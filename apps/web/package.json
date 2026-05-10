@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "prisma generate --schema prisma/schema.prisma",
     "dev": "next dev",
+    "prebuild": "prisma generate --schema prisma/schema.prisma",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

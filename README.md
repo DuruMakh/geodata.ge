@@ -17,8 +17,18 @@ The Next.js app lives in `apps/web`.
 ```powershell
 cd apps/web
 npm install
+npm run prisma:generate
 npm run dev
 ```
+
+For local development, create `apps/web/.env` from the root `.env.example` shape before running Prisma, dev, or build commands:
+
+```ini
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/geodata"
+DIRECT_URL="postgresql://postgres:postgres@localhost:5432/geodata"
+```
+
+`npm run dev` and `npm run build` run Prisma Client generation first, so a fresh clone does not depend on an already-generated local client.
 
 ## Data Foundation
 
