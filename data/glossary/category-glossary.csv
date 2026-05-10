@@ -1,0 +1,26 @@
+id,ka_label,en_label,description,notes
+spending.social_protection,სოციალური დაცვა,Social protection,Public spending field for social protection and welfare programs,Review mappings against official program rows
+spending.health,ჯანდაცვა,Health,Public spending field for health-related spending,Review mixed health/social programs carefully
+spending.education,განათლება,Education,Public spending field for education-related spending,Use for education programs and institutions
+spending.defence,თავდაცვა,Defence,Public spending field for defence-related spending,Use for defence budget rows
+spending.public_order_safety,საზოგადოებრივი წესრიგი და უსაფრთხოება,Public order and safety,Public spending field for public order and safety,Use for police/security/justice rows where appropriate
+spending.infrastructure_regional_development,ინფრასტრუქტურა და რეგიონული განვითარება,Infrastructure and regional development,Public spending field for infrastructure and regional development,Review municipal-transfer boundary before future versions
+spending.economic_affairs,ეკონომიკური საქმიანობა,Economic affairs,Public spending field for economic affairs,Use for economy/business/support programs
+spending.agriculture_environment,სოფლის მეურნეობა და გარემო,Agriculture and environment,Public spending field for agriculture and environment,User-approved combined category
+spending.culture,კულტურა,Culture,Public spending field for culture,Separated from sport by user decision
+spending.sport,სპორტი,Sport,Public spending field for sport,Separated from culture by user decision
+spending.general_public_services,საერთო სახელმწიფო მომსახურება,General public services,Public spending field for general public services,Review debt rows separately
+spending.debt_service,ვალის მომსახურება,Debt service,Public spending field for debt service expenditure,Separate field; not a debt explorer
+spending.other_unclassified,სხვა / დაუკლასიფიცირებელი,Other / unclassified,Explicit bucket for rows not confidently mapped,No rows may disappear silently
+revenue.vat,დამატებული ღირებულების გადასახადი,VAT,Top-level revenue category,Source-confirmed label
+revenue.income_tax,საშემოსავლო გადასახადი,Income tax,Top-level revenue category,Source-confirmed label
+revenue.profit_tax,მოგების გადასახადი,Profit tax,Top-level revenue category,Source-confirmed label
+revenue.excise_tax,აქციზის გადასახადი,Excise tax,Top-level revenue category,Source-confirmed label
+revenue.import_tax,იმპორტის გადასახადი,Import tax,Top-level revenue category,Source-confirmed label
+revenue.property_tax,ქონების გადასახადი,Property tax,Top-level revenue category,Source-confirmed label
+revenue.other_taxes,სხვა გადასახადები,Other taxes,Top-level revenue category,Source-confirmed label
+revenue.grants,გრანტები,Grants,Top-level revenue category,Source-confirmed label
+revenue.other_revenue,სხვა შემოსავლები,Other revenue,Top-level revenue category,Source-confirmed label
+revenue.decrease_non_financial_assets,არაფინანსური აქტივების კლება,Decrease in non-financial assets,Top-level revenue category,Confirm against source before production
+revenue.decrease_financial_assets,ფინანსური აქტივების კლება,Decrease in financial assets,Top-level revenue category,Confirm against source before production
+revenue.increase_liabilities,ვალდებულებების ზრდა,Increase in liabilities,Top-level revenue category,Confirm against source before production

@@ -1,0 +1,98 @@
+[
+  {
+    "id": "revenue.vat",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "დამატებული ღირებულების გადასახადი",
+    "enLabel": "VAT",
+    "sortOrder": 10
+  },
+  {
+    "id": "revenue.income_tax",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "საშემოსავლო გადასახადი",
+    "enLabel": "Income tax",
+    "sortOrder": 20
+  },
+  {
+    "id": "revenue.profit_tax",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "მოგების გადასახადი",
+    "enLabel": "Profit tax",
+    "sortOrder": 30
+  },
+  {
+    "id": "revenue.excise_tax",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "აქციზის გადასახადი",
+    "enLabel": "Excise tax",
+    "sortOrder": 40
+  },
+  {
+    "id": "revenue.import_tax",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "იმპორტის გადასახადი",
+    "enLabel": "Import tax",
+    "sortOrder": 50
+  },
+  {
+    "id": "revenue.property_tax",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "ქონების გადასახადი",
+    "enLabel": "Property tax",
+    "sortOrder": 60
+  },
+  {
+    "id": "revenue.other_taxes",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "სხვა გადასახადები",
+    "enLabel": "Other taxes",
+    "sortOrder": 70
+  },
+  {
+    "id": "revenue.grants",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "გრანტები",
+    "enLabel": "Grants",
+    "sortOrder": 80
+  },
+  {
+    "id": "revenue.other_revenue",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "სხვა შემოსავლები",
+    "enLabel": "Other revenue",
+    "sortOrder": 90
+  },
+  {
+    "id": "revenue.decrease_non_financial_assets",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "არაფინანსური აქტივების კლება",
+    "enLabel": "Decrease in non-financial assets",
+    "sortOrder": 100
+  },
+  {
+    "id": "revenue.decrease_financial_assets",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "ფინანსური აქტივების კლება",
+    "enLabel": "Decrease in financial assets",
+    "sortOrder": 110
+  },
+  {
+    "id": "revenue.increase_liabilities",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "ვალდებულებების ზრდა",
+    "enLabel": "Increase in liabilities",
+    "sortOrder": 120
+  }
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "id": "spending.social_protection",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "სოციალური დაცვა",
+    "enLabel": "Social protection",
+    "sortOrder": 10
+  },
+  {
+    "id": "spending.health",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "ჯანდაცვა",
+    "enLabel": "Health",
+    "sortOrder": 20
+  },
+  {
+    "id": "spending.education",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "განათლება",
+    "enLabel": "Education",
+    "sortOrder": 30
+  },
+  {
+    "id": "spending.defence",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "თავდაცვა",
+    "enLabel": "Defence",
+    "sortOrder": 40
+  },
+  {
+    "id": "spending.public_order_safety",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "საზოგადოებრივი წესრიგი და უსაფრთხოება",
+    "enLabel": "Public order and safety",
+    "sortOrder": 50
+  },
+  {
+    "id": "spending.infrastructure_regional_development",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "ინფრასტრუქტურა და რეგიონული განვითარება",
+    "enLabel": "Infrastructure and regional development",
+    "sortOrder": 60
+  },
+  {
+    "id": "spending.economic_affairs",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "ეკონომიკური საქმიანობა",
+    "enLabel": "Economic affairs",
+    "sortOrder": 70
+  },
+  {
+    "id": "spending.agriculture_environment",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "სოფლის მეურნეობა და გარემო",
+    "enLabel": "Agriculture and environment",
+    "sortOrder": 80
+  },
+  {
+    "id": "spending.culture",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "კულტურა",
+    "enLabel": "Culture",
+    "sortOrder": 90
+  },
+  {
+    "id": "spending.sport",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "სპორტი",
+    "enLabel": "Sport",
+    "sortOrder": 100
+  },
+  {
+    "id": "spending.general_public_services",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "საერთო სახელმწიფო მომსახურება",
+    "enLabel": "General public services",
+    "sortOrder": 110
+  },
+  {
+    "id": "spending.debt_service",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "ვალის მომსახურება",
+    "enLabel": "Debt service",
+    "sortOrder": 120
+  },
+  {
+    "id": "spending.other_unclassified",
+    "side": "expenditure",
+    "level": "public_spending_field",
+    "kaLabel": "სხვა / დაუკლასიფიცირებელი",
+    "enLabel": "Other / unclassified",
+    "sortOrder": 999
+  }
+]

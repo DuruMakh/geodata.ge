@@ -1,0 +1,4 @@
+year,official_institution,official_program,official_subprogram,public_spending_field_id,mapping_confidence,mapping_notes
+2025,Ministry of Internally Displaced Persons Labour Health and Social Affairs,Healthcare program,,spending.health,high,Sample row for foundation validation
+2025,Ministry of Education Science and Youth,General education program,,spending.education,high,Sample row for foundation validation
+2026,Ministry of Internally Displaced Persons Labour Health and Social Affairs,Social protection program,,spending.social_protection,medium,Sample row; review final source mapping
