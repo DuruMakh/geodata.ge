@@ -30,3 +30,14 @@ Root data files live under `data/`.
 - `data/imports`: reviewed import files and sample imports.
 - `data/sources`: source document metadata.
 - `data/reports`: generated internal import validation reports.
+
+## Encoding
+
+All source files containing Georgian text must be UTF-8.
+
+Before importing or exporting data, verify Georgian labels render correctly in:
+
+- source files under `data/`
+- import reports under `data/reports/`
+- browser UI
+- CSV exports opened in spreadsheet software
