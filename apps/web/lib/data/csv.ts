@@ -5,7 +5,7 @@ import path from "node:path";
 export type CsvRecord = Record<string, string>;
 
 export async function readCsvRecords(relativePath: string): Promise<CsvRecord[]> {
-  const filePath = path.resolve(process.cwd(), relativePath);
+  const filePath = path.resolve(/* turbopackIgnore: true */ process.cwd(), relativePath);
   const content = await readFile(filePath, "utf8");
 
   return parse(content, {
