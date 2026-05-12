@@ -13,8 +13,8 @@ async function main() {
   const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
   const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
   const mappings = await loadSpendingMappings("../../data/mappings/spending-field-mapping.csv");
-  const facts = await loadBudgetFactRows("../../data/imports/sample-budget-facts.csv");
-  const report = buildImportReport("sample-budget-facts", facts);
+  const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+  const report = buildImportReport("real-expenditure-2023-2025", facts);
   const missingGlossary = taxonomy.filter((item) => !glossary.has(item.id));
 
   if (missingGlossary.length > 0) {
@@ -25,7 +25,7 @@ async function main() {
 
   const reportPath = path.resolve(
     process.cwd(),
-    "../../data/reports/sample-budget-facts-report.json",
+    "../../data/reports/real-expenditure-2023-2025-import-report.json",
   );
 
   await writeFile(reportPath, JSON.stringify(report, null, 2), "utf8");
