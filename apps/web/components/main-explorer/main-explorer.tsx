@@ -55,9 +55,8 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
     endYear: modelEndYear,
     measure,
   });
-  const totalRow = model.tableRows.find((row) => row.itemId === `${side}.total`);
   const latestYear = model.years.at(-1);
-  const latestTotal = latestYear === undefined ? null : totalRow?.valuesByYear[latestYear] ?? null;
+  const latestTotal = latestYear === undefined ? null : model.totalRow?.valuesByYear[latestYear] ?? null;
   const selectorRows = [...model.tableRows, ...model.comparisonRows];
 
   function handleStartYearChange(year: number) {

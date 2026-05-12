@@ -62,6 +62,47 @@ describe("main explorer data model", () => {
       sourceUrlOrFile: "docs/source-2026",
       lastReviewedAt: "2026-05-11",
     });
+    expect(model.summary.biggestShareChange).not.toBeNull();
+  });
+
+  it("keeps the active side total available when the total series is not selected", () => {
+    const model = buildExplorerModel({
+      facts,
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: ["spending.health"],
+      startYear: 2025,
+      endYear: 2026,
+      measure: "nominal",
+    });
+
+    expect(model.tableRows.map((row) => row.itemId)).toEqual(["spending.health"]);
+    expect(model.totalRow?.itemId).toBe("expenditure.total");
+    expect(model.totalRow?.valuesByYear[2026]).toBe(450);
+  });
+
+  it("treats the biggest share-of-total change as the largest movement in either direction", () => {
+    const localFacts: BudgetFactImportRow[] = [
+      { ...facts[0], itemId: "spending.health", amountGel: 900 },
+      { ...facts[1], itemId: "spending.health", amountGel: 100 },
+      { ...facts[2], itemId: "spending.education", amountGel: 100 },
+      { ...facts[3], itemId: "spending.education", amountGel: 250 },
+      { ...facts[2], itemId: "spending.social", amountGel: 100 },
+      { ...facts[3], itemId: "spending.social", amountGel: 150 },
+    ];
+
+    const model = buildExplorerModel({
+      facts: localFacts,
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: ["expenditure.total"],
+      startYear: 2025,
+      endYear: 2026,
+      measure: "nominal",
+    });
+
     expect(model.summary.biggestShareChange?.itemId).toBe("spending.health");
   });
 

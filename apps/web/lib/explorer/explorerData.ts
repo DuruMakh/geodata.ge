@@ -44,6 +44,7 @@ export type ExplorerModel = {
   selectedItems: ExplorerItem[];
   points: ExplorerPoint[];
   tableRows: ExplorerTableRow[];
+  totalRow: ExplorerTableRow | null;
   comparisonRows: ExplorerTableRow[];
   summary: PeriodSummary;
   topGrowth: ExplorerTableRow[];
@@ -110,6 +111,10 @@ function absoluteIncrease(row: ExplorerTableRow, startYear: number, endYear: num
   return end - start;
 }
 
+function shareChangeFor(row: ExplorerTableRow, totalRow: ExplorerTableRow | null, startYear: number): number {
+  return (row.shareEndYear ?? 0) - shareForYear(row, totalRow, startYear);
+}
+
 function buildSummary(rows: ExplorerTableRow[], totalRow: ExplorerTableRow | null, years: number[]): {
   summary: PeriodSummary;
   topGrowth: ExplorerTableRow[];
@@ -139,9 +144,7 @@ function buildSummary(rows: ExplorerTableRow[], totalRow: ExplorerTableRow | nul
     (a, b) => (absoluteIncrease(b, startYear, endYear) ?? -Infinity) - (absoluteIncrease(a, startYear, endYear) ?? -Infinity),
   );
   const sortedShareChange = [...comparableRows].sort(
-    (a, b) =>
-      ((b.shareEndYear ?? 0) - shareForYear(b, totalRow, startYear)) -
-      ((a.shareEndYear ?? 0) - shareForYear(a, totalRow, startYear)),
+    (a, b) => Math.abs(shareChangeFor(b, totalRow, startYear)) - Math.abs(shareChangeFor(a, totalRow, startYear)),
   );
 
   return {
@@ -303,6 +306,7 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     selectedItems,
     points: selectedPoints,
     tableRows: selectedRows,
+    totalRow,
     comparisonRows: allItemRows,
     summary,
     topGrowth,

@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "test:browser": "playwright test",
     "test:watch": "vitest",
     "data:validate": "tsx scripts/validate-data-files.ts",
     "data:import": "tsx scripts/import-budget-facts.ts",
@@ -29,6 +30,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

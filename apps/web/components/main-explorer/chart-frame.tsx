@@ -32,8 +32,28 @@ type ChartDatum = {
   [key: string]: string | number | null | undefined;
 };
 
+const CHART_HEIGHT = 396;
+const INITIAL_CHART_DIMENSION = { width: 900, height: CHART_HEIGHT };
+
 function chartKey(itemId: string): string {
   return itemId.replace(/[^a-z0-9]/gi, "_");
+}
+
+function renderPointDot(props: { cx?: number; cy?: number; payload?: ChartDatum; stroke?: string }, key: string) {
+  if (props.cx === undefined || props.cy === undefined) return null;
+
+  const planned = props.payload?.[`${key}Basis`] === "planned";
+
+  return (
+    <circle
+      cx={props.cx}
+      cy={props.cy}
+      r={planned ? 5 : 3}
+      fill={planned ? "#facc15" : "#05070b"}
+      stroke={planned ? "#facc15" : props.stroke ?? "#22d3ee"}
+      strokeWidth={2}
+    />
+  );
 }
 
 export function ChartFrame({ mode, measure, years, points, selectedItems }: ChartFrameProps) {
@@ -52,7 +72,7 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
 
     return (
       <div className="h-[420px] border border-cyan-400/20 bg-black/40 p-3">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
           <BarChart data={barRows} margin={{ top: 20, right: 16, bottom: 72, left: 18 }}>
             <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
             <XAxis dataKey="kaLabel" stroke="#a1a1aa" tick={{ fontSize: 12 }} angle={-35} textAnchor="end" interval={0} />
@@ -84,7 +104,7 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
 
   return (
     <div className="h-[420px] border border-cyan-400/20 bg-black/40 p-3">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
         <LineChart data={rows} margin={{ top: 18, right: 24, bottom: 12, left: 18 }}>
           <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
           <XAxis dataKey="year" stroke="#a1a1aa" tick={{ fontSize: 12 }} />
@@ -95,7 +115,6 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
           />
           {selectedItems.map((item) => {
             const key = chartKey(item.id);
-            const hasPlanned = points.some((point) => point.itemId === item.id && point.basis === "planned");
 
             return (
               <Line
@@ -105,8 +124,7 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
                 name={item.kaLabel}
                 stroke={item.color}
                 strokeWidth={2}
-                strokeDasharray={hasPlanned ? "5 5" : undefined}
-                dot={{ r: hasPlanned ? 4 : 3, strokeWidth: 2 }}
+                dot={(props) => renderPointDot(props, key)}
                 activeDot={{ r: 5 }}
                 connectNulls
               />
