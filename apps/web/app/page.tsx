@@ -5,7 +5,7 @@ import { loadSourceDocuments } from "../lib/data/sources";
 
 export default async function Home() {
   const [facts, glossary, sourceDocuments] = await Promise.all([
-    loadBudgetFactRows("../../data/imports/sample-budget-facts.csv"),
+    loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv"),
     loadGlossary("../../data/glossary/category-glossary.csv"),
     loadSourceDocuments("../../data/sources/source-documents.csv"),
   ]);

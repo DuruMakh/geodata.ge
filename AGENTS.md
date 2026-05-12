@@ -25,7 +25,21 @@ Update the project-specific sections when:
 
 Do not casually rewrite the Engineering Behavior section. Only change it if the user explicitly asks or if there is a clear project-wide reason.
 
+Prefer links to canonical docs over re-summarizing them.
+
 Do not duplicate the full design spec here. Link to the spec and record only the rules that future agents need before engaging with the project.
+
+## Context Discipline
+
+Keep persistent agent context small, current, and non-duplicative.
+
+- Keep `AGENTS.md` short: operational rules and durable non-negotiables only.
+- Do not duplicate full specs, plans, schemas, file trees, command logs, or recent-commit summaries here.
+- Store product decisions in the design spec, implementation steps in plan files, and current stack/workflow facts here only when they affect every future agent.
+- Before adding persistent context, ask: could a future agent recover this from repo files, git history, or a plan in under 30 seconds? If yes, do not add it.
+- Capture durable decisions, rejected alternatives, and project-specific footguns that are not obvious from code.
+- Make staleness visible: update project-specific sections when v1 becomes v2, the stack changes, source-of-truth docs move, or a major workflow decision changes.
+- If context grows large, split detail into a canonical doc and link to it instead of expanding this file.
 
 ## Engineering Behavior
 
@@ -110,7 +124,7 @@ Current stack:
 - Prisma.
 - Tailwind plus shadcn or a disciplined component layer.
 
-The workspace is currently not a git repository unless that changes. Check git state before promising commits, branches, or PRs.
+The workspace is a git repository on `main` with a GitHub `origin` remote. Check git state before promising commits, branches, pushes, or PRs.
 
 ## V1 Non-Negotiables
 

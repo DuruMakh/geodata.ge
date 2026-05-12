@@ -13,6 +13,8 @@
     "test:browser": "playwright test",
     "test:watch": "vitest",
     "data:validate": "tsx scripts/validate-data-files.ts",
+    "data:extract-expenditure": "tsx scripts/extract-real-expenditure.ts",
+    "data:generate-expenditure-facts": "tsx scripts/generate-real-expenditure-facts.ts",
     "data:import": "tsx scripts/import-budget-facts.ts",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev"
@@ -27,6 +29,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
+    "xlsx": "^0.18.5",
     "zod": "^4.4.3"
   },
   "devDependencies": {
