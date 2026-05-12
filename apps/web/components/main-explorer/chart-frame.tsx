@@ -69,6 +69,7 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
     const barRows = [...points]
       .filter((point) => point.value !== null)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
+    const colorByItemId = new Map(selectedItems.map((item) => [item.id, item.color]));
 
     return (
       <div className="h-[420px] border border-cyan-400/20 bg-black/40 p-3">
@@ -83,7 +84,11 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
             />
             <Bar dataKey="value" radius={[3, 3, 0, 0]}>
               {barRows.map((row) => (
-                <Cell key={row.itemId} fill={row.basis === "planned" ? "#facc15" : "#22d3ee"} />
+                <Cell
+                  key={row.itemId}
+                  fill={colorByItemId.get(row.itemId) ?? "#22d3ee"}
+                  opacity={row.basis === "planned" ? 0.6 : 1}
+                />
               ))}
             </Bar>
           </BarChart>
