@@ -8,7 +8,9 @@ import type { SourceDocumentRow } from "../../lib/data/sources";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
 import { formatGel } from "../../lib/explorer/format";
+import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 import { MAX_CHART_SERIES, type ChartMode, type ExplorerSide, type MeasureMode, type ViewMode } from "../../lib/explorer/types";
+import { SingleYearSnapshot } from "../single-year/single-year-snapshot";
 import { ExplorerControls } from "./explorer-controls";
 import { ExplorerTable } from "./explorer-table";
 import { PeriodSummaryPanel } from "./period-summary";
@@ -56,6 +58,13 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
     startYear: modelStartYear,
     endYear: modelEndYear,
     measure,
+  });
+  const singleYearModel = buildSingleYearSnapshotModel({
+    facts,
+    glossary,
+    sourceDocuments,
+    side,
+    year: singleYear,
   });
   const latestYear = model.years.at(-1);
   const latestTotal = latestYear === undefined ? null : model.totalRow?.valuesByYear[latestYear] ?? null;
@@ -115,7 +124,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
 
   return (
     <main className="min-h-screen bg-background px-4 py-4 text-foreground sm:px-6 lg:px-8">
-      <section className="grid min-h-[calc(100vh-2rem)] gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <section className={`grid min-h-[calc(100vh-2rem)] gap-5 ${viewMode === "multi_year" ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
         <div className="order-1 flex min-w-0 flex-col gap-4 lg:order-none">
           <header className="border border-cyan-400/20 bg-black/50 p-4">
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -167,7 +176,9 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
             </div>
           </div>
 
-          {model.unavailableReason ? (
+          {viewMode === "single_year" ? (
+            <SingleYearSnapshot model={singleYearModel} />
+          ) : model.unavailableReason ? (
             <div className="border border-amber-300/30 bg-amber-300/10 p-6 text-sm text-amber-100">{model.unavailableReason}</div>
           ) : chartMode === "table" ? (
             <ExplorerTable rows={model.tableRows} years={model.years} />
@@ -181,28 +192,32 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
           </p>
         </div>
 
-        <div className="order-2 lg:order-none">
-          <SeriesSelector
-            items={model.items}
-            selectedIds={selectedIds}
-            rows={selectorRows}
-            years={model.years}
-            chartMode={chartMode}
-            limitMessage={limitMessage}
-            onToggle={handleToggle}
-          />
-        </div>
+        {viewMode === "multi_year" ? (
+          <div className="order-2 lg:order-none">
+            <SeriesSelector
+              items={model.items}
+              selectedIds={selectedIds}
+              rows={selectorRows}
+              years={model.years}
+              chartMode={chartMode}
+              limitMessage={limitMessage}
+              onToggle={handleToggle}
+            />
+          </div>
+        ) : null}
       </section>
 
-      <section className="mt-8 pb-12">
-        <PeriodSummaryPanel
-          years={model.years}
-          summary={model.summary}
-          rows={model.comparisonRows}
-          topGrowth={model.topGrowth}
-          bottomGrowth={model.bottomGrowth}
-        />
-      </section>
+      {viewMode === "multi_year" ? (
+        <section className="mt-8 pb-12">
+          <PeriodSummaryPanel
+            years={model.years}
+            summary={model.summary}
+            rows={model.comparisonRows}
+            topGrowth={model.topGrowth}
+            bottomGrowth={model.bottomGrowth}
+          />
+        </section>
+      ) : null}
     </main>
   );
 }
