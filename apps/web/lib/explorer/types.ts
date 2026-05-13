@@ -1,8 +1,10 @@
 export const EXPLORER_SIDES = ["expenditure", "revenue"] as const;
+export const VIEW_MODES = ["multi_year", "single_year"] as const;
 export const CHART_MODES = ["line", "bar", "table"] as const;
 export const MEASURE_MODES = ["nominal", "percent_change", "share_of_total", "share_of_gdp"] as const;
 
 export type ExplorerSide = (typeof EXPLORER_SIDES)[number];
+export type ViewMode = (typeof VIEW_MODES)[number];
 export type ChartMode = (typeof CHART_MODES)[number];
 export type MeasureMode = (typeof MEASURE_MODES)[number];
 
@@ -52,4 +54,51 @@ export type PeriodSummary = {
   fastestGrowth: ExplorerTableRow | null;
   lowestGrowth: ExplorerTableRow | null;
   biggestShareChange: ExplorerTableRow | null;
+};
+
+export type SnapshotItem = {
+  itemId: string;
+  kaLabel: string;
+  enLabel: string;
+  color: string;
+  amountGel: number;
+  shareOfTotal: number;
+  previousAmountGel: number | null;
+  changeFromPreviousYear: number | null;
+  amountChangeFromPreviousYear: number | null;
+  basis: "actual" | "planned";
+  source: SourceMetadata;
+};
+
+export type Every100Item = {
+  itemId: string;
+  kaLabel: string;
+  enLabel: string;
+  color: string;
+  gelFrom100: number;
+  exactShare: number;
+};
+
+export type SnapshotHeadline = {
+  id: string;
+  label: string;
+  value: string;
+  detail: string;
+};
+
+export type SingleYearSnapshotModel = {
+  side: ExplorerSide;
+  year: number;
+  previousYear: number | null;
+  totalGel: number;
+  basis: "actual" | "planned";
+  hasPlannedValues: boolean;
+  source: SourceMetadata;
+  headlineCards: SnapshotHeadline[];
+  items: SnapshotItem[];
+  every100: Every100Item[];
+  petals: SnapshotItem[];
+  rankingRows: SnapshotItem[];
+  hasGrowthData: boolean;
+  emptyReason: string | null;
 };
