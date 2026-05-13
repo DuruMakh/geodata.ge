@@ -3,6 +3,7 @@ import { loadGlossary } from "../../lib/data/glossary";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadSourceDocuments } from "../../lib/data/sources";
 import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
+import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
 describe("explorer integration with real CSV data", () => {
   it("loads sample facts and produces the expected year range", async () => {
@@ -73,5 +74,45 @@ describe("explorer integration with real CSV data", () => {
     const itemIds = [...new Set(facts.map((fact) => fact.itemId))];
     const missingGlossary = itemIds.filter((itemId) => !glossary.has(itemId));
     expect(missingGlossary).toEqual([]);
+  });
+
+  it("builds a non-empty single-year expenditure snapshot from real facts", async () => {
+    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
+    const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
+
+    const model = buildSingleYearSnapshotModel({
+      facts,
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      year: 2025,
+    });
+
+    expect(model.emptyReason).toBeNull();
+    expect(model.totalGel).toBeGreaterThan(0);
+    expect(model.items.length).toBeGreaterThan(5);
+    expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
+    expect(model.rankingRows.length).toBeGreaterThan(1);
+    const first = model.rankingRows[0];
+    const second = model.rankingRows[1];
+    expect(first?.amountGel).toBeGreaterThanOrEqual(second?.amountGel ?? 0);
+  });
+
+  it("returns a revenue empty state for current real facts", async () => {
+    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
+    const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
+
+    const model = buildSingleYearSnapshotModel({
+      facts,
+      glossary,
+      sourceDocuments,
+      side: "revenue",
+      year: 2025,
+    });
+
+    expect(model.items).toEqual([]);
+    expect(model.emptyReason).toBe("ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული.");
   });
 });
