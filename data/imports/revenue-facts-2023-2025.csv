@@ -1,10 +1,28 @@
 year,side,item_id,amount_gel,basis,source_id,official_institution,official_program,official_subprogram,public_spending_field_id,mapping_confidence,mapping_notes
-2023,revenue,revenue.taxes_total,16994174887,actual,source.mof_2023_tavi1_actual,,,,,,Source row: გადასახადები
-2023,revenue,revenue.grants,325789758,actual,source.mof_2023_tavi1_actual,,,,,,Source row: გრანტები
-2023,revenue,revenue.other_revenue,1396519791,actual,source.mof_2023_tavi1_actual,,,,,,Source row: სხვა შემოსავლები
-2024,revenue,revenue.taxes_total,20196546453,actual,source.mof_2024_tavi1_actual,,,,,,Source row: გადასახადები
-2024,revenue,revenue.grants,335871131,actual,source.mof_2024_tavi1_actual,,,,,,Source row: გრანტები
-2024,revenue,revenue.other_revenue,1316418498,actual,source.mof_2024_tavi1_actual,,,,,,Source row: სხვა შემოსავლები
-2025,revenue,revenue.taxes_total,21957477800,actual,source.mof_2025_tavi1_actual,,,,,,Source row: გადასახადები
-2025,revenue,revenue.grants,279567800,actual,source.mof_2025_tavi1_actual,,,,,,Source row: გრანტები
-2025,revenue,revenue.other_revenue,1754706600,actual,source.mof_2025_tavi1_actual,,,,,,Source row: სხვა შემოსავლები
+2023,revenue,revenue.vat,8387241707,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
+2023,revenue,revenue.income_tax,6071356714,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
+2023,revenue,revenue.profit_tax,2018166538,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
+2023,revenue,revenue.excise_tax,2270263894,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
+2023,revenue,revenue.import_tax,151212050,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
+2023,revenue,revenue.property_tax,648341799,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.3: გადასახადები ქონებაზე
+2023,revenue,revenue.other_taxes,186037053,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
+2023,revenue,revenue.grants,200516597,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები
+2023,revenue,revenue.other_revenue,2059408954,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები
+2024,revenue,revenue.vat,9331846717,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
+2024,revenue,revenue.income_tax,7250478710,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
+2024,revenue,revenue.profit_tax,3117548526,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
+2024,revenue,revenue.excise_tax,2488024918,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
+2024,revenue,revenue.import_tax,138902348,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
+2024,revenue,revenue.property_tax,697679276,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.3: გადასახადები ქონებაზე
+2024,revenue,revenue.other_taxes,265524346,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
+2024,revenue,revenue.grants,198330607,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები
+2024,revenue,revenue.other_revenue,2083608794,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები
+2025,revenue,revenue.vat,10158086603,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
+2025,revenue,revenue.income_tax,8261217582,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
+2025,revenue,revenue.profit_tax,2881352179,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
+2025,revenue,revenue.excise_tax,2728646345,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
+2025,revenue,revenue.import_tax,146620436,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
+2025,revenue,revenue.property_tax,801093482,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.3: გადასახადები ქონებაზე
+2025,revenue,revenue.other_taxes,559333444,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
+2025,revenue,revenue.grants,123020970,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები
+2025,revenue,revenue.other_revenue,2646820211,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები

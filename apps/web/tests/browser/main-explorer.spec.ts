@@ -21,7 +21,7 @@ for (const host of previewHosts) {
 
     await page.getByTestId("side-revenue").click();
 
-    await expect(page.locator("aside")).toContainText("გადასახადები სულ");
+    await expect(page.locator("aside")).toContainText("დამატებული ღირებულების გადასახადი");
     await expect(page.locator(".recharts-wrapper")).toBeVisible();
     await expect(page.locator('path.recharts-line-curve[stroke-dasharray="5 5"]')).toHaveCount(0);
     expect(consoleProblems).toEqual([]);
@@ -57,7 +57,7 @@ test("single-year snapshot renders sections and revenue data", async ({ page }) 
 
   await page.getByTestId("side-revenue").click();
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
-  await expect(page.getByTestId("single-year-ranking")).toContainText("გადასახადები სულ");
+  await expect(page.getByTestId("single-year-ranking")).toContainText("დამატებული ღირებულების გადასახადი");
 
   expect(consoleProblems).toEqual([]);
 });

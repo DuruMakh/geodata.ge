@@ -29,4 +29,13 @@ describe("budget fact import validation", () => {
 
     expect(expenditureRows.every((row) => row.publicSpendingFieldId)).toBe(true);
   });
+
+  it("allows negative revenue correction rows but still rejects negative expenditure", async () => {
+    const rows = await loadBudgetFactRows("tests/fixtures/negative-revenue-facts.csv");
+
+    expect(rows.find((row) => row.itemId === "revenue.property_tax")?.amountGel).toBe(-11010);
+    await expect(loadBudgetFactRows("tests/fixtures/negative-expenditure-facts.csv")).rejects.toThrow(
+      "expenditure amount_gel must not be negative",
+    );
+  });
 });

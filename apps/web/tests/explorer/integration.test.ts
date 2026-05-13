@@ -90,8 +90,25 @@ describe("explorer integration with real CSV data", () => {
     expect(model.unavailableReason).toBeNull();
     expect(model.totalRow?.valuesByYear[2025]).toBeGreaterThan(0);
     expect(model.comparisonRows.map((row) => row.itemId)).toEqual(
-      expect.arrayContaining(["revenue.taxes_total", "revenue.grants", "revenue.other_revenue"]),
+      expect.arrayContaining(["revenue.vat", "revenue.income_tax", "revenue.grants", "revenue.other_revenue"]),
     );
+  });
+
+  it("keeps real revenue facts reconciled by year", async () => {
+    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const revenueFacts = facts.filter((fact) => fact.side === "revenue");
+    const expectedTotalsByYear = new Map([
+      [2023, 21992545306],
+      [2024, 25571944242],
+      [2025, 28306191252],
+    ]);
+
+    for (const [year, expectedTotalGel] of expectedTotalsByYear) {
+      const yearFacts = revenueFacts.filter((fact) => fact.year === year);
+
+      expect(yearFacts).toHaveLength(9);
+      expect(yearFacts.reduce((sum, fact) => sum + fact.amountGel, 0)).toBe(expectedTotalGel);
+    }
   });
 
   it("has glossary entries for every sample fact item", async () => {
@@ -126,7 +143,7 @@ describe("explorer integration with real CSV data", () => {
     expect(first?.amountGel).toBeGreaterThanOrEqual(second?.amountGel ?? 0);
   });
 
-  it("keeps single-year revenue source-backed but aggregate-only", async () => {
+  it("keeps single-year revenue source-backed with public tax categories", async () => {
     const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
@@ -141,7 +158,7 @@ describe("explorer integration with real CSV data", () => {
 
     expect(model.emptyReason).toBeNull();
     expect(model.items.map((item) => item.itemId)).toEqual(
-      expect.arrayContaining(["revenue.taxes_total", "revenue.grants", "revenue.other_revenue"]),
+      expect.arrayContaining(["revenue.vat", "revenue.income_tax", "revenue.grants", "revenue.other_revenue"]),
     );
   });
 });
