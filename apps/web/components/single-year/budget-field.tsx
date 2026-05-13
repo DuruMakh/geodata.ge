@@ -19,6 +19,10 @@ type BudgetFieldDatum = {
   growthValue: number;
 };
 
+type SnapshotItemWithGrowth = SnapshotItem & {
+  changeFromPreviousYear: number;
+};
+
 const CHART_HEIGHT = 360;
 const INITIAL_CHART_DIMENSION = { width: 760, height: CHART_HEIGHT };
 
@@ -44,21 +48,23 @@ function BudgetFieldTooltip({ active, payload }: TooltipContentProps) {
 }
 
 export function BudgetField({ items, hasGrowthData }: BudgetFieldProps) {
-  const data: BudgetFieldDatum[] = items.map((item) => ({
-    itemId: item.itemId,
-    kaLabel: item.kaLabel,
-    color: item.color,
-    amountGel: item.amountGel,
-    shareOfTotal: item.shareOfTotal,
-    changeFromPreviousYear: item.changeFromPreviousYear,
-    growthValue: item.changeFromPreviousYear ?? 0,
-  }));
+  const data: BudgetFieldDatum[] = items
+    .filter((item): item is SnapshotItemWithGrowth => item.changeFromPreviousYear !== null)
+    .map((item) => ({
+      itemId: item.itemId,
+      kaLabel: item.kaLabel,
+      color: item.color,
+      amountGel: item.amountGel,
+      shareOfTotal: item.shareOfTotal,
+      changeFromPreviousYear: item.changeFromPreviousYear,
+      growthValue: item.changeFromPreviousYear,
+    }));
 
   return (
     <section data-testid="budget-field" className="mt-4 min-w-[760px]">
       <h3 className="mb-3 text-lg font-semibold text-white">Budget Field</h3>
       <div className="h-[400px] border border-cyan-400/20 bg-black/40 p-3">
-        {hasGrowthData ? (
+        {hasGrowthData && data.length > 0 ? (
           <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
             <ScatterChart margin={{ top: 16, right: 24, bottom: 24, left: 12 }}>
               <CartesianGrid stroke="rgba(34, 211, 238, 0.16)" strokeDasharray="3 3" />

@@ -27,7 +27,7 @@ export function SpendingPetals({ items }: SpendingPetalsProps) {
             const cy = CENTER + Math.sin(angle) * 58;
             const labelX = CENTER + Math.cos(angle) * 116;
             const labelY = CENTER + Math.sin(angle) * 116;
-            const showLabel = item.shareOfTotal >= 0.08;
+            const showLabel = item.shareOfTotal >= 0.1 && item.kaLabel.length <= 18;
 
             return (
               <g key={item.itemId}>
