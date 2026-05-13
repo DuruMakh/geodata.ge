@@ -68,6 +68,9 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
   });
   const latestYear = model.years.at(-1);
   const latestTotal = latestYear === undefined ? null : model.totalRow?.valuesByYear[latestYear] ?? null;
+  const headerYear = viewMode === "single_year" ? singleYearModel.year : latestYear;
+  const headerTotal = viewMode === "single_year" ? singleYearModel.totalGel : latestTotal;
+  const hasPlannedValues = viewMode === "single_year" ? singleYearModel.hasPlannedValues : model.hasPlannedValues;
   const selectorRows = [...model.tableRows, ...model.comparisonRows];
 
   function handleStartYearChange(year: number) {
@@ -136,9 +139,9 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
                 </p>
               </div>
               <div className="border border-lime-300/20 bg-lime-300/10 px-4 py-3 text-right">
-                <p className="font-mono text-xs uppercase text-lime-200">{latestYear ?? "n/a"}</p>
-                <p className="mt-1 text-lg font-semibold text-white">{formatGel(latestTotal)}</p>
-                {model.hasPlannedValues ? <p className="mt-1 text-xs text-amber-200">გეგმური მნიშვნელობა აქტიურია</p> : null}
+                <p className="font-mono text-xs uppercase text-lime-200">{headerYear ?? "n/a"}</p>
+                <p className="mt-1 text-lg font-semibold text-white">{formatGel(headerTotal)}</p>
+                {hasPlannedValues ? <p className="mt-1 text-xs text-amber-200">გეგმური მნიშვნელობა აქტიურია</p> : null}
               </div>
             </div>
           </header>
@@ -188,7 +191,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
 
           <p className="text-xs text-zinc-500">
             მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები. ბოლო განახლება: {lastUpdatedAt}.
-            {model.hasPlannedValues ? " აქტიურ მნიშვნელობებში არის გეგმური ბიუჯეტის მონაცემები." : ""}
+            {hasPlannedValues ? " აქტიურ მნიშვნელობებში არის გეგმური ბიუჯეტის მონაცემები." : ""}
           </p>
         </div>
 
