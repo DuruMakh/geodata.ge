@@ -93,7 +93,10 @@ describe("explorer integration with real CSV data", () => {
     expect(model.totalGel).toBeGreaterThan(0);
     expect(model.items.length).toBeGreaterThan(5);
     expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
-    expect(model.rankingRows[0]?.amountGel ?? 0).toBeGreaterThanOrEqual(model.rankingRows[1]?.amountGel ?? 0);
+    expect(model.rankingRows.length).toBeGreaterThan(1);
+    const first = model.rankingRows[0];
+    const second = model.rankingRows[1];
+    expect(first?.amountGel).toBeGreaterThanOrEqual(second?.amountGel ?? 0);
   });
 
   it("returns a revenue empty state for current real facts", async () => {
