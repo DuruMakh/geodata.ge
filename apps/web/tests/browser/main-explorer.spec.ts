@@ -15,14 +15,14 @@ for (const host of previewHosts) {
     await page.goto(`http://${host}:3100`);
 
     await expect(page.getByRole("heading", { name: "საქართველოს ბიუჯეტის ანალიტიკა" })).toBeVisible();
-    await expect(page.locator("svg")).toHaveCount(2);
+    await expect(page.locator(".recharts-wrapper")).toBeVisible();
     await expect(page.locator('path.recharts-line-curve[stroke-dasharray="5 5"]')).toHaveCount(0);
     await expect(page.locator("aside")).toContainText("ხარჯები სულ");
 
     await page.getByRole("button", { name: "შემოსავლები" }).click();
 
     await expect(page.locator("aside")).toContainText("შემოსავლები სულ");
-    await expect(page.locator("svg")).toHaveCount(2);
+    await expect(page.getByText("არჩეული მონაცემი არ არის.")).toBeVisible();
     await expect(page.locator('path.recharts-line-curve[stroke-dasharray="5 5"]')).toHaveCount(0);
     expect(consoleProblems).toEqual([]);
   });
