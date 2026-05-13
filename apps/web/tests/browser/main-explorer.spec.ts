@@ -28,6 +28,34 @@ for (const host of previewHosts) {
   });
 }
 
+test("stacked composition mode renders real expenditure bars", async ({ page }) => {
+  const consoleProblems: string[] = [];
+
+  page.on("console", (message) => {
+    if (["error", "warning"].includes(message.type())) {
+      consoleProblems.push(`${message.type()}: ${message.text()}`);
+    }
+  });
+
+  await page.goto("http://localhost:3100");
+  await expect(async () => {
+    await page.getByRole("button", { name: "კომპოზიცია" }).click();
+    await expect(page.getByLabel("საზომი")).toHaveValue("share_of_total", { timeout: 500 });
+  }).toPass();
+
+  const stackedChart = page.getByTestId("stacked-composition-chart");
+  await expect(stackedChart).toBeVisible();
+  await expect(stackedChart).toHaveAttribute("data-chart-mode", "stacked");
+  await expect(stackedChart).toHaveAttribute("data-measure", "share_of_total");
+  expect(Number(await stackedChart.getAttribute("data-series-count"))).toBeGreaterThan(1);
+  await expect(stackedChart.locator(".recharts-bar-rectangle, .recharts-bar .recharts-rectangle, .recharts-bar rect")).not.toHaveCount(0);
+  await expect(page.getByText("კომპოზიციისთვის აირჩიე ცალკეული კატეგორიები, არა ჯამის სერია.")).toHaveCount(0);
+  await expect(page.getByLabel("საზომი")).toBeVisible();
+  await expect(page.getByLabel("საზომი")).toHaveValue("share_of_total");
+
+  expect(consoleProblems).toEqual([]);
+});
+
 test("single-year snapshot renders sections and empty states", async ({ page }) => {
   const consoleProblems: string[] = [];
 

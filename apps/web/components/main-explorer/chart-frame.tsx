@@ -124,7 +124,13 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
     }
 
     return (
-      <div className="h-[420px] border border-cyan-400/20 bg-black/40 p-3">
+      <div
+        className="h-[420px] border border-cyan-400/20 bg-black/40 p-3"
+        data-chart-mode="stacked"
+        data-measure={measure}
+        data-series-count={stackItems.length}
+        data-testid="stacked-composition-chart"
+      >
         <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
           <BarChart data={rows} margin={{ top: 20, right: 16, bottom: 28, left: 18 }}>
             <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />

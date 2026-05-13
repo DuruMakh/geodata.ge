@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loadGlossary } from "../../lib/data/glossary";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadSourceDocuments } from "../../lib/data/sources";
-import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
+import { buildExplorerModel, getDefaultSelection, getDefaultStackedSelection } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
 describe("explorer integration with real CSV data", () => {
@@ -74,6 +74,45 @@ describe("explorer integration with real CSV data", () => {
     const itemIds = [...new Set(facts.map((fact) => fact.itemId))];
     const missingGlossary = itemIds.filter((itemId) => !glossary.has(itemId));
     expect(missingGlossary).toEqual([]);
+  });
+
+  it("builds a stacked expenditure composition model from real facts", async () => {
+    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
+    const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
+    const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
+    const selectedItemIds = getDefaultStackedSelection("expenditure", facts);
+    const allStackedItemIds = [
+      ...new Set(facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.itemId).filter((itemId) => itemId !== "expenditure.total")),
+    ].sort();
+
+    expect(selectedItemIds.length).toBeGreaterThan(1);
+    expect(selectedItemIds).not.toContain("expenditure.total");
+    expect(allStackedItemIds.length).toBeGreaterThan(selectedItemIds.length);
+
+    const model = buildExplorerModel({
+      facts,
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: allStackedItemIds,
+      startYear: years[0],
+      endYear: years[years.length - 1],
+      measure: "share_of_total",
+    });
+
+    expect(model.points.length).toBeGreaterThan(allStackedItemIds.length);
+    expect(model.points.every((point) => point.value === null || (point.value >= 0 && point.value <= 1))).toBe(true);
+
+    for (const year of model.years) {
+      const values = model.points
+        .filter((point) => point.year === year)
+        .map((point) => point.value)
+        .filter((value): value is number => value !== null);
+
+      expect(values.length).toBeGreaterThan(1);
+      expect(values.reduce((sum, value) => sum + value, 0)).toBeCloseTo(1, 8);
+    }
   });
 
   it("builds a non-empty single-year expenditure snapshot from real facts", async () => {
