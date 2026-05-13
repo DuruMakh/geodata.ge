@@ -43,7 +43,10 @@ function SnapshotTreemapTooltip({ active, payload }: TooltipContentProps) {
 function TreemapCell(node: TreemapNode) {
   const label = typeof node.kaLabel === "string" ? node.kaLabel : node.name;
   const color = typeof node.color === "string" ? node.color : "#22d3ee";
-  const showLabel = node.width >= 112 && node.height >= 54;
+  const maxLabelChars = Math.max(0, Math.floor((node.width - 20) / 8));
+  const showLabel = Boolean(label) && node.width >= 128 && node.height >= 58 && maxLabelChars >= 8;
+  const displayLabel =
+    showLabel && label.length > maxLabelChars ? `${label.slice(0, Math.max(0, maxLabelChars - 1))}…` : label;
 
   return (
     <g>
@@ -58,8 +61,16 @@ function TreemapCell(node: TreemapNode) {
         strokeWidth={2}
       />
       {showLabel ? (
-        <text x={node.x + 10} y={node.y + 22} fill="#f4f4f5" fontSize={12} fontWeight={700}>
-          {label}
+        <text
+          x={node.x + 10}
+          y={node.y + 22}
+          fill="#f4f4f5"
+          fontSize={12}
+          fontWeight={700}
+          textLength={Math.max(0, node.width - 20)}
+          lengthAdjust="spacingAndGlyphs"
+        >
+          {displayLabel}
         </text>
       ) : null}
     </g>
