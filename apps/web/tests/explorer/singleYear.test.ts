@@ -24,6 +24,12 @@ const sourceDocuments: SourceDocumentRow[] = [
     sourceUrlOrFile: "docs/audit",
     lastReviewedAt: "2026-05-12",
   },
+  {
+    sourceId: "source.tail",
+    sourceName: "Reviewed tail source",
+    sourceUrlOrFile: "docs/tail",
+    lastReviewedAt: "2026-05-13",
+  },
 ];
 
 function fact(row: Partial<BudgetFactImportRow> & Pick<BudgetFactImportRow, "year" | "side" | "itemId" | "amountGel">): BudgetFactImportRow {
@@ -100,6 +106,69 @@ describe("single-year snapshot model", () => {
       ["spending.defense", 19],
     ]);
     expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
+  });
+
+  it("does not create fake every100 allocation for a loaded zero-total year", () => {
+    const model = buildSingleYearSnapshotModel({
+      facts: [
+        fact({ year: 2026, side: "expenditure", itemId: "spending.health", amountGel: 0 }),
+        fact({ year: 2026, side: "expenditure", itemId: "spending.education", amountGel: 0 }),
+      ],
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      year: 2026,
+    });
+
+    expect(model.items).toHaveLength(2);
+    expect(model.every100.map((item) => item.gelFrom100)).toEqual([0, 0]);
+  });
+
+  it("keeps a single source label when all facts resolve to the same official source", () => {
+    const model = buildSingleYearSnapshotModel({
+      facts: [
+        fact({ year: 2026, side: "expenditure", itemId: "spending.health", amountGel: 100, sourceId: "source.execution" }),
+        fact({ year: 2026, side: "expenditure", itemId: "spending.education", amountGel: 200, sourceId: "source.execution" }),
+      ],
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      year: 2026,
+    });
+
+    expect(model.source).toEqual({
+      sourceName: "Reviewed execution report",
+      sourceUrlOrFile: "docs/execution",
+      lastReviewedAt: "2026-05-10",
+    });
+  });
+
+  it("aggregates snapshot.other source metadata from omitted tail items only", () => {
+    const manyFacts = Array.from({ length: 9 }, (_, index) =>
+      fact({
+        year: 2026,
+        side: "expenditure",
+        itemId: `spending.item_${index + 1}`,
+        amountGel: 90 - index,
+        sourceId: index < 7 ? "source.execution" : "source.tail",
+      }),
+    );
+
+    const model = buildSingleYearSnapshotModel({
+      facts: manyFacts,
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      year: 2026,
+    });
+    const other = model.petals.find((item) => item.itemId === "snapshot.other");
+
+    expect(model.petals).toHaveLength(8);
+    expect(other?.source).toEqual({
+      sourceName: "Reviewed tail source",
+      sourceUrlOrFile: "docs/tail",
+      lastReviewedAt: "2026-05-13",
+    });
   });
 
   it("marks growth unavailable when no previous year exists", () => {

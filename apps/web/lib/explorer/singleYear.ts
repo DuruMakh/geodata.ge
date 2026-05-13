@@ -51,9 +51,20 @@ function sourceMetadataFor(sourceIds: string[], sources: Map<string, SourceDocum
   const uniqueFiles = Array.from(new Set(rows.map((source) => source.sourceUrlOrFile)));
 
   return {
-    sourceName: sourceIds.length === 1 ? uniqueNames[0] ?? "" : "Multiple reviewed official sources",
+    sourceName: uniqueNames.length === 1 && uniqueFiles.length === 1 ? uniqueNames[0] ?? "" : "Multiple reviewed official sources",
     sourceUrlOrFile: uniqueFiles.join("; "),
     lastReviewedAt: rows.map((source) => source.lastReviewedAt).sort().at(-1) ?? "",
+  };
+}
+
+function sourceMetadataFromItems(items: SnapshotItem[]): SourceMetadata {
+  const uniqueNames = Array.from(new Set(items.map((item) => item.source.sourceName)));
+  const uniqueFiles = Array.from(new Set(items.map((item) => item.source.sourceUrlOrFile)));
+
+  return {
+    sourceName: uniqueNames.length === 1 && uniqueFiles.length === 1 ? uniqueNames[0] ?? "" : "Multiple reviewed official sources",
+    sourceUrlOrFile: uniqueFiles.join("; "),
+    lastReviewedAt: items.map((item) => item.source.lastReviewedAt).sort().at(-1) ?? "",
   };
 }
 
@@ -69,6 +80,17 @@ function changeFromPrevious(amountGel: number, previousAmountGel: number | null)
 }
 
 function wholeGelFrom100(items: SnapshotItem[]): Every100Item[] {
+  if (items.every((item) => item.shareOfTotal === 0)) {
+    return items.map((item) => ({
+      itemId: item.itemId,
+      kaLabel: item.kaLabel,
+      enLabel: item.enLabel,
+      color: item.color,
+      gelFrom100: 0,
+      exactShare: 0,
+    }));
+  }
+
   const allocated = items.map((item, index) => {
     const exactShare = item.shareOfTotal * 100;
     const floorShare = Math.floor(exactShare);
@@ -103,7 +125,7 @@ function wholeGelFrom100(items: SnapshotItem[]): Every100Item[] {
   }));
 }
 
-function buildPetals(items: SnapshotItem[], modelSource: SourceMetadata): SnapshotItem[] {
+function buildPetals(items: SnapshotItem[]): SnapshotItem[] {
   if (items.length <= 8) return items;
 
   const visible = items.slice(0, 7);
@@ -127,7 +149,7 @@ function buildPetals(items: SnapshotItem[], modelSource: SourceMetadata): Snapsh
       changeFromPreviousYear: changeFromPrevious(amountGel, previousAmountGel),
       amountChangeFromPreviousYear: previousAmountGel === null ? null : amountGel - previousAmountGel,
       basis: omitted.some((item) => item.basis === "planned") ? "planned" : "actual",
-      source: modelSource,
+      source: sourceMetadataFromItems(omitted),
     },
   ];
 }
@@ -229,7 +251,7 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
     headlineCards: headlineCards(totalGel, items),
     items,
     every100: wholeGelFrom100(items),
-    petals: buildPetals(items, modelSource),
+    petals: buildPetals(items),
     rankingRows: items,
     hasGrowthData: items.some((item) => item.changeFromPreviousYear !== null),
     emptyReason: null,
