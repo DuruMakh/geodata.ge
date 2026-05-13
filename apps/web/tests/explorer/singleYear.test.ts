@@ -127,6 +127,7 @@ describe("single-year snapshot model", () => {
     });
 
     expect(model.items).toEqual([]);
+    expect(model.source).toBeNull();
     expect(model.emptyReason).toBe("ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული.");
   });
 });

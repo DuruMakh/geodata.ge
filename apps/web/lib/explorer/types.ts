@@ -93,7 +93,7 @@ export type SingleYearSnapshotModel = {
   totalGel: number;
   basis: "actual" | "planned";
   hasPlannedValues: boolean;
-  source: SourceMetadata;
+  source: SourceMetadata | null;
   headlineCards: SnapshotHeadline[];
   items: SnapshotItem[];
   every100: Every100Item[];

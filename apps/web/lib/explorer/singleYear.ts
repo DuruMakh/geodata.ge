@@ -27,12 +27,6 @@ const palette = [
   "#f43f5e",
 ];
 
-const emptySource: SourceMetadata = {
-  sourceName: "",
-  sourceUrlOrFile: "",
-  lastReviewedAt: "",
-};
-
 export type SingleYearSnapshotInput = {
   facts: BudgetFactImportRow[];
   glossary: Map<string, GlossaryEntry>;
@@ -188,7 +182,7 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
       totalGel: 0,
       basis: "actual",
       hasPlannedValues: false,
-      source: emptySource,
+      source: null,
       headlineCards: headlineCards(0, []),
       items: [],
       every100: [],
