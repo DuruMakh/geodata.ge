@@ -132,9 +132,9 @@ function buildPetals(items: SnapshotItem[]): SnapshotItem[] {
   const omitted = items.slice(7);
   const amountGel = omitted.reduce((sum, item) => sum + item.amountGel, 0);
   const previousAmounts = omitted.map((item) => item.previousAmountGel);
-  const previousAmountGel = previousAmounts.some((amount) => amount === null)
-    ? null
-    : previousAmounts.reduce((sum, amount) => sum + (amount ?? 0), 0);
+  const previousAmountGel = previousAmounts.every((amount): amount is number => amount !== null)
+    ? previousAmounts.reduce((sum, amount) => sum + amount, 0)
+    : null;
 
   return [
     ...visible,
