@@ -2,6 +2,7 @@ import type { SingleYearSnapshotModel } from "../../lib/explorer/types";
 import { BudgetField } from "./budget-field";
 import { Every100Gel } from "./every-100-gel";
 import { SnapshotHeadlineCards } from "./snapshot-headline-cards";
+import { SingleYearRanking } from "./single-year-ranking";
 import { SnapshotTreemap } from "./snapshot-treemap";
 import { SpendingPetals } from "./spending-petals";
 
@@ -38,6 +39,7 @@ export function SingleYearSnapshot({ model }: SingleYearSnapshotProps) {
       <div className="overflow-x-auto">
         <BudgetField items={model.items} hasGrowthData={model.hasGrowthData} />
       </div>
+      <SingleYearRanking rows={model.rankingRows} />
     </section>
   );
 }
