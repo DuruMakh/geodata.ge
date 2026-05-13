@@ -8,7 +8,7 @@ import type { SourceDocumentRow } from "../../lib/data/sources";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
 import { formatGel } from "../../lib/explorer/format";
-import { MAX_CHART_SERIES, type ChartMode, type ExplorerSide, type MeasureMode } from "../../lib/explorer/types";
+import { MAX_CHART_SERIES, type ChartMode, type ExplorerSide, type MeasureMode, type ViewMode } from "../../lib/explorer/types";
 import { ExplorerControls } from "./explorer-controls";
 import { ExplorerTable } from "./explorer-table";
 import { PeriodSummaryPanel } from "./period-summary";
@@ -32,11 +32,13 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
   const initialEndYear = allYears.at(-1) ?? initialStartYear;
   const glossary = useMemo(() => new Map(glossaryEntries.map((entry) => [entry.id, entry])), [glossaryEntries]);
   const [side, setSide] = useState<ExplorerSide>("expenditure");
+  const [viewMode, setViewMode] = useState<ViewMode>("multi_year");
   const [chartMode, setChartMode] = useState<ChartMode>("line");
   const [measure, setMeasure] = useState<MeasureMode>("nominal");
   const [startYear, setStartYear] = useState(initialStartYear);
   const [endYear, setEndYear] = useState(initialEndYear);
   const [barYear, setBarYear] = useState(initialEndYear);
+  const [singleYear, setSingleYear] = useState(initialEndYear);
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
   const [selections, setSelections] = useState<Record<ExplorerSide, string[]>>({
     expenditure: getDefaultSelection("expenditure", facts),
@@ -136,26 +138,32 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
             <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
               <ExplorerControls
                 side={side}
+                viewMode={viewMode}
                 chartMode={chartMode}
                 measure={measure}
                 years={allYears}
                 startYear={startYear}
                 endYear={endYear}
                 barYear={barYear}
+                singleYear={singleYear}
                 onSideChange={setSide}
+                onViewModeChange={setViewMode}
                 onChartModeChange={handleChartModeChange}
                 onMeasureChange={setMeasure}
                 onStartYearChange={handleStartYearChange}
                 onEndYearChange={handleEndYearChange}
                 onBarYearChange={setBarYear}
+                onSingleYearChange={setSingleYear}
               />
-              <button
-                type="button"
-                onClick={downloadCsv}
-                className="h-10 border border-cyan-300 px-4 font-mono text-xs uppercase text-cyan-100 transition hover:bg-cyan-300 hover:text-black"
-              >
-                CSV ჩამოტვირთვა
-              </button>
+              {viewMode === "multi_year" ? (
+                <button
+                  type="button"
+                  onClick={downloadCsv}
+                  className="h-10 border border-cyan-300 px-4 font-mono text-xs uppercase text-cyan-100 transition hover:bg-cyan-300 hover:text-black"
+                >
+                  CSV ჩამოტვირთვა
+                </button>
+              ) : null}
             </div>
           </div>
 
