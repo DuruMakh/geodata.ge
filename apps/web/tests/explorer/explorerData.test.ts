@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
+import { buildExplorerModel, getDefaultSelection, getDefaultStackedSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type { SourceDocumentRow } from "../../lib/data/sources";
@@ -37,6 +37,18 @@ describe("main explorer data model", () => {
   it("returns side-specific default selections", () => {
     expect(getDefaultSelection("expenditure", facts)).toEqual(["expenditure.total"]);
     expect(getDefaultSelection("revenue", facts)).toEqual(["revenue.total"]);
+  });
+
+  it("returns side-specific default stacked selections", () => {
+    expect(getDefaultStackedSelection("expenditure", facts)).toEqual(["spending.education", "spending.health"]);
+    expect(getDefaultStackedSelection("revenue", facts)).toEqual(["revenue.vat"]);
+  });
+
+  it("identifies derived total item IDs", () => {
+    expect(isDerivedTotalItemId("expenditure.total")).toBe(true);
+    expect(isDerivedTotalItemId("revenue.total")).toBe(true);
+    expect(isDerivedTotalItemId("spending.health")).toBe(false);
+    expect(isDerivedTotalItemId("revenue.vat")).toBe(false);
   });
 
   it("builds derived total points and planned-year metadata", () => {

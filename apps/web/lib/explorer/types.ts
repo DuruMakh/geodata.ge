@@ -1,6 +1,6 @@
 export const EXPLORER_SIDES = ["expenditure", "revenue"] as const;
 export const VIEW_MODES = ["multi_year", "single_year"] as const;
-export const CHART_MODES = ["line", "bar", "table"] as const;
+export const CHART_MODES = ["line", "bar", "stacked", "table"] as const;
 export const MEASURE_MODES = ["nominal", "percent_change", "share_of_total", "share_of_gdp"] as const;
 
 export type ExplorerSide = (typeof EXPLORER_SIDES)[number];

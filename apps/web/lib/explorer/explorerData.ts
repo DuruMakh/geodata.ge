@@ -2,6 +2,7 @@ import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { SourceDocumentRow } from "../data/sources";
 import { chooseActivePublicFacts } from "../data/activeFacts";
+import { MAX_CHART_SERIES } from "./types";
 import type {
   ExplorerItem,
   ExplorerPoint,
@@ -169,6 +170,23 @@ function shareForYear(row: ExplorerTableRow, totalRow: ExplorerTableRow | null, 
 
 export function getDefaultSelection(side: ExplorerSide, facts: BudgetFactImportRow[]): string[] {
   return chooseActivePublicFacts(facts).some((fact) => fact.side === side) ? [totalIdFor(side)] : [];
+}
+
+export function isDerivedTotalItemId(itemId: string): boolean {
+  return itemId === "expenditure.total" || itemId === "revenue.total";
+}
+
+export function getDefaultStackedSelection(side: ExplorerSide, facts: BudgetFactImportRow[]): string[] {
+  return Array.from(
+    new Set(
+      chooseActivePublicFacts(facts)
+        .filter((fact) => fact.side === side)
+        .map((fact) => fact.itemId)
+        .filter((itemId) => !isDerivedTotalItemId(itemId)),
+    ),
+  )
+    .sort()
+    .slice(0, MAX_CHART_SERIES);
 }
 
 export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
