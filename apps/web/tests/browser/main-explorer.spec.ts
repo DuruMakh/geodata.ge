@@ -49,6 +49,7 @@ test("stacked composition mode renders real expenditure bars", async ({ page }) 
   await expect(stackedChart).toHaveAttribute("data-measure", "share_of_total");
   expect(Number(await stackedChart.getAttribute("data-series-count"))).toBeGreaterThan(1);
   await expect(stackedChart.locator(".recharts-bar-rectangle, .recharts-bar .recharts-rectangle, .recharts-bar rect")).not.toHaveCount(0);
+  await expect(page.getByText("კომპოზიცია აჩვენებს არჩეული კატეგორიების წილს მთლიანში; არაარჩეული კატეგორიები გრაფიკში არ ჯამდება.")).toBeVisible();
   await expect(page.getByText("კომპოზიციისთვის აირჩიე ცალკეული კატეგორიები, არა ჯამის სერია.")).toHaveCount(0);
   await expect(page.getByLabel("საზომი")).toBeVisible();
   await expect(page.getByLabel("საზომი")).toHaveValue("share_of_total");

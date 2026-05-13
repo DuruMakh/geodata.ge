@@ -12,6 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { formatMeasureValue } from "../../lib/explorer/format";
 import type { ChartMode, ExplorerItem, ExplorerPoint, MeasureMode } from "../../lib/explorer/types";
 
@@ -113,7 +114,7 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
 
   if (mode === "stacked") {
     const rows = buildYearRows(years, points);
-    const stackItems = selectedItems.filter((item) => !item.id.endsWith(".total"));
+    const stackItems = selectedItems.filter((item) => !isDerivedTotalItemId(item.id));
 
     if (stackItems.length === 0) {
       return (
@@ -124,29 +125,34 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
     }
 
     return (
-      <div
-        className="h-[420px] border border-cyan-400/20 bg-black/40 p-3"
-        data-chart-mode="stacked"
-        data-measure={measure}
-        data-series-count={stackItems.length}
-        data-testid="stacked-composition-chart"
-      >
-        <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
-          <BarChart data={rows} margin={{ top: 20, right: 16, bottom: 28, left: 18 }}>
-            <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
-            <XAxis dataKey="year" stroke="#a1a1aa" tick={{ fontSize: 12 }} />
-            <YAxis stroke="#a1a1aa" tickFormatter={(value) => formatMeasureValue(Number(value), measure)} width={88} />
-            <Tooltip
-              contentStyle={{ background: "#05070b", border: "1px solid rgba(34, 211, 238, 0.35)", color: "#f4f4f5" }}
-              formatter={(value) => formatMeasureValue(Number(value), measure)}
-            />
-            {stackItems.map((item) => {
-              const key = chartKey(item.id);
+      <div className="flex flex-col gap-2">
+        <p className="border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-xs text-cyan-100">
+          კომპოზიცია აჩვენებს არჩეული კატეგორიების წილს მთლიანში; არაარჩეული კატეგორიები გრაფიკში არ ჯამდება.
+        </p>
+        <div
+          className="h-[420px] border border-cyan-400/20 bg-black/40 p-3"
+          data-chart-mode="stacked"
+          data-measure={measure}
+          data-series-count={stackItems.length}
+          data-testid="stacked-composition-chart"
+        >
+          <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
+            <BarChart data={rows} margin={{ top: 20, right: 16, bottom: 28, left: 18 }}>
+              <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
+              <XAxis dataKey="year" stroke="#a1a1aa" tick={{ fontSize: 12 }} />
+              <YAxis stroke="#a1a1aa" tickFormatter={(value) => formatMeasureValue(Number(value), measure)} width={88} />
+              <Tooltip
+                contentStyle={{ background: "#05070b", border: "1px solid rgba(34, 211, 238, 0.35)", color: "#f4f4f5" }}
+                formatter={(value) => formatMeasureValue(Number(value), measure)}
+              />
+              {stackItems.map((item) => {
+                const key = chartKey(item.id);
 
-              return <Bar key={item.id} dataKey={key} name={item.kaLabel} stackId="composition" fill={item.color} />;
-            })}
-          </BarChart>
-        </ResponsiveContainer>
+                return <Bar key={item.id} dataKey={key} name={item.kaLabel} stackId="composition" fill={item.color} />;
+              })}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     );
   }
