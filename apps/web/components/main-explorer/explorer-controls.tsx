@@ -33,6 +33,7 @@ const viewModeLabels: Record<ViewMode, string> = {
 const chartModeLabels: Record<ChartMode, string> = {
   line: "ხაზი",
   bar: "სვეტები",
+  stacked: "კომპოზიცია",
   table: "ცხრილი",
 };
 
@@ -62,6 +63,9 @@ export function ExplorerControls({
   onBarYearChange,
   onSingleYearChange,
 }: ExplorerControlsProps) {
+  const availableMeasures: MeasureMode[] =
+    chartMode === "stacked" ? ["share_of_total"] : ["nominal", "percent_change", "share_of_total", "share_of_gdp"];
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-2">
@@ -104,7 +108,7 @@ export function ExplorerControls({
       {viewMode === "multi_year" ? (
         <>
           <div className="flex flex-wrap items-center gap-2">
-            {(["line", "bar", "table"] as const).map((mode) => (
+            {(["line", "bar", "stacked", "table"] as const).map((mode) => (
               <button
                 key={mode}
                 type="button"
@@ -118,14 +122,6 @@ export function ExplorerControls({
                 {chartModeLabels[mode]}
               </button>
             ))}
-            <button
-              type="button"
-              disabled
-              className="h-9 cursor-not-allowed border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-600"
-              title="Plan 2-ში კომპოზიციური რეჟიმი ჯერ არ მუშაობს"
-            >
-              კომპოზიცია
-            </button>
           </div>
 
           <div className="grid gap-3 md:grid-cols-[220px_1fr]">
@@ -136,7 +132,7 @@ export function ExplorerControls({
                 onChange={(event) => onMeasureChange(event.target.value as MeasureMode)}
                 className="h-10 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
               >
-                {(["nominal", "percent_change", "share_of_total", "share_of_gdp"] as const).map((nextMeasure) => (
+                {availableMeasures.map((nextMeasure) => (
                   <option key={nextMeasure} value={nextMeasure}>
                     {measureLabels[nextMeasure]}
                   </option>

@@ -6,7 +6,7 @@ import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
-import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
+import { buildExplorerModel, getDefaultSelection, getDefaultStackedSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { formatGel } from "../../lib/explorer/format";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 import { MAX_CHART_SERIES, type ChartMode, type ExplorerSide, type MeasureMode, type ViewMode } from "../../lib/explorer/types";
@@ -73,6 +73,18 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
   const hasPlannedValues = viewMode === "single_year" ? singleYearModel.hasPlannedValues : model.hasPlannedValues;
   const selectorRows = [...model.tableRows, ...model.comparisonRows];
 
+  function handleSideChange(nextSide: ExplorerSide) {
+    setSide(nextSide);
+    setLimitMessage(null);
+    if (chartMode === "stacked") {
+      setMeasure("share_of_total");
+      setSelections((current) => ({
+        ...current,
+        [nextSide]: getDefaultStackedSelection(nextSide, facts),
+      }));
+    }
+  }
+
   function handleStartYearChange(year: number) {
     setStartYear(year);
     if (year > endYear) setEndYear(year);
@@ -87,10 +99,22 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
     setChartMode(mode);
     setLimitMessage(null);
     if (mode === "bar") setBarYear(endYear);
+    if (mode === "stacked") {
+      setMeasure("share_of_total");
+      setSelections((current) => ({
+        ...current,
+        [side]: getDefaultStackedSelection(side, facts),
+      }));
+    }
   }
 
   function handleToggle(itemId: string) {
     setLimitMessage(null);
+    if (chartMode === "stacked" && isDerivedTotalItemId(itemId)) {
+      setLimitMessage("კომპოზიციის რეჟიმში ჯამის სერია არ ირჩევა. აირჩიე ცალკეული კატეგორიები.");
+      return;
+    }
+
     setSelections((current) => {
       const currentSideSelection = current[side];
       const alreadySelected = currentSideSelection.includes(itemId);
@@ -158,7 +182,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
                 endYear={endYear}
                 barYear={barYear}
                 singleYear={singleYear}
-                onSideChange={setSide}
+                onSideChange={handleSideChange}
                 onViewModeChange={setViewMode}
                 onChartModeChange={handleChartModeChange}
                 onMeasureChange={setMeasure}
