@@ -73,6 +73,7 @@ export function ExplorerControls({
           <button
             key={nextSide}
             type="button"
+            data-testid={`side-${nextSide}`}
             onClick={() => onSideChange(nextSide)}
             className={`h-10 border px-4 font-mono text-xs uppercase transition ${
               side === nextSide
@@ -92,6 +93,7 @@ export function ExplorerControls({
             <button
               key={mode}
               type="button"
+              data-testid={`view-${mode}`}
               onClick={() => onViewModeChange(mode)}
               className={`h-10 border px-4 font-mono text-xs uppercase transition ${
                 viewMode === mode

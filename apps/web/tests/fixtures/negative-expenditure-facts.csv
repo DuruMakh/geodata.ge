@@ -1,0 +1,2 @@
+year,side,item_id,amount_gel,basis,source_id,official_institution,official_program,official_subprogram,public_spending_field_id,mapping_confidence,mapping_notes
+2025,expenditure,spending.health,-1,actual,source.mof_2025_execution,Health Ministry,Program,,spending.health,high,Invalid negative expenditure

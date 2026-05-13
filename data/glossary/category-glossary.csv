@@ -12,6 +12,7 @@ spending.sport,სპორტი,Sport,Public spending field for sport,Separate
 spending.general_public_services,საერთო სახელმწიფო მომსახურება,General public services,Public spending field for general public services,Review debt rows separately
 spending.debt_service,ვალის მომსახურება,Debt service,Public spending field for debt service expenditure,Separate field; not a debt explorer
 spending.other_unclassified,სხვა / დაუკლასიფიცირებელი,Other / unclassified,Explicit bucket for rows not confidently mapped,No rows may disappear silently
+revenue.taxes_total,გადასახადები სულ,Taxes total,Temporary top-level source aggregate for tax revenue,Temporary source aggregate for Plan 5 source-backed revenue import
 revenue.vat,დამატებული ღირებულების გადასახადი,VAT,Top-level revenue category,Source-confirmed label
 revenue.income_tax,საშემოსავლო გადასახადი,Income tax,Top-level revenue category,Source-confirmed label
 revenue.profit_tax,მოგების გადასახადი,Profit tax,Top-level revenue category,Source-confirmed label

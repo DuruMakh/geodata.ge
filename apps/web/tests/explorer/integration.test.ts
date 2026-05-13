@@ -67,6 +67,50 @@ describe("explorer integration with real CSV data", () => {
     expect(model.items.length).toBeGreaterThan(1);
   });
 
+  it("builds a non-empty revenue model from real facts", async () => {
+    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
+    const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
+    const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
+
+    const selectedItemIds = getDefaultSelection("revenue", facts);
+    expect(selectedItemIds).toEqual(["revenue.total"]);
+
+    const model = buildExplorerModel({
+      facts,
+      glossary,
+      sourceDocuments,
+      side: "revenue",
+      selectedItemIds,
+      startYear: years[0],
+      endYear: years[years.length - 1],
+      measure: "nominal",
+    });
+
+    expect(model.unavailableReason).toBeNull();
+    expect(model.totalRow?.valuesByYear[2025]).toBeGreaterThan(0);
+    expect(model.comparisonRows.map((row) => row.itemId)).toEqual(
+      expect.arrayContaining(["revenue.vat", "revenue.income_tax", "revenue.grants", "revenue.other_revenue"]),
+    );
+  });
+
+  it("keeps real revenue facts reconciled by year", async () => {
+    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const revenueFacts = facts.filter((fact) => fact.side === "revenue");
+    const expectedTotalsByYear = new Map([
+      [2023, 21992545306],
+      [2024, 25571944242],
+      [2025, 28306191252],
+    ]);
+
+    for (const [year, expectedTotalGel] of expectedTotalsByYear) {
+      const yearFacts = revenueFacts.filter((fact) => fact.year === year);
+
+      expect(yearFacts).toHaveLength(9);
+      expect(yearFacts.reduce((sum, fact) => sum + fact.amountGel, 0)).toBe(expectedTotalGel);
+    }
+  });
+
   it("has glossary entries for every sample fact item", async () => {
     const facts = await loadBudgetFactRows("../../data/imports/sample-budget-facts.csv");
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
@@ -138,7 +182,7 @@ describe("explorer integration with real CSV data", () => {
     expect(first?.amountGel).toBeGreaterThanOrEqual(second?.amountGel ?? 0);
   });
 
-  it("returns a revenue empty state for current real facts", async () => {
+  it("keeps single-year revenue source-backed with public tax categories", async () => {
     const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
@@ -151,7 +195,9 @@ describe("explorer integration with real CSV data", () => {
       year: 2025,
     });
 
-    expect(model.items).toEqual([]);
-    expect(model.emptyReason).toBe("ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული.");
+    expect(model.emptyReason).toBeNull();
+    expect(model.items.map((item) => item.itemId)).toEqual(
+      expect.arrayContaining(["revenue.vat", "revenue.income_tax", "revenue.grants", "revenue.other_revenue"]),
+    );
   });
 });

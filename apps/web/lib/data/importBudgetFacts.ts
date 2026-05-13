@@ -37,11 +37,11 @@ export type BudgetFactImportRow = {
   mappingNotes: string;
 };
 
-function parseAmountGel(value: string): number {
+function parseAmountGel(value: string, side: "revenue" | "expenditure"): number {
   const amount = new Decimal(value);
 
-  if (amount.isNegative()) {
-    throw new Error(`amount_gel must not be negative: ${value}`);
+  if (side === "expenditure" && amount.isNegative()) {
+    throw new Error(`expenditure amount_gel must not be negative: ${value}`);
   }
 
   return amount.toNumber();
@@ -70,7 +70,7 @@ export async function loadBudgetFactRows(relativePath: string): Promise<BudgetFa
       year: row.year,
       side: row.side,
       itemId: row.item_id,
-      amountGel: parseAmountGel(row.amount_gel),
+      amountGel: parseAmountGel(row.amount_gel, row.side),
       basis: row.basis,
       sourceId: row.source_id,
       officialInstitution: row.official_institution.trim() || null,
