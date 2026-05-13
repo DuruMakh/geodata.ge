@@ -1,0 +1,133 @@
+year,source_id,workbook_path,sheet_name,row_number,label_ka,section,approved_plan_thousand_gel,revised_plan_thousand_gel,actual_thousand_gel,execution_percent
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,2,შემოსავლები,revenues,18239900,18239900,18716484.43581,1.0261286759143415
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,3,გადასახადები,revenues,16710350,16710350,16994174.887059998,1.0169849756025455
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,4,გრანტები,revenues,279550,279550,325789.75767,1.1654078256841354
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,5,სხვა შემოსავლები,revenues,1250000,1250000,1396519.79108,1.117215832864
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,6,ხარჯები,expenditures,16899923.208,16914310.536000002,16928572.24737,1.0008431742659356
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,7,შრომის ანაზღაურება,expenditures,2237142.9180000005,2175027.823,2177166.6731999996,1.0009833668228896
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,8,საქონელი და მომსახურება,expenditures,2085411.7759999998,2123642.3639599998,2138984.7126,1.0072245444432515
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,9,პროცენტი,expenditures,1201047,1191047,1182238.78259,0.9926046433012299
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,10,სუბსიდიები,expenditures,932555.388,924465.656,943859.0583300001,1.0209779586771368
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,11,გრანტები,expenditures,1370033.323,1436136.1151200002,1423282.9468600003,0.9910501740575433
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,12,"მათ შორის, კაპიტალური",expenditures,1028557,1024966.012,1016606.90965,0.9918445077669561
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,13,სოციალური უზრუნველყოფა,expenditures,6762888.2,6810434.276960001,6805914.406000001,0.9993363314619611
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,14,სხვა ხარჯები,expenditures,2310844.6029999997,2253557.3009599997,2257125.6677900003,1.0015834373629997
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,15,"მათ შორის,  კაპიტალური",expenditures,610070,614590.163,618419.17693,1.0062301907197952
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,16,საოპერაციო სალდო,expenditures,1339976.7919999994,1325589.4639999978,1787912.1884399988,1.3487676516716804
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,17,არაფინანსური აქტივების ცვლილება,non_financial_assets,3755654.892,3773758.4769999995,3769439.835129999,0.9988556125421589
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,18,ზრდა,non_financial_assets,3955654.892,3973758.4769999995,3972798.801609999,0.9997584967995526
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,19,კლება,non_financial_assets,200000,200000,203358.96648,1.0167948324
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,20,მთლიანი სალდო,expenditures,-2415678.1000000006,-2448169.0130000017,-1981527.6466900003,0.8093916866719197
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,21,ფინასური აქტივების ცვლილება,expenditures,-253155.60000000102,-262853.600000001,394869.2984699999,-1.5022404048108848
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,22,ზრდა,expenditures,337200,327502,685718.1116899999,2.0937829744245833
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,23,ვალუტა და დეპოზიტები,expenditures,0,0,329839.1664499999,
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,24,სესხები,expenditures,337200,325975,354352.80673,1.0870551629112661
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,25,აქციები და სხვა კაპიტალი,expenditures,,1527,1526.13851,0.999435828421742
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,26,კლება,expenditures,590355.600000001,590355.600000001,290848.81322,0.4926671538645513
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,27,ვალუტა და დეპოზიტები,expenditures,140355.600000001,140355.600000001,0,0
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,28,სესხები,expenditures,450000,450000,289253.86322,0.6427863627111111
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,29,აქციები და სხვა კაპიტალი,expenditures,0,0,1594.95,
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,30,სხვა დებიტორული დავალიანებები,expenditures,0,0,0,
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,31,ვალდებულებების ცვლილება,liabilities,2162522.5,2185315.413,2376396.94516,1.0874388800002484
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,32,ზრდა,liabilities,3281035.5,3281035.5,3469326.35965,1.0573876325477125
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,33,საშინაო,expenditures,1400000,1400000,1459421.37321,1.042443838007143
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,34,"ფასიანი ქაღალდები, გარდა აქციებისა",expenditures,1400000,1400000,1459420.87321,1.0424434808642857
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,35,სხვა კრედიტორული დავალიანებები,expenditures,0,0,0.5,
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,36,საგარეო,expenditures,1881035.5,1881035.5,2009904.98644,1.0685098640828417
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,37,ვალუტა და დეპოზიტები,expenditures,0,0,0,
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,38,"ფასიანი ქაღალდები, გარდა აქციებისა",expenditures,0,0,0,
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,39,სესხები,expenditures,1881035.5,1881035.5,2009904.98644,1.0685098640828417
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,40,"აქციები და სხვა კაპიტალი (მხოლოდ
+სახელმწიფო საწარმოები და ორგანიზაციები)",expenditures,0,0,0,
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,41,კლება,expenditures,1118513,1095720.0869999998,1092929.4144899999,0.9974531154962755
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,42,საშინაო,expenditures,42913,42632.38,42632.38,1
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,43,"ფასიანი ქაღალდები, გარდა აქციებისა",expenditures,40000,40000,40000,1
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,44,სესხები,expenditures,2913,2632.38,2632.38,1
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,45,სხვა კრედიტორული დავალიანებები,expenditures,0,0,0,
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,46,საგარეო,expenditures,1075600,1053087.707,1050297.03449,0.9973500094137934
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,47,"ფასიანი ქაღალდები, გარდა აქციებისა",expenditures,0,0,0,
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,48,სესხები,expenditures,1070000,1048000,1045209.32818,0.9973371452099237
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,49,სხვა კრედიტორული დავალიანებები,expenditures,5600,5087.707,5087.70631,0.9999998643789824
+2023,source.mof_2023_tavi1_actual,docs/Raw Data/2023 12 tve saitistvis.xls,ბალანსი,50,ბალანსი,expenditures,0,0,0,
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,2,შემოსავლები,revenues,21726000,21726000,21848836.08234,1.0056538747279755
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,3,გადასახადები,revenues,20190000,20190000,20196546.45272,1.0003242423338288
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,4,გრანტები,revenues,266000,266000,335871.13147,1.2626734265789474
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,5,სხვა შემოსავლები,revenues,1270000,1270000,1316418.4981499999,1.036549998543307
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,6,ხარჯები,expenditures,19961805.23,20082806.972,20048532.10593,0.9982933229344989
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,7,შრომის ანაზღაურება,expenditures,2632981.374,2590371.6149999998,2585978.5272799996,0.998304070468283
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,8,საქონელი და მომსახურება,expenditures,2232517.766,2293587.64,2301309.0122799994,1.003366504137596
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,9,პროცენტი,expenditures,1480039,1479339,1472416.0289,0.9953202267364005
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,10,სუბსიდიები,expenditures,1146103,1121879.792,1165170.7291700002,1.0385878571650038
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,11,გრანტები,expenditures,1682488.2,1721586.36054,1706640.0585599998,0.9913182967043767
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,12,"მათ შორის, კაპიტალური",expenditures,1337100,1335231.748,1327093.74692,0.9939051770659367
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,13,სოციალური უზრუნველყოფა,expenditures,7720410,7827786.124,7787324.529320001,0.9948310296118152
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,14,სხვა ხარჯები,expenditures,3067265.8899999997,3048256.44046,3029693.220419999,0.9939102170691388
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,15,"მათ შორის,  კაპიტალური",expenditures,1084719,1052787.126,1053449.02308,1.0006287093218122
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,16,საოპერაციო სალდო,expenditures,1764194.7699999996,1643193.0280000009,1800303.9764099978,1.0956132029121517
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,17,არაფინანსური აქტივების ცვლილება,non_financial_assets,4099704.45,3860391.549,3941244.90682,1.0209443412135084
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,18,ზრდა,non_financial_assets,4399704.45,4160391.549,4242546.63896,1.0197469610714278
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,19,კლება,non_financial_assets,300000,300000,301301.73214,1.0043391071333332
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,20,მთლიანი სალდო,expenditures,-2335509.6800000006,-2217198.5209999993,-2140940.9304100024,0.965606331653332
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,21,ფინასური აქტივების ცვლილება,expenditures,-273878.180000001,-154972.91599999898,-170380.552780002,1.0994214807186253
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,22,ზრდა,expenditures,260550,379455.264,365262.02529,0.9625957522360264
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,23,სესხები,expenditures,260550,266160.264,251985.95472,0.9467452088189993
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,24,აქციები და სხვა კაპიტალი,expenditures,0,113295,113276.07057,0.9998329191049914
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,25,კლება,expenditures,534428.180000001,534428.179999999,535642.578070002,1.0022723316536246
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,26,ვალუტა და დეპოზიტები,expenditures,234428.180000001,234428.179999999,191084.189120002,0.8151075912460815
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,27,სესხები,expenditures,300000,300000,344558.38895,1.1485279631666667
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,28,ვალდებულებების ცვლილება,liabilities,2061631.5,2062225.605,1970560.3776299995,0.9555503398135722
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,29,ზრდა,liabilities,3369992.5,3369992.5,3260562.5248499997,0.9675281250180823
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,30,საშინაო,expenditures,1500000,1500000,1521279.64016,1.0141864267733334
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,31,"ფასიანი ქაღალდები, გარდა აქციებისა",expenditures,1500000,1500000,1521279.64016,1.0141864267733334
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,32,საგარეო,expenditures,1869992.5,1869992.5,1739282.88469,0.9301015296531938
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,33,სესხები,expenditures,1869992.5,1869992.5,1739282.88469,0.9301015296531938
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,34,კლება,expenditures,1308361,1307766.895,1290002.1472200002,0.9864159676713641
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,35,საშინაო,expenditures,42741,45319.32,45319.32,1
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,36,"ფასიანი ქაღალდები, გარდა აქციებისა",expenditures,40000,40000,40000,1
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,37,სესხები,expenditures,2741,5319.32,5319.32,1
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,38,საგარეო,expenditures,1265620,1262447.575,1244682.82722,0.9859283283268219
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,39,სესხები,expenditures,1260000,1256800,1239035.25304,0.985865096308084
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,40,სხვა კრედიტორული დავალიანებები,expenditures,5620,5647.575,5647.57418,0.9999998548049384
+2024,source.mof_2024_tavi1_actual,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,I თავი,41,ბალანსი,expenditures,0,0,0,
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,2,შემოსავლები,revenues,23816199,23816199,23991752.2,1.007
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,3,გადასახადები,revenues,21940000,21940000,21957477.8,1.001
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,4,გრანტები,revenues,186199,186199,279567.8,1.501
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,5,სხვა შემოსავლები,revenues,1690000,1690000,1754706.6,1.038
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,6,ხარჯები,expenditures,22802016.4,23031489.5,22854435.8,0.992
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,7,შრომის ანაზღაურება,expenditures,3020394.5,2964859.2,2952019.5,0.996
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,8,საქონელი და მომსახურება,expenditures,2467179.5,2410636.7,2350763.6,0.975
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,9,პროცენტი,expenditures,1645027,1634027,1632175.3,0.999
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,10,სუბსიდიები,expenditures,1475553,1608013.8,1604410.8,0.998
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,11,გრანტები,expenditures,1988072.5,2139906.5,2079783.1,0.972
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,12,"მათ შორის, კაპიტალური",expenditures,1556001,1640985.7,1587778.5,0.968
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,13,სოციალური უზრუნველყოფა,expenditures,8644293.3,8718526.5,8705828.8,0.999
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,14,სხვა ხარჯები,expenditures,3561496.5,3555519.9,3529454.7,0.993
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,15,"მათ შორის,  კაპიტალური",expenditures,1264305,1293556.9,1291111.2,0.998
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,16,საოპერაციო სალდო,expenditures,1014182.6,784709.5,1137316.4,1.449
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,17,არაფინანსური აქტივების ცვლილება,non_financial_assets,3101415,2794830.8,2713052.8,0.971
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,18,ზრდა,non_financial_assets,3401415,3094830.8,3057769.8,0.988
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,19,კლება,non_financial_assets,300000,300000,344717,1.149
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,20,მთლიანი სალდო,expenditures,-2087232.4,-2010121.3,-1575736.4,0.784
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,21,ფინანსური აქტივების ცვლილება,financial_assets,-391665.4,-302992.9,93846.8,-0.31
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,22,ზრდა,financial_assets,317755,406427.5,472386.3,1.162
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,23,ვალუტა და დეპოზიტები,expenditures,0,0,79554.9,
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,24,სესხები,expenditures,315305,316200.6,302605.4,0.957
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,25,აქციები და სხვა კაპიტალი,expenditures,2450,90226.9,90226,1
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,26,კლება,expenditures,709420.4,709420.4,378539.5,0.534
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,27,ვალუტა და დეპოზიტები,expenditures,369420.4,369420.4,0,0
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,28,სესხები,expenditures,340000,340000,377713.4,1.111
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,29,აქციები და სხვა კაპიტალი,expenditures,0,0,826.1,
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,30,ვალდებულებების ცვლილება,liabilities,1695567,1707128.5,1669583.2,0.978
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,31,ზრდა,liabilities,3127300,3127300,3087865.4,0.987
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,32,საშინაო,expenditures,1600000,1600000,1588993.6,0.993
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,33,"ფასიანი ქაღალდები, გარდა აქციებისა",expenditures,1600000,1600000,1588993.6,0.993
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,34,საგარეო,expenditures,1527300,1527300,1498871.8,0.981
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,35,სესხები,expenditures,1527300,1527300,1498871.8,0.981
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,36,კლება,expenditures,1431733,1420171.5,1418282.2,0.999
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,37,საშინაო,expenditures,57933,55053,55053,1
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,38,"ფასიანი ქაღალდები, გარდა აქციებისა",expenditures,40000,40000,40000,1
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,39,სესხები,expenditures,17933,15053,15053,1
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,40,საგარეო,expenditures,1373800,1365118.5,1363229.2,0.999
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,41,სესხები,expenditures,1370000,1361000,1359110.6,0.999
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,42,სხვა კრედიტორული დავალიანებები,expenditures,3800,4118.5,4118.5,1
+2025,source.mof_2025_tavi1_actual,docs/Raw Data/2025.xlsx,tavi I,43,ბალანსი,expenditures,0,0,0,

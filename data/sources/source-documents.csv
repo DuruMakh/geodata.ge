@@ -1,6 +1,9 @@
 source_id,source_name,source_url_or_file,last_reviewed_at
 source.mof_2023_tavi6_actual,Reviewed official 2023 state budget execution tavi 6,docs/Raw Data/2023 12 tve saitistvis.xls,2026-05-12
+source.mof_2023_tavi1_actual,Reviewed official 2023 state budget execution tavi 1,docs/Raw Data/2023 12 tve saitistvis.xls,2026-05-13
 source.mof_2024_tavi6_actual,Reviewed official 2024 state budget execution tavi 6,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,2026-05-12
+source.mof_2024_tavi1_actual,Reviewed official 2024 state budget execution tavi 1,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,2026-05-13
 source.mof_2025_tavi6_actual,Reviewed official 2025 state budget execution tavi 6,docs/Raw Data/2025.xlsx,2026-05-12
+source.mof_2025_tavi1_actual,Reviewed official 2025 state budget execution tavi 1,docs/Raw Data/2025.xlsx,2026-05-13
 source.mof_2025_execution,Reviewed official 2025 budget execution documents,docs/Budget Data 2025,2026-05-10
 source.mof_2026_plan,Reviewed official 2026 planned budget documents,docs/Budget Data 2025,2026-05-10

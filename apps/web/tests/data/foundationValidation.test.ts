@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { validateFoundationReferences } from "../../lib/data/foundationValidation";
+import { loadGlossary } from "../../lib/data/glossary";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadSpendingMappings } from "../../lib/data/mappings";
 import { loadSourceDocuments } from "../../lib/data/sources";
@@ -47,5 +48,29 @@ describe("foundation cross-file validation", () => {
     expect(() =>
       validateFoundationReferences({ taxonomy, sources, mappings, facts }),
     ).toThrow("Fact references unknown source document: source.missing");
+  });
+
+  it("includes the temporary taxes aggregate before VAT in taxonomy and glossary", async () => {
+    const taxonomy = await loadTaxonomyFiles("../../data/taxonomy");
+    const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
+    const taxesTotal = taxonomy.find((item) => item.id === "revenue.taxes_total");
+    const vat = taxonomy.find((item) => item.id === "revenue.vat");
+
+    expect(taxesTotal).toEqual(
+      expect.objectContaining({
+        side: "revenue",
+        level: "revenue_category",
+        enLabel: "Taxes total",
+        sortOrder: 5,
+      }),
+    );
+    expect(vat?.sortOrder).toBeGreaterThan(taxesTotal?.sortOrder ?? 0);
+    expect(glossary.get("revenue.taxes_total")).toEqual(
+      expect.objectContaining({
+        kaLabel: taxesTotal?.kaLabel,
+        enLabel: "Taxes total",
+        notes: expect.stringContaining("Temporary source aggregate"),
+      }),
+    );
   });
 });

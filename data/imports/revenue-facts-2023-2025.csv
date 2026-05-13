@@ -1,0 +1,10 @@
+year,side,item_id,amount_gel,basis,source_id,official_institution,official_program,official_subprogram,public_spending_field_id,mapping_confidence,mapping_notes
+2023,revenue,revenue.taxes_total,16994174887,actual,source.mof_2023_tavi1_actual,,,,,,Source row: გადასახადები
+2023,revenue,revenue.grants,325789758,actual,source.mof_2023_tavi1_actual,,,,,,Source row: გრანტები
+2023,revenue,revenue.other_revenue,1396519791,actual,source.mof_2023_tavi1_actual,,,,,,Source row: სხვა შემოსავლები
+2024,revenue,revenue.taxes_total,20196546453,actual,source.mof_2024_tavi1_actual,,,,,,Source row: გადასახადები
+2024,revenue,revenue.grants,335871131,actual,source.mof_2024_tavi1_actual,,,,,,Source row: გრანტები
+2024,revenue,revenue.other_revenue,1316418498,actual,source.mof_2024_tavi1_actual,,,,,,Source row: სხვა შემოსავლები
+2025,revenue,revenue.taxes_total,21957477800,actual,source.mof_2025_tavi1_actual,,,,,,Source row: გადასახადები
+2025,revenue,revenue.grants,279567800,actual,source.mof_2025_tavi1_actual,,,,,,Source row: გრანტები
+2025,revenue,revenue.other_revenue,1754706600,actual,source.mof_2025_tavi1_actual,,,,,,Source row: სხვა შემოსავლები

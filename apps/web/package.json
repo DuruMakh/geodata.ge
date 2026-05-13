@@ -14,7 +14,10 @@
     "test:watch": "vitest",
     "data:validate": "tsx scripts/validate-data-files.ts",
     "data:extract-expenditure": "tsx scripts/extract-real-expenditure.ts",
+    "data:extract-revenue": "tsx scripts/extract-real-revenue.ts",
     "data:generate-expenditure-facts": "tsx scripts/generate-real-expenditure-facts.ts",
+    "data:generate-revenue-facts": "tsx scripts/generate-real-revenue-facts.ts",
+    "data:compose-budget-facts": "tsx scripts/compose-budget-facts.ts",
     "data:import": "tsx scripts/import-budget-facts.ts",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev"
