@@ -25,9 +25,6 @@ export function SpendingPetals({ items }: SpendingPetalsProps) {
             const radius = BASE_RADIUS + normalizedShare * RADIUS_RANGE;
             const cx = CENTER + Math.cos(angle) * 58;
             const cy = CENTER + Math.sin(angle) * 58;
-            const labelX = CENTER + Math.cos(angle) * 116;
-            const labelY = CENTER + Math.sin(angle) * 116;
-            const showLabel = item.shareOfTotal >= 0.1 && item.kaLabel.length <= 18;
 
             return (
               <g key={item.itemId}>
@@ -44,19 +41,6 @@ export function SpendingPetals({ items }: SpendingPetalsProps) {
                 >
                   <title>{`${item.kaLabel}: ${formatGel(item.amountGel)} / ${formatPercent(item.shareOfTotal)}`}</title>
                 </ellipse>
-                {showLabel ? (
-                  <text
-                    x={labelX}
-                    y={labelY}
-                    textAnchor={labelX < CENTER ? "end" : labelX > CENTER ? "start" : "middle"}
-                    dominantBaseline="middle"
-                    fill="#f4f4f5"
-                    fontSize={11}
-                    fontWeight={700}
-                  >
-                    {item.kaLabel}
-                  </text>
-                ) : null}
               </g>
             );
           })}
