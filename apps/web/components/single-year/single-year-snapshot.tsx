@@ -1,7 +1,9 @@
 import type { SingleYearSnapshotModel } from "../../lib/explorer/types";
+import { BudgetField } from "./budget-field";
 import { Every100Gel } from "./every-100-gel";
 import { SnapshotHeadlineCards } from "./snapshot-headline-cards";
 import { SnapshotTreemap } from "./snapshot-treemap";
+import { SpendingPetals } from "./spending-petals";
 
 type SingleYearSnapshotProps = {
   model: SingleYearSnapshotModel;
@@ -32,6 +34,10 @@ export function SingleYearSnapshot({ model }: SingleYearSnapshotProps) {
       <SnapshotHeadlineCards cards={model.headlineCards} />
       <SnapshotTreemap items={model.items} />
       <Every100Gel items={model.every100} side={model.side} />
+      <SpendingPetals items={model.petals} />
+      <div className="overflow-x-auto">
+        <BudgetField items={model.items} hasGrowthData={model.hasGrowthData} />
+      </div>
     </section>
   );
 }
