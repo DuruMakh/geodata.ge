@@ -2,34 +2,43 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add the GeoData.ge v1 single-year budget snapshot view for real expenditure data: headline cards, treemap, Every 100 GEL, spending petals, Budget Field, and full ranking.
+**Goal:** Add a v1 single-year budget snapshot for the existing real expenditure dataset, with headline cards, treemap, Every 100 GEL, spending petals, Budget Field, and full ranking.
 
-**Architecture:** Reuse the existing validated budget facts, glossary, source metadata, and dark analytical UI shell. Add a focused single-year data model in `lib/explorer/singleYear.ts`, then render it through small client components under `components/single-year/*`. The existing `MainExplorer` becomes the state owner for side, view mode, and selected year; no data ingestion changes are included.
+**Architecture:** Keep the current multi-year explorer as the default first screen. Add a `single_year` view mode owned by `MainExplorer`, derive all snapshot values in a pure `lib/explorer/singleYear.ts` model, and render the snapshot through focused components under `components/single-year/`. Reuse the existing CSV facts, glossary, source metadata, formatting helpers, dark visual system, and Recharts patterns.
 
 **Tech Stack:** Next.js App Router, TypeScript, React 19, Tailwind 4, Recharts 3, Vitest, Playwright.
 
 ---
 
+## Review of the Previous Plan
+
+The previous plan had the right product intent, but it needed cleanup before an AI agent should execute it.
+
+Main issues to fix:
+
+- It was too long and embedded large component implementations, which made it harder to review and easier for an agent to copy brittle code blindly.
+- It committed the intentionally failing test state. That is useful for local TDD, but bad for a task-by-task agent handoff because it leaves broken commits in history.
+- Recharts instructions were underspecified around the existing project pattern. The current app already uses `ResponsiveContainer`, `Cell`, and fixed initial dimensions in `ChartFrame`; Plan 4 should follow those patterns.
+- Browser success criteria used a raw `svg` count, which is fragile. The stronger check is by stable headings/test IDs plus no console errors.
+- The petals model said "top 7 plus Other", but the component could slice away the aggregated `Other` item.
+- The plan did not make current data assumptions explicit enough: current real app data is expenditure-only, `2023-2025`, with `39` validated fact rows.
+- It did not call out the known Windows `spawn EPERM` and report-writer permission behavior strongly enough for future verification.
+
+This rewrite keeps the same feature scope but makes the implementation smaller, more testable, and easier to execute.
+
 ## Scope
 
 Included:
 
-- Add a `ViewMode` switch: `multi_year` and `single_year`.
-- Keep the default first view as multi-year expenditure.
-- Add a single-year selector using the existing real data years.
-- Render single-year expenditure snapshot from `data/imports/budget-facts-2023-2025.csv`.
-- Keep the single-year view top-level only: public spending fields, no programs, subprograms, or clickable drilldown.
-- Render, in order:
-  1. Year headline cards.
-  2. Treemap.
-  3. Every 100 GEL.
-  4. Spending petals.
-  5. Budget Field.
-  6. Full ranking.
-- Support the existing side switch. If revenue has no facts, show a clean Georgian empty state in single-year mode.
-- Preserve the minimal public source label and planned badge behavior if planned facts exist later.
-- Add unit tests for all snapshot calculations.
-- Add browser coverage for switching to single-year mode and seeing the six sections.
+- Add a `ViewMode` switch with `multi_year` and `single_year`.
+- Keep default first view unchanged: expenditure, multi-year, nominal GEL, line chart.
+- Add a single-year selector using currently loaded fact years.
+- Build the single-year snapshot from `data/imports/budget-facts-2023-2025.csv`.
+- Render expenditure snapshots for top-level public spending fields only.
+- Keep revenue ingestion out of scope. In `single_year` revenue mode, show a Georgian empty state when no revenue facts exist.
+- Preserve current source label behavior and planned-value badge behavior for future planned facts.
+- Add unit tests for snapshot calculations and integration tests against the real current CSV.
+- Add browser coverage for the single-year route through the UI.
 
 Excluded:
 
@@ -38,8 +47,9 @@ Excluded:
 - Stacked mode.
 - Share of GDP.
 - Public provenance panels.
-- Drilldown/detail pages.
-- Supabase reads or database insert.
+- Clickable drilldown/detail pages.
+- Supabase reads or database inserts.
+- Refactoring the real expenditure extraction pipeline.
 
 ## Source Documents
 
@@ -53,16 +63,19 @@ Read before executing:
 
 ## Current Baseline
 
-The current app already has:
+Current verified assumptions:
 
-- `MainExplorer` as the client state owner.
-- `ExplorerControls`, `ChartFrame`, `ExplorerTable`, `SeriesSelector`, and `PeriodSummaryPanel`.
-- Real expenditure facts for 2023-2025.
-- `buildExplorerModel` for multi-year line, bar, table, CSV, and period summary.
-- Recharts installed.
-- Browser tests at `apps/web/tests/browser/main-explorer.spec.ts`.
+- `apps/web/app/page.tsx` loads `../../data/imports/budget-facts-2023-2025.csv`.
+- Real expenditure facts currently cover `2023`, `2024`, and `2025`.
+- `npm run data:validate` should report `Validated fact rows: 39`.
+- Revenue facts are not currently loaded in the real app data file.
+- `MainExplorer` owns side, chart mode, measure, range, bar year, selection state, CSV export, and source label.
+- `ChartFrame` is the local Recharts pattern to follow for responsive chart sizing, `Cell`, tooltip styling, and planned markers.
+- Playwright starts the app on `http://localhost:3100` through `apps/web/playwright.config.ts`.
 
-Plan 4 should not change the real expenditure pipeline except to rely on its generated facts.
+Known Windows tooling behavior:
+
+- If `npm run test`, `npm run data:validate`, or `npm run test:browser` fails with `spawn EPERM`, index lock, or report-write permission errors, rerun the same command with Codex escalation. Treat that as a Windows sandbox/tooling problem unless the rerun exposes a product failure.
 
 ## File Structure
 
@@ -86,34 +99,21 @@ Modify:
 apps/web/lib/explorer/types.ts
 apps/web/components/main-explorer/explorer-controls.tsx
 apps/web/components/main-explorer/main-explorer.tsx
+apps/web/tests/explorer/integration.test.ts
 apps/web/tests/browser/main-explorer.spec.ts
 ```
 
-Responsibilities:
+Do not modify:
 
-- `singleYear.ts`: pure data model for the snapshot.
-- `single-year-snapshot.tsx`: section composition and no-data state.
-- `snapshot-headline-cards.tsx`: four-card headline block.
-- `snapshot-treemap.tsx`: Recharts treemap for top-level composition.
-- `every-100-gel.tsx`: rounded whole-GEL distribution that sums to 100.
-- `spending-petals.tsx`: expressive SVG composition visual, top 7 plus Other.
-- `budget-field.tsx`: Recharts scatter plot for share vs growth.
-- `single-year-ranking.tsx`: sortable top-level ranking.
-- `explorer-controls.tsx`: add view-mode and single-year controls.
-- `main-explorer.tsx`: switch between multi-year explorer and single-year snapshot.
+```text
+data/imports/budget-facts-2023-2025.csv
+data/mappings/review/spending-field-mapping-review-2023-2025.csv
+apps/web/lib/data/realExpenditure/*
+```
 
----
+## Shared Model Contract
 
-### Task 1: Add View Mode Types and Single-Year Model Tests
-
-**Files:**
-
-- Modify: `apps/web/lib/explorer/types.ts`
-- Create: `apps/web/tests/explorer/singleYear.test.ts`
-
-- [ ] **Step 1: Extend shared explorer types**
-
-Modify `apps/web/lib/explorer/types.ts` by adding:
+Add these exported types to `apps/web/lib/explorer/types.ts`:
 
 ```ts
 export const VIEW_MODES = ["multi_year", "single_year"] as const;
@@ -143,6 +143,7 @@ export type Every100Item = {
 };
 
 export type SnapshotHeadline = {
+  id: string;
   label: string;
   value: string;
   detail: string;
@@ -166,9 +167,31 @@ export type SingleYearSnapshotModel = {
 };
 ```
 
-- [ ] **Step 2: Write failing single-year tests**
+Model rules:
 
-Create `apps/web/tests/explorer/singleYear.test.ts`:
+- `items` and `rankingRows` are top-level rows sorted by `amountGel` descending.
+- `totalGel` is the sum of active public facts for `side + year`.
+- `previousYear` is the closest earlier year with facts for the same side.
+- `changeFromPreviousYear` is `null` when previous item amount is missing or zero.
+- `amountChangeFromPreviousYear` is `null` when previous item amount is missing.
+- `every100` must sum to exactly `100` across `gelFrom100`.
+- `petals` must be top 7 items plus an aggregated `snapshot.other` item when there are more than 8 items. If there are 8 or fewer items, include all items.
+- `emptyReason` is non-null when the selected side/year has no rows.
+
+## Task 1: Add Snapshot Model Tests
+
+**Files:**
+
+- Modify: `apps/web/lib/explorer/types.ts`
+- Create: `apps/web/tests/explorer/singleYear.test.ts`
+
+- [ ] **Step 1: Add the shared model types**
+
+Add the types from `Shared Model Contract` to `apps/web/lib/explorer/types.ts`.
+
+- [ ] **Step 2: Add focused unit tests**
+
+Create `apps/web/tests/explorer/singleYear.test.ts` with tests for:
 
 ```ts
 import { describe, expect, it } from "vitest";
@@ -181,6 +204,7 @@ const glossary = new Map<string, GlossaryEntry>([
   ["spending.health", { id: "spending.health", kaLabel: "ჯანმრთელობა", enLabel: "Health", description: "", notes: "" }],
   ["spending.education", { id: "spending.education", kaLabel: "განათლება", enLabel: "Education", description: "", notes: "" }],
   ["spending.defence", { id: "spending.defence", kaLabel: "თავდაცვა", enLabel: "Defence", description: "", notes: "" }],
+  ["spending.infrastructure", { id: "spending.infrastructure", kaLabel: "ინფრასტრუქტურა", enLabel: "Infrastructure", description: "", notes: "" }],
 ]);
 
 const facts: BudgetFactImportRow[] = [
@@ -198,69 +222,34 @@ const sources: SourceDocumentRow[] = [
 ];
 
 describe("single-year snapshot model", () => {
-  it("builds total, shares, previous-year growth, and headline cards", () => {
-    const model = buildSingleYearSnapshotModel({
-      facts,
-      glossary,
-      sourceDocuments: sources,
-      side: "expenditure",
-      year: 2025,
-    });
+  it("builds total, shares, growth, and four headline cards", () => {
+    const model = buildSingleYearSnapshotModel({ facts, glossary, sourceDocuments: sources, side: "expenditure", year: 2025 });
 
     expect(model.totalGel).toBe(500);
     expect(model.previousYear).toBe(2024);
-    expect(model.hasGrowthData).toBe(true);
-    expect(model.items.map((item) => item.itemId)).toEqual([
-      "spending.education",
-      "spending.health",
-      "spending.defence",
-    ]);
+    expect(model.items.map((item) => item.itemId)).toEqual(["spending.education", "spending.health", "spending.defence"]);
     expect(model.items[0]?.shareOfTotal).toBe(0.5);
     expect(model.items.find((item) => item.itemId === "spending.health")?.changeFromPreviousYear).toBe(0.5);
-    expect(model.headlineCards).toHaveLength(4);
+    expect(model.headlineCards.map((card) => card.id)).toEqual(["total", "largest", "fastest_growth", "largest_increase"]);
     expect(model.emptyReason).toBeNull();
   });
 
-  it("rounds Every 100 GEL rows so the total is exactly 100", () => {
-    const model = buildSingleYearSnapshotModel({
-      facts,
-      glossary,
-      sourceDocuments: sources,
-      side: "expenditure",
-      year: 2025,
-    });
+  it("rounds Every 100 GEL to exactly 100", () => {
+    const model = buildSingleYearSnapshotModel({ facts, glossary, sourceDocuments: sources, side: "expenditure", year: 2025 });
 
     expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
-    expect(model.every100[0]).toEqual(
-      expect.objectContaining({
-        itemId: "spending.education",
-        gelFrom100: 50,
-      }),
-    );
   });
 
-  it("returns growth unavailable when there is no previous available year", () => {
-    const model = buildSingleYearSnapshotModel({
-      facts,
-      glossary,
-      sourceDocuments: sources,
-      side: "expenditure",
-      year: 2024,
-    });
+  it("marks growth unavailable when there is no previous available year", () => {
+    const model = buildSingleYearSnapshotModel({ facts, glossary, sourceDocuments: sources, side: "expenditure", year: 2024 });
 
     expect(model.previousYear).toBeNull();
     expect(model.hasGrowthData).toBe(false);
     expect(model.items.every((item) => item.changeFromPreviousYear === null)).toBe(true);
   });
 
-  it("returns a Georgian empty state when the selected side has no rows", () => {
-    const model = buildSingleYearSnapshotModel({
-      facts,
-      glossary,
-      sourceDocuments: sources,
-      side: "revenue",
-      year: 2025,
-    });
+  it("returns a Georgian empty state when selected side has no data", () => {
+    const model = buildSingleYearSnapshotModel({ facts, glossary, sourceDocuments: sources, side: "revenue", year: 2025 });
 
     expect(model.items).toEqual([]);
     expect(model.emptyReason).toBe("ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული.");
@@ -268,7 +257,7 @@ describe("single-year snapshot model", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to verify it fails**
+- [ ] **Step 3: Verify the new test fails for the right reason**
 
 Run:
 
@@ -283,63 +272,22 @@ Expected:
 Cannot find module '../../lib/explorer/singleYear'
 ```
 
-- [ ] **Step 4: Commit the failing test and type expansion**
+Do not commit the failing test state.
 
-Run:
-
-```powershell
-git add apps/web/lib/explorer/types.ts apps/web/tests/explorer/singleYear.test.ts
-git commit -m "test: define single year snapshot model"
-```
-
-Expected:
-
-```text
-[branch ...] test: define single year snapshot model
-```
-
----
-
-### Task 2: Implement Single-Year Snapshot Data Model
+## Task 2: Implement `buildSingleYearSnapshotModel`
 
 **Files:**
 
 - Create: `apps/web/lib/explorer/singleYear.ts`
 - Test: `apps/web/tests/explorer/singleYear.test.ts`
 
-- [ ] **Step 1: Add the pure snapshot model**
+- [ ] **Step 1: Implement the model**
 
-Create `apps/web/lib/explorer/singleYear.ts`:
+Create `apps/web/lib/explorer/singleYear.ts`.
+
+Required exports:
 
 ```ts
-import type { GlossaryEntry } from "../data/glossary";
-import type { BudgetFactImportRow } from "../data/importBudgetFacts";
-import type { SourceDocumentRow } from "../data/sources";
-import { chooseActivePublicFacts } from "../data/activeFacts";
-import { formatGel, formatPercent, formatSignedPercent } from "./format";
-import type {
-  Every100Item,
-  ExplorerSide,
-  SingleYearSnapshotModel,
-  SnapshotItem,
-  SourceMetadata,
-} from "./types";
-
-const palette = [
-  "#22d3ee",
-  "#a3e635",
-  "#f97316",
-  "#f472b6",
-  "#c084fc",
-  "#facc15",
-  "#38bdf8",
-  "#fb7185",
-  "#14b8a6",
-  "#e879f9",
-  "#84cc16",
-  "#f43f5e",
-];
-
 export type SingleYearSnapshotInput = {
   facts: BudgetFactImportRow[];
   glossary: Map<string, GlossaryEntry>;
@@ -348,186 +296,29 @@ export type SingleYearSnapshotInput = {
   year: number;
 };
 
-function emptyReasonFor(side: ExplorerSide): string {
-  return side === "revenue"
-    ? "ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული."
-    : "ამ წლისთვის ხარჯების მონაცემები ჯერ არ არის ჩატვირთული.";
-}
-
-function sourceMetadataFor(sourceIds: string[], sourceDocuments: SourceDocumentRow[]): SourceMetadata {
-  const byId = new Map(sourceDocuments.map((source) => [source.sourceId, source]));
-  const rows = sourceIds
-    .map((sourceId) => byId.get(sourceId))
-    .filter((source): source is SourceDocumentRow => Boolean(source));
-  const uniqueNames = Array.from(new Set(rows.map((source) => source.sourceName)));
-  const uniqueFiles = Array.from(new Set(rows.map((source) => source.sourceUrlOrFile)));
-
-  return {
-    sourceName: sourceIds.length === 1 ? uniqueNames[0] ?? "" : "Multiple reviewed official sources",
-    sourceUrlOrFile: uniqueFiles.join("; "),
-    lastReviewedAt: rows.map((source) => source.lastReviewedAt).sort().at(-1) ?? "",
-  };
-}
-
-function labelsFor(itemId: string, glossary: Map<string, GlossaryEntry>) {
-  const entry = glossary.get(itemId);
-  return {
-    kaLabel: entry?.kaLabel ?? itemId,
-    enLabel: entry?.enLabel ?? itemId,
-  };
-}
-
-function previousYearFor(facts: BudgetFactImportRow[], side: ExplorerSide, year: number): number | null {
-  return Array.from(new Set(facts.filter((fact) => fact.side === side && fact.year < year).map((fact) => fact.year)))
-    .sort((a, b) => b - a)[0] ?? null;
-}
-
-function buildEvery100(items: SnapshotItem[]): Every100Item[] {
-  const base = items.map((item) => {
-    const exact = item.shareOfTotal * 100;
-    return {
-      item,
-      whole: Math.floor(exact),
-      remainder: exact - Math.floor(exact),
-    };
-  });
-  let remaining = 100 - base.reduce((sum, row) => sum + row.whole, 0);
-  const byRemainder = [...base].sort((a, b) => b.remainder - a.remainder);
-
-  for (const row of byRemainder) {
-    if (remaining <= 0) break;
-    row.whole += 1;
-    remaining -= 1;
-  }
-
-  return base
-    .filter((row) => row.whole > 0)
-    .map((row) => ({
-      itemId: row.item.itemId,
-      kaLabel: row.item.kaLabel,
-      enLabel: row.item.enLabel,
-      color: row.item.color,
-      gelFrom100: row.whole,
-      exactShare: row.item.shareOfTotal,
-    }));
-}
-
-function buildPetals(items: SnapshotItem[]): SnapshotItem[] {
-  if (items.length <= 8) return items;
-
-  const visible = items.slice(0, 7);
-  const rest = items.slice(7);
-  const otherAmountGel = rest.reduce((sum, item) => sum + item.amountGel, 0);
-  const otherPreviousAmountGel = rest.reduce((sum, item) => sum + (item.previousAmountGel ?? 0), 0);
-  const fallbackSource = visible[0]?.source ?? rest[0]?.source;
-
-  if (!fallbackSource) return visible;
-
-  return [
-    ...visible,
-    {
-      itemId: "snapshot.other",
-      kaLabel: "სხვა",
-      enLabel: "Other",
-      color: "#71717a",
-      amountGel: otherAmountGel,
-      shareOfTotal: rest.reduce((sum, item) => sum + item.shareOfTotal, 0),
-      previousAmountGel: otherPreviousAmountGel === 0 ? null : otherPreviousAmountGel,
-      changeFromPreviousYear:
-        otherPreviousAmountGel === 0 ? null : (otherAmountGel - otherPreviousAmountGel) / otherPreviousAmountGel,
-      amountChangeFromPreviousYear:
-        otherPreviousAmountGel === 0 ? null : otherAmountGel - otherPreviousAmountGel,
-      basis: rest.some((item) => item.basis === "planned") ? "planned" : "actual",
-      source: fallbackSource,
-    },
-  ];
-}
-
-export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): SingleYearSnapshotModel {
-  const activeFacts = chooseActivePublicFacts(input.facts);
-  const sideFacts = activeFacts.filter((fact) => fact.side === input.side);
-  const yearFacts = sideFacts.filter((fact) => fact.year === input.year);
-  const previousYear = previousYearFor(activeFacts, input.side, input.year);
-  const previousFacts = previousYear === null ? [] : sideFacts.filter((fact) => fact.year === previousYear);
-  const previousByItem = new Map(previousFacts.map((fact) => [fact.itemId, fact]));
-  const totalGel = yearFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
-  const totalPreviousGel = previousFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
-
-  if (yearFacts.length === 0 || totalGel === 0) {
-    return {
-      side: input.side,
-      year: input.year,
-      previousYear,
-      totalGel: 0,
-      basis: "actual",
-      hasPlannedValues: false,
-      source: null,
-      headlineCards: [],
-      items: [],
-      every100: [],
-      petals: [],
-      rankingRows: [],
-      hasGrowthData: false,
-      emptyReason: emptyReasonFor(input.side),
-    };
-  }
-
-  const items = yearFacts
-    .map((fact, index): SnapshotItem => {
-      const previousAmountGel = previousByItem.get(fact.itemId)?.amountGel ?? null;
-      const changeFromPreviousYear =
-        previousAmountGel === null || previousAmountGel === 0
-          ? null
-          : (fact.amountGel - previousAmountGel) / previousAmountGel;
-
-      return {
-        itemId: fact.itemId,
-        ...labelsFor(fact.itemId, input.glossary),
-        color: palette[index % palette.length] ?? "#22d3ee",
-        amountGel: fact.amountGel,
-        shareOfTotal: fact.amountGel / totalGel,
-        previousAmountGel,
-        changeFromPreviousYear,
-        amountChangeFromPreviousYear: previousAmountGel === null ? null : fact.amountGel - previousAmountGel,
-        basis: fact.basis,
-        source: sourceMetadataFor([fact.sourceId], input.sourceDocuments),
-      };
-    })
-    .sort((a, b) => b.amountGel - a.amountGel);
-
-  const largest = items[0] ?? null;
-  const growthItems = items.filter((item) => item.changeFromPreviousYear !== null);
-  const fastestGrowth = [...growthItems].sort((a, b) => (b.changeFromPreviousYear ?? -Infinity) - (a.changeFromPreviousYear ?? -Infinity))[0] ?? null;
-  const largestIncrease = [...items].sort((a, b) => (b.amountChangeFromPreviousYear ?? -Infinity) - (a.amountChangeFromPreviousYear ?? -Infinity))[0] ?? null;
-  const totalChange = previousYear === null || totalPreviousGel === 0 ? null : (totalGel - totalPreviousGel) / totalPreviousGel;
-  const source = sourceMetadataFor(yearFacts.map((fact) => fact.sourceId), input.sourceDocuments);
-  const sideNoun = input.side === "revenue" ? "შემოსავალი" : "ხარჯი";
-
-  return {
-    side: input.side,
-    year: input.year,
-    previousYear,
-    totalGel,
-    basis: yearFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual",
-    hasPlannedValues: yearFacts.some((fact) => fact.basis === "planned"),
-    source,
-    headlineCards: [
-      { label: `${sideNoun} სულ`, value: formatGel(totalGel), detail: totalChange === null ? "წინა წელი არ არის ხელმისაწვდომი" : `${formatSignedPercent(totalChange)} წინა ხელმისაწვდომ წელთან` },
-      { label: "ყველაზე დიდი მუხლი", value: largest?.kaLabel ?? "n/a", detail: largest ? formatPercent(largest.shareOfTotal) : "n/a" },
-      { label: "ყველაზე სწრაფი ზრდა", value: fastestGrowth?.kaLabel ?? "n/a", detail: fastestGrowth ? formatSignedPercent(fastestGrowth.changeFromPreviousYear) : "ზრდა მიუწვდომელია" },
-      { label: "ყველაზე დიდი GEL მატება", value: largestIncrease?.kaLabel ?? "n/a", detail: largestIncrease?.amountChangeFromPreviousYear === null || largestIncrease === null ? "ზრდა მიუწვდომელია" : formatGel(largestIncrease.amountChangeFromPreviousYear) },
-    ],
-    items,
-    every100: buildEvery100(items),
-    petals: buildPetals(items),
-    rankingRows: items,
-    hasGrowthData: previousYear !== null && growthItems.length > 0,
-    emptyReason: null,
-  };
-}
+export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): SingleYearSnapshotModel;
 ```
 
-- [ ] **Step 2: Run single-year tests**
+Implementation requirements:
+
+- Use `chooseActivePublicFacts(input.facts)` before filtering.
+- Filter by `input.side` and `input.year`.
+- Use the closest previous year with facts for the same side.
+- Use the existing `formatGel`, `formatPercent`, and `formatSignedPercent` helpers for headline display strings.
+- Use the same palette values as `apps/web/lib/explorer/explorerData.ts` unless that palette is exported later.
+- Build source metadata with the same behavior as `explorerData.ts`: one source keeps its source name, multiple sources use `Multiple reviewed official sources`, source files are joined with `; `, and `lastReviewedAt` is the latest source date.
+- Use Georgian empty states:
+  - Revenue: `ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული.`
+  - Expenditure: `ამ წლისთვის ხარჯების მონაცემები ჯერ არ არის ჩატვირთული.`
+- `headlineCards` must contain exactly four cards:
+  - `total`
+  - `largest`
+  - `fastest_growth`
+  - `largest_increase`
+- `every100` must allocate rounding remainders by largest fractional remainder so the displayed whole-GEL values sum to exactly `100`.
+- `petals` must include all items when there are 8 or fewer items. When there are more than 8, use top 7 plus `snapshot.other`.
+
+- [ ] **Step 2: Run model tests**
 
 Run:
 
@@ -542,150 +333,160 @@ Expected:
 4 passed
 ```
 
-- [ ] **Step 3: Commit the data model**
+- [ ] **Step 3: Commit passing model work**
 
 Run:
 
 ```powershell
-git add apps/web/lib/explorer/singleYear.ts apps/web/tests/explorer/singleYear.test.ts
-git commit -m "feat: build single year snapshot model"
+git add apps/web/lib/explorer/types.ts apps/web/lib/explorer/singleYear.ts apps/web/tests/explorer/singleYear.test.ts
+git commit -m "feat: add single year snapshot model"
 ```
 
 Expected:
 
 ```text
-[branch ...] feat: build single year snapshot model
+[branch ...] feat: add single year snapshot model
 ```
 
----
+## Task 3: Add Real-Data Integration Coverage
 
-### Task 3: Add Single-Year Controls to the Explorer Shell
+**Files:**
+
+- Modify: `apps/web/tests/explorer/integration.test.ts`
+
+- [ ] **Step 1: Add real CSV snapshot integration tests**
+
+Append tests that load `../../data/imports/budget-facts-2023-2025.csv` and assert:
+
+```ts
+it("builds a non-empty single-year expenditure snapshot from real facts", async () => {
+  const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+  const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
+  const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
+  const model = buildSingleYearSnapshotModel({
+    facts,
+    glossary,
+    sourceDocuments,
+    side: "expenditure",
+    year: 2025,
+  });
+
+  expect(model.emptyReason).toBeNull();
+  expect(model.totalGel).toBeGreaterThan(0);
+  expect(model.items.length).toBeGreaterThan(5);
+  expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
+  expect(model.rankingRows[0]?.amountGel).toBeGreaterThanOrEqual(model.rankingRows[1]?.amountGel ?? 0);
+});
+
+it("returns a revenue empty state for current real facts", async () => {
+  const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+  const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
+  const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
+  const model = buildSingleYearSnapshotModel({
+    facts,
+    glossary,
+    sourceDocuments,
+    side: "revenue",
+    year: 2025,
+  });
+
+  expect(model.items).toEqual([]);
+  expect(model.emptyReason).toBe("ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული.");
+});
+```
+
+Import `buildSingleYearSnapshotModel` at the top of the file.
+
+- [ ] **Step 2: Run explorer tests**
+
+Run:
+
+```powershell
+cd apps/web
+npm run test -- tests/explorer
+```
+
+Expected:
+
+```text
+Test Files ... passed
+```
+
+- [ ] **Step 3: Commit integration coverage**
+
+Run:
+
+```powershell
+git add apps/web/tests/explorer/integration.test.ts
+git commit -m "test: cover real single year snapshot data"
+```
+
+Expected:
+
+```text
+[branch ...] test: cover real single year snapshot data
+```
+
+## Task 4: Add View Mode and Single-Year Controls
 
 **Files:**
 
 - Modify: `apps/web/components/main-explorer/explorer-controls.tsx`
 - Modify: `apps/web/components/main-explorer/main-explorer.tsx`
 
-- [ ] **Step 1: Update control props**
+- [ ] **Step 1: Extend `ExplorerControls` props**
 
-Modify the props in `apps/web/components/main-explorer/explorer-controls.tsx` to include:
+Add `ViewMode` to the imports and add these props:
 
 ```ts
-import type { ChartMode, ExplorerSide, MeasureMode, ViewMode } from "../../lib/explorer/types";
-
-type ExplorerControlsProps = {
-  side: ExplorerSide;
-  viewMode: ViewMode;
-  chartMode: ChartMode;
-  measure: MeasureMode;
-  years: number[];
-  startYear: number;
-  endYear: number;
-  barYear: number;
-  singleYear: number;
-  onSideChange: (side: ExplorerSide) => void;
-  onViewModeChange: (mode: ViewMode) => void;
-  onChartModeChange: (mode: ChartMode) => void;
-  onMeasureChange: (measure: MeasureMode) => void;
-  onStartYearChange: (year: number) => void;
-  onEndYearChange: (year: number) => void;
-  onBarYearChange: (year: number) => void;
-  onSingleYearChange: (year: number) => void;
-};
+viewMode: ViewMode;
+singleYear: number;
+onViewModeChange: (mode: ViewMode) => void;
+onSingleYearChange: (year: number) => void;
 ```
 
-- [ ] **Step 2: Add Georgian view-mode control**
+- [ ] **Step 2: Add view-mode buttons**
 
-Inside `ExplorerControls`, render this segmented control after the side switch:
+Add a `ხედი` control with two buttons:
 
-```tsx
-<div className="flex flex-col gap-2">
-  <span className="font-mono text-xs uppercase text-zinc-500">ხედი</span>
-  <div className="flex flex-wrap gap-2">
-    {[
-      ["multi_year", "მრავალწლიანი"],
-      ["single_year", "ერთი წელი"],
-    ].map(([nextMode, label]) => (
-      <button
-        key={nextMode}
-        type="button"
-        onClick={() => onViewModeChange(nextMode as ViewMode)}
-        className={`h-9 border px-3 text-sm ${
-          viewMode === nextMode
-            ? "border-cyan-300 bg-cyan-300 text-black"
-            : "border-zinc-700 bg-black text-zinc-300 hover:border-cyan-300"
-        }`}
-      >
-        {label}
-      </button>
-    ))}
-  </div>
-</div>
-```
+- `მრავალწლიანი` -> `multi_year`
+- `ერთი წელი` -> `single_year`
 
-- [ ] **Step 3: Render only relevant year controls**
+Acceptance criteria:
 
-Keep the existing chart-mode and measure controls visible only for `viewMode === "multi_year"`. Add this single-year select for `viewMode === "single_year"`:
+- The active view button uses the same active visual treatment as the existing side buttons.
+- Switching views does not reset selected side.
+- Switching to `single_year` does not mutate multi-year range state.
 
-```tsx
-{viewMode === "single_year" ? (
-  <label className="flex flex-col gap-2 text-sm text-zinc-300">
-    <span className="font-mono text-xs uppercase text-zinc-500">წელი</span>
-    <select
-      value={singleYear}
-      onChange={(event) => onSingleYearChange(Number(event.target.value))}
-      className="h-10 border border-zinc-700 bg-black px-3 text-zinc-100"
-    >
-      {years.map((year) => (
-        <option key={year} value={year}>
-          {year}
-        </option>
-      ))}
-    </select>
-  </label>
-) : null}
-```
+- [ ] **Step 3: Make controls mode-aware**
+
+When `viewMode === "multi_year"`:
+
+- Show chart mode buttons.
+- Show measure selector.
+- Show range or bar-year controls exactly as the app does today.
+- Show CSV export in `MainExplorer`.
+
+When `viewMode === "single_year"`:
+
+- Hide chart mode buttons.
+- Hide measure selector.
+- Hide start/end range controls.
+- Show one year selector labeled `წელი`.
+- Hide CSV export for now. CSV export stays a multi-year/table feature until a later snapshot-export plan.
 
 - [ ] **Step 4: Add state in `MainExplorer`**
 
-Modify `apps/web/components/main-explorer/main-explorer.tsx` imports:
-
-```ts
-import { MAX_CHART_SERIES, type ChartMode, type ExplorerSide, type MeasureMode, type ViewMode } from "../../lib/explorer/types";
-```
-
-Add state beside existing chart mode state:
+Add:
 
 ```ts
 const [viewMode, setViewMode] = useState<ViewMode>("multi_year");
 const [singleYear, setSingleYear] = useState(initialEndYear);
 ```
 
-Pass the new props to `ExplorerControls`:
+Pass `viewMode`, `singleYear`, `setViewMode`, and `setSingleYear` into `ExplorerControls`.
 
-```tsx
-<ExplorerControls
-  side={side}
-  viewMode={viewMode}
-  chartMode={chartMode}
-  measure={measure}
-  years={allYears}
-  startYear={startYear}
-  endYear={endYear}
-  barYear={barYear}
-  singleYear={singleYear}
-  onSideChange={setSide}
-  onViewModeChange={setViewMode}
-  onChartModeChange={handleChartModeChange}
-  onMeasureChange={setMeasure}
-  onStartYearChange={handleStartYearChange}
-  onEndYearChange={handleEndYearChange}
-  onBarYearChange={setBarYear}
-  onSingleYearChange={setSingleYear}
-/>
-```
-
-- [ ] **Step 5: Run type and build checks**
+- [ ] **Step 5: Run build**
 
 Run:
 
@@ -705,19 +506,17 @@ Compiled successfully
 Run:
 
 ```powershell
-git add apps/web/components/main-explorer/explorer-controls.tsx apps/web/components/main-explorer/main-explorer.tsx apps/web/lib/explorer/types.ts
-git commit -m "feat: add single year explorer controls"
+git add apps/web/components/main-explorer/explorer-controls.tsx apps/web/components/main-explorer/main-explorer.tsx
+git commit -m "feat: add single year view controls"
 ```
 
 Expected:
 
 ```text
-[branch ...] feat: add single year explorer controls
+[branch ...] feat: add single year view controls
 ```
 
----
-
-### Task 4: Render Headline Cards and Full Snapshot Shell
+## Task 5: Add Snapshot Shell and Headline Cards
 
 **Files:**
 
@@ -725,84 +524,48 @@ Expected:
 - Create: `apps/web/components/single-year/snapshot-headline-cards.tsx`
 - Modify: `apps/web/components/main-explorer/main-explorer.tsx`
 
-- [ ] **Step 1: Create headline cards component**
+- [ ] **Step 1: Create `SnapshotHeadlineCards`**
 
-Create `apps/web/components/single-year/snapshot-headline-cards.tsx`:
+Create a presentational component that accepts:
 
-```tsx
-import type { SnapshotHeadline } from "../../lib/explorer/types";
-
+```ts
 type SnapshotHeadlineCardsProps = {
   cards: SnapshotHeadline[];
 };
-
-export function SnapshotHeadlineCards({ cards }: SnapshotHeadlineCardsProps) {
-  return (
-    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-      {cards.map((card) => (
-        <div key={card.label} className="border border-cyan-400/20 bg-black/40 p-4">
-          <p className="font-mono text-xs uppercase text-zinc-500">{card.label}</p>
-          <p className="mt-2 text-lg font-semibold text-white">{card.value}</p>
-          <p className="mt-1 text-sm text-zinc-400">{card.detail}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
 ```
 
-- [ ] **Step 2: Create snapshot shell**
+Acceptance criteria:
 
-Create `apps/web/components/single-year/single-year-snapshot.tsx`:
+- Render exactly one card per `cards` item.
+- Use compact panel styling consistent with `PeriodSummaryPanel`.
+- Use `card.id` as key, not display text.
+- No hard-coded numbers inside the component.
 
-```tsx
-import type { SingleYearSnapshotModel } from "../../lib/explorer/types";
-import { SnapshotHeadlineCards } from "./snapshot-headline-cards";
+- [ ] **Step 2: Create `SingleYearSnapshot` shell**
 
+Create a client-compatible component with:
+
+```ts
 type SingleYearSnapshotProps = {
   model: SingleYearSnapshotModel;
 };
-
-export function SingleYearSnapshot({ model }: SingleYearSnapshotProps) {
-  if (model.emptyReason) {
-    return (
-      <section className="border border-amber-300/30 bg-amber-300/10 p-6 text-sm text-amber-100">
-        {model.emptyReason}
-      </section>
-    );
-  }
-
-  return (
-    <section className="flex flex-col gap-5">
-      <header className="border border-cyan-400/20 bg-black/50 p-4">
-        <p className="font-mono text-xs uppercase text-cyan-200">Single-year snapshot</p>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h2 className="text-2xl font-semibold text-white">{model.year} წლის ბიუჯეტის სურათი</h2>
-          {model.hasPlannedValues ? (
-            <span className="border border-amber-300/40 px-2 py-1 text-xs text-amber-100">გეგმური ბიუჯეტი</span>
-          ) : null}
-        </div>
-        <p className="mt-2 text-sm text-zinc-400">
-          {model.side === "revenue" ? "საიდან მოდის საჯარო ფული" : "სად მიდის საჯარო ფული"}
-        </p>
-      </header>
-
-      <SnapshotHeadlineCards cards={model.headlineCards} />
-    </section>
-  );
-}
 ```
 
-- [ ] **Step 3: Wire snapshot shell into `MainExplorer`**
+Acceptance criteria:
 
-Modify `apps/web/components/main-explorer/main-explorer.tsx` imports:
+- If `model.emptyReason` exists, render only a bordered amber empty state.
+- Otherwise render header plus the headline cards.
+- Header copy:
+  - Title: `${model.year} წლის ბიუჯეტის სურათი`
+  - Eyebrow: `Single-year snapshot`
+  - Expenditure subtitle: `სად მიდის საჯარო ფული`
+  - Revenue subtitle: `საიდან მოდის საჯარო ფული`
+- If `model.hasPlannedValues`, show a small `გეგმური ბიუჯეტი` badge near the title.
+- Add `data-testid="single-year-snapshot"` to the root non-empty section.
 
-```ts
-import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
-import { SingleYearSnapshot } from "../single-year/single-year-snapshot";
-```
+- [ ] **Step 3: Wire model and shell into `MainExplorer`**
 
-Add the model:
+Add:
 
 ```ts
 const singleYearModel = buildSingleYearSnapshotModel({
@@ -814,68 +577,28 @@ const singleYearModel = buildSingleYearSnapshotModel({
 });
 ```
 
-Replace the chart/table block with:
+Render rules:
 
-```tsx
-{viewMode === "single_year" ? (
-  <SingleYearSnapshot model={singleYearModel} />
-) : model.unavailableReason ? (
-  <div className="border border-amber-300/30 bg-amber-300/10 p-6 text-sm text-amber-100">{model.unavailableReason}</div>
-) : chartMode === "table" ? (
-  <ExplorerTable rows={model.tableRows} years={model.years} />
-) : (
-  <ChartFrame mode={chartMode} measure={measure} years={model.years} points={model.points} selectedItems={model.selectedItems} />
-)}
-```
+- If `viewMode === "single_year"`, render `<SingleYearSnapshot model={singleYearModel} />`.
+- If `viewMode === "multi_year"`, keep the existing chart/table/unavailable behavior.
+- Hide `SeriesSelector` in single-year mode.
+- Hide `PeriodSummaryPanel` in single-year mode.
+- Use a one-column main content layout in single-year mode so the removed sidebar does not leave awkward empty space.
 
-Hide `SeriesSelector` in single-year mode:
-
-```tsx
-{viewMode === "multi_year" ? (
-  <div className="order-2 lg:order-none">
-    <SeriesSelector
-      items={model.items}
-      selectedIds={selectedIds}
-      rows={selectorRows}
-      years={model.years}
-      chartMode={chartMode}
-      limitMessage={limitMessage}
-      onToggle={handleToggle}
-    />
-  </div>
-) : null}
-```
-
-Hide the period summary in single-year mode:
-
-```tsx
-{viewMode === "multi_year" ? (
-  <section className="mt-8 pb-12">
-    <PeriodSummaryPanel
-      years={model.years}
-      summary={model.summary}
-      rows={model.comparisonRows}
-      topGrowth={model.topGrowth}
-      bottomGrowth={model.bottomGrowth}
-    />
-  </section>
-) : null}
-```
-
-- [ ] **Step 4: Run tests and build**
+- [ ] **Step 4: Run focused checks**
 
 Run:
 
 ```powershell
 cd apps/web
-npm run test -- tests/explorer/singleYear.test.ts
+npm run test -- tests/explorer/singleYear.test.ts tests/explorer/integration.test.ts
 npm run build
 ```
 
 Expected:
 
 ```text
-4 passed
+Tests passed
 Compiled successfully
 ```
 
@@ -894,9 +617,7 @@ Expected:
 [branch ...] feat: render single year snapshot shell
 ```
 
----
-
-### Task 5: Add Treemap and Every 100 GEL
+## Task 6: Add Treemap and Every 100 GEL
 
 **Files:**
 
@@ -904,143 +625,36 @@ Expected:
 - Create: `apps/web/components/single-year/every-100-gel.tsx`
 - Modify: `apps/web/components/single-year/single-year-snapshot.tsx`
 
-- [ ] **Step 1: Create treemap component**
+- [ ] **Step 1: Create `SnapshotTreemap`**
 
-Create `apps/web/components/single-year/snapshot-treemap.tsx`:
+Use Recharts `ResponsiveContainer` and `Treemap`.
 
-```tsx
-import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
-import { formatGel, formatPercent } from "../../lib/explorer/format";
-import type { SnapshotItem } from "../../lib/explorer/types";
+Acceptance criteria:
 
-type SnapshotTreemapProps = {
-  items: SnapshotItem[];
-};
+- Props: `{ items: SnapshotItem[] }`.
+- Section heading: `ბიუჯეტის რუკა`.
+- Add `data-testid="snapshot-treemap"`.
+- Size rectangles by `amountGel`.
+- Show labels only when the rectangle is wide and tall enough.
+- Tooltip shows item label, formatted GEL amount, and formatted share.
+- Do not add click handlers or links.
+- Follow `ChartFrame` sizing style: fixed chart height, `ResponsiveContainer`, dark tooltip styling.
 
-type TreemapNode = SnapshotItem & {
-  name: string;
-  size: number;
-};
+- [ ] **Step 2: Create `Every100Gel`**
 
-export function SnapshotTreemap({ items }: SnapshotTreemapProps) {
-  const data: TreemapNode[] = items.map((item) => ({
-    ...item,
-    name: item.kaLabel,
-    size: item.amountGel,
-  }));
+Acceptance criteria:
 
-  return (
-    <section className="border border-cyan-400/20 bg-black/40 p-4">
-      <div className="mb-3">
-        <h3 className="text-lg font-semibold text-white">ბიუჯეტის რუკა</h3>
-        <p className="text-sm text-zinc-500">ზომა აჩვენებს წლის მთლიან ხარჯში წილს.</p>
-      </div>
-      <div className="h-[360px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <Treemap
-            data={data}
-            dataKey="size"
-            nameKey="name"
-            stroke="#05070b"
-            fill="#22d3ee"
-            content={<TreemapCell />}
-          >
-            <Tooltip
-              contentStyle={{ background: "#05070b", border: "1px solid rgba(34, 211, 238, 0.35)" }}
-              formatter={(_, __, payload) => {
-                const item = payload?.payload as TreemapNode | undefined;
-                return item ? [`${formatGel(item.amountGel)} / ${formatPercent(item.shareOfTotal)}`, item.kaLabel] : ["", ""];
-              }}
-            />
-          </Treemap>
-        </ResponsiveContainer>
-      </div>
-    </section>
-  );
-}
+- Props: `{ items: Every100Item[]; side: ExplorerSide }`.
+- Section heading: `ყოველი 100 GEL`.
+- Add `data-testid="every-100-gel"`.
+- Render a stable 10x10 grid of exactly 100 cells.
+- Each cell color comes from its item.
+- Legend rows show item label and whole-GEL amount.
+- The component must not calculate rounding; it trusts `model.every100`.
 
-function TreemapCell(props: unknown) {
-  const cell = props as TreemapNode & { x: number; y: number; width: number; height: number };
-  const showLabel = cell.width > 110 && cell.height > 42;
+- [ ] **Step 3: Render sections in order**
 
-  return (
-    <g>
-      <rect x={cell.x} y={cell.y} width={cell.width} height={cell.height} fill={cell.color} fillOpacity={0.84} stroke="#05070b" />
-      {showLabel ? (
-        <text x={cell.x + 8} y={cell.y + 22} fill="#020617" fontSize={12} fontWeight={700}>
-          {cell.kaLabel}
-        </text>
-      ) : null}
-    </g>
-  );
-}
-```
-
-- [ ] **Step 2: Create Every 100 GEL component**
-
-Create `apps/web/components/single-year/every-100-gel.tsx`:
-
-```tsx
-import type { Every100Item } from "../../lib/explorer/types";
-
-type Every100GelProps = {
-  items: Every100Item[];
-  side: "expenditure" | "revenue";
-};
-
-export function Every100Gel({ items, side }: Every100GelProps) {
-  const cells = items.flatMap((item) =>
-    Array.from({ length: item.gelFrom100 }, (_, index) => ({
-      key: `${item.itemId}-${index}`,
-      color: item.color,
-      label: item.kaLabel,
-    })),
-  );
-
-  return (
-    <section className="border border-lime-300/20 bg-black/40 p-4">
-      <div className="mb-3">
-        <h3 className="text-lg font-semibold text-white">ყოველი 100 GEL</h3>
-        <p className="text-sm text-zinc-500">
-          {side === "revenue" ? "ყოველი 100 GEL შემოსავლიდან" : "ყოველი 100 GEL ხარჯიდან"}
-        </p>
-      </div>
-      <div className="grid grid-cols-10 gap-1 sm:max-w-[360px]">
-        {cells.map((cell) => (
-          <span
-            key={cell.key}
-            title={cell.label}
-            className="aspect-square border border-black/50"
-            style={{ backgroundColor: cell.color }}
-          />
-        ))}
-      </div>
-      <div className="mt-4 grid gap-2 md:grid-cols-2">
-        {items.map((item) => (
-          <div key={item.itemId} className="flex items-center justify-between gap-3 text-sm">
-            <span className="flex items-center gap-2 text-zinc-300">
-              <span className="h-3 w-3" style={{ backgroundColor: item.color }} />
-              {item.kaLabel}
-            </span>
-            <span className="font-mono text-zinc-100">{item.gelFrom100} GEL</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-```
-
-- [ ] **Step 3: Render treemap and Every 100 GEL**
-
-Modify `apps/web/components/single-year/single-year-snapshot.tsx` imports:
-
-```ts
-import { Every100Gel } from "./every-100-gel";
-import { SnapshotTreemap } from "./snapshot-treemap";
-```
-
-Render after headline cards:
+In `SingleYearSnapshot`, render after headline cards:
 
 ```tsx
 <SnapshotTreemap items={model.items} />
@@ -1062,24 +676,22 @@ Expected:
 Compiled successfully
 ```
 
-- [ ] **Step 5: Commit treemap and Every 100 GEL**
+- [ ] **Step 5: Commit composition visuals**
 
 Run:
 
 ```powershell
 git add apps/web/components/single-year
-git commit -m "feat: add snapshot treemap and every 100 gel"
+git commit -m "feat: add snapshot composition visuals"
 ```
 
 Expected:
 
 ```text
-[branch ...] feat: add snapshot treemap and every 100 gel
+[branch ...] feat: add snapshot composition visuals
 ```
 
----
-
-### Task 6: Add Spending Petals and Budget Field
+## Task 7: Add Spending Petals and Budget Field
 
 **Files:**
 
@@ -1087,152 +699,39 @@ Expected:
 - Create: `apps/web/components/single-year/budget-field.tsx`
 - Modify: `apps/web/components/single-year/single-year-snapshot.tsx`
 
-- [ ] **Step 1: Create spending petals component**
+- [ ] **Step 1: Create `SpendingPetals`**
 
-Create `apps/web/components/single-year/spending-petals.tsx`:
+Acceptance criteria:
 
-```tsx
-import { formatGel, formatPercent } from "../../lib/explorer/format";
-import type { SnapshotItem } from "../../lib/explorer/types";
+- Props: `{ items: SnapshotItem[] }`.
+- Section heading: `ხარჯების ფურცლები`.
+- Add `data-testid="spending-petals"`.
+- Render all `items` received from `model.petals`. Do not slice again inside the component.
+- The last item may be `snapshot.other`; render it like every other item.
+- Petal size is proportional to `shareOfTotal`.
+- Include SVG `<title>` for hover detail.
+- No click handlers or links.
 
-type SpendingPetalsProps = {
-  items: SnapshotItem[];
-};
+- [ ] **Step 2: Create `BudgetField`**
 
-export function SpendingPetals({ items }: SpendingPetalsProps) {
-  const topItems = items.slice(0, 7);
-  const center = 150;
+Use Recharts `ScatterChart`, `Scatter`, `XAxis`, `YAxis`, `ZAxis`, `Tooltip`, `Cell`, and `ResponsiveContainer`.
 
-  return (
-    <section className="border border-fuchsia-300/20 bg-black/40 p-4">
-      <div className="mb-3">
-        <h3 className="text-lg font-semibold text-white">ხარჯების ფურცლები</h3>
-        <p className="text-sm text-zinc-500">უფრო დიდი ფურცელი ნიშნავს უფრო დიდ წილს.</p>
-      </div>
-      <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <svg viewBox="0 0 300 300" className="h-[300px] w-full max-w-[320px]">
-          <circle cx={center} cy={center} r="18" fill="#05070b" stroke="#22d3ee" />
-          {topItems.map((item, index) => {
-            const angle = (Math.PI * 2 * index) / Math.max(topItems.length, 1);
-            const rx = 32 + item.shareOfTotal * 90;
-            const ry = 18 + item.shareOfTotal * 52;
-            const x = center + Math.cos(angle) * 72;
-            const y = center + Math.sin(angle) * 72;
+Acceptance criteria:
 
-            return (
-              <ellipse
-                key={item.itemId}
-                cx={x}
-                cy={y}
-                rx={rx}
-                ry={ry}
-                fill={item.color}
-                fillOpacity="0.75"
-                stroke="#05070b"
-                transform={`rotate(${(angle * 180) / Math.PI} ${x} ${y})`}
-              >
-                <title>{`${item.kaLabel}: ${formatGel(item.amountGel)} / ${formatPercent(item.shareOfTotal)}`}</title>
-              </ellipse>
-            );
-          })}
-        </svg>
-        <div className="grid content-start gap-2">
-          {topItems.map((item) => (
-            <div key={item.itemId} className="flex items-center justify-between gap-3 text-sm">
-              <span className="flex items-center gap-2 text-zinc-300">
-                <span className="h-3 w-3" style={{ backgroundColor: item.color }} />
-                {item.kaLabel}
-              </span>
-              <span className="font-mono text-zinc-100">{formatPercent(item.shareOfTotal)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-```
+- Props: `{ items: SnapshotItem[]; hasGrowthData: boolean }`.
+- Section heading: `Budget Field`.
+- Add `data-testid="budget-field"`.
+- If `hasGrowthData` is false, render a clear amber state: `ზრდის საჩვენებლად წინა ხელმისაწვდომი წელი საჭიროა.`
+- x-axis is `shareOfTotal`.
+- y-axis is `changeFromPreviousYear`.
+- bubble size is `amountGel`.
+- per-point color uses Recharts `Cell`, following the local `ChartFrame` bar color pattern.
+- Tooltip shows item label, formatted GEL, share, and growth.
+- Wrap the chart in an overflow container from the parent so mobile can scroll horizontally.
 
-- [ ] **Step 2: Create Budget Field component**
+- [ ] **Step 3: Render sections in order**
 
-Create `apps/web/components/single-year/budget-field.tsx`:
-
-```tsx
-import { CartesianGrid, Cell, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
-import { formatGel, formatPercent, formatSignedPercent } from "../../lib/explorer/format";
-import type { SnapshotItem } from "../../lib/explorer/types";
-
-type BudgetFieldProps = {
-  items: SnapshotItem[];
-  hasGrowthData: boolean;
-};
-
-export function BudgetField({ items, hasGrowthData }: BudgetFieldProps) {
-  if (!hasGrowthData) {
-    return (
-      <section className="border border-amber-300/30 bg-amber-300/10 p-4 text-sm text-amber-100">
-        ზრდის საჩვენებლად წინა ხელმისაწვდომი წელი საჭიროა.
-      </section>
-    );
-  }
-
-  const data = items
-    .filter((item) => item.changeFromPreviousYear !== null)
-    .map((item) => ({
-      ...item,
-      x: item.shareOfTotal,
-      y: item.changeFromPreviousYear,
-      z: item.amountGel,
-    }));
-
-  return (
-    <section className="border border-cyan-400/20 bg-black/40 p-4">
-      <div className="mb-3">
-        <h3 className="text-lg font-semibold text-white">Budget Field</h3>
-        <p className="text-sm text-zinc-500">ჰორიზონტალი არის წილი, ვერტიკალი - ზრდა წინა ხელმისაწვდომ წელთან.</p>
-      </div>
-      <div className="h-[360px] min-w-[520px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 16, right: 16, bottom: 16, left: 16 }}>
-            <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
-            <XAxis dataKey="x" type="number" name="წილი" tickFormatter={(value) => formatPercent(Number(value))} stroke="#a1a1aa" />
-            <YAxis dataKey="y" type="number" name="ზრდა" tickFormatter={(value) => formatSignedPercent(Number(value))} stroke="#a1a1aa" />
-            <ZAxis dataKey="z" type="number" range={[80, 900]} />
-            <Tooltip
-              cursor={{ strokeDasharray: "3 3" }}
-              contentStyle={{ background: "#05070b", border: "1px solid rgba(34, 211, 238, 0.35)" }}
-              formatter={(_, name, payload) => {
-                const item = payload?.payload as SnapshotItem | undefined;
-                if (!item) return ["", name];
-                return [
-                  `${formatGel(item.amountGel)} / ${formatPercent(item.shareOfTotal)} / ${formatSignedPercent(item.changeFromPreviousYear)}`,
-                  item.kaLabel,
-                ];
-              }}
-            />
-            <Scatter data={data} fill="#22d3ee" name="Budget Field">
-              {data.map((item, index) => (
-                <Cell key={`budget-field-${item.itemId}-${index}`} fill={item.color} />
-              ))}
-            </Scatter>
-          </ScatterChart>
-        </ResponsiveContainer>
-      </div>
-    </section>
-  );
-}
-```
-
-- [ ] **Step 3: Render petals and Budget Field**
-
-Modify `apps/web/components/single-year/single-year-snapshot.tsx` imports:
-
-```ts
-import { BudgetField } from "./budget-field";
-import { SpendingPetals } from "./spending-petals";
-```
-
-Render after Every 100 GEL:
+In `SingleYearSnapshot`, render after Every 100 GEL:
 
 ```tsx
 <SpendingPetals items={model.petals} />
@@ -1256,123 +755,44 @@ Expected:
 Compiled successfully
 ```
 
-- [ ] **Step 5: Commit visuals**
+- [ ] **Step 5: Commit advanced visuals**
 
 Run:
 
 ```powershell
 git add apps/web/components/single-year
-git commit -m "feat: add snapshot petals and budget field"
+git commit -m "feat: add snapshot field visuals"
 ```
 
 Expected:
 
 ```text
-[branch ...] feat: add snapshot petals and budget field
+[branch ...] feat: add snapshot field visuals
 ```
 
----
-
-### Task 7: Add Sortable Full Ranking
+## Task 8: Add Full Ranking
 
 **Files:**
 
 - Create: `apps/web/components/single-year/single-year-ranking.tsx`
 - Modify: `apps/web/components/single-year/single-year-snapshot.tsx`
 
-- [ ] **Step 1: Create sortable ranking component**
+- [ ] **Step 1: Create `SingleYearRanking`**
 
-Create `apps/web/components/single-year/single-year-ranking.tsx`:
+Acceptance criteria:
 
-```tsx
-"use client";
-
-import { useMemo, useState } from "react";
-import { formatGel, formatPercent, formatSignedPercent } from "../../lib/explorer/format";
-import type { SnapshotItem } from "../../lib/explorer/types";
-
-type SortKey = "amount" | "share" | "change";
-
-type SingleYearRankingProps = {
-  rows: SnapshotItem[];
-};
-
-export function SingleYearRanking({ rows }: SingleYearRankingProps) {
-  const [sortKey, setSortKey] = useState<SortKey>("amount");
-  const sortedRows = useMemo(() => {
-    return [...rows].sort((a, b) => {
-      if (sortKey === "share") return b.shareOfTotal - a.shareOfTotal;
-      if (sortKey === "change") return (b.changeFromPreviousYear ?? -Infinity) - (a.changeFromPreviousYear ?? -Infinity);
-      return b.amountGel - a.amountGel;
-    });
-  }, [rows, sortKey]);
-
-  return (
-    <section className="border border-cyan-400/20 bg-black/40 p-4">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h3 className="text-lg font-semibold text-white">სრული რეიტინგი</h3>
-          <p className="text-sm text-zinc-500">ზუსტი წლიური მნიშვნელობები ზედა დონის მუხლებით.</p>
-        </div>
-        <div className="flex gap-2">
-          {[
-            ["amount", "თანხა"],
-            ["share", "წილი"],
-            ["change", "ცვლილება"],
-          ].map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setSortKey(key as SortKey)}
-              className={`h-9 border px-3 text-sm ${
-                sortKey === key
-                  ? "border-cyan-300 bg-cyan-300 text-black"
-                  : "border-zinc-700 bg-black text-zinc-300 hover:border-cyan-300"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-zinc-800 text-xs uppercase text-zinc-500">
-            <tr>
-              <th className="px-3 py-3">Rank</th>
-              <th className="px-3 py-3">მუხლი</th>
-              <th className="px-3 py-3">GEL</th>
-              <th className="px-3 py-3">წილი</th>
-              <th className="px-3 py-3">ცვლილება</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedRows.map((row, index) => (
-              <tr key={row.itemId} className="border-b border-zinc-900">
-                <td className="px-3 py-3 font-mono text-zinc-500">{index + 1}</td>
-                <td className="px-3 py-3 font-medium text-zinc-100">{row.kaLabel}</td>
-                <td className="px-3 py-3 text-zinc-300">{formatGel(row.amountGel)}</td>
-                <td className="px-3 py-3 text-zinc-300">{formatPercent(row.shareOfTotal)}</td>
-                <td className="px-3 py-3 text-zinc-300">{formatSignedPercent(row.changeFromPreviousYear)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  );
-}
-```
+- Props: `{ rows: SnapshotItem[] }`.
+- Section heading: `სრული რეიტინგი`.
+- Add `data-testid="single-year-ranking"`.
+- Default sort is `amountGel` descending.
+- User can sort by amount, share, or change.
+- Table columns: `Rank`, `მუხლი`, `GEL`, `წილი`, `ცვლილება`.
+- Use existing formatters.
+- Do not render official programs, subprograms, source columns, or drilldown links.
 
 - [ ] **Step 2: Render ranking last**
 
-Modify `apps/web/components/single-year/single-year-snapshot.tsx` imports:
-
-```ts
-import { SingleYearRanking } from "./single-year-ranking";
-```
-
-Render after Budget Field:
+In `SingleYearSnapshot`, render after Budget Field:
 
 ```tsx
 <SingleYearRanking rows={model.rankingRows} />
@@ -1408,95 +828,32 @@ Expected:
 [branch ...] feat: add single year ranking
 ```
 
----
-
-### Task 8: Add Browser Coverage and Final Verification
+## Task 9: Add Browser Coverage
 
 **Files:**
 
 - Modify: `apps/web/tests/browser/main-explorer.spec.ts`
 
-- [ ] **Step 1: Add browser test for single-year mode**
+- [ ] **Step 1: Add a single-year browser test**
 
-Append a new test in `apps/web/tests/browser/main-explorer.spec.ts`:
+Add one test that:
 
-```ts
-test("single-year snapshot renders the expected sections", async ({ page }) => {
-  const consoleProblems: string[] = [];
+- Opens `http://localhost:3100`.
+- Clicks the `ერთი წელი` button.
+- Verifies `data-testid="single-year-snapshot"` is visible.
+- Verifies these section test IDs are visible:
+  - `snapshot-treemap`
+  - `every-100-gel`
+  - `spending-petals`
+  - `budget-field`
+  - `single-year-ranking`
+- Changes year to the earliest available year and verifies the Budget Field growth-unavailable state is visible.
+- Switches side to revenue and verifies the Georgian revenue empty state.
+- Fails on browser console errors or warnings, matching the existing test pattern.
 
-  page.on("console", (message) => {
-    if (["error", "warning"].includes(message.type())) {
-      consoleProblems.push(`${message.type()}: ${message.text()}`);
-    }
-  });
+Do not assert raw SVG counts.
 
-  await page.goto("http://localhost:3100");
-
-  await page.getByRole("button", { name: "ერთი წელი" }).click();
-
-  await expect(page.getByRole("heading", { name: /წლის ბიუჯეტის სურათი/ })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "ბიუჯეტის რუკა" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "ყოველი 100 GEL" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "ხარჯების ფურცლები" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Budget Field" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "სრული რეიტინგი" })).toBeVisible();
-  await expect(page.locator("svg")).toHaveCount(3);
-  expect(consoleProblems).toEqual([]);
-});
-```
-
-- [ ] **Step 2: Run unit tests**
-
-Run:
-
-```powershell
-cd apps/web
-npm run test
-```
-
-Expected:
-
-```text
-Test Files  ... passed
-Tests       ... passed
-```
-
-- [ ] **Step 3: Run data validation**
-
-Run:
-
-```powershell
-cd apps/web
-npm run data:validate
-```
-
-Expected:
-
-```text
-Validated taxonomy rows: 25
-Validated glossary rows: 25
-Validated source rows: 5
-Validated mapping rows: 3
-Validated fact rows: 39
-Report written:
-```
-
-- [ ] **Step 4: Run production build**
-
-Run:
-
-```powershell
-cd apps/web
-npm run build
-```
-
-Expected:
-
-```text
-Compiled successfully
-```
-
-- [ ] **Step 5: Run browser tests**
+- [ ] **Step 2: Run browser tests**
 
 Run:
 
@@ -1511,34 +868,9 @@ Expected:
 passed
 ```
 
-If browser tests require the dev server manually, run:
+If Playwright or the dev server fails with Windows sandbox `EPERM`, rerun with Codex escalation.
 
-```powershell
-cd apps/web
-npm run dev -- --port 3100
-```
-
-Then rerun:
-
-```powershell
-npm run test:browser
-```
-
-- [ ] **Step 6: Manual browser check**
-
-Open `http://localhost:3100` in the Codex Browser and verify:
-
-- Default view remains multi-year expenditure.
-- Clicking `ერთი წელი` shows the single-year snapshot.
-- Year selector changes the snapshot year.
-- Revenue side shows a clean empty state because revenue facts are not loaded yet.
-- No drilldown links appear in treemap, petals, Budget Field, or ranking.
-- Every 100 GEL cells sum visually to 100.
-- Budget Field shows a growth-unavailable state for the earliest year.
-- Mobile viewport stacks sections vertically and keeps Budget Field horizontally scrollable.
-- Georgian text is readable and not overlapping.
-
-- [ ] **Step 7: Commit verification coverage**
+- [ ] **Step 3: Commit browser coverage**
 
 Run:
 
@@ -1553,11 +885,9 @@ Expected:
 [branch ...] test: cover single year snapshot browser flow
 ```
 
----
-
 ## Final Verification
 
-Before calling Plan 4 implemented, run:
+Before marking Plan 4 implemented, run:
 
 ```powershell
 cd apps/web
@@ -1570,59 +900,48 @@ npm run test:browser
 Expected:
 
 ```text
-Tests passed
-Data validation passed
+All Vitest tests pass
+Validated fact rows: 39
 Compiled successfully
-Browser tests passed
+Playwright tests pass
 ```
 
-If `npm run test` or `npm run data:validate` fails with Windows sandbox `EPERM`, rerun the same command with Codex escalation because Vitest and the report writer may need to spawn or rewrite generated report files on this machine.
+Manual browser check at `http://localhost:3100`:
 
----
+- Default view remains multi-year expenditure.
+- `ერთი წელი` opens the single-year snapshot.
+- Single-year sections appear in this order:
+  1. headline cards
+  2. treemap
+  3. Every 100 GEL
+  4. spending petals
+  5. Budget Field
+  6. full ranking
+- Year selector changes the snapshot year.
+- Revenue side shows a clean empty state.
+- No drilldown links appear.
+- Every 100 GEL renders exactly 100 cells.
+- Earliest year shows Budget Field growth-unavailable state.
+- Mobile viewport stacks sections vertically and keeps Budget Field horizontally scrollable.
+- Georgian text is readable and does not overlap.
 
 ## Self-Review
 
-### Spec Coverage
+Spec coverage:
 
-Covered:
+- Covered: single-year mode, headline cards, treemap, Every 100 GEL, petals, Budget Field, full ranking, planned badge support, revenue empty state, mobile stacking, no drilldown.
+- Deferred by explicit scope: revenue ingestion, 2026 planned data, stacked mode, Share of GDP, source/provenance panels.
 
-- Single-year mode as a zoomed-out snapshot.
-- Top-level public spending fields only.
-- No drilldown.
-- Four headline cards.
-- Treemap with share-of-total sizing.
-- Every 100 GEL as rounded whole-GEL explainer.
-- Spending petals as expressive composition visual.
-- Budget Field with share, growth, and amount dimensions.
-- Growth unavailable state for first available year.
-- Full ranking with amount, share, and previous-year change sorting.
-- Planned badge if planned values appear later.
-- Mobile stacked sections and horizontally scrollable Budget Field.
+Execution clarity:
 
-Deferred by explicit user direction:
+- Every task has exact files, checks, and commit points.
+- Tests are added before implementation, but failing states are not committed.
+- Browser tests use stable `data-testid` markers instead of fragile SVG counts.
+- The plan follows existing app ownership: `MainExplorer` owns state; `singleYear.ts` owns data derivation; components render only.
 
-- Revenue ingestion.
-- 2026 planned budget.
-- Revenue single-year data display beyond an empty state.
+Risk controls:
 
-### Placeholder Scan
-
-No open placeholders are intended in the plan. All named files, commands, tests, and component responsibilities are explicit.
-
-### Type Consistency
-
-Shared names are consistent across tasks:
-
-- `ViewMode`
-- `SnapshotItem`
-- `Every100Item`
-- `SnapshotHeadline`
-- `SingleYearSnapshotModel`
-- `buildSingleYearSnapshotModel`
-- `SingleYearSnapshot`
-- `SnapshotHeadlineCards`
-- `SnapshotTreemap`
-- `Every100Gel`
-- `SpendingPetals`
-- `BudgetField`
-- `SingleYearRanking`
+- No data pipeline files are modified.
+- Revenue absence is handled as an empty state, not as a fake dataset.
+- Known Windows EPERM behavior is documented in verification.
+- Recharts usage follows existing local patterns from `ChartFrame`.
