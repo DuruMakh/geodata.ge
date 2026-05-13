@@ -59,8 +59,12 @@ function renderPointDot(props: { cx?: number; cy?: number; payload?: ChartDatum;
 export function ChartFrame({ mode, measure, years, points, selectedItems }: ChartFrameProps) {
   if (points.length === 0) {
     return (
-      <div className="flex h-[420px] items-center justify-center border border-cyan-400/20 bg-black/40 p-6 text-sm text-zinc-400">
-        არჩეული მონაცემი არ არის.
+      <div data-testid="chart-frame" className="overflow-x-auto">
+        <div className="h-[420px] min-w-[680px] border border-cyan-400/20 bg-black/45 p-3">
+          <div className="flex h-full items-center justify-center text-sm text-zinc-400">
+            არჩეული მონაცემი არ არის.
+          </div>
+        </div>
       </div>
     );
   }
@@ -72,10 +76,11 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
     const colorByItemId = new Map(selectedItems.map((item) => [item.id, item.color]));
 
     return (
-      <div className="h-[420px] border border-cyan-400/20 bg-black/40 p-3">
+      <div data-testid="chart-frame" className="overflow-x-auto">
+        <div className="h-[420px] min-w-[680px] border border-cyan-400/20 bg-black/45 p-3">
         <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
           <BarChart data={barRows} margin={{ top: 20, right: 16, bottom: 72, left: 18 }}>
-            <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
+            <CartesianGrid stroke="rgba(34, 211, 238, 0.16)" strokeDasharray="3 3" />
             <XAxis dataKey="kaLabel" stroke="#a1a1aa" tick={{ fontSize: 12 }} angle={-35} textAnchor="end" interval={0} />
             <YAxis stroke="#a1a1aa" tickFormatter={(value) => formatMeasureValue(Number(value), measure)} width={88} />
             <Tooltip
@@ -93,6 +98,7 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+        </div>
       </div>
     );
   }
@@ -108,10 +114,11 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
   }
 
   return (
-    <div className="h-[420px] border border-cyan-400/20 bg-black/40 p-3">
+    <div data-testid="chart-frame" className="overflow-x-auto">
+      <div className="h-[420px] min-w-[680px] border border-cyan-400/20 bg-black/45 p-3">
       <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
         <LineChart data={rows} margin={{ top: 18, right: 24, bottom: 12, left: 18 }}>
-          <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
+          <CartesianGrid stroke="rgba(34, 211, 238, 0.16)" strokeDasharray="3 3" />
           <XAxis dataKey="year" stroke="#a1a1aa" tick={{ fontSize: 12 }} />
           <YAxis stroke="#a1a1aa" tickFormatter={(value) => formatMeasureValue(Number(value), measure)} width={88} />
           <Tooltip
@@ -137,6 +144,7 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
           })}
         </LineChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }

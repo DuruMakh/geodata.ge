@@ -24,9 +24,9 @@ export function Every100Gel({ items, side }: Every100GelProps) {
   const ariaLabel = side === "expenditure" ? "Expenditure composition per 100 GEL" : "Revenue composition per 100 GEL";
 
   return (
-    <section data-testid="every-100-gel" className="mt-4">
+    <section data-testid="every-100-gel" className="border border-cyan-400/20 bg-black/45 p-4">
       <h3 className="mb-3 text-lg font-semibold text-white">ყოველი 100 GEL</h3>
-      <div className="grid gap-4 border border-cyan-400/20 bg-black/40 p-4 lg:grid-cols-[220px_1fr]">
+      <div className="grid gap-4 lg:grid-cols-[220px_1fr]">
         <div className="grid grid-cols-10 gap-1" role="img" aria-label={ariaLabel}>
           {cells.map((item, index) => (
             <span

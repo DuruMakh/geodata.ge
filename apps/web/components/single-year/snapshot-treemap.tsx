@@ -88,9 +88,9 @@ export function SnapshotTreemap({ items }: SnapshotTreemapProps) {
   }));
 
   return (
-    <section data-testid="snapshot-treemap" className="mt-4">
+    <section data-testid="snapshot-treemap" className="border border-cyan-400/20 bg-black/45 p-4">
       <h3 className="mb-3 text-lg font-semibold text-white">ბიუჯეტის რუკა</h3>
-      <div className="h-[384px] border border-cyan-400/20 bg-black/40 p-3">
+      <div className="h-[384px]">
         <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
           <Treemap
             data={data}

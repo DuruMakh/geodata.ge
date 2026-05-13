@@ -61,7 +61,7 @@ export function BudgetField({ items, hasGrowthData }: BudgetFieldProps) {
     }));
 
   return (
-    <section data-testid="budget-field" className="mt-4 min-w-[760px]">
+    <section data-testid="budget-field" className="min-w-[760px] border border-cyan-400/20 bg-black/45 p-4">
       <h3 className="mb-3 text-lg font-semibold text-white">Budget Field</h3>
       <div className="h-[400px] border border-cyan-400/20 bg-black/40 p-3">
         {hasGrowthData && data.length > 0 ? (

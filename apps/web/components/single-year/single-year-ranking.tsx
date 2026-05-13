@@ -40,7 +40,7 @@ export function SingleYearRanking({ rows }: SingleYearRankingProps) {
   );
 
   return (
-    <section data-testid="single-year-ranking" className="mt-4">
+    <section data-testid="single-year-ranking" className="border border-cyan-400/20 bg-black/45 p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-lg font-semibold text-white">სრული რეიტინგი</h3>
         <div className="flex flex-wrap gap-2" aria-label="Sort full ranking">
