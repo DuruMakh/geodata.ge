@@ -50,7 +50,10 @@ test("single-year snapshot renders sections and empty states", async ({ page }) 
   await expect(page.getByTestId("budget-field")).toBeVisible();
   await expect(page.getByTestId("single-year-ranking")).toBeVisible();
 
-  await page.locator("select").selectOption("2023");
+  const yearSelect = page.locator("select");
+  const earliestYear = await yearSelect.locator("option").first().getAttribute("value");
+  if (!earliestYear) throw new Error("Expected at least one single-year option");
+  await yearSelect.selectOption(earliestYear);
   await expect(page.getByText("ზრდის საჩვენებლად წინა ხელმისაწვდომი წელი საჭიროა.")).toBeVisible();
 
   await page.getByRole("button", { name: "შემოსავლები" }).click();
