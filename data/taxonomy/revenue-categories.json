@@ -1,5 +1,13 @@
 [
   {
+    "id": "revenue.taxes_total",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "გადასახადები სულ",
+    "enLabel": "Taxes total",
+    "sortOrder": 5
+  },
+  {
     "id": "revenue.vat",
     "side": "revenue",
     "level": "revenue_category",

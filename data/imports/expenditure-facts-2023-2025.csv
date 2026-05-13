@@ -12,15 +12,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2023,expenditure,spending.public_order_safety,1954800251,actual,source.mof_2023_tavi6_actual,Multiple official rows,,,spending.public_order_safety,medium,"Aggregated 30 reviewed leaf rows; codes: 07 00, 08 00, 09 01, 09 02, 10 00, 20 01, 20 02, 20 03, 21 00, 26 01, 26 02 01, 26 03, 26 04, 26 05, 26 06, 26 07, 30 01, 30 02, 30 03, 30 04, 30 06, 31 12, 34 00, 39 00, 40 01, 40 02, 46 00, 51 00, 54 00, 55 06"
 2023,expenditure,spending.social_protection,5751620908,actual,source.mof_2023_tavi6_actual,Multiple official rows,,,spending.social_protection,medium,"Aggregated 20 reviewed leaf rows; codes: 24 13, 27 01 04, 27 01 05, 27 01 06, 27 01 07, 27 02 01, 27 02 02, 27 02 03, 27 02 04, 27 02 05, 27 06 01, 27 06 02, 27 06 03, 27 06 06, 32 02 07, 33 08, 36 00, 37 00, 55 11, 55 13 08"
 2023,expenditure,spending.sport,187750676,actual,source.mof_2023_tavi6_actual,Multiple official rows,,,spending.sport,medium,"Aggregated 2 reviewed leaf rows; codes: 24 10, 33 07"
-2023,revenue,revenue.excise_tax,2270263894,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
-2023,revenue,revenue.grants,200516597,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები
-2023,revenue,revenue.import_tax,151212050,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
-2023,revenue,revenue.income_tax,6071356714,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
-2023,revenue,revenue.other_revenue,2059408954,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები
-2023,revenue,revenue.other_taxes,186037053,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
-2023,revenue,revenue.profit_tax,2018166538,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
-2023,revenue,revenue.property_tax,648341799,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.3: გადასახადები ქონებაზე
-2023,revenue,revenue.vat,8387241707,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
 2024,expenditure,spending.agriculture_environment,726150171,actual,source.mof_2024_tavi6_actual,Multiple official rows,,,spending.agriculture_environment,medium,"Aggregated 23 reviewed leaf rows; codes: 06 01, 26 09, 31 01 01, 31 02, 31 03, 31 04, 31 05 01, 31 05 02, 31 05 03, 31 05 04, 31 05 11, 31 05 12, 31 05 15 01, 31 05 18, 31 06 01, 31 06 04, 31 07, 31 08, 31 09, 31 11, 31 13, 31 15, 32 02 03"
 2024,expenditure,spending.culture,188666149,actual,source.mof_2024_tavi6_actual,Multiple official rows,,,spending.culture,medium,"Aggregated 6 reviewed leaf rows; codes: 33 01, 33 02, 33 04, 33 05, 33 06, 45 13"
 2024,expenditure,spending.debt_service,2761651609,actual,source.mof_2024_tavi6_actual,Multiple official rows,,,spending.debt_service,medium,"Aggregated 3 reviewed leaf rows; codes: 56 01, 56 02, 56 03"
@@ -34,15 +25,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2024,expenditure,spending.public_order_safety,2209482172,actual,source.mof_2024_tavi6_actual,Multiple official rows,,,spending.public_order_safety,medium,"Aggregated 31 reviewed leaf rows; codes: 07 00, 08 00, 09 01, 09 02, 10 00, 20 01, 20 02, 20 03, 21 00, 26 01, 26 02 01, 26 03, 26 04, 26 05, 26 06, 26 07, 30 01, 30 02, 30 03, 30 04, 30 06, 31 12, 34 00, 39 00, 40 01, 40 02, 46 00, 51 00, 54 00, 55 00, 56 06"
 2024,expenditure,spending.social_protection,6440156441,actual,source.mof_2024_tavi6_actual,Multiple official rows,,,spending.social_protection,medium,"Aggregated 19 reviewed leaf rows; codes: 24 13, 27 01 04, 27 01 05, 27 01 06, 27 01 07, 27 02 01, 27 02 02, 27 02 03, 27 02 04, 27 02 05, 27 06 01, 27 06 02, 27 06 03, 27 06 06, 32 02 07, 33 08, 36 00, 37 00, 56 11"
 2024,expenditure,spending.sport,235496947,actual,source.mof_2024_tavi6_actual,Multiple official rows,,,spending.sport,medium,"Aggregated 3 reviewed leaf rows; codes: 24 10, 24 28, 33 07"
-2024,revenue,revenue.excise_tax,2488024918,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
-2024,revenue,revenue.grants,198330607,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები
-2024,revenue,revenue.import_tax,138902348,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
-2024,revenue,revenue.income_tax,7250478710,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
-2024,revenue,revenue.other_revenue,2083608794,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები
-2024,revenue,revenue.other_taxes,265524346,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
-2024,revenue,revenue.profit_tax,3117548526,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
-2024,revenue,revenue.property_tax,697679276,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.3: გადასახადები ქონებაზე
-2024,revenue,revenue.vat,9331846717,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
 2025,expenditure,spending.agriculture_environment,1023479400,actual,source.mof_2025_tavi6_actual,Multiple official rows,,,spending.agriculture_environment,medium,"Aggregated 27 reviewed leaf rows; codes: 06 01, 26 08, 31 01 01, 31 01 04, 31 02, 31 03, 31 04, 31 05 01, 31 05 02, 31 05 03, 31 05 04, 31 05 11, 31 05 12, 31 05 15 01, 31 05 18, 31 06 01, 31 06 03, 31 06 04 03, 31 06 04 04, 31 07, 31 08, 31 09, 31 11, 31 13, 31 14, 31 15, 32 02 03"
 2025,expenditure,spending.culture,263991400,actual,source.mof_2025_tavi6_actual,Multiple official rows,,,spending.culture,medium,"Aggregated 6 reviewed leaf rows; codes: 33 01, 33 02, 33 03, 33 04, 33 05, 45 13"
 2025,expenditure,spending.debt_service,3040094400,actual,source.mof_2025_tavi6_actual,Multiple official rows,,,spending.debt_service,medium,"Aggregated 3 reviewed leaf rows; codes: 57 01, 57 02, 57 03"
@@ -56,12 +38,3 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2025,expenditure,spending.public_order_safety,2447665900,actual,source.mof_2025_tavi6_actual,Multiple official rows,,,spending.public_order_safety,medium,"Aggregated 32 reviewed leaf rows; codes: 07 00, 08 00, 09 01, 09 02, 10 00, 20 01, 20 02, 20 03, 21 00, 26 01, 26 02 01, 26 03, 26 04, 26 05, 26 06, 26 07, 27 01 13, 30 01, 30 02, 30 03, 30 04, 30 06, 31 12, 39 00, 40 01, 40 02, 46 00, 51 00, 54 00, 55 00, 56 00, 57 06"
 2025,expenditure,spending.social_protection,7302909300,actual,source.mof_2025_tavi6_actual,Multiple official rows,,,spending.social_protection,medium,"Aggregated 22 reviewed leaf rows; codes: 24 13, 27 01 04, 27 01 05, 27 01 06, 27 01 07, 27 02 01, 27 02 02, 27 02 03, 27 02 04, 27 02 05, 27 05, 27 06 01, 27 06 02, 27 06 03, 31 05 28, 32 02 07, 33 06, 34 03, 36 00, 37 00, 57 11, 57 14 06"
 2025,expenditure,spending.sport,295415400,actual,source.mof_2025_tavi6_actual,Multiple official rows,,,spending.sport,medium,"Aggregated 5 reviewed leaf rows; codes: 24 10, 24 28, 34 01, 34 02, 34 05"
-2025,revenue,revenue.excise_tax,2728646345,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
-2025,revenue,revenue.grants,123020970,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები
-2025,revenue,revenue.import_tax,146620436,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
-2025,revenue,revenue.income_tax,8261217582,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
-2025,revenue,revenue.other_revenue,2646820211,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები
-2025,revenue,revenue.other_taxes,559333444,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
-2025,revenue,revenue.profit_tax,2881352179,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
-2025,revenue,revenue.property_tax,801093482,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.3: გადასახადები ქონებაზე
-2025,revenue,revenue.vat,10158086603,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი

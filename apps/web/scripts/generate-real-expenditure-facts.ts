@@ -1,36 +1,10 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { budgetFactsToCsv } from "../lib/data/factCsv";
 import { extractOfficialExpenditureRows } from "../lib/data/realExpenditure/extractWorkbooks";
 import { generateBudgetFactsFromReviewedMappings } from "../lib/data/realExpenditure/generateFacts";
 import { loadCandidateMappingReviewRows } from "../lib/data/realExpenditure/reviewMappings";
 import { validateRealExpenditureFacts } from "../lib/data/realExpenditure/validateRealExpenditure";
-
-function csvEscape(value: string | number): string {
-  const text = String(value);
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
-function factsToCsv(rows: ReturnType<typeof generateBudgetFactsFromReviewedMappings>): string {
-  const headers = [
-    "year",
-    "side",
-    "item_id",
-    "amount_gel",
-    "basis",
-    "source_id",
-    "official_institution",
-    "official_program",
-    "official_subprogram",
-    "public_spending_field_id",
-    "mapping_confidence",
-    "mapping_notes",
-  ] as const;
-
-  return [
-    headers.join(","),
-    ...rows.map((row) => headers.map((header) => csvEscape(row[header])).join(",")),
-  ].join("\n");
-}
 
 async function main() {
   const officialRows = extractOfficialExpenditureRows();
@@ -42,7 +16,7 @@ async function main() {
 
   await mkdir(importsDir, { recursive: true });
   await mkdir(reportsDir, { recursive: true });
-  await writeFile(path.join(importsDir, "budget-facts-2023-2025.csv"), factsToCsv(facts), "utf8");
+  await writeFile(path.join(importsDir, "expenditure-facts-2023-2025.csv"), budgetFactsToCsv(facts), "utf8");
   await writeFile(path.join(reportsDir, "real-expenditure-2023-2025-report.json"), JSON.stringify(report, null, 2), "utf8");
 
   if (Object.values(report.reconciliationStatusByYear).some((status) => status === "failed")) {
