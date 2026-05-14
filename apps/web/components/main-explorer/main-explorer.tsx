@@ -72,6 +72,10 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
   const headerTotal = viewMode === "single_year" ? singleYearModel.totalGel : latestTotal;
   const hasPlannedValues = viewMode === "single_year" ? singleYearModel.hasPlannedValues : model.hasPlannedValues;
   const selectorRows = [...model.tableRows, ...model.comparisonRows];
+  const exportRows = model.totalRow ? [model.totalRow, ...model.comparisonRows] : model.comparisonRows;
+  const csvDownloadText = buildExplorerCsv(exportRows, model.years);
+  const csvDownloadHref = `data:text/csv;charset=utf-8,${encodeURIComponent(csvDownloadText)}`;
+  const csvDownloadFilename = `geodata-budget-${side}-${modelStartYear}-${modelEndYear}.csv`;
 
   function handleSideChange(nextSide: ExplorerSide) {
     setSide(nextSide);
@@ -138,17 +142,6 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
     });
   }
 
-  function downloadCsv() {
-    const csv = buildExplorerCsv(model.tableRows, model.years);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `geodata-budget-${side}-${modelStartYear}-${modelEndYear}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-background px-3 py-3 text-foreground sm:px-5 sm:py-5 lg:px-8">
       <section className={`grid min-h-[calc(100vh-1.5rem)] max-w-full gap-4 sm:gap-5 ${viewMode === "multi_year" ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
@@ -192,13 +185,14 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
                 onSingleYearChange={setSingleYear}
               />
               {viewMode === "multi_year" ? (
-                <button
-                  type="button"
-                  onClick={downloadCsv}
+                <a
+                  data-testid="csv-download"
+                  href={csvDownloadHref}
+                  download={csvDownloadFilename}
                   className="h-10 border border-cyan-300 px-4 font-mono text-xs uppercase text-cyan-100 transition hover:bg-cyan-300 hover:text-black"
                 >
                   CSV ჩამოტვირთვა
-                </button>
+                </a>
               ) : null}
             </div>
           </div>
@@ -208,7 +202,9 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
               <SingleYearSnapshot model={singleYearModel} />
             </div>
           ) : model.unavailableReason ? (
-            <div className="border border-amber-300/30 bg-amber-300/10 p-6 text-sm text-amber-100">{model.unavailableReason}</div>
+            <div data-testid="unavailable-state" className="border border-amber-300/30 bg-amber-300/10 p-6 text-sm text-amber-100">
+              {model.unavailableReason}
+            </div>
           ) : chartMode === "table" ? (
             <ExplorerTable rows={model.tableRows} years={model.years} />
           ) : (

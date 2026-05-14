@@ -16,7 +16,7 @@ export function PeriodSummaryPanel({ years, summary, rows, topGrowth, bottomGrow
   if (startYear === undefined || endYear === undefined) return null;
 
   return (
-    <section className="grid gap-4 lg:grid-cols-4">
+    <section data-testid="period-summary" className="grid gap-4 lg:grid-cols-4">
       <SummaryCell title="ჯამური ცვლილება" value={formatSignedPercent(summary.totalChange)} />
       <SummaryCell
         title="ყველაზე დიდი GEL მატება"
@@ -55,14 +55,18 @@ function MovementList({ title, rows }: { title: string; rows: ExplorerTableRow[]
     <div className="border border-cyan-400/20 bg-black/45 p-4">
       <h3 className="text-sm font-semibold text-white">{title}</h3>
       <div className="mt-3 flex flex-col gap-2">
-        {rows.map((row, index) => (
-          <div key={row.itemId} className="flex items-center justify-between gap-4 text-sm">
-            <span className="text-zinc-300">
-              {index + 1}. {row.kaLabel}
-            </span>
-            <span className="font-mono text-zinc-100">{formatSignedPercent(row.change)}</span>
-          </div>
-        ))}
+        {rows.length === 0 ? (
+          <p className="text-sm text-zinc-400">საკმარისი შედარებითი მონაცემი არ არის.</p>
+        ) : (
+          rows.map((row, index) => (
+            <div key={row.itemId} className="flex items-center justify-between gap-4 text-sm">
+              <span className="text-zinc-300">
+                {index + 1}. {row.kaLabel}
+              </span>
+              <span className="font-mono text-zinc-100">{formatSignedPercent(row.change)}</span>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

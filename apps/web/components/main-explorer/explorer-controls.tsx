@@ -74,6 +74,7 @@ export function ExplorerControls({
             key={nextSide}
             type="button"
             data-testid={`side-${nextSide}`}
+            aria-pressed={side === nextSide}
             onClick={() => onSideChange(nextSide)}
             className={`h-10 whitespace-nowrap border px-4 font-mono text-xs uppercase transition ${
               side === nextSide
@@ -94,6 +95,7 @@ export function ExplorerControls({
               key={mode}
               type="button"
               data-testid={`view-${mode}`}
+              aria-pressed={viewMode === mode}
               onClick={() => onViewModeChange(mode)}
               className={`h-10 whitespace-nowrap border px-4 font-mono text-xs uppercase transition ${
                 viewMode === mode
@@ -114,6 +116,8 @@ export function ExplorerControls({
               <button
                 key={mode}
                 type="button"
+                data-testid={`chart-mode-${mode}`}
+                aria-pressed={chartMode === mode}
                 onClick={() => onChartModeChange(mode)}
                 className={`h-9 whitespace-nowrap border px-3 text-sm transition ${
                   chartMode === mode
@@ -130,6 +134,7 @@ export function ExplorerControls({
             <label className="flex flex-col gap-1 text-xs uppercase text-zinc-500">
               საზომი
               <select
+                data-testid="measure-select"
                 value={measure}
                 onChange={(event) => onMeasureChange(event.target.value as MeasureMode)}
                 className="h-10 min-w-0 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"

@@ -9,14 +9,14 @@ type ExplorerTableProps = {
 export function ExplorerTable({ rows, years }: ExplorerTableProps) {
   if (rows.length === 0) {
     return (
-      <div className="overflow-x-auto border border-cyan-400/20 bg-black/45">
+      <div data-testid="explorer-table" className="overflow-x-auto border border-cyan-400/20 bg-black/45">
         <div className="p-6 text-sm text-zinc-400">არჩეული მწკრივი არ არის.</div>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto border border-cyan-400/20 bg-black/45">
+    <div data-testid="explorer-table" className="overflow-x-auto border border-cyan-400/20 bg-black/45">
       <table className="min-w-[760px] w-full border-collapse text-sm">
         <thead className="border-b border-zinc-800 text-xs uppercase text-zinc-500">
           <tr>

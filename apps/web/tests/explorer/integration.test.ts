@@ -198,4 +198,59 @@ describe("explorer integration with real CSV data", () => {
       expect.arrayContaining(["revenue.vat", "revenue.income_tax", "revenue.grants", "revenue.other_revenue"]),
     );
   });
+
+  it("keeps v1 default state anchored to expenditure total over 2023-2025", async () => {
+    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
+    const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
+    const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
+
+    expect(years).toEqual([2023, 2024, 2025]);
+    expect(getDefaultSelection("expenditure", facts)).toEqual(["expenditure.total"]);
+
+    const model = buildExplorerModel({
+      facts,
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: getDefaultSelection("expenditure", facts),
+      startYear: 2023,
+      endYear: 2025,
+      measure: "nominal",
+    });
+
+    expect(model.years).toEqual([2023, 2024, 2025]);
+    expect(model.selectedItems.map((item) => item.id)).toEqual(["expenditure.total"]);
+    expect(model.totalRow?.valuesByYear[2025]).toBeGreaterThan(0);
+    expect(model.unavailableReason).toBeNull();
+  });
+
+  it("keeps active public facts actual-only for the current v1 dataset", async () => {
+    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+
+    expect(facts).toHaveLength(66);
+    expect(facts.every((fact) => fact.basis === "actual")).toBe(true);
+    expect(facts.some((fact) => fact.side === "revenue" && fact.itemId === "revenue.vat")).toBe(true);
+    expect(facts.some((fact) => fact.side === "expenditure" && fact.itemId === "spending.health")).toBe(true);
+  });
+
+  it("returns a missing-data state for share of GDP until trusted GDP data exists", async () => {
+    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
+    const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
+
+    const model = buildExplorerModel({
+      facts,
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: getDefaultSelection("expenditure", facts),
+      startYear: 2023,
+      endYear: 2025,
+      measure: "share_of_gdp",
+    });
+
+    expect(model.unavailableReason).toBeTruthy();
+    expect(model.points.every((point) => point.value === null)).toBe(true);
+  });
 });

@@ -33,19 +33,31 @@ export function SeriesSelector({ items, selectedIds, rows, years, chartMode, lim
             {chartMode === "table" ? "ცხრილში ლიმიტი არ არის" : `გრაფიკზე მაქსიმუმ ${MAX_CHART_SERIES} სერია`}
           </p>
         </div>
-        <span className="font-mono text-xs text-cyan-200">{selectedIds.length}</span>
+        <span data-testid="selected-series-count" className="font-mono text-xs text-cyan-200">
+          {selectedIds.length}
+        </span>
       </div>
 
       <input
+        data-testid="series-search"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         className="mt-4 h-10 w-full border border-zinc-700 bg-black px-3 text-sm text-zinc-100 placeholder:text-zinc-600"
         placeholder="ძებნა"
       />
 
-      {limitMessage ? <p className="mt-3 border border-amber-300/30 bg-amber-300/10 p-2 text-xs text-amber-100">{limitMessage}</p> : null}
+      {limitMessage ? (
+        <p data-testid="series-limit-message" className="mt-3 border border-amber-300/30 bg-amber-300/10 p-2 text-xs text-amber-100">
+          {limitMessage}
+        </p>
+      ) : null}
 
       <div className="mt-4 flex max-h-[430px] flex-col gap-2 overflow-y-auto pr-1">
+        {filteredItems.length === 0 ? (
+          <div data-testid="series-no-results" className="border border-zinc-800 bg-zinc-950/75 p-3 text-sm text-zinc-400">
+            ამ ძებნით სერია ვერ მოიძებნა.
+          </div>
+        ) : null}
         {filteredItems.map((item) => {
           const selected = selectedIds.includes(item.id);
           const disabled = chartMode === "stacked" && isDerivedTotalItemId(item.id);
