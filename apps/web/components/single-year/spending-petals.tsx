@@ -14,9 +14,9 @@ export function SpendingPetals({ items }: SpendingPetalsProps) {
   const maxShare = Math.max(...items.map((item) => item.shareOfTotal), 0);
 
   return (
-    <section data-testid="spending-petals" className="border border-cyan-400/20 bg-black/45 p-4">
+    <section data-testid="spending-petals" className="min-w-0 border border-cyan-400/20 bg-black/45 p-4">
       <h3 className="mb-3 text-lg font-semibold text-white">ხარჯების ფურცლები</h3>
-      <div className="grid gap-4 lg:grid-cols-[360px_1fr]">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[360px_1fr]">
         <svg viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`} role="img" aria-label="Spending petals by share of total" className="h-auto w-full max-w-[360px]">
           <circle cx={CENTER} cy={CENTER} r={28} fill="#05070b" stroke="rgba(34, 211, 238, 0.45)" strokeWidth={1.5} />
           {items.map((item, index) => {
@@ -45,9 +45,9 @@ export function SpendingPetals({ items }: SpendingPetalsProps) {
             );
           })}
         </svg>
-        <div className="space-y-2">
+        <div className="min-w-0 max-w-full space-y-2">
           {items.map((item) => (
-            <div key={item.itemId} className="flex items-center justify-between gap-3 border-b border-zinc-800/80 pb-2 text-sm last:border-b-0">
+            <div key={item.itemId} className="flex min-w-0 items-center justify-between gap-3 border-b border-zinc-800/80 pb-2 text-sm last:border-b-0">
               <div className="flex min-w-0 items-center gap-2">
                 <span className="h-3 w-3 shrink-0 border border-white/20" style={{ backgroundColor: item.color }} />
                 <span className="truncate text-zinc-200">{item.kaLabel}</span>

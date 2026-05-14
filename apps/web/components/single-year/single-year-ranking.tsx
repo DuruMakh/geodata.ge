@@ -40,7 +40,7 @@ export function SingleYearRanking({ rows }: SingleYearRankingProps) {
   );
 
   return (
-    <section data-testid="single-year-ranking" className="border border-cyan-400/20 bg-black/45 p-4">
+    <section data-testid="single-year-ranking" className="min-w-0 border border-cyan-400/20 bg-black/45 p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-lg font-semibold text-white">სრული რეიტინგი</h3>
         <div className="flex flex-wrap gap-2" aria-label="Sort full ranking">
@@ -66,7 +66,7 @@ export function SingleYearRanking({ rows }: SingleYearRankingProps) {
           })}
         </div>
       </div>
-      <div className="overflow-x-auto border border-cyan-400/20 bg-black/40">
+      <div className="max-w-full overflow-x-auto border border-cyan-400/20 bg-black/40">
         <table className="min-w-[760px] w-full text-left text-sm">
           <thead className="border-b border-cyan-400/20 text-xs uppercase text-zinc-500">
             <tr>

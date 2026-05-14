@@ -24,10 +24,16 @@ export function Every100Gel({ items, side }: Every100GelProps) {
   const ariaLabel = side === "expenditure" ? "Expenditure composition per 100 GEL" : "Revenue composition per 100 GEL";
 
   return (
-    <section data-testid="every-100-gel" className="border border-cyan-400/20 bg-black/45 p-4">
+    <section data-testid="every-100-gel" className="min-w-0 border border-cyan-400/20 bg-black/45 p-4">
       <h3 className="mb-3 text-lg font-semibold text-white">ყოველი 100 GEL</h3>
-      <div className="grid gap-4 lg:grid-cols-[220px_1fr]">
-        <div className="grid grid-cols-10 gap-1" role="img" aria-label={ariaLabel}>
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[220px_1fr]">
+        <div
+          data-testid="every-100-grid"
+          className="grid w-full max-w-[320px] gap-1 justify-self-start"
+          role="img"
+          aria-label={ariaLabel}
+          style={{ gridTemplateColumns: "repeat(10, minmax(0, 1fr))" }}
+        >
           {cells.map((item, index) => (
             <span
               key={`${item?.itemId ?? "empty"}-${index}`}
@@ -37,9 +43,9 @@ export function Every100Gel({ items, side }: Every100GelProps) {
             />
           ))}
         </div>
-        <div className="space-y-2">
+        <div className="min-w-0 max-w-full space-y-2">
           {items.map((item) => (
-            <div key={item.itemId} className="flex items-center justify-between gap-3 border-b border-zinc-800/80 pb-2 text-sm last:border-b-0">
+            <div key={item.itemId} className="flex min-w-0 items-center justify-between gap-3 border-b border-zinc-800/80 pb-2 text-sm last:border-b-0">
               <div className="flex min-w-0 items-center gap-2">
                 <span className="h-3 w-3 shrink-0 border border-white/20" style={{ backgroundColor: item.color }} />
                 <span className="truncate text-zinc-200">{item.kaLabel}</span>

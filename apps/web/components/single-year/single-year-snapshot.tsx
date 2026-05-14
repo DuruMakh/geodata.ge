@@ -36,11 +36,11 @@ export function SingleYearSnapshot({ model }: SingleYearSnapshotProps) {
       </header>
 
       <SnapshotHeadlineCards cards={model.headlineCards} />
-      <div className="mt-4 grid gap-4">
+      <div className="mt-4 grid min-w-0 gap-4">
         <SnapshotTreemap items={model.items} />
         <Every100Gel items={model.every100} side={model.side} />
         <SpendingPetals items={model.petals} />
-        <div data-testid="budget-field-scroll" className="overflow-x-auto">
+        <div data-testid="budget-field-scroll" className="min-w-0 max-w-full overflow-x-auto">
           <BudgetField items={model.items} hasGrowthData={model.hasGrowthData} />
         </div>
         <SingleYearRanking rows={model.rankingRows} />

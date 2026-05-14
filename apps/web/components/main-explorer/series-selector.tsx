@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { formatGel } from "../../lib/explorer/format";
 import { MAX_CHART_SERIES, type ChartMode, type ExplorerItem, type ExplorerTableRow } from "../../lib/explorer/types";
 
@@ -47,17 +48,28 @@ export function SeriesSelector({ items, selectedIds, rows, years, chartMode, lim
       <div className="mt-4 flex max-h-[430px] flex-col gap-2 overflow-y-auto pr-1">
         {filteredItems.map((item) => {
           const selected = selectedIds.includes(item.id);
+          const disabled = chartMode === "stacked" && isDerivedTotalItemId(item.id);
           const row = values.get(item.id);
           const latest = latestYear === undefined ? null : row?.valuesByYear[latestYear] ?? null;
 
           return (
             <label
               key={item.id}
-              className={`flex cursor-pointer items-start gap-3 border p-3 transition ${
-                selected ? "border-cyan-300/70 bg-cyan-300/10 shadow-[0_0_18px_rgba(34,211,238,0.08)]" : "border-zinc-800 bg-zinc-950/75 hover:border-zinc-600"
+              className={`flex items-start gap-3 border p-3 transition ${
+                disabled
+                  ? "cursor-not-allowed border-zinc-900 bg-zinc-950/40 opacity-50"
+                  : selected
+                    ? "cursor-pointer border-cyan-300/70 bg-cyan-300/10 shadow-[0_0_18px_rgba(34,211,238,0.08)]"
+                    : "cursor-pointer border-zinc-800 bg-zinc-950/75 hover:border-zinc-600"
               }`}
             >
-              <input type="checkbox" checked={selected} onChange={() => onToggle(item.id)} className="mt-1 size-4 accent-cyan-300" />
+              <input
+                type="checkbox"
+                checked={selected}
+                disabled={disabled}
+                onChange={() => onToggle(item.id)}
+                className="mt-1 size-4 accent-cyan-300"
+              />
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-2">
                   <span className="size-2 shrink-0" style={{ backgroundColor: item.color }} />

@@ -6,7 +6,7 @@ import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
-import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
+import { buildExplorerModel, getDefaultSelection, getDefaultStackedSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { formatGel } from "../../lib/explorer/format";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 import { MAX_CHART_SERIES, type ChartMode, type ExplorerSide, type MeasureMode, type ViewMode } from "../../lib/explorer/types";
@@ -73,6 +73,18 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
   const hasPlannedValues = viewMode === "single_year" ? singleYearModel.hasPlannedValues : model.hasPlannedValues;
   const selectorRows = [...model.tableRows, ...model.comparisonRows];
 
+  function handleSideChange(nextSide: ExplorerSide) {
+    setSide(nextSide);
+    setLimitMessage(null);
+    if (chartMode === "stacked") {
+      setMeasure("share_of_total");
+      setSelections((current) => ({
+        ...current,
+        [nextSide]: getDefaultStackedSelection(nextSide, facts),
+      }));
+    }
+  }
+
   function handleStartYearChange(year: number) {
     setStartYear(year);
     if (year > endYear) setEndYear(year);
@@ -87,10 +99,22 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
     setChartMode(mode);
     setLimitMessage(null);
     if (mode === "bar") setBarYear(endYear);
+    if (mode === "stacked") {
+      setMeasure("share_of_total");
+      setSelections((current) => ({
+        ...current,
+        [side]: getDefaultStackedSelection(side, facts),
+      }));
+    }
   }
 
   function handleToggle(itemId: string) {
     setLimitMessage(null);
+    if (chartMode === "stacked" && isDerivedTotalItemId(itemId)) {
+      setLimitMessage("კომპოზიციის რეჟიმში ჯამის სერია არ ირჩევა. აირჩიე ცალკეული კატეგორიები.");
+      return;
+    }
+
     setSelections((current) => {
       const currentSideSelection = current[side];
       const alreadySelected = currentSideSelection.includes(itemId);
@@ -127,8 +151,8 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-background px-3 py-3 text-foreground sm:px-5 sm:py-5 lg:px-8">
-      <section className={`grid min-h-[calc(100vh-1.5rem)] max-w-full gap-4 overflow-hidden sm:gap-5 ${viewMode === "multi_year" ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
-        <div className="order-1 flex min-w-0 max-w-full flex-col gap-4 overflow-hidden lg:order-none">
+      <section className={`grid min-h-[calc(100vh-1.5rem)] max-w-full gap-4 sm:gap-5 ${viewMode === "multi_year" ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
+        <div className="order-1 flex min-w-0 max-w-full flex-col gap-4 lg:order-none">
           <header data-testid="explorer-header" className="border border-cyan-400/25 bg-black/60 p-4 shadow-[0_0_36px_rgba(34,211,238,0.08)] sm:p-5">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
@@ -158,7 +182,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
                 endYear={endYear}
                 barYear={barYear}
                 singleYear={singleYear}
-                onSideChange={setSide}
+                onSideChange={handleSideChange}
                 onViewModeChange={setViewMode}
                 onChartModeChange={handleChartModeChange}
                 onMeasureChange={setMeasure}
@@ -180,7 +204,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
           </div>
 
           {viewMode === "single_year" ? (
-            <div className="min-w-0 max-w-full overflow-hidden">
+            <div className="min-w-0 max-w-full">
               <SingleYearSnapshot model={singleYearModel} />
             </div>
           ) : model.unavailableReason ? (
@@ -198,7 +222,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
         </div>
 
         {viewMode === "multi_year" ? (
-          <div className="order-2 min-w-0 max-w-full overflow-hidden lg:order-none">
+          <div className="order-2 min-w-0 max-w-full lg:order-none">
             <SeriesSelector
               items={model.items}
               selectedIds={selectedIds}
