@@ -42,7 +42,7 @@ export function PeriodSummaryPanel({ years, summary, rows, topGrowth, bottomGrow
 
 function SummaryCell({ title, value, detail }: { title: string; value: string; detail?: string }) {
   return (
-    <div className="border border-cyan-400/20 bg-black/40 p-4">
+    <div className="border border-cyan-400/20 bg-black/45 p-4">
       <p className="text-xs uppercase text-zinc-500">{title}</p>
       <p className="mt-2 text-base font-semibold text-white">{value}</p>
       {detail ? <p className="mt-1 text-sm text-zinc-400">{detail}</p> : null}
@@ -52,7 +52,7 @@ function SummaryCell({ title, value, detail }: { title: string; value: string; d
 
 function MovementList({ title, rows }: { title: string; rows: ExplorerTableRow[] }) {
   return (
-    <div className="border border-zinc-800 bg-black/40 p-4">
+    <div className="border border-cyan-400/20 bg-black/45 p-4">
       <h3 className="text-sm font-semibold text-white">{title}</h3>
       <div className="mt-3 flex flex-col gap-2">
         {rows.map((row, index) => (
@@ -78,7 +78,7 @@ function StartEndComparison({
   endYear: number;
 }) {
   return (
-    <div className="border border-zinc-800 bg-black/40 p-4 lg:col-span-2">
+    <div className="border border-cyan-400/20 bg-black/45 p-4 lg:col-span-2">
       <h3 className="text-sm font-semibold text-white">პერიოდის დასაწყისი და დასასრული</h3>
       <div className="mt-3 overflow-x-auto">
         <table className="min-w-full text-left text-sm">

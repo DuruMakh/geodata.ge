@@ -25,7 +25,7 @@ export function SeriesSelector({ items, selectedIds, rows, years, chartMode, lim
   });
 
   return (
-    <aside className="border border-cyan-400/20 bg-black/40 p-4">
+    <aside data-testid="series-selector" className="border border-cyan-400/20 bg-black/45 p-4 lg:sticky lg:top-5">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-sm font-semibold text-white">სერიები</h2>
@@ -59,8 +59,8 @@ export function SeriesSelector({ items, selectedIds, rows, years, chartMode, lim
                 disabled
                   ? "cursor-not-allowed border-zinc-900 bg-zinc-950/40 opacity-50"
                   : selected
-                    ? "cursor-pointer border-cyan-300/70 bg-cyan-300/10"
-                    : "cursor-pointer border-zinc-800 bg-zinc-950/70 hover:border-zinc-600"
+                    ? "cursor-pointer border-cyan-300/70 bg-cyan-300/10 shadow-[0_0_18px_rgba(34,211,238,0.08)]"
+                    : "cursor-pointer border-zinc-800 bg-zinc-950/75 hover:border-zinc-600"
               }`}
             >
               <input

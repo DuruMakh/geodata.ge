@@ -150,10 +150,10 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
   }
 
   return (
-    <main className="min-h-screen bg-background px-4 py-4 text-foreground sm:px-6 lg:px-8">
-      <section className={`grid min-h-[calc(100vh-2rem)] gap-5 ${viewMode === "multi_year" ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
-        <div className="order-1 flex min-w-0 flex-col gap-4 lg:order-none">
-          <header className="border border-cyan-400/20 bg-black/50 p-4">
+    <main data-testid="explorer-shell" className="min-h-screen bg-background px-3 py-3 text-foreground sm:px-5 sm:py-5 lg:px-8">
+      <section className={`grid min-h-[calc(100vh-1.5rem)] max-w-full gap-4 sm:gap-5 ${viewMode === "multi_year" ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
+        <div className="order-1 flex min-w-0 max-w-full flex-col gap-4 lg:order-none">
+          <header data-testid="explorer-header" className="border border-cyan-400/25 bg-black/60 p-4 shadow-[0_0_36px_rgba(34,211,238,0.08)] sm:p-5">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="font-mono text-xs uppercase text-cyan-200">GeoData.ge / Budget Explorer</p>
@@ -162,7 +162,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
                   წლიური ეროვნული ბიუჯეტის სამუშაო ვერსია: ხარჯები, შემოსავლები, ტრენდები და CSV ექსპორტი.
                 </p>
               </div>
-              <div className="border border-lime-300/20 bg-lime-300/10 px-4 py-3 text-right">
+              <div data-testid="active-total-card" className="min-w-[180px] border border-lime-300/25 bg-lime-300/10 px-4 py-3 text-left shadow-[0_0_24px_rgba(163,230,53,0.08)] sm:text-right">
                 <p className="font-mono text-xs uppercase text-lime-200">{headerYear ?? "n/a"}</p>
                 <p className="mt-1 text-lg font-semibold text-white">{formatGel(headerTotal)}</p>
                 {hasPlannedValues ? <p className="mt-1 text-xs text-amber-200">გეგმური მნიშვნელობა აქტიურია</p> : null}
@@ -170,7 +170,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
             </div>
           </header>
 
-          <div className="border border-cyan-400/20 bg-zinc-950/80 p-4">
+          <div data-testid="explorer-controls" className="border border-cyan-400/20 bg-zinc-950/85 p-4 shadow-[0_0_28px_rgba(8,145,178,0.08)]">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
               <ExplorerControls
                 side={side}
@@ -204,7 +204,9 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
           </div>
 
           {viewMode === "single_year" ? (
-            <SingleYearSnapshot model={singleYearModel} />
+            <div className="min-w-0 max-w-full">
+              <SingleYearSnapshot model={singleYearModel} />
+            </div>
           ) : model.unavailableReason ? (
             <div className="border border-amber-300/30 bg-amber-300/10 p-6 text-sm text-amber-100">{model.unavailableReason}</div>
           ) : chartMode === "table" ? (
@@ -213,14 +215,14 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
             <ChartFrame mode={chartMode} measure={measure} years={model.years} points={model.points} selectedItems={model.selectedItems} />
           )}
 
-          <p className="text-xs text-zinc-500">
+          <p data-testid="source-label" className="border border-zinc-800 bg-black/35 px-3 py-2 text-xs leading-5 text-zinc-400">
             მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები. ბოლო განახლება: {lastUpdatedAt}.
             {hasPlannedValues ? " აქტიურ მნიშვნელობებში არის გეგმური ბიუჯეტის მონაცემები." : ""}
           </p>
         </div>
 
         {viewMode === "multi_year" ? (
-          <div className="order-2 lg:order-none">
+          <div className="order-2 min-w-0 max-w-full lg:order-none">
             <SeriesSelector
               items={model.items}
               selectedIds={selectedIds}
