@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { budgetFactsToCsv, type BudgetFactCsvRow } from "../lib/data/factCsv";
 import { loadBudgetFactRows, type BudgetFactImportRow } from "../lib/data/importBudgetFacts";
 
@@ -49,7 +50,9 @@ async function main() {
   console.log(`Composed budget fact rows: ${rows.length}`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

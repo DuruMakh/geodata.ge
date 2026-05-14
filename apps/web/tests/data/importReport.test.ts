@@ -9,8 +9,8 @@ describe("import validation report", () => {
 
     expect(report.rowsRead).toBe(6);
     expect(report.rowsImported).toBe(6);
-    expect(report.actualRows).toBe(4);
-    expect(report.plannedRows).toBe(2);
+    expect(report.actualRows).toBe(6);
+    expect(report.plannedRows).toBe(0);
     expect(report.totalRevenueGel).toBe(22500000000);
     expect(report.totalExpenditureGel).toBe(17800000000);
   });
