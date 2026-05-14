@@ -3,6 +3,11 @@
 :root {
   --background: #05070b;
   --foreground: #f4f4f5;
+  --panel: rgba(9, 12, 20, 0.84);
+  --panel-strong: rgba(0, 0, 0, 0.62);
+  --line-cyan: rgba(34, 211, 238, 0.24);
+  --line-lime: rgba(163, 230, 53, 0.28);
+  --muted: #a1a1aa;
 }
 
 @theme inline {
@@ -17,9 +22,12 @@
 }
 
 body {
+  min-width: 320px;
+  overflow-x: hidden;
   background:
-    linear-gradient(180deg, rgba(34, 211, 238, 0.08), transparent 340px),
-    radial-gradient(circle at 80% 0%, rgba(163, 230, 53, 0.08), transparent 300px),
+    linear-gradient(180deg, rgba(34, 211, 238, 0.1), transparent 360px),
+    radial-gradient(circle at 82% 0%, rgba(163, 230, 53, 0.09), transparent 320px),
+    linear-gradient(135deg, rgba(39, 39, 42, 0.34) 0 1px, transparent 1px 18px),
     var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
@@ -29,4 +37,17 @@ button,
 select,
 input {
   font: inherit;
+  min-width: 0;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid #a3e635;
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(163, 230, 53, 0.35);
+  color: #ffffff;
 }

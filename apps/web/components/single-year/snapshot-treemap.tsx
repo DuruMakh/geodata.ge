@@ -43,10 +43,10 @@ function SnapshotTreemapTooltip({ active, payload }: TooltipContentProps) {
 function TreemapCell(node: TreemapNode) {
   const label = typeof node.kaLabel === "string" ? node.kaLabel : node.name;
   const color = typeof node.color === "string" ? node.color : "#22d3ee";
-  const maxLabelChars = Math.max(0, Math.floor((node.width - 20) / 8));
-  const showLabel = Boolean(label) && node.width >= 128 && node.height >= 58 && maxLabelChars >= 8;
+  const maxLabelChars = Math.max(0, Math.floor((node.width - 24) / 18));
+  const showLabel = Boolean(label) && node.width >= 260 && node.height >= 92 && maxLabelChars >= 10;
   const displayLabel =
-    showLabel && label.length > maxLabelChars ? `${label.slice(0, Math.max(0, maxLabelChars - 1))}…` : label;
+    showLabel && label.length > maxLabelChars ? `${label.slice(0, Math.max(0, maxLabelChars - 3))}...` : label;
 
   return (
     <g>
@@ -65,10 +65,8 @@ function TreemapCell(node: TreemapNode) {
           x={node.x + 10}
           y={node.y + 22}
           fill="#f4f4f5"
-          fontSize={12}
+          fontSize={10}
           fontWeight={700}
-          textLength={Math.max(0, node.width - 20)}
-          lengthAdjust="spacingAndGlyphs"
         >
           {displayLabel}
         </text>
@@ -88,9 +86,9 @@ export function SnapshotTreemap({ items }: SnapshotTreemapProps) {
   }));
 
   return (
-    <section data-testid="snapshot-treemap" className="mt-4">
+    <section data-testid="snapshot-treemap" className="min-w-0 border border-cyan-400/20 bg-black/45 p-4">
       <h3 className="mb-3 text-lg font-semibold text-white">ბიუჯეტის რუკა</h3>
-      <div className="h-[384px] border border-cyan-400/20 bg-black/40 p-3">
+      <div className="h-[384px]">
         <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
           <Treemap
             data={data}

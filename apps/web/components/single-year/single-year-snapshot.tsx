@@ -18,7 +18,10 @@ export function SingleYearSnapshot({ model }: SingleYearSnapshotProps) {
   const subtitle = model.side === "expenditure" ? "სად მიდის საჯარო ფული" : "საიდან მოდის საჯარო ფული";
 
   return (
-    <section data-testid="single-year-snapshot" className="border border-cyan-400/20 bg-zinc-950/80 p-4">
+    <section
+      data-testid="single-year-snapshot"
+      className="border border-cyan-400/20 bg-zinc-950/85 p-4 shadow-[0_0_32px_rgba(34,211,238,0.07)] sm:p-5"
+    >
       <header className="mb-4">
         <p className="font-mono text-xs uppercase text-cyan-200">Single-year snapshot</p>
         <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -33,13 +36,15 @@ export function SingleYearSnapshot({ model }: SingleYearSnapshotProps) {
       </header>
 
       <SnapshotHeadlineCards cards={model.headlineCards} />
-      <SnapshotTreemap items={model.items} />
-      <Every100Gel items={model.every100} side={model.side} />
-      <SpendingPetals items={model.petals} />
-      <div className="overflow-x-auto">
-        <BudgetField items={model.items} hasGrowthData={model.hasGrowthData} />
+      <div className="mt-4 grid min-w-0 gap-4">
+        <SnapshotTreemap items={model.items} />
+        <Every100Gel items={model.every100} side={model.side} />
+        <SpendingPetals items={model.petals} />
+        <div data-testid="budget-field-scroll" className="min-w-0 max-w-full overflow-x-auto">
+          <BudgetField items={model.items} hasGrowthData={model.hasGrowthData} />
+        </div>
+        <SingleYearRanking rows={model.rankingRows} />
       </div>
-      <SingleYearRanking rows={model.rankingRows} />
     </section>
   );
 }

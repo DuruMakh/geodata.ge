@@ -33,6 +33,7 @@ const viewModeLabels: Record<ViewMode, string> = {
 const chartModeLabels: Record<ChartMode, string> = {
   line: "ხაზი",
   bar: "სვეტები",
+  stacked: "კომპოზიცია",
   table: "ცხრილი",
 };
 
@@ -62,8 +63,11 @@ export function ExplorerControls({
   onBarYearChange,
   onSingleYearChange,
 }: ExplorerControlsProps) {
+  const availableMeasures: MeasureMode[] =
+    chartMode === "stacked" ? ["share_of_total"] : ["nominal", "percent_change", "share_of_total", "share_of_gdp"];
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-4">
       <div className="flex flex-wrap gap-2">
         {(["expenditure", "revenue"] as const).map((nextSide) => (
           <button
@@ -71,7 +75,7 @@ export function ExplorerControls({
             type="button"
             data-testid={`side-${nextSide}`}
             onClick={() => onSideChange(nextSide)}
-            className={`h-10 border px-4 font-mono text-xs uppercase transition ${
+            className={`h-10 whitespace-nowrap border px-4 font-mono text-xs uppercase transition ${
               side === nextSide
                 ? "border-cyan-300 bg-cyan-300 text-black"
                 : "border-cyan-300/30 bg-black/30 text-cyan-100 hover:border-cyan-200"
@@ -91,7 +95,7 @@ export function ExplorerControls({
               type="button"
               data-testid={`view-${mode}`}
               onClick={() => onViewModeChange(mode)}
-              className={`h-10 border px-4 font-mono text-xs uppercase transition ${
+              className={`h-10 whitespace-nowrap border px-4 font-mono text-xs uppercase transition ${
                 viewMode === mode
                   ? "border-cyan-300 bg-cyan-300 text-black"
                   : "border-cyan-300/30 bg-black/30 text-cyan-100 hover:border-cyan-200"
@@ -106,12 +110,12 @@ export function ExplorerControls({
       {viewMode === "multi_year" ? (
         <>
           <div className="flex flex-wrap items-center gap-2">
-            {(["line", "bar", "table"] as const).map((mode) => (
+            {(["line", "bar", "stacked", "table"] as const).map((mode) => (
               <button
                 key={mode}
                 type="button"
                 onClick={() => onChartModeChange(mode)}
-                className={`h-9 border px-3 text-sm transition ${
+                className={`h-9 whitespace-nowrap border px-3 text-sm transition ${
                   chartMode === mode
                     ? "border-lime-300 bg-lime-300 text-black"
                     : "border-zinc-700 bg-zinc-950 text-zinc-300 hover:border-lime-300/70"
@@ -120,14 +124,6 @@ export function ExplorerControls({
                 {chartModeLabels[mode]}
               </button>
             ))}
-            <button
-              type="button"
-              disabled
-              className="h-9 cursor-not-allowed border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-600"
-              title="Plan 2-ში კომპოზიციური რეჟიმი ჯერ არ მუშაობს"
-            >
-              კომპოზიცია
-            </button>
           </div>
 
           <div className="grid gap-3 md:grid-cols-[220px_1fr]">
@@ -136,9 +132,9 @@ export function ExplorerControls({
               <select
                 value={measure}
                 onChange={(event) => onMeasureChange(event.target.value as MeasureMode)}
-                className="h-10 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
+                className="h-10 min-w-0 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
               >
-                {(["nominal", "percent_change", "share_of_total", "share_of_gdp"] as const).map((nextMeasure) => (
+                {availableMeasures.map((nextMeasure) => (
                   <option key={nextMeasure} value={nextMeasure}>
                     {measureLabels[nextMeasure]}
                   </option>
@@ -152,7 +148,7 @@ export function ExplorerControls({
                 <select
                   value={barYear}
                   onChange={(event) => onBarYearChange(Number(event.target.value))}
-                  className="h-10 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
+                  className="h-10 min-w-0 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
                 >
                   {years.map((year) => (
                     <option key={year} value={year}>
@@ -168,7 +164,7 @@ export function ExplorerControls({
                   <select
                     value={startYear}
                     onChange={(event) => onStartYearChange(Number(event.target.value))}
-                    className="h-10 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
+                    className="h-10 min-w-0 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
                   >
                     {years.map((year) => (
                       <option key={year} value={year}>
@@ -182,7 +178,7 @@ export function ExplorerControls({
                   <select
                     value={endYear}
                     onChange={(event) => onEndYearChange(Number(event.target.value))}
-                    className="h-10 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
+                    className="h-10 min-w-0 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
                   >
                     {years.map((year) => (
                       <option key={year} value={year}>
@@ -201,7 +197,7 @@ export function ExplorerControls({
           <select
             value={singleYear}
             onChange={(event) => onSingleYearChange(Number(event.target.value))}
-            className="h-10 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
+            className="h-10 min-w-0 border border-zinc-700 bg-black px-3 text-sm text-zinc-100"
           >
             {years.map((year) => (
               <option key={year} value={year}>
