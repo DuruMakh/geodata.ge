@@ -27,7 +27,7 @@ Excluded:
 
 - No new expenditure or revenue ingestion.
 - No Plan 5 revenue pipeline changes.
-- No 2016-2026 expansion.
+- No data expansion outside the 2023-2025 v1 window.
 - No GDP data or Share of GDP implementation.
 - No Supabase/database read path.
 - No single-year component redesign.
