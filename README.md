@@ -8,7 +8,7 @@ Read first:
 - `Project_Definition.md`
 - `docs/superpowers/specs/2026-05-10-geodata-budget-v1-design.md`
 
-V1 focuses on annual national budget data for 2016-2026, reviewed data ingestion, public spending-field taxonomy, revenue categories, CSV export, and clear budget visualizations.
+V1 focuses on annual national budget data for 2023-2025, reviewed data ingestion, public spending-field taxonomy, revenue categories, CSV export, and clear budget visualizations.
 
 ## Development
 

@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run",
+    "test": "vitest run --configLoader native --pool=threads",
     "test:browser": "playwright test",
     "test:watch": "vitest",
     "data:validate": "tsx scripts/validate-data-files.ts",

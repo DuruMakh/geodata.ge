@@ -11,9 +11,7 @@ describe("explorer integration with real CSV data", () => {
     expect(facts.length).toBeGreaterThan(0);
 
     const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
-    expect(years.length).toBeGreaterThanOrEqual(2);
-    expect(years[0]).toBeLessThanOrEqual(2025);
-    expect(years[years.length - 1]).toBeGreaterThanOrEqual(2026);
+    expect(years).toEqual([2024, 2025]);
   });
 
   it("builds a non-empty expenditure model with the default selection", async () => {

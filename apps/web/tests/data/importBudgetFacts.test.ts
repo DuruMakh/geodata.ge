@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 
 describe("budget fact import validation", () => {
-  it("loads sample budget facts with actual and planned basis", async () => {
+  it("loads sample budget facts inside the 2024-2025 fixture range", async () => {
     const rows = await loadBudgetFactRows("../../data/imports/sample-budget-facts.csv");
 
     expect(rows).toEqual(
@@ -14,10 +14,10 @@ describe("budget fact import validation", () => {
           basis: "actual",
         }),
         expect.objectContaining({
-          year: 2026,
+          year: 2024,
           side: "revenue",
           itemId: "revenue.vat",
-          basis: "planned",
+          basis: "actual",
         }),
       ]),
     );

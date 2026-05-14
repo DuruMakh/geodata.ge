@@ -130,7 +130,7 @@ The workspace is a git repository on `main` with a GitHub `origin` remote. Check
 
 V1 includes:
 
-- Annual national budget data for 2016-2026.
+- Annual national budget data for 2023-2025.
 - Revenue overview with top-level tax categories shown directly.
 - Expenditure overview using public-friendly spending fields.
 - Multi-year explorer.
@@ -178,7 +178,7 @@ Default first view:
 - Multi-year.
 - Nominal GEL.
 - Line chart.
-- 2016-2026.
+- 2023-2025.
 - Total expenditure selected.
 
 Single-year mode has no v1 drilldown and should stay top-level. Multi-year mode can allow selecting deeper official rows as chart/table series.

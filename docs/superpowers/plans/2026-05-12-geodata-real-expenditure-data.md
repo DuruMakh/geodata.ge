@@ -31,7 +31,7 @@ Included:
 Excluded:
 
 - Revenue extraction.
-- 2026 planned data.
+- Data outside the 2023-2025 v1 window.
 - Economic-classification public visuals from blank-code rows such as `შრომის ანაზღაურება`.
 - Database insert into Supabase.
 - UI changes beyond switching the app from sample facts to the generated 2023-2025 facts.
@@ -192,7 +192,6 @@ source.mof_2023_tavi6_actual,Reviewed official 2023 state budget execution tavi 
 source.mof_2024_tavi6_actual,Reviewed official 2024 state budget execution tavi 6,docs/Raw Data/2024 12 თვე საიტისთვის.xlsx,2026-05-12
 source.mof_2025_tavi6_actual,Reviewed official 2025 state budget execution tavi 6,docs/Raw Data/2025.xlsx,2026-05-12
 source.mof_2025_execution,Reviewed official 2025 budget execution documents,docs/Budget Data 2025,2026-05-10
-source.mof_2026_plan,Reviewed official 2026 planned budget documents,docs/Budget Data 2025,2026-05-10
 ```
 
 Keep existing source rows if other sample tests still use them.
@@ -2200,7 +2199,7 @@ Covered:
 Deferred by design:
 
 - Revenue data extraction.
-- 2026 planned budget.
+- Data outside the 2023-2025 v1 window.
 - Supabase insert.
 - Single-year snapshot UI.
 - Economic-classification analytics from blank-code rows.

@@ -37,7 +37,7 @@ Excluded:
 - Production Supabase reads.
 - Public provenance panels.
 - Clickable drilldown/detail pages.
-- Full 2016-2026 production data ingestion.
+- Production data outside the 2023-2025 v1 window.
 
 ## Source Documents
 
@@ -333,24 +333,24 @@ const glossary = new Map<string, GlossaryEntry>([
 ]);
 
 const facts: BudgetFactImportRow[] = [
-  { year: 2025, side: "expenditure", itemId: "spending.health", amountGel: 100, basis: "actual", sourceId: "source.one", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: "spending.health", mappingConfidence: "high", mappingNotes: "" },
-  { year: 2026, side: "expenditure", itemId: "spending.health", amountGel: 150, basis: "planned", sourceId: "source.two", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: "spending.health", mappingConfidence: "high", mappingNotes: "" },
-  { year: 2025, side: "expenditure", itemId: "spending.education", amountGel: 300, basis: "actual", sourceId: "source.one", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: "spending.education", mappingConfidence: "high", mappingNotes: "" },
-  { year: 2026, side: "expenditure", itemId: "spending.education", amountGel: 300, basis: "actual", sourceId: "source.two", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: "spending.education", mappingConfidence: "high", mappingNotes: "" },
-  { year: 2026, side: "revenue", itemId: "revenue.vat", amountGel: 500, basis: "planned", sourceId: "source.two", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: null, mappingConfidence: null, mappingNotes: "" },
+  { year: 2024, side: "expenditure", itemId: "spending.health", amountGel: 100, basis: "actual", sourceId: "source.one", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: "spending.health", mappingConfidence: "high", mappingNotes: "" },
+  { year: 2025, side: "expenditure", itemId: "spending.health", amountGel: 150, basis: "planned", sourceId: "source.two", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: "spending.health", mappingConfidence: "high", mappingNotes: "" },
+  { year: 2024, side: "expenditure", itemId: "spending.education", amountGel: 300, basis: "actual", sourceId: "source.one", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: "spending.education", mappingConfidence: "high", mappingNotes: "" },
+  { year: 2025, side: "expenditure", itemId: "spending.education", amountGel: 300, basis: "actual", sourceId: "source.two", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: "spending.education", mappingConfidence: "high", mappingNotes: "" },
+  { year: 2025, side: "revenue", itemId: "revenue.vat", amountGel: 500, basis: "planned", sourceId: "source.two", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: null, mappingConfidence: null, mappingNotes: "" },
 ];
 
 const sourceDocuments: SourceDocumentRow[] = [
   {
     sourceId: "source.one",
-    sourceName: "Reviewed 2025 execution",
-    sourceUrlOrFile: "docs/source-2025",
+    sourceName: "Reviewed 2024 execution",
+    sourceUrlOrFile: "docs/source-2024",
     lastReviewedAt: "2026-05-10",
   },
   {
     sourceId: "source.two",
-    sourceName: "Reviewed 2026 planned budget",
-    sourceUrlOrFile: "docs/source-2026",
+    sourceName: "Reviewed 2025 planned budget scenario",
+    sourceUrlOrFile: "docs/source-2025-plan",
     lastReviewedAt: "2026-05-11",
   },
 ];
@@ -369,19 +369,19 @@ describe("main explorer data model", () => {
       side: "expenditure",
       selectedItemIds: ["expenditure.total"],
       startYear: 2025,
-      endYear: 2026,
+      endYear: 2025,
       measure: "nominal",
     });
 
-    expect(model.years).toEqual([2025, 2026]);
+    expect(model.years).toEqual([2024, 2025]);
     expect(model.points).toEqual([
-      expect.objectContaining({ year: 2025, value: 400, basis: "actual" }),
-      expect.objectContaining({ year: 2026, value: 450, basis: "planned" }),
+      expect.objectContaining({ year: 2024, value: 400, basis: "actual" }),
+      expect.objectContaining({ year: 2025, value: 450, basis: "planned" }),
     ]);
     expect(model.hasPlannedValues).toBe(true);
-    expect(model.tableRows.find((row) => row.itemId === "expenditure.total")?.sourceByYear[2026]).toEqual({
+    expect(model.tableRows.find((row) => row.itemId === "expenditure.total")?.sourceByYear[2025]).toEqual({
       sourceName: "Multiple reviewed official sources",
-      sourceUrlOrFile: "docs/source-2026",
+      sourceUrlOrFile: "docs/source-2025-plan",
       lastReviewedAt: "2026-05-11",
     });
     expect(model.summary.biggestShareChange?.itemId).toBe("spending.health");
@@ -394,8 +394,8 @@ describe("main explorer data model", () => {
       sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["spending.health"],
-      startYear: 2025,
-      endYear: 2026,
+      startYear: 2024,
+      endYear: 2025,
       measure: "percent_change",
     });
     const shareModel = buildExplorerModel({
@@ -404,8 +404,8 @@ describe("main explorer data model", () => {
       sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["spending.health"],
-      startYear: 2025,
-      endYear: 2026,
+      startYear: 2024,
+      endYear: 2025,
       measure: "share_of_total",
     });
 
@@ -421,8 +421,8 @@ describe("main explorer data model", () => {
       sourceDocuments,
       side: "revenue",
       selectedItemIds: ["revenue.vat"],
-      startYear: 2026,
-      endYear: 2026,
+      startYear: 2025,
+      endYear: 2025,
       measure: "share_of_gdp",
     });
 
@@ -767,17 +767,17 @@ describe("explorer CSV export", () => {
         itemId: "spending.health",
         kaLabel: "ჯანდაცვა",
         enLabel: "Health",
-        valuesByYear: { 2025: 100, 2026: 150 },
-        basisByYear: { 2025: "actual", 2026: "planned" },
+        valuesByYear: { 2024: 100, 2025: 150 },
+        basisByYear: { 2024: "actual", 2025: "planned" },
         sourceByYear: {
-          2025: {
-            sourceName: "Reviewed 2025 execution",
-            sourceUrlOrFile: "docs/source-2025",
+          2024: {
+            sourceName: "Reviewed 2024 execution",
+            sourceUrlOrFile: "docs/source-2024",
             lastReviewedAt: "2026-05-10",
           },
-          2026: {
-            sourceName: "Reviewed 2026 planned budget",
-            sourceUrlOrFile: "docs/source-2026",
+          2025: {
+            sourceName: "Reviewed 2025 planned budget scenario",
+            sourceUrlOrFile: "docs/source-2025-plan",
             lastReviewedAt: "2026-05-11",
           },
         },
@@ -786,11 +786,11 @@ describe("explorer CSV export", () => {
       },
     ];
 
-    expect(buildExplorerCsv(rows, [2025, 2026])).toContain(
+    expect(buildExplorerCsv(rows, [2024, 2025])).toContain(
       "year,category_id,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at",
     );
-    expect(buildExplorerCsv(rows, [2025, 2026])).toContain(
-      '2026,spending.health,"ჯანდაცვა",Health,150,planned,Reviewed 2026 planned budget,docs/source-2026,2026-05-11',
+    expect(buildExplorerCsv(rows, [2024, 2025])).toContain(
+      '2025,spending.health,"ჯანდაცვა",Health,150,planned,Reviewed 2025 planned budget scenario,docs/source-2025-plan,2026-05-11',
     );
   });
 });
@@ -1284,9 +1284,9 @@ Use this state skeleton:
 const [side, setSide] = useState<ExplorerSide>("expenditure");
 const [chartMode, setChartMode] = useState<ChartMode>("line");
 const [measure, setMeasure] = useState<MeasureMode>("nominal");
-const [startYear, setStartYear] = useState(allYears[0] ?? 2016);
-const [endYear, setEndYear] = useState(allYears[allYears.length - 1] ?? 2026);
-const [barYear, setBarYear] = useState(allYears[allYears.length - 1] ?? 2026);
+const [startYear, setStartYear] = useState(allYears[0] ?? 2023);
+const [endYear, setEndYear] = useState(allYears[allYears.length - 1] ?? 2025);
+const [barYear, setBarYear] = useState(allYears[allYears.length - 1] ?? 2025);
 const [expenditureSelection, setExpenditureSelection] = useState(() =>
   getDefaultSelection("expenditure", facts),
 );

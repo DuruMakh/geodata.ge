@@ -43,7 +43,7 @@ Included:
 Excluded:
 
 - Revenue ingestion.
-- 2026 planned budget ingestion.
+- Data outside the 2023-2025 v1 window.
 - Stacked mode.
 - Share of GDP.
 - Public provenance panels.
@@ -930,7 +930,7 @@ Manual browser check at `http://localhost:3100`:
 Spec coverage:
 
 - Covered: single-year mode, headline cards, treemap, Every 100 GEL, petals, Budget Field, full ranking, planned badge support, revenue empty state, mobile stacking, no drilldown.
-- Deferred by explicit scope: revenue ingestion, 2026 planned data, stacked mode, Share of GDP, source/provenance panels.
+- Deferred by explicit scope: revenue ingestion, data outside the 2023-2025 v1 window, stacked mode, Share of GDP, source/provenance panels.
 
 Execution clarity:
 

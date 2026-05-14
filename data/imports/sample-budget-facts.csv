@@ -3,5 +3,5 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2025,expenditure,spending.education,4500000000,actual,source.mof_2025_execution,Ministry of Education Science and Youth,General education program,,spending.education,high,Sample expenditure row
 2025,revenue,revenue.vat,7800000000,actual,source.mof_2025_execution,,,,,,Sample revenue row
 2025,revenue,revenue.income_tax,6200000000,actual,source.mof_2025_execution,,,,,,Sample revenue row
-2026,expenditure,spending.social_protection,8100000000,planned,source.mof_2026_plan,Ministry of Internally Displaced Persons Labour Health and Social Affairs,Social protection program,,spending.social_protection,medium,Sample planned row
-2026,revenue,revenue.vat,8500000000,planned,source.mof_2026_plan,,,,,,Sample planned revenue row
+2024,expenditure,spending.social_protection,8100000000,actual,source.mof_2024_tavi6_actual,Ministry of Internally Displaced Persons Labour Health and Social Affairs,Social protection program,,spending.social_protection,medium,Sample expenditure row
+2024,revenue,revenue.vat,8500000000,actual,source.mof_2024_tavi1_actual,,,,,,Sample revenue row

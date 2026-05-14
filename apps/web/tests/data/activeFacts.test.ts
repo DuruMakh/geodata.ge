@@ -6,12 +6,12 @@ describe("active public fact selection", () => {
   it("uses actual when planned and actual exist for the same item and year", () => {
     const rows: BudgetFactImportRow[] = [
       {
-        year: 2026,
+        year: 2025,
         side: "revenue",
         itemId: "revenue.vat",
         amountGel: 800,
         basis: "planned",
-        sourceId: "source.mof_2026_plan",
+        sourceId: "source.mof_2025_plan",
         officialInstitution: null,
         officialProgram: null,
         officialSubprogram: null,
@@ -20,12 +20,12 @@ describe("active public fact selection", () => {
         mappingNotes: "",
       },
       {
-        year: 2026,
+        year: 2025,
         side: "revenue",
         itemId: "revenue.vat",
         amountGel: 900,
         basis: "actual",
-        sourceId: "source.mof_2026_actual",
+        sourceId: "source.mof_2025_actual",
         officialInstitution: null,
         officialProgram: null,
         officialSubprogram: null,
@@ -45,12 +45,12 @@ describe("active public fact selection", () => {
   it("keeps planned when no actual exists", () => {
     const rows: BudgetFactImportRow[] = [
       {
-        year: 2026,
+        year: 2025,
         side: "expenditure",
         itemId: "spending.health",
         amountGel: 500,
         basis: "planned",
-        sourceId: "source.mof_2026_plan",
+        sourceId: "source.mof_2025_plan",
         officialInstitution: "Health institution",
         officialProgram: "Health program",
         officialSubprogram: null,

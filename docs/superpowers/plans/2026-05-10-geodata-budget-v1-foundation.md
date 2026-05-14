@@ -22,14 +22,14 @@ Included:
 - Root data directories for taxonomy, glossary, mappings, sources, sample imports, and import reports.
 - Prisma schema for budget facts, public categories, source documents, mappings, and import runs.
 - TypeScript validation utilities for taxonomy, glossary, mappings, CSV rows, and import reports.
-- Sample data import path for 2025-2026.
+- Sample data import path for 2024-2025.
 - Verification commands.
 - UTF-8 and Georgian label render checks for seed data.
 
 Excluded from this plan:
 
 - Final charts.
-- Full production data for 2016-2026.
+- Production data outside the 2023-2025 v1 window.
 - Supabase production project provisioning.
 - Public deployment.
 - Auth/admin UI.
@@ -282,7 +282,7 @@ Read first:
 - `Project_Definition.md`
 - `docs/superpowers/specs/2026-05-10-geodata-budget-v1-design.md`
 
-V1 focuses on annual national budget data for 2016-2026, reviewed data ingestion, public spending-field taxonomy, revenue categories, CSV export, and clear budget visualizations.
+V1 focuses on annual national budget data for 2023-2025, reviewed data ingestion, public spending-field taxonomy, revenue categories, CSV export, and clear budget visualizations.
 
 ## Development
 
@@ -813,7 +813,7 @@ Create:
 ```csv
 source_id,source_name,source_url_or_file,last_reviewed_at
 source.mof_2025_execution,Reviewed official 2025 budget execution documents,docs/Budget Data 2025,2026-05-10
-source.mof_2026_plan,Reviewed official 2026 planned budget documents,docs/Budget Data 2025,2026-05-10
+source.mof_2024_execution,Reviewed official 2024 budget execution documents,docs/Budget Data 2025,2026-05-10
 ```
 
 - [ ] **Step 6: Verify UTF-8 rendering of seed Georgian labels**
@@ -844,7 +844,7 @@ Create:
 year,official_institution,official_program,official_subprogram,public_spending_field_id,mapping_confidence,mapping_notes
 2025,Ministry of Internally Displaced Persons Labour Health and Social Affairs,Healthcare program,,spending.health,high,Sample row for foundation validation
 2025,Ministry of Education Science and Youth,General education program,,spending.education,high,Sample row for foundation validation
-2026,Ministry of Internally Displaced Persons Labour Health and Social Affairs,Social protection program,,spending.social_protection,medium,Sample row; review final source mapping
+2024,Ministry of Internally Displaced Persons Labour Health and Social Affairs,Social protection program,,spending.social_protection,medium,Sample row; review final source mapping
 ```
 
 - [ ] **Step 8: Create `data/imports/sample-budget-facts.csv`**
@@ -857,8 +857,8 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2025,expenditure,spending.education,4500000000,actual,source.mof_2025_execution,Ministry of Education Science and Youth,General education program,,spending.education,high,Sample expenditure row
 2025,revenue,revenue.vat,7800000000,actual,source.mof_2025_execution,,,,,,Sample revenue row
 2025,revenue,revenue.income_tax,6200000000,actual,source.mof_2025_execution,,,,,,Sample revenue row
-2026,expenditure,spending.social_protection,8100000000,planned,source.mof_2026_plan,Ministry of Internally Displaced Persons Labour Health and Social Affairs,Social protection program,,spending.social_protection,medium,Sample planned row
-2026,revenue,revenue.vat,8500000000,planned,source.mof_2026_plan,,,,,,Sample planned revenue row
+2024,expenditure,spending.social_protection,8100000000,actual,source.mof_2024_execution,Ministry of Internally Displaced Persons Labour Health and Social Affairs,Social protection program,,spending.social_protection,medium,Sample expenditure row
+2024,revenue,revenue.vat,8500000000,actual,source.mof_2024_execution,,,,,,Sample revenue row
 ```
 
 - [ ] **Step 9: Commit data foundation files**
@@ -1543,10 +1543,10 @@ describe("budget fact import validation", () => {
           basis: "actual",
         }),
         expect.objectContaining({
-          year: 2026,
+          year: 2024,
           side: "revenue",
           itemId: "revenue.vat",
-          basis: "planned",
+          basis: "actual",
         }),
       ]),
     );
@@ -1929,12 +1929,12 @@ describe("active public fact selection", () => {
   it("uses actual when planned and actual exist for the same item and year", () => {
     const rows: BudgetFactImportRow[] = [
       {
-        year: 2026,
+        year: 2025,
         side: "revenue",
         itemId: "revenue.vat",
         amountGel: 800,
         basis: "planned",
-        sourceId: "source.mof_2026_plan",
+        sourceId: "source.mof_2025_plan",
         officialInstitution: null,
         officialProgram: null,
         officialSubprogram: null,
@@ -1943,12 +1943,12 @@ describe("active public fact selection", () => {
         mappingNotes: "",
       },
       {
-        year: 2026,
+        year: 2025,
         side: "revenue",
         itemId: "revenue.vat",
         amountGel: 900,
         basis: "actual",
-        sourceId: "source.mof_2026_actual",
+        sourceId: "source.mof_2025_actual",
         officialInstitution: null,
         officialProgram: null,
         officialSubprogram: null,
@@ -1968,12 +1968,12 @@ describe("active public fact selection", () => {
   it("keeps planned when no actual exists", () => {
     const rows: BudgetFactImportRow[] = [
       {
-        year: 2026,
+        year: 2025,
         side: "expenditure",
         itemId: "spending.health",
         amountGel: 500,
         basis: "planned",
-        sourceId: "source.mof_2026_plan",
+        sourceId: "source.mof_2025_plan",
         officialInstitution: "Health institution",
         officialProgram: "Health program",
         officialSubprogram: null,
@@ -2205,7 +2205,7 @@ Not covered because they belong in follow-up UI/data plans:
 - Stacked mode UI.
 - Budget Field scatter.
 - Share of GDP source and calculation.
-- Full 2016-2026 production data loading.
+- Production data outside the 2023-2025 v1 window.
 - Deployment to Vercel.
 
 ### Red-Flag Scan
