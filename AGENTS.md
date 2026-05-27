@@ -183,7 +183,9 @@ Default first view:
 
 Single-year mode has no v1 drilldown and should stay top-level. Multi-year mode can allow selecting deeper official rows as chart/table series.
 
-The user wants a dark, bold, neon, crypto/terminal-like analytical interface. Do not force a boring civic-finance style.
+Production UI now follows `DESIGN.md` and the confirmed references in `docs/Design HTML files/`.
+
+The current approved direction is a clean Apple-like analytical Budget Explorer with Light and Night themes. Older dark/neon/terminal prototype styling is superseded for production unless the user explicitly approves a new design change.
 
 Guardrails:
 
@@ -191,7 +193,7 @@ Guardrails:
 - Chart labels must remain clear.
 - Color choices must be distinguishable.
 - Decorative effects must not reduce data comprehension.
-- Light mode can be future work; it is not required for v1.
+- Light and Night themes must keep the same layout, controls, and chart geometry.
 
 ## Workflow Rules
 
