@@ -38,11 +38,11 @@ function BudgetFieldTooltip({ active, payload }: TooltipContentProps) {
   if (!active || !isBudgetFieldDatum(datum)) return null;
 
   return (
-    <div className="border border-cyan-400/35 bg-[#05070b] px-3 py-2 text-sm text-zinc-100 shadow-xl shadow-cyan-950/40">
-      <p className="font-semibold text-white">{datum.kaLabel}</p>
-      <p className="mt-1 font-mono text-cyan-100">{formatGel(datum.amountGel)}</p>
-      <p className="mt-1 text-xs text-zinc-400">Share: {formatPercent(datum.shareOfTotal)}</p>
-      <p className="mt-1 text-xs text-zinc-400">Growth: {formatSignedPercent(datum.changeFromPreviousYear)}</p>
+    <div className="rounded-[12px] border border-[var(--hairline)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--ink)] shadow-xl">
+      <p className="font-semibold">{datum.kaLabel}</p>
+      <p className="mt-1 text-[var(--primary)]">{formatGel(datum.amountGel)}</p>
+      <p className="mt-1 text-xs text-[var(--body)]">{"\u10ec\u10d8\u10da\u10d8"}: {formatPercent(datum.shareOfTotal)}</p>
+      <p className="mt-1 text-xs text-[var(--body)]">{"\u10d6\u10e0\u10d3\u10d0"}: {formatSignedPercent(datum.changeFromPreviousYear)}</p>
     </div>
   );
 }
@@ -61,45 +61,45 @@ export function BudgetField({ items, hasGrowthData }: BudgetFieldProps) {
     }));
 
   return (
-    <section data-testid="budget-field" className="min-w-[760px] border border-cyan-400/20 bg-black/45 p-4">
-      <h3 className="mb-3 text-lg font-semibold text-white">Budget Field</h3>
-      <div className="h-[400px] border border-cyan-400/20 bg-black/40 p-3">
+    <section data-testid="budget-field" className="min-w-[760px] rounded-[20px] border border-[var(--hairline)] bg-[var(--surface)] p-4">
+      <h3 className="mb-3 text-lg font-semibold text-[var(--ink)]">{"\u10d1\u10d8\u10e3\u10ef\u10d4\u10e2\u10d8\u10e1 \u10d5\u10d4\u10da\u10d8"}</h3>
+      <div className="h-[400px] rounded-[18px] bg-[var(--canvas)] p-3">
         {hasGrowthData && data.length > 0 ? (
           <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
             <ScatterChart margin={{ top: 16, right: 24, bottom: 24, left: 12 }}>
-              <CartesianGrid stroke="rgba(34, 211, 238, 0.16)" strokeDasharray="3 3" />
+              <CartesianGrid stroke="var(--grid)" strokeDasharray="3 3" />
               <XAxis
                 type="number"
                 dataKey="shareOfTotal"
-                name="Share"
+                name={"\u10ec\u10d8\u10da\u10d8"}
                 tickFormatter={formatPercent}
-                stroke="#a1a1aa"
-                tick={{ fill: "#a1a1aa", fontSize: 11 }}
-                axisLine={{ stroke: "rgba(34, 211, 238, 0.32)" }}
-                tickLine={{ stroke: "rgba(34, 211, 238, 0.32)" }}
+                stroke="var(--mute)"
+                tick={{ fill: "var(--mute)", fontSize: 11 }}
+                axisLine={{ stroke: "var(--hairline)" }}
+                tickLine={{ stroke: "var(--hairline)" }}
               />
               <YAxis
                 type="number"
                 dataKey="growthValue"
-                name="Growth"
+                name={"\u10d6\u10e0\u10d3\u10d0"}
                 tickFormatter={formatSignedPercent}
-                stroke="#a1a1aa"
-                tick={{ fill: "#a1a1aa", fontSize: 11 }}
-                axisLine={{ stroke: "rgba(34, 211, 238, 0.32)" }}
-                tickLine={{ stroke: "rgba(34, 211, 238, 0.32)" }}
+                stroke="var(--mute)"
+                tick={{ fill: "var(--mute)", fontSize: 11 }}
+                axisLine={{ stroke: "var(--hairline)" }}
+                tickLine={{ stroke: "var(--hairline)" }}
               />
               <ZAxis type="number" dataKey="amountGel" range={[90, 1200]} />
-              <Tooltip content={BudgetFieldTooltip} cursor={{ stroke: "#22d3ee", strokeWidth: 1 }} />
+              <Tooltip content={BudgetFieldTooltip} cursor={{ stroke: "var(--primary)", strokeWidth: 1 }} />
               <Scatter data={data} isAnimationActive={false}>
                 {data.map((item) => (
-                  <Cell key={item.itemId} fill={item.color} stroke="#05070b" strokeWidth={1.5} />
+                  <Cell key={item.itemId} fill={item.color} stroke="var(--surface)" strokeWidth={1.5} />
                 ))}
               </Scatter>
             </ScatterChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex h-full items-center justify-center border border-amber-300/30 bg-amber-300/10 p-6 text-center text-sm text-amber-100">
-            ზრდის საჩვენებლად წინა ხელმისაწვდომი წელი საჭიროა.
+          <div className="flex h-full items-center justify-center rounded-[16px] border border-[var(--hairline)] bg-[var(--soft)] p-6 text-center text-sm text-[var(--body)]">
+            {"\u10d6\u10e0\u10d3\u10d8\u10e1 \u10e1\u10d0\u10e9\u10d5\u10d4\u10dc\u10d4\u10d1\u10da\u10d0\u10d3 \u10ec\u10d8\u10dc\u10d0 \u10ee\u10d4\u10da\u10db\u10d8\u10e1\u10d0\u10ec\u10d5\u10d3\u10dd\u10db\u10d8 \u10ec\u10d4\u10da\u10d8 \u10e1\u10d0\u10ed\u10d8\u10e0\u10dd\u10d0."}
           </div>
         )}
       </div>
