@@ -72,6 +72,7 @@ describe("single-year snapshot model", () => {
     expect(model.basis).toBe("actual");
     expect(model.hasGrowthData).toBe(true);
     expect(model.items.map((item) => item.itemId)).toEqual(["spending.health", "spending.education", "spending.defense"]);
+    expect(model.radarItems.map((item) => item.itemId)).toEqual(["spending.health", "spending.education", "spending.defense"]);
     expect(model.rankingRows.map((item) => item.itemId)).toEqual(["spending.health", "spending.education", "spending.defense"]);
     expect(model.items[0]).toEqual(expect.objectContaining({
       itemId: "spending.health",
@@ -161,9 +162,9 @@ describe("single-year snapshot model", () => {
       side: "expenditure",
       year: 2026,
     });
-    const other = model.petals.find((item) => item.itemId === "snapshot.other");
+    const other = model.radarItems.find((item) => item.itemId === "snapshot.other");
 
-    expect(model.petals).toHaveLength(8);
+    expect(model.radarItems).toHaveLength(8);
     expect(other?.source).toEqual({
       sourceName: "Reviewed tail source",
       sourceUrlOrFile: "docs/tail",

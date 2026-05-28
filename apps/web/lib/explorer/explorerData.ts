@@ -14,18 +14,13 @@ import type {
 } from "./types";
 
 const palette = [
-  "#22d3ee",
-  "#a3e635",
-  "#f97316",
-  "#f472b6",
-  "#c084fc",
-  "#facc15",
-  "#38bdf8",
-  "#fb7185",
-  "#14b8a6",
-  "#e879f9",
-  "#84cc16",
-  "#f43f5e",
+  "#0071e3",
+  "#ffd60a",
+  "#30d5c8",
+  "#0a84ff",
+  "#ff9f0a",
+  "#bf5af2",
+  "#8e8e93",
 ];
 
 export type ExplorerModelInput = {
@@ -296,6 +291,7 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
       itemId: item.id,
       kaLabel: item.kaLabel,
       enLabel: item.enLabel,
+      color: item.color,
       basisByYear,
       sourceByYear,
       valuesByYear,

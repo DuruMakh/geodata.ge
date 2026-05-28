@@ -41,6 +41,7 @@ export type ExplorerTableRow = {
   itemId: string;
   kaLabel: string;
   enLabel: string;
+  color: string;
   basisByYear: Record<number, "actual" | "planned">;
   sourceByYear: Record<number, SourceMetadata>;
   valuesByYear: Record<number, number | null>;
@@ -97,7 +98,7 @@ export type SingleYearSnapshotModel = {
   headlineCards: SnapshotHeadline[];
   items: SnapshotItem[];
   every100: Every100Item[];
-  petals: SnapshotItem[];
+  radarItems: SnapshotItem[];
   rankingRows: SnapshotItem[];
   hasGrowthData: boolean;
   emptyReason: string | null;

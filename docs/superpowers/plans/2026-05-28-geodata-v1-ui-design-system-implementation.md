@@ -1,5 +1,7 @@
 # GeoData.ge V1 UI Design System Implementation Plan
 
+> **Status:** Superseded for follow-up by `docs/superpowers/plans/2026-05-28-geodata-v1-ui-follow-up-fidelity.md`. The implementation was completed but review found remaining fidelity, accessibility, CSV-test, and hygiene gaps.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Convert the current Budget Explorer UI to the approved Apple-like Light/Night design system from the confirmed HTML references while preserving existing data, CSV export, and source-label behavior.

@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { formatMeasureValue } from "../../lib/explorer/format";
 import type { ChartMode, ExplorerItem, ExplorerPoint, MeasureMode } from "../../lib/explorer/types";
@@ -33,7 +22,8 @@ type ChartDatum = {
   [key: string]: string | number | null | undefined;
 };
 
-const CHART_HEIGHT = 396;
+const BILLION = 1_000_000_000;
+const CHART_HEIGHT = 360;
 const INITIAL_CHART_DIMENSION = { width: 900, height: CHART_HEIGHT };
 
 function chartKey(itemId: string): string {
@@ -50,9 +40,9 @@ function renderPointDot(props: { cx?: number; cy?: number; payload?: ChartDatum;
       cx={props.cx}
       cy={props.cy}
       r={planned ? 5 : 3}
-      fill={planned ? "#facc15" : "#05070b"}
-      stroke={planned ? "#facc15" : props.stroke ?? "#22d3ee"}
-      strokeWidth={2}
+      fill={planned ? "var(--yellow)" : "var(--surface)"}
+      stroke={planned ? "var(--yellow)" : props.stroke ?? "var(--primary)"}
+      strokeWidth={3}
     />
   );
 }
@@ -71,12 +61,49 @@ function buildYearRows(years: number[], points: ExplorerPoint[]): ChartDatum[] {
   return rows;
 }
 
+function formatBillions(value: number) {
+  const billions = value / BILLION;
+  if (billions === 0) return "0";
+  if (billions >= 1) return Number.isInteger(billions) ? String(billions) : billions.toFixed(1).replace(/\.0$/, "");
+  return billions.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function niceStep(rawStep: number) {
+  if (rawStep <= 0) return 1;
+
+  const power = 10 ** Math.floor(Math.log10(rawStep));
+  const normalized = rawStep / power;
+
+  if (normalized <= 1) return power;
+  if (normalized <= 2) return 2 * power;
+  if (normalized <= 5) return 5 * power;
+  return 10 * power;
+}
+
+function buildBillionTicks(points: ExplorerPoint[], targetIntervals = 4) {
+  const maxValue = Math.max(...points.map((point) => Number(point.value ?? 0)), 0);
+  const maxBillions = maxValue / BILLION;
+  const step = niceStep(maxBillions / targetIntervals);
+  const top = Math.max(step, Math.ceil(maxBillions / step) * step);
+  const ticks = [];
+
+  for (let tick = 0; tick <= top + step / 2; tick += step) {
+    ticks.push(Number((tick * BILLION).toPrecision(12)));
+  }
+
+  return ticks.length >= 2 ? ticks : [0, top * BILLION];
+}
+
+function formatAxisTick(value: number, measure: MeasureMode) {
+  return measure === "nominal" ? formatBillions(value) : formatMeasureValue(value, measure);
+}
+
 export function ChartFrame({ mode, measure, years, points, selectedItems }: ChartFrameProps) {
   if (points.length === 0) {
     return (
       <div data-testid="chart-frame" className="overflow-x-auto">
-        <div className="h-[420px] min-w-[680px] border border-cyan-400/20 bg-black/45 p-3">
-          <div className="flex h-full items-center justify-center text-sm text-zinc-400">
+        <div className="h-[360px] min-w-[680px]">
+          <div className="flex h-full items-center justify-center text-sm text-[var(--body)]">
             არჩეული მონაცემი არ არის.
           </div>
         </div>
@@ -92,21 +119,20 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
 
     return (
       <div data-testid="chart-frame" className="overflow-x-auto">
-        <div className="h-[420px] min-w-[680px] border border-cyan-400/20 bg-black/45 p-3">
+        <div className="h-[360px] min-w-[680px]">
           <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
             <BarChart data={barRows} margin={{ top: 20, right: 16, bottom: 72, left: 18 }}>
-              <CartesianGrid stroke="rgba(34, 211, 238, 0.16)" strokeDasharray="3 3" />
-              <XAxis dataKey="kaLabel" stroke="#a1a1aa" tick={{ fontSize: 12 }} angle={-35} textAnchor="end" interval={0} />
-              <YAxis stroke="#a1a1aa" tickFormatter={(value) => formatMeasureValue(Number(value), measure)} width={88} />
+              <XAxis dataKey="kaLabel" stroke="var(--mute)" tick={{ fontSize: 12 }} angle={-35} textAnchor="end" interval={0} axisLine={false} tickLine={false} />
+              <YAxis stroke="var(--mute)" tickFormatter={(value) => formatAxisTick(Number(value), measure)} width={72} axisLine={false} tickLine={false} />
               <Tooltip
-                contentStyle={{ background: "#05070b", border: "1px solid rgba(34, 211, 238, 0.35)", color: "#f4f4f5" }}
+                contentStyle={{ background: "var(--surface)", border: "1px solid var(--hairline)", color: "var(--ink)" }}
                 formatter={(value) => formatMeasureValue(Number(value), measure)}
               />
               <Bar dataKey="value" radius={[3, 3, 0, 0]}>
                 {barRows.map((row) => (
                   <Cell
                     key={row.itemId}
-                    fill={colorByItemId.get(row.itemId) ?? "#22d3ee"}
+                    fill={colorByItemId.get(row.itemId) ?? "var(--primary)"}
                     opacity={row.basis === "planned" ? 0.6 : 1}
                   />
                 ))}
@@ -125,7 +151,7 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
     if (stackItems.length === 0) {
       return (
         <div data-testid="chart-frame" className="overflow-x-auto">
-          <div className="flex h-[420px] min-w-[680px] items-center justify-center border border-cyan-400/20 bg-black/45 p-6 text-sm text-zinc-400">
+          <div className="flex h-[360px] min-w-[680px] items-center justify-center text-sm text-[var(--body)]">
             კომპოზიციისთვის აირჩიე ცალკეული კატეგორიები, არა ჯამის სერია.
           </div>
         </div>
@@ -134,11 +160,11 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
 
     return (
       <div data-testid="chart-frame" className="flex min-w-0 flex-col gap-2 overflow-x-auto">
-        <p className="border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-xs text-cyan-100">
+        <p className="rounded-[12px] border border-[var(--hairline)] bg-[var(--soft)] px-3 py-2 text-xs text-[var(--body)]">
           კომპოზიცია აჩვენებს არჩეული კატეგორიების წილს მთლიანში; არაარჩეული კატეგორიები გრაფიკში არ ჯამდება.
         </p>
         <div
-          className="h-[420px] min-w-[680px] border border-cyan-400/20 bg-black/45 p-3"
+          className="h-[360px] min-w-[680px]"
           data-chart-mode="stacked"
           data-measure={measure}
           data-series-count={stackItems.length}
@@ -146,11 +172,10 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
         >
           <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
             <BarChart data={rows} margin={{ top: 20, right: 16, bottom: 28, left: 18 }}>
-              <CartesianGrid stroke="rgba(34, 211, 238, 0.16)" strokeDasharray="3 3" />
-              <XAxis dataKey="year" stroke="#a1a1aa" tick={{ fontSize: 12 }} />
-              <YAxis stroke="#a1a1aa" tickFormatter={(value) => formatMeasureValue(Number(value), measure)} width={88} />
+              <XAxis dataKey="year" stroke="var(--mute)" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+              <YAxis stroke="var(--mute)" tickFormatter={(value) => formatAxisTick(Number(value), measure)} width={72} axisLine={false} tickLine={false} />
               <Tooltip
-                contentStyle={{ background: "#05070b", border: "1px solid rgba(34, 211, 238, 0.35)", color: "#f4f4f5" }}
+                contentStyle={{ background: "var(--surface)", border: "1px solid var(--hairline)", color: "var(--ink)" }}
                 formatter={(value) => formatMeasureValue(Number(value), measure)}
               />
               {stackItems.map((item) => {
@@ -166,17 +191,26 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
   }
 
   const rows = buildYearRows(years, points);
+  const yTicks = measure === "nominal" ? buildBillionTicks(points) : undefined;
 
   return (
     <div data-testid="chart-frame" className="overflow-x-auto">
-      <div className="h-[420px] min-w-[680px] border border-cyan-400/20 bg-black/45 p-3">
+      <div className="h-[360px] min-w-[680px]">
         <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={1} minHeight={CHART_HEIGHT} initialDimension={INITIAL_CHART_DIMENSION}>
-          <LineChart data={rows} margin={{ top: 18, right: 24, bottom: 12, left: 18 }}>
-            <CartesianGrid stroke="rgba(34, 211, 238, 0.16)" strokeDasharray="3 3" />
-            <XAxis dataKey="year" stroke="#a1a1aa" tick={{ fontSize: 12 }} />
-            <YAxis stroke="#a1a1aa" tickFormatter={(value) => formatMeasureValue(Number(value), measure)} width={88} />
+          <LineChart data={rows} margin={{ top: 18, right: 24, bottom: 12, left: 36 }}>
+            <XAxis dataKey="year" stroke="var(--mute)" tick={{ fontSize: 12 }} padding={{ left: 72, right: 8 }} axisLine={false} tickLine={false} />
+            <YAxis
+              stroke="var(--mute)"
+              tick={{ fontSize: 12 }}
+              tickFormatter={(value) => formatAxisTick(Number(value), measure)}
+              ticks={yTicks}
+              domain={yTicks ? [0, yTicks.at(-1) ?? "auto"] : undefined}
+              width={72}
+              axisLine={false}
+              tickLine={false}
+            />
             <Tooltip
-              contentStyle={{ background: "#05070b", border: "1px solid rgba(34, 211, 238, 0.35)", color: "#f4f4f5" }}
+              contentStyle={{ background: "var(--surface)", border: "1px solid var(--hairline)", color: "var(--ink)" }}
               formatter={(value) => formatMeasureValue(Number(value), measure)}
             />
             {selectedItems.map((item) => {
@@ -189,9 +223,9 @@ export function ChartFrame({ mode, measure, years, points, selectedItems }: Char
                   dataKey={key}
                   name={item.kaLabel}
                   stroke={item.color}
-                  strokeWidth={2}
+                  strokeWidth={isDerivedTotalItemId(item.id) ? 4 : 3}
                   dot={(props) => renderPointDot(props, key)}
-                  activeDot={{ r: 5 }}
+                  activeDot={{ r: 6 }}
                   connectNulls
                 />
               );

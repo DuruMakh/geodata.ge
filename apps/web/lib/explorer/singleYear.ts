@@ -125,7 +125,7 @@ function wholeGelFrom100(items: SnapshotItem[]): Every100Item[] {
   }));
 }
 
-function buildPetals(items: SnapshotItem[]): SnapshotItem[] {
+function buildRadarItems(items: SnapshotItem[]): SnapshotItem[] {
   if (items.length <= 8) return items;
 
   const visible = items.slice(0, 7);
@@ -142,7 +142,7 @@ function buildPetals(items: SnapshotItem[]): SnapshotItem[] {
       itemId: "snapshot.other",
       kaLabel: "სხვა",
       enLabel: "Other",
-      color: palette[7] ?? "#fb7185",
+      color: "#8e8e93",
       amountGel,
       shareOfTotal: omitted.reduce((sum, item) => sum + item.shareOfTotal, 0),
       previousAmountGel,
@@ -208,7 +208,7 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
       headlineCards: headlineCards(0, []),
       items: [],
       every100: [],
-      petals: [],
+      radarItems: [],
       rankingRows: [],
       hasGrowthData: false,
       emptyReason: emptyReasonFor(input.side),
@@ -251,7 +251,7 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
     headlineCards: headlineCards(totalGel, items),
     items,
     every100: wholeGelFrom100(items),
-    petals: buildPetals(items),
+    radarItems: buildRadarItems(items),
     rankingRows: items,
     hasGrowthData: items.some((item) => item.changeFromPreviousYear !== null),
     emptyReason: null,
