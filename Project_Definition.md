@@ -129,17 +129,18 @@ When actual data arrives for a planned year, actual data becomes the active publ
 
 ## 7. Visual Direction
 
-The visual direction is intentionally dark, bold, analytical, and terminal-like. It can feel closer to a crypto/market-data dashboard than a traditional civic website.
+The production visual direction follows `DESIGN.md` and the confirmed references in `docs/Design HTML files/`.
 
 This is a product decision.
 
 Guardrails:
 
-- The interface can be high-energy and neon.
+- The interface is a clean Apple-like analytical Budget Explorer with matching Light and Night themes.
+- Older dark, neon, and terminal-like prototype styling is superseded for production unless a new design change is explicitly approved.
 - Georgian text must remain readable.
 - Charts must stay clear and accessible.
 - Decorative effects must not reduce data comprehension.
-- A future light mode can provide a calmer civic/public style, but light mode is not required for v1.
+- Light and Night themes must keep the same layout, controls, and chart geometry.
 
 ## 8. Product Stack
 
@@ -167,4 +168,4 @@ Build the data foundation first. Visual ambition is important, but the platform 
 
 Avoid short-term UI-only hacks. The product should be architected so future versions can add more datasets, drilldown, bilingual UI, source pages, and additional budget modules without rebuilding the foundation.
 
-Implementation should follow this order: data foundation, real sample data, main explorer core, bar mode, single-year core, advanced visuals, then polish. Do not start with visual richness before the data model and import validation are working.
+Implementation should follow this order: data foundation, real sample data, main explorer core with line/table modes and CSV, single-year core, and production UI polish against `DESIGN.md`. Bar mode, stacked mode, Share of GDP, and broader advanced chart controls are not part of the current production v1 scope unless explicitly re-approved. Do not start with visual richness before the data model and import validation are working.

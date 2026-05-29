@@ -211,21 +211,17 @@ Layout:
 - Year or range controls below the chart.
 - Chart mode switcher above the chart.
 
-Chart modes:
+Current production chart modes:
 
 - `Line`: multi-year trend over selected range.
-- `Bar`: selected-year ranking or comparison.
-- `Stacked`: multi-year composition over selected range.
 - `Table`: exact data table.
 
-Measure modes:
+Current production measure controls:
 
 - `Nominal GEL`
-- `% change`
 - `Share of total`
-- `Share of GDP`
 
-`Share of GDP` requires trusted GDP data. If GDP is unavailable for a selected year, show a clear missing-data state instead of guessing.
+Bar mode, stacked mode, `% change`, and `Share of GDP` are deferred from the current production v1 UI. They should not be exposed unless a new design and implementation scope explicitly re-approves them. `Share of GDP` still requires trusted GDP data before implementation.
 
 ### Series Selection
 
@@ -253,21 +249,9 @@ Rules:
 - Hover tooltip remains simple: item name, year, value, and current measure if relevant.
 - Planned values are visually distinct from actual values. For line charts, use a dotted final segment or distinct planned-year marker when the latest year is planned.
 
-### Bar Mode
+### Deferred Chart Modes
 
-Bar mode uses a single selected year, not a range. When switching from line mode to bar mode, the control changes to single-year selection and defaults to the latest year in the current range.
-
-This follows the Our World in Data behavior the user approved.
-
-### Stacked Mode
-
-Stacked mode shows multi-year composition.
-
-Rules:
-
-- Only sibling items at the same hierarchy level can be stacked. This can include public spending fields, institutions, programs, or subprograms when the selected series are compatible.
-- Do not mix total, ministry, program, and subprogram levels because that double-counts.
-- If selected items are incompatible, show a helper message asking the user to choose one hierarchy level.
+Bar and stacked modes are not part of the current production v1 UI. Older plans may describe them, but `DESIGN.md` is the current source of truth for the production interface. Keep these modes out of the visible UI until they are re-approved with matching design references, data semantics, and tests.
 
 ### Table Mode
 
@@ -598,10 +582,8 @@ Recommended sequence:
 1. Data foundation: schema, taxonomy IDs, glossary, mapping table, import validation report.
 2. Real v1 data: load and validate the 2023-2025 source-backed facts.
 3. Main explorer core: expenditure/revenue switch, line mode, table mode, CSV.
-4. Add bar mode and selected-year behavior.
-5. Add single-year core: headline cards, treemap, Every 100 GEL, ranking.
-6. Add advanced visuals: stacked mode, spending petals, Budget Field.
-7. Polish: planned badges, source label, mobile behavior, dark terminal visual system.
+4. Add single-year core: headline cards, treemap, Every 100 GEL, ranking, and the approved snapshot visuals.
+5. Polish: planned badges, source label, mobile behavior, and the `DESIGN.md` Light/Night production visual system.
 
 This order prevents a visually impressive but data-weak product.
 
@@ -651,15 +633,16 @@ Latest year: YYYY planned budget
 
 ## 12. Visual Direction
 
-The chosen visual direction is a high-energy dark analytical interface, closer to a crypto/terminal control room than a conventional civic finance website. This is intentional.
+The production visual direction follows `DESIGN.md` and the confirmed references in `docs/Design HTML files/`. The current approved direction is a clean Apple-like analytical Budget Explorer with Light and Night themes.
 
 Guardrails:
 
-- Keep the dark/neon analytical identity for v1.
+- Keep production UI aligned with `DESIGN.md`.
+- Older dark, neon, and terminal-like prototype styling is superseded for production unless a new design change is explicitly approved.
 - Do not let the style reduce readability of Georgian text or chart labels.
 - Data colors must remain distinguishable and accessible.
 - Avoid decorative effects that make charts harder to read.
-- A future light mode can be added later as a more civic/public style, but it is not required for v1.
+- Light and Night themes must keep the same layout, controls, and chart geometry.
 
 ## 13. Durable Agent Context
 
@@ -677,7 +660,7 @@ Future sessions should preserve these project decisions:
 - Source/provenance is backend-first in v1, with only minimal public source labeling.
 - Multi-year and single-year views are both first-class product surfaces.
 - Long-term architecture should remain stable and data-first; avoid short-term UI-only hacks.
-- The visual direction is intentionally dark, neon, analytical, and terminal-like, with readability guardrails.
+- Production UI follows `DESIGN.md`: clean Apple-like analytical Budget Explorer, Light and Night themes, no default dark/neon/terminal prototype layer.
 
 ## 14. Pre-Implementation Requirements
 
@@ -702,9 +685,8 @@ These do not require perfect final data before coding starts, but they do requir
 
 These should be resolved during implementation planning, not by changing product scope:
 
-- Which GDP data source to use for `Share of GDP`.
-- Charting library choice.
-- Georgian typography and final visual system.
+- Mapping-review decisions needed to reduce `Other / unclassified` expenditure after the current validated data pipeline.
+- Any future re-approval criteria for deferred chart controls such as Bar, Stacked, `% change`, or `Share of GDP`.
 - Import file format conventions and validation error format.
 
 ## 16. Success Criteria
