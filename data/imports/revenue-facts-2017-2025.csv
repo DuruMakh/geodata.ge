@@ -1,0 +1,100 @@
+year,side,item_id,amount_gel,basis,source_id,official_institution,official_program,official_subprogram,public_spending_field_id,mapping_confidence,mapping_notes
+2017,revenue,revenue.vat,4122612803,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
+2017,revenue,revenue.income_tax,2918865406,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
+2017,revenue,revenue.profit_tax,756555502,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
+2017,revenue,revenue.excise_tax,1450921949,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
+2017,revenue,revenue.import_tax,71618886,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
+2017,revenue,revenue.property_tax,394754558,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
+2017,revenue,revenue.other_taxes,63619225,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
+2017,revenue,revenue.grants,290807926,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2017,revenue,revenue.other_revenue,788612893,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2017,revenue,revenue.asset_decrease,357917201,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2017,revenue,revenue.increase_liabilities,1651755856,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
+2018,revenue,revenue.vat,4426909832,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
+2018,revenue,revenue.income_tax,3247088831,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
+2018,revenue,revenue.profit_tax,736624354,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
+2018,revenue,revenue.excise_tax,1465726553,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
+2018,revenue,revenue.import_tax,73416934,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
+2018,revenue,revenue.property_tax,441176545,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
+2018,revenue,revenue.other_taxes,115373126,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
+2018,revenue,revenue.grants,341804345,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2018,revenue,revenue.other_revenue,909608482,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2018,revenue,revenue.asset_decrease,326185265,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2018,revenue,revenue.increase_liabilities,1878092629,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
+2019,revenue,revenue.vat,5239020666,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
+2019,revenue,revenue.income_tax,3482793823,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
+2019,revenue,revenue.profit_tax,866288872,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
+2019,revenue,revenue.excise_tax,1506675796,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
+2019,revenue,revenue.import_tax,79073828,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
+2019,revenue,revenue.property_tax,474324888,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
+2019,revenue,revenue.other_taxes,-230339071,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
+2019,revenue,revenue.grants,423754122,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2019,revenue,revenue.other_revenue,996695060,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2019,revenue,revenue.asset_decrease,356187377,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2019,revenue,revenue.increase_liabilities,2338902567,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
+2020,revenue,revenue.vat,4837233428,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
+2020,revenue,revenue.income_tax,3326735089,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
+2020,revenue,revenue.profit_tax,919440581,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
+2020,revenue,revenue.excise_tax,1619392300,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
+2020,revenue,revenue.import_tax,74369017,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
+2020,revenue,revenue.property_tax,433665929,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
+2020,revenue,revenue.other_taxes,-246423796,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
+2020,revenue,revenue.grants,412332891,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2020,revenue,revenue.other_revenue,982090359,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2020,revenue,revenue.asset_decrease,392087630,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2020,revenue,revenue.increase_liabilities,7290421886,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
+2021,revenue,revenue.vat,6029546995,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
+2021,revenue,revenue.income_tax,3775673772,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
+2021,revenue,revenue.profit_tax,1015296083,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
+2021,revenue,revenue.excise_tax,1868783716,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
+2021,revenue,revenue.import_tax,86361935,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
+2021,revenue,revenue.property_tax,510729685,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
+2021,revenue,revenue.other_taxes,93568393,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
+2021,revenue,revenue.grants,346867959,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2021,revenue,revenue.other_revenue,1265187026,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2021,revenue,revenue.asset_decrease,585012107,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2021,revenue,revenue.increase_liabilities,5247107182,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
+2022,revenue,revenue.vat,7452868535,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
+2022,revenue,revenue.income_tax,5034089285,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
+2022,revenue,revenue.profit_tax,1930151409,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
+2022,revenue,revenue.excise_tax,2010227760,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
+2022,revenue,revenue.import_tax,125992036,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
+2022,revenue,revenue.property_tax,603515429,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
+2022,revenue,revenue.other_taxes,229099888,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
+2022,revenue,revenue.grants,265441959,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2022,revenue,revenue.other_revenue,1625096859,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2022,revenue,revenue.asset_decrease,580192148,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2022,revenue,revenue.increase_liabilities,3753883411,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
+2023,revenue,revenue.vat,8387241707,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
+2023,revenue,revenue.income_tax,6071356714,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
+2023,revenue,revenue.profit_tax,2018166538,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
+2023,revenue,revenue.excise_tax,2270263894,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
+2023,revenue,revenue.import_tax,151212050,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
+2023,revenue,revenue.property_tax,648341799,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
+2023,revenue,revenue.other_taxes,186037053,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
+2023,revenue,revenue.grants,200516597,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2023,revenue,revenue.other_revenue,2059408954,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2023,revenue,revenue.asset_decrease,724496687,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2023,revenue,revenue.increase_liabilities,3468850964,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
+2024,revenue,revenue.vat,9331846717,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
+2024,revenue,revenue.income_tax,7250478710,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
+2024,revenue,revenue.profit_tax,3117548526,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
+2024,revenue,revenue.excise_tax,2488024918,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
+2024,revenue,revenue.import_tax,138902348,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
+2024,revenue,revenue.property_tax,697679276,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
+2024,revenue,revenue.other_taxes,265524346,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
+2024,revenue,revenue.grants,198330607,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2024,revenue,revenue.other_revenue,2083608794,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2024,revenue,revenue.asset_decrease,904896963,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2024,revenue,revenue.increase_liabilities,3267478812,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
+2025,revenue,revenue.vat,10158086603,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
+2025,revenue,revenue.income_tax,8261217582,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
+2025,revenue,revenue.profit_tax,2881352179,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
+2025,revenue,revenue.excise_tax,2728646345,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
+2025,revenue,revenue.import_tax,146620436,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
+2025,revenue,revenue.property_tax,801093482,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
+2025,revenue,revenue.other_taxes,559333444,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
+2025,revenue,revenue.grants,122323962,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2025,revenue,revenue.other_revenue,2646820211,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2025,revenue,revenue.asset_decrease,961493032,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2025,revenue,revenue.increase_liabilities,3101893132,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა

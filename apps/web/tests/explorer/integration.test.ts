@@ -100,23 +100,42 @@ describe("explorer integration with real CSV data", () => {
       [...new Set(facts.filter((fact) => fact.side === side).map((fact) => fact.year))].sort((a, b) => a - b);
 
     expect(yearsBySide("expenditure")).toEqual([2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
-    expect(yearsBySide("revenue")).toEqual([2023, 2024, 2025]);
+    expect(yearsBySide("revenue")).toEqual([2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
   });
 
   it("keeps real revenue facts reconciled by year", async () => {
     const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const revenueFacts = facts.filter((fact) => fact.side === "revenue");
-    const expectedTotalsByYear = new Map([
+    const expectedReceiptsByYear = new Map([
+      [2017, 12868042205],
+      [2018, 13962006896],
+      [2019, 15533377928],
+      [2020, 20041345314],
+      [2021, 20824134853],
+      [2022, 23610558719],
+      [2023, 26185892957],
+      [2024, 29744320017],
+      [2025, 32368880408],
+    ]);
+    const expectedNetRevenueByYear = new Map([
+      [2017, 10858369148],
+      [2018, 11757729002],
+      [2019, 12838287984],
+      [2020, 12358835798],
+      [2021, 14992015564],
+      [2022, 19276483160],
       [2023, 21992545306],
       [2024, 25571944242],
       [2025, 28305494244],
     ]);
 
-    for (const [year, expectedTotalGel] of expectedTotalsByYear) {
+    for (const [year, expectedReceiptsGel] of expectedReceiptsByYear) {
       const yearFacts = revenueFacts.filter((fact) => fact.year === year);
+      const netRevenueFacts = yearFacts.filter((fact) => !["revenue.asset_decrease", "revenue.increase_liabilities"].includes(fact.itemId));
 
-      expect(yearFacts).toHaveLength(9);
-      expect(yearFacts.reduce((sum, fact) => sum + fact.amountGel, 0)).toBe(expectedTotalGel);
+      expect(yearFacts).toHaveLength(11);
+      expect(yearFacts.reduce((sum, fact) => sum + fact.amountGel, 0)).toBe(expectedReceiptsGel);
+      expect(netRevenueFacts.reduce((sum, fact) => sum + fact.amountGel, 0)).toBe(expectedNetRevenueByYear.get(year));
     }
   });
 

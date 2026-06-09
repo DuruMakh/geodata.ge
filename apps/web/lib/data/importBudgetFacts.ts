@@ -6,6 +6,7 @@ import { stableIdSchema } from "./validation";
 const basisSchema = z.enum(["actual", "planned"]);
 const sideSchema = z.enum(["revenue", "expenditure"]);
 const confidenceSchema = z.enum(["high", "medium", "low", "unclassified"]).or(z.literal(""));
+const suspiciousSourceGlyphs = /[\u02b0-\u02ff]/;
 
 const importRowSchema = z.object({
   year: z.coerce.number().int().min(2000).max(2100),
@@ -64,6 +65,10 @@ export async function loadBudgetFactRows(relativePath: string): Promise<BudgetFa
 
     if (row.side === "expenditure" && !row.item_id.startsWith("spending.")) {
       throw new Error(`Expenditure row must use spending.* item_id: ${row.item_id}`);
+    }
+
+    if (suspiciousSourceGlyphs.test(row.mapping_notes)) {
+      throw new Error(`Suspicious source glyphs in mapping_notes for ${row.year} ${row.item_id}`);
     }
 
     return {

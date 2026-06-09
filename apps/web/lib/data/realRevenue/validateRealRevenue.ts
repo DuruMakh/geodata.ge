@@ -2,9 +2,15 @@ import type { RealRevenueFactCsvRow } from "./generateFacts";
 import type { OfficialRevenueRow, RealRevenueValidationReport } from "./types";
 
 const roundingToleranceGel = 10;
-const internalRevenueFlowCodes = ["1.3.3", "1.4.1.1.3"] as const;
-
-const requiredRevenueFactIds = [
+const internalGrantCode = "1.3.3";
+const internalOtherRevenueCode = "1.4.1.1.3";
+const internalRevenueFlowCodes = [internalGrantCode, internalOtherRevenueCode] as const;
+const receiptSourceCodes = ["31", "32", "33"] as const;
+const sourceCodeFallbacks: Record<string, string[]> = {
+  "1.3.3": ["133"],
+  "1.4.1.1.3": ["14111"],
+};
+const netRevenueFactIds = [
   "revenue.vat",
   "revenue.income_tax",
   "revenue.profit_tax",
@@ -16,47 +22,52 @@ const requiredRevenueFactIds = [
   "revenue.other_revenue",
 ] as const;
 
-function officialRevenueTotalGelByYear(rows: OfficialRevenueRow[]): Record<number, number> {
-  const totals: Record<number, number> = {};
+const requiredRevenueFactIds = [
+  ...netRevenueFactIds,
+  "revenue.asset_decrease",
+  "revenue.increase_liabilities",
+] as const;
 
-  for (const row of rows.filter((candidate) => candidate.section === "revenues" && (candidate.sourceCode === "1" || candidate.labelKa === "შემოსავლები"))) {
-    totals[row.year] = Math.round((row.consolidatedActualGel ?? row.actualThousandGel * 1000) - internalRevenueFlowGelForYear(rows, row.year));
-  }
+function consolidatedGel(row: OfficialRevenueRow | undefined): number {
+  return row?.consolidatedActualGel ?? (row?.actualThousandGel ?? 0) * 1000;
+}
 
-  return totals;
+function rowBySourceCode(rows: OfficialRevenueRow[], year: number, sourceCode: string): OfficialRevenueRow | undefined {
+  const sourceCodes = [sourceCode, ...(sourceCodeFallbacks[sourceCode] ?? [])];
+  return rows.find((row) => row.year === year && sourceCodes.includes(row.sourceCode ?? ""));
+}
+
+function roundedRowAmount(rows: OfficialRevenueRow[], year: number, sourceCode: string): number {
+  return Math.round(consolidatedGel(rowBySourceCode(rows, year, sourceCode)));
 }
 
 function grossOfficialRevenueTotalGelByYear(rows: OfficialRevenueRow[]): Record<number, number> {
   const totals: Record<number, number> = {};
 
-  for (const row of rows.filter((candidate) => candidate.section === "revenues" && (candidate.sourceCode === "1" || candidate.labelKa === "შემოსავლები"))) {
-    totals[row.year] = Math.round(row.consolidatedActualGel ?? row.actualThousandGel * 1000);
+  for (const row of rows.filter((candidate) => candidate.sourceCode === "1")) {
+    totals[row.year] = Math.round(consolidatedGel(row));
   }
 
   return totals;
 }
 
-function internalRevenueFlowGelByYear(rows: OfficialRevenueRow[], years: number[]): Record<number, number> {
+function amountByYear(years: number[], amountForYear: (year: number) => number): Record<number, number> {
   const totals: Record<number, number> = {};
 
   for (const year of years) {
-    totals[year] = Math.round(internalRevenueFlowGelForYear(rows, year));
+    totals[year] = amountForYear(year);
   }
 
   return totals;
 }
 
-function internalRevenueFlowGelForYear(rows: OfficialRevenueRow[], year: number): number {
-  return internalRevenueFlowCodes.reduce((sum, sourceCode) => {
-    const row = rows.find((candidate) => candidate.year === year && candidate.sourceCode === sourceCode);
-    return sum + (row?.consolidatedActualGel ?? (row?.actualThousandGel ?? 0) * 1000);
-  }, 0);
-}
-
-function generatedTotalGelByYear(rows: RealRevenueFactCsvRow[]): Record<number, number> {
+function generatedTotalGelByYear(
+  rows: RealRevenueFactCsvRow[],
+  includeRow: (row: RealRevenueFactCsvRow) => boolean,
+): Record<number, number> {
   const totals: Record<number, number> = {};
 
-  for (const row of rows) {
+  for (const row of rows.filter(includeRow)) {
     totals[row.year] = (totals[row.year] ?? 0) + Number(row.amount_gel);
   }
 
@@ -69,19 +80,34 @@ export function validateRealRevenueFacts(
   expectedYears?: number[],
 ): RealRevenueValidationReport {
   const years = Array.from(new Set(expectedYears ?? officialRows.map((row) => row.year))).sort((a, b) => a - b);
-  const officialTotals = officialRevenueTotalGelByYear(officialRows);
   const grossOfficialTotals = grossOfficialRevenueTotalGelByYear(officialRows);
-  const internalFlowTotals = internalRevenueFlowGelByYear(officialRows, years);
-  const generatedTotals = generatedTotalGelByYear(facts);
+  const internalGrantsRemoved = amountByYear(years, (year) => roundedRowAmount(officialRows, year, internalGrantCode));
+  const internalOtherRevenueRemoved = amountByYear(years, (year) => roundedRowAmount(officialRows, year, internalOtherRevenueCode));
+  const internalFlowTotals = amountByYear(years, (year) => internalGrantsRemoved[year] + internalOtherRevenueRemoved[year]);
+  const officialRevenueTotals = amountByYear(years, (year) => (grossOfficialTotals[year] ?? 0) - internalFlowTotals[year]);
+  const assetDecreaseTotals = amountByYear(
+    years,
+    (year) => roundedRowAmount(officialRows, year, "31") + roundedRowAmount(officialRows, year, "32"),
+  );
+  const liabilitiesIncreaseTotals = amountByYear(years, (year) => roundedRowAmount(officialRows, year, "33"));
+  const finalReceiptsTotals = amountByYear(
+    years,
+    (year) => officialRevenueTotals[year] + assetDecreaseTotals[year] + liabilitiesIncreaseTotals[year],
+  );
+  const generatedRevenueTotals = generatedTotalGelByYear(
+    facts,
+    (row) => netRevenueFactIds.includes(row.item_id as (typeof netRevenueFactIds)[number]),
+  );
+  const generatedReceiptsTotals = generatedTotalGelByYear(facts, () => true);
   const reconciliationStatusByYear: Record<number, "passed" | "failed"> = {};
   const warnings: string[] = [];
 
   for (const year of years) {
-    const officialTotal = officialTotals[year] ?? 0;
-    const generatedTotal = generatedTotals[year] ?? 0;
+    const finalReceiptsTotal = finalReceiptsTotals[year] ?? 0;
+    const generatedReceiptsTotal = generatedReceiptsTotals[year] ?? 0;
     const missingRequirements: string[] = [];
 
-    if (officialTotals[year] === undefined) {
+    if (grossOfficialTotals[year] === undefined) {
       missingRequirements.push(`${year} missing official revenue total row`);
     }
 
@@ -92,32 +118,44 @@ export function validateRealRevenueFacts(
     }
 
     for (const sourceCode of internalRevenueFlowCodes) {
-      if (!officialRows.some((row) => row.year === year && row.sourceCode === sourceCode)) {
+      if (!rowBySourceCode(officialRows, year, sourceCode)) {
         missingRequirements.push(`${year} missing internal revenue flow row: ${sourceCode}`);
       }
     }
 
-    if (missingRequirements.length === 0 && Math.abs(officialTotal - generatedTotal) <= roundingToleranceGel) {
+    for (const sourceCode of receiptSourceCodes) {
+      if (!rowBySourceCode(officialRows, year, sourceCode)) {
+        missingRequirements.push(`${year} missing receipt source row: ${sourceCode}`);
+      }
+    }
+
+    if (missingRequirements.length === 0 && Math.abs(finalReceiptsTotal - generatedReceiptsTotal) <= roundingToleranceGel) {
       reconciliationStatusByYear[year] = "passed";
       continue;
     }
 
     reconciliationStatusByYear[year] = "failed";
     warnings.unshift(...missingRequirements);
-    if (officialTotal !== generatedTotal) {
-      warnings.unshift(`${year} revenue reconciliation mismatch: official ${officialTotal}, generated ${generatedTotal}`);
+    if (finalReceiptsTotal !== generatedReceiptsTotal) {
+      warnings.unshift(`${year} receipts reconciliation mismatch: official ${finalReceiptsTotal}, generated ${generatedReceiptsTotal}`);
     }
   }
 
   return {
-    importLabel: "real-revenue-2023-2025",
+    importLabel: "real-revenue-2017-2025",
     years,
     sourceRows: officialRows.length,
     generatedFactRows: facts.length,
     grossOfficialRevenueTotalGelByYear: grossOfficialTotals,
     internalRevenueFlowGelByYear: internalFlowTotals,
-    officialRevenueTotalGelByYear: officialTotals,
-    generatedRevenueTotalGelByYear: generatedTotals,
+    internalGrantsRemovedGelByYear: internalGrantsRemoved,
+    internalOtherRevenueRemovedGelByYear: internalOtherRevenueRemoved,
+    officialRevenueTotalGelByYear: officialRevenueTotals,
+    generatedRevenueTotalGelByYear: generatedRevenueTotals,
+    assetDecreaseGelByYear: assetDecreaseTotals,
+    liabilitiesIncreaseGelByYear: liabilitiesIncreaseTotals,
+    finalReceiptsTotalGelByYear: finalReceiptsTotals,
+    generatedReceiptsTotalGelByYear: generatedReceiptsTotals,
     reconciliationStatusByYear,
     warnings,
   };

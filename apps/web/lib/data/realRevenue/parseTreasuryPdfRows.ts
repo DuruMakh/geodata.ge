@@ -25,15 +25,20 @@ function parseAmountGel(value: string): number {
 }
 
 function isLikelyBudgetCode(code: string): boolean {
-  if (code.includes(".")) return true;
+  if (code.includes(".")) return /^\d{1,2}(?:\.\d+)+$/.test(code);
+  if (["31", "32", "33", "41"].includes(code)) return true;
+  if (/^[1-5]\d{1,5}$/.test(code)) return true;
   return ["0", "1", "2", "3", "4", "5"].includes(code);
 }
 
 function sectionForCode(code: string): RevenueMatrixSection {
-  if (code === "1" || code.startsWith("1.")) return "revenues";
+  if (code === "31" || code.startsWith("31.")) return "non_financial_assets";
+  if (code === "32" || code.startsWith("32.")) return "financial_assets";
+  if (code === "33" || code.startsWith("33.")) return "liabilities";
+  if (code === "41" || code.startsWith("41.")) return "opening_balance";
+  if (code === "1" || code.startsWith("1.") || /^1\d+$/.test(code)) return "revenues";
   if (code === "2" || code.startsWith("2.")) return "expenditures";
   if (code === "3" || code.startsWith("3.")) return "non_financial_assets";
-  if (code === "4" || code.startsWith("4.")) return "financial_assets";
   if (code === "5" || code.startsWith("5.")) return "liabilities";
   return "other";
 }
@@ -77,6 +82,13 @@ export function parseTreasuryPdfRows(input: ParseTreasuryPdfInput): OfficialReve
     const firstAmount = amounts[0];
     const labelKa = normalizeText(segment.slice(0, firstAmount.index).replace(/\s-\s*$/, ""));
     if (!labelKa) continue;
+    if (
+      labelKa.startsWith("of ")
+      || labelKa.startsWith("--")
+      || labelKa.includes(" of ")
+      || labelKa.includes("დან --")
+      || labelKa.includes("გვერდი")
+    ) continue;
 
     rows.push({
       year: input.year,

@@ -25,3 +25,4 @@ revenue.other_revenue,სხვა შემოსავლები,Other reven
 revenue.decrease_non_financial_assets,არაფინანსური აქტივების კლება,Decrease in non-financial assets,Top-level revenue category,Confirm against source before production
 revenue.decrease_financial_assets,ფინანსური აქტივების კლება,Decrease in financial assets,Top-level revenue category,Confirm against source before production
 revenue.increase_liabilities,ვალდებულებების ზრდა,Increase in liabilities,Top-level revenue category,Confirm against source before production
+revenue.asset_decrease,ფინანსური და არაფინანსური აქტივების კლება,Decrease in financial and non-financial assets,Combined current-year receipts from source rows 31 and 32,Source-confirmed label

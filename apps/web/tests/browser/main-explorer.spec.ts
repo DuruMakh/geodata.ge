@@ -318,7 +318,8 @@ test("single-year snapshot renders sections and revenue data", async ({ page }) 
 
   await page.getByTestId("side-revenue").click();
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
-  await expect(page.getByTestId("year-pills")).not.toContainText("2017");
+  await expect(page.getByTestId("year-pills")).toContainText("2017");
+  await expect(page.getByTestId("year-pills")).toContainText("2025");
   await expect(page.getByTestId("single-year-ranking")).toContainText("დამატებული ღირებულების გადასახადი");
 
   expect(consoleProblems).toEqual([]);

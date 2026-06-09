@@ -80,12 +80,20 @@
     "sortOrder": 90
   },
   {
+    "id": "revenue.asset_decrease",
+    "side": "revenue",
+    "level": "revenue_category",
+    "kaLabel": "ფინანსური და არაფინანსური აქტივების კლება",
+    "enLabel": "Decrease in financial and non-financial assets",
+    "sortOrder": 100
+  },
+  {
     "id": "revenue.decrease_non_financial_assets",
     "side": "revenue",
     "level": "revenue_category",
     "kaLabel": "არაფინანსური აქტივების კლება",
     "enLabel": "Decrease in non-financial assets",
-    "sortOrder": 100
+    "sortOrder": 105
   },
   {
     "id": "revenue.decrease_financial_assets",

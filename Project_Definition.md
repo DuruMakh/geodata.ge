@@ -14,7 +14,7 @@ A Georgian-first public budget explorer for understanding Georgia's national bud
 
 GeoData.ge is a long-term public data platform idea, but v1 is intentionally narrow: Georgia Budget Explorer.
 
-The first version focuses on annual national budget data for 2023-2025, including revenue, tax revenue, and expenditure by public spending fields. The product should help users understand where public money comes from, where it goes, and how the structure changes over time.
+The first version focuses on annual national budget data for 2017-2025, including revenue, tax revenue, and expenditure by public spending fields. The product should help users understand where public money comes from, where it goes, and how the structure changes over time.
 
 This v1 scope is deliberate. A narrow, high-quality budget explorer is more valuable than a broad but shallow data catalog.
 
@@ -22,10 +22,10 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 
 ### Included
 
-- Annual budget data for 2023-2025.
+- Annual budget data for 2017-2025.
 - Revenue overview and major tax revenue categories.
 - Expenditure overview using public-friendly spending fields such as health, education, social protection, defence, infrastructure, and similar categories.
-- Multi-year explorer with line, bar, stacked, and table views.
+- Multi-year explorer with line and table views.
 - Single-year snapshot with headline cards, treemap, Every 100 GEL, spending petals, Budget Field, and full ranking.
 - CSV export.
 - Georgian-first UI.

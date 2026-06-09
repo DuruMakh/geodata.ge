@@ -23,6 +23,8 @@ const palette = [
   "#8e8e93",
 ];
 
+const SERIES_ORDER_BASE_YEAR = 2025;
+
 export type ExplorerModelInput = {
   facts: BudgetFactImportRow[];
   glossary: Map<string, GlossaryEntry>;
@@ -184,13 +186,34 @@ export function getDefaultStackedSelection(side: ExplorerSide, facts: BudgetFact
     .slice(0, MAX_CHART_SERIES);
 }
 
+function compareBaselineAmountDesc(leftId: string, rightId: string, baselineAmounts: Map<string, number>): number {
+  const leftAmount = baselineAmounts.get(leftId);
+  const rightAmount = baselineAmounts.get(rightId);
+
+  if (leftAmount !== undefined && rightAmount !== undefined && leftAmount !== rightAmount) return rightAmount - leftAmount;
+  if (leftAmount !== undefined && rightAmount === undefined) return -1;
+  if (leftAmount === undefined && rightAmount !== undefined) return 1;
+  return leftId.localeCompare(rightId);
+}
+
 export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
   const active = chooseActivePublicFacts(input.facts).filter((fact) => fact.side === input.side);
   const visibleFacts = active.filter((fact) => fact.year >= input.startYear && fact.year <= input.endYear);
   const years = Array.from(new Set(visibleFacts.map((fact) => fact.year))).sort((a, b) => a - b);
   const totalId = totalIdFor(input.side);
   const sourceDocuments = new Map(input.sourceDocuments.map((source) => [source.sourceId, source]));
-  const itemIds = [totalId, ...Array.from(new Set(active.map((fact) => fact.itemId))).sort()];
+  const baselineAmounts = new Map<string, number>();
+
+  for (const fact of active) {
+    if (fact.year === SERIES_ORDER_BASE_YEAR) {
+      baselineAmounts.set(fact.itemId, (baselineAmounts.get(fact.itemId) ?? 0) + fact.amountGel);
+    }
+  }
+
+  const itemIds = [
+    totalId,
+    ...Array.from(new Set(active.map((fact) => fact.itemId))).sort((left, right) => compareBaselineAmountDesc(left, right, baselineAmounts)),
+  ];
   const items = itemIds.map((id, index) => ({
     id,
     side: sideForItemId(id),

@@ -5,6 +5,12 @@ source.mof_2019_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed offici
 source.mof_2020_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed official 2020 expenditure E11 PDF plus tavi 6 workbook supplement,docs/Raw Data/Expenditure/treasury.ge/2020-12-month-state-budget-functional-expenditure.pdf + docs/Raw Data/Expenditure/mof.ge/2020-tavi-VI.xlsx,2026-06-08
 source.mof_2021_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed official 2021 expenditure E11 PDF plus tavi 6 workbook supplement,docs/Raw Data/Expenditure/treasury.ge/2021-12-month-state-budget-functional-expenditure.pdf + docs/Raw Data/Expenditure/mof.ge/2021-tavi-VI.xlsx,2026-06-08
 source.mof_2022_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed official 2022 expenditure E11 PDF plus tavi 6 workbook supplement,docs/Raw Data/Expenditure/treasury.ge/2022-12-month-state-budget-functional-expenditure.pdf + docs/Raw Data/Expenditure/mof.ge/2022 redaqtirenadi 12 Tve.xls,2026-06-08
+source.mof_2017_revenue_form1_pdf,Reviewed official 2017 revenue classification form 1 PDF,docs/Raw Data/Revenue/2017-jan-dec-consolidated-revenue.pdf,2026-06-09
+source.mof_2018_revenue_form1_pdf,Reviewed official 2018 revenue classification form 1 PDF,docs/Raw Data/Revenue/2018-jan-dec-consolidated-revenue.pdf,2026-06-09
+source.mof_2019_revenue_form1_pdf,Reviewed official 2019 revenue classification form 1 PDF,docs/Raw Data/Revenue/2019-jan-dec-consolidated-revenue.pdf,2026-06-09
+source.mof_2020_revenue_form1_pdf,Reviewed official 2020 revenue classification form 1 PDF,docs/Raw Data/Revenue/2020-jan-dec-consolidated-revenue.pdf,2026-06-09
+source.mof_2021_revenue_form1_pdf,Reviewed official 2021 revenue classification form 1 PDF,docs/Raw Data/Revenue/2021-jan-dec-consolidated-revenue.pdf,2026-06-09
+source.mof_2022_revenue_form1_pdf,Reviewed official 2022 revenue classification form 1 PDF,docs/Raw Data/Revenue/2022-jan-dec-consolidated-revenue.pdf,2026-06-09
 source.mof_2023_tavi6_actual,Reviewed official 2023 state budget execution tavi 6,docs/Raw Data/Expenditure/mof.ge/2023 12 tve saitistvis.xls,2026-05-12
 source.mof_2023_tavi1_actual,Reviewed official 2023 state budget execution tavi 1,docs/Raw Data/Expenditure/mof.ge/2023 12 tve saitistvis.xls,2026-05-13
 source.mof_2023_revenue_form1_pdf,Reviewed official 2023 revenue classification form 1 PDF,docs/Raw Data/Revenue/2023-jan-dec-consolidated-revenue.pdf,2026-05-13

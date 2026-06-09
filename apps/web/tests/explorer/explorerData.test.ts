@@ -8,6 +8,9 @@ const glossary = new Map<string, GlossaryEntry>([
   ["spending.health", { id: "spending.health", kaLabel: "ჯანმრთელობა", enLabel: "Health", description: "", notes: "" }],
   ["spending.education", { id: "spending.education", kaLabel: "განათლება", enLabel: "Education", description: "", notes: "" }],
   ["revenue.vat", { id: "revenue.vat", kaLabel: "დღგ", enLabel: "VAT", description: "", notes: "" }],
+  ["spending.social", { id: "spending.social", kaLabel: "Social", enLabel: "Social", description: "", notes: "" }],
+  ["revenue.income_tax", { id: "revenue.income_tax", kaLabel: "Income tax", enLabel: "Income tax", description: "", notes: "" }],
+  ["revenue.other_revenue", { id: "revenue.other_revenue", kaLabel: "Other revenue", enLabel: "Other revenue", description: "", notes: "" }],
 ]);
 
 const facts: BudgetFactImportRow[] = [
@@ -92,6 +95,57 @@ describe("main explorer data model", () => {
     expect(model.tableRows.map((row) => row.itemId)).toEqual(["spending.health"]);
     expect(model.totalRow?.itemId).toBe("expenditure.total");
     expect(model.totalRow?.valuesByYear[2025]).toBe(450);
+  });
+
+  it("orders selectable series by 2025 amount for both budget sides", () => {
+    const localFacts: BudgetFactImportRow[] = [
+      { ...facts[0], year: 2024, itemId: "spending.health", amountGel: 900, publicSpendingFieldId: "spending.health" },
+      { ...facts[0], year: 2024, itemId: "spending.education", amountGel: 100, publicSpendingFieldId: "spending.education" },
+      { ...facts[0], year: 2024, itemId: "spending.social", amountGel: 50, publicSpendingFieldId: "spending.social" },
+      { ...facts[1], year: 2025, itemId: "spending.health", amountGel: 150, publicSpendingFieldId: "spending.health" },
+      { ...facts[3], year: 2025, itemId: "spending.education", amountGel: 300, publicSpendingFieldId: "spending.education" },
+      { ...facts[1], year: 2025, itemId: "spending.social", amountGel: 450, publicSpendingFieldId: "spending.social" },
+      { ...facts[4], year: 2024, itemId: "revenue.vat", amountGel: 900 },
+      { ...facts[4], year: 2024, itemId: "revenue.income_tax", amountGel: 100 },
+      { ...facts[4], year: 2024, itemId: "revenue.other_revenue", amountGel: 50 },
+      { ...facts[4], year: 2025, itemId: "revenue.vat", amountGel: 500 },
+      { ...facts[4], year: 2025, itemId: "revenue.income_tax", amountGel: 800 },
+      { ...facts[4], year: 2025, itemId: "revenue.other_revenue", amountGel: 1200 },
+    ];
+
+    const expenditureModel = buildExplorerModel({
+      facts: localFacts,
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: ["expenditure.total"],
+      startYear: 2024,
+      endYear: 2024,
+      measure: "nominal",
+    });
+    const revenueModel = buildExplorerModel({
+      facts: localFacts,
+      glossary,
+      sourceDocuments,
+      side: "revenue",
+      selectedItemIds: ["revenue.total"],
+      startYear: 2024,
+      endYear: 2024,
+      measure: "nominal",
+    });
+
+    expect(expenditureModel.items.map((item) => item.id)).toEqual([
+      "expenditure.total",
+      "spending.social",
+      "spending.education",
+      "spending.health",
+    ]);
+    expect(revenueModel.items.map((item) => item.id)).toEqual([
+      "revenue.total",
+      "revenue.other_revenue",
+      "revenue.income_tax",
+      "revenue.vat",
+    ]);
   });
 
   it("treats the biggest share-of-total change as the largest movement in either direction", () => {

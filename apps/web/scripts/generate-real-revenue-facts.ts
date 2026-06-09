@@ -32,10 +32,10 @@ function compareAggregateFacts(workbookFacts: RealRevenueFactCsvRow[], pdfAggreg
 async function main() {
   const officialRows = await extractOfficialRevenueRows();
   const facts = generateRevenueFacts(officialRows);
-  const report = validateRealRevenueFacts(officialRows, facts, [2023, 2024, 2025]);
+  const report = validateRealRevenueFacts(officialRows, facts, [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
   const workbookRows = extractOfficialWorkbookRevenueRows();
   const comparisonReport = {
-    importLabel: "real-revenue-pdf-vs-workbook-2023-2025",
+    importLabel: "real-revenue-pdf-vs-workbook-2017-2025",
     basis: "state_budget_actual_gel",
     rows: compareAggregateFacts(generateLegacyAggregateRevenueFacts(workbookRows), generateLegacyAggregateRevenueFacts(officialRows)),
   };
@@ -44,17 +44,17 @@ async function main() {
 
   await mkdir(importsDir, { recursive: true });
   await mkdir(reportsDir, { recursive: true });
-  await writeFile(path.join(importsDir, "revenue-facts-2023-2025.csv"), budgetFactsToCsv(facts), "utf8");
-  await writeFile(path.join(reportsDir, "real-revenue-2023-2025-report.json"), JSON.stringify(report, null, 2), "utf8");
-  await writeFile(path.join(reportsDir, "revenue-pdf-vs-workbook-2023-2025-report.json"), JSON.stringify(comparisonReport, null, 2), "utf8");
+  await writeFile(path.join(importsDir, "revenue-facts-2017-2025.csv"), budgetFactsToCsv(facts), "utf8");
+  await writeFile(path.join(reportsDir, "real-revenue-2017-2025-report.json"), JSON.stringify(report, null, 2), "utf8");
+  await writeFile(path.join(reportsDir, "revenue-pdf-vs-workbook-2017-2025-report.json"), JSON.stringify(comparisonReport, null, 2), "utf8");
 
   if (Object.values(report.reconciliationStatusByYear).some((status) => status === "failed")) {
-    throw new Error("Real revenue reconciliation failed. See data/reports/real-revenue-2023-2025-report.json");
+    throw new Error("Real revenue reconciliation failed. See data/reports/real-revenue-2017-2025-report.json");
   }
 
   console.log(`Generated revenue fact rows: ${facts.length}`);
-  console.log("Report written: data/reports/real-revenue-2023-2025-report.json");
-  console.log("Comparison written: data/reports/revenue-pdf-vs-workbook-2023-2025-report.json");
+  console.log("Report written: data/reports/real-revenue-2017-2025-report.json");
+  console.log("Comparison written: data/reports/revenue-pdf-vs-workbook-2017-2025-report.json");
 }
 
 main().catch((error) => {

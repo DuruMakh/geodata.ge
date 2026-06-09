@@ -17,6 +17,7 @@ export type RevenueMatrixSection =
   | "non_financial_assets"
   | "financial_assets"
   | "liabilities"
+  | "opening_balance"
   | "other";
 
 export type OfficialRevenueRow = {
@@ -44,8 +45,14 @@ export type RealRevenueValidationReport = {
   generatedFactRows: number;
   grossOfficialRevenueTotalGelByYear?: Record<number, number>;
   internalRevenueFlowGelByYear?: Record<number, number>;
+  internalGrantsRemovedGelByYear?: Record<number, number>;
+  internalOtherRevenueRemovedGelByYear?: Record<number, number>;
   officialRevenueTotalGelByYear: Record<number, number>;
   generatedRevenueTotalGelByYear: Record<number, number>;
+  assetDecreaseGelByYear?: Record<number, number>;
+  liabilitiesIncreaseGelByYear?: Record<number, number>;
+  finalReceiptsTotalGelByYear?: Record<number, number>;
+  generatedReceiptsTotalGelByYear?: Record<number, number>;
   reconciliationStatusByYear: Record<number, "passed" | "failed">;
   warnings: string[];
 };

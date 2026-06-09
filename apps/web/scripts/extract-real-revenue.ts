@@ -59,7 +59,7 @@ async function main() {
   const stagingDir = path.resolve(process.cwd(), "../../data/staging");
 
   await mkdir(stagingDir, { recursive: true });
-  await writeFile(path.join(stagingDir, "revenue-official-rows-2023-2025.csv"), rowsToCsv(rows), "utf8");
+  await writeFile(path.join(stagingDir, "revenue-official-rows-2017-2025.csv"), rowsToCsv(rows), "utf8");
 
   console.log(`Extracted official revenue rows: ${rows.length}`);
 }

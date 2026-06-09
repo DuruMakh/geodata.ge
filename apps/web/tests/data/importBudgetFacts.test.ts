@@ -38,4 +38,10 @@ describe("budget fact import validation", () => {
       "expenditure amount_gel must not be negative",
     );
   });
+
+  it("rejects suspicious extracted glyphs in public mapping notes", async () => {
+    await expect(loadBudgetFactRows("tests/fixtures/suspicious-mapping-notes-facts.csv")).rejects.toThrow(
+      "Suspicious source glyphs in mapping_notes for 2025 revenue.vat",
+    );
+  });
 });

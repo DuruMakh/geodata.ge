@@ -23,7 +23,7 @@ async function main() {
   const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
   const mappings = await loadSpendingMappings("../../data/mappings/spending-field-mapping.csv");
   const expenditureRows = await loadBudgetFactRows("../../data/imports/expenditure-facts-2017-2025.csv");
-  const revenueRows = await loadBudgetFactRows("../../data/imports/revenue-facts-2023-2025.csv");
+  const revenueRows = await loadBudgetFactRows("../../data/imports/revenue-facts-2017-2025.csv");
   const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2017-2025.csv");
   const report = buildImportReport("real-budget-2017-2025", facts);
   const missingGlossary = taxonomy.filter((item) => !glossary.has(item.id));

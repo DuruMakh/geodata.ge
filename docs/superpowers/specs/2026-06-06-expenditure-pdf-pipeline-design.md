@@ -13,7 +13,7 @@ The pilot source is:
 docs/Raw Data/Expenditure/treasury.ge/2025-12-month-state-budget-functional-expenditure.pdf
 ```
 
-The 2025 PDF pipeline is a separate staged pilot source. It does not replace the current workbook-based `2023-2025` expenditure pipeline until the PDF extraction, mapping, and validation outputs are reviewed and explicitly promoted.
+The 2025 PDF pipeline is a separate staged pilot source. It does not replace the current reviewed `2017-2025` expenditure pipeline until the PDF extraction, mapping, and validation outputs are reviewed and explicitly promoted.
 
 After the 2025 pilot works, the rollout order is:
 
@@ -27,7 +27,7 @@ Every rollout remains an internal extraction plus review workflow. No unchecked 
 
 This design does not add a public UI feature.
 
-This design does not replace existing `2023-2025` app data during the pilot.
+This design does not replace existing `2017-2025` app data during the pilot.
 
 This design does not use `2025.xlsx` as a pipeline source. The workbook comparison is required once for the 2025 pilot as diagnostic evidence, but the workbook is not a future source of truth for this PDF pipeline because it has a different data structure.
 
@@ -184,7 +184,7 @@ Use the existing project data structure instead of introducing a parallel layout
 - validation and import reports: `data/reports/`;
 - category definitions and labels: `data/taxonomy/` and `data/glossary/`.
 
-The pilot must use PDF-specific filenames and must not overwrite current `2023-2025` files.
+The pilot must use PDF-specific filenames and must not overwrite current `2017-2025` files.
 
 Phase 1 pilot outputs:
 
@@ -205,9 +205,9 @@ data/reports/expenditure-pdf-import-report-2025-pilot.json
 The existing files below are not pilot outputs and must not be modified by the pilot:
 
 ```text
-data/staging/expenditure-official-rows-2023-2025.csv
-data/imports/expenditure-facts-2023-2025.csv
-data/imports/budget-facts-2023-2025.csv
+data/staging/expenditure-official-rows-2017-2025.csv
+data/imports/expenditure-facts-2017-2025.csv
+data/imports/budget-facts-2017-2025.csv
 ```
 
 ## 9. Extraction Strategy

@@ -33,7 +33,7 @@ GeoData.ge v1 is a Georgian-first national budget explorer for annual data. It i
 
 V1 includes:
 
-- Annual national budget data for 2023-2025.
+- Annual national budget data for 2017-2025.
 - Expenditure and revenue modes.
 - Multi-year explorer.
 - Single-year snapshot.
@@ -506,7 +506,7 @@ Default view:
 - View: Multi-year.
 - Chart mode: Line.
 - Measure: nominal GEL.
-- Range: 2023-2025.
+- Range: 2017-2025.
 - Selected series: total expenditure plus selected public spending fields.
 
 Revenue reuses the same structure. Only labels, taxonomy, data, and source semantics change.
@@ -583,7 +583,7 @@ Table mode replaces the chart area inside the plot frame.
 Confirmed columns:
 
 ```text
-კატეგორია | 2023 | 2024 | 2025 | ცვლილება
+კატეგორია | 2017 | ... | 2025 | ცვლილება
 ```
 
 Rules:
@@ -610,14 +610,14 @@ Range strip appears below the legend in line mode.
 
 Confirmed pieces:
 
-- Range label: `Range: 2023 - 2025`.
+- Range label: `Range: 2017 - 2025`.
 - Quick actions: `1Y`, `5Y`, `ALL`.
 - Rail with two handles.
 
 Rules:
 
 - For v1, range bounds are constrained to available years.
-- If only 2023-2025 exists, `ALL` and `5Y` can resolve to the same range.
+- `ALL` resolves to the full loaded 2017-2025 range; `5Y` resolves to the latest five loaded years.
 - Handles should not imply missing years outside loaded data.
 
 ### 9.9 Series Panel

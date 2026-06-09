@@ -27,6 +27,53 @@ const publicRevenueMappings = [
   { sourceCode: "1.4", itemId: "revenue.other_revenue", sortOrder: 90 },
 ] as const;
 
+const receiptSortOrder = {
+  "revenue.asset_decrease": 100,
+  "revenue.increase_liabilities": 110,
+} as const;
+
+const sourceCodeFallbacks: Record<string, string[]> = {
+  "1.1.4.1.1": ["11411"],
+  "1.1.1.1.1": ["11111"],
+  "1.1.1.2.1": ["11121"],
+  "1.1.4.2": ["1142"],
+  "1.1.5.1": ["1151"],
+  "1.1.3": ["113"],
+  "1.1.6": ["116"],
+  "1.3": ["13"],
+  "1.3.3": ["133"],
+  "1.4": ["14"],
+  "1.4.1.1.3": ["14111"],
+};
+
+const sourceCodeDisplayLabels: Record<string, string> = {
+  "1.1.4.1.1": "დამატებული ღირებულების გადასახადი",
+  "11411": "დამატებული ღირებულების გადასახადი",
+  "1.1.1.1.1": "საშემოსავლო გადასახადი",
+  "11111": "საშემოსავლო გადასახადი",
+  "1.1.1.2.1": "მოგების გადასახადი",
+  "11121": "მოგების გადასახადი",
+  "1.1.4.2": "აქციზი",
+  "1142": "აქციზი",
+  "1.1.5.1": "იმპორტის გადასახადი",
+  "1151": "იმპორტის გადასახადი",
+  "1.1.3": "ქონების გადასახადი",
+  "113": "ქონების გადასახადი",
+  "1.1.6": "სხვა გადასახადები",
+  "116": "სხვა გადასახადები",
+  "1.3": "გრანტები",
+  "13": "გრანტები",
+  "1.3.3": "სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები",
+  "133": "სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები",
+  "1.4": "სხვა შემოსავლები",
+  "14": "სხვა შემოსავლები",
+  "1.4.1.1.3": "შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი",
+  "14111": "შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი",
+  "31": "არაფინანსური აქტივების კლება",
+  "32": "ფინანსური აქტივების კლება",
+  "33": "ვალდებულებების ზრდა",
+};
+
 const legacyAggregateMappings = [
   { sourceCode: "1.1", labelKa: "გადასახადები", itemId: "revenue.taxes_total", sortOrder: 5 },
   { sourceCode: "1.3", labelKa: "გრანტები", itemId: "revenue.grants", sortOrder: 80 },
@@ -41,8 +88,17 @@ function rowForMapping(
   rows: OfficialRevenueRow[],
   mapping: { sourceCode: string; labelKa?: string },
 ): OfficialRevenueRow | undefined {
-  return rows.find((candidate) => candidate.sourceCode === mapping.sourceCode)
+  const sourceCodes = [mapping.sourceCode, ...(sourceCodeFallbacks[mapping.sourceCode] ?? [])];
+
+  return rows.find((candidate) => sourceCodes.includes(candidate.sourceCode ?? ""))
     ?? (mapping.labelKa ? rows.find((candidate) => candidate.labelKa === mapping.labelKa) : undefined);
+}
+
+function sourceNote(row: OfficialRevenueRow): string {
+  const sourceCode = row.sourceCode ?? "";
+  const label = sourceCodeDisplayLabels[sourceCode] ?? row.labelKa;
+
+  return `Source row ${sourceCode}: ${label}`.replace(/\s+:/, ":");
 }
 
 function generateFactsFromMappings(
@@ -73,7 +129,7 @@ function generateFactsFromMappings(
         official_subprogram: "",
         public_spending_field_id: "",
         mapping_confidence: "",
-        mapping_notes: `Source row ${row.sourceCode ?? ""}: ${row.labelKa}`.replace(/\s+:/, ":"),
+        mapping_notes: sourceNote(row),
       });
     }
   }
@@ -87,16 +143,47 @@ function generateFactsFromMappings(
 }
 
 export function generateRevenueFacts(officialRows: OfficialRevenueRow[]): RealRevenueFactCsvRow[] {
-  return generateFactsFromMappings(officialRows, publicRevenueMappings, (row, yearRows) => {
-    if (row.sourceCode === "1.3") {
+  const facts = generateFactsFromMappings(officialRows, publicRevenueMappings, (row, yearRows) => {
+    if (row.sourceCode === "1.3" || row.sourceCode === "13") {
       return consolidatedGel(row) - consolidatedGel(requiredRow(yearRows, "1.3.3", row.year));
     }
 
-    if (row.sourceCode === "1.4") {
+    if (row.sourceCode === "1.4" || row.sourceCode === "14") {
       return consolidatedGel(row) - consolidatedGel(requiredRow(yearRows, "1.4.1.1.3", row.year));
     }
 
     return consolidatedGel(row);
+  });
+  const years = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
+
+  for (const year of years) {
+    const yearRows = officialRows.filter((row) => row.year === year);
+    const nonFinancialAssetDecrease = requiredRow(yearRows, "31", year);
+    const financialAssetDecrease = requiredRow(yearRows, "32", year);
+    const increaseLiabilities = requiredRow(yearRows, "33", year);
+    const internalGrants = requiredRow(yearRows, "1.3.3", year);
+    const internalOtherRevenue = requiredRow(yearRows, "1.4.1.1.3", year);
+
+    for (const fact of facts) {
+      if (fact.year === year && fact.item_id === "revenue.grants") {
+        fact.mapping_notes = `${fact.mapping_notes}; net of ${sourceNote(internalGrants)}`;
+      }
+
+      if (fact.year === year && fact.item_id === "revenue.other_revenue") {
+        fact.mapping_notes = `${fact.mapping_notes}; net of ${sourceNote(internalOtherRevenue)}`;
+      }
+    }
+
+    facts.push({
+      ...factFromRow(nonFinancialAssetDecrease, "revenue.asset_decrease", consolidatedGel(nonFinancialAssetDecrease) + consolidatedGel(financialAssetDecrease)),
+      mapping_notes: `Source rows 31 + 32: ${sourceNote(nonFinancialAssetDecrease)}; ${sourceNote(financialAssetDecrease)}`,
+    });
+    facts.push(factFromRow(increaseLiabilities, "revenue.increase_liabilities", consolidatedGel(increaseLiabilities)));
+  }
+
+  return facts.sort((a, b) => {
+    if (a.year !== b.year) return a.year - b.year;
+    return sortOrderForItem(a.item_id) - sortOrderForItem(b.item_id);
   });
 }
 
@@ -105,7 +192,30 @@ export function generateLegacyAggregateRevenueFacts(officialRows: OfficialRevenu
 }
 
 function requiredRow(rows: OfficialRevenueRow[], sourceCode: string, year: number): OfficialRevenueRow {
-  const row = rows.find((candidate) => candidate.sourceCode === sourceCode);
+  const row = rowForMapping(rows, { sourceCode });
   if (!row) throw new Error(`Missing required revenue row for ${year}: ${sourceCode}`);
   return row;
+}
+
+function factFromRow(row: OfficialRevenueRow, itemId: string, amountGel: number): RealRevenueFactCsvRow {
+  return {
+    year: row.year,
+    side: "revenue",
+    item_id: itemId,
+    amount_gel: String(Math.round(amountGel)),
+    basis: "actual",
+    source_id: row.sourceId,
+    official_institution: "",
+    official_program: "",
+    official_subprogram: "",
+    public_spending_field_id: "",
+    mapping_confidence: "",
+    mapping_notes: sourceNote(row),
+  };
+}
+
+function sortOrderForItem(itemId: string): number {
+  return publicRevenueMappings.find((mapping) => mapping.itemId === itemId)?.sortOrder
+    ?? receiptSortOrder[itemId as keyof typeof receiptSortOrder]
+    ?? 999;
 }

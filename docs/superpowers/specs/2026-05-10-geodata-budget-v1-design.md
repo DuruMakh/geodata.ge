@@ -5,13 +5,13 @@ Status: Draft for user review
 
 ## 1. Product Scope
 
-GeoData.ge v1 is a Georgian-first public budget explorer for Georgia. It is not a broad data catalog in the first version. The v1 focus is national budget overview and visualization for annual budget data from 2023 through 2025.
+GeoData.ge v1 is a Georgian-first public budget explorer for Georgia. It is not a broad data catalog in the first version. The v1 focus is national budget overview and visualization for annual budget data from 2017 through 2025.
 
 The first release should beat the current manual workflow of reading budget documents and copying figures into Excel by giving users a clear, trustworthy, interactive public interface.
 
 ### Included in V1
 
-- Annual national budget data for 2023-2025.
+- Annual national budget data for 2017-2025.
 - Revenue overview with tax revenue and major revenue categories.
 - Expenditure overview with public-friendly top-level spending fields such as health, education, social protection, defence, infrastructure, and similar categories where the source data supports a reviewed mapping.
 - Multi-year trends and selected-period comparisons.
@@ -194,7 +194,7 @@ Default first view:
 - View: `Multi-year`
 - Measure: `Nominal GEL`
 - Chart type: `Line`
-- Time range: `2023-2025`
+- Time range: `2017-2025`
 - Selected series: `Total expenditure`
 
 The product should avoid a generic marketing homepage in v1. The budget explorer itself is the primary experience.
@@ -260,7 +260,7 @@ Table mode shows exact values.
 Approved table structure:
 
 ```text
-Budget item | 2023 | 2024 | 2025 | Change | Share 2025
+Budget item | 2017 | ... | 2025 | Change | Share 2025
 ```
 
 Hierarchy should be shown with indentation, not a separate parent column.
@@ -580,7 +580,7 @@ Build v1 data-first, not visual-first.
 Recommended sequence:
 
 1. Data foundation: schema, taxonomy IDs, glossary, mapping table, import validation report.
-2. Real v1 data: load and validate the 2023-2025 source-backed facts.
+2. Real v1 data: load and validate the 2017-2025 source-backed facts.
 3. Main explorer core: expenditure/revenue switch, line mode, table mode, CSV.
 4. Add single-year core: headline cards, treemap, Every 100 GEL, ranking, and the approved snapshot visuals.
 5. Polish: planned badges, source label, mobile behavior, and the `DESIGN.md` Light/Night production visual system.
@@ -650,7 +650,7 @@ Future sessions should preserve these project decisions:
 
 - GeoData.ge v1 is a Georgian-first Georgia Budget Explorer.
 - Budget Explorer comes before a broad public-data catalog.
-- Annual national budget data for 2023-2025 is the v1 data window.
+- Annual national budget data for 2017-2025 is the v1 data window.
 - Planned years are shown with subtle badges and planned markers in charts.
 - V1 has no admin UI and no public API.
 - V1 has no clickable drilldown/detail pages; single-year pages show zoomed-out top-level budget composition.
@@ -695,7 +695,7 @@ V1 succeeds when a Georgian-speaking user can:
 
 - Open GeoData.ge and immediately understand national budget direction.
 - Switch between expenditure and revenue.
-- Compare annual trends from 2023-2025.
+- Compare annual trends from 2017-2025.
 - Understand whether a latest-year value is planned or actual.
 - See exact values in table mode.
 - Export filtered data to CSV.

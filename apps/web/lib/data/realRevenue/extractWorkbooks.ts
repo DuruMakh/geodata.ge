@@ -29,6 +29,36 @@ export const realRevenueSources: RealRevenueSource[] = [
 
 export const realRevenuePdfSources: RealRevenuePdfSource[] = [
   {
+    year: 2017,
+    sourceId: "source.mof_2017_revenue_form1_pdf",
+    pdfPath: "../../docs/Raw Data/Revenue/2017-jan-dec-consolidated-revenue.pdf",
+  },
+  {
+    year: 2018,
+    sourceId: "source.mof_2018_revenue_form1_pdf",
+    pdfPath: "../../docs/Raw Data/Revenue/2018-jan-dec-consolidated-revenue.pdf",
+  },
+  {
+    year: 2019,
+    sourceId: "source.mof_2019_revenue_form1_pdf",
+    pdfPath: "../../docs/Raw Data/Revenue/2019-jan-dec-consolidated-revenue.pdf",
+  },
+  {
+    year: 2020,
+    sourceId: "source.mof_2020_revenue_form1_pdf",
+    pdfPath: "../../docs/Raw Data/Revenue/2020-jan-dec-consolidated-revenue.pdf",
+  },
+  {
+    year: 2021,
+    sourceId: "source.mof_2021_revenue_form1_pdf",
+    pdfPath: "../../docs/Raw Data/Revenue/2021-jan-dec-consolidated-revenue.pdf",
+  },
+  {
+    year: 2022,
+    sourceId: "source.mof_2022_revenue_form1_pdf",
+    pdfPath: "../../docs/Raw Data/Revenue/2022-jan-dec-consolidated-revenue.pdf",
+  },
+  {
     year: 2023,
     sourceId: "source.mof_2023_revenue_form1_pdf",
     pdfPath: "../../docs/Raw Data/Revenue/2023-jan-dec-consolidated-revenue.pdf",

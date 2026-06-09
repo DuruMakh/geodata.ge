@@ -5,7 +5,7 @@ import { budgetFactsToCsv, type BudgetFactCsvRow } from "../lib/data/factCsv";
 import { loadBudgetFactRows, type BudgetFactImportRow } from "../lib/data/importBudgetFacts";
 
 const expenditureYears = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
-const revenueYears = [2023, 2024, 2025];
+const revenueYears = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
 
 export function budgetRowsToCsvRows(rows: BudgetFactImportRow[]): BudgetFactCsvRow[] {
   return rows
@@ -37,7 +37,7 @@ async function main() {
         loadBudgetFactRows(`../../data/imports/expenditure-facts-${year}-final.csv`),
       ),
     ),
-    loadBudgetFactRows("../../data/imports/revenue-facts-2023-2025.csv"),
+    loadBudgetFactRows("../../data/imports/revenue-facts-2017-2025.csv"),
   ]);
   const expenditureRows = expenditureRowsByYear.flat();
   const rows = budgetRowsToCsvRows([...expenditureRows, ...revenueRows]);

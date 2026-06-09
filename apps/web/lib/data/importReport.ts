@@ -29,10 +29,15 @@ export function buildImportReport(
     .reduce((sum, row) => sum + row.amountGel, 0);
   const plannedRows = rows.filter((row) => row.basis === "planned").length;
   const actualRows = rows.filter((row) => row.basis === "actual").length;
+  const negativeRevenueRows = rows.filter((row) => row.side === "revenue" && row.amountGel < 0);
   const warnings: string[] = [];
 
   if (unclassifiedAmountGel > 0) {
     warnings.push(`${unclassifiedAmountGel} GEL assigned to Other / unclassified`);
+  }
+
+  if (negativeRevenueRows.length > 0) {
+    warnings.push(`${negativeRevenueRows.length} negative revenue correction row(s) retained`);
   }
 
   return {

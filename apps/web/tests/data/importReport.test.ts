@@ -14,4 +14,12 @@ describe("import validation report", () => {
     expect(report.totalRevenueGel).toBe(22500000000);
     expect(report.totalExpenditureGel).toBe(17800000000);
   });
+
+  it("surfaces negative revenue correction rows as report warnings", async () => {
+    const rows = await loadBudgetFactRows("tests/fixtures/negative-revenue-facts.csv");
+    const report = buildImportReport("negative revenue fixture", rows);
+
+    expect(report.reconciliationStatus).toBe("warning");
+    expect(report.warnings).toContain("1 negative revenue correction row(s) retained");
+  });
 });
