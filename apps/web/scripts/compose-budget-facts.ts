@@ -4,6 +4,9 @@ import { pathToFileURL } from "node:url";
 import { budgetFactsToCsv, type BudgetFactCsvRow } from "../lib/data/factCsv";
 import { loadBudgetFactRows, type BudgetFactImportRow } from "../lib/data/importBudgetFacts";
 
+const expenditureYears = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+const revenueYears = [2023, 2024, 2025];
+
 export function budgetRowsToCsvRows(rows: BudgetFactImportRow[]): BudgetFactCsvRow[] {
   return rows
     .sort((a, b) => {
@@ -28,15 +31,22 @@ export function budgetRowsToCsvRows(rows: BudgetFactImportRow[]): BudgetFactCsvR
 }
 
 async function main() {
-  const [expenditureRows, revenueRows] = await Promise.all([
-    loadBudgetFactRows("../../data/imports/expenditure-facts-2023-2025.csv"),
+  const [expenditureRowsByYear, revenueRows] = await Promise.all([
+    Promise.all(
+      expenditureYears.map((year) =>
+        loadBudgetFactRows(`../../data/imports/expenditure-facts-${year}-final.csv`),
+      ),
+    ),
     loadBudgetFactRows("../../data/imports/revenue-facts-2023-2025.csv"),
   ]);
+  const expenditureRows = expenditureRowsByYear.flat();
   const rows = budgetRowsToCsvRows([...expenditureRows, ...revenueRows]);
   const importsDir = path.resolve(process.cwd(), "../../data/imports");
   const reportsDir = path.resolve(process.cwd(), "../../data/reports");
   const report = {
-    importLabel: "budget-facts-2023-2025",
+    importLabel: "budget-facts-2017-2025",
+    expenditureYears,
+    revenueYears,
     expenditureRows: expenditureRows.length,
     revenueRows: revenueRows.length,
     totalRows: rows.length,
@@ -44,8 +54,13 @@ async function main() {
 
   await mkdir(importsDir, { recursive: true });
   await mkdir(reportsDir, { recursive: true });
-  await writeFile(path.join(importsDir, "budget-facts-2023-2025.csv"), budgetFactsToCsv(rows), "utf8");
-  await writeFile(path.join(reportsDir, "budget-facts-2023-2025-compose-report.json"), JSON.stringify(report, null, 2), "utf8");
+  await writeFile(
+    path.join(importsDir, "expenditure-facts-2017-2025.csv"),
+    budgetFactsToCsv(budgetRowsToCsvRows(expenditureRows)),
+    "utf8",
+  );
+  await writeFile(path.join(importsDir, "budget-facts-2017-2025.csv"), budgetFactsToCsv(rows), "utf8");
+  await writeFile(path.join(reportsDir, "budget-facts-2017-2025-compose-report.json"), JSON.stringify(report, null, 2), "utf8");
 
   console.log(`Composed budget fact rows: ${rows.length}`);
 }

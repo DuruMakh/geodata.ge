@@ -33,6 +33,13 @@ type MainExplorerProps = {
   lastUpdatedAt: string;
 };
 
+function clampYearToCoverage(year: number, years: number[]): number {
+  const minYear = years[0];
+  const maxYear = years.at(-1);
+  if (minYear === undefined || maxYear === undefined) return year;
+  return Math.min(Math.max(year, minYear), maxYear);
+}
+
 export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpdatedAt }: MainExplorerProps) {
   useEffect(() => {
     document.body.dataset.appReady = "true";
@@ -42,9 +49,15 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
     };
   }, []);
 
-  const allYears = useMemo(() => Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b), [facts]);
-  const initialStartYear = allYears[0] ?? 2025;
-  const initialEndYear = allYears.at(-1) ?? initialStartYear;
+  const yearsBySide = useMemo(
+    () => ({
+      expenditure: Array.from(new Set(facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.year))).sort((a, b) => a - b),
+      revenue: Array.from(new Set(facts.filter((fact) => fact.side === "revenue").map((fact) => fact.year))).sort((a, b) => a - b),
+    }),
+    [facts],
+  );
+  const initialStartYear = yearsBySide.expenditure[0] ?? 2025;
+  const initialEndYear = yearsBySide.expenditure.at(-1) ?? initialStartYear;
   const glossary = useMemo(() => new Map(glossaryEntries.map((entry) => [entry.id, entry])), [glossaryEntries]);
   const [side, setSide] = useState<ExplorerSide>("expenditure");
   const [viewMode, setViewMode] = useState<ViewMode>("multi_year");
@@ -58,6 +71,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
     expenditure: getDefaultSelection("expenditure", facts),
     revenue: getDefaultSelection("revenue", facts),
   });
+  const sideYears = yearsBySide[side];
   const selectedIds = selections[side];
   const measure: MeasureMode = shareModeActive ? "share_of_total" : "nominal";
   const modelStartYear = startYear;
@@ -87,7 +101,13 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
   const selectorRows = [...model.tableRows, ...model.comparisonRows];
 
   function handleSideChange(nextSide: ExplorerSide) {
+    const nextYears = yearsBySide[nextSide];
+    const latestYear = nextYears.at(-1);
+
     setSide(nextSide);
+    setStartYear((current) => clampYearToCoverage(current, nextYears));
+    setEndYear((current) => clampYearToCoverage(current, nextYears));
+    setSingleYear((current) => (nextYears.includes(current) || latestYear === undefined ? current : latestYear));
     setLimitMessage(null);
   }
 
@@ -155,7 +175,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
 
   const rangeStrip = (
     <YearRangeStrip
-      years={allYears}
+      years={sideYears}
       startYear={startYear}
       endYear={endYear}
       onStartYearChange={handleStartYearChange}
@@ -198,7 +218,7 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
 
               {viewMode === "single_year" ? (
                 <div className="min-w-0 max-w-full">
-                  <SingleYearSnapshot model={singleYearModel} years={allYears} onYearChange={setSingleYear} />
+                  <SingleYearSnapshot model={singleYearModel} years={sideYears} onYearChange={setSingleYear} />
                 </div>
               ) : model.unavailableReason ? (
                 <StatusSurface>{model.unavailableReason}</StatusSurface>

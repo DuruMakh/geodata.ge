@@ -15,7 +15,107 @@ function suggestForLabel(labelKa: string): RuleResult {
   const hasHealth = includesAny(text, ["ჯანმრთელ", "ჯანდაცვ", "სამედიცინო", "დაავადებ"]);
   const hasSocial = includesAny(text, ["სოციალურ", "პენსი", "დევნილ", "დახმარებ", "ვეტერან"]);
 
-  if (hasHealth && hasSocial) {
+  const hasHealthSignal = hasHealth || text.includes("სისხლ");
+
+  if (
+    includesAny(text, [
+      "სახელმწიფო ვალდებულებების მომსახურება",
+      "სახელმწიფო ვალდებულებების დაფარვ",
+      "ვალდებულებების მომსახურება და დაფარვა",
+      "აღიარებული ვალდებულებების დაფარვ",
+      "საფინანსო ორგანიზაციებთან თანამშრომლობიდან გამომდინარე ვალდებულებები",
+    ])
+  ) {
+    return { fieldId: "spending.debt_service", confidence: "high", reason: "state debt or obligation repayment label" };
+  }
+
+  if (
+    includesAny(text, [
+      "ავტობუს",
+      "მეტრო",
+      "მყარი ნარჩენ",
+      "ნარჩენების მართვ",
+      "მუნიციპალური ინფრასტრუქტურ",
+      "ადგილობრივი თვითმმართველ",
+      "ელექტროგადამცემი",
+      "ელექტროგადაცემ",
+      "ეგხ",
+      "კვ ხაზ",
+      "220კვ",
+      "ჰიდროელექტრო",
+      "ენგურ",
+      "ვარდნილ",
+      "ბუნებრივი აირ",
+    ])
+  ) {
+    return {
+      fieldId: "spending.infrastructure_regional_development",
+      confidence: "medium",
+      reason: "transport, municipal, or waste infrastructure label",
+    };
+  }
+
+  if (includesAny(text, ["ენერგეტიკ"])) {
+    return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "energy sector label" };
+  }
+
+  if (includesAny(text, ["სახელმწიფო ქონების მართვა", "ანაკლიის ღრმაწყლოვანი პორტ"])) {
+    return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "reviewed economic affairs label pattern" };
+  }
+
+  if (includesAny(text, ["სამელიორაციო", "ირიგაცი", "დრენაჟ", "სოფლის მეურნეობის", "სასოფლო-სამეურნეო", "სარწყავ"])) {
+    return {
+      fieldId: "spending.agriculture_environment",
+      confidence: "medium",
+      reason: "agriculture, irrigation, or drainage label",
+    };
+  }
+
+  if (includesAny(text, ["პენიტენც", "პრობაცი", "დანაშაულ", "საზოგადოებრივი წესრიგ", "სამართალდამცავი"])) {
+    return { fieldId: "spending.public_order_safety", confidence: "medium", reason: "public order or justice keyword" };
+  }
+
+  if (includesAny(text, ["თავდაცვის", "სამხედრო"])) {
+    return { fieldId: "spending.defence", confidence: "high", reason: "defence keyword" };
+  }
+
+  if (includesAny(text, ["აივ", "შიდს", "სამედიცინო", "ექიმი"])) {
+    return { fieldId: "spending.health", confidence: "medium", reason: "health keyword" };
+  }
+
+  if (includesAny(text, ["იძულებით გადაადგილებულ", "მიგრანტ"])) {
+    return { fieldId: "spending.social_protection", confidence: "medium", reason: "social protection keyword" };
+  }
+
+  if (includesAny(text, ["ეპარქი", "რელიგიურ"])) {
+    return { fieldId: "spending.culture", confidence: "medium", reason: "religious or cultural activity keyword" };
+  }
+
+  if (includesAny(text, ["საზოგადოებრივი მაუწყებელი", "ტელერადიომაუწყებლობა"])) {
+    return { fieldId: "spending.culture", confidence: "medium", reason: "broadcasting and public media keyword" };
+  }
+
+  if (includesAny(text, ["კონკურენციის სააგენტო", "საინვესტიციო სააგენტო"])) {
+    return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "economic affairs agency keyword" };
+  }
+
+  if (hasHealthSignal && hasSocial && includesAny(text, ["პოლიტიკის შემუშავება", "სფეროში პოლიტიკის"])) {
+    return {
+      fieldId: "spending.health",
+      confidence: "medium",
+      reason: "health and social ministry policy management reviewed as health",
+    };
+  }
+
+  if (hasHealthSignal && hasSocial && includesAny(text, ["პროგრამების მართვა"])) {
+    return {
+      fieldId: "spending.health",
+      confidence: "medium",
+      reason: "mixed health and social program management reviewed as health",
+    };
+  }
+
+  if (hasHealthSignal && hasSocial) {
     return {
       fieldId: "spending.other_unclassified",
       confidence: "medium",
@@ -31,7 +131,7 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.education", confidence: "high", reason: "education keyword" };
   }
 
-  if (hasHealth) {
+  if (hasHealthSignal) {
     return { fieldId: "spending.health", confidence: "medium", reason: "health keyword" };
   }
 
@@ -58,6 +158,10 @@ function suggestForLabel(labelKa: string): RuleResult {
       confidence: "medium",
       reason: "infrastructure or regional development keyword",
     };
+  }
+
+  if (text.includes("ტრანსპორტ")) {
+    return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "transport keyword" };
   }
 
   if (includesAny(text, ["ეკონომიკ", "ბიზნეს", "მეწარმ", "ინოვაცი", "ტურიზმ"])) {

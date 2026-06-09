@@ -8,19 +8,19 @@ export const realExpenditureSources: RealExpenditureSource[] = [
   {
     year: 2023,
     sourceId: "source.mof_2023_tavi6_actual",
-    workbookPath: "../../docs/Raw Data/2023 12 tve saitistvis.xls",
+    workbookPath: "../../docs/Raw Data/Expenditure/mof.ge/2023 12 tve saitistvis.xls",
     preferredSheetNames: ["VI თავი", "tavi 6"],
   },
   {
     year: 2024,
     sourceId: "source.mof_2024_tavi6_actual",
-    workbookPath: "../../docs/Raw Data/2024 12 თვე საიტისთვის.xlsx",
+    workbookPath: "../../docs/Raw Data/Expenditure/mof.ge/2024 12 თვე საიტისთვის.xlsx",
     preferredSheetNames: ["VI თავი", "tavi 6"],
   },
   {
     year: 2025,
     sourceId: "source.mof_2025_tavi6_actual",
-    workbookPath: "../../docs/Raw Data/2025.xlsx",
+    workbookPath: "../../docs/Raw Data/Expenditure/mof.ge/2025.xlsx",
     preferredSheetNames: ["tavi 6", "VI თავი"],
   },
 ];

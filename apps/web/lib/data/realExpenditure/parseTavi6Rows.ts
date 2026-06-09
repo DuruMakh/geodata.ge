@@ -17,7 +17,7 @@ function cellText(value: MatrixCell): string {
 
 function numericCell(value: MatrixCell): number | null {
   if (value === null || value === undefined || value === "") return null;
-  const parsed = Number(value);
+  const parsed = Number(String(value).replaceAll(",", "").replace(/%$/, ""));
   return Number.isFinite(parsed) ? parsed : null;
 }
 
@@ -41,7 +41,25 @@ function findHeaderIndexes(matrix: MatrixCell[][]) {
     }
   }
 
-  throw new Error("Could not find tavi 6 header row with კოდი, დასახელება, and ფაქტი columns");
+  for (let rowIndex = 0; rowIndex < Math.min(matrix.length, 30); rowIndex += 1) {
+    const row = matrix[rowIndex] ?? [];
+    const codeIndex = row.findIndex((cell) => normalizeOfficialCode(cell) === "00 00");
+    if (codeIndex < 0) continue;
+
+    const labelIndex = codeIndex + 1;
+
+    return {
+      headerRowIndex: rowIndex - 1,
+      codeIndex,
+      labelIndex,
+      approvedPlanIndex: labelIndex + 1,
+      revisedPlanIndex: labelIndex + 2,
+      actualIndex: labelIndex + 3,
+      executionPercentIndex: labelIndex + 4,
+    };
+  }
+
+  throw new Error("Could not find tavi 6 header row or 00 00 total row.");
 }
 
 function contextFor(code: string | null, rowsByCode: Map<string, { labelKa: string }>) {

@@ -23,7 +23,7 @@ export function PeriodSummaryPanel({ years, summary, totalRow, rows, topGrowth, 
   const totalEnd = totalRow?.valuesByYear[endYear] ?? null;
   const formulaRows = [
     ...(totalRow ? [totalRow] : []),
-    ...[...rows].sort((a, b) => (b.valuesByYear[endYear] ?? -Infinity) - (a.valuesByYear[endYear] ?? -Infinity)).slice(0, 3),
+    ...[...rows].sort((a, b) => (b.valuesByYear[endYear] ?? -Infinity) - (a.valuesByYear[endYear] ?? -Infinity)),
   ];
 
   return (

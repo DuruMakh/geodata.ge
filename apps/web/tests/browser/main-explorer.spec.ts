@@ -90,15 +90,18 @@ for (const host of previewHosts) {
       const line = document.querySelector(".recharts-line-curve");
       const gridLines = document.querySelectorAll(".recharts-cartesian-grid line").length;
       const svgText = Array.from(document.querySelectorAll(".recharts-wrapper svg text"));
-      const yAxisTicks = svgText.filter((node) => !["2023", "2024", "2025"].includes(node.textContent ?? ""));
+      const expenditureYearLabels = ["2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"];
+      const yAxisTicks = svgText.filter((node) => !expenditureYearLabels.includes(node.textContent ?? ""));
       const yAxisText = yAxisTicks.map((node) => node.textContent ?? "");
-      const x2023Tick = svgText.find((node) => node.textContent === "2023");
+      const x2017Tick = svgText.find((node) => node.textContent === "2017");
+      const xAxisYears = svgText.map((node) => node.textContent ?? "").filter((text) => expenditureYearLabels.includes(text));
 
       return {
         gridLines,
         hasMillionTicks: yAxisText.some((text) => text.includes("M GEL")),
         yAxisLeft: yAxisTicks[0]?.getBoundingClientRect().left ?? 0,
-        x2023Left: x2023Tick?.getBoundingClientRect().left ?? 0,
+        x2017Left: x2017Tick?.getBoundingClientRect().left ?? 0,
+        xAxisYears,
         plotTop: plot?.top ?? 0,
         selectorTop: selector?.top ?? 0,
         strokeWidth: Number(line?.getAttribute("stroke-width") ?? 0),
@@ -113,7 +116,8 @@ for (const host of previewHosts) {
     expect(mainLayout.gridLines).toBe(0);
     expect(mainLayout.hasMillionTicks).toBe(false);
     expect(mainLayout.yAxisText).toEqual(["0", "10", "20", "30"]);
-    expect(mainLayout.x2023Left - mainLayout.yAxisLeft).toBeGreaterThanOrEqual(70);
+    expect(mainLayout.xAxisYears).toEqual(["2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"]);
+    expect(mainLayout.x2017Left - mainLayout.yAxisLeft).toBeGreaterThanOrEqual(70);
     await expect(page.locator("aside")).toContainText("ხარჯები სულ");
 
     await page.getByTestId("side-revenue").click();
@@ -143,7 +147,8 @@ test("multi-year production controls expose only line table and share toggle", a
   await expect(page.getByTestId("period-movers")).toBeVisible();
   await expect(page.getByTestId("period-start-end")).toBeVisible();
   await expect(page.getByTestId("formula-analysis")).toBeVisible();
-  await expect(page.getByTestId("formula-analysis").locator(":scope > div")).toHaveCount(4);
+  const formulaRowCount = await page.getByTestId("formula-analysis").evaluate((element) => element.children.length);
+  expect(formulaRowCount).toBe(14);
   const periodOrder = await page.evaluate(() => {
     const kpis = document.querySelector('[data-testid="period-kpi-cards"]')?.getBoundingClientRect();
     const movers = document.querySelector('[data-testid="period-movers"]')?.getBoundingClientRect();
@@ -190,7 +195,7 @@ test("year range strip supports dragging handles", async ({ page }) => {
   await expectAppReady(page);
 
   const strip = page.getByTestId("year-range-strip");
-  await expect(strip).toContainText("Range: 2023 - 2025");
+  await expect(strip).toContainText("Range: 2017 - 2025");
 
   const startHandle = strip.getByTestId("range-start-handle");
   await startHandle.scrollIntoViewIfNeeded();
@@ -203,7 +208,7 @@ test("year range strip supports dragging handles", async ({ page }) => {
   await page.mouse.move(stripBox.x + stripBox.width / 2, startBox.y + startBox.height / 2, { steps: 8 });
   await page.mouse.up();
 
-  await expect(strip).toContainText("Range: 2024 - 2025");
+  await expect(strip).toContainText("Range: 2021 - 2025");
 });
 
 test("theme defaults to light and persists night mode without layout shift", async ({ page }) => {
@@ -313,6 +318,7 @@ test("single-year snapshot renders sections and revenue data", async ({ page }) 
 
   await page.getByTestId("side-revenue").click();
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
+  await expect(page.getByTestId("year-pills")).not.toContainText("2017");
   await expect(page.getByTestId("single-year-ranking")).toContainText("დამატებული ღირებულების გადასახადი");
 
   expect(consoleProblems).toEqual([]);

@@ -10,19 +10,19 @@ export const realRevenueSources: RealRevenueSource[] = [
   {
     year: 2023,
     sourceId: "source.mof_2023_tavi1_actual",
-    workbookPath: "../../docs/Raw Data/2023 12 tve saitistvis.xls",
+    workbookPath: "../../docs/Raw Data/Expenditure/mof.ge/2023 12 tve saitistvis.xls",
     preferredSheetNames: ["ბალანსი"],
   },
   {
     year: 2024,
     sourceId: "source.mof_2024_tavi1_actual",
-    workbookPath: "../../docs/Raw Data/2024 12 თვე საიტისთვის.xlsx",
+    workbookPath: "../../docs/Raw Data/Expenditure/mof.ge/2024 12 თვე საიტისთვის.xlsx",
     preferredSheetNames: ["I თავი"],
   },
   {
     year: 2025,
     sourceId: "source.mof_2025_tavi1_actual",
-    workbookPath: "../../docs/Raw Data/2025.xlsx",
+    workbookPath: "../../docs/Raw Data/Expenditure/mof.ge/2025.xlsx",
     preferredSheetNames: ["tavi I", "I თავი"],
   },
 ];
@@ -31,17 +31,17 @@ export const realRevenuePdfSources: RealRevenuePdfSource[] = [
   {
     year: 2023,
     sourceId: "source.mof_2023_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/2023.pdf",
+    pdfPath: "../../docs/Raw Data/Revenue/2023-jan-dec-consolidated-revenue.pdf",
   },
   {
     year: 2024,
     sourceId: "source.mof_2024_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/2024.pdf",
+    pdfPath: "../../docs/Raw Data/Revenue/2024-jan-dec-consolidated-revenue.pdf",
   },
   {
     year: 2025,
     sourceId: "source.mof_2025_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/2025.pdf",
+    pdfPath: "../../docs/Raw Data/Revenue/2025-jan-dec-consolidated-revenue.pdf",
   },
 ];
 

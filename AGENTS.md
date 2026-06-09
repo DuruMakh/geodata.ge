@@ -157,6 +157,8 @@ V1 excludes:
 
 Build data foundation before visual richness.
 
+Raw source files under `docs/Raw Data` are organized by data side first: expenditure sources live in `Expenditure/mof.ge` for MoF Excel workbooks and `Expenditure/treasury.ge` for Treasury PDFs, while revenue PDFs live in `Revenue`.
+
 Required data principles:
 
 - Use stable lowercase ASCII category IDs, such as `revenue.vat` and `spending.health`.

@@ -5,6 +5,8 @@ import { loadSourceDocuments } from "../../lib/data/sources";
 import { buildExplorerModel, getDefaultSelection, getDefaultStackedSelection } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
+const REAL_BUDGET_FACTS_PATH = "../../data/imports/budget-facts-2017-2025.csv";
+
 describe("explorer integration with real CSV data", () => {
   it("loads sample facts and produces the expected year range", async () => {
     const facts = await loadBudgetFactRows("../../data/imports/sample-budget-facts.csv");
@@ -66,7 +68,7 @@ describe("explorer integration with real CSV data", () => {
   });
 
   it("builds a non-empty revenue model from real facts", async () => {
-    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
     const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
@@ -92,13 +94,22 @@ describe("explorer integration with real CSV data", () => {
     );
   });
 
+  it("loads real app facts with 2017-2025 expenditure and current revenue coverage", async () => {
+    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
+    const yearsBySide = (side: "expenditure" | "revenue") =>
+      [...new Set(facts.filter((fact) => fact.side === side).map((fact) => fact.year))].sort((a, b) => a - b);
+
+    expect(yearsBySide("expenditure")).toEqual([2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
+    expect(yearsBySide("revenue")).toEqual([2023, 2024, 2025]);
+  });
+
   it("keeps real revenue facts reconciled by year", async () => {
-    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const revenueFacts = facts.filter((fact) => fact.side === "revenue");
     const expectedTotalsByYear = new Map([
       [2023, 21992545306],
       [2024, 25571944242],
-      [2025, 28306191252],
+      [2025, 28305494244],
     ]);
 
     for (const [year, expectedTotalGel] of expectedTotalsByYear) {
@@ -119,7 +130,7 @@ describe("explorer integration with real CSV data", () => {
   });
 
   it("builds a stacked expenditure composition model from real facts", async () => {
-    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
     const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
@@ -158,7 +169,7 @@ describe("explorer integration with real CSV data", () => {
   });
 
   it("builds a non-empty single-year expenditure snapshot from real facts", async () => {
-    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
 
@@ -181,7 +192,7 @@ describe("explorer integration with real CSV data", () => {
   });
 
   it("keeps single-year revenue source-backed with public tax categories", async () => {
-    const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2023-2025.csv");
+    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
 

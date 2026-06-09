@@ -13,7 +13,7 @@ export default defineConfig({
       DATABASE_URL: "postgresql://user:pass@localhost:5432/geodata",
       DIRECT_URL: "postgresql://user:pass@localhost:5432/geodata",
     },
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     url: "http://localhost:3100",
   },

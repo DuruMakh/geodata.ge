@@ -77,4 +77,41 @@ describe("generateCandidateMappings", () => {
       ]),
     );
   });
+
+  it("maps health ministry policy management to health", () => {
+    const mappings = generateCandidateMappings([
+      row("ოკუპირებული ტერიტორიებიდან დევნილთა, შრომის, ჯანმრთელობისა და სოციალური დაცვის სფეროში პოლიტიკის შემუშავება და მართვა", "27 01 01", 100),
+    ]);
+
+    expect(mappings[0]).toEqual(
+      expect.objectContaining({
+        suggestedPublicSpendingFieldId: "spending.health",
+        mappingConfidence: "medium",
+      }),
+    );
+  });
+
+  it("does not treat blood safety management as public order safety", () => {
+    const mappings = generateCandidateMappings([
+      row("ადამიანის სისხლისა და მისი კომპონენტების ხარისხისა და უსაფრთხოების მართვა", "27 01 13", 100),
+    ]);
+
+    expect(mappings[0]).toEqual(
+      expect.objectContaining({
+        suggestedPublicSpendingFieldId: "spending.health",
+      }),
+    );
+  });
+
+  it("does not treat transport as sport", () => {
+    const mappings = generateCandidateMappings([
+      row("საზღვაო ტრანსპორტის რეგულირება, მართვა და განვითარება", "24 28", 100),
+    ]);
+
+    expect(mappings[0]).toEqual(
+      expect.objectContaining({
+        suggestedPublicSpendingFieldId: "spending.economic_affairs",
+      }),
+    );
+  });
 });

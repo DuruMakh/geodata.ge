@@ -10,7 +10,7 @@ Build a strict pilot pipeline that turns the 2025 Treasury expenditure PDF into 
 The pilot source is:
 
 ```text
-docs/Raw Data/Expenditure/2025-12-month-state-budget-functional-expenditure.pdf
+docs/Raw Data/Expenditure/treasury.ge/2025-12-month-state-budget-functional-expenditure.pdf
 ```
 
 The 2025 PDF pipeline is a separate staged pilot source. It does not replace the current workbook-based `2023-2025` expenditure pipeline until the PDF extraction, mapping, and validation outputs are reviewed and explicitly promoted.
@@ -162,7 +162,7 @@ The 2025 pilot source metadata is:
 
 ```text
 source_id: source.mof_2025_expenditure_pdf_form_e11_actual
-source_path: docs/Raw Data/Expenditure/2025-12-month-state-budget-functional-expenditure.pdf
+source_path: docs/Raw Data/Expenditure/treasury.ge/2025-12-month-state-budget-functional-expenditure.pdf
 source_sha256: 1B680A253394C689703BE0279F41860AFEB6EF8D6791D5E42F5BE8C70FF39EAD
 source_file_id: cb40ddb8-11f6-4da3-b411-b5a7b565e07b
 source_reviewed_at: 2026-06-06
@@ -171,13 +171,13 @@ form_id: E11
 
 The implementation must inspect and record `table_title`, `page_start`, and `page_end` before parsing. Those fields should appear in the extraction report and source metadata if the source catalog is updated.
 
-The source document itself remains stored in `docs/Raw Data/Expenditure`. Source catalog updates should continue to use `data/sources/source-documents.csv`.
+The source document itself remains stored in `docs/Raw Data/Expenditure/treasury.ge`. Source catalog updates should continue to use `data/sources/source-documents.csv`.
 
 ## 8. Output Locations
 
 Use the existing project data structure instead of introducing a parallel layout:
 
-- raw official source file: `docs/Raw Data/Expenditure/`;
+- raw official source file: `docs/Raw Data/Expenditure/treasury.ge/`;
 - extracted official rows: `data/staging/`;
 - public spending mapping: `data/mappings/`;
 - app-ready facts: `data/imports/`;

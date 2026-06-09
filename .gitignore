@@ -21,6 +21,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+.codex-*.log
 
 # OS/editor
 .DS_Store
@@ -36,6 +37,7 @@ data/reports/*.txt
 .superpowers/
 .tmp/
 tools/
+design-shotgun/
 design.md
 docs/Budget Data 2025/
 docs/Prototpy variatints experiments/
