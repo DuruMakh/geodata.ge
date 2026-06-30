@@ -7,6 +7,8 @@ export type ExplorerSide = (typeof EXPLORER_SIDES)[number];
 export type ViewMode = (typeof VIEW_MODES)[number];
 export type ChartMode = (typeof CHART_MODES)[number];
 export type MeasureMode = (typeof MEASURE_MODES)[number];
+export type ExpenditureGrouping = "fields" | "ministries";
+export type ExplorerItemLevel = "total" | "public_field" | "admin_category" | "major_program";
 
 export const MAX_CHART_SERIES = 8;
 
@@ -19,6 +21,9 @@ export type SourceMetadata = {
 export type ExplorerItem = {
   id: string;
   side: ExplorerSide;
+  parentItemId: string | null;
+  level: ExplorerItemLevel;
+  detailLabel: string | null;
   kaLabel: string;
   enLabel: string;
   color: string;
@@ -39,6 +44,10 @@ export type ExplorerPoint = {
 
 export type ExplorerTableRow = {
   itemId: string;
+  parentItemId: string | null;
+  level: ExplorerItemLevel;
+  detailLabel: string | null;
+  officialInstitutionLabelByYear?: Record<number, string | null>;
   kaLabel: string;
   enLabel: string;
   color: string;

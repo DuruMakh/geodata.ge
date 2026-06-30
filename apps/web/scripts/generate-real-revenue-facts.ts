@@ -1,6 +1,8 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { REVENUE_DETAILED_YEARS, REVENUE_YEARS } from "../lib/data/coverage";
 import { budgetFactsToCsv } from "../lib/data/factCsv";
+import { TOTAL_ONLY_BUDGET_FACTS, TOTAL_ONLY_BUDGET_FACT_REPORT } from "../lib/data/totalOnlyBudgetFacts";
 import { extractOfficialRevenueRows, extractOfficialWorkbookRevenueRows } from "../lib/data/realRevenue/extractWorkbooks";
 import { generateLegacyAggregateRevenueFacts, generateRevenueFacts, type RealRevenueFactCsvRow } from "../lib/data/realRevenue/generateFacts";
 import { validateRealRevenueFacts } from "../lib/data/realRevenue/validateRealRevenue";
@@ -31,33 +33,51 @@ function compareAggregateFacts(workbookFacts: RealRevenueFactCsvRow[], pdfAggreg
 
 async function main() {
   const officialRows = await extractOfficialRevenueRows();
-  const facts = generateRevenueFacts(officialRows);
-  const report = validateRealRevenueFacts(officialRows, facts, [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
+  const detailedOfficialRows = officialRows.filter((row) => REVENUE_DETAILED_YEARS.includes(row.year));
+  const facts = [
+    ...TOTAL_ONLY_BUDGET_FACTS.filter((row) => row.side === "revenue" && !REVENUE_DETAILED_YEARS.includes(row.year)),
+    ...generateRevenueFacts(detailedOfficialRows),
+  ];
+  const report = {
+    ...validateRealRevenueFacts(
+      detailedOfficialRows,
+      facts.filter((row) => REVENUE_DETAILED_YEARS.includes(row.year)) as RealRevenueFactCsvRow[],
+      REVENUE_DETAILED_YEARS,
+    ),
+    years: REVENUE_YEARS,
+    totalOnlyRows: TOTAL_ONLY_BUDGET_FACT_REPORT.rows.filter(
+      (row) => row.side === "revenue" && !REVENUE_DETAILED_YEARS.includes(row.year),
+    ),
+  };
   const workbookRows = extractOfficialWorkbookRevenueRows();
+  const workbookYears = new Set(workbookRows.map((row) => row.year));
+  const comparisonOfficialRows = detailedOfficialRows.filter((row) => workbookYears.has(row.year));
   const comparisonReport = {
-    importLabel: "real-revenue-pdf-vs-workbook-2017-2025",
+    importLabel: "real-revenue-pdf-vs-workbook-2005-2025",
     basis: "state_budget_actual_gel",
-    rows: compareAggregateFacts(generateLegacyAggregateRevenueFacts(workbookRows), generateLegacyAggregateRevenueFacts(officialRows)),
+    rows: compareAggregateFacts(generateLegacyAggregateRevenueFacts(workbookRows), generateLegacyAggregateRevenueFacts(comparisonOfficialRows)),
   };
   const importsDir = path.resolve(process.cwd(), "../../data/imports");
   const reportsDir = path.resolve(process.cwd(), "../../data/reports");
 
   await mkdir(importsDir, { recursive: true });
   await mkdir(reportsDir, { recursive: true });
-  await writeFile(path.join(importsDir, "revenue-facts-2017-2025.csv"), budgetFactsToCsv(facts), "utf8");
-  await writeFile(path.join(reportsDir, "real-revenue-2017-2025-report.json"), JSON.stringify(report, null, 2), "utf8");
-  await writeFile(path.join(reportsDir, "revenue-pdf-vs-workbook-2017-2025-report.json"), JSON.stringify(comparisonReport, null, 2), "utf8");
+  await writeFile(path.join(importsDir, "revenue-facts-2005-2025.csv"), budgetFactsToCsv(facts), "utf8");
+  await writeFile(path.join(reportsDir, "real-revenue-2005-2025-report.json"), JSON.stringify(report, null, 2), "utf8");
+  await writeFile(path.join(reportsDir, "revenue-pdf-vs-workbook-2005-2025-report.json"), JSON.stringify(comparisonReport, null, 2), "utf8");
 
   if (Object.values(report.reconciliationStatusByYear).some((status) => status === "failed")) {
-    throw new Error("Real revenue reconciliation failed. See data/reports/real-revenue-2017-2025-report.json");
+    throw new Error("Real revenue reconciliation failed. See data/reports/real-revenue-2005-2025-report.json");
   }
 
   console.log(`Generated revenue fact rows: ${facts.length}`);
-  console.log("Report written: data/reports/real-revenue-2017-2025-report.json");
-  console.log("Comparison written: data/reports/revenue-pdf-vs-workbook-2017-2025-report.json");
+  console.log("Report written: data/reports/real-revenue-2005-2025-report.json");
+  console.log("Comparison written: data/reports/revenue-pdf-vs-workbook-2005-2025-report.json");
 }
 
 main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
+
+

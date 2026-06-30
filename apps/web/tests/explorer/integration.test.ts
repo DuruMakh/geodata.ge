@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
+import { loadAdminSpendingFacts } from "../../lib/data/adminSpending/importAdminSpendingFacts";
 import { loadGlossary } from "../../lib/data/glossary";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadSourceDocuments } from "../../lib/data/sources";
+import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_DETAILED_YEARS, REVENUE_TOTAL_ONLY_YEARS, REVENUE_YEARS } from "../../lib/data/coverage";
 import { buildExplorerModel, getDefaultSelection, getDefaultStackedSelection } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
-const REAL_BUDGET_FACTS_PATH = "../../data/imports/budget-facts-2017-2025.csv";
+const REAL_BUDGET_FACTS_PATH = "../../data/imports/budget-facts-2004-2025.csv";
+const REAL_ADMIN_FACTS_PATH = "../../data/imports/admin-spending-facts-2004-2025.csv";
 
 describe("explorer integration with real CSV data", () => {
   it("loads sample facts and produces the expected year range", async () => {
@@ -94,19 +97,21 @@ describe("explorer integration with real CSV data", () => {
     );
   });
 
-  it("loads real app facts with 2017-2025 expenditure and current revenue coverage", async () => {
+  it("loads real app facts with current expenditure and revenue coverage", async () => {
     const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const yearsBySide = (side: "expenditure" | "revenue") =>
       [...new Set(facts.filter((fact) => fact.side === side).map((fact) => fact.year))].sort((a, b) => a - b);
 
-    expect(yearsBySide("expenditure")).toEqual([2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
-    expect(yearsBySide("revenue")).toEqual([2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
+    expect(yearsBySide("expenditure")).toEqual(EXPENDITURE_YEARS);
+    expect(yearsBySide("revenue")).toEqual(REVENUE_YEARS);
   });
 
   it("keeps real revenue facts reconciled by year", async () => {
     const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const revenueFacts = facts.filter((fact) => fact.side === "revenue");
     const expectedReceiptsByYear = new Map([
+      [2006, 4537916326],
+      [2016, 11595009761],
       [2017, 12868042205],
       [2018, 13962006896],
       [2019, 15533377928],
@@ -118,6 +123,8 @@ describe("explorer integration with real CSV data", () => {
       [2025, 32368880408],
     ]);
     const expectedNetRevenueByYear = new Map([
+      [2006, 3802956630],
+      [2016, 9675743059],
       [2017, 10858369148],
       [2018, 11757729002],
       [2019, 12838287984],
@@ -128,6 +135,22 @@ describe("explorer integration with real CSV data", () => {
       [2024, 25571944242],
       [2025, 28305494244],
     ]);
+
+    const totalOnlyRevenueByYear = new Map([
+      [2005, 3289223826],
+      [2007, 6356421170],
+    ]);
+
+    expect([...expectedReceiptsByYear.keys()]).toEqual(REVENUE_DETAILED_YEARS);
+    expect([...totalOnlyRevenueByYear.keys()]).toEqual(REVENUE_TOTAL_ONLY_YEARS);
+
+    for (const [year, expectedReceiptsGel] of totalOnlyRevenueByYear) {
+      const yearFacts = revenueFacts.filter((fact) => fact.year === year);
+
+      expect(yearFacts).toHaveLength(1);
+      expect(yearFacts[0]?.itemId).toBe("revenue.total");
+      expect(yearFacts[0]?.amountGel).toBe(expectedReceiptsGel);
+    }
 
     for (const [year, expectedReceiptsGel] of expectedReceiptsByYear) {
       const yearFacts = revenueFacts.filter((fact) => fact.year === year);
@@ -152,7 +175,6 @@ describe("explorer integration with real CSV data", () => {
     const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
-    const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
     const selectedItemIds = getDefaultStackedSelection("expenditure", facts);
     const allStackedItemIds = [
       ...new Set(facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.itemId).filter((itemId) => itemId !== "expenditure.total")),
@@ -168,8 +190,8 @@ describe("explorer integration with real CSV data", () => {
       sourceDocuments,
       side: "expenditure",
       selectedItemIds: allStackedItemIds,
-      startYear: years[0],
-      endYear: years[years.length - 1],
+      startYear: EXPENDITURE_DETAILED_YEARS[0],
+      endYear: EXPENDITURE_DETAILED_YEARS[EXPENDITURE_DETAILED_YEARS.length - 1],
       measure: "share_of_total",
     });
 
@@ -185,6 +207,36 @@ describe("explorer integration with real CSV data", () => {
       expect(values.length).toBeGreaterThan(1);
       expect(values.reduce((sum, value) => sum + value, 0)).toBeCloseTo(1, 8);
     }
+  });
+
+  it("builds a ministry expenditure model from real admin spending facts", async () => {
+    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
+    const adminFacts = await loadAdminSpendingFacts(REAL_ADMIN_FACTS_PATH);
+    const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
+    const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
+
+    const selectedItemIds = getDefaultSelection("expenditure", facts, "ministries", adminFacts);
+    expect(selectedItemIds).toEqual(["admin_spending.total"]);
+
+    const model = buildExplorerModel({
+      facts,
+      adminFacts,
+      adminCategories: new Map(),
+      expenditureGrouping: "ministries",
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds,
+      startYear: ADMIN_SPENDING_YEARS[0],
+      endYear: ADMIN_SPENDING_YEARS[ADMIN_SPENDING_YEARS.length - 1],
+      measure: "nominal",
+    });
+    const programItems = model.items.filter((item) => item.level === "major_program");
+
+    expect(model.totalRow?.valuesByYear[2025]).toBeGreaterThan(0);
+    expect(model.items.some((item) => item.id.startsWith("spending."))).toBe(false);
+    expect(programItems.length).toBeGreaterThan(0);
+    expect(programItems.every((item) => item.parentItemId?.startsWith("admin_spending") ?? false)).toBe(true);
   });
 
   it("builds a non-empty single-year expenditure snapshot from real facts", async () => {

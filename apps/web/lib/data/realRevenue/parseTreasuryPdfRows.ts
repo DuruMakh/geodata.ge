@@ -13,6 +13,11 @@ type CodeMatch = {
   contentStart: number;
 };
 
+type ParsedAmount = {
+  value: string;
+  index: number;
+};
+
 const rowCodePattern = /(?:^|\s)(\d+(?:\.\d+)*)(?=\s)/g;
 const amountPattern = /-?(?:\d{1,3}(?:,\d{3})+|\d{1,3}(?: \d{3})+|\d+)\.\d{2}/g;
 
@@ -29,6 +34,13 @@ function isLikelyBudgetCode(code: string): boolean {
   if (["31", "32", "33", "41"].includes(code)) return true;
   if (/^[1-5]\d{1,5}$/.test(code)) return true;
   return ["0", "1", "2", "3", "4", "5"].includes(code);
+}
+
+function sectionForOldCode(code: string): RevenueMatrixSection {
+  if (code.startsWith("01") || code.startsWith("02") || code.startsWith("04")) return "revenues";
+  if (code.startsWith("03")) return "non_financial_assets";
+  if (code.startsWith("05")) return "liabilities";
+  return "other";
 }
 
 function sectionForCode(code: string): RevenueMatrixSection {
@@ -65,8 +77,55 @@ function findCodeMatches(text: string): CodeMatch[] {
   return matches;
 }
 
+
+function parseOldCodeRows(input: ParseTreasuryPdfInput, text: string): OfficialRevenueRow[] {
+  const codeMatches = Array.from(text.matchAll(/\b\d{12}\b/g));
+  const rows: OfficialRevenueRow[] = [];
+
+  for (const [index, codeMatch] of codeMatches.entries()) {
+    const code = codeMatch[0];
+    const contentStart = (codeMatch.index ?? 0) + code.length;
+    const next = codeMatches[index + 1];
+    const segment = text.slice(contentStart, next?.index).trim();
+    const amounts: ParsedAmount[] = Array.from(segment.matchAll(amountPattern)).map((match) => ({
+      value: match[0],
+      index: match.index ?? 0,
+    }));
+
+    if (amounts.length < 3) continue;
+
+    const stateBudgetActualGel = parseAmountGel(amounts[0]?.value ?? "0");
+    const territorialBudgetActualGel = parseAmountGel(amounts[1]?.value ?? "0");
+    const consolidatedActualGel = parseAmountGel(amounts[2]?.value ?? "0");
+    const labelKa = normalizeText(segment.slice(0, amounts[0]?.index));
+    if (!labelKa) continue;
+
+    rows.push({
+      year: input.year,
+      sourceId: input.sourceId,
+      workbookPath: input.pdfPath,
+      sheetName: "form #1",
+      rowNumber: rows.length + 1,
+      sourceCode: code,
+      labelKa,
+      section: sectionForOldCode(code),
+      approvedPlanThousandGel: null,
+      revisedPlanThousandGel: null,
+      actualThousandGel: stateBudgetActualGel / 1000,
+      executionPercent: null,
+      stateBudgetActualGel,
+      territorialBudgetActualGel,
+      consolidatedActualGel,
+    });
+  }
+
+  return rows;
+}
+
 export function parseTreasuryPdfRows(input: ParseTreasuryPdfInput): OfficialRevenueRow[] {
   const text = normalizeText(input.text);
+  const oldCodeRows = parseOldCodeRows(input, text);
+  if (oldCodeRows.length > 0) return oldCodeRows;
   const matches = findCodeMatches(text);
   const rows: OfficialRevenueRow[] = [];
 

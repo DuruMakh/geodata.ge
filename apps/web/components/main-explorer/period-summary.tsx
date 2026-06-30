@@ -64,7 +64,7 @@ export function PeriodSummaryPanel({ years, summary, totalRow, rows, topGrowth, 
           className="mt-6 grid gap-4 md:grid-cols-2 xl:h-[360px] xl:grid-cols-6 xl:items-end"
         >
           <MovementCards label="Gainer" rows={topGrowth} tone="gain" />
-          <MovementCards label="Loser" rows={bottomGrowth} tone="loss" />
+          <MovementCards label="Bottom growth" rows={bottomGrowth} tone="loss" />
         </div>
       </div>
 

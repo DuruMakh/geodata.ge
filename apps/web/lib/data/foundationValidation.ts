@@ -1,7 +1,9 @@
-import type { BudgetFactImportRow } from "./importBudgetFacts";
+﻿import type { BudgetFactImportRow } from "./importBudgetFacts";
 import type { SourceDocumentRow } from "./sources";
 import type { SpendingMapping } from "./mappings";
 import type { TaxonomyItem } from "./taxonomy";
+
+const importedTotalFactIds = new Set(["expenditure.total", "revenue.total"]);
 
 export type FoundationValidationInput = {
   taxonomy: TaxonomyItem[];
@@ -23,7 +25,7 @@ export function validateFoundationReferences(input: FoundationValidationInput): 
   }
 
   for (const fact of input.facts) {
-    if (!taxonomyIds.has(fact.itemId)) {
+    if (!taxonomyIds.has(fact.itemId) && !importedTotalFactIds.has(fact.itemId)) {
       throw new Error(`Fact references unknown taxonomy item: ${fact.itemId}`);
     }
 
@@ -38,3 +40,5 @@ export function validateFoundationReferences(input: FoundationValidationInput): 
     }
   }
 }
+
+

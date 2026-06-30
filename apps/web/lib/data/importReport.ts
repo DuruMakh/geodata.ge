@@ -1,4 +1,4 @@
-import type { BudgetFactImportRow } from "./importBudgetFacts";
+﻿import type { BudgetFactImportRow } from "./importBudgetFacts";
 
 export type ImportReport = {
   importLabel: string;
@@ -14,16 +14,22 @@ export type ImportReport = {
   warnings: string[];
 };
 
+function totalForSide(rows: BudgetFactImportRow[], side: "revenue" | "expenditure"): number {
+  const totalItemId = side === "revenue" ? "revenue.total" : "expenditure.total";
+  const explicitTotals = rows.filter((row) => row.side === side && row.itemId === totalItemId);
+  if (explicitTotals.length > 0) return explicitTotals.reduce((sum, row) => sum + row.amountGel, 0);
+
+  return rows
+    .filter((row) => row.side === side && row.itemId !== totalItemId)
+    .reduce((sum, row) => sum + row.amountGel, 0);
+}
+
 export function buildImportReport(
   importLabel: string,
   rows: BudgetFactImportRow[],
 ): ImportReport {
-  const totalRevenueGel = rows
-    .filter((row) => row.side === "revenue")
-    .reduce((sum, row) => sum + row.amountGel, 0);
-  const totalExpenditureGel = rows
-    .filter((row) => row.side === "expenditure")
-    .reduce((sum, row) => sum + row.amountGel, 0);
+  const totalRevenueGel = totalForSide(rows, "revenue");
+  const totalExpenditureGel = totalForSide(rows, "expenditure");
   const unclassifiedAmountGel = rows
     .filter((row) => row.publicSpendingFieldId === "spending.other_unclassified")
     .reduce((sum, row) => sum + row.amountGel, 0);
@@ -55,3 +61,4 @@ export function buildImportReport(
     warnings,
   };
 }
+

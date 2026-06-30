@@ -1,4 +1,4 @@
-import { chooseActivePublicFacts } from "../data/activeFacts";
+﻿import { chooseActivePublicFacts } from "../data/activeFacts";
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { SourceDocumentRow } from "../data/sources";
@@ -43,6 +43,10 @@ function labelsFor(id: string, glossary: Map<string, GlossaryEntry>) {
   };
 }
 
+function totalIdFor(side: ExplorerSide): string {
+  return side === "revenue" ? "revenue.total" : "expenditure.total";
+}
+
 function sourceMetadataFor(sourceIds: string[], sources: Map<string, SourceDocumentRow>): SourceMetadata {
   const rows = sourceIds
     .map((sourceId) => sources.get(sourceId))
@@ -70,8 +74,8 @@ function sourceMetadataFromItems(items: SnapshotItem[]): SourceMetadata {
 
 function emptyReasonFor(side: ExplorerSide): string {
   return side === "revenue"
-    ? "ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული."
-    : "ამ წლისთვის ხარჯების მონაცემები ჯერ არ არის ჩატვირთული.";
+    ? "áƒáƒ› áƒ¬áƒšáƒ˜áƒ¡áƒ—áƒ•áƒ˜áƒ¡ áƒ¨áƒ”áƒ›áƒáƒ¡áƒáƒ•áƒšáƒ”áƒ‘áƒ˜áƒ¡ áƒ›áƒáƒœáƒáƒªáƒ”áƒ›áƒ”áƒ‘áƒ˜ áƒ¯áƒ”áƒ  áƒáƒ  áƒáƒ áƒ˜áƒ¡ áƒ©áƒáƒ¢áƒ•áƒ˜áƒ áƒ—áƒ£áƒšáƒ˜."
+    : "áƒáƒ› áƒ¬áƒšáƒ˜áƒ¡áƒ—áƒ•áƒ˜áƒ¡ áƒ®áƒáƒ áƒ¯áƒ”áƒ‘áƒ˜áƒ¡ áƒ›áƒáƒœáƒáƒªáƒ”áƒ›áƒ”áƒ‘áƒ˜ áƒ¯áƒ”áƒ  áƒáƒ  áƒáƒ áƒ˜áƒ¡ áƒ©áƒáƒ¢áƒ•áƒ˜áƒ áƒ—áƒ£áƒšáƒ˜.";
 }
 
 function changeFromPrevious(amountGel: number, previousAmountGel: number | null): number | null {
@@ -140,7 +144,7 @@ function buildRadarItems(items: SnapshotItem[]): SnapshotItem[] {
     ...visible,
     {
       itemId: "snapshot.other",
-      kaLabel: "სხვა",
+      kaLabel: "áƒ¡áƒ®áƒ•áƒ",
       enLabel: "Other",
       color: "#8e8e93",
       amountGel,
@@ -166,25 +170,25 @@ function headlineCards(totalGel: number, items: SnapshotItem[]): SnapshotHeadlin
   return [
     {
       id: "total",
-      label: "სულ",
+      label: "áƒ¡áƒ£áƒš",
       value: formatGel(totalGel),
-      detail: `${items.length} კატეგორია`,
+      detail: `${items.length} áƒ™áƒáƒ¢áƒ”áƒ’áƒáƒ áƒ˜áƒ`,
     },
     {
       id: "largest",
-      label: "ყველაზე დიდი",
+      label: "áƒ§áƒ•áƒ”áƒšáƒáƒ–áƒ” áƒ“áƒ˜áƒ“áƒ˜",
       value: largest ? formatGel(largest.amountGel) : "n/a",
       detail: largest ? `${largest.kaLabel} - ${formatPercent(largest.shareOfTotal)}` : "n/a",
     },
     {
       id: "fastest_growth",
-      label: "ყველაზე სწრაფი ზრდა",
+      label: "áƒ§áƒ•áƒ”áƒšáƒáƒ–áƒ” áƒ¡áƒ¬áƒ áƒáƒ¤áƒ˜ áƒ–áƒ áƒ“áƒ",
       value: fastestGrowth ? formatSignedPercent(fastestGrowth.changeFromPreviousYear) : "n/a",
       detail: fastestGrowth?.kaLabel ?? "n/a",
     },
     {
       id: "largest_increase",
-      label: "ყველაზე დიდი მატება",
+      label: "áƒ§áƒ•áƒ”áƒšáƒáƒ–áƒ” áƒ“áƒ˜áƒ“áƒ˜ áƒ›áƒáƒ¢áƒ”áƒ‘áƒ",
       value: largestIncrease ? formatGel(largestIncrease.amountChangeFromPreviousYear) : "n/a",
       detail: largestIncrease?.kaLabel ?? "n/a",
     },
@@ -194,6 +198,8 @@ function headlineCards(totalGel: number, items: SnapshotItem[]): SnapshotHeadlin
 export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): SingleYearSnapshotModel {
   const active = chooseActivePublicFacts(input.facts).filter((fact) => fact.side === input.side);
   const yearFacts = active.filter((fact) => fact.year === input.year);
+  const totalFact = yearFacts.find((fact) => fact.itemId === totalIdFor(input.side)) ?? null;
+  const detailFacts = yearFacts.filter((fact) => fact.itemId !== totalIdFor(input.side));
   const sourceDocuments = new Map(input.sourceDocuments.map((source) => [source.sourceId, source]));
 
   if (yearFacts.length === 0) {
@@ -216,12 +222,12 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
   }
 
   const previousYear = Array.from(new Set(active.filter((fact) => fact.year < input.year).map((fact) => fact.year))).sort((a, b) => b - a)[0] ?? null;
-  const previousFacts = previousYear === null ? [] : active.filter((fact) => fact.year === previousYear);
+  const previousFacts = previousYear === null ? [] : active.filter((fact) => fact.year === previousYear && fact.itemId !== totalIdFor(input.side));
   const previousByItemId = new Map(previousFacts.map((fact) => [fact.itemId, fact.amountGel]));
-  const totalGel = yearFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
-  const modelSource = sourceMetadataFor(yearFacts.map((fact) => fact.sourceId), sourceDocuments);
+  const totalGel = totalFact?.amountGel ?? detailFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
+  const modelSource = sourceMetadataFor((totalFact ? [totalFact] : detailFacts).map((fact) => fact.sourceId), sourceDocuments);
 
-  const items = yearFacts
+  const items = detailFacts
     .map((fact, index): SnapshotItem => {
       const previousAmountGel = previousByItemId.get(fact.itemId) ?? null;
 
@@ -257,3 +263,5 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
     emptyReason: null,
   };
 }
+
+

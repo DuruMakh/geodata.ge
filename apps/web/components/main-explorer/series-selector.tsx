@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { formatGel } from "../../lib/explorer/format";
 import { MAX_CHART_SERIES, type ChartMode, type ExplorerItem, type ExplorerTableRow } from "../../lib/explorer/types";
@@ -13,21 +14,39 @@ type SeriesSelectorProps = {
   years: number[];
   chartMode: ChartMode;
   limitMessage: string | null;
+  headerControl?: ReactNode;
   onToggle: (itemId: string) => void;
   onDownloadCsv: () => void;
 };
 
-export function SeriesSelector({ items, selectedIds, rows, years, chartMode, limitMessage, onToggle, onDownloadCsv }: SeriesSelectorProps) {
+export function filterSeriesItems(items: ExplorerItem[], query: string): ExplorerItem[] {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return items;
+
+  const matchedIds = new Set(
+    items
+      .filter((item) => {
+        const haystack = `${item.kaLabel} ${item.enLabel} ${item.detailLabel ?? ""} ${item.id}`.toLowerCase();
+        return haystack.includes(normalizedQuery);
+      })
+      .map((item) => item.id),
+  );
+
+  for (const item of items) {
+    if (matchedIds.has(item.id) && item.parentItemId) matchedIds.add(item.parentItemId);
+  }
+
+  return items.filter((item) => matchedIds.has(item.id));
+}
+
+export function SeriesSelector({ items, selectedIds, rows, years, chartMode, limitMessage, headerControl, onToggle, onDownloadCsv }: SeriesSelectorProps) {
   const [query, setQuery] = useState("");
   const latestYear = years.at(-1);
   const values = useMemo(() => new Map(rows.map((row) => [row.itemId, row])), [rows]);
-  const filteredItems = items.filter((item) => {
-    const haystack = `${item.kaLabel} ${item.enLabel} ${item.id}`.toLowerCase();
-    return haystack.includes(query.toLowerCase());
-  });
+  const filteredItems = filterSeriesItems(items, query);
 
   return (
-    <aside data-testid="series-selector" className="bg-[var(--surface)] lg:sticky lg:top-5">
+    <aside data-testid="series-selector" className="order-2 min-w-0 max-w-full bg-[var(--surface)] lg:order-none lg:sticky lg:top-5">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold tracking-[-0.01em] text-[var(--ink)]">{"\u10e1\u10d4\u10e0\u10d8\u10d4\u10d1\u10d8"}</h2>
@@ -39,8 +58,10 @@ export function SeriesSelector({ items, selectedIds, rows, years, chartMode, lim
         </div>
         <span className="rounded-full bg-[var(--soft)] px-3 py-1 text-xs font-semibold text-[var(--primary)]">{selectedIds.length}</span>
       </div>
+      {headerControl ? <div className="mt-4">{headerControl}</div> : null}
 
       <input
+        data-testid="series-search"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         className="mt-4 h-11 w-full rounded-[12px] border border-[var(--hairline)] bg-[var(--canvas)] px-4 text-sm font-semibold text-[var(--ink)] placeholder:text-[var(--mute)]"
@@ -63,6 +84,8 @@ export function SeriesSelector({ items, selectedIds, rows, years, chartMode, lim
           return (
             <label
               key={item.id}
+              data-level={item.level}
+              data-parent-id={item.parentItemId ?? undefined}
               className={`grid min-h-14 grid-cols-[auto_1fr] items-center gap-3 rounded-[10px] px-3 py-2 transition ${
                 disabled
                   ? "cursor-not-allowed bg-[var(--soft)] opacity-50"
@@ -79,8 +102,9 @@ export function SeriesSelector({ items, selectedIds, rows, years, chartMode, lim
                 className="sr-only"
               />
               <span className="size-3 rounded-[4px]" style={{ backgroundColor: item.color }} />
-              <span className="min-w-0">
+              <span className="min-w-0" style={{ paddingLeft: item.parentItemId ? 16 : 0 }}>
                 <span className="block break-words text-[13px] font-bold text-[var(--ink)]">{item.kaLabel}</span>
+                {item.detailLabel ? <span className="block break-words text-[11px] font-semibold text-[var(--mute)]">{item.detailLabel}</span> : null}
                 <span className="sr-only">{item.id}</span>
               </span>
               <span className="sr-only">{formatGel(latest)}</span>

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "admin_spending.health_social_affairs",
+    "kaLabel": "ჯანმრთელობა, შრომა და სოციალური დაცვა",
+    "enLabel": "Health, labour and social affairs",
+    "sortOrder": 10
+  },
+  {
+    "id": "admin_spending.education_science_youth",
+    "kaLabel": "განათლება, მეცნიერება და ახალგაზრდობა",
+    "enLabel": "Education, science and youth",
+    "sortOrder": 20
+  },
+  {
+    "id": "admin_spending.regional_development_infrastructure",
+    "kaLabel": "რეგიონული განვითარება და ინფრასტრუქტურა",
+    "enLabel": "Regional development and infrastructure",
+    "sortOrder": 30
+  },
+  {
+    "id": "admin_spending.defence",
+    "kaLabel": "თავდაცვა",
+    "enLabel": "Defence",
+    "sortOrder": 40
+  },
+  {
+    "id": "admin_spending.internal_affairs",
+    "kaLabel": "შინაგან საქმეთა სამინისტრო",
+    "enLabel": "Internal affairs",
+    "sortOrder": 50
+  },
+  {
+    "id": "admin_spending.environment_agriculture",
+    "kaLabel": "გარემოს დაცვა და სოფლის მეურნეობა",
+    "enLabel": "Environment and agriculture",
+    "sortOrder": 60
+  },
+  {
+    "id": "admin_spending.economy_sustainable_development",
+    "kaLabel": "ეკონომიკა და მდგრადი განვითარება",
+    "enLabel": "Economy and sustainable development",
+    "sortOrder": 70
+  },
+  {
+    "id": "admin_spending.justice",
+    "kaLabel": "იუსტიცია",
+    "enLabel": "Justice",
+    "sortOrder": 80
+  },
+  {
+    "id": "admin_spending.foreign_affairs",
+    "kaLabel": "საგარეო საქმეთა სამინისტრო",
+    "enLabel": "Foreign affairs",
+    "sortOrder": 90
+  },
+  {
+    "id": "admin_spending.finance",
+    "kaLabel": "ფინანსთა სამინისტრო",
+    "enLabel": "Finance",
+    "sortOrder": 100
+  },
+  {
+    "id": "admin_spending.culture",
+    "kaLabel": "კულტურა",
+    "enLabel": "Culture",
+    "sortOrder": 110
+  },
+  {
+    "id": "admin_spending.sport",
+    "kaLabel": "სპორტი",
+    "enLabel": "Sport",
+    "sortOrder": 120
+  },
+  {
+    "id": "admin_spending.debt_service",
+    "kaLabel": "ვალის მომსახურება",
+    "enLabel": "Debt service",
+    "sortOrder": 130
+  },
+  {
+    "id": "admin_spending.other_costs",
+    "kaLabel": "სხვა ხარჯები",
+    "enLabel": "Other costs",
+    "sortOrder": 999
+  }
+]

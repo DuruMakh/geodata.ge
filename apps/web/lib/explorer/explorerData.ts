@@ -1,10 +1,13 @@
-import type { GlossaryEntry } from "../data/glossary";
+﻿import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { SourceDocumentRow } from "../data/sources";
+import type { AdminSpendingCategory, AdminSpendingFact } from "../data/adminSpending/types";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { MAX_CHART_SERIES } from "./types";
 import type {
+  ExpenditureGrouping,
   ExplorerItem,
+  ExplorerItemLevel,
   ExplorerPoint,
   ExplorerSide,
   ExplorerTableRow,
@@ -24,9 +27,28 @@ const palette = [
 ];
 
 const SERIES_ORDER_BASE_YEAR = 2025;
+const ADMIN_SPENDING_TOTAL_ID = "admin_spending.total";
+
+type ModelFact = {
+  year: number;
+  side: ExplorerSide;
+  itemId: string;
+  parentItemId: string | null;
+  level: ExplorerItemLevel;
+  amountGel: number;
+  basis: "actual" | "planned";
+  sourceId: string;
+  kaLabel: string | null;
+  enLabel: string | null;
+  detailLabel: string | null;
+  officialInstitutionLabel: string | null;
+};
 
 export type ExplorerModelInput = {
   facts: BudgetFactImportRow[];
+  adminFacts?: AdminSpendingFact[];
+  adminCategories?: Map<string, AdminSpendingCategory>;
+  expenditureGrouping?: ExpenditureGrouping;
   glossary: Map<string, GlossaryEntry>;
   sourceDocuments: SourceDocumentRow[];
   side: ExplorerSide;
@@ -55,6 +77,10 @@ function totalIdFor(side: ExplorerSide): string {
   return side === "revenue" ? "revenue.total" : "expenditure.total";
 }
 
+function isPublicTotalFact(fact: ModelFact): boolean {
+  return fact.itemId === totalIdFor(fact.side);
+}
+
 function sideForItemId(itemId: string): ExplorerSide {
   return itemId.startsWith("revenue.") ? "revenue" : "expenditure";
 }
@@ -62,8 +88,8 @@ function sideForItemId(itemId: string): ExplorerSide {
 function labelsFor(id: string, side: ExplorerSide, glossary: Map<string, GlossaryEntry>) {
   if (id === totalIdFor(side)) {
     return side === "revenue"
-      ? { kaLabel: "შემოსავლები სულ", enLabel: "Total revenue" }
-      : { kaLabel: "ხარჯები სულ", enLabel: "Total expenditure" };
+      ? { kaLabel: "áƒ¨áƒ”áƒ›áƒáƒ¡áƒáƒ•áƒšáƒ”áƒ‘áƒ˜ áƒ¡áƒ£áƒš", enLabel: "Total revenue" }
+      : { kaLabel: "áƒ®áƒáƒ áƒ¯áƒ”áƒ‘áƒ˜ áƒ¡áƒ£áƒš", enLabel: "Total expenditure" };
   }
 
   const entry = glossary.get(id);
@@ -73,15 +99,37 @@ function labelsFor(id: string, side: ExplorerSide, glossary: Map<string, Glossar
   };
 }
 
+function adminLabelsFor(id: string, fact: ModelFact | undefined, categories: Map<string, AdminSpendingCategory>) {
+  if (id === ADMIN_SPENDING_TOTAL_ID) {
+    return labelsFor("expenditure.total", "expenditure", new Map());
+  }
+
+  const category = categories.get(id);
+  if (category) return { kaLabel: category.kaLabel, enLabel: category.enLabel };
+
+  return {
+    kaLabel: fact?.kaLabel ?? id,
+    enLabel: fact?.enLabel ?? fact?.kaLabel ?? id,
+  };
+}
+
+function sourceIdsFor(sourceIds: string[]): string[] {
+  return sourceIds.flatMap((sourceId) => sourceId.split(";").map((id) => id.trim()).filter(Boolean));
+}
+
 function sourceMetadataFor(sourceIds: string[], sources: Map<string, SourceDocumentRow>): SourceMetadata {
-  const rows = sourceIds
+  const normalizedSourceIds = sourceIdsFor(sourceIds);
+  const rows = normalizedSourceIds
     .map((sourceId) => sources.get(sourceId))
     .filter((source): source is SourceDocumentRow => Boolean(source));
+  const uniqueRows = Array.from(
+    new Map(rows.map((source) => [`${source.sourceName}\0${source.sourceUrlOrFile}\0${source.lastReviewedAt}`, source])).values(),
+  );
   const uniqueNames = Array.from(new Set(rows.map((source) => source.sourceName)));
   const uniqueFiles = Array.from(new Set(rows.map((source) => source.sourceUrlOrFile)));
 
   return {
-    sourceName: sourceIds.length === 1 ? uniqueNames[0] ?? "" : "Multiple reviewed official sources",
+    sourceName: uniqueRows.length <= 1 ? uniqueNames[0] ?? "" : "Multiple reviewed official sources",
     sourceUrlOrFile: uniqueFiles.join("; "),
     lastReviewedAt: rows.map((source) => source.lastReviewedAt).sort().at(-1) ?? "",
   };
@@ -165,12 +213,21 @@ function shareForYear(row: ExplorerTableRow, totalRow: ExplorerTableRow | null, 
   return amount / total;
 }
 
-export function getDefaultSelection(side: ExplorerSide, facts: BudgetFactImportRow[]): string[] {
+export function getDefaultSelection(
+  side: ExplorerSide,
+  facts: BudgetFactImportRow[],
+  expenditureGrouping: ExpenditureGrouping = "fields",
+  adminFacts: AdminSpendingFact[] = [],
+): string[] {
+  if (side === "expenditure" && expenditureGrouping === "ministries") {
+    return adminFacts.length > 0 ? [ADMIN_SPENDING_TOTAL_ID] : [];
+  }
+
   return chooseActivePublicFacts(facts).some((fact) => fact.side === side) ? [totalIdFor(side)] : [];
 }
 
 export function isDerivedTotalItemId(itemId: string): boolean {
-  return itemId === "expenditure.total" || itemId === "revenue.total";
+  return itemId === "expenditure.total" || itemId === "revenue.total" || itemId === ADMIN_SPENDING_TOTAL_ID;
 }
 
 export function getDefaultStackedSelection(side: ExplorerSide, facts: BudgetFactImportRow[]): string[] {
@@ -196,11 +253,75 @@ function compareBaselineAmountDesc(leftId: string, rightId: string, baselineAmou
   return leftId.localeCompare(rightId);
 }
 
+function publicFactForModel(fact: BudgetFactImportRow): ModelFact {
+  return {
+    year: fact.year,
+    side: fact.side,
+    itemId: fact.itemId,
+    parentItemId: null,
+    level: "public_field",
+    amountGel: fact.amountGel,
+    basis: fact.basis,
+    sourceId: fact.sourceId,
+    kaLabel: null,
+    enLabel: null,
+    detailLabel: null,
+    officialInstitutionLabel: null,
+  };
+}
+
+function adminFactForModel(fact: AdminSpendingFact): ModelFact {
+  const label = fact.officialLabelKa ?? fact.itemId;
+
+  return {
+    year: fact.year,
+    side: "expenditure",
+    itemId: fact.itemId,
+    parentItemId: fact.parentItemId,
+    level: fact.level,
+    amountGel: fact.amountGel,
+    basis: fact.basis,
+    sourceId: fact.sourceId,
+    kaLabel: fact.level === "major_program" ? label : null,
+    enLabel: fact.level === "major_program" ? label : null,
+    detailLabel: fact.level === "major_program" ? fact.officialCode : null,
+    officialInstitutionLabel: fact.level === "major_program" ? fact.officialInstitutionLabelKa : null,
+  };
+}
+
+function ministryItemIds(active: ModelFact[], baselineAmounts: Map<string, number>): string[] {
+  const categoryIds = Array.from(new Set(active.filter((fact) => fact.level === "admin_category").map((fact) => fact.itemId))).sort((left, right) =>
+    compareBaselineAmountDesc(left, right, baselineAmounts),
+  );
+  const programIdsByParent = new Map<string, string[]>();
+
+  for (const fact of active.filter((row) => row.level === "major_program")) {
+    const parentItemId = fact.parentItemId ?? "";
+    const programIds = programIdsByParent.get(parentItemId) ?? [];
+    if (!programIds.includes(fact.itemId)) programIds.push(fact.itemId);
+    programIdsByParent.set(parentItemId, programIds);
+  }
+
+  return [
+    ADMIN_SPENDING_TOTAL_ID,
+    ...categoryIds.flatMap((categoryId) => [
+      categoryId,
+      ...(programIdsByParent.get(categoryId) ?? []).sort((left, right) => compareBaselineAmountDesc(left, right, baselineAmounts)),
+    ]),
+  ];
+}
+
 export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
-  const active = chooseActivePublicFacts(input.facts).filter((fact) => fact.side === input.side);
+  const isMinistryGrouping = input.side === "expenditure" && input.expenditureGrouping === "ministries";
+  const active = isMinistryGrouping
+    ? (input.adminFacts ?? []).map(adminFactForModel)
+    : chooseActivePublicFacts(input.facts)
+        .filter((fact) => fact.side === input.side)
+        .map(publicFactForModel);
   const visibleFacts = active.filter((fact) => fact.year >= input.startYear && fact.year <= input.endYear);
+  const visibleDetailFacts = visibleFacts.filter((fact) => !isPublicTotalFact(fact));
   const years = Array.from(new Set(visibleFacts.map((fact) => fact.year))).sort((a, b) => a - b);
-  const totalId = totalIdFor(input.side);
+  const totalId = isMinistryGrouping ? ADMIN_SPENDING_TOTAL_ID : totalIdFor(input.side);
   const sourceDocuments = new Map(input.sourceDocuments.map((source) => [source.sourceId, source]));
   const baselineAmounts = new Map<string, number>();
 
@@ -210,25 +331,52 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     }
   }
 
-  const itemIds = [
-    totalId,
-    ...Array.from(new Set(active.map((fact) => fact.itemId))).sort((left, right) => compareBaselineAmountDesc(left, right, baselineAmounts)),
-  ];
+  const itemIds = isMinistryGrouping
+    ? ministryItemIds(active, baselineAmounts)
+    : [
+        totalId,
+        ...Array.from(new Set(active.map((fact) => fact.itemId).filter((itemId) => !isDerivedTotalItemId(itemId)))).sort((left, right) => compareBaselineAmountDesc(left, right, baselineAmounts)),
+      ];
+  const factsByItem = new Map<string, ModelFact>();
+  for (const fact of active) {
+    if (!factsByItem.has(fact.itemId)) factsByItem.set(fact.itemId, fact);
+  }
   const items = itemIds.map((id, index) => ({
     id,
     side: sideForItemId(id),
-    ...labelsFor(id, input.side, input.glossary),
+    parentItemId: id === totalId ? null : factsByItem.get(id)?.parentItemId ?? null,
+    level: id === totalId ? "total" : factsByItem.get(id)?.level ?? "public_field",
+    detailLabel: id === totalId ? null : factsByItem.get(id)?.detailLabel ?? null,
+    ...(isMinistryGrouping ? adminLabelsFor(id, factsByItem.get(id), input.adminCategories ?? new Map()) : labelsFor(id, input.side, input.glossary)),
     color: palette[index % palette.length] ?? "#22d3ee",
     sortOrder: index + 1,
   }));
   const selectedItems = items.filter((item) => input.selectedItemIds.includes(item.id));
-  const factsByItemYear = new Map<string, BudgetFactImportRow>();
+  const factsByItemYear = new Map<string, ModelFact>();
   const totalByYear = new Map<number, number>();
+  const detailFactsForTotals = visibleDetailFacts.filter((fact) => !isMinistryGrouping || fact.level === "admin_category");
+  const explicitTotalFactsByYear = new Map<number, ModelFact>();
 
-  for (const fact of visibleFacts) {
+  for (const fact of visibleFacts.filter(isPublicTotalFact)) {
+    explicitTotalFactsByYear.set(fact.year, fact);
+  }
+
+  for (const fact of visibleDetailFacts) {
     factsByItemYear.set(`${fact.itemId}:${fact.year}`, fact);
+  }
+
+  for (const fact of detailFactsForTotals) {
     totalByYear.set(fact.year, (totalByYear.get(fact.year) ?? 0) + fact.amountGel);
   }
+  for (const [year, fact] of explicitTotalFactsByYear) {
+    totalByYear.set(year, fact.amountGel);
+  }
+
+  const totalFactsForYear = (year: number): ModelFact[] => {
+    const explicitTotalFact = explicitTotalFactsByYear.get(year);
+    if (explicitTotalFact) return [explicitTotalFact];
+    return detailFactsForTotals.filter((fact) => fact.year === year);
+  };
 
   const previousAmount = (itemId: string, year: number): number | null => {
     const previousYear = active
@@ -241,17 +389,20 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
   };
 
   const totalPreviousAmount = (year: number): number | null => {
-    const previousYear = Array.from(new Set(active.filter((fact) => fact.year < year).map((fact) => fact.year))).sort((a, b) => b - a)[0];
+    const detailActive = active.filter((fact) => !isPublicTotalFact(fact) && (!isMinistryGrouping || fact.level === "admin_category"));
+    const explicitTotalActive = new Map(active.filter(isPublicTotalFact).map((fact) => [fact.year, fact]));
+    const totalActive = [...detailActive, ...explicitTotalActive.values()];
+    const previousYear = Array.from(new Set(totalActive.filter((fact) => fact.year < year).map((fact) => fact.year))).sort((a, b) => b - a)[0];
     if (previousYear === undefined) return null;
-    return active.filter((fact) => fact.year === previousYear).reduce((sum, fact) => sum + fact.amountGel, 0);
+    return explicitTotalActive.get(previousYear)?.amountGel ?? detailActive.filter((fact) => fact.year === previousYear).reduce((sum, fact) => sum + fact.amountGel, 0);
   };
 
   const pointFor = (item: ExplorerItem, year: number): ExplorerPoint | null => {
     const yearTotal = totalByYear.get(year) ?? 0;
 
     if (item.id === totalId) {
-      const sourceIds = visibleFacts.filter((fact) => fact.year === year).map((fact) => fact.sourceId);
-      if (sourceIds.length === 0) return null;
+      const yearTotalFacts = totalFactsForYear(year);
+      if (yearTotalFacts.length === 0) return null;
       const amountGel = yearTotal;
 
       return {
@@ -260,7 +411,7 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
         kaLabel: item.kaLabel,
         enLabel: item.enLabel,
         amountGel,
-        basis: visibleFacts.some((fact) => fact.year === year && fact.basis === "planned") ? "planned" : "actual",
+        basis: yearTotalFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual",
         value: valueForMeasure(amountGel, totalPreviousAmount(year), yearTotal, input.measure),
         shareOfTotal: yearTotal === 0 ? null : 1,
         percentChange: valueForMeasure(amountGel, totalPreviousAmount(year), yearTotal, "percent_change"),
@@ -287,10 +438,11 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     const valuesByYear: Record<number, number | null> = {};
     const basisByYear: Record<number, "actual" | "planned"> = {};
     const sourceByYear: Record<number, SourceMetadata> = {};
+    const officialInstitutionLabelByYear: Record<number, string | null> = {};
 
     for (const year of years) {
       if (item.id === totalId) {
-        const yearFacts = visibleFacts.filter((fact) => fact.year === year);
+        const yearFacts = totalFactsForYear(year);
         if (yearFacts.length === 0) continue;
         valuesByYear[year] = yearFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
         basisByYear[year] = yearFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual";
@@ -303,6 +455,7 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
       valuesByYear[year] = fact.amountGel;
       basisByYear[year] = fact.basis;
       sourceByYear[year] = sourceMetadataFor([fact.sourceId], sourceDocuments);
+      officialInstitutionLabelByYear[year] = fact.officialInstitutionLabel;
     }
 
     if (Object.keys(valuesByYear).length === 0) return null;
@@ -312,6 +465,10 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
 
     return {
       itemId: item.id,
+      parentItemId: item.parentItemId,
+      level: item.level,
+      detailLabel: item.detailLabel,
+      officialInstitutionLabelByYear,
       kaLabel: item.kaLabel,
       enLabel: item.enLabel,
       color: item.color,
@@ -349,6 +506,8 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     topGrowth,
     bottomGrowth,
     hasPlannedValues: selectedPoints.some((point) => point.basis === "planned"),
-    unavailableReason: input.measure === "share_of_gdp" ? "მშპ-სთან წილის საჩვენებლად საჭიროა სანდო მშპ მონაცემები." : null,
+    unavailableReason: input.measure === "share_of_gdp" ? "áƒ›áƒ¨áƒž-áƒ¡áƒ—áƒáƒœ áƒ¬áƒ˜áƒšáƒ˜áƒ¡ áƒ¡áƒáƒ©áƒ•áƒ”áƒœáƒ”áƒ‘áƒšáƒáƒ“ áƒ¡áƒáƒ­áƒ˜áƒ áƒáƒ áƒ¡áƒáƒœáƒ“áƒ áƒ›áƒ¨áƒž áƒ›áƒáƒœáƒáƒªáƒ”áƒ›áƒ”áƒ‘áƒ˜." : null,
   };
 }
+
+

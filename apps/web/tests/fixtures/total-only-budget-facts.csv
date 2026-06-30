@@ -1,0 +1,3 @@
+﻿year,side,item_id,amount_gel,basis,source_id,official_institution,official_program,official_subprogram,public_spending_field_id,mapping_confidence,mapping_notes
+2005,revenue,revenue.total,1000,actual,source.total,,,,,,Official total only
+2005,expenditure,expenditure.total,2000,actual,source.total,,,,,,Official total only

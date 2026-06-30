@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 import { validateFoundationReferences } from "../../lib/data/foundationValidation";
 import { loadGlossary } from "../../lib/data/glossary";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
@@ -72,5 +72,16 @@ describe("foundation cross-file validation", () => {
         notes: expect.stringContaining("Temporary source aggregate"),
       }),
     );
+  });
+  it("accepts reserved official total fact IDs without taxonomy rows", async () => {
+    const taxonomy = await loadTaxonomyFiles("../../data/taxonomy");
+    const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
+    const mappings = await loadSpendingMappings("../../data/mappings/spending-field-mapping.csv");
+    const facts = await loadBudgetFactRows("../../data/imports/sample-budget-facts.csv");
+
+    facts[0] = { ...facts[0], itemId: "expenditure.total", publicSpendingFieldId: null };
+    facts[1] = { ...facts[1], side: "revenue", itemId: "revenue.total", publicSpendingFieldId: null };
+
+    expect(() => validateFoundationReferences({ taxonomy, sources, mappings, facts })).not.toThrow();
   });
 });

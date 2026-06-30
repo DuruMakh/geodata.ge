@@ -1,13 +1,14 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 import { buildExplorerModel, getDefaultSelection, getDefaultStackedSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
+import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 
 const glossary = new Map<string, GlossaryEntry>([
-  ["spending.health", { id: "spending.health", kaLabel: "ჯანმრთელობა", enLabel: "Health", description: "", notes: "" }],
-  ["spending.education", { id: "spending.education", kaLabel: "განათლება", enLabel: "Education", description: "", notes: "" }],
-  ["revenue.vat", { id: "revenue.vat", kaLabel: "დღგ", enLabel: "VAT", description: "", notes: "" }],
+  ["spending.health", { id: "spending.health", kaLabel: "áƒ¯áƒáƒœáƒ›áƒ áƒ—áƒ”áƒšáƒáƒ‘áƒ", enLabel: "Health", description: "", notes: "" }],
+  ["spending.education", { id: "spending.education", kaLabel: "áƒ’áƒáƒœáƒáƒ—áƒšáƒ”áƒ‘áƒ", enLabel: "Education", description: "", notes: "" }],
+  ["revenue.vat", { id: "revenue.vat", kaLabel: "áƒ“áƒ¦áƒ’", enLabel: "VAT", description: "", notes: "" }],
   ["spending.social", { id: "spending.social", kaLabel: "Social", enLabel: "Social", description: "", notes: "" }],
   ["revenue.income_tax", { id: "revenue.income_tax", kaLabel: "Income tax", enLabel: "Income tax", description: "", notes: "" }],
   ["revenue.other_revenue", { id: "revenue.other_revenue", kaLabel: "Other revenue", enLabel: "Other revenue", description: "", notes: "" }],
@@ -36,10 +37,81 @@ const sourceDocuments: SourceDocumentRow[] = [
   },
 ];
 
+const adminCategories = new Map<string, AdminSpendingCategory>([
+  [
+    "admin_spending.health_social_affairs",
+    {
+      id: "admin_spending.health_social_affairs",
+      kaLabel: "Health ministry",
+      enLabel: "Health ministry",
+      sortOrder: 10,
+    },
+  ],
+  [
+    "admin_spending.education_science_youth",
+    {
+      id: "admin_spending.education_science_youth",
+      kaLabel: "Education ministry",
+      enLabel: "Education ministry",
+      sortOrder: 20,
+    },
+  ],
+]);
+
+const adminFacts: AdminSpendingFact[] = [
+  {
+    year: 2025,
+    itemId: "admin_spending.education_science_youth",
+    parentItemId: null,
+    level: "admin_category",
+    amountGel: 400,
+    basis: "actual",
+    sourceId: "source.two",
+    officialCode: null,
+    officialLabelKa: null,
+    officialInstitutionCode: null,
+    officialInstitutionLabelKa: null,
+    mappingConfidence: "high",
+    mappingNotes: "",
+  },
+  {
+    year: 2025,
+    itemId: "admin_spending.health_social_affairs",
+    parentItemId: null,
+    level: "admin_category",
+    amountGel: 600,
+    basis: "actual",
+    sourceId: "source.two",
+    officialCode: null,
+    officialLabelKa: null,
+    officialInstitutionCode: null,
+    officialInstitutionLabelKa: null,
+    mappingConfidence: "high",
+    mappingNotes: "",
+  },
+  {
+    year: 2025,
+    itemId: "admin_program.education.general",
+    parentItemId: "admin_spending.education_science_youth",
+    level: "major_program",
+    amountGel: 250,
+    basis: "actual",
+    sourceId: "source.two",
+    officialCode: "32 02",
+    officialLabelKa: "General education",
+    officialInstitutionCode: "32 00",
+    officialInstitutionLabelKa: "Education ministry",
+    mappingConfidence: "medium",
+    mappingNotes: "",
+  },
+];
+
 describe("main explorer data model", () => {
   it("returns side-specific default selections", () => {
     expect(getDefaultSelection("expenditure", facts)).toEqual(["expenditure.total"]);
     expect(getDefaultSelection("revenue", facts)).toEqual(["revenue.total"]);
+    expect(getDefaultSelection("expenditure", facts, "ministries", adminFacts)).toEqual(["admin_spending.total"]);
+    expect(getDefaultSelection("expenditure", facts, "ministries", [])).toEqual([]);
   });
 
   it("returns side-specific default stacked selections", () => {
@@ -50,6 +122,7 @@ describe("main explorer data model", () => {
   it("identifies derived total item IDs", () => {
     expect(isDerivedTotalItemId("expenditure.total")).toBe(true);
     expect(isDerivedTotalItemId("revenue.total")).toBe(true);
+    expect(isDerivedTotalItemId("admin_spending.total")).toBe(true);
     expect(isDerivedTotalItemId("spending.health")).toBe(false);
     expect(isDerivedTotalItemId("revenue.vat")).toBe(false);
   });
@@ -73,7 +146,7 @@ describe("main explorer data model", () => {
     ]);
     expect(model.hasPlannedValues).toBe(true);
     expect(model.tableRows.find((row) => row.itemId === "expenditure.total")?.sourceByYear[2025]).toEqual({
-      sourceName: "Multiple reviewed official sources",
+      sourceName: "Reviewed 2025 planned budget scenario",
       sourceUrlOrFile: "docs/source-2025-plan",
       lastReviewedAt: "2026-05-11",
     });
@@ -148,6 +221,53 @@ describe("main explorer data model", () => {
     ]);
   });
 
+  it("builds nested ministry and major-program rows from admin spending facts", () => {
+    const model = buildExplorerModel({
+      facts,
+      adminFacts,
+      adminCategories,
+      expenditureGrouping: "ministries",
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: [
+        "admin_spending.total",
+        "admin_spending.health_social_affairs",
+        "admin_spending.education_science_youth",
+        "admin_program.education.general",
+      ],
+      startYear: 2025,
+      endYear: 2025,
+      measure: "share_of_total",
+    });
+
+    expect(model.items.map((item) => item.id)).toEqual([
+      "admin_spending.total",
+      "admin_spending.health_social_affairs",
+      "admin_spending.education_science_youth",
+      "admin_program.education.general",
+    ]);
+    expect(model.items.find((item) => item.id === "admin_spending.total")).toEqual(
+      expect.objectContaining({ parentItemId: null, level: "total", detailLabel: null }),
+    );
+    expect(model.items.find((item) => item.id === "admin_spending.health_social_affairs")).toEqual(
+      expect.objectContaining({ parentItemId: null, level: "admin_category", detailLabel: null, enLabel: "Health ministry" }),
+    );
+    expect(model.items.find((item) => item.id === "admin_program.education.general")).toEqual(
+      expect.objectContaining({
+        parentItemId: "admin_spending.education_science_youth",
+        level: "major_program",
+        kaLabel: "General education",
+        enLabel: "General education",
+        detailLabel: "32 02",
+      }),
+    );
+    expect(model.items.some((item) => item.id.startsWith("spending."))).toBe(false);
+    expect(model.totalRow?.valuesByYear[2025]).toBe(1000);
+    expect(model.points.find((point) => point.itemId === "admin_spending.health_social_affairs")?.value).toBe(0.6);
+    expect(model.points.find((point) => point.itemId === "admin_program.education.general")?.value).toBe(0.25);
+  });
+
   it("treats the biggest share-of-total change as the largest movement in either direction", () => {
     const localFacts: BudgetFactImportRow[] = [
       { ...facts[0], itemId: "spending.health", amountGel: 900 },
@@ -211,6 +331,39 @@ describe("main explorer data model", () => {
       measure: "share_of_gdp",
     });
 
-    expect(model.unavailableReason).toBe("მშპ-სთან წილის საჩვენებლად საჭიროა სანდო მშპ მონაცემები.");
+    expect(model.unavailableReason).toBe("áƒ›áƒ¨áƒž-áƒ¡áƒ—áƒáƒœ áƒ¬áƒ˜áƒšáƒ˜áƒ¡ áƒ¡áƒáƒ©áƒ•áƒ”áƒœáƒ”áƒ‘áƒšáƒáƒ“ áƒ¡áƒáƒ­áƒ˜áƒ áƒáƒ áƒ¡áƒáƒœáƒ“áƒ áƒ›áƒ¨áƒž áƒ›áƒáƒœáƒáƒªáƒ”áƒ›áƒ”áƒ‘áƒ˜.");
+  });
+  it("uses explicit total facts for totals-only years without exposing fake categories", () => {
+    const localFacts: BudgetFactImportRow[] = [
+      { ...facts[0], year: 2004, itemId: "expenditure.total", amountGel: 1000, publicSpendingFieldId: null, sourceId: "source.one" },
+      { ...facts[0], year: 2005, itemId: "expenditure.total", amountGel: 1100, publicSpendingFieldId: null, sourceId: "source.one" },
+      { ...facts[0], year: 2006, itemId: "spending.health", amountGel: 400, publicSpendingFieldId: "spending.health", sourceId: "source.two" },
+      { ...facts[2], year: 2006, itemId: "spending.education", amountGel: 800, publicSpendingFieldId: "spending.education", sourceId: "source.two" },
+    ];
+
+    const model = buildExplorerModel({
+      facts: localFacts,
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: ["expenditure.total"],
+      startYear: 2004,
+      endYear: 2006,
+      measure: "nominal",
+    });
+
+    expect(model.years).toEqual([2004, 2005, 2006]);
+    expect(model.points.map((point) => [point.year, point.amountGel])).toEqual([
+      [2004, 1000],
+      [2005, 1100],
+      [2006, 1200],
+    ]);
+    expect(model.items.map((item) => item.id)).toEqual(["expenditure.total", "spending.education", "spending.health"]);
+    expect(model.comparisonRows.map((row) => row.itemId)).toEqual(["spending.education", "spending.health"]);
+    expect(model.totalRow?.sourceByYear[2004]).toEqual({
+      sourceName: "Reviewed 2024 execution",
+      sourceUrlOrFile: "docs/source-2024",
+      lastReviewedAt: "2026-05-10",
+    });
   });
 });

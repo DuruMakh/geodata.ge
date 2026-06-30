@@ -1,7 +1,9 @@
 import path from "node:path";
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { PDFParse } from "pdf-parse";
 import * as XLSX from "xlsx";
+import { REVENUE_YEARS } from "../coverage";
 import { parseTavi1Rows, type MatrixCell } from "./parseTavi1Rows";
 import { parseTreasuryPdfRows } from "./parseTreasuryPdfRows";
 import type { OfficialRevenueRow, RealRevenuePdfSource, RealRevenueSource } from "./types";
@@ -27,53 +29,12 @@ export const realRevenueSources: RealRevenueSource[] = [
   },
 ];
 
-export const realRevenuePdfSources: RealRevenuePdfSource[] = [
-  {
-    year: 2017,
-    sourceId: "source.mof_2017_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/Revenue/2017-jan-dec-consolidated-revenue.pdf",
-  },
-  {
-    year: 2018,
-    sourceId: "source.mof_2018_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/Revenue/2018-jan-dec-consolidated-revenue.pdf",
-  },
-  {
-    year: 2019,
-    sourceId: "source.mof_2019_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/Revenue/2019-jan-dec-consolidated-revenue.pdf",
-  },
-  {
-    year: 2020,
-    sourceId: "source.mof_2020_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/Revenue/2020-jan-dec-consolidated-revenue.pdf",
-  },
-  {
-    year: 2021,
-    sourceId: "source.mof_2021_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/Revenue/2021-jan-dec-consolidated-revenue.pdf",
-  },
-  {
-    year: 2022,
-    sourceId: "source.mof_2022_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/Revenue/2022-jan-dec-consolidated-revenue.pdf",
-  },
-  {
-    year: 2023,
-    sourceId: "source.mof_2023_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/Revenue/2023-jan-dec-consolidated-revenue.pdf",
-  },
-  {
-    year: 2024,
-    sourceId: "source.mof_2024_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/Revenue/2024-jan-dec-consolidated-revenue.pdf",
-  },
-  {
-    year: 2025,
-    sourceId: "source.mof_2025_revenue_form1_pdf",
-    pdfPath: "../../docs/Raw Data/Revenue/2025-jan-dec-consolidated-revenue.pdf",
-  },
-];
+export const realRevenuePdfSources: RealRevenuePdfSource[] = REVENUE_YEARS.map((year) => ({
+  year,
+  sourceId: `source.mof_${year}_revenue_form1_pdf`,
+  pdfPath: `../../docs/Raw Data/Revenue/${year}-jan-dec-consolidated-revenue.pdf`,
+  ...(year === 2006 ? { textPath: "../../docs/Raw Data/Revenue/text/2006-jan-dec-consolidated-revenue.txt" } : {}),
+}));
 
 function normalizeSheetName(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, " ");
@@ -93,6 +54,8 @@ function pickSheetName(workbook: XLSX.WorkBook, preferredNames: string[]): strin
 export function extractOfficialWorkbookRevenueRows(): OfficialRevenueRow[] {
   return realRevenueSources.flatMap((source) => {
     const workbookFile = path.resolve(process.cwd(), source.workbookPath);
+    if (!existsSync(workbookFile)) return [];
+
     const workbook = XLSX.readFile(workbookFile, { cellDates: false });
     const sheetName = pickSheetName(workbook, source.preferredSheetNames);
     const sheet = workbook.Sheets[sheetName];
@@ -128,12 +91,20 @@ async function extractPdfText(pdfFile: string): Promise<string> {
   }
 }
 
+async function extractRevenueSourceText(source: RealRevenuePdfSource, pdfFile: string): Promise<string> {
+  if (source.textPath) {
+    return readFile(path.resolve(process.cwd(), source.textPath), "utf8");
+  }
+
+  return extractPdfText(pdfFile);
+}
+
 export async function extractOfficialRevenueRows(): Promise<OfficialRevenueRow[]> {
   const rows: OfficialRevenueRow[] = [];
 
   for (const source of realRevenuePdfSources) {
     const pdfFile = path.resolve(process.cwd(), source.pdfPath);
-    const text = await extractPdfText(pdfFile);
+    const text = await extractRevenueSourceText(source, pdfFile);
     rows.push(
       ...parseTreasuryPdfRows({
         year: source.year,

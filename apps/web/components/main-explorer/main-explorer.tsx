@@ -2,18 +2,20 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
-import { MAX_CHART_SERIES, type ChartMode, type ExplorerSide, type MeasureMode, type ViewMode } from "../../lib/explorer/types";
+import { MAX_CHART_SERIES, type ChartMode, type ExpenditureGrouping, type ExplorerSide, type MeasureMode, type ViewMode } from "../../lib/explorer/types";
 import { SingleYearSnapshot } from "../single-year/single-year-snapshot";
 import { ThemeToggle } from "../ui/theme-toggle";
 import { ViewSwitch } from "../ui/view-switch";
 import { ChartPanel, ScreenCard, StatusSurface } from "../ui/surfaces";
 import { ChartLegend } from "./chart-legend";
+import { ExpenditureGroupingControl } from "./expenditure-grouping-control";
 import { ExplorerControls } from "./explorer-controls";
 import { ExplorerTable } from "./explorer-table";
 import { ChartPanelControls } from "./chart-panel-controls";
@@ -28,6 +30,8 @@ const ChartFrame = dynamic(() => import("./chart-frame").then((module) => module
 
 type MainExplorerProps = {
   facts: BudgetFactImportRow[];
+  adminFacts: AdminSpendingFact[];
+  adminCategories: AdminSpendingCategory[];
   glossaryEntries: GlossaryEntry[];
   sourceDocuments: SourceDocumentRow[];
   lastUpdatedAt: string;
@@ -40,7 +44,7 @@ function clampYearToCoverage(year: number, years: number[]): number {
   return Math.min(Math.max(year, minYear), maxYear);
 }
 
-export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpdatedAt }: MainExplorerProps) {
+export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntries, sourceDocuments, lastUpdatedAt }: MainExplorerProps) {
   useEffect(() => {
     document.body.dataset.appReady = "true";
 
@@ -59,25 +63,31 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
   const initialStartYear = yearsBySide.expenditure[0] ?? 2025;
   const initialEndYear = yearsBySide.expenditure.at(-1) ?? initialStartYear;
   const glossary = useMemo(() => new Map(glossaryEntries.map((entry) => [entry.id, entry])), [glossaryEntries]);
+  const adminCategoryMap = useMemo(() => new Map(adminCategories.map((category) => [category.id, category])), [adminCategories]);
   const [side, setSide] = useState<ExplorerSide>("expenditure");
   const [viewMode, setViewMode] = useState<ViewMode>("multi_year");
   const [chartMode, setChartMode] = useState<ChartMode>("line");
+  const [expenditureGrouping, setExpenditureGrouping] = useState<ExpenditureGrouping>("fields");
   const [shareModeActive, setShareModeActive] = useState(false);
   const [startYear, setStartYear] = useState(initialStartYear);
   const [endYear, setEndYear] = useState(initialEndYear);
   const [singleYear, setSingleYear] = useState(initialEndYear);
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
-  const [selections, setSelections] = useState<Record<ExplorerSide, string[]>>({
-    expenditure: getDefaultSelection("expenditure", facts),
-    revenue: getDefaultSelection("revenue", facts),
+  const [expenditureSelections, setExpenditureSelections] = useState<Record<ExpenditureGrouping, string[]>>({
+    fields: getDefaultSelection("expenditure", facts, "fields", adminFacts),
+    ministries: getDefaultSelection("expenditure", facts, "ministries", adminFacts),
   });
+  const [revenueSelection, setRevenueSelection] = useState<string[]>(getDefaultSelection("revenue", facts));
   const sideYears = yearsBySide[side];
-  const selectedIds = selections[side];
+  const selectedIds = side === "expenditure" ? expenditureSelections[expenditureGrouping] : revenueSelection;
   const measure: MeasureMode = shareModeActive ? "share_of_total" : "nominal";
   const modelStartYear = startYear;
   const modelEndYear = endYear;
   const model = buildExplorerModel({
     facts,
+    adminFacts,
+    adminCategories: adminCategoryMap,
+    expenditureGrouping,
     glossary,
     sourceDocuments,
     side,
@@ -126,29 +136,37 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
     setLimitMessage(null);
   }
 
+  function handleExpenditureGroupingChange(grouping: ExpenditureGrouping) {
+    setExpenditureGrouping(grouping);
+    setLimitMessage(null);
+  }
+
   function handleToggle(itemId: string) {
     setLimitMessage(null);
-    setSelections((current) => {
-      const currentSideSelection = current[side];
-      const alreadySelected = currentSideSelection.includes(itemId);
+    const updateSelection = (currentSelection: string[]) => {
+      const alreadySelected = currentSelection.includes(itemId);
 
       if (alreadySelected) {
-        return {
-          ...current,
-          [side]: currentSideSelection.filter((id) => id !== itemId),
-        };
+        return currentSelection.filter((id) => id !== itemId);
       }
 
-      if (chartMode !== "table" && currentSideSelection.length >= MAX_CHART_SERIES) {
+      if (chartMode !== "table" && currentSelection.length >= MAX_CHART_SERIES) {
         setLimitMessage(`\u10d2\u10e0\u10d0\u10e4\u10d8\u10d9\u10d6\u10d4 \u10db\u10d0\u10e5\u10e1\u10d8\u10db\u10e3\u10db ${MAX_CHART_SERIES} \u10e1\u10d4\u10e0\u10d8\u10d0 \u10e8\u10d4\u10d8\u10eb\u10da\u10d4\u10d1\u10d0. \u10ea\u10ee\u10e0\u10d8\u10da\u10d8\u10e1 \u10e0\u10d4\u10df\u10d8\u10db\u10e8\u10d8 \u10da\u10d8\u10db\u10d8\u10e2\u10d8 \u10d0\u10e0 \u10d0\u10e0\u10d8\u10e1.`);
-        return current;
+        return currentSelection;
       }
 
-      return {
+      return [...currentSelection, itemId];
+    };
+
+    if (side === "expenditure") {
+      setExpenditureSelections((current) => ({
         ...current,
-        [side]: [...currentSideSelection, itemId],
-      };
-    });
+        [expenditureGrouping]: updateSelection(current[expenditureGrouping]),
+      }));
+      return;
+    }
+
+    setRevenueSelection(updateSelection);
   }
 
   function downloadCsv() {
@@ -242,18 +260,17 @@ export function MainExplorer({ facts, glossaryEntries, sourceDocuments, lastUpda
             </div>
 
             {viewMode === "multi_year" ? (
-              <div className="order-2 min-w-0 max-w-full lg:order-none">
-                <SeriesSelector
-                  items={model.items}
-                  selectedIds={selectedIds}
-                  rows={selectorRows}
-                  years={model.years}
-                  chartMode={chartMode}
-                  limitMessage={limitMessage}
-                  onToggle={handleToggle}
-                  onDownloadCsv={downloadCsv}
-                />
-              </div>
+              <SeriesSelector
+                items={model.items}
+                selectedIds={selectedIds}
+                rows={selectorRows}
+                years={model.years}
+                chartMode={chartMode}
+                limitMessage={limitMessage}
+                headerControl={side === "expenditure" ? <ExpenditureGroupingControl value={expenditureGrouping} onChange={handleExpenditureGroupingChange} /> : undefined}
+                onToggle={handleToggle}
+                onDownloadCsv={downloadCsv}
+              />
             ) : null}
           </div>
         </ScreenCard>

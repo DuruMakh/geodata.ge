@@ -6,6 +6,13 @@ const internalGrantCode = "1.3.3";
 const internalOtherRevenueCode = "1.4.1.1.3";
 const internalRevenueFlowCodes = [internalGrantCode, internalOtherRevenueCode] as const;
 const receiptSourceCodes = ["31", "32", "33"] as const;
+const oldRevenueCodes = {
+  taxTotal: "010000000000",
+  otherRevenue: "020000000000",
+  assetDecrease: "030000000000",
+  grants: "040000000000",
+  increaseLiabilities: "050000000000",
+} as const;
 const sourceCodeFallbacks: Record<string, string[]> = {
   "1.3.3": ["133"],
   "1.4.1.1.3": ["14111"],
@@ -41,11 +48,26 @@ function roundedRowAmount(rows: OfficialRevenueRow[], year: number, sourceCode: 
   return Math.round(consolidatedGel(rowBySourceCode(rows, year, sourceCode)));
 }
 
+function isOldRevenueYear(rows: OfficialRevenueRow[], year: number): boolean {
+  return Boolean(rowBySourceCode(rows, year, oldRevenueCodes.taxTotal));
+}
+
 function grossOfficialRevenueTotalGelByYear(rows: OfficialRevenueRow[]): Record<number, number> {
   const totals: Record<number, number> = {};
+  const years = Array.from(new Set(rows.map((row) => row.year)));
 
-  for (const row of rows.filter((candidate) => candidate.sourceCode === "1")) {
-    totals[row.year] = Math.round(consolidatedGel(row));
+  for (const year of years) {
+    if (isOldRevenueYear(rows, year)) {
+      totals[year] = Math.round(
+        roundedRowAmount(rows, year, oldRevenueCodes.taxTotal)
+          + roundedRowAmount(rows, year, oldRevenueCodes.otherRevenue)
+          + roundedRowAmount(rows, year, oldRevenueCodes.grants),
+      );
+      continue;
+    }
+
+    const row = rowBySourceCode(rows, year, "1");
+    if (row) totals[year] = Math.round(consolidatedGel(row));
   }
 
   return totals;
@@ -81,15 +103,22 @@ export function validateRealRevenueFacts(
 ): RealRevenueValidationReport {
   const years = Array.from(new Set(expectedYears ?? officialRows.map((row) => row.year))).sort((a, b) => a - b);
   const grossOfficialTotals = grossOfficialRevenueTotalGelByYear(officialRows);
-  const internalGrantsRemoved = amountByYear(years, (year) => roundedRowAmount(officialRows, year, internalGrantCode));
-  const internalOtherRevenueRemoved = amountByYear(years, (year) => roundedRowAmount(officialRows, year, internalOtherRevenueCode));
+  const internalGrantsRemoved = amountByYear(years, (year) => isOldRevenueYear(officialRows, year) ? 0 : roundedRowAmount(officialRows, year, internalGrantCode));
+  const internalOtherRevenueRemoved = amountByYear(years, (year) => isOldRevenueYear(officialRows, year) ? 0 : roundedRowAmount(officialRows, year, internalOtherRevenueCode));
   const internalFlowTotals = amountByYear(years, (year) => internalGrantsRemoved[year] + internalOtherRevenueRemoved[year]);
   const officialRevenueTotals = amountByYear(years, (year) => (grossOfficialTotals[year] ?? 0) - internalFlowTotals[year]);
   const assetDecreaseTotals = amountByYear(
     years,
-    (year) => roundedRowAmount(officialRows, year, "31") + roundedRowAmount(officialRows, year, "32"),
+    (year) => isOldRevenueYear(officialRows, year)
+      ? roundedRowAmount(officialRows, year, oldRevenueCodes.assetDecrease)
+      : roundedRowAmount(officialRows, year, "31") + roundedRowAmount(officialRows, year, "32"),
   );
-  const liabilitiesIncreaseTotals = amountByYear(years, (year) => roundedRowAmount(officialRows, year, "33"));
+  const liabilitiesIncreaseTotals = amountByYear(
+    years,
+    (year) => isOldRevenueYear(officialRows, year)
+      ? roundedRowAmount(officialRows, year, oldRevenueCodes.increaseLiabilities)
+      : roundedRowAmount(officialRows, year, "33"),
+  );
   const finalReceiptsTotals = amountByYear(
     years,
     (year) => officialRevenueTotals[year] + assetDecreaseTotals[year] + liabilitiesIncreaseTotals[year],
@@ -117,13 +146,18 @@ export function validateRealRevenueFacts(
       }
     }
 
-    for (const sourceCode of internalRevenueFlowCodes) {
-      if (!rowBySourceCode(officialRows, year, sourceCode)) {
-        missingRequirements.push(`${year} missing internal revenue flow row: ${sourceCode}`);
+    if (!isOldRevenueYear(officialRows, year)) {
+      for (const sourceCode of internalRevenueFlowCodes) {
+        if (!rowBySourceCode(officialRows, year, sourceCode)) {
+          missingRequirements.push(`${year} missing internal revenue flow row: ${sourceCode}`);
+        }
       }
     }
 
-    for (const sourceCode of receiptSourceCodes) {
+    const requiredReceiptSourceCodes = isOldRevenueYear(officialRows, year)
+      ? [oldRevenueCodes.assetDecrease, oldRevenueCodes.increaseLiabilities]
+      : receiptSourceCodes;
+    for (const sourceCode of requiredReceiptSourceCodes) {
       if (!rowBySourceCode(officialRows, year, sourceCode)) {
         missingRequirements.push(`${year} missing receipt source row: ${sourceCode}`);
       }
@@ -142,7 +176,7 @@ export function validateRealRevenueFacts(
   }
 
   return {
-    importLabel: "real-revenue-2017-2025",
+    importLabel: "real-revenue-2005-2025",
     years,
     sourceRows: officialRows.length,
     generatedFactRows: facts.length,

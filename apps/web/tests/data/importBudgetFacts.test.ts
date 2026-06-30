@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 
 describe("budget fact import validation", () => {
@@ -43,5 +43,13 @@ describe("budget fact import validation", () => {
     await expect(loadBudgetFactRows("tests/fixtures/suspicious-mapping-notes-facts.csv")).rejects.toThrow(
       "Suspicious source glyphs in mapping_notes for 2025 revenue.vat",
     );
+  });
+  it("loads explicit official total rows without forcing fake category mappings", async () => {
+    const rows = await loadBudgetFactRows("tests/fixtures/total-only-budget-facts.csv");
+
+    expect(rows).toEqual([
+      expect.objectContaining({ side: "revenue", itemId: "revenue.total", publicSpendingFieldId: null }),
+      expect.objectContaining({ side: "expenditure", itemId: "expenditure.total", publicSpendingFieldId: null }),
+    ]);
   });
 });

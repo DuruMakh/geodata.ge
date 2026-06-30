@@ -9,6 +9,7 @@ export type RealRevenuePdfSource = {
   year: number;
   sourceId: string;
   pdfPath: string;
+  textPath?: string;
 };
 
 export type RevenueMatrixSection =

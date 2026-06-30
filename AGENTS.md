@@ -114,6 +114,8 @@ Strong success criteria let you loop independently. Weak criteria like "make it 
 
 GeoData.ge is currently in v1 planning for a Georgian-first Georgia Budget Explorer.
 
+Revenue coverage starts in 2005 because the project does not currently have a reviewed 2004 revenue source. Expenditure coverage starts in 2004.
+
 V1 is not a broad public-data catalog. Do not re-expand scope unless the user explicitly approves it.
 
 Current stack:
@@ -130,7 +132,7 @@ The workspace is a git repository on `main` with a GitHub `origin` remote. Check
 
 V1 includes:
 
-- Annual national budget data for 2017-2025.
+- Annual national budget data for 2004-2025 for expenditure and 2005-2025 for revenue.
 - Revenue overview with top-level tax categories shown directly.
 - Expenditure overview using public-friendly spending fields.
 - Multi-year explorer.
@@ -180,7 +182,7 @@ Default first view:
 - Multi-year.
 - Nominal GEL.
 - Line chart.
-- 2017-2025.
+- 2004-2025 for expenditure; 2005-2025 for revenue.
 - Total expenditure selected.
 
 Single-year mode has no v1 drilldown and should stay top-level. Multi-year mode can allow selecting deeper official rows as chart/table series.

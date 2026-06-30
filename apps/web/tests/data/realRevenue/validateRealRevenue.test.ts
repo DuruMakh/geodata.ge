@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { REVENUE_YEARS } from "../../../lib/data/coverage";
 import type { RealRevenueFactCsvRow } from "../../../lib/data/realRevenue/generateFacts";
 import type { OfficialRevenueRow } from "../../../lib/data/realRevenue/types";
 import { validateRealRevenueFacts } from "../../../lib/data/realRevenue/validateRealRevenue";
@@ -143,6 +144,43 @@ const validFacts = [
 ];
 
 describe("validateRealRevenueFacts", () => {
+  it("reports revenue coverage for 2005-2025 without 2004", () => {
+    const rows: OfficialRevenueRow[] = REVENUE_YEARS.map((year) => ({
+      year,
+      sourceId: `source.mof_${year}_revenue_form1_pdf`,
+      workbookPath: `docs/Raw Data/Revenue/${year}-jan-dec-consolidated-revenue.pdf`,
+      sheetName: "form #1",
+      rowNumber: 1,
+      sourceCode: "1",
+      labelKa: "revenue total",
+      approvedPlanThousandGel: null,
+      revisedPlanThousandGel: null,
+      actualThousandGel: 1000,
+      executionPercent: null,
+      section: "revenues",
+      consolidatedActualGel: 1000000,
+    }));
+    const facts: RealRevenueFactCsvRow[] = REVENUE_YEARS.map((year) => ({
+      year,
+      side: "revenue",
+      item_id: "revenue.other_revenue",
+      amount_gel: "1000000",
+      basis: "actual",
+      source_id: `source.mof_${year}_revenue_form1_pdf`,
+      official_institution: "",
+      official_program: "",
+      official_subprogram: "",
+      public_spending_field_id: "",
+      mapping_confidence: "",
+      mapping_notes: "test row",
+    }));
+
+    const report = validateRealRevenueFacts(rows, facts, REVENUE_YEARS);
+
+    expect(report.importLabel).toBe("real-revenue-2005-2025");
+    expect(report.years).toEqual(REVENUE_YEARS);
+    expect(report.years).not.toContain(2004);
+  });
   it("passes when detailed generated facts reconcile to final receipts without opening balance rows", () => {
     const report = validateRealRevenueFacts(officialRows, validFacts);
 
@@ -152,6 +190,36 @@ describe("validateRealRevenueFacts", () => {
     expect(report.liabilitiesIncreaseGelByYear).toEqual({ 2025: 200000 });
     expect(report.finalReceiptsTotalGelByYear).toEqual({ 2025: 1500000 });
     expect(report.generatedReceiptsTotalGelByYear).toEqual({ 2025: 1500000 });
+    expect(report.warnings).toEqual([]);
+  });
+
+
+  it("passes old 2006 revenue codes without modern internal transfer rows", () => {
+    const oldRows: OfficialRevenueRow[] = [
+      { ...officialRows[0], year: 2006, sourceCode: "010000000000", consolidatedActualGel: 3151976058 },
+      { ...officialRows[0], year: 2006, sourceCode: "020000000000", consolidatedActualGel: 519108357 },
+      { ...officialRows[0], year: 2006, sourceCode: "030000000000", section: "non_financial_assets", consolidatedActualGel: 564458259 },
+      { ...officialRows[0], year: 2006, sourceCode: "040000000000", consolidatedActualGel: 131872214 },
+      { ...officialRows[0], year: 2006, sourceCode: "050000000000", section: "liabilities", consolidatedActualGel: 170501437 },
+    ];
+    const oldFacts: RealRevenueFactCsvRow[] = [
+      fact("revenue.vat", "1332651137"),
+      fact("revenue.income_tax", "385945388"),
+      fact("revenue.profit_tax", "341070394"),
+      fact("revenue.excise_tax", "335622390"),
+      fact("revenue.import_tax", "132366209"),
+      fact("revenue.property_tax", "85820217"),
+      fact("revenue.other_taxes", "538500324"),
+      fact("revenue.grants", "131872214"),
+      fact("revenue.other_revenue", "519108357"),
+      fact("revenue.asset_decrease", "564458259"),
+      fact("revenue.increase_liabilities", "170501437"),
+    ].map((candidate) => ({ ...candidate, year: 2006, source_id: "source.mof_2006_revenue_form1_pdf" }));
+
+    const report = validateRealRevenueFacts(oldRows, oldFacts, [2006]);
+
+    expect(report.reconciliationStatusByYear[2006]).toBe("passed");
+    expect(report.generatedReceiptsTotalGelByYear[2006]).toBe(4537916326);
     expect(report.warnings).toEqual([]);
   });
 

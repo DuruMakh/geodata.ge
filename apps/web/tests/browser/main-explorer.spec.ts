@@ -145,6 +145,7 @@ test("multi-year production controls expose only line table and share toggle", a
   await expect(chartPanel.getByTestId("year-range-strip")).toBeVisible();
   await expect(page.getByTestId("period-kpi-cards")).toBeVisible();
   await expect(page.getByTestId("period-movers")).toBeVisible();
+  await expect(page.getByTestId("period-movers").getByText("Bottom growth 01", { exact: true })).toBeVisible();
   await expect(page.getByTestId("period-start-end")).toBeVisible();
   await expect(page.getByTestId("formula-analysis")).toBeVisible();
   const formulaRowCount = await page.getByTestId("formula-analysis").evaluate((element) => element.children.length);
@@ -186,6 +187,41 @@ test("multi-year production controls expose only line table and share toggle", a
   await expect(page.getByTestId("chart-frame")).toBeVisible();
   await chartPanel.getByTestId("measure-share-toggle").click();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "share_of_total");
+
+  expect(consoleProblems).toEqual([]);
+});
+
+test("expenditure multi-year grouping switches to nested ministry programs", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+
+  await page.goto("http://localhost:3100");
+  await expectAppReady(page);
+
+  const groupingControl = page.getByTestId("expenditure-grouping-control");
+  const seriesSelector = page.getByTestId("series-selector");
+
+  await expect(groupingControl).toBeVisible();
+  await expect(page.getByTestId("grouping-fields")).toHaveAttribute("aria-pressed", "true");
+  await expect(seriesSelector).toContainText("expenditure.total");
+
+  await page.getByTestId("grouping-ministries").click();
+
+  await expect(page.getByTestId("grouping-ministries")).toHaveAttribute("aria-pressed", "true");
+  await expect(seriesSelector).toContainText("admin_spending.total");
+  await expect(seriesSelector.locator('[data-level="major_program"]').first()).toBeVisible();
+  await expect(seriesSelector.locator('[data-parent-id^="admin_spending."]').first()).toBeVisible();
+
+  const firstProgram = seriesSelector.locator('[data-level="major_program"]').first();
+  const parentId = await firstProgram.getAttribute("data-parent-id");
+  const officialCode = (await firstProgram.locator("span").nth(3).textContent())?.trim();
+  if (!parentId || !officialCode) throw new Error("Expected the first program to expose parent and code metadata");
+
+  await page.getByTestId("series-search").fill(officialCode);
+  await expect(seriesSelector.locator(`[data-parent-id="${parentId}"]`).first()).toBeVisible();
+  await expect(seriesSelector.locator(`[data-level="admin_category"]`).filter({ hasText: parentId })).toHaveCount(1);
+
+  await page.getByTestId("side-revenue").click();
+  await expect(page.getByTestId("expenditure-grouping-control")).toHaveCount(0);
 
   expect(consoleProblems).toEqual([]);
 });
@@ -247,7 +283,9 @@ test("CSV download uses the active filtered table data", async ({ page }) => {
   const csv = await readFile(path, "utf8");
 
   expect(download.suggestedFilename()).toContain("geodata-budget-expenditure-");
-  expect(csv.split("\n")[0]).toBe("year,category_id,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at");
+  expect(csv.split("\n")[0]).toBe(
+    "year,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at",
+  );
   expect(csv).toContain("expenditure.total");
   expect(csv).toContain("actual");
 });

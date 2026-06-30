@@ -142,8 +142,96 @@ function generateFactsFromMappings(
   });
 }
 
+
+const oldRevenueTaxTotalCode = "010000000000";
+const oldRevenuePublicCodes = {
+  incomeTax: "010100000000",
+  profitTax: "010200000000",
+  vat: "010300000000",
+  exciseTax: "010400000000",
+  importTax: "010500000000",
+  propertyTax: ["010600000000", "013000000000"],
+  grants: "040000000000",
+  otherRevenue: "020000000000",
+  assetDecrease: "030000000000",
+  increaseLiabilities: "050000000000",
+} as const;
+
+const oldRevenueSortOrder = {
+  "revenue.vat": 10,
+  "revenue.income_tax": 20,
+  "revenue.profit_tax": 30,
+  "revenue.excise_tax": 40,
+  "revenue.import_tax": 50,
+  "revenue.property_tax": 60,
+  "revenue.other_taxes": 70,
+  "revenue.grants": 80,
+  "revenue.other_revenue": 90,
+  "revenue.asset_decrease": 100,
+  "revenue.increase_liabilities": 110,
+} as const;
+
+function isOldRevenueRow(row: OfficialRevenueRow): boolean {
+  return /^\d{12}$/.test(row.sourceCode ?? "");
+}
+
+function oldTopLevelTaxRows(rows: OfficialRevenueRow[]): OfficialRevenueRow[] {
+  return rows.filter((row) => /^01\d{2}0{8}$/.test(row.sourceCode ?? "") && row.sourceCode !== oldRevenueTaxTotalCode);
+}
+
+function oldFactFromRows(rows: OfficialRevenueRow[], itemId: keyof typeof oldRevenueSortOrder): RealRevenueFactCsvRow {
+  const amountGel = rows.reduce((sum, row) => sum + consolidatedGel(row), 0);
+  const sourceIds = Array.from(new Set(rows.map((row) => row.sourceId)));
+  const sourceCodes = rows.map((row) => row.sourceCode).filter(Boolean).join(" + ");
+
+  return {
+    year: rows[0]?.year ?? 0,
+    side: "revenue",
+    item_id: itemId,
+    amount_gel: String(Math.round(amountGel)),
+    basis: "actual",
+    source_id: sourceIds.join("; "),
+    official_institution: "",
+    official_program: "",
+    official_subprogram: "",
+    public_spending_field_id: "",
+    mapping_confidence: "",
+    mapping_notes: `Source rows ${sourceCodes}: old 12-digit revenue classification`,
+  };
+}
+
+function generateOldCodeRevenueFacts(yearRows: OfficialRevenueRow[]): RealRevenueFactCsvRow[] {
+  const propertyTaxRows = oldRevenuePublicCodes.propertyTax.map((code) => requiredRow(yearRows, code, yearRows[0]?.year ?? 0));
+  const knownTaxCodes = new Set<string>([
+    oldRevenuePublicCodes.incomeTax,
+    oldRevenuePublicCodes.profitTax,
+    oldRevenuePublicCodes.vat,
+    oldRevenuePublicCodes.exciseTax,
+    oldRevenuePublicCodes.importTax,
+    ...oldRevenuePublicCodes.propertyTax,
+  ]);
+  const otherTaxRows = oldTopLevelTaxRows(yearRows).filter((row) => !knownTaxCodes.has(row.sourceCode ?? ""));
+
+  return [
+    oldFactFromRows([requiredRow(yearRows, oldRevenuePublicCodes.vat, yearRows[0]?.year ?? 0)], "revenue.vat"),
+    oldFactFromRows([requiredRow(yearRows, oldRevenuePublicCodes.incomeTax, yearRows[0]?.year ?? 0)], "revenue.income_tax"),
+    oldFactFromRows([requiredRow(yearRows, oldRevenuePublicCodes.profitTax, yearRows[0]?.year ?? 0)], "revenue.profit_tax"),
+    oldFactFromRows([requiredRow(yearRows, oldRevenuePublicCodes.exciseTax, yearRows[0]?.year ?? 0)], "revenue.excise_tax"),
+    oldFactFromRows([requiredRow(yearRows, oldRevenuePublicCodes.importTax, yearRows[0]?.year ?? 0)], "revenue.import_tax"),
+    oldFactFromRows(propertyTaxRows, "revenue.property_tax"),
+    oldFactFromRows(otherTaxRows, "revenue.other_taxes"),
+    oldFactFromRows([requiredRow(yearRows, oldRevenuePublicCodes.grants, yearRows[0]?.year ?? 0)], "revenue.grants"),
+    oldFactFromRows([requiredRow(yearRows, oldRevenuePublicCodes.otherRevenue, yearRows[0]?.year ?? 0)], "revenue.other_revenue"),
+    oldFactFromRows([requiredRow(yearRows, oldRevenuePublicCodes.assetDecrease, yearRows[0]?.year ?? 0)], "revenue.asset_decrease"),
+    oldFactFromRows([requiredRow(yearRows, oldRevenuePublicCodes.increaseLiabilities, yearRows[0]?.year ?? 0)], "revenue.increase_liabilities"),
+  ];
+}
+
 export function generateRevenueFacts(officialRows: OfficialRevenueRow[]): RealRevenueFactCsvRow[] {
-  const facts = generateFactsFromMappings(officialRows, publicRevenueMappings, (row, yearRows) => {
+  const oldCodeYears = new Set(officialRows.filter(isOldRevenueRow).map((row) => row.year));
+  const oldCodeFacts = Array.from(oldCodeYears).flatMap((year) => generateOldCodeRevenueFacts(officialRows.filter((row) => row.year === year)));
+  const modernRows = officialRows.filter((row) => !oldCodeYears.has(row.year));
+  const facts = generateFactsFromMappings(modernRows, publicRevenueMappings, (row, yearRows) => {
     if (row.sourceCode === "1.3" || row.sourceCode === "13") {
       return consolidatedGel(row) - consolidatedGel(requiredRow(yearRows, "1.3.3", row.year));
     }
@@ -181,7 +269,7 @@ export function generateRevenueFacts(officialRows: OfficialRevenueRow[]): RealRe
     facts.push(factFromRow(increaseLiabilities, "revenue.increase_liabilities", consolidatedGel(increaseLiabilities)));
   }
 
-  return facts.sort((a, b) => {
+  return [...facts, ...oldCodeFacts].sort((a, b) => {
     if (a.year !== b.year) return a.year - b.year;
     return sortOrderForItem(a.item_id) - sortOrderForItem(b.item_id);
   });
@@ -217,5 +305,6 @@ function factFromRow(row: OfficialRevenueRow, itemId: string, amountGel: number)
 function sortOrderForItem(itemId: string): number {
   return publicRevenueMappings.find((mapping) => mapping.itemId === itemId)?.sortOrder
     ?? receiptSortOrder[itemId as keyof typeof receiptSortOrder]
+    ?? oldRevenueSortOrder[itemId as keyof typeof oldRevenueSortOrder]
     ?? 999;
 }

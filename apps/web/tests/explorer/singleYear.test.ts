@@ -1,14 +1,14 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
 const glossary = new Map<string, GlossaryEntry>([
-  ["spending.health", { id: "spending.health", kaLabel: "ჯანმრთელობა", enLabel: "Health", description: "", notes: "" }],
-  ["spending.education", { id: "spending.education", kaLabel: "განათლება", enLabel: "Education", description: "", notes: "" }],
-  ["spending.defense", { id: "spending.defense", kaLabel: "თავდაცვა", enLabel: "Defense", description: "", notes: "" }],
-  ["revenue.vat", { id: "revenue.vat", kaLabel: "დღგ", enLabel: "VAT", description: "", notes: "" }],
+  ["spending.health", { id: "spending.health", kaLabel: "áƒ¯áƒáƒœáƒ›áƒ áƒ—áƒ”áƒšáƒáƒ‘áƒ", enLabel: "Health", description: "", notes: "" }],
+  ["spending.education", { id: "spending.education", kaLabel: "áƒ’áƒáƒœáƒáƒ—áƒšáƒ”áƒ‘áƒ", enLabel: "Education", description: "", notes: "" }],
+  ["spending.defense", { id: "spending.defense", kaLabel: "áƒ—áƒáƒ•áƒ“áƒáƒªáƒ•áƒ", enLabel: "Defense", description: "", notes: "" }],
+  ["revenue.vat", { id: "revenue.vat", kaLabel: "áƒ“áƒ¦áƒ’", enLabel: "VAT", description: "", notes: "" }],
 ]);
 
 const sourceDocuments: SourceDocumentRow[] = [
@@ -198,6 +198,26 @@ describe("single-year snapshot model", () => {
 
     expect(model.items).toEqual([]);
     expect(model.source).toBeNull();
-    expect(model.emptyReason).toBe("ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული.");
+    expect(model.emptyReason).toBe("áƒáƒ› áƒ¬áƒšáƒ˜áƒ¡áƒ—áƒ•áƒ˜áƒ¡ áƒ¨áƒ”áƒ›áƒáƒ¡áƒáƒ•áƒšáƒ”áƒ‘áƒ˜áƒ¡ áƒ›áƒáƒœáƒáƒªáƒ”áƒ›áƒ”áƒ‘áƒ˜ áƒ¯áƒ”áƒ  áƒáƒ  áƒáƒ áƒ˜áƒ¡ áƒ©áƒáƒ¢áƒ•áƒ˜áƒ áƒ—áƒ£áƒšáƒ˜.");
+  });
+  it("shows source-backed totals-only years without category breakdowns", () => {
+    const model = buildSingleYearSnapshotModel({
+      facts: [fact({ year: 2005, side: "expenditure", itemId: "expenditure.total", amountGel: 2000, publicSpendingFieldId: null, mappingConfidence: null })],
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      year: 2005,
+    });
+
+    expect(model.totalGel).toBe(2000);
+    expect(model.source).toEqual({
+      sourceName: "Reviewed execution report",
+      sourceUrlOrFile: "docs/execution",
+      lastReviewedAt: "2026-05-10",
+    });
+    expect(model.items).toEqual([]);
+    expect(model.rankingRows).toEqual([]);
+    expect(model.every100).toEqual([]);
+    expect(model.radarItems).toEqual([]);
   });
 });

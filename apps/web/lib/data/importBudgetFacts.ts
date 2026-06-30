@@ -1,4 +1,4 @@
-import Decimal from "decimal.js";
+﻿import Decimal from "decimal.js";
 import { z } from "zod";
 import { readCsvRecords } from "./csv";
 import { stableIdSchema } from "./validation";
@@ -7,6 +7,7 @@ const basisSchema = z.enum(["actual", "planned"]);
 const sideSchema = z.enum(["revenue", "expenditure"]);
 const confidenceSchema = z.enum(["high", "medium", "low", "unclassified"]).or(z.literal(""));
 const suspiciousSourceGlyphs = /[\u02b0-\u02ff]/;
+const expenditureTotalItemId = "expenditure.total";
 
 const importRowSchema = z.object({
   year: z.coerce.number().int().min(2000).max(2100),
@@ -55,7 +56,7 @@ export async function loadBudgetFactRows(relativePath: string): Promise<BudgetFa
     const row = importRowSchema.parse(record);
     const publicSpendingFieldId = row.public_spending_field_id.trim() || null;
 
-    if (row.side === "expenditure" && !publicSpendingFieldId) {
+    if (row.side === "expenditure" && row.item_id !== expenditureTotalItemId && !publicSpendingFieldId) {
       throw new Error(`Expenditure row ${row.item_id} must have a public_spending_field_id`);
     }
 
@@ -63,7 +64,7 @@ export async function loadBudgetFactRows(relativePath: string): Promise<BudgetFa
       throw new Error(`Revenue row must use revenue.* item_id: ${row.item_id}`);
     }
 
-    if (row.side === "expenditure" && !row.item_id.startsWith("spending.")) {
+    if (row.side === "expenditure" && row.item_id !== expenditureTotalItemId && !row.item_id.startsWith("spending.")) {
       throw new Error(`Expenditure row must use spending.* item_id: ${row.item_id}`);
     }
 
@@ -87,3 +88,5 @@ export async function loadBudgetFactRows(relativePath: string): Promise<BudgetFa
     };
   });
 }
+
+
