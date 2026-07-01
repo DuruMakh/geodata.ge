@@ -40,6 +40,7 @@ const sourceCodeFallbacks: Record<string, string[]> = {
   "1.1.5.1": ["1151"],
   "1.1.3": ["113"],
   "1.1.6": ["116"],
+  "1.1": ["11"],
   "1.3": ["13"],
   "1.3.3": ["133"],
   "1.4": ["14"],
@@ -74,6 +75,8 @@ const sourceCodeDisplayLabels: Record<string, string> = {
   "33": "ვალდებულებების ზრდა",
 };
 
+const suspiciousSourceGlyphs = /[\u02b0-\u02ff]/;
+
 const legacyAggregateMappings = [
   { sourceCode: "1.1", labelKa: "გადასახადები", itemId: "revenue.taxes_total", sortOrder: 5 },
   { sourceCode: "1.3", labelKa: "გრანტები", itemId: "revenue.grants", sortOrder: 80 },
@@ -97,8 +100,9 @@ function rowForMapping(
 function sourceNote(row: OfficialRevenueRow): string {
   const sourceCode = row.sourceCode ?? "";
   const label = sourceCodeDisplayLabels[sourceCode] ?? row.labelKa;
+  const safeLabel = suspiciousSourceGlyphs.test(label) ? `official revenue row ${sourceCode}` : label;
 
-  return `Source row ${sourceCode}: ${label}`.replace(/\s+:/, ":");
+  return `Source row ${sourceCode}: ${safeLabel}`.replace(/\s+:/, ":");
 }
 
 function generateFactsFromMappings(
@@ -291,6 +295,16 @@ export function generateRevenueFacts(officialRows: OfficialRevenueRow[]): RealRe
 
     if (row.sourceCode === "1.4" || row.sourceCode === "14") {
       return consolidatedGel(row) - consolidatedGel(requiredRow(yearRows, "1.4.1.1.3", row.year));
+    }
+
+    if (row.sourceCode === "116" && rowForMapping(yearRows, { sourceCode: "1.1" })) {
+      const knownTaxCodes = ["11111", "11121", "11411", "1142", "1151", "113"];
+      const knownTaxesGel = knownTaxCodes.reduce(
+        (sum, sourceCode) => sum + consolidatedGel(requiredRow(yearRows, sourceCode, row.year)),
+        0,
+      );
+
+      return consolidatedGel(requiredRow(yearRows, "1.1", row.year)) - knownTaxesGel;
     }
 
     return consolidatedGel(row);

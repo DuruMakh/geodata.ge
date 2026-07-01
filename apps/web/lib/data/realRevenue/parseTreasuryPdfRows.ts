@@ -29,10 +29,34 @@ function parseAmountGel(value: string): number {
   return Number(value.replace(/,/g, "").replace(/\s/g, ""));
 }
 
+function actualColumnsFromFirstThreeAmounts(amounts: RegExpMatchArray[]): {
+  stateBudgetActualGel: number;
+  territorialBudgetActualGel: number;
+  consolidatedActualGel: number;
+} {
+  const first = parseAmountGel(amounts[0]?.[0] ?? "0");
+  const second = parseAmountGel(amounts[1]?.[0] ?? "0");
+  const third = parseAmountGel(amounts[2]?.[0] ?? "0");
+
+  if (second !== 0 && Math.abs(first - second - third) <= 1) {
+    return {
+      stateBudgetActualGel: second,
+      territorialBudgetActualGel: third,
+      consolidatedActualGel: first,
+    };
+  }
+
+  return {
+    stateBudgetActualGel: first,
+    territorialBudgetActualGel: second,
+    consolidatedActualGel: third,
+  };
+}
+
 function isLikelyBudgetCode(code: string): boolean {
   if (code.includes(".")) return /^\d{1,2}(?:\.\d+)+$/.test(code);
   if (["31", "32", "33", "41"].includes(code)) return true;
-  if (/^[1-5]\d{1,5}$/.test(code)) return true;
+  if (/^[1-5]\d{1,7}$/.test(code)) return true;
   return ["0", "1", "2", "3", "4", "5"].includes(code);
 }
 
@@ -139,9 +163,7 @@ export function parseTreasuryPdfRows(input: ParseTreasuryPdfInput): OfficialReve
     const amounts = Array.from(segment.matchAll(amountPattern));
     if (amounts.length < 3) continue;
 
-    const stateBudgetActualGel = parseAmountGel(amounts.at(-3)?.[0] ?? "0");
-    const territorialBudgetActualGel = parseAmountGel(amounts.at(-2)?.[0] ?? "0");
-    const consolidatedActualGel = parseAmountGel(amounts.at(-1)?.[0] ?? "0");
+    const { stateBudgetActualGel, territorialBudgetActualGel, consolidatedActualGel } = actualColumnsFromFirstThreeAmounts(amounts);
     const firstAmount = amounts[0];
     const labelKa = normalizeText(segment.slice(0, firstAmount.index).replace(/\s-\s*$/, ""));
     if (!labelKa) continue;

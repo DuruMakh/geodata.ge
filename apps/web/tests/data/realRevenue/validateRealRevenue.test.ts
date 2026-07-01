@@ -219,7 +219,7 @@ describe("validateRealRevenueFacts", () => {
     const report = validateRealRevenueFacts(oldRows, oldFacts, [2006]);
 
     expect(report.reconciliationStatusByYear[2006]).toBe("passed");
-    expect(report.generatedReceiptsTotalGelByYear[2006]).toBe(4537916326);
+    expect(report.generatedReceiptsTotalGelByYear?.[2006]).toBe(4537916326);
     expect(report.warnings).toEqual([]);
   });
 
