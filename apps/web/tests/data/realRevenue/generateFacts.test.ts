@@ -139,6 +139,35 @@ describe("generateRevenueFacts", () => {
   });
 
 
+  it("uses the tax total residual for compact numeric other taxes", () => {
+    const compactRows = [
+      row("1", "revenues", 1000, 1300000),
+      row("11", "taxes", 800, 1000000),
+      row("11411", "VAT", 300, 400000),
+      row("11111", "income tax", 200, 250000),
+      row("11121", "profit tax", 100, 100000),
+      row("1142", "excise", 90, 110000),
+      row("1151", "import tax", 40, 40000),
+      row("113", "property tax", 20, 50000),
+      row("116", "other taxes row below residual", 5, 5000),
+      row("13", "grants", 50, 200000),
+      row("133", "internal grants", 10, 75000),
+      row("14", "other revenue", 150, 100000),
+      row("14111", "internal other revenue", 5, 25000),
+      row("31", "non-financial asset decrease", 60, 60000, "non_financial_assets"),
+      row("32", "financial asset decrease", 40, 40000, "financial_assets"),
+      row("33", "increase in liabilities", 200, 200000, "liabilities"),
+    ];
+
+    const facts = generateRevenueFacts(compactRows);
+
+    expect(facts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ item_id: "revenue.other_taxes", amount_gel: "50000" }),
+      ]),
+    );
+    expect(facts.reduce((sum, fact) => sum + Number(fact.amount_gel), 0)).toBe(1500000);
+  });
   it("maps 2006 old 12-digit revenue codes into public revenue categories", () => {
     const rows2006 = [
       row("010000000000", "???????????? ???????????", 3151976.05837, 3151976058.37),
@@ -188,6 +217,40 @@ describe("generateRevenueFacts", () => {
     expect(facts.reduce((sum, fact) => sum + Number(fact.amount_gel), 0)).toBe(4537916326);
   });
 
+  it("maps 2007 old 8-digit revenue codes into public revenue categories", () => {
+    const rows2007 = [
+      row("01000000", "tax revenue", 4391099.39402, 4391099394.02),
+      row("01010000", "income tax", 526747.6738, 526747673.8),
+      row("01020000", "profit tax", 554797.06223, 554797062.23),
+      row("01030000", "VAT", 1973665.8296, 1973665829.6),
+      row("01040000", "excise", 428637.04012, 428637040.12),
+      row("01050000", "import tax", 51965.57468, 51965574.68),
+      row("01060000", "social tax", 722049.51919, 722049519.19),
+      row("01070000", "property tax", 107886.0687, 107886068.7),
+      row("01900000", "other unclassified tax", 25350.6257, 25350625.7),
+      row("02000000", "other revenue", 880695.22191, 880695221.91),
+      row("03000000", "capital operations", 643786.98339, 643786983.39, "non_financial_assets"),
+      row("04000000", "grants", 152717.59086, 152717590.86),
+      row("05000000", "borrowing", 288121.97988, 288121979.88, "liabilities"),
+    ].map((candidate) => ({ ...candidate, year: 2007, sourceId: "source.mof_2007_revenue_form1_pdf" }));
+
+    const facts = generateRevenueFacts(rows2007);
+
+    expect(facts).toEqual([
+      expect.objectContaining({ item_id: "revenue.vat", amount_gel: "1973665830" }),
+      expect.objectContaining({ item_id: "revenue.income_tax", amount_gel: "526747674" }),
+      expect.objectContaining({ item_id: "revenue.profit_tax", amount_gel: "554797062" }),
+      expect.objectContaining({ item_id: "revenue.excise_tax", amount_gel: "428637040" }),
+      expect.objectContaining({ item_id: "revenue.import_tax", amount_gel: "51965575" }),
+      expect.objectContaining({ item_id: "revenue.property_tax", amount_gel: "107886069" }),
+      expect.objectContaining({ item_id: "revenue.other_taxes", amount_gel: "747400145" }),
+      expect.objectContaining({ item_id: "revenue.grants", amount_gel: "152717591" }),
+      expect.objectContaining({ item_id: "revenue.other_revenue", amount_gel: "880695222" }),
+      expect.objectContaining({ item_id: "revenue.asset_decrease", amount_gel: "643786983" }),
+      expect.objectContaining({ item_id: "revenue.increase_liabilities", amount_gel: "288121980" }),
+    ]);
+    expect(facts.reduce((sum, fact) => sum + Number(fact.amount_gel), 0)).toBe(6356421171);
+  });
   it("throws when a required detailed revenue source row is missing", () => {
     expect(() => generateRevenueFacts(rows.filter((candidate) => candidate.sourceCode !== "1.3"))).toThrow(
       "Missing required revenue row for 2025: 1.3",

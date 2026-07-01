@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 import { parseTreasuryPdfRows } from "../../../lib/data/realRevenue/parseTreasuryPdfRows";
 
 describe("parseTreasuryPdfRows", () => {
@@ -135,6 +135,52 @@ describe("parseTreasuryPdfRows", () => {
     );
   });
 
+  it("parses compact numeric rows without absorbing child rows and detects amount column order", () => {
+    const rows = parseTreasuryPdfRows({
+      year: 2008,
+      sourceId: "source.mof_2008_revenue_form1_pdf",
+      pdfPath: "docs/Raw Data/Revenue/2008-jan-dec-consolidated-revenue.pdf",
+      text: `
+        11111 income tax 1,296,344,116.94 1,218,300,448.30 78,043,668.64
+        1111101 employer withheld income tax 1,105,673,927.41 1,032,376,588.59 73,297,338.82
+        11121 profit tax 592,119,128.28 592,119,128.28 0.00
+        2012 11111 income tax 1,636,355,961.72 128,398,324.84 1,764,754,286.56
+        1111101 employer withheld income tax 1,356,096,420.00 109,605,096.73 1,465,701,516.73
+      `,
+    });
+
+    expect(rows).toEqual([
+      expect.objectContaining({
+        sourceCode: "11111",
+        labelKa: "income tax",
+        stateBudgetActualGel: 1218300448.3,
+        territorialBudgetActualGel: 78043668.64,
+        consolidatedActualGel: 1296344116.94,
+      }),
+      expect.objectContaining({
+        sourceCode: "1111101",
+        labelKa: "employer withheld income tax",
+        consolidatedActualGel: 1105673927.41,
+      }),
+      expect.objectContaining({
+        sourceCode: "11121",
+        labelKa: "profit tax",
+        consolidatedActualGel: 592119128.28,
+      }),
+      expect.objectContaining({
+        sourceCode: "11111",
+        labelKa: "income tax",
+        stateBudgetActualGel: 1636355961.72,
+        territorialBudgetActualGel: 128398324.84,
+        consolidatedActualGel: 1764754286.56,
+      }),
+      expect.objectContaining({
+        sourceCode: "1111101",
+        labelKa: "employer withheld income tax",
+        consolidatedActualGel: 1465701516.73,
+      }),
+    ]);
+  });
   it("parses old 12-digit revenue codes split across wrapped PDF text", () => {
     const rows = parseTreasuryPdfRows({
       year: 2006,
@@ -179,4 +225,44 @@ describe("parseTreasuryPdfRows", () => {
     ]);
   });
 
+  it("parses old 8-digit revenue codes from 2007 text", () => {
+    const rows = parseTreasuryPdfRows({
+      year: 2007,
+      sourceId: "source.mof_2007_revenue_form1_pdf",
+      pdfPath: "docs/Raw Data/Revenue/2007-jan-dec-consolidated-revenue.pdf",
+      text: `
+        01000000 tax revenue 3,732,585,502.95 658,513,891.07 4,391,099,394.02
+        01010000 income tax 0.00 526,747,673.80 526,747,673.80
+        03000000 capital operations 449,067,957.47 194,719,025.92 643,786,983.39
+        05000000 borrowing 283,487,035.10 4,634,944.78 288,121,979.88
+      `,
+    });
+
+    expect(rows).toEqual([
+      expect.objectContaining({
+        sourceCode: "01000000",
+        labelKa: "tax revenue",
+        section: "revenues",
+        consolidatedActualGel: 4391099394.02,
+      }),
+      expect.objectContaining({
+        sourceCode: "01010000",
+        labelKa: "income tax",
+        section: "revenues",
+        consolidatedActualGel: 526747673.8,
+      }),
+      expect.objectContaining({
+        sourceCode: "03000000",
+        labelKa: "capital operations",
+        section: "non_financial_assets",
+        consolidatedActualGel: 643786983.39,
+      }),
+      expect.objectContaining({
+        sourceCode: "05000000",
+        labelKa: "borrowing",
+        section: "liabilities",
+        consolidatedActualGel: 288121979.88,
+      }),
+    ]);
+  });
 });

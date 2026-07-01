@@ -13,6 +13,13 @@ const oldRevenueCodes = {
   grants: "040000000000",
   increaseLiabilities: "050000000000",
 } as const;
+const oldEightDigitRevenueCodes = {
+  taxTotal: "01000000",
+  otherRevenue: "02000000",
+  assetDecrease: "03000000",
+  grants: "04000000",
+  increaseLiabilities: "05000000",
+} as const;
 const sourceCodeFallbacks: Record<string, string[]> = {
   "1.3.3": ["133"],
   "1.4.1.1.3": ["14111"],
@@ -48,8 +55,22 @@ function roundedRowAmount(rows: OfficialRevenueRow[], year: number, sourceCode: 
   return Math.round(consolidatedGel(rowBySourceCode(rows, year, sourceCode)));
 }
 
+type OldRevenueCodes = {
+  taxTotal: string;
+  otherRevenue: string;
+  assetDecrease: string;
+  grants: string;
+  increaseLiabilities: string;
+};
+
+function oldRevenueCodesForYear(rows: OfficialRevenueRow[], year: number): OldRevenueCodes {
+  if (rowBySourceCode(rows, year, oldEightDigitRevenueCodes.taxTotal)) return oldEightDigitRevenueCodes;
+  return oldRevenueCodes;
+}
+
 function isOldRevenueYear(rows: OfficialRevenueRow[], year: number): boolean {
-  return Boolean(rowBySourceCode(rows, year, oldRevenueCodes.taxTotal));
+  const oldCodes = oldRevenueCodesForYear(rows, year);
+  return Boolean(rowBySourceCode(rows, year, oldCodes.taxTotal));
 }
 
 function grossOfficialRevenueTotalGelByYear(rows: OfficialRevenueRow[]): Record<number, number> {
@@ -59,9 +80,9 @@ function grossOfficialRevenueTotalGelByYear(rows: OfficialRevenueRow[]): Record<
   for (const year of years) {
     if (isOldRevenueYear(rows, year)) {
       totals[year] = Math.round(
-        roundedRowAmount(rows, year, oldRevenueCodes.taxTotal)
-          + roundedRowAmount(rows, year, oldRevenueCodes.otherRevenue)
-          + roundedRowAmount(rows, year, oldRevenueCodes.grants),
+        roundedRowAmount(rows, year, oldRevenueCodesForYear(rows, year).taxTotal)
+          + roundedRowAmount(rows, year, oldRevenueCodesForYear(rows, year).otherRevenue)
+          + roundedRowAmount(rows, year, oldRevenueCodesForYear(rows, year).grants),
       );
       continue;
     }
@@ -110,13 +131,13 @@ export function validateRealRevenueFacts(
   const assetDecreaseTotals = amountByYear(
     years,
     (year) => isOldRevenueYear(officialRows, year)
-      ? roundedRowAmount(officialRows, year, oldRevenueCodes.assetDecrease)
+      ? roundedRowAmount(officialRows, year, oldRevenueCodesForYear(officialRows, year).assetDecrease)
       : roundedRowAmount(officialRows, year, "31") + roundedRowAmount(officialRows, year, "32"),
   );
   const liabilitiesIncreaseTotals = amountByYear(
     years,
     (year) => isOldRevenueYear(officialRows, year)
-      ? roundedRowAmount(officialRows, year, oldRevenueCodes.increaseLiabilities)
+      ? roundedRowAmount(officialRows, year, oldRevenueCodesForYear(officialRows, year).increaseLiabilities)
       : roundedRowAmount(officialRows, year, "33"),
   );
   const finalReceiptsTotals = amountByYear(
@@ -155,7 +176,7 @@ export function validateRealRevenueFacts(
     }
 
     const requiredReceiptSourceCodes = isOldRevenueYear(officialRows, year)
-      ? [oldRevenueCodes.assetDecrease, oldRevenueCodes.increaseLiabilities]
+      ? [oldRevenueCodesForYear(officialRows, year).assetDecrease, oldRevenueCodesForYear(officialRows, year).increaseLiabilities]
       : receiptSourceCodes;
     for (const sourceCode of requiredReceiptSourceCodes) {
       if (!rowBySourceCode(officialRows, year, sourceCode)) {

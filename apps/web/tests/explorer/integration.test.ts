@@ -111,6 +111,7 @@ describe("explorer integration with real CSV data", () => {
     const revenueFacts = facts.filter((fact) => fact.side === "revenue");
     const expectedReceiptsByYear = new Map([
       [2006, 4537916326],
+      [2007, 6356421171],
       [2016, 11595009761],
       [2017, 12868042205],
       [2018, 13962006896],
@@ -124,6 +125,7 @@ describe("explorer integration with real CSV data", () => {
     ]);
     const expectedNetRevenueByYear = new Map([
       [2006, 3802956630],
+      [2007, 5424512208],
       [2016, 9675743059],
       [2017, 10858369148],
       [2018, 11757729002],
@@ -138,7 +140,6 @@ describe("explorer integration with real CSV data", () => {
 
     const totalOnlyRevenueByYear = new Map([
       [2005, 3289223826],
-      [2007, 6356421170],
     ]);
 
     expect([...expectedReceiptsByYear.keys()]).toEqual(REVENUE_DETAILED_YEARS);

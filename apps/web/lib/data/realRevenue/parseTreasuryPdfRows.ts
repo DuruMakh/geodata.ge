@@ -43,6 +43,10 @@ function sectionForOldCode(code: string): RevenueMatrixSection {
   return "other";
 }
 
+function isOldFixedWidthCode(code: string): boolean {
+  return /^0[1-5]\d{6}$/.test(code) || /^\d{12}$/.test(code);
+}
+
 function sectionForCode(code: string): RevenueMatrixSection {
   if (code === "31" || code.startsWith("31.")) return "non_financial_assets";
   if (code === "32" || code.startsWith("32.")) return "financial_assets";
@@ -79,7 +83,7 @@ function findCodeMatches(text: string): CodeMatch[] {
 
 
 function parseOldCodeRows(input: ParseTreasuryPdfInput, text: string): OfficialRevenueRow[] {
-  const codeMatches = Array.from(text.matchAll(/\b\d{12}\b/g));
+  const codeMatches = Array.from(text.matchAll(/(?<!\d)(?:0[1-5]\d{6}|\d{12})(?!\d)/g)).filter((match) => isOldFixedWidthCode(match[0]));
   const rows: OfficialRevenueRow[] = [];
 
   for (const [index, codeMatch] of codeMatches.entries()) {

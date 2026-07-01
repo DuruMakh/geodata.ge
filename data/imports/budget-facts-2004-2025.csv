@@ -2,18 +2,28 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2004,expenditure,expenditure.total,1513216526,actual,source.mof_2004_expenditure_pdf_form_e11_actual,,,,,,Total-only fallback. Source row: sul sakaso xarjebi.
 2005,expenditure,expenditure.total,2626507300,actual,source.mof_2005_expenditure_pdf_form_e11_actual,,,,,,"Total-only fallback. Source row: sul saxelmwifo biujetis gadasaxdelebi da xarjebi; value 2,626,507.3 thousand GEL."
 2005,revenue,revenue.total,3289223826,actual,source.mof_2005_revenue_form1_pdf,,,,,,Total-only fallback. Source row: consolidated receipts total; rounded to whole GEL.
-2006,revenue,revenue.asset_decrease,564458259,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 030000000000: old 12-digit revenue classification
-2006,revenue,revenue.excise_tax,335622390,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010400000000: old 12-digit revenue classification
-2006,revenue,revenue.grants,131872214,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 040000000000: old 12-digit revenue classification
-2006,revenue,revenue.import_tax,132366209,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010500000000: old 12-digit revenue classification
-2006,revenue,revenue.income_tax,385945388,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010100000000: old 12-digit revenue classification
-2006,revenue,revenue.increase_liabilities,170501437,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 050000000000: old 12-digit revenue classification
-2006,revenue,revenue.other_revenue,519108357,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 020000000000: old 12-digit revenue classification
-2006,revenue,revenue.other_taxes,538500324,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010700000000 + 010800000000 + 010900000000 + 011000000000 + 011100000000 + 012500000000 + 012600000000 + 012700000000 + 012800000000 + 012900000000 + 013100000000 + 013300000000 + 014000000000 + 014100000000 + 014500000000: old 12-digit revenue classification
-2006,revenue,revenue.profit_tax,341070394,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010200000000: old 12-digit revenue classification
-2006,revenue,revenue.property_tax,85820217,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010600000000 + 013000000000: old 12-digit revenue classification
-2006,revenue,revenue.vat,1332651137,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010300000000: old 12-digit revenue classification
-2007,revenue,revenue.total,6356421170,actual,source.mof_2007_revenue_form1_pdf,,,,,,Total-only fallback. Source row: consolidated receipts total; rounded to whole GEL.
+2006,revenue,revenue.asset_decrease,564458259,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 030000000000: old fixed-width revenue classification
+2006,revenue,revenue.excise_tax,335622390,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010400000000: old fixed-width revenue classification
+2006,revenue,revenue.grants,131872214,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 040000000000: old fixed-width revenue classification
+2006,revenue,revenue.import_tax,132366209,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010500000000: old fixed-width revenue classification
+2006,revenue,revenue.income_tax,385945388,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010100000000: old fixed-width revenue classification
+2006,revenue,revenue.increase_liabilities,170501437,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 050000000000: old fixed-width revenue classification
+2006,revenue,revenue.other_revenue,519108357,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 020000000000: old fixed-width revenue classification
+2006,revenue,revenue.other_taxes,538500324,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010700000000 + 010800000000 + 010900000000 + 011000000000 + 011100000000 + 012500000000 + 012600000000 + 012700000000 + 012800000000 + 012900000000 + 013100000000 + 013300000000 + 014000000000 + 014100000000 + 014500000000: old fixed-width revenue classification
+2006,revenue,revenue.profit_tax,341070394,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010200000000: old fixed-width revenue classification
+2006,revenue,revenue.property_tax,85820217,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010600000000 + 013000000000: old fixed-width revenue classification
+2006,revenue,revenue.vat,1332651137,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010300000000: old fixed-width revenue classification
+2007,revenue,revenue.asset_decrease,643786983,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 03000000: old fixed-width revenue classification
+2007,revenue,revenue.excise_tax,428637040,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01040000: old fixed-width revenue classification
+2007,revenue,revenue.grants,152717591,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 04000000: old fixed-width revenue classification
+2007,revenue,revenue.import_tax,51965575,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01050000: old fixed-width revenue classification
+2007,revenue,revenue.income_tax,526747674,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01010000: old fixed-width revenue classification
+2007,revenue,revenue.increase_liabilities,288121980,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 05000000: old fixed-width revenue classification
+2007,revenue,revenue.other_revenue,880695222,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 02000000: old fixed-width revenue classification
+2007,revenue,revenue.other_taxes,747400145,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01060000 + 01900000: old fixed-width revenue classification
+2007,revenue,revenue.profit_tax,554797062,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01020000: old fixed-width revenue classification
+2007,revenue,revenue.property_tax,107886069,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01070000: old fixed-width revenue classification
+2007,revenue,revenue.vat,1973665830,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01030000: old fixed-width revenue classification
 2016,revenue,revenue.asset_decrease,458775581,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
 2016,revenue,revenue.excise_tax,1069658088,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
 2016,revenue,revenue.grants,297933661,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები

@@ -171,11 +171,23 @@ const oldRevenueSortOrder = {
   "revenue.increase_liabilities": 110,
 } as const;
 
-function isOldRevenueRow(row: OfficialRevenueRow): boolean {
+function isOldTwelveDigitRevenueRow(row: OfficialRevenueRow): boolean {
   return /^\d{12}$/.test(row.sourceCode ?? "");
 }
 
+function isOldEightDigitRevenueRow(row: OfficialRevenueRow): boolean {
+  return /^0[1-5]\d{6}$/.test(row.sourceCode ?? "");
+}
+
+function isOldRevenueRow(row: OfficialRevenueRow): boolean {
+  return isOldTwelveDigitRevenueRow(row) || isOldEightDigitRevenueRow(row);
+}
+
 function oldTopLevelTaxRows(rows: OfficialRevenueRow[]): OfficialRevenueRow[] {
+  if (rows.some(isOldEightDigitRevenueRow)) {
+    return rows.filter((row) => /^01\d{2}0000$/.test(row.sourceCode ?? "") && row.sourceCode !== "01000000");
+  }
+
   return rows.filter((row) => /^01\d{2}0{8}$/.test(row.sourceCode ?? "") && row.sourceCode !== oldRevenueTaxTotalCode);
 }
 
@@ -196,11 +208,52 @@ function oldFactFromRows(rows: OfficialRevenueRow[], itemId: keyof typeof oldRev
     official_subprogram: "",
     public_spending_field_id: "",
     mapping_confidence: "",
-    mapping_notes: `Source rows ${sourceCodes}: old 12-digit revenue classification`,
+    mapping_notes: `Source rows ${sourceCodes}: old fixed-width revenue classification`,
   };
 }
 
+function generateOldEightDigitRevenueFacts(yearRows: OfficialRevenueRow[]): RealRevenueFactCsvRow[] {
+  const publicCodes = {
+    incomeTax: "01010000",
+    profitTax: "01020000",
+    vat: "01030000",
+    exciseTax: "01040000",
+    importTax: "01050000",
+    propertyTax: "01070000",
+    grants: "04000000",
+    otherRevenue: "02000000",
+    assetDecrease: "03000000",
+    increaseLiabilities: "05000000",
+  } as const;
+  const knownTaxCodes = new Set<string>([
+    publicCodes.incomeTax,
+    publicCodes.profitTax,
+    publicCodes.vat,
+    publicCodes.exciseTax,
+    publicCodes.importTax,
+    publicCodes.propertyTax,
+  ]);
+  const otherTaxRows = oldTopLevelTaxRows(yearRows).filter((row) => !knownTaxCodes.has(row.sourceCode ?? ""));
+  const year = yearRows[0]?.year ?? 0;
+
+  return [
+    oldFactFromRows([requiredRow(yearRows, publicCodes.vat, year)], "revenue.vat"),
+    oldFactFromRows([requiredRow(yearRows, publicCodes.incomeTax, year)], "revenue.income_tax"),
+    oldFactFromRows([requiredRow(yearRows, publicCodes.profitTax, year)], "revenue.profit_tax"),
+    oldFactFromRows([requiredRow(yearRows, publicCodes.exciseTax, year)], "revenue.excise_tax"),
+    oldFactFromRows([requiredRow(yearRows, publicCodes.importTax, year)], "revenue.import_tax"),
+    oldFactFromRows([requiredRow(yearRows, publicCodes.propertyTax, year)], "revenue.property_tax"),
+    oldFactFromRows(otherTaxRows, "revenue.other_taxes"),
+    oldFactFromRows([requiredRow(yearRows, publicCodes.grants, year)], "revenue.grants"),
+    oldFactFromRows([requiredRow(yearRows, publicCodes.otherRevenue, year)], "revenue.other_revenue"),
+    oldFactFromRows([requiredRow(yearRows, publicCodes.assetDecrease, year)], "revenue.asset_decrease"),
+    oldFactFromRows([requiredRow(yearRows, publicCodes.increaseLiabilities, year)], "revenue.increase_liabilities"),
+  ];
+}
+
 function generateOldCodeRevenueFacts(yearRows: OfficialRevenueRow[]): RealRevenueFactCsvRow[] {
+  if (yearRows.some(isOldEightDigitRevenueRow)) return generateOldEightDigitRevenueFacts(yearRows);
+
   const propertyTaxRows = oldRevenuePublicCodes.propertyTax.map((code) => requiredRow(yearRows, code, yearRows[0]?.year ?? 0));
   const knownTaxCodes = new Set<string>([
     oldRevenuePublicCodes.incomeTax,

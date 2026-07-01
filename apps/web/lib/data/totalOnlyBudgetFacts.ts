@@ -1,4 +1,4 @@
-﻿import type { BudgetFactCsvRow } from "./factCsv";
+import type { BudgetFactCsvRow } from "./factCsv";
 
 export type TotalOnlyBudgetFact = BudgetFactCsvRow & {
   evidence: string;
@@ -69,22 +69,6 @@ const totalOnlyRows = [
     mapping_notes: "Total-only fallback. Source row: consolidated receipts total; rounded to whole GEL.",
     sourceUnit: "GEL",
     evidence: "docs/Raw Data/Revenue/2006-jan-dec-consolidated-revenue.pdf page 22 row sul consolidated column",
-  },
-  {
-    year: 2007,
-    side: "revenue",
-    item_id: "revenue.total",
-    amount_gel: "6356421170",
-    basis: "actual",
-    source_id: "source.mof_2007_revenue_form1_pdf",
-    official_institution: "",
-    official_program: "",
-    official_subprogram: "",
-    public_spending_field_id: "",
-    mapping_confidence: "",
-    mapping_notes: "Total-only fallback. Source row: consolidated receipts total; rounded to whole GEL.",
-    sourceUnit: "GEL",
-    evidence: "docs/Raw Data/Revenue/2007-jan-dec-consolidated-revenue.pdf page 15 row sul consolidated column",
   },
 ] satisfies TotalOnlyBudgetFact[];
 
