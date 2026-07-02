@@ -181,6 +181,39 @@ describe("parseTreasuryPdfRows", () => {
       }),
     ]);
   });
+
+  it("parses space-grouped amounts with comma decimals from 2015 PDF text", () => {
+    const rows = parseTreasuryPdfRows({
+      year: 2015,
+      sourceId: "source.mof_2015_revenue_form1_pdf",
+      pdfPath: "docs/Raw Data/Revenue/2015-jan-dec-consolidated-revenue.pdf",
+      text: `
+        0 ჯამური 10 325 300 242,54 2 442 098 474,76 12 767 398 717,30
+        1 შემოსავლები 8 826 736 031,77 2 433 953 851,38 11 260 689 883,15
+        11 გადასახადები 7 849 171 285,25 1 223 895 866,56 9 073 067 151,81
+      `,
+    });
+
+    expect(rows).toEqual([
+      expect.objectContaining({
+        sourceCode: "0",
+        labelKa: "ჯამური",
+        consolidatedActualGel: 12767398717.3,
+      }),
+      expect.objectContaining({
+        sourceCode: "1",
+        labelKa: "შემოსავლები",
+        stateBudgetActualGel: 8826736031.77,
+        territorialBudgetActualGel: 2433953851.38,
+        consolidatedActualGel: 11260689883.15,
+      }),
+      expect.objectContaining({
+        sourceCode: "11",
+        labelKa: "გადასახადები",
+        consolidatedActualGel: 9073067151.81,
+      }),
+    ]);
+  });
   it("parses old 12-digit revenue codes split across wrapped PDF text", () => {
     const rows = parseTreasuryPdfRows({
       year: 2006,

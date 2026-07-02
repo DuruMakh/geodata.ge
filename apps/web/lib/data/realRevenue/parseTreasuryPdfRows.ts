@@ -19,14 +19,18 @@ type ParsedAmount = {
 };
 
 const rowCodePattern = /(?:^|\s)(\d+(?:\.\d+)*)(?=\s)/g;
-const amountPattern = /-?(?:\d{1,3}(?:,\d{3})+|\d{1,3}(?: \d{3})+|\d+)\.\d{2}/g;
+const amountPattern = /-?(?:\d{1,3}(?:,\d{3})+|\d{1,3}(?: \d{3})+|\d+)[,.]\d{2}/g;
 
 function normalizeText(value: string): string {
   return value.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
 }
 
 function parseAmountGel(value: string): number {
-  return Number(value.replace(/,/g, "").replace(/\s/g, ""));
+  const normalized = value.includes(".")
+    ? value.replace(/,/g, "").replace(/\s/g, "")
+    : value.replace(/\s/g, "").replace(",", ".");
+
+  return Number(normalized);
 }
 
 function actualColumnsFromFirstThreeAmounts(amounts: RegExpMatchArray[]): {

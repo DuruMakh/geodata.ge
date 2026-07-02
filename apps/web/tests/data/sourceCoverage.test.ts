@@ -43,7 +43,7 @@ describe("2004-2025 source coverage", () => {
     expect(REVENUE_TOTAL_ONLY_YEARS).toEqual([2005]);
     expect(REVENUE_DETAILED_YEARS[0]).toBe(2006);
     expect(ADMIN_SPENDING_YEARS[0]).toBe(2017);
-    expect(REVENUE_DETAILED_YEARS).toEqual(expect.arrayContaining([2008, 2009, 2010, 2011, 2012]));
+    expect(REVENUE_DETAILED_YEARS).toEqual(expect.arrayContaining([2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016]));
     expect(REVENUE_DETAILED_YEARS).not.toContain(2013);
     expect(ADMIN_SPENDING_YEARS).not.toContain(2012);
     expect(ADMIN_SPENDING_YEARS).not.toContain(2013);

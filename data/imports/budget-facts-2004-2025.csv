@@ -79,6 +79,28 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2012,revenue,revenue.profit_tax,850995044,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
 2012,revenue,revenue.property_tax,229970274,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
 2012,revenue,revenue.vat,3040331851,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
+2014,revenue,revenue.asset_decrease,189203395,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2014,revenue,revenue.excise_tax,810209110,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
+2014,revenue,revenue.grants,55189703,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2014,revenue,revenue.import_tax,94883250,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
+2014,revenue,revenue.income_tax,1938794503,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
+2014,revenue,revenue.increase_liabilities,1400133914,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
+2014,revenue,revenue.other_revenue,578071340,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2014,revenue,revenue.other_taxes,24451058,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
+2014,revenue,revenue.profit_tax,828823152,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
+2014,revenue,revenue.property_tax,245877472,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
+2014,revenue,revenue.vat,3298518287,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
+2015,revenue,revenue.asset_decrease,427848106,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
+2015,revenue,revenue.excise_tax,870731815,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
+2015,revenue,revenue.grants,310102880,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
+2015,revenue,revenue.import_tax,69293961,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
+2015,revenue,revenue.income_tax,2223220609,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
+2015,revenue,revenue.increase_liabilities,1379393193,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
+2015,revenue,revenue.other_revenue,633418401,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
+2015,revenue,revenue.other_taxes,26454877,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
+2015,revenue,revenue.profit_tax,1025228422,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
+2015,revenue,revenue.property_tax,290471261,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
+2015,revenue,revenue.vat,3505454639,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2016,revenue,revenue.asset_decrease,458775581,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
 2016,revenue,revenue.excise_tax,1069658088,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
 2016,revenue,revenue.grants,297933661,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
