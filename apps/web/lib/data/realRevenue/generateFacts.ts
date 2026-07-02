@@ -15,6 +15,9 @@ export type RealRevenueFactCsvRow = {
   mapping_notes: string;
 };
 
+const roundingToleranceGel = 10;
+const missingInternalGrantNote = "no internal grant source row; grant children reconcile to total grants";
+
 const publicRevenueMappings = [
   { sourceCode: "1.1.4.1.1", itemId: "revenue.vat", sortOrder: 10 },
   { sourceCode: "1.1.1.1.1", itemId: "revenue.income_tax", sortOrder: 20 },
@@ -83,8 +86,8 @@ const legacyAggregateMappings = [
   { sourceCode: "1.4", labelKa: "სხვა შემოსავლები", itemId: "revenue.other_revenue", sortOrder: 90 },
 ] as const;
 
-function consolidatedGel(row: OfficialRevenueRow): number {
-  return row.consolidatedActualGel ?? row.actualThousandGel * 1000;
+function consolidatedGel(row: OfficialRevenueRow | undefined): number {
+  return row ? row.consolidatedActualGel ?? row.actualThousandGel * 1000 : 0;
 }
 
 function rowForMapping(
@@ -95,6 +98,27 @@ function rowForMapping(
 
   return rows.find((candidate) => sourceCodes.includes(candidate.sourceCode ?? ""))
     ?? (mapping.labelKa ? rows.find((candidate) => candidate.labelKa === mapping.labelKa) : undefined);
+}
+
+function rowForAnySourceCode(rows: OfficialRevenueRow[], sourceCodes: string[]): OfficialRevenueRow | undefined {
+  return rows.find((candidate) => sourceCodes.includes(candidate.sourceCode ?? ""));
+}
+
+function hasReconcilingExternalGrantChildren(rows: OfficialRevenueRow[]): boolean {
+  const grantTotal = rowForMapping(rows, { sourceCode: "1.3" });
+  const internationalGrants = rowForAnySourceCode(rows, ["1.3.1", "131"]);
+  const foreignGovernmentGrants = rowForAnySourceCode(rows, ["1.3.2", "132"]);
+  if (!grantTotal || !internationalGrants || !foreignGovernmentGrants) return false;
+
+  const externalGrantTotal = consolidatedGel(internationalGrants) + consolidatedGel(foreignGovernmentGrants);
+  return Math.abs(consolidatedGel(grantTotal) - externalGrantTotal) <= roundingToleranceGel;
+}
+
+function optionalInternalGrantRow(rows: OfficialRevenueRow[], year: number): OfficialRevenueRow | undefined {
+  const row = rowForMapping(rows, { sourceCode: "1.3.3" });
+  if (row) return row;
+  if (hasReconcilingExternalGrantChildren(rows)) return undefined;
+  throw new Error(`Missing required revenue row for ${year}: 1.3.3`);
 }
 
 function sourceNote(row: OfficialRevenueRow): string {
@@ -290,7 +314,7 @@ export function generateRevenueFacts(officialRows: OfficialRevenueRow[]): RealRe
   const modernRows = officialRows.filter((row) => !oldCodeYears.has(row.year));
   const facts = generateFactsFromMappings(modernRows, publicRevenueMappings, (row, yearRows) => {
     if (row.sourceCode === "1.3" || row.sourceCode === "13") {
-      return consolidatedGel(row) - consolidatedGel(requiredRow(yearRows, "1.3.3", row.year));
+      return consolidatedGel(row) - consolidatedGel(optionalInternalGrantRow(yearRows, row.year));
     }
 
     if (row.sourceCode === "1.4" || row.sourceCode === "14") {
@@ -316,12 +340,14 @@ export function generateRevenueFacts(officialRows: OfficialRevenueRow[]): RealRe
     const nonFinancialAssetDecrease = requiredRow(yearRows, "31", year);
     const financialAssetDecrease = requiredRow(yearRows, "32", year);
     const increaseLiabilities = requiredRow(yearRows, "33", year);
-    const internalGrants = requiredRow(yearRows, "1.3.3", year);
+    const internalGrants = optionalInternalGrantRow(yearRows, year);
     const internalOtherRevenue = requiredRow(yearRows, "1.4.1.1.3", year);
 
     for (const fact of facts) {
       if (fact.year === year && fact.item_id === "revenue.grants") {
-        fact.mapping_notes = `${fact.mapping_notes}; net of ${sourceNote(internalGrants)}`;
+        fact.mapping_notes = internalGrants
+          ? `${fact.mapping_notes}; net of ${sourceNote(internalGrants)}`
+          : `${fact.mapping_notes}; ${missingInternalGrantNote}`;
       }
 
       if (fact.year === year && fact.item_id === "revenue.other_revenue") {

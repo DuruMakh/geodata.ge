@@ -21,6 +21,9 @@ const oldEightDigitRevenueCodes = {
   increaseLiabilities: "05000000",
 } as const;
 const sourceCodeFallbacks: Record<string, string[]> = {
+  "1.3": ["13"],
+  "1.3.1": ["131"],
+  "1.3.2": ["132"],
   "1.3.3": ["133"],
   "1.4.1.1.3": ["14111"],
 };
@@ -53,6 +56,20 @@ function rowBySourceCode(rows: OfficialRevenueRow[], year: number, sourceCode: s
 
 function roundedRowAmount(rows: OfficialRevenueRow[], year: number, sourceCode: string): number {
   return Math.round(consolidatedGel(rowBySourceCode(rows, year, sourceCode)));
+}
+
+function hasReconcilingExternalGrantChildren(rows: OfficialRevenueRow[], year: number): boolean {
+  const grantTotal = rowBySourceCode(rows, year, "1.3");
+  const internationalGrants = rowBySourceCode(rows, year, "1.3.1");
+  const foreignGovernmentGrants = rowBySourceCode(rows, year, "1.3.2");
+  if (!grantTotal || !internationalGrants || !foreignGovernmentGrants) return false;
+
+  const externalGrantTotal = consolidatedGel(internationalGrants) + consolidatedGel(foreignGovernmentGrants);
+  return Math.abs(consolidatedGel(grantTotal) - externalGrantTotal) <= roundingToleranceGel;
+}
+
+function hasRequiredInternalGrantEvidence(rows: OfficialRevenueRow[], year: number): boolean {
+  return Boolean(rowBySourceCode(rows, year, internalGrantCode)) || hasReconcilingExternalGrantChildren(rows, year);
 }
 
 type OldRevenueCodes = {
@@ -124,7 +141,12 @@ export function validateRealRevenueFacts(
 ): RealRevenueValidationReport {
   const years = Array.from(new Set(expectedYears ?? officialRows.map((row) => row.year))).sort((a, b) => a - b);
   const grossOfficialTotals = grossOfficialRevenueTotalGelByYear(officialRows);
-  const internalGrantsRemoved = amountByYear(years, (year) => isOldRevenueYear(officialRows, year) ? 0 : roundedRowAmount(officialRows, year, internalGrantCode));
+  const internalGrantsRemoved = amountByYear(
+    years,
+    (year) => isOldRevenueYear(officialRows, year) || hasReconcilingExternalGrantChildren(officialRows, year)
+      ? 0
+      : roundedRowAmount(officialRows, year, internalGrantCode),
+  );
   const internalOtherRevenueRemoved = amountByYear(years, (year) => isOldRevenueYear(officialRows, year) ? 0 : roundedRowAmount(officialRows, year, internalOtherRevenueCode));
   const internalFlowTotals = amountByYear(years, (year) => internalGrantsRemoved[year] + internalOtherRevenueRemoved[year]);
   const officialRevenueTotals = amountByYear(years, (year) => (grossOfficialTotals[year] ?? 0) - internalFlowTotals[year]);
@@ -169,7 +191,10 @@ export function validateRealRevenueFacts(
 
     if (!isOldRevenueYear(officialRows, year)) {
       for (const sourceCode of internalRevenueFlowCodes) {
-        if (!rowBySourceCode(officialRows, year, sourceCode)) {
+        const hasRequiredRow = sourceCode === internalGrantCode
+          ? hasRequiredInternalGrantEvidence(officialRows, year)
+          : Boolean(rowBySourceCode(officialRows, year, sourceCode));
+        if (!hasRequiredRow) {
           missingRequirements.push(`${year} missing internal revenue flow row: ${sourceCode}`);
         }
       }

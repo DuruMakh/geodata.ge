@@ -33,7 +33,7 @@ export const realRevenuePdfSources: RealRevenuePdfSource[] = REVENUE_YEARS.map((
   year,
   sourceId: `source.mof_${year}_revenue_form1_pdf`,
   pdfPath: `../../docs/Raw Data/Revenue/${year}-jan-dec-consolidated-revenue.pdf`,
-  ...([2006, 2007, 2015].includes(year) ? { textPath: `../../docs/Raw Data/Revenue/text/${year}-jan-dec-consolidated-revenue.txt` } : {}),
+  ...([2005, 2006, 2007, 2015].includes(year) ? { textPath: `../../docs/Raw Data/Revenue/text/${year}-jan-dec-consolidated-revenue.txt` } : {}),
 }));
 
 function normalizeSheetName(value: string): string {

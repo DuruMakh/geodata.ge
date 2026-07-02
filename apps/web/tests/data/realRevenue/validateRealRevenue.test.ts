@@ -223,6 +223,28 @@ describe("validateRealRevenueFacts", () => {
     expect(report.warnings).toEqual([]);
   });
 
+  it("passes when compact internal grant rows are absent and grant children reconcile", () => {
+    const compactRows: OfficialRevenueRow[] = [
+      { ...officialRows[0], sourceCode: "1", consolidatedActualGel: 1300000 },
+      { ...officialRows[0], sourceCode: "13", consolidatedActualGel: 200000 },
+      { ...officialRows[0], sourceCode: "131", consolidatedActualGel: 180000 },
+      { ...officialRows[0], sourceCode: "132", consolidatedActualGel: 20000 },
+      { ...officialRows[2], sourceCode: "14111" },
+      officialRows[3],
+      officialRows[4],
+      officialRows[5],
+    ];
+    const facts = validFacts.map((candidate) => candidate.item_id === "revenue.grants"
+      ? { ...candidate, amount_gel: "200000" }
+      : candidate);
+
+    const report = validateRealRevenueFacts(compactRows, facts, [2025]);
+
+    expect(report.reconciliationStatusByYear[2025]).toBe("passed");
+    expect(report.internalGrantsRemovedGelByYear?.[2025]).toBe(0);
+    expect(report.finalReceiptsTotalGelByYear?.[2025]).toBe(1575000);
+    expect(report.warnings).toEqual([]);
+  });
   it("fails when generated facts do not reconcile to final receipts", () => {
     const report = validateRealRevenueFacts(officialRows, [fact("revenue.vat", "900000")]);
 

@@ -110,6 +110,7 @@ describe("explorer integration with real CSV data", () => {
     const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const revenueFacts = facts.filter((fact) => fact.side === "revenue");
     const expectedReceiptsByYear = new Map([
+      [2005, 3289223828],
       [2006, 4537916326],
       [2007, 6356421171],
       [2008, 7418098313],
@@ -117,6 +118,7 @@ describe("explorer integration with real CSV data", () => {
       [2010, 7050180952],
       [2011, 7575052376],
       [2012, 8118927350],
+      [2013, 8319395319],
       [2014, 9464155184],
       [2015, 10761618164],
       [2016, 11595009761],
@@ -131,6 +133,7 @@ describe("explorer integration with real CSV data", () => {
       [2025, 32368880408],
     ]);
     const expectedNetRevenueByYear = new Map([
+      [2005, 2784499174],
       [2006, 3802956630],
       [2007, 5424512208],
       [2008, 5726890036],
@@ -138,6 +141,7 @@ describe("explorer integration with real CSV data", () => {
       [2010, 5557913105],
       [2011, 6775045250],
       [2012, 7515896465],
+      [2013, 7292336359],
       [2014, 7874817875],
       [2015, 8954376865],
       [2016, 9675743059],
@@ -152,9 +156,7 @@ describe("explorer integration with real CSV data", () => {
       [2025, 28305494244],
     ]);
 
-    const totalOnlyRevenueByYear = new Map([
-      [2005, 3289223826],
-    ]);
+    const totalOnlyRevenueByYear = new Map<number, number>();
 
     expect([...expectedReceiptsByYear.keys()]).toEqual(REVENUE_DETAILED_YEARS);
     expect([...totalOnlyRevenueByYear.keys()]).toEqual(REVENUE_TOTAL_ONLY_YEARS);

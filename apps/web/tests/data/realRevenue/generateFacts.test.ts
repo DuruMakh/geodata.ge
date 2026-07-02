@@ -168,6 +168,41 @@ describe("generateRevenueFacts", () => {
     );
     expect(facts.reduce((sum, fact) => sum + Number(fact.amount_gel), 0)).toBe(1500000);
   });
+
+  it("treats absent compact internal grant rows as zero when grant children reconcile", () => {
+    const compactRows = [
+      row("1", "revenues", 1000, 1300000),
+      row("11", "taxes", 800, 1000000),
+      row("11411", "VAT", 300, 400000),
+      row("11111", "income tax", 200, 250000),
+      row("11121", "profit tax", 100, 100000),
+      row("1142", "excise", 90, 110000),
+      row("1151", "import tax", 40, 40000),
+      row("113", "property tax", 20, 50000),
+      row("116", "other taxes row below residual", 5, 5000),
+      row("13", "grants", 50, 200000),
+      row("131", "international grants", 45, 180000),
+      row("132", "foreign government grants", 5, 20000),
+      row("14", "other revenue", 150, 100000),
+      row("14111", "internal other revenue", 5, 25000),
+      row("31", "non-financial asset decrease", 60, 60000, "non_financial_assets"),
+      row("32", "financial asset decrease", 40, 40000, "financial_assets"),
+      row("33", "increase in liabilities", 200, 200000, "liabilities"),
+    ];
+
+    const facts = generateRevenueFacts(compactRows);
+
+    expect(facts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          item_id: "revenue.grants",
+          amount_gel: "200000",
+          mapping_notes: expect.stringContaining("no internal grant source row"),
+        }),
+      ]),
+    );
+    expect(facts.reduce((sum, fact) => sum + Number(fact.amount_gel), 0)).toBe(1575000);
+  });
   it("maps 2006 old 12-digit revenue codes into public revenue categories", () => {
     const rows2006 = [
       row("010000000000", "???????????? ???????????", 3151976.05837, 3151976058.37),

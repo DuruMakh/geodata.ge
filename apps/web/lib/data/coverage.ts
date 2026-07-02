@@ -12,8 +12,8 @@ export const EXPENDITURE_DETAILED_YEARS = inclusiveYears(2017, APP_END_YEAR);
 export const EXPENDITURE_YEARS = [...EXPENDITURE_TOTAL_ONLY_YEARS, ...EXPENDITURE_DETAILED_YEARS];
 
 export const REVENUE_SOURCE_YEARS = inclusiveYears(REVENUE_START_YEAR, APP_END_YEAR);
-export const REVENUE_TOTAL_ONLY_YEARS = [2005];
-export const REVENUE_DETAILED_YEARS = [2006, 2007, ...inclusiveYears(2008, 2012), ...inclusiveYears(2014, APP_END_YEAR)];
+export const REVENUE_TOTAL_ONLY_YEARS: number[] = [];
+export const REVENUE_DETAILED_YEARS = inclusiveYears(2005, APP_END_YEAR);
 export const REVENUE_YEARS = [...REVENUE_TOTAL_ONLY_YEARS, ...REVENUE_DETAILED_YEARS].sort((a, b) => a - b);
 
 export const ADMIN_SPENDING_YEARS = inclusiveYears(2017, APP_END_YEAR);
