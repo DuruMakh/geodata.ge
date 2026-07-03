@@ -1,7 +1,7 @@
 # GeoData.ge Design System
 
-Version: 3.0  
-Last updated: 2026-05-27  
+Version: 3.1  
+Last updated: 2026-07-03  
 Status: Production-ready visual system for GeoData.ge Budget Explorer v1  
 Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -31,29 +31,9 @@ If this file and the confirmed HTML disagree, prefer the confirmed HTML for visu
 
 GeoData.ge v1 is a Georgian-first national budget explorer for annual data. It is not a broad public-data catalog.
 
-V1 includes:
+The canonical V1 Included/Excluded scope list lives in `Project_Definition.md` section 2. Design-relevant summary: annual national budget data in a 2004-2025 window (expenditure from 2004, revenue from 2005), expenditure and revenue modes, multi-year explorer with fields/ministries grouping, single-year snapshot, CSV export, Georgian-first UI, minimal public source label. No drilldown pages, admin UI, public API, or sub-annual data in v1.
 
-- Annual national budget data for 2017-2025.
-- Expenditure and revenue modes.
-- Multi-year explorer.
-- Single-year snapshot.
-- CSV export.
-- Georgian-first UI.
-- Minimal public source label.
-- Internal source and provenance metadata.
-
-V1 excludes:
-
-- Broad public data catalog.
-- Municipal transfers explorer.
-- Capital projects explorer.
-- Debt explorer.
-- Admin UI.
-- Public API.
-- User uploads.
-- Quarterly or monthly data.
-- Automated production extraction from DOCX/PDF.
-- Clickable drilldown/detail pages.
+Coverage note for design work: expenditure has public-field detail from 2017 onward; 2004-2005 are total-only and 2006-2016 expenditure is still being rolled out. Charts and tables must handle years where only the total series has data.
 
 Design implication: every visual decision should support a focused budget product, not a generic data platform.
 
@@ -506,7 +486,8 @@ Default view:
 - View: Multi-year.
 - Chart mode: Line.
 - Measure: nominal GEL.
-- Range: 2017-2025.
+- Grouping: public spending fields.
+- Range: the full loaded year range (currently the 2004-2025 window; the default is data-driven, not hardcoded).
 - Selected series: total expenditure plus selected public spending fields.
 
 Revenue reuses the same structure. Only labels, taxonomy, data, and source semantics change.
@@ -580,10 +561,10 @@ Rules:
 
 Table mode replaces the chart area inside the plot frame.
 
-Confirmed columns:
+Confirmed columns (year columns span the selected range):
 
 ```text
-კატეგორია | 2017 | ... | 2025 | ცვლილება
+კატეგორია | <first year> | ... | <last year> | ცვლილება
 ```
 
 Rules:
@@ -610,14 +591,14 @@ Range strip appears below the legend in line mode.
 
 Confirmed pieces:
 
-- Range label: `Range: 2017 - 2025`.
+- Range label: `Range: <first year> - <last year>` (e.g. `Range: 2004 - 2025`).
 - Quick actions: `1Y`, `5Y`, `ALL`.
 - Rail with two handles.
 
 Rules:
 
 - For v1, range bounds are constrained to available years.
-- `ALL` resolves to the full loaded 2017-2025 range; `5Y` resolves to the latest five loaded years.
+- `ALL` resolves to the full loaded year range; `5Y` resolves to the latest five loaded years.
 - Handles should not imply missing years outside loaded data.
 
 ### 9.9 Series Panel
@@ -639,7 +620,23 @@ Rules:
 - CSV button stays at the bottom after series list.
 - If production supports many rows, the series list may scroll inside the panel.
 
-### 9.10 Below-Chart Multi-Year Sections
+### 9.10 Expenditure Grouping Switch
+
+Confirmed source: `docs/superpowers/specs/2026-06-11-ministry-expenditure-multiyear-design.md` (implemented).
+
+In expenditure mode, a segmented control switches how series are grouped:
+
+- Public spending fields (default).
+- Ministries: administrative view with ministries and major programs as selectable series.
+
+Rules:
+
+- The grouping control appears only in expenditure mode; revenue has no grouping switch.
+- Administrative data exists for 2017-2025 only; the UI must not imply earlier ministry coverage.
+- This is series selection, not clickable drilldown.
+- Reuse the standard segmented switch styling from section 8.2.
+
+### 9.11 Below-Chart Multi-Year Sections
 
 Confirmed order:
 

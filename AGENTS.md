@@ -112,7 +112,9 @@ Strong success criteria let you loop independently. Weak criteria like "make it 
 
 ## Current Project State
 
-GeoData.ge is currently in v1 planning for a Georgian-first Georgia Budget Explorer.
+GeoData.ge v1, a Georgian-first Georgia Budget Explorer, is implemented and mid data rollout. The production UI follows the `DESIGN.md` system (Light/Night themes, multi-year explorer with fields/ministries grouping, single-year snapshot).
+
+Data rollout status as of 2026-07: revenue facts are complete for 2005-2025; expenditure facts cover 2004-2005 (total-only) and 2017-2025 (detailed public fields); 2006-2016 expenditure is still being rolled out. Update this paragraph as the rollout progresses.
 
 Revenue coverage starts in 2005 because the project does not currently have a reviewed 2004 revenue source. Expenditure coverage starts in 2004.
 
@@ -130,30 +132,12 @@ The workspace is a git repository on `main` with a GitHub `origin` remote. Check
 
 ## V1 Non-Negotiables
 
-V1 includes:
+The canonical V1 Included/Excluded scope list lives in `Project_Definition.md` section 2. Read it before planning any feature work; do not duplicate it here.
 
-- Annual national budget data for 2004-2025 for expenditure and 2005-2025 for revenue.
-- Revenue overview with top-level tax categories shown directly.
-- Expenditure overview using public-friendly spending fields.
-- Multi-year explorer.
-- Single-year budget snapshot.
-- CSV export.
-- Georgian-first UI.
-- Minimal public source label.
-- Internal source/provenance metadata.
+Hard rules:
 
-V1 excludes:
-
-- Broad public data catalog.
-- Municipal transfers explorer.
-- Capital projects explorer.
-- Debt explorer.
-- Admin UI.
-- Public API.
-- User uploads.
-- Quarterly or monthly data.
-- Automated production extraction from DOCX/PDF.
-- Clickable drilldown/detail pages into programs, subprograms, or revenue subcategories.
+- Do not re-expand v1 into a broad data catalog or add excluded features (drilldown/detail pages, admin UI, public API, user uploads, sub-annual data, automated production DOCX/PDF extraction) without explicit user approval.
+- Multi-year expenditure supports grouping by public spending fields or by ministries/major programs. This is series selection, not clickable drilldown.
 
 ## Data Rules
 

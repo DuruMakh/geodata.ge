@@ -26,7 +26,8 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Revenue overview and major tax revenue categories.
 - Expenditure overview using public-friendly spending fields such as health, education, social protection, defence, infrastructure, and similar categories.
 - Multi-year explorer with line and table views.
-- Single-year snapshot with headline cards, treemap, Every 100 GEL, spending petals, Budget Field, and full ranking.
+- Multi-year expenditure grouping by public spending fields or by ministries/major programs (administrative data exists for 2017-2025); this is series selection, not drilldown.
+- Single-year snapshot with headline cards, treemap, Every 100 GEL, Budget Radar, Budget Field, and full ranking.
 - CSV export.
 - Georgian-first UI.
 - Minimal public source label.

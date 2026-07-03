@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GeoData.ge Web App
 
-## Getting Started
+Next.js app for the GeoData.ge Budget Explorer (multi-year explorer, single-year snapshot, CSV export).
 
-First, run the development server:
+Product scope, agent rules, data rules, and the design system live at the repo root — read those before changing this app:
 
-```bash
+- `../../README.md` (setup and data foundation overview)
+- `../../AGENTS.md` (operating rules)
+- `../../Project_Definition.md` (canonical v1 scope)
+- `../../DESIGN.md` (production design system)
+
+## Setup
+
+Create `apps/web/.env` from `.env.example` before running Prisma, dev, or build commands (see the root README for the expected shape).
+
+```powershell
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run dev` and `npm run build` run Prisma Client generation first via `predev`/`prebuild` hooks.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```powershell
+npm run dev            # dev server
+npm run build          # production build
+npm run lint           # eslint
+npm run test           # vitest unit tests
+npm run test:browser   # Playwright browser tests
+npm run prisma:generate
+npm run prisma:migrate
+```
 
-## Learn More
+## Data pipeline scripts
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Data extraction, fact generation, validation, and import scripts are exposed as `data:*` npm scripts (see `package.json`). The extraction methodology is documented in `../../docs/data-methodology/`.
