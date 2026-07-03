@@ -203,4 +203,72 @@ describe("parseTavi1Rows", () => {
 
     expect(rows.map((row) => row.labelKa)).toEqual(["შემოსავლები", "გადასახადები"]);
   });
+
+  it("collects warnings for content-bearing dropped rows but not for blank or label-only rows", () => {
+    const warnings: string[] = [];
+    const rows = parseTavi1Rows({
+      year: 2025,
+      sourceId: "source.mof_2025_tavi1_actual",
+      workbookPath: "docs/Raw Data/2025.xlsx",
+      sheetName: "tavi I",
+      matrix: [
+        ["დასახელება", "2025 წლის დამტკიცებული გეგმა", "2025 წლის დაზუსტებული გეგმა", "2025 წლის ფაქტი", "შესრულება %"],
+        ["შემოსავლები", 100, 100, 100, 1],
+        [null, null, null, null, null],
+        ["განმარტებითი ჩანაწერი", null, null, null, null],
+        [null, 40, 41, null, null],
+        ["გადასახადები", 80, 80, null, 1],
+      ],
+    });
+
+    expect(rows.map((row) => row.labelKa)).toEqual(["შემოსავლები"]);
+    expect(warnings).toHaveLength(0);
+
+    parseTavi1Rows({
+      year: 2025,
+      sourceId: "source.mof_2025_tavi1_actual",
+      workbookPath: "docs/Raw Data/2025.xlsx",
+      sheetName: "tavi I",
+      matrix: [
+        ["დასახელება", "2025 წლის დამტკიცებული გეგმა", "2025 წლის დაზუსტებული გეგმა", "2025 წლის ფაქტი", "შესრულება %"],
+        ["შემოსავლები", 100, 100, 100, 1],
+        [null, null, null, null, null],
+        ["განმარტებითი ჩანაწერი", null, null, null, null],
+        [null, 40, 41, null, null],
+        ["გადასახადები", 80, 80, null, 1],
+      ],
+      warnings,
+    });
+
+    expect(warnings).toHaveLength(2);
+    expect(warnings[0]).toContain("row 5");
+    expect(warnings[0]).toContain("no label");
+    expect(warnings[1]).toContain("row 6");
+    expect(warnings[1]).toContain('label="გადასახადები"');
+    expect(warnings[1]).toContain("no actual amount");
+  });
+
+  it("warns when a row with a label and amounts classifies as other", () => {
+    const warnings: string[] = [];
+    const rows = parseTavi1Rows({
+      year: 2025,
+      sourceId: "source.mof_2025_tavi1_actual",
+      workbookPath: "docs/Raw Data/2025.xlsx",
+      sheetName: "tavi I",
+      matrix: [
+        ["დასახელება", "2025 წლის დამტკიცებული გეგმა", "2025 წლის დაზუსტებული გეგმა", "2025 წლის ფაქტი", "შესრულება %"],
+        ["ნაშთის ცვლილება", 5, 5, 5, 1],
+        ["შემოსავლები", 100, 100, 100, 1],
+      ],
+      warnings,
+    });
+
+    expect(rows.map((row) => [row.labelKa, row.section])).toEqual([
+      ["ნაშთის ცვლილება", "other"],
+      ["შემოსავლები", "revenues"],
+    ]);
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain('label "ნაშთის ცვლილება"');
+    expect(warnings[0]).toContain('"other"');
+  });
 });

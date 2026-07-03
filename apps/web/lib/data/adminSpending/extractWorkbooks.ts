@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import * as XLSX from "xlsx";
 import { ADMIN_SPENDING_YEARS } from "../coverage";
+import { cellText, numericCell, pickSheetName } from "../parsing/cellUtils";
+import { contextFor } from "../parsing/hierarchyContext";
 import { codeDepth, findLeafCodes, normalizeOfficialCode, parentCodeFor } from "../realExpenditure/hierarchy";
 import { parseTavi6Rows } from "../realExpenditure/parseTavi6Rows";
 import type { MatrixCell } from "../realExpenditure/parseTavi6Rows";
@@ -17,55 +19,43 @@ function yearFromFileName(fileName: string): number | null {
   return match ? Number(match[1]) : null;
 }
 
-function normalizeSheetName(value: string): string {
-  return value.trim().toLowerCase().replace(/\s+/g, " ");
+function adminNumericCell(value: MatrixCell): number | null {
+  return numericCell(value, { stripWhitespace: true });
 }
 
-function cellText(value: MatrixCell): string {
-  return value === null || value === undefined ? "" : String(value).trim();
-}
+type ParseSheetInput = {
+  year: number;
+  sourceId: string;
+  workbookPath: string;
+  sheetName: string;
+  matrix: MatrixCell[][];
+  /** Optional collector for human-readable warnings about dropped content-bearing rows. */
+  warnings?: string[];
+};
 
-function numericCell(value: MatrixCell): number | null {
-  if (value === null || value === undefined || value === "") return null;
-  const parsed = Number(String(value).replaceAll(",", "").replace(/\s+/g, "").replace(/%$/, ""));
-  return Number.isFinite(parsed) ? parsed : null;
-}
+function warnDroppedRow(
+  input: ParseSheetInput,
+  row: {
+    rowNumber: number;
+    code: string | null;
+    labelKa: string;
+    approved: number | null;
+    revised: number | null;
+    actual: number | null;
+  },
+) {
+  // Only warn about rows that carry numeric content (or a code without a label).
+  // Label-only rows are normal sheet structure in these workbooks: repeated page
+  // headers and merged multi-line economic-detail labels.
+  const hasAmount = row.approved !== null || row.revised !== null || row.actual !== null;
+  if (!hasAmount && !(row.code && !row.labelKa)) return;
 
-function pickSheetName(workbook: XLSX.WorkBook): string {
-  const available = workbook.SheetNames;
-  const preferred = available.find((name) => {
-    const normalized = normalizeSheetName(name);
-    return normalized.includes("tavi 6") || /(^|\s)vi(\s|$)/.test(normalized);
-  });
-
-  return preferred ?? available[0];
-}
-
-function contextFor(code: string | null, rowsByCode: Map<string, { labelKa: string }>) {
-  if (!code) {
-    return {
-      institutionCode: null,
-      institutionLabelKa: null,
-      programCode: null,
-      programLabelKa: null,
-      subprogramCode: null,
-      subprogramLabelKa: null,
-    };
-  }
-
-  const parts = code.split(" ");
-  const institutionCode = parts.length >= 2 ? `${parts[0]} 00` : null;
-  const programCode = parts.length >= 2 && parts[1] !== "00" ? `${parts[0]} ${parts[1]}` : null;
-  const subprogramCode = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : null;
-
-  return {
-    institutionCode,
-    institutionLabelKa: institutionCode ? rowsByCode.get(institutionCode)?.labelKa ?? null : null,
-    programCode,
-    programLabelKa: programCode ? rowsByCode.get(programCode)?.labelKa ?? null : null,
-    subprogramCode,
-    subprogramLabelKa: subprogramCode ? rowsByCode.get(subprogramCode)?.labelKa ?? null : null,
-  };
+  const why = !row.labelKa ? "row has content but no label" : "row has a label and plan amounts but no actual amount";
+  input.warnings?.push(
+    `year ${input.year}, sheet "${input.sheetName}", row ${row.rowNumber} (${input.workbookPath}): ` +
+      `dropped row — ${why}; code=${row.code ?? "-"}, label="${row.labelKa}", ` +
+      `approved=${row.approved ?? "-"}, revised=${row.revised ?? "-"}, actual=${row.actual ?? "-"}`,
+  );
 }
 
 function finalizeRows(rows: Array<Omit<OfficialExpenditureRow, "isLeafCode">>): OfficialExpenditureRow[] {
@@ -107,13 +97,7 @@ function rowFromParts(input: {
   };
 }
 
-function parseNormalizedRowsSheet(input: {
-  year: number;
-  sourceId: string;
-  workbookPath: string;
-  sheetName: string;
-  matrix: MatrixCell[][];
-}): OfficialExpenditureRow[] {
+function parseNormalizedRowsSheet(input: ParseSheetInput): OfficialExpenditureRow[] {
   const headers = (input.matrix[0] ?? []).map(cellText);
   const codeIndex = headers.indexOf("code");
   const labelIndex = headers.indexOf("label");
@@ -128,9 +112,19 @@ function parseNormalizedRowsSheet(input: {
     .map((row, index) => {
       const code = normalizeOfficialCode(row[codeIndex]);
       const labelKa = cellText(row[labelIndex]);
-      const actualThousandGel = numericCell(row[actualIndex]);
+      const actualThousandGel = adminNumericCell(row[actualIndex]);
 
-      if (!labelKa || actualThousandGel === null) return null;
+      if (!labelKa || actualThousandGel === null) {
+        warnDroppedRow(input, {
+          rowNumber: index + 2,
+          code,
+          labelKa,
+          approved: null,
+          revised: null,
+          actual: actualThousandGel,
+        });
+        return null;
+      }
 
       return rowFromParts({
         year: input.year,
@@ -151,13 +145,63 @@ function parseNormalizedRowsSheet(input: {
   return finalizeRows(rows);
 }
 
-function parseExtractedTablesSheet(input: {
-  year: number;
-  sourceId: string;
-  workbookPath: string;
-  sheetName: string;
-  matrix: MatrixCell[][];
-}): OfficialExpenditureRow[] {
+/**
+ * The extracted-tables sheets carry positional headers (col_1..col_5), so the parser
+ * assumes: col_1 = code, col_2 = label, col_3/col_4 = plan figures, col_5 = actual.
+ * When the first table row repeats the original Georgian header text, use it to verify
+ * that the code/label columns are where the parser assumes them to be. The plan/actual
+ * year columns intentionally stay unvalidated beyond "not a code/label header": their
+ * wording varies per year (gegma, saka­so shesruleba, fact of a previous year, typos).
+ */
+function validateExtractedTablesHeader(
+  input: ParseSheetInput,
+  indexes: { codeIndex: number; labelIndex: number; amountIndexes: Array<{ name: string; index: number }> },
+) {
+  const headerRow = input.matrix[1] ?? [];
+  const hasHeaderText = headerRow.some((cell) => {
+    const text = cellText(cell);
+    return text.includes("კოდი") || text.includes("დასახელება");
+  });
+  if (!hasHeaderText) return;
+
+  const codeText = cellText(headerRow[indexes.codeIndex]).replace(/\s+/g, " ");
+  const labelText = cellText(headerRow[indexes.labelIndex]).replace(/\s+/g, " ");
+
+  const describe = `${input.workbookPath} sheet "${input.sheetName}"`;
+
+  if (codeText.includes("დასახელება")) {
+    throw new Error(
+      `Extracted-tables header mismatch in ${describe}: expected the code column (col_1) to contain "კოდი" ` +
+        `but found "${codeText}". The sheet's column order differs from the assumed col_1..col_5 layout.`,
+    );
+  }
+  if (labelText.includes("კოდი")) {
+    throw new Error(
+      `Extracted-tables header mismatch in ${describe}: expected the label column (col_2) to contain "დასახელება" ` +
+        `but found "${labelText}". The sheet's column order differs from the assumed col_1..col_5 layout.`,
+    );
+  }
+  if (!codeText.includes("კოდი") && !labelText.includes("დასახელება")) {
+    throw new Error(
+      `Extracted-tables header mismatch in ${describe}: header text is present in the first table row, ` +
+        `but neither col_1 ("${codeText}") contains "კოდი" nor col_2 ("${labelText}") contains "დასახელება". ` +
+        "The sheet's column order differs from the assumed col_1..col_5 layout.",
+    );
+  }
+
+  for (const { name, index } of indexes.amountIndexes) {
+    if (index < 0) continue;
+    const text = cellText(headerRow[index]).replace(/\s+/g, " ");
+    if (text.includes("კოდი") || text.includes("დასახელება")) {
+      throw new Error(
+        `Extracted-tables header mismatch in ${describe}: expected the ${name} column to be a numeric column ` +
+          `but its header reads "${text}". The sheet's column order differs from the assumed col_1..col_5 layout.`,
+      );
+    }
+  }
+}
+
+function parseExtractedTablesSheet(input: ParseSheetInput): OfficialExpenditureRow[] {
   const headers = (input.matrix[0] ?? []).map(cellText);
   const codeIndex = headers.indexOf("col_1");
   const labelIndex = headers.indexOf("col_2");
@@ -167,14 +211,34 @@ function parseExtractedTablesSheet(input: {
 
   if (codeIndex < 0 || labelIndex < 0 || actualIndex < 0) return [];
 
+  validateExtractedTablesHeader(input, {
+    codeIndex,
+    labelIndex,
+    amountIndexes: [
+      { name: "approved plan (col_3)", index: approvedPlanIndex },
+      { name: "revised plan (col_4)", index: revisedPlanIndex },
+      { name: "actual (col_5)", index: actualIndex },
+    ],
+  });
+
   const rows = input.matrix
     .slice(1)
     .map((row, index) => {
       const code = normalizeOfficialCode(row[codeIndex]);
       const labelKa = cellText(row[labelIndex]).replace(/\s+/g, " ");
-      const actualThousandGel = numericCell(row[actualIndex]);
+      const actualThousandGel = adminNumericCell(row[actualIndex]);
 
-      if (!labelKa || actualThousandGel === null) return null;
+      if (!labelKa || actualThousandGel === null) {
+        warnDroppedRow(input, {
+          rowNumber: index + 2,
+          code,
+          labelKa,
+          approved: approvedPlanIndex >= 0 ? adminNumericCell(row[approvedPlanIndex]) : null,
+          revised: revisedPlanIndex >= 0 ? adminNumericCell(row[revisedPlanIndex]) : null,
+          actual: actualThousandGel,
+        });
+        return null;
+      }
 
       return rowFromParts({
         year: input.year,
@@ -184,8 +248,8 @@ function parseExtractedTablesSheet(input: {
         rowNumber: index + 2,
         code,
         labelKa,
-        approvedPlanThousandGel: approvedPlanIndex >= 0 ? numericCell(row[approvedPlanIndex]) : null,
-        revisedPlanThousandGel: revisedPlanIndex >= 0 ? numericCell(row[revisedPlanIndex]) : null,
+        approvedPlanThousandGel: approvedPlanIndex >= 0 ? adminNumericCell(row[approvedPlanIndex]) : null,
+        revisedPlanThousandGel: revisedPlanIndex >= 0 ? adminNumericCell(row[revisedPlanIndex]) : null,
         actualThousandGel,
         executionPercent: null,
       });
@@ -195,13 +259,7 @@ function parseExtractedTablesSheet(input: {
   return finalizeRows(rows);
 }
 
-function parseFallbackRows(input: {
-  year: number;
-  sourceId: string;
-  workbookPath: string;
-  sheetName: string;
-  matrix: MatrixCell[][];
-}): OfficialExpenditureRow[] {
+function parseFallbackRows(input: ParseSheetInput): OfficialExpenditureRow[] {
   const headers = (input.matrix[0] ?? []).map(cellText);
 
   if (headers.includes("code") && headers.includes("label")) {
@@ -215,20 +273,14 @@ function parseFallbackRows(input: {
   return [];
 }
 
-export function parseAdminWorkbookRows(input: {
-  year: number;
-  sourceId: string;
-  workbookPath: string;
-  sheetName: string;
-  matrix: MatrixCell[][];
-}): OfficialExpenditureRow[] {
+export function parseAdminWorkbookRows(input: ParseSheetInput): OfficialExpenditureRow[] {
   const fallbackRows = parseFallbackRows(input);
   if (fallbackRows.length > 0) return fallbackRows;
 
   return parseTavi6Rows(input);
 }
 
-export function extractAdminSpendingOfficialRows(): OfficialExpenditureRow[] {
+export function extractAdminSpendingOfficialRows(warnings?: string[]): OfficialExpenditureRow[] {
   const workbookDir = path.resolve(process.cwd(), WORKBOOK_DIR);
   const adminYears = new Set(ADMIN_SPENDING_YEARS);
   const workbookFiles = fs
@@ -243,7 +295,10 @@ export function extractAdminSpendingOfficialRows(): OfficialExpenditureRow[] {
     const workbookPath = path.join(WORKBOOK_DIR, fileName);
     const workbookFile = path.resolve(process.cwd(), workbookPath);
     const workbook = XLSX.readFile(workbookFile, { cellDates: false });
-    const sheetName = pickSheetName(workbook);
+    const sheetName = pickSheetName(workbook, {
+      fallbackPattern: (normalized) => normalized.includes("tavi 6") || /(^|\s)vi(\s|$)/.test(normalized),
+      defaultToFirstSheet: true,
+    });
     const sheet = workbook.Sheets[sheetName];
 
     if (!sheet) throw new Error(`Missing sheet after selection: ${sheetName}`);
@@ -261,6 +316,7 @@ export function extractAdminSpendingOfficialRows(): OfficialExpenditureRow[] {
       workbookPath: workbookPath.replace("../../", ""),
       sheetName,
       matrix,
+      warnings,
     });
   });
 }

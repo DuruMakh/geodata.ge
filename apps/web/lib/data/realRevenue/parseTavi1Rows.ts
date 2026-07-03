@@ -1,6 +1,7 @@
+import { cellText, numericCell, type MatrixCell } from "../parsing/cellUtils";
 import type { OfficialRevenueRow, RevenueMatrixSection } from "./types";
 
-export type MatrixCell = string | number | boolean | null | undefined;
+export type { MatrixCell };
 
 export type ParseTavi1Input = {
   year: number;
@@ -8,27 +9,16 @@ export type ParseTavi1Input = {
   workbookPath: string;
   sheetName: string;
   matrix: MatrixCell[][];
+  /** Optional collector for human-readable warnings about dropped or unclassifiable rows. */
+  warnings?: string[];
 };
-
-function cellText(value: MatrixCell): string {
-  return value === null || value === undefined ? "" : String(value).trim();
-}
 
 function normalizedText(value: MatrixCell): string {
   return cellText(value).replace(/\s+/g, " ").toLowerCase();
 }
 
-function numericCell(value: MatrixCell): number | null {
-  if (value === null || value === undefined || value === "") return null;
-  const normalized = String(value)
-    .trim()
-    .replace(/\u00a0/g, "")
-    .replace(/\s+/g, "")
-    .replace(/,/g, "");
-  const isPercent = normalized.endsWith("%");
-  const parsed = Number(isPercent ? normalized.slice(0, -1) : normalized);
-  if (!Number.isFinite(parsed)) return null;
-  return isPercent ? parsed / 100 : parsed;
+function amountCell(value: MatrixCell): number | null {
+  return numericCell(value, { stripWhitespace: true, percentMode: "fraction" });
 }
 
 function findHeaderIndexes(matrix: MatrixCell[][]) {
@@ -70,10 +60,6 @@ function classifySection(
 ): RevenueMatrixSection {
   const label = labelKa.replace(/\s+/g, " ").trim();
   const revenueLabels = new Set([
-    "áƒ¨áƒ”áƒ›áƒáƒ¡áƒáƒ•áƒšáƒ”áƒ‘áƒ˜",
-    "áƒ’áƒáƒ“áƒáƒ¡áƒáƒ®áƒáƒ“áƒ”áƒ‘áƒ˜",
-    "áƒ’áƒ áƒáƒœáƒ¢áƒ”áƒ‘áƒ˜",
-    "áƒ¡áƒ®áƒ•áƒ áƒ¨áƒ”áƒ›áƒáƒ¡áƒáƒ•áƒšáƒ”áƒ‘áƒ˜",
     "შემოსავლები",
     "გადასახადები",
     "გრანტები",
@@ -99,17 +85,6 @@ function classifySection(
   if (currentSection === "expenditures") return "expenditures";
   if (revenueLabels.has(label)) return "revenues";
 
-  if (
-    label === "შემოსავლები" ||
-    label === "გადასახადები" ||
-    label === "გრანტები" ||
-    label === "სხვა შემოსავლები"
-  ) {
-    return "revenues";
-  }
-
-  if (label === "ხარჯები") return "expenditures";
-
   return "other";
 }
 
@@ -120,13 +95,36 @@ export function parseTavi1Rows(input: ParseTavi1Input): OfficialRevenueRow[] {
   const parsedRows: OfficialRevenueRow[] = [];
 
   for (const [offset, row] of input.matrix.slice(indexes.headerRowIndex + 1).entries()) {
+    const rowNumber = indexes.headerRowIndex + offset + 2;
     const labelKa = cellText(row[indexes.labelIndex]);
     if (normalizedText(labelKa) === normalizedText("დასახელება")) break;
 
-    const actualThousandGel = numericCell(row[indexes.actualIndex]);
-    if (!labelKa || actualThousandGel === null) continue;
+    const actualThousandGel = amountCell(row[indexes.actualIndex]);
+    if (!labelKa || actualThousandGel === null) {
+      // Only warn about rows that carry numeric amounts; label-only rows (section
+      // headings without figures) and blank separator rows are normal structure.
+      const approved = amountCell(row[indexes.approvedPlanIndex]);
+      const revised = amountCell(row[indexes.revisedPlanIndex]);
+
+      if (approved !== null || revised !== null || actualThousandGel !== null) {
+        const why = !labelKa ? "row has amounts but no label" : "row has a label and plan amounts but no actual amount";
+        input.warnings?.push(
+          `year ${input.year}, sheet "${input.sheetName}", row ${rowNumber} (${input.workbookPath}): ` +
+            `dropped row — ${why}; label="${labelKa}", ` +
+            `approved=${approved ?? "-"}, revised=${revised ?? "-"}, actual=${actualThousandGel ?? "-"}`,
+        );
+      }
+
+      continue;
+    }
 
     const section = classifySection(labelKa, currentSection, financingContext);
+    if (section === "other") {
+      input.warnings?.push(
+        `year ${input.year}, sheet "${input.sheetName}", row ${rowNumber} (${input.workbookPath}): ` +
+          `label "${labelKa}" with amounts could not be classified into a known section (kept as "other")`,
+      );
+    }
     if (section === "revenues" || section === "expenditures") currentSection = section;
     if (
       section === "non_financial_assets" ||
@@ -143,13 +141,13 @@ export function parseTavi1Rows(input: ParseTavi1Input): OfficialRevenueRow[] {
       sourceId: input.sourceId,
       workbookPath: input.workbookPath,
       sheetName: input.sheetName,
-      rowNumber: indexes.headerRowIndex + offset + 2,
+      rowNumber,
       labelKa,
       section,
-      approvedPlanThousandGel: numericCell(row[indexes.approvedPlanIndex]),
-      revisedPlanThousandGel: numericCell(row[indexes.revisedPlanIndex]),
+      approvedPlanThousandGel: amountCell(row[indexes.approvedPlanIndex]),
+      revisedPlanThousandGel: amountCell(row[indexes.revisedPlanIndex]),
       actualThousandGel,
-      executionPercent: numericCell(row[indexes.executionPercentIndex]),
+      executionPercent: amountCell(row[indexes.executionPercentIndex]),
     });
   }
 

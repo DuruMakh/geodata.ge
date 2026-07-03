@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { PDFParse } from "pdf-parse";
 import * as XLSX from "xlsx";
 import { REVENUE_YEARS } from "../coverage";
+import { pickSheetName } from "../parsing/cellUtils";
 import { parseTavi1Rows, type MatrixCell } from "./parseTavi1Rows";
 import { parseTreasuryPdfRows } from "./parseTreasuryPdfRows";
 import type { OfficialRevenueRow, RealRevenuePdfSource, RealRevenueSource } from "./types";
@@ -36,28 +37,17 @@ export const realRevenuePdfSources: RealRevenuePdfSource[] = REVENUE_YEARS.map((
   ...([2005, 2006, 2007, 2015].includes(year) ? { textPath: `../../docs/Raw Data/Revenue/text/${year}-jan-dec-consolidated-revenue.txt` } : {}),
 }));
 
-function normalizeSheetName(value: string): string {
-  return value.trim().toLowerCase().replace(/\s+/g, " ");
-}
-
-function pickSheetName(workbook: XLSX.WorkBook, preferredNames: string[]): string {
-  const availableByNormalized = new Map(workbook.SheetNames.map((name) => [normalizeSheetName(name), name]));
-
-  for (const preferred of preferredNames) {
-    const matched = availableByNormalized.get(normalizeSheetName(preferred));
-    if (matched) return matched;
-  }
-
-  throw new Error(`Could not find revenue sheet. Available sheets: ${workbook.SheetNames.join(", ")}`);
-}
-
-export function extractOfficialWorkbookRevenueRows(): OfficialRevenueRow[] {
+export function extractOfficialWorkbookRevenueRows(warnings?: string[]): OfficialRevenueRow[] {
   return realRevenueSources.flatMap((source) => {
     const workbookFile = path.resolve(process.cwd(), source.workbookPath);
     if (!existsSync(workbookFile)) return [];
 
     const workbook = XLSX.readFile(workbookFile, { cellDates: false });
-    const sheetName = pickSheetName(workbook, source.preferredSheetNames);
+    // No fallback pattern here: revenue extraction must only use explicitly reviewed sheets.
+    const sheetName = pickSheetName(workbook, {
+      preferredNames: source.preferredSheetNames,
+      sheetDescription: "revenue sheet",
+    });
     const sheet = workbook.Sheets[sheetName];
 
     if (!sheet) throw new Error(`Missing sheet after selection: ${sheetName}`);
@@ -75,6 +65,7 @@ export function extractOfficialWorkbookRevenueRows(): OfficialRevenueRow[] {
       workbookPath: source.workbookPath.replace("../../", ""),
       sheetName,
       matrix,
+      warnings,
     });
   });
 }

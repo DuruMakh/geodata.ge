@@ -161,4 +161,70 @@ describe("parseTavi6Rows", () => {
       }),
     ]);
   });
+
+  it("throws when the assumed column offsets do not match the header keywords", () => {
+    const matrix = [
+      // Approved and revised plan columns are swapped relative to the assumed layout.
+      ["კოდი", "დასახელება", "2025 წლის დაზუსტებული გეგმა", "2025 წლის დამტკიცებული გეგმა", "2025 წლის ფაქტი", "შესრულება %"],
+      ["00 00", "სულ ჯამი", 100, 100, 110, 1.1],
+    ];
+
+    expect(() =>
+      parseTavi6Rows({
+        year: 2025,
+        sourceId: "source.mof_2025_tavi6_actual",
+        workbookPath: "docs/Raw Data/2025.xlsx",
+        sheetName: "tavi 6",
+        matrix,
+      }),
+    ).toThrow(/approved plan column .+ დაზუსტებული/);
+  });
+
+  it("throws when the execution percent offset lands on a plan column", () => {
+    const matrix = [
+      ["კოდი", "დასახელება", "2025 წლის დამტკიცებული გეგმა", "2025 წლის ფაქტი", "2025 წლის დაზუსტებული გეგმა", "შესრულება %"],
+      ["00 00", "სულ ჯამი", 100, 110, 100, 1.1],
+    ];
+
+    expect(() =>
+      parseTavi6Rows({
+        year: 2025,
+        sourceId: "source.mof_2025_tavi6_actual",
+        workbookPath: "docs/Raw Data/2025.xlsx",
+        sheetName: "tavi 6",
+        matrix,
+      }),
+    ).toThrow(/Tavi 6 header column mismatch/);
+  });
+
+  it("collects warnings for content-bearing dropped rows but not for blank separators", () => {
+    const warnings: string[] = [];
+    const matrix = [
+      ["კოდი", "დასახელება", "2025 წლის დამტკიცებული გეგმა", "2025 წლის დაზუსტებული გეგმა", "2025 წლის ფაქტი", "შესრულება %"],
+      ["00 00", "სულ ჯამი", 100, 100, 110, 1.1],
+      [null, null, null, null, null, null],
+      [null, null, null, null, null, "%"],
+      [null, "შენიშვნა ფასს გარეშე", null, null, null, null],
+      [null, null, 55, 56, null, null],
+      [null, "გეგმიანი ჩანაწერი", 70, 71, null, null],
+    ];
+
+    const rows = parseTavi6Rows({
+      year: 2025,
+      sourceId: "source.mof_2025_tavi6_actual",
+      workbookPath: "docs/Raw Data/2025.xlsx",
+      sheetName: "tavi 6",
+      matrix,
+      warnings,
+    });
+
+    expect(rows).toHaveLength(1);
+    // Blank separator, percent header continuation, and label-only note rows stay silent.
+    expect(warnings).toHaveLength(2);
+    expect(warnings[0]).toContain("row 6");
+    expect(warnings[0]).toContain("no label");
+    expect(warnings[1]).toContain("row 7");
+    expect(warnings[1]).toContain('label="გეგმიანი ჩანაწერი"');
+    expect(warnings[1]).toContain("no actual amount");
+  });
 });

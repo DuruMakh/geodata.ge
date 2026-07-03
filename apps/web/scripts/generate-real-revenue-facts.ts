@@ -49,7 +49,8 @@ async function main() {
       (row) => row.side === "revenue" && !REVENUE_DETAILED_YEARS.includes(row.year),
     ),
   };
-  const workbookRows = extractOfficialWorkbookRevenueRows();
+  const parserWarnings: string[] = [];
+  const workbookRows = extractOfficialWorkbookRevenueRows(parserWarnings);
   const workbookYears = new Set(workbookRows.map((row) => row.year));
   const comparisonOfficialRows = detailedOfficialRows.filter((row) => workbookYears.has(row.year));
   const comparisonReport = {
@@ -65,6 +66,9 @@ async function main() {
   await writeFile(path.join(importsDir, "revenue-facts-2005-2025.csv"), budgetFactsToCsv(facts), "utf8");
   await writeFile(path.join(reportsDir, "real-revenue-2005-2025-report.json"), JSON.stringify(report, null, 2), "utf8");
   await writeFile(path.join(reportsDir, "revenue-pdf-vs-workbook-2005-2025-report.json"), JSON.stringify(comparisonReport, null, 2), "utf8");
+
+  console.error(`Parser warnings: ${parserWarnings.length}`);
+  for (const warning of parserWarnings) console.error(`  - ${warning}`);
 
   if (Object.values(report.reconciliationStatusByYear).some((status) => status === "failed")) {
     throw new Error("Real revenue reconciliation failed. See data/reports/real-revenue-2005-2025-report.json");

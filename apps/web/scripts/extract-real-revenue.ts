@@ -1,6 +1,6 @@
 ﻿import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { extractOfficialRevenueRows } from "../lib/data/realRevenue/extractWorkbooks";
+import { extractOfficialRevenueRows, extractOfficialWorkbookRevenueRows } from "../lib/data/realRevenue/extractWorkbooks";
 import type { OfficialRevenueRow } from "../lib/data/realRevenue/types";
 
 function csvEscape(value: string | number | null): string {
@@ -55,13 +55,20 @@ function rowsToCsv(rows: OfficialRevenueRow[]): string {
 }
 
 async function main() {
+  const parserWarnings: string[] = [];
   const rows = await extractOfficialRevenueRows();
+  // The tavi 1 workbook comparison sources are parsed here as well so their
+  // parser warnings surface in this pipeline run (the rows themselves are only
+  // written by generate-real-revenue-facts).
+  extractOfficialWorkbookRevenueRows(parserWarnings);
   const stagingDir = path.resolve(process.cwd(), "../../data/staging");
 
   await mkdir(stagingDir, { recursive: true });
   await writeFile(path.join(stagingDir, "revenue-official-rows-2005-2025.csv"), rowsToCsv(rows), "utf8");
 
   console.log(`Extracted official revenue rows: ${rows.length}`);
+  console.error(`Parser warnings: ${parserWarnings.length}`);
+  for (const warning of parserWarnings) console.error(`  - ${warning}`);
 }
 
 main().catch((error) => {

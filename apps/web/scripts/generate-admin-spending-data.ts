@@ -176,7 +176,8 @@ function programReviewCsv(facts: AdminSpendingFact[]): string {
 }
 
 async function main() {
-  const officialRows = extractAdminSpendingOfficialRows();
+  const parserWarnings: string[] = [];
+  const officialRows = extractAdminSpendingOfficialRows(parserWarnings);
   const facts = generateAdminSpendingFacts(officialRows);
   const report = buildAdminSpendingReport(officialRows, facts);
 
@@ -209,6 +210,9 @@ async function main() {
     JSON.stringify(report, null, 2),
     "utf8",
   );
+
+  console.error(`Parser warnings: ${parserWarnings.length}`);
+  for (const warning of parserWarnings) console.error(`  - ${warning}`);
 
   if (Object.values(report.reconciliationStatusByYear).some((status) => status === "failed")) {
     throw new Error("Admin spending reconciliation failed. See data/reports/admin-spending-2004-2025-report.json");

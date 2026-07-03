@@ -17,7 +17,8 @@ function rowsToCsv(headers: string[], rows: Array<Record<string, string | number
 }
 
 async function main() {
-  const officialRows = extractOfficialExpenditureRows();
+  const parserWarnings: string[] = [];
+  const officialRows = extractOfficialExpenditureRows(parserWarnings);
   const candidateMappings = generateCandidateMappings(officialRows);
   const stagingDir = path.resolve(process.cwd(), "../../data/staging");
   const reviewDir = path.resolve(process.cwd(), "../../data/mappings/review");
@@ -127,6 +128,8 @@ async function main() {
 
   console.log(`Extracted official rows: ${officialRows.length}`);
   console.log(`Candidate mapping rows: ${candidateMappings.length}`);
+  console.error(`Parser warnings: ${parserWarnings.length}`);
+  for (const warning of parserWarnings) console.error(`  - ${warning}`);
 }
 
 main().catch((error) => {

@@ -1,5 +1,6 @@
 import path from "node:path";
 import * as XLSX from "xlsx";
+import { pickSheetName } from "../parsing/cellUtils";
 import { parseTavi6Rows } from "./parseTavi6Rows";
 import type { MatrixCell } from "./parseTavi6Rows";
 import type { OfficialExpenditureRow, RealExpenditureSource } from "./types";
@@ -25,34 +26,15 @@ export const realExpenditureSources: RealExpenditureSource[] = [
   },
 ];
 
-function normalizeSheetName(value: string): string {
-  return value.trim().toLowerCase().replace(/\s+/g, " ");
-}
-
-function pickSheetName(workbook: XLSX.WorkBook, preferredNames: string[]): string {
-  const available = workbook.SheetNames;
-  const availableByNormalized = new Map(available.map((name) => [normalizeSheetName(name), name]));
-
-  for (const preferred of preferredNames) {
-    const matched = availableByNormalized.get(normalizeSheetName(preferred));
-    if (matched) return matched;
-  }
-
-  const candidate = available.find((name) => {
-    const normalized = normalizeSheetName(name);
-    return normalized.includes("tavi 6") || normalized.includes("vi თავი");
-  });
-
-  if (candidate) return candidate;
-
-  throw new Error(`Could not find tavi 6 sheet. Available sheets: ${available.join(", ")}`);
-}
-
-export function extractOfficialExpenditureRows(): OfficialExpenditureRow[] {
+export function extractOfficialExpenditureRows(warnings?: string[]): OfficialExpenditureRow[] {
   return realExpenditureSources.flatMap((source) => {
     const workbookFile = path.resolve(process.cwd(), source.workbookPath);
     const workbook = XLSX.readFile(workbookFile, { cellDates: false });
-    const sheetName = pickSheetName(workbook, source.preferredSheetNames);
+    const sheetName = pickSheetName(workbook, {
+      preferredNames: source.preferredSheetNames,
+      fallbackPattern: (normalized) => normalized.includes("tavi 6") || normalized.includes("vi თავი"),
+      sheetDescription: "tavi 6 sheet",
+    });
     const sheet = workbook.Sheets[sheetName];
 
     if (!sheet) throw new Error(`Missing sheet after selection: ${sheetName}`);
@@ -70,6 +52,7 @@ export function extractOfficialExpenditureRows(): OfficialExpenditureRow[] {
       workbookPath: source.workbookPath.replace("../../", ""),
       sheetName,
       matrix,
+      warnings,
     });
   });
 }
