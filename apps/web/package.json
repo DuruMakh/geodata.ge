@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "prisma generate --schema prisma/schema.prisma",
+    "postinstall": "prisma generate --schema prisma/schema.prisma",
     "dev": "next dev",
-    "prebuild": "prisma generate --schema prisma/schema.prisma",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -33,7 +32,6 @@
     "data:generate-final-2023-expenditure": "tsx scripts/generate-final-2025-expenditure-data.ts --year 2023",
     "data:generate-final-2024-expenditure": "tsx scripts/generate-final-2025-expenditure-data.ts --year 2024",
     "data:extract-revenue": "tsx scripts/extract-real-revenue.ts",
-    "data:generate-expenditure-facts": "tsx scripts/generate-real-expenditure-facts.ts",
     "data:generate-revenue-facts": "tsx scripts/generate-real-revenue-facts.ts",
     "data:generate-admin-spending": "tsx scripts/generate-admin-spending-data.ts",
     "data:compose-budget-facts": "tsx scripts/compose-budget-facts.ts",
@@ -51,7 +49,6 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
-    "xlsx": "^0.18.5",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -60,9 +57,11 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "pdf-parse": "^2.4.5",
+    "xlsx": "^0.18.5",
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
