@@ -21,6 +21,7 @@ import {
 } from "../lib/data/realExpenditurePdf/publicMapping";
 import { parseExpenditurePdfText, readPdfTextPages, sha256File } from "../lib/data/realExpenditurePdf/phase1Pilot";
 import { parseTavi6ProgrammaticPdfRows } from "../lib/data/realExpenditurePdf/tavi6ProgrammaticPdf";
+import { canonicalizeExpenditurePdfRowLabels } from "../lib/data/realExpenditurePdf/cofogCanonicalLabels";
 
 const sourcesByYear = {
   2004: {
@@ -140,8 +141,9 @@ const sourcesByYear = {
     sourceSha256: "A09E932E6683CC2B7D55F01691841D5E393F376BD0A7013914D2E8B2CE18B23F",
     formId: "E11",
     tableTitle: "2014 state budget expenditure execution by functional classification",
-    actualAmountIndex: 1,
-    workbookPath: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2014-fact.xlsx",
+    actualAmountIndex: 3,
+    legacyEncodedLabels: true,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2014-annual-execution-tavi-VI-programmatic.pdf",
     workbookSourceId: "source.mof_2014_programmatic_fact_actual",
     finalSourceId: "source.mof_2014_expenditure_functional_plus_programmatic_supplement_actual",
   },  2015: {
@@ -462,10 +464,12 @@ async function main() {
   }
 
   const pdf = await readPdfTextPages(repoPath(source.sourceFile));
-  const pdfRows = parseExpenditurePdfText({
+  const parsedPdfRows = parseExpenditurePdfText({
     ...source,
     pages: pdf.pages,
   });
+  const legacyEncodedLabels = "legacyEncodedLabels" in source && source.legacyEncodedLabels === true;
+  const pdfRows = legacyEncodedLabels ? canonicalizeExpenditurePdfRowLabels(parsedPdfRows) : parsedPdfRows;
   const pdfMappings = generateCompactPdfSpendingMappings(pdfRows);
   const pdfValidation = validateCompactPdfSpendingMappings(pdfRows, pdfMappings);
 

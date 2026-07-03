@@ -1,10 +1,10 @@
-# 2015-2016 Expenditure Final Data Methodology
+# 2014-2016 Expenditure Final Data Methodology
 
 Status: implemented and reconciled (2026-07-04)
 
-Scope: national budget expenditure, actual execution, 2015 and 2016
+Scope: national budget expenditure, actual execution, 2014, 2015, and 2016
 
-These two years extend the confirmed 2017-2025 process (see `2025-expenditure-final-methodology.md`) backwards. The E11 functional PDF side is identical to 2017-2025. The supplement side required a different official source, documented below.
+These years extend the confirmed 2017-2025 process (see `2025-expenditure-final-methodology.md`) backwards. The E11 functional PDF side is structurally identical to 2017-2025 (2014's E11 additionally embeds a legacy non-Unicode Georgian font — see section 3a). The supplement side required a different official source, documented below.
 
 ## 1. Why these years needed a new supplement source
 
@@ -19,10 +19,11 @@ final = mapped E11 functional PDF total
 For 2017-2025 the supplements come from the annual execution workbooks in
 `docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/`.
 
-For 2015 and 2016 the files with the same names in that folder are NOT
+For 2014-2016 the files with the same names in that folder are NOT
 execution reports. They are budget-law annexes:
 
 ```text
+2014-fact.xlsx  ->  2014 budget law annex: 2012 fact, 2013 fact, 2014 PLAN
 2015-fact.xlsx  ->  2015 budget law annex: 2013 fact, 2014 fact, 2015 PLAN
 2016-fact.xlsx  ->  2016 budget law annex (truncated): 2014 fact, 2015 fact, 2016 PLAN
 ```
@@ -44,6 +45,14 @@ files were retrieved from the Internet Archive captures of the original
 mof.ge URLs:
 
 ```text
+docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2014-annual-execution-tavi-VI-programmatic.pdf
+  original: https://mof.ge/images/File/biuj2014_12tve/TAVI_VI.pdf
+  landing page: https://mof.ge/shesrulebis_angarishi_2014
+  archived copy used: http://web.archive.org/web/20250622055924/https://www.mof.ge/images/File/biuj2014_12tve/TAVI_VI.pdf
+  (note: the 2022 capture of this URL is truncated at 1 MiB; the 2024+
+  captures carry the full 2,987,605-byte file)
+  SHA-256: 712B5B562E44F94A9A21547A3D47A684F8CF59AC1E5F79B3AF31514AD12F44E9
+
 docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2015-annual-execution-tavi-VI-programmatic.pdf
   original: https://mof.ge/images/File/biuj2015/TAVI_VI.pdf
   landing page: https://mof.ge/shesrulebis_angarishi_2015
@@ -61,8 +70,29 @@ Independent cross-check: the truncated 2016 law annex republishes the 2015
 actual aggregates, and they match the 2015 report exactly (ხარჯები
 8,157,998.4k; არაფინანსური აქტივების ზრდა 680,173.3k; ფინანსური აქტივების
 ზრდა 444,804.8k; ვალდებულებების კლება 420,150.6k; სულ 9,703,127.1k).
+Likewise the 2015 law annex republishes the 2014 actual aggregates and they
+match the 2014 report exactly (ხარჯები 7,479,426.2k; ფინანსური აქტივების
+ზრდა 272,202.2k; ვალდებულებების კლება 559,733.7k; სულ 9,009,812.2k).
+
+The 2014-2016 execution report PDFs use proper Unicode Georgian text (only
+the treasury E11 PDF for 2014 carries the legacy font).
 
 ## 3. Pipeline pieces added or changed
+
+### 3a. Legacy-font E11 labels (2014)
+
+The 2014 treasury E11 PDF embeds a legacy Georgian font: glyphs land in
+IPA/spacing-modifier codepoints (for example `ˆʨʸˇʬʩʰ` for ხარჯები) and
+word spaces are lost. Codes and amounts parse normally, so extraction and
+mapping key on functional codes; only the display labels are affected.
+
+`apps/web/lib/data/realExpenditurePdf/cofogCanonicalLabels.ts` carries the
+canonical functional-code -> Georgian label table (96 entries sourced from
+the reviewed 2017/2016/2015 E11 extractions; COFOG labels are standardized
+across years — every 2014 code is covered). Years flagged with
+`legacyEncodedLabels: true` in the script configs get labelKa/hierarchyPath
+replaced with canonical text; rawRowText keeps the original extracted
+evidence.
 
 ```text
 apps/web/lib/data/realExpenditurePdf/tavi6ProgrammaticPdf.ts
@@ -99,6 +129,13 @@ report notes how many rows used generated candidates.
 ## 4. Reconciliation results
 
 ```text
+2014
+  E11 PDF mapped total:            8,177,876,295 GEL
+  Supplements (fin.assets+liab.):    831,935,900 GEL
+  Final total:                     9,009,812,195 GEL
+  Official annual total:           9,009,812,200 GEL (thousand-GEL annex rounding)
+  Difference:                                  5 GEL (tolerance 1,000)
+
 2015
   E11 PDF mapped total:            8,838,171,764 GEL
   Supplements (fin.assets+liab.):    864,955,200 GEL
@@ -113,8 +150,14 @@ report notes how many rows used generated candidates.
   Official annual total:          10,292,234,100 GEL
   Difference:                                520 GEL (tolerance 1,000)
 
-spending.other_unclassified: 288,100 GEL (2015), 541,300 GEL (2016) —
-supplement rows whose program labels matched no reviewed or candidate rule.
+spending.other_unclassified: 3,919,900 GEL (2014, 0.04%), 288,100 GEL
+(2015), 541,300 GEL (2016) — supplement rows whose program labels matched
+no reviewed or candidate rule; each row stays flagged in the supplement
+staging CSV for review. The largest 2014 residuals are treaty-obligation
+and armed-forces-readiness arrears rows whose labels miss the current
+candidate keywords; extending `candidateMapping.ts` rules would reclassify
+them but also regenerate already-pinned years, so it is left as a conscious
+follow-up.
 ```
 
 Regression pins for both totals live in
@@ -124,8 +167,10 @@ Regression pins for both totals live in
 
 ```powershell
 cd apps/web
+npm run data:extract-expenditure-pdf-2014
 npm run data:extract-expenditure-pdf-2015
 npm run data:extract-expenditure-pdf-2016
+npm run data:generate-final-2014-expenditure
 npm run data:generate-final-2015-expenditure
 npm run data:generate-final-2016-expenditure
 npm run data:compose-budget-facts
@@ -133,7 +178,7 @@ npm run data:validate
 npm test
 ```
 
-## 6. Notes for older years (2006-2014 rollout)
+## 6. Notes for older years (2006-2013 rollout)
 
 - The `excel-fact-files-2004-2025/<year>-fact.xlsx` files for pre-2017 years
   are budget-law annexes (plan data, prior-year facts). Do not use them as
@@ -142,5 +187,10 @@ npm test
   under the same URL family (`mof.ge/images/File/biuj<year>...`, landing
   pages `mof.ge/shesrulebis_angarishi_<year>...`), retrievable through the
   Internet Archive. Their Chapter VI annexes are the natural supplement
-  source for Group 2-4 years (2008-2014), pending the same E11-side format
-  adaptations described in the year-group analysis.
+  source for the remaining Group 3-4 years (2008-2013), pending the
+  E11-side format adaptations described in the year-group analysis
+  (non-dotted COFOG codes for 2012-2013 and the 2008-2011 row shape).
+- Wayback captures of large files can be silently truncated (the 2022
+  capture of the 2014 Chapter VI stops at exactly 1 MiB). Always compare
+  the downloaded size against `x-archive-orig-content-length` or prefer the
+  newest capture, and check the file ends with `%%EOF`.
