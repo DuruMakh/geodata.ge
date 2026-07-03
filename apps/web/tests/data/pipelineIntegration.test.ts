@@ -304,9 +304,11 @@ describe("data pipeline gate (real shipped data files)", () => {
     // state budget payments for a year, so their per-year actual sums must
     // agree within the shared reconciliation tolerance the generators use
     // (ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL, 1000 GEL).
+    // Detailed expenditure now reaches further back (2015+) than the admin
+    // pipeline (2017+, execution workbooks only), so reconcile the overlap.
     const mismatches: { year: number; functionalTotalGel: number; adminTotalGel: number; differenceGel: number }[] = [];
 
-    for (const year of EXPENDITURE_DETAILED_YEARS) {
+    for (const year of EXPENDITURE_DETAILED_YEARS.filter((candidate) => ADMIN_SPENDING_YEARS.includes(candidate))) {
       const functionalTotalGel = sumAmountGel(
         actualOnly(expenditureCategoryFacts(facts)).filter((fact) => fact.year === year),
       );
@@ -384,6 +386,13 @@ describe("data pipeline gate (real shipped data files)", () => {
     // "Total revenue" series.
     expect(totalFor("revenue", 2024)).toBe(29_744_320_017);
     expect(totalFor("revenue", 2025)).toBe(32_368_880_408);
+
+    // Same intentional pins for the oldest detailed expenditure years (added
+    // 2026-07): E11 functional PDF plus mof.ge annual execution report tavi VI
+    // supplements. Official annual totals they reconcile against (thousand-GEL
+    // annex rounding): 9,703,127,100 and 10,292,234,100 GEL.
+    expect(totalFor("expenditure", 2015)).toBe(9_703_126_964);
+    expect(totalFor("expenditure", 2016)).toBe(10_292_234_620);
   });
 
   it("has no negative actual amounts where the domain forbids them", async () => {

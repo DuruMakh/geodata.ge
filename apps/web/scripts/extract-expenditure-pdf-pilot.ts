@@ -19,6 +19,10 @@ import {
 } from "../lib/data/realExpenditurePdf/publicMapping";
 import { parseTavi6Rows } from "../lib/data/realExpenditure/parseTavi6Rows";
 import type { MatrixCell } from "../lib/data/realExpenditure/parseTavi6Rows";
+import {
+  parseTavi6ProgrammaticPdfRows,
+  tavi6ProgrammaticPdfTotalActualGel,
+} from "../lib/data/realExpenditurePdf/tavi6ProgrammaticPdf";
 
 const sourcesByYear = {
   2004: {
@@ -149,8 +153,8 @@ const sourcesByYear = {
     sourceSha256: "ABDF59CF9192CFF61C8C619D1948777BBFB9F7D2606D6E1CD94D0E02769F80D6",
     formId: "E11",
     tableTitle: "2015 state budget expenditure execution by functional classification",
-    actualAmountIndex: 1,
-    workbookPath: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2015-fact.xlsx",
+    actualAmountIndex: 3,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2015-annual-execution-tavi-VI-programmatic.pdf",
     workbookSourceId: "source.mof_2015_programmatic_fact_actual",
     finalSourceId: "source.mof_2015_expenditure_functional_plus_programmatic_supplement_actual",
   },  2016: {
@@ -160,8 +164,8 @@ const sourcesByYear = {
     sourceSha256: "8F8509EB985AC16E52D02F08480B6374E368AEC3ED7E575B1BAA997A773E1127",
     formId: "E11",
     tableTitle: "2016 state budget expenditure execution by functional classification",
-    actualAmountIndex: 1,
-    workbookPath: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2016-fact.xlsx",
+    actualAmountIndex: 3,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2016-annual-execution-tavi-VI-programmatic.pdf",
     workbookSourceId: "source.mof_2016_programmatic_fact_actual",
     finalSourceId: "source.mof_2016_expenditure_functional_plus_programmatic_supplement_actual",
   },  2017: {
@@ -299,7 +303,18 @@ function pickTavi6Sheet(workbook: XLSX.WorkBook): string {
   return sheetName;
 }
 
-function readWorkbookGrandTotalActualGel(): number | null {
+async function readWorkbookGrandTotalActualGel(): Promise<number | null> {
+  if (source.workbookPath.endsWith(".pdf")) {
+    const workbookPdf = await readPdfTextPages(repoPath(source.workbookPath));
+    const rows = parseTavi6ProgrammaticPdfRows({
+      year: source.year,
+      sourceId: source.workbookSourceId,
+      workbookPath: source.workbookPath,
+      pages: workbookPdf.pages,
+    });
+    return tavi6ProgrammaticPdfTotalActualGel(rows);
+  }
+
   const workbook = XLSX.readFile(repoPath(source.workbookPath), { cellDates: false });
   const sheetName = pickTavi6Sheet(workbook);
   const sheet = workbook.Sheets[sheetName];
@@ -348,7 +363,7 @@ async function main() {
   });
   const workbookComparisonReport = buildWorkbookComparisonReport({
     pdfRows: rows,
-    workbookGrandTotalActualGel: readWorkbookGrandTotalActualGel(),
+    workbookGrandTotalActualGel: await readWorkbookGrandTotalActualGel(),
   });
   const compactMappings = generateCompactPdfSpendingMappings(rows);
   const compactMappingValidation = validateCompactPdfSpendingMappings(rows, compactMappings);

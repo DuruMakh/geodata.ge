@@ -127,6 +127,40 @@ function normalizeText(value: string): string {
   return value.replace(/\u00a0/g, " ").replace(/\t/g, " ").replace(/\s+/g, " ").trim();
 }
 
+/**
+ * Some E11 text layers (2015) repeat every visual label cell several times on the
+ * same tab-separated line ("\u10ef\u10d0\u10db\u10e3\u10e0\u10d8\t\u10ef\u10d0\u10db\u10e3\u10e0\u10d8\t\u10ef\u10d0\u10db\u10e3\u10e0\u10d8\t\u10ef\u10d0\u10db\u10e3\u10e0\u10d8 8,771,288.0 ...").
+ * Collapse those artifacts: a Georgian cell is dropped when the previous kept cell
+ * already ends with it, and a repeated Georgian phrase is stripped from the head of
+ * a cell that carries the row amounts. Numeric cells are never touched, so rows with
+ * legitimately equal adjacent amounts are safe.
+ */
+function dedupeRepeatedLineCells(line: string): string {
+  if (!line.includes("\t")) return line;
+  const cells = line
+    .split("\t")
+    .map((cell) => cell.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim())
+    .filter((cell) => cell.length > 0);
+  const kept: string[] = [];
+
+  for (const cell of cells) {
+    const previous = kept[kept.length - 1];
+    if (previous && /[\u10d0-\u10ff]/.test(cell)) {
+      if (previous === cell || previous.endsWith(cell)) continue;
+      const repeatedHead = cell.match(/^([^\d-]+)/)?.[1];
+      if (repeatedHead && previous.endsWith(repeatedHead.trim())) {
+        const stripped = cell.slice(repeatedHead.length).trim();
+        if (!stripped) continue;
+        kept.push(stripped);
+        continue;
+      }
+    }
+    kept.push(cell);
+  }
+
+  return kept.join(" ");
+}
+
 function parseGel(value: string | null): number | null {
   if (!value) return null;
   const parsed = Number(value.replaceAll(",", ""));
@@ -193,11 +227,11 @@ function segmentsFromPages(pages: ExpenditurePdfPageText[]): ParsedSegment[] {
   for (const page of pages) {
     const lines = page.text
       .split(/\r?\n/)
-      .map(normalizeText)
+      .map((line) => normalizeText(dedupeRepeatedLineCells(line)))
       .filter(Boolean);
 
     for (const line of lines) {
-      if (/^(2025 |01\/04\/2026|\d{2}\/\d{2}\/\d{4})/.test(line) || line.includes(" - 42 ")) {
+      if (/^(2025 |01\/04\/2026|\d{2}\/\d{2}\/\d{4}|\d{2}-\d{2}-\d{4})/.test(line) || line.includes(" - 42 ")) {
         flush();
         continue;
       }

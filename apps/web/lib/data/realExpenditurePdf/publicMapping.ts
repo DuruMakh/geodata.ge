@@ -131,6 +131,12 @@ const mappingRules: MappingRule[] = [
     mappingReason: "7.4 split: other economic sectors",
   },
   {
+    functionalCode: "7.4.8",
+    publicSpendingFieldId: "spending.economic_affairs",
+    mappingConfidence: "medium",
+    mappingReason: "7.4 split: applied research in economic activity (present through 2015) stays under economic affairs",
+  },
+  {
     functionalCode: "7.4.9",
     publicSpendingFieldId: "spending.economic_affairs",
     mappingConfidence: "medium",
