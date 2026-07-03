@@ -293,7 +293,7 @@ function pickTavi6Sheet(workbook: XLSX.WorkBook): string {
   const sheetName =
     workbook.SheetNames.find((name) => {
       const normalized = name.trim().toLowerCase();
-      return normalized.includes("tavi 6") || normalized.includes("vi áƒ—áƒáƒ•áƒ˜");
+      return normalized.includes("tavi 6") || normalized.includes("vi თავი");
     }) ?? workbook.SheetNames[0];
   if (!sheetName) throw new Error("Workbook has no sheets for diagnostic comparison.");
   return sheetName;

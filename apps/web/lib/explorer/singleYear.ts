@@ -74,8 +74,8 @@ function sourceMetadataFromItems(items: SnapshotItem[]): SourceMetadata {
 
 function emptyReasonFor(side: ExplorerSide): string {
   return side === "revenue"
-    ? "áƒáƒ› áƒ¬áƒšáƒ˜áƒ¡áƒ—áƒ•áƒ˜áƒ¡ áƒ¨áƒ”áƒ›áƒáƒ¡áƒáƒ•áƒšáƒ”áƒ‘áƒ˜áƒ¡ áƒ›áƒáƒœáƒáƒªáƒ”áƒ›áƒ”áƒ‘áƒ˜ áƒ¯áƒ”áƒ  áƒáƒ  áƒáƒ áƒ˜áƒ¡ áƒ©áƒáƒ¢áƒ•áƒ˜áƒ áƒ—áƒ£áƒšáƒ˜."
-    : "áƒáƒ› áƒ¬áƒšáƒ˜áƒ¡áƒ—áƒ•áƒ˜áƒ¡ áƒ®áƒáƒ áƒ¯áƒ”áƒ‘áƒ˜áƒ¡ áƒ›áƒáƒœáƒáƒªáƒ”áƒ›áƒ”áƒ‘áƒ˜ áƒ¯áƒ”áƒ  áƒáƒ  áƒáƒ áƒ˜áƒ¡ áƒ©áƒáƒ¢áƒ•áƒ˜áƒ áƒ—áƒ£áƒšáƒ˜.";
+    ? "ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული."
+    : "ამ წლისთვის ხარჯების მონაცემები ჯერ არ არის ჩატვირთული.";
 }
 
 function changeFromPrevious(amountGel: number, previousAmountGel: number | null): number | null {
@@ -144,7 +144,7 @@ function buildRadarItems(items: SnapshotItem[]): SnapshotItem[] {
     ...visible,
     {
       itemId: "snapshot.other",
-      kaLabel: "áƒ¡áƒ®áƒ•áƒ",
+      kaLabel: "სხვა",
       enLabel: "Other",
       color: "#8e8e93",
       amountGel,
@@ -170,25 +170,25 @@ function headlineCards(totalGel: number, items: SnapshotItem[]): SnapshotHeadlin
   return [
     {
       id: "total",
-      label: "áƒ¡áƒ£áƒš",
+      label: "სულ",
       value: formatGel(totalGel),
-      detail: `${items.length} áƒ™áƒáƒ¢áƒ”áƒ’áƒáƒ áƒ˜áƒ`,
+      detail: `${items.length} კატეგორია`,
     },
     {
       id: "largest",
-      label: "áƒ§áƒ•áƒ”áƒšáƒáƒ–áƒ” áƒ“áƒ˜áƒ“áƒ˜",
+      label: "ყველაზე დიდი",
       value: largest ? formatGel(largest.amountGel) : "n/a",
       detail: largest ? `${largest.kaLabel} - ${formatPercent(largest.shareOfTotal)}` : "n/a",
     },
     {
       id: "fastest_growth",
-      label: "áƒ§áƒ•áƒ”áƒšáƒáƒ–áƒ” áƒ¡áƒ¬áƒ áƒáƒ¤áƒ˜ áƒ–áƒ áƒ“áƒ",
+      label: "ყველაზე სწრაფი ზრდა",
       value: fastestGrowth ? formatSignedPercent(fastestGrowth.changeFromPreviousYear) : "n/a",
       detail: fastestGrowth?.kaLabel ?? "n/a",
     },
     {
       id: "largest_increase",
-      label: "áƒ§áƒ•áƒ”áƒšáƒáƒ–áƒ” áƒ“áƒ˜áƒ“áƒ˜ áƒ›áƒáƒ¢áƒ”áƒ‘áƒ",
+      label: "ყველაზე დიდი მატება",
       value: largestIncrease ? formatGel(largestIncrease.amountChangeFromPreviousYear) : "n/a",
       detail: largestIncrease?.kaLabel ?? "n/a",
     },

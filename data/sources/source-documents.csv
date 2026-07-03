@@ -15,10 +15,10 @@ source.mof_2023_tavi6_actual,Reviewed official 2023 state budget execution tavi 
 source.mof_2023_tavi1_actual,Reviewed official 2023 state budget execution tavi 1,docs/Raw Data/Expenditure/mof.ge/2023 12 tve saitistvis.xls,2026-05-13
 source.mof_2023_revenue_form1_pdf,Reviewed official 2023 revenue classification form 1 PDF,docs/Raw Data/Revenue/2023-jan-dec-consolidated-revenue.pdf,2026-05-13
 source.mof_2023_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed official 2023 expenditure E11 PDF plus tavi 6 workbook supplement,docs/Raw Data/Expenditure/treasury.ge/2023-12-month-state-budget-functional-expenditure.pdf + docs/Raw Data/Expenditure/mof.ge/2023 12 tve saitistvis.xls,2026-06-07
-source.mof_2024_tavi6_actual,Reviewed official 2024 state budget execution tavi 6,docs/Raw Data/Expenditure/mof.ge/2024 12 áƒ—áƒ•áƒ” áƒ¡áƒáƒ˜áƒ¢áƒ˜áƒ¡áƒ—áƒ•áƒ˜áƒ¡.xlsx,2026-05-12
-source.mof_2024_tavi1_actual,Reviewed official 2024 state budget execution tavi 1,docs/Raw Data/Expenditure/mof.ge/2024 12 áƒ—áƒ•áƒ” áƒ¡áƒáƒ˜áƒ¢áƒ˜áƒ¡áƒ—áƒ•áƒ˜áƒ¡.xlsx,2026-05-13
+source.mof_2024_tavi6_actual,Reviewed official 2024 state budget execution tavi 6,docs/Raw Data/Expenditure/mof.ge/2024 12 თვე საიტისთვის.xlsx,2026-05-12
+source.mof_2024_tavi1_actual,Reviewed official 2024 state budget execution tavi 1,docs/Raw Data/Expenditure/mof.ge/2024 12 თვე საიტისთვის.xlsx,2026-05-13
 source.mof_2024_revenue_form1_pdf,Reviewed official 2024 revenue classification form 1 PDF,docs/Raw Data/Revenue/2024-jan-dec-consolidated-revenue.pdf,2026-05-13
-source.mof_2024_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed official 2024 expenditure E11 PDF plus tavi 6 workbook supplement,docs/Raw Data/Expenditure/treasury.ge/2024-12-month-state-budget-functional-expenditure.pdf + docs/Raw Data/Expenditure/mof.ge/2024 12 áƒ—áƒ•áƒ” áƒ¡áƒáƒ˜áƒ¢áƒ˜áƒ¡áƒ—áƒ•áƒ˜áƒ¡.xlsx,2026-06-07
+source.mof_2024_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed official 2024 expenditure E11 PDF plus tavi 6 workbook supplement,docs/Raw Data/Expenditure/treasury.ge/2024-12-month-state-budget-functional-expenditure.pdf + docs/Raw Data/Expenditure/mof.ge/2024 12 თვე საიტისთვის.xlsx,2026-06-07
 source.mof_2025_tavi6_actual,Reviewed official 2025 state budget execution tavi 6,docs/Raw Data/Expenditure/mof.ge/2025.xlsx,2026-05-12
 source.mof_2025_tavi1_actual,Reviewed official 2025 state budget execution tavi 1,docs/Raw Data/Expenditure/mof.ge/2025.xlsx,2026-05-13
 source.mof_2025_revenue_form1_pdf,Reviewed official 2025 revenue classification form 1 PDF,docs/Raw Data/Revenue/2025-jan-dec-consolidated-revenue.pdf,2026-05-13

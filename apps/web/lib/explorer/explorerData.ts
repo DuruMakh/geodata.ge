@@ -88,8 +88,8 @@ function sideForItemId(itemId: string): ExplorerSide {
 function labelsFor(id: string, side: ExplorerSide, glossary: Map<string, GlossaryEntry>) {
   if (id === totalIdFor(side)) {
     return side === "revenue"
-      ? { kaLabel: "áƒ¨áƒ”áƒ›áƒáƒ¡áƒáƒ•áƒšáƒ”áƒ‘áƒ˜ áƒ¡áƒ£áƒš", enLabel: "Total revenue" }
-      : { kaLabel: "áƒ®áƒáƒ áƒ¯áƒ”áƒ‘áƒ˜ áƒ¡áƒ£áƒš", enLabel: "Total expenditure" };
+      ? { kaLabel: "შემოსავლები სულ", enLabel: "Total revenue" }
+      : { kaLabel: "ხარჯები სულ", enLabel: "Total expenditure" };
   }
 
   const entry = glossary.get(id);
@@ -506,7 +506,7 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     topGrowth,
     bottomGrowth,
     hasPlannedValues: selectedPoints.some((point) => point.basis === "planned"),
-    unavailableReason: input.measure === "share_of_gdp" ? "áƒ›áƒ¨áƒž-áƒ¡áƒ—áƒáƒœ áƒ¬áƒ˜áƒšáƒ˜áƒ¡ áƒ¡áƒáƒ©áƒ•áƒ”áƒœáƒ”áƒ‘áƒšáƒáƒ“ áƒ¡áƒáƒ­áƒ˜áƒ áƒáƒ áƒ¡áƒáƒœáƒ“áƒ áƒ›áƒ¨áƒž áƒ›áƒáƒœáƒáƒªáƒ”áƒ›áƒ”áƒ‘áƒ˜." : null,
+    unavailableReason: input.measure === "share_of_gdp" ? "მშპ-სთან წილის საჩვენებლად საჭიროა სანდო მშპ მონაცემები." : null,
   };
 }
 

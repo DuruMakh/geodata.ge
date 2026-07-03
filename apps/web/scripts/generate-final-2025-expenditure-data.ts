@@ -308,7 +308,7 @@ function pickTavi6Sheet(workbook: XLSX.WorkBook): string {
   const sheetName =
     workbook.SheetNames.find((name) => {
       const normalized = normalizeSheetName(name);
-      return normalized.includes("tavi 6") || normalized.includes("tavi vi") || normalized.includes("vi áƒ—áƒáƒ•áƒ˜");
+      return normalized.includes("tavi 6") || normalized.includes("tavi vi") || normalized.includes("vi თავი");
     }) ??
     workbook.SheetNames.find((name) => normalizeSheetName(name) === "vi") ??
     workbook.SheetNames[0];

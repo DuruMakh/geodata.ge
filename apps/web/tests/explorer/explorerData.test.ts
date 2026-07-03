@@ -6,9 +6,9 @@ import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 
 const glossary = new Map<string, GlossaryEntry>([
-  ["spending.health", { id: "spending.health", kaLabel: "áƒ¯áƒáƒœáƒ›áƒ áƒ—áƒ”áƒšáƒáƒ‘áƒ", enLabel: "Health", description: "", notes: "" }],
-  ["spending.education", { id: "spending.education", kaLabel: "áƒ’áƒáƒœáƒáƒ—áƒšáƒ”áƒ‘áƒ", enLabel: "Education", description: "", notes: "" }],
-  ["revenue.vat", { id: "revenue.vat", kaLabel: "áƒ“áƒ¦áƒ’", enLabel: "VAT", description: "", notes: "" }],
+  ["spending.health", { id: "spending.health", kaLabel: "ჯანმრთელობა", enLabel: "Health", description: "", notes: "" }],
+  ["spending.education", { id: "spending.education", kaLabel: "განათლება", enLabel: "Education", description: "", notes: "" }],
+  ["revenue.vat", { id: "revenue.vat", kaLabel: "დღგ", enLabel: "VAT", description: "", notes: "" }],
   ["spending.social", { id: "spending.social", kaLabel: "Social", enLabel: "Social", description: "", notes: "" }],
   ["revenue.income_tax", { id: "revenue.income_tax", kaLabel: "Income tax", enLabel: "Income tax", description: "", notes: "" }],
   ["revenue.other_revenue", { id: "revenue.other_revenue", kaLabel: "Other revenue", enLabel: "Other revenue", description: "", notes: "" }],
@@ -151,6 +151,32 @@ describe("main explorer data model", () => {
       lastReviewedAt: "2026-05-11",
     });
     expect(model.summary.biggestShareChange).not.toBeNull();
+  });
+
+  it("uses readable Georgian labels for derived total series", () => {
+    const expenditureModel = buildExplorerModel({
+      facts,
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: ["expenditure.total"],
+      startYear: 2024,
+      endYear: 2025,
+      measure: "nominal",
+    });
+    const revenueModel = buildExplorerModel({
+      facts,
+      glossary,
+      sourceDocuments,
+      side: "revenue",
+      selectedItemIds: ["revenue.total"],
+      startYear: 2025,
+      endYear: 2025,
+      measure: "nominal",
+    });
+
+    expect(expenditureModel.items.find((item) => item.id === "expenditure.total")?.kaLabel).toBe("ხარჯები სულ");
+    expect(revenueModel.items.find((item) => item.id === "revenue.total")?.kaLabel).toBe("შემოსავლები სულ");
   });
 
   it("keeps the active side total available when the total series is not selected", () => {
@@ -331,7 +357,7 @@ describe("main explorer data model", () => {
       measure: "share_of_gdp",
     });
 
-    expect(model.unavailableReason).toBe("áƒ›áƒ¨áƒž-áƒ¡áƒ—áƒáƒœ áƒ¬áƒ˜áƒšáƒ˜áƒ¡ áƒ¡áƒáƒ©áƒ•áƒ”áƒœáƒ”áƒ‘áƒšáƒáƒ“ áƒ¡áƒáƒ­áƒ˜áƒ áƒáƒ áƒ¡áƒáƒœáƒ“áƒ áƒ›áƒ¨áƒž áƒ›áƒáƒœáƒáƒªáƒ”áƒ›áƒ”áƒ‘áƒ˜.");
+    expect(model.unavailableReason).toBe("მშპ-სთან წილის საჩვენებლად საჭიროა სანდო მშპ მონაცემები.");
   });
   it("uses explicit total facts for totals-only years without exposing fake categories", () => {
     const localFacts: BudgetFactImportRow[] = [
