@@ -13,7 +13,9 @@ function includesAny(text: string, needles: string[]): boolean {
 function suggestForLabel(labelKa: string): RuleResult {
   const text = labelKa.toLowerCase();
   const hasHealth = includesAny(text, ["ჯანმრთელ", "ჯანდაცვ", "სამედიცინო", "დაავადებ", "ეპიდზედამხედველ"]);
-  const hasSocial = includesAny(text, ["სოციალურ", "პენსი", "დევნილ", "დახმარებ", "ვეტერან"]);
+  // NOTE: never use the bare stem "ზრუნვ" here — it is a substring of the
+  // ubiquitous "უზრუნველყოფა" (provision) and hijacks unrelated labels.
+  const hasSocial = includesAny(text, ["სოციალურ", "პენსი", "დევნილ", "დახმარებ", "ვეტერან", "სახელმწიფო ზრუნვ"]);
 
   const hasHealthSignal = hasHealth || text.includes("სისხლ");
 
@@ -61,7 +63,7 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "energy sector label" };
   }
 
-  if (includesAny(text, ["სახელმწიფო ქონების მართვა", "ანაკლიის ღრმაწყლოვანი პორტ"])) {
+  if (includesAny(text, ["სახელმწიფო ქონების მართვა", "ანაკლიის ღრმაწყლოვანი პორტ", "საინვესტიციო პოლიტიკ"])) {
     return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "reviewed economic affairs label pattern" };
   }
 

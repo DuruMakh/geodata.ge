@@ -121,8 +121,11 @@ const sourcesByYear = {
     sourceSha256: "8509167D1D564218B9B8BAEC3455437F4D82E417D45176B8608D3CCA623DDD4F",
     formId: "E11",
     tableTitle: "2012 state budget expenditure execution by functional classification",
-    actualAmountIndex: 1,
-    workbookPath: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2012-fact.xlsx",
+    actualAmountIndex: 3,
+    nonDottedCodes: true,
+    legacyEncodedLabels: true,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2012-annual-execution-report.pdf",
+    workbookPageRange: [202, 249],
     workbookSourceId: "source.mof_2012_programmatic_fact_actual",
     finalSourceId: "source.mof_2012_expenditure_functional_plus_programmatic_supplement_actual",
   },  2013: {
@@ -132,8 +135,10 @@ const sourcesByYear = {
     sourceSha256: "84088FD0EA3E944E5E5CBD865191D3D02228307C13B5F0877423C962045D7968",
     formId: "E11",
     tableTitle: "2013 state budget expenditure execution by functional classification",
-    actualAmountIndex: 1,
-    workbookPath: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2013-fact.xlsx",
+    actualAmountIndex: 3,
+    nonDottedCodes: true,
+    legacyEncodedLabels: true,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/final-fact-files-2004-2025/2013-fact.pdf",
     workbookSourceId: "source.mof_2013_programmatic_fact_actual",
     finalSourceId: "source.mof_2013_expenditure_functional_plus_programmatic_supplement_actual",
   },  2014: {
@@ -308,11 +313,12 @@ function pickTavi6Sheet(workbook: XLSX.WorkBook): string {
 async function readWorkbookGrandTotalActualGel(): Promise<number | null> {
   if (source.workbookPath.endsWith(".pdf")) {
     const workbookPdf = await readPdfTextPages(repoPath(source.workbookPath));
+    const pageRange = "workbookPageRange" in source ? source.workbookPageRange : null;
     const rows = parseTavi6ProgrammaticPdfRows({
       year: source.year,
       sourceId: source.workbookSourceId,
       workbookPath: source.workbookPath,
-      pages: workbookPdf.pages,
+      pages: pageRange ? workbookPdf.pages.slice(pageRange[0] - 1, pageRange[1]) : workbookPdf.pages,
     });
     return tavi6ProgrammaticPdfTotalActualGel(rows);
   }

@@ -21,6 +21,12 @@ export type ExpenditurePdfSource = {
   formId: string;
   tableTitle: string;
   actualAmountIndex?: number;
+  /**
+   * Pre-2014 E11 PDFs print classification codes without dots (701, 70111,
+   * 21). When set, codes are normalized to the dotted form (7.1, 7.1.1.1,
+   * 2.1) before the functional-context logic runs.
+   */
+  nonDottedCodes?: boolean;
 };
 
 export type ExpenditurePdfPageText = {
@@ -175,6 +181,21 @@ function roundedGel(value: number | null): number | null {
   return value === null ? null : Math.round(value);
 }
 
+/**
+ * Convert a non-dotted classification code to the dotted form used from 2014
+ * on: COFOG functional codes carry a two-digit division after the leading 7
+ * (701 -> 7.1, 710 -> 7.10, 70111 -> 7.1.1.1) and economic codes a single
+ * digit (21 -> 2.1). "00", "31", and bare "2"/"7" stay as they are.
+ */
+function normalizeNonDottedCode(code: string): string {
+  if (/^7\d{2,}$/.test(code)) {
+    const division = String(Number(code.slice(1, 3)));
+    return ["7", division, ...code.slice(3).split("")].join(".");
+  }
+  if (/^2\d$/.test(code)) return `2.${code[1]}`;
+  return code;
+}
+
 function parentFunctionalCode(code: string): string | null {
   const parts = code.split(".");
   if (parts.length <= 2) return null;
@@ -257,7 +278,10 @@ function segmentsFromPages(pages: ExpenditurePdfPageText[]): ParsedSegment[] {
 }
 
 export function parseExpenditurePdfText(input: ExpenditurePdfSource & { pages: ExpenditurePdfPageText[] }): ExpenditurePdfOfficialRow[] {
-  const segments = segmentsFromPages(input.pages);
+  const rawSegments = segmentsFromPages(input.pages);
+  const segments = input.nonDottedCodes
+    ? rawSegments.map((segment) => ({ ...segment, code: normalizeNonDottedCode(segment.code) }))
+    : rawSegments;
   const rows: ExpenditurePdfOfficialRow[] = [];
   const seen = new Set<string>();
   const functionalPaths = new Map<string, string>();

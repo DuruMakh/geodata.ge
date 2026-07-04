@@ -388,9 +388,12 @@ describe("data pipeline gate (real shipped data files)", () => {
     expect(totalFor("revenue", 2025)).toBe(32_368_880_408);
 
     // Same intentional pins for the oldest detailed expenditure years (added
-    // 2026-07): E11 functional PDF plus mof.ge annual execution report tavi VI
-    // supplements. Official annual totals they reconcile against (thousand-GEL
-    // annex rounding): 9,009,812,200, 9,703,127,100, and 10,292,234,100 GEL.
+    // 2026-07): E11 functional PDF plus mof.ge annual execution report
+    // payments-by-program supplements. Official annual totals they reconcile
+    // against (thousand-GEL annex rounding): 7,806,801,800, 8,104,217,600,
+    // 9,009,812,200, 9,703,127,100, and 10,292,234,100 GEL.
+    expect(totalFor("expenditure", 2012)).toBe(7_806_801_963);
+    expect(totalFor("expenditure", 2013)).toBe(8_104_217_952);
     expect(totalFor("expenditure", 2014)).toBe(9_009_812_195);
     expect(totalFor("expenditure", 2015)).toBe(9_703_126_964);
     expect(totalFor("expenditure", 2016)).toBe(10_292_234_620);
