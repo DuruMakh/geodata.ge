@@ -11,7 +11,7 @@ Read first:
 
 V1 focuses on annual national budget data for 2004-2025 (expenditure from 2004, revenue from 2005), reviewed data ingestion, public spending-field taxonomy, revenue categories, ministry-level expenditure series, CSV export, and clear budget visualizations.
 
-Current loaded coverage: revenue is complete for 2005-2025; expenditure has detailed public-field data for 2008-2025 plus total-only values for 2004-2005, with 2006-2007 expenditure still being rolled out.
+Current loaded coverage: revenue is complete for 2005-2025; expenditure has detailed public-field data for 2007-2025 plus total-only values for 2004-2005, with 2006 expenditure still being rolled out.
 
 ## Development
 

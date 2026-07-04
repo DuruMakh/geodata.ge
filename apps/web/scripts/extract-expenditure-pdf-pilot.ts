@@ -68,9 +68,20 @@ const sourcesByYear = {
     formId: "E11",
     tableTitle: "2007 state budget expenditure execution by functional classification",
     actualAmountIndex: 1,
-    workbookPath: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2007-fact.xlsx",
-    workbookSourceId: "source.mof_2007_programmatic_fact_actual",
-    finalSourceId: "source.mof_2007_expenditure_functional_plus_programmatic_supplement_actual",
+    nonDottedCodes: true,
+    inlineFunctionalRows: true,
+    canonicalizeLabels: true,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2007-annual-execution-report.pdf",
+    // The 2007 E11 (old economic classification) already spans the whole
+    // payments concept — lending and debt repayment print inside the
+    // functional blocks — so there are no supplement rows; the execution
+    // report only provides the official total to reconcile against.
+    aggregateSupplements: {
+      paymentsTotalThousandGel: 5237131.1,
+      items: [],
+    },
+    workbookSourceId: "source.mof_2007_execution_report_total_actual",
+    finalSourceId: "source.mof_2007_expenditure_functional_actual",
   },  2008: {
     year: 2008,
     sourceId: "source.mof_2008_expenditure_pdf_form_e11_actual",

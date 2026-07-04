@@ -299,8 +299,10 @@ const inlineHeaderLinePatterns = [
 
 // Functional codes only (7, 701..710, 7011..., 70111...); the label after the
 // code never starts with a digit, which keeps wrapped amount lines (that may
-// begin with digits) from being misread as new rows.
+// begin with digits) from being misread as new rows. The 2007 layout prints
+// each code alone on its own line with the label and amounts following.
 const inlineCodeLinePattern = /^(7\d{0,4})\s+(\D.*)$/;
+const inlineBareCodeLinePattern = /^(7\d{0,4})$/;
 
 type InlineParsedRow = {
   pageNumber: number;
@@ -339,14 +341,14 @@ function inlineRowsFromPages(pages: ExpenditurePdfPageText[]): InlineParsedRow[]
       if (inlineHeaderLinePatterns.some((pattern) => pattern.test(line))) continue;
 
       const lineAmounts = Array.from(line.matchAll(amountPattern)).map((match) => match[0]);
-      const codeMatch = line.match(inlineCodeLinePattern);
+      const codeMatch = line.match(inlineCodeLinePattern) ?? line.match(inlineBareCodeLinePattern);
 
       if (codeMatch) {
         flush();
         active = {
           pageNumber: page.pageNumber,
           code: codeMatch[1],
-          parts: [line.slice(codeMatch[1].length).trim()],
+          parts: [line.slice(codeMatch[1].length).trim()].filter(Boolean),
           amounts: lineAmounts,
         };
         if (active.amounts.length >= 5) flush();

@@ -407,6 +407,12 @@ describe("data pipeline gate (real shipped data files)", () => {
     expect(totalFor("expenditure", 2009)).toBe(6_754_106_742);
     expect(totalFor("expenditure", 2010)).toBe(6_972_343_653);
     expect(totalFor("expenditure", 2011)).toBe(7_459_279_360);
+
+    // 2007 (added 2026-07): the old-classification E11 already covers the
+    // whole payments concept (lending and debt repayment inside functional
+    // blocks), so the composition is the mapped E11 alone, reconciled against
+    // the execution report total of 5,237,131.1 thousand GEL.
+    expect(totalFor("expenditure", 2007)).toBe(5_237_131_090);
   });
 
   it("has no negative actual amounts where the domain forbids them", async () => {
