@@ -516,17 +516,20 @@ npm run data:validate
 npm test
 ```
 
-## 6. Notes for the remaining years (2004-2006 rollout)
+## 6. Notes for the remaining years (2004-2006)
 
+- 2005 and 2006 are now detailed via the pre-COFOG old 14-group
+  classification — see `2005-2006-old-classification-expenditure-methodology.md`.
+- 2004 is deliberately not loaded: its treasury E11 is central-budget scoped
+  (~1.51B) rather than the full state budget (~1.93B). The source PDF stays
+  recognized in `EXPENDITURE_SOURCE_YEARS`; revisiting it needs a
+  state-budget functional source and a scope-caveat decision.
 - The `excel-fact-files-2004-2025/<year>-fact.xlsx` files for pre-2017 years
   are budget-law annexes (plan data, prior-year facts). Do not use them as
   actual-execution sources without checking the column headers.
 - The old-site year pages live under mof.ge/4981 ("შესრულების ანგარიშები"):
   2006 -> mof.ge/5033, 2005 -> /5037, 2004 -> /5039 (Wayback); files via
   mof.ge/common/get_doc.aspx?doc_id=NNNN.
-- 2004-2006 use the pre-COFOG 14-group classification and need a taxonomy
-  mapping decision before detailed coverage (see the year-group analysis);
-  2004-2005 are currently total-only in the app, 2006 has nothing yet.
 - Wayback captures of large files can be silently truncated (the 2022
   capture of the 2014 Chapter VI stops at exactly 1 MiB). Always compare
   the downloaded size against `x-archive-orig-content-length` or prefer the

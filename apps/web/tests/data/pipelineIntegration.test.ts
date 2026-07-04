@@ -413,6 +413,13 @@ describe("data pipeline gate (real shipped data files)", () => {
     // blocks), so the composition is the mapped E11 alone, reconciled against
     // the execution report total of 5,237,131.1 thousand GEL.
     expect(totalFor("expenditure", 2007)).toBe(5_237_131_090);
+
+    // 2005-2006 (added 2026-07): the pre-COFOG 14-group functional
+    // classification mapped to public categories (group total minus
+    // carve-outs). Category totals sum exactly to the official payments
+    // grand totals: 2,626,507.3 thousand GEL (2005) and 3,822,512.6 (2006).
+    expect(totalFor("expenditure", 2005)).toBe(2_626_507_300);
+    expect(totalFor("expenditure", 2006)).toBe(3_822_512_626);
   });
 
   it("has no negative actual amounts where the domain forbids them", async () => {

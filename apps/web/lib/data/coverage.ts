@@ -7,8 +7,11 @@ export const APP_END_YEAR = 2025;
 export const REVENUE_START_YEAR = 2005;
 
 export const EXPENDITURE_SOURCE_YEARS = inclusiveYears(APP_START_YEAR, APP_END_YEAR);
-export const EXPENDITURE_TOTAL_ONLY_YEARS = [2004, 2005];
-export const EXPENDITURE_DETAILED_YEARS = inclusiveYears(2007, APP_END_YEAR);
+// 2004 is deliberately not loaded for now: its treasury E11 is central-budget
+// scoped (~1.51B) rather than the full state budget, so it would understate the
+// year against the rest of the series. The source PDF stays recognized above.
+export const EXPENDITURE_TOTAL_ONLY_YEARS: number[] = [];
+export const EXPENDITURE_DETAILED_YEARS = inclusiveYears(2005, APP_END_YEAR);
 export const EXPENDITURE_YEARS = [...EXPENDITURE_TOTAL_ONLY_YEARS, ...EXPENDITURE_DETAILED_YEARS];
 
 export const REVENUE_SOURCE_YEARS = inclusiveYears(REVENUE_START_YEAR, APP_END_YEAR);
