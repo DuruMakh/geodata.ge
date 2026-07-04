@@ -22,7 +22,7 @@ source.mof_2024_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed offici
 source.mof_2025_tavi6_actual,Reviewed official 2025 state budget execution tavi 6,docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2025-fact.xlsx,2026-05-12
 source.mof_2025_tavi1_actual,Reviewed official 2025 state budget execution tavi 1,docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2025-fact.xlsx,2026-05-13
 source.mof_2025_revenue_form1_pdf,Reviewed official 2025 revenue classification form 1 PDF,docs/Raw Data/Revenue/2025-jan-dec-consolidated-revenue.pdf,2026-05-13
-source.mof_2025_execution,Reviewed official 2025 budget execution documents,docs/Budget Data 2025,2026-05-10
+source.mof_2025_execution,Reviewed official 2025 budget execution documents,docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2025-fact.xlsx,2026-05-10
 source.mof_2025_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed official 2025 expenditure E11 PDF plus tavi 6 workbook supplement,docs/Raw Data/Expenditure/treasury.ge/2025-12-month-state-budget-functional-expenditure.pdf + docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2025-fact.xlsx,2026-06-07
 source.mof_2005_revenue_form1_pdf,Reviewed official 2005 revenue classification form 1 PDF,docs/Raw Data/Revenue/2005-jan-dec-consolidated-revenue.pdf,2026-06-28
 source.mof_2006_revenue_form1_pdf,Reviewed official 2006 revenue classification form 1 PDF,docs/Raw Data/Revenue/2006-jan-dec-consolidated-revenue.pdf,2026-06-28

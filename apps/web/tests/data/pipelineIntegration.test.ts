@@ -420,6 +420,18 @@ describe("data pipeline gate (real shipped data files)", () => {
     // grand totals: 2,626,507.3 thousand GEL (2005) and 3,822,512.6 (2006).
     expect(totalFor("expenditure", 2005)).toBe(2_626_507_300);
     expect(totalFor("expenditure", 2006)).toBe(3_822_512_626);
+
+    // 2017-2023 (pinned 2026-07): E11 functional PDF plus tavi-6 workbook
+    // financial-asset/liability supplements. These reconcile at generation
+    // time; pinning here closes the regression gap so all 21 detailed years
+    // (2005-2025) are guarded, not just the endpoints.
+    expect(totalFor("expenditure", 2017)).toBe(11_764_835_158);
+    expect(totalFor("expenditure", 2018)).toBe(12_590_181_621);
+    expect(totalFor("expenditure", 2019)).toBe(13_469_688_961);
+    expect(totalFor("expenditure", 2020)).toBe(16_174_635_967);
+    expect(totalFor("expenditure", 2021)).toBe(19_807_502_469);
+    expect(totalFor("expenditure", 2022)).toBe(20_163_012_511);
+    expect(totalFor("expenditure", 2023)).toBe(22_350_179_410);
   });
 
   it("has no negative actual amounts where the domain forbids them", async () => {
