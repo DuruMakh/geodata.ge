@@ -150,14 +150,20 @@ report notes how many rows used generated candidates.
   Official annual total:          10,292,234,100 GEL
   Difference:                                520 GEL (tolerance 1,000)
 
-spending.other_unclassified: 3,919,900 GEL (2014, 0.04%), 288,100 GEL
-(2015), 541,300 GEL (2016) — supplement rows whose program labels matched
-no reviewed or candidate rule; each row stays flagged in the supplement
-staging CSV for review. The largest 2014 residuals are treaty-obligation
-and armed-forces-readiness arrears rows whose labels miss the current
-candidate keywords; extending `candidateMapping.ts` rules would reclassify
-them but also regenerate already-pinned years, so it is left as a conscious
-follow-up.
+spending.other_unclassified: 0 GEL in all three years. The initial runs
+left 19 supplement arrears rows unclassified (3,919,900 / 288,100 /
+541,300 GEL); their program labels were individually reviewed (2026-07-04)
+and the deterministic keyword rules in `candidateMapping.ts` were extended
+to cover them: შეიარაღებული ძალ -> defence; პატიმრობ, სამართალშემოქმედ ->
+public order; სასწავლო, საგანმანათლებლო, ახალგაზრდ -> education;
+ეპიდზედამხედველ -> health; ფერმერ -> agriculture/environment;
+უშიშროების საბჭო, საკანონმდებლო, სახელმწიფო მინისტრის აპარატ -> general
+public services; აეროპორტ, საჰაერო ხომალდ -> infrastructure (the largest
+2014 row, 2.5M GEL, is reimbursement of aircraft takeoff/landing services
+at Georgian airports under treaty obligations — air transport, following
+the same convention that maps functional 7.4.5 transport to
+infrastructure_regional_development). Year totals are invariant under
+reclassification; the regression pins did not change.
 ```
 
 Regression pins for both totals live in

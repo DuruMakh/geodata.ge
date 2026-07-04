@@ -12,7 +12,7 @@ function includesAny(text: string, needles: string[]): boolean {
 
 function suggestForLabel(labelKa: string): RuleResult {
   const text = labelKa.toLowerCase();
-  const hasHealth = includesAny(text, ["ჯანმრთელ", "ჯანდაცვ", "სამედიცინო", "დაავადებ"]);
+  const hasHealth = includesAny(text, ["ჯანმრთელ", "ჯანდაცვ", "სამედიცინო", "დაავადებ", "ეპიდზედამხედველ"]);
   const hasSocial = includesAny(text, ["სოციალურ", "პენსი", "დევნილ", "დახმარებ", "ვეტერან"]);
 
   const hasHealthSignal = hasHealth || text.includes("სისხლ");
@@ -46,6 +46,8 @@ function suggestForLabel(labelKa: string): RuleResult {
       "ენგურ",
       "ვარდნილ",
       "ბუნებრივი აირ",
+      "აეროპორტ",
+      "საჰაერო ხომალდ",
     ])
   ) {
     return {
@@ -63,7 +65,7 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "reviewed economic affairs label pattern" };
   }
 
-  if (includesAny(text, ["სამელიორაციო", "ირიგაცი", "დრენაჟ", "სოფლის მეურნეობის", "სასოფლო-სამეურნეო", "სარწყავ"])) {
+  if (includesAny(text, ["სამელიორაციო", "ირიგაცი", "დრენაჟ", "სოფლის მეურნეობის", "სასოფლო-სამეურნეო", "სარწყავ", "ფერმერ"])) {
     return {
       fieldId: "spending.agriculture_environment",
       confidence: "medium",
@@ -71,11 +73,11 @@ function suggestForLabel(labelKa: string): RuleResult {
     };
   }
 
-  if (includesAny(text, ["პენიტენც", "პრობაცი", "დანაშაულ", "საზოგადოებრივი წესრიგ", "სამართალდამცავი"])) {
+  if (includesAny(text, ["პენიტენც", "პრობაცი", "დანაშაულ", "საზოგადოებრივი წესრიგ", "სამართალდამცავი", "პატიმრობ", "სამართალშემოქმედ"])) {
     return { fieldId: "spending.public_order_safety", confidence: "medium", reason: "public order or justice keyword" };
   }
 
-  if (includesAny(text, ["თავდაცვის", "სამხედრო"])) {
+  if (includesAny(text, ["თავდაცვის", "სამხედრო", "შეიარაღებული ძალ"])) {
     return { fieldId: "spending.defence", confidence: "high", reason: "defence keyword" };
   }
 
@@ -127,7 +129,7 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.defence", confidence: "high", reason: "defence keyword" };
   }
 
-  if (includesAny(text, ["განათლების", "სკოლ", "უნივერსიტეტ", "მეცნიერებ"])) {
+  if (includesAny(text, ["განათლების", "სკოლ", "უნივერსიტეტ", "მეცნიერებ", "სასწავლო", "საგანმანათლებლო", "ახალგაზრდ"])) {
     return { fieldId: "spending.education", confidence: "high", reason: "education keyword" };
   }
 
@@ -195,6 +197,9 @@ function suggestForLabel(labelKa: string): RuleResult {
       "მთავრობის ადმინისტრაცია",
       "აუდიტის სამსახური",
       "სახელმწიფო რწმუნებულ",
+      "უშიშროების საბჭო",
+      "საკანონმდებლო",
+      "სახელმწიფო მინისტრის აპარატ",
     ])
   ) {
     return {
