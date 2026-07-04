@@ -202,9 +202,8 @@ report notes how many rows used generated candidates.
   Official annual total:          10,292,234,100 GEL
   Difference:                                520 GEL (tolerance 1,000)
 
-spending.other_unclassified: 0 GEL for 2014-2016; 9,500 GEL for 2013 and
-784,500 GEL (0.01%) for 2012 — see the review-pending note at the end of
-this section. The initial runs
+spending.other_unclassified: 0 GEL for 2013-2016; 700,000 GEL (0.009%)
+for 2012 — a single reviewed row kept there deliberately (see below). The initial runs
 left 19 supplement arrears rows unclassified (3,919,900 / 288,100 /
 541,300 GEL); their program labels were individually reviewed (2026-07-04)
 and the deterministic keyword rules in `candidateMapping.ts` were extended
@@ -222,10 +221,14 @@ reclassification; the regression pins did not change. Keyword additions for
 is forbidden — it is a substring of უზრუნველყოფა and hijacks unrelated
 labels), საინვესტიციო პოლიტიკ -> economic affairs.
 
-Still review-pending (left in other_unclassified deliberately): the 2012
-disaster-fund financial-assets row "სტიქიის შედეგების ლიკვიდაცია" (700,000
-GEL) and the GIZ/KfW donor-coordination arrears rows (84,500 GEL in 2012,
-9,500 GEL in 2013) — their public-category attribution needs a human call.
+Owner-reviewed decisions (2026-07-04): the GIZ/KfW donor-coordination
+rows (ორმხრივი, რეგიონალური და რეგიონთაშორისი პროექტები; KfW ოფისის
+თანადაფინანსება) map to spending.infrastructure_regional_development
+(keywords: რეგიონთაშორისი პროექტ, kfw). The 2012 disaster-fund
+financial-assets row "სტიქიის შედეგების ლიკვიდაცია" (700,000 GEL) stays
+in spending.other_unclassified by explicit owner decision — the label
+alone does not determine whether it financed infrastructure restoration
+or household support.
 ```
 
 Regression pins for both totals live in

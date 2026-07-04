@@ -67,6 +67,14 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "reviewed economic affairs label pattern" };
   }
 
+  if (includesAny(text, ["რეგიონთაშორისი პროექტ", "kfw"])) {
+    return {
+      fieldId: "spending.infrastructure_regional_development",
+      confidence: "medium",
+      reason: "reviewed donor-financed regional development project label",
+    };
+  }
+
   if (includesAny(text, ["სამელიორაციო", "ირიგაცი", "დრენაჟ", "სოფლის მეურნეობის", "სასოფლო-სამეურნეო", "სარწყავ", "ფერმერ"])) {
     return {
       fieldId: "spending.agriculture_environment",
