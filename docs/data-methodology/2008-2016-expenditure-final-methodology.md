@@ -397,10 +397,13 @@ plus the two 2008 aggregates unclassified; each label was reviewed and the
 keyword rules extended (2026-07-04) — all additions verified to leave the
 2012-2016 outputs byte-identical:
 
-- debt service: საგადასახადო დავალიანებების დაფარვ (the 2009 row
+- general public services: საგადასახადო დავალიანებ (the 2009 row
   "ორგანიზაციების წინა წლებში წარმოქმნილი საგადასახადო დავალიანებების
-  დაფარვა", 182.9M GEL — repayment of recognized state liabilities held
-  centrally under the Ministry of Finance);
+  დაფარვა", 182.9M GEL — owner-reviewed 2026-07-04: this is the state
+  returning organizations' accumulated tax refund/overpayment claims, a
+  fiscal-administration operation under the Ministry of Finance; it is not
+  sovereign debt service and has no single sector, so it follows the
+  MoF-family convention into general public services);
 - infrastructure: ბუნებრივი გაზ, ელექტროქსელ, ელექტრომომარაგ,
   ელექტროსადგურ, წყლის პროექტ (energy-grid, gas-supply, and water donor
   projects, matching the existing power-infrastructure convention);

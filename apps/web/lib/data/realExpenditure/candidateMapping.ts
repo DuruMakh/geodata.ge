@@ -26,10 +26,20 @@ function suggestForLabel(labelKa: string): RuleResult {
       "ვალდებულებების მომსახურება და დაფარვა",
       "აღიარებული ვალდებულებების დაფარვ",
       "საფინანსო ორგანიზაციებთან თანამშრომლობიდან გამომდინარე ვალდებულებები",
-      "საგადასახადო დავალიანებების დაფარვ",
     ])
   ) {
     return { fieldId: "spending.debt_service", confidence: "high", reason: "state debt or obligation repayment label" };
+  }
+
+  // Owner decision (2026-07-04): clearing the state's accumulated tax
+  // refund/overpayment liabilities to organizations is a fiscal-administration
+  // operation, not sovereign debt service and not sector support.
+  if (includesAny(text, ["საგადასახადო დავალიანებ"])) {
+    return {
+      fieldId: "spending.general_public_services",
+      confidence: "medium",
+      reason: "reviewed fiscal operation: returning organizations' tax arrears is general public services",
+    };
   }
 
   if (
