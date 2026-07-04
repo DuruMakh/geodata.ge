@@ -397,6 +397,16 @@ describe("data pipeline gate (real shipped data files)", () => {
     expect(totalFor("expenditure", 2014)).toBe(9_009_812_195);
     expect(totalFor("expenditure", 2015)).toBe(9_703_126_964);
     expect(totalFor("expenditure", 2016)).toBe(10_292_234_620);
+
+    // 2008-2011 (added 2026-07): E11 functional PDF plus mof.ge annual
+    // execution report payments-by-organization supplements (2008 uses the
+    // report's whole-budget aggregates). Official annual totals they
+    // reconcile against (thousand-GEL report rounding): 6,758,831,800,
+    // 6,754,106,800, 6,972,343,800, and 7,459,279,500 GEL.
+    expect(totalFor("expenditure", 2008)).toBe(6_758_831_737);
+    expect(totalFor("expenditure", 2009)).toBe(6_754_106_742);
+    expect(totalFor("expenditure", 2010)).toBe(6_972_343_653);
+    expect(totalFor("expenditure", 2011)).toBe(7_459_279_360);
   });
 
   it("has no negative actual amounts where the domain forbids them", async () => {

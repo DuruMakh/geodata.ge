@@ -26,6 +26,7 @@ function suggestForLabel(labelKa: string): RuleResult {
       "ვალდებულებების მომსახურება და დაფარვა",
       "აღიარებული ვალდებულებების დაფარვ",
       "საფინანსო ორგანიზაციებთან თანამშრომლობიდან გამომდინარე ვალდებულებები",
+      "საგადასახადო დავალიანებების დაფარვ",
     ])
   ) {
     return { fieldId: "spending.debt_service", confidence: "high", reason: "state debt or obligation repayment label" };
@@ -48,6 +49,11 @@ function suggestForLabel(labelKa: string): RuleResult {
       "ენგურ",
       "ვარდნილ",
       "ბუნებრივი აირ",
+      "ბუნებრივი გაზ",
+      "ელექტროქსელ",
+      "ელექტრომომარაგ",
+      "ელექტროსადგურ",
+      "წყლის პროექტ",
       "აეროპორტ",
       "საჰაერო ხომალდ",
     ])
@@ -63,7 +69,20 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "energy sector label" };
   }
 
-  if (includesAny(text, ["სახელმწიფო ქონების მართვა", "ანაკლიის ღრმაწყლოვანი პორტ", "საინვესტიციო პოლიტიკ"])) {
+  if (
+    includesAny(text, [
+      "სახელმწიფო ქონების მართვა",
+      "ანაკლიის ღრმაწყლოვანი პორტ",
+      "საინვესტიციო პოლიტიკ",
+      "საწარმოთა მართვის სააგენტო",
+      "იაფი კრედიტ",
+      "სესხები (ფინანსური აქტივების ზრდა)",
+      "აქციები და სხვა კაპიტალი",
+      "სამშენებლო ინსპექცი",
+      "საინვესტიციო რისკ",
+      "ენერგომატარებლ",
+    ])
+  ) {
     return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "reviewed economic affairs label pattern" };
   }
 
@@ -75,7 +94,21 @@ function suggestForLabel(labelKa: string): RuleResult {
     };
   }
 
-  if (includesAny(text, ["სამელიორაციო", "ირიგაცი", "დრენაჟ", "სოფლის მეურნეობის", "სასოფლო-სამეურნეო", "სარწყავ", "ფერმერ"])) {
+  if (
+    includesAny(text, [
+      "სამელიორაციო",
+      "ირიგაცი",
+      "დრენაჟ",
+      "სოფლის მეურნეობის",
+      "სასოფლო-სამეურნეო",
+      "სარწყავ",
+      "ფერმერ",
+      "სოფლის განვითარების პროექტ",
+      "მეღვინეობ",
+      "ვაზისა და ღვინის",
+      "ბუნებრივი რესურს",
+    ])
+  ) {
     return {
       fieldId: "spending.agriculture_environment",
       confidence: "medium",
@@ -83,7 +116,7 @@ function suggestForLabel(labelKa: string): RuleResult {
     };
   }
 
-  if (includesAny(text, ["პენიტენც", "პრობაცი", "დანაშაულ", "საზოგადოებრივი წესრიგ", "სამართალდამცავი", "პატიმრობ", "სამართალშემოქმედ"])) {
+  if (includesAny(text, ["პენიტენც", "პრობაცი", "დანაშაულ", "საზოგადოებრივი წესრიგ", "სამართალდამცავი", "პატიმრობ", "სამართალშემოქმედ", "სასჯელაღსრულებ"])) {
     return { fieldId: "spending.public_order_safety", confidence: "medium", reason: "public order or justice keyword" };
   }
 
@@ -95,7 +128,7 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.health", confidence: "medium", reason: "health keyword" };
   }
 
-  if (includesAny(text, ["იძულებით გადაადგილებულ", "მიგრანტ"])) {
+  if (includesAny(text, ["იძულებით გადაადგილებულ", "მიგრანტ", "მიგრაციულ", "ლტოლვილ", "ხანდაზმულ"])) {
     return { fieldId: "spending.social_protection", confidence: "medium", reason: "social protection keyword" };
   }
 
@@ -119,7 +152,11 @@ function suggestForLabel(labelKa: string): RuleResult {
     };
   }
 
-  if (hasHealthSignal && hasSocial && includesAny(text, ["პროგრამების მართვა"])) {
+  if (
+    hasHealthSignal &&
+    hasSocial &&
+    includesAny(text, ["პროგრამების მართვა", "პროგრამების სააგენტო", "პროექტების განმახორციელებელ", "ცენტრალური აპარატ"])
+  ) {
     return {
       fieldId: "spending.health",
       confidence: "medium",
@@ -139,7 +176,20 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.defence", confidence: "high", reason: "defence keyword" };
   }
 
-  if (includesAny(text, ["განათლების", "სკოლ", "უნივერსიტეტ", "მეცნიერებ", "სასწავლო", "საგანმანათლებლო", "ახალგაზრდ"])) {
+  if (
+    includesAny(text, [
+      "განათლების",
+      "სკოლ",
+      "უნივერსიტეტ",
+      "მეცნიერებ",
+      "სასწავლო",
+      "საგანმანათლებლო",
+      "ახალგაზრდ",
+      "ბიოქიმი",
+      "ბიოლოგი",
+      "პატრიოტ",
+    ])
+  ) {
     return { fieldId: "spending.education", confidence: "high", reason: "education keyword" };
   }
 
@@ -210,6 +260,17 @@ function suggestForLabel(labelKa: string): RuleResult {
       "უშიშროების საბჭო",
       "საკანონმდებლო",
       "სახელმწიფო მინისტრის აპარატ",
+      "შემოსავლების სამსახური",
+      "სახაზინო სამსახური",
+      "ფინანსთა სამინისტრო",
+      "კონტროლის პალატა",
+      "არჩევნ",
+      "შესყიდვების სააგენტო",
+      "საჯარო სამსახურის ბიურო",
+      "სტატისტიკის",
+      "საგარეო საქმეთა",
+      "სამხრეთ ოსეთის ადმინისტრაცია",
+      "მიწის მართვის დეპარტამენტ",
     ])
   ) {
     return {

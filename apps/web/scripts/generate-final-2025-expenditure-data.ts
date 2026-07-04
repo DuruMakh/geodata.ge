@@ -21,6 +21,10 @@ import {
 } from "../lib/data/realExpenditurePdf/publicMapping";
 import { parseExpenditurePdfText, readPdfTextPages, sha256File } from "../lib/data/realExpenditurePdf/phase1Pilot";
 import { parseTavi6ProgrammaticPdfRows } from "../lib/data/realExpenditurePdf/tavi6ProgrammaticPdf";
+import {
+  buildAggregateSupplementWorkbookRows,
+  parseLegacyAnnualReportRows,
+} from "../lib/data/realExpenditurePdf/legacyAnnualReportPdf";
 import { canonicalizeExpenditurePdfRowLabels } from "../lib/data/realExpenditurePdf/cofogCanonicalLabels";
 
 const sourcesByYear = {
@@ -76,9 +80,24 @@ const sourcesByYear = {
     formId: "E11",
     tableTitle: "2008 state budget expenditure execution by functional classification",
     actualAmountIndex: 1,
-    workbookPath: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2008-fact.xlsx",
-    workbookSourceId: "source.mof_2008_programmatic_fact_actual",
-    finalSourceId: "source.mof_2008_expenditure_functional_plus_programmatic_supplement_actual",
+    nonDottedCodes: true,
+    inlineFunctionalRows: true,
+    canonicalizeLabels: true,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2008-annual-execution-report.pdf",
+    // The 2008 report itemizes financial assets growth and liabilities
+    // decrease only at whole-budget level (Tavi I balance and the
+    // financial-assets/liabilities chapter, report pages 109-110).
+    aggregateSupplements: {
+      paymentsTotalThousandGel: 6758831.8,
+      items: [
+        { code: "FIN-LOANS", labelKa: "სესხები (ფინანსური აქტივების ზრდა)", kind: "fin", amountThousandGel: 142620.2 },
+        { code: "FIN-EQUITY", labelKa: "აქციები და სხვა კაპიტალი (ფინანსური აქტივების ზრდა)", kind: "fin", amountThousandGel: 57092.9 },
+        { code: "LIAB-EXT", labelKa: "სახელმწიფო ვალდებულებების დაფარვა - საგარეო", kind: "liab", amountThousandGel: 58633.3 },
+        { code: "LIAB-DOM", labelKa: "სახელმწიფო ვალდებულებების დაფარვა - საშინაო", kind: "liab", amountThousandGel: 52400.0 },
+      ],
+    },
+    workbookSourceId: "source.mof_2008_execution_report_aggregate_actual",
+    finalSourceId: "source.mof_2008_expenditure_functional_plus_execution_report_supplement_actual",
   },  2009: {
     year: 2009,
     sourceId: "source.mof_2009_expenditure_pdf_form_e11_actual",
@@ -87,9 +106,21 @@ const sourcesByYear = {
     formId: "E11",
     tableTitle: "2009 state budget expenditure execution by functional classification",
     actualAmountIndex: 1,
-    workbookPath: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2009-fact.xlsx",
-    workbookSourceId: "source.mof_2009_programmatic_fact_actual",
-    finalSourceId: "source.mof_2009_expenditure_functional_plus_programmatic_supplement_actual",
+    nonDottedCodes: true,
+    inlineFunctionalRows: true,
+    canonicalizeLabels: true,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2009-annual-execution-report.pdf",
+    legacyAnnualReport: {
+      dialect: "translit",
+      orgChapterPageRange: [53, 141],
+      officialTotals: {
+        paymentsTotalThousandGel: 6754106.8,
+        financialAssetsGrowthThousandGel: 130842.8,
+        liabilitiesDecreaseThousandGel: 348995.5,
+      },
+    },
+    workbookSourceId: "source.mof_2009_organizational_fact_actual",
+    finalSourceId: "source.mof_2009_expenditure_functional_plus_execution_report_supplement_actual",
   },  2010: {
     year: 2010,
     sourceId: "source.mof_2010_expenditure_pdf_form_e11_actual",
@@ -98,9 +129,21 @@ const sourcesByYear = {
     formId: "E11",
     tableTitle: "2010 state budget expenditure execution by functional classification",
     actualAmountIndex: 1,
-    workbookPath: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2010-fact.xlsx",
-    workbookSourceId: "source.mof_2010_programmatic_fact_actual",
-    finalSourceId: "source.mof_2010_expenditure_functional_plus_programmatic_supplement_actual",
+    nonDottedCodes: true,
+    inlineFunctionalRows: true,
+    canonicalizeLabels: true,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2010-annual-execution-report.pdf",
+    legacyAnnualReport: {
+      dialect: "translit",
+      orgChapterPageRange: [47, 118],
+      officialTotals: {
+        paymentsTotalThousandGel: 6972343.8,
+        financialAssetsGrowthThousandGel: 314287.8,
+        liabilitiesDecreaseThousandGel: 171324.0,
+      },
+    },
+    workbookSourceId: "source.mof_2010_organizational_fact_actual",
+    finalSourceId: "source.mof_2010_expenditure_functional_plus_execution_report_supplement_actual",
   },  2011: {
     year: 2011,
     sourceId: "source.mof_2011_expenditure_pdf_form_e11_actual",
@@ -109,9 +152,21 @@ const sourcesByYear = {
     formId: "E11",
     tableTitle: "2011 state budget expenditure execution by functional classification",
     actualAmountIndex: 1,
-    workbookPath: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2011-fact.xlsx",
-    workbookSourceId: "source.mof_2011_programmatic_fact_actual",
-    finalSourceId: "source.mof_2011_expenditure_functional_plus_programmatic_supplement_actual",
+    nonDottedCodes: true,
+    inlineFunctionalRows: true,
+    canonicalizeLabels: true,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2011-annual-execution-report.pdf",
+    legacyAnnualReport: {
+      dialect: "unicode",
+      orgChapterPageRange: [69, 165],
+      officialTotals: {
+        paymentsTotalThousandGel: 7459279.5,
+        financialAssetsGrowthThousandGel: 429976.5,
+        liabilitiesDecreaseThousandGel: 166378.2,
+      },
+    },
+    workbookSourceId: "source.mof_2011_organizational_fact_actual",
+    finalSourceId: "source.mof_2011_expenditure_functional_plus_execution_report_supplement_actual",
   },  2012: {
     year: 2012,
     sourceId: "source.mof_2012_expenditure_pdf_form_e11_actual",
@@ -334,6 +389,29 @@ async function readCsv<T>(relativePath: string): Promise<T[]> {
 }
 
 async function readWorkbookRows(): Promise<ReturnType<typeof parseAdminWorkbookRows>> {
+  if ("legacyAnnualReport" in source) {
+    const workbookPdf = await readPdfTextPages(repoPath(source.workbookPath));
+    return parseLegacyAnnualReportRows({
+      year: source.year,
+      sourceId: source.workbookSourceId,
+      workbookPath: source.workbookPath,
+      dialect: source.legacyAnnualReport.dialect,
+      orgChapterPageRange: source.legacyAnnualReport.orgChapterPageRange,
+      officialTotals: source.legacyAnnualReport.officialTotals,
+      pages: workbookPdf.pages,
+    });
+  }
+
+  if ("aggregateSupplements" in source) {
+    return buildAggregateSupplementWorkbookRows({
+      year: source.year,
+      sourceId: source.workbookSourceId,
+      workbookPath: source.workbookPath,
+      paymentsTotalThousandGel: source.aggregateSupplements.paymentsTotalThousandGel,
+      items: source.aggregateSupplements.items,
+    });
+  }
+
   if (source.workbookPath.endsWith(".pdf")) {
     const workbookPdf = await readPdfTextPages(repoPath(source.workbookPath));
     const pageRange = "workbookPageRange" in source ? source.workbookPageRange : null;
@@ -474,8 +552,10 @@ async function main() {
     ...source,
     pages: pdf.pages,
   });
-  const legacyEncodedLabels = "legacyEncodedLabels" in source && source.legacyEncodedLabels === true;
-  const pdfRows = legacyEncodedLabels ? canonicalizeExpenditurePdfRowLabels(parsedPdfRows) : parsedPdfRows;
+  const canonicalLabels =
+    ("legacyEncodedLabels" in source && source.legacyEncodedLabels === true) ||
+    ("canonicalizeLabels" in source && source.canonicalizeLabels === true);
+  const pdfRows = canonicalLabels ? canonicalizeExpenditurePdfRowLabels(parsedPdfRows) : parsedPdfRows;
   const pdfMappings = generateCompactPdfSpendingMappings(pdfRows);
   const pdfValidation = validateCompactPdfSpendingMappings(pdfRows, pdfMappings);
 

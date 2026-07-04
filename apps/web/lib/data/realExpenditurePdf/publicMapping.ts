@@ -57,6 +57,12 @@ const mappingRules: MappingRule[] = [
     mappingReason: "7.1 split: fundamental research kept under general public services for pilot review",
   },
   {
+    functionalCode: "7.1.5",
+    publicSpendingFieldId: "spending.general_public_services",
+    mappingConfidence: "medium",
+    mappingReason: "7.1 split: applied research in general public services (present through 2010) stays under general public services",
+  },
+  {
     functionalCode: "7.1.6",
     publicSpendingFieldId: "spending.debt_service",
     mappingConfidence: "high",
