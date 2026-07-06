@@ -107,10 +107,12 @@ describe("2005 ministry-total extraction", () => {
   const totals = categoryTotals(rows, 2005);
   const totalRow = rows.find((row) => row.isTotal);
 
-  it("reconciles category totals to the synthesized grand total", () => {
+  it("reconciles category totals to the official 2005 payments total (with undistributed residual)", () => {
     const categorySum = Object.values(totals).reduce((sum, amount) => sum + amount, 0);
     const sourceTotal = Math.round((totalRow?.actualThousandGel ?? 0) * 1000);
-    expect(sourceTotal).toBe(2_609_022_900);
+    // The workbook itemises 2,609,022.9k by ministry; the extractor reconciles to the official
+    // 2005 payments total (2,626,507.3k) by booking the ~17.5M undistributed residual to Other costs.
+    expect(sourceTotal).toBe(2_626_507_300);
     expect(Math.abs(categorySum - sourceTotal)).toBeLessThanOrEqual(ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL);
   });
 

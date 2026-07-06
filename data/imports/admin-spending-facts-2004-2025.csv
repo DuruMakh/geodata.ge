@@ -10,7 +10,7 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2005,admin_spending.health_social_affairs,,admin_category,693674400,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.internal_affairs,,admin_category,182161700,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.justice,,admin_category,50482800,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2005,admin_spending.other_costs,,admin_category,291888300,actual,source.mof_2005_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2005,admin_spending.other_costs,,admin_category,309372700,actual,source.mof_2005_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.sport,,admin_category,6915100,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2006,admin_spending.culture,,admin_category,48982000,actual,source.mof_2006_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2006,admin_spending.debt_service,,admin_category,334908600,actual,source.mof_2006_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.

@@ -1,0 +1,5 @@
+﻿year,source_id,code,label_ka,economic_label_ka,amount_gel,public_spending_field_id,mapping_confidence,mapping_notes
+2008,source.mof_2008_execution_report_aggregate_actual,FIN-LOANS,სესხები (ფინანსური აქტივების ზრდა),ფინანსური აქტივების ზრდა,142620200,spending.economic_affairs,medium,Generated older-year supplement mapping candidate: reviewed economic affairs label pattern
+2008,source.mof_2008_execution_report_aggregate_actual,FIN-EQUITY,აქციები და სხვა კაპიტალი (ფინანსური აქტივების ზრდა),ფინანსური აქტივების ზრდა,57092900,spending.economic_affairs,medium,Generated older-year supplement mapping candidate: reviewed economic affairs label pattern
+2008,source.mof_2008_execution_report_aggregate_actual,LIAB-EXT,სახელმწიფო ვალდებულებების დაფარვა - საგარეო,ვალდებულებების კლება,58633300,spending.debt_service,high,Generated older-year supplement mapping candidate: state debt or obligation repayment label
+2008,source.mof_2008_execution_report_aggregate_actual,LIAB-DOM,სახელმწიფო ვალდებულებების დაფარვა - საშინაო,ვალდებულებების კლება,52400000,spending.debt_service,high,Generated older-year supplement mapping candidate: state debt or obligation repayment label

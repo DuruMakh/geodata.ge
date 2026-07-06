@@ -68,6 +68,17 @@ const Y2005_CULTURE_LABEL = "საქართველოს კულტუ�
 const Y2005_SPORT_LABEL = "სპორტის დეპარტამენტი";
 const Y2005_YOUTH_LABEL = "ახალგაზრდობის საქმეთა დეპარტამენტი";
 
+// The 2005 organizational workbook is a preliminary ministry-total annex whose itemised rows sum
+// to 2,609,022.9k, but the official 2005 payments grand total is 2,626,507.3k — the figure the
+// treasury functional E11 report carries and the functional-expenditure pipeline reconciles to
+// (and the same org==official identity that holds for 2006: 3,822,512.6k). The ~17.5M the 2005
+// workbook does not itemise by ministry is booked to Other costs as an explicit undistributed
+// residual, so 2005 reconciles to the official total and agrees with the functional dataset
+// (see tests/data/pipelineIntegration.test.ts) instead of understating the budget by 0.67%.
+const Y2005_OFFICIAL_TOTAL_THOUSAND_GEL = 2626507.3;
+const Y2005_RESIDUAL_CODE = "90 00";
+const Y2005_RESIDUAL_LABEL = "გაუნაწილებელი გადასახდელები (2005 ორგანიზაციული ნაშთი)";
+
 function make2005Row(input: {
   code: string;
   label: string;
@@ -136,7 +147,9 @@ export function extractAdminSpending2005Rows(): OfficialExpenditureRow[] {
     roots.push({ code, label, actual, rowNumber: index + 2 });
   });
 
-  const grandTotal = roots.reduce((sum, root) => sum + root.actual, 0);
+  const rootsSum = roots.reduce((sum, root) => sum + root.actual, 0);
+  // Reconcile to the official 2005 payments total, not the incomplete workbook sum (see constants).
+  const grandTotal = Y2005_OFFICIAL_TOTAL_THOUSAND_GEL;
 
   const rows: OfficialExpenditureRow[] = [
     make2005Row({ code: "00 00", label: "სულ ჯამი", actual: grandTotal, rowNumber: 1, isTotal: true }),
@@ -175,6 +188,15 @@ export function extractAdminSpending2005Rows(): OfficialExpenditureRow[] {
     } else {
       rows.push(make2005Row(root));
     }
+  }
+
+  // Undistributed residual (official total minus the itemised ministry rows) -> Other costs, so the
+  // category sum reconciles to the official 2005 payments total.
+  const residual = Math.round((grandTotal - rootsSum) * 10) / 10;
+  if (residual > 0.05) {
+    rows.push(
+      make2005Row({ code: Y2005_RESIDUAL_CODE, label: Y2005_RESIDUAL_LABEL, actual: residual, rowNumber: roots.length + 2 }),
+    );
   }
 
   return rows;

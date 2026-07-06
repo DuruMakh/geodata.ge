@@ -49,7 +49,9 @@ a **ministry-total** year: no drill-down programs, aggregated at the institution
   verified 1:1 map (`saqarTvelos finansTa saministro` → `საქართველოს ფინანსთა სამინისტრო`).
 - **Institution-level rows**: only subtree-root coded rows are kept — the 34 `NN 00`
   institutions plus the orphan Patriarchate subtree-top `43 03` (its `43 00` parent is not
-  printed). Grand total is synthesized (`00 00` = **2,609,022.9k**), since the source has none.
+  printed). The workbook itemises **2,609,022.9k**, but the extractor reconciles to the official
+  2005 payments total **2,626,507.3k** (the functional-report figure; org == official from 2006 on),
+  booking the ~17.5M undistributed difference to `other_costs` as an explicit residual.
 - **Finance line split (owner-approved)**: institution `25 00` "Ministry of Finance" =
   **574,203.3k** is a single line with no children and bundles debt + transfers + finance.
   The organizational file cannot split it, so we borrow the split from the 2005 **functional**

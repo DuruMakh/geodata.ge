@@ -213,7 +213,11 @@ The 2005 workbook stores labels in the **AcadNusx** legacy font (Latin glyphs en
 and prints only ministry **totals** (sub-program detail is incomplete). So 2005 is an
 **institution-level** year — no drill-down programs.
 - **Transliteration** (`transliterateAcadNusx.ts`): deterministic 1:1 Latin→Mkhedruli map.
-- **Synthesized `00 00`** = 2,609,022.9 k (source has none).
+- **Total & residual**: the workbook itemises only **2,609,022.9 k** by ministry, but the official
+  2005 payments total is **2,626,507.3 k** (the treasury functional E11 figure the functional
+  pipeline reconciles to; org == official holds from 2006 on). The ~17.5 M the 2005 annex does not
+  itemise is booked to `other_costs` as an explicit undistributed residual, so 2005 reconciles to
+  the official total instead of understating it by 0.67 %.
 - **Finance line split** (owner-approved): `25 00` "Ministry of Finance" = 574,203.3 k bundles
   debt + transfers + finance. Split using the 2005 **functional** report: debt 282,040.4 k →
   `debt_service`; transfers/other 178,800.8 k → `other_costs`; finance-proper 113,362.1 k →

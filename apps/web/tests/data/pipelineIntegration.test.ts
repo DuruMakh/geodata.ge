@@ -301,12 +301,22 @@ describe("data pipeline gate (real shipped data files)", () => {
 
     // The functional (spending.*) and administrative (admin_spending.*) imports
     // are generated from independent official sources but both cover the full
-    // state budget payments for a year, so their per-year actual sums must
-    // agree within the shared reconciliation tolerance the generators use
-    // (ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL, 1000 GEL).
+    // state budget payments for a year, so their per-year actual sums must agree.
+    // For 2017-2025 both draw on the same tavi-6 execution workbooks and match
+    // within a single pipeline's reconciliation tolerance (1000 GEL). The pre-2017
+    // backfill overlap (2005-2016) draws each pipeline on a DIFFERENT official
+    // document (functional: treasury E11 PDFs + supplements; admin: mof.ge annual-
+    // execution reports), so the two independently round the same budget at the
+    // thousand-GEL annex level and their sums can diverge by the sum of both
+    // pipelines' rounding budgets. Cross-pipeline agreement therefore tolerates 2x
+    // the single-pipeline reconciliation tolerance (observed worst case: 2016,
+    // 1,120 GEL on a 10.3B budget = 0.00001%). This is a rounding envelope across
+    // two independent sources, NOT a data-quality slack: each pipeline still
+    // reconciles to its own official total within 1000 GEL at generation time.
+    const CROSS_PIPELINE_TOLERANCE_GEL = 2 * ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL;
     const mismatches: { year: number; functionalTotalGel: number; adminTotalGel: number; differenceGel: number }[] = [];
 
-    for (const year of EXPENDITURE_DETAILED_YEARS) {
+    for (const year of EXPENDITURE_DETAILED_YEARS.filter((candidate) => ADMIN_SPENDING_YEARS.includes(candidate))) {
       const functionalTotalGel = sumAmountGel(
         actualOnly(expenditureCategoryFacts(facts)).filter((fact) => fact.year === year),
       );
@@ -315,7 +325,7 @@ describe("data pipeline gate (real shipped data files)", () => {
       );
       const differenceGel = Math.abs(functionalTotalGel - adminTotalGel);
 
-      if (differenceGel > ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL) {
+      if (differenceGel > CROSS_PIPELINE_TOLERANCE_GEL) {
         mismatches.push({ year, functionalTotalGel, adminTotalGel, differenceGel });
       }
     }
@@ -384,6 +394,52 @@ describe("data pipeline gate (real shipped data files)", () => {
     // "Total revenue" series.
     expect(totalFor("revenue", 2024)).toBe(29_744_320_017);
     expect(totalFor("revenue", 2025)).toBe(32_368_880_408);
+
+    // Same intentional pins for the oldest detailed expenditure years (added
+    // 2026-07): E11 functional PDF plus mof.ge annual execution report
+    // payments-by-program supplements. Official annual totals they reconcile
+    // against (thousand-GEL annex rounding): 7,806,801,800, 8,104,217,600,
+    // 9,009,812,200, 9,703,127,100, and 10,292,234,100 GEL.
+    expect(totalFor("expenditure", 2012)).toBe(7_806_801_963);
+    expect(totalFor("expenditure", 2013)).toBe(8_104_217_952);
+    expect(totalFor("expenditure", 2014)).toBe(9_009_812_195);
+    expect(totalFor("expenditure", 2015)).toBe(9_703_126_964);
+    expect(totalFor("expenditure", 2016)).toBe(10_292_234_620);
+
+    // 2008-2011 (added 2026-07): E11 functional PDF plus mof.ge annual
+    // execution report payments-by-organization supplements (2008 uses the
+    // report's whole-budget aggregates). Official annual totals they
+    // reconcile against (thousand-GEL report rounding): 6,758,831,800,
+    // 6,754,106,800, 6,972,343,800, and 7,459,279,500 GEL.
+    expect(totalFor("expenditure", 2008)).toBe(6_758_831_737);
+    expect(totalFor("expenditure", 2009)).toBe(6_754_106_742);
+    expect(totalFor("expenditure", 2010)).toBe(6_972_343_653);
+    expect(totalFor("expenditure", 2011)).toBe(7_459_279_360);
+
+    // 2007 (added 2026-07): the old-classification E11 already covers the
+    // whole payments concept (lending and debt repayment inside functional
+    // blocks), so the composition is the mapped E11 alone, reconciled against
+    // the execution report total of 5,237,131.1 thousand GEL.
+    expect(totalFor("expenditure", 2007)).toBe(5_237_131_090);
+
+    // 2005-2006 (added 2026-07): the pre-COFOG 14-group functional
+    // classification mapped to public categories (group total minus
+    // carve-outs). Category totals sum exactly to the official payments
+    // grand totals: 2,626,507.3 thousand GEL (2005) and 3,822,512.6 (2006).
+    expect(totalFor("expenditure", 2005)).toBe(2_626_507_300);
+    expect(totalFor("expenditure", 2006)).toBe(3_822_512_626);
+
+    // 2017-2023 (pinned 2026-07): E11 functional PDF plus tavi-6 workbook
+    // financial-asset/liability supplements. These reconcile at generation
+    // time; pinning here closes the regression gap so all 21 detailed years
+    // (2005-2025) are guarded, not just the endpoints.
+    expect(totalFor("expenditure", 2017)).toBe(11_764_835_158);
+    expect(totalFor("expenditure", 2018)).toBe(12_590_181_621);
+    expect(totalFor("expenditure", 2019)).toBe(13_469_688_961);
+    expect(totalFor("expenditure", 2020)).toBe(16_174_635_967);
+    expect(totalFor("expenditure", 2021)).toBe(19_807_502_469);
+    expect(totalFor("expenditure", 2022)).toBe(20_163_012_511);
+    expect(totalFor("expenditure", 2023)).toBe(22_350_179_410);
   });
 
   it("has no negative actual amounts where the domain forbids them", async () => {

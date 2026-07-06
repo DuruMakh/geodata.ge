@@ -57,6 +57,12 @@ const mappingRules: MappingRule[] = [
     mappingReason: "7.1 split: fundamental research kept under general public services for pilot review",
   },
   {
+    functionalCode: "7.1.5",
+    publicSpendingFieldId: "spending.general_public_services",
+    mappingConfidence: "medium",
+    mappingReason: "7.1 split: applied research in general public services (present through 2010) stays under general public services",
+  },
+  {
     functionalCode: "7.1.6",
     publicSpendingFieldId: "spending.debt_service",
     mappingConfidence: "high",
@@ -129,6 +135,12 @@ const mappingRules: MappingRule[] = [
     publicSpendingFieldId: "spending.economic_affairs",
     mappingConfidence: "medium",
     mappingReason: "7.4 split: other economic sectors",
+  },
+  {
+    functionalCode: "7.4.8",
+    publicSpendingFieldId: "spending.economic_affairs",
+    mappingConfidence: "medium",
+    mappingReason: "7.4 split: applied research in economic activity (present through 2015) stays under economic affairs",
   },
   {
     functionalCode: "7.4.9",

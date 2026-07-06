@@ -12,8 +12,10 @@ function includesAny(text: string, needles: string[]): boolean {
 
 function suggestForLabel(labelKa: string): RuleResult {
   const text = labelKa.toLowerCase();
-  const hasHealth = includesAny(text, ["ჯანმრთელ", "ჯანდაცვ", "სამედიცინო", "დაავადებ"]);
-  const hasSocial = includesAny(text, ["სოციალურ", "პენსი", "დევნილ", "დახმარებ", "ვეტერან"]);
+  const hasHealth = includesAny(text, ["ჯანმრთელ", "ჯანდაცვ", "სამედიცინო", "დაავადებ", "ეპიდზედამხედველ"]);
+  // NOTE: never use the bare stem "ზრუნვ" here — it is a substring of the
+  // ubiquitous "უზრუნველყოფა" (provision) and hijacks unrelated labels.
+  const hasSocial = includesAny(text, ["სოციალურ", "პენსი", "დევნილ", "დახმარებ", "ვეტერან", "სახელმწიფო ზრუნვ"]);
 
   const hasHealthSignal = hasHealth || text.includes("სისხლ");
 
@@ -27,6 +29,17 @@ function suggestForLabel(labelKa: string): RuleResult {
     ])
   ) {
     return { fieldId: "spending.debt_service", confidence: "high", reason: "state debt or obligation repayment label" };
+  }
+
+  // Owner decision (2026-07-04): clearing the state's accumulated tax
+  // refund/overpayment liabilities to organizations is a fiscal-administration
+  // operation, not sovereign debt service and not sector support.
+  if (includesAny(text, ["საგადასახადო დავალიანებ"])) {
+    return {
+      fieldId: "spending.general_public_services",
+      confidence: "medium",
+      reason: "reviewed fiscal operation: returning organizations' tax arrears is general public services",
+    };
   }
 
   if (
@@ -46,6 +59,13 @@ function suggestForLabel(labelKa: string): RuleResult {
       "ენგურ",
       "ვარდნილ",
       "ბუნებრივი აირ",
+      "ბუნებრივი გაზ",
+      "ელექტროქსელ",
+      "ელექტრომომარაგ",
+      "ელექტროსადგურ",
+      "წყლის პროექტ",
+      "აეროპორტ",
+      "საჰაერო ხომალდ",
     ])
   ) {
     return {
@@ -59,11 +79,46 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "energy sector label" };
   }
 
-  if (includesAny(text, ["სახელმწიფო ქონების მართვა", "ანაკლიის ღრმაწყლოვანი პორტ"])) {
+  if (
+    includesAny(text, [
+      "სახელმწიფო ქონების მართვა",
+      "ანაკლიის ღრმაწყლოვანი პორტ",
+      "საინვესტიციო პოლიტიკ",
+      "საწარმოთა მართვის სააგენტო",
+      "იაფი კრედიტ",
+      "სესხები (ფინანსური აქტივების ზრდა)",
+      "აქციები და სხვა კაპიტალი",
+      "სამშენებლო ინსპექცი",
+      "საინვესტიციო რისკ",
+      "ენერგომატარებლ",
+    ])
+  ) {
     return { fieldId: "spending.economic_affairs", confidence: "medium", reason: "reviewed economic affairs label pattern" };
   }
 
-  if (includesAny(text, ["სამელიორაციო", "ირიგაცი", "დრენაჟ", "სოფლის მეურნეობის", "სასოფლო-სამეურნეო", "სარწყავ"])) {
+  if (includesAny(text, ["რეგიონთაშორისი პროექტ", "kfw"])) {
+    return {
+      fieldId: "spending.infrastructure_regional_development",
+      confidence: "medium",
+      reason: "reviewed donor-financed regional development project label",
+    };
+  }
+
+  if (
+    includesAny(text, [
+      "სამელიორაციო",
+      "ირიგაცი",
+      "დრენაჟ",
+      "სოფლის მეურნეობის",
+      "სასოფლო-სამეურნეო",
+      "სარწყავ",
+      "ფერმერ",
+      "სოფლის განვითარების პროექტ",
+      "მეღვინეობ",
+      "ვაზისა და ღვინის",
+      "ბუნებრივი რესურს",
+    ])
+  ) {
     return {
       fieldId: "spending.agriculture_environment",
       confidence: "medium",
@@ -71,11 +126,11 @@ function suggestForLabel(labelKa: string): RuleResult {
     };
   }
 
-  if (includesAny(text, ["პენიტენც", "პრობაცი", "დანაშაულ", "საზოგადოებრივი წესრიგ", "სამართალდამცავი"])) {
+  if (includesAny(text, ["პენიტენც", "პრობაცი", "დანაშაულ", "საზოგადოებრივი წესრიგ", "სამართალდამცავი", "პატიმრობ", "სამართალშემოქმედ", "სასჯელაღსრულებ"])) {
     return { fieldId: "spending.public_order_safety", confidence: "medium", reason: "public order or justice keyword" };
   }
 
-  if (includesAny(text, ["თავდაცვის", "სამხედრო"])) {
+  if (includesAny(text, ["თავდაცვის", "სამხედრო", "შეიარაღებული ძალ"])) {
     return { fieldId: "spending.defence", confidence: "high", reason: "defence keyword" };
   }
 
@@ -83,7 +138,7 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.health", confidence: "medium", reason: "health keyword" };
   }
 
-  if (includesAny(text, ["იძულებით გადაადგილებულ", "მიგრანტ"])) {
+  if (includesAny(text, ["იძულებით გადაადგილებულ", "მიგრანტ", "მიგრაციულ", "ლტოლვილ", "ხანდაზმულ"])) {
     return { fieldId: "spending.social_protection", confidence: "medium", reason: "social protection keyword" };
   }
 
@@ -107,7 +162,11 @@ function suggestForLabel(labelKa: string): RuleResult {
     };
   }
 
-  if (hasHealthSignal && hasSocial && includesAny(text, ["პროგრამების მართვა"])) {
+  if (
+    hasHealthSignal &&
+    hasSocial &&
+    includesAny(text, ["პროგრამების მართვა", "პროგრამების სააგენტო", "პროექტების განმახორციელებელ", "ცენტრალური აპარატ"])
+  ) {
     return {
       fieldId: "spending.health",
       confidence: "medium",
@@ -127,7 +186,20 @@ function suggestForLabel(labelKa: string): RuleResult {
     return { fieldId: "spending.defence", confidence: "high", reason: "defence keyword" };
   }
 
-  if (includesAny(text, ["განათლების", "სკოლ", "უნივერსიტეტ", "მეცნიერებ"])) {
+  if (
+    includesAny(text, [
+      "განათლების",
+      "სკოლ",
+      "უნივერსიტეტ",
+      "მეცნიერებ",
+      "სასწავლო",
+      "საგანმანათლებლო",
+      "ახალგაზრდ",
+      "ბიოქიმი",
+      "ბიოლოგი",
+      "პატრიოტ",
+    ])
+  ) {
     return { fieldId: "spending.education", confidence: "high", reason: "education keyword" };
   }
 
@@ -195,6 +267,20 @@ function suggestForLabel(labelKa: string): RuleResult {
       "მთავრობის ადმინისტრაცია",
       "აუდიტის სამსახური",
       "სახელმწიფო რწმუნებულ",
+      "უშიშროების საბჭო",
+      "საკანონმდებლო",
+      "სახელმწიფო მინისტრის აპარატ",
+      "შემოსავლების სამსახური",
+      "სახაზინო სამსახური",
+      "ფინანსთა სამინისტრო",
+      "კონტროლის პალატა",
+      "არჩევნ",
+      "შესყიდვების სააგენტო",
+      "საჯარო სამსახურის ბიურო",
+      "სტატისტიკის",
+      "საგარეო საქმეთა",
+      "სამხრეთ ოსეთის ადმინისტრაცია",
+      "მიწის მართვის დეპარტამენტ",
     ])
   ) {
     return {

@@ -38,8 +38,8 @@ describe("2004-2025 source coverage", () => {
     expect(missing).toEqual([]);
   });
   it("documents explicit old-year coverage tiers", () => {
-    expect(EXPENDITURE_TOTAL_ONLY_YEARS).toEqual([2004, 2005]);
-    expect(EXPENDITURE_DETAILED_YEARS[0]).toBe(2017);
+    expect(EXPENDITURE_TOTAL_ONLY_YEARS).toEqual([]);
+    expect(EXPENDITURE_DETAILED_YEARS[0]).toBe(2005);
     expect(REVENUE_TOTAL_ONLY_YEARS).toEqual([]);
     expect(REVENUE_DETAILED_YEARS[0]).toBe(2005);
     // Ministries backfill: 2005-2016 all covered (2005 AcadNusx ministry totals; 2006-2012 Group C

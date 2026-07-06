@@ -21,6 +21,22 @@ export type ExpenditurePdfSource = {
   formId: string;
   tableTitle: string;
   actualAmountIndex?: number;
+  /**
+   * Pre-2014 E11 PDFs print classification codes without dots (701, 70111,
+   * 21). When set, codes are normalized to the dotted form (7.1, 7.1.1.1,
+   * 2.1) before the functional-context logic runs.
+   */
+  nonDottedCodes?: boolean;
+  /**
+   * 2008-2011 E11 PDFs use an older row shape: every functional row carries
+   * its non-dotted code, label, and five amount columns (გეგმა, გადახდა,
+   * მოთხოვნა, ვალდებულება, დავალიანება — payment is column index 1) inline,
+   * economic breakdown rows underneath are label-only without codes, there
+   * are no "00" totals rows, and the grand total is the bare code "7" row.
+   * When set, rows are reconstructed by accumulating wrapped label lines
+   * until five amounts are collected.
+   */
+  inlineFunctionalRows?: boolean;
 };
 
 export type ExpenditurePdfPageText = {
@@ -127,6 +143,40 @@ function normalizeText(value: string): string {
   return value.replace(/\u00a0/g, " ").replace(/\t/g, " ").replace(/\s+/g, " ").trim();
 }
 
+/**
+ * Some E11 text layers (2015) repeat every visual label cell several times on the
+ * same tab-separated line ("\u10ef\u10d0\u10db\u10e3\u10e0\u10d8\t\u10ef\u10d0\u10db\u10e3\u10e0\u10d8\t\u10ef\u10d0\u10db\u10e3\u10e0\u10d8\t\u10ef\u10d0\u10db\u10e3\u10e0\u10d8 8,771,288.0 ...").
+ * Collapse those artifacts: a Georgian cell is dropped when the previous kept cell
+ * already ends with it, and a repeated Georgian phrase is stripped from the head of
+ * a cell that carries the row amounts. Numeric cells are never touched, so rows with
+ * legitimately equal adjacent amounts are safe.
+ */
+function dedupeRepeatedLineCells(line: string): string {
+  if (!line.includes("\t")) return line;
+  const cells = line
+    .split("\t")
+    .map((cell) => cell.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim())
+    .filter((cell) => cell.length > 0);
+  const kept: string[] = [];
+
+  for (const cell of cells) {
+    const previous = kept[kept.length - 1];
+    if (previous && /[\u10d0-\u10ff]/.test(cell)) {
+      if (previous === cell || previous.endsWith(cell)) continue;
+      const repeatedHead = cell.match(/^([^\d-]+)/)?.[1];
+      if (repeatedHead && previous.endsWith(repeatedHead.trim())) {
+        const stripped = cell.slice(repeatedHead.length).trim();
+        if (!stripped) continue;
+        kept.push(stripped);
+        continue;
+      }
+    }
+    kept.push(cell);
+  }
+
+  return kept.join(" ");
+}
+
 function parseGel(value: string | null): number | null {
   if (!value) return null;
   const parsed = Number(value.replaceAll(",", ""));
@@ -139,6 +189,21 @@ function gelToThousandGel(value: number | null): number | null {
 
 function roundedGel(value: number | null): number | null {
   return value === null ? null : Math.round(value);
+}
+
+/**
+ * Convert a non-dotted classification code to the dotted form used from 2014
+ * on: COFOG functional codes carry a two-digit division after the leading 7
+ * (701 -> 7.1, 710 -> 7.10, 70111 -> 7.1.1.1) and economic codes a single
+ * digit (21 -> 2.1). "00", "31", and bare "2"/"7" stay as they are.
+ */
+function normalizeNonDottedCode(code: string): string {
+  if (/^7\d{2,}$/.test(code)) {
+    const division = String(Number(code.slice(1, 3)));
+    return ["7", division, ...code.slice(3).split("")].join(".");
+  }
+  if (/^2\d$/.test(code)) return `2.${code[1]}`;
+  return code;
 }
 
 function parentFunctionalCode(code: string): string | null {
@@ -193,11 +258,11 @@ function segmentsFromPages(pages: ExpenditurePdfPageText[]): ParsedSegment[] {
   for (const page of pages) {
     const lines = page.text
       .split(/\r?\n/)
-      .map(normalizeText)
+      .map((line) => normalizeText(dedupeRepeatedLineCells(line)))
       .filter(Boolean);
 
     for (const line of lines) {
-      if (/^(2025 |01\/04\/2026|\d{2}\/\d{2}\/\d{4})/.test(line) || line.includes(" - 42 ")) {
+      if (/^(2025 |01\/04\/2026|\d{2}\/\d{2}\/\d{4}|\d{2}-\d{2}-\d{4})/.test(line) || line.includes(" - 42 ")) {
         flush();
         continue;
       }
@@ -222,8 +287,177 @@ function segmentsFromPages(pages: ExpenditurePdfPageText[]): ParsedSegment[] {
   return segments;
 }
 
+const inlineHeaderLinePatterns = [
+  /^\d{2}\/\d{2}\/\d{2,4}\s/, // print datestamp in the repeated page title
+  /^\( ?ფუნქციონალურ ჭრილში ?\)$/,
+  /^ფორმა # E11/,
+  /^ÂÄÂÌÀ/, // legacy-font column header line (გეგმა ვალდებულება ...)
+  /^ფუნქციონალუ-$/,
+  /^რი კოდი გადახდა/,
+  /^გვერდი \d+ - \d+ დან/,
+];
+
+// Functional codes only (7, 701..710, 7011..., 70111...); the label after the
+// code never starts with a digit, which keeps wrapped amount lines (that may
+// begin with digits) from being misread as new rows. The 2007 layout prints
+// each code alone on its own line with the label and amounts following.
+const inlineCodeLinePattern = /^(7\d{0,4})\s+(\D.*)$/;
+const inlineBareCodeLinePattern = /^(7\d{0,4})$/;
+
+type InlineParsedRow = {
+  pageNumber: number;
+  code: string;
+  labelKa: string;
+  amounts: string[];
+  rawText: string;
+};
+
+function inlineRowsFromPages(pages: ExpenditurePdfPageText[]): InlineParsedRow[] {
+  const rows: InlineParsedRow[] = [];
+  let active: { pageNumber: number; code: string; parts: string[]; amounts: string[] } | null = null;
+
+  const flush = () => {
+    if (!active) return;
+    const text = normalizeText(active.parts.join(" "));
+    rows.push({
+      pageNumber: active.pageNumber,
+      code: active.code,
+      labelKa: normalizeText(text.replace(amountPattern, "")),
+      amounts: active.amounts,
+      rawText: `${active.code} ${text}`,
+    });
+    active = null;
+  };
+
+  for (const page of pages) {
+    const lines = page.text
+      .split(/\r?\n/)
+      .map((line) => normalizeText(dedupeRepeatedLineCells(line)))
+      .filter(Boolean);
+
+    for (const line of lines) {
+      // Header and footer lines are skipped without flushing so that a row
+      // wrapped across a page break keeps accumulating.
+      if (inlineHeaderLinePatterns.some((pattern) => pattern.test(line))) continue;
+
+      const lineAmounts = Array.from(line.matchAll(amountPattern)).map((match) => match[0]);
+      const codeMatch = line.match(inlineCodeLinePattern) ?? line.match(inlineBareCodeLinePattern);
+
+      if (codeMatch) {
+        flush();
+        active = {
+          pageNumber: page.pageNumber,
+          code: codeMatch[1],
+          parts: [line.slice(codeMatch[1].length).trim()].filter(Boolean),
+          amounts: lineAmounts,
+        };
+        if (active.amounts.length >= 5) flush();
+        continue;
+      }
+
+      if (active) {
+        active.parts.push(line);
+        active.amounts.push(...lineAmounts);
+        if (active.amounts.length >= 5) flush();
+        continue;
+      }
+
+      // Label-only economic breakdown rows (ხარჯები, შრომის ანაზღაურება, ...)
+      // sit outside any active coded row and are intentionally not extracted,
+      // matching the modern-format exclusion of 2.x/31 breakdown rows.
+    }
+  }
+
+  flush();
+  return rows;
+}
+
+function parseInlineExpenditurePdfText(
+  input: ExpenditurePdfSource & { pages: ExpenditurePdfPageText[] },
+): ExpenditurePdfOfficialRow[] {
+  const rows: ExpenditurePdfOfficialRow[] = [];
+  const seen = new Set<string>();
+  const functionalPaths = new Map<string, string>();
+
+  for (const parsed of inlineRowsFromPages(input.pages)) {
+    if (parsed.amounts.length < 5 || !parsed.labelKa) continue;
+
+    const code = input.nonDottedCodes ? normalizeNonDottedCode(parsed.code) : parsed.code;
+    const isGrandTotal = code === "7";
+    const functionalCode = isGrandTotal ? null : code;
+
+    let hierarchyPath = parsed.labelKa;
+    if (functionalCode) {
+      const parentPath = parentFunctionalCode(functionalCode);
+      hierarchyPath = parentPath
+        ? [functionalPaths.get(parentPath), parsed.labelKa].filter(Boolean).join(" > ")
+        : parsed.labelKa;
+      functionalPaths.set(functionalCode, hierarchyPath);
+    }
+
+    const approvedPlanGel = parseGel(parsed.amounts[0] ?? null);
+    const actualIndex = Math.min(input.actualAmountIndex ?? 1, parsed.amounts.length - 1);
+    const actualGel = parseGel(parsed.amounts[actualIndex] ?? null);
+    const annualObligationGel = parseGel(parsed.amounts[3] ?? null);
+    if (actualGel === null) continue;
+
+    const dedupeKey = [functionalCode ?? "root", code, parsed.labelKa, ...parsed.amounts].join("|");
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    rows.push({
+      sourceId: input.sourceId,
+      sourceFile: input.sourceFile,
+      year: input.year,
+      formId: input.formId,
+      tableTitle: input.tableTitle,
+      pageNumber: parsed.pageNumber,
+      tableIndex: 1,
+      rowIndex: rows.length + 1,
+      rowId: buildRowId({
+        year: input.year,
+        formId: input.formId,
+        functionalCode,
+        economicCode: "00",
+        hierarchyPath,
+      }),
+      rowType: isGrandTotal ? "grand_total" : "functional_total",
+      includeInPublicMapping: !isGrandTotal,
+      identityConfidence: "official_code",
+      functionalCode,
+      economicCode: "00",
+      hierarchyPath,
+      labelKa: parsed.labelKa,
+      approvedPlanRaw: parsed.amounts[0] ?? null,
+      approvedPlanThousandGel: gelToThousandGel(approvedPlanGel),
+      approvedPlanGel: roundedGel(approvedPlanGel),
+      revisedPlanRaw: null,
+      revisedPlanThousandGel: null,
+      revisedPlanGel: null,
+      actualRaw: parsed.amounts[actualIndex] ?? "",
+      actualThousandGel: actualGel / 1000,
+      actualGel: Math.round(actualGel),
+      annualObligationRaw: parsed.amounts[3] ?? null,
+      annualObligationThousandGel: gelToThousandGel(annualObligationGel),
+      annualObligationGel: roundedGel(annualObligationGel),
+      yearResourceRaw: null,
+      yearResourceThousandGel: null,
+      yearResourceGel: null,
+      sourceUnit: "gel",
+      rawRowText: parsed.rawText,
+    });
+  }
+
+  return rows;
+}
+
 export function parseExpenditurePdfText(input: ExpenditurePdfSource & { pages: ExpenditurePdfPageText[] }): ExpenditurePdfOfficialRow[] {
-  const segments = segmentsFromPages(input.pages);
+  if (input.inlineFunctionalRows) return parseInlineExpenditurePdfText(input);
+
+  const rawSegments = segmentsFromPages(input.pages);
+  const segments = input.nonDottedCodes
+    ? rawSegments.map((segment) => ({ ...segment, code: normalizeNonDottedCode(segment.code) }))
+    : rawSegments;
   const rows: ExpenditurePdfOfficialRow[] = [];
   const seen = new Set<string>();
   const functionalPaths = new Map<string, string>();
