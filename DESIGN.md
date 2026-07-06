@@ -285,7 +285,7 @@ Baseline-aligned row: serif brand left (`GeoData`), nav tabs center, mono contex
 
 ### 7.2 Mode / Grouping Tabs
 
-Text-only, sans 12.5px; active = ink 600 with `text-decoration: underline`, 2px thickness, accent color, `text-underline-offset: 4px`. No backgrounds. Mode tabs: `ხაზი / ცხრილი`. Grouping tabs (`სფეროები / უწყებები`) appear only in expenditure mode, separated from mode tabs by a 1px×13px `control` vertical divider.
+Text-only, sans 12.5px; active = ink 600 with `text-decoration: underline`, 2px thickness, accent color, `text-underline-offset: 4px`. No backgrounds. Mode tabs: `ხაზი / ცხრილი`, in the chart controls row. In the **explorer**, the grouping tabs (`სფეროები / უწყებები`, expenditure only) live in the series aside, directly under the `სერიები` header row (gap 18px, 12px padding-bottom, 1px `row-border` bottom rule). In the **analysis view**, grouping tabs sit next to the side tabs, separated by a 1px×13px `control` vertical divider.
 
 ### 7.3 Measure Pill (% წილი)
 
@@ -297,7 +297,7 @@ Mono 11px text links; active = ink 600 underlined (accent underline); inactive =
 
 ### 7.5 Range Slider
 
-24px-high rail: 3px `hairline-soft` track, accent fill at 40% opacity between handles, 5px round year ticks (paper with 1px `control` border inside range, `hairline` outside), 15px round handles (paper fill, 2px accent border, handle shadow). Handles are buttons with `role="slider"`, aria value attributes, and Arrow/Home/End keyboard support. Mono min/max year labels below.
+24px-high rail: 3px `hairline-soft` track, accent fill at 40% opacity between handles, 15px round handles (paper fill, 2px accent border, handle shadow). The rail is clean — no per-year tick dots. Handles are buttons with `role="slider"`, aria value attributes, and Arrow/Home/End keyboard support. Mono min/max year labels below.
 
 ### 7.6 Series Row (aside panel)
 
@@ -358,7 +358,7 @@ workspace:
   gap: "40px"
 ```
 
-Left: mode tabs + grouping tabs + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline + mono count (`n / 6` in line mode, `n` in table mode; count turns accent at the limit), search, series rows (scroll ≤430px), CSV button.
+Left: mode tabs + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline + mono count (`n / 6` in line mode, `n` in table mode; count turns accent at the limit), grouping tabs (expenditure only, §7.2), search, series rows (scroll ≤430px), CSV button.
 
 ### 8.3 Line Chart
 

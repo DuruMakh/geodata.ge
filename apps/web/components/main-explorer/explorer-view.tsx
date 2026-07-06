@@ -2,7 +2,7 @@
 
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ChartMode, ExpenditureGrouping, ExplorerScope } from "../../lib/explorer/types";
-import { Callout, SourceNote, TabDivider, TextTab } from "../ui/editorial";
+import { Callout, SourceNote, TextTab } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
 import { ExplorerTable } from "./explorer-table";
 import { Indicators } from "./indicators";
@@ -96,13 +96,6 @@ export function ExplorerView({
               <div className="flex flex-wrap items-center gap-[18px]">
                 <TextTab label="ხაზი" active={chartMode === "line"} onClick={() => onChartModeChange("line")} testId="chart-mode-line" />
                 <TextTab label="ცხრილი" active={chartMode === "table"} onClick={() => onChartModeChange("table")} testId="chart-mode-table" />
-                {showGrouping ? (
-                  <>
-                    <TabDivider />
-                    <TextTab label="სფეროები" active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
-                    <TextTab label="უწყებები" active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
-                  </>
-                ) : null}
               </div>
               <div className="flex items-center gap-3.5">
                 <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
@@ -157,12 +150,15 @@ export function ExplorerView({
           items={model.items}
           rows={model.comparisonRows}
           scope={scope}
+          showGrouping={showGrouping}
+          grouping={grouping}
           selectedIds={selectedIds}
           chartMode={chartMode}
           endYear={range.end}
           query={query}
           limitMessage={limitMessage}
           expandedIds={expandedMinistries}
+          onGroupingChange={onGroupingChange}
           onQueryChange={onQueryChange}
           onToggle={onToggleSeries}
           onToggleExpanded={onToggleExpanded}

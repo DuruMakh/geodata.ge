@@ -4,7 +4,8 @@ import type { ExplorerItem, ExplorerScope, ExplorerTableRow } from "../../lib/ex
 import { MAX_CHART_SERIES, type ChartMode } from "../../lib/explorer/types";
 import { isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { formatAmount } from "../../lib/explorer/format";
-import { Callout, SwatchBar } from "../ui/editorial";
+import type { ExpenditureGrouping } from "../../lib/explorer/types";
+import { Callout, SwatchBar, TextTab } from "../ui/editorial";
 
 // Series aside per DESIGN.md §7.6–7.8: flat editorial rows with a checkbox square,
 // swatch bar on selection, and (for ministries) caret-expandable major programs.
@@ -60,12 +61,15 @@ type SeriesPanelProps = {
   items: ExplorerItem[];
   rows: ExplorerTableRow[];
   scope: ExplorerScope;
+  showGrouping: boolean;
+  grouping: ExpenditureGrouping;
   selectedIds: string[];
   chartMode: ChartMode;
   endYear: number;
   query: string;
   limitMessage: string | null;
   expandedIds: string[];
+  onGroupingChange: (grouping: ExpenditureGrouping) => void;
   onQueryChange: (query: string) => void;
   onToggle: (itemId: string) => void;
   onToggleExpanded: (itemId: string) => void;
@@ -76,12 +80,15 @@ export function SeriesPanel({
   items,
   rows,
   scope,
+  showGrouping,
+  grouping,
   selectedIds,
   chartMode,
   endYear,
   query,
   limitMessage,
   expandedIds,
+  onGroupingChange,
   onQueryChange,
   onToggle,
   onToggleExpanded,
@@ -106,6 +113,13 @@ export function SeriesPanel({
           {chartMode === "table" ? String(selectedIds.length) : `${selectedIds.length} / ${MAX_CHART_SERIES}`}
         </span>
       </div>
+
+      {showGrouping ? (
+        <div className="mt-3.5 flex gap-[18px] border-b border-[var(--row-border)] pb-3">
+          <TextTab label="სფეროები" active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
+          <TextTab label="უწყებები" active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
+        </div>
+      ) : null}
 
       <input
         data-testid="series-search"

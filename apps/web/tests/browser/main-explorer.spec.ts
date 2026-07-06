@@ -79,10 +79,12 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await expectAppReady(page);
 
   const chartPanel = page.getByTestId("chart-panel");
+  const seriesPanel = page.getByTestId("series-selector");
   await expect(chartPanel.getByTestId("chart-mode-line")).toHaveAttribute("aria-pressed", "true");
   await expect(chartPanel.getByTestId("chart-mode-table")).toBeVisible();
-  await expect(chartPanel.getByTestId("grouping-fields")).toHaveAttribute("aria-pressed", "true");
-  await expect(chartPanel.getByTestId("grouping-ministries")).toBeVisible();
+  // The grouping switch lives in the series panel, not in the chart controls row.
+  await expect(seriesPanel.getByTestId("grouping-fields")).toHaveAttribute("aria-pressed", "true");
+  await expect(seriesPanel.getByTestId("grouping-ministries")).toBeVisible();
   await expect(chartPanel.getByTestId("measure-share-toggle")).toBeVisible();
   await expect(page.getByTestId("year-range-strip")).toContainText("დიაპაზონი");
 

@@ -152,22 +152,6 @@ export function RangeStrip({ years, range, onChange }: RangeStripProps) {
           className="absolute top-2.5 h-[3px] bg-[var(--accent)] opacity-40"
           style={{ left: pct(start), right: `${(100 - ((end - min) / span) * 100).toFixed(2)}%` }}
         />
-        {years.map((year) => {
-          const inRange = year >= start && year <= end;
-
-          return (
-            <span
-              key={year}
-              aria-hidden
-              className="pointer-events-none absolute top-[9px] size-[5px] -translate-x-1/2 rounded-full"
-              style={{
-                left: pct(year),
-                background: inRange ? "var(--paper)" : "var(--hairline)",
-                border: inRange ? "1px solid var(--control)" : "1px solid transparent",
-              }}
-            />
-          );
-        })}
         <button
           type="button"
           data-testid="range-start-handle"
