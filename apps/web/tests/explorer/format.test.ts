@@ -1,20 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { formatGel, formatPercent, formatSignedPercent } from "../../lib/explorer/format";
+import { formatAmount, formatAmountParts, formatBn, formatShare, formatSignedAmount } from "../../lib/explorer/format";
 
-describe("explorer formatters", () => {
-  it("formats GEL values compactly", () => {
-    expect(formatGel(22_500_000_000)).toBe("22.5B GEL");
-    expect(formatGel(4_500_000)).toBe("4.5M GEL");
+describe("editorial formatters", () => {
+  it("formats billions with fixed decimals and en-US grouping", () => {
+    expect(formatBn(26_500_000_000)).toBe("26.50");
+    expect(formatBn(1_234_500_000_000)).toBe("1,234.50");
+    expect(formatBn(null)).toBe("—");
   });
 
-  it("formats nullable percent values", () => {
-    expect(formatPercent(0.183)).toBe("18.3%");
-    expect(formatPercent(null)).toBe("n/a");
+  it("chooses მლრდ or მლნ by magnitude", () => {
+    expect(formatAmount(26_500_000_000)).toBe("26.50 მლრდ ₾");
+    expect(formatAmount(450_000_000)).toBe("450.0 მლნ ₾");
+    expect(formatAmountParts(2_190_000_000, true)).toEqual({ num: "+2.19", unit: "მლრდ ₾" });
+    expect(formatAmountParts(-450_000_000, true)).toEqual({ num: "−450.0", unit: "მლნ ₾" });
+    expect(formatSignedAmount(2_190_000_000)).toBe("+2.19 მლრდ ₾");
   });
 
-  it("formats signed percent values", () => {
-    expect(formatSignedPercent(0.12)).toBe("+12.0%");
-    expect(formatSignedPercent(-0.04)).toBe("-4.0%");
-    expect(formatSignedPercent(null)).toBe("n/a");
+  it("formats shares with one decimal and a true minus sign", () => {
+    expect(formatShare(0.183)).toBe("18.3%");
+    expect(formatShare(0.124, true)).toBe("+12.4%");
+    expect(formatShare(-0.031, true)).toBe("−3.1%");
+    expect(formatShare(null)).toBe("—");
   });
 });

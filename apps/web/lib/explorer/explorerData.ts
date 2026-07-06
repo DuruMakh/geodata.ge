@@ -3,7 +3,7 @@ import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { SourceDocumentRow } from "../data/sources";
 import type { AdminSpendingCategory, AdminSpendingFact } from "../data/adminSpending/types";
 import { chooseActivePublicFacts } from "../data/activeFacts";
-import { MAX_CHART_SERIES } from "./types";
+import { colorForItem } from "./colors";
 import type {
   ExpenditureGrouping,
   ExplorerItem,
@@ -16,17 +16,8 @@ import type {
   SourceMetadata,
 } from "./types";
 
-const palette = [
-  "#0071e3",
-  "#ffd60a",
-  "#30d5c8",
-  "#0a84ff",
-  "#ff9f0a",
-  "#bf5af2",
-  "#8e8e93",
-];
-
 const SERIES_ORDER_BASE_YEAR = 2025;
+const DEFAULT_SELECTION_SIZE = 5;
 const ADMIN_SPENDING_TOTAL_ID = "admin_spending.total";
 
 type ModelFact = {
@@ -70,7 +61,6 @@ export type ExplorerModel = {
   topGrowth: ExplorerTableRow[];
   bottomGrowth: ExplorerTableRow[];
   hasPlannedValues: boolean;
-  unavailableReason: string | null;
 };
 
 function totalIdFor(side: ExplorerSide): string {
@@ -135,18 +125,20 @@ function sourceMetadataFor(sourceIds: string[], sources: Map<string, SourceDocum
   };
 }
 
-function valueForMeasure(amountGel: number, previousAmountGel: number | null, yearTotal: number, measure: MeasureMode) {
-  if (measure === "nominal") return amountGel;
+function valueForMeasure(amountGel: number, yearTotal: number, measure: MeasureMode) {
   if (measure === "share_of_total") return yearTotal === 0 ? null : amountGel / yearTotal;
-  if (measure === "percent_change") {
-    if (previousAmountGel === null || previousAmountGel === 0) return null;
-    return (amountGel - previousAmountGel) / previousAmountGel;
-  }
-  return null;
+  return amountGel;
 }
 
+// Percent change from a non-positive base is not meaningful for display.
+function percentChangeFrom(amountGel: number, previousAmountGel: number | null): number | null {
+  if (previousAmountGel === null || previousAmountGel <= 0) return null;
+  return (amountGel - previousAmountGel) / previousAmountGel;
+}
+
+// Change from a non-positive base is not meaningful for display.
 function changeBetween(startValue: number | null, endValue: number | null): number | null {
-  if (startValue === null || endValue === null || startValue === 0) return null;
+  if (startValue === null || endValue === null || startValue <= 0) return null;
   return (endValue - startValue) / startValue;
 }
 
@@ -213,34 +205,41 @@ function shareForYear(row: ExplorerTableRow, totalRow: ExplorerTableRow | null, 
   return amount / total;
 }
 
+// Default selection follows the editorial design: top categories by latest-year
+// value, never the derived total (totals live in the table "სულ" row and KPIs).
 export function getDefaultSelection(
   side: ExplorerSide,
   facts: BudgetFactImportRow[],
   expenditureGrouping: ExpenditureGrouping = "fields",
   adminFacts: AdminSpendingFact[] = [],
 ): string[] {
+  const amountsByItem = new Map<string, { year: number; amountGel: number }>();
+  const consider = (itemId: string, year: number, amountGel: number) => {
+    const existing = amountsByItem.get(itemId);
+    if (!existing || year > existing.year) amountsByItem.set(itemId, { year, amountGel });
+  };
+
   if (side === "expenditure" && expenditureGrouping === "ministries") {
-    return adminFacts.length > 0 ? [ADMIN_SPENDING_TOTAL_ID] : [];
+    for (const fact of adminFacts) {
+      if (fact.level === "admin_category") consider(fact.itemId, fact.year, fact.amountGel);
+    }
+  } else {
+    for (const fact of chooseActivePublicFacts(facts)) {
+      if (fact.side === side && !isDerivedTotalItemId(fact.itemId)) consider(fact.itemId, fact.year, fact.amountGel);
+    }
   }
 
-  return chooseActivePublicFacts(facts).some((fact) => fact.side === side) ? [totalIdFor(side)] : [];
+  const latestYear = Math.max(...Array.from(amountsByItem.values()).map((entry) => entry.year), 0);
+
+  return Array.from(amountsByItem.entries())
+    .filter(([, entry]) => entry.year === latestYear)
+    .sort((a, b) => b[1].amountGel - a[1].amountGel)
+    .slice(0, DEFAULT_SELECTION_SIZE)
+    .map(([itemId]) => itemId);
 }
 
 export function isDerivedTotalItemId(itemId: string): boolean {
   return itemId === "expenditure.total" || itemId === "revenue.total" || itemId === ADMIN_SPENDING_TOTAL_ID;
-}
-
-export function getDefaultStackedSelection(side: ExplorerSide, facts: BudgetFactImportRow[]): string[] {
-  return Array.from(
-    new Set(
-      chooseActivePublicFacts(facts)
-        .filter((fact) => fact.side === side)
-        .map((fact) => fact.itemId)
-        .filter((itemId) => !isDerivedTotalItemId(itemId)),
-    ),
-  )
-    .sort()
-    .slice(0, MAX_CHART_SERIES);
 }
 
 function compareBaselineAmountDesc(leftId: string, rightId: string, baselineAmounts: Map<string, number>): number {
@@ -351,7 +350,7 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     level: id === totalId ? "total" : factsByItem.get(id)?.level ?? "public_field",
     detailLabel: id === totalId ? null : factsByItem.get(id)?.detailLabel ?? null,
     ...(isMinistryGrouping ? adminLabelsFor(id, factsByItem.get(id), input.adminCategories ?? new Map()) : labelsFor(id, input.side, input.glossary)),
-    color: palette[index % palette.length] ?? "#22d3ee",
+    color: colorForItem(id, index),
     sortOrder: index + 1,
   }));
   const selectedItems = items.filter((item) => input.selectedItemIds.includes(item.id));
@@ -415,9 +414,9 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
         enLabel: item.enLabel,
         amountGel,
         basis: yearTotalFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual",
-        value: valueForMeasure(amountGel, totalPreviousAmount(year), yearTotal, input.measure),
+        value: valueForMeasure(amountGel, yearTotal, input.measure),
         shareOfTotal: yearTotal === 0 ? null : 1,
-        percentChange: valueForMeasure(amountGel, totalPreviousAmount(year), yearTotal, "percent_change"),
+        percentChange: percentChangeFrom(amountGel, totalPreviousAmount(year)),
       };
     }
 
@@ -431,9 +430,9 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
       enLabel: item.enLabel,
       amountGel: fact.amountGel,
       basis: fact.basis,
-      value: valueForMeasure(fact.amountGel, previousAmount(item.id, year), yearTotal, input.measure),
+      value: valueForMeasure(fact.amountGel, yearTotal, input.measure),
       shareOfTotal: yearTotal === 0 ? null : fact.amountGel / yearTotal,
-      percentChange: valueForMeasure(fact.amountGel, previousAmount(item.id, year), yearTotal, "percent_change"),
+      percentChange: percentChangeFrom(fact.amountGel, previousAmount(item.id, year)),
     };
   };
 
@@ -495,7 +494,10 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     .filter((row): row is ExplorerTableRow => Boolean(row));
   const totalItem = items.find((item) => item.id === totalId);
   const totalRow = totalItem ? rowFor(totalItem) : null;
-  const { summary, topGrowth, bottomGrowth } = buildSummary(allItemRows, totalRow, years);
+  // Movers and summary rank top-level scope items only; ministry major programs
+  // stay selectable series but must not compete with their own parent categories.
+  const summaryRows = allItemRows.filter((row) => row.level !== "major_program");
+  const { summary, topGrowth, bottomGrowth } = buildSummary(summaryRows, totalRow, years);
 
   return {
     years,
@@ -509,7 +511,6 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     topGrowth,
     bottomGrowth,
     hasPlannedValues: selectedPoints.some((point) => point.basis === "planned"),
-    unavailableReason: input.measure === "share_of_gdp" ? "მშპ-სთან წილის საჩვენებლად საჭიროა სანდო მშპ მონაცემები." : null,
   };
 }
 

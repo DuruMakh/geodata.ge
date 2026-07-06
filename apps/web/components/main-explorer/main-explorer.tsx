@@ -1,32 +1,20 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import dynamic from "next/dynamic";
 import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type { SourceDocumentRow } from "../../lib/data/sources";
+import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
-import { buildExplorerModel } from "../../lib/explorer/explorerData";
+import { buildExplorerModel, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
-import { SingleYearSnapshot } from "../single-year/single-year-snapshot";
-import { ThemeToggle } from "../ui/theme-toggle";
-import { ViewSwitch } from "../ui/view-switch";
-import { ChartPanel, ScreenCard, StatusSurface } from "../ui/surfaces";
-import { ChartLegend } from "./chart-legend";
-import { ExpenditureGroupingControl } from "./expenditure-grouping-control";
-import { ExplorerControls } from "./explorer-controls";
-import { ExplorerTable } from "./explorer-table";
-import { ChartPanelControls } from "./chart-panel-controls";
-import { PeriodSummaryPanel } from "./period-summary";
-import { SeriesSelector } from "./series-selector";
+import { formatAmount, formatShare } from "../../lib/explorer/format";
+import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
+import type { ExplorerNav, ExplorerScope } from "../../lib/explorer/types";
+import { AnalysisView } from "../analysis/analysis-view";
+import { ExplorerView } from "./explorer-view";
 import { useExplorerState } from "./use-explorer-state";
-import { YearRangeStrip } from "./year-range-strip";
-
-const ChartFrame = dynamic(() => import("./chart-frame").then((module) => module.ChartFrame), {
-  ssr: false,
-  loading: () => <div className="h-[420px] rounded-[18px] bg-[var(--canvas)]" />,
-});
 
 type MainExplorerProps = {
   facts: BudgetFactImportRow[];
@@ -36,6 +24,12 @@ type MainExplorerProps = {
   sourceDocuments: SourceDocumentRow[];
   lastUpdatedAt: string;
 };
+
+const NAV_ITEMS: Array<{ key: ExplorerNav; label: string }> = [
+  { key: "expenditure", label: "ხარჯები" },
+  { key: "revenue", label: "შემოსავლები" },
+  { key: "analysis", label: "ანალიზი" },
+];
 
 export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntries, sourceDocuments, lastUpdatedAt }: MainExplorerProps) {
   useEffect(() => {
@@ -48,65 +42,138 @@ export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntri
 
   const glossary = useMemo(() => new Map(glossaryEntries.map((entry) => [entry.id, entry])), [glossaryEntries]);
   const adminCategoryMap = useMemo(() => new Map(adminCategories.map((category) => [category.id, category])), [adminCategories]);
+  const state = useExplorerState({ facts, adminFacts });
   const {
-    side,
-    viewMode,
-    setViewMode,
+    nav,
+    explorerSide,
+    scope,
+    grouping,
     chartMode,
-    expenditureGrouping,
-    shareModeActive,
-    setShareModeActive,
-    startYear,
-    endYear,
-    singleYear,
-    setSingleYear,
-    limitMessage,
-    sideYears,
+    share,
+    setShare,
+    scopeYears,
+    range,
+    setRange,
     selectedIds,
-    measure,
-    handleSideChange,
-    handleStartYearChange,
-    handleEndYearChange,
+    query,
+    setQuery,
+    limitMessage,
+    expandedMinistries,
+    toggleMinistryExpanded,
+    toggleSeries,
+    handleNavChange,
+    handleGroupingChange,
     handleChartModeChange,
-    handleExpenditureGroupingChange,
-    handleToggle,
-  } = useExplorerState({ facts, adminFacts });
-  const modelStartYear = startYear;
-  const modelEndYear = endYear;
+    analysisSide,
+    setAnalysisSide,
+    analysisGrouping,
+    setAnalysisGrouping,
+    analysisYears,
+    analysisYear,
+    setAnalysisYear,
+  } = state;
+
+  // Full-history totals per scope, for the deck line under the page title.
+  const totalsByScope = useMemo(() => {
+    const totals: Record<ExplorerScope, Map<number, number>> = {
+      fields: new Map(),
+      ministries: new Map(),
+      revenue: new Map(),
+    };
+
+    for (const fact of chooseActivePublicFacts(facts)) {
+      if (isDerivedTotalItemId(fact.itemId)) continue;
+      const scopeKey: ExplorerScope = fact.side === "revenue" ? "revenue" : "fields";
+      totals[scopeKey].set(fact.year, (totals[scopeKey].get(fact.year) ?? 0) + fact.amountGel);
+    }
+    for (const fact of adminFacts) {
+      if (fact.level !== "admin_category") continue;
+      totals.ministries.set(fact.year, (totals.ministries.get(fact.year) ?? 0) + fact.amountGel);
+    }
+
+    return totals;
+  }, [facts, adminFacts]);
+
   const model = useMemo(
     () =>
       buildExplorerModel({
         facts,
         adminFacts,
         adminCategories: adminCategoryMap,
-        expenditureGrouping,
+        expenditureGrouping: grouping,
         glossary,
         sourceDocuments,
-        side,
+        side: explorerSide,
         selectedItemIds: selectedIds,
-        startYear: modelStartYear,
-        endYear: modelEndYear,
-        measure,
+        startYear: range.start,
+        endYear: range.end,
+        measure: share ? "share_of_total" : "nominal",
       }),
-    [facts, adminFacts, adminCategoryMap, expenditureGrouping, glossary, sourceDocuments, side, selectedIds, modelStartYear, modelEndYear, measure],
+    [facts, adminFacts, adminCategoryMap, grouping, glossary, sourceDocuments, explorerSide, selectedIds, range.start, range.end, share],
   );
-  const singleYearModel = useMemo(
+
+  // Years whose ACTIVE values are planned (actual wins over planned), for the
+  // analysis year selector's გეგმა tags. Admin facts are actual-only by contract,
+  // so the ministries grouping never has planned years.
+  const analysisPlannedYears = useMemo(() => {
+    const planned = new Set<number>();
+    if (analysisSide === "expenditure" && analysisGrouping === "ministries") return planned;
+    for (const fact of chooseActivePublicFacts(facts)) {
+      if (fact.side === analysisSide && fact.basis === "planned") planned.add(fact.year);
+    }
+    return planned;
+  }, [facts, analysisSide, analysisGrouping]);
+
+  const analysisModel = useMemo(
     () =>
       buildSingleYearSnapshotModel({
         facts,
+        adminFacts,
+        adminCategories: adminCategoryMap,
+        grouping: analysisGrouping,
         glossary,
         sourceDocuments,
-        side,
-        year: singleYear,
+        side: analysisSide,
+        year: analysisYear ?? analysisYears.at(-1) ?? 0,
       }),
-    [facts, glossary, sourceDocuments, side, singleYear],
+    [facts, adminFacts, adminCategoryMap, analysisGrouping, glossary, sourceDocuments, analysisSide, analysisYear, analysisYears],
   );
-  const screenTitle =
-    side === "expenditure"
-      ? "\u10ee\u10d0\u10e0\u10ef\u10d4\u10d1\u10d8\u10e1 \u10d3\u10d8\u10dc\u10d0\u10db\u10d8\u10d9\u10d0"
-      : "\u10e8\u10d4\u10db\u10dd\u10e1\u10d0\u10d5\u10da\u10d4\u10d1\u10d8\u10e1 \u10d3\u10d8\u10dc\u10d0\u10db\u10d8\u10d9\u10d0";
-  const hasPlannedValues = viewMode === "single_year" ? singleYearModel.hasPlannedValues : model.hasPlannedValues;
-  const selectorRows = [...model.tableRows, ...model.comparisonRows];
+
+  const isAnalysis = nav === "analysis";
+
+  const deck = useMemo(() => {
+    if (isAnalysis) {
+      const totals = totalsByScope[analysisSide === "revenue" ? "revenue" : analysisGrouping === "ministries" ? "ministries" : "fields"];
+      const year = analysisModel.year;
+      const previousTotal = totals.get(year - 1) ?? null;
+      const yoy = previousTotal ? (analysisModel.totalGel - previousTotal) / previousTotal : null;
+
+      return {
+        lead: `${year} · ${analysisModel.items.length} კატეგორია · სულ ${formatAmount(analysisModel.totalGel)}`,
+        yoy,
+      };
+    }
+
+    const totals = totalsByScope[scope];
+    const latestYear = scopeYears.at(-1);
+    const previousYear = scopeYears.at(-2);
+    if (latestYear === undefined) return { lead: "", yoy: null };
+    const latestTotal = totals.get(latestYear) ?? null;
+    const previousTotal = previousYear === undefined ? null : totals.get(previousYear) ?? null;
+    const yoy = latestTotal !== null && previousTotal ? (latestTotal - previousTotal) / previousTotal : null;
+
+    return {
+      lead: latestTotal === null ? "" : `${latestYear}: ${formatAmount(latestTotal)}`,
+      yoy,
+    };
+  }, [isAnalysis, totalsByScope, scope, scopeYears, analysisSide, analysisGrouping, analysisModel]);
+
+  const screenTitle = isAnalysis
+    ? `${analysisModel.year} წლის ბიუჯეტის სურათი — ${analysisSide === "expenditure" ? "სად მიდის საჯარო ფული" : "საიდან მოდის საჯარო ფული"}`
+    : nav === "expenditure"
+      ? "როგორ იხარჯება საქართველოს ბიუჯეტი"
+      : "როგორ ივსება საქართველოს ბიუჯეტი";
+  const contextLabel = isAnalysis ? `${analysisModel.year} წელი` : `${range.start}–${range.end}`;
 
   function downloadCsv() {
     const csv = buildExplorerCsv(model.tableRows, model.years);
@@ -114,120 +181,102 @@ export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntri
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `geodata-budget-${side}-${modelStartYear}-${modelEndYear}.csv`;
+    link.download = `geodata-${scope}-${range.start}-${range.end}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   }
 
-  const chartToolbar = (
-    <ChartPanelControls
-      chartMode={chartMode}
-      shareModeActive={shareModeActive}
-      onChartModeChange={handleChartModeChange}
-      onShareModeChange={setShareModeActive}
-    />
-  );
-
-  const chartLegend = <ChartLegend items={model.selectedItems} />;
-
-  const rangeStrip = (
-    <YearRangeStrip
-      years={sideYears}
-      startYear={startYear}
-      endYear={endYear}
-      onStartYearChange={handleStartYearChange}
-      onEndYearChange={handleEndYearChange}
-    />
-  );
-
   return (
-    <main data-testid="explorer-shell" className="min-h-screen bg-[var(--canvas)] px-4 py-10 text-[var(--ink)]">
-      <section className="mx-auto w-[min(1200px,calc(100vw-32px))]">
-        <ScreenCard>
-          <header data-testid="explorer-header" className="border-b border-[var(--hairline)] pb-5">
-            <div className="grid items-center gap-4 md:grid-cols-[1fr_auto_1fr]">
-              <strong className="text-[22px] font-bold tracking-[-0.02em] text-[var(--ink)]">GeoData.ge</strong>
-              <div data-testid="explorer-controls" className="flex justify-start md:justify-center">
-                <ExplorerControls side={side} onSideChange={handleSideChange} />
-              </div>
-              <div className="flex flex-wrap items-center gap-3 md:justify-end">
-                <ThemeToggle />
-                <div data-testid="view-switch">
-                  <ViewSwitch
-                    label={viewMode === "single_year" ? "\u10db\u10e0\u10d0\u10d5\u10d0\u10da\u10ec\u10da\u10d8\u10d0\u10dc\u10d8" : "\u10d4\u10e0\u10d7\u10ec\u10da\u10d8\u10d0\u10dc\u10d8"}
-                    checked={viewMode === "single_year"}
-                    checkedValue="single_year"
-                    uncheckedValue="multi_year"
-                    onChange={setViewMode}
-                    testId={viewMode === "single_year" ? "view-multi_year" : "view-single_year"}
-                    ariaLabel={viewMode === "single_year" ? "Switch to multi-year view" : "Switch to single-year view"}
-                  />
-                </div>
-              </div>
-            </div>
-          </header>
+    <main
+      data-testid="explorer-shell"
+      className="min-h-screen bg-[var(--paper)] px-5 pt-6 pb-16 text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px] min-[768px]:pb-[72px]"
+    >
+      <div className="mx-auto max-w-[1240px]">
+        <header data-testid="explorer-header" className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2 border-b-2 border-[var(--ink)] pb-4 min-[768px]:gap-5">
+          <span className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em]">GeoData</span>
+          <nav data-testid="explorer-controls" className="flex gap-4 min-[768px]:gap-[26px]">
+            {NAV_ITEMS.map((item) => {
+              const active = nav === item.key;
 
-          <div className={`mt-5 grid max-w-full gap-5 ${viewMode === "multi_year" ? "lg:grid-cols-[minmax(0,1fr)_300px]" : ""}`}>
-            <div className="order-1 flex min-w-0 max-w-full flex-col gap-5 lg:order-none">
-              <h1 className="text-[28px] font-bold leading-tight tracking-[-0.03em] text-[var(--ink)] md:text-[36px]">
-                {screenTitle}
-              </h1>
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  data-testid={`nav-${item.key}`}
+                  aria-pressed={active}
+                  onClick={() => handleNavChange(item.key)}
+                  className={`-mb-4 cursor-pointer border-b-2 pb-3.5 text-[13px] transition-colors duration-150 ${
+                    active
+                      ? "border-[var(--accent)] font-semibold text-[var(--ink)]"
+                      : "border-transparent font-medium text-[var(--muted)] hover:text-[var(--ink)]"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+          <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{contextLabel}</span>
+        </header>
 
-              {viewMode === "single_year" ? (
-                <div className="min-w-0 max-w-full">
-                  <SingleYearSnapshot model={singleYearModel} years={sideYears} onYearChange={setSingleYear} />
-                </div>
-              ) : model.unavailableReason ? (
-                <StatusSurface>{model.unavailableReason}</StatusSurface>
-              ) : chartMode === "table" ? (
-                <ChartPanel mode={chartMode} measure={measure} toolbar={chartToolbar} legend={chartLegend} rangeStrip={rangeStrip}>
-                  <ExplorerTable rows={model.tableRows} years={model.years} />
-                </ChartPanel>
-              ) : (
-                <ChartPanel mode={chartMode} measure={measure} toolbar={chartToolbar} legend={chartLegend} rangeStrip={rangeStrip}>
-                  <ChartFrame mode={chartMode} measure={measure} years={model.years} points={model.points} selectedItems={model.selectedItems} />
-                </ChartPanel>
-              )}
+        <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
+          {screenTitle}
+        </h1>
 
-              <p data-testid="source-label" className="rounded-[12px] border border-[var(--hairline)] bg-[var(--soft)] px-3 py-2 text-xs leading-5 text-[var(--body)]">
-                {"\u10db\u10dd\u10dc\u10d0\u10ea\u10d4\u10db\u10d4\u10d1\u10d8: \u10d2\u10d0\u10d3\u10d0\u10db\u10dd\u10ec\u10db\u10d4\u10d1\u10e3\u10da\u10d8 \u10dd\u10e4\u10d8\u10ea\u10d8\u10d0\u10da\u10e3\u10e0\u10d8 \u10e1\u10d0\u10d1\u10d8\u10e3\u10ef\u10d4\u10e2\u10dd \u10d3\u10dd\u10d9\u10e3\u10db\u10d4\u10dc\u10e2\u10d4\u10d1\u10d8. \u10d1\u10dd\u10da\u10dd \u10d2\u10d0\u10dc\u10d0\u10ee\u10da\u10d4\u10d1\u10d0: "}
-                {lastUpdatedAt}.
-                {" წლიური ჯამები ოფიციალურ წყაროებს ეყრდნობა; კატეგორიებად დაყოფა GeoData-ის კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით."}
-                {hasPlannedValues
-                  ? " \u10d0\u10e5\u10e2\u10d8\u10e3\u10e0 \u10db\u10dc\u10d8\u10e8\u10d5\u10dc\u10d4\u10da\u10dd\u10d1\u10d4\u10d1\u10e8\u10d8 \u10d0\u10e0\u10d8\u10e1 \u10d2\u10d4\u10d2\u10db\u10e3\u10e0\u10d8 \u10d1\u10d8\u10e3\u10ef\u10d4\u10e2\u10d8\u10e1 \u10db\u10dd\u10dc\u10d0\u10ea\u10d4\u10db\u10d4\u10d1\u10d8."
-                  : ""}
-              </p>
-            </div>
+        <p className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
+          <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">{deck.lead}</span>
+          {deck.yoy !== null ? (
+            <>
+              <span
+                className="font-[family-name:var(--font-numeric)] text-[13px]"
+                style={{ color: deck.yoy < 0 ? NEGATIVE : POSITIVE }}
+              >
+                {formatShare(deck.yoy, true)}
+              </span>
+              <span>წინა წელთან</span>
+            </>
+          ) : null}
+        </p>
 
-            {viewMode === "multi_year" ? (
-              <SeriesSelector
-                items={model.items}
-                selectedIds={selectedIds}
-                rows={selectorRows}
-                years={model.years}
-                chartMode={chartMode}
-                limitMessage={limitMessage}
-                headerControl={side === "expenditure" ? <ExpenditureGroupingControl value={expenditureGrouping} onChange={handleExpenditureGroupingChange} /> : undefined}
-                onToggle={handleToggle}
-                onDownloadCsv={downloadCsv}
-              />
-            ) : null}
-          </div>
-        </ScreenCard>
-      </section>
-
-      {viewMode === "multi_year" ? (
-        <section className="mx-auto mt-8 w-[min(1200px,calc(100vw-32px))] pb-12">
-          <PeriodSummaryPanel
-            years={model.years}
-            summary={model.summary}
-            totalRow={model.totalRow}
-            rows={model.comparisonRows}
-            topGrowth={model.topGrowth}
-            bottomGrowth={model.bottomGrowth}
+        {isAnalysis ? (
+          <AnalysisView
+            model={analysisModel}
+            years={analysisYears}
+            plannedYears={analysisPlannedYears}
+            side={analysisSide}
+            grouping={analysisGrouping}
+            year={analysisYear}
+            lastUpdatedAt={lastUpdatedAt}
+            onSideChange={setAnalysisSide}
+            onGroupingChange={setAnalysisGrouping}
+            onYearChange={setAnalysisYear}
           />
-        </section>
-      ) : null}
+        ) : (
+          <ExplorerView
+            model={model}
+            scope={scope}
+            showGrouping={nav === "expenditure"}
+            grouping={grouping}
+            chartMode={chartMode}
+            share={share}
+            range={range}
+            scopeYears={scopeYears}
+            selectedIds={selectedIds}
+            query={query}
+            limitMessage={limitMessage}
+            expandedMinistries={expandedMinistries}
+            lastUpdatedAt={lastUpdatedAt}
+            onGroupingChange={handleGroupingChange}
+            onChartModeChange={handleChartModeChange}
+            onShareChange={setShare}
+            onRangeChange={(patch) => setRange(scope, patch)}
+            onQueryChange={setQuery}
+            onToggleSeries={toggleSeries}
+            onToggleExpanded={toggleMinistryExpanded}
+            onDownloadCsv={downloadCsv}
+          />
+        )}
+      </div>
     </main>
   );
 }

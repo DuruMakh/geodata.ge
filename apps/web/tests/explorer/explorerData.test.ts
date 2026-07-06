@@ -1,5 +1,5 @@
 ﻿import { describe, expect, it } from "vitest";
-import { buildExplorerModel, getDefaultSelection, getDefaultStackedSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
+import { buildExplorerModel, getDefaultSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
@@ -107,16 +107,14 @@ const adminFacts: AdminSpendingFact[] = [
 ];
 
 describe("main explorer data model", () => {
-  it("returns side-specific default selections", () => {
-    expect(getDefaultSelection("expenditure", facts)).toEqual(["expenditure.total"]);
-    expect(getDefaultSelection("revenue", facts)).toEqual(["revenue.total"]);
-    expect(getDefaultSelection("expenditure", facts, "ministries", adminFacts)).toEqual(["admin_spending.total"]);
+  it("returns top categories by latest-year value as the default selection, never totals", () => {
+    expect(getDefaultSelection("expenditure", facts)).toEqual(["spending.education", "spending.health"]);
+    expect(getDefaultSelection("revenue", facts)).toEqual(["revenue.vat"]);
+    expect(getDefaultSelection("expenditure", facts, "ministries", adminFacts)).toEqual([
+      "admin_spending.health_social_affairs",
+      "admin_spending.education_science_youth",
+    ]);
     expect(getDefaultSelection("expenditure", facts, "ministries", [])).toEqual([]);
-  });
-
-  it("returns side-specific default stacked selections", () => {
-    expect(getDefaultStackedSelection("expenditure", facts)).toEqual(["spending.education", "spending.health"]);
-    expect(getDefaultStackedSelection("revenue", facts)).toEqual(["revenue.vat"]);
   });
 
   it("identifies derived total item IDs", () => {
@@ -319,17 +317,7 @@ describe("main explorer data model", () => {
     expect(model.summary.biggestShareChange?.itemId).toBe("spending.health");
   });
 
-  it("calculates percent change and share of total", () => {
-    const percentModel = buildExplorerModel({
-      facts,
-      glossary,
-      sourceDocuments,
-      side: "expenditure",
-      selectedItemIds: ["spending.health"],
-      startYear: 2024,
-      endYear: 2025,
-      measure: "percent_change",
-    });
+  it("calculates share of total and per-point percent change", () => {
     const shareModel = buildExplorerModel({
       facts,
       glossary,
@@ -341,24 +329,9 @@ describe("main explorer data model", () => {
       measure: "share_of_total",
     });
 
-    expect(percentModel.points[0]?.value).toBeNull();
-    expect(percentModel.points[1]?.value).toBe(0.5);
+    expect(shareModel.points[0]?.percentChange).toBeNull();
+    expect(shareModel.points[1]?.percentChange).toBe(0.5);
     expect(shareModel.points[1]?.value).toBeCloseTo(0.3333, 4);
-  });
-
-  it("returns an unavailable message for share of GDP", () => {
-    const model = buildExplorerModel({
-      facts,
-      glossary,
-      sourceDocuments,
-      side: "revenue",
-      selectedItemIds: ["revenue.vat"],
-      startYear: 2025,
-      endYear: 2025,
-      measure: "share_of_gdp",
-    });
-
-    expect(model.unavailableReason).toBe("მშპ-სთან წილის საჩვენებლად საჭიროა სანდო მშპ მონაცემები.");
   });
   it("uses explicit total facts for totals-only years without exposing fake categories", () => {
     const localFacts: BudgetFactImportRow[] = [

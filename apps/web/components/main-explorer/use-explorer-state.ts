@@ -1,93 +1,137 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { AdminSpendingFact } from "../../lib/data/adminSpending/types";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
-import { getDefaultSelection } from "../../lib/explorer/explorerData";
-import { MAX_CHART_SERIES, type ChartMode, type ExpenditureGrouping, type ExplorerSide, type MeasureMode, type ViewMode } from "../../lib/explorer/types";
+import { getDefaultSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
+import { MAX_CHART_SERIES, type ChartMode, type ExpenditureGrouping, type ExplorerNav, type ExplorerScope } from "../../lib/explorer/types";
+import { parseExplorerHash, scopeFor, serializeExplorerHash } from "../../lib/explorer/urlState";
 
 type UseExplorerStateInput = {
   facts: BudgetFactImportRow[];
   adminFacts: AdminSpendingFact[];
 };
 
-function clampYearToCoverage(year: number, years: number[]): number {
-  const minYear = years[0];
-  const maxYear = years.at(-1);
-  if (minYear === undefined || maxYear === undefined) return year;
-  return Math.min(Math.max(year, minYear), maxYear);
-}
+type RangePatch = { start?: number; end?: number };
 
-// Snap to the nearest year that actually has coverage. Used when switching side or
-// grouping, so a range handle never lands on a year the new dataset does not cover
-// (e.g. keeping 2004 when moving to the ministries grouping, which starts at 2013).
-function snapYearToCoverage(year: number, years: number[]): number {
-  if (years.length === 0 || years.includes(year)) return year;
-  const clamped = clampYearToCoverage(year, years);
-  return years.reduce((best, candidate) =>
-    Math.abs(candidate - clamped) < Math.abs(best - clamped) ? candidate : best,
-  years[0]);
+export type ResolvedRange = { start: number; end: number; min: number; max: number };
+
+const SERIES_LIMIT_MESSAGE = `გრაფიკზე მაქსიმუმ ${MAX_CHART_SERIES} სერია შეიძლება. ცხრილის რეჟიმში ლიმიტი არ არის.`;
+
+function clampYear(year: number, min: number, max: number): number {
+  return Math.min(Math.max(year, min), max);
 }
 
 export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
-  const yearsBySide = useMemo(
+  const yearsByScope = useMemo<Record<ExplorerScope, number[]>>(() => {
+    const collect = (values: Iterable<number>) => Array.from(new Set(values)).sort((a, b) => a - b);
+
+    return {
+      // Chartable field/revenue years are years with category detail; derived totals
+      // are not selectable series, so total-only years are not offered.
+      fields: collect(
+        facts.filter((fact) => fact.side === "expenditure" && !isDerivedTotalItemId(fact.itemId)).map((fact) => fact.year),
+      ),
+      revenue: collect(
+        facts.filter((fact) => fact.side === "revenue" && !isDerivedTotalItemId(fact.itemId)).map((fact) => fact.year),
+      ),
+      ministries: collect(adminFacts.map((fact) => fact.year)),
+    };
+  }, [facts, adminFacts]);
+
+  const idsByScope = useMemo<Record<ExplorerScope, Set<string>>>(
     () => ({
-      expenditure: Array.from(new Set(facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.year))).sort((a, b) => a - b),
-      revenue: Array.from(new Set(facts.filter((fact) => fact.side === "revenue").map((fact) => fact.year))).sort((a, b) => a - b),
+      fields: new Set(facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.itemId)),
+      revenue: new Set(facts.filter((fact) => fact.side === "revenue").map((fact) => fact.itemId)),
+      ministries: new Set(adminFacts.map((fact) => fact.itemId)),
     }),
-    [facts],
+    [facts, adminFacts],
   );
-  // The ministries grouping has its own coverage (from the admin-spending facts),
-  // which differs from the functional-expenditure years — e.g. it includes 2013 but
-  // not the total-only years 2004-2005. Its year strip must reflect that, not the
-  // functional years.
-  const adminYears = useMemo(
-    () => Array.from(new Set(adminFacts.map((fact) => fact.year))).sort((a, b) => a - b),
-    [adminFacts],
+
+  const defaultSelections = useMemo<Record<ExplorerScope, string[]>>(
+    () => ({
+      fields: getDefaultSelection("expenditure", facts, "fields", adminFacts),
+      ministries: getDefaultSelection("expenditure", facts, "ministries", adminFacts),
+      revenue: getDefaultSelection("revenue", facts),
+    }),
+    [facts, adminFacts],
   );
-  const expenditureYearsFor = (grouping: ExpenditureGrouping) =>
-    grouping === "ministries" ? adminYears : yearsBySide.expenditure;
-  const yearsFor = (nextSide: ExplorerSide, grouping: ExpenditureGrouping) =>
-    nextSide === "expenditure" ? expenditureYearsFor(grouping) : yearsBySide.revenue;
-  const initialStartYear = yearsBySide.expenditure[0] ?? 2025;
-  const initialEndYear = yearsBySide.expenditure.at(-1) ?? initialStartYear;
-  const [side, setSide] = useState<ExplorerSide>("expenditure");
-  const [viewMode, setViewMode] = useState<ViewMode>("multi_year");
+
+  const [nav, setNav] = useState<ExplorerNav>("expenditure");
+  const [grouping, setGrouping] = useState<ExpenditureGrouping>("fields");
   const [chartMode, setChartMode] = useState<ChartMode>("line");
-  const [expenditureGrouping, setExpenditureGrouping] = useState<ExpenditureGrouping>("fields");
-  const [shareModeActive, setShareModeActive] = useState(false);
-  const [startYear, setStartYear] = useState(initialStartYear);
-  const [endYear, setEndYear] = useState(initialEndYear);
-  const [singleYear, setSingleYear] = useState(initialEndYear);
+  const [share, setShare] = useState(false);
+  const [ranges, setRanges] = useState<Partial<Record<ExplorerScope, RangePatch>>>({});
+  const [selections, setSelections] = useState<Partial<Record<ExplorerScope, string[]>>>({});
+  const [expandedMinistries, setExpandedMinistries] = useState<string[]>([]);
+  const [query, setQuery] = useState("");
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
-  const [expenditureSelections, setExpenditureSelections] = useState<Record<ExpenditureGrouping, string[]>>({
-    fields: getDefaultSelection("expenditure", facts, "fields", adminFacts),
-    ministries: getDefaultSelection("expenditure", facts, "ministries", adminFacts),
-  });
-  const [revenueSelection, setRevenueSelection] = useState<string[]>(getDefaultSelection("revenue", facts));
-  const sideYears = yearsFor(side, expenditureGrouping);
-  const selectedIds = side === "expenditure" ? expenditureSelections[expenditureGrouping] : revenueSelection;
-  const measure: MeasureMode = shareModeActive ? "share_of_total" : "nominal";
+  const [analysisSide, setAnalysisSide] = useState<"expenditure" | "revenue">("expenditure");
+  const [analysisGrouping, setAnalysisGrouping] = useState<ExpenditureGrouping>("fields");
+  const [analysisYear, setAnalysisYear] = useState<number | null>(null);
+  const hashAppliedRef = useRef(false);
+  const hashWrittenRef = useRef(false);
 
-  function handleSideChange(nextSide: ExplorerSide) {
-    const nextYears = yearsFor(nextSide, expenditureGrouping);
-    const latestYear = nextYears.at(-1);
+  const explorerSide: "expenditure" | "revenue" = nav === "revenue" ? "revenue" : "expenditure";
+  const scope = scopeFor(explorerSide, grouping);
+  const scopeYears = yearsByScope[scope];
 
-    setSide(nextSide);
-    setStartYear((current) => snapYearToCoverage(current, nextYears));
-    setEndYear((current) => snapYearToCoverage(current, nextYears));
-    setSingleYear((current) => (nextYears.includes(current) || latestYear === undefined ? current : latestYear));
+  const analysisScope = scopeFor(analysisSide, analysisGrouping);
+  const analysisYears = yearsByScope[analysisScope];
+  const resolvedAnalysisYear =
+    analysisYear !== null && analysisYears.includes(analysisYear) ? analysisYear : analysisYears.at(-1) ?? null;
+
+  function rangeOf(targetScope: ExplorerScope): ResolvedRange {
+    const years = yearsByScope[targetScope];
+    if (years.length === 0) return { start: 0, end: 0, min: 0, max: 0 };
+    const min = years[0];
+    const max = years.at(-1) ?? min;
+    const patch = ranges[targetScope] ?? {};
+    let start = patch.start === undefined ? min : clampYear(patch.start, min, max);
+    let end = patch.end === undefined ? max : clampYear(patch.end, min, max);
+    if (start > end) [start, end] = [end, start];
+    return { start, end, min, max };
+  }
+
+  function setRange(targetScope: ExplorerScope, patch: RangePatch) {
+    setRanges((current) => ({ ...current, [targetScope]: { ...(current[targetScope] ?? {}), ...patch } }));
+  }
+
+  const selectedIds = selections[scope] ?? defaultSelections[scope];
+
+  function toggleSeries(itemId: string) {
+    const current = selections[scope] ?? defaultSelections[scope];
+
+    if (current.includes(itemId)) {
+      setSelections((existing) => ({ ...existing, [scope]: current.filter((id) => id !== itemId) }));
+      setLimitMessage(null);
+      return;
+    }
+
+    if (chartMode !== "table" && current.length >= MAX_CHART_SERIES) {
+      setLimitMessage(SERIES_LIMIT_MESSAGE);
+      return;
+    }
+
+    setSelections((existing) => ({ ...existing, [scope]: [...current, itemId] }));
     setLimitMessage(null);
   }
 
-  function handleStartYearChange(year: number) {
-    setStartYear(year);
-    if (year > endYear) setEndYear(year);
+  function toggleMinistryExpanded(ministryId: string) {
+    setExpandedMinistries((current) =>
+      current.includes(ministryId) ? current.filter((id) => id !== ministryId) : [...current, ministryId],
+    );
   }
 
-  function handleEndYearChange(year: number) {
-    setEndYear(year);
-    if (year < startYear) setStartYear(year);
+  function handleNavChange(nextNav: ExplorerNav) {
+    setNav(nextNav);
+    setLimitMessage(null);
+  }
+
+  function handleGroupingChange(nextGrouping: ExpenditureGrouping) {
+    setGrouping(nextGrouping);
+    setQuery("");
+    setLimitMessage(null);
   }
 
   function handleChartModeChange(mode: ChartMode) {
@@ -95,71 +139,90 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
     setLimitMessage(null);
   }
 
-  function handleExpenditureGroupingChange(grouping: ExpenditureGrouping) {
-    setExpenditureGrouping(grouping);
-    setLimitMessage(null);
+  // Restore shareable state from the URL hash once, after mount (the server render
+  // always shows defaults; unknown values are dropped by the parser or the checks below).
+  // The hash is a one-time external input on load, so the one extra render is intended.
+  useEffect(() => {
+    if (hashAppliedRef.current) return;
+    hashAppliedRef.current = true;
+    const parsed = parseExplorerHash(window.location.hash);
 
-    if (side !== "expenditure") return;
-    // Re-anchor the selected range onto the new grouping's coverage so the strip and
-    // chart show a year the grouping actually has (fields includes 2004-2005 + 2017+;
-    // ministries includes 2013 + 2017+).
-    const nextYears = expenditureYearsFor(grouping);
-    const latestYear = nextYears.at(-1);
-    setStartYear((current) => snapYearToCoverage(current, nextYears));
-    setEndYear((current) => snapYearToCoverage(current, nextYears));
-    setSingleYear((current) => (nextYears.includes(current) || latestYear === undefined ? current : latestYear));
-  }
-
-  function handleToggle(itemId: string) {
-    setLimitMessage(null);
-    const updateSelection = (currentSelection: string[]) => {
-      const alreadySelected = currentSelection.includes(itemId);
-
-      if (alreadySelected) {
-        return currentSelection.filter((id) => id !== itemId);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (parsed.nav) setNav(parsed.nav);
+    if (parsed.grouping) setGrouping(parsed.grouping);
+    if (parsed.chartMode) setChartMode(parsed.chartMode);
+    if (parsed.share) setShare(true);
+    if (parsed.analysisSide) setAnalysisSide(parsed.analysisSide);
+    if (parsed.analysisGrouping) setAnalysisGrouping(parsed.analysisGrouping);
+    if (parsed.analysisYear !== undefined) setAnalysisYear(parsed.analysisYear);
+    if (parsed.range) setRanges((current) => ({ ...current, [parsed.range!.scope]: { start: parsed.range!.start, end: parsed.range!.end } }));
+    if (parsed.selection) {
+      const knownIds = parsed.selection.ids.filter((id) => idsByScope[parsed.selection!.scope].has(id));
+      // A deliberately-empty shared selection restores as empty; a selection whose
+      // ids are ALL unknown (renamed taxonomy, typos) falls back to the default.
+      if (knownIds.length > 0 || parsed.selection.ids.length === 0) {
+        setSelections((current) => ({ ...current, [parsed.selection!.scope]: knownIds }));
       }
+    }
+    // The hook state is the source of truth after mount; the hash is write-only from here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      if (chartMode !== "table" && currentSelection.length >= MAX_CHART_SERIES) {
-        setLimitMessage(`\u10d2\u10e0\u10d0\u10e4\u10d8\u10d9\u10d6\u10d4 \u10db\u10d0\u10e5\u10e1\u10d8\u10db\u10e3\u10db ${MAX_CHART_SERIES} \u10e1\u10d4\u10e0\u10d8\u10d0 \u10e8\u10d4\u10d8\u10eb\u10da\u10d4\u10d1\u10d0. \u10ea\u10ee\u10e0\u10d8\u10da\u10d8\u10e1 \u10e0\u10d4\u10df\u10d8\u10db\u10e8\u10d8 \u10da\u10d8\u10db\u10d8\u10e2\u10d8 \u10d0\u10e0 \u10d0\u10e0\u10d8\u10e1.`);
-        return currentSelection;
-      }
+  const activeRange = rangeOf(scope);
+  const serializedHash = serializeExplorerHash({
+    nav,
+    grouping,
+    chartMode,
+    share,
+    rangeStart: activeRange.start,
+    rangeEnd: activeRange.end,
+    selectedIds,
+    analysisSide,
+    analysisGrouping,
+    analysisYear: resolvedAnalysisYear,
+  });
 
-      return [...currentSelection, itemId];
-    };
-
-    if (side === "expenditure") {
-      setExpenditureSelections((current) => ({
-        ...current,
-        [expenditureGrouping]: updateSelection(current[expenditureGrouping]),
-      }));
+  useEffect(() => {
+    // Skip the mount run: its serializedHash was computed from default state, so
+    // writing it would clobber an incoming deep link (and stamp pristine URLs).
+    if (!hashWrittenRef.current) {
+      hashWrittenRef.current = true;
       return;
     }
-
-    setRevenueSelection(updateSelection);
-  }
+    try {
+      history.replaceState(null, "", `#${serializedHash}`);
+    } catch {
+      // History can be unavailable in some embedded contexts; the UI still works.
+    }
+  }, [serializedHash]);
 
   return {
-    side,
-    viewMode,
-    setViewMode,
+    nav,
+    explorerSide,
+    scope,
+    grouping,
     chartMode,
-    expenditureGrouping,
-    shareModeActive,
-    setShareModeActive,
-    startYear,
-    endYear,
-    singleYear,
-    setSingleYear,
-    limitMessage,
-    yearsBySide,
-    sideYears,
+    share,
+    setShare,
+    scopeYears,
+    range: activeRange,
+    setRange,
     selectedIds,
-    measure,
-    handleSideChange,
-    handleStartYearChange,
-    handleEndYearChange,
+    query,
+    setQuery,
+    limitMessage,
+    expandedMinistries,
+    toggleMinistryExpanded,
+    toggleSeries,
+    handleNavChange,
+    handleGroupingChange,
     handleChartModeChange,
-    handleExpenditureGroupingChange,
-    handleToggle,
+    analysisSide,
+    setAnalysisSide,
+    analysisGrouping,
+    setAnalysisGrouping,
+    analysisYears,
+    analysisYear: resolvedAnalysisYear,
+    setAnalysisYear,
   };
 }

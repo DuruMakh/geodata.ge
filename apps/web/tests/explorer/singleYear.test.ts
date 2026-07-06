@@ -109,7 +109,7 @@ describe("single-year snapshot model", () => {
     expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
   });
 
-  it("does not create fake every100 allocation for a loaded zero-total year", () => {
+  it("keeps zero and negative rows out of the visual sections without faking allocations", () => {
     const model = buildSingleYearSnapshotModel({
       facts: [
         fact({ year: 2026, side: "expenditure", itemId: "spending.health", amountGel: 0 }),
@@ -121,8 +121,28 @@ describe("single-year snapshot model", () => {
       year: 2026,
     });
 
-    expect(model.items).toHaveLength(2);
-    expect(model.every100.map((item) => item.gelFrom100)).toEqual([0, 0]);
+    // Zero rows would render degenerate tiles/cells; the year still counts as loaded.
+    expect(model.emptyReason).toBeNull();
+    expect(model.items).toHaveLength(0);
+    expect(model.every100).toEqual([]);
+  });
+
+  it("allocates exactly 100 cells even when the year total includes negative rows", () => {
+    const model = buildSingleYearSnapshotModel({
+      facts: [
+        fact({ year: 2026, side: "revenue", itemId: "revenue.vat", amountGel: 900 }),
+        fact({ year: 2026, side: "revenue", itemId: "revenue.income_tax", amountGel: 150 }),
+        fact({ year: 2026, side: "revenue", itemId: "revenue.other_taxes", amountGel: -50 }),
+      ],
+      glossary,
+      sourceDocuments,
+      side: "revenue",
+      year: 2026,
+    });
+
+    expect(model.totalGel).toBe(1000);
+    expect(model.items.map((item) => item.itemId)).toEqual(["revenue.vat", "revenue.income_tax"]);
+    expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
   });
 
   it("keeps a single source label when all facts resolve to the same official source", () => {

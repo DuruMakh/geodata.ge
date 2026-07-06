@@ -1,1171 +1,553 @@
-# GeoData.ge Design System
+# GeoData.ge Design System — Editorial
 
-Version: 3.1  
-Last updated: 2026-07-03  
-Status: Production-ready visual system for GeoData.ge Budget Explorer v1  
+Version: 4.1
+Last updated: 2026-07-07
+Status: Production visual system for GeoData.ge Budget Explorer v1
 Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
 ---
 
 ## 1. Source of Truth
 
-This file defines the production design system for GeoData.ge v1. It replaces earlier visual directions and must be treated as the implementation contract for the Budget Explorer UI.
+This file defines the production design system for GeoData.ge v1. It **replaces DESIGN.md v3.x (the Apple-like Light/Night system) in full**. The editorial direction is the approved production direction.
 
-Confirmed visual references:
+Confirmed visual references (checked into the repo):
 
-- `docs/Design HTML files/multiyear-apple.html`
-- `docs/Design HTML files/singleyear-apple.html`
+- `docs/Design HTML files/editorial-v2/GeoData Platform - Editorial v2.dc.html` — **primary reference**: full product prototype (3-tab navigation, explorer, indicators, analysis/single-year view, responsive rules, hash deep-linking).
+- `docs/Design HTML files/editorial-v2/Editorial Design System - Reference.dc.html` — component reference sheet (colors, typography, rules, controls, data patterns, single-year surfaces).
+- `docs/Design HTML files/editorial-v2/Budget Explorer - Editorial (approved).dc.html` — earlier approved multi-year explorer layout.
+- `docs/Design HTML files/editorial-v2/DESIGN v4 (Editorial).md` — the original v4.0 draft exported from Claude Design (kept for provenance; this file supersedes it where they differ).
 
 Confirmed product references:
 
 - `Project_Definition.md`
-- `docs/superpowers/specs/2026-05-10-geodata-budget-v1-design.md`
 
-The HTML files define visual layout, spacing, controls, theme behavior, chart treatment, and component composition. This `DESIGN.md` turns those confirmed pages into a reusable design system for production React components.
+If this file and the confirmed reference files disagree, prefer **GeoData Platform - Editorial v2.dc.html** for visual and behavioral details and update this file immediately.
 
-If this file and the confirmed HTML disagree, prefer the confirmed HTML for visual details and update this file immediately.
+Superseded and must not appear in production:
 
----
+- The Apple-like Light/Night system (DESIGN.md v3.x), including `#0071e3` primary, card/shadow surfaces, 24px radii, gradient headline cards, the SF Pro stack, the theme toggle, and the iOS view switch.
+- Crypto/terminal, neon, and marketing-homepage directions.
 
 ## 2. Product Scope Boundary
 
 GeoData.ge v1 is a Georgian-first national budget explorer for annual data. It is not a broad public-data catalog.
 
-The canonical V1 Included/Excluded scope list lives in `Project_Definition.md` section 2. Design-relevant summary: annual national budget data in a 2004-2025 window (expenditure from 2004, revenue from 2005), expenditure and revenue modes, multi-year explorer with fields/ministries grouping, single-year snapshot, CSV export, Georgian-first UI, minimal public source label. No drilldown pages, admin UI, public API, or sub-annual data in v1.
+V1 includes: multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, CSV export, Georgian-first UI, minimal public source label, internal provenance metadata.
 
-Coverage note for design work: expenditure has public-field detail from 2017 onward; 2004-2005 are total-only and 2006-2016 expenditure is still being rolled out. Charts and tables must handle years where only the total series has data.
+V1 excludes: data catalog, municipal/capital/debt explorers, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown).
 
-Design implication: every visual decision should support a focused budget product, not a generic data platform.
+Every visual decision should support a focused budget product, not a generic dashboard.
 
----
+### 2.1 Actual Data Coverage (data-driven, never hardcoded)
+
+Year ranges in the UI always derive from loaded facts. Current reviewed coverage:
+
+- Expenditure by public spending fields: **2005–2025** (13 fields per year, 12-month actual execution).
+- Expenditure by ministries (administrative view): **2005–2025** categories; major-program drill-down rows exist from 2012 (partial) and are contiguous 2017–2025.
+- Revenue: **2005–2025** (11 top-level categories).
+- All current facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned facts ever load.
 
 ## 3. Design Direction
 
-The confirmed direction is a clean analytical Budget Explorer: spacious, precise, Georgian-first, and data-led. It uses an Apple-like product calm without becoming a generic SaaS dashboard.
+The confirmed direction is a **warm editorial statistical annual**: the product should read like a precisely typeset printed reference publication, not a SaaS dashboard.
 
 Core atmosphere:
 
-- Clean public finance instrument.
-- High-trust analytical workspace.
-- Spacious cards and restrained borders.
-- Two complete themes: Light and Night.
-- Stable category colors across charts, tables, treemaps, and summary visuals.
-- Clear year, unit, source, and export context.
+- Paper background, ink foreground, one terracotta accent.
+- Structure comes from **typographic rules (horizontal lines)**, not cards. There are no cards, no elevated surfaces, no container shadows.
+- Serif display type for titles and big numbers; sans for UI; mono for every numeral.
+- Dense but calm; generous section spacing, compact data rows.
+- Georgian-first.
 
-The system should feel:
+The system should feel: civic and archival, analytical but humane, printed rather than rendered.
 
-- Civic but not bureaucratic.
-- Analytical but not dense by default.
-- Polished but not decorative.
-- Georgian-first but easy to extend to bilingual UI later.
+## 4. Theme
 
-Do not reintroduce previous unconfirmed directions into production:
+**One theme in v1: editorial paper (light).** There is no night theme and no theme toggle. If a night variant is ever approved, it must keep identical layout, section order, chart geometry, and controls, changing tokens only.
 
-- No crypto/terminal visual layer as the default UI.
-- No warm editorial atlas system.
-- No neon pink primary system.
-- No separate revenue visual style.
-- No marketing-first homepage pattern for v1.
-
----
-
-## 4. Theme System
-
-GeoData.ge has two themes with one shared structure:
-
-- `light`: default public-facing theme.
-- `night`: same layout, darker surfaces, same data colors.
-
-The theme switch changes tokens only. It must not change layout, section order, chart geometry, or available controls.
-
-### 4.1 Core Color Tokens
+### 4.1 Role Tokens
 
 ```yaml
 colors:
-  primary: "#0071e3"
-  primary-active: "#0077ed"
-
-  series:
-    total: "#0071e3"
-    social-protection: "#ffd60a"
-    health: "#30d5c8"
-    education: "#0a84ff"
-    infrastructure: "#ff9f0a"
-    defence: "#bf5af2"
-    other: "#8e8e93"
-
-  semantic:
-    success: "#34c759"
-    warning: "#ffd60a"
-    error: "#ff453a"
-    info: "#0071e3"
-    unavailable: "#8e8e93"
+  paper: "#F7F2E9"        # page background; the only canvas
+  tint: "#F1EADC"         # hover rows, selected rows, callout background
+  tile: "#FDFAF3"         # tooltip and treemap tile fill (only "raised" surface)
+  ink: "#1E1B16"          # primary text, strong rules, total row
+  body: "#55503F"         # secondary data text
+  muted: "#6A6050"        # labels, captions, inactive controls (v2 darkened from #7A7060 for contrast)
+  faint: "#A89C88"        # decoration-only metadata
+  hairline: "#D9CFBE"     # section sub-rules, aside border
+  hairline-soft: "#E7DECF" # row borders, chart grid, bar tracks
+  row-border: "#EDE4D3"   # series-panel row borders
+  control: "#C9BEA9"      # control borders (checkbox, pill, search underline)
+  accent: "#B3402A"       # terracotta: active states, focus, negative values
+  positive: "#1F6E56"     # positive change
+  negative: "#B3402A"     # negative change (shared with accent by design)
 ```
-
-### 4.2 Light Theme Tokens
-
-```yaml
-light:
-  canvas: "#f5f5f7"
-  surface: "#ffffff"
-  soft: "#fafafa"
-  strong: "#e8e8ed"
-  chart: "#ffffff"
-  hairline: "#e8e8ed"
-  hairline-soft: "#f5f5f7"
-  ink: "#1d1d1f"
-  body: "#515154"
-  mute: "#86868b"
-  grid: "#f5f5f7"
-  shadow: "rgba(0, 0, 0, 0.04)"
-  on-primary: "#ffffff"
-```
-
-### 4.3 Night Theme Tokens
-
-```yaml
-night:
-  canvas: "#000000"
-  surface: "#1d1d1f"
-  soft: "#161617"
-  strong: "#323236"
-  chart: "#1d1d1f"
-  hairline: "#323236"
-  hairline-soft: "#2d2d2f"
-  ink: "#f5f5f7"
-  body: "#a1a1a6"
-  mute: "#86868b"
-  grid: "#161617"
-  shadow: "rgba(0, 0, 0, 0.6)"
-  on-primary: "#ffffff"
-```
-
-### 4.4 Single-Year Headline Card Gradients
-
-Use these only for the four single-year headline cards. Do not use them as generic page backgrounds.
-
-```yaml
-headlineCards:
-  light:
-    card1Background: "linear-gradient(135deg, #fffcf0, #fff7d6)"
-    card1Border: "#ffe599"
-    card2Background: "linear-gradient(135deg, #fff5f2, #ffe6e0)"
-    card2Border: "#ffccbe"
-    card3Background: "linear-gradient(135deg, #f9f5ff, #f0e6ff)"
-    card3Border: "#d9c2ff"
-    card4Background: "linear-gradient(135deg, #f2fffb, #e0fff5)"
-    card4Border: "#b3ffd9"
-
-  night:
-    card1Background: "linear-gradient(135deg, #211c00, #141100)"
-    card1Border: "#423800"
-    card2Background: "linear-gradient(135deg, #240a05, #140502)"
-    card2Border: "#4f170b"
-    card3Background: "linear-gradient(135deg, #130026, #0c0017)"
-    card3Border: "#2d005c"
-    card4Background: "linear-gradient(135deg, #001f16, #00120d)"
-    card4Border: "#004d36"
-```
-
----
-
-## 5. Color Rules
-
-Budget colors are stable semantic assignments, not a rotating chart palette.
-
-| Meaning | Token | Hex |
-|---|---|---:|
-| Total expenditure / total revenue | `series.total` | `#0071e3` |
-| Social protection | `series.social-protection` | `#ffd60a` |
-| Health | `series.health` | `#30d5c8` |
-| Education | `series.education` | `#0a84ff` |
-| Infrastructure | `series.infrastructure` | `#ff9f0a` |
-| Defence | `series.defence` | `#bf5af2` |
-| Other / unclassified | `series.other` | `#8e8e93` |
 
 Rules:
 
-- A category keeps the same color in charts, legends, table swatches, treemap tiles, Every 100 GEL cells, radar, Budget Field, and ranking rows.
-- Use `primary` for controls, active states, and the total series.
-- Do not assign `primary` to every important value.
-- Do not use color alone for meaning; pair color with labels, values, and shape.
-- Revenue categories should use the same visual system and stable token pattern. Add revenue-specific series tokens only after the revenue taxonomy is finalized.
+- `paper` is the only page background. Never introduce white panels.
+- Selection/hover emphasis is always `tint`, never shadow or border color change.
+- `tile` is reserved for tooltips and treemap tiles.
+- Focus rings: `2px solid rgba(179,64,42,0.4)`, offset 2px.
+- Selection highlight: `rgba(179,64,42,0.16)`.
+- Scrollbars: thin, `control`-colored thumb on transparent track.
 
----
+### 4.2 Category Series Tokens (stable)
 
-## 6. Typography
+A category keeps the same color in every surface: chart lines, table swatches, series panel, treemap tiles, Every 100 GEL cells, radar, budget field, ranking rows. IDs are stable and label-independent. These use the **actual repo taxonomy IDs**.
 
-The system is Georgian-first. Georgian labels must stay readable in both themes and all viewports.
+Expenditure (public spending fields):
 
-### 6.1 Font Stack
+```yaml
+series:
+  total: "#1E1B16"
+  spending.social_protection: "#B3402A"
+  spending.health: "#1F6E56"
+  spending.education: "#3D5A98"
+  spending.infrastructure_regional_development: "#B08A2E"
+  spending.defence: "#7A4E8C"
+  spending.public_order_safety: "#4A707A"
+  spending.economic_affairs: "#C26E4C"
+  spending.agriculture_environment: "#2F4B3A"
+  spending.culture: "#9C3D5E"
+  spending.sport: "#8A7B65"
+  spending.general_public_services: "#5B5347"
+  spending.debt_service: "#8C5A32"
+  spending.other_unclassified: "#A89C88"
+```
+
+Revenue:
+
+```yaml
+series:
+  revenue.vat: "#B3402A"
+  revenue.income_tax: "#3D5A98"
+  revenue.profit_tax: "#1F6E56"
+  revenue.excise_tax: "#B08A2E"
+  revenue.import_tax: "#C26E4C"
+  revenue.property_tax: "#7A4E8C"
+  revenue.other_taxes: "#8A7B65"
+  revenue.grants: "#4A707A"
+  revenue.other_revenue: "#9C3D5E"
+  revenue.asset_decrease: "#2F4B3A"
+  revenue.increase_liabilities: "#5B5347"
+```
+
+Ministries (administrative view) keep stable per-ministry assignments:
+
+```yaml
+series:
+  admin_spending.health_social_affairs: "#B3402A"
+  admin_spending.education_science_youth: "#3D5A98"
+  admin_spending.regional_development_infrastructure: "#B08A2E"
+  admin_spending.defence: "#7A4E8C"
+  admin_spending.internal_affairs: "#4A707A"
+  admin_spending.environment_agriculture: "#2F4B3A"
+  admin_spending.economy_sustainable_development: "#C26E4C"
+  admin_spending.justice: "#1F6E56"
+  admin_spending.foreign_affairs: "#5B5347"
+  admin_spending.finance: "#4E5D74"
+  admin_spending.culture: "#9C3D5E"
+  admin_spending.sport: "#8A7B65"
+  admin_spending.debt_service: "#8C5A32"
+  admin_spending.other_costs: "#A89C88"
+```
+
+Open-ended sets (major programs, any future ministry not listed) use index-based assignment cycling through the editorial palette:
+
+```text
+#B3402A #1F6E56 #3D5A98 #B08A2E #7A4E8C #4A707A #C26E4C #2F4B3A #9C3D5E #8A7B65 #5B5347 #8C5A32 #4E5D74 #A89C88
+```
+
+Rules:
+
+- Never assign `accent` meaning beyond "active/negative" in UI chrome; as a series color it belongs only to the categories listed above.
+- Never use color alone; pair with the 14×3px swatch bar, label, and value.
+
+## 5. Typography
+
+### 5.1 Font Stack
 
 ```yaml
 fonts:
-  ui: '"SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Noto Sans Georgian", sans-serif'
-  display: '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Noto Sans Georgian", sans-serif'
-  numeric: '"SF Pro Text", "Inter", "Noto Sans Georgian", sans-serif'
+  display: "'Noto Serif Georgian', serif"
+  ui: "'Noto Sans Georgian', 'Helvetica Neue', sans-serif"
+  numeric: "'Geist Mono', monospace"
 ```
 
-`Plus Jakarta Sans` can remain in prototypes, but production should prefer the system stack plus `Noto Sans Georgian` for reliable Georgian rendering.
+Weights: Noto Serif Georgian 400–700, Noto Sans Georgian 400–700, Geist Mono 400–600. In production, load via `next/font` (self-hosted), not a runtime Google Fonts `<link>`.
 
-### 6.2 Type Scale
+**Every numeral in a data context (values, years, %, axis labels, counts) is set in Geist Mono.** Serif is reserved for display: page title, section titles, KPI/headline values, treemap share values, brand. Sans covers everything else.
+
+### 5.2 Type Scale
 
 ```yaml
 type:
-  page-title:
-    size: 32px
-    weight: 700
-    line-height: 1.15
-    letter-spacing: "-0.03em"
-  screen-brand:
-    size: 22px
-    weight: 700
-    line-height: 1.25
-  section-title:
-    size: 20px
-    weight: 700
-    line-height: 1.3
-  chart-title:
-    size: 28px
-    weight: 700
-    line-height: 1.2
-  body:
-    size: 15px
-    weight: 400
-    line-height: 1.5
-  ui-label:
-    size: 13px
-    weight: 600
-    line-height: 1.3
-  table:
-    size: 14px
-    weight: 500
-    line-height: 1.45
-  chart-axis:
-    size: 12px
-    weight: 600
-    line-height: 1.35
-  caption:
-    size: 12px
-    weight: 600
-    line-height: 1.35
+  page-title:      { font: display, size: 40px (30px mobile), weight: 600, ls: -0.01em, lh: 1.15 }
+  hero-value:      { font: display, size: 62px (44px mobile), weight: 600, ls: -0.02em, lh: 1 }   # indicators hero KPI
+  headline-value:  { font: display, size: 34px, weight: 600, ls: -0.02em, lh: 1.1 }  # analysis headline stats
+  kpi-value:       { font: display, size: 24px, weight: 600, ls: -0.02em, lh: 1.1 }  # indicators side KPIs
+  section-title:   { font: display, size: 22px, weight: 600, ls: -0.01em }
+  brand:           { font: display, size: 18px, weight: 700, ls: -0.01em }
+  subsection:      { font: ui, size: 13px, weight: 600 }
+  row-label:       { font: ui, size: 12.5–13px, weight: 500 }
+  body:            { font: ui, size: 13.5px, weight: 400, lh: 1.6 }
+  caption:         { font: ui, size: 12px, weight: 400, color: muted, lh: 1.5–1.6 }
+  overline:        { font: ui, size: 11px, weight: 600, uppercase, ls: 0.06–0.1em, color: muted }
+  data:            { font: numeric, size: 12.5px, weight: 400–600 }
+  data-meta:       { font: numeric, size: 10.5–11px, color: muted/faint }
+  chart-axis:      { font: numeric, size: 10px, color: muted }
+  deck-lead:       { font: numeric, size: 13px, weight: 500 }   # value line under the page title
 ```
 
 Rules:
 
-- Do not scale font sizes with viewport width.
-- Do not use negative letter spacing below `16px`.
-- Numeric values should align consistently and remain scannable.
-- Large Georgian headings can be bold, but compact controls should stay plain and readable.
+- Do not scale font sizes with viewport width beyond the specified mobile overrides.
+- Negative letter-spacing only at ≥16px.
+- Emphasis inside data = weight 600 (e.g. latest-year column), never color-only.
+- Unit suffixes on serif values (`მლრდ ₾`) are mono 12–13px in `body` color, not serif.
 
----
+## 6. Layout System
 
-## 7. Layout System
-
-### 7.1 Page Shell
-
-The Budget Explorer page uses a centered shell.
+### 6.1 Page Shell
 
 ```yaml
 page:
-  maxWidth: "1200px"
-  width: "min(1200px, calc(100vw - 32px))"
-  paddingTop: "40px"
-  paddingBottom: "80px"
+  background: paper
+  maxWidth: "1240px"
+  padding: "30px 28px 72px"   # mobile: "24px 20px 64px"
 ```
 
-Structure:
+No screen card, no outer container. Content sits directly on paper.
 
-1. Review/page header with title, subtitle, and theme toggle.
-2. Primary screen card.
-3. Below-screen content sections.
+### 6.2 Information Architecture
 
-### 7.2 Screen Card
+One page, three header nav tabs (hash-synced):
 
-```yaml
-screen:
-  background: "theme.surface"
-  radius: "24px"
-  padding: "24px"
-  shadow: "0 20px 40px theme.shadow"
-  marginBottom: "24px"
+1. `ხარჯები` — multi-year expenditure explorer (fields/ministries grouping).
+2. `შემოსავლები` — multi-year revenue explorer.
+3. `ანალიზი` — single-year analysis view with its own side switch, grouping switch (expenditure only), and year selector.
+
+Under the page title sits the **deck line**: a mono lead value (latest-year total for the explorer, `year · N კატეგორია · სულ X` for analysis) plus a colored YoY delta and the phrase `წინა წელთან`.
+
+The header right slot shows a mono context label: selected range (`2005–2025`) in the explorer, selected year (`2025 წელი`) in analysis.
+
+### 6.3 URL State (deep linking)
+
+Screen state serializes into the URL hash so any view is shareable:
+
+```text
+#nav=expenditure&g=fields&m=line&sh=1&r=2005-2025&sel=id1,id2   (explorer)
+#nav=analysis&as=expenditure&ag=ministries&ay=2024              (analysis)
 ```
 
-The screen card is the product frame. It contains the product top bar and the primary view.
+Restore on load with validation (unknown values fall back to defaults; ranges clamp to loaded years).
 
-### 7.3 Top Bar
+### 6.4 Rule Hierarchy (replaces cards)
 
-The top bar contains:
+Sections are separated by horizontal rules, in three weights:
 
-- Brand.
-- Expenditure / Revenue segmented switch.
-- Multi-year / Single-year switch.
+- `2px solid ink` — page header bottom, major section tops, table header bottom, table total-row top, aside top rule when stacked.
+- `1px solid ink` — primary panel top (chart/table block).
+- `1px solid hairline (#D9CFBE)` — sub-section separators, aside left border.
+- `1px solid hairline-soft (#E7DECF)` — data row borders, chart grid.
 
-Rules:
+Never nest a rule-framed block inside another rule-framed block with the same weight.
 
-- The top bar sits inside the screen card.
-- It has a bottom border using `theme.hairline`.
-- It is not a global marketing nav.
-- Controls should be compact and horizontally aligned on desktop.
-- On narrow screens, controls wrap or stack without clipping.
-
-### 7.4 Spacing Tokens
+### 6.5 Spacing
 
 ```yaml
 spacing:
-  xxs: "4px"
-  xs: "8px"
-  sm: "12px"
-  md: "16px"
-  lg: "20px"
-  xl: "24px"
-  xxl: "32px"
-  section: "24px"
+  row-pad-comfortable: "11px 12px"   # table cells
+  row-pad-compact: "8px 12px"
+  section-gap: "48px"       # between major sections (with 2px rule + 22px padding-top)
+  block-gap: "36px"         # sub-blocks inside a section (with 1px hairline + 24px padding-top)
+  workspace-gap: "40px"     # chart column ↔ aside (32px stacked)
+  grid-gap: "32px"          # KPI columns
 ```
 
-Confirmed visual rhythm uses `16px`, `20px`, and `24px` more than large marketing gaps. Keep sections compact enough for data work.
+### 6.6 Shape and Elevation Policy
 
-### 7.5 Shape Tokens
+- Border radius: **0–3px everywhere** (buttons 2px, tooltip 3px). Exception: the `% წილი` measure pill and slider handles/ticks use `999px`.
+- Shadows: only the chart tooltip (`0 4px 16px rgba(30,27,22,0.10)`) and slider handles (`0 1px 3px rgba(30,27,22,0.15)`). Nothing else casts a shadow.
+- Swatches are **14×3px bars**, never dots or rounded squares.
 
-```yaml
-radii:
-  xs: "5px"
-  sm: "10px"
-  md: "12px"
-  lg: "14px"
-  xl: "16px"
-  xxl: "18px"
-  section: "20px"
-  screen: "24px"
-  pill: "999px"
-```
+## 7. Core Components
 
-Rules:
+Specs below are contracts; visual proof lives in the reference files.
 
-- Use `24px` only for major product containers.
-- Use `18px` to `20px` for chart sections and headline cards.
-- Use `10px` to `14px` for rows, inputs, buttons, table wrappers, and compact surfaces.
-- Use pill radius only for segmented controls, theme toggles, range quick actions, and switches.
+### 7.1 Header / Nav
 
----
+Baseline-aligned row: serif brand left (`GeoData`), nav tabs center, mono context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500.
 
-## 8. Core Components
+### 7.2 Mode / Grouping Tabs
 
-### 8.1 Theme Toggle
+Text-only, sans 12.5px; active = ink 600 with `text-decoration: underline`, 2px thickness, accent color, `text-underline-offset: 4px`. No backgrounds. Mode tabs: `ხაზი / ცხრილი`. Grouping tabs (`სფეროები / უწყებები`) appear only in expenditure mode, separated from mode tabs by a 1px×13px `control` vertical divider.
 
-Purpose: switch `light` and `night` themes.
+### 7.3 Measure Pill (% წილი)
 
-```yaml
-themeToggle:
-  display: "inline-flex"
-  height: "36px"
-  padding: "3px"
-  radius: "pill"
-  background: "theme.strong"
-  buttonWidth: "80px"
-  buttonHeight: "30px"
-```
+Height 27px, pill radius, 1px `control` border, transparent bg, muted text. Active: ink bg, paper text, ink border, `aria-pressed`. This is the only pill in the system. Share = share of the side's total; there is no GDP measure.
 
-Rules:
+### 7.4 Range Quick Chips (1წ / 5წ / 10წ / ყველა)
 
-- Active theme uses `theme.surface`, `theme.ink`, and a subtle shadow.
-- Theme choice should persist in `localStorage`.
-- Theme switch must not reload data or change selected view state.
+Mono 11px text links; active = ink 600 underlined (accent underline); inactive = muted 400. `5წ` shows only when >5 loaded years, `10წ` only when >10.
 
-### 8.2 Segmented Switch
+### 7.5 Range Slider
 
-Used for:
+24px-high rail: 3px `hairline-soft` track, accent fill at 40% opacity between handles, 5px round year ticks (paper with 1px `control` border inside range, `hairline` outside), 15px round handles (paper fill, 2px accent border, handle shadow). Handles are buttons with `role="slider"`, aria value attributes, and Arrow/Home/End keyboard support. Mono min/max year labels below.
 
-- Expenditure / Revenue.
-- Chart mode tabs.
-- Year pills.
-- Quick range actions.
+### 7.6 Series Row (aside panel)
 
-Rules:
+Row: 1px `row-border` bottom border; hover/selected bg `tint`; a 2px accent left rail marks expanded ministries and program rows. Toggle button (`aria-pressed`): 14px square checkbox (1.5px `control` border; checked = accent fill + paper ✓), swatch bar shown only when selected, sans 12.5/500 label clamped to 2 lines, latest value mono 11 muted right. Ministries rows add a caret button (`▸/▾`, `aria-expanded`) that expands the ministry's major programs; program rows are indented, sans 11.5/400 in `body` color. Program rows show names only — official program codes stay in the data layer (they fragment across reorganizations) and are not surfaced.
 
-- Use pill background with active segment.
-- Active state uses `theme.surface` in normal segmented controls.
-- The `% წილი` measure button uses `primary` when active.
-- Labels must be short and Georgian-first.
+### 7.7 Search
 
-### 8.3 View Switch
+Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. Placeholder in ministries grouping: `ძებნა — უწყება ან პროგრამა`. A query with no matches shows `0 შედეგი — შეცვალე საძიებო ტექსტი.` While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs.
 
-Used to move between Multi-year and Single-year.
+### 7.8 CSV Button
 
-Rules:
+Full-width block, h38, ink bg, paper text, sans 12.5/600, radius 2px. Hover: opacity 0.85. Label: `CSV ჩამოტვირთვა`. Must export exactly the visible filtered dataset with the metadata columns of §15.
 
-- Use a label plus iOS-style switch.
-- Keep the switch compact: `51px x 31px`.
-- Do not make this a large card or route preview.
-- It can navigate between the paired page routes.
+### 7.9 Callout / Notice
 
-### 8.4 Product Panel
+Tint bg, `2px accent` left border, sans 11.5–12.5px, `body` color, max-width 560px. Used for series limit, empty selection, no-growth-data, and load-error states.
 
-Product panels are surfaces inside the screen card.
+### 7.10 Source Note
 
-```yaml
-panel:
-  background: "theme.surface"
-  radius: "20px"
-```
-
-Use panels for:
-
-- Multi-year chart card.
-- Multi-year series side panel.
-- Single-year inner sections.
-
-### 8.5 Content Section
-
-Below-screen sections use:
-
-```yaml
-contentSection:
-  background: "theme.surface"
-  radius: "24px"
-  padding: "24px"
-  shadow: "0 20px 40px theme.shadow"
-  marginTop: "24px"
-```
-
-Each section has a title row with:
-
-- `h2`
-- optional explanatory `p`
-- optional small tag
-
-Do not put page sections inside another decorative card. The screen card and content section already frame the page.
-
-### 8.6 Search Field
-
-Series search uses a quiet field:
-
-```yaml
-search:
-  height: "36px"
-  radius: "10px"
-  background: "theme.canvas"
-  border: "1px solid theme.hairline"
-  text: "theme.mute"
-  paddingInline: "12px"
-```
-
-Search should filter rows without changing active selections unless the user explicitly toggles a result.
-
-### 8.7 CSV Button
-
-CSV export is a primary utility action, not a decorative CTA.
-
-```yaml
-csvButton:
-  height: "44px"
-  radius: "12px"
-  background: "theme.ink"
-  text: "theme.surface"
-  fontSize: "13px"
-  fontWeight: 600
-```
-
-Rules:
-
-- Label should be Georgian-first and explicit: `მონაცემების ჩამოტვირთვა CSV`.
-- CSV export must use the same filtered dataset as the visible chart/table.
-- Disabled state should explain why export is unavailable.
-
----
-
-## 9. Multi-Year Explorer
-
-Confirmed source: `docs/Design HTML files/multiyear-apple.html`
-
-### 9.1 Default State
-
-Default view:
-
-- Side: Expenditure.
-- View: Multi-year.
-- Chart mode: Line.
-- Measure: nominal GEL.
-- Grouping: public spending fields.
-- Range: the full loaded year range (currently the 2004-2025 window; the default is data-driven, not hardcoded).
-- Selected series: total expenditure plus selected public spending fields.
-
-Revenue reuses the same structure. Only labels, taxonomy, data, and source semantics change.
-
-### 9.2 Desktop Layout
-
-```yaml
-multiYearWorkspace:
-  display: "grid"
-  columns: "minmax(0, 1fr) 280px"
-  gap: "24px"
-```
-
-Left column:
-
-- Chart title.
-- Plot frame.
-- Chart mode tabs.
-- `% წილი` measure toggle.
-- Line chart or table.
-- Legend.
-- Range strip.
-
-Right column:
-
-- Series title.
-- Search.
-- Series rows.
-- CSV button.
-
-### 9.3 Confirmed Chart Modes
-
-Confirmed modes:
-
-- `ხაზი`
-- `ცხრილი`
-
-Do not show `სვეტი` or `კომპოზიცია` in v1 production unless a new confirmed design is created for those modes.
-
-### 9.4 Measure Toggle
-
-The confirmed measure toggle is `% წილი`.
-
-Rules:
-
-- Default state shows nominal GEL.
-- Active `% წილი` state uses `primary` fill and white text.
-- In `% წილი`, line view uses dual vertical axes:
-  - Left axis: `მშპს წილი`.
-  - Right axis: `ბიუჯეტის წილი`.
-- Do not add extra measure chips inside the confirmed plot unless design is re-approved.
-
-### 9.5 Plot Frame
-
-```yaml
-plot:
-  background: "theme.canvas"
-  radius: "18px"
-  padding: "70px 24px 24px"
-```
-
-Rules:
-
-- Chart mode tabs sit inside the plot frame at top-left.
-- `% წილი` toggle sits inside the plot frame at top-right.
-- Grid lines use `theme.grid`.
-- Direct line labels are off the plot in the confirmed visual.
-- Use legend and side panel for series identity.
-
-### 9.6 Table Mode
-
-Table mode replaces the chart area inside the plot frame.
-
-Confirmed columns (year columns span the selected range):
+Sans 12px, muted, plain paragraph under the primary panel and at the end of the analysis view. Pattern:
 
 ```text
-კატეგორია | <first year> | ... | <last year> | ცვლილება
+მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო). <coverage note> · 12-თვიანი ფაქტობრივი შესრულება. ბოლო განახლება: YYYY-MM-DD.
 ```
 
-Rules:
+Coverage notes state actual loaded ranges (e.g. `ხარჯვითი მონაცემები: 2005–2025`, `შემოსავლების მონაცემები: 2005–2025`).
 
-- Hide chart SVG, range strip, and legend in table mode if the confirmed layout requires it.
-- Use swatches in the first column.
-- Text column aligns left; numeric columns align right.
-- Table data must match the active side and period.
+### 7.11 KPI Block
 
-### 9.7 Legend
+No card: overline label, serif value, muted detail line. Two variants: analysis headlines (serif 34, four per row) and indicators side KPIs (serif 24, stacked with `hairline-soft` separators, value left / detail right on one baseline).
 
-Legend appears below the chart.
+### 7.12 Hero KPI (indicators)
 
-Rules:
+The first indicator (`პერიოდის ცვლილება`) is a hero block: overline, serif 62px value (accent-negative if the period change is negative), then a 3px two-segment gauge (ink = base year total share, accent = delta), mono `year · amount` labels at both ends, and an editorial sentence with mono-set delta and CAGR values:
 
-- Use colored dots.
-- Use Georgian category labels.
-- Legend can toggle series visibility if implementation supports it.
-- Muted legend state should reduce opacity but keep layout stable.
+```text
+2005–2025 წლებში ჯამური ხარჯები გაიზარდა X მლრდ ₾-ით — საშუალო წლიური ზრდა +Y%.
+```
 
-### 9.8 Range Strip
+### 7.13 Mover Row
 
-Range strip appears below the legend in line mode.
+Grid `24px 1fr 96px 72px`: mono rank (`01`), sans label (ellipsized), 3px horizontal bar (track `hairline-soft`, fill positive/negative color, width relative to max |change|), mono % right-aligned. Board = two columns: `ყველაზე მზარდი` / `ყველაზე ნელი ზრდა`. If a "bottom mover" is still positive growth, the copy stays `ყველაზე ნელი ზრდა` — never call growth a loss.
 
-Confirmed pieces:
+## 8. Multi-Year Explorer
 
-- Range label: `Range: <first year> - <last year>` (e.g. `Range: 2004 - 2025`).
-- Quick actions: `1Y`, `5Y`, `ALL`.
-- Rail with two handles.
+Confirmed source: `GeoData Platform - Editorial v2.dc.html` (Explorer + Indicators screens).
 
-Rules:
+### 8.1 Defaults
 
-- For v1, range bounds are constrained to available years.
-- `ALL` resolves to the full loaded year range; `5Y` resolves to the latest five loaded years.
-- Handles should not imply missing years outside loaded data.
+Side: expenditure. Grouping: fields. Mode: line. Measure: nominal GEL. Range: full available per scope. Selection: **top 5 categories by latest-year value** per scope (fields, ministries, and revenue each keep their own selection and range). Chart series limit: 6 (table mode unlimited; exceeding shows the callout). The derived total is not a selectable series — totals appear in the table `სულ` row, deck line, and hero KPI.
 
-### 9.9 Series Panel
+### 8.2 Layout
 
 ```yaml
-seriesPanel:
-  width: "280px"
-  title: "სერიები"
-  rowMinHeight: "48px"
-  rowRadius: "10px"
-  activeBackground: "theme.canvas"
+workspace:
+  display: grid
+  columns: "minmax(0,1fr) 292px"   # <1100px: one column, aside below with 2px ink top rule
+  gap: "40px"
 ```
 
-Rules:
+Left: mode tabs + grouping tabs + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline + mono count (`n / 6` in line mode, `n` in table mode; count turns accent at the limit), search, series rows (scroll ≤430px), CSV button.
 
-- Use square/rounded-square color chips, not decorative icons.
-- Active rows have quiet surface emphasis.
-- Search filters available rows.
-- CSV button stays at the bottom after series list.
-- If production supports many rows, the series list may scroll inside the panel.
+### 8.3 Line Chart
 
-### 9.10 Expenditure Grouping Switch
+SVG on paper (no plot frame), viewBox 920×320: grid lines `hairline-soft`, baseline `1px ink` at zero, 1px `hairline` y-axis line; axis labels mono 10px muted (y labels right-aligned outside the plot, ~62px left padding); year labels thinned to ≤12 (first anchored start, last anchored end); series polylines 2.2px round-joined with a 3.5px dot on the final point only; no in-plot direct labels. Hover/pointer: 1px `control` vertical guide, ring markers (paper fill, 2px series stroke), tooltip (tile bg, 1px hairline border, radius 3, tooltip shadow, mono year + swatch/label/value rows; flips side past 60% width). `role="img"` + Georgian aria-label.
 
-Confirmed source: `docs/superpowers/specs/2026-06-11-ministry-expenditure-multiyear-design.md` (implemented).
+### 8.4 Table Mode
 
-In expenditure mode, a segmented control switches how series are grouped:
+Columns: `<first col> | years… | ცვლილება | წილი <end-year>`. First column header by scope: `სფერო` (fields), `უწყება` (ministries), `საბიუჯეტო მუხლი` (revenue). Header: overline style, `2px ink` bottom rule. Rows: 1px `hairline-soft` borders, tint hover; swatch bar + sans label left; numerals mono right-aligned; latest-year column weight 600; change colored positive/negative (minus sign `−`). Total row `სულ`: `2px ink` top rule, weight 600, share `100.0%`. Horizontal scroll with sticky first column and sticky right change/share columns (paper bg, 1px `hairline-soft` edge shadows).
 
-- Public spending fields (default).
-- Ministries: administrative view with ministries and major programs as selectable series.
+### 8.5 Below-Chart Sections (`ძირითადი ინდიკატორები`, order fixed)
 
-Rules:
+1. Hero KPI (`პერიოდის ცვლილება`, §7.12) + three side KPIs (`ყველაზე დიდი ზრდა`, `ყველაზე ნელი ზრდა`, `ყველაზე დიდი წილი`) in a `1.35fr | 1fr` grid split by a hairline.
+2. Movers board (top 3 / bottom 3 across all scope items).
+3. `პერიოდის შედარება` — table `<first col> | start year | ცვლილება | end year`, total row first, fixed layout with 44% label column.
 
-- The grouping control appears only in expenditure mode; revenue has no grouping switch.
-- Administrative data exists for 2017-2025 only; the UI must not imply earlier ministry coverage.
-- This is series selection, not clickable drilldown.
-- Reuse the standard segmented switch styling from section 8.2.
+## 9. Single-Year Analysis (ანალიზი)
 
-### 9.11 Below-Chart Multi-Year Sections
+Confirmed source: `GeoData Platform - Editorial v2.dc.html` (Analysis screen). Order is fixed:
 
-Confirmed order:
+1. Side tabs (`ხარჯები / შემოსავლები`) + grouping tabs (expenditure only: `სფეროები / უწყებები`) + mono basis note.
+2. Year selector.
+3. Four headline stats.
+4. `სტრუქტურა …` treemap — full width.
+5. `ყოველი 100 ლარი` — grid + legend.
+6. `ბიუჯეტის რადარი` — radar + numbered list.
+7. `ბიუჯეტის ველი` — full width.
+8. `სრული რეიტინგი`.
+9. Source note.
 
-1. Main indicators / poster KPI cards.
-2. Top movers board.
-3. Formula analysis.
+### 9.1 Year Selector
 
-Do not replace these with unrelated storytelling blocks.
+Horizontal row of mono 12px year buttons (scrolls on narrow screens). Active: ink 600 + 2px accent underline. Planned year: mono superscript tag `გეგმა` in faint next to the label; keep the tag in the active state.
 
-#### KPI Cards
+### 9.2 Headline Stats
 
-Use four cards in a grid. Each card contains:
+Exactly four, in the KPI pattern (no cards, no gradients): overline label, serif 34px value with mono unit suffix, muted detail. Content: `სულ` (total + category count), `ყველაზე დიდი` (largest category + share), `ყველაზე სწრაფი ზრდა`, `ყველაზე დიდი მატება`. When no previous year exists, growth cells show `—` with detail `წინა წლის მონაცემები არ არის`.
 
-- Small label.
-- Large value.
-- Short context line.
+### 9.3 Structure Treemap
 
-#### Top Movers Board
+Production computes a **squarified treemap** over a `1000×430` unit area rendered at `aspect-ratio: 1000/430`, sorted by value descending. Title by scope: `სტრუქტურა სფეროების მიხედვით` / `სტრუქტურა უწყებების მიხედვით` / `სტრუქტურა კატეგორიების მიხედვით`.
 
-Use six vertical tower blocks:
+Tile: `tile` bg, 1px `hairline` border, **3px category-color top bar**, radius 0, padding 9px 11px. Content: serif share % (22px at ≥8% share, 16px at ≥3.3%, 12px at ≥1.4%, hidden below), sans label 12/500 (shown ≥3.3%), mono amount 11 muted (shown ≥8%). Hover: tint bg; no lift, no shadow. Categories too small to label render as bare tiles and are listed in a small swatch legend below the treemap. Full detail lives in the `title` tooltip. No drilldown.
 
-- Top 3 gainers.
-- Bottom 3 movers.
+### 9.4 Every 100 GEL
 
-Copy rule: if the value is still positive growth, avoid calling it a true loss in production copy. Prefer `ყველაზე სწრაფი ზრდა` and `ყველაზე ნელი ზრდა`, or equivalent Georgian wording.
+Exactly 100 square cells, 10×10 grid, `gap: 5px`, `width: min(100%, 560px)`, radius 0, category colors, allocations rounded to whole GEL summing to 100 (largest remainder method). A legend column sits beside the grid on wide screens (wraps below on narrow): swatch bar + label + mono `n ₾` per category. Caption notes the rounding rule and how many categories round to 0 ₾.
 
-#### Formula Analysis
+### 9.5 Budget Radar
 
-Use formula rows:
+Radar + list grid (`1fr 300px`, stacks on narrow). Radar: single polygon of top-level category shares, top 7 + `სხვა` when more than 8 categories; rings + spokes `hairline-soft` 1px; polygon `2px accent` stroke with `rgba(179,64,42,0.12)` fill; 3px vertex dots in category colors; **mono two-digit index labels** (`01`…) around the rim. The list beside repeats the indices with swatch, label, and mono share. Visual-only — exact values live in the ranking.
+
+### 9.6 Budget Field
+
+Bubble scatter, viewBox 920×380: x = share of total, y = growth vs previous year, radius = `7 + sqrt(value/max)·40`, color = category token (fill at 18% opacity + 1.5px solid stroke). Zero-growth line `1px ink`; grid `hairline-soft`; y-axis line `hairline`; axis labels mono 10px. Labels (sans 11px, `body`) only on the top 3 by amount plus |change| ≥ 20% outliers, with overlap avoidance; full values in `title` tooltips. If previous-year data is missing, show the callout: `წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.`
+
+### 9.7 Full Ranking
+
+Table columns: `<scope header> | მლრდ ₾ | წილი | ცვლილება`, sorted by GEL descending, top-level categories of the active grouping only. Rank as mono `01`-style index + swatch + label; a 120px 3px share bar (category color on `hairline-soft` track) next to the mono share; change colored positive/negative. Same table anatomy as §8.4 including sticky first column on horizontal scroll.
+
+## 10. Revenue Adaptation
+
+No separate revenue direction. Same shell, tokens, controls, chart/table treatment, analysis order, CSV and source patterns. Change only labels, taxonomy, revenue series tokens (§4.2), source wording, tooltips, CSV metadata.
+
+## 11. Content and Copy
+
+Voice: precise, civic, archival. Georgian is primary; English only for compact technical labels (`CSV`).
+
+Canonical terms: `ხარჯები`, `შემოსავლები`, `ანალიზი`, `სერიები`, `ხაზი`, `ცხრილი`, `სფეროები`, `უწყებები`, `% წილი`, `დიაპაზონი`, `სულ`, `ძირითადი ინდიკატორები`, `პერიოდის ცვლილება`, `ყველაზე მზარდი`, `ყველაზე ნელი ზრდა`, `პერიოდის შედარება`, `სტრუქტურა სფეროების მიხედვით`, `ყოველი 100 ლარი`, `ბიუჯეტის რადარი`, `ბიუჯეტის ველი`, `სრული რეიტინგი`, `CSV ჩამოტვირთვა`, `გეგმა`.
+
+Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US` grouping, fixed decimals (bn: 2, mln: 1, %: 1). Amounts ≥ ~1bn display in `მლრდ ₾`, below in `მლნ ₾`. Negative sign is `−` (minus, not hyphen) in deltas.
+
+Page titles are editorial sentences, not labels: `როგორ იხარჯება საქართველოს ბიუჯეტი`, `როგორ ივსება საქართველოს ბიუჯეტი`, `<year> წლის ბიუჯეტის სურათი — სად მიდის საჯარო ფული / საიდან მოდის საჯარო ფული`.
+
+Empty/error copy explains what happened and what to do, e.g.:
 
 ```text
-start year + change = end year
+არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.
+გრაფიკზე მაქსიმუმ 6 სერია შეიძლება. ცხრილის რეჟიმში ლიმიტი არ არის.
+მონაცემები ვერ ჩაიტვირთა. განაახლე გვერდი — თუ პრობლემა გაგრძელდება, სცადე მოგვიანებით.
 ```
 
-Rules:
-
-- Rows use category swatch.
-- Values stay compact.
-- Formula blocks stack on mobile.
-
----
-
-## 10. Single-Year Snapshot
-
-Confirmed source: `docs/Design HTML files/singleyear-apple.html`
-
-Single-year mode is a zoomed-out national budget snapshot. It has no drilldown in v1.
-
-Revenue reuses the same layout and system. Only labels, taxonomy, data, and source semantics change.
-
-### 10.1 Confirmed Order
-
-1. Year selector.
-2. Four headline cards.
-3. Full-width structure/treemap section.
-4. Full-width Every 100 GEL section.
-5. Budget radar.
-6. Budget Field.
-7. Full ranking.
-
-Do not place the structure section and Every 100 GEL side by side. The confirmed layout stacks them vertically.
-
-### 10.2 Year Selector
-
-The year selector is a horizontal pill row and must handle 10+ years.
-
-Rules:
-
-- Selected year uses active pill state.
-- On narrow screens, allow horizontal scroll instead of squeezing labels.
-- If the selected year is planned, show a subtle planned badge near the year context.
-
-### 10.3 Headline Cards
-
-Four cards only:
-
-1. Total amount.
-2. Largest category/source.
-3. Fastest growth.
-4. Largest GEL increase.
-
-Rules:
-
-- Use the confirmed gradient tokens.
-- Keep large value and short context line.
-- Do not add more cards; additional detail belongs in the ranking or visual sections.
-
-### 10.4 Structure Section
-
-Production title:
-
-```text
-სტრუქტურა სფეროების მიხედვით
-```
-
-This section is the single-year composition opener.
-
-Confirmed layout:
-
-```yaml
-treemap:
-  display: "grid"
-  columns: "1.1fr .72fr .52fr"
-  rows: "150px 112px 94px"
-  gap: "12px"
-  minHeight: "372px"
-```
-
-Tile rules:
-
-- Tile background uses `theme.surface`.
-- Tile border uses `theme.hairline`.
-- Left border uses category color.
-- Large categories can span two rows.
-- `Other` can span two columns.
-- No click drilldown in v1.
-- Hover may slightly lift the tile.
-
-### 10.5 Every 100 GEL
-
-Production title:
-
-```text
-ყოველი 100 ლარი
-```
-
-Confirmed layout:
-
-```yaml
-every100:
-  section: "full-width below structure"
-  gridColumns: 10
-  cellCount: 100
-  gridWidth: "min(100%, 560px)"
-  gap: "6px"
-  cellRadius: "5px"
-```
-
-Rules:
-
-- This is a visual-only 100-cell explainer.
-- Do not add a list beside it in v1.
-- Cells use category colors.
-- Cell counts use rounded whole GEL values that sum to 100.
-- Exact values remain available in ranking, table, tooltips, and export.
-
-### 10.6 Budget Radar
-
-Budget Radar replaces the older petals concept.
-
-Rules:
-
-- Radar is visual-only in v1.
-- Use top-level categories.
-- No list beside the chart.
-- Labels can be reduced on narrow screens.
-- If too many categories make the radar unreadable, use top categories plus `Other`.
-
-### 10.7 Budget Field
-
-Budget Field is a bubble/scatter view for one selected year.
-
-Rules:
-
-- x-axis: share of total.
-- y-axis: growth versus previous available year.
-- bubble size: GEL amount.
-- color: category token.
-- If previous-year data is unavailable, show a clear missing-growth state instead of guessing.
-- Labels are only for notable or selected points.
-
-### 10.8 Full Ranking
-
-Full ranking is the exact inspection section.
-
-Columns:
-
-```text
-სფერო | GEL | წილი | ცვლილება
-```
-
-Rules:
-
-- Default sort is GEL amount descending.
-- Use swatches next to category names.
-- Values must match the active side, selected year, and public taxonomy.
-- Single-year ranking shows top-level public spending fields or top-level revenue categories only.
-- No program/subprogram rows in single-year ranking.
-
----
-
-## 11. Revenue Adaptation
-
-Do not create a separate revenue visual direction.
-
-Revenue uses:
-
-- Same page shell.
-- Same theme tokens.
-- Same controls.
-- Same chart/table treatment.
-- Same single-year section order.
-- Same CSV and source patterns.
-
-Change only:
-
-- Labels.
-- Category taxonomy.
-- Series colors if revenue-specific stable tokens are added.
-- Source wording.
-- Tooltips and CSV metadata.
-
-Revenue taxonomy should expose top-level tax categories directly, including VAT, income tax, profit tax, excise tax, import tax, property tax, other taxes, grants, other revenue, decrease in non-financial assets, decrease in financial assets, and increase in liabilities.
-
-Georgian labels for source-specific budget-classification categories must be confirmed before production release.
-
----
-
-## 12. Data Visualization Rules
-
-### 12.1 Line Charts
-
-Rules:
-
-- Use clean polylines with circular points.
-- Use category tokens for stroke colors.
-- Use `theme.grid` for grid lines.
-- Keep axes readable at `12px`.
-- Avoid direct labels inside dense plot areas.
-- Use legend and side panel for series identity.
-- Planned values use a subtle marker or badge if active public value is planned.
-
-### 12.2 Tables
-
-Rules:
-
-- Table background is `theme.surface`.
-- Header background is `theme.soft`.
-- Borders use `theme.hairline`.
-- Text column aligns left.
-- Numeric columns align right.
-- Include category swatches in the first column.
-- Table values are exact and export-consistent.
-
-### 12.3 Treemap
-
-Rules:
-
-- Tile area represents share of total where implementation supports true treemap sizing.
-- The confirmed prototype uses a fixed editorial composition; production can compute layout but must preserve the same visual hierarchy.
-- Labels appear only where readable.
-- Full detail should be available on hover/focus.
-- No click drilldown in v1.
-
-### 12.4 Every 100 GEL
-
-Rules:
-
-- Always render exactly 100 cells.
-- Use rounded allocations that sum to 100.
-- Keep grid centered in its section.
-- Preserve layout stability while data changes.
-
-### 12.5 Radar
-
-Rules:
-
-- Use category color sparingly.
-- Keep grid and polygon readable in both themes.
-- Do not overload with too many labels.
-- Provide accessible text summary outside SVG where needed.
-
-### 12.6 Budget Field
-
-Rules:
-
-- Use bubble size for amount, x for share, y for growth.
-- Keep axes labeled.
-- Use hover/focus details for exact numbers.
-- Use a no-data state when growth cannot be computed.
-
----
-
-## 13. Content and Copy
-
-The voice is precise, civic, and analytical.
-
-Use:
-
-- `ხარჯები`
-- `შემოსავლები`
-- `მრავალწლიანი`
-- `ერთწლიანი`
-- `სერიები`
-- `სტრუქტურა სფეროების მიხედვით`
-- `ყოველი 100 ლარი`
-- `ბიუჯეტის რადარი`
-- `ბიუჯეტის ველი`
-- `სრული რეიტინგი`
-- `მონაცემების ჩამოტვირთვა CSV`
-
-Rules:
-
-- Georgian is primary in the UI.
-- English is allowed only where the user has approved it or where a compact technical label is clearer, such as `CSV`.
-- Include units with values: `მლრდ`, `მლნ`, `%`, `GEL`.
-- Avoid vague marketing copy.
-- Empty/error copy should explain what happened and what the user can do next.
-
-Example error:
-
-```text
-ამ არჩევანისთვის მონაცემები არ არის ხელმისაწვდომი. შეცვალე წელი ან გაასუფთავე ფილტრები.
-```
-
----
-
-## 14. Responsive Behavior
-
-### 14.1 Breakpoints
+## 12. Responsive Behavior
 
 ```yaml
 breakpoints:
   desktop: ">= 1100px"
-  tablet: "768px - 1099px"
+  tablet: "768px – 1099px"
   mobile: "< 768px"
 ```
 
-### 14.2 Desktop
+At `<1100px`: workspace becomes one column; aside moves below the chart, loses its left border, gains a `2px ink` top rule; headline stats/KPIs become two columns; hero + side KPIs stack (side column gains a hairline top rule); movers board stacks; radar/every-100 side lists wrap below.
 
-- Page width maxes at `1200px`.
-- Multi-year workspace uses chart plus 280px side panel.
-- Single-year sections stack vertically after headline cards.
-- Below-screen sections use four-card or six-column grids where confirmed.
+Mobile (<768px): page padding `24px 20px 64px`; page title 30px; hero value 44px; year selector scrolls horizontally; tables scroll horizontally (min-width preserved, sticky columns active); Every 100 GEL stays 10×10 — shrink cells, never cell count; controls ≥30px tall (prefer 36px+).
 
-### 14.3 Tablet and Mobile
+Breakpoint behavior keys off the page container width (ResizeObserver or CSS container/media queries), matching the reference prototype.
 
-At `max-width: 1100px`:
+## 13. Accessibility
 
-- Multi-year workspace becomes one column.
-- Series panel moves below chart.
-- Headline cards become two columns.
-- Movement board becomes one column.
-- Formula rows stack.
-- Top bar can stack vertically.
+- All controls have accessible names; toggles expose pressed/selected state (`aria-pressed`, `aria-expanded`); slider handles expose `role="slider"` with value attributes and keyboard support.
+- SVG charts: `role="img"` + Georgian accessible label; SVG-only data must also exist in table/tooltip/summary.
+- Focus visible (accent ring) on paper.
+- Never color-only meaning: swatch + label + value.
+- Respect `prefers-reduced-motion`.
+- Chart labels ≥10px mono only for axes; interactive text ≥12px; body ≥12px.
+- Contrast: `muted` (#6A6050) on paper is the minimum for meaningful text; `faint` is decoration/metadata only.
 
-Additional mobile rules:
-
-- Year pills may scroll horizontally.
-- Treemap can reduce to a simpler stacked grid if labels would clip.
-- Every 100 GEL must remain a 10x10 grid when width allows; otherwise reduce cell size, not cell count.
-- Tables can horizontally scroll.
-- Controls must remain at least `30px` high, preferably `36px+`.
-
----
-
-## 15. Accessibility
-
-Rules:
-
-- All controls need accessible names.
-- Theme, side, view, mode, and measure controls must expose selected/pressed state.
-- SVG charts need `role="img"` and an accessible label.
-- Data shown only in SVG must also be available in table, tooltip, or accessible summary.
-- Focus states must be visible in both themes.
-- Do not rely on color alone; use labels, swatches, values, and row text.
-- Respect reduced motion preferences.
-- Keep chart labels at least `12px` on desktop.
-- Keep body text at least `14px`.
-
----
-
-## 16. Motion and Interaction
+## 14. Motion
 
 ```yaml
 motion:
   fast: "120ms"
-  base: "200ms"
-  slow: "260ms"
-  easing: "cubic-bezier(0.16, 1, 0.3, 1)"
+  base: "150ms"
+  easing: "ease"
 ```
 
-Rules:
+Only color, background, border-color, and opacity transition. No transforms, no lifts, no decorative loops. Nothing animates on load.
 
-- Theme switching should feel immediate.
-- Hover states may lift cards by `2px`.
-- Chart changes can fade or update lightly.
-- Avoid decorative animation loops.
-- Loading states should preserve layout size.
+## 15. Data and Trust Presentation
 
----
+Every analytical view exposes: active side, view, year/period, unit, measure, source note. Planned years get the `გეგმა` tag near the year context and a subtle marker in charts. When planned and actual both exist, actual wins in UI and CSV.
 
-## 17. Data and Trust Presentation
+CSV metadata columns: `year, category_id, parent_item_id, level, detail_label, official_institution_label, ka_label, en_label, amount_gel, basis, source_name, source_url_or_file, last_reviewed_at`.
 
-Design must make data context visible without adding heavy provenance panels in v1.
-
-Every public analytical view should expose:
-
-- Active side: expenditure or revenue.
-- Active view: multi-year or single-year.
-- Year or period.
-- Unit.
-- Measure.
-- Source/update context.
-- CSV export path where applicable.
-
-Minimal public source label:
-
-```text
-მონაცემები: გადამოწმებული ოფიციალური ბიუჯეტის დოკუმენტები
-ბოლო განახლება: YYYY-MM-DD
-```
-
-CSV export must include metadata columns:
-
-```text
-year
-category_id
-ka_label
-en_label
-amount_gel
-basis
-source_name
-source_url_or_file
-last_reviewed_at
-```
-
-If a year is planned, show a subtle planned badge or marker. If planned and actual both exist for the same item/year, actual wins in public UI and CSV.
-
----
-
-## 18. Implementation Tokens
-
-Use these CSS custom properties as the production baseline.
+## 16. Implementation Tokens
 
 ```css
 :root {
-  --primary: #0071e3;
-  --primary-active: #0077ed;
-  --teal: #30d5c8;
-  --yellow: #ffd60a;
-  --blue: #0a84ff;
-  --orange: #ff9f0a;
-  --violet: #bf5af2;
-  --slate: #8e8e93;
-  --font-ui: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Noto Sans Georgian", sans-serif;
-}
-
-[data-theme="light"] {
-  --canvas: #f5f5f7;
-  --surface: #ffffff;
-  --soft: #fafafa;
-  --strong: #e8e8ed;
-  --chart: #ffffff;
-  --hairline: #e8e8ed;
-  --hairline-soft: #f5f5f7;
-  --ink: #1d1d1f;
-  --body: #515154;
-  --mute: #86868b;
-  --grid: #f5f5f7;
-  --shadow: rgba(0, 0, 0, .04);
-  --on-primary: #ffffff;
-}
-
-[data-theme="night"] {
-  --canvas: #000000;
-  --surface: #1d1d1f;
-  --soft: #161617;
-  --strong: #323236;
-  --chart: #1d1d1f;
-  --hairline: #323236;
-  --hairline-soft: #2d2d2f;
-  --ink: #f5f5f7;
-  --body: #a1a1a6;
-  --mute: #86868b;
-  --grid: #161617;
-  --shadow: rgba(0, 0, 0, .6);
-  --on-primary: #ffffff;
+  --paper: #F7F2E9;
+  --tint: #F1EADC;
+  --tile: #FDFAF3;
+  --ink: #1E1B16;
+  --body: #55503F;
+  --muted: #6A6050;
+  --faint: #A89C88;
+  --hairline: #D9CFBE;
+  --hairline-soft: #E7DECF;
+  --row-border: #EDE4D3;
+  --control: #C9BEA9;
+  --accent: #B3402A;
+  --positive: #1F6E56;
+  --negative: #B3402A;
+  --font-display: 'Noto Serif Georgian', serif;
+  --font-ui: 'Noto Sans Georgian', 'Helvetica Neue', sans-serif;
+  --font-numeric: 'Geist Mono', monospace;
 }
 ```
 
----
-
-## 19. Production Do / Do Not
+## 17. Do / Do Not
 
 Do:
 
-- Use the confirmed multi-year and single-year HTML as visual references.
-- Keep Light and Night variants.
-- Keep the same layout structure across both themes.
-- Keep the single-year structure and Every 100 GEL sections stacked vertically.
-- Use only confirmed multi-year chart modes: line and table.
-- Keep `% წილი` as the confirmed measure toggle.
-- Reuse the visual system for revenue.
-- Keep category colors stable across all surfaces.
-- Preserve Georgian-first labels.
-- Keep CSV export visible in multi-year explorer.
+- Structure pages with the rule hierarchy; keep content directly on paper.
+- Set every data numeral in Geist Mono; every display value in Noto Serif Georgian.
+- Keep category colors stable across all surfaces via §4.2 tokens.
+- Keep the single measure toggle (`% წილი`) as the only pill.
+- Keep the analysis sections in the fixed order of §9.
+- Reuse the identical system for revenue.
+- Keep the CSV button visible and bound to active filters.
+- Show source/update context on every analytical view.
+- Derive every year range from loaded data.
 
 Do not:
 
-- Do not bring back unconfirmed visual variants.
-- Do not add bar or stacked chart modes to the confirmed multi-year UI without a new approved design.
-- Do not put the single-year structure section and Every 100 GEL side by side.
-- Do not add a list beside Every 100 GEL in v1.
-- Do not use the old petals section; use Budget Radar.
-- Do not create a separate revenue design direction.
-- Do not turn v1 into a broad data catalog.
-- Do not add clickable drilldown pages in v1.
-- Do not hide units, year, measure, source, or export context.
+- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only).
+- No white surfaces; no gradients anywhere.
+- No blue `#0071e3` or any v3.x Apple token; no night theme or theme toggle.
+- No dots/rounded-square swatches — bars only.
+- No bar/stacked chart modes; only `ხაზი` and `ცხრილი`.
+- No GDP-share measure; `% წილი` is share of the side total.
+- No official program codes in the series panel (names only).
+- No emoji, no decorative icons; the system is typographic (caret `▸/▾` and checkmark `✓` glyphs are part of the control language).
+- No drilldown anywhere.
 
----
+## 18. Design QA Checklist
 
-## 20. Design QA Checklist
-
-Before shipping UI that claims to follow this system, verify:
-
-1. Light and Night themes render the same layout.
-2. Multi-year default is line mode with nominal GEL.
-3. Multi-year only exposes `ხაზი` and `ცხრილი`.
-4. `% წილი` toggle switches to the confirmed share view.
-5. Series panel uses stable category colors.
-6. CSV button is visible and tied to active filters.
-7. Single-year headline cards are exactly four.
-8. Single-year structure section is full-width.
-9. Every 100 GEL is full-width below structure and renders 100 cells.
-10. Budget Radar appears before Budget Field.
-11. Full Ranking is last.
-12. Revenue reuses the same visual system.
-13. Georgian labels do not clip at desktop and mobile widths.
-14. Tables and SVG charts have accessible equivalents or labels.
-15. Source/update context is present.
-16. No deprecated visual direction remains in production UI.
+1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only).
+2. Header has the 2px ink rule; major sections open with 2px rules; nav has exactly three tabs.
+3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
+4. Explorer default: line mode, nominal GEL, full range, top-5 selection, 6-series chart limit with callout.
+5. Only `ხაზი` and `ცხრილი` modes exist; `% წილი` is the only pill.
+6. Swatches are 14×3px bars everywhere.
+7. Category colors match §4.2 on every surface.
+8. Analysis order: controls → year selector → 4 headlines → structure → 100 GEL → radar → field → ranking → source.
+9. Every 100 GEL renders exactly 100 cells, allocations sum to 100.
+10. Headline stats are exactly four, card-free.
+11. CSV exports the visible filtered dataset with metadata columns.
+12. Source note present with actual coverage ranges; planned years tagged `გეგმა` when planned data exists.
+13. Georgian labels don't clip at any breakpoint.
+14. Revenue reuses the identical system.
+15. Ministries grouping works in both explorer (with program expansion) and analysis (categories only).
+16. URL hash round-trips: reloading a deep link restores nav, grouping, mode, share, range, selection, and analysis year.
+17. No v3.x (Apple) or older terminal/neon styling anywhere.
