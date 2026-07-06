@@ -285,7 +285,8 @@ describe("main explorer data model", () => {
         level: "major_program",
         kaLabel: "General education",
         enLabel: "General education",
-        detailLabel: "32 02",
+        // Drill-down programs are surfaced by name only; the official code is not shown.
+        detailLabel: null,
       }),
     );
     expect(model.items.some((item) => item.id.startsWith("spending."))).toBe(false);

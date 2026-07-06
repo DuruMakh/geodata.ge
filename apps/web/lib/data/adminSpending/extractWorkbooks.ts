@@ -8,16 +8,13 @@ import { codeDepth, findLeafCodes, normalizeOfficialCode, parentCodeFor } from "
 import { parseTavi6Rows } from "../realExpenditure/parseTavi6Rows";
 import type { MatrixCell } from "../realExpenditure/parseTavi6Rows";
 import type { OfficialExpenditureRow } from "../realExpenditure/types";
+import { ANNUAL_REPORT_YEAR_EXTRACTORS } from "./extractAnnualReportYears";
+import { OLDER_MINISTRY_YEAR_EXTRACTORS } from "./extractOlderMinistryYears";
 
 const WORKBOOK_DIR = "../../docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025";
 const SOURCE_ID_BY_YEAR: Record<number, string> = Object.fromEntries(
   ADMIN_SPENDING_YEARS.map((year) => [year, `source.mof_${year}_programmatic_fact_actual`]),
 ) as Record<number, string>;
-
-function yearFromFileName(fileName: string): number | null {
-  const match = fileName.match(/^(20\d{2})/);
-  return match ? Number(match[1]) : null;
-}
 
 function adminNumericCell(value: MatrixCell): number | null {
   return numericCell(value, { stripWhitespace: true });
@@ -281,19 +278,24 @@ export function parseAdminWorkbookRows(input: ParseSheetInput): OfficialExpendit
 }
 
 export function extractAdminSpendingOfficialRows(warnings?: string[]): OfficialExpenditureRow[] {
-  const workbookDir = path.resolve(process.cwd(), WORKBOOK_DIR);
-  const adminYears = new Set(ADMIN_SPENDING_YEARS);
-  const workbookFiles = fs
-    .readdirSync(workbookDir)
-    .map((fileName) => ({ fileName, year: yearFromFileName(fileName) }))
-    .filter((source): source is { fileName: string; year: number } => {
-      return Boolean(source.year && adminYears.has(source.year) && /\.xlsx$/i.test(source.fileName));
-    })
-    .sort((a, b) => a.year - b.year);
+  return [...ADMIN_SPENDING_YEARS].sort((a, b) => a - b).flatMap((year) => {
+    // 2005 and 2014 do not follow the generic "<year>-fact.xlsx, tavi 6" shape (2005 is
+    // AcadNusx ministry-totals with a bundled Finance line; 2014's actuals live in the 2015
+    // workbook). They have dedicated extractors.
+    // Group C years come from the official annual-execution-report PDFs (pre-parsed to a
+    // staging CSV), not from a <year>-fact.xlsx workbook.
+    const annualReportExtractor = ANNUAL_REPORT_YEAR_EXTRACTORS[year];
+    if (annualReportExtractor) return annualReportExtractor();
 
-  return workbookFiles.flatMap(({ fileName, year }) => {
+    const olderExtractor = OLDER_MINISTRY_YEAR_EXTRACTORS[year];
+    if (olderExtractor) return olderExtractor();
+
+    const fileName = `${year}-fact.xlsx`;
     const workbookPath = path.join(WORKBOOK_DIR, fileName);
     const workbookFile = path.resolve(process.cwd(), workbookPath);
+    if (!fs.existsSync(workbookFile)) {
+      throw new Error(`Missing admin spending workbook for ${year}: ${fileName}`);
+    }
     const workbook = XLSX.readFile(workbookFile, { cellDates: false });
     const sheetName = pickSheetName(workbook, {
       fallbackPattern: (normalized) => normalized.includes("tavi 6") || /(^|\s)vi(\s|$)/.test(normalized),

@@ -33,6 +33,7 @@
     "data:generate-final-2024-expenditure": "tsx scripts/generate-final-2025-expenditure-data.ts --year 2024",
     "data:extract-revenue": "tsx scripts/extract-real-revenue.ts",
     "data:generate-revenue-facts": "tsx scripts/generate-real-revenue-facts.ts",
+    "data:extract-annual-reports": "tsx scripts/extract-annual-report-pdf.ts",
     "data:generate-admin-spending": "tsx scripts/generate-admin-spending-data.ts",
     "data:compose-budget-facts": "tsx scripts/compose-budget-facts.ts",
     "data:import": "tsx scripts/import-budget-facts.ts",
