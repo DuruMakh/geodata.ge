@@ -18,6 +18,17 @@ function clampYearToCoverage(year: number, years: number[]): number {
   return Math.min(Math.max(year, minYear), maxYear);
 }
 
+// Snap to the nearest year that actually has coverage. Used when switching side or
+// grouping, so a range handle never lands on a year the new dataset does not cover
+// (e.g. keeping 2004 when moving to the ministries grouping, which starts at 2013).
+function snapYearToCoverage(year: number, years: number[]): number {
+  if (years.length === 0 || years.includes(year)) return year;
+  const clamped = clampYearToCoverage(year, years);
+  return years.reduce((best, candidate) =>
+    Math.abs(candidate - clamped) < Math.abs(best - clamped) ? candidate : best,
+  years[0]);
+}
+
 export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
   const yearsBySide = useMemo(
     () => ({
@@ -26,6 +37,18 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
     }),
     [facts],
   );
+  // The ministries grouping has its own coverage (from the admin-spending facts),
+  // which differs from the functional-expenditure years — e.g. it includes 2013 but
+  // not the total-only years 2004-2005. Its year strip must reflect that, not the
+  // functional years.
+  const adminYears = useMemo(
+    () => Array.from(new Set(adminFacts.map((fact) => fact.year))).sort((a, b) => a - b),
+    [adminFacts],
+  );
+  const expenditureYearsFor = (grouping: ExpenditureGrouping) =>
+    grouping === "ministries" ? adminYears : yearsBySide.expenditure;
+  const yearsFor = (nextSide: ExplorerSide, grouping: ExpenditureGrouping) =>
+    nextSide === "expenditure" ? expenditureYearsFor(grouping) : yearsBySide.revenue;
   const initialStartYear = yearsBySide.expenditure[0] ?? 2025;
   const initialEndYear = yearsBySide.expenditure.at(-1) ?? initialStartYear;
   const [side, setSide] = useState<ExplorerSide>("expenditure");
@@ -42,17 +65,17 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
     ministries: getDefaultSelection("expenditure", facts, "ministries", adminFacts),
   });
   const [revenueSelection, setRevenueSelection] = useState<string[]>(getDefaultSelection("revenue", facts));
-  const sideYears = yearsBySide[side];
+  const sideYears = yearsFor(side, expenditureGrouping);
   const selectedIds = side === "expenditure" ? expenditureSelections[expenditureGrouping] : revenueSelection;
   const measure: MeasureMode = shareModeActive ? "share_of_total" : "nominal";
 
   function handleSideChange(nextSide: ExplorerSide) {
-    const nextYears = yearsBySide[nextSide];
+    const nextYears = yearsFor(nextSide, expenditureGrouping);
     const latestYear = nextYears.at(-1);
 
     setSide(nextSide);
-    setStartYear((current) => clampYearToCoverage(current, nextYears));
-    setEndYear((current) => clampYearToCoverage(current, nextYears));
+    setStartYear((current) => snapYearToCoverage(current, nextYears));
+    setEndYear((current) => snapYearToCoverage(current, nextYears));
     setSingleYear((current) => (nextYears.includes(current) || latestYear === undefined ? current : latestYear));
     setLimitMessage(null);
   }
@@ -75,6 +98,16 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
   function handleExpenditureGroupingChange(grouping: ExpenditureGrouping) {
     setExpenditureGrouping(grouping);
     setLimitMessage(null);
+
+    if (side !== "expenditure") return;
+    // Re-anchor the selected range onto the new grouping's coverage so the strip and
+    // chart show a year the grouping actually has (fields includes 2004-2005 + 2017+;
+    // ministries includes 2013 + 2017+).
+    const nextYears = expenditureYearsFor(grouping);
+    const latestYear = nextYears.at(-1);
+    setStartYear((current) => snapYearToCoverage(current, nextYears));
+    setEndYear((current) => snapYearToCoverage(current, nextYears));
+    setSingleYear((current) => (nextYears.includes(current) || latestYear === undefined ? current : latestYear));
   }
 
   function handleToggle(itemId: string) {

@@ -284,7 +284,10 @@ function adminFactForModel(fact: AdminSpendingFact): ModelFact {
     sourceId: fact.sourceId,
     kaLabel: fact.level === "major_program" ? label : null,
     enLabel: fact.level === "major_program" ? label : null,
-    detailLabel: fact.level === "major_program" ? fact.officialCode : null,
+    // Drill-down programs are shown by NAME only — the official tavi-VI code (which fragments
+    // across reorganizations, e.g. sport development moving 39 02→33 05→32 12→…) is intentionally
+    // not surfaced in the explorer. officialCode stays in the facts CSV for provenance.
+    detailLabel: null,
     officialInstitutionLabel: fact.level === "major_program" ? fact.officialInstitutionLabelKa : null,
   };
 }

@@ -6,6 +6,7 @@ import {
   buildAdminSpendingReport,
   generateAdminSpendingFacts,
 } from "../../lib/data/adminSpending/generateAdminSpendingFacts";
+import { classifyAdminSpendingCategory } from "../../lib/data/adminSpending/categories";
 import { extractAdminSpendingOfficialRows } from "../../lib/data/adminSpending/extractWorkbooks";
 import { loadAdminSpendingFacts } from "../../lib/data/adminSpending/importAdminSpendingFacts";
 import { ADMIN_SPENDING_YEARS } from "../../lib/data/coverage";
@@ -241,7 +242,9 @@ describe("admin spending facts", () => {
         fact.parentItemId === "admin_spending.education_science_youth",
     );
 
-    expect(educationFacts.map((fact) => fact.year)).toEqual([2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
+    // Code 32 02 ("ზოგადი განათლება") is the same general-education program across the
+    // drill-down years (2012-2014, 2016, 2017-2025), so they join one identity.
+    expect(educationFacts.map((fact) => fact.year)).toEqual([2012, 2013, 2014, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
     expect(new Set(educationFacts.map((fact) => fact.itemId)).size).toBe(1);
 
     const yearsByItemId = (officialCode: string) => {
@@ -276,6 +279,36 @@ describe("admin spending facts", () => {
     expect(programFacts.every((fact) => /^[a-z0-9_.]+$/.test(fact.itemId))).toBe(true);
   }, 30_000);
 
+  it("shows only programs that survive into the 2017-2025 series (drops abolished programs)", () => {
+    const programFacts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
+      (fact) => fact.level === "major_program",
+    );
+    const yearsForCode = (officialCode: string) =>
+      programFacts
+        .filter((fact) => fact.officialCode === officialCode)
+        .map((fact) => fact.year)
+        .sort((a, b) => a - b);
+
+    // Reused codes: the 2017+ program keeps only its own years; the different 2013
+    // program is split off and dropped, so no 2013 figure contaminates it.
+    expect(yearsForCode("25 05")).not.toContain(2013); // 2013 IDP support vs 2017+ solid waste
+    expect(yearsForCode("24 07")).not.toContain(2013); // 2013 France aid vs 2017+ entrepreneurship
+    expect(yearsForCode("24 06")).not.toContain(2013); // 2013 aviation obligations vs 2017+ state property
+
+    // Programs that never existed in 2017-2025 (institution 51 common-state payments,
+    // e.g. debt service) are absent from the drill-down entirely.
+    expect(programFacts.some((fact) => fact.officialCode?.startsWith("51 "))).toBe(false);
+
+    // Every surfaced program identity appears in at least one 2017-2025 year.
+    const yearsByItem = new Map<string, number[]>();
+    for (const fact of programFacts) {
+      yearsByItem.set(fact.itemId, [...(yearsByItem.get(fact.itemId) ?? []), fact.year]);
+    }
+    for (const years of yearsByItem.values()) {
+      expect(years.some((year) => year >= 2017)).toBe(true);
+    }
+  }, 30_000);
+
   it("excludes a program series that never reaches 100M GEL", () => {
     const rows = [programRow(2024, "32 03", "სკოლები", 80_000), programRow(2025, "32 03", "სკოლები", 99_999)];
 
@@ -283,6 +316,162 @@ describe("admin spending facts", () => {
 
     expect(programFacts).toHaveLength(0);
   });
+
+  it("never promotes a modern program identity into the drill-down via a pre-2017 amount", () => {
+    // Regression guard: qualifyingIds must be measured over modern (2017+) rows only, so a large
+    // backfill row (e.g. an abolished 2012 program) cannot push a below-threshold 2017-2025
+    // program that happens to share its code into the major-program set. Every surfaced identity
+    // must reach the 100M threshold within its own 2017-2025 rows.
+    const programFacts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
+      (fact) => fact.level === "major_program",
+    );
+    const modernMaxByItem = new Map<string, number>();
+    for (const fact of programFacts) {
+      if (fact.year >= 2017) modernMaxByItem.set(fact.itemId, Math.max(modernMaxByItem.get(fact.itemId) ?? 0, fact.amountGel));
+    }
+    for (const fact of programFacts) {
+      expect(modernMaxByItem.get(fact.itemId) ?? 0).toBeGreaterThanOrEqual(100_000_000);
+    }
+    // The specific codes the review caught leaking: they never reach 100M in 2017-2025, so they
+    // must not appear at all.
+    for (const code of ["32 05", "36 02", "37 01"]) {
+      expect(programFacts.some((fact) => fact.officialCode === code)).toBe(false);
+    }
+  }, 30_000);
+
+  it("de-merges Sport and Culture out of the 2018-2024 combined ministries (no series holes)", () => {
+    const facts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
+      (fact) => fact.level === "admin_category",
+    );
+    const cat = (year: number, id: string) =>
+      facts.find((f) => f.year === year && f.itemId === `admin_spending.${id}`)?.amountGel ?? 0;
+
+    // Sport was folded into the combined Culture+Sport ministry (2018, 2022-2024) and the
+    // Education mega-ministry (2019-2021); the program-level split keeps the series continuous.
+    for (const year of [2018, 2019, 2020, 2021, 2022, 2023, 2024]) {
+      expect(cat(year, "sport")).toBeGreaterThan(0);
+    }
+    // Culture was additionally hidden inside the 2019-2021 education mega-ministry.
+    for (const year of [2019, 2020, 2021]) {
+      expect(cat(year, "culture")).toBeGreaterThan(0);
+    }
+    // Pinned composition: 2021 sport = the sport-development program + sport infrastructure only.
+    // Crucially it does NOT include the school-student-transport program (17.2M): "ტრანსპორტ"
+    // contains the substring "სპორტ", and this value would be ~202M if that leaked in.
+    expect(cat(2021, "sport")).toBe(184_730_700);
+    expect(cat(2019, "sport")).toBe(131_451_700);
+  }, 30_000);
+
+  it("never routes the school-transport program to sport (ტრანსპორტ contains the substring სპორტ)", () => {
+    // A leaf under the 2019-2021 Education mega-ministry (its name carries "სპორტ", so the
+    // program-level split is active). "ტრანსპორტ" contains "სპორტ" as a substring, so without the
+    // guard this school-student-transport program would leak into Sport instead of Education.
+    const megaMinistry = "საქართველოს განათლების, მეცნიერების, კულტურისა და სპორტის სამინისტრო";
+    const transportRow = officialRow(
+      2021,
+      "32 02 10",
+      "საჯარო სკოლის მოსწავლეების ტრანსპორტით უზრუნველყოფა",
+      17_200,
+      { institutionLabelKa: megaMinistry, isLeafCode: true, depth: 3 },
+    );
+    expect(classifyAdminSpendingCategory(transportRow)).toBe("admin_spending.education_science_youth");
+
+    // A genuine sport-development program under the same ministry DOES route to Sport.
+    const sportRow = officialRow(
+      2021,
+      "32 11",
+      "მასობრივი და მაღალი მიღწევების სპორტის განვითარება და პოპულარიზაცია",
+      137_000,
+      { institutionLabelKa: megaMinistry, isLeafCode: true, depth: 2 },
+    );
+    expect(classifyAdminSpendingCategory(sportRow)).toBe("admin_spending.sport");
+  });
+
+  it("splits recycled program codes so no pre-2017 legacy program leaks into a modern drill-down series", () => {
+    const programFacts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
+      (fact) => fact.level === "major_program",
+    );
+    const yearsFor = (code: string) =>
+      programFacts.filter((f) => f.officialCode === code).map((f) => f.year).sort((a, b) => a - b);
+
+    // Fully-recycled codes: the entire pre-2017 program is unrelated to the 2017+ program, so no
+    // pre-2017 year may appear in the (modern) drill-down series for that code.
+    for (const code of ["24 06", "24 07", "25 05"]) {
+      expect(yearsFor(code).filter((y) => y < 2017)).toEqual([]);
+    }
+    // Partially-recycled codes: only the genuinely-different early years are dropped; the years
+    // that are a rename of the modern program stay in the series.
+    expect(yearsFor("30 06")).not.toContain(2012); // archive digitization dropped; 2016 civil-security kept
+    expect(yearsFor("32 07")).not.toContain(2016); // Millennium Challenge dropped
+    expect(yearsFor("36 03")).not.toContain(2012); // high-mountain municipal dropped
+    expect(yearsFor("36 03")).not.toContain(2013); // general energy-infra dropped
+    expect(yearsFor("36 03")).toContain(2016); // system-critical electricity transmission (rename) kept
+
+    // General coherence guard: a drill-down series must be ONE program. Any identity whose member
+    // facts carry more than one officialLabelKa must be a KNOWN legitimate rename (same program,
+    // evolved name) — every other mixed-label identity is a code-reuse leak. Update this allowlist
+    // only when a real rename is added; a NEW code appearing here is a bug, not a test to relax.
+    const KNOWN_RENAME_CODES = new Set([
+      "24 01", "24 15", "24 17", "25 04", "25 07", "26 01", "27 01", "27 05", "29 01", "29 02",
+      "29 08", "29 09", "30 06", "32 02", "32 04", "32 07", "35 02", "35 03", "56 04", "56 13",
+    ]);
+    const labelsByItem = new Map<string, Set<string>>();
+    const codeByItem = new Map<string, string>();
+    for (const fact of programFacts) {
+      const labels = labelsByItem.get(fact.itemId) ?? new Set<string>();
+      labels.add(fact.officialLabelKa ?? "");
+      labelsByItem.set(fact.itemId, labels);
+      codeByItem.set(fact.itemId, fact.officialCode ?? "");
+    }
+    const unexpectedMixed = [...labelsByItem.entries()]
+      .filter(([itemId, labels]) => labels.size > 1 && !KNOWN_RENAME_CODES.has(codeByItem.get(itemId) ?? ""))
+      .map(([itemId]) => codeByItem.get(itemId));
+    expect(unexpectedMixed).toEqual([]);
+  }, 30_000);
+
+  it("splits recycled program codes so no pre-2017 program leaks into a modern drill-down series", () => {
+    // A drill-down series must be ONE program. When a tavi-VI code was recycled for a different
+    // 2017+ program, its pre-2017 rows must be split into a separate (dropped) identity, not merged
+    // into the modern series. This guards the class of bug the 2026-07-06 validation caught (6 codes
+    // leaking ~196M GEL of unrelated pre-2017 spend). Codes whose pre-2017 rows are a legitimate
+    // RENAME of the modern program (same program, evolved name) are allowlisted; every other
+    // boundary-spanning identity must carry a pre-2017 label identical to a modern-year label.
+    const PRE2017_RENAME_ALLOWLIST = new Set([
+      "24 01", "25 04", "26 01", "27 01", "29 01", "29 02", "32 02", "32 04", "35 02", "35 03",
+    ]);
+    const programFacts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
+      (fact) => fact.level === "major_program",
+    );
+    const byItem = new Map<string, { code: string; pre: Set<string>; modern: Set<string> }>();
+    for (const fact of programFacts) {
+      const entry = byItem.get(fact.itemId) ?? { code: fact.officialCode ?? "", pre: new Set<string>(), modern: new Set<string>() };
+      (fact.year <= 2016 ? entry.pre : entry.modern).add(fact.officialLabelKa ?? "");
+      byItem.set(fact.itemId, entry);
+    }
+    const leaks: string[] = [];
+    for (const entry of byItem.values()) {
+      if (entry.pre.size === 0 || entry.modern.size === 0) continue; // only identities spanning 2016/2017
+      if (PRE2017_RENAME_ALLOWLIST.has(entry.code)) continue;
+      for (const preLabel of entry.pre) {
+        if (!entry.modern.has(preLabel)) leaks.push(`${entry.code}: pre-2017 "${preLabel.slice(0, 34)}" absent from modern years`);
+      }
+    }
+    expect(leaks).toEqual([]);
+  }, 30_000);
+
+  it("routes the pre-2014 Corrections/Penitentiary ministry to justice (not other_costs)", () => {
+    const categoryByYear = (year: number) => {
+      const facts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
+        (fact) => fact.level === "admin_category" && fact.year === year,
+      );
+      return Object.fromEntries(facts.map((fact) => [fact.itemId, fact.amountGel]));
+    };
+    // The 2009-2013 ministry label uses "სასჯელაღსრულების" (no trailing "ა"); justice must still
+    // include its ~110-160M so it is not stranded in other_costs.
+    for (const year of [2009, 2011, 2013]) {
+      expect(categoryByYear(year)["admin_spending.justice"]).toBeGreaterThan(150_000_000);
+    }
+  }, 30_000);
 
   it("does not merge unrelated programs that reused the same official code", () => {
     const rows = [

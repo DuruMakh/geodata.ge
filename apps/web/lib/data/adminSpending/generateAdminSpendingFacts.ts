@@ -5,6 +5,12 @@ import type { AdminSpendingFact, AdminSpendingReport } from "./types";
 
 export const MAJOR_PROGRAM_THRESHOLD_GEL = 100_000_000;
 export const ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL = 1_000;
+// The program drill-down only shows programs that still exist in the confirmed
+// 2017-2025 series. An older-year figure appears only when it belongs to a program
+// that survives to 2017+ (same code / slight rename → shared identity); programs
+// abolished before 2017 are dropped from the drill-down (their spend remains in the
+// administrative-category totals, which aggregate leaf rows independently).
+export const MAJOR_PROGRAM_MODERN_MIN_YEAR = 2017;
 
 function amountGel(row: OfficialExpenditureRow): number {
   return Math.round(row.actualThousandGel * 1000);
@@ -14,6 +20,13 @@ function shortHash(value: string): string {
   return createHash("sha1").update(value).digest("hex").slice(0, 8);
 }
 
+// An era only applies when the row classifies into its parentItemId (see programItemId). Note the
+// 2018-2024 program-level Sport/Culture de-merge in classifyAdminSpendingCategory (categories.ts):
+// a few codes here list an education/culture parent for years whose programs that split now routes
+// to Sport or Culture instead (e.g. 32 11 / 32 12 sport-development in 2019-2021, 33 07 in
+// 2022-2024). For those rows the era simply no longer matches and the category split does the
+// separating; the entries are kept because their other years (and the synthetic-row era tests) still
+// rely on them. Real-data grouping is unaffected — verified in the drill-down.
 const PROGRAM_SEMANTIC_ERAS = [
   {
     code: "06 04",
@@ -358,6 +371,90 @@ const PROGRAM_SEMANTIC_ERAS = [
     endYear: 2024,
     key: "funded_pension_cofinancing",
   },
+  // Pre-2017 code reuses: these program codes were later recycled for a DIFFERENT 2017+ program.
+  // Give the pre-2017 program its own identity so its amount does not merge into (and contaminate)
+  // the modern program; the drill-down filter below then drops it, because a program that no longer
+  // exists under this code in 2017-2025 is not shown. Ranges cover ONLY each code's genuinely-
+  // recycled pre-2017 years (the backfill's earliest organizational-coding year is 2012). Where a
+  // pre-2017 year is a genuine RENAME of the modern program (same program, evolved name), it is
+  // intentionally left OUT so it stays merged into the continuous series — e.g. 30 06 2014/2016
+  // (civil-security) and 36 03 2014/2016 (electricity transmission) match their modern program and
+  // are NOT listed here, while their earlier truly-different years are.
+  {
+    code: "24 06",
+    parentItemId: "admin_spending.economy_sustainable_development",
+    startYear: 2012,
+    endYear: 2016,
+    key: "aviation_treaty_obligations_legacy",
+  },
+  {
+    code: "24 07",
+    parentItemId: "admin_spending.economy_sustainable_development",
+    startYear: 2012,
+    endYear: 2016,
+    key: "france_commodity_assistance_legacy",
+  },
+  {
+    code: "25 05",
+    parentItemId: "admin_spending.regional_development_infrastructure",
+    startYear: 2012,
+    endYear: 2016,
+    key: "displaced_person_support_legacy",
+  },
+  {
+    // 2012 archive-fund digitization; 2017+ (and already 2014/2016) code 30 06 is civil-security,
+    // so only 2012 is split off and dropped.
+    code: "30 06",
+    parentItemId: "admin_spending.internal_affairs",
+    startYear: 2012,
+    endYear: 2012,
+    key: "archive_digitization_legacy",
+  },
+  {
+    // 2016 Millennium Challenge Georgia (a one-off); 2017+ code 32 07 is education/science
+    // infrastructure development.
+    code: "32 07",
+    parentItemId: "admin_spending.education_science_youth",
+    startYear: 2016,
+    endYear: 2016,
+    key: "millennium_challenge_infra_legacy",
+  },
+  {
+    // 2012 high-mountain municipal support + 2013 general energy-infrastructure construction;
+    // 2017+ (and already 2014/2016) code 36 03 is system-critical electricity transmission, left
+    // merged, so only 2012-2013 are split off.
+    code: "36 03",
+    parentItemId: "admin_spending.economy_sustainable_development",
+    startYear: 2012,
+    endYear: 2013,
+    key: "energy_infrastructure_legacy",
+  },
+  {
+    // 2013-2014: defence scientific-research support; 2017+ code 29 05 is defence infrastructure.
+    code: "29 05",
+    parentItemId: "admin_spending.defence",
+    startYear: 2013,
+    endYear: 2016,
+    key: "defence_scientific_research_legacy",
+  },
+  {
+    // 2013-2014: educational/scientific-institution infrastructure; 2017+ code 32 05 is science
+    // and scientific-research support.
+    code: "32 05",
+    parentItemId: "admin_spending.education_science_youth",
+    startYear: 2013,
+    endYear: 2016,
+    key: "education_institution_infrastructure_legacy",
+  },
+  {
+    // 2013-2014: criminal-justice-system reform (a large one-off, 131M in 2014) under the
+    // penitentiary ministry; 2017+ code 27 02 (still penitentiary) is the small probation system.
+    code: "27 02",
+    parentItemId: "admin_spending.justice",
+    startYear: 2013,
+    endYear: 2016,
+    key: "criminal_justice_reform_legacy",
+  },
 ] as const;
 
 function programItemId(row: OfficialExpenditureRow): string {
@@ -430,8 +527,17 @@ export function generateAdminSpendingFacts(rows: OfficialExpenditureRow[]): Admi
   }
 
   const programs = programRows(rows);
+  // A program identity qualifies for the drill-down only if it reaches the threshold in a
+  // MODERN (2017+) year. Measuring the threshold over modern years alone (rather than over all
+  // years) is what keeps the confirmed 2017-2025 baseline unchanged: a pre-2017 backfill row
+  // whose code is shared with a below-threshold modern program must NOT promote that modern
+  // identity into the major-program set. This also subsumes the old "present in 2017+" filter —
+  // any qualifying identity necessarily has a modern row — so abolished pre-2017 programs
+  // (their identity never reaches the threshold in a modern year) are dropped automatically.
   const qualifyingIds = new Set(
-    programs.filter((row) => amountGel(row) >= MAJOR_PROGRAM_THRESHOLD_GEL).map((row) => programItemId(row)),
+    programs
+      .filter((row) => row.year >= MAJOR_PROGRAM_MODERN_MIN_YEAR && amountGel(row) >= MAJOR_PROGRAM_THRESHOLD_GEL)
+      .map((row) => programItemId(row)),
   );
 
   for (const row of programs) {

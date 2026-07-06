@@ -213,10 +213,11 @@ test("expenditure multi-year grouping switches to nested ministry programs", asy
 
   const firstProgram = seriesSelector.locator('[data-level="major_program"]').first();
   const parentId = await firstProgram.getAttribute("data-parent-id");
-  const officialCode = (await firstProgram.locator("span").nth(3).textContent())?.trim();
-  if (!parentId || !officialCode) throw new Error("Expected the first program to expose parent and code metadata");
+  // Drill-down programs are shown by NAME only (no official code). Search by the program name.
+  const programName = (await firstProgram.locator("span").nth(2).textContent())?.trim();
+  if (!parentId || !programName) throw new Error("Expected the first program to expose parent and name metadata");
 
-  await page.getByTestId("series-search").fill(officialCode);
+  await page.getByTestId("series-search").fill(programName);
   await expect(seriesSelector.locator(`[data-parent-id="${parentId}"]`).first()).toBeVisible();
   await expect(seriesSelector.locator(`[data-level="admin_category"]`).filter({ hasText: parentId })).toHaveCount(1);
 
