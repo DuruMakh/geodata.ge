@@ -64,7 +64,6 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
   const [ranges, setRanges] = useState<Partial<Record<ExplorerScope, RangePatch>>>({});
   const [selections, setSelections] = useState<Partial<Record<ExplorerScope, string[]>>>({});
   const [expandedMinistries, setExpandedMinistries] = useState<string[]>([]);
-  const [query, setQuery] = useState("");
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
   const [analysisSide, setAnalysisSide] = useState<"expenditure" | "revenue">("expenditure");
   const [analysisGrouping, setAnalysisGrouping] = useState<ExpenditureGrouping>("fields");
@@ -100,20 +99,22 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
   const selectedIds = selections[scope] ?? defaultSelections[scope];
 
   function toggleSeries(itemId: string) {
+    // The limit check reads render-time state (good enough for the message), but
+    // the write derives from the updater's own argument so rapid toggles in one
+    // render window can't overwrite each other with a stale array.
     const current = selections[scope] ?? defaultSelections[scope];
-
-    if (current.includes(itemId)) {
-      setSelections((existing) => ({ ...existing, [scope]: current.filter((id) => id !== itemId) }));
-      setLimitMessage(null);
-      return;
-    }
-
-    if (chartMode !== "table" && current.length >= MAX_CHART_SERIES) {
+    if (!current.includes(itemId) && chartMode !== "table" && current.length >= MAX_CHART_SERIES) {
       setLimitMessage(SERIES_LIMIT_MESSAGE);
       return;
     }
 
-    setSelections((existing) => ({ ...existing, [scope]: [...current, itemId] }));
+    setSelections((existing) => {
+      const fresh = existing[scope] ?? defaultSelections[scope];
+      return {
+        ...existing,
+        [scope]: fresh.includes(itemId) ? fresh.filter((id) => id !== itemId) : [...fresh, itemId],
+      };
+    });
     setLimitMessage(null);
   }
 
@@ -130,7 +131,6 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
 
   function handleGroupingChange(nextGrouping: ExpenditureGrouping) {
     setGrouping(nextGrouping);
-    setQuery("");
     setLimitMessage(null);
   }
 
@@ -162,6 +162,20 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
       // ids are ALL unknown (renamed taxonomy, typos) falls back to the default.
       if (knownIds.length > 0 || parsed.selection.ids.length === 0) {
         setSelections((current) => ({ ...current, [parsed.selection!.scope]: knownIds }));
+      }
+      // A restored program selection must be visible in the panel: expand the
+      // parents of every selected major program, or the recipient sees a charted
+      // series with no checked row anywhere.
+      if (parsed.selection.scope === "ministries") {
+        const known = new Set(knownIds);
+        const parents = Array.from(
+          new Set(
+            adminFacts
+              .filter((fact) => fact.level === "major_program" && fact.parentItemId !== null && known.has(fact.itemId))
+              .map((fact) => fact.parentItemId as string),
+          ),
+        );
+        if (parents.length > 0) setExpandedMinistries(parents);
       }
     }
     // The hook state is the source of truth after mount; the hash is write-only from here.
@@ -208,8 +222,6 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
     range: activeRange,
     setRange,
     selectedIds,
-    query,
-    setQuery,
     limitMessage,
     expandedMinistries,
     toggleMinistryExpanded,

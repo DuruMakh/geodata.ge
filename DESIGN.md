@@ -305,7 +305,7 @@ Row: 1px `row-border` bottom border; hover/selected bg `tint`; a 2px accent left
 
 ### 7.7 Search
 
-Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. Placeholder in ministries grouping: `ძებნა — უწყება ან პროგრამა`. A query with no matches shows `0 შედეგი — შეცვალე საძიებო ტექსტი.` While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs.
+Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. Placeholder in ministries grouping: `ძებნა — უწყება ან პროგრამა`. A query with no matches shows `0 შედეგი — შეცვალე საძიებო ტექსტი.` While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs (their caret is locked open); a ministry matched by name still honors its caret and expands to all of its programs. The query is panel-local state and resets on ANY scope switch — nav (ხარჯები↔შემოსავლები) and grouping alike; typing must not re-render the chart.
 
 ### 7.8 CSV Button
 
@@ -320,10 +320,16 @@ Tint bg, `2px accent` left border, sans 11.5–12.5px, `body` color, max-width 5
 Sans 12px, muted, plain paragraph under the primary panel and at the end of the analysis view. Pattern:
 
 ```text
-მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო). <coverage note> · 12-თვიანი ფაქტობრივი შესრულება. ბოლო განახლება: YYYY-MM-DD.
+მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო). <coverage note> · 12-თვიანი ფაქტობრივი შესრულება. <classification note> ბოლო განახლება: YYYY-MM-DD.
 ```
 
 Coverage notes state actual loaded ranges (e.g. `ხარჯვითი მონაცემები: 2005–2025`, `შემოსავლების მონაცემები: 2005–2025`).
+
+The classification note is a required data-trust disclosure — year totals are official, but the category split is GeoData's own mapping and must say so on every expenditure surface:
+
+- fields: `კატეგორიებად დაყოფა GeoData-ის კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით.`
+- ministries: `უწყებრივი დაჯგუფება GeoData-ისაა ბიუჯეტის შესრულების ანგარიშების პროგრამული კლასიფიკაციის მიხედვით.`
+- revenue: none (revenue categories are the official budget-classification lines).
 
 ### 7.11 KPI Block
 
@@ -347,7 +353,7 @@ Confirmed source: `GeoData Platform - Editorial v2.dc.html` (Explorer + Indicato
 
 ### 8.1 Defaults
 
-Side: expenditure. Grouping: fields. Mode: line. Measure: nominal GEL. Range: full available per scope. Selection: **top 5 categories by latest-year value** per scope (fields, ministries, and revenue each keep their own selection and range). Chart series limit: 6 (table mode unlimited; exceeding shows the callout). The derived total is not a selectable series — totals appear in the table `სულ` row, deck line, and hero KPI.
+Side: expenditure. Grouping: fields. Mode: line. Measure: nominal GEL. Range: full available per scope. Selection: **top 5 categories by latest-year value** per scope (fields, ministries, and revenue each keep their own selection and range). Chart series limit: 6 (table mode unlimited). The limit holds on every path into line mode: toggling past it shows the limit callout, and a larger selection arriving from table mode or a shared hash keeps the full selection but draws only the first 6 series with the callout `ხაზის რეჟიმში ნაჩვენებია პირველი 6 სერია…`. The derived total is not a selectable series — totals appear in the table `სულ` row, deck line, and hero KPI.
 
 ### 8.2 Layout
 
@@ -362,7 +368,14 @@ Left: mode tabs + unit note + measure pill row → chart or table → range stri
 
 ### 8.3 Line Chart
 
-SVG on paper (no plot frame), viewBox 920×320: grid lines `hairline-soft`, baseline `1px ink` at zero, 1px `hairline` y-axis line; axis labels mono 10px muted (y labels right-aligned outside the plot, ~62px left padding); year labels thinned to ≤12 (first anchored start, last anchored end); series polylines 2.2px round-joined with a 3.5px dot on the final point only; no in-plot direct labels. Hover/pointer: 1px `control` vertical guide, ring markers (paper fill, 2px series stroke), tooltip (tile bg, 1px hairline border, radius 3, tooltip shadow, mono year + swatch/label/value rows; flips side past 60% width). `role="img"` + Georgian aria-label.
+SVG on paper (no plot frame), viewBox 920×320: grid lines `hairline-soft`, `1px ink` line at zero, 1px `hairline` y-axis line; axis labels mono 11px muted (y labels right-aligned outside the plot, ~62px left padding); year labels thinned to ≤12 (first anchored start, last anchored end); series polylines 2.2px round-joined with a 3.5px dot on the final point only; no in-plot direct labels. Hover/pointer: 1px `control` vertical guide, ring markers (paper fill, 2px series stroke), tooltip (tile bg, 1px hairline border, radius 3, tooltip shadow, mono year + swatch/label/value rows; flips side past 60% width). `role="img"` + Georgian aria-label. SVG text sets fonts via `style` (the `font-family` presentation attribute does not resolve `var()`).
+
+Data-reality rules (the prototype's snapshot had none of these; production data does):
+
+- **Negative values** (e.g. `revenue.other_taxes` 2019–2020) extend the y-domain below zero: both bounds snap to one shared gridline step so 0 always sits on a gridline; the ink line stays at zero, not at the plot floor.
+- **Interior gaps** (e.g. programs with no 2015 facts) split the polyline into segments — never bridge a missing year; an isolated point renders as a small dot.
+- **Empty range**: a non-empty selection with zero points in the active range shows the callout `არჩეული სერიებისთვის ამ დიაპაზონში მონაცემები არ არის…` instead of a fabricated axis (table mode shows the same callout instead of a total-only table).
+- **Narrow screens**: the chart scrolls horizontally inside its own container (min-width 720px) instead of scaling its type below the §13 floor; hover state is clamped when the years array shrinks.
 
 ### 8.4 Table Mode
 
@@ -370,9 +383,9 @@ Columns: `<first col> | years… | ცვლილება | წილი <end-
 
 ### 8.5 Below-Chart Sections (`ძირითადი ინდიკატორები`, order fixed)
 
-1. Hero KPI (`პერიოდის ცვლილება`, §7.12) + three side KPIs (`ყველაზე დიდი ზრდა`, `ყველაზე ნელი ზრდა`, `ყველაზე დიდი წილი`) in a `1.35fr | 1fr` grid split by a hairline.
+1. Hero KPI (`პერიოდის ცვლილება`, §7.12) + three side KPIs (`ყველაზე დიდი ზრდა`, `ყველაზე ნელი ზრდა`, `ყველაზე დიდი წილი`) in a `1.35fr | 1fr` grid split by a hairline. Side KPIs rank **all top-level scope items** — the same population as the movers board, so the identical headings can never contradict each other on one screen. The `ყველაზე დიდი ზრდა` GEL delta requires a positive start value (a delta measured against a negative base is a correction unwind, not growth).
 2. Movers board (top 3 / bottom 3 across all scope items).
-3. `პერიოდის შედარება` — table `<first col> | start year | ცვლილება | end year`, total row first, fixed layout with 44% label column.
+3. `პერიოდის შედარება` — table `<first col> | start year | ცვლილება | end year`, total row first, fixed layout with 44% label column. This table (only) is scoped to the user's selected series.
 
 ## 9. Single-Year Analysis (ანალიზი)
 
@@ -417,6 +430,8 @@ Bubble scatter, viewBox 920×380: x = share of total, y = growth vs previous yea
 ### 9.7 Full Ranking
 
 Table columns: `<scope header> | მლრდ ₾ | წილი | ცვლილება`, sorted by GEL descending, top-level categories of the active grouping only. Rank as mono `01`-style index + swatch + label; a 120px 3px share bar (category color on `hairline-soft` track) next to the mono share; change colored positive/negative. Same table anatomy as §8.4 including sticky first column on horizontal scroll.
+
+**Completeness rule:** the ranking lists EVERY official row of the year — including zero and negative lines (e.g. `revenue.other_taxes` 2019–2020) — so the rows always reconcile with the `სულ` headline, and the category counts in the headline/deck count all rows. Shares are of the true year total (negative rows get a negative share and no bar). Only the geometry sections (treemap, every-100, radar, field) draw positive rows exclusively.
 
 ## 10. Revenue Adaptation
 

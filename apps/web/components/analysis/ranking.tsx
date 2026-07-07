@@ -60,7 +60,8 @@ export function FullRanking({ rows, side, grouping }: FullRankingProps) {
                         className="block h-full"
                         style={{
                           background: row.color,
-                          width: `${Math.max(2, Math.round((row.shareOfTotal / maxShare) * 100))}%`,
+                          // Negative shares (real data) get no bar rather than a fake sliver.
+                          width: `${row.shareOfTotal > 0 ? Math.max(2, Math.round((row.shareOfTotal / maxShare) * 100)) : 0}%`,
                         }}
                       />
                     </span>

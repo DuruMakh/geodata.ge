@@ -38,42 +38,74 @@ function niceMax(rawMax: number): number {
   return step * magnitude;
 }
 
-export function EditorialLineChart({ years, series, share }: EditorialLineChartProps) {
-  const [hover, setHover] = useState<number | null>(null);
-  const n = years.length;
+// Smallest decimal count (up to max) that renders the gridline step exactly,
+// so axis labels are never rounded into duplicates ("0.3" for a 0.25 step).
+function decimalsFor(step: number, max: number): number {
+  for (let digits = 0; digits <= max; digits += 1) {
+    const scaled = step * 10 ** digits;
+    if (Math.abs(Math.round(scaled) - scaled) < 1e-6) return digits;
+  }
+  return max;
+}
 
+export function EditorialLineChart({ years, series, share }: EditorialLineChartProps) {
+  const [hoverRaw, setHover] = useState<number | null>(null);
+  const n = years.length;
+  // The hover index survives range shrinks (no pointer event fires), so clamp it
+  // instead of trusting it — a stale index would render a ghost tooltip.
+  const hover = hoverRaw !== null && hoverRaw < n ? hoverRaw : null;
+
+  // The domain must cover negative values (e.g. revenue.other_taxes 2019-2020):
+  // both bounds snap to one shared gridline step so 0 always sits on a line.
   let maxValue = 0;
-  for (const line of series) for (const value of line.vals) if (value !== null && value > maxValue) maxValue = value;
-  if (maxValue <= 0) maxValue = 1;
-  const top = niceMax(maxValue);
+  let minValue = 0;
+  for (const line of series) {
+    for (const value of line.vals) {
+      if (value === null) continue;
+      if (value > maxValue) maxValue = value;
+      if (value < minValue) minValue = value;
+    }
+  }
+  if (maxValue <= 0 && minValue >= 0) maxValue = 1;
+  const posSpan = maxValue > 0 ? niceMax(maxValue) : 0;
+  const negSpan = minValue < 0 ? niceMax(-minValue) : 0;
+  const step = Math.max(posSpan, negSpan) / 4;
+  const top = posSpan > 0 ? Math.ceil(posSpan / step - 1e-9) * step : 0;
+  const bottom = negSpan > 0 ? -Math.ceil(negSpan / step - 1e-9) * step : 0;
+  const span = top - bottom;
 
   const x = (index: number) => PAD_L + (n <= 1 ? (W - PAD_L - PAD_R) / 2 : (index * (W - PAD_L - PAD_R)) / (n - 1));
-  const y = (value: number) => PAD_T + (1 - value / top) * (H - PAD_T - PAD_B);
+  const y = (value: number) => PAD_T + ((top - value) / span) * (H - PAD_T - PAD_B);
   // Axis precision follows the gridline step so small-magnitude series (single
   // programs, share mode) never produce duplicate or all-zero labels.
-  const shareDigits = Math.max(0, -Math.floor(Math.log10(top / 4)));
-  const bnDigits = Math.min(4, Math.max(1, -Math.floor(Math.log10(top / 4 / 1_000_000_000))));
+  const shareDigits = decimalsFor(step, 2);
+  const bnDigits = Math.max(1, decimalsFor(step / 1_000_000_000, 4));
   const formatAxis = (value: number) =>
-    share
+    (share
       ? `${value.toFixed(shareDigits)}%`
-      : `${(value / 1_000_000_000).toLocaleString("en-US", { maximumFractionDigits: bnDigits })} მლრდ`;
+      : `${(value / 1_000_000_000).toLocaleString("en-US", { maximumFractionDigits: bnDigits })} მლრდ`
+    ).replace("-", "−");
+
   const formatValue = (value: number | null) => (share ? formatShare(value === null ? null : value / 100) : formatBn(value));
 
-  const gridLines = [0, 1, 2, 3, 4].map((step) => (top / 4) * step);
+  const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
   const labelStep = Math.max(1, Math.ceil(n / 12));
 
   function handlePointerMove(event: React.PointerEvent<SVGSVGElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
     const px = ((event.clientX - rect.left) / rect.width) * W;
-    const step = n <= 1 ? 1 : (W - PAD_L - PAD_R) / (n - 1);
-    const index = Math.min(n - 1, Math.max(0, Math.round((px - PAD_L) / step)));
-    if (index !== hover) setHover(index);
+    const pointerStep = n <= 1 ? 1 : (W - PAD_L - PAD_R) / (n - 1);
+    const index = Math.min(n - 1, Math.max(0, Math.round((px - PAD_L) / pointerStep)));
+    if (index !== hoverRaw) setHover(index);
   }
 
   const hoverX = hover === null ? null : (x(hover) / W) * 100;
 
   return (
-    <div data-testid="chart-frame" className="relative">
+    // Scroll instead of shrink on narrow screens: an unbounded w-full SVG scales
+    // its text below the DESIGN.md §13 legibility floor on phones.
+    <div data-testid="chart-frame" className="overflow-x-auto">
+      <div className="relative min-w-[720px]">
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
@@ -84,8 +116,8 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
       >
         {gridLines.map((value, index) => (
           <g key={`grid-${index}`}>
-            <line x1={PAD_L} x2={W - PAD_R} y1={y(value)} y2={y(value)} stroke={index === 0 ? "#1E1B16" : "#E7DECF"} strokeWidth={1} />
-            <text x={PAD_L - 10} y={y(value) + 3} fontSize={10} fill="#6A6050" textAnchor="end" fontFamily="var(--font-numeric)">
+            <line x1={PAD_L} x2={W - PAD_R} y1={y(value)} y2={y(value)} stroke={value === 0 ? "#1E1B16" : "#E7DECF"} strokeWidth={1} />
+            <text x={PAD_L - 10} y={y(value) + 3} fontSize={11} fill="#6A6050" textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
               {formatAxis(value)}
             </text>
           </g>
@@ -99,7 +131,7 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
           const tx = index === 0 ? x(index) - 4 : isLast ? x(index) + 4 : x(index);
 
           return (
-            <text key={`year-${year}`} x={tx} y={H - 8} fontSize={10} fill="#6A6050" textAnchor={anchor} fontFamily="var(--font-numeric)">
+            <text key={`year-${year}`} x={tx} y={H - 8} fontSize={11} fill="#6A6050" textAnchor={anchor} style={{ fontFamily: "var(--font-numeric)" }}>
               {year}
             </text>
           );
@@ -108,18 +140,36 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
           <line x1={x(hover)} x2={x(hover)} y1={PAD_T - 6} y2={H - PAD_B} stroke="#C9BEA9" strokeWidth={1} />
         ) : null}
         {series.map((line) => {
-          const points: Array<[number, number, number]> = [];
+          // Interior data gaps (e.g. programs with no 2015 facts) split the path
+          // into segments — a bridged line would assert values that don't exist.
+          const segments: Array<Array<[number, number, number]>> = [];
+          let run: Array<[number, number, number]> = [];
           for (let index = 0; index < n; index += 1) {
             const value = line.vals[index];
-            if (value !== null && value !== undefined) points.push([x(index), y(value), index]);
+            if (value === null || value === undefined) {
+              if (run.length > 0) segments.push(run);
+              run = [];
+            } else {
+              run.push([x(index), y(value), index]);
+            }
           }
-          if (points.length === 0) return null;
-          const path = points.map(([px, py], index) => `${index === 0 ? "M" : "L"}${px.toFixed(1)} ${py.toFixed(1)}`).join(" ");
+          if (run.length > 0) segments.push(run);
+          if (segments.length === 0) return null;
+
+          const path = segments
+            .filter((segment) => segment.length > 1)
+            .map((segment) => segment.map(([px, py], index) => `${index === 0 ? "M" : "L"}${px.toFixed(1)} ${py.toFixed(1)}`).join(" "))
+            .join(" ");
+          const isolated = segments.filter((segment) => segment.length === 1).map((segment) => segment[0]);
+          const points = segments.flat();
           const last = points[points.length - 1];
 
           return (
             <g key={line.id}>
-              <path d={path} fill="none" stroke={line.color} strokeWidth={2.2} strokeLinejoin="round" strokeLinecap="round" />
+              {path ? <path d={path} fill="none" stroke={line.color} strokeWidth={2.2} strokeLinejoin="round" strokeLinecap="round" /> : null}
+              {isolated.map(([px, py, index]) => (
+                <circle key={`isolated-${index}`} cx={px} cy={py} r={2.5} fill={line.color} />
+              ))}
               <circle cx={last[0]} cy={last[1]} r={3.5} fill={line.color} />
               {points
                 .filter(([, , index]) => line.planned[index])
@@ -155,6 +205,7 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
           ))}
         </div>
       ) : null}
+      </div>
     </div>
   );
 }

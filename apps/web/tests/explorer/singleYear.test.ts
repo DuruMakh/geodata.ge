@@ -109,7 +109,7 @@ describe("single-year snapshot model", () => {
     expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
   });
 
-  it("keeps zero and negative rows out of the visual sections without faking allocations", () => {
+  it("keeps zero rows in the ranking but out of the drawn allocations", () => {
     const model = buildSingleYearSnapshotModel({
       facts: [
         fact({ year: 2026, side: "expenditure", itemId: "spending.health", amountGel: 0 }),
@@ -121,13 +121,16 @@ describe("single-year snapshot model", () => {
       year: 2026,
     });
 
-    // Zero rows would render degenerate tiles/cells; the year still counts as loaded.
+    // Every official row stays visible in ranking/counts; geometry sections
+    // (every-100, radar) draw only positive rows, so they stay empty here.
     expect(model.emptyReason).toBeNull();
-    expect(model.items).toHaveLength(0);
+    expect(model.items).toHaveLength(2);
+    expect(model.rankingRows).toHaveLength(2);
     expect(model.every100).toEqual([]);
+    expect(model.radarItems).toEqual([]);
   });
 
-  it("allocates exactly 100 cells even when the year total includes negative rows", () => {
+  it("keeps negative rows in the ranking with true-total shares while cells still sum to 100", () => {
     const model = buildSingleYearSnapshotModel({
       facts: [
         fact({ year: 2026, side: "revenue", itemId: "revenue.vat", amountGel: 900 }),
@@ -141,7 +144,13 @@ describe("single-year snapshot model", () => {
     });
 
     expect(model.totalGel).toBe(1000);
-    expect(model.items.map((item) => item.itemId)).toEqual(["revenue.vat", "revenue.income_tax"]);
+    // All official rows are items (count/ranking match the total); negative last.
+    expect(model.items.map((item) => item.itemId)).toEqual(["revenue.vat", "revenue.income_tax", "revenue.other_taxes"]);
+    // Shares are of the true total, so the visible rows reconcile with "სულ".
+    expect(model.items.map((item) => item.shareOfTotal)).toEqual([0.9, 0.15, -0.05]);
+    expect(model.items.reduce((sum, item) => sum + item.shareOfTotal, 0)).toBeCloseTo(1);
+    // The 100-cell grid draws positive rows only and still allocates exactly 100.
+    expect(model.every100.map((item) => item.itemId)).toEqual(["revenue.vat", "revenue.income_tax"]);
     expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
   });
 

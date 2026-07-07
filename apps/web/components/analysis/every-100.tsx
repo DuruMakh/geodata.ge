@@ -26,7 +26,15 @@ export function Every100Gel({ items }: Every100Props) {
         {zeroCount > 0 ? ` · ${zeroCount} კატეგორია მრგვალდება 0 ₾-მდე` : ""}
       </p>
       <div className="flex flex-wrap items-start gap-x-12 gap-y-6">
-        <div data-testid="every-100-grid" className="grid w-[min(100%,560px)] flex-none grid-cols-10 gap-[5px]">
+        <div
+          data-testid="every-100-grid"
+          role="img"
+          aria-label={`ყოველი 100 ლარის განაწილება: ${items
+            .filter((item) => item.gelFrom100 > 0)
+            .map((item) => `${item.kaLabel} — ${item.gelFrom100} ₾`)
+            .join(", ")}`}
+          className="grid w-[min(100%,560px)] flex-none grid-cols-10 gap-[5px]"
+        >
           {cells.map((cell) => (
             <span key={cell.key} data-cell="gel" title={cell.title} className="block aspect-square" style={{ background: cell.color }} />
           ))}

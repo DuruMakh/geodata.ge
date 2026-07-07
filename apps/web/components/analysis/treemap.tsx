@@ -78,9 +78,12 @@ type StructureTreemapProps = {
 };
 
 export function StructureTreemap({ items, title, yearLabel }: StructureTreemapProps) {
+  // Only positive rows have tile geometry; negative rows (real data: e.g.
+  // revenue.other_taxes 2019-2020) stay visible in the ranking table instead.
   // Lay out over the drawn items' own sum so the tiles exactly fill the area.
-  const rects = squarify(items, items.reduce((sum, item) => sum + item.amountGel, 0));
-  const tinyLegend = items.filter((item) => item.shareOfTotal < 0.033);
+  const drawn = items.filter((item) => item.amountGel > 0);
+  const rects = squarify(drawn, drawn.reduce((sum, item) => sum + item.amountGel, 0));
+  const tinyLegend = drawn.filter((item) => item.shareOfTotal < 0.033);
 
   return (
     <div data-testid="snapshot-treemap" className="mt-9 border-t border-[var(--hairline)] pt-6">

@@ -73,18 +73,23 @@ export function Indicators({ model, scope }: IndicatorsProps) {
   const sideNoun = scope === "revenue" ? "ჯამური შემოსავლები" : "ჯამური ხარჯები";
   const showSentence = totalStart > 0 && totalEnd > 0 && totalStart !== totalEnd;
 
-  // Rows missing either endpoint have no meaningful period delta — exclude them
-  // rather than treating the missing side as 0.
-  const withDelta = tableRows.flatMap((row) => {
+  // Side KPIs rank ALL top-level scope rows — the same population as the movers
+  // board below, so identical headings never contradict each other on one screen.
+  // The comparison table further down stays scoped to the user's selection.
+  const scopeRows = comparisonRows.filter((row) => row.level !== "major_program");
+  // Rows missing either endpoint have no meaningful period delta, and a delta
+  // measured against a non-positive start is mostly the unwind of a correction
+  // (e.g. revenue.other_taxes 2020→2021) — exclude both.
+  const withDelta = scopeRows.flatMap((row) => {
     const startValue = row.valuesByYear[startYear];
     const endValue = row.valuesByYear[endYear];
-    if (startValue === undefined || startValue === null || endValue === undefined || endValue === null) return [];
+    if (startValue === undefined || startValue === null || startValue <= 0 || endValue === undefined || endValue === null) return [];
     return [{ row, delta: endValue - startValue }];
   });
   const biggestIncrease = [...withDelta].sort((a, b) => b.delta - a.delta)[0] ?? null;
   const biggestParts = biggestIncrease ? formatAmountParts(biggestIncrease.delta, true) : { num: MISSING, unit: "" };
-  const slowest = tableRows.filter((row) => row.change !== null).sort((a, b) => (a.change ?? 0) - (b.change ?? 0))[0] ?? null;
-  const largestShare = [...tableRows].sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0))[0] ?? null;
+  const slowest = scopeRows.filter((row) => row.change !== null).sort((a, b) => (a.change ?? 0) - (b.change ?? 0))[0] ?? null;
+  const largestShare = [...scopeRows].sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0))[0] ?? null;
 
   const sideKpis = [
     {
@@ -242,7 +247,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           </thead>
           <tbody>
             {[
-              totalRow ? { row: totalRow, label: "სულ", weight: 600, color: "#1E1B16" } : null,
+              totalRow ? { row: totalRow, label: "სულ", weight: 600, color: "var(--ink)" } : null,
               ...comparisonSorted.map((row) => ({ row, label: truncate(row.kaLabel, 40), weight: 500, color: row.color })),
             ]
               .filter((entry): entry is { row: ExplorerTableRow; label: string; weight: number; color: string } => entry !== null)

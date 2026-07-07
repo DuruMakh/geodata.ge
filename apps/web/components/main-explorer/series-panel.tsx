@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { ExplorerItem, ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { MAX_CHART_SERIES, type ChartMode } from "../../lib/explorer/types";
 import { isDerivedTotalItemId } from "../../lib/explorer/explorerData";
@@ -15,6 +16,8 @@ export type SeriesPanelRow = {
   isProgram: boolean;
   hasChildren: boolean;
   expanded: boolean;
+  /** True while a search forces this row open (its programs matched) — the caret is inert then. */
+  caretLocked: boolean;
 };
 
 function matches(item: ExplorerItem, query: string): boolean {
@@ -42,14 +45,17 @@ export function buildSeriesPanelRows(items: ExplorerItem[], query: string, expan
 
     if (!categoryMatches && matchedPrograms.length === 0) continue;
 
-    // While searching, ministries with matching programs auto-expand to the matches.
-    const expanded = normalizedQuery ? matchedPrograms.length > 0 : expandedIds.includes(category.id);
+    // While searching, ministries with matching programs auto-expand to the matches
+    // (caret locked open); a name-matched ministry still honors the manual caret,
+    // showing all its programs — the caret is never a silent no-op.
+    const forcedOpen = Boolean(normalizedQuery) && matchedPrograms.length > 0;
+    const expanded = forcedOpen || expandedIds.includes(category.id);
 
-    rows.push({ item: category, isProgram: false, hasChildren: programs.length > 0, expanded });
+    rows.push({ item: category, isProgram: false, hasChildren: programs.length > 0, expanded, caretLocked: forcedOpen });
 
     if (expanded) {
-      for (const program of normalizedQuery ? matchedPrograms : programs) {
-        rows.push({ item: program, isProgram: true, hasChildren: false, expanded: false });
+      for (const program of forcedOpen ? matchedPrograms : programs) {
+        rows.push({ item: program, isProgram: true, hasChildren: false, expanded: false, caretLocked: false });
       }
     }
   }
@@ -66,11 +72,9 @@ type SeriesPanelProps = {
   selectedIds: string[];
   chartMode: ChartMode;
   endYear: number;
-  query: string;
   limitMessage: string | null;
   expandedIds: string[];
   onGroupingChange: (grouping: ExpenditureGrouping) => void;
-  onQueryChange: (query: string) => void;
   onToggle: (itemId: string) => void;
   onToggleExpanded: (itemId: string) => void;
   onDownloadCsv: () => void;
@@ -85,15 +89,17 @@ export function SeriesPanel({
   selectedIds,
   chartMode,
   endYear,
-  query,
   limitMessage,
   expandedIds,
   onGroupingChange,
-  onQueryChange,
   onToggle,
   onToggleExpanded,
   onDownloadCsv,
 }: SeriesPanelProps) {
+  // The query is panel-local so keystrokes re-render only this aside — the parent
+  // keys this component by scope, which also resets the search on nav/grouping
+  // switches consistently.
+  const [query, setQuery] = useState("");
   const valuesByItem = new Map(rows.map((row) => [row.itemId, row]));
   const panelRows = buildSeriesPanelRows(items, query, expandedIds);
   const atLimit = chartMode !== "table" && selectedIds.length >= MAX_CHART_SERIES;
@@ -124,7 +130,7 @@ export function SeriesPanel({
       <input
         data-testid="series-search"
         value={query}
-        onChange={(event) => onQueryChange(event.target.value)}
+        onChange={(event) => setQuery(event.target.value)}
         placeholder={isMinistries ? "ძებნა — უწყება ან პროგრამა" : "ძებნა"}
         aria-label="ძებნა სერიებში"
         className="mt-3.5 h-[34px] w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted)]"
@@ -143,7 +149,7 @@ export function SeriesPanel({
       ) : null}
 
       <div className="mt-3.5 flex max-h-[430px] flex-col overflow-y-auto">
-        {panelRows.map(({ item, isProgram, hasChildren, expanded }) => {
+        {panelRows.map(({ item, isProgram, hasChildren, expanded, caretLocked }) => {
           const selected = selectedIds.includes(item.id);
           const latest = valuesByItem.get(item.id)?.valuesByYear[endYear] ?? null;
           const showRail = isProgram || (hasChildren && expanded);
@@ -167,13 +173,16 @@ export function SeriesPanel({
                   type="button"
                   onClick={(event) => {
                     event.stopPropagation();
-                    onToggleExpanded(item.id);
+                    // A search-forced row is already open to its matches; toggling
+                    // hidden state now would only surface after clearing the search.
+                    if (!caretLocked) onToggleExpanded(item.id);
                   }}
                   aria-expanded={expanded}
                   aria-label="ქვეპროგრამები"
-                  className="flex w-[22px] flex-none cursor-pointer items-center justify-center text-base leading-none"
+                  aria-disabled={caretLocked || undefined}
+                  className={`flex w-[22px] flex-none items-center justify-center text-base leading-none ${caretLocked ? "cursor-default" : "cursor-pointer"}`}
                   style={{ visibility: hasChildren ? "visible" : "hidden" }}
-                  tabIndex={hasChildren ? 0 : -1}
+                  tabIndex={hasChildren && !caretLocked ? 0 : -1}
                 >
                   <span style={{ color: expanded ? "var(--accent)" : "var(--ink)" }}>{expanded ? "▾" : "▸"}</span>
                 </button>

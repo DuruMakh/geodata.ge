@@ -38,8 +38,15 @@ export function RangeStrip({ years, range, onChange }: RangeStripProps) {
 
   function moveHandle(handle: Handle, clientX: number) {
     const year = yearFromClientX(clientX);
-    if (handle === "start") onChange({ start: Math.min(year, end) });
-    else onChange({ end: Math.max(year, start) });
+    // Bail when the resolved year is unchanged: pointer moves land far more often
+    // than year boundaries, and each onChange re-renders the whole explorer tree.
+    if (handle === "start") {
+      const next = Math.min(year, end);
+      if (next !== start) onChange({ start: next });
+    } else {
+      const next = Math.max(year, start);
+      if (next !== end) onChange({ end: next });
+    }
   }
 
   function capturePointer(event: React.PointerEvent<HTMLElement>) {
@@ -68,7 +75,11 @@ export function RangeStrip({ years, range, onChange }: RangeStripProps) {
     const rect = rail.getBoundingClientRect();
     const startX = rect.left + ((start - min) / span) * rect.width;
     const endX = rect.left + ((end - min) / span) * rect.width;
-    const handle: Handle = Math.abs(event.clientX - startX) <= Math.abs(event.clientX - endX) ? "start" : "end";
+    // Clicks outside the current range pick the handle on that side — a nearest-
+    // handle tie on a collapsed range would otherwise make rightward clicks no-ops.
+    const year = yearFromClientX(event.clientX);
+    const handle: Handle =
+      year > end ? "end" : year < start ? "start" : Math.abs(event.clientX - startX) <= Math.abs(event.clientX - endX) ? "start" : "end";
     capturePointer(event);
     draggingRef.current = handle;
     moveHandle(handle, event.clientX);
@@ -77,6 +88,12 @@ export function RangeStrip({ years, range, onChange }: RangeStripProps) {
   function handleRailMove(event: React.PointerEvent<HTMLDivElement>) {
     const handle = draggingRef.current;
     if (handle === null) return;
+    // If the press ended outside the rail while capture wasn't held (untracked
+    // pointers), no pointerup ever reaches us — don't ghost-drag on plain hover.
+    if (event.buttons === 0) {
+      endDrag();
+      return;
+    }
     moveHandle(handle, event.clientX);
   }
 

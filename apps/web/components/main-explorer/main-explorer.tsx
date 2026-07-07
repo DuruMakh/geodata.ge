@@ -55,8 +55,6 @@ export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntri
     range,
     setRange,
     selectedIds,
-    query,
-    setQuery,
     limitMessage,
     expandedMinistries,
     toggleMinistryExpanded,
@@ -262,7 +260,6 @@ export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntri
             range={range}
             scopeYears={scopeYears}
             selectedIds={selectedIds}
-            query={query}
             limitMessage={limitMessage}
             expandedMinistries={expandedMinistries}
             lastUpdatedAt={lastUpdatedAt}
@@ -270,7 +267,6 @@ export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntri
             onChartModeChange={handleChartModeChange}
             onShareChange={setShare}
             onRangeChange={(patch) => setRange(scope, patch)}
-            onQueryChange={setQuery}
             onToggleSeries={toggleSeries}
             onToggleExpanded={toggleMinistryExpanded}
             onDownloadCsv={downloadCsv}

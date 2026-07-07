@@ -195,6 +195,49 @@ test("URL hash round-trips explorer state", async ({ page }) => {
   await expect(page.getByTestId("series-selector")).toContainText("1");
 });
 
+test("line mode caps over-limit shared selections with a callout", async ({ page }) => {
+  const sel = [
+    "spending.social_protection",
+    "spending.health",
+    "spending.education",
+    "spending.defence",
+    "spending.public_order_safety",
+    "spending.economic_affairs",
+    "spending.culture",
+    "spending.sport",
+  ].join(",");
+
+  await page.goto(`http://localhost:3100/#nav=expenditure&m=line&sel=${sel}`);
+  await page.reload();
+  await expectAppReady(page);
+
+  // The full selection is kept (table mode can show it), but the line chart
+  // draws only the first 6 series and says so.
+  await expect(page.getByTestId("series-overflow-callout")).toBeVisible();
+  await expect(page.getByTestId("series-selector")).toContainText("8 / 6");
+  expect(await page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']").count()).toBe(6);
+});
+
+test("shared ministries program links restore with the parent expanded", async ({ page }) => {
+  await page.goto("http://localhost:3100");
+  await expectAppReady(page);
+
+  await page.getByTestId("grouping-ministries").click();
+  const panel = page.getByTestId("series-selector");
+  await panel.getByRole("button", { name: "ქვეპროგრამები" }).first().click();
+  const firstProgram = panel.locator("[data-level='major_program']").first();
+  await firstProgram.getByRole("button").last().click();
+  await expect(page).toHaveURL(/sel=[^&]*admin_program/);
+
+  await page.reload();
+  await expectAppReady(page);
+
+  // The restore expands the selected program's parent, so the checked row is
+  // visible in the panel instead of hiding behind a collapsed ministry.
+  const restored = page.getByTestId("series-selector").locator("[data-level='major_program']").locator("[aria-pressed='true']").first();
+  await expect(restored).toBeVisible();
+});
+
 test("CSV download uses the active filtered table data", async ({ page }) => {
   await page.goto("http://localhost:3100");
   await expectAppReady(page);

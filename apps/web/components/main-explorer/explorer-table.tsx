@@ -1,5 +1,5 @@
 import type { ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
-import { formatBn, formatShare } from "../../lib/explorer/format";
+import { formatBn, formatShare, MISSING } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { SwatchBar } from "../ui/editorial";
 
@@ -36,10 +36,10 @@ export function ExplorerTable({ rows, totalRow, years, scope, share }: ExplorerT
 
   const cellValue = (row: ExplorerTableRow, year: number): string => {
     const amount = row.valuesByYear[year];
-    if (amount === null || amount === undefined) return "—";
+    if (amount === null || amount === undefined) return MISSING;
     if (!share) return formatBn(amount);
     const total = totalsByYear.get(year);
-    return total ? formatShare(amount / total) : "—";
+    return total ? formatShare(amount / total) : MISSING;
   };
 
   const cellPad = { paddingTop: 11, paddingBottom: 11 };
@@ -90,6 +90,9 @@ export function ExplorerTable({ rows, totalRow, years, scope, share }: ExplorerT
                   }}
                 >
                   {cellValue(row, year)}
+                  {row.basisByYear[year] === "planned" ? (
+                    <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">გეგმა</sup>
+                  ) : null}
                 </td>
               ))}
               <td

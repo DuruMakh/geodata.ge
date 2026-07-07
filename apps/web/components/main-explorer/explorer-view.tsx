@@ -1,7 +1,7 @@
 "use client";
 
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
-import type { ChartMode, ExpenditureGrouping, ExplorerScope } from "../../lib/explorer/types";
+import { MAX_CHART_SERIES, type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
 import { Callout, SourceNote, TextTab } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
 import { ExplorerTable } from "./explorer-table";
@@ -23,7 +23,6 @@ type ExplorerViewProps = {
   range: ResolvedRange;
   scopeYears: number[];
   selectedIds: string[];
-  query: string;
   limitMessage: string | null;
   expandedMinistries: string[];
   lastUpdatedAt: string;
@@ -31,7 +30,6 @@ type ExplorerViewProps = {
   onChartModeChange: (mode: ChartMode) => void;
   onShareChange: (share: boolean) => void;
   onRangeChange: (patch: { start?: number; end?: number }) => void;
-  onQueryChange: (query: string) => void;
   onToggleSeries: (itemId: string) => void;
   onToggleExpanded: (itemId: string) => void;
   onDownloadCsv: () => void;
@@ -41,6 +39,15 @@ const COVERAGE_NOTE: Record<ExplorerScope, string> = {
   fields: "ხარჯვითი მონაცემები",
   ministries: "უწყებრივი მონაცემები",
   revenue: "შემოსავლების მონაცემები",
+};
+
+// Classification-authorship disclosure (DESIGN.md §7.10): year totals are official;
+// the category split is GeoData's own mapping and must say so. Revenue categories
+// are the official budget-classification lines, so no disclosure is needed there.
+const CLASSIFICATION_NOTE: Record<ExplorerScope, string | null> = {
+  fields: "კატეგორიებად დაყოფა GeoData-ის კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით.",
+  ministries: "უწყებრივი დაჯგუფება GeoData-ისაა ბიუჯეტის შესრულების ანგარიშების პროგრამული კლასიფიკაციის მიხედვით.",
+  revenue: null,
 };
 
 export function ExplorerView({
@@ -53,7 +60,6 @@ export function ExplorerView({
   range,
   scopeYears,
   selectedIds,
-  query,
   limitMessage,
   expandedMinistries,
   lastUpdatedAt,
@@ -61,7 +67,6 @@ export function ExplorerView({
   onChartModeChange,
   onShareChange,
   onRangeChange,
-  onQueryChange,
   onToggleSeries,
   onToggleExpanded,
   onDownloadCsv,
@@ -86,6 +91,15 @@ export function ExplorerView({
 
   const coverage =
     scopeYears.length > 0 ? `${COVERAGE_NOTE[scope]}: ${scopeYears[0]}–${scopeYears.at(-1)}` : COVERAGE_NOTE[scope];
+
+  // The line chart honors the series cap even when a larger selection arrives from
+  // table mode or a shared hash (DESIGN.md §8.1: exceeding shows the callout).
+  const chartSeries = series.slice(0, MAX_CHART_SERIES);
+  const overLimit = chartMode === "line" && !noSelection && series.length > MAX_CHART_SERIES;
+  // A non-empty selection can still have zero coverage in the active range
+  // (e.g. a program series with a pre-2016 range) — say so instead of drawing
+  // a fabricated empty axis or a total-only table.
+  const noRangeData = !noSelection && series.every((line) => line.vals.every((value) => value === null));
 
   return (
     <>
@@ -121,11 +135,24 @@ export function ExplorerView({
               <div className="mt-5">
                 <Callout testId="no-selection-callout">არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.</Callout>
               </div>
+            ) : noRangeData ? (
+              <div className="mt-5">
+                <Callout testId="no-range-data-callout">
+                  არჩეული სერიებისთვის ამ დიაპაზონში მონაცემები არ არის. გააფართოვე დიაპაზონი ან შეცვალე სერიები.
+                </Callout>
+              </div>
             ) : chartMode === "table" ? (
               <ExplorerTable rows={model.tableRows} totalRow={model.totalRow} years={model.years} scope={scope} share={share} />
             ) : (
               <div className="mt-5">
-                <EditorialLineChart years={model.years} series={series} share={share} />
+                {overLimit ? (
+                  <div className="mb-4">
+                    <Callout testId="series-overflow-callout">
+                      ხაზის რეჟიმში ნაჩვენებია პირველი {MAX_CHART_SERIES} სერია. მოხსენი ზედმეტი ან გადადი ცხრილის რეჟიმში.
+                    </Callout>
+                  </div>
+                ) : null}
+                <EditorialLineChart years={model.years} series={chartSeries} share={share} />
               </div>
             )}
 
@@ -136,6 +163,7 @@ export function ExplorerView({
             <SourceNote testId="source-label">
               მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო).{" "}
               <span className="font-[family-name:var(--font-numeric)]">{coverage}</span> · 12-თვიანი ფაქტობრივი შესრულება.
+              {CLASSIFICATION_NOTE[scope] ? ` ${CLASSIFICATION_NOTE[scope]}` : null}
               {lastUpdatedAt ? (
                 <>
                   {" "}ბოლო განახლება: <span className="font-[family-name:var(--font-numeric)]">{lastUpdatedAt}</span>.
@@ -147,6 +175,7 @@ export function ExplorerView({
         </div>
 
         <SeriesPanel
+          key={scope}
           items={model.items}
           rows={model.comparisonRows}
           scope={scope}
@@ -155,11 +184,9 @@ export function ExplorerView({
           selectedIds={selectedIds}
           chartMode={chartMode}
           endYear={range.end}
-          query={query}
           limitMessage={limitMessage}
           expandedIds={expandedMinistries}
           onGroupingChange={onGroupingChange}
-          onQueryChange={onQueryChange}
           onToggle={onToggleSeries}
           onToggleExpanded={onToggleExpanded}
           onDownloadCsv={onDownloadCsv}

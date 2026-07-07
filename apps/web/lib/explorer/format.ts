@@ -16,7 +16,8 @@ function fixed(value: number, decimals: number): string {
 /** Chart/table cell value in the active unit: billions with 2 decimals. */
 export function formatBn(value: number | null | undefined): string {
   if (value === null || value === undefined) return MISSING;
-  return fixed(value / BILLION, 2);
+  // Intl emits ASCII "-"; the module contract is U+2212 (sign is always leading).
+  return fixed(value / BILLION, 2).replace("-", "−");
 }
 
 export type AmountParts = { num: string; unit: string };

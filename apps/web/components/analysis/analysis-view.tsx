@@ -61,7 +61,7 @@ export function AnalysisView({
             ) : null}
           </div>
           <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-            12-თვიანი ფაქტობრივი შესრულება
+            {model.hasPlannedValues ? "გეგმური ბიუჯეტის მონაცემები" : "12-თვიანი ფაქტობრივი შესრულება"}
           </span>
         </div>
 
@@ -124,7 +124,13 @@ export function AnalysisView({
           <div className="mt-[26px]">
             <SourceNote testId="source-label">
               მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო) ·{" "}
-              <span className="font-[family-name:var(--font-numeric)]">{model.year}</span> · 12-თვიანი ფაქტობრივი შესრულება.
+              <span className="font-[family-name:var(--font-numeric)]">{model.year}</span> ·{" "}
+              {model.hasPlannedValues ? "გეგმური ბიუჯეტის მონაცემები" : "12-თვიანი ფაქტობრივი შესრულება"}.
+              {side === "expenditure"
+                ? grouping === "ministries"
+                  ? " უწყებრივი დაჯგუფება GeoData-ისაა ბიუჯეტის შესრულების ანგარიშების პროგრამული კლასიფიკაციის მიხედვით."
+                  : " კატეგორიებად დაყოფა GeoData-ის კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით."
+                : null}
               {lastUpdatedAt ? (
                 <>
                   {" "}ბოლო განახლება: <span className="font-[family-name:var(--font-numeric)]">{lastUpdatedAt}</span>.

@@ -170,8 +170,11 @@ function headlineCards(totalGel: number, year: number, items: SnapshotItem[]): S
   const fastestGrowth = [...items]
     .filter((item) => item.changeFromPreviousYear !== null)
     .sort((a, b) => (b.changeFromPreviousYear ?? -Infinity) - (a.changeFromPreviousYear ?? -Infinity))[0] ?? null;
+  // Require a positive base (changeFromPreviousYear !== null): a delta measured
+  // against a negative prior value is mostly the unwind of a correction, not a
+  // real "largest increase" (e.g. revenue.other_taxes 2020→2021).
   const largestIncrease = [...items]
-    .filter((item) => item.amountChangeFromPreviousYear !== null)
+    .filter((item) => item.amountChangeFromPreviousYear !== null && item.changeFromPreviousYear !== null)
     .sort((a, b) => (b.amountChangeFromPreviousYear ?? -Infinity) - (a.amountChangeFromPreviousYear ?? -Infinity))[0] ?? null;
   const totalParts = formatAmountParts(items.length > 0 ? totalGel : null);
   const largestParts = largest ? formatAmountParts(largest.amountGel) : { num: MISSING, unit: "" };
@@ -264,14 +267,12 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
   const totalGel = totalFact?.amountGel ?? detailFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
   const modelSource = sourceMetadataFor((totalFact ? [totalFact] : detailFacts).map((fact) => fact.sourceId), sourceDocuments);
 
-  // Visual sections only show positive amounts (the reference prototype filters
-  // value > 0): zero rows would render degenerate tiles and negative rows (e.g.
-  // revenue.other_taxes 2019-2020) would break share geometry. The year total above
-  // still includes every fact, so headline sums stay exact. Shares are normalized
-  // over the drawn (positive) sum so tiles, cells, and share bars sum to 100%.
-  const drawnFacts = detailFacts.filter((fact) => fact.amountGel > 0);
-  const drawnTotal = drawnFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
-  const items = drawnFacts
+  // Every official row is a model item — including zero and negative rows (e.g.
+  // revenue.other_taxes 2019-2020) — so the ranking, category counts, and the
+  // "სულ" headline all describe the same population and rows sum to the total.
+  // Shares are of the true year total; geometry sections (treemap, every-100,
+  // radar, field) draw only positive rows and normalize internally.
+  const items = detailFacts
     .map((fact, index): SnapshotItem => {
       const previousAmountGel = previousByItemId.get(fact.itemId) ?? null;
 
@@ -280,7 +281,7 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
         ...labelFor(fact.itemId),
         color: colorForItem(fact.itemId, index),
         amountGel: fact.amountGel,
-        shareOfTotal: drawnTotal === 0 ? 0 : fact.amountGel / drawnTotal,
+        shareOfTotal: totalGel > 0 ? fact.amountGel / totalGel : 0,
         previousAmountGel,
         changeFromPreviousYear: changeFromPrevious(fact.amountGel, previousAmountGel),
         amountChangeFromPreviousYear: previousAmountGel === null ? null : fact.amountGel - previousAmountGel,
@@ -289,6 +290,7 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
       };
     })
     .sort((a, b) => b.amountGel - a.amountGel);
+  const drawnItems = items.filter((item) => item.amountGel > 0);
 
   return {
     side: input.side,
@@ -301,8 +303,8 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
     source: modelSource,
     headlineCards: headlineCards(totalGel, input.year, items),
     items,
-    every100: wholeGelFrom100(items),
-    radarItems: buildRadarItems(items),
+    every100: wholeGelFrom100(drawnItems),
+    radarItems: buildRadarItems(drawnItems),
     rankingRows: items,
     hasGrowthData: items.some((item) => item.changeFromPreviousYear !== null),
     emptyReason: null,

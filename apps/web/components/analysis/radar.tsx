@@ -55,7 +55,7 @@ export function BudgetRadar({ items }: BudgetRadarProps) {
             return (
               <g key={item.itemId}>
                 <line x1={CX} y1={CY} x2={x} y2={y} stroke="#E7DECF" strokeWidth={1} />
-                <text x={lx} y={ly + 3.5} fontSize={10.5} fill="#6A6050" textAnchor="middle" fontFamily="var(--font-numeric)">
+                <text x={lx} y={ly + 3.5} fontSize={10.5} fill="#6A6050" textAnchor="middle" style={{ fontFamily: "var(--font-numeric)" }}>
                   {item.num}
                 </text>
               </g>

@@ -26,8 +26,11 @@ function truncate(text: string, length: number): string {
 }
 
 export function BudgetField({ items }: BudgetFieldProps) {
+  // Negative rows have no meaningful share/size geometry; growth from a
+  // non-positive base is already null upstream, but guard the amount too.
   const withGrowth = items.filter(
-    (item): item is SnapshotItem & { changeFromPreviousYear: number } => item.changeFromPreviousYear !== null,
+    (item): item is SnapshotItem & { changeFromPreviousYear: number } =>
+      item.changeFromPreviousYear !== null && item.amountGel > 0,
   );
 
   if (withGrowth.length === 0) {
@@ -73,17 +76,18 @@ export function BudgetField({ items }: BudgetFieldProps) {
     <div data-testid="budget-field" className="mt-9 border-t border-[var(--hairline)] pt-6">
       <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის ველი</h3>
       <p className="mb-4 text-xs text-[var(--muted)]">x — წილი მთლიანიდან · y — ზრდა წინა წელთან · ზომა — მოცულობა</p>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="ბიუჯეტის ველი" className="block h-auto w-full">
+      <div className="overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="ბიუჯეტის ველი" className="block h-auto w-full min-w-[720px]">
         {yTicks.map((tick) => (
           <g key={`y-${tick}`}>
             <line x1={PAD_L} x2={W - PAD_R} y1={y(tick)} y2={y(tick)} stroke={tick === 0 ? "#1E1B16" : "#E7DECF"} strokeWidth={1} />
-            <text x={PAD_L - 8} y={y(tick) + 3} fontSize={10} fill="#6A6050" textAnchor="end" fontFamily="var(--font-numeric)">
-              {tick > 0 ? `+${tick}%` : `${tick}%`}
+            <text x={PAD_L - 8} y={y(tick) + 3} fontSize={11} fill="#6A6050" textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
+              {tick > 0 ? `+${tick}%` : `${tick}%`.replace("-", "−")}
             </text>
           </g>
         ))}
         {xTicks.map((tick) => (
-          <text key={`x-${tick}`} x={x(tick)} y={H - 14} fontSize={10} fill="#6A6050" textAnchor="middle" fontFamily="var(--font-numeric)">
+          <text key={`x-${tick}`} x={x(tick)} y={H - 14} fontSize={11} fill="#6A6050" textAnchor="middle" style={{ fontFamily: "var(--font-numeric)" }}>
             {tick}%
           </text>
         ))}
@@ -111,7 +115,7 @@ export function BudgetField({ items }: BudgetFieldProps) {
             if (!collides(lx, ly)) {
               placedLabels.push({ x: lx, y: ly });
               label = (
-                <text x={lx} y={ly} fontSize={11} fill="#55503F" textAnchor={anchor} fontWeight={500} fontFamily="var(--font-ui)">
+                <text x={lx} y={ly} fontSize={11} fill="#55503F" textAnchor={anchor} fontWeight={500} style={{ fontFamily: "var(--font-ui)" }}>
                   {truncate(item.kaLabel, 26)}
                 </text>
               );
@@ -130,6 +134,7 @@ export function BudgetField({ items }: BudgetFieldProps) {
           );
         })}
       </svg>
+      </div>
     </div>
   );
 }
