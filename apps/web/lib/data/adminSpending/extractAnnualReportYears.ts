@@ -4,6 +4,7 @@ import { parse } from "csv-parse/sync";
 import { contextFor } from "../parsing/hierarchyContext";
 import { codeDepth, findLeafCodes, parentCodeFor } from "../realExpenditure/hierarchy";
 import type { OfficialExpenditureRow } from "../realExpenditure/types";
+import { LEGACY_PROGRAM_JOINS, type LegacyProgramJoin } from "./legacyProgramJoins";
 
 /**
  * Group C ministries-expenditure years extracted from the official mof.ge annual-execution
@@ -24,7 +25,7 @@ type YearSource = {
   reportPath: string;
   /**
    * true  — keep coded rows down to maxDepth, so the year gets program-level drill-down (only
-   *         for years whose program detail sub-reconciles: 2012, 2016).
+   *         for years whose program detail sub-reconciles: 2012, 2015, 2016).
    * false — aggregate at the institution (depth-1) level, because the report's program detail
    *         is incomplete (institution totals != sum of printed programs). Debt still splits:
    *         the state-wide-payments institution keeps its depth-2 children.
@@ -139,7 +140,12 @@ const YEAR_SOURCES: Record<number, YearSource> = {
   2015: {
     sourceId: "source.mof_2015_programmatic_fact_actual",
     reportPath: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2015-annual-execution-tavi-VI-programmatic.pdf",
-    drillDown: false,
+    // Full program detail like 2016 (owner-verified 2026-07-07): all 23 program-carrying
+    // institutions sum to their totals at every depth (121 depth-2 rows; net drift -0.3k),
+    // so the year gets the full drill-down. The earlier "printed program detail incomplete"
+    // note was wrong — it referred to the 38 small institutions that print no program rows,
+    // which simply remain their own aggregation leaves.
+    drillDown: true,
   },
   2016: {
     sourceId: "source.mof_2016_programmatic_fact_actual",
@@ -310,7 +316,7 @@ function buildYearRows(year: number): OfficialExpenditureRow[] {
     preliminary.filter((row) => row.code).map((row) => [row.code as string, { labelKa: row.labelKa }]),
   );
 
-  return preliminary.map((row) => {
+  const aggregationRows = preliminary.map((row) => {
     const context = contextFor(row.code, rowsByCode);
     // A depth-1 institution IS its own institution, so its institution label is its own label.
     // This also keeps split rows (multiple rows sharing one NN 00 code — e.g. the Finance debt
@@ -326,6 +332,103 @@ function buildYearRows(year: number): OfficialExpenditureRow[] {
       isLeafCode: row.code ? leafCodes.has(row.code) : false,
     };
   });
+
+  // Owner-approved pre-2012 program points (see legacyProgramJoins.ts). Appended AFTER leaf
+  // detection and marked isLeafCode=false, so they join the program drill-down (depth-2 rows)
+  // without ever touching category aggregation or reconciliation — the institution-level
+  // aggregation above stays byte-identical.
+  const joins = LEGACY_PROGRAM_JOINS.filter((join) => join.year === year);
+  const joinedRows = joins.map((join, index) => buildJoinedProgramRow(join, corrected, source, index));
+  return [...aggregationRows, ...joinedRows];
+}
+
+function round1(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
+/**
+ * Build one synthetic depth-2 program row for an owner-approved legacy join: the sum of the
+ * join's source rows, carrying the primary source code + source institution for provenance.
+ */
+function buildJoinedProgramRow(
+  join: LegacyProgramJoin,
+  corrected: StagingRow[],
+  source: YearSource,
+  index: number,
+): OfficialExpenditureRow {
+  const components = join.sourceCodes.map((code, index) => {
+    const matches = corrected.filter((candidate) => candidate.code === code);
+    if (matches.length === 0) {
+      throw new Error(
+        `${join.year}: legacy program join source code ${code} (target ${join.targetCode}) not found in staged rows.`,
+      );
+    }
+    // The staging can contain (year, code) echoes from parser artifacts; a join must never
+    // silently pick one of several candidates.
+    if (matches.length > 1) {
+      throw new Error(
+        `${join.year}: legacy program join source code ${code} (target ${join.targetCode}) matches ${matches.length} staged rows (${matches.map((row) => row.actual).join(", ")}k) — ambiguous.`,
+      );
+    }
+    const row = matches[0];
+    // A modelled split's constants are only valid for the source values they were derived
+    // from; pin them so a re-extraction that shifts a source fails loudly.
+    const expected = join.componentActualsThousandGel?.[index];
+    if (expected !== undefined && Math.abs(row.actual - expected) > 0.05) {
+      throw new Error(
+        `${join.year}: legacy join source ${code} (target ${join.targetCode}) actual ${row.actual}k differs from the pinned ${expected}k — re-derive the join's split figures.`,
+      );
+    }
+    return row;
+  });
+  const institutionPrefixes = new Set(components.map((row) => institutionPrefix(row.code)));
+  if (institutionPrefixes.size !== 1) {
+    throw new Error(`${join.year}: legacy join for ${join.targetCode} mixes institutions (${[...institutionPrefixes].join(", ")}).`);
+  }
+  const primary = components[0];
+  const institutionCode = parentCodeFor(primary.code);
+  const institution = institutionCode ? corrected.find((row) => row.code === institutionCode) : undefined;
+  if (!institutionCode || !institution) {
+    throw new Error(`${join.year}: institution ${institutionCode ?? "?"} for legacy join ${join.targetCode} not found.`);
+  }
+  const labelKa = join.labelKaOverride ?? primary.label;
+  const componentSum = round1(components.reduce((sum, row) => sum + row.actual, 0));
+  if (join.amountThousandGelOverride !== undefined && join.amountThousandGelOverride > componentSum + 0.05) {
+    throw new Error(
+      `${join.year}: legacy join override for ${join.targetCode} (${join.amountThousandGelOverride}k) exceeds its component sum (${componentSum}k).`,
+    );
+  }
+
+  return {
+    year: join.year,
+    sourceId: source.sourceId,
+    workbookPath: source.reportPath,
+    sheetName: "tavi VI (annual execution report PDF)",
+    rowNumber: 9000 + index,
+    code: primary.code,
+    parentCode: institutionCode,
+    depth: 2,
+    institutionCode,
+    institutionLabelKa: institution.label,
+    programCode: primary.code,
+    programLabelKa: labelKa,
+    subprogramCode: null,
+    subprogramLabelKa: null,
+    isTotal: false,
+    isCodedRow: true,
+    // Never an aggregation leaf: the institution-level rows above already carry this money.
+    isLeafCode: false,
+    labelKa,
+    approvedPlanThousandGel: null,
+    revisedPlanThousandGel: null,
+    actualThousandGel: join.amountThousandGelOverride ?? componentSum,
+    executionPercent: null,
+    legacyProgramJoin: {
+      targetCode: join.targetCode,
+      targetParentItemId: join.targetParentItemId,
+      note: join.note,
+    },
+  };
 }
 
 export const ANNUAL_REPORT_YEAR_EXTRACTORS: Record<number, () => OfficialExpenditureRow[]> = Object.fromEntries(

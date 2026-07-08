@@ -28,6 +28,16 @@ export type OfficialExpenditureRow = {
   revisedPlanThousandGel: number | null;
   actualThousandGel: number;
   executionPercent: number | null;
+  /**
+   * Set only on synthetic pre-2012 rows injected by the admin-spending pipeline
+   * (adminSpending/legacyProgramJoins.ts): the modern program series the row's amount joins.
+   * Regular extracted rows never carry it.
+   */
+  legacyProgramJoin?: {
+    targetCode: string;
+    targetParentItemId: string;
+    note: string;
+  };
 };
 
 export type MappingConfidence = "high" | "medium" | "low" | "unclassified";

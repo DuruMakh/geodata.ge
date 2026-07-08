@@ -180,3 +180,129 @@ function makeRow(code: string, match: AmountMatch): AnnualReportRow {
     actualThousandGel: match.actual,
   };
 }
+
+// ---------------------------------------------------------------------------------------------
+// Targeted detail-section pass (2006/2007)
+//
+// The 2006/2007 reports print program-level rows only in per-ministry DETAIL sections deep in
+// the document (the summary tavi-VI table is institution-only, and the narrative-stop guard of
+// parseAnnualReportRows correctly ends there). Detail rows use the [plan | ACTUAL | %] layout,
+// interleave no-code economic-classification lines, wrap labels, and often split the code
+// itself across lines ("35" ⏎ "26 სოციალური პროგრამები 707,401.9 699,886.4 98.94%"). pdf-parse
+// can also merge two visual rows into one text line, so the FIRST plan/actual/% triple after
+// the label is the row's own (a trailing economic line may follow on the same text line).
+//
+// This pass extracts ONLY an explicit whitelist of depth-2 codes (the owner-approved
+// legacy-join components), so stray code-like lines elsewhere in the report can never leak
+// into staging. The first resolved occurrence of a code wins; a later occurrence with a
+// different ACTUAL is reported as a warning.
+// ---------------------------------------------------------------------------------------------
+
+/** A line that is nothing but 2-digit code groups (a code split across lines). */
+const CODE_GROUPS_ONLY = /^\d{2}(?: \d{2}){0,3}$/;
+// The FIRST [plan | ACTUAL | %] triple anywhere in a line.
+const FIRST_TWO_AMOUNTS_PERCENT = new RegExp(
+  `(${AMOUNT_SOURCE})\\s+(${AMOUNT_SOURCE})\\s+[\\d.,\\u00a0]+\\s*%`,
+);
+
+/** Merge consecutive code-groups-only lines into the following line ("35"+"26 label…" → "35 26 label…"). */
+function rejoinDetailSplitCodes(lines: string[]): string[] {
+  const out: string[] = [];
+  let pending = "";
+  for (const line of lines) {
+    if (CODE_GROUPS_ONLY.test(line) && `${pending} ${line}`.trim().split(" ").length <= 4) {
+      pending = `${pending} ${line}`.trim();
+      continue;
+    }
+    if (pending) {
+      // A pending fragment only continues onto a line that does NOT itself start a complete
+      // code: a genuine split looks like "35" ⏎ "26 label…" (single group + label). If the next
+      // line already carries a full code ("32 03 label…"), the pending token was a stray
+      // digit-only line (page number, table fragment) — merging would corrupt the real code, so
+      // flush the fragment as its own (harmless, code-less) line instead.
+      if (CODE_LINE.test(line)) {
+        out.push(pending);
+        out.push(line);
+        pending = "";
+        continue;
+      }
+      out.push(`${pending} ${line}`.trim());
+      pending = "";
+      continue;
+    }
+    out.push(line);
+  }
+  if (pending) out.push(pending);
+  return out;
+}
+
+export function parseDetailProgramRows(text: string, codes: string[]): ParseAnnualReportResult {
+  const wanted = new Set(codes);
+  const lines = rejoinDetailSplitCodes(
+    text
+      .split(/\r?\n/)
+      .map((line) => line.replace(/\t/g, " ").replace(/\s+/g, " ").trim())
+      .filter(Boolean),
+  );
+  const byCode = new Map<string, AnnualReportRow>();
+  const warnings: string[] = [];
+
+  const resolveTriple = (candidate: string): { label: string; plan: number | null; actual: number } | null => {
+    const m = candidate.match(FIRST_TWO_AMOUNTS_PERCENT);
+    if (!m || m.index === undefined) return null;
+    const actual = toNumber(m[2]);
+    if (actual === null) return null;
+    return { label: candidate.slice(0, m.index).trim(), plan: toNumber(m[1]), actual };
+  };
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const codeMatch = lines[i].match(CODE_LINE);
+    if (!codeMatch || !wanted.has(codeMatch[1])) continue;
+    const code = codeMatch[1];
+
+    const labelParts: string[] = [];
+    let resolved: { label: string; plan: number | null; actual: number } | null = null;
+    const inline = resolveTriple(codeMatch[2] ?? "");
+    if (inline) {
+      resolved = inline;
+    } else {
+      if (codeMatch[2]) labelParts.push(codeMatch[2]);
+      for (let j = i + 1, steps = 0; j < lines.length && steps < 8; j += 1, steps += 1) {
+        if (CODE_LINE.test(lines[j])) break;
+        // The amounts themselves can wrap mid-number ("… 181 297,5" ⏎ "181" ⏎ "243,0 100,0%"),
+        // so resolve the triple against the ACCUMULATED text, not each line in isolation —
+        // otherwise the row would steal the amounts of the next (economic) line.
+        const wrapped = resolveTriple([...labelParts, lines[j]].join(" ").replace(/\s+/g, " ").trim());
+        if (wrapped) {
+          resolved = wrapped;
+          break;
+        }
+        labelParts.push(lines[j]);
+      }
+    }
+    if (!resolved) continue;
+
+    const existing = byCode.get(code);
+    if (existing) {
+      if (Math.abs(existing.actualThousandGel - resolved.actual) > 0.05) {
+        warnings.push(
+          `Detail code ${code} resolved twice with different actuals (${existing.actualThousandGel} vs ${resolved.actual}); kept the first.`,
+        );
+      }
+      continue;
+    }
+    byCode.set(code, {
+      code,
+      label: resolved.label,
+      approvedThousandGel: resolved.plan,
+      revisedThousandGel: null,
+      actualThousandGel: resolved.actual,
+    });
+  }
+
+  for (const code of codes) {
+    if (!byCode.has(code)) warnings.push(`Detail code ${code} not found in the report text.`);
+  }
+
+  return { rows: codes.filter((code) => byCode.has(code)).map((code) => byCode.get(code)!), warnings };
+}

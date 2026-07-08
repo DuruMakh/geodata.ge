@@ -142,6 +142,11 @@ function programReviewCsv(facts: AdminSpendingFact[]): string {
 
     existing.years.add(fact.year);
     existing.maxAmountGel = Math.max(existing.maxAmountGel, fact.amountGel);
+    // Facts are year-ascending; keep the LATEST code/label so the review row names the series
+    // by its modern identity, not by a pre-2012 legacy-join point's source-year line.
+    existing.officialCode = fact.officialCode;
+    existing.officialLabelKa = fact.officialLabelKa;
+    existing.officialInstitutionLabelKa = fact.officialInstitutionLabelKa;
     byItemId.set(fact.itemId, existing);
   }
 

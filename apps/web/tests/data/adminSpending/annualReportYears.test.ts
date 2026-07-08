@@ -138,7 +138,7 @@ describe("2012 annual-report extraction (drill-down, depth capped at 3)", () => 
   });
 });
 
-describe("2015 annual-report extraction (institution-level)", () => {
+describe("2015 annual-report extraction (full drill-down)", () => {
   const rows = ANNUAL_REPORT_YEAR_EXTRACTORS[2015]();
   const totals = categoryTotals(rows, 2015);
   const totalRow = rows.find((row) => row.isTotal);
@@ -150,16 +150,20 @@ describe("2015 annual-report extraction (institution-level)", () => {
     expect(Math.abs(categorySum - sourceTotal)).toBeLessThanOrEqual(ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL);
   });
 
-  it("splits debt service out of the state-wide-payments institution (58 00 children kept)", () => {
+  it("splits debt service out of the state-wide-payments institution", () => {
     // 58 01 external + 58 02 domestic debt service & repayment = 731,023.7k.
     expect(totals.debt_service).toBe(731_023_700);
   });
 
-  it("has no program drill-down (institution-level year)", () => {
-    const programFacts = generateAdminSpendingFacts(rows).filter(
-      (fact) => fact.level === "major_program" && fact.year === 2015,
-    );
-    expect(programFacts).toHaveLength(0);
+  it("carries the full program detail (drillDown enabled 2026-07-07)", () => {
+    // 121 depth-2 program rows staged across 23 program-carrying institutions (a few carry a
+    // zero actual); e.g. general education 32 02 = 485,043.8k. (Whether a program becomes a
+    // drill-down FACT is decided later by the corpus-wide 2017+ qualifying threshold, so assert
+    // the extracted rows, not the facts.)
+    const programRows = rows.filter((row) => row.code && row.depth === 2 && row.actualThousandGel > 0);
+    expect(programRows.length).toBeGreaterThan(100);
+    const education = programRows.find((row) => row.code === "32 02");
+    expect(education?.actualThousandGel).toBe(485_043.8);
   });
 });
 

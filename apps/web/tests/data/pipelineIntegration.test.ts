@@ -28,6 +28,12 @@ import { TOTAL_ONLY_BUDGET_FACTS } from "../../lib/data/totalOnlyBudgetFacts";
 // End-to-end gate over the REAL production data files that app/page.tsx ships at
 // build time. Every path below matches the corresponding loader call in
 // app/page.tsx (plus the taxonomy/mapping files used by foundation validation).
+// Legacy-join facts (pre-2012 program points joined onto modern series) are marked by the
+// mapping-notes prefix stamped in lib/data/adminSpending/legacyProgramJoins.ts — key their
+// gate exemptions on this marker, never on a year literal.
+const LEGACY_JOIN_NOTE_PREFIX = "Pre-2012 organizational line(s) joined";
+const isLegacyJoinFact = (fact: AdminSpendingFact) => fact.mappingNotes.startsWith(LEGACY_JOIN_NOTE_PREFIX);
+
 const BUDGET_FACTS_CSV = "../../data/imports/budget-facts-2004-2025.csv";
 const ADMIN_SPENDING_FACTS_CSV = "../../data/imports/admin-spending-facts-2004-2025.csv";
 const GLOSSARY_CSV = "../../data/glossary/category-glossary.csv";
@@ -211,12 +217,25 @@ describe("data pipeline gate (real shipped data files)", () => {
     expect(unresolvedCategoryFactIds).toEqual([]);
 
     // Every major program must roll up to an admin category fact in the same year.
+    // Exception: a legacy-join point (marked by its mapping_notes prefix, stamped in
+    // adminSpending/legacyProgramJoins.ts) follows the PROGRAM across machinery-of-government
+    // changes, so it may precede its modern parent category's first year (2006-2008 roads ran
+    // under the Economy ministry; the Regional Development category only starts in 2009). Such
+    // a point must still name a category that exists in some year; every other fact — including
+    // legacy joins whose parent category does exist that year — keeps the same-year requirement.
     const categoryFactKeys = new Set(
       adminFacts.filter((fact) => fact.level === "admin_category").map((fact) => `${fact.year}:${fact.itemId}`),
     );
+    const categoryItemIds = new Set(
+      adminFacts.filter((fact) => fact.level === "admin_category").map((fact) => fact.itemId),
+    );
     const orphanPrograms = adminFacts
       .filter((fact) => fact.level === "major_program")
-      .filter((fact) => !fact.parentItemId || !categoryFactKeys.has(`${fact.year}:${fact.parentItemId}`))
+      .filter((fact) => {
+        if (!fact.parentItemId) return true;
+        if (categoryFactKeys.has(`${fact.year}:${fact.parentItemId}`)) return false;
+        return !(isLegacyJoinFact(fact) && categoryItemIds.has(fact.parentItemId));
+      })
       .map((fact) => `${fact.year}:${fact.itemId}`);
     expect(orphanPrograms).toEqual([]);
   });
@@ -340,14 +359,23 @@ describe("data pipeline gate (real shipped data files)", () => {
     );
     const programSumByKey = new Map<string, number>();
 
+    // All program facts participate, including legacy-join points — the envelope holds for
+    // them too wherever their parent category exists that year. The ONLY exemption is a
+    // (year, category) cell with no category fact whose program sum comes entirely from
+    // legacy-join points: those follow the PROGRAM across ministry moves, so their money can
+    // sit under a different administrative owner that year (2006-2008 roads: economy owner,
+    // regional-infrastructure series; the regional category only starts in 2009).
+    const keyHasNonJoinFact = new Set<string>();
     for (const fact of adminFacts.filter((row) => row.level === "major_program")) {
       const key = `${fact.year}:${fact.parentItemId}`;
       programSumByKey.set(key, (programSumByKey.get(key) ?? 0) + fact.amountGel);
+      if (!isLegacyJoinFact(fact)) keyHasNonJoinFact.add(key);
     }
 
     // Major programs are a curated subset of each category, so their sum can
     // never exceed the category total (beyond GEL rounding drift).
     const overflows = Array.from(programSumByKey.entries())
+      .filter(([key]) => categoryAmountByKey.has(key) || keyHasNonJoinFact.has(key))
       .filter(([key, programSum]) => programSum > (categoryAmountByKey.get(key) ?? 0) + ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL)
       .map(([key, programSum]) => ({ key, programSum, categoryAmount: categoryAmountByKey.get(key) ?? 0 }));
     expect(overflows).toEqual([]);

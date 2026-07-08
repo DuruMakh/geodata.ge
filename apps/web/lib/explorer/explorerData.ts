@@ -340,9 +340,13 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
         totalId,
         ...Array.from(new Set(active.map((fact) => fact.itemId).filter((itemId) => !isDerivedTotalItemId(itemId)))).sort((left, right) => compareBaselineAmountDesc(left, right, baselineAmounts)),
       ];
+  // Facts are year-ascending, so keeping the LAST fact per item makes each series carry its
+  // most recent official name. First-fact-wins would title a series by its oldest label — since
+  // the pre-2012 legacy-join points (whose labels are old organizational lines, e.g. the 2006
+  // Roads Department) sort first, that would mislabel every joined series for all viewed years.
   const factsByItem = new Map<string, ModelFact>();
   for (const fact of active) {
-    if (!factsByItem.has(fact.itemId)) factsByItem.set(fact.itemId, fact);
+    factsByItem.set(fact.itemId, fact);
   }
   const items = itemIds.map((id, index) => ({
     id,
