@@ -141,9 +141,13 @@ const PROGRAM_SEMANTIC_ERAS = [
     key: "logistics",
   },
   {
+    // Owner decision 2026-07-07: the pre-2019 "public order + state border" program is the SAME
+    // program back through 2012 (2013-2016 labels are identical to 2017-2018; 2012 is a slight
+    // rename), so the era starts at 2012 and the series runs 2012-2018. From 2019 the border
+    // guard split out (see the 2019+ eras of 30 01/30 02).
     code: "30 01",
     parentItemId: "admin_spending.internal_affairs",
-    startYear: 2017,
+    startYear: 2012,
     endYear: 2018,
     key: "public_order_and_border",
   },
@@ -457,8 +461,21 @@ const PROGRAM_SEMANTIC_ERAS = [
   },
 ] as const;
 
+function makeProgramItemId(code: string, parentItemId: string, eraKey: string): string {
+  const identityKey = `${code}|${parentItemId}|${eraKey}`;
+  return `admin_program.${code.replaceAll(" ", "_")}.${shortHash(identityKey)}`;
+}
+
 function programItemId(row: OfficialExpenditureRow): string {
   const code = row.code as string;
+  // Owner-approved pre-2012 join rows (injected by extractAnnualReportYears from
+  // legacyProgramJoins.ts) resolve straight to their modern series' identity; the row keeps
+  // its source-year code/label for provenance. The era key is "default" because no join
+  // target code carries a semantic era — the join-completeness guard test fails loudly if
+  // that ever changes (an era entry for a target code would shift the modern identity away
+  // from this one and orphan the join).
+  const join = row.legacyProgramJoin;
+  if (join) return makeProgramItemId(join.targetCode, join.targetParentItemId, "default");
   const parentItemId = classifyAdminSpendingCategory(row);
   const semanticEra = PROGRAM_SEMANTIC_ERAS.find(
     (era) =>
@@ -467,8 +484,7 @@ function programItemId(row: OfficialExpenditureRow): string {
       row.year >= era.startYear &&
       row.year <= era.endYear,
   );
-  const identityKey = `${code}|${parentItemId}|${semanticEra?.key ?? "default"}`;
-  return `admin_program.${code.replaceAll(" ", "_")}.${shortHash(identityKey)}`;
+  return makeProgramItemId(code, parentItemId, semanticEra?.key ?? "default");
 }
 
 function compareFacts(a: AdminSpendingFact, b: AdminSpendingFact): number {
@@ -544,10 +560,13 @@ export function generateAdminSpendingFacts(rows: OfficialExpenditureRow[]): Admi
     const itemId = programItemId(row);
     if (!qualifyingIds.has(itemId)) continue;
 
+    // Joined pre-2012 points belong to their modern series: they carry the series' parent
+    // category and a provenance note; officialCode/officialLabel stay source-year truth.
+    const join = row.legacyProgramJoin;
     facts.push({
       year: row.year,
       itemId,
-      parentItemId: classifyAdminSpendingCategory(row),
+      parentItemId: join?.targetParentItemId ?? classifyAdminSpendingCategory(row),
       level: "major_program",
       amountGel: amountGel(row),
       basis: "actual",
@@ -557,7 +576,9 @@ export function generateAdminSpendingFacts(rows: OfficialExpenditureRow[]): Admi
       officialInstitutionCode: row.institutionCode,
       officialInstitutionLabelKa: row.institutionLabelKa,
       mappingConfidence: "medium",
-      mappingNotes: `Official depth-2 program. Included because this source-code series reaches at least ${MAJOR_PROGRAM_THRESHOLD_GEL} GEL in one or more years.`,
+      mappingNotes: join
+        ? join.note
+        : `Official depth-2 program. Included because this source-code series reaches at least ${MAJOR_PROGRAM_THRESHOLD_GEL} GEL in one or more years.`,
     });
   }
 

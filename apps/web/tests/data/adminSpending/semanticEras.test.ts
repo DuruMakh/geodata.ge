@@ -24,9 +24,10 @@ const ELECTION_COMMISSION_LABEL_KA = "საქართველოს ცე�
 // State-wide payments institution -> admin_spending.other_costs (program label is not debt service).
 const STATE_WIDE_PAYMENTS_LABEL_KA = "საერთო-სახელმწიფოებრივი მნიშვნელობის გადასახდელები";
 
-// All production eras start at >= 2017 and end at <= 2025, so 2016..2026 covers
-// startYear-1 and endYear+1 for every era entry.
-const TEST_YEARS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
+// Eras mirrored in this spec span 2012..2025 (30 01's public_order_and_border reaches back to
+// 2012 since the 2026-07-07 owner decision), so 2011..2026 covers startYear-1 and endYear+1 for
+// every era entry.
+const TEST_YEARS = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
 
 type EraSpec = { startYear: number; endYear: number; key: string };
 
@@ -116,11 +117,13 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     ],
   },
   {
+    // public_order_and_border reaches back to 2012 (owner decision 2026-07-07): the pre-2017
+    // program is the same public-order+border program, so its backfill years join the series.
     code: "30 01",
     institutionLabelKa: INTERNAL_AFFAIRS_LABEL_KA,
     parentItemId: "admin_spending.internal_affairs",
     eras: [
-      { startYear: 2017, endYear: 2018, key: "public_order_and_border" },
+      { startYear: 2012, endYear: 2018, key: "public_order_and_border" },
       { startYear: 2019, endYear: 2025, key: "public_order" },
     ],
   },
