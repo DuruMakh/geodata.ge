@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type { OfficialExpenditureRow } from "../realExpenditure/types";
 import { classifyAdminSpendingCategory } from "./categories";
+import { findProgramSuccession } from "./programSuccessions";
 import type { AdminSpendingFact, AdminSpendingReport } from "./types";
 
 export const MAJOR_PROGRAM_THRESHOLD_GEL = 100_000_000;
@@ -20,13 +21,17 @@ function shortHash(value: string): string {
   return createHash("sha1").update(value).digest("hex").slice(0, 8);
 }
 
-// An era only applies when the row classifies into its parentItemId (see programItemId). Note the
-// 2018-2024 program-level Sport/Culture de-merge in classifyAdminSpendingCategory (categories.ts):
-// a few codes here list an education/culture parent for years whose programs that split now routes
-// to Sport or Culture instead (e.g. 32 11 / 32 12 sport-development in 2019-2021, 33 07 in
-// 2022-2024). For those rows the era simply no longer matches and the category split does the
-// separating; the entries are kept because their other years (and the synthetic-row era tests) still
-// rely on them. Real-data grouping is unaffected — verified in the drill-down.
+// An era only applies when the row classifies into its parentItemId (see programItemId), and a
+// PROGRAM_SUCCESSIONS entry covering the same (code, parent, years) takes precedence — eras whose
+// entire range was superseded by a succession were removed (25 07 school 2019-2024, 25 08 tourism
+// 2023-2024, 29 08 defence-capabilities 2017-2023, 32 08 millennium-challenge 2017, 56 11 pension
+// 2020-2024, 32 07 millennium-challenge legacy 2016). Note the 2018-2024 program-level
+// Sport/Culture de-merge in classifyAdminSpendingCategory (categories.ts): a few codes here list
+// an education/culture parent for years whose programs that split now routes to Sport or Culture
+// instead (e.g. 32 11 / 32 12 sport-development in 2019-2021, 33 07 in 2022-2024). For those rows
+// the era simply no longer matches and the category split (plus, for the sport/culture chains,
+// the succession table) does the separating; the entries are kept because their other years (and
+// the synthetic-row era tests) still rely on them.
 const PROGRAM_SEMANTIC_ERAS = [
   {
     code: "06 04",
@@ -71,24 +76,12 @@ const PROGRAM_SEMANTIC_ERAS = [
     key: "school_infrastructure",
   },
   {
-    code: "25 07",
-    parentItemId: "admin_spending.regional_development_infrastructure",
-    startYear: 2019,
-    endYear: 2024,
-    key: "school_infrastructure",
-  },
-  {
+    // Canonical identity of the tourism-infrastructure succession chain (25 08 2023-2024 rows
+    // redirect here); 25 07's 2019-2024 school rows redirect away to 25 06 via PROGRAM_SUCCESSIONS.
     code: "25 07",
     parentItemId: "admin_spending.regional_development_infrastructure",
     startYear: 2025,
     endYear: 2025,
-    key: "tourism_infrastructure",
-  },
-  {
-    code: "25 08",
-    parentItemId: "admin_spending.regional_development_infrastructure",
-    startYear: 2023,
-    endYear: 2024,
     key: "tourism_infrastructure",
   },
   {
@@ -127,13 +120,8 @@ const PROGRAM_SEMANTIC_ERAS = [
     key: "defence_capabilities",
   },
   {
-    code: "29 08",
-    parentItemId: "admin_spending.defence",
-    startYear: 2017,
-    endYear: 2023,
-    key: "defence_capabilities",
-  },
-  {
+    // Canonical identity of the logistics succession chain (29 09's 2018-2023 rows redirect
+    // here); 29 08's own 2017-2023 defence-capabilities rows redirect away to 29 07.
     code: "29 08",
     parentItemId: "admin_spending.defence",
     startYear: 2024,
@@ -187,13 +175,8 @@ const PROGRAM_SEMANTIC_ERAS = [
     key: "irrigation_modernization",
   },
   {
-    code: "32 08",
-    parentItemId: "admin_spending.education_science_youth",
-    startYear: 2017,
-    endYear: 2017,
-    key: "millennium_challenge",
-  },
-  {
+    // 32 08's 2017 Millennium Challenge row redirects to the 32 09 MC canonical identity via
+    // PROGRAM_SUCCESSIONS; eras here cover the code's later reuses only.
     code: "32 08",
     parentItemId: "admin_spending.education_science_youth",
     startYear: 2018,
@@ -362,18 +345,13 @@ const PROGRAM_SEMANTIC_ERAS = [
     key: "infrastructure_development",
   },
   {
+    // 56 11's 2020-2024 pension-cofinancing rows redirect to the 57 11 canonical identity via
+    // PROGRAM_SUCCESSIONS; this era documents the code's unrelated 2018 use.
     code: "56 11",
     parentItemId: "admin_spending.other_costs",
     startYear: 2018,
     endYear: 2018,
     key: "international_obligations",
-  },
-  {
-    code: "56 11",
-    parentItemId: "admin_spending.other_costs",
-    startYear: 2020,
-    endYear: 2024,
-    key: "funded_pension_cofinancing",
   },
   // Pre-2017 code reuses: these program codes were later recycled for a DIFFERENT 2017+ program.
   // Give the pre-2017 program its own identity so its amount does not merge into (and contaminate)
@@ -413,15 +391,6 @@ const PROGRAM_SEMANTIC_ERAS = [
     startYear: 2012,
     endYear: 2012,
     key: "archive_digitization_legacy",
-  },
-  {
-    // 2016 Millennium Challenge Georgia (a one-off); 2017+ code 32 07 is education/science
-    // infrastructure development.
-    code: "32 07",
-    parentItemId: "admin_spending.education_science_youth",
-    startYear: 2016,
-    endYear: 2016,
-    key: "millennium_challenge_infra_legacy",
   },
   {
     // 2012 high-mountain municipal support + 2013 general energy-infrastructure construction;
@@ -467,16 +436,27 @@ function makeProgramItemId(code: string, parentItemId: string, eraKey: string): 
 }
 
 function programItemId(row: OfficialExpenditureRow): string {
-  const code = row.code as string;
   // Owner-approved pre-2012 join rows (injected by extractAnnualReportYears from
-  // legacyProgramJoins.ts) resolve straight to their modern series' identity; the row keeps
-  // its source-year code/label for provenance. The era key is "default" because no join
-  // target code carries a semantic era — the join-completeness guard test fails loudly if
-  // that ever changes (an era entry for a target code would shift the modern identity away
-  // from this one and orphan the join).
+  // legacyProgramJoins.ts) resolve to their modern series first; the row keeps its source-year
+  // code/label for provenance. The joined series may itself continue under a newer code, so the
+  // succession lookup below runs on the JOIN TARGET (e.g. a 2008 "35 21" row joins 35 02, and
+  // 35 02's 2006-2018 segment succeeds to 27 02). No join target code carries a semantic era —
+  // the join-completeness guard test fails loudly if that ever changes (an era entry for a
+  // target code would shift the modern identity away and orphan the join).
   const join = row.legacyProgramJoin;
-  if (join) return makeProgramItemId(join.targetCode, join.targetParentItemId, "default");
-  const parentItemId = classifyAdminSpendingCategory(row);
+  const code = join?.targetCode ?? (row.code as string);
+  const parentItemId = join?.targetParentItemId ?? classifyAdminSpendingCategory(row);
+
+  // Program successions (programSuccessions.ts) resolve a source-year code segment straight to
+  // its canonical (latest-code) identity. Checked BEFORE eras: a succession range supersedes any
+  // era covering the same (code, parent, years); resolution is single-step, so entries always
+  // point at the chain's final code.
+  const succession = findProgramSuccession(code, parentItemId, row.year);
+  if (succession) {
+    return makeProgramItemId(succession.targetCode, parentItemId, succession.targetEraKey ?? "default");
+  }
+  if (join) return makeProgramItemId(code, parentItemId, "default");
+
   const semanticEra = PROGRAM_SEMANTIC_ERAS.find(
     (era) =>
       era.code === code &&
@@ -561,12 +541,16 @@ export function generateAdminSpendingFacts(rows: OfficialExpenditureRow[]): Admi
     if (!qualifyingIds.has(itemId)) continue;
 
     // Joined pre-2012 points belong to their modern series: they carry the series' parent
-    // category and a provenance note; officialCode/officialLabel stay source-year truth.
+    // category and a provenance note; officialCode/officialLabel stay source-year truth. The
+    // same holds for succession-redirected points (the join note wins when a row is both — the
+    // pre-2012 composition is the more important provenance).
     const join = row.legacyProgramJoin;
+    const parentItemId = join?.targetParentItemId ?? classifyAdminSpendingCategory(row);
+    const succession = findProgramSuccession(join?.targetCode ?? (row.code as string), parentItemId, row.year);
     facts.push({
       year: row.year,
       itemId,
-      parentItemId: join?.targetParentItemId ?? classifyAdminSpendingCategory(row),
+      parentItemId,
       level: "major_program",
       amountGel: amountGel(row),
       basis: "actual",
@@ -576,9 +560,10 @@ export function generateAdminSpendingFacts(rows: OfficialExpenditureRow[]): Admi
       officialInstitutionCode: row.institutionCode,
       officialInstitutionLabelKa: row.institutionLabelKa,
       mappingConfidence: "medium",
-      mappingNotes: join
-        ? join.note
-        : `Official depth-2 program. Included because this source-code series reaches at least ${MAJOR_PROGRAM_THRESHOLD_GEL} GEL in one or more years.`,
+      mappingNotes:
+        join?.note ??
+        succession?.note ??
+        `Official depth-2 program. Included because this source-code series reaches at least ${MAJOR_PROGRAM_THRESHOLD_GEL} GEL in one or more years.`,
     });
   }
 

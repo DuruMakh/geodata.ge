@@ -8,7 +8,9 @@ processing-group notes (`2005-2014-ministries-expenditure-methodology.md`,
 appendices. Where any older note disagrees with this document or with
 `apps/web/lib/data/adminSpending/categories.ts`, **this document and the code are authoritative.**
 
-Last reviewed: 2026-07-06 (full multi-dimension validation; see §8).
+Last reviewed: 2026-07-09 (program successions shipped — see
+`ministries-drilldown-programs-methodology.md`, the authoritative deep-dive on the §7
+drill-down; §7 here is the summary).
 
 ---
 
@@ -348,6 +350,10 @@ Revisit as a scope decision, not an extraction gap.
 
 ## 7. The drill-down (major programs)
 
+> **Full reference:** `ministries-drilldown-programs-methodology.md` — data structure, all
+> identity rules (eras, successions, joins), the complete 48-series coverage table, decision
+> log and maintenance guide. This section is the summary.
+
 ### 7.1 Threshold
 A program is a "major program" only if it reaches **`MAJOR_PROGRAM_THRESHOLD_GEL` = 100 M GEL** in
 at least one **modern (≥ 2017)** year (`MAJOR_PROGRAM_MODERN_MIN_YEAR = 2017`). Measuring the
@@ -360,12 +366,18 @@ only when it belongs to a program that survives to 2017+ (same code, same or sli
 program). Abolished programs are not shown as their own line — their money still counts in the
 category totals.
 
-### 7.3 Program identity & semantic eras
+### 7.3 Program identity, semantic eras & successions
 Identity = `code | parentCategory | eraKey`. By default all rows of a code+category merge into one
 series (so a **rename** stays a continuous series). `PROGRAM_SEMANTIC_ERAS` splits a code into
 distinct identities across year ranges when the same code was **recycled** for a genuinely
 different program — the old program gets its own identity and is then dropped (it never reaches the
-threshold in a modern year).
+threshold in a modern year). `PROGRAM_SUCCESSIONS` (`programSuccessions.ts`, owner-approved
+2026-07-09) does the inverse: when the SAME program continued under a **new code** (ministry
+merger, renumbering, or the state-wide institution's near-yearly code rotation), all segments
+resolve to one canonical identity — the latest code — so the series is continuous (e.g. social
+protection 35 02 → 27 02 runs 2006–2025 as one series; external debt service runs 2012–2025
+across eleven code segments). Succession ranges take precedence over eras; perimeter changes
+(e.g. the 2019 border-guard split of 30 01) are NOT successions and stay separate series.
 
 ### 7.4 Code-reuse rule (the maintenance hazard)
 When a code is recycled between the pre-2017 organizational coding and the 2017+ coding, its
@@ -390,11 +402,12 @@ their legacy years and that any major-program identity with more than one distin
 on a documented rename allowlist — so a new reuse leak fails CI.
 
 ### 7.5 Display: names only
-The explorer shows each drill-down program **by name** (`officialLabelKa`); the tavi-VI code is
-intentionally **not** surfaced (it fragments across reorganizations — the same sport-development
-program is `39 02` → `33 05` → `32 12` → `32 11` → `33 07` → `34 02` across the years). The
-`officialCode` remains in the facts CSV for provenance. (`lib/explorer/explorerData.ts` sets
-`detailLabel: null` for admin facts.)
+The explorer shows each drill-down program **by name** (the series' LATEST `officialLabelKa`);
+the tavi-VI code is intentionally **not** surfaced, because it changes across reorganizations —
+the same sport-development program is `39 02` → `33 05` → `32 12` → `32 11` → `33 07` → `34 02`
+across the years (since 2026-07-09 those segments are succession-joined into one continuous
+2010–2025 series). The per-point `officialCode` remains in the facts CSV for provenance.
+(`lib/explorer/explorerData.ts` sets `detailLabel: null` for admin facts.)
 
 ### 7.6 Pre-2012 legacy program joins (2006–2011)
 
@@ -485,10 +498,12 @@ leaking pre-2017 spend into modern series — was fixed (§7.4) and locked with 
 ## 9. Known limitations & caveats
 
 1. **Reconciliation checks the year total only** — mis-splits need independent figure review (§8.1).
-2. **Drill-down series fragment across reorganizations** — because program codes change at each
-   machinery-of-government change, a continuous *function* (e.g. sport development) appears as
-   several code segments. The **category** series are continuous; only the per-program view is
-   segmented. This is inherent to organizational coding and accepted.
+2. **Drill-down continuity across reorganizations is modelled** — program codes change at each
+   machinery-of-government change, so a continuous *function* (e.g. sport development) spans
+   several code segments. Since 2026-07-09 `PROGRAM_SUCCESSIONS` joins those segments into one
+   series wherever the label evidence shows the SAME program (see
+   `ministries-drilldown-programs-methodology.md` §5); this is a documented modelling layer, not
+   a source-stated continuity. Perimeter changes remain separate series.
 3. **2005–2011 are institution-level for aggregation.** Nine drill-down series carry
    owner-approved joined points for 2006–2011 (§7.6); everything else has no program points before
    2012. 2005 is totals-only.
@@ -526,7 +541,7 @@ To add a new (older or newer) year:
 9. **Owner sign-off** for any taxonomy-relevance judgment (a ministry that maps ambiguously, a
    combined ministry to split, a program to drop) — do not decide these unilaterally.
 
-**Key files:** `lib/data/adminSpending/{categories,generateAdminSpendingFacts,extractWorkbooks,extractAnnualReportYears,extractOlderMinistryYears,parseAnnualReportPdf,transliterateAcadNusx}.ts`,
+**Key files:** `lib/data/adminSpending/{categories,generateAdminSpendingFacts,programSuccessions,legacyProgramJoins,extractWorkbooks,extractAnnualReportYears,extractOlderMinistryYears,parseAnnualReportPdf,transliterateAcadNusx}.ts`,
 `scripts/extract-annual-report-pdf.ts`, `lib/data/coverage.ts`, `lib/explorer/explorerData.ts`.
 **Tests:** `tests/data/adminSpending.test.ts`, `tests/data/adminSpending/{annualReportYears,olderMinistryYears,semanticEras}.test.ts`, `tests/data/sourceCoverage.test.ts`.
 **Detailed per-year config appendices:** `group-c-annual-report-ministries-methodology.md`

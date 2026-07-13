@@ -29,7 +29,17 @@ const STATE_WIDE_PAYMENTS_LABEL_KA = "საერთო-სახელმწ�
 // every era entry.
 const TEST_YEARS = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
 
-type EraSpec = { startYear: number; endYear: number; key: string };
+type EraSpec = {
+  startYear: number;
+  endYear: number;
+  key: string;
+  /**
+   * Set when the range is covered by a PROGRAM_SUCCESSIONS entry instead of (or superseding) a
+   * semantic era: those years resolve to the canonical identity of TARGET code, so the itemId
+   * prefix carries the target code rather than this spec's code. Partitioning is unaffected.
+   */
+  targetCode?: string;
+};
 
 type CodeSpec = {
   code: string;
@@ -39,9 +49,11 @@ type CodeSpec = {
 };
 
 /**
- * Mirror of the production PROGRAM_SEMANTIC_ERAS table, grouped by code. This is the
- * expected specification: if the production table (or the era lookup) drifts by even
- * one year, the identity partition below changes and the parameterized test fails.
+ * Mirror of the production identity rules per code: PROGRAM_SEMANTIC_ERAS plus the
+ * PROGRAM_SUCCESSIONS ranges that redirect a code's rows to a canonical identity (entries
+ * with `targetCode`). This is the expected specification: if either production table (or
+ * the lookup precedence) drifts by even one year, the identity partition below changes
+ * and the parameterized test fails.
  */
 const SEMANTIC_ERA_SPECS: CodeSpec[] = [
   {
@@ -76,7 +88,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     institutionLabelKa: REGIONAL_LABEL_KA,
     parentItemId: "admin_spending.regional_development_infrastructure",
     eras: [
-      { startYear: 2019, endYear: 2024, key: "school_infrastructure" },
+      { startYear: 2019, endYear: 2024, key: "school_infrastructure", targetCode: "25 06" },
       { startYear: 2025, endYear: 2025, key: "tourism_infrastructure" },
     ],
   },
@@ -85,7 +97,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     institutionLabelKa: REGIONAL_LABEL_KA,
     parentItemId: "admin_spending.regional_development_infrastructure",
     eras: [
-      { startYear: 2023, endYear: 2024, key: "tourism_infrastructure" },
+      { startYear: 2023, endYear: 2024, key: "tourism_infrastructure", targetCode: "25 07" },
       { startYear: 2025, endYear: 2025, key: "sport_infrastructure" },
     ],
   },
@@ -112,7 +124,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     institutionLabelKa: DEFENCE_LABEL_KA,
     parentItemId: "admin_spending.defence",
     eras: [
-      { startYear: 2017, endYear: 2023, key: "defence_capabilities" },
+      { startYear: 2017, endYear: 2023, key: "defence_capabilities", targetCode: "29 07" },
       { startYear: 2024, endYear: 2025, key: "logistics" },
     ],
   },
@@ -152,7 +164,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     institutionLabelKa: EDUCATION_LABEL_KA,
     parentItemId: "admin_spending.education_science_youth",
     eras: [
-      { startYear: 2017, endYear: 2017, key: "millennium_challenge" },
+      { startYear: 2017, endYear: 2017, key: "millennium_challenge_second_project", targetCode: "32 09" },
       { startYear: 2018, endYear: 2019, key: "youth_support" },
       { startYear: 2020, endYear: 2021, key: "arts_and_sport_institutions" },
       { startYear: 2022, endYear: 2023, key: "i2q" },
@@ -205,13 +217,15 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     ],
   },
   {
-    // GAP: no era covers 2017 or 2019-2021 for this code.
+    // GAP: no era or succession covers 2017 or 2019-2021 for this code. The 2018 "sport" era
+    // applies only to culture-classified rows (like this spec's); REAL 2018 rows de-merge to
+    // the sport category and join the 34 02 sport succession chain instead.
     code: "33 05",
     institutionLabelKa: CULTURE_LABEL_KA,
     parentItemId: "admin_spending.culture",
     eras: [
       { startYear: 2018, endYear: 2018, key: "sport" },
-      { startYear: 2022, endYear: 2024, key: "culture_support" },
+      { startYear: 2022, endYear: 2024, key: "culture_support", targetCode: "33 02" },
       { startYear: 2025, endYear: 2025, key: "higher_arts_education" },
     ],
   },
@@ -227,13 +241,13 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     ],
   },
   {
-    // GAP: no era covers 2017, 2019 or 2025 for this code.
+    // GAP: no era or succession covers 2017, 2019 or 2025 for this code.
     code: "56 11",
     institutionLabelKa: STATE_WIDE_PAYMENTS_LABEL_KA,
     parentItemId: "admin_spending.other_costs",
     eras: [
       { startYear: 2018, endYear: 2018, key: "international_obligations" },
-      { startYear: 2020, endYear: 2024, key: "funded_pension_cofinancing" },
+      { startYear: 2020, endYear: 2024, key: "funded_pension_cofinancing", targetCode: "57 11" },
     ],
   },
 ];
@@ -333,9 +347,12 @@ describe("PROGRAM_SEMANTIC_ERAS business rules", () => {
 
       expect(partitionYears(identityByYear)).toEqual(expectedPartition(spec.eras, TEST_YEARS));
 
-      const expectedPrefix = `admin_program.${spec.code.replaceAll(" ", "_")}.`;
-      for (const identity of identityByYear.values()) {
-        expect(identity.startsWith(expectedPrefix)).toBe(true);
+      for (const [year, identity] of identityByYear) {
+        // Succession-redirected years (targetCode) resolve to the canonical identity of the
+        // TARGET code; all other years keep this spec's own code.
+        const era = spec.eras.find((candidate) => year >= candidate.startYear && year <= candidate.endYear);
+        const expectedCode = era?.targetCode ?? spec.code;
+        expect(identity.startsWith(`admin_program.${expectedCode.replaceAll(" ", "_")}.`)).toBe(true);
       }
     },
   );
@@ -395,13 +412,19 @@ describe("PROGRAM_SEMANTIC_ERAS business rules", () => {
     expect(identityByYear.get(2020)).not.toBe(identityByYear.get(2022));
   });
 
-  it("keeps the same semantic key separate across different codes", () => {
-    // school_infrastructure exists for "25 07" (2019-2024) and "25 06" (2025 only);
-    // identities include the code, so they must not merge.
+  it("keeps the same semantic key separate across different codes unless a succession joins them", () => {
+    // sport_development exists for "32 11" (education parent, 2020-2021) and "33 07" (culture
+    // parent, 2022-2024); identities include the code and parent, so they must not merge.
+    const code3211 = itemIdByYear("32 11", EDUCATION_LABEL_KA, [2020]);
+    const code3307 = itemIdByYear("33 07", CULTURE_LABEL_KA, [2022]);
+    expect(code3211.get(2020)).not.toBe(code3307.get(2022));
+
+    // Counterpart: school_infrastructure for "25 07" (2019-2024) and "25 06" (2025) is ONE
+    // program whose code shifted — the PROGRAM_SUCCESSIONS entry deliberately joins them
+    // (owner-approved 2026-07-09).
     const code2506 = itemIdByYear("25 06", REGIONAL_LABEL_KA, [2025]);
     const code2507 = itemIdByYear("25 07", REGIONAL_LABEL_KA, [2019]);
-
-    expect(code2506.get(2025)).not.toBe(code2507.get(2019));
+    expect(code2506.get(2025)).toBe(code2507.get(2019));
   });
 
   it("BEHAVIOR NOTE: era gap years of one code collapse into a single shared default identity", () => {
