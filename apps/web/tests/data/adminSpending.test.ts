@@ -264,7 +264,10 @@ describe("admin spending facts", () => {
     expect(yearsByItemId("06 04")).toEqual([[2019, 2020, 2021, 2022, 2023, 2024, 2025]]);
     expect(yearsByItemId("24 17")).toEqual([[2021, 2022, 2023, 2024, 2025]]);
     expect(yearsByItemId("25 06")).toEqual([[2025]]);
-    expect(yearsByItemId("25 07")).toEqual([[2019, 2020, 2021, 2022, 2023, 2024]]);
+    // 25 07 groups two ways: the 2019-2024 school-construction rows (succession-joined to the
+    // canonical 25 06 identity) and the 2025 tourism point (the tourism chain's canonical
+    // segment, which the 25 08 2023-2024 rows join).
+    expect(yearsByItemId("25 07")).toEqual([[2019, 2020, 2021, 2022, 2023, 2024], [2025]]);
     expect(yearsByItemId("26 02")).toEqual([[2019, 2020, 2021, 2022, 2023, 2024, 2025]]);
     expect(yearsByItemId("29 07")).toEqual([[2024, 2025]]);
     expect(yearsByItemId("30 02")).toEqual([[2019, 2020, 2021, 2022, 2023, 2024, 2025]]);
@@ -273,7 +276,10 @@ describe("admin spending facts", () => {
     // 32 09 / 32 12 are ALSO the primary source codes of the pre-2012 education joins
     // (legacyProgramJoins.ts), so those official codes appear in the modern 32 02 / 32 04
     // series' 2008-2011 points — separate identities from the era-split modern programs.
-    expect(yearsByItemId("32 09")).toEqual([[2008, 2009, 2010, 2011], [2018]]);
+    // 32 09's own rows group two ways: the 2018 Millennium Challenge point (the MC succession
+    // chain's canonical segment) and the 2020-2021 culture-support rows (succession-joined to
+    // the canonical 33 02 culture identity).
+    expect(yearsByItemId("32 09")).toEqual([[2008, 2009, 2010, 2011], [2018], [2020, 2021]]);
     expect(yearsByItemId("32 11")).toEqual([[2020, 2021]]);
     expect(yearsByItemId("32 12")).toEqual([[2008, 2009, 2010, 2011], [2019]]);
     expect(yearsByItemId("33 02")).toEqual([[2025]]);
@@ -299,9 +305,12 @@ describe("admin spending facts", () => {
     expect(yearsForCode("24 07")).not.toContain(2013); // 2013 France aid vs 2017+ entrepreneurship
     expect(yearsForCode("24 06")).not.toContain(2013); // 2013 aviation obligations vs 2017+ state property
 
-    // Programs that never existed in 2017-2025 (institution 51 common-state payments,
-    // e.g. debt service) are absent from the drill-down entirely.
-    expect(programFacts.some((fact) => fact.officialCode?.startsWith("51 "))).toBe(false);
+    // 2013's state-wide payment lines (institution code 51) surface ONLY as member points of
+    // their canonical succession series (57 01/57 02/57 04/57 14): no drill-down series is
+    // NAMED by a rotated 51-code identity, and the 2022 State Inspector reuse of 51 01/51 02
+    // stays out entirely.
+    expect(programFacts.some((fact) => fact.itemId.startsWith("admin_program.51_"))).toBe(false);
+    expect(programFacts.some((fact) => fact.officialCode?.startsWith("51 ") && fact.year !== 2013)).toBe(false);
 
     // Every surfaced program identity appears in at least one 2017-2025 year.
     const yearsByItem = new Map<string, number[]>();
@@ -406,21 +415,30 @@ describe("admin spending facts", () => {
     // Partially-recycled codes: only the genuinely-different early years are dropped; the years
     // that are a rename of the modern program stay in the series.
     expect(yearsFor("30 06")).not.toContain(2012); // archive digitization dropped; 2016 civil-security kept
-    expect(yearsFor("32 07")).not.toContain(2016); // Millennium Challenge dropped
     expect(yearsFor("36 03")).not.toContain(2012); // high-mountain municipal dropped
     expect(yearsFor("36 03")).not.toContain(2013); // general energy-infra dropped
     expect(yearsFor("36 03")).toContain(2016); // system-critical electricity transmission (rename) kept
+
+    // 32 07's 2016 Millennium Challenge point joins the MC succession series (canonical 32 09),
+    // NOT the modern 32 07 infrastructure series — the two identities must stay separate.
+    const mc2016 = programFacts.find((f) => f.officialCode === "32 07" && f.year === 2016);
+    const infra2017 = programFacts.find((f) => f.officialCode === "32 07" && f.year === 2017);
+    expect(mc2016?.itemId).toMatch(/^admin_program\.32_09\./);
+    expect(infra2017?.itemId).toMatch(/^admin_program\.32_07\./);
 
     // General coherence guard: a drill-down series must be ONE program. Any identity whose member
     // facts carry more than one officialLabelKa must be a KNOWN legitimate rename (same program,
     // evolved name) — every other mixed-label identity is a code-reuse leak. Update this allowlist
     // only when a real rename is added; a NEW code appearing here is a bug, not a test to relax.
-    // 09 01 / 25 02 / 28 01 / 34 02 joined their pre-2012 organizational-line labels in
-    // 2026-07-07 (legacyProgramJoins.ts); the others are documented renames of one program.
+    // Keyed on the identity's CANONICAL code: succession-joined series (programSuccessions.ts,
+    // 2026-07-09) carry their member segments' source labels (e.g. 27 02 carries the 35 02-era
+    // and pre-2012-join labels; 57 04/57 14 carry the rotated state-wide labels; 34 02 carries
+    // the sport chain's labels); 09 01 / 25 02 / 28 01 joined pre-2012 organizational-line
+    // labels in 2026-07-07 (legacyProgramJoins.ts); the rest are documented renames.
     const KNOWN_RENAME_CODES = new Set([
-      "09 01", "24 01", "24 15", "24 17", "25 02", "25 04", "25 07", "26 01", "27 01", "27 05",
-      "28 01", "29 01", "29 02", "29 08", "29 09", "30 01", "30 06", "32 02", "32 04", "32 07",
-      "34 02", "35 02", "35 03", "56 04", "56 13",
+      "09 01", "24 01", "24 15", "24 17", "25 02", "25 04", "25 06", "26 01", "26 02", "27 02",
+      "27 03", "27 05", "27 06", "28 01", "29 01", "29 02", "29 07", "29 08", "30 01", "30 06",
+      "31 06", "32 02", "32 04", "32 07", "32 09", "34 02", "57 04", "57 14",
     ]);
     const labelsByItem = new Map<string, Set<string>>();
     for (const fact of programFacts) {
@@ -445,9 +463,12 @@ describe("admin spending facts", () => {
     // leaking ~196M GEL of unrelated pre-2017 spend). Codes whose pre-2017 rows are a legitimate
     // RENAME of the modern program (same program, evolved name) are allowlisted; every other
     // boundary-spanning identity must carry a pre-2017 label identical to a modern-year label.
+    // Keyed on canonical codes: the 2019 super-ministry successions moved the health/social/IDP
+    // and penitentiary series onto 27 02/27 03/27 06/26 02 (2026-07-09); 57 14's pre-2017 donor
+    // label differs from the modern hyphenated wording only.
     const PRE2017_RENAME_ALLOWLIST = new Set([
-      "09 01", "24 01", "25 02", "25 04", "26 01", "27 01", "28 01", "29 01", "29 02", "30 01",
-      "32 02", "32 04", "34 02", "35 02", "35 03",
+      "09 01", "24 01", "25 02", "25 04", "26 01", "26 02", "27 02", "27 03", "27 06", "28 01",
+      "29 01", "29 02", "30 01", "32 02", "32 04", "57 14",
     ]);
     const programFacts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
       (fact) => fact.level === "major_program",
