@@ -26,7 +26,7 @@ test("explorer matches the confirmed editorial v2 reference structure", async ({
   await page.waitForTimeout(1500);
   await capture(page, "editorial-v2-reference");
 
-  await page.goto("http://localhost:3100");
+  await page.goto("http://localhost:3100/explorer");
   await waitForApp(page);
   await capture(page, "editorial-v2-product");
 
@@ -60,7 +60,7 @@ test("analysis matches the single-year reference structure on mobile", async ({ 
   await page.waitForTimeout(1500);
   await capture(page, "editorial-reference-sheet-mobile");
 
-  await page.goto("http://localhost:3100");
+  await page.goto("http://localhost:3100/explorer");
   await waitForApp(page);
   await page.getByTestId("nav-analysis").click();
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();

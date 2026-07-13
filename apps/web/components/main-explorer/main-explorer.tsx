@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
+import Link from "next/link";
 import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
@@ -191,7 +192,12 @@ export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntri
     >
       <div className="mx-auto max-w-[1240px]">
         <header data-testid="explorer-header" className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2 border-b-2 border-[var(--ink)] pb-4 min-[768px]:gap-5">
-          <span className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em]">GeoData</span>
+          <Link
+            href="/"
+            className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em] text-[var(--ink)] no-underline hover:text-[var(--accent)]"
+          >
+            GeoData
+          </Link>
           <nav data-testid="explorer-controls" className="flex gap-4 min-[768px]:gap-[26px]">
             {NAV_ITEMS.map((item) => {
               const active = nav === item.key;

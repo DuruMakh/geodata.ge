@@ -1,6 +1,6 @@
 # GeoData.ge Web App
 
-Next.js app for the GeoData.ge Budget Explorer (multi-year explorer, single-year snapshot, CSV export).
+Next.js app for GeoData.ge: the landing page at `/` (living-relief hero, three paths to the data) and the Budget Explorer at `/explorer` (multi-year explorer, single-year analysis, CSV export).
 
 Product scope, agent rules, data rules, and the design system live at the repo root — read those before changing this app:
 

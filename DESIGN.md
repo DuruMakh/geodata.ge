@@ -14,6 +14,7 @@ This file defines the production design system for GeoData.ge v1. It **replaces 
 Confirmed visual references (checked into the repo):
 
 - `docs/Design HTML files/editorial-v2/GeoData Platform - Editorial v2.dc.html` — **primary reference**: full product prototype (3-tab navigation, explorer, indicators, analysis/single-year view, responsive rules, hash deep-linking).
+- `docs/Design HTML files/editorial-v2/GeoData Site v2.dc.html` — **landing page reference**: site header nav (მთავარი / ექსპლორერი), living-relief hero (Three.js dotted map of Georgia, `data/georgia-geo.js`), key country numbers, "სამი გზა მონაცემებამდე" cards, site footer.
 - `docs/Design HTML files/editorial-v2/Editorial Design System - Reference.dc.html` — component reference sheet (colors, typography, rules, controls, data patterns, single-year surfaces).
 - `docs/Design HTML files/editorial-v2/Budget Explorer - Editorial (approved).dc.html` — earlier approved multi-year explorer layout.
 - `docs/Design HTML files/editorial-v2/DESIGN v4 (Editorial).md` — the original v4.0 draft exported from Claude Design (kept for provenance; this file supersedes it where they differ).
@@ -225,7 +226,9 @@ No screen card, no outer container. Content sits directly on paper.
 
 ### 6.2 Information Architecture
 
-One page, three header nav tabs (hash-synced):
+Two pages: the landing at `/` (მთავარი — see §19) and the explorer at `/explorer`. The landing header nav links the two pages; the explorer wordmark links back to `/`.
+
+The explorer is one page with three header nav tabs (hash-synced):
 
 1. `ხარჯები` — multi-year expenditure explorer (fields/ministries grouping).
 2. `შემოსავლები` — multi-year revenue explorer.
@@ -240,9 +243,11 @@ The header right slot shows a mono context label: selected range (`2005–2025`)
 Screen state serializes into the URL hash so any view is shareable:
 
 ```text
-#nav=expenditure&g=fields&m=line&sh=1&r=2005-2025&sel=id1,id2   (explorer)
-#nav=analysis&as=expenditure&ag=ministries&ay=2024              (analysis)
+/explorer#nav=expenditure&g=fields&m=line&sh=1&r=2005-2025&sel=id1,id2   (explorer)
+/explorer#nav=analysis&as=expenditure&ag=ministries&ay=2024              (analysis)
 ```
+
+The landing links into these (hero CTA and card 01 → `/explorer`, card 02 → `/explorer#nav=analysis`).
 
 Restore on load with validation (unknown values fall back to defaults; ranges clamp to loaded years).
 
@@ -566,3 +571,17 @@ Do not:
 15. Ministries grouping works in both explorer (with program expansion) and analysis (categories only).
 16. URL hash round-trips: reloading a deep link restores nav, grouping, mode, share, range, selection, and analysis year.
 17. No v3.x (Apple) or older terminal/neon styling anywhere.
+
+## 19. Landing Page (მთავარი)
+
+Reference: `docs/Design HTML files/editorial-v2/GeoData Site v2.dc.html`. Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implementation: `apps/web/components/landing/`, geo data in `apps/web/lib/landing/georgiaGeo.ts`, budget-derived values computed server-side in `apps/web/lib/landing/landingData.ts` from the same active facts as the explorer.
+
+Section order (top to bottom):
+
+1. **Header** — editorial header (§7.1) with page links instead of tabs: `მთავარი` (active, accent underline) and `ექსპლორერი` → `/explorer`; right slot shows the mono revenue year range (hidden on mobile).
+2. **Hero — living relief** — Three.js dotted map of Georgia (exact ADM0 outline, analytic elevation, population-scaled city squares emitting ripple waves, Tbilisi national pulse every 45s, peak labels Shkhara/Mkinvartsveri, city hover readout, mouse parallax). **The map is the hero's main subject and is maximized**: the figure is full-bleed (spans the viewport, escaping the 1240px column) and the camera keeps the reference's viewing angle but fits its distance at runtime so the country's real dot bounds fill the canvas at any aspect (margins ≈9%/6%, refit on resize). Headline (`როგორ ივსება და იხარჯება საქართველოს ბიუჯეტი`) overlays top-right on ≥768px, staying in the content grid, and sits above the map on mobile; CTA `დაიწყე ბიუჯეტით` → `/explorer`. The hero's height is not fixed: the camera fits inside a fixed virtual frame (340px <768, 500px <1100, `min(78vh, 820px)` ≥1100), then the canvas is cropped to the map's projected vertical band via a camera view offset — the map never rescales, and the key-numbers section starts immediately under the last dots. The headline overlay's measured height is a hard floor so the copy can never overflow into the stats. `prefers-reduced-motion` renders a still frame; WebGL failure shows a mono fallback note.
+3. **Key numbers** — three hardcoded country figures (population 3.7 მლნ, area 69.7 ათ. კმ², nominal GDP 104.6 მლრდ ₾ · 2025 preliminary, per Geostat), serif 46px values, maintained by hand in `landing-page.tsx`. The section sits 40/56px below the full-bleed hero.
+4. **სამი გზა მონაცემებამდე** — three rule-topped cards, all data live: 01 multi-year explorer (total-revenue + VAT sparkline) → `/explorer`; 02 single-year picture (30-cell expenditure waffle, §4.2 colors) → `/explorer#nav=analysis`; 03 open CSV (real header + two active-fact rows in a tint block) → `/explorer`.
+5. **Footer** — brand + tagline + `info@geodata.ge`; nav links (explorer, analysis); data/license notes (source, last-updated date, CC BY 4.0); mono bottom bar.
+
+Landing QA: waffle renders exactly 30 cells; sparkline endpoints match the loaded revenue range; CSV preview shows real active-fact rows; hero canvas mounts or the fallback note shows; no cards or shadows.
