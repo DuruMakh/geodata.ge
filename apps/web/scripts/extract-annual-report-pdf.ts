@@ -11,7 +11,8 @@
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { parseAnnualReportRows } from "../lib/data/adminSpending/parseAnnualReportPdf";
+import { legacyJoinSourceCodes } from "../lib/data/adminSpending/legacyProgramJoins";
+import { parseAnnualReportRows, parseDetailProgramRows } from "../lib/data/adminSpending/parseAnnualReportPdf";
 import { transliterateAcadNusx } from "../lib/data/adminSpending/transliterateAcadNusx";
 import { normalizeOfficialCode } from "../lib/data/realExpenditure/hierarchy";
 
@@ -38,6 +39,13 @@ type YearConfig = {
   maxGap?: number;
   /** 2006 prints each institution code split across lines ("01"\n"00"\n label); rejoin them. */
   rejoinSplitCodes?: boolean;
+  /**
+   * 2006/2007: the summary tavi-VI table is institution-only; program rows live in per-ministry
+   * DETAIL sections deep in the report. Extract exactly these depth-2 codes from those sections
+   * (parseDetailProgramRows) — the whitelist is the owner-approved legacy-join component set,
+   * so nothing else can leak into staging. Rows are appended to the year's staging output.
+   */
+  detailProgramCodes?: string[];
 };
 
 /**
@@ -66,8 +74,18 @@ function rejoinSplitCodes(text: string): string {
 // 2012 is a full report (org table sliced from its grand-total marker); legacy years
 // (2006-2011) will set transliterate: true.
 const YEAR_CONFIGS: YearConfig[] = [
-  { year: 2006, file: "2006-annual-execution-report.pdf", transliterate: true, tableStartMarker: "ბიუჯეტის ხარჯების ორგანიზაციული კლასიფიკაცია", rejoinSplitCodes: true },
-  { year: 2007, file: "2007-annual-execution-report.pdf", transliterate: true, tableStartMarker: "01 00 საქართველოს პარლამენტი და მასთან არსებული", percentColumn: true },
+  {
+    year: 2006, file: "2006-annual-execution-report.pdf", transliterate: true,
+    tableStartMarker: "ბიუჯეტის ხარჯების ორგანიზაციული კლასიფიკაცია", rejoinSplitCodes: true,
+    // Legacy-join components (owner-approved 2026-07-07), derived from LEGACY_PROGRAM_JOINS so
+    // the join table stays the single source of truth for which lines must be staged.
+    detailProgramCodes: legacyJoinSourceCodes(2006),
+  },
+  {
+    year: 2007, file: "2007-annual-execution-report.pdf", transliterate: true,
+    tableStartMarker: "01 00 საქართველოს პარლამენტი და მასთან არსებული", percentColumn: true,
+    detailProgramCodes: legacyJoinSourceCodes(2007),
+  },
   { year: 2008, file: "2008-annual-execution-report.pdf", transliterate: true, tableStartMarker: "01 00 საქართველოს პარლამენტი და მასთან არსებული ორგანიზაციები", percentColumn: true },
   { year: 2009, file: "2009-annual-execution-report.pdf", transliterate: true, tableStartMarker: "01 00 საქართველოს პარლამენტი და მასთან", maxGap: 90 },
   { year: 2010, file: "2010-annual-execution-report.pdf", transliterate: true, tableStartMarker: "01 00 საქართველოს პარლამენტი და მასთან არსებული" },
@@ -134,6 +152,44 @@ async function main() {
           numText(row.actualThousandGel),
         ].join(","),
       );
+    }
+
+    if (config.detailProgramCodes) {
+      const detail = parseDetailProgramRows(text, config.detailProgramCodes);
+      const institutionActualByPrefix = new Map(
+        rows.filter((row) => /^\d{2} 00$/.test(row.code) && row.code !== "00 00").map((row) => [row.code.slice(0, 2), row.actualThousandGel]),
+      );
+      for (const row of detail.rows) {
+        const institutionActual = institutionActualByPrefix.get(row.code.slice(0, 2));
+        // Every whitelisted detail row belongs to an institution the summary parse must have
+        // captured; a missing total means the summary parse broke, so fail rather than skip
+        // the sanity check.
+        if (institutionActual === undefined) {
+          throw new Error(
+            `${config.year}: detail row ${row.code} has no institution total in the summary parse — cannot sanity-check.`,
+          );
+        }
+        if (row.actualThousandGel > institutionActual + 0.05) {
+          throw new Error(
+            `${config.year}: detail row ${row.code} (${row.actualThousandGel}k) exceeds its institution total (${institutionActual}k) — mis-parse.`,
+          );
+        }
+        const code = normalizeOfficialCode(row.code) ?? row.code;
+        lines.push(
+          [
+            String(config.year),
+            csvEscape(code),
+            csvEscape(row.label),
+            numText(row.approvedThousandGel),
+            numText(row.revisedThousandGel),
+            numText(row.actualThousandGel),
+          ].join(","),
+        );
+      }
+      console.error(
+        `${config.year}: detail pass captured ${detail.rows.length}/${config.detailProgramCodes.length} whitelisted program rows | warnings=${detail.warnings.length}`,
+      );
+      for (const warning of detail.warnings) console.error(`  ! ${warning}`);
     }
   }
 

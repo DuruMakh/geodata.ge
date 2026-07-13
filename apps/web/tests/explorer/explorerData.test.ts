@@ -293,6 +293,44 @@ describe("main explorer data model", () => {
     expect(model.points.find((point) => point.itemId === "admin_program.education.general")?.value).toBe(0.25);
   });
 
+  it("labels a program series by its most recent official name, not by an earlier joined point's", () => {
+    // Pre-2012 legacy-join points sort first (facts are year-ascending) and carry source-year
+    // organizational labels; the series display name must come from the LATEST fact.
+    const legacyJoined: AdminSpendingFact = {
+      year: 2006,
+      itemId: "admin_program.education.general",
+      parentItemId: "admin_spending.education_science_youth",
+      level: "major_program",
+      amountGel: 120,
+      basis: "actual",
+      sourceId: "source.two",
+      officialCode: "32 03",
+      officialLabelKa: "Schools + support units (2006 join)",
+      officialInstitutionCode: "32 00",
+      officialInstitutionLabelKa: "Education ministry (2006)",
+      mappingConfidence: "medium",
+      mappingNotes: "Pre-2012 organizational line(s) joined to this modern program series.",
+    };
+
+    const model = buildExplorerModel({
+      facts,
+      adminFacts: [legacyJoined, ...adminFacts],
+      adminCategories,
+      expenditureGrouping: "ministries",
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: ["admin_spending.total", "admin_program.education.general"],
+      startYear: 2025,
+      endYear: 2025,
+      measure: "share_of_total",
+    });
+
+    expect(model.items.find((item) => item.id === "admin_program.education.general")).toEqual(
+      expect.objectContaining({ kaLabel: "General education", enLabel: "General education" }),
+    );
+  });
+
   it("treats the biggest share-of-total change as the largest movement in either direction", () => {
     const localFacts: BudgetFactImportRow[] = [
       { ...facts[0], itemId: "spending.health", amountGel: 900 },

@@ -8,7 +8,9 @@ processing-group notes (`2005-2014-ministries-expenditure-methodology.md`,
 appendices. Where any older note disagrees with this document or with
 `apps/web/lib/data/adminSpending/categories.ts`, **this document and the code are authoritative.**
 
-Last reviewed: 2026-07-06 (full multi-dimension validation; see §8).
+Last reviewed: 2026-07-09 (program successions shipped — see
+`ministries-drilldown-programs-methodology.md`, the authoritative deep-dive on the §7
+drill-down; §7 here is the summary).
 
 ---
 
@@ -71,7 +73,7 @@ SHA-256 hashes match the appendix tables in the two group docs).
 | 2012 | `mof_2012_programmatic_fact_actual` | `…/2012-annual-execution-report.pdf` | PDF, drill-down |
 | 2013 | `mof_2013_programmatic_fact_actual` | `excel-fact-files/2013-fact.xlsx` | Drop-in workbook (§5.2) |
 | 2014 | `mof_2014_programmatic_fact_actual` | `excel-fact-files/2015-fact.xlsx` (`col_4`) | Column extract (§5.3) |
-| 2015 | `mof_2015_programmatic_fact_actual` | `…/2015-annual-execution-tavi-VI-programmatic.pdf` | PDF, institution-level |
+| 2015 | `mof_2015_programmatic_fact_actual` | `…/2015-annual-execution-tavi-VI-programmatic.pdf` | PDF, drill-down |
 | 2016 | `mof_2016_programmatic_fact_actual` | `…/2016-annual-execution-tavi-VI-programmatic.pdf` | PDF, drill-down |
 | 2017–2025 | `mof_<year>_programmatic_fact_actual` | `excel-fact-files/<year>-fact.xlsx` | Confirmed baseline (§5.1) |
 
@@ -248,15 +250,20 @@ wider table (`maxGap`). Shared characteristics:
 
 - **2016** — full program detail (drill-down, depth 4), `00 00` = 10,292,234.1 k, debt service
   740,185.7 k.
-- **2015** — institution-level (printed program detail incomplete), `00 00` = 9,703,127.1 k, debt
-  service 731,023.7 k (`58 00` children kept so debt still splits).
+- **2015** — full program detail (drill-down, depth 4; enabled 2026-07-07), `00 00` = 9,703,127.1 k,
+  debt service 731,023.7 k. All 23 program-carrying institutions sum to their totals at every
+  depth (121 depth-2 rows); the 38 small institutions print no program rows and remain their own
+  aggregation leaves. An earlier note calling 2015 "institution-level (printed program detail
+  incomplete)" was **wrong** and is superseded — the drill-down was initially left off by mistake.
 
 ### 5.7 Drill-down availability by year
 
-Program-level (`major_program`) points exist only where the source carries depth-2 detail:
-**2012, 2013, 2014, 2016, 2017–2025**. **2005–2011 and 2015 are institution-level** — they
-contribute to category totals but not to any program series. (This is a source-detail limit, not a
-classification choice.)
+Program-level (`major_program`) points exist for **2012–2025** (full source depth-2 detail) plus
+**owner-approved joined points for 2006–2011** (§7.6): nine modern series carry pre-2012 values
+mapped from the annual reports' organizational lines (2008–2011 from the summary tables;
+2006–2007 recovered from the reports' per-ministry detail sections). **2005–2011 remain
+institution-level for aggregation** — category totals never use program rows there. Only 2005
+(totals-only source) has no drill-down points.
 
 ---
 
@@ -343,6 +350,10 @@ Revisit as a scope decision, not an extraction gap.
 
 ## 7. The drill-down (major programs)
 
+> **Full reference:** `ministries-drilldown-programs-methodology.md` — data structure, all
+> identity rules (eras, successions, joins), the complete 48-series coverage table, decision
+> log and maintenance guide. This section is the summary.
+
 ### 7.1 Threshold
 A program is a "major program" only if it reaches **`MAJOR_PROGRAM_THRESHOLD_GEL` = 100 M GEL** in
 at least one **modern (≥ 2017)** year (`MAJOR_PROGRAM_MODERN_MIN_YEAR = 2017`). Measuring the
@@ -355,12 +366,18 @@ only when it belongs to a program that survives to 2017+ (same code, same or sli
 program). Abolished programs are not shown as their own line — their money still counts in the
 category totals.
 
-### 7.3 Program identity & semantic eras
+### 7.3 Program identity, semantic eras & successions
 Identity = `code | parentCategory | eraKey`. By default all rows of a code+category merge into one
 series (so a **rename** stays a continuous series). `PROGRAM_SEMANTIC_ERAS` splits a code into
 distinct identities across year ranges when the same code was **recycled** for a genuinely
 different program — the old program gets its own identity and is then dropped (it never reaches the
-threshold in a modern year).
+threshold in a modern year). `PROGRAM_SUCCESSIONS` (`programSuccessions.ts`, owner-approved
+2026-07-09) does the inverse: when the SAME program continued under a **new code** (ministry
+merger, renumbering, or the state-wide institution's near-yearly code rotation), all segments
+resolve to one canonical identity — the latest code — so the series is continuous (e.g. social
+protection 35 02 → 27 02 runs 2006–2025 as one series; external debt service runs 2012–2025
+across eleven code segments). Succession ranges take precedence over eras; perimeter changes
+(e.g. the 2019 border-guard split of 30 01) are NOT successions and stay separate series.
 
 ### 7.4 Code-reuse rule (the maintenance hazard)
 When a code is recycled between the pre-2017 organizational coding and the 2017+ coding, its
@@ -375,18 +392,80 @@ be *partly* rename and *partly* reuse. Worked examples (all in `PROGRAM_SEMANTIC
   `29 01`, `29 02`, `32 02`, `32 04`, `35 02`, `35 03`, and modern-only drifts like `29 09`
   (ლოგისტიკური/ლოჯისტიკური spelling).
 
-The **earliest backfilled organizational-coding year is 2012**, so legacy ranges start at 2012
-where a 2012 row exists. A guard test
+The **earliest organizational-coding year is 2012**, so legacy ranges start at 2012 where a 2012
+row exists. One era deliberately reaches further back: `30 01` `public_order_and_border` starts at
+**2012** (owner decision 2026-07-07) — the pre-2019 "public order + state border" program is the
+same program back through 2012 (identical labels 2013–2016), so the series runs 2012–2018 and the
+post-border-split `public_order` era continues 2019+. A guard test
 (`tests/data/adminSpending.test.ts` "splits recycled program codes…") asserts the fixed codes drop
 their legacy years and that any major-program identity with more than one distinct program name is
 on a documented rename allowlist — so a new reuse leak fails CI.
 
 ### 7.5 Display: names only
-The explorer shows each drill-down program **by name** (`officialLabelKa`); the tavi-VI code is
-intentionally **not** surfaced (it fragments across reorganizations — the same sport-development
-program is `39 02` → `33 05` → `32 12` → `32 11` → `33 07` → `34 02` across the years). The
-`officialCode` remains in the facts CSV for provenance. (`lib/explorer/explorerData.ts` sets
-`detailLabel: null` for admin facts.)
+The explorer shows each drill-down program **by name** (the series' LATEST `officialLabelKa`);
+the tavi-VI code is intentionally **not** surfaced, because it changes across reorganizations —
+the same sport-development program is `39 02` → `33 05` → `32 12` → `32 11` → `33 07` → `34 02`
+across the years (since 2026-07-09 those segments are succession-joined into one continuous
+2010–2025 series). The per-point `officialCode` remains in the facts CSV for provenance.
+(`lib/explorer/explorerData.ts` sets `detailLabel: null` for admin facts.)
+
+### 7.6 Pre-2012 legacy program joins (2006–2011)
+
+Georgia's budget switched to **program budgeting with the 2012 budget**; before that, depth-2
+lines are organizational units (departments, LEPLs, financing lines). The 2008–2011
+annual-execution reports print those lines in full (157–175 per year), under a **different code
+numbering** (e.g. `25 00` = Finance in 2008 but Regional Development from 2009); the 2006–2007
+reports print them only in per-ministry **detail sections** deep in the document (recovered by a
+targeted whitelist pass, `parseDetailProgramRows` — codes split across lines and amounts wrapping
+mid-number are rejoined; nothing outside the whitelist can enter staging). Owner decision
+(2026-07-07, "map as many programs as long as they existed"): where a modern qualifying program's
+function is carried by one or a few pre-2012 lines with continuous label/value evidence, those
+years **join the modern series**. Nine series were approved (`legacyProgramJoins.ts` holds every
+component code + amount):
+
+| Series | 2006 | 2007 | 2008 | 2009 | 2010 | 2011 | Notes |
+|---|---|---|---|---|---|---|---|
+| `25 02` roads | 181.2M | 277.1M | 272.3M | 509.2M | 549.9M | 580.8M | 2006–2008 under the Economy ministry (2006 = Roads Department line, confirmed by the narrative's 181.2M transport total) |
+| `35 02` social/pensions | 562.9M | 699.9M | 990.0M | 1 142.7M | 1 166.6M | 1 219.4M | 2006 = fund+agency minus health (see below); 2011 = merge of pensions + assistance + rehabilitation |
+| `35 03` health programmes | 123.5M | 158.6M | 226.5M | 285.6M | 329.2M | 277.2M | 2006 = narrative carve-out (see below) |
+| `32 02` general education | 188.8M | 204.1M | 286.1M | 326.3M | 365.4M | 349.1M | owner-chosen perimeter: schools + support units (resource centers, curriculum, teacher dev, mandaturi, textbooks — as each existed) |
+| `32 04` higher ed & science | 47.2M | 64.3M | 84.8M | 99.5M | 99.4M | 94.7M | university/research support + science + exams center (+ constitutionalism) |
+| `28 01` foreign policy | 43.6M | 57.8M | 57.1M | 66.0M | 67.9M | 74.5M | merge: apparatus + missions + international organisations |
+| `09 01` common courts | 26.3M | 28.5M | 32.7M | 35.2M | 30.6M | 29.9M | source code `09 02` |
+| `34 02` IDP maintenance | 15.6M | 20.4M | 24.5M | 22.2M | 25.8M | 23.9M | source codes `34 04`/`34 03` |
+| `39 02` sport | — | — | — | — | 28.5M | 34.3M | ministry created 2010; same code+label |
+
+**The 2006 Social Insurance Fund split (owner-approved).** 2006 predates the social/health
+financing reform: state pensions AND the state health programmes both ran through the Social
+Insurance Fund's single line (`35 22` = 630,504.7k), with a separate assistance agency
+(`35 23` = 55,916.1k). Per the report narrative (health programmes = **123.5M**), the fund is
+split: social = 630,504.7 + 55,916.1 − 123,500.0 = **562,920.8k**, health = **123,500.0k** —
+the two carve-outs complement the printed lines exactly. This is a modelled split like the 2005
+finance/culture splits, carried as `amountThousandGelOverride` on the join entries.
+
+**Mechanics.** `extractAnnualReportYears` injects one synthetic depth-2 row per join (sum of the
+source rows, or the documented override), keeping the **primary source code, source label and
+source institution** for provenance and carrying a `legacyProgramJoin` marker with the target
+series. The row is `isLeafCode=false` and excluded from leaf detection, so **2006–2011 category
+aggregation and reconciliation are byte-identical to the institution-level pipeline** — the
+joins are drill-down-only. `generateAdminSpendingFacts` resolves the marked rows straight to the
+modern identity and stamps the series' parent category plus a per-point provenance note
+(`mapping_notes`).
+
+**Explicitly NOT mapped** (owner-reviewed): defence `29 01` and MIA `30 xx` (pre-2012 = one
+whole-ministry line each), prisons department (its true successor is the dropped `27 02`
+criminal-justice-reform legacy program, not the small modern `27 01` policy program), and the
+**modern series** municipal `25 03`, water `25 04`, vocational `32 03`, justice `26 01`, economy
+`24 01`, energy `36 03` (perimeter or aggregation mismatch). Those are 2012+ series codes — not
+to be confused with the pre-2012 **source** codes in the table above, which reuse the same
+numbers for different programs under the old numbering (the 2009–2011 roads source lines are
+literally coded `25 03`/`25 04`, and 2007's schools line is `32 03`).
+
+**Caveats.** (1) Pre-2012 points are the closest organizational-unit equivalents of the modern
+programs — a modelled continuity, not a source-stated one; per-point composition is in the facts'
+`mapping_notes`. (2) The 2008 roads point precedes its modern parent category (no Regional
+Development ministry until 2009): the drill-down follows the *program*, the category follows the
+*administrative owner* — the two integrity tests document this exemption.
 
 ---
 
@@ -419,12 +498,15 @@ leaking pre-2017 spend into modern series — was fixed (§7.4) and locked with 
 ## 9. Known limitations & caveats
 
 1. **Reconciliation checks the year total only** — mis-splits need independent figure review (§8.1).
-2. **Drill-down series fragment across reorganizations** — because program codes change at each
-   machinery-of-government change, a continuous *function* (e.g. sport development) appears as
-   several code segments. The **category** series are continuous; only the per-program view is
-   segmented. This is inherent to organizational coding and accepted.
-3. **2005–2011 and 2015 are institution-level** — no program drill-down those years (source
-   detail limit).
+2. **Drill-down continuity across reorganizations is modelled** — program codes change at each
+   machinery-of-government change, so a continuous *function* (e.g. sport development) spans
+   several code segments. Since 2026-07-09 `PROGRAM_SUCCESSIONS` joins those segments into one
+   series wherever the label evidence shows the SAME program (see
+   `ministries-drilldown-programs-methodology.md` §5); this is a documented modelling layer, not
+   a source-stated continuity. Perimeter changes remain separate series.
+3. **2005–2011 are institution-level for aggregation.** Nine drill-down series carry
+   owner-approved joined points for 2006–2011 (§7.6); everything else has no program points before
+   2012. 2005 is totals-only.
 4. **Classifier keys on institution labels** — a new year with an unforeseen label spelling could
    mis-route; always re-run the anomaly-scan (below) after adding a year.
 5. **2004 excluded** — scope decision (§6.11).
@@ -459,7 +541,7 @@ To add a new (older or newer) year:
 9. **Owner sign-off** for any taxonomy-relevance judgment (a ministry that maps ambiguously, a
    combined ministry to split, a program to drop) — do not decide these unilaterally.
 
-**Key files:** `lib/data/adminSpending/{categories,generateAdminSpendingFacts,extractWorkbooks,extractAnnualReportYears,extractOlderMinistryYears,parseAnnualReportPdf,transliterateAcadNusx}.ts`,
+**Key files:** `lib/data/adminSpending/{categories,generateAdminSpendingFacts,programSuccessions,legacyProgramJoins,extractWorkbooks,extractAnnualReportYears,extractOlderMinistryYears,parseAnnualReportPdf,transliterateAcadNusx}.ts`,
 `scripts/extract-annual-report-pdf.ts`, `lib/data/coverage.ts`, `lib/explorer/explorerData.ts`.
 **Tests:** `tests/data/adminSpending.test.ts`, `tests/data/adminSpending/{annualReportYears,olderMinistryYears,semanticEras}.test.ts`, `tests/data/sourceCoverage.test.ts`.
 **Detailed per-year config appendices:** `group-c-annual-report-ministries-methodology.md`
