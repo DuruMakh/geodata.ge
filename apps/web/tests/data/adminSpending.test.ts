@@ -92,7 +92,7 @@ describe("admin spending facts", () => {
   }, 30_000);
 
   it("resolves every generated admin-spending fact source ID to a registered source document", async () => {
-    const facts = await loadAdminSpendingFacts("../../data/imports/admin-spending-facts-2004-2025.csv");
+    const facts = await loadAdminSpendingFacts("../../data/imports/admin-spending-facts-2005-2025.csv");
     const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
     const registeredSourceIds = new Set(sources.map((source) => source.sourceId));
     const unresolvedSourceIds = Array.from(
@@ -130,7 +130,7 @@ describe("admin spending facts", () => {
   });
 
   it("loads generated admin spending facts from CSV", async () => {
-    const facts = await loadAdminSpendingFacts("../../data/imports/admin-spending-facts-2004-2025.csv");
+    const facts = await loadAdminSpendingFacts("../../data/imports/admin-spending-facts-2005-2025.csv");
     const categoryFacts = facts.filter((fact) => fact.level === "admin_category");
     const majorProgramFacts = facts.filter((fact) => fact.level === "major_program");
 

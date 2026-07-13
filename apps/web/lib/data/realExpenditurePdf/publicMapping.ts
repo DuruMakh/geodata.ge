@@ -1,3 +1,4 @@
+import { csvEscape } from "../csvEscape";
 import type { ExpenditurePdfOfficialRow } from "./phase1Pilot";
 
 export function expenditurePdfCompactMappingOutputFileForYear(year: number): string {
@@ -254,12 +255,6 @@ export function validateCompactPdfSpendingMappings(
     differenceGel,
     missingCodes: [],
   };
-}
-
-function csvEscape(value: string | number | boolean | null): string {
-  if (value === null) return "";
-  const text = String(value);
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
 export function pdfSpendingMappingsToCsv(rows: CompactPdfSpendingMappingRow[]): string {

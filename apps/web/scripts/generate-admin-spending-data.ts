@@ -199,7 +199,7 @@ async function main() {
     officialRowsToCsv(officialRows),
     "utf8",
   );
-  await writeFile(path.join(importsDir, "admin-spending-facts-2004-2025.csv"), factsToCsv(facts), "utf8");
+  await writeFile(path.join(importsDir, "admin-spending-facts-2005-2025.csv"), factsToCsv(facts), "utf8");
   await writeFile(
     path.join(reviewDir, "admin-spending-major-program-review-2004-2025.csv"),
     programReviewCsv(facts),

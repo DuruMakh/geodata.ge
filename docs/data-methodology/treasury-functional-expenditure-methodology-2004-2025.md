@@ -16,6 +16,10 @@ for deeper provenance detail:
 - `2007-2016-expenditure-final-methodology.md`
 - `2025-expenditure-final-methodology.md` (the original confirmed 2017–2025 process)
 
+Sibling methodologies for the app's other datasets: `revenue-methodology.md` (the receipts side —
+consolidated-budget revenue from treasury Form #1, 2005–2025) and
+`ministries-expenditure-methodology.md` (the organizational expenditure lens).
+
 One-line integrity claim: **every published year reproduces byte-identical from
 SHA-256-verified official source PDFs, and every year's category totals sum to the
 official state-budget payments total within 1,000 GEL on multi-billion-GEL budgets.**
@@ -406,7 +410,7 @@ file ends with `%%EOF`.
 | Compose / import | `apps/web/scripts/compose-budget-facts.ts` |
 | Regression pins | `apps/web/tests/data/pipelineIntegration.test.ts` |
 | Machine-readable source catalog | `data/sources/source-documents.csv` |
-| Published facts | `data/imports/expenditure-facts-2004-2025.csv`, `budget-facts-2004-2025.csv` |
+| Published facts | `data/imports/expenditure-facts-2005-2025.csv`, `budget-facts-2005-2025.csv` |
 
 ---
 
@@ -416,3 +420,5 @@ Compiled 2026-07-05 from the reviewed, landed state of `main` (commit `17b0b66`)
 consolidating this project's per-era methodology notes, the source catalog, the extraction
 and mapping code, the regression pins, and the pre-landing grounding review. To export to
 Word or PDF for external distribution: `pandoc treasury-functional-expenditure-methodology-2004-2025.md -o methodology.docx`.
+
+Changelog 2026-07-13: published facts CSVs renamed `expenditure-facts-2004-2025.csv` / `budget-facts-2004-2025.csv` → `*-2005-2025.csv` — the files ship 2005–2025 rows only (2004 was deliberately removed), so the filenames now match actual coverage. Data content unchanged.

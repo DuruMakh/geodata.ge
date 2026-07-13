@@ -1,3 +1,4 @@
+import { csvEscape } from "../data/csvEscape";
 import type { ExplorerTableRow } from "./types";
 
 const headers = [
@@ -15,11 +16,6 @@ const headers = [
   "source_url_or_file",
   "last_reviewed_at",
 ];
-
-function csvCell(value: string | number): string {
-  const text = String(value);
-  return /[",\n\r]/.test(text) ? `"${text.replaceAll("\"", "\"\"")}"` : text;
-}
 
 export function buildExplorerCsv(rows: ExplorerTableRow[], years: number[]): string {
   const csvRows = [headers.join(",")];
@@ -48,7 +44,7 @@ export function buildExplorerCsv(rows: ExplorerTableRow[], years: number[]): str
           source.sourceUrlOrFile,
           source.lastReviewedAt,
         ]
-          .map(csvCell)
+          .map(csvEscape)
           .join(","),
       );
     }

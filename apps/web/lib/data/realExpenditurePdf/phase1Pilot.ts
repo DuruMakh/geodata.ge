@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { PDFParse } from "pdf-parse";
+import { csvEscape } from "../csvEscape";
 
 export function expenditurePdfPhase1OutputFilesForYear(year: number) {
   return {
@@ -640,12 +641,6 @@ export function buildWorkbookComparisonReport(input: {
         ? []
         : ["Diagnostic only: the PDF E11 source and workbook tavi 6 source have different structures."],
   };
-}
-
-function csvEscape(value: string | number | boolean | null): string {
-  if (value === null) return "";
-  const text = String(value);
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
 export function expenditurePdfRowsToCsv(rows: ExpenditurePdfOfficialRow[]): string {

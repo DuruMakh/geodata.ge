@@ -34,8 +34,8 @@ import { TOTAL_ONLY_BUDGET_FACTS } from "../../lib/data/totalOnlyBudgetFacts";
 const LEGACY_JOIN_NOTE_PREFIX = "Pre-2012 organizational line(s) joined";
 const isLegacyJoinFact = (fact: AdminSpendingFact) => fact.mappingNotes.startsWith(LEGACY_JOIN_NOTE_PREFIX);
 
-const BUDGET_FACTS_CSV = "../../data/imports/budget-facts-2004-2025.csv";
-const ADMIN_SPENDING_FACTS_CSV = "../../data/imports/admin-spending-facts-2004-2025.csv";
+const BUDGET_FACTS_CSV = "../../data/imports/budget-facts-2005-2025.csv";
+const ADMIN_SPENDING_FACTS_CSV = "../../data/imports/admin-spending-facts-2005-2025.csv";
 const GLOSSARY_CSV = "../../data/glossary/category-glossary.csv";
 const SOURCE_DOCUMENTS_CSV = "../../data/sources/source-documents.csv";
 const ADMIN_CATEGORIES_JSON = "../../data/taxonomy/admin-spending-categories.json";
