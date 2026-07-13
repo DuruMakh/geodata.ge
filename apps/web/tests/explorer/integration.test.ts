@@ -7,8 +7,8 @@ import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, RE
 import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
-const REAL_BUDGET_FACTS_PATH = "../../data/imports/budget-facts-2004-2025.csv";
-const REAL_ADMIN_FACTS_PATH = "../../data/imports/admin-spending-facts-2004-2025.csv";
+const REAL_BUDGET_FACTS_PATH = "../../data/imports/budget-facts-2005-2025.csv";
+const REAL_ADMIN_FACTS_PATH = "../../data/imports/admin-spending-facts-2005-2025.csv";
 
 describe("explorer integration with real CSV data", () => {
   it("loads sample facts and produces the expected year range", async () => {

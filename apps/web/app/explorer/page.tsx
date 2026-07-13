@@ -20,10 +20,10 @@ async function loadAdminCategories(relativePath: string): Promise<AdminSpendingC
 
 export default async function ExplorerPage() {
   const [facts, glossary, sourceDocuments, adminFacts, adminCategories] = await Promise.all([
-    loadBudgetFactRows("../../data/imports/budget-facts-2004-2025.csv"),
+    loadBudgetFactRows("../../data/imports/budget-facts-2005-2025.csv"),
     loadGlossary("../../data/glossary/category-glossary.csv"),
     loadSourceDocuments("../../data/sources/source-documents.csv"),
-    loadAdminSpendingFacts("../../data/imports/admin-spending-facts-2004-2025.csv"),
+    loadAdminSpendingFacts("../../data/imports/admin-spending-facts-2005-2025.csv"),
     loadAdminCategories("../../data/taxonomy/admin-spending-categories.json"),
   ]);
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";

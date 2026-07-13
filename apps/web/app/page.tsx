@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const [facts, glossary, sourceDocuments] = await Promise.all([
-    loadBudgetFactRows("../../data/imports/budget-facts-2004-2025.csv"),
+    loadBudgetFactRows("../../data/imports/budget-facts-2005-2025.csv"),
     loadGlossary("../../data/glossary/category-glossary.csv"),
     loadSourceDocuments("../../data/sources/source-documents.csv"),
   ]);

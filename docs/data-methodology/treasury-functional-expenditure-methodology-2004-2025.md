@@ -406,7 +406,7 @@ file ends with `%%EOF`.
 | Compose / import | `apps/web/scripts/compose-budget-facts.ts` |
 | Regression pins | `apps/web/tests/data/pipelineIntegration.test.ts` |
 | Machine-readable source catalog | `data/sources/source-documents.csv` |
-| Published facts | `data/imports/expenditure-facts-2004-2025.csv`, `budget-facts-2004-2025.csv` |
+| Published facts | `data/imports/expenditure-facts-2005-2025.csv`, `budget-facts-2005-2025.csv` |
 
 ---
 
@@ -416,3 +416,5 @@ Compiled 2026-07-05 from the reviewed, landed state of `main` (commit `17b0b66`)
 consolidating this project's per-era methodology notes, the source catalog, the extraction
 and mapping code, the regression pins, and the pre-landing grounding review. To export to
 Word or PDF for external distribution: `pandoc treasury-functional-expenditure-methodology-2004-2025.md -o methodology.docx`.
+
+Changelog 2026-07-13: published facts CSVs renamed `expenditure-facts-2004-2025.csv` / `budget-facts-2004-2025.csv` → `*-2005-2025.csv` — the files ship 2005–2025 rows only (2004 was deliberately removed), so the filenames now match actual coverage. Data content unchanged.
