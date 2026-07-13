@@ -9,7 +9,7 @@ Read first:
 - `docs/superpowers/specs/2026-05-10-geodata-budget-v1-design.md`
 - `DESIGN.md` (for any UI work)
 
-V1 focuses on annual national budget data for 2004-2025 (expenditure from 2004, revenue from 2005), reviewed data ingestion, public spending-field taxonomy, revenue categories, ministry-level expenditure series, CSV export, and clear budget visualizations.
+V1 focuses on annual national budget data for 2005-2025, reviewed data ingestion, public spending-field taxonomy, revenue categories, ministry-level expenditure series, CSV export, and clear budget visualizations.
 
 Current loaded coverage: revenue is complete for 2005-2025; expenditure has detailed public-field data for 2005-2025. 2004 expenditure is not currently loaded (its treasury source is central-budget scoped).
 

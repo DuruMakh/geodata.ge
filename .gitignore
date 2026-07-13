@@ -38,7 +38,6 @@ data/reports/*.txt
 .tmp/
 tools/
 design-shotgun/
-design.md
 docs/Budget Data 2025/
 docs/Prototpy variatints experiments/
 .gstack/
