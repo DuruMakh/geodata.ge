@@ -1,8 +1,6 @@
 import path from "node:path";
-import * as XLSX from "xlsx";
-import { pickSheetName } from "../parsing/cellUtils";
+import { readWorkbookMatrix } from "../parsing/workbookMatrix";
 import { parseTavi6Rows } from "./parseTavi6Rows";
-import type { MatrixCell } from "./parseTavi6Rows";
 import type { OfficialExpenditureRow, RealExpenditureSource } from "./types";
 
 export const realExpenditureSources: RealExpenditureSource[] = [
@@ -29,21 +27,10 @@ export const realExpenditureSources: RealExpenditureSource[] = [
 export function extractOfficialExpenditureRows(warnings?: string[]): OfficialExpenditureRow[] {
   return realExpenditureSources.flatMap((source) => {
     const workbookFile = path.resolve(process.cwd(), source.workbookPath);
-    const workbook = XLSX.readFile(workbookFile, { cellDates: false });
-    const sheetName = pickSheetName(workbook, {
+    const { sheetName, matrix } = readWorkbookMatrix(workbookFile, {
       preferredNames: source.preferredSheetNames,
       fallbackPattern: (normalized) => normalized.includes("tavi 6") || normalized.includes("vi თავი"),
       sheetDescription: "tavi 6 sheet",
-    });
-    const sheet = workbook.Sheets[sheetName];
-
-    if (!sheet) throw new Error(`Missing sheet after selection: ${sheetName}`);
-
-    const matrix = XLSX.utils.sheet_to_json<MatrixCell[]>(sheet, {
-      header: 1,
-      blankrows: false,
-      defval: null,
-      raw: true,
     });
 
     return parseTavi6Rows({

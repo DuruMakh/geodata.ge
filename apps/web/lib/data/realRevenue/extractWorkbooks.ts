@@ -2,10 +2,9 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { PDFParse } from "pdf-parse";
-import * as XLSX from "xlsx";
 import { REVENUE_YEARS } from "../coverage";
-import { pickSheetName } from "../parsing/cellUtils";
-import { parseTavi1Rows, type MatrixCell } from "./parseTavi1Rows";
+import { readWorkbookMatrix } from "../parsing/workbookMatrix";
+import { parseTavi1Rows } from "./parseTavi1Rows";
 import { parseTreasuryPdfRows } from "./parseTreasuryPdfRows";
 import type { OfficialRevenueRow, RealRevenuePdfSource, RealRevenueSource } from "./types";
 
@@ -42,21 +41,10 @@ export function extractOfficialWorkbookRevenueRows(warnings?: string[]): Officia
     const workbookFile = path.resolve(process.cwd(), source.workbookPath);
     if (!existsSync(workbookFile)) return [];
 
-    const workbook = XLSX.readFile(workbookFile, { cellDates: false });
     // No fallback pattern here: revenue extraction must only use explicitly reviewed sheets.
-    const sheetName = pickSheetName(workbook, {
+    const { sheetName, matrix } = readWorkbookMatrix(workbookFile, {
       preferredNames: source.preferredSheetNames,
       sheetDescription: "revenue sheet",
-    });
-    const sheet = workbook.Sheets[sheetName];
-
-    if (!sheet) throw new Error(`Missing sheet after selection: ${sheetName}`);
-
-    const matrix = XLSX.utils.sheet_to_json<MatrixCell[]>(sheet, {
-      header: 1,
-      blankrows: false,
-      defval: null,
-      raw: true,
     });
 
     return parseTavi1Rows({
