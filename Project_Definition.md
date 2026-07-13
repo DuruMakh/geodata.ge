@@ -151,11 +151,10 @@ Frontend and backend:
 
 Data serving (current):
 
-- Reviewed CSV files under `data/imports/`, read at build time. The deployed app is fully static and needs no runtime database.
-
-Database (planned, not wired):
-
-- Supabase Postgres via Prisma. Schema and client are scaffolded (`apps/web/prisma/`, `apps/web/lib/db/prisma.ts`) but no runtime code imports them.
+- Reviewed CSV files under `data/imports/` remain the canonical human-reviewed source of truth.
+- Supabase Postgres (via Prisma 7) is the canonical serving store, populated from those CSVs by an idempotent import (`npm run data:import`) that proves exact parity (row counts and GEL totals) on every run.
+- Pages are still rendered at build time (`GEODATA_DATA_SOURCE=db` reads the database during the build); the deployed app stays fully static, so database downtime never affects visitors.
+- `GEODATA_DATA_SOURCE=csv` (the default when unset) builds directly from the CSVs — the documented fallback, guaranteed identical by the import parity check. See `docs/data-methodology/database-import.md`.
 
 UI:
 

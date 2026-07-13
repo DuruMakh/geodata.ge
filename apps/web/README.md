@@ -11,7 +11,7 @@ Product scope, agent rules, data rules, and the design system live at the repo r
 
 ## Setup
 
-Dev and build need no `.env`. Create `apps/web/.env` from `.env.example` (see the root README) only before running Prisma commands.
+Dev and build need no `.env` by default (data comes from the reviewed CSVs). Create `apps/web/.env` from `.env.example` before running Prisma commands, `npm run data:import`, or builds with `GEODATA_DATA_SOURCE=db` (see `../../docs/data-methodology/database-import.md`).
 
 ```powershell
 npm install

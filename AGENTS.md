@@ -124,8 +124,7 @@ V1 is not a broad public-data catalog. Do not re-expand scope unless the user ex
 Current stack:
 
 - Next.js 16 with TypeScript (strict) and Tailwind v4; custom editorial component layer (`apps/web/components/ui/editorial.tsx`), no shadcn.
-- Data serving: reviewed CSVs under `data/imports/` read at build time. The app is fully static — no runtime database and no `.env` needed for dev or build.
-- Prisma + Supabase Postgres are the planned future database path: scaffolded (`apps/web/prisma/`, `apps/web/lib/db/prisma.ts`) but imported by no runtime code. Do not build against them without explicit user approval.
+- Data serving: reviewed CSVs under `data/imports/` are the canonical human-reviewed source of truth. Supabase Postgres (via Prisma 7) is the canonical serving store, populated from them by the idempotent, parity-checked `npm run data:import`. Pages are rendered at build time from the database when `GEODATA_DATA_SOURCE=db` (db builds also re-verify the mirror row-by-row against the checkout's CSVs); the default (`csv`, no `.env` needed) builds straight from the CSVs and is the documented fallback. The deployed app stays fully static either way. The database must never be edited directly — see `docs/data-methodology/database-import.md`. Activation status: the mechanism is merged; until the owner completes the one-time Supabase setup and first import (database-import.md §One-time setup), production builds still use the CSV default. Update this sentence when that changes.
 - Deployment: Vercel.
 
 The workspace is a git repository on `main` with a GitHub `origin` remote. Check git state before promising commits, branches, pushes, or PRs.
