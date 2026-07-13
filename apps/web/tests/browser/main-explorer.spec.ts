@@ -159,13 +159,16 @@ test("range strip supports chips and dragging handles", async ({ page }) => {
   await expect(strip).toContainText("2005–2025");
   await expect(strip).toContainText("10წ");
 
+  // Late font loads shift the layout on slow CI runners; settle before
+  // measuring, and let hover()'s stability checks position the pointer.
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
   const startHandle = strip.getByTestId("range-start-handle");
   await startHandle.scrollIntoViewIfNeeded();
+  await startHandle.hover();
   const startBox = await startHandle.boundingBox();
   const railBox = await strip.locator("[role='group']").boundingBox();
   if (!startBox || !railBox) throw new Error("Expected draggable range elements to be measurable");
 
-  await page.mouse.move(startBox.x + startBox.width / 2, startBox.y + startBox.height / 2);
   await page.mouse.down();
   await page.mouse.move(railBox.x + railBox.width / 2, startBox.y + startBox.height / 2, { steps: 8 });
   await page.mouse.up();

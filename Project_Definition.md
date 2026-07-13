@@ -14,7 +14,7 @@ A Georgian-first public budget explorer for understanding Georgia's national bud
 
 GeoData.ge is a long-term public data platform idea, but v1 is intentionally narrow: Georgia Budget Explorer.
 
-The first version focuses on annual national budget data for 2004-2025, including revenue, tax revenue, and expenditure by public spending fields. Revenue coverage starts in 2005 because the project does not currently have a reviewed 2004 revenue source. Expenditure coverage starts in 2004. The product should help users understand where public money comes from, where it goes, and how the structure changes over time.
+The first version focuses on annual national budget data for 2005-2025, including revenue, tax revenue, and expenditure by public spending fields. Both sides start in 2005: the project does not have reviewed 2004 sources in the served datasets (the available 2004 treasury expenditure source is central-budget scoped). The product should help users understand where public money comes from, where it goes, and how the structure changes over time.
 
 This v1 scope is deliberate. A narrow, high-quality budget explorer is more valuable than a broad but shallow data catalog.
 
@@ -22,11 +22,11 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 
 ### Included
 
-- Annual budget data for 2004-2025 for expenditure and 2005-2025 for revenue.
+- Annual budget data for 2005-2025 for both expenditure and revenue.
 - Revenue overview and major tax revenue categories.
 - Expenditure overview using public-friendly spending fields such as health, education, social protection, defence, infrastructure, and similar categories.
 - Multi-year explorer with line and table views.
-- Multi-year expenditure grouping by public spending fields or by ministries/major programs (administrative data exists for 2017-2025); this is series selection, not drilldown.
+- Multi-year expenditure grouping by public spending fields or by ministries/major programs (ministries data exists for 2005-2025, with major-program drill-down rows partial from 2012 and contiguous 2017-2025); this is series selection, not drilldown.
 - Single-year snapshot with headline cards, treemap, Every 100 GEL, Budget Radar, Budget Field, and full ranking.
 - CSV export.
 - Georgian-first UI.
@@ -136,12 +136,11 @@ This is a product decision.
 
 Guardrails:
 
-- The interface is a clean Apple-like analytical Budget Explorer with matching Light and Night themes.
-- Older dark, neon, and terminal-like prototype styling is superseded for production unless a new design change is explicitly approved.
+- The interface is the warm editorial statistical annual defined in `DESIGN.md` v4.1: single paper theme, ink rules, serif display with mono numerals, one terracotta accent, no theme toggle.
+- The previous Apple-like Light/Night system and older dark, neon, and terminal-like prototype styling are superseded for production unless a new design change is explicitly approved.
 - Georgian text must remain readable.
 - Charts must stay clear and accessible.
 - Decorative effects must not reduce data comprehension.
-- Light and Night themes must keep the same layout, controls, and chart geometry.
 
 ## 8. Product Stack
 
@@ -150,18 +149,18 @@ Frontend and backend:
 - Next.js with TypeScript.
 - Vercel.
 
-Database:
+Data serving (current):
 
-- Supabase Postgres.
+- Reviewed CSV files under `data/imports/`, read at build time. The deployed app is fully static and needs no runtime database.
 
-ORM:
+Database (planned, not wired):
 
-- Prisma.
+- Supabase Postgres via Prisma. Schema and client are scaffolded (`apps/web/prisma/`, `apps/web/lib/db/prisma.ts`) but no runtime code imports them.
 
 UI:
 
 - Tailwind.
-- shadcn or a disciplined component layer.
+- A disciplined custom component layer (no shadcn).
 
 ## 9. Durable V1 Principle
 

@@ -7,9 +7,10 @@ These instructions are the operating contract for agents working in this workspa
 Before planning or coding, read:
 
 1. `Project_Definition.md`
-2. `docs/superpowers/specs/2026-05-10-geodata-budget-v1-design.md`
+2. `DESIGN.md` (for any UI work)
+3. `docs/superpowers/specs/2026-05-10-geodata-budget-v1-design.md` (historical detail)
 
-Use those files as the source of truth for product scope and detailed requirements. Keep this `AGENTS.md` short, current, and focused on rules future agents must not miss.
+Precedence when documents disagree: `Project_Definition.md` §2 owns scope, `DESIGN.md` v4.1 owns visuals, and this `AGENTS.md` owns current stack and project state. The 2026-05-10 spec is historical and not maintained. Keep this `AGENTS.md` short, current, and focused on rules future agents must not miss.
 
 ## Maintenance Rule
 
@@ -122,11 +123,10 @@ V1 is not a broad public-data catalog. Do not re-expand scope unless the user ex
 
 Current stack:
 
-- Next.js with TypeScript.
-- Vercel.
-- Supabase Postgres.
-- Prisma.
-- Tailwind plus shadcn or a disciplined component layer.
+- Next.js 16 with TypeScript (strict) and Tailwind v4; custom editorial component layer (`apps/web/components/ui/editorial.tsx`), no shadcn.
+- Data serving: reviewed CSVs under `data/imports/` read at build time. The app is fully static — no runtime database and no `.env` needed for dev or build.
+- Prisma + Supabase Postgres are the planned future database path: scaffolded (`apps/web/prisma/`, `apps/web/lib/db/prisma.ts`) but imported by no runtime code. Do not build against them without explicit user approval.
+- Deployment: Vercel.
 
 The workspace is a git repository on `main` with a GitHub `origin` remote. Check git state before promising commits, branches, pushes, or PRs.
 
@@ -193,3 +193,5 @@ Use the Superpowers workflow:
 When library, framework, SDK, API, CLI, or cloud-service docs are needed, use Context7 for current documentation before relying on memory.
 
 Do not claim work is complete without running relevant verification.
+
+Verification commands and the definition of done live in the root `CLAUDE.md`. CI (`.github/workflows/ci.yml`) runs lint, typecheck, unit tests, data validation, build, and Playwright browser tests on every PR and must be green before merge.

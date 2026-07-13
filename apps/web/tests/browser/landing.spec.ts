@@ -48,9 +48,10 @@ test("landing renders the site v2 structure with live data", async ({ page }) =>
 test("landing nav and cards lead into the explorer", async ({ page }) => {
   await page.goto("http://localhost:3100");
 
-  // Header nav → explorer.
+  // Header nav → explorer. The explorer writes its default state into the
+  // URL hash after hydration, so tolerate an optional hash.
   await page.getByTestId("landing-header").getByRole("link", { name: "ექსპლორერი" }).click();
-  await expect(page).toHaveURL(/\/explorer$/);
+  await expect(page).toHaveURL(/\/explorer(#.*)?$/);
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
 
   // Explorer wordmark → back to the landing.

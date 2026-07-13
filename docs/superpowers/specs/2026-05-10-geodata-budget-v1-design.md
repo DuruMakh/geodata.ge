@@ -1,7 +1,14 @@
 # GeoData.ge Budget Explorer V1 Design
 
 Date: 2026-05-10
-Status: Draft for user review
+Status: Historical v1 spec — kept for provenance, not maintained
+
+> Supersedure note (2026-07-13): this spec predates implementation. Where it
+> conflicts with `Project_Definition.md` (served coverage is 2005-2025 — no
+> loaded 2004 data), `DESIGN.md` v4.1 (single editorial paper theme; the
+> Light/Night system and theme toggle in §12 are superseded), or `AGENTS.md`
+> (current stack: static CSVs read at build time, no runtime database), those
+> documents win.
 
 ## 1. Product Scope
 
