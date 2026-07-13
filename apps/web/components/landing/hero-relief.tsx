@@ -8,27 +8,104 @@ import { GEORGIA_GEO } from "../../lib/landing/georgiaGeo";
 // country outline as a dotted elevation field, city squares scaled by population
 // emitting ripple waves, peak labels, a hoverable city readout, and a national
 // pulse sweeping from Tbilisi. Ported 1:1 from the design's Three.js scene;
-// all magic numbers are the design's.
+// all magic numbers are the design's — treat them as tuned constants, not
+// derivable values, and keep the design's terse identifiers as they are.
+//
+// ================= scene structure =================
+//
+// Module scope (computed once per page load, cached and reused across scene
+// rebuilds — none of it depends on viewport or preset):
+//   geoProj()      projection between lon/lat and a fixed 1240×640 px "design
+//                  plane", the canvas the design was tuned on.
+//   geoField()     the terrain: an 8.6px grid over that plane, each cell
+//                  jittered into a dot and classified — inside the outline?
+//                  edge dot? which region? — with precomputed elevation
+//                  (elevGe: analytic Caucasus ridges/lowlands + hash noise),
+//                  distances to Tbilisi and the region capital, hill shading,
+//                  and two per-dot random seeds.
+//   makeDotCloud() a THREE.Points cloud with per-dot position/col/psize
+//                  attributes driven by a two-line point shader.
+//
+// World space: world X/Z = design-plane px minus the plane center (620, 320);
+// world Y = elevation × opts.hrel. North is −Z (plane y grows downward).
+//
+// <HeroRelief /> builds everything inside one effect, keyed on sceneEpoch:
+//   1. WebGLRenderer appended to heroRef's div. Any setup failure lands in the
+//      catch at the bottom of the try, which disposes what was built and swaps
+//      in the static "ვიზუალი ვერ ჩაიტვირთა" note — that IS the no-WebGL path.
+//   2. Camera: the preset supplies only a viewing direction and margins (see
+//      HeroOpts); fitCameraDistance() binary-searches the camera distance so
+//      every sampled dot projects inside the margins, then refit() measures
+//      the map's projected vertical band, CROPS the canvas to it with
+//      cam.setViewOffset, and pins the parent <figure> height to the band so
+//      the stats section starts right under the last dots.
+//   3. Geometry: one dot cloud for terrain (N grid dots), one for city squares
+//      (NC cities, index 0 = Tbilisi), four reusable LineLoop rings for ripple
+//      fronts, and HTML <span>s (labelsRef) for peak labels + hover readout.
+//   4. Wiring: mousemove/mouseleave feed parallax + hover; click re-emits a
+//      ripple from the hovered city; IntersectionObserver pauses rendering
+//      offscreen; ResizeObserver refits on container resize; a window resize
+//      listener refits — or bumps sceneEpoch to rebuild the scene when the
+//      width crosses a 768/1100px bucket boundary, because the preset is
+//      baked into buffers and cannot be patched in place.
+//   5. updater(t), once per rAF frame (skipped while the tab is hidden; one
+//      seeded frame renders if mounted hidden, for exports/previews):
+//      spawn/advance ripples and the national pulse → ease the camera
+//      (parallax + drift + shake) → rewrite ring vertices → recompute every
+//      dot's height/color/size (entry animation, ripple boost, hover lift,
+//      elevation color ramp) → tint city squares → hover hit-test + readout
+//      label → project peak labels → render.
+//
+// Timing: dots "geologically" enter over the first ~2s, staggered by elevation
+// and west→east position; a ripple batch spawns every WAVE_EVERY seconds and
+// lives ~3.8s (2.6s × 1.45 envelope); the national pulse first fires at t=20s,
+// then every 45s, sweeping from Tbilisi for 3.4s with camera shake.
+// prefers-reduced-motion skips entry/ripples/pulse/drift/shake and shows the
+// static relief with one frozen Tbilisi ring; hover and parallax stay live.
+//
+// Micro-identifier glossary (the design's names, kept 1:1):
+//   h2 / rand01   deterministic sin-hash noise in [-1,1] / [0,1] (stateless)
+//   eo            cubic ease-out            cl   clamp to [0,1]
+//   vv            scratch Vector3 reused for every projection — never store it
+//   dd            a 2D distance, squared or plain depending on call site
+//   wd            a band width passed to band()
+//   band(dd,R,wd) ripple ring profile: 1 at radius R, fading over wd×0.55
+//                 ahead of the front and wd×2.3 behind it (long inner wake)
+//   ndcToGround() mouse ray → y=0 plane hit, in design-plane px, into `ground`
+//   mk / NC       city-square dot cloud / city count (index 0 is Tbilisi)
+//   act           ripples alive this frame; np/npR/npEnv = national pulse
+//                 active flag / current radius / sine envelope
+//   paper/ink/crimson/tan  RGB triples mirroring the CSS palette; a dot's
+//                 color is paper→(tan→ink by elevation) blended by its alpha
 
+// Per-breakpoint scene preset. Every field is a tuned design constant; what
+// each one changes on screen:
 type HeroOpts = {
-  fov: number;
+  fov: number; // camera vertical field of view, degrees; lower = flatter, tele-lens look
+  // camX/camY/camZ define the VIEWING DIRECTION only, never a position — the
+  // camera sits along (cam − look), at a distance fitted at runtime; raising
+  // camY relative to camZ tilts the view more top-down.
   camX: number;
   camY: number;
   camZ: number;
+  // Aim point of that direction. lookX is recentered onto the country (and
+  // shifted for the headline gutter) at runtime; negative lookY (below sea
+  // level) and negative lookZ (north of the plane center) nudge where the
+  // country sits vertically in the frame.
   lookX: number;
   lookY: number;
   lookZ: number;
-  hrel: number;
-  parX: number;
-  parY: number;
-  drift: number;
-  peaks: boolean;
-  mkMul: number;
-  sizeMul: number;
-  hitScr: number;
-  npShake: number;
-  wvShake: number;
-  maxCities: number;
+  hrel: number; // relief height: world-Y of elevation 1.0 — bigger = taller mountains
+  parX: number; // mouse-parallax amplitude, world units, horizontal
+  parY: number; // mouse-parallax amplitude, vertical (inverted: cursor up = camera down)
+  drift: number; // amplitude of the slow autonomous camera sway, X only (off when reduced motion)
+  peaks: boolean; // show the two 5000m peak labels and include them in the camera fit
+  mkMul: number; // city-square point-size multiplier
+  sizeMul: number; // terrain-dot point-size multiplier
+  hitScr: number; // city hover hit-test radius, screen px
+  npShake: number; // camera-shake amplitude while the national pulse sweeps
+  wvShake: number; // max camera shake from ripples of cities with amp > 1.2 (only Tbilisi qualifies)
+  maxCities: number; // cap on city markers/ripple emitters: 10 on mobile, 99 = all
   // NDC margins (fractions of the half-frame) the country must stay inside.
   // marginR reserves the gutter under the right-aligned headline overlay.
   marginL: number;
