@@ -16,6 +16,10 @@ for deeper provenance detail:
 - `2007-2016-expenditure-final-methodology.md`
 - `2025-expenditure-final-methodology.md` (the original confirmed 2017–2025 process)
 
+Sibling methodologies for the app's other datasets: `revenue-methodology.md` (the receipts side —
+consolidated-budget revenue from treasury Form #1, 2005–2025) and
+`ministries-expenditure-methodology.md` (the organizational expenditure lens).
+
 One-line integrity claim: **every published year reproduces byte-identical from
 SHA-256-verified official source PDFs, and every year's category totals sum to the
 official state-budget payments total within 1,000 GEL on multi-billion-GEL budgets.**
