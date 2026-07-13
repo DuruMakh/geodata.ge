@@ -305,7 +305,9 @@ async function main() {
 
         return { importRunId: run.id, parity: parityInTx };
       },
-      { timeout: 120_000 },
+      // maxWait: opening the transaction needs a round-trip to the pooler,
+      // which can take several seconds from far-away regions.
+      { maxWait: 30_000, timeout: 120_000 },
     );
 
     await writeParityReport(importRunId, report, parity);
