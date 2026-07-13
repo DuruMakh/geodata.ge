@@ -1,16 +1,17 @@
 export const EXPLORER_SIDES = ["expenditure", "revenue"] as const;
-export const VIEW_MODES = ["multi_year", "single_year"] as const;
-export const CHART_MODES = ["line", "bar", "stacked", "table"] as const;
-export const MEASURE_MODES = ["nominal", "percent_change", "share_of_total", "share_of_gdp"] as const;
+export const EXPLORER_NAVS = ["expenditure", "revenue", "analysis"] as const;
+export const CHART_MODES = ["line", "table"] as const;
+export const MEASURE_MODES = ["nominal", "share_of_total"] as const;
 
 export type ExplorerSide = (typeof EXPLORER_SIDES)[number];
-export type ViewMode = (typeof VIEW_MODES)[number];
+export type ExplorerNav = (typeof EXPLORER_NAVS)[number];
 export type ChartMode = (typeof CHART_MODES)[number];
 export type MeasureMode = (typeof MEASURE_MODES)[number];
 export type ExpenditureGrouping = "fields" | "ministries";
+export type ExplorerScope = "fields" | "ministries" | "revenue";
 export type ExplorerItemLevel = "total" | "public_field" | "admin_category" | "major_program";
 
-export const MAX_CHART_SERIES = 8;
+export const MAX_CHART_SERIES = 6;
 
 export type SourceMetadata = {
   sourceName: string;
@@ -93,11 +94,14 @@ export type SnapshotHeadline = {
   id: string;
   label: string;
   value: string;
+  unit: string;
   detail: string;
+  negative: boolean;
 };
 
 export type SingleYearSnapshotModel = {
   side: ExplorerSide;
+  grouping: ExpenditureGrouping;
   year: number;
   previousYear: number | null;
   totalGel: number;

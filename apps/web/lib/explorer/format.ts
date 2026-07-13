@@ -1,31 +1,54 @@
-const compactNumber = new Intl.NumberFormat("en", {
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
+// Editorial number formatting (DESIGN.md §11): en-US grouping, fixed decimals
+// (bn: 2, mln: 1, %: 1), minus sign is "−" (U+2212), em dash "—" for missing values.
 
-const percentNumber = new Intl.NumberFormat("en", {
-  maximumFractionDigits: 1,
-  minimumFractionDigits: 1,
-  style: "percent",
-});
+const BILLION = 1_000_000_000;
+const MILLION = 1_000_000;
 
-export function formatGel(value: number | null): string {
-  if (value === null) return "n/a";
-  return `${compactNumber.format(value)} GEL`;
+export const MISSING = "—";
+
+function fixed(value: number, decimals: number): string {
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(value);
 }
 
-export function formatPercent(value: number | null): string {
-  if (value === null) return "n/a";
-  return percentNumber.format(value);
+/** Chart/table cell value in the active unit: billions with 2 decimals. */
+export function formatBn(value: number | null | undefined): string {
+  if (value === null || value === undefined) return MISSING;
+  // Intl emits ASCII "-"; the module contract is U+2212 (sign is always leading).
+  return fixed(value / BILLION, 2).replace("-", "−");
 }
 
-export function formatSignedPercent(value: number | null): string {
-  if (value === null) return "n/a";
-  const formatted = percentNumber.format(value);
-  return value > 0 ? `+${formatted}` : formatted;
+export type AmountParts = { num: string; unit: string };
+
+/** Split amount into number + Georgian unit, choosing მლრდ/მლნ by magnitude. */
+export function formatAmountParts(value: number | null | undefined, signed = false): AmountParts {
+  if (value === null || value === undefined) return { num: MISSING, unit: "" };
+  const sign = signed ? (value >= 0 ? "+" : "−") : value < 0 ? "−" : "";
+  const abs = Math.abs(value);
+  if (abs >= 0.9995 * BILLION) return { num: sign + fixed(abs / BILLION, 2), unit: "მლრდ ₾" };
+  return { num: sign + fixed(abs / MILLION, 1), unit: "მლნ ₾" };
 }
 
-export function formatMeasureValue(value: number | null, measure: "nominal" | "percent_change" | "share_of_total" | "share_of_gdp"): string {
-  if (measure === "nominal") return formatGel(value);
-  return measure === "percent_change" ? formatSignedPercent(value) : formatPercent(value);
+/** Full amount string with unit, e.g. "26.50 მლრდ ₾". */
+export function formatAmount(value: number | null | undefined): string {
+  if (value === null || value === undefined) return MISSING;
+  const parts = formatAmountParts(value);
+  return `${parts.num} ${parts.unit}`;
+}
+
+/** Signed full amount string, e.g. "+2.19 მლრდ ₾". */
+export function formatSignedAmount(value: number | null | undefined): string {
+  if (value === null || value === undefined) return MISSING;
+  const parts = formatAmountParts(value, true);
+  return `${parts.num} ${parts.unit}`;
+}
+
+/** Percentage from a fraction, 1 decimal; "−" minus; optional "+" for positives. */
+export function formatShare(fraction: number | null | undefined, signed = false): string {
+  if (fraction === null || fraction === undefined || !Number.isFinite(fraction)) return MISSING;
+  const value = fraction * 100;
+  const prefix = signed && value > 0 ? "+" : "";
+  return (prefix + value.toFixed(1) + "%").replace("-", "−");
 }

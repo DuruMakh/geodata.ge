@@ -112,11 +112,11 @@ Strong success criteria let you loop independently. Weak criteria like "make it 
 
 ## Current Project State
 
-GeoData.ge v1, a Georgian-first Georgia Budget Explorer, is implemented and mid data rollout. The production UI follows the `DESIGN.md` system (Light/Night themes, multi-year explorer with fields/ministries grouping, single-year snapshot).
+GeoData.ge v1, a Georgian-first Georgia Budget Explorer, is implemented. The production UI follows the `DESIGN.md` v4.1 editorial system (single paper theme, three-tab IA: ხარჯები / შემოსავლები / ანალიზი; multi-year explorer with fields/ministries grouping; single-year analysis view; URL-hash deep links). Confirmed visual references live in `docs/Design HTML files/editorial-v2/`.
 
-Data rollout status as of 2026-07: revenue facts are complete for 2005-2025; expenditure facts cover 2004-2005 (total-only) and 2017-2025 (detailed public fields); 2006-2016 expenditure is still being rolled out. Update this paragraph as the rollout progresses.
+Data rollout status as of 2026-07: revenue facts are complete for 2005-2025; expenditure facts by public spending fields are complete for 2005-2025; ministries (admin) facts are complete for 2005-2025 with major-program drill-down rows from 2012 (partial) and contiguous 2017-2025. Update this paragraph as coverage changes.
 
-Revenue coverage starts in 2005 because the project does not currently have a reviewed 2004 revenue source. Expenditure coverage starts in 2004.
+Both sides start in 2005 because the project does not currently have reviewed 2004 sources in the served datasets.
 
 V1 is not a broad public-data catalog. Do not re-expand scope unless the user explicitly approves it.
 
@@ -162,26 +162,24 @@ Required data principles:
 
 Default first view:
 
-- Expenditure.
-- Multi-year.
-- Nominal GEL.
-- Line chart.
-- 2004-2025 for expenditure; 2005-2025 for revenue.
-- Total expenditure selected.
+- Expenditure nav tab.
+- Multi-year line chart, nominal GEL.
+- Full loaded range (currently 2005-2025), data-driven, never hardcoded.
+- Top 5 categories by latest-year value selected (derived totals are not selectable series; totals live in the table "სულ" row, deck line, and hero KPI).
 
-Single-year mode has no v1 drilldown and should stay top-level. Multi-year mode can allow selecting deeper official rows as chart/table series.
+The single-year analysis view has no v1 drilldown and stays top-level (fields, ministries categories, or revenue categories). Multi-year mode can allow selecting deeper official rows (major programs, by name only — no official codes) as chart/table series.
 
-Production UI now follows `DESIGN.md` and the confirmed references in `docs/Design HTML files/`.
+Production UI follows `DESIGN.md` v4.1 and the confirmed references in `docs/Design HTML files/editorial-v2/`.
 
-The current approved direction is a clean Apple-like analytical Budget Explorer with Light and Night themes. Older dark/neon/terminal prototype styling is superseded for production unless the user explicitly approves a new design change.
+The approved direction is the warm editorial statistical annual (paper background, ink rules instead of cards, serif display + mono numerals, one terracotta accent). The previous Apple-like Light/Night system and older dark/neon/terminal styling are superseded for production unless the user explicitly approves a new design change. There is no theme toggle in v1.
 
 Guardrails:
 
 - Georgian text must stay readable.
 - Chart labels must remain clear.
-- Color choices must be distinguishable.
+- Color choices must be distinguishable; category colors are stable tokens (DESIGN.md §4.2).
 - Decorative effects must not reduce data comprehension.
-- Light and Night themes must keep the same layout, controls, and chart geometry.
+- No cards, container shadows, gradients, or radii above 3px (measure pill and slider handles excepted).
 
 ## Workflow Rules
 

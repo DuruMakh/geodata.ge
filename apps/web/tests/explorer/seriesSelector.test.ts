@@ -1,52 +1,58 @@
 import { describe, expect, it } from "vitest";
-import { filterSeriesItems } from "../../components/main-explorer/series-selector";
+import { buildSeriesPanelRows } from "../../components/main-explorer/series-panel";
 import type { ExplorerItem } from "../../lib/explorer/types";
 
-const items: ExplorerItem[] = [
-  {
-    id: "admin_spending.education",
+function item(partial: Partial<ExplorerItem> & Pick<ExplorerItem, "id" | "kaLabel" | "level">): ExplorerItem {
+  return {
     side: "expenditure",
     parentItemId: null,
-    level: "admin_category",
     detailLabel: null,
-    kaLabel: "Education ministry",
-    enLabel: "Education ministry",
-    color: "#0071e3",
+    enLabel: partial.kaLabel,
+    color: "#B3402A",
     sortOrder: 1,
-  },
-  {
+    ...partial,
+  };
+}
+
+const items: ExplorerItem[] = [
+  item({ id: "admin_spending.total", kaLabel: "ხარჯები სულ", level: "total" }),
+  item({ id: "admin_spending.education", kaLabel: "Education ministry", level: "admin_category" }),
+  item({
     id: "admin_program.general_education",
-    side: "expenditure",
-    parentItemId: "admin_spending.education",
-    level: "major_program",
-    detailLabel: "32 02",
     kaLabel: "General education",
-    enLabel: "General education",
-    color: "#ffd60a",
-    sortOrder: 2,
-  },
-  {
-    id: "admin_spending.health",
-    side: "expenditure",
-    parentItemId: null,
-    level: "admin_category",
-    detailLabel: null,
-    kaLabel: "Health ministry",
-    enLabel: "Health ministry",
-    color: "#30d5c8",
-    sortOrder: 3,
-  },
+    level: "major_program",
+    parentItemId: "admin_spending.education",
+  }),
+  item({ id: "admin_spending.health", kaLabel: "Health ministry", level: "admin_category" }),
 ];
 
-describe("series selector search", () => {
-  it("keeps the parent ministry when only a nested program matches", () => {
-    expect(filterSeriesItems(items, "32 02").map((item) => item.id)).toEqual([
-      "admin_spending.education",
-      "admin_program.general_education",
-    ]);
+describe("series panel rows", () => {
+  it("excludes derived totals and hides collapsed programs", () => {
+    const rows = buildSeriesPanelRows(items, "", []);
+
+    expect(rows.map((row) => row.item.id)).toEqual(["admin_spending.education", "admin_spending.health"]);
+    expect(rows[0]).toEqual(expect.objectContaining({ hasChildren: true, expanded: false, isProgram: false }));
   });
 
-  it("returns all items for an empty search", () => {
-    expect(filterSeriesItems(items, "")).toEqual(items);
+  it("shows programs for expanded ministries", () => {
+    const rows = buildSeriesPanelRows(items, "", ["admin_spending.education"]);
+
+    expect(rows.map((row) => row.item.id)).toEqual([
+      "admin_spending.education",
+      "admin_program.general_education",
+      "admin_spending.health",
+    ]);
+    expect(rows[1]?.isProgram).toBe(true);
+  });
+
+  it("keeps the parent ministry and auto-expands when only a nested program matches", () => {
+    const rows = buildSeriesPanelRows(items, "general education", []);
+
+    expect(rows.map((row) => row.item.id)).toEqual(["admin_spending.education", "admin_program.general_education"]);
+    expect(rows[0]?.expanded).toBe(true);
+  });
+
+  it("returns no rows when nothing matches", () => {
+    expect(buildSeriesPanelRows(items, "does-not-exist", [])).toEqual([]);
   });
 });

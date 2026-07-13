@@ -4,7 +4,7 @@ import { loadGlossary } from "../../lib/data/glossary";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadSourceDocuments } from "../../lib/data/sources";
 import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_DETAILED_YEARS, REVENUE_TOTAL_ONLY_YEARS, REVENUE_YEARS } from "../../lib/data/coverage";
-import { buildExplorerModel, getDefaultSelection, getDefaultStackedSelection } from "../../lib/explorer/explorerData";
+import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
 const REAL_BUDGET_FACTS_PATH = "../../data/imports/budget-facts-2004-2025.csv";
@@ -26,7 +26,9 @@ describe("explorer integration with real CSV data", () => {
     const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
 
     const selectedItemIds = getDefaultSelection("expenditure", facts);
-    expect(selectedItemIds).toEqual(["expenditure.total"]);
+    expect(selectedItemIds.length).toBeGreaterThan(0);
+    expect(selectedItemIds.length).toBeLessThanOrEqual(5);
+    expect(selectedItemIds).not.toContain("expenditure.total");
 
     const model = buildExplorerModel({
       facts,
@@ -52,7 +54,8 @@ describe("explorer integration with real CSV data", () => {
     const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
 
     const selectedItemIds = getDefaultSelection("revenue", facts);
-    expect(selectedItemIds).toEqual(["revenue.total"]);
+    expect(selectedItemIds.length).toBeGreaterThan(0);
+    expect(selectedItemIds).not.toContain("revenue.total");
 
     const model = buildExplorerModel({
       facts,
@@ -77,7 +80,9 @@ describe("explorer integration with real CSV data", () => {
     const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
 
     const selectedItemIds = getDefaultSelection("revenue", facts);
-    expect(selectedItemIds).toEqual(["revenue.total"]);
+    expect(selectedItemIds).toHaveLength(5);
+    expect(selectedItemIds).toContain("revenue.vat");
+    expect(selectedItemIds).not.toContain("revenue.total");
 
     const model = buildExplorerModel({
       facts,
@@ -90,7 +95,6 @@ describe("explorer integration with real CSV data", () => {
       measure: "nominal",
     });
 
-    expect(model.unavailableReason).toBeNull();
     expect(model.totalRow?.valuesByYear[2025]).toBeGreaterThan(0);
     expect(model.comparisonRows.map((row) => row.itemId)).toEqual(
       expect.arrayContaining(["revenue.vat", "revenue.income_tax", "revenue.grants", "revenue.other_revenue"]),
@@ -188,31 +192,26 @@ describe("explorer integration with real CSV data", () => {
     expect(missingGlossary).toEqual([]);
   });
 
-  it("builds a stacked expenditure composition model from real facts", async () => {
+  it("keeps share-of-total values summing to one across all expenditure categories", async () => {
     const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
-    const selectedItemIds = getDefaultStackedSelection("expenditure", facts);
-    const allStackedItemIds = [
+    const allItemIds = [
       ...new Set(facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.itemId).filter((itemId) => itemId !== "expenditure.total")),
     ].sort();
-
-    expect(selectedItemIds.length).toBeGreaterThan(1);
-    expect(selectedItemIds).not.toContain("expenditure.total");
-    expect(allStackedItemIds.length).toBeGreaterThan(selectedItemIds.length);
 
     const model = buildExplorerModel({
       facts,
       glossary,
       sourceDocuments,
       side: "expenditure",
-      selectedItemIds: allStackedItemIds,
+      selectedItemIds: allItemIds,
       startYear: EXPENDITURE_DETAILED_YEARS[0],
       endYear: EXPENDITURE_DETAILED_YEARS[EXPENDITURE_DETAILED_YEARS.length - 1],
       measure: "share_of_total",
     });
 
-    expect(model.points.length).toBeGreaterThan(allStackedItemIds.length);
+    expect(model.points.length).toBeGreaterThan(allItemIds.length);
     expect(model.points.every((point) => point.value === null || (point.value >= 0 && point.value <= 1))).toBe(true);
 
     for (const year of model.years) {
@@ -233,7 +232,9 @@ describe("explorer integration with real CSV data", () => {
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
 
     const selectedItemIds = getDefaultSelection("expenditure", facts, "ministries", adminFacts);
-    expect(selectedItemIds).toEqual(["admin_spending.total"]);
+    expect(selectedItemIds).toHaveLength(5);
+    expect(selectedItemIds.every((itemId) => itemId.startsWith("admin_spending."))).toBe(true);
+    expect(selectedItemIds).not.toContain("admin_spending.total");
 
     const model = buildExplorerModel({
       facts,

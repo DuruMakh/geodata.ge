@@ -1,73 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #0071e3;
-  --primary-active: #0077ed;
-  --teal: #30d5c8;
-  --yellow: #ffd60a;
-  --blue: #0a84ff;
-  --orange: #ff9f0a;
-  --violet: #bf5af2;
-  --slate: #8e8e93;
-  --font-ui: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Noto Sans Georgian", sans-serif;
-}
-
-[data-theme="light"] {
-  --canvas: #f5f5f7;
-  --surface: #ffffff;
-  --soft: #fafafa;
-  --strong: #e8e8ed;
-  --chart: #ffffff;
-  --hairline: #e8e8ed;
-  --hairline-soft: #f5f5f7;
-  --ink: #1d1d1f;
-  --body: #515154;
-  --mute: #86868b;
-  --grid: #f5f5f7;
-  --shadow: rgba(0, 0, 0, 0.04);
-  --on-primary: #ffffff;
-  --apple-gradient-1: linear-gradient(135deg, #fffcf0, #fff7d6);
-  --apple-border-1: #ffe599;
-  --apple-gradient-2: linear-gradient(135deg, #fff5f2, #ffe6e0);
-  --apple-border-2: #ffccbe;
-  --apple-gradient-3: linear-gradient(135deg, #f9f5ff, #f0e6ff);
-  --apple-border-3: #d9c2ff;
-  --apple-gradient-4: linear-gradient(135deg, #f2fffb, #e0fff5);
-  --apple-border-4: #b3ffd9;
-}
-
-[data-theme="night"] {
-  --canvas: #000000;
-  --surface: #1d1d1f;
-  --soft: #161617;
-  --strong: #323236;
-  --chart: #1d1d1f;
-  --hairline: #323236;
-  --hairline-soft: #2d2d2f;
-  --ink: #f5f5f7;
-  --body: #a1a1a6;
-  --mute: #86868b;
-  --grid: #161617;
-  --shadow: rgba(0, 0, 0, 0.6);
-  --on-primary: #ffffff;
-  --apple-gradient-1: linear-gradient(135deg, #211c00, #141100);
-  --apple-border-1: #423800;
-  --apple-gradient-2: linear-gradient(135deg, #240a05, #140502);
-  --apple-border-2: #4f170b;
-  --apple-gradient-3: linear-gradient(135deg, #130026, #0c0017);
-  --apple-border-3: #2d005c;
-  --apple-gradient-4: linear-gradient(135deg, #001f16, #00120d);
-  --apple-border-4: #004d36;
+  --paper: #F7F2E9;
+  --tint: #F1EADC;
+  --tile: #FDFAF3;
+  --ink: #1E1B16;
+  --body: #55503F;
+  --muted: #6A6050;
+  --faint: #A89C88;
+  --hairline: #D9CFBE;
+  --hairline-soft: #E7DECF;
+  --row-border: #EDE4D3;
+  --control: #C9BEA9;
+  --accent: #B3402A;
+  --positive: #1F6E56;
+  --negative: #B3402A;
+  --font-display: var(--font-noto-serif-georgian), "Noto Serif Georgian", serif;
+  --font-ui: var(--font-noto-sans-georgian), "Noto Sans Georgian", "Helvetica Neue", sans-serif;
+  --font-numeric: var(--font-geist-mono), "Geist Mono", var(--font-noto-sans-georgian), monospace;
 }
 
 @theme inline {
-  --color-background: var(--canvas);
+  --color-background: var(--paper);
   --color-foreground: var(--ink);
   --font-sans: var(--font-ui);
 }
 
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--control) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--control);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 html,
@@ -75,7 +51,7 @@ body {
   min-width: 320px;
   min-height: 100%;
   overflow-x: hidden;
-  background: var(--canvas);
+  background: var(--paper);
 }
 
 body {
@@ -95,11 +71,20 @@ input {
 button:focus-visible,
 select:focus-visible,
 input:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid rgba(179, 64, 42, 0.4);
   outline-offset: 2px;
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--primary) 24%, transparent);
+  background: rgba(179, 64, 42, 0.16);
   color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

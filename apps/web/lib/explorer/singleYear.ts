@@ -1,10 +1,13 @@
-﻿import { chooseActivePublicFacts } from "../data/activeFacts";
+import { chooseActivePublicFacts } from "../data/activeFacts";
+import type { AdminSpendingCategory, AdminSpendingFact } from "../data/adminSpending/types";
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { SourceDocumentRow } from "../data/sources";
-import { formatGel, formatPercent, formatSignedPercent } from "./format";
+import { colorForItem, OTHER_COLOR } from "./colors";
+import { formatAmountParts, formatShare, MISSING } from "./format";
 import type {
   Every100Item,
+  ExpenditureGrouping,
   ExplorerSide,
   SingleYearSnapshotModel,
   SnapshotHeadline,
@@ -12,27 +15,23 @@ import type {
   SourceMetadata,
 } from "./types";
 
-const palette = [
-  "#22d3ee",
-  "#a3e635",
-  "#f97316",
-  "#f472b6",
-  "#c084fc",
-  "#facc15",
-  "#38bdf8",
-  "#fb7185",
-  "#14b8a6",
-  "#e879f9",
-  "#84cc16",
-  "#f43f5e",
-];
-
 export type SingleYearSnapshotInput = {
   facts: BudgetFactImportRow[];
+  adminFacts?: AdminSpendingFact[];
+  adminCategories?: Map<string, AdminSpendingCategory>;
+  grouping?: ExpenditureGrouping;
   glossary: Map<string, GlossaryEntry>;
   sourceDocuments: SourceDocumentRow[];
   side: ExplorerSide;
   year: number;
+};
+
+type SnapshotFact = {
+  year: number;
+  itemId: string;
+  amountGel: number;
+  basis: "actual" | "planned";
+  sourceId: string;
 };
 
 function labelsFor(id: string, glossary: Map<string, GlossaryEntry>) {
@@ -78,13 +77,19 @@ function emptyReasonFor(side: ExplorerSide): string {
     : "ამ წლისთვის ხარჯების მონაცემები ჯერ არ არის ჩატვირთული.";
 }
 
+// Growth from a non-positive base (e.g. revenue.other_taxes 2019-2020) is not
+// meaningful for display; treat it as missing.
 function changeFromPrevious(amountGel: number, previousAmountGel: number | null): number | null {
-  if (previousAmountGel === null || previousAmountGel === 0) return null;
+  if (previousAmountGel === null || previousAmountGel <= 0) return null;
   return (amountGel - previousAmountGel) / previousAmountGel;
 }
 
 function wholeGelFrom100(items: SnapshotItem[]): Every100Item[] {
-  if (items.every((item) => item.shareOfTotal === 0)) {
+  // Normalize over the drawn (positive) items so the allocation always sums to
+  // exactly 100, even when the true year total includes negative rows.
+  const drawnTotal = items.reduce((sum, item) => sum + item.amountGel, 0);
+
+  if (drawnTotal <= 0) {
     return items.map((item) => ({
       itemId: item.itemId,
       kaLabel: item.kaLabel,
@@ -96,7 +101,7 @@ function wholeGelFrom100(items: SnapshotItem[]): Every100Item[] {
   }
 
   const allocated = items.map((item, index) => {
-    const exactShare = item.shareOfTotal * 100;
+    const exactShare = (item.amountGel / drawnTotal) * 100;
     const floorShare = Math.floor(exactShare);
 
     return {
@@ -146,7 +151,7 @@ function buildRadarItems(items: SnapshotItem[]): SnapshotItem[] {
       itemId: "snapshot.other",
       kaLabel: "სხვა",
       enLabel: "Other",
-      color: "#8e8e93",
+      color: OTHER_COLOR,
       amountGel,
       shareOfTotal: omitted.reduce((sum, item) => sum + item.shareOfTotal, 0),
       previousAmountGel,
@@ -158,60 +163,95 @@ function buildRadarItems(items: SnapshotItem[]): SnapshotItem[] {
   ];
 }
 
-function headlineCards(totalGel: number, items: SnapshotItem[]): SnapshotHeadline[] {
+const NO_PREVIOUS_YEAR_NOTE = "წინა წლის მონაცემები არ არის";
+
+function headlineCards(totalGel: number, year: number, items: SnapshotItem[]): SnapshotHeadline[] {
   const largest = items[0] ?? null;
   const fastestGrowth = [...items]
     .filter((item) => item.changeFromPreviousYear !== null)
     .sort((a, b) => (b.changeFromPreviousYear ?? -Infinity) - (a.changeFromPreviousYear ?? -Infinity))[0] ?? null;
+  // Require a positive base (changeFromPreviousYear !== null): a delta measured
+  // against a negative prior value is mostly the unwind of a correction, not a
+  // real "largest increase" (e.g. revenue.other_taxes 2020→2021).
   const largestIncrease = [...items]
-    .filter((item) => item.amountChangeFromPreviousYear !== null)
+    .filter((item) => item.amountChangeFromPreviousYear !== null && item.changeFromPreviousYear !== null)
     .sort((a, b) => (b.amountChangeFromPreviousYear ?? -Infinity) - (a.amountChangeFromPreviousYear ?? -Infinity))[0] ?? null;
+  const totalParts = formatAmountParts(items.length > 0 ? totalGel : null);
+  const largestParts = largest ? formatAmountParts(largest.amountGel) : { num: MISSING, unit: "" };
+  const increaseParts = largestIncrease ? formatAmountParts(largestIncrease.amountChangeFromPreviousYear, true) : { num: MISSING, unit: "" };
 
   return [
     {
       id: "total",
       label: "სულ",
-      value: formatGel(totalGel),
-      detail: `${items.length} კატეგორია`,
+      value: totalParts.num,
+      unit: totalParts.unit,
+      detail: `${items.length} კატეგორია · ${year}`,
+      negative: false,
     },
     {
       id: "largest",
       label: "ყველაზე დიდი",
-      value: largest ? formatGel(largest.amountGel) : "n/a",
-      detail: largest ? `${largest.kaLabel} - ${formatPercent(largest.shareOfTotal)}` : "n/a",
+      value: largestParts.num,
+      unit: largestParts.unit,
+      detail: largest ? `${largest.kaLabel} · ${formatShare(largest.shareOfTotal)}` : MISSING,
+      negative: false,
     },
     {
       id: "fastest_growth",
       label: "ყველაზე სწრაფი ზრდა",
-      value: fastestGrowth ? formatSignedPercent(fastestGrowth.changeFromPreviousYear) : "n/a",
-      detail: fastestGrowth?.kaLabel ?? "n/a",
+      value: fastestGrowth ? formatShare(fastestGrowth.changeFromPreviousYear, true) : MISSING,
+      unit: "",
+      detail: fastestGrowth?.kaLabel ?? NO_PREVIOUS_YEAR_NOTE,
+      negative: (fastestGrowth?.changeFromPreviousYear ?? 0) < 0,
     },
     {
       id: "largest_increase",
       label: "ყველაზე დიდი მატება",
-      value: largestIncrease ? formatGel(largestIncrease.amountChangeFromPreviousYear) : "n/a",
-      detail: largestIncrease?.kaLabel ?? "n/a",
+      value: increaseParts.num,
+      unit: increaseParts.unit,
+      detail: largestIncrease?.kaLabel ?? NO_PREVIOUS_YEAR_NOTE,
+      negative: false,
     },
   ];
 }
 
 export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): SingleYearSnapshotModel {
-  const active = chooseActivePublicFacts(input.facts).filter((fact) => fact.side === input.side);
+  const grouping: ExpenditureGrouping = input.side === "expenditure" ? input.grouping ?? "fields" : "fields";
+  const isMinistryGrouping = input.side === "expenditure" && grouping === "ministries";
+  const sourceDocuments = new Map(input.sourceDocuments.map((source) => [source.sourceId, source]));
+
+  const active: SnapshotFact[] = isMinistryGrouping
+    ? (input.adminFacts ?? [])
+        .filter((fact) => fact.level === "admin_category")
+        .map((fact) => ({ year: fact.year, itemId: fact.itemId, amountGel: fact.amountGel, basis: fact.basis, sourceId: fact.sourceId }))
+    : chooseActivePublicFacts(input.facts)
+        .filter((fact) => fact.side === input.side)
+        .map((fact) => ({ year: fact.year, itemId: fact.itemId, amountGel: fact.amountGel, basis: fact.basis, sourceId: fact.sourceId }));
+
+  const labelFor = (itemId: string) => {
+    if (!isMinistryGrouping) return labelsFor(itemId, input.glossary);
+    const category = input.adminCategories?.get(itemId);
+    return category
+      ? { kaLabel: category.kaLabel, enLabel: category.enLabel }
+      : { kaLabel: itemId, enLabel: itemId };
+  };
+
   const yearFacts = active.filter((fact) => fact.year === input.year);
   const totalFact = yearFacts.find((fact) => fact.itemId === totalIdFor(input.side)) ?? null;
   const detailFacts = yearFacts.filter((fact) => fact.itemId !== totalIdFor(input.side));
-  const sourceDocuments = new Map(input.sourceDocuments.map((source) => [source.sourceId, source]));
 
   if (yearFacts.length === 0) {
     return {
       side: input.side,
+      grouping,
       year: input.year,
       previousYear: null,
       totalGel: 0,
       basis: "actual",
       hasPlannedValues: false,
       source: null,
-      headlineCards: headlineCards(0, []),
+      headlineCards: headlineCards(0, input.year, []),
       items: [],
       every100: [],
       radarItems: [],
@@ -227,16 +267,21 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
   const totalGel = totalFact?.amountGel ?? detailFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
   const modelSource = sourceMetadataFor((totalFact ? [totalFact] : detailFacts).map((fact) => fact.sourceId), sourceDocuments);
 
+  // Every official row is a model item — including zero and negative rows (e.g.
+  // revenue.other_taxes 2019-2020) — so the ranking, category counts, and the
+  // "სულ" headline all describe the same population and rows sum to the total.
+  // Shares are of the true year total; geometry sections (treemap, every-100,
+  // radar, field) draw only positive rows and normalize internally.
   const items = detailFacts
     .map((fact, index): SnapshotItem => {
       const previousAmountGel = previousByItemId.get(fact.itemId) ?? null;
 
       return {
         itemId: fact.itemId,
-        ...labelsFor(fact.itemId, input.glossary),
-        color: palette[index % palette.length] ?? "#22d3ee",
+        ...labelFor(fact.itemId),
+        color: colorForItem(fact.itemId, index),
         amountGel: fact.amountGel,
-        shareOfTotal: totalGel === 0 ? 0 : fact.amountGel / totalGel,
+        shareOfTotal: totalGel > 0 ? fact.amountGel / totalGel : 0,
         previousAmountGel,
         changeFromPreviousYear: changeFromPrevious(fact.amountGel, previousAmountGel),
         amountChangeFromPreviousYear: previousAmountGel === null ? null : fact.amountGel - previousAmountGel,
@@ -245,23 +290,23 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
       };
     })
     .sort((a, b) => b.amountGel - a.amountGel);
+  const drawnItems = items.filter((item) => item.amountGel > 0);
 
   return {
     side: input.side,
+    grouping,
     year: input.year,
     previousYear,
     totalGel,
     basis: yearFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual",
     hasPlannedValues: yearFacts.some((fact) => fact.basis === "planned"),
     source: modelSource,
-    headlineCards: headlineCards(totalGel, items),
+    headlineCards: headlineCards(totalGel, input.year, items),
     items,
-    every100: wholeGelFrom100(items),
-    radarItems: buildRadarItems(items),
+    every100: wholeGelFrom100(drawnItems),
+    radarItems: buildRadarItems(drawnItems),
     rankingRows: items,
     hasGrowthData: items.some((item) => item.changeFromPreviousYear !== null),
     emptyReason: null,
   };
 }
-
-

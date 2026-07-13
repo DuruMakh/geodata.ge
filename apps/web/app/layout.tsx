@@ -1,5 +1,27 @@
 import type { Metadata } from "next";
+import { Geist_Mono, Noto_Sans_Georgian, Noto_Serif_Georgian } from "next/font/google";
 import "./globals.css";
+
+const notoSansGeorgian = Noto_Sans_Georgian({
+  subsets: ["georgian", "latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-noto-sans-georgian",
+  display: "swap",
+});
+
+const notoSerifGeorgian = Noto_Serif_Georgian({
+  subsets: ["georgian", "latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-noto-serif-georgian",
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-geist-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "GeoData.ge Budget Explorer",
@@ -12,10 +34,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ka" className="h-full antialiased">
-      <body data-theme="light" className="min-h-full flex flex-col">
-        {children}
-      </body>
+    <html
+      lang="ka"
+      className={`h-full antialiased ${notoSansGeorgian.variable} ${notoSerifGeorgian.variable} ${geistMono.variable}`}
+    >
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
