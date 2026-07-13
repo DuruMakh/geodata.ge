@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { LandingModel } from "../../lib/landing/landingData";
-import { HeroRelief } from "./hero-relief";
+import { HeroReliefLazy } from "./hero-relief-lazy";
 
 // Landing page (GeoData Site v2 design): header, living-relief hero, key country
 // numbers, the three paths to the data, and the site footer. Static figures
@@ -98,7 +98,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
             aria-label={HERO_ARIA_LABEL}
             className="relative m-0 ml-[calc(50%-50vw)] h-[340px] w-screen min-w-0 overflow-hidden p-0 min-[768px]:h-[500px] min-[1100px]:h-[clamp(560px,78vh,820px)]"
           >
-            <HeroRelief />
+            <HeroReliefLazy />
           </figure>
         </section>
 
