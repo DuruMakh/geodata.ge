@@ -11,21 +11,23 @@ Product scope, agent rules, data rules, and the design system live at the repo r
 
 ## Setup
 
-Create `apps/web/.env` from `.env.example` before running Prisma, dev, or build commands (see the root README for the expected shape).
+Dev and build need no `.env`. Create `apps/web/.env` from `.env.example` (see the root README) only before running Prisma commands.
 
 ```powershell
 npm install
 npm run dev
 ```
 
-`npm run dev` and `npm run build` run Prisma Client generation first via `predev`/`prebuild` hooks.
+`npm install` generates the Prisma Client via the `postinstall` hook.
 
 ## Commands
 
 ```powershell
 npm run dev            # dev server
 npm run build          # production build
-npm run lint           # eslint
+npm run lint           # eslint (zero warnings allowed)
+npm run typecheck      # tsc --noEmit
+npm run check          # lint + typecheck + unit tests + data validation
 npm run test           # vitest unit tests
 npm run test:browser   # Playwright browser tests
 npm run prisma:generate
