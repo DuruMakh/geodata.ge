@@ -1,3 +1,4 @@
+import { csvEscape } from "../csvEscape";
 import type { ExpenditurePdfPageText } from "./phase1Pilot";
 
 /**
@@ -307,11 +308,6 @@ export function assertOldClassificationReconciled(result: OldClassificationResul
       `Old-classification reconciliation failed: grand ${result.grandTotalGel} vs official ${result.officialTotalGel} (diff ${result.differenceGel})`,
     );
   }
-}
-
-function csvEscape(value: string | number): string {
-  const text = String(value);
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
 export function oldClassificationReviewRowsToCsv(rows: OldClassificationReviewRow[]): string {

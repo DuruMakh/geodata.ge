@@ -1,3 +1,5 @@
+import { csvEscape } from "./csvEscape";
+
 export type BudgetFactCsvRow = {
   year: number;
   side: "revenue" | "expenditure";
@@ -27,11 +29,6 @@ export const budgetFactHeaders = [
   "mapping_confidence",
   "mapping_notes",
 ] as const;
-
-function csvEscape(value: string | number): string {
-  const text = String(value);
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
 
 export function budgetFactsToCsv(rows: BudgetFactCsvRow[]): string {
   return [
