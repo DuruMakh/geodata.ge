@@ -85,15 +85,18 @@ export function buildLandingModel({ facts, glossary, sourceDocuments }: BuildLan
     for (let k = 0; k < (floors[index] ?? 0); k++) waffleCells.push(color);
   });
 
-  // CSV preview: the download's real header plus one revenue and one
-  // expenditure row, labels from the glossary and basis from the active fact.
+  // CSV preview: an abridged cut of the export — these five columns are a
+  // subset of the real 13-column header (csvExport.ts) in the same relative
+  // order; the trailing ellipsis marks the elided metadata columns. One
+  // revenue and one expenditure row, labels from the glossary, basis from
+  // the active fact.
   const vatFact = revenueFacts.find((fact) => fact.year === revMax && fact.itemId === "revenue.vat");
   const socialFact = expenditureFacts.find((fact) => fact.year === expMax && fact.itemId === "spending.social_protection");
   const csvRow = (fact: BudgetFactImportRow | undefined) =>
     fact
-      ? `${fact.year},${fact.itemId},${glossary.get(fact.itemId)?.kaLabel ?? fact.itemId},${fact.amountGel},${fact.basis}`
+      ? `${fact.year},${fact.itemId},${glossary.get(fact.itemId)?.kaLabel ?? fact.itemId},${fact.amountGel},${fact.basis},…`
       : "";
-  const csvLines: [string, string, string] = ["year,category_id,ka_label,amount_gel,basis", csvRow(vatFact), csvRow(socialFact)];
+  const csvLines: [string, string, string] = ["year,category_id,ka_label,amount_gel,basis,…", csvRow(vatFact), csvRow(socialFact)];
 
   return {
     revMin,

@@ -42,6 +42,12 @@ const WAVE_EVERY = 2;
 // the actual camera distance is fitted at runtime so the country fills the
 // frame as fully as possible at any canvas aspect — the map is the hero's
 // main subject.
+// Preset bucket boundaries — must match the CSS breakpoints that switch the
+// hero copy between stacked (mobile) and right-overlay (desktop) layouts.
+function heroBucket(w: number): number {
+  return w < 768 ? 0 : w < 1100 ? 1 : 2;
+}
+
 function heroOpts(w: number): HeroOpts {
   if (w < 768) {
     // Text sits above the map — fit symmetrically.
@@ -274,6 +280,10 @@ export function HeroRelief() {
   const heroRef = useRef<HTMLDivElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
+  // Bumped when the viewport crosses a preset breakpoint: the preset (camera
+  // angle, relief height, peaks, city cap) is baked into the scene at build
+  // time, so matching the CSS layout switch requires a full scene rebuild.
+  const [sceneEpoch, setSceneEpoch] = useState(0);
 
   useEffect(() => {
     const el = heroRef.current;
@@ -281,6 +291,7 @@ export function HeroRelief() {
     if (!el || !labelsEl) return;
 
     const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const bucket = heroBucket(window.innerWidth);
     const O = heroOpts(window.innerWidth);
     const disposers: Array<() => void> = [];
     let raf = 0;
@@ -519,6 +530,15 @@ export function HeroRelief() {
       });
       ro.observe(el);
       disposers.push(() => ro.disconnect());
+      // The ResizeObserver goes blind to height-only viewport changes once
+      // refit() pins the figure height inline, and a width change across a
+      // breakpoint needs a scene rebuilt on the matching preset.
+      const onWindowResize = () => {
+        if (heroBucket(window.innerWidth) !== bucket) setSceneEpoch((n) => n + 1);
+        else refit();
+      };
+      window.addEventListener("resize", onWindowResize);
+      disposers.push(() => window.removeEventListener("resize", onWindowResize));
 
       const paper = [0.968, 0.949, 0.914] as const;
       const ink = [0.118, 0.106, 0.086] as const;
@@ -768,7 +788,7 @@ export function HeroRelief() {
       cancelAnimationFrame(raf);
       disposers.forEach((dispose) => dispose());
     };
-  }, []);
+  }, [sceneEpoch]);
 
   return (
     <>
