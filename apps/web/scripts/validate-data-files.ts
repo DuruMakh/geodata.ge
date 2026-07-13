@@ -35,10 +35,10 @@ async function main() {
   const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
   const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
   const mappings = await loadSpendingMappings("../../data/mappings/spending-field-mapping.csv");
-  const expenditureRows = await loadBudgetFactRows("../../data/imports/expenditure-facts-2004-2025.csv");
+  const expenditureRows = await loadBudgetFactRows("../../data/imports/expenditure-facts-2005-2025.csv");
   const revenueRows = await loadBudgetFactRows("../../data/imports/revenue-facts-2005-2025.csv");
-  const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2004-2025.csv");
-  const adminSpendingFacts = await loadAdminSpendingFacts("../../data/imports/admin-spending-facts-2004-2025.csv");
+  const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2005-2025.csv");
+  const adminSpendingFacts = await loadAdminSpendingFacts("../../data/imports/admin-spending-facts-2005-2025.csv");
   const report = buildImportReport("real-budget-2004-2025", facts);
   const missingGlossary = taxonomy.filter((item) => !glossary.has(item.id));
   const registeredSourceIds = new Set(sources.map((source) => source.sourceId));

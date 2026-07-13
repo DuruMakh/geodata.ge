@@ -167,7 +167,7 @@ parseTreasuryPdfRows ──► OfficialRevenueRow[] (year, sourceCode, labelKa, 
                 └─ writes data/reports/real-revenue-2005-2025-report.json
                           + revenue-pdf-vs-workbook-2005-2025-report.json
 
-npm run data:compose-budget-facts ──► data/imports/budget-facts-2004-2025.csv (revenue + expenditure)
+npm run data:compose-budget-facts ──► data/imports/budget-facts-2005-2025.csv (revenue + expenditure)
 npm run data:validate             ──► coverage / referential-integrity / staleness gate
 app build (app/page.tsx, app/explorer/page.tsx) reads the composed CSV
 ```
@@ -253,7 +253,7 @@ rejects notes containing such glyphs, so this guard is what keeps mojibake years
 
 `npm run data:compose-budget-facts` (`scripts/compose-budget-facts.ts`) merges
 `revenue-facts-2005-2025.csv` with the per-year expenditure CSVs into
-`data/imports/budget-facts-2004-2025.csv` (sorted year → side → item), which is what the app
+`data/imports/budget-facts-2005-2025.csv` (sorted year → side → item), which is what the app
 loads at build time (`app/page.tsx` for the landing figures, `app/explorer/page.tsx` for the
 explorer; the explorer synthesizes the "Total revenue / შემოსავლები სულ" series — there is no
 stored total row for detailed years). `npm run data:validate` (`scripts/validate-data-files.ts`)
@@ -268,7 +268,7 @@ the negative-expenditure ban / negative-revenue allowance, and the mojibake-glyp
 ### 4.6 Deferred database import (`npm run data:import`)
 
 `scripts/import-budget-facts.ts` is the designed hand-off to a database and currently a **no-op
-by intent**: it loads the composed `data/imports/budget-facts-2004-2025.csv` through the same
+by intent**: it loads the composed `data/imports/budget-facts-2005-2025.csv` through the same
 validating loader, builds the summary import report (`buildImportReport` — row counts,
 revenue/expenditure totals, unclassified share, retained-negative-revenue warnings), prints the
 report as JSON, and then prints "Database insert is intentionally deferred until Supabase
@@ -534,7 +534,7 @@ PINS" — update them consciously with any legitimate data refresh, never loosen
 `apps/web/lib/data/{coverage,factCsv,totalOnlyBudgetFacts,importBudgetFacts,importReport,foundationValidation}.ts`,
 `apps/web/lib/data/parsing/cellUtils.ts`.
 **Data:** `docs/Raw Data/Revenue/` (+ `text/` sidecars), `data/staging/revenue-official-rows-2005-2025.csv`,
-`data/imports/revenue-facts-2005-2025.csv`, `data/imports/budget-facts-2004-2025.csv`,
+`data/imports/revenue-facts-2005-2025.csv`, `data/imports/budget-facts-2005-2025.csv`,
 `data/taxonomy/revenue-categories.json`, `data/sources/source-documents.csv`.
 **Tests:** `apps/web/tests/data/realRevenue/*.test.ts`, `tests/data/pipelineIntegration.test.ts`,
 `tests/data/sourceCoverage.test.ts`.
