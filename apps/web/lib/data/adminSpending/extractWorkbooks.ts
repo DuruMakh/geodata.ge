@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import * as XLSX from "xlsx";
 import { ADMIN_SPENDING_YEARS } from "../coverage";
-import { cellText, numericCell, pickSheetName } from "../parsing/cellUtils";
+import { cellText, numericCell } from "../parsing/cellUtils";
 import { contextFor } from "../parsing/hierarchyContext";
+import { readWorkbookMatrix } from "../parsing/workbookMatrix";
 import { codeDepth, findLeafCodes, normalizeOfficialCode, parentCodeFor } from "../realExpenditure/hierarchy";
 import { parseTavi6Rows } from "../realExpenditure/parseTavi6Rows";
 import type { MatrixCell } from "../realExpenditure/parseTavi6Rows";
@@ -296,20 +296,9 @@ export function extractAdminSpendingOfficialRows(warnings?: string[]): OfficialE
     if (!fs.existsSync(workbookFile)) {
       throw new Error(`Missing admin spending workbook for ${year}: ${fileName}`);
     }
-    const workbook = XLSX.readFile(workbookFile, { cellDates: false });
-    const sheetName = pickSheetName(workbook, {
+    const { sheetName, matrix } = readWorkbookMatrix(workbookFile, {
       fallbackPattern: (normalized) => normalized.includes("tavi 6") || /(^|\s)vi(\s|$)/.test(normalized),
       defaultToFirstSheet: true,
-    });
-    const sheet = workbook.Sheets[sheetName];
-
-    if (!sheet) throw new Error(`Missing sheet after selection: ${sheetName}`);
-
-    const matrix = XLSX.utils.sheet_to_json<MatrixCell[]>(sheet, {
-      header: 1,
-      blankrows: false,
-      defval: null,
-      raw: true,
     });
 
     return parseAdminWorkbookRows({

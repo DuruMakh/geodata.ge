@@ -1,3 +1,4 @@
+import { csvEscape } from "../csvEscape";
 import { budgetFactHeaders, budgetFactsToCsv, type BudgetFactCsvRow } from "../factCsv";
 import type { MappingConfidence } from "../realExpenditure/types";
 import type { CompactPdfSpendingMappingRow } from "./publicMapping";
@@ -84,11 +85,6 @@ function worstConfidence(current: MappingConfidence, next: MappingConfidence): M
   };
 
   return order[next] < order[current] ? next : current;
-}
-
-function csvEscape(value: string | number | boolean): string {
-  const text = String(value);
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
 export function extractFinancialAssetAndLiabilitySupplements(input: {

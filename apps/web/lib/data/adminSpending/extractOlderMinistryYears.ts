@@ -2,6 +2,7 @@ import path from "node:path";
 import * as XLSX from "xlsx";
 import { cellText, numericCell, type MatrixCell } from "../parsing/cellUtils";
 import { contextFor } from "../parsing/hierarchyContext";
+import { sheetToMatrix } from "../parsing/workbookMatrix";
 import { codeDepth, findLeafCodes, normalizeOfficialCode, parentCodeFor } from "../realExpenditure/hierarchy";
 import type { OfficialExpenditureRow } from "../realExpenditure/types";
 import { transliterateAcadNusx } from "./transliterateAcadNusx";
@@ -28,7 +29,7 @@ function readMatrix(fileName: string, sheetName: string): MatrixCell[][] {
   const workbook = XLSX.readFile(file, { cellDates: false });
   const sheet = workbook.Sheets[sheetName];
   if (!sheet) throw new Error(`Missing sheet "${sheetName}" in ${fileName}. Available: ${workbook.SheetNames.join(", ")}`);
-  return XLSX.utils.sheet_to_json<MatrixCell[]>(sheet, { header: 1, blankrows: false, defval: null, raw: true });
+  return sheetToMatrix(sheet);
 }
 
 function repoWorkbookPath(fileName: string): string {
