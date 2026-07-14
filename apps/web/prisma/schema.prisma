@@ -18,12 +18,13 @@ enum BudgetBasis {
 }
 
 enum BudgetItemLevel {
-  total
   revenue_category
   public_spending_field
-  institution
-  program
-  subprogram
+}
+
+enum AdminSpendingLevel {
+  admin_category
+  major_program
 }
 
 enum MappingConfidence {
@@ -33,53 +34,60 @@ enum MappingConfidence {
   unclassified
 }
 
+// Mirror of data/taxonomy/{revenue-categories,spending-fields}.json merged with
+// data/glossary/category-glossary.csv (IDs are 1:1 across the three files).
 model BudgetItem {
-  id        String          @id
-  side      BudgetSide
-  level     BudgetItemLevel
-  parentId  String?
-  parent    BudgetItem?     @relation("BudgetItemHierarchy", fields: [parentId], references: [id])
-  children  BudgetItem[]    @relation("BudgetItemHierarchy")
-  kaLabel   String
-  enLabel   String
-  sortOrder Int             @default(999)
-  active    Boolean         @default(true)
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  facts     BudgetFact[]
-  mappings  BudgetMapping[] @relation("PublicSpendingField")
+  id          String          @id
+  side        BudgetSide
+  level       BudgetItemLevel
+  kaLabel     String
+  enLabel     String
+  sortOrder   Int
+  description String
+  notes       String
+  mappings    BudgetMapping[] @relation("PublicSpendingField")
 
   @@index([side, level])
-  @@index([parentId])
 }
 
+// Mirror of data/taxonomy/admin-spending-categories.json.
+model AdminSpendingCategory {
+  id           String              @id
+  kaLabel      String
+  enLabel      String
+  sortOrder    Int
+  programFacts AdminSpendingFact[] @relation("AdminCategoryPrograms")
+}
+
+// Mirror of data/sources/source-documents.csv.
 model SourceDocument {
   id              String       @id
   sourceName      String
   sourceUrlOrFile String
-  lastReviewedAt  DateTime
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  lastReviewedAt  DateTime     @db.Date
   facts           BudgetFact[]
 }
 
 model ImportRun {
-  id                    String       @id @default(cuid())
+  id                    String              @id @default(cuid())
   importLabel           String
-  importedAt            DateTime     @default(now())
+  importedAt            DateTime            @default(now())
   rowsRead              Int
   rowsImported          Int
-  totalRevenueGel       Decimal      @db.Decimal(18, 2)
-  totalExpenditureGel   Decimal      @db.Decimal(18, 2)
-  unclassifiedAmountGel Decimal      @db.Decimal(18, 2)
-  unclassifiedShare     Decimal      @db.Decimal(9, 6)
+  totalRevenueGel       Decimal             @db.Decimal(18, 2)
+  totalExpenditureGel   Decimal             @db.Decimal(18, 2)
+  unclassifiedAmountGel Decimal             @db.Decimal(18, 2)
+  unclassifiedShare     Decimal             @db.Decimal(9, 6)
   plannedRows           Int
   actualRows            Int
   reconciliationStatus  String
   warningsJson          Json
+  reportJson            Json
   facts                 BudgetFact[]
+  adminFacts            AdminSpendingFact[]
 }
 
+// Mirror of data/mappings/spending-field-mapping.csv.
 model BudgetMapping {
   id                    String            @id @default(cuid())
   year                  Int
@@ -90,19 +98,22 @@ model BudgetMapping {
   publicSpendingField   BudgetItem        @relation("PublicSpendingField", fields: [publicSpendingFieldId], references: [id])
   confidence            MappingConfidence
   notes                 String
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
 
   @@index([year])
   @@index([publicSpendingFieldId])
 }
 
+// Mirror of data/imports/budget-facts-2005-2025.csv.
+// id is deterministic: `${year}:${side}:${itemId}:${basis}`.
+// itemId is deliberately NOT a foreign key: the CSV contract also allows
+// explicit `revenue.total` / `expenditure.total` rows that have no taxonomy
+// entry (see lib/data/foundationValidation.ts); the import validates
+// references with the same rules the site uses.
 model BudgetFact {
-  id                    String             @id @default(cuid())
+  id                    String             @id
   year                  Int
   side                  BudgetSide
   itemId                String
-  item                  BudgetItem         @relation(fields: [itemId], references: [id])
   amountGel             Decimal            @db.Decimal(18, 2)
   basis                 BudgetBasis
   sourceDocumentId      String
@@ -114,13 +125,39 @@ model BudgetFact {
   officialSubprogram    String?
   publicSpendingFieldId String?
   mappingConfidence     MappingConfidence?
-  mappingNotes          String?
-  activePublicValue     Boolean            @default(true)
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime           @updatedAt
+  mappingNotes          String
 
+  @@unique([year, side, itemId, basis])
   @@index([year, side])
   @@index([itemId])
-  @@index([basis])
-  @@index([activePublicValue])
+}
+
+// Mirror of data/imports/admin-spending-facts-2005-2025.csv (ministries dataset,
+// admin_category rows plus major_program drill-down rows).
+// id is deterministic: `${year}:${itemId}`.
+// sourceId is deliberately NOT a foreign key: the CSV contract allows
+// `;`-joined multi-source values (see scripts/validate-data-files.ts); the
+// import validates every `;`-split part against SourceDocument.
+model AdminSpendingFact {
+  id                         String                 @id
+  year                       Int
+  itemId                     String
+  parentItemId               String?
+  parent                     AdminSpendingCategory? @relation("AdminCategoryPrograms", fields: [parentItemId], references: [id])
+  level                      AdminSpendingLevel
+  amountGel                  Decimal                @db.Decimal(18, 2)
+  basis                      BudgetBasis
+  sourceId                   String
+  importRunId                String?
+  importRun                  ImportRun?             @relation(fields: [importRunId], references: [id])
+  officialCode               String?
+  officialLabelKa            String?
+  officialInstitutionCode    String?
+  officialInstitutionLabelKa String?
+  mappingConfidence          MappingConfidence
+  mappingNotes               String
+
+  @@unique([year, itemId])
+  @@index([year, level])
+  @@index([parentItemId])
 }

@@ -1,6 +1,5 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { loadAdminSpendingCategoriesFile } from "../../lib/data/adminSpending/categoriesFile";
 import { ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL } from "../../lib/data/adminSpending/generateAdminSpendingFacts";
 import { loadAdminSpendingFacts } from "../../lib/data/adminSpending/importAdminSpendingFacts";
 import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/adminSpending/types";
@@ -19,6 +18,7 @@ import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import type { SpendingMapping } from "../../lib/data/mappings";
 import { loadSpendingMappings } from "../../lib/data/mappings";
+import { SERVED_DATA_FILES } from "../../lib/data/servedData";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import { loadSourceDocuments } from "../../lib/data/sources";
 import type { TaxonomyItem } from "../../lib/data/taxonomy";
@@ -34,11 +34,11 @@ import { TOTAL_ONLY_BUDGET_FACTS } from "../../lib/data/totalOnlyBudgetFacts";
 const LEGACY_JOIN_NOTE_PREFIX = "Pre-2012 organizational line(s) joined";
 const isLegacyJoinFact = (fact: AdminSpendingFact) => fact.mappingNotes.startsWith(LEGACY_JOIN_NOTE_PREFIX);
 
-const BUDGET_FACTS_CSV = "../../data/imports/budget-facts-2005-2025.csv";
-const ADMIN_SPENDING_FACTS_CSV = "../../data/imports/admin-spending-facts-2005-2025.csv";
-const GLOSSARY_CSV = "../../data/glossary/category-glossary.csv";
-const SOURCE_DOCUMENTS_CSV = "../../data/sources/source-documents.csv";
-const ADMIN_CATEGORIES_JSON = "../../data/taxonomy/admin-spending-categories.json";
+const BUDGET_FACTS_CSV = SERVED_DATA_FILES.budgetFacts;
+const ADMIN_SPENDING_FACTS_CSV = SERVED_DATA_FILES.adminSpendingFacts;
+const GLOSSARY_CSV = SERVED_DATA_FILES.glossary;
+const SOURCE_DOCUMENTS_CSV = SERVED_DATA_FILES.sourceDocuments;
+const ADMIN_CATEGORIES_JSON = SERVED_DATA_FILES.adminSpendingCategories;
 const TAXONOMY_DIR = "../../data/taxonomy";
 const SPENDING_FIELD_MAPPING_CSV = "../../data/mappings/spending-field-mapping.csv";
 
@@ -77,12 +77,6 @@ type Pipeline = {
   mappings: SpendingMapping[];
 };
 
-// Same JSON loading approach app/page.tsx uses for admin spending categories.
-async function loadAdminCategories(relativePath: string): Promise<AdminSpendingCategory[]> {
-  const filePath = path.resolve(process.cwd(), relativePath);
-  return JSON.parse(await readFile(filePath, "utf8")) as AdminSpendingCategory[];
-}
-
 let pipelinePromise: Promise<Pipeline> | null = null;
 
 function loadPipeline(): Promise<Pipeline> {
@@ -92,7 +86,7 @@ function loadPipeline(): Promise<Pipeline> {
       loadAdminSpendingFacts(ADMIN_SPENDING_FACTS_CSV),
       loadGlossary(GLOSSARY_CSV),
       loadSourceDocuments(SOURCE_DOCUMENTS_CSV),
-      loadAdminCategories(ADMIN_CATEGORIES_JSON),
+      loadAdminSpendingCategoriesFile(ADMIN_CATEGORIES_JSON),
       loadTaxonomyFiles(TAXONOMY_DIR),
       loadSpendingMappings(SPENDING_FIELD_MAPPING_CSV),
     ]);
@@ -197,7 +191,7 @@ describe("data pipeline gate (real shipped data files)", () => {
     const unresolvedAdminSourceIds = Array.from(
       new Set(
         adminFacts
-          .flatMap((fact) => fact.sourceId.split(";").map((sourceId) => sourceId.trim()))
+          .flatMap((fact) => fact.sourceId.split(";"))
           .filter((sourceId) => !registeredSourceIds.has(sourceId)),
       ),
     ).sort();

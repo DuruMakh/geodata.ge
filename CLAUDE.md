@@ -6,7 +6,8 @@
 
 - `npm run check` — lint + typecheck + unit tests + data validation. Run before claiming any work done.
 - `npm run test:browser` — Playwright e2e (local Edge; CI uses Chromium). Run for UI-affecting changes.
-- `npm run build` — production build (static; reads CSVs from `data/imports`, no `.env` needed).
+- `npm run build` — production build (static; reads CSVs from `data/imports` by default, no `.env` needed; `GEODATA_DATA_SOURCE=db` builds from the Supabase mirror instead).
+- `npm run data:import` — parity-checked CSV→Supabase import (needs `apps/web/.env`; see `docs/data-methodology/database-import.md`).
 
 ## Definition of done
 
