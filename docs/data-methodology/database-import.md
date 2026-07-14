@@ -39,10 +39,17 @@ Every run prints and stores (in `ImportRun.reportJson` and
 - budget-fact GEL totals per year/side, database vs CSV;
 - admin-spending GEL totals per year/level, database vs CSV.
 
+Beyond counts and totals, the import re-reads every inserted row **through the
+same code path db-mode builds use** and compares it field by field against the
+CSV loader output — a mapping bug in any column (labels, notes, dates) fails
+the import, not a later build.
+
 All comparisons are exact (decimal arithmetic, no floating-point tolerance).
-The parity check runs **inside** the import transaction: any mismatch rolls
-the whole transaction back — the previous database state stays untouched —
-and the run exits non-zero.
+Both checks run **inside** the import transaction: any mismatch rolls the
+whole transaction back — the previous database state stays untouched — and
+the run exits non-zero. A run that fails for any reason leaves no report file
+behind (the previous run's report is removed at start), so a present
+`db-import-parity.json` always describes the current mirror.
 
 ## One-time setup
 
@@ -52,14 +59,20 @@ and the run exits non-zero.
    - `DATABASE_URL` — pooled connection, port 6543, `?pgbouncer=true`;
    - `DIRECT_URL` — direct connection, port 5432.
    Never commit `.env`.
-3. From `apps/web`: `npm run prisma:migrate` — creates/applies migrations over
-   the direct connection (Prisma 7 CLI reads `DIRECT_URL` via `prisma.config.ts`).
+3. From `apps/web`: `npm run prisma:deploy` — applies the committed migrations
+   over the direct connection (Prisma 7 CLI reads `DIRECT_URL` via
+   `prisma.config.ts`). Always use `prisma:deploy` against the live database;
+   `prisma:migrate` (`prisma migrate dev`) is a development command for
+   authoring new migrations and may offer to RESET a database whose state
+   drifts from the migration history.
 4. From `apps/web`: `npm run data:import` — loads everything and prints the
    parity report.
-5. Recommended hardening in Supabase: enable row level security (with no
-   policies) on all imported tables, or disable the public Data API — nothing
-   in this project reads via PostgREST, and Prisma connects as the table owner,
-   so this does not affect the import or builds.
+5. Hardening ships as migrations (applied automatically by step 3): row level
+   security with no policies on every mirror table and on Prisma's
+   `_prisma_migrations` table, so Supabase's public Data API (PostgREST)
+   exposes nothing. Prisma connects as the table owner and is unaffected.
+   Disabling the Data API entirely in the Supabase dashboard is a fine extra
+   step — nothing in this project uses it.
 
 ## Serving
 
@@ -74,6 +87,9 @@ and the run exits non-zero.
 - `GEODATA_DATA_SOURCE=csv` or unset — pages are rendered from the CSVs
   directly (dev, CI, and the documented fallback if the database is
   unreachable). Both sources are guaranteed identical by the parity check.
+- Row *order* is the one deliberate difference: db mode returns rows in a
+  deterministic canonical order that may differ from CSV file order. All UI
+  ordering is derived (amounts, sort tokens, years), never file-order-dependent.
 
 The deployed site is fully static in both modes; database downtime can only
 ever delay a rebuild, never take the site down.
@@ -83,8 +99,9 @@ ever delay a rebuild, never take the site down.
 1. Land the reviewed CSVs as usual (extraction → staging → review → promotion
    into `data/imports/`, with the matching methodology doc).
 2. If the data introduced new columns or datasets, reconcile
-   `apps/web/prisma/schema.prisma` and create a migration (`npm run
-   prisma:migrate`); for data-only updates this step is a no-op.
+   `apps/web/prisma/schema.prisma`, author the migration in development
+   (`npm run prisma:migrate`), and apply it to the live database with
+   `npm run prisma:deploy`; for data-only updates this step is a no-op.
 3. From `apps/web`: `npm run data:import`. Re-running is always safe — the
    import replaces the mirror wholesale inside one transaction.
 4. Check the parity report says `Parity status: PASSED`.

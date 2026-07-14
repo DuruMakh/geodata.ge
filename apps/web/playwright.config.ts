@@ -11,7 +11,9 @@ export default defineConfig({
   },
   webServer: {
     command: "npm run dev -- --hostname 0.0.0.0 --port 3100",
-    reuseExistingServer: !process.env.CI,
+    // Never reuse a leftover server when a data source is pinned: a stale
+    // csv-mode dev server on the port would silently masquerade as a db run.
+    reuseExistingServer: !process.env.CI && !process.env.GEODATA_DATA_SOURCE,
     timeout: 120_000,
     url: "http://localhost:3100",
   },

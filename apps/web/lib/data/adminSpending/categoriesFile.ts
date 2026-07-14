@@ -4,7 +4,7 @@ import { z } from "zod";
 import type { AdminSpendingCategory } from "./types";
 
 const adminCategorySchema = z.object({
-  id: z.string().min(1),
+  id: z.string().regex(/^admin_spending\.[a-z0-9_]+$/, "admin category IDs use admin_spending.*"),
   kaLabel: z.string().min(1),
   enLabel: z.string().min(1),
   sortOrder: z.number().int().positive(),

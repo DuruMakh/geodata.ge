@@ -1,5 +1,5 @@
-import "dotenv/config";
-import { mkdir, writeFile } from "node:fs/promises";
+import { config as loadEnv } from "dotenv";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import Decimal from "decimal.js";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -18,10 +18,27 @@ import {
   type ParityReport,
 } from "../lib/data/parityReport";
 import { SERVED_DATA_FILES } from "../lib/data/servedData";
+import {
+  adminFactParityKey,
+  assertSameServedRows,
+  budgetFactParityKey,
+} from "../lib/data/servedDataParity";
 import { loadSourceDocuments } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
+import {
+  loadAdminCategoriesFromMirror,
+  loadAdminFactsFromMirror,
+  loadBudgetFactsFromMirror,
+  loadGlossaryFromMirror,
+  loadSourceDocumentsFromMirror,
+} from "../lib/db/mirrorRows";
 
-const IMPORT_LABEL = "real-budget-2004-2025";
+// Match Next.js env-file precedence for the variables this script needs:
+// shell env wins, then .env.local, then .env (dotenv never overrides).
+loadEnv({ path: ".env.local", quiet: true });
+loadEnv({ path: ".env", quiet: true });
+
+const IMPORT_LABEL = "real-budget-2005-2025";
 const TAXONOMY_DIR = "../../data/taxonomy";
 const MAPPINGS_FILE = "../../data/mappings/spending-field-mapping.csv";
 
@@ -58,7 +75,20 @@ function assertAmountPrecision(label: string, rows: { amountGel: number }[]): vo
   }
 }
 
+// Fixed audit columns must be exact 2-decimal values; float sums may carry
+// stray precision that Decimal(18, 2) would otherwise round silently.
+function gelColumn(value: number): string {
+  return new Decimal(value).toFixed(2);
+}
+
 async function main() {
+  if (!process.env.DIRECT_URL && process.env.DATABASE_URL) {
+    console.warn(
+      "DIRECT_URL is not set — falling back to the pooled DATABASE_URL for the " +
+        "import transaction. This is slower and exposed to pooler timeouts; " +
+        "set DIRECT_URL (port 5432) as in apps/web/.env.example.",
+    );
+  }
   const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error(
@@ -66,6 +96,10 @@ async function main() {
         "(see apps/web/.env.example) before running npm run data:import.",
     );
   }
+
+  // A stale report from an earlier run must not outlive it: remove it now so a
+  // run that dies mid-way leaves no report rather than the previous PASSED one.
+  await rm(reportPath(), { force: true });
 
   // Load every served dataset through the same validated loaders the site uses.
   const [taxonomy, glossary, adminCategories, sourceDocuments, mappings, budgetFacts, adminFacts] =
@@ -91,6 +125,19 @@ async function main() {
 
   assertSubset("Glossary IDs", glossaryIds, taxonomyIds);
   assertSubset("Taxonomy IDs missing glossary entries", taxonomyIds, glossaryIds);
+  // BudgetItem stores one label set serving both files, so taxonomy and
+  // glossary labels must agree — otherwise the mirror can only ever match one
+  // of the two and every db-mode build would fail with no import error.
+  for (const item of taxonomy) {
+    const glossaryEntry = glossary.get(item.id)!;
+    if (glossaryEntry.kaLabel !== item.kaLabel || glossaryEntry.enLabel !== item.enLabel) {
+      throw new Error(
+        `Labels for ${item.id} differ between data/taxonomy (${item.kaLabel} / ${item.enLabel}) ` +
+          `and data/glossary/category-glossary.csv (${glossaryEntry.kaLabel} / ${glossaryEntry.enLabel}). ` +
+          "Align the two files before importing.",
+      );
+    }
+  }
   // Admin source IDs may be `;`-joined multi-source values (same contract as
   // scripts/validate-data-files.ts).
   assertSubset(
@@ -108,11 +155,8 @@ async function main() {
     adminFacts.flatMap((fact) => (fact.parentItemId ? [fact.parentItemId] : [])),
     adminCategoryIds,
   );
-  assertUnique(
-    "budget fact natural key",
-    budgetFacts.map((fact) => `${fact.year}:${fact.side}:${fact.itemId}:${fact.basis}`),
-  );
-  assertUnique("admin fact natural key", adminFacts.map((fact) => `${fact.year}:${fact.itemId}`));
+  assertUnique("budget fact natural key", budgetFacts.map(budgetFactParityKey));
+  assertUnique("admin fact natural key", adminFacts.map(adminFactParityKey));
   assertAmountPrecision("Budget fact", budgetFacts);
   assertAmountPrecision("Admin fact", adminFacts);
 
@@ -181,9 +225,9 @@ async function main() {
             importLabel: report.importLabel,
             rowsRead: report.rowsRead,
             rowsImported: report.rowsImported,
-            totalRevenueGel: String(report.totalRevenueGel),
-            totalExpenditureGel: String(report.totalExpenditureGel),
-            unclassifiedAmountGel: String(report.unclassifiedAmountGel),
+            totalRevenueGel: gelColumn(report.totalRevenueGel),
+            totalExpenditureGel: gelColumn(report.totalExpenditureGel),
+            unclassifiedAmountGel: gelColumn(report.unclassifiedAmountGel),
             unclassifiedShare: report.unclassifiedShare.toFixed(6),
             plannedRows: report.plannedRows,
             actualRows: report.actualRows,
@@ -195,7 +239,7 @@ async function main() {
 
         await tx.budgetFact.createMany({
           data: budgetFacts.map((fact) => ({
-            id: `${fact.year}:${fact.side}:${fact.itemId}:${fact.basis}`,
+            id: budgetFactParityKey(fact),
             year: fact.year,
             side: fact.side,
             itemId: fact.itemId,
@@ -214,7 +258,7 @@ async function main() {
 
         await tx.adminSpendingFact.createMany({
           data: adminFacts.map((fact) => ({
-            id: `${fact.year}:${fact.itemId}`,
+            id: adminFactParityKey(fact),
             year: fact.year,
             itemId: fact.itemId,
             parentItemId: fact.parentItemId,
@@ -244,38 +288,55 @@ async function main() {
           })),
         });
 
-        // Parity verification against what this transaction is about to commit.
-        const [
-          dbBudgetFacts,
-          dbAdminFacts,
-          dbItems,
-          dbAdminCategories,
-          dbSources,
-          dbMappings,
-          dbBudgetTotals,
-          dbAdminTotals,
-        ] = await Promise.all([
-          tx.budgetFact.count(),
-          tx.adminSpendingFact.count(),
-          tx.budgetItem.count(),
-          tx.adminSpendingCategory.count(),
-          tx.sourceDocument.count(),
-          tx.budgetMapping.count(),
+        // Row-level verification INSIDE the transaction, through the exact
+        // read path db-mode builds use: the import only commits if the serving
+        // path reproduces every CSV loader row field for field. A mapping bug
+        // in any column rolls the whole import back.
+        const [mirrorFacts, mirrorGlossary, mirrorSources, mirrorAdminFacts, mirrorAdminCategories] =
+          await Promise.all([
+            loadBudgetFactsFromMirror(tx),
+            loadGlossaryFromMirror(tx),
+            loadSourceDocumentsFromMirror(tx),
+            loadAdminFactsFromMirror(tx),
+            loadAdminCategoriesFromMirror(tx),
+          ]);
+
+        assertSameServedRows("budget facts", budgetFacts, mirrorFacts, budgetFactParityKey);
+        assertSameServedRows(
+          "glossary entries",
+          [...glossary.values()],
+          [...mirrorGlossary.values()],
+          (row) => row.id,
+        );
+        assertSameServedRows("source documents", sourceDocuments, mirrorSources, (row) => row.sourceId);
+        assertSameServedRows("admin spending facts", adminFacts, mirrorAdminFacts, adminFactParityKey);
+        assertSameServedRows(
+          "admin spending categories",
+          adminCategories,
+          mirrorAdminCategories,
+          (row) => row.id,
+        );
+
+        // Totals parity for the human-readable report; counts come from the
+        // row-level readback above, GEL sums from the database's own Decimal
+        // aggregation to prove storage fidelity.
+        const [dbBudgetTotals, dbAdminTotals, dbMappings] = await Promise.all([
           tx.budgetFact.groupBy({ by: ["year", "side"], _sum: { amountGel: true } }),
           tx.adminSpendingFact.groupBy({ by: ["year", "level"], _sum: { amountGel: true } }),
+          tx.budgetMapping.count(),
         ]);
 
         const parityInTx = buildParityReport({
           counts: [
-            { table: "BudgetFact", csvRows: budgetFacts.length, dbRows: dbBudgetFacts },
-            { table: "AdminSpendingFact", csvRows: adminFacts.length, dbRows: dbAdminFacts },
-            { table: "BudgetItem", csvRows: taxonomy.length, dbRows: dbItems },
+            { table: "BudgetFact", csvRows: budgetFacts.length, dbRows: mirrorFacts.length },
+            { table: "AdminSpendingFact", csvRows: adminFacts.length, dbRows: mirrorAdminFacts.length },
+            { table: "BudgetItem", csvRows: taxonomy.length, dbRows: mirrorGlossary.size },
             {
               table: "AdminSpendingCategory",
               csvRows: adminCategories.length,
-              dbRows: dbAdminCategories,
+              dbRows: mirrorAdminCategories.length,
             },
-            { table: "SourceDocument", csvRows: sourceDocuments.length, dbRows: dbSources },
+            { table: "SourceDocument", csvRows: sourceDocuments.length, dbRows: mirrorSources.length },
             { table: "BudgetMapping", csvRows: mappings.length, dbRows: dbMappings },
           ],
           budgetTotalsCsv,
@@ -333,20 +394,22 @@ async function main() {
   }
 }
 
+function reportPath(): string {
+  return path.resolve(process.cwd(), "../../data/reports/db-import-parity.json");
+}
+
 async function writeParityReport(
   importRunId: string | null,
   importReport: unknown,
   parity: ParityReport,
 ): Promise<void> {
-  const reportsDir = path.resolve(process.cwd(), "../../data/reports");
-  await mkdir(reportsDir, { recursive: true });
-  const reportPath = path.join(reportsDir, "db-import-parity.json");
+  await mkdir(path.dirname(reportPath()), { recursive: true });
   await writeFile(
-    reportPath,
+    reportPath(),
     JSON.stringify({ importLabel: IMPORT_LABEL, importRunId, importReport, parity }, null, 2),
     "utf8",
   );
-  console.log(`Full report written to ${reportPath}`);
+  console.log(`Full report written to ${reportPath()}`);
 }
 
 main().catch((error) => {

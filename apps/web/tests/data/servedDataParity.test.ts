@@ -44,4 +44,14 @@ describe("served data row parity", () => {
 
     expect(() => assertSameServedRows("test rows", csv, db, keyOf)).toThrow(/row count differs/);
   });
+
+  it("sees differences inside nested values, not just top-level keys", () => {
+    type NestedRow = { id: string; sources: { url: string }[] };
+    const csv: NestedRow[] = [{ id: "a", sources: [{ url: "one" }] }];
+    const db: NestedRow[] = [{ id: "a", sources: [{ url: "two" }] }];
+
+    expect(() => assertSameServedRows("test rows", csv, db, (row) => row.id)).toThrow(
+      /row a differs/,
+    );
+  });
 });

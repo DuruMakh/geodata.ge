@@ -4,7 +4,11 @@ import { loadAdminSpendingFacts } from "./adminSpending/importAdminSpendingFacts
 import { loadGlossary, type GlossaryEntry } from "./glossary";
 import { loadBudgetFactRows, type BudgetFactImportRow } from "./importBudgetFacts";
 import { loadSourceDocuments, type SourceDocumentRow } from "./sources";
-import { assertSameServedRows } from "./servedDataParity";
+import {
+  adminFactParityKey,
+  assertSameServedRows,
+  budgetFactParityKey,
+} from "./servedDataParity";
 
 // The one list of files the site serves. The database import mirrors exactly
 // these files (scripts/import-budget-facts.ts imports this constant), so
@@ -74,9 +78,7 @@ async function loadExplorerDataFromCsv(): Promise<ExplorerData> {
 // any import mapping bug — the build fails loudly instead of serving drifted
 // data.
 function assertLandingParity(db: LandingData, csv: LandingData): void {
-  assertSameServedRows("budget facts", csv.facts, db.facts, (row) =>
-    [row.year, row.side, row.itemId, row.basis].join(":"),
-  );
+  assertSameServedRows("budget facts", csv.facts, db.facts, budgetFactParityKey);
   assertSameServedRows(
     "glossary entries",
     [...csv.glossary.values()],
@@ -102,9 +104,7 @@ export async function loadServedExplorerData(): Promise<ExplorerData> {
     const { loadExplorerDataFromDb } = await import("../db/servedDataDb");
     const [db, csv] = await Promise.all([loadExplorerDataFromDb(), loadExplorerDataFromCsv()]);
     assertLandingParity(db, csv);
-    assertSameServedRows("admin spending facts", csv.adminFacts, db.adminFacts, (row) =>
-      [row.year, row.itemId].join(":"),
-    );
+    assertSameServedRows("admin spending facts", csv.adminFacts, db.adminFacts, adminFactParityKey);
     assertSameServedRows("admin spending categories", csv.adminCategories, db.adminCategories, (row) => row.id);
     return db;
   }

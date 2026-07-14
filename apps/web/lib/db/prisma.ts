@@ -13,14 +13,12 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-});
-
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    adapter,
+    adapter: new PrismaPg({
+      connectionString: process.env.DATABASE_URL,
+    }),
     log:
       process.env.NODE_ENV === "development"
         ? ["query", "error", "warn"]
