@@ -29,6 +29,10 @@ The reviewed CSVs are the canonical source of truth. Supabase Postgres is the ca
 
 Database commands (`npm run prisma:migrate`, `npm run data:import`, builds with `GEODATA_DATA_SOURCE=db`) need `apps/web/.env` with the Supabase connection strings — copy `apps/web/.env.example` and fill in the pooled (`DATABASE_URL`, port 6543) and direct (`DIRECT_URL`, port 5432) URLs.
 
+## Deployment
+
+The site deploys to Vercel (project `geodata-ge`): pushes to `main` go to production at https://geodata-ge.vercel.app, other branches get preview deployments. See `docs/deployment.md` for project settings, rollback, environment variables, and custom-domain steps.
+
 ## Data Foundation
 
 Root data files live under `data/`.

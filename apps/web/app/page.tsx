@@ -6,6 +6,15 @@ import { buildLandingModel } from "../lib/landing/landingData";
 export const metadata: Metadata = {
   title: "GeoData — საქართველოს ბიუჯეტის ექსპლორერი",
   description: "გადამოწმებული ოფიციალური საბიუჯეტო მონაცემები: მრავალწლიანი დინამიკა, ერთი წლის სურათი და ღია CSV.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "GeoData.ge",
+    locale: "ka_GE",
+    url: "/",
+    title: "GeoData — საქართველოს ბიუჯეტის ექსპლორერი",
+    description: "გადამოწმებული ოფიციალური საბიუჯეტო მონაცემები: მრავალწლიანი დინამიკა, ერთი წლის სურათი და ღია CSV.",
+  },
 };
 
 export default async function Home() {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Sans_Georgian, Noto_Serif_Georgian } from "next/font/google";
+import { resolveSiteUrl } from "../lib/siteUrl";
 import "./globals.css";
 
 const notoSansGeorgian = Noto_Sans_Georgian({
@@ -24,8 +25,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(resolveSiteUrl()),
   title: "GeoData.ge Budget Explorer",
   description: "Georgian-first public budget explorer for Georgia.",
+  openGraph: {
+    type: "website",
+    siteName: "GeoData.ge",
+    locale: "ka_GE",
+  },
 };
 
 export default function RootLayout({
