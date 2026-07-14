@@ -5,6 +5,15 @@ import { loadServedExplorerData } from "../../lib/data/servedData";
 export const metadata: Metadata = {
   title: "ბიუჯეტის ექსპლორერი — GeoData",
   description: "საქართველოს ბიუჯეტის მრავალწლიანი დინამიკა და ერთი წლის ანალიზი — გადამოწმებული ოფიციალური მონაცემები და ღია CSV.",
+  alternates: { canonical: "/explorer" },
+  openGraph: {
+    type: "website",
+    siteName: "GeoData.ge",
+    locale: "ka_GE",
+    url: "/explorer",
+    title: "ბიუჯეტის ექსპლორერი — GeoData",
+    description: "საქართველოს ბიუჯეტის მრავალწლიანი დინამიკა და ერთი წლის ანალიზი — გადამოწმებული ოფიციალური მონაცემები და ღია CSV.",
+  },
 };
 
 export default async function ExplorerPage() {

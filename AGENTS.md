@@ -125,7 +125,7 @@ Current stack:
 
 - Next.js 16 with TypeScript (strict) and Tailwind v4; custom editorial component layer (`apps/web/components/ui/editorial.tsx`), no shadcn.
 - Data serving: reviewed CSVs under `data/imports/` are the canonical human-reviewed source of truth. Supabase Postgres (via Prisma 7) is the canonical serving store, populated from them by the idempotent, parity-checked `npm run data:import`. Pages are rendered at build time from the database when `GEODATA_DATA_SOURCE=db` (db builds also re-verify the mirror row-by-row against the checkout's CSVs); the default (`csv`, no `.env` needed) builds straight from the CSVs and is the documented fallback. The deployed app stays fully static either way. The database must never be edited directly — see `docs/data-methodology/database-import.md`. Activation status: Supabase project live (2026-07-14), migrations applied, first import parity PASSED, db-mode build + browser tests verified. Production (Vercel) still builds with the CSV default until `DATABASE_URL` + `GEODATA_DATA_SOURCE=db` are set in the Vercel project env. Update this sentence when that changes.
-- Deployment: Vercel.
+- Deployment: Vercel project `geodata-ge` (team `durumakh-1974s-projects`), git-connected to `origin` — push to `main` auto-deploys production at https://geodata-ge.vercel.app; branches/PRs get preview deployments. Canonical workflow doc: `docs/deployment.md`. Custom domain not yet attached (owner step; see the doc).
 
 The workspace is a git repository on `main` with a GitHub `origin` remote. Check git state before promising commits, branches, pushes, or PRs.
 
