@@ -1,0 +1,834 @@
+{
+  "generatedAt": "2026-07-26T07:32:30.595Z",
+  "lastReviewedAt": "2026-07-26",
+  "status": "PASS",
+  "sourceRule": {
+    "portalYears": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019
+    ],
+    "officialWorkbookYears": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "sourceTransitionYear": 2020
+  },
+  "municipalityDimension": {
+    "count": 69,
+    "conflicts": []
+  },
+  "datasets": {
+    "main": {
+      "rows": 7590,
+      "expectedRows": 7590,
+      "years": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "municipalities": 69,
+      "functionalCodes": [
+        "7.1",
+        "7.10",
+        "7.2",
+        "7.3",
+        "7.4",
+        "7.5",
+        "7.6",
+        "7.7",
+        "7.8",
+        "7.9"
+      ],
+      "duplicateKeys": [],
+      "nullOrNonNumericAmounts": 0,
+      "negativeAmounts": 0,
+      "byYear": [
+        {
+          "year": 2015,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 2043872100.46,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2016,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 2002147309.67,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2017,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 2016116246.6,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2018,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 2273962143.43,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2019,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 2660036253.12,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2020,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 2634743842.15,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2021,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 2923990396.45,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2022,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 3616722196.21,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2023,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 4338246204.12,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2024,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 5075951947.64,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2025,
+          "rows": 690,
+          "municipalities": 69,
+          "categories": 10,
+          "amountGel": 5640161736.23,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        }
+      ]
+    },
+    "selectedDetail": {
+      "rows": 4554,
+      "expectedRows": 4554,
+      "years": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "municipalities": 69,
+      "functionalCodes": [
+        "7.1.1",
+        "7.4.5.1",
+        "7.5.1",
+        "7.8.1",
+        "7.8.2",
+        "7.9.1"
+      ],
+      "duplicateKeys": [],
+      "nullOrNonNumericAmounts": 0,
+      "negativeAmounts": 0,
+      "byYear": [
+        {
+          "year": 2015,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 990608777.76,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2016,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 1120525828.01,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2017,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 1194945382.19,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2018,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 1398525613.01,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2019,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 1501011780.28,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2020,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 1578354969.31,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2021,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 1763378543.05,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2022,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 2253925799.78,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2023,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 2772132865.33,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2024,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 3274938778.96,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2025,
+          "rows": 414,
+          "municipalities": 69,
+          "categories": 6,
+          "amountGel": 3618137662.66,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        }
+      ]
+    },
+    "combined": {
+      "rows": 12144,
+      "expectedRows": 12144,
+      "years": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "municipalities": 69,
+      "functionalCodes": [
+        "7.1",
+        "7.1.1",
+        "7.10",
+        "7.2",
+        "7.3",
+        "7.4",
+        "7.4.5.1",
+        "7.5",
+        "7.5.1",
+        "7.6",
+        "7.7",
+        "7.8",
+        "7.8.1",
+        "7.8.2",
+        "7.9",
+        "7.9.1"
+      ],
+      "duplicateKeys": [],
+      "nullOrNonNumericAmounts": 0,
+      "negativeAmounts": 0,
+      "byYear": [
+        {
+          "year": 2015,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 3034480878.22,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2016,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 3122673137.68,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2017,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 3211061628.79,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2018,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 3672487756.44,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2019,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 4161048033.4,
+          "sourceFamilies": [
+            "municipalities_mof_ge_portal_archive"
+          ]
+        },
+        {
+          "year": 2020,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 4213098811.46,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2021,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 4687368939.5,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2022,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 5870647995.99,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2023,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 7110379069.45,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2024,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 8350890726.6,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        },
+        {
+          "year": 2025,
+          "rows": 1104,
+          "municipalities": 69,
+          "categories": 16,
+          "amountGel": 9258299398.89,
+          "sourceFamilies": [
+            "mof_functional_classification_workbook"
+          ]
+        }
+      ]
+    }
+  },
+  "reconciliations": {
+    "portalMainToAllDetails": [
+      {
+        "year": 2015,
+        "derivedMainTotalGel": 2043872100.46,
+        "portalPublishedAllDetailsGel": 2043872100.46,
+        "differenceGel": 0
+      },
+      {
+        "year": 2016,
+        "derivedMainTotalGel": 2002147309.67,
+        "portalPublishedAllDetailsGel": 2002147309.67,
+        "differenceGel": 0
+      },
+      {
+        "year": 2017,
+        "derivedMainTotalGel": 2016116246.6,
+        "portalPublishedAllDetailsGel": 2016116246.6,
+        "differenceGel": 0
+      },
+      {
+        "year": 2018,
+        "derivedMainTotalGel": 2273962143.43,
+        "portalPublishedAllDetailsGel": 2273962143.43,
+        "differenceGel": 0
+      },
+      {
+        "year": 2019,
+        "derivedMainTotalGel": 2660036253.12,
+        "portalPublishedAllDetailsGel": 2660036253.12,
+        "differenceGel": 0
+      }
+    ],
+    "portalAllDetailsInconsistencies": [],
+    "officialMainToCode7": [
+      {
+        "year": 2020,
+        "derivedMainTotalGel": 2634743842.15,
+        "workbookCode7Gel": 2634743842.15,
+        "differenceGel": 0
+      },
+      {
+        "year": 2021,
+        "derivedMainTotalGel": 2923990396.45,
+        "workbookCode7Gel": 2923990396.45,
+        "differenceGel": 0
+      },
+      {
+        "year": 2022,
+        "derivedMainTotalGel": 3616722196.21,
+        "workbookCode7Gel": 3616722196.21,
+        "differenceGel": 0
+      },
+      {
+        "year": 2023,
+        "derivedMainTotalGel": 4338246204.12,
+        "workbookCode7Gel": 4338246204.12,
+        "differenceGel": 0
+      },
+      {
+        "year": 2024,
+        "derivedMainTotalGel": 5075951947.64,
+        "workbookCode7Gel": 5075951947.64,
+        "differenceGel": 0
+      },
+      {
+        "year": 2025,
+        "derivedMainTotalGel": 5640161736.23,
+        "workbookCode7Gel": 5640161736.23,
+        "differenceGel": 0
+      }
+    ],
+    "overlap2020": {
+      "note": "Portal 2020 is retained as a raw comparison source but is not used in the canonical derived series.",
+      "mainPortalGel": 2696588549.26,
+      "mainWorkbookGel": 2634743842.15,
+      "mainDifferenceGel": -61844707.11,
+      "mainDifferencePercent": -0.022934,
+      "selectedDetailPortalGel": 1595129025.49,
+      "selectedDetailWorkbookGel": 1578354969.31,
+      "selectedDetailDifferenceGel": -16774056.18,
+      "selectedDetailDifferencePercent": -0.010516
+    }
+  },
+  "excelCompatibility": {
+    "csvEncoding": "UTF-8 with BOM",
+    "combinedHasUtf8Bom": true,
+    "mainHasUtf8Bom": true,
+    "selectedDetailHasUtf8Bom": true,
+    "sourceManifestHasUtf8Bom": true,
+    "nativeWorkbook": "docs/Raw Data/Municipalities/combined-annual-2015-2025/municipal-functional-annual-2015-2025.xlsx",
+    "totalPaymentsHasUtf8Bom": true
+  },
+  "outputHashes": {
+    "combined": {
+      "sha256": "57A79D86DC9D570FC2390AB6696B0A89F1251A53320022F0E948D25038D0FBF7",
+      "bytes": 7793982
+    },
+    "main": {
+      "sha256": "DC5B6BE11528FC4DD5EFA2B1C6FE68F07895C5CCC427001A930412A0A99A240B",
+      "bytes": 4656728
+    },
+    "selectedDetail": {
+      "sha256": "F33E551D70C55B235A4CB2D4F24B2883811C3FA511453D2918291C5987C25CA4",
+      "bytes": 3137626
+    },
+    "excelWorkbook": {
+      "sha256": "85F6781AAE8DE00BD9969ADF93D9C5B724ED2897113A72FFB97B25770AD106BC",
+      "bytes": 1324545
+    },
+    "sourceManifest": {
+      "sha256": "6812B50A72659BC807221F95FC70FDB5EB98B22D8E261652513D649DF3F6E202",
+      "bytes": 4612
+    },
+    "totalPayments": {
+      "sha256": "B75B846110FAE13B869E2BC4D4255E30D2ED14945FD9206AD8A00DDC063A9FE2",
+      "bytes": 378819
+    },
+    "municipalityHistoryManifest": {
+      "sha256": "3EAD58F27CEC7EAB3226C6DCCC4D6228CC2DCBFDF741565C88666F70982FE12E",
+      "bytes": 32117
+    }
+  },
+  "totalPaymentsReconciliation": {
+    "status": "PASS",
+    "rows": 759,
+    "expectedRows": 759,
+    "municipalities": 69,
+    "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "warningThresholdGel": 1000000,
+    "financingToleranceGel": 50000,
+    "warningRule": {
+      "sourceVersionDifferenceYears": [
+        2016,
+        2017,
+        2018,
+        2019
+      ],
+      "financingOutsideFunctionalYears": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "noDoubleCountYear": 2025
+    },
+    "missingOfficialActualRows": [
+      {
+        "year": 2024,
+        "municipalityCode": "11",
+        "municipalityNameKa": "ხულოს მუნიციპალიტეტი",
+        "availableHeader": "2024 წლის გეგმა",
+        "fallbackMeasure": "functional_total_fallback_missing_payment_actual"
+      }
+    ],
+    "byYear": [
+      {
+        "year": 2015,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 2043872100.46,
+        "totalPaymentsGel": null,
+        "functionalSumGel": 2043872100.46,
+        "reconciliationDifferenceGel": null,
+        "financingComponentsGel": null,
+        "componentReconciliations": null,
+        "warnings": 0,
+        "warningCounts": {
+          "none": 69
+        },
+        "maximumAbsoluteDifferenceGel": 0
+      },
+      {
+        "year": 2016,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 1964677074.87,
+        "totalPaymentsGel": 1964677074.87,
+        "functionalSumGel": 2002147309.67,
+        "reconciliationDifferenceGel": -37470234.8,
+        "financingComponentsGel": 127303383.04,
+        "componentReconciliations": 69,
+        "warnings": 7,
+        "warningCounts": {
+          "source_version_difference": 7,
+          "none": 62
+        },
+        "maximumAbsoluteDifferenceGel": 15631462.01
+      },
+      {
+        "year": 2017,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 1978973176.72,
+        "totalPaymentsGel": 1978973176.72,
+        "functionalSumGel": 2016116246.6,
+        "reconciliationDifferenceGel": -37143069.88,
+        "financingComponentsGel": 166260550.86,
+        "componentReconciliations": 69,
+        "warnings": 7,
+        "warningCounts": {
+          "source_version_difference": 7,
+          "none": 62
+        },
+        "maximumAbsoluteDifferenceGel": 15733026.05
+      },
+      {
+        "year": 2018,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 2239801579.7,
+        "totalPaymentsGel": 2239801579.7,
+        "functionalSumGel": 2273962143.43,
+        "reconciliationDifferenceGel": -34160563.73,
+        "financingComponentsGel": 343400956.25,
+        "componentReconciliations": 69,
+        "warnings": 5,
+        "warningCounts": {
+          "source_version_difference": 5,
+          "none": 64
+        },
+        "maximumAbsoluteDifferenceGel": 15126904.35
+      },
+      {
+        "year": 2019,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 2617436406.74,
+        "totalPaymentsGel": 2617436406.74,
+        "functionalSumGel": 2660036253.12,
+        "reconciliationDifferenceGel": -42599846.38,
+        "financingComponentsGel": 34928455,
+        "componentReconciliations": 69,
+        "warnings": 5,
+        "warningCounts": {
+          "source_version_difference": 5,
+          "none": 64
+        },
+        "maximumAbsoluteDifferenceGel": 21081708.49
+      },
+      {
+        "year": 2020,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 2662965260.1,
+        "totalPaymentsGel": 2662965260.1,
+        "functionalSumGel": 2634743842.15,
+        "reconciliationDifferenceGel": 28221417.95,
+        "financingComponentsGel": 28221417.95,
+        "componentReconciliations": 69,
+        "warnings": 3,
+        "warningCounts": {
+          "financing_outside_functional": 3,
+          "none": 66
+        },
+        "maximumAbsoluteDifferenceGel": 16049471.72
+      },
+      {
+        "year": 2021,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 2950220526.72,
+        "totalPaymentsGel": 2950220526.72,
+        "functionalSumGel": 2923990396.45,
+        "reconciliationDifferenceGel": 26230130.27,
+        "financingComponentsGel": 26230130.27,
+        "componentReconciliations": 69,
+        "warnings": 3,
+        "warningCounts": {
+          "financing_outside_functional": 3,
+          "none": 66
+        },
+        "maximumAbsoluteDifferenceGel": 14878157.16
+      },
+      {
+        "year": 2022,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 3664160091.5,
+        "totalPaymentsGel": 3664160091.5,
+        "functionalSumGel": 3616722196.21,
+        "reconciliationDifferenceGel": 47437895.29,
+        "financingComponentsGel": 47438750.42,
+        "componentReconciliations": 69,
+        "warnings": 3,
+        "warningCounts": {
+          "financing_outside_functional": 3,
+          "none": 66
+        },
+        "maximumAbsoluteDifferenceGel": 25888761.48
+      },
+      {
+        "year": 2023,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 4411806853.2,
+        "totalPaymentsGel": 4411806853.2,
+        "functionalSumGel": 4338246204.12,
+        "reconciliationDifferenceGel": 73560649.08,
+        "financingComponentsGel": 73589601.91,
+        "componentReconciliations": 69,
+        "warnings": 6,
+        "warningCounts": {
+          "financing_outside_functional": 6,
+          "none": 63
+        },
+        "maximumAbsoluteDifferenceGel": 28800391.16
+      },
+      {
+        "year": 2024,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 5159412203.83,
+        "totalPaymentsGel": null,
+        "functionalSumGel": 5075951947.64,
+        "reconciliationDifferenceGel": null,
+        "financingComponentsGel": null,
+        "componentReconciliations": null,
+        "warnings": 6,
+        "warningCounts": {
+          "financing_outside_functional": 6,
+          "none": 62,
+          "source_actual_missing": 1
+        },
+        "maximumAbsoluteDifferenceGel": 36375017.69
+      },
+      {
+        "year": 2025,
+        "rows": 69,
+        "municipalities": 69,
+        "publicTotalGel": 5640161736.23,
+        "totalPaymentsGel": 5640161736.23,
+        "functionalSumGel": 5640161736.23,
+        "reconciliationDifferenceGel": 0,
+        "financingComponentsGel": 98873151.17,
+        "componentReconciliations": 69,
+        "warnings": 0,
+        "warningCounts": {
+          "none": 69
+        },
+        "maximumAbsoluteDifferenceGel": 0
+      }
+    ],
+    "warningsByType": {
+      "none": 713,
+      "source_actual_missing": 1,
+      "source_version_difference": 24,
+      "financing_outside_functional": 21,
+      "reconciliation_review_required": 0
+    },
+    "officialSourceWorkbooks": 69,
+    "officialComponentReconciliationFailures": 0,
+    "outputFile": "docs/Raw Data/Municipalities/combined-annual-2015-2025/municipal-total-payments-annual-2015-2025.csv",
+    "sourceManifest": "docs/Raw Data/Municipalities/mof-municipality-budget-history-2016-2025/source-manifest.csv"
+  }
+}
