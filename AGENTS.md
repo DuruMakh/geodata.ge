@@ -156,6 +156,7 @@ Required data principles:
 - If planned and actual values both exist for the same item/year, actual wins in public charts, tables, and CSV.
 - Planned active values need a subtle badge or planned chart marker.
 - Every import should produce an internal validation report.
+- Any Georgian CSV intended for direct human opening in Microsoft Excel must use UTF-8 with BOM and have an automated encoding regression check. Keep application/internal machine CSV encoding decisions separate, and prefer a native `.xlsx` companion for human review when text identifiers must not be auto-converted.
 
 ## UX and Visual Guardrails
 
