@@ -23,6 +23,8 @@ type MunicipalTotalPaymentRow = {
   public_total_gel: string;
   public_total_measure: string;
   total_payments_gel: string;
+  financial_asset_growth_gel: string;
+  liability_decrease_gel: string;
   functional_sum_gel: string;
   reconciliation_difference_gel: string;
   financing_components_gel: string;
@@ -99,6 +101,9 @@ describe("municipal functional annual exports", () => {
       ]),
     );
     expect(new Set(rows.map((row) => row.municipality_code)).size).toBe(69);
+    expect(
+      new Set(rows.map((row) => `${row.year}:${row.municipality_code}`)).size,
+    ).toBe(69 * 11);
 
     const missingOfficialActualRows = rows.filter(
       (row) =>
@@ -116,6 +121,8 @@ describe("municipal functional annual exports", () => {
 
     for (const row of rows) {
       expect(row.municipality_name_ka).not.toBe("");
+      expect(row.public_total_gel).not.toBe("");
+      expect(Number.isFinite(Number(row.public_total_gel))).toBe(true);
       expect(Number(row.public_total_gel)).toBeGreaterThanOrEqual(0);
 
       if (row.year === "2015") {
@@ -132,6 +139,8 @@ describe("municipal functional annual exports", () => {
         expect(row.total_payments_gel).toBe("");
       } else {
         expect(row.public_total_measure).toBe("total_payments");
+        expect(row.total_payments_gel).not.toBe("");
+        expect(Number.isFinite(Number(row.total_payments_gel))).toBe(true);
         expect(Number(row.total_payments_gel)).toBeGreaterThanOrEqual(0);
       }
     }
@@ -142,13 +151,37 @@ describe("municipal functional annual exports", () => {
 
     for (const row of rows) {
       const year = Number(row.year);
-      const difference = Number(row.reconciliation_difference_gel || 0);
-      const financingComponents = Number(row.financing_components_gel || 0);
-      const financingDifference = Number(
-        row.financing_reconciliation_difference_gel || 0,
-      );
+      const hasOfficialTotal = row.total_payments_gel !== "";
+      const totalPayments = Number(row.total_payments_gel || 0);
+      const functionalSum = Number(row.functional_sum_gel);
+      const financialAssetGrowth = Number(row.financial_asset_growth_gel || 0);
+      const liabilityDecrease = Number(row.liability_decrease_gel || 0);
+      const difference = totalPayments - functionalSum;
+      const financingComponents = financialAssetGrowth + liabilityDecrease;
+      const financingDifference = difference - financingComponents;
       const shouldWarn =
-        row.total_payments_gel !== "" && Math.abs(difference) > 1_000_000;
+        hasOfficialTotal && Math.abs(difference) > 1_000_000;
+
+      expect(row.functional_sum_gel).not.toBe("");
+      expect(Number.isFinite(functionalSum)).toBe(true);
+
+      if (hasOfficialTotal) {
+        expect(Number.isFinite(totalPayments)).toBe(true);
+        expect(row.reconciliation_difference_gel).not.toBe("");
+        expect(Number(row.reconciliation_difference_gel)).toBeCloseTo(
+          difference,
+          2,
+        );
+        expect(row.financing_components_gel).not.toBe("");
+        expect(Number(row.financing_components_gel)).toBeCloseTo(
+          financingComponents,
+          2,
+        );
+        expect(row.financing_reconciliation_difference_gel).not.toBe("");
+        expect(
+          Number(row.financing_reconciliation_difference_gel),
+        ).toBeCloseTo(financingDifference, 2);
+      }
 
       expect(row.show_warning).toBe(shouldWarn ? "true" : "false");
 
@@ -171,6 +204,31 @@ describe("municipal functional annual exports", () => {
       } else {
         expect(row.warning_type).toBe("reconciliation_review_required");
       }
+    }
+  });
+
+  it("reports component reconciliation coverage for every year", () => {
+    const report = JSON.parse(
+      fs.readFileSync(
+        path.join(outputDirectory, "validation-report.json"),
+        "utf8",
+      ),
+    ) as {
+      totalPaymentsReconciliation: {
+        byYear: Array<{
+          year: number;
+          officialActualRows: number;
+          componentReconciliations: number;
+        }>;
+      };
+    };
+
+    for (const summary of report.totalPaymentsReconciliation.byYear) {
+      const expectedRows =
+        summary.year === 2015 ? 0 : summary.year === 2024 ? 68 : 69;
+
+      expect(summary.officialActualRows).toBe(expectedRows);
+      expect(summary.componentReconciliations).toBe(expectedRows);
     }
   });
 });

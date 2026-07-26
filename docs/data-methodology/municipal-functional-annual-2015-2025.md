@@ -88,14 +88,13 @@ A public warning marker is set only when both an official total-payment value an
 
 The comparison is strict: exactly GEL 1,000,000 does not trigger the marker.
 
-The proposed public wording is:
+Public wording must follow `warning_type`:
 
-> Total payments include GEL {warning_amount_gel} that is not distributed across the displayed functional categories. The difference primarily reflects financial-asset growth and/or liability repayment.
+- `source_version_difference`, 2016-2019: "The official total-payments figure differs by GEL {warning_amount_gel} from the displayed functional subtotal. The figures come from different MoF publication vintages, so the difference is not assigned to a specific financing component."
+- `financing_outside_functional`, 2020-2024: "Total payments include GEL {warning_amount_gel} that is not distributed across the displayed functional categories. The difference primarily reflects financial-asset growth and/or liability repayment." This wording is used only when the difference is positive and reconciles to financial-asset growth plus liability decrease within GEL 50,000. The tolerance accommodates small cross-workbook rounding or publication-vintage residuals; it does not change any published amount.
+- `reconciliation_review_required`: "The official total-payments figure differs by GEL {warning_amount_gel} from the displayed functional subtotal. The difference could not be fully reconciled and requires source review."
 
-The metadata distinguishes two periods:
-
-- `source_version_difference`, 2016-2019: the archived portal functional source and the current MoF history workbook are different publication vintages. The difference must not be attributed mechanically to financing components.
-- `financing_outside_functional`, 2020-2024: the total-payment difference is positive and reconciles to financial-asset growth plus liability decrease within GEL 50,000. This tolerance accommodates small cross-workbook rounding or publication-vintage residuals; it does not change any published amount.
+`source_actual_missing` does not trigger the GEL 1 million marker because no official actual total-payment value is available for comparison.
 
 The finalized package has:
 
