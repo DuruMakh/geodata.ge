@@ -1,9 +1,9 @@
 # Deployment (Vercel)
 
 The site is a fully static Next.js build served by Vercel. This doc records the
-project configuration and the operational workflows: automatic deploys,
-manual deploys/rollback, environment variables, and connecting the custom
-domain.
+project configuration and the operational workflows: the production deploy pipeline, manual deploys/rollback, environment
+variables, GitHub Actions credentials, the runbook, the scheduled health
+check, and connecting the custom domain.
 
 ## Vercel project
 
@@ -16,7 +16,7 @@ domain.
 | Root Directory | `apps/web` |
 | Framework preset | Next.js (default build/install commands) |
 | Node.js | 24.x (also pinned via `engines` in `apps/web/package.json`) |
-| Environment variables | None required — the default CSV-mode build reads `data/imports/` from the repo checkout |
+| Environment variables | Production: `DATABASE_URL` + `GEODATA_DATA_SOURCE=db` (see Environment variables below); previews/dev: none — CSV-mode builds read `data/imports/` from the repo checkout |
 
 The repo clone on the build machine includes the repo root, so the build can
 read `data/` via the `../../` relative paths in `apps/web/lib/data/servedData.ts`.
@@ -105,7 +105,7 @@ nothing here can take the site down.
 | Import fails (validation, parity, connection) | *Deploy production* red + GitHub email; the mirror transaction rolled back | Fix the data (or transient cause); rerun the workflow from the Actions tab |
 | Vercel build fails (Supabase paused or unreachable) | Vercel failed-deployment email | Resume the project in the Supabase dashboard; rerun *Deploy production* |
 | CI red on `main` | No deploy triggered | Fix `main`; or run *Deploy production* manually to deploy past a known-flaky check |
-| GitHub Actions outage / broken workflow | Deploys stall (visible in the Actions tab) | From a clean `main` checkout: `npm run data:import`, then `vercel deploy --prod`; or revert the `git.deploymentEnabled` line in `apps/web/vercel.json` to restore auto-deploy |
+| GitHub Actions outage / broken workflow | Deploys stall (visible in the Actions tab) | From a clean `main` checkout: `npm run prisma:deploy` (if new migrations), `npm run data:import`, then `vercel deploy --prod`; or revert the `git.deploymentEnabled` line in `apps/web/vercel.json` to restore auto-deploy |
 | Persistent db-mode blocker | Repeated build failures | Break-glass: switch production to CSV mode (see Environment variables) |
 
 ### Credential rotation

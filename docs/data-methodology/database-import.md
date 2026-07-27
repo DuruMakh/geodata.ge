@@ -57,7 +57,8 @@ behind (the previous run's report is removed at start), so a present
    pausing becomes annoying for rebuilds; visitors are never affected either way).
 2. Copy `apps/web/.env.example` to `apps/web/.env` and fill in:
    - `DATABASE_URL` — pooled connection, port 6543, `?pgbouncer=true`;
-   - `DIRECT_URL` — direct connection, port 5432.
+   - `DIRECT_URL` — session pooler connection, port 5432 (used for
+     migrations and the import; see "CI credentials" below).
    Never commit `.env`.
 3. From `apps/web`: `npm run prisma:deploy` — applies the committed migrations
    over the direct connection (Prisma 7 CLI reads `DIRECT_URL` via
