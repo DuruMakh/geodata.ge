@@ -74,6 +74,17 @@ behind (the previous run's report is removed at start), so a present
    Disabling the Data API entirely in the Supabase dashboard is a fine extra
    step — nothing in this project uses it.
 
+### CI credentials (GitHub Actions)
+
+The deploy pipeline runs the same commands in CI. GitHub-hosted runners are
+IPv4-only and Supabase's true direct host (`db.<ref>.supabase.co`) is
+IPv6-only, so the `DIRECT_URL` **repository secret** holds the Supabase
+**session pooler** string (port 5432, user `postgres.<project-ref>`)
+instead — it behaves like a direct connection for migrations and the
+import. The local `.env` uses the same session pooler string (the true
+direct host is IPv6-only and unused in this project). Secret table:
+`docs/deployment.md`.
+
 ## Serving
 
 - `GEODATA_DATA_SOURCE=db` — pages are rendered at build time from the
@@ -96,19 +107,33 @@ ever delay a rebuild, never take the site down.
 
 ## Re-running for a new data year
 
-1. Land the reviewed CSVs as usual (extraction → staging → review → promotion
-   into `data/imports/`, with the matching methodology doc).
+1. Land the reviewed CSVs as usual (extraction → staging → review →
+   promotion into `data/imports/`, with the matching methodology doc).
 2. If the data introduced new columns or datasets, reconcile
-   `apps/web/prisma/schema.prisma`, author the migration in development
-   (`npm run prisma:migrate`), and apply it to the live database with
-   `npm run prisma:deploy`; for data-only updates this step is a no-op.
-3. From `apps/web`: `npm run data:import`. Re-running is always safe — the
-   import replaces the mirror wholesale inside one transaction.
-4. Check the parity report says `Parity status: PASSED`.
-5. Redeploy the site (rebuild) so the static pages pick up the new data.
+   `apps/web/prisma/schema.prisma` and author the migration in development
+   (`npm run prisma:migrate`); commit it with the data change.
+3. Merge to `main`. Nothing else is manual: after CI passes,
+   `.github/workflows/deploy-production.yml` applies any new migrations
+   (`npm run prisma:deploy`), re-runs `npm run data:import` (every
+   production deploy converges the mirror to the checkout,
+   unconditionally), and triggers the Vercel production build, which
+   re-verifies the mirror row-by-row. The parity report is in the workflow
+   log.
+
+### Manual fallback (Actions outage or local work)
+
+From `apps/web`, with `.env` configured:
+
+1. `npm run prisma:deploy` (only if there are new migrations).
+2. `npm run data:import`; check the report says `Parity status: PASSED`.
+3. Redeploy the site (`vercel deploy --prod` from the repo root, or rerun
+   the *Deploy production* workflow once Actions is back).
 
 ## Failure modes
 
+- Import fails inside the deploy pipeline → the *Deploy production* workflow
+  goes red and no deploy is triggered; production keeps serving the
+  previous build. Fix and rerun from the Actions tab.
 - Import fails validation or parity → the transaction rolls back; fix the
   data or the schema, re-run. The previous database state (and the live site)
   are unaffected.
