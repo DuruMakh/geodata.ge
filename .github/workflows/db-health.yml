@@ -1,0 +1,41 @@
+name: DB health
+
+# Weekly db-mode build (spec 2026-07-28 §3.4): one green run proves the
+# Supabase mirror is reachable and credentialed and still matches the
+# checkout's CSVs row-by-row, and the activity prevents free-tier pausing.
+# Weekly cadence is an owner decision; if a quiet week ever pauses the
+# project anyway, bump this to twice-weekly.
+#
+# Deliberately NO skip-when-secret-missing: a misconfigured secret must fail
+# loudly (the old ci.yml db-build job skipped silently for weeks).
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: apps/web
+
+jobs:
+  db-build:
+    name: DB-mode build (Supabase mirror)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Build from the database mirror
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GEODATA_DATA_SOURCE: db
+        run: npm run build
