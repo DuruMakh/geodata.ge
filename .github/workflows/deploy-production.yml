@@ -41,7 +41,7 @@ jobs:
     steps:
       # The deploy hook always builds latest main, so the import must also
       # run from latest main (not the workflow_run head SHA).
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: main
       - uses: actions/setup-node@v4
