@@ -1,0 +1,65 @@
+name: Deploy production
+
+# The single road to production (spec: docs/superpowers/specs/
+# 2026-07-28-database-production-readiness-design.md). Vercel auto-deploy for
+# main is disabled in apps/web/vercel.json, so production only updates when
+# this workflow succeeds: CI green on main -> converge the Supabase mirror to
+# the checkout (migrations + parity-checked import, unconditionally — the
+# import is idempotent) -> POST the Vercel deploy hook, whose db-mode build
+# re-verifies the mirror row-by-row. Any failure leaves production serving
+# its previous deploy.
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: apps/web
+
+jobs:
+  import-and-deploy:
+    name: Converge mirror, then deploy
+    # workflow_run also fires when CI fails; deploy only after green CI.
+    # workflow_dispatch is the manual escape hatch (reruns, rollout,
+    # deploying past a known-flaky check).
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      # The deploy hook always builds latest main, so the import must also
+      # run from latest main (not the workflow_run head SHA).
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      # DIRECT_URL is the Supabase session pooler string (port 5432): GitHub
+      # runners are IPv4-only and the true direct host is IPv6-only.
+      # prisma.config.ts and the import both resolve DIRECT_URL first.
+      - name: Apply migrations (no-op when none are new)
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: npm run prisma:deploy
+      - name: Converge mirror (parity-checked import)
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: npm run data:import
+      - name: Trigger Vercel production build
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: curl -fsS --retry 3 -X POST "$VERCEL_DEPLOY_HOOK_URL"
