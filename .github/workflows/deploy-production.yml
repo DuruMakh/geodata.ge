@@ -30,10 +30,12 @@ defaults:
 jobs:
   import-and-deploy:
     name: Converge mirror, then deploy
-    # workflow_run also fires when CI fails; deploy only after green CI.
-    # workflow_dispatch is the manual escape hatch (reruns, rollout,
-    # deploying past a known-flaky check).
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    # workflow_run also fires when CI fails; deploy only after green CI —
+    # and only for push-triggered CI runs: a fork PR's CI run can carry
+    # head_branch == main, so admitting pull_request-sourced runs would let
+    # outside PRs trigger production deploys. workflow_dispatch is the
+    # manual escape hatch (reruns, rollout, deploying past a flaky check).
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -62,4 +64,4 @@ jobs:
       - name: Trigger Vercel production build
         env:
           VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
-        run: curl -fsS --retry 3 -X POST "$VERCEL_DEPLOY_HOOK_URL"
+        run: curl -fsS --retry 3 --max-time 60 -X POST "$VERCEL_DEPLOY_HOOK_URL"

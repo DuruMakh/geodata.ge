@@ -113,7 +113,10 @@ nothing here can take the site down.
 1. Rotate the database password in the Supabase dashboard.
 2. Update the two GitHub secrets (`DIRECT_URL`, `DATABASE_URL`), the Vercel
    Production `DATABASE_URL`, and local `apps/web/.env`.
-3. Run *DB health* from the Actions tab and confirm it goes green.
+3. From the Actions tab, run *DB health* (validates the pooled
+   `DATABASE_URL` secret) and *Deploy production* (validates `DIRECT_URL`
+   via migrate + import, and the Vercel Production `DATABASE_URL` via the
+   hook-triggered build); confirm both go green.
 
 ### Backups
 
@@ -131,7 +134,11 @@ the checkout's CSVs; the activity also counts against Supabase free-tier
 pausing (~7-day inactivity window — weekly cadence is deliberate, an owner
 decision; bump the cron to twice-weekly if a quiet week ever pauses the
 project). A failure emails the repo owner via GitHub's standard
-failed-workflow notification.
+failed-workflow notification. Note: GitHub auto-disables scheduled
+workflows after ~60 days without repository activity (it emails a warning
+first); if that happens, re-enable the workflow in the Actions tab — and
+if Supabase paused in the meantime, resume the project in the dashboard
+before rerunning.
 
 ## Connecting the custom domain (owner steps)
 

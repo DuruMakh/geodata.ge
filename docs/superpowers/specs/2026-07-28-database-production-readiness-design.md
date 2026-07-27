@@ -119,8 +119,10 @@ legitimately lags — keep building CSV-mode):
 - `DATABASE_URL` = pooled string;
 - `GEODATA_DATA_SOURCE` = `db`.
 
-Local `apps/web/.env` stays as documented in `.env.example` (true direct URL
-for `DIRECT_URL`); CI is the only place that substitutes the session pooler.
+Erratum (2026-07-28, found during implementation): the local `apps/web/.env`
+also uses the session pooler string for `DIRECT_URL` — the true direct host
+is IPv6-only and unused in this project — so the pooler string is the
+`DIRECT_URL` everywhere, locally and in CI. `.env.example` documents this.
 
 Early technical verification (rollout step 1, before anything is built on
 it): run `npm run data:import` locally once with `DIRECT_URL` pointed at the
