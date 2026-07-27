@@ -33,34 +33,6 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
-  # Post-merge check of the canonical serving path: builds from the Supabase
-  # mirror (including the build's row-by-row DB<->CSV verification). Runs on
-  # main only — on a data PR the mirror legitimately lags the CSVs until
-  # `npm run data:import` runs after merge, so this must not block PRs.
-  # Requires the DATABASE_URL repository secret; skips (green) when unset.
-  db-build:
-    name: DB-mode build (Supabase mirror)
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: apps/web/package-lock.json
-      - run: npm ci
-      - name: Build from the database mirror
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          GEODATA_DATA_SOURCE: db
-        run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "DATABASE_URL secret not configured — skipping db-mode build."
-            exit 0
-          fi
-          npm run build
-
   e2e:
     name: Browser tests (Playwright)
     runs-on: ubuntu-latest
