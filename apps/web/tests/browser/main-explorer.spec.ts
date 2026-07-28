@@ -379,4 +379,29 @@ test("chart draws a dot lattice instead of horizontal gridlines", async ({ page 
   );
   expect(strokes).not.toContain("#E7DECF");
   expect(strokes).toContain("#1E1B16");
+
+  // The pattern tile is offset back by half a pitch and its circle is centred
+  // in the tile (editorial-line-chart.tsx: `x={PAD_L - lattice.colPitch / 2}`,
+  // `cx={lattice.colPitch / 2}`), so dots land exactly on the chart's own grid
+  // at (PAD_L, PAD_T) rather than merely tiling the plot rect. Dropping that
+  // offset wouldn't affect the lattice's visibility or stroke colors above,
+  // so the half-pitch relationship is asserted directly against the live DOM.
+  const geometry = await chart.locator("#chart-dot-lattice").evaluate((pattern) => {
+    const circle = pattern.querySelector("circle");
+    return {
+      patternX: Number(pattern.getAttribute("x")),
+      patternY: Number(pattern.getAttribute("y")),
+      patternWidth: Number(pattern.getAttribute("width")),
+      patternHeight: Number(pattern.getAttribute("height")),
+      circleCx: Number(circle?.getAttribute("cx")),
+      circleCy: Number(circle?.getAttribute("cy")),
+    };
+  });
+
+  const PAD_L = 74;
+  const PAD_T = 16;
+  expect(geometry.patternX + geometry.circleCx).toBeCloseTo(PAD_L, 5);
+  expect(geometry.patternY + geometry.circleCy).toBeCloseTo(PAD_T, 5);
+  expect(geometry.circleCx).toBeCloseTo(geometry.patternWidth / 2, 5);
+  expect(geometry.circleCy).toBeCloseTo(geometry.patternHeight / 2, 5);
 });
