@@ -1,7 +1,7 @@
 # Database production readiness — design
 
 Date: 2026-07-28
-Status: approved design, pending implementation plan
+Status: implemented 2026-07-28 (plan: docs/superpowers/plans/2026-07-28-database-production-readiness.md)
 Owner decisions: flip production to db-mode + operational hardening; fully
 automated data pipeline (no human in the loop after merge); Supabase free tier
 with a weekly keep-alive/health check; pipeline approach A ("single deploy
