@@ -25,6 +25,13 @@ async function expectAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
 
+async function expectSidebarWidth(page: Page, width: number) {
+  // The rail animates over 150ms, so a single boundingBox() can land mid-transition.
+  await expect
+    .poll(async () => Math.round((await page.getByTestId("data-sidebar").boundingBox())?.width ?? 0))
+    .toBe(width);
+}
+
 async function expectLineChartRendered(page: Page) {
   const line = page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']").first();
 
@@ -444,4 +451,86 @@ test("chart draws a dot lattice instead of horizontal gridlines", async ({ page 
   expect(geometry.patternY + geometry.circleCy).toBeCloseTo(PAD_T, 5);
   expect(geometry.circleCx).toBeCloseTo(geometry.patternWidth / 2, 5);
   expect(geometry.circleCy).toBeCloseTo(geometry.patternHeight / 2, 5);
+});
+
+test("sidebar collapses to a rail and remembers the choice", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const sidebar = page.getByTestId("data-sidebar");
+  const toggle = page.getByTestId("sidebar-toggle");
+
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expectSidebarWidth(page, 232);
+  await expect(page.getByTestId("section-link-revenue")).toBeVisible();
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expectSidebarWidth(page, 52);
+  await expect(sidebar).toHaveAttribute("data-collapsed", "true");
+  await expect(page.getByTestId("section-link-revenue")).toHaveCount(0);
+  // The rail keeps orientation instead of the section list (spec §4.2).
+  await expect(sidebar).toContainText("მონაცემები · ბიუჯეტი");
+
+  // The toggle is not one-way: expanding must bring the sections back.
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expectSidebarWidth(page, 232);
+  await expect(page.getByTestId("section-link-revenue")).toBeVisible();
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await page.reload();
+  await expectAppReady(page);
+
+  await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
+  await expectSidebarWidth(page, 52);
+
+  expect(consoleProblems).toEqual([]);
+});
+
+test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  // Arrive carrying a collapse preference set on a desktop. It must be ignored
+  // here rather than applied as an unexplained 52px rail on a phone.
+  await page.addInitScript(() => window.localStorage.setItem("geodata:sidebar-collapsed", "1"));
+
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const toggle = page.getByTestId("sidebar-toggle");
+  const revenueLink = page.getByTestId("section-link-revenue");
+
+  // Tripwire: the sidebar used to ship on phones as a 232px ink column stacked
+  // above the content. That state overflows nothing, so the mobile-overflow test
+  // above passes in both worlds — assert the bar's shape directly.
+  const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+  const bar = await page.getByTestId("data-sidebar").boundingBox();
+  expect(bar?.width ?? 0).toBeGreaterThan(clientWidth - 2);
+  expect(bar?.width ?? 0).toBeLessThan(clientWidth + 2);
+  expect(bar?.height ?? 0).toBeLessThan(120);
+
+  // Closed sheet, and the stored preference left data-collapsed alone.
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(page.getByTestId("data-sidebar")).toHaveAttribute("data-collapsed", "false");
+  await expect(revenueLink).toBeHidden();
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(revenueLink).toBeVisible();
+  await expectNoPageOverflow(page);
+
+  // Escape closes the sheet from inside it and hands focus back to the trigger
+  // rather than dropping it on a display:none link.
+  await revenueLink.focus();
+  await page.keyboard.press("Escape");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(revenueLink).toBeHidden();
+  await expect(toggle).toBeFocused();
+
+  expect(consoleProblems).toEqual([]);
 });
