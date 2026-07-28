@@ -22,13 +22,23 @@ export function DataSidebar() {
   // Read after mount: the server render cannot see localStorage, and guessing
   // would flash the wrong width on every load.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "1");
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "1");
+    } catch {
+      // Storage access denials (blocked cookies, sandboxed iframes) must not
+      // break the render — default to expanded.
+    }
   }, []);
 
   useEffect(() => {
     const query = window.matchMedia(`(min-width: ${DESKTOP_MIN_WIDTH}px)`);
-    const sync = () => setIsDesktop(query.matches);
+    const sync = () => {
+      setIsDesktop(query.matches);
+      // A sheet opened below 900px must not survive into the desktop rail —
+      // otherwise a stray Escape keypress anywhere on the page steals focus.
+      if (query.matches) setSheetOpen(false);
+    };
     sync();
     query.addEventListener("change", sync);
     return () => query.removeEventListener("change", sync);
