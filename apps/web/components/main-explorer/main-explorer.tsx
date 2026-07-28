@@ -188,9 +188,9 @@ export function MainExplorer({ nav, facts, adminFacts, adminCategories, glossary
   return (
     <main
       data-testid="explorer-shell"
-      className="min-h-screen bg-[var(--paper)] px-5 pt-6 pb-16 text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px] min-[768px]:pb-[72px]"
+      className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"
     >
-      <div className="mx-auto max-w-[1240px]">
+      <div className="max-w-[1180px]">
         <PageHeader
           crumbs={[
             { label: "მთავარი", href: "/" },

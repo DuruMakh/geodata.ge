@@ -55,8 +55,9 @@ test("landing nav and cards lead into the explorer", async ({ page }) => {
   await expect(page).toHaveURL(/\/explorer\/expenditure(#.*)?$/);
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
 
-  // Explorer breadcrumb → back to the landing.
-  await page.getByRole("link", { name: "მთავარი" }).click();
+  // Explorer breadcrumb → back to the landing. Scoped to the header: the
+  // sidebar foot carries a second home link (← მთავარი).
+  await page.getByTestId("explorer-header").getByRole("link", { name: "მთავარი" }).click();
   await expect(page.getByTestId("landing-shell")).toBeVisible();
 
   // Card 02 deep-links into the analysis section.
