@@ -73,7 +73,7 @@ The system should feel: civic and archival, analytical but humane, printed rathe
 
 ```yaml
 colors:
-  paper: "#F7F2E9"        # page background; the only canvas
+  paper: "#F7F2E9"        # page background; the default canvas
   tint: "#F1EADC"         # hover rows, selected rows, callout background
   tile: "#FDFAF3"         # tooltip and treemap tile fill (only "raised" surface)
   ink: "#1E1B16"          # primary text, strong rules, total row

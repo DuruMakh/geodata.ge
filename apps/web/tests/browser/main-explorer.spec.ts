@@ -532,6 +532,18 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
   await expect(revenueLink).toBeHidden();
   await expect(toggle).toBeFocused();
 
+  // Tapping a section must close the sheet too. The explorer layout persists
+  // across section routes, so nothing unmounts the panel — without a reset the
+  // user lands on the nav list they just used, the section pushed below it, and
+  // a phone has no Escape key to undo it.
+  await toggle.click();
+  await expect(revenueLink).toBeVisible();
+  await revenueLink.click();
+  await expect(page).toHaveURL(/\/explorer\/revenue/);
+  await expectAppReady(page);
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(revenueLink).toBeHidden();
+
   expect(consoleProblems).toEqual([]);
 });
 
@@ -559,10 +571,17 @@ test("hub lists four cards and keeps municipalities inert", async ({ page }) => 
   await expect(page.getByTestId("budget-hub")).not.toContainText("სტატია");
   await expect(page.getByTestId("budget-hub")).not.toContainText("64 ერთეული");
 
+  // Absence alone would pass on a hub whose footers all came back null, so also
+  // assert a real figure is there. The shape, not the figure: the number moves
+  // with every dataset update, the "<year> · <n.nn> მლრდ ₾" contract does not.
+  await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} · [\d,]+\.\d{2} მლრდ ₾/);
+
   expect(consoleProblems).toEqual([]);
 });
 
 test("legacy nav hashes redirect to their route", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+
   await page.goto("http://localhost:3100/explorer#nav=analysis&ay=2024");
   await expect(page).toHaveURL(/\/explorer\/analysis/);
   await expect(page).toHaveURL(/ay=2024/);
@@ -571,4 +590,6 @@ test("legacy nav hashes redirect to their route", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer#nav=revenue&m=table");
   await expect(page).toHaveURL(/\/explorer\/revenue/);
   await expect(page.getByTestId("explorer-table")).toBeVisible();
+
+  expect(consoleProblems).toEqual([]);
 });

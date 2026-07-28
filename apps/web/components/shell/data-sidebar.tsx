@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ComingSoonBadge } from "../ui/editorial";
 import { SectionNav } from "./section-nav";
 
@@ -17,7 +18,9 @@ export function DataSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(true);
+  const [animateWidth, setAnimateWidth] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const pathname = usePathname();
 
   // Read after mount: the server render cannot see localStorage, and guessing
   // would flash the wrong width on every load.
@@ -43,6 +46,14 @@ export function DataSidebar() {
     query.addEventListener("change", sync);
     return () => query.removeEventListener("change", sync);
   }, []);
+
+  // The explorer layout persists across section routes, so navigating never
+  // unmounts the sheet. Close it on arrival or the user lands on the nav list
+  // they just used — and a phone has no Escape key to undo that.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSheetOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!sheetOpen) return;
@@ -70,6 +81,11 @@ export function DataSidebar() {
       setSheetOpen((open) => !open);
       return;
     }
+    // Arm the width transition on the first click, not on mount: a browser
+    // starts a transition whenever the transition property and the width land in
+    // the same style change, so a mount-time class would animate the restored
+    // rail on every cold load (DESIGN.md §14: nothing animates on load).
+    setAnimateWidth(true);
     const next = !collapsed;
     setCollapsed(next);
     try {
@@ -83,9 +99,9 @@ export function DataSidebar() {
     <aside
       data-testid="data-sidebar"
       data-collapsed={railed ? "true" : "false"}
-      className={`flex w-full flex-none flex-col bg-[var(--ink)] px-4 pt-[18px] pb-4 transition-[width] duration-150 ease-in-out min-[900px]:sticky min-[900px]:top-0 min-[900px]:h-screen ${
-        railed ? "min-[900px]:w-[52px] min-[900px]:px-3" : "min-[900px]:w-[232px]"
-      }`}
+      className={`flex w-full flex-none flex-col bg-[var(--ink)] px-4 pt-[18px] pb-4 min-[900px]:sticky min-[900px]:top-0 min-[900px]:h-screen ${
+        animateWidth ? "transition-[width] duration-150 ease-in-out" : ""
+      } ${railed ? "min-[900px]:w-[52px] min-[900px]:px-3" : "min-[900px]:w-[232px]"}`}
     >
       <div className="flex items-center justify-between gap-2.5">
         {railed ? null : (
