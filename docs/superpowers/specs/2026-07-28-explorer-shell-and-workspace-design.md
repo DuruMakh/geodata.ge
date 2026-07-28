@@ -99,10 +99,39 @@ scrolls.
 
 - Brand block: serif `GeoData` in `--paper`, mono `ღია მონაცემები` beneath in `--ink-fg-faint`.
 - `მონაცემები /` overline, mono, letter-spaced.
-- `ბიუჯეტი` — active dataset. Its four sections nest beneath it (§4.2).
+- `ბიუჯეტი` — active dataset. Its four sections nest beneath it (§4.3).
 - `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` — `--ink-fg-muted` label with a
   `მალე` badge (1px `#3A362E` border, 2px radius, mono 9px). Not links, not focusable.
 - Foot: `← მთავარი`. No version string.
+- Top-right: the collapse toggle (§4.2), a 26px box with a 1px `rgba(247,242,233,0.18)` border.
+
+### 4.2 Collapsed rail
+
+The sidebar has two desktop states. Collapsed is **52px** wide, same `--ink` surface, radius 0:
+
+- The toggle stays in place at the top, glyph flipped to `»`.
+- Below it, the context line set vertically down the rail: `მონაცემები · ბიუჯეტი`, mono 9.5px,
+  `--ink-fg-faint`, `letter-spacing: 0.1em`, via `writing-mode: vertical-rl` plus
+  `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded
+  overline and active row carry, which is why the section list can disappear without losing
+  orientation.
+- At the foot, an 8×8 `--accent` square: the collapsed `← მთავარი` link. It keeps a 26×26 hit
+  area centred on the mark, `aria-label="მთავარი"`, and a `title` tooltip.
+
+**Sections are not reachable while collapsed.** A 52px rail cannot carry Georgian section names,
+and reducing ხარჯები / შემოსავლები / ანალიზი to invented initials or icons would trade one extra
+click for three ambiguous glyphs. Collapsed is a reading posture: it hands the width back to the
+data and keeps only orientation and escape.
+
+Toggle contract: `aria-expanded`, `aria-controls` pointing at the nav region, and a label that
+flips between `პანელის ჩაკეცვა` and `პანელის გაშლა`.
+
+State persists. It survives route changes for free — the sidebar lives in the layout, which does
+not remount — and is written to `localStorage` under `geodata:sidebar-collapsed` so it also
+survives a reload.
+
+Width transitions at `base` (150ms ease); under `prefers-reduced-motion: reduce` it snaps. This
+requires adding `width` to the properties `DESIGN.md` §14 permits — see §9.
 
 Two dark-surface colours are not in the current token set and are added to `DESIGN.md` §4.1
 rather than inlined as hex:
@@ -115,7 +144,7 @@ rather than inlined as hex:
 Dividers on ink use `rgba(247,242,233,0.12)`; the active row background is
 `rgba(247,242,233,0.07)`.
 
-### 4.2 Section switcher (`section-nav.tsx`)
+### 4.3 Section switcher (`section-nav.tsx`)
 
 Nested list under ბიუჯეტი. Each entry is a `next/link` to its route. Active state: accent `▸`
 marker, `--paper` text at weight 600, `rgba(247,242,233,0.07)` background, `aria-current="page"`.
@@ -125,17 +154,22 @@ non-interactive row with the `მალე` badge and `aria-disabled="true"`.
 Deleting this component and its single usage in `data-sidebar.tsx` reverts navigation to
 hub-and-breadcrumb only. Nothing else imports it.
 
-### 4.3 Responsive
+### 4.4 Responsive
 
-- ≥900px: sidebar as specified, content column beside it, max-width 1180px.
-- <900px: the sidebar collapses to a slim top bar (brand + menu button). Tapping opens the nav as
-  a full-height sheet; `«` closes it. Focus is trapped while open, `Escape` closes, and the
-  trigger regains focus on close. Content gets the full width.
+- ≥900px: sidebar as specified, expanded (232px) or collapsed (52px) per §4.2, content column
+  beside it, max-width 1180px.
+- <900px: the sidebar becomes a slim top bar (brand + menu button). Tapping opens the nav as a
+  full-height sheet; `«` closes it. Focus is trapped while open, `Escape` closes, and the trigger
+  regains focus on close. Content gets the full width.
 
-The reference has no small-screen behaviour — its sidebar stays 232px at every width. This
-section is designed here, not inherited.
+Expanded/collapsed is a **desktop-only** state; the mobile sheet is always the full nav. The `«`
+glyph therefore does double duty — collapse on desktop, close the sheet on mobile — and the
+persisted collapse preference is ignored below 900px rather than applied and hidden.
 
-### 4.4 Page header (`page-header.tsx`)
+The reference has no small-screen behaviour — its sidebar stays 232px at every width. That part
+is designed here, not inherited.
+
+### 4.5 Page header (`page-header.tsx`)
 
 Breadcrumb row with a `2px --ink` bottom rule. Crumbs: `მთავარი` (link) `/` `მონაცემები` (plain
 text, no route) `/` `ბიუჯეტი` (link to hub on section pages, plain text on the hub) `/`
@@ -277,8 +311,10 @@ change, and is left alone per the surgical-changes rule.
 Required in the same change:
 
 - `DESIGN.md`: §4.1 two ink-surface tokens; §6.2 IA rewritten for hub + routes; §6.3 URL state
-  minus `nav`; §6.6 explicit hub-card exception to the no-cards rule; new §6.7 shell and sidebar;
-  §7.2 split into mode control and grouping tabs; §7.11 sparklines; §8.3 dot lattice.
+  minus `nav`; §6.6 explicit hub-card exception to the no-cards rule; new §6.7 shell and sidebar
+  including the collapsed rail; §7.2 split into mode control and grouping tabs; §7.11 sparklines;
+  §8.3 dot lattice; §14 adds `width` to the transitionable properties, scoped to the sidebar rail
+  and gated on `prefers-reduced-motion`.
 - `Project_Definition.md`: §2 moves municipalities from Excluded to a named future section.
 - `AGENTS.md`: "Current Project State" gets the new IA and route structure.
 
@@ -289,7 +325,8 @@ Required in the same change:
 - New: hub renders four cards; `მუნიციპალიტეტები` is not a link and carries `მალე`; legacy
   `#nav=` on `/explorer` redirects to the matching route preserving the rest of the hash; each
   side KPI renders a sparkline; the chart renders a dot pattern and no `--hairline-soft`
-  gridlines; the sidebar collapses to a top bar below 900px.
+  gridlines; the sidebar collapses to a top bar below 900px; the collapse toggle switches the
+  sidebar between 232px and 52px, flips `aria-expanded`, and the state survives a reload.
 - `visual-reference.spec.ts` reference screenshots are refreshed.
 
 ## 11. Out of scope
@@ -300,7 +337,8 @@ Required in the same change:
   `/explorer`, and `#nav=analysis` becomes `/explorer/analysis`.
 - Range strip changes.
 - Splitting analysis state out of `useExplorerState`.
-- A collapsed desktop sidebar rail. `«` exists only as the mobile sheet's close control.
+- Reaching sections from the collapsed rail. Collapse is a reading posture; navigating means
+  expanding first (§4.2).
 
 ## 12. Rejected alternatives
 
