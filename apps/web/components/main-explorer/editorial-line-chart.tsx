@@ -5,8 +5,8 @@ import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatBn, formatShare } from "../../lib/explorer/format";
 import { SwatchBar } from "../ui/editorial";
 
-// Bespoke SVG line chart per DESIGN.md §8.3: chart sits directly on paper, grid in
-// hairline-soft, ink baseline at zero, mono axis labels, hover crosshair + tooltip.
+// Bespoke SVG line chart per DESIGN.md §8.3: chart sits directly on paper, dot
+// lattice for the grid, ink baseline at zero, mono axis labels, hover crosshair + tooltip.
 
 export type ChartSeries = {
   id: string;

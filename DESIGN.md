@@ -93,7 +93,8 @@ colors:
 
 Rules:
 
-- `paper` is the only page background. Never introduce white panels.
+- `paper` is the only background for the landing page and the explorer content column. Never introduce white panels.
+- **Exception: the explorer sidebar** (`ink` background, §6.7) — a persistent navigation shell beside the content column, not a panel within it. This does not generalize: `paper` remains the only background for every panel, block, or surface inside the content column.
 - Selection/hover emphasis is always `tint`, never shadow or border color change.
 - `tile` is reserved for tooltips, treemap tiles, and budget hub cards (§6.6).
 - The two `ink-fg-*` tokens exist only on the `ink` shell surface (§6.7); never use them on paper. **These lines are the single definition of both hex values** — §16 mirrors the paper tokens only, so a value change is one edit here plus one in `apps/web/app/globals.css`.
@@ -229,6 +230,8 @@ page:
 ```
 
 No screen card, no outer container. Content sits directly on paper.
+
+**Exception: the explorer shell** (§6.7) — `/explorer` and its three sections use a sidebar + content-column layout instead, with different max-width and padding. This page shell applies to the landing page (§19) only.
 
 ### 6.2 Information Architecture
 
@@ -453,7 +456,7 @@ workspace:
   gap: "40px"
 ```
 
-Left: mode tabs + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline + mono count (`n / 6` in line mode, `n` in table mode; count turns accent at the limit), grouping tabs (expenditure only, §7.2), search, series rows (scroll ≤430px), CSV button.
+Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline + mono count (`n / 6` in line mode, `n` in table mode; count turns accent at the limit), grouping tabs (expenditure only, §7.2b), search, series rows (scroll ≤430px), CSV button.
 
 ### 8.3 Line Chart
 
