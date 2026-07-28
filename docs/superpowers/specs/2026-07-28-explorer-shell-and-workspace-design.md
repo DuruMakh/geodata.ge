@@ -126,6 +126,10 @@ data and keeps only orientation and escape.
 Toggle contract: `aria-expanded`, `aria-controls` pointing at the nav region, and a label that
 flips between `პანელის ჩაკეცვა` and `პანელის გაშლა`.
 
+**As built:** `aria-controls` was not implemented — the nav is unmounted while railed, so on
+desktop there is nothing to point at, but below 900px the nav stays mounted and merely hidden,
+where the attribute would resolve. Recorded as an open gap in `DESIGN.md` §6.7.
+
 State persists. It survives route changes for free — the sidebar lives in the layout, which does
 not remount — and is written to `localStorage` under `geodata:sidebar-collapsed` so it also
 survives a reload.
@@ -161,6 +165,11 @@ hub-and-breadcrumb only. Nothing else imports it.
 - <900px: the sidebar becomes a slim top bar (brand + menu button). Tapping opens the nav as a
   full-height sheet; `«` closes it. Focus is trapped while open, `Escape` closes, and the trigger
   regains focus on close. Content gets the full width.
+
+  **As built:** the panel is content-height and in flow — it pushes the content down instead of
+  filling the viewport — and there is no focus trap, because a panel that overlays nothing must
+  not hold the keyboard. `Escape` + focus return shipped as specified. Both decisions are the same
+  one and are recorded in `DESIGN.md` §6.7.
 
 Expanded/collapsed is a **desktop-only** state; the mobile sheet is always the full nav. The `«`
 glyph therefore does double duty — collapse on desktop, close the sheet on mobile — and the

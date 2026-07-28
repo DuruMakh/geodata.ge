@@ -1,7 +1,7 @@
 # GeoData.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-07-07
+Last updated: 2026-07-28
 Status: Production visual system for GeoData.ge Budget Explorer v1
 Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -23,7 +23,7 @@ Confirmed product references:
 
 - `Project_Definition.md`
 
-If this file and the confirmed reference files disagree, prefer **GeoData Platform - Editorial v2.dc.html** for visual and behavioral details and update this file immediately.
+If this file and the confirmed reference files disagree, prefer **GeoData Platform - Editorial v2.dc.html** for visual and behavioral details and update this file immediately. One carve-out: the platform shell and route IA of §6.2/§6.7 deliberately supersede the prototype's three in-page nav tabs — see `docs/superpowers/specs/2026-07-28-explorer-shell-and-workspace-design.md`.
 
 Superseded and must not appear in production:
 
@@ -34,9 +34,11 @@ Superseded and must not appear in production:
 
 GeoData.ge v1 is a Georgian-first national budget explorer for annual data. It is not a broad public-data catalog.
 
-V1 includes: multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, CSV export, Georgian-first UI, minimal public source label, internal provenance metadata.
+V1 includes: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, CSV export, Georgian-first UI, minimal public source label, internal provenance metadata.
 
-V1 excludes: data catalog, municipal/capital/debt explorers, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown).
+V1 excludes: data catalog, capital/debt explorers, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown).
+
+Municipal budgets are a named future section, not a v1 feature: no municipal data ships, and the section exists only as a `მალე` marker in the sidebar and on the hub (§6.7). The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) are markers on the same terms. Nothing about a marker may be styled as if it were live.
 
 Every visual decision should support a focused budget product, not a generic dashboard.
 
@@ -78,6 +80,8 @@ colors:
   body: "#55503F"         # secondary data text
   muted: "#6A6050"        # labels, captions, inactive controls (v2 darkened from #7A7060 for contrast)
   faint: "#A89C88"        # decoration-only metadata
+  ink-fg-muted: "#8F8676" # inactive labels on the ink shell surface only
+  ink-fg-faint: "#7A7060" # overlines, badges, tertiary text on the ink shell surface only
   hairline: "#D9CFBE"     # section sub-rules, aside border
   hairline-soft: "#E7DECF" # row borders, chart grid, bar tracks
   row-border: "#EDE4D3"   # series-panel row borders
@@ -91,7 +95,9 @@ Rules:
 
 - `paper` is the only page background. Never introduce white panels.
 - Selection/hover emphasis is always `tint`, never shadow or border color change.
-- `tile` is reserved for tooltips and treemap tiles.
+- `tile` is reserved for tooltips, treemap tiles, and budget hub cards (§6.6).
+- The two `ink-fg-*` tokens exist only on the `ink` shell surface (§6.7); never use them on paper. **These lines are the single definition of both hex values** — §16 mirrors the paper tokens only, so a value change is one edit here plus one in `apps/web/app/globals.css`.
+- `ink-fg-faint` on `ink` measures **3.53:1** and is provisional: it currently carries 8.5–9.5px text (brand sub-line, `მონაცემები /` overline, rail label, `მალე` badge), which is below the WCAG AA 4.5:1 floor for text that size. Do not extend it to new text; the value is under review. `ink-fg-muted` on `ink` measures 4.77:1 and passes for the 12–12.5px labels it carries.
 - Focus rings: `2px solid rgba(179,64,42,0.4)`, offset 2px.
 - Selection highlight: `rgba(179,64,42,0.16)`.
 - Scrollbars: thin, `control`-colored thumb on transparent track.
@@ -226,30 +232,38 @@ No screen card, no outer container. Content sits directly on paper.
 
 ### 6.2 Information Architecture
 
-Two pages: the landing at `/` (მთავარი — see §19) and the explorer at `/explorer`. The landing header nav links the two pages; the explorer wordmark links back to `/`.
+The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: a budget hub and its sections, all mounted under `/explorer` inside the shell of §6.7.
 
-The explorer is one page with three header nav tabs (hash-synced):
+```text
+/explorer              budget hub — the four sections as cards
+/explorer/expenditure  ხარჯები       multi-year expenditure explorer (fields/ministries grouping)
+/explorer/revenue      შემოსავლები   multi-year revenue explorer
+/explorer/analysis     ანალიზი       single-year analysis view (own side switch, grouping switch
+                                     for expenditure, and year selector)
+```
 
-1. `ხარჯები` — multi-year expenditure explorer (fields/ministries grouping).
-2. `შემოსავლები` — multi-year revenue explorer.
-3. `ანალიზი` — single-year analysis view with its own side switch, grouping switch (expenditure only), and year selector.
+The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები` (`მალე`, no route), `ანალიზი`.
 
-Under the page title sits the **deck line**: a mono lead value (latest-year total for the explorer, `year · N კატეგორია · სულ X` for analysis) plus a colored YoY delta and the phrase `წინა წელთან`.
+Every surface under `/explorer` opens with the **breadcrumb row** (§6.7): `მთავარი / მონაცემები / ბიუჯეტი` on the hub, `მთავარი / მონაცემები / ბიუჯეტი / <section>` on a section. Its right slot is a mono **coverage** label — `{minYear} — {maxYear} · განახლდა {YYYY-MM-DD}` for the route's active scope, not the user's selection (the range strip owns that, and the two facts live at different altitudes).
 
-The header right slot shows a mono context label: selected range (`2005–2025`) in the explorer, selected year (`2025 წელი`) in analysis.
+On the section routes, under the page title, sits the **deck line**: a mono lead value (latest-year total for the explorer, `year · N კატეგორია · სულ X` for analysis) plus a colored YoY delta and the phrase `წინა წელთან`. The hub has no deck line — it opens with the serif H1 `საქართველოს ბიუჯეტი` and a plain lead paragraph.
 
 ### 6.3 URL State (deep linking)
 
-Screen state serializes into the URL hash so any view is shareable:
+The section lives in the route (§6.2). Everything else about a screen serializes into the URL hash so any view is shareable:
 
 ```text
-/explorer#nav=expenditure&g=fields&m=line&sh=1&r=2005-2025&sel=id1,id2   (explorer)
-/explorer#nav=analysis&as=expenditure&ag=ministries&ay=2024              (analysis)
+/explorer/expenditure#g=fields&m=line&sh=1&r=2005-2025&sel=id1,id2   (explorer sections)
+/explorer/analysis#as=expenditure&ag=ministries&ay=2024              (analysis)
 ```
 
-The landing links into these (hero CTA and card 01 → `/explorer`, card 02 → `/explorer#nav=analysis`).
+Keys: `g` grouping (expenditure only), `m` mode, `sh` share measure, `r` range, `sel` selection; `as` analysis side, `ag` analysis grouping, `ay` analysis year. The hash never carries `nav`.
 
 Restore on load with validation (unknown values fall back to defaults; ranges clamp to loaded years).
+
+Links shared before the route split still work: `/explorer#nav=expenditure|revenue|analysis` is honored once by a client component mounted on the hub, which reads the hash on mount and `router.replace`s to the matching route with `nav` stripped and the rest of the hash preserved.
+
+The landing links into `/explorer` (hero CTA, card 01, card 03, footer) and `/explorer/analysis` (card 02, footer).
 
 ### 6.4 Rule Hierarchy (replaces cards)
 
@@ -258,7 +272,7 @@ Sections are separated by horizontal rules, in three weights:
 - `2px solid ink` — page header bottom, major section tops, table header bottom, table total-row top, aside top rule when stacked.
 - `1px solid ink` — primary panel top (chart/table block).
 - `1px solid hairline (#D9CFBE)` — sub-section separators, aside left border.
-- `1px solid hairline-soft (#E7DECF)` — data row borders, chart grid.
+- `1px solid hairline-soft (#E7DECF)` — data row borders, analysis chart grids (radar rings, budget field). The multi-year line chart's grid is the dot lattice of §8.3, not a rule.
 
 Never nest a rule-framed block inside another rule-framed block with the same weight.
 
@@ -279,6 +293,53 @@ spacing:
 - Border radius: **0–3px everywhere** (buttons 2px, tooltip 3px). Exception: the `% წილი` measure pill and slider handles/ticks use `999px`.
 - Shadows: only the chart tooltip (`0 4px 16px rgba(30,27,22,0.10)`) and slider handles (`0 1px 3px rgba(30,27,22,0.15)`). Nothing else casts a shadow.
 - Swatches are **14×3px bars**, never dots or rounded squares.
+- **Exception: budget hub cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow). Four peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
+
+### 6.7 Shell and Sidebar
+
+Everything under `/explorer` renders inside a persistent shell: a dark sidebar on the left, the content column beside it (max-width 1180px, page padding `20px` / `34px` at ≥768px). Implementation: `apps/web/components/shell/`.
+
+**Sidebar (expanded, ≥900px).** 232px, `ink` background, radius 0, sticky at `top: 0` with full viewport height so it holds while the long explorer page scrolls. Dividers on ink are `rgba(247,242,233,0.12)`; the active row background is `rgba(247,242,233,0.07)`.
+
+- Brand block → `/`: serif `GeoData` in `paper`, mono `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`.
+- `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
+- `ბიუჯეტი` — the active dataset: `2px accent` left border, active-row background, sans 12.5/600 in `paper`. Not a link; it is where you already are.
+- Its four sections nest beneath it (below).
+- `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#3A362E` border, 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
+- Foot, above a 1px divider: `← მთავარი`. No version string.
+- Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, mono glyph `«` (expanded) / `»` (collapsed).
+
+**Section list** (`section-nav.tsx`, nested under `ბიუჯეტი`). Each entry is a route link. Active: accent `▸` marker, `paper` text at weight 600, active-row background, `aria-current="page"`. Inactive: `ink-fg-muted`, marker held in transparent so labels do not shift. `მუნიციპალიტეტები` sits in the same list as a non-interactive row with the `მალე` badge. Deleting this one component and its single usage reverts navigation to hub-and-breadcrumb only; nothing else imports it.
+
+**Collapsed rail (≥900px).** 52px, same `ink` surface, radius 0:
+
+- The toggle stays in place at the top, glyph flipped to `»`.
+- Below it, the context line runs vertically down the rail: `მონაცემები · ბიუჯეტი`, mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
+- At the foot, an 8×8 `accent` square is the collapsed `← მთავარი` link, with a 26×26 hit area, `aria-label="მთავარი"`, and a `title` tooltip.
+- **Sections are not reachable while collapsed** — the list is unmounted, not hidden. A 52px rail cannot carry Georgian section names, and reducing them to invented initials would trade one extra click for three ambiguous glyphs. Collapse is a reading posture: it hands the width back to the data and keeps only orientation and escape.
+
+Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: reduce`. The choice persists in `localStorage` under `geodata:sidebar-collapsed`, read after mount; a storage denial falls back to expanded rather than breaking the render.
+
+**Below 900px.** The sidebar becomes a full-width top bar (brand + toggle). The toggle opens the same nav as an **in-flow panel directly below the bar**: it is content-height, it pushes the page content down, and it has no backdrop. It is deliberately not the full-height sheet the design spec asked for — nothing is overlaid, so nothing needs covering. `Escape` closes it and hands focus back to the toggle. Expanded/collapsed is a **desktop-only** state: a persisted collapse preference is ignored below 900px rather than applied as an unexplained narrow rail, so the `«` glyph does double duty — collapse on desktop, close the panel on mobile.
+
+**Accessibility, and the deviations on record.**
+
+- The toggle exposes `aria-expanded` and a label that flips between `პანელის ჩაკეცვა` and `პანელის გაშლა`. It carries **no `aria-controls`**. On desktop the collapse unmounts the nav, so there is no element to point at; below 900px that is not true — the nav stays mounted and is merely `display:none` — so this is a real gap at mobile widths, not a fully justified omission. Closing it means giving the nav a stable id and keeping it mounted in both desktop states.
+- There is **no focus trap** on the mobile panel, by decision. A trap is the contract for a modal that covers the page; this panel is in flow and obscures nothing, so trapping would strand keyboard users in a region they can simply tab past. `Escape` to close plus focus return to the trigger is the whole contract.
+- The `მუნიციპალიტეტები` row in the sidebar is a plain non-interactive list item with **no** `aria-disabled` — the `listitem` role ignores it, and the `მალე` badge text already reads out. The hub card, which is a `div`, does carry `aria-disabled="true"`.
+
+**Breadcrumb page header** (`page-header.tsx`). One row with a `2px ink` bottom rule, rendered per route (the final crumb differs per route, and a server layout cannot read the child route). Crumbs: sans 10.5px uppercase 600 in `muted`, current crumb in `ink`, separators `/` in accent. `მთავარი` links to `/`; `მონაცემები` is plain text with no route; `ბიუჯეტი` links to the hub on section routes and is plain text on the hub. Right slot: the mono 10.5px `faint` coverage label of §6.2 — the loaded range of the route's active scope, so it tracks the grouping, and the union of both sides on the hub.
+
+**Budget hub (`/explorer`).** Breadcrumb, serif H1 `საქართველოს ბიუჯეტი`, lead paragraph, then four cards in a 2×2 grid (one column below 768px, max-width 860px), then the standard source note (§7.10). Card anatomy, in order: mono index in accent with `→` right-aligned, serif 18px title, 11.5px `muted` description, graphic, mono 10px `faint` footer.
+
+| # | Card | Graphic | Footer | Links to |
+|---|------|---------|--------|----------|
+| 01 | `ხარჯები` | total expenditure series, `Sparkline` at 200×34 in `accent` | `{latestYear} · {total}` | `/explorer/expenditure` |
+| 02 | `შემოსავლები` | total revenue series, same at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/revenue` |
+| 03 | `მუნიციპალიტეტები` | none | none | nothing |
+| 04 | `ანალიზი` | none | `{latestYear} · {n} კატეგორია` | `/explorer/analysis` |
+
+Card 03 is not a link, carries a `მალე` badge in place of the `→` (paper-surface variant: 1px `control` border, `muted` text), takes a `muted` title, and has no hover state — it must not be stylable as live. Every figure on the hub is computed at build time from the same served facts the section pages use, so the hub cannot drift from the pages behind it. Nothing on it is hardcoded.
 
 ## 7. Core Components
 
@@ -286,11 +347,19 @@ Specs below are contracts; visual proof lives in the reference files.
 
 ### 7.1 Header / Nav
 
+The landing header (§19) only — surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs.
+
 Baseline-aligned row: serif brand left (`GeoData`), nav tabs center, mono context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500.
 
-### 7.2 Mode / Grouping Tabs
+### 7.2a Mode Control
 
-Text-only, sans 12.5px; active = ink 600 with `text-decoration: underline`, 2px thickness, accent color, `text-underline-offset: 4px`. No backgrounds. Mode tabs: `ხაზი / ცხრილი`, in the chart controls row. In the **explorer**, the grouping tabs (`სფეროები / უწყებები`, expenditure only) live in the series aside, directly under the `სერიები` header row (gap 18px, 12px padding-bottom, 1px `row-border` bottom rule). In the **analysis view**, grouping tabs sit next to the side tabs, separated by a 1px×13px `control` vertical divider.
+A segmented control, used **only** for `ხაზი / ცხრილი` in the chart controls row: inline-flex, 1px `control` border, 2px radius, overflow hidden. Segments are mono 10.5px with 0.04em tracking and `6px 13px` padding; the divider between them is the shared 1px `control` border. Active segment: `ink` background, `paper` text. Inactive: `muted` on transparent, hover `tint` + `ink`. The group has `role="group"` with a Georgian label; each segment keeps `aria-pressed`.
+
+A boxed either/or switch is the honest affordance for choosing which view of the same data you are looking at. A filter is not that — do not box the tab groups of §7.2b.
+
+### 7.2b Grouping Tabs
+
+Text-only, sans 12.5px; active = ink 600 with `text-decoration: underline`, 2px thickness, accent color, `text-underline-offset: 4px`. No backgrounds. In the **explorer**, the grouping tabs (`სფეროები / უწყებები`, expenditure only) live in the series aside, directly under the `სერიები` header row (gap 18px, 12px padding-bottom, 1px `row-border` bottom rule). In the **analysis view**, the side tabs (`ხარჯები / შემოსავლები`) and grouping tabs use this same style, separated by a 1px×13px `control` vertical divider.
 
 ### 7.3 Measure Pill (% წილი)
 
@@ -340,6 +409,21 @@ The classification note is a required data-trust disclosure — year totals are 
 
 No card: overline label, serif value, muted detail line. Two variants: analysis headlines (serif 34, four per row) and indicators side KPIs (serif 24, stacked with `hairline-soft` separators, value left / detail right on one baseline).
 
+**Sparkline.** Every side KPI carries one, left-aligned under the value/detail row with a 6px top margin. Pure SVG, no client state, safe from a server component (`components/ui/sparkline.tsx`).
+
+- 64×16 by default, 1.2px stroke with round caps and joins, 1px inset so the stroke never clips. No axis, no end dot, no fill.
+- The domain is the min/max of the non-null values; an all-equal series draws a flat mid line rather than pinning to an edge.
+- Nulls split the polyline into segments and are **never bridged**, matching the chart rule of §8.3. Fewer than two non-null points renders nothing rather than a misleading flat line.
+- `aria-hidden`: the KPI value and detail line already carry the meaning, and a 64px decoration has nothing to add to a screen reader.
+
+| KPI | Series plotted | Color |
+|-----|----------------|-------|
+| `ყველაზე დიდი ზრდა` | that row's values across the selected period | its category color |
+| `ყველაზე ნელი ზრდა` | that row's values across the selected period | its category color |
+| `ყველაზე დიდი წილი` | that row's **share of the year total** | `accent` |
+
+The third is deliberately a different metric: the KPI states a percentage, so the sparkline traces that percentage — which is also why it reads jagged next to two smooth level lines. Years where either side is null, or the total is zero, produce a null point. The hero KPI (§7.12) keeps its gauge and gets no sparkline. The same component draws the hub graphics at 200×34 (§6.7).
+
 ### 7.12 Hero KPI (indicators)
 
 The first indicator (`პერიოდის ცვლილება`) is a hero block: overline, serif 62px value (accent-negative if the period change is negative), then a 3px two-segment gauge (ink = base year total share, accent = delta), mono `year · amount` labels at both ends, and an editorial sentence with mono-set delta and CAGR values:
@@ -373,7 +457,15 @@ Left: mode tabs + unit note + measure pill row → chart or table → range stri
 
 ### 8.3 Line Chart
 
-SVG on paper (no plot frame), viewBox 920×320: grid lines `hairline-soft`, `1px ink` line at zero, 1px `hairline` y-axis line; axis labels mono 11px muted (y labels right-aligned outside the plot, ~62px left padding); year labels thinned to ≤12 (first anchored start, last anchored end); series polylines 2.2px round-joined with a 3.5px dot on the final point only; no in-plot direct labels. Hover/pointer: 1px `control` vertical guide, ring markers (paper fill, 2px series stroke), tooltip (tile bg, 1px hairline border, radius 3, tooltip shadow, mono year + swatch/label/value rows; flips side past 60% width). `role="img"` + Georgian aria-label. SVG text sets fonts via `style` (the `font-family` presentation attribute does not resolve `var()`).
+SVG on paper (no plot frame), viewBox 920×320: a dot lattice for the grid (below), `1px ink` line at zero, 1px `hairline` y-axis line; axis labels mono 11px muted (y labels right-aligned outside the plot, 74px left padding); year labels thinned to ≤12 (first anchored start, last anchored end); series polylines 2.2px round-joined with a 3.5px dot on the final point only; no in-plot direct labels. Hover/pointer: 1px `control` vertical guide, ring markers (paper fill, 2px series stroke), tooltip (tile bg, 1px hairline border, radius 3, tooltip shadow, mono year + swatch/label/value rows; flips side past 60% width). `role="img"` + Georgian aria-label. SVG text sets fonts via `style` (the `font-family` presentation attribute does not resolve `var()`).
+
+**Dot lattice.** It replaces the horizontal gridlines outright — the dot field *is* the grid, not decoration behind one.
+
+- `#C9BEA9` (the `control` value) at opacity 0.6, radius 0.7. Literal hex, matching the rest of this chart: `var()` does not resolve in SVG presentation attributes.
+- Pitch is derived from the active scale, never fixed: **2 columns per year interval** (`plotWidth / (2 × (n − 1))`) and **3 rows per gridline step** (`stepPx / 3`), so every third row lands exactly on a labelled y value and every second column on a year.
+- Density guards: a sub-division pitch below 12px falls back to one column per year, or one row per step, independently. A negative domain can produce many gridline steps, and dots must never smear into a tone. With `n ≤ 1` there is no interval to divide and no lattice is drawn.
+- Drawn as one `<pattern patternUnits="userSpaceOnUse">` with the circle at the tile center and the pattern origin offset back by half a pitch, so dot centers land exactly on the plot's grid intersections with no edge clipping — a pattern, not ~500 `<circle>` elements.
+- The `1px ink` line at zero stays: it is load-bearing for negative domains. The `hairline-soft` horizontal gridlines are gone.
 
 Data-reality rules (the prototype's snapshot had none of these; production data does):
 
@@ -475,6 +567,8 @@ Mobile (<768px): page padding `24px 20px 64px`; page title 30px; hero value 44px
 
 Breakpoint behavior keys off the page container width (ResizeObserver or CSS container/media queries), matching the reference prototype.
 
+The shell adds one breakpoint of its own at **900px** (§6.7). It governs the sidebar only — above it the sidebar is a column, below it a top bar with an in-flow nav panel — and does not change the content column's own breakpoints above. The hub card grid drops to one column below 768px.
+
 ## 13. Accessibility
 
 - All controls have accessible names; toggles expose pressed/selected state (`aria-pressed`, `aria-expanded`); slider handles expose `role="slider"` with value attributes and keyboard support.
@@ -491,10 +585,12 @@ Breakpoint behavior keys off the page container width (ResizeObserver or CSS con
 motion:
   fast: "120ms"
   base: "150ms"
-  easing: "ease"
+  easing: "ease-in-out"   # cubic-bezier(0.4, 0, 0.2, 1) — the curve the utility layer emits
 ```
 
-Only color, background, border-color, and opacity transition. No transforms, no lifts, no decorative loops. Nothing animates on load.
+Only color, background, border-color, opacity, and — for the sidebar rail alone (§6.7) — `width` transition. No transforms, no lifts, no decorative loops. Nothing animates on load.
+
+The sidebar's width transition runs at `base` and is gated on `prefers-reduced-motion: reduce`, where it snaps: `globals.css` zeroes every transition duration under that query and additionally sets `transition: none` on the sidebar. `width` is permitted here and nowhere else — it is a layout change the user asked for by clicking, not motion for its own sake.
 
 ## 15. Data and Trust Presentation
 
@@ -526,6 +622,8 @@ CSV metadata columns: `year, category_id, parent_item_id, level, detail_label, o
 }
 ```
 
+`apps/web/app/globals.css` ships these plus the two ink-surface tokens `--ink-fg-muted` and `--ink-fg-faint` (§6.7). Their values are defined once, in §4.1, and are deliberately not repeated here — `--ink-fg-faint` is under contrast review, and a change to it should be a one-line edit, not a hunt.
+
 ## 17. Do / Do Not
 
 Do:
@@ -542,7 +640,7 @@ Do:
 
 Do not:
 
-- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only).
+- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only). The single card exception is the budget hub's four cards (§6.6); it does not generalize.
 - No white surfaces; no gradients anywhere.
 - No blue `#0071e3` or any v3.x Apple token; no night theme or theme toggle.
 - No dots/rounded-square swatches — bars only.
@@ -554,8 +652,8 @@ Do not:
 
 ## 18. Design QA Checklist
 
-1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only).
-2. Header has the 2px ink rule; major sections open with 2px rules; nav has exactly three tabs.
+1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only; the budget hub's four cards are the one card exception, §6.6).
+2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), not in-page nav tabs.
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
 4. Explorer default: line mode, nominal GEL, full range, top-5 selection, 6-series chart limit with callout.
 5. Only `ხაზი` and `ცხრილი` modes exist; `% წილი` is the only pill.
@@ -569,7 +667,7 @@ Do not:
 13. Georgian labels don't clip at any breakpoint.
 14. Revenue reuses the identical system.
 15. Ministries grouping works in both explorer (with program expansion) and analysis (categories only).
-16. URL hash round-trips: reloading a deep link restores nav, grouping, mode, share, range, selection, and analysis year.
+16. URL hash round-trips: reloading a deep link restores grouping, mode, share, range, selection, and analysis year; the section comes from the route, and a legacy `#nav=` link on `/explorer` redirects to it with the rest of the hash intact.
 17. No v3.x (Apple) or older terminal/neon styling anywhere.
 
 ## 19. Landing Page (მთავარი)
@@ -581,7 +679,7 @@ Section order (top to bottom):
 1. **Header** — editorial header (§7.1) with page links instead of tabs: `მთავარი` (active, accent underline) and `ექსპლორერი` → `/explorer`; right slot shows the mono revenue year range (hidden on mobile).
 2. **Hero — living relief** — Three.js dotted map of Georgia (exact ADM0 outline, analytic elevation, population-scaled city squares emitting ripple waves, Tbilisi national pulse every 45s, peak labels Shkhara/Mkinvartsveri, city hover readout, mouse parallax). **The map is the hero's main subject and is maximized**: the figure is full-bleed (spans the viewport, escaping the 1240px column) and the camera keeps the reference's viewing angle but fits its distance at runtime so the country's real dot bounds fill the canvas at any aspect (margins ≈9%/6%, refit on resize). Headline (`როგორ ივსება და იხარჯება საქართველოს ბიუჯეტი`) overlays top-right on ≥768px, staying in the content grid, and sits above the map on mobile; CTA `დაიწყე ბიუჯეტით` → `/explorer`. The hero's height is not fixed: the camera fits inside a fixed virtual frame (340px <768, 500px <1100, `min(78vh, 820px)` ≥1100), then the canvas is cropped to the map's projected vertical band via a camera view offset — the map never rescales, and the key-numbers section starts immediately under the last dots. The headline overlay's measured height is a hard floor so the copy can never overflow into the stats. `prefers-reduced-motion` renders a still frame; WebGL failure shows a mono fallback note.
 3. **Key numbers** — three hardcoded country figures (population 3.7 მლნ, area 69.7 ათ. კმ², nominal GDP 104.6 მლრდ ₾ · 2025 preliminary, per Geostat), serif 46px values, maintained by hand in `landing-page.tsx`. The section sits 40/56px below the full-bleed hero.
-4. **სამი გზა მონაცემებამდე** — three rule-topped cards, all data live: 01 multi-year explorer (total-revenue + VAT sparkline) → `/explorer`; 02 single-year picture (30-cell expenditure waffle, §4.2 colors) → `/explorer#nav=analysis`; 03 open CSV (real header + two active-fact rows in a tint block) → `/explorer`.
+4. **სამი გზა მონაცემებამდე** — three rule-topped cards, all data live: 01 multi-year explorer (total-revenue + VAT sparkline) → `/explorer`; 02 single-year picture (30-cell expenditure waffle, §4.2 colors) → `/explorer/analysis`; 03 open CSV (real header + two active-fact rows in a tint block) → `/explorer`.
 5. **Footer** — brand + tagline + `info@geodata.ge`; nav links (explorer, analysis); data/license notes (source, last-updated date, CC BY 4.0); mono bottom bar.
 
 Landing QA: waffle renders exactly 30 cells; sparkline endpoints match the loaded revenue range; CSV preview shows real active-fact rows; hero canvas mounts or the fallback note shows; no cards or shadows.

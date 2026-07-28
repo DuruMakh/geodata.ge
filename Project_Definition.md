@@ -28,6 +28,7 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Multi-year explorer with line and table views.
 - Multi-year expenditure grouping by public spending fields or by ministries/major programs (ministries data exists for 2005-2025, with major-program drill-down rows partial from 2012 and contiguous 2017-2025); this is series selection, not drilldown.
 - Single-year snapshot with headline cards, treemap, Every 100 GEL, Budget Radar, Budget Field, and full ranking.
+- Municipal budgets section — in scope as a named future section; the hub lists it with a `მალე` marker and no data ships in v1.
 - CSV export.
 - Georgian-first UI.
 - Minimal public source label.
@@ -36,7 +37,6 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 ### Excluded From V1
 
 - Broad public data catalog.
-- Municipal transfers explorer.
 - Capital projects explorer.
 - Debt explorer.
 - Admin UI.

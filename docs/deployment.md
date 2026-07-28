@@ -20,7 +20,8 @@ check, and connecting the custom domain.
 
 The repo clone on the build machine includes the repo root, so the build can
 read `data/` via the `../../` relative paths in `apps/web/lib/data/servedData.ts`.
-Every route (`/`, `/explorer`, `/robots.txt`, `/sitemap.xml`, the 404 page) is
+Every route (`/`, `/explorer`, `/explorer/expenditure`, `/explorer/revenue`,
+`/explorer/analysis`, `/robots.txt`, `/sitemap.xml`, the 404 page) is
 prerendered at build time; nothing runs server-side at request time.
 
 ## How deploys happen
