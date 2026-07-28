@@ -26,7 +26,7 @@ export default async function ExplorerHubPage() {
   const cards = buildHubCards(facts);
   const years = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
   const coverage = [
-    years.length > 0 ? `${years[0]} — ${years.at(-1)}` : "",
+    years.length > 0 ? `${years[0]}–${years.at(-1)}` : "",
     lastUpdatedAt ? `განახლდა ${lastUpdatedAt}` : "",
   ]
     .filter(Boolean)
@@ -37,7 +37,7 @@ export default async function ExplorerHubPage() {
       data-testid="explorer-shell"
       className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"
     >
-      <div className="max-w-[1180px]">
+      <div className="mx-auto max-w-[1180px]">
         <LegacyHashRedirect />
         <PageHeader
           crumbs={[{ label: "მთავარი", href: "/" }, { label: "მონაცემები" }, { label: "ბიუჯეტი" }]}

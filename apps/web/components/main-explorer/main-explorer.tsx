@@ -168,7 +168,7 @@ export function MainExplorer({ nav, facts, adminFacts, adminCategories, glossary
   const sectionLabel = isAnalysis ? "ანალიზი" : nav === "revenue" ? "შემოსავლები" : "ხარჯები";
   const coverageYears = isAnalysis ? analysisYears : scopeYears;
   const coverage = [
-    coverageYears.length > 0 ? `${coverageYears[0]} — ${coverageYears.at(-1)}` : "",
+    coverageYears.length > 0 ? `${coverageYears[0]}–${coverageYears.at(-1)}` : "",
     lastUpdatedAt ? `განახლდა ${lastUpdatedAt}` : "",
   ]
     .filter(Boolean)
@@ -190,7 +190,7 @@ export function MainExplorer({ nav, facts, adminFacts, adminCategories, glossary
       data-testid="explorer-shell"
       className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"
     >
-      <div className="max-w-[1180px]">
+      <div className="mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[
             { label: "მთავარი", href: "/" },

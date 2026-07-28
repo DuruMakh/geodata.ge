@@ -80,8 +80,8 @@ colors:
   body: "#55503F"         # secondary data text
   muted: "#6A6050"        # labels, captions, inactive controls (v2 darkened from #7A7060 for contrast)
   faint: "#A89C88"        # decoration-only metadata
-  ink-fg-muted: "#8F8676" # inactive labels on the ink shell surface only
-  ink-fg-faint: "#7A7060" # overlines, badges, tertiary text on the ink shell surface only
+  ink-fg-muted: "#A69C8C" # inactive labels on the ink shell surface only
+  ink-fg-faint: "#8F8676" # overlines, badges, tertiary text on the ink shell surface only
   hairline: "#D9CFBE"     # section sub-rules, aside border
   hairline-soft: "#E7DECF" # row borders, chart grid, bar tracks
   row-border: "#EDE4D3"   # series-panel row borders
@@ -98,7 +98,7 @@ Rules:
 - Selection/hover emphasis is always `tint`, never shadow or border color change.
 - `tile` is reserved for tooltips, treemap tiles, and budget hub cards (§6.6).
 - The two `ink-fg-*` tokens exist only on the `ink` shell surface (§6.7); never use them on paper. **These lines are the single definition of both hex values** — §16 mirrors the paper tokens only, so a value change is one edit here plus one in `apps/web/app/globals.css`.
-- `ink-fg-faint` on `ink` measures **3.53:1** and is provisional: it currently carries 8.5–9.5px text (brand sub-line, `მონაცემები /` overline, rail label, `მალე` badge), which is below the WCAG AA 4.5:1 floor for text that size. Do not extend it to new text; the value is under review. `ink-fg-muted` on `ink` measures 4.77:1 and passes for the 12–12.5px labels it carries.
+- Both ink tokens clear WCAG AA on `ink`: `ink-fg-faint` measures **4.77:1** for the 8.5–9.5px text it carries (brand sub-line, `მონაცემები /` overline, rail label, `მალე` badge) and `ink-fg-muted` measures **6.34:1** for its 12–12.5px labels. They are a deliberate two-step hierarchy — an ~8.5 CIE L\* gap, so faint still reads dimmer than muted. Any future move has to keep **both** above 4.5:1 **and** that gap; raising one alone collapses the pair. (The pair was raised from `#7A7060` / `#8F8676`, where faint sat at 3.53:1.)
 - Focus rings: `2px solid rgba(179,64,42,0.4)`, offset 2px.
 - Selection highlight: `rgba(179,64,42,0.16)`.
 - Scrollbars: thin, `control`-colored thumb on transparent track.
@@ -217,6 +217,7 @@ Rules:
 - Negative letter-spacing only at ≥16px.
 - Emphasis inside data = weight 600 (e.g. latest-year column), never color-only.
 - Unit suffixes on serif values (`მლრდ ₾`) are mono 12–13px in `body` color, not serif.
+- Year ranges are one style everywhere: an **unspaced en dash** (`2005–2025`, U+2013). Not an em dash, not spaced. This covers the coverage label (§6.2), the source note (§7.10), and the range strip (§7.4).
 
 ## 6. Layout System
 
@@ -247,7 +248,7 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 
 The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები` (`მალე`, no route), `ანალიზი`.
 
-Every surface under `/explorer` opens with the **breadcrumb row** (§6.7): `მთავარი / მონაცემები / ბიუჯეტი` on the hub, `მთავარი / მონაცემები / ბიუჯეტი / <section>` on a section. Its right slot is a mono **coverage** label — `{minYear} — {maxYear} · განახლდა {YYYY-MM-DD}` for the route's active scope, not the user's selection (the range strip owns that, and the two facts live at different altitudes).
+Every surface under `/explorer` opens with the **breadcrumb row** (§6.7): `მთავარი / მონაცემები / ბიუჯეტი` on the hub, `მთავარი / მონაცემები / ბიუჯეტი / <section>` on a section. Its right slot is a mono **coverage** label — `{minYear}–{maxYear} · განახლდა {YYYY-MM-DD}` for the route's active scope, not the user's selection (the range strip owns that, and the two facts live at different altitudes).
 
 On the section routes, under the page title, sits the **deck line**: a mono lead value (latest-year total for the explorer, `year · N კატეგორია · სულ X` for analysis) plus a colored YoY delta and the phrase `წინა წელთან`. The hub has no deck line — it opens with the serif H1 `საქართველოს ბიუჯეტი` and a plain lead paragraph.
 
@@ -300,7 +301,7 @@ spacing:
 
 ### 6.7 Shell and Sidebar
 
-Everything under `/explorer` renders inside a persistent shell: a dark sidebar on the left, the content column beside it (max-width 1180px, page padding `20px` / `34px` at ≥768px). Implementation: `apps/web/components/shell/`.
+Everything under `/explorer` renders inside a persistent shell: a dark sidebar on the left, the content column beside it (max-width 1180px, **centred** in the space left over, page padding `20px` / `34px` at ≥768px). Centring matters past ~1500px: left-aligned, the column strands the whole surplus as one blank margin on the right. Implementation: `apps/web/components/shell/`.
 
 **Sidebar (expanded, ≥900px).** 232px, `ink` background, radius 0, sticky at `top: 0` with full viewport height so it holds while the long explorer page scrolls. Dividers on ink are `rgba(247,242,233,0.12)`; the active row background is `rgba(247,242,233,0.07)`.
 
@@ -308,7 +309,7 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
 - `ბიუჯეტი` — the active dataset: `2px accent` left border, active-row background, sans 12.5/600 in `paper`. Not a link; it is where you already are.
 - Its four sections nest beneath it (below).
-- `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#3A362E` border, 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
+- `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, mono glyph `«` (expanded) / `»` (collapsed).
 
@@ -337,10 +338,12 @@ Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: redu
 
 | # | Card | Graphic | Footer | Links to |
 |---|------|---------|--------|----------|
-| 01 | `ხარჯები` | total expenditure series, `Sparkline` at 200×34 in `accent` | `{latestYear} · {total}` | `/explorer/expenditure` |
+| 01 | `ხარჯები` | total expenditure series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/expenditure` |
 | 02 | `შემოსავლები` | total revenue series, same at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/revenue` |
 | 03 | `მუნიციპალიტეტები` | none | none | nothing |
 | 04 | `ანალიზი` | none | `{latestYear} · {n} კატეგორია` | `/explorer/analysis` |
+
+Both sparklines are `ink` because each traces a **side total**, and §4.2 gives every `*.total` series `ink`. `accent` is not free chrome here: `#B3402A` is the token of `spending.social_protection` and `revenue.vat`, so an accent total would draw one quantity in another category's color.
 
 Card 03 is not a link, carries a `მალე` badge in place of the `→` (paper-surface variant: 1px `control` border, `muted` text), takes a `muted` title, and has no hover state — it must not be stylable as live. Every figure on the hub is computed at build time from the same served facts the section pages use, so the hub cannot drift from the pages behind it. Nothing on it is hardcoded.
 
@@ -625,7 +628,7 @@ CSV metadata columns: `year, category_id, parent_item_id, level, detail_label, o
 }
 ```
 
-`apps/web/app/globals.css` ships these plus the two ink-surface tokens `--ink-fg-muted` and `--ink-fg-faint` (§6.7). Their values are defined once, in §4.1, and are deliberately not repeated here — `--ink-fg-faint` is under contrast review, and a change to it should be a one-line edit, not a hunt.
+`apps/web/app/globals.css` ships these plus the two ink-surface tokens `--ink-fg-muted` and `--ink-fg-faint` (§6.7). Their values are defined once, in §4.1, and are deliberately not repeated here — the pair is contrast-constrained (§4.1), and a change to either should be a one-line edit, not a hunt.
 
 ## 17. Do / Do Not
 

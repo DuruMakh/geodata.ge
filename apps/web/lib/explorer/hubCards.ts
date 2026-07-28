@@ -2,7 +2,7 @@ import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { isDerivedTotalItemId } from "./explorerData";
 import { formatAmount } from "./format";
-import { ACCENT, INK } from "./colors";
+import { INK } from "./colors";
 
 // Budget hub cards (DESIGN.md §6.7). Every figure is derived from the served
 // facts at build time, so the hub can never drift from the pages behind it.
@@ -64,7 +64,7 @@ export function buildHubCards(facts: BudgetFactImportRow[]): HubCardModel[] {
       href: "/explorer/expenditure",
       comingSoon: false,
       series: spend.series,
-      seriesColor: ACCENT,
+      seriesColor: INK,
       footer: spend.footer,
     },
     {
