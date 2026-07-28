@@ -365,3 +365,18 @@ test("every side KPI carries a sparkline", async ({ page }) => {
     await expect(kpis.nth(index).locator("svg")).toHaveCount(1);
   }
 });
+
+test("chart draws a dot lattice instead of horizontal gridlines", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer");
+  await expectAppReady(page);
+
+  const chart = page.getByTestId("chart-frame");
+  await expect(chart.getByTestId("chart-dot-lattice")).toBeVisible();
+
+  // Only the zero rule survives; the hairline-soft gridlines are gone.
+  const strokes = await chart.locator("svg line").evaluateAll((lines) =>
+    lines.map((line) => line.getAttribute("stroke")),
+  );
+  expect(strokes).not.toContain("#E7DECF");
+  expect(strokes).toContain("#1E1B16");
+});

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatBn, formatShare } from "../../lib/explorer/format";
 import { SwatchBar } from "../ui/editorial";
 
@@ -91,6 +92,13 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
   const labelStep = Math.max(1, Math.ceil(n / 12));
 
+  const lattice = buildDotLattice({
+    plotWidth: W - PAD_L - PAD_R,
+    plotHeight: H - PAD_T - PAD_B,
+    yearCount: n,
+    gridStepCount: Math.round(span / step),
+  });
+
   function handlePointerMove(event: React.PointerEvent<SVGSVGElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
     const px = ((event.clientX - rect.left) / rect.width) * W;
@@ -114,9 +122,38 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
         onPointerMove={handlePointerMove}
         onPointerLeave={() => setHover(null)}
       >
+        {lattice ? (
+          <>
+            <defs>
+              <pattern
+                id="chart-dot-lattice"
+                patternUnits="userSpaceOnUse"
+                x={PAD_L - lattice.colPitch / 2}
+                y={PAD_T - lattice.rowPitch / 2}
+                width={lattice.colPitch}
+                height={lattice.rowPitch}
+              >
+                <circle cx={lattice.colPitch / 2} cy={lattice.rowPitch / 2} r={0.7} fill="#C9BEA9" />
+              </pattern>
+            </defs>
+            <rect
+              data-testid="chart-dot-lattice"
+              x={PAD_L}
+              y={PAD_T}
+              width={W - PAD_L - PAD_R}
+              height={H - PAD_T - PAD_B}
+              fill="url(#chart-dot-lattice)"
+              opacity={0.6}
+            />
+          </>
+        ) : null}
         {gridLines.map((value, index) => (
           <g key={`grid-${index}`}>
-            <line x1={PAD_L} x2={W - PAD_R} y1={y(value)} y2={y(value)} stroke={value === 0 ? "#1E1B16" : "#E7DECF"} strokeWidth={1} />
+            {/* The lattice carries the grid; only zero keeps a drawn rule, because a
+                negative domain is unreadable without it. */}
+            {value === 0 ? (
+              <line x1={PAD_L} x2={W - PAD_R} y1={y(value)} y2={y(value)} stroke="#1E1B16" strokeWidth={1} />
+            ) : null}
             <text x={PAD_L - 10} y={y(value) + 3} fontSize={11} fill="#6A6050" textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
               {formatAxis(value)}
             </text>
