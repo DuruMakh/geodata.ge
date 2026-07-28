@@ -10,6 +10,7 @@ import { parseExplorerHash, scopeFor, serializeExplorerHash } from "../../lib/ex
 type UseExplorerStateInput = {
   facts: BudgetFactImportRow[];
   adminFacts: AdminSpendingFact[];
+  nav: ExplorerNav;
 };
 
 type RangePatch = { start?: number; end?: number };
@@ -22,7 +23,7 @@ function clampYear(year: number, min: number, max: number): number {
   return Math.min(Math.max(year, min), max);
 }
 
-export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
+export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInput) {
   const yearsByScope = useMemo<Record<ExplorerScope, number[]>>(() => {
     const collect = (values: Iterable<number>) => Array.from(new Set(values)).sort((a, b) => a - b);
 
@@ -57,7 +58,6 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
     [facts, adminFacts],
   );
 
-  const [nav, setNav] = useState<ExplorerNav>("expenditure");
   const [grouping, setGrouping] = useState<ExpenditureGrouping>("fields");
   const [chartMode, setChartMode] = useState<ChartMode>("line");
   const [share, setShare] = useState(false);
@@ -124,11 +124,6 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
     );
   }
 
-  function handleNavChange(nextNav: ExplorerNav) {
-    setNav(nextNav);
-    setLimitMessage(null);
-  }
-
   function handleGroupingChange(nextGrouping: ExpenditureGrouping) {
     setGrouping(nextGrouping);
     setLimitMessage(null);
@@ -145,10 +140,9 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
   useEffect(() => {
     if (hashAppliedRef.current) return;
     hashAppliedRef.current = true;
-    const parsed = parseExplorerHash(window.location.hash);
+    const parsed = parseExplorerHash(window.location.hash, nav);
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (parsed.nav) setNav(parsed.nav);
     if (parsed.grouping) setGrouping(parsed.grouping);
     if (parsed.chartMode) setChartMode(parsed.chartMode);
     if (parsed.share) setShare(true);
@@ -211,7 +205,6 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
   }, [serializedHash]);
 
   return {
-    nav,
     explorerSide,
     scope,
     grouping,
@@ -226,7 +219,6 @@ export function useExplorerState({ facts, adminFacts }: UseExplorerStateInput) {
     expandedMinistries,
     toggleMinistryExpanded,
     toggleSeries,
-    handleNavChange,
     handleGroupingChange,
     handleChartModeChange,
     analysisSide,

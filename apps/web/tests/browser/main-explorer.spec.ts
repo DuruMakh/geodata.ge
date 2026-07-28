@@ -38,7 +38,7 @@ async function expectLineChartRendered(page: Page) {
 test("explorer hydrates with the editorial shell and default expenditure view", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
@@ -48,11 +48,6 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   // Editorial paper background, no cards.
   const paper = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   expect(paper).toBe("rgb(247, 242, 233)");
-
-  // Three-tab nav.
-  await expect(page.getByTestId("nav-expenditure")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("nav-revenue")).toBeVisible();
-  await expect(page.getByTestId("nav-analysis")).toBeVisible();
 
   // Default: line mode, top-5 selection, chart drawn on paper.
   await expectLineChartRendered(page);
@@ -75,7 +70,7 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
 test("explorer controls expose line, table, grouping, and the share pill", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   const chartPanel = page.getByTestId("chart-panel");
@@ -106,10 +101,9 @@ test("explorer controls expose line, table, grouping, and the share pill", async
 test("revenue nav reuses the identical system without a grouping switch", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/revenue");
   await expectAppReady(page);
 
-  await page.getByTestId("nav-revenue").click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება საქართველოს ბიუჯეტი");
   await expect(page.getByTestId("grouping-fields")).toHaveCount(0);
   await expect(page.getByTestId("series-selector")).toContainText("დამატებული ღირებულების გადასახადი");
@@ -122,7 +116,7 @@ test("revenue nav reuses the identical system without a grouping switch", async 
 test("ministries grouping expands nested programs by name only", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   await page.getByTestId("grouping-ministries").click();
@@ -152,7 +146,7 @@ test("ministries grouping expands nested programs by name only", async ({ page }
 });
 
 test("range strip supports chips and dragging handles", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   const strip = page.getByTestId("year-range-strip");
@@ -180,7 +174,7 @@ test("range strip supports chips and dragging handles", async ({ page }) => {
 });
 
 test("URL hash round-trips explorer state", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   await page.getByTestId("chart-mode-table").click();
@@ -188,7 +182,7 @@ test("URL hash round-trips explorer state", async ({ page }) => {
   await expect(page).toHaveURL(/#.*m=table/);
   await expect(page).toHaveURL(/sh=1/);
 
-  await page.goto("http://localhost:3100/explorer#nav=revenue&m=table&sh=1&r=2010-2020&sel=revenue.vat");
+  await page.goto("http://localhost:3100/explorer/revenue#m=table&sh=1&r=2010-2020&sel=revenue.vat");
   await page.reload();
   await expectAppReady(page);
 
@@ -210,7 +204,7 @@ test("line mode caps over-limit shared selections with a callout", async ({ page
     "spending.sport",
   ].join(",");
 
-  await page.goto(`http://localhost:3100/explorer#nav=expenditure&m=line&sel=${sel}`);
+  await page.goto(`http://localhost:3100/explorer/expenditure#m=line&sel=${sel}`);
   await page.reload();
   await expectAppReady(page);
 
@@ -222,7 +216,7 @@ test("line mode caps over-limit shared selections with a callout", async ({ page
 });
 
 test("shared ministries program links restore with the parent expanded", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   await page.getByTestId("grouping-ministries").click();
@@ -242,7 +236,7 @@ test("shared ministries program links restore with the parent expanded", async (
 });
 
 test("CSV download uses the active filtered table data", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   const downloadPromise = page.waitForEvent("download");
@@ -265,10 +259,9 @@ test("CSV download uses the active filtered table data", async ({ page }) => {
 test("analysis view renders the fixed single-year section order", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/analysis");
   await expectAppReady(page);
 
-  await page.getByTestId("nav-analysis").click();
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("ბიუჯეტის სურათი");
 
@@ -320,7 +313,7 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   const consoleProblems = collectConsoleProblems(page);
   await page.setViewportSize({ width: 390, height: 844 });
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   await expect(page.getByTestId("explorer-header")).toBeVisible();
@@ -328,7 +321,9 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   await expect(page.getByTestId("series-selector")).toBeVisible();
   await expectNoPageOverflow(page);
 
-  await page.getByTestId("nav-analysis").click();
+  await page.goto("http://localhost:3100/explorer/analysis");
+  await expectAppReady(page);
+
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await expect(page.getByTestId("every-100-grid").locator("[data-cell='gel']")).toHaveCount(100);
   await expectNoPageOverflow(page);
@@ -337,23 +332,24 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
 });
 
 test("captures editorial desktop and mobile screenshots", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
   await expectLineChartRendered(page);
   await page.screenshot({ path: "test-results/geodata-editorial-desktop.png", fullPage: true, caret: "initial" });
 
-  await page.getByTestId("nav-analysis").click();
+  await page.goto("http://localhost:3100/explorer/analysis");
+  await expectAppReady(page);
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await page.screenshot({ path: "test-results/geodata-editorial-analysis.png", fullPage: true, caret: "initial" });
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
   await page.screenshot({ path: "test-results/geodata-editorial-mobile.png", fullPage: true, caret: "initial" });
 });
 
 test("every side KPI carries a sparkline", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   const kpis = page.getByTestId("side-kpi");
@@ -367,7 +363,7 @@ test("every side KPI carries a sparkline", async ({ page }) => {
 });
 
 test("chart draws a dot lattice instead of horizontal gridlines", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   const chart = page.getByTestId("chart-frame");

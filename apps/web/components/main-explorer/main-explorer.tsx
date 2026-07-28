@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import Link from "next/link";
 import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
@@ -14,10 +13,12 @@ import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import type { ExplorerNav, ExplorerScope } from "../../lib/explorer/types";
 import { AnalysisView } from "../analysis/analysis-view";
+import { PageHeader } from "../shell/page-header";
 import { ExplorerView } from "./explorer-view";
 import { useExplorerState } from "./use-explorer-state";
 
 type MainExplorerProps = {
+  nav: ExplorerNav;
   facts: BudgetFactImportRow[];
   adminFacts: AdminSpendingFact[];
   adminCategories: AdminSpendingCategory[];
@@ -26,13 +27,7 @@ type MainExplorerProps = {
   lastUpdatedAt: string;
 };
 
-const NAV_ITEMS: Array<{ key: ExplorerNav; label: string }> = [
-  { key: "expenditure", label: "ხარჯები" },
-  { key: "revenue", label: "შემოსავლები" },
-  { key: "analysis", label: "ანალიზი" },
-];
-
-export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntries, sourceDocuments, lastUpdatedAt }: MainExplorerProps) {
+export function MainExplorer({ nav, facts, adminFacts, adminCategories, glossaryEntries, sourceDocuments, lastUpdatedAt }: MainExplorerProps) {
   useEffect(() => {
     document.body.dataset.appReady = "true";
 
@@ -43,9 +38,8 @@ export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntri
 
   const glossary = useMemo(() => new Map(glossaryEntries.map((entry) => [entry.id, entry])), [glossaryEntries]);
   const adminCategoryMap = useMemo(() => new Map(adminCategories.map((category) => [category.id, category])), [adminCategories]);
-  const state = useExplorerState({ facts, adminFacts });
+  const state = useExplorerState({ facts, adminFacts, nav });
   const {
-    nav,
     explorerSide,
     scope,
     grouping,
@@ -60,7 +54,6 @@ export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntri
     expandedMinistries,
     toggleMinistryExpanded,
     toggleSeries,
-    handleNavChange,
     handleGroupingChange,
     handleChartModeChange,
     analysisSide,
@@ -172,7 +165,14 @@ export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntri
     : nav === "expenditure"
       ? "როგორ იხარჯება საქართველოს ბიუჯეტი"
       : "როგორ ივსება საქართველოს ბიუჯეტი";
-  const contextLabel = isAnalysis ? `${analysisModel.year} წელი` : `${range.start}–${range.end}`;
+  const sectionLabel = isAnalysis ? "ანალიზი" : nav === "revenue" ? "შემოსავლები" : "ხარჯები";
+  const coverageYears = isAnalysis ? analysisYears : scopeYears;
+  const coverage = [
+    coverageYears.length > 0 ? `${coverageYears[0]} — ${coverageYears.at(-1)}` : "",
+    lastUpdatedAt ? `განახლდა ${lastUpdatedAt}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   function downloadCsv() {
     const csv = buildExplorerCsv(model.tableRows, model.years);
@@ -191,37 +191,15 @@ export function MainExplorer({ facts, adminFacts, adminCategories, glossaryEntri
       className="min-h-screen bg-[var(--paper)] px-5 pt-6 pb-16 text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px] min-[768px]:pb-[72px]"
     >
       <div className="mx-auto max-w-[1240px]">
-        <header data-testid="explorer-header" className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2 border-b-2 border-[var(--ink)] pb-4 min-[768px]:gap-5">
-          <Link
-            href="/"
-            className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em] text-[var(--ink)] no-underline hover:text-[var(--accent)]"
-          >
-            GeoData
-          </Link>
-          <nav data-testid="explorer-controls" className="flex gap-4 min-[768px]:gap-[26px]">
-            {NAV_ITEMS.map((item) => {
-              const active = nav === item.key;
-
-              return (
-                <button
-                  key={item.key}
-                  type="button"
-                  data-testid={`nav-${item.key}`}
-                  aria-pressed={active}
-                  onClick={() => handleNavChange(item.key)}
-                  className={`-mb-4 cursor-pointer border-b-2 pb-3.5 text-[13px] transition-colors duration-150 ${
-                    active
-                      ? "border-[var(--accent)] font-semibold text-[var(--ink)]"
-                      : "border-transparent font-medium text-[var(--muted)] hover:text-[var(--ink)]"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
-          <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{contextLabel}</span>
-        </header>
+        <PageHeader
+          crumbs={[
+            { label: "მთავარი", href: "/" },
+            { label: "მონაცემები" },
+            { label: "ბიუჯეტი", href: "/explorer" },
+            { label: sectionLabel },
+          ]}
+          coverage={coverage}
+        />
 
         <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
           {screenTitle}
