@@ -2,7 +2,7 @@
 
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import { MAX_CHART_SERIES, type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
-import { Callout, SourceNote, TextTab } from "../ui/editorial";
+import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
 import { ExplorerTable } from "./explorer-table";
 import { Indicators } from "./indicators";
@@ -107,10 +107,15 @@ export function ExplorerView({
         <div className="flex min-w-0 flex-col">
           <section data-testid="chart-panel" data-mode={chartMode} data-measure={share ? "share_of_total" : "nominal"} className="border-t border-[var(--ink)] pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-[18px]">
-                <TextTab label="ხაზი" active={chartMode === "line"} onClick={() => onChartModeChange("line")} testId="chart-mode-line" />
-                <TextTab label="ცხრილი" active={chartMode === "table"} onClick={() => onChartModeChange("table")} testId="chart-mode-table" />
-              </div>
+              <SegmentedTabs<ChartMode>
+                ariaLabel="ხედის რეჟიმი"
+                value={chartMode}
+                onChange={onChartModeChange}
+                options={[
+                  { value: "line", label: "ხაზი", testId: "chart-mode-line" },
+                  { value: "table", label: "ცხრილი", testId: "chart-mode-table" },
+                ]}
+              />
               <div className="flex items-center gap-3.5">
                 <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
                   {share ? `% მთლიანი ${sideWord}` : "მლრდ ₾"}

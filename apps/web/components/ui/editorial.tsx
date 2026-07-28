@@ -91,3 +91,37 @@ export function SourceNote({ children, testId }: SourceNoteProps) {
     </p>
   );
 }
+
+type SegmentedTabsProps<T extends string> = {
+  options: Array<{ value: T; label: string; testId?: string }>;
+  value: T;
+  onChange: (next: T) => void;
+  ariaLabel: string;
+};
+
+// Segmented control for either/or view switches (DESIGN.md §7.2a). Filters keep
+// TextTab — boxing every tab group turns the page into a control panel.
+export function SegmentedTabs<T extends string>({ options, value, onChange, ariaLabel }: SegmentedTabsProps<T>) {
+  return (
+    <span role="group" aria-label={ariaLabel} className="inline-flex items-stretch overflow-hidden rounded-[2px] border border-[var(--control)]">
+      {options.map((option, index) => {
+        const active = option.value === value;
+
+        return (
+          <button
+            key={option.value}
+            type="button"
+            data-testid={option.testId}
+            aria-pressed={active}
+            onClick={() => onChange(option.value)}
+            className={`cursor-pointer px-[13px] py-1.5 font-[family-name:var(--font-numeric)] text-[10.5px] tracking-[0.04em] transition-colors duration-150 ${
+              index > 0 ? "border-l border-[var(--control)]" : ""
+            } ${active ? "bg-[var(--ink)] text-[var(--paper)]" : "bg-transparent text-[var(--muted)] hover:bg-[var(--tint)] hover:text-[var(--ink)]"}`}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </span>
+  );
+}
