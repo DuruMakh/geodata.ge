@@ -534,3 +534,41 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
 
   expect(consoleProblems).toEqual([]);
 });
+
+test("hub lists four cards and keeps municipalities inert", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+
+  await page.goto("http://localhost:3100/explorer");
+  await expectAppReady(page);
+
+  await expect(page.getByTestId("hub-card")).toHaveCount(4);
+  // Scoped to the hub: the sidebar carries a ხარჯები link too, and an unscoped
+  // role query would trip Playwright's strict mode.
+  await expect(page.getByTestId("budget-hub").getByRole("link", { name: /ხარჯები/ })).toHaveAttribute(
+    "href",
+    "/explorer/expenditure",
+  );
+
+  const municipalities = page.getByTestId("hub-card").nth(2);
+  await expect(municipalities).toContainText("მუნიციპალიტეტები");
+  await expect(municipalities).toContainText("მალე");
+  await expect(municipalities).toHaveAttribute("aria-disabled", "true");
+  expect(await municipalities.evaluate((node) => node.tagName)).toBe("DIV");
+
+  // No invented article count or unit total anywhere on the hub.
+  await expect(page.getByTestId("budget-hub")).not.toContainText("სტატია");
+  await expect(page.getByTestId("budget-hub")).not.toContainText("64 ერთეული");
+
+  expect(consoleProblems).toEqual([]);
+});
+
+test("legacy nav hashes redirect to their route", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer#nav=analysis&ay=2024");
+  await expect(page).toHaveURL(/\/explorer\/analysis/);
+  await expect(page).toHaveURL(/ay=2024/);
+  await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
+
+  await page.goto("http://localhost:3100/explorer#nav=revenue&m=table");
+  await expect(page).toHaveURL(/\/explorer\/revenue/);
+  await expect(page.getByTestId("explorer-table")).toBeVisible();
+});
