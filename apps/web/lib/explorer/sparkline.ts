@@ -1,6 +1,8 @@
 // Sparkline path geometry (DESIGN.md §7.11). Kept pure so it can be unit-tested
 // in the node environment — the component around it is a thin SVG wrapper.
 
+import type { ExplorerTableRow } from "./types";
+
 type Point = { value: number; index: number };
 
 export function buildSparklinePath(
@@ -44,4 +46,22 @@ export function buildSparklinePath(
   flush();
 
   return segments;
+}
+
+// The "ყველაზე დიდი წილი" KPI states a percentage, so its sparkline traces that
+// percentage rather than the level — which is also why it reads jagged.
+export function buildKpiShareSeries(
+  row: ExplorerTableRow | null,
+  totalRow: ExplorerTableRow | null,
+  years: number[],
+): (number | null)[] {
+  if (row === null || totalRow === null) return years.map(() => null);
+
+  return years.map((year) => {
+    const value = row.valuesByYear[year];
+    const total = totalRow.valuesByYear[year];
+    if (value === null || value === undefined) return null;
+    if (total === null || total === undefined || total === 0) return null;
+    return value / total;
+  });
 }

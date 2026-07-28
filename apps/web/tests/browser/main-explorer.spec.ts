@@ -351,3 +351,17 @@ test("captures editorial desktop and mobile screenshots", async ({ page }) => {
   await expectAppReady(page);
   await page.screenshot({ path: "test-results/geodata-editorial-mobile.png", fullPage: true, caret: "initial" });
 });
+
+test("every side KPI carries a sparkline", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer");
+  await expectAppReady(page);
+
+  const kpis = page.getByTestId("side-kpi");
+  await expect(kpis).toHaveCount(3);
+
+  // One sparkline each. Path count is deliberately not asserted — a series with
+  // an interior gap legitimately draws more than one segment.
+  for (let index = 0; index < 3; index += 1) {
+    await expect(kpis.nth(index).locator("svg")).toHaveCount(1);
+  }
+});

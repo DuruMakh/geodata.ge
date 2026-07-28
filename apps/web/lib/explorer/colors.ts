@@ -73,6 +73,7 @@ export const EDITORIAL_PALETTE = [
 export const OTHER_COLOR = "#A89C88";
 export const POSITIVE = "#1F6E56";
 export const NEGATIVE = "#B3402A";
+export const ACCENT = "#B3402A";
 
 export function colorForItem(itemId: string, index: number): string {
   return SERIES_COLORS[itemId] ?? EDITORIAL_PALETTE[index % EDITORIAL_PALETTE.length] ?? OTHER_COLOR;

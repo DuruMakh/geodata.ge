@@ -1,6 +1,8 @@
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
-import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
+import { ACCENT, NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
+import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
+import { Sparkline } from "../ui/sparkline";
 import { formatAmount, formatAmountParts, formatBn, formatShare, MISSING } from "../../lib/explorer/format";
 import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
 
@@ -91,6 +93,9 @@ export function Indicators({ model, scope }: IndicatorsProps) {
   const slowest = scopeRows.filter((row) => row.change !== null).sort((a, b) => (a.change ?? 0) - (b.change ?? 0))[0] ?? null;
   const largestShare = [...scopeRows].sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0))[0] ?? null;
 
+  const seriesValues = (source: ExplorerTableRow | null) =>
+    source === null ? null : years.map((year) => source.valuesByYear[year] ?? null);
+
   const sideKpis = [
     {
       label: "ყველაზე დიდი ზრდა",
@@ -98,6 +103,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       unit: biggestParts.unit,
       color: "var(--ink)",
       detail: biggestIncrease ? truncate(biggestIncrease.row.kaLabel, 46) : MISSING,
+      spark: biggestIncrease ? { values: seriesValues(biggestIncrease.row) ?? [], color: biggestIncrease.row.color } : null,
     },
     {
       label: "ყველაზე ნელი ზრდა",
@@ -105,6 +111,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       unit: "",
       color: slowest && (slowest.change ?? 0) < 0 ? NEGATIVE : "var(--ink)",
       detail: slowest ? truncate(slowest.kaLabel, 46) : MISSING,
+      spark: slowest ? { values: seriesValues(slowest) ?? [], color: slowest.color } : null,
     },
     {
       label: "ყველაზე დიდი წილი",
@@ -112,6 +119,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       unit: "",
       color: "var(--ink)",
       detail: largestShare ? `${truncate(largestShare.kaLabel, 40)}, ${endYear}` : MISSING,
+      spark: largestShare ? { values: buildKpiShareSeries(largestShare, totalRow, years), color: ACCENT } : null,
     },
   ];
 
@@ -176,6 +184,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           {sideKpis.map((kpi, index) => (
             <div
               key={kpi.label}
+              data-testid="side-kpi"
               className={index === 0 ? "pt-0.5 pb-3.5" : index === sideKpis.length - 1 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}
             >
               <Overline>{kpi.label}</Overline>
@@ -195,6 +204,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
                   {kpi.detail}
                 </p>
               </div>
+              {kpi.spark ? <Sparkline values={kpi.spark.values} color={kpi.spark.color} /> : null}
             </div>
           ))}
         </div>
