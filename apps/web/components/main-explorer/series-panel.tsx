@@ -107,8 +107,9 @@ export function SeriesPanel({
 
   return (
     <aside
+      aria-label="სერიები"
       data-testid="series-selector"
-      className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] min-[1100px]:sticky min-[1100px]:top-5 min-[1100px]:border-t-0 min-[1100px]:border-l min-[1100px]:border-[var(--hairline)] min-[1100px]:pt-0 min-[1100px]:pl-[26px]"
+      className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
     >
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">სერიები</h2>

@@ -97,6 +97,7 @@ export function DataSidebar() {
 
   return (
     <aside
+      aria-label="მონაცემთა პანელი"
       data-testid="data-sidebar"
       data-collapsed={railed ? "true" : "false"}
       className={`flex w-full flex-none flex-col bg-[var(--ink)] px-4 pt-[18px] pb-4 min-[900px]:sticky min-[900px]:top-0 min-[900px]:h-screen ${

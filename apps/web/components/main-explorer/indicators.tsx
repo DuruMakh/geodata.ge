@@ -140,8 +140,8 @@ export function Indicators({ model, scope }: IndicatorsProps) {
         </p>
       </div>
 
-      <div data-testid="period-kpi-cards" className="mt-[26px] grid min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-        <div className="min-w-0 min-[1100px]:pr-11">
+      <div data-testid="period-kpi-cards" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <div className="min-w-0 @min-[1100px]:pr-11">
           <Overline>პერიოდის ცვლილება</Overline>
           <p
             className="mt-3.5 whitespace-nowrap font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]"
@@ -180,7 +180,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
             ) : null}
           </div>
         </div>
-        <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] min-[1100px]:mt-0 min-[1100px]:border-t-0 min-[1100px]:border-l min-[1100px]:pt-0 min-[1100px]:pl-9">
+        <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
           {sideKpis.map((kpi, index) => (
             <div
               key={kpi.label}
@@ -210,7 +210,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
         </div>
       </div>
 
-      <div data-testid="period-movers" className="mt-9 grid gap-7 border-t border-[var(--hairline)] pt-6 min-[1100px]:grid-cols-2 min-[1100px]:gap-x-10">
+      <div data-testid="period-movers" className="mt-9 grid gap-7 border-t border-[var(--hairline)] pt-6 @min-[1100px]:grid-cols-2 @min-[1100px]:gap-x-10">
         <div className="min-w-0">
           <h3 className="mb-3 text-[13px] font-semibold text-[var(--ink)]">ყველაზე მზარდი</h3>
           <div className="flex flex-col">

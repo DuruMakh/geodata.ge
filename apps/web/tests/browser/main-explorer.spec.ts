@@ -451,6 +451,17 @@ test("chart draws a dot lattice instead of horizontal gridlines", async ({ page 
   expect(geometry.patternY + geometry.circleCy).toBeCloseTo(PAD_T, 5);
   expect(geometry.circleCx).toBeCloseTo(geometry.patternWidth / 2, 5);
   expect(geometry.circleCy).toBeCloseTo(geometry.patternHeight / 2, 5);
+
+  // A single-year range gives the lattice no interval to divide, so it drops out
+  // entirely and the hairline rules have to come back — without them the axis
+  // labels sit against blank paper with nothing to read a value against.
+  await page.getByRole("button", { name: "1წ", exact: true }).click();
+  await expect(chart.getByTestId("chart-dot-lattice")).toHaveCount(0);
+
+  const singleYearStrokes = await chart.locator("svg line").evaluateAll((lines) =>
+    lines.map((line) => line.getAttribute("stroke")),
+  );
+  expect(singleYearStrokes).toContain("#E7DECF");
 });
 
 test("sidebar collapses to a rail and remembers the choice", async ({ page }) => {

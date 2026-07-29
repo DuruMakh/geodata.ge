@@ -102,6 +102,8 @@ scrolls.
 - `ბიუჯეტი` — active dataset. Its four sections nest beneath it (§4.3).
 - `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` — `--ink-fg-muted` label with a
   `მალე` badge (1px `#3A362E` border, 2px radius, mono 9px). Not links, not focusable.
+  **As built:** the badge border ships as `#6C6860` (3.09:1 on `--ink`), since `#3A362E` sits under
+  the WCAG 1.4.11 3:1 floor for a component boundary. See `DESIGN.md` §6.7.
 - Foot: `← მთავარი`. No version string.
 - Top-right: the collapse toggle (§4.2), a 26px box with a 1px `rgba(247,242,233,0.18)` border.
 
@@ -145,6 +147,12 @@ rather than inlined as hex:
 --ink-fg-faint: #7A7060   /* overlines, badges, tertiary text on ink */
 ```
 
+**As built:** both values were raised one step before merge, because `#7A7060` on `--ink` measures
+3.53:1 — below the 4.5:1 WCAG AA floor for text this size. The shipped pair is
+`--ink-fg-muted: #A69C8C` (6.34:1) and `--ink-fg-faint: #8F8676` (4.77:1). `DESIGN.md` §4.1 and
+`apps/web/app/globals.css` are the definition; the values above are the pre-review draft and must
+not be copied back.
+
 Dividers on ink use `rgba(247,242,233,0.12)`; the active row background is
 `rgba(247,242,233,0.07)`.
 
@@ -154,6 +162,12 @@ Nested list under ბიუჯეტი. Each entry is a `next/link` to its rout
 marker, `--paper` text at weight 600, `rgba(247,242,233,0.07)` background, `aria-current="page"`.
 Inactive: `--ink-fg-muted`, no marker. `მუნიციპალიტეტები` renders in the same list as a
 non-interactive row with the `მალე` badge and `aria-disabled="true"`.
+
+**As built:** inactive rows keep the `▸` marker in `transparent` rather than dropping it, so the
+labels of all four rows sit on one column. The `მუნიციპალიტეტები` row carries **no**
+`aria-disabled` — the `listitem` role ignores it and `jsx-a11y` rejects it — and relies on the
+`მალე` badge text, which reads out. The hub's card, being a `div`, does still carry it. Order and
+labels for both surfaces come from `apps/web/lib/explorer/sections.ts`.
 
 Deleting this component and its single usage in `data-sidebar.tsx` reverts navigation to
 hub-and-breadcrumb only. Nothing else imports it.

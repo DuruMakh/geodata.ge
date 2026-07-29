@@ -30,6 +30,7 @@ const PAD_L = 74;
 const PAD_R = 30;
 const PAD_T = 16;
 const PAD_B = 26;
+const DOT_R = 0.7;
 
 function niceMax(rawMax: number): number {
   const raw = rawMax * 1.12;
@@ -133,15 +134,19 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
                 width={lattice.colPitch}
                 height={lattice.rowPitch}
               >
-                <circle cx={lattice.colPitch / 2} cy={lattice.rowPitch / 2} r={0.7} fill="#C9BEA9" />
+                <circle cx={lattice.colPitch / 2} cy={lattice.rowPitch / 2} r={DOT_R} fill="#C9BEA9" />
               </pattern>
             </defs>
+            {/* Grown by one dot radius on every side: the pitch divides the plot
+                box exactly, so dots land on all four bounds, and a pattern fill
+                clips to the shape it fills — without this the border columns and
+                rows draw as half dots (quarters at the corners). */}
             <rect
               data-testid="chart-dot-lattice"
-              x={PAD_L}
-              y={PAD_T}
-              width={W - PAD_L - PAD_R}
-              height={H - PAD_T - PAD_B}
+              x={PAD_L - DOT_R}
+              y={PAD_T - DOT_R}
+              width={W - PAD_L - PAD_R + DOT_R * 2}
+              height={H - PAD_T - PAD_B + DOT_R * 2}
               fill="url(#chart-dot-lattice)"
               opacity={0.6}
             />
@@ -149,10 +154,19 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
         ) : null}
         {gridLines.map((value, index) => (
           <g key={`grid-${index}`}>
-            {/* The lattice carries the grid; only zero keeps a drawn rule, because a
-                negative domain is unreadable without it. */}
-            {value === 0 ? (
-              <line x1={PAD_L} x2={W - PAD_R} y1={y(value)} y2={y(value)} stroke="#1E1B16" strokeWidth={1} />
+            {/* The lattice carries the grid, so only zero keeps a drawn rule — a
+                negative domain is unreadable without it. When there is no lattice
+                (a single-year range has no interval to divide) the rules come back,
+                or the axis labels would have nothing to sit against. */}
+            {value === 0 || lattice === null ? (
+              <line
+                x1={PAD_L}
+                x2={W - PAD_R}
+                y1={y(value)}
+                y2={y(value)}
+                stroke={value === 0 ? "#1E1B16" : "#E7DECF"}
+                strokeWidth={1}
+              />
             ) : null}
             <text x={PAD_L - 10} y={y(value) + 3} fontSize={11} fill="#6A6050" textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
               {formatAxis(value)}

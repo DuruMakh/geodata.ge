@@ -1,20 +1,34 @@
 import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
-import { loadServedExplorerData } from "../../../lib/data/servedData";
+import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
+import { firstServedYear } from "../../../lib/explorer/coverage";
 
-export const metadata: Metadata = {
-  title: "ხარჯები — GeoData",
-  description: "საქართველოს ბიუჯეტის ხარჯები სფეროებისა და უწყებების ჭრილში, 2005 წლიდან დღემდე.",
-  alternates: { canonical: "/explorer/expenditure" },
-  openGraph: {
-    type: "website",
-    siteName: "GeoData.ge",
-    locale: "ka_GE",
-    url: "/explorer/expenditure",
-    title: "ხარჯები — GeoData",
-    description: "საქართველოს ბიუჯეტის ხარჯები სფეროებისა და უწყებების ჭრილში, 2005 წლიდან დღემდე.",
-  },
-};
+const TITLE = "ხარჯები — GeoData";
+const DESCRIPTION_STEM = "საქართველოს ბიუჯეტის ხარჯები სფეროებისა და უწყებების ჭრილში";
+
+// The coverage start is read from the served facts, not written into the string:
+// a hardcoded year keeps asserting itself in search results and link previews
+// after the data moves (AGENTS.md, "UX and Visual Guardrails").
+export async function generateMetadata(): Promise<Metadata> {
+  const { facts } = await loadServedLandingData();
+  const firstYear = firstServedYear(facts, "expenditure");
+  const description =
+    firstYear === null ? `${DESCRIPTION_STEM}.` : `${DESCRIPTION_STEM}, ${firstYear} წლიდან დღემდე.`;
+
+  return {
+    title: TITLE,
+    description,
+    alternates: { canonical: "/explorer/expenditure" },
+    openGraph: {
+      type: "website",
+      siteName: "GeoData.ge",
+      locale: "ka_GE",
+      url: "/explorer/expenditure",
+      title: TITLE,
+      description,
+    },
+  };
+}
 
 export default async function ExpenditurePage() {
   const { facts, glossary, sourceDocuments, adminFacts, adminCategories } = await loadServedExplorerData();

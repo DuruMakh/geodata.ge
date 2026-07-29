@@ -103,7 +103,7 @@ export function ExplorerView({
 
   return (
     <>
-      <div data-testid="explorer-workspace" className="grid items-start gap-8 min-[1100px]:grid-cols-[minmax(0,1fr)_292px] min-[1100px]:gap-10">
+      <div data-testid="explorer-workspace" className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">
         <div className="flex min-w-0 flex-col">
           <section data-testid="chart-panel" data-mode={chartMode} data-measure={share ? "share_of_total" : "nominal"} className="border-t border-[var(--ink)] pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">

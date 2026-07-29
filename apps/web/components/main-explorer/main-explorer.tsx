@@ -190,7 +190,10 @@ export function MainExplorer({ nav, facts, adminFacts, adminCategories, glossary
       data-testid="explorer-shell"
       className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"
     >
-      <div className="mx-auto max-w-[1180px]">
+      {/* The workspace measures THIS column, not the viewport (DESIGN.md §12):
+          the shell sidebar takes 232px off the viewport, so a viewport query
+          would keep the two-column layout past the width the chart can fit. */}
+      <div className="@container mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[
             { label: "მთავარი", href: "/" },

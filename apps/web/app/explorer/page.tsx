@@ -47,7 +47,7 @@ export default async function ExplorerHubPage() {
           საქართველოს ბიუჯეტი
         </h1>
         <p className="mb-[26px] max-w-[560px] text-[13.5px] leading-relaxed text-[var(--body)]">
-          აირჩიეთ განყოფილება — შემოსავლები, ხარჯები, მუნიციპალიტეტების ბიუჯეტები ან ანალიტიკური მასალები.
+          აირჩიეთ განყოფილება — ხარჯები, შემოსავლები, მუნიციპალიტეტების ბიუჯეტები ან ანალიზი.
         </p>
         <BudgetHub cards={cards} />
         <div className="mt-[26px] max-w-[860px]">

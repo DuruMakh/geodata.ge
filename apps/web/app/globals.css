@@ -52,8 +52,14 @@ html,
 body {
   min-width: 320px;
   min-height: 100%;
-  overflow-x: hidden;
   background: var(--paper);
+}
+
+/* Clip horizontally on the viewport only. Setting overflow-x on body as well
+   makes body its own scroll container, which silently defeats every
+   position: sticky descendant (the shell sidebar, the series aside). */
+html {
+  overflow-x: hidden;
 }
 
 body {
@@ -75,6 +81,16 @@ select:focus-visible,
 input:focus-visible {
   outline: 2px solid rgba(179, 64, 42, 0.4);
   outline-offset: 2px;
+}
+
+/* Same ring, drawn inside the control. For anything inside a clipping container
+   — the segmented control's rounded, overflow-hidden group — the outward ring is
+   cut away on every side that meets the container's edge, leaving a stray stroke
+   over the neighbouring segment. Opt in with `data-focus-inset`. This has to live
+   beside the rule above rather than as a utility class: the rule is unlayered, and
+   unlayered declarations beat anything in Tailwind's `utilities` layer. */
+[data-focus-inset]:focus-visible {
+  outline-offset: -2px;
 }
 
 ::selection {
