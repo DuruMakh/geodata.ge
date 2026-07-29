@@ -113,8 +113,14 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
   return (
     // Scroll instead of shrink on narrow screens: an unbounded w-full SVG scales
     // its text below the DESIGN.md §13 legibility floor on phones.
+    //
+    // Exception, 900–1019px: the shell's sidebar leaves the column under 720px, so
+    // the floor would put a scrollbar under a desktop-width chart. There the chart
+    // shrinks to fit instead — an approved trade of label size for a whole chart
+    // (DESIGN.md §12). Below 900px the sidebar is a top bar and the column is wide
+    // again, so phones keep the scroll.
     <div data-testid="chart-frame" className="overflow-x-auto">
-      <div className="relative min-w-[720px]">
+      <div className="relative min-w-[720px] min-[900px]:max-[1020px]:min-w-0">
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"

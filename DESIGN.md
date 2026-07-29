@@ -575,6 +575,10 @@ Breakpoint behavior keys off the page container width (ResizeObserver or CSS con
 
 The shell adds one breakpoint of its own at **900px** (§6.7). It governs the sidebar only — above it the sidebar is a column, below it a top bar with an in-flow nav panel — and does not change the content column's own breakpoints above. The hub card grid drops to one column below 768px.
 
+The workspace's own breakpoints measure the **content column**, not the viewport (`@container` on the centred column in `main-explorer.tsx`). With a 232px sidebar in front of it the two differ by more than the 292px aside costs, so a viewport query keeps the two-column layout past the width the chart can fit and the chart clips inside its own frame.
+
+**Chart width between 900 and 1019px — an accepted deviation from the §8.3 label size.** In that band the sidebar leaves the column 600–719px, under the chart frame's 720px minimum. The chart shrinks to fit there rather than scrolling, so the rendered axis label falls to **7.2px at 900px** (from 8.6px). This is a deliberate trade of label size for a whole chart, approved for this band only. Two things it does not change: below 900px the sidebar becomes a top bar, the column is wide again, and phones keep the 720px minimum and the horizontal scroll; and the 11px in §8.3 is a viewBox unit, so the rendered size has always tracked the frame — it is 8.6px at 1020px and 9.7px at 1440px, reaching 11px only where the chart is widest.
+
 ## 13. Accessibility
 
 - All controls have accessible names; toggles expose pressed/selected state (`aria-pressed`, `aria-expanded`); slider handles expose `role="slider"` with value attributes and keyboard support.
