@@ -1,6 +1,8 @@
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
-import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
+import { ACCENT, NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
+import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
+import { Sparkline } from "../ui/sparkline";
 import { formatAmount, formatAmountParts, formatBn, formatShare, MISSING } from "../../lib/explorer/format";
 import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
 
@@ -91,6 +93,9 @@ export function Indicators({ model, scope }: IndicatorsProps) {
   const slowest = scopeRows.filter((row) => row.change !== null).sort((a, b) => (a.change ?? 0) - (b.change ?? 0))[0] ?? null;
   const largestShare = [...scopeRows].sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0))[0] ?? null;
 
+  const seriesValues = (source: ExplorerTableRow | null) =>
+    source === null ? null : years.map((year) => source.valuesByYear[year] ?? null);
+
   const sideKpis = [
     {
       label: "ყველაზე დიდი ზრდა",
@@ -98,6 +103,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       unit: biggestParts.unit,
       color: "var(--ink)",
       detail: biggestIncrease ? truncate(biggestIncrease.row.kaLabel, 46) : MISSING,
+      spark: biggestIncrease ? { values: seriesValues(biggestIncrease.row) ?? [], color: biggestIncrease.row.color } : null,
     },
     {
       label: "ყველაზე ნელი ზრდა",
@@ -105,6 +111,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       unit: "",
       color: slowest && (slowest.change ?? 0) < 0 ? NEGATIVE : "var(--ink)",
       detail: slowest ? truncate(slowest.kaLabel, 46) : MISSING,
+      spark: slowest ? { values: seriesValues(slowest) ?? [], color: slowest.color } : null,
     },
     {
       label: "ყველაზე დიდი წილი",
@@ -112,6 +119,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       unit: "",
       color: "var(--ink)",
       detail: largestShare ? `${truncate(largestShare.kaLabel, 40)}, ${endYear}` : MISSING,
+      spark: largestShare ? { values: buildKpiShareSeries(largestShare, totalRow, years), color: ACCENT } : null,
     },
   ];
 
@@ -132,8 +140,8 @@ export function Indicators({ model, scope }: IndicatorsProps) {
         </p>
       </div>
 
-      <div data-testid="period-kpi-cards" className="mt-[26px] grid min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-        <div className="min-w-0 min-[1100px]:pr-11">
+      <div data-testid="period-kpi-cards" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <div className="min-w-0 @min-[1100px]:pr-11">
           <Overline>პერიოდის ცვლილება</Overline>
           <p
             className="mt-3.5 whitespace-nowrap font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]"
@@ -172,10 +180,11 @@ export function Indicators({ model, scope }: IndicatorsProps) {
             ) : null}
           </div>
         </div>
-        <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] min-[1100px]:mt-0 min-[1100px]:border-t-0 min-[1100px]:border-l min-[1100px]:pt-0 min-[1100px]:pl-9">
+        <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
           {sideKpis.map((kpi, index) => (
             <div
               key={kpi.label}
+              data-testid="side-kpi"
               className={index === 0 ? "pt-0.5 pb-3.5" : index === sideKpis.length - 1 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}
             >
               <Overline>{kpi.label}</Overline>
@@ -195,12 +204,13 @@ export function Indicators({ model, scope }: IndicatorsProps) {
                   {kpi.detail}
                 </p>
               </div>
+              {kpi.spark ? <Sparkline values={kpi.spark.values} color={kpi.spark.color} /> : null}
             </div>
           ))}
         </div>
       </div>
 
-      <div data-testid="period-movers" className="mt-9 grid gap-7 border-t border-[var(--hairline)] pt-6 min-[1100px]:grid-cols-2 min-[1100px]:gap-x-10">
+      <div data-testid="period-movers" className="mt-9 grid gap-7 border-t border-[var(--hairline)] pt-6 @min-[1100px]:grid-cols-2 @min-[1100px]:gap-x-10">
         <div className="min-w-0">
           <h3 className="mb-3 text-[13px] font-semibold text-[var(--ink)]">ყველაზე მზარდი</h3>
           <div className="flex flex-col">

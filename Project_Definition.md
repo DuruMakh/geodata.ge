@@ -28,6 +28,7 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Multi-year explorer with line and table views.
 - Multi-year expenditure grouping by public spending fields or by ministries/major programs (ministries data exists for 2005-2025, with major-program drill-down rows partial from 2012 and contiguous 2017-2025); this is series selection, not drilldown.
 - Single-year snapshot with headline cards, treemap, Every 100 GEL, Budget Radar, Budget Field, and full ranking.
+- `მალე` markers for named future sections and datasets (municipal budgets in the sidebar and on the hub; `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` in the sidebar). Labels only: no data, no routes, not clickable.
 - CSV export.
 - Georgian-first UI.
 - Minimal public source label.
@@ -36,7 +37,8 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 ### Excluded From V1
 
 - Broad public data catalog.
-- Municipal transfers explorer.
+- Municipal budgets explorer, and any municipal data or route. The section is named as a future one and ships as a `მალე` marker only; building it out needs explicit approval.
+- Any data behind the four sidebar indicator markers (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`).
 - Capital projects explorer.
 - Debt explorer.
 - Admin UI.

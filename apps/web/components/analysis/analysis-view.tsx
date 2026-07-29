@@ -95,7 +95,7 @@ export function AnalysisView({
         </div>
       ) : (
         <>
-          <div className="mt-[34px] grid grid-cols-2 gap-x-8 gap-y-7 border-t border-[var(--hairline)] pt-6 min-[1100px]:grid-cols-4">
+          <div className="mt-[34px] grid grid-cols-2 gap-x-8 gap-y-7 border-t border-[var(--hairline)] pt-6 @min-[1100px]:grid-cols-4">
             {model.headlineCards.map((card) => (
               <div key={card.id} className="min-w-0">
                 <Overline>{card.label}</Overline>

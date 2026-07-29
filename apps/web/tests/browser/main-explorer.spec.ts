@@ -25,6 +25,13 @@ async function expectAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
 
+async function expectSidebarWidth(page: Page, width: number) {
+  // The rail animates over 150ms, so a single boundingBox() can land mid-transition.
+  await expect
+    .poll(async () => Math.round((await page.getByTestId("data-sidebar").boundingBox())?.width ?? 0))
+    .toBe(width);
+}
+
 async function expectLineChartRendered(page: Page) {
   const line = page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']").first();
 
@@ -38,7 +45,7 @@ async function expectLineChartRendered(page: Page) {
 test("explorer hydrates with the editorial shell and default expenditure view", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
@@ -48,11 +55,6 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   // Editorial paper background, no cards.
   const paper = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   expect(paper).toBe("rgb(247, 242, 233)");
-
-  // Three-tab nav.
-  await expect(page.getByTestId("nav-expenditure")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("nav-revenue")).toBeVisible();
-  await expect(page.getByTestId("nav-analysis")).toBeVisible();
 
   // Default: line mode, top-5 selection, chart drawn on paper.
   await expectLineChartRendered(page);
@@ -75,7 +77,7 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
 test("explorer controls expose line, table, grouping, and the share pill", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   const chartPanel = page.getByTestId("chart-panel");
@@ -106,10 +108,9 @@ test("explorer controls expose line, table, grouping, and the share pill", async
 test("revenue nav reuses the identical system without a grouping switch", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/revenue");
   await expectAppReady(page);
 
-  await page.getByTestId("nav-revenue").click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება საქართველოს ბიუჯეტი");
   await expect(page.getByTestId("grouping-fields")).toHaveCount(0);
   await expect(page.getByTestId("series-selector")).toContainText("დამატებული ღირებულების გადასახადი");
@@ -119,10 +120,54 @@ test("revenue nav reuses the identical system without a grouping switch", async 
   expect(consoleProblems).toEqual([]);
 });
 
+test("sidebar section links move between sections in-app", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const sidebar = page.getByTestId("data-sidebar");
+  await expect(sidebar.getByTestId("section-link-expenditure")).toHaveAttribute("aria-current", "page");
+
+  // Fill the line-mode series budget, then overflow it: the callout that appears
+  // is component state, and it must not follow the user into another section.
+  // Two clicks assume the documented top-5 default, so pin it — otherwise a
+  // changed default would fail below with an unrelated-looking message.
+  await expect(page.getByTestId("series-selector")).toContainText("5 / 6");
+  const unselected = page.getByTestId("series-selector").locator('button[title][aria-pressed="false"]');
+  await unselected.first().click();
+  await unselected.first().click();
+  await expect(page.getByTestId("series-limit-callout")).toBeVisible();
+
+  await sidebar.getByTestId("section-link-revenue").click();
+  await expect(page).toHaveURL(/\/explorer\/revenue/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება საქართველოს ბიუჯეტი");
+  await expect(page.getByTestId("series-selector")).toContainText("დამატებული ღირებულების გადასახადი");
+  await expect(page.getByTestId("series-limit-callout")).toHaveCount(0);
+  await expect(sidebar.getByTestId("section-link-revenue")).toHaveAttribute("aria-current", "page");
+  await expect(sidebar.getByTestId("section-link-expenditure")).not.toHaveAttribute("aria-current", "page");
+
+  await sidebar.getByTestId("section-link-analysis").click();
+  await expect(page).toHaveURL(/\/explorer\/analysis/);
+  await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
+  await expect(sidebar.getByTestId("section-link-analysis")).toHaveAttribute("aria-current", "page");
+
+  await sidebar.getByTestId("section-link-expenditure").click();
+  await expect(page).toHaveURL(/\/explorer\/expenditure/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ იხარჯება საქართველოს ბიუჯეტი");
+  await expectLineChartRendered(page);
+
+  // მუნიციპალიტეტები is listed but unbuilt: a marker, never a link.
+  await expect(sidebar.getByRole("link", { name: "მუნიციპალიტეტები" })).toHaveCount(0);
+  await expect(sidebar).toContainText("მუნიციპალიტეტები");
+
+  expect(consoleProblems).toEqual([]);
+});
+
 test("ministries grouping expands nested programs by name only", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   await page.getByTestId("grouping-ministries").click();
@@ -152,7 +197,7 @@ test("ministries grouping expands nested programs by name only", async ({ page }
 });
 
 test("range strip supports chips and dragging handles", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   const strip = page.getByTestId("year-range-strip");
@@ -180,7 +225,7 @@ test("range strip supports chips and dragging handles", async ({ page }) => {
 });
 
 test("URL hash round-trips explorer state", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   await page.getByTestId("chart-mode-table").click();
@@ -188,7 +233,7 @@ test("URL hash round-trips explorer state", async ({ page }) => {
   await expect(page).toHaveURL(/#.*m=table/);
   await expect(page).toHaveURL(/sh=1/);
 
-  await page.goto("http://localhost:3100/explorer#nav=revenue&m=table&sh=1&r=2010-2020&sel=revenue.vat");
+  await page.goto("http://localhost:3100/explorer/revenue#m=table&sh=1&r=2010-2020&sel=revenue.vat");
   await page.reload();
   await expectAppReady(page);
 
@@ -210,7 +255,7 @@ test("line mode caps over-limit shared selections with a callout", async ({ page
     "spending.sport",
   ].join(",");
 
-  await page.goto(`http://localhost:3100/explorer#nav=expenditure&m=line&sel=${sel}`);
+  await page.goto(`http://localhost:3100/explorer/expenditure#m=line&sel=${sel}`);
   await page.reload();
   await expectAppReady(page);
 
@@ -222,7 +267,7 @@ test("line mode caps over-limit shared selections with a callout", async ({ page
 });
 
 test("shared ministries program links restore with the parent expanded", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   await page.getByTestId("grouping-ministries").click();
@@ -242,7 +287,7 @@ test("shared ministries program links restore with the parent expanded", async (
 });
 
 test("CSV download uses the active filtered table data", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   const downloadPromise = page.waitForEvent("download");
@@ -265,10 +310,9 @@ test("CSV download uses the active filtered table data", async ({ page }) => {
 test("analysis view renders the fixed single-year section order", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/analysis");
   await expectAppReady(page);
 
-  await page.getByTestId("nav-analysis").click();
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("ბიუჯეტის სურათი");
 
@@ -320,7 +364,7 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   const consoleProblems = collectConsoleProblems(page);
   await page.setViewportSize({ width: 390, height: 844 });
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   await expect(page.getByTestId("explorer-header")).toBeVisible();
@@ -328,7 +372,9 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   await expect(page.getByTestId("series-selector")).toBeVisible();
   await expectNoPageOverflow(page);
 
-  await page.getByTestId("nav-analysis").click();
+  await page.goto("http://localhost:3100/explorer/analysis");
+  await expectAppReady(page);
+
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await expect(page.getByTestId("every-100-grid").locator("[data-cell='gel']")).toHaveCount(100);
   await expectNoPageOverflow(page);
@@ -337,17 +383,224 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
 });
 
 test("captures editorial desktop and mobile screenshots", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
   await expectLineChartRendered(page);
   await page.screenshot({ path: "test-results/geodata-editorial-desktop.png", fullPage: true, caret: "initial" });
 
-  await page.getByTestId("nav-analysis").click();
+  await page.goto("http://localhost:3100/explorer/analysis");
+  await expectAppReady(page);
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await page.screenshot({ path: "test-results/geodata-editorial-analysis.png", fullPage: true, caret: "initial" });
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
   await page.screenshot({ path: "test-results/geodata-editorial-mobile.png", fullPage: true, caret: "initial" });
+});
+
+test("every side KPI carries a sparkline", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const kpis = page.getByTestId("side-kpi");
+  await expect(kpis).toHaveCount(3);
+
+  // One sparkline each. Path count is deliberately not asserted — a series with
+  // an interior gap legitimately draws more than one segment.
+  for (let index = 0; index < 3; index += 1) {
+    await expect(kpis.nth(index).locator("svg")).toHaveCount(1);
+  }
+});
+
+test("chart draws a dot lattice instead of horizontal gridlines", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const chart = page.getByTestId("chart-frame");
+  await expect(chart.getByTestId("chart-dot-lattice")).toBeVisible();
+
+  // Only the zero rule survives; the hairline-soft gridlines are gone.
+  const strokes = await chart.locator("svg line").evaluateAll((lines) =>
+    lines.map((line) => line.getAttribute("stroke")),
+  );
+  expect(strokes).not.toContain("#E7DECF");
+  expect(strokes).toContain("#1E1B16");
+
+  // The pattern tile is offset back by half a pitch and its circle is centred
+  // in the tile (editorial-line-chart.tsx: `x={PAD_L - lattice.colPitch / 2}`,
+  // `cx={lattice.colPitch / 2}`), so dots land exactly on the chart's own grid
+  // at (PAD_L, PAD_T) rather than merely tiling the plot rect. Dropping that
+  // offset wouldn't affect the lattice's visibility or stroke colors above,
+  // so the half-pitch relationship is asserted directly against the live DOM.
+  const geometry = await chart.locator("#chart-dot-lattice").evaluate((pattern) => {
+    const circle = pattern.querySelector("circle");
+    return {
+      patternX: Number(pattern.getAttribute("x")),
+      patternY: Number(pattern.getAttribute("y")),
+      patternWidth: Number(pattern.getAttribute("width")),
+      patternHeight: Number(pattern.getAttribute("height")),
+      circleCx: Number(circle?.getAttribute("cx")),
+      circleCy: Number(circle?.getAttribute("cy")),
+    };
+  });
+
+  const PAD_L = 74;
+  const PAD_T = 16;
+  expect(geometry.patternX + geometry.circleCx).toBeCloseTo(PAD_L, 5);
+  expect(geometry.patternY + geometry.circleCy).toBeCloseTo(PAD_T, 5);
+  expect(geometry.circleCx).toBeCloseTo(geometry.patternWidth / 2, 5);
+  expect(geometry.circleCy).toBeCloseTo(geometry.patternHeight / 2, 5);
+
+  // A single-year range gives the lattice no interval to divide, so it drops out
+  // entirely and the hairline rules have to come back — without them the axis
+  // labels sit against blank paper with nothing to read a value against.
+  await page.getByRole("button", { name: "1წ", exact: true }).click();
+  await expect(chart.getByTestId("chart-dot-lattice")).toHaveCount(0);
+
+  const singleYearStrokes = await chart.locator("svg line").evaluateAll((lines) =>
+    lines.map((line) => line.getAttribute("stroke")),
+  );
+  expect(singleYearStrokes).toContain("#E7DECF");
+});
+
+test("sidebar collapses to a rail and remembers the choice", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const sidebar = page.getByTestId("data-sidebar");
+  const toggle = page.getByTestId("sidebar-toggle");
+
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expectSidebarWidth(page, 232);
+  await expect(page.getByTestId("section-link-revenue")).toBeVisible();
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expectSidebarWidth(page, 52);
+  await expect(sidebar).toHaveAttribute("data-collapsed", "true");
+  await expect(page.getByTestId("section-link-revenue")).toHaveCount(0);
+  // The rail keeps orientation instead of the section list (spec §4.2).
+  await expect(sidebar).toContainText("მონაცემები · ბიუჯეტი");
+
+  // The toggle is not one-way: expanding must bring the sections back.
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expectSidebarWidth(page, 232);
+  await expect(page.getByTestId("section-link-revenue")).toBeVisible();
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await page.reload();
+  await expectAppReady(page);
+
+  await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
+  await expectSidebarWidth(page, 52);
+
+  expect(consoleProblems).toEqual([]);
+});
+
+test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  // Arrive carrying a collapse preference set on a desktop. It must be ignored
+  // here rather than applied as an unexplained 52px rail on a phone.
+  await page.addInitScript(() => window.localStorage.setItem("geodata:sidebar-collapsed", "1"));
+
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const toggle = page.getByTestId("sidebar-toggle");
+  const revenueLink = page.getByTestId("section-link-revenue");
+
+  // Tripwire: the sidebar used to ship on phones as a 232px ink column stacked
+  // above the content. That state overflows nothing, so the mobile-overflow test
+  // above passes in both worlds — assert the bar's shape directly.
+  const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+  const bar = await page.getByTestId("data-sidebar").boundingBox();
+  expect(bar?.width ?? 0).toBeGreaterThan(clientWidth - 2);
+  expect(bar?.width ?? 0).toBeLessThan(clientWidth + 2);
+  expect(bar?.height ?? 0).toBeLessThan(120);
+
+  // Closed sheet, and the stored preference left data-collapsed alone.
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(page.getByTestId("data-sidebar")).toHaveAttribute("data-collapsed", "false");
+  await expect(revenueLink).toBeHidden();
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(revenueLink).toBeVisible();
+  await expectNoPageOverflow(page);
+
+  // Escape closes the sheet from inside it and hands focus back to the trigger
+  // rather than dropping it on a display:none link.
+  await revenueLink.focus();
+  await page.keyboard.press("Escape");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(revenueLink).toBeHidden();
+  await expect(toggle).toBeFocused();
+
+  // Tapping a section must close the sheet too. The explorer layout persists
+  // across section routes, so nothing unmounts the panel — without a reset the
+  // user lands on the nav list they just used, the section pushed below it, and
+  // a phone has no Escape key to undo it.
+  await toggle.click();
+  await expect(revenueLink).toBeVisible();
+  await revenueLink.click();
+  await expect(page).toHaveURL(/\/explorer\/revenue/);
+  await expectAppReady(page);
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(revenueLink).toBeHidden();
+
+  expect(consoleProblems).toEqual([]);
+});
+
+test("hub lists four cards and keeps municipalities inert", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+
+  await page.goto("http://localhost:3100/explorer");
+  await expectAppReady(page);
+
+  await expect(page.getByTestId("hub-card")).toHaveCount(4);
+  // Scoped to the hub: the sidebar carries a ხარჯები link too, and an unscoped
+  // role query would trip Playwright's strict mode.
+  await expect(page.getByTestId("budget-hub").getByRole("link", { name: /ხარჯები/ })).toHaveAttribute(
+    "href",
+    "/explorer/expenditure",
+  );
+
+  const municipalities = page.getByTestId("hub-card").nth(2);
+  await expect(municipalities).toContainText("მუნიციპალიტეტები");
+  await expect(municipalities).toContainText("მალე");
+  await expect(municipalities).toHaveAttribute("aria-disabled", "true");
+  expect(await municipalities.evaluate((node) => node.tagName)).toBe("DIV");
+
+  // No invented article count or unit total anywhere on the hub.
+  await expect(page.getByTestId("budget-hub")).not.toContainText("სტატია");
+  await expect(page.getByTestId("budget-hub")).not.toContainText("64 ერთეული");
+
+  // Absence alone would pass on a hub whose footers all came back null, so also
+  // assert a real figure is there. The shape, not the figure: the number moves
+  // with every dataset update, the "<year> · <n.nn> მლრდ ₾" contract does not.
+  await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} · [\d,]+\.\d{2} მლრდ ₾/);
+
+  expect(consoleProblems).toEqual([]);
+});
+
+test("legacy nav hashes redirect to their route", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+
+  await page.goto("http://localhost:3100/explorer#nav=analysis&ay=2024");
+  await expect(page).toHaveURL(/\/explorer\/analysis/);
+  await expect(page).toHaveURL(/ay=2024/);
+  await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
+
+  await page.goto("http://localhost:3100/explorer#nav=revenue&m=table");
+  await expect(page).toHaveURL(/\/explorer\/revenue/);
+  await expect(page.getByTestId("explorer-table")).toBeVisible();
+
+  expect(consoleProblems).toEqual([]);
 });

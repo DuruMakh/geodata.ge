@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatBn, formatShare } from "../../lib/explorer/format";
 import { SwatchBar } from "../ui/editorial";
 
-// Bespoke SVG line chart per DESIGN.md §8.3: chart sits directly on paper, grid in
-// hairline-soft, ink baseline at zero, mono axis labels, hover crosshair + tooltip.
+// Bespoke SVG line chart per DESIGN.md §8.3: chart sits directly on paper, dot
+// lattice for the grid, ink baseline at zero, mono axis labels, hover crosshair + tooltip.
 
 export type ChartSeries = {
   id: string;
@@ -29,6 +30,7 @@ const PAD_L = 74;
 const PAD_R = 30;
 const PAD_T = 16;
 const PAD_B = 26;
+const DOT_R = 0.7;
 
 function niceMax(rawMax: number): number {
   const raw = rawMax * 1.12;
@@ -91,6 +93,13 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
   const labelStep = Math.max(1, Math.ceil(n / 12));
 
+  const lattice = buildDotLattice({
+    plotWidth: W - PAD_L - PAD_R,
+    plotHeight: H - PAD_T - PAD_B,
+    yearCount: n,
+    gridStepCount: Math.round(span / step),
+  });
+
   function handlePointerMove(event: React.PointerEvent<SVGSVGElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
     const px = ((event.clientX - rect.left) / rect.width) * W;
@@ -104,8 +113,14 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
   return (
     // Scroll instead of shrink on narrow screens: an unbounded w-full SVG scales
     // its text below the DESIGN.md §13 legibility floor on phones.
+    //
+    // Exception, 900–1019px: the shell's sidebar leaves the column under 720px, so
+    // the floor would put a scrollbar under a desktop-width chart. There the chart
+    // shrinks to fit instead — an approved trade of label size for a whole chart
+    // (DESIGN.md §12). Below 900px the sidebar is a top bar and the column is wide
+    // again, so phones keep the scroll.
     <div data-testid="chart-frame" className="overflow-x-auto">
-      <div className="relative min-w-[720px]">
+      <div className="relative min-w-[720px] min-[900px]:max-[1020px]:min-w-0">
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
@@ -114,9 +129,51 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
         onPointerMove={handlePointerMove}
         onPointerLeave={() => setHover(null)}
       >
+        {lattice ? (
+          <>
+            <defs>
+              <pattern
+                id="chart-dot-lattice"
+                patternUnits="userSpaceOnUse"
+                x={PAD_L - lattice.colPitch / 2}
+                y={PAD_T - lattice.rowPitch / 2}
+                width={lattice.colPitch}
+                height={lattice.rowPitch}
+              >
+                <circle cx={lattice.colPitch / 2} cy={lattice.rowPitch / 2} r={DOT_R} fill="#C9BEA9" />
+              </pattern>
+            </defs>
+            {/* Grown by one dot radius on every side: the pitch divides the plot
+                box exactly, so dots land on all four bounds, and a pattern fill
+                clips to the shape it fills — without this the border columns and
+                rows draw as half dots (quarters at the corners). */}
+            <rect
+              data-testid="chart-dot-lattice"
+              x={PAD_L - DOT_R}
+              y={PAD_T - DOT_R}
+              width={W - PAD_L - PAD_R + DOT_R * 2}
+              height={H - PAD_T - PAD_B + DOT_R * 2}
+              fill="url(#chart-dot-lattice)"
+              opacity={0.6}
+            />
+          </>
+        ) : null}
         {gridLines.map((value, index) => (
           <g key={`grid-${index}`}>
-            <line x1={PAD_L} x2={W - PAD_R} y1={y(value)} y2={y(value)} stroke={value === 0 ? "#1E1B16" : "#E7DECF"} strokeWidth={1} />
+            {/* The lattice carries the grid, so only zero keeps a drawn rule — a
+                negative domain is unreadable without it. When there is no lattice
+                (a single-year range has no interval to divide) the rules come back,
+                or the axis labels would have nothing to sit against. */}
+            {value === 0 || lattice === null ? (
+              <line
+                x1={PAD_L}
+                x2={W - PAD_R}
+                y1={y(value)}
+                y2={y(value)}
+                stroke={value === 0 ? "#1E1B16" : "#E7DECF"}
+                strokeWidth={1}
+              />
+            ) : null}
             <text x={PAD_L - 10} y={y(value) + 3} fontSize={11} fill="#6A6050" textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
               {formatAxis(value)}
             </text>

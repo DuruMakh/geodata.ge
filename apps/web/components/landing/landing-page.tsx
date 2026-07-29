@@ -14,7 +14,7 @@ const KEY_NUMBERS = [
   { label: "ეკონომიკის ზომა", value: "104.6", unit: "მლრდ ₾", caption: "ნომინალური მშპ · 2025, წინასწარი" },
 ] as const;
 
-const ANALYSIS_HREF = "/explorer#nav=analysis";
+const ANALYSIS_HREF = "/explorer/analysis";
 
 const HERO_ARIA_LABEL =
   "საქართველოს ზუსტი რუკა ცოცხალ რელიეფად: მთავარი ქალაქები მოსახლეობის ზომის კვადრატებით უშვებენ ტალღებს; კავკასიონი მუქდება სიმაღლესთან ერთად";

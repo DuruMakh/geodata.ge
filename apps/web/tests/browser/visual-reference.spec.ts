@@ -26,14 +26,11 @@ test("explorer matches the confirmed editorial v2 reference structure", async ({
   await page.waitForTimeout(1500);
   await capture(page, "editorial-v2-reference");
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/expenditure");
   await waitForApp(page);
   await capture(page, "editorial-v2-product");
 
   // Structural contract of the confirmed design.
-  await expect(page.getByTestId("nav-expenditure")).toBeVisible();
-  await expect(page.getByTestId("nav-revenue")).toBeVisible();
-  await expect(page.getByTestId("nav-analysis")).toBeVisible();
   await expect(page.getByTestId("chart-mode-line")).toBeVisible();
   await expect(page.getByTestId("chart-mode-table")).toBeVisible();
   await expect(page.getByTestId("measure-share-toggle")).toBeVisible();
@@ -60,9 +57,8 @@ test("analysis matches the single-year reference structure on mobile", async ({ 
   await page.waitForTimeout(1500);
   await capture(page, "editorial-reference-sheet-mobile");
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto("http://localhost:3100/explorer/analysis");
   await waitForApp(page);
-  await page.getByTestId("nav-analysis").click();
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await capture(page, "editorial-analysis-product-mobile");
 

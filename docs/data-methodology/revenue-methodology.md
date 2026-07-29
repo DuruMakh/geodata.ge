@@ -169,7 +169,7 @@ parseTreasuryPdfRows ──► OfficialRevenueRow[] (year, sourceCode, labelKa, 
 
 npm run data:compose-budget-facts ──► data/imports/budget-facts-2005-2025.csv (revenue + expenditure)
 npm run data:validate             ──► coverage / referential-integrity / staleness gate
-app build (app/page.tsx, app/explorer/page.tsx) reads the composed CSV
+app build (app/page.tsx, the app/explorer routes) reads the composed CSV
 ```
 
 All commands run from `apps/web`. Note one deliberate difference from the admin-spending
@@ -255,8 +255,9 @@ rejects notes containing such glyphs, so this guard is what keeps mojibake years
 `revenue-facts-2005-2025.csv` with the per-year expenditure CSVs into
 `data/imports/budget-facts-2005-2025.csv` (sorted year → side → item), which is what the app
 loads at build time (`app/page.tsx` for the landing figures, `app/explorer/page.tsx` for the
-explorer; the explorer synthesizes the "Total revenue / შემოსავლები სულ" series — there is no
-stored total row for detailed years). `npm run data:validate` (`scripts/validate-data-files.ts`)
+budget hub's card figures, and `app/explorer/{expenditure,revenue,analysis}/page.tsx` for the
+explorer itself; the explorer synthesizes the "Total revenue / შემოსავლები სულ" series — there is
+no stored total row for detailed years). `npm run data:validate` (`scripts/validate-data-files.ts`)
 is the promotion gate: revenue years must equal `REVENUE_YEARS` exactly, every fact's `item_id`
 must resolve in the taxonomy and its `source_id` in the source registry
 (`lib/data/foundationValidation.ts`), every taxonomy item needs a glossary row, and the composed

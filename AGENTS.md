@@ -113,7 +113,9 @@ Strong success criteria let you loop independently. Weak criteria like "make it 
 
 ## Current Project State
 
-GeoData.ge v1, a Georgian-first Georgia Budget Explorer, is implemented. The production UI follows the `DESIGN.md` v4.1 editorial system (single paper theme, three-tab IA: ხარჯები / შემოსავლები / ანალიზი; multi-year explorer with fields/ministries grouping; single-year analysis view; URL-hash deep links). Confirmed visual references live in `docs/Design HTML files/editorial-v2/`.
+GeoData.ge v1, a Georgian-first Georgia Budget Explorer, is implemented. The production UI follows the `DESIGN.md` v4.1 editorial system (single paper theme; multi-year explorer with fields/ministries grouping; single-year analysis view). Confirmed visual references live in `docs/Design HTML files/editorial-v2/`.
+
+The budget sits behind a platform shell (`DESIGN.md` §6.7): a dark sidebar, a hub at `/explorer`, and one route per section — `/explorer/expenditure`, `/explorer/revenue`, `/explorer/analysis`. The section is the route, not React state and not a hash key; the rest of the screen state still deep-links through the URL hash, and legacy `#nav=` links redirect once from the hub. The sidebar and hub carry `მალე` markers for datasets that do not exist yet (municipalities, plus four teaser indicators) — markers only: no data, no routes, not clickable. Design rationale for the shell: `docs/superpowers/specs/2026-07-28-explorer-shell-and-workspace-design.md`.
 
 Data rollout status as of 2026-07: revenue facts are complete for 2005-2025; expenditure facts by public spending fields are complete for 2005-2025; ministries (admin) facts are complete for 2005-2025 with major-program drill-down rows from 2012 (partial) and contiguous 2017-2025. Update this paragraph as coverage changes.
 
@@ -162,7 +164,7 @@ Required data principles:
 
 Default first view:
 
-- Expenditure nav tab.
+- Expenditure section (`/explorer/expenditure`).
 - Multi-year line chart, nominal GEL.
 - Full loaded range (currently 2005-2025), data-driven, never hardcoded.
 - Top 5 categories by latest-year value selected (derived totals are not selectable series; totals live in the table "სულ" row, deck line, and hero KPI).
@@ -179,7 +181,7 @@ Guardrails:
 - Chart labels must remain clear.
 - Color choices must be distinguishable; category colors are stable tokens (DESIGN.md §4.2).
 - Decorative effects must not reduce data comprehension.
-- No cards, container shadows, gradients, or radii above 3px (measure pill and slider handles excepted).
+- No cards, container shadows, gradients, or radii above 3px (measure pill and slider handles excepted). One card exception, approved by the user and specified in `DESIGN.md` §6.6: the budget hub's four section cards. It covers those cards only and does not license cards anywhere else.
 
 ## Workflow Rules
 

@@ -91,3 +91,53 @@ export function SourceNote({ children, testId }: SourceNoteProps) {
     </p>
   );
 }
+
+type SegmentedTabsProps<T extends string> = {
+  options: Array<{ value: T; label: string; testId?: string }>;
+  value: T;
+  onChange: (next: T) => void;
+  ariaLabel: string;
+};
+
+// Segmented control for either/or view switches (DESIGN.md §7.2a). Filters keep
+// TextTab — boxing every tab group turns the page into a control panel.
+export function SegmentedTabs<T extends string>({ options, value, onChange, ariaLabel }: SegmentedTabsProps<T>) {
+  return (
+    <span role="group" aria-label={ariaLabel} className="inline-flex items-stretch overflow-hidden rounded-[2px] border border-[var(--control)]">
+      {options.map((option, index) => {
+        const active = option.value === value;
+
+        return (
+          <button
+            key={option.value}
+            type="button"
+            data-testid={option.testId}
+            data-focus-inset=""
+            aria-pressed={active}
+            onClick={() => onChange(option.value)}
+            // `data-focus-inset` above draws the focus ring inside the button:
+            // the group clips to its rounded box, so an outward ring is cut away
+            // on three sides and the survivor lands over the neighbouring tab.
+            // Transition only the two properties that change — `transition-colors`
+            // also animates outline-color, hiding the ring for its first 150ms.
+            className={`cursor-pointer px-[13px] py-1.5 font-[family-name:var(--font-numeric)] text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
+              index > 0 ? "border-l border-[var(--control)]" : ""
+            } ${active ? "bg-[var(--ink)] text-[var(--paper)]" : "bg-transparent text-[var(--muted)] hover:bg-[var(--tint)] hover:text-[var(--ink)]"}`}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </span>
+  );
+}
+
+// Marks a dataset or section that has no data yet (DESIGN.md §6.7). Rendering a
+// coming-soon surface as if it were live is the failure this guards against.
+export function ComingSoonBadge() {
+  return (
+    <span className="flex-none rounded-[2px] border border-[#6C6860] px-1.5 py-px font-[family-name:var(--font-numeric)] text-[9px] text-[var(--ink-fg-faint)]">
+      მალე
+    </span>
+  );
+}
