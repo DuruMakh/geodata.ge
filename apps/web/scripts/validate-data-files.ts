@@ -7,6 +7,7 @@ import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
 import { buildImportReport } from "../lib/data/importReport";
 import { loadSpendingMappings } from "../lib/data/mappings";
+import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import { loadSourceDocuments } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
 import { budgetRowsToCsvRows } from "./compose-budget-facts";
@@ -32,13 +33,16 @@ function composedFactsMatchSideFiles(
 
 async function main() {
   const taxonomy = await loadTaxonomyFiles("../../data/taxonomy");
-  const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
-  const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
+  // The served datasets come from SERVED_DATA_FILES so this gate, the site and
+  // the database import all read the same four paths. The two side files below
+  // are not served — they are the compose inputs this script cross-checks.
+  const glossary = await loadGlossary(SERVED_DATA_FILES.glossary);
+  const sources = await loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments);
   const mappings = await loadSpendingMappings("../../data/mappings/spending-field-mapping.csv");
   const expenditureRows = await loadBudgetFactRows("../../data/imports/expenditure-facts-2005-2025.csv");
   const revenueRows = await loadBudgetFactRows("../../data/imports/revenue-facts-2005-2025.csv");
-  const facts = await loadBudgetFactRows("../../data/imports/budget-facts-2005-2025.csv");
-  const adminSpendingFacts = await loadAdminSpendingFacts("../../data/imports/admin-spending-facts-2005-2025.csv");
+  const facts = await loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts);
+  const adminSpendingFacts = await loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts);
   const report = buildImportReport("real-budget-2004-2025", facts);
   const missingGlossary = taxonomy.filter((item) => !glossary.has(item.id));
   const registeredSourceIds = new Set(sources.map((source) => source.sourceId));

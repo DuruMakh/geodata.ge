@@ -1,11 +1,14 @@
-import type { BudgetFactImportRow } from "./importBudgetFacts";
+import type { ServedBudgetFact } from "../servedRows";
 
-function keyFor(row: BudgetFactImportRow): string {
+function keyFor(row: ServedBudgetFact): string {
   return `${row.year}:${row.side}:${row.itemId}`;
 }
 
-export function chooseActivePublicFacts(rows: BudgetFactImportRow[]): BudgetFactImportRow[] {
-  const byKey = new Map<string, BudgetFactImportRow>();
+// Generic so the caller's element type survives the round trip: this reads only
+// year/side/itemId/basis, so it accepts the narrow served row and the wider
+// ingestion row alike and returns whichever it was given.
+export function chooseActivePublicFacts<T extends ServedBudgetFact>(rows: T[]): T[] {
+  const byKey = new Map<string, T>();
 
   for (const row of rows) {
     const key = keyFor(row);

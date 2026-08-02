@@ -1,5 +1,7 @@
+import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { readCsvRecords } from "../lib/data/csv";
 import { generateCandidateMappings } from "../lib/data/realExpenditure/candidateMapping";
 import { extractOfficialExpenditureRows } from "../lib/data/realExpenditure/extractWorkbooks";
 
@@ -16,6 +18,33 @@ function rowsToCsv(headers: string[], rows: Array<Record<string, string | number
   ].join("\n");
 }
 
+// This script generates a BLANK review template: every row it writes has an
+// empty reviewed_public_spending_field_id and review_notes. The committed
+// spending-field-mapping-review-2023-2025.csv is the filled-in result of that
+// review — 831 of its 953 rows carry a human mapping decision, 242 carry a
+// Georgian კომენტარი, and it has two reviewer columns this script does not even
+// emit. Overwriting it would destroy all of that silently, and the file feeds
+// the live generator. So refuse, and make regenerating an explicit act.
+//
+// Parsed with the shared reader rather than by hand: it handles quoted and
+// unquoted dialects, embedded newlines in the free-text review columns, and the
+// UTF-8 BOM these Georgian CSVs carry. A guard that silently reads zero
+// reviewed rows off a file it cannot parse would wave through the exact
+// overwrite it exists to prevent.
+async function assertReviewFileIsSafeToWrite(relativePath: string): Promise<void> {
+  if (!existsSync(path.resolve(process.cwd(), relativePath))) return;
+
+  const records = await readCsvRecords(relativePath);
+  const reviewed = records.filter((record) => (record.reviewed_public_spending_field_id ?? "").trim()).length;
+  if (reviewed === 0) return;
+
+  throw new Error(
+    `${path.basename(relativePath)} already holds ${reviewed} reviewed rows. This script only ` +
+      "emits a blank template, so writing would erase them. Move or delete the file " +
+      "deliberately if you really mean to restart the review.",
+  );
+}
+
 async function main() {
   const parserWarnings: string[] = [];
   const officialRows = extractOfficialExpenditureRows(parserWarnings);
@@ -25,6 +54,9 @@ async function main() {
 
   await mkdir(stagingDir, { recursive: true });
   await mkdir(reviewDir, { recursive: true });
+
+  // Checked before either write, so a refusal leaves both outputs untouched.
+  await assertReviewFileIsSafeToWrite("../../data/mappings/review/spending-field-mapping-review-2023-2025.csv");
 
   await writeFile(
     path.join(stagingDir, "expenditure-official-rows-2023-2025.csv"),

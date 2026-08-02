@@ -1,6 +1,6 @@
 import type { GlossaryEntry } from "../data/glossary";
-import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { SourceDocumentRow } from "../data/sources";
+import type { ServedBudgetFact } from "../servedRows";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { isDerivedTotalItemId } from "../explorer/explorerData";
 import { colorForItem } from "../explorer/colors";
@@ -24,7 +24,7 @@ export type LandingModel = {
 };
 
 type BuildLandingModelInput = {
-  facts: BudgetFactImportRow[];
+  facts: ServedBudgetFact[];
   glossary: Map<string, GlossaryEntry>;
   sourceDocuments: SourceDocumentRow[];
 };
@@ -92,7 +92,7 @@ export function buildLandingModel({ facts, glossary, sourceDocuments }: BuildLan
   // the active fact.
   const vatFact = revenueFacts.find((fact) => fact.year === revMax && fact.itemId === "revenue.vat");
   const socialFact = expenditureFacts.find((fact) => fact.year === expMax && fact.itemId === "spending.social_protection");
-  const csvRow = (fact: BudgetFactImportRow | undefined) =>
+  const csvRow = (fact: ServedBudgetFact | undefined) =>
     fact
       ? `${fact.year},${fact.itemId},${glossary.get(fact.itemId)?.kaLabel ?? fact.itemId},${fact.amountGel},${fact.basis},…`
       : "";

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -71,6 +71,51 @@ describe("editorial design system tokens", () => {
     // Two distinguishable tiers, not one value spelled twice.
     expect(muted).not.toBe(faint);
     expect(relativeLuminance(muted)).toBeGreaterThan(relativeLuminance(faint));
+  });
+
+  it("keeps the paper-surface faint token above the WCAG AA floor", () => {
+    const paper = token("--paper");
+    const tile = token("--tile");
+    const muted = token("--muted");
+    const faint = token("--faint");
+
+    // --faint is not decoration: it carries the page-header coverage line at
+    // 10.5px, the hub card footers at 10px and the გეგმა planned tag at 9px, all
+    // small text, so it answers to the 4.5:1 floor on both persistent
+    // paper-family surfaces (DESIGN.md §4.1). The ink pair has had this guard
+    // since v4.1; the paper surface did not, which is how faint sat at 2.42:1.
+    expect(contrastRatio(faint, paper)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(faint, tile)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(muted, paper)).toBeGreaterThanOrEqual(4.5);
+
+    // Same two-tier rule the ink pair follows: faint stays a visible step
+    // lighter than muted, so the hierarchy survives the contrast fix.
+    expect(muted).not.toBe(faint);
+    expect(relativeLuminance(faint)).toBeGreaterThan(relativeLuminance(muted));
+  });
+
+  it("keeps paper-surface foreground tokens off every ink shell surface", () => {
+    // Found by content, not by filename: the rule is about any component that
+    // paints the ink surface, so a second dark shell element must inherit the
+    // guard automatically rather than slip past a hardcoded path.
+    const shellDir = join(process.cwd(), "components", "shell");
+    const inkSurfaces = readdirSync(shellDir)
+      .filter((name) => name.endsWith(".tsx"))
+      .map((name) => ({ name, source: readFileSync(join(shellDir, name), "utf8") }))
+      .filter(({ source }) => source.includes("bg-[var(--ink)]"));
+
+    // Guards the guard: if the sidebar is renamed or restructured so nothing
+    // matches, this fails loudly instead of vacuously passing over zero files.
+    expect(inkSurfaces.map(({ name }) => name)).toContain("data-sidebar.tsx");
+
+    // Paper-surface foreground tokens are tuned against paper and go unreadable
+    // on ink once they clear AA on paper; the ink surface has its own
+    // --ink-fg-* counterparts (DESIGN.md §4.1).
+    for (const { name, source } of inkSurfaces) {
+      for (const paperToken of ["var(--faint)", "var(--muted)", "var(--body)"]) {
+        expect(`${name}: ${source.includes(paperToken)}`).toBe(`${name}: false`);
+      }
+    }
   });
 
   it("does not reintroduce superseded theme systems", () => {
