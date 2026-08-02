@@ -120,7 +120,7 @@ export function DataSidebar() {
           aria-expanded={navVisible}
           aria-label={navVisible ? "პანელის ჩაკეცვა" : "პანელის გაშლა"}
           onClick={handleToggle}
-          className="size-[26px] flex-none cursor-pointer rounded-[3px] border border-[rgba(247,242,233,0.18)] font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)] hover:text-[var(--paper)]"
+          className="size-[26px] flex-none cursor-pointer rounded-[3px] border border-[rgba(247,242,233,0.18)] font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"
         >
           {navVisible ? "«" : "»"}
         </button>
@@ -170,7 +170,7 @@ export function DataSidebar() {
             </ul>
           </nav>
           <div className="mt-auto border-t border-[rgba(247,242,233,0.12)] pt-3">
-            <Link href="/" className="text-[11.5px] font-medium text-[var(--faint)] no-underline hover:text-[var(--paper)]">
+            <Link href="/" className="text-[11.5px] font-medium text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)]">
               ← მთავარი
             </Link>
           </div>

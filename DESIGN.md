@@ -79,7 +79,7 @@ colors:
   ink: "#1E1B16"          # primary text, strong rules, total row
   body: "#55503F"         # secondary data text
   muted: "#6A6050"        # labels, captions, inactive controls (v2 darkened from #7A7060 for contrast)
-  faint: "#A89C88"        # decoration-only metadata
+  faint: "#776E5C"        # small metadata text (darkened from #A89C88 for contrast)
   ink-fg-muted: "#A69C8C" # inactive labels on the ink shell surface only
   ink-fg-faint: "#8F8676" # overlines, badges, tertiary text on the ink shell surface only
   hairline: "#D9CFBE"     # section sub-rules, aside border
@@ -99,6 +99,7 @@ Rules:
 - `tile` is reserved for tooltips, treemap tiles, and budget hub cards (§6.6).
 - The two `ink-fg-*` tokens exist only on the `ink` shell surface (§6.7); never use them on paper. **These lines are the single definition of both hex values** — §16 mirrors the paper tokens only, so a value change is one edit here plus one in `apps/web/app/globals.css`.
 - Both ink tokens clear WCAG AA on `ink`: `ink-fg-faint` measures **4.77:1** for the 8.5–9.5px text it carries (brand sub-line, `მონაცემები /` overline, rail label, `მალე` badge) and `ink-fg-muted` measures **6.34:1** for its 12–12.5px labels. They are a deliberate two-step hierarchy — an ~8.5 CIE L\* gap, so faint still reads dimmer than muted. Any future move has to keep **both** above 4.5:1 **and** that gap; raising one alone collapses the pair. (The pair was raised from `#7A7060` / `#8F8676`, where faint sat at 3.53:1.)
+- The paper pair answers to the same floor: `faint` measures **4.52:1** on `paper` and **4.83:1** on `tile`, and `muted` **5.54:1** / **5.92:1**. `faint` is the dimmest paper tier, not decoration — it carries the page-header coverage line (10.5px), hub card footers (10px) and the `გეგმა` planned tag (9px), all small text, all owed 4.5:1. `tests/explorer/themeTokens.test.ts` asserts both, mirroring the ink-pair guard. (The token was darkened from `#A89C88`, which sat at 2.42:1. The paper two-step is necessarily tighter than the ink pair's — `muted` is itself only 5.54:1, so the L\* gap is ~5.6, not 8.5. Restoring a wider step means moving `muted` down first.)
 - Focus rings: `2px solid rgba(179,64,42,0.4)`, offset 2px.
 - Selection highlight: `rgba(179,64,42,0.16)`.
 - Scrollbars: thin, `control`-colored thumb on transparent track.
@@ -587,7 +588,7 @@ The workspace's own breakpoints measure the **content column**, not the viewport
 - Never color-only meaning: swatch + label + value.
 - Respect `prefers-reduced-motion`.
 - Chart labels ≥10px mono only for axes; interactive text ≥12px; body ≥12px.
-- Contrast: `muted` (#6A6050) on paper is the minimum for meaningful text; `faint` is decoration/metadata only.
+- Contrast: every paper-surface foreground token clears WCAG AA small-text (4.5:1) on both `paper` and `tile` — `muted` and `faint` included. `faint` is the dimmest tier, not an exemption from the floor.
 
 ## 14. Motion
 
@@ -618,7 +619,7 @@ CSV metadata columns: `year, category_id, parent_item_id, level, detail_label, o
   --ink: #1E1B16;
   --body: #55503F;
   --muted: #6A6050;
-  --faint: #A89C88;
+  --faint: #776E5C;
   --hairline: #D9CFBE;
   --hairline-soft: #E7DECF;
   --row-border: #EDE4D3;
