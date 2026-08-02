@@ -696,7 +696,10 @@ describe("municipal fact loaders", () => {
       `${FUNCTION_HEADER}\n2015,04,municipal.preschool,7.9.1,1.00,actual,source.municipal_portal_archive\n`,
     );
 
-    await expect(loadMunicipalFunctionFacts(file)).rejects.toThrow();
+    // Pattern, not a bare toThrow(): a bare one passes on ANY error, including
+    // a mistyped fixture path, so it cannot prove the row was rejected by the
+    // branch the test exists to guard.
+    await expect(loadMunicipalFunctionFacts(file)).rejects.toThrow(/functional_code must be/);
   });
 
   it("rejects a negative amount", async () => {
@@ -742,7 +745,10 @@ describe("municipal fact loaders", () => {
       `${TOTAL_HEADER}\n2020,04,100.00,total_payments,100.00,60.00,20.00,15.00,5.00,80.00,20.00,20.00,true,mystery,actual,source.municipal_history_workbooks\n`,
     );
 
-    await expect(loadMunicipalTotalFacts(file)).rejects.toThrow();
+    // Must name the field. Zod's generic `/Invalid option/` enum wording is
+    // also produced by `show_warning` in this same row schema, so it cannot
+    // prove which column was rejected.
+    await expect(loadMunicipalTotalFacts(file)).rejects.toThrow(/warning_type/);
   });
 });
 ```
