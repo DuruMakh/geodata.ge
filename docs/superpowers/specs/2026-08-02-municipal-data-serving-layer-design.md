@@ -83,12 +83,28 @@ A new reviewed file, one row per municipality:
 | `name_ka` | Official long form, e.g. `ქალაქ თბილისის მუნიციპალიტეტი` |
 | `display_name_ka` | Short form for map and list, e.g. `თბილისი` |
 | `region_id` | Semantic region ID, see below |
-| `map_shape_id` | Join key into the ADM2 geometry |
 | `is_self_governing_city` | Boolean; the design renders these as dots on the map |
+
+There is deliberately no `map_shape_id`. See §4.3.
 
 `display_name_ka` is a reviewed editorial field, not a derived one. Stripping
 `ქალაქ …ის მუნიციპალიტეტი` mechanically produces wrong Georgian for several units, so each
 short form is reviewed once and stored.
+
+### Occupied territory carries data
+
+Extracting the 69 during planning turned up five municipalities administering territory
+Georgia does not control, all of which appear in the official budget series with real rows:
+`05 აჟარის`, `42 ერედვის`, `43 ქურთის`, `46 თიღვის`, `64 ახალგორის`.
+
+The design file assumes the opposite and legends occupied territory as
+`ოკუპირებული ტერიტორია — მონაცემები არ არის`. **That legend is wrong as written**, and Spec 2
+must not ship it unchanged. Nothing changes in this spec: all 69 are registered and served on
+identical terms.
+
+`05 აჟარის` also needs its region confirmed. It sits inside the Adjara sort block, but the
+Adjara autonomous republic has six municipalities (codes 06-11) and Azhara/Kodori is
+Abkhazian territory. If it is not Adjara, the region set is twelve, not eleven.
 
 ### Regions
 
@@ -105,19 +121,35 @@ A region roll-up is the sum of that region's municipal budgets. For აჭარ
 caveat must appear in the region source note; it is not optional, because the number is
 otherwise read as "what Adjara spends."
 
-### Map shape join
+### 4.3 Map shape join — deferred to Spec 2
 
-The design file's geometry carries 75 ADM2 units, of which 69 would carry data. Whatever
-geometry §10 settles on, every shape must resolve to either a municipality or an explicit
+The join is **not** in this spec. Resolving it during planning on 2026-08-02 turned up two
+blockers that make it a research task with a possible "none of these fit" outcome:
+
+- The design file's geometry cites `bumbeishvili/geojson-georgian-regions`. That repository
+  has **no license** — GitHub reports the license field as null, so it is all-rights-reserved
+  and cannot be vendored.
+- The obvious open replacement, geoBoundaries `gbOpen/GEO/ADM2`, is Public Domain (sourced
+  from Wikimedia Commons) but represents **2007** and carries **68 units**, one short of the
+  69 municipalities and predating the 2014 reform that created the self-governing cities.
+
+Neither is adoptable without review, and none of the tabular work below depends on the
+answer. The join therefore moves to the first task of Spec 2, where the geometry is actually
+consumed and a wrong join is visible on screen rather than only in a test.
+
+When it lands, the rule stands: every shape resolves to a municipality or to an explicit
 `no_data` reason — occupied territory (Abkhazia, Tskhinvali region) or non-budget unit — and
-every municipality must resolve to exactly one shape. No shape may be silently unmapped,
-mirroring the existing rule that no official row disappears silently from totals.
-
-Geometry provenance is an open item (§10).
+every municipality resolves to exactly one shape. No shape silently unmapped, mirroring the
+existing rule that no official row disappears silently from totals.
 
 ## 5. Fact files in `data/imports/`
 
-Both UTF-8 with BOM, per the Georgian-CSV rule.
+Both UTF-8 **without** BOM. The Georgian-CSV BOM rule covers files intended for direct human
+opening in Excel and explicitly keeps internal machine-CSV encoding separate. `data/imports/`
+is the machine tier and its existing files carry no BOM (verified on
+`budget-facts-2005-2025.csv` and `admin-spending-facts-2005-2025.csv`, both of which contain
+Georgian text). The human-review tier is the raw package under `docs/Raw Data/`, which
+already carries its BOM and is not modified here.
 
 **`municipal-function-facts-2015-2025.csv`** — 7,590 rows.
 Year, municipality code, `category_id`, `functional_code`, amount GEL, basis, and the
@@ -168,13 +200,13 @@ Added to `npm run data:validate`:
 - No duplicate keys; no null, non-numeric, or negative functional amounts.
 - Every municipality resolves to exactly one region; every region has at least one
   municipality.
-- Every shape in the chosen geometry resolves to a municipality or to a stated `no_data`
-  reason, and every municipality resolves to exactly one shape. Asserted against whatever
-  geometry §10 settles on, not against a hardcoded count.
+- Every municipality resolves to exactly one region; region IDs are a closed set of eleven.
+  (The map-shape join is asserted in Spec 2, per §4.3.)
 - Warning counts match the methodology exactly: 24 `source_version_difference`,
   21 `financing_outside_functional`, 1 `source_actual_missing` (Khulo 2024, non-warning).
 - For every municipality-year, the ten functions sum to `functional_sum_gel`.
-- UTF-8 BOM regression check on both output CSVs.
+- Encoding regression: both output CSVs are UTF-8 with no BOM, matching the other
+  `data/imports/` files, and round-trip Georgian text unchanged.
 
 ## 8. Population
 
@@ -212,13 +244,10 @@ with measures the data supports.
 `municipalities: { href: null }`. That stays until the UI spec ships the route; flipping it
 here would put a live link in front of a page that does not exist.
 
-## 10. Open item
+## 10. Open items
 
-Map geometry provenance. The design file's shapes cite
-`bumbeishvili/geojson-georgian-regions` ("official GE boundaries, UTM 38N", simplified to
-0.5px, projected to a 1000-wide viewBox). Before vendoring, the license and the boundary
-accuracy need checking. If either does not hold up, source the boundaries directly rather
-than ship unverified geometry. Resolve during planning, not implementation.
+None blocking. Map geometry provenance was the one open item; it was investigated on
+2026-08-02 and moved out of this spec entirely — see §4.3.
 
 ## 11. Definition of done
 
