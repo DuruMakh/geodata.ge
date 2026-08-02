@@ -32,7 +32,7 @@ Raw inputs (read-only):
 
 **Create — data (repo root):**
 - `data/taxonomy/municipal-functions.json` — 10 functions
-- `data/taxonomy/municipal-regions.json` — 11 regions
+- `data/taxonomy/municipal-regions.json` — 12 regions
 - `data/imports/municipalities.csv` — 69-row registry
 - `data/imports/municipal-function-facts-2015-2025.csv` — 7,590 rows (generated)
 - `data/imports/municipal-total-facts-2015-2025.csv` — 759 rows (generated)
@@ -119,11 +119,15 @@ describe("municipal taxonomy files", () => {
     expect(codes).toEqual(["7.1", "7.2", "7.3", "7.4", "7.5", "7.6", "7.7", "7.8", "7.9", "7.10"]);
   });
 
-  it("loads exactly eleven regions with stable ids", async () => {
+  it("loads exactly twelve regions with stable ids", async () => {
     const regions = await loadMunicipalRegionsFile(REGIONS);
-    expect(regions).toHaveLength(11);
-    expect(regions.map((region) => region.id)).toContain("region.tbilisi");
-    expect(regions.map((region) => region.id)).toContain("region.adjara");
+    const ids = regions.map((region) => region.id);
+
+    expect(regions).toHaveLength(12);
+    expect(ids).toContain("region.tbilisi");
+    expect(ids).toContain("region.adjara");
+    // Azhara (code 05) is Upper Abkhazia, not Adjara — see the file comment.
+    expect(ids).toContain("region.abkhazia");
     for (const region of regions) {
       expect(region.id).toMatch(/^region\.[a-z0-9_]+$/);
     }
@@ -226,9 +230,12 @@ export async function loadMunicipalRegionsFile(relativePath: string): Promise<Mu
 
 - [ ] **Step 6: Create the regions taxonomy file**
 
+`region.abkhazia` exists because `05 აჟარის მუნიციპალიტეტი` is Azhara / Upper Abkhazia (ზემო აფხაზეთი), a municipality of the Abkhaz autonomous republic. It sits in the Adjara sort block in the official ordering but is not an Adjara municipality; Adjara AR has exactly six (codes 06-11). Verified 2026-08-02.
+
 ```json
 [
   { "id": "region.tbilisi", "kaLabel": "თბილისი", "sortOrder": 1 },
+  { "id": "region.abkhazia", "kaLabel": "აფხაზეთი", "sortOrder": 12 },
   { "id": "region.adjara", "kaLabel": "აჭარა", "sortOrder": 2 },
   { "id": "region.guria", "kaLabel": "გურია", "sortOrder": 3 },
   { "id": "region.imereti", "kaLabel": "იმერეთი", "sortOrder": 4 },
@@ -282,7 +289,7 @@ cd "docs/Raw Data/Municipalities/combined-annual-2015-2025" && node -e "const fs
 
 **Finding that affects Spec 2 — five occupied-territory municipalities carry data.** The 69 include `05 აჟარის`, `42 ერედვის`, `43 ქურთის`, `46 თიღვის` and `64 ახალგორის` — administrations for territory Georgia does not control, which still appear in the official budget series. The design file assumes occupied territory has no data and legends it as `ოკუპირებული ტერიტორია — მონაცემები არ არის`. That legend is wrong as written. Nothing in this task changes: all 69 are registered and served. Record it for the UI spec.
 
-**One assignment needs verification, not assumption:** `05 აჟარის` sits inside the Adjara sort block, but Adjara AR has six municipalities (06-11) and Azhara/Kodori is Abkhazian territory. Step 5 assigns it `region.adjara` on the strength of its block position. Confirm against the official administrative division before committing; if it belongs to Abkhazia, a twelfth region ID is needed in `data/taxonomy/municipal-regions.json` and Task 1's eleven-region test changes with it.
+**`05 აჟარის` is Abkhazia, resolved 2026-08-02.** It sits inside the Adjara sort block, but Azhara / Upper Abkhazia (ზემო აფხაზეთი) is a municipality of the Abkhaz autonomous republic, not Adjara — Adjara AR has exactly six (codes 06-11). Step 5 assigns it `region.abkhazia`, which is why the region set is twelve. Do not "fix" it to `region.adjara` on the strength of its block position.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -415,7 +422,7 @@ No BOM. LF line endings. `display_name_ka` values below are proposed nominative 
 ```csv
 municipality_code,municipality_sort_id,name_ka,display_name_ka,region_id,is_self_governing_city
 04,12408,ქალაქ თბილისის მუნიციპალიტეტი,თბილისი,region.tbilisi,true
-05,12409,აჟარის მუნიციპალიტეტი,აჟარა,region.adjara,false
+05,12409,აჟარის მუნიციპალიტეტი,აჟარა,region.abkhazia,false
 06,12410,ქალაქ ბათუმის მუნიციპალიტეტი,ბათუმი,region.adjara,true
 07,12411,ქობულეთის მუნიციპალიტეტი,ქობულეთი,region.adjara,false
 08,12412,ხელვაჩაურის მუნიციპალიტეტი,ხელვაჩაური,region.adjara,false
@@ -485,7 +492,7 @@ municipality_code,municipality_sort_id,name_ka,display_name_ka,region_id,is_self
 72,12476,ცაგერის მუნიციპალიტეტი,ცაგერი,region.racha_lechkhumi_kvemo_svaneti,false
 ```
 
-Region counts implied by the blocks, for a quick sanity check: Tbilisi 1, Adjara 7, Kakheti 8, Imereti 12, Samegrelo-Zemo Svaneti 9, Shida Kartli 7, Kvemo Kartli 7, Guria 3, Samtskhe-Javakheti 6, Mtskheta-Mtianeti 5, Racha-Lechkhumi and Kvemo Svaneti 4 — 69 total.
+Region counts for a quick sanity check: Tbilisi 1, Abkhazia 1, Adjara 6, Kakheti 8, Imereti 12, Samegrelo-Zemo Svaneti 9, Shida Kartli 7, Kvemo Kartli 7, Guria 3, Samtskhe-Javakheti 6, Mtskheta-Mtianeti 5, Racha-Lechkhumi and Kvemo Svaneti 4 — 69 total across 12 regions.
 
 - [ ] **Step 6: Run tests to verify they pass**
 
@@ -1496,7 +1503,7 @@ describe("loadServedMunicipalData", () => {
     const data = await loadServedMunicipalData();
 
     expect(data.functions).toHaveLength(10);
-    expect(data.regions).toHaveLength(11);
+    expect(data.regions).toHaveLength(12);
     expect(data.municipalities).toHaveLength(69);
     expect(data.functionFacts).toHaveLength(7590);
     expect(data.totalFacts).toHaveLength(759);

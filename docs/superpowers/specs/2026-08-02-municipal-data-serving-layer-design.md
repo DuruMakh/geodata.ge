@@ -102,24 +102,33 @@ The design file assumes the opposite and legends occupied territory as
 must not ship it unchanged. Nothing changes in this spec: all 69 are registered and served on
 identical terms.
 
-`05 აჟარის` also needs its region confirmed. It sits inside the Adjara sort block, but the
-Adjara autonomous republic has six municipalities (codes 06-11) and Azhara/Kodori is
-Abkhazian territory. If it is not Adjara, the region set is twelve, not eleven.
+`05 აჟარის` is **Abkhazia, not Adjara** (confirmed 2026-08-02). Azhara / Upper Abkhazia
+(ზემო აფხაზეთი) is a municipality of the Abkhaz autonomous republic; it merely sits inside
+the Adjara sort block in the official ordering. Adjara AR has exactly six municipalities,
+codes 06-11. The region set is therefore **twelve**.
 
 ### Regions
 
-Eleven regions with semantic IDs (`region.tbilisi`, `region.adjara`, `region.imereti`,
-`region.kvemo_kartli`, `region.samegrelo_zemo_svaneti`, `region.shida_kartli`,
-`region.guria`, `region.kakheti`, `region.mtskheta_mtianeti`, `region.samtskhe_javakheti`,
-`region.racha_lechkhumi_kvemo_svaneti`).
+Twelve regions with semantic IDs (`region.tbilisi`, `region.abkhazia`, `region.adjara`,
+`region.imereti`, `region.kvemo_kartli`, `region.samegrelo_zemo_svaneti`,
+`region.shida_kartli`, `region.guria`, `region.kakheti`, `region.mtskheta_mtianeti`,
+`region.samtskhe_javakheti`, `region.racha_lechkhumi_kvemo_svaneti`).
+
+Municipality counts: Tbilisi 1, Abkhazia 1, Adjara 6, Kakheti 8, Imereti 12,
+Samegrelo-Zemo Svaneti 9, Shida Kartli 7, Kvemo Kartli 7, Guria 3, Samtskhe-Javakheti 6,
+Mtskheta-Mtianeti 5, Racha-Lechkhumi and Kvemo Svaneti 4 — 69 in total.
 
 No region column exists anywhere in the source data — this is genuinely new reviewed
 mapping, assigned from the official administrative division and reviewed once.
 
 A region roll-up is the sum of that region's municipal budgets. For აჭარა it therefore does
-**not** include the Adjara autonomous republic's own budget, which the package excludes. This
-caveat must appear in the region source note; it is not optional, because the number is
-otherwise read as "what Adjara spends."
+**not** include the Adjara autonomous republic's own budget, which the package excludes. The
+same holds for აფხაზეთი. This caveat must appear in the region source note; it is not
+optional, because the number is otherwise read as "what Adjara spends."
+
+`region.abkhazia` is a one-municipality region, and `region.shida_kartli` carries three
+occupied-territory units alongside four controlled ones. Neither is a modelling accident;
+both follow the official administrative division.
 
 ### 4.3 Map shape join — deferred to Spec 2
 
@@ -200,7 +209,7 @@ Added to `npm run data:validate`:
 - No duplicate keys; no null, non-numeric, or negative functional amounts.
 - Every municipality resolves to exactly one region; every region has at least one
   municipality.
-- Every municipality resolves to exactly one region; region IDs are a closed set of eleven.
+- Every municipality resolves to exactly one region; region IDs are a closed set of twelve.
   (The map-shape join is asserted in Spec 2, per §4.3.)
 - Warning counts match the methodology exactly: 24 `source_version_difference`,
   21 `financing_outside_functional`, 1 `source_actual_missing` (Khulo 2024, non-warning).
