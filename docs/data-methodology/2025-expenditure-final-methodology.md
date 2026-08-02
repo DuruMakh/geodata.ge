@@ -40,12 +40,16 @@ docs/Raw Data/Expenditure/mof.ge/2025.xlsx
 For existing earlier app years, the annual Excel files are:
 
 ```text
-docs/Raw Data/Expenditure/mof.ge/2023 12 tve saitistvis.xls
-docs/Raw Data/Expenditure/mof.ge/2024 12 თვე საიტისთვის.xlsx
-docs/Raw Data/Expenditure/mof.ge/2025.xlsx
+docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2023-fact.xlsx
+docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2024-fact.xlsx
+docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2025-fact.xlsx
 ```
 
-For future years or older years, the same rule should apply: the official annual Excel file uploaded to `docs/Raw Data/Expenditure/mof.ge/` is the raw source for program/economic rows. Generated staging CSV files are not raw sources.
+These three paths were previously the loose top-level uploads `2023 12 tve saitistvis.xls`, `2024 12 თვე საიტისთვის.xlsx` and `2025.xlsx`. Those files were reorganised into `excel-fact-files-2004-2025/`, which left `npm run data:extract-expenditure` pointing at paths that no longer existed; it now reads the per-year fact workbooks above. The repoint was verified to be data-equivalent: extraction yields 6,355 official rows with zero parser warnings and 953 candidate mappings whose `year|code` keys and `actual_gel` values match the committed review file exactly, row for row.
+
+For future years or older years, the same rule should apply: the official annual Excel file uploaded under `docs/Raw Data/Expenditure/mof.ge/` is the raw source for program/economic rows. Generated staging CSV files are not raw sources.
+
+**`npm run data:extract-expenditure` emits a blank review template, not a regeneration of the reviewed file.** Every row it writes has an empty `reviewed_public_spending_field_id` and `review_notes`, and it does not emit the `კომენტარი` / `comment` reviewer columns at all. The committed `spending-field-mapping-review-2023-2025.csv` is the *filled-in* result: 831 of its 953 rows carry a human mapping decision and 242 carry a Georgian comment, and the live generator reads it. Re-running the script over that file would erase all of it, so the script now refuses to write when the target already holds reviewed rows. Restarting the review is therefore a deliberate act: move or delete the file first.
 
 ## 3. Generated Intermediate Files
 
