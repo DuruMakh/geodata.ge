@@ -105,6 +105,6 @@ describe("municipal fact loaders", () => {
       `${TOTAL_HEADER}\n2020,04,100.00,total_payments,100.00,60.00,20.00,15.00,5.00,80.00,20.00,20.00,true,mystery,actual,source.municipal_history_workbooks\n`,
     );
 
-    await expect(loadMunicipalTotalFacts(file)).rejects.toThrow(/Invalid option/);
+    await expect(loadMunicipalTotalFacts(file)).rejects.toThrow(/warning_type/);
   });
 });
