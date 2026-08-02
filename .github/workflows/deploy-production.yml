@@ -61,6 +61,11 @@ jobs:
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: npm run data:import
+      # Fire-and-forget by design: -f proves only that Vercel accepted the
+      # trigger. The db-mode build runs after this job goes green, so a green
+      # run is NOT proof the deploy landed — see the runbook note in
+      # docs/deployment.md. Closing that gap needs a VERCEL_TOKEN secret to poll
+      # GET /v13/deployments/{id}.
       - name: Trigger Vercel production build
         env:
           VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}

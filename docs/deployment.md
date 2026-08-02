@@ -101,6 +101,19 @@ Actions):
 Every failure below leaves the live site serving its previous deploy;
 nothing here can take the site down.
 
+**A green *Deploy production* run does not mean the deploy landed.** The final
+step POSTs the deploy hook and `curl -f` only proves Vercel accepted the
+trigger; the db-mode build that re-verifies the mirror and produces the site
+runs asynchronously, after the workflow has already gone green. So a paused
+pooler at build time, a stale Vercel Production `DATABASE_URL`, or any build
+error surfaces *only* as the Vercel failed-deployment email in the table below
+— and with `main` auto-deploy off, nothing retries on its own. Confirm a
+release by checking the deployment in the Vercel dashboard, not by the green
+check in the Actions tab. (Closing this gap means polling
+`GET /v13/deployments/{id}` with the hook's returned job id until
+`READY`/`ERROR`, which needs a `VERCEL_TOKEN` secret this pipeline does not
+currently hold.)
+
 | Failure | Symptom | Response |
 | --- | --- | --- |
 | Import fails (validation, parity, connection) | *Deploy production* red + GitHub email; the mirror transaction rolled back | Fix the data (or transient cause); rerun the workflow from the Actions tab |
