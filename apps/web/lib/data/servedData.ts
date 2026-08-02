@@ -9,6 +9,8 @@ import {
   adminFactParityKey,
   assertSameServedRows,
   budgetFactParityKey,
+  municipalFunctionFactParityKey,
+  municipalTotalFactParityKey,
 } from "./servedDataParity";
 import type {
   Municipality,
@@ -224,11 +226,32 @@ async function loadServedExplorerDataUncached(): Promise<LoadedExplorerData> {
   return loadExplorerDataFromCsv();
 }
 
-// CSV-only for now: the db branch and its parity assert (loadMunicipalDataFromDb,
-// lib/db/servedDataDb.ts) land in a later task, the same way the two loaders
-// above branch on resolveServedDataSource(). Until then GEODATA_DATA_SOURCE=db
-// has no effect on this loader.
+function assertMunicipalParity(db: MunicipalData, csv: MunicipalData): void {
+  assertSameServedRows("municipal functions", csv.functions, db.functions, (row) => row.id);
+  assertSameServedRows("municipal regions", csv.regions, db.regions, (row) => row.id);
+  assertSameServedRows("municipalities", csv.municipalities, db.municipalities, (row) => row.code);
+  assertSameServedRows(
+    "municipal function facts",
+    csv.functionFacts,
+    db.functionFacts,
+    municipalFunctionFactParityKey,
+  );
+  assertSameServedRows(
+    "municipal total facts",
+    csv.totalFacts,
+    db.totalFacts,
+    municipalTotalFactParityKey,
+  );
+}
+
 async function loadServedMunicipalDataUncached(): Promise<MunicipalData> {
+  if (resolveServedDataSource() === "db") {
+    const { loadMunicipalDataFromDb } = await import("../db/servedDataDb");
+    const [db, csv] = await Promise.all([loadMunicipalDataFromDb(), loadMunicipalDataFromCsv()]);
+    assertMunicipalParity(db, csv);
+    return db;
+  }
+
   return loadMunicipalDataFromCsv();
 }
 
