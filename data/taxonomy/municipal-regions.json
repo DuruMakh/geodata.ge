@@ -1,0 +1,62 @@
+[
+  {
+    "id": "region.tbilisi",
+    "kaLabel": "თბილისი",
+    "sortOrder": 1
+  },
+  {
+    "id": "region.abkhazia",
+    "kaLabel": "აფხაზეთი",
+    "sortOrder": 12
+  },
+  {
+    "id": "region.adjara",
+    "kaLabel": "აჭარა",
+    "sortOrder": 2
+  },
+  {
+    "id": "region.guria",
+    "kaLabel": "გურია",
+    "sortOrder": 3
+  },
+  {
+    "id": "region.imereti",
+    "kaLabel": "იმერეთი",
+    "sortOrder": 4
+  },
+  {
+    "id": "region.kakheti",
+    "kaLabel": "კახეთი",
+    "sortOrder": 5
+  },
+  {
+    "id": "region.mtskheta_mtianeti",
+    "kaLabel": "მცხეთა-მთიანეთი",
+    "sortOrder": 6
+  },
+  {
+    "id": "region.racha_lechkhumi_kvemo_svaneti",
+    "kaLabel": "რაჭა-ლეჩხუმი და ქვემო სვანეთი",
+    "sortOrder": 7
+  },
+  {
+    "id": "region.samegrelo_zemo_svaneti",
+    "kaLabel": "სამეგრელო-ზემო სვანეთი",
+    "sortOrder": 8
+  },
+  {
+    "id": "region.samtskhe_javakheti",
+    "kaLabel": "სამცხე-ჯავახეთი",
+    "sortOrder": 9
+  },
+  {
+    "id": "region.kvemo_kartli",
+    "kaLabel": "ქვემო ქართლი",
+    "sortOrder": 10
+  },
+  {
+    "id": "region.shida_kartli",
+    "kaLabel": "შიდა ქართლი",
+    "sortOrder": 11
+  }
+]
