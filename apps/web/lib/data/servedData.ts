@@ -10,6 +10,22 @@ import {
   assertSameServedRows,
   budgetFactParityKey,
 } from "./servedDataParity";
+import type {
+  Municipality,
+  MunicipalFunction,
+  MunicipalFunctionFact,
+  MunicipalRegion,
+  MunicipalTotalFact,
+} from "./municipal/types";
+import { loadMunicipalitiesFile } from "./municipal/municipalitiesFile";
+import {
+  loadMunicipalFunctionFacts,
+  loadMunicipalTotalFacts,
+} from "./municipal/importMunicipalFacts";
+import {
+  loadMunicipalFunctionsFile,
+  loadMunicipalRegionsFile,
+} from "./municipal/taxonomyFiles";
 
 // The one list of files the site serves. The database import mirrors exactly
 // these files (scripts/import-budget-facts.ts imports this constant), so
@@ -20,6 +36,11 @@ export const SERVED_DATA_FILES = {
   glossary: "../../data/glossary/category-glossary.csv",
   sourceDocuments: "../../data/sources/source-documents.csv",
   adminSpendingCategories: "../../data/taxonomy/admin-spending-categories.json",
+  municipalFunctions: "../../data/taxonomy/municipal-functions.json",
+  municipalRegions: "../../data/taxonomy/municipal-regions.json",
+  municipalities: "../../data/imports/municipalities.csv",
+  municipalFunctionFacts: "../../data/imports/municipal-function-facts-2015-2025.csv",
+  municipalTotalFacts: "../../data/imports/municipal-total-facts-2015-2025.csv",
 } as const;
 
 // Single switch for where the site reads its data while pages are built.
@@ -53,6 +74,18 @@ export type LandingData = {
 export type ExplorerData = LandingData & {
   adminFacts: ServedAdminFact[];
   adminCategories: AdminSpendingCategory[];
+};
+
+// Municipal data is its own load, not part of ExplorerData: only the
+// municipalities routes read it, and folding 8,349 rows into the explorer
+// payload would make every other route pay for them on every build — and, in
+// db mode, parity-check them too.
+export type MunicipalData = {
+  functions: MunicipalFunction[];
+  regions: MunicipalRegion[];
+  municipalities: Municipality[];
+  functionFacts: MunicipalFunctionFact[];
+  totalFacts: MunicipalTotalFact[];
 };
 
 export function resolveServedDataSource(): ServedDataSource {
@@ -133,6 +166,24 @@ async function loadExplorerDataFromCsv(): Promise<LoadedExplorerData> {
   return { ...landing, adminFacts: byYearAscending(adminFacts), adminCategories };
 }
 
+async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
+  const [functions, regions, municipalities, functionFacts, totalFacts] = await Promise.all([
+    loadMunicipalFunctionsFile(SERVED_DATA_FILES.municipalFunctions),
+    loadMunicipalRegionsFile(SERVED_DATA_FILES.municipalRegions),
+    loadMunicipalitiesFile(SERVED_DATA_FILES.municipalities),
+    loadMunicipalFunctionFacts(SERVED_DATA_FILES.municipalFunctionFacts),
+    loadMunicipalTotalFacts(SERVED_DATA_FILES.municipalTotalFacts),
+  ]);
+
+  return {
+    functions,
+    regions,
+    municipalities,
+    functionFacts: byYearAscending(functionFacts),
+    totalFacts: byYearAscending(totalFacts),
+  };
+}
+
 // The database is only served after proving it still matches the reviewed
 // CSVs in this checkout, row by row. This catches a stale mirror (CSVs merged
 // without re-running `npm run data:import`), any direct database edit, and
@@ -173,6 +224,14 @@ async function loadServedExplorerDataUncached(): Promise<LoadedExplorerData> {
   return loadExplorerDataFromCsv();
 }
 
+// CSV-only for now: the db branch and its parity assert (loadMunicipalDataFromDb,
+// lib/db/servedDataDb.ts) land in a later task, the same way the two loaders
+// above branch on resolveServedDataSource(). Until then GEODATA_DATA_SOURCE=db
+// has no effect on this loader.
+async function loadServedMunicipalDataUncached(): Promise<MunicipalData> {
+  return loadMunicipalDataFromCsv();
+}
+
 // Build-time memo. Every route calls one of these, and generateMetadata calls
 // again alongside its own page, so a build made 8 separate loads — each one
 // re-parsing the CSVs, and in db mode re-running the whole row-by-row parity
@@ -196,6 +255,7 @@ async function loadServedExplorerDataUncached(): Promise<LoadedExplorerData> {
 // failure, and repeating it would only reprint the same error.
 let landingDataPromise: Promise<LandingData> | null = null;
 let explorerDataPromise: Promise<ExplorerData> | null = null;
+let municipalDataPromise: Promise<MunicipalData> | null = null;
 
 // The memo would otherwise freeze the resolved data source for the life of the
 // process, which is right for a build but wrong for a test file that switches
@@ -204,6 +264,7 @@ let explorerDataPromise: Promise<ExplorerData> | null = null;
 export function resetServedDataCacheForTests(): void {
   landingDataPromise = null;
   explorerDataPromise = null;
+  municipalDataPromise = null;
 }
 
 export function loadServedLandingData(): Promise<LandingData> {
@@ -228,4 +289,9 @@ export function loadServedExplorerData(): Promise<ExplorerData> {
   // Later landing callers in this process reuse the superset.
   landingDataPromise ??= explorerDataPromise;
   return explorerDataPromise;
+}
+
+export function loadServedMunicipalData(): Promise<MunicipalData> {
+  municipalDataPromise ??= loadServedMunicipalDataUncached();
+  return municipalDataPromise;
 }
