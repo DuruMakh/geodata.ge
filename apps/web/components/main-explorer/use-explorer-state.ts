@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { AdminSpendingFact } from "../../lib/data/adminSpending/types";
-import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
+import type { ServedAdminFact, ServedBudgetFact } from "../../lib/servedRows";
 import { getDefaultSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { MAX_CHART_SERIES, type ChartMode, type ExpenditureGrouping, type ExplorerNav, type ExplorerScope } from "../../lib/explorer/types";
 import { parseExplorerHash, scopeFor, serializeExplorerHash } from "../../lib/explorer/urlState";
 
 type UseExplorerStateInput = {
-  facts: BudgetFactImportRow[];
-  adminFacts: AdminSpendingFact[];
+  facts: ServedBudgetFact[];
+  adminFacts: ServedAdminFact[];
   nav: ExplorerNav;
 };
 

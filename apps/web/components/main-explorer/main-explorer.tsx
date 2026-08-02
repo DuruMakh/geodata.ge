@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/adminSpending/types";
+import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
-import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type { SourceDocumentRow } from "../../lib/data/sources";
+import type { ServedAdminFact, ServedBudgetFact } from "../../lib/servedRows";
 import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { buildExplorerModel, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
@@ -19,15 +19,19 @@ import { useExplorerState } from "./use-explorer-state";
 
 type MainExplorerProps = {
   nav: ExplorerNav;
-  facts: BudgetFactImportRow[];
-  adminFacts: AdminSpendingFact[];
-  adminCategories: AdminSpendingCategory[];
+  facts: ServedBudgetFact[];
+  // Optional because the ministries scope is unreachable on the revenue route:
+  // scopeFor() returns "revenue" before it consults grouping (urlState.ts), so
+  // not even a #g=ministries deep link can switch. Omitting them there keeps the
+  // whole admin corpus out of that route's RSC payload.
+  adminFacts?: ServedAdminFact[];
+  adminCategories?: AdminSpendingCategory[];
   glossaryEntries: GlossaryEntry[];
   sourceDocuments: SourceDocumentRow[];
   lastUpdatedAt: string;
 };
 
-export function MainExplorer({ nav, facts, adminFacts, adminCategories, glossaryEntries, sourceDocuments, lastUpdatedAt }: MainExplorerProps) {
+export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, sourceDocuments, lastUpdatedAt }: MainExplorerProps) {
   useEffect(() => {
     document.body.dataset.appReady = "true";
 
@@ -116,25 +120,30 @@ export function MainExplorer({ nav, facts, adminFacts, adminCategories, glossary
     return planned;
   }, [facts, analysisSide, analysisGrouping]);
 
-  const analysisModel = useMemo(
-    () =>
-      buildSingleYearSnapshotModel({
-        facts,
-        adminFacts,
-        adminCategories: adminCategoryMap,
-        grouping: analysisGrouping,
-        glossary,
-        sourceDocuments,
-        side: analysisSide,
-        year: analysisYear ?? analysisYears.at(-1) ?? 0,
-      }),
-    [facts, adminFacts, adminCategoryMap, analysisGrouping, glossary, sourceDocuments, analysisSide, analysisYear, analysisYears],
-  );
-
   const isAnalysis = nav === "analysis";
 
+  // Only the analysis route renders this, and nav is a prop fixed by the route,
+  // so the other two sections were building and discarding a full snapshot model
+  // on every mount. Null off-route; every read below narrows on the model itself.
+  const analysisModel = useMemo(
+    () =>
+      isAnalysis
+        ? buildSingleYearSnapshotModel({
+            facts,
+            adminFacts,
+            adminCategories: adminCategoryMap,
+            grouping: analysisGrouping,
+            glossary,
+            sourceDocuments,
+            side: analysisSide,
+            year: analysisYear ?? analysisYears.at(-1) ?? 0,
+          })
+        : null,
+    [isAnalysis, facts, adminFacts, adminCategoryMap, analysisGrouping, glossary, sourceDocuments, analysisSide, analysisYear, analysisYears],
+  );
+
   const deck = useMemo(() => {
-    if (isAnalysis) {
+    if (analysisModel) {
       const totals = totalsByScope[analysisSide === "revenue" ? "revenue" : analysisGrouping === "ministries" ? "ministries" : "fields"];
       const year = analysisModel.year;
       const previousTotal = totals.get(year - 1) ?? null;
@@ -158,9 +167,9 @@ export function MainExplorer({ nav, facts, adminFacts, adminCategories, glossary
       lead: latestTotal === null ? "" : `${latestYear}: ${formatAmount(latestTotal)}`,
       yoy,
     };
-  }, [isAnalysis, totalsByScope, scope, scopeYears, analysisSide, analysisGrouping, analysisModel]);
+  }, [totalsByScope, scope, scopeYears, analysisSide, analysisGrouping, analysisModel]);
 
-  const screenTitle = isAnalysis
+  const screenTitle = analysisModel
     ? `${analysisModel.year} წლის ბიუჯეტის სურათი — ${analysisSide === "expenditure" ? "სად მიდის საჯარო ფული" : "საიდან მოდის საჯარო ფული"}`
     : nav === "expenditure"
       ? "როგორ იხარჯება საქართველოს ბიუჯეტი"
@@ -223,7 +232,7 @@ export function MainExplorer({ nav, facts, adminFacts, adminCategories, glossary
           ) : null}
         </p>
 
-        {isAnalysis ? (
+        {analysisModel ? (
           <AnalysisView
             model={analysisModel}
             years={analysisYears}

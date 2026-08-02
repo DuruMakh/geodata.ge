@@ -31,15 +31,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RevenuePage() {
-  const { facts, glossary, sourceDocuments, adminFacts, adminCategories } = await loadServedExplorerData();
+  const { facts, glossary, sourceDocuments } = await loadServedExplorerData();
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
 
+  // No adminFacts/adminCategories: the ministries scope cannot be reached from
+  // this route, so shipping the admin corpus here is dead payload.
   return (
     <MainExplorer
       nav="revenue"
       facts={facts}
-      adminFacts={adminFacts}
-      adminCategories={adminCategories}
       glossaryEntries={Array.from(glossary.values())}
       sourceDocuments={sourceDocuments}
       lastUpdatedAt={lastUpdatedAt}

@@ -1,4 +1,4 @@
-import type { ExplorerData, LandingData } from "../data/servedData";
+import type { LoadedExplorerData, LoadedLandingData } from "../data/servedData";
 import {
   loadAdminCategoriesFromMirror,
   loadAdminFactsFromMirror,
@@ -12,7 +12,7 @@ import { prisma } from "./prisma";
 // the pooled connection. The row shapes and mapping live in ./mirrorRows so
 // the import can run the identical read path inside its transaction.
 
-export async function loadLandingDataFromDb(): Promise<LandingData> {
+export async function loadLandingDataFromDb(): Promise<LoadedLandingData> {
   const [facts, glossary, sourceDocuments] = await Promise.all([
     loadBudgetFactsFromMirror(prisma),
     loadGlossaryFromMirror(prisma),
@@ -22,7 +22,7 @@ export async function loadLandingDataFromDb(): Promise<LandingData> {
   return { facts, glossary, sourceDocuments };
 }
 
-export async function loadExplorerDataFromDb(): Promise<ExplorerData> {
+export async function loadExplorerDataFromDb(): Promise<LoadedExplorerData> {
   const [landing, adminFacts, adminCategories] = await Promise.all([
     loadLandingDataFromDb(),
     loadAdminFactsFromMirror(prisma),

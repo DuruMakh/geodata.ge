@@ -1,7 +1,7 @@
 ﻿import type { GlossaryEntry } from "../data/glossary";
-import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { SourceDocumentRow } from "../data/sources";
-import type { AdminSpendingCategory, AdminSpendingFact } from "../data/adminSpending/types";
+import type { ServedAdminFact, ServedBudgetFact } from "../servedRows";
+import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { colorForItem } from "./colors";
 import type {
@@ -36,8 +36,8 @@ type ModelFact = {
 };
 
 export type ExplorerModelInput = {
-  facts: BudgetFactImportRow[];
-  adminFacts?: AdminSpendingFact[];
+  facts: ServedBudgetFact[];
+  adminFacts?: ServedAdminFact[];
   adminCategories?: Map<string, AdminSpendingCategory>;
   expenditureGrouping?: ExpenditureGrouping;
   glossary: Map<string, GlossaryEntry>;
@@ -209,9 +209,9 @@ function shareForYear(row: ExplorerTableRow, totalRow: ExplorerTableRow | null, 
 // value, never the derived total (totals live in the table "სულ" row and KPIs).
 export function getDefaultSelection(
   side: ExplorerSide,
-  facts: BudgetFactImportRow[],
+  facts: ServedBudgetFact[],
   expenditureGrouping: ExpenditureGrouping = "fields",
-  adminFacts: AdminSpendingFact[] = [],
+  adminFacts: ServedAdminFact[] = [],
 ): string[] {
   const amountsByItem = new Map<string, { year: number; amountGel: number }>();
   const consider = (itemId: string, year: number, amountGel: number) => {
@@ -252,7 +252,7 @@ function compareBaselineAmountDesc(leftId: string, rightId: string, baselineAmou
   return leftId.localeCompare(rightId);
 }
 
-function publicFactForModel(fact: BudgetFactImportRow): ModelFact {
+function publicFactForModel(fact: ServedBudgetFact): ModelFact {
   return {
     year: fact.year,
     side: fact.side,
@@ -269,7 +269,7 @@ function publicFactForModel(fact: BudgetFactImportRow): ModelFact {
   };
 }
 
-function adminFactForModel(fact: AdminSpendingFact): ModelFact {
+function adminFactForModel(fact: ServedAdminFact): ModelFact {
   const label = fact.officialLabelKa ?? fact.itemId;
 
   return {
@@ -311,6 +311,25 @@ function ministryItemIds(active: ModelFact[], baselineAmounts: Map<string, numbe
       ...(programIdsByParent.get(categoryId) ?? []).sort((left, right) => compareBaselineAmountDesc(left, right, baselineAmounts)),
     ]),
   ];
+}
+
+// Largest entry strictly below `year` in an ascending, deduplicated array.
+function latestYearBelow(years: number[], year: number): number | null {
+  let low = 0;
+  let high = years.length - 1;
+  let found: number | null = null;
+
+  while (low <= high) {
+    const mid = (low + high) >> 1;
+    if (years[mid] < year) {
+      found = years[mid];
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+
+  return found;
 }
 
 export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
@@ -378,29 +397,68 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     totalByYear.set(year, fact.amountGel);
   }
 
+  // Prior-year lookups are called once per (series, year) cell. Rescanning
+  // `active` inside them made a table of S series over Y years cost S x Y x
+  // |active| element visits, and |active| itself grows with items x years — so
+  // the term was effectively cubic in dataset breadth. These indexes are built
+  // once per model and make each lookup O(log n). Note they cover ALL active
+  // years, not just the visible range: the prior year is often outside it.
+  const detailFactsForTotalsByYear = new Map<number, ModelFact[]>();
+
+  for (const fact of detailFactsForTotals) {
+    const yearFacts = detailFactsForTotalsByYear.get(fact.year);
+    if (yearFacts) yearFacts.push(fact);
+    else detailFactsForTotalsByYear.set(fact.year, [fact]);
+  }
+
+  // First fact wins per item-year, matching the .find() this replaced.
+  const activeYearsByItem = new Map<string, number[]>();
+  const activeAmountByItemYear = new Map<string, number>();
+
+  for (const fact of active) {
+    const key = `${fact.itemId}:${fact.year}`;
+    if (activeAmountByItemYear.has(key)) continue;
+    activeAmountByItemYear.set(key, fact.amountGel);
+    const itemYears = activeYearsByItem.get(fact.itemId);
+    if (itemYears) itemYears.push(fact.year);
+    else activeYearsByItem.set(fact.itemId, [fact.year]);
+  }
+
+  for (const itemYears of activeYearsByItem.values()) itemYears.sort((a, b) => a - b);
+
+  const detailActive = active.filter((fact) => !isPublicTotalFact(fact) && (!isMinistryGrouping || fact.level === "admin_category"));
+  const explicitTotalActive = new Map(active.filter(isPublicTotalFact).map((fact) => [fact.year, fact]));
+  const detailActiveSumByYear = new Map<number, number>();
+
+  for (const fact of detailActive) {
+    detailActiveSumByYear.set(fact.year, (detailActiveSumByYear.get(fact.year) ?? 0) + fact.amountGel);
+  }
+
+  const totalActiveYears = Array.from(new Set([...detailActive.map((fact) => fact.year), ...explicitTotalActive.keys()])).sort((a, b) => a - b);
+
+  // Returns a copy: the array in the index is shared across every call for the
+  // same year, and the sibling branch hands back a fresh one, so returning the
+  // live array would make the two paths differ in whether a caller may mutate
+  // the result. The filter this replaced always allocated.
   const totalFactsForYear = (year: number): ModelFact[] => {
     const explicitTotalFact = explicitTotalFactsByYear.get(year);
     if (explicitTotalFact) return [explicitTotalFact];
-    return detailFactsForTotals.filter((fact) => fact.year === year);
+    const yearFacts = detailFactsForTotalsByYear.get(year);
+    return yearFacts ? [...yearFacts] : [];
   };
 
   const previousAmount = (itemId: string, year: number): number | null => {
-    const previousYear = active
-      .filter((fact) => fact.itemId === itemId && fact.year < year)
-      .map((fact) => fact.year)
-      .sort((a, b) => b - a)[0];
-
-    if (previousYear === undefined) return null;
-    return active.find((fact) => fact.itemId === itemId && fact.year === previousYear)?.amountGel ?? null;
+    const itemYears = activeYearsByItem.get(itemId);
+    if (!itemYears) return null;
+    const previousYear = latestYearBelow(itemYears, year);
+    if (previousYear === null) return null;
+    return activeAmountByItemYear.get(`${itemId}:${previousYear}`) ?? null;
   };
 
   const totalPreviousAmount = (year: number): number | null => {
-    const detailActive = active.filter((fact) => !isPublicTotalFact(fact) && (!isMinistryGrouping || fact.level === "admin_category"));
-    const explicitTotalActive = new Map(active.filter(isPublicTotalFact).map((fact) => [fact.year, fact]));
-    const totalActive = [...detailActive, ...explicitTotalActive.values()];
-    const previousYear = Array.from(new Set(totalActive.filter((fact) => fact.year < year).map((fact) => fact.year))).sort((a, b) => b - a)[0];
-    if (previousYear === undefined) return null;
-    return explicitTotalActive.get(previousYear)?.amountGel ?? detailActive.filter((fact) => fact.year === previousYear).reduce((sum, fact) => sum + fact.amountGel, 0);
+    const previousYear = latestYearBelow(totalActiveYears, year);
+    if (previousYear === null) return null;
+    return explicitTotalActive.get(previousYear)?.amountGel ?? detailActiveSumByYear.get(previousYear) ?? 0;
   };
 
   const pointFor = (item: ExplorerItem, year: number): ExplorerPoint | null => {

@@ -1,10 +1,10 @@
-import type { BudgetFactImportRow } from "../data/importBudgetFacts";
+import type { ServedBudgetFact } from "../servedRows";
 
 // The loaded range is data-driven everywhere it is stated, including in route
 // metadata (AGENTS.md, "UX and Visual Guardrails"). Returns null when a side has
 // no served facts, so callers can drop the clause rather than print a guess.
 export function firstServedYear(
-  facts: BudgetFactImportRow[],
+  facts: ServedBudgetFact[],
   side: "expenditure" | "revenue",
 ): number | null {
   let earliest: number | null = null;

@@ -1,8 +1,8 @@
 import { chooseActivePublicFacts } from "../data/activeFacts";
-import type { AdminSpendingCategory, AdminSpendingFact } from "../data/adminSpending/types";
+import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import type { GlossaryEntry } from "../data/glossary";
-import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { SourceDocumentRow } from "../data/sources";
+import type { ServedAdminFact, ServedBudgetFact } from "../servedRows";
 import { colorForItem, OTHER_COLOR } from "./colors";
 import { formatAmountParts, formatShare, MISSING } from "./format";
 import type {
@@ -16,8 +16,8 @@ import type {
 } from "./types";
 
 export type SingleYearSnapshotInput = {
-  facts: BudgetFactImportRow[];
-  adminFacts?: AdminSpendingFact[];
+  facts: ServedBudgetFact[];
+  adminFacts?: ServedAdminFact[];
   adminCategories?: Map<string, AdminSpendingCategory>;
   grouping?: ExpenditureGrouping;
   glossary: Map<string, GlossaryEntry>;

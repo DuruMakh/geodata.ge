@@ -1,4 +1,4 @@
-import type { BudgetFactImportRow } from "../data/importBudgetFacts";
+import type { ServedBudgetFact } from "../servedRows";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { isDerivedTotalItemId } from "./explorerData";
 import { formatAmount } from "./format";
@@ -23,7 +23,7 @@ export type HubCardModel = {
 // explicit `<side>.total` row win for its year when the source carries one, the
 // way singleYear.ts and explorerData.ts already do. Adding such a row to the sum
 // instead of overriding with it would report the budget at several times its size.
-function totalsByYear(facts: BudgetFactImportRow[], side: "expenditure" | "revenue"): Map<number, number> {
+function totalsByYear(facts: ServedBudgetFact[], side: "expenditure" | "revenue"): Map<number, number> {
   const totals = new Map<number, number>();
   const explicitTotals = new Map<number, number>();
 
@@ -43,7 +43,7 @@ function totalsByYear(facts: BudgetFactImportRow[], side: "expenditure" | "reven
   return totals;
 }
 
-function categoryCount(facts: BudgetFactImportRow[], side: "expenditure" | "revenue", year: number): number {
+function categoryCount(facts: ServedBudgetFact[], side: "expenditure" | "revenue", year: number): number {
   const ids = new Set<string>();
   for (const fact of chooseActivePublicFacts(facts)) {
     if (fact.side !== side || fact.year !== year) continue;
@@ -53,7 +53,7 @@ function categoryCount(facts: BudgetFactImportRow[], side: "expenditure" | "reve
   return ids.size;
 }
 
-export function buildHubCards(facts: BudgetFactImportRow[]): HubCardModel[] {
+export function buildHubCards(facts: ServedBudgetFact[]): HubCardModel[] {
   const expenditure = totalsByYear(facts, "expenditure");
   const revenue = totalsByYear(facts, "revenue");
 
