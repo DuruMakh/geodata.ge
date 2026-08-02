@@ -14,3 +14,12 @@ export type MunicipalRegion = {
   kaLabel: string;
   sortOrder: number;
 };
+
+export type Municipality = {
+  code: string;
+  sortId: number;
+  nameKa: string;
+  displayNameKa: string;
+  regionId: string;
+  isSelfGoverningCity: boolean;
+};

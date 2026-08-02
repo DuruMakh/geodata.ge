@@ -1,0 +1,70 @@
+municipality_code,municipality_sort_id,name_ka,display_name_ka,region_id,is_self_governing_city
+04,12408,ქალაქ თბილისის მუნიციპალიტეტი,თბილისი,region.tbilisi,true
+05,12409,აჟარის მუნიციპალიტეტი,აჟარა,region.abkhazia,false
+06,12410,ქალაქ ბათუმის მუნიციპალიტეტი,ბათუმი,region.adjara,true
+07,12411,ქობულეთის მუნიციპალიტეტი,ქობულეთი,region.adjara,false
+08,12412,ხელვაჩაურის მუნიციპალიტეტი,ხელვაჩაური,region.adjara,false
+09,12413,ქედის მუნიციპალიტეტი,ქედა,region.adjara,false
+10,12414,შუახევის მუნიციპალიტეტი,შუახევი,region.adjara,false
+11,12415,ხულოს მუნიციპალიტეტი,ხულო,region.adjara,false
+12,12416,ახმეტის მუნიციპალიტეტი,ახმეტა,region.kakheti,false
+13,12417,გურჯაანის მუნიციპალიტეტი,გურჯაანი,region.kakheti,false
+14,12418,დედოფლისწყაროს მუნიციპალიტეტი,დედოფლისწყარო,region.kakheti,false
+15,12419,თელავის მუნიციპალიტეტი,თელავი,region.kakheti,false
+16,12420,ლაგოდეხის მუნიციპალიტეტი,ლაგოდეხი,region.kakheti,false
+17,12421,საგარეჯოს მუნიციპალიტეტი,საგარეჯო,region.kakheti,false
+18,12422,სიღნაღის მუნიციპალიტეტი,სიღნაღი,region.kakheti,false
+19,12423,ყვარელის მუნიციპალიტეტი,ყვარელი,region.kakheti,false
+20,12424,ქალაქ ქუთაისის მუნიციპალიტეტი,ქუთაისი,region.imereti,true
+21,12425,ჭიათურის მუნიციპალიტეტი,ჭიათურა,region.imereti,false
+22,12426,ტყიბულის მუნიციპალიტეტი,ტყიბული,region.imereti,false
+23,12427,წყალტუბოს მუნიციპალიტეტი,წყალტუბო,region.imereti,false
+24,12428,ბაღდათის მუნიციპალიტეტი,ბაღდათი,region.imereti,false
+25,12429,ვანის მუნიციპალიტეტი,ვანი,region.imereti,false
+26,12430,ზესტაფონის მუნიციპალიტეტი,ზესტაფონი,region.imereti,false
+27,12431,თერჯოლის მუნიციპალიტეტი,თერჯოლა,region.imereti,false
+28,12432,სამტრედიის მუნიციპალიტეტი,სამტრედია,region.imereti,false
+29,12433,საჩხერის მუნიციპალიტეტი,საჩხერე,region.imereti,false
+30,12434,ხარაგაულის მუნიციპალიტეტი,ხარაგაული,region.imereti,false
+31,12435,ხონის მუნიციპალიტეტი,ხონი,region.imereti,false
+32,12436,ქალაქ ფოთის მუნიციპალიტეტი,ფოთი,region.samegrelo_zemo_svaneti,true
+33,12437,ზუგდიდის მუნიციპალიტეტი,ზუგდიდი,region.samegrelo_zemo_svaneti,false
+34,12438,აბაშის მუნიციპალიტეტი,აბაშა,region.samegrelo_zemo_svaneti,false
+35,12439,მარტვილის მუნიციპალიტეტი,მარტვილი,region.samegrelo_zemo_svaneti,false
+36,12440,მესტიის მუნიციპალიტეტი,მესტია,region.samegrelo_zemo_svaneti,false
+37,12441,სენაკის მუნიციპალიტეტი,სენაკი,region.samegrelo_zemo_svaneti,false
+38,12442,ჩხოროწყუს მუნიციპალიტეტი,ჩხოროწყუ,region.samegrelo_zemo_svaneti,false
+39,12443,წალენჯიხის მუნიციპალიტეტი,წალენჯიხა,region.samegrelo_zemo_svaneti,false
+40,12444,ხობის მუნიციპალიტეტი,ხობი,region.samegrelo_zemo_svaneti,false
+41,12445,გორის მუნიციპალიტეტი,გორი,region.shida_kartli,false
+42,12446,ერედვის მუნიციპალიტეტი,ერედვი,region.shida_kartli,false
+43,12447,ქურთის მუნიციპალიტეტი,ქურთა,region.shida_kartli,false
+44,12448,ქარელის მუნიციპალიტეტი,ქარელი,region.shida_kartli,false
+45,12449,კასპის მუნიციპალიტეტი,კასპი,region.shida_kartli,false
+46,12450,თიღვის მუნიციპალიტეტი,თიღვა,region.shida_kartli,false
+47,12451,ხაშურის მუნიციპალიტეტი,ხაშური,region.shida_kartli,false
+48,12452,ქალაქ რუსთავის მუნიციპალიტეტი,რუსთავი,region.kvemo_kartli,true
+49,12453,ბოლნისის მუნიციპალიტეტი,ბოლნისი,region.kvemo_kartli,false
+50,12454,გარდაბნის მუნიციპალიტეტი,გარდაბანი,region.kvemo_kartli,false
+51,12455,დმანისის მუნიციპალიტეტი,დმანისი,region.kvemo_kartli,false
+52,12456,თეთრიწყაროს მუნიციპალიტეტი,თეთრიწყარო,region.kvemo_kartli,false
+53,12457,მარნეულის მუნიციპალიტეტი,მარნეული,region.kvemo_kartli,false
+54,12458,წალკის მუნიციპალიტეტი,წალკა,region.kvemo_kartli,false
+55,12459,ლანჩხუთის მუნიციპალიტეტი,ლანჩხუთი,region.guria,false
+56,12460,ოზურგეთის მუნიციპალიტეტი,ოზურგეთი,region.guria,false
+57,12461,ჩოხატაურის მუნიციპალიტეტი,ჩოხატაური,region.guria,false
+58,12462,ბორჯომის მუნიციპალიტეტი,ბორჯომი,region.samtskhe_javakheti,false
+59,12463,ადიგენის მუნიციპალიტეტი,ადიგენი,region.samtskhe_javakheti,false
+60,12464,ასპინძის მუნიციპალიტეტი,ასპინძა,region.samtskhe_javakheti,false
+61,12465,ახალქალაქის მუნიციპალიტეტი,ახალქალაქი,region.samtskhe_javakheti,false
+62,12466,ახალციხის მუნიციპალიტეტი,ახალციხე,region.samtskhe_javakheti,false
+63,12467,ნინოწმინდის მუნიციპალიტეტი,ნინოწმინდა,region.samtskhe_javakheti,false
+64,12468,ახალგორის მუნიციპალიტეტი,ახალგორი,region.mtskheta_mtianeti,false
+65,12469,დუშეთის მუნიციპალიტეტი,დუშეთი,region.mtskheta_mtianeti,false
+66,12470,თიანეთის მუნიციპალიტეტი,თიანეთი,region.mtskheta_mtianeti,false
+67,12471,მცხეთის მუნიციპალიტეტი,მცხეთა,region.mtskheta_mtianeti,false
+68,12472,ყაზბეგის მუნიციპალიტეტი,ყაზბეგი,region.mtskheta_mtianeti,false
+69,12473,ამბროლაურის მუნიციპალიტეტი,ამბროლაური,region.racha_lechkhumi_kvemo_svaneti,false
+70,12474,ლენტეხის მუნიციპალიტეტი,ლენტეხი,region.racha_lechkhumi_kvemo_svaneti,false
+71,12475,ონის მუნიციპალიტეტი,ონი,region.racha_lechkhumi_kvemo_svaneti,false
+72,12476,ცაგერის მუნიციპალიტეტი,ცაგერი,region.racha_lechkhumi_kvemo_svaneti,false
