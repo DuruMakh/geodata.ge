@@ -40,9 +40,13 @@ point, not a separate sign-off. The operation is safe by construction — one
 transaction, parity verified before commit, rollback on any mismatch — and
 production keeps serving the previous build if the workflow goes red. Until
 that deploy runs, municipal data serves only from the CSVs
-(`GEODATA_DATA_SOURCE=csv`, the default), and a `GEODATA_DATA_SOURCE=db` build
-would fail on the missing tables. See
-`docs/data-methodology/municipal-functional-annual-2015-2025.md`.
+(`GEODATA_DATA_SOURCE=csv`, the default). A `GEODATA_DATA_SOURCE=db` build does
+**not** fail on the missing tables, because it never queries them: no route
+under `app/`, `components/`, or `lib/` calls `loadServedMunicipalData` yet (its
+only caller is a test file), so a db-mode build succeeds whether or not the
+migration has been applied. Until a route reads it, the in-transaction check
+inside `npm run data:import` is the **sole** parity gate for the municipal
+tables. See `docs/data-methodology/municipal-functional-annual-2015-2025.md`.
 
 The import reuses the same validated loaders the site uses, then cross-checks
 referential integrity (fact item IDs against taxonomy, source IDs against
@@ -158,8 +162,13 @@ From `apps/web`, with `.env` configured:
   data or the schema, re-run. The previous database state (and the live site)
   are unaffected.
 - Mirror out of date or edited (CSVs changed without re-running the import,
-  or a direct database edit) → the next db-mode build fails its row-level
-  verification with a message pointing at `npm run data:import`.
+  or a direct database edit) → for budget and admin-spending data, the next
+  db-mode build fails its row-level verification with a message pointing at
+  `npm run data:import`. Municipal data is the exception:
+  `assertMunicipalParity` is reachable only from `loadServedMunicipalData`,
+  which no route calls yet, so a db-mode build never runs it —
+  `npm run data:import`'s in-transaction check is the only parity gate for
+  the municipal tables until a route reads them.
 - Database unreachable at build time → the build fails loudly; either resume
   the Supabase project and rebuild, or build with `GEODATA_DATA_SOURCE=csv`.
 - Database empty (import never run) → the db-mode build fails with a clear
