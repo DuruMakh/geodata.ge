@@ -85,10 +85,11 @@ behind (the previous run's report is removed at start), so a present
    Never commit `.env`.
 3. From `apps/web`: `npm run prisma:deploy` — applies the committed migrations
    over the direct connection (Prisma 7 CLI reads `DIRECT_URL` via
-   `prisma.config.ts`). Always use `prisma:deploy` against the live database;
-   `prisma:migrate` (`prisma migrate dev`) is a development command for
-   authoring new migrations and may offer to RESET a database whose state
-   drifts from the migration history.
+   `prisma.config.ts`). Always use `prisma:deploy` against the live database.
+   Never point `prisma:migrate` (`prisma migrate dev`) at it: it is an
+   authoring command that may offer to RESET a database whose state drifts
+   from the migration history — and on this project it does not work at all
+   (P3006; see "Creating a migration" below).
 4. From `apps/web`: `npm run data:import` — loads everything and prints the
    parity report.
 5. Hardening ships as migrations (applied automatically by step 3): row level
@@ -134,14 +135,17 @@ ever delay a rebuild, never take the site down.
 1. Land the reviewed CSVs as usual (extraction → staging → review →
    promotion into `data/imports/`, with the matching methodology doc).
 2. If the data introduced new columns or datasets, reconcile
-   `apps/web/prisma/schema.prisma` and author the migration in development
-   (`npm run prisma:migrate`); commit it with the data change.
+   `apps/web/prisma/schema.prisma` and author the migration; commit it with
+   the data change. **Do not use `npm run prisma:migrate`** — `prisma migrate
+   dev` fails on this project with P3006. See "Creating a migration" below
+   for why and for the read-only command to use instead.
 3. Merge to `main`. Nothing else is manual: after CI passes,
    `.github/workflows/deploy-production.yml` applies any new migrations
    (`npm run prisma:deploy`), re-runs `npm run data:import` (every
    production deploy converges the mirror to the checkout,
    unconditionally), and triggers the Vercel production build, which
-   re-verifies the mirror row-by-row. The parity report is in the workflow
+   re-verifies the mirror row-by-row for every table a route reads — see the
+   three tiers under "Failure modes". The parity report is in the workflow
    log.
 
 ### Manual fallback (Actions outage or local work)
@@ -162,13 +166,27 @@ From `apps/web`, with `.env` configured:
   data or the schema, re-run. The previous database state (and the live site)
   are unaffected.
 - Mirror out of date or edited (CSVs changed without re-running the import,
-  or a direct database edit) → for budget and admin-spending data, the next
-  db-mode build fails its row-level verification with a message pointing at
-  `npm run data:import`. Municipal data is the exception:
-  `assertMunicipalParity` is reachable only from `loadServedMunicipalData`,
-  which no route calls yet, so a db-mode build never runs it —
-  `npm run data:import`'s in-transaction check is the only parity gate for
-  the municipal tables until a route reads them.
+  or a direct database edit) → the next db-mode build fails its row-level
+  verification with a message pointing at `npm run data:import` — but only
+  for the tables a route actually reads. Three tiers, and the tier is decided
+  by whether a page loads the data, not by how important the table looks:
+  - **`BudgetFact`, `BudgetItem`, `SourceDocument`, `AdminSpendingFact`,
+    `AdminSpendingCategory`** — read by `loadServedLandingData` /
+    `loadServedExplorerData`, which every route calls. Verified field by field
+    at import *and* on every db-mode build. This is the tier the sentence
+    above describes.
+  - **The five municipal tables** — verified field by field at import, but
+    `assertMunicipalParity` is reachable only from `loadServedMunicipalData`,
+    which no route calls yet, so a db-mode build never runs it. Until a route
+    reads them, the import's in-transaction check is their only gate.
+  - **`BudgetMapping`** — the weakest tier, and it predates the municipal
+    work. No reader anywhere under `app/`, `components/` or `lib/`, and the
+    import checks only its **row count** (`tx.budgetMapping.count()`), never
+    its field values. A corrupted mapping row would pass both the import and
+    every build. Low impact today — it is an audit table, and served
+    `BudgetFact` rows already carry their resolved `publicSpendingFieldId`
+    from the CSV pipeline, so nothing a visitor sees depends on it — but do
+    not read the first tier as covering it.
 - Database unreachable at build time → the build fails loudly; either resume
   the Supabase project and rebuild, or build with `GEODATA_DATA_SOURCE=csv`.
 - Database empty (import never run) → the db-mode build fails with a clear
