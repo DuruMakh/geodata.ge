@@ -88,6 +88,9 @@ CREATE UNIQUE INDEX "MunicipalFunctionFact_year_municipalityCode_categoryId_key"
 CREATE INDEX "MunicipalTotalFact_year_idx" ON "MunicipalTotalFact"("year");
 
 -- CreateIndex
+CREATE INDEX "MunicipalTotalFact_municipalityCode_idx" ON "MunicipalTotalFact"("municipalityCode");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "MunicipalTotalFact_year_municipalityCode_key" ON "MunicipalTotalFact"("year", "municipalityCode");
 
 -- AddForeignKey

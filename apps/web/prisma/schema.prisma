@@ -249,4 +249,5 @@ model MunicipalTotalFact {
 
   @@unique([year, municipalityCode])
   @@index([year])
+  @@index([municipalityCode])
 }
