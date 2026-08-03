@@ -43,8 +43,9 @@ function composedFactsMatchSideFiles(
 async function main() {
   const taxonomy = await loadTaxonomyFiles("../../data/taxonomy");
   // The served datasets come from SERVED_DATA_FILES so this gate, the site and
-  // the database import all read the same four paths. The two side files below
-  // are not served — they are the compose inputs this script cross-checks.
+  // the database import all read the same served-data paths. The two side
+  // files below are not served — they are the compose inputs this script
+  // cross-checks.
   const glossary = await loadGlossary(SERVED_DATA_FILES.glossary);
   const sources = await loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments);
   const mappings = await loadSpendingMappings("../../data/mappings/spending-field-mapping.csv");
