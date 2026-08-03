@@ -110,34 +110,61 @@ permission — and publishing a website hands the coordinates to every visitor's
 browser, which is redistribution regardless of the site being free.
 
 The first task of the implementation replaces those 12 rings with
-**geoBoundaries `gbOpen/GEO/ADM1`**, which is Public Domain and is already the
-source of the ADM0 outline in the same file. Georgia's twelve top-level regions
-are stable, so unlike the ADM2 problem Spec 1 hit there is no unit mismatch and
-no reform-era reconciliation. The swap is a data change behind one module with
-no UI consequence, and it clears the landing hero's exposure at the same time.
+**geoBoundaries `gbOpen/GEO/ADM1`**, verified against the geoBoundaries API on
+2026-08-03:
+
+| Field | Value |
+|---|---|
+| `boundaryLicense` | **Creative Commons Attribution 3.0** |
+| `licenseSource` | `commons.wikimedia.org/wiki/File` |
+| `boundaryYearRepresented` | 2015 |
+| `admUnitCount` | 12 |
+| Release pin | `9469f09` |
+
+**It is CC BY 3.0, not Public Domain.** CC BY explicitly permits redistribution,
+including commercially, which is exactly the term GADM withholds — so the swap
+solves the problem — but it *requires attribution*. Attribution is therefore part
+of this task, not an optional nicety:
+
+- The index map's source note names geoBoundaries and the licence.
+- `georgiaGeo.ts`'s header comment records source, licence and release pin.
+- The same attribution covers the **ADM0 outline already in that file**, which
+  is from the same source and is likewise unattributed today.
+
+`boundaryYearRepresented: 2015` is after the 2014 reform, and `admUnitCount: 12`
+matches Georgia's twelve top-level regions exactly — so unlike the ADM2 problem
+Spec 1 hit there is no unit mismatch and no reform-era reconciliation.
 
 The `GeoRegion` type, the `regions` array shape, and every consumer stay as they
 are. Only the ring coordinates and the file's provenance comment change.
 
+All 12 features are simple `Polygon`s with one ring each, totalling 3,720 points.
+Douglas-Peucker at tolerance **0.006°** reduces this to 1,194 points (~15 KB of
+path data, about 1.25px of error at 1400px render width), which is the budget
+this spec assumes.
+
 ### 4.2 The join
 
-Twelve ADM1 shapes, eleven served regions. The join is a hand-written map from
-the geometry's `en` name to the semantic region id, reviewed once:
+Twelve ADM1 shapes, eleven served regions. The join is keyed on **`shapeISO`**,
+not `shapeName`. This is not a style preference: geoBoundaries spells
+`Samtskhe–Javakheti` with an **en dash** (U+2013) and calls the seventh region
+`Racha-Lechkhumi and Kvemo Svaneti`, neither of which matches the strings in
+`georgiaGeo.ts`. A name join would fail silently on exactly those two.
 
-| Shape (`en`) | Resolves to |
-|---|---|
-| Tbilisi | `region.tbilisi` |
-| Adjara | `region.adjara` |
-| Guria | `region.guria` |
-| Imereti | `region.imereti` |
-| Kakheti | `region.kakheti` |
-| Kvemo Kartli | `region.kvemo_kartli` |
-| Mtskheta-Mtianeti | `region.mtskheta_mtianeti` |
-| Racha-Lechkhumi | `region.racha_lechkhumi_kvemo_svaneti` |
-| Samegrelo-Zemo Svaneti | `region.samegrelo_zemo_svaneti` |
-| Samtskhe-Javakheti | `region.samtskhe_javakheti` |
-| Shida Kartli | `region.shida_kartli` |
-| Abkhazia | `no_data: occupied_territory` |
+| `shapeISO` | `shapeName` | Resolves to |
+|---|---|---|
+| `GE-TB` | Tbilisi | `region.tbilisi` |
+| `GE-AJ` | Adjara | `region.adjara` |
+| `GE-GU` | Guria | `region.guria` |
+| `GE-IM` | Imereti | `region.imereti` |
+| `GE-KA` | Kakheti | `region.kakheti` |
+| `GE-MM` | Mtskheta-Mtianeti | `region.mtskheta_mtianeti` |
+| `GE-RL` | Racha-Lechkhumi and Kvemo Svaneti | `region.racha_lechkhumi_kvemo_svaneti` |
+| `GE-SZ` | Samegrelo-Zemo Svaneti | `region.samegrelo_zemo_svaneti` |
+| `GE-SJ` | Samtskhe–Javakheti | `region.samtskhe_javakheti` |
+| `GE-KK` | Kvemo Kartli | `region.kvemo_kartli` |
+| `GE-SK` | Shida Kartli | `region.shida_kartli` |
+| `GE-AB` | Abkhazia | `no_data: occupied_territory` |
 
 This satisfies Spec 1 §4.3's rule at region grain, and §7 asserts it in both
 directions: every shape resolves to a region or to a stated no-data reason, and
@@ -191,6 +218,9 @@ one-line readout at the right of the legend row, which reads
 The map header reads `რეგიონები რუკაზე · 2025`, not the design file's
 `ყველა მუნიციპალიტეტი რუკაზე` — the map is regions, and the header must not
 promise a grain it does not have.
+
+Beneath the map, the geometry attribution required by §4.1:
+`საზღვრები: geoBoundaries (gbOpen GEO ADM1), CC BY 3.0.`
 
 ### 5.2 List
 
@@ -407,10 +437,53 @@ share}`), `RangeStrip` (`{years, range, onChange}`), `Sparkline`, and the
 editorial primitives `Callout`, `SegmentedTabs`, `TextTab`, `SourceNote`,
 `Overline`, `SectionTitle`, `SwatchBar`.
 
-**One decoupling change:** `ExplorerTable` currently takes `scope: ExplorerScope`
-and uses it in exactly one place, to look up a column header from a three-entry
-record. It becomes `firstColumnLabel: string`, with the lookup moved to its one
-caller (`explorer-view.tsx`). This removes a coupling rather than adding one.
+**Two decoupling changes**, both removing a coupling rather than adding one:
+
+1. `ExplorerTable` takes `scope: ExplorerScope` and uses it in exactly one place,
+   to look up a column header from a three-entry record. It becomes
+   `firstColumnLabel: string`, with the lookup moved to its one caller
+   (`explorer-view.tsx`).
+
+2. **The value unit must become a parameter.** `formatBn` renders billions with
+   two fixed decimals, and both `ExplorerTable` (cell values, total row) and
+   `EditorialLineChart` (axis unit string, tooltip values) hardcode it. At
+   municipal magnitudes that is unusable: ლენტეხი's 16.9M total renders as
+   `0.02` and every one of its ten functions renders as `0.00`. The chart's axis
+   *decimal count* already adapts (`decimalsFor`), but its divisor and the
+   literal `მლრდ` label do not.
+
+   `format.ts` gains a `ValueUnit = { divisor, label, decimals }` with exported
+   `UNIT_BN` (1e9, `მლრდ`, 2) and `UNIT_MLN` (1e6, `მლნ`, 1), plus
+   `formatInUnit(value, unit)`. Both components take a `unit: ValueUnit` prop;
+   the existing budget callers pass `UNIT_BN`, preserving current output exactly,
+   and the municipal explorer passes `UNIT_MLN`.
+
+**One signature change:** `buildHubCards(facts)` gains a second parameter for the
+municipal total series, because hub card 03 stops being blank (§3.1) and its
+sparkline and footer must be derived from served facts like cards 01 and 02.
+
+### 9.3 Category colours
+
+`lib/explorer/colors.ts` has no `municipal.*` entries, so `colorForItem` would
+fall back to positional palette cycling — which contradicts DESIGN.md §4.2's rule
+that category colours are stable tokens. Ten tokens are added, reusing the
+existing semantic colours so a concept keeps its colour across the whole site:
+
+| Function | Token | Shared with |
+|---|---|---|
+| `municipal.social_protection` | `#B3402A` | `spending.social_protection` |
+| `municipal.health` | `#1F6E56` | `spending.health` |
+| `municipal.education` | `#3D5A98` | `spending.education` |
+| `municipal.housing_communal` | `#B08A2E` | `spending.infrastructure_regional_development` |
+| `municipal.defence` | `#7A4E8C` | `spending.defence` |
+| `municipal.public_order_safety` | `#4A707A` | `spending.public_order_safety` |
+| `municipal.economic_affairs` | `#C26E4C` | `spending.economic_affairs` |
+| `municipal.environment` | `#2F4B3A` | `spending.agriculture_environment` |
+| `municipal.recreation_culture` | `#9C3D5E` | `spending.culture` |
+| `municipal.general_public_services` | `#5B5347` | `spending.general_public_services` |
+
+All ten values are distinct, so no two functions collide on a chart. DESIGN.md
+§4.2 gains the same table.
 
 **Not reused:** `buildExplorerModel`, `useExplorerState` and the budget hash
 functions. They are built around sides, groupings and a national item×year grain;
@@ -471,6 +544,9 @@ New `municipalData.test.ts` and `municipalGeo.test.ts`:
   no callout; one including them names the right years.
 - Default selection is top 5 by latest year and contains no derived total.
 - The Georgian ordinal helper, including the `პირველი` case.
+- `formatInUnit` in both units, and a regression asserting `UNIT_BN` output is
+  byte-identical to the current `formatBn` for the existing budget callers.
+- All ten `municipal.*` colour tokens resolve, and no two are equal.
 - Hash round-trip for `lvl` and the reused keys; unknown values fall back,
   ranges clamp.
 
@@ -494,13 +570,16 @@ assertion Spec 1 §7 deferred to this spec.
 
 ## 11. Documents updated in this change
 
-- `DESIGN.md` §6.2 (route list), §6.7 (hub-card table row and sidebar wording),
-  plus a new section specifying the municipal surfaces.
+- `DESIGN.md` §4.2 (the ten `municipal.*` colour tokens), §6.2 (route list),
+  §6.7 (hub-card table row and sidebar wording), plus a new section specifying
+  the municipal surfaces.
 - `AGENTS.md` Current Project State — municipal flips from data-only to routed.
 - `docs/data-methodology/municipal-functional-annual-2015-2025.md` — the region
-  shape join, its provenance, and the `nameKaGenitive` field.
+  shape join keyed on `shapeISO`, its provenance and licence, and the
+  `nameKaGenitive` field.
 - `apps/web/lib/landing/georgiaGeo.ts` header comment — provenance of the region
-  rings changes from GADM to geoBoundaries `gbOpen` ADM1.
+  rings changes from GADM to geoBoundaries `gbOpen` ADM1, with the CC BY 3.0
+  attribution and release pin covering both the rings and the ADM0 outline.
 
 `Project_Definition.md` already moved municipal data and route into scope in
 Spec 1; no further change there.
