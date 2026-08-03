@@ -9,14 +9,14 @@ afterEach(() => {
 });
 
 describe("loadServedMunicipalData", () => {
-  it("loads the whole municipal dataset from the reviewed CSVs", async () => {
+  it("loads the public municipal dataset from the reviewed CSVs", async () => {
     const data = await loadServedMunicipalData();
 
     expect(data.functions).toHaveLength(10);
-    expect(data.regions).toHaveLength(12);
-    expect(data.municipalities).toHaveLength(69);
-    expect(data.functionFacts).toHaveLength(7590);
-    expect(data.totalFacts).toHaveLength(759);
+    expect(data.regions).toHaveLength(11);
+    expect(data.municipalities).toHaveLength(64);
+    expect(data.functionFacts).toHaveLength(7040);
+    expect(data.totalFacts).toHaveLength(704);
   });
 
   it("returns facts in year-ascending order", async () => {

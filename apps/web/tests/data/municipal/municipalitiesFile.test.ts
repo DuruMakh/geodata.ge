@@ -4,13 +4,15 @@ import { loadMunicipalRegionsFile } from "../../../lib/data/municipal/taxonomyFi
 
 const MUNICIPALITIES = "../../data/imports/municipalities.csv";
 const REGIONS = "../../data/taxonomy/municipal-regions.json";
+const EXCLUDED_CODES = ["05", "42", "43", "46", "64"];
 
 describe("municipality registry", () => {
-  it("holds all 69 municipalities with unique codes", async () => {
+  it("holds 64 public municipalities with unique codes", async () => {
     const municipalities = await loadMunicipalitiesFile(MUNICIPALITIES);
 
-    expect(municipalities).toHaveLength(69);
-    expect(new Set(municipalities.map((row) => row.code)).size).toBe(69);
+    expect(municipalities).toHaveLength(64);
+    expect(new Set(municipalities.map((row) => row.code)).size).toBe(64);
+    expect(municipalities.filter((row) => EXCLUDED_CODES.includes(row.code))).toEqual([]);
   });
 
   it("assigns every municipality to a known region", async () => {
@@ -46,7 +48,7 @@ describe("municipality registry", () => {
     const municipalities = await loadMunicipalitiesFile(MUNICIPALITIES);
     const names = municipalities.map((row) => row.displayNameKa);
 
-    expect(new Set(names).size).toBe(69);
+    expect(new Set(names).size).toBe(64);
     for (const name of names) {
       expect(name).not.toContain("მუნიციპალიტეტი");
     }

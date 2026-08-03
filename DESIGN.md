@@ -49,7 +49,7 @@ Year ranges in the UI always derive from loaded facts. Current reviewed coverage
 - Expenditure by public spending fields: **2005–2025** (13 fields per year, 12-month actual execution).
 - Expenditure by ministries (administrative view): **2005–2025** categories; major-program drill-down rows exist from 2012 (partial) and are contiguous 2017–2025.
 - Revenue: **2005–2025** (11 top-level categories).
-- Municipal expenditure by functional category: **2015–2025** (10 main functions, 69 municipalities across 12 regions, plus the official total-payments headline). Served as data only — no route reads it yet, so it contributes no year range to any coverage label.
+- Municipal expenditure by functional category: **2015–2025** (10 main functions, 64 municipalities across 11 data-bearing regions, plus the official total-payments headline). Five municipal bodies associated with occupied territories are excluded from the public dataset. Served as data only — no route reads it yet, so it contributes no year range to any coverage label.
 - All current facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned facts ever load.
 
 ## 3. Design Direction

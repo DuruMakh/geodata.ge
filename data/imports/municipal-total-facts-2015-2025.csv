@@ -1,6 +1,5 @@
 year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,expenses_gel,nonfinancial_asset_growth_gel,financial_asset_growth_gel,liability_decrease_gel,functional_sum_gel,reconciliation_difference_gel,warning_amount_gel,show_warning,warning_type,basis,source_id
 2015,04,958433318.62,portal_functional_total_fallback,,,,,,958433318.62,,,false,none,actual,source.municipal_portal_archive
-2015,05,1109906.39,portal_functional_total_fallback,,,,,,1109906.39,,,false,none,actual,source.municipal_portal_archive
 2015,06,139492139.22,portal_functional_total_fallback,,,,,,139492139.22,,,false,none,actual,source.municipal_portal_archive
 2015,07,30532864.86,portal_functional_total_fallback,,,,,,30532864.86,,,false,none,actual,source.municipal_portal_archive
 2015,08,18193825.34,portal_functional_total_fallback,,,,,,18193825.34,,,false,none,actual,source.municipal_portal_archive
@@ -37,11 +36,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2015,39,11628712.64,portal_functional_total_fallback,,,,,,11628712.64,,,false,none,actual,source.municipal_portal_archive
 2015,40,8976798.13,portal_functional_total_fallback,,,,,,8976798.13,,,false,none,actual,source.municipal_portal_archive
 2015,41,37579708.33,portal_functional_total_fallback,,,,,,37579708.33,,,false,none,actual,source.municipal_portal_archive
-2015,42,2070039.31,portal_functional_total_fallback,,,,,,2070039.31,,,false,none,actual,source.municipal_portal_archive
-2015,43,2599027.58,portal_functional_total_fallback,,,,,,2599027.58,,,false,none,actual,source.municipal_portal_archive
 2015,44,16215902.76,portal_functional_total_fallback,,,,,,16215902.76,,,false,none,actual,source.municipal_portal_archive
 2015,45,13894961.01,portal_functional_total_fallback,,,,,,13894961.01,,,false,none,actual,source.municipal_portal_archive
-2015,46,1351578.35,portal_functional_total_fallback,,,,,,1351578.35,,,false,none,actual,source.municipal_portal_archive
 2015,47,13601895.21,portal_functional_total_fallback,,,,,,13601895.21,,,false,none,actual,source.municipal_portal_archive
 2015,48,42922775.82,portal_functional_total_fallback,,,,,,42922775.82,,,false,none,actual,source.municipal_portal_archive
 2015,49,18968761.30,portal_functional_total_fallback,,,,,,18968761.30,,,false,none,actual,source.municipal_portal_archive
@@ -59,7 +55,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2015,61,11806013.77,portal_functional_total_fallback,,,,,,11806013.77,,,false,none,actual,source.municipal_portal_archive
 2015,62,16652758.41,portal_functional_total_fallback,,,,,,16652758.41,,,false,none,actual,source.municipal_portal_archive
 2015,63,7682601.99,portal_functional_total_fallback,,,,,,7682601.99,,,false,none,actual,source.municipal_portal_archive
-2015,64,2263833.07,portal_functional_total_fallback,,,,,,2263833.07,,,false,none,actual,source.municipal_portal_archive
 2015,65,13543720.15,portal_functional_total_fallback,,,,,,13543720.15,,,false,none,actual,source.municipal_portal_archive
 2015,66,6391054.87,portal_functional_total_fallback,,,,,,6391054.87,,,false,none,actual,source.municipal_portal_archive
 2015,67,19473168.59,portal_functional_total_fallback,,,,,,19473168.59,,,false,none,actual,source.municipal_portal_archive
@@ -69,7 +64,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2015,71,6173939.33,portal_functional_total_fallback,,,,,,6173939.33,,,false,none,actual,source.municipal_portal_archive
 2015,72,9576999.36,portal_functional_total_fallback,,,,,,9576999.36,,,false,none,actual,source.municipal_portal_archive
 2016,04,832409547.15,total_payments,832409547.15,617512981.45,107988658.70,97034586.75,9873320.25,848041009.16,-15631462.01,15631462.01,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
-2016,05,1088326.41,total_payments,1088326.41,1076665.91,11660.50,0.00,0.00,1088326.41,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,06,139027010.37,total_payments,139027010.37,83689665.97,46430353.45,93330.00,8813660.95,142021337.81,-2994327.44,2994327.44,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
 2016,07,34467146.94,total_payments,34467146.94,14684917.86,18595276.98,250000.00,936952.10,34483287.85,-16140.91,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,08,18671078.36,total_payments,18671078.36,10113536.21,8466356.10,0.00,91186.05,18671078.36,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -106,11 +100,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2016,39,10654398.75,total_payments,10654398.75,7216273.91,3353386.80,0.00,84738.04,11113288.43,-458889.68,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,40,13404053.28,total_payments,13404053.28,7280340.04,5988739.78,0.00,134973.46,13824239.99,-420186.71,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,41,39855887.55,total_payments,39855887.55,28026915.27,11654193.07,0.00,174779.21,42027371.27,-2171483.72,2171483.72,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
-2016,42,3193712.21,total_payments,3193712.21,3148432.28,45279.93,0.00,0.00,3387474.32,-193762.11,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2016,43,2067108.48,total_payments,2067108.48,2033292.09,33816.39,0.00,0.00,2067108.48,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,44,14090349.03,total_payments,14090349.03,7040509.31,7037609.83,0.00,12229.89,14139602.27,-49253.24,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,45,13724760.46,total_payments,13724760.46,7386883.59,6324053.87,0.00,13823.00,13801800.52,-77040.06,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2016,46,1574702.84,total_payments,1574702.84,1571535.84,3167.00,0.00,0.00,1574985.05,-282.21,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,47,16492955.63,total_payments,16492955.63,8955429.24,7528723.53,0.00,8802.86,16829940.53,-336984.90,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,48,44226370.27,total_payments,44226370.27,32138733.41,10966053.70,0.00,1121583.16,44931884.14,-705513.87,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,49,22031291.44,total_payments,22031291.44,16649957.56,5109055.58,0.00,272278.30,22101727.11,-70435.67,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -128,7 +119,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2016,61,12146731.60,total_payments,12146731.60,6100622.62,5907664.98,0.00,138444.00,12179730.82,-32999.22,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,62,21499202.58,total_payments,21499202.58,10659373.21,10828425.97,0.00,11403.40,22352265.56,-853062.98,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,63,8084374.12,total_payments,8084374.12,4326233.74,3758140.38,0.00,0.00,8123299.92,-38925.80,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2016,64,2417464.43,total_payments,2417464.43,2393658.56,12877.50,0.00,10928.37,2417395.38,69.05,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,65,12750738.86,total_payments,12750738.86,6006762.64,6389245.89,0.00,354730.33,12890800.62,-140061.76,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,66,6905619.57,total_payments,6905619.57,5433519.79,1469077.54,0.00,3022.24,6945628.74,-40009.17,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,67,21572693.20,total_payments,21572693.20,13129155.60,8178024.25,0.00,265513.35,21816701.25,-244008.05,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -138,7 +128,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2016,71,4915535.83,total_payments,4915535.83,2608334.22,2243654.04,0.00,63547.57,4945104.82,-29568.99,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2016,72,8754406.94,total_payments,8754406.94,5065708.96,3678117.98,0.00,10580.00,8770762.92,-16355.98,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,04,825933368.45,total_payments,825933368.45,580885515.60,111741621.42,128911100.99,4395130.44,841666394.50,-15733026.05,15733026.05,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
-2017,05,1085520.14,total_payments,1085520.14,1083123.15,2396.99,0.00,0.00,1085520.14,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,06,162700371.77,total_payments,162700371.77,85201085.16,59350403.18,723112.01,17425771.42,166540257.89,-3839886.12,3839886.12,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
 2017,07,35054909.86,total_payments,35054909.86,13666985.52,20289405.84,52100.00,1046418.50,35054909.86,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,08,18070315.34,total_payments,18070315.34,10056237.63,7970611.29,14300.00,29166.42,18083411.13,-13095.79,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -175,11 +164,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2017,39,10612859.57,total_payments,10612859.57,7676126.89,2788194.99,0.00,148537.69,10907038.59,-294179.02,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,40,11966797.78,total_payments,11966797.78,6078701.01,5715327.40,0.00,172769.37,12312214.81,-345417.03,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,41,39028927.97,total_payments,39028927.97,23785810.96,15084571.40,0.00,158545.61,39801645.39,-772717.42,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2017,42,2015336.67,total_payments,2015336.67,1953023.35,62313.32,0.00,0.00,2215335.22,-199998.55,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2017,43,2140327.85,total_payments,2140327.85,2133311.86,7015.99,0.00,0.00,2194520.34,-54192.49,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,44,13391875.36,total_payments,13391875.36,6450972.59,6913171.90,0.00,27730.87,13442826.84,-50951.48,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,45,13454212.28,total_payments,13454212.28,7492335.51,5838896.59,0.00,122980.18,13544724.82,-90512.54,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2017,46,1337727.23,total_payments,1337727.23,1333293.24,4433.99,0.00,0.00,1337727.23,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,47,16018454.49,total_payments,16018454.49,8732908.98,7019566.16,0.00,265979.35,16268631.39,-250176.90,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,48,40355431.79,total_payments,40355431.79,30181084.27,8095768.27,0.00,2078579.25,41108974.44,-753542.65,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,49,23144978.33,total_payments,23144978.33,16908792.71,4449627.52,444490.00,1342068.10,23206815.47,-61837.14,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -197,7 +183,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2017,61,15872123.24,total_payments,15872123.24,6940432.43,8775798.81,0.00,155892.00,15920441.54,-48318.30,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,62,21781304.08,total_payments,21781304.08,10431843.85,11270246.05,0.00,79214.18,22819303.58,-1037999.50,1037999.50,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
 2017,63,7540052.78,total_payments,7540052.78,3910892.93,3628559.85,0.00,600.00,7576755.18,-36702.40,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2017,64,2439218.41,total_payments,2439218.41,2413911.11,24572.59,0.00,734.71,2439218.41,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,65,10946946.37,total_payments,10946946.37,5828161.27,4755447.60,0.00,363337.50,11000530.99,-53584.62,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,66,6307934.12,total_payments,6307934.12,4830201.13,1440932.75,0.00,36800.24,6341163.27,-33229.15,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,67,23194917.71,total_payments,23194917.71,12780918.25,10096180.15,0.00,317819.31,23391052.59,-196134.88,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -207,7 +192,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2017,71,8803734.96,total_payments,8803734.96,2712637.63,6053861.53,0.00,37235.80,8835339.20,-31604.24,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2017,72,8176990.01,total_payments,8176990.01,4876353.66,3294556.35,0.00,6080.00,8194054.00,-17063.99,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,04,1066576018.28,total_payments,1066576018.28,563028168.43,188778610.18,311668503.67,3100736.00,1081702922.63,-15126904.35,15126904.35,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
-2018,05,1089925.02,total_payments,1089925.02,1089925.02,0.00,0.00,0.00,1089925.02,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,06,164527283.21,total_payments,164527283.21,83359025.48,60502661.36,5338410.33,15327186.04,169550024.00,-5022740.79,5022740.79,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
 2018,07,32497844.44,total_payments,32497844.44,15540838.78,15727627.87,44200.00,1185177.79,32527126.39,-29281.95,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,08,16379621.44,total_payments,16379621.44,10381209.56,5969811.88,28600.00,0.00,16401554.97,-21933.53,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -244,11 +228,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2018,39,12931393.14,total_payments,12931393.14,8028076.58,4623576.97,0.00,279739.59,13053877.78,-122484.64,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,40,13352149.70,total_payments,13352149.70,6846731.72,6346592.98,0.00,158825.00,13738908.75,-386759.05,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,41,41518710.18,total_payments,41518710.18,24181603.00,17189813.18,0.00,147294.00,42127771.67,-609061.49,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2018,42,1990516.36,total_payments,1990516.36,1976835.20,13681.16,0.00,0.00,2050516.36,-60000.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2018,43,2117463.63,total_payments,2117463.63,2097412.22,20051.41,0.00,0.00,2167463.63,-50000.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,44,14409803.00,total_payments,14409803.00,6981170.50,7428632.50,0.00,0.00,14470263.03,-60460.03,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,45,12885013.05,total_payments,12885013.05,8355723.03,4418335.02,0.00,110955.00,12923328.02,-38314.97,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2018,46,1571814.42,total_payments,1571814.42,1566082.42,5732.00,0.00,0.00,1571814.42,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,47,15818546.70,total_payments,15818546.70,9338635.39,6477214.31,0.00,2697.00,16056135.81,-237589.11,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,48,39314654.47,total_payments,39314654.47,30459122.81,8065029.66,0.00,790502.00,40247836.24,-933181.77,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,49,26278994.82,total_payments,26278994.82,19473651.54,6462919.28,0.00,342424.00,26352796.81,-73801.99,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -266,7 +247,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2018,61,13644116.87,total_payments,13644116.87,6748525.60,6719932.27,0.00,175659.00,13703046.41,-58929.54,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,62,20258161.98,total_payments,20258161.98,10394855.07,9863306.91,0.00,0.00,21258584.51,-1000422.53,1000422.53,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
 2018,63,7485210.80,total_payments,7485210.80,4064294.04,3420916.76,0.00,0.00,7535420.07,-50209.27,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2018,64,2387672.69,total_payments,2387672.69,2370483.69,17189.00,0.00,0.00,2387672.69,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,65,11652491.16,total_payments,11652491.16,7098898.78,4225611.38,0.00,327981.00,11705227.20,-52736.04,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,66,5707242.58,total_payments,5707242.58,3936803.29,1770439.29,0.00,0.00,5716924.58,-9682.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,67,24797875.74,total_payments,24797875.74,14584183.43,9878963.31,0.00,334729.00,24979400.44,-181524.70,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -276,7 +256,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2018,71,7106585.34,total_payments,7106585.34,2992743.10,4113842.24,0.00,0.00,7149681.03,-43095.69,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2018,72,8806704.59,total_payments,8806704.59,5195578.30,3611126.29,0.00,0.00,8832356.83,-25652.24,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,04,1002542383.78,total_payments,1002542383.78,710069195.53,282821294.46,0.00,9651893.79,1023624092.27,-21081708.49,21081708.49,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
-2019,05,1097807.50,total_payments,1097807.50,1092405.50,5402.00,0.00,0.00,1097807.50,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,06,172591496.53,total_payments,172591496.53,97154524.78,59628161.27,0.00,15808810.48,178118929.46,-5527432.93,5527432.93,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
 2019,07,34427299.38,total_payments,34427299.38,16787664.09,16132411.65,0.00,1507223.64,34437194.93,-9895.55,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,08,22220998.12,total_payments,22220998.12,12621489.79,9570908.33,28600.00,0.00,22231139.40,-10141.28,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -313,11 +292,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2019,39,16361318.29,total_payments,16361318.29,9086230.51,7137095.78,0.00,137992.00,16503621.07,-142302.78,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,40,17776243.73,total_payments,17776243.73,8610961.91,8986102.82,0.00,179179.00,18192845.28,-416601.55,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,41,57160021.27,total_payments,57160021.27,27077497.28,29807397.99,0.00,275126.00,57966412.12,-806390.85,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2019,42,1948612.75,total_payments,1948612.75,1880034.21,68578.54,0.00,0.00,1998579.26,-49966.51,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2019,43,2153051.15,total_payments,2153051.15,2134193.21,18857.94,0.00,0.00,2207651.15,-54600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,44,20049443.98,total_payments,20049443.98,8203518.75,11821187.23,0.00,24738.00,20128262.41,-78818.43,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,45,24385909.90,total_payments,24385909.90,10463465.61,13771337.29,0.00,151107.00,24433931.91,-48022.01,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2019,46,1584387.62,total_payments,1584387.62,1528874.62,55513.00,0.00,0.00,1584390.56,-2.94,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,47,23297504.96,total_payments,23297504.96,10750345.85,12487126.11,0.00,60033.00,23567087.05,-269582.09,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,48,60566770.80,total_payments,60566770.80,36491085.71,23249056.09,0.00,826629.00,61471643.50,-904872.70,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,49,35075864.47,total_payments,35075864.47,24699634.67,10033828.80,0.00,342401.00,35155363.20,-79498.73,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -335,7 +311,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2019,61,17496652.41,total_payments,17496652.41,8671382.20,8627223.21,0.00,198047.00,17591784.44,-95132.03,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,62,27214869.92,total_payments,27214869.92,13556374.26,13598586.66,0.00,59909.00,28341513.26,-1126643.34,1126643.34,true,source_version_difference,actual,source.municipal_mof_annual_and_history_workbooks
 2019,63,11355038.07,total_payments,11355038.07,4841865.66,6488434.41,0.00,24738.00,11408399.53,-53361.46,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2019,64,2402782.18,total_payments,2402782.18,2363616.33,39165.85,0.00,0.00,2449818.18,-47036.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,65,22004334.15,total_payments,22004334.15,8221660.75,13494011.40,0.00,288662.00,22064749.68,-60415.53,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,66,15241253.95,total_payments,15241253.95,5314325.58,9906699.37,0.00,20229.00,15260964.51,-19710.56,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,67,35958534.67,total_payments,35958534.67,17013992.48,18608217.19,0.00,336325.00,36267357.52,-308822.85,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -345,7 +320,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2019,71,13723879.89,total_payments,13723879.89,3488637.03,10207442.86,0.00,27800.00,13768679.28,-44799.39,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2019,72,15020711.68,total_payments,15020711.68,6473121.01,8519790.67,0.00,27800.00,15052239.78,-31528.10,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,04,1080555805.54,total_payments,1080555805.54,825205534.03,239300799.79,0.00,16049471.72,1064506333.82,16049471.72,16049471.72,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
-2020,05,1091969.35,total_payments,1091969.35,1087247.35,4722.00,0.00,0.00,1091969.35,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,06,140992751.06,total_payments,140992751.06,84376486.57,54683197.43,0.00,1933067.06,139059684.00,1933067.06,1933067.06,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
 2020,07,33584579.99,total_payments,33584579.99,18988108.10,12611831.28,0.00,1984640.61,31599939.38,1984640.61,1984640.61,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
 2020,08,19696805.96,total_payments,19696805.96,12099080.15,7597725.81,0.00,0.00,19696805.96,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -382,11 +356,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2020,39,16578573.10,total_payments,16578573.10,8774469.19,7625824.91,0.00,178279.00,16400294.10,178279.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,40,17046968.22,total_payments,17046968.22,7845146.84,9086225.38,0.00,115596.00,16931372.22,115596.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,41,58030129.55,total_payments,58030129.55,27407684.14,30260057.41,0.00,362388.00,57667741.55,362388.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2020,42,2030172.64,total_payments,2030172.64,2013086.16,17086.48,0.00,0.00,2030172.64,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2020,43,2124138.03,total_payments,2124138.03,2118935.03,5203.00,0.00,0.00,2124138.03,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,44,21820216.34,total_payments,21820216.34,7931243.26,13839497.08,0.00,49476.00,21770740.34,49476.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,45,24841559.26,total_payments,24841559.26,10757413.68,13888557.58,0.00,195588.00,24645971.26,195588.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2020,46,1663819.36,total_payments,1663819.36,1652180.76,11638.60,0.00,0.00,1663819.36,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,47,22860118.28,total_payments,22860118.28,10553333.48,12217103.80,0.00,89681.00,22770437.28,89681.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,48,57251528.77,total_payments,57251528.77,36811280.85,19963698.92,0.00,476549.00,56774979.77,476549.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,49,36070782.77,total_payments,36070782.77,25013193.91,10919489.86,0.00,138099.00,35932683.77,138099.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -404,7 +375,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2020,61,19698214.61,total_payments,19698214.61,7499244.50,12073596.11,0.00,125374.00,19572840.61,125374.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,62,26014325.94,total_payments,26014325.94,12665070.37,13229437.57,0.00,119818.00,25894507.94,119818.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,63,12146683.89,total_payments,12146683.89,4578667.60,7480099.29,0.00,87917.00,12058766.89,87917.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2020,64,2484553.06,total_payments,2484553.06,2463278.69,21274.37,0.00,0.00,2484553.06,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,65,21563253.78,total_payments,21563253.78,7735259.47,13768122.31,0.00,59872.00,21503381.78,59872.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,66,10903755.49,total_payments,10903755.49,5072022.44,5791275.05,0.00,40458.00,10863297.49,40458.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,67,31449142.33,total_payments,31449142.33,16476212.92,14808811.41,0.00,164118.00,31285024.33,164118.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -414,7 +384,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2020,71,16509992.54,total_payments,16509992.54,4573245.63,11881146.91,0.00,55600.00,16454392.54,55600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2020,72,12503610.72,total_payments,12503610.72,6576423.67,5871587.05,0.00,55600.00,12448010.72,55600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,04,1222777834.23,total_payments,1222777834.23,968334125.18,239565551.89,0.00,14878157.16,1207899677.07,14878157.16,14878157.16,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
-2021,05,1138411.95,total_payments,1138411.95,1138411.95,0.00,0.00,0.00,1138411.95,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,06,178358642.78,total_payments,178358642.78,118798503.78,56795330.81,0.00,2764808.19,175593834.59,2764808.19,2764808.19,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
 2021,07,44398436.37,total_payments,44398436.37,23979157.39,18495137.92,0.00,1924141.06,42474295.31,1924141.06,1924141.06,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
 2021,08,22771393.54,total_payments,22771393.54,14644431.04,8126962.50,0.00,0.00,22771393.54,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -451,11 +420,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2021,39,15374101.06,total_payments,15374101.06,10456798.83,4723830.23,0.00,193472.00,15180629.06,193472.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,40,18181950.47,total_payments,18181950.47,8748150.88,9382457.59,0.00,51342.00,18130608.47,51342.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,41,63476517.92,total_payments,63476517.92,35238483.02,27848216.90,0.00,389818.00,63086699.92,389818.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2021,42,1985046.78,total_payments,1985046.78,1971736.78,13310.00,0.00,0.00,1985046.78,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2021,43,2057104.33,total_payments,2057104.33,2055144.33,1960.00,0.00,0.00,2057104.33,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,44,23632561.25,total_payments,23632561.25,9511046.88,14072038.37,0.00,49476.00,23583085.25,49476.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,45,23133379.42,total_payments,23133379.42,12001140.97,10920670.45,0.00,211568.00,22921811.42,211568.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2021,46,1770643.30,total_payments,1770643.30,1769778.30,865.00,0.00,0.00,1770643.30,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,47,25419787.95,total_payments,25419787.95,11478392.88,13847276.07,0.00,94119.00,25325668.95,94119.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,48,66782753.61,total_payments,66782753.61,48113627.13,18423348.48,0.00,245778.00,66536975.61,245778.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,49,39100417.33,total_payments,39100417.33,28669150.78,10373800.55,0.00,57466.00,39042951.33,57466.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -473,7 +439,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2021,61,16774361.70,total_payments,16774361.70,8426741.85,8267121.85,0.00,80498.00,16693863.70,80498.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,62,23097207.75,total_payments,23097207.75,13072728.88,9904660.87,0.00,119818.00,22977389.75,119818.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,63,13681218.75,total_payments,13681218.75,5256142.62,8312410.13,0.00,112666.00,13568552.75,112666.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2021,64,2700946.53,total_payments,2700946.53,2671704.03,29242.50,0.00,0.00,2700946.53,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,65,20215529.77,total_payments,20215529.77,9150520.27,11005137.50,0.00,59872.00,20155657.77,59872.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,66,8541575.52,total_payments,8541575.52,5557192.20,2943925.32,0.00,40458.00,8501117.52,40458.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,67,36184382.52,total_payments,36184382.52,19972080.77,16086583.75,0.00,125718.00,36058664.52,125718.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -483,7 +448,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2021,71,17431628.88,total_payments,17431628.88,4272377.84,13103651.04,0.00,55600.00,17376028.88,55600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2021,72,13639111.39,total_payments,13639111.39,7396210.19,6187301.20,0.00,55600.00,13583511.39,55600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,04,1463004526.62,total_payments,1463004526.62,1180321329.88,269673310.53,0.00,13009886.21,1449994640.41,13009886.21,13009886.21,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
-2022,05,1256755.81,total_payments,1256755.81,1256755.81,0.00,0.00,0.00,1256755.81,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,06,246557348.63,total_payments,246557348.63,161938351.89,58730066.31,0.00,25888930.43,220668587.15,25888761.48,25888761.48,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
 2022,07,48439132.09,total_payments,48439132.09,31576717.29,15647749.62,0.00,1214665.18,47224466.91,1214665.18,1214665.18,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
 2022,08,31623311.96,total_payments,31623311.96,18482570.99,13140740.97,0.00,0.00,31623320.21,-8.25,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -520,11 +484,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2022,39,20941654.63,total_payments,20941654.63,13528559.83,7203883.80,0.00,209211.00,20732443.63,209211.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,40,19696774.29,total_payments,19696774.29,11518790.24,8126642.05,0.00,51342.00,19645432.29,51342.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,41,76760388.84,total_payments,76760388.84,45270358.98,31069606.86,0.00,420423.00,76339965.84,420423.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2022,42,2267338.95,total_payments,2267338.95,2162303.07,105035.88,0.00,0.00,2267338.95,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2022,43,2479929.17,total_payments,2479929.17,2425269.65,54659.52,0.00,0.00,2479929.17,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,44,26953216.71,total_payments,26953216.71,12514141.21,14389599.50,0.00,49476.00,26903740.71,49476.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,45,27455845.46,total_payments,27455845.46,14864819.27,12361624.19,0.00,229402.00,27226443.46,229402.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2022,46,1838852.59,total_payments,1838852.59,1824597.49,14255.10,0.00,0.00,1838852.59,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,47,33458425.25,total_payments,33458425.25,14567445.88,18637361.37,0.00,253618.00,33205057.25,253368.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,48,90773185.95,total_payments,90773185.95,69121322.22,21541783.73,0.00,110080.00,90663105.95,110080.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,49,39858061.41,total_payments,39858061.41,31196751.90,8603843.51,0.00,57466.00,39800595.41,57466.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -542,7 +503,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2022,61,21772270.46,total_payments,21772270.46,11497424.11,10194348.35,0.00,80498.00,21691772.46,80498.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,62,28564225.33,total_payments,28564225.33,17639439.97,10804967.36,0.00,119818.00,28444407.33,119818.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,63,15915472.80,total_payments,15915472.80,7165116.35,8457208.45,0.00,293148.00,15622324.80,293148.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2022,64,3370143.28,total_payments,3370143.28,3123886.38,246256.90,0.00,0.00,3370143.28,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,65,29152691.01,total_payments,29152691.01,14618155.53,14474663.48,0.00,59872.00,29092819.01,59872.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,66,16452396.06,total_payments,16452396.06,9201670.04,7210268.02,0.00,40458.00,16411938.06,40458.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,67,51066444.18,total_payments,51066444.18,25766999.18,25173727.00,0.00,125718.00,50940726.18,125718.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -552,7 +512,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2022,71,21455693.25,total_payments,21455693.25,6341484.79,15058608.46,0.00,55600.00,21400093.25,55600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2022,72,16460420.39,total_payments,16460420.39,9097133.30,7307687.09,0.00,55600.00,16404820.39,55600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,04,1722247886.74,total_payments,1722247886.74,1351338930.51,342084565.07,0.00,28824391.16,1693447495.58,28800391.16,28800391.16,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
-2023,05,1366484.48,total_payments,1366484.48,1363889.48,2595.00,0.00,0.00,1366484.48,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,06,337641239.79,total_payments,337641239.79,192282744.66,119741870.91,0.00,25616624.22,312024615.57,25616624.22,25616624.22,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
 2023,07,61183986.81,total_payments,61183986.81,40978048.18,19289832.70,0.00,916105.93,60267880.88,916105.93,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,08,43952605.46,total_payments,43952605.46,22878848.41,21073757.05,0.00,0.00,43952605.46,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -589,11 +548,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2023,39,24372266.87,total_payments,24372266.87,15252413.97,8893083.90,0.00,226769.00,24145497.87,226769.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,40,25038424.47,total_payments,25038424.47,14087065.37,10900017.10,0.00,51342.00,24987082.47,51342.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,41,101156312.75,total_payments,101156312.75,59283088.68,39564873.07,0.00,2308351.00,98847961.75,2308351.00,2308351.00,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
-2023,42,2677463.01,total_payments,2677463.01,2503376.15,174086.86,0.00,0.00,2677463.01,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2023,43,2648356.11,total_payments,2648356.11,2544620.69,103735.42,0.00,0.00,2648356.11,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,44,30657432.03,total_payments,30657432.03,14365167.40,16242788.63,0.00,49476.00,30607956.03,49476.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,45,33396294.63,total_payments,33396294.63,17456557.18,15690439.45,0.00,249298.00,33146996.63,249298.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2023,46,2022572.69,total_payments,2022572.69,2019777.69,2795.00,0.00,0.00,2022572.69,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,47,37941851.43,total_payments,37941851.43,16190765.04,21310812.39,0.00,440274.00,37501577.43,440274.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,48,106491059.07,total_payments,106491059.07,81601139.43,21715457.64,0.00,3174462.00,103316597.07,3174462.00,3174462.00,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
 2023,49,46664683.32,total_payments,46664683.32,36647587.03,9959630.29,0.00,57466.00,46607217.32,57466.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -611,7 +567,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2023,61,26385852.86,total_payments,26385852.86,13811909.09,12493445.77,0.00,80498.00,26305354.86,80498.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,62,38822039.71,total_payments,38822039.71,21329328.37,17372893.34,0.00,119818.00,38702221.71,119818.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,63,17834995.20,total_payments,17834995.20,8480595.66,9275739.54,0.00,78660.00,17756335.20,78660.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2023,64,3693175.69,total_payments,3693175.69,3664861.88,28313.81,0.00,0.00,3693175.69,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,65,35376039.11,total_payments,35376039.11,16840815.47,18475351.64,0.00,59872.00,35316167.11,59872.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,66,18195468.04,total_payments,18195468.04,9909112.37,8245897.67,0.00,40458.00,18155010.04,40458.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,67,59881524.20,total_payments,59881524.20,31729823.07,28025983.13,0.00,125718.00,59755806.20,125718.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -621,7 +576,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2023,71,19645986.89,total_payments,19645986.89,7491470.96,12098915.93,0.00,55600.00,19590386.89,55600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2023,72,19161824.38,total_payments,19161824.38,10895426.81,8210797.57,0.00,55600.00,19106224.38,55600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,04,1923712255.61,total_payments,1923712255.61,1505905953.13,389676540.49,0.00,28129761.99,1895582627.29,28129628.32,28129628.32,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
-2024,05,1439707.85,total_payments,1439707.85,1436007.85,3700.00,0.00,0.00,1439707.85,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,06,412598028.90,total_payments,412598028.90,231633660.18,144589147.83,0.00,36375220.89,376223011.21,36375017.69,36375017.69,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
 2024,07,70198849.48,total_payments,70198849.48,45115764.33,24408785.49,0.00,674299.66,69524549.82,674299.66,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,08,54340867.66,total_payments,54340867.66,28596565.15,25744302.51,0.00,0.00,54340867.66,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -658,11 +612,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2024,39,28926171.96,total_payments,28926171.96,17586877.62,11092932.34,0.00,246362.00,28679809.96,246362.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,40,28497466.13,total_payments,28497466.13,15359372.86,13086751.27,0.00,51342.00,28446124.13,51342.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,41,104918314.39,total_payments,104918314.39,68470754.24,34101112.15,0.00,2346448.00,102572540.67,2345773.72,2345773.72,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
-2024,42,3043910.25,total_payments,3043910.25,2640894.26,403015.99,0.00,0.00,3043910.25,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2024,43,3061225.65,total_payments,3061225.65,3044846.65,16379.00,0.00,0.00,3061225.65,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,44,37817497.21,total_payments,37817497.21,18095216.71,19672804.50,0.00,49476.00,37768021.21,49476.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,45,40650525.97,total_payments,40650525.97,20774337.38,19604690.59,0.00,271498.00,40379027.97,271498.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2024,46,2356962.70,total_payments,2356962.70,2214770.22,142192.48,0.00,0.00,2356962.70,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,47,48092837.05,total_payments,48092837.05,19634502.68,27973052.37,0.00,485282.00,47607555.05,485282.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,48,134811369.19,total_payments,134811369.19,97905209.34,33731697.85,0.00,3174462.00,131636907.19,3174462.00,3174462.00,true,financing_outside_functional,actual,source.municipal_mof_annual_and_history_workbooks
 2024,49,57519588.16,total_payments,57519588.16,43748388.57,13713733.59,0.00,57466.00,57462122.16,57466.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -680,7 +631,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2024,61,36859308.26,total_payments,36859308.26,14943461.34,21835348.92,0.00,80498.00,36778810.26,80498.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,62,49736617.93,total_payments,49736617.93,26495163.38,23121636.55,0.00,119818.00,49616799.93,119818.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,63,22291993.40,total_payments,22291993.40,9464536.28,12739694.12,0.00,87763.00,22204230.40,87763.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2024,64,4221695.49,total_payments,4221695.49,4185387.73,36307.76,0.00,0.00,4221695.49,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,65,44887621.74,total_payments,44887621.74,20603481.48,24224268.26,0.00,59872.00,44827749.74,59872.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,66,20344821.66,total_payments,20344821.66,11290179.09,9014184.57,0.00,40458.00,20304363.66,40458.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,67,70534310.86,total_payments,70534310.86,38149878.94,32258713.92,0.00,125718.00,70408592.86,125718.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -690,7 +640,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2024,71,28256015.22,total_payments,28256015.22,9647577.06,18552838.16,0.00,55600.00,28200415.22,55600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2024,72,22910203.58,total_payments,22910203.58,12332684.25,10521919.33,0.00,55600.00,22854603.58,55600.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,04,2108420516.34,total_payments,2108420516.34,1690122759.77,383628422.06,0.00,34669334.51,2108420516.34,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2025,05,1649973.03,total_payments,1649973.03,1644228.03,5745.00,0.00,0.00,1649973.03,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,06,486198056.59,total_payments,486198056.59,260445670.41,181510302.37,0.00,44242083.81,486198056.59,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,07,88514052.49,total_payments,88514052.49,60884866.44,26908340.09,0.00,720845.96,88514052.49,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,08,68119918.14,total_payments,68119918.14,38177266.09,29942652.05,0.00,0.00,68119918.14,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -727,11 +676,8 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2025,39,25186893.78,total_payments,25186893.78,19104096.90,5940233.88,0.00,142563.00,25186893.78,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,40,31796927.33,total_payments,31796927.33,18586353.88,13159231.45,0.00,51342.00,31796927.33,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,41,113747875.10,total_payments,113747875.10,77538889.78,34079149.32,0.00,2129836.00,113747875.10,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2025,42,3253509.39,total_payments,3253509.39,2997035.30,256474.09,0.00,0.00,3253509.39,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2025,43,3204024.36,total_payments,3204024.36,3143736.88,60287.48,0.00,0.00,3204024.36,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,44,40313880.30,total_payments,40313880.30,20538991.70,19725412.60,0.00,49476.00,40313880.30,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,45,45271120.26,total_payments,45271120.26,23526662.01,21629657.25,0.00,114801.00,45271120.26,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2025,46,2669530.93,total_payments,2669530.93,2563810.12,105720.81,0.00,0.00,2669530.93,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,47,45332555.94,total_payments,45332555.94,22096132.55,22700928.39,0.00,535495.00,45332555.94,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,48,172751760.78,total_payments,172751760.78,120116774.03,49460524.75,0.00,3174462.00,172751760.78,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,49,61664059.38,total_payments,61664059.38,48580878.48,13025714.90,0.00,57466.00,61664059.38,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
@@ -749,7 +695,6 @@ year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,
 2025,61,42205513.19,total_payments,42205513.19,18199265.95,23925749.24,0.00,80498.00,42205513.19,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,62,49127836.45,total_payments,49127836.45,30342198.53,18665819.92,0.00,119818.00,49127836.45,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,63,27942109.09,total_payments,27942109.09,11315670.21,16185125.88,0.00,441313.00,27942109.09,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
-2025,64,4522765.58,total_payments,4522765.58,4427623.82,95141.76,0.00,0.00,4522765.58,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,65,44681859.14,total_payments,44681859.14,23888978.40,20733008.74,0.00,59872.00,44681859.14,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,66,22324474.52,total_payments,22324474.52,13111450.65,9172565.87,0.00,40458.00,22324474.52,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
 2025,67,67933544.17,total_payments,67933544.17,43743711.90,24001255.27,0.00,188577.00,67933544.17,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks

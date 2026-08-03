@@ -1,6 +1,5 @@
 municipality_code,municipality_sort_id,name_ka,display_name_ka,region_id,is_self_governing_city
 04,12408,ქალაქ თბილისის მუნიციპალიტეტი,თბილისი,region.tbilisi,true
-05,12409,აჟარის მუნიციპალიტეტი,აჟარა,region.abkhazia,false
 06,12410,ქალაქ ბათუმის მუნიციპალიტეტი,ბათუმი,region.adjara,true
 07,12411,ქობულეთის მუნიციპალიტეტი,ქობულეთი,region.adjara,false
 08,12412,ხელვაჩაურის მუნიციპალიტეტი,ხელვაჩაური,region.adjara,false
@@ -37,11 +36,8 @@ municipality_code,municipality_sort_id,name_ka,display_name_ka,region_id,is_self
 39,12443,წალენჯიხის მუნიციპალიტეტი,წალენჯიხა,region.samegrelo_zemo_svaneti,false
 40,12444,ხობის მუნიციპალიტეტი,ხობი,region.samegrelo_zemo_svaneti,false
 41,12445,გორის მუნიციპალიტეტი,გორი,region.shida_kartli,false
-42,12446,ერედვის მუნიციპალიტეტი,ერედვი,region.shida_kartli,false
-43,12447,ქურთის მუნიციპალიტეტი,ქურთა,region.shida_kartli,false
 44,12448,ქარელის მუნიციპალიტეტი,ქარელი,region.shida_kartli,false
 45,12449,კასპის მუნიციპალიტეტი,კასპი,region.shida_kartli,false
-46,12450,თიღვის მუნიციპალიტეტი,თიღვა,region.shida_kartli,false
 47,12451,ხაშურის მუნიციპალიტეტი,ხაშური,region.shida_kartli,false
 48,12452,ქალაქ რუსთავის მუნიციპალიტეტი,რუსთავი,region.kvemo_kartli,true
 49,12453,ბოლნისის მუნიციპალიტეტი,ბოლნისი,region.kvemo_kartli,false
@@ -59,7 +55,6 @@ municipality_code,municipality_sort_id,name_ka,display_name_ka,region_id,is_self
 61,12465,ახალქალაქის მუნიციპალიტეტი,ახალქალაქი,region.samtskhe_javakheti,false
 62,12466,ახალციხის მუნიციპალიტეტი,ახალციხე,region.samtskhe_javakheti,false
 63,12467,ნინოწმინდის მუნიციპალიტეტი,ნინოწმინდა,region.samtskhe_javakheti,false
-64,12468,ახალგორის მუნიციპალიტეტი,ახალგორი,region.mtskheta_mtianeti,false
 65,12469,დუშეთის მუნიციპალიტეტი,დუშეთი,region.mtskheta_mtianeti,false
 66,12470,თიანეთის მუნიციპალიტეტი,თიანეთი,region.mtskheta_mtianeti,false
 67,12471,მცხეთის მუნიციპალიტეტი,მცხეთა,region.mtskheta_mtianeti,false

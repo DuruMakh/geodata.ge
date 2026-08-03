@@ -13,6 +13,10 @@ const OUT_TOTALS = "../../data/imports/municipal-total-facts-2015-2025.csv";
 
 const PORTAL_SOURCE = "source.municipal_portal_archive";
 const WORKBOOK_SOURCE = "source.municipal_mof_annual_and_history_workbooks";
+// These official rows describe municipal bodies operating outside occupied
+// territories, not territorially attributable spending there. Keep them in the
+// raw archive, but never copy them into GeoData.ge's public municipal dataset.
+const EXCLUDED_MUNICIPALITY_CODES = new Set(["05", "42", "43", "46", "64"]);
 
 const FUNCTION_HEADER = [
   "year",
@@ -82,6 +86,7 @@ export async function generateMunicipalFactCsvs(): Promise<{
   ]);
 
   const functionRows = rawFunctions
+    .filter((record) => !EXCLUDED_MUNICIPALITY_CODES.has(record.municipality_code))
     .map((record) => ({
       year: Number(record.year),
       code: record.municipality_code,
@@ -105,6 +110,7 @@ export async function generateMunicipalFactCsvs(): Promise<{
     ]);
 
   const totalRows = rawTotals
+    .filter((record) => !EXCLUDED_MUNICIPALITY_CODES.has(record.municipality_code))
     .map((record) => ({ year: Number(record.year), code: record.municipality_code, record }))
     .sort((left, right) => left.year - right.year || left.code.localeCompare(right.code))
     .map(({ record }) => [
