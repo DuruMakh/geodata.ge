@@ -45,7 +45,7 @@ An official blank, suppressed, unavailable, or non-numeric source cell must rema
 
 ## Validation and reconciliation
 
-The preparation step validates the two source hashes and byte sizes against `source-manifest.csv`, the exact municipality and region crosswalk sets, excluded-code absence, unique keys, year sets, numeric nonnegative values, UTF-8 BOM/Georgian-text CSV encoding, required headers, and normalized XLSX/CSV row parity.
+The preparation step validates the two source hashes and byte sizes against `source-manifest.csv`, the exact municipality and region crosswalk sets, excluded-code absence, unique keys, year sets, and numeric nonnegative values. It emits the fixed approved CSV headers and writes the normalized CSVs with a UTF-8 BOM, but does not reopen them to validate the BOM or Georgian text. It does not open or validate the XLSX review workbook.
 
 It then recalculates every normalized value from its recorded source workbook cell and compares the serialized CSV entry to that selected cell. `validation-report.json` consequently reports `source_hashes_match: true` and `normalized_values_reconcile: true` as well as `status: complete` and `estimates_created: 0`.
 
@@ -63,7 +63,7 @@ npm run check
 npm run build
 ```
 
-The preparation command regenerates only the two normalized CSVs and `validation-report.json` from the preserved source captures. The focused test independently checks capture hashes, BOM encoding, source-row/cell values, conversion, crosswalks, zero gaps, national reconciliation, and XLSX/CSV row parity. `npm run check` and `npm run build` are the repository-wide validation and production-build gates.
+The preparation command regenerates only the two normalized CSVs and `validation-report.json` from the preserved source captures. The focused test independently checks capture hashes, CSV BOM and Georgian-text encoding, source-row/cell values, conversion, crosswalks, zero gaps, and national reconciliation. It opens the review workbook to assert its four sheet names and that its data-row counts equal the CSV row counts; it does not establish row-by-row XLSX value parity. `npm run check` and `npm run build` are the repository-wide validation and production-build gates.
 
 Author the XLSX review workbook separately, after the preparation command, with the git-ignored SDD support builder `.superpowers/sdd/2026-08-03-municipal-population-regional-gdp-collection/build-review-workbook.mjs` and its bundled workspace `@oai/artifact-tool` runtime. The builder reads the generated CSVs and geography map, writes the four review sheets, and is neither a committed project dependency nor part of `npm run data:prepare-municipal-indicators`. Inspect its key workbook ranges, scan for formula errors, render all four sheets, and visually verify legibility and layout before accepting the workbook; do not commit the builder, runtime junction, or render previews.
 

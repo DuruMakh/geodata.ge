@@ -40,6 +40,8 @@ The population source title is *Population as of 1 January by regions and self-g
 
 The normalized output has 704 rows: 64 canonical municipalities for every year 2015-2025, inclusive. `population_thousand` retains Geostat's published precision; `population_persons` is the exact mechanical conversion `population_thousand * 1000`, not an additional estimate. Every normalized source cell is numeric, so the panel has zero official gaps.
 
+Population sheet `1` also marks `- Occupied territories`; the dash marker denotes occupied territories. Along with the workbook's `*`, `**`, and 2025 census-recalculation notes, it is preserved source context and does not create a normalized 2015-2025 gap for the 64 canonical rows.
+
 The workbook states: “Based on the results of the 2024 population census, the population size and related data as of January 1, 2025 were recalculated.” It also states that `*` data are included in the relevant municipalities before 2014 and starting from 2017, and that `**` data are included in the relevant municipalities before 2006. These source footnotes are preserved in the official workbook; they do not create a normalized 2015-2025 gap for the 64 canonical rows.
 
 ## Regional GDP definition and coverage
@@ -68,7 +70,9 @@ Each normalized row's `transformation` field records the exact source sheet, sou
 
 `validation-report.json` reports `status: complete`, zero population gaps, zero regional GDP gaps, `estimates_created: 0`, `excluded_codes_present: []`, `source_hashes_match: true`, and `normalized_values_reconcile: true`. It verifies exact population years 2015-2025, 704 unique municipality-year keys, all 64 canonical municipality codes, and the exact persons conversion. It verifies regional GDP years 2010-2024, 165 unique region-year keys, and all 11 canonical region IDs for every year.
 
-The generator re-reads every selected XLSX cell and compares it with the serialized normalized CSV value. It also checks SHA-256 and byte size against `source-manifest.csv`, UTF-8 BOM and Georgian-text CSV encoding, required headers, and XLSX/CSV sheet-row parity.
+The preparation module checks SHA-256 and byte size against `source-manifest.csv`, the geography sets, excluded-code absence, year/key coverage, and numeric rules. It writes the normalized CSVs with a UTF-8 BOM and compares every serialized normalized record with its selected source XLSX cell. It does not reopen the written CSVs to validate their BOM or Georgian text, and it does not open or validate the XLSX review workbook.
+
+The focused test independently asserts the CSV BOM and Georgian-text encoding, source-row/cell values and conversions, crosswalks, gaps, and national reconciliation. It opens the review workbook only to verify its four sheet names and data-row counts against the CSV files; it does not claim row-by-row XLSX value parity. The separate artifact-tool workflow performs workbook key-range inspection, formula-error scanning, rendering, and visual review.
 
 For regional GDP, the reported difference is `published national total minus sum of the 11 published regional components`, in million GEL. Values are never changed to force a match. The only non-zero differences are normal published component rounding:
 
