@@ -6,7 +6,92 @@ This methodology covers the prepared annual municipality-level research files un
 
 `docs/Raw Data/Municipalities/combined-annual-2015-2025/`
 
-The package is not imported into the GeoData.ge application or serving database.
+### Serving status (2026-08-02)
+
+The ten main functional categories are served, on the same terms as expenditure and revenue:
+reviewed, mapped to stable `municipal.*` category IDs, and shipped as
+`data/imports/municipal-function-facts-2015-2025.csv` (7,590 rows),
+`data/imports/municipal-total-facts-2015-2025.csv` (759 rows), and a new municipality registry
+`data/imports/municipalities.csv` (69 rows). These are read by the CSV serving path
+(`GEODATA_DATA_SOURCE=csv`, the default) the same way expenditure and revenue are. Prisma
+models, a migration, and a database-mode reader also exist for this dataset (see
+`docs/data-methodology/database-import.md`), but as of this date the migration has not been
+applied to the Supabase database and `npm run data:import` has not loaded municipal rows into
+it — the mirror holds no municipal data yet. Both happen automatically, with no manual approval
+step, on the next CI-green push to `main`: `.github/workflows/deploy-production.yml` runs
+`npm run prisma:deploy` and then `npm run data:import` unconditionally, so merging this branch is
+the decision point. The operation is safe by construction — one transaction, parity verified
+before commit, rollback on any mismatch — and production keeps serving the previous build if the
+workflow goes red.
+
+No page or route reads this data. `apps/web/lib/explorer/sections.ts` keeps
+`municipalities: { href: null }`, and the sidebar/hub keep the `მალე` marker (`DESIGN.md`
+§6.7); that stays until a future UI spec ships the route.
+
+The six selected-detail rows (`7.1.1`, `7.4.5.1`, `7.5.1`, `7.8.1`, `7.8.2`, `7.9.1`; 4,554 rows
+in the prepared package below) are deliberately not imported — not an oversight. Dropping them
+removes any non-additivity hazard: the ten main functions are mutually exclusive and sum
+exactly to `functional_sum_gel`. They remain in the raw package only, unimported.
+
+### Function mapping
+
+`functional_code` maps to a semantic `category_id` at the import boundary
+(`apps/web/lib/data/municipal/functionMapping.ts`). The raw package itself is never rewritten,
+so its recorded SHA-256 hashes and `PASS` validation report below stay valid.
+
+| Code | `category_id` | Georgian label |
+| --- | --- | --- |
+| 7.1 | `municipal.general_public_services` | საერთო დანიშნულების სახელმწიფო მომსახურება |
+| 7.2 | `municipal.defence` | თავდაცვა |
+| 7.3 | `municipal.public_order_safety` | საზოგადოებრივი წესრიგი და უსაფრთხოება |
+| 7.4 | `municipal.economic_affairs` | ეკონომიკური საქმიანობა |
+| 7.5 | `municipal.environment` | გარემოს დაცვა |
+| 7.6 | `municipal.housing_communal` | საბინაო-კომუნალური მეურნეობა |
+| 7.7 | `municipal.health` | ჯანმრთელობის დაცვა |
+| 7.8 | `municipal.recreation_culture` | დასვენება, კულტურა და რელიგია |
+| 7.9 | `municipal.education` | განათლება |
+| 7.10 | `municipal.social_protection` | სოციალური დაცვა |
+
+### Region mapping
+
+A new reviewed registry, one row per municipality (`data/imports/municipalities.csv`), assigns
+each of the 69 municipalities to one of twelve semantic regions: `region.tbilisi`,
+`region.abkhazia`, `region.adjara`, `region.imereti`, `region.kvemo_kartli`,
+`region.samegrelo_zemo_svaneti`, `region.shida_kartli`, `region.guria`, `region.kakheti`,
+`region.mtskheta_mtianeti`, `region.samtskhe_javakheti`, `region.racha_lechkhumi_kvemo_svaneti`.
+No region column exists in any source file; this mapping is new, assigned once against the
+official administrative division and reviewed.
+
+Municipality counts: Tbilisi 1, Abkhazia 1, Adjara 6, Kakheti 8, Imereti 12, Samegrelo-Zemo
+Svaneti 9, Shida Kartli 7, Kvemo Kartli 7, Guria 3, Samtskhe-Javakheti 6, Mtskheta-Mtianeti 5,
+Racha-Lechkhumi and Kvemo Svaneti 4 — 69 in total.
+
+**Autonomous-republic caveat.** `05 აჟარის` is **Abkhazia, not Adjara**: Azhara / Upper Abkhazia
+(ზემო აფხაზეთი) is a municipality of the Abkhaz autonomous republic that merely sits inside the
+Adjara sort block in the official ordering, so `region.abkhazia` is a one-municipality region
+and Adjara AR has exactly six municipalities (codes 06-11). A region roll-up is the sum of that
+region's municipal budgets only — for აჭარა that total does **not** include the Adjara
+autonomous republic's own budget, and the same holds for აფხაზეთი; those autonomous-republic
+budgets are outside this package entirely. Five municipalities that administer territory
+Georgia does not control (`05 აჟარის`, `42 ერედვის`, `43 ქურთის`, `46 თიღვის`, `64 ახალგორის`)
+carry real official rows and are registered and served on identical terms to every other
+municipality.
+
+The map-shape join (matching each municipality to a map boundary) is deferred to the future UI
+spec and is not part of what is served here; see
+`docs/superpowers/specs/2026-08-02-municipal-data-serving-layer-design.md` §4.3.
+
+### Population — not imported
+
+The archived MoF portal export carries a `Population` column for all 69 municipalities,
+2015-2021 (Tbilisi 1,115,689 → 1,202,731, consistent with Geostat); it is empty from 2022 on.
+It is not imported: the column stops four years short of 2025, so it cannot support a
+latest-year per-capita measure, and its provenance is unreviewed (Georgia's
+registered-population and Geostat resident-population figures diverge substantially, and the
+package author explicitly recorded that no population adjustment is applied). Sourcing
+municipal population 2015-2025 from Geostat, reviewing it, and adding a per-capita measure is a
+separate, future candidate dataset (see
+`docs/superpowers/specs/2026-08-02-municipal-data-serving-layer-design.md` §8).
 
 - Period: 2015-2025, inclusive.
 - Geography: 69 Georgian municipalities.

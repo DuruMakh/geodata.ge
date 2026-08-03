@@ -1,9 +1,14 @@
-import type { LoadedExplorerData, LoadedLandingData } from "../data/servedData";
+import type { LoadedExplorerData, LoadedLandingData, MunicipalData } from "../data/servedData";
 import {
   loadAdminCategoriesFromMirror,
   loadAdminFactsFromMirror,
   loadBudgetFactsFromMirror,
   loadGlossaryFromMirror,
+  loadMunicipalFunctionFactsFromMirror,
+  loadMunicipalFunctionsFromMirror,
+  loadMunicipalitiesFromMirror,
+  loadMunicipalRegionsFromMirror,
+  loadMunicipalTotalFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "./mirrorRows";
 import { prisma } from "./prisma";
@@ -30,4 +35,16 @@ export async function loadExplorerDataFromDb(): Promise<LoadedExplorerData> {
   ]);
 
   return { ...landing, adminFacts, adminCategories };
+}
+
+export async function loadMunicipalDataFromDb(): Promise<MunicipalData> {
+  const [functions, regions, municipalities, functionFacts, totalFacts] = await Promise.all([
+    loadMunicipalFunctionsFromMirror(prisma),
+    loadMunicipalRegionsFromMirror(prisma),
+    loadMunicipalitiesFromMirror(prisma),
+    loadMunicipalFunctionFactsFromMirror(prisma),
+    loadMunicipalTotalFactsFromMirror(prisma),
+  ]);
+
+  return { functions, regions, municipalities, functionFacts, totalFacts };
 }

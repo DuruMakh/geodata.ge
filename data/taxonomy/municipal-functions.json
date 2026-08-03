@@ -1,0 +1,62 @@
+[
+  {
+    "id": "municipal.general_public_services",
+    "kaLabel": "საერთო დანიშნულების სახელმწიფო მომსახურება",
+    "functionalCode": "7.1",
+    "sortOrder": 1
+  },
+  {
+    "id": "municipal.defence",
+    "kaLabel": "თავდაცვა",
+    "functionalCode": "7.2",
+    "sortOrder": 2
+  },
+  {
+    "id": "municipal.public_order_safety",
+    "kaLabel": "საზოგადოებრივი წესრიგი და უსაფრთხოება",
+    "functionalCode": "7.3",
+    "sortOrder": 3
+  },
+  {
+    "id": "municipal.economic_affairs",
+    "kaLabel": "ეკონომიკური საქმიანობა",
+    "functionalCode": "7.4",
+    "sortOrder": 4
+  },
+  {
+    "id": "municipal.environment",
+    "kaLabel": "გარემოს დაცვა",
+    "functionalCode": "7.5",
+    "sortOrder": 5
+  },
+  {
+    "id": "municipal.housing_communal",
+    "kaLabel": "საბინაო-კომუნალური მეურნეობა",
+    "functionalCode": "7.6",
+    "sortOrder": 6
+  },
+  {
+    "id": "municipal.health",
+    "kaLabel": "ჯანმრთელობის დაცვა",
+    "functionalCode": "7.7",
+    "sortOrder": 7
+  },
+  {
+    "id": "municipal.recreation_culture",
+    "kaLabel": "დასვენება, კულტურა და რელიგია",
+    "functionalCode": "7.8",
+    "sortOrder": 8
+  },
+  {
+    "id": "municipal.education",
+    "kaLabel": "განათლება",
+    "functionalCode": "7.9",
+    "sortOrder": 9
+  },
+  {
+    "id": "municipal.social_protection",
+    "kaLabel": "სოციალური დაცვა",
+    "functionalCode": "7.10",
+    "sortOrder": 10
+  }
+]

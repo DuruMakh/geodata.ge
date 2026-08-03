@@ -63,6 +63,7 @@
     "data:extract-annual-reports": "tsx scripts/extract-annual-report-pdf.ts",
     "data:generate-admin-spending": "tsx scripts/generate-admin-spending-data.ts",
     "data:compose-budget-facts": "tsx scripts/compose-budget-facts.ts",
+    "data:generate-municipal-facts": "tsx scripts/generate-municipal-facts.ts",
     "data:import": "tsx scripts/import-budget-facts.ts",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev",

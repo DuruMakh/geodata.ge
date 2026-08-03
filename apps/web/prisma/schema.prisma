@@ -161,3 +161,93 @@ model AdminSpendingFact {
   @@index([year, level])
   @@index([parentItemId])
 }
+
+enum MunicipalWarningType {
+  none
+  source_version_difference
+  financing_outside_functional
+  reconciliation_review_required
+  source_actual_missing
+}
+
+// Mirror of data/taxonomy/municipal-functions.json.
+model MunicipalFunctionCategory {
+  id             String                 @id
+  kaLabel        String
+  functionalCode String                 @unique
+  sortOrder      Int
+  facts          MunicipalFunctionFact[]
+}
+
+// Mirror of data/taxonomy/municipal-regions.json.
+model MunicipalRegion {
+  id             String          @id
+  kaLabel        String
+  sortOrder      Int
+  municipalities Municipality[]
+}
+
+// Mirror of data/imports/municipalities.csv.
+// code is the official municipality code and stays text: leading zeros ("04")
+// are part of the identifier.
+model Municipality {
+  code                String                  @id
+  sortId              Int
+  nameKa              String
+  displayNameKa       String
+  regionId            String
+  region              MunicipalRegion         @relation(fields: [regionId], references: [id])
+  isSelfGoverningCity Boolean
+  functionFacts       MunicipalFunctionFact[]
+  totalFacts          MunicipalTotalFact[]
+
+  @@index([regionId])
+}
+
+// Mirror of data/imports/municipal-function-facts-2015-2025.csv.
+// id is deterministic: `${year}:${municipalityCode}:${categoryId}`.
+model MunicipalFunctionFact {
+  id               String                    @id
+  year             Int
+  municipalityCode String
+  municipality     Municipality              @relation(fields: [municipalityCode], references: [code])
+  categoryId       String
+  category         MunicipalFunctionCategory @relation(fields: [categoryId], references: [id])
+  functionalCode   String
+  amountGel        Decimal                   @db.Decimal(18, 2)
+  basis            BudgetBasis
+  sourceId         String
+
+  @@unique([year, municipalityCode, categoryId])
+  @@index([year])
+  @@index([municipalityCode])
+}
+
+// Mirror of data/imports/municipal-total-facts-2015-2025.csv.
+// id is deterministic: `${year}:${municipalityCode}`.
+// The nullable component columns are null where the official source does not
+// publish the value — never coerced to zero, which would read as "spent none".
+model MunicipalTotalFact {
+  id                          String               @id
+  year                        Int
+  municipalityCode            String
+  municipality                Municipality         @relation(fields: [municipalityCode], references: [code])
+  publicTotalGel              Decimal              @db.Decimal(18, 2)
+  publicTotalMeasure          String
+  totalPaymentsGel            Decimal?             @db.Decimal(18, 2)
+  expensesGel                 Decimal?             @db.Decimal(18, 2)
+  nonfinancialAssetGrowthGel  Decimal?             @db.Decimal(18, 2)
+  financialAssetGrowthGel     Decimal?             @db.Decimal(18, 2)
+  liabilityDecreaseGel        Decimal?             @db.Decimal(18, 2)
+  functionalSumGel            Decimal              @db.Decimal(18, 2)
+  reconciliationDifferenceGel Decimal?             @db.Decimal(18, 2)
+  warningAmountGel            Decimal?             @db.Decimal(18, 2)
+  showWarning                 Boolean
+  warningType                 MunicipalWarningType
+  basis                       BudgetBasis
+  sourceId                    String
+
+  @@unique([year, municipalityCode])
+  @@index([year])
+  @@index([municipalityCode])
+}

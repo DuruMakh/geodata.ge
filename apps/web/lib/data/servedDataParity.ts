@@ -17,6 +17,21 @@ export function adminFactParityKey(row: { year: number; itemId: string }): strin
   return [row.year, row.itemId].join(":");
 }
 
+export function municipalFunctionFactParityKey(row: {
+  year: number;
+  municipalityCode: string;
+  categoryId: string;
+}): string {
+  return [row.year, row.municipalityCode, row.categoryId].join(":");
+}
+
+export function municipalTotalFactParityKey(row: {
+  year: number;
+  municipalityCode: string;
+}): string {
+  return [row.year, row.municipalityCode].join(":");
+}
+
 // Serialize with sorted top-level keys. Sorting is applied by rebuilding the
 // object (not via a JSON.stringify replacer array, which would filter keys at
 // every nesting depth and silently blank out any future nested field).

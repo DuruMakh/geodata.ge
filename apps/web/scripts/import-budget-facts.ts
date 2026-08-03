@@ -11,6 +11,15 @@ import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
 import { buildImportReport } from "../lib/data/importReport";
 import { loadSpendingMappings } from "../lib/data/mappings";
+import { loadMunicipalitiesFile } from "../lib/data/municipal/municipalitiesFile";
+import {
+  loadMunicipalFunctionFacts,
+  loadMunicipalTotalFacts,
+} from "../lib/data/municipal/importMunicipalFacts";
+import {
+  loadMunicipalFunctionsFile,
+  loadMunicipalRegionsFile,
+} from "../lib/data/municipal/taxonomyFiles";
 import {
   buildParityReport,
   buildTotalsByKey,
@@ -22,6 +31,8 @@ import {
   adminFactParityKey,
   assertSameServedRows,
   budgetFactParityKey,
+  municipalFunctionFactParityKey,
+  municipalTotalFactParityKey,
 } from "../lib/data/servedDataParity";
 import { loadSourceDocuments } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
@@ -30,6 +41,11 @@ import {
   loadAdminFactsFromMirror,
   loadBudgetFactsFromMirror,
   loadGlossaryFromMirror,
+  loadMunicipalFunctionFactsFromMirror,
+  loadMunicipalFunctionsFromMirror,
+  loadMunicipalitiesFromMirror,
+  loadMunicipalRegionsFromMirror,
+  loadMunicipalTotalFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "../lib/db/mirrorRows";
 
@@ -102,16 +118,33 @@ async function main() {
   await rm(reportPath(), { force: true });
 
   // Load every served dataset through the same validated loaders the site uses.
-  const [taxonomy, glossary, adminCategories, sourceDocuments, mappings, budgetFacts, adminFacts] =
-    await Promise.all([
-      loadTaxonomyFiles(TAXONOMY_DIR),
-      loadGlossary(SERVED_DATA_FILES.glossary),
-      loadAdminSpendingCategoriesFile(SERVED_DATA_FILES.adminSpendingCategories),
-      loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments),
-      loadSpendingMappings(MAPPINGS_FILE),
-      loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts),
-      loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts),
-    ]);
+  const [
+    taxonomy,
+    glossary,
+    adminCategories,
+    sourceDocuments,
+    mappings,
+    budgetFacts,
+    adminFacts,
+    municipalFunctions,
+    municipalRegions,
+    municipalities,
+    municipalFunctionFacts,
+    municipalTotalFacts,
+  ] = await Promise.all([
+    loadTaxonomyFiles(TAXONOMY_DIR),
+    loadGlossary(SERVED_DATA_FILES.glossary),
+    loadAdminSpendingCategoriesFile(SERVED_DATA_FILES.adminSpendingCategories),
+    loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments),
+    loadSpendingMappings(MAPPINGS_FILE),
+    loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts),
+    loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts),
+    loadMunicipalFunctionsFile(SERVED_DATA_FILES.municipalFunctions),
+    loadMunicipalRegionsFile(SERVED_DATA_FILES.municipalRegions),
+    loadMunicipalitiesFile(SERVED_DATA_FILES.municipalities),
+    loadMunicipalFunctionFacts(SERVED_DATA_FILES.municipalFunctionFacts),
+    loadMunicipalTotalFacts(SERVED_DATA_FILES.municipalTotalFacts),
+  ]);
 
   // Same reference validation the site's data pipeline uses (allows explicit
   // revenue.total / expenditure.total fact rows), plus the checks specific to
@@ -160,6 +193,26 @@ async function main() {
   assertAmountPrecision("Budget fact", budgetFacts);
   assertAmountPrecision("Admin fact", adminFacts);
 
+  const municipalRegionIds = new Set(municipalRegions.map((region) => region.id));
+  const municipalCategoryIds = new Set(municipalFunctions.map((entry) => entry.id));
+  const municipalityCodes = new Set(municipalities.map((row) => row.code));
+
+  assertSubset("Municipality region IDs", municipalities.map((row) => row.regionId), municipalRegionIds);
+  assertSubset("Municipal fact category IDs", municipalFunctionFacts.map((fact) => fact.categoryId), municipalCategoryIds);
+  assertSubset(
+    "Municipal fact municipality codes",
+    [...municipalFunctionFacts, ...municipalTotalFacts].map((fact) => fact.municipalityCode),
+    municipalityCodes,
+  );
+  assertSubset(
+    "Municipal fact source IDs",
+    [...municipalFunctionFacts, ...municipalTotalFacts].map((fact) => fact.sourceId),
+    sourceIds,
+  );
+  assertUnique("municipal function fact natural key", municipalFunctionFacts.map(municipalFunctionFactParityKey));
+  assertUnique("municipal total fact natural key", municipalTotalFacts.map(municipalTotalFactParityKey));
+  assertAmountPrecision("Municipal function fact", municipalFunctionFacts);
+
   const report = buildImportReport(IMPORT_LABEL, budgetFacts);
 
   const adapter = new PrismaPg({ connectionString });
@@ -184,6 +237,11 @@ async function main() {
         await tx.budgetMapping.deleteMany();
         await tx.budgetItem.deleteMany();
         await tx.adminSpendingCategory.deleteMany();
+        await tx.municipalFunctionFact.deleteMany();
+        await tx.municipalTotalFact.deleteMany();
+        await tx.municipality.deleteMany();
+        await tx.municipalRegion.deleteMany();
+        await tx.municipalFunctionCategory.deleteMany();
         await tx.sourceDocument.deleteMany();
 
         await tx.sourceDocument.createMany({
@@ -217,6 +275,69 @@ async function main() {
             kaLabel: category.kaLabel,
             enLabel: category.enLabel,
             sortOrder: category.sortOrder,
+          })),
+        });
+
+        await tx.municipalRegion.createMany({
+          data: municipalRegions.map((region) => ({
+            id: region.id,
+            kaLabel: region.kaLabel,
+            sortOrder: region.sortOrder,
+          })),
+        });
+
+        await tx.municipalFunctionCategory.createMany({
+          data: municipalFunctions.map((entry) => ({
+            id: entry.id,
+            kaLabel: entry.kaLabel,
+            functionalCode: entry.functionalCode,
+            sortOrder: entry.sortOrder,
+          })),
+        });
+
+        await tx.municipality.createMany({
+          data: municipalities.map((row) => ({
+            code: row.code,
+            sortId: row.sortId,
+            nameKa: row.nameKa,
+            displayNameKa: row.displayNameKa,
+            regionId: row.regionId,
+            isSelfGoverningCity: row.isSelfGoverningCity,
+          })),
+        });
+
+        await tx.municipalFunctionFact.createMany({
+          data: municipalFunctionFacts.map((fact) => ({
+            id: municipalFunctionFactParityKey(fact),
+            year: fact.year,
+            municipalityCode: fact.municipalityCode,
+            categoryId: fact.categoryId,
+            functionalCode: fact.functionalCode,
+            amountGel: fact.amountGel,
+            basis: fact.basis,
+            sourceId: fact.sourceId,
+          })),
+        });
+
+        await tx.municipalTotalFact.createMany({
+          data: municipalTotalFacts.map((total) => ({
+            id: municipalTotalFactParityKey(total),
+            year: total.year,
+            municipalityCode: total.municipalityCode,
+            publicTotalGel: total.publicTotalGel,
+            publicTotalMeasure: total.publicTotalMeasure,
+            totalPaymentsGel: total.totalPaymentsGel,
+            expensesGel: total.expensesGel,
+            nonfinancialAssetGrowthGel: total.nonfinancialAssetGrowthGel,
+            financialAssetGrowthGel: total.financialAssetGrowthGel,
+            liabilityDecreaseGel: total.liabilityDecreaseGel,
+            functionalSumGel: total.functionalSumGel,
+            reconciliationDifferenceGel: total.reconciliationDifferenceGel,
+            warningAmountGel: total.warningAmountGel,
+            showWarning: total.showWarning,
+            warningType: total.warningType,
+            basis: total.basis,
+            sourceId: total.sourceId,
           })),
         });
 
@@ -301,6 +422,20 @@ async function main() {
             loadAdminCategoriesFromMirror(tx),
           ]);
 
+        const [
+          mirrorMunicipalFunctions,
+          mirrorMunicipalRegions,
+          mirrorMunicipalities,
+          mirrorMunicipalFunctionFacts,
+          mirrorMunicipalTotalFacts,
+        ] = await Promise.all([
+          loadMunicipalFunctionsFromMirror(tx),
+          loadMunicipalRegionsFromMirror(tx),
+          loadMunicipalitiesFromMirror(tx),
+          loadMunicipalFunctionFactsFromMirror(tx),
+          loadMunicipalTotalFactsFromMirror(tx),
+        ]);
+
         assertSameServedRows("budget facts", budgetFacts, mirrorFacts, budgetFactParityKey);
         assertSameServedRows(
           "glossary entries",
@@ -315,6 +450,36 @@ async function main() {
           adminCategories,
           mirrorAdminCategories,
           (row) => row.id,
+        );
+        assertSameServedRows(
+          "municipal functions",
+          municipalFunctions,
+          mirrorMunicipalFunctions,
+          (row) => row.id,
+        );
+        assertSameServedRows(
+          "municipal regions",
+          municipalRegions,
+          mirrorMunicipalRegions,
+          (row) => row.id,
+        );
+        assertSameServedRows(
+          "municipalities",
+          municipalities,
+          mirrorMunicipalities,
+          (row) => row.code,
+        );
+        assertSameServedRows(
+          "municipal function facts",
+          municipalFunctionFacts,
+          mirrorMunicipalFunctionFacts,
+          municipalFunctionFactParityKey,
+        );
+        assertSameServedRows(
+          "municipal total facts",
+          municipalTotalFacts,
+          mirrorMunicipalTotalFacts,
+          municipalTotalFactParityKey,
         );
 
         // Totals parity for the human-readable report; counts come from the
@@ -338,6 +503,27 @@ async function main() {
             },
             { table: "SourceDocument", csvRows: sourceDocuments.length, dbRows: mirrorSources.length },
             { table: "BudgetMapping", csvRows: mappings.length, dbRows: dbMappings },
+            {
+              table: "MunicipalFunctionCategory",
+              csvRows: municipalFunctions.length,
+              dbRows: mirrorMunicipalFunctions.length,
+            },
+            {
+              table: "MunicipalRegion",
+              csvRows: municipalRegions.length,
+              dbRows: mirrorMunicipalRegions.length,
+            },
+            { table: "Municipality", csvRows: municipalities.length, dbRows: mirrorMunicipalities.length },
+            {
+              table: "MunicipalFunctionFact",
+              csvRows: municipalFunctionFacts.length,
+              dbRows: mirrorMunicipalFunctionFacts.length,
+            },
+            {
+              table: "MunicipalTotalFact",
+              csvRows: municipalTotalFacts.length,
+              dbRows: mirrorMunicipalTotalFacts.length,
+            },
           ],
           budgetTotalsCsv,
           budgetTotalsDb: buildTotalsByKey(

@@ -23,7 +23,30 @@ the import is re-run.
 | `BudgetMapping` | `data/mappings/spending-field-mapping.csv` |
 | `BudgetFact` | `data/imports/budget-facts-2005-2025.csv` |
 | `AdminSpendingFact` | `data/imports/admin-spending-facts-2005-2025.csv` (admin categories + major-program drill-down rows) |
+| `MunicipalFunctionCategory` | `data/taxonomy/municipal-functions.json` |
+| `MunicipalRegion` | `data/taxonomy/municipal-regions.json` |
+| `Municipality` | `data/imports/municipalities.csv` |
+| `MunicipalFunctionFact` | `data/imports/municipal-function-facts-2015-2025.csv` |
+| `MunicipalTotalFact` | `data/imports/municipal-total-facts-2015-2025.csv` |
 | `ImportRun` | one audit row per import run, including the full parity report |
+
+The five municipal tables are wired into the import but **the mirror does not
+hold municipal rows yet**: migration `20260802194939_municipal_dataset` has not
+been applied and no import has run since the wiring landed. Neither step is a
+manual approval gate: `.github/workflows/deploy-production.yml` runs
+`npm run prisma:deploy` and then `npm run data:import` unconditionally on every
+push-triggered CI-green run on `main`, so merging this work is the decision
+point, not a separate sign-off. The operation is safe by construction — one
+transaction, parity verified before commit, rollback on any mismatch — and
+production keeps serving the previous build if the workflow goes red. Until
+that deploy runs, municipal data serves only from the CSVs
+(`GEODATA_DATA_SOURCE=csv`, the default). A `GEODATA_DATA_SOURCE=db` build does
+**not** fail on the missing tables, because it never queries them: no route
+under `app/`, `components/`, or `lib/` calls `loadServedMunicipalData` yet (its
+only caller is a test file), so a db-mode build succeeds whether or not the
+migration has been applied. Until a route reads it, the in-transaction check
+inside `npm run data:import` is the **sole** parity gate for the municipal
+tables. See `docs/data-methodology/municipal-functional-annual-2015-2025.md`.
 
 The import reuses the same validated loaders the site uses, then cross-checks
 referential integrity (fact item IDs against taxonomy, source IDs against
@@ -62,10 +85,11 @@ behind (the previous run's report is removed at start), so a present
    Never commit `.env`.
 3. From `apps/web`: `npm run prisma:deploy` — applies the committed migrations
    over the direct connection (Prisma 7 CLI reads `DIRECT_URL` via
-   `prisma.config.ts`). Always use `prisma:deploy` against the live database;
-   `prisma:migrate` (`prisma migrate dev`) is a development command for
-   authoring new migrations and may offer to RESET a database whose state
-   drifts from the migration history.
+   `prisma.config.ts`). Always use `prisma:deploy` against the live database.
+   Never point `prisma:migrate` (`prisma migrate dev`) at it: it is an
+   authoring command that may offer to RESET a database whose state drifts
+   from the migration history — and on this project it does not work at all
+   (P3006; see "Creating a migration" below).
 4. From `apps/web`: `npm run data:import` — loads everything and prints the
    parity report.
 5. Hardening ships as migrations (applied automatically by step 3): row level
@@ -111,14 +135,17 @@ ever delay a rebuild, never take the site down.
 1. Land the reviewed CSVs as usual (extraction → staging → review →
    promotion into `data/imports/`, with the matching methodology doc).
 2. If the data introduced new columns or datasets, reconcile
-   `apps/web/prisma/schema.prisma` and author the migration in development
-   (`npm run prisma:migrate`); commit it with the data change.
+   `apps/web/prisma/schema.prisma` and author the migration; commit it with
+   the data change. **Do not use `npm run prisma:migrate`** — `prisma migrate
+   dev` fails on this project with P3006. See "Creating a migration" below
+   for why and for the read-only command to use instead.
 3. Merge to `main`. Nothing else is manual: after CI passes,
    `.github/workflows/deploy-production.yml` applies any new migrations
    (`npm run prisma:deploy`), re-runs `npm run data:import` (every
    production deploy converges the mirror to the checkout,
    unconditionally), and triggers the Vercel production build, which
-   re-verifies the mirror row-by-row. The parity report is in the workflow
+   re-verifies the mirror row-by-row for every table a route reads — see the
+   three tiers under "Failure modes". The parity report is in the workflow
    log.
 
 ### Manual fallback (Actions outage or local work)
@@ -140,8 +167,65 @@ From `apps/web`, with `.env` configured:
   are unaffected.
 - Mirror out of date or edited (CSVs changed without re-running the import,
   or a direct database edit) → the next db-mode build fails its row-level
-  verification with a message pointing at `npm run data:import`.
+  verification with a message pointing at `npm run data:import` — but only
+  for the tables a route actually reads. Three tiers, and the tier is decided
+  by whether a page loads the data, not by how important the table looks:
+  - **`BudgetFact`, `BudgetItem`, `SourceDocument`, `AdminSpendingFact`,
+    `AdminSpendingCategory`** — read by `loadServedLandingData` /
+    `loadServedExplorerData`, which every route calls. Verified field by field
+    at import *and* on every db-mode build. This is the tier the sentence
+    above describes.
+  - **The five municipal tables** — verified field by field at import, but
+    `assertMunicipalParity` is reachable only from `loadServedMunicipalData`,
+    which no route calls yet, so a db-mode build never runs it. Until a route
+    reads them, the import's in-transaction check is their only gate.
+  - **`BudgetMapping`** — the weakest tier, and it predates the municipal
+    work. No reader anywhere under `app/`, `components/` or `lib/`, and the
+    import checks only its **row count** (`tx.budgetMapping.count()`), never
+    its field values. A corrupted mapping row would pass both the import and
+    every build. Low impact today — it is an audit table, and served
+    `BudgetFact` rows already carry their resolved `publicSpendingFieldId`
+    from the CSV pipeline, so nothing a visitor sees depends on it — but do
+    not read the first tier as covering it.
 - Database unreachable at build time → the build fails loudly; either resume
   the Supabase project and rebuild, or build with `GEODATA_DATA_SOURCE=csv`.
 - Database empty (import never run) → the db-mode build fails with a clear
   message pointing at `npm run data:import`.
+
+## Creating a migration: `prisma migrate dev` does not work here
+
+`prisma migrate dev` — including `--create-only` — fails on this project with
+**P3006**. It is not a sign the database is broken.
+
+Cause: migration `20260714010000_enable_rls_on_prisma_migrations` puts row
+level security on the `_prisma_migrations` table. `migrate dev` bootstraps a
+shadow database by replaying every migration into it, and that replay breaks
+against the Supabase pooler once RLS covers the bookkeeping table. Any future
+`migrate dev` on this project will hit it.
+
+Create new migrations with Prisma's documented patching pattern instead, which
+is read-only:
+
+```bash
+npx prisma migrate diff --from-config-datasource --to-schema-datamodel prisma/schema.prisma --script > migration.sql
+```
+
+Then place the SQL in a `prisma/migrations/<timestamp>_<name>/migration.sql`
+folder by hand, and add `ALTER TABLE "<Table>" ENABLE ROW LEVEL SECURITY;` for
+every new table — the generator does not emit RLS, and every mirror table here
+carries it.
+
+**Verifying that workaround — `migrate status` is not enough.** `--from-config-datasource`
+diffs against the *live database*, not against migration history, so live drift
+would be silently baked into the generated SQL. `prisma migrate status` does
+not rule that out: it compares migration-table bookkeeping only. Structural
+drift detection is a `migrate dev` feature — the very thing that fails here.
+Verify instead by either:
+
+- confirming the generated SQL contains **zero statements referencing any
+  pre-existing table or enum** (a clean delta touches only the new objects); or
+- running `prisma db pull` into a scratch schema file and diffing it against
+  the committed models.
+
+Production is unaffected by all of this: deploys run `prisma migrate deploy`,
+which never uses a shadow database, so P3006 is not in the production path.

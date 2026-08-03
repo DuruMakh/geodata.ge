@@ -5,6 +5,13 @@ import type {
 } from "../data/adminSpending/types";
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
+import type {
+  Municipality,
+  MunicipalFunction,
+  MunicipalFunctionFact,
+  MunicipalRegion,
+  MunicipalTotalFact,
+} from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
 
 // Client-parameterized readers of the database mirror. They return exactly the
@@ -132,4 +139,116 @@ export async function loadAdminCategoriesFromMirror(
     enLabel: category.enLabel,
     sortOrder: category.sortOrder,
   }));
+}
+
+// Nullable money columns: a `null` column means "the official source does not
+// publish this value" and must stay `null`. `Number(null)` is `0`, so a plain
+// `Number(...)` conversion would silently turn "not published" into "spent
+// zero" — this helper is what stands between the two.
+function decimalOrNull(value: { toString(): string } | null): number | null {
+  return value === null ? null : Number(value);
+}
+
+export async function loadMunicipalFunctionsFromMirror(
+  db: MirrorClient,
+): Promise<MunicipalFunction[]> {
+  const rows = await db.municipalFunctionCategory.findMany({
+    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    kaLabel: row.kaLabel,
+    functionalCode: row.functionalCode,
+    sortOrder: row.sortOrder,
+  }));
+}
+
+export async function loadMunicipalRegionsFromMirror(
+  db: MirrorClient,
+): Promise<MunicipalRegion[]> {
+  const rows = await db.municipalRegion.findMany({
+    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+  });
+
+  return rows.map((row) => ({ id: row.id, kaLabel: row.kaLabel, sortOrder: row.sortOrder }));
+}
+
+export async function loadMunicipalitiesFromMirror(db: MirrorClient): Promise<Municipality[]> {
+  const rows = await db.municipality.findMany({ orderBy: [{ sortId: "asc" }, { code: "asc" }] });
+
+  return rows.map((row) => ({
+    code: row.code,
+    sortId: row.sortId,
+    nameKa: row.nameKa,
+    displayNameKa: row.displayNameKa,
+    regionId: row.regionId,
+    isSelfGoverningCity: row.isSelfGoverningCity,
+  }));
+}
+
+export async function loadMunicipalFunctionFactsFromMirror(
+  db: MirrorClient,
+): Promise<MunicipalFunctionFact[]> {
+  const rows = await db.municipalFunctionFact.findMany({
+    orderBy: [{ year: "asc" }, { municipalityCode: "asc" }, { categoryId: "asc" }],
+  });
+
+  if (rows.length === 0) {
+    throw new Error(
+      "The database has no municipal function facts. Run `npm run data:import` first, " +
+        "or build with GEODATA_DATA_SOURCE=csv. If the import has already succeeded, " +
+        "check the role in DATABASE_URL: the mirror tables use row level security, " +
+        "which hides all rows from non-owner roles.",
+    );
+  }
+
+  return rows.map((row) => {
+    if (row.basis !== "actual") {
+      throw new Error(`Municipal function fact ${row.id} must have basis=actual, got ${row.basis}`);
+    }
+
+    return {
+      year: row.year,
+      municipalityCode: row.municipalityCode,
+      categoryId: row.categoryId,
+      functionalCode: row.functionalCode,
+      amountGel: Number(row.amountGel),
+      basis: "actual" as const,
+      sourceId: row.sourceId,
+    };
+  });
+}
+
+export async function loadMunicipalTotalFactsFromMirror(
+  db: MirrorClient,
+): Promise<MunicipalTotalFact[]> {
+  const rows = await db.municipalTotalFact.findMany({
+    orderBy: [{ year: "asc" }, { municipalityCode: "asc" }],
+  });
+
+  return rows.map((row) => {
+    if (row.basis !== "actual") {
+      throw new Error(`Municipal total fact ${row.id} must have basis=actual, got ${row.basis}`);
+    }
+
+    return {
+      year: row.year,
+      municipalityCode: row.municipalityCode,
+      publicTotalGel: Number(row.publicTotalGel),
+      publicTotalMeasure: row.publicTotalMeasure,
+      totalPaymentsGel: decimalOrNull(row.totalPaymentsGel),
+      expensesGel: decimalOrNull(row.expensesGel),
+      nonfinancialAssetGrowthGel: decimalOrNull(row.nonfinancialAssetGrowthGel),
+      financialAssetGrowthGel: decimalOrNull(row.financialAssetGrowthGel),
+      liabilityDecreaseGel: decimalOrNull(row.liabilityDecreaseGel),
+      functionalSumGel: Number(row.functionalSumGel),
+      reconciliationDifferenceGel: decimalOrNull(row.reconciliationDifferenceGel),
+      warningAmountGel: decimalOrNull(row.warningAmountGel),
+      showWarning: row.showWarning,
+      warningType: row.warningType,
+      basis: "actual" as const,
+      sourceId: row.sourceId,
+    };
+  });
 }
