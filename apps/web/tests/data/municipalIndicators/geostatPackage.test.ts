@@ -173,6 +173,12 @@ function sourceRowsByLabel(matrix: unknown[][]): Map<string, unknown[]> {
   );
 }
 
+function sourceRowNumber(matrix: unknown[][], sourceLabel: string): number {
+  const rowIndex = matrix.findIndex((row) => row[0] === sourceLabel);
+  expect(rowIndex).toBeGreaterThanOrEqual(0);
+  return rowIndex + 1;
+}
+
 function municipalityMappings(geographyRows: GeographyRow[]): GeographyRow[] {
   return geographyRows.filter((row) => row.geography_level === "municipality");
 }
@@ -236,13 +242,19 @@ function assertPopulationRowsReconcile(
     expect(row.source_unit).toBe("(thousands)");
 
     const sourceRow = sourceRows.get(mapping?.source_label ?? "");
-    const sourceValue = workbookNumber(sourceRow?.[yearColumns.get(year) ?? -1]);
+    const yearColumn = yearColumns.get(year) ?? -1;
+    const sourceValue = workbookNumber(sourceRow?.[yearColumn]);
     const populationThousand = outputNumber(row.population_thousand);
     const populationPersons = outputNumber(row.population_persons);
+    const rowNumber = sourceRowNumber(source.matrix, mapping?.source_label ?? "");
+    const sourceCell = XLSX.utils.encode_cell({ r: rowNumber - 1, c: yearColumn });
 
     expect(populationThousand).toBe(sourceValue);
     expect(populationPersons).toBe(
       sourceValue === null ? null : sourceValue * 1000,
+    );
+    expect(row.transformation).toBe(
+      `Source sheet "1"; source row ${rowNumber}; year ${year} column ${XLSX.utils.encode_col(yearColumn)} (cell ${sourceCell}); retained published thousands; persons = thousands * 1000; no estimates.`,
     );
   }
 }
@@ -264,17 +276,22 @@ function assertRegionalGdpRowsReconcile(
   for (const row of rows) {
     const mapping = mappings.get(String(row.region_id));
     const sourceRow = sourceRows.get(mapping?.source_label ?? "");
-    const sourceValue = sourceGdpMillionGel(
-      sourceRow?.[yearColumns.get(Number(row.year)) ?? -1],
-      "mil. GEL",
-    );
+    const year = Number(row.year);
+    const yearColumn = yearColumns.get(year) ?? -1;
+    const sourceValue = sourceGdpMillionGel(sourceRow?.[yearColumn], "mil. GEL");
+    const rowNumber = sourceRowNumber(source.matrix, mapping?.source_label ?? "");
+    const sourceCell = XLSX.utils.encode_cell({ r: rowNumber - 1, c: yearColumn });
 
     expect(mapping).toBeDefined();
     expect(row.source_region_label).toBe(mapping?.source_label);
     expect(row.source_id).toBe("geostat_regional_gdp_current_prices");
     expect(row.source_sheet).toBe(source.sheetName);
     expect(row.source_unit).toBe("mil. GEL");
+    expect(row.status).toBe("final_as_published");
     expect(outputNumber(row.gdp_current_prices_million_gel)).toBe(sourceValue);
+    expect(row.transformation).toBe(
+      `Source sheet "regional GDP"; source row ${rowNumber}; year ${year} column ${XLSX.utils.encode_col(yearColumn)} (cell ${sourceCell}); source already mil. GEL; no scale conversion; no estimates.`,
+    );
   }
 }
 
@@ -288,6 +305,31 @@ function sheetDataRowCount(workbook: XLSX.WorkBook, sheetName: string): number {
 }
 
 describe("Geostat population and regional GDP research package", () => {
+  it("rejects altered, missing, or duplicate normalized reconciliation entries", async () => {
+    const { reconciliationEntriesMatch } = await import(
+      "../../../lib/data/municipalIndicators/prepareGeostatPackage"
+    );
+    const expected = [
+      { key: "2015:04", values: ["04", 1115.7, 1115700] },
+      { key: "2015:06", values: ["06", 155.2, 155200] },
+    ];
+
+    expect(reconciliationEntriesMatch(expected, expected)).toBe(true);
+    expect(
+      reconciliationEntriesMatch(
+        [
+          { key: "2015:04", values: ["04", 1115.8, 1115800] },
+          expected[1],
+        ],
+        expected,
+      ),
+    ).toBe(false);
+    expect(reconciliationEntriesMatch([expected[0]], expected)).toBe(false);
+    expect(
+      reconciliationEntriesMatch([expected[0], expected[0]], expected),
+    ).toBe(false);
+  });
+
   it("builds a complete 64 x 11 municipal population panel", async () => {
     expect(fs.existsSync(modulePath)).toBe(true);
     const { buildGeostatPackage } = await import(
@@ -422,6 +464,13 @@ describe("Geostat population and regional GDP research package", () => {
     );
     expect(sheetDataRowCount(workbook, "Geography map")).toBe(
       readPackageCsvRows("geography-map.csv").length,
+    );
+    const readMeRows = XLSX.utils.sheet_to_json<unknown[]>(
+      workbook.Sheets["Read me"],
+      { header: 1, raw: false, blankrows: false },
+    );
+    expect(readMeRows.some((row) => row[0] === "Retrieval/review date")).toBe(
+      true,
     );
   });
 });

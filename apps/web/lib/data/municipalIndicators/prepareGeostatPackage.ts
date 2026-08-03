@@ -29,7 +29,7 @@ export type RegionalGdpRow = {
   source_id: "geostat_regional_gdp_current_prices";
   source_sheet: string;
   source_unit: string;
-  status: string;
+  status: "final_as_published";
   transformation: string;
   last_reviewed_at: string;
 };
@@ -88,6 +88,35 @@ export type GeostatPackageBuild = {
   geographyRows: GeographyMapRow[];
   validation: ValidationReport;
 };
+
+export type ReconciliationEntry = {
+  key: string;
+  values: Array<string | number | null>;
+};
+
+export function reconciliationEntriesMatch(
+  actual: ReconciliationEntry[],
+  expected: ReconciliationEntry[],
+): boolean {
+  if (actual.length !== expected.length) return false;
+
+  const actualByKey = new Map<string, ReconciliationEntry>();
+  for (const entry of actual) {
+    if (actualByKey.has(entry.key)) return false;
+    actualByKey.set(entry.key, entry);
+  }
+
+  return expected.every((expectedEntry) => {
+    const actualEntry = actualByKey.get(expectedEntry.key);
+    return (
+      actualEntry !== undefined &&
+      actualEntry.values.length === expectedEntry.values.length &&
+      actualEntry.values.every(
+        (value, index) => value === expectedEntry.values[index],
+      )
+    );
+  });
+}
 
 type CsvRow = Record<string, string>;
 type Matrix = unknown[][];
@@ -170,7 +199,10 @@ function requireSourceNumber(value: unknown, context: string): number {
   }
   const normalized = String(value).replace(/\s/g, "").replace(/,/g, "");
   const number = Number(normalized);
-  if (!Number.isFinite(number) || number < 0) {
+  if (!Number.isFinite(number)) {
+    throw new OfficialGapError(context, "non_numeric");
+  }
+  if (number < 0) {
     throw new Error(`Invalid nonnegative source number at ${context}: ${String(value)}`);
   }
   return number;
@@ -277,6 +309,51 @@ function serializeCsv<T extends object>(headers: Array<keyof T>, rows: T[]): str
   return `\uFEFF${lines.join("\n")}\n`;
 }
 
+function csvNumber(value: string): number | null {
+  if (value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : Number.NaN;
+}
+
+function serializedPopulationEntry(row: CsvRow): ReconciliationEntry {
+  return {
+    key: `${row.year}:${row.municipality_code}`,
+    values: [
+      Number(row.year),
+      row.municipality_code,
+      row.municipality_name_ka,
+      row.region_id,
+      csvNumber(row.population_thousand),
+      csvNumber(row.population_persons),
+      row.reference_date,
+      row.source_id,
+      row.source_sheet,
+      row.source_unit,
+      row.transformation,
+      row.last_reviewed_at,
+    ],
+  };
+}
+
+function serializedGdpEntry(row: CsvRow): ReconciliationEntry {
+  return {
+    key: `${row.year}:${row.region_id}`,
+    values: [
+      Number(row.year),
+      row.region_id,
+      row.region_name_ka,
+      row.source_region_label,
+      csvNumber(row.gdp_current_prices_million_gel),
+      row.source_id,
+      row.source_sheet,
+      row.source_unit,
+      row.status,
+      row.transformation,
+      row.last_reviewed_at,
+    ],
+  };
+}
+
 export async function buildGeostatPackage(
   options: { write: boolean } = { write: true },
 ): Promise<GeostatPackageBuild> {
@@ -324,6 +401,7 @@ export async function buildGeostatPackage(
   const populationSourceRows = rowsByLabel(populationMatrix);
   const populationGaps: Gap[] = [];
   const populationRows: PopulationRow[] = [];
+  const expectedPopulationEntries: ReconciliationEntry[] = [];
 
   for (const year of POPULATION_YEARS) {
     const columnIndex = populationColumns.get(year);
@@ -344,18 +422,38 @@ export async function buildGeostatPackage(
         },
         populationGaps,
       );
+      const populationPersons =
+        populationThousand === null ? null : populationThousand * 1000;
+      const transformation = `Source sheet "1"; source row ${source.rowNumber}; year ${year} column ${XLSX.utils.encode_col(columnIndex)} (cell ${sourceCell}); retained published thousands; persons = thousands * 1000; no estimates.`;
+      expectedPopulationEntries.push({
+        key: `${year}:${mapping.geodata_id}`,
+        values: [
+          year,
+          mapping.geodata_id,
+          mapping.display_name_ka,
+          mapping.region_id,
+          populationThousand,
+          populationPersons,
+          `${year}-01-01`,
+          POPULATION_SOURCE_ID,
+          "1",
+          populationUnit,
+          transformation,
+          REVIEW_DATE,
+        ],
+      });
       populationRows.push({
         year,
         municipality_code: mapping.geodata_id,
         municipality_name_ka: mapping.display_name_ka,
         region_id: mapping.region_id,
         population_thousand: populationThousand,
-        population_persons: populationThousand === null ? null : populationThousand * 1000,
+        population_persons: populationPersons,
         reference_date: `${year}-01-01`,
         source_id: POPULATION_SOURCE_ID,
         source_sheet: "1",
         source_unit: populationUnit,
-        transformation: "Copied from Geostat thousands; persons = thousands * 1000; no estimates.",
+        transformation,
         last_reviewed_at: REVIEW_DATE,
       });
     }
@@ -374,6 +472,7 @@ export async function buildGeostatPackage(
   const gdpSourceRows = rowsByLabel(gdpMatrix);
   const gdpGaps: Gap[] = [];
   const regionalGdpRows: RegionalGdpRow[] = [];
+  const expectedGdpEntries: ReconciliationEntry[] = [];
 
   for (const year of gdpYears) {
     const columnIndex = gdpColumns.get(year);
@@ -393,6 +492,23 @@ export async function buildGeostatPackage(
         },
         gdpGaps,
       );
+      const transformation = `Source sheet "regional GDP"; source row ${source.rowNumber}; year ${year} column ${XLSX.utils.encode_col(columnIndex)} (cell ${sourceCell}); source already mil. GEL; no scale conversion; no estimates.`;
+      expectedGdpEntries.push({
+        key: `${year}:${mapping.geodata_id}`,
+        values: [
+          year,
+          mapping.geodata_id,
+          mapping.display_name_ka,
+          mapping.source_label,
+          sourceValue,
+          GDP_SOURCE_ID,
+          "regional GDP",
+          gdpSourceUnit,
+          "final_as_published",
+          transformation,
+          REVIEW_DATE,
+        ],
+      });
       regionalGdpRows.push({
         year,
         region_id: mapping.geodata_id,
@@ -403,8 +519,8 @@ export async function buildGeostatPackage(
         source_id: GDP_SOURCE_ID,
         source_sheet: "regional GDP",
         source_unit: gdpSourceUnit,
-        status: "official",
-        transformation: "Copied from Geostat current-price mil. GEL; no scale conversion; no estimates.",
+        status: "final_as_published",
+        transformation,
         last_reviewed_at: REVIEW_DATE,
       });
     }
@@ -446,6 +562,50 @@ export async function buildGeostatPackage(
     throw new Error(`Unexpected regional GDP row count: ${regionalGdpRows.length}`);
   }
 
+  const populationHeaders: Array<keyof PopulationRow> = [
+    "year",
+    "municipality_code",
+    "municipality_name_ka",
+    "region_id",
+    "population_thousand",
+    "population_persons",
+    "reference_date",
+    "source_id",
+    "source_sheet",
+    "source_unit",
+    "transformation",
+    "last_reviewed_at",
+  ];
+  const gdpHeaders: Array<keyof RegionalGdpRow> = [
+    "year",
+    "region_id",
+    "region_name_ka",
+    "source_region_label",
+    "gdp_current_prices_million_gel",
+    "source_id",
+    "source_sheet",
+    "source_unit",
+    "status",
+    "transformation",
+    "last_reviewed_at",
+  ];
+  const populationCsv = serializeCsv(populationHeaders, populationRows);
+  const gdpCsv = serializeCsv(gdpHeaders, regionalGdpRows);
+  const normalizedValuesReconcile =
+    reconciliationEntriesMatch(
+      parseCsv(populationCsv).map(serializedPopulationEntry),
+      expectedPopulationEntries,
+    ) &&
+    reconciliationEntriesMatch(
+      parseCsv(gdpCsv).map(serializedGdpEntry),
+      expectedGdpEntries,
+    );
+  if (!normalizedValuesReconcile) {
+    throw new Error(
+      "Serialized normalized rows do not reconcile to selected preserved workbook cells",
+    );
+  }
+
   const validation: ValidationReport = {
     status:
       populationGaps.length + gdpGaps.length === 0
@@ -465,51 +625,12 @@ export async function buildGeostatPackage(
     estimates_created: 0,
     excluded_codes_present: excludedCodesPresent,
     source_hashes_match: sourceHashesMatch,
-    normalized_values_reconcile: true,
+    normalized_values_reconcile: normalizedValuesReconcile,
   };
 
   if (options.write) {
-    await fs.writeFile(
-      paths.populationOutput,
-      serializeCsv<PopulationRow>(
-        [
-          "year",
-          "municipality_code",
-          "municipality_name_ka",
-          "region_id",
-          "population_thousand",
-          "population_persons",
-          "reference_date",
-          "source_id",
-          "source_sheet",
-          "source_unit",
-          "transformation",
-          "last_reviewed_at",
-        ],
-        populationRows,
-      ),
-      "utf8",
-    );
-    await fs.writeFile(
-      paths.gdpOutput,
-      serializeCsv<RegionalGdpRow>(
-        [
-          "year",
-          "region_id",
-          "region_name_ka",
-          "source_region_label",
-          "gdp_current_prices_million_gel",
-          "source_id",
-          "source_sheet",
-          "source_unit",
-          "status",
-          "transformation",
-          "last_reviewed_at",
-        ],
-        regionalGdpRows,
-      ),
-      "utf8",
-    );
+    await fs.writeFile(paths.populationOutput, populationCsv, "utf8");
+    await fs.writeFile(paths.gdpOutput, gdpCsv, "utf8");
     await fs.writeFile(paths.validationOutput, `${JSON.stringify(validation, null, 2)}\n`, "utf8");
   }
 
