@@ -2,8 +2,9 @@
 
 Date: 2026-08-03
 Status: approved design
-Scope: UI only. No change to the served municipal dataset except one reviewed
-label field (§7.2) and one geometry provenance swap (§4).
+Scope: UI only. **No change to the served municipal dataset, its Prisma schema,
+or the import.** The one data-layer touch is a geometry provenance swap (§4) in
+the landing geo module, which the municipal dataset does not depend on.
 
 ## 1. Why this exists
 
@@ -376,12 +377,21 @@ Two details that need handling rather than papering over.
   tested, used by both page types.
 - **Genitive region names.** The headline needs `იმერეთის`, not `იმერეთი`, and
   deriving Georgian genitives mechanically is the trap that already made
-  `display_name_ka` a reviewed field rather than a computed one (Spec 1 §4). A
-  reviewed `nameKaGenitive` is added to the 11 rows of
-  `data/taxonomy/municipal-regions.json`, following that precedent, so the H1
-  reads `როგორ იხარჯება იმერეთის მუნიციპალური ბიუჯეტები`. This is the only
-  change this spec makes to a Spec 1 data file, and it is display data, not an
-  identifier.
+  `display_name_ka` a reviewed field rather than a computed one (Spec 1 §4). So
+  the eleven genitive forms are reviewed once and stored — but **as a UI-side
+  constant** in `lib/explorer/municipalLabels.ts`, keyed by region id, **not** in
+  `data/taxonomy/municipal-regions.json`.
+
+  The reason is cost. `municipal-regions.json` is mirrored by the
+  `MunicipalRegion` Prisma model and parity-checked on `{id, kaLabel, sortOrder}`
+  (`servedData.ts`). Adding a field there means a schema change, a migration, an
+  import-script change, a live `npm run data:import` against Supabase, a
+  `mirrorRows.ts` change and a parity re-verification — a database migration
+  inside a UI spec, for one word in one headline. The genitive is display copy
+  consumed by exactly one component; it belongs with the UI.
+
+  A unit test asserts the constant covers all eleven region ids, so a future
+  region can never render an undefined headline.
 
 ### 7.3 Source note
 
@@ -547,6 +557,7 @@ New `municipalData.test.ts` and `municipalGeo.test.ts`:
 - `formatInUnit` in both units, and a regression asserting `UNIT_BN` output is
   byte-identical to the current `formatBn` for the existing budget callers.
 - All ten `municipal.*` colour tokens resolve, and no two are equal.
+- The genitive constant covers all eleven region ids (§7.2).
 - Hash round-trip for `lvl` and the reused keys; unknown values fall back,
   ranges clamp.
 
@@ -575,8 +586,7 @@ assertion Spec 1 §7 deferred to this spec.
   the municipal surfaces.
 - `AGENTS.md` Current Project State — municipal flips from data-only to routed.
 - `docs/data-methodology/municipal-functional-annual-2015-2025.md` — the region
-  shape join keyed on `shapeISO`, its provenance and licence, and the
-  `nameKaGenitive` field.
+  shape join keyed on `shapeISO`, and its provenance and licence.
 - `apps/web/lib/landing/georgiaGeo.ts` header comment — provenance of the region
   rings changes from GADM to geoBoundaries `gbOpen` ADM1, with the CC BY 3.0
   attribution and release pin covering both the rings and the ADM0 outline.
