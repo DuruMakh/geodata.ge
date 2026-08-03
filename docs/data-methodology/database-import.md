@@ -32,11 +32,17 @@ the import is re-run.
 
 The five municipal tables are wired into the import but **the mirror does not
 hold municipal rows yet**: migration `20260802194939_municipal_dataset` has not
-been applied and no import has run since the wiring landed. Both are owner
-steps because they write to the database that serves production. Until they
-run, municipal data serves only from the CSVs (`GEODATA_DATA_SOURCE=csv`, the
-default), and a `GEODATA_DATA_SOURCE=db` build would fail on the missing
-tables. See `docs/data-methodology/municipal-functional-annual-2015-2025.md`.
+been applied and no import has run since the wiring landed. Neither step is a
+manual approval gate: `.github/workflows/deploy-production.yml` runs
+`npm run prisma:deploy` and then `npm run data:import` unconditionally on every
+push-triggered CI-green run on `main`, so merging this work is the decision
+point, not a separate sign-off. The operation is safe by construction — one
+transaction, parity verified before commit, rollback on any mismatch — and
+production keeps serving the previous build if the workflow goes red. Until
+that deploy runs, municipal data serves only from the CSVs
+(`GEODATA_DATA_SOURCE=csv`, the default), and a `GEODATA_DATA_SOURCE=db` build
+would fail on the missing tables. See
+`docs/data-methodology/municipal-functional-annual-2015-2025.md`.
 
 The import reuses the same validated loaders the site uses, then cross-checks
 referential integrity (fact item IDs against taxonomy, source IDs against

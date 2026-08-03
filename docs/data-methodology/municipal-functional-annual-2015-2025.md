@@ -17,8 +17,12 @@ reviewed, mapped to stable `municipal.*` category IDs, and shipped as
 models, a migration, and a database-mode reader also exist for this dataset (see
 `docs/data-methodology/database-import.md`), but as of this date the migration has not been
 applied to the Supabase database and `npm run data:import` has not loaded municipal rows into
-it — the mirror holds no municipal data yet. Both steps are pending owner approval, since they
-write to the database that serves production.
+it — the mirror holds no municipal data yet. Both happen automatically, with no manual approval
+step, on the next CI-green push to `main`: `.github/workflows/deploy-production.yml` runs
+`npm run prisma:deploy` and then `npm run data:import` unconditionally, so merging this branch is
+the decision point. The operation is safe by construction — one transaction, parity verified
+before commit, rollback on any mismatch — and production keeps serving the previous build if the
+workflow goes red.
 
 No page or route reads this data. `apps/web/lib/explorer/sections.ts` keeps
 `municipalities: { href: null }`, and the sidebar/hub keep the `მალე` marker (`DESIGN.md`
