@@ -723,7 +723,8 @@ Append to `apps/web/tests/explorer/municipalGeo.test.ts`:
 ```ts
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { buildRegionShapes, MAP_HEIGHT, MAP_WIDTH, REGION_ID_BY_SHAPE_ISO } from "../../lib/explorer/municipalGeo";
+import { GEORGIA_GEO } from "../../lib/landing/georgiaGeo";
+import { buildRegionShapes, MAP_HEIGHT, MAP_WIDTH, projectPoint, REGION_ID_BY_SHAPE_ISO } from "../../lib/explorer/municipalGeo";
 
 const servedRegionIds = (
   JSON.parse(
@@ -789,6 +790,18 @@ describe("the projection", () => {
       expect(shape.d.startsWith("M")).toBe(true);
       expect(shape.d.endsWith("Z")).toBe(true);
     }
+  });
+
+  it("places points through the same function the rings use", () => {
+    // The self-governing city dots call projectPoint directly. If a caller ever
+    // reimplements the arithmetic, the dots drift off the shapes silently —
+    // this pins the two to one implementation.
+    const { x, y } = projectPoint(GEORGIA_GEO.bbox.lonMin, GEORGIA_GEO.bbox.latMax);
+    expect(x).toBe(0);
+    expect(y).toBe(0);
+    const corner = projectPoint(GEORGIA_GEO.bbox.lonMax, GEORGIA_GEO.bbox.latMin);
+    expect(corner.x).toBeCloseTo(MAP_WIDTH, 0);
+    expect(corner.y).toBeCloseTo(MAP_HEIGHT, 0);
   });
 });
 ```
@@ -864,12 +877,24 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
+/**
+ * Project one [lon, lat] into viewBox space. Everything placed on the map goes
+ * through this — shapes AND the self-governing city dots. Do not reimplement the
+ * arithmetic at a call site: a second copy drifts the moment the projection
+ * changes, and nothing fails when it does.
+ */
+export function projectPoint(lon: number, lat: number): { x: number; y: number } {
+  return {
+    x: Number(clamp((lon - BBOX.lonMin) * KX * SCALE, 0, MAP_WIDTH).toFixed(1)),
+    y: Number(clamp((BBOX.latMax - lat) * SCALE, 0, MAP_HEIGHT).toFixed(1)),
+  };
+}
+
 /** Project a [lon, lat] ring into an SVG path. Rounded to 1dp — sub-pixel. */
 export function projectRing(ring: ReadonlyArray<readonly [number, number]>): string {
   const points = ring.map(([lon, lat]) => {
-    const x = clamp((lon - BBOX.lonMin) * KX * SCALE, 0, MAP_WIDTH);
-    const y = clamp((BBOX.latMax - lat) * SCALE, 0, MAP_HEIGHT);
-    return `${x.toFixed(1)} ${y.toFixed(1)}`;
+    const { x, y } = projectPoint(lon, lat);
+    return `${x} ${y}`;
   });
   return `M${points.join("L")}Z`;
 }
@@ -1101,6 +1126,17 @@ describe("buildMunicipalEntityModel", () => {
     expect(build(2016, 2017).years).toEqual([2016, 2017]);
   });
 
+  it("scopes change and share to the selected range, not the full span", () => {
+    // The bug this guards: rendering a model built for the whole span next to
+    // range-filtered year columns, so ცვლილება describes a period the reader
+    // is not looking at. economic_affairs: 100→300 full span, 200→300 clipped.
+    const economicFull = build().rows.find((row) => row.itemId === "municipal.economic_affairs")!;
+    const economicClipped = build(2016, 2017).rows.find((row) => row.itemId === "municipal.economic_affairs")!;
+    expect(economicFull.change).toBeCloseTo(2, 6);
+    expect(economicClipped.change).toBeCloseTo(0.5, 6);
+    expect(build(2015, 2016).totalRow.change).not.toBe(build().totalRow.change);
+  });
+
   it("reports warnings only for years inside the range", () => {
     expect(build().warnings.map((w) => w.year)).toEqual([2016]);
     expect(build(2017, 2017).warnings).toEqual([]);
@@ -1196,6 +1232,55 @@ export type MunicipalEntityInput = {
   startYear: number;
   endYear: number;
 };
+
+/**
+ * Collapse many municipalities' facts into one entity's, for a region roll-up.
+ * Called on the SERVER so a region page ships ~110 function rows like a
+ * municipality page does, rather than up to twelve times that.
+ *
+ * Both totals are summed independently — never reconcile one against the other.
+ */
+export function aggregateFactsForEntity(
+  entityId: string,
+  functionFacts: MunicipalFunctionFact[],
+  totalFacts: MunicipalTotalFact[],
+): { functionFacts: MunicipalFunctionFact[]; totalFacts: MunicipalTotalFact[] } {
+  const functionByKey = new Map<string, MunicipalFunctionFact>();
+  for (const row of functionFacts) {
+    const key = `${row.year}|${row.categoryId}`;
+    const existing = functionByKey.get(key);
+    if (existing) {
+      existing.amountGel += row.amountGel;
+      continue;
+    }
+    functionByKey.set(key, { ...row, municipalityCode: entityId });
+  }
+
+  const totalByYear = new Map<number, MunicipalTotalFact>();
+  for (const row of totalFacts) {
+    const existing = totalByYear.get(row.year);
+    if (existing) {
+      existing.publicTotalGel += row.publicTotalGel;
+      existing.functionalSumGel += row.functionalSumGel;
+      // A roll-up's own two totals reconcile, so it carries no warning of its
+      // own; region pages suppress the callout anyway (see the UI spec §8.2).
+      continue;
+    }
+    totalByYear.set(row.year, {
+      ...row,
+      municipalityCode: entityId,
+      showWarning: false,
+      warningType: "none",
+      warningAmountGel: null,
+      reconciliationDifferenceGel: null,
+    });
+  }
+
+  return {
+    functionFacts: Array.from(functionByKey.values()),
+    totalFacts: Array.from(totalByYear.values()),
+  };
+}
 
 function sourceMetadataFor(sourceId: string, sources: Map<string, SourceDocumentRow>): SourceMetadata {
   const source = sources.get(sourceId);
@@ -1391,7 +1476,7 @@ Append to `apps/web/tests/explorer/municipalData.test.ts`:
 
 ```ts
 import type { Municipality } from "../../lib/data/municipal/types";
-import { buildIndexKpis, buildMunicipalListRows, regionFactsFor } from "../../lib/explorer/municipalData";
+import { aggregateFactsForEntity, buildIndexKpis, buildMunicipalListRows, regionFactsFor } from "../../lib/explorer/municipalData";
 
 const MUNICIPALITIES: Municipality[] = [
   { code: "04", sortId: 1, nameKa: "ქალაქ თბილისის მუნიციპალიტეტი", displayNameKa: "თბილისი", regionId: "region.tbilisi", isSelfGoverningCity: true },
@@ -1450,6 +1535,31 @@ describe("regionFactsFor", () => {
     const selected = regionFactsFor("region.adjara", MUNICIPALITIES, [], INDEX_TOTALS);
     expect(selected.memberCodes.sort()).toEqual(["06", "07"]);
     expect(selected.totalFacts).toHaveLength(4);
+  });
+});
+
+describe("aggregateFactsForEntity", () => {
+  const members = regionFactsFor("region.adjara", MUNICIPALITIES, [], INDEX_TOTALS);
+  const rolled = aggregateFactsForEntity("region.adjara", members.functionFacts, members.totalFacts);
+
+  it("collapses the members to one row per year", () => {
+    expect(rolled.totalFacts).toHaveLength(2);
+    expect(rolled.totalFacts.every((row) => row.municipalityCode === "region.adjara")).toBe(true);
+  });
+
+  it("sums both totals independently", () => {
+    const y2025 = rolled.totalFacts.find((row) => row.year === 2025)!;
+    expect(y2025.publicTotalGel).toBe(600_000_000);
+    expect(y2025.functionalSumGel).toBe(600_000_000);
+  });
+
+  it("carries no warning of its own — a roll-up's two totals reconcile", () => {
+    expect(rolled.totalFacts.every((row) => row.showWarning === false)).toBe(true);
+    expect(rolled.totalFacts.every((row) => row.warningType === "none")).toBe(true);
+  });
+
+  it("does not mutate the input rows", () => {
+    expect(members.totalFacts[0]!.municipalityCode).not.toBe("region.adjara");
   });
 });
 
@@ -2440,7 +2550,7 @@ import { PageHeader } from "../../../components/shell/page-header";
 import { RAMP, type RegionMapCity, type RegionMapShape } from "../../../components/municipalities/region-map";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
 import { buildIndexKpis, buildMunicipalListRows } from "../../../lib/explorer/municipalData";
-import { buildRegionShapes, MAP_VIEWBOX, MAP_WIDTH } from "../../../lib/explorer/municipalGeo";
+import { buildRegionShapes, MAP_VIEWBOX, projectPoint } from "../../../lib/explorer/municipalGeo";
 import { GEORGIA_GEO } from "../../../lib/landing/georgiaGeo";
 import { formatAmount } from "../../../lib/explorer/format";
 
@@ -2505,26 +2615,22 @@ export default async function MunicipalitiesIndexPage() {
     };
   });
 
-  // Self-governing city dots: registry flag decides membership, GEORGIA_GEO
-  // supplies the coordinates, projected the same way the shapes are.
-  const bbox = GEORGIA_GEO.bbox;
-  const kx = Math.cos((((bbox.latMin + bbox.latMax) / 2) * Math.PI) / 180);
-  const scale = MAP_WIDTH / ((bbox.lonMax - bbox.lonMin) * kx);
+  // Self-governing city dots: the registry flag decides membership, GEORGIA_GEO
+  // supplies the coordinates, and projectPoint — the SAME function the shapes
+  // use — places them. Never reimplement the projection here.
   const cities: RegionMapCity[] = municipalities
     .filter((municipality) => municipality.isSelfGoverningCity)
     .flatMap((municipality) => {
       const marker = GEORGIA_GEO.cityMarkers.find((city) => city.ka === municipality.displayNameKa);
       if (!marker) return [];
+      const { x, y } = projectPoint(marker.lon, marker.lat);
 
-      return [
-        {
-          code: municipality.code,
-          nameKa: municipality.displayNameKa,
-          x: Number(((marker.lon - bbox.lonMin) * kx * scale).toFixed(1)),
-          y: Number(((bbox.latMax - marker.lat) * scale).toFixed(1)),
-        },
-      ];
+      return [{ code: municipality.code, nameKa: municipality.displayNameKa, x, y }];
     });
+
+  if (cities.length !== municipalities.filter((row) => row.isSelfGoverningCity).length) {
+    throw new Error("a self-governing city has no coordinate in GEORGIA_GEO.cityMarkers");
+  }
 
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
   const values = list.regions.map((row) => row.valueGel);
@@ -2598,7 +2704,14 @@ git commit -m "feat: add the municipalities index page"
 
 **Interfaces:**
 - Consumes: `MunicipalListRow` (Task 6).
-- Produces: `<EntityPicker triggerLabel groups onSelectMunicipality onSelectRegion />` where `groups: EntityPickerGroup[]` and `EntityPickerGroup = { regionId: string; nameKa: string; valueGel: number; members: Array<{ code: string; nameKa: string; valueGel: number }> }`.
+- Produces: `<EntityPicker open onClose groups activeId onSelectMunicipality onSelectRegion />` where `EntityPickerGroup = { regionId: string; nameKa: string; valueGel: number; members: Array<{ code: string; nameKa: string; valueGel: number }> }`.
+
+**The trigger button lives in the parent, not here.** The parent renders it
+inside its `<h1>`; this component renders only the popover, as a sibling of that
+heading. A `role="dialog"` nested inside a heading is announced as part of the
+heading, and a `position: fixed` overlay inside an `h1` is fragile to position.
+Open state is therefore owned by `MunicipalExplorer` (Task 11), which also binds
+`⌘K`.
 
 - [ ] **Step 1: Write the component**
 
@@ -2623,39 +2736,41 @@ export type EntityPickerGroup = {
 };
 
 type EntityPickerProps = {
-  triggerLabel: string;
+  open: boolean;
+  onClose: () => void;
   groups: EntityPickerGroup[];
   activeId: string;
   onSelectMunicipality: (code: string) => void;
   onSelectRegion: (regionId: string) => void;
 };
 
-export function EntityPicker({ triggerLabel, groups, activeId, onSelectMunicipality, onSelectRegion }: EntityPickerProps) {
-  const [open, setOpen] = useState(false);
+export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipality, onSelectRegion }: EntityPickerProps) {
   const [query, setQuery] = useState("");
-  const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (!open) return;
+
     function onKey(event: KeyboardEvent) {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setQuery("");
-        setOpen(true);
-      }
-      if (event.key === "Escape" && open) {
-        setOpen(false);
-        triggerRef.current?.focus();
+      if (event.key === "Escape") {
+        onClose();
+        // Focus returns to the trigger, which the parent renders in its <h1>.
+        document.querySelector<HTMLButtonElement>("[data-testid='entity-picker-trigger']")?.focus();
       }
     }
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [open, onClose]);
 
   useEffect(() => {
-    if (open) inputRef.current?.focus();
+    if (open) {
+      setQuery("");
+      inputRef.current?.focus();
+    }
   }, [open]);
+
+  if (!open) return null;
 
   const filtered = useMemo(() => {
     const needle = query.trim();
@@ -2667,89 +2782,70 @@ export function EntityPicker({ triggerLabel, groups, activeId, onSelectMunicipal
   }, [groups, query]);
 
   return (
-    <span className="relative inline-block">
-      <button
-        ref={triggerRef}
-        type="button"
-        data-testid="entity-picker-trigger"
-        aria-expanded={open}
-        aria-haspopup="dialog"
-        onClick={() => {
-          setQuery("");
-          setOpen((current) => !current);
-        }}
-        className="cursor-pointer border-b-2 border-[var(--accent)] font-[family-name:var(--font-display)] text-inherit"
+    <div className="relative">
+      <div className="fixed inset-0 z-30" onClick={onClose} aria-hidden />
+      <div
+        role="dialog"
+        aria-label="აირჩიე მუნიციპალიტეტი ან რეგიონი"
+        data-testid="entity-picker"
+        className="absolute top-1 left-0 z-40 w-[430px] max-w-[92vw] border border-[var(--control)] bg-[var(--tile)]"
       >
-        {triggerLabel}
-      </button>
-
-      {open ? (
-        <>
-          <span className="fixed inset-0 z-30" onClick={() => setOpen(false)} aria-hidden />
-          <span
-            role="dialog"
-            aria-label="აირჩიე მუნიციპალიტეტი ან რეგიონი"
-            data-testid="entity-picker"
-            className="absolute top-10 left-0 z-40 block w-[430px] max-w-[92vw] border border-[var(--control)] bg-[var(--tile)]"
-          >
-            <span className="block border-b border-[var(--hairline-soft)] p-3">
+        <div className="border-b border-[var(--hairline-soft)] p-3">
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="ძებნა — მუნიციპალიტეტი ან რეგიონი"
                 aria-label="ძებნა"
-                className="h-[34px] w-full rounded-[3px] border border-[var(--control)] bg-[var(--paper)] px-2.5 text-[13px] text-[var(--ink)] outline-none"
-              />
-            </span>
-            <span className="block max-h-[340px] overflow-y-auto">
-              {filtered.map((group) => (
-                <span key={group.regionId} className="block">
-                  <button
-                    type="button"
-                    data-testid="picker-region"
-                    onClick={() => {
-                      setOpen(false);
-                      onSelectRegion(group.regionId);
-                    }}
-                    className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-left ${
-                      group.regionId === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"
-                    }`}
-                  >
-                    <span className="truncate text-[12px] font-semibold">{group.nameKa}</span>
-                    <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-                      {formatAmount(group.valueGel)} · {group.members.length}
-                    </span>
-                  </button>
-                  {group.members.map((member) => (
-                    <button
-                      key={member.code}
-                      type="button"
-                      data-testid="picker-municipality"
-                      onClick={() => {
-                        setOpen(false);
-                        onSelectMunicipality(member.code);
-                      }}
-                      className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-[var(--row-border)] py-[7px] pr-3 pl-[26px] text-left ${
-                        member.code === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"
-                      }`}
-                    >
-                      <span className="truncate text-[13px]">{member.nameKa}</span>
-                      <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                        {formatAmount(member.valueGel)}
-                      </span>
-                    </button>
-                  ))}
+            className="h-[34px] w-full rounded-[3px] border border-[var(--control)] bg-[var(--paper)] px-2.5 text-[13px] text-[var(--ink)] outline-none"
+          />
+        </div>
+        <div className="max-h-[340px] overflow-y-auto">
+          {filtered.map((group) => (
+            <div key={group.regionId}>
+              <button
+                type="button"
+                data-testid="picker-region"
+                onClick={() => {
+                  onClose();
+                  onSelectRegion(group.regionId);
+                }}
+                className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-left ${
+                  group.regionId === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"
+                }`}
+              >
+                <span className="truncate text-[12px] font-semibold">{group.nameKa}</span>
+                <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
+                  {formatAmount(group.valueGel)} · {group.members.length}
                 </span>
+              </button>
+              {group.members.map((member) => (
+                <button
+                  key={member.code}
+                  type="button"
+                  data-testid="picker-municipality"
+                  onClick={() => {
+                    onClose();
+                    onSelectMunicipality(member.code);
+                  }}
+                  className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-[var(--row-border)] py-[7px] pr-3 pl-[26px] text-left ${
+                    member.code === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"
+                  }`}
+                >
+                  <span className="truncate text-[13px]">{member.nameKa}</span>
+                  <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
+                    {formatAmount(member.valueGel)}
+                  </span>
+                </button>
               ))}
-            </span>
-            <span className="block border-t border-[var(--hairline-soft)] px-3 py-2 text-[11px] text-[var(--faint)]">
-              რეგიონის დაჭერა აჩვენებს მის ჯამურ მონაცემებს
-            </span>
-          </span>
-        </>
-      ) : null}
-    </span>
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-[var(--hairline-soft)] px-3 py-2 text-[11px] text-[var(--faint)]">
+          რეგიონის დაჭერა აჩვენებს მის ჯამურ მონაცემებს
+        </div>
+      </div>
+    </div>
   );
 }
 ```
@@ -2783,11 +2879,19 @@ export type MunicipalExplorerProps = {
   triggerLabel: string;          // the entity name, rendered as the picker trigger
   metaLine: string;
   entityId: string;              // municipality code, or region id — marks the active picker row
-  model: MunicipalEntityModel;
-  buildKpis: (startYear: number, endYear: number) => MunicipalKpi[];
-  movers: { up: MunicipalMover[]; down: MunicipalMover[] };
-  comparison: MunicipalComparisonRow[];
-  warnings: MunicipalWarning[];  // region pages pass [] — see Task 12
+
+  // RAW facts, already narrowed (and, for a region, aggregated) by the route.
+  // The component rebuilds the model whenever the range moves; see below.
+  functions: MunicipalFunction[];
+  functionFacts: MunicipalFunctionFact[];
+  totalFacts: MunicipalTotalFact[];
+  sourceDocuments: SourceDocumentRow[];
+
+  nationalTotalLatest: number;
+  rank: number;
+  rankOutOf: number;
+  showWarnings: boolean;         // region pages pass false — see Task 12
+  csvBasename: string;
   pickerGroups: EntityPickerGroup[];
   prev: { label: string; href: string };
   next: { label: string; href: string };
@@ -2796,8 +2900,14 @@ export type MunicipalExplorerProps = {
 };
 ```
 
-  `buildKpis` is a function rather than a precomputed array because the KPIs
-  depend on the selected range, which is client state the route cannot know.
+**Why raw facts and not a prebuilt model.** `ExplorerTableRow.change` and
+`.shareEndYear`, the movers board and the comparison table are all *functions of
+the selected range*. Handing the component one model built for the full span and
+filtering its `years` array leaves those four describing 2015–2025 while the year
+columns describe the user's selection — wrong numbers, silently. The budget
+explorer rebuilds via `buildExplorerModel(startYear, endYear)` in a `useMemo` for
+exactly this reason, and this component does the same. Rebuilding is ~110 rows of
+arithmetic; the alternative is 66 precomputed range combinations per page.
 
 - [ ] **Step 1: Write the state hook**
 
@@ -3050,9 +3160,17 @@ Create `apps/web/components/municipalities/municipal-explorer.tsx`. It renders t
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, type ReactNode } from "react";
-import type { MunicipalComparisonRow, MunicipalEntityModel, MunicipalKpi, MunicipalMover, MunicipalWarning } from "../../lib/explorer/municipalData";
-import { getDefaultMunicipalSelection } from "../../lib/explorer/municipalData";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
+import type { SourceDocumentRow } from "../../lib/data/sources";
+import {
+  buildComparisonRows,
+  buildEntityKpis,
+  buildMovers,
+  buildMunicipalEntityModel,
+  getDefaultMunicipalSelection,
+} from "../../lib/explorer/municipalData";
+import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { formatAmount, UNIT_MLN } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
 import { Callout, SegmentedTabs, SourceNote, SwatchBar } from "../ui/editorial";
@@ -3074,11 +3192,22 @@ export type MunicipalExplorerProps = {
   triggerLabel: string;
   metaLine: string;
   entityId: string;
-  model: MunicipalEntityModel;
-  buildKpis: (startYear: number, endYear: number) => MunicipalKpi[];
-  movers: { up: MunicipalMover[]; down: MunicipalMover[] };
-  comparison: MunicipalComparisonRow[];
-  warnings: MunicipalWarning[];
+
+  // Raw facts, already narrowed (and, for a region, aggregated) by the route.
+  // NOT a prebuilt model: change, shareEndYear, the KPIs, the movers and the
+  // comparison table are all functions of the selected range, which is client
+  // state. Handing over one full-span model and filtering its years array would
+  // leave all five describing a period the reader is not looking at.
+  functions: MunicipalFunction[];
+  functionFacts: MunicipalFunctionFact[];
+  totalFacts: MunicipalTotalFact[];
+  sourceDocuments: SourceDocumentRow[];
+
+  nationalTotalLatest: number;
+  rank: number;
+  rankOutOf: number;
+  showWarnings: boolean;
+  csvBasename: string;
   pickerGroups: EntityPickerGroup[];
   prev: { label: string; href: string };
   next: { label: string; href: string };
@@ -3088,12 +3217,52 @@ export type MunicipalExplorerProps = {
 
 export function MunicipalExplorer(props: MunicipalExplorerProps) {
   const router = useRouter();
-  const { model } = props;
-  const knownIds = useMemo(() => new Set(model.rows.map((row) => row.itemId)), [model]);
-  const defaults = useMemo(() => getDefaultMunicipalSelection(model), [model]);
-  const state = useMunicipalState(model.years, defaults, knownIds);
+  const { functions, functionFacts, totalFacts, sourceDocuments } = props;
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  const years = model.years.filter((year) => year >= state.range.start && year <= state.range.end);
+  const allYears = useMemo(
+    () => Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b),
+    [totalFacts],
+  );
+  const firstYear = allYears[0] ?? 0;
+  const lastYear = allYears.at(-1) ?? 0;
+
+  // Full-span model, for the series list's stable order and the default
+  // selection — both must survive a range change rather than re-deriving.
+  const fullModel = useMemo(
+    () =>
+      buildMunicipalEntityModel({
+        functions,
+        functionFacts,
+        totalFacts,
+        sourceDocuments,
+        startYear: firstYear,
+        endYear: lastYear,
+      }),
+    [functions, functionFacts, totalFacts, sourceDocuments, firstYear, lastYear],
+  );
+
+  const knownIds = useMemo(() => new Set(fullModel.rows.map((row) => row.itemId)), [fullModel]);
+  const defaults = useMemo(() => getDefaultMunicipalSelection(fullModel), [fullModel]);
+  const state = useMunicipalState(allYears, defaults, knownIds);
+
+  // REBUILT on every range change. Filtering the full model's years instead
+  // would leave change, shareEndYear, the movers and the comparison describing
+  // the whole span while the year columns describe the selection.
+  const model = useMemo(
+    () =>
+      buildMunicipalEntityModel({
+        functions,
+        functionFacts,
+        totalFacts,
+        sourceDocuments,
+        startYear: state.range.start,
+        endYear: state.range.end,
+      }),
+    [functions, functionFacts, totalFacts, sourceDocuments, state.range.start, state.range.end],
+  );
+
+  const years = model.years;
   const totalsByYear = new Map(years.map((year) => [year, model.totalRow.valuesByYear[year] ?? null]));
 
   const series: ChartSeries[] = model.rows
@@ -3111,24 +3280,76 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       planned: years.map(() => false),
     }));
 
-  const visibleWarnings = props.warnings.filter(
-    (warning) => warning.year >= state.range.start && warning.year <= state.range.end,
-  );
+  const visibleWarnings = props.showWarnings ? model.warnings : [];
+
+  const [seriesQuery, setSeriesQuery] = useState("");
+  const visibleRows = useMemo(() => {
+    const needle = seriesQuery.trim();
+    return needle === "" ? model.rows : model.rows.filter((row) => row.kaLabel.includes(needle));
+  }, [model.rows, seriesQuery]);
+  const allSelected = visibleRows.length > 0 && visibleRows.every((row) => state.selectedIds.includes(row.itemId));
+
+  function toggleAll() {
+    // Selecting every function would exceed the chart cap, so select-all is a
+    // table-mode affordance: in line mode it clears instead of overfilling.
+    if (allSelected || state.chartMode === "line") {
+      state.setSelectedIds([]);
+      return;
+    }
+    state.setSelectedIds(visibleRows.map((row) => row.itemId));
+  }
+
+  function downloadCsv() {
+    const csv = buildExplorerCsv([...model.rows, model.totalRow], years);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `geodata-${props.csvBasename}-${state.range.start}-${state.range.end}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setPickerOpen(true);
+      }
+    }
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
     <>
       <div className="mt-[22px] flex items-baseline justify-between gap-5">
         <div className="min-w-0">
+          {/* The popover is a SIBLING of the heading, not a child: a role="dialog"
+              and a fixed overlay nested inside an h1 is announced as part of the
+              heading and is fragile to position. */}
           <h1 className="mb-2 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[36px]">
             {props.title}{" "}
-            <EntityPicker
-              triggerLabel={props.triggerLabel}
-              groups={props.pickerGroups}
-              activeId={props.entityId}
-              onSelectMunicipality={(code) => router.push(`/explorer/municipalities/${code}`)}
-              onSelectRegion={(regionId) => router.push(`/explorer/municipalities/region/${regionId.replace("region.", "")}`)}
-            />
+            <button
+              type="button"
+              data-testid="entity-picker-trigger"
+              aria-expanded={pickerOpen}
+              aria-haspopup="dialog"
+              onClick={() => setPickerOpen((current) => !current)}
+              className="cursor-pointer border-b-2 border-[var(--accent)] font-[family-name:var(--font-display)] text-inherit"
+            >
+              {props.triggerLabel}
+            </button>
           </h1>
+          <EntityPicker
+            open={pickerOpen}
+            onClose={() => setPickerOpen(false)}
+            groups={props.pickerGroups}
+            activeId={props.entityId}
+            onSelectMunicipality={(code) => router.push(`/explorer/municipalities/${code}`)}
+            onSelectRegion={(regionId) => router.push(`/explorer/municipalities/region/${regionId.replace("region.", "")}`)}
+          />
           <div className="text-[12.5px] text-[var(--muted)]">{props.metaLine}</div>
         </div>
         <span className="flex flex-none items-center gap-4">
@@ -3186,8 +3407,10 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             />
           )}
 
+          {/* allYears, never model.years — the strip must offer the full span
+              even when the selection has narrowed it. */}
           <div className="mt-6 border-t border-[var(--hairline-soft)] pt-4">
-            <RangeStrip years={model.years} range={state.range} onChange={state.setRange} />
+            <RangeStrip years={allYears} range={state.range} onChange={state.setRange} />
           </div>
 
           {visibleWarnings.length > 0 ? (
@@ -3205,10 +3428,17 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
 
           {props.children}
 
+          {/* All three derive from the RANGE model, so they move together with
+              the chart instead of describing a span the user is not looking at. */}
           <MunicipalIndicators
-            kpis={props.buildKpis(state.range.start, state.range.end)}
-            movers={props.movers}
-            comparison={props.comparison}
+            kpis={buildEntityKpis({
+              model,
+              nationalTotalLatest: props.nationalTotalLatest,
+              rank: props.rank,
+              rankOutOf: props.rankOutOf,
+            })}
+            movers={buildMovers(model)}
+            comparison={buildComparisonRows(model)}
             startYear={state.range.start}
             endYear={state.range.end}
           />
@@ -3222,7 +3452,39 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                 {state.selectedIds.length} / {model.rows.length}
               </span>
             </div>
-            {model.rows.map((row) => {
+
+            <input
+              data-testid="municipal-series-search"
+              value={seriesQuery}
+              onChange={(event) => setSeriesQuery(event.target.value)}
+              placeholder="ძებნა"
+              aria-label="სერიების ძებნა"
+              className="mb-2 h-[34px] w-full border-0 border-b border-[var(--control)] bg-transparent text-[13px] text-[var(--ink)] outline-none"
+            />
+
+            <button
+              type="button"
+              data-testid="municipal-series-all"
+              aria-pressed={allSelected}
+              onClick={toggleAll}
+              className="grid w-full grid-cols-[auto_minmax(0,1fr)] items-center gap-2 border-b-2 border-[var(--ink)] py-2 pr-1 pl-0.5 text-left"
+            >
+              <span
+                aria-hidden
+                className="inline-flex h-3.5 w-3.5 items-center justify-center border-[1.5px] text-[9px] leading-none text-[var(--paper)]"
+                style={{
+                  borderColor: allSelected ? "var(--ink)" : "var(--control)",
+                  backgroundColor: allSelected ? "var(--ink)" : "transparent",
+                }}
+              >
+                {allSelected ? "✓" : ""}
+              </span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
+                {allSelected || state.chartMode === "line" ? "გასუფთავება" : "ყველას მონიშვნა"}
+              </span>
+            </button>
+
+            {visibleRows.map((row) => {
               const selected = state.selectedIds.includes(row.itemId);
               const latest = row.valuesByYear[state.range.end] ?? null;
 
@@ -3260,6 +3522,16 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                 <Callout testId="municipal-series-limit">{state.limitMessage}</Callout>
               </div>
             ) : null}
+
+            <button
+              type="button"
+              data-testid="municipal-csv"
+              onClick={downloadCsv}
+              className="mt-4 flex h-[38px] w-full cursor-pointer items-center justify-center rounded-[2px] bg-[var(--ink)] text-[12.5px] font-semibold text-[var(--paper)] hover:opacity-85"
+            >
+              CSV ჩამოტვირთვა
+            </button>
+
             <a
               href="/explorer/municipalities"
               className="mt-3.5 block text-[12px] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
@@ -3321,15 +3593,12 @@ import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../../../components/municipalities/municipal-explorer";
 import { PageHeader } from "../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../lib/data/servedData";
-import {
-  buildComparisonRows,
-  buildEntityKpis,
-  buildMovers,
-  buildMunicipalEntityModel,
-  buildMunicipalListRows,
-  buildPickerGroups,
-} from "../../../../lib/explorer/municipalData";
+import { buildMunicipalListRows, buildPickerGroups } from "../../../../lib/explorer/municipalData";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
+
+// The 64 codes are the complete, closed set. Without this, an unknown code is
+// left to request-time rendering instead of failing at build.
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const { municipalities } = await loadServedMunicipalData();
@@ -3379,19 +3648,12 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
   const rank = list.municipalities.find((row) => row.id === code)?.rank ?? 0;
   const nationalTotalLatest = list.municipalities.reduce((sum, row) => sum + row.valueGel, 0);
 
+  // Only this municipality's rows travel to the client: ~110 function facts and
+  // 11 total facts, not the 7,744-row corpus.
   const own = {
     functionFacts: functionFacts.filter((row) => row.municipalityCode === code),
     totalFacts: totalFacts.filter((row) => row.municipalityCode === code),
   };
-
-  const fullModel = buildMunicipalEntityModel({
-    functions,
-    functionFacts: own.functionFacts,
-    totalFacts: own.totalFacts,
-    sourceDocuments,
-    startYear: firstYear,
-    endYear: latestYear,
-  });
 
   // Prev/next walk the registry's official sort order, which is roughly
   // region-grouped in the source, so stepping through stays geographic.
@@ -3421,25 +3683,15 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
           triggerLabel={municipality.displayNameKa}
           entityId={code}
           metaLine={`${regionLabels.get(municipality.regionId) ?? ""} · ${georgianOrdinal(rank)} ადგილი ${municipalities.length}-დან ${latestYear} წელს`}
-          model={fullModel}
-          buildKpis={(startYear, endYear) =>
-            buildEntityKpis({
-              model: buildMunicipalEntityModel({
-                functions,
-                functionFacts: own.functionFacts,
-                totalFacts: own.totalFacts,
-                sourceDocuments,
-                startYear,
-                endYear,
-              }),
-              nationalTotalLatest,
-              rank,
-              rankOutOf: municipalities.length,
-            })
-          }
-          movers={buildMovers(fullModel)}
-          comparison={buildComparisonRows(fullModel)}
-          warnings={fullModel.warnings}
+          functions={functions}
+          functionFacts={own.functionFacts}
+          totalFacts={own.totalFacts}
+          sourceDocuments={sourceDocuments}
+          nationalTotalLatest={nationalTotalLatest}
+          rank={rank}
+          rankOutOf={municipalities.length}
+          showWarnings
+          csvBasename={`municipality-${code}`}
           pickerGroups={buildPickerGroups(listInput)}
           prev={{ label: prev.displayNameKa, href: `/explorer/municipalities/${prev.code}` }}
           next={{ label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` }}
@@ -3451,9 +3703,10 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
 }
 ```
 
-`buildKpis` rebuilds the model for the selected range. That is 110 rows of
-arithmetic per call and runs on the client, which is cheap; the alternative —
-precomputing 66 range combinations on the server — is not.
+The route hands over **raw facts, not a model**: the KPIs, the movers, the
+comparison table and each row's `change` / `shareEndYear` all depend on the
+selected range, which is client state the route cannot know. `MunicipalExplorer`
+rebuilds on every range change (Task 11 Step 3).
 
 **Before writing this, read `node_modules/next/dist/docs/` on route params.**
 This Next.js version awaits `params`; if the local docs say otherwise, follow
@@ -3502,10 +3755,7 @@ import { MunicipalExplorer } from "../../../../../components/municipalities/muni
 import { PageHeader } from "../../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../../lib/data/servedData";
 import {
-  buildComparisonRows,
-  buildEntityKpis,
-  buildMovers,
-  buildMunicipalEntityModel,
+  aggregateFactsForEntity,
   buildMunicipalListRows,
   buildPickerGroups,
   regionFactsFor,
@@ -3519,6 +3769,9 @@ const SOURCE_NOTE_BASE =
   "რეგიონის ჯამი მხოლოდ საჯაროდ მოწოდებულ მუნიციპალურ ბიუჯეტებს აერთიანებს: " +
   "აჭარის ავტონომიური რესპუბლიკის საკუთარი ბიუჯეტი მასში არ შედის, ხოლო შიდა ქართლსა და " +
   "მცხეთა-მთიანეთს ოკუპირებულ ტერიტორიებთან დაკავშირებული ერთეულები აკლია.";
+
+// The 11 region ids are the complete, closed set.
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const { regions } = await loadServedMunicipalData();
@@ -3569,19 +3822,14 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   const rank = list.regions.find((row) => row.id === regionId)?.rank ?? 0;
   const nationalTotalLatest = list.municipalities.reduce((sum, row) => sum + row.valueGel, 0);
 
-  const own = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
+  const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
+  // Collapse the members' rows into one entity's on the SERVER, so this page
+  // ships ~110 function rows like a municipality page rather than up to 12×.
+  const own = aggregateFactsForEntity(regionId, members.functionFacts, members.totalFacts);
+
   const memberRows = list.municipalities
     .filter((row) => row.regionId === regionId)
     .map((row, index) => ({ ...row, rank: index + 1 }));
-
-  const fullModel = buildMunicipalEntityModel({
-    functions,
-    functionFacts: own.functionFacts,
-    totalFacts: own.totalFacts,
-    sourceDocuments,
-    startYear: firstYear,
-    endYear: latestYear,
-  });
 
   const ordered = regions.slice().sort((left, right) => left.sortOrder - right.sortOrder);
   const index = ordered.findIndex((row) => row.id === regionId);
@@ -3609,30 +3857,20 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           title="როგორ იხარჯება"
           triggerLabel={`${REGION_GENITIVE_KA[regionId] ?? region.kaLabel} მუნიციპალური ბიუჯეტები`}
           entityId={regionId}
-          metaLine={`${own.memberCodes.length} მუნიციპალიტეტი · ${georgianOrdinal(rank)} ადგილი ${regions.length}-დან`}
-          model={fullModel}
-          buildKpis={(startYear, endYear) =>
-            buildEntityKpis({
-              model: buildMunicipalEntityModel({
-                functions,
-                functionFacts: own.functionFacts,
-                totalFacts: own.totalFacts,
-                sourceDocuments,
-                startYear,
-                endYear,
-              }),
-              nationalTotalLatest,
-              rank,
-              rankOutOf: regions.length,
-            })
-          }
-          movers={buildMovers(fullModel)}
-          comparison={buildComparisonRows(fullModel)}
+          metaLine={`${members.memberCodes.length} მუნიციპალიტეტი · ${georgianOrdinal(rank)} ადგილი ${regions.length}-დან`}
+          functions={functions}
+          functionFacts={own.functionFacts}
+          totalFacts={own.totalFacts}
+          sourceDocuments={sourceDocuments}
+          nationalTotalLatest={nationalTotalLatest}
+          rank={rank}
+          rankOutOf={regions.length}
           // No callout on a roll-up: its own two totals reconcile, and თბილისი
           // and აჭარა each have a warning member in 9 of 11 years, so a
           // region-level banner would be near-permanent on the two most-visited
           // pages. The standing two-measures note below still applies.
-          warnings={[]}
+          showWarnings={false}
+          csvBasename={`region-${id}`}
           pickerGroups={buildPickerGroups(listInput)}
           prev={{ label: prev.kaLabel, href: hrefFor(prev) }}
           next={{ label: next.kaLabel, href: hrefFor(next) }}
@@ -3876,6 +4114,51 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("entity-picker")).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByTestId("entity-picker")).toHaveCount(0);
+  });
+
+  test("keeps the picker popover out of the heading", async ({ page }) => {
+    await page.goto("/explorer/municipalities/04");
+    await page.keyboard.press("Control+k");
+    // A role="dialog" inside an h1 is announced as part of the heading.
+    await expect(page.locator("h1 [data-testid='entity-picker']")).toHaveCount(0);
+    await expect(page.locator("h1 [data-testid='entity-picker-trigger']")).toHaveCount(1);
+  });
+
+  test("filters the series list and clears the selection", async ({ page }) => {
+    await page.goto("/explorer/municipalities/04");
+    await page.getByTestId("municipal-series-search").fill("განათლება");
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(1);
+    await page.getByTestId("municipal-series-search").fill("");
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(10);
+    await page.getByTestId("municipal-series-all").click();
+    await expect(page.getByTestId("municipal-series-row").first()).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("selects every function in table mode", async ({ page }) => {
+    await page.goto("/explorer/municipalities/04");
+    await page.getByTestId("municipal-mode-table").click();
+    await page.getByTestId("municipal-series-all").click();
+    await expect(page.getByTestId("municipal-series-row").filter({ has: page.locator("[aria-pressed]") })).toBeTruthy();
+    await expect(page.getByTestId("municipal-series-all")).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("offers a CSV download", async ({ page }) => {
+    await page.goto("/explorer/municipalities/04");
+    const download = page.waitForEvent("download");
+    await page.getByTestId("municipal-csv").click();
+    expect((await download).suggestedFilename()).toMatch(/^geodata-municipality-04-\d{4}-\d{4}\.csv$/);
+  });
+
+  test("recomputes the period comparison when the range moves", async ({ page }) => {
+    // The regression this guards: filtering years without rebuilding the model,
+    // so ცვლილება and the comparison table describe the full span while the
+    // chart describes the selection.
+    await page.goto("/explorer/municipalities/04");
+    const before = await page.getByTestId("comparison-table").innerText();
+    await page.goto("/explorer/municipalities/04#m=line&r=2020-2025&sel=municipal.education");
+    await page.reload();
+    const after = await page.getByTestId("comparison-table").innerText();
+    expect(after).not.toBe(before);
   });
 });
 
