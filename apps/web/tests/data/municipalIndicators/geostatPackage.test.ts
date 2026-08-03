@@ -35,6 +35,7 @@ type GeographyRow = CsvRow & {
 
 type SourceWorkbook = {
   matrix: unknown[][];
+  worksheet: XLSX.WorkSheet;
   sheetName: string;
 };
 
@@ -92,6 +93,7 @@ function readWorkbook(fileName: string, sheetName: string): SourceWorkbook {
       blankrows: false,
       defval: null,
     }) as unknown[][],
+    worksheet: workbook.Sheets[sheetName],
     sheetName,
   };
 }
@@ -173,10 +175,22 @@ function sourceRowsByLabel(matrix: unknown[][]): Map<string, unknown[]> {
   );
 }
 
-function sourceRowNumber(matrix: unknown[][], sourceLabel: string): number {
-  const rowIndex = matrix.findIndex((row) => row[0] === sourceLabel);
-  expect(rowIndex).toBeGreaterThanOrEqual(0);
-  return rowIndex + 1;
+function sourceWorksheetRowNumber(
+  worksheet: XLSX.WorkSheet,
+  sourceLabel: string,
+): number {
+  const sheetRange = worksheet["!ref"];
+  expect(sheetRange).toBeDefined();
+  const range = XLSX.utils.decode_range(sheetRange ?? "A1:A1");
+
+  for (let rowIndex = range.s.r; rowIndex <= range.e.r; rowIndex += 1) {
+    const address = XLSX.utils.encode_cell({ r: rowIndex, c: range.s.c });
+    if (worksheet[address]?.w === sourceLabel || worksheet[address]?.v === sourceLabel) {
+      return rowIndex + 1;
+    }
+  }
+
+  throw new Error(`Missing source worksheet row: ${sourceLabel}`);
 }
 
 function municipalityMappings(geographyRows: GeographyRow[]): GeographyRow[] {
@@ -246,7 +260,10 @@ function assertPopulationRowsReconcile(
     const sourceValue = workbookNumber(sourceRow?.[yearColumn]);
     const populationThousand = outputNumber(row.population_thousand);
     const populationPersons = outputNumber(row.population_persons);
-    const rowNumber = sourceRowNumber(source.matrix, mapping?.source_label ?? "");
+    const rowNumber = sourceWorksheetRowNumber(
+      source.worksheet,
+      mapping?.source_label ?? "",
+    );
     const sourceCell = XLSX.utils.encode_cell({ r: rowNumber - 1, c: yearColumn });
 
     expect(populationThousand).toBe(sourceValue);
@@ -279,7 +296,10 @@ function assertRegionalGdpRowsReconcile(
     const year = Number(row.year);
     const yearColumn = yearColumns.get(year) ?? -1;
     const sourceValue = sourceGdpMillionGel(sourceRow?.[yearColumn], "mil. GEL");
-    const rowNumber = sourceRowNumber(source.matrix, mapping?.source_label ?? "");
+    const rowNumber = sourceWorksheetRowNumber(
+      source.worksheet,
+      mapping?.source_label ?? "",
+    );
     const sourceCell = XLSX.utils.encode_cell({ r: rowNumber - 1, c: yearColumn });
 
     expect(mapping).toBeDefined();
@@ -343,6 +363,9 @@ describe("Geostat population and regional GDP research package", () => {
 
     assertCanonicalGeography(geographyRows);
     expect(result.populationRows).toHaveLength(64 * 11);
+    expect(result.populationRows[0]?.transformation).toContain(
+      "source row 6; year 2015 column W (cell W6)",
+    );
     expect(new Set(result.populationRows.map((row) => row.year))).toEqual(
       new Set(POPULATION_YEARS),
     );

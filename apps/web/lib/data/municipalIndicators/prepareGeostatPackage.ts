@@ -120,6 +120,10 @@ export function reconciliationEntriesMatch(
 
 type CsvRow = Record<string, string>;
 type Matrix = unknown[][];
+type SheetMatrix = {
+  rows: Matrix;
+  firstRowNumber: number;
+};
 
 const REVIEW_DATE = "2026-08-03";
 const POPULATION_YEARS = Array.from({ length: 11 }, (_, index) => 2015 + index);
@@ -181,16 +185,22 @@ async function readGeographyRows(filePath: string): Promise<GeographyMapRow[]> {
   return rows;
 }
 
-function readMatrix(filePath: string, sheetName: string): Matrix {
+function readMatrix(filePath: string, sheetName: string): SheetMatrix {
   const workbook = XLSX.readFile(filePath, { cellDates: false });
   const sheet = workbook.Sheets[sheetName];
   if (!sheet) throw new Error(`Missing source sheet ${sheetName} in ${filePath}`);
-  return XLSX.utils.sheet_to_json(sheet, {
-    header: 1,
-    raw: false,
-    blankrows: false,
-    defval: null,
-  }) as Matrix;
+  const sheetRange = sheet["!ref"];
+  if (!sheetRange) throw new Error(`Empty source sheet ${sheetName} in ${filePath}`);
+  return {
+    rows: XLSX.utils.sheet_to_json(sheet, {
+      header: 1,
+      raw: false,
+      blankrows: true,
+      defval: null,
+      range: sheetRange,
+    }) as Matrix,
+    firstRowNumber: XLSX.utils.decode_range(sheetRange).s.r + 1,
+  };
 }
 
 function requireSourceNumber(value: unknown, context: string): number {
@@ -238,11 +248,14 @@ function yearColumns(header: unknown[], years?: number[]): Map<number, number> {
   );
 }
 
-function rowsByLabel(matrix: Matrix): Map<string, { row: unknown[]; rowNumber: number }> {
+function rowsByLabel(
+  matrix: Matrix,
+  firstRowNumber: number,
+): Map<string, { row: unknown[]; rowNumber: number }> {
   return new Map(
     matrix.flatMap((row, index) =>
       typeof row[0] === "string"
-        ? [[row[0], { row, rowNumber: index + 1 }] as const]
+        ? [[row[0], { row, rowNumber: firstRowNumber + index }] as const]
         : [],
     ),
   );
@@ -388,17 +401,21 @@ export async function buildGeostatPackage(
   });
   if (!sourceHashesMatch) throw new Error("Preserved source hashes do not match source-manifest.csv");
 
-  const populationMatrix = readMatrix(paths.populationSource, "1");
+  const populationSource = readMatrix(paths.populationSource, "1");
+  const populationMatrix = populationSource.rows;
   if (!String(populationMatrix[0]?.[0]).includes("Population as of 1 January")) {
     throw new Error("Unexpected population workbook title");
   }
-  const populationUnit = String(populationMatrix[1]?.[0]);
+  const populationUnit = String(populationMatrix[2]?.[0]);
   if (populationUnit !== "(thousands)") throw new Error(`Unexpected population unit: ${populationUnit}`);
-  const populationColumns = yearColumns(populationMatrix[2] ?? [], POPULATION_YEARS);
+  const populationColumns = yearColumns(populationMatrix[3] ?? [], POPULATION_YEARS);
   if (populationColumns.size !== POPULATION_YEARS.length) {
     throw new Error("Population source does not contain every requested year");
   }
-  const populationSourceRows = rowsByLabel(populationMatrix);
+  const populationSourceRows = rowsByLabel(
+    populationMatrix,
+    populationSource.firstRowNumber,
+  );
   const populationGaps: Gap[] = [];
   const populationRows: PopulationRow[] = [];
   const expectedPopulationEntries: ReconciliationEntry[] = [];
@@ -459,7 +476,8 @@ export async function buildGeostatPackage(
     }
   }
 
-  const gdpMatrix = readMatrix(paths.gdpSource, "regional GDP");
+  const gdpSource = readMatrix(paths.gdpSource, "regional GDP");
+  const gdpMatrix = gdpSource.rows;
   const gdpTitle = String(gdpMatrix[0]?.[0]);
   if (!/current prices, mil\. GEL/i.test(gdpTitle)) throw new Error("Unexpected regional GDP title or unit");
   const gdpSourceUnit = "mil. GEL";
@@ -469,7 +487,7 @@ export async function buildGeostatPackage(
     .filter((year) => year >= 2005 && year <= 2025)
     .sort((a, b) => a - b);
   if (gdpYears.length === 0) throw new Error("Regional GDP source has no in-window year columns");
-  const gdpSourceRows = rowsByLabel(gdpMatrix);
+  const gdpSourceRows = rowsByLabel(gdpMatrix, gdpSource.firstRowNumber);
   const gdpGaps: Gap[] = [];
   const regionalGdpRows: RegionalGdpRow[] = [];
   const expectedGdpEntries: ReconciliationEntry[] = [];
