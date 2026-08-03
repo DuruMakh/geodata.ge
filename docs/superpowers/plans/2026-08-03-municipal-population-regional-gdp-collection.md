@@ -6,7 +6,7 @@
 
 **Architecture:** Preserve the two official XLSX files unchanged, then use one testable TypeScript package builder to map their geographic labels, normalize only the approved measures, generate human-review CSV/XLSX artifacts, and emit a fail-closed validation report. Keep the package under `docs/Raw Data/Municipalities/`; do not connect it to `data/imports`, Prisma, application loaders, routes, or UI.
 
-**Tech Stack:** PowerShell source capture, Geostat XLSX files, TypeScript strict mode, `xlsx` 0.18.5, `csv-parse` 6.2.1, Node cryptography/filesystem APIs, Vitest 4.1.5, Markdown methodology.
+**Tech Stack:** PowerShell source capture, Geostat XLSX files, TypeScript strict mode, `xlsx` 0.18.5 for source parsing and verification only, `csv-parse` 6.2.1, Node cryptography/filesystem APIs, Vitest 4.1.5, `@oai/artifact-tool` 2.8.6+ from the bundled workspace runtime for review-workbook authoring and visual verification, Markdown methodology.
 
 ## Global Constraints
 
@@ -30,6 +30,7 @@
 - `docs/Raw Data/Municipalities/geostat-population-regional-gdp/geography-map.csv` — reviewed one-to-one source-label crosswalk.
 - `docs/Raw Data/Municipalities/geostat-population-regional-gdp/*.csv|*.xlsx|*.json|README.md` — reviewed research outputs and provenance.
 - `docs/data-methodology/municipal-population-regional-gdp.md` — canonical collection, definition, transformation, gap, and rerun methodology.
+- `.superpowers/sdd/2026-08-03-municipal-population-regional-gdp-collection/build-review-workbook.mjs` — git-ignored `@oai/artifact-tool` builder used to create and render-verify the final XLSX; it is a support artifact, not a project dependency or deliverable.
 
 ---
 
@@ -243,12 +244,12 @@ git commit -m "test: define municipal indicator package contract"
 - Create: `docs/Raw Data/Municipalities/geostat-population-regional-gdp/source-manifest.csv`
 - Generate: `docs/Raw Data/Municipalities/geostat-population-regional-gdp/municipal-population-annual-2015-2025.csv`
 - Generate: `docs/Raw Data/Municipalities/geostat-population-regional-gdp/regional-gdp-annual-2005-2025-available-years.csv`
-- Generate: `docs/Raw Data/Municipalities/geostat-population-regional-gdp/municipal-population-and-regional-gdp.xlsx`
+- Create with `@oai/artifact-tool`: `docs/Raw Data/Municipalities/geostat-population-regional-gdp/municipal-population-and-regional-gdp.xlsx`
 - Generate: `docs/Raw Data/Municipalities/geostat-population-regional-gdp/validation-report.json`
 
 **Interfaces:**
 - Consumes: the two preserved workbooks; the reviewed `source-manifest.csv` and `geography-map.csv`; the canonical municipality and region files.
-- Produces: `buildGeostatPackage(options: { write: boolean }): Promise<GeostatPackageBuild>` and deterministic human-review artifacts.
+- Produces: `buildGeostatPackage(options: { write: boolean }): Promise<GeostatPackageBuild>`, deterministic CSV/JSON artifacts, and source rows consumed by the separate `@oai/artifact-tool` review-workbook builder.
 
 - [ ] **Step 1: Define strict row and report types**
 
@@ -403,7 +404,7 @@ type ValidationReport = {
 };
 ```
 
-Ensure all four human-facing CSVs use `"\uFEFF" + rows.join("\n") + "\n"`. The package builder writes the two normalized data CSVs and reads the reviewed manifest/crosswalk without rewriting them. Escape generated fields with the existing `csvEscape` helper. Generate the four-sheet review workbook from the exact same in-memory normalized rows and reviewed geography rows. Hash the preserved sources at generation time and compare them to the fixed manifest values.
+Ensure all four human-facing CSVs use `"\uFEFF" + rows.join("\n") + "\n"`. The package builder writes the two normalized data CSVs and `validation-report.json`, and reads the reviewed manifest/crosswalk without rewriting them. Escape generated fields with the existing `csvEscape` helper. Hash the preserved sources at generation time and compare them to the fixed manifest values. Do not create or edit XLSX files with this module.
 
 - [ ] **Step 6: Add the CLI and package script**
 
@@ -432,7 +433,7 @@ Add to `apps/web/package.json`:
 "data:prepare-municipal-indicators": "tsx scripts/prepare-geostat-municipal-indicators.ts"
 ```
 
-- [ ] **Step 7: Generate the package twice and prove a fixed point**
+- [ ] **Step 7: Generate the CSV/JSON package twice and prove a fixed point**
 
 Run from `apps/web`:
 
@@ -450,7 +451,22 @@ git diff --check
 
 Expected: both runs report identical population/GDP counts and years; the second run creates no content drift; `git diff --check` passes.
 
-- [ ] **Step 8: Run the focused test and verify GREEN**
+- [ ] **Step 8: Author and visually verify the review workbook with `@oai/artifact-tool`**
+
+Use the bundled runtime paths returned by `load_workspace_dependencies`. In this plan's git-ignored SDD workspace, create a Windows junction named `node_modules` pointing to the loader-provided Node packages and one executable `build-review-workbook.mjs`. The builder must:
+
+- import `Workbook` and `SpreadsheetFile` from `@oai/artifact-tool`;
+- read the two generated data CSVs and `geography-map.csv` as UTF-8 with BOM;
+- create exactly four sheets named `Read me`, `Population`, `Regional GDP`, and `Geography map`;
+- write typed numbers and ISO dates as values, not preformatted strings;
+- use block writes, freeze the header row on each data sheet, hide gridlines, apply a restrained header fill and bold white text, use `#,##0.0` for thousand-person values, `#,##0` for person counts, and `#,##0.0` for million-GEL values;
+- put both official source-page URLs and the validation status visibly on `Read me`;
+- size populated columns so headers and representative values are legible without formatting unused ranges;
+- export exactly one workbook to the approved raw-package path.
+
+After export, use `workbook.inspect` on the key used ranges, scan for `#REF!|#DIV/0!|#VALUE!|#NAME\?|#N/A`, and render all four sheets to PNG files inside the SDD workspace. Visually inspect every render and fix clipped headers, unreadable values, excessive widths, or blank/broken sheets before the final export. Do not commit the builder, runtime junction, or PNG previews.
+
+- [ ] **Step 9: Run the focused test and verify GREEN**
 
 ```powershell
 npm test -- tests/data/municipalIndicators/geostatPackage.test.ts
@@ -458,7 +474,7 @@ npm test -- tests/data/municipalIndicators/geostatPackage.test.ts
 
 Expected: PASS for coverage, geography, hashes, encoding, reconciliation, XLSX parity, and zero estimates.
 
-- [ ] **Step 9: Commit the normalizer and generated research artifacts**
+- [ ] **Step 10: Commit the normalizer and generated research artifacts**
 
 ```powershell
 git add -- 'apps/web/lib/data/municipalIndicators/prepareGeostatPackage.ts' 'apps/web/scripts/prepare-geostat-municipal-indicators.ts' 'apps/web/package.json' 'docs/Raw Data/Municipalities/geostat-population-regional-gdp'
