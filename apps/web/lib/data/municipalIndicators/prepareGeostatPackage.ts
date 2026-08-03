@@ -45,6 +45,15 @@ export type GeographyMapRow = {
   mapping_note: string;
 };
 
+export type PopulationComponentMapRow = {
+  geodata_id: string;
+  component_source_label: string;
+  start_year: number;
+  end_year: number;
+  operation: "sum";
+  mapping_note: string;
+};
+
 export type Gap = {
   dataset: "population" | "regional_gdp";
   geography_id: string;
@@ -64,15 +73,27 @@ export class OfficialGapError extends Error {
 
 export type ValidationReport = {
   status: "complete" | "complete_with_official_gaps" | "failed";
-  population: { observedYears: number[]; rowCount: number; gaps: Gap[] };
+  population: {
+    observedYears: number[];
+    rowCount: number;
+    gaps: Gap[];
+    nationalReconciliation: Array<{
+      year: number;
+      complete: boolean;
+      published_total_thousand: number | null;
+      municipality_sum_thousand: number | null;
+      difference_thousand: number | null;
+    }>;
+  };
   regionalGdp: {
     observedYears: number[];
     rowCount: number;
     gaps: Gap[];
     nationalReconciliation: Array<{
       year: number;
+      complete: boolean;
       published_total_million_gel: number | null;
-      regional_sum_million_gel: number;
+      regional_sum_million_gel: number | null;
       difference_million_gel: number | null;
     }>;
   };
@@ -130,6 +151,67 @@ const POPULATION_YEARS = Array.from({ length: 11 }, (_, index) => 2015 + index);
 const EXCLUDED_CODES = new Set(["05", "42", "43", "46", "64"]);
 const POPULATION_SOURCE_ID = "geostat_population_self_governed_units" as const;
 const GDP_SOURCE_ID = "geostat_regional_gdp_current_prices" as const;
+const COMPONENT_MAP_HEADERS = [
+  "geodata_id",
+  "component_source_label",
+  "start_year",
+  "end_year",
+  "operation",
+  "mapping_note",
+] as const;
+const MANIFEST_HEADERS = [
+  "source_id",
+  "dataset_title",
+  "publisher",
+  "role",
+  "source_page_url",
+  "retrieved_file_url",
+  "retrieved_at",
+  "local_file",
+  "sha256",
+  "bytes",
+  "source_year_min",
+  "source_year_max",
+  "normalized_year_min",
+  "normalized_year_max",
+  "notes",
+] as const;
+const APPROVED_SOURCE_MANIFEST: CsvRow[] = [
+  {
+    source_id: POPULATION_SOURCE_ID,
+    dataset_title: "Population as of 1 January by regions and self-governed units",
+    publisher: "National Statistics Office of Georgia (Geostat)",
+    role: "municipal population",
+    source_page_url: "https://www.geostat.ge/en/modules/categories/41/population",
+    retrieved_file_url: "https://www.geostat.ge/media/78356/01-population-by-self-governed-unit.xlsx",
+    retrieved_at: REVIEW_DATE,
+    local_file: "official/01-population-by-self-governed-unit.xlsx",
+    sha256: "8BD7A1B56E756E8D6BC92192095795B204B23FD18274AAFF39B78C0B0A487A57",
+    bytes: "34994",
+    source_year_min: "1994",
+    source_year_max: "2026",
+    normalized_year_min: "2015",
+    normalized_year_max: "2025",
+    notes: "2025 values were recalculated from the 2024 census; normalized output includes the 64 canonical municipalities and preserves official values without estimates.",
+  },
+  {
+    source_id: GDP_SOURCE_ID,
+    dataset_title: "Distribution of gross domestic product by regions at current prices",
+    publisher: "National Statistics Office of Georgia (Geostat)",
+    role: "regional GDP",
+    source_page_url: "https://www.geostat.ge/en/modules/categories/23/gross-domestic-product-gdp",
+    retrieved_file_url: "https://www.geostat.ge/media/79752/regional-GDP-ENG.xlsx",
+    retrieved_at: REVIEW_DATE,
+    local_file: "official/regional-GDP-ENG.xlsx",
+    sha256: "DD2042DFF5E2C44B98B4BB140163B5736CF5A71F4683B9E6A359373907D59C35",
+    bytes: "13871",
+    source_year_min: "2010",
+    source_year_max: "2024",
+    normalized_year_min: "2010",
+    normalized_year_max: "2024",
+    notes: "Last updated 2025-12-23; normalized output includes the 11 canonical regions and excludes the national aggregate from normalized rows.",
+  },
+];
 
 function packagePaths() {
   const repoRoot = path.resolve(process.cwd(), "../..");
@@ -142,6 +224,7 @@ function packagePaths() {
     repoRoot,
     packageDir,
     geographyMap: path.join(packageDir, "geography-map.csv"),
+    populationComponentMap: path.join(packageDir, "population-component-map.csv"),
     manifest: path.join(packageDir, "source-manifest.csv"),
     populationSource: path.join(
       packageDir,
@@ -183,6 +266,154 @@ async function readGeographyRows(filePath: string): Promise<GeographyMapRow[]> {
   }
 
   return rows;
+}
+
+function assertExactHeaders(
+  row: CsvRow,
+  expectedHeaders: readonly string[],
+  context: string,
+) {
+  if (Object.keys(row).join(",") !== expectedHeaders.join(",")) {
+    throw new Error(`${context} headers do not match the approved schema`);
+  }
+}
+
+export function validateSourceManifestRows(rows: CsvRow[]) {
+  if (rows.length !== APPROVED_SOURCE_MANIFEST.length) {
+    throw new Error(`Expected ${APPROVED_SOURCE_MANIFEST.length} source-manifest rows`);
+  }
+
+  const seenIds = new Set<string>();
+  for (const row of rows) {
+    assertExactHeaders(row, MANIFEST_HEADERS, "Source manifest");
+    if (seenIds.has(row.source_id)) {
+      throw new Error(`Duplicate source-manifest ID: ${row.source_id}`);
+    }
+    seenIds.add(row.source_id);
+
+    for (const field of ["source_page_url", "retrieved_file_url"] as const) {
+      const url = new URL(row[field]);
+      if (url.protocol !== "http:" && url.protocol !== "https:") {
+        throw new Error(`Invalid source-manifest URL protocol: ${row[field]}`);
+      }
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(row.retrieved_at)) {
+      throw new Error(`Invalid source-manifest retrieval date: ${row.retrieved_at}`);
+    }
+    if (
+      new Date(`${row.retrieved_at}T00:00:00Z`).toISOString().slice(0, 10) !==
+      row.retrieved_at
+    ) {
+      throw new Error(`Invalid source-manifest retrieval date: ${row.retrieved_at}`);
+    }
+
+    const yearFields = [
+      "source_year_min",
+      "source_year_max",
+      "normalized_year_min",
+      "normalized_year_max",
+    ] as const;
+    if (yearFields.some((field) => !Number.isInteger(Number(row[field])))) {
+      throw new Error(`Invalid source-manifest year bound for ${row.source_id}`);
+    }
+    const sourceMin = Number(row.source_year_min);
+    const sourceMax = Number(row.source_year_max);
+    const normalizedMin = Number(row.normalized_year_min);
+    const normalizedMax = Number(row.normalized_year_max);
+    if (
+      sourceMin > normalizedMin ||
+      normalizedMin > normalizedMax ||
+      normalizedMax > sourceMax
+    ) {
+      throw new Error(`Invalid source-manifest year range for ${row.source_id}`);
+    }
+
+    const approved = APPROVED_SOURCE_MANIFEST.find(
+      (candidate) => candidate.source_id === row.source_id,
+    );
+    if (!approved) throw new Error(`Unapproved source-manifest ID: ${row.source_id}`);
+    for (const field of MANIFEST_HEADERS) {
+      if (row[field] !== approved[field]) {
+        throw new Error(`Unexpected source-manifest ${field} for ${row.source_id}`);
+      }
+    }
+  }
+}
+
+export function validatePopulationComponentRows(
+  rows: CsvRow[],
+  knownMunicipalityIds: string[],
+  knownSourceLabels: string[],
+): PopulationComponentMapRow[] {
+  if (rows.length !== 7) throw new Error(`Expected 7 population component rules`);
+  const municipalityIds = new Set(knownMunicipalityIds);
+  const sourceLabels = new Set(knownSourceLabels);
+  const seenIds = new Set<string>();
+  const seenLabels = new Set<string>();
+
+  return rows.map((row) => {
+    assertExactHeaders(row, COMPONENT_MAP_HEADERS, "Population component map");
+    if (!municipalityIds.has(row.geodata_id)) {
+      throw new Error(`Unknown component-map municipality ID: ${row.geodata_id}`);
+    }
+    if (!sourceLabels.has(row.component_source_label)) {
+      throw new Error(`Unknown population component label: ${row.component_source_label}`);
+    }
+    if (seenIds.has(row.geodata_id) || seenLabels.has(row.component_source_label)) {
+      throw new Error(`Duplicate population component rule: ${row.geodata_id}`);
+    }
+    seenIds.add(row.geodata_id);
+    seenLabels.add(row.component_source_label);
+
+    const startYear = Number(row.start_year);
+    const endYear = Number(row.end_year);
+    if (
+      !Number.isInteger(startYear) ||
+      !Number.isInteger(endYear) ||
+      startYear > endYear ||
+      startYear < POPULATION_YEARS[0] ||
+      endYear > POPULATION_YEARS.at(-1)! ||
+      startYear !== 2015 ||
+      endYear !== 2017
+    ) {
+      throw new Error(`Invalid population component year bounds: ${row.geodata_id}`);
+    }
+    if (row.operation !== "sum") {
+      throw new Error(`Unsupported population component operation: ${row.operation}`);
+    }
+    if (!row.mapping_note.trim()) {
+      throw new Error(`Missing population component mapping note: ${row.geodata_id}`);
+    }
+
+    return {
+      geodata_id: row.geodata_id,
+      component_source_label: row.component_source_label,
+      start_year: startYear,
+      end_year: endYear,
+      operation: "sum",
+      mapping_note: row.mapping_note,
+    };
+  });
+}
+
+export function reconcileNationalValues(
+  publishedTotal: number | null,
+  components: Array<number | null>,
+) {
+  if (publishedTotal === null || components.some((value) => value === null)) {
+    return { complete: false, component_sum: null, difference: null };
+  }
+  const numericComponents = components.filter(
+    (value): value is number => value !== null,
+  );
+  const componentSum = Number(
+    numericComponents.reduce((sum, value) => sum + value, 0).toFixed(10),
+  );
+  return {
+    complete: true,
+    component_sum: componentSum,
+    difference: Number((publishedTotal - componentSum).toFixed(10)),
+  };
 }
 
 function readMatrix(filePath: string, sheetName: string): SheetMatrix {
@@ -297,9 +528,8 @@ async function verifySources(
   sources: Record<string, string>,
 ): Promise<boolean> {
   const manifest = parseCsv(await fs.readFile(manifestPath, "utf8"));
-  if (manifest.length !== Object.keys(sources).length) {
-    throw new Error(`Expected ${Object.keys(sources).length} source-manifest rows`);
-  }
+  validateSourceManifestRows(manifest);
+  if (manifest.length !== Object.keys(sources).length) return false;
 
   for (const [sourceId, sourcePath] of Object.entries(sources)) {
     const row = manifest.find((candidate) => candidate.source_id === sourceId);
@@ -416,6 +646,11 @@ export async function buildGeostatPackage(
     populationMatrix,
     populationSource.firstRowNumber,
   );
+  const populationComponentRows = validatePopulationComponentRows(
+    parseCsv(await fs.readFile(paths.populationComponentMap, "utf8")),
+    municipalityMappings.map((row) => row.geodata_id),
+    [...populationSourceRows.keys()],
+  );
   const populationGaps: Gap[] = [];
   const populationRows: PopulationRow[] = [];
   const expectedPopulationEntries: ReconciliationEntry[] = [];
@@ -428,7 +663,7 @@ export async function buildGeostatPackage(
       if (!source) throw new Error(`Missing population source row: ${mapping.source_label}`);
       const context = `population ${mapping.geodata_id} ${year}`;
       const sourceCell = cellAddress(source.rowNumber, columnIndex);
-      const populationThousand = readWithGap(
+      const basePopulationThousand = readWithGap(
         source.row[columnIndex],
         context,
         {
@@ -439,9 +674,55 @@ export async function buildGeostatPackage(
         },
         populationGaps,
       );
+      const componentSources = populationComponentRows
+        .filter(
+          (component) =>
+            component.geodata_id === mapping.geodata_id &&
+            year >= component.start_year &&
+            year <= component.end_year,
+        )
+        .map((component) => {
+          const componentSource = populationSourceRows.get(
+            component.component_source_label,
+          );
+          if (!componentSource) {
+            throw new Error(
+              `Missing population component row: ${component.component_source_label}`,
+            );
+          }
+          const componentCell = cellAddress(componentSource.rowNumber, columnIndex);
+          let value: number;
+          try {
+            value = sourceNumber(
+              componentSource.row[columnIndex],
+              `population component ${component.geodata_id} ${year} ${component.component_source_label}`,
+            );
+          } catch (error) {
+            if (!(error instanceof OfficialGapError)) throw error;
+            throw new Error(
+              `Missing required population component cell ${componentCell}: ${error.sourceCellState}`,
+            );
+          }
+          return {
+            rowNumber: componentSource.rowNumber,
+            cell: componentCell,
+            value,
+          };
+        });
+      const populationThousand =
+        basePopulationThousand === null
+          ? null
+          : Number(
+              componentSources
+                .reduce((sum, component) => sum + component.value, basePopulationThousand)
+                .toFixed(10),
+            );
       const populationPersons =
         populationThousand === null ? null : populationThousand * 1000;
-      const transformation = `Source sheet "1"; source row ${source.rowNumber}; year ${year} column ${XLSX.utils.encode_col(columnIndex)} (cell ${sourceCell}); retained published thousands; persons = thousands * 1000; no estimates.`;
+      const transformation =
+        componentSources.length === 0
+          ? `Source sheet "1"; source row ${source.rowNumber}; year ${year} column ${XLSX.utils.encode_col(columnIndex)} (cell ${sourceCell}); retained published thousands; persons = thousands * 1000; no estimates.`
+          : `Source sheet "1"; source rows ${[source.rowNumber, ...componentSources.map((component) => component.rowNumber)].join(" + ")}; year ${year} column ${XLSX.utils.encode_col(columnIndex)} (cells ${[sourceCell, ...componentSources.map((component) => component.cell)].join(" + ")}); population_thousand = ${[sourceCell, ...componentSources.map((component) => component.cell)].join(" + ")}; persons = thousands * 1000; no estimates.`;
       expectedPopulationEntries.push({
         key: `${year}:${mapping.geodata_id}`,
         values: [
@@ -475,6 +756,36 @@ export async function buildGeostatPackage(
       });
     }
   }
+
+  const populationNationalRow = populationSourceRows.get("Georgia");
+  if (!populationNationalRow) throw new Error("Missing Georgia population total row");
+  const populationNationalReconciliation = POPULATION_YEARS.map((year) => {
+    const columnIndex = populationColumns.get(year);
+    if (columnIndex === undefined) throw new Error(`Missing population year ${year}`);
+    let publishedTotal: number | null;
+    try {
+      publishedTotal = sourceNumber(
+        populationNationalRow.row[columnIndex],
+        `population national total ${year}`,
+      );
+    } catch (error) {
+      if (!(error instanceof OfficialGapError)) throw error;
+      publishedTotal = null;
+    }
+    const reconciliation = reconcileNationalValues(
+      publishedTotal,
+      populationRows
+        .filter((row) => row.year === year)
+        .map((row) => row.population_thousand),
+    );
+    return {
+      year,
+      complete: reconciliation.complete,
+      published_total_thousand: publishedTotal,
+      municipality_sum_thousand: reconciliation.component_sum,
+      difference_thousand: reconciliation.difference,
+    };
+  });
 
   const gdpSource = readMatrix(paths.gdpSource, "regional GDP");
   const gdpMatrix = gdpSource.rows;
@@ -549,21 +860,30 @@ export async function buildGeostatPackage(
   const nationalReconciliation = gdpYears.map((year) => {
     const columnIndex = gdpColumns.get(year);
     if (columnIndex === undefined) throw new Error(`Missing regional GDP year ${year}`);
-    const published = sourceNumber(
-      nationalRow.row[columnIndex],
-      `regional GDP national total ${year}`,
-    );
-    const regionalSum = Number(
+    let published: number | null;
+    try {
+      published = sourceNumber(
+        nationalRow.row[columnIndex],
+        `regional GDP national total ${year}`,
+      );
+    } catch (error) {
+      if (!(error instanceof OfficialGapError)) throw error;
+      published = null;
+    }
+    const publishedTotal =
+      published === null ? null : toMillionGel(published, gdpConversionUnit);
+    const reconciliation = reconcileNationalValues(
+      publishedTotal,
       regionalGdpRows
         .filter((row) => row.year === year)
-        .reduce((sum, row) => sum + (row.gdp_current_prices_million_gel ?? 0), 0)
-        .toFixed(10),
+        .map((row) => row.gdp_current_prices_million_gel),
     );
     return {
       year,
-      published_total_million_gel: toMillionGel(published, gdpConversionUnit),
-      regional_sum_million_gel: regionalSum,
-      difference_million_gel: Number((published - regionalSum).toFixed(10)),
+      complete: reconciliation.complete,
+      published_total_million_gel: publishedTotal,
+      regional_sum_million_gel: reconciliation.component_sum,
+      difference_million_gel: reconciliation.difference,
     };
   });
 
@@ -633,6 +953,7 @@ export async function buildGeostatPackage(
       observedYears: POPULATION_YEARS,
       rowCount: populationRows.length,
       gaps: populationGaps,
+      nationalReconciliation: populationNationalReconciliation,
     },
     regionalGdp: {
       observedYears: gdpYears,

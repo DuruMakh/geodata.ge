@@ -134,6 +134,26 @@ Rules:
 - National totals, subtotals, autonomous-republic headings, footnotes, and other non-municipality or non-region rows are not assigned artificial GeoData IDs.
 - Every reviewed alias requires a plain-language `mapping_note`.
 
+`population-component-map.csv` records source rows that must be added to a
+canonical municipality for a bounded period when Geostat published a city and
+its surrounding municipality separately:
+
+```text
+geodata_id
+component_source_label
+start_year
+end_year
+operation
+mapping_note
+```
+
+The seven starred city rows (`C. Ozurgeti*`, `C. Telavi*`, `C. Mtskheta*`,
+`C. Ambrolauri*`, `C. Zugdidi*`, `C. Akhaltsikhe*`, and `C. Gori*`) are additive
+components for the corresponding present-day canonical municipality in
+2015-2017. This is an explicit temporal composite mapping, not fuzzy matching.
+The base `geography-map.csv` remains the one-to-one 64-municipality and
+11-region identity crosswalk.
+
 ## 7. Normalized Population Dataset
 
 `municipal-population-annual-2015-2025.csv` has this schema:
@@ -161,6 +181,9 @@ Rules:
 - `population_persons` is the exact mechanical unit conversion `population_thousand * 1000`; it is not an estimate and must not add precision beyond the published value.
 - `source_unit` records the workbook's exact stated unit.
 - `transformation` states the sheet/row/column selection and the unit conversion.
+- When `population-component-map.csv` applies, `population_thousand` is the sum
+  of the base municipality cell and every mapped component cell for that year;
+  `transformation` records every contributing A1 cell and the addition.
 - Blank, suppressed, unavailable, or non-numeric source cells remain blank in normalized output and are listed as gaps. They are never replaced with zero.
 - If the official source has complete coverage, the file contains exactly 704 rows: 64 municipalities times 11 years.
 
@@ -225,7 +248,11 @@ Required population checks:
 - Every municipality maps to its existing `region_id`.
 - Values numeric and nonnegative when present.
 - `population_persons` equals the exact documented unit conversion.
-- Every normalized source value reconciles to its workbook cell.
+- Every normalized source value reconciles to its workbook cell or, for an
+  explicit temporal composite, to the exact sum of all recorded workbook cells.
+- The sum of the 64 canonical municipality values is compared with Geostat's
+  published Georgia total for every year. Differences are reported exactly and
+  values are never adjusted to force equality.
 
 Required regional GDP checks:
 
@@ -235,9 +262,15 @@ Required regional GDP checks:
 - Values numeric and nonnegative when present.
 - Every normalized value reconciles to its workbook cell after any documented unit conversion.
 - When the workbook supplies a national total or reconciliation total, the sum of published regional components is compared with it. Any difference is reported exactly; regional values are never adjusted to force equality.
+- If any regional component is blank or unavailable, national reconciliation is
+  marked incomplete and its regional sum/difference are `null`; missing
+  components are never treated as zero.
 
 Required package checks:
 
+- The complete source-manifest schema is validated: exact source IDs, titles,
+  publisher, roles, page and file URLs, ISO retrieval dates, local files,
+  hashes, byte sizes, source year bounds, normalized year bounds, and notes.
 - Original-file hashes and byte sizes match the source manifest.
 - CSV headers match the approved schemas.
 - Human-facing CSVs begin with a UTF-8 BOM and Georgian text round-trips unchanged.

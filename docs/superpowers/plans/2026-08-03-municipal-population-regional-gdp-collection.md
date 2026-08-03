@@ -639,3 +639,80 @@ git commit -m "test: finalize municipal indicator package verification"
 ```
 
 If no changes were needed, do not create an empty commit. Record the command results in the final handoff.
+
+### Task 6: Correct temporal population composites and final-review validation gaps
+
+**Files:**
+- Modify: `docs/superpowers/specs/2026-08-03-municipal-population-regional-gdp-collection-design.md`
+- Create: `docs/Raw Data/Municipalities/geostat-population-regional-gdp/population-component-map.csv`
+- Modify: `apps/web/lib/data/municipalIndicators/prepareGeostatPackage.ts`
+- Modify: `apps/web/tests/data/municipalIndicators/geostatPackage.test.ts`
+- Regenerate: the two normalized CSVs, validation report, and review XLSX as affected
+- Modify: package README and `docs/data-methodology/municipal-population-regional-gdp.md`
+
+**Interfaces:**
+- Preserve `geography-map.csv` as the one-to-one canonical 64-municipality/11-region crosswalk.
+- Add an explicit seven-row temporal component map for the starred city rows that Geostat publishes separately in 2015-2017.
+- Extend validation with population national reconciliation, complete manifest-field validation, and null-safe GDP national reconciliation.
+
+- [ ] **Step 1: Write source-driven failing tests**
+
+Before production edits, prove RED with assertions that:
+
+- all 21 affected municipality-year rows equal the base municipality cell plus the mapped starred-city cell;
+- Telavi 2015 uses `W39 + W35` and equals 58.2 thousand at published precision;
+- every affected transformation records both source cells and addition;
+- the 64-row population sum is reconciled with Geostat's `Georgia` row for every 2015-2025 year;
+- all manifest fields, year bounds, ISO retrieval dates, and HTTP(S) URLs are validated independently;
+- a GDP reconciliation helper returns an incomplete/null reconciliation when any regional component is null.
+
+- [ ] **Step 2: Implement the explicit component map and aggregation**
+
+Create a UTF-8-BOM CSV with columns `geodata_id`, `component_source_label`,
+`start_year`, `end_year`, `operation`, and `mapping_note`. Add the seven observed
+starred city rows for 2015-2017 with `operation=sum`. Fail on duplicate or
+unknown IDs/labels, invalid year bounds, unsupported operations, missing
+component cells, or component rules outside the normalized window.
+
+For affected rows, sum the base and component source values without estimation,
+record both source cells in `transformation`, and retain the existing 704-row
+canonical panel. Regenerate the population CSV and review XLSX.
+
+- [ ] **Step 3: Strengthen validation**
+
+Validate every source-manifest field against the approved package facts, not
+only hash/size. Add population national reconciliation in thousands for all
+2015-2025 years. For GDP, if any regional component is null, emit an incomplete
+reconciliation with null regional sum/difference rather than adding zero.
+Regenerate `validation-report.json` and update types/tests.
+
+- [ ] **Step 4: Update human documentation and workbook review**
+
+Document the seven temporal composite mappings, source footnote interpretation,
+all contributing-cell provenance, population reconciliation differences, and
+the stronger manifest/GDP-gap behavior. Keep the workbook at exactly four
+sheets; include the component-rule summary on `Read me` and ensure the
+`Population` sheet matches the corrected CSV. Rebuild with the existing
+git-ignored `@oai/artifact-tool` builder, inspect key ranges/formula errors, and
+render-review all four sheets.
+
+- [ ] **Step 5: Verify and commit**
+
+Run deterministic generation twice, focused tests, typecheck, scoped lint,
+`git diff --check`, source/hash/value reconciliation, population and GDP
+national reconciliation, CSV BOM checks, and XLSX semantic parity. Commit the
+scoped correction as `fix(data): aggregate historical municipal components`.
+
+### Task 7: Re-run complete verification after the final-review correction
+
+**Files:**
+- Verify only; edit only if a failure traces directly to Task 6 files.
+
+- [ ] Run `npm run data:prepare-municipal-indicators` and prove a clean fixed point.
+- [ ] Run the focused municipal-indicator test.
+- [ ] Run `npm run check`.
+- [ ] Run the CSV-mode `npm run build`.
+- [ ] Audit the full diff from `e6123b0` for approved scope only.
+- [ ] Independently verify corrected 2015-2017 composites, population and GDP
+  reconciliation, manifest fields/hashes, zero estimates, exclusions, BOMs,
+  workbook semantic parity, and a clean worktree.

@@ -16,12 +16,13 @@ The old Ministry of Finance municipal-portal `Population` column is unused: it i
 | `official/regional-GDP-ENG.xlsx` | Immutable Geostat regional GDP capture; sheet `regional GDP`. |
 | `source-manifest.csv` | Retrieved URLs, date, local paths, SHA-256 hashes, byte sizes, and full versus normalized year coverage. |
 | `geography-map.csv` | Explicit source-label-to-GeoData ID crosswalk. |
+| `population-component-map.csv` | Seven explicit 2015-2017 rules for adding separately published starred city rows to the present-day canonical municipality. |
 | `municipal-population-annual-2015-2025.csv` | 704 normalized municipality-year rows. |
 | `regional-gdp-annual-2005-2025-available-years.csv` | 165 normalized region-year rows. |
 | `municipal-population-and-regional-gdp.xlsx` | Excel review workbook with `Read me`, `Population`, `Regional GDP`, and `Geography map` sheets. |
 | `validation-report.json` | Machine-readable coverage, gap, hash, reconciliation, and exclusion checks. |
 
-The four human-facing CSVs in this package (`source-manifest.csv`, `geography-map.csv`, and the two normalized files) use UTF-8 with BOM. The XLSX review sheets have the same normalized rows and geography rows as their CSV counterparts.
+The five human-facing CSVs in this package (`source-manifest.csv`, `geography-map.csv`, `population-component-map.csv`, and the two normalized files) use UTF-8 with BOM. The XLSX review sheets have the same normalized rows and geography rows as their CSV counterparts.
 
 ## Official sources and retrieval
 
@@ -42,7 +43,17 @@ The normalized output has 704 rows: 64 canonical municipalities for every year 2
 
 Population sheet `1` also marks `- Occupied territories`; the dash marker denotes occupied territories. Along with the workbook's `*`, `**`, and 2025 census-recalculation notes, it is preserved source context and does not create a normalized 2015-2025 gap for the 64 canonical rows.
 
-The workbook states: “Based on the results of the 2024 population census, the population size and related data as of January 1, 2025 were recalculated.” It also states that `*` data are included in the relevant municipalities before 2014 and starting from 2017, and that `**` data are included in the relevant municipalities before 2006. These source footnotes are preserved in the official workbook; they do not create a normalized 2015-2025 gap for the 64 canonical rows.
+The workbook states: “Based on the results of the 2024 population census, the population size and related data as of January 1, 2025 were recalculated.” It also states that `*` data are included in the relevant municipalities before 2014 and starting from 2017, and that `**` data are included in the relevant municipalities before 2006. In the actual 1 January columns for 2015, 2016, and 2017, seven starred city rows remain separately populated while their surrounding-municipality rows exclude those city values. `population-component-map.csv` therefore adds each published city cell to its corresponding base municipality for those three years. From 2018 onward the starred cells are blank and the base municipality row contains the combined value. This is explicit source aggregation, not estimation.
+
+| Canonical municipality | Base row + starred city row | 2015 | 2016 | 2017 |
+| --- | --- | ---: | ---: | ---: |
+| Telavi (`15`) | `Telavi Municipality` + `C. Telavi*` | 58.2 | 57.7 | 57.2 |
+| Zugdidi (`33`) | `Zugdidi Municipality` + `C. Zugdidi*` | 106.7 | 105.7 | 104.2 |
+| Gori (`41`) | `Gori Municipality` + `C. Gori*` | 125.4 | 124.7 | 123.8 |
+| Ozurgeti (`56`) | `Ozurgeti Municipality` + `C. Ozurgeti*` | 62.8 | 62.3 | 61.8 |
+| Akhaltsikhe (`62`) | `Akhaltsikhe Municipality` + `C. Akhaltsikhe*` | 39.2 | 39.2 | 39.3 |
+| Mtskheta (`67`) | `Mtskheta Municipality` + `C. Mtskheta*` | 54.6 | 54.4 | 54.2 |
+| Ambrolauri (`69`) | `Ambrolauri Municipality` + `C. Ambrolauri*` | 11.2 | 11.1 | 10.8 |
 
 ## Regional GDP definition and coverage
 
@@ -60,19 +71,37 @@ The twelve reviewed aliases are five municipal `C.` city prefixes — Tbilisi (`
 
 National totals, source-only regional headings, footnotes, and other noncanonical rows receive no artificial GeoData ID. The excluded municipal codes `05`, `42`, `43`, `46`, and `64` are outside the canonical municipality crosswalk and normalized output.
 
+The base `geography-map.csv` remains a one-to-one identity crosswalk. The separate `population-component-map.csv` contains only the seven bounded 2015-2017 additive rules; it does not assign the starred source rows new municipality IDs.
+
 ## Transformations and units
 
 Population rows select the mapped label from sheet `1`, preserve `(thousands)`, set `reference_date` to `YYYY-01-01`, and calculate `population_persons = population_thousand * 1000`. GDP rows select the mapped label from `regional GDP`, retain `mil. GEL` as million GEL, and apply no scale conversion.
 
-Each normalized row's `transformation` field records the exact source sheet, source worksheet row, year column, and A1 cell. For example, Tbilisi population for 2015 records `W6`, and Tbilisi regional GDP for 2010 records `B3`. This provenance is derived from the preserved XLSX coordinates, not from a reordered CSV row. Blank, suppressed, unavailable, or non-numeric official cells would remain blank and be listed as official gaps; they are never converted to zero.
+Each normalized row's `transformation` field records the exact source sheet, source worksheet row, year column, and A1 cell. Composite rows record both cells and the addition: Telavi 2015 is `W39 + W35 = 58.2` thousand. Non-composite examples include Tbilisi population 2015 at `W6` and Tbilisi regional GDP 2010 at `B3`. This provenance is derived from the preserved XLSX coordinates, not from a reordered CSV row. Blank, suppressed, unavailable, or non-numeric official cells would remain blank and be listed as official gaps; required component cells fail generation rather than becoming zero.
 
 ## Validation and reconciliation
 
 `validation-report.json` reports `status: complete`, zero population gaps, zero regional GDP gaps, `estimates_created: 0`, `excluded_codes_present: []`, `source_hashes_match: true`, and `normalized_values_reconcile: true`. It verifies exact population years 2015-2025, 704 unique municipality-year keys, all 64 canonical municipality codes, and the exact persons conversion. It verifies regional GDP years 2010-2024, 165 unique region-year keys, and all 11 canonical region IDs for every year.
 
-The preparation module checks SHA-256 and byte size against `source-manifest.csv`, the geography sets, excluded-code absence, year/key coverage, and numeric rules. It writes the normalized CSVs with a UTF-8 BOM, compares every serialized normalized record with its selected source XLSX cell, records official gap inventories, and calculates the regional GDP national reconciliation in `validation-report.json`. It does not reopen the written CSVs to validate their BOM or Georgian text, and it does not open or validate the XLSX review workbook.
+The preparation module checks every approved manifest field (schema, IDs, titles, publisher, roles, URLs, retrieval dates, local paths, hashes, byte sizes, year bounds, and notes), the source bytes, component rules, geography sets, excluded-code absence, year/key coverage, and numeric rules. It writes the normalized CSVs with a UTF-8 BOM, compares every serialized normalized record with its selected source cell or explicit cell sum, records official gap inventories, and calculates both population and regional GDP national reconciliations in `validation-report.json`.
 
-The focused test asserts the CSV BOM bytes, source hashes, source-row/cell values and conversions, geography/crosswalk and canonical sets, and validation-report status/booleans. It permits either `complete` or `complete_with_official_gaps`; it does not independently assert Georgian-text round-tripping, the gap inventories or zero-gap result, or national-reconciliation contents. It opens the review workbook only to verify its four sheet names and data-row counts against the CSV files; it does not claim row-by-row XLSX value parity. The separate artifact-tool workflow performs workbook key-range inspection, formula-error scanning, rendering, and visual review.
+The focused test independently checks all manifest fields and semantic constraints, mutates every manifest field to prove fail-closed behavior, checks invalid component rules, source-driven values and contributing cells for all 21 composites, both national reconciliations, BOMs, Georgian text, exact CSV schemas, and zero estimates. It compares every CSV field to the XLSX value and underlying type, including text municipality codes and displayed ISO dates, while preserving exactly four workbook sheets. The separate artifact-tool workflow performs workbook key-range inspection, formula-error scanning, rendering, and visual review.
+
+For population, the reported difference is `published Georgia total minus sum of the 64 canonical municipalities`, in thousands. Values are never adjusted to force equality; the small differences are published component rounding:
+
+| Year | Published | Municipality sum | Difference, thousand |
+| --- | ---: | ---: | ---: |
+| 2015 | 3,721.9 | 3,722.0 | -0.1 |
+| 2016 | 3,728.6 | 3,728.6 | 0.0 |
+| 2017 | 3,726.4 | 3,726.7 | -0.3 |
+| 2018 | 3,729.6 | 3,729.1 | +0.5 |
+| 2019 | 3,723.5 | 3,723.2 | +0.3 |
+| 2020 | 3,716.9 | 3,717.0 | -0.1 |
+| 2021 | 3,728.6 | 3,728.4 | +0.2 |
+| 2022 | 3,688.6 | 3,688.3 | +0.3 |
+| 2023 | 3,736.4 | 3,736.3 | +0.1 |
+| 2024 | 3,694.6 | 3,694.6 | 0.0 |
+| 2025 | 3,930.4 | 3,930.6 | -0.2 |
 
 For regional GDP, the reported difference is `published national total minus sum of the 11 published regional components`, in million GEL. Values are never changed to force a match. The only non-zero differences are normal published component rounding:
 
@@ -88,7 +117,7 @@ For regional GDP, the reported difference is `published national total minus sum
 | 2022 | -0.2 |
 | 2023 | +0.2 |
 
-All other observed GDP years reconcile to 0.0 million GEL at the published precision.
+All other observed GDP years reconcile to 0.0 million GEL at the published precision. Every current GDP reconciliation is complete. If any regional component is blank, its reconciliation is marked incomplete with `regional_sum_million_gel` and `difference_million_gel` set to `null`; a missing component is never treated as zero.
 
 ### Reproduce the package and checks
 
@@ -102,7 +131,7 @@ npm run check
 npm run build
 ```
 
-The preparation command regenerates only the two normalized CSVs and `validation-report.json` from the two preserved official workbooks; it first verifies the manifest hashes and byte sizes. Do not overwrite an official capture with a different file.
+The preparation command regenerates only the two normalized CSVs and `validation-report.json` from the two preserved official workbooks plus the reviewed one-to-one geography and temporal component maps; it first validates the complete manifest and source bytes. Do not overwrite an official capture with a different file.
 
 The XLSX review workbook is authored separately after normalization by the git-ignored SDD support builder `.superpowers/sdd/2026-08-03-municipal-population-regional-gdp-collection/build-review-workbook.mjs`, using the bundled workspace `@oai/artifact-tool` runtime. It reads the generated CSVs and geography map and writes the four review sheets; it is not a committed project dependency or a package-generation command. After authoring, inspect the used workbook ranges, scan for formula errors, render all four sheets, and visually check for clipped headers, unreadable values, excessive widths, blank sheets, or broken data before accepting the workbook. Do not commit the builder, its runtime junction, or render previews. Recheck the generated counts, years, hashes, gaps, and reconciliation against `source-manifest.csv` and `validation-report.json` before publishing any future update.
 
