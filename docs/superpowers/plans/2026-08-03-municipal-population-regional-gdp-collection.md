@@ -121,7 +121,6 @@ import fs from "node:fs";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import { describe, expect, it } from "vitest";
-import { buildGeostatPackage } from "../../../lib/data/municipalIndicators/prepareGeostatPackage";
 
 const repoRoot = path.resolve(process.cwd(), "../..");
 const packageDir = path.join(
@@ -130,9 +129,17 @@ const packageDir = path.join(
 );
 const POPULATION_YEARS = Array.from({ length: 11 }, (_, index) => 2015 + index);
 const EXCLUDED_CODES = new Set(["05", "42", "43", "46", "64"]);
+const modulePath = path.join(
+  process.cwd(),
+  "lib/data/municipalIndicators/prepareGeostatPackage.ts",
+);
 
 describe("Geostat population and regional GDP research package", () => {
   it("builds a complete 64 x 11 municipal population panel", async () => {
+    expect(fs.existsSync(modulePath)).toBe(true);
+    const { buildGeostatPackage } = await import(
+      "../../../lib/data/municipalIndicators/prepareGeostatPackage"
+    );
     const result = await buildGeostatPackage({ write: false });
     const keys = result.populationRows.map(
       (row) => `${row.year}:${row.municipality_code}`,
@@ -165,6 +172,10 @@ Add a test that derives the expected bounded period from the preserved workbook 
 
 ```ts
 it("emits every available regional GDP year within 2005-2025", async () => {
+  expect(fs.existsSync(modulePath)).toBe(true);
+  const { buildGeostatPackage } = await import(
+    "../../../lib/data/municipalIndicators/prepareGeostatPackage"
+  );
   const result = await buildGeostatPackage({ write: false });
   const years = [...new Set(result.regionalGdpRows.map((row) => row.year))].sort(
     (left, right) => left - right,
@@ -225,7 +236,7 @@ Run from `apps/web`:
 npm test -- tests/data/municipalIndicators/geostatPackage.test.ts
 ```
 
-Expected: FAIL because `prepareGeostatPackage` and normalized package artifacts do not exist.
+Expected: FAIL on the explicit `fs.existsSync(modulePath)` assertion because `prepareGeostatPackage.ts` does not exist. The dynamic import is not reached, so RED is a behavior assertion rather than a module-loader error.
 
 - [ ] **Step 5: Commit the failing contract**
 
