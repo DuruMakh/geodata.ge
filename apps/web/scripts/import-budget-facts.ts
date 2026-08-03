@@ -503,6 +503,27 @@ async function main() {
             },
             { table: "SourceDocument", csvRows: sourceDocuments.length, dbRows: mirrorSources.length },
             { table: "BudgetMapping", csvRows: mappings.length, dbRows: dbMappings },
+            {
+              table: "MunicipalFunctionCategory",
+              csvRows: municipalFunctions.length,
+              dbRows: mirrorMunicipalFunctions.length,
+            },
+            {
+              table: "MunicipalRegion",
+              csvRows: municipalRegions.length,
+              dbRows: mirrorMunicipalRegions.length,
+            },
+            { table: "Municipality", csvRows: municipalities.length, dbRows: mirrorMunicipalities.length },
+            {
+              table: "MunicipalFunctionFact",
+              csvRows: municipalFunctionFacts.length,
+              dbRows: mirrorMunicipalFunctionFacts.length,
+            },
+            {
+              table: "MunicipalTotalFact",
+              csvRows: municipalTotalFacts.length,
+              dbRows: mirrorMunicipalTotalFacts.length,
+            },
           ],
           budgetTotalsCsv,
           budgetTotalsDb: buildTotalsByKey(
