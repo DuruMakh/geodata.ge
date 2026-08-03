@@ -35,15 +35,15 @@ describe("municipal taxonomy files", () => {
     expect(codes).toEqual(["7.1", "7.2", "7.3", "7.4", "7.5", "7.6", "7.7", "7.8", "7.9", "7.10"]);
   });
 
-  it("loads exactly twelve regions with stable ids", async () => {
+  it("loads exactly eleven data-bearing regions with stable ids", async () => {
     const regions = await loadMunicipalRegionsFile(REGIONS);
     const ids = regions.map((region) => region.id);
 
-    expect(regions).toHaveLength(12);
+    expect(regions).toHaveLength(11);
     expect(ids).toContain("region.tbilisi");
     expect(ids).toContain("region.adjara");
     // Azhara (code 05) is Upper Abkhazia, not Adjara — see the file comment.
-    expect(ids).toContain("region.abkhazia");
+    expect(ids).not.toContain("region.abkhazia");
     for (const region of regions) {
       expect(region.id).toMatch(/^region\.[a-z0-9_]+$/);
     }

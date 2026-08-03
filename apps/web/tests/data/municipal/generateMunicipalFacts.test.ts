@@ -12,21 +12,24 @@ const MUNICIPALITIES = "../../data/imports/municipalities.csv";
 const FUNCTIONS = "../../data/taxonomy/municipal-functions.json";
 
 const YEARS = Array.from({ length: 11 }, (_, index) => 2015 + index);
+const EXCLUDED_CODES = ["05", "42", "43", "46", "64"];
 
 describe("generated municipal fact files", () => {
-  it("is dense: 10 functions x 69 municipalities x 11 years", async () => {
+  it("is dense: 10 functions x 64 municipalities x 11 years", async () => {
     const facts = await loadMunicipalFunctionFacts(FUNCTION_FACTS);
 
-    expect(facts).toHaveLength(7590);
+    expect(facts).toHaveLength(7040);
     expect(new Set(facts.map((fact) => fact.year))).toEqual(new Set(YEARS));
+    expect(facts.filter((fact) => EXCLUDED_CODES.includes(fact.municipalityCode))).toEqual([]);
   });
 
   it("has one total row per municipality-year", async () => {
     const totals = await loadMunicipalTotalFacts(TOTAL_FACTS);
     const keys = totals.map((total) => `${total.year}:${total.municipalityCode}`);
 
-    expect(totals).toHaveLength(759);
-    expect(new Set(keys).size).toBe(759);
+    expect(totals).toHaveLength(704);
+    expect(new Set(keys).size).toBe(704);
+    expect(totals.filter((total) => EXCLUDED_CODES.includes(total.municipalityCode))).toEqual([]);
   });
 
   it("references only registered municipalities", async () => {

@@ -129,7 +129,7 @@ async function main() {
     );
   }
 
-  // Density alone does not prove uniqueness — 7,590 rows could still contain a
+  // Density alone does not prove uniqueness — 7,040 rows could still contain a
   // duplicate and a hole. The import asserts this too, but the import needs a
   // database and CI runs this gate without one.
   const functionKeys = municipalFunctionFacts.map(

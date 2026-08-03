@@ -28,8 +28,9 @@ export const REVENUE_YEARS = [...REVENUE_TOTAL_ONLY_YEARS, ...REVENUE_DETAILED_Y
 export const ADMIN_SPENDING_YEARS = [2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, ...inclusiveYears(2017, APP_END_YEAR)];
 
 // Municipal coverage. 2015 is the first year the archived portal publishes a
-// complete twelve-month functional series for all 69 municipalities; 2014 and
-// earlier have no comparable source. See
+// complete twelve-month functional series for the 69-unit raw package; the
+// public serving layer intentionally excludes five occupied-territory municipal
+// bodies and serves 64. Earlier years have no comparable source. See
 // docs/data-methodology/municipal-functional-annual-2015-2025.md.
 export const MUNICIPAL_START_YEAR = 2015;
 export const MUNICIPAL_YEARS = inclusiveYears(MUNICIPAL_START_YEAR, APP_END_YEAR);

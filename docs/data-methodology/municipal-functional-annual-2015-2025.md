@@ -10,9 +10,9 @@ This methodology covers the prepared annual municipality-level research files un
 
 The ten main functional categories are served, on the same terms as expenditure and revenue:
 reviewed, mapped to stable `municipal.*` category IDs, and shipped as
-`data/imports/municipal-function-facts-2015-2025.csv` (7,590 rows),
-`data/imports/municipal-total-facts-2015-2025.csv` (759 rows), and a new municipality registry
-`data/imports/municipalities.csv` (69 rows). These are read by the CSV serving path
+`data/imports/municipal-function-facts-2015-2025.csv` (7,040 rows),
+`data/imports/municipal-total-facts-2015-2025.csv` (704 rows), and a municipality registry
+`data/imports/municipalities.csv` (64 rows). These are read by the CSV serving path
 (`GEODATA_DATA_SOURCE=csv`, the default) the same way expenditure and revenue are. Prisma
 models, a migration, and a database-mode reader also exist for this dataset (see
 `docs/data-methodology/database-import.md`), but as of this date the migration has not been
@@ -54,28 +54,31 @@ so its recorded SHA-256 hashes and `PASS` validation report below stay valid.
 
 ### Region mapping
 
-A new reviewed registry, one row per municipality (`data/imports/municipalities.csv`), assigns
-each of the 69 municipalities to one of twelve semantic regions: `region.tbilisi`,
-`region.abkhazia`, `region.adjara`, `region.imereti`, `region.kvemo_kartli`,
+A reviewed public registry, one row per served municipality (`data/imports/municipalities.csv`),
+assigns each of the 64 municipalities to one of eleven data-bearing semantic regions:
+`region.tbilisi`, `region.adjara`, `region.imereti`, `region.kvemo_kartli`,
 `region.samegrelo_zemo_svaneti`, `region.shida_kartli`, `region.guria`, `region.kakheti`,
 `region.mtskheta_mtianeti`, `region.samtskhe_javakheti`, `region.racha_lechkhumi_kvemo_svaneti`.
 No region column exists in any source file; this mapping is new, assigned once against the
 official administrative division and reviewed.
 
-Municipality counts: Tbilisi 1, Abkhazia 1, Adjara 6, Kakheti 8, Imereti 12, Samegrelo-Zemo
-Svaneti 9, Shida Kartli 7, Kvemo Kartli 7, Guria 3, Samtskhe-Javakheti 6, Mtskheta-Mtianeti 5,
-Racha-Lechkhumi and Kvemo Svaneti 4 — 69 in total.
+Municipality counts: Tbilisi 1, Adjara 6, Kakheti 8, Imereti 12, Samegrelo-Zemo
+Svaneti 9, Shida Kartli 4, Kvemo Kartli 7, Guria 3, Samtskhe-Javakheti 6, Mtskheta-Mtianeti 4,
+Racha-Lechkhumi and Kvemo Svaneti 4 — 64 in total.
 
-**Autonomous-republic caveat.** `05 აჟარის` is **Abkhazia, not Adjara**: Azhara / Upper Abkhazia
-(ზემო აფხაზეთი) is a municipality of the Abkhaz autonomous republic that merely sits inside the
-Adjara sort block in the official ordering, so `region.abkhazia` is a one-municipality region
-and Adjara AR has exactly six municipalities (codes 06-11). A region roll-up is the sum of that
-region's municipal budgets only — for აჭარა that total does **not** include the Adjara
-autonomous republic's own budget, and the same holds for აფხაზეთი; those autonomous-republic
-budgets are outside this package entirely. Five municipalities that administer territory
-Georgia does not control (`05 აჟარის`, `42 ერედვის`, `43 ქურთის`, `46 თიღვის`, `64 ახალგორის`)
-carry real official rows and are registered and served on identical terms to every other
-municipality.
+**Public exclusion decision (2026-08-03).** The raw official package contains five real budget
+series under codes `05` (Azhara / Upper Abkhazia), `42` (Eredvi), `43` (Kurta), `46` (Tighvi),
+and `64` (Akhalgori). Source review established that these are budgets of Georgian municipal
+bodies operating outside the occupied territories and serving displaced communities, not
+territorially attributable expenditure delivered inside those occupied municipalities. By
+user decision, all five codes are excluded from the public registry, both served fact files,
+regional aggregates, rankings, and the future municipalities UI. The raw research package,
+official workbooks, manifests, hashes, and validation report remain unchanged for provenance.
+
+With code `05` excluded, `region.abkhazia` has no served municipality and is omitted from the
+municipal data taxonomy. Occupied territory may still appear in future map geometry with an
+explicit no-data treatment. The Adjara regional roll-up continues to exclude the autonomous
+republic's own budget, which is outside this package entirely.
 
 The map-shape join (matching each municipality to a map boundary) is deferred to the future UI
 spec and is not part of what is served here; see
@@ -83,7 +86,7 @@ spec and is not part of what is served here; see
 
 ### Population — not imported
 
-The archived MoF portal export carries a `Population` column for all 69 municipalities,
+The archived MoF portal export in the raw package carries a `Population` column for all 69 municipalities,
 2015-2021 (Tbilisi 1,115,689 → 1,202,731, consistent with Geostat); it is empty from 2022 on.
 It is not imported: the column stops four years short of 2025, so it cannot support a
 latest-year per-capita measure, and its provenance is unreviewed (Georgia's
@@ -94,7 +97,7 @@ separate, future candidate dataset (see
 `docs/superpowers/specs/2026-08-02-municipal-data-serving-layer-design.md` §8).
 
 - Period: 2015-2025, inclusive.
-- Geography: 69 Georgian municipalities.
+- Geography: 64 publicly served municipalities; the raw research package retains 69 official rows.
 - Frequency: annual only.
 - Currency: nominal GEL.
 - Basis: actual, except that no planned value is substituted when an official actual total is unavailable.
@@ -102,7 +105,10 @@ separate, future candidate dataset (see
 
 The two autonomous republic budgets are excluded.
 
-## Prepared outputs
+## Prepared raw outputs
+
+These source-review artifacts retain all 69 official municipal rows. The smaller public files
+under `data/imports/` are generated from them using the five-code exclusion above.
 
 | File | Rows | Use |
 | --- | ---: | --- |
@@ -135,7 +141,7 @@ The portal has all 12 months for every retained 2015-2019 year. The archived por
 | 2016-2025 | Total payments | The current official MoF municipality budget-history workbook for each municipality. |
 | Khulo, 2024 | Functional total fallback | The current Khulo workbook labels the 2024 column as plan and does not provide a 2024 actual total. The official 2024 functional actual total is used instead; the planned value is not substituted. |
 
-The 69 current municipality history workbooks are retained unchanged under:
+The 69 current raw municipality history workbooks are retained unchanged under:
 
 `docs/Raw Data/Municipalities/mof-municipality-budget-history-2016-2025/`
 
@@ -188,7 +194,7 @@ The finalized package has:
 - no unresolved material reconciliation rows;
 - one non-warning `source_actual_missing` row for Khulo 2024.
 
-In 2025, the official functional workbook already reconciles to total payments for all 69 municipalities. No amount is added again and no warning is shown.
+In 2025, the raw official functional workbook already reconciles to total payments for all 69 municipalities. No amount is added again and no warning is shown.
 
 ## Total-payment output fields
 
@@ -223,7 +229,7 @@ The native XLSX workbook is the preferred human-review artifact. Georgian text a
 
 ## Validation
 
-The generated `validation-report.json` has status `PASS` and records:
+The raw package's generated `validation-report.json` has status `PASS` and records:
 
 - 759 total-payment/public-total rows: 11 years times 69 municipalities;
 - 7,590 main-function rows and 4,554 selected-detail rows;
