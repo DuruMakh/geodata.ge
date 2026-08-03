@@ -23,7 +23,20 @@ the import is re-run.
 | `BudgetMapping` | `data/mappings/spending-field-mapping.csv` |
 | `BudgetFact` | `data/imports/budget-facts-2005-2025.csv` |
 | `AdminSpendingFact` | `data/imports/admin-spending-facts-2005-2025.csv` (admin categories + major-program drill-down rows) |
+| `MunicipalFunctionCategory` | `data/taxonomy/municipal-functions.json` |
+| `MunicipalRegion` | `data/taxonomy/municipal-regions.json` |
+| `Municipality` | `data/imports/municipalities.csv` |
+| `MunicipalFunctionFact` | `data/imports/municipal-function-facts-2015-2025.csv` |
+| `MunicipalTotalFact` | `data/imports/municipal-total-facts-2015-2025.csv` |
 | `ImportRun` | one audit row per import run, including the full parity report |
+
+The five municipal tables are wired into the import but **the mirror does not
+hold municipal rows yet**: migration `20260802194939_municipal_dataset` has not
+been applied and no import has run since the wiring landed. Both are owner
+steps because they write to the database that serves production. Until they
+run, municipal data serves only from the CSVs (`GEODATA_DATA_SOURCE=csv`, the
+default), and a `GEODATA_DATA_SOURCE=db` build would fail on the missing
+tables. See `docs/data-methodology/municipal-functional-annual-2015-2025.md`.
 
 The import reuses the same validated loaders the site uses, then cross-checks
 referential integrity (fact item IDs against taxonomy, source IDs against
@@ -145,3 +158,41 @@ From `apps/web`, with `.env` configured:
   the Supabase project and rebuild, or build with `GEODATA_DATA_SOURCE=csv`.
 - Database empty (import never run) → the db-mode build fails with a clear
   message pointing at `npm run data:import`.
+
+## Creating a migration: `prisma migrate dev` does not work here
+
+`prisma migrate dev` — including `--create-only` — fails on this project with
+**P3006**. It is not a sign the database is broken.
+
+Cause: migration `20260714010000_enable_rls_on_prisma_migrations` puts row
+level security on the `_prisma_migrations` table. `migrate dev` bootstraps a
+shadow database by replaying every migration into it, and that replay breaks
+against the Supabase pooler once RLS covers the bookkeeping table. Any future
+`migrate dev` on this project will hit it.
+
+Create new migrations with Prisma's documented patching pattern instead, which
+is read-only:
+
+```bash
+npx prisma migrate diff --from-config-datasource --to-schema-datamodel prisma/schema.prisma --script > migration.sql
+```
+
+Then place the SQL in a `prisma/migrations/<timestamp>_<name>/migration.sql`
+folder by hand, and add `ALTER TABLE "<Table>" ENABLE ROW LEVEL SECURITY;` for
+every new table — the generator does not emit RLS, and every mirror table here
+carries it.
+
+**Verifying that workaround — `migrate status` is not enough.** `--from-config-datasource`
+diffs against the *live database*, not against migration history, so live drift
+would be silently baked into the generated SQL. `prisma migrate status` does
+not rule that out: it compares migration-table bookkeeping only. Structural
+drift detection is a `migrate dev` feature — the very thing that fails here.
+Verify instead by either:
+
+- confirming the generated SQL contains **zero statements referencing any
+  pre-existing table or enum** (a clean delta touches only the new objects); or
+- running `prisma db pull` into a scratch schema file and diffing it against
+  the committed models.
+
+Production is unaffected by all of this: deploys run `prisma migrate deploy`,
+which never uses a shadow database, so P3006 is not in the production path.

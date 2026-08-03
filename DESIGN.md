@@ -38,7 +38,7 @@ V1 includes: the budget hub, multi-year explorer (line + table) with fields/mini
 
 V1 excludes: data catalog, capital/debt explorers, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown).
 
-Municipal budgets are a named future section, not a v1 feature: no municipal data ships, and the section exists only as a `მალე` marker in the sidebar and on the hub (§6.7). The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) are markers on the same terms. Nothing about a marker may be styled as if it were live.
+Municipal budgets are a named future **section**, not a v1 interface. Since 2026-08-02 the municipal *data* ships (§2.1), but no page reads it: there is no municipalities route, `apps/web/lib/explorer/sections.ts` keeps `municipalities: { href: null }`, and the section exists only as a `მალე` marker in the sidebar and on the hub (§6.7). The marker stays until a UI spec ships the route — data landing behind it changes nothing visual. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) are markers on the same terms and have no data at all. Nothing about a marker may be styled as if it were live.
 
 Every visual decision should support a focused budget product, not a generic dashboard.
 
@@ -49,6 +49,7 @@ Year ranges in the UI always derive from loaded facts. Current reviewed coverage
 - Expenditure by public spending fields: **2005–2025** (13 fields per year, 12-month actual execution).
 - Expenditure by ministries (administrative view): **2005–2025** categories; major-program drill-down rows exist from 2012 (partial) and are contiguous 2017–2025.
 - Revenue: **2005–2025** (11 top-level categories).
+- Municipal expenditure by functional category: **2015–2025** (10 main functions, 69 municipalities across 12 regions, plus the official total-payments headline). Served as data only — no route reads it yet, so it contributes no year range to any coverage label.
 - All current facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned facts ever load.
 
 ## 3. Design Direction
