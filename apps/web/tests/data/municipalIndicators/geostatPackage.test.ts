@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
@@ -9,6 +10,7 @@ const packageDir = path.join(
   repoRoot,
   "docs/Raw Data/Municipalities/geostat-population-regional-gdp",
 );
+const officialDir = path.join(packageDir, "official");
 const POPULATION_YEARS = Array.from({ length: 11 }, (_, index) => 2015 + index);
 const EXCLUDED_CODES = new Set(["05", "42", "43", "46", "64"]);
 const modulePath = path.join(
@@ -22,6 +24,20 @@ const excelCsvFiles = [
   "regional-gdp-annual-2005-2025-available-years.csv",
 ];
 
+type CsvRow = Record<string, string>;
+
+type GeographyRow = CsvRow & {
+  geography_level: "municipality" | "region";
+  geodata_id: string;
+  source_label: string;
+  region_id: string;
+};
+
+type SourceWorkbook = {
+  matrix: unknown[][];
+  sheetName: string;
+};
+
 async function buildPackage(write: boolean) {
   expect(fs.existsSync(modulePath)).toBe(true);
   const { buildGeostatPackage } = await import(
@@ -31,12 +47,235 @@ async function buildPackage(write: boolean) {
   return buildGeostatPackage({ write });
 }
 
-function readCsvRows(fileName: string): Record<string, string>[] {
-  return parse(fs.readFileSync(path.join(packageDir, fileName), "utf8"), {
+function readCsvRows(filePath: string): CsvRow[] {
+  return parse(fs.readFileSync(filePath, "utf8"), {
     bom: true,
     columns: true,
     skip_empty_lines: true,
-  }) as Record<string, string>[];
+  }) as CsvRow[];
+}
+
+function readPackageCsvRows(fileName: string): CsvRow[] {
+  return readCsvRows(path.join(packageDir, fileName));
+}
+
+function readCanonicalMunicipalities(): CsvRow[] {
+  return readCsvRows(path.join(repoRoot, "data/imports/municipalities.csv"));
+}
+
+function readCanonicalRegionIds(): string[] {
+  return (
+    JSON.parse(
+      fs.readFileSync(
+        path.join(repoRoot, "data/taxonomy/municipal-regions.json"),
+        "utf8",
+      ),
+    ) as Array<{ id: string }>
+  ).map((region) => region.id);
+}
+
+function readGeographyRows(): GeographyRow[] {
+  return readPackageCsvRows("geography-map.csv") as GeographyRow[];
+}
+
+function readWorkbook(fileName: string, sheetName: string): SourceWorkbook {
+  const workbook = XLSX.readFile(path.join(officialDir, fileName), {
+    cellDates: false,
+  });
+
+  expect(workbook.SheetNames).toContain(sheetName);
+
+  return {
+    matrix: XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+      header: 1,
+      raw: false,
+      blankrows: false,
+      defval: null,
+    }) as unknown[][],
+    sheetName,
+  };
+}
+
+function workbookNumber(value: unknown): number | null {
+  if (value === null || value === undefined || String(value).trim() === "") {
+    return null;
+  }
+
+  const normalized = String(value).replace(/\s/g, "").replace(/,/g, "");
+  const number = Number(normalized);
+
+  return Number.isFinite(number) ? number : null;
+}
+
+function outputNumber(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const number = Number(value);
+  expect(Number.isFinite(number)).toBe(true);
+  return number;
+}
+
+function sourceGdpMillionGel(value: unknown, sourceUnit: string): number | null {
+  const number = workbookNumber(value);
+
+  if (number === null) {
+    return null;
+  }
+
+  expect(sourceUnit).toBe("mil. GEL");
+  return number;
+}
+
+function populationSource(): SourceWorkbook {
+  const source = readWorkbook(
+    "01-population-by-self-governed-unit.xlsx",
+    "1",
+  );
+
+  expect(String(source.matrix[0][0])).toContain(
+    "Population as of 1 January by regions and self-governed units",
+  );
+  expect(source.matrix[1][0]).toBe("(thousands)");
+
+  return source;
+}
+
+function regionalGdpSource(): SourceWorkbook {
+  const source = readWorkbook("regional-GDP-ENG.xlsx", "regional GDP");
+  const title = String(source.matrix[0][0]);
+
+  expect(title).toMatch(/distribution of gross domestic product by regions/i);
+  expect(title).toMatch(/at current prices, mil\. GEL/i);
+
+  return source;
+}
+
+function sourceYearColumns(header: unknown[], allowedYears: number[]): Map<number, number> {
+  const columns = new Map<number, number>();
+
+  header.forEach((value, index) => {
+    const year = Number(value);
+    if (allowedYears.includes(year)) {
+      columns.set(year, index);
+    }
+  });
+
+  return columns;
+}
+
+function sourceRowsByLabel(matrix: unknown[][]): Map<string, unknown[]> {
+  return new Map(
+    matrix.flatMap((row) =>
+      typeof row[0] === "string" ? [[row[0], row] as const] : [],
+    ),
+  );
+}
+
+function municipalityMappings(geographyRows: GeographyRow[]): GeographyRow[] {
+  return geographyRows.filter((row) => row.geography_level === "municipality");
+}
+
+function regionMappings(geographyRows: GeographyRow[]): GeographyRow[] {
+  return geographyRows.filter((row) => row.geography_level === "region");
+}
+
+function assertCanonicalGeography(geographyRows: GeographyRow[]) {
+  const canonicalMunicipalities = readCanonicalMunicipalities();
+  const canonicalMunicipalityCodes = canonicalMunicipalities.map(
+    (row) => row.municipality_code,
+  );
+  const canonicalRegions = readCanonicalRegionIds();
+  const municipalities = municipalityMappings(geographyRows);
+  const regions = regionMappings(geographyRows);
+
+  expect(canonicalMunicipalityCodes).toHaveLength(64);
+  expect(new Set(canonicalMunicipalityCodes)).toEqual(
+    new Set(municipalities.map((row) => row.geodata_id)),
+  );
+  expect(new Set(canonicalRegions)).toEqual(
+    new Set(regions.map((row) => row.geodata_id)),
+  );
+  expect(new Set(municipalities.map((row) => row.source_label)).size).toBe(
+    municipalities.length,
+  );
+  expect(new Set(regions.map((row) => row.source_label)).size).toBe(
+    regions.length,
+  );
+  expect(
+    municipalities.filter((row) => EXCLUDED_CODES.has(row.geodata_id)),
+  ).toEqual([]);
+}
+
+function assertPopulationRowsReconcile(
+  rows: Array<Record<string, unknown>>,
+  geographyRows: GeographyRow[],
+) {
+  const source = populationSource();
+  const sourceRows = sourceRowsByLabel(source.matrix);
+  const yearColumns = sourceYearColumns(source.matrix[2], POPULATION_YEARS);
+  const canonicalMunicipalities = new Map(
+    readCanonicalMunicipalities().map((row) => [row.municipality_code, row]),
+  );
+  const mappings = new Map(
+    municipalityMappings(geographyRows).map((row) => [row.geodata_id, row]),
+  );
+
+  for (const row of rows) {
+    const code = String(row.municipality_code);
+    const year = Number(row.year);
+    const canonicalMunicipality = canonicalMunicipalities.get(code);
+    const mapping = mappings.get(code);
+
+    expect(canonicalMunicipality).toBeDefined();
+    expect(mapping).toBeDefined();
+    expect(row.region_id).toBe(canonicalMunicipality?.region_id);
+    expect(row.source_id).toBe("geostat_population_self_governed_units");
+    expect(row.source_sheet).toBe(source.sheetName);
+    expect(row.source_unit).toBe("(thousands)");
+
+    const sourceRow = sourceRows.get(mapping?.source_label ?? "");
+    const sourceValue = workbookNumber(sourceRow?.[yearColumns.get(year) ?? -1]);
+    const populationThousand = outputNumber(row.population_thousand);
+    const populationPersons = outputNumber(row.population_persons);
+
+    expect(populationThousand).toBe(sourceValue);
+    expect(populationPersons).toBe(
+      sourceValue === null ? null : sourceValue * 1000,
+    );
+  }
+}
+
+function assertRegionalGdpRowsReconcile(
+  rows: Array<Record<string, unknown>>,
+  geographyRows: GeographyRow[],
+) {
+  const source = regionalGdpSource();
+  const sourceRows = sourceRowsByLabel(source.matrix);
+  const observedYears = source.matrix[1]
+    .map((value) => Number(value))
+    .filter((year) => year >= 2005 && year <= 2025);
+  const yearColumns = sourceYearColumns(source.matrix[1], observedYears);
+  const mappings = new Map(
+    regionMappings(geographyRows).map((row) => [row.geodata_id, row]),
+  );
+
+  for (const row of rows) {
+    const mapping = mappings.get(String(row.region_id));
+    const sourceRow = sourceRows.get(mapping?.source_label ?? "");
+    const sourceValue = sourceGdpMillionGel(
+      sourceRow?.[yearColumns.get(Number(row.year)) ?? -1],
+      "mil. GEL",
+    );
+
+    expect(mapping).toBeDefined();
+    expect(row.source_region_label).toBe(mapping?.source_label);
+    expect(row.source_id).toBe("geostat_regional_gdp_current_prices");
+    expect(row.source_sheet).toBe(source.sheetName);
+    expect(row.source_unit).toBe("mil. GEL");
+    expect(outputNumber(row.gdp_current_prices_million_gel)).toBe(sourceValue);
+  }
 }
 
 function sheetDataRowCount(workbook: XLSX.WorkBook, sheetName: string): number {
@@ -55,41 +294,43 @@ describe("Geostat population and regional GDP research package", () => {
       "../../../lib/data/municipalIndicators/prepareGeostatPackage"
     );
     const result = await buildGeostatPackage({ write: false });
+    const geographyRows = readGeographyRows();
     const keys = result.populationRows.map(
       (row) => `${row.year}:${row.municipality_code}`,
     );
 
+    assertCanonicalGeography(geographyRows);
     expect(result.populationRows).toHaveLength(64 * 11);
     expect(new Set(result.populationRows.map((row) => row.year))).toEqual(
       new Set(POPULATION_YEARS),
     );
     expect(new Set(keys).size).toBe(64 * 11);
+    expect(new Set(result.populationRows.map((row) => row.municipality_code))).toEqual(
+      new Set(readCanonicalMunicipalities().map((row) => row.municipality_code)),
+    );
     expect(
       result.populationRows.filter((row) =>
         EXCLUDED_CODES.has(row.municipality_code),
       ),
     ).toEqual([]);
-    expect(
-      result.populationRows.every((row) =>
-        row.population_thousand === null
-          ? row.population_persons === null
-          : row.population_thousand >= 0 &&
-            row.population_persons === row.population_thousand * 1000,
-      ),
-    ).toBe(true);
+    assertPopulationRowsReconcile(result.populationRows, geographyRows);
   });
 
-  it("emits every available regional GDP year within 2005-2025", async () => {
+  it("emits every available total current-price regional GDP year", async () => {
     const result = await buildPackage(false);
+    const geographyRows = readGeographyRows();
+    const source = regionalGdpSource();
+    const sourceYears = source.matrix[1]
+      .map((value) => Number(value))
+      .filter((year) => year >= 2005 && year <= 2025);
     const years = [...new Set(result.regionalGdpRows.map((row) => row.year))].sort(
       (left, right) => left - right,
     );
+    const canonicalRegionIds = new Set(readCanonicalRegionIds());
 
-    expect(years).toEqual(result.validation.regionalGdp.observedYears);
-    expect(years.length).toBeGreaterThan(0);
-    expect(years[0]).toBeGreaterThanOrEqual(2005);
-    expect(years.at(-1)).toBeLessThanOrEqual(2025);
-    expect(result.regionalGdpRows).toHaveLength(years.length * 11);
+    assertCanonicalGeography(geographyRows);
+    expect(years).toEqual(sourceYears);
+    expect(result.regionalGdpRows).toHaveLength(sourceYears.length * 11);
 
     for (const year of years) {
       expect(
@@ -97,12 +338,14 @@ describe("Geostat population and regional GDP research package", () => {
           result.regionalGdpRows
             .filter((row) => row.year === year)
             .map((row) => row.region_id),
-        ).size,
-      ).toBe(11);
+        ),
+      ).toEqual(canonicalRegionIds);
     }
+
+    assertRegionalGdpRowsReconcile(result.regionalGdpRows, geographyRows);
   });
 
-  it("writes Excel-readable artifacts with source-backed validation", async () => {
+  it("writes Excel-readable artifacts with independently verified provenance", async () => {
     await buildPackage(true);
 
     for (const fileName of excelCsvFiles) {
@@ -113,6 +356,40 @@ describe("Geostat population and regional GDP research package", () => {
         `${fileName} must start with the UTF-8 BOM bytes EF BB BF`,
       ).toEqual([0xef, 0xbb, 0xbf]);
     }
+
+    const manifestRows = readPackageCsvRows("source-manifest.csv");
+    const expectedSources = new Map([
+      [
+        "geostat_population_self_governed_units",
+        "official/01-population-by-self-governed-unit.xlsx",
+      ],
+      ["geostat_regional_gdp_current_prices", "official/regional-GDP-ENG.xlsx"],
+    ]);
+
+    expect(manifestRows).toHaveLength(expectedSources.size);
+    for (const [sourceId, localFile] of expectedSources) {
+      const manifest = manifestRows.find((row) => row.source_id === sourceId);
+      const sourceBytes = fs.readFileSync(path.join(packageDir, localFile));
+      const sourceHash = createHash("sha256")
+        .update(sourceBytes)
+        .digest("hex")
+        .toUpperCase();
+
+      expect(manifest).toMatchObject({ source_id: sourceId, local_file: localFile });
+      expect(manifest?.sha256).toBe(sourceHash);
+      expect(manifest?.bytes).toBe(String(sourceBytes.length));
+    }
+
+    const geographyRows = readGeographyRows();
+    assertCanonicalGeography(geographyRows);
+    assertPopulationRowsReconcile(
+      readPackageCsvRows("municipal-population-annual-2015-2025.csv"),
+      geographyRows,
+    );
+    assertRegionalGdpRowsReconcile(
+      readPackageCsvRows("regional-gdp-annual-2005-2025-available-years.csv"),
+      geographyRows,
+    );
 
     const report = JSON.parse(
       fs.readFileSync(path.join(packageDir, "validation-report.json"), "utf8"),
@@ -137,13 +414,14 @@ describe("Geostat population and regional GDP research package", () => {
       "Geography map",
     ]);
     expect(sheetDataRowCount(workbook, "Population")).toBe(
-      readCsvRows("municipal-population-annual-2015-2025.csv").length,
+      readPackageCsvRows("municipal-population-annual-2015-2025.csv").length,
     );
     expect(sheetDataRowCount(workbook, "Regional GDP")).toBe(
-      readCsvRows("regional-gdp-annual-2005-2025-available-years.csv").length,
+      readPackageCsvRows("regional-gdp-annual-2005-2025-available-years.csv")
+        .length,
     );
     expect(sheetDataRowCount(workbook, "Geography map")).toBe(
-      readCsvRows("geography-map.csv").length,
+      readPackageCsvRows("geography-map.csv").length,
     );
   });
 });
