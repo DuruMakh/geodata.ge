@@ -532,7 +532,7 @@ git commit -m "refactor: make the chart and table value unit a parameter"
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: `SERIES_COLORS` gains ten `municipal.*` keys. `ExplorerItemLevel` gains `"municipal_function"`. `municipalLabels.ts` exports `REGION_GENITIVE_KA: Record<string, string>` and `georgianOrdinal(rank: number): string`.
+- Produces: `SERIES_COLORS` gains ten `municipal.*` keys. `colors.ts` also exports `MAP_RAMP: string[]` (six steps), `MAP_NO_DATA_FILL: string` and `MAP_NO_DATA_STROKE: string` for the Task 9 choropleth. `ExplorerItemLevel` gains `"municipal_function"`. `municipalLabels.ts` exports `REGION_GENITIVE_KA: Record<string, string>` and `georgianOrdinal(rank: number): string`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -543,7 +543,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { REGION_GENITIVE_KA, georgianOrdinal } from "../../lib/explorer/municipalLabels";
-import { SERIES_COLORS } from "../../lib/explorer/colors";
+import { ACCENT, MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP, SERIES_COLORS } from "../../lib/explorer/colors";
 
 const MUNICIPAL_FUNCTION_IDS = [
   "municipal.general_public_services",
@@ -594,6 +594,24 @@ describe("municipal colour tokens", () => {
     expect(new Set(used).size).toBe(MUNICIPAL_FUNCTION_IDS.length);
   });
 });
+
+describe("map ramp tokens", () => {
+  it("runs six distinct steps ending at the accent", () => {
+    expect(MAP_RAMP).toHaveLength(6);
+    expect(new Set(MAP_RAMP).size).toBe(6);
+    expect(MAP_RAMP.at(-1)).toBe(ACCENT);
+    for (const step of MAP_RAMP) {
+      expect(step).toMatch(/^#[0-9A-F]{6}$/);
+    }
+  });
+
+  it("gives no-data shapes a fill and stroke outside the ramp", () => {
+    expect(MAP_NO_DATA_FILL).toMatch(/^#[0-9A-F]{6}$/);
+    expect(MAP_NO_DATA_STROKE).toMatch(/^#[0-9A-F]{6}$/);
+    expect(MAP_RAMP).not.toContain(MAP_NO_DATA_FILL);
+    expect(MAP_RAMP).not.toContain(MAP_NO_DATA_STROKE);
+  });
+});
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -619,6 +637,22 @@ In `apps/web/lib/explorer/colors.ts`, insert before the closing `};` of `SERIES_
   "municipal.environment": "#2F4B3A",
   "municipal.recreation_culture": "#9C3D5E",
   "municipal.general_public_services": "#5B5347",
+```
+
+Then append, after `export const ACCENT = "#B3402A";`:
+
+```ts
+// Region choropleth (spec §5.2). Six-step terracotta ramp, quantile-classed by
+// the caller; the last step is ACCENT. Occupied-territory shapes carry no value,
+// so they get a flat fill and a dashed stroke instead of a ramp step.
+//
+// These live here, not in region-map.tsx, because the plan's Global Constraints
+// forbid hardcoding a hex in a component: colors.ts is this codebase's token
+// module and components receive colours as data. Keeping them here also lets the
+// index page read the ramp without importing from a "use client" file.
+export const MAP_RAMP = ["#F3EBDB", "#E9D6C6", "#DEBBA6", "#D19A80", "#C4735A", ACCENT];
+export const MAP_NO_DATA_FILL = "#E5DBC9";
+export const MAP_NO_DATA_STROKE = "#C4B69C";
 ```
 
 - [ ] **Step 4: Widen the item level**
@@ -2218,7 +2252,7 @@ git commit -m "feat: add municipal URL hash state"
 - Create: `apps/web/components/municipalities/region-map.tsx`, `apps/web/components/municipalities/municipalities-index.tsx`, `apps/web/app/explorer/municipalities/page.tsx`
 
 **Interfaces:**
-- Consumes: `buildRegionShapes`, `MAP_VIEWBOX` (Task 4); `buildMunicipalListRows`, `buildIndexKpis` (Task 6); `parseMunicipalLevel` (Task 8).
+- Consumes: `MAP_RAMP`, `MAP_NO_DATA_FILL`, `MAP_NO_DATA_STROKE` from `lib/explorer/colors.ts` (Task 3) — this component must not write a hex of its own; `buildRegionShapes`, `MAP_VIEWBOX`, `projectPoint` (Task 4); `buildMunicipalListRows`, `buildIndexKpis` (Task 6); `parseMunicipalLevel` (Task 8).
 - Produces: the route `/explorer/municipalities`. `RegionMapShape = { shapeIso: string; regionId: string | null; nameKa: string; d: string; valueGel: number | null; bucket: number }`.
 
 - [ ] **Step 1: Write the map component**
@@ -2229,11 +2263,14 @@ Create `apps/web/components/municipalities/region-map.tsx`:
 "use client";
 
 import { useState } from "react";
+import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
 import { formatAmount } from "../../lib/explorer/format";
 
 // Region choropleth (DESIGN.md §6.4 rules: no cards, no shadows except the
 // tooltip). Paths arrive already projected from the server, so this component
 // ships ~15 KB of `d` strings rather than the coordinate table.
+//
+// Every colour comes from colors.ts. No hex is written here.
 
 export type RegionMapShape = {
   shapeIso: string;
@@ -2241,14 +2278,11 @@ export type RegionMapShape = {
   nameKa: string;
   d: string;
   valueGel: number | null;
-  /** 0-5 index into RAMP; -1 for a no-data shape. */
+  /** 0-5 index into MAP_RAMP; -1 for a no-data shape. */
   bucket: number;
 };
 
 export type RegionMapCity = { code: string; nameKa: string; x: number; y: number };
-
-// Six-step terracotta ramp, quantile-classed by the caller.
-export const RAMP = ["#F3EBDB", "#E9D6C6", "#DEBBA6", "#D19A80", "#C4735A", "#B3402A"];
 
 type RegionMapProps = {
   viewBox: string;
@@ -2294,8 +2328,8 @@ export function RegionMap({
               data-testid={`region-shape-${shape.shapeIso}`}
               data-no-data={noData ? "true" : undefined}
               d={shape.d}
-              fill={noData ? "#E5DBC9" : active ? "var(--ink)" : RAMP[shape.bucket]}
-              stroke={noData ? "#C4B69C" : active ? "var(--ink)" : "var(--hairline-soft)"}
+              fill={noData ? MAP_NO_DATA_FILL : active ? "var(--ink)" : MAP_RAMP[shape.bucket]}
+              stroke={noData ? MAP_NO_DATA_STROKE : active ? "var(--ink)" : "var(--hairline-soft)"}
               strokeWidth={active ? 1.6 : 0.7}
               strokeDasharray={noData ? "3 2.5" : undefined}
               strokeLinejoin="round"
@@ -2330,7 +2364,7 @@ export function RegionMap({
       <div className="mt-2 flex flex-wrap items-center gap-3.5 border-t border-[var(--hairline-soft)] pt-2.5">
         <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{legendMin}</span>
         <span className="flex flex-none">
-          {RAMP.map((fill) => (
+          {MAP_RAMP.map((fill) => (
             <span key={fill} aria-hidden className="h-[9px] w-8" style={{ backgroundColor: fill }} />
           ))}
         </span>
@@ -2340,7 +2374,11 @@ export function RegionMap({
           <span className="text-[11px] text-[var(--faint)]">თვითმმართველი ქალაქები</span>
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span aria-hidden className="h-[9px] w-3.5 border border-dashed border-[#C4B69C] bg-[#E5DBC9]" />
+          <span
+            aria-hidden
+            className="h-[9px] w-3.5 border border-dashed"
+            style={{ borderColor: MAP_NO_DATA_STROKE, backgroundColor: MAP_NO_DATA_FILL }}
+          />
           <span className="text-[11px] text-[var(--faint)]">ოკუპირებული ტერიტორია — მონაცემები არ არის</span>
         </span>
         <span
@@ -2547,7 +2585,8 @@ Create `apps/web/app/explorer/municipalities/page.tsx`:
 import type { Metadata } from "next";
 import { MunicipalitiesIndex } from "../../../components/municipalities/municipalities-index";
 import { PageHeader } from "../../../components/shell/page-header";
-import { RAMP, type RegionMapCity, type RegionMapShape } from "../../../components/municipalities/region-map";
+import type { RegionMapCity, RegionMapShape } from "../../../components/municipalities/region-map";
+import { MAP_RAMP } from "../../../lib/explorer/colors";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
 import { buildIndexKpis, buildMunicipalListRows } from "../../../lib/explorer/municipalData";
 import { buildRegionShapes, MAP_VIEWBOX, projectPoint } from "../../../lib/explorer/municipalGeo";
@@ -4138,7 +4177,13 @@ test.describe("municipality page", () => {
     await page.goto("/explorer/municipalities/04");
     await page.getByTestId("municipal-mode-table").click();
     await page.getByTestId("municipal-series-all").click();
-    await expect(page.getByTestId("municipal-series-row").filter({ has: page.locator("[aria-pressed]") })).toBeTruthy();
+    // Table mode has no six-series cap, so select-all must leave all ten rows
+    // pressed. Asserting the count of pressed rows is the point of this test:
+    // a locator on its own is always truthy and would pass unconditionally.
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(10);
+    await expect(
+      page.getByTestId("municipal-series-row").filter({ has: page.locator("[aria-pressed='true']") }),
+    ).toHaveCount(10);
     await expect(page.getByTestId("municipal-series-all")).toHaveAttribute("aria-pressed", "true");
   });
 
