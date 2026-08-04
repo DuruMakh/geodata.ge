@@ -704,7 +704,7 @@ export function georgianOrdinal(rank: number): string {
 - [ ] **Step 6: Run test to verify it passes**
 
 Run: `npm test -- tests/explorer/municipalLabels.test.ts`
-Expected: PASS, 5 tests.
+Expected: PASS, 7 tests.
 
 - [ ] **Step 7: Document the tokens**
 
