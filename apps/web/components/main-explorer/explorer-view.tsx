@@ -1,6 +1,7 @@
 "use client";
 
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
+import { UNIT_BN } from "../../lib/explorer/format";
 import { MAX_CHART_SERIES, type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
@@ -39,6 +40,13 @@ const COVERAGE_NOTE: Record<ExplorerScope, string> = {
   fields: "ხარჯვითი მონაცემები",
   ministries: "უწყებრივი მონაცემები",
   revenue: "შემოსავლების მონაცემები",
+};
+
+// Moved out of ExplorerTable so the table takes a label rather than a scope.
+const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
+  fields: "სფერო",
+  ministries: "უწყება",
+  revenue: "საბიუჯეტო მუხლი",
 };
 
 // Classification-authorship disclosure (DESIGN.md §7.10): year totals are official;
@@ -147,7 +155,14 @@ export function ExplorerView({
                 </Callout>
               </div>
             ) : chartMode === "table" ? (
-              <ExplorerTable rows={model.tableRows} totalRow={model.totalRow} years={model.years} scope={scope} share={share} />
+              <ExplorerTable
+                rows={model.tableRows}
+                totalRow={model.totalRow}
+                years={model.years}
+                firstColumnLabel={FIRST_COL_LABEL[scope]}
+                unit={UNIT_BN}
+                share={share}
+              />
             ) : (
               <div className="mt-5">
                 {overLimit ? (
@@ -157,7 +172,7 @@ export function ExplorerView({
                     </Callout>
                   </div>
                 ) : null}
-                <EditorialLineChart years={model.years} series={chartSeries} share={share} />
+                <EditorialLineChart years={model.years} series={chartSeries} share={share} unit={UNIT_BN} />
               </div>
             )}
 

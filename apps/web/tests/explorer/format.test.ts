@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatAmount, formatAmountParts, formatBn, formatShare, formatSignedAmount } from "../../lib/explorer/format";
+import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatShare, formatSignedAmount, UNIT_BN, UNIT_MLN } from "../../lib/explorer/format";
 
 describe("editorial formatters", () => {
   it("formats billions with fixed decimals and en-US grouping", () => {
@@ -21,5 +21,30 @@ describe("editorial formatters", () => {
     expect(formatShare(0.124, true)).toBe("+12.4%");
     expect(formatShare(-0.031, true)).toBe("−3.1%");
     expect(formatShare(null)).toBe("—");
+  });
+});
+
+describe("formatInUnit", () => {
+  it("reproduces formatBn exactly for the billions unit", () => {
+    for (const value of [0, 1, 1_500_000, 2_034_000_000, 5_625_000_000, -3_200_000_000]) {
+      expect(formatInUnit(value, UNIT_BN)).toBe(formatBn(value));
+    }
+  });
+
+  it("renders municipal magnitudes legibly in millions", () => {
+    // ლენტეხი's 2025 total: 0.02 in billions, which is why the unit is a parameter.
+    expect(formatInUnit(16_900_000, UNIT_MLN)).toBe("16.9");
+    expect(formatInUnit(2_108_000_000, UNIT_MLN)).toBe("2,108.0");
+  });
+
+  it("uses U+2212 for negatives and an em dash for missing values", () => {
+    expect(formatInUnit(-16_900_000, UNIT_MLN)).toBe("−16.9");
+    expect(formatInUnit(null, UNIT_MLN)).toBe("—");
+    expect(formatInUnit(undefined, UNIT_BN)).toBe("—");
+  });
+
+  it("labels the units in Georgian", () => {
+    expect(UNIT_BN.label).toBe("მლრდ");
+    expect(UNIT_MLN.label).toBe("მლნ");
   });
 });
