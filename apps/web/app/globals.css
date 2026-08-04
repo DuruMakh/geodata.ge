@@ -83,6 +83,15 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+/* Same ring for focusable SVG shapes (region map, city dots): button/select/
+   input above are HTML form controls, so an SVG geometry element with
+   tabindex needs its own selector to pick up the same treatment. */
+path:focus-visible,
+circle:focus-visible {
+  outline: 2px solid rgba(179, 64, 42, 0.4);
+  outline-offset: 2px;
+}
+
 /* Same ring, drawn inside the control. For anything inside a clipping container
    — the segmented control's rounded, overflow-hidden group — the outward ring is
    cut away on every side that meets the container's edge, leaving a stray stroke

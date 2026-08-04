@@ -20,7 +20,18 @@ export type RegionMapShape = {
   bucket: number;
 };
 
-export type RegionMapCity = { code: string; nameKa: string; x: number; y: number };
+export type RegionMapCity = { code: string; nameKa: string; x: number; y: number; valueGel: number };
+
+/** Per-shape accessible name: same "name · value" pairing the hover readout
+ *  already shows a sighted user, so a screen-reader user gets the same
+ *  information a click needs from the map itself, not just its aria-label. */
+function accessibleShapeName(nameKa: string, valueGel: number | null): string {
+  return `${nameKa} · ${formatAmount(valueGel)}`;
+}
+
+function isActivationKey(key: string): boolean {
+  return key === "Enter" || key === " ";
+}
 
 type RegionMapProps = {
   viewBox: string;
@@ -53,10 +64,17 @@ export function RegionMap({
       ? "გადაატარე კურსორი რუკაზე"
       : `${hovered.nameKa} · ${formatAmount(hovered.valueGel)} · გახსნა →`;
 
+  // Tab order follows DOM order, and the source geometry's order is an accident
+  // of the upstream shapefile join (roughly ISO-code order, meaningless to a
+  // user). Render in Georgian alphabetical order so keyboard focus moves
+  // through shapes and city dots in a sequence a person can actually predict.
+  const orderedShapes = shapes.slice().sort((a, b) => a.nameKa.localeCompare(b.nameKa, "ka"));
+  const orderedCities = cities.slice().sort((a, b) => a.nameKa.localeCompare(b.nameKa, "ka"));
+
   return (
     <div data-testid="region-map">
       <svg viewBox={viewBox} role="img" aria-label="საქართველოს რეგიონების ბიუჯეტის რუკა" className="block h-auto w-full">
-        {shapes.map((shape) => {
+        {orderedShapes.map((shape) => {
           const noData = shape.regionId === null;
           const active = !noData && shape.regionId === hoveredRegionId;
 
@@ -72,13 +90,26 @@ export function RegionMap({
               strokeDasharray={noData ? "3 2.5" : undefined}
               strokeLinejoin="round"
               style={{ cursor: noData ? "default" : "pointer" }}
+              // The occupied-territory shape has no data and no action: it must
+              // stay out of the tab order rather than be a focus stop that does
+              // nothing, so tabIndex/role/aria-label are omitted entirely.
+              tabIndex={noData ? undefined : 0}
+              role={noData ? undefined : "button"}
+              aria-label={noData ? undefined : accessibleShapeName(shape.nameKa, shape.valueGel)}
               onMouseEnter={() => onHoverRegion(shape.regionId)}
               onMouseLeave={() => onHoverRegion(null)}
               onClick={() => (shape.regionId === null ? undefined : onOpenRegion(shape.regionId))}
+              onKeyDown={(event) => {
+                if (shape.regionId === null) return;
+                if (!isActivationKey(event.key)) return;
+                // Space must not also scroll the page.
+                event.preventDefault();
+                onOpenRegion(shape.regionId);
+              }}
             />
           );
         })}
-        {cities.map((city) => (
+        {orderedCities.map((city) => (
           <circle
             key={city.code}
             data-testid={`self-gov-city-${city.code}`}
@@ -90,9 +121,17 @@ export function RegionMap({
             stroke="var(--tile)"
             strokeWidth={hoveredCity === city.code ? 2 : 1.2}
             style={{ cursor: "pointer" }}
+            tabIndex={0}
+            role="button"
+            aria-label={accessibleShapeName(city.nameKa, city.valueGel)}
             onMouseEnter={() => setHoveredCity(city.code)}
             onMouseLeave={() => setHoveredCity(null)}
             onClick={() => onOpenMunicipality(city.code)}
+            onKeyDown={(event) => {
+              if (!isActivationKey(event.key)) return;
+              event.preventDefault();
+              onOpenMunicipality(city.code);
+            }}
           >
             <title>{city.nameKa}</title>
           </circle>

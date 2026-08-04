@@ -54,6 +54,7 @@ export default async function MunicipalitiesIndexPage() {
 
   const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year: latestYear });
   const valueByRegion = new Map(list.regions.map((row) => [row.id, row.valueGel]));
+  const valueByMunicipality = new Map(list.municipalities.map((row) => [row.id, row.valueGel]));
   const bucketOf = bucketize(list.regions.map((row) => row.valueGel));
 
   const shapes: RegionMapShape[] = buildRegionShapes().map((shape) => {
@@ -78,8 +79,9 @@ export default async function MunicipalitiesIndexPage() {
       const marker = GEORGIA_GEO.cityMarkers.find((city) => city.ka === municipality.displayNameKa);
       if (!marker) return [];
       const { x, y } = projectPoint(marker.lon, marker.lat);
+      const valueGel = valueByMunicipality.get(municipality.code) ?? 0;
 
-      return [{ code: municipality.code, nameKa: municipality.displayNameKa, x, y }];
+      return [{ code: municipality.code, nameKa: municipality.displayNameKa, x, y, valueGel }];
     });
 
   if (cities.length !== municipalities.filter((row) => row.isSelfGoverningCity).length) {

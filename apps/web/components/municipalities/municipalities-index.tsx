@@ -148,6 +148,8 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                   onClick={() => (row.kind === "region" ? openRegion(row.id) : openMunicipality(row.id))}
                   onMouseEnter={() => setHoveredRegionId(row.regionId)}
                   onMouseLeave={() => setHoveredRegionId(null)}
+                  onFocus={() => setHoveredRegionId(row.regionId)}
+                  onBlur={() => setHoveredRegionId(null)}
                   className={`grid w-full grid-cols-[22px_minmax(0,1fr)_66px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left ${
                     row.regionId !== null && row.regionId === hoveredRegionId ? "bg-[var(--tint)]" : ""
                   }`}
