@@ -172,6 +172,22 @@ Open-ended sets (major programs, any future ministry not listed) use index-based
 #B3402A #1F6E56 #3D5A98 #B08A2E #7A4E8C #4A707A #C26E4C #2F4B3A #9C3D5E #8A7B65 #5B5347 #8C5A32 #4E5D74 #A89C88
 ```
 
+Municipal functions (`municipal.*`) reuse the semantic colour of the same concept
+on the budget side, so a category keeps one colour across the whole site:
+
+| Function | Token | Shares with |
+|---|---|---|
+| `municipal.social_protection` | `#B3402A` | `spending.social_protection` |
+| `municipal.health` | `#1F6E56` | `spending.health` |
+| `municipal.education` | `#3D5A98` | `spending.education` |
+| `municipal.housing_communal` | `#B08A2E` | `spending.infrastructure_regional_development` |
+| `municipal.defence` | `#7A4E8C` | `spending.defence` |
+| `municipal.public_order_safety` | `#4A707A` | `spending.public_order_safety` |
+| `municipal.economic_affairs` | `#C26E4C` | `spending.economic_affairs` |
+| `municipal.environment` | `#2F4B3A` | `spending.agriculture_environment` |
+| `municipal.recreation_culture` | `#9C3D5E` | `spending.culture` |
+| `municipal.general_public_services` | `#5B5347` | `spending.general_public_services` |
+
 Rules:
 
 - Never assign `accent` meaning beyond "active/negative" in UI chrome; as a series color it belongs only to the categories listed above.
