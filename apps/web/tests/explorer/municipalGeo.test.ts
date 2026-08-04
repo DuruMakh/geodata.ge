@@ -107,6 +107,25 @@ describe("the shape ↔ region join", () => {
       if (regionId !== null) expect(servedRegionIds).toContain(regionId);
     }
   });
+
+  it("throws and names the offending shape when an ADM1 shape has no join-table entry", () => {
+    // Every other test in this file runs buildRegionShapes() against the real,
+    // fully-mapped GEORGIA_GEO.regions, where `regionId === undefined` can
+    // never happen — the branch is structurally unreachable there. This is
+    // the module's central invariant (nothing may be silently unmapped), so
+    // it needs its own case: force a shape out of the join table and prove
+    // the module refuses to drop it silently, naming which shape it was.
+    const removedEntry = REGION_ID_BY_SHAPE_ISO["GE-SK"];
+    delete REGION_ID_BY_SHAPE_ISO["GE-SK"];
+
+    try {
+      expect(() => buildRegionShapes()).toThrow(/GE-SK.*Shida Kartli/);
+    } finally {
+      // Restoring here, not after the assertion, so a failed expect() above
+      // cannot leave the mutation to leak into every later test in this file.
+      REGION_ID_BY_SHAPE_ISO["GE-SK"] = removedEntry;
+    }
+  });
 });
 
 describe("the projection", () => {
