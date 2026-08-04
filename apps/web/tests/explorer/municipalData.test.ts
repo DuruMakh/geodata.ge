@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
 import type { SourceDocumentRow } from "../../lib/data/sources";
-import { aggregateFactsForEntity, buildMunicipalEntityModel, getDefaultMunicipalSelection } from "../../lib/explorer/municipalData";
+import {
+  aggregateFactsForEntity,
+  buildMunicipalEntityModel,
+  getDefaultMunicipalSelection,
+  MIXED_PUBLIC_TOTAL_MEASURE,
+  MIXED_SOURCE_ID,
+} from "../../lib/explorer/municipalData";
 
 const FUNCTIONS: MunicipalFunction[] = [
   { id: "municipal.economic_affairs", kaLabel: "ეკონომიკური საქმიანობა", functionalCode: "7.4", sortOrder: 4 },
@@ -267,5 +273,112 @@ describe("aggregateFactsForEntity", () => {
       expect(row.warningType).toBe("none");
       expect(row.warningAmountGel).toBeNull();
     }
+  });
+});
+
+describe("aggregateFactsForEntity — fields that must not present one constituent's value as the group's", () => {
+  // region.adjara's real 2024 rows (data/imports/municipal-total-facts-2015-2025.csv):
+  // Batumi (06) reports on the normal total_payments measure with every
+  // component populated; Khulo (11) is the one municipality that year on the
+  // functional-total fallback measure, where the component fields and the
+  // reconciliation difference are genuinely absent (empty in the CSV), not zero.
+  const BATUMI_2024: MunicipalTotalFact = {
+    year: 2024,
+    municipalityCode: "06",
+    publicTotalGel: 412598028.9,
+    publicTotalMeasure: "total_payments",
+    totalPaymentsGel: 412598028.9,
+    expensesGel: 231633660.18,
+    nonfinancialAssetGrowthGel: 144589147.83,
+    financialAssetGrowthGel: 0,
+    liabilityDecreaseGel: 36375220.89,
+    functionalSumGel: 376223011.21,
+    reconciliationDifferenceGel: 36375017.69,
+    warningAmountGel: 36375017.69,
+    showWarning: true,
+    warningType: "financing_outside_functional",
+    basis: "actual",
+    sourceId: "source.municipal_mof_annual_and_history_workbooks",
+  };
+
+  const KHULO_2024: MunicipalTotalFact = {
+    year: 2024,
+    municipalityCode: "11",
+    publicTotalGel: 30969077.43,
+    publicTotalMeasure: "functional_total_fallback_missing_payment_actual",
+    totalPaymentsGel: null,
+    expensesGel: null,
+    nonfinancialAssetGrowthGel: null,
+    financialAssetGrowthGel: null,
+    liabilityDecreaseGel: null,
+    functionalSumGel: 30969077.43,
+    reconciliationDifferenceGel: null,
+    warningAmountGel: null,
+    showWarning: false,
+    warningType: "source_actual_missing",
+    basis: "actual",
+    sourceId: "source.municipal_mof_annual_and_history_workbooks",
+  };
+
+  it("merges differing publicTotalMeasure values to the mixed marker, not to either input", () => {
+    const aggregated = aggregateFactsForEntity("region.adjara", [], [BATUMI_2024, KHULO_2024]);
+
+    expect(aggregated.totalFacts).toHaveLength(1);
+    const row = aggregated.totalFacts[0]!;
+    expect(row.publicTotalMeasure).not.toBe("total_payments");
+    expect(row.publicTotalMeasure).not.toBe("functional_total_fallback_missing_payment_actual");
+    expect(row.publicTotalMeasure).toBe(MIXED_PUBLIC_TOTAL_MEASURE);
+  });
+
+  it("collapses a nullable component field to null when any constituent is missing it, never treating the gap as zero", () => {
+    const aggregated = aggregateFactsForEntity("region.adjara", [], [BATUMI_2024, KHULO_2024]);
+
+    const row = aggregated.totalFacts[0]!;
+    expect(row.totalPaymentsGel).toBeNull();
+    expect(row.expensesGel).toBeNull();
+    expect(row.nonfinancialAssetGrowthGel).toBeNull();
+    expect(row.financialAssetGrowthGel).toBeNull();
+    expect(row.liabilityDecreaseGel).toBeNull();
+    expect(row.reconciliationDifferenceGel).toBeNull();
+
+    // The two headline totals are unaffected: they are summed independently
+    // of the component fields and are never null on a served row.
+    expect(row.publicTotalGel).toBeCloseTo(412598028.9 + 30969077.43, 2);
+    expect(row.functionalSumGel).toBeCloseTo(376223011.21 + 30969077.43, 2);
+  });
+
+  it("carries agreeing values through unchanged, so the fix does not erase good data", () => {
+    // A second total_payments municipality (region.adjara's Kobuleti, 07) that
+    // agrees with Batumi on both string fields and has every component
+    // populated too.
+    const KOBULETI_2024: MunicipalTotalFact = {
+      ...BATUMI_2024,
+      municipalityCode: "07",
+      publicTotalGel: 70198849.48,
+      totalPaymentsGel: 70198849.48,
+      expensesGel: 45115764.33,
+      nonfinancialAssetGrowthGel: 24408785.49,
+      financialAssetGrowthGel: 0,
+      liabilityDecreaseGel: 674299.66,
+      functionalSumGel: 69524549.82,
+      reconciliationDifferenceGel: 674299.66,
+      warningAmountGel: null,
+      showWarning: false,
+      warningType: "none",
+    };
+
+    const aggregated = aggregateFactsForEntity("region.adjara", [], [BATUMI_2024, KOBULETI_2024]);
+
+    const row = aggregated.totalFacts[0]!;
+    // Both agree on measure and source, so the group keeps the real value —
+    // the mixed marker only appears on genuine disagreement.
+    expect(row.publicTotalMeasure).toBe("total_payments");
+    expect(row.sourceId).toBe("source.municipal_mof_annual_and_history_workbooks");
+    expect(row.sourceId).not.toBe(MIXED_SOURCE_ID);
+    // Both have real numbers for the nullable fields, so they still sum.
+    expect(row.totalPaymentsGel).toBeCloseTo(412598028.9 + 70198849.48, 2);
+    expect(row.expensesGel).toBeCloseTo(231633660.18 + 45115764.33, 2);
+    expect(row.liabilityDecreaseGel).toBeCloseTo(36375220.89 + 674299.66, 2);
+    expect(row.reconciliationDifferenceGel).toBeCloseTo(36375017.69 + 674299.66, 2);
   });
 });
