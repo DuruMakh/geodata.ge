@@ -1,4 +1,5 @@
 import type {
+  Municipality,
   MunicipalFunction,
   MunicipalFunctionFact,
   MunicipalTotalFact,
@@ -8,6 +9,7 @@ import type { SourceDocumentRow } from "../data/sources";
 import type { ExplorerTableRow, SourceMetadata } from "./types";
 import { MAX_CHART_SERIES } from "./types";
 import { colorForItem, INK } from "./colors";
+import { formatAmount, formatShare } from "./format";
 
 // Model layer for the municipalities section.
 //
@@ -290,4 +292,165 @@ export function getDefaultMunicipalSelection(model: MunicipalEntityModel): strin
     .sort((left, right) => (right.valuesByYear[lastYear] ?? 0) - (left.valuesByYear[lastYear] ?? 0))
     .slice(0, Math.min(5, MAX_CHART_SERIES))
     .map((row) => row.itemId);
+}
+
+export type MunicipalListRow = {
+  id: string;
+  kind: "municipality" | "region";
+  nameKa: string;
+  subtitleKa: string;
+  regionId: string | null;
+  valueGel: number;
+  rank: number;
+};
+
+export type MunicipalListInput = {
+  municipalities: Municipality[];
+  regionLabels: Map<string, string>;
+  totalFacts: MunicipalTotalFact[];
+  year: number;
+};
+
+/**
+ * Index rows for both grains. Both rank on public_total_gel, the official
+ * headline — the measure the index shows everywhere (the functional sum is a
+ * property of an entity's own page, not of a ranking).
+ */
+export function buildMunicipalListRows(input: MunicipalListInput): {
+  municipalities: MunicipalListRow[];
+  regions: MunicipalListRow[];
+} {
+  const { municipalities, regionLabels, totalFacts, year } = input;
+
+  const totalByCode = new Map<string, number>();
+  for (const row of totalFacts) {
+    if (row.year !== year) continue;
+    totalByCode.set(row.municipalityCode, (totalByCode.get(row.municipalityCode) ?? 0) + row.publicTotalGel);
+  }
+
+  const municipalityRows = municipalities
+    .map((municipality) => ({
+      id: municipality.code,
+      kind: "municipality" as const,
+      nameKa: municipality.displayNameKa,
+      subtitleKa: regionLabels.get(municipality.regionId) ?? "",
+      regionId: municipality.regionId,
+      valueGel: totalByCode.get(municipality.code) ?? 0,
+      rank: 0,
+    }))
+    .sort((left, right) => right.valueGel - left.valueGel)
+    .map((row, index) => ({ ...row, rank: index + 1 }));
+
+  const byRegion = new Map<string, { valueGel: number; members: number }>();
+  for (const municipality of municipalities) {
+    const bucket = byRegion.get(municipality.regionId) ?? { valueGel: 0, members: 0 };
+    bucket.valueGel += totalByCode.get(municipality.code) ?? 0;
+    bucket.members += 1;
+    byRegion.set(municipality.regionId, bucket);
+  }
+
+  const regionRows = Array.from(byRegion.entries())
+    .map(([regionId, bucket]) => ({
+      id: regionId,
+      kind: "region" as const,
+      nameKa: regionLabels.get(regionId) ?? regionId,
+      subtitleKa: `${bucket.members} მუნიციპალიტეტი`,
+      regionId,
+      valueGel: bucket.valueGel,
+      rank: 0,
+    }))
+    .sort((left, right) => right.valueGel - left.valueGel)
+    .map((row, index) => ({ ...row, rank: index + 1 }));
+
+  return { municipalities: municipalityRows, regions: regionRows };
+}
+
+/** Narrow the corpus to one region's members, for a region page. */
+export function regionFactsFor(
+  regionId: string,
+  municipalities: Municipality[],
+  functionFacts: MunicipalFunctionFact[],
+  totalFacts: MunicipalTotalFact[],
+): { functionFacts: MunicipalFunctionFact[]; totalFacts: MunicipalTotalFact[]; memberCodes: string[] } {
+  const memberCodes = municipalities.filter((row) => row.regionId === regionId).map((row) => row.code);
+  const members = new Set(memberCodes);
+
+  return {
+    memberCodes,
+    functionFacts: functionFacts.filter((row) => members.has(row.municipalityCode)),
+    totalFacts: totalFacts.filter((row) => members.has(row.municipalityCode)),
+  };
+}
+
+export type MunicipalKpi = { label: string; value: string; detail: string };
+
+export type MunicipalIndexKpiInput = {
+  municipalities: Municipality[];
+  totalFacts: MunicipalTotalFact[];
+  functionFacts: MunicipalFunctionFact[];
+  functions: MunicipalFunction[];
+  firstYear: number;
+  latestYear: number;
+};
+
+function sumPublicTotal(totalFacts: MunicipalTotalFact[], year: number): number {
+  return totalFacts.filter((row) => row.year === year).reduce((sum, row) => sum + row.publicTotalGel, 0);
+}
+
+/**
+ * The four index KPIs. Per-capita is not available (no reviewed population
+ * dataset), so the third is concentration and the fourth is composition —
+ * both size-independent and both derivable from served facts.
+ */
+export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
+  const { municipalities, totalFacts, functionFacts, functions, firstYear, latestYear } = input;
+
+  const latestTotal = sumPublicTotal(totalFacts, latestYear);
+  const firstTotal = sumPublicTotal(totalFacts, firstYear);
+  const growth = firstTotal === 0 ? null : (latestTotal - firstTotal) / firstTotal;
+
+  const largest = municipalities
+    .map((municipality) => ({
+      nameKa: municipality.displayNameKa,
+      valueGel: totalFacts
+        .filter((row) => row.year === latestYear && row.municipalityCode === municipality.code)
+        .reduce((sum, row) => sum + row.publicTotalGel, 0),
+    }))
+    .sort((left, right) => right.valueGel - left.valueGel)[0];
+  const concentration = largest && latestTotal > 0 ? largest.valueGel / latestTotal : null;
+
+  const byFunction = new Map<string, number>();
+  for (const row of functionFacts) {
+    if (row.year !== latestYear) continue;
+    byFunction.set(row.categoryId, (byFunction.get(row.categoryId) ?? 0) + row.amountGel);
+  }
+  const functionalSum = Array.from(byFunction.values()).reduce((sum, value) => sum + value, 0);
+  const topFunction = Array.from(byFunction.entries()).sort((left, right) => right[1] - left[1])[0];
+  const topFunctionLabel = functions.find((fn) => fn.id === topFunction?.[0])?.kaLabel ?? "";
+
+  return [
+    {
+      label: "მუნიციპალური ხარჯი",
+      value: formatAmount(latestTotal),
+      detail: `${latestYear} · ${municipalities.length} მუნიციპალიტეტი`,
+    },
+    {
+      label: `ზრდა ${firstYear}-დან`,
+      value: growth === null ? "—" : `${growth >= 0 ? "+" : "−"}${Math.abs(growth * 100).toFixed(0)}%`,
+      detail: `${formatAmount(firstTotal)} → ${formatAmount(latestTotal)}`,
+    },
+    {
+      label: largest ? `${largest.nameKa}ს წილი` : "კონცენტრაცია",
+      value: formatShare(concentration),
+      detail:
+        concentration === null
+          ? ""
+          : `დანარჩენი ${municipalities.length - 1} ერთეული — ${formatShare(1 - concentration)}`,
+    },
+    {
+      label: "უმსხვილესი სფერო",
+      value: functionalSum > 0 && topFunction ? formatShare(topFunction[1] / functionalSum) : "—",
+      detail: topFunctionLabel,
+    },
+  ];
 }

@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
-import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
+import type { Municipality, MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import {
   aggregateFactsForEntity,
+  buildIndexKpis,
   buildMunicipalEntityModel,
+  buildMunicipalListRows,
   getDefaultMunicipalSelection,
   MIXED_PUBLIC_TOTAL_MEASURE,
   MIXED_SOURCE_ID,
+  regionFactsFor,
 } from "../../lib/explorer/municipalData";
 
 const FUNCTIONS: MunicipalFunction[] = [
@@ -380,5 +383,187 @@ describe("aggregateFactsForEntity — fields that must not present one constitue
     expect(row.expensesGel).toBeCloseTo(231633660.18 + 45115764.33, 2);
     expect(row.liabilityDecreaseGel).toBeCloseTo(36375220.89 + 674299.66, 2);
     expect(row.reconciliationDifferenceGel).toBeCloseTo(36375017.69 + 674299.66, 2);
+  });
+});
+
+const MUNICIPALITIES: Municipality[] = [
+  { code: "04", sortId: 1, nameKa: "ქალაქ თბილისის მუნიციპალიტეტი", displayNameKa: "თბილისი", regionId: "region.tbilisi", isSelfGoverningCity: true },
+  { code: "06", sortId: 2, nameKa: "ქალაქ ბათუმის მუნიციპალიტეტი", displayNameKa: "ბათუმი", regionId: "region.adjara", isSelfGoverningCity: true },
+  { code: "07", sortId: 3, nameKa: "ქობულეთის მუნიციპალიტეტი", displayNameKa: "ქობულეთი", regionId: "region.adjara", isSelfGoverningCity: false },
+];
+
+const REGION_LABELS = new Map([
+  ["region.tbilisi", "თბილისი"],
+  ["region.adjara", "აჭარა"],
+]);
+
+function totalFor(code: string, year: number, publicTotalGel: number): MunicipalTotalFact {
+  return { ...total(year, publicTotalGel, publicTotalGel), municipalityCode: code };
+}
+
+const INDEX_TOTALS: MunicipalTotalFact[] = [
+  totalFor("04", 2015, 1_000_000_000), totalFor("04", 2025, 2_000_000_000),
+  totalFor("06", 2015, 200_000_000), totalFor("06", 2025, 500_000_000),
+  totalFor("07", 2015, 50_000_000), totalFor("07", 2025, 100_000_000),
+];
+
+const listInput = {
+  municipalities: MUNICIPALITIES,
+  regionLabels: REGION_LABELS,
+  totalFacts: INDEX_TOTALS,
+  year: 2025,
+};
+
+describe("buildMunicipalListRows", () => {
+  it("ranks municipalities by the official total, descending", () => {
+    const { municipalities } = buildMunicipalListRows(listInput);
+    expect(municipalities.map((row) => row.nameKa)).toEqual(["თბილისი", "ბათუმი", "ქობულეთი"]);
+    expect(municipalities.map((row) => row.rank)).toEqual([1, 2, 3]);
+  });
+
+  it("labels a municipality row with its region", () => {
+    const { municipalities } = buildMunicipalListRows(listInput);
+    expect(municipalities[1]!.subtitleKa).toBe("აჭარა");
+  });
+
+  it("rolls regions up and ranks them independently", () => {
+    const { regions } = buildMunicipalListRows(listInput);
+    expect(regions.map((row) => row.id)).toEqual(["region.tbilisi", "region.adjara"]);
+    expect(regions[1]!.valueGel).toBe(600_000_000);
+  });
+
+  it("counts a region's members in its subtitle", () => {
+    const { regions } = buildMunicipalListRows(listInput);
+    expect(regions[1]!.subtitleKa).toBe("2 მუნიციპალიტეტი");
+  });
+});
+
+describe("regionFactsFor", () => {
+  it("selects only the region's members", () => {
+    const selected = regionFactsFor("region.adjara", MUNICIPALITIES, [], INDEX_TOTALS);
+    expect(selected.memberCodes.sort()).toEqual(["06", "07"]);
+    expect(selected.totalFacts).toHaveLength(4);
+  });
+});
+
+describe("aggregateFactsForEntity", () => {
+  const members = regionFactsFor("region.adjara", MUNICIPALITIES, [], INDEX_TOTALS);
+  const rolled = aggregateFactsForEntity("region.adjara", members.functionFacts, members.totalFacts);
+
+  it("collapses the members to one row per year", () => {
+    expect(rolled.totalFacts).toHaveLength(2);
+    expect(rolled.totalFacts.every((row) => row.municipalityCode === "region.adjara")).toBe(true);
+  });
+
+  it("sums both totals independently", () => {
+    const y2025 = rolled.totalFacts.find((row) => row.year === 2025)!;
+    expect(y2025.publicTotalGel).toBe(600_000_000);
+    expect(y2025.functionalSumGel).toBe(600_000_000);
+  });
+
+  it("carries no warning of its own — a roll-up's two totals reconcile", () => {
+    expect(rolled.totalFacts.every((row) => row.showWarning === false)).toBe(true);
+    expect(rolled.totalFacts.every((row) => row.warningType === "none")).toBe(true);
+  });
+
+  it("does not mutate the input rows", () => {
+    expect(members.totalFacts[0]!.municipalityCode).not.toBe("region.adjara");
+  });
+});
+
+describe("buildIndexKpis", () => {
+  const kpis = () =>
+    buildIndexKpis({
+      municipalities: MUNICIPALITIES,
+      totalFacts: INDEX_TOTALS,
+      functionFacts: [],
+      functions: FUNCTIONS,
+      firstYear: 2015,
+      latestYear: 2025,
+    });
+
+  it("leads with the municipal total for the latest year", () => {
+    expect(kpis()[0]!.value).toBe("2.60 მლრდ ₾");
+    expect(kpis()[0]!.detail).toBe("2025 · 3 მუნიციპალიტეტი");
+  });
+
+  it("reports growth from the first served year", () => {
+    // 1.25bn → 2.6bn
+    expect(kpis()[1]!.label).toBe("ზრდა 2015-დან");
+    expect(kpis()[1]!.value).toBe("+108%");
+  });
+
+  it("reports concentration rather than a max/min ratio", () => {
+    expect(kpis()[2]!.label).toBe("თბილისის წილი");
+    expect(kpis()[2]!.value).toBe("76.9%");
+    expect(kpis()[2]!.detail).toBe("დანარჩენი 2 ერთეული — 23.1%");
+  });
+});
+
+// INDEX_TOTALS above sets functionalSumGel equal to publicTotalGel on every
+// row (via totalFor), so it cannot tell the two totals apart: a version of
+// buildMunicipalListRows/buildIndexKpis that silently read functionalSumGel
+// instead of publicTotalGel would pass every test above unchanged. These
+// fixtures deliberately diverge — and even invert which municipality leads —
+// so such a swap fails loudly.
+const DIVERGENT_TOTALS: MunicipalTotalFact[] = [
+  { ...total(2015, 50_000_000, 50_000_000), municipalityCode: "04" },
+  { ...total(2015, 50_000_000, 50_000_000), municipalityCode: "06" },
+  // 2025: თბილისი leads on functionalSumGel (900M), ბათუმი leads on
+  // publicTotalGel (300M) — the two measures disagree on both the sum AND
+  // the ranking.
+  { ...total(2025, 100_000_000, 900_000_000), municipalityCode: "04" },
+  { ...total(2025, 300_000_000, 50_000_000), municipalityCode: "06" },
+];
+
+describe("buildMunicipalListRows — ranks and sums publicTotalGel, not functionalSumGel", () => {
+  const divergentInput = {
+    municipalities: MUNICIPALITIES,
+    regionLabels: REGION_LABELS,
+    totalFacts: DIVERGENT_TOTALS,
+    year: 2025,
+  };
+
+  it("orders municipalities by publicTotalGel", () => {
+    const { municipalities } = buildMunicipalListRows(divergentInput);
+    // ბათუმი (06, 300M publicTotalGel) beats თბილისი (04, 100M publicTotalGel)
+    // even though თბილისი has the larger functionalSumGel (900M vs 50M).
+    expect(municipalities.map((row) => row.id)).toEqual(["06", "04", "07"]);
+    expect(municipalities[0]!.valueGel).toBe(300_000_000);
+    expect(municipalities[1]!.valueGel).toBe(100_000_000);
+  });
+
+  it("rolls regions up on publicTotalGel too", () => {
+    const { regions } = buildMunicipalListRows(divergentInput);
+    // region.adjara (06 + 07) sums publicTotalGel to 300M, ahead of
+    // region.tbilisi's 100M — the functionalSumGel sums (50M vs 900M) would
+    // put them in the opposite order.
+    expect(regions.map((row) => row.id)).toEqual(["region.adjara", "region.tbilisi"]);
+    expect(regions[0]!.valueGel).toBe(300_000_000);
+  });
+});
+
+describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
+  const kpis = () =>
+    buildIndexKpis({
+      municipalities: MUNICIPALITIES,
+      totalFacts: DIVERGENT_TOTALS,
+      functionFacts: [],
+      functions: FUNCTIONS,
+      firstYear: 2015,
+      latestYear: 2025,
+    });
+
+  it("leads with the sum of publicTotalGel", () => {
+    // publicTotalGel: 100M + 300M = 400M. Reading functionalSumGel instead
+    // would sum to 900M + 50M = 950M.
+    expect(kpis()[0]!.value).toBe("400.0 მლნ ₾");
+  });
+
+  it("names the municipality that is largest by publicTotalGel", () => {
+    // ბათუმი leads on publicTotalGel (300M vs თბილისი's 100M); თბილისი would
+    // lead if concentration were computed from functionalSumGel instead.
+    expect(kpis()[2]!.label).toBe("ბათუმის წილი");
+    expect(kpis()[2]!.label).not.toBe("თბილისის წილი");
   });
 });
