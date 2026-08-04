@@ -1852,7 +1852,7 @@ git commit -m "feat: add municipal index rows, region roll-ups and index KPIs"
 - Test: `apps/web/tests/explorer/municipalData.test.ts` (extend)
 
 **Interfaces:**
-- Consumes: `MunicipalEntityModel` (Task 5), `MunicipalKpi` (Task 6).
+- Consumes: `MunicipalEntityModel` (Task 5), `MunicipalKpi` (Task 6). Also from `lib/explorer/format.ts`: `MISSING`, and `formatShare(fraction, signed?, decimals?)` — Task 6 added the third `decimals` argument (default `1`) precisely so a KPI can render a 0-decimal signed percent without building its own sign. `municipalData.ts` already imports both; extend the existing import rather than adding a second line.
 - Produces:
   - `MunicipalMover = { rank: number; kaLabel: string; growth: number | null; color: string }`
   - `MunicipalComparisonRow = { kaLabel: string; color: string; isTotal: boolean; fromGel: number | null; toGel: number | null; changeShare: number | null; changeGel: number | null }`
@@ -2003,17 +2003,21 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
     },
     {
       label: `ზრდა ${startYear ?? ""}-დან`,
-      value: growth === null ? "—" : `${growth >= 0 ? "+" : "−"}${Math.abs(growth * 100).toFixed(0)}%`,
+      // MISSING and the U+2212 minus come from format.ts — never hand-write
+      // either (Global Constraints). formatShare's third argument is the
+      // decimal count; Task 6 added it so a 0-decimal signed percent does not
+      // have to build its own sign. Zero growth renders "0%", not "+0%".
+      value: growth === null ? MISSING : formatShare(growth, true, 0),
       detail: `${formatAmount(functionalStart)} → ${formatAmount(functionalEnd)}`,
     },
     {
       label: "უმსხვილესი სფერო",
-      value: functionalEnd ? formatShare(largestValue / functionalEnd) : "—",
+      value: functionalEnd ? formatShare(largestValue / functionalEnd) : MISSING,
       detail: largest?.kaLabel ?? "",
     },
     {
       label: "წილი მუნიციპალურ ხარჯებში",
-      value: nationalTotalLatest > 0 ? formatShare(officialEnd / nationalTotalLatest) : "—",
+      value: nationalTotalLatest > 0 ? formatShare(officialEnd / nationalTotalLatest) : MISSING,
       detail: `${input.rankOutOf} ერთეულიდან`,
     },
   ];
