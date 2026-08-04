@@ -1,0 +1,131 @@
+"use client";
+
+import { useState } from "react";
+import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
+import { formatAmount } from "../../lib/explorer/format";
+
+// Region choropleth (DESIGN.md §6.4 rules: no cards, no shadows except the
+// tooltip). Paths arrive already projected from the server, so this component
+// ships ~15 KB of `d` strings rather than the coordinate table.
+//
+// Every colour comes from colors.ts. No hex is written here.
+
+export type RegionMapShape = {
+  shapeIso: string;
+  regionId: string | null;
+  nameKa: string;
+  d: string;
+  valueGel: number | null;
+  /** 0-5 index into MAP_RAMP; -1 for a no-data shape. */
+  bucket: number;
+};
+
+export type RegionMapCity = { code: string; nameKa: string; x: number; y: number };
+
+type RegionMapProps = {
+  viewBox: string;
+  shapes: RegionMapShape[];
+  cities: RegionMapCity[];
+  legendMin: string;
+  legendMax: string;
+  onOpenRegion: (regionId: string) => void;
+  onOpenMunicipality: (code: string) => void;
+  hoveredRegionId: string | null;
+  onHoverRegion: (regionId: string | null) => void;
+};
+
+export function RegionMap({
+  viewBox,
+  shapes,
+  cities,
+  legendMin,
+  legendMax,
+  onOpenRegion,
+  onOpenMunicipality,
+  hoveredRegionId,
+  onHoverRegion,
+}: RegionMapProps) {
+  const [hoveredCity, setHoveredCity] = useState<string | null>(null);
+  const hovered = shapes.find((shape) => shape.regionId !== null && shape.regionId === hoveredRegionId) ?? null;
+
+  const readout =
+    hovered === null
+      ? "გადაატარე კურსორი რუკაზე"
+      : `${hovered.nameKa} · ${formatAmount(hovered.valueGel)} · გახსნა →`;
+
+  return (
+    <div data-testid="region-map">
+      <svg viewBox={viewBox} role="img" aria-label="საქართველოს რეგიონების ბიუჯეტის რუკა" className="block h-auto w-full">
+        {shapes.map((shape) => {
+          const noData = shape.regionId === null;
+          const active = !noData && shape.regionId === hoveredRegionId;
+
+          return (
+            <path
+              key={shape.shapeIso}
+              data-testid={`region-shape-${shape.shapeIso}`}
+              data-no-data={noData ? "true" : undefined}
+              d={shape.d}
+              fill={noData ? MAP_NO_DATA_FILL : active ? "var(--ink)" : MAP_RAMP[shape.bucket]}
+              stroke={noData ? MAP_NO_DATA_STROKE : active ? "var(--ink)" : "var(--hairline-soft)"}
+              strokeWidth={active ? 1.6 : 0.7}
+              strokeDasharray={noData ? "3 2.5" : undefined}
+              strokeLinejoin="round"
+              style={{ cursor: noData ? "default" : "pointer" }}
+              onMouseEnter={() => onHoverRegion(shape.regionId)}
+              onMouseLeave={() => onHoverRegion(null)}
+              onClick={() => (shape.regionId === null ? undefined : onOpenRegion(shape.regionId))}
+            />
+          );
+        })}
+        {cities.map((city) => (
+          <circle
+            key={city.code}
+            data-testid={`self-gov-city-${city.code}`}
+            cx={city.x}
+            cy={city.y}
+            r={hoveredCity === city.code ? 9.5 : 7.5}
+            fill={hoveredCity === city.code ? "var(--accent)" : "var(--positive)"}
+            fillOpacity={hoveredCity === city.code ? 1 : 0.88}
+            stroke="var(--tile)"
+            strokeWidth={hoveredCity === city.code ? 2 : 1.2}
+            style={{ cursor: "pointer" }}
+            onMouseEnter={() => setHoveredCity(city.code)}
+            onMouseLeave={() => setHoveredCity(null)}
+            onClick={() => onOpenMunicipality(city.code)}
+          >
+            <title>{city.nameKa}</title>
+          </circle>
+        ))}
+      </svg>
+
+      <div className="mt-2 flex flex-wrap items-center gap-3.5 border-t border-[var(--hairline-soft)] pt-2.5">
+        <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{legendMin}</span>
+        <span className="flex flex-none">
+          {MAP_RAMP.map((fill) => (
+            <span key={fill} aria-hidden className="h-[9px] w-8" style={{ backgroundColor: fill }} />
+          ))}
+        </span>
+        <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{legendMax}</span>
+        <span className="inline-flex items-center gap-1.5">
+          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-[var(--positive)] opacity-[0.88]" />
+          <span className="text-[11px] text-[var(--faint)]">თვითმმართველი ქალაქები</span>
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span
+            aria-hidden
+            className="h-[9px] w-3.5 border border-dashed"
+            style={{ borderColor: MAP_NO_DATA_STROKE, backgroundColor: MAP_NO_DATA_FILL }}
+          />
+          <span className="text-[11px] text-[var(--faint)]">ოკუპირებული ტერიტორია — მონაცემები არ არის</span>
+        </span>
+        <span
+          data-testid="map-readout"
+          className="ml-auto font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]"
+        >
+          {readout}
+        </span>
+      </div>
+    </div>
+  );
+}
