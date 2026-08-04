@@ -607,16 +607,22 @@ describe("buildEntityKpis", () => {
     });
 
   it("leads with the OFFICIAL total, not the functional sum", () => {
-    // 2016 is the divergent year: official 300, functional 265. The KPI must
-    // read the official headline, so it must NOT equal the functional sum.
+    // 2016 is the divergent year: official 300, functional 265. This test
+    // checks the label, the detail's ფინანსთა სამინისტროს wording, and the
+    // model's two raw totals — it does NOT discriminate on `.value` itself:
+    // at this fixture's toy-number scale formatAmount(300) and
+    // formatAmount(265) both round to the identical "0.0 მლნ ₾" string, so
+    // the last assertion below would still pass even if the KPI read the
+    // functional total instead. The adjacent test right below this one (GEL-
+    // realistic magnitude) is the one that actually catches an
+    // official/functional swap on `.value` — it covers the gap this test
+    // leaves, so do not delete it as "redundant" with this one.
     const model = build(2015, 2016);
     const divergent = buildEntityKpis({ model, nationalTotalLatest: 740, rank: 1, rankOutOf: 64 });
     expect(divergent[0]!.label).toBe("ოფიციალური ბიუჯეტი");
     expect(divergent[0]!.detail).toContain("ფინანსთა სამინისტროს");
     expect(model.officialTotalByYear[2016]).toBe(300);
     expect(model.totalRow.valuesByYear[2016]).toBe(265);
-    // formatAmount renders both in მლნ; assert the KPI tracked the official one
-    // by checking it changes when the official total does, not the functional.
     expect(divergent[0]!.value).toBe(formatAmount(300));
   });
 
@@ -648,6 +654,18 @@ describe("buildEntityKpis", () => {
 
   it("reports growth across the selected range", () => {
     expect(kpis()[1]!.label).toBe("ზრდა 2015-დან");
+  });
+
+  it("computes growth from the functional total, not the official one", () => {
+    // Reuse the divergent (2015-2016) build: functional 160→265 (growth
+    // +66%) vs official 160→300 (would be +88% if this KPI read
+    // officialTotalByYear instead — see the officialTotalByYear/totalRow
+    // checks in "leads with the OFFICIAL total" above). Unlike KPI 0's
+    // `.value`, this discriminates even at the fixture's toy-number scale: a
+    // percentage is scale-invariant, so +66% vs +88% never collapses under
+    // rounding the way formatAmount(300) vs formatAmount(265) does.
+    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalLatest: 740, rank: 1, rankOutOf: 64 });
+    expect(divergent[1]!.value).toBe("+66%");
   });
 
   it("names the largest function and its share", () => {

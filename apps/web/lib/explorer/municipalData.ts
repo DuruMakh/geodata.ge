@@ -475,6 +475,22 @@ export type MunicipalEntityKpiInput = {
   rankOutOf: number;
 };
 
+/**
+ * Rows ordered by end-year value, descending, missing/undefined treated as 0.
+ * Shared by `buildEntityKpis` (finding the largest row) and
+ * `buildComparisonRows` (ordering the period-comparison table) so the two
+ * never drift apart. `.slice()` so the caller's array is never mutated.
+ */
+function sortedByEndYear(rows: ExplorerTableRow[], endYear: number | undefined): ExplorerTableRow[] {
+  return rows
+    .slice()
+    .sort(
+      (left, right) =>
+        (endYear === undefined ? 0 : right.valuesByYear[endYear] ?? 0) -
+        (endYear === undefined ? 0 : left.valuesByYear[endYear] ?? 0),
+    );
+}
+
 /** The four entity KPIs, for both municipality and region pages. */
 export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] {
   const { model, nationalTotalLatest } = input;
@@ -486,13 +502,7 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
   const functionalEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
   const growth = changeBetween(functionalStart, functionalEnd);
 
-  const largest = model.rows
-    .slice()
-    .sort(
-      (left, right) =>
-        (endYear === undefined ? 0 : right.valuesByYear[endYear] ?? 0) -
-        (endYear === undefined ? 0 : left.valuesByYear[endYear] ?? 0),
-    )[0];
+  const largest = sortedByEndYear(model.rows, endYear)[0];
   const largestValue = largest && endYear !== undefined ? largest.valuesByYear[endYear] ?? 0 : 0;
 
   return [
@@ -567,14 +577,7 @@ export function buildComparisonRows(model: MunicipalEntityModel): MunicipalCompa
     };
   };
 
-  const functions = model.rows
-    .slice()
-    .sort(
-      (left, right) =>
-        (endYear === undefined ? 0 : right.valuesByYear[endYear] ?? 0) -
-        (endYear === undefined ? 0 : left.valuesByYear[endYear] ?? 0),
-    )
-    .map((row) => rowFor(row, false));
+  const functions = sortedByEndYear(model.rows, endYear).map((row) => rowFor(row, false));
 
   return [rowFor(model.totalRow, true), ...functions];
 }
