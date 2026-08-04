@@ -113,3 +113,64 @@ export function stripNavFromHash(hash: string): string {
     return "";
   }
 }
+
+// The municipalities section reuses the same hash keys as the budget explorer —
+// m mode, sh share, r range, sel selection — so there is one vocabulary in the
+// URL spec (DESIGN.md §6.3), plus lvl which exists only on the index.
+
+export type MunicipalUrlState = {
+  chartMode?: ChartMode;
+  share?: boolean;
+  range?: { start: number; end: number };
+  selection?: string[];
+};
+
+export function parseMunicipalHash(hash: string): MunicipalUrlState {
+  const state: MunicipalUrlState = {};
+
+  try {
+    const params = new URLSearchParams(hash.replace(/^#/, ""));
+
+    const mode = params.get("m");
+    if (mode === "line" || mode === "table") state.chartMode = mode;
+
+    if (params.get("sh") === "1") state.share = true;
+
+    const range = params.get("r");
+    if (range && /^\d{4}-\d{4}$/.test(range)) {
+      const [start = 0, end = 0] = range.split("-").map(Number);
+      state.range = { start, end };
+    }
+
+    const selection = params.get("sel");
+    if (selection !== null) state.selection = selection.split(",").filter(Boolean);
+  } catch {
+    return state;
+  }
+
+  return state;
+}
+
+export function serializeMunicipalHash(input: {
+  chartMode: ChartMode;
+  share: boolean;
+  rangeStart: number;
+  rangeEnd: number;
+  selectedIds: string[];
+}): string {
+  const params = new URLSearchParams();
+  params.set("m", input.chartMode);
+  if (input.share) params.set("sh", "1");
+  params.set("r", `${input.rangeStart}-${input.rangeEnd}`);
+  params.set("sel", input.selectedIds.join(","));
+  return params.toString();
+}
+
+/** Index list grain. Municipalities is the default; the map is always regions. */
+export function parseMunicipalLevel(hash: string): "muni" | "region" {
+  try {
+    return new URLSearchParams(hash.replace(/^#/, "")).get("lvl") === "region" ? "region" : "muni";
+  } catch {
+    return "muni";
+  }
+}
