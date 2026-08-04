@@ -454,3 +454,127 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     },
   ];
 }
+
+export type MunicipalMover = { rank: number; kaLabel: string; growth: number | null; color: string };
+
+export type MunicipalComparisonRow = {
+  kaLabel: string;
+  color: string;
+  isTotal: boolean;
+  fromGel: number | null;
+  toGel: number | null;
+  changeShare: number | null;
+  changeGel: number | null;
+};
+
+export type MunicipalEntityKpiInput = {
+  model: MunicipalEntityModel;
+  /** Sum of every served municipality's public total in the range's end year. */
+  nationalTotalLatest: number;
+  rank: number;
+  rankOutOf: number;
+};
+
+/** The four entity KPIs, for both municipality and region pages. */
+export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] {
+  const { model, nationalTotalLatest } = input;
+  const startYear = model.years[0];
+  const endYear = model.years.at(-1);
+
+  const officialEnd = endYear === undefined ? 0 : model.officialTotalByYear[endYear] ?? 0;
+  const functionalStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
+  const functionalEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
+  const growth = changeBetween(functionalStart, functionalEnd);
+
+  const largest = model.rows
+    .slice()
+    .sort(
+      (left, right) =>
+        (endYear === undefined ? 0 : right.valuesByYear[endYear] ?? 0) -
+        (endYear === undefined ? 0 : left.valuesByYear[endYear] ?? 0),
+    )[0];
+  const largestValue = largest && endYear !== undefined ? largest.valuesByYear[endYear] ?? 0 : 0;
+
+  return [
+    {
+      label: "ოფიციალური ბიუჯეტი",
+      value: formatAmount(officialEnd),
+      detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
+    },
+    {
+      label: `ზრდა ${startYear ?? ""}-დან`,
+      // MISSING and the U+2212 minus come from format.ts — never hand-write
+      // either (Global Constraints). formatShare's third argument is the
+      // decimal count; Task 6 added it so a 0-decimal signed percent does not
+      // have to build its own sign. Zero growth renders "0%", not "+0%".
+      value: growth === null ? MISSING : formatShare(growth, true, 0),
+      detail: `${formatAmount(functionalStart)} → ${formatAmount(functionalEnd)}`,
+    },
+    {
+      label: "უმსხვილესი სფერო",
+      value: functionalEnd ? formatShare(largestValue / functionalEnd) : MISSING,
+      detail: largest?.kaLabel ?? "",
+    },
+    {
+      label: "წილი მუნიციპალურ ხარჯებში",
+      value: nationalTotalLatest > 0 ? formatShare(officialEnd / nationalTotalLatest) : MISSING,
+      detail: `${input.rankOutOf} ერთეულიდან`,
+    },
+  ];
+}
+
+/**
+ * Growth board (DESIGN.md §7.13). The bottom column is ყველაზე ნელი ზრდა even
+ * when a row is shrinking — never call growth a loss.
+ */
+export function buildMovers(model: MunicipalEntityModel): { up: MunicipalMover[]; down: MunicipalMover[] } {
+  const startYear = model.years[0];
+  const endYear = model.years.at(-1);
+
+  const growth = model.rows
+    .map((row) => ({
+      kaLabel: row.kaLabel,
+      color: row.color,
+      growth: changeBetween(
+        startYear === undefined ? null : row.valuesByYear[startYear] ?? null,
+        endYear === undefined ? null : row.valuesByYear[endYear] ?? null,
+      ),
+    }))
+    .sort((left, right) => (right.growth ?? -Infinity) - (left.growth ?? -Infinity));
+
+  const rank = (rows: typeof growth) => rows.map((row, index) => ({ ...row, rank: index + 1 }));
+
+  return { up: rank(growth.slice(0, 3)), down: rank(growth.slice(-3).reverse()) };
+}
+
+/** პერიოდის შედარება: the total, then every function by end-year size. */
+export function buildComparisonRows(model: MunicipalEntityModel): MunicipalComparisonRow[] {
+  const startYear = model.years[0];
+  const endYear = model.years.at(-1);
+
+  const rowFor = (source: ExplorerTableRow, isTotal: boolean): MunicipalComparisonRow => {
+    const fromGel = startYear === undefined ? null : source.valuesByYear[startYear] ?? null;
+    const toGel = endYear === undefined ? null : source.valuesByYear[endYear] ?? null;
+
+    return {
+      kaLabel: source.kaLabel,
+      color: source.color,
+      isTotal,
+      fromGel,
+      toGel,
+      changeShare: changeBetween(fromGel, toGel),
+      changeGel: fromGel === null || toGel === null ? null : toGel - fromGel,
+    };
+  };
+
+  const functions = model.rows
+    .slice()
+    .sort(
+      (left, right) =>
+        (endYear === undefined ? 0 : right.valuesByYear[endYear] ?? 0) -
+        (endYear === undefined ? 0 : left.valuesByYear[endYear] ?? 0),
+    )
+    .map((row) => rowFor(row, false));
+
+  return [rowFor(model.totalRow, true), ...functions];
+}

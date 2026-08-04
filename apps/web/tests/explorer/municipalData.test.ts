@@ -3,7 +3,10 @@ import type { Municipality, MunicipalFunction, MunicipalFunctionFact, MunicipalT
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import {
   aggregateFactsForEntity,
+  buildComparisonRows,
+  buildEntityKpis,
   buildIndexKpis,
+  buildMovers,
   buildMunicipalEntityModel,
   buildMunicipalListRows,
   getDefaultMunicipalSelection,
@@ -11,6 +14,7 @@ import {
   MIXED_SOURCE_ID,
   regionFactsFor,
 } from "../../lib/explorer/municipalData";
+import { formatAmount } from "../../lib/explorer/format";
 
 const FUNCTIONS: MunicipalFunction[] = [
   { id: "municipal.economic_affairs", kaLabel: "ეკონომიკური საქმიანობა", functionalCode: "7.4", sortOrder: 4 },
@@ -590,5 +594,123 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
     // lead if concentration were computed from functionalSumGel instead.
     expect(kpis()[2]!.label).toBe("ბათუმის წილი");
     expect(kpis()[2]!.label).not.toBe("თბილისის წილი");
+  });
+});
+
+describe("buildEntityKpis", () => {
+  const kpis = () =>
+    buildEntityKpis({
+      model: build(),
+      nationalTotalLatest: 740,
+      rank: 1,
+      rankOutOf: 64,
+    });
+
+  it("leads with the OFFICIAL total, not the functional sum", () => {
+    // 2016 is the divergent year: official 300, functional 265. The KPI must
+    // read the official headline, so it must NOT equal the functional sum.
+    const model = build(2015, 2016);
+    const divergent = buildEntityKpis({ model, nationalTotalLatest: 740, rank: 1, rankOutOf: 64 });
+    expect(divergent[0]!.label).toBe("ოფიციალური ბიუჯეტი");
+    expect(divergent[0]!.detail).toContain("ფინანსთა სამინისტროს");
+    expect(model.officialTotalByYear[2016]).toBe(300);
+    expect(model.totalRow.valuesByYear[2016]).toBe(265);
+    // formatAmount renders both in მლნ; assert the KPI tracked the official one
+    // by checking it changes when the official total does, not the functional.
+    expect(divergent[0]!.value).toBe(formatAmount(300));
+  });
+
+  it("renders the official total's own formatted string, distinguishable from the functional one", () => {
+    // At the fixture's 100s-scale magnitude, formatAmount(300) and
+    // formatAmount(265) both round to the same "0.0 მლნ ₾" string, so the test
+    // above cannot actually tell, from divergent[0].value alone, whether the
+    // KPI read officialTotalByYear or totalRow — only that its raw output
+    // equals formatAmount(300), which a functionalEnd-based value would ALSO
+    // equal at this scale. Re-run the same divergence at GEL-realistic
+    // magnitude (hundreds of millions), where the two totals format to visibly
+    // different strings, so a swap cannot hide behind rounding.
+    const bigTotalFacts: MunicipalTotalFact[] = [
+      total(2015, 100_000_000, 100_000_000),
+      total(2016, 350_000_000, 265_000_000, true),
+    ];
+    const model = buildMunicipalEntityModel({
+      functions: FUNCTIONS,
+      functionFacts: FUNCTION_FACTS,
+      totalFacts: bigTotalFacts,
+      sourceDocuments: SOURCES,
+      startYear: 2015,
+      endYear: 2016,
+    });
+    const divergent = buildEntityKpis({ model, nationalTotalLatest: 740_000_000, rank: 1, rankOutOf: 64 });
+    expect(divergent[0]!.value).toBe(formatAmount(350_000_000));
+    expect(divergent[0]!.value).not.toBe(formatAmount(265_000_000));
+  });
+
+  it("reports growth across the selected range", () => {
+    expect(kpis()[1]!.label).toBe("ზრდა 2015-დან");
+  });
+
+  it("names the largest function and its share", () => {
+    expect(kpis()[2]!.label).toBe("უმსხვილესი სფერო");
+    expect(kpis()[2]!.detail).toBe("ეკონომიკური საქმიანობა");
+  });
+
+  it("gives the size-independent placement figure per-capita used to provide", () => {
+    expect(kpis()[3]!.label).toBe("წილი მუნიციპალურ ხარჯებში");
+    expect(kpis()[3]!.value).toBe("50.0%");
+  });
+
+  // The default build()'s end year (2017) has official === functional (370 ===
+  // 370), so the two tests above cannot tell which total KPI 2 and KPI 3 divide
+  // by. Reuse the divergent (2015-2016) build — official 300, functional 265 —
+  // to pin each to the correct total.
+  it("shares the largest function against the functional total, not the official one", () => {
+    // economic_affairs is largest at 2016 (200). Against the functional total
+    // (265) that's 75.5%; against the official total (300) it would be 66.7%.
+    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalLatest: 740, rank: 1, rankOutOf: 64 });
+    expect(divergent[2]!.value).toBe("75.5%");
+  });
+
+  it("shares the national-total KPI against the official total, not the functional one", () => {
+    // official (300) / nationalTotalLatest (740) = 40.5%; functional (265) /
+    // 740 would be 35.8%.
+    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalLatest: 740, rank: 1, rankOutOf: 64 });
+    expect(divergent[3]!.value).toBe("40.5%");
+  });
+});
+
+describe("buildMovers", () => {
+  it("ranks the fastest growers first", () => {
+    expect(buildMovers(build()).up[0]!.kaLabel).toBe("ეკონომიკური საქმიანობა");
+  });
+
+  it("keeps a shrinking series in the slow-growth column, never called a loss", () => {
+    const down = buildMovers(build()).down;
+    expect(down[0]!.kaLabel).toBe("ჯანმრთელობის დაცვა");
+    expect(down[0]!.growth).toBeLessThan(0);
+  });
+
+  it("carries each row's category colour", () => {
+    expect(buildMovers(build()).up[0]!.color).toBe("#C26E4C");
+  });
+});
+
+describe("buildComparisonRows", () => {
+  it("puts the total first, then functions by end-year size", () => {
+    const rows = buildComparisonRows(build());
+    expect(rows[0]!.isTotal).toBe(true);
+    expect(rows.slice(1).map((row) => row.kaLabel)).toEqual([
+      "ეკონომიკური საქმიანობა",
+      "განათლება",
+      "ჯანმრთელობის დაცვა",
+    ]);
+  });
+
+  it("reports both the absolute and relative change", () => {
+    const economic = buildComparisonRows(build()).find((row) => row.kaLabel === "ეკონომიკური საქმიანობა")!;
+    expect(economic.fromGel).toBe(100);
+    expect(economic.toGel).toBe(300);
+    expect(economic.changeGel).toBe(200);
+    expect(economic.changeShare).toBeCloseTo(2, 6);
   });
 });
