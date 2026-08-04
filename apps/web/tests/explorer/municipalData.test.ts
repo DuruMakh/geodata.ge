@@ -500,6 +500,31 @@ describe("buildIndexKpis", () => {
   });
 });
 
+// growth's sign prefix and formatShare's differ at exactly zero: formatShare
+// (and every other change/growth KPI in the app — indicators.tsx,
+// explorer-table.tsx, main-explorer.tsx, budget-field.tsx, ranking.tsx — all
+// call formatShare(x, true)) only prefixes "+" when the value is > 0, so a
+// flat total renders unsigned. Pinned here so a future edit cannot silently
+// reintroduce the old hand-rolled ">= 0" branch, which prefixed "+0%".
+const ZERO_GROWTH_TOTALS: MunicipalTotalFact[] = [
+  totalFor("04", 2015, 1_000_000_000),
+  totalFor("04", 2025, 1_000_000_000),
+];
+
+describe("buildIndexKpis — growth sign at exactly zero", () => {
+  it("renders a flat total as unsigned 0%, not +0%", () => {
+    const kpis = buildIndexKpis({
+      municipalities: MUNICIPALITIES,
+      totalFacts: ZERO_GROWTH_TOTALS,
+      functionFacts: [],
+      functions: FUNCTIONS,
+      firstYear: 2015,
+      latestYear: 2025,
+    });
+    expect(kpis[1]!.value).toBe("0%");
+  });
+});
+
 // INDEX_TOTALS above sets functionalSumGel equal to publicTotalGel on every
 // row (via totalFor), so it cannot tell the two totals apart: a version of
 // buildMunicipalListRows/buildIndexKpis that silently read functionalSumGel

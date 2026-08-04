@@ -22,6 +22,13 @@ describe("editorial formatters", () => {
     expect(formatShare(-0.031, true)).toBe("−3.1%");
     expect(formatShare(null)).toBe("—");
   });
+
+  it("accepts a decimals override for 0-decimal signed percents", () => {
+    expect(formatShare(1.08, true, 0)).toBe("+108%");
+    expect(formatShare(-0.031, true, 0)).toBe("−3%");
+    // Negative render must use U+2212, never an ASCII hyphen.
+    expect(formatShare(-0.031, true, 0)).not.toMatch(/-/);
+  });
 });
 
 describe("formatInUnit", () => {

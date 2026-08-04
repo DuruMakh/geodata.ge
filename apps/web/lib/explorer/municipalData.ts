@@ -9,7 +9,7 @@ import type { SourceDocumentRow } from "../data/sources";
 import type { ExplorerTableRow, SourceMetadata } from "./types";
 import { MAX_CHART_SERIES } from "./types";
 import { colorForItem, INK } from "./colors";
-import { formatAmount, formatShare } from "./format";
+import { formatAmount, formatShare, MISSING } from "./format";
 
 // Model layer for the municipalities section.
 //
@@ -436,7 +436,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     },
     {
       label: `ზრდა ${firstYear}-დან`,
-      value: growth === null ? "—" : `${growth >= 0 ? "+" : "−"}${Math.abs(growth * 100).toFixed(0)}%`,
+      value: growth === null ? MISSING : formatShare(growth, true, 0),
       detail: `${formatAmount(firstTotal)} → ${formatAmount(latestTotal)}`,
     },
     {
@@ -449,7 +449,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     },
     {
       label: "უმსხვილესი სფერო",
-      value: functionalSum > 0 && topFunction ? formatShare(topFunction[1] / functionalSum) : "—",
+      value: functionalSum > 0 && topFunction ? formatShare(topFunction[1] / functionalSum) : MISSING,
       detail: topFunctionLabel,
     },
   ];

@@ -45,12 +45,12 @@ export function formatSignedAmount(value: number | null | undefined): string {
   return `${parts.num} ${parts.unit}`;
 }
 
-/** Percentage from a fraction, 1 decimal; "−" minus; optional "+" for positives. */
-export function formatShare(fraction: number | null | undefined, signed = false): string {
+/** Percentage from a fraction, `decimals` digits (default 1); "−" minus; optional "+" for positives. */
+export function formatShare(fraction: number | null | undefined, signed = false, decimals = 1): string {
   if (fraction === null || fraction === undefined || !Number.isFinite(fraction)) return MISSING;
   const value = fraction * 100;
   const prefix = signed && value > 0 ? "+" : "";
-  return (prefix + value.toFixed(1) + "%").replace("-", "−");
+  return (prefix + value.toFixed(decimals) + "%").replace("-", "−");
 }
 
 /**
