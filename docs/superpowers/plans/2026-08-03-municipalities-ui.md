@@ -1832,7 +1832,9 @@ for (const k of buildIndexKpis({ municipalities: d.municipalities, totalFacts: d
 "
 ```
 
-Expected: `municipalities 64 regions 11`; top three `თბილისი 2108M, ბათუმი 486M, რუსთავი 173M`; KPIs reading `5.63 მლრდ ₾`, `+176%`, `37.5%`, `31.5% / ეკონომიკური საქმიანობა`.
+Expected: `municipalities 64 regions 11`; top three `თბილისი 2108M, ბათუმი 486M, რუსთავი 173M`; KPIs reading `5.62 მლრდ ₾`, `+176%`, `37.5%`, `31.5% / ეკონომიკური საქმიანობა`.
+
+The 2025 national figure is `5,624,861,932.94` GEL, which is `5.62` at two decimals. (`public_total_gel` and `functional_sum_gel` happen to sum to the identical national figure in 2025 — the per-municipality divergences cancel out. That is a property of this year, not a rule; never rely on it.)
 
 - [ ] **Step 6: Commit**
 
@@ -3987,7 +3989,7 @@ it("makes card 03 a live destination once municipal data is routed", () => {
   expect(card.href).toBe("/explorer/municipalities");
   expect(card.comingSoon).toBe(false);
   expect(card.series).not.toBeNull();
-  expect(card.footer).toBe("2025 · 5.63 მლრდ ₾");
+  expect(card.footer).toBe("2025 · 5.62 მლრდ ₾");
 });
 ```
 
