@@ -1,0 +1,235 @@
+import type {
+  MunicipalFunction,
+  MunicipalFunctionFact,
+  MunicipalTotalFact,
+  MunicipalWarningType,
+} from "../data/municipal/types";
+import type { SourceDocumentRow } from "../data/sources";
+import type { ExplorerTableRow, SourceMetadata } from "./types";
+import { MAX_CHART_SERIES } from "./types";
+import { colorForItem, INK } from "./colors";
+
+// Model layer for the municipalities section.
+//
+// It produces the SAME shapes the budget explorer's chart and table already
+// consume (ExplorerTableRow, and ChartSeries built from it), so those components
+// are reused untouched. It deliberately does not go through buildExplorerModel:
+// that model is built around sides, groupings and a national item×year grain,
+// while this one is municipality×function×year with two separate totals.
+
+export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
+
+export type MunicipalWarning = {
+  year: number;
+  type: MunicipalWarningType;
+  amountGel: number | null;
+};
+
+export type MunicipalEntityModel = {
+  years: number[];
+  rows: ExplorerTableRow[];
+  totalRow: ExplorerTableRow;
+  /**
+   * public_total_gel by year — the official MoF headline. Kept apart from
+   * totalRow (the sum of the ten served functions) because they are different
+   * measures and must never be reconciled by adjusting a category.
+   */
+  officialTotalByYear: Record<number, number>;
+  warnings: MunicipalWarning[];
+};
+
+export type MunicipalEntityInput = {
+  functions: MunicipalFunction[];
+  functionFacts: MunicipalFunctionFact[];
+  totalFacts: MunicipalTotalFact[];
+  sourceDocuments: SourceDocumentRow[];
+  startYear: number;
+  endYear: number;
+};
+
+/**
+ * Collapse many municipalities' facts into one entity's, for a region roll-up.
+ * Called on the SERVER so a region page ships ~110 function rows like a
+ * municipality page does, rather than up to twelve times that.
+ *
+ * Both totals are summed independently — never reconcile one against the other.
+ */
+export function aggregateFactsForEntity(
+  entityId: string,
+  functionFacts: MunicipalFunctionFact[],
+  totalFacts: MunicipalTotalFact[],
+): { functionFacts: MunicipalFunctionFact[]; totalFacts: MunicipalTotalFact[] } {
+  const functionByKey = new Map<string, MunicipalFunctionFact>();
+  for (const row of functionFacts) {
+    const key = `${row.year}|${row.categoryId}`;
+    const existing = functionByKey.get(key);
+    if (existing) {
+      existing.amountGel += row.amountGel;
+      continue;
+    }
+    functionByKey.set(key, { ...row, municipalityCode: entityId });
+  }
+
+  const totalByYear = new Map<number, MunicipalTotalFact>();
+  for (const row of totalFacts) {
+    const existing = totalByYear.get(row.year);
+    if (existing) {
+      existing.publicTotalGel += row.publicTotalGel;
+      existing.functionalSumGel += row.functionalSumGel;
+      // A roll-up's own two totals reconcile, so it carries no warning of its
+      // own; region pages suppress the callout anyway (see the UI spec §8.2).
+      continue;
+    }
+    totalByYear.set(row.year, {
+      ...row,
+      municipalityCode: entityId,
+      showWarning: false,
+      warningType: "none",
+      warningAmountGel: null,
+      reconciliationDifferenceGel: null,
+    });
+  }
+
+  return {
+    functionFacts: Array.from(functionByKey.values()),
+    totalFacts: Array.from(totalByYear.values()),
+  };
+}
+
+function sourceMetadataFor(sourceId: string, sources: Map<string, SourceDocumentRow>): SourceMetadata {
+  const source = sources.get(sourceId);
+  return {
+    sourceName: source?.sourceName ?? "",
+    sourceUrlOrFile: source?.sourceUrlOrFile ?? "",
+    lastReviewedAt: source?.lastReviewedAt ?? "",
+  };
+}
+
+function changeBetween(start: number | null, end: number | null): number | null {
+  if (start === null || end === null || start === 0) return null;
+  return (end - start) / start;
+}
+
+export function buildMunicipalEntityModel(input: MunicipalEntityInput): MunicipalEntityModel {
+  const { functions, functionFacts, totalFacts, sourceDocuments, startYear, endYear } = input;
+
+  const sources = new Map(sourceDocuments.map((source) => [source.sourceId, source]));
+  const years = Array.from(new Set(totalFacts.map((row) => row.year)))
+    .filter((year) => year >= startYear && year <= endYear)
+    .sort((a, b) => a - b);
+  const inRange = new Set(years);
+
+  const amounts = new Map<string, number>();
+  const sourceIds = new Map<string, string>();
+  for (const row of functionFacts) {
+    if (!inRange.has(row.year)) continue;
+    const key = `${row.categoryId}|${row.year}`;
+    amounts.set(key, (amounts.get(key) ?? 0) + row.amountGel);
+    sourceIds.set(key, row.sourceId);
+  }
+
+  const functionalSumByYear: Record<number, number> = {};
+  const officialTotalByYear: Record<number, number> = {};
+  // Per-year, like sourceIds above — source_id genuinely varies by year (a
+  // municipality's early years come from the portal archive, later ones from
+  // MoF workbooks), so this cannot collapse to a single totalFacts[0] lookup.
+  const totalSourceIdByYear = new Map<number, string>();
+  const warnings: MunicipalWarning[] = [];
+  for (const row of totalFacts) {
+    if (!inRange.has(row.year)) continue;
+    functionalSumByYear[row.year] = (functionalSumByYear[row.year] ?? 0) + row.functionalSumGel;
+    officialTotalByYear[row.year] = (officialTotalByYear[row.year] ?? 0) + row.publicTotalGel;
+    totalSourceIdByYear.set(row.year, row.sourceId);
+    if (row.showWarning) {
+      warnings.push({ year: row.year, type: row.warningType, amountGel: row.warningAmountGel });
+    }
+  }
+  warnings.sort((left, right) => left.year - right.year);
+
+  const firstYear = years[0];
+  const lastYear = years.at(-1);
+
+  const ordered = functions.slice().sort((left, right) => left.sortOrder - right.sortOrder);
+
+  const rows: ExplorerTableRow[] = ordered.map((fn, index) => {
+    const valuesByYear: Record<number, number | null> = {};
+    const basisByYear: Record<number, "actual" | "planned"> = {};
+    const sourceByYear: Record<number, SourceMetadata> = {};
+
+    for (const year of years) {
+      const key = `${fn.id}|${year}`;
+      // The dataset is dense, so a missing key means the year is genuinely
+      // outside coverage — null, not zero. A served zero stays zero.
+      valuesByYear[year] = amounts.has(key) ? amounts.get(key)! : null;
+      basisByYear[year] = "actual";
+      sourceByYear[year] = sourceMetadataFor(sourceIds.get(key) ?? "", sources);
+    }
+
+    const endValue = lastYear === undefined ? null : valuesByYear[lastYear] ?? null;
+    const endTotal = lastYear === undefined ? null : functionalSumByYear[lastYear] ?? null;
+
+    return {
+      itemId: fn.id,
+      parentItemId: null,
+      level: "municipal_function",
+      detailLabel: null,
+      kaLabel: fn.kaLabel,
+      enLabel: fn.kaLabel,
+      color: colorForItem(fn.id, index),
+      basisByYear,
+      sourceByYear,
+      valuesByYear,
+      change: changeBetween(
+        firstYear === undefined ? null : valuesByYear[firstYear] ?? null,
+        endValue,
+      ),
+      shareEndYear: endValue !== null && endTotal ? endValue / endTotal : null,
+    };
+  });
+
+  const totalValuesByYear: Record<number, number | null> = {};
+  const totalBasisByYear: Record<number, "actual" | "planned"> = {};
+  const totalSourceByYear: Record<number, SourceMetadata> = {};
+  for (const year of years) {
+    totalValuesByYear[year] = functionalSumByYear[year] ?? null;
+    totalBasisByYear[year] = "actual";
+    totalSourceByYear[year] = sourceMetadataFor(totalSourceIdByYear.get(year) ?? "", sources);
+  }
+
+  const totalRow: ExplorerTableRow = {
+    itemId: MUNICIPAL_TOTAL_ITEM_ID,
+    parentItemId: null,
+    level: "total",
+    detailLabel: null,
+    kaLabel: "სულ",
+    enLabel: "Total",
+    color: INK,
+    basisByYear: totalBasisByYear,
+    sourceByYear: totalSourceByYear,
+    valuesByYear: totalValuesByYear,
+    change: changeBetween(
+      firstYear === undefined ? null : totalValuesByYear[firstYear] ?? null,
+      lastYear === undefined ? null : totalValuesByYear[lastYear] ?? null,
+    ),
+    shareEndYear: 1,
+  };
+
+  return { years, rows, totalRow, officialTotalByYear, warnings };
+}
+
+/**
+ * Top five functions by latest-year value. Derived totals are never selectable
+ * series (AGENTS.md "UX and Visual Guardrails") — the total lives in the table's
+ * სულ row and the KPI, which is why the design file's pinned __total entry is
+ * deliberately not reproduced.
+ */
+export function getDefaultMunicipalSelection(model: MunicipalEntityModel): string[] {
+  const lastYear = model.years.at(-1);
+  if (lastYear === undefined) return [];
+
+  return model.rows
+    .slice()
+    .sort((left, right) => (right.valuesByYear[lastYear] ?? 0) - (left.valuesByYear[lastYear] ?? 0))
+    .slice(0, Math.min(5, MAX_CHART_SERIES))
+    .map((row) => row.itemId);
+}
