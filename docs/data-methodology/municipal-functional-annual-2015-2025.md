@@ -24,9 +24,9 @@ the decision point. The operation is safe by construction — one transaction, p
 before commit, rollback on any mismatch — and production keeps serving the previous build if the
 workflow goes red.
 
-No page or route reads this data. `apps/web/lib/explorer/sections.ts` keeps
-`municipalities: { href: null }`, and the sidebar/hub keep the `მალე` marker (`DESIGN.md`
-§6.7); that stays until a future UI spec ships the route.
+This data is served in production: `/explorer/municipalities` (index), 64 municipality pages,
+and 11 region roll-up pages, reachable from the sidebar and hub card 03 (`DESIGN.md` §6.7,
+§20). The index's map is region-grain (ADM1); see "Region shape join" below.
 
 The six selected-detail rows (`7.1.1`, `7.4.5.1`, `7.5.1`, `7.8.1`, `7.8.2`, `7.9.1`; 4,554 rows
 in the prepared package below) are deliberately not imported — not an oversight. Dropping them
@@ -72,17 +72,57 @@ and `64` (Akhalgori). Source review established that these are budgets of Georgi
 bodies operating outside the occupied territories and serving displaced communities, not
 territorially attributable expenditure delivered inside those occupied municipalities. By
 user decision, all five codes are excluded from the public registry, both served fact files,
-regional aggregates, rankings, and the future municipalities UI. The raw research package,
+regional aggregates, rankings, and the municipalities UI. The raw research package,
 official workbooks, manifests, hashes, and validation report remain unchanged for provenance.
 
 With code `05` excluded, `region.abkhazia` has no served municipality and is omitted from the
-municipal data taxonomy. Occupied territory may still appear in future map geometry with an
-explicit no-data treatment. The Adjara regional roll-up continues to exclude the autonomous
-republic's own budget, which is outside this package entirely.
+municipal data taxonomy. Occupied territory appears in the shipped map geometry as an explicit
+no-data shape (see "Region shape join" below). The Adjara regional roll-up continues to exclude
+the autonomous republic's own budget, which is outside this package entirely.
 
-The map-shape join (matching each municipality to a map boundary) is deferred to the future UI
-spec and is not part of what is served here; see
-`docs/superpowers/specs/2026-08-02-municipal-data-serving-layer-design.md` §4.3.
+### Region shape join
+
+The municipalities UI (`/explorer/municipalities`) renders a region-grain choropleth, not a
+municipality-grain one: no openly-licensed ADM2 (municipality-level) geometry matches this
+package's 64-unit registry, so the join here stops at the 11 data-bearing regions and a
+municipality-grain map is deferred to a future spec.
+
+Region geometry is **geoBoundaries `gbOpen` GEO ADM1, release `9469f09`, CC BY 3.0** (source:
+`commons.wikimedia.org`). It replaced GADM, which permits non-commercial use but forbids
+redistribution — publishing a map ships the coordinates to every visitor's browser, which is
+redistribution. CC BY 3.0 permits that but requires attribution; the index page's source note
+and `apps/web/lib/landing/georgiaGeo.ts`'s header comment both carry it.
+
+The join is keyed on geoBoundaries' **`shapeISO`**, never `shapeName`: geoBoundaries spells
+Samtskhe-Javakheti with an en dash and names `GE-RL` "Racha-Lechkhumi and Kvemo Svaneti", neither
+of which matches this package's region labels, so a name join would fail silently on exactly
+those two. The join table (`apps/web/lib/explorer/municipalGeo.ts`,
+`REGION_ID_BY_SHAPE_ISO`) is exhaustive over all 12 shapes:
+
+| `shapeISO` | English name | Resolves to |
+| --- | --- | --- |
+| `GE-TB` | Tbilisi | `region.tbilisi` |
+| `GE-AJ` | Adjara | `region.adjara` |
+| `GE-GU` | Guria | `region.guria` |
+| `GE-IM` | Imereti | `region.imereti` |
+| `GE-KA` | Kakheti | `region.kakheti` |
+| `GE-MM` | Mtskheta-Mtianeti | `region.mtskheta_mtianeti` |
+| `GE-RL` | Racha-Lechkhumi and Kvemo Svaneti | `region.racha_lechkhumi_kvemo_svaneti` |
+| `GE-SZ` | Samegrelo-Zemo Svaneti | `region.samegrelo_zemo_svaneti` |
+| `GE-SJ` | Samtskhe-Javakheti | `region.samtskhe_javakheti` |
+| `GE-KK` | Kvemo Kartli | `region.kvemo_kartli` |
+| `GE-SK` | Shida Kartli | `region.shida_kartli` |
+| `GE-AB` | Abkhazia | no data (`occupied_territory`) — `region.abkhazia` has no served municipality (above) |
+
+Every shape resolves to a region or to a stated no-data reason, and every one of the 11
+data-bearing regions resolves to exactly one shape — `buildRegionShapes()` throws at build time
+on any unmapped shape, and both directions are covered by `tests/explorer/municipalGeo.test.ts`
+and by `npm run data:validate`.
+
+Shida Kartli and Mtskheta-Mtianeti render as ordinary data-bearing shapes even though the
+Tskhinvali region is not a separate ADM1 shape (it lies de jure inside both) — their totals
+exclude the four affected municipal bodies (`42`, `43`, `46`, `64`) named above, a caveat that
+lives in the region page's source note as text, since it cannot be carried by a map colour.
 
 ### Population — not imported
 

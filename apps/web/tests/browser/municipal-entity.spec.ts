@@ -217,3 +217,113 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
     expect(lastYearValue).toBeGreaterThan(50);
   });
 });
+
+// Task 14: the full municipality-page e2e coverage the header comment above
+// defers to this task ("Full section e2e coverage is Task 14's").
+test.describe("municipality page", () => {
+  test("switches between chart and table", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await page.getByTestId("municipal-mode-table").click();
+    const table = page.getByTestId("explorer-table");
+    await expect(table).toBeVisible();
+    // The regression this guards: in billions every municipal cell reads 0.00.
+    // Checked cell by cell, not as a substring of the table's full text: this
+    // municipality's თავდაცვა (defence) row is genuinely 0.0 for every loaded
+    // year, and eleven adjacent, individually-correct "0.0" cells concatenate
+    // to "...0.00.00.0...", which itself contains "0.00" — a naive substring
+    // check on the whole table would fail here even though every cell is
+    // individually correct. UNIT_MLN always renders exactly one decimal, so a
+    // real cell can never be the two-decimal string "0.00".
+    const cells = await table.locator("tbody td").allTextContents();
+    for (const cell of cells) {
+      expect(cell).not.toBe("0.00");
+    }
+  });
+
+  test("enforces the six-series chart cap", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    const rows = page.getByTestId("municipal-series-row");
+    for (let index = 0; index < 10; index += 1) {
+      const row = rows.nth(index);
+      if ((await row.getAttribute("aria-pressed")) === "false") await row.click();
+    }
+    await expect(page.getByTestId("municipal-series-limit")).toBeVisible();
+  });
+
+  test("shows the divergence callout only where the data diverges", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expect(page.getByTestId("divergence-callout")).toBeVisible();
+    // თელავი is municipality code 15, not 22 (verified against
+    // data/imports/municipalities.csv) — show_warning is false for all of its
+    // loaded years, so its page never renders the callout.
+    await page.goto("http://localhost:3100/explorer/municipalities/15");
+    await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
+  });
+
+  test("opens the entity picker with the keyboard", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await page.keyboard.press("Control+k");
+    await expect(page.getByTestId("entity-picker")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("entity-picker")).toHaveCount(0);
+  });
+
+  test("keeps the picker popover out of the heading", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await page.keyboard.press("Control+k");
+    // A role="dialog" inside an h1 is announced as part of the heading.
+    await expect(page.locator("h1 [data-testid='entity-picker']")).toHaveCount(0);
+    await expect(page.locator("h1 [data-testid='entity-picker-trigger']")).toHaveCount(1);
+  });
+
+  test("filters the series list and clears the selection", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await page.getByTestId("municipal-series-search").fill("განათლება");
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(1);
+    await page.getByTestId("municipal-series-search").fill("");
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(10);
+    await page.getByTestId("municipal-series-all").click();
+    await expect(page.getByTestId("municipal-series-row").first()).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("selects every function in table mode", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await page.getByTestId("municipal-mode-table").click();
+    await page.getByTestId("municipal-series-all").click();
+    // Table mode has no six-series cap, so select-all must leave all ten rows
+    // pressed. Asserting the count of pressed rows is the point of this test:
+    // a locator on its own is always truthy and would pass unconditionally.
+    // aria-pressed lives on the row element itself, not a descendant, so this
+    // is a compound attribute selector rather than `.filter({ has })` — `has`
+    // only matches a DESCENDANT of the outer locator, and would silently find
+    // zero rows here regardless of how many are actually pressed.
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(10);
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(10);
+    await expect(page.getByTestId("municipal-series-all")).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("offers a CSV download", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    const download = page.waitForEvent("download");
+    await page.getByTestId("municipal-csv").click();
+    expect((await download).suggestedFilename()).toMatch(/^geodata-municipality-04-\d{4}-\d{4}\.csv$/);
+  });
+
+  test("recomputes the period comparison when the range moves", async ({ page }) => {
+    // The regression this guards: filtering years without rebuilding the model,
+    // so ცვლილება and the comparison table describe the full span while the
+    // chart describes the selection.
+    await page.goto(ENTITY_URL);
+    const before = await page.getByTestId("comparison-table").innerText();
+    await page.goto(`${ENTITY_URL}#m=line&r=2020-2025&sel=municipal.education`);
+    await page.reload();
+    // The server always renders the default range first — a URL hash is never
+    // sent in the request — so the hash-restored range lands only after
+    // client-side hydration runs. Wait for it to actually show in the DOM
+    // before reading the table; an immediate innerText() can capture that
+    // pre-hydration snapshot and compare the default range against itself.
+    await expect(page.getByTestId("comparison-table").locator("thead th").nth(1)).toHaveText("2020");
+    const after = await page.getByTestId("comparison-table").innerText();
+    expect(after).not.toBe(before);
+  });
+});

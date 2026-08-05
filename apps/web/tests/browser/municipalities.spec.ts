@@ -75,3 +75,42 @@ test("focusing a list row highlights the map, matching mouse hover", async ({ pa
   await page.getByTestId("municipal-list-row").first().blur();
   await expect(readout).toHaveText("გადაატარე კურსორი რუკაზე");
 });
+
+// Task 14: the full index-page e2e coverage the header comment above defers
+// to this task ("Full section e2e coverage is Task 14's").
+test.describe("municipalities index", () => {
+  test("renders the region map with an explicit no-data shape", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await expect(page.getByTestId("region-map")).toBeVisible();
+    await expect(page.locator("[data-testid^='region-shape-']")).toHaveCount(12);
+    await expect(page.getByTestId("region-shape-GE-AB")).toHaveAttribute("data-no-data", "true");
+    await expect(page.locator("[data-testid^='self-gov-city-']")).toHaveCount(5);
+  });
+
+  test("lists all municipalities and switches grain", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
+    await page.getByTestId("level-region").click();
+    await expect(page.getByTestId("municipal-list-row")).toHaveCount(11);
+    await expect(page).toHaveURL(/#lvl=region/);
+  });
+
+  test("filters and clears the search", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.getByTestId("municipal-search").fill("თელავი");
+    await expect(page.getByTestId("municipal-list-row")).toHaveCount(1);
+    await page.getByTestId("municipal-search").fill("ზზზზ");
+    await expect(page.getByTestId("municipal-empty")).toBeVisible();
+  });
+
+  test("opens a municipality from the list", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.getByTestId("municipal-list-row").first().click();
+    await expect(page).toHaveURL(/\/explorer\/municipalities\/04$/);
+  });
+
+  test("shows four KPIs", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await expect(page.getByTestId("index-kpi")).toHaveCount(4);
+  });
+});

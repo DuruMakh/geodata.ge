@@ -81,3 +81,17 @@ test.describe("entity picker region options resolve (previously 404)", () => {
     await expect(page.getByTestId("entity-picker-trigger")).toContainText("იმერეთის");
   });
 });
+
+// Task 14: the full region-page e2e coverage the header comment above defers
+// to this task ("Full section e2e coverage is Task 14's"). This necessarily
+// overlaps in substance with the two targeted tests above — those pin specific
+// past defects (the source note and the picker's region options), this is the
+// page's general contract.
+test.describe("region page", () => {
+  test("lists its member municipalities and carries the roll-up caveats", async ({ page }) => {
+    await page.goto(REGION_URL);
+    await expect(page.getByTestId("region-member-row")).toHaveCount(12);
+    await expect(page.getByTestId("municipal-source-note").first()).toContainText("აჭარის ავტონომიური რესპუბლიკის");
+    await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
+  });
+});
