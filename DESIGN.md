@@ -365,6 +365,8 @@ Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: redu
 
 All three sparklines are `ink` because each traces a **total** (a side total for cards 01/02, the municipal total for card 03), and §4.2 gives every `*.total` series `ink`. `accent` is not free chrome here: `#B3402A` is the token of `spending.social_protection` and `revenue.vat`, so an accent total would draw one quantity in another category's color.
 
+Every figure on the hub — series, footers and card 03's description counts alike — is computed at build time from the same served facts the section pages use, so the hub cannot drift from the pages behind it. Nothing on it is hardcoded.
+
 ## 7. Core Components
 
 Specs below are contracts; visual proof lives in the reference files.

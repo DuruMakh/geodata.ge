@@ -56,6 +56,7 @@ function categoryCount(facts: ServedBudgetFact[], side: "expenditure" | "revenue
 export function buildHubCards(
   facts: ServedBudgetFact[],
   municipalTotals: Map<number, number>,
+  municipalCounts: { municipalities: number; regions: number },
 ): HubCardModel[] {
   const expenditure = totalsByYear(facts, "expenditure");
   const revenue = totalsByYear(facts, "revenue");
@@ -109,7 +110,7 @@ export function buildHubCards(
     {
       index: "03",
       title: BUDGET_SECTIONS.municipalities.label,
-      description: "64 მუნიციპალიტეტი და 11 რეგიონი — რაში იხარჯება ადგილობრივი ბიუჯეტები.",
+      description: `${municipalCounts.municipalities} მუნიციპალიტეტი და ${municipalCounts.regions} რეგიონი — რაში იხარჯება ადგილობრივი ბიუჯეტები.`,
       href: BUDGET_SECTIONS.municipalities.href,
       comingSoon: BUDGET_SECTIONS.municipalities.href === null,
       series: municipal.series,

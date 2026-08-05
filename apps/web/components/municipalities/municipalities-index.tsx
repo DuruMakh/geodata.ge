@@ -38,8 +38,13 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
 
   useEffect(() => {
     try {
-      // Clearing the hash must restore the path, not write a literal space.
-      history.replaceState(null, "", level === "region" ? "#lvl=region" : window.location.pathname);
+      // Clearing the hash must restore the path (and any query string), not
+      // write a literal space or silently drop `?...`.
+      history.replaceState(
+        null,
+        "",
+        level === "region" ? "#lvl=region" : `${window.location.pathname}${window.location.search}`,
+      );
     } catch {
       // History can be unavailable in embedded contexts; the UI still works.
     }

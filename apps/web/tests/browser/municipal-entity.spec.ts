@@ -326,4 +326,37 @@ test.describe("municipality page", () => {
     const after = await page.getByTestId("comparison-table").innerText();
     expect(after).not.toBe(before);
   });
+
+  // Whole-branch review finding: municipalities is the first section with
+  // child routes, so `pathname === section.href` alone never matched on a
+  // municipality sub-page and the sidebar carried no active state at all —
+  // no accent marker, no aria-current — even though the reader is inside the
+  // section. main-explorer.spec.ts already pins this on the index; this pins
+  // it one level deeper, on an actual municipality page.
+  test("the sidebar keeps მუნიციპალიტეტები highlighted on a municipality sub-page, not just the index", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+
+    const sidebar = page.getByTestId("data-sidebar");
+    const municipalitiesLink = sidebar.getByTestId("section-link-municipalities");
+    await expect(municipalitiesLink).toHaveAttribute("aria-current", "page");
+    // No other section row should also claim to be current.
+    await expect(sidebar.getByTestId("section-link-expenditure")).not.toHaveAttribute("aria-current", "page");
+  });
+
+  // Whole-branch review finding: the comparison table's header hardcoded the
+  // revenue scope's column label ("საბიუჯეტო მუხლი") even though its rows are
+  // municipal functions, so the same page named the same column two different
+  // ways. Comparing the two tables to each other (not just to a literal) means
+  // a future edit that moves one label without the other fails here too.
+  test("the chart-mode table and the period-comparison table label their first column the same way", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await page.getByTestId("municipal-mode-table").click();
+
+    const explorerHeader = page.getByTestId("explorer-table").locator("thead th").first();
+    const comparisonHeader = page.getByTestId("comparison-table").locator("thead th").first();
+
+    await expect(explorerHeader).toHaveText("ფუნქცია");
+    await expect(comparisonHeader).toHaveText("ფუნქცია");
+    expect(await comparisonHeader.innerText()).toBe(await explorerHeader.innerText());
+  });
 });

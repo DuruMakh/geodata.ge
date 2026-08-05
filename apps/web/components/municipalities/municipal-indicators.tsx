@@ -91,7 +91,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, startYear, endYe
           <table data-testid="comparison-table" className="w-full border-collapse" style={{ minWidth: 560 }}>
             <thead>
               <tr>
-                {["საბიუჯეტო მუხლი", String(startYear), "ცვლილება", String(endYear)].map((label, index) => (
+                {["ფუნქცია", String(startYear), "ცვლილება", String(endYear)].map((label, index) => (
                   <th
                     key={label}
                     className={`border-b-2 border-[var(--ink)] pb-[7px] text-[10px] font-semibold uppercase tracking-[0.05em] text-[var(--muted)] ${

@@ -22,13 +22,16 @@ export const metadata: Metadata = {
 
 export default async function ExplorerHubPage() {
   const { facts, sourceDocuments } = await loadServedLandingData();
-  const { totalFacts } = await loadServedMunicipalData();
+  const { totalFacts, municipalities, regions } = await loadServedMunicipalData();
   const municipalTotals = new Map<number, number>();
   for (const row of totalFacts) {
     municipalTotals.set(row.year, (municipalTotals.get(row.year) ?? 0) + row.publicTotalGel);
   }
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
-  const cards = buildHubCards(facts, municipalTotals);
+  const cards = buildHubCards(facts, municipalTotals, {
+    municipalities: municipalities.length,
+    regions: regions.length,
+  });
   const years = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
   const coverage = [
     years.length > 0 ? `${years[0]}–${years.at(-1)}` : "",
