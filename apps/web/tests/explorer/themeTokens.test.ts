@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { MAP_NO_DATA_FILL, MAP_RAMP } from "../../lib/explorer/colors";
 
 const globalsCss = readFileSync(join(process.cwd(), "app", "globals.css"), "utf8");
 
@@ -122,5 +123,49 @@ describe("editorial design system tokens", () => {
     expect(globalsCss).not.toContain("#0071e3");
     expect(globalsCss).not.toContain('[data-theme="night"]');
     expect(globalsCss).not.toContain("gradient");
+  });
+});
+
+describe("map focus ring", () => {
+  // Regression coverage for the review finding on d09613e: the region map's
+  // focus ring reused the app-wide translucent --accent, which is invisible
+  // on the two darkest-bucket regions because MAP_RAMP's own last step IS
+  // --accent (the composited ring is byte-identical to the fill). Pins two
+  // things a future edit could silently break: the ring colour itself, and
+  // the fact that only the map's dedicated selector changed.
+
+  it("keeps --map-focus-ring above the WCAG 3:1 non-text floor on every surface it can land on", () => {
+    const ring = token("--map-focus-ring");
+    const paper = token("--paper");
+
+    // The ring draws around each focused shape's bounding box, so it can
+    // land on: the shape's own fill (any MAP_RAMP step), a neighbouring
+    // shape's fill (any other MAP_RAMP step, or MAP_NO_DATA_FILL for a shape
+    // bordering occupied-territory Abkhazia), or --paper at the map's edge.
+    // All eight must clear 3:1 (WCAG 1.4.11 / 2.4.11).
+    for (const surface of [...MAP_RAMP, MAP_NO_DATA_FILL, paper]) {
+      expect(contrastRatio(ring, surface), `${ring} vs ${surface}`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("is solid, not a translucent copy of --accent", () => {
+    // A translucent colour is exactly how the old ring went invisible: this
+    // guards against reintroducing an rgba()/alpha value for this token.
+    expect(globalsCss).toMatch(/--map-focus-ring:\s*#[0-9A-Fa-f]{6};/);
+  });
+
+  it("is wired to the map only, through a dedicated data attribute", () => {
+    expect(globalsCss).toContain(
+      "[data-focus-map]:focus-visible {\n  outline: 2px solid var(--map-focus-ring);\n  outline-offset: 2px;\n}",
+    );
+    // The bare element-type selector this used to be is gone, so nothing
+    // outside the map can silently inherit a ring tuned for the ramp.
+    expect(globalsCss).not.toContain("path:focus-visible,\ncircle:focus-visible");
+  });
+
+  it("leaves the app-wide button/select/input ring untouched", () => {
+    expect(globalsCss).toContain(
+      "button:focus-visible,\nselect:focus-visible,\ninput:focus-visible {\n  outline: 2px solid rgba(179, 64, 42, 0.4);\n  outline-offset: 2px;\n}",
+    );
   });
 });

@@ -18,10 +18,17 @@ test("region shapes and city markers are keyboard-focusable and activate on Ente
 
   const outline = await region.evaluate((el) => {
     const style = getComputedStyle(el as Element);
-    return { style: style.outlineStyle, width: style.outlineWidth };
+    return { style: style.outlineStyle, width: style.outlineWidth, color: style.outlineColor };
   });
   expect(outline.style).toBe("solid");
   expect(outline.width).not.toBe("0px");
+  // Pins the actual rendered colour, not just "some outline exists": the
+  // finding this closes is that the ring was rgba(179, 64, 42, 0.4) — a
+  // translucent --accent that composites to the same colour as the ramp's
+  // own darkest step (MAP_RAMP[5] IS --accent) and disappears. --map-focus-
+  // ring is solid black, verified >=3:1 against every ramp step,
+  // MAP_NO_DATA_FILL and --paper in tests/explorer/themeTokens.test.ts.
+  expect(outline.color).toBe("rgb(0, 0, 0)");
 
   const scrollBefore = await page.evaluate(() => window.scrollY);
   await page.keyboard.press("Space");
@@ -34,6 +41,13 @@ test("region shapes and city markers are keyboard-focusable and activate on Ente
   const city = page.locator('[data-testid^="self-gov-city-"]').first();
   await city.focus();
   await expect(city).toBeFocused();
+  const cityOutline = await city.evaluate((el) => {
+    const style = getComputedStyle(el as Element);
+    return { style: style.outlineStyle, width: style.outlineWidth, color: style.outlineColor };
+  });
+  expect(cityOutline.style).toBe("solid");
+  expect(cityOutline.width).not.toBe("0px");
+  expect(cityOutline.color).toBe("rgb(0, 0, 0)");
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/explorer\/municipalities\/[^/]+$/);
 });

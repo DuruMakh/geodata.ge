@@ -17,6 +17,17 @@
   --accent: #B3402A;
   --positive: #1F6E56;
   --negative: #B3402A;
+  /* Focus ring for the municipal choropleth's SVG shapes only (region-map.tsx,
+     [data-focus-map]:focus-visible below). A translucent --accent (the
+     app-wide ring's colour) is invisible there: MAP_RAMP's own darkest step
+     IS --accent, so the composited ring is byte-identical to the fill it
+     sits on. The ring also draws around each shape's bounding box, so it can
+     land on any MAP_RAMP step, MAP_NO_DATA_FILL or --paper — a single flat
+     colour needs to clear 3:1 against all of them at once. Solid black is
+     the simplest colour that does, with real margin (even --ink only just
+     clears the darkest ramp step, ~3.01:1 — too thin to rely on). Verified
+     in tests/explorer/themeTokens.test.ts ("map focus ring"). */
+  --map-focus-ring: #000000;
   --font-display: var(--font-noto-serif-georgian), "Noto Serif Georgian", serif;
   --font-ui: var(--font-noto-sans-georgian), "Noto Sans Georgian", "Helvetica Neue", sans-serif;
   --font-numeric: var(--font-geist-mono), "Geist Mono", var(--font-noto-sans-georgian), monospace;
@@ -83,15 +94,6 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
-/* Same ring for focusable SVG shapes (region map, city dots): button/select/
-   input above are HTML form controls, so an SVG geometry element with
-   tabindex needs its own selector to pick up the same treatment. */
-path:focus-visible,
-circle:focus-visible {
-  outline: 2px solid rgba(179, 64, 42, 0.4);
-  outline-offset: 2px;
-}
-
 /* Same ring, drawn inside the control. For anything inside a clipping container
    — the segmented control's rounded, overflow-hidden group — the outward ring is
    cut away on every side that meets the container's edge, leaving a stray stroke
@@ -100,6 +102,19 @@ circle:focus-visible {
    unlayered declarations beat anything in Tailwind's `utilities` layer. */
 [data-focus-inset]:focus-visible {
   outline-offset: -2px;
+}
+
+/* Focus ring for the region map's SVG shapes (region-map.tsx sets
+   data-focus-map="" on every focusable <path>/<circle>). Scoped to that
+   attribute rather than a bare `path:focus-visible, circle:focus-visible`
+   type selector, and deliberately not the app-wide button/select/input ring
+   above (left untouched — its colour is a separate design-token decision):
+   this map needs its own colour because a translucent --accent disappears
+   against the choropleth's own --accent-coloured ramp step. See
+   --map-focus-ring's definition above for the contrast reasoning. */
+[data-focus-map]:focus-visible {
+  outline: 2px solid var(--map-focus-ring);
+  outline-offset: 2px;
 }
 
 ::selection {

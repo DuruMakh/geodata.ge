@@ -92,10 +92,14 @@ export function RegionMap({
               style={{ cursor: noData ? "default" : "pointer" }}
               // The occupied-territory shape has no data and no action: it must
               // stay out of the tab order rather than be a focus stop that does
-              // nothing, so tabIndex/role/aria-label are omitted entirely.
+              // nothing, so tabIndex/role/aria-label/data-focus-map are omitted
+              // entirely. data-focus-map picks up globals.css's map-only focus
+              // ring (opaque black — a translucent --accent disappears against
+              // this shape's own ramp fill when it's the darkest step).
               tabIndex={noData ? undefined : 0}
               role={noData ? undefined : "button"}
               aria-label={noData ? undefined : accessibleShapeName(shape.nameKa, shape.valueGel)}
+              data-focus-map={noData ? undefined : ""}
               onMouseEnter={() => onHoverRegion(shape.regionId)}
               onMouseLeave={() => onHoverRegion(null)}
               onClick={() => (shape.regionId === null ? undefined : onOpenRegion(shape.regionId))}
@@ -124,6 +128,7 @@ export function RegionMap({
             tabIndex={0}
             role="button"
             aria-label={accessibleShapeName(city.nameKa, city.valueGel)}
+            data-focus-map=""
             onMouseEnter={() => setHoveredCity(city.code)}
             onMouseLeave={() => setHoveredCity(null)}
             onClick={() => onOpenMunicipality(city.code)}
