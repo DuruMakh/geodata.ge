@@ -9,6 +9,7 @@ import {
   buildMovers,
   buildMunicipalEntityModel,
   buildMunicipalListRows,
+  buildPickerGroups,
   getDefaultMunicipalSelection,
   MIXED_PUBLIC_TOTAL_MEASURE,
   MIXED_SOURCE_ID,
@@ -678,6 +679,17 @@ describe("buildEntityKpis", () => {
     expect(kpis()[3]!.value).toBe("50.0%");
   });
 
+  // `rank` is a real input read by this KPI's detail, not dead weight on the
+  // interface: first place reads პირველი, never მე-1 (georgianOrdinal, Task 3).
+  it("names the placement with the georgian ordinal of rank, not just the count it is out of", () => {
+    expect(kpis()[3]!.detail).toBe("პირველი ადგილი 64-დან");
+  });
+
+  it("switches to მე-N for any rank other than first", () => {
+    const fifth = buildEntityKpis({ model: build(), nationalTotalLatest: 740, rank: 5, rankOutOf: 64 });
+    expect(fifth[3]!.detail).toBe("მე-5 ადგილი 64-დან");
+  });
+
   // The default build()'s end year (2017) has official === functional (370 ===
   // 370), so the two tests above cannot tell which total KPI 2 and KPI 3 divide
   // by. Reuse the divergent (2015-2016) build — official 300, functional 265 —
@@ -730,5 +742,38 @@ describe("buildComparisonRows", () => {
     expect(economic.toGel).toBe(300);
     expect(economic.changeGel).toBe(200);
     expect(economic.changeShare).toBeCloseTo(2, 6);
+  });
+});
+
+describe("buildPickerGroups", () => {
+  it("orders regions by value, descending — same order buildMunicipalListRows gives the map/list", () => {
+    const groups = buildPickerGroups(listInput);
+    expect(groups.map((group) => group.regionId)).toEqual(["region.tbilisi", "region.adjara"]);
+  });
+
+  it("orders each region's members by value, descending", () => {
+    const groups = buildPickerGroups(listInput);
+    const adjara = groups.find((group) => group.regionId === "region.adjara")!;
+    // ბათუმი (06, 500M in 2025) outranks ქობულეთი (07, 100M).
+    expect(adjara.members.map((member) => member.code)).toEqual(["06", "07"]);
+  });
+
+  it("carries each member's display name and value, not the registry's legal name", () => {
+    const groups = buildPickerGroups(listInput);
+    const tbilisi = groups.find((group) => group.regionId === "region.tbilisi")!;
+    expect(tbilisi.members).toEqual([{ code: "04", nameKa: "თბილისი", valueGel: 2_000_000_000 }]);
+  });
+
+  it("gives a region its own rolled-up value, not a single member's", () => {
+    const groups = buildPickerGroups(listInput);
+    const adjara = groups.find((group) => group.regionId === "region.adjara")!;
+    // 500M (06) + 100M (07) = 600M — neither constituent alone.
+    expect(adjara.valueGel).toBe(600_000_000);
+  });
+
+  it("covers every region in the taxonomy, each carrying its members", () => {
+    const groups = buildPickerGroups(listInput);
+    expect(groups).toHaveLength(2);
+    expect(groups.every((group) => group.members.length > 0)).toBe(true);
   });
 });

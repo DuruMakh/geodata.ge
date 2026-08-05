@@ -10,6 +10,7 @@ import type { ExplorerTableRow, SourceMetadata } from "./types";
 import { MAX_CHART_SERIES } from "./types";
 import { colorForItem, INK } from "./colors";
 import { formatAmount, formatShare, MISSING } from "./format";
+import { georgianOrdinal } from "./municipalLabels";
 
 // Model layer for the municipalities section.
 //
@@ -528,7 +529,10 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
     {
       label: "წილი მუნიციპალურ ხარჯებში",
       value: nationalTotalLatest > 0 ? formatShare(officialEnd / nationalTotalLatest) : MISSING,
-      detail: `${input.rankOutOf} ერთეულიდან`,
+      // The size-independent placement figure per-capita used to provide
+      // (§6.4) — the ordinal makes that placement legible, not just the count
+      // it is out of.
+      detail: `${georgianOrdinal(input.rank)} ადგილი ${input.rankOutOf}-დან`,
     },
   ];
 }
@@ -580,4 +584,31 @@ export function buildComparisonRows(model: MunicipalEntityModel): MunicipalCompa
   const functions = sortedByEndYear(model.rows, endYear).map((row) => rowFor(row, false));
 
   return [rowFor(model.totalRow, true), ...functions];
+}
+
+export type EntityPickerGroupModel = {
+  regionId: string;
+  nameKa: string;
+  valueGel: number;
+  members: Array<{ code: string; nameKa: string; valueGel: number }>;
+};
+
+/** Picker groups: regions in value order, each with its members in value order. */
+export function buildPickerGroups(input: MunicipalListInput): EntityPickerGroupModel[] {
+  const { municipalities, regions } = buildMunicipalListRows(input);
+  const membersByRegion = new Map<string, Array<{ code: string; nameKa: string; valueGel: number }>>();
+
+  for (const row of municipalities) {
+    if (row.regionId === null) continue;
+    const bucket = membersByRegion.get(row.regionId) ?? [];
+    bucket.push({ code: row.id, nameKa: row.nameKa, valueGel: row.valueGel });
+    membersByRegion.set(row.regionId, bucket);
+  }
+
+  return regions.map((region) => ({
+    regionId: region.id,
+    nameKa: region.nameKa,
+    valueGel: region.valueGel,
+    members: membersByRegion.get(region.id) ?? [],
+  }));
 }
