@@ -94,12 +94,12 @@ redistribution. CC BY 3.0 permits that but requires attribution; the index page'
 and `apps/web/lib/landing/georgiaGeo.ts`'s header comment both carry it.
 
 The join is keyed on geoBoundaries' **`shapeISO`**, never `shapeName`: geoBoundaries spells
-Samtskhe-Javakheti with an en dash and names `GE-RL` "Racha-Lechkhumi and Kvemo Svaneti", neither
-of which matches this package's region labels, so a name join would fail silently on exactly
-those two. The join table (`apps/web/lib/explorer/municipalGeo.ts`,
+Samtskhe–Javakheti with an **en dash** (U+2013) and names `GE-RL` "Racha-Lechkhumi and Kvemo
+Svaneti", neither of which matches this package's region labels, so a name join would fail
+silently on exactly those two. The join table (`apps/web/lib/explorer/municipalGeo.ts`,
 `REGION_ID_BY_SHAPE_ISO`) is exhaustive over all 12 shapes:
 
-| `shapeISO` | English name | Resolves to |
+| `shapeISO` | `shapeName` | Resolves to |
 | --- | --- | --- |
 | `GE-TB` | Tbilisi | `region.tbilisi` |
 | `GE-AJ` | Adjara | `region.adjara` |
@@ -109,7 +109,7 @@ those two. The join table (`apps/web/lib/explorer/municipalGeo.ts`,
 | `GE-MM` | Mtskheta-Mtianeti | `region.mtskheta_mtianeti` |
 | `GE-RL` | Racha-Lechkhumi and Kvemo Svaneti | `region.racha_lechkhumi_kvemo_svaneti` |
 | `GE-SZ` | Samegrelo-Zemo Svaneti | `region.samegrelo_zemo_svaneti` |
-| `GE-SJ` | Samtskhe-Javakheti | `region.samtskhe_javakheti` |
+| `GE-SJ` | Samtskhe–Javakheti | `region.samtskhe_javakheti` |
 | `GE-KK` | Kvemo Kartli | `region.kvemo_kartli` |
 | `GE-SK` | Shida Kartli | `region.shida_kartli` |
 | `GE-AB` | Abkhazia | no data (`occupied_territory`) — `region.abkhazia` has no served municipality (above) |
