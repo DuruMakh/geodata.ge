@@ -391,6 +391,116 @@ describe("aggregateFactsForEntity — fields that must not present one constitue
   });
 });
 
+// Real served data never disagrees here: source_id is uniform within every
+// year across all 64 municipalities (data/imports/municipal-function-facts-
+// 2015-2025.csv and .../municipal-total-facts-2015-2025.csv), so a genuine
+// region never reaches the mixed branch today. That made the FUNCTION-fact
+// loop's own `agreeOrMixed` call on sourceId (municipalData.ts, inside the
+// `for (const row of functionFacts)` merge branch) provably untested by every
+// fixture above it: delete that one line and every existing test still
+// passes, because they all agree on sourceId. Nothing above folds 3 or more
+// constituents either — every prior multi-municipality fixture uses exactly
+// two. Regions are exactly where a real 3+ fold happens. These fixtures are
+// deliberately constructed disagreements, for exactly those two reasons.
+describe("aggregateFactsForEntity — sourceId fold on the FUNCTION-FACT loop", () => {
+  it("merges disagreeing sourceId values on the FUNCTION-FACT loop to the mixed marker, not to either input", () => {
+    const functionFacts: MunicipalFunctionFact[] = [
+      fact(2015, "municipal.economic_affairs", 100), // 04, source.municipal_portal_archive
+      {
+        year: 2015,
+        municipalityCode: "06",
+        categoryId: "municipal.economic_affairs",
+        functionalCode: "7.4",
+        amountGel: 50,
+        basis: "actual",
+        sourceId: "source.municipal_mof_annual_and_history_workbooks",
+      },
+    ];
+
+    const aggregated = aggregateFactsForEntity("region.test", functionFacts, []);
+
+    expect(aggregated.functionFacts).toHaveLength(1);
+    const row = aggregated.functionFacts[0]!;
+    expect(row.amountGel).toBe(150);
+    expect(row.sourceId).not.toBe("source.municipal_portal_archive");
+    expect(row.sourceId).not.toBe("source.municipal_mof_annual_and_history_workbooks");
+    expect(row.sourceId).toBe(MIXED_SOURCE_ID);
+  });
+
+  it("keeps the mixed marker once set, even when a third constituent's sourceId agrees with an earlier one — a fold across 3+ constituents", () => {
+    const functionFacts: MunicipalFunctionFact[] = [
+      fact(2015, "municipal.economic_affairs", 100), // 04, source.municipal_portal_archive
+      {
+        year: 2015,
+        municipalityCode: "06",
+        categoryId: "municipal.economic_affairs",
+        functionalCode: "7.4",
+        amountGel: 50,
+        basis: "actual",
+        sourceId: "source.municipal_mof_annual_and_history_workbooks", // disagrees with 04 -> mixes the group
+      },
+      {
+        year: 2015,
+        municipalityCode: "07",
+        categoryId: "municipal.economic_affairs",
+        functionalCode: "7.4",
+        amountGel: 20,
+        basis: "actual",
+        sourceId: "source.municipal_portal_archive", // agrees with municipality 04 ALONE, not with the now-mixed group
+      },
+    ];
+
+    const aggregated = aggregateFactsForEntity("region.test", functionFacts, []);
+
+    const row = aggregated.functionFacts[0]!;
+    expect(row.amountGel).toBe(170);
+    // A fold that compared each incoming row only against the FIRST inserted
+    // value (rather than the running, already-mixed group value) would wrongly
+    // "unmix" back to municipality 04's sourceId here, since row 3 agrees with
+    // row 1. It must not: once mixed, always mixed for this group.
+    expect(row.sourceId).toBe(MIXED_SOURCE_ID);
+  });
+
+  it("carries a three-way agreeing sourceId through unchanged — the mixed marker only appears on genuine disagreement", () => {
+    const functionFacts: MunicipalFunctionFact[] = [
+      fact(2015, "municipal.economic_affairs", 100),
+      { ...fact(2015, "municipal.economic_affairs", 50), municipalityCode: "06" },
+      { ...fact(2015, "municipal.economic_affairs", 20), municipalityCode: "07" },
+    ];
+
+    const aggregated = aggregateFactsForEntity("region.test", functionFacts, []);
+
+    const row = aggregated.functionFacts[0]!;
+    expect(row.amountGel).toBe(170);
+    expect(row.sourceId).toBe("source.municipal_portal_archive");
+    expect(row.sourceId).not.toBe(MIXED_SOURCE_ID);
+  });
+});
+
+describe("aggregateFactsForEntity — sourceId fold on the TOTAL-FACT loop, isolated from publicTotalMeasure", () => {
+  // The existing publicTotalMeasure-mixing tests above (BATUMI_2024/KHULO_2024)
+  // never actually exercise a sourceId disagreement — both fixtures share the
+  // same sourceId, so MIXED_SOURCE_ID (imported at the top of this file) was
+  // never once asserted to be the ACTUAL result of a merge before this test.
+  it("merges disagreeing sourceId values to the mixed marker even when publicTotalMeasure agrees", () => {
+    const totalFacts: MunicipalTotalFact[] = [
+      total(2015, 160, 160),
+      { ...total(2015, 90, 80), municipalityCode: "06", sourceId: "source.municipal_mof_annual_and_history_workbooks" },
+    ];
+
+    const aggregated = aggregateFactsForEntity("region.test", [], totalFacts);
+
+    const row = aggregated.totalFacts[0]!;
+    // publicTotalMeasure agrees ("total_payments" on both inputs), so it must
+    // stay a real value — proving the two string fields fold independently,
+    // not as one bundled "something disagreed" flag.
+    expect(row.publicTotalMeasure).toBe("total_payments");
+    expect(row.sourceId).not.toBe("source.municipal_portal_archive");
+    expect(row.sourceId).not.toBe("source.municipal_mof_annual_and_history_workbooks");
+    expect(row.sourceId).toBe(MIXED_SOURCE_ID);
+  });
+});
+
 const MUNICIPALITIES: Municipality[] = [
   { code: "04", sortId: 1, nameKa: "ქალაქ თბილისის მუნიციპალიტეტი", displayNameKa: "თბილისი", regionId: "region.tbilisi", isSelfGoverningCity: true },
   { code: "06", sortId: 2, nameKa: "ქალაქ ბათუმის მუნიციპალიტეტი", displayNameKa: "ბათუმი", regionId: "region.adjara", isSelfGoverningCity: true },
