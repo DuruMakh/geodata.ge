@@ -529,9 +529,11 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
     {
       label: "წილი მუნიციპალურ ხარჯებში",
       value: nationalTotalLatest > 0 ? formatShare(officialEnd / nationalTotalLatest) : MISSING,
-      // The size-independent placement figure per-capita used to provide
-      // (§6.4) — the ordinal makes that placement legible, not just the count
-      // it is out of.
+      // `detail` is this municipality's ordinal RANK among all municipalities —
+      // not a per-capita figure. It stands in for the per-capita KPI the
+      // reference design used (§6.4): rank is size-independent without needing
+      // the population data this project does not have. Per-capita is an
+      // explicit v1 exclusion; do not reintroduce it here.
       detail: `${georgianOrdinal(input.rank)} ადგილი ${input.rankOutOf}-დან`,
     },
   ];

@@ -6,6 +6,21 @@ import { parseMunicipalHash, serializeMunicipalHash } from "../../lib/explorer/u
 
 const SERIES_LIMIT_MESSAGE = `გრაფიკზე მაქსიმუმ ${MAX_CHART_SERIES} სერია შეიძლება. ცხრილის რეჟიმში ლიმიტი არ არის.`;
 
+function clampYear(year: number, min: number, max: number): number {
+  return Math.min(Math.max(year, min), max);
+}
+
+// Clamps AND orders (start <= end) before either value ever reaches state. This
+// is the one funnel every range write — the mount-hash parse and setRange —
+// goes through, so the raw start/end fields, the hash and the returned range
+// can never disagree, and a later single-field patch (e.g. `{ start: ... }`
+// from the start handle) can never land on what is logically the other handle.
+function normalizeRange(rawStart: number, rawEnd: number, min: number, max: number): { start: number; end: number } {
+  const start = clampYear(rawStart, min, max);
+  const end = clampYear(rawEnd, min, max);
+  return start <= end ? { start, end } : { start: end, end: start };
+}
+
 export function useMunicipalState(years: number[], defaultSelection: string[], knownIds: Set<string>) {
   const min = years[0] ?? 0;
   const max = years.at(-1) ?? 0;
@@ -28,8 +43,9 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
     if (parsed.chartMode) setChartMode(parsed.chartMode);
     if (parsed.share) setShare(true);
     if (parsed.range) {
-      setStart(Math.min(Math.max(parsed.range.start, min), max));
-      setEnd(Math.min(Math.max(parsed.range.end, min), max));
+      const resolved = normalizeRange(parsed.range.start, parsed.range.end, min, max);
+      setStart(resolved.start);
+      setEnd(resolved.end);
     }
     if (parsed.selection) {
       const known = parsed.selection.filter((id) => knownIds.has(id));
@@ -67,8 +83,9 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
   }
 
   function setRange(patch: { start?: number; end?: number }) {
-    if (patch.start !== undefined) setStart(Math.min(Math.max(patch.start, min), max));
-    if (patch.end !== undefined) setEnd(Math.min(Math.max(patch.end, min), max));
+    const resolved = normalizeRange(patch.start ?? start, patch.end ?? end, min, max);
+    setStart(resolved.start);
+    setEnd(resolved.end);
   }
 
   return {
@@ -79,7 +96,7 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
     },
     share,
     setShare,
-    range: { start: Math.min(start, end), end: Math.max(start, end), min, max },
+    range: { start, end, min, max },
     setRange,
     selectedIds,
     toggleSeries,

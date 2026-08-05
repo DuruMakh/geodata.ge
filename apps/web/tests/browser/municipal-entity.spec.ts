@@ -35,6 +35,43 @@ test.describe("hash sanitising", () => {
     await expect(headers.nth(3)).toHaveText("2024");
   });
 
+  test("a reversed shared range self-corrects the address bar, not just the display", async ({ page }) => {
+    await page.goto(`${ENTITY_URL}#r=2024-2016`);
+    await page.reload();
+
+    await expect(page.getByTestId("year-range-strip")).toContainText("2016–2024");
+
+    // use-municipal-state.ts used to serialise the hash from the raw,
+    // still-reversed start/end fields, so the address bar stayed "r=2024-2016"
+    // forever even once the rail itself displayed the corrected order.
+    const hash = await page.evaluate(() => window.location.hash);
+    expect(hash).toContain("r=2016-2024");
+    expect(hash).not.toContain("r=2024-2016");
+  });
+
+  test("after loading a reversed shared range, moving the start handle moves the start handle, not the end", async ({
+    page,
+  }) => {
+    await page.goto(`${ENTITY_URL}#r=2024-2016`);
+    await page.reload();
+
+    const startHandle = page.getByTestId("range-start-handle");
+    const endHandle = page.getByTestId("range-end-handle");
+    await expect(startHandle).toHaveAttribute("aria-valuenow", "2016");
+    await expect(endHandle).toHaveAttribute("aria-valuenow", "2024");
+
+    // The bug this guards: while the raw start/end fields stayed reversed
+    // (2024/2016) after mount, a `{ start: ... }` patch from the displayed
+    // start handle actually wrote the field driving the displayed END, so one
+    // ArrowRight on the start handle silently moved end from 2024 to 2017
+    // instead of moving start.
+    await startHandle.focus();
+    await page.keyboard.press("ArrowRight");
+
+    await expect(startHandle).toHaveAttribute("aria-valuenow", "2017");
+    await expect(endHandle).toHaveAttribute("aria-valuenow", "2024");
+  });
+
   test("a selection whose ids are all unknown falls back to the default selection", async ({ page }) => {
     await page.goto(`${ENTITY_URL}#sel=municipal.made_up`);
     await page.reload();

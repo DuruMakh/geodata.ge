@@ -674,7 +674,7 @@ describe("buildEntityKpis", () => {
     expect(kpis()[2]!.detail).toBe("ეკონომიკური საქმიანობა");
   });
 
-  it("gives the size-independent placement figure per-capita used to provide", () => {
+  it("reports the municipality's share of the national municipal total, not a per-capita figure", () => {
     expect(kpis()[3]!.label).toBe("წილი მუნიციპალურ ხარჯებში");
     expect(kpis()[3]!.value).toBe("50.0%");
   });
