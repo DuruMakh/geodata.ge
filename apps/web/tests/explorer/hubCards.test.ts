@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildHubCards } from "../../lib/explorer/hubCards";
+import { ACCENT, INK } from "../../lib/explorer/colors";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 
 function fact(
@@ -116,6 +117,12 @@ describe("buildHubCards", () => {
     // total (5,624,861,932.94, not a tie) renders as on the live index page —
     // it does not apply to this fixture's rounder synthetic figure.
     expect(card.footer).toBe("2025 · 5.63 მლრდ ₾");
+    // A side total is drawn in INK. ACCENT is byte-identical to the
+    // spending.social_protection and revenue.vat tokens, so a total drawn in it
+    // wears another category's colour (DESIGN.md §4.2). Two hub sparklines
+    // already had to be corrected for exactly this; nothing pinned it until now.
+    expect(card.seriesColor).toBe(INK);
+    expect(card.seriesColor).not.toBe(ACCENT);
   });
 
   it("points the analysis card at the route it actually opens", () => {
