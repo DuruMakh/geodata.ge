@@ -4,7 +4,7 @@ import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect"
 import { PageHeader } from "../../components/shell/page-header";
 import { SourceNote } from "../../components/ui/editorial";
 import { buildHubCards } from "../../lib/explorer/hubCards";
-import { loadServedLandingData } from "../../lib/data/servedData";
+import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 
 export const metadata: Metadata = {
   title: "ბიუჯეტი — GeoData",
@@ -22,8 +22,13 @@ export const metadata: Metadata = {
 
 export default async function ExplorerHubPage() {
   const { facts, sourceDocuments } = await loadServedLandingData();
+  const { totalFacts } = await loadServedMunicipalData();
+  const municipalTotals = new Map<number, number>();
+  for (const row of totalFacts) {
+    municipalTotals.set(row.year, (municipalTotals.get(row.year) ?? 0) + row.publicTotalGel);
+  }
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
-  const cards = buildHubCards(facts);
+  const cards = buildHubCards(facts, municipalTotals);
   const years = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
   const coverage = [
     years.length > 0 ? `${years[0]}–${years.at(-1)}` : "",
