@@ -30,23 +30,27 @@ the import is re-run.
 | `MunicipalTotalFact` | `data/imports/municipal-total-facts-2015-2025.csv` |
 | `ImportRun` | one audit row per import run, including the full parity report |
 
-The five municipal tables are wired into the import but **the mirror does not
-hold municipal rows yet**: migration `20260802194939_municipal_dataset` has not
-been applied and no import has run since the wiring landed. Neither step is a
-manual approval gate: `.github/workflows/deploy-production.yml` runs
-`npm run prisma:deploy` and then `npm run data:import` unconditionally on every
-push-triggered CI-green run on `main`, so merging this work is the decision
-point, not a separate sign-off. The operation is safe by construction — one
-transaction, parity verified before commit, rollback on any mismatch — and
-production keeps serving the previous build if the workflow goes red. Until
-that deploy runs, municipal data serves only from the CSVs
-(`GEODATA_DATA_SOURCE=csv`, the default). A `GEODATA_DATA_SOURCE=db` build does
-**not** fail on the missing tables, because it never queries them: no route
-under `app/`, `components/`, or `lib/` calls `loadServedMunicipalData` yet (its
-only caller is a test file), so a db-mode build succeeds whether or not the
-migration has been applied. Until a route reads it, the in-transaction check
-inside `npm run data:import` is the **sole** parity gate for the municipal
-tables. See `docs/data-methodology/municipal-functional-annual-2015-2025.md`.
+### Municipal activation status (2026-08-06)
+
+The five municipal tables, migration `20260802194939_municipal_dataset`,
+transactional mirror import, and field-by-field import parity checks shipped in
+the earlier data-only rollout; migration and import are not pending. The
+Actions-owned production workflow continues to run `npm run prisma:deploy`
+and then `npm run data:import` unconditionally on every CI-gated workflow run,
+reconverging the mirror to the reviewed CSVs before it triggers Vercel. Manual
+Vercel dashboard or CLI deployments do not run those Actions steps; see
+`docs/deployment.md`.
+
+That earlier rollout had no municipal UI route, so its db-mode build never
+called `loadServedMunicipalData()` and did not exercise build-time municipal
+row parity. The current branch implements the municipal index, 64 municipality
+routes, and 11 region routes, all through `loadServedMunicipalData()`; a db-mode
+build of this code therefore queries the municipal tables and runs
+`assertMunicipalParity`. This is a statement about the branch code, not proof
+that the UI is deployed: direct production route checks returned HTTP 404 on
+2026-08-06, while hosted GitHub/remote-main metadata and the live database
+contents could not be freshly authenticated from this workspace. See
+`docs/data-methodology/municipal-functional-annual-2015-2025.md`.
 
 The import reuses the same validated loaders the site uses, then cross-checks
 referential integrity (fact item IDs against taxonomy, source IDs against
@@ -142,7 +146,7 @@ ever delay a rebuild, never take the site down.
 3. Merge to `main`. Nothing else is manual: after CI passes,
    `.github/workflows/deploy-production.yml` applies any new migrations
    (`npm run prisma:deploy`), re-runs `npm run data:import` (every
-   production deploy converges the mirror to the checkout,
+   Actions-owned production workflow run converges the mirror to the checkout,
    unconditionally), and triggers the Vercel production build, which
    re-verifies the mirror row-by-row for every table a route reads — see the
    three tiers under "Failure modes". The parity report is in the workflow
@@ -175,10 +179,12 @@ From `apps/web`, with `.env` configured:
     `loadServedExplorerData`, which every route calls. Verified field by field
     at import *and* on every db-mode build. This is the tier the sentence
     above describes.
-  - **The five municipal tables** — verified field by field at import, but
-    `assertMunicipalParity` is reachable only from `loadServedMunicipalData`,
-    which no route calls yet, so a db-mode build never runs it. Until a route
-    reads them, the import's in-transaction check is their only gate.
+  - **The five municipal tables** — verified field by field at import. The
+    earlier data-only deployment had no route that called
+    `loadServedMunicipalData`, so its db-mode build did not run
+    `assertMunicipalParity`. The current branch's municipal index,
+    municipality, and region routes do call that loader, so db-mode builds of
+    this code verify the municipal rows at build time as well.
   - **`BudgetMapping`** — the weakest tier, and it predates the municipal
     work. No reader anywhere under `app/`, `components/` or `lib/`, and the
     import checks only its **row count** (`tx.budgetMapping.count()`), never

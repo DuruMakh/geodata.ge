@@ -50,5 +50,5 @@ export function buildExplorerCsv(rows: ExplorerTableRow[], years: number[]): str
     }
   }
 
-  return csvRows.join("\n");
+  return `\uFEFF${csvRows.join("\n")}`;
 }

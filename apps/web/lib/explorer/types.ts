@@ -9,7 +9,7 @@ export type ChartMode = (typeof CHART_MODES)[number];
 export type MeasureMode = (typeof MEASURE_MODES)[number];
 export type ExpenditureGrouping = "fields" | "ministries";
 export type ExplorerScope = "fields" | "ministries" | "revenue";
-export type ExplorerItemLevel = "total" | "public_field" | "admin_category" | "major_program";
+export type ExplorerItemLevel = "total" | "public_field" | "admin_category" | "major_program" | "municipal_function";
 
 export const MAX_CHART_SERIES = 6;
 

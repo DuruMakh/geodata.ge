@@ -12,6 +12,6 @@ export type BudgetSection = { label: string; href: string | null };
 export const BUDGET_SECTIONS: Record<BudgetSectionId, BudgetSection> = {
   expenditure: { label: "ხარჯები", href: "/explorer/expenditure" },
   revenue: { label: "შემოსავლები", href: "/explorer/revenue" },
-  municipalities: { label: "მუნიციპალიტეტები", href: null },
+  municipalities: { label: "მუნიციპალიტეტები", href: "/explorer/municipalities" },
   analysis: { label: "ანალიზი", href: "/explorer/analysis" },
 };

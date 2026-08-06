@@ -3,6 +3,12 @@ import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import type { ExplorerTableRow } from "../../lib/explorer/types";
 
 describe("explorer CSV export", () => {
+  it("starts every public CSV with the UTF-8 BOM bytes", () => {
+    const bytes = new TextEncoder().encode(buildExplorerCsv([], []));
+
+    expect(Array.from(bytes.slice(0, 3))).toEqual([0xef, 0xbb, 0xbf]);
+  });
+
   it("serializes visible rows with source metadata columns", () => {
     const rows: ExplorerTableRow[] = [
       {
@@ -30,7 +36,7 @@ describe("explorer CSV export", () => {
 
     expect(buildExplorerCsv(rows, [2025])).toBe(
       [
-        "year,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at",
+        "\uFEFFyear,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at",
         "2025,spending.health,,public_field,,,Health KA,Health,150,planned,Reviewed 2025 planned budget scenario,docs/source-2025-plan,2026-05-11",
       ].join("\n"),
     );
@@ -63,7 +69,7 @@ describe("explorer CSV export", () => {
 
     expect(buildExplorerCsv(rows, [2025])).toBe(
       [
-        "year,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at",
+        "\uFEFFyear,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at",
         "2025,admin_program.education.general,admin_spending.education_science_youth,major_program,32 02,Education ministry,General education,General education,250,actual,Reviewed official expenditure rows,docs/admin-spending.csv,2026-06-11",
       ].join("\n"),
     );

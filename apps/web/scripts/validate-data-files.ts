@@ -19,6 +19,7 @@ import {
 import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import { loadSourceDocuments } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
+import { buildRegionShapes } from "../lib/explorer/municipalGeo";
 import { budgetRowsToCsvRows } from "./compose-budget-facts";
 
 function sortedYears(years: number[]): number[] {
@@ -149,6 +150,36 @@ async function main() {
     .map((region) => region.id);
   if (unusedRegions.length > 0) {
     throw new Error(`Regions with no municipalities: ${unusedRegions.join(", ")}`);
+  }
+
+  // buildRegionShapes() already guarantees internally that every shape
+  // resolves to a region or an explicit no-data reason (it throws otherwise;
+  // see tests/explorer/municipalGeo.test.ts). What it cannot guarantee is that
+  // its hardcoded join table still matches the *live* region taxonomy below —
+  // that taxonomy is data, editable independently of code. These two checks
+  // catch exactly that: a taxonomy region renamed or removed out from under
+  // the join table, or a new taxonomy region the join table was never told
+  // about. This gate has to catch it directly because `npm run data:validate`
+  // is meant to run standalone (see AGENTS.md Health Stack), not only after
+  // `npm test`.
+  const mapShapes = buildRegionShapes();
+
+  const shapesWithUnknownRegion = mapShapes.filter(
+    (shape) => shape.regionId !== null && !regionIds.has(shape.regionId),
+  );
+  if (shapesWithUnknownRegion.length > 0) {
+    throw new Error(
+      `Map shapes reference unknown regions: ${shapesWithUnknownRegion
+        .map((shape) => `${shape.shapeIso}→${shape.regionId}`)
+        .join(", ")}`,
+    );
+  }
+
+  const regionsWithoutOneShape = Array.from(regionIds).filter(
+    (regionId) => mapShapes.filter((shape) => shape.regionId === regionId).length !== 1,
+  );
+  if (regionsWithoutOneShape.length > 0) {
+    throw new Error(`Regions not mapped to exactly one map shape: ${regionsWithoutOneShape.join(", ")}`);
   }
 
   if (missingGlossary.length > 0) {

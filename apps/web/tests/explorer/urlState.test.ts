@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { parseExplorerHash, readLegacyNav, serializeExplorerHash, stripNavFromHash } from "../../lib/explorer/urlState";
+import {
+  parseExplorerHash,
+  parseMunicipalHash,
+  parseMunicipalLevel,
+  readLegacyNav,
+  serializeExplorerHash,
+  serializeMunicipalHash,
+  stripNavFromHash,
+} from "../../lib/explorer/urlState";
 
 describe("serializeExplorerHash", () => {
   it("never emits nav — the route owns it", () => {
@@ -65,5 +73,55 @@ describe("stripNavFromHash", () => {
 
   it("returns an empty string when nav was all there was", () => {
     expect(stripNavFromHash("#nav=analysis")).toBe("");
+  });
+});
+
+describe("municipal hash state", () => {
+  it("round-trips an entity view", () => {
+    const hash = serializeMunicipalHash({
+      chartMode: "table",
+      share: true,
+      rangeStart: 2016,
+      rangeEnd: 2024,
+      selectedIds: ["municipal.health", "municipal.education"],
+    });
+    const parsed = parseMunicipalHash(`#${hash}`);
+    expect(parsed.chartMode).toBe("table");
+    expect(parsed.share).toBe(true);
+    expect(parsed.range).toEqual({ start: 2016, end: 2024 });
+    expect(parsed.selection).toEqual(["municipal.health", "municipal.education"]);
+  });
+
+  it("reuses the budget explorer's key vocabulary", () => {
+    const hash = serializeMunicipalHash({
+      chartMode: "line",
+      share: false,
+      rangeStart: 2015,
+      rangeEnd: 2025,
+      selectedIds: ["municipal.health"],
+    });
+    expect(hash).toBe("m=line&r=2015-2025&sel=municipal.health");
+  });
+
+  it("drops unknown values rather than trusting them", () => {
+    const parsed = parseMunicipalHash("#m=pie&r=nope&sh=maybe");
+    expect(parsed.chartMode).toBeUndefined();
+    expect(parsed.range).toBeUndefined();
+    expect(parsed.share).toBeUndefined();
+  });
+
+  it("restores a deliberately empty selection as empty", () => {
+    expect(parseMunicipalHash("#sel=").selection).toEqual([]);
+  });
+
+  it("reads the index level, defaulting to municipalities", () => {
+    expect(parseMunicipalLevel("#lvl=region")).toBe("region");
+    expect(parseMunicipalLevel("#lvl=muni")).toBe("muni");
+    expect(parseMunicipalLevel("#lvl=galaxy")).toBe("muni");
+    expect(parseMunicipalLevel("")).toBe("muni");
+  });
+
+  it("survives a malformed hash", () => {
+    expect(() => parseMunicipalHash("#%%%")).not.toThrow();
   });
 });

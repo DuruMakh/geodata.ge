@@ -45,10 +45,27 @@ export function formatSignedAmount(value: number | null | undefined): string {
   return `${parts.num} ${parts.unit}`;
 }
 
-/** Percentage from a fraction, 1 decimal; "−" minus; optional "+" for positives. */
-export function formatShare(fraction: number | null | undefined, signed = false): string {
+/** Percentage from a fraction, `decimals` digits (default 1); "−" minus; optional "+" for positives. */
+export function formatShare(fraction: number | null | undefined, signed = false, decimals = 1): string {
   if (fraction === null || fraction === undefined || !Number.isFinite(fraction)) return MISSING;
   const value = fraction * 100;
   const prefix = signed && value > 0 ? "+" : "";
-  return (prefix + value.toFixed(1) + "%").replace("-", "−");
+  return (prefix + value.toFixed(decimals) + "%").replace("-", "−");
+}
+
+/**
+ * The scale a chart or table renders values in. Budget surfaces work in
+ * billions; municipal budgets are two to three orders of magnitude smaller, so
+ * billions would render a whole municipality as "0.02" and each of its
+ * functions as "0.00".
+ */
+export type ValueUnit = { divisor: number; label: string; decimals: number };
+
+export const UNIT_BN: ValueUnit = { divisor: BILLION, label: "მლრდ", decimals: 2 };
+export const UNIT_MLN: ValueUnit = { divisor: MILLION, label: "მლნ", decimals: 1 };
+
+/** Cell value in the given unit. UNIT_BN is byte-identical to formatBn. */
+export function formatInUnit(value: number | null | undefined, unit: ValueUnit): string {
+  if (value === null || value === undefined) return MISSING;
+  return fixed(value / unit.divisor, unit.decimals).replace("-", "−");
 }

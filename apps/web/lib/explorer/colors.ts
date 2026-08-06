@@ -49,6 +49,20 @@ export const SERIES_COLORS: Record<string, string> = {
   "admin_spending.sport": "#8A7B65",
   "admin_spending.debt_service": "#8C5A32",
   "admin_spending.other_costs": "#A89C88",
+
+  // Municipal functions reuse the semantic colour of the same concept on the
+  // budget side, so a category keeps one colour across the whole site
+  // (DESIGN.md §4.2). All ten are distinct.
+  "municipal.social_protection": "#B3402A",
+  "municipal.health": "#1F6E56",
+  "municipal.education": "#3D5A98",
+  "municipal.housing_communal": "#B08A2E",
+  "municipal.defence": "#7A4E8C",
+  "municipal.public_order_safety": "#4A707A",
+  "municipal.economic_affairs": "#C26E4C",
+  "municipal.environment": "#2F4B3A",
+  "municipal.recreation_culture": "#9C3D5E",
+  "municipal.general_public_services": "#5B5347",
 };
 
 // Open-ended sets (major programs, unlisted categories) cycle through the editorial
@@ -74,6 +88,18 @@ export const OTHER_COLOR = "#A89C88";
 export const POSITIVE = "#1F6E56";
 export const NEGATIVE = "#B3402A";
 export const ACCENT = "#B3402A";
+
+// Region choropleth (spec §5.2). Six-step terracotta ramp, quantile-classed by
+// the caller; the last step is ACCENT. Occupied-territory shapes carry no value,
+// so they get a flat fill and a dashed stroke instead of a ramp step.
+//
+// These live here, not in region-map.tsx, because the plan's Global Constraints
+// forbid hardcoding a hex in a component: colors.ts is this codebase's token
+// module and components receive colours as data. Keeping them here also lets the
+// index page read the ramp without importing from a "use client" file.
+export const MAP_RAMP = ["#F3EBDB", "#E9D6C6", "#DEBBA6", "#D19A80", "#C4735A", ACCENT];
+export const MAP_NO_DATA_FILL = "#E5DBC9";
+export const MAP_NO_DATA_STROKE = "#C4B69C";
 
 export function colorForItem(itemId: string, index: number): string {
   return SERIES_COLORS[itemId] ?? EDITORIAL_PALETTE[index % EDITORIAL_PALETTE.length] ?? OTHER_COLOR;

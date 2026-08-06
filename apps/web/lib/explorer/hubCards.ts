@@ -53,7 +53,11 @@ function categoryCount(facts: ServedBudgetFact[], side: "expenditure" | "revenue
   return ids.size;
 }
 
-export function buildHubCards(facts: ServedBudgetFact[]): HubCardModel[] {
+export function buildHubCards(
+  facts: ServedBudgetFact[],
+  municipalTotals: Map<number, number>,
+  municipalCounts: { municipalities: number; regions: number },
+): HubCardModel[] {
   const expenditure = totalsByYear(facts, "expenditure");
   const revenue = totalsByYear(facts, "revenue");
 
@@ -79,6 +83,7 @@ export function buildHubCards(facts: ServedBudgetFact[]): HubCardModel[] {
 
   const spend = build(expenditure);
   const revenues = build(revenue);
+  const municipal = build(municipalTotals);
   const analysisYear = spend.latest;
 
   return [
@@ -105,12 +110,14 @@ export function buildHubCards(facts: ServedBudgetFact[]): HubCardModel[] {
     {
       index: "03",
       title: BUDGET_SECTIONS.municipalities.label,
-      description: "მუნიციპალური ბიუჯეტების ჭრილი — მონაცემები მზადდება.",
+      description: `${municipalCounts.municipalities} მუნიციპალიტეტი და ${municipalCounts.regions} რეგიონი — რაში იხარჯება ადგილობრივი ბიუჯეტები.`,
       href: BUDGET_SECTIONS.municipalities.href,
       comingSoon: BUDGET_SECTIONS.municipalities.href === null,
-      series: null,
-      seriesColor: null,
-      footer: null,
+      series: municipal.series,
+      // ink, not accent: the sparkline traces a side total, and DESIGN.md §4.2
+      // gives every total series ink. #B3402A is a category token.
+      seriesColor: municipal.series === null ? null : INK,
+      footer: municipal.footer,
     },
     {
       index: "04",

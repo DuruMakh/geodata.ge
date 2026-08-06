@@ -36,7 +36,11 @@ export function SectionNav() {
           );
         }
 
-        const active = pathname === section.href;
+        // Municipalities is the first section with child routes (a municipality
+        // or region sub-page), so an exact match alone would leave the sidebar
+        // blank on all of them. `${section.href}/` guards the prefix so a
+        // sibling route that merely starts with the same string cannot match.
+        const active = pathname === section.href || pathname.startsWith(`${section.href}/`);
 
         return (
           <li key={section.label}>

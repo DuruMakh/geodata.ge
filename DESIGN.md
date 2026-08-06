@@ -38,7 +38,7 @@ V1 includes: the budget hub, multi-year explorer (line + table) with fields/mini
 
 V1 excludes: data catalog, capital/debt explorers, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown).
 
-Municipal budgets are a named future **section**, not a v1 interface. Since 2026-08-02 the municipal *data* ships (§2.1), but no page reads it: there is no municipalities route, `apps/web/lib/explorer/sections.ts` keeps `municipalities: { href: null }`, and the section exists only as a `მალე` marker in the sidebar and on the hub (§6.7). The marker stays until a UI spec ships the route — data landing behind it changes nothing visual. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) are markers on the same terms and have no data at all. Nothing about a marker may be styled as if it were live.
+Municipal budgets are an implemented v1 **section** in this branch at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a region-grain map and ranked list, 64 municipality pages, and 11 region roll-up pages, reachable from the sidebar and hub card 03 (§6.7). Direct production checks returned HTTP 404 on 2026-08-06, so the municipal UI must not be called live until a post-deployment route check returns HTTP 200. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) remain markers only, with no data at all. Nothing about a marker may be styled as if it were live.
 
 Every visual decision should support a focused budget product, not a generic dashboard.
 
@@ -49,7 +49,7 @@ Year ranges in the UI always derive from loaded facts. Current reviewed coverage
 - Expenditure by public spending fields: **2005–2025** (13 fields per year, 12-month actual execution).
 - Expenditure by ministries (administrative view): **2005–2025** categories; major-program drill-down rows exist from 2012 (partial) and are contiguous 2017–2025.
 - Revenue: **2005–2025** (11 top-level categories).
-- Municipal expenditure by functional category: **2015–2025** (10 main functions, 64 municipalities across 11 data-bearing regions, plus the official total-payments headline). Five municipal bodies associated with occupied territories are excluded from the public dataset. Served as data only — no route reads it yet, so it contributes no year range to any coverage label.
+- Municipal expenditure by functional category: **2015–2025** (10 main functions, 64 municipalities across 11 data-bearing regions, plus the official total-payments headline). Five municipal bodies associated with occupied territories are excluded from the public dataset. Implemented in this branch at `/explorer/municipalities` (§20); production deployment remains unverified as described above.
 - All current facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned facts ever load.
 
 ## 3. Design Direction
@@ -172,6 +172,22 @@ Open-ended sets (major programs, any future ministry not listed) use index-based
 #B3402A #1F6E56 #3D5A98 #B08A2E #7A4E8C #4A707A #C26E4C #2F4B3A #9C3D5E #8A7B65 #5B5347 #8C5A32 #4E5D74 #A89C88
 ```
 
+Municipal functions (`municipal.*`) reuse the semantic colour of the same concept
+on the budget side, so a category keeps one colour across the whole site:
+
+| Function | Token | Shares with |
+|---|---|---|
+| `municipal.social_protection` | `#B3402A` | `spending.social_protection` |
+| `municipal.health` | `#1F6E56` | `spending.health` |
+| `municipal.education` | `#3D5A98` | `spending.education` |
+| `municipal.housing_communal` | `#B08A2E` | `spending.infrastructure_regional_development` |
+| `municipal.defence` | `#7A4E8C` | `spending.defence` |
+| `municipal.public_order_safety` | `#4A707A` | `spending.public_order_safety` |
+| `municipal.economic_affairs` | `#C26E4C` | `spending.economic_affairs` |
+| `municipal.environment` | `#2F4B3A` | `spending.agriculture_environment` |
+| `municipal.recreation_culture` | `#9C3D5E` | `spending.culture` |
+| `municipal.general_public_services` | `#5B5347` | `spending.general_public_services` |
+
 Rules:
 
 - Never assign `accent` meaning beyond "active/negative" in UI chrome; as a series color it belongs only to the categories listed above.
@@ -241,14 +257,17 @@ No screen card, no outer container. Content sits directly on paper.
 The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: a budget hub and its sections, all mounted under `/explorer` inside the shell of §6.7.
 
 ```text
-/explorer              budget hub — the four sections as cards
-/explorer/expenditure  ხარჯები       multi-year expenditure explorer (fields/ministries grouping)
-/explorer/revenue      შემოსავლები   multi-year revenue explorer
-/explorer/analysis     ანალიზი       single-year analysis view (own side switch, grouping switch
-                                     for expenditure, and year selector)
+/explorer                              budget hub — the four sections as cards
+/explorer/expenditure                  ხარჯები           multi-year expenditure explorer (fields/ministries grouping)
+/explorer/revenue                      შემოსავლები       multi-year revenue explorer
+/explorer/municipalities               მუნიციპალიტეტები  index — region-grain map, ranked list, KPIs (§20)
+/explorer/municipalities/[code]                          64 municipality pages
+/explorer/municipalities/region/[id]                     11 region roll-up pages
+/explorer/analysis                     ანალიზი           single-year analysis view (own side switch, grouping switch
+                                                          for expenditure, and year selector)
 ```
 
-The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები` (`მალე`, no route), `ანალიზი`.
+The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`.
 
 Every surface under `/explorer` opens with the **breadcrumb row** (§6.7): `მთავარი / მონაცემები / ბიუჯეტი` on the hub, `მთავარი / მონაცემები / ბიუჯეტი / <section>` on a section. Its right slot is a mono **coverage** label — `{minYear}–{maxYear} · განახლდა {YYYY-MM-DD}` for the route's active scope, not the user's selection (the range strip owns that, and the two facts live at different altitudes).
 
@@ -315,7 +334,7 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, mono glyph `«` (expanded) / `»` (collapsed).
 
-**Section list** (`section-nav.tsx`, nested under `ბიუჯეტი`). Each entry is a route link. Active: accent `▸` marker, `paper` text at weight 600, active-row background, `aria-current="page"`. Inactive: `ink-fg-muted`, marker held in transparent so labels do not shift. `მუნიციპალიტეტები` sits in the same list as a non-interactive row with the `მალე` badge. Deleting this one component and its single usage reverts navigation to hub-and-breadcrumb only; nothing else imports it.
+**Section list** (`section-nav.tsx`, nested under `ბიუჯეტი`). Each entry is a route link. Active: accent `▸` marker, `paper` text at weight 600, active-row background, `aria-current="page"`. Inactive: `ink-fg-muted`, marker held in transparent so labels do not shift. All four sections — `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი` — render this way; none is a `მალე` marker. Deleting this one component and its single usage reverts navigation to hub-and-breadcrumb only; nothing else imports it.
 
 **Collapsed rail (≥900px).** 52px, same `ink` surface, radius 0:
 
@@ -332,7 +351,6 @@ Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: redu
 
 - The toggle exposes `aria-expanded` and a label that flips between `პანელის ჩაკეცვა` and `პანელის გაშლა`. It carries **no `aria-controls`**. On desktop the collapse unmounts the nav, so there is no element to point at; below 900px that is not true — the nav stays mounted and is merely `display:none` — so this is a real gap at mobile widths, not a fully justified omission. Closing it means giving the nav a stable id and keeping it mounted in both desktop states.
 - There is **no focus trap** on the mobile panel, by decision. A trap is the contract for a modal that covers the page; this panel is in flow and obscures nothing, so trapping would strand keyboard users in a region they can simply tab past. `Escape` to close plus focus return to the trigger is the whole contract.
-- The `მუნიციპალიტეტები` row in the sidebar is a plain non-interactive list item with **no** `aria-disabled` — the `listitem` role ignores it, and the `მალე` badge text already reads out. The hub card, which is a `div`, does carry `aria-disabled="true"`.
 
 **Breadcrumb page header** (`page-header.tsx`). One row with a `2px ink` bottom rule, rendered per route (the final crumb differs per route, and a server layout cannot read the child route). Crumbs: sans 10.5px uppercase 600 in `muted`, current crumb in `ink`, separators `/` in accent. `მთავარი` links to `/`; `მონაცემები` is plain text with no route; `ბიუჯეტი` links to the hub on section routes and is plain text on the hub. Right slot: the mono 10.5px `faint` coverage label of §6.2 — the loaded range of the route's active scope, so it tracks the grouping, and the union of both sides on the hub.
 
@@ -342,12 +360,12 @@ Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: redu
 |---|------|---------|--------|----------|
 | 01 | `ხარჯები` | total expenditure series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/expenditure` |
 | 02 | `შემოსავლები` | total revenue series, same at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/revenue` |
-| 03 | `მუნიციპალიტეტები` | none | none | nothing |
+| 03 | `მუნიციპალიტეტები` | total municipal series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/municipalities` |
 | 04 | `ანალიზი` | none | `{latestYear} · {n} კატეგორია` | `/explorer/analysis` |
 
-Both sparklines are `ink` because each traces a **side total**, and §4.2 gives every `*.total` series `ink`. `accent` is not free chrome here: `#B3402A` is the token of `spending.social_protection` and `revenue.vat`, so an accent total would draw one quantity in another category's color.
+All three sparklines are `ink` because each traces a **total** (a side total for cards 01/02, the municipal total for card 03), and §4.2 gives every `*.total` series `ink`. `accent` is not free chrome here: `#B3402A` is the token of `spending.social_protection` and `revenue.vat`, so an accent total would draw one quantity in another category's color.
 
-Card 03 is not a link, carries a `მალე` badge in place of the `→` (paper-surface variant: 1px `control` border, `muted` text), takes a `muted` title, and has no hover state — it must not be stylable as live. Every figure on the hub is computed at build time from the same served facts the section pages use, so the hub cannot drift from the pages behind it. Nothing on it is hardcoded.
+Every figure on the hub — series, footers and card 03's description counts alike — is computed at build time from the same served facts the section pages use, so the hub cannot drift from the pages behind it. Nothing on it is hardcoded.
 
 ## 7. Core Components
 
@@ -695,3 +713,15 @@ Section order (top to bottom):
 5. **Footer** — brand + tagline + `info@geodata.ge`; nav links (explorer, analysis); data/license notes (source, last-updated date, CC BY 4.0); mono bottom bar.
 
 Landing QA: waffle renders exactly 30 cells; sparkline endpoints match the loaded revenue range; CSV preview shows real active-fact rows; hero canvas mounts or the fallback note shows; no cards or shadows.
+
+## 20. Municipal Surfaces
+
+Reference implementation: `apps/web/components/municipalities/`, routes under `apps/web/app/explorer/municipalities/`. The section reuses the shell (§6.7) and the existing explorer machinery — `EditorialLineChart`, `RangeStrip`, `Callout`, `SourceNote`, `SwatchBar` — rather than inventing new surface types; `region-map.tsx` is the one genuinely new component.
+
+**Region-grain map, not municipality-grain.** The index page's choropleth colors 12 ADM1 shapes: the 11 data-bearing regions by latest-year total, plus აფხაზეთი drawn as an explicit no-data shape (dashed stroke, excluded from the tab order). It does not draw all 64 municipality boundaries — no openly-licensed ADM2 (municipality-level) geometry matches the 64-unit served registry, so a municipality-grain map is deferred to a future spec (`lib/explorer/municipalGeo.ts`'s own header comment records this). Geometry is geoBoundaries `gbOpen` GEO ADM1 (release `9469f09`), CC BY 3.0 — it replaced GADM, which permits non-commercial use but forbids redistribution, and shipping coordinates to every visitor's browser is redistribution. CC BY permits that but requires attribution, which the index page's source note carries: `საზღვრები: geoBoundaries (gbOpen GEO ADM1), CC BY 3.0.` (full provenance: `lib/landing/georgiaGeo.ts`'s header comment; the shape↔region join: `lib/explorer/municipalGeo.ts`, documented in `docs/data-methodology/municipal-functional-annual-2015-2025.md`). Self-governing cities (თბილისი, ბათუმი, ქუთაისი, ფოთი, რუსთავი — the registry's `is_self_governing_city` flag, an administrative status, not a ranking by budget) additionally get their own city-dot markers on top of the region fill: they are municipalities in their own right, so the dots give the region-grain map a second entry point straight into the municipality grain, without needing municipality-grain polygons. Each is still counted inside its own region's aggregate.
+
+**Two labelled totals, not one.** Every municipal and region surface can show two different sums for the same year: the official Ministry of Finance headline (`ოფიციალური ბიუჯეტი`), and the sum of the ten served functional categories. The two are computed independently and are never reconciled by adjusting a category — they genuinely diverge in some municipality-years. The chart, the table's `სულ` row, and the CSV export always read the functional sum, since only the ten functions are chartable series; each page's "largest function" KPI is likewise computed on the functional sum, because a function's share can only be a share of the functional total. Everything else — the index list, the index's other KPIs, the map colour, and each entity page's headline KPI — reads the official total. Every municipal surface carries a standing source-note sentence naming the two as different measures (§7.10), whether or not the callout below is showing.
+
+**The divergence callout is scoped to municipality pages only.** When a municipality's two totals differ by more than GEL 1,000,000 in a year inside the selected range (methodology and public wording: `docs/data-methodology/municipal-functional-annual-2015-2025.md`), a §7.9 `Callout` names the affected years; narrowing the range past every warning year removes it. Region roll-up pages never show it. Their official and functional totals are summed independently and can still diverge, but the warning type and reconciliation explanation are municipality-grain provenance that cannot be assigned honestly to the aggregate. Aggregating member warnings would also make the callout near-permanent on heavily visited regions. The standing source note therefore labels the two region measures without presenting a misleading roll-up warning.
+
+**Unit: `მლნ ₾`, not `მლრდ ₾`.** Municipal budgets run one to three orders of magnitude below the national totals the rest of the explorer charts in billions; a billions axis would round most municipal functions to `0.0`. The municipal chart and table pass `UNIT_MLN` (`lib/explorer/format.ts` — one decimal, million GEL) to the same `EditorialLineChart`/`ExplorerTable` the budget explorer passes `UNIT_BN` to. KPI values, list rows, and the entity picker use `formatAmount`, which already auto-selects `მლნ ₾` below ~1bn GEL on its own.

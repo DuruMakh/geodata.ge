@@ -157,9 +157,16 @@ test("sidebar section links move between sections in-app", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ იხარჯება საქართველოს ბიუჯეტი");
   await expectLineChartRendered(page);
 
-  // მუნიციპალიტეტები is listed but unbuilt: a marker, never a link.
-  await expect(sidebar.getByRole("link", { name: "მუნიციპალიტეტები" })).toHaveCount(0);
-  await expect(sidebar).toContainText("მუნიციპალიტეტები");
+  // მუნიციპალიტეტები is now routed: a real link, not a "მალე" marker. Scoped to
+  // the row itself, not the whole sidebar — the unrelated TEASERS rows below
+  // (უმუშევრობა etc.) are still genuinely coming soon and keep their badge.
+  const municipalitiesLink = sidebar.getByTestId("section-link-municipalities");
+  await expect(municipalitiesLink).not.toContainText("მალე");
+  expect(await municipalitiesLink.evaluate((node) => node.tagName)).toBe("A");
+  await municipalitiesLink.click();
+  await expect(page).toHaveURL(/\/explorer\/municipalities/);
+  await expect(page.getByTestId("region-map")).toBeVisible();
+  await expect(municipalitiesLink).toHaveAttribute("aria-current", "page");
 
   expect(consoleProblems).toEqual([]);
 });
@@ -297,10 +304,14 @@ test("CSV download uses the active filtered table data", async ({ page }) => {
   if (!path) throw new Error("Expected a local CSV download path");
 
   const { readFile } = await import("node:fs/promises");
-  const csv = await readFile(path, "utf8");
+  const csvBytes = await readFile(path);
+  const csv = csvBytes.toString("utf8");
 
   expect(download.suggestedFilename()).toContain("geodata-fields-");
-  expect(csv.split("\n")[0]).toBe(
+  expect(Array.from(csvBytes.subarray(0, 3))).toEqual([0xef, 0xbb, 0xbf]);
+  expect(csv.startsWith("\uFEFF")).toBe(true);
+  const csvWithoutBom = csv.slice(1);
+  expect(csvWithoutBom.split("\n")[0]).toBe(
     "year,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at",
   );
   expect(csv).toContain("spending.");
@@ -558,7 +569,7 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
   expect(consoleProblems).toEqual([]);
 });
 
-test("hub lists four cards and keeps municipalities inert", async ({ page }) => {
+test("hub lists four cards, all four now live", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
   await page.goto("http://localhost:3100/explorer");
@@ -572,11 +583,13 @@ test("hub lists four cards and keeps municipalities inert", async ({ page }) => 
     "/explorer/expenditure",
   );
 
+  // Card 03: routed like the other three, not a "მალე" marker any more.
   const municipalities = page.getByTestId("hub-card").nth(2);
   await expect(municipalities).toContainText("მუნიციპალიტეტები");
-  await expect(municipalities).toContainText("მალე");
-  await expect(municipalities).toHaveAttribute("aria-disabled", "true");
-  expect(await municipalities.evaluate((node) => node.tagName)).toBe("DIV");
+  await expect(municipalities).not.toContainText("მალე");
+  await expect(municipalities).not.toHaveAttribute("aria-disabled");
+  expect(await municipalities.evaluate((node) => node.tagName)).toBe("A");
+  await expect(municipalities).toHaveAttribute("href", "/explorer/municipalities");
 
   // No invented article count or unit total anywhere on the hub.
   await expect(page.getByTestId("budget-hub")).not.toContainText("სტატია");
@@ -586,6 +599,14 @@ test("hub lists four cards and keeps municipalities inert", async ({ page }) => 
   // assert a real figure is there. The shape, not the figure: the number moves
   // with every dataset update, the "<year> · <n.nn> მლრდ ₾" contract does not.
   await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} · [\d,]+\.\d{2} მლრდ ₾/);
+  // Card 03 now carries the same contract — this is the figure this task adds.
+  await expect(municipalities).toContainText(/\d{4} · [\d,]+\.\d{2} მლრდ ₾/);
+
+  // The card is not just styled as a link — clicking it actually lands on the
+  // municipalities index.
+  await municipalities.click();
+  await expect(page).toHaveURL(/\/explorer\/municipalities$/);
+  await expect(page.getByTestId("region-map")).toBeVisible();
 
   expect(consoleProblems).toEqual([]);
 });

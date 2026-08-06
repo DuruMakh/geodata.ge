@@ -1,5 +1,5 @@
-import type { ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
-import { formatBn, formatShare, MISSING } from "../../lib/explorer/format";
+import type { ExplorerTableRow } from "../../lib/explorer/types";
+import { formatInUnit, formatShare, MISSING, type ValueUnit } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { SwatchBar } from "../ui/editorial";
 
@@ -10,14 +10,9 @@ type ExplorerTableProps = {
   rows: ExplorerTableRow[];
   totalRow: ExplorerTableRow | null;
   years: number[];
-  scope: ExplorerScope;
+  firstColumnLabel: string;
+  unit: ValueUnit;
   share: boolean;
-};
-
-const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
-  fields: "სფერო",
-  ministries: "უწყება",
-  revenue: "საბიუჯეტო მუხლი",
 };
 
 const headCellClass =
@@ -29,7 +24,7 @@ function changeColor(change: number | null): string {
   return change >= 0 ? POSITIVE : NEGATIVE;
 }
 
-export function ExplorerTable({ rows, totalRow, years, scope, share }: ExplorerTableProps) {
+export function ExplorerTable({ rows, totalRow, years, firstColumnLabel, unit, share }: ExplorerTableProps) {
   const endYear = years.at(-1);
   const lastIndex = years.length - 1;
   const totalsByYear = new Map(years.map((year) => [year, totalRow?.valuesByYear[year] ?? null]));
@@ -37,7 +32,7 @@ export function ExplorerTable({ rows, totalRow, years, scope, share }: ExplorerT
   const cellValue = (row: ExplorerTableRow, year: number): string => {
     const amount = row.valuesByYear[year];
     if (amount === null || amount === undefined) return MISSING;
-    if (!share) return formatBn(amount);
+    if (!share) return formatInUnit(amount, unit);
     const total = totalsByYear.get(year);
     return total ? formatShare(amount / total) : MISSING;
   };
@@ -51,7 +46,7 @@ export function ExplorerTable({ rows, totalRow, years, scope, share }: ExplorerT
         <thead>
           <tr>
             <th className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]">
-              {FIRST_COL_LABEL[scope]}
+              {firstColumnLabel}
             </th>
             {years.map((year) => (
               <th key={year} className={`${headCellClass} font-[family-name:var(--font-numeric)] tracking-[0.04em]`}>
@@ -113,7 +108,7 @@ export function ExplorerTable({ rows, totalRow, years, scope, share }: ExplorerT
               </td>
               {years.map((year) => (
                 <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={cellPad}>
-                  {share ? "100.0%" : formatBn(totalRow.valuesByYear[year] ?? null)}
+                  {share ? "100.0%" : formatInUnit(totalRow.valuesByYear[year] ?? null, unit)}
                 </td>
               ))}
               <td

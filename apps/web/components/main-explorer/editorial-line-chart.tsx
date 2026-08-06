@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
-import { formatBn, formatShare } from "../../lib/explorer/format";
+import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
 import { SwatchBar } from "../ui/editorial";
 
 // Bespoke SVG line chart per DESIGN.md §8.3: chart sits directly on paper, dot
@@ -20,6 +20,7 @@ type EditorialLineChartProps = {
   years: number[];
   series: ChartSeries[];
   share: boolean;
+  unit: ValueUnit;
 };
 
 const W = 920;
@@ -50,7 +51,7 @@ function decimalsFor(step: number, max: number): number {
   return max;
 }
 
-export function EditorialLineChart({ years, series, share }: EditorialLineChartProps) {
+export function EditorialLineChart({ years, series, share, unit }: EditorialLineChartProps) {
   const [hoverRaw, setHover] = useState<number | null>(null);
   const n = years.length;
   // The hover index survives range shrinks (no pointer event fires), so clamp it
@@ -81,14 +82,15 @@ export function EditorialLineChart({ years, series, share }: EditorialLineChartP
   // Axis precision follows the gridline step so small-magnitude series (single
   // programs, share mode) never produce duplicate or all-zero labels.
   const shareDigits = decimalsFor(step, 2);
-  const bnDigits = Math.max(1, decimalsFor(step / 1_000_000_000, 4));
+  const unitDigits = Math.max(1, decimalsFor(step / unit.divisor, 4));
   const formatAxis = (value: number) =>
     (share
       ? `${value.toFixed(shareDigits)}%`
-      : `${(value / 1_000_000_000).toLocaleString("en-US", { maximumFractionDigits: bnDigits })} მლრდ`
+      : `${(value / unit.divisor).toLocaleString("en-US", { maximumFractionDigits: unitDigits })} ${unit.label}`
     ).replace("-", "−");
 
-  const formatValue = (value: number | null) => (share ? formatShare(value === null ? null : value / 100) : formatBn(value));
+  const formatValue = (value: number | null) =>
+    share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
   const labelStep = Math.max(1, Math.ceil(n / 12));

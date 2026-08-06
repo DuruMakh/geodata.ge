@@ -6,7 +6,7 @@ This methodology covers the prepared annual municipality-level research files un
 
 `docs/Raw Data/Municipalities/combined-annual-2015-2025/`
 
-### Serving status (2026-08-02)
+### Serving status (2026-08-06)
 
 The ten main functional categories are served, on the same terms as expenditure and revenue:
 reviewed, mapped to stable `municipal.*` category IDs, and shipped as
@@ -14,19 +14,23 @@ reviewed, mapped to stable `municipal.*` category IDs, and shipped as
 `data/imports/municipal-total-facts-2015-2025.csv` (704 rows), and a municipality registry
 `data/imports/municipalities.csv` (64 rows). These are read by the CSV serving path
 (`GEODATA_DATA_SOURCE=csv`, the default) the same way expenditure and revenue are. Prisma
-models, a migration, and a database-mode reader also exist for this dataset (see
-`docs/data-methodology/database-import.md`), but as of this date the migration has not been
-applied to the Supabase database and `npm run data:import` has not loaded municipal rows into
-it — the mirror holds no municipal data yet. Both happen automatically, with no manual approval
-step, on the next CI-green push to `main`: `.github/workflows/deploy-production.yml` runs
-`npm run prisma:deploy` and then `npm run data:import` unconditionally, so merging this branch is
-the decision point. The operation is safe by construction — one transaction, parity verified
-before commit, rollback on any mismatch — and production keeps serving the previous build if the
-workflow goes red.
+models, migration `20260802194939_municipal_dataset`, the transactional Supabase mirror import,
+and field-by-field import parity checks shipped in the earlier data-only rollout (see
+`docs/data-methodology/database-import.md`). Migration and import are therefore not pending.
+Every CI-gated production run owned by `.github/workflows/deploy-production.yml` runs
+`npm run prisma:deploy` and `npm run data:import` unconditionally, reconverging the mirror to
+the reviewed CSVs before Vercel is triggered. Manual Vercel dashboard or CLI deployments do not
+run those Actions steps; see `docs/deployment.md`.
 
-No page or route reads this data. `apps/web/lib/explorer/sections.ts` keeps
-`municipalities: { href: null }`, and the sidebar/hub keep the `მალე` marker (`DESIGN.md`
-§6.7); that stays until a future UI spec ships the route.
+This branch implements `/explorer/municipalities`, 64 municipality pages, and 11 region roll-up
+pages. Those routes call `loadServedMunicipalData()`, so a db-mode build of this code verifies the
+municipal mirror row by row. The earlier data-only deployment had no municipal route and did not
+exercise that build-time municipal parity check. Implementation is not confirmation of a
+production deployment: direct checks of `https://geodata-ge.vercel.app/explorer/municipalities`
+and `/explorer/municipalities/04` returned HTTP 404 on 2026-08-06, and this workspace could not
+freshly authenticate hosted GitHub/remote-main metadata or the live database contents. Do not
+describe the municipal UI as live until a post-deployment route check returns HTTP 200. The
+index's map is region-grain (ADM1); see "Region shape join" below.
 
 The six selected-detail rows (`7.1.1`, `7.4.5.1`, `7.5.1`, `7.8.1`, `7.8.2`, `7.9.1`; 4,554 rows
 in the prepared package below) are deliberately not imported — not an oversight. Dropping them
@@ -72,17 +76,57 @@ and `64` (Akhalgori). Source review established that these are budgets of Georgi
 bodies operating outside the occupied territories and serving displaced communities, not
 territorially attributable expenditure delivered inside those occupied municipalities. By
 user decision, all five codes are excluded from the public registry, both served fact files,
-regional aggregates, rankings, and the future municipalities UI. The raw research package,
+regional aggregates, rankings, and the municipalities UI. The raw research package,
 official workbooks, manifests, hashes, and validation report remain unchanged for provenance.
 
 With code `05` excluded, `region.abkhazia` has no served municipality and is omitted from the
-municipal data taxonomy. Occupied territory may still appear in future map geometry with an
-explicit no-data treatment. The Adjara regional roll-up continues to exclude the autonomous
-republic's own budget, which is outside this package entirely.
+municipal data taxonomy. Occupied territory appears in the shipped map geometry as an explicit
+no-data shape (see "Region shape join" below). The Adjara regional roll-up continues to exclude
+the autonomous republic's own budget, which is outside this package entirely.
 
-The map-shape join (matching each municipality to a map boundary) is deferred to the future UI
-spec and is not part of what is served here; see
-`docs/superpowers/specs/2026-08-02-municipal-data-serving-layer-design.md` §4.3.
+### Region shape join
+
+The municipalities UI (`/explorer/municipalities`) renders a region-grain choropleth, not a
+municipality-grain one: no openly-licensed ADM2 (municipality-level) geometry matches this
+package's 64-unit registry, so the join here stops at the 11 data-bearing regions and a
+municipality-grain map is deferred to a future spec.
+
+Region geometry is **geoBoundaries `gbOpen` GEO ADM1, release `9469f09`, CC BY 3.0** (source:
+`commons.wikimedia.org`). It replaced GADM, which permits non-commercial use but forbids
+redistribution — publishing a map ships the coordinates to every visitor's browser, which is
+redistribution. CC BY 3.0 permits that but requires attribution; the index page's source note
+and `apps/web/lib/landing/georgiaGeo.ts`'s header comment both carry it.
+
+The join is keyed on geoBoundaries' **`shapeISO`**, never `shapeName`: geoBoundaries spells
+Samtskhe–Javakheti with an **en dash** (U+2013) and names `GE-RL` "Racha-Lechkhumi and Kvemo
+Svaneti", neither of which matches this package's region labels, so a name join would fail
+silently on exactly those two. The join table (`apps/web/lib/explorer/municipalGeo.ts`,
+`REGION_ID_BY_SHAPE_ISO`) is exhaustive over all 12 shapes:
+
+| `shapeISO` | `shapeName` | Resolves to |
+| --- | --- | --- |
+| `GE-TB` | Tbilisi | `region.tbilisi` |
+| `GE-AJ` | Adjara | `region.adjara` |
+| `GE-GU` | Guria | `region.guria` |
+| `GE-IM` | Imereti | `region.imereti` |
+| `GE-KA` | Kakheti | `region.kakheti` |
+| `GE-MM` | Mtskheta-Mtianeti | `region.mtskheta_mtianeti` |
+| `GE-RL` | Racha-Lechkhumi and Kvemo Svaneti | `region.racha_lechkhumi_kvemo_svaneti` |
+| `GE-SZ` | Samegrelo-Zemo Svaneti | `region.samegrelo_zemo_svaneti` |
+| `GE-SJ` | Samtskhe–Javakheti | `region.samtskhe_javakheti` |
+| `GE-KK` | Kvemo Kartli | `region.kvemo_kartli` |
+| `GE-SK` | Shida Kartli | `region.shida_kartli` |
+| `GE-AB` | Abkhazia | no data (`occupied_territory`) — `region.abkhazia` has no served municipality (above) |
+
+Every shape resolves to a region or to a stated no-data reason, and every one of the 11
+data-bearing regions resolves to exactly one shape — `buildRegionShapes()` throws at build time
+on any unmapped shape, and both directions are covered by `tests/explorer/municipalGeo.test.ts`
+and by `npm run data:validate`.
+
+Shida Kartli and Mtskheta-Mtianeti render as ordinary data-bearing shapes even though the
+Tskhinvali region is not a separate ADM1 shape (it lies de jure inside both) — their totals
+exclude the four affected municipal bodies (`42`, `43`, `46`, `64`) named above, a caveat that
+lives in the region page's source note as text, since it cannot be carried by a map colour.
 
 ### Population — not imported
 
