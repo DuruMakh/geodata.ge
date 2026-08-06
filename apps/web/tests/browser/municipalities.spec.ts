@@ -242,7 +242,7 @@ test.describe("municipalities index", () => {
   test("opens a municipality from the list", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await page.getByTestId("municipal-list-row").first().click();
-    await expect(page).toHaveURL(/\/explorer\/municipalities\/04$/);
+    await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/04");
   });
 
   test("shows four KPIs", async ({ page }) => {

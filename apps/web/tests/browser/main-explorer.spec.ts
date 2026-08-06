@@ -304,10 +304,14 @@ test("CSV download uses the active filtered table data", async ({ page }) => {
   if (!path) throw new Error("Expected a local CSV download path");
 
   const { readFile } = await import("node:fs/promises");
-  const csv = await readFile(path, "utf8");
+  const csvBytes = await readFile(path);
+  const csv = csvBytes.toString("utf8");
 
   expect(download.suggestedFilename()).toContain("geodata-fields-");
-  expect(csv.split("\n")[0]).toBe(
+  expect(Array.from(csvBytes.subarray(0, 3))).toEqual([0xef, 0xbb, 0xbf]);
+  expect(csv.startsWith("\uFEFF")).toBe(true);
+  const csvWithoutBom = csv.slice(1);
+  expect(csvWithoutBom.split("\n")[0]).toBe(
     "year,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at",
   );
   expect(csv).toContain("spending.");
