@@ -166,6 +166,20 @@ function sourceMetadataFor(sourceId: string, sources: Map<string, SourceDocument
   };
 }
 
+export function latestReviewedAtForMunicipalFacts(
+  sourceDocuments: SourceDocumentRow[],
+  functionFacts: MunicipalFunctionFact[],
+  totalFacts: MunicipalTotalFact[],
+): string {
+  const referencedSourceIds = new Set([...functionFacts, ...totalFacts].map((row) => row.sourceId));
+
+  return sourceDocuments.reduce(
+    (latest, source) =>
+      referencedSourceIds.has(source.sourceId) && source.lastReviewedAt > latest ? source.lastReviewedAt : latest,
+    "",
+  );
+}
+
 function changeBetween(start: number | null, end: number | null): number | null {
   if (start === null || end === null || start === 0) return null;
   return (end - start) / start;
@@ -235,7 +249,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
       level: "municipal_function",
       detailLabel: null,
       kaLabel: fn.kaLabel,
-      enLabel: fn.kaLabel,
+      enLabel: "",
       color: colorForItem(fn.id, index),
       basisByYear,
       sourceByYear,
@@ -470,8 +484,8 @@ export type MunicipalComparisonRow = {
 
 export type MunicipalEntityKpiInput = {
   model: MunicipalEntityModel;
-  /** Sum of every served municipality's public total in the range's end year. */
-  nationalTotalLatest: number;
+  /** Sum of every served municipality's public total, keyed by year. */
+  nationalTotalByYear: Record<number, number>;
   rank: number;
   rankOutOf: number;
 };
@@ -494,11 +508,12 @@ function sortedByEndYear(rows: ExplorerTableRow[], endYear: number | undefined):
 
 /** The four entity KPIs, for both municipality and region pages. */
 export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] {
-  const { model, nationalTotalLatest } = input;
+  const { model, nationalTotalByYear } = input;
   const startYear = model.years[0];
   const endYear = model.years.at(-1);
 
   const officialEnd = endYear === undefined ? 0 : model.officialTotalByYear[endYear] ?? 0;
+  const nationalEnd = endYear === undefined ? 0 : nationalTotalByYear[endYear] ?? 0;
   const functionalStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
   const functionalEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
   const growth = changeBetween(functionalStart, functionalEnd);
@@ -528,7 +543,7 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
     },
     {
       label: "წილი მუნიციპალურ ხარჯებში",
-      value: nationalTotalLatest > 0 ? formatShare(officialEnd / nationalTotalLatest) : MISSING,
+      value: nationalEnd > 0 ? formatShare(officialEnd / nationalEnd) : MISSING,
       // `detail` is this municipality's ordinal RANK among all municipalities —
       // not a per-capita figure. It stands in for the per-capita KPI the
       // reference design used (§6.4): rank is size-independent without needing
@@ -556,6 +571,7 @@ export function buildMovers(model: MunicipalEntityModel): { up: MunicipalMover[]
         endYear === undefined ? null : row.valuesByYear[endYear] ?? null,
       ),
     }))
+    .filter((row) => row.growth !== null)
     .sort((left, right) => (right.growth ?? -Infinity) - (left.growth ?? -Infinity));
 
   const rank = (rows: typeof growth) => rows.map((row, index) => ({ ...row, rank: index + 1 }));

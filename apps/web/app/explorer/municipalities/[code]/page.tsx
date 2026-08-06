@@ -3,7 +3,11 @@ import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../../../components/municipalities/municipal-explorer";
 import { PageHeader } from "../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../lib/data/servedData";
-import { buildMunicipalListRows, buildPickerGroups } from "../../../../lib/explorer/municipalData";
+import {
+  buildMunicipalListRows,
+  buildPickerGroups,
+  latestReviewedAtForMunicipalFacts,
+} from "../../../../lib/explorer/municipalData";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
 
 // The 64 codes are the complete, closed set. Without this, an unknown code is
@@ -56,7 +60,10 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
   const listInput = { municipalities, regionLabels, totalFacts, year: latestYear };
   const list = buildMunicipalListRows(listInput);
   const rank = list.municipalities.find((row) => row.id === code)?.rank ?? 0;
-  const nationalTotalLatest = list.municipalities.reduce((sum, row) => sum + row.valueGel, 0);
+  const nationalTotalByYear = totalFacts.reduce<Record<number, number>>((totals, row) => {
+    totals[row.year] = (totals[row.year] ?? 0) + row.publicTotalGel;
+    return totals;
+  }, {});
 
   // Only this municipality's rows travel to the client: ~110 function facts and
   // 11 total facts, not the 7,744-row corpus.
@@ -72,7 +79,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
   const prev = ordered[(index - 1 + ordered.length) % ordered.length]!;
   const next = ordered[(index + 1) % ordered.length]!;
 
-  const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
+  const lastUpdatedAt = latestReviewedAtForMunicipalFacts(sourceDocuments, own.functionFacts, own.totalFacts);
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
@@ -97,7 +104,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
           functionFacts={own.functionFacts}
           totalFacts={own.totalFacts}
           sourceDocuments={sourceDocuments}
-          nationalTotalLatest={nationalTotalLatest}
+          nationalTotalByYear={nationalTotalByYear}
           rank={rank}
           rankOutOf={municipalities.length}
           showWarnings

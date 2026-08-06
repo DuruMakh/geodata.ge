@@ -7,6 +7,7 @@ import {
   aggregateFactsForEntity,
   buildMunicipalListRows,
   buildPickerGroups,
+  latestReviewedAtForMunicipalFacts,
   regionFactsFor,
 } from "../../../../../lib/explorer/municipalData";
 import { georgianOrdinal, REGION_GENITIVE_KA } from "../../../../../lib/explorer/municipalLabels";
@@ -69,7 +70,10 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   const listInput = { municipalities, regionLabels, totalFacts, year: latestYear };
   const list = buildMunicipalListRows(listInput);
   const rank = list.regions.find((row) => row.id === regionId)?.rank ?? 0;
-  const nationalTotalLatest = list.municipalities.reduce((sum, row) => sum + row.valueGel, 0);
+  const nationalTotalByYear = totalFacts.reduce<Record<number, number>>((totals, row) => {
+    totals[row.year] = (totals[row.year] ?? 0) + row.publicTotalGel;
+    return totals;
+  }, {});
 
   const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
   // Collapse the members' rows into one entity's on the SERVER, so this page
@@ -86,7 +90,11 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   const next = ordered[(index + 1) % ordered.length]!;
   const hrefFor = (target: { id: string }) => `/explorer/municipalities/region/${target.id.replace("region.", "")}`;
 
-  const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
+  const lastUpdatedAt = latestReviewedAtForMunicipalFacts(
+    sourceDocuments,
+    members.functionFacts,
+    members.totalFacts,
+  );
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
@@ -111,7 +119,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           functionFacts={own.functionFacts}
           totalFacts={own.totalFacts}
           sourceDocuments={sourceDocuments}
-          nationalTotalLatest={nationalTotalLatest}
+          nationalTotalByYear={nationalTotalByYear}
           rank={rank}
           rankOutOf={regions.length}
           // No callout on a roll-up: its own two totals reconcile, and თბილისი

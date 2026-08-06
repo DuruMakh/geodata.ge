@@ -45,7 +45,7 @@ export type MunicipalExplorerProps = {
   totalFacts: MunicipalTotalFact[];
   sourceDocuments: SourceDocumentRow[];
 
-  nationalTotalLatest: number;
+  nationalTotalByYear: Record<number, number>;
   rank: number;
   rankOutOf: number;
   showWarnings: boolean;
@@ -275,7 +275,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
           <MunicipalIndicators
             kpis={buildEntityKpis({
               model,
-              nationalTotalLatest: props.nationalTotalLatest,
+              nationalTotalByYear: props.nationalTotalByYear,
               rank: props.rank,
               rankOutOf: props.rankOutOf,
             })}

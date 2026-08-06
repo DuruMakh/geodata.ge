@@ -11,6 +11,7 @@ import {
   buildMunicipalListRows,
   buildPickerGroups,
   getDefaultMunicipalSelection,
+  latestReviewedAtForMunicipalFacts,
   MIXED_PUBLIC_TOTAL_MEASURE,
   MIXED_SOURCE_ID,
   regionFactsFor,
@@ -96,6 +97,10 @@ describe("buildMunicipalEntityModel", () => {
       "municipal.health",
       "municipal.education",
     ]);
+  });
+
+  it("leaves English metadata blank when the municipal taxonomy has only Georgian labels", () => {
+    expect(build().rows.map((row) => row.enLabel)).toEqual(["", "", ""]);
   });
 
   it("makes the total row the FUNCTIONAL sum, not the official headline", () => {
@@ -205,6 +210,21 @@ describe("buildMunicipalEntityModel total row source attribution", () => {
 
     expect(model.totalRow.sourceByYear[2015].sourceName).toBe("ადგილობრივი ბიუჯეტების შესრულება");
     expect(model.totalRow.sourceByYear[2017].sourceName).toBe("წლიური და საარქივო პუბლიკაციები");
+  });
+});
+
+describe("latestReviewedAtForMunicipalFacts", () => {
+  it("ignores a newer source document that is not referenced by the municipal facts", () => {
+    const unrelatedNationalSource: SourceDocumentRow = {
+      sourceId: "source.national_budget_2027",
+      sourceName: "National budget",
+      sourceUrlOrFile: "national-budget.xlsx",
+      lastReviewedAt: "2026-12-31",
+    };
+
+    expect(latestReviewedAtForMunicipalFacts([...SOURCES, unrelatedNationalSource], FUNCTION_FACTS, TOTAL_FACTS)).toBe(
+      "2026-08-01",
+    );
   });
 });
 
@@ -709,10 +729,11 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
 });
 
 describe("buildEntityKpis", () => {
+  const nationalTotalByYear = { 2016: 740, 2017: 740 };
   const kpis = () =>
     buildEntityKpis({
       model: build(),
-      nationalTotalLatest: 740,
+      nationalTotalByYear,
       rank: 1,
       rankOutOf: 64,
     });
@@ -729,7 +750,7 @@ describe("buildEntityKpis", () => {
     // official/functional swap on `.value` — it covers the gap this test
     // leaves, so do not delete it as "redundant" with this one.
     const model = build(2015, 2016);
-    const divergent = buildEntityKpis({ model, nationalTotalLatest: 740, rank: 1, rankOutOf: 64 });
+    const divergent = buildEntityKpis({ model, nationalTotalByYear, rank: 1, rankOutOf: 64 });
     expect(divergent[0]!.label).toBe("ოფიციალური ბიუჯეტი");
     expect(divergent[0]!.detail).toContain("ფინანსთა სამინისტროს");
     expect(model.officialTotalByYear[2016]).toBe(300);
@@ -758,7 +779,12 @@ describe("buildEntityKpis", () => {
       startYear: 2015,
       endYear: 2016,
     });
-    const divergent = buildEntityKpis({ model, nationalTotalLatest: 740_000_000, rank: 1, rankOutOf: 64 });
+    const divergent = buildEntityKpis({
+      model,
+      nationalTotalByYear: { 2016: 740_000_000 },
+      rank: 1,
+      rankOutOf: 64,
+    });
     expect(divergent[0]!.value).toBe(formatAmount(350_000_000));
     expect(divergent[0]!.value).not.toBe(formatAmount(265_000_000));
   });
@@ -775,7 +801,7 @@ describe("buildEntityKpis", () => {
     // `.value`, this discriminates even at the fixture's toy-number scale: a
     // percentage is scale-invariant, so +66% vs +88% never collapses under
     // rounding the way formatAmount(300) vs formatAmount(265) does.
-    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalLatest: 740, rank: 1, rankOutOf: 64 });
+    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rank: 1, rankOutOf: 64 });
     expect(divergent[1]!.value).toBe("+66%");
   });
 
@@ -789,6 +815,17 @@ describe("buildEntityKpis", () => {
     expect(kpis()[3]!.value).toBe("50.0%");
   });
 
+  it("uses the selected range-end year's national total for the national share", () => {
+    const clipped = buildEntityKpis({
+      model: build(2015, 2016),
+      nationalTotalByYear: { 2016: 600, 2017: 740 },
+      rank: 1,
+      rankOutOf: 64,
+    });
+
+    expect(clipped[3]!.value).toBe("50.0%");
+  });
+
   // `rank` is a real input read by this KPI's detail, not dead weight on the
   // interface: first place reads პირველი, never მე-1 (georgianOrdinal, Task 3).
   it("names the placement with the georgian ordinal of rank, not just the count it is out of", () => {
@@ -796,7 +833,7 @@ describe("buildEntityKpis", () => {
   });
 
   it("switches to მე-N for any rank other than first", () => {
-    const fifth = buildEntityKpis({ model: build(), nationalTotalLatest: 740, rank: 5, rankOutOf: 64 });
+    const fifth = buildEntityKpis({ model: build(), nationalTotalByYear, rank: 5, rankOutOf: 64 });
     expect(fifth[3]!.detail).toBe("მე-5 ადგილი 64-დან");
   });
 
@@ -807,14 +844,14 @@ describe("buildEntityKpis", () => {
   it("shares the largest function against the functional total, not the official one", () => {
     // economic_affairs is largest at 2016 (200). Against the functional total
     // (265) that's 75.5%; against the official total (300) it would be 66.7%.
-    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalLatest: 740, rank: 1, rankOutOf: 64 });
+    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rank: 1, rankOutOf: 64 });
     expect(divergent[2]!.value).toBe("75.5%");
   });
 
   it("shares the national-total KPI against the official total, not the functional one", () => {
-    // official (300) / nationalTotalLatest (740) = 40.5%; functional (265) /
+    // official (300) / nationalTotalByYear[2016] (740) = 40.5%; functional (265) /
     // 740 would be 35.8%.
-    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalLatest: 740, rank: 1, rankOutOf: 64 });
+    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rank: 1, rankOutOf: 64 });
     expect(divergent[3]!.value).toBe("40.5%");
   });
 });
@@ -832,6 +869,24 @@ describe("buildMovers", () => {
 
   it("carries each row's category colour", () => {
     expect(buildMovers(build()).up[0]!.color).toBe("#C26E4C");
+  });
+
+  it("excludes a zero-start row instead of ranking its unavailable growth as the slowest mover", () => {
+    const zeroStartFacts = FUNCTION_FACTS.map((row) =>
+      row.year === 2015 && row.categoryId === "municipal.education" ? { ...row, amountGel: 0 } : row,
+    );
+    const model = buildMunicipalEntityModel({
+      functions: FUNCTIONS,
+      functionFacts: zeroStartFacts,
+      totalFacts: TOTAL_FACTS,
+      sourceDocuments: SOURCES,
+      startYear: 2015,
+      endYear: 2017,
+    });
+    const movers = buildMovers(model);
+
+    expect(movers.down[0]!.kaLabel).toBe("ჯანმრთელობის დაცვა");
+    expect([...movers.up, ...movers.down].some((row) => row.kaLabel === "განათლება")).toBe(false);
   });
 });
 

@@ -3,7 +3,11 @@ import { MunicipalitiesIndex } from "../../../components/municipalities/municipa
 import { PageHeader } from "../../../components/shell/page-header";
 import type { RegionMapCity, RegionMapShape } from "../../../components/municipalities/region-map";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
-import { buildIndexKpis, buildMunicipalListRows } from "../../../lib/explorer/municipalData";
+import {
+  buildIndexKpis,
+  buildMunicipalListRows,
+  latestReviewedAtForMunicipalFacts,
+} from "../../../lib/explorer/municipalData";
 import { buildRegionShapes, MAP_VIEWBOX, projectPoint } from "../../../lib/explorer/municipalGeo";
 import { GEORGIA_GEO } from "../../../lib/landing/georgiaGeo";
 import { formatAmount } from "../../../lib/explorer/format";
@@ -88,7 +92,7 @@ export default async function MunicipalitiesIndexPage() {
     throw new Error("a self-governing city has no coordinate in GEORGIA_GEO.cityMarkers");
   }
 
-  const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
+  const lastUpdatedAt = latestReviewedAtForMunicipalFacts(sourceDocuments, functionFacts, totalFacts);
   const values = list.regions.map((row) => row.valueGel);
 
   return (
