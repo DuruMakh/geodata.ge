@@ -1,0 +1,231 @@
+{
+  "status": "complete",
+  "population": {
+    "observedYears": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "rowCount": 704,
+    "gaps": [],
+    "nationalReconciliation": [
+      {
+        "year": 2015,
+        "complete": true,
+        "published_total_thousand": 3721.9,
+        "municipality_sum_thousand": 3722,
+        "difference_thousand": -0.1
+      },
+      {
+        "year": 2016,
+        "complete": true,
+        "published_total_thousand": 3728.6,
+        "municipality_sum_thousand": 3728.6,
+        "difference_thousand": 0
+      },
+      {
+        "year": 2017,
+        "complete": true,
+        "published_total_thousand": 3726.4,
+        "municipality_sum_thousand": 3726.7,
+        "difference_thousand": -0.3
+      },
+      {
+        "year": 2018,
+        "complete": true,
+        "published_total_thousand": 3729.6,
+        "municipality_sum_thousand": 3729.1,
+        "difference_thousand": 0.5
+      },
+      {
+        "year": 2019,
+        "complete": true,
+        "published_total_thousand": 3723.5,
+        "municipality_sum_thousand": 3723.2,
+        "difference_thousand": 0.3
+      },
+      {
+        "year": 2020,
+        "complete": true,
+        "published_total_thousand": 3716.9,
+        "municipality_sum_thousand": 3717,
+        "difference_thousand": -0.1
+      },
+      {
+        "year": 2021,
+        "complete": true,
+        "published_total_thousand": 3728.6,
+        "municipality_sum_thousand": 3728.4,
+        "difference_thousand": 0.2
+      },
+      {
+        "year": 2022,
+        "complete": true,
+        "published_total_thousand": 3688.6,
+        "municipality_sum_thousand": 3688.3,
+        "difference_thousand": 0.3
+      },
+      {
+        "year": 2023,
+        "complete": true,
+        "published_total_thousand": 3736.4,
+        "municipality_sum_thousand": 3736.3,
+        "difference_thousand": 0.1
+      },
+      {
+        "year": 2024,
+        "complete": true,
+        "published_total_thousand": 3694.6,
+        "municipality_sum_thousand": 3694.6,
+        "difference_thousand": 0
+      },
+      {
+        "year": 2025,
+        "complete": true,
+        "published_total_thousand": 3930.4,
+        "municipality_sum_thousand": 3930.6,
+        "difference_thousand": -0.2
+      }
+    ]
+  },
+  "regionalGdp": {
+    "observedYears": [
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "rowCount": 165,
+    "gaps": [],
+    "nationalReconciliation": [
+      {
+        "year": 2010,
+        "complete": true,
+        "published_total_million_gel": 22148.7,
+        "regional_sum_million_gel": 22148.7,
+        "difference_million_gel": 0
+      },
+      {
+        "year": 2011,
+        "complete": true,
+        "published_total_million_gel": 26099.4,
+        "regional_sum_million_gel": 26099.4,
+        "difference_million_gel": 0
+      },
+      {
+        "year": 2012,
+        "complete": true,
+        "published_total_million_gel": 27896.9,
+        "regional_sum_million_gel": 27896.8,
+        "difference_million_gel": 0.1
+      },
+      {
+        "year": 2013,
+        "complete": true,
+        "published_total_million_gel": 29137.7,
+        "regional_sum_million_gel": 29137.9,
+        "difference_million_gel": -0.2
+      },
+      {
+        "year": 2014,
+        "complete": true,
+        "published_total_million_gel": 31722.4,
+        "regional_sum_million_gel": 31722.4,
+        "difference_million_gel": 0
+      },
+      {
+        "year": 2015,
+        "complete": true,
+        "published_total_million_gel": 34548.2,
+        "regional_sum_million_gel": 34548.2,
+        "difference_million_gel": 0
+      },
+      {
+        "year": 2016,
+        "complete": true,
+        "published_total_million_gel": 36553.3,
+        "regional_sum_million_gel": 36553.4,
+        "difference_million_gel": -0.1
+      },
+      {
+        "year": 2017,
+        "complete": true,
+        "published_total_million_gel": 41339.8,
+        "regional_sum_million_gel": 41339.9,
+        "difference_million_gel": -0.1
+      },
+      {
+        "year": 2018,
+        "complete": true,
+        "published_total_million_gel": 45374.4,
+        "regional_sum_million_gel": 45374.2,
+        "difference_million_gel": 0.2
+      },
+      {
+        "year": 2019,
+        "complete": true,
+        "published_total_million_gel": 49726.3,
+        "regional_sum_million_gel": 49726.2,
+        "difference_million_gel": 0.1
+      },
+      {
+        "year": 2020,
+        "complete": true,
+        "published_total_million_gel": 49788.5,
+        "regional_sum_million_gel": 49788.5,
+        "difference_million_gel": 0
+      },
+      {
+        "year": 2021,
+        "complete": true,
+        "published_total_million_gel": 60724.1,
+        "regional_sum_million_gel": 60724.3,
+        "difference_million_gel": -0.2
+      },
+      {
+        "year": 2022,
+        "complete": true,
+        "published_total_million_gel": 72860.1,
+        "regional_sum_million_gel": 72860.3,
+        "difference_million_gel": -0.2
+      },
+      {
+        "year": 2023,
+        "complete": true,
+        "published_total_million_gel": 80882.8,
+        "regional_sum_million_gel": 80882.6,
+        "difference_million_gel": 0.2
+      },
+      {
+        "year": 2024,
+        "complete": true,
+        "published_total_million_gel": 93022.3,
+        "regional_sum_million_gel": 93022.3,
+        "difference_million_gel": 0
+      }
+    ]
+  },
+  "estimates_created": 0,
+  "excluded_codes_present": [],
+  "source_hashes_match": true,
+  "normalized_values_reconcile": true
+}
