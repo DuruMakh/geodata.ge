@@ -191,6 +191,15 @@ Use the Superpowers workflow:
 2. Writing plan.
 3. Implementation.
 4. Verification/review.
+5. GitHub delivery, when the implementation is intended for GitHub.
+
+The mandatory GitHub delivery flow is:
+
+```text
+codex/* branch -> commits -> push branch -> draft PR -> required CI -> review/resolved conversations -> merge -> delete branch
+```
+
+Do not push implementation commits directly to `main`. Complete implementation and verification/review before starting the GitHub delivery flow. Publishing or merging still requires the task to include GitHub delivery or explicit user authorization.
 
 When library, framework, SDK, API, CLI, or cloud-service docs are needed, use Context7 for current documentation before relying on memory.
 

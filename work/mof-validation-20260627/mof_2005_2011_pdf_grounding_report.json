@@ -1,0 +1,182 @@
+{
+  "years": {
+    "2005": {
+      "source_pdf": "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2005-programmatic-budget-law-from-2006-december\\sources\\2005-fact-from-2006-december-tavi-iv.pdf",
+      "parsed_rows": 151,
+      "comparison": {
+        "expected_rows": 152,
+        "actual_rows": 152,
+        "mismatch_count": 0,
+        "mismatch_examples": []
+      }
+    },
+    "2006": {
+      "source_pdf": "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\sources\\2006-annex.pdf",
+      "parsed_rows": 304,
+      "comparison": {
+        "expected_rows": 305,
+        "actual_rows": 305,
+        "mismatch_count": 0,
+        "mismatch_examples": []
+      }
+    },
+    "2007": {
+      "source_pdf": "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\sources\\2007-annex.pdf",
+      "parsed_rows": 376,
+      "comparison": {
+        "expected_rows": 377,
+        "actual_rows": 377,
+        "mismatch_count": 0,
+        "mismatch_examples": []
+      }
+    },
+    "2008": {
+      "source_pdf": "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\sources\\2008-annex.pdf",
+      "parsed_rows": 526,
+      "comparison": {
+        "expected_rows": 527,
+        "actual_rows": 527,
+        "mismatch_count": 1,
+        "mismatch_examples": [
+          {
+            "row": 311,
+            "expected": [
+              2008,
+              12,
+              41,
+              "32 13 03 66",
+              "32 00",
+              "coded",
+              "ssip - levan yanCavelis mcenareTa dacvis instituti",
+              null,
+              985528.39,
+              null,
+              0,
+              0,
+              null,
+              85600,
+              85528.39,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "actual": [
+              2008,
+              12,
+              41,
+              "32 13 03 66",
+              "32 00",
+              "coded",
+              "ssip - levan yanCavelis mcenareTa dacvis instituti",
+              85600,
+              85528.39,
+              null,
+              0,
+              0,
+              null,
+              85600,
+              85528.39,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      }
+    },
+    "2009": {
+      "source_pdf": "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\sources\\2009-annex.pdf",
+      "parsed_rows": 578,
+      "comparison": {
+        "expected_rows": 579,
+        "actual_rows": 579,
+        "mismatch_count": 0,
+        "mismatch_examples": []
+      }
+    },
+    "2010": {
+      "source_pdf": "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\sources\\2010-annex.pdf",
+      "parsed_rows": 333,
+      "comparison": {
+        "expected_rows": 334,
+        "actual_rows": 334,
+        "mismatch_count": 1,
+        "mismatch_examples": [
+          {
+            "row": 211,
+            "expected": [
+              2010,
+              15,
+              11,
+              "34 00",
+              null,
+              "coded",
+              "saqarTvelos okupirebuli teritoriebidan iZulebiT gadaadgilebul pirTa, gansaxlebisa da ltolvilTa saministtro",
+              22884411991122,
+              22117788554444.78,
+              666633336677.2211,
+              663300331122,
+              662233003399.9988,
+              77227722.0022,
+              22221111660000,
+              11555555550044.88,
+              665566009955.1199,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "actual": [
+              2010,
+              15,
+              11,
+              "34 00",
+              null,
+              "coded",
+              "saqarTvelos okupirebuli teritoriebidan iZulebiT gadaadgilebul pirTa, gansaxlebisa da ltolvilTa saministtro",
+              2841912,
+              2178544.79,
+              663367.21,
+              630312,
+              623039.98,
+              7272.02,
+              2211600,
+              1555504.81,
+              656095.19,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      }
+    },
+    "2011": {
+      "source_pdf": "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\sources\\2011-annex.pdf",
+      "parsed_rows": 659,
+      "comparison": {
+        "expected_rows": 660,
+        "actual_rows": 660,
+        "mismatch_count": 0,
+        "mismatch_examples": []
+      }
+    }
+  },
+  "failures": [
+    "2008: extracted PDF rows differ from final Excel",
+    "2010: extracted PDF rows differ from final Excel"
+  ]
+}

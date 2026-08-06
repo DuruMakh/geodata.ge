@@ -1,0 +1,50 @@
+﻿{
+    "inspected_at":  "2026-06-24",
+    "local_download_path":  "C:/Users/Mylaptop/Downloads/4. cvlileba 3 (1).rar",
+    "copied_source_candidate":  "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2004/official-sources/2005-october-budget-law-editable-files-with-2004-fact.source-candidate.rar",
+    "local_sha256":  "315B553AF0742DB1F5F12E52904646CBD51C3AC7F00F8F74CC8F9FDB6A38A175",
+    "local_size":  872996,
+    "official_inventory":  {
+                               "year":  2005,
+                               "category":  "state_budget",
+                               "label":  "რედაქტირებადი ფაილები",
+                               "related_law_label":  "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - ოქტომბერი",
+                               "href":  "https://mof.ge/files/download/4.%20cvlileba%203.rar/14f0e115-b730-4cca-8531-d828ec286d49",
+                               "official_size_from_audit_inventory":  872996,
+                               "direct_redownload_status":  "failed locally: TLS receive error, so hash was not re-confirmed in this turn"
+                           },
+    "archive_members":  [
+                            "4. cvlileba 3/2005-10/I TAVI.doc",
+                            "4. cvlileba 3/2005-10/II tavi.doc",
+                            "4. cvlileba 3/2005-10/III tavi.doc",
+                            "4. cvlileba 3/2005-10/IV tavi -1.doc",
+                            "4. cvlileba 3/2005-10/IV tavi - 2.doc",
+                            "4. cvlileba 3/2005-10/IV tavi -3.doc"
+                        ],
+    "evidence_snippets_latin_translit":  [
+                                             {
+                                                 "file":  "II tavi.doc",
+                                                 "evidence":  "saxelmwifo biujetis gadasaxdelebi organizaciul WrilSi ... 2004 wlis faqti ... 2005 wlis gegma",
+                                                 "first_rows":  "01 00 saqarTvelos parlamenti ... 14,603.5 ... 22,866.1; 02 00 prezidentis administracia ... 8,449.1 ... 9,964.1"
+                                             },
+                                             {
+                                                 "file":  "II tavi.doc",
+                                                 "evidence":  "saqarTvelos saxelmwifo biujetis gadasaxdelebi da xarjebi",
+                                                 "total_2004_fact_thousand_gel":  "1,978,549.3",
+                                                 "total_2005_plan_thousand_gel":  "2,825,073.0"
+                                             },
+                                             {
+                                                 "file":  "IV tavi -1.doc",
+                                                 "evidence":  "detail rows start with 01 00/01 01 and contain 2004 wlis faqti / 2005 wlis gegma columns"
+                                             },
+                                             {
+                                                 "file":  "IV tavi - 2.doc",
+                                                 "evidence":  "detail rows continue at 29 00, 30 00 etc. and contain 2004 wlis faqti / 2005 wlis gegma columns"
+                                             },
+                                             {
+                                                 "file":  "IV tavi -3.doc",
+                                                 "evidence":  "detail rows continue at 33 00, 34 00 etc. and contain 2004 wlis faqti / 2005 wlis gegma columns"
+                                             }
+                                         ],
+    "conclusion":  "This RAR is an official MoF 2005 October budget-law editable package candidate. It contains 2004 fact columns in organizational/programmatic expenditure tables. It is a better 2004 fact source candidate than the Treasury functional-expenditure annex for alignment with later years, but it is still a budget-law comparative fact column, not the standalone 2004 annual execution-report PDF."
+}
