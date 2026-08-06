@@ -1,0 +1,350 @@
+{
+  "version": 1,
+  "snapshotDate": "2026-08-06",
+  "projection": {
+    "name": "Web Mercator",
+    "viewBox": "0 0 1000 540",
+    "paddingPx": 14,
+    "coordinateDecimals": 1,
+    "simplificationTolerancePx": 0
+  },
+  "sources": [
+    {
+      "id": "openstreetmap-municipality-boundaries",
+      "url": "https://www.openstreetmap.org/copyright",
+      "licence": "ODbL 1.0",
+      "file": "docs/Raw Data/Municipalities/municipality-map-geometry/municipalities-osm.geojson",
+      "bytes": 459040,
+      "sha256": "EEE0FF11AED3F6F77A564C44B6B1D4C2779385EB05EC534B3EC6DBD784370539",
+      "featureCount": 60
+    },
+    {
+      "id": "natural-earth-occupied-area-overlays",
+      "url": "https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-details/",
+      "licence": "Public domain",
+      "file": "docs/Raw Data/Municipalities/municipality-map-geometry/occupied-areas-natural-earth.geojson",
+      "bytes": 5424,
+      "sha256": "4D983CCA1FFC4825D87345550E194BB17ABE1CCBED3C62301D30E4C6DBAD7464",
+      "featureCount": 2
+    },
+    {
+      "id": "approved-city-markers",
+      "url": null,
+      "licence": "Reviewed project data",
+      "file": "docs/Raw Data/Municipalities/municipality-map-geometry/city-markers.json",
+      "bytes": 446,
+      "sha256": "CBA85ACCCCE642F595282EFA7064CB3CA4BE4A08A586C7A0764089E4527E0E41",
+      "featureCount": 5
+    }
+  ],
+  "municipalityCodeCrosswalk": [
+    {
+      "code": "04",
+      "relationId": 1996871,
+      "sourceUrl": "https://www.openstreetmap.org/relation/1996871"
+    },
+    {
+      "code": "07",
+      "relationId": 2009239,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2009239"
+    },
+    {
+      "code": "08",
+      "relationId": 2009238,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2009238"
+    },
+    {
+      "code": "09",
+      "relationId": 2009240,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2009240"
+    },
+    {
+      "code": "10",
+      "relationId": 2009241,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2009241"
+    },
+    {
+      "code": "11",
+      "relationId": 2009242,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2009242"
+    },
+    {
+      "code": "12",
+      "relationId": 2027328,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2027328"
+    },
+    {
+      "code": "13",
+      "relationId": 2027330,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2027330"
+    },
+    {
+      "code": "14",
+      "relationId": 2027334,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2027334"
+    },
+    {
+      "code": "15",
+      "relationId": 2027329,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2027329"
+    },
+    {
+      "code": "16",
+      "relationId": 2027332,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2027332"
+    },
+    {
+      "code": "17",
+      "relationId": 2027335,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2027335"
+    },
+    {
+      "code": "18",
+      "relationId": 2027333,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2027333"
+    },
+    {
+      "code": "19",
+      "relationId": 2027331,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2027331"
+    },
+    {
+      "code": "21",
+      "relationId": 2024543,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024543"
+    },
+    {
+      "code": "22",
+      "relationId": 2024546,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024546"
+    },
+    {
+      "code": "23",
+      "relationId": 2024548,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024548"
+    },
+    {
+      "code": "24",
+      "relationId": 2024539,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024539"
+    },
+    {
+      "code": "25",
+      "relationId": 2024538,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024538"
+    },
+    {
+      "code": "26",
+      "relationId": 2024541,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024541"
+    },
+    {
+      "code": "27",
+      "relationId": 2024542,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024542"
+    },
+    {
+      "code": "28",
+      "relationId": 2024537,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024537"
+    },
+    {
+      "code": "29",
+      "relationId": 2024545,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024545"
+    },
+    {
+      "code": "30",
+      "relationId": 2024540,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024540"
+    },
+    {
+      "code": "31",
+      "relationId": 2024536,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2024536"
+    },
+    {
+      "code": "33",
+      "relationId": 2016161,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2016161"
+    },
+    {
+      "code": "34",
+      "relationId": 2016164,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2016164"
+    },
+    {
+      "code": "35",
+      "relationId": 2016165,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2016165"
+    },
+    {
+      "code": "36",
+      "relationId": 2016168,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2016168"
+    },
+    {
+      "code": "37",
+      "relationId": 2016163,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2016163"
+    },
+    {
+      "code": "38",
+      "relationId": 2016166,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2016166"
+    },
+    {
+      "code": "39",
+      "relationId": 2016167,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2016167"
+    },
+    {
+      "code": "40",
+      "relationId": 2016162,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2016162"
+    },
+    {
+      "code": "41",
+      "relationId": 2025548,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2025548"
+    },
+    {
+      "code": "44",
+      "relationId": 2025547,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2025547"
+    },
+    {
+      "code": "45",
+      "relationId": 2025549,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2025549"
+    },
+    {
+      "code": "47",
+      "relationId": 2025546,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2025546"
+    },
+    {
+      "code": "49",
+      "relationId": 2014300,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2014300"
+    },
+    {
+      "code": "50",
+      "relationId": 2014334,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2014334"
+    },
+    {
+      "code": "51",
+      "relationId": 2014299,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2014299"
+    },
+    {
+      "code": "52",
+      "relationId": 2014301,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2014301"
+    },
+    {
+      "code": "53",
+      "relationId": 1997312,
+      "sourceUrl": "https://www.openstreetmap.org/relation/1997312"
+    },
+    {
+      "code": "54",
+      "relationId": 2014298,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2014298"
+    },
+    {
+      "code": "55",
+      "relationId": 1995783,
+      "sourceUrl": "https://www.openstreetmap.org/relation/1995783"
+    },
+    {
+      "code": "56",
+      "relationId": 1995403,
+      "sourceUrl": "https://www.openstreetmap.org/relation/1995403"
+    },
+    {
+      "code": "57",
+      "relationId": 1995969,
+      "sourceUrl": "https://www.openstreetmap.org/relation/1995969"
+    },
+    {
+      "code": "58",
+      "relationId": 2013752,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2013752"
+    },
+    {
+      "code": "59",
+      "relationId": 2013747,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2013747"
+    },
+    {
+      "code": "60",
+      "relationId": 2013749,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2013749"
+    },
+    {
+      "code": "61",
+      "relationId": 2013750,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2013750"
+    },
+    {
+      "code": "62",
+      "relationId": 2013748,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2013748"
+    },
+    {
+      "code": "63",
+      "relationId": 2013751,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2013751"
+    },
+    {
+      "code": "65",
+      "relationId": 2025552,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2025552"
+    },
+    {
+      "code": "66",
+      "relationId": 2025551,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2025551"
+    },
+    {
+      "code": "67",
+      "relationId": 2025550,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2025550"
+    },
+    {
+      "code": "68",
+      "relationId": 2025553,
+      "sourceUrl": "https://www.openstreetmap.org/relation/2025553"
+    },
+    {
+      "code": "69",
+      "relationId": 1997287,
+      "sourceUrl": "https://www.openstreetmap.org/relation/1997287"
+    },
+    {
+      "code": "70",
+      "relationId": 1997285,
+      "sourceUrl": "https://www.openstreetmap.org/relation/1997285"
+    },
+    {
+      "code": "71",
+      "relationId": 1997288,
+      "sourceUrl": "https://www.openstreetmap.org/relation/1997288"
+    },
+    {
+      "code": "72",
+      "relationId": 1997286,
+      "sourceUrl": "https://www.openstreetmap.org/relation/1997286"
+    }
+  ],
+  "generatedArtifact": {
+    "file": "data/geometry/municipality-map-paths.json",
+    "bytes": 231958,
+    "sha256": "9E2DC1A7FF63F339DEFBF539E066002FFFC697BEA956210A39B2821EE3B35D3D",
+    "municipalityPathCount": 60,
+    "cityMarkerCount": 5,
+    "occupiedOverlayCount": 2
+  }
+}

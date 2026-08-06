@@ -65,6 +65,8 @@
     "data:compose-budget-facts": "tsx scripts/compose-budget-facts.ts",
     "data:generate-municipal-facts": "tsx scripts/generate-municipal-facts.ts",
     "data:prepare-municipal-indicators": "tsx scripts/prepare-geostat-municipal-indicators.ts",
+    "data:prepare-municipality-geometry": "tsx scripts/prepare-municipality-geometry.ts",
+    "data:check-municipality-geometry": "tsx scripts/prepare-municipality-geometry.ts --check",
     "data:import": "tsx scripts/import-budget-facts.ts",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev",
