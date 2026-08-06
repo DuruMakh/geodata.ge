@@ -22,6 +22,18 @@ import { expect, test } from "@playwright/test";
 // Full section e2e coverage is Task 14's; this pins the specific gaps above.
 
 const ENTITY_URL = "http://localhost:3100/explorer/municipalities/04"; // თბილისი
+const ALL_FUNCTIONS = [
+  "municipal.general_public_services",
+  "municipal.defence",
+  "municipal.public_order_safety",
+  "municipal.economic_affairs",
+  "municipal.environment",
+  "municipal.housing_communal",
+  "municipal.health",
+  "municipal.recreation_culture",
+  "municipal.education",
+  "municipal.social_protection",
+].join(",");
 
 test.describe("hash sanitising", () => {
   test("a reversed shared range renders in the correct order, not reversed", async ({ page }) => {
@@ -240,19 +252,77 @@ test.describe("municipality page", () => {
     }
   });
 
-  test("enforces the six-series chart cap", async ({ page }) => {
+  test("caps an over-limit shared line selection without discarding selected ids", async ({ page }) => {
+    await page.addInitScript((selection) => {
+      history.replaceState(null, "", `#m=line&sel=${selection}`);
+    }, ALL_FUNCTIONS);
     await page.goto(ENTITY_URL);
-    const rows = page.getByTestId("municipal-series-row");
-    for (let index = 0; index < 10; index += 1) {
-      const row = rows.nth(index);
-      if ((await row.getAttribute("aria-pressed")) === "false") await row.click();
-    }
+
+    await expect(page.getByTestId("series-overflow-callout")).toBeVisible();
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(10);
+    await expect(page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']")).toHaveCount(6);
+  });
+
+  test("caps all table selections when switching back to line mode", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await page.getByTestId("municipal-mode-table").click();
+    await page.getByTestId("municipal-series-all").click();
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(10);
+
+    await page.getByTestId("municipal-mode-line").click();
+
+    await expect(page.getByTestId("series-overflow-callout")).toBeVisible();
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(10);
+    await expect(page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']")).toHaveCount(6);
+  });
+
+  test("rejects a seventh series selected directly in line mode", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    const unselectedRows = page.locator("[data-testid='municipal-series-row'][aria-pressed='false']");
+
+    await unselectedRows.first().click();
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(6);
+
+    const rejectedSeventhSeries = unselectedRows.first();
+    await rejectedSeventhSeries.click();
+
+    await expect(rejectedSeventhSeries).toHaveAttribute("aria-pressed", "false");
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(6);
     await expect(page.getByTestId("municipal-series-limit")).toBeVisible();
+  });
+
+  test("an explicitly empty selection shows guidance instead of an empty chart", async ({ page }) => {
+    await page.addInitScript(() => {
+      history.replaceState(null, "", "#m=line&sel=");
+    });
+    await page.goto(ENTITY_URL);
+
+    await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+    await expect(page.getByTestId("chart-frame")).toHaveCount(0);
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(0);
   });
 
   test("shows the divergence callout only where the data diverges", async ({ page }) => {
     await page.goto(ENTITY_URL);
-    await expect(page.getByTestId("divergence-callout")).toBeVisible();
+    const callout = page.getByTestId("divergence-callout");
+    await expect(callout).toBeVisible();
+    const warningGroups = callout.locator("li");
+    await expect(warningGroups).toHaveCount(2);
+    await expect(warningGroups.nth(0)).toContainText(
+      "ოფიციალური ჯამი და ფუნქციური კლასიფიკაციის ჯამი წყაროს სხვადასხვა ვერსიიდან მოდის",
+    );
+    await expect(warningGroups.nth(0)).toContainText("2016 (15.6 მლნ ₾)");
+    await expect(warningGroups.nth(0)).toContainText("2017 (15.7 მლნ ₾)");
+    await expect(warningGroups.nth(0)).toContainText("2018 (15.1 მლნ ₾)");
+    await expect(warningGroups.nth(0)).toContainText("2019 (21.1 მლნ ₾)");
+    await expect(warningGroups.nth(1)).toContainText(
+      "ოფიციალური ჯამი მოიცავს დაფინანსების ოპერაციებს, რომლებიც ფუნქციურ კლასიფიკაციაში არ ნაწილდება",
+    );
+    await expect(warningGroups.nth(1)).toContainText("2020 (16.0 მლნ ₾)");
+    await expect(warningGroups.nth(1)).toContainText("2021 (14.9 მლნ ₾)");
+    await expect(warningGroups.nth(1)).toContainText("2022 (13.0 მლნ ₾)");
+    await expect(warningGroups.nth(1)).toContainText("2023 (28.8 მლნ ₾)");
+    await expect(warningGroups.nth(1)).toContainText("2024 (28.1 მლნ ₾)");
     // თელავი is municipality code 15, not 22 (verified against
     // data/imports/municipalities.csv) — show_warning is false for all of its
     // loaded years, so its page never renders the callout.

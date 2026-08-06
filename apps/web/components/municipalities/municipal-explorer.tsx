@@ -11,10 +11,11 @@ import {
   buildMovers,
   buildMunicipalEntityModel,
   getDefaultMunicipalSelection,
+  type MunicipalWarning,
 } from "../../lib/explorer/municipalData";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { formatAmount, UNIT_MLN } from "../../lib/explorer/format";
-import type { ChartMode } from "../../lib/explorer/types";
+import { MAX_CHART_SERIES, type ChartMode } from "../../lib/explorer/types";
 import { Callout, SegmentedTabs, SourceNote, SwatchBar } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -122,7 +123,19 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       planned: years.map(() => false),
     }));
 
-  const visibleWarnings = props.showWarnings ? model.warnings : [];
+  const noSelection = state.selectedIds.length === 0;
+  const chartSeries = series.slice(0, MAX_CHART_SERIES);
+  const overLimit = state.chartMode === "line" && !noSelection && series.length > MAX_CHART_SERIES;
+  const warningGroups = useMemo(() => {
+    const groups = new Map<MunicipalWarning["type"], MunicipalWarning[]>();
+    const visibleWarnings = props.showWarnings ? model.warnings : [];
+    for (const warning of visibleWarnings) {
+      const group = groups.get(warning.type) ?? [];
+      group.push(warning);
+      groups.set(warning.type, group);
+    }
+    return Array.from(groups.entries());
+  }, [model.warnings, props.showWarnings]);
 
   const [seriesQuery, setSeriesQuery] = useState("");
   const visibleRows = useMemo(() => {
@@ -236,8 +249,21 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             </button>
           </div>
 
-          {state.chartMode === "line" ? (
-            <EditorialLineChart years={years} series={series} share={state.share} unit={UNIT_MLN} />
+          {noSelection ? (
+            <div className="mt-5">
+              <Callout testId="no-selection-callout">არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.</Callout>
+            </div>
+          ) : state.chartMode === "line" ? (
+            <div>
+              {overLimit ? (
+                <div className="mb-4">
+                  <Callout testId="series-overflow-callout">
+                    ხაზის რეჟიმში ნაჩვენებია პირველი {MAX_CHART_SERIES} სერია. მოხსენი ზედმეტი ან გადადი ცხრილის რეჟიმში.
+                  </Callout>
+                </div>
+              ) : null}
+              <EditorialLineChart years={years} series={chartSeries} share={state.share} unit={UNIT_MLN} />
+            </div>
           ) : (
             <ExplorerTable
               rows={model.rows}
@@ -255,12 +281,27 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             <RangeStrip years={allYears} range={state.range} onChange={state.setRange} />
           </div>
 
-          {visibleWarnings.length > 0 ? (
+          {warningGroups.length > 0 ? (
             <div className="mt-5">
-              <Callout testId="divergence-callout">
-                {visibleWarnings.map((warning) => warning.year).join(", ")} — {WARNING_TEXT[visibleWarnings[0]!.type] ?? "ოფიციალური ჯამი და ფუნქციური ჯამი განსხვავდება"}
-                {visibleWarnings[0]!.amountGel === null ? "" : ` (${formatAmount(Math.abs(visibleWarnings[0]!.amountGel))})`}.
-              </Callout>
+              <div
+                data-testid="divergence-callout"
+                className="max-w-[560px] border-l-2 border-[var(--accent)] bg-[var(--tint)] px-3.5 py-3 text-[12.5px] leading-relaxed text-[var(--body)]"
+              >
+                <ul className="space-y-1.5 pl-4">
+                  {warningGroups.map(([type, warnings]) => (
+                    <li key={type}>
+                      {warnings
+                        .map((warning) =>
+                          warning.amountGel === null
+                            ? `${warning.year}`
+                            : `${warning.year} (${formatAmount(Math.abs(warning.amountGel))})`,
+                        )
+                        .join(", ")}{" "}
+                      — {WARNING_TEXT[type] ?? "ოფიციალური ჯამი და ფუნქციური ჯამი განსხვავდება"}.
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           ) : null}
 
