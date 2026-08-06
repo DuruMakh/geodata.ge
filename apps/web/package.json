@@ -16,7 +16,7 @@
     "test:browser": "playwright test",
     "test:watch": "vitest",
     "check": "npm run lint && npm run typecheck && npm run test && npm run data:validate",
-    "data:validate": "tsx scripts/validate-data-files.ts",
+    "data:validate": "tsx scripts/validate-data-files.ts && npm run data:check-municipality-geometry",
     "data:extract-expenditure": "tsx scripts/extract-real-expenditure.ts",
     "data:extract-expenditure-pdf-pilot": "tsx scripts/extract-expenditure-pdf-pilot.ts",
     "data:extract-expenditure-pdf-2007": "tsx scripts/extract-expenditure-pdf-pilot.ts --year 2007",
