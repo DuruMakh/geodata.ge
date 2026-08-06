@@ -53,7 +53,7 @@ function hasExactCodes(actual: Iterable<string>, expected: readonly string[]): b
   return JSON.stringify([...actual].sort()) === JSON.stringify(expected.slice().sort());
 }
 
-function validateArtifact(artifact: typeof rawArtifact): MunicipalityMapArtifact {
+export function validateMunicipalityMapArtifact(artifact: typeof rawArtifact): MunicipalityMapArtifact {
   if (artifact.version !== 1) throw new Error("Municipality map artifact version must be 1");
   if (artifact.viewBox !== "0 0 1000 540") throw new Error("Municipality map artifact viewBox must be 0 0 1000 540");
   if (artifact.municipalityPaths.length !== 60) throw new Error("Municipality map artifact must contain 60 paths");
@@ -65,6 +65,9 @@ function validateArtifact(artifact: typeof rawArtifact): MunicipalityMapArtifact
     if (!shape.code || polygonCodes.has(shape.code)) throw new Error(`Invalid municipality polygon code ${shape.code}`);
     if (!shape.d) throw new Error(`Municipality polygon ${shape.code} must have a non-empty path`);
     if (!Number.isFinite(shape.relationId)) throw new Error(`Municipality polygon ${shape.code} must have a finite relation id`);
+    if (shape.code === "33" && shape.relationId !== 2016161) {
+      throw new Error("Municipality polygon 33 must use relation 2016161");
+    }
     polygonCodes.add(shape.code);
   }
 
@@ -79,6 +82,9 @@ function validateArtifact(artifact: typeof rawArtifact): MunicipalityMapArtifact
 
   const occupiedAreaKeys = new Set<string>();
   for (const area of artifact.occupiedAreas) {
+    if (!hasExactCodes(Object.keys(area), ["key", "d"])) {
+      throw new Error(`Unexpected fields for occupied area ${area.key}`);
+    }
     if (!area.d) throw new Error(`Occupied area ${area.key} must have a non-empty path`);
     if (occupiedAreaKeys.has(area.key)) throw new Error(`Duplicate occupied area ${area.key}`);
     occupiedAreaKeys.add(area.key);
@@ -97,7 +103,7 @@ function validateArtifact(artifact: typeof rawArtifact): MunicipalityMapArtifact
   return artifact as MunicipalityMapArtifact;
 }
 
-export const MUNICIPALITY_MAP_ARTIFACT = validateArtifact(rawArtifact);
+export const MUNICIPALITY_MAP_ARTIFACT = validateMunicipalityMapArtifact(rawArtifact);
 
 function quantileBucket(values: number[]): (value: number) => number {
   const sorted = values.slice().sort((left, right) => left - right);
@@ -171,7 +177,7 @@ export function buildMunicipalityMapModel({
       y: marker.y,
       valueGel: valueFor(marker.code),
     })),
-    occupiedAreas: MUNICIPALITY_MAP_ARTIFACT.occupiedAreas.map((area) => ({ ...area })),
+    occupiedAreas: MUNICIPALITY_MAP_ARTIFACT.occupiedAreas.map((area) => ({ key: area.key, d: area.d })),
     legendMinGel: Math.min(...polygonValues),
     legendMaxGel: Math.max(...polygonValues),
   };
