@@ -52,7 +52,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, startYear, endYe
     <>
       <div className="mt-11 border-t-2 border-[var(--ink)] pt-[22px]">
         <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">ძირითადი ინდიკატორები</h2>
-        <div className="grid grid-cols-2 gap-8 min-[1100px]:grid-cols-4">
+        <div data-testid="entity-kpi-grid" className="grid grid-cols-2 gap-8 @min-[1100px]:grid-cols-4">
           {kpis.map((kpi) => (
             <div key={kpi.label} data-testid="entity-kpi" className="flex flex-col gap-[5px]">
               <span className="text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{kpi.label}</span>
@@ -65,7 +65,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, startYear, endYe
         </div>
       </div>
 
-      <div className="mt-11 grid grid-cols-1 gap-10 border-t-2 border-[var(--ink)] pt-[22px] min-[1100px]:grid-cols-2">
+      <div className="mt-11 grid grid-cols-1 gap-10 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:grid-cols-2">
         <div>
           <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">ყველაზე მზარდი</div>
           {movers.up.map((mover) => (

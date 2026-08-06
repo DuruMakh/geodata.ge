@@ -42,7 +42,9 @@ async function expectMunicipalAppReady(page: Page) {
 test.describe("hash sanitising", () => {
   test("a reversed shared range renders in the correct order, not reversed", async ({ page }) => {
     await page.goto(`${ENTITY_URL}#r=2024-2016`);
+    await expectMunicipalAppReady(page);
     await page.reload();
+    await expectMunicipalAppReady(page);
 
     await expect(page.getByTestId("year-range-strip")).toContainText("2016–2024");
 
@@ -53,7 +55,9 @@ test.describe("hash sanitising", () => {
 
   test("a reversed shared range self-corrects the address bar, not just the display", async ({ page }) => {
     await page.goto(`${ENTITY_URL}#r=2024-2016`);
+    await expectMunicipalAppReady(page);
     await page.reload();
+    await expectMunicipalAppReady(page);
 
     await expect(page.getByTestId("year-range-strip")).toContainText("2016–2024");
 
@@ -69,7 +73,9 @@ test.describe("hash sanitising", () => {
     page,
   }) => {
     await page.goto(`${ENTITY_URL}#r=2024-2016`);
+    await expectMunicipalAppReady(page);
     await page.reload();
+    await expectMunicipalAppReady(page);
 
     const startHandle = page.getByTestId("range-start-handle");
     const endHandle = page.getByTestId("range-end-handle");
@@ -90,7 +96,9 @@ test.describe("hash sanitising", () => {
 
   test("a selection whose ids are all unknown falls back to the default selection", async ({ page }) => {
     await page.goto(`${ENTITY_URL}#sel=municipal.made_up`);
+    await expectMunicipalAppReady(page);
     await page.reload();
+    await expectMunicipalAppReady(page);
 
     // getDefaultMunicipalSelection: top 5 functions by latest-year value.
     await expect(page.locator('[data-testid="municipal-series-row"][aria-pressed="true"]')).toHaveCount(5);
@@ -98,7 +106,9 @@ test.describe("hash sanitising", () => {
 
   test("a selection mixing a known and an unknown id keeps the known one and drops the unknown one", async ({ page }) => {
     await page.goto(`${ENTITY_URL}#sel=municipal.education,municipal.made_up`);
+    await expectMunicipalAppReady(page);
     await page.reload();
+    await expectMunicipalAppReady(page);
 
     const checked = page.locator('[data-testid="municipal-series-row"][aria-pressed="true"]');
     await expect(checked).toHaveCount(1);
@@ -109,6 +119,7 @@ test.describe("hash sanitising", () => {
 test.describe("entity picker accessibility", () => {
   test("opening moves focus into the search input", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     await page.getByTestId("entity-picker-trigger").click();
 
     const combobox = page.getByTestId("entity-picker").getByRole("combobox");
@@ -117,6 +128,7 @@ test.describe("entity picker accessibility", () => {
 
   test("the popover mounts as a sibling of the trigger, not nested inside the h1", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     await page.getByTestId("entity-picker-trigger").click();
     await expect(page.getByTestId("entity-picker")).toBeVisible();
 
@@ -133,6 +145,7 @@ test.describe("entity picker accessibility", () => {
 
   test("Escape closes the popover and returns focus to the trigger", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     const trigger = page.getByTestId("entity-picker-trigger");
     await trigger.click();
     await expect(page.getByTestId("entity-picker")).toBeVisible();
@@ -145,6 +158,7 @@ test.describe("entity picker accessibility", () => {
 
   test("clicking outside the popover closes it and returns focus to the trigger", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     const trigger = page.getByTestId("entity-picker-trigger");
     await trigger.click();
     await expect(page.getByTestId("entity-picker")).toBeVisible();
@@ -159,8 +173,25 @@ test.describe("entity picker accessibility", () => {
     await expect(trigger).toBeFocused();
   });
 
+  test("Tab closes the popover and leaves focus on the next page control", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+    const trigger = page.getByTestId("entity-picker-trigger");
+    await trigger.click();
+    const combobox = page.getByTestId("entity-picker").getByRole("combobox");
+    await expect(combobox).toBeFocused();
+
+    await page.keyboard.press("Tab");
+
+    await expect(page.getByTestId("entity-picker")).toBeHidden();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(trigger).not.toBeFocused();
+    await expect(page.locator("a:focus")).toHaveCount(1);
+  });
+
   test("ArrowDown/ArrowUp move aria-activedescendant across real options, and Enter activates the highlighted one", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     await page.getByTestId("entity-picker-trigger").click();
 
     const combobox = page.getByTestId("entity-picker").getByRole("combobox");
@@ -208,6 +239,7 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
     page,
   }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
 
     const chart = page.getByTestId("chart-frame");
     await expect(chart).toBeVisible();
@@ -239,6 +271,7 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
 test.describe("municipality page", () => {
   test("switches between chart and table", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-mode-table").click();
     const table = page.getByTestId("explorer-table");
     await expect(table).toBeVisible();
@@ -261,6 +294,7 @@ test.describe("municipality page", () => {
       history.replaceState(null, "", `#m=line&sel=${selection}`);
     }, ALL_FUNCTIONS);
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
 
     await expect(page.getByTestId("series-overflow-callout")).toBeVisible();
     await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(10);
@@ -269,6 +303,7 @@ test.describe("municipality page", () => {
 
   test("caps all table selections when switching back to line mode", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-mode-table").click();
     await page.getByTestId("municipal-series-all").click();
     await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(10);
@@ -282,6 +317,7 @@ test.describe("municipality page", () => {
 
   test("rejects a seventh series selected directly in line mode", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     const unselectedRows = page.locator("[data-testid='municipal-series-row'][aria-pressed='false']");
 
     await unselectedRows.first().click();
@@ -295,19 +331,45 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("municipal-series-limit")).toBeVisible();
   });
 
+  test("clearing after a rejected seventh series also clears the limit message", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+    const selectedRows = page.locator("[data-testid='municipal-series-row'][aria-pressed='true']");
+    const unselectedRows = page.locator("[data-testid='municipal-series-row'][aria-pressed='false']");
+    await unselectedRows.first().click();
+    await expect(selectedRows).toHaveCount(6);
+    await unselectedRows.first().click();
+    await expect(page.getByTestId("municipal-series-limit")).toBeVisible();
+
+    await page.getByTestId("municipal-series-all").click();
+
+    await expect(selectedRows).toHaveCount(0);
+    await expect(page.getByTestId("municipal-series-limit")).toHaveCount(0);
+  });
+
   test("an explicitly empty selection shows guidance instead of an empty chart", async ({ page }) => {
     await page.addInitScript(() => {
       history.replaceState(null, "", "#m=line&sel=");
     });
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
 
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
     await expect(page.getByTestId("chart-frame")).toHaveCount(0);
     await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(0);
   });
 
+  test("an explicitly empty selection still renders all functions in table mode", async ({ page }) => {
+    await page.goto(`${ENTITY_URL}#m=table&sel=`);
+    await expectMunicipalAppReady(page);
+
+    await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(11);
+  });
+
   test("shows the divergence callout only where the data diverges", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     const callout = page.getByTestId("divergence-callout");
     await expect(callout).toBeVisible();
     const warningGroups = callout.locator("li");
@@ -331,6 +393,7 @@ test.describe("municipality page", () => {
     // data/imports/municipalities.csv) — show_warning is false for all of its
     // loaded years, so its page never renders the callout.
     await page.goto("http://localhost:3100/explorer/municipalities/15");
+    await expectMunicipalAppReady(page);
     await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
   });
 
@@ -345,6 +408,7 @@ test.describe("municipality page", () => {
 
   test("keeps the picker popover out of the heading", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     await page.keyboard.press("Control+k");
     // A role="dialog" inside an h1 is announced as part of the heading.
     await expect(page.locator("h1 [data-testid='entity-picker']")).toHaveCount(0);
@@ -353,6 +417,7 @@ test.describe("municipality page", () => {
 
   test("filters the series list and clears the selection", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-series-search").fill("განათლება");
     await expect(page.getByTestId("municipal-series-row")).toHaveCount(1);
     await page.getByTestId("municipal-series-search").fill("");
@@ -363,6 +428,7 @@ test.describe("municipality page", () => {
 
   test("selects every function in table mode", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-mode-table").click();
     await page.getByTestId("municipal-series-all").click();
     // Table mode has no six-series cap, so select-all must leave all ten rows
@@ -379,6 +445,7 @@ test.describe("municipality page", () => {
 
   test("offers a CSV download", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     const download = page.waitForEvent("download");
     await page.getByTestId("municipal-csv").click();
     expect((await download).suggestedFilename()).toMatch(/^geodata-municipality-04-\d{4}-\d{4}\.csv$/);
@@ -389,9 +456,12 @@ test.describe("municipality page", () => {
     // so ცვლილება and the comparison table describe the full span while the
     // chart describes the selection.
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     const before = await page.getByTestId("comparison-table").innerText();
     await page.goto(`${ENTITY_URL}#m=line&r=2020-2025&sel=municipal.education`);
+    await expectMunicipalAppReady(page);
     await page.reload();
+    await expectMunicipalAppReady(page);
     // The server always renders the default range first — a URL hash is never
     // sent in the request — so the hash-restored range lands only after
     // client-side hydration runs. Wait for it to actually show in the DOM
@@ -402,6 +472,39 @@ test.describe("municipality page", () => {
     expect(after).not.toBe(before);
   });
 
+  test("uses the historical range-end rank rather than the latest-year rank", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities/18#r=2015-2015");
+    await expectMunicipalAppReady(page);
+
+    const rankKpi = page.getByTestId("entity-kpi").filter({ hasText: "წილი მუნიციპალურ ხარჯებში" });
+    await expect(rankKpi).toContainText("მე-51 ადგილი 64-დან");
+    await expect(rankKpi).not.toContainText("მე-26 ადგილი 64-დან");
+  });
+
+  test("keeps the municipal workspace stacked until its content container reaches 1100px", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+    await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "true");
+
+    const columns = await page.getByTestId("municipal-workspace").evaluate((element) =>
+      getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/),
+    );
+    const kpiColumns = await page.getByTestId("entity-kpi-grid").evaluate((element) =>
+      getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/),
+    );
+    expect(columns).toHaveLength(1);
+    expect(kpiColumns).toHaveLength(2);
+  });
+
+  test("uses reviewed punctuation in the municipality metadata description", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+    const description = page.locator('meta[name="description"]');
+    await expect(description).toHaveAttribute("content", /თბილისი — მუნიციპალური ბიუჯეტი/);
+    await expect(description).not.toHaveAttribute("content", /მუნიციპალიტეტიის/);
+  });
+
   // Whole-branch review finding: municipalities is the first section with
   // child routes, so `pathname === section.href` alone never matched on a
   // municipality sub-page and the sidebar carried no active state at all —
@@ -410,6 +513,7 @@ test.describe("municipality page", () => {
   // it one level deeper, on an actual municipality page.
   test("the sidebar keeps მუნიციპალიტეტები highlighted on a municipality sub-page, not just the index", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
 
     const sidebar = page.getByTestId("data-sidebar");
     const municipalitiesLink = sidebar.getByTestId("section-link-municipalities");
@@ -425,6 +529,7 @@ test.describe("municipality page", () => {
   // a future edit that moves one label without the other fails here too.
   test("the chart-mode table and the period-comparison table label their first column the same way", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-mode-table").click();
 
     const explorerHeader = page.getByTestId("explorer-table").locator("thead th").first();

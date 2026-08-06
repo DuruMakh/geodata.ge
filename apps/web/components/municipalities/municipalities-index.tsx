@@ -71,7 +71,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
 
   return (
     <>
-      <div className="grid items-start gap-10 min-[1100px]:grid-cols-[minmax(0,1fr)_336px]">
+      <div data-testid="municipal-index-workspace" className="grid items-start gap-10 @min-[1100px]:grid-cols-[minmax(0,1fr)_336px]">
         <div className="min-w-0">
           <div className="flex items-baseline justify-between gap-3 border-b border-[var(--hairline)] pb-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
@@ -96,7 +96,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
             <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">
               ძირითადი ინდიკატორები
             </h2>
-            <div className="grid grid-cols-2 gap-8 min-[1100px]:grid-cols-4">
+            <div data-testid="index-kpi-grid" className="grid grid-cols-2 gap-8 @min-[1100px]:grid-cols-4">
               {props.kpis.map((kpi) => (
                 <div key={kpi.label} data-testid="index-kpi" className="flex flex-col gap-[5px]">
                   <span className="text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">
@@ -116,7 +116,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
           </div>
         </div>
 
-        <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] min-[1100px]:border-t-0 min-[1100px]:border-l min-[1100px]:border-[var(--hairline)] min-[1100px]:pt-0 min-[1100px]:pl-[26px]">
+        <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
           <div className="flex items-baseline justify-between gap-2.5 border-b-2 border-[var(--ink)] pb-2">
             <span className="flex items-baseline gap-3.5">
               <TextTab label="მუნიციპალიტეტები" active={level === "muni"} onClick={() => setLevel("muni")} testId="level-muni" />

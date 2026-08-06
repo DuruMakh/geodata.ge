@@ -47,7 +47,7 @@ export type MunicipalExplorerProps = {
   sourceDocuments: SourceDocumentRow[];
 
   nationalTotalByYear: Record<number, number>;
-  rank: number;
+  rankByYear: Record<number, number>;
   rankOutOf: number;
   showWarnings: boolean;
   csvBasename: string;
@@ -222,7 +222,10 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
         </span>
       </div>
 
-      <div className="mt-7 grid items-start gap-10 border-t border-[var(--ink)] pt-5 min-[1100px]:grid-cols-[minmax(0,1fr)_340px]">
+      <div
+        data-testid="municipal-workspace"
+        className="mt-7 grid items-start gap-10 border-t border-[var(--ink)] pt-5 @min-[1100px]:grid-cols-[minmax(0,1fr)_340px]"
+      >
         <div className="min-w-0">
           <div className="mb-[18px] flex items-center justify-between gap-5">
             <span className="flex items-baseline gap-4">
@@ -254,7 +257,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             </button>
           </div>
 
-          {noSelection ? (
+          {state.chartMode === "line" && noSelection ? (
             <div className="mt-5">
               <Callout testId="no-selection-callout">არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.</Callout>
             </div>
@@ -322,7 +325,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             kpis={buildEntityKpis({
               model,
               nationalTotalByYear: props.nationalTotalByYear,
-              rank: props.rank,
+              rankByYear: props.rankByYear,
               rankOutOf: props.rankOutOf,
             })}
             movers={buildMovers(model)}
@@ -332,7 +335,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
           />
         </div>
 
-        <aside className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] min-[1100px]:border-t-0 min-[1100px]:border-l min-[1100px]:border-[var(--hairline)] min-[1100px]:pt-0 min-[1100px]:pl-[26px]">
+        <aside className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
           <div className="sticky top-5">
             <div className="flex items-baseline justify-between pb-2.5">
               <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">სერიები</span>

@@ -428,10 +428,11 @@ It names the years and the amount, using the methodology's public wording for th
 row's `warning_type`. Changing the range so that no warning year is selected
 removes it.
 
-Region pages get **no callout**: a roll-up's own two totals still reconcile, and
-თბილისი and აჭარა each have a warning member in 9 of 11 years, so a region-level
-banner would be near-permanent on exactly the two pages people look at most.
-That is where warning fatigue starts.
+Region pages get **no callout**. Their two totals are summed independently and
+can still diverge, but warning type and reconciliation wording are
+municipality-grain provenance that cannot be attributed honestly to the
+aggregate. Aggregating member warnings would also create a near-permanent
+banner on heavily visited regions. The standing two-measures source note remains.
 
 Every municipal surface — index, municipality, region — carries the standing
 one-line source note explaining that the official headline and the functional sum
@@ -577,7 +578,7 @@ assertion Spec 1 §7 deferred to this spec.
   municipality such as თელავი.
 - Region page shows its member list, and the member count matches the registry.
 - Shell: the sidebar `მუნიციპალიტეტები` row is a link with no `მალე`, and hub
-  card 03 is live.
+  card 03 links to the implemented route.
 
 ## 11. Documents updated in this change
 
@@ -591,8 +592,8 @@ assertion Spec 1 §7 deferred to this spec.
   rings changes from GADM to geoBoundaries `gbOpen` ADM1, with the CC BY 3.0
   attribution and release pin covering both the rings and the ADM0 outline.
 
-`Project_Definition.md` already moved municipal data and route into scope in
-Spec 1; no further change there.
+`Project_Definition.md` is updated in this branch so the v1 scope entry records
+the municipal index, municipality pages, and region roll-ups implemented here.
 
 ## 12. Explicitly not shipping
 

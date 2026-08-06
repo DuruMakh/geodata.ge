@@ -1,4 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function expectMunicipalAppReady(page: Page) {
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+}
 
 // Region roll-up pages (Task 12) — reuse Task 11's MunicipalExplorer
 // workspace and the entity picker via `children`/`pickerGroups`. Two things
@@ -30,6 +34,7 @@ test.describe("region header responsiveness", () => {
     test(`keeps the longest heading readable without horizontal overflow at ${viewport.width}px`, async ({ page }) => {
       await page.setViewportSize(viewport);
       const response = await page.goto(LONG_REGION_URL);
+      await expectMunicipalAppReady(page);
       expect(response?.status()).toBe(200);
 
       const heading = page.getByRole("heading", { level: 1 });
@@ -53,6 +58,7 @@ test.describe("region header responsiveness", () => {
 test.describe("region source note", () => {
   test("names both roll-up carve-outs — აჭარა's own budget and the occupied-territory exclusions", async ({ page }) => {
     const response = await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
     expect(response?.status()).toBe(200);
 
     const note = page.getByTestId("municipal-source-note");
@@ -65,6 +71,7 @@ test.describe("region source note", () => {
 test.describe("region roll-up page", () => {
   test("renders every member, the roll-up chart, and suppresses the per-member divergence callout", async ({ page }) => {
     const response = await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
     expect(response?.status()).toBe(200);
 
     // 12 member rows, matching the taxonomy count for region.imereti.
@@ -74,15 +81,15 @@ test.describe("region roll-up page", () => {
     await expect(chart).toBeVisible();
     await expect(chart.locator("svg text").first()).toBeVisible();
 
-    // Region pages pass showWarnings={false}: a roll-up's own two totals
-    // reconcile by construction, and თბილისი/აჭარა each have a warning
-    // member in 9 of 11 years, so a region-level banner would be
-    // near-permanent on the two most-visited pages (design spec §8.2).
+    // Region pages pass showWarnings={false}: warning type and reconciliation
+    // wording are municipality-grain provenance and cannot be assigned to the
+    // aggregate. The standing two-measures source note still applies.
     await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
   });
 
   test("a member row links through to its own municipality page", async ({ page }) => {
     await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
 
     const first = page.getByTestId("region-member-row").first();
     await expect(first).toHaveAttribute("href", /^\/explorer\/municipalities\/[^/]+$/);
@@ -90,6 +97,7 @@ test.describe("region roll-up page", () => {
 
   test("meta line reports the member count and the region's rank out of 11, not 64", async ({ page }) => {
     await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
 
     await expect(page.getByTestId("explorer-shell")).toContainText("12 მუნიციპალიტეტი");
     await expect(page.getByTestId("explorer-shell")).toContainText("ადგილი 11-დან");
@@ -99,6 +107,7 @@ test.describe("region roll-up page", () => {
 test.describe("entity picker region options resolve (previously 404)", () => {
   test("selecting a region option from a municipality page's picker navigates to a real, fully-rendered region page", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities/04"); // თბილისი
+    await expectMunicipalAppReady(page);
     await page.getByTestId("entity-picker-trigger").click();
 
     const regionOption = page.getByTestId("picker-region").filter({ hasText: "იმერეთი" });
@@ -121,6 +130,7 @@ test.describe("entity picker region options resolve (previously 404)", () => {
 test.describe("region page", () => {
   test("lists its member municipalities and carries the roll-up caveats", async ({ page }) => {
     await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
     await expect(page.getByTestId("region-member-row")).toHaveCount(12);
     await expect(page.getByTestId("municipal-source-note").first()).toContainText("აჭარის ავტონომიური რესპუბლიკის");
     await expect(page.getByTestId("divergence-callout")).toHaveCount(0);

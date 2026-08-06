@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Municipality, MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
 import type { SourceDocumentRow } from "../../lib/data/sources";
+import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 import {
   aggregateFactsForEntity,
   buildComparisonRows,
@@ -177,11 +178,9 @@ describe("getDefaultMunicipalSelection", () => {
 });
 
 describe("buildMunicipalEntityModel total row source attribution", () => {
-  // Real served data proves source_id genuinely varies by year within one
-  // municipality (e.g. municipality 04: 2015 is the portal archive, 2016-2025
-  // are MoF workbooks). A total row that reads its source from a single fact
-  // — first-in-array, or otherwise not keyed by year — silently mislabels the
-  // source for every other year.
+  // The derived total row exports the ten-function sum, so its source must
+  // come from those function facts rather than the independently sourced
+  // official-total row.
   const MULTI_SOURCE_DOCS: SourceDocumentRow[] = [
     ...SOURCES,
     {
@@ -198,7 +197,7 @@ describe("buildMunicipalEntityModel total row source attribution", () => {
     { ...total(2017, 370, 370), sourceId: "source.municipal_mof_annual_and_history_workbooks" },
   ];
 
-  it("looks up the total row's source per year, not from a single fact for the whole range", () => {
+  it("attributes the derived total to the function facts, not the official-total facts", () => {
     const model = buildMunicipalEntityModel({
       functions: FUNCTIONS,
       functionFacts: FUNCTION_FACTS,
@@ -209,7 +208,29 @@ describe("buildMunicipalEntityModel total row source attribution", () => {
     });
 
     expect(model.totalRow.sourceByYear[2015].sourceName).toBe("ადგილობრივი ბიუჯეტების შესრულება");
-    expect(model.totalRow.sourceByYear[2017].sourceName).toBe("წლიური და საარქივო პუბლიკაციები");
+    expect(model.totalRow.sourceByYear[2017].sourceName).toBe("ადგილობრივი ბიუჯეტების შესრულება");
+  });
+
+  it("keeps the real 2016 Tbilisi functional total on the portal-archive provenance", async () => {
+    const [{ functions, functionFacts, totalFacts }, { sourceDocuments }] = await Promise.all([
+      loadServedMunicipalData(),
+      loadServedLandingData(),
+    ]);
+    const model = buildMunicipalEntityModel({
+      functions,
+      functionFacts: functionFacts.filter((row) => row.municipalityCode === "04"),
+      totalFacts: totalFacts.filter((row) => row.municipalityCode === "04"),
+      sourceDocuments,
+      startYear: 2016,
+      endYear: 2016,
+    });
+
+    expect(model.totalRow.sourceByYear[2016].sourceName).toBe(
+      sourceDocuments.find((row) => row.sourceId === "source.municipal_portal_archive")?.sourceName,
+    );
+    expect(model.totalRow.sourceByYear[2016].sourceName).not.toBe(
+      sourceDocuments.find((row) => row.sourceId === "source.municipal_mof_annual_and_history_workbooks")?.sourceName,
+    );
   });
 });
 
@@ -290,8 +311,8 @@ describe("aggregateFactsForEntity", () => {
   });
 
   it("suppresses the per-municipality warning on the rolled-up total", () => {
-    // A region's own two totals reconcile by construction (each is an
-    // independent sum), so it must not inherit a source municipality's warning.
+    // The warning type belongs to one municipality's reconciliation and cannot
+    // be attributed honestly to the aggregate row.
     const totalFacts: MunicipalTotalFact[] = [total(2015, 160, 160), total(2016, 300, 265, true)];
 
     const aggregated = aggregateFactsForEntity("region.test", [], totalFacts);
@@ -596,7 +617,7 @@ describe("aggregateFactsForEntity", () => {
     expect(y2025.functionalSumGel).toBe(600_000_000);
   });
 
-  it("carries no warning of its own — a roll-up's two totals reconcile", () => {
+  it("carries no municipality-grain warning on the roll-up", () => {
     expect(rolled.totalFacts.every((row) => row.showWarning === false)).toBe(true);
     expect(rolled.totalFacts.every((row) => row.warningType === "none")).toBe(true);
   });
@@ -730,11 +751,12 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
 
 describe("buildEntityKpis", () => {
   const nationalTotalByYear = { 2016: 740, 2017: 740 };
+  const rankByYear = { 2015: 1, 2016: 1, 2017: 1 };
   const kpis = () =>
     buildEntityKpis({
       model: build(),
       nationalTotalByYear,
-      rank: 1,
+      rankByYear,
       rankOutOf: 64,
     });
 
@@ -750,7 +772,7 @@ describe("buildEntityKpis", () => {
     // official/functional swap on `.value` — it covers the gap this test
     // leaves, so do not delete it as "redundant" with this one.
     const model = build(2015, 2016);
-    const divergent = buildEntityKpis({ model, nationalTotalByYear, rank: 1, rankOutOf: 64 });
+    const divergent = buildEntityKpis({ model, nationalTotalByYear, rankByYear, rankOutOf: 64 });
     expect(divergent[0]!.label).toBe("ოფიციალური ბიუჯეტი");
     expect(divergent[0]!.detail).toContain("ფინანსთა სამინისტროს");
     expect(model.officialTotalByYear[2016]).toBe(300);
@@ -782,7 +804,7 @@ describe("buildEntityKpis", () => {
     const divergent = buildEntityKpis({
       model,
       nationalTotalByYear: { 2016: 740_000_000 },
-      rank: 1,
+      rankByYear,
       rankOutOf: 64,
     });
     expect(divergent[0]!.value).toBe(formatAmount(350_000_000));
@@ -801,7 +823,7 @@ describe("buildEntityKpis", () => {
     // `.value`, this discriminates even at the fixture's toy-number scale: a
     // percentage is scale-invariant, so +66% vs +88% never collapses under
     // rounding the way formatAmount(300) vs formatAmount(265) does.
-    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rank: 1, rankOutOf: 64 });
+    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rankByYear, rankOutOf: 64 });
     expect(divergent[1]!.value).toBe("+66%");
   });
 
@@ -819,22 +841,38 @@ describe("buildEntityKpis", () => {
     const clipped = buildEntityKpis({
       model: build(2015, 2016),
       nationalTotalByYear: { 2016: 600, 2017: 740 },
-      rank: 1,
+      rankByYear,
       rankOutOf: 64,
     });
 
     expect(clipped[3]!.value).toBe("50.0%");
   });
 
-  // `rank` is a real input read by this KPI's detail, not dead weight on the
-  // interface: first place reads პირველი, never მე-1 (georgianOrdinal, Task 3).
+  // `rankByYear` is a real input read by this KPI's detail, not dead weight on
+  // the interface: first place reads პირველი, never მე-1 (georgianOrdinal, Task 3).
   it("names the placement with the georgian ordinal of rank, not just the count it is out of", () => {
     expect(kpis()[3]!.detail).toBe("პირველი ადგილი 64-დან");
   });
 
   it("switches to მე-N for any rank other than first", () => {
-    const fifth = buildEntityKpis({ model: build(), nationalTotalByYear, rank: 5, rankOutOf: 64 });
+    const fifth = buildEntityKpis({
+      model: build(),
+      nationalTotalByYear,
+      rankByYear: { 2015: 5, 2016: 5, 2017: 5 },
+      rankOutOf: 64,
+    });
     expect(fifth[3]!.detail).toBe("მე-5 ადგილი 64-დან");
+  });
+
+  it("uses the selected range-end year's rank", () => {
+    const historical = buildEntityKpis({
+      model: build(2015, 2016),
+      nationalTotalByYear,
+      rankByYear: { 2015: 51, 2016: 26 },
+      rankOutOf: 64,
+    });
+
+    expect(historical[3]!.detail).toBe("მე-26 ადგილი 64-დან");
   });
 
   // The default build()'s end year (2017) has official === functional (370 ===
@@ -844,14 +882,14 @@ describe("buildEntityKpis", () => {
   it("shares the largest function against the functional total, not the official one", () => {
     // economic_affairs is largest at 2016 (200). Against the functional total
     // (265) that's 75.5%; against the official total (300) it would be 66.7%.
-    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rank: 1, rankOutOf: 64 });
+    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rankByYear, rankOutOf: 64 });
     expect(divergent[2]!.value).toBe("75.5%");
   });
 
   it("shares the national-total KPI against the official total, not the functional one", () => {
     // official (300) / nationalTotalByYear[2016] (740) = 40.5%; functional (265) /
     // 740 would be 35.8%.
-    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rank: 1, rankOutOf: 64 });
+    const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rankByYear, rankOutOf: 64 });
     expect(divergent[3]!.value).toBe("40.5%");
   });
 });

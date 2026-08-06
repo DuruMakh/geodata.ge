@@ -12,6 +12,7 @@ async function expectMunicipalAppReady(page: Page) {
 
 test("region shapes and city markers are keyboard-focusable and activate on Enter/Space", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
   await expect(page.getByTestId("region-map")).toBeVisible();
 
   // A real region shape: focusable, shows a visible focus ring, and Space
@@ -42,6 +43,7 @@ test("region shapes and city markers are keyboard-focusable and activate on Ente
 
   // A city marker: same story, Enter this time.
   await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
   const city = page.locator('[data-testid^="self-gov-city-"]').first();
   await city.focus();
   await expect(city).toBeFocused();
@@ -58,6 +60,7 @@ test("region shapes and city markers are keyboard-focusable and activate on Ente
 
 test("the no-data region shape is excluded from the tab order", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
 
   const noData = page.getByTestId("region-shape-GE-AB");
   await expect(noData).toHaveAttribute("data-no-data", "true");
@@ -69,6 +72,7 @@ test("the no-data region shape is excluded from the tab order", async ({ page })
 
 test("focusing a list row highlights the map, matching mouse hover", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
 
   const readout = page.getByTestId("map-readout");
   await expect(readout).toHaveText("გადაატარე კურსორი რუკაზე");
@@ -82,6 +86,7 @@ test("focusing a list row highlights the map, matching mouse hover", async ({ pa
 
 test("the map exposes an accessible group around its interactive shapes", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
 
   const svg = page.getByTestId("region-map").locator("svg");
   await expect(svg).toHaveAttribute("role", "group");
@@ -91,6 +96,7 @@ test("the map exposes an accessible group around its interactive shapes", async 
 
 test("region hover and keyboard focus show an anchored name-and-value tooltip", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
 
   const map = page.getByTestId("region-map");
   const region = map.locator('[data-testid^="region-shape-"]:not([data-no-data])').first();
@@ -133,6 +139,7 @@ test("region hover and keyboard focus show an anchored name-and-value tooltip", 
 
 test("region tooltip preserves independent pointer and keyboard interactions", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
 
   const map = page.getByTestId("region-map");
   const regions = map.locator('[data-testid^="region-shape-"]:not([data-no-data])');
@@ -166,6 +173,7 @@ test("region tooltip preserves independent pointer and keyboard interactions", a
 test("focused lower-edge tooltip stays inside the SVG after a narrow viewport resize", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
 
   const svg = page.getByTestId("region-map").locator("svg");
   const regions = svg.locator('[data-testid^="region-shape-"]:not([data-no-data])');
@@ -205,6 +213,7 @@ test("focused lower-edge tooltip stays inside the SVG after a narrow viewport re
 test.describe("municipalities index", () => {
   test("renders the region map with an explicit no-data shape", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
     await expect(page.getByTestId("region-map")).toBeVisible();
     await expect(page.locator("[data-testid^='region-shape-']")).toHaveCount(12);
     await expect(page.getByTestId("region-shape-GE-AB")).toHaveAttribute("data-no-data", "true");
@@ -222,6 +231,7 @@ test.describe("municipalities index", () => {
 
   test("filters and clears the search", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-search").fill("თელავი");
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(1);
     await page.getByTestId("municipal-search").fill("ზზზზ");
@@ -230,6 +240,7 @@ test.describe("municipalities index", () => {
 
   test("keeps row bars normalized to the unfiltered leader while searching", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
 
     const rows = page.getByTestId("municipal-list-row");
     const comparisonRow = rows.nth(1);
@@ -253,6 +264,31 @@ test.describe("municipalities index", () => {
 
   test("shows four KPIs", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
     await expect(page.getByTestId("index-kpi")).toHaveCount(4);
+  });
+
+  test("describes regions on the map and municipalities in the list", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
+    await expect(page.locator("main > div > p").first()).toContainText(
+      "აირჩიე რეგიონი რუკაზე ან მუნიციპალიტეტი სიაში",
+    );
+  });
+
+  test("keeps the index workspace stacked until its content container reaches 1100px", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
+    await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "true");
+
+    const columns = await page.getByTestId("municipal-index-workspace").evaluate((element) =>
+      getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/),
+    );
+    const kpiColumns = await page.getByTestId("index-kpi-grid").evaluate((element) =>
+      getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/),
+    );
+    expect(columns).toHaveLength(1);
+    expect(kpiColumns).toHaveLength(2);
   });
 });

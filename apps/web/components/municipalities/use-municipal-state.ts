@@ -100,7 +100,10 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
     setRange,
     selectedIds,
     toggleSeries,
-    setSelectedIds,
+    setSelectedIds: (nextSelectedIds: string[]) => {
+      setSelectedIds(nextSelectedIds);
+      setLimitMessage(null);
+    },
     limitMessage,
   };
 }

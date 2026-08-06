@@ -138,8 +138,8 @@ export function aggregateFactsForEntity(
       existing.reconciliationDifferenceGel = sumNullable(existing.reconciliationDifferenceGel, row.reconciliationDifferenceGel);
       existing.publicTotalMeasure = agreeOrMixed(existing.publicTotalMeasure, row.publicTotalMeasure, MIXED_PUBLIC_TOTAL_MEASURE);
       existing.sourceId = agreeOrMixed(existing.sourceId, row.sourceId, MIXED_SOURCE_ID);
-      // A roll-up's own two totals reconcile, so it carries no warning of its
-      // own; region pages suppress the callout anyway (see the UI spec §8.2).
+      // Warning provenance is municipality-grain and cannot be assigned to
+      // the aggregate row; region pages therefore suppress the callout.
       continue;
     }
     totalByYear.set(row.year, {
@@ -196,25 +196,26 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
 
   const amounts = new Map<string, number>();
   const sourceIds = new Map<string, string>();
+  const functionalSourceIdByYear = new Map<number, string>();
   for (const row of functionFacts) {
     if (!inRange.has(row.year)) continue;
     const key = `${row.categoryId}|${row.year}`;
     amounts.set(key, (amounts.get(key) ?? 0) + row.amountGel);
     sourceIds.set(key, row.sourceId);
+    const currentSourceId = functionalSourceIdByYear.get(row.year);
+    functionalSourceIdByYear.set(
+      row.year,
+      currentSourceId === undefined ? row.sourceId : agreeOrMixed(currentSourceId, row.sourceId, MIXED_SOURCE_ID),
+    );
   }
 
   const functionalSumByYear: Record<number, number> = {};
   const officialTotalByYear: Record<number, number> = {};
-  // Per-year, like sourceIds above — source_id genuinely varies by year (a
-  // municipality's early years come from the portal archive, later ones from
-  // MoF workbooks), so this cannot collapse to a single totalFacts[0] lookup.
-  const totalSourceIdByYear = new Map<number, string>();
   const warnings: MunicipalWarning[] = [];
   for (const row of totalFacts) {
     if (!inRange.has(row.year)) continue;
     functionalSumByYear[row.year] = (functionalSumByYear[row.year] ?? 0) + row.functionalSumGel;
     officialTotalByYear[row.year] = (officialTotalByYear[row.year] ?? 0) + row.publicTotalGel;
-    totalSourceIdByYear.set(row.year, row.sourceId);
     if (row.showWarning) {
       warnings.push({ year: row.year, type: row.warningType, amountGel: row.warningAmountGel });
     }
@@ -268,7 +269,10 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
   for (const year of years) {
     totalValuesByYear[year] = functionalSumByYear[year] ?? null;
     totalBasisByYear[year] = "actual";
-    totalSourceByYear[year] = sourceMetadataFor(totalSourceIdByYear.get(year) ?? "", sources);
+    // This row exports functional_sum_gel, so its provenance follows the ten
+    // function facts. The independently sourced official total is not the
+    // source of this derived value.
+    totalSourceByYear[year] = sourceMetadataFor(functionalSourceIdByYear.get(year) ?? "", sources);
   }
 
   const totalRow: ExplorerTableRow = {
@@ -486,7 +490,7 @@ export type MunicipalEntityKpiInput = {
   model: MunicipalEntityModel;
   /** Sum of every served municipality's public total, keyed by year. */
   nationalTotalByYear: Record<number, number>;
-  rank: number;
+  rankByYear: Record<number, number>;
   rankOutOf: number;
 };
 
@@ -517,6 +521,7 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
   const functionalStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
   const functionalEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
   const growth = changeBetween(functionalStart, functionalEnd);
+  const rank = endYear === undefined ? 0 : input.rankByYear[endYear] ?? 0;
 
   const largest = sortedByEndYear(model.rows, endYear)[0];
   const largestValue = largest && endYear !== undefined ? largest.valuesByYear[endYear] ?? 0 : 0;
@@ -549,7 +554,7 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
       // reference design used (§6.4): rank is size-independent without needing
       // the population data this project does not have. Per-capita is an
       // explicit v1 exclusion; do not reintroduce it here.
-      detail: `${georgianOrdinal(input.rank)} ადგილი ${input.rankOutOf}-დან`,
+      detail: `${georgianOrdinal(rank)} ადგილი ${input.rankOutOf}-დან`,
     },
   ];
 }

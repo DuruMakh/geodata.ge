@@ -69,7 +69,12 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
 
   const listInput = { municipalities, regionLabels, totalFacts, year: latestYear };
   const list = buildMunicipalListRows(listInput);
-  const rank = list.regions.find((row) => row.id === regionId)?.rank ?? 0;
+  const rankByYear = years.reduce<Record<number, number>>((ranks, year) => {
+    const yearList = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year });
+    ranks[year] = yearList.regions.find((row) => row.id === regionId)?.rank ?? 0;
+    return ranks;
+  }, {});
+  const rank = rankByYear[latestYear] ?? 0;
   const nationalTotalByYear = totalFacts.reduce<Record<number, number>>((totals, row) => {
     totals[row.year] = (totals[row.year] ?? 0) + row.publicTotalGel;
     return totals;
@@ -120,12 +125,12 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           totalFacts={own.totalFacts}
           sourceDocuments={sourceDocuments}
           nationalTotalByYear={nationalTotalByYear}
-          rank={rank}
+          rankByYear={rankByYear}
           rankOutOf={regions.length}
-          // No callout on a roll-up: its own two totals reconcile, and თბილისი
-          // and აჭარა each have a warning member in 9 of 11 years, so a
-          // region-level banner would be near-permanent on the two most-visited
-          // pages. The standing two-measures note below still applies.
+          // Reconciliation warnings are municipality-grain provenance. Region
+          // totals may still differ, but a roll-up cannot honestly attribute
+          // that difference to one warning type or member. The standing
+          // two-measures note below still applies.
           showWarnings={false}
           csvBasename={`region-${id}`}
           pickerGroups={buildPickerGroups(listInput)}

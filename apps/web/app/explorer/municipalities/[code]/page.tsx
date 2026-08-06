@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
 
   const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
   const title = `${municipality.displayNameKa} — მუნიციპალიტეტები — GeoData`;
-  const description = `${municipality.nameKa}ს ბიუჯეტი ფუნქციების მიხედვით, ${years[0]}–${years.at(-1)}.`;
+  const description = `${municipality.displayNameKa} — მუნიციპალური ბიუჯეტი ფუნქციების მიხედვით, ${years[0]}–${years.at(-1)}.`;
 
   return {
     title,
@@ -58,8 +58,12 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
   const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
 
   const listInput = { municipalities, regionLabels, totalFacts, year: latestYear };
-  const list = buildMunicipalListRows(listInput);
-  const rank = list.municipalities.find((row) => row.id === code)?.rank ?? 0;
+  const rankByYear = years.reduce<Record<number, number>>((ranks, year) => {
+    const yearList = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year });
+    ranks[year] = yearList.municipalities.find((row) => row.id === code)?.rank ?? 0;
+    return ranks;
+  }, {});
+  const rank = rankByYear[latestYear] ?? 0;
   const nationalTotalByYear = totalFacts.reduce<Record<number, number>>((totals, row) => {
     totals[row.year] = (totals[row.year] ?? 0) + row.publicTotalGel;
     return totals;
@@ -105,7 +109,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
           totalFacts={own.totalFacts}
           sourceDocuments={sourceDocuments}
           nationalTotalByYear={nationalTotalByYear}
-          rank={rank}
+          rankByYear={rankByYear}
           rankOutOf={municipalities.length}
           showWarnings
           csvBasename={`municipality-${code}`}

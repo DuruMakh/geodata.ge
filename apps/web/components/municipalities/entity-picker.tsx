@@ -193,6 +193,11 @@ export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipa
               } else if (event.key === "Enter") {
                 event.preventDefault();
                 selectActive();
+              } else if (event.key === "Tab") {
+                // This is not a focus trap. Let the browser advance focus,
+                // but remove the non-modal popover and its click catcher so
+                // the newly focused page control is not left behind an overlay.
+                onClose();
               }
             }}
             placeholder="ძებნა — მუნიციპალიტეტი ან რეგიონი"
