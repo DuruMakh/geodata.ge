@@ -6,7 +6,7 @@ This methodology covers the prepared annual municipality-level research files un
 
 `docs/Raw Data/Municipalities/combined-annual-2015-2025/`
 
-### Serving status (2026-08-02)
+### Serving status (2026-08-06)
 
 The ten main functional categories are served, on the same terms as expenditure and revenue:
 reviewed, mapped to stable `municipal.*` category IDs, and shipped as
@@ -14,19 +14,23 @@ reviewed, mapped to stable `municipal.*` category IDs, and shipped as
 `data/imports/municipal-total-facts-2015-2025.csv` (704 rows), and a municipality registry
 `data/imports/municipalities.csv` (64 rows). These are read by the CSV serving path
 (`GEODATA_DATA_SOURCE=csv`, the default) the same way expenditure and revenue are. Prisma
-models, a migration, and a database-mode reader also exist for this dataset (see
-`docs/data-methodology/database-import.md`), but as of this date the migration has not been
-applied to the Supabase database and `npm run data:import` has not loaded municipal rows into
-it — the mirror holds no municipal data yet. Both happen automatically, with no manual approval
-step, on the next CI-green push to `main`: `.github/workflows/deploy-production.yml` runs
-`npm run prisma:deploy` and then `npm run data:import` unconditionally, so merging this branch is
-the decision point. The operation is safe by construction — one transaction, parity verified
-before commit, rollback on any mismatch — and production keeps serving the previous build if the
-workflow goes red.
+models, migration `20260802194939_municipal_dataset`, the transactional Supabase mirror import,
+and field-by-field import parity checks shipped in the earlier data-only rollout (see
+`docs/data-methodology/database-import.md`). Migration and import are therefore not pending.
+Every CI-gated production run owned by `.github/workflows/deploy-production.yml` runs
+`npm run prisma:deploy` and `npm run data:import` unconditionally, reconverging the mirror to
+the reviewed CSVs before Vercel is triggered. Manual Vercel dashboard or CLI deployments do not
+run those Actions steps; see `docs/deployment.md`.
 
-This data is served in production: `/explorer/municipalities` (index), 64 municipality pages,
-and 11 region roll-up pages, reachable from the sidebar and hub card 03 (`DESIGN.md` §6.7,
-§20). The index's map is region-grain (ADM1); see "Region shape join" below.
+This branch implements `/explorer/municipalities`, 64 municipality pages, and 11 region roll-up
+pages. Those routes call `loadServedMunicipalData()`, so a db-mode build of this code verifies the
+municipal mirror row by row. The earlier data-only deployment had no municipal route and did not
+exercise that build-time municipal parity check. Implementation is not confirmation of a
+production deployment: direct checks of `https://geodata-ge.vercel.app/explorer/municipalities`
+and `/explorer/municipalities/04` returned HTTP 404 on 2026-08-06, and this workspace could not
+freshly authenticate hosted GitHub/remote-main metadata or the live database contents. Do not
+describe the municipal UI as live until a post-deployment route check returns HTTP 200. The
+index's map is region-grain (ADM1); see "Region shape join" below.
 
 The six selected-detail rows (`7.1.1`, `7.4.5.1`, `7.5.1`, `7.8.1`, `7.8.2`, `7.9.1`; 4,554 rows
 in the prepared package below) are deliberately not imported — not an oversight. Dropping them
