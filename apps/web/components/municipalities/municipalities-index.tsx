@@ -57,7 +57,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
     return source.filter((row) => row.nameKa.includes(needle) || row.subtitleKa.includes(needle));
   }, [source, query]);
 
-  const max = rows[0]?.valueGel ?? 1;
+  const max = source[0]?.valueGel ?? 1;
   const openMunicipality = (code: string) => router.push(`/explorer/municipalities/${code}`);
   const openRegion = (regionId: string) => router.push(`/explorer/municipalities/region/${regionId.replace("region.", "")}`);
 
@@ -163,10 +163,13 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                     {String(row.rank).padStart(2, "0")}
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-[12.5px] font-medium">{row.nameKa}</span>
+                    <span data-testid="municipal-row-name" className="block truncate text-[12.5px] font-medium">
+                      {row.nameKa}
+                    </span>
                     <span className="block truncate text-[10.5px] text-[var(--faint)]">{row.subtitleKa}</span>
                     <span className="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
                       <span
+                        data-testid="municipal-row-bar"
                         className="block h-[3px] bg-[var(--accent)]"
                         style={{ width: `${((row.valueGel / max) * 100).toFixed(1)}%` }}
                       />

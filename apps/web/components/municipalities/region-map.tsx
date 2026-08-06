@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
 import { formatAmount } from "../../lib/explorer/format";
 
@@ -45,6 +45,43 @@ type RegionMapProps = {
   onHoverRegion: (regionId: string | null) => void;
 };
 
+type InteractionTarget = {
+  shape: RegionMapShape;
+  element: SVGPathElement;
+};
+
+type TooltipPosition = {
+  left: number;
+  top: number;
+};
+
+const TOOLTIP_ID = "region-map-tooltip";
+const TOOLTIP_WIDTH = 200;
+const TOOLTIP_HEIGHT = 50;
+const TOOLTIP_GAP = 8;
+const TOOLTIP_EDGE = 6;
+
+function getTooltipPosition(svg: SVGSVGElement, target: SVGPathElement): TooltipPosition {
+  const svgBox = svg.getBoundingClientRect();
+  const shapeBox = target.getBoundingClientRect();
+  const centeredLeft = shapeBox.left - svgBox.left + shapeBox.width / 2 - TOOLTIP_WIDTH / 2;
+  const left = Math.min(
+    Math.max(centeredLeft, TOOLTIP_EDGE),
+    Math.max(TOOLTIP_EDGE, svgBox.width - TOOLTIP_WIDTH - TOOLTIP_EDGE),
+  );
+  const roomAbove = shapeBox.top - svgBox.top;
+  const preferredTop =
+    roomAbove >= TOOLTIP_HEIGHT + TOOLTIP_GAP + TOOLTIP_EDGE
+      ? roomAbove - TOOLTIP_HEIGHT - TOOLTIP_GAP
+      : shapeBox.bottom - svgBox.top + TOOLTIP_GAP;
+  const top = Math.min(
+    Math.max(preferredTop, TOOLTIP_EDGE),
+    Math.max(TOOLTIP_EDGE, svgBox.height - TOOLTIP_HEIGHT - TOOLTIP_EDGE),
+  );
+
+  return { left, top };
+}
+
 export function RegionMap({
   viewBox,
   shapes,
@@ -56,8 +93,30 @@ export function RegionMap({
   hoveredRegionId,
   onHoverRegion,
 }: RegionMapProps) {
+  const svgRef = useRef<SVGSVGElement>(null);
   const [hoveredCity, setHoveredCity] = useState<string | null>(null);
-  const hovered = shapes.find((shape) => shape.regionId !== null && shape.regionId === hoveredRegionId) ?? null;
+  const [pointerTarget, setPointerTarget] = useState<InteractionTarget | null>(null);
+  const [focusTarget, setFocusTarget] = useState<InteractionTarget | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
+  const activeTarget = focusTarget ?? pointerTarget;
+  const activeRegionId = activeTarget?.shape.regionId ?? hoveredRegionId;
+  const hovered = shapes.find((shape) => shape.regionId !== null && shape.regionId === activeRegionId) ?? null;
+
+  const positionTooltip = (target: InteractionTarget) => {
+    if (svgRef.current === null) return;
+    setTooltipPosition(getTooltipPosition(svgRef.current, target.element));
+  };
+
+  useEffect(() => {
+    if (activeTarget === null) return;
+
+    const handleResize = () => {
+      if (svgRef.current === null) return;
+      setTooltipPosition(getTooltipPosition(svgRef.current, activeTarget.element));
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [activeTarget]);
 
   const readout =
     hovered === null
@@ -73,10 +132,11 @@ export function RegionMap({
 
   return (
     <div data-testid="region-map">
-      <svg viewBox={viewBox} role="img" aria-label="საქართველოს რეგიონების ბიუჯეტის რუკა" className="block h-auto w-full">
-        {orderedShapes.map((shape) => {
+      <div className="relative">
+        <svg ref={svgRef} viewBox={viewBox} role="group" aria-label="საქართველოს რეგიონების ბიუჯეტის რუკა" className="block h-auto w-full">
+          {orderedShapes.map((shape) => {
           const noData = shape.regionId === null;
-          const active = !noData && shape.regionId === hoveredRegionId;
+          const active = !noData && shape.regionId === activeRegionId;
 
           return (
             <path
@@ -99,9 +159,36 @@ export function RegionMap({
               tabIndex={noData ? undefined : 0}
               role={noData ? undefined : "button"}
               aria-label={noData ? undefined : accessibleShapeName(shape.nameKa, shape.valueGel)}
+              aria-describedby={activeTarget?.shape.shapeIso === shape.shapeIso ? TOOLTIP_ID : undefined}
               data-focus-map={noData ? undefined : ""}
-              onMouseEnter={() => onHoverRegion(shape.regionId)}
-              onMouseLeave={() => onHoverRegion(null)}
+              onMouseEnter={(event) => {
+                if (noData) return;
+                const nextTarget = { shape, element: event.currentTarget };
+                setPointerTarget(nextTarget);
+                if (focusTarget === null) positionTooltip(nextTarget);
+                onHoverRegion(focusTarget?.shape.regionId ?? shape.regionId);
+              }}
+              onMouseLeave={() => {
+                if (noData) return;
+                setPointerTarget(null);
+                if (focusTarget === null) setTooltipPosition(null);
+                else positionTooltip(focusTarget);
+                onHoverRegion(focusTarget?.shape.regionId ?? null);
+              }}
+              onFocus={(event) => {
+                if (noData) return;
+                const nextTarget = { shape, element: event.currentTarget };
+                setFocusTarget(nextTarget);
+                positionTooltip(nextTarget);
+                onHoverRegion(shape.regionId);
+              }}
+              onBlur={() => {
+                if (noData) return;
+                setFocusTarget(null);
+                if (pointerTarget === null) setTooltipPosition(null);
+                else positionTooltip(pointerTarget);
+                onHoverRegion(pointerTarget?.shape.regionId ?? null);
+              }}
               onClick={() => (shape.regionId === null ? undefined : onOpenRegion(shape.regionId))}
               onKeyDown={(event) => {
                 if (shape.regionId === null) return;
@@ -112,8 +199,8 @@ export function RegionMap({
               }}
             />
           );
-        })}
-        {orderedCities.map((city) => (
+          })}
+          {orderedCities.map((city) => (
           <circle
             key={city.code}
             data-testid={`self-gov-city-${city.code}`}
@@ -140,8 +227,24 @@ export function RegionMap({
           >
             <title>{city.nameKa}</title>
           </circle>
-        ))}
-      </svg>
+          ))}
+        </svg>
+
+        {activeTarget !== null && tooltipPosition !== null ? (
+          <div
+            id={TOOLTIP_ID}
+            role="tooltip"
+            data-testid="region-map-tooltip"
+            className="pointer-events-none absolute z-[2] h-[50px] w-[200px] overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
+            style={{ left: tooltipPosition.left, top: tooltipPosition.top }}
+          >
+            <div className="truncate text-[12px] font-medium text-[var(--ink)]">{activeTarget.shape.nameKa}</div>
+            <div className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+              {formatAmount(activeTarget.shape.valueGel)}
+            </div>
+          </div>
+        ) : null}
+      </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-3.5 border-t border-[var(--hairline-soft)] pt-2.5">
         <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{legendMin}</span>
