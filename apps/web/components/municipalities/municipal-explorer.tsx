@@ -174,7 +174,12 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
     }
 
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    document.body.dataset.appReady = "true";
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      delete document.body.dataset.appReady;
+    };
   }, []);
 
   return (

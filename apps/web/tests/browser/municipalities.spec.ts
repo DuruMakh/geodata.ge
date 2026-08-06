@@ -1,4 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function expectMunicipalAppReady(page: Page) {
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+}
 
 // Municipalities index map: keyboard-accessibility regression coverage for the
 // review finding that region <path>/city <circle> elements were click-only
@@ -209,6 +213,7 @@ test.describe("municipalities index", () => {
 
   test("lists all municipalities and switches grain", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
     await page.getByTestId("level-region").click();
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(11);
@@ -241,6 +246,7 @@ test.describe("municipalities index", () => {
 
   test("opens a municipality from the list", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-list-row").first().click();
     await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/04");
   });

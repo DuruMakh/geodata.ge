@@ -50,6 +50,14 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
     }
   }, [level]);
 
+  useEffect(() => {
+    document.body.dataset.appReady = "true";
+
+    return () => {
+      delete document.body.dataset.appReady;
+    };
+  }, []);
+
   const source = level === "region" ? props.regions : props.municipalities;
   const rows = useMemo(() => {
     const needle = query.trim();

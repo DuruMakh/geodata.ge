@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 // Municipality entity pages (Task 11). Three things nothing in the repo
 // exercised before this page existed:
@@ -34,6 +34,10 @@ const ALL_FUNCTIONS = [
   "municipal.education",
   "municipal.social_protection",
 ].join(",");
+
+async function expectMunicipalAppReady(page: Page) {
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+}
 
 test.describe("hash sanitising", () => {
   test("a reversed shared range renders in the correct order, not reversed", async ({ page }) => {
@@ -332,6 +336,7 @@ test.describe("municipality page", () => {
 
   test("opens the entity picker with the keyboard", async ({ page }) => {
     await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
     await page.keyboard.press("Control+k");
     await expect(page.getByTestId("entity-picker")).toBeVisible();
     await page.keyboard.press("Escape");
