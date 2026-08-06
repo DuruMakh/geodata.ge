@@ -1,0 +1,1346 @@
+{
+  "root": "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge",
+  "manifest": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025-manifest.csv",
+  "techniques": [
+    "coverage_and_manifest_consistency",
+    "sha256_exact_copy_for_copied_xlsx",
+    "old_folder_hash_match_for_source_provenance",
+    "xlsx_openability_shape_numeric_integrity",
+    "pdf_table_reextract_vs_xlsx_matrix",
+    "word_table_rerun_csv_vs_xlsx_matrix_when_available",
+    "xls_to_xlsx_rerun_vs_output_matrix_when_available",
+    "pdf_text_numeric_token_probe"
+  ],
+  "coverage": {
+    "manifest_row_count": 22,
+    "years": [
+      2004,
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "expected_years": [
+      2004,
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "missing_years": [],
+    "duplicate_years": []
+  },
+  "years": {
+    "2004": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2004-fact.pdf",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2004-fact.xlsx",
+      "method": "pdfplumber_tables_to_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "33ee4a12881fb6aa6b3d7221abbf8feb61f1764b448b6f8a76155cc24af67a97",
+      "output_sha256": "d569882d06a2988d7993c0ba2720990064a2f24d7785bd116430d503a4ddaf3c",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2004\\official-sources\\2004-12-month-state-budget-functional-expenditure.official.pdf",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2004\\2004-fact-official-source.pdf"
+      ],
+      "checks": {
+        "copy_hash_match": null,
+        "pdf_table_matrix_match": {
+          "expected_rows": 47,
+          "actual_rows": 47,
+          "mismatch_count": 0,
+          "mismatch_examples": []
+        },
+        "pdf_metadata": {
+          "metadata_sheet": true,
+          "rows": [
+            [
+              "source_file",
+              "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge\\docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2004-fact.pdf"
+            ],
+            [
+              "extracted_table_rows",
+              46
+            ],
+            [
+              "max_table_columns",
+              11
+            ]
+          ]
+        },
+        "pdf_text_probe": {
+          "first_pages": [
+            {
+              "page": 1,
+              "chars": 15334,
+              "snippet": "`saqarTvelos 2004 wlis saxelmwifo biujetis Sesaxeb~ saqarTvelos 2004 wlis 11 maisis kanonis danarTi #7 2004 wlis centraluri biujetis xarjebis Sesruleba funqcionalur WrilSi 2004 wlis centraluri biujetis xarjebis Sesruleba funqcionalur WrilSi 2004 wlis centraluri biujetis xarjebis Sesruleba funqcionalur WrilSi 2004 wlis centraluri biujetis xarjebis Sesruleba funqcionalur WrilSi cf[fpbyj cfvcf[ehbc j"
+            }
+          ],
+          "pdf_number_tokens_first_3_pages": 113,
+          "xlsx_number_tokens": 474,
+          "common_number_tokens": 35,
+          "year_markers_in_first_pages": [
+            "2004"
+          ]
+        }
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "extracted_tables",
+            "max_row": 47,
+            "max_column": 14,
+            "non_empty_cells": 626
+          },
+          {
+            "name": "metadata",
+            "max_row": 3,
+            "max_column": 2,
+            "non_empty_cells": 6
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 632,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 140,
+        "numeric_sum": 1230.0,
+        "numeric_min": 1.0,
+        "numeric_max": 46.0,
+        "text_cell_count": 492,
+        "source_path_cells": [
+          "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge\\docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2004-fact.pdf"
+        ]
+      }
+    },
+    "2005": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2005-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2005-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "b0039981526ea083f59704fe27bd670784b3b67512b07cc3307366d09f71c8f4",
+      "output_sha256": "b0039981526ea083f59704fe27bd670784b3b67512b07cc3307366d09f71c8f4",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2005-programmatic-budget-law-from-2006-december\\xlsx\\2005-programmatic-from-2006-december.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2005\\2005-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "rows",
+            "max_row": 152,
+            "max_column": 11,
+            "non_empty_cells": 1417
+          },
+          {
+            "name": "metadata",
+            "max_row": 4,
+            "max_column": 2,
+            "non_empty_cells": 8
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 1425,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 897,
+        "numeric_sum": 14802873.5,
+        "numeric_min": 0.0,
+        "numeric_max": 851395.7,
+        "text_cell_count": 528,
+        "source_path_cells": []
+      }
+    },
+    "2006": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2006-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2006-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "dc2e223287a70338581e8be04a5635f25b556a814655162c4f70031c6dc32128",
+      "output_sha256": "dc2e223287a70338581e8be04a5635f25b556a814655162c4f70031c6dc32128",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\xlsx\\2006-programmatic-annex.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2006\\2006-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "rows",
+            "max_row": 305,
+            "max_column": 22,
+            "non_empty_cells": 4692
+          },
+          {
+            "name": "metadata",
+            "max_row": 3,
+            "max_column": 2,
+            "non_empty_cells": 6
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 4698,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 3650,
+        "numeric_sum": 7697852156.0,
+        "numeric_min": -18556032.75,
+        "numeric_max": 256801647.21,
+        "text_cell_count": 1048,
+        "source_path_cells": []
+      }
+    },
+    "2007": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2007-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2007-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "090fe4ba3f98e1fcac85594928f2c2bb4d593c3c944514cbf955d719d5439c65",
+      "output_sha256": "090fe4ba3f98e1fcac85594928f2c2bb4d593c3c944514cbf955d719d5439c65",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\xlsx\\2007-programmatic-annex.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2007\\2007-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "rows",
+            "max_row": 377,
+            "max_column": 22,
+            "non_empty_cells": 5800
+          },
+          {
+            "name": "metadata",
+            "max_row": 3,
+            "max_column": 2,
+            "non_empty_cells": 6
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 5806,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 4514,
+        "numeric_sum": 9779376720.0,
+        "numeric_min": -1530998.94,
+        "numeric_max": 267834928.0,
+        "text_cell_count": 1292,
+        "source_path_cells": []
+      }
+    },
+    "2008": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2008-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2008-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "b37d8aaaa99d959f9c13380cac39568feda8dcfa22aab4c0b417cb3a2fde6d91",
+      "output_sha256": "b37d8aaaa99d959f9c13380cac39568feda8dcfa22aab4c0b417cb3a2fde6d91",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\xlsx\\2008-programmatic-annex.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2008\\2008-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "rows",
+            "max_row": 527,
+            "max_column": 22,
+            "non_empty_cells": 6403
+          },
+          {
+            "name": "metadata",
+            "max_row": 4,
+            "max_column": 2,
+            "non_empty_cells": 8
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 6411,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 4699,
+        "numeric_sum": 15916777485.148,
+        "numeric_min": 0.0,
+        "numeric_max": 616779918.33,
+        "text_cell_count": 1712,
+        "source_path_cells": []
+      }
+    },
+    "2009": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2009-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2009-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "dc5c8bde555a0b1dbb18d82b188454e26352457b833c09541f89d8ccce90b8ac",
+      "output_sha256": "dc5c8bde555a0b1dbb18d82b188454e26352457b833c09541f89d8ccce90b8ac",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\xlsx\\2009-programmatic-annex.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2009\\2009-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "rows",
+            "max_row": 579,
+            "max_column": 22,
+            "non_empty_cells": 7780
+          },
+          {
+            "name": "metadata",
+            "max_row": 3,
+            "max_column": 2,
+            "non_empty_cells": 6
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 7786,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 5912,
+        "numeric_sum": 42948142224.14,
+        "numeric_min": -1127125.38,
+        "numeric_max": 893923196.3,
+        "text_cell_count": 1874,
+        "source_path_cells": []
+      }
+    },
+    "2010": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2010-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2010-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "81f7c6939d892970876a2762aaa086a70e134dc4260e2409f17e295a88621321",
+      "output_sha256": "81f7c6939d892970876a2762aaa086a70e134dc4260e2409f17e295a88621321",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\xlsx\\2010-programmatic-annex.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2010\\2010-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "rows",
+            "max_row": 334,
+            "max_column": 22,
+            "non_empty_cells": 3965
+          },
+          {
+            "name": "metadata",
+            "max_row": 4,
+            "max_column": 2,
+            "non_empty_cells": 8
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 3973,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 2740,
+        "numeric_sum": 19094157601.0,
+        "numeric_min": -22760607.14,
+        "numeric_max": 945146456.0,
+        "text_cell_count": 1233,
+        "source_path_cells": []
+      }
+    },
+    "2011": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2011-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2011-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "0e9cf410cd9881d778159f796a3c890ce19f70cc1f413748d57c50f26e52446c",
+      "output_sha256": "0e9cf410cd9881d778159f796a3c890ce19f70cc1f413748d57c50f26e52446c",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2006-2011-programmatic-annexes\\xlsx\\2011-programmatic-annex.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2011\\2011-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "rows",
+            "max_row": 660,
+            "max_column": 22,
+            "non_empty_cells": 11954
+          },
+          {
+            "name": "metadata",
+            "max_row": 3,
+            "max_column": 2,
+            "non_empty_cells": 6
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 11960,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 9830,
+        "numeric_sum": 39401918754.0,
+        "numeric_min": -9140915.78,
+        "numeric_max": 971006739.0,
+        "text_cell_count": 2130,
+        "source_path_cells": []
+      }
+    },
+    "2012": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2012-fact.pdf",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2012-fact.xlsx",
+      "method": "pdfplumber_tables_to_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "0e124dcab6ae102ca0730cae7794f60ba544de3ab8b44d9e2bd26b3a1c56a00f",
+      "output_sha256": "b9a174d0775a3a61dc62ed90977bfcd977b3a9e6e35b5486d16c3deba93c5d11",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2012\\official-sources\\2012-programmatic-execution-annex.official.pdf",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2012\\2012-fact-official-source.pdf"
+      ],
+      "checks": {
+        "copy_hash_match": null,
+        "pdf_table_matrix_match": {
+          "expected_rows": 173,
+          "actual_rows": 173,
+          "mismatch_count": 0,
+          "mismatch_examples": []
+        },
+        "pdf_metadata": {
+          "metadata_sheet": true,
+          "rows": [
+            [
+              "source_file",
+              "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge\\docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2012-fact.pdf"
+            ],
+            [
+              "extracted_table_rows",
+              172
+            ],
+            [
+              "max_table_columns",
+              7
+            ]
+          ]
+        },
+        "pdf_text_probe": {
+          "first_pages": [
+            {
+              "page": 1,
+              "chars": 1407,
+              "snippet": "2 ინფორმაცია 2012 წლის სახელმწიფო ბიუჯეტით გათვალისწინებული პროგრამების შესახებ 1. პრიორიტეტი − ხელმისაწვდომი ხარისხიანი ჯანდაცვა და სოციალური უზრუნველყოფა პროგრა მული კოდი დასახელება 2012 წლის გეგმა 2012 წლის საკასო შესრულება მთლიანი დაფინანსება მ.შ. სახელმწიფო ბიუჯეტით გამოყოფილი სახსრები მთლიანი დაფინანსება მ.შ. სახელმწიფო ბიუჯეტით გამოყოფილი სახსრები მ.შ. საკუთარი სახსრები 35 01 შრომის, ჯანმრთ"
+            },
+            {
+              "page": 2,
+              "chars": 1954,
+              "snippet": "3 1.1.2. სამედიცინო საქმიანობის რეგულირების პროგრამა (პროგრამული კოდი 35 01 02) ქვეპროგრამის განმახორციელებელი  სსიპ - „სამედიცინო საქმიანობის სახელმწიფო რეგულირების სააგენტო“,  სსიპ - „სამედიცინო მედიაციის სამსახური“, დასახული შუალედური შედეგები:  ფალსიფიცირებული, ვადაგასული და წუნდებული ფარმაცევტული პროდუქტებისაგან დაცული ფარმაცევტული ბაზარი;  უკანონო სამედიცინო და საექიმო საქმიანობისაგან და"
+            },
+            {
+              "page": 3,
+              "chars": 1710,
+              "snippet": "4  სახელმწიფო ზრუნვის ქვეშ მყოფ პირთა საცხოვრებელი პირობები  ჩვილ ბავშვთა მიტოვების პრევენციის რაოდენობა 1.1.6. ადამიანით ვაჭრობის (ტრეფიკინგის) მსხვერპლთა დაცვა და დახმარება (პროგრამული კოდი 35 01 06) ქვეპროგრამის განმახორციელებელი  სსიპ - „ადამიანით ვაჭრობის (ტრეფიკინგის) მსხვერპლთა, დაზარალებულთა დაცვისა და დახმარების სახელმწიფო ფონდი“ დასახული შუალედური შედეგი  ადამიანით ვაჭრობისა (ტრეფიკი"
+            }
+          ],
+          "pdf_number_tokens_first_3_pages": 25,
+          "xlsx_number_tokens": 1269,
+          "common_number_tokens": 8,
+          "year_markers_in_first_pages": [
+            "2012"
+          ]
+        }
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "extracted_tables",
+            "max_row": 173,
+            "max_column": 10,
+            "non_empty_cells": 1536
+          },
+          {
+            "name": "metadata",
+            "max_row": 3,
+            "max_column": 2,
+            "non_empty_cells": 6
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 1542,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 518,
+        "numeric_sum": 13576.0,
+        "numeric_min": 1.0,
+        "numeric_max": 172.0,
+        "text_cell_count": 1024,
+        "source_path_cells": [
+          "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge\\docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2012-fact.pdf"
+        ]
+      }
+    },
+    "2013": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2013-fact.pdf",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2013-fact.xlsx",
+      "method": "pdfplumber_tables_to_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "6b83d75048a7ba4fd5abb171ca1e9c84ae7422b553cfc8aacef0c330791c604a",
+      "output_sha256": "1b682c29a1c66a26ab485773fb22fefcf076d100377bb8b58d16e5d9807cc13a",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\31314230-4bbd-46dc-904f-eab927c186c8.pdf",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-reports-chapter-VI-2013-2025\\2013-12-month-tavi-VI.pdf",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-tavi-VI\\2013-12-month-tavi-VI.pdf",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2013-2025-12-month-tavi-VI\\2013-12-month-tavi-VI.pdf",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2013\\2013-fact.pdf"
+      ],
+      "checks": {
+        "copy_hash_match": null,
+        "pdf_table_matrix_match": {
+          "expected_rows": 596,
+          "actual_rows": 596,
+          "mismatch_count": 0,
+          "mismatch_examples": []
+        },
+        "pdf_metadata": {
+          "metadata_sheet": true,
+          "rows": [
+            [
+              "source_file",
+              "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge\\docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2013-fact.pdf"
+            ],
+            [
+              "extracted_table_rows",
+              595
+            ],
+            [
+              "max_table_columns",
+              5
+            ]
+          ]
+        },
+        "pdf_text_probe": {
+          "first_pages": [
+            {
+              "page": 1,
+              "chars": 1971,
+              "snippet": "242 თავი VI 2013 წლის სახელმწიფო ბიუჯეტის გადასახდელები პროგრამული კლასიფიკაციის მიხედვით ათასი ლარი პროგრამული კოდი დასახელება 2013 წლის დამტკიცებული გეგმა 2013 წლის დაზუსტბული გეგმა 2013 წლის ფაქტიური შესრულება 00 00 სულ ჯამი 8,748,500.0 8,748,500.0 8,104,217.6 ხარჯები 7,248,474.4 7,005,579.1 6,545,615.2 შრომის ანაზღაურება 1,180,933.8 1,193,959.4 1,187,569.5 საქონელი და მომსახურება 854,685.0 796"
+            },
+            {
+              "page": 2,
+              "chars": 2099,
+              "snippet": "243 პროგრამული კოდი დასახელება 2013 წლის დამტკიცებული გეგმა 2013 წლის დაზუსტბული გეგმა 2013 წლის ფაქტიური შესრულება არაფინანსური აქტივების ზრდა 150.0 215.0 213.8 01 03 ჰერალდიკური საქმიანობის სახელმწიფო რეგულირება 400.0 400.0 396.6 ხარჯები 395.0 395.0 391.6 შრომის ანაზღაურება 286.0 286.0 286.0 საქონელი და მომსახურება 103.0 103.0 102.9 სხვა ხარჯები 6.0 6.0 2.8 არაფინანსური აქტივების ზრდა 5.0 5.0 4."
+            },
+            {
+              "page": 3,
+              "chars": 2045,
+              "snippet": "244 პროგრამული კოდი დასახელება 2013 წლის დამტკიცებული გეგმა 2013 წლის დაზუსტბული გეგმა 2013 წლის ფაქტიური შესრულება სოციალური უზრუნველყოფა 0.0 6.0 0.0 სხვა ხარჯები 0.0 2.3 0.8 არაფინანსური აქტივების ზრდა 0.0 51.0 50.3 04 03 პერსონალურ მონაცემთა დაცვის ინსპექტორის აპარატი 0.0 204.0 202.7 ხარჯები 0.0 178.2 177.0 შრომის ანაზღაურება 0.0 135.0 134.8 საქონელი და მომსახურება 0.0 43.2 42.3 არაფინანსური აქ"
+            }
+          ],
+          "pdf_number_tokens_first_3_pages": 137,
+          "xlsx_number_tokens": 3848,
+          "common_number_tokens": 11,
+          "year_markers_in_first_pages": [
+            "2013"
+          ]
+        }
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "extracted_tables",
+            "max_row": 596,
+            "max_column": 8,
+            "non_empty_cells": 4487
+          },
+          {
+            "name": "metadata",
+            "max_row": 3,
+            "max_column": 2,
+            "non_empty_cells": 6
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 4493,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 1787,
+        "numeric_sum": 19508.0,
+        "numeric_min": 1.0,
+        "numeric_max": 595.0,
+        "text_cell_count": 2706,
+        "source_path_cells": [
+          "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge\\docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2013-fact.pdf"
+        ]
+      }
+    },
+    "2014": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2014-fact.doc",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2014-fact.xlsx",
+      "method": "word_com_tables_csv_to_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "419a17b8557c257ead1599176dd9d46996db388a7bad0a7e4eca6e1d2316e6e3",
+      "output_sha256": "ceafe9182b56a63cd41055e4f71e77a9e7fbbcef41cbd6249254d565a8a1f202",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2014-tavi-VI.doc"
+      ],
+      "checks": {
+        "copy_hash_match": null,
+        "word_table_rerun_matrix_match": {
+          "expected_rows": 682,
+          "actual_rows": 682,
+          "mismatch_count": 0,
+          "mismatch_examples": []
+        },
+        "word_metadata": {
+          "metadata_sheet": true,
+          "rows": [
+            [
+              "source_file",
+              "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge\\docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2014-fact.doc"
+            ],
+            [
+              "source_csv",
+              "C:\\tmp\\geodata-mof-word-csv\\2014-fact-word-tables.csv"
+            ],
+            [
+              "rows_including_header",
+              682
+            ],
+            [
+              "max_columns",
+              10
+            ]
+          ]
+        }
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "extracted_tables",
+            "max_row": 682,
+            "max_column": 10,
+            "non_empty_cells": 6232
+          },
+          {
+            "name": "metadata",
+            "max_row": 4,
+            "max_column": 2,
+            "non_empty_cells": 8
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 6240,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 2,
+        "numeric_sum": 692.0,
+        "numeric_min": 10.0,
+        "numeric_max": 682.0,
+        "text_cell_count": 6238,
+        "source_path_cells": [
+          "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge\\docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2014-fact.doc"
+        ]
+      }
+    },
+    "2015": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2015-fact.doc",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2015-fact.xlsx",
+      "method": "word_com_tables_csv_to_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "1f9c44d2b780ff4d4c3fe7cdd1ebbe38e5c7452d2e417dd7a370bc16c48f87ed",
+      "output_sha256": "47f9c22fffcae56faecb79bc0cfe84bcddb42db265ff4da7089ba84abdb0906e",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2015-tavi-VI.doc"
+      ],
+      "checks": {
+        "copy_hash_match": null,
+        "word_table_rerun_matrix_match": {
+          "expected_rows": 1393,
+          "actual_rows": 1393,
+          "mismatch_count": 0,
+          "mismatch_examples": []
+        },
+        "word_metadata": {
+          "metadata_sheet": true,
+          "rows": [
+            [
+              "source_file",
+              "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge\\docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2015-fact.doc"
+            ],
+            [
+              "source_csv",
+              "C:\\tmp\\geodata-mof-word-csv\\2015-fact-word-tables.csv"
+            ],
+            [
+              "rows_including_header",
+              1393
+            ],
+            [
+              "max_columns",
+              10
+            ]
+          ]
+        }
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "extracted_tables",
+            "max_row": 1393,
+            "max_column": 10,
+            "non_empty_cells": 12665
+          },
+          {
+            "name": "metadata",
+            "max_row": 4,
+            "max_column": 2,
+            "non_empty_cells": 8
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 12673,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 2,
+        "numeric_sum": 1403.0,
+        "numeric_min": 10.0,
+        "numeric_max": 1393.0,
+        "text_cell_count": 12671,
+        "source_path_cells": [
+          "C:\\Users\\Mylaptop\\Desktop\\Projects\\Geodata.ge\\docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2015-fact.doc"
+        ]
+      }
+    },
+    "2016": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2016-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2016-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "68fd38bcde25171b15e7a4deab321aeeeb9de99ac71c3c2ab90242637347e4ba",
+      "output_sha256": "68fd38bcde25171b15e7a4deab321aeeeb9de99ac71c3c2ab90242637347e4ba",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2016-tavi-VI.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "მუხლი 15",
+            "max_row": 33,
+            "max_column": 9,
+            "non_empty_cells": 181
+          },
+          {
+            "name": "Sheet2",
+            "max_row": 1,
+            "max_column": 1,
+            "non_empty_cells": 0
+          },
+          {
+            "name": "Sheet3",
+            "max_row": 1,
+            "max_column": 1,
+            "non_empty_cells": 0
+          }
+        ],
+        "sheet_count": 3,
+        "non_empty_cells": 181,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 144,
+        "numeric_sum": 85781893.3,
+        "numeric_min": 0.0,
+        "numeric_max": 10297950.0,
+        "text_cell_count": 37,
+        "source_path_cells": []
+      }
+    },
+    "2017": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2017-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2017-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "aea8e9e0ca28a7bb98e6ce760820f0e0d6ec9c4144e16a67729923a46a85c06d",
+      "output_sha256": "aea8e9e0ca28a7bb98e6ce760820f0e0d6ec9c4144e16a67729923a46a85c06d",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2017-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2013-2025-12-month-tavi-VI\\2017-12-month-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2017\\2017-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "VI TAVI",
+            "max_row": 2013,
+            "max_column": 6,
+            "non_empty_cells": 8365
+          },
+          {
+            "name": "Sheet1",
+            "max_row": 1,
+            "max_column": 1,
+            "non_empty_cells": 0
+          }
+        ],
+        "sheet_count": 2,
+        "non_empty_cells": 8365,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 6027,
+        "numeric_sum": 353773705.5,
+        "numeric_min": 0.0,
+        "numeric_max": 11764835.4,
+        "text_cell_count": 2338,
+        "source_path_cells": []
+      }
+    },
+    "2018": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2018-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2018-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "5cb7e6c9afaef23fa77933dd2c40898949c17a61945cfa0c2f59ee7d6df95fe8",
+      "output_sha256": "5cb7e6c9afaef23fa77933dd2c40898949c17a61945cfa0c2f59ee7d6df95fe8",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2018-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2013-2025-12-month-tavi-VI\\2018-12-month-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2018\\2018-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "Sheet1",
+            "max_row": 1874,
+            "max_column": 6,
+            "non_empty_cells": 9357
+          }
+        ],
+        "sheet_count": 1,
+        "non_empty_cells": 9357,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 5610,
+        "numeric_sum": 376391536.05662,
+        "numeric_min": 0.0,
+        "numeric_max": 12590181.62203,
+        "text_cell_count": 2194,
+        "source_path_cells": []
+      }
+    },
+    "2019": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2019-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2019-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "4dd19863be70a9c070bd83db55d06ab285ac4dccb73f4406b2943c9b3dbba7a3",
+      "output_sha256": "4dd19863be70a9c070bd83db55d06ab285ac4dccb73f4406b2943c9b3dbba7a3",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2019-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2013-2025-12-month-tavi-VI\\2019-12-month-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2019\\2019-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "tavi 6",
+            "max_row": 1891,
+            "max_column": 6,
+            "non_empty_cells": 7876
+          }
+        ],
+        "sheet_count": 1,
+        "non_empty_cells": 7876,
+        "formula_cells": 0,
+        "error_literals": 0,
+        "numeric_cell_count": 5658,
+        "numeric_sum": 395730421.4,
+        "numeric_min": 0.0,
+        "numeric_max": 13469689.0,
+        "text_cell_count": 2218,
+        "source_path_cells": []
+      }
+    },
+    "2020": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2020-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2020-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "6beac113bdd32316f357b5d26568f2757eb7af8b1ddb38ef7e6d815241a526b8",
+      "output_sha256": "6beac113bdd32316f357b5d26568f2757eb7af8b1ddb38ef7e6d815241a526b8",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2020-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2013-2025-12-month-tavi-VI\\2020-12-month-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2020\\2020-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "Sheet1",
+            "max_row": 2046,
+            "max_column": 7,
+            "non_empty_cells": 10574
+          }
+        ],
+        "sheet_count": 1,
+        "non_empty_cells": 10574,
+        "formula_cells": 0,
+        "error_literals": 90,
+        "numeric_cell_count": 264,
+        "numeric_sum": 91698.5,
+        "numeric_min": 1.1,
+        "numeric_max": 44445.0,
+        "text_cell_count": 10300,
+        "source_path_cells": []
+      }
+    },
+    "2021": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2021-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2021-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "a675a964065ceeabba6e990494fbed59b88feb00a1262a7fd316fc80efeaeae6",
+      "output_sha256": "a675a964065ceeabba6e990494fbed59b88feb00a1262a7fd316fc80efeaeae6",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2021-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2013-2025-12-month-tavi-VI\\2021-12-month-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2021\\2021-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "Tavi VI",
+            "max_row": 2068,
+            "max_column": 7,
+            "non_empty_cells": 10649
+          }
+        ],
+        "sheet_count": 1,
+        "non_empty_cells": 10649,
+        "formula_cells": 0,
+        "error_literals": 77,
+        "numeric_cell_count": 8147,
+        "numeric_sum": 596128177.07,
+        "numeric_min": 0.0,
+        "numeric_max": 19807502.5,
+        "text_cell_count": 2502,
+        "source_path_cells": []
+      }
+    },
+    "2022": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2022-fact.xls",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2022-fact.xlsx",
+      "method": "excel_com_xls_to_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "7473b401a270f84a7ba6841242ae16edc2cc2b3f7d3ec41c2e42828c63bf756c",
+      "output_sha256": "a34e5419e1a986a25ad24e4a1239b245616a0b80ee8f756749dd5e56586fa610",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2022-tavi-VI.xls",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2013-2025-12-month-tavi-VI\\2022-12-month-tavi-VI.xls",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2022\\2022-fact.xls"
+      ],
+      "checks": {
+        "copy_hash_match": null,
+        "xls_rerun_matrix_match": {
+          "expected_rows": 2091,
+          "actual_rows": 2091,
+          "mismatch_count": 0,
+          "mismatch_examples": []
+        },
+        "xls_rerun_sha256": "d4adb98a0dfc59fff04fad89b31a0aa6898fbf7fccd833ae03787f8cb0b77137"
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "VI",
+            "max_row": 2091,
+            "max_column": 11,
+            "non_empty_cells": 14637
+          },
+          {
+            "name": "ბალანსი",
+            "max_row": 69,
+            "max_column": 16136,
+            "non_empty_cells": 372
+          },
+          {
+            "name": "ფინანსური და ვალდებულებები",
+            "max_row": 41,
+            "max_column": 7,
+            "non_empty_cells": 126
+          },
+          {
+            "name": "funqcionaluri",
+            "max_row": 96,
+            "max_column": 7,
+            "non_empty_cells": 581
+          },
+          {
+            "name": "კრედიტები",
+            "max_row": 25,
+            "max_column": 5,
+            "non_empty_cells": 45
+          },
+          {
+            "name": "გრანტები",
+            "max_row": 21,
+            "max_column": 9,
+            "non_empty_cells": 38
+          },
+          {
+            "name": "პროგრამული",
+            "max_row": 219,
+            "max_column": 9,
+            "non_empty_cells": 1733
+          },
+          {
+            "name": "ცენტრალური",
+            "max_row": 2256,
+            "max_column": 9,
+            "non_empty_cells": 13529
+          },
+          {
+            "name": "ცენტრალური ბალანსი V2",
+            "max_row": 54,
+            "max_column": 6,
+            "non_empty_cells": 229
+          },
+          {
+            "name": "SOE",
+            "max_row": 1260,
+            "max_column": 5,
+            "non_empty_cells": 1701
+          },
+          {
+            "name": "LEPL+resurs",
+            "max_row": 5657,
+            "max_column": 7,
+            "non_empty_cells": 11020
+          },
+          {
+            "name": "ფულადი სხსრები",
+            "max_row": 14,
+            "max_column": 9,
+            "non_empty_cells": 27
+          },
+          {
+            "name": "მხარჯავები",
+            "max_row": 69,
+            "max_column": 6,
+            "non_empty_cells": 394
+          }
+        ],
+        "sheet_count": 13,
+        "non_empty_cells": 44432,
+        "formula_cells": 7097,
+        "error_literals": 9,
+        "numeric_cell_count": 21101,
+        "numeric_sum": 1953044752.529369,
+        "numeric_min": -2001510.96166,
+        "numeric_max": 23286103.74143,
+        "text_cell_count": 19705,
+        "source_path_cells": []
+      }
+    },
+    "2023": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2023-fact.xls",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2023-fact.xlsx",
+      "method": "excel_com_xls_to_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "0d5539aadf24d86afb4c1cf325c6ea30a746ee597237e57562db346a3d3ba5dc",
+      "output_sha256": "eab03bb86067e0e1b72b0637447da178e59b0f3dacf476d3db70ed13d35ae02d",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2023-tavi-VI.xls",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2013-2025-12-month-tavi-VI\\2023-12-month-tavi-VI.xls",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2023\\2023-fact.xls"
+      ],
+      "checks": {
+        "copy_hash_match": null,
+        "xls_rerun_matrix_match": {
+          "expected_rows": 69,
+          "actual_rows": 69,
+          "mismatch_count": 0,
+          "mismatch_examples": []
+        },
+        "xls_rerun_sha256": "2a71cfeb9a8ff2722540476bd401c5e6360b977d036d798c54991139c932c9d6"
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "ბალანსი",
+            "max_row": 69,
+            "max_column": 16136,
+            "non_empty_cells": 370
+          },
+          {
+            "name": "VI თავი",
+            "max_row": 2075,
+            "max_column": 11,
+            "non_empty_cells": 14517
+          },
+          {
+            "name": "ცენტრალური",
+            "max_row": 2236,
+            "max_column": 9,
+            "non_empty_cells": 13409
+          },
+          {
+            "name": "ცენტრალური ბალანსი",
+            "max_row": 60,
+            "max_column": 11,
+            "non_empty_cells": 225
+          },
+          {
+            "name": "SOE",
+            "max_row": 1127,
+            "max_column": 8,
+            "non_empty_cells": 2251
+          },
+          {
+            "name": "LEPL+RES 12 TVE",
+            "max_row": 19734,
+            "max_column": 8,
+            "non_empty_cells": 11095
+          }
+        ],
+        "sheet_count": 6,
+        "non_empty_cells": 41867,
+        "formula_cells": 4369,
+        "error_literals": 0,
+        "numeric_cell_count": 19629,
+        "numeric_sum": 1754931207.393493,
+        "numeric_min": -1981527.64669,
+        "numeric_max": 25685883.451114,
+        "text_cell_count": 18656,
+        "source_path_cells": []
+      }
+    },
+    "2024": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2024-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2024-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "6049d3dd56f21282b2f6ba0602c3acc1fcdb8e16a83244dcf1f3cff046a04058",
+      "output_sha256": "6049d3dd56f21282b2f6ba0602c3acc1fcdb8e16a83244dcf1f3cff046a04058",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2024-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2013-2025-12-month-tavi-VI\\2024-12-month-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2024\\2024-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "I თავი",
+            "max_row": 60,
+            "max_column": 16134,
+            "non_empty_cells": 264
+          },
+          {
+            "name": "VI თავი",
+            "max_row": 2121,
+            "max_column": 8,
+            "non_empty_cells": 12708
+          },
+          {
+            "name": "VII თავი",
+            "max_row": 2279,
+            "max_column": 86,
+            "non_empty_cells": 11380
+          },
+          {
+            "name": "VII თავი ბალანსი",
+            "max_row": 54,
+            "max_column": 6,
+            "non_empty_cells": 225
+          },
+          {
+            "name": "VII თავი (სსიპ და რესურსენტრი)",
+            "max_row": 5850,
+            "max_column": 3,
+            "non_empty_cells": 11396
+          },
+          {
+            "name": "SOE -  2024  წლიური დასაბეჭდი",
+            "max_row": 6190,
+            "max_column": 11,
+            "non_empty_cells": 5644
+          }
+        ],
+        "sheet_count": 6,
+        "non_empty_cells": 41617,
+        "formula_cells": 0,
+        "error_literals": 94,
+        "numeric_cell_count": 21883,
+        "numeric_sum": 2514138400.431878,
+        "numeric_min": -2335509.68,
+        "numeric_max": 29174668.24777,
+        "text_cell_count": 16081,
+        "source_path_cells": []
+      }
+    },
+    "2025": {
+      "source": "docs\\Raw Data\\Expenditure\\mof.ge\\final-fact-files-2004-2025\\2025-fact.xlsx",
+      "output": "docs\\Raw Data\\Expenditure\\mof.ge\\excel-fact-files-2004-2025\\2025-fact.xlsx",
+      "method": "copied_xlsx",
+      "source_exists": true,
+      "output_exists": true,
+      "source_sha256": "80e0b455501e38ff401c36f3d615f17e220231d249367debbc60c3207c614a45",
+      "output_sha256": "80e0b455501e38ff401c36f3d615f17e220231d249367debbc60c3207c614a45",
+      "source_hash_matches_in_old": [
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\2025-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\12-month-facts-2004-2025\\2013-2025-12-month-tavi-VI\\2025-12-month-tavi-VI.xlsx",
+        "docs\\Raw Data\\Expenditure\\mof.ge\\old\\final-fact-files-2004-2025-nested-2026-06-24\\2025\\2025-fact.xlsx"
+      ],
+      "checks": {
+        "copy_hash_match": true
+      },
+      "workbook_stats": {
+        "sheets": [
+          {
+            "name": "tavi I",
+            "max_row": 59,
+            "max_column": 7,
+            "non_empty_cells": 271
+          },
+          {
+            "name": "tavi 6",
+            "max_row": 2168,
+            "max_column": 7,
+            "non_empty_cells": 11205
+          },
+          {
+            "name": "tavi 7 balansi",
+            "max_row": 51,
+            "max_column": 7,
+            "non_empty_cells": 220
+          },
+          {
+            "name": "tavi 7 centraluri",
+            "max_row": 2320,
+            "max_column": 7,
+            "non_empty_cells": 9655
+          },
+          {
+            "name": "ssipebi",
+            "max_row": 5845,
+            "max_column": 5,
+            "non_empty_cells": 11384
+          },
+          {
+            "name": "sawarmebi",
+            "max_row": 1300,
+            "max_column": 4,
+            "non_empty_cells": 2526
+          }
+        ],
+        "sheet_count": 6,
+        "non_empty_cells": 35261,
+        "formula_cells": 0,
+        "error_literals": 73,
+        "numeric_cell_count": 22679,
+        "numeric_sum": 2812018277.07988,
+        "numeric_min": -2087232.4,
+        "numeric_max": 31474005.8,
+        "text_cell_count": 12582,
+        "source_path_cells": []
+      }
+    }
+  },
+  "summary": {
+    "failure_count": 5,
+    "failures": [
+      "2020: output workbook contains error literals",
+      "2021: output workbook contains error literals",
+      "2022: output workbook contains error literals",
+      "2024: output workbook contains error literals",
+      "2025: output workbook contains error literals"
+    ],
+    "unresolved_provenance_notes": [],
+    "years_checked": 22
+  }
+}

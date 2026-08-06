@@ -1,0 +1,11 @@
+{
+  "remoteName": "origin",
+  "projects": [
+    {
+      "id": "prj_NLITyuy8RsVuiS0Rq19DOQBBDd7u",
+      "name": "geodata-ge",
+      "directory": "apps/web",
+      "orgId": "team_UlZGXmbDimQJyVqvSc4IguVe"
+    }
+  ]
+}

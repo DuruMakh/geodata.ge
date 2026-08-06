@@ -1,0 +1,10 @@
+{
+  "source_pdf": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2005-programmatic-budget-law-from-2006-december/sources/2005-fact-from-2006-december-tavi-iv.pdf",
+  "local_xlsx": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2005-programmatic-budget-law-from-2006-december/xlsx/2005-programmatic-from-2006-december.xlsx",
+  "checked_coded_rows_with_fact_2005": 93,
+  "matched": 93,
+  "match_rate": 1.0,
+  "first_unmatched": [],
+  "plan_2006_additivity_mismatches": 0,
+  "first_plan_2006_additivity_mismatches": []
+}

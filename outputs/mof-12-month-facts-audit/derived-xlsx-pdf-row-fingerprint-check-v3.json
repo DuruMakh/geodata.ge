@@ -1,0 +1,68 @@
+[
+  {
+    "year": 2006,
+    "checked_coded_rows_with_actual": 126,
+    "matched": 126,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2007,
+    "checked_coded_rows_with_actual": 156,
+    "matched": 156,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2008,
+    "checked_coded_rows_with_actual": 135,
+    "matched": 134,
+    "match_rate": 0.9925925925925926,
+    "first_unmatched": [
+      {
+        "code": "32 13 03 66",
+        "actual": 985528.39,
+        "patterns": [
+          "985 528,39",
+          "985,528.39",
+          "985528,39",
+          "985,528.4",
+          "985 528,4"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2009,
+    "checked_coded_rows_with_actual": 143,
+    "matched": 143,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2010,
+    "checked_coded_rows_with_actual": 176,
+    "matched": 175,
+    "match_rate": 0.9943181818181818,
+    "first_unmatched": [
+      {
+        "code": "34 00",
+        "actual": 22117788554444.78,
+        "patterns": [
+          "22,117,788,554,444.78",
+          "22 117 788 554 444,78",
+          "22,117,788,554,444.8",
+          "22 117 788 554 444,8",
+          "22 117 788 554 445"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2011,
+    "checked_coded_rows_with_actual": 482,
+    "matched": 482,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  }
+]

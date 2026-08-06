@@ -1,0 +1,24 @@
+{
+  "path": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2006-2011-programmatic-annexes/xlsx/2008-programmatic-annex.xlsx",
+  "row_code": "32 13 03 66",
+  "worksheet_row": 311,
+  "old": {
+    "total_plan": null,
+    "total_actual": 985528.39,
+    "total_variance": null,
+    "cofinancing_plan": 0,
+    "cofinancing_actual": 0,
+    "grants_and_credits_plan": 85600,
+    "grants_and_credits_actual": 85528.39
+  },
+  "new": {
+    "total_plan": 85600,
+    "total_actual": 85528.39,
+    "total_variance": null,
+    "cofinancing_plan": 0,
+    "cofinancing_actual": 0,
+    "grants_and_credits_plan": 85600,
+    "grants_and_credits_actual": 85528.39
+  },
+  "basis": "adjacent detail rows 312-313 and grants_and_credits columns in the same source extraction"
+}

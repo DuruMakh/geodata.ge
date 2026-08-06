@@ -1,0 +1,50 @@
+[
+  {
+    "year": 2006,
+    "coded_rows": 126,
+    "additivity_mismatches": 0,
+    "impossible_large_values": 0,
+    "first_additivity_mismatches": [],
+    "first_impossible_large_values": []
+  },
+  {
+    "year": 2007,
+    "coded_rows": 156,
+    "additivity_mismatches": 0,
+    "impossible_large_values": 0,
+    "first_additivity_mismatches": [],
+    "first_impossible_large_values": []
+  },
+  {
+    "year": 2008,
+    "coded_rows": 135,
+    "additivity_mismatches": 0,
+    "impossible_large_values": 0,
+    "first_additivity_mismatches": [],
+    "first_impossible_large_values": []
+  },
+  {
+    "year": 2009,
+    "coded_rows": 146,
+    "additivity_mismatches": 0,
+    "impossible_large_values": 0,
+    "first_additivity_mismatches": [],
+    "first_impossible_large_values": []
+  },
+  {
+    "year": 2010,
+    "coded_rows": 269,
+    "additivity_mismatches": 0,
+    "impossible_large_values": 0,
+    "first_additivity_mismatches": [],
+    "first_impossible_large_values": []
+  },
+  {
+    "year": 2011,
+    "coded_rows": 482,
+    "additivity_mismatches": 0,
+    "impossible_large_values": 0,
+    "first_additivity_mismatches": [],
+    "first_impossible_large_values": []
+  }
+]

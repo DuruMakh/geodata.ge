@@ -1,0 +1,137 @@
+[
+  {
+    "year": 2006,
+    "checked_coded_rows": 126,
+    "matched_code_and_actual_or_actual": 126,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2007,
+    "checked_coded_rows": 156,
+    "matched_code_and_actual_or_actual": 156,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2008,
+    "checked_coded_rows": 135,
+    "matched_code_and_actual_or_actual": 134,
+    "match_rate": 0.9925925925925926,
+    "first_unmatched": [
+      {
+        "code": "32 13 03 66",
+        "label": "ssip - levan yanCavelis mcenareTa dacvis instituti",
+        "actual": 985528.39,
+        "patterns": [
+          "985,528.39",
+          "985 528,39",
+          "985528,39",
+          "985 528,4",
+          "985,528.4"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2009,
+    "checked_coded_rows": 146,
+    "matched_code_and_actual_or_actual": 143,
+    "match_rate": 0.9794520547945206,
+    "first_unmatched": [
+      {
+        "code": "24 17 01",
+        "label": "ekonomikuri politikis SemuSavebisaTvis socialur-ekonomikuri statistikis gamoyenebadobis gaumjobesebis xelSewyoba",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "24 17 05",
+        "label": "foTis sazRvao navsadguris damcavi molos reabilitacia",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "35 20 08",
+        "label": "pirveladi jandacvis reformis mxardaWeris proeqti (evrokavSiri)",
+        "actual": null,
+        "patterns": []
+      }
+    ]
+  },
+  {
+    "year": 2010,
+    "checked_coded_rows": 269,
+    "matched_code_and_actual_or_actual": 175,
+    "match_rate": 0.6505576208178439,
+    "first_unmatched": [
+      {
+        "code": "61 65 68 69 70 71",
+        "label": "xarjebi subsidiebi sxva xarjebi arafinansuri aqtivebis zrda finansuri aqtivebis zrda valdebulebebis kleba",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "61 63 65 68 69 70",
+        "label": "xarjebi saqoneli da momsaxureba subsidiebi sxva xarjebi arafinansuri aqtivebis zrda finansuri aqtivebis zrda",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "63 69",
+        "label": "saqoneli da momsaxureba arafinansuri aqtivebis zrda",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "61 62 63 65 69",
+        "label": "xarjebi Sromis anazRaureba saqoneli da momsaxureba subsidiebi arafinansuri aqtivebis zrda",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "61 62 63 65 69",
+        "label": "xarjebi Sromis anazRaureba saqoneli da momsaxureba subsidiebi arafinansuri aqtivebis zrda",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "61 63 69",
+        "label": "xarjebi saqoneli da momsaxureba arafinansuri aqtivebis zrda",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "61 62 63 65 68 69",
+        "label": "xarjebi Sromis anazRaureba saqoneli da momsaxureba subsidiebi sxva xarjebi arafinansuri aqtivebis zrda",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "61 63 69",
+        "label": "xarjebi saqoneli da momsaxureba arafinansuri aqtivebis zrda",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "61 62 63 69",
+        "label": "xarjebi Sromis anazRaureba saqoneli da momsaxureba arafinansuri aqtivebis zrda",
+        "actual": null,
+        "patterns": []
+      },
+      {
+        "code": "61 63",
+        "label": "xarjebi saqoneli da momsaxureba",
+        "actual": null,
+        "patterns": []
+      }
+    ]
+  },
+  {
+    "year": 2011,
+    "checked_coded_rows": 482,
+    "matched_code_and_actual_or_actual": 482,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  }
+]

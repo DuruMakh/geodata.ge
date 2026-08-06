@@ -1,0 +1,52 @@
+[
+  {
+    "year": "2012",
+    "path": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2012/official-sources/2012-programmatic-execution-annex.official.pdf",
+    "url": "https://mof.ge/files/download/2012%20tslis%20biujetis%20shesrulebis%20programuli%20danarti.pdf/0af34a5b-14c0-4ae5-bddf-74aa420c0db6",
+    "final_url": "https://mof.ge/files/download/2012%20tslis%20biujetis%20shesrulebis%20programuli%20danarti.pdf/0af34a5b-14c0-4ae5-bddf-74aa420c0db6",
+    "content_type": "application/pdf",
+    "bytes": 1355895,
+    "sha256": "0e124dcab6ae102ca0730cae7794f60ba544de3ab8b44d9e2bd26b3a1c56a00f",
+    "magic_hex": "255044462d312e35"
+  },
+  {
+    "year": "2014",
+    "path": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2013-2025-12-month-tavi-VI/official-sources/2014-12-month-tavi-VI.official.pdf",
+    "url": "https://mof.ge/files/download/TAVIVI.pdf/c576d5da-ff55-46f4-8950-d829db4d0230",
+    "final_url": "https://mof.ge/files/download/TAVIVI.pdf/c576d5da-ff55-46f4-8950-d829db4d0230",
+    "content_type": "application/pdf",
+    "bytes": 2987605,
+    "sha256": "712b5b562e44f94a9a21547a3d47a684f8cf59ac1e5f79b3af31514ad12f44e9",
+    "magic_hex": "255044462d312e35"
+  },
+  {
+    "year": "2015",
+    "path": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2013-2025-12-month-tavi-VI/official-sources/2015-12-month-tavi-VI.official.pdf",
+    "url": "https://mof.ge/files/download/TAVIVI.pdf/e8a38cec-2563-40fa-919d-df74b7f10093",
+    "final_url": "https://mof.ge/files/download/TAVIVI.pdf/e8a38cec-2563-40fa-919d-df74b7f10093",
+    "content_type": "application/pdf",
+    "bytes": 1389361,
+    "sha256": "fc2056952a81fb514d6cc90a81ccf8ceeb299a563eb2a3d962a6d959d1c0bed4",
+    "magic_hex": "255044462d312e35"
+  },
+  {
+    "year": "2016",
+    "path": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2013-2025-12-month-tavi-VI/official-sources/2016-12-month-tavi-VI.official.pdf",
+    "url": "https://mof.ge/files/download/TAVIVIe.pdf/40a1cc5f-cfd6-4406-b2d6-71867e893102",
+    "final_url": "https://mof.ge/files/download/TAVIVIe.pdf/40a1cc5f-cfd6-4406-b2d6-71867e893102",
+    "content_type": "application/pdf",
+    "bytes": 1483564,
+    "sha256": "94206ba75b2acb7f1f28ce88f69db64e18617ea548537d195e055fe395436c7d",
+    "magic_hex": "255044462d312e35"
+  },
+  {
+    "year": "2021",
+    "path": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2013-2025-12-month-tavi-VI/official-sources/2021-12-month-tavi-VI.official.docx",
+    "url": "https://mof.ge/files/download/TAVI%20VI%202021.docx/0c504017-9b4f-4c68-b3bc-1c6244312aac",
+    "final_url": "https://mof.ge/files/download/TAVI%20VI%202021.docx/0c504017-9b4f-4c68-b3bc-1c6244312aac",
+    "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "bytes": 604769,
+    "sha256": "59390be5ee84cf6da0b6e7287a140b0a09a1c23d21d81b5500566b58feaa6e09",
+    "magic_hex": "504b030414000600"
+  }
+]

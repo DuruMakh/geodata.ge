@@ -1,0 +1,118 @@
+{
+  "years": {
+    "2004": {
+      "categories": {
+        "state_budget": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2004&categoryId=1&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "execution_report": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2004&categoryId=3&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "quarterly_plan": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2004&categoryId=4&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        }
+      }
+    },
+    "2012": {
+      "categories": {
+        "state_budget": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2012&categoryId=1&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "execution_report": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2012&categoryId=3&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "quarterly_plan": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2012&categoryId=4&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        }
+      }
+    },
+    "2014": {
+      "categories": {
+        "state_budget": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2014&categoryId=1&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "execution_report": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2014&categoryId=3&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "quarterly_plan": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2014&categoryId=4&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        }
+      }
+    },
+    "2015": {
+      "categories": {
+        "state_budget": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2015&categoryId=1&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "execution_report": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2015&categoryId=3&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "quarterly_plan": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2015&categoryId=4&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        }
+      }
+    },
+    "2016": {
+      "categories": {
+        "state_budget": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2016&categoryId=1&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "execution_report": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2016&categoryId=3&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "quarterly_plan": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2016&categoryId=4&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        }
+      }
+    },
+    "2021": {
+      "categories": {
+        "state_budget": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2021&categoryId=1&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "execution_report": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2021&categoryId=3&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        },
+        "quarterly_plan": {
+          "url": "https://mof.ge/ka/GovBudget/GetData?year=2021&categoryId=4&showOnlyHidden=true",
+          "links_count": 0,
+          "links": []
+        }
+      }
+    }
+  }
+}
