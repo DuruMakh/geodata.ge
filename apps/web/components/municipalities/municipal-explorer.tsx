@@ -179,8 +179,8 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
 
   return (
     <>
-      <div className="mt-[22px] flex items-baseline justify-between gap-5">
-        <div className="min-w-0">
+      <div className="mt-[22px] flex flex-col gap-4 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:justify-between min-[768px]:gap-5">
+        <div className="min-w-0 min-[768px]:flex-1">
           {/* The popover is a SIBLING of the heading, not a child: a role="dialog"
               and a fixed overlay nested inside an h1 is announced as part of the
               heading and is fragile to position. */}
@@ -207,11 +207,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
           />
           <div className="text-[12.5px] text-[var(--muted)]">{props.metaLine}</div>
         </div>
-        <span className="flex flex-none items-center gap-4">
-          <a href={props.prev.href} className="font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
+        <span className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink">
+          <a href={props.prev.href} className="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
             ← {props.prev.label}
           </a>
-          <a href={props.next.href} className="font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
+          <a href={props.next.href} className="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
             {props.next.label} →
           </a>
         </span>

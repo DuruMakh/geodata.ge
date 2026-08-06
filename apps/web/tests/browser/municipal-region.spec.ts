@@ -18,6 +18,37 @@ import { expect, test } from "@playwright/test";
 // იმერეთი: 12 member municipalities (data/imports/municipalities.csv), the
 // same region the brief's own manual verification step names.
 const REGION_URL = "http://localhost:3100/explorer/municipalities/region/imereti";
+const LONG_REGION_URL =
+  "http://localhost:3100/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti";
+
+test.describe("region header responsiveness", () => {
+  for (const viewport of [
+    { width: 375, height: 844 },
+    { width: 768, height: 900 },
+    { width: 900, height: 900 },
+  ]) {
+    test(`keeps the longest heading readable without horizontal overflow at ${viewport.width}px`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      const response = await page.goto(LONG_REGION_URL);
+      expect(response?.status()).toBe(200);
+
+      const heading = page.getByRole("heading", { level: 1 });
+      await expect(heading).toHaveText(
+        "როგორ იხარჯება რაჭა-ლეჩხუმისა და ქვემო სვანეთის მუნიციპალური ბიუჯეტები",
+      );
+
+      const headingBox = await heading.boundingBox();
+      const headerBox = await heading.locator("xpath=../..").boundingBox();
+      expect(headingBox?.width ?? 0).toBeGreaterThan((headerBox?.width ?? 0) * 0.45);
+
+      const pageWidth = await page.evaluate(() => ({
+        content: document.documentElement.scrollWidth,
+        viewport: document.documentElement.clientWidth,
+      }));
+      expect(pageWidth.content).toBe(pageWidth.viewport);
+    });
+  }
+});
 
 test.describe("region source note", () => {
   test("names both roll-up carve-outs — აჭარა's own budget and the occupied-territory exclusions", async ({ page }) => {
