@@ -4,14 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { MunicipalKpi, MunicipalListRow } from "../../lib/explorer/municipalData";
 import { formatAmount } from "../../lib/explorer/format";
+import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
 import { parseMunicipalLevel } from "../../lib/explorer/urlState";
 import { SourceNote, TabDivider, TextTab } from "../ui/editorial";
-import { RegionMap, type RegionMapCity, type RegionMapShape } from "./region-map";
+import { MunicipalityMap } from "./municipality-map";
 
-type MunicipalitiesIndexProps = {
-  viewBox: string;
-  shapes: RegionMapShape[];
-  cities: RegionMapCity[];
+type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinGel" | "legendMaxGel"> & {
   legendMin: string;
   legendMax: string;
   municipalities: MunicipalListRow[];
@@ -25,7 +23,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
   const router = useRouter();
   const [level, setLevel] = useState<"muni" | "region">("muni");
   const [query, setQuery] = useState("");
-  const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
+  const [activeMunicipalityCode, setActiveMunicipalityCode] = useState<string | null>(null);
 
   // Restore the level from the URL hash once, after mount (the server render
   // always shows "muni"; an unknown value falls back to it in the parser).
@@ -75,19 +73,19 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
         <div className="min-w-0">
           <div className="flex items-baseline justify-between gap-3 border-b border-[var(--hairline)] pb-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-              რეგიონები რუკაზე · {props.latestYear}
+              მუნიციპალიტეტები რუკაზე · {props.latestYear}
             </span>
           </div>
           <div className="mt-1.5">
-            <RegionMap
+            <MunicipalityMap
               viewBox={props.viewBox}
               shapes={props.shapes}
-              cities={props.cities}
+              markers={props.markers}
+              occupiedAreas={props.occupiedAreas}
               legendMin={props.legendMin}
               legendMax={props.legendMax}
-              hoveredRegionId={hoveredRegionId}
-              onHoverRegion={setHoveredRegionId}
-              onOpenRegion={openRegion}
+              activeCode={activeMunicipalityCode}
+              onActiveCodeChange={setActiveMunicipalityCode}
               onOpenMunicipality={openMunicipality}
             />
           </div>
@@ -159,12 +157,12 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                   type="button"
                   data-testid="municipal-list-row"
                   onClick={() => (row.kind === "region" ? openRegion(row.id) : openMunicipality(row.id))}
-                  onMouseEnter={() => setHoveredRegionId(row.regionId)}
-                  onMouseLeave={() => setHoveredRegionId(null)}
-                  onFocus={() => setHoveredRegionId(row.regionId)}
-                  onBlur={() => setHoveredRegionId(null)}
+                  onMouseEnter={() => setActiveMunicipalityCode(row.kind === "municipality" ? row.id : null)}
+                  onMouseLeave={() => setActiveMunicipalityCode(null)}
+                  onFocus={() => setActiveMunicipalityCode(row.kind === "municipality" ? row.id : null)}
+                  onBlur={() => setActiveMunicipalityCode(null)}
                   className={`grid w-full grid-cols-[22px_minmax(0,1fr)_66px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left ${
-                    row.regionId !== null && row.regionId === hoveredRegionId ? "bg-[var(--tint)]" : ""
+                    row.kind === "municipality" && row.id === activeMunicipalityCode ? "bg-[var(--tint)]" : ""
                   }`}
                 >
                   <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
