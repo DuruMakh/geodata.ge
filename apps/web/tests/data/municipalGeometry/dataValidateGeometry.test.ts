@@ -6,7 +6,7 @@ import { GENERATED_ARTIFACT_PATH } from "../../../lib/data/municipalGeometry/pre
 
 const execAsync = promisify(exec);
 
-it("rejects stale geometry through the data:validate entry point", async () => {
+async function expectStaleGeometryFailure(command: string) {
   const originalArtifact = await readFile(GENERATED_ARTIFACT_PATH, "utf8");
 
   try {
@@ -15,9 +15,7 @@ it("rejects stale geometry through the data:validate entry point", async () => {
     let output = "";
     let exitCode = 0;
     try {
-      const result = await execAsync(`${process.platform === "win32" ? "npm.cmd" : "npm"} run data:validate`, {
-        cwd: process.cwd(),
-      });
+      const result = await execAsync(command, { cwd: process.cwd() });
       output = `${result.stdout}${result.stderr}`;
     } catch (error) {
       const failure = error as { code?: number; stdout?: string; stderr?: string };
@@ -30,4 +28,14 @@ it("rejects stale geometry through the data:validate entry point", async () => {
   } finally {
     await writeFile(GENERATED_ARTIFACT_PATH, originalArtifact, "utf8");
   }
+}
+
+it("rejects stale geometry through the data:validate entry point", async () => {
+  const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+  await expectStaleGeometryFailure(`${npm} run data:validate`);
+}, 60_000);
+
+it("rejects stale geometry through the standalone data validator", async () => {
+  const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+  await expectStaleGeometryFailure(`${npm} exec -- tsx scripts/validate-data-files.ts`);
 }, 60_000);

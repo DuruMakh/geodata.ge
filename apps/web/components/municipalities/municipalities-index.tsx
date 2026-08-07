@@ -113,7 +113,19 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
           </div>
 
           <div className="mt-6 max-w-[640px]">
-            <SourceNote testId="municipal-source-note">{props.sourceNote}</SourceNote>
+            <SourceNote testId="municipal-source-note">
+              {props.sourceNote}{" "}
+              საზღვრები:{" "}
+              <a
+                href="https://www.openstreetmap.org/copyright"
+                target="_blank"
+                rel="noreferrer"
+                className="underline decoration-[var(--hairline)] underline-offset-2"
+              >
+                © OpenStreetMap contributors
+              </a>
+              , ODbL.
+            </SourceNote>
           </div>
         </div>
 

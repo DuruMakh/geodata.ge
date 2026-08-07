@@ -60,6 +60,19 @@ test("occupied overlays expose no interaction or public explanation", async ({ p
   await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
 });
 
+test("credits OpenStreetMap boundaries without occupied-territory copy", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const source = page.getByTestId("municipal-source-note");
+  await expect(source.getByRole("link", { name: /OpenStreetMap contributors/ })).toHaveAttribute(
+    "href",
+    "https://www.openstreetmap.org/copyright",
+  );
+  await expect(source).toContainText("ODbL");
+  await expect(source).not.toContainText(/ოკუპირ|Russian/i);
+  await expect(page.getByTestId("municipality-map")).not.toContainText(/მონაცემები არ არის|no data/i);
+});
+
 test("map hover and focus show only name, amount, and an arrow visibly", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);

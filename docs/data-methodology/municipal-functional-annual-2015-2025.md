@@ -30,7 +30,7 @@ production deployment: direct checks of `https://geodata-ge.vercel.app/explorer/
 and `/explorer/municipalities/04` returned HTTP 404 on 2026-08-06, and this workspace could not
 freshly authenticate hosted GitHub/remote-main metadata or the live database contents. Do not
 describe the municipal UI as live until a post-deployment route check returns HTTP 200. The
-index's map is region-grain (ADM1); see "Region shape join" below.
+current branch's index map is municipality-grain; see "Municipality geometry join" below.
 
 The six selected-detail rows (`7.1.1`, `7.4.5.1`, `7.5.1`, `7.8.1`, `7.8.2`, `7.9.1`; 4,554 rows
 in the prepared package below) are deliberately not imported — not an oversight. Dropping them
@@ -80,53 +80,55 @@ regional aggregates, rankings, and the municipalities UI. The raw research packa
 official workbooks, manifests, hashes, and validation report remain unchanged for provenance.
 
 With code `05` excluded, `region.abkhazia` has no served municipality and is omitted from the
-municipal data taxonomy. Occupied territory appears in the shipped map geometry as an explicit
-no-data shape (see "Region shape join" below). The Adjara regional roll-up continues to exclude
-the autonomous republic's own budget, which is outside this package entirely.
+municipal data taxonomy. The map's reviewed occupied-area geometry is a non-interactive visual
+overlay without public copy (see "Municipality geometry join" below). The Adjara regional
+roll-up continues to exclude the autonomous republic's own budget, which is outside this package
+entirely.
 
-### Region shape join
+### Municipality geometry join
 
-The municipalities UI (`/explorer/municipalities`) renders a region-grain choropleth, not a
-municipality-grain one: no openly-licensed ADM2 (municipality-level) geometry matches this
-package's 64-unit registry, so the join here stops at the 11 data-bearing regions and a
-municipality-grain map is deferred to a future spec.
+The municipalities UI (`/explorer/municipalities`) joins latest-year official totals to a
+reviewed municipality-grain geometry snapshot. Its immutable raw inputs are:
 
-Region geometry is **geoBoundaries `gbOpen` GEO ADM1, release `9469f09`, CC BY 3.0** (source:
-`commons.wikimedia.org`). It replaced GADM, which permits non-commercial use but forbids
-redistribution — publishing a map ships the coordinates to every visitor's browser, which is
-redistribution. CC BY 3.0 permits that but requires attribution; the index page's source note
-and `apps/web/lib/landing/georgiaGeo.ts`'s header comment both carry it.
+- `docs/Raw Data/Municipalities/municipality-map-geometry/municipalities-osm.geojson` — 60 reviewed OpenStreetMap municipality polygons and their relation IDs;
+- `docs/Raw Data/Municipalities/municipality-map-geometry/occupied-areas-natural-earth.geojson` — two reviewed Natural Earth occupied-area overlays;
+- `docs/Raw Data/Municipalities/municipality-map-geometry/city-markers.json` — the five approved city marker coordinates.
 
-The join is keyed on geoBoundaries' **`shapeISO`**, never `shapeName`: geoBoundaries spells
-Samtskhe–Javakheti with an **en dash** (U+2013) and names `GE-RL` "Racha-Lechkhumi and Kvemo
-Svaneti", neither of which matches this package's region labels, so a name join would fail
-silently on exactly those two. The join table (`apps/web/lib/explorer/municipalGeo.ts`,
-`REGION_ID_BY_SHAPE_ISO`) is exhaustive over all 12 shapes:
+The preparation command writes the compact application artifact to
+`data/geometry/municipality-map-paths.json` and the source hashes, output hash, code crosswalk,
+licences, byte counts, and feature counts to
+`docs/Raw Data/Municipalities/municipality-map-geometry/source-manifest.json`. The source
+contract is exactly 60 unique polygon codes and five markers: Tbilisi `04` is the sole
+polygon-plus-marker duplicate, while Batumi `06`, Kutaisi `20`, Poti `32`, and Rustavi `48` are
+marker-only. Their union is exactly the 64 codes in `data/imports/municipalities.csv`. Zugdidi
+code `33` is pinned to the reviewed corrected OpenStreetMap relation `2016161`.
 
-| `shapeISO` | `shapeName` | Resolves to |
-| --- | --- | --- |
-| `GE-TB` | Tbilisi | `region.tbilisi` |
-| `GE-AJ` | Adjara | `region.adjara` |
-| `GE-GU` | Guria | `region.guria` |
-| `GE-IM` | Imereti | `region.imereti` |
-| `GE-KA` | Kakheti | `region.kakheti` |
-| `GE-MM` | Mtskheta-Mtianeti | `region.mtskheta_mtianeti` |
-| `GE-RL` | Racha-Lechkhumi and Kvemo Svaneti | `region.racha_lechkhumi_kvemo_svaneti` |
-| `GE-SZ` | Samegrelo-Zemo Svaneti | `region.samegrelo_zemo_svaneti` |
-| `GE-SJ` | Samtskhe–Javakheti | `region.samtskhe_javakheti` |
-| `GE-KK` | Kvemo Kartli | `region.kvemo_kartli` |
-| `GE-SK` | Shida Kartli | `region.shida_kartli` |
-| `GE-AB` | Abkhazia | no data (`occupied_territory`) — `region.abkhazia` has no served municipality (above) |
+Codes `05`, `42`, `43`, `46`, and `64` remain absent from both the served registry union and all
+interactive geometry. As documented in the public exclusion decision above, their budgets are
+for Georgian municipal bodies operating outside those territories and serving displaced
+communities, not territorially attributable spending inside the named municipalities. They
+remain only in the immutable raw budget research package for provenance.
 
-Every shape resolves to a region or to a stated no-data reason, and every one of the 11
-data-bearing regions resolves to exactly one shape — `buildRegionShapes()` throws at build time
-on any unmapped shape, and both directions are covered by `tests/explorer/municipalGeo.test.ts`
-and by `npm run data:validate`.
+OpenStreetMap municipality boundaries are licensed under ODbL 1.0. The public source note links
+`© OpenStreetMap contributors` to `https://www.openstreetmap.org/copyright` and states `ODbL`.
+Natural Earth vector data is public domain, so its provenance is retained in the source package
+and manifest without requiring a public attribution line. The two occupied-area overlays render
+above municipality fills but expose no public label, tooltip, link, keyboard focus, map text, or
+legend entry.
 
-Shida Kartli and Mtskheta-Mtianeti render as ordinary data-bearing shapes even though the
-Tskhinvali region is not a separate ADM1 shape (it lies de jure inside both) — their totals
-exclude the four affected municipal bodies (`42`, `43`, `46`, `64`) named above, a caveat that
-lives in the region page's source note as text, since it cannot be carried by a map colour.
+Geometry preparation uses zero simplification tolerance and one-decimal projected coordinates.
+The combined generated municipality and overlay SVG path payload must remain at or below 350 KB
+uncompressed. From `apps/web`, regenerate or verify the deterministic fixed point with:
+
+```powershell
+npm.cmd run data:prepare-municipality-geometry
+npm.cmd run data:check-municipality-geometry
+```
+
+`npm.cmd run data:validate` independently loads the raw geometry, validates it against the live
+64-code registry, and checks the committed artifact and manifest fixed point. The landing page's
+shared ADM0/ADM1 geometry in `apps/web/lib/landing/georgiaGeo.ts` and its fetch script remain a
+separate input and are not part of the municipality join.
 
 ### Population — not imported
 
