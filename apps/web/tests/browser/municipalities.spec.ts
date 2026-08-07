@@ -4,7 +4,7 @@ async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
 
-test("renders 60 municipality polygons, five markers, two inert overlays, and 64 unique routes", async ({ page }) => {
+test("renders 65 globally ordered accessible map targets and two inert overlays", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
   const map = page.getByTestId("municipality-map");
@@ -12,11 +12,57 @@ test("renders 60 municipality polygons, five markers, two inert overlays, and 64
   await expect(map.locator("[data-municipality-marker]")).toHaveCount(5);
   await expect(map.locator("[data-occupied-overlay]")).toHaveCount(2);
 
-  const codes = await map.locator("[data-municipality-code]").evaluateAll((elements) =>
-    elements.map((element) => element.getAttribute("data-municipality-code")),
+  const targets = map.locator("[data-municipality-map-target]");
+  await expect(targets).toHaveCount(65);
+  const targetMetadata = await targets.evaluateAll((elements) =>
+    elements.map((element) => {
+      const label = element.getAttribute("aria-label") ?? "";
+      return {
+        code: element.getAttribute("data-municipality-code"),
+        label,
+        name: label.split(" · ")[0],
+        role: element.getAttribute("role"),
+        tabIndex: element.getAttribute("tabindex"),
+      };
+    }),
   );
+  const codes = targetMetadata.map(({ code }) => code);
   expect(new Set(codes).size).toBe(64);
   expect(codes).toHaveLength(65);
+  expect(targetMetadata.every(({ role }) => role === "link")).toBe(true);
+  expect(targetMetadata.every(({ tabIndex }) => tabIndex === "0")).toBe(true);
+  expect(
+    targetMetadata.every(({ label }) => /[\u10A0-\u10FF].+მუნიციპალიტეტის გახსნა$/.test(label)),
+  ).toBe(true);
+
+  const names = targetMetadata.map(({ name }) => name);
+  expect(names).toEqual(names.toSorted((left, right) => left.localeCompare(right, "ka")));
+  const tbilisiIndexes = targetMetadata
+    .map(({ code }, index) => (code === "04" ? index : -1))
+    .filter((index) => index >= 0);
+  expect(tbilisiIndexes).toHaveLength(2);
+  expect(tbilisiIndexes[1]).toBe(tbilisiIndexes[0] + 1);
+
+  const markersAreTopmostAtTheirCenters = await map.locator("[data-municipality-marker]").evaluateAll((markers) =>
+    markers.every((marker) => {
+      const box = marker.getBoundingClientRect();
+      return document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2) === marker;
+    }),
+  );
+  expect(markersAreTopmostAtTheirCenters).toBe(true);
+
+  const overlaysFollowTargets = await map.locator("svg").evaluate((svg) => {
+    const targets = [...svg.querySelectorAll("[data-municipality-map-target]")];
+    const lastTarget = targets.at(-1);
+    const overlays = [...svg.querySelectorAll("[data-occupied-overlay]")];
+    return (
+      lastTarget !== undefined &&
+      overlays.every((overlay) =>
+        Boolean(lastTarget.compareDocumentPosition(overlay) & Node.DOCUMENT_POSITION_FOLLOWING),
+      )
+    );
+  });
+  expect(overlaysFollowTargets).toBe(true);
 });
 
 test("polygon and marker clicks open municipality pages directly", async ({ page }) => {
@@ -84,12 +130,59 @@ test("map hover and focus show only name, amount, and an arrow visibly", async (
   await expect(tooltip).toContainText("→");
   await expect(tooltip).not.toContainText(/Open|გახსნა/);
   await expect(zugdidi).toHaveAccessibleName(/ზუგდიდი.*გახსნა/);
+  await expect(zugdidi).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
+  await expect(page.locator('[data-municipality-map-target][aria-describedby="municipality-map-tooltip"]')).toHaveCount(1);
 
   const batumi = page.getByTestId("municipality-marker-06");
   await batumi.focus();
   await expect(tooltip).toContainText("ბათუმი");
   await expect(tooltip).toContainText("→");
   await expect(batumi).toHaveAccessibleName(/ბათუმი.*გახსნა/);
+  await expect(batumi).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
+  await expect(zugdidi).not.toHaveAttribute("aria-describedby");
+  await expect(page.locator('[data-municipality-map-target][aria-describedby="municipality-map-tooltip"]')).toHaveCount(1);
+});
+
+test("Tbilisi path and marker activate together while only the map-origin target owns the description", async ({
+  page,
+}) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const path = page.getByTestId("municipality-shape-04");
+  const marker = page.getByTestId("municipality-marker-04");
+
+  await path.focus();
+  await expect(path).toHaveAttribute("data-active", "true");
+  await expect(marker).toHaveAttribute("data-active", "true");
+  await expect(path).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
+  await expect(marker).not.toHaveAttribute("aria-describedby");
+
+  await marker.focus();
+  await expect(path).toHaveAttribute("data-active", "true");
+  await expect(marker).toHaveAttribute("data-active", "true");
+  await expect(marker).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
+  await expect(path).not.toHaveAttribute("aria-describedby");
+});
+
+test("list focus suppresses a stale tooltip from a different map pointer target", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const zugdidi = page.getByTestId("municipality-shape-33");
+  const tbilisiPath = page.getByTestId("municipality-shape-04");
+  const tbilisiMarker = page.getByTestId("municipality-marker-04");
+
+  await zugdidi.dispatchEvent("mouseover");
+  await expect(page.getByTestId("municipality-map-tooltip")).toContainText("ზუგდიდი");
+  await page.locator('[data-municipality-row-code="04"]').evaluate((row) =>
+    (row as HTMLElement).focus({ preventScroll: true }),
+  );
+
+  await expect(tbilisiPath).toHaveAttribute("data-active", "true");
+  await expect(tbilisiMarker).toHaveAttribute("data-active", "true");
+  await expect(zugdidi).not.toHaveAttribute("data-active");
+  await expect(page.getByTestId("municipality-map-tooltip")).toHaveCount(0);
+  await expect(zugdidi).not.toHaveAttribute("aria-describedby");
+  await expect(page.locator("[data-municipality-map-target][aria-describedby]")).toHaveCount(0);
 });
 
 test("municipality map and list highlight each other by exact code", async ({ page }) => {
@@ -107,7 +200,7 @@ test("municipality map and list highlight each other by exact code", async ({ pa
   await expect(shape).toHaveAttribute("data-active", "true");
 });
 
-test("keyboard focus wins over a simultaneous pointer target", async ({ page }) => {
+test("map keyboard focus wins over a simultaneous list pointer target", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
   const focusedShape = page.getByTestId("municipality-shape-33");

@@ -78,13 +78,19 @@ export function MunicipalityMap({
   const [focusTarget, setFocusTarget] = useState<InteractionTarget | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
   const activeTarget = focusTarget ?? pointerTarget;
-  const orderedShapes = useMemo(
-    () => shapes.slice().sort((left, right) => left.nameKa.localeCompare(right.nameKa, "ka")),
-    [shapes],
-  );
-  const orderedMarkers = useMemo(
-    () => markers.slice().sort((left, right) => left.nameKa.localeCompare(right.nameKa, "ka")),
-    [markers],
+  const describedTarget =
+    activeTarget?.code === activeCode && tooltipPosition !== null ? activeTarget : null;
+  const orderedTargets = useMemo(
+    () =>
+      [
+        ...shapes.map((shape) => ({ kind: "shape" as const, nameKa: shape.nameKa, shape })),
+        ...markers.map((marker) => ({ kind: "marker" as const, nameKa: marker.nameKa, marker })),
+      ].toSorted(
+        (left, right) =>
+          left.nameKa.localeCompare(right.nameKa, "ka") ||
+          (left.kind === right.kind ? 0 : left.kind === "shape" ? -1 : 1),
+      ),
+    [markers, shapes],
   );
 
   const positionTooltip = (target: InteractionTarget) => {
@@ -146,85 +152,68 @@ export function MunicipalityMap({
             </pattern>
           </defs>
 
-          {orderedShapes.map((shape) => {
-            const active = shape.code === activeCode;
+          {orderedTargets.map((target) => {
+            if (target.kind === "shape") {
+              const { shape } = target;
+              const active = shape.code === activeCode;
 
-            return (
-              <path
-                key={shape.code}
-                data-testid={`municipality-shape-${shape.code}`}
-                data-municipality-shape=""
-                data-municipality-map-target=""
-                data-municipality-code={shape.code}
-                data-active={active ? "true" : undefined}
-                d={shape.d}
-                fill={MAP_RAMP[shape.bucket]}
-                fillRule="evenodd"
-                clipRule="evenodd"
-                stroke={active ? "var(--ink)" : "var(--hairline-soft)"}
-                strokeWidth={active ? 1.8 : 0.7}
-                strokeLinejoin="round"
-                vectorEffect="non-scaling-stroke"
-                tabIndex={0}
-                role="link"
-                aria-label={accessibleName(shape.nameKa, shape.valueGel)}
-                aria-describedby={activeTarget?.key === `shape:${shape.code}` ? TOOLTIP_ID : undefined}
-                className="cursor-pointer"
-                onMouseEnter={(event) => {
-                  activatePointerTarget({
-                    key: `shape:${shape.code}`,
-                    code: shape.code,
-                    nameKa: shape.nameKa,
-                    valueGel: shape.valueGel,
-                    element: event.currentTarget,
-                  });
-                }}
-                onMouseLeave={clearPointerTarget}
-                onFocus={(event) => {
-                  activateFocusTarget({
-                    key: `shape:${shape.code}`,
-                    code: shape.code,
-                    nameKa: shape.nameKa,
-                    valueGel: shape.valueGel,
-                    element: event.currentTarget,
-                  });
-                }}
-                onBlur={clearFocusTarget}
-                onClick={() => onOpenMunicipality(shape.code)}
-                onKeyDown={(event) => {
-                  if (!isActivationKey(event.key)) return;
-                  event.preventDefault();
-                  onOpenMunicipality(shape.code);
-                }}
-              />
-            );
-          })}
+              return (
+                <path
+                  key={`shape:${shape.code}`}
+                  data-testid={`municipality-shape-${shape.code}`}
+                  data-municipality-shape=""
+                  data-municipality-map-target=""
+                  data-municipality-code={shape.code}
+                  data-active={active ? "true" : undefined}
+                  d={shape.d}
+                  fill={MAP_RAMP[shape.bucket]}
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  stroke={active ? "var(--ink)" : "var(--hairline-soft)"}
+                  strokeWidth={active ? 1.8 : 0.7}
+                  strokeLinejoin="round"
+                  vectorEffect="non-scaling-stroke"
+                  tabIndex={0}
+                  role="link"
+                  aria-label={accessibleName(shape.nameKa, shape.valueGel)}
+                  aria-describedby={describedTarget?.key === `shape:${shape.code}` ? TOOLTIP_ID : undefined}
+                  className="cursor-pointer"
+                  onMouseEnter={(event) => {
+                    activatePointerTarget({
+                      key: `shape:${shape.code}`,
+                      code: shape.code,
+                      nameKa: shape.nameKa,
+                      valueGel: shape.valueGel,
+                      element: event.currentTarget,
+                    });
+                  }}
+                  onMouseLeave={clearPointerTarget}
+                  onFocus={(event) => {
+                    activateFocusTarget({
+                      key: `shape:${shape.code}`,
+                      code: shape.code,
+                      nameKa: shape.nameKa,
+                      valueGel: shape.valueGel,
+                      element: event.currentTarget,
+                    });
+                  }}
+                  onBlur={clearFocusTarget}
+                  onClick={() => onOpenMunicipality(shape.code)}
+                  onKeyDown={(event) => {
+                    if (!isActivationKey(event.key)) return;
+                    event.preventDefault();
+                    onOpenMunicipality(shape.code);
+                  }}
+                />
+              );
+            }
 
-          {occupiedAreas.map((area) => (
-            <path
-              key={area.key}
-              data-testid={`occupied-overlay-${area.key}`}
-              data-occupied-overlay=""
-              d={area.d}
-              fill={`url(#${HATCH_ID})`}
-              fillRule="evenodd"
-              clipRule="evenodd"
-              stroke={MAP_NO_DATA_STROKE}
-              strokeWidth="1.5"
-              strokeDasharray="5 4"
-              strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
-              pointerEvents="none"
-              aria-hidden="true"
-            />
-          ))}
-
-          {orderedMarkers.map((marker) => {
+            const { marker } = target;
             const active = marker.code === activeCode;
 
             return (
               <circle
-                key={marker.code}
+                key={`marker:${marker.code}`}
                 data-testid={`municipality-marker-${marker.code}`}
                 data-municipality-marker=""
                 data-municipality-map-target=""
@@ -240,7 +229,7 @@ export function MunicipalityMap({
                 tabIndex={0}
                 role="link"
                 aria-label={accessibleName(marker.nameKa, marker.valueGel)}
-                aria-describedby={activeTarget?.key === `marker:${marker.code}` ? TOOLTIP_ID : undefined}
+                aria-describedby={describedTarget?.key === `marker:${marker.code}` ? TOOLTIP_ID : undefined}
                 className="cursor-pointer"
                 onMouseEnter={(event) => {
                   activatePointerTarget({
@@ -271,9 +260,28 @@ export function MunicipalityMap({
               />
             );
           })}
+
+          {occupiedAreas.map((area) => (
+            <path
+              key={area.key}
+              data-testid={`occupied-overlay-${area.key}`}
+              data-occupied-overlay=""
+              d={area.d}
+              fill={`url(#${HATCH_ID})`}
+              fillRule="evenodd"
+              clipRule="evenodd"
+              stroke={MAP_NO_DATA_STROKE}
+              strokeWidth="1.5"
+              strokeDasharray="5 4"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+              pointerEvents="none"
+              aria-hidden="true"
+            />
+          ))}
         </svg>
 
-        {activeTarget !== null && tooltipPosition !== null ? (
+        {describedTarget !== null && tooltipPosition !== null ? (
           <div
             id={TOOLTIP_ID}
             role="tooltip"
@@ -282,11 +290,11 @@ export function MunicipalityMap({
             style={{ left: tooltipPosition.left, top: tooltipPosition.top }}
           >
             <div className="flex items-center justify-between gap-2 text-[12px] font-medium text-[var(--ink)]">
-              <span className="truncate">{activeTarget.nameKa}</span>
+              <span className="truncate">{describedTarget.nameKa}</span>
               <span aria-hidden>→</span>
             </div>
             <div className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-              {formatAmount(activeTarget.valueGel)}
+              {formatAmount(describedTarget.valueGel)}
             </div>
           </div>
         ) : null}
