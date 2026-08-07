@@ -7,10 +7,10 @@
 - Desktop implementation capture: `C:\tmp\municipality-map-desktop.png`
 - Mobile source capture: `C:\tmp\municipality-map-source-mobile.png`
 - Mobile implementation capture: `C:\tmp\municipality-map-mobile.png`
-- Side-by-side desktop comparison: `C:\Users\Mylaptop\.codex\worktrees\00e2\Geodata.ge\.tmp\municipality-map-comparison-desktop.png`
-- Side-by-side mobile comparison: `C:\Users\Mylaptop\.codex\worktrees\00e2\Geodata.ge\.tmp\municipality-map-comparison-mobile.png`
+- Final side-by-side desktop comparison: `C:\Users\Mylaptop\.codex\worktrees\00e2\Geodata.ge\.tmp\municipality-map-comparison-desktop-final.png`
+- Final side-by-side mobile comparison: `C:\Users\Mylaptop\.codex\worktrees\00e2\Geodata.ge\.tmp\municipality-map-comparison-mobile-final.png`
 - Tooltip interaction capture: `C:\Users\Mylaptop\.codex\worktrees\00e2\Geodata.ge\.tmp\municipality-map-tooltip-desktop.png`
-- Route/state: `/explorer/municipalities`, latest official year 2025, municipality list active unless otherwise noted.
+- Route/state: `/explorer/municipalities`, latest official year 2025, municipality list active unless otherwise noted. Final implementation captures were regenerated from code HEAD `820b15a473ffa0af6b5707069286ceb7bd4277fc` after the interaction and validation review fixes.
 
 Desktop source and implementation were both captured at a 1440 x 900 CSS viewport and are 1440 x 900 pixels. Mobile source and implementation were both captured at a 390 x 844 CSS viewport and are 390 x 844 pixels. Pixel dimensions equal CSS viewport dimensions, so the comparison is normalized at 1:1 density.
 
@@ -43,6 +43,7 @@ A separate crop was not needed: in the desktop comparison the map occupies most 
 ## Comparison History
 
 - Pass 1: no actionable P0/P1/P2 difference was found, so no visual fix or recapture iteration was required.
+- Post-review confirmation: the interaction fix changed target DOM order and tooltip reconciliation without intending a visual redesign. Fresh desktop/mobile captures from `820b15a` were compared again in the final composites; marker visibility, overlay layering, geometry, color, spacing, typography, and responsive containment remain visually unchanged, with no actionable P0/P1/P2 finding.
 
 ## Implementation Checklist
 
