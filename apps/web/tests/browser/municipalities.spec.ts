@@ -77,7 +77,7 @@ test("polygon and marker clicks open municipality pages directly", async ({ page
   await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/06");
 });
 
-test("Enter and Space activate polygon and marker without scrolling", async ({ page }) => {
+test("Enter activates a polygon and Space activates a marker", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
   await page.getByTestId("municipality-shape-33").focus();
