@@ -113,7 +113,7 @@ Strong success criteria let you loop independently. Weak criteria like "make it 
 
 ## Current Project State
 
-GeoData.ge v1, a Georgian-first Georgia Budget Explorer, is implemented. The production UI follows the `DESIGN.md` v4.1 editorial system (single paper theme; multi-year explorer with fields/ministries grouping; single-year analysis view). Confirmed visual references live in `docs/Design HTML files/editorial-v2/`.
+GeoData.ge v1, a Georgian-first Georgia Budget Explorer, is implemented. The production UI follows the `DESIGN.md` v4.1 editorial system (single paper theme; multi-year explorer with fields/ministries grouping; single-year analysis view). `DESIGN.md` v4.1 is the canonical visual contract; the `editorial-v2` HTML prototype package was intentionally removed as superseded in 2026-08.
 
 The budget sits behind a platform shell (`DESIGN.md` §6.7): a dark sidebar, a hub at `/explorer`, and one route per section — `/explorer/expenditure`, `/explorer/revenue`, `/explorer/municipalities`, `/explorer/analysis`. The section is the route, not React state and not a hash key; the rest of the screen state still deep-links through the URL hash, and legacy `#nav=` links redirect once from the hub. The sidebar and hub carry `მალე` markers only for datasets that do not exist yet (the four teaser indicators) — markers only: no data, no routes, not clickable; the municipalities section has an implemented route and no marker in this branch as of 2026-08. Design rationale for the shell: `docs/superpowers/specs/2026-07-28-explorer-shell-and-workspace-design.md`.
 
@@ -171,7 +171,7 @@ Default first view:
 
 The single-year analysis view has no v1 drilldown and stays top-level (fields, ministries categories, or revenue categories). Multi-year mode can allow selecting deeper official rows (major programs, by name only — no official codes) as chart/table series.
 
-Production UI follows `DESIGN.md` v4.1 and the confirmed references in `docs/Design HTML files/editorial-v2/`.
+Production UI follows `DESIGN.md` v4.1. Retained concept files are contextual inputs only unless a current product spec explicitly promotes them.
 
 The approved direction is the warm editorial statistical annual (paper background, ink rules instead of cards, serif display + mono numerals, one terracotta accent). The previous Apple-like Light/Night system and older dark/neon/terminal styling are superseded for production unless the user explicitly approves a new design change. There is no theme toggle in v1.
 

@@ -134,7 +134,7 @@ When actual data arrives for a planned year, actual data becomes the active publ
 
 ## 7. Visual Direction
 
-The production visual direction follows `DESIGN.md` and the confirmed references in `docs/Design HTML files/`.
+The production visual direction follows the canonical `DESIGN.md` v4.1 contract. Retained files under `docs/Design HTML files/` are contextual inputs only unless a current product spec explicitly promotes them.
 
 This is a product decision.
 

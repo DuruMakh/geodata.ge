@@ -1,7 +1,7 @@
 # GeoData.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-07-28
+Last updated: 2026-08-07
 Status: Production visual system for GeoData.ge Budget Explorer v1
 Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -11,19 +11,13 @@ Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, re
 
 This file defines the production design system for GeoData.ge v1. It **replaces DESIGN.md v3.x (the Apple-like Light/Night system) in full**. The editorial direction is the approved production direction.
 
-Confirmed visual references (checked into the repo):
-
-- `docs/Design HTML files/editorial-v2/GeoData Platform - Editorial v2.dc.html` — **primary reference**: full product prototype (3-tab navigation, explorer, indicators, analysis/single-year view, responsive rules, hash deep-linking).
-- `docs/Design HTML files/editorial-v2/GeoData Site v2.dc.html` — **landing page reference**: site header nav (მთავარი / ექსპლორერი), living-relief hero (Three.js dotted map of Georgia, `data/georgia-geo.js`), key country numbers, "სამი გზა მონაცემებამდე" cards, site footer.
-- `docs/Design HTML files/editorial-v2/Editorial Design System - Reference.dc.html` — component reference sheet (colors, typography, rules, controls, data patterns, single-year surfaces).
-- `docs/Design HTML files/editorial-v2/Budget Explorer - Editorial (approved).dc.html` — earlier approved multi-year explorer layout.
-- `docs/Design HTML files/editorial-v2/DESIGN v4 (Editorial).md` — the original v4.0 draft exported from Claude Design (kept for provenance; this file supersedes it where they differ).
+`DESIGN.md` v4.1 is the canonical visual and behavioral source of truth. The earlier `editorial-v2` HTML prototype package was intentionally removed as superseded in 2026-08. Retained concept files under `docs/Design HTML files/` are contextual inputs only unless a current product spec explicitly promotes them; they do not override this file or current route contracts.
 
 Confirmed product references:
 
 - `Project_Definition.md`
 
-If this file and the confirmed reference files disagree, prefer **GeoData Platform - Editorial v2.dc.html** for visual and behavioral details and update this file immediately. One carve-out: the platform shell and route IA of §6.2/§6.7 deliberately supersede the prototype's three in-page nav tabs — see `docs/superpowers/specs/2026-07-28-explorer-shell-and-workspace-design.md`.
+This file owns production visuals. Current product specs may record deliberate feature-level carve-outs, which must be reflected here when they become durable; the platform shell and route IA are specified in §6.2/§6.7 and `docs/superpowers/specs/2026-07-28-explorer-shell-and-workspace-design.md`.
 
 Superseded and must not appear in production:
 
@@ -464,7 +458,7 @@ Grid `24px 1fr 96px 72px`: mono rank (`01`), sans label (ellipsized), 3px horizo
 
 ## 8. Multi-Year Explorer
 
-Confirmed source: `GeoData Platform - Editorial v2.dc.html` (Explorer + Indicators screens).
+Canonical contract: this section and the reusable component contracts in §7.
 
 ### 8.1 Defaults
 
@@ -512,7 +506,7 @@ Columns: `<first col> | years… | ცვლილება | წილი <end-
 
 ## 9. Single-Year Analysis (ანალიზი)
 
-Confirmed source: `GeoData Platform - Editorial v2.dc.html` (Analysis screen). Order is fixed:
+Canonical contract: this section and the reusable component contracts in §7. Order is fixed:
 
 1. Side tabs (`ხარჯები / შემოსავლები`) + grouping tabs (expenditure only: `სფეროები / უწყებები`) + mono basis note.
 2. Year selector.
@@ -702,7 +696,7 @@ Do not:
 
 ## 19. Landing Page (მთავარი)
 
-Reference: `docs/Design HTML files/editorial-v2/GeoData Site v2.dc.html`. Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implementation: `apps/web/components/landing/`, geo data in `apps/web/lib/landing/georgiaGeo.ts`, budget-derived values computed server-side in `apps/web/lib/landing/landingData.ts` from the same active facts as the explorer.
+Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implementation: `apps/web/components/landing/`, geo data in `apps/web/lib/landing/georgiaGeo.ts`, budget-derived values computed server-side in `apps/web/lib/landing/landingData.ts` from the same active facts as the explorer.
 
 Section order (top to bottom):
 
