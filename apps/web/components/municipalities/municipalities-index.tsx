@@ -23,7 +23,10 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
   const router = useRouter();
   const [level, setLevel] = useState<"muni" | "region">("muni");
   const [query, setQuery] = useState("");
-  const [activeMunicipalityCode, setActiveMunicipalityCode] = useState<string | null>(null);
+  const [mapActiveCode, setMapActiveCode] = useState<string | null>(null);
+  const [listPointerCode, setListPointerCode] = useState<string | null>(null);
+  const [listFocusCode, setListFocusCode] = useState<string | null>(null);
+  const activeMunicipalityCode = listFocusCode ?? mapActiveCode ?? listPointerCode;
 
   // Restore the level from the URL hash once, after mount (the server render
   // always shows "muni"; an unknown value falls back to it in the parser).
@@ -85,7 +88,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               legendMin={props.legendMin}
               legendMax={props.legendMax}
               activeCode={activeMunicipalityCode}
-              onActiveCodeChange={setActiveMunicipalityCode}
+              onActiveCodeChange={setMapActiveCode}
               onOpenMunicipality={openMunicipality}
             />
           </div>
@@ -156,11 +159,21 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                   key={row.id}
                   type="button"
                   data-testid="municipal-list-row"
+                  data-municipality-row-code={row.kind === "municipality" ? row.id : undefined}
+                  data-active={row.kind === "municipality" && row.id === activeMunicipalityCode ? "true" : undefined}
                   onClick={() => (row.kind === "region" ? openRegion(row.id) : openMunicipality(row.id))}
-                  onMouseEnter={() => setActiveMunicipalityCode(row.kind === "municipality" ? row.id : null)}
-                  onMouseLeave={() => setActiveMunicipalityCode(null)}
-                  onFocus={() => setActiveMunicipalityCode(row.kind === "municipality" ? row.id : null)}
-                  onBlur={() => setActiveMunicipalityCode(null)}
+                  onMouseEnter={() => {
+                    if (row.kind === "municipality") setListPointerCode(row.id);
+                  }}
+                  onMouseLeave={() => {
+                    if (row.kind === "municipality") setListPointerCode(null);
+                  }}
+                  onFocus={() => {
+                    if (row.kind === "municipality") setListFocusCode(row.id);
+                  }}
+                  onBlur={() => {
+                    if (row.kind === "municipality") setListFocusCode(null);
+                  }}
                   className={`grid w-full grid-cols-[22px_minmax(0,1fr)_66px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left ${
                     row.kind === "municipality" && row.id === activeMunicipalityCode ? "bg-[var(--tint)]" : ""
                   }`}
