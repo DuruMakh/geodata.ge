@@ -12,6 +12,8 @@
 - Tooltip interaction capture: `C:\Users\Mylaptop\.codex\worktrees\00e2\Geodata.ge\.tmp\municipality-map-tooltip-desktop.png`
 - Route/state: `/explorer/municipalities`, latest official year 2025, municipality list active unless otherwise noted. Final implementation captures were regenerated from code HEAD `820b15a473ffa0af6b5707069286ceb7bd4277fc` after the interaction and validation review fixes.
 
+These images are intentionally local, uncommitted QA evidence under Task 7 of the approved implementation plan. The durable regression contract is the municipality browser suite and hosted CI; this document records the human visual comparison rather than defining a pixel-diff baseline.
+
 Desktop source and implementation were both captured at a 1440 x 900 CSS viewport and are 1440 x 900 pixels. Mobile source and implementation were both captured at a 390 x 844 CSS viewport and are 390 x 844 pixels. Pixel dimensions equal CSS viewport dimensions, so the comparison is normalized at 1:1 density.
 
 ## Findings

@@ -4,6 +4,21 @@ async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
 
+function contrastRatio(foreground: string, background: string): number {
+  const luminance = (color: string) => {
+    const channels = color.match(/[\d.]+/g)?.slice(0, 3).map(Number);
+    if (channels?.length !== 3) throw new Error(`Expected an RGB color, received ${color}`);
+    const [red, green, blue] = channels.map((channel) => {
+      const normalized = channel / 255;
+      return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+  };
+
+  const values = [luminance(foreground), luminance(background)].sort((left, right) => right - left);
+  return (values[0] + 0.05) / (values[1] + 0.05);
+}
+
 test("renders 65 globally ordered accessible map targets and two inert overlays", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
@@ -227,19 +242,33 @@ test("focus uses the polygon or marker instead of a rectangular outline", async 
   await shape.focus();
   const shapeStyle = await shape.evaluate((element) => {
     const style = getComputedStyle(element);
-    return { outline: style.outlineStyle, strokeWidth: Number.parseFloat(style.strokeWidth) };
+    return {
+      fill: style.fill,
+      outline: style.outlineStyle,
+      stroke: style.stroke,
+      strokeWidth: Number.parseFloat(style.strokeWidth),
+    };
   });
   expect(shapeStyle.outline).toBe("none");
-  expect(shapeStyle.strokeWidth).toBeGreaterThan(1);
+  expect(shapeStyle.strokeWidth).toBeGreaterThanOrEqual(2);
+  expect(contrastRatio(shapeStyle.stroke, shapeStyle.fill)).toBeGreaterThanOrEqual(3);
 
   const marker = page.getByTestId("municipality-marker-06");
   await marker.focus();
   const markerStyle = await marker.evaluate((element) => {
     const style = getComputedStyle(element);
-    return { outline: style.outlineStyle, radius: Number.parseFloat(element.getAttribute("r") ?? "0") };
+    return {
+      fill: style.fill,
+      outline: style.outlineStyle,
+      radius: Number.parseFloat(element.getAttribute("r") ?? "0"),
+      stroke: style.stroke,
+      strokeWidth: Number.parseFloat(style.strokeWidth),
+    };
   });
   expect(markerStyle.outline).toBe("none");
   expect(markerStyle.radius).toBeGreaterThan(7.5);
+  expect(markerStyle.strokeWidth).toBeGreaterThanOrEqual(2);
+  expect(contrastRatio(markerStyle.stroke, markerStyle.fill)).toBeGreaterThanOrEqual(3);
 });
 
 test("keeps the tooltip inside the map after a narrow viewport resize", async ({ page }) => {

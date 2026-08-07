@@ -1,7 +1,7 @@
 # Municipality Map Upgrade Design
 
 **Date:** 2026-08-07
-**Status:** Approved in conversation; awaiting written-spec review
+**Status:** Approved and implemented; merge and production verification pending
 **Scope:** Replace the municipalities index's region-grain map with a municipality-grain map.
 
 ## 1. Goal

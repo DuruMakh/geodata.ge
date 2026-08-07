@@ -6,7 +6,7 @@ This methodology covers the prepared annual municipality-level research files un
 
 `docs/Raw Data/Municipalities/combined-annual-2015-2025/`
 
-### Serving status (2026-08-06)
+### Serving status (2026-08-07)
 
 The ten main functional categories are served, on the same terms as expenditure and revenue:
 reviewed, mapped to stable `municipal.*` category IDs, and shipped as
@@ -22,15 +22,17 @@ Every CI-gated production run owned by `.github/workflows/deploy-production.yml`
 the reviewed CSVs before Vercel is triggered. Manual Vercel dashboard or CLI deployments do not
 run those Actions steps; see `docs/deployment.md`.
 
-This branch implements `/explorer/municipalities`, 64 municipality pages, and 11 region roll-up
-pages. Those routes call `loadServedMunicipalData()`, so a db-mode build of this code verifies the
-municipal mirror row by row. The earlier data-only deployment had no municipal route and did not
-exercise that build-time municipal parity check. Implementation is not confirmation of a
-production deployment: direct checks of `https://geodata-ge.vercel.app/explorer/municipalities`
-and `/explorer/municipalities/04` returned HTTP 404 on 2026-08-06, and this workspace could not
-freshly authenticate hosted GitHub/remote-main metadata or the live database contents. Do not
-describe the municipal UI as live until a post-deployment route check returns HTTP 200. The
-current branch's index map is municipality-grain; see "Municipality geometry join" below.
+The base municipal UI shipped through PR #38 (merge `0f4a287`) with
+`/explorer/municipalities`, 64 municipality pages, and 11 region roll-up pages. Post-deployment
+checks on 2026-08-06 returned HTTP 200 for the index, municipality `04`, and the Tbilisi region
+route. Those routes call `loadServedMunicipalData()`, so a db-mode build verifies the municipal
+mirror row by row.
+
+This map-upgrade branch retains those routes and replaces only the index map with the
+municipality-grain geometry described in "Municipality geometry join" below. Its production
+status remains separate from the base municipal UI: do not describe the municipality-grain map
+as live until PR #40 is merged, the production deployment is ready, and the map routes and
+interactions pass post-deployment smoke checks.
 
 The six selected-detail rows (`7.1.1`, `7.4.5.1`, `7.5.1`, `7.8.1`, `7.8.2`, `7.9.1`; 4,554 rows
 in the prepared package below) are deliberately not imported — not an oversight. Dropping them

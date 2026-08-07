@@ -170,7 +170,7 @@ export function MunicipalityMap({
                   fillRule="evenodd"
                   clipRule="evenodd"
                   stroke={active ? "var(--ink)" : "var(--hairline-soft)"}
-                  strokeWidth={active ? 1.8 : 0.7}
+                  strokeWidth={active ? 2.2 : 0.7}
                   strokeLinejoin="round"
                   vectorEffect="non-scaling-stroke"
                   tabIndex={0}
