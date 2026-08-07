@@ -1,0 +1,722 @@
+{
+  "archive_member_matches": [
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "“საქართველოს 2006 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - დეკემბერი",
+      "href": "https://mof.ge/files/download/2006%20wlis%20dekemberi.zip/8b5e599c-cbaf-48cf-b332-5f96f71e7b68",
+      "archive_member": "2006 wlis dekemberi/TAVI IV.pdf",
+      "sha256": "4A545EA9D38E95C17A37C85F04ACC8F217E530A018D3EA265D6218A5B65D701C",
+      "member_size": 723643,
+      "local_match": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2005-programmatic-budget-law-from-2006-december/sources/2005-fact-from-2006-december-tavi-iv.pdf"
+    },
+    {
+      "year": 2017,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2017wliswliuriangarishi.zip/121571f9-a100-4597-9c37-db6f82ae2742",
+      "archive_member": "2017 wlis wliuri angarishi/თავი VI.xlsx",
+      "sha256": "AEA8E9E0CA28A7BB98E6CE760820F0E0D6EC9C4144E16A67729923A46A85C06D",
+      "member_size": 92966,
+      "local_match": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2013-2025-12-month-tavi-VI/2017-12-month-tavi-VI.xlsx"
+    },
+    {
+      "year": 2018,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2018%20wliuri%20eqseli.rar/225b94fd-f934-4d22-9d17-233b49301732",
+      "archive_member": "2018 wliuri eqseli/tavi VI.xlsx",
+      "sha256": "5CB7E6C9AFAEF23FA77933DD2C40898949C17A61945CFA0C2F59EE7D6DF95FE8",
+      "member_size": 99060,
+      "local_match": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2013-2025-12-month-tavi-VI/2018-12-month-tavi-VI.xlsx"
+    },
+    {
+      "year": 2019,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi%20formati.rar/fb5d3fa3-6367-41c3-9091-957f3a87431b",
+      "archive_member": "redaqtirebadi formati/tavi 6.xlsx",
+      "sha256": "4DD19863BE70A9C070BD83DB55D06AB285AC4DCCB73F4406B2943C9B3DBBA7A3",
+      "member_size": 90057,
+      "local_match": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2013-2025-12-month-tavi-VI/2019-12-month-tavi-VI.xlsx"
+    },
+    {
+      "year": 2020,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi.rar/b912a8b6-1153-4537-af90-c4ea721bbc24",
+      "archive_member": "tavi VI.xlsx",
+      "sha256": "6BEAC113BDD32316F357B5D26568F2757EB7AF8B1DDB38EF7E6D815241A526B8",
+      "member_size": 123653,
+      "local_match": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2013-2025-12-month-tavi-VI/2020-12-month-tavi-VI.xlsx"
+    }
+  ],
+  "archive_summaries": [
+    {
+      "year": 2004,
+      "category": "state_budget",
+      "label": "“საქართველოს 2004 წლის სახელმწიფო ბიუჯეტის შესახებ” - ბიუჯეტი",
+      "href": "https://mof.ge/files/download/2004%20wlis%20biujeti.zip/62daa783-1416-4b27-83f4-2895c4bba00a",
+      "official_size": 4012717,
+      "members_checked": 10,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2004%20wlis%20biujeti.zip"
+    },
+    {
+      "year": 2004,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/2004%20wlis%20biujeti.rar/17910020-54d0-4581-a263-3b691e136798",
+      "official_size": 2669429,
+      "members_checked": 10,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''2004%20wlis%20biujeti.rar"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” - იანვარი",
+      "href": "https://mof.ge/files/download/200501.zip/d0b0ba55-49d6-4cf1-a65c-35876e0329c5",
+      "official_size": 1236467,
+      "members_checked": 7,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2005-01.zip"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/1.%20kanoni.rar/957626f8-a317-4265-afab-d763e1ea08e8",
+      "official_size": 832780,
+      "members_checked": 7,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''1.%20kanoni.rar"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - აპრილი",
+      "href": "https://mof.ge/files/download/200504.zip/cc9d6e92-ce74-43f5-93d7-6f6f5c578413",
+      "official_size": 1315564,
+      "members_checked": 7,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2005-04.zip"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/2.%20cvlileba%201.rar/fc272289-0bc6-44ed-8498-ad22c384419d",
+      "official_size": 824818,
+      "members_checked": 6,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''2.%20cvlileba%201.rar"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - მაისი",
+      "href": "https://mof.ge/files/download/200505.zip/f5200d5b-49c7-4251-91c6-3aeb8440224d",
+      "official_size": 630402,
+      "members_checked": 5,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2005-05.zip"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/3.%20cvlileba%202.rar/4ead7418-5201-4749-9f3b-3948091caf78",
+      "official_size": 397985,
+      "members_checked": 4,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''3.%20cvlileba%202.rar"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - ოქტომბერი",
+      "href": "https://mof.ge/files/download/200510.zip/b7ef89e2-6c74-4164-8198-9bad70582c42",
+      "official_size": 1305861,
+      "members_checked": 7,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2005-10.zip"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/4.%20cvlileba%203.rar/14f0e115-b730-4cca-8531-d828ec286d49",
+      "official_size": 872996,
+      "members_checked": 6,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''4.%20cvlileba%203.rar"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - დეკემბერი",
+      "href": "https://mof.ge/files/download/200512.zip/eece0f2a-e0cd-4ee8-902f-7d08a05958b7",
+      "official_size": 1292762,
+      "members_checked": 7,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2005-12.zip"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/5.%20cvlileba%204.rar/355f65d8-ee34-4a3b-af4f-2e145040c7ee",
+      "official_size": 869897,
+      "members_checked": 6,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''5.%20cvlileba%204.rar"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "“საქართველოს 2006 წლის სახელმწიფო ბიუჯეტის შესახებ” - იანვარი",
+      "href": "https://mof.ge/files/download/2006%20wlis%20saxelmwifo%20biujetis%20Sesaxeb01.zip/23d8606b-b9a6-4997-b089-f84928bd43e7",
+      "official_size": 896135,
+      "members_checked": 5,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2006%20wlis%20saxelmwifo%20biujetis%20Sesaxeb-01.zip"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/1.%20kanoni.rar/956ba608-7cf1-49fb-9f8c-2798107256dc",
+      "official_size": 676935,
+      "members_checked": 5,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''1.%20kanoni.rar"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "“საქართველოს 2006 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - აპრილი",
+      "href": "https://mof.ge/files/download/2006%20wlis%2004.zip/759a07f0-26f3-4148-b9e3-349653d255c6",
+      "official_size": 913241,
+      "members_checked": 5,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2006%20wlis-%2004.zip"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/2.%20cvlileba%201.rar/0f045ad8-22b4-476f-b739-889858296aed",
+      "official_size": 708806,
+      "members_checked": 4,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''2.%20cvlileba%201.rar"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "“საქართველოს 2006 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - ივლისი",
+      "href": "https://mof.ge/files/download/200607.zip/5a31e0dc-79e6-4220-9280-db5ff7622107",
+      "official_size": 929079,
+      "members_checked": 5,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2006-07.zip"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/3.%20cvlileba%202.rar/4b281efe-f086-4143-86ad-ce3416861e79",
+      "official_size": 625201,
+      "members_checked": 4,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''3.%20cvlileba%202.rar"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "“საქართველოს 2006 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - დეკემბერი",
+      "href": "https://mof.ge/files/download/2006%20wlis%20dekemberi.zip/8b5e599c-cbaf-48cf-b332-5f96f71e7b68",
+      "official_size": 919025,
+      "members_checked": 5,
+      "matches": 1,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2006%20wlis%20dekemberi.zip"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/4.%20cvlileba%203.rar/157af961-8f0e-4a13-a2e5-0f7ccddafc53",
+      "official_size": 609568,
+      "members_checked": 4,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''4.%20cvlileba%203.rar"
+    },
+    {
+      "year": 2017,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2017wliswliuriangarishi.zip/121571f9-a100-4597-9c37-db6f82ae2742",
+      "official_size": 186727,
+      "members_checked": 3,
+      "matches": 1,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2017-wlis-wliuri-angarishi.zip"
+    },
+    {
+      "year": 2018,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/3tve.zip/5d2ab372-0ce7-441c-9096-c11bb3f31fdd",
+      "official_size": 165031,
+      "members_checked": 3,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''3-tve.zip"
+    },
+    {
+      "year": 2018,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/6tve.zip/6b01b070-b682-4e25-aea2-82f0b93d05a7",
+      "official_size": 276307,
+      "members_checked": 4,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''6-tve.zip"
+    },
+    {
+      "year": 2018,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/9tve.zip/a479ffaf-bba7-46c4-8446-d71894c28580",
+      "official_size": 178359,
+      "members_checked": 3,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''9-tve.zip"
+    },
+    {
+      "year": 2018,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2018%20wliuri%20eqseli.rar/225b94fd-f934-4d22-9d17-233b49301732",
+      "official_size": 186243,
+      "members_checked": 3,
+      "matches": 1,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''2018%20wliuri%20eqseli.rar"
+    },
+    {
+      "year": 2019,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2019wlisbiujetiskanoni.zip/dba16ea7-2d1c-440b-9950-0470c0a426ff",
+      "official_size": 1530066,
+      "members_checked": 10,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2019-wlis-biujetis-kanoni.zip"
+    },
+    {
+      "year": 2019,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2019wlisbiujeti3wardgena.zip/bad27138-b6ef-4e0f-b3bc-f1ba2982c70c",
+      "official_size": 1530126,
+      "members_checked": 10,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2019-wlis-biujeti-3-wardgena.zip"
+    },
+    {
+      "year": 2019,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2019wlisbiujeti2wardgena.zip/e20b408b-2999-4a69-96d1-8ae39b6a09f2",
+      "official_size": 1544694,
+      "members_checked": 10,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2019-wlis-biujeti-2-wardgena.zip"
+    },
+    {
+      "year": 2019,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2019wlisbiujeti1wardgena.zip/e5edf694-bc22-447b-b425-681f655c9e64",
+      "official_size": 1548270,
+      "members_checked": 10,
+      "matches": 0,
+      "content_type": "application/x-zip-compressed",
+      "content_disposition": "attachment; filename*=utf-8''2019-wlis-biujeti-1-wardgena.zip"
+    },
+    {
+      "year": 2019,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/20193tve.rar/4c9701c7-662f-4b4b-a0b9-2aa4fd4ff1b2",
+      "official_size": 666564,
+      "members_checked": 3,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''2019-3tve.rar"
+    },
+    {
+      "year": 2019,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/excel.rar/1c15d441-a149-4223-a931-45c30497af85",
+      "official_size": 365141,
+      "members_checked": 4,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''excel.rar"
+    },
+    {
+      "year": 2019,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/excel.rar/57d2c063-9323-4c04-9418-d39bf23f410d",
+      "official_size": 348802,
+      "members_checked": 4,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''excel.rar"
+    },
+    {
+      "year": 2019,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi%20formati.rar/fb5d3fa3-6367-41c3-9091-957f3a87431b",
+      "official_size": 7444583,
+      "members_checked": 3,
+      "matches": 1,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''redaqtirebadi%20formati.rar"
+    },
+    {
+      "year": 2020,
+      "category": "state_budget",
+      "label": "საინვესტიციო პროექტების დანართი",
+      "href": "https://mof.ge/files/download/sainvestivio%20proeqtebis%20danarti.rar/d927dbae-7991-4475-b6ab-d0baced55448",
+      "official_size": 1413416,
+      "members_checked": 28,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''sainvestivio%20proeqtebis%20danarti.rar"
+    },
+    {
+      "year": 2020,
+      "category": "state_budget",
+      "label": "საინვესტიციო პროექტების დანართი",
+      "href": "https://mof.ge/files/download/sainvestivio%20proeqtebis%20danarti.rar/9fe19483-1db3-4162-8c54-67e699bb33dc",
+      "official_size": 1413416,
+      "members_checked": 28,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''sainvestivio%20proeqtebis%20danarti.rar"
+    },
+    {
+      "year": 2020,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi%20formati.rar/801f8686-163a-452e-928e-9e6773dd3a5a",
+      "official_size": 250758,
+      "members_checked": 3,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''redaqtirebadi%20formati.rar"
+    },
+    {
+      "year": 2020,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi%20formati.rar/c10e8a62-a89f-4677-a12e-44ed3cb0e778",
+      "official_size": 293708,
+      "members_checked": 3,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''redaqtirebadi%20formati.rar"
+    },
+    {
+      "year": 2020,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi%20formati%201.rar/b5ad383d-d74c-4ac5-9c66-fcdcf0cea30b",
+      "official_size": 1131890,
+      "members_checked": 3,
+      "matches": 0,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''redaqtirebadi%20formati%20%281%29.rar"
+    },
+    {
+      "year": 2020,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi.rar/b912a8b6-1153-4537-af90-c4ea721bbc24",
+      "official_size": 360383,
+      "members_checked": 3,
+      "matches": 1,
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename*=utf-8''redaqtirebadi.rar"
+    }
+  ],
+  "errors": [],
+  "candidates": [
+    {
+      "year": 2004,
+      "category": "state_budget",
+      "label": "“საქართველოს 2004 წლის სახელმწიფო ბიუჯეტის შესახებ” - ბიუჯეტი",
+      "href": "https://mof.ge/files/download/2004%20wlis%20biujeti.zip/62daa783-1416-4b27-83f4-2895c4bba00a"
+    },
+    {
+      "year": 2004,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/2004%20wlis%20biujeti.rar/17910020-54d0-4581-a263-3b691e136798"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” - იანვარი",
+      "href": "https://mof.ge/files/download/200501.zip/d0b0ba55-49d6-4cf1-a65c-35876e0329c5"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/1.%20kanoni.rar/957626f8-a317-4265-afab-d763e1ea08e8"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - აპრილი",
+      "href": "https://mof.ge/files/download/200504.zip/cc9d6e92-ce74-43f5-93d7-6f6f5c578413"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/2.%20cvlileba%201.rar/fc272289-0bc6-44ed-8498-ad22c384419d"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - მაისი",
+      "href": "https://mof.ge/files/download/200505.zip/f5200d5b-49c7-4251-91c6-3aeb8440224d"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/3.%20cvlileba%202.rar/4ead7418-5201-4749-9f3b-3948091caf78"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - ოქტომბერი",
+      "href": "https://mof.ge/files/download/200510.zip/b7ef89e2-6c74-4164-8198-9bad70582c42"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/4.%20cvlileba%203.rar/14f0e115-b730-4cca-8531-d828ec286d49"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "“საქართველოს 2005 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - დეკემბერი",
+      "href": "https://mof.ge/files/download/200512.zip/eece0f2a-e0cd-4ee8-902f-7d08a05958b7"
+    },
+    {
+      "year": 2005,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/5.%20cvlileba%204.rar/355f65d8-ee34-4a3b-af4f-2e145040c7ee"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "“საქართველოს 2006 წლის სახელმწიფო ბიუჯეტის შესახებ” - იანვარი",
+      "href": "https://mof.ge/files/download/2006%20wlis%20saxelmwifo%20biujetis%20Sesaxeb01.zip/23d8606b-b9a6-4997-b089-f84928bd43e7"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/1.%20kanoni.rar/956ba608-7cf1-49fb-9f8c-2798107256dc"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "“საქართველოს 2006 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - აპრილი",
+      "href": "https://mof.ge/files/download/2006%20wlis%2004.zip/759a07f0-26f3-4148-b9e3-349653d255c6"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/2.%20cvlileba%201.rar/0f045ad8-22b4-476f-b739-889858296aed"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "“საქართველოს 2006 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - ივლისი",
+      "href": "https://mof.ge/files/download/200607.zip/5a31e0dc-79e6-4220-9280-db5ff7622107"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/3.%20cvlileba%202.rar/4b281efe-f086-4143-86ad-ce3416861e79"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "“საქართველოს 2006 წლის სახელმწიფო ბიუჯეტის შესახებ” საქართველოს კანონში ცვლილებების შეტანის თაობაზე - დეკემბერი",
+      "href": "https://mof.ge/files/download/2006%20wlis%20dekemberi.zip/8b5e599c-cbaf-48cf-b332-5f96f71e7b68"
+    },
+    {
+      "year": 2006,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფაილები",
+      "href": "https://mof.ge/files/download/4.%20cvlileba%203.rar/157af961-8f0e-4a13-a2e5-0f7ccddafc53"
+    },
+    {
+      "year": 2017,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2017wliswliuriangarishi.zip/121571f9-a100-4597-9c37-db6f82ae2742"
+    },
+    {
+      "year": 2018,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/3tve.zip/5d2ab372-0ce7-441c-9096-c11bb3f31fdd"
+    },
+    {
+      "year": 2018,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/6tve.zip/6b01b070-b682-4e25-aea2-82f0b93d05a7"
+    },
+    {
+      "year": 2018,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/9tve.zip/a479ffaf-bba7-46c4-8446-d71894c28580"
+    },
+    {
+      "year": 2018,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2018%20wliuri%20eqseli.rar/225b94fd-f934-4d22-9d17-233b49301732"
+    },
+    {
+      "year": 2019,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2019wlisbiujetiskanoni.zip/dba16ea7-2d1c-440b-9950-0470c0a426ff"
+    },
+    {
+      "year": 2019,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2019wlisbiujeti3wardgena.zip/bad27138-b6ef-4e0f-b3bc-f1ba2982c70c"
+    },
+    {
+      "year": 2019,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2019wlisbiujeti2wardgena.zip/e20b408b-2999-4a69-96d1-8ae39b6a09f2"
+    },
+    {
+      "year": 2019,
+      "category": "state_budget",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/2019wlisbiujeti1wardgena.zip/e5edf694-bc22-447b-b425-681f655c9e64"
+    },
+    {
+      "year": 2019,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/20193tve.rar/4c9701c7-662f-4b4b-a0b9-2aa4fd4ff1b2"
+    },
+    {
+      "year": 2019,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/excel.rar/1c15d441-a149-4223-a931-45c30497af85"
+    },
+    {
+      "year": 2019,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/excel.rar/57d2c063-9323-4c04-9418-d39bf23f410d"
+    },
+    {
+      "year": 2019,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi%20formati.rar/fb5d3fa3-6367-41c3-9091-957f3a87431b"
+    },
+    {
+      "year": 2020,
+      "category": "state_budget",
+      "label": "საინვესტიციო პროექტების დანართი",
+      "href": "https://mof.ge/files/download/sainvestivio%20proeqtebis%20danarti.rar/d927dbae-7991-4475-b6ab-d0baced55448"
+    },
+    {
+      "year": 2020,
+      "category": "state_budget",
+      "label": "საინვესტიციო პროექტების დანართი",
+      "href": "https://mof.ge/files/download/sainvestivio%20proeqtebis%20danarti.rar/9fe19483-1db3-4162-8c54-67e699bb33dc"
+    },
+    {
+      "year": 2020,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi%20formati.rar/801f8686-163a-452e-928e-9e6773dd3a5a"
+    },
+    {
+      "year": 2020,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi%20formati.rar/c10e8a62-a89f-4677-a12e-44ed3cb0e778"
+    },
+    {
+      "year": 2020,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi%20formati%201.rar/b5ad383d-d74c-4ac5-9c66-fcdcf0cea30b"
+    },
+    {
+      "year": 2020,
+      "category": "execution_report",
+      "label": "რედაქტირებადი ფორმატი (ექსელი)",
+      "href": "https://mof.ge/files/download/redaqtirebadi.rar/b912a8b6-1153-4537-af90-c4ea721bbc24"
+    }
+  ]
+}

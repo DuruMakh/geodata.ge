@@ -1,0 +1,56 @@
+[
+  {
+    "year": 2006,
+    "checked_coded_rows_with_actual": 126,
+    "matched": 126,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2007,
+    "checked_coded_rows_with_actual": 156,
+    "matched": 156,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2008,
+    "checked_coded_rows_with_actual": 135,
+    "matched": 135,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2009,
+    "checked_coded_rows_with_actual": 143,
+    "matched": 143,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2010,
+    "checked_coded_rows_with_actual": 176,
+    "matched": 175,
+    "match_rate": 0.9943181818181818,
+    "first_unmatched": [
+      {
+        "code": "34 00",
+        "actual": 2178544.79,
+        "patterns": [
+          "2,178,544.79",
+          "2 178 544,79",
+          "2178544,79",
+          "2,178,544,79",
+          "2 178 544.79"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2011,
+    "checked_coded_rows_with_actual": 482,
+    "matched": 482,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  }
+]

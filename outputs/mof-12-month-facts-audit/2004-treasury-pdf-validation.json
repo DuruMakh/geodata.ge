@@ -1,0 +1,134 @@
+{
+  "path": "docs/Raw Data/Expenditure/mof.ge/12-month-facts-2004-2025/2004/official-sources/2004-12-month-state-budget-functional-expenditure.official.pdf",
+  "sha256": "33ee4a12881fb6aa6b3d7221abbf8feb61f1764b448b6f8a76155cc24af67a97",
+  "size": 35685,
+  "page_count": 1,
+  "table_count": 1,
+  "table_rows": 46,
+  "nonblank_table_rows": 46,
+  "title_lines": [
+    "                                                                   `saqarTvelos 2004 wlis saxelmwifo biujetis Sesaxeb~",
+    "                                                                          saqarTvelos 2004 wlis 11 maisis kanonis ",
+    "                                                                                        danarTi #7",
+    "                                                                                            2222000000004444    wwwwlllliiiissss        cccceeeennnnttttrrrraaaalllluuuurrrriiii    bbbbiiiiuuuujjjjeeeettttiiiissss    xxxxaaaarrrrjjjjeeeebbbbiiiissss        SSSSeeeessssrrrruuuulllleeeebbbbaaaa    ffffuuuunnnnqqqqcccciiiioooonnnnaaaalllluuuurrrr    WWWWrrrriiiillllSSSSiiii",
+    "cf[fpbyj cfvcf[ehbc jgthfnbekb byajhvfwbf larebSi"
+  ],
+  "signature_rows": {
+    "row_1": [
+      "01 00",
+      "ssssaaaaeeeerrrrTTTToooo ddddaaaannnniiiiSSSSnnnnuuuulllleeeebbbbiiiissss ssssaaaaxxxx.... mmmmoooommmmssssaaaaxxxxuuuurrrreeeebbbbaaaa",
+      "2 85,414,574",
+      "59,875,081",
+      "17,314,854",
+      "4 ,950,895",
+      "6 1,188,564",
+      "-",
+      "66,829,095",
+      "7 ,946,085",
+      "67,310,000"
+    ],
+    "row_44": [
+      "",
+      "ssssuuuullll ssssaaaakkkkaaaassssoooo xxxxaaaarrrrjjjjeeeebbbbiiii",
+      "1 ,513,216,526",
+      "2 00,261,867",
+      "3 2,340,625",
+      "9 ,690,115",
+      "2 60,822,959",
+      "140,909,041",
+      "5 38,499,679",
+      "9 9,786,198",
+      "230,906,042"
+    ],
+    "row_45": [
+      "",
+      "ssssxxxxvvvvaaaaoooobbbbaaaa",
+      "- 1 ,660,897",
+      "2,617,804",
+      "8 61,853",
+      "4 96,068",
+      "3,453,676",
+      "549,916",
+      "1,768,644",
+      "1,746,094",
+      "- 13,154,952"
+    ]
+  },
+  "summary_consistency": {
+    "comparisons": [
+      {
+        "col": 1,
+        "central_budget": 1511555629.0,
+        "total_expenses": 1513216526.0,
+        "difference": -1660897.0,
+        "calc_diff": -1660897.0,
+        "matches": true
+      },
+      {
+        "col": 2,
+        "central_budget": 202879671.0,
+        "total_expenses": 200261867.0,
+        "difference": 2617804.0,
+        "calc_diff": 2617804.0,
+        "matches": true
+      },
+      {
+        "col": 3,
+        "central_budget": 33202478.0,
+        "total_expenses": 32340625.0,
+        "difference": 861853.0,
+        "calc_diff": 861853.0,
+        "matches": true
+      },
+      {
+        "col": 4,
+        "central_budget": 10186183.0,
+        "total_expenses": 9690115.0,
+        "difference": 496068.0,
+        "calc_diff": 496068.0,
+        "matches": true
+      },
+      {
+        "col": 5,
+        "central_budget": 264276635.0,
+        "total_expenses": 260822959.0,
+        "difference": 3453676.0,
+        "calc_diff": 3453676.0,
+        "matches": true
+      },
+      {
+        "col": 6,
+        "central_budget": 141458957.0,
+        "total_expenses": 140909041.0,
+        "difference": 549916.0,
+        "calc_diff": 549916.0,
+        "matches": true
+      },
+      {
+        "col": 7,
+        "central_budget": 540268323.0,
+        "total_expenses": 538499679.0,
+        "difference": 1768644.0,
+        "calc_diff": 1768644.0,
+        "matches": true
+      },
+      {
+        "col": 8,
+        "central_budget": 101532292.0,
+        "total_expenses": 99786198.0,
+        "difference": 1746094.0,
+        "calc_diff": 1746094.0,
+        "matches": true
+      },
+      {
+        "col": 9,
+        "central_budget": 217751090.0,
+        "total_expenses": 230906042.0,
+        "difference": -13154952.0,
+        "calc_diff": -13154952.0,
+        "matches": true
+      }
+    ],
+    "all_match": true
+  }
+}

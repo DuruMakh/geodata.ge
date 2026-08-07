@@ -1,0 +1,448 @@
+[
+  {
+    "year": 2006,
+    "checked_coded_rows": 126,
+    "matched_code_and_actual_nearby": 126,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2007,
+    "checked_coded_rows": 156,
+    "matched_code_and_actual_nearby": 156,
+    "match_rate": 1.0,
+    "first_unmatched": []
+  },
+  {
+    "year": 2008,
+    "checked_coded_rows": 135,
+    "matched_code_and_actual_nearby": 0,
+    "match_rate": 0.0,
+    "first_unmatched": [
+      {
+        "code": "01 00",
+        "label": "saqarTvelos parlamenti da masTan arsebuli organizaciebi",
+        "actual": 115635.3,
+        "patterns": [
+          "115,635.30",
+          "115,635.3",
+          "115,635"
+        ]
+      },
+      {
+        "code": "01 03",
+        "label": "saqarTvelos parlamentis ilia WavWavaZis saxelobis erovnuli biblioTeka",
+        "actual": 15635.3,
+        "patterns": [
+          "15,635.30",
+          "15,635.3",
+          "15,635"
+        ]
+      },
+      {
+        "code": "01 05",
+        "label": "ucxoeTidan miRebuli dafinansebis wyaroebiTa da grantebiT gansaxorcielebeli sainvesticio proeqtebi da am proeqtebSi Tanamonawileobasa da Tanadafinansebaze gaTvaliswinebuli asignebebi",
+        "actual": 100000,
+        "patterns": [
+          "100,000.00",
+          "100,000.0",
+          "100,000"
+        ]
+      },
+      {
+        "code": "01 05 02",
+        "label": "saqarTvelos parlamentis efeqtianobisa da gamWirvalobis gaZliereba (UNDP)",
+        "actual": 100000,
+        "patterns": [
+          "100,000.00",
+          "100,000.0",
+          "100,000"
+        ]
+      },
+      {
+        "code": "05 00",
+        "label": "saqarTvelos kontrolis palata",
+        "actual": 38917.16,
+        "patterns": [
+          "38,917.16",
+          "38,917.2",
+          "38,917"
+        ]
+      },
+      {
+        "code": "05 02",
+        "label": "ucxoeTidan miRebuli dafinansebis wyaroebiTa da grantebiT gansaxorcielebeli sainvesticio proeqtebi da am proeqtebSi Tanamonawileobasa da Tanadafinansebaze gaTvaliswinebuli asignebebi",
+        "actual": 38917.16,
+        "patterns": [
+          "38,917.16",
+          "38,917.2",
+          "38,917"
+        ]
+      },
+      {
+        "code": "05 02 02",
+        "label": "saxelmwifo seqtoris finansuri marTvis mxardaWeris proeqti (kontrolis palatis komponenti)",
+        "actual": 38917.16,
+        "patterns": [
+          "38,917.16",
+          "38,917.2",
+          "38,917"
+        ]
+      },
+      {
+        "code": "06 00",
+        "label": "saqarTvelos centraluri saarCevno komisia",
+        "actual": 2344582.22,
+        "patterns": [
+          "2,344,582.22",
+          "2,344,582.2",
+          "2,344,582"
+        ]
+      },
+      {
+        "code": "06 03",
+        "label": "ucxoeTidan miRebuli dafinansebis wyaroebiTa da grantebiT gansaxorcielebeli sainvesticio proeqtebi da am proeqtebSi Tanamonawileobasa da Tanadafinansebaze gaTvaliswinebuli asignebebi",
+        "actual": 2344582.22,
+        "patterns": [
+          "2,344,582.22",
+          "2,344,582.2",
+          "2,344,582"
+        ]
+      },
+      {
+        "code": "06 03 01",
+        "label": "saqarTvelos saarCevno administraciis SesaZleblobaTa gazrda 2008 wlis saprezidento da saparlamento arCevnebisaTvis mzadebis procesSi( UNDP)",
+        "actual": 2344582.22,
+        "patterns": [
+          "2,344,582.22",
+          "2,344,582.2",
+          "2,344,582"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2009,
+    "checked_coded_rows": 146,
+    "matched_code_and_actual_nearby": 0,
+    "match_rate": 0.0,
+    "first_unmatched": [
+      {
+        "code": "01 00",
+        "label": "saqarTvelos parlamenti da masTan arsebuli organizaciebi",
+        "actual": 24584.76,
+        "patterns": [
+          "24,584.76",
+          "24,584.8",
+          "24,585"
+        ]
+      },
+      {
+        "code": "01 03",
+        "label": "saqarTvelos parlamentis ilia WavWavaZis saxelobis erovnuli biblioTeka",
+        "actual": 24584.76,
+        "patterns": [
+          "24,584.76",
+          "24,584.8",
+          "24,585"
+        ]
+      },
+      {
+        "code": "05 00",
+        "label": "saqarTvelos kontrolis palata",
+        "actual": 448662.57,
+        "patterns": [
+          "448,662.57",
+          "448,662.6",
+          "448,663"
+        ]
+      },
+      {
+        "code": "05 02",
+        "label": "ucxoeTidan miRebuli dafinansebis wyaroebiTa da grantebiT gansaxorcielebeli sainvesticio proeqtebi da am proeqtebSi Tanamonawileobasa da Tanadafinansebaze gaTvaliswinebuli asignebebi",
+        "actual": 448662.57,
+        "patterns": [
+          "448,662.57",
+          "448,662.6",
+          "448,663"
+        ]
+      },
+      {
+        "code": "05 02 02",
+        "label": "saxelmwifo seqtoris finansuri marTvis mxardaWeris proeqti (kontrolis palatis komponenti)",
+        "actual": 448662.57,
+        "patterns": [
+          "448,662.57",
+          "448,662.6",
+          "448,663"
+        ]
+      },
+      {
+        "code": "06 00",
+        "label": "saqarTvelos centraluri saarCevno komisia",
+        "actual": 1437533.18,
+        "patterns": [
+          "1,437,533.18",
+          "1,437,533.2",
+          "1,437,533"
+        ]
+      },
+      {
+        "code": "06 04",
+        "label": "ucxoeTidan miRebuli dafinansebis wyaroebiTa da grantebiT gansaxorcielebeli sainvesticio proeqtebi da am proeqtebSi Tanamonawileobasa da Tanadafinansebaze gaTvaliswinebuli asignebebi",
+        "actual": 1437533.18,
+        "patterns": [
+          "1,437,533.18",
+          "1,437,533.2",
+          "1,437,533"
+        ]
+      },
+      {
+        "code": "06 04 01",
+        "label": "saqarTvelos saarCevno administraciis SesaZleblobaTa gazrda 2008 wlis saprezidento da saparlamento arCevnebisaTvis mzadebis procesSi( UNDP)",
+        "actual": 1437533.18,
+        "patterns": [
+          "1,437,533.18",
+          "1,437,533.2",
+          "1,437,533"
+        ]
+      },
+      {
+        "code": "07 00",
+        "label": "saqarTvelos sakonstitucio sasamarTlo",
+        "actual": 12384.91,
+        "patterns": [
+          "12,384.91",
+          "12,384.9",
+          "12,385"
+        ]
+      },
+      {
+        "code": "08 00",
+        "label": "saqarTvelos uzenaesi sasamarTlo",
+        "actual": 622974.02,
+        "patterns": [
+          "622,974.02",
+          "622,974.0",
+          "622,974"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2010,
+    "checked_coded_rows": 269,
+    "matched_code_and_actual_nearby": 0,
+    "match_rate": 0.0,
+    "first_unmatched": [
+      {
+        "code": "01 00",
+        "label": "საქართველოს პარლამენტი და მასთან არსებული ორგანიზაციები",
+        "actual": 314714.68,
+        "patterns": [
+          "314,714.68",
+          "314,714.7",
+          "314,715"
+        ]
+      },
+      {
+        "code": "01 05",
+        "label": "უცხოეთიდან მიღებული დაფინანსების წყაროებითა და გრანტებით განსახორციელებელი საინვვეესტტიცციო პროეექქტტეები დდა ამ პროეექქტტეების თანამონაწილეობასა და თანადაფინანსებაზე გათვალისწინებული ასიგნებები",
+        "actual": 314714.68,
+        "patterns": [
+          "314,714.68",
+          "314,714.7",
+          "314,715"
+        ]
+      },
+      {
+        "code": "01 05 02",
+        "label": "ძლიერი პარლამენტი კონსოლიდირებულ დემოკრატიაში (UNDP)",
+        "actual": 314714.68,
+        "patterns": [
+          "314,714.68",
+          "314,714.7",
+          "314,715"
+        ]
+      },
+      {
+        "code": "05 00",
+        "label": "საქართველოს კონტროლის პალატა",
+        "actual": 230974.1,
+        "patterns": [
+          "230,974.10",
+          "230,974.1",
+          "230,974"
+        ]
+      },
+      {
+        "code": "05 02",
+        "label": "უცხოეთიდან მიღებული დაფინანსების წყაროებითა და გრანტებით განსახორციელებელი საინვესტიციო პროექტები და ამ პროექტების თანამონაწილეობასა და თანადაფინანსებაზე გათვალისწინებული ასიგნებები",
+        "actual": 230974.1,
+        "patterns": [
+          "230,974.10",
+          "230,974.1",
+          "230,974"
+        ]
+      },
+      {
+        "code": "05 02 01",
+        "label": "სახელმწიფო სექტორის ფინანსური მართვის მხარდაჭერის პროექტი (კონტროლის პალატის კომპონენტი) (WB, SIDA, ნიდერლანდები, DFID)",
+        "actual": 230974.1,
+        "patterns": [
+          "230,974.10",
+          "230,974.1",
+          "230,974"
+        ]
+      },
+      {
+        "code": "06 00",
+        "label": "საქართველოს ცენტრალური საარჩევნო კომისია",
+        "actual": 2804052.5,
+        "patterns": [
+          "2,804,052.50",
+          "2,804,052.5",
+          "2,804,052"
+        ]
+      },
+      {
+        "code": "06 05",
+        "label": "უცხოეთიდან მიღებული დაფინანსების წყაროებითა და გრანტებით განსახორციელებელი საინვესტიციო პროექტები და ამ პროექტების თანამონაწილეობასა და თანადაფინანსებაზე გათვალისწინებული ასიგნებები",
+        "actual": 2804052.5,
+        "patterns": [
+          "2,804,052.50",
+          "2,804,052.5",
+          "2,804,052"
+        ]
+      },
+      {
+        "code": "06 05 01",
+        "label": "დემოკრატიული ინსტიტუტების განვითარება სამართლიანი საარჩევნო პროცესებისა და აქტიური სამოქალაქო მონაწილეობისათვის (UNDP)",
+        "actual": 2804052.5,
+        "patterns": [
+          "2,804,052.50",
+          "2,804,052.5",
+          "2,804,052"
+        ]
+      },
+      {
+        "code": "07 00",
+        "label": "saqarTvelos sakonstitucio sasamarTlo",
+        "actual": 108477.48,
+        "patterns": [
+          "108,477.48",
+          "108,477.5",
+          "108,477"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2011,
+    "checked_coded_rows": 482,
+    "matched_code_and_actual_nearby": 21,
+    "match_rate": 0.043568464730290454,
+    "first_unmatched": [
+      {
+        "code": "01 00",
+        "label": "საქართველოს პარლამენტი და მასთან არსებული ორგანიზაციები",
+        "actual": 483716.16,
+        "patterns": [
+          "483,716.16",
+          "483,716.2",
+          "483,716"
+        ]
+      },
+      {
+        "code": "01 03",
+        "label": "საქართველოს პარლამენტის ილია ჭავჭავაძის სახელობის ეროვნული ბიბლიოთეკა",
+        "actual": 52467.37,
+        "patterns": [
+          "52,467.37",
+          "52,467.4",
+          "52,467"
+        ]
+      },
+      {
+        "code": "01 05",
+        "label": "დონორების დაფინანსებული პროექტები",
+        "actual": 431248.79,
+        "patterns": [
+          "431,248.79",
+          "431,248.8",
+          "431,249"
+        ]
+      },
+      {
+        "code": "01 05 02",
+        "label": "ძლიერი პარლამენტი კონსოლიდირებულ დემოკრატიაში (UNDP)",
+        "actual": 431248.79,
+        "patterns": [
+          "431,248.79",
+          "431,248.8",
+          "431,249"
+        ]
+      },
+      {
+        "code": "05 00",
+        "label": "საქართველოს კონტროლის პალატა",
+        "actual": 807442.99,
+        "patterns": [
+          "807,442.99",
+          "807,443.0",
+          "807,443"
+        ]
+      },
+      {
+        "code": "05 02",
+        "label": "დონორების დაფინანსებული პროექტები",
+        "actual": 807442.99,
+        "patterns": [
+          "807,442.99",
+          "807,443.0",
+          "807,443"
+        ]
+      },
+      {
+        "code": "05 02 01",
+        "label": "სახელმწიფო სექტორის ფინანსური მართვის მხარდაჭერის პროექტი (კონტროლის პალატის კომპონენტი) (WB, SIDA, ნიდერლანდები, DFID)",
+        "actual": 807442.99,
+        "patterns": [
+          "807,442.99",
+          "807,443.0",
+          "807,443"
+        ]
+      },
+      {
+        "code": "06 00",
+        "label": "საქართველოს ცენტრალური საარჩევნო კომისია",
+        "actual": 705718.92,
+        "patterns": [
+          "705,718.92",
+          "705,718.9",
+          "705,719"
+        ]
+      },
+      {
+        "code": "06 05",
+        "label": "დონორების დაფინანსებული პროექტები",
+        "actual": 705718.92,
+        "patterns": [
+          "705,718.92",
+          "705,718.9",
+          "705,719"
+        ]
+      },
+      {
+        "code": "06 05 01",
+        "label": "დემოკრატიული ინსტიტუტების განვითარება სამართლიანი საარჩევნო პროცესებისა და აქტიური სამოქალაქო მონაწილეობისათვის (UNDP)",
+        "actual": 705718.92,
+        "patterns": [
+          "705,718.92",
+          "705,718.9",
+          "705,719"
+        ]
+      }
+    ]
+  }
+]
