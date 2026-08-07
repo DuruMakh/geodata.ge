@@ -5,6 +5,7 @@ import path from "node:path";
 export const MARKER_ONLY_CODES = ["06", "20", "32", "48"] as const;
 export const POLYGON_AND_MARKER_CODES = ["04"] as const;
 export const EXCLUDED_MAP_CODES = ["05", "42", "43", "46", "64"] as const;
+const WEB_MERCATOR_MAX_LATITUDE = 85.05112878;
 
 export const MUNICIPALITY_GEOMETRY_DIRECTORY =
   "../../docs/Raw Data/Municipalities/municipality-map-geometry";
@@ -124,6 +125,11 @@ function validateLongitudeLatitude(longitude: number, latitude: number, context:
   }
   if (latitude < -90 || latitude > 90) {
     throw new Error(`${context} latitude must be between -90 and 90`);
+  }
+  if (latitude < -WEB_MERCATOR_MAX_LATITUDE || latitude > WEB_MERCATOR_MAX_LATITUDE) {
+    throw new Error(
+      `${context} latitude must be between -${WEB_MERCATOR_MAX_LATITUDE} and ${WEB_MERCATOR_MAX_LATITUDE} for Web Mercator`,
+    );
   }
 }
 

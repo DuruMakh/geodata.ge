@@ -184,6 +184,22 @@ describe("reviewed municipality geometry sources", () => {
     expect(() => validateMunicipalityGeometrySources(malformed, servedCodes)).toThrow(message);
   });
 
+  it.each([85.05112879, -85.05112879])(
+    "rejects latitude %s outside the Web Mercator projection domain",
+    async (latitude) => {
+      const { sources, servedCodes } = await loadFixture();
+      const malformed = mutableCopy(sources);
+      const geometry = featureAt(malformed, "municipalities", 0).geometry as {
+        coordinates: number[][][];
+      };
+      geometry.coordinates[0][1] = [44, latitude];
+
+      expect(() => validateMunicipalityGeometrySources(malformed, servedCodes)).toThrow(
+        "latitude must be between -85.05112878 and 85.05112878 for Web Mercator",
+      );
+    },
+  );
+
   it("rejects an out-of-range city marker coordinate", async () => {
     const { sources, servedCodes } = await loadFixture();
     const malformed = mutableCopy(sources);
