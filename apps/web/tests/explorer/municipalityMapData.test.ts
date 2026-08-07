@@ -116,6 +116,75 @@ describe("municipality map server composition", () => {
     expect(() => validateMunicipalityMapArtifact(artifact)).toThrow(/unexpected fields.*occupied area/i);
   });
 
+  it("rejects null and non-object nested geometry members contextually", () => {
+    const artifact = structuredClone(MUNICIPALITY_MAP_ARTIFACT);
+
+    for (const member of [null, 42]) {
+      expect(() => validateMunicipalityMapArtifact({
+        ...artifact,
+        municipalityPaths: [member, ...artifact.municipalityPaths.slice(1)],
+      })).toThrow(/municipality polygon at index 0 must be an object/i);
+      expect(() => validateMunicipalityMapArtifact({
+        ...artifact,
+        cityMarkers: [member, ...artifact.cityMarkers.slice(1)],
+      })).toThrow(/municipality marker at index 0 must be an object/i);
+      expect(() => validateMunicipalityMapArtifact({
+        ...artifact,
+        occupiedAreas: [member, ...artifact.occupiedAreas.slice(1)],
+      })).toThrow(/occupied area at index 0 must be an object/i);
+    }
+  });
+
+  it("rejects non-string and empty nested SVG paths", () => {
+    const artifact = structuredClone(MUNICIPALITY_MAP_ARTIFACT);
+
+    for (const d of [42, {}, ""]) {
+      expect(() => validateMunicipalityMapArtifact({
+        ...artifact,
+        municipalityPaths: artifact.municipalityPaths.map((shape, index) => index === 0 ? { ...shape, d } : shape),
+      })).toThrow(/municipality polygon 04 must have a non-empty string path/i);
+      expect(() => validateMunicipalityMapArtifact({
+        ...artifact,
+        occupiedAreas: artifact.occupiedAreas.map((area, index) => index === 0 ? { ...area, d } : area),
+      })).toThrow(/occupied area abkhazia must have a non-empty string path/i);
+    }
+  });
+
+  it("rejects invalid nested polygon field types contextually", () => {
+    const artifact = structuredClone(MUNICIPALITY_MAP_ARTIFACT);
+
+    expect(() => validateMunicipalityMapArtifact({
+      ...artifact,
+      municipalityPaths: artifact.municipalityPaths.map((shape, index) => index === 0 ? { ...shape, code: 36 } : shape),
+    })).toThrow(/municipality polygon at index 0 must have a non-empty string code/i);
+    expect(() => validateMunicipalityMapArtifact({
+      ...artifact,
+      municipalityPaths: artifact.municipalityPaths.map((shape, index) => index === 0 ? { ...shape, relationId: "2016168" } : shape),
+    })).toThrow(/municipality polygon 04 must have a finite numeric relation id/i);
+  });
+
+  it("rejects invalid nested marker field types contextually", () => {
+    const artifact = structuredClone(MUNICIPALITY_MAP_ARTIFACT);
+
+    expect(() => validateMunicipalityMapArtifact({
+      ...artifact,
+      cityMarkers: artifact.cityMarkers.map((marker, index) => index === 0 ? { ...marker, code: 4 } : marker),
+    })).toThrow(/municipality marker at index 0 must have a non-empty string code/i);
+    expect(() => validateMunicipalityMapArtifact({
+      ...artifact,
+      cityMarkers: artifact.cityMarkers.map((marker, index) => index === 0 ? { ...marker, x: "1" } : marker),
+    })).toThrow(/municipality marker 04 must have finite numeric coordinates/i);
+  });
+
+  it("rejects invalid nested occupied-area key types contextually", () => {
+    const artifact = structuredClone(MUNICIPALITY_MAP_ARTIFACT);
+
+    expect(() => validateMunicipalityMapArtifact({
+      ...artifact,
+      occupiedAreas: artifact.occupiedAreas.map((area, index) => index === 0 ? { ...area, key: 1 } : area),
+    })).toThrow(/occupied area at index 0 must have a non-empty string key/i);
+  });
+
   it("rejects invalid version, count, path, marker, and code contracts", () => {
     const artifact = structuredClone(MUNICIPALITY_MAP_ARTIFACT);
 
@@ -124,11 +193,11 @@ describe("municipality map server composition", () => {
     expect(() => validateMunicipalityMapArtifact({
       ...artifact,
       municipalityPaths: artifact.municipalityPaths.map((shape, index) => index === 0 ? { ...shape, d: "" } : shape),
-    })).toThrow(/non-empty path/i);
+    })).toThrow(/non-empty string path/i);
     expect(() => validateMunicipalityMapArtifact({
       ...artifact,
       cityMarkers: artifact.cityMarkers.map((marker, index) => index === 0 ? { ...marker, x: Number.NaN } : marker),
-    })).toThrow(/finite coordinates/i);
+    })).toThrow(/finite numeric coordinates/i);
     expect(() => validateMunicipalityMapArtifact({
       ...artifact,
       cityMarkers: artifact.cityMarkers.map((marker, index) => index === 0 ? { ...marker, code: "99" } : marker),
@@ -148,7 +217,7 @@ describe("municipality map server composition", () => {
     expect(() => validateMunicipalityMapArtifact({
       ...artifact,
       municipalityPaths: artifact.municipalityPaths.map((shape, index) => index === 0 ? { ...shape, relationId: Number.NaN } : shape),
-    })).toThrow(/finite relation id/i);
+    })).toThrow(/finite numeric relation id/i);
     expect(() => validateMunicipalityMapArtifact({
       ...artifact,
       municipalityPaths: artifact.municipalityPaths.map((shape, index) => index === 1 ? { ...shape, code: "99" } : shape),
@@ -160,7 +229,7 @@ describe("municipality map server composition", () => {
     expect(() => validateMunicipalityMapArtifact({
       ...artifact,
       occupiedAreas: artifact.occupiedAreas.map((area, index) => index === 0 ? { ...area, d: "" } : area),
-    })).toThrow(/occupied area.*non-empty path/i);
+    })).toThrow(/occupied area.*non-empty string path/i);
     expect(() => validateMunicipalityMapArtifact({
       ...artifact,
       occupiedAreas: artifact.occupiedAreas.map((area, index) => index === 1 ? { ...area, key: artifact.occupiedAreas[0]!.key } : area),

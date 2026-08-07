@@ -61,32 +61,43 @@ function hasExactCodes(actual: Iterable<string>, expected: readonly string[]): b
   return JSON.stringify([...actual].sort()) === JSON.stringify(expected.slice().sort());
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 export function validateMunicipalityMapArtifact(artifact: unknown): MunicipalityMapArtifact {
-  if (typeof artifact !== "object" || artifact === null) {
+  if (!isRecord(artifact)) {
     throw new Error("Municipality map artifact must be an object");
   }
-  const candidate = artifact as Partial<MunicipalityMapArtifact>;
-  if (!Array.isArray(candidate.municipalityPaths)) {
+  if (!Array.isArray(artifact.municipalityPaths)) {
     throw new Error("Municipality map artifact must contain municipality paths");
   }
-  if (!Array.isArray(candidate.cityMarkers)) {
+  if (!Array.isArray(artifact.cityMarkers)) {
     throw new Error("Municipality map artifact must contain city markers");
   }
-  if (!Array.isArray(candidate.occupiedAreas)) {
+  if (!Array.isArray(artifact.occupiedAreas)) {
     throw new Error("Municipality map artifact must contain occupied areas");
   }
 
-  if (candidate.version !== 1) throw new Error("Municipality map artifact version must be 1");
-  if (candidate.viewBox !== "0 0 1000 540") throw new Error("Municipality map artifact viewBox must be 0 0 1000 540");
-  if (candidate.municipalityPaths.length !== 60) throw new Error("Municipality map artifact must contain 60 paths");
-  if (candidate.cityMarkers.length !== 5) throw new Error("Municipality map artifact must contain 5 city markers");
-  if (candidate.occupiedAreas.length !== 2) throw new Error("Municipality map artifact must contain 2 occupied areas");
+  if (artifact.version !== 1) throw new Error("Municipality map artifact version must be 1");
+  if (artifact.viewBox !== "0 0 1000 540") throw new Error("Municipality map artifact viewBox must be 0 0 1000 540");
+  if (artifact.municipalityPaths.length !== 60) throw new Error("Municipality map artifact must contain 60 paths");
+  if (artifact.cityMarkers.length !== 5) throw new Error("Municipality map artifact must contain 5 city markers");
+  if (artifact.occupiedAreas.length !== 2) throw new Error("Municipality map artifact must contain 2 occupied areas");
 
   const polygonCodes = new Set<string>();
-  for (const shape of candidate.municipalityPaths) {
-    if (!shape.code || polygonCodes.has(shape.code)) throw new Error(`Invalid municipality polygon code ${shape.code}`);
-    if (!shape.d) throw new Error(`Municipality polygon ${shape.code} must have a non-empty path`);
-    if (!Number.isFinite(shape.relationId)) throw new Error(`Municipality polygon ${shape.code} must have a finite relation id`);
+  for (const [index, shape] of artifact.municipalityPaths.entries()) {
+    if (!isRecord(shape)) throw new Error(`Municipality polygon at index ${index} must be an object`);
+    if (typeof shape.code !== "string" || shape.code.length === 0) {
+      throw new Error(`Municipality polygon at index ${index} must have a non-empty string code`);
+    }
+    if (typeof shape.d !== "string" || shape.d.trim().length === 0) {
+      throw new Error(`Municipality polygon ${shape.code} must have a non-empty string path`);
+    }
+    if (typeof shape.relationId !== "number" || !Number.isFinite(shape.relationId)) {
+      throw new Error(`Municipality polygon ${shape.code} must have a finite numeric relation id`);
+    }
+    if (polygonCodes.has(shape.code)) throw new Error(`Invalid municipality polygon code ${shape.code}`);
     if (shape.code === "33" && shape.relationId !== 2016161) {
       throw new Error("Municipality polygon 33 must use relation 2016161");
     }
@@ -94,20 +105,35 @@ export function validateMunicipalityMapArtifact(artifact: unknown): Municipality
   }
 
   const markerCodes = new Set<string>();
-  for (const marker of candidate.cityMarkers) {
-    if (!marker.code || markerCodes.has(marker.code)) throw new Error(`Invalid municipality marker code ${marker.code}`);
-    if (!Number.isFinite(marker.x) || !Number.isFinite(marker.y)) {
-      throw new Error(`Municipality marker ${marker.code} must have finite coordinates`);
+  for (const [index, marker] of artifact.cityMarkers.entries()) {
+    if (!isRecord(marker)) throw new Error(`Municipality marker at index ${index} must be an object`);
+    if (typeof marker.code !== "string" || marker.code.length === 0) {
+      throw new Error(`Municipality marker at index ${index} must have a non-empty string code`);
     }
+    if (
+      typeof marker.x !== "number" ||
+      typeof marker.y !== "number" ||
+      !Number.isFinite(marker.x) ||
+      !Number.isFinite(marker.y)
+    ) {
+      throw new Error(`Municipality marker ${marker.code} must have finite numeric coordinates`);
+    }
+    if (markerCodes.has(marker.code)) throw new Error(`Invalid municipality marker code ${marker.code}`);
     markerCodes.add(marker.code);
   }
 
   const occupiedAreaKeys = new Set<string>();
-  for (const area of candidate.occupiedAreas) {
+  for (const [index, area] of artifact.occupiedAreas.entries()) {
+    if (!isRecord(area)) throw new Error(`Occupied area at index ${index} must be an object`);
+    if (typeof area.key !== "string" || area.key.length === 0) {
+      throw new Error(`Occupied area at index ${index} must have a non-empty string key`);
+    }
+    if (typeof area.d !== "string" || area.d.trim().length === 0) {
+      throw new Error(`Occupied area ${area.key} must have a non-empty string path`);
+    }
     if (!hasExactCodes(Object.keys(area), ["key", "d"])) {
       throw new Error(`Unexpected fields for occupied area ${area.key}`);
     }
-    if (!area.d) throw new Error(`Occupied area ${area.key} must have a non-empty path`);
     if (occupiedAreaKeys.has(area.key)) throw new Error(`Duplicate occupied area ${area.key}`);
     occupiedAreaKeys.add(area.key);
   }
@@ -122,7 +148,7 @@ export function validateMunicipalityMapArtifact(artifact: unknown): Municipality
     throw new Error("Municipality map artifact has unexpected occupied area keys");
   }
 
-  return candidate as MunicipalityMapArtifact;
+  return artifact as unknown as MunicipalityMapArtifact;
 }
 
 export const MUNICIPALITY_MAP_ARTIFACT = validateMunicipalityMapArtifact(rawArtifact);
