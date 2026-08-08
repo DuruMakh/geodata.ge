@@ -113,7 +113,7 @@ Expected: all commands PASS. The audit command is outside `check` and remains se
 
 Using the in-app Browser, capture closed, hover, and open states at the same viewport as the supplied preview where practical. Compare the supplied preview and latest implementation together, check console errors, append the evidence and comparison history to `design-qa.md`, and require `final result: passed`.
 
-- [ ] **Step 6: Commit, push, and wait for PR checks**
+- [x] **Step 6: Commit, push, and wait for PR checks**
 
 ```powershell
 git add apps/web/components/municipalities/municipal-explorer.tsx apps/web/tests/browser/municipal-entity.spec.ts apps/web/tests/browser/municipal-region.spec.ts design-qa.md docs/superpowers/plans/2026-08-08-entity-picker-affordance.md
