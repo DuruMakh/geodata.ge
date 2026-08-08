@@ -25,4 +25,3 @@ Make region pages easier to scan and make every entity-picker option visibly int
 - Confirm the new region heading text at desktop and narrow widths.
 - Confirm both region and municipality option rows react on hover without layout movement.
 - Run focused browser tests, repository checks, build, and the complete browser suite.
-
