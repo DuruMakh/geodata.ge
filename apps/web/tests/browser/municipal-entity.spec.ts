@@ -117,6 +117,28 @@ test.describe("hash sanitising", () => {
 });
 
 test.describe("entity picker accessibility", () => {
+  test("picker rows expose hover feedback", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("entity-picker-trigger").click();
+
+    const region = page.getByTestId("picker-region").first();
+    const municipality = page.getByTestId("picker-municipality").first();
+    const regionBox = await region.boundingBox();
+    const municipalityBox = await municipality.boundingBox();
+
+    for (const row of [region, municipality]) {
+      await row.hover();
+      await expect(row).toHaveCSS("color", "rgb(179, 64, 42)");
+      await expect(row).toHaveCSS("border-left-color", "rgb(179, 64, 42)");
+      await expect(row).toHaveCSS("transition-duration", "0.1s");
+      await expect(row).toHaveCSS("transition-property", /color/);
+    }
+
+    expect(await region.boundingBox()).toEqual(regionBox);
+    expect(await municipality.boundingBox()).toEqual(municipalityBox);
+  });
+
   test("the entity picker trigger keeps the preview affordance across rest, hover, and open states", async ({
     page,
   }) => {

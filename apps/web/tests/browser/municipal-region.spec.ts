@@ -128,6 +128,15 @@ test.describe("entity picker region options resolve (previously 404)", () => {
 // past defects (the source note and the picker's region options), this is the
 // page's general contract.
 test.describe("region page", () => {
+  test("uses the plain region name in the picker trigger", async ({ page }) => {
+    await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
+
+    const trigger = page.getByTestId("entity-picker-trigger");
+    await expect(trigger).toContainText("იმერეთი");
+    await expect(trigger).not.toContainText("მუნიციპალური ბიუჯეტები");
+  });
+
   test("lists its member municipalities and carries the roll-up caveats", async ({ page }) => {
     await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);

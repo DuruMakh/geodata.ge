@@ -221,7 +221,7 @@ export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipa
                   tabIndex={-1}
                   data-testid="picker-region"
                   onClick={() => selectOption({ id: regionId, kind: "region", regionId: group.regionId })}
-                  className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left ${
+                  className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
                     regionActive ? "border-l-[var(--ink)]" : "border-l-transparent"
                   } ${group.regionId === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
                 >
@@ -245,7 +245,7 @@ export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipa
                       tabIndex={-1}
                       data-testid="picker-municipality"
                       onClick={() => selectOption({ id: memberId, kind: "municipality", code: member.code })}
-                      className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--row-border)] border-l-2 py-[7px] pr-3 pl-[26px] text-left ${
+                      className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--row-border)] border-l-2 py-[7px] pr-3 pl-[26px] text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:bg-[var(--tint)] hover:text-[var(--accent)] ${
                         memberActive ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"
                       } ${member.code === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
                     >
