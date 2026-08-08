@@ -57,4 +57,53 @@ A separate crop was not needed: in the desktop comparison the map occupies most 
 
 No P3 polish item is required for this map upgrade.
 
+## Municipality Interaction Consistency QA — 2026-08-08
+
+### Evidence
+
+- Region-row source visual truth: `C:\Users\Mylaptop\AppData\Local\Temp\codex-clipboard-526ee6e4-02e6-4542-9167-5bc8cc8223b3.png` (working municipality hover state, 453 x 745 pixels).
+- Region-row implementation: `C:\Users\Mylaptop\.codex\worktrees\00e2\Geodata.ge\.tmp\municipality-region-row-hover-final.png` (`/explorer/municipalities#lvl=region`, first region hovered, 1270 x 714 CSS viewport and pixels).
+- Series source visual truth: `C:\Users\Mylaptop\.codex\worktrees\00e2\Geodata.ge\.tmp\expenditure-series-reference.png` (the existing expenditure explorer's selected-series treatment, 1270 x 714 CSS viewport and pixels).
+- Series implementation: `C:\Users\Mylaptop\.codex\worktrees\00e2\Geodata.ge\.tmp\municipal-series-selected-final.png` (`/explorer/municipalities/27`, a newly selected series, 1270 x 714 CSS viewport and pixels).
+- Density normalization: all browser captures are 1 CSS pixel to 1 image pixel. The user-provided municipality crop differs in frame size, so it was used only as the focused interaction-state reference; the two full-view series captures use the same viewport and density.
+
+These images remain local, ignored QA evidence. The browser regression tests are the durable interaction contract.
+
+### Findings
+
+No actionable P0, P1, or P2 differences remain. The region row now uses the same pale `--tint` hover background as the working municipality row without activating municipality map geometry. Municipal and region detail explorers now use the same selected/hover tint and 100ms color transition as the expenditure explorer. Their pre-existing category-colored checkboxes remain intentional municipal-series semantics.
+
+### Required Fidelity Surfaces
+
+- Fonts and typography: unchanged; Georgian labels, mono amounts, weights, line heights, truncation, and hierarchy match the existing surfaces.
+- Spacing and layout rhythm: unchanged; the fix adds no dimensions, borders, shadows, transforms, or reflow.
+- Colors and visual tokens: both interactions resolve to `--tint` (`rgb(241, 234, 220)`), matching the working explorer. The transition duration resolves to `0.1s` and uses the existing color-only motion contract.
+- Image quality and asset fidelity: no image, map, icon, or SVG asset changed.
+- Copy and content: unchanged.
+- Accessibility and interaction states: `aria-pressed` still tracks series selection; region hover remains visually responsive while the map retains zero active municipality targets. `prefers-reduced-motion` continues to be handled globally. In-app console inspection found no warnings or errors beyond React DevTools/HMR informational logs.
+
+### Full-view Comparison Evidence
+
+The expenditure reference and municipality implementation were compared together at the same 1270 x 714 viewport. Selected rows use the same paper/tint contrast and editorial rule hierarchy; no unintended layout, type, color, or content drift is visible.
+
+### Focused-region Comparison Evidence
+
+The user-provided working municipality-row hover and the rendered region-row hover were compared together. Although their crops differ, the relevant row state is readable in both and uses the same tint. Computed browser evidence separately confirmed `rgb(241, 234, 220)` and `0.1s` on the rendered region row and newly selected municipal series row.
+
+### Comparison History
+
+- Pass 1: the original implementation had two P2 consistency gaps: region rows had no hover tint/transition, and municipal explorer series rows had no hover/selected tint/transition.
+- Fix: reused the existing `transition-colors duration-100 hover:bg-[var(--tint)]` and selected `bg-[var(--tint)]` treatment on the two affected row types.
+- Pass 2: fresh in-app captures and computed-style checks found no remaining actionable P0/P1/P2 mismatch. Focused browser tests passed for both interaction states.
+
+### Implementation Checklist
+
+- Preserve region rows as inert toward municipality geometry while retaining row hover feedback.
+- Preserve the shared 100ms color-only transition and selected tint on municipal and region detail series rows.
+- Keep focused browser coverage for both states in the municipality suites.
+
+### Follow-up Polish
+
+No P3 refinement is required for this interaction-consistency fix.
+
 final result: passed

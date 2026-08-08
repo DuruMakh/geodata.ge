@@ -230,7 +230,10 @@ test("region rows do not activate municipality geometry", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
   await page.getByTestId("level-region").click();
-  await page.getByTestId("municipal-list-row").first().hover();
+  const regionRow = page.getByTestId("municipal-list-row").first();
+  await expect(regionRow).toHaveCSS("transition-duration", "0.1s");
+  await regionRow.hover();
+  await expect(regionRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
   await expect(page.locator('[data-municipality-code][data-active="true"]')).toHaveCount(0);
   await expect(page.getByTestId("municipality-map").locator("[data-municipality-shape]")).toHaveCount(60);
 });

@@ -186,8 +186,8 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                   onBlur={() => {
                     if (row.kind === "municipality") setListFocusCode(null);
                   }}
-                  className={`grid w-full grid-cols-[22px_minmax(0,1fr)_66px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left ${
-                    row.kind === "municipality" && row.id === activeMunicipalityCode ? "bg-[var(--tint)]" : ""
+                  className={`grid w-full grid-cols-[22px_minmax(0,1fr)_66px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] ${
+                    row.kind === "municipality" && row.id === activeMunicipalityCode ? "bg-[var(--tint)]" : "bg-transparent"
                   }`}
                 >
                   <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">

@@ -269,6 +269,29 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
 // Task 14: the full municipality-page e2e coverage the header comment above
 // defers to this task ("Full section e2e coverage is Task 14's").
 test.describe("municipality page", () => {
+  test("series rows reuse the explorer's animated hover and selected tint", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const initiallySelected = page.locator('[data-testid="municipal-series-row"][aria-pressed="true"]').first();
+    const initiallyUnselected = page.locator('[data-testid="municipal-series-row"][aria-pressed="false"]').first();
+    const selectedLabel = await initiallySelected.locator("span.truncate").innerText();
+    const unselectedLabel = await initiallyUnselected.locator("span.truncate").innerText();
+    const selectedRow = page.getByTestId("municipal-series-row").filter({ hasText: selectedLabel }).first();
+    const unselectedRow = page.getByTestId("municipal-series-row").filter({ hasText: unselectedLabel }).first();
+
+    await expect(selectedRow).toHaveAttribute("aria-pressed", "true");
+    await expect(unselectedRow).toHaveAttribute("aria-pressed", "false");
+    await expect(selectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
+    await expect(selectedRow).toHaveCSS("transition-duration", "0.1s");
+    await unselectedRow.hover();
+    await expect(unselectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
+
+    await unselectedRow.click();
+    await expect(unselectedRow).toHaveAttribute("aria-pressed", "true");
+    await expect(unselectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
+  });
+
   test("switches between chart and table", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);

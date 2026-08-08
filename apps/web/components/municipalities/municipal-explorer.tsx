@@ -386,7 +386,9 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                   data-testid="municipal-series-row"
                   aria-pressed={selected}
                   onClick={() => state.toggleSeries(row.itemId)}
-                  className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b border-[var(--row-border)] py-[7px] pr-1 text-left"
+                  className={`grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] ${
+                    selected ? "bg-[var(--tint)]" : "bg-transparent"
+                  }`}
                 >
                   <span
                     aria-hidden
