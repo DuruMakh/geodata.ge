@@ -39,7 +39,7 @@ test.describe("region header responsiveness", () => {
 
       const heading = page.getByRole("heading", { level: 1 });
       await expect(heading).toHaveText(
-        "როგორ იხარჯება რაჭა-ლეჩხუმისა და ქვემო სვანეთის მუნიციპალური ბიუჯეტები▾",
+        "როგორ იხარჯება რაჭა-ლეჩხუმი და ქვემო სვანეთი▾",
       );
 
       const headingBox = await heading.boundingBox();
