@@ -1,36 +1,16 @@
 import { expect, test, type Page } from "@playwright/test";
-import { mkdir } from "node:fs/promises";
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
-
-const artifactDir = join(process.cwd(), "test-results", "visual-reference");
-const referenceDir = join(process.cwd(), "..", "..", "docs", "Design HTML files", "editorial-v2");
 
 async function waitForApp(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
 
-async function capture(page: Page, name: string) {
-  await mkdir(artifactDir, { recursive: true });
-  await page.screenshot({
-    path: join(artifactDir, `${name}.png`),
-    fullPage: true,
-    caret: "hide",
-  });
-}
-
-test("explorer matches the confirmed editorial v2 reference structure", async ({ page }) => {
+test("explorer preserves the editorial v4.1 structure", async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-
-  await page.goto(pathToFileURL(join(referenceDir, "GeoData Platform - Editorial v2.dc.html")).href);
-  await page.waitForTimeout(1500);
-  await capture(page, "editorial-v2-reference");
 
   await page.goto("http://localhost:3100/explorer/expenditure");
   await waitForApp(page);
-  await capture(page, "editorial-v2-product");
 
-  // Structural contract of the confirmed design.
+  // Structural contract of DESIGN.md v4.1.
   await expect(page.getByTestId("chart-mode-line")).toBeVisible();
   await expect(page.getByTestId("chart-mode-table")).toBeVisible();
   await expect(page.getByTestId("measure-share-toggle")).toBeVisible();
@@ -50,17 +30,12 @@ test("explorer matches the confirmed editorial v2 reference structure", async ({
   expect(style.headingFont).toContain("Noto Serif Georgian");
 });
 
-test("analysis matches the single-year reference structure on mobile", async ({ page }) => {
+test("analysis preserves the editorial v4.1 single-year structure on mobile", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-
-  await page.goto(pathToFileURL(join(referenceDir, "Editorial Design System - Reference.dc.html")).href);
-  await page.waitForTimeout(1500);
-  await capture(page, "editorial-reference-sheet-mobile");
 
   await page.goto("http://localhost:3100/explorer/analysis");
   await waitForApp(page);
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
-  await capture(page, "editorial-analysis-product-mobile");
 
   await expect(page.getByTestId("analysis-year-selector")).toBeVisible();
   await expect(page.locator("select")).toHaveCount(0);

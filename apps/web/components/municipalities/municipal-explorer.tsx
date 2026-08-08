@@ -197,9 +197,16 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               aria-expanded={pickerOpen}
               aria-haspopup="dialog"
               onClick={() => setPickerOpen((current) => !current)}
-              className="cursor-pointer border-b-2 border-[var(--accent)] font-[family-name:var(--font-display)] text-inherit"
+              className="group cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]"
             >
               {props.triggerLabel}
+              <span
+                data-testid="entity-picker-caret"
+                aria-hidden
+                className="ml-1 inline-block align-middle text-[0.35em] text-[var(--control)] transition-colors duration-100 group-hover:text-[var(--accent)]"
+              >
+                {pickerOpen ? "▴" : "▾"}
+              </span>
             </button>
           </h1>
           <EntityPicker
@@ -386,7 +393,9 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                   data-testid="municipal-series-row"
                   aria-pressed={selected}
                   onClick={() => state.toggleSeries(row.itemId)}
-                  className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b border-[var(--row-border)] py-[7px] pr-1 text-left"
+                  className={`grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] ${
+                    selected ? "bg-[var(--tint)]" : "bg-transparent"
+                  }`}
                 >
                   <span
                     aria-hidden

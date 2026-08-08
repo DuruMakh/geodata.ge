@@ -1,11 +1,9 @@
-// Georgia (country) geodata for the landing hero relief and the municipalities
-// region map.
+// Georgia (country) geodata for the landing hero relief.
 //
 // outline + regions: geoBoundaries gbOpen GEO ADM0/ADM1, release 9469f09,
 //   © geoBoundaries, CC BY 3.0 (source: commons.wikimedia.org).
 //   Region rings are simplified with Douglas-Peucker at 0.006°.
-//   `iso` is the geoBoundaries shapeISO and is the join key for the region map —
-//   never join on `en`, whose spelling differs from geoBoundaries' shapeName.
+//   `iso` preserves each region's geoBoundaries shapeISO identifier.
 // cityMarkers: top-20 cities + Gurjaani, pop in thousands, placement-validated,
 //   sorted by pop desc. Coordinates are [lon, lat].
 

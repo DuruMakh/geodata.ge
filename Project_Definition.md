@@ -28,7 +28,7 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Multi-year explorer with line and table views.
 - Multi-year expenditure grouping by public spending fields or by ministries/major programs (ministries data exists for 2005-2025, with major-program drill-down rows partial from 2012 and contiguous 2017-2025); this is series selection, not drilldown.
 - Single-year snapshot with headline cards, treemap, Every 100 GEL, Budget Radar, Budget Field, and full ranking.
-- Municipal annual expenditure data for 2015-2025: ten main functional categories across 64 publicly served municipalities, plus the official total-payments headline. Five municipal bodies associated with occupied territories (`05`, `42`, `43`, `46`, `64`) are intentionally excluded because their budgets are not territorially attributable spending inside those municipalities. Served at `/explorer/municipalities`: an index with a region-grain map and ranked list, 64 municipality pages, and 11 region roll-up pages. Methodology: `docs/data-methodology/municipal-functional-annual-2015-2025.md`.
+- Municipal annual expenditure data for 2015-2025: ten main functional categories across 64 publicly served municipalities, plus the official total-payments headline. Five municipal bodies associated with occupied territories (`05`, `42`, `43`, `46`, `64`) are intentionally excluded because their budgets are not territorially attributable spending inside those municipalities. Served at `/explorer/municipalities`: an index with a municipality-grain map and ranked list, 64 municipality pages, and 11 region roll-up pages. Methodology: `docs/data-methodology/municipal-functional-annual-2015-2025.md`.
 - `მალე` markers for named future datasets (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` in the sidebar). Labels only: no routes, not clickable, no data.
 - CSV export.
 - Georgian-first UI.
@@ -134,7 +134,7 @@ When actual data arrives for a planned year, actual data becomes the active publ
 
 ## 7. Visual Direction
 
-The production visual direction follows `DESIGN.md` and the confirmed references in `docs/Design HTML files/`.
+The production visual direction follows the canonical `DESIGN.md` v4.1 contract. Retained files under `docs/Design HTML files/` are contextual inputs only unless a current product spec explicitly promotes them.
 
 This is a product decision.
 
