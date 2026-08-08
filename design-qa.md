@@ -106,4 +106,14 @@ The user-provided working municipality-row hover and the rendered region-row hov
 
 No P3 refinement is required for this interaction-consistency fix.
 
+## Entity Picker Affordance QA — 2026-08-08
+
+- Source visual truth: `C:\Users\Mylaptop\AppData\Local\Temp\codex-clipboard-03312d30-57b1-41cb-bd9e-6fb95db7eee6.png`.
+- Verified route: `/explorer/municipalities/06` in the in-app browser.
+- Resting state: entity label is `--accent`, the underline is a 1px dashed accent rule at 60% opacity, and the muted `▾` caret is always visible.
+- Hover state: focused Playwright coverage confirms the caret and underline strengthen to accent in 100ms with an unchanged trigger bounding box.
+- Open state: `aria-expanded` changes from `false` to `true`, the caret changes to `▴`, and the existing picker opens without layout movement.
+- Computed evidence: label `rgb(179, 64, 42)`, caret `rgb(201, 190, 169)`, transition `0.1s`, trigger box `152.475 x 42.2` CSS pixels.
+- Fidelity review: typography, spacing, chart layout, picker contents, and accessibility behavior remain unchanged. No actionable P0/P1/P2 difference remains from the requested preview treatment.
+
 final result: passed

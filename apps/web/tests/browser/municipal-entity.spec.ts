@@ -117,6 +117,32 @@ test.describe("hash sanitising", () => {
 });
 
 test.describe("entity picker accessibility", () => {
+  test("the entity picker trigger keeps the preview affordance across rest, hover, and open states", async ({
+    page,
+  }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const trigger = page.getByTestId("entity-picker-trigger");
+    const caret = page.getByTestId("entity-picker-caret");
+    const restingBox = await trigger.boundingBox();
+
+    await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
+    await expect(trigger).toHaveCSS("border-bottom-style", "dashed");
+    await expect(trigger).toHaveCSS("border-bottom-width", "1px");
+    await expect(trigger).toHaveCSS("transition-duration", "0.1s");
+    await expect(caret).toHaveText("▾");
+    await expect(caret).toHaveCSS("color", "rgb(201, 190, 169)");
+
+    await trigger.hover();
+    await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
+    expect(await trigger.boundingBox()).toEqual(restingBox);
+
+    await trigger.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(caret).toHaveText("▴");
+  });
+
   test("opening moves focus into the search input", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);

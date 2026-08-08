@@ -39,7 +39,7 @@ test.describe("region header responsiveness", () => {
 
       const heading = page.getByRole("heading", { level: 1 });
       await expect(heading).toHaveText(
-        "როგორ იხარჯება რაჭა-ლეჩხუმისა და ქვემო სვანეთის მუნიციპალური ბიუჯეტები",
+        "როგორ იხარჯება რაჭა-ლეჩხუმისა და ქვემო სვანეთის მუნიციპალური ბიუჯეტები▾",
       );
 
       const headingBox = await heading.boundingBox();
@@ -131,6 +131,9 @@ test.describe("region page", () => {
   test("lists its member municipalities and carries the roll-up caveats", async ({ page }) => {
     await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);
+    const trigger = page.getByTestId("entity-picker-trigger");
+    await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
+    await expect(page.getByTestId("entity-picker-caret")).toHaveText("▾");
     await expect(page.getByTestId("region-member-row")).toHaveCount(12);
     await expect(page.getByTestId("municipal-source-note").first()).toContainText("აჭარის ავტონომიური რესპუბლიკის");
     await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
