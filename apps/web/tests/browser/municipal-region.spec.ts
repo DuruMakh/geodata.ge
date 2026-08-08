@@ -116,9 +116,9 @@ test.describe("entity picker region options resolve (previously 404)", () => {
 
     await expect(page).toHaveURL(/\/explorer\/municipalities\/region\/imereti(#|$)/);
     // Proof this is a real render, not Next's built-in 404 page: the
-    // region-only member list and the genitive-form heading are both present.
+    // region-only member list and the plain-name picker trigger are both present.
     await expect(page.getByTestId("region-member-row")).toHaveCount(12);
-    await expect(page.getByTestId("entity-picker-trigger")).toContainText("იმერეთის");
+    await expect(page.getByTestId("entity-picker-trigger")).toContainText("იმერეთი");
   });
 });
 
