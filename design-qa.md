@@ -116,4 +116,15 @@ No P3 refinement is required for this interaction-consistency fix.
 - Computed evidence: label `rgb(179, 64, 42)`, caret `rgb(201, 190, 169)`, transition `0.1s`, trigger box `152.475 x 42.2` CSS pixels.
 - Fidelity review: typography, spacing, chart layout, picker contents, and accessibility behavior remain unchanged. No actionable P0/P1/P2 difference remains from the requested preview treatment.
 
+## Region Label and Picker Hover QA — 2026-08-08
+
+- Source references: `C:\Users\Mylaptop\AppData\Local\Temp\codex-clipboard-982178dc-4025-44be-84ec-cff9b7e812dd.png` and `C:\Users\Mylaptop\AppData\Local\Temp\codex-clipboard-81cd0171-01b3-482b-bc64-6513fd2fc8c4.png`.
+- Implementation capture: `C:\Users\Mylaptop\.codex\worktrees\00e2\Geodata.ge\.tmp\region-picker-hover-final.png`, rendered from `/explorer/municipalities/region/adjara` in the in-app browser.
+- Heading: the clickable region trigger is now the canonical `აჭარა`, producing the compact `როგორ იხარჯება აჭარა` headline while retaining the established terracotta trigger, caret, and dashed underline.
+- Region row hover: text and the existing 2px left rule resolve to `rgb(179, 64, 42)` over `0.1s`; the grouped tint remains `rgb(241, 234, 220)`.
+- Municipality row hover: background resolves to `rgb(241, 234, 220)`, text and left rule to `rgb(179, 64, 42)`, and transition to `0.1s`.
+- Layout stability: the region row remained `418 x 35` CSS pixels and the municipality row remained `418 x 34.3` CSS pixels before and after hover.
+- Comparison: the two supplied crops and the full implementation capture were inspected together. The excessive region phrase is removed, the picker hierarchy and values are unchanged, and the new hover state supplies the requested visible reaction without movement or added clutter.
+- Result: no actionable P0/P1/P2 visual mismatch remains.
+
 final result: passed
