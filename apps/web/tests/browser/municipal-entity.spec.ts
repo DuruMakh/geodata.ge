@@ -123,7 +123,10 @@ test.describe("entity picker accessibility", () => {
     await page.getByTestId("entity-picker-trigger").click();
 
     const region = page.getByTestId("picker-region").first();
-    const municipality = page.getByTestId("picker-municipality").first();
+    const municipality = page.getByTestId("picker-municipality").nth(1);
+    await expect(municipality).not.toHaveAttribute("aria-current", "page");
+    await expect(municipality).not.toHaveCSS("color", "rgb(179, 64, 42)");
+    await expect(municipality).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     const regionBox = await region.boundingBox();
     const municipalityBox = await municipality.boundingBox();
 
@@ -134,6 +137,7 @@ test.describe("entity picker accessibility", () => {
       await expect(row).toHaveCSS("transition-duration", "0.1s");
       await expect(row).toHaveCSS("transition-property", /color/);
     }
+    await expect(municipality).toHaveCSS("background-color", "rgb(241, 234, 220)");
 
     expect(await region.boundingBox()).toEqual(regionBox);
     expect(await municipality.boundingBox()).toEqual(municipalityBox);
