@@ -47,6 +47,15 @@ describe("explorer integration with real CSV data", () => {
     expect(model.items.length).toBeGreaterThan(1);
   });
 
+  it("selects the expenditure total plus five categories from real facts", async () => {
+    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
+
+    const selectedItemIds = getDefaultSelection("expenditure", facts);
+
+    expect(selectedItemIds).toHaveLength(6);
+    expect(selectedItemIds[0]).toBe("expenditure.total");
+  });
+
   it("builds a non-empty revenue model with the default selection", async () => {
     const facts = await loadBudgetFactRows("../../data/imports/sample-budget-facts.csv");
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
