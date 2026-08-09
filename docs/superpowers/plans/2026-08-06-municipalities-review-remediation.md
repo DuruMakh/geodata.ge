@@ -144,7 +144,7 @@ Update exact-string assertions to include the BOM.
 
 Run the focused test. Expected: PASS.
 
-### Task 4: Line-mode guards and accurate warning disclosure
+### Task 4: Unrestricted line rendering and no public reconciliation warning
 
 **Files:**
 - Modify: `apps/web/components/municipalities/municipal-explorer.tsx`
@@ -152,18 +152,17 @@ Run the focused test. Expected: PASS.
 
 - [ ] **Step 1: Add failing browser regressions**
 
-Cover a ten-series shared hash, a deliberate empty `sel=`, and Tbilisi's two warning types with their year-specific amounts:
+Cover an all-series shared hash, a deliberate empty `sel=`, and absence of a public reconciliation callout:
 
 ```ts
 await page.goto(`${BASE}/explorer/municipalities/04#m=line&r=2015-2025&sel=${ALL_TEN_IDS}`);
-await expect(page.getByTestId("series-overflow-callout")).toBeVisible();
-await expect(page.locator("[data-testid='editorial-line-chart'] path[data-series]")).toHaveCount(6);
+await expect(page.locator("[data-testid='editorial-line-chart'] path[data-series]")).toHaveCount(10);
 
 await page.goto(`${BASE}/explorer/municipalities/04#m=line&r=2015-2025&sel=`);
 await expect(page.getByTestId("no-selection-callout")).toBeVisible();
 ```
 
-Assert the divergence callout contains both `წყაროს ვერსიებს შორის განსხვავება` and `ფუნქციური კლასიფიკაციის გარეთ დაფინანსება`, with distinct annual amounts.
+Assert no public reconciliation callout is rendered.
 
 - [ ] **Step 2: Run focused Playwright tests and confirm RED**
 
@@ -173,11 +172,10 @@ Run `npm.cmd exec playwright test tests/browser/municipal-entity.spec.ts`. Expec
 
 ```ts
 const noSelection = state.selectedIds.length === 0;
-const chartSeries = series.slice(0, MAX_CHART_SERIES);
-const overLimit = state.chartMode === "line" && series.length > MAX_CHART_SERIES;
+const chartSeries = series;
 ```
 
-Render the existing Georgian no-selection and overflow callouts. Render each warning as its own year/type/amount line so heterogeneous warning rows are never collapsed.
+Render the existing Georgian no-selection callout only. Retain warning fields as internal reconciliation data; do not render them in the explorer.
 
 - [ ] **Step 4: Rerun focused Playwright and confirm GREEN**
 

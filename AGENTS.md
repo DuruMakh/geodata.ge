@@ -167,7 +167,8 @@ Default first view:
 - Expenditure section (`/explorer/expenditure`).
 - Multi-year line chart, nominal GEL.
 - Full loaded range (currently 2005-2025), data-driven, never hardcoded.
-- Top 5 categories by latest-year value selected (derived totals are not selectable series; totals live in the table "სულ" row, deck line, and hero KPI).
+- Total plus the top 5 categories by latest-year value selected; the total is first, ink-coloured, selectable, and removable.
+- Series selection is unlimited. The header shows `სერიები {selected} / {all}` and switches between `გასუფთავება` and `ყველას მონიშვნა`; search never scopes the bulk action.
 
 The single-year analysis view has no v1 drilldown and stays top-level (fields, ministries categories, or revenue categories). Multi-year mode can allow selecting deeper official rows (major programs, by name only — no official codes) as chart/table series.
 

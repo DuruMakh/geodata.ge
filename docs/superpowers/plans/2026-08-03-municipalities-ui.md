@@ -1028,7 +1028,7 @@ git commit -m "feat: add region map projection and shape join"
 
 ### Task 5: Municipal entity model
 
-The core model: turn one municipality's (or one region's) facts into the chart and table shapes, keeping the two totals separate.
+The core model: turn one municipality's (or one region's) facts into chart and table shapes, with `public_total_gel` as the one public total and functional sums retained for reconciliation.
 
 **Files:**
 - Create: `apps/web/lib/explorer/municipalData.ts`
@@ -1041,7 +1041,6 @@ The core model: turn one municipality's (or one region's) facts into the chart a
   - `MunicipalEntityModel = { years: number[]; rows: ExplorerTableRow[]; totalRow: ExplorerTableRow; officialTotalByYear: Record<number, number>; warnings: MunicipalWarning[] }`
   - `buildMunicipalEntityModel(input: MunicipalEntityInput): MunicipalEntityModel`
   - `getDefaultMunicipalSelection(model: MunicipalEntityModel): string[]`
-  - `MAX_CHART_SERIES` is re-used from `lib/explorer/types`, not redefined.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1134,25 +1133,15 @@ describe("buildMunicipalEntityModel", () => {
     ]);
   });
 
-  it("makes the total row the FUNCTIONAL sum, not the official headline", () => {
-    // 2016 is the divergent year: official 300, functional 265.
-    expect(build().totalRow.valuesByYear[2016]).toBe(265);
-  });
-
-  it("keeps the official headline as a separate measure", () => {
-    expect(build().officialTotalByYear[2016]).toBe(300);
-  });
-
-  it("never conflates the two totals", () => {
-    const model = build();
-    expect(model.totalRow.valuesByYear[2016]).not.toBe(model.officialTotalByYear[2016]);
+  it("makes the total row the official headline", () => {
+    expect(build().totalRow.valuesByYear[2016]).toBe(300);
   });
 
   it("makes the ten functions sum to the functional total in every year", () => {
     const model = build();
     for (const year of model.years) {
       const summed = model.rows.reduce((sum, row) => sum + (row.valuesByYear[year] ?? 0), 0);
-      expect(summed).toBeCloseTo(model.totalRow.valuesByYear[year]!, 6);
+      expect(summed).toBeCloseTo(year === 2016 ? 265 : model.officialTotalByYear[year]!, 6);
     }
   });
 
@@ -1171,7 +1160,7 @@ describe("buildMunicipalEntityModel", () => {
     expect(build(2015, 2016).totalRow.change).not.toBe(build().totalRow.change);
   });
 
-  it("reports warnings only for years inside the range", () => {
+  it("retains warnings as internal reconciliation data", () => {
     expect(build().warnings.map((w) => w.year)).toEqual([2016]);
     expect(build(2017, 2017).warnings).toEqual([]);
   });
@@ -1194,17 +1183,15 @@ describe("buildMunicipalEntityModel", () => {
 });
 
 describe("getDefaultMunicipalSelection", () => {
-  it("takes the top five by latest-year value", () => {
+  it("takes the official total plus the top five by latest-year value", () => {
     expect(getDefaultMunicipalSelection(build())).toEqual([
+      "municipal.total",
       "municipal.economic_affairs",
       "municipal.education",
       "municipal.health",
     ]);
   });
 
-  it("never includes a derived total", () => {
-    expect(getDefaultMunicipalSelection(build())).not.toContain(build().totalRow.itemId);
-  });
 });
 ```
 
@@ -1226,7 +1213,6 @@ import type {
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
 import type { ExplorerTableRow, SourceMetadata } from "./types";
-import { MAX_CHART_SERIES } from "./types";
 import { colorForItem, INK } from "./colors";
 
 // Model layer for the municipalities section.
@@ -1235,7 +1221,7 @@ import { colorForItem, INK } from "./colors";
 // consume (ExplorerTableRow, and ChartSeries built from it), so those components
 // are reused untouched. It deliberately does not go through buildExplorerModel:
 // that model is built around sides, groupings and a national item×year grain,
-// while this one is municipality×function×year with two separate totals.
+// while this one is municipality×function×year with a public total plus internal reconciliation data.
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
 
@@ -1250,9 +1236,7 @@ export type MunicipalEntityModel = {
   rows: ExplorerTableRow[];
   totalRow: ExplorerTableRow;
   /**
-   * public_total_gel by year — the official MoF headline. Kept apart from
-   * totalRow (the sum of the ten served functions) because they are different
-   * measures and must never be reconciled by adjusting a category.
+   * public_total_gel by year — the official MoF headline and public total.
    */
   officialTotalByYear: Record<number, number>;
   warnings: MunicipalWarning[];
@@ -1272,7 +1256,7 @@ export type MunicipalEntityInput = {
  * Called on the SERVER so a region page ships ~110 function rows like a
  * municipality page does, rather than up to twelve times that.
  *
- * Both totals are summed independently — never reconcile one against the other.
+   * Both stored totals are summed independently; the public roll-up uses public_total_gel.
  */
 export function aggregateFactsForEntity(
   entityId: string,
@@ -1296,8 +1280,7 @@ export function aggregateFactsForEntity(
     if (existing) {
       existing.publicTotalGel += row.publicTotalGel;
       existing.functionalSumGel += row.functionalSumGel;
-      // A roll-up's own two totals reconcile, so it carries no warning of its
-      // own; region pages suppress the callout anyway (see the UI spec §8.2).
+      // Reconciliation fields remain internal after the roll-up.
       continue;
     }
     totalByYear.set(row.year, {
@@ -1381,7 +1364,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
     }
 
     const endValue = lastYear === undefined ? null : valuesByYear[lastYear] ?? null;
-    const endTotal = lastYear === undefined ? null : functionalSumByYear[lastYear] ?? null;
+    const endTotal = lastYear === undefined ? null : officialTotalByYear[lastYear] ?? null;
 
     return {
       itemId: fn.id,
@@ -1406,7 +1389,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
   const totalBasisByYear: Record<number, "actual" | "planned"> = {};
   const totalSourceByYear: Record<number, SourceMetadata> = {};
   for (const year of years) {
-    totalValuesByYear[year] = functionalSumByYear[year] ?? null;
+    totalValuesByYear[year] = officialTotalByYear[year] ?? null;
     totalBasisByYear[year] = "actual";
     totalSourceByYear[year] = sourceMetadataFor(totalFacts[0]?.sourceId ?? "", sources);
   }
@@ -1433,20 +1416,17 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
 }
 
 /**
- * Top five functions by latest-year value. Derived totals are never selectable
- * series (AGENTS.md "UX and Visual Guardrails") — the total lives in the table's
- * სულ row and the KPI, which is why the design file's pinned __total entry is
- * deliberately not reproduced.
+ * The official total plus the top five functions by latest-year value.
  */
 export function getDefaultMunicipalSelection(model: MunicipalEntityModel): string[] {
   const lastYear = model.years.at(-1);
   if (lastYear === undefined) return [];
 
-  return model.rows
+  return [model.totalRow.itemId, ...model.rows
     .slice()
     .sort((left, right) => (right.valuesByYear[lastYear] ?? 0) - (left.valuesByYear[lastYear] ?? 0))
-    .slice(0, Math.min(5, MAX_CHART_SERIES))
-    .map((row) => row.itemId);
+    .slice(0, 5)
+    .map((row) => row.itemId)];
 }
 ```
 
@@ -1587,7 +1567,7 @@ describe("aggregateFactsForEntity", () => {
     expect(y2025.functionalSumGel).toBe(600_000_000);
   });
 
-  it("carries no warning of its own — a roll-up's two totals reconcile", () => {
+  it("keeps roll-up reconciliation fields internal", () => {
     expect(rolled.totalFacts.every((row) => row.showWarning === false)).toBe(true);
     expect(rolled.totalFacts.every((row) => row.warningType === "none")).toBe(true);
   });
@@ -1834,7 +1814,7 @@ for (const k of buildIndexKpis({ municipalities: d.municipalities, totalFacts: d
 
 Expected: `municipalities 64 regions 11`; top three `თბილისი 2108M, ბათუმი 486M, რუსთავი 173M`; KPIs reading `5.62 მლრდ ₾`, `+176%`, `37.5%`, `31.5% / ეკონომიკური საქმიანობა`.
 
-The 2025 national figure is `5,624,861,932.94` GEL, which is `5.62` at two decimals. (`public_total_gel` and `functional_sum_gel` happen to sum to the identical national figure in 2025 — the per-municipality divergences cancel out. That is a property of this year, not a rule; never rely on it.)
+The 2025 national figure is `5,624,861,932.94` GEL, which is `5.62` at two decimals. Internal reconciliation happens to agree nationally in that year; this is not a rule and must not affect the public-total contract.
 
 - [ ] **Step 6: Commit**
 
@@ -2935,7 +2915,6 @@ export type MunicipalExplorerProps = {
   nationalTotalLatest: number;
   rank: number;
   rankOutOf: number;
-  showWarnings: boolean;         // region pages pass false — see Task 12
   csvBasename: string;
   pickerGroups: EntityPickerGroup[];
   prev: { label: string; href: string };
@@ -2962,10 +2941,9 @@ Create `apps/web/components/municipalities/use-municipal-state.ts`:
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MAX_CHART_SERIES, type ChartMode } from "../../lib/explorer/types";
+import type { ChartMode } from "../../lib/explorer/types";
 import { parseMunicipalHash, serializeMunicipalHash } from "../../lib/explorer/urlState";
 
-const SERIES_LIMIT_MESSAGE = `გრაფიკზე მაქსიმუმ ${MAX_CHART_SERIES} სერია შეიძლება. ცხრილის რეჟიმში ლიმიტი არ არის.`;
 
 export function useMunicipalState(years: number[], defaultSelection: string[], knownIds: Set<string>) {
   const min = years[0] ?? 0;
@@ -2976,7 +2954,6 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
   const [start, setStart] = useState(min);
   const [end, setEnd] = useState(max);
   const [selectedIds, setSelectedIds] = useState(defaultSelection);
-  const [limitMessage, setLimitMessage] = useState<string | null>(null);
   const appliedRef = useRef(false);
   const writtenRef = useRef(false);
 
@@ -3017,14 +2994,9 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
   }, [hash]);
 
   function toggleSeries(itemId: string) {
-    if (!selectedIds.includes(itemId) && chartMode !== "table" && selectedIds.length >= MAX_CHART_SERIES) {
-      setLimitMessage(SERIES_LIMIT_MESSAGE);
-      return;
-    }
     setSelectedIds((current) =>
       current.includes(itemId) ? current.filter((id) => id !== itemId) : [...current, itemId],
     );
-    setLimitMessage(null);
   }
 
   function setRange(patch: { start?: number; end?: number }) {
@@ -3036,7 +3008,6 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
     chartMode,
     setChartMode: (mode: ChartMode) => {
       setChartMode(mode);
-      setLimitMessage(null);
     },
     share,
     setShare,
@@ -3045,7 +3016,6 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
     selectedIds,
     toggleSeries,
     setSelectedIds,
-    limitMessage,
   };
 }
 ```
@@ -3218,19 +3188,13 @@ import {
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { formatAmount, UNIT_MLN } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
-import { Callout, SegmentedTabs, SourceNote, SwatchBar } from "../ui/editorial";
+import { SegmentedTabs, SourceNote, SwatchBar } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { EntityPicker, type EntityPickerGroup } from "./entity-picker";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
-
-const WARNING_TEXT: Record<string, string> = {
-  source_version_difference: "ოფიციალური ჯამი და ფუნქციური კლასიფიკაციის ჯამი წყაროს სხვადასხვა ვერსიიდან მოდის",
-  financing_outside_functional: "ოფიციალური ჯამი მოიცავს დაფინანსების ოპერაციებს, რომლებიც ფუნქციურ კლასიფიკაციაში არ ნაწილდება",
-  reconciliation_review_required: "სხვაობა დამატებით გადამოწმებას საჭიროებს",
-};
 
 export type MunicipalExplorerProps = {
   title: string;
@@ -3251,7 +3215,6 @@ export type MunicipalExplorerProps = {
   nationalTotalLatest: number;
   rank: number;
   rankOutOf: number;
-  showWarnings: boolean;
   csvBasename: string;
   pickerGroups: EntityPickerGroup[];
   prev: { label: string; href: string };
@@ -3287,7 +3250,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
     [functions, functionFacts, totalFacts, sourceDocuments, firstYear, lastYear],
   );
 
-  const knownIds = useMemo(() => new Set(fullModel.rows.map((row) => row.itemId)), [fullModel]);
+  const knownIds = useMemo(() => new Set([fullModel.totalRow.itemId, ...fullModel.rows.map((row) => row.itemId)]), [fullModel]);
   const defaults = useMemo(() => getDefaultMunicipalSelection(fullModel), [fullModel]);
   const state = useMunicipalState(allYears, defaults, knownIds);
 
@@ -3310,7 +3273,8 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
   const years = model.years;
   const totalsByYear = new Map(years.map((year) => [year, model.totalRow.valuesByYear[year] ?? null]));
 
-  const series: ChartSeries[] = model.rows
+  const selectableRows = [model.totalRow, ...model.rows];
+  const series: ChartSeries[] = selectableRows
     .filter((row) => state.selectedIds.includes(row.itemId))
     .map((row) => ({
       id: row.itemId,
@@ -3325,23 +3289,19 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       planned: years.map(() => false),
     }));
 
-  const visibleWarnings = props.showWarnings ? model.warnings : [];
-
   const [seriesQuery, setSeriesQuery] = useState("");
   const visibleRows = useMemo(() => {
     const needle = seriesQuery.trim();
-    return needle === "" ? model.rows : model.rows.filter((row) => row.kaLabel.includes(needle));
-  }, [model.rows, seriesQuery]);
-  const allSelected = visibleRows.length > 0 && visibleRows.every((row) => state.selectedIds.includes(row.itemId));
+    return needle === "" ? [model.totalRow, ...model.rows] : [model.totalRow, ...model.rows].filter((row) => row.kaLabel.includes(needle));
+  }, [model, seriesQuery]);
+  const allSelected = selectableRows.length > 0 && selectableRows.every((row) => state.selectedIds.includes(row.itemId));
 
   function toggleAll() {
-    // Selecting every function would exceed the chart cap, so select-all is a
-    // table-mode affordance: in line mode it clears instead of overfilling.
-    if (allSelected || state.chartMode === "line") {
+    if (allSelected) {
       state.setSelectedIds([]);
       return;
     }
-    state.setSelectedIds(visibleRows.map((row) => row.itemId));
+    state.setSelectedIds(selectableRows.map((row) => row.itemId));
   }
 
   function downloadCsv() {
@@ -3458,15 +3418,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             <RangeStrip years={allYears} range={state.range} onChange={state.setRange} />
           </div>
 
-          {visibleWarnings.length > 0 ? (
-            <div className="mt-5">
-              <Callout testId="divergence-callout">
-                {visibleWarnings.map((warning) => warning.year).join(", ")} — {WARNING_TEXT[visibleWarnings[0]!.type] ?? "ოფიციალური ჯამი და ფუნქციური ჯამი განსხვავდება"}
-                {visibleWarnings[0]!.amountGel === null ? "" : ` (${formatAmount(Math.abs(visibleWarnings[0]!.amountGel))})`}.
-              </Callout>
-            </div>
-          ) : null}
-
           <div className="mt-5 max-w-[640px]">
             <SourceNote testId="municipal-source-note">{props.sourceNote}</SourceNote>
           </div>
@@ -3494,7 +3445,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             <div className="flex items-baseline justify-between pb-2.5">
               <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">სერიები</span>
               <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                {state.selectedIds.length} / {model.rows.length}
+                {state.selectedIds.length} / {selectableRows.length}
               </span>
             </div>
 
@@ -3525,7 +3476,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                 {allSelected ? "✓" : ""}
               </span>
               <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
-                {allSelected || state.chartMode === "line" ? "გასუფთავება" : "ყველას მონიშვნა"}
+                {allSelected ? "გასუფთავება" : "ყველას მონიშვნა"}
               </span>
             </button>
 
@@ -3562,11 +3513,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                 </button>
               );
             })}
-            {state.limitMessage ? (
-              <div className="mt-3">
-                <Callout testId="municipal-series-limit">{state.limitMessage}</Callout>
-              </div>
-            ) : null}
 
             <button
               type="button"
@@ -3735,12 +3681,11 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
           nationalTotalLatest={nationalTotalLatest}
           rank={rank}
           rankOutOf={municipalities.length}
-          showWarnings
           csvBasename={`municipality-${code}`}
           pickerGroups={buildPickerGroups(listInput)}
           prev={{ label: prev.displayNameKa, href: `/explorer/municipalities/${prev.code}` }}
           next={{ label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` }}
-          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). ოფიციალური ჯამი (ფინანსთა სამინისტრო) და ათი ფუნქციის ჯამი ორი განსხვავებული საზომია.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />
       </div>
     </main>
@@ -3769,7 +3714,7 @@ rather than casting.
 
 - [ ] **Step 7: Verify in the browser**
 
-Navigate to `/explorer/municipalities/04` and confirm: chart renders with 5 series; the mode toggle switches to a table whose numbers read in the hundreds, not `0.00`; the range strip narrows the chart; the divergence callout is present. Then find თელავი's code with `grep "თელავი" ../../data/imports/municipalities.csv` and confirm that page shows no callout.
+Navigate to `/explorer/municipalities/04` and confirm: chart renders with the total plus five functions; the mode toggle switches to a table whose numbers read in the hundreds, not `0.00`; the range strip narrows the chart; selecting every row renders every series without a limit or reconciliation callout.
 
 - [ ] **Step 8: Commit**
 
@@ -3910,11 +3855,6 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           nationalTotalLatest={nationalTotalLatest}
           rank={rank}
           rankOutOf={regions.length}
-          // No callout on a roll-up: its own two totals reconcile, and თბილისი
-          // and აჭარა each have a warning member in 9 of 11 years, so a
-          // region-level banner would be near-permanent on the two most-visited
-          // pages. The standing two-measures note below still applies.
-          showWarnings={false}
           csvBasename={`region-${id}`}
           pickerGroups={buildPickerGroups(listInput)}
           prev={{ label: prev.kaLabel, href: hrefFor(prev) }}
@@ -3957,7 +3897,7 @@ Expected: PASS.
 
 - [ ] **Step 3: Verify in the browser**
 
-Navigate to `/explorer/municipalities/region/imereti` and confirm: 12 member rows, the roll-up chart renders, no divergence callout, and the source note names the აჭარა and შიდა ქართლი caveats.
+Navigate to `/explorer/municipalities/region/imereti` and confirm: 12 member rows, the roll-up chart renders, and the source note names the აჭარა and შიდა ქართლი caveats.
 
 - [ ] **Step 4: Commit**
 
@@ -4136,21 +4076,19 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("explorer-table")).not.toContainText("0.00");
   });
 
-  test("enforces the six-series chart cap", async ({ page }) => {
+  test("renders every selected series without a cap", async ({ page }) => {
     await page.goto("/explorer/municipalities/04");
     const rows = page.getByTestId("municipal-series-row");
     for (let index = 0; index < 10; index += 1) {
       const row = rows.nth(index);
       if ((await row.getAttribute("aria-pressed")) === "false") await row.click();
     }
-    await expect(page.getByTestId("municipal-series-limit")).toBeVisible();
+    await expect(page.locator("[data-testid='editorial-line-chart'] path[data-series]")).toHaveCount(11);
   });
 
-  test("shows the divergence callout only where the data diverges", async ({ page }) => {
+  test("does not render a reconciliation callout", async ({ page }) => {
     await page.goto("/explorer/municipalities/04");
-    await expect(page.getByTestId("divergence-callout")).toBeVisible();
-    await page.goto("/explorer/municipalities/22");
-    await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
+    await expect(page.getByTestId("municipal-source-note")).toBeVisible();
   });
 
   test("opens the entity picker with the keyboard", async ({ page }) => {
@@ -4179,17 +4117,16 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("municipal-series-row").first()).toHaveAttribute("aria-pressed", "false");
   });
 
-  test("selects every function in table mode", async ({ page }) => {
+  test("selects every row globally", async ({ page }) => {
     await page.goto("/explorer/municipalities/04");
-    await page.getByTestId("municipal-mode-table").click();
     await page.getByTestId("municipal-series-all").click();
-    // Table mode has no six-series cap, so select-all must leave all ten rows
+    // Global select-all must leave the official total and all ten functions
     // pressed. Asserting the count of pressed rows is the point of this test:
     // a locator on its own is always truthy and would pass unconditionally.
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(10);
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(11);
     await expect(
       page.getByTestId("municipal-series-row").filter({ has: page.locator("[aria-pressed='true']") }),
-    ).toHaveCount(10);
+    ).toHaveCount(11);
     await expect(page.getByTestId("municipal-series-all")).toHaveAttribute("aria-pressed", "true");
   });
 
@@ -4218,7 +4155,6 @@ test.describe("region page", () => {
     await page.goto("/explorer/municipalities/region/imereti");
     await expect(page.getByTestId("region-member-row")).toHaveCount(12);
     await expect(page.getByTestId("municipal-source-note").first()).toContainText("აჭარის ავტონომიური რესპუბლიკის");
-    await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
   });
 });
 
@@ -4256,7 +4192,7 @@ Expected: PASS. This catches any regression in the landing hero (Task 1) or the 
 - §6.2, add the three routes to the IA block and drop `მალე` from the municipalities entry.
 - §6.7, hub-card table: card 03 gains `total municipal series, Sparkline at 200×34 in ink`, footer `{latestYear} · {total}`, links to `/explorer/municipalities`. Delete the paragraph describing card 03 as not-a-link.
 - §6.7, sidebar: `მუნიციპალიტეტები` is now an ordinary section link; only the four indicator teasers keep `მალე`.
-- Add a new section specifying the municipal surfaces: the region-grain map and why (no openly-licensed ADM2 geometry matches the 64-unit registry), the two labelled totals, the year-scoped callout on municipality pages only, and the `მლნ ₾` unit.
+- Add a new section specifying the municipal surfaces: the region-grain map and why (no openly-licensed ADM2 geometry matches the 64-unit registry), the one public official total with internal reconciliation, and the `მლნ ₾` unit.
 
 `AGENTS.md`, Current Project State: change "served for 2015-2025 … as **data only** … no route reads the data, and the `მალე` marker stays" to record that the section is routed at `/explorer/municipalities`, with a region-grain map, and that a municipality-level ADM2 map remains a future spec.
 

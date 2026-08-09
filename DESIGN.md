@@ -413,7 +413,7 @@ Full-width block, h38, ink bg, paper text, sans 12.5/600, radius 2px. Hover: opa
 
 ### 7.9 Callout / Notice
 
-Tint bg, `2px accent` left border, sans 11.5–12.5px, `body` color, max-width 560px. Used for series limit, empty selection, no-growth-data, and load-error states.
+Tint bg, `2px accent` left border, sans 11.5–12.5px, `body` color, max-width 560px. Used for empty selection, no-growth-data, and load-error states.
 
 ### 7.10 Source Note
 
@@ -468,7 +468,7 @@ Confirmed source: `GeoData Platform - Editorial v2.dc.html` (Explorer + Indicato
 
 ### 8.1 Defaults
 
-Side: expenditure. Grouping: fields. Mode: line. Measure: nominal GEL. Range: full available per scope. Selection: **top 5 categories by latest-year value** per scope (fields, ministries, and revenue each keep their own selection and range). Chart series limit: 6 (table mode unlimited). The limit holds on every path into line mode: toggling past it shows the limit callout, and a larger selection arriving from table mode or a shared hash keeps the full selection but draws only the first 6 series with the callout `ხაზის რეჟიმში ნაჩვენებია პირველი 6 სერია…`. The derived total is not a selectable series — totals appear in the table `სულ` row, deck line, and hero KPI.
+Side: expenditure. Grouping: fields. Mode: line. Measure: nominal GEL. Range: full available per scope. Selection: **total plus the top 5 categories by latest-year value** per scope (fields, ministries, and revenue each keep their own selection and range). The total is first, ink-coloured, selectable, and removable. Series selection is unlimited: the header shows `სერიები {selected} / {all}` and switches between `გასუფთავება` and `ყველას მონიშვნა`; search filters visible rows only and never scopes the bulk action.
 
 ### 8.2 Layout
 
@@ -479,7 +479,7 @@ workspace:
   gap: "40px"
 ```
 
-Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline + mono count (`n / 6` in line mode, `n` in table mode; count turns accent at the limit), grouping tabs (expenditure only, §7.2b), search, series rows (scroll ≤430px), CSV button.
+Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline + mono count (`{selected} / {all}`), grouping tabs (expenditure only, §7.2b), search, global clear/select-all action, series rows (scroll ≤430px), CSV button.
 
 ### 8.3 Line Chart
 
@@ -574,7 +574,6 @@ Empty/error copy explains what happened and what to do, e.g.:
 
 ```text
 არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.
-გრაფიკზე მაქსიმუმ 6 სერია შეიძლება. ცხრილის რეჟიმში ლიმიტი არ არის.
 მონაცემები ვერ ჩაიტვირთა. განაახლე გვერდი — თუ პრობლემა გაგრძელდება, სცადე მოგვიანებით.
 ```
 
@@ -685,7 +684,7 @@ Do not:
 1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only; the budget hub's four cards are the one card exception, §6.6).
 2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), not in-page nav tabs.
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
-4. Explorer default: line mode, nominal GEL, full range, top-5 selection, 6-series chart limit with callout.
+4. Explorer default: line mode, nominal GEL, full range, total-plus-top-five selection, and unrestricted line rendering.
 5. Only `ხაზი` and `ცხრილი` modes exist; `% წილი` is the only pill.
 6. Swatches are 14×3px bars everywhere.
 7. Category colors match §4.2 on every surface.
@@ -720,8 +719,6 @@ Reference implementation: `apps/web/components/municipalities/`, routes under `a
 
 **Region-grain map, not municipality-grain.** The index page's choropleth colors 12 ADM1 shapes: the 11 data-bearing regions by latest-year total, plus აფხაზეთი drawn as an explicit no-data shape (dashed stroke, excluded from the tab order). It does not draw all 64 municipality boundaries — no openly-licensed ADM2 (municipality-level) geometry matches the 64-unit served registry, so a municipality-grain map is deferred to a future spec (`lib/explorer/municipalGeo.ts`'s own header comment records this). Geometry is geoBoundaries `gbOpen` GEO ADM1 (release `9469f09`), CC BY 3.0 — it replaced GADM, which permits non-commercial use but forbids redistribution, and shipping coordinates to every visitor's browser is redistribution. CC BY permits that but requires attribution, which the index page's source note carries: `საზღვრები: geoBoundaries (gbOpen GEO ADM1), CC BY 3.0.` (full provenance: `lib/landing/georgiaGeo.ts`'s header comment; the shape↔region join: `lib/explorer/municipalGeo.ts`, documented in `docs/data-methodology/municipal-functional-annual-2015-2025.md`). Self-governing cities (თბილისი, ბათუმი, ქუთაისი, ფოთი, რუსთავი — the registry's `is_self_governing_city` flag, an administrative status, not a ranking by budget) additionally get their own city-dot markers on top of the region fill: they are municipalities in their own right, so the dots give the region-grain map a second entry point straight into the municipality grain, without needing municipality-grain polygons. Each is still counted inside its own region's aggregate.
 
-**Two labelled totals, not one.** Every municipal and region surface can show two different sums for the same year: the official Ministry of Finance headline (`ოფიციალური ბიუჯეტი`), and the sum of the ten served functional categories. The two are computed independently and are never reconciled by adjusting a category — they genuinely diverge in some municipality-years. The chart, the table's `სულ` row, and the CSV export always read the functional sum, since only the ten functions are chartable series; each page's "largest function" KPI is likewise computed on the functional sum, because a function's share can only be a share of the functional total. Everything else — the index list, the index's other KPIs, the map colour, and each entity page's headline KPI — reads the official total. Every municipal surface carries a standing source-note sentence naming the two as different measures (§7.10), whether or not the callout below is showing.
-
-**The divergence callout is scoped to municipality pages only.** When a municipality's two totals differ by more than GEL 1,000,000 in a year inside the selected range (methodology and public wording: `docs/data-methodology/municipal-functional-annual-2015-2025.md`), a §7.9 `Callout` names the affected years; narrowing the range past every warning year removes it. Region roll-up pages never show it. Their official and functional totals are summed independently and can still diverge, but the warning type and reconciliation explanation are municipality-grain provenance that cannot be assigned honestly to the aggregate. Aggregating member warnings would also make the callout near-permanent on heavily visited regions. The standing source note therefore labels the two region measures without presenting a misleading roll-up warning.
+**One public total.** `მთლიანი ბიუჯეტი` uses `public_total_gel` in the selector, chart, table, KPIs, comparisons, percentage denominator, and numeric CSV total row. The ten functions remain unchanged; their shares can sum below or above 100%. No residual category or reconciliation warning appears in the explorer. The methodology document explains the source-version and financing differences.
 
 **Unit: `მლნ ₾`, not `მლრდ ₾`.** Municipal budgets run one to three orders of magnitude below the national totals the rest of the explorer charts in billions; a billions axis would round most municipal functions to `0.0`. The municipal chart and table pass `UNIT_MLN` (`lib/explorer/format.ts` — one decimal, million GEL) to the same `EditorialLineChart`/`ExplorerTable` the budget explorer passes `UNIT_BN` to. KPI values, list rows, and the entity picker use `formatAmount`, which already auto-selects `მლნ ₾` below ~1bn GEL on its own.
