@@ -16,7 +16,7 @@ import { georgianOrdinal } from "./municipalLabels";
 // consume (ExplorerTableRow, and ChartSeries built from it), so those components
 // are reused untouched. It deliberately does not go through buildExplorerModel:
 // that model is built around sides, groupings and a national item×year grain,
-// while this one is municipality×function×year with two separate totals.
+// while this one is municipality×function×year.
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
 export const MAX_MUNICIPAL_CHART_SERIES = 6;
@@ -273,10 +273,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
 }
 
 /**
- * Top five functions by latest-year value. Derived totals are never selectable
- * series (AGENTS.md "UX and Visual Guardrails") — the total lives in the table's
- * სულ row and the KPI, which is why the design file's pinned __total entry is
- * deliberately not reproduced.
+ * Official total followed by the top five functions by latest-year value.
  */
 export function getDefaultMunicipalSelection(model: MunicipalEntityModel): string[] {
   const lastYear = model.years.at(-1);
@@ -287,7 +284,7 @@ export function getDefaultMunicipalSelection(model: MunicipalEntityModel): strin
     ...model.rows
       .slice()
       .sort((left, right) => (right.valuesByYear[lastYear] ?? 0) - (left.valuesByYear[lastYear] ?? 0))
-      .slice(0, MAX_MUNICIPAL_CHART_SERIES - 1)
+      .slice(0, 5)
       .map((row) => row.itemId),
   ];
 }
@@ -506,7 +503,7 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
   return [
     {
       label: "ოფიციალური ბიუჯეტი",
-      value: formatAmount(officialEnd ?? 0),
+      value: formatAmount(officialEnd),
       detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
     },
     {

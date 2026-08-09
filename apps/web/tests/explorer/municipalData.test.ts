@@ -17,7 +17,7 @@ import {
   MIXED_SOURCE_ID,
   regionFactsFor,
 } from "../../lib/explorer/municipalData";
-import { formatAmount } from "../../lib/explorer/format";
+import { formatAmount, MISSING } from "../../lib/explorer/format";
 
 const FUNCTIONS: MunicipalFunction[] = [
   { id: "municipal.economic_affairs", kaLabel: "ეკონომიკური საქმიანობა", functionalCode: "7.4", sortOrder: 4 },
@@ -158,6 +158,37 @@ describe("getDefaultMunicipalSelection", () => {
       "municipal.economic_affairs",
       "municipal.education",
       "municipal.health",
+    ]);
+  });
+
+  it("selects the total and exactly five functions when more functions are available", () => {
+    const extendedFunctions: MunicipalFunction[] = [
+      ...FUNCTIONS,
+      { id: "municipal.one", kaLabel: "ერთი", functionalCode: "7.1", sortOrder: 1 },
+      { id: "municipal.two", kaLabel: "ორი", functionalCode: "7.2", sortOrder: 2 },
+      { id: "municipal.three", kaLabel: "სამი", functionalCode: "7.3", sortOrder: 3 },
+    ];
+    const model = buildMunicipalEntityModel({
+      functions: extendedFunctions,
+      functionFacts: [
+        ...FUNCTION_FACTS,
+        { year: 2017, municipalityCode: "04", categoryId: "municipal.one", functionalCode: "7.1", amountGel: 600, basis: "actual", sourceId: "source.municipal_portal_archive" },
+        { year: 2017, municipalityCode: "04", categoryId: "municipal.two", functionalCode: "7.2", amountGel: 500, basis: "actual", sourceId: "source.municipal_portal_archive" },
+        { year: 2017, municipalityCode: "04", categoryId: "municipal.three", functionalCode: "7.3", amountGel: 400, basis: "actual", sourceId: "source.municipal_portal_archive" },
+      ],
+      totalFacts: TOTAL_FACTS,
+      sourceDocuments: SOURCES,
+      startYear: 2015,
+      endYear: 2017,
+    });
+
+    expect(getDefaultMunicipalSelection(model)).toEqual([
+      "municipal.total",
+      "municipal.one",
+      "municipal.two",
+      "municipal.three",
+      "municipal.economic_affairs",
+      "municipal.education",
     ]);
   });
 });
@@ -773,6 +804,14 @@ describe("buildEntityKpis", () => {
     expect(divergent[0]!.detail).toContain("ფინანსთა სამინისტროს");
     expect(model.totalRow.valuesByYear[2016]).toBe(300);
     expect(divergent[0]!.value).toBe(formatAmount(300));
+  });
+
+  it("keeps a missing official end total missing instead of rendering zero", () => {
+    const model = build();
+    model.totalRow.valuesByYear[2017] = null;
+    const missing = buildEntityKpis({ model, nationalTotalByYear, rankByYear, rankOutOf: 64 });
+
+    expect(missing[0]!.value).toBe(MISSING);
   });
 
   it("renders the official total's own formatted string, distinguishable from the functional one", () => {
