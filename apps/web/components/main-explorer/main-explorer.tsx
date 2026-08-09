@@ -54,10 +54,10 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
     range,
     setRange,
     selectedIds,
-    limitMessage,
     expandedMinistries,
     toggleMinistryExpanded,
     toggleSeries,
+    setSelectedSeries,
     handleGroupingChange,
     handleChartModeChange,
     analysisSide,
@@ -256,13 +256,13 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
             range={range}
             scopeYears={scopeYears}
             selectedIds={selectedIds}
-            limitMessage={limitMessage}
             expandedMinistries={expandedMinistries}
             lastUpdatedAt={lastUpdatedAt}
             onGroupingChange={handleGroupingChange}
             onChartModeChange={handleChartModeChange}
             onShareChange={setShare}
             onRangeChange={(patch) => setRange(scope, patch)}
+            onSelectionChange={setSelectedSeries}
             onToggleSeries={toggleSeries}
             onToggleExpanded={toggleMinistryExpanded}
             onDownloadCsv={downloadCsv}

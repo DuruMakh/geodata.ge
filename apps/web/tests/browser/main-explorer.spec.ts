@@ -60,7 +60,7 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   await expectLineChartRendered(page);
   await expect(page.getByTestId("series-selector")).toBeVisible();
   await expect(page.getByTestId("series-selector")).toContainText("სერიები");
-  await expect(page.getByTestId("series-selector")).toContainText("5 / 6");
+  await expect(page.getByTestId("series-selector")).toContainText(/სერიები\s*6 \/ \d+/);
   await expect(page.getByTestId("source-label")).toContainText("გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები");
   await expect(page.getByTestId("source-label")).toContainText("2005–2025");
 
@@ -72,6 +72,30 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
 
   await expectNoPageOverflow(page);
   expect(consoleProblems).toEqual([]);
+});
+
+test("series header clears and selects every series independently of search", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const panel = page.getByTestId("series-selector");
+  const bulk = panel.getByTestId("series-toggle-all");
+  const seriesButtons = panel.locator("button[title]");
+
+  await expect(panel.locator('[data-level="total"]').first()).toContainText("მთლიანი ხარჯი");
+  await expect(panel).toContainText(/სერიები\s*6 \/ \d+/);
+  await expect(bulk).toHaveText("გასუფთავება");
+
+  await bulk.click();
+  await expect(panel.locator('button[title][aria-pressed="true"]')).toHaveCount(0);
+  await expect(bulk).toHaveText("ყველას მონიშვნა");
+
+  await panel.getByTestId("series-search").fill("ჯანმრთელობა");
+  await bulk.click();
+  await panel.getByTestId("series-search").fill("");
+
+  const allCount = await seriesButtons.count();
+  await expect(panel.locator('button[title][aria-pressed="true"]')).toHaveCount(allCount);
 });
 
 test("explorer controls expose line, table, grouping, and the share pill", async ({ page }) => {
@@ -129,21 +153,10 @@ test("sidebar section links move between sections in-app", async ({ page }) => {
   const sidebar = page.getByTestId("data-sidebar");
   await expect(sidebar.getByTestId("section-link-expenditure")).toHaveAttribute("aria-current", "page");
 
-  // Fill the line-mode series budget, then overflow it: the callout that appears
-  // is component state, and it must not follow the user into another section.
-  // Two clicks assume the documented top-5 default, so pin it — otherwise a
-  // changed default would fail below with an unrelated-looking message.
-  await expect(page.getByTestId("series-selector")).toContainText("5 / 6");
-  const unselected = page.getByTestId("series-selector").locator('button[title][aria-pressed="false"]');
-  await unselected.first().click();
-  await unselected.first().click();
-  await expect(page.getByTestId("series-limit-callout")).toBeVisible();
-
   await sidebar.getByTestId("section-link-revenue").click();
   await expect(page).toHaveURL(/\/explorer\/revenue/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება საქართველოს ბიუჯეტი");
   await expect(page.getByTestId("series-selector")).toContainText("დამატებული ღირებულების გადასახადი");
-  await expect(page.getByTestId("series-limit-callout")).toHaveCount(0);
   await expect(sidebar.getByTestId("section-link-revenue")).toHaveAttribute("aria-current", "page");
   await expect(sidebar.getByTestId("section-link-expenditure")).not.toHaveAttribute("aria-current", "page");
 

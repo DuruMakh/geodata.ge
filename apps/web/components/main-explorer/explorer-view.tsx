@@ -24,13 +24,13 @@ type ExplorerViewProps = {
   range: ResolvedRange;
   scopeYears: number[];
   selectedIds: string[];
-  limitMessage: string | null;
   expandedMinistries: string[];
   lastUpdatedAt: string;
   onGroupingChange: (grouping: ExpenditureGrouping) => void;
   onChartModeChange: (mode: ChartMode) => void;
   onShareChange: (share: boolean) => void;
   onRangeChange: (patch: { start?: number; end?: number }) => void;
+  onSelectionChange: (itemIds: string[]) => void;
   onToggleSeries: (itemId: string) => void;
   onToggleExpanded: (itemId: string) => void;
   onDownloadCsv: () => void;
@@ -68,13 +68,13 @@ export function ExplorerView({
   range,
   scopeYears,
   selectedIds,
-  limitMessage,
   expandedMinistries,
   lastUpdatedAt,
   onGroupingChange,
   onChartModeChange,
   onShareChange,
   onRangeChange,
+  onSelectionChange,
   onToggleSeries,
   onToggleExpanded,
   onDownloadCsv,
@@ -197,16 +197,15 @@ export function ExplorerView({
         <SeriesPanel
           key={scope}
           items={model.items}
-          rows={model.comparisonRows}
+          rows={model.totalRow ? [model.totalRow, ...model.comparisonRows] : model.comparisonRows}
           scope={scope}
           showGrouping={showGrouping}
           grouping={grouping}
           selectedIds={selectedIds}
-          chartMode={chartMode}
           endYear={range.end}
-          limitMessage={limitMessage}
           expandedIds={expandedMinistries}
           onGroupingChange={onGroupingChange}
+          onSelectionChange={onSelectionChange}
           onToggle={onToggleSeries}
           onToggleExpanded={onToggleExpanded}
           onDownloadCsv={onDownloadCsv}

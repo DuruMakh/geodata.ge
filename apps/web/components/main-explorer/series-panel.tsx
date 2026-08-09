@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import type { ExplorerItem, ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
-import { MAX_CHART_SERIES, type ChartMode } from "../../lib/explorer/types";
 import { formatAmount } from "../../lib/explorer/format";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
-import { Callout, SwatchBar, TextTab } from "../ui/editorial";
+import { SwatchBar, TextTab } from "../ui/editorial";
 
 // Series aside per DESIGN.md §7.6–7.8: flat editorial rows with a checkbox square,
 // swatch bar on selection, and (for ministries) caret-expandable major programs.
@@ -72,11 +71,10 @@ type SeriesPanelProps = {
   showGrouping: boolean;
   grouping: ExpenditureGrouping;
   selectedIds: string[];
-  chartMode: ChartMode;
   endYear: number;
-  limitMessage: string | null;
   expandedIds: string[];
   onGroupingChange: (grouping: ExpenditureGrouping) => void;
+  onSelectionChange: (itemIds: string[]) => void;
   onToggle: (itemId: string) => void;
   onToggleExpanded: (itemId: string) => void;
   onDownloadCsv: () => void;
@@ -89,11 +87,10 @@ export function SeriesPanel({
   showGrouping,
   grouping,
   selectedIds,
-  chartMode,
   endYear,
-  limitMessage,
   expandedIds,
   onGroupingChange,
+  onSelectionChange,
   onToggle,
   onToggleExpanded,
   onDownloadCsv,
@@ -104,7 +101,8 @@ export function SeriesPanel({
   const [query, setQuery] = useState("");
   const valuesByItem = new Map(rows.map((row) => [row.itemId, row]));
   const panelRows = buildSeriesPanelRows(items, query, expandedIds);
-  const atLimit = chartMode !== "table" && selectedIds.length >= MAX_CHART_SERIES;
+  const selectableIds = items.map((item) => item.id);
+  const hasSelection = selectedIds.length > 0;
   const isMinistries = scope === "ministries";
 
   return (
@@ -113,14 +111,21 @@ export function SeriesPanel({
       data-testid="series-selector"
       className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
     >
-      <div className="flex items-baseline justify-between gap-2">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">სერიები</h2>
-        <span
-          className="font-[family-name:var(--font-numeric)] text-[11px] font-medium"
-          style={{ color: atLimit ? "var(--accent)" : "var(--ink)" }}
+      <div className="flex items-baseline justify-between gap-3 border-b-2 border-[var(--ink)] pb-2.5">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--ink)]">
+          სერიები{" "}
+          <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--muted)]">
+            {selectedIds.length} / {selectableIds.length}
+          </span>
+        </h2>
+        <button
+          type="button"
+          data-testid="series-toggle-all"
+          onClick={() => onSelectionChange(hasSelection ? [] : selectableIds)}
+          className="cursor-pointer text-[11px] font-medium text-[var(--accent)] underline underline-offset-4"
         >
-          {chartMode === "table" ? String(selectedIds.length) : `${selectedIds.length} / ${MAX_CHART_SERIES}`}
-        </span>
+          {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}
+        </button>
       </div>
 
       {showGrouping ? (
@@ -138,12 +143,6 @@ export function SeriesPanel({
         aria-label="ძებნა სერიებში"
         className="mt-3.5 h-[34px] w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted)]"
       />
-
-      {limitMessage ? (
-        <div className="mt-3">
-          <Callout testId="series-limit-callout">{limitMessage}</Callout>
-        </div>
-      ) : null}
 
       {query.trim() && panelRows.length === 0 ? (
         <p className="mt-3.5 border-b border-[var(--row-border)] px-1 py-3 text-xs text-[var(--muted)]">
