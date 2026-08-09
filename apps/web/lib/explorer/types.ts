@@ -11,8 +11,6 @@ export type ExpenditureGrouping = "fields" | "ministries";
 export type ExplorerScope = "fields" | "ministries" | "revenue";
 export type ExplorerItemLevel = "total" | "public_field" | "admin_category" | "major_program" | "municipal_function";
 
-export const MAX_CHART_SERIES = 6;
-
 export type SourceMetadata = {
   sourceName: string;
   sourceUrlOrFile: string;

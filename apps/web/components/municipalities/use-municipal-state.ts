@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MAX_CHART_SERIES, type ChartMode } from "../../lib/explorer/types";
+import type { ChartMode } from "../../lib/explorer/types";
+import { MAX_MUNICIPAL_CHART_SERIES } from "../../lib/explorer/municipalData";
 import { parseMunicipalHash, serializeMunicipalHash } from "../../lib/explorer/urlState";
 
-const SERIES_LIMIT_MESSAGE = `გრაფიკზე მაქსიმუმ ${MAX_CHART_SERIES} სერია შეიძლება. ცხრილის რეჟიმში ლიმიტი არ არის.`;
+const SERIES_LIMIT_MESSAGE = `გრაფიკზე მაქსიმუმ ${MAX_MUNICIPAL_CHART_SERIES} სერია შეიძლება. ცხრილის რეჟიმში ლიმიტი არ არის.`;
 
 function clampYear(year: number, min: number, max: number): number {
   return Math.min(Math.max(year, min), max);
@@ -72,7 +73,7 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
   }, [hash]);
 
   function toggleSeries(itemId: string) {
-    if (!selectedIds.includes(itemId) && chartMode !== "table" && selectedIds.length >= MAX_CHART_SERIES) {
+    if (!selectedIds.includes(itemId) && chartMode !== "table" && selectedIds.length >= MAX_MUNICIPAL_CHART_SERIES) {
       setLimitMessage(SERIES_LIMIT_MESSAGE);
       return;
     }

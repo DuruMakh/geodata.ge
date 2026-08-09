@@ -127,7 +127,9 @@ export function Indicators({ model, scope }: IndicatorsProps) {
     ...comparisonRows.filter((row) => row.level !== "major_program").map((row) => Math.abs(row.change ?? 0)),
     0.001,
   );
-  const comparisonSorted = [...tableRows].sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0));
+  const comparisonSorted = tableRows
+    .filter((row) => row.level !== "total")
+    .sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0));
 
   const comparisonCell = (value: number | null | undefined) => (value === null || value === undefined ? MISSING : formatBn(value));
 

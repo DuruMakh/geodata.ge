@@ -7,7 +7,6 @@ import type {
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
 import type { ExplorerTableRow, SourceMetadata } from "./types";
-import { MAX_CHART_SERIES } from "./types";
 import { colorForItem, INK } from "./colors";
 import { formatAmount, formatShare, MISSING } from "./format";
 import { georgianOrdinal } from "./municipalLabels";
@@ -21,6 +20,7 @@ import { georgianOrdinal } from "./municipalLabels";
 // while this one is municipality×function×year with two separate totals.
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
+export const MAX_MUNICIPAL_CHART_SERIES = 6;
 
 export type MunicipalWarning = {
   year: number;
@@ -309,7 +309,7 @@ export function getDefaultMunicipalSelection(model: MunicipalEntityModel): strin
   return model.rows
     .slice()
     .sort((left, right) => (right.valuesByYear[lastYear] ?? 0) - (left.valuesByYear[lastYear] ?? 0))
-    .slice(0, Math.min(5, MAX_CHART_SERIES))
+    .slice(0, Math.min(5, MAX_MUNICIPAL_CHART_SERIES))
     .map((row) => row.itemId);
 }
 

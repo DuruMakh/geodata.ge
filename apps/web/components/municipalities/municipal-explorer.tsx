@@ -11,11 +11,12 @@ import {
   buildMovers,
   buildMunicipalEntityModel,
   getDefaultMunicipalSelection,
+  MAX_MUNICIPAL_CHART_SERIES,
   type MunicipalWarning,
 } from "../../lib/explorer/municipalData";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { formatAmount, UNIT_MLN } from "../../lib/explorer/format";
-import { MAX_CHART_SERIES, type ChartMode } from "../../lib/explorer/types";
+import type { ChartMode } from "../../lib/explorer/types";
 import { Callout, SegmentedTabs, SourceNote, SwatchBar } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -124,8 +125,8 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
     }));
 
   const noSelection = state.selectedIds.length === 0;
-  const chartSeries = series.slice(0, MAX_CHART_SERIES);
-  const overLimit = state.chartMode === "line" && !noSelection && series.length > MAX_CHART_SERIES;
+  const chartSeries = series.slice(0, MAX_MUNICIPAL_CHART_SERIES);
+  const overLimit = state.chartMode === "line" && !noSelection && series.length > MAX_MUNICIPAL_CHART_SERIES;
   const warningGroups = useMemo(() => {
     const groups = new Map<MunicipalWarning["type"], MunicipalWarning[]>();
     const visibleWarnings = props.showWarnings ? model.warnings : [];
@@ -266,7 +267,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               {overLimit ? (
                 <div className="mb-4">
                   <Callout testId="series-overflow-callout">
-                    ხაზის რეჟიმში ნაჩვენებია პირველი {MAX_CHART_SERIES} სერია. მოხსენი ზედმეტი ან გადადი ცხრილის რეჟიმში.
+                    ხაზის რეჟიმში ნაჩვენებია პირველი {MAX_MUNICIPAL_CHART_SERIES} სერია. მოხსენი ზედმეტი ან გადადი ცხრილის რეჟიმში.
                   </Callout>
                 </div>
               ) : null}
@@ -276,6 +277,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             <ExplorerTable
               rows={model.rows}
               totalRow={model.totalRow}
+              showTotal
               years={years}
               firstColumnLabel="ფუნქცია"
               unit={UNIT_MLN}

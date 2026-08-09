@@ -2,7 +2,7 @@
 
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import { UNIT_BN } from "../../lib/explorer/format";
-import { MAX_CHART_SERIES, type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
+import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
 import { ExplorerTable } from "./explorer-table";
@@ -100,10 +100,6 @@ export function ExplorerView({
   const coverage =
     scopeYears.length > 0 ? `${COVERAGE_NOTE[scope]}: ${scopeYears[0]}–${scopeYears.at(-1)}` : COVERAGE_NOTE[scope];
 
-  // The line chart honors the series cap even when a larger selection arrives from
-  // table mode or a shared hash (DESIGN.md §8.1: exceeding shows the callout).
-  const chartSeries = series.slice(0, MAX_CHART_SERIES);
-  const overLimit = chartMode === "line" && !noSelection && series.length > MAX_CHART_SERIES;
   // A non-empty selection can still have zero coverage in the active range
   // (e.g. a program series with a pre-2016 range) — say so instead of drawing
   // a fabricated empty axis or a total-only table.
@@ -156,8 +152,9 @@ export function ExplorerView({
               </div>
             ) : chartMode === "table" ? (
               <ExplorerTable
-                rows={model.tableRows}
+                rows={model.tableRows.filter((row) => row.level !== "total")}
                 totalRow={model.totalRow}
+                showTotal={Boolean(model.totalRow && selectedIds.includes(model.totalRow.itemId))}
                 years={model.years}
                 firstColumnLabel={FIRST_COL_LABEL[scope]}
                 unit={UNIT_BN}
@@ -165,14 +162,7 @@ export function ExplorerView({
               />
             ) : (
               <div className="mt-5">
-                {overLimit ? (
-                  <div className="mb-4">
-                    <Callout testId="series-overflow-callout">
-                      ხაზის რეჟიმში ნაჩვენებია პირველი {MAX_CHART_SERIES} სერია. მოხსენი ზედმეტი ან გადადი ცხრილის რეჟიმში.
-                    </Callout>
-                  </div>
-                ) : null}
-                <EditorialLineChart years={model.years} series={chartSeries} share={share} unit={UNIT_BN} />
+                <EditorialLineChart years={model.years} series={series} share={share} unit={UNIT_BN} />
               </div>
             )}
 

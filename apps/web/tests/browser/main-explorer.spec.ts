@@ -69,6 +69,7 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   await expect(page.getByTestId("period-kpi-cards")).toContainText("პერიოდის ცვლილება");
   await expect(page.getByTestId("period-movers")).toContainText("ყველაზე მზარდი");
   await expect(page.getByTestId("period-comparison")).toContainText("პერიოდის შედარება");
+  await expect(page.getByTestId("period-comparison").locator("tbody tr")).toHaveCount(6);
 
   await expectNoPageOverflow(page);
   expect(consoleProblems).toEqual([]);
@@ -116,7 +117,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
 
   await chartPanel.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table")).toBeVisible();
-  await expect(page.getByTestId("explorer-table")).toContainText("სულ");
+  await expect(page.getByTestId("explorer-table")).toContainText("მთლიანი ხარჯი");
   await expect(page.getByTestId("explorer-table")).toContainText("ცვლილება");
 
   await chartPanel.getByTestId("chart-mode-line").click();
@@ -253,18 +254,18 @@ test("URL hash round-trips explorer state", async ({ page }) => {
   await expect(page).toHaveURL(/#.*m=table/);
   await expect(page).toHaveURL(/sh=1/);
 
-  await page.goto("http://localhost:3100/explorer/revenue#m=table&sh=1&r=2010-2020&sel=revenue.vat");
+  await page.goto("http://localhost:3100/explorer/revenue#m=table&sh=1&r=2010-2020&sel=revenue.total,revenue.vat");
   await page.reload();
   await expectAppReady(page);
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება საქართველოს ბიუჯეტი");
   await expect(page.getByTestId("explorer-table")).toBeVisible();
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2020");
-  await expect(page.getByTestId("series-selector")).toContainText("1");
+  await expect(page.getByTestId("series-selector").getByTitle("მთლიანი შემოსავლები")).toHaveAttribute("aria-pressed", "true");
 });
 
-test("line mode caps over-limit shared selections with a callout", async ({ page }) => {
-  const sel = [
+test("line mode renders every series from a large shared selection", async ({ page }) => {
+  const ids = [
     "spending.social_protection",
     "spending.health",
     "spending.education",
@@ -273,17 +274,27 @@ test("line mode caps over-limit shared selections with a callout", async ({ page
     "spending.economic_affairs",
     "spending.culture",
     "spending.sport",
-  ].join(",");
+  ];
 
-  await page.goto(`http://localhost:3100/explorer/expenditure#m=line&sel=${sel}`);
+  await page.goto(`http://localhost:3100/explorer/expenditure#m=line&sel=${ids.join(",")}`);
   await page.reload();
   await expectAppReady(page);
 
-  // The full selection is kept (table mode can show it), but the line chart
-  // draws only the first 6 series and says so.
-  await expect(page.getByTestId("series-overflow-callout")).toBeVisible();
-  await expect(page.getByTestId("series-selector")).toContainText("8 / 6");
-  expect(await page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']").count()).toBe(6);
+  await expect(page.getByTestId("series-overflow-callout")).toHaveCount(0);
+  await expect(page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']")).toHaveCount(ids.length);
+});
+
+test("unchecking the total hides its table row without breaking share denominators", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/revenue");
+  await expectAppReady(page);
+  await page.getByTestId("chart-mode-table").click();
+  await page.getByTestId("measure-share-toggle").click();
+
+  const totalButton = page.getByTestId("series-selector").getByTitle("მთლიანი შემოსავლები");
+  await totalButton.click();
+
+  await expect(page.getByTestId("explorer-table")).not.toContainText("მთლიანი შემოსავლები");
+  await expect(page.getByTestId("explorer-table").locator("tbody tr").first()).toContainText("%");
 });
 
 test("shared ministries program links restore with the parent expanded", async ({ page }) => {
@@ -328,6 +339,7 @@ test("CSV download uses the active filtered table data", async ({ page }) => {
     "year,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at",
   );
   expect(csv).toContain("spending.");
+  expect(csv).toContain("expenditure.total");
   expect(csv).toContain("actual");
 });
 

@@ -39,9 +39,9 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
 
   const idsByScope = useMemo<Record<ExplorerScope, Set<string>>>(
     () => ({
-      fields: new Set(facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.itemId)),
-      revenue: new Set(facts.filter((fact) => fact.side === "revenue").map((fact) => fact.itemId)),
-      ministries: new Set(adminFacts.map((fact) => fact.itemId)),
+      fields: new Set(["expenditure.total", ...facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.itemId)]),
+      revenue: new Set(["revenue.total", ...facts.filter((fact) => fact.side === "revenue").map((fact) => fact.itemId)]),
+      ministries: new Set(["admin_spending.total", ...adminFacts.map((fact) => fact.itemId)]),
     }),
     [facts, adminFacts],
   );
