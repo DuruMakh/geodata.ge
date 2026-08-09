@@ -340,18 +340,17 @@ placement figure that per-capita was there to provide.
 - **Movers board** per DESIGN.md §7.13: grid `24px 1fr 96px 72px`, two columns
   `ყველაზე მზარდი` / `ყველაზე ნელი ზრდა`. A bottom mover that is still growing
   keeps the `ნელი ზრდა` wording — never call growth a loss.
-- **`პერიოდის შედარება`**: total plus ten functions, from / change / to across
-  the selected range. The budget explorer has no comparison table, so this is
-  the one element here without a counterpart elsewhere in the app. It is
-  included because with only ten functions the municipality page is otherwise
-  thinner than the budget pages, and it answers "what changed over the period"
-  in a single view.
+- **`პერიოდის შედარება`**: the selected total (when selected) plus selected
+  functions, from / change / to across the selected range. It follows the
+  national explorer's selection-scoped comparison-table rationale while
+  keeping the municipal population compact and explicit.
 
 ## 7. Region pages (`/explorer/municipalities/region/[id]`)
 
-Same workspace as a municipality page, fed by the roll-up: each function summed
-across member municipalities, and **both totals summed independently** so the two
-measures stay separate at region grain.
+Same workspace as a municipality page, fed by the roll-up: each function and
+the official `publicTotalGel` are summed across member municipalities. Only the
+official total is public; functional reconciliation remains internal at region
+grain.
 
 ### 7.1 The member list
 

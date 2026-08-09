@@ -1213,6 +1213,11 @@ import { colorForItem, INK } from "./colors";
 // while this one is municipality×function×year with a public total plus internal reconciliation data.
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
+export const MIXED_SOURCE_ID = "mixed:source_id";
+
+function agreeOrMixed(current: string, incoming: string, mixedMarker: string): string {
+  return current === incoming ? current : mixedMarker;
+}
 
 export type MunicipalEntityModel = {
   years: number[];
@@ -1234,7 +1239,9 @@ export type MunicipalEntityInput = {
  * Called on the SERVER so a region page ships ~110 function rows like a
  * municipality page does, rather than up to twelve times that.
  *
-   * Both stored totals are summed independently; the public roll-up uses public_total_gel.
+ * Functions and `publicTotalGel` are summed at region grain; the functional
+ * reconciliation fields remain internal and the public roll-up uses only the
+ * official total.
  */
 export function aggregateFactsForEntity(
   entityId: string,
@@ -1247,6 +1254,7 @@ export function aggregateFactsForEntity(
     const existing = functionByKey.get(key);
     if (existing) {
       existing.amountGel += row.amountGel;
+      existing.sourceId = agreeOrMixed(existing.sourceId, row.sourceId, MIXED_SOURCE_ID);
       continue;
     }
     functionByKey.set(key, { ...row, municipalityCode: entityId });
@@ -1258,6 +1266,7 @@ export function aggregateFactsForEntity(
     if (existing) {
       existing.publicTotalGel += row.publicTotalGel;
       existing.functionalSumGel += row.functionalSumGel;
+      existing.sourceId = agreeOrMixed(existing.sourceId, row.sourceId, MIXED_SOURCE_ID);
       // Reconciliation fields remain internal after the roll-up.
       continue;
     }
@@ -1310,9 +1319,15 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
   }
 
   const publicTotalByYear: Record<number, number> = {};
+  const officialSourceIdByYear = new Map<number, string>();
   for (const row of totalFacts) {
     if (!inRange.has(row.year)) continue;
     publicTotalByYear[row.year] = (publicTotalByYear[row.year] ?? 0) + row.publicTotalGel;
+    const currentSourceId = officialSourceIdByYear.get(row.year);
+    officialSourceIdByYear.set(
+      row.year,
+      currentSourceId === undefined ? row.sourceId : agreeOrMixed(currentSourceId, row.sourceId, MIXED_SOURCE_ID),
+    );
   }
 
   const firstYear = years[0];
@@ -1362,7 +1377,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
   for (const year of years) {
     totalValuesByYear[year] = publicTotalByYear[year] ?? null;
     totalBasisByYear[year] = "actual";
-    totalSourceByYear[year] = sourceMetadataFor(totalFacts[0]?.sourceId ?? "", sources);
+    totalSourceByYear[year] = sourceMetadataFor(officialSourceIdByYear.get(year) ?? "", sources);
   }
 
   const totalRow: ExplorerTableRow = {
@@ -1530,7 +1545,7 @@ describe("aggregateFactsForEntity", () => {
     expect(rolled.totalFacts.every((row) => row.municipalityCode === "region.adjara")).toBe(true);
   });
 
-  it("sums both totals independently", () => {
+  it("rolls functions and the official public total up independently", () => {
     const y2025 = rolled.totalFacts.find((row) => row.year === 2025)!;
     expect(y2025.publicTotalGel).toBe(600_000_000);
     expect(y2025.functionalSumGel).toBe(600_000_000);
@@ -1724,7 +1739,6 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     if (row.year !== latestYear) continue;
     byFunction.set(row.categoryId, (byFunction.get(row.categoryId) ?? 0) + row.amountGel);
   }
-  const functionalSum = Array.from(byFunction.values()).reduce((sum, value) => sum + value, 0);
   const topFunction = Array.from(byFunction.entries()).sort((left, right) => right[1] - left[1])[0];
   const topFunctionLabel = functions.find((fn) => fn.id === topFunction?.[0])?.kaLabel ?? "";
 
@@ -1749,7 +1763,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     },
     {
       label: "უმსხვილესი სფერო",
-      value: functionalSum > 0 && topFunction ? formatShare(topFunction[1] / functionalSum) : "—",
+      value: latestTotal > 0 && topFunction ? formatShare(topFunction[1] / latestTotal) : "—",
       detail: topFunctionLabel,
     },
   ];
@@ -3267,7 +3281,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
   const hasSelection = state.selectedIds.length > 0;
 
   function toggleAll() {
-    if (allSelected) {
+    if (hasSelection) {
       state.setSelectedIds([]);
       return;
     }
@@ -4066,27 +4080,21 @@ test.describe("municipality page", () => {
     await expect(page.locator("h1 [data-testid='entity-picker-trigger']")).toHaveCount(1);
   });
 
-  test("filters the series list and clears the selection", async ({ page }) => {
+  test("pins the total under search and selects every row globally from empty", async ({ page }) => {
     await page.goto("/explorer/municipalities/04");
+    const bulk = page.getByTestId("municipal-series-all");
+    await bulk.click();
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(0);
+
     await page.getByTestId("municipal-series-search").fill("განათლება");
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(1);
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(2);
+    await expect(page.getByTestId("municipal-series-row").first()).toContainText("მთლიანი ბიუჯეტი");
+
+    await bulk.click();
     await page.getByTestId("municipal-series-search").fill("");
     await expect(page.getByTestId("municipal-series-row")).toHaveCount(11);
-    await page.getByTestId("municipal-series-all").click();
-    await expect(page.getByTestId("municipal-series-row").first()).toHaveAttribute("aria-pressed", "false");
-  });
-
-  test("selects every row globally", async ({ page }) => {
-    await page.goto("/explorer/municipalities/04");
-    await page.getByTestId("municipal-series-all").click();
-    // Global select-all must leave the official total and all ten functions
-    // pressed. Asserting the count of pressed rows is the point of this test:
-    // a locator on its own is always truthy and would pass unconditionally.
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(11);
-    await expect(
-      page.getByTestId("municipal-series-row").filter({ has: page.locator("[aria-pressed='true']") }),
-    ).toHaveCount(11);
-    await expect(page.getByTestId("municipal-series-all")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(11);
+    await expect(bulk).toHaveAttribute("aria-pressed", "true");
   });
 
   test("offers a CSV download", async ({ page }) => {
