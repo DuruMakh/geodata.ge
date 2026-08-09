@@ -343,7 +343,7 @@ test.describe("municipality page", () => {
     const selection = `municipal.total,${ALL_FUNCTIONS}`;
     const duplicateKeyWarnings: string[] = [];
     page.on("console", (message) => {
-      if (message.type() === "warning" && message.text().includes("same key")) {
+      if (["warning", "error"].includes(message.type()) && message.text().includes("same key")) {
         duplicateKeyWarnings.push(message.text());
       }
     });
