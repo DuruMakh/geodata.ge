@@ -19,7 +19,6 @@ import { georgianOrdinal } from "./municipalLabels";
 // while this one is municipality×function×year.
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
-export const MAX_MUNICIPAL_CHART_SERIES = 6;
 
 export type MunicipalEntityModel = {
   years: number[];

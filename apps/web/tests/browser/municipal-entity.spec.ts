@@ -341,6 +341,12 @@ test.describe("municipality page", () => {
 
   test("uses the official municipal total as 100% without normalizing functions", async ({ page }) => {
     const selection = `municipal.total,${ALL_FUNCTIONS}`;
+    const duplicateKeyWarnings: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "warning" && message.text().includes("same key")) {
+        duplicateKeyWarnings.push(message.text());
+      }
+    });
     await page.goto(`${ENTITY_URL}#m=table&sh=1&r=2024-2024&sel=${selection}`);
     await page.reload();
     await expectMunicipalAppReady(page);
@@ -354,6 +360,7 @@ test.describe("municipality page", () => {
       .slice(0, -1)
       .reduce((sum, value) => sum + Number.parseFloat(value.replace("%", "")), 0);
     expect(functionalSum).not.toBeCloseTo(100, 1);
+    expect(duplicateKeyWarnings).toEqual([]);
   });
 
   test("does not render a divergence callout or two-total source copy", async ({ page }) => {
