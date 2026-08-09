@@ -89,11 +89,11 @@ export const POSITIVE = "#1F6E56";
 export const NEGATIVE = "#B3402A";
 export const ACCENT = "#B3402A";
 
-// Region choropleth (spec §5.2). Six-step terracotta ramp, quantile-classed by
+// Municipality choropleth (spec §5.2). Six-step terracotta ramp, quantile-classed by
 // the caller; the last step is ACCENT. Occupied-territory shapes carry no value,
 // so they get a flat fill and a dashed stroke instead of a ramp step.
 //
-// These live here, not in region-map.tsx, because the plan's Global Constraints
+// These live here, not in municipality-map.tsx, because the plan's Global Constraints
 // forbid hardcoding a hex in a component: colors.ts is this codebase's token
 // module and components receive colours as data. Keeping them here also lets the
 // index page read the ramp without importing from a "use client" file.

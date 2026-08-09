@@ -7,6 +7,11 @@ import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
 import { buildImportReport } from "../lib/data/importReport";
 import { loadSpendingMappings } from "../lib/data/mappings";
+import { checkMunicipalityGeometryOutputs } from "../lib/data/municipalGeometry/prepareMunicipalGeometry";
+import {
+  loadMunicipalityGeometrySources,
+  validateMunicipalityGeometrySources,
+} from "../lib/data/municipalGeometry/source";
 import {
   loadMunicipalFunctionFacts,
   loadMunicipalTotalFacts,
@@ -19,7 +24,6 @@ import {
 import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import { loadSourceDocuments } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
-import { buildRegionShapes } from "../lib/explorer/municipalGeo";
 import { budgetRowsToCsvRows } from "./compose-budget-facts";
 
 function sortedYears(years: number[]): number[] {
@@ -78,6 +82,10 @@ async function main() {
   const municipalCodes = new Set(municipalities.map((row) => row.code));
   const regionIds = new Set(municipalRegions.map((region) => region.id));
   const municipalCategoryIds = new Set(municipalFunctions.map((entry) => entry.id));
+  const municipalityGeometrySources = await loadMunicipalityGeometrySources();
+
+  validateMunicipalityGeometrySources(municipalityGeometrySources, Array.from(municipalCodes));
+  await checkMunicipalityGeometryOutputs();
 
   const unknownRegions = municipalities.filter((row) => !regionIds.has(row.regionId));
   if (unknownRegions.length > 0) {
@@ -152,36 +160,6 @@ async function main() {
     throw new Error(`Regions with no municipalities: ${unusedRegions.join(", ")}`);
   }
 
-  // buildRegionShapes() already guarantees internally that every shape
-  // resolves to a region or an explicit no-data reason (it throws otherwise;
-  // see tests/explorer/municipalGeo.test.ts). What it cannot guarantee is that
-  // its hardcoded join table still matches the *live* region taxonomy below —
-  // that taxonomy is data, editable independently of code. These two checks
-  // catch exactly that: a taxonomy region renamed or removed out from under
-  // the join table, or a new taxonomy region the join table was never told
-  // about. This gate has to catch it directly because `npm run data:validate`
-  // is meant to run standalone (see AGENTS.md Health Stack), not only after
-  // `npm test`.
-  const mapShapes = buildRegionShapes();
-
-  const shapesWithUnknownRegion = mapShapes.filter(
-    (shape) => shape.regionId !== null && !regionIds.has(shape.regionId),
-  );
-  if (shapesWithUnknownRegion.length > 0) {
-    throw new Error(
-      `Map shapes reference unknown regions: ${shapesWithUnknownRegion
-        .map((shape) => `${shape.shapeIso}→${shape.regionId}`)
-        .join(", ")}`,
-    );
-  }
-
-  const regionsWithoutOneShape = Array.from(regionIds).filter(
-    (regionId) => mapShapes.filter((shape) => shape.regionId === regionId).length !== 1,
-  );
-  if (regionsWithoutOneShape.length > 0) {
-    throw new Error(`Regions not mapped to exactly one map shape: ${regionsWithoutOneShape.join(", ")}`);
-  }
-
   if (missingGlossary.length > 0) {
     throw new Error(`Missing glossary rows: ${missingGlossary.map((item) => item.id).join(", ")}`);
   }
@@ -207,6 +185,7 @@ async function main() {
   console.log(`Validated municipal function rows: ${municipalFunctionFacts.length}`);
   console.log(`Validated municipal total rows: ${municipalTotalFacts.length}`);
   console.log(`Validated municipalities: ${municipalities.length}`);
+  console.log(`Validated municipality map polygons: ${municipalityGeometrySources.municipalities.features.length}`);
   console.log(`Validated taxonomy rows: ${taxonomy.length}`);
   console.log(`Validated glossary rows: ${glossary.size}`);
   console.log(`Validated source rows: ${sources.length}`);

@@ -118,6 +118,58 @@ test.describe("hash sanitising", () => {
 });
 
 test.describe("entity picker accessibility", () => {
+  test("picker rows expose hover feedback", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("entity-picker-trigger").click();
+
+    const region = page.getByTestId("picker-region").first();
+    const municipality = page.getByTestId("picker-municipality").nth(1);
+    await expect(municipality).not.toHaveAttribute("aria-current", "page");
+    await expect(municipality).not.toHaveCSS("color", "rgb(179, 64, 42)");
+    await expect(municipality).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    const regionBox = await region.boundingBox();
+    const municipalityBox = await municipality.boundingBox();
+
+    for (const row of [region, municipality]) {
+      await row.hover();
+      await expect(row).toHaveCSS("color", "rgb(179, 64, 42)");
+      await expect(row).toHaveCSS("border-left-color", "rgb(179, 64, 42)");
+      await expect(row).toHaveCSS("transition-duration", "0.1s");
+      await expect(row).toHaveCSS("transition-property", /color/);
+    }
+    await expect(municipality).toHaveCSS("background-color", "rgb(241, 234, 220)");
+
+    expect(await region.boundingBox()).toEqual(regionBox);
+    expect(await municipality.boundingBox()).toEqual(municipalityBox);
+  });
+
+  test("the entity picker trigger keeps the preview affordance across rest, hover, and open states", async ({
+    page,
+  }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const trigger = page.getByTestId("entity-picker-trigger");
+    const caret = page.getByTestId("entity-picker-caret");
+    const restingBox = await trigger.boundingBox();
+
+    await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
+    await expect(trigger).toHaveCSS("border-bottom-style", "dashed");
+    await expect(trigger).toHaveCSS("border-bottom-width", "1px");
+    await expect(trigger).toHaveCSS("transition-duration", "0.1s");
+    await expect(caret).toHaveText("▾");
+    await expect(caret).toHaveCSS("color", "rgb(201, 190, 169)");
+
+    await trigger.hover();
+    await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
+    expect(await trigger.boundingBox()).toEqual(restingBox);
+
+    await trigger.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(caret).toHaveText("▴");
+  });
+
   test("opening moves focus into the search input", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
@@ -270,6 +322,29 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
 // Task 14: the full municipality-page e2e coverage the header comment above
 // defers to this task ("Full section e2e coverage is Task 14's").
 test.describe("municipality page", () => {
+  test("series rows reuse the explorer's animated hover and selected tint", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const initiallySelected = page.locator('[data-testid="municipal-series-row"][aria-pressed="true"]').first();
+    const initiallyUnselected = page.locator('[data-testid="municipal-series-row"][aria-pressed="false"]').first();
+    const selectedLabel = await initiallySelected.locator("span.truncate").innerText();
+    const unselectedLabel = await initiallyUnselected.locator("span.truncate").innerText();
+    const selectedRow = page.getByTestId("municipal-series-row").filter({ hasText: selectedLabel }).first();
+    const unselectedRow = page.getByTestId("municipal-series-row").filter({ hasText: unselectedLabel }).first();
+
+    await expect(selectedRow).toHaveAttribute("aria-pressed", "true");
+    await expect(unselectedRow).toHaveAttribute("aria-pressed", "false");
+    await expect(selectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
+    await expect(selectedRow).toHaveCSS("transition-duration", "0.1s");
+    await unselectedRow.hover();
+    await expect(unselectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
+
+    await unselectedRow.click();
+    await expect(unselectedRow).toHaveAttribute("aria-pressed", "true");
+    await expect(unselectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
+  });
+
   test("switches between chart and table", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);

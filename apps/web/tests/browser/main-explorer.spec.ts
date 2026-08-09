@@ -179,7 +179,7 @@ test("sidebar section links move between sections in-app", async ({ page }) => {
   expect(await municipalitiesLink.evaluate((node) => node.tagName)).toBe("A");
   await municipalitiesLink.click();
   await expect(page).toHaveURL(/\/explorer\/municipalities/);
-  await expect(page.getByTestId("region-map")).toBeVisible();
+  await expect(page.getByTestId("municipality-map")).toBeVisible();
   await expect(municipalitiesLink).toHaveAttribute("aria-current", "page");
 
   expect(consoleProblems).toEqual([]);
@@ -635,7 +635,7 @@ test("hub lists four cards, all four now live", async ({ page }) => {
   // municipalities index.
   await municipalities.click();
   await expect(page).toHaveURL(/\/explorer\/municipalities$/);
-  await expect(page.getByTestId("region-map")).toBeVisible();
+  await expect(page.getByTestId("municipality-map")).toBeVisible();
 
   expect(consoleProblems).toEqual([]);
 });

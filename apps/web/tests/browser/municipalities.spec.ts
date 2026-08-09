@@ -4,222 +4,308 @@ async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
 
-// Municipalities index map: keyboard-accessibility regression coverage for the
-// review finding that region <path>/city <circle> elements were click-only
-// (no tabIndex, no role, no onKeyDown — .focus() left document.activeElement
-// as BODY). Full section e2e coverage is Task 14's; this pins only the
-// specific behaviour the finding closed.
+function contrastRatio(foreground: string, background: string): number {
+  const luminance = (color: string) => {
+    const channels = color.match(/[\d.]+/g)?.slice(0, 3).map(Number);
+    if (channels?.length !== 3) throw new Error(`Expected an RGB color, received ${color}`);
+    const [red, green, blue] = channels.map((channel) => {
+      const normalized = channel / 255;
+      return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+  };
 
-test("region shapes and city markers are keyboard-focusable and activate on Enter/Space", async ({ page }) => {
+  const values = [luminance(foreground), luminance(background)].sort((left, right) => right - left);
+  return (values[0] + 0.05) / (values[1] + 0.05);
+}
+
+test("renders 65 globally ordered accessible map targets and two inert overlays", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
-  await expect(page.getByTestId("region-map")).toBeVisible();
+  const map = page.getByTestId("municipality-map");
+  await expect(map.locator("[data-municipality-shape]")).toHaveCount(60);
+  await expect(map.locator("[data-municipality-marker]")).toHaveCount(5);
+  await expect(map.locator("[data-occupied-overlay]")).toHaveCount(2);
 
-  // A real region shape: focusable, shows a visible focus ring, and Space
-  // activates it (same as a click) without also scrolling the page.
-  const region = page.locator('[data-testid^="region-shape-"]:not([data-no-data])').first();
-  await region.focus();
-  await expect(region).toBeFocused();
-
-  const outline = await region.evaluate((el) => {
-    const style = getComputedStyle(el as Element);
-    return { style: style.outlineStyle, width: style.outlineWidth, color: style.outlineColor };
-  });
-  expect(outline.style).toBe("solid");
-  expect(outline.width).not.toBe("0px");
-  // Pins the actual rendered colour, not just "some outline exists": the
-  // finding this closes is that the ring was rgba(179, 64, 42, 0.4) — a
-  // translucent --accent that composites to the same colour as the ramp's
-  // own darkest step (MAP_RAMP[5] IS --accent) and disappears. --map-focus-
-  // ring is solid black, verified >=3:1 against every ramp step,
-  // MAP_NO_DATA_FILL and --paper in tests/explorer/themeTokens.test.ts.
-  expect(outline.color).toBe("rgb(0, 0, 0)");
-
-  const scrollBefore = await page.evaluate(() => window.scrollY);
-  await page.keyboard.press("Space");
-  await expect(page).toHaveURL(/\/explorer\/municipalities\/region\//);
-  const scrollAfter = await page.evaluate(() => window.scrollY);
-  expect(scrollAfter).toBe(scrollBefore);
-
-  // A city marker: same story, Enter this time.
-  await page.goto("http://localhost:3100/explorer/municipalities");
-  await expectMunicipalAppReady(page);
-  const city = page.locator('[data-testid^="self-gov-city-"]').first();
-  await city.focus();
-  await expect(city).toBeFocused();
-  const cityOutline = await city.evaluate((el) => {
-    const style = getComputedStyle(el as Element);
-    return { style: style.outlineStyle, width: style.outlineWidth, color: style.outlineColor };
-  });
-  expect(cityOutline.style).toBe("solid");
-  expect(cityOutline.width).not.toBe("0px");
-  expect(cityOutline.color).toBe("rgb(0, 0, 0)");
-  await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/explorer\/municipalities\/[^/]+$/);
-});
-
-test("the no-data region shape is excluded from the tab order", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
-  await expectMunicipalAppReady(page);
-
-  const noData = page.getByTestId("region-shape-GE-AB");
-  await expect(noData).toHaveAttribute("data-no-data", "true");
-  await expect(noData).not.toHaveAttribute("tabindex");
-
-  await noData.evaluate((el) => (el as unknown as HTMLElement).focus());
-  await expect(noData).not.toBeFocused();
-});
-
-test("focusing a list row highlights the map, matching mouse hover", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
-  await expectMunicipalAppReady(page);
-
-  const readout = page.getByTestId("map-readout");
-  await expect(readout).toHaveText("გადაატარე კურსორი რუკაზე");
-
-  await page.getByTestId("municipal-list-row").first().focus();
-  await expect(readout).not.toHaveText("გადაატარე კურსორი რუკაზე");
-
-  await page.getByTestId("municipal-list-row").first().blur();
-  await expect(readout).toHaveText("გადაატარე კურსორი რუკაზე");
-});
-
-test("the map exposes an accessible group around its interactive shapes", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
-  await expectMunicipalAppReady(page);
-
-  const svg = page.getByTestId("region-map").locator("svg");
-  await expect(svg).toHaveAttribute("role", "group");
-  await expect(svg).toHaveAccessibleName(/.+/);
-  await expect(svg.locator('[role="button"]')).not.toHaveCount(0);
-});
-
-test("region hover and keyboard focus show an anchored name-and-value tooltip", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
-  await expectMunicipalAppReady(page);
-
-  const map = page.getByTestId("region-map");
-  const region = map.locator('[data-testid^="region-shape-"]:not([data-no-data])').first();
-  const accessibleName = await region.getAttribute("aria-label");
-  expect(accessibleName).toBeTruthy();
-  const [name, value] = accessibleName!.split(" · ");
-
-  await region.hover();
-  const tooltip = page.getByTestId("region-map-tooltip");
-  await expect(tooltip).toBeVisible();
-  await expect(tooltip).toContainText(name);
-  await expect(tooltip).toContainText(value);
-  await expect(page.getByTestId("map-readout")).toContainText(name);
-
-  const [mapBox, regionBox, tooltipBox] = await Promise.all([
-    map.boundingBox(),
-    region.boundingBox(),
-    tooltip.boundingBox(),
-  ]);
-  expect(mapBox).not.toBeNull();
-  expect(regionBox).not.toBeNull();
-  expect(tooltipBox).not.toBeNull();
-  expect(tooltipBox!.x).toBeGreaterThanOrEqual(mapBox!.x);
-  expect(tooltipBox!.x + tooltipBox!.width).toBeLessThanOrEqual(mapBox!.x + mapBox!.width + 1);
-  expect(tooltipBox!.y).toBeGreaterThanOrEqual(mapBox!.y);
-  expect(tooltipBox!.y + tooltipBox!.height).toBeLessThanOrEqual(mapBox!.y + mapBox!.height + 1);
+  const targets = map.locator("[data-municipality-map-target]");
+  await expect(targets).toHaveCount(65);
+  const targetMetadata = await targets.evaluateAll((elements) =>
+    elements.map((element) => {
+      const label = element.getAttribute("aria-label") ?? "";
+      return {
+        code: element.getAttribute("data-municipality-code"),
+        label,
+        name: label.split(" · ")[0],
+        role: element.getAttribute("role"),
+        tabIndex: element.getAttribute("tabindex"),
+      };
+    }),
+  );
+  const codes = targetMetadata.map(({ code }) => code);
+  expect(new Set(codes).size).toBe(64);
+  expect(codes).toHaveLength(65);
+  expect(targetMetadata.every(({ role }) => role === "link")).toBe(true);
+  expect(targetMetadata.every(({ tabIndex }) => tabIndex === "0")).toBe(true);
   expect(
-    Math.abs(
-      tooltipBox!.x + tooltipBox!.width / 2 - (regionBox!.x + regionBox!.width / 2),
-    ),
-  ).toBeLessThan(mapBox!.width / 2);
+    targetMetadata.every(({ label }) => /[\u10A0-\u10FF].+მუნიციპალიტეტის გახსნა$/.test(label)),
+  ).toBe(true);
 
-  await page.mouse.move(mapBox!.x, mapBox!.y);
-  await expect(tooltip).toBeHidden();
-  await region.focus();
-  await expect(tooltip).toBeVisible();
-  await expect(tooltip).toContainText(name);
-  await expect(tooltip).toContainText(value);
+  const names = targetMetadata.map(({ name }) => name);
+  expect(names).toEqual(names.toSorted((left, right) => left.localeCompare(right, "ka")));
+  const tbilisiIndexes = targetMetadata
+    .map(({ code }, index) => (code === "04" ? index : -1))
+    .filter((index) => index >= 0);
+  expect(tbilisiIndexes).toHaveLength(2);
+  expect(tbilisiIndexes[1]).toBe(tbilisiIndexes[0] + 1);
+
+  const markersAreTopmostAtTheirCenters = await map.locator("[data-municipality-marker]").evaluateAll((markers) =>
+    markers.every((marker) => {
+      const box = marker.getBoundingClientRect();
+      return document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2) === marker;
+    }),
+  );
+  expect(markersAreTopmostAtTheirCenters).toBe(true);
+
+  const overlaysFollowTargets = await map.locator("svg").evaluate((svg) => {
+    const targets = [...svg.querySelectorAll("[data-municipality-map-target]")];
+    const lastTarget = targets.at(-1);
+    const overlays = [...svg.querySelectorAll("[data-occupied-overlay]")];
+    return (
+      lastTarget !== undefined &&
+      overlays.every((overlay) =>
+        Boolean(lastTarget.compareDocumentPosition(overlay) & Node.DOCUMENT_POSITION_FOLLOWING),
+      )
+    );
+  });
+  expect(overlaysFollowTargets).toBe(true);
 });
 
-test("region tooltip preserves independent pointer and keyboard interactions", async ({ page }) => {
+test("polygon and marker clicks open municipality pages directly", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
+  await page.getByTestId("municipality-shape-33").click();
+  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/33");
 
-  const map = page.getByTestId("region-map");
-  const regions = map.locator('[data-testid^="region-shape-"]:not([data-no-data])');
-  const pointerRegion = regions.nth(0);
-  const focusRegion = regions.nth(1);
-  const pointerName = (await pointerRegion.getAttribute("aria-label"))!.split(" · ")[0];
-  const focusName = (await focusRegion.getAttribute("aria-label"))!.split(" · ")[0];
-  const tooltip = page.getByTestId("region-map-tooltip");
-
-  await pointerRegion.hover();
-  await focusRegion.focus();
-  await expect(tooltip).toContainText(focusName);
-  await expect(focusRegion).toHaveAttribute("aria-describedby", "region-map-tooltip");
-  await expect(pointerRegion).not.toHaveAttribute("aria-describedby");
-
-  const heading = page.getByRole("heading", { level: 1 });
-  await heading.hover();
-  await expect(tooltip).toBeVisible();
-  await expect(tooltip).toContainText(focusName);
-  await expect(page.getByTestId("map-readout")).toContainText(focusName);
-
-  await pointerRegion.hover();
-  await expect(tooltip).toContainText(focusName);
-  await focusRegion.evaluate((element) => (element as unknown as HTMLElement).blur());
-  await expect(tooltip).toBeVisible();
-  await expect(tooltip).toContainText(pointerName);
-  await expect(pointerRegion).toHaveAttribute("aria-describedby", "region-map-tooltip");
-  await expect(page.getByTestId("map-readout")).toContainText(pointerName);
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  await page.getByTestId("municipality-marker-06").click();
+  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/06");
 });
 
-test("focused lower-edge tooltip stays inside the SVG after a narrow viewport resize", async ({ page }) => {
+test("Enter activates a polygon and Space activates a marker", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  await page.getByTestId("municipality-shape-33").focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/33");
+
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const before = await page.evaluate(() => window.scrollY);
+  await page.getByTestId("municipality-marker-06").focus();
+  await page.keyboard.press("Space");
+  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/06");
+  expect(await page.evaluate(() => window.scrollY)).toBe(before);
+});
+
+test("occupied overlays expose no interaction or public explanation", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const overlays = page.locator("[data-occupied-overlay]");
+  await expect(overlays).toHaveCount(2);
+  for (const overlay of await overlays.all()) {
+    await expect(overlay).toHaveAttribute("aria-hidden", "true");
+    await expect(overlay).not.toHaveAttribute("tabindex");
+    await expect(overlay).not.toHaveAttribute("role");
+  }
+  await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
+});
+
+test("credits OpenStreetMap boundaries without occupied-territory copy", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const source = page.getByTestId("municipal-source-note");
+  await expect(source.getByRole("link", { name: /OpenStreetMap contributors/ })).toHaveAttribute(
+    "href",
+    "https://www.openstreetmap.org/copyright",
+  );
+  await expect(source).toContainText("ODbL");
+  await expect(source).not.toContainText(/ოკუპირ|Russian/i);
+  await expect(page.getByTestId("municipality-map")).not.toContainText(/მონაცემები არ არის|no data/i);
+});
+
+test("map hover and focus show only name, amount, and an arrow visibly", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const zugdidi = page.getByTestId("municipality-shape-33");
+  await zugdidi.hover();
+  const tooltip = page.getByTestId("municipality-map-tooltip");
+  await expect(tooltip).toContainText("ზუგდიდი");
+  await expect(tooltip).toContainText("₾");
+  await expect(tooltip).toContainText("→");
+  await expect(tooltip).not.toContainText(/Open|გახსნა/);
+  await expect(zugdidi).toHaveAccessibleName(/ზუგდიდი.*გახსნა/);
+  await expect(zugdidi).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
+  await expect(page.locator('[data-municipality-map-target][aria-describedby="municipality-map-tooltip"]')).toHaveCount(1);
+
+  const batumi = page.getByTestId("municipality-marker-06");
+  await batumi.focus();
+  await expect(tooltip).toContainText("ბათუმი");
+  await expect(tooltip).toContainText("→");
+  await expect(batumi).toHaveAccessibleName(/ბათუმი.*გახსნა/);
+  await expect(batumi).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
+  await expect(zugdidi).not.toHaveAttribute("aria-describedby");
+  await expect(page.locator('[data-municipality-map-target][aria-describedby="municipality-map-tooltip"]')).toHaveCount(1);
+});
+
+test("Tbilisi path and marker activate together while only the map-origin target owns the description", async ({
+  page,
+}) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const path = page.getByTestId("municipality-shape-04");
+  const marker = page.getByTestId("municipality-marker-04");
+
+  await path.focus();
+  await expect(path).toHaveAttribute("data-active", "true");
+  await expect(marker).toHaveAttribute("data-active", "true");
+  await expect(path).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
+  await expect(marker).not.toHaveAttribute("aria-describedby");
+
+  await marker.focus();
+  await expect(path).toHaveAttribute("data-active", "true");
+  await expect(marker).toHaveAttribute("data-active", "true");
+  await expect(marker).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
+  await expect(path).not.toHaveAttribute("aria-describedby");
+});
+
+test("list focus suppresses a stale tooltip from a different map pointer target", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const zugdidi = page.getByTestId("municipality-shape-33");
+  const tbilisiPath = page.getByTestId("municipality-shape-04");
+  const tbilisiMarker = page.getByTestId("municipality-marker-04");
+
+  await zugdidi.dispatchEvent("mouseover");
+  await expect(page.getByTestId("municipality-map-tooltip")).toContainText("ზუგდიდი");
+  await page.locator('[data-municipality-row-code="04"]').evaluate((row) =>
+    (row as HTMLElement).focus({ preventScroll: true }),
+  );
+
+  await expect(tbilisiPath).toHaveAttribute("data-active", "true");
+  await expect(tbilisiMarker).toHaveAttribute("data-active", "true");
+  await expect(zugdidi).not.toHaveAttribute("data-active");
+  await expect(page.getByTestId("municipality-map-tooltip")).toHaveCount(0);
+  await expect(zugdidi).not.toHaveAttribute("aria-describedby");
+  await expect(page.locator("[data-municipality-map-target][aria-describedby]")).toHaveCount(0);
+});
+
+test("municipality map and list highlight each other by exact code", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const shape = page.getByTestId("municipality-shape-33");
+  const row = page.locator('[data-municipality-row-code="33"]');
+
+  await shape.hover();
+  await expect(shape).toHaveAttribute("data-active", "true");
+  await expect(row).toHaveAttribute("data-active", "true");
+
+  await page.getByRole("heading", { level: 1 }).hover();
+  await row.focus();
+  await expect(shape).toHaveAttribute("data-active", "true");
+});
+
+test("map keyboard focus wins over a simultaneous list pointer target", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const focusedShape = page.getByTestId("municipality-shape-33");
+  const otherRow = page.locator('[data-municipality-row-code="04"]');
+  await focusedShape.focus();
+  await otherRow.hover();
+  await expect(focusedShape).toHaveAttribute("data-active", "true");
+  await expect(otherRow).not.toHaveAttribute("data-active", "true");
+});
+
+test("region rows do not activate municipality geometry", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  await page.getByTestId("level-region").click();
+  const regionRow = page.getByTestId("municipal-list-row").first();
+  await expect(regionRow).toHaveCSS("transition-duration", "0.1s");
+  await regionRow.hover();
+  await expect(regionRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
+  await expect(page.locator('[data-municipality-code][data-active="true"]')).toHaveCount(0);
+  await expect(page.getByTestId("municipality-map").locator("[data-municipality-shape]")).toHaveCount(60);
+});
+
+test("focus uses the polygon or marker instead of a rectangular outline", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+  const shape = page.getByTestId("municipality-shape-33");
+  await shape.focus();
+  const shapeStyle = await shape.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      fill: style.fill,
+      outline: style.outlineStyle,
+      stroke: style.stroke,
+      strokeWidth: Number.parseFloat(style.strokeWidth),
+    };
+  });
+  expect(shapeStyle.outline).toBe("none");
+  expect(shapeStyle.strokeWidth).toBeGreaterThanOrEqual(2);
+  expect(contrastRatio(shapeStyle.stroke, shapeStyle.fill)).toBeGreaterThanOrEqual(3);
+
+  const marker = page.getByTestId("municipality-marker-06");
+  await marker.focus();
+  const markerStyle = await marker.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      fill: style.fill,
+      outline: style.outlineStyle,
+      radius: Number.parseFloat(element.getAttribute("r") ?? "0"),
+      stroke: style.stroke,
+      strokeWidth: Number.parseFloat(style.strokeWidth),
+    };
+  });
+  expect(markerStyle.outline).toBe("none");
+  expect(markerStyle.radius).toBeGreaterThan(7.5);
+  expect(markerStyle.strokeWidth).toBeGreaterThanOrEqual(2);
+  expect(contrastRatio(markerStyle.stroke, markerStyle.fill)).toBeGreaterThanOrEqual(3);
+});
+
+test("keeps the tooltip inside the map after a narrow viewport resize", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
+  const map = page.getByTestId("municipality-map");
+  const lowestTestId = await map.locator("[data-municipality-shape]").evaluateAll((elements) => {
+    const lowest = elements.reduce((current, element) =>
+      element.getBoundingClientRect().bottom > current.getBoundingClientRect().bottom ? element : current,
+    );
+    return lowest.getAttribute("data-testid");
+  });
+  expect(lowestTestId).toBeTruthy();
+  await page.getByTestId(lowestTestId!).focus();
+  await expect(page.getByTestId("municipality-map-tooltip")).toBeVisible();
 
-  const svg = page.getByTestId("region-map").locator("svg");
-  const regions = svg.locator('[data-testid^="region-shape-"]:not([data-no-data])');
-  const boxes = await regions.evaluateAll((elements) =>
-    elements.map((element, index) => {
-      const box = element.getBoundingClientRect();
-      return { index, bottom: box.bottom };
-    }),
-  );
-  const lowerEdgeIndex = boxes.sort((a, b) => b.bottom - a.bottom)[0]!.index;
-  const lowerEdgeRegion = regions.nth(lowerEdgeIndex);
-  await lowerEdgeRegion.focus();
-
-  const tooltip = page.getByTestId("region-map-tooltip");
-  await expect(tooltip).toBeVisible();
-
-  const expectInsideSvg = async () => {
-    const [svgBox, tooltipBox] = await Promise.all([svg.boundingBox(), tooltip.boundingBox()]);
-    expect(svgBox).not.toBeNull();
-    expect(tooltipBox).not.toBeNull();
-    expect(tooltipBox!.x).toBeGreaterThanOrEqual(svgBox!.x);
-    expect(tooltipBox!.x + tooltipBox!.width).toBeLessThanOrEqual(svgBox!.x + svgBox!.width + 1);
-    expect(tooltipBox!.y).toBeGreaterThanOrEqual(svgBox!.y);
-    expect(tooltipBox!.y + tooltipBox!.height).toBeLessThanOrEqual(svgBox!.y + svgBox!.height + 1);
-  };
-
-  await expectInsideSvg();
-  const beforeResize = await tooltip.getAttribute("style");
   await page.setViewportSize({ width: 340, height: 844 });
-  await expect(tooltip).toBeVisible();
-  await expect.poll(() => tooltip.getAttribute("style")).not.toBe(beforeResize);
-  await expectInsideSvg();
+  await expect
+    .poll(async () => {
+      const svgBox = await map.locator("svg").boundingBox();
+      const tooltipBox = await page.getByTestId("municipality-map-tooltip").boundingBox();
+      if (svgBox === null || tooltipBox === null) return false;
+      return (
+        tooltipBox.x >= svgBox.x &&
+        tooltipBox.y >= svgBox.y &&
+        tooltipBox.x + tooltipBox.width <= svgBox.x + svgBox.width &&
+        tooltipBox.y + tooltipBox.height <= svgBox.y + svgBox.height
+      );
+    })
+    .toBe(true);
 });
 
-// Task 14: the full index-page e2e coverage the header comment above defers
-// to this task ("Full section e2e coverage is Task 14's").
 test.describe("municipalities index", () => {
-  test("renders the region map with an explicit no-data shape", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities");
-    await expectMunicipalAppReady(page);
-    await expect(page.getByTestId("region-map")).toBeVisible();
-    await expect(page.locator("[data-testid^='region-shape-']")).toHaveCount(12);
-    await expect(page.getByTestId("region-shape-GE-AB")).toHaveAttribute("data-no-data", "true");
-    await expect(page.locator("[data-testid^='self-gov-city-']")).toHaveCount(5);
-  });
-
   test("lists all municipalities and switches grain", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
@@ -268,11 +354,11 @@ test.describe("municipalities index", () => {
     await expect(page.getByTestId("index-kpi")).toHaveCount(4);
   });
 
-  test("describes regions on the map and municipalities in the list", async ({ page }) => {
+  test("describes municipalities on the map and in the list", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
     await expect(page.locator("main > div > p").first()).toContainText(
-      "აირჩიე რეგიონი რუკაზე ან მუნიციპალიტეტი სიაში",
+      "აირჩიე მუნიციპალიტეტი რუკაზე ან სიაში",
     );
   });
 

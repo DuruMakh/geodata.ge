@@ -1,7 +1,7 @@
 # GeoData.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-07-28
+Last updated: 2026-08-07
 Status: Production visual system for GeoData.ge Budget Explorer v1
 Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -11,19 +11,13 @@ Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, re
 
 This file defines the production design system for GeoData.ge v1. It **replaces DESIGN.md v3.x (the Apple-like Light/Night system) in full**. The editorial direction is the approved production direction.
 
-Confirmed visual references (checked into the repo):
-
-- `docs/Design HTML files/editorial-v2/GeoData Platform - Editorial v2.dc.html` — **primary reference**: full product prototype (3-tab navigation, explorer, indicators, analysis/single-year view, responsive rules, hash deep-linking).
-- `docs/Design HTML files/editorial-v2/GeoData Site v2.dc.html` — **landing page reference**: site header nav (მთავარი / ექსპლორერი), living-relief hero (Three.js dotted map of Georgia, `data/georgia-geo.js`), key country numbers, "სამი გზა მონაცემებამდე" cards, site footer.
-- `docs/Design HTML files/editorial-v2/Editorial Design System - Reference.dc.html` — component reference sheet (colors, typography, rules, controls, data patterns, single-year surfaces).
-- `docs/Design HTML files/editorial-v2/Budget Explorer - Editorial (approved).dc.html` — earlier approved multi-year explorer layout.
-- `docs/Design HTML files/editorial-v2/DESIGN v4 (Editorial).md` — the original v4.0 draft exported from Claude Design (kept for provenance; this file supersedes it where they differ).
+`DESIGN.md` v4.1 is the canonical visual and behavioral source of truth. The earlier `editorial-v2` HTML prototype package was intentionally removed as superseded in 2026-08. Retained concept files under `docs/Design HTML files/` are contextual inputs only unless a current product spec explicitly promotes them; they do not override this file or current route contracts.
 
 Confirmed product references:
 
 - `Project_Definition.md`
 
-If this file and the confirmed reference files disagree, prefer **GeoData Platform - Editorial v2.dc.html** for visual and behavioral details and update this file immediately. One carve-out: the platform shell and route IA of §6.2/§6.7 deliberately supersede the prototype's three in-page nav tabs — see `docs/superpowers/specs/2026-07-28-explorer-shell-and-workspace-design.md`.
+This file owns production visuals. Current product specs may record deliberate feature-level carve-outs, which must be reflected here when they become durable; the platform shell and route IA are specified in §6.2/§6.7 and `docs/superpowers/specs/2026-07-28-explorer-shell-and-workspace-design.md`.
 
 Superseded and must not appear in production:
 
@@ -38,7 +32,7 @@ V1 includes: the budget hub, multi-year explorer (line + table) with fields/mini
 
 V1 excludes: data catalog, capital/debt explorers, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown).
 
-Municipal budgets are an implemented v1 **section** in this branch at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a region-grain map and ranked list, 64 municipality pages, and 11 region roll-up pages, reachable from the sidebar and hub card 03 (§6.7). Direct production checks returned HTTP 404 on 2026-08-06, so the municipal UI must not be called live until a post-deployment route check returns HTTP 200. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) remain markers only, with no data at all. Nothing about a marker may be styled as if it were live.
+Municipal budgets are an implemented v1 **section** in this branch at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, and 11 region roll-up pages, reachable from the sidebar and hub card 03 (§6.7). Production verification follows merge and deployment; this branch state is not evidence that the map is live. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) remain markers only, with no data at all. Nothing about a marker may be styled as if it were live.
 
 Every visual decision should support a focused budget product, not a generic dashboard.
 
@@ -260,7 +254,7 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer                              budget hub — the four sections as cards
 /explorer/expenditure                  ხარჯები           multi-year expenditure explorer (fields/ministries grouping)
 /explorer/revenue                      შემოსავლები       multi-year revenue explorer
-/explorer/municipalities               მუნიციპალიტეტები  index — region-grain map, ranked list, KPIs (§20)
+/explorer/municipalities               მუნიციპალიტეტები  index — municipality-grain map, ranked list, KPIs (§20)
 /explorer/municipalities/[code]                          64 municipality pages
 /explorer/municipalities/region/[id]                     11 region roll-up pages
 /explorer/analysis                     ანალიზი           single-year analysis view (own side switch, grouping switch
@@ -464,7 +458,7 @@ Grid `24px 1fr 96px 72px`: mono rank (`01`), sans label (ellipsized), 3px horizo
 
 ## 8. Multi-Year Explorer
 
-Confirmed source: `GeoData Platform - Editorial v2.dc.html` (Explorer + Indicators screens).
+Canonical contract: this section and the reusable component contracts in §7.
 
 ### 8.1 Defaults
 
@@ -512,7 +506,7 @@ Columns: `<first col> | years… | ცვლილება | წილი <end-
 
 ## 9. Single-Year Analysis (ანალიზი)
 
-Confirmed source: `GeoData Platform - Editorial v2.dc.html` (Analysis screen). Order is fixed:
+Canonical contract: this section and the reusable component contracts in §7. Order is fixed:
 
 1. Side tabs (`ხარჯები / შემოსავლები`) + grouping tabs (expenditure only: `სფეროები / უწყებები`) + mono basis note.
 2. Year selector.
@@ -701,7 +695,7 @@ Do not:
 
 ## 19. Landing Page (მთავარი)
 
-Reference: `docs/Design HTML files/editorial-v2/GeoData Site v2.dc.html`. Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implementation: `apps/web/components/landing/`, geo data in `apps/web/lib/landing/georgiaGeo.ts`, budget-derived values computed server-side in `apps/web/lib/landing/landingData.ts` from the same active facts as the explorer.
+Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implementation: `apps/web/components/landing/`, geo data in `apps/web/lib/landing/georgiaGeo.ts`, budget-derived values computed server-side in `apps/web/lib/landing/landingData.ts` from the same active facts as the explorer.
 
 Section order (top to bottom):
 
@@ -715,9 +709,11 @@ Landing QA: waffle renders exactly 30 cells; sparkline endpoints match the loade
 
 ## 20. Municipal Surfaces
 
-Reference implementation: `apps/web/components/municipalities/`, routes under `apps/web/app/explorer/municipalities/`. The section reuses the shell (§6.7) and the existing explorer machinery — `EditorialLineChart`, `RangeStrip`, `Callout`, `SourceNote`, `SwatchBar` — rather than inventing new surface types; `region-map.tsx` is the one genuinely new component.
+Reference implementation: `apps/web/components/municipalities/`, routes under `apps/web/app/explorer/municipalities/`. The section reuses the shell (§6.7) and the existing explorer machinery — `EditorialLineChart`, `RangeStrip`, `Callout`, `SourceNote`, `SwatchBar` — rather than inventing new surface types; `municipality-map.tsx` is the dedicated static SVG map component.
 
-**Region-grain map, not municipality-grain.** The index page's choropleth colors 12 ADM1 shapes: the 11 data-bearing regions by latest-year total, plus აფხაზეთი drawn as an explicit no-data shape (dashed stroke, excluded from the tab order). It does not draw all 64 municipality boundaries — no openly-licensed ADM2 (municipality-level) geometry matches the 64-unit served registry, so a municipality-grain map is deferred to a future spec (`lib/explorer/municipalGeo.ts`'s own header comment records this). Geometry is geoBoundaries `gbOpen` GEO ADM1 (release `9469f09`), CC BY 3.0 — it replaced GADM, which permits non-commercial use but forbids redistribution, and shipping coordinates to every visitor's browser is redistribution. CC BY permits that but requires attribution, which the index page's source note carries: `საზღვრები: geoBoundaries (gbOpen GEO ADM1), CC BY 3.0.` (full provenance: `lib/landing/georgiaGeo.ts`'s header comment; the shape↔region join: `lib/explorer/municipalGeo.ts`, documented in `docs/data-methodology/municipal-functional-annual-2015-2025.md`). Self-governing cities (თბილისი, ბათუმი, ქუთაისი, ფოთი, რუსთავი — the registry's `is_self_governing_city` flag, an administrative status, not a ranking by budget) additionally get their own city-dot markers on top of the region fill: they are municipalities in their own right, so the dots give the region-grain map a second entry point straight into the municipality grain, without needing municipality-grain polygons. Each is still counted inside its own region's aggregate.
+**Municipality-grain static SVG map.** The index choropleth renders a deterministic, vendored OpenStreetMap snapshot as 60 municipality polygons plus five green city markers: Tbilisi `04`, Batumi `06`, Kutaisi `20`, Poti `32`, and Rustavi `48`. Codes `06`, `20`, `32`, and `48` are marker-only; Tbilisi `04` is the sole polygon-plus-marker duplicate; the union is exactly the 64 publicly served municipality codes. Each polygon or marker opens `/explorer/municipalities/[code]` directly. The six-step terracotta ramp is quantile-classed by the latest available official municipal total. Pointer and keyboard activity synchronizes the exact municipality between map and ranked list; switching to the Regions list leaves the map at municipality grain and region rows remain inert toward map highlighting.
+
+The two reviewed occupied-area overlays render above the municipality fills as pale, non-interactive SVG paths with no public label, tooltip, link, keyboard focus, map text, or legend entry. The source note links `© OpenStreetMap contributors` to `https://www.openstreetmap.org/copyright` and states `ODbL` without adding occupied-territory wording. Natural Earth overlay provenance remains repository documentation because that source is public domain. Codes `05`, `42`, `43`, `46`, and `64` remain excluded from the public registry, facts, aggregates, rankings, and all interactive map targets: their raw budgets belong to Georgian municipal bodies operating outside those territories and serving displaced communities, so they are not territorially attributable spending inside the named municipalities. Full geometry and licence provenance is documented in `docs/data-methodology/municipal-functional-annual-2015-2025.md`; the approved behavior is specified in `docs/superpowers/specs/2026-08-07-municipality-map-upgrade-design.md`.
 
 **One public total.** `მთლიანი ბიუჯეტი` uses `public_total_gel` in the selector, chart, table, KPIs, comparisons, percentage denominator, and numeric CSV total row. The ten functions remain unchanged; their shares can sum below or above 100%. No residual category or reconciliation warning appears in the explorer. The methodology document explains the source-version and financing differences.
 

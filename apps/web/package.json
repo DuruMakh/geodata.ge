@@ -65,14 +65,16 @@
     "data:compose-budget-facts": "tsx scripts/compose-budget-facts.ts",
     "data:generate-municipal-facts": "tsx scripts/generate-municipal-facts.ts",
     "data:prepare-municipal-indicators": "tsx scripts/prepare-geostat-municipal-indicators.ts",
+    "data:prepare-municipality-geometry": "tsx scripts/prepare-municipality-geometry.ts",
+    "data:check-municipality-geometry": "tsx scripts/prepare-municipality-geometry.ts --check",
     "data:import": "tsx scripts/import-budget-facts.ts",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
     "csv-parse": "^6.2.1",
     "decimal.js": "^10.6.0",
     "next": "16.2.11",
@@ -93,7 +95,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.11",
     "pdf-parse": "^2.4.5",
-    "prisma": "^7.8.0",
+    "prisma": "^7.9.1",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5",
@@ -102,7 +104,7 @@
   },
   "overrides": {
     "fast-uri": "3.1.5",
-    "postcss": "8.5.18",
+    "postcss": "8.5.26",
     "sharp": "0.35.3"
   }
 }

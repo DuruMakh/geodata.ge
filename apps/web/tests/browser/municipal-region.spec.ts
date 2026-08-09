@@ -39,7 +39,7 @@ test.describe("region header responsiveness", () => {
 
       const heading = page.getByRole("heading", { level: 1 });
       await expect(heading).toHaveText(
-        "როგორ იხარჯება რაჭა-ლეჩხუმისა და ქვემო სვანეთის მუნიციპალური ბიუჯეტები",
+        "როგორ იხარჯება რაჭა-ლეჩხუმი და ქვემო სვანეთი▾",
       );
 
       const headingBox = await heading.boundingBox();
@@ -113,9 +113,9 @@ test.describe("entity picker region options resolve (previously 404)", () => {
 
     await expect(page).toHaveURL(/\/explorer\/municipalities\/region\/imereti(#|$)/);
     // Proof this is a real render, not Next's built-in 404 page: the
-    // region-only member list and the genitive-form heading are both present.
+    // region-only member list and the plain-name picker trigger are both present.
     await expect(page.getByTestId("region-member-row")).toHaveCount(12);
-    await expect(page.getByTestId("entity-picker-trigger")).toContainText("იმერეთის");
+    await expect(page.getByTestId("entity-picker-trigger")).toContainText("იმერეთი");
   });
 });
 
@@ -125,9 +125,21 @@ test.describe("entity picker region options resolve (previously 404)", () => {
 // past defects (the source note and the picker's region options), this is the
 // page's general contract.
 test.describe("region page", () => {
+  test("uses the plain region name in the picker trigger", async ({ page }) => {
+    await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
+
+    const trigger = page.getByTestId("entity-picker-trigger");
+    await expect(trigger).toContainText("იმერეთი");
+    await expect(trigger).not.toContainText("მუნიციპალური ბიუჯეტები");
+  });
+
   test("lists its member municipalities and carries the roll-up caveats", async ({ page }) => {
     await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);
+    const trigger = page.getByTestId("entity-picker-trigger");
+    await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
+    await expect(page.getByTestId("entity-picker-caret")).toHaveText("▾");
     await expect(page.getByTestId("region-member-row")).toHaveCount(12);
     await expect(page.getByTestId("municipal-source-note").first()).toContainText("აჭარის ავტონომიური რესპუბლიკის");
     await expect(page.getByTestId("divergence-callout")).toHaveCount(0);

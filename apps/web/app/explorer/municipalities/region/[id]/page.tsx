@@ -116,7 +116,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
 
         <MunicipalExplorer
           title="როგორ იხარჯება"
-          triggerLabel={`${REGION_GENITIVE_KA[regionId] ?? region.kaLabel} მუნიციპალური ბიუჯეტები`}
+          triggerLabel={region.kaLabel}
           entityId={regionId}
           metaLine={`${members.memberCodes.length} მუნიციპალიტეტი · ${georgianOrdinal(rank)} ადგილი ${regions.length}-დან`}
           functions={functions}
