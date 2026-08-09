@@ -3,7 +3,6 @@
 import { useState } from "react";
 import type { ExplorerItem, ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { MAX_CHART_SERIES, type ChartMode } from "../../lib/explorer/types";
-import { isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { formatAmount } from "../../lib/explorer/format";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
 import { Callout, SwatchBar, TextTab } from "../ui/editorial";
@@ -26,7 +25,8 @@ function matches(item: ExplorerItem, query: string): boolean {
 
 export function buildSeriesPanelRows(items: ExplorerItem[], query: string, expandedIds: string[]): SeriesPanelRow[] {
   const normalizedQuery = query.trim().toLowerCase();
-  const selectable = items.filter((item) => !isDerivedTotalItemId(item.id));
+  const total = items.find((item) => item.level === "total");
+  const selectable = items.filter((item) => item.level !== "total");
   const categories = selectable.filter((item) => item.level !== "major_program");
   const programsByParent = new Map<string, ExplorerItem[]>();
 
@@ -36,7 +36,9 @@ export function buildSeriesPanelRows(items: ExplorerItem[], query: string, expan
     programsByParent.set(parentId, [...(programsByParent.get(parentId) ?? []), item]);
   }
 
-  const rows: SeriesPanelRow[] = [];
+  const rows: SeriesPanelRow[] = total
+    ? [{ item: total, isProgram: false, hasChildren: false, expanded: false, caretLocked: false }]
+    : [];
 
   for (const category of categories) {
     const programs = programsByParent.get(category.id) ?? [];

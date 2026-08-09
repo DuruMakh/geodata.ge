@@ -78,8 +78,8 @@ function sideForItemId(itemId: string): ExplorerSide {
 function labelsFor(id: string, side: ExplorerSide, glossary: Map<string, GlossaryEntry>) {
   if (id === totalIdFor(side)) {
     return side === "revenue"
-      ? { kaLabel: "შემოსავლები სულ", enLabel: "Total revenue" }
-      : { kaLabel: "ხარჯები სულ", enLabel: "Total expenditure" };
+      ? { kaLabel: "მთლიანი შემოსავლები", enLabel: "Total revenue" }
+      : { kaLabel: "მთლიანი ხარჯი", enLabel: "Total expenditure" };
   }
 
   const entry = glossary.get(id);
@@ -205,8 +205,8 @@ function shareForYear(row: ExplorerTableRow, totalRow: ExplorerTableRow | null, 
   return amount / total;
 }
 
-// Default selection follows the editorial design: top categories by latest-year
-// value, never the derived total (totals live in the table "სულ" row and KPIs).
+// Default selection follows the editorial design: the applicable total plus the
+// top categories by latest-year value.
 export function getDefaultSelection(
   side: ExplorerSide,
   facts: ServedBudgetFact[],
@@ -231,11 +231,19 @@ export function getDefaultSelection(
 
   const latestYear = Math.max(...Array.from(amountsByItem.values()).map((entry) => entry.year), 0);
 
-  return Array.from(amountsByItem.entries())
+  const totalId =
+    side === "revenue"
+      ? "revenue.total"
+      : expenditureGrouping === "ministries"
+        ? ADMIN_SPENDING_TOTAL_ID
+        : "expenditure.total";
+  const categories = Array.from(amountsByItem.entries())
     .filter(([, entry]) => entry.year === latestYear)
     .sort((a, b) => b[1].amountGel - a[1].amountGel)
     .slice(0, DEFAULT_SELECTION_SIZE)
     .map(([itemId]) => itemId);
+
+  return categories.length === 0 ? [] : [totalId, ...categories];
 }
 
 export function isDerivedTotalItemId(itemId: string): boolean {
@@ -575,5 +583,4 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     hasPlannedValues: selectedPoints.some((point) => point.basis === "planned"),
   };
 }
-
 
