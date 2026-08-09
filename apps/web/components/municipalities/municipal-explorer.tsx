@@ -11,8 +11,6 @@ import {
   buildMovers,
   buildMunicipalEntityModel,
   getDefaultMunicipalSelection,
-  MAX_MUNICIPAL_CHART_SERIES,
-  type MunicipalWarning,
 } from "../../lib/explorer/municipalData";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { formatAmount, UNIT_MLN } from "../../lib/explorer/format";
@@ -24,12 +22,6 @@ import { RangeStrip } from "../main-explorer/range-strip";
 import { EntityPicker, type EntityPickerGroup } from "./entity-picker";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
-
-const WARNING_TEXT: Record<string, string> = {
-  source_version_difference: "ოფიციალური ჯამი და ფუნქციური კლასიფიკაციის ჯამი წყაროს სხვადასხვა ვერსიიდან მოდის",
-  financing_outside_functional: "ოფიციალური ჯამი მოიცავს დაფინანსების ოპერაციებს, რომლებიც ფუნქციურ კლასიფიკაციაში არ ნაწილდება",
-  reconciliation_review_required: "სხვაობა დამატებით გადამოწმებას საჭიროებს",
-};
 
 export type MunicipalExplorerProps = {
   title: string;
@@ -50,7 +42,6 @@ export type MunicipalExplorerProps = {
   nationalTotalByYear: Record<number, number>;
   rankByYear: Record<number, number>;
   rankOutOf: number;
-  showWarnings: boolean;
   csvBasename: string;
   pickerGroups: EntityPickerGroup[];
   prev: { label: string; href: string };
@@ -86,7 +77,10 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
     [functions, functionFacts, totalFacts, sourceDocuments, firstYear, lastYear],
   );
 
-  const knownIds = useMemo(() => new Set(fullModel.rows.map((row) => row.itemId)), [fullModel]);
+  const knownIds = useMemo(
+    () => new Set([fullModel.totalRow.itemId, ...fullModel.rows.map((row) => row.itemId)]),
+    [fullModel],
+  );
   const defaults = useMemo(() => getDefaultMunicipalSelection(fullModel), [fullModel]);
   const state = useMunicipalState(allYears, defaults, knownIds);
 
@@ -107,9 +101,8 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
   );
 
   const years = model.years;
-  const totalsByYear = new Map(years.map((year) => [year, model.totalRow.valuesByYear[year] ?? null]));
-
-  const series: ChartSeries[] = model.rows
+  const selectableRows = useMemo(() => [model.totalRow, ...model.rows], [model]);
+  const series: ChartSeries[] = selectableRows
     .filter((row) => state.selectedIds.includes(row.itemId))
     .map((row) => ({
       id: row.itemId,
@@ -117,42 +110,24 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       color: row.color,
       vals: years.map((year) => {
         const value = row.valuesByYear[year] ?? null;
-        if (!state.share) return value;
-        const total = totalsByYear.get(year);
-        return value === null || !total ? null : (value / total) * 100;
+        const total = model.totalRow.valuesByYear[year] ?? null;
+        return !state.share ? value : value === null || !total ? null : (value / total) * 100;
       }),
       planned: years.map(() => false),
     }));
 
   const noSelection = state.selectedIds.length === 0;
-  const chartSeries = series.slice(0, MAX_MUNICIPAL_CHART_SERIES);
-  const overLimit = state.chartMode === "line" && !noSelection && series.length > MAX_MUNICIPAL_CHART_SERIES;
-  const warningGroups = useMemo(() => {
-    const groups = new Map<MunicipalWarning["type"], MunicipalWarning[]>();
-    const visibleWarnings = props.showWarnings ? model.warnings : [];
-    for (const warning of visibleWarnings) {
-      const group = groups.get(warning.type) ?? [];
-      group.push(warning);
-      groups.set(warning.type, group);
-    }
-    return Array.from(groups.entries());
-  }, [model.warnings, props.showWarnings]);
-
   const [seriesQuery, setSeriesQuery] = useState("");
   const visibleRows = useMemo(() => {
     const needle = seriesQuery.trim();
-    return needle === "" ? model.rows : model.rows.filter((row) => row.kaLabel.includes(needle));
-  }, [model.rows, seriesQuery]);
-  const allSelected = visibleRows.length > 0 && visibleRows.every((row) => state.selectedIds.includes(row.itemId));
+    const functions = needle === "" ? model.rows : model.rows.filter((row) => row.kaLabel.includes(needle));
+    return [model.totalRow, ...functions];
+  }, [model.rows, model.totalRow, seriesQuery]);
+  const allSelected = selectableRows.every((row) => state.selectedIds.includes(row.itemId));
+  const hasSelection = state.selectedIds.length > 0;
 
   function toggleAll() {
-    // Selecting every function would exceed the chart cap, so select-all is a
-    // table-mode affordance: in line mode it clears instead of overfilling.
-    if (allSelected || state.chartMode === "line") {
-      state.setSelectedIds([]);
-      return;
-    }
-    state.setSelectedIds(visibleRows.map((row) => row.itemId));
+    state.setSelectedIds(hasSelection ? [] : selectableRows.map((row) => row.itemId));
   }
 
   function downloadCsv() {
@@ -240,7 +215,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                 ]}
               />
               <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                {state.share ? "წილი ჯამურ ხარჯებში, %" : "ათი ფუნქციის ჯამი · მლნ ₾"}
+                {state.share ? "წილი მთლიან ბიუჯეტში, %" : "მთლიანი ბიუჯეტი · მლნ ₾"}
               </span>
             </span>
             <button
@@ -263,21 +238,12 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               <Callout testId="no-selection-callout">არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.</Callout>
             </div>
           ) : state.chartMode === "line" ? (
-            <div>
-              {overLimit ? (
-                <div className="mb-4">
-                  <Callout testId="series-overflow-callout">
-                    ხაზის რეჟიმში ნაჩვენებია პირველი {MAX_MUNICIPAL_CHART_SERIES} სერია. მოხსენი ზედმეტი ან გადადი ცხრილის რეჟიმში.
-                  </Callout>
-                </div>
-              ) : null}
-              <EditorialLineChart years={years} series={chartSeries} share={state.share} unit={UNIT_MLN} />
-            </div>
+            <EditorialLineChart years={years} series={series} share={state.share} unit={UNIT_MLN} />
           ) : (
             <ExplorerTable
-              rows={model.rows}
+              rows={model.rows.filter((row) => state.selectedIds.includes(row.itemId))}
               totalRow={model.totalRow}
-              showTotal
+              showTotal={state.selectedIds.includes(model.totalRow.itemId)}
               years={years}
               firstColumnLabel="ფუნქცია"
               unit={UNIT_MLN}
@@ -290,30 +256,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
           <div className="mt-6 border-t border-[var(--hairline-soft)] pt-4">
             <RangeStrip years={allYears} range={state.range} onChange={state.setRange} />
           </div>
-
-          {warningGroups.length > 0 ? (
-            <div className="mt-5">
-              <div
-                data-testid="divergence-callout"
-                className="max-w-[560px] border-l-2 border-[var(--accent)] bg-[var(--tint)] px-3.5 py-3 text-[12.5px] leading-relaxed text-[var(--body)]"
-              >
-                <ul className="space-y-1.5 pl-4">
-                  {warningGroups.map(([type, warnings]) => (
-                    <li key={type}>
-                      {warnings
-                        .map((warning) =>
-                          warning.amountGel === null
-                            ? `${warning.year}`
-                            : `${warning.year} (${formatAmount(Math.abs(warning.amountGel))})`,
-                        )
-                        .join(", ")}{" "}
-                      — {WARNING_TEXT[type] ?? "ოფიციალური ჯამი და ფუნქციური ჯამი განსხვავდება"}.
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ) : null}
 
           <div className="mt-5 max-w-[640px]">
             <SourceNote testId="municipal-source-note">{props.sourceNote}</SourceNote>
@@ -342,7 +284,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             <div className="flex items-baseline justify-between pb-2.5">
               <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">სერიები</span>
               <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                {state.selectedIds.length} / {model.rows.length}
+                {" "}{state.selectedIds.length} / {selectableRows.length}
               </span>
             </div>
 
@@ -373,7 +315,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                 {allSelected ? "✓" : ""}
               </span>
               <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
-                {allSelected || state.chartMode === "line" ? "გასუფთავება" : "ყველას მონიშვნა"}
+                {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}
               </span>
             </button>
 
@@ -410,12 +352,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                 </button>
               );
             })}
-            {state.limitMessage ? (
-              <div className="mt-3">
-                <Callout testId="municipal-series-limit">{state.limitMessage}</Callout>
-              </div>
-            ) : null}
-
             <button
               type="button"
               data-testid="municipal-csv"

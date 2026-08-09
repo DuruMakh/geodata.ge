@@ -2,10 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ChartMode } from "../../lib/explorer/types";
-import { MAX_MUNICIPAL_CHART_SERIES } from "../../lib/explorer/municipalData";
 import { parseMunicipalHash, serializeMunicipalHash } from "../../lib/explorer/urlState";
-
-const SERIES_LIMIT_MESSAGE = `გრაფიკზე მაქსიმუმ ${MAX_MUNICIPAL_CHART_SERIES} სერია შეიძლება. ცხრილის რეჟიმში ლიმიტი არ არის.`;
 
 function clampYear(year: number, min: number, max: number): number {
   return Math.min(Math.max(year, min), max);
@@ -31,7 +28,6 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
   const [start, setStart] = useState(min);
   const [end, setEnd] = useState(max);
   const [selectedIds, setSelectedIds] = useState(defaultSelection);
-  const [limitMessage, setLimitMessage] = useState<string | null>(null);
   const appliedRef = useRef(false);
   const writtenRef = useRef(false);
 
@@ -73,14 +69,9 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
   }, [hash]);
 
   function toggleSeries(itemId: string) {
-    if (!selectedIds.includes(itemId) && chartMode !== "table" && selectedIds.length >= MAX_MUNICIPAL_CHART_SERIES) {
-      setLimitMessage(SERIES_LIMIT_MESSAGE);
-      return;
-    }
     setSelectedIds((current) =>
       current.includes(itemId) ? current.filter((id) => id !== itemId) : [...current, itemId],
     );
-    setLimitMessage(null);
   }
 
   function setRange(patch: { start?: number; end?: number }) {
@@ -91,20 +82,13 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
 
   return {
     chartMode,
-    setChartMode: (mode: ChartMode) => {
-      setChartMode(mode);
-      setLimitMessage(null);
-    },
+    setChartMode,
     share,
     setShare,
     range: { start, end, min, max },
     setRange,
     selectedIds,
     toggleSeries,
-    setSelectedIds: (nextSelectedIds: string[]) => {
-      setSelectedIds(nextSelectedIds);
-      setLimitMessage(null);
-    },
-    limitMessage,
+    setSelectedIds,
   };
 }
