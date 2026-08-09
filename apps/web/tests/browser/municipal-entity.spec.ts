@@ -306,8 +306,10 @@ test.describe("municipality page", () => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
     const bulk = page.getByTestId("municipal-series-all");
+    const header = page.getByTestId("municipal-series-header");
 
-    await expect(page.getByTestId("municipal-workspace")).toContainText("სერიები 6 / 11");
+    await expect(header).toContainText("სერიები 6 / 11");
+    await expect(header.locator(":scope > [data-testid='municipal-series-all']")).toHaveCount(1);
     await expect(bulk).toHaveText("გასუფთავება");
     await bulk.click();
     await expect(bulk).toHaveText("ყველას მონიშვნა");

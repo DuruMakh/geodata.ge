@@ -290,11 +290,15 @@ test("unchecking the total hides its table row without breaking share denominato
   await page.getByTestId("chart-mode-table").click();
   await page.getByTestId("measure-share-toggle").click();
 
+  const comparison = page.getByTestId("period-comparison");
+  await expect(comparison.locator("tbody tr").first()).toContainText("მთლიანი შემოსავლები");
+
   const totalButton = page.getByTestId("series-selector").getByTitle("მთლიანი შემოსავლები");
   await totalButton.click();
 
   await expect(page.getByTestId("explorer-table")).not.toContainText("მთლიანი შემოსავლები");
   await expect(page.getByTestId("explorer-table").locator("tbody tr").first()).toContainText("%");
+  await expect(comparison.locator("tbody tr")).toHaveCount(5);
 });
 
 test("shared ministries program links restore with the parent expanded", async ({ page }) => {

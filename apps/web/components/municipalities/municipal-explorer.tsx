@@ -281,11 +281,34 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
 
         <aside className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
           <div className="sticky top-5">
-            <div className="flex items-baseline justify-between pb-2.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">სერიები</span>
-              <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                {" "}{state.selectedIds.length} / {selectableRows.length}
+            <div data-testid="municipal-series-header" className="flex items-center justify-between gap-4 pb-2.5">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+                სერიები{" "}
+                <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
+                  {state.selectedIds.length} / {selectableRows.length}
+                </span>
               </span>
+              <button
+                type="button"
+                data-testid="municipal-series-all"
+                aria-pressed={allSelected}
+                onClick={toggleAll}
+                className="grid shrink-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-2 py-1 pr-1 pl-0.5 text-left"
+              >
+                <span
+                  aria-hidden
+                  className="inline-flex h-3.5 w-3.5 items-center justify-center border-[1.5px] text-[9px] leading-none text-[var(--paper)]"
+                  style={{
+                    borderColor: allSelected ? "var(--ink)" : "var(--control)",
+                    backgroundColor: allSelected ? "var(--ink)" : "transparent",
+                  }}
+                >
+                  {allSelected ? "✓" : ""}
+                </span>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
+                  {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}
+                </span>
+              </button>
             </div>
 
             <input
@@ -296,28 +319,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               aria-label="სერიების ძებნა"
               className="mb-2 h-[34px] w-full border-0 border-b border-[var(--control)] bg-transparent text-[13px] text-[var(--ink)] outline-none"
             />
-
-            <button
-              type="button"
-              data-testid="municipal-series-all"
-              aria-pressed={allSelected}
-              onClick={toggleAll}
-              className="grid w-full grid-cols-[auto_minmax(0,1fr)] items-center gap-2 border-b-2 border-[var(--ink)] py-2 pr-1 pl-0.5 text-left"
-            >
-              <span
-                aria-hidden
-                className="inline-flex h-3.5 w-3.5 items-center justify-center border-[1.5px] text-[9px] leading-none text-[var(--paper)]"
-                style={{
-                  borderColor: allSelected ? "var(--ink)" : "var(--control)",
-                  backgroundColor: allSelected ? "var(--ink)" : "transparent",
-                }}
-              >
-                {allSelected ? "✓" : ""}
-              </span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
-                {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}
-              </span>
-            </button>
 
             {visibleRows.map((row) => {
               const selected = state.selectedIds.includes(row.itemId);

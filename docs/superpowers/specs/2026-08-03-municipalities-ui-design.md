@@ -523,8 +523,9 @@ New `municipalData.test.ts` and `municipalGeo.test.ts`:
   region resolves to exactly one shape.
 - The projection is deterministic and bounded — same input, same path string,
   every point inside the viewBox.
-- The official total is first-class: it is selected by default, appears in the
-  KPI and `სულ` row, and remains removable.
+- The official `publicTotalGel` total is first-class: it is selected by default,
+  stays pinned first under search, appears as `მთლიანი ბიუჯეტი` in the KPI and
+  selected table row, and remains removable.
 - Region roll-ups use `public_total_gel` as their public total; the ten functions
   remain unchanged reconciliation inputs.
 - No reconciliation warning or dual-total source copy is rendered.

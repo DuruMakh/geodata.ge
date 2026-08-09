@@ -87,10 +87,8 @@ function agreeOrMixed(current: string, incoming: string, mixedMarker: string): s
  *   whichever row lands first: safe, because `functionalCode` is a 1:1
  *   property of `categoryId` (part of the group key) and `basis` is always
  *   the literal `"actual"` — neither can vary within a group.
- * - `showWarning` / `warningType` / `warningAmountGel` are always reset, not
- *   aggregated: a roll-up's warning state describes one municipality's
- *   reconciliation, not the group's, and region pages suppress the callout
- *   anyway (see the UI spec §8.2).
+ * - `showWarning` / `warningType` / `warningAmountGel` are internal
+ *   municipality-grain reconciliation state, so every roll-up resets them.
  */
 export function aggregateFactsForEntity(
   entityId: string,
@@ -123,8 +121,8 @@ export function aggregateFactsForEntity(
       existing.reconciliationDifferenceGel = sumNullable(existing.reconciliationDifferenceGel, row.reconciliationDifferenceGel);
       existing.publicTotalMeasure = agreeOrMixed(existing.publicTotalMeasure, row.publicTotalMeasure, MIXED_PUBLIC_TOTAL_MEASURE);
       existing.sourceId = agreeOrMixed(existing.sourceId, row.sourceId, MIXED_SOURCE_ID);
-      // Warning provenance is municipality-grain and cannot be assigned to
-      // the aggregate row; region pages therefore suppress the callout.
+      // Municipality-grain reconciliation state is not attributable to an
+      // aggregate row, so it stays reset during the roll-up.
       continue;
     }
     totalByYear.set(row.year, {

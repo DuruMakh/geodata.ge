@@ -155,8 +155,8 @@ Run the focused test. Expected: PASS.
 Cover an all-series shared hash, a deliberate empty `sel=`, and absence of a public reconciliation callout:
 
 ```ts
-await page.goto(`${BASE}/explorer/municipalities/04#m=line&r=2015-2025&sel=${ALL_TEN_IDS}`);
-await expect(page.locator("[data-testid='editorial-line-chart'] path[data-series]")).toHaveCount(10);
+await page.goto(`${BASE}/explorer/municipalities/04#m=line&r=2015-2025&sel=${ALL_SERIES_IDS}`);
+await expect(page.locator("[data-testid='editorial-line-chart'] path[data-series]")).toHaveCount(11);
 
 await page.goto(`${BASE}/explorer/municipalities/04#m=line&r=2015-2025&sel=`);
 await expect(page.getByTestId("no-selection-callout")).toBeVisible();

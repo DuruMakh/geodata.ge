@@ -1037,8 +1037,7 @@ The core model: turn one municipality's (or one region's) facts into chart and t
 **Interfaces:**
 - Consumes: `MunicipalFunction`, `Municipality`, `MunicipalFunctionFact`, `MunicipalTotalFact` from `lib/data/municipal/types`; `SourceDocumentRow` from `lib/data/sources`; `ExplorerTableRow` from `lib/explorer/types`; `colorForItem` from `lib/explorer/colors`.
 - Produces:
-  - `MunicipalWarning = { year: number; type: MunicipalWarningType; amountGel: number | null }`
-  - `MunicipalEntityModel = { years: number[]; rows: ExplorerTableRow[]; totalRow: ExplorerTableRow; officialTotalByYear: Record<number, number>; warnings: MunicipalWarning[] }`
+  - `MunicipalEntityModel = { years: number[]; rows: ExplorerTableRow[]; totalRow: ExplorerTableRow }`
   - `buildMunicipalEntityModel(input: MunicipalEntityInput): MunicipalEntityModel`
   - `getDefaultMunicipalSelection(model: MunicipalEntityModel): string[]`
 
@@ -1137,11 +1136,11 @@ describe("buildMunicipalEntityModel", () => {
     expect(build().totalRow.valuesByYear[2016]).toBe(300);
   });
 
-  it("makes the ten functions sum to the functional total in every year", () => {
+  it("keeps the functional rows distinct from the official public total", () => {
     const model = build();
     for (const year of model.years) {
       const summed = model.rows.reduce((sum, row) => sum + (row.valuesByYear[year] ?? 0), 0);
-      expect(summed).toBeCloseTo(year === 2016 ? 265 : model.officialTotalByYear[year]!, 6);
+      expect(summed).toBeCloseTo(year === 2016 ? 265 : model.totalRow.valuesByYear[year]!, 6);
     }
   });
 
@@ -1158,15 +1157,6 @@ describe("buildMunicipalEntityModel", () => {
     expect(economicFull.change).toBeCloseTo(2, 6);
     expect(economicClipped.change).toBeCloseTo(0.5, 6);
     expect(build(2015, 2016).totalRow.change).not.toBe(build().totalRow.change);
-  });
-
-  it("retains warnings as internal reconciliation data", () => {
-    expect(build().warnings.map((w) => w.year)).toEqual([2016]);
-    expect(build(2017, 2017).warnings).toEqual([]);
-  });
-
-  it("carries the warning amount and type", () => {
-    expect(build().warnings[0]).toEqual({ year: 2016, type: "source_version_difference", amountGel: 35 });
   });
 
   it("treats a zero function as a real zero, not a gap", () => {
@@ -1209,7 +1199,6 @@ import type {
   MunicipalFunction,
   MunicipalFunctionFact,
   MunicipalTotalFact,
-  MunicipalWarningType,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
 import type { ExplorerTableRow, SourceMetadata } from "./types";
@@ -1225,21 +1214,10 @@ import { colorForItem, INK } from "./colors";
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
 
-export type MunicipalWarning = {
-  year: number;
-  type: MunicipalWarningType;
-  amountGel: number | null;
-};
-
 export type MunicipalEntityModel = {
   years: number[];
   rows: ExplorerTableRow[];
   totalRow: ExplorerTableRow;
-  /**
-   * public_total_gel by year — the official MoF headline and public total.
-   */
-  officialTotalByYear: Record<number, number>;
-  warnings: MunicipalWarning[];
 };
 
 export type MunicipalEntityInput = {
@@ -1331,18 +1309,11 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
     sourceIds.set(key, row.sourceId);
   }
 
-  const functionalSumByYear: Record<number, number> = {};
-  const officialTotalByYear: Record<number, number> = {};
-  const warnings: MunicipalWarning[] = [];
+  const publicTotalByYear: Record<number, number> = {};
   for (const row of totalFacts) {
     if (!inRange.has(row.year)) continue;
-    functionalSumByYear[row.year] = (functionalSumByYear[row.year] ?? 0) + row.functionalSumGel;
-    officialTotalByYear[row.year] = (officialTotalByYear[row.year] ?? 0) + row.publicTotalGel;
-    if (row.showWarning) {
-      warnings.push({ year: row.year, type: row.warningType, amountGel: row.warningAmountGel });
-    }
+    publicTotalByYear[row.year] = (publicTotalByYear[row.year] ?? 0) + row.publicTotalGel;
   }
-  warnings.sort((left, right) => left.year - right.year);
 
   const firstYear = years[0];
   const lastYear = years.at(-1);
@@ -1364,7 +1335,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
     }
 
     const endValue = lastYear === undefined ? null : valuesByYear[lastYear] ?? null;
-    const endTotal = lastYear === undefined ? null : officialTotalByYear[lastYear] ?? null;
+    const endTotal = lastYear === undefined ? null : publicTotalByYear[lastYear] ?? null;
 
     return {
       itemId: fn.id,
@@ -1389,7 +1360,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
   const totalBasisByYear: Record<number, "actual" | "planned"> = {};
   const totalSourceByYear: Record<number, SourceMetadata> = {};
   for (const year of years) {
-    totalValuesByYear[year] = officialTotalByYear[year] ?? null;
+    totalValuesByYear[year] = publicTotalByYear[year] ?? null;
     totalBasisByYear[year] = "actual";
     totalSourceByYear[year] = sourceMetadataFor(totalFacts[0]?.sourceId ?? "", sources);
   }
@@ -1399,7 +1370,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
     parentItemId: null,
     level: "total",
     detailLabel: null,
-    kaLabel: "სულ",
+    kaLabel: "მთლიანი ბიუჯეტი",
     enLabel: "Total",
     color: INK,
     basisByYear: totalBasisByYear,
@@ -1412,7 +1383,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
     shareEndYear: 1,
   };
 
-  return { years, rows, totalRow, officialTotalByYear, warnings };
+  return { years, rows, totalRow };
 }
 
 /**
@@ -1453,13 +1424,11 @@ const m = buildMunicipalEntityModel({
   sourceDocuments, startYear: 2015, endYear: 2025,
 });
 console.log('years', m.years.length, 'rows', m.rows.length);
-console.log('2025 functional', m.totalRow.valuesByYear[2025]);
-console.log('2025 official  ', m.officialTotalByYear[2025]);
-console.log('warnings', m.warnings.length);
+console.log('2025 public total', m.totalRow.valuesByYear[2025]);
 "
 ```
 
-Expected: `years 11 rows 10`, the two 2025 numbers equal (თბილისი's 2025 rows reconcile), and `warnings 9` — თბილისი carries a warning in 9 of 11 years.
+Expected: `years 11 rows 10`; the public total is sourced from `public_total_gel`, while the ten functional rows remain available for internal reconciliation.
 
 - [ ] **Step 6: Commit**
 
@@ -1864,8 +1833,7 @@ describe("buildEntityKpis", () => {
     const divergent = buildEntityKpis({ model, nationalTotalLatest: 740, rank: 1, rankOutOf: 64 });
     expect(divergent[0]!.label).toBe("ოფიციალური ბიუჯეტი");
     expect(divergent[0]!.detail).toContain("ფინანსთა სამინისტროს");
-    expect(model.officialTotalByYear[2016]).toBe(300);
-    expect(model.totalRow.valuesByYear[2016]).toBe(265);
+    expect(model.totalRow.valuesByYear[2016]).toBe(300);
     // formatAmount renders both in მლნ; assert the KPI tracked the official one
     // by checking it changes when the official total does, not the functional.
     expect(divergent[0]!.value).toBe(formatAmount(300));
@@ -1961,7 +1929,7 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
   const startYear = model.years[0];
   const endYear = model.years.at(-1);
 
-  const officialEnd = endYear === undefined ? 0 : model.officialTotalByYear[endYear] ?? 0;
+  const officialEnd = endYear === undefined ? 0 : model.totalRow.valuesByYear[endYear] ?? 0;
   const functionalStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
   const functionalEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
   const growth = changeBetween(functionalStart, functionalEnd);
@@ -3292,9 +3260,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
   const [seriesQuery, setSeriesQuery] = useState("");
   const visibleRows = useMemo(() => {
     const needle = seriesQuery.trim();
-    return needle === "" ? [model.totalRow, ...model.rows] : [model.totalRow, ...model.rows].filter((row) => row.kaLabel.includes(needle));
-  }, [model, seriesQuery]);
+    const functions = needle === "" ? model.rows : model.rows.filter((row) => row.kaLabel.includes(needle));
+    return [model.totalRow, ...functions];
+  }, [model.rows, model.totalRow, seriesQuery]);
   const allSelected = selectableRows.length > 0 && selectableRows.every((row) => state.selectedIds.includes(row.itemId));
+  const hasSelection = state.selectedIds.length > 0;
 
   function toggleAll() {
     if (allSelected) {
@@ -3381,7 +3351,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                 ]}
               />
               <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                {state.share ? "წილი ჯამურ ხარჯებში, %" : "ათი ფუნქციის ჯამი · მლნ ₾"}
+                {state.share ? "წილი მთლიან ბიუჯეტში, %" : "მთლიანი ბიუჯეტი · მლნ ₾"}
               </span>
             </span>
             <button
@@ -3403,8 +3373,9 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             <EditorialLineChart years={years} series={series} share={state.share} unit={UNIT_MLN} />
           ) : (
             <ExplorerTable
-              rows={model.rows}
+              rows={model.rows.filter((row) => state.selectedIds.includes(row.itemId))}
               totalRow={model.totalRow}
+              showTotal={state.selectedIds.includes(model.totalRow.itemId)}
               years={years}
               firstColumnLabel="ფუნქცია"
               unit={UNIT_MLN}
@@ -3442,11 +3413,22 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
 
         <aside className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] min-[1100px]:border-t-0 min-[1100px]:border-l min-[1100px]:border-[var(--hairline)] min-[1100px]:pt-0 min-[1100px]:pl-[26px]">
           <div className="sticky top-5">
-            <div className="flex items-baseline justify-between pb-2.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">სერიები</span>
-              <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                {state.selectedIds.length} / {selectableRows.length}
+            <div className="flex items-center justify-between gap-4 pb-2.5">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+                სერიები {state.selectedIds.length} / {selectableRows.length}
               </span>
+              <button
+                type="button"
+                data-testid="municipal-series-all"
+                aria-pressed={allSelected}
+                onClick={toggleAll}
+                className="grid shrink-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-2 py-1 pr-1 pl-0.5 text-left"
+              >
+                <span aria-hidden>{allSelected ? "✓" : ""}</span>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
+                  {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}
+                </span>
+              </button>
             </div>
 
             <input
@@ -3457,28 +3439,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               aria-label="სერიების ძებნა"
               className="mb-2 h-[34px] w-full border-0 border-b border-[var(--control)] bg-transparent text-[13px] text-[var(--ink)] outline-none"
             />
-
-            <button
-              type="button"
-              data-testid="municipal-series-all"
-              aria-pressed={allSelected}
-              onClick={toggleAll}
-              className="grid w-full grid-cols-[auto_minmax(0,1fr)] items-center gap-2 border-b-2 border-[var(--ink)] py-2 pr-1 pl-0.5 text-left"
-            >
-              <span
-                aria-hidden
-                className="inline-flex h-3.5 w-3.5 items-center justify-center border-[1.5px] text-[9px] leading-none text-[var(--paper)]"
-                style={{
-                  borderColor: allSelected ? "var(--ink)" : "var(--control)",
-                  backgroundColor: allSelected ? "var(--ink)" : "transparent",
-                }}
-              >
-                {allSelected ? "✓" : ""}
-              </span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
-                {allSelected ? "გასუფთავება" : "ყველას მონიშვნა"}
-              </span>
-            </button>
 
             {visibleRows.map((row) => {
               const selected = state.selectedIds.includes(row.itemId);
@@ -4078,7 +4038,7 @@ test.describe("municipality page", () => {
   test("renders every selected series without a cap", async ({ page }) => {
     await page.goto("/explorer/municipalities/04");
     const rows = page.getByTestId("municipal-series-row");
-    for (let index = 0; index < 10; index += 1) {
+    for (let index = 0; index < 11; index += 1) {
       const row = rows.nth(index);
       if ((await row.getAttribute("aria-pressed")) === "false") await row.click();
     }
@@ -4111,7 +4071,7 @@ test.describe("municipality page", () => {
     await page.getByTestId("municipal-series-search").fill("განათლება");
     await expect(page.getByTestId("municipal-series-row")).toHaveCount(1);
     await page.getByTestId("municipal-series-search").fill("");
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(10);
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(11);
     await page.getByTestId("municipal-series-all").click();
     await expect(page.getByTestId("municipal-series-row").first()).toHaveAttribute("aria-pressed", "false");
   });
