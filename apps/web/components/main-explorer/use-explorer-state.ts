@@ -25,8 +25,8 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     const collect = (values: Iterable<number>) => Array.from(new Set(values)).sort((a, b) => a - b);
 
     return {
-      // Chartable field/revenue years are years with category detail; derived totals
-      // are not selectable series, so total-only years are not offered.
+      // Chartable field/revenue years follow category-detail coverage. Derived
+      // totals remain selectable, but total-only years are not offered.
       fields: collect(
         facts.filter((fact) => fact.side === "expenditure" && !isDerivedTotalItemId(fact.itemId)).map((fact) => fact.year),
       ),
