@@ -238,9 +238,9 @@ In 2025, the raw official functional workbook already reconciles to total paymen
 | `reconciliation_difference_gel` | Total payments minus functional subtotal. |
 | `financing_components_gel` | Financial-asset growth plus liability decrease. |
 | `financing_reconciliation_difference_gel` | Reconciliation difference minus financing components. |
-| `warning_amount_gel` | Absolute material difference shown in the public note. |
-| `show_warning` | `true` only under the GEL 1 million rule. |
-| `warning_type` | Explanation category used by the public note and review workflow. |
+| `warning_amount_gel` | Absolute material reconciliation difference retained for internal validation and review. |
+| `show_warning` | Internal validation flag under the GEL 1 million review rule; never a public UI instruction. |
+| `warning_type` | Internal reconciliation classification used by validation and source review only. |
 
 ## Functional output fields
 

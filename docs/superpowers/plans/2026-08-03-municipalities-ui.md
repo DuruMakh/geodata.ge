@@ -3169,7 +3169,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, startYear, endYe
 
 - [ ] **Step 3: Write the shared explorer component**
 
-Create `apps/web/components/municipalities/municipal-explorer.tsx`. It renders the workspace, the warning callout and the aside, and is used by both the municipality and region routes.
+Create `apps/web/components/municipalities/municipal-explorer.tsx`. It renders the workspace and the aside, uses the official total as the public total, and is used by both the municipality and region routes. Reconciliation fields remain internal.
 
 ```tsx
 "use client";

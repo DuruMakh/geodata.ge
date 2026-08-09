@@ -17,9 +17,9 @@ no route reading it. `apps/web/lib/explorer/sections.ts` still carries
 This spec is the second of the two. It builds the section: an index with a map
 and a ranked list, a page per municipality, and a page per region.
 
-Spec 1 deliberately deferred three things to this spec. All three are resolved
-here: map geometry (§4), the replacement for per-capita (§5.3, §6.4), and
-warning placement (§8).
+Spec 1 deliberately deferred two things to this spec. Both are resolved here:
+map geometry (§4) and the replacement for per-capita (§5.3, §6.4). Municipal
+reconciliation remains internal as specified in §8.
 
 ## 2. Decisions taken during brainstorming
 
@@ -31,7 +31,7 @@ Recorded because each closes an option that looks open from the code.
    unblocked at ADM1 grain. A municipality-level map is a separate future spec;
    it is not owed by this one.
 2. **One measure: absolute GEL.** No measure pill. See §5.3.
-3. **Divergence callout on municipality pages only**, year-scoped. See §8.
+3. **One public official total with internal reconciliation only.** See §8.
 4. **Reuse the existing chart, range strip and table**; write a new model layer
    underneath them. See §9.
 5. **Region geometry moves from GADM to geoBoundaries `gbOpen`** before anything

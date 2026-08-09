@@ -1166,7 +1166,7 @@ In `apps/web/tests/browser/main-explorer.spec.ts`:
 - In the first test, delete the three `nav-*` assertions (lines 52-55) and the `// Three-tab nav.` comment.
 - In `"revenue nav reuses the identical system without a grouping switch"`, replace the `await page.getByTestId("nav-revenue").click();` line with `await page.goto("http://localhost:3100/explorer/revenue");` followed by `await expectAppReady(page);`.
 - In `"URL hash round-trips explorer state"`, change the second `goto` to `http://localhost:3100/explorer/revenue#m=table&sh=1&r=2010-2020&sel=revenue.vat`.
-- In `"line mode caps over-limit shared selections with a callout"`, change the `goto` to `` `http://localhost:3100/explorer/expenditure#m=line&sel=${sel}` ``.
+- In the large shared-selection test, change the `goto` to `` `http://localhost:3100/explorer/expenditure#m=line&sel=${sel}` `` and assert every selected series renders with no limit message.
 - In `"analysis view renders the fixed single-year section order"`, replace the `nav-analysis` click with `await page.goto("http://localhost:3100/explorer/analysis");` and `await expectAppReady(page);`.
 - In `"mobile explorer and analysis layouts have no page overflow"` and `"captures editorial desktop and mobile screenshots"`, do the same for the `nav-analysis` clicks.
 

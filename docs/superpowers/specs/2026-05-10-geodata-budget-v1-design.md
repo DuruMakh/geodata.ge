@@ -236,13 +236,12 @@ Users can select multiple series from the right-side panel.
 
 Rules:
 
-- Up to 8 visible series on charts.
-- Table mode has no 8-series limit.
-- Search filters available items while preserving hierarchy context.
-- If the user tries to select more than 8 chart series, show a clear limit message.
+- The default selection is the total plus the top 5 categories by latest-year value; the total is selectable and removable.
+- Selection and line rendering are unlimited; every selected line renders.
+- Search filters visible items while preserving hierarchy context and never scopes global clear/select-all.
 - Expenditure and revenue remember separate selections when switching modes.
 
-The default selected series is total expenditure in expenditure mode.
+The header shows `სერიები {selected} / {all}` and switches between `გასუფთავება` and `ყველას მონიშვნა`.
 
 ### Line Mode
 
