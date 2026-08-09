@@ -81,9 +81,6 @@ test.describe("region roll-up page", () => {
     await expect(chart).toBeVisible();
     await expect(chart.locator("svg text").first()).toBeVisible();
 
-    // Region pages pass showWarnings={false}: warning type and reconciliation
-    // wording are municipality-grain provenance and cannot be assigned to the
-    // aggregate. The standing two-measures source note still applies.
     await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
   });
 

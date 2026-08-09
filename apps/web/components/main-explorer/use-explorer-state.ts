@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ServedAdminFact, ServedBudgetFact } from "../../lib/servedRows";
 import { getDefaultSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
-import { MAX_CHART_SERIES, type ChartMode, type ExpenditureGrouping, type ExplorerNav, type ExplorerScope } from "../../lib/explorer/types";
+import { type ChartMode, type ExpenditureGrouping, type ExplorerNav, type ExplorerScope } from "../../lib/explorer/types";
 import { parseExplorerHash, scopeFor, serializeExplorerHash } from "../../lib/explorer/urlState";
 
 type UseExplorerStateInput = {
@@ -16,8 +16,6 @@ type RangePatch = { start?: number; end?: number };
 
 export type ResolvedRange = { start: number; end: number; min: number; max: number };
 
-const SERIES_LIMIT_MESSAGE = `გრაფიკზე მაქსიმუმ ${MAX_CHART_SERIES} სერია შეიძლება. ცხრილის რეჟიმში ლიმიტი არ არის.`;
-
 function clampYear(year: number, min: number, max: number): number {
   return Math.min(Math.max(year, min), max);
 }
@@ -27,8 +25,8 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     const collect = (values: Iterable<number>) => Array.from(new Set(values)).sort((a, b) => a - b);
 
     return {
-      // Chartable field/revenue years are years with category detail; derived totals
-      // are not selectable series, so total-only years are not offered.
+      // Chartable field/revenue years follow category-detail coverage. Derived
+      // totals remain selectable, but total-only years are not offered.
       fields: collect(
         facts.filter((fact) => fact.side === "expenditure" && !isDerivedTotalItemId(fact.itemId)).map((fact) => fact.year),
       ),
@@ -41,9 +39,9 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
 
   const idsByScope = useMemo<Record<ExplorerScope, Set<string>>>(
     () => ({
-      fields: new Set(facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.itemId)),
-      revenue: new Set(facts.filter((fact) => fact.side === "revenue").map((fact) => fact.itemId)),
-      ministries: new Set(adminFacts.map((fact) => fact.itemId)),
+      fields: new Set(["expenditure.total", ...facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.itemId)]),
+      revenue: new Set(["revenue.total", ...facts.filter((fact) => fact.side === "revenue").map((fact) => fact.itemId)]),
+      ministries: new Set(["admin_spending.total", ...adminFacts.map((fact) => fact.itemId)]),
     }),
     [facts, adminFacts],
   );
@@ -63,7 +61,6 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
   const [ranges, setRanges] = useState<Partial<Record<ExplorerScope, RangePatch>>>({});
   const [selections, setSelections] = useState<Partial<Record<ExplorerScope, string[]>>>({});
   const [expandedMinistries, setExpandedMinistries] = useState<string[]>([]);
-  const [limitMessage, setLimitMessage] = useState<string | null>(null);
   const [analysisSide, setAnalysisSide] = useState<"expenditure" | "revenue">("expenditure");
   const [analysisGrouping, setAnalysisGrouping] = useState<ExpenditureGrouping>("fields");
   const [analysisYear, setAnalysisYear] = useState<number | null>(null);
@@ -98,15 +95,6 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
   const selectedIds = selections[scope] ?? defaultSelections[scope];
 
   function toggleSeries(itemId: string) {
-    // The limit check reads render-time state (good enough for the message), but
-    // the write derives from the updater's own argument so rapid toggles in one
-    // render window can't overwrite each other with a stale array.
-    const current = selections[scope] ?? defaultSelections[scope];
-    if (!current.includes(itemId) && chartMode !== "table" && current.length >= MAX_CHART_SERIES) {
-      setLimitMessage(SERIES_LIMIT_MESSAGE);
-      return;
-    }
-
     setSelections((existing) => {
       const fresh = existing[scope] ?? defaultSelections[scope];
       return {
@@ -114,7 +102,10 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
         [scope]: fresh.includes(itemId) ? fresh.filter((id) => id !== itemId) : [...fresh, itemId],
       };
     });
-    setLimitMessage(null);
+  }
+
+  function setSelectedSeries(nextSelectedIds: string[]) {
+    setSelections((existing) => ({ ...existing, [scope]: nextSelectedIds }));
   }
 
   function toggleMinistryExpanded(ministryId: string) {
@@ -125,12 +116,10 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
 
   function handleGroupingChange(nextGrouping: ExpenditureGrouping) {
     setGrouping(nextGrouping);
-    setLimitMessage(null);
   }
 
   function handleChartModeChange(mode: ChartMode) {
     setChartMode(mode);
-    setLimitMessage(null);
   }
 
   // Restore shareable state from the URL hash once, after mount (the server render
@@ -214,10 +203,10 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     range: activeRange,
     setRange,
     selectedIds,
-    limitMessage,
     expandedMinistries,
     toggleMinistryExpanded,
     toggleSeries,
+    setSelectedSeries,
     handleGroupingChange,
     handleChartModeChange,
     analysisSide,

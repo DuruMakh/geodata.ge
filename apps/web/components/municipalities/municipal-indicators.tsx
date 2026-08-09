@@ -93,7 +93,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, startYear, endYe
               <tr>
                 {["ფუნქცია", String(startYear), "ცვლილება", String(endYear)].map((label, index) => (
                   <th
-                    key={label}
+                    key={`comparison-header-${index}`}
                     className={`border-b-2 border-[var(--ink)] pb-[7px] text-[10px] font-semibold uppercase tracking-[0.05em] text-[var(--muted)] ${
                       index === 0 ? "text-left" : "text-right"
                     }`}

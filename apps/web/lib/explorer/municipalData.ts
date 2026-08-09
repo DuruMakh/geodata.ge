@@ -3,11 +3,9 @@ import type {
   MunicipalFunction,
   MunicipalFunctionFact,
   MunicipalTotalFact,
-  MunicipalWarningType,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
 import type { ExplorerTableRow, SourceMetadata } from "./types";
-import { MAX_CHART_SERIES } from "./types";
 import { colorForItem, INK } from "./colors";
 import { formatAmount, formatShare, MISSING } from "./format";
 import { georgianOrdinal } from "./municipalLabels";
@@ -18,27 +16,14 @@ import { georgianOrdinal } from "./municipalLabels";
 // consume (ExplorerTableRow, and ChartSeries built from it), so those components
 // are reused untouched. It deliberately does not go through buildExplorerModel:
 // that model is built around sides, groupings and a national item×year grain,
-// while this one is municipality×function×year with two separate totals.
+// while this one is municipality×function×year.
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
-
-export type MunicipalWarning = {
-  year: number;
-  type: MunicipalWarningType;
-  amountGel: number | null;
-};
 
 export type MunicipalEntityModel = {
   years: number[];
   rows: ExplorerTableRow[];
   totalRow: ExplorerTableRow;
-  /**
-   * public_total_gel by year — the official MoF headline. Kept apart from
-   * totalRow (the sum of the ten served functions) because they are different
-   * measures and must never be reconciled by adjusting a category.
-   */
-  officialTotalByYear: Record<number, number>;
-  warnings: MunicipalWarning[];
 };
 
 export type MunicipalEntityInput = {
@@ -102,10 +87,8 @@ function agreeOrMixed(current: string, incoming: string, mixedMarker: string): s
  *   whichever row lands first: safe, because `functionalCode` is a 1:1
  *   property of `categoryId` (part of the group key) and `basis` is always
  *   the literal `"actual"` — neither can vary within a group.
- * - `showWarning` / `warningType` / `warningAmountGel` are always reset, not
- *   aggregated: a roll-up's warning state describes one municipality's
- *   reconciliation, not the group's, and region pages suppress the callout
- *   anyway (see the UI spec §8.2).
+ * - `showWarning` / `warningType` / `warningAmountGel` are internal
+ *   municipality-grain reconciliation state, so every roll-up resets them.
  */
 export function aggregateFactsForEntity(
   entityId: string,
@@ -138,8 +121,8 @@ export function aggregateFactsForEntity(
       existing.reconciliationDifferenceGel = sumNullable(existing.reconciliationDifferenceGel, row.reconciliationDifferenceGel);
       existing.publicTotalMeasure = agreeOrMixed(existing.publicTotalMeasure, row.publicTotalMeasure, MIXED_PUBLIC_TOTAL_MEASURE);
       existing.sourceId = agreeOrMixed(existing.sourceId, row.sourceId, MIXED_SOURCE_ID);
-      // Warning provenance is municipality-grain and cannot be assigned to
-      // the aggregate row; region pages therefore suppress the callout.
+      // Municipality-grain reconciliation state is not attributable to an
+      // aggregate row, so it stays reset during the roll-up.
       continue;
     }
     totalByYear.set(row.year, {
@@ -196,31 +179,24 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
 
   const amounts = new Map<string, number>();
   const sourceIds = new Map<string, string>();
-  const functionalSourceIdByYear = new Map<number, string>();
   for (const row of functionFacts) {
     if (!inRange.has(row.year)) continue;
     const key = `${row.categoryId}|${row.year}`;
     amounts.set(key, (amounts.get(key) ?? 0) + row.amountGel);
     sourceIds.set(key, row.sourceId);
-    const currentSourceId = functionalSourceIdByYear.get(row.year);
-    functionalSourceIdByYear.set(
+  }
+
+  const officialTotalByYear: Record<number, number> = {};
+  const officialSourceIdByYear = new Map<number, string>();
+  for (const row of totalFacts) {
+    if (!inRange.has(row.year)) continue;
+    officialTotalByYear[row.year] = (officialTotalByYear[row.year] ?? 0) + row.publicTotalGel;
+    const currentSourceId = officialSourceIdByYear.get(row.year);
+    officialSourceIdByYear.set(
       row.year,
       currentSourceId === undefined ? row.sourceId : agreeOrMixed(currentSourceId, row.sourceId, MIXED_SOURCE_ID),
     );
   }
-
-  const functionalSumByYear: Record<number, number> = {};
-  const officialTotalByYear: Record<number, number> = {};
-  const warnings: MunicipalWarning[] = [];
-  for (const row of totalFacts) {
-    if (!inRange.has(row.year)) continue;
-    functionalSumByYear[row.year] = (functionalSumByYear[row.year] ?? 0) + row.functionalSumGel;
-    officialTotalByYear[row.year] = (officialTotalByYear[row.year] ?? 0) + row.publicTotalGel;
-    if (row.showWarning) {
-      warnings.push({ year: row.year, type: row.warningType, amountGel: row.warningAmountGel });
-    }
-  }
-  warnings.sort((left, right) => left.year - right.year);
 
   const firstYear = years[0];
   const lastYear = years.at(-1);
@@ -242,7 +218,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
     }
 
     const endValue = lastYear === undefined ? null : valuesByYear[lastYear] ?? null;
-    const endTotal = lastYear === undefined ? null : functionalSumByYear[lastYear] ?? null;
+    const endTotal = lastYear === undefined ? null : officialTotalByYear[lastYear] ?? null;
 
     return {
       itemId: fn.id,
@@ -267,12 +243,9 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
   const totalBasisByYear: Record<number, "actual" | "planned"> = {};
   const totalSourceByYear: Record<number, SourceMetadata> = {};
   for (const year of years) {
-    totalValuesByYear[year] = functionalSumByYear[year] ?? null;
+    totalValuesByYear[year] = officialTotalByYear[year] ?? null;
     totalBasisByYear[year] = "actual";
-    // This row exports functional_sum_gel, so its provenance follows the ten
-    // function facts. The independently sourced official total is not the
-    // source of this derived value.
-    totalSourceByYear[year] = sourceMetadataFor(functionalSourceIdByYear.get(year) ?? "", sources);
+    totalSourceByYear[year] = sourceMetadataFor(officialSourceIdByYear.get(year) ?? "", sources);
   }
 
   const totalRow: ExplorerTableRow = {
@@ -280,7 +253,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
     parentItemId: null,
     level: "total",
     detailLabel: null,
-    kaLabel: "სულ",
+    kaLabel: "მთლიანი ბიუჯეტი",
     enLabel: "Total",
     color: INK,
     basisByYear: totalBasisByYear,
@@ -293,24 +266,24 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
     shareEndYear: 1,
   };
 
-  return { years, rows, totalRow, officialTotalByYear, warnings };
+  return { years, rows, totalRow };
 }
 
 /**
- * Top five functions by latest-year value. Derived totals are never selectable
- * series (AGENTS.md "UX and Visual Guardrails") — the total lives in the table's
- * სულ row and the KPI, which is why the design file's pinned __total entry is
- * deliberately not reproduced.
+ * Official total followed by the top five functions by latest-year value.
  */
 export function getDefaultMunicipalSelection(model: MunicipalEntityModel): string[] {
   const lastYear = model.years.at(-1);
   if (lastYear === undefined) return [];
 
-  return model.rows
-    .slice()
-    .sort((left, right) => (right.valuesByYear[lastYear] ?? 0) - (left.valuesByYear[lastYear] ?? 0))
-    .slice(0, Math.min(5, MAX_CHART_SERIES))
-    .map((row) => row.itemId);
+  return [
+    model.totalRow.itemId,
+    ...model.rows
+      .slice()
+      .sort((left, right) => (right.valuesByYear[lastYear] ?? 0) - (left.valuesByYear[lastYear] ?? 0))
+      .slice(0, 5)
+      .map((row) => row.itemId),
+  ];
 }
 
 export type MunicipalListRow = {
@@ -443,7 +416,6 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     if (row.year !== latestYear) continue;
     byFunction.set(row.categoryId, (byFunction.get(row.categoryId) ?? 0) + row.amountGel);
   }
-  const functionalSum = Array.from(byFunction.values()).reduce((sum, value) => sum + value, 0);
   const topFunction = Array.from(byFunction.entries()).sort((left, right) => right[1] - left[1])[0];
   const topFunctionLabel = functions.find((fn) => fn.id === topFunction?.[0])?.kaLabel ?? "";
 
@@ -468,7 +440,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     },
     {
       label: "უმსხვილესი სფერო",
-      value: functionalSum > 0 && topFunction ? formatShare(topFunction[1] / functionalSum) : MISSING,
+      value: latestTotal > 0 && topFunction ? formatShare(topFunction[1] / latestTotal) : MISSING,
       detail: topFunctionLabel,
     },
   ];
@@ -516,11 +488,10 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
   const startYear = model.years[0];
   const endYear = model.years.at(-1);
 
-  const officialEnd = endYear === undefined ? 0 : model.officialTotalByYear[endYear] ?? 0;
+  const officialStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
+  const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
   const nationalEnd = endYear === undefined ? 0 : nationalTotalByYear[endYear] ?? 0;
-  const functionalStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
-  const functionalEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
-  const growth = changeBetween(functionalStart, functionalEnd);
+  const growth = changeBetween(officialStart, officialEnd);
   const rank = endYear === undefined ? 0 : input.rankByYear[endYear] ?? 0;
 
   const largest = sortedByEndYear(model.rows, endYear)[0];
@@ -539,16 +510,16 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
       // decimal count; Task 6 added it so a 0-decimal signed percent does not
       // have to build its own sign. Zero growth renders "0%", not "+0%".
       value: growth === null ? MISSING : formatShare(growth, true, 0),
-      detail: `${formatAmount(functionalStart)} → ${formatAmount(functionalEnd)}`,
+      detail: `${formatAmount(officialStart)} → ${formatAmount(officialEnd)}`,
     },
     {
       label: "უმსხვილესი სფერო",
-      value: functionalEnd ? formatShare(largestValue / functionalEnd) : MISSING,
+      value: officialEnd ? formatShare(largestValue / officialEnd) : MISSING,
       detail: largest?.kaLabel ?? "",
     },
     {
       label: "წილი მუნიციპალურ ხარჯებში",
-      value: nationalEnd > 0 ? formatShare(officialEnd / nationalEnd) : MISSING,
+      value: nationalEnd > 0 && officialEnd !== null ? formatShare(officialEnd / nationalEnd) : MISSING,
       // `detail` is this municipality's ordinal RANK among all municipalities —
       // not a per-capita figure. It stands in for the per-capita KPI the
       // reference design used (§6.4): rank is size-independent without needing

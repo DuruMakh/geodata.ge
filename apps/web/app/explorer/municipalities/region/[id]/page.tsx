@@ -15,7 +15,6 @@ import { formatAmount } from "../../../../../lib/explorer/format";
 
 const SOURCE_NOTE_BASE =
   "მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). " +
-  "ოფიციალური ჯამი და ათი ფუნქციის ჯამი ორი განსხვავებული საზომია. " +
   "რეგიონის ჯამი მხოლოდ საჯაროდ მოწოდებულ მუნიციპალურ ბიუჯეტებს აერთიანებს: " +
   "აჭარის ავტონომიური რესპუბლიკის საკუთარი ბიუჯეტი მასში არ შედის, ხოლო შიდა ქართლსა და " +
   "მცხეთა-მთიანეთს ოკუპირებულ ტერიტორიებთან დაკავშირებული ერთეულები აკლია.";
@@ -127,11 +126,6 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           nationalTotalByYear={nationalTotalByYear}
           rankByYear={rankByYear}
           rankOutOf={regions.length}
-          // Reconciliation warnings are municipality-grain provenance. Region
-          // totals may still differ, but a roll-up cannot honestly attribute
-          // that difference to one warning type or member. The standing
-          // two-measures note below still applies.
-          showWarnings={false}
           csvBasename={`region-${id}`}
           pickerGroups={buildPickerGroups(listInput)}
           prev={{ label: prev.kaLabel, href: hrefFor(prev) }}

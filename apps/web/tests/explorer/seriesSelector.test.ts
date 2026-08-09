@@ -27,32 +27,34 @@ const items: ExplorerItem[] = [
 ];
 
 describe("series panel rows", () => {
-  it("excludes derived totals and hides collapsed programs", () => {
+  it("pins the total before categories and collapsed programs", () => {
     const rows = buildSeriesPanelRows(items, "", []);
 
-    expect(rows.map((row) => row.item.id)).toEqual(["admin_spending.education", "admin_spending.health"]);
-    expect(rows[0]).toEqual(expect.objectContaining({ hasChildren: true, expanded: false, isProgram: false }));
+    expect(rows.map((row) => row.item.id)).toEqual(["admin_spending.total", "admin_spending.education", "admin_spending.health"]);
+    expect(rows[0]).toEqual(expect.objectContaining({ isProgram: false, hasChildren: false }));
   });
 
   it("shows programs for expanded ministries", () => {
     const rows = buildSeriesPanelRows(items, "", ["admin_spending.education"]);
 
     expect(rows.map((row) => row.item.id)).toEqual([
+      "admin_spending.total",
       "admin_spending.education",
       "admin_program.general_education",
       "admin_spending.health",
     ]);
-    expect(rows[1]?.isProgram).toBe(true);
+    expect(rows[2]?.isProgram).toBe(true);
   });
 
   it("keeps the parent ministry and auto-expands when only a nested program matches", () => {
     const rows = buildSeriesPanelRows(items, "general education", []);
 
-    expect(rows.map((row) => row.item.id)).toEqual(["admin_spending.education", "admin_program.general_education"]);
-    expect(rows[0]?.expanded).toBe(true);
+    expect(rows.map((row) => row.item.id)).toEqual(["admin_spending.total", "admin_spending.education", "admin_program.general_education"]);
+    expect(rows[1]?.expanded).toBe(true);
   });
 
-  it("returns no rows when nothing matches", () => {
-    expect(buildSeriesPanelRows(items, "does-not-exist", [])).toEqual([]);
+  it("keeps the total first while search filters categories", () => {
+    expect(buildSeriesPanelRows(items, "health", []).map((row) => row.item.id)).toEqual(["admin_spending.total", "admin_spending.health"]);
+    expect(buildSeriesPanelRows(items, "does-not-exist", []).map((row) => row.item.id)).toEqual(["admin_spending.total"]);
   });
 });

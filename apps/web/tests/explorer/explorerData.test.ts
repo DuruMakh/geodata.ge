@@ -107,10 +107,11 @@ const adminFacts: AdminSpendingFact[] = [
 ];
 
 describe("main explorer data model", () => {
-  it("returns top categories by latest-year value as the default selection, never totals", () => {
-    expect(getDefaultSelection("expenditure", facts)).toEqual(["spending.education", "spending.health"]);
-    expect(getDefaultSelection("revenue", facts)).toEqual(["revenue.vat"]);
+  it("prepends the total to the latest-year top categories", () => {
+    expect(getDefaultSelection("expenditure", facts)).toEqual(["expenditure.total", "spending.education", "spending.health"]);
+    expect(getDefaultSelection("revenue", facts)).toEqual(["revenue.total", "revenue.vat"]);
     expect(getDefaultSelection("expenditure", facts, "ministries", adminFacts)).toEqual([
+      "admin_spending.total",
       "admin_spending.health_social_affairs",
       "admin_spending.education_science_youth",
     ]);
@@ -173,8 +174,26 @@ describe("main explorer data model", () => {
       measure: "nominal",
     });
 
-    expect(expenditureModel.items.find((item) => item.id === "expenditure.total")?.kaLabel).toBe("ხარჯები სულ");
-    expect(revenueModel.items.find((item) => item.id === "revenue.total")?.kaLabel).toBe("შემოსავლები სულ");
+    const ministryModel = buildExplorerModel({
+      facts,
+      adminFacts,
+      adminCategories: new Map(),
+      expenditureGrouping: "ministries",
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: ["admin_spending.total"],
+      startYear: 2024,
+      endYear: 2025,
+      measure: "nominal",
+    });
+
+    expect(expenditureModel.items.find((item) => item.id === "expenditure.total")?.kaLabel).toBe("მთლიანი ხარჯი");
+    expect(revenueModel.items.find((item) => item.id === "revenue.total")?.kaLabel).toBe("მთლიანი შემოსავლები");
+    expect(ministryModel.items.find((item) => item.id === "admin_spending.total")?.kaLabel).toBe("მთლიანი ხარჯი");
+    expect(expenditureModel.items.find((item) => item.id === "expenditure.total")?.color).toBe("#1E1B16");
+    expect(revenueModel.items.find((item) => item.id === "revenue.total")?.color).toBe("#1E1B16");
+    expect(ministryModel.items.find((item) => item.id === "admin_spending.total")?.color).toBe("#1E1B16");
   });
 
   it("keeps the active side total available when the total series is not selected", () => {

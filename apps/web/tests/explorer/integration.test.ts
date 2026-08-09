@@ -27,8 +27,8 @@ describe("explorer integration with real CSV data", () => {
 
     const selectedItemIds = getDefaultSelection("expenditure", facts);
     expect(selectedItemIds.length).toBeGreaterThan(0);
-    expect(selectedItemIds.length).toBeLessThanOrEqual(5);
-    expect(selectedItemIds).not.toContain("expenditure.total");
+    expect(selectedItemIds.length).toBeLessThanOrEqual(6);
+    expect(selectedItemIds[0]).toBe("expenditure.total");
 
     const model = buildExplorerModel({
       facts,
@@ -47,6 +47,15 @@ describe("explorer integration with real CSV data", () => {
     expect(model.items.length).toBeGreaterThan(1);
   });
 
+  it("selects the expenditure total plus five categories from real facts", async () => {
+    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
+
+    const selectedItemIds = getDefaultSelection("expenditure", facts);
+
+    expect(selectedItemIds).toHaveLength(6);
+    expect(selectedItemIds[0]).toBe("expenditure.total");
+  });
+
   it("builds a non-empty revenue model with the default selection", async () => {
     const facts = await loadBudgetFactRows("../../data/imports/sample-budget-facts.csv");
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
@@ -55,7 +64,8 @@ describe("explorer integration with real CSV data", () => {
 
     const selectedItemIds = getDefaultSelection("revenue", facts);
     expect(selectedItemIds.length).toBeGreaterThan(0);
-    expect(selectedItemIds).not.toContain("revenue.total");
+    expect(selectedItemIds.length).toBeLessThanOrEqual(6);
+    expect(selectedItemIds[0]).toBe("revenue.total");
 
     const model = buildExplorerModel({
       facts,
@@ -80,9 +90,9 @@ describe("explorer integration with real CSV data", () => {
     const years = [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
 
     const selectedItemIds = getDefaultSelection("revenue", facts);
-    expect(selectedItemIds).toHaveLength(5);
+    expect(selectedItemIds).toHaveLength(6);
+    expect(selectedItemIds[0]).toBe("revenue.total");
     expect(selectedItemIds).toContain("revenue.vat");
-    expect(selectedItemIds).not.toContain("revenue.total");
 
     const model = buildExplorerModel({
       facts,
@@ -232,9 +242,9 @@ describe("explorer integration with real CSV data", () => {
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
 
     const selectedItemIds = getDefaultSelection("expenditure", facts, "ministries", adminFacts);
-    expect(selectedItemIds).toHaveLength(5);
+    expect(selectedItemIds).toHaveLength(6);
+    expect(selectedItemIds[0]).toBe("admin_spending.total");
     expect(selectedItemIds.every((itemId) => itemId.startsWith("admin_spending."))).toBe(true);
-    expect(selectedItemIds).not.toContain("admin_spending.total");
 
     const model = buildExplorerModel({
       facts,

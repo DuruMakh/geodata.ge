@@ -111,12 +111,11 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
           nationalTotalByYear={nationalTotalByYear}
           rankByYear={rankByYear}
           rankOutOf={municipalities.length}
-          showWarnings
           csvBasename={`municipality-${code}`}
           pickerGroups={buildPickerGroups(listInput)}
           prev={{ label: prev.displayNameKa, href: `/explorer/municipalities/${prev.code}` }}
           next={{ label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` }}
-          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). ოფიციალური ჯამი (ფინანსთა სამინისტრო) და ათი ფუნქციის ჯამი ორი განსხვავებული საზომია.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />
       </div>
     </main>

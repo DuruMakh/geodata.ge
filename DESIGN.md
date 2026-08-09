@@ -407,7 +407,7 @@ Full-width block, h38, ink bg, paper text, sans 12.5/600, radius 2px. Hover: opa
 
 ### 7.9 Callout / Notice
 
-Tint bg, `2px accent` left border, sans 11.5–12.5px, `body` color, max-width 560px. Used for series limit, empty selection, no-growth-data, and load-error states.
+Tint bg, `2px accent` left border, sans 11.5–12.5px, `body` color, max-width 560px. Used for empty selection, no-growth-data, and load-error states.
 
 ### 7.10 Source Note
 
@@ -462,7 +462,7 @@ Canonical contract: this section and the reusable component contracts in §7.
 
 ### 8.1 Defaults
 
-Side: expenditure. Grouping: fields. Mode: line. Measure: nominal GEL. Range: full available per scope. Selection: **top 5 categories by latest-year value** per scope (fields, ministries, and revenue each keep their own selection and range). Chart series limit: 6 (table mode unlimited). The limit holds on every path into line mode: toggling past it shows the limit callout, and a larger selection arriving from table mode or a shared hash keeps the full selection but draws only the first 6 series with the callout `ხაზის რეჟიმში ნაჩვენებია პირველი 6 სერია…`. The derived total is not a selectable series — totals appear in the table `სულ` row, deck line, and hero KPI.
+Side: expenditure. Grouping: fields. Mode: line. Measure: nominal GEL. Range: full available per scope. Selection: **total plus the top 5 categories by latest-year value** per scope (fields, ministries, and revenue each keep their own selection and range). The total is first, ink-coloured, selectable, and removable. Series selection is unlimited: the header shows `სერიები {selected} / {all}` and switches between `გასუფთავება` and `ყველას მონიშვნა`; search filters visible rows only and never scopes the bulk action.
 
 ### 8.2 Layout
 
@@ -473,7 +473,7 @@ workspace:
   gap: "40px"
 ```
 
-Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline + mono count (`n / 6` in line mode, `n` in table mode; count turns accent at the limit), grouping tabs (expenditure only, §7.2b), search, series rows (scroll ≤430px), CSV button.
+Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline + mono count (`{selected} / {all}`), grouping tabs (expenditure only, §7.2b), search, global clear/select-all action, series rows (scroll ≤430px), CSV button.
 
 ### 8.3 Line Chart
 
@@ -496,13 +496,13 @@ Data-reality rules (the prototype's snapshot had none of these; production data 
 
 ### 8.4 Table Mode
 
-Columns: `<first col> | years… | ცვლილება | წილი <end-year>`. First column header by scope: `სფერო` (fields), `უწყება` (ministries), `საბიუჯეტო მუხლი` (revenue). Header: overline style, `2px ink` bottom rule. Rows: 1px `hairline-soft` borders, tint hover; swatch bar + sans label left; numerals mono right-aligned; latest-year column weight 600; change colored positive/negative (minus sign `−`). Total row `სულ`: `2px ink` top rule, weight 600, share `100.0%`. Horizontal scroll with sticky first column and sticky right change/share columns (paper bg, 1px `hairline-soft` edge shadows).
+Columns: `<first col> | years… | ცვლილება | წილი <end-year>`. First column header by scope: `სფერო` (fields), `უწყება` (ministries), `საბიუჯეტო მუხლი` (revenue). Header: overline style, `2px ink` bottom rule. Rows: 1px `hairline-soft` borders, tint hover; swatch bar + sans label left; numerals mono right-aligned; latest-year column weight 600; change colored positive/negative (minus sign `−`). When selected, the dataset total row uses its exact scope label (`მთლიანი ხარჯი`, `მთლიანი შემოსავლები`, or `მთლიანი ბიუჯეტი`) with a `2px ink` top rule, weight 600, and share `100.0%`; it is absent when deselected. Horizontal scroll with sticky first column and sticky right change/share columns (paper bg, 1px `hairline-soft` edge shadows).
 
 ### 8.5 Below-Chart Sections (`ძირითადი ინდიკატორები`, order fixed)
 
 1. Hero KPI (`პერიოდის ცვლილება`, §7.12) + three side KPIs (`ყველაზე დიდი ზრდა`, `ყველაზე ნელი ზრდა`, `ყველაზე დიდი წილი`) in a `1.35fr | 1fr` grid split by a hairline. Side KPIs rank **all top-level scope items** — the same population as the movers board, so the identical headings can never contradict each other on one screen. The `ყველაზე დიდი ზრდა` GEL delta requires a positive start value (a delta measured against a negative base is a correction unwind, not growth).
 2. Movers board (top 3 / bottom 3 across all scope items).
-3. `პერიოდის შედარება` — table `<first col> | start year | ცვლილება | end year`, total row first, fixed layout with 44% label column. This table (only) is scoped to the user's selected series.
+3. `პერიოდის შედარება` — table `<first col> | start year | ცვლილება | end year`, with the exact-labeled total row first only when it is selected, fixed layout with 44% label column. This table (only) is scoped to the user's selected series.
 
 ## 9. Single-Year Analysis (ანალიზი)
 
@@ -558,7 +558,7 @@ No separate revenue direction. Same shell, tokens, controls, chart/table treatme
 
 Voice: precise, civic, archival. Georgian is primary; English only for compact technical labels (`CSV`).
 
-Canonical terms: `ხარჯები`, `შემოსავლები`, `ანალიზი`, `სერიები`, `ხაზი`, `ცხრილი`, `სფეროები`, `უწყებები`, `% წილი`, `დიაპაზონი`, `სულ`, `ძირითადი ინდიკატორები`, `პერიოდის ცვლილება`, `ყველაზე მზარდი`, `ყველაზე ნელი ზრდა`, `პერიოდის შედარება`, `სტრუქტურა სფეროების მიხედვით`, `ყოველი 100 ლარი`, `ბიუჯეტის რადარი`, `ბიუჯეტის ველი`, `სრული რეიტინგი`, `CSV ჩამოტვირთვა`, `გეგმა`.
+Canonical terms: `ხარჯები`, `შემოსავლები`, `ანალიზი`, `სერიები`, `ხაზი`, `ცხრილი`, `სფეროები`, `უწყებები`, `% წილი`, `დიაპაზონი`, `მთლიანი ხარჯი`, `მთლიანი შემოსავლები`, `მთლიანი ბიუჯეტი`, `სულ` (single-year analysis), `ძირითადი ინდიკატორები`, `პერიოდის ცვლილება`, `ყველაზე მზარდი`, `ყველაზე ნელი ზრდა`, `პერიოდის შედარება`, `სტრუქტურა სფეროების მიხედვით`, `ყოველი 100 ლარი`, `ბიუჯეტის რადარი`, `ბიუჯეტის ველი`, `სრული რეიტინგი`, `CSV ჩამოტვირთვა`, `გეგმა`.
 
 Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US` grouping, fixed decimals (bn: 2, mln: 1, %: 1). Amounts ≥ ~1bn display in `მლრდ ₾`, below in `მლნ ₾`. Negative sign is `−` (minus, not hyphen) in deltas.
 
@@ -568,7 +568,6 @@ Empty/error copy explains what happened and what to do, e.g.:
 
 ```text
 არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.
-გრაფიკზე მაქსიმუმ 6 სერია შეიძლება. ცხრილის რეჟიმში ლიმიტი არ არის.
 მონაცემები ვერ ჩაიტვირთა. განაახლე გვერდი — თუ პრობლემა გაგრძელდება, სცადე მოგვიანებით.
 ```
 
@@ -679,7 +678,7 @@ Do not:
 1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only; the budget hub's four cards are the one card exception, §6.6).
 2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), not in-page nav tabs.
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
-4. Explorer default: line mode, nominal GEL, full range, top-5 selection, 6-series chart limit with callout.
+4. Explorer default: line mode, nominal GEL, full range, total-plus-top-five selection, and unrestricted line rendering.
 5. Only `ხაზი` and `ცხრილი` modes exist; `% წილი` is the only pill.
 6. Swatches are 14×3px bars everywhere.
 7. Category colors match §4.2 on every surface.
@@ -716,8 +715,6 @@ Reference implementation: `apps/web/components/municipalities/`, routes under `a
 
 The two reviewed occupied-area overlays render above the municipality fills as pale, non-interactive SVG paths with no public label, tooltip, link, keyboard focus, map text, or legend entry. The source note links `© OpenStreetMap contributors` to `https://www.openstreetmap.org/copyright` and states `ODbL` without adding occupied-territory wording. Natural Earth overlay provenance remains repository documentation because that source is public domain. Codes `05`, `42`, `43`, `46`, and `64` remain excluded from the public registry, facts, aggregates, rankings, and all interactive map targets: their raw budgets belong to Georgian municipal bodies operating outside those territories and serving displaced communities, so they are not territorially attributable spending inside the named municipalities. Full geometry and licence provenance is documented in `docs/data-methodology/municipal-functional-annual-2015-2025.md`; the approved behavior is specified in `docs/superpowers/specs/2026-08-07-municipality-map-upgrade-design.md`.
 
-**Two labelled totals, not one.** Every municipal and region surface can show two different sums for the same year: the official Ministry of Finance headline (`ოფიციალური ბიუჯეტი`), and the sum of the ten served functional categories. The two are computed independently and are never reconciled by adjusting a category — they genuinely diverge in some municipality-years. The chart, the table's `სულ` row, and the CSV export always read the functional sum, since only the ten functions are chartable series; each page's "largest function" KPI is likewise computed on the functional sum, because a function's share can only be a share of the functional total. Everything else — the index list, the index's other KPIs, the map colour, and each entity page's headline KPI — reads the official total. Every municipal surface carries a standing source-note sentence naming the two as different measures (§7.10), whether or not the callout below is showing.
-
-**The divergence callout is scoped to municipality pages only.** When a municipality's two totals differ by more than GEL 1,000,000 in a year inside the selected range (methodology and public wording: `docs/data-methodology/municipal-functional-annual-2015-2025.md`), a §7.9 `Callout` names the affected years; narrowing the range past every warning year removes it. Region roll-up pages never show it. Their official and functional totals are summed independently and can still diverge, but the warning type and reconciliation explanation are municipality-grain provenance that cannot be assigned honestly to the aggregate. Aggregating member warnings would also make the callout near-permanent on heavily visited regions. The standing source note therefore labels the two region measures without presenting a misleading roll-up warning.
+**One public total.** `მთლიანი ბიუჯეტი` uses `public_total_gel` in the selector, chart, table, KPIs, comparisons, percentage denominator, and numeric CSV total row. The ten functions remain unchanged; their shares can sum below or above 100%. No residual category or reconciliation warning appears in the explorer. The methodology document explains the source-version and financing differences.
 
 **Unit: `მლნ ₾`, not `მლრდ ₾`.** Municipal budgets run one to three orders of magnitude below the national totals the rest of the explorer charts in billions; a billions axis would round most municipal functions to `0.0`. The municipal chart and table pass `UNIT_MLN` (`lib/explorer/format.ts` — one decimal, million GEL) to the same `EditorialLineChart`/`ExplorerTable` the budget explorer passes `UNIT_BN` to. KPI values, list rows, and the entity picker use `formatAmount`, which already auto-selects `მლნ ₾` below ~1bn GEL on its own.

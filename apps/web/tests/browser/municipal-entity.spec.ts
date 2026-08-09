@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
 
 // Municipality entity pages (Task 11). Three things nothing in the repo
@@ -100,8 +101,8 @@ test.describe("hash sanitising", () => {
     await page.reload();
     await expectMunicipalAppReady(page);
 
-    // getDefaultMunicipalSelection: top 5 functions by latest-year value.
-    await expect(page.locator('[data-testid="municipal-series-row"][aria-pressed="true"]')).toHaveCount(5);
+    // getDefaultMunicipalSelection: official total plus top 5 functions.
+    await expect(page.locator('[data-testid="municipal-series-row"][aria-pressed="true"]')).toHaveCount(6);
   });
 
   test("a selection mixing a known and an unknown id keeps the known one and drops the unknown one", async ({ page }) => {
@@ -306,7 +307,7 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
 
     await page.getByTestId("municipal-mode-table").click();
     const totalRow = page.getByTestId("explorer-table").locator("tbody tr").last();
-    await expect(totalRow).toContainText("სულ");
+    await expect(totalRow).toContainText("მთლიანი ბიუჯეტი");
 
     // Total row, last-year cell (label, then one td per year, then change,
     // then share — third from the end). A hard-coded billion divisor would
@@ -364,62 +365,35 @@ test.describe("municipality page", () => {
     }
   });
 
-  test("caps an over-limit shared line selection without discarding selected ids", async ({ page }) => {
-    await page.addInitScript((selection) => {
-      history.replaceState(null, "", `#m=line&sel=${selection}`);
-    }, ALL_FUNCTIONS);
-    await page.goto(ENTITY_URL);
+  test("renders the official total and every selected municipal line", async ({ page }) => {
+    const selection = `municipal.total,${ALL_FUNCTIONS}`;
+    await page.goto(`${ENTITY_URL}#m=line&sel=${selection}`);
+    await page.reload();
     await expectMunicipalAppReady(page);
 
-    await expect(page.getByTestId("series-overflow-callout")).toBeVisible();
-    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(10);
-    await expect(page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']")).toHaveCount(6);
+    await expect(page.getByTestId("municipal-series-row").first()).toContainText("მთლიანი ბიუჯეტი");
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(11);
+    await expect(page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']")).toHaveCount(11);
+    await expect(page.getByTestId("series-overflow-callout")).toHaveCount(0);
   });
 
-  test("caps all table selections when switching back to line mode", async ({ page }) => {
+  test("bulk actions ignore the active municipal search", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
-    await page.getByTestId("municipal-mode-table").click();
-    await page.getByTestId("municipal-series-all").click();
-    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(10);
+    const bulk = page.getByTestId("municipal-series-all");
+    const header = page.getByTestId("municipal-series-header");
 
-    await page.getByTestId("municipal-mode-line").click();
+    await expect(header).toContainText("სერიები 6 / 11");
+    await expect(header.locator(":scope > [data-testid='municipal-series-all']")).toHaveCount(1);
+    await expect(bulk).toHaveText("გასუფთავება");
+    await bulk.click();
+    await expect(bulk).toHaveText("ყველას მონიშვნა");
 
-    await expect(page.getByTestId("series-overflow-callout")).toBeVisible();
-    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(10);
-    await expect(page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']")).toHaveCount(6);
-  });
-
-  test("rejects a seventh series selected directly in line mode", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    const unselectedRows = page.locator("[data-testid='municipal-series-row'][aria-pressed='false']");
-
-    await unselectedRows.first().click();
-    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(6);
-
-    const rejectedSeventhSeries = unselectedRows.first();
-    await rejectedSeventhSeries.click();
-
-    await expect(rejectedSeventhSeries).toHaveAttribute("aria-pressed", "false");
-    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(6);
-    await expect(page.getByTestId("municipal-series-limit")).toBeVisible();
-  });
-
-  test("clearing after a rejected seventh series also clears the limit message", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    const selectedRows = page.locator("[data-testid='municipal-series-row'][aria-pressed='true']");
-    const unselectedRows = page.locator("[data-testid='municipal-series-row'][aria-pressed='false']");
-    await unselectedRows.first().click();
-    await expect(selectedRows).toHaveCount(6);
-    await unselectedRows.first().click();
-    await expect(page.getByTestId("municipal-series-limit")).toBeVisible();
-
-    await page.getByTestId("municipal-series-all").click();
-
-    await expect(selectedRows).toHaveCount(0);
-    await expect(page.getByTestId("municipal-series-limit")).toHaveCount(0);
+    await page.getByTestId("municipal-series-search").fill("განათლება");
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(2);
+    await bulk.click();
+    await page.getByTestId("municipal-series-search").fill("");
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(11);
   });
 
   test("an explicitly empty selection shows guidance instead of an empty chart", async ({ page }) => {
@@ -434,42 +408,43 @@ test.describe("municipality page", () => {
     await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(0);
   });
 
-  test("an explicitly empty selection still renders all functions in table mode", async ({ page }) => {
+  test("an explicitly empty selection renders no table rows", async ({ page }) => {
     await page.goto(`${ENTITY_URL}#m=table&sel=`);
     await expectMunicipalAppReady(page);
 
     await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(11);
+    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(0);
   });
 
-  test("shows the divergence callout only where the data diverges", async ({ page }) => {
+  test("uses the official municipal total as 100% without normalizing functions", async ({ page }) => {
+    const selection = `municipal.total,${ALL_FUNCTIONS}`;
+    const duplicateKeyWarnings: string[] = [];
+    page.on("console", (message) => {
+      if (["warning", "error"].includes(message.type()) && message.text().includes("same key")) {
+        duplicateKeyWarnings.push(message.text());
+      }
+    });
+    await page.goto(`${ENTITY_URL}#m=table&sh=1&r=2024-2024&sel=${selection}`);
+    await page.reload();
+    await expectMunicipalAppReady(page);
+
+    const rows = page.getByTestId("explorer-table").locator("tbody tr");
+    await expect(rows.last()).toContainText("მთლიანი ბიუჯეტი");
+    await expect(rows.last()).toContainText("100.0%");
+
+    const shares = await rows.locator("td:last-child").allTextContents();
+    const functionalSum = shares
+      .slice(0, -1)
+      .reduce((sum, value) => sum + Number.parseFloat(value.replace("%", "")), 0);
+    expect(functionalSum).not.toBeCloseTo(100, 1);
+    expect(duplicateKeyWarnings).toEqual([]);
+  });
+
+  test("does not render a divergence callout or two-total source copy", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
-    const callout = page.getByTestId("divergence-callout");
-    await expect(callout).toBeVisible();
-    const warningGroups = callout.locator("li");
-    await expect(warningGroups).toHaveCount(2);
-    await expect(warningGroups.nth(0)).toContainText(
-      "ოფიციალური ჯამი და ფუნქციური კლასიფიკაციის ჯამი წყაროს სხვადასხვა ვერსიიდან მოდის",
-    );
-    await expect(warningGroups.nth(0)).toContainText("2016 (15.6 მლნ ₾)");
-    await expect(warningGroups.nth(0)).toContainText("2017 (15.7 მლნ ₾)");
-    await expect(warningGroups.nth(0)).toContainText("2018 (15.1 მლნ ₾)");
-    await expect(warningGroups.nth(0)).toContainText("2019 (21.1 მლნ ₾)");
-    await expect(warningGroups.nth(1)).toContainText(
-      "ოფიციალური ჯამი მოიცავს დაფინანსების ოპერაციებს, რომლებიც ფუნქციურ კლასიფიკაციაში არ ნაწილდება",
-    );
-    await expect(warningGroups.nth(1)).toContainText("2020 (16.0 მლნ ₾)");
-    await expect(warningGroups.nth(1)).toContainText("2021 (14.9 მლნ ₾)");
-    await expect(warningGroups.nth(1)).toContainText("2022 (13.0 მლნ ₾)");
-    await expect(warningGroups.nth(1)).toContainText("2023 (28.8 მლნ ₾)");
-    await expect(warningGroups.nth(1)).toContainText("2024 (28.1 მლნ ₾)");
-    // თელავი is municipality code 15, not 22 (verified against
-    // data/imports/municipalities.csv) — show_warning is false for all of its
-    // loaded years, so its page never renders the callout.
-    await page.goto("http://localhost:3100/explorer/municipalities/15");
-    await expectMunicipalAppReady(page);
     await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
+    await expect(page.getByTestId("municipal-source-note")).not.toContainText("ორი განსხვავებული საზომია");
   });
 
   test("opens the entity picker with the keyboard", async ({ page }) => {
@@ -494,36 +469,34 @@ test.describe("municipality page", () => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-series-search").fill("განათლება");
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(1);
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(2);
     await page.getByTestId("municipal-series-search").fill("");
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(10);
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(11);
     await page.getByTestId("municipal-series-all").click();
     await expect(page.getByTestId("municipal-series-row").first()).toHaveAttribute("aria-pressed", "false");
   });
 
-  test("selects every function in table mode", async ({ page }) => {
+  test("selects the official total and every function", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
-    await page.getByTestId("municipal-mode-table").click();
     await page.getByTestId("municipal-series-all").click();
-    // Table mode has no six-series cap, so select-all must leave all ten rows
-    // pressed. Asserting the count of pressed rows is the point of this test:
-    // a locator on its own is always truthy and would pass unconditionally.
-    // aria-pressed lives on the row element itself, not a descendant, so this
-    // is a compound attribute selector rather than `.filter({ has })` — `has`
-    // only matches a DESCENDANT of the outer locator, and would silently find
-    // zero rows here regardless of how many are actually pressed.
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(10);
-    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(10);
+    await page.getByTestId("municipal-series-all").click();
+    await expect(page.getByTestId("municipal-series-row")).toHaveCount(11);
+    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(11);
     await expect(page.getByTestId("municipal-series-all")).toHaveAttribute("aria-pressed", "true");
   });
 
   test("offers a CSV download", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
-    const download = page.waitForEvent("download");
+    const downloadPromise = page.waitForEvent("download");
     await page.getByTestId("municipal-csv").click();
-    expect((await download).suggestedFilename()).toMatch(/^geodata-municipality-04-\d{4}-\d{4}\.csv$/);
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/^geodata-municipality-04-\d{4}-\d{4}\.csv$/);
+    const path = await download.path();
+    const csv = await readFile(path!, "utf8");
+    const total2016 = csv.split("\n").find((row) => row.startsWith("2016,municipal.total,"));
+    expect(total2016).toContain("832409547.15");
   });
 
   test("recomputes the period comparison when the range moves", async ({ page }) => {

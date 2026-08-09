@@ -17,9 +17,9 @@ no route reading it. `apps/web/lib/explorer/sections.ts` still carries
 This spec is the second of the two. It builds the section: an index with a map
 and a ranked list, a page per municipality, and a page per region.
 
-Spec 1 deliberately deferred three things to this spec. All three are resolved
-here: map geometry (§4), the replacement for per-capita (§5.3, §6.4), and
-warning placement (§8).
+Spec 1 deliberately deferred two things to this spec. Both are resolved here:
+map geometry (§4) and the replacement for per-capita (§5.3, §6.4). Municipal
+reconciliation remains internal as specified in §8.
 
 ## 2. Decisions taken during brainstorming
 
@@ -31,7 +31,7 @@ Recorded because each closes an option that looks open from the code.
    unblocked at ADM1 grain. A municipality-level map is a separate future spec;
    it is not owed by this one.
 2. **One measure: absolute GEL.** No measure pill. See §5.3.
-3. **Divergence callout on municipality pages only**, year-scoped. See §8.
+3. **One public official total with internal reconciliation only.** See §8.
 4. **Reuse the existing chart, range strip and table**; write a new model layer
    underneath them. See §9.
 5. **Region geometry moves from GADM to geoBoundaries `gbOpen`** before anything
@@ -269,11 +269,9 @@ which was a max/min ratio — 125× on absolute values, a statement that თბ�
 large rather than a finding. Concentration says the same thing truthfully in one
 number.
 
-The first three KPIs read `public_total_gel`, the official headline. The fourth
-is necessarily computed on `functional_sum_gel`, because a function's share can
-only be a share of the functional total (§8). The values coincide nationally in
-2025, but the rule is stated so a future year with divergence does not produce a
-share that fails to reconcile with the headline above it.
+The first three KPIs and the fourth function share read `public_total_gel`, the
+official headline. Functions remain unchanged, so their shares can sum below or
+above 100% (§8).
 
 ## 6. Municipality page (`/explorer/municipalities/[code]`)
 
@@ -305,15 +303,14 @@ Mirrors the budget explorer, which is the point of reusing its parts:
 - `SegmentedTabs` for `ხაზი` / `ცხრილი`.
 - `% წილი` pill and unit note, then `EditorialLineChart` or `ExplorerTable`.
 - `RangeStrip` beneath, over 2015-2025, with the range quick chips.
-- Aside: the ten functions as a flat checkbox list with search, select-all, a
-  mono latest value per row, the over-limit `Callout`, a CSV button, and
+- Aside: the official total plus the ten functions as a flat checkbox list with search, a
+  global clear/select-all action, a mono latest value per row, a CSV button, and
   `← ყველა მუნიციპალიტეტი`.
 
-Chart cap is the existing `MAX_CHART_SERIES = 6`; the table always shows all ten.
-Default selection is **top 5 by latest year in range, with no total series** —
-the AGENTS.md guardrail, which deliberately overrides the design file's pinned
-`__total` entry. Derived totals are not selectable series here any more than they
-are on the budget side; totals live in the `სულ` row and the KPI.
+Default selection is **the official total plus the top 5 functions by latest year in range**.
+The total is first, ink-coloured, selectable, and removable. Selection and line rendering are
+unrestricted. The header shows `სერიები {selected} / {all}`; search filters visible rows only
+and never changes the scope of the global clear/select-all action.
 
 The aside is a flat list, not the budget explorer's `SeriesPanel`. Municipal
 functions have no hierarchy, so the panel's program expansion, caret locking and
@@ -343,18 +340,18 @@ placement figure that per-capita was there to provide.
 - **Movers board** per DESIGN.md §7.13: grid `24px 1fr 96px 72px`, two columns
   `ყველაზე მზარდი` / `ყველაზე ნელი ზრდა`. A bottom mover that is still growing
   keeps the `ნელი ზრდა` wording — never call growth a loss.
-- **`პერიოდის შედარება`**: total plus ten functions, from / change / to across
-  the selected range. The budget explorer has no comparison table, so this is
-  the one element here without a counterpart elsewhere in the app. It is
-  included because with only ten functions the municipality page is otherwise
-  thinner than the budget pages, and it answers "what changed over the period"
-  in a single view.
+- **`პერიოდის შედარება`**: the official `მთლიანი ბიუჯეტი` plus all ten unchanged
+  functions, from / change / to across the selected year range. It is
+  independent of chart-series selection; the national comparison table is
+  selection-scoped, while the municipal table stays a compact complete function
+  comparison.
 
 ## 7. Region pages (`/explorer/municipalities/region/[id]`)
 
-Same workspace as a municipality page, fed by the roll-up: each function summed
-across member municipalities, and **both totals summed independently** so the two
-measures stay separate at region grain.
+Same workspace as a municipality page, fed by the roll-up: each function and
+the official `publicTotalGel` are summed across member municipalities. Only the
+official total is public; functional reconciliation remains internal at region
+grain.
 
 ### 7.1 The member list
 
@@ -402,41 +399,19 @@ otherwise read as complete territorially attributed spending:
 - შიდა ქართლი and მცხეთა-მთიანეთი exclude the four affected municipal bodies.
 - A roll-up is the sum of publicly served municipal budgets only.
 
-## 8. The two totals, and warnings
+## 8. One public total and internal reconciliation
 
-`public_total_gel` and `functional_sum_gel` are different measures and are never
-reconciled by adjusting a category. On the served data they differ at all on 548
-of 704 rows, exceed the GEL 1M warning threshold on 45 rows across 12
-municipalities, and reach 13.5% at worst (სამტრედია 2016). At national roll-up
-the divergence stays under 1.9% and is exactly zero in 2015 and 2025 — 2015
-because every row that year uses `portal_functional_total_fallback`, where the
-official total *is* the functional sum by construction.
+`მთლიანი ბიუჯეტი` uses `public_total_gel` on every municipal surface: selector,
+chart, table, KPIs, comparisons, percentage denominator, and numeric CSV total row.
+The ten functions stay unchanged and can sum below or above 100% in share mode. No
+category is adjusted, no residual is created, and the explorer renders no reconciliation
+warning or dual-total source copy.
 
-### 8.1 Where each number appears
-
-| Where | Number | Label |
-|---|---|---|
-| First KPI, municipality and region pages | `public_total_gel` | `ოფიციალური ბიუჯეტი`, detail `{year} · ფინანსთა სამინისტროს ჯამი` |
-| Index list, index KPIs, map colour | `public_total_gel` | the official headline |
-| Table `სულ` row, chart total, CSV | `functional_sum_gel` | unit note reads `ათი ფუნქციის ჯამი` |
-
-### 8.2 The callout
-
-A `Callout` appears directly under the workspace on a **municipality page**, and
-only when `show_warning` is true for at least one year inside the selected range.
-It names the years and the amount, using the methodology's public wording for the
-row's `warning_type`. Changing the range so that no warning year is selected
-removes it.
-
-Region pages get **no callout**. Their two totals are summed independently and
-can still diverge, but warning type and reconciliation wording are
-municipality-grain provenance that cannot be attributed honestly to the
-aggregate. Aggregating member warnings would also create a near-permanent
-banner on heavily visited regions. The standing two-measures source note remains.
-
-Every municipal surface — index, municipality, region — carries the standing
-one-line source note explaining that the official headline and the functional sum
-are different measures, whether or not a callout is showing.
+`functional_sum_gel`, `show_warning`, and `warning_type` remain internal reconciliation
+data. The methodology records that 2016-2019 source versions can differ and later total
+payments can include financing operations outside the ten functions. Region roll-ups retain
+their existing autonomous-republic and occupied-territory caveats; they do not acquire a
+separate public total rule.
 
 ## 9. Architecture and data layer
 
@@ -498,7 +473,8 @@ All ten values are distinct, so no two functions collide on a chart. DESIGN.md
 
 **Not reused:** `buildExplorerModel`, `useExplorerState` and the budget hash
 functions. They are built around sides, groupings and a national item×year grain;
-the municipal grain is municipality×function×year with two totals and no side.
+the municipal grain is municipality×function×year with a public total and internal
+reconciliation fields, and no side.
 Widening them would push conditionals into a 579-line module that three shipped
 routes depend on, for no gain — see AGENTS.md "Surgical Changes" and "Simplicity
 First". `SeriesPanel` is likewise not reused (§6.3).
@@ -547,13 +523,13 @@ New `municipalData.test.ts` and `municipalGeo.test.ts`:
   region resolves to exactly one shape.
 - The projection is deterministic and bounded — same input, same path string,
   every point inside the viewBox.
-- The two totals are never conflated: a municipality-year where they differ
-  produces a different number in the KPI than in the `სულ` row.
-- Region roll-ups sum both totals independently, and the ten functions sum to
-  the region's `functional_sum_gel`.
-- Warning selection is range-scoped: a range excluding all warning years shows
-  no callout; one including them names the right years.
-- Default selection is top 5 by latest year and contains no derived total.
+- The official `publicTotalGel` total is first-class: it is selected by default,
+  stays pinned first under search, appears as `მთლიანი ბიუჯეტი` in the KPI and
+  selected table row, and remains removable.
+- Region roll-ups use `public_total_gel` as their public total; the ten functions
+  remain unchanged reconciliation inputs.
+- No reconciliation warning or dual-total source copy is rendered.
+- Default selection is the official total plus the top 5 functions by latest year.
 - The Georgian ordinal helper, including the `პირველი` case.
 - `formatInUnit` in both units, and a regression asserting `UNIT_BN` output is
   byte-identical to the current `formatBn` for the existing budget callers.
@@ -572,10 +548,9 @@ assertion Spec 1 §7 deferred to this spec.
 
 - Index: map and legend render, list tabs switch grain, search filters and
   clears, a row click reaches the right municipality page.
-- Municipality page: mode switch, series toggle past the six-series cap shows
-  the limit callout, range change updates the chart.
-- Warning callout present on თბილისი (9 warning years), absent on a clean
-  municipality such as თელავი.
+- Municipality page: mode switch, unrestricted series selection and rendering,
+  global clear/select-all independent of search, range change updates the chart.
+- No reconciliation callout is rendered on municipality or region pages.
 - Region page shows its member list, and the member count matches the registry.
 - Shell: the sidebar `მუნიციპალიტეტები` row is a link with no `მალე`, and hub
   card 03 links to the implemented route.

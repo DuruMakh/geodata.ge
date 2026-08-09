@@ -79,7 +79,7 @@ export default async function MunicipalitiesIndexPage() {
           regions={list.regions}
           kpis={buildIndexKpis({ municipalities, totalFacts, functionFacts, functions, firstYear, latestYear })}
           latestYear={latestYear}
-          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). ოფიციალური ჯამი და ათი ფუნქციის ჯამი ორი განსხვავებული საზომია. რეგიონის ჯამი მხოლოდ საჯაროდ მოწოდებულ მუნიციპალურ ბიუჯეტებს აერთიანებს.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />
       </div>
     </main>

@@ -210,39 +210,22 @@ Functional classification primarily allocates expenses and nonfinancial-asset op
 
 No functional category is changed or inflated to force a reconciliation. The public headline and functional rows are kept as separate measures.
 
-## Public-display rule
+## Public-display and percentage rule
 
-The public interface should display only `public_total_gel` as the municipality's annual headline:
+The public interface uses `public_total_gel` as `მთლიანი ბიუჯეტი` for every year and entity. That row is 100% in share mode. Each of the ten unchanged functional rows is divided by `public_total_gel`, so the functional percentages are not normalized and may sum below or above 100%.
 
-- use `total_payments_gel` for 2016-2025 when the official actual value exists;
-- use the explicitly labelled fallback for 2015 and Khulo 2024;
-- keep all functional categories unchanged;
-- do not display a second competing total by default.
+For 2016-2019, the official total and functional rows may come from different archived MoF publication versions. For later years, total payments may include financial-asset growth and liability decrease that are not distributed across the ten functions. No category is adjusted and no residual series is created.
 
-## Warning rule
+Reconciliation fields and warning types remain internal quality-control data. The explorer does not render a warning. A future municipal CSV enhancement should carry this explanation as metadata; that narrative CSV enhancement is deferred.
 
-A public warning marker is set only when both an official total-payment value and a functional subtotal exist and:
-
-`absolute(total_payments_gel - functional_sum_gel) > GEL 1,000,000`
-
-The comparison is strict: exactly GEL 1,000,000 does not trigger the marker.
-
-Public wording must follow `warning_type`:
-
-- `source_version_difference`, 2016-2019: "The official total-payments figure differs by GEL {warning_amount_gel} from the displayed functional subtotal. The figures come from different MoF publication vintages, so the difference is not assigned to a specific financing component."
-- `financing_outside_functional`, 2020-2024: "Total payments include GEL {warning_amount_gel} that is not distributed across the displayed functional categories. The difference primarily reflects financial-asset growth and/or liability repayment." This wording is used only when the difference is positive and reconciles to financial-asset growth plus liability decrease within GEL 50,000. The tolerance accommodates small cross-workbook rounding or publication-vintage residuals; it does not change any published amount.
-- `reconciliation_review_required`: "The official total-payments figure differs by GEL {warning_amount_gel} from the displayed functional subtotal. The difference could not be fully reconciled and requires source review."
-
-`source_actual_missing` does not trigger the GEL 1 million marker because no official actual total-payment value is available for comparison.
-
-The finalized package has:
+The finalized package has the following internal validation classifications:
 
 - 24 `source_version_difference` rows;
 - 21 `financing_outside_functional` rows;
 - no unresolved material reconciliation rows;
 - one non-warning `source_actual_missing` row for Khulo 2024.
 
-In 2025, the raw official functional workbook already reconciles to total payments for all 69 municipalities. No amount is added again and no warning is shown.
+In 2025, the raw official functional workbook already reconciles to total payments for all 69 municipalities. No amount is added again.
 
 ## Total-payment output fields
 
@@ -259,9 +242,9 @@ In 2025, the raw official functional workbook already reconciles to total paymen
 | `reconciliation_difference_gel` | Total payments minus functional subtotal. |
 | `financing_components_gel` | Financial-asset growth plus liability decrease. |
 | `financing_reconciliation_difference_gel` | Reconciliation difference minus financing components. |
-| `warning_amount_gel` | Absolute material difference shown in the public note. |
-| `show_warning` | `true` only under the GEL 1 million rule. |
-| `warning_type` | Explanation category used by the public note and review workflow. |
+| `warning_amount_gel` | Absolute material reconciliation difference retained for internal validation and review. |
+| `show_warning` | Internal validation flag under the GEL 1 million review rule; never a public UI instruction. |
+| `warning_type` | Internal reconciliation classification used by validation and source review only. |
 
 ## Functional output fields
 

@@ -174,10 +174,10 @@ URL, transformation, last reviewed at).
 These are different measures and the serving layer keeps them separate, never reconciled by
 adjusting a category.
 
-- `public_total_gel` is the official MoF headline. It is what the UI will show as the
-  municipality's budget.
-- `functional_sum_gel` is the sum of the ten served functions. It is what a table's `სულ` row
-  and a chart's total describe.
+- `public_total_gel` is the official MoF headline and the downstream UI total for the selector,
+  chart, table, KPIs, comparisons, percentage denominator, and numeric CSV total row.
+- `functional_sum_gel` is the sum of the ten served functions and remains reconciliation data;
+  it is not a public explorer total or percentage denominator.
 
 They differ on 45 municipality-years by more than GEL 1 million, because functional
 classification does not distribute financial-asset growth or liability repayment. That is a
@@ -188,10 +188,10 @@ total: every official row there is mapped, `spending.other_unclassified` catches
 remainder, so the two numbers coincide and the distinction never had to surface. No change is
 needed on those pages.
 
-`show_warning` and `warning_type` carry the methodology's three public wordings
+`show_warning` and `warning_type` retain internal reconciliation classifications
 (`source_version_difference`, `financing_outside_functional`,
-`reconciliation_review_required`). The serving layer ships the flags; the UI spec decides
-placement.
+`reconciliation_review_required`). The serving layer ships the flags for validation; the
+explorer does not render them.
 
 ## 6. Prisma models and import
 

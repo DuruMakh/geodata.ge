@@ -9,6 +9,7 @@ import { SwatchBar } from "../ui/editorial";
 type ExplorerTableProps = {
   rows: ExplorerTableRow[];
   totalRow: ExplorerTableRow | null;
+  showTotal: boolean;
   years: number[];
   firstColumnLabel: string;
   unit: ValueUnit;
@@ -24,7 +25,7 @@ function changeColor(change: number | null): string {
   return change >= 0 ? POSITIVE : NEGATIVE;
 }
 
-export function ExplorerTable({ rows, totalRow, years, firstColumnLabel, unit, share }: ExplorerTableProps) {
+export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLabel, unit, share }: ExplorerTableProps) {
   const endYear = years.at(-1);
   const lastIndex = years.length - 1;
   const totalsByYear = new Map(years.map((year) => [year, totalRow?.valuesByYear[year] ?? null]));
@@ -101,10 +102,10 @@ export function ExplorerTable({ rows, totalRow, years, firstColumnLabel, unit, s
               </td>
             </tr>
           ))}
-          {totalRow ? (
+          {showTotal && totalRow ? (
             <tr className="border-t-2 border-[var(--ink)]">
               <td className="sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-[13px] font-semibold whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]" style={cellPad}>
-                სულ
+                {totalRow.kaLabel}
               </td>
               {years.map((year) => (
                 <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={cellPad}>

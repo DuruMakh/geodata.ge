@@ -127,7 +127,10 @@ export function Indicators({ model, scope }: IndicatorsProps) {
     ...comparisonRows.filter((row) => row.level !== "major_program").map((row) => Math.abs(row.change ?? 0)),
     0.001,
   );
-  const comparisonSorted = [...tableRows].sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0));
+  const comparisonSorted = tableRows
+    .filter((row) => row.level !== "total")
+    .sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0));
+  const selectedTotal = totalRow !== null && tableRows.some((row) => row.itemId === totalRow.itemId);
 
   const comparisonCell = (value: number | null | undefined) => (value === null || value === undefined ? MISSING : formatBn(value));
 
@@ -257,7 +260,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           </thead>
           <tbody>
             {[
-              totalRow ? { row: totalRow, label: "სულ", weight: 600, color: "var(--ink)" } : null,
+              selectedTotal && totalRow ? { row: totalRow, label: totalRow.kaLabel, weight: 600, color: "var(--ink)" } : null,
               ...comparisonSorted.map((row) => ({ row, label: truncate(row.kaLabel, 40), weight: 500, color: row.color })),
             ]
               .filter((entry): entry is { row: ExplorerTableRow; label: string; weight: number; color: string } => entry !== null)
