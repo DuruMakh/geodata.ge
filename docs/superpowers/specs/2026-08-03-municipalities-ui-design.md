@@ -340,10 +340,11 @@ placement figure that per-capita was there to provide.
 - **Movers board** per DESIGN.md §7.13: grid `24px 1fr 96px 72px`, two columns
   `ყველაზე მზარდი` / `ყველაზე ნელი ზრდა`. A bottom mover that is still growing
   keeps the `ნელი ზრდა` wording — never call growth a loss.
-- **`პერიოდის შედარება`**: the selected total (when selected) plus selected
-  functions, from / change / to across the selected range. It follows the
-  national explorer's selection-scoped comparison-table rationale while
-  keeping the municipal population compact and explicit.
+- **`პერიოდის შედარება`**: the official `მთლიანი ბიუჯეტი` plus all ten unchanged
+  functions, from / change / to across the selected year range. It is
+  independent of chart-series selection; the national comparison table is
+  selection-scoped, while the municipal table stays a compact complete function
+  comparison.
 
 ## 7. Region pages (`/explorer/municipalities/region/[id]`)
 

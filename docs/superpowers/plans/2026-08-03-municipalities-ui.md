@@ -1628,8 +1628,8 @@ export type MunicipalListInput = {
 
 /**
  * Index rows for both grains. Both rank on public_total_gel, the official
- * headline — the measure the index shows everywhere (the functional sum is a
- * property of an entity's own page, not of a ranking).
+ * headline — the measure the index shows everywhere. The functional sum
+ * remains internal reconciliation data and is never the public ranking/page total.
  */
 export function buildMunicipalListRows(input: MunicipalListInput): {
   municipalities: MunicipalListRow[];
