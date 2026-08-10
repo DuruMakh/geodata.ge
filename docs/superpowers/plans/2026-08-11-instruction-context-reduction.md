@@ -106,6 +106,8 @@ The stack is Next.js 16, strict TypeScript, Tailwind v4, and the custom editoria
 
 Production deploys to Vercel through the Actions-owned, CI-gated pipeline. `docs/deployment.md` owns project identifiers, environment configuration, release operations, rollback, and live-verification procedure.
 
+A branch implementation, merged commit, green deploy-trigger workflow, or accepted Vercel hook is not proof that a route is live. Verify the deployed commit and relevant production URLs separately.
+
 ## V1 and Data Non-Negotiables
 
 - Do not expand v1 beyond `Project_Definition.md` section 2 without explicit user approval. Excluded features include a broad catalog, clickable drilldown/detail pages, admin UI, public API, uploads, sub-annual data, and automated production document extraction.
@@ -114,7 +116,9 @@ Production deploys to Vercel through the Actions-owned, CI-gated pipeline. `docs
 - Public expenditure fields come from reviewed mappings over official rows. Preserve every official row. Assign uncertain rows explicitly to `spending.other_unclassified` and retain mapping confidence and notes.
 - Store `basis = actual | planned`. When both exist for an item and year, actual wins in public charts, tables, and CSV; active planned values remain visibly marked.
 - Every import must produce validation and reconciliation evidence.
+- CSV exports retain source and basis metadata.
 - Georgian CSVs intended for direct opening in Microsoft Excel must use UTF-8 with BOM and automated encoding regression coverage. Prefer a native XLSX companion when spreadsheet auto-conversion could alter identifiers.
+- Municipal codes `05`, `42`, `43`, `46`, and `64` remain excluded because their budgets are not territorially attributable spending inside those municipalities.
 
 ## UI Contract
 
@@ -129,10 +133,10 @@ Use this sequence: brainstorming/spec -> plan -> implementation -> verification/
 GitHub delivery is mandatory when the task includes publishing:
 
 ```text
-codex/* branch -> commits -> push -> draft PR -> required CI -> resolved review -> merge -> delete branch
+codex/* branch -> commits -> push -> draft PR -> required CI -> review/resolved conversations -> merge -> delete branch
 ```
 
-Do not push implementation commits directly to `main`. Publishing or merging requires task scope or explicit authorization. Required CI must be green before merge; do not bypass a required check.
+Check Git and worktree state before promising branch, commit, push, PR, or merge actions. Do not push implementation commits directly to `main`. Publishing or merging requires task scope or explicit authorization. Required CI must be green before merge; do not bypass a required check.
 
 Use Context7 for current library, framework, SDK, API, CLI, or cloud-service documentation before relying on memory. Do not claim completion without the relevant verification in `CLAUDE.md`.
 ```
@@ -198,6 +202,9 @@ $requiredPatterns = @(
   'UTF-8 with BOM',
   'never edit the database directly',
   'codex/\* branch -> commits -> push -> draft PR',
+  'review/resolved conversations',
+  'Municipal codes `05`, `42`, `43`, `46`, and `64` remain excluded',
+  'Verify the deployed commit and relevant production URLs separately',
   'Do not push implementation commits directly to `main`',
   'Required CI must be green before merge'
 )
