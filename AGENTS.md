@@ -117,6 +117,8 @@ A branch implementation, merged commit, green deploy-trigger workflow, or accept
 - Production follows the warm editorial system in `DESIGN.md` v4.1. Do not revive the superseded Apple Light/Night, dark, neon, or terminal directions without explicit approval.
 - Derive year ranges and defaults from loaded facts; do not hardcode coverage.
 - Preserve readable Georgian text, accessible chart labels, distinguishable stable category colors, and data comprehension.
+- Only the applicable total is selected by default; it remains first, selectable, and removable.
+- Series selection is unlimited. Optional grouping tabs precede search; the next row places `გასუფთავება` / `ყველას მონიშვნა` on the left and `სერიები {selected} / {all}` on the right. Search never scopes the bulk action or denominator.
 
 ## Workflow and Delivery
 

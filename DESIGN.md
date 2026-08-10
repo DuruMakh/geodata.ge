@@ -395,13 +395,17 @@ Mono 11px text links; active = ink 600 underlined (accent underline); inactive =
 
 ### 7.6 Series Row (aside panel)
 
-Row: 1px `row-border` bottom border; hover/selected bg `tint`; a 2px accent left rail marks expanded ministries and program rows. Toggle button (`aria-pressed`): 14px square checkbox (1.5px `control` border; checked = accent fill + paper ✓), swatch bar shown only when selected, sans 12.5/500 label clamped to 2 lines, latest value mono 11 muted right. Ministries rows add a caret button (`▸/▾`, `aria-expanded`) that expands the ministry's major programs; program rows are indented, sans 11.5/400 in `body` color. Program rows show names only — official program codes stay in the data layer (they fragment across reorganizations) and are not surfaced.
+Row: 1px `row-border` bottom border; hover/selected bg `tint`; a 2px accent left rail marks expanded ministries and program rows. Toggle button (`aria-pressed`): 14px square checkbox (1.5px `control` border; checked = the row's series-colour fill + paper ✓), swatch bar shown for selected and unselected rows, sans 12.5/500 label clamped to 2 lines, latest value mono 11 muted right-aligned. Ministries rows add a caret button (`▸/▾`, `aria-expanded`) that expands the ministry's major programs; program rows are indented, sans 11.5/400 in `body` color. Program rows show names only — official program codes stay in the data layer (they fragment across reorganizations) and are not surfaced.
 
 ### 7.7 Search
+
+The shared selector order is: optional grouping tabs, search, an action/status row, then the series list. The action/status row places `გასუფთავება` / `ყველას მონიშვნა` on the left and `სერიები {selected} / {all}` on the right. Search never scopes the count or bulk action; selection remains unlimited.
 
 Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. Placeholder in ministries grouping: `ძებნა — უწყება ან პროგრამა`. A query with no matches shows `0 შედეგი — შეცვალე საძიებო ტექსტი.` While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs (their caret is locked open); a ministry matched by name still honors its caret and expands to all of its programs. The query is panel-local state and resets on ANY scope switch — nav (ხარჯები↔შემოსავლები) and grouping alike; typing must not re-render the chart.
 
 ### 7.8 CSV Button
+
+CSV remains dataset-owned below the selector and is not part of the shared selector contract.
 
 Full-width block, h38, ink bg, paper text, sans 12.5/600, radius 2px. Hover: opacity 0.85. Label: `CSV ჩამოტვირთვა`. Must export exactly the visible filtered dataset with the metadata columns of §15.
 
@@ -462,7 +466,7 @@ Canonical contract: this section and the reusable component contracts in §7.
 
 ### 8.1 Defaults
 
-Side: expenditure. Grouping: fields. Mode: line. Measure: nominal GEL. Range: full available per scope. Selection: **total plus the top 5 categories by latest-year value** per scope (fields, ministries, and revenue each keep their own selection and range). The total is first, ink-coloured, selectable, and removable. Series selection is unlimited: the header shows `სერიები {selected} / {all}` and switches between `გასუფთავება` and `ყველას მონიშვნა`; search filters visible rows only and never scopes the bulk action.
+Side: expenditure. Grouping: fields. Mode: line. Measure: nominal GEL. Range: full available per scope. Selection: **the applicable total only** per scope (fields, ministries, revenue, municipalities, and regions each keep their own selection and range). The total is first, ink-coloured, selectable, and removable. Series selection is unlimited; search filters visible rows only and never scopes the count or bulk action.
 
 ### 8.2 Layout
 
@@ -473,7 +477,7 @@ workspace:
   gap: "40px"
 ```
 
-Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline + mono count (`{selected} / {all}`), grouping tabs (expenditure only, §7.2b), search, global clear/select-all action, series rows (scroll ≤430px), CSV button.
+Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline, grouping tabs (expenditure only, §7.2b), search, action-left/status-right row, series rows (scroll ≤430px), dataset-owned CSV button.
 
 ### 8.3 Line Chart
 
@@ -678,7 +682,7 @@ Do not:
 1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only; the budget hub's four cards are the one card exception, §6.6).
 2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), not in-page nav tabs.
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
-4. Explorer default: line mode, nominal GEL, full range, total-plus-top-five selection, and unrestricted line rendering.
+4. Explorer default: line mode, nominal GEL, full range, total-only selection, and unrestricted line rendering.
 5. Only `ხაზი` and `ცხრილი` modes exist; `% წილი` is the only pill.
 6. Swatches are 14×3px bars everywhere.
 7. Category colors match §4.2 on every surface.

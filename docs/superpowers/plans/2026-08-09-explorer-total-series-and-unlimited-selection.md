@@ -8,6 +8,11 @@
 
 **Tech Stack:** Next.js 16, React 19, TypeScript strict mode, Vitest, Playwright, Tailwind v4, reviewed CSV-backed municipal facts.
 
+> Superseded in part by `2026-08-10-standardized-data-explorer-design.md`:
+> the current default is total-only, and the standardized selector places search
+> above an action-left/status-right row. Its unlimited-selection and official-total
+> decisions remain in force.
+
 ## Global Constraints
 
 - Default selection is the applicable total followed by the existing latest-year top five categories.
