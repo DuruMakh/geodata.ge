@@ -34,7 +34,7 @@
 - Consumes: `docs/superpowers/specs/2026-08-10-instruction-context-reduction-design.md`, `Project_Definition.md`, `DESIGN.md`, `docs/deployment.md`, `docs/data-methodology/database-import.md`, and the existing Engineering Behavior block.
 - Produces: a 7,000-8,000-character root `AGENTS.md` with task-routed loading, stable repository precedence, compact durable constraints, and an aligned root `CLAUDE.md` definition of done.
 
-- [ ] **Step 1: Capture the protected block and baseline measurements**
+- [x] **Step 1: Capture the protected block and baseline measurements**
 
 Run from the repository root:
 
@@ -63,7 +63,7 @@ EngineeringCharacters  2348
 
 Record the printed SHA-256 value in the terminal output for comparison in Step 5. Do not write it into a persistent repository file.
 
-- [ ] **Step 2: Replace the pre-Engineering instruction shell**
+- [x] **Step 2: Replace the pre-Engineering instruction shell**
 
 Use `apply_patch` to replace `AGENTS.md` from the first line through the line immediately before `## Engineering Behavior` with exactly:
 
@@ -95,7 +95,7 @@ Repository precedence: `Project_Definition.md` section 2 owns scope; `DESIGN.md`
 
 Do not include `## Engineering Behavior` in the replacement. The existing heading and all content through the line before `## Current Project State` must remain untouched.
 
-- [ ] **Step 3: Replace dated project detail with the compact durable capsule**
+- [x] **Step 3: Replace dated project detail with the compact durable capsule**
 
 Use `apply_patch` to replace `AGENTS.md` from `## Current Project State` through end of file with exactly:
 
@@ -143,7 +143,7 @@ Check Git and worktree state before promising branch, commit, push, PR, or merge
 Use Context7 for current library, framework, SDK, API, CLI, or cloud-service documentation before relying on memory. Do not claim completion without the relevant verification in `CLAUDE.md`.
 ```
 
-- [ ] **Step 4: Align the root definition of done**
+- [x] **Step 4: Align the root definition of done**
 
 Use `apply_patch` to replace item 4 under `CLAUDE.md`'s `## Definition of done` with:
 
@@ -153,7 +153,7 @@ Use `apply_patch` to replace item 4 under `CLAUDE.md`'s `## Definition of done` 
 
 Leave every other command and definition-of-done item unchanged.
 
-- [ ] **Step 5: Prove the Engineering Behavior block is unchanged**
+- [x] **Step 5: Prove the Engineering Behavior block is unchanged**
 
 Run:
 
@@ -181,7 +181,7 @@ if ($beforeHash -ne $afterHash) { throw 'Engineering Behavior changed' }
 
 Expected: `Identical` is `True` and both hashes equal the value printed in Step 1.
 
-- [ ] **Step 6: Verify size, links, retained rules, and removed dated detail**
+- [x] **Step 6: Verify size, links, retained rules, and removed dated detail**
 
 Run:
 
@@ -233,7 +233,7 @@ foreach ($pattern in $forbiddenPatterns) {
 
 Expected: `Characters` is between 7,000 and 8,000; `MissingLinks` is blank; no exception is thrown.
 
-- [ ] **Step 7: Review the complete documentation diff**
+- [x] **Step 7: Review the complete documentation diff**
 
 Run:
 
@@ -250,7 +250,7 @@ Expected:
 - Only `AGENTS.md` and `CLAUDE.md` are modified; the plan is already committed separately.
 - No application, data, dependency, nested instruction, or deployment file changed.
 
-- [ ] **Step 8: Commit the compact instruction contract**
+- [x] **Step 8: Commit the compact instruction contract**
 
 Run:
 
