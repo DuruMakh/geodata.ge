@@ -122,13 +122,13 @@ export function SeriesPanel({
           showGrouping ? (
             <div className="flex gap-[18px] border-b border-[var(--row-border)] pb-3">
               <TextTab label="სფეროები" active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
-              <TextTab label="უწყებები" active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
+              <TextTab label="სამინისტროები" active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
             </div>
           ) : undefined
         }
         query={query}
         onQueryChange={setQuery}
-        searchPlaceholder={isMinistries ? "ძებნა — უწყება ან პროგრამა" : "ძებნა"}
+        searchPlaceholder="ძებნა"
         selectedCount={selectedIds.length}
         totalCount={selectableIds.length}
         hasSelection={hasSelection}

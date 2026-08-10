@@ -30,6 +30,10 @@ export function SeriesSelector({
   hasVisibleMatches,
   children,
 }: SeriesSelectorProps) {
+  const bulkState: "false" | "mixed" | "true" =
+    hasSelection && allSelected ? "true" : hasSelection ? "mixed" : "false";
+  const bulkMark = bulkState === "true" ? "✓" : bulkState === "mixed" ? "—" : "";
+
   return (
     <div data-testid="series-selector">
       {controls ? <div data-selector-section="controls">{controls}</div> : null}
@@ -51,20 +55,23 @@ export function SeriesSelector({
       >
         <button
           type="button"
+          role="checkbox"
           data-testid="series-toggle-all"
-          aria-pressed={allSelected}
+          aria-checked={bulkState}
           onClick={onToggleAll}
           className="grid shrink-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 py-1 pr-1 pl-0.5 text-left"
         >
           <span
             aria-hidden
-            className="inline-flex size-3.5 items-center justify-center border-[1.5px] text-[9px] leading-none text-[var(--paper)]"
+            data-testid="series-toggle-indicator"
+            className="inline-flex size-3.5 items-center justify-center border-[1.5px] text-[9px] leading-none"
             style={{
-              borderColor: allSelected ? "var(--ink)" : "var(--control)",
-              backgroundColor: allSelected ? "var(--ink)" : "transparent",
+              borderColor: bulkState === "false" ? "var(--control)" : "var(--ink)",
+              backgroundColor: bulkState === "true" ? "var(--ink)" : "transparent",
+              color: bulkState === "true" ? "var(--paper)" : "var(--ink)",
             }}
           >
-            {allSelected ? "✓" : ""}
+            {bulkMark}
           </span>
           <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
             {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}

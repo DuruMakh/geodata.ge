@@ -86,7 +86,7 @@ test("national selector uses the standardized search, action, status, and row an
   expect(sections).toEqual(["controls", "search", "actions", "list"]);
 
   await expect(panel.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
-  await expect(panel.getByTestId("series-toggle-all")).toHaveText("გასუფთავება");
+  await expect(panel.getByTestId("series-toggle-all")).toContainText("გასუფთავება");
 
   const actionBox = await panel.getByTestId("series-toggle-all").boundingBox();
   const statusBox = await panel.getByTestId("series-status").boundingBox();
@@ -151,11 +151,11 @@ test("series header clears and selects every series independently of search", as
 
   await expect(panel.locator('[data-level="total"]').first()).toContainText("მთლიანი ხარჯი");
   await expect(panel.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
-  await expect(bulk).toHaveText("გასუფთავება");
+  await expect(bulk).toContainText("გასუფთავება");
 
   await bulk.click();
   await expect(panel.locator('button[title][aria-pressed="true"]')).toHaveCount(0);
-  await expect(bulk).toHaveText("ყველას მონიშვნა");
+  await expect(bulk).toContainText("ყველას მონიშვნა");
 
   await panel.getByTestId("series-search").fill("ჯანმრთელობა");
   await bulk.click();
@@ -163,6 +163,35 @@ test("series header clears and selects every series independently of search", as
 
   const allCount = await seriesButtons.count();
   await expect(panel.locator('button[title][aria-pressed="true"]')).toHaveCount(allCount);
+});
+
+test("bulk selector exposes mixed, empty, and checked states", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const panel = page.getByTestId("series-selector");
+  const bulk = panel.getByTestId("series-toggle-all");
+  const indicator = panel.getByTestId("series-toggle-indicator");
+
+  await expect(bulk).toHaveAttribute("role", "checkbox");
+  await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+  await expect(indicator).toHaveText("—");
+
+  await panel.getByTestId("series-row").nth(1).getByTestId("series-row-toggle").click();
+  await expect(panel.getByTestId("series-status")).toContainText(/სერიები\s*2 \/ \d+/);
+  await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+  await expect(indicator).toHaveText("—");
+
+  await bulk.click();
+  await expect(bulk).toHaveAttribute("aria-checked", "false");
+  await expect(indicator).toHaveText("");
+  await expect(bulk).toContainText("ყველას მონიშვნა");
+
+  await panel.getByTestId("series-search").fill("ჯანმრთელობა");
+  await bulk.click();
+  await expect(bulk).toHaveAttribute("aria-checked", "true");
+  await expect(indicator).toHaveText("✓");
+  await expect(bulk).toContainText("გასუფთავება");
 });
 
 test("explorer controls expose line, table, grouping, and the share pill", async ({ page }) => {
@@ -178,6 +207,8 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   // The grouping switch lives in the series panel, not in the chart controls row.
   await expect(seriesPanel.getByTestId("grouping-fields")).toHaveAttribute("aria-pressed", "true");
   await expect(seriesPanel.getByTestId("grouping-ministries")).toBeVisible();
+  await expect(seriesPanel.getByTestId("grouping-ministries")).toHaveText("სამინისტროები");
+  await expect(seriesPanel.getByTestId("series-search")).toHaveAttribute("placeholder", "ძებნა");
   await expect(chartPanel.getByTestId("measure-share-toggle")).toBeVisible();
   await expect(page.getByTestId("year-range-strip")).toContainText("დიაპაზონი");
 
@@ -188,6 +219,9 @@ test("explorer controls expose line, table, grouping, and the share pill", async
 
   await chartPanel.getByTestId("chart-mode-line").click();
   await expect(page.getByTestId("chart-frame")).toBeVisible();
+
+  await seriesPanel.getByTestId("grouping-ministries").click();
+  await expect(seriesPanel.getByTestId("series-search")).toHaveAttribute("placeholder", "ძებნა");
 
   await chartPanel.getByTestId("measure-share-toggle").click();
   await expect(chartPanel).toHaveAttribute("data-measure", "share_of_total");

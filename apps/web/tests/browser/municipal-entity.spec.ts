@@ -400,16 +400,24 @@ test.describe("municipality page", () => {
     await expectMunicipalAppReady(page);
     const panel = page.getByTestId("series-selector");
     const bulk = panel.getByTestId("series-toggle-all");
+    const indicator = panel.getByTestId("series-toggle-indicator");
     const status = panel.getByTestId("series-status");
 
     await expect(status).toContainText("სერიები 1 / 11");
-    await expect(bulk).toHaveText("გასუფთავება");
+    await expect(bulk).toHaveAttribute("role", "checkbox");
+    await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+    await expect(indicator).toHaveText("—");
+    await expect(bulk).toContainText("გასუფთავება");
     await bulk.click();
-    await expect(bulk).toHaveText("ყველას მონიშვნა");
+    await expect(bulk).toHaveAttribute("aria-checked", "false");
+    await expect(indicator).toHaveText("");
+    await expect(bulk).toContainText("ყველას მონიშვნა");
 
     await panel.getByTestId("series-search").fill("განათლება");
     await expect(panel.getByTestId("series-row")).toHaveCount(2);
     await bulk.click();
+    await expect(bulk).toHaveAttribute("aria-checked", "true");
+    await expect(indicator).toHaveText("✓");
     await panel.getByTestId("series-search").fill("");
     await expect(panel.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
   });
@@ -519,7 +527,7 @@ test.describe("municipality page", () => {
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-row")).toHaveCount(11);
     await expect(page.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
-    await expect(page.getByTestId("series-toggle-all")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("series-toggle-all")).toHaveAttribute("aria-checked", "true");
   });
 
   test("offers a CSV download", async ({ page }) => {
