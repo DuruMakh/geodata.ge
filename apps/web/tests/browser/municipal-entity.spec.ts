@@ -494,6 +494,24 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("series-row").first().getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
   });
 
+  test("treats a pinned total search as a match and reports genuine misses", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const panel = page.getByTestId("series-selector");
+    const search = panel.getByTestId("series-search");
+    const totalLabel = await panel.locator('[data-level="total"] [data-testid="series-label"]').innerText();
+    const emptyState = panel.getByText(/^0 შედეგი/);
+
+    await search.fill(totalLabel);
+    await expect(panel.getByTestId("series-row")).toHaveCount(1);
+    await expect(emptyState).toHaveCount(0);
+
+    await search.fill("definitely-no-municipal-series-match");
+    await expect(panel.getByTestId("series-row")).toHaveCount(1);
+    await expect(emptyState).toBeVisible();
+  });
+
   test("selects the official total and every function", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);

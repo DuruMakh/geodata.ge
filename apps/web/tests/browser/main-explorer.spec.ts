@@ -105,6 +105,24 @@ test("national selector uses the standardized search, action, status, and row an
   ).toBe("2");
 });
 
+test("national selector treats a pinned total search as a match and reports genuine misses", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const panel = page.getByTestId("series-selector");
+  const search = panel.getByTestId("series-search");
+  const totalLabel = await panel.locator('[data-level="total"] [data-testid="series-label"]').innerText();
+  const emptyState = panel.getByText(/^0 შედეგი/);
+
+  await search.fill(totalLabel);
+  await expect(panel.getByTestId("series-row")).toHaveCount(1);
+  await expect(emptyState).toHaveCount(0);
+
+  await search.fill("definitely-no-national-series-match");
+  await expect(panel.getByTestId("series-row")).toHaveCount(1);
+  await expect(emptyState).toBeVisible();
+});
+
 test("standardized selector keeps its order when stacked below the chart", async ({ page }) => {
   await page.setViewportSize({ width: 820, height: 900 });
   await page.goto("http://localhost:3100/explorer/expenditure");
@@ -310,6 +328,29 @@ test("URL hash round-trips explorer state", async ({ page }) => {
   await expect(page.getByTestId("explorer-table")).toBeVisible();
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2020");
   await expect(page.getByTestId("series-selector").getByTitle("მთლიანი შემოსავლები")).toHaveAttribute("aria-pressed", "true");
+});
+
+test("national URL restores an explicitly empty selection as empty", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure#m=line&sel=");
+  await expectAppReady(page);
+  await page.reload();
+  await expectAppReady(page);
+
+  const panel = page.getByTestId("series-selector");
+  await expect(panel.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(0);
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+});
+
+test("national URL falls back to the applicable total when every selected id is unknown", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/revenue#m=line&sel=revenue.made_up");
+  await expectAppReady(page);
+  await page.reload();
+  await expectAppReady(page);
+
+  const panel = page.getByTestId("series-selector");
+  const selected = panel.locator('[data-testid="series-row-toggle"][aria-pressed="true"]');
+  await expect(selected).toHaveCount(1);
+  await expect(panel.locator('[data-level="total"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "true");
 });
 
 test("line mode renders every series from a large shared selection", async ({ page }) => {

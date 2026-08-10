@@ -8,7 +8,7 @@ import { TextTab } from "../ui/editorial";
 import { SeriesSelector, SeriesSelectorRow } from "./series-selector";
 
 // Series aside per DESIGN.md §7.6–7.8: flat editorial rows with a checkbox square,
-// swatch bar on selection, and (for ministries) caret-expandable major programs.
+// persistent swatch bar, and (for ministries) caret-expandable major programs.
 
 export type SeriesPanelRow = {
   item: ExplorerItem;
@@ -50,7 +50,7 @@ export function buildSeriesPanelRows(items: ExplorerItem[], query: string, expan
     // While searching, ministries with matching programs auto-expand to the matches
     // (caret locked open); a name-matched ministry still honors the manual caret,
     // showing all its programs — the caret is never a silent no-op.
-    const forcedOpen = Boolean(normalizedQuery) && matchedPrograms.length > 0;
+    const forcedOpen = Boolean(normalizedQuery) && !categoryMatches && matchedPrograms.length > 0;
     const expanded = forcedOpen || expandedIds.includes(category.id);
 
     rows.push({ item: category, isProgram: false, hasChildren: programs.length > 0, expanded, caretLocked: forcedOpen });
@@ -105,7 +105,11 @@ export function SeriesPanel({
   const selectableIds = items.map((item) => item.id);
   const hasSelection = selectedIds.length > 0;
   const isMinistries = scope === "ministries";
-  const hasVisibleMatches = query.trim() === "" || panelRows.some((row) => row.item.level !== "total");
+  const normalizedQuery = query.trim().toLowerCase();
+  const hasVisibleMatches =
+    normalizedQuery === "" ||
+    Boolean(items.find((item) => item.level === "total" && matches(item, normalizedQuery))) ||
+    panelRows.some((row) => row.item.level !== "total");
   const allSelected = selectableIds.every((itemId) => selectedIds.includes(itemId));
 
   return (

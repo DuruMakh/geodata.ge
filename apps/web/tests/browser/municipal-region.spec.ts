@@ -125,6 +125,20 @@ test.describe("entity picker region options resolve (previously 404)", () => {
 // past defects (the source note and the picker's region options), this is the
 // page's general contract.
 test.describe("region page", () => {
+  test("uses the standardized selector structure with only its total selected by default", async ({ page }) => {
+    await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
+
+    const panel = page.getByTestId("series-selector");
+    const sections = await panel.locator("[data-selector-section]").evaluateAll((nodes) =>
+      nodes.map((node) => node.getAttribute("data-selector-section")),
+    );
+    expect(sections).toEqual(["search", "actions", "list"]);
+    await expect(panel.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+    await expect(panel.locator('[data-level="total"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "true");
+    await expect(panel.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ 11/);
+  });
+
   test("uses the plain region name in the picker trigger", async ({ page }) => {
     await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);

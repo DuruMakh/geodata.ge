@@ -124,7 +124,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
     const functions = needle === "" ? model.rows : model.rows.filter((row) => row.kaLabel.includes(needle));
     return [model.totalRow, ...functions];
   }, [model.rows, model.totalRow, seriesQuery]);
-  const hasVisibleMatches = seriesQuery.trim() === "" || visibleRows.length > 1;
+  const normalizedSeriesQuery = seriesQuery.trim().toLowerCase();
+  const hasVisibleMatches =
+    normalizedSeriesQuery === "" ||
+    model.totalRow.kaLabel.toLowerCase().includes(normalizedSeriesQuery) ||
+    visibleRows.length > 1;
   const allSelected = selectableRows.every((row) => state.selectedIds.includes(row.itemId));
   const hasSelection = state.selectedIds.length > 0;
 

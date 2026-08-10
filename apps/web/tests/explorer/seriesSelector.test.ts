@@ -23,6 +23,12 @@ const items: ExplorerItem[] = [
     level: "major_program",
     parentItemId: "admin_spending.education",
   }),
+  item({
+    id: "admin_program.school_infrastructure",
+    kaLabel: "School infrastructure",
+    level: "major_program",
+    parentItemId: "admin_spending.education",
+  }),
   item({ id: "admin_spending.health", kaLabel: "Health ministry", level: "admin_category" }),
 ];
 
@@ -41,6 +47,7 @@ describe("series panel rows", () => {
       "admin_spending.total",
       "admin_spending.education",
       "admin_program.general_education",
+      "admin_program.school_infrastructure",
       "admin_spending.health",
     ]);
     expect(rows[2]?.isProgram).toBe(true);
@@ -51,6 +58,21 @@ describe("series panel rows", () => {
 
     expect(rows.map((row) => row.item.id)).toEqual(["admin_spending.total", "admin_spending.education", "admin_program.general_education"]);
     expect(rows[1]?.expanded).toBe(true);
+  });
+
+  it("keeps manual expansion when both a ministry and one of its programs match", () => {
+    const collapsed = buildSeriesPanelRows(items, "education", []);
+
+    expect(collapsed.map((row) => row.item.id)).toEqual(["admin_spending.total", "admin_spending.education"]);
+    expect(collapsed[1]).toEqual(expect.objectContaining({ expanded: false, caretLocked: false }));
+
+    const expanded = buildSeriesPanelRows(items, "education", ["admin_spending.education"]);
+    expect(expanded.map((row) => row.item.id)).toEqual([
+      "admin_spending.total",
+      "admin_spending.education",
+      "admin_program.general_education",
+      "admin_program.school_infrastructure",
+    ]);
   });
 
   it("keeps the total first while search filters categories", () => {
