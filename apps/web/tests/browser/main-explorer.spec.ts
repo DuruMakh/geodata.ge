@@ -56,11 +56,11 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   const paper = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   expect(paper).toBe("rgb(247, 242, 233)");
 
-  // Default: line mode, top-5 selection, chart drawn on paper.
+  // Default: line mode, total-only selection, chart drawn on paper.
   await expectLineChartRendered(page);
   await expect(page.getByTestId("series-selector")).toBeVisible();
   await expect(page.getByTestId("series-selector")).toContainText("სერიები");
-  await expect(page.getByTestId("series-selector")).toContainText(/სერიები\s*6 \/ \d+/);
+  await expect(page.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
   await expect(page.getByTestId("source-label")).toContainText("გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები");
   await expect(page.getByTestId("source-label")).toContainText("2005–2025");
 
@@ -69,10 +69,58 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   await expect(page.getByTestId("period-kpi-cards")).toContainText("პერიოდის ცვლილება");
   await expect(page.getByTestId("period-movers")).toContainText("ყველაზე მზარდი");
   await expect(page.getByTestId("period-comparison")).toContainText("პერიოდის შედარება");
-  await expect(page.getByTestId("period-comparison").locator("tbody tr")).toHaveCount(6);
+  await expect(page.getByTestId("period-comparison").locator("tbody tr")).toHaveCount(1);
 
   await expectNoPageOverflow(page);
   expect(consoleProblems).toEqual([]);
+});
+
+test("national selector uses the standardized search, action, status, and row anatomy", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const panel = page.getByTestId("series-selector");
+  const sections = await panel.locator("[data-selector-section]").evaluateAll((nodes) =>
+    nodes.map((node) => node.getAttribute("data-selector-section")),
+  );
+  expect(sections).toEqual(["controls", "search", "actions", "list"]);
+
+  await expect(panel.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
+  await expect(panel.getByTestId("series-toggle-all")).toHaveText("გასუფთავება");
+
+  const actionBox = await panel.getByTestId("series-toggle-all").boundingBox();
+  const statusBox = await panel.getByTestId("series-status").boundingBox();
+  expect(actionBox).not.toBeNull();
+  expect(statusBox).not.toBeNull();
+  expect(actionBox!.x).toBeLessThan(statusBox!.x);
+
+  const rows = panel.getByTestId("series-row");
+  await expect(rows.first()).toContainText("მთლიანი ხარჯი");
+  await expect(rows.locator("[data-testid='series-swatch']")).toHaveCount(await rows.count());
+  expect(
+    await rows
+      .first()
+      .getByTestId("series-label")
+      .evaluate((node) => getComputedStyle(node).getPropertyValue("-webkit-line-clamp")),
+  ).toBe("2");
+});
+
+test("standardized selector keeps its order when stacked below the chart", async ({ page }) => {
+  await page.setViewportSize({ width: 820, height: 900 });
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const chartBox = await page.getByTestId("chart-panel").boundingBox();
+  const selector = page.getByTestId("series-selector");
+  const selectorBox = await selector.boundingBox();
+  expect(chartBox).not.toBeNull();
+  expect(selectorBox).not.toBeNull();
+  expect(selectorBox!.y).toBeGreaterThan(chartBox!.y + chartBox!.height);
+
+  const sections = await selector.locator("[data-selector-section]").evaluateAll((nodes) =>
+    nodes.map((node) => node.getAttribute("data-selector-section")),
+  );
+  expect(sections).toEqual(["controls", "search", "actions", "list"]);
 });
 
 test("series header clears and selects every series independently of search", async ({ page }) => {
@@ -84,7 +132,7 @@ test("series header clears and selects every series independently of search", as
   const seriesButtons = panel.locator("button[title]");
 
   await expect(panel.locator('[data-level="total"]').first()).toContainText("მთლიანი ხარჯი");
-  await expect(panel).toContainText(/სერიები\s*6 \/ \d+/);
+  await expect(panel.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
   await expect(bulk).toHaveText("გასუფთავება");
 
   await bulk.click();
@@ -287,6 +335,11 @@ test("line mode renders every series from a large shared selection", async ({ pa
 test("unchecking the total hides its table row without breaking share denominators", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/revenue");
   await expectAppReady(page);
+
+  const vatButton = page.getByTestId("series-selector").getByTitle("დამატებული ღირებულების გადასახადი");
+  await vatButton.click();
+  await expect(vatButton).toHaveAttribute("aria-pressed", "true");
+
   await page.getByTestId("chart-mode-table").click();
   await page.getByTestId("measure-share-toggle").click();
 
@@ -298,7 +351,7 @@ test("unchecking the total hides its table row without breaking share denominato
 
   await expect(page.getByTestId("explorer-table")).not.toContainText("მთლიანი შემოსავლები");
   await expect(page.getByTestId("explorer-table").locator("tbody tr").first()).toContainText("%");
-  await expect(comparison.locator("tbody tr")).toHaveCount(5);
+  await expect(comparison.locator("tbody tr")).toHaveCount(1);
 });
 
 test("shared ministries program links restore with the parent expanded", async ({ page }) => {
@@ -324,6 +377,10 @@ test("shared ministries program links restore with the parent expanded", async (
 test("CSV download uses the active filtered table data", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
+
+  const socialProtectionButton = page.getByTestId("series-selector").getByTitle("სოციალური დაცვა");
+  await socialProtectionButton.click();
+  await expect(socialProtectionButton).toHaveAttribute("aria-pressed", "true");
 
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: /CSV/ }).click();
