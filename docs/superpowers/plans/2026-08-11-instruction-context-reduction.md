@@ -44,7 +44,9 @@ $start = [Array]::IndexOf($baseline, '## Engineering Behavior')
 $end = [Array]::IndexOf($baseline, '## Current Project State')
 $block = $baseline[$start..($end - 1)] -join "`n"
 $bytes = [Text.Encoding]::UTF8.GetBytes($block)
-$hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+$sha = [Security.Cryptography.SHA256]::Create()
+try { $hash = [BitConverter]::ToString($sha.ComputeHash($bytes)).Replace('-', '') }
+finally { $sha.Dispose() }
 [pscustomobject]@{
   BaselineCharacters = (($baseline -join "`n").Length)
   EngineeringCharacters = $block.Length
@@ -167,8 +169,12 @@ $beforeLines = & 'C:\Program Files\Git\cmd\git.exe' show 596eb41:AGENTS.md
 $afterLines = Get-Content 'AGENTS.md'
 $before = Get-EngineeringBlock $beforeLines '## Current Project State'
 $after = Get-EngineeringBlock $afterLines '## Project Snapshot'
-$beforeHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($before)))
-$afterHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($after)))
+$sha = [Security.Cryptography.SHA256]::Create()
+try {
+  $beforeHash = [BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($before))).Replace('-', '')
+  $afterHash = [BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($after))).Replace('-', '')
+}
+finally { $sha.Dispose() }
 [pscustomobject]@{Before=$beforeHash; After=$afterHash; Identical=($beforeHash -eq $afterHash)}
 if ($beforeHash -ne $afterHash) { throw 'Engineering Behavior changed' }
 ```
