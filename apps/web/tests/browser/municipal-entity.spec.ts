@@ -101,8 +101,8 @@ test.describe("hash sanitising", () => {
     await page.reload();
     await expectMunicipalAppReady(page);
 
-    // getDefaultMunicipalSelection: official total plus top 5 functions.
-    await expect(page.locator('[data-testid="municipal-series-row"][aria-pressed="true"]')).toHaveCount(6);
+    // getDefaultMunicipalSelection: official total only.
+    await expect(page.locator('[data-testid="series-row"] [data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
   });
 
   test("a selection mixing a known and an unknown id keeps the known one and drops the unknown one", async ({ page }) => {
@@ -111,7 +111,7 @@ test.describe("hash sanitising", () => {
     await page.reload();
     await expectMunicipalAppReady(page);
 
-    const checked = page.locator('[data-testid="municipal-series-row"][aria-pressed="true"]');
+    const checked = page.locator('[data-testid="series-row"] [data-testid="series-row-toggle"][aria-pressed="true"]');
     await expect(checked).toHaveCount(1);
     await expect(checked).toContainText("განათლება");
   });
@@ -322,26 +322,44 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
 // Task 14: the full municipality-page e2e coverage the header comment above
 // defers to this task ("Full section e2e coverage is Task 14's").
 test.describe("municipality page", () => {
+  test("municipal selector uses the same standardized anatomy as the national explorer", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const panel = page.getByTestId("series-selector");
+    const sections = await panel.locator("[data-selector-section]").evaluateAll((nodes) =>
+      nodes.map((node) => node.getAttribute("data-selector-section")),
+    );
+    expect(sections).toEqual(["search", "actions", "list"]);
+
+    await expect(panel.getByTestId("series-row").first()).toContainText("მთლიანი ბიუჯეტი");
+    await expect(panel.getByTitle("მთლიანი ბიუჯეტი")).toHaveAttribute("aria-pressed", "true");
+
+    const actionBox = await panel.getByTestId("series-toggle-all").boundingBox();
+    const statusBox = await panel.getByTestId("series-status").boundingBox();
+    expect(actionBox!.x).toBeLessThan(statusBox!.x);
+  });
+
   test("series rows reuse the explorer's animated hover and selected tint", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
-    const initiallySelected = page.locator('[data-testid="municipal-series-row"][aria-pressed="true"]').first();
-    const initiallyUnselected = page.locator('[data-testid="municipal-series-row"][aria-pressed="false"]').first();
-    const selectedLabel = await initiallySelected.locator("span.truncate").innerText();
-    const unselectedLabel = await initiallyUnselected.locator("span.truncate").innerText();
-    const selectedRow = page.getByTestId("municipal-series-row").filter({ hasText: selectedLabel }).first();
-    const unselectedRow = page.getByTestId("municipal-series-row").filter({ hasText: unselectedLabel }).first();
+    const initiallySelected = page.locator('[data-testid="series-row"]:has([data-testid="series-row-toggle"][aria-pressed="true"])').first();
+    const initiallyUnselected = page.locator('[data-testid="series-row"]:has([data-testid="series-row-toggle"][aria-pressed="false"])').first();
+    const selectedLabel = await initiallySelected.getByTestId("series-label").innerText();
+    const unselectedLabel = await initiallyUnselected.getByTestId("series-label").innerText();
+    const selectedRow = page.getByTestId("series-row").filter({ hasText: selectedLabel }).first();
+    const unselectedRow = page.getByTestId("series-row").filter({ hasText: unselectedLabel }).first();
 
-    await expect(selectedRow).toHaveAttribute("aria-pressed", "true");
-    await expect(unselectedRow).toHaveAttribute("aria-pressed", "false");
+    await expect(selectedRow.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
+    await expect(unselectedRow.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
     await expect(selectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
     await expect(selectedRow).toHaveCSS("transition-duration", "0.1s");
     await unselectedRow.hover();
     await expect(unselectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
 
-    await unselectedRow.click();
-    await expect(unselectedRow).toHaveAttribute("aria-pressed", "true");
+    await unselectedRow.getByTestId("series-row-toggle").click();
+    await expect(unselectedRow.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
     await expect(unselectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
   });
 
@@ -371,8 +389,8 @@ test.describe("municipality page", () => {
     await page.reload();
     await expectMunicipalAppReady(page);
 
-    await expect(page.getByTestId("municipal-series-row").first()).toContainText("მთლიანი ბიუჯეტი");
-    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(11);
+    await expect(page.getByTestId("series-row").first()).toContainText("მთლიანი ბიუჯეტი");
+    await expect(page.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
     await expect(page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']")).toHaveCount(11);
     await expect(page.getByTestId("series-overflow-callout")).toHaveCount(0);
   });
@@ -380,20 +398,20 @@ test.describe("municipality page", () => {
   test("bulk actions ignore the active municipal search", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
-    const bulk = page.getByTestId("municipal-series-all");
-    const header = page.getByTestId("municipal-series-header");
+    const panel = page.getByTestId("series-selector");
+    const bulk = panel.getByTestId("series-toggle-all");
+    const status = panel.getByTestId("series-status");
 
-    await expect(header).toContainText("სერიები 6 / 11");
-    await expect(header.locator(":scope > [data-testid='municipal-series-all']")).toHaveCount(1);
+    await expect(status).toContainText("სერიები 1 / 11");
     await expect(bulk).toHaveText("გასუფთავება");
     await bulk.click();
     await expect(bulk).toHaveText("ყველას მონიშვნა");
 
-    await page.getByTestId("municipal-series-search").fill("განათლება");
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(2);
+    await panel.getByTestId("series-search").fill("განათლება");
+    await expect(panel.getByTestId("series-row")).toHaveCount(2);
     await bulk.click();
-    await page.getByTestId("municipal-series-search").fill("");
-    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(11);
+    await panel.getByTestId("series-search").fill("");
+    await expect(panel.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
   });
 
   test("an explicitly empty selection shows guidance instead of an empty chart", async ({ page }) => {
@@ -405,7 +423,7 @@ test.describe("municipality page", () => {
 
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
     await expect(page.getByTestId("chart-frame")).toHaveCount(0);
-    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(0);
+    await expect(page.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(0);
   });
 
   test("an explicitly empty selection renders no table rows", async ({ page }) => {
@@ -468,22 +486,22 @@ test.describe("municipality page", () => {
   test("filters the series list and clears the selection", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
-    await page.getByTestId("municipal-series-search").fill("განათლება");
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(2);
-    await page.getByTestId("municipal-series-search").fill("");
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(11);
-    await page.getByTestId("municipal-series-all").click();
-    await expect(page.getByTestId("municipal-series-row").first()).toHaveAttribute("aria-pressed", "false");
+    await page.getByTestId("series-search").fill("განათლება");
+    await expect(page.getByTestId("series-row")).toHaveCount(2);
+    await page.getByTestId("series-search").fill("");
+    await expect(page.getByTestId("series-row")).toHaveCount(11);
+    await page.getByTestId("series-toggle-all").click();
+    await expect(page.getByTestId("series-row").first().getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
   });
 
   test("selects the official total and every function", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
-    await page.getByTestId("municipal-series-all").click();
-    await page.getByTestId("municipal-series-all").click();
-    await expect(page.getByTestId("municipal-series-row")).toHaveCount(11);
-    await expect(page.locator("[data-testid='municipal-series-row'][aria-pressed='true']")).toHaveCount(11);
-    await expect(page.getByTestId("municipal-series-all")).toHaveAttribute("aria-pressed", "true");
+    await page.getByTestId("series-toggle-all").click();
+    await page.getByTestId("series-toggle-all").click();
+    await expect(page.getByTestId("series-row")).toHaveCount(11);
+    await expect(page.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
+    await expect(page.getByTestId("series-toggle-all")).toHaveAttribute("aria-pressed", "true");
   });
 
   test("offers a CSV download", async ({ page }) => {
