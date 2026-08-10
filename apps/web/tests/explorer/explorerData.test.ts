@@ -107,13 +107,11 @@ const adminFacts: AdminSpendingFact[] = [
 ];
 
 describe("main explorer data model", () => {
-  it("prepends the total to the latest-year top categories", () => {
-    expect(getDefaultSelection("expenditure", facts)).toEqual(["expenditure.total", "spending.education", "spending.health"]);
-    expect(getDefaultSelection("revenue", facts)).toEqual(["revenue.total", "revenue.vat"]);
+  it("defaults each populated scope to only its total", () => {
+    expect(getDefaultSelection("expenditure", facts)).toEqual(["expenditure.total"]);
+    expect(getDefaultSelection("revenue", facts)).toEqual(["revenue.total"]);
     expect(getDefaultSelection("expenditure", facts, "ministries", adminFacts)).toEqual([
       "admin_spending.total",
-      "admin_spending.health_social_affairs",
-      "admin_spending.education_science_youth",
     ]);
     expect(getDefaultSelection("expenditure", facts, "ministries", [])).toEqual([]);
   });

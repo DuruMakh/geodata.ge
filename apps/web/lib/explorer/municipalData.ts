@@ -269,21 +269,9 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
   return { years, rows, totalRow };
 }
 
-/**
- * Official total followed by the top five functions by latest-year value.
- */
+/** The official total is the only pristine municipal selection. */
 export function getDefaultMunicipalSelection(model: MunicipalEntityModel): string[] {
-  const lastYear = model.years.at(-1);
-  if (lastYear === undefined) return [];
-
-  return [
-    model.totalRow.itemId,
-    ...model.rows
-      .slice()
-      .sort((left, right) => (right.valuesByYear[lastYear] ?? 0) - (left.valuesByYear[lastYear] ?? 0))
-      .slice(0, 5)
-      .map((row) => row.itemId),
-  ];
+  return model.years.length === 0 ? [] : [model.totalRow.itemId];
 }
 
 export type MunicipalListRow = {
