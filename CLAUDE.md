@@ -14,7 +14,7 @@
 1. `npm run check` and `npm run build` pass locally.
 2. UI changes: `npm run test:browser` passes.
 3. Data changes: the matching methodology doc under `docs/data-methodology/` is updated in the same change.
-4. Durable project-state changes: update `AGENTS.md` "Current Project State".
+4. Durable project changes update their canonical owner: scope in `Project_Definition.md`, visuals in `DESIGN.md`, data/deployment behavior in the relevant methodology or runbook, and `AGENTS.md` only for always-relevant operational rules.
 5. CI (`.github/workflows/ci.yml`) must be green before a PR merges.
 
 ## Health Stack
