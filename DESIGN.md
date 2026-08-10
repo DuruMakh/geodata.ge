@@ -379,7 +379,7 @@ A boxed either/or switch is the honest affordance for choosing which view of the
 
 ### 7.2b Grouping Tabs
 
-Text-only, sans 12.5px; active = ink 600 with `text-decoration: underline`, 2px thickness, accent color, `text-underline-offset: 4px`. No backgrounds. In the **explorer**, the grouping tabs (`სფეროები / უწყებები`, expenditure only) live in the series aside, directly under the `სერიები` header row (gap 18px, 12px padding-bottom, 1px `row-border` bottom rule). In the **analysis view**, the side tabs (`ხარჯები / შემოსავლები`) and grouping tabs use this same style, separated by a 1px×13px `control` vertical divider.
+Text-only, sans 12.5px; active = ink 600 with `text-decoration: underline`, 2px thickness, accent color, `text-underline-offset: 4px`. No backgrounds. In the **explorer**, the grouping tabs (`სფეროები / სამინისტროები`, expenditure multi-year only) live in the series aside, directly under the `სერიები` header row (gap 18px, 12px padding-bottom, 1px `row-border` bottom rule). In the **analysis view**, the side tabs (`ხარჯები / შემოსავლები`) and grouping tabs use this same style, separated by a 1px×13px `control` vertical divider.
 
 ### 7.3 Measure Pill (% წილი)
 
@@ -399,9 +399,9 @@ Row: 1px `row-border` bottom border; hover/selected bg `tint`; a 2px accent left
 
 ### 7.7 Search
 
-The shared selector order is: optional grouping tabs, search, an action/status row, then the series list. The action/status row places `გასუფთავება` / `ყველას მონიშვნა` on the left and `სერიები {selected} / {all}` on the right. Search never scopes the count or bulk action; selection remains unlimited.
+The shared selector order is: optional grouping tabs, search, an action/status row, then the series list. The action/status row places `გასუფთავება` / `ყველას მონიშვნა` on the left and `სერიები {selected} / {all}` on the right. The bulk indicator is a three-state checkbox: empty (`aria-checked="false"`), partial with a centered ink dash (`aria-checked="mixed"`), or ink-filled with a paper checkmark (`aria-checked="true"`). Empty selects all; partial and full states clear all. Search never scopes the count or bulk action; selection remains unlimited.
 
-Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. Placeholder in ministries grouping: `ძებნა — უწყება ან პროგრამა`. A query with no matches shows `0 შედეგი — შეცვალე საძიებო ტექსტი.` While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs (their caret is locked open); a ministry matched by name still honors its caret and expands to all of its programs. The query is panel-local state and resets on ANY scope switch — nav (ხარჯები↔შემოსავლები) and grouping alike; typing must not re-render the chart.
+Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. The placeholder is `ძებნა` in both fields and ministries grouping. A query with no matches shows `0 შედეგი — შეცვალე საძიებო ტექსტი.` While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs (their caret is locked open); a ministry matched by name still honors its caret and expands to all of its programs. The query is panel-local state and resets on ANY scope switch — nav (ხარჯები↔შემოსავლები) and grouping alike; typing must not re-render the chart.
 
 ### 7.8 CSV Button
 
@@ -598,7 +598,7 @@ The workspace's own breakpoints measure the **content column**, not the viewport
 
 ## 13. Accessibility
 
-- All controls have accessible names; toggles expose pressed/selected state (`aria-pressed`, `aria-expanded`); slider handles expose `role="slider"` with value attributes and keyboard support.
+- All controls have accessible names; toggles expose pressed/selected state (`aria-pressed`, `aria-checked`, `aria-expanded`); slider handles expose `role="slider"` with value attributes and keyboard support.
 - SVG charts: `role="img"` + Georgian accessible label; SVG-only data must also exist in table/tooltip/summary.
 - Focus visible (accent ring) on paper.
 - Never color-only meaning: swatch + label + value.
