@@ -4,10 +4,11 @@ import { useState } from "react";
 import type { ExplorerItem, ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { formatAmount } from "../../lib/explorer/format";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
-import { SwatchBar, TextTab } from "../ui/editorial";
+import { TextTab } from "../ui/editorial";
+import { SeriesSelector, SeriesSelectorRow } from "./series-selector";
 
 // Series aside per DESIGN.md §7.6–7.8: flat editorial rows with a checkbox square,
-// swatch bar on selection, and (for ministries) caret-expandable major programs.
+// persistent swatch bar, and (for ministries) caret-expandable major programs.
 
 export type SeriesPanelRow = {
   item: ExplorerItem;
@@ -49,7 +50,7 @@ export function buildSeriesPanelRows(items: ExplorerItem[], query: string, expan
     // While searching, ministries with matching programs auto-expand to the matches
     // (caret locked open); a name-matched ministry still honors the manual caret,
     // showing all its programs — the caret is never a silent no-op.
-    const forcedOpen = Boolean(normalizedQuery) && matchedPrograms.length > 0;
+    const forcedOpen = Boolean(normalizedQuery) && !categoryMatches && matchedPrograms.length > 0;
     const expanded = forcedOpen || expandedIds.includes(category.id);
 
     rows.push({ item: category, isProgram: false, hasChildren: programs.length > 0, expanded, caretLocked: forcedOpen });
@@ -104,130 +105,63 @@ export function SeriesPanel({
   const selectableIds = items.map((item) => item.id);
   const hasSelection = selectedIds.length > 0;
   const isMinistries = scope === "ministries";
+  const normalizedQuery = query.trim().toLowerCase();
+  const hasVisibleMatches =
+    normalizedQuery === "" ||
+    Boolean(items.find((item) => item.level === "total" && matches(item, normalizedQuery))) ||
+    panelRows.some((row) => row.item.level !== "total");
+  const allSelected = selectableIds.every((itemId) => selectedIds.includes(itemId));
 
   return (
     <aside
       aria-label="სერიები"
-      data-testid="series-selector"
       className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
     >
-      <div className="flex items-baseline justify-between gap-3 border-b-2 border-[var(--ink)] pb-2.5">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--ink)]">
-          სერიები{" "}
-          <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--muted)]">
-            {selectedIds.length} / {selectableIds.length}
-          </span>
-        </h2>
-        <button
-          type="button"
-          data-testid="series-toggle-all"
-          onClick={() => onSelectionChange(hasSelection ? [] : selectableIds)}
-          className="cursor-pointer text-[11px] font-medium text-[var(--accent)] underline underline-offset-4"
-        >
-          {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}
-        </button>
-      </div>
-
-      {showGrouping ? (
-        <div className="mt-3.5 flex gap-[18px] border-b border-[var(--row-border)] pb-3">
-          <TextTab label="სფეროები" active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
-          <TextTab label="უწყებები" active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
-        </div>
-      ) : null}
-
-      <input
-        data-testid="series-search"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder={isMinistries ? "ძებნა — უწყება ან პროგრამა" : "ძებნა"}
-        aria-label="ძებნა სერიებში"
-        className="mt-3.5 h-[34px] w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] placeholder:text-[var(--muted)]"
-      />
-
-      {query.trim() && panelRows.length === 0 ? (
-        <p className="mt-3.5 border-b border-[var(--row-border)] px-1 py-3 text-xs text-[var(--muted)]">
-          0 შედეგი — შეცვალე საძიებო ტექსტი.
-        </p>
-      ) : null}
-
-      <div className="mt-3.5 flex max-h-[430px] flex-col overflow-y-auto">
+      <SeriesSelector
+        controls={
+          showGrouping ? (
+            <div className="flex gap-[18px] border-b border-[var(--row-border)] pb-3">
+              <TextTab label="სფეროები" active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
+              <TextTab label="სამინისტროები" active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
+            </div>
+          ) : undefined
+        }
+        query={query}
+        onQueryChange={setQuery}
+        searchPlaceholder="ძებნა"
+        selectedCount={selectedIds.length}
+        totalCount={selectableIds.length}
+        hasSelection={hasSelection}
+        allSelected={allSelected}
+        onToggleAll={() => onSelectionChange(hasSelection ? [] : selectableIds)}
+        hasVisibleMatches={hasVisibleMatches}
+      >
         {panelRows.map(({ item, isProgram, hasChildren, expanded, caretLocked }) => {
           const selected = selectedIds.includes(item.id);
           const latest = valuesByItem.get(item.id)?.valuesByYear[endYear] ?? null;
-          const showRail = isProgram || (hasChildren && expanded);
 
           return (
-            <div
+            <SeriesSelectorRow
               key={item.id}
-              data-level={item.level}
-              data-parent-id={item.parentItemId ?? undefined}
-              className={`relative flex items-stretch border-b border-[var(--row-border)] transition-colors duration-100 hover:bg-[var(--tint)] ${
-                selected ? "bg-[var(--tint)]" : "bg-transparent"
-              }`}
-            >
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -top-px -bottom-px left-0 w-0.5"
-                style={{ background: showRail ? "var(--accent)" : "transparent" }}
-              />
-              {isMinistries ? (
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    // A search-forced row is already open to its matches; toggling
-                    // hidden state now would only surface after clearing the search.
-                    if (!caretLocked) onToggleExpanded(item.id);
-                  }}
-                  aria-expanded={expanded}
-                  aria-label="ქვეპროგრამები"
-                  aria-disabled={caretLocked || undefined}
-                  className={`flex w-[22px] flex-none items-center justify-center text-base leading-none ${caretLocked ? "cursor-default" : "cursor-pointer"}`}
-                  style={{ visibility: hasChildren ? "visible" : "hidden" }}
-                  tabIndex={hasChildren && !caretLocked ? 0 : -1}
-                >
-                  <span style={{ color: expanded ? "var(--accent)" : "var(--ink)" }}>{expanded ? "▾" : "▸"}</span>
-                </button>
-              ) : null}
-              <button
-                type="button"
-                onClick={() => onToggle(item.id)}
-                aria-pressed={selected}
-                title={item.kaLabel}
-                className={`flex min-w-0 flex-1 cursor-pointer items-start gap-2.5 text-left ${
-                  isProgram ? "py-[7px] pr-1.5 pl-0.5" : "py-[9px] pr-1.5 pl-1"
-                }`}
-              >
-                <span
-                  aria-hidden
-                  className="mt-0.5 inline-flex size-3.5 flex-none items-center justify-center text-[9.5px] leading-none text-[var(--paper)]"
-                  style={{
-                    border: `1.5px solid ${selected ? "var(--accent)" : "var(--control)"}`,
-                    background: selected ? "var(--accent)" : "transparent",
-                  }}
-                >
-                  {selected ? "✓" : ""}
-                </span>
-                <span className="flex min-w-0 flex-1 items-start gap-2">
-                  {selected ? <SwatchBar color={item.color} className="mt-[7px]" /> : null}
-                  <span
-                    className={`line-clamp-2 leading-[1.35] ${
-                      isProgram
-                        ? `text-[11.5px] font-normal text-[var(--body)]`
-                        : `text-[12.5px] ${expanded && hasChildren ? "font-semibold" : "font-medium"} text-[var(--ink)]`
-                    }`}
-                  >
-                    {item.kaLabel}
-                  </span>
-                </span>
-                <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                  {formatAmount(latest)}
-                </span>
-              </button>
-            </div>
+              id={item.id}
+              label={item.kaLabel}
+              color={item.color}
+              value={formatAmount(latest)}
+              selected={selected}
+              level={item.level}
+              parentId={item.parentItemId}
+              showCaretColumn={isMinistries}
+              hasChildren={hasChildren}
+              expanded={expanded}
+              expansionLocked={caretLocked}
+              showRail={isProgram || (hasChildren && expanded)}
+              isChild={isProgram}
+              onToggle={() => onToggle(item.id)}
+              onToggleExpanded={() => onToggleExpanded(item.id)}
+            />
           );
         })}
-      </div>
+      </SeriesSelector>
 
       <button
         type="button"

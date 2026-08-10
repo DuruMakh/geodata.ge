@@ -15,10 +15,11 @@ import {
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { formatAmount, UNIT_MLN } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
-import { Callout, SegmentedTabs, SourceNote, SwatchBar } from "../ui/editorial";
+import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
+import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { EntityPicker, type EntityPickerGroup } from "./entity-picker";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
@@ -123,6 +124,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
     const functions = needle === "" ? model.rows : model.rows.filter((row) => row.kaLabel.includes(needle));
     return [model.totalRow, ...functions];
   }, [model.rows, model.totalRow, seriesQuery]);
+  const normalizedSeriesQuery = seriesQuery.trim().toLowerCase();
+  const hasVisibleMatches =
+    normalizedSeriesQuery === "" ||
+    model.totalRow.kaLabel.toLowerCase().includes(normalizedSeriesQuery) ||
+    visibleRows.length > 1;
   const allSelected = selectableRows.every((row) => state.selectedIds.includes(row.itemId));
   const hasSelection = state.selectedIds.length > 0;
 
@@ -288,80 +294,30 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
 
         <aside className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
           <div className="sticky top-5">
-            <div data-testid="municipal-series-header" className="flex items-center justify-between gap-4 pb-2.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-                სერიები{" "}
-                <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
-                  {state.selectedIds.length} / {selectableRows.length}
-                </span>
-              </span>
-              <button
-                type="button"
-                data-testid="municipal-series-all"
-                aria-pressed={allSelected}
-                onClick={toggleAll}
-                className="grid shrink-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-2 py-1 pr-1 pl-0.5 text-left"
-              >
-                <span
-                  aria-hidden
-                  className="inline-flex h-3.5 w-3.5 items-center justify-center border-[1.5px] text-[9px] leading-none text-[var(--paper)]"
-                  style={{
-                    borderColor: allSelected ? "var(--ink)" : "var(--control)",
-                    backgroundColor: allSelected ? "var(--ink)" : "transparent",
-                  }}
-                >
-                  {allSelected ? "✓" : ""}
-                </span>
-                <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
-                  {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}
-                </span>
-              </button>
-            </div>
-
-            <input
-              data-testid="municipal-series-search"
-              value={seriesQuery}
-              onChange={(event) => setSeriesQuery(event.target.value)}
-              placeholder="ძებნა"
-              aria-label="სერიების ძებნა"
-              className="mb-2 h-[34px] w-full border-0 border-b border-[var(--control)] bg-transparent text-[13px] text-[var(--ink)] outline-none"
-            />
-
-            {visibleRows.map((row) => {
-              const selected = state.selectedIds.includes(row.itemId);
-              const latest = row.valuesByYear[state.range.end] ?? null;
-
-              return (
-                <button
+            <SeriesSelector
+              query={seriesQuery}
+              onQueryChange={setSeriesQuery}
+              searchPlaceholder="ძებნა"
+              selectedCount={state.selectedIds.length}
+              totalCount={selectableRows.length}
+              hasSelection={hasSelection}
+              allSelected={allSelected}
+              onToggleAll={toggleAll}
+              hasVisibleMatches={hasVisibleMatches}
+            >
+              {visibleRows.map((row) => (
+                <SeriesSelectorRow
                   key={row.itemId}
-                  type="button"
-                  data-testid="municipal-series-row"
-                  aria-pressed={selected}
-                  onClick={() => state.toggleSeries(row.itemId)}
-                  className={`grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] ${
-                    selected ? "bg-[var(--tint)]" : "bg-transparent"
-                  }`}
-                >
-                  <span
-                    aria-hidden
-                    className="inline-flex h-3.5 w-3.5 items-center justify-center border-[1.5px] text-[9px] leading-none text-[var(--paper)]"
-                    style={{
-                      borderColor: selected ? row.color : "var(--control)",
-                      backgroundColor: selected ? row.color : "transparent",
-                    }}
-                  >
-                    {selected ? "✓" : ""}
-                  </span>
-                  <span className="flex min-w-0 items-center gap-[7px]">
-                    <SwatchBar color={row.color} />
-                    <span className="truncate text-[12px] font-medium">{row.kaLabel}</span>
-                  </span>
-                  <span className="font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--faint)]">
-                    {formatAmount(latest)}
-                  </span>
-                </button>
-              );
-            })}
+                  id={row.itemId}
+                  label={row.kaLabel}
+                  color={row.color}
+                  value={formatAmount(row.valuesByYear[state.range.end] ?? null)}
+                  selected={state.selectedIds.includes(row.itemId)}
+                  level={row.itemId === model.totalRow.itemId ? "total" : "category"}
+                  onToggle={() => state.toggleSeries(row.itemId)}
+                />
+              ))}
+            </SeriesSelector>
             <button
               type="button"
               data-testid="municipal-csv"

@@ -6,6 +6,10 @@ Scope: UI only. **No change to the served municipal dataset, its Prisma schema,
 or the import.** The one data-layer touch is a geometry provenance swap (§4) in
 the landing geo module, which the municipal dataset does not depend on.
 
+> Selector update: `2026-08-10-standardized-data-explorer-design.md` supersedes
+> the total-plus-five default and the municipality-specific selector markup.
+> Municipal data semantics, routes, and the rest of this design remain in force.
+
 ## 1. Why this exists
 
 `docs/superpowers/specs/2026-08-02-municipal-data-serving-layer-design.md` (Spec 1)
