@@ -1,4 +1,4 @@
-# Series Selector Indeterminate State Design
+# Series Selector Indeterminate State and Ministry Copy Design
 
 **Date:** 2026-08-11  
 **Status:** Approved design; implementation pending
@@ -9,6 +9,9 @@ Make the shared series bulk control communicate partial selection correctly.
 The current control looks empty unless every series is selected, which makes a
 partially selected explorer appear to have no aggregate selection state.
 
+Also simplify the national expenditure grouping copy so the visible language
+uses the user-facing term for ministries and the shared short search prompt.
+
 ## Scope
 
 This is a presentation and accessibility change inside the existing shared
@@ -17,6 +20,18 @@ regional multi-year explorers.
 
 The change does not alter selection data, search behavior, URL state, CSV
 exports, row checkboxes, charts, tables, or dataset-specific adapters.
+
+## Ministry Grouping Copy
+
+In the national expenditure explorer:
+
+- rename the grouping tab from `უწყებები` to `სამინისტროები`;
+- replace the ministries-mode placeholder `ძებნა — უწყება ან პროგრამა` with
+  the same short placeholder used elsewhere: `ძებნა`.
+
+This is display copy only. The existing ministries/major-program grouping,
+hierarchy-aware search, underlying identifiers, and data coverage do not
+change.
 
 ## Three States
 
@@ -74,6 +89,8 @@ Automated coverage must prove:
 - the same shared behavior is visible in national and municipal explorer
   browser coverage;
 - search continues not to scope the bulk state or action.
+- the national expenditure grouping tab displays `სამინისტროები`;
+- the search placeholder is `ძებნა` in both expenditure groupings.
 
 Run the focused browser tests for the national and municipal explorers, then
 the full non-browser gate and production build. Browser output that prints all
@@ -86,4 +103,6 @@ functionally green but not a clean command exit.
 - changing row-level checkbox visuals;
 - changing which series are selected by default;
 - changing clear/select-all behavior;
+- renaming internal grouping identifiers or changing ministry/program search
+  behavior;
 - changing URL, CSV, chart, table, or data semantics.
