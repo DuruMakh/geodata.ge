@@ -1,3 +1,4 @@
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import type { MunicipalTotalFact } from "../../lib/data/municipal/types";
 import {
@@ -6,8 +7,9 @@ import {
   METHODOLOGY_CONTENT,
   buildMethodologyHubEntries,
   deriveMethodologyCoverage,
-  validateDecisionCoverage,
 } from "../../lib/methodology/catalog";
+import { validateDecisionCoverage } from "../../lib/methodology/decisionCoverage";
+import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
 import type {
   DecisionRegisterRow,
   MethodologyArchiveSummary,
@@ -41,6 +43,7 @@ const municipalFact = (year: number): MunicipalTotalFact => ({
 });
 
 const municipalFacts = [municipalFact(2015), municipalFact(2025)];
+const repositoryRoot = path.resolve(process.cwd(), "../..");
 
 const validCanonicalDocument = "docs/data-methodology/revenue-methodology.md";
 const validCanonicalHeading = "6.1 Publish the consolidated column";
@@ -81,6 +84,22 @@ describe("methodology catalog", () => {
         "archive",
       ]);
     }
+  });
+
+  it("discloses the complete SHA-256 coverage of the published revenue originals", async () => {
+    const manifest = await loadReviewedSourceManifest(repositoryRoot, "revenue");
+    const disclosure = [
+      ...METHODOLOGY_CONTENT.revenue.decisions,
+      ...METHODOLOGY_CONTENT.revenue.technicalAppendix,
+    ].find(
+      (decision) => decision.id === "revenue.limitation.legacy_hash_gap",
+    );
+    const publicText = [disclosure?.titleKa, disclosure?.summaryKa, ...(disclosure?.detailKa ?? [])].join(" ");
+
+    expect(manifest).toHaveLength(21);
+    expect(publicText).toContain(`ყველა ${manifest.length} გამოქვეყნებულ PDF-ს SHA-256 აქვს`);
+    expect(publicText).not.toContain("არ აქვთ");
+    expect(publicText).not.toContain("ჯერ არ არსებობს");
   });
 
   it("covers every canonical decision exactly through a public entry", async () => {

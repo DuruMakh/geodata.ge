@@ -40,6 +40,20 @@ describe("original-source inventory", () => {
     }
   });
 
+  it("includes only top-level revenue PDFs regardless of extension case", async () => {
+    const repositoryRoot = await mkdtemp(path.join(tmpdir(), "methodology-revenue-inventory-"));
+    tempDirectories.push(repositoryRoot);
+    const revenueRoot = path.join(repositoryRoot, "docs/Raw Data/Revenue");
+    await mkdir(path.join(revenueRoot, "ArchivedRevenue"), { recursive: true });
+    await writeFile(path.join(revenueRoot, "published.PDF"), "top-level");
+    await writeFile(path.join(revenueRoot, "notes.txt"), "not a PDF");
+    await writeFile(path.join(revenueRoot, "ArchivedRevenue", "nested.pdf"), "nested");
+
+    await expect(expectedOriginalSourcePaths(repositoryRoot, "revenue")).resolves.toEqual([
+      { path: "docs/Raw Data/Revenue/published.PDF", byteSize: 9 },
+    ]);
+  });
+
   it("has one reviewed manifest row for every approved original", async () => {
     for (const datasetId of LIVE_METHODOLOGY_IDS) {
       const expected = await expectedOriginalSourcePaths(REPOSITORY_ROOT, datasetId);
