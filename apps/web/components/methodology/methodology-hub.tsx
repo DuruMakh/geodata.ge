@@ -39,7 +39,7 @@ export function MethodologyHub({ liveEntries }: { liveEntries: readonly Methodol
               key={entry.id}
               data-testid="methodology-live-row"
               href={entry.href}
-              className="group grid gap-5 border-b border-[var(--hairline)] py-7 transition-[background-color,transform] duration-150 hover:translate-x-1 hover:bg-[var(--tint)] focus-visible:translate-x-1 focus-visible:bg-[var(--tint)] min-[768px]:grid-cols-[minmax(180px,0.75fr)_minmax(300px,1.25fr)_auto] min-[768px]:items-center min-[768px]:gap-8 min-[768px]:px-3"
+              className="group grid gap-5 border-b border-[var(--hairline)] py-7 transition-[background-color,transform] duration-150 hover:translate-x-1 hover:bg-[var(--tint)] focus-visible:translate-x-1 focus-visible:bg-[var(--tint)] motion-reduce:transform-none motion-reduce:transition-none min-[768px]:grid-cols-[minmax(180px,0.75fr)_minmax(300px,1.25fr)_auto] min-[768px]:items-center min-[768px]:gap-8 min-[768px]:px-3"
             >
               <h3 className="font-[family-name:var(--font-display)] text-[24px] font-semibold tracking-[-0.01em]">{entry.titleKa}</h3>
               <div>
@@ -50,7 +50,12 @@ export function MethodologyHub({ liveEntries }: { liveEntries: readonly Methodol
                   <span>განხილულია {entry.reviewedAt}</span>
                 </p>
               </div>
-              <span aria-hidden="true" className="text-xl text-[var(--accent)] transition-transform duration-150 group-hover:translate-x-1">→</span>
+              <span
+                aria-hidden="true"
+                className="text-xl text-[var(--accent)] transition-transform duration-150 group-hover:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none"
+              >
+                →
+              </span>
             </Link>
           ))}
         </div>
