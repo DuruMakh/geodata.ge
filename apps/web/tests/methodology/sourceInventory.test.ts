@@ -50,4 +50,19 @@ describe("original-source inventory", () => {
 
     await expect(expectedOriginalSourcePaths(repositoryRoot, "expenditure")).rejects.toThrow(/symlink/i);
   });
+
+  it("rejects an approved inventory root that is itself a symlink outside the repository", async () => {
+    const repositoryRoot = await mkdtemp(path.join(tmpdir(), "methodology-inventory-root-"));
+    const outsideRoot = await mkdtemp(path.join(tmpdir(), "methodology-inventory-outside-"));
+    tempDirectories.push(repositoryRoot, outsideRoot);
+    await mkdir(path.join(repositoryRoot, "docs/Raw Data"), { recursive: true });
+    await writeFile(path.join(outsideRoot, "source.pdf"), "source");
+    await symlink(
+      outsideRoot,
+      path.join(repositoryRoot, "docs/Raw Data/Expenditure"),
+      process.platform === "win32" ? "junction" : "dir",
+    );
+
+    await expect(expectedOriginalSourcePaths(repositoryRoot, "expenditure")).rejects.toThrow(/symlink|outside repository/i);
+  });
 });

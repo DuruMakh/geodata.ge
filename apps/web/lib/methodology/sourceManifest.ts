@@ -86,6 +86,12 @@ function assertRelativeForwardSlashPath(value: string, label: string) {
   }
 }
 
+function assertStablePublicDownloadPath(value: string) {
+  if (!value.split("/").every((segment) => /^[a-z0-9][a-z0-9._-]*$/.test(segment))) {
+    throw new Error(`public_download_path must use lowercase ASCII URL-safe segments: ${value}`);
+  }
+}
+
 async function resolveRegularFile(repositoryRoot: string, repositorySourcePath: string) {
   const rootRealPath = await realpath(repositoryRoot);
   let currentPath = repositoryRoot;
@@ -142,6 +148,7 @@ export async function validateSourceManifest(
   for (const row of rows) {
     assertRelativeForwardSlashPath(row.repository_source_path, "repository_source_path");
     assertRelativeForwardSlashPath(row.public_download_path, "public_download_path");
+    assertStablePublicDownloadPath(row.public_download_path);
     const publicPrefix = `downloads/methodology/${datasetId}/files/`;
     if (!row.public_download_path.startsWith(publicPrefix) || row.public_download_path === publicPrefix) {
       throw new Error(`Invalid public download path for ${datasetId}: ${row.public_download_path}`);

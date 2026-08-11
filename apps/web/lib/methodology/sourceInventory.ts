@@ -1,5 +1,5 @@
 import path from "node:path";
-import { lstat, readdir } from "node:fs/promises";
+import { lstat, readdir, realpath } from "node:fs/promises";
 import type { MethodologyDatasetId } from "./types";
 
 export type OriginalSourceInventoryRow = {
@@ -38,6 +38,17 @@ function repositoryPath(...segments: string[]) {
 
 async function enumerateRule(repositoryRoot: string, rule: InventoryRule): Promise<OriginalSourceInventoryRow[]> {
   const rootPath = path.join(repositoryRoot, ...rule.root.split("/"));
+  const rootStat = await lstat(rootPath);
+  if (rootStat.isSymbolicLink()) {
+    throw new Error(`Approved source inventory root cannot be a symlink: ${rule.root}`);
+  }
+  if (!rootStat.isDirectory()) throw new Error(`Approved source inventory root is not a directory: ${rule.root}`);
+  const repositoryRealPath = await realpath(repositoryRoot);
+  const rootRealPath = await realpath(rootPath);
+  const rootRelativePath = path.relative(repositoryRealPath, rootRealPath);
+  if (rootRelativePath.startsWith("..") || path.isAbsolute(rootRelativePath)) {
+    throw new Error(`Approved source inventory root resolves outside repository: ${rule.root}`);
+  }
   const rows: OriginalSourceInventoryRow[] = [];
 
   async function visit(directoryPath: string, relativeSegments: string[]): Promise<void> {

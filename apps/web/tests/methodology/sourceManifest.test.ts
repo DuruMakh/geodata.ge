@@ -133,6 +133,10 @@ describe("reviewed source manifest", () => {
     { name: "disallowed redistribution", mutate: (row: ReviewedSourceManifestRow) => ({ ...row, redistribution_status: "unknown" as never }), message: /redistribution/i },
     { name: "missing proxy basis", mutate: (row: ReviewedSourceManifestRow) => ({ ...row, retrieved_at_basis: "" as never }), message: /retrieved.*basis/i },
     { name: "public paths outside the dataset files root", mutate: (row: ReviewedSourceManifestRow) => ({ ...row, public_download_path: "downloads/methodology/revenue/files/2005/source-a.pdf" }), message: /public download path/i },
+    { name: "uppercase public path characters", mutate: (row: ReviewedSourceManifestRow) => ({ ...row, public_download_path: "downloads/methodology/expenditure/files/2005/Source-a.pdf" }), message: /lowercase ascii/i },
+    { name: "non-ASCII public path characters", mutate: (row: ReviewedSourceManifestRow) => ({ ...row, public_download_path: "downloads/methodology/expenditure/files/2005/source-ა.pdf" }), message: /lowercase ascii/i },
+    { name: "spaces in public paths", mutate: (row: ReviewedSourceManifestRow) => ({ ...row, public_download_path: "downloads/methodology/expenditure/files/2005/source a.pdf" }), message: /lowercase ascii/i },
+    { name: "URL-special public path characters", mutate: (row: ReviewedSourceManifestRow) => ({ ...row, public_download_path: "downloads/methodology/expenditure/files/2005/source%2fa.pdf" }), message: /lowercase ascii/i },
   ])("rejects $name", async ({ mutate, message }) => {
     const repositoryRoot = await createRepository();
     await expect(validateSourceManifest(repositoryRoot, "expenditure", [mutate(validRow(), repositoryRoot)])).rejects.toThrow(message);
