@@ -95,11 +95,17 @@ test("future routes stay on the static 404 surface and out of navigation", async
     expect(response?.status(), slug).toBe(404);
     await expect(page.locator("body")).toContainText("404");
     await expect(page.locator("body")).toContainText("This page could not be found.");
+    await expect(page.locator(`link[rel="canonical"][href*="/methodology/${slug}"]`)).toHaveCount(0);
+    await expect(page.locator(`meta[property="og:url"][content*="/methodology/${slug}"]`)).toHaveCount(0);
+    await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
   }
 
   await page.goto("http://localhost:3100/methodology");
   const futureRows = page.getByTestId("methodology-future-row");
   await expect(futureRows).toHaveCount(4);
+  for (const label of ["ინფლაცია", "მშპ", "მოსახლეობა", "უმუშევრობა"] as const) {
+    await expect(futureRows.getByText(label, { exact: true })).toBeVisible();
+  }
   expect(
     await futureRows.evaluateAll((rows) =>
       rows.every(
@@ -180,6 +186,7 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
   expect(headingBox).not.toBeNull();
   expect(jumpBox).not.toBeNull();
   expect(documentBox).not.toBeNull();
+  expect(headingBox!.y).toBeGreaterThanOrEqual(0);
   expect(headingBox!.x).toBeGreaterThanOrEqual(0);
   expect(headingBox!.x + headingBox!.width).toBeLessThanOrEqual(390);
   expect(headingBox!.y + headingBox!.height).toBeLessThan(844);
