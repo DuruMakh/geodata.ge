@@ -230,4 +230,21 @@ describe("methodology archive preparation", () => {
     expect(await readFile(sentinelPath, "utf8")).toBe("keep");
     expect(await listFiles(publicRoot)).toEqual(["downloads/methodology/sentinel.txt"]);
   });
+
+  it("does not rewrite an existing repository report in check mode", async () => {
+    const { repositoryRoot } = await createFixtureRepository();
+    const reportPath = path.join(repositoryRoot, "data/reports/methodology-archive-validation.json");
+    const existingReport = '{"status":"prior-evidence"}\n';
+    await mkdir(path.dirname(reportPath), { recursive: true });
+    await writeFile(reportPath, existingReport);
+
+    await prepareMethodologyArchives({
+      repositoryRoot,
+      publicRoot: path.join(repositoryRoot, "apps/web/public"),
+      reportPath,
+      mode: "check",
+    });
+
+    expect(await readFile(reportPath, "utf8")).toBe(existingReport);
+  });
 });

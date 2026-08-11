@@ -234,7 +234,6 @@ export async function prepareMethodologyArchives(options: {
     const first = await generateAll(options.repositoryRoot, path.join(firstTempRoot, "public"));
     const second = await generateAll(options.repositoryRoot, path.join(secondTempRoot, "public"));
     assertFixedPoint(first, second);
-    await writeReport(options.reportPath, first);
     return first;
   } finally {
     await Promise.all([
