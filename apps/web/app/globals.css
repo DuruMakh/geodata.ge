@@ -78,7 +78,9 @@ input {
 
 button:focus-visible,
 select:focus-visible,
-input:focus-visible {
+input:focus-visible,
+a:focus-visible,
+summary:focus-visible {
   outline: 2px solid rgba(179, 64, 42, 0.4);
   outline-offset: 2px;
 }

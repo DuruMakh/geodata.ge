@@ -138,9 +138,9 @@ describe("municipality map focus", () => {
     expect(globalsCss).not.toContain("path:focus-visible,\ncircle:focus-visible");
   });
 
-  it("leaves the app-wide button/select/input ring untouched", () => {
+  it("keeps one app-wide focus ring for controls, links, and disclosures", () => {
     expect(globalsCss).toContain(
-      "button:focus-visible,\nselect:focus-visible,\ninput:focus-visible {\n  outline: 2px solid rgba(179, 64, 42, 0.4);\n  outline-offset: 2px;\n}",
+      "button:focus-visible,\nselect:focus-visible,\ninput:focus-visible,\na:focus-visible,\nsummary:focus-visible {\n  outline: 2px solid rgba(179, 64, 42, 0.4);\n  outline-offset: 2px;\n}",
     );
   });
 });
