@@ -17,6 +17,10 @@ function sectionByKind(content: MethodologyContent, kind: MethodologyContent["se
   return section;
 }
 
+function sectionAnchorId(section: MethodologyContent["sections"][number]) {
+  return section.kind === "archive" ? "source-archive" : section.id;
+}
+
 export function MethodologyArticle({ content, coverage, rows, archiveSummary }: MethodologyArticleProps) {
   const journeyDescriptions = [
     sectionByKind(content, "archive").paragraphsKa[0],
@@ -71,7 +75,7 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary }: 
           <ol className="mt-3">
             {content.sections.map((section, index) => (
               <li key={section.id} className="border-b border-[var(--hairline-soft)]">
-                <a href={`#${section.id}`} className="grid grid-cols-[24px_1fr] gap-2 py-3 text-[11.5px] leading-relaxed text-[var(--body)] hover:text-[var(--accent)]">
+                <a href={`#${sectionAnchorId(section)}`} className="grid grid-cols-[24px_1fr] gap-2 py-3 text-[11.5px] leading-relaxed text-[var(--body)] hover:text-[var(--accent)]">
                   <span className="font-[family-name:var(--font-numeric)] text-[9.5px] text-[var(--faint)]">
                     {String(index + 1).padStart(2, "0")}
                   </span>
@@ -86,7 +90,7 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary }: 
           {content.sections.map((section) => (
             <section
               key={section.id}
-              id={section.id === "archive" ? "source-archive" : section.id}
+              id={sectionAnchorId(section)}
               aria-labelledby={`${section.id}-title`}
               className="scroll-mt-6 border-t-2 border-[var(--ink)] py-10 first:pt-7 min-[768px]:py-14"
             >

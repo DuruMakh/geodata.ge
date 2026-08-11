@@ -41,6 +41,13 @@ test("expenditure methodology exposes the complete layered article", async ({ pa
   await expect(page.getByTestId("method-journey-step")).toHaveCount(4);
   await expect(page.getByTestId("decision-record")).toContainText("2004");
   await expect(page.getByTestId("source-archive-row")).toHaveCount(77);
+
+  const archiveLink = page
+    .getByRole("navigation", { name: "გვერდის სარჩევი" })
+    .getByRole("link", { name: "უცვლელი პირველწყაროები" });
+  await archiveLink.click();
+  await expect(page).toHaveURL(/#source-archive$/);
+  await expect(page.locator("#source-archive")).toBeInViewport();
 });
 
 test("archive filters by search and year with a visible zero state", async ({ page }) => {
