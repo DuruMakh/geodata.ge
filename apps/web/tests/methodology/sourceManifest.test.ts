@@ -173,4 +173,25 @@ describe("reviewed source manifest", () => {
     await expect(validateSourceManifest(repositoryRoot, "expenditure", [validRow(), { ...second, source_id: validRow().source_id }])).rejects.toThrow(/duplicate source id/i);
     await expect(validateSourceManifest(repositoryRoot, "expenditure", [validRow(), { ...second, public_download_path: validRow().public_download_path }])).rejects.toThrow(/duplicate public path/i);
   });
+
+  it.each([
+    { date: "2026-02-30", name: "an impossible day" },
+    { date: "2025-02-29", name: "a non-leap-year February 29" },
+  ])("rejects $name instead of normalizing $date", async ({ date }) => {
+    const repositoryRoot = await createRepository();
+
+    await expect(
+      validateSourceManifest(repositoryRoot, "expenditure", [validRow({ retrieved_at: date })]),
+    ).rejects.toThrow(/valid date/i);
+  });
+
+  it("accepts February 29 in a leap year", async () => {
+    const repositoryRoot = await createRepository();
+
+    const [row] = await validateSourceManifest(repositoryRoot, "expenditure", [
+      validRow({ retrieved_at: "2024-02-29" }),
+    ]);
+
+    expect(row.retrieved_at).toBe("2024-02-29");
+  });
 });

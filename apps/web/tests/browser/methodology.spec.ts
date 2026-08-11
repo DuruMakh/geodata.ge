@@ -156,6 +156,83 @@ test("expenditure methodology exposes the complete layered article", async ({ pa
   await expect(page.locator("#source-archive")).toBeInViewport();
 });
 
+for (const dataset of ["expenditure", "revenue", "municipalities"] as const) {
+  test(`${dataset} methodology article is followed by the shared footer`, async ({ page }) => {
+    await page.goto(`http://localhost:3100/methodology/${dataset}`);
+
+    const footer = page.getByTestId("site-footer");
+    await expect(footer).toBeVisible();
+    await expect(footer.getByRole("link", { name: "მეთოდოლოგია", exact: true })).toHaveAttribute(
+      "href",
+      "/methodology",
+    );
+    expect(
+      await page.evaluate(() => {
+        const article = document.querySelector("main");
+        const sharedFooter = document.querySelector('[data-testid="site-footer"]');
+        return Boolean(
+          article &&
+            sharedFooter &&
+            article.compareDocumentPosition(sharedFooter) & Node.DOCUMENT_POSITION_FOLLOWING,
+        );
+      }),
+    ).toBe(true);
+  });
+}
+
+test("archive dates distinguish repository proxies from source-manifest dates", async ({ page }) => {
+  for (const [dataset, proxyCount] of [
+    ["expenditure", 77],
+    ["revenue", 21],
+  ] as const) {
+    await page.goto(`http://localhost:3100/methodology/${dataset}#source-archive`);
+    const archive = page.getByTestId("source-archive");
+    await expect(archive.getByTestId("source-archive-proxy-disclosure")).toContainText(
+      `${proxyCount} ჩანაწერისთვის`,
+    );
+    await expect(
+      archive.getByTestId("source-archive-retrieval").first(),
+    ).toContainText("რეპოზიტორში პირველი დამატების თარიღი");
+    expect(await page.content()).not.toContain("docs/Raw Data");
+  }
+
+  await page.goto("http://localhost:3100/methodology/municipalities#source-archive");
+  const municipalArchive = page.getByTestId("source-archive");
+  await expect(municipalArchive.getByTestId("source-archive-proxy-disclosure")).toHaveCount(0);
+  await expect(
+    municipalArchive.getByTestId("source-archive-retrieval").first(),
+  ).toContainText("წყაროს მანიფესტში მითითებული თარიღი");
+  expect(await page.content()).not.toContain("docs/Raw Data");
+});
+
+test("municipality archive copy keeps prepared geometry outside the download boundary", async ({ page }) => {
+  await page.goto("http://localhost:3100/methodology/municipalities#source-archive");
+
+  const archiveSection = page.locator("#source-archive");
+  await expect(archiveSection).toContainText("პორტალურ ექსპორტებსა და ფინანსთა სამინისტროს სამუშაო წიგნებს");
+  await expect(archiveSection).toContainText("რუკის გეომეტრიის წარმომავლობა საჯარო მეთოდოლოგიაშია დოკუმენტირებული");
+  await expect(archiveSection).toContainText("გეომეტრიის ასლები და პროექტის არტეფაქტები ჩამოსატვირთ არქივში არ შედის");
+  await expect(archiveSection).not.toContainText("ლიცენზირებულ გეომეტრიის წყაროებს უცვლელი ბაიტებით");
+});
+
+test("method journey shows its tokenized spine only on desktop", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("http://localhost:3100/methodology/expenditure");
+
+  const spine = page.getByTestId("method-journey-spine");
+  await expect(spine).toBeVisible();
+  expect(
+    await spine.evaluate((element) => {
+      const style = getComputedStyle(element);
+      const token = getComputedStyle(document.documentElement).getPropertyValue("--hairline").trim();
+      return { backgroundColor: style.backgroundColor, token, width: style.width };
+    }),
+  ).toEqual({ backgroundColor: "rgb(217, 207, 190)", token: "#d9cfbe", width: "1px" });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(spine).toBeHidden();
+});
+
 test("archive filters by search and year with a visible zero state", async ({ page }) => {
   await page.goto("http://localhost:3100/methodology/revenue#source-archive");
 
@@ -233,9 +310,14 @@ test("methodology keyboard controls expose native behavior and visible focus", a
 
   await page.goto("http://localhost:3100/methodology/expenditure#source-archive");
   const summary = page.getByTestId("methodology-decision").first().locator("summary");
+  const indicator = summary.getByTestId("decision-disclosure-indicator");
+  await expect(indicator.locator('[data-disclosure-state="closed"]')).toBeVisible();
+  await expect(indicator.locator('[data-disclosure-state="open"]')).toBeHidden();
   await expectVisibleFocusOutline(summary);
   await page.keyboard.press("Enter");
   await expect(page.getByTestId("methodology-decision").first()).toHaveAttribute("open", "");
+  await expect(indicator.locator('[data-disclosure-state="closed"]')).toBeHidden();
+  await expect(indicator.locator('[data-disclosure-state="open"]')).toBeVisible();
 
   const archive = page.getByTestId("source-archive");
   const search = archive.getByRole("searchbox", { name: "პირველწყაროს ძებნა" });
@@ -245,6 +327,12 @@ test("methodology keyboard controls expose native behavior and visible focus", a
   await expectVisibleFocusOutline(
     archive.getByTestId("source-archive-row").first().getByRole("link", { name: /ჩამოტვირთვა/ }),
   );
+  await expect(
+    archive.getByRole("link", { name: "პირველწყაროების მანიფესტი — CSV ჩამოტვირთვა" }),
+  ).toHaveAttribute("href", "/downloads/methodology/expenditure/manifest.csv");
+  await expect(
+    archive.getByRole("link", { name: "პირველწყაროების მანიფესტი — JSON ჩამოტვირთვა" }),
+  ).toHaveAttribute("href", "/downloads/methodology/expenditure/manifest.json");
 });
 
 test("published download bytes match the archive row and manifest", async ({ page, request }) => {

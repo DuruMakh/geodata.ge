@@ -14,8 +14,18 @@ function DecisionDetails({ decision }: { decision: MethodologyDecision }) {
   return (
     <details data-testid="methodology-decision" className="group border-b border-[var(--hairline-soft)]">
       <summary className="grid cursor-pointer list-none gap-2 py-4 pr-1 marker:content-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(179,64,42,0.4)] min-[640px]:grid-cols-[minmax(0,1fr)_auto] min-[640px]:items-start min-[640px]:gap-6 [&::-webkit-details-marker]:hidden">
-        <span className="font-[family-name:var(--font-display)] text-[15px] font-semibold leading-relaxed group-open:text-[var(--accent)]">
-          {decision.titleKa}
+        <span className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
+          <span className="font-[family-name:var(--font-display)] text-[15px] font-semibold leading-relaxed group-open:text-[var(--accent)]">
+            {decision.titleKa}
+          </span>
+          <span
+            aria-hidden="true"
+            data-testid="decision-disclosure-indicator"
+            className="pt-0.5 font-[family-name:var(--font-numeric)] text-[14px] text-[var(--accent)]"
+          >
+            <span data-disclosure-state="closed" className="group-open:hidden">＋</span>
+            <span data-disclosure-state="open" className="hidden group-open:inline">−</span>
+          </span>
         </span>
         <span className="font-[family-name:var(--font-numeric)] text-[9.5px] leading-6 text-[var(--muted)]">
           {decision.statusKa}

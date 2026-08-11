@@ -16,6 +16,7 @@ export type PublicSourceManifestRow = Pick<
   | "byte_size"
   | "sha256"
   | "retrieved_at"
+  | "retrieved_at_basis"
   | "downloadHref"
 >;
 
@@ -34,6 +35,14 @@ function formatBytes(bytes: number) {
   if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
   if (bytes >= 1_000) return `${(bytes / 1_000).toFixed(1)} KB`;
   return `${bytes} B`;
+}
+
+function retrievalBasisLabel(basis: PublicSourceManifestRow["retrieved_at_basis"]) {
+  if (basis === "repository_first_commit_proxy") {
+    return "რეპოზიტორში პირველი დამატების თარიღი (მიახლოებითი)";
+  }
+  if (basis === "source_manifest") return "წყაროს მანიფესტში მითითებული თარიღი";
+  return "ზუსტი მიღების თარიღი";
 }
 
 export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) {
@@ -66,8 +75,17 @@ export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) 
             {summary.fileCount} უცვლელი პირველწყარო
           </p>
           <p className="mt-1 font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-            {formatBytes(summary.totalBytes)} · მიღებულია {summary.latestRetrievedAt}
+            {formatBytes(summary.totalBytes)} · უახლესი ჩანაწერის თარიღი {summary.latestRetrievedAt}
           </p>
+          {(summary.proxyDateCount ?? 0) > 0 ? (
+            <p
+              data-testid="source-archive-proxy-disclosure"
+              className="mt-3 max-w-[680px] text-[11.5px] leading-relaxed text-[var(--body)]"
+            >
+              {summary.proxyDateCount} ჩანაწერისთვის ნაჩვენებია ფაილის რეპოზიტორში პირველი დამატების
+              მიახლოებითი თარიღი და არა პირველწყაროს ზუსტი მიღების თარიღი.
+            </p>
+          ) : null}
         </div>
         <a
           href={`/downloads/methodology/${datasetId}/${datasetId}-original-sources.zip`}
@@ -120,7 +138,7 @@ export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) 
               <th className="px-2 py-3 font-semibold">პირველწყარო / ფაილი</th>
               <th className="px-2 py-3 font-semibold">ფორმატი</th>
               <th className="px-2 py-3 font-semibold">ზომა</th>
-              <th className="px-2 py-3 font-semibold">მიღებულია</th>
+              <th className="px-2 py-3 font-semibold">თარიღი</th>
               <th className="px-2 py-3 font-semibold">SHA-256</th>
               <th className="px-2 py-3 font-semibold">ჩამოტვირთვა</th>
             </tr>
@@ -140,7 +158,15 @@ export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) 
                   </td>
                   <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{format}</td>
                   <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{formatBytes(row.byte_size)}</td>
-                  <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{row.retrieved_at}</td>
+                  <td
+                    data-testid="source-archive-retrieval"
+                    className="px-2 py-4 font-[family-name:var(--font-numeric)]"
+                  >
+                    <span className="block">{row.retrieved_at}</span>
+                    <span className="mt-1 block max-w-[190px] font-[family-name:var(--font-ui)] text-[9.5px] leading-relaxed text-[var(--muted)]">
+                      {retrievalBasisLabel(row.retrieved_at_basis)}
+                    </span>
+                  </td>
                   <td
                     data-testid="source-archive-sha256"
                     title={row.sha256}
@@ -173,10 +199,18 @@ export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) 
 
       <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-[11px]">
         <span className="text-[var(--muted)]">მანიფესტი:</span>
-        <a href={`/downloads/methodology/${datasetId}/manifest.csv`} className="text-[var(--accent)] underline underline-offset-4">
+        <a
+          href={`/downloads/methodology/${datasetId}/manifest.csv`}
+          aria-label="პირველწყაროების მანიფესტი — CSV ჩამოტვირთვა"
+          className="text-[var(--accent)] underline underline-offset-4"
+        >
           CSV ↓
         </a>
-        <a href={`/downloads/methodology/${datasetId}/manifest.json`} className="text-[var(--accent)] underline underline-offset-4">
+        <a
+          href={`/downloads/methodology/${datasetId}/manifest.json`}
+          aria-label="პირველწყაროების მანიფესტი — JSON ჩამოტვირთვა"
+          className="text-[var(--accent)] underline underline-offset-4"
+        >
           JSON ↓
         </a>
       </div>
