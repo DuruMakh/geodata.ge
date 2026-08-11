@@ -72,27 +72,29 @@ describe("methodology catalog", () => {
   });
 
   it("keeps the retained article sections in their approved order", () => {
-    for (const dataset of ["expenditure", "revenue"] as const) {
-      const content = METHODOLOGY_CONTENT[dataset];
-      expect(content.sections.map((section) => section.kind)).toEqual([
-        "scope",
-        "sources",
-        "journey",
-        "decisions",
-        "classification",
-        "validation",
-        "limitations",
-        "archive",
-      ]);
-    }
+    expect(METHODOLOGY_CONTENT.expenditure.sections.map((section) => section.kind)).toEqual([
+      "scope",
+      "sources",
+      "journey",
+      "decisions",
+      "classification",
+      "validation",
+      "limitations",
+      "archive",
+    ]);
+
+    expect(METHODOLOGY_CONTENT.revenue.sections.map((section) => section.kind)).toEqual([
+      "scope",
+      "sources",
+      "journey",
+      "decisions",
+      "archive",
+    ]);
 
     expect(METHODOLOGY_CONTENT.municipalities.sections.map((section) => section.kind)).toEqual([
       "scope",
       "sources",
       "journey",
-      "classification",
-      "validation",
-      "limitations",
       "archive",
     ]);
   });

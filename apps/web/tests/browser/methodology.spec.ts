@@ -232,7 +232,7 @@ test("source archives keep provenance metadata out of every public table", async
   }
 });
 
-test("dataset articles omit only the public decision blocks requested for simplification", async ({ page }) => {
+test("dataset articles omit the public methodology blocks requested for simplification", async ({ page }) => {
   await page.goto("http://localhost:3100/methodology/expenditure");
   await expect(page.getByRole("heading", { name: "ისტორიული გადაწყვეტილებები" })).toHaveCount(0);
   await expect(page.getByTestId("decision-record")).toContainText("2004");
@@ -241,11 +241,18 @@ test("dataset articles omit only the public decision blocks requested for simpli
   await expect(page.getByRole("heading", { name: "ვალიდაცია" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "ტექნიკური დანართი" })).toHaveCount(0);
   await expect(page.getByTestId("decision-record")).toContainText("ფაქტი უპირატესია გეგმაზე");
+  for (const title of ["კლასიფიკაცია და გარდაქმნა", "შემოწმება და შეჯერება", "შეზღუდვები"] as const) {
+    await expect(page.getByRole("heading", { name: title })).toHaveCount(0);
+  }
+  await expect(page.getByRole("heading", { name: "უცვლელი პირველწყაროები" })).toBeVisible();
 
   await page.goto("http://localhost:3100/methodology/municipalities");
   await expect(page.getByRole("heading", { name: "გადაწყვეტილებების სრული ჩანაწერი" })).toHaveCount(0);
   await expect(page.getByTestId("decision-record")).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "კლასიფიკაცია და გარდაქმნა" })).toBeVisible();
+  for (const title of ["კლასიფიკაცია და გარდაქმნა", "შემოწმება და შეჯერება", "შეზღუდვები"] as const) {
+    await expect(page.getByRole("heading", { name: title })).toHaveCount(0);
+  }
+  await expect(page.getByRole("heading", { name: "უცვლელი პირველწყაროები" })).toBeVisible();
 });
 
 test("municipality archive copy keeps prepared geometry outside the download boundary", async ({ page }) => {

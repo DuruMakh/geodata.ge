@@ -11,10 +11,12 @@ type MethodologyArticleProps = {
   archiveSummary: MethodologyArchiveSummary;
 };
 
-function sectionByKind(content: MethodologyContent, kind: MethodologyContent["sections"][number]["kind"]) {
-  const section = content.sections.find((candidate) => candidate.kind === kind);
-  if (!section) throw new Error(`Methodology content is missing the ${kind} section: ${content.id}`);
-  return section;
+function firstParagraphByKind(
+  content: MethodologyContent,
+  kind: MethodologyContent["sections"][number]["kind"],
+  fallback: string,
+) {
+  return content.sections.find((candidate) => candidate.kind === kind)?.paragraphsKa[0] ?? fallback;
 }
 
 function sectionAnchorId(section: MethodologyContent["sections"][number]) {
@@ -23,10 +25,10 @@ function sectionAnchorId(section: MethodologyContent["sections"][number]) {
 
 export function MethodologyArticle({ content, coverage, rows, archiveSummary }: MethodologyArticleProps) {
   const journeyDescriptions = [
-    sectionByKind(content, "archive").paragraphsKa[0],
-    sectionByKind(content, "sources").paragraphsKa[0],
-    sectionByKind(content, "classification").paragraphsKa[0],
-    sectionByKind(content, "validation").paragraphsKa[0],
+    firstParagraphByKind(content, "archive", content.summaryKa),
+    firstParagraphByKind(content, "sources", content.summaryKa),
+    firstParagraphByKind(content, "classification", content.disclosureKa),
+    firstParagraphByKind(content, "validation", content.summaryKa),
   ];
 
   return (
