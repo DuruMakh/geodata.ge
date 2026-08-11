@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { loadServedLandingData, loadServedMunicipalData } from "../lib/data/servedData";
+import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../lib/methodology/catalog";
 import { resolveSiteUrl } from "../lib/siteUrl";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -11,6 +12,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .sort()
     .at(-1);
   const lastModified = lastReviewedAt ? new Date(lastReviewedAt) : undefined;
+  const methodologyLastModified = LIVE_METHODOLOGY_IDS.map(
+    (id) => METHODOLOGY_CONTENT[id].reviewedAt,
+  )
+    .sort()
+    .at(-1);
 
   return [
     { url: `${siteUrl}/`, lastModified },
@@ -19,6 +25,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/revenue`, lastModified },
     { url: `${siteUrl}/explorer/analysis`, lastModified },
     { url: `${siteUrl}/explorer/municipalities`, lastModified },
+    {
+      url: `${siteUrl}/methodology`,
+      lastModified: methodologyLastModified ? new Date(methodologyLastModified) : undefined,
+    },
+    ...LIVE_METHODOLOGY_IDS.map((id) => ({
+      url: `${siteUrl}/methodology/${id}`,
+      lastModified: new Date(METHODOLOGY_CONTENT[id].reviewedAt),
+    })),
     // The 64 municipality pages and 11 region roll-ups: the same complete,
     // closed sets app/explorer/municipalities/[code]/page.tsx and
     // .../region/[id]/page.tsx build generateStaticParams from, never a
