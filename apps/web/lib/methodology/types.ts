@@ -47,6 +47,8 @@ export type MethodologyContent = {
   }[];
   decisions: readonly MethodologyDecision[];
   technicalAppendix: readonly MethodologyDecision[];
+  hiddenDecisionGroups?: readonly string[];
+  showTechnicalAppendix?: boolean;
 };
 
 export type DecisionRegisterRow = {

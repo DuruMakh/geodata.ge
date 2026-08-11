@@ -108,7 +108,12 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary }: 
 
               {section.kind === "journey" ? <MethodJourney descriptionsKa={journeyDescriptions} /> : null}
               {section.kind === "decisions" ? (
-                <DecisionRecord decisions={content.decisions} technicalAppendix={content.technicalAppendix} />
+                <DecisionRecord
+                  decisions={content.decisions}
+                  technicalAppendix={content.technicalAppendix}
+                  hiddenGroups={content.hiddenDecisionGroups}
+                  showTechnicalAppendix={content.showTechnicalAppendix}
+                />
               ) : null}
               {section.kind === "archive" ? (
                 <SourceArchive datasetId={content.archiveManifestId} rows={rows} summary={archiveSummary} />

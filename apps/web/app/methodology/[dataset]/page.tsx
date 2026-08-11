@@ -74,9 +74,6 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
     official_filename: row.official_filename,
     media_type: row.media_type,
     byte_size: row.byte_size,
-    sha256: row.sha256,
-    retrieved_at: row.retrieved_at,
-    retrieved_at_basis: row.retrieved_at_basis,
     downloadHref: row.downloadHref,
   }));
 

@@ -14,9 +14,6 @@ export type PublicSourceManifestRow = Pick<
   | "official_filename"
   | "media_type"
   | "byte_size"
-  | "sha256"
-  | "retrieved_at"
-  | "retrieved_at_basis"
   | "downloadHref"
 >;
 
@@ -35,14 +32,6 @@ function formatBytes(bytes: number) {
   if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
   if (bytes >= 1_000) return `${(bytes / 1_000).toFixed(1)} KB`;
   return `${bytes} B`;
-}
-
-function retrievalBasisLabel(basis: PublicSourceManifestRow["retrieved_at_basis"]) {
-  if (basis === "repository_first_commit_proxy") {
-    return "რეპოზიტორში პირველი დამატების თარიღი (მიახლოებითი)";
-  }
-  if (basis === "source_manifest") return "წყაროს მანიფესტში მითითებული თარიღი";
-  return "ზუსტი მიღების თარიღი";
 }
 
 export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) {
@@ -75,17 +64,8 @@ export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) 
             {summary.fileCount} უცვლელი პირველწყარო
           </p>
           <p className="mt-1 font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-            {formatBytes(summary.totalBytes)} · უახლესი ჩანაწერის თარიღი {summary.latestRetrievedAt}
+            {formatBytes(summary.totalBytes)}
           </p>
-          {(summary.proxyDateCount ?? 0) > 0 ? (
-            <p
-              data-testid="source-archive-proxy-disclosure"
-              className="mt-3 max-w-[680px] text-[11.5px] leading-relaxed text-[var(--body)]"
-            >
-              {summary.proxyDateCount} ჩანაწერისთვის ნაჩვენებია ფაილის რეპოზიტორში პირველი დამატების
-              მიახლოებითი თარიღი და არა პირველწყაროს ზუსტი მიღების თარიღი.
-            </p>
-          ) : null}
         </div>
         <a
           href={`/downloads/methodology/${datasetId}/${datasetId}-original-sources.zip`}
@@ -131,15 +111,13 @@ export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) 
       </div>
 
       <div className="mt-7 overflow-x-auto border-t-2 border-[var(--ink)]">
-        <table className="w-full min-w-[1020px] border-collapse text-left text-[11.5px]">
+        <table className="w-full min-w-[760px] border-collapse text-left text-[11.5px]">
           <thead>
             <tr className="border-b border-[var(--ink)] text-[9.5px] uppercase tracking-[0.05em] text-[var(--muted)]">
               <th className="px-2 py-3 font-semibold">წელი</th>
               <th className="px-2 py-3 font-semibold">პირველწყარო / ფაილი</th>
               <th className="px-2 py-3 font-semibold">ფორმატი</th>
               <th className="px-2 py-3 font-semibold">ზომა</th>
-              <th className="px-2 py-3 font-semibold">თარიღი</th>
-              <th className="px-2 py-3 font-semibold">SHA-256</th>
               <th className="px-2 py-3 font-semibold">ჩამოტვირთვა</th>
             </tr>
           </thead>
@@ -158,22 +136,6 @@ export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) 
                   </td>
                   <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{format}</td>
                   <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{formatBytes(row.byte_size)}</td>
-                  <td
-                    data-testid="source-archive-retrieval"
-                    className="px-2 py-4 font-[family-name:var(--font-numeric)]"
-                  >
-                    <span className="block">{row.retrieved_at}</span>
-                    <span className="mt-1 block max-w-[190px] font-[family-name:var(--font-ui)] text-[9.5px] leading-relaxed text-[var(--muted)]">
-                      {retrievalBasisLabel(row.retrieved_at_basis)}
-                    </span>
-                  </td>
-                  <td
-                    data-testid="source-archive-sha256"
-                    title={row.sha256}
-                    className="max-w-[185px] break-all px-2 py-4 font-[family-name:var(--font-numeric)] text-[9px] leading-relaxed"
-                  >
-                    {row.sha256}
-                  </td>
                   <td className="px-2 py-4">
                     <a
                       href={row.downloadHref}
@@ -188,7 +150,7 @@ export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) 
             })}
             {filteredRows.length === 0 ? (
               <tr>
-                <td colSpan={7} data-testid="source-archive-empty" className="py-12 text-center text-[13px] text-[var(--muted)]">
+                <td colSpan={5} data-testid="source-archive-empty" className="py-12 text-center text-[13px] text-[var(--muted)]">
                   ვერაფერი მოიძებნა
                 </td>
               </tr>

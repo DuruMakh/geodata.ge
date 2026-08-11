@@ -139,4 +139,5 @@ export const EXPENDITURE_METHODOLOGY_CONTENT: MethodologyContent = {
   ],
   decisions: coreDecisions,
   technicalAppendix,
+  hiddenDecisionGroups: ["ისტორიული გადაწყვეტილებები"],
 };

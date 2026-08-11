@@ -218,29 +218,34 @@ for (const dataset of ["expenditure", "revenue", "municipalities"] as const) {
   });
 }
 
-test("archive dates distinguish repository proxies from source-manifest dates", async ({ page }) => {
-  for (const [dataset, proxyCount] of [
-    ["expenditure", 77],
-    ["revenue", 21],
-  ] as const) {
+test("source archives keep provenance metadata out of every public table", async ({ page }) => {
+  for (const dataset of ["expenditure", "revenue", "municipalities"] as const) {
     await page.goto(`http://localhost:3100/methodology/${dataset}#source-archive`);
     const archive = page.getByTestId("source-archive");
-    await expect(archive.getByTestId("source-archive-proxy-disclosure")).toContainText(
-      `${proxyCount} ჩანაწერისთვის`,
-    );
-    await expect(
-      archive.getByTestId("source-archive-retrieval").first(),
-    ).toContainText("რეპოზიტორში პირველი დამატების თარიღი");
+
+    await expect(archive.locator("thead")).not.toContainText("თარიღი");
+    await expect(archive.locator("thead")).not.toContainText("SHA-256");
+    await expect(archive.getByTestId("source-archive-retrieval")).toHaveCount(0);
+    await expect(archive.getByTestId("source-archive-sha256")).toHaveCount(0);
+    await expect(archive.getByTestId("source-archive-proxy-disclosure")).toHaveCount(0);
     expect(await page.content()).not.toContain("docs/Raw Data");
   }
+});
 
-  await page.goto("http://localhost:3100/methodology/municipalities#source-archive");
-  const municipalArchive = page.getByTestId("source-archive");
-  await expect(municipalArchive.getByTestId("source-archive-proxy-disclosure")).toHaveCount(0);
-  await expect(
-    municipalArchive.getByTestId("source-archive-retrieval").first(),
-  ).toContainText("წყაროს მანიფესტში მითითებული თარიღი");
-  expect(await page.content()).not.toContain("docs/Raw Data");
+test("dataset articles omit only the public decision blocks requested for simplification", async ({ page }) => {
+  await page.goto("http://localhost:3100/methodology/expenditure");
+  await expect(page.getByRole("heading", { name: "ისტორიული გადაწყვეტილებები" })).toHaveCount(0);
+  await expect(page.getByTestId("decision-record")).toContainText("2004");
+
+  await page.goto("http://localhost:3100/methodology/revenue");
+  await expect(page.getByRole("heading", { name: "ვალიდაცია" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "ტექნიკური დანართი" })).toHaveCount(0);
+  await expect(page.getByTestId("decision-record")).toContainText("ფაქტი უპირატესია გეგმაზე");
+
+  await page.goto("http://localhost:3100/methodology/municipalities");
+  await expect(page.getByRole("heading", { name: "გადაწყვეტილებების სრული ჩანაწერი" })).toHaveCount(0);
+  await expect(page.getByTestId("decision-record")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "კლასიფიკაცია და გარდაქმნა" })).toBeVisible();
 });
 
 test("municipality archive copy keeps prepared geometry outside the download boundary", async ({ page }) => {
@@ -373,15 +378,13 @@ test("methodology keyboard controls expose native behavior and visible focus", a
   ).toHaveAttribute("href", "/downloads/methodology/expenditure/manifest.json");
 });
 
-test("published download bytes match the archive row and manifest", async ({ page, request }) => {
+test("published download bytes match the manifest integrity record", async ({ page, request }) => {
   await page.goto("http://localhost:3100/methodology/expenditure#source-archive");
 
   const firstRow = page.getByTestId("source-archive-row").first();
   const download = firstRow.getByRole("link", { name: /ჩამოტვირთვა/ });
   const downloadHref = await download.getAttribute("href");
-  const rowHash = await firstRow.getByTestId("source-archive-sha256").getAttribute("title");
   expect(downloadHref).toBeTruthy();
-  expect(rowHash).toMatch(/^[a-f0-9]{64}$/);
 
   const manifestResponse = await request.get(
     "http://localhost:3100/downloads/methodology/expenditure/manifest.json",
@@ -390,7 +393,7 @@ test("published download bytes match the archive row and manifest", async ({ pag
   const manifest = (await manifestResponse.json()) as { downloadHref: string; sha256: string }[];
   const manifestRow = manifest.find((row) => row.downloadHref === downloadHref);
   expect(manifestRow).toBeTruthy();
-  expect(rowHash).toBe(manifestRow?.sha256);
+  expect(manifestRow?.sha256).toMatch(/^[a-f0-9]{64}$/);
 
   const fileResponse = await request.get(`http://localhost:3100${downloadHref}`);
   expect(fileResponse.ok()).toBe(true);

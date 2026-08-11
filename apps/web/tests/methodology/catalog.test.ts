@@ -71,8 +71,9 @@ describe("methodology catalog", () => {
     ]);
   });
 
-  it("keeps the approved layered section order", () => {
-    for (const content of Object.values(METHODOLOGY_CONTENT)) {
+  it("keeps the retained article sections in their approved order", () => {
+    for (const dataset of ["expenditure", "revenue"] as const) {
+      const content = METHODOLOGY_CONTENT[dataset];
       expect(content.sections.map((section) => section.kind)).toEqual([
         "scope",
         "sources",
@@ -84,9 +85,19 @@ describe("methodology catalog", () => {
         "archive",
       ]);
     }
+
+    expect(METHODOLOGY_CONTENT.municipalities.sections.map((section) => section.kind)).toEqual([
+      "scope",
+      "sources",
+      "journey",
+      "classification",
+      "validation",
+      "limitations",
+      "archive",
+    ]);
   });
 
-  it("discloses the complete SHA-256 coverage of the published revenue originals", async () => {
+  it("retains the complete SHA-256 coverage of the published revenue originals in methodology provenance", async () => {
     const manifest = await loadReviewedSourceManifest(repositoryRoot, "revenue");
     const disclosure = [
       ...METHODOLOGY_CONTENT.revenue.decisions,

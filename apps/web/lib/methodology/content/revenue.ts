@@ -64,4 +64,6 @@ export const REVENUE_METHODOLOGY_CONTENT: MethodologyContent = {
   ],
   decisions,
   technicalAppendix,
+  hiddenDecisionGroups: ["ვალიდაცია"],
+  showTechnicalAppendix: false,
 };

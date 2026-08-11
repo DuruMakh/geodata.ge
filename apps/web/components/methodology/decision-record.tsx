@@ -41,8 +41,16 @@ function DecisionDetails({ decision }: { decision: MethodologyDecision }) {
   );
 }
 
-function DecisionGroups({ decisions }: { decisions: readonly MethodologyDecision[] }) {
-  return grouped(decisions).map(([group, entries]) => (
+function DecisionGroups({
+  decisions,
+  hiddenGroups = [],
+}: {
+  decisions: readonly MethodologyDecision[];
+  hiddenGroups?: readonly string[];
+}) {
+  return grouped(decisions)
+    .filter(([group]) => !hiddenGroups.includes(group))
+    .map(([group, entries]) => (
     <section key={group} aria-labelledby={`decision-group-${entries[0].id}`} className="mt-8">
       <h3
         id={`decision-group-${entries[0].id}`}
@@ -60,25 +68,31 @@ function DecisionGroups({ decisions }: { decisions: readonly MethodologyDecision
 export function DecisionRecord({
   decisions,
   technicalAppendix,
+  hiddenGroups,
+  showTechnicalAppendix = true,
 }: {
   decisions: readonly MethodologyDecision[];
   technicalAppendix: readonly MethodologyDecision[];
+  hiddenGroups?: readonly string[];
+  showTechnicalAppendix?: boolean;
 }) {
   return (
     <div data-testid="decision-record">
-      <DecisionGroups decisions={decisions} />
-      <section className="mt-12 border-t-2 border-[var(--ink)] pt-6" aria-labelledby="technical-appendix-title">
-        <h3
-          id="technical-appendix-title"
-          className="font-[family-name:var(--font-display)] text-[22px] font-semibold"
-        >
-          ტექნიკური დანართი
-        </h3>
-        <p className="mt-3 max-w-[760px] text-[13px] leading-[1.75] text-[var(--body)]">
-          ქვემოთ სრულად არის დატოვებული ისტორიული, ტექნიკური და შეზღუდვის ჩანაწერები, რომლებიც საჯარო შედეგის განმარტებისთვის საჭიროა.
-        </p>
-        <DecisionGroups decisions={technicalAppendix} />
-      </section>
+      <DecisionGroups decisions={decisions} hiddenGroups={hiddenGroups} />
+      {showTechnicalAppendix ? (
+        <section className="mt-12 border-t-2 border-[var(--ink)] pt-6" aria-labelledby="technical-appendix-title">
+          <h3
+            id="technical-appendix-title"
+            className="font-[family-name:var(--font-display)] text-[22px] font-semibold"
+          >
+            ტექნიკური დანართი
+          </h3>
+          <p className="mt-3 max-w-[760px] text-[13px] leading-[1.75] text-[var(--body)]">
+            ქვემოთ სრულად არის დატოვებული ისტორიული, ტექნიკური და შეზღუდვის ჩანაწერები, რომლებიც საჯარო შედეგის განმარტებისთვის საჭიროა.
+          </p>
+          <DecisionGroups decisions={technicalAppendix} hiddenGroups={hiddenGroups} />
+        </section>
+      ) : null}
     </div>
   );
 }
