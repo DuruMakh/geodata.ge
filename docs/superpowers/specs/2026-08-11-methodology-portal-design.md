@@ -18,7 +18,7 @@ The first release covers:
 
 The information architecture must later accept inflation, GDP, population, unemployment, and other datasets without redesigning the system or implying that unavailable data already exists.
 
-The experience is a balanced portal. Public explanation and original-source access have equal weight. A visitor should be able to understand what a dataset means without technical knowledge, while a researcher should be able to inspect the complete decision record, validation approach, limitations, and source archive.
+The experience is a balanced portal. Public explanation and original-source access have equal weight. A visitor should be able to understand what a dataset means without technical knowledge, while a researcher can inspect the curated public explanation and source archive; complete canonical decision, retrieval, and hash records remain internally validated and available through the download manifest where applicable.
 
 This approval extends the current product scope beyond minimal source labels to dedicated public methodology and original-source pages. It does not re-expand GeoData into a broad data catalog: only datasets that are already live receive methodology routes.
 
@@ -47,18 +47,15 @@ Future datasets appear on the hub only as non-clickable `მალე` markers. 
 
 ### 2.3 Reading model
 
-Category pages use layered reading:
+Category pages use layered reading, with the public detail curated per dataset:
 
 1. plain-language summary;
 2. dataset scope and definitions;
 3. source-to-data process;
-4. complete reviewed methodology decisions;
-5. classification and transformation rules;
-6. validation and reconciliation;
-7. known limitations and coverage gaps;
-8. untouched upstream source archive.
+4. approved public methodology and decision content, where shown;
+5. untouched upstream source archive.
 
-Technical detail stays available on the page. It is not hidden exclusively in downloadable developer documentation.
+Complete canonical decisions, retrieval metadata, and hash records remain internal provenance and download-manifest integrity data. The approved public visibility is exact: expenditure hides its historical-decision group; revenue hides its validation group, technical appendix, and later classification, validation, and limitations sections; municipalities hide the full decision record, appendix, and later classification, validation, and limitations sections.
 
 ### 2.4 Download boundary
 
@@ -70,7 +67,7 @@ Each live category provides:
 - text search and quick year filters;
 - a category-level ZIP containing every original;
 - a machine-readable and human-readable manifest;
-- retrieval date, byte size, media type, original URL or archive location, and SHA-256 for every file.
+- a manifest that preserves retrieval date, byte size, media type, original URL or archive location, and SHA-256 for every file; the public table shows only the approved research columns.
 
 ## 3. Information architecture
 
@@ -106,13 +103,10 @@ Every category page follows the same anatomy while allowing dataset-specific con
 6. `რას ზომავს`;
 7. official source families;
 8. a numbered source-to-data journey;
-9. full decision record;
-10. classification and transformation rules;
-11. validation and reconciliation;
-12. known limitations and exclusions;
-13. original-source archive.
+9. approved dataset-specific public methodology content, where shown;
+10. original-source archive.
 
-The decision record is grouped by topic for scanning. Every decision stated in the canonical repository methodology documents must have a public entry or an explicit row in a same-page technical appendix; operational commands that carry no methodological choice do not count as decisions. Native `details` disclosures may collapse explanations, but decision titles and status remain visible without interaction.
+Where displayed, the decision record is grouped by topic for scanning. Every canonical repository decision remains mapped and validated in internal provenance records; public display is intentionally curated per dataset. Native `details` disclosures may collapse shown explanations, but shown decision titles and status remain visible without interaction.
 
 ### 3.3 Page-to-methodology mapping
 
@@ -181,7 +175,7 @@ The source archive remains a research tool, not a visual story:
 The initial visible columns are:
 
 ```text
-Year | Original source/file | Format | Size | Retrieved | SHA-256 | Download
+Year | Original source/file | Format | Size | Download
 ```
 
 The exact official filename and original source organization remain available even if a shorter Georgian display title is added.
@@ -348,9 +342,9 @@ Dataset-specific public copy and decision records remain data/content, not condi
 
 ### 11.1 Content
 
-- Every decision in the canonical category methodology has a public entry or an explicit row in a technical appendix on the same page; purely operational commands are excluded from this requirement.
+- Every decision in the canonical category methodology remains mapped and covered by internal provenance validation; public presentation follows the approved dataset-specific visibility set.
 - Official facts and GeoData classifications are clearly distinguished.
-- Coverage, basis, units, exclusions, limitations, and last review date are visible.
+- Coverage, basis, units, and last review date are visible; other methodology detail follows the approved dataset-specific visibility set.
 - Prepared GeoData CSV files are not presented as raw originals.
 
 ### 11.2 Archive integrity

@@ -225,6 +225,7 @@ test("source archives keep provenance metadata out of every public table", async
 
     await expect(archive.locator("thead")).not.toContainText("თარიღი");
     await expect(archive.locator("thead")).not.toContainText("SHA-256");
+    await expect(archive).not.toContainText("უახლესი ჩანაწერის თარიღი");
     await expect(archive.getByTestId("source-archive-retrieval")).toHaveCount(0);
     await expect(archive.getByTestId("source-archive-sha256")).toHaveCount(0);
     await expect(archive.getByTestId("source-archive-proxy-disclosure")).toHaveCount(0);
