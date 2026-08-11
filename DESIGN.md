@@ -367,9 +367,9 @@ Specs below are contracts; visual proof lives in the reference files.
 
 ### 7.1 Header / Nav
 
-The landing header (§19) only — surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs.
+The public-site header appears on the landing page (§19), the methodology hub, and every live dataset methodology route. Surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs. The landing and methodology surfaces use one shared component.
 
-Baseline-aligned row: serif brand left (`GeoData`), nav tabs center, mono context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500.
+Baseline-aligned row: serif brand left (`GeoData`), nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `ექსპლორერი` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
 
 ### 7.2a Mode Control
 

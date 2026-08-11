@@ -27,6 +27,9 @@ This approval extends the current product scope beyond minimal source labels to 
 ### 2.1 Discovery
 
 - Methodology is not a top-header navigation item.
+- The methodology hub and all live dataset methodology routes show the same public-site header as the landing page above their page content. The shared header keeps `GeoData`, `მთავარი`, `ექსპლორერი`, the loaded site coverage range, and the existing responsive rule-based anatomy.
+- Neither `მთავარი` nor `ექსპლორერი` is active on methodology routes: neither link receives the accent underline or `aria-current`, because methodology is a separate destination. No methodology tab is added.
+- The landing page and methodology routes use one shared header component so their typography, spacing, responsive behavior, links, and coverage context cannot drift. The landing page retains `მთავარი` as its active link.
 - The current landing footer gains a simple `მეთოდოლოგია` link to `/methodology`.
 - Methodology pages reuse the current footer anatomy and include the same link; extracting that existing anatomy into a shared component is allowed, but changing its layout or content system is not.
 - Relevant main data pages end with a substantial methodology promotion. Where a current footer exists, the promotion sits above it; explorer surfaces do not gain a new global footer in this scope.
