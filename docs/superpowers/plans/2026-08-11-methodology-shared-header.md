@@ -214,4 +214,3 @@ Confirm every changed line traces to the approved shared-header requirement, gen
 git add -- apps/web/components/site/site-header.tsx apps/web/components/landing/landing-page.tsx apps/web/app/methodology/layout.tsx apps/web/tests/browser/methodology.spec.ts design-qa.md docs/superpowers/plans/2026-08-11-methodology-shared-header.md
 git commit -m "feat(methodology): add shared public header"
 ```
-

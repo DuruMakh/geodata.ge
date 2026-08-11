@@ -131,11 +131,13 @@ final result: passed
 
 ## Shared Public Header QA — 2026-08-12
 
-Desktop in-app-browser comparison at 1280×900, against the supplied landing-header anatomy:
+In-app-browser comparison at an explicit 1640×900 desktop viewport, using the same 1640×98 crop as the supplied landing-header screenshot:
 
-- Landing and methodology share the serif GeoData mark, centered navigation, right-aligned coverage label, and ink rule.
-- The landing keeps the terracotta active underline on `მთავარი`.
-- Methodology leaves both navigation links inactive and places the header above the page H1.
+- Landing header geometry: x=194.8, y=30, width=1240, height=43.6.
+- Methodology header geometry: x=194.8, y=30, width=1240, height=43.6.
+- Reference, methodology, and landing share the serif GeoData mark, centered navigation, right-aligned coverage label, baseline, ink rule, and typography anatomy.
+- Methodology has zero active links and correctly omits the accent underline; landing retains the active `მთავარი` underline.
+- The supplied screenshot has wider outer margins than the current landing shell, so the product-correct criterion is exact methodology alignment with the current landing header while retaining the screenshot anatomy.
 - No P0, P1, or P2 differences found.
 
 final result: passed

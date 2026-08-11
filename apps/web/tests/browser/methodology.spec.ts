@@ -18,12 +18,15 @@ async function expectVisibleFocusOutline(locator: Locator) {
 }
 
 test("public header keeps landing active and leaves methodology navigation inactive", async ({ page }) => {
+  await page.setViewportSize({ width: 1640, height: 900 });
   await page.goto("http://localhost:3100/");
   const landingHeader = page.getByTestId("landing-header");
   await expect(landingHeader.getByRole("link", { name: "მთავარი" })).toHaveAttribute(
     "aria-current",
     "page",
   );
+  const landingHeaderBox = await landingHeader.boundingBox();
+  expect(landingHeaderBox).not.toBeNull();
 
   for (const path of [
     "/methodology",
@@ -46,6 +49,8 @@ test("public header keeps landing active and leaves methodology navigation inact
     const headingBox = await page.getByRole("heading", { level: 1 }).boundingBox();
     expect(headerBox).not.toBeNull();
     expect(headingBox).not.toBeNull();
+    expect(headerBox!.x).toBeCloseTo(landingHeaderBox!.x, 1);
+    expect(headerBox!.width).toBeCloseTo(landingHeaderBox!.width, 1);
     expect(headerBox!.y + headerBox!.height).toBeLessThanOrEqual(headingBox!.y);
   }
 });

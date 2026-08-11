@@ -9,8 +9,10 @@ export default async function MethodologyLayout({
 
   return (
     <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)]">
-      <div className="mx-auto w-full max-w-[1240px] px-5 pt-[22px] min-[768px]:px-7 min-[768px]:pt-[30px]">
-        <SiteHeader yearsLabel={model.yearsLabel} testId="methodology-header" />
+      <div className="px-5 pt-[22px] min-[768px]:px-7 min-[768px]:pt-[30px]">
+        <div className="mx-auto max-w-[1240px]">
+          <SiteHeader yearsLabel={model.yearsLabel} testId="methodology-header" />
+        </div>
       </div>
       {children}
     </div>
