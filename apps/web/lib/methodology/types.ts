@@ -71,6 +71,16 @@ export type MethodologyArchiveSummary = {
   totalBytes: number;
   latestRetrievedAt: string;
   validated: boolean;
+  status?: "PASS";
+  generatedBytes?: number;
+  formats?: readonly string[];
+  minYear?: number;
+  maxYear?: number;
+  proxyDateCount?: number;
+  licenseCounts?: Readonly<Record<string, number>>;
+  redistributionStatusCounts?: Readonly<Record<string, number>>;
+  outputHashes?: Readonly<Record<string, string>>;
+  outputByteSizes?: Readonly<Record<string, number>>;
 };
 
 export type MethodologyHubEntry = {

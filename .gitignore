@@ -43,3 +43,6 @@ docs/Prototpy variatints experiments/
 .gstack/
 
 .vercel
+
+# generated public methodology archives
+apps/web/public/downloads/methodology/
