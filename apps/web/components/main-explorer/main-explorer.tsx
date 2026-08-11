@@ -13,6 +13,7 @@ import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import type { ExplorerNav, ExplorerScope } from "../../lib/explorer/types";
 import { AnalysisView } from "../analysis/analysis-view";
+import { MethodologyPromo } from "../methodology/methodology-promo";
 import { PageHeader } from "../shell/page-header";
 import { ExplorerView } from "./explorer-view";
 import { useExplorerState } from "./use-explorer-state";
@@ -121,6 +122,17 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
   }, [facts, analysisSide, analysisGrouping]);
 
   const isAnalysis = nav === "analysis";
+  const methodologyDataset: "expenditure" | "revenue" = nav === "analysis" ? analysisSide : nav;
+  const methodologyHref = `/methodology/${methodologyDataset}` as const;
+  const methodologyCopy = methodologyDataset === "expenditure"
+    ? {
+        titleKa: "როგორ მუშავდება ხარჯების ოფიციალური მონაცემები",
+        bodyKa: "გაეცანით ხარჯების წყაროებს, კლასიფიკაციის გადაწყვეტილებებს, გადამოწმების წესებსა და უცვლელ ოფიციალურ დოკუმენტებს.",
+      }
+    : {
+        titleKa: "როგორ მუშავდება შემოსავლების ოფიციალური მონაცემები",
+        bodyKa: "გაეცანით შემოსავლების წყაროებს, კლასიფიკაციის კროსვოქებს, გადამოწმების წესებსა და უცვლელ ოფიციალურ დოკუმენტებს.",
+      };
 
   // Only the analysis route renders this, and nav is a prop fixed by the route,
   // so the other two sections were building and discarding a full snapshot model
@@ -268,6 +280,11 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
             onDownloadCsv={downloadCsv}
           />
         )}
+        <MethodologyPromo
+          href={methodologyHref}
+          titleKa={methodologyCopy.titleKa}
+          bodyKa={methodologyCopy.bodyKa}
+        />
       </div>
     </main>
   );

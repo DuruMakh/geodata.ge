@@ -1,6 +1,50 @@
 import { expect, test } from "@playwright/test";
 import { createHash } from "node:crypto";
 
+for (const [path, expectedHref] of [
+  ["/explorer", "/methodology"],
+  ["/explorer/expenditure", "/methodology/expenditure"],
+  ["/explorer/revenue", "/methodology/revenue"],
+  ["/explorer/municipalities", "/methodology/municipalities"],
+] as const) {
+  test(`${path} ends with the approved methodology promotion`, async ({ page }) => {
+    await page.goto(`http://localhost:3100${path}`);
+
+    await expect(page.getByTestId("methodology-promo").getByRole("link")).toHaveAttribute(
+      "href",
+      expectedHref,
+    );
+    await expect(page.locator("footer")).toHaveCount(0);
+  });
+}
+
+test("analysis promotion follows the active analysis side", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/analysis");
+
+  const promotionLink = page.getByTestId("methodology-promo").getByRole("link");
+  await expect(promotionLink).toHaveAttribute("href", "/methodology/expenditure");
+  await page.getByTestId("analysis-side-revenue").click();
+  await expect(promotionLink).toHaveAttribute("href", "/methodology/revenue");
+  await expect(page.locator("footer")).toHaveCount(0);
+});
+
+for (const path of [
+  "/explorer/municipalities/04",
+  "/explorer/municipalities/region/imereti",
+] as const) {
+  test(`${path} uses one compact methodology link`, async ({ page }) => {
+    await page.goto(`http://localhost:3100${path}`);
+
+    await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
+    await expect(page.getByTestId("compact-methodology-link")).toHaveCount(1);
+    await expect(page.getByTestId("compact-methodology-link")).toHaveAttribute(
+      "href",
+      "/methodology/municipalities",
+    );
+    await expect(page.locator("footer")).toHaveCount(0);
+  });
+}
+
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
   await page.goto("http://localhost:3100/methodology");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
