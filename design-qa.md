@@ -128,3 +128,14 @@ No P3 refinement is required for this interaction-consistency fix.
 - Result: no actionable P0/P1/P2 visual mismatch remains.
 
 final result: passed
+
+## Shared Public Header QA — 2026-08-12
+
+Desktop in-app-browser comparison at 1280×900, against the supplied landing-header anatomy:
+
+- Landing and methodology share the serif GeoData mark, centered navigation, right-aligned coverage label, and ink rule.
+- The landing keeps the terracotta active underline on `მთავარი`.
+- Methodology leaves both navigation links inactive and places the header above the page H1.
+- No P0, P1, or P2 differences found.
+
+final result: passed

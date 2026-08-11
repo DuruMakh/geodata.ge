@@ -17,6 +17,39 @@ async function expectVisibleFocusOutline(locator: Locator) {
   expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
 }
 
+test("public header keeps landing active and leaves methodology navigation inactive", async ({ page }) => {
+  await page.goto("http://localhost:3100/");
+  const landingHeader = page.getByTestId("landing-header");
+  await expect(landingHeader.getByRole("link", { name: "მთავარი" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+
+  for (const path of [
+    "/methodology",
+    "/methodology/expenditure",
+    "/methodology/revenue",
+    "/methodology/municipalities",
+  ] as const) {
+    await page.goto(`http://localhost:3100${path}`);
+    const header = page.getByTestId("methodology-header");
+    await expect(header).toBeVisible();
+    await expect(header.getByRole("link", { name: "მთავარი" })).toHaveAttribute("href", "/");
+    await expect(header.getByRole("link", { name: "ექსპლორერი" })).toHaveAttribute(
+      "href",
+      "/explorer",
+    );
+    await expect(header.locator("[aria-current]")).toHaveCount(0);
+    await expect(header).toContainText("2005–2025");
+
+    const headerBox = await header.boundingBox();
+    const headingBox = await page.getByRole("heading", { level: 1 }).boundingBox();
+    expect(headerBox).not.toBeNull();
+    expect(headingBox).not.toBeNull();
+    expect(headerBox!.y + headerBox!.height).toBeLessThanOrEqual(headingBox!.y);
+  }
+});
+
 for (const [path, expectedHref] of [
   ["/explorer", "/methodology"],
   ["/explorer/expenditure", "/methodology/expenditure"],
