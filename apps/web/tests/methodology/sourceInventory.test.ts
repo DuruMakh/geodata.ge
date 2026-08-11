@@ -3,6 +3,8 @@ import { mkdtemp, mkdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, it } from "vitest";
 import { expectedOriginalSourcePaths } from "../../lib/methodology/sourceInventory";
+import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
+import { LIVE_METHODOLOGY_IDS } from "../../lib/methodology/types";
 
 const REPOSITORY_ROOT = path.resolve(process.cwd(), "../..");
 const tempDirectories: string[] = [];
@@ -35,6 +37,14 @@ describe("original-source inventory", () => {
     for (const rows of Object.values(inventory)) {
       expect(rows.map((row) => row.path)).toEqual(rows.map((row) => row.path).toSorted());
       expect(rows.every((row) => !row.path.includes("\\"))).toBe(true);
+    }
+  });
+
+  it("has one reviewed manifest row for every approved original", async () => {
+    for (const datasetId of LIVE_METHODOLOGY_IDS) {
+      const expected = await expectedOriginalSourcePaths(REPOSITORY_ROOT, datasetId);
+      const manifest = await loadReviewedSourceManifest(REPOSITORY_ROOT, datasetId);
+      expect(manifest.map((row) => row.repository_source_path).toSorted()).toEqual(expected.map((row) => row.path));
     }
   });
 
