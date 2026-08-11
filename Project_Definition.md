@@ -34,6 +34,7 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Georgian-first UI.
 - Minimal public source label.
 - Internal source/provenance metadata.
+- Public methodology and original-source centre: a `/methodology` hub plus live pages for expenditure, revenue, and municipalities; complete public decision records; and untouched upstream files available individually and as category archives. Future dataset names remain non-clickable `მალე` markers until their data, methodology, validation, and sources are ready together. Approved design: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`.
 
 ### Excluded From V1
 
@@ -118,7 +119,7 @@ Public labels should come from a Georgian-first terminology glossary, not from h
 
 ## 6. Trust Policy
 
-V1 should not overload the UI with provenance panels, but it must not hide trust completely.
+Analytical views should not be overloaded with provenance panels. They retain a concise source label and contextual methodology link; the dedicated `/methodology` surfaces own the complete public decision record and original-source archive.
 
 Public UI should include a small source label, such as:
 
@@ -169,6 +170,6 @@ UI:
 
 Build the data foundation first. Visual ambition is important, but the platform only becomes valuable if the budget taxonomy, validation, planned/actual handling, and data export are trustworthy.
 
-Avoid short-term UI-only hacks. The product should be architected so future versions can add more datasets, drilldown, bilingual UI, source pages, and additional budget modules without rebuilding the foundation.
+Avoid short-term UI-only hacks. The product should be architected so future versions can add more datasets, drilldown, bilingual UI, and additional budget modules without rebuilding the foundation.
 
 Implementation should follow this order: data foundation, real sample data, main explorer core with line/table modes and CSV, single-year core, and production UI polish against `DESIGN.md`. Bar mode, stacked mode, Share of GDP, and broader advanced chart controls are not part of the current production v1 scope unless explicitly re-approved. Do not start with visual richness before the data model and import validation are working.
