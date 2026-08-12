@@ -458,7 +458,7 @@ test("CSV download uses the active filtered table data", async ({ page }) => {
   await expect(socialProtectionButton).toHaveAttribute("aria-pressed", "true");
 
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: /CSV/ }).click();
+  await page.getByTestId("series-csv").click();
   const download = await downloadPromise;
   const path = await download.path();
   if (!path) throw new Error("Expected a local CSV download path");

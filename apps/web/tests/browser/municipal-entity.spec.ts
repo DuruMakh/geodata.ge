@@ -561,6 +561,18 @@ test.describe("municipality page", () => {
     expect(total2016).toContain("832409547.15");
   });
 
+  test("uses the same export control treatment as the national explorer", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const classes = await page.getByTestId("municipal-csv").getAttribute("class");
+    expect(classes).toContain("mt-[18px]");
+    expect(classes).toContain("h-[38px]");
+    expect(classes).toContain("w-full");
+    expect(classes).toContain("bg-[var(--ink)]");
+    expect(classes).toContain("text-[var(--paper)]");
+  });
+
   test("recomputes the period comparison when the range moves", async ({ page }) => {
     // The regression this guards: filtering years without rebuilding the model,
     // so ცვლილება and the comparison table describe the full span while the
