@@ -86,15 +86,11 @@ for (const path of [
   "/explorer/municipalities/04",
   "/explorer/municipalities/region/imereti",
 ] as const) {
-  test(`${path} uses one compact methodology link`, async ({ page }) => {
+  test(`${path} keeps methodology promotion on the municipalities index`, async ({ page }) => {
     await page.goto(`http://localhost:3100${path}`);
 
     await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
-    await expect(page.getByTestId("compact-methodology-link")).toHaveCount(1);
-    await expect(page.getByTestId("compact-methodology-link")).toHaveAttribute(
-      "href",
-      "/methodology/municipalities",
-    );
+    await expect(page.getByTestId("compact-methodology-link")).toHaveCount(0);
     await expect(page.locator("footer")).toHaveCount(0);
   });
 }

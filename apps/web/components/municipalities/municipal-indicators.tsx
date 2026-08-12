@@ -1,5 +1,5 @@
 import type { MunicipalComparisonRow, MunicipalKpi, MunicipalMover } from "../../lib/explorer/municipalData";
-import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
+import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { SwatchBar } from "../ui/editorial";
 
@@ -49,23 +49,38 @@ export function MunicipalIndicators({ kpis, movers, comparison, startYear, endYe
   );
 
   return (
-    <>
-      <div className="mt-11 border-t-2 border-[var(--ink)] pt-[22px]">
-        <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">ძირითადი ინდიკატორები</h2>
-        <div data-testid="entity-kpi-grid" className="grid grid-cols-2 gap-8 @min-[1100px]:grid-cols-4">
-          {kpis.map((kpi) => (
-            <div key={kpi.label} data-testid="entity-kpi" className="flex flex-col gap-[5px]">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{kpi.label}</span>
-              <span className="font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.1] tracking-[-0.02em] whitespace-nowrap">
-                {kpi.value}
-              </span>
-              <span className="text-[11.5px] leading-snug text-[var(--muted)]">{kpi.detail}</span>
-            </div>
-          ))}
+    <section data-testid="period-indicators" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
+        <div className="flex flex-wrap items-baseline justify-between gap-4">
+          <h2 className="font-[family-name:var(--font-display)] text-[22px] font-semibold">ძირითადი ინდიკატორები</h2>
+          <p className="text-[12.5px] text-[var(--muted)]">
+            არჩეული პერიოდი: <span className="font-[family-name:var(--font-numeric)]">{startYear}–{endYear}</span>
+          </p>
         </div>
-      </div>
 
-      <div className="mt-11 grid grid-cols-1 gap-10 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:grid-cols-2">
+        <div data-testid="entity-kpi-grid" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+          <div className="min-w-0 @min-[1100px]:pr-11">
+            <div data-testid="entity-kpi" className="flex flex-col gap-[5px]">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{kpis[1]?.label}</span>
+              <span className="font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px] whitespace-nowrap">
+                {kpis[1]?.value}
+              </span>
+              <span className="text-[12.5px] leading-relaxed text-[var(--body)]">{kpis[1]?.detail}</span>
+            </div>
+          </div>
+          <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
+            {[kpis[0], kpis[2], kpis[3]].map((kpi, index) => (
+              <div key={kpi.label} data-testid="entity-kpi" className={index === 0 ? "pt-0.5 pb-3.5" : index === 2 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{kpi.label}</span>
+                <div className="mt-[7px] flex items-baseline justify-between gap-4">
+                  <span className="whitespace-nowrap font-[family-name:var(--font-display)] text-2xl font-semibold leading-[1.1] tracking-[-0.02em]">{kpi.value}</span>
+                  <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right text-xs text-[var(--muted)]" title={kpi.detail}>{kpi.detail}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      <div data-testid="period-movers" className="mt-9 grid grid-cols-1 gap-7 border-t border-[var(--hairline)] pt-6 @min-[1100px]:grid-cols-2 @min-[1100px]:gap-x-10">
         <div>
           <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">ყველაზე მზარდი</div>
           {movers.up.map((mover) => (
@@ -80,7 +95,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, startYear, endYe
         </div>
       </div>
 
-      <div className="mt-11 border-t-2 border-[var(--ink)] pt-[22px]">
+      <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
         <div className="mb-3.5 flex items-baseline justify-between gap-3">
           <h2 className="font-[family-name:var(--font-display)] text-[22px] font-semibold whitespace-nowrap">პერიოდის შედარება</h2>
           <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
@@ -121,10 +136,11 @@ export function MunicipalIndicators({ kpis, movers, comparison, startYear, endYe
                     {formatAmount(row.fromGel)}
                   </td>
                   <td
+                    data-testid="comparison-change-cell"
                     className="py-[9px] text-right font-[family-name:var(--font-numeric)] text-[11.5px]"
                     style={{ color: growthColor(row.changeShare) }}
                   >
-                    {row.changeShare === null ? MISSING : `${formatShare(row.changeShare, true)}  ${formatAmount(row.changeGel)}`}
+                    {formatAmount(row.changeGel)}
                   </td>
                   <td className="py-[9px] text-right font-[family-name:var(--font-numeric)] text-[11.5px] font-semibold">
                     {formatAmount(row.toGel)}
@@ -135,6 +151,6 @@ export function MunicipalIndicators({ kpis, movers, comparison, startYear, endYe
           </table>
         </div>
       </div>
-    </>
+    </section>
   );
 }

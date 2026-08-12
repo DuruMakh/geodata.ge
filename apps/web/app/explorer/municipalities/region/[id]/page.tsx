@@ -115,7 +115,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
         />
 
         <MunicipalExplorer
-          title="როგორ იხარჯება"
+          title="როგორ ხარჯავს ბიუჯეტს"
           triggerLabel={region.kaLabel}
           entityId={regionId}
           metaLine={`${members.memberCodes.length} მუნიციპალიტეტი · ${georgianOrdinal(rank)} ადგილი ${regions.length}-დან`}
@@ -127,7 +127,6 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           rankByYear={rankByYear}
           rankOutOf={regions.length}
           csvBasename={`region-${id}`}
-          methodologyHref="/methodology/municipalities"
           pickerGroups={buildPickerGroups(listInput)}
           prev={{ label: prev.kaLabel, href: hrefFor(prev) }}
           next={{ label: next.kaLabel, href: hrefFor(next) }}
