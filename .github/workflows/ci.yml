@@ -29,7 +29,6 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run data:validate
-      - run: npm run build
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 

@@ -39,7 +39,7 @@ test.describe("region header responsiveness", () => {
 
       const heading = page.getByRole("heading", { level: 1 });
       await expect(heading).toHaveText(
-        "როგორ იხარჯება რაჭა-ლეჩხუმი და ქვემო სვანეთი▾",
+        "როგორ ხარჯავს ბიუჯეტს რაჭა-ლეჩხუმი და ქვემო სვანეთი▾",
       );
 
       const headingBox = await heading.boundingBox();
@@ -146,6 +146,14 @@ test.describe("region page", () => {
     const trigger = page.getByTestId("entity-picker-trigger");
     await expect(trigger).toContainText("იმერეთი");
     await expect(trigger).not.toContainText("მუნიციპალური ბიუჯეტები");
+  });
+
+  test("uses the municipality-style regional heading and no individual methodology link", async ({ page }) => {
+    await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
+
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ხარჯავს ბიუჯეტს იმერეთი▾");
+    await expect(page.getByTestId("compact-methodology-link")).toHaveCount(0);
   });
 
   test("lists its member municipalities and carries the roll-up caveats", async ({ page }) => {
