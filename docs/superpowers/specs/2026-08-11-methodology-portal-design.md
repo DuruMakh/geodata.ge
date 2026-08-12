@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-GeoData needs a public methodology and source centre that scales beyond the current budget explorer. It must explain every material data decision, make untouched upstream source files downloadable, and organize both by dataset rather than as one long technical document.
+GeoData needs a public methodology and source centre that scales beyond the current budget explorer. It must preserve traceability for every material data decision, make untouched upstream source files downloadable, and organize both by dataset rather than as one long technical document.
 
 The first release covers:
 
@@ -189,11 +189,13 @@ The promotion is a substantial two-column editorial section:
 
 It uses generous vertical space and stacks on mobile. It is neither a narrow horizontal strip nor a contained card. Where a current footer follows, that footer remains unchanged except for its methodology link.
 
-## 5. Dataset content requirements
+## 5. Canonical methodology and provenance coverage
+
+The following lists define the canonical/internal coverage that must remain traceable and validated. They do not require every item to be rendered publicly: public rendering follows the curated visibility in §2.3.
 
 ### 5.1 Expenditure
 
-The public methodology consolidates the relevant decisions currently distributed across the expenditure, ministries, program, and historical-era documents. It must explain at least:
+Expenditure canonical coverage includes:
 
 - served coverage begins in 2005;
 - the reviewed 2004 source is excluded from the served series because it is central-budget scoped;
@@ -208,7 +210,7 @@ The public methodology consolidates the relevant decisions currently distributed
 
 ### 5.2 Revenue
 
-The page must explain at least:
+Revenue canonical coverage includes:
 
 - served coverage begins in 2005;
 - top-level public categories are official budget-classification lines;
@@ -220,7 +222,7 @@ The page must explain at least:
 
 ### 5.3 Municipalities
 
-The page must explain at least:
+Municipalities canonical coverage includes:
 
 - 2015–2025 coverage;
 - 64 served municipalities and 11 data-bearing region roll-ups;
