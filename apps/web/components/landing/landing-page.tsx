@@ -1,5 +1,8 @@
 import Link from "next/link";
 import type { LandingModel } from "../../lib/landing/landingData";
+import { MethodologyPromo } from "../methodology/methodology-promo";
+import { SiteFooter } from "../site/site-footer";
+import { SiteHeader } from "../site/site-header";
 import { HeroReliefLazy } from "./hero-relief-lazy";
 
 // Landing page (GeoData Site v2 design): header, living-relief hero, key country
@@ -45,30 +48,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
       className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]"
     >
       <div className="mx-auto max-w-[1240px]">
-        <header
-          data-testid="landing-header"
-          className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2 border-b-2 border-[var(--ink)] pb-3.5 min-[768px]:gap-5"
-        >
-          <span className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em]">GeoData</span>
-          <nav aria-label="ნავიგაცია" className="flex gap-4 min-[768px]:gap-[26px]">
-            <Link
-              href="/"
-              aria-current="page"
-              className="-mb-3.5 border-b-2 border-[var(--accent)] pb-3 text-[13px] font-semibold text-[var(--ink)]"
-            >
-              მთავარი
-            </Link>
-            <Link
-              href="/explorer"
-              className="-mb-3.5 border-b-2 border-transparent pb-3 text-[13px] font-medium text-[var(--muted)] transition-colors duration-150 hover:text-[var(--ink)]"
-            >
-              ექსპლორერი
-            </Link>
-          </nav>
-          <span className="hidden font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)] min-[768px]:inline">
-            {model.yearsLabel}
-          </span>
-        </header>
+        <SiteHeader active="home" yearsLabel={model.yearsLabel} testId="landing-header" />
 
         <section className="relative">
           <div
@@ -198,45 +178,13 @@ export function LandingPage({ model }: { model: LandingModel }) {
           </div>
         </section>
 
-        <footer data-testid="landing-footer" className="mt-[72px] border-t-2 border-[var(--ink)] pb-10 pt-[26px]">
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-9">
-            <div className="flex flex-col gap-2.5">
-              <span className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em]">GeoData</span>
-              <p className="max-w-[260px] text-pretty text-[12.5px] leading-relaxed text-[var(--body)]">
-                საქართველოს ბიუჯეტი — ნათლად, გადამოწმებულად, ღიად.
-              </p>
-              <a
-                href="mailto:info@geodata.ge"
-                className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--accent)] underline underline-offset-[3px]"
-              >
-                info@geodata.ge
-              </a>
-            </div>
-            <div className="flex flex-col gap-[9px]">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">ნავიგაცია</span>
-              <Link href="/explorer" className="text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
-                მრავალწლიანი ექსპლორერი
-              </Link>
-              <Link href={ANALYSIS_HREF} className="text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
-                ერთი წლის სურათი
-              </Link>
-            </div>
-            <div className="flex max-w-[340px] flex-col gap-[9px]">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">მონაცემები</span>
-              <p className="text-pretty text-[12px] leading-relaxed text-[var(--muted)]">
-                მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო). ბოლო განახლება:{" "}
-                <span className="font-[family-name:var(--font-numeric)]">{model.updatedAt}</span>.
-              </p>
-              <p className="text-pretty text-[12px] leading-relaxed text-[var(--muted)]">
-                მონაცემები ქვეყნდება CC BY 4.0 ლიცენზიით — მიუთითე წყარო და გამოიყენე თავისუფლად.
-              </p>
-            </div>
-          </div>
-          <div className="mt-[30px] flex flex-wrap justify-between gap-4 border-t border-[var(--hairline-soft)] pt-3.5">
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">© 2026 GeoData.ge</span>
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">CC BY 4.0</span>
-          </div>
-        </footer>
+        <MethodologyPromo
+          href="/methodology"
+          titleKa="როგორ იქცევა ოფიციალური წყარო ღია მონაცემად"
+          bodyKa="გაეცანით თითოეული კრებულის სრულ მეთოდოლოგიას, გადამოწმების წესებსა და უცვლელ ოფიციალურ დოკუმენტებს."
+        />
+
+        <SiteFooter updatedAt={model.updatedAt} />
       </div>
     </main>
   );

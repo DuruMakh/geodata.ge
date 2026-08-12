@@ -20,9 +20,13 @@ check, and connecting the custom domain.
 
 The repo clone on the build machine includes the repo root, so the build can
 read `data/` via the `../../` relative paths in `apps/web/lib/data/servedData.ts`.
-Every route (`/`, `/explorer`, `/explorer/expenditure`, `/explorer/revenue`,
-`/explorer/analysis`, `/robots.txt`, `/sitemap.xml`, the 404 page) is
-prerendered at build time; nothing runs server-side at request time.
+Before Next.js builds, `prebuild` deterministically prepares the ignored public
+methodology downloads from the reviewed manifests and immutable originals; see
+`docs/data-methodology/public-methodology-and-source-archives.md`. All app
+routes—including `/`, the explorer hub/sections and municipal detail pages,
+the methodology hub and its three live category pages, `/robots.txt`,
+`/sitemap.xml`, and the 404 page—are prerendered at build time; nothing runs
+server-side at request time.
 
 ## How deploys happen
 
@@ -36,7 +40,8 @@ prerendered at build time; nothing runs server-side at request time.
      every deploy (the import is idempotent; the parity report is in the
      workflow log);
   3. it POSTs the Vercel deploy hook, and Vercel builds latest `main` with
-     `GEODATA_DATA_SOURCE=db`, re-verifying the mirror row-by-row during the
+     `GEODATA_DATA_SOURCE=db`, regenerating and validating the methodology
+     archives in `prebuild`, and re-verifying the mirror row-by-row during the
      build.
   A failure at any step leaves production serving its previous deploy, and a
   red `main` blocks production updates by design. The workflow's manual
@@ -46,6 +51,36 @@ prerendered at build time; nothing runs server-side at request time.
   gets its own preview deployment, always CSV-mode (the database env vars
   are scoped to Production only), so data-PR previews never depend on the
   mirror. Preview deployments are automatically `noindex`ed by Vercel.
+
+## Methodology archive release checks
+
+`npm run build` runs `npm run data:prepare-methodology-archives` through
+`prebuild`. The generated tree under
+`apps/web/public/downloads/methodology/` and
+`data/reports/methodology-archive-validation.json` are ignored build outputs;
+they must not be committed. The reviewed CSV manifests under
+`data/methodology/source-archives/` remain the only publication control.
+
+Before a release, inspect the generated report for top-level and per-dataset
+`PASS`, expected original counts/source bytes, `generatedBytes`, and output
+hashes/sizes. Compare the sum of `generatedBytes` and the full static build
+with the active Vercel plan's deployment and per-file limits. Source bytes
+alone understate the deployment because individual files, two manifests, and
+each category ZIP coexist. The detailed write/check/update contract is in
+`docs/data-methodology/public-methodology-and-source-archives.md`.
+
+If Vercel cannot safely serve the archive size, change only byte storage to an
+approved object store/CDN and proxy or rewrite the same stable
+`/downloads/methodology/<dataset>/...` paths. Do not change the product URLs,
+reviewed manifest records, generated CSV/JSON contents, hashes, ZIP membership,
+or Actions-owned production flow; external storage is not a new source of
+truth.
+
+After Vercel reaches `READY` for the merge SHA, smoke-test one individual
+original from each category, all three category ZIPs, and one category's CSV
+and JSON manifest pair. Require HTTP 200, manifest-matching SHA-256 for each
+byte, the CSV BOM, and exact ZIP membership. A green deploy-hook workflow still
+proves only hook acceptance, not these deployed bytes.
 
 ## Manual operations (Vercel CLI)
 

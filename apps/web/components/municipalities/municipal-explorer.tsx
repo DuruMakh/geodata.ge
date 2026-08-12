@@ -48,6 +48,7 @@ export type MunicipalExplorerProps = {
   prev: { label: string; href: string };
   next: { label: string; href: string };
   sourceNote: string;
+  methodologyHref: "/methodology/municipalities";
   children?: ReactNode;
 };
 
@@ -272,6 +273,13 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
 
           <div className="mt-5 max-w-[640px]">
             <SourceNote testId="municipal-source-note">{props.sourceNote}</SourceNote>
+            <Link
+              data-testid="compact-methodology-link"
+              href={props.methodologyHref}
+              className="mt-2 inline-block text-[12px] font-medium text-[var(--accent)] underline underline-offset-4 hover:text-[var(--ink)]"
+            >
+              მეთოდოლოგია და პირველწყაროები →
+            </Link>
           </div>
 
           {props.children}

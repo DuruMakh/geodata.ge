@@ -60,8 +60,11 @@ extraction", `tests/data/realRevenue/extractWorkbooks.test.ts`).
 **Registry.** All 21 PDFs are registered in `data/sources/source-documents.csv`
 (review dates: 2005–2016 on 2026-06-28, 2017–2022 on 2026-06-09, 2023–2025 on 2026-05-13), and
 `tests/data/sourceCoverage.test.ts` asserts every `REVENUE_SOURCE_YEARS` PDF exists on disk — and
-that a 2004 PDF deliberately does **not** (§5.6). Unlike the expenditure methodologies, no
-SHA-256 table has been recorded for the revenue PDFs (§9.6).
+that a 2004 PDF deliberately does **not** (§5.6). All 21 PDFs are also listed in
+`data/methodology/source-archives/revenue.csv` with byte size and SHA-256, and archive generation
+revalidates those current repository bytes. This publication registry was created from the
+committed originals in 2026, so it is not contemporaneous proof of the bytes retrieved on the
+earlier review dates (§9.6).
 
 ### 2.2 Secondary sources: tavi-1 workbook cross-checks (2023–2025)
 
@@ -489,9 +492,10 @@ PINS" — update them consciously with any legitimate data refresh, never loosen
    gap; the arithmetic itself is asserted by tests.
 5. **Label mojibake in 2012, 2013, 2016, 2019** (§5.1): matching is code-based and display
    labels are curated, but staging-CSV labels for those four years are not human-readable.
-6. **No SHA-256 registry for the revenue PDFs** — unlike the expenditure group appendices, the
-   revenue sources have review dates but no recorded hashes; byte-level provenance relies on git
-   history of `docs/Raw Data/Revenue/`.
+6. **Publication hashes are complete; historical capture hashes were not recorded.** The public
+   source manifest has byte sizes and SHA-256 hashes for all 21 current PDFs, but those hashes were
+   created from the committed originals in 2026. Earlier review dates therefore have repository
+   history, not a contemporaneous retrieval hash.
 7. **The workbook cross-check is dormant in a fresh checkout** (§2.2 / §7): its monthly source
    workbooks are not committed, so the comparison report only carries rows on a machine that has
    them.

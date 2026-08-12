@@ -127,6 +127,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           rankByYear={rankByYear}
           rankOutOf={regions.length}
           csvBasename={`region-${id}`}
+          methodologyHref="/methodology/municipalities"
           pickerGroups={buildPickerGroups(listInput)}
           prev={{ label: prev.kaLabel, href: hrefFor(prev) }}
           next={{ label: next.kaLabel, href: hrefFor(next) }}

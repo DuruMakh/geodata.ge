@@ -75,3 +75,13 @@ test("landing on mobile shows the hero text above the map and hides the year ran
 
   await capture(page, "landing-mobile");
 });
+
+test("methodology is in the footer but never the landing header", async ({ page }) => {
+  await page.goto("http://localhost:3100/");
+  await expect(page.getByTestId("landing-header").getByRole("link", { name: "მეთოდოლოგია" })).toHaveCount(0);
+  await expect(page.getByTestId("site-footer").getByRole("link", { name: "მეთოდოლოგია" })).toHaveAttribute(
+    "href",
+    "/methodology",
+  );
+  await expect(page.getByTestId("methodology-promo")).toBeVisible();
+});

@@ -112,6 +112,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
           rankByYear={rankByYear}
           rankOutOf={municipalities.length}
           csvBasename={`municipality-${code}`}
+          methodologyHref="/methodology/municipalities"
           pickerGroups={buildPickerGroups(listInput)}
           prev={{ label: prev.displayNameKa, href: `/explorer/municipalities/${prev.code}` }}
           next={{ label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` }}
