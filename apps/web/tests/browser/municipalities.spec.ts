@@ -324,6 +324,16 @@ test.describe("municipalities index", () => {
     await expect(page.getByTestId("municipal-empty")).toBeVisible();
   });
 
+  test("uses the same simple search label for municipalities and regions", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
+
+    const search = page.getByTestId("municipal-search");
+    await expect(search).toHaveAttribute("placeholder", "ძებნა");
+    await page.getByTestId("level-region").click();
+    await expect(search).toHaveAttribute("placeholder", "ძებნა");
+  });
+
   test("keeps row bars normalized to the unfiltered leader while searching", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);

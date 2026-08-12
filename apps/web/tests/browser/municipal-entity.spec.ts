@@ -494,12 +494,30 @@ test.describe("municipality page", () => {
   test("filters the series list and clears the selection", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
+    await expect(page.getByTestId("series-search")).toHaveAttribute("placeholder", "ძებნა");
     await page.getByTestId("series-search").fill("განათლება");
     await expect(page.getByTestId("series-row")).toHaveCount(2);
     await page.getByTestId("series-search").fill("");
     await expect(page.getByTestId("series-row")).toHaveCount(11);
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-row").first().getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("keeps methodology promotion on the municipalities index, not an individual page", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    await expect(page.getByTestId("compact-methodology-link")).toHaveCount(0);
+  });
+
+  test("shows only the GEL amount in the municipality period-change column", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const changes = page.getByTestId("comparison-change-cell");
+    await expect(changes).toHaveCount(11);
+    await expect(changes.first()).not.toContainText("%");
+    await expect(changes.first()).toContainText("₾");
   });
 
   test("treats a pinned total search as a match and reports genuine misses", async ({ page }) => {
@@ -586,7 +604,7 @@ test.describe("municipality page", () => {
       getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/),
     );
     expect(columns).toHaveLength(1);
-    expect(kpiColumns).toHaveLength(2);
+    expect(kpiColumns).toHaveLength(1);
   });
 
   test("uses reviewed punctuation in the municipality metadata description", async ({ page }) => {

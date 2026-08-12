@@ -144,7 +144,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               data-testid="municipal-search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={level === "region" ? "ძებნა — რეგიონი" : "ძებნა — მუნიციპალიტეტი ან რეგიონი"}
+              placeholder="ძებნა"
               aria-label="ძებნა"
               className="h-[38px] min-w-0 flex-1 rounded-[3px] border border-[var(--control)] bg-[var(--tile)] px-[11px] text-[13px] text-[var(--ink)] outline-none focus:border-[var(--ink)]"
             />
