@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { BudgetHub } from "../../components/hub/budget-hub";
-import { MethodologyPromo } from "../../components/methodology/methodology-promo";
 import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect";
 import { PageHeader } from "../../components/shell/page-header";
 import { SourceNote } from "../../components/ui/editorial";
@@ -69,11 +68,6 @@ export default async function ExplorerHubPage() {
             ) : null}
           </SourceNote>
         </div>
-        <MethodologyPromo
-          href="/methodology"
-          titleKa="როგორ იქცევა ოფიციალური წყარო ღია მონაცემად"
-          bodyKa="გაეცანით თითოეული კრებულის სრულ მეთოდოლოგიას, გადამოწმების წესებსა და უცვლელ ოფიციალურ დოკუმენტებს."
-        />
       </div>
     </main>
   );

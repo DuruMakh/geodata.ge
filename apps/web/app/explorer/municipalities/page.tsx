@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { MethodologyPromo } from "../../../components/methodology/methodology-promo";
 import { MunicipalitiesIndex } from "../../../components/municipalities/municipalities-index";
 import { PageHeader } from "../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
@@ -81,11 +80,6 @@ export default async function MunicipalitiesIndexPage() {
           kpis={buildIndexKpis({ municipalities, totalFacts, functionFacts, functions, firstYear, latestYear })}
           latestYear={latestYear}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
-        />
-        <MethodologyPromo
-          href="/methodology/municipalities"
-          titleKa="როგორ მუშავდება მუნიციპალიტეტების ოფიციალური მონაცემები"
-          bodyKa="გაეცანით მუნიციპალური ხარჯების წყაროებს, აგრეგაციისა და გეოგრაფიული შესაბამისობის წესებს, შეზღუდვებსა და უცვლელ პირველწყაროებს."
         />
       </div>
     </main>

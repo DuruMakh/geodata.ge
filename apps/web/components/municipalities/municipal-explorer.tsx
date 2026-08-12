@@ -322,7 +322,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               type="button"
               data-testid="municipal-csv"
               onClick={downloadCsv}
-              className="mt-4 flex h-[38px] w-full cursor-pointer items-center justify-center rounded-[2px] bg-[var(--ink)] text-[12.5px] font-semibold text-[var(--paper)] hover:opacity-85"
+              className="mt-[18px] h-[38px] w-full cursor-pointer rounded-[2px] bg-[var(--ink)] text-[12.5px] font-semibold text-[var(--paper)] transition-opacity duration-150 hover:opacity-85"
             >
               CSV ჩამოტვირთვა
             </button>

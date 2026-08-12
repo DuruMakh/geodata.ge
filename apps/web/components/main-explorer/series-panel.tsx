@@ -165,6 +165,7 @@ export function SeriesPanel({
 
       <button
         type="button"
+        data-testid="series-csv"
         onClick={onDownloadCsv}
         className="mt-[18px] h-[38px] w-full cursor-pointer rounded-[2px] bg-[var(--ink)] text-[12.5px] font-semibold text-[var(--paper)] transition-opacity duration-150 hover:opacity-85"
       >

@@ -55,42 +55,20 @@ test("public header keeps landing active and leaves methodology navigation inact
   }
 });
 
-for (const [path, expectedHref] of [
-  ["/explorer", "/methodology"],
-  ["/explorer/expenditure", "/methodology/expenditure"],
-  ["/explorer/revenue", "/methodology/revenue"],
-  ["/explorer/municipalities", "/methodology/municipalities"],
-] as const) {
-  test(`${path} ends with the approved methodology promotion`, async ({ page }) => {
-    await page.goto(`http://localhost:3100${path}`);
-
-    await expect(page.getByTestId("methodology-promo").getByRole("link")).toHaveAttribute(
-      "href",
-      expectedHref,
-    );
-    await expect(page.locator("footer")).toHaveCount(0);
-  });
-}
-
-test("analysis promotion follows the active analysis side", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/analysis");
-
-  const promotionLink = page.getByTestId("methodology-promo").getByRole("link");
-  await expect(promotionLink).toHaveAttribute("href", "/methodology/expenditure");
-  await page.getByTestId("analysis-side-revenue").click();
-  await expect(promotionLink).toHaveAttribute("href", "/methodology/revenue");
-  await expect(page.locator("footer")).toHaveCount(0);
-});
-
 for (const path of [
+  "/explorer",
+  "/explorer/expenditure",
+  "/explorer/revenue",
+  "/explorer/analysis",
+  "/explorer/municipalities",
   "/explorer/municipalities/04",
   "/explorer/municipalities/region/imereti",
 ] as const) {
-  test(`${path} keeps methodology promotion on the municipalities index`, async ({ page }) => {
+  test(`${path} has no methodology promotion or link`, async ({ page }) => {
     await page.goto(`http://localhost:3100${path}`);
 
     await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
-    await expect(page.getByTestId("compact-methodology-link")).toHaveCount(0);
+    await expect(page.locator('a[href^="/methodology"]')).toHaveCount(0);
     await expect(page.locator("footer")).toHaveCount(0);
   });
 }
