@@ -1,46 +1,25 @@
 # GeoData.ge Agent Instructions
 
-These instructions are the operating contract for agents working in this workspace. They are not the full product spec.
+These are durable, always-loaded rules for this repository. Load task-specific detail only when the task needs it.
 
-## Read First
+## Task-Routed Sources
 
-Before planning or coding, read:
+- Feature scope: read `Project_Definition.md` section 2.
+- UI or interaction work: read `DESIGN.md` and the current task's approved spec.
+- Data work: read the relevant file under `docs/data-methodology/`.
+- Deployment work: read `docs/deployment.md`.
+- Commands and definition of done: read `CLAUDE.md`.
+- Historical provenance only: consult `docs/superpowers/specs/2026-05-10-geodata-budget-v1-design.md`; it is not authoritative for current work.
 
-1. `Project_Definition.md`
-2. `DESIGN.md` (for any UI work)
-3. `docs/superpowers/specs/2026-05-10-geodata-budget-v1-design.md` (historical detail)
+Repository precedence: `Project_Definition.md` section 2 owns scope; `DESIGN.md` owns production visuals and interactions; an approved task spec owns its bounded decisions; this file owns always-relevant stack, workflow, and operational constraints. For current status claims, live repository, CI, deployment, or URL evidence outranks remembered or historical text.
 
-Precedence when documents disagree: `Project_Definition.md` §2 owns scope, `DESIGN.md` v4.1 owns visuals, and this `AGENTS.md` owns current stack and project state. The 2026-05-10 spec is historical and not maintained. Keep this `AGENTS.md` short, current, and focused on rules future agents must not miss.
+## Context Maintenance
 
-## Maintenance Rule
-
-Future agents should keep this file up to date when the durable project state changes.
-
-Update the project-specific sections when:
-
-- v1 moves to v2 or the active product scope changes.
-- The software stack changes.
-- Data architecture, import workflow, deployment workflow, or source-of-truth documents change.
-- New non-negotiable project rules are approved by the user.
-- Existing project rules become obsolete.
-
-Do not casually rewrite the Engineering Behavior section. Only change it if the user explicitly asks or if there is a clear project-wide reason.
-
-Prefer links to canonical docs over re-summarizing them.
-
-Do not duplicate the full design spec here. Link to the spec and record only the rules that future agents need before engaging with the project.
-
-## Context Discipline
-
-Keep persistent agent context small, current, and non-duplicative.
-
-- Keep `AGENTS.md` short: operational rules and durable non-negotiables only.
-- Do not duplicate full specs, plans, schemas, file trees, command logs, or recent-commit summaries here.
-- Store product decisions in the design spec, implementation steps in plan files, and current stack/workflow facts here only when they affect every future agent.
-- Before adding persistent context, ask: could a future agent recover this from repo files, git history, or a plan in under 30 seconds? If yes, do not add it.
-- Capture durable decisions, rejected alternatives, and project-specific footguns that are not obvious from code.
-- Make staleness visible: update project-specific sections when v1 becomes v2, the stack changes, source-of-truth docs move, or a major workflow decision changes.
-- If context grows large, split detail into a canonical doc and link to it instead of expanding this file.
+- Keep only durable, always-relevant constraints here.
+- Put scope in `Project_Definition.md`, visuals in `DESIGN.md`, task decisions in specs, implementation steps in plans, and operational detail in methodology or runbooks.
+- Do not add recent commits, command logs, detailed coverage inventories, or branch-specific implementation summaries.
+- Update this file only when an always-relevant stack, workflow, authority, or non-negotiable changes.
+- Do not casually rewrite the Engineering Behavior section. Change it only with explicit user approval or a clear project-wide reason.
 
 ## Engineering Behavior
 
@@ -111,101 +90,46 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria like "make it work" require clarification.
 
-## Current Project State
+## Project Snapshot
 
-GeoData.ge v1, a Georgian-first Georgia Budget Explorer, is implemented. The production UI follows the `DESIGN.md` v4.1 editorial system (single paper theme; multi-year explorer with fields/ministries grouping; single-year analysis view). `DESIGN.md` v4.1 is the canonical visual contract; the `editorial-v2` HTML prototype package was intentionally removed as superseded in 2026-08.
+GeoData.ge v1 is an implemented Georgian-first Georgia Budget Explorer, not a broad public-data catalog. Current route families are expenditure, revenue, municipalities, and single-year analysis under `/explorer`.
 
-The budget sits behind a platform shell (`DESIGN.md` §6.7): a dark sidebar, a hub at `/explorer`, and one route per section — `/explorer/expenditure`, `/explorer/revenue`, `/explorer/municipalities`, `/explorer/analysis`. The section is the route, not React state and not a hash key; the rest of the screen state still deep-links through the URL hash, and legacy `#nav=` links redirect once from the hub. The sidebar and hub carry `მალე` markers only for datasets that do not exist yet (the four teaser indicators) — markers only: no data, no routes, not clickable; the municipalities section has an implemented route and no marker in this branch as of 2026-08. Design rationale for the shell: `docs/superpowers/specs/2026-07-28-explorer-shell-and-workspace-design.md`.
+The stack is Next.js 16, strict TypeScript, Tailwind v4, and the custom editorial component layer; do not introduce shadcn. Reviewed CSVs under `data/imports/` are the canonical human-reviewed source of truth. Supabase Postgres via Prisma 7 is the serving mirror, populated only by the transactional, parity-checked `npm run data:import`; never edit the database directly. Builds remain fully static, with CSV mode as the documented fallback. See `docs/data-methodology/database-import.md`.
 
-Data rollout status as of 2026-08: revenue facts are complete for 2005-2025; expenditure facts by public spending fields are complete for 2005-2025; ministries (admin) facts are complete for 2005-2025 with major-program drill-down rows from 2012 (partial) and contiguous 2017-2025. The municipal data-serving layer covers 2015-2025 (10 main functions, 64 municipalities, 11 data-bearing regions). The current branch implements an index and ranked list at `/explorer/municipalities` with a deterministic municipality-grain SVG map (60 OpenStreetMap polygons, five city markers, 64 unique served codes, and two inert Natural Earth overlays), 64 municipality pages, and 11 region roll-up pages, all reachable from the sidebar and hub card 03 and included in the sitemap (index + 64 + 11 URLs); see `docs/superpowers/specs/2026-08-07-municipality-map-upgrade-design.md`. Codes `05`, `42`, `43`, `46`, and `64` remain excluded from the public dataset and all interactive map targets because their budgets are not territorially attributable spending inside those municipalities. Production verification follows merge and deployment; implementation in this branch is not evidence that the municipality map is live. The raw MoF source archive remains unchanged. The database mirror is updated only through the transactional CSV mirror import. Update this paragraph as coverage changes.
+Production deploys to Vercel through the Actions-owned, CI-gated pipeline. `docs/deployment.md` owns project identifiers, environment configuration, release operations, rollback, and live-verification procedure.
 
-The current branch also implements the approved public methodology and original-source centre at `/methodology` plus expenditure, revenue, and municipality category pages. Its content and UI contract is `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`; archive publication and source-update operations are maintained in `docs/data-methodology/public-methodology-and-source-archives.md`. Reviewed manifests are the publication control and generated downloads remain ignored build artifacts. Production verification follows authorized merge and deployment; implementation in this branch is not evidence that these routes or downloads are live.
+A branch implementation, merged commit, green deploy-trigger workflow, or accepted Vercel hook is not proof that a route is live. Verify the deployed commit and relevant production URLs separately.
 
-Both sides start in 2005 because the project does not currently have reviewed 2004 sources in the served datasets.
+## V1 and Data Non-Negotiables
 
-V1 is not a broad public-data catalog. Do not re-expand scope unless the user explicitly approves it.
+- Do not expand v1 beyond `Project_Definition.md` section 2 without explicit user approval. Excluded features include a broad catalog, clickable drilldown/detail pages, admin UI, public API, uploads, sub-annual data, and automated production document extraction.
+- Multi-year institutions and major programs are selectable series, not clickable drilldown.
+- Use stable lowercase ASCII category IDs; Georgian and English labels are display data, not identifiers.
+- Public expenditure fields come from reviewed mappings over official rows. Preserve every official row. Assign uncertain rows explicitly to `spending.other_unclassified` and retain mapping confidence and notes.
+- Store `basis = actual | planned`. When both exist for an item and year, actual wins in public charts, tables, and CSV; active planned values remain visibly marked.
+- Every import must produce validation and reconciliation evidence.
+- CSV exports retain source and basis metadata.
+- Georgian CSVs intended for direct opening in Microsoft Excel must use UTF-8 with BOM and automated encoding regression coverage. Prefer a native XLSX companion when spreadsheet auto-conversion could alter identifiers.
+- Municipal codes `05`, `42`, `43`, `46`, and `64` remain excluded because their budgets are not territorially attributable spending inside those municipalities.
 
-Current stack:
+## UI Contract
 
-- Next.js 16 with TypeScript (strict) and Tailwind v4; custom editorial component layer (`apps/web/components/ui/editorial.tsx`), no shadcn.
-- Data serving: reviewed CSVs under `data/imports/` are the canonical human-reviewed source of truth. Supabase Postgres (via Prisma 7) is the canonical serving store, populated from them by the idempotent, parity-checked `npm run data:import`. Pages are rendered at build time from the database when `GEODATA_DATA_SOURCE=db` (db builds also re-verify the mirror row-by-row against the checkout's CSVs); the default (`csv`, no `.env` needed) builds straight from the CSVs and is the documented fallback. The deployed app stays fully static either way. The database must never be edited directly — see `docs/data-methodology/database-import.md`. Activation status: Supabase project live (2026-07-14), migrations applied, first import parity PASSED, db-mode build + browser tests verified. Production (Vercel) builds from the mirror (`GEODATA_DATA_SOURCE=db`, since 2026-07-28) via the Actions-owned deploy pipeline; CSV mode remains the documented break-glass fallback (`docs/deployment.md`).
-- Deployment: Vercel project `geodata-ge` (team `durumakh-1974s-projects`), git-connected to `origin` — production deploys via `.github/workflows/deploy-production.yml` (CI-green gate → parity-checked import → deploy hook; `main` auto-deploy disabled) to https://geodata-ge.vercel.app; branches/PRs still get preview deployments. Canonical workflow doc: `docs/deployment.md`. Custom domain not yet attached (owner step; see the doc).
+- Production follows the warm editorial system in `DESIGN.md` v4.1. Do not revive the superseded Apple Light/Night, dark, neon, or terminal directions without explicit approval.
+- Derive year ranges and defaults from loaded facts; do not hardcode coverage.
+- Preserve readable Georgian text, accessible chart labels, distinguishable stable category colors, and data comprehension.
+- Only the applicable total is selected by default; it remains first, selectable, and removable.
+- Series selection is unlimited. Optional grouping tabs precede search; the next row places `გასუფთავება` / `ყველას მონიშვნა` on the left and `სერიები {selected} / {all}` on the right. Search never scopes the bulk action or denominator.
 
-The workspace is a git repository on `main` with a GitHub `origin` remote. Check git state before promising commits, branches, pushes, or PRs.
+## Workflow and Delivery
 
-## V1 Non-Negotiables
+Use this sequence: brainstorming/spec -> plan -> implementation -> verification/review -> GitHub delivery when authorized.
 
-The canonical V1 Included/Excluded scope list lives in `Project_Definition.md` section 2. Read it before planning any feature work; do not duplicate it here.
-
-Hard rules:
-
-- Do not re-expand v1 into a broad data catalog or add excluded features (drilldown/detail pages, admin UI, public API, user uploads, sub-annual data, automated production DOCX/PDF extraction) without explicit user approval.
-- Multi-year expenditure supports grouping by public spending fields or by ministries/major programs. This is series selection, not clickable drilldown.
-
-## Data Rules
-
-Build data foundation before visual richness.
-
-Raw source files under `docs/Raw Data` are organized by data side first: expenditure sources live in `Expenditure/mof.ge` for MoF Excel workbooks and `Expenditure/treasury.ge` for Treasury PDFs, while revenue PDFs live in `Revenue`.
-
-Required data principles:
-
-- Use stable lowercase ASCII category IDs, such as `revenue.vat` and `spending.health`.
-- Georgian and English labels are display data, not identifiers.
-- Public expenditure fields come from a reviewed mapping layer over official institution/program/subprogram rows.
-- Multi-year charts/tables may expose official institutions, programs, and subprograms as selectable series when data exists. This is not clickable drilldown.
-- If an official row cannot be confidently mapped, assign it explicitly to `spending.other_unclassified`; no official row may disappear silently from totals.
-- Store mapping confidence and notes where mappings are uncertain or require review.
-- Use `basis = actual | planned`.
-- If planned and actual values both exist for the same item/year, actual wins in public charts, tables, and CSV.
-- Planned active values need a subtle badge or planned chart marker.
-- Every import should produce an internal validation report.
-- Any Georgian CSV intended for direct human opening in Microsoft Excel must use UTF-8 with BOM and have an automated encoding regression check. Keep application/internal machine CSV encoding decisions separate, and prefer a native `.xlsx` companion for human review when text identifiers must not be auto-converted.
-
-## UX and Visual Guardrails
-
-Default first view:
-
-- Expenditure section (`/explorer/expenditure`).
-- Multi-year line chart, nominal GEL.
-- Full loaded range (currently 2005-2025), data-driven, never hardcoded.
-- Total plus the top 5 categories by latest-year value selected; the total is first, ink-coloured, selectable, and removable.
-- Series selection is unlimited. The header shows `სერიები {selected} / {all}` and switches between `გასუფთავება` and `ყველას მონიშვნა`; search never scopes the bulk action.
-
-The single-year analysis view has no v1 drilldown and stays top-level (fields, ministries categories, or revenue categories). Multi-year mode can allow selecting deeper official rows (major programs, by name only — no official codes) as chart/table series.
-
-Production UI follows `DESIGN.md` v4.1. Retained concept files are contextual inputs only unless a current product spec explicitly promotes them.
-
-The approved direction is the warm editorial statistical annual (paper background, ink rules instead of cards, serif display + mono numerals, one terracotta accent). The previous Apple-like Light/Night system and older dark/neon/terminal styling are superseded for production unless the user explicitly approves a new design change. There is no theme toggle in v1.
-
-Guardrails:
-
-- Georgian text must stay readable.
-- Chart labels must remain clear.
-- Color choices must be distinguishable; category colors are stable tokens (DESIGN.md §4.2).
-- Decorative effects must not reduce data comprehension.
-- No cards, container shadows, gradients, or radii above 3px (measure pill and slider handles excepted). One card exception, approved by the user and specified in `DESIGN.md` §6.6: the budget hub's four section cards. It covers those cards only and does not license cards anywhere else.
-
-## Workflow Rules
-
-Use the Superpowers workflow:
-
-1. Brainstorming/spec.
-2. Writing plan.
-3. Implementation.
-4. Verification/review.
-5. GitHub delivery, when the implementation is intended for GitHub.
-
-The mandatory GitHub delivery flow is:
+GitHub delivery is mandatory when the task includes publishing:
 
 ```text
-codex/* branch -> commits -> push branch -> draft PR -> required CI -> review/resolved conversations -> merge -> delete branch
+codex/* branch -> commits -> push -> draft PR -> required CI -> review/resolved conversations -> merge -> delete branch
 ```
 
-Do not push implementation commits directly to `main`. Complete implementation and verification/review before starting the GitHub delivery flow. Publishing or merging still requires the task to include GitHub delivery or explicit user authorization.
+Check Git and worktree state before promising branch, commit, push, PR, or merge actions. Do not push implementation commits directly to `main`. Publishing or merging requires task scope or explicit authorization. Required CI must be green before merge; do not bypass a required check.
 
-When library, framework, SDK, API, CLI, or cloud-service docs are needed, use Context7 for current documentation before relying on memory.
-
-Do not claim work is complete without running relevant verification.
-
-Verification commands and the definition of done live in the root `CLAUDE.md`. CI (`.github/workflows/ci.yml`) runs lint, typecheck, unit tests, data validation, build, and Playwright browser tests on every PR and must be green before merge.
+Use Context7 for current library, framework, SDK, API, CLI, or cloud-service documentation before relying on memory. Do not claim completion without the relevant verification in `CLAUDE.md`.

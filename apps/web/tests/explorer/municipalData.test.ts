@@ -152,44 +152,8 @@ describe("buildMunicipalEntityModel", () => {
 });
 
 describe("getDefaultMunicipalSelection", () => {
-  it("defaults to the total followed by latest-year functions", () => {
-    expect(getDefaultMunicipalSelection(build())).toEqual([
-      "municipal.total",
-      "municipal.economic_affairs",
-      "municipal.education",
-      "municipal.health",
-    ]);
-  });
-
-  it("selects the total and exactly five functions when more functions are available", () => {
-    const extendedFunctions: MunicipalFunction[] = [
-      ...FUNCTIONS,
-      { id: "municipal.one", kaLabel: "ერთი", functionalCode: "7.1", sortOrder: 1 },
-      { id: "municipal.two", kaLabel: "ორი", functionalCode: "7.2", sortOrder: 2 },
-      { id: "municipal.three", kaLabel: "სამი", functionalCode: "7.3", sortOrder: 3 },
-    ];
-    const model = buildMunicipalEntityModel({
-      functions: extendedFunctions,
-      functionFacts: [
-        ...FUNCTION_FACTS,
-        { year: 2017, municipalityCode: "04", categoryId: "municipal.one", functionalCode: "7.1", amountGel: 600, basis: "actual", sourceId: "source.municipal_portal_archive" },
-        { year: 2017, municipalityCode: "04", categoryId: "municipal.two", functionalCode: "7.2", amountGel: 500, basis: "actual", sourceId: "source.municipal_portal_archive" },
-        { year: 2017, municipalityCode: "04", categoryId: "municipal.three", functionalCode: "7.3", amountGel: 400, basis: "actual", sourceId: "source.municipal_portal_archive" },
-      ],
-      totalFacts: TOTAL_FACTS,
-      sourceDocuments: SOURCES,
-      startYear: 2015,
-      endYear: 2017,
-    });
-
-    expect(getDefaultMunicipalSelection(model)).toEqual([
-      "municipal.total",
-      "municipal.one",
-      "municipal.two",
-      "municipal.three",
-      "municipal.economic_affairs",
-      "municipal.education",
-    ]);
+  it("defaults a populated municipal model to only its official total", () => {
+    expect(getDefaultMunicipalSelection(build())).toEqual(["municipal.total"]);
   });
 });
 

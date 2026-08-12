@@ -3,6 +3,11 @@
 **Date:** 2026-08-09
 **Status:** Approved for implementation planning
 
+> Superseded in part by `2026-08-10-standardized-data-explorer-design.md`:
+> the current default is total-only, and the standardized selector places search
+> above an action-left/status-right row. Its unlimited-selection and official-total
+> decisions remain in force.
+
 ## 1. Goal
 
 Make totals visible and selectable in every multi-year budget explorer, simplify the series-selection controls, and remove the fixed chart-line limit everywhere.

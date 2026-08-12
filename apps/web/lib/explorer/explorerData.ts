@@ -17,7 +17,6 @@ import type {
 } from "./types";
 
 const SERIES_ORDER_BASE_YEAR = 2025;
-const DEFAULT_SELECTION_SIZE = 5;
 const ADMIN_SPENDING_TOTAL_ID = "admin_spending.total";
 
 type ModelFact = {
@@ -205,45 +204,30 @@ function shareForYear(row: ExplorerTableRow, totalRow: ExplorerTableRow | null, 
   return amount / total;
 }
 
-// Default selection follows the editorial design: the applicable total plus the
-// top categories by latest-year value.
+// Every populated explorer starts with its reviewed total only. The total is
+// still removable; this function decides the pristine fallback, not a required
+// selection.
 export function getDefaultSelection(
   side: ExplorerSide,
   facts: ServedBudgetFact[],
   expenditureGrouping: ExpenditureGrouping = "fields",
   adminFacts: ServedAdminFact[] = [],
 ): string[] {
-  const amountsByItem = new Map<string, { year: number; amountGel: number }>();
-  const consider = (itemId: string, year: number, amountGel: number) => {
-    const existing = amountsByItem.get(itemId);
-    if (!existing || year > existing.year) amountsByItem.set(itemId, { year, amountGel });
-  };
-
-  if (side === "expenditure" && expenditureGrouping === "ministries") {
-    for (const fact of adminFacts) {
-      if (fact.level === "admin_category") consider(fact.itemId, fact.year, fact.amountGel);
-    }
-  } else {
-    for (const fact of chooseActivePublicFacts(facts)) {
-      if (fact.side === side && !isDerivedTotalItemId(fact.itemId)) consider(fact.itemId, fact.year, fact.amountGel);
-    }
-  }
-
-  const latestYear = Math.max(...Array.from(amountsByItem.values()).map((entry) => entry.year), 0);
-
   const totalId =
     side === "revenue"
       ? "revenue.total"
       : expenditureGrouping === "ministries"
         ? ADMIN_SPENDING_TOTAL_ID
         : "expenditure.total";
-  const categories = Array.from(amountsByItem.entries())
-    .filter(([, entry]) => entry.year === latestYear)
-    .sort((a, b) => b[1].amountGel - a[1].amountGel)
-    .slice(0, DEFAULT_SELECTION_SIZE)
-    .map(([itemId]) => itemId);
 
-  return categories.length === 0 ? [] : [totalId, ...categories];
+  const hasSelectableRows =
+    side === "expenditure" && expenditureGrouping === "ministries"
+      ? adminFacts.some((fact) => fact.level === "admin_category")
+      : chooseActivePublicFacts(facts).some(
+          (fact) => fact.side === side && !isDerivedTotalItemId(fact.itemId),
+        );
+
+  return hasSelectableRows ? [totalId] : [];
 }
 
 export function isDerivedTotalItemId(itemId: string): boolean {
@@ -583,4 +567,3 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     hasPlannedValues: selectedPoints.some((point) => point.basis === "planned"),
   };
 }
-
