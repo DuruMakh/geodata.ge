@@ -101,7 +101,7 @@ export function ExplorerView({
   // A non-empty selection can still have zero coverage in the active range
   // (e.g. a program series with a pre-2016 range) — say so instead of drawing
   // a fabricated empty axis or a total-only table.
-  const noRangeData = !noSelection && series.every((line) => line.vals.every((value) => value === null));
+  const noRangeData = !noSelection && model.points.length === 0;
 
   return (
     <>
@@ -157,10 +157,12 @@ export function ExplorerView({
                 firstColumnLabel={FIRST_COL_LABEL[scope]}
                 unit={UNIT_BN}
                 share={share}
+                shareColumnLabel="წილი მშპ-ში"
+                shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
               />
             ) : (
               <div className="mt-5">
-                <EditorialLineChart years={model.years} series={series} share={share} unit={UNIT_BN} />
+                <EditorialLineChart years={model.years} series={series} share={share} unit={UNIT_BN} shareLabel="წილი მშპ-ში" />
               </div>
             )}
 
@@ -172,7 +174,8 @@ export function ExplorerView({
               მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო).{" "}
               <span className="font-[family-name:var(--font-numeric)]">{coverage}</span> · 12-თვიანი ფაქტობრივი შესრულება.
               {CLASSIFICATION_NOTE[scope] ? ` ${CLASSIFICATION_NOTE[scope]}` : null}
-              {share ? " მშპ: საქსტატი, მიმდინარე ფასებში." : null}
+              {Object.keys(model.gdpByYear).length > 0 ? " მშპ: საქსტატი, მიმდინარე ფასებში." : null}
+              {model.years.some((year) => model.gdpByYear[year]?.status === "preliminary") ? " 2025 წლის მშპ წინასწარია." : null}
               {lastUpdatedAt ? (
                 <>
                   {" "}ბოლო განახლება: <span className="font-[family-name:var(--font-numeric)]">{lastUpdatedAt}</span>.

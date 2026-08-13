@@ -63,6 +63,8 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   await expect(page.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
   await expect(page.getByTestId("source-label")).toContainText("გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები");
   await expect(page.getByTestId("source-label")).toContainText("2005–2025");
+  await expect(page.getByTestId("source-label")).toContainText("მშპ: საქსტატი, მიმდინარე ფასებში");
+  await expect(page.getByTestId("source-label")).toContainText("2025 წლის მშპ წინასწარია");
 
   // Indicators below the chart.
   await expect(page.getByTestId("period-indicators")).toBeVisible();
@@ -227,6 +229,8 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await expect(chartPanel).toHaveAttribute("data-measure", "share_of_gdp");
   await expect(chartPanel.getByTestId("measure-share-toggle")).toHaveText("% მშპ-ში");
   await expect(chartPanel.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("img", { name: "მრავალწლიანი დინამიკა" }).hover({ position: { x: 300, y: 100 } });
+  await expect(page.getByTestId("chart-tooltip")).toContainText("წილი მშპ-ში");
   await chartPanel.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table")).toContainText("წილი მშპ-ში 2025");
   await expect(page.getByTestId("explorer-table")).not.toContainText("100.0%");

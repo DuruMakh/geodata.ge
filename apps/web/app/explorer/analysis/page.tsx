@@ -20,7 +20,14 @@ export const metadata: Metadata = {
 
 export default async function AnalysisPage() {
   const { facts, glossary, sourceDocuments, adminFacts, adminCategories } = await loadServedExplorerData();
-  const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
+  const referencedSourceIds = new Set(
+    [...facts, ...adminFacts].flatMap((fact) => fact.sourceId.split(";").map((sourceId) => sourceId.trim())),
+  );
+  const lastUpdatedAt = sourceDocuments
+    .filter((source) => referencedSourceIds.has(source.sourceId))
+    .map((source) => source.lastReviewedAt)
+    .sort()
+    .at(-1) ?? "";
 
   return (
     <MainExplorer

@@ -158,6 +158,7 @@ describe("main explorer data model", () => {
       startYear: 2024,
       endYear: 2025,
       measure: "nominal",
+      gdpFacts,
     });
 
     expect(model.years).toEqual([2024, 2025]);
@@ -464,6 +465,8 @@ describe("main explorer data model", () => {
 
     expect(model.points.find((point) => point.year === 2025)?.value).toBeNull();
     expect(model.tableRows[0]?.shareByYear?.[2025]).toBeNull();
+    expect(model.points.find((point) => point.year === 2025)?.amountGel).toBe(150);
+    expect(model.summary.biggestShareChange).toBeNull();
   });
 
   it("preserves negative revenue corrections as negative GDP shares", () => {

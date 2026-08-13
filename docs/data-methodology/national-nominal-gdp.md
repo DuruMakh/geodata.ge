@@ -27,7 +27,7 @@ The SNA 1993 workbook publishes 1996–2018 and the SNA 2008 workbook publishes 
 
 The deterministic preparation script reads the `(=) GDP at market prices` row from each reviewed workbook. The canonical `valuation` is therefore `market_prices`; “current prices” describes the nominal price basis rather than the valuation. The script rounds the source to the published one-decimal million-GEL precision, then multiplies by 1,000,000 to obtain GEL. It does not interpolate, forecast, or back-cast values.
 
-The current workbook marks 2025 with an asterisk; the canonical row is therefore `preliminary`. Earlier selected rows are retained as `final_as_published`. The canonical CSV preserves the accounting standard, status, workbook sheet and cell, source unit, transformation, and review date beside every value.
+The current workbook marks 2025 with an asterisk; the canonical row is therefore `preliminary`. Its published note states: “Revised data will be published on November 16, 2026.” Earlier selected rows are retained as `final_as_published`. The canonical CSV preserves the accounting standard, status, workbook sheet and cell, source unit, transformation, and review date beside every value.
 
 ## Reproduction and validation
 

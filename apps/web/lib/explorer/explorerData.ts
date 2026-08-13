@@ -163,8 +163,11 @@ function absoluteIncrease(row: ExplorerTableRow, startYear: number, endYear: num
   return end - start;
 }
 
-function shareChangeFor(row: ExplorerTableRow, startYear: number, endYear: number): number {
-  return (row.shareByYear?.[endYear] ?? 0) - (row.shareByYear?.[startYear] ?? 0);
+function shareChangeFor(row: ExplorerTableRow, startYear: number, endYear: number): number | null {
+  const start = row.shareByYear?.[startYear];
+  const end = row.shareByYear?.[endYear];
+  if (start === null || start === undefined || end === null || end === undefined) return null;
+  return end - start;
 }
 
 function buildSummary(rows: ExplorerTableRow[], totalRow: ExplorerTableRow | null, years: number[]): {
@@ -195,10 +198,11 @@ function buildSummary(rows: ExplorerTableRow[], totalRow: ExplorerTableRow | nul
   const sortedIncrease = [...comparableRows].sort(
     (a, b) => (absoluteIncrease(b, startYear, endYear) ?? -Infinity) - (absoluteIncrease(a, startYear, endYear) ?? -Infinity),
   );
-  const sortedShareChange = [...comparableRows].sort(
+  const shareChangeRows = comparableRows.filter((row) => shareChangeFor(row, startYear, endYear) !== null);
+  const sortedShareChange = [...shareChangeRows].sort(
     (a, b) =>
-      Math.abs(shareChangeFor(b, startYear, endYear)) -
-      Math.abs(shareChangeFor(a, startYear, endYear)),
+      Math.abs(shareChangeFor(b, startYear, endYear) ?? 0) -
+      Math.abs(shareChangeFor(a, startYear, endYear) ?? 0),
   );
 
   return {

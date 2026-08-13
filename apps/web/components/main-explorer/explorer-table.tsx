@@ -14,6 +14,8 @@ type ExplorerTableProps = {
   firstColumnLabel: string;
   unit: ValueUnit;
   share: boolean;
+  shareColumnLabel: string;
+  shareValueForYear: (row: ExplorerTableRow, year: number) => number | null;
 };
 
 const headCellClass =
@@ -25,14 +27,14 @@ function changeColor(change: number | null): string {
   return change >= 0 ? POSITIVE : NEGATIVE;
 }
 
-export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLabel, unit, share }: ExplorerTableProps) {
+export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLabel, unit, share, shareColumnLabel, shareValueForYear }: ExplorerTableProps) {
   const endYear = years.at(-1);
   const lastIndex = years.length - 1;
   const cellValue = (row: ExplorerTableRow, year: number): string => {
     const amount = row.valuesByYear[year];
     if (amount === null || amount === undefined) return MISSING;
     if (!share) return formatInUnit(amount, unit);
-    return formatShare(row.shareByYear?.[year] ?? null);
+    return formatShare(shareValueForYear(row, year));
   };
 
   const cellPad = { paddingTop: 11, paddingBottom: 11 };
@@ -55,7 +57,7 @@ export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLab
               ცვლილება
             </th>
             <th className={`${headCellClass} sticky right-0 z-[2] w-24 min-w-24 bg-[var(--paper)] pr-0 uppercase tracking-[0.06em]`}>
-              წილი მშპ-ში {endYear}
+              {shareColumnLabel} {endYear}
             </th>
           </tr>
         </thead>

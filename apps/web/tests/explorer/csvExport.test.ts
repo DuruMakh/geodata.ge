@@ -121,4 +121,35 @@ describe("explorer CSV export", () => {
       ",2000,sna_2008,preliminary,Reviewed nominal GDP,docs/gdp.xlsx,2026-08-13,0.125",
     );
   });
+
+  it("keeps a budget row and leaves every GDP field blank when its denominator is missing", () => {
+    const rows: ExplorerTableRow[] = [
+      {
+        itemId: "spending.health",
+        parentItemId: null,
+        level: "public_field",
+        detailLabel: null,
+        kaLabel: "Health KA",
+        enLabel: "Health",
+        color: "#0071e3",
+        basisByYear: { 2025: "actual" },
+        sourceByYear: {
+          2025: {
+            sourceName: "Reviewed budget",
+            sourceUrlOrFile: "docs/budget.xlsx",
+            lastReviewedAt: "2026-08-12",
+          },
+        },
+        valuesByYear: { 2025: 250 },
+        shareByYear: { 2025: null },
+        change: null,
+        shareEndYear: null,
+      },
+    ];
+
+    const csv = buildExplorerCsv(rows, [2025], {});
+
+    expect(Array.from(new TextEncoder().encode(csv).slice(0, 3))).toEqual([0xef, 0xbb, 0xbf]);
+    expect(csv).toContain("2025,spending.health,,public_field,,,Health KA,Health,250,actual,Reviewed budget,docs/budget.xlsx,2026-08-12,,,,,,,");
+  });
 });

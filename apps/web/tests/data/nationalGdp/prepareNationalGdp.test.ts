@@ -2,11 +2,14 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import * as XLSX from "xlsx";
 
 import {
   assertGeneratedArtifactMatches,
   prepareNationalGdp,
+  validateGdpWorkbookTitle,
   validateNationalGdpSeries,
+  validatePublishedOneDecimal,
 } from "../../../lib/data/nationalGdp/prepareNationalGdp";
 
 describe("prepareNationalGdp", () => {
@@ -63,6 +66,35 @@ describe("prepareNationalGdp", () => {
     await expect(assertGeneratedArtifactMatches(artifactPath, "generated\n")).rejects.toThrow(
       "Generated national GDP artifact is stale",
     );
+  });
+
+  it("rejects unexpected workbook titles and units", () => {
+    const valid = XLSX.utils.aoa_to_sheet([
+      ["GROSS DOMESTIC PRODUCT\n(at current prices, mil. GEL)"],
+    ]);
+    const wrongBasis = XLSX.utils.aoa_to_sheet([
+      ["GROSS DOMESTIC PRODUCT\n(at constant prices, mil. GEL)"],
+    ]);
+    const wrongUnit = XLSX.utils.aoa_to_sheet([
+      ["GROSS DOMESTIC PRODUCT\n(at current prices, GEL)"],
+    ]);
+
+    expect(() => validateGdpWorkbookTitle(valid, "source.test")).not.toThrow();
+    expect(() => validateGdpWorkbookTitle(wrongBasis, "source.test")).toThrow(
+      "current-price million-GEL title",
+    );
+    expect(() => validateGdpWorkbookTitle(wrongUnit, "source.test")).toThrow(
+      "current-price million-GEL title",
+    );
+  });
+
+  it("rejects a source cell not published to one decimal place", () => {
+    expect(() =>
+      validatePublishedOneDecimal({ t: "n", v: 3868.55, z: "#,##0.0" }, "B2"),
+    ).not.toThrow();
+    expect(() =>
+      validatePublishedOneDecimal({ t: "n", v: 3868.55, z: "#,##0.00" }, "B2"),
+    ).toThrow("one-decimal million-GEL precision");
   });
 
   it("rejects duplicate and incomplete source coverage", async () => {

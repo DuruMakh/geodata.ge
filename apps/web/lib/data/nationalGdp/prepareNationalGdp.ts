@@ -71,6 +71,32 @@ function sourceByteKey(standard: GdpAccountingStandard): "sna1993" | "sna2008" {
   return standard === "sna_1993" ? "sna1993" : "sna2008";
 }
 
+export function validateGdpWorkbookTitle(sheet: XLSX.WorkSheet, sourceId: string): void {
+  const range = XLSX.utils.decode_range(sheet["!ref"] ?? "A1:A1");
+  const titles: string[] = [];
+  for (let row = range.s.r; row <= Math.min(range.e.r, 1); row += 1) {
+    for (let column = range.s.c; column <= range.e.c; column += 1) {
+      const value = sheet[XLSX.utils.encode_cell({ c: column, r: row })]?.v;
+      if (typeof value === "string") titles.push(value.replace(/\s+/g, " ").trim());
+    }
+  }
+  const valid = titles.some(
+    (title) =>
+      title.startsWith("GROSS DOMESTIC PRODUCT") &&
+      title.includes("(at current prices, mil. GEL)"),
+  );
+  if (!valid) {
+    throw new Error(`${sourceId} is missing the expected current-price million-GEL title`);
+  }
+}
+
+export function validatePublishedOneDecimal(cell: XLSX.CellObject | undefined, sourceCell: string): void {
+  const decimalPlaces = String(cell?.z ?? "").match(/0\.(0+)/)?.[1]?.length;
+  if (decimalPlaces !== 1) {
+    throw new Error(`${sourceCell} is not published at one-decimal million-GEL precision`);
+  }
+}
+
 function findMarketPriceRow(sheet: XLSX.WorkSheet): number {
   const range = XLSX.utils.decode_range(sheet["!ref"] ?? "A1:A1");
   for (let row = range.s.r; row <= range.e.r; row += 1) {
@@ -86,11 +112,12 @@ function extractSourceFacts(
   workbookBytes: Buffer,
   manifest: ManifestRow,
 ): NationalGdpSourceFact[] {
-  const workbook = XLSX.read(workbookBytes, { type: "buffer" });
+  const workbook = XLSX.read(workbookBytes, { type: "buffer", cellNF: true });
   const sourceSheet = workbook.SheetNames[0];
   const sheet = workbook.Sheets[sourceSheet];
   if (!sheet) throw new Error(`Missing first worksheet for ${manifest.source_id}`);
 
+  validateGdpWorkbookTitle(sheet, manifest.source_id);
   const marketPriceRow = findMarketPriceRow(sheet);
   const range = XLSX.utils.decode_range(sheet["!ref"] ?? "A1:A1");
   const yearMin = Number(manifest.source_year_min);
@@ -107,7 +134,9 @@ function extractSourceFacts(
     const year = Number(match[1]);
     if (year < yearMin || year > yearMax) continue;
     const sourceCell = XLSX.utils.encode_cell({ c: column, r: marketPriceRow });
-    const rawValue = Number(sheet[sourceCell]?.v);
+    const cell = sheet[sourceCell];
+    validatePublishedOneDecimal(cell, `${sourceSheet}!${sourceCell}`);
+    const rawValue = Number(cell?.v);
     if (!Number.isFinite(rawValue) || rawValue <= 0) {
       throw new Error(`Invalid GDP value at ${sourceSheet}!${sourceCell}`);
     }
