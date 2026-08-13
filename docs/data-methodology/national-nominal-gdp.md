@@ -25,7 +25,7 @@ The SNA 1993 workbook publishes 1996–2018 and the SNA 2008 workbook publishes 
 
 ## Extraction and units
 
-The deterministic preparation script reads the `(=) GDP at market prices` row from each reviewed workbook. It rounds the source to the published one-decimal million-GEL precision, then multiplies by 1,000,000 to obtain GEL. It does not interpolate, forecast, or back-cast values.
+The deterministic preparation script reads the `(=) GDP at market prices` row from each reviewed workbook. The canonical `valuation` is therefore `market_prices`; “current prices” describes the nominal price basis rather than the valuation. The script rounds the source to the published one-decimal million-GEL precision, then multiplies by 1,000,000 to obtain GEL. It does not interpolate, forecast, or back-cast values.
 
 The current workbook marks 2025 with an asterisk; the canonical row is therefore `preliminary`. Earlier selected rows are retained as `final_as_published`. The canonical CSV preserves the accounting standard, status, workbook sheet and cell, source unit, transformation, and review date beside every value.
 
@@ -43,6 +43,8 @@ The preparation command regenerates:
 - `data/staging/national-gdp-source-facts-1996-2025.csv` — both source series, including overlap;
 - `data/imports/national-gdp-annual-1996-2025.csv` — the 30-row canonical series;
 - `data/reports/national-gdp-annual-1996-2025-validation.json` — source hashes, byte counts, counts, coverage, and overlap.
+
+The check command regenerates all three artifacts in memory and requires an exact byte-for-byte match with the committed files. It also validates unique source-year keys, complete source coverage, the 2010 accounting-standard handoff, the exact overlap, and the 2025 preliminary status.
 
 `npm run data:validate` additionally requires one positive, unique, source-registered denominator for every served national budget year. `npm run data:import` mirrors the canonical rows transactionally into `NationalGdpFact`, reads them back through the database serving path, and compares every field against the reviewed CSV before commit.
 

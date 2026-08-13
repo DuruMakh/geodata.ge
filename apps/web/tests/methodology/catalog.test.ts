@@ -103,6 +103,9 @@ describe("methodology catalog", () => {
     for (const dataset of ["expenditure", "revenue"] as const) {
       expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("მშპ");
       expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("მიმდინარე ფასებში");
+      expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("2010 წლიდან — SNA 2008");
+      expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("2025 წლის მშპ წინასწარია");
+      expect(METHODOLOGY_CONTENT[dataset].reviewedAt).toBe("2026-08-13");
     }
 
     expect(FUTURE_METHODOLOGY_DATASETS.find((entry) => entry.titleKa === "მშპ")).toEqual({

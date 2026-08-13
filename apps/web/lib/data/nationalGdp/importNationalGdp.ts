@@ -9,7 +9,7 @@ const rowSchema = z.object({
   year: z.coerce.number().int().min(1900).max(2100),
   gdp_current_prices_million_gel: z.string().min(1),
   gdp_current_prices_gel: z.string().min(1),
-  valuation: z.literal("current_prices"),
+  valuation: z.literal("market_prices"),
   accounting_standard: z.enum(["sna_1993", "sna_2008"]),
   status: z.enum(["final_as_published", "preliminary"]),
   source_id: stableIdSchema,

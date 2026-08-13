@@ -1,6 +1,13 @@
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { prepareNationalGdp } from "../../../lib/data/nationalGdp/prepareNationalGdp";
+import {
+  assertGeneratedArtifactMatches,
+  prepareNationalGdp,
+  validateNationalGdpSeries,
+} from "../../../lib/data/nationalGdp/prepareNationalGdp";
 
 describe("prepareNationalGdp", () => {
   it("preserves the reviewed Geostat captures", async () => {
@@ -46,5 +53,53 @@ describe("prepareNationalGdp", () => {
       gdpCurrentPricesGel: 104_598_100_000,
       status: "preliminary",
     });
+  });
+
+  it("fails when a generated artifact differs byte-for-byte", async () => {
+    const tempDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "geodata-gdp-check-"));
+    const artifactPath = path.join(tempDirectory, "artifact.csv");
+    await fs.writeFile(artifactPath, "stale\n", "utf8");
+
+    await expect(assertGeneratedArtifactMatches(artifactPath, "generated\n")).rejects.toThrow(
+      "Generated national GDP artifact is stale",
+    );
+  });
+
+  it("rejects duplicate and incomplete source coverage", async () => {
+    const result = await prepareNationalGdp({ write: false });
+
+    expect(() =>
+      validateNationalGdpSeries(
+        [...result.sourceFacts, result.sourceFacts[0]],
+        result.canonicalFacts,
+      ),
+    ).toThrow("Duplicate GDP source year");
+    expect(() =>
+      validateNationalGdpSeries(result.sourceFacts.slice(1), result.canonicalFacts),
+    ).toThrow("GDP source coverage must be");
+  });
+
+  it("rejects canonical gaps, wrong handoffs, and lost preliminary status", async () => {
+    const result = await prepareNationalGdp({ write: false });
+
+    expect(() =>
+      validateNationalGdpSeries(result.sourceFacts, result.canonicalFacts.slice(1)),
+    ).toThrow("Canonical GDP coverage");
+    expect(() =>
+      validateNationalGdpSeries(
+        result.sourceFacts,
+        result.canonicalFacts.map((row) =>
+          row.year === 2010 ? { ...row, accountingStandard: "sna_1993" } : row,
+        ),
+      ),
+    ).toThrow("accounting-standard handoff");
+    expect(() =>
+      validateNationalGdpSeries(
+        result.sourceFacts,
+        result.canonicalFacts.map((row) =>
+          row.year === 2025 ? { ...row, status: "final_as_published" } : row,
+        ),
+      ),
+    ).toThrow("status is invalid for 2025");
   });
 });

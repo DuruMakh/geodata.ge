@@ -53,6 +53,13 @@ const REPORT_PATH = path.join(
   "national-gdp-annual-1996-2025-validation.json",
 );
 
+const EXPECTED_SOURCE_YEARS: Record<GdpAccountingStandard, [number, number]> = {
+  sna_1993: [1996, 2018],
+  sna_2008: [2010, 2025],
+};
+const EXPECTED_CANONICAL_YEARS = Array.from({ length: 30 }, (_, index) => 1996 + index);
+const EXPECTED_OVERLAP_YEARS = Array.from({ length: 9 }, (_, index) => 2010 + index);
+
 function serializeCsv(headers: string[], rows: Array<Record<string, string | number>>): string {
   return `\uFEFF${[
     headers.join(","),
@@ -126,6 +133,68 @@ function extractSourceFacts(
   return rows;
 }
 
+export function validateNationalGdpSeries(
+  sourceFacts: NationalGdpSourceFact[],
+  canonicalFacts: NationalGdpFact[],
+): number[] {
+  const sourceKeys = new Set<string>();
+  for (const row of sourceFacts) {
+    const key = `${row.accountingStandard}:${row.year}`;
+    if (sourceKeys.has(key)) throw new Error(`Duplicate GDP source year: ${key}`);
+    sourceKeys.add(key);
+  }
+
+  for (const [standard, [yearMin, yearMax]] of Object.entries(EXPECTED_SOURCE_YEARS)) {
+    const years = sourceFacts
+      .filter((row) => row.accountingStandard === standard)
+      .map((row) => row.year);
+    const expected = Array.from({ length: yearMax - yearMin + 1 }, (_, index) => yearMin + index);
+    if (JSON.stringify(years) !== JSON.stringify(expected)) {
+      throw new Error(`${standard} GDP source coverage must be ${yearMin}–${yearMax}`);
+    }
+  }
+
+  const canonicalYears = canonicalFacts.map((row) => row.year);
+  if (JSON.stringify(canonicalYears) !== JSON.stringify(EXPECTED_CANONICAL_YEARS)) {
+    throw new Error("Canonical GDP coverage must contain each year from 1996–2025 exactly once");
+  }
+  for (const row of canonicalFacts) {
+    const expectedStandard = row.year <= 2009 ? "sna_1993" : "sna_2008";
+    if (row.accountingStandard !== expectedStandard) {
+      throw new Error(`Canonical GDP accounting-standard handoff is invalid for ${row.year}`);
+    }
+    const expectedStatus = row.year === 2025 ? "preliminary" : "final_as_published";
+    if (row.status !== expectedStatus) {
+      throw new Error(`Canonical GDP status is invalid for ${row.year}`);
+    }
+  }
+
+  const standardsByYear = new Map<number, Set<GdpAccountingStandard>>();
+  for (const row of sourceFacts) {
+    const standards = standardsByYear.get(row.year) ?? new Set<GdpAccountingStandard>();
+    standards.add(row.accountingStandard);
+    standardsByYear.set(row.year, standards);
+  }
+  const overlapYears = [...standardsByYear.entries()]
+    .filter(([, standards]) => standards.size === 2)
+    .map(([year]) => year)
+    .sort((left, right) => left - right);
+  if (JSON.stringify(overlapYears) !== JSON.stringify(EXPECTED_OVERLAP_YEARS)) {
+    throw new Error("GDP source overlap must cover 2010–2018 exactly");
+  }
+  return overlapYears;
+}
+
+export async function assertGeneratedArtifactMatches(
+  filePath: string,
+  expectedContent: string,
+): Promise<void> {
+  const actualContent = await fs.readFile(filePath, "utf8");
+  if (actualContent !== expectedContent) {
+    throw new Error(`Generated national GDP artifact is stale: ${path.relative(REPO_ROOT, filePath)}`);
+  }
+}
+
 export async function prepareNationalGdp({
   write,
 }: {
@@ -173,6 +242,7 @@ export async function prepareNationalGdp({
       transformation: TRANSFORMATION,
       lastReviewedAt: REVIEWED_AT,
     }));
+  const overlapYears = validateNationalGdpSeries(sourceFacts, canonicalFacts);
 
   const validation: NationalGdpValidationReport = {
     status: "PASS",
@@ -183,48 +253,51 @@ export async function prepareNationalGdp({
     canonicalFactCount: canonicalFacts.length,
     canonicalYearMin: canonicalFacts[0]?.year ?? 0,
     canonicalYearMax: canonicalFacts.at(-1)?.year ?? 0,
-    overlapYears: Array.from({ length: 9 }, (_, index) => 2010 + index),
+    overlapYears,
   };
 
-  if (write) {
-    const stagingRows = sourceFacts.map((row) => ({
-      year: row.year,
-      gdp_current_prices_million_gel: row.gdpCurrentPricesMillionGel.toFixed(1),
-      accounting_standard: row.accountingStandard,
-      status: row.status,
-      source_id: row.sourceId,
-      source_sheet: row.sourceSheet,
-      source_cell: row.sourceCell,
-      source_unit: row.sourceUnit,
-    }));
-    const canonicalRows = canonicalFacts.map((row) => ({
-      year: row.year,
-      gdp_current_prices_million_gel: row.gdpCurrentPricesMillionGel.toFixed(1),
-      gdp_current_prices_gel: row.gdpCurrentPricesGel,
-      valuation: "current_prices",
-      accounting_standard: row.accountingStandard,
-      status: row.status,
-      source_id: row.sourceId,
-      source_sheet: row.sourceSheet,
-      source_cell: row.sourceCell,
-      source_unit: row.sourceUnit,
-      transformation: row.transformation,
-      last_reviewed_at: row.lastReviewedAt,
-    }));
+  const stagingRows = sourceFacts.map((row) => ({
+    year: row.year,
+    gdp_current_prices_million_gel: row.gdpCurrentPricesMillionGel.toFixed(1),
+    accounting_standard: row.accountingStandard,
+    status: row.status,
+    source_id: row.sourceId,
+    source_sheet: row.sourceSheet,
+    source_cell: row.sourceCell,
+    source_unit: row.sourceUnit,
+  }));
+  const canonicalRows = canonicalFacts.map((row) => ({
+    year: row.year,
+    gdp_current_prices_million_gel: row.gdpCurrentPricesMillionGel.toFixed(1),
+    gdp_current_prices_gel: row.gdpCurrentPricesGel,
+    valuation: "market_prices",
+    accounting_standard: row.accountingStandard,
+    status: row.status,
+    source_id: row.sourceId,
+    source_sheet: row.sourceSheet,
+    source_cell: row.sourceCell,
+    source_unit: row.sourceUnit,
+    transformation: row.transformation,
+    last_reviewed_at: row.lastReviewedAt,
+  }));
+  const artifacts = [
+    {
+      filePath: STAGING_PATH,
+      content: serializeCsv(Object.keys(stagingRows[0] ?? {}), stagingRows),
+    },
+    {
+      filePath: CANONICAL_PATH,
+      content: serializeCsv(Object.keys(canonicalRows[0] ?? {}), canonicalRows),
+    },
+    { filePath: REPORT_PATH, content: `${JSON.stringify(validation, null, 2)}\n` },
+  ];
 
-    await Promise.all([
-      fs.writeFile(
-        STAGING_PATH,
-        serializeCsv(Object.keys(stagingRows[0] ?? {}), stagingRows),
-        "utf8",
-      ),
-      fs.writeFile(
-        CANONICAL_PATH,
-        serializeCsv(Object.keys(canonicalRows[0] ?? {}), canonicalRows),
-        "utf8",
-      ),
-      fs.writeFile(REPORT_PATH, `${JSON.stringify(validation, null, 2)}\n`, "utf8"),
-    ]);
+  if (write) {
+    await Promise.all(artifacts.map((artifact) => fs.writeFile(artifact.filePath, artifact.content, "utf8")));
+  } else {
+    await Promise.all(
+      artifacts.map((artifact) => assertGeneratedArtifactMatches(artifact.filePath, artifact.content)),
+    );
   }
 
   return { sourceFacts, canonicalFacts, validation };
