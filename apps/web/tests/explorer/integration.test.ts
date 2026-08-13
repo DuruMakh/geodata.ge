@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loadAdminSpendingFacts } from "../../lib/data/adminSpending/importAdminSpendingFacts";
 import { loadGlossary } from "../../lib/data/glossary";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
+import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
 import { loadSourceDocuments } from "../../lib/data/sources";
 import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_DETAILED_YEARS, REVENUE_TOTAL_ONLY_YEARS, REVENUE_YEARS } from "../../lib/data/coverage";
 import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
@@ -9,6 +10,7 @@ import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
 const REAL_BUDGET_FACTS_PATH = "../../data/imports/budget-facts-2005-2025.csv";
 const REAL_ADMIN_FACTS_PATH = "../../data/imports/admin-spending-facts-2005-2025.csv";
+const REAL_GDP_FACTS_PATH = "../../data/imports/national-gdp-annual-1996-2025.csv";
 
 describe("explorer integration with real CSV data", () => {
   it("loads sample facts and produces the expected year range", async () => {
@@ -195,8 +197,9 @@ describe("explorer integration with real CSV data", () => {
     expect(missingGlossary).toEqual([]);
   });
 
-  it("keeps share-of-total values summing to one across all expenditure categories", async () => {
+  it("calculates real expenditure values against same-year nominal GDP", async () => {
     const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
+    const gdpFacts = await loadNationalGdpFacts(REAL_GDP_FACTS_PATH);
     const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
     const sourceDocuments = await loadSourceDocuments("../../data/sources/source-documents.csv");
     const allItemIds = [
@@ -205,27 +208,27 @@ describe("explorer integration with real CSV data", () => {
 
     const model = buildExplorerModel({
       facts,
+      gdpFacts,
       glossary,
       sourceDocuments,
       side: "expenditure",
       selectedItemIds: allItemIds,
       startYear: EXPENDITURE_DETAILED_YEARS[0],
       endYear: EXPENDITURE_DETAILED_YEARS[EXPENDITURE_DETAILED_YEARS.length - 1],
-      measure: "share_of_total",
+      measure: "share_of_gdp",
     });
 
     expect(model.points.length).toBeGreaterThan(allItemIds.length);
     expect(model.points.every((point) => point.value === null || (point.value >= 0 && point.value <= 1))).toBe(true);
 
-    for (const year of model.years) {
-      const values = model.points
-        .filter((point) => point.year === year)
-        .map((point) => point.value)
-        .filter((value): value is number => value !== null);
-
-      expect(values.length).toBeGreaterThan(1);
-      expect(values.reduce((sum, value) => sum + value, 0)).toBeCloseTo(1, 8);
+    const gdpByYear = new Map(gdpFacts.map((fact) => [fact.year, fact.gdpCurrentPricesGel]));
+    for (const point of model.points) {
+      expect(point.value).toBeCloseTo(point.amountGel / (gdpByYear.get(point.year) ?? 1), 12);
     }
+    expect(model.totalRow?.shareEndYear).toBeCloseTo(
+      27_723_319_039 / 104_598_100_000,
+      12,
+    );
   });
 
   it("builds a ministry expenditure model from real admin spending facts", async () => {

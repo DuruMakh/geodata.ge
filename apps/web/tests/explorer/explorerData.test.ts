@@ -4,6 +4,7 @@ import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/ad
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type { SourceDocumentRow } from "../../lib/data/sources";
+import type { ServedNationalGdpFact } from "../../lib/servedRows";
 
 const glossary = new Map<string, GlossaryEntry>([
   ["spending.health", { id: "spending.health", kaLabel: "ჯანმრთელობა", enLabel: "Health", description: "", notes: "" }],
@@ -34,6 +35,29 @@ const sourceDocuments: SourceDocumentRow[] = [
     sourceName: "Reviewed 2025 planned budget scenario",
     sourceUrlOrFile: "docs/source-2025-plan",
     lastReviewedAt: "2026-05-11",
+  },
+  {
+    sourceId: "source.gdp",
+    sourceName: "Reviewed nominal GDP",
+    sourceUrlOrFile: "docs/gdp.xlsx",
+    lastReviewedAt: "2026-08-13",
+  },
+];
+
+const gdpFacts: ServedNationalGdpFact[] = [
+  {
+    year: 2024,
+    gdpCurrentPricesGel: 1_000,
+    accountingStandard: "sna_2008",
+    status: "final_as_published",
+    sourceId: "source.gdp",
+  },
+  {
+    year: 2025,
+    gdpCurrentPricesGel: 2_000,
+    accountingStandard: "sna_2008",
+    status: "preliminary",
+    sourceId: "source.gdp",
   },
 ];
 
@@ -279,7 +303,8 @@ describe("main explorer data model", () => {
       ],
       startYear: 2025,
       endYear: 2025,
-      measure: "share_of_total",
+      measure: "share_of_gdp",
+      gdpFacts,
     });
 
     expect(model.items.map((item) => item.id)).toEqual([
@@ -306,8 +331,8 @@ describe("main explorer data model", () => {
     );
     expect(model.items.some((item) => item.id.startsWith("spending."))).toBe(false);
     expect(model.totalRow?.valuesByYear[2025]).toBe(1000);
-    expect(model.points.find((point) => point.itemId === "admin_spending.health_social_affairs")?.value).toBe(0.6);
-    expect(model.points.find((point) => point.itemId === "admin_program.education.general")?.value).toBe(0.25);
+    expect(model.points.find((point) => point.itemId === "admin_spending.health_social_affairs")?.value).toBe(0.3);
+    expect(model.points.find((point) => point.itemId === "admin_program.education.general")?.value).toBe(0.125);
   });
 
   it("labels a program series by its most recent official name, not by an earlier joined point's", () => {
@@ -340,7 +365,8 @@ describe("main explorer data model", () => {
       selectedItemIds: ["admin_spending.total", "admin_program.education.general"],
       startYear: 2025,
       endYear: 2025,
-      measure: "share_of_total",
+      measure: "share_of_gdp",
+      gdpFacts,
     });
 
     expect(model.items.find((item) => item.id === "admin_program.education.general")).toEqual(
@@ -348,7 +374,7 @@ describe("main explorer data model", () => {
     );
   });
 
-  it("treats the biggest share-of-total change as the largest movement in either direction", () => {
+  it("treats the biggest share-of-GDP change as the largest movement in either direction", () => {
     const localFacts: BudgetFactImportRow[] = [
       { ...facts[0], itemId: "spending.health", amountGel: 900 },
       { ...facts[1], itemId: "spending.health", amountGel: 100 },
@@ -367,12 +393,13 @@ describe("main explorer data model", () => {
       startYear: 2024,
       endYear: 2025,
       measure: "nominal",
+      gdpFacts,
     });
 
     expect(model.summary.biggestShareChange?.itemId).toBe("spending.health");
   });
 
-  it("calculates share of total and per-point percent change", () => {
+  it("calculates share of GDP and keeps per-point nominal percent change", () => {
     const shareModel = buildExplorerModel({
       facts,
       glossary,
@@ -381,12 +408,78 @@ describe("main explorer data model", () => {
       selectedItemIds: ["spending.health"],
       startYear: 2024,
       endYear: 2025,
-      measure: "share_of_total",
+      measure: "share_of_gdp",
+      gdpFacts,
     });
 
     expect(shareModel.points[0]?.percentChange).toBeNull();
     expect(shareModel.points[1]?.percentChange).toBe(0.5);
-    expect(shareModel.points[1]?.value).toBeCloseTo(0.3333, 4);
+    expect(shareModel.points[1]?.value).toBeCloseTo(0.075, 4);
+  });
+
+  it("uses same-year GDP for detail and total rows regardless of selection", () => {
+    const localFacts: BudgetFactImportRow[] = [
+      { ...facts[1], itemId: "spending.health", amountGel: 250 },
+      { ...facts[3], itemId: "spending.education", amountGel: 500 },
+    ];
+    const build = (selectedItemIds: string[]) =>
+      buildExplorerModel({
+        facts: localFacts,
+        gdpFacts,
+        glossary,
+        sourceDocuments,
+        side: "expenditure",
+        selectedItemIds,
+        startYear: 2025,
+        endYear: 2025,
+        measure: "share_of_gdp",
+      });
+
+    const one = build(["expenditure.total", "spending.health"]);
+    const many = build(["expenditure.total", "spending.health", "spending.education"]);
+
+    expect(one.points.find((point) => point.itemId === "spending.health")?.value).toBe(0.125);
+    expect(many.points.find((point) => point.itemId === "spending.health")?.value).toBe(0.125);
+    expect(one.totalRow?.shareEndYear).toBe(0.375);
+    expect(one.totalRow?.shareEndYear).not.toBe(1);
+    expect(one.gdpByYear[2025]).toMatchObject({
+      gdpCurrentPricesGel: 2_000,
+      status: "preliminary",
+      source: { sourceName: "Reviewed nominal GDP" },
+    });
+  });
+
+  it("returns null when the same-year GDP denominator is missing", () => {
+    const model = buildExplorerModel({
+      facts,
+      gdpFacts: gdpFacts.filter((row) => row.year !== 2025),
+      glossary,
+      sourceDocuments,
+      side: "expenditure",
+      selectedItemIds: ["spending.health"],
+      startYear: 2024,
+      endYear: 2025,
+      measure: "share_of_gdp",
+    });
+
+    expect(model.points.find((point) => point.year === 2025)?.value).toBeNull();
+    expect(model.tableRows[0]?.shareByYear?.[2025]).toBeNull();
+  });
+
+  it("preserves negative revenue corrections as negative GDP shares", () => {
+    const model = buildExplorerModel({
+      facts: [{ ...facts[4], amountGel: -20 }],
+      gdpFacts,
+      glossary,
+      sourceDocuments,
+      side: "revenue",
+      selectedItemIds: ["revenue.vat"],
+      startYear: 2025,
+      endYear: 2025,
+      measure: "share_of_gdp",
+    });
+
+    expect(model.points[0]?.value).toBe(-0.01);
   });
   it("uses explicit total facts for totals-only years without exposing fake categories", () => {
     const localFacts: BudgetFactImportRow[] = [

@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ExpenditurePage() {
-  const { facts, glossary, sourceDocuments, adminFacts, adminCategories } = await loadServedExplorerData();
+  const { facts, glossary, sourceDocuments, adminFacts, adminCategories, gdpFacts } = await loadServedExplorerData();
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
 
   return (
@@ -42,6 +42,7 @@ export default async function ExpenditurePage() {
       adminCategories={adminCategories}
       glossaryEntries={Array.from(glossary.values())}
       sourceDocuments={sourceDocuments}
+      gdpFacts={gdpFacts}
       lastUpdatedAt={lastUpdatedAt}
     />
   );

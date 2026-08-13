@@ -119,7 +119,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       unit: "",
       color: "var(--ink)",
       detail: largestShare ? `${truncate(largestShare.kaLabel, 40)}, ${endYear}` : MISSING,
-      spark: largestShare ? { values: buildKpiShareSeries(largestShare, totalRow, years), color: ACCENT } : null,
+      spark: largestShare ? { values: buildKpiShareSeries(largestShare, years), color: ACCENT } : null,
     },
   ];
 
