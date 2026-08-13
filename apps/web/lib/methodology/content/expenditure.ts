@@ -120,7 +120,7 @@ export const EXPENDITURE_METHODOLOGY_CONTENT: MethodologyContent = {
     "docs/data-methodology/ministries-expenditure-methodology.md",
     "docs/data-methodology/ministries-drilldown-programs-methodology.md",
   ],
-  disclosureKa: "წლიური თანხები და გადასახდელების ჯამები ოფიციალური წყაროებიდან მოდის. საჯარო სფეროები, ისტორიული უწყებების გაერთიანება და პროგრამების უწყვეტობა GeoData-ის განხილული კლასიფიკაციაა.",
+  disclosureKa: "წლიური თანხები და გადასახდელების ჯამები ოფიციალური წყაროებიდან მოდის. საჯარო სფეროები, ისტორიული უწყებების გაერთიანება და პროგრამების უწყვეტობა GeoData-ის განხილული კლასიფიკაციაა. მრავალწლიანი გრაფიკის წილი ითვლება საქსტატის იმავე წლის ნომინალურ მშპ-სთან, მიმდინარე ფასებში.",
   keyFacts: [
     { labelKa: "პერიოდი", valueKind: "coverage" },
     { labelKa: "სიხშირე", valueKind: "frequency", valueKa: "წლიური" },

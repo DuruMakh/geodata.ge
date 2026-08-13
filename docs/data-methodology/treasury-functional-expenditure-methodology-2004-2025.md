@@ -422,3 +422,7 @@ and mapping code, the regression pins, and the pre-landing grounding review. To 
 Word or PDF for external distribution: `pandoc treasury-functional-expenditure-methodology-2004-2025.md -o methodology.docx`.
 
 Changelog 2026-07-13: published facts CSVs renamed `expenditure-facts-2004-2025.csv` / `budget-facts-2004-2025.csv` → `*-2005-2025.csv` — the files ship 2005–2025 rows only (2004 was deliberately removed), so the filenames now match actual coverage. Data content unchanged.
+
+## 14. National GDP denominator
+
+The multi-year explorer's `% მშპ-ში` measure divides each expenditure amount—including fields, ministries, programs, and the derived total—by Geostat's same-year nominal GDP at current prices. It is independent of selected series, and missing GDP is not estimated. The SNA 1993/SNA 2008 handoff, preliminary status, preserved workbooks, hashes, preparation commands, and export columns are documented in `national-nominal-gdp.md`. This denominator does not change the single-year expenditure composition view.

@@ -99,6 +99,19 @@ describe("methodology catalog", () => {
     ]);
   });
 
+  it("discloses the nominal-GDP denominator without opening a GDP methodology route", () => {
+    for (const dataset of ["expenditure", "revenue"] as const) {
+      expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("მშპ");
+      expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("მიმდინარე ფასებში");
+    }
+
+    expect(FUTURE_METHODOLOGY_DATASETS.find((entry) => entry.titleKa === "მშპ")).toEqual({
+      titleKa: "მშპ",
+      href: null,
+      state: "future",
+    });
+  });
+
   it("retains the complete SHA-256 coverage of the published revenue originals in methodology provenance", async () => {
     const manifest = await loadReviewedSourceManifest(repositoryRoot, "revenue");
     const disclosure = [

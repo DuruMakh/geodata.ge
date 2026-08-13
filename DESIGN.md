@@ -309,7 +309,7 @@ spacing:
 
 ### 6.6 Shape and Elevation Policy
 
-- Border radius: **0–3px everywhere** (buttons 2px, tooltip 3px). Exception: the `% წილი` measure pill and slider handles/ticks use `999px`.
+- Border radius: **0–3px everywhere** (buttons 2px, tooltip 3px). Exception: the national `% მშპ-ში` measure pill, the municipal `% წილი` measure pill, and slider handles/ticks use `999px`.
 - Shadows: only the chart tooltip (`0 4px 16px rgba(30,27,22,0.10)`) and slider handles (`0 1px 3px rgba(30,27,22,0.15)`). Nothing else casts a shadow.
 - Swatches are **14×3px bars**, never dots or rounded squares.
 - **Exception: budget hub cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow). Four peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
@@ -381,9 +381,9 @@ A boxed either/or switch is the honest affordance for choosing which view of the
 
 Text-only, sans 12.5px; active = ink 600 with `text-decoration: underline`, 2px thickness, accent color, `text-underline-offset: 4px`. No backgrounds. In the **explorer**, the grouping tabs (`სფეროები / სამინისტროები`, expenditure multi-year only) live in the series aside, directly under the `სერიები` header row (gap 18px, 12px padding-bottom, 1px `row-border` bottom rule). In the **analysis view**, the side tabs (`ხარჯები / შემოსავლები`) and grouping tabs use this same style, separated by a 1px×13px `control` vertical divider.
 
-### 7.3 Measure Pill (% წილი)
+### 7.3 Measure Pill (% მშპ-ში)
 
-Height 27px, pill radius, 1px `control` border, transparent bg, muted text. Active: ink bg, paper text, ink border, `aria-pressed`. This is the only pill in the system. Share = share of the side's total; there is no GDP measure.
+Height 27px, pill radius, 1px `control` border, transparent bg, muted text. Active: ink bg, paper text, ink border, `aria-pressed`. This is the only pill in the national multi-year explorer. Active `% მშპ-ში` divides every national revenue or expenditure amount, including the derived total, by Geostat's same-year nominal GDP at current prices. The denominator is independent of series selection. Missing same-year GDP renders a gap. Municipal explorers retain their `% წილი` pill as share of the municipality or region budget total, and single-year analysis retains composition shares. There is no separate GDP explorer page.
 
 ### 7.4 Range Quick Chips (1წ / 5წ / 10წ / ყველა)
 
@@ -444,7 +444,7 @@ No card: overline label, serif value, muted detail line. Two variants: analysis 
 |-----|----------------|-------|
 | `ყველაზე დიდი ზრდა` | that row's values across the selected period | its category color |
 | `ყველაზე ნელი ზრდა` | that row's values across the selected period | its category color |
-| `ყველაზე დიდი წილი` | that row's **share of the year total** | `accent` |
+| `ყველაზე დიდი წილი მშპ-ში` | that row's **share of same-year nominal GDP** | `accent` |
 
 The third is deliberately a different metric: the KPI states a percentage, so the sparkline traces that percentage — which is also why it reads jagged next to two smooth level lines. Years where either side is null, or the total is zero, produce a null point. The hero KPI (§7.12) keeps its gauge and gets no sparkline. The same component draws the hub graphics at 200×34 (§6.7).
 
@@ -500,11 +500,11 @@ Data-reality rules (the prototype's snapshot had none of these; production data 
 
 ### 8.4 Table Mode
 
-Columns: `<first col> | years… | ცვლილება | წილი <end-year>`. First column header by scope: `სფერო` (fields), `უწყება` (ministries), `საბიუჯეტო მუხლი` (revenue). Header: overline style, `2px ink` bottom rule. Rows: 1px `hairline-soft` borders, tint hover; swatch bar + sans label left; numerals mono right-aligned; latest-year column weight 600; change colored positive/negative (minus sign `−`). When selected, the dataset total row uses its exact scope label (`მთლიანი ხარჯი`, `მთლიანი შემოსავლები`, or `მთლიანი ბიუჯეტი`) with a `2px ink` top rule, weight 600, and share `100.0%`; it is absent when deselected. Horizontal scroll with sticky first column and sticky right change/share columns (paper bg, 1px `hairline-soft` edge shadows).
+National columns: `<first col> | years… | ცვლილება | წილი მშპ-ში <end-year>`. First column header by scope: `სფერო` (fields), `უწყება` (ministries), `საბიუჯეტო მუხლი` (revenue). Header: overline style, `2px ink` bottom rule. Rows: 1px `hairline-soft` borders, tint hover; swatch bar + sans label left; numerals mono right-aligned; latest-year column weight 600; change colored positive/negative (minus sign `−`). When selected, the national dataset total row uses its exact scope label (`მთლიანი ხარჯი` or `მთლიანი შემოსავლები`) with a `2px ink` top rule, weight 600, and its calculated GDP share rather than `100.0%`; it is absent when deselected. Municipal tables retain `წილი <end-year>` and the selected `მთლიანი ბიუჯეტი` row at `100.0%`. Horizontal scroll with sticky first column and sticky right change/share columns (paper bg, 1px `hairline-soft` edge shadows).
 
 ### 8.5 Below-Chart Sections (`ძირითადი ინდიკატორები`, order fixed)
 
-1. Hero KPI (`პერიოდის ცვლილება`, §7.12) + three side KPIs (`ყველაზე დიდი ზრდა`, `ყველაზე ნელი ზრდა`, `ყველაზე დიდი წილი`) in a `1.35fr | 1fr` grid split by a hairline. Side KPIs rank **all top-level scope items** — the same population as the movers board, so the identical headings can never contradict each other on one screen. The `ყველაზე დიდი ზრდა` GEL delta requires a positive start value (a delta measured against a negative base is a correction unwind, not growth).
+1. Hero KPI (`პერიოდის ცვლილება`, §7.12) + three side KPIs (`ყველაზე დიდი ზრდა`, `ყველაზე ნელი ზრდა`, `ყველაზე დიდი წილი მშპ-ში`) in a `1.35fr | 1fr` grid split by a hairline. Side KPIs rank **all top-level scope items** — the same population as the movers board, so the identical headings can never contradict each other on one screen. The `ყველაზე დიდი ზრდა` GEL delta requires a positive start value (a delta measured against a negative base is a correction unwind, not growth).
 2. Movers board (top 3 / bottom 3 across all scope items).
 3. `პერიოდის შედარება` — table `<first col> | start year | ცვლილება | end year`, with the exact-labeled total row first only when it is selected, fixed layout with 44% label column. This table (only) is scoped to the user's selected series.
 
@@ -562,7 +562,7 @@ No separate revenue direction. Same shell, tokens, controls, chart/table treatme
 
 Voice: precise, civic, archival. Georgian is primary; English only for compact technical labels (`CSV`).
 
-Canonical terms: `ხარჯები`, `შემოსავლები`, `ანალიზი`, `სერიები`, `ხაზი`, `ცხრილი`, `სფეროები`, `უწყებები`, `% წილი`, `დიაპაზონი`, `მთლიანი ხარჯი`, `მთლიანი შემოსავლები`, `მთლიანი ბიუჯეტი`, `სულ` (single-year analysis), `ძირითადი ინდიკატორები`, `პერიოდის ცვლილება`, `ყველაზე მზარდი`, `ყველაზე ნელი ზრდა`, `პერიოდის შედარება`, `სტრუქტურა სფეროების მიხედვით`, `ყოველი 100 ლარი`, `ბიუჯეტის რადარი`, `ბიუჯეტის ველი`, `სრული რეიტინგი`, `CSV ჩამოტვირთვა`, `გეგმა`.
+Canonical terms: `ხარჯები`, `შემოსავლები`, `ანალიზი`, `სერიები`, `ხაზი`, `ცხრილი`, `სფეროები`, `უწყებები`, `% მშპ-ში` (national multi-year), `% წილი` (municipal), `დიაპაზონი`, `მთლიანი ხარჯი`, `მთლიანი შემოსავლები`, `მთლიანი ბიუჯეტი`, `სულ` (single-year analysis), `ძირითადი ინდიკატორები`, `პერიოდის ცვლილება`, `ყველაზე მზარდი`, `ყველაზე ნელი ზრდა`, `პერიოდის შედარება`, `სტრუქტურა სფეროების მიხედვით`, `ყოველი 100 ლარი`, `ბიუჯეტის რადარი`, `ბიუჯეტის ველი`, `სრული რეიტინგი`, `CSV ჩამოტვირთვა`, `გეგმა`.
 
 Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US` grouping, fixed decimals (bn: 2, mln: 1, %: 1). Amounts ≥ ~1bn display in `მლრდ ₾`, below in `მლნ ₾`. Negative sign is `−` (minus, not hyphen) in deltas.
 
@@ -658,7 +658,7 @@ Do:
 - Structure pages with the rule hierarchy; keep content directly on paper.
 - Set every data numeral in Geist Mono; every display value in Noto Serif Georgian.
 - Keep category colors stable across all surfaces via §4.2 tokens.
-- Keep the single measure toggle (`% წილი`) as the only pill.
+- Keep the single measure toggle (`% მშპ-ში` nationally; `% წილი` municipally) as the only pill.
 - Keep the analysis sections in the fixed order of §9.
 - Reuse the identical system for revenue.
 - Keep the CSV button visible and bound to active filters.
@@ -672,7 +672,7 @@ Do not:
 - No blue `#0071e3` or any v3.x Apple token; no night theme or theme toggle.
 - No dots/rounded-square swatches — bars only.
 - No bar/stacked chart modes; only `ხაზი` and `ცხრილი`.
-- No GDP-share measure; `% წილი` is share of the side total.
+- National `% მშპ-ში` is share of same-year nominal GDP; municipal `% წილი` and single-year composition remain shares of their applicable budget total.
 - No official program codes in the series panel (names only).
 - No emoji, no decorative icons; the system is typographic (caret `▸/▾` and checkmark `✓` glyphs are part of the control language).
 - No drilldown anywhere.
@@ -683,7 +683,7 @@ Do not:
 2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), not in-page nav tabs.
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
 4. Explorer default: line mode, nominal GEL, full range, total-only selection, and unrestricted line rendering.
-5. Only `ხაზი` and `ცხრილი` modes exist; `% წილი` is the only pill.
+5. Only `ხაზი` and `ცხრილი` modes exist; the national `% მშპ-ში` measure is the only pill on national multi-year routes.
 6. Swatches are 14×3px bars everywhere.
 7. Category colors match §4.2 on every surface.
 8. Analysis order: controls → year selector → 4 headlines → structure → 100 GEL → radar → field → ranking → source.

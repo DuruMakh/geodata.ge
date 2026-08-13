@@ -45,7 +45,7 @@ export const REVENUE_METHODOLOGY_CONTENT: MethodologyContent = {
   reviewedAt: "2026-08-11",
   archiveManifestId: "revenue",
   canonicalDocuments: ["docs/data-methodology/revenue-methodology.md"],
-  disclosureKa: "11 საჯარო კატეგორია ოფიციალური საბიუჯეტო კლასიფიკაციის ზედა დონის ხაზებს ეფუძნება. GeoData-ის გარდაქმნა მხოლოდ კოდური ეპოქების შეჯერებას, შიდა ნაკადების გამორიცხვასა და დოკუმენტირებულ გაერთიანებებს მოიცავს.",
+  disclosureKa: "11 საჯარო კატეგორია ოფიციალური საბიუჯეტო კლასიფიკაციის ზედა დონის ხაზებს ეფუძნება. GeoData-ის გარდაქმნა მხოლოდ კოდური ეპოქების შეჯერებას, შიდა ნაკადების გამორიცხვასა და დოკუმენტირებულ გაერთიანებებს მოიცავს. მრავალწლიანი გრაფიკის წილი ითვლება საქსტატის იმავე წლის ნომინალურ მშპ-სთან, მიმდინარე ფასებში.",
   keyFacts: [
     { labelKa: "პერიოდი", valueKind: "coverage" },
     { labelKa: "სიხშირე", valueKind: "frequency", valueKa: "წლიური" },
