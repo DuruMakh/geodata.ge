@@ -7,6 +7,7 @@ import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
 import { buildImportReport } from "../lib/data/importReport";
 import { loadSpendingMappings } from "../lib/data/mappings";
+import { loadNationalGdpFacts } from "../lib/data/nationalGdp/importNationalGdp";
 import { checkMunicipalityGeometryOutputs } from "../lib/data/municipalGeometry/prepareMunicipalGeometry";
 import {
   loadMunicipalityGeometrySources,
@@ -58,6 +59,7 @@ async function main() {
   const revenueRows = await loadBudgetFactRows("../../data/imports/revenue-facts-2005-2025.csv");
   const facts = await loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts);
   const adminSpendingFacts = await loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts);
+  const nationalGdpFacts = await loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts);
   const municipalFunctions = await loadMunicipalFunctionsFile(SERVED_DATA_FILES.municipalFunctions);
   const municipalRegions = await loadMunicipalRegionsFile(SERVED_DATA_FILES.municipalRegions);
   const municipalities = await loadMunicipalitiesFile(SERVED_DATA_FILES.municipalities);
@@ -73,6 +75,16 @@ async function main() {
         .filter((sourceId) => !registeredSourceIds.has(sourceId)),
     ),
   ).sort();
+  const unresolvedGdpSourceIds = Array.from(
+    new Set(
+      nationalGdpFacts
+        .map((fact) => fact.sourceId)
+        .filter((sourceId) => !registeredSourceIds.has(sourceId)),
+    ),
+  ).sort();
+  const gdpYears = new Set(nationalGdpFacts.map((fact) => fact.year));
+  const nationalBudgetYears = sortedYears(facts.map((fact) => fact.year));
+  const missingGdpYears = nationalBudgetYears.filter((year) => !gdpYears.has(year));
 
   assertYears("Expenditure", sortedYears(expenditureRows.map((row) => row.year)), EXPENDITURE_YEARS);
   assertYears("Revenue", sortedYears(revenueRows.map((row) => row.year)), REVENUE_YEARS);
@@ -170,6 +182,12 @@ async function main() {
       `Admin spending facts reference unknown source documents: ${unresolvedAdminSpendingSourceIds.join(", ")}`,
     );
   }
+  if (unresolvedGdpSourceIds.length > 0) {
+    throw new Error(`GDP facts reference unknown source documents: ${unresolvedGdpSourceIds.join(", ")}`);
+  }
+  if (missingGdpYears.length > 0) {
+    throw new Error(`National budget years missing a GDP denominator: ${missingGdpYears.join(", ")}`);
+  }
 
   if (!composedFactsMatchSideFiles(expenditureRows, revenueRows, facts)) {
     throw new Error("Combined budget facts are stale. Run npm run data:compose-budget-facts.");
@@ -192,6 +210,7 @@ async function main() {
   console.log(`Validated mapping rows: ${mappings.length}`);
   console.log(`Validated fact rows: ${facts.length}`);
   console.log(`Validated admin spending fact rows: ${adminSpendingFacts.length}`);
+  console.log(`Validated national GDP fact rows: ${nationalGdpFacts.length}`);
   console.log(`Report written: ${reportPath}`);
 }
 

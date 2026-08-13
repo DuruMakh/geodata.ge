@@ -60,6 +60,7 @@ describe("csv served data", () => {
 
     expect(explorer.adminFacts.length).toBeGreaterThan(0);
     expect(explorer.adminCategories.length).toBeGreaterThan(0);
+    expect(explorer.gdpFacts).toHaveLength(30);
     for (const category of explorer.adminCategories) {
       expect(category.id).toMatch(/^admin_spending\./);
     }
@@ -91,6 +92,13 @@ describe("csv served data", () => {
       "officialLabelKa",
       "parentItemId",
       "sourceId",
+      "year",
+    ]);
+    expect(Object.keys(explorer.gdpFacts[0]).sort()).toEqual([
+      "accountingStandard",
+      "gdpCurrentPricesGel",
+      "sourceId",
+      "status",
       "year",
     ]);
   });

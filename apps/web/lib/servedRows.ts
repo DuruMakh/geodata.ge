@@ -41,3 +41,11 @@ export type ServedAdminFact = {
   officialLabelKa: string | null;
   officialInstitutionLabelKa: string | null;
 };
+
+export type ServedNationalGdpFact = {
+  year: number;
+  gdpCurrentPricesGel: number;
+  accountingStandard: "sna_1993" | "sna_2008";
+  status: "final_as_published" | "preliminary";
+  sourceId: string;
+};

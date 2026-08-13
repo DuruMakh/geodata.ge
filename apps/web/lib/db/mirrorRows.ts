@@ -5,6 +5,7 @@ import type {
 } from "../data/adminSpending/types";
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
+import type { NationalGdpFact } from "../data/nationalGdp/types";
 import type {
   Municipality,
   MunicipalFunction,
@@ -138,6 +139,26 @@ export async function loadAdminCategoriesFromMirror(
     kaLabel: category.kaLabel,
     enLabel: category.enLabel,
     sortOrder: category.sortOrder,
+  }));
+}
+
+export async function loadNationalGdpFactsFromMirror(
+  db: MirrorClient,
+): Promise<NationalGdpFact[]> {
+  const rows = await db.nationalGdpFact.findMany({ orderBy: { year: "asc" } });
+
+  return rows.map((row) => ({
+    year: row.year,
+    gdpCurrentPricesGel: Number(row.gdpCurrentPricesGel),
+    gdpCurrentPricesMillionGel: Number(row.gdpCurrentPricesGel) / 1_000_000,
+    accountingStandard: row.accountingStandard,
+    status: row.status,
+    sourceId: row.sourceDocumentId,
+    sourceSheet: row.sourceSheet,
+    sourceCell: row.sourceCell,
+    sourceUnit: row.sourceUnit as "mil. GEL",
+    transformation: row.transformation,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
   }));
 }
 

@@ -94,4 +94,5 @@ source.mof_2024_programmatic_fact_actual,Reviewed official 2024 programmatic exp
 source.mof_2025_programmatic_fact_actual,Reviewed official 2025 programmatic expenditure workbook,docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2025-fact.xlsx,2026-06-28
 source.municipal_portal_archive,Archived Municipalities Analytical Portal open-data exports (2015-2019 functional actuals),docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022/functionals/functionals.csv,2026-07-26
 source.municipal_mof_annual_and_history_workbooks,MoF annual functional-classification workbooks (2020-2025) and municipality budget-history workbooks (2016-2025 total payments),docs/Raw Data/Municipalities/mof-functional-classification + docs/Raw Data/Municipalities/mof-municipality-budget-history-2016-2025,2026-07-26
-
+source.geostat_national_gdp_sna_1993,"Geostat GDP at current prices, SNA 1993",docs/Raw Data/GDP/national-nominal-gdp/official/GDP-at-current-prices.xlsx,2026-08-13
+source.geostat_national_gdp_sna_2008,"Geostat GDP at current prices, SNA 2008",docs/Raw Data/GDP/national-nominal-gdp/official/03_GDP-at-Current-Prices.xlsx,2026-08-13

@@ -17,6 +17,10 @@ export function adminFactParityKey(row: { year: number; itemId: string }): strin
   return [row.year, row.itemId].join(":");
 }
 
+export function nationalGdpFactParityKey(row: { year: number }): string {
+  return String(row.year);
+}
+
 export function municipalFunctionFactParityKey(row: {
   year: number;
   municipalityCode: string;

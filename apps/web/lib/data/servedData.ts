@@ -3,14 +3,21 @@ import { loadAdminSpendingCategoriesFile } from "./adminSpending/categoriesFile"
 import { loadAdminSpendingFacts } from "./adminSpending/importAdminSpendingFacts";
 import { loadGlossary, type GlossaryEntry } from "./glossary";
 import { loadBudgetFactRows, type BudgetFactImportRow } from "./importBudgetFacts";
+import { loadNationalGdpFacts } from "./nationalGdp/importNationalGdp";
+import type { NationalGdpFact } from "./nationalGdp/types";
 import { loadSourceDocuments, type SourceDocumentRow } from "./sources";
-import type { ServedAdminFact, ServedBudgetFact } from "../servedRows";
+import type {
+  ServedAdminFact,
+  ServedBudgetFact,
+  ServedNationalGdpFact,
+} from "../servedRows";
 import {
   adminFactParityKey,
   assertSameServedRows,
   budgetFactParityKey,
   municipalFunctionFactParityKey,
   municipalTotalFactParityKey,
+  nationalGdpFactParityKey,
 } from "./servedDataParity";
 import type {
   Municipality,
@@ -43,6 +50,7 @@ export const SERVED_DATA_FILES = {
   municipalities: "../../data/imports/municipalities.csv",
   municipalFunctionFacts: "../../data/imports/municipal-function-facts-2015-2025.csv",
   municipalTotalFacts: "../../data/imports/municipal-total-facts-2015-2025.csv",
+  gdpFacts: "../../data/imports/national-gdp-annual-1996-2025.csv",
 } as const;
 
 // Single switch for where the site reads its data while pages are built.
@@ -63,6 +71,7 @@ export type LoadedLandingData = {
 export type LoadedExplorerData = LoadedLandingData & {
   adminFacts: AdminSpendingFact[];
   adminCategories: AdminSpendingCategory[];
+  gdpFacts: NationalGdpFact[];
 };
 
 // What callers get: the same data with the ingestion-only columns projected
@@ -76,6 +85,7 @@ export type LandingData = {
 export type ExplorerData = LandingData & {
   adminFacts: ServedAdminFact[];
   adminCategories: AdminSpendingCategory[];
+  gdpFacts: ServedNationalGdpFact[];
 };
 
 // Municipal data is its own load, not part of ExplorerData: only the
@@ -148,6 +158,16 @@ function toServedAdminFact(fact: AdminSpendingFact): ServedAdminFact {
   };
 }
 
+function toServedNationalGdpFact(fact: NationalGdpFact): ServedNationalGdpFact {
+  return {
+    year: fact.year,
+    gdpCurrentPricesGel: fact.gdpCurrentPricesGel,
+    accountingStandard: fact.accountingStandard,
+    status: fact.status,
+    sourceId: fact.sourceId,
+  };
+}
+
 async function loadLandingDataFromCsv(): Promise<LoadedLandingData> {
   const [facts, glossary, sourceDocuments] = await Promise.all([
     loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts),
@@ -159,13 +179,19 @@ async function loadLandingDataFromCsv(): Promise<LoadedLandingData> {
 }
 
 async function loadExplorerDataFromCsv(): Promise<LoadedExplorerData> {
-  const [landing, adminFacts, adminCategories] = await Promise.all([
+  const [landing, adminFacts, adminCategories, gdpFacts] = await Promise.all([
     loadLandingDataFromCsv(),
     loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts),
     loadAdminSpendingCategoriesFile(SERVED_DATA_FILES.adminSpendingCategories),
+    loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
   ]);
 
-  return { ...landing, adminFacts: byYearAscending(adminFacts), adminCategories };
+  return {
+    ...landing,
+    adminFacts: byYearAscending(adminFacts),
+    adminCategories,
+    gdpFacts: byYearAscending(gdpFacts),
+  };
 }
 
 async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
@@ -220,6 +246,12 @@ async function loadServedExplorerDataUncached(): Promise<LoadedExplorerData> {
     assertLandingParity(db, csv);
     assertSameServedRows("admin spending facts", csv.adminFacts, db.adminFacts, adminFactParityKey);
     assertSameServedRows("admin spending categories", csv.adminCategories, db.adminCategories, (row) => row.id);
+    assertSameServedRows(
+      "national GDP facts",
+      csv.gdpFacts,
+      db.gdpFacts,
+      nationalGdpFactParityKey,
+    );
     return db;
   }
 
@@ -308,6 +340,7 @@ export function loadServedExplorerData(): Promise<ExplorerData> {
     ...loaded,
     facts: loaded.facts.map(toServedBudgetFact),
     adminFacts: loaded.adminFacts.map(toServedAdminFact),
+    gdpFacts: loaded.gdpFacts.map(toServedNationalGdpFact),
   }));
   // Later landing callers in this process reuse the superset.
   landingDataPromise ??= explorerDataPromise;
