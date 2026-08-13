@@ -114,7 +114,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       spark: slowest ? { values: seriesValues(slowest) ?? [], color: slowest.color } : null,
     },
     {
-      label: "ყველაზე დიდი წილი",
+      label: "ყველაზე დიდი წილი მშპ-ში",
       value: largestShare ? formatShare(largestShare.shareEndYear) : MISSING,
       unit: "",
       color: "var(--ink)",

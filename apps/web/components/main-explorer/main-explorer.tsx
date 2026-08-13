@@ -202,7 +202,7 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
     .join(" · ");
 
   function downloadCsv() {
-    const csv = buildExplorerCsv(model.tableRows, model.years);
+    const csv = buildExplorerCsv(model.tableRows, model.years, model.gdpByYear);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");

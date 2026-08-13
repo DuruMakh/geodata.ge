@@ -80,8 +80,6 @@ export function ExplorerView({
   onDownloadCsv,
 }: ExplorerViewProps) {
   const noSelection = selectedIds.length === 0;
-  const sideWord = scope === "revenue" ? "შემოსავლებიდან" : "ხარჯებიდან";
-
   const series: ChartSeries[] = model.selectedItems.map((item) => {
     const pointsByYear = new Map(model.points.filter((point) => point.itemId === item.id).map((point) => [point.year, point]));
 
@@ -109,7 +107,7 @@ export function ExplorerView({
     <>
       <div data-testid="explorer-workspace" className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">
         <div className="flex min-w-0 flex-col">
-          <section data-testid="chart-panel" data-mode={chartMode} data-measure={share ? "share_of_total" : "nominal"} className="border-t border-[var(--ink)] pt-4">
+          <section data-testid="chart-panel" data-mode={chartMode} data-measure={share ? "share_of_gdp" : "nominal"} className="border-t border-[var(--ink)] pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <SegmentedTabs<ChartMode>
                 ariaLabel="ხედის რეჟიმი"
@@ -122,7 +120,7 @@ export function ExplorerView({
               />
               <div className="flex items-center gap-3.5">
                 <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                  {share ? `% მთლიანი ${sideWord}` : "მლრდ ₾"}
+                  {share ? "% მშპ-ში" : "მლრდ ₾"}
                 </span>
                 <button
                   type="button"
@@ -135,7 +133,7 @@ export function ExplorerView({
                       : "border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]"
                   }`}
                 >
-                  % წილი
+                  % მშპ-ში
                 </button>
               </div>
             </div>
@@ -174,6 +172,7 @@ export function ExplorerView({
               მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო).{" "}
               <span className="font-[family-name:var(--font-numeric)]">{coverage}</span> · 12-თვიანი ფაქტობრივი შესრულება.
               {CLASSIFICATION_NOTE[scope] ? ` ${CLASSIFICATION_NOTE[scope]}` : null}
+              {share ? " მშპ: საქსტატი, მიმდინარე ფასებში." : null}
               {lastUpdatedAt ? (
                 <>
                   {" "}ბოლო განახლება: <span className="font-[family-name:var(--font-numeric)]">{lastUpdatedAt}</span>.

@@ -28,14 +28,11 @@ function changeColor(change: number | null): string {
 export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLabel, unit, share }: ExplorerTableProps) {
   const endYear = years.at(-1);
   const lastIndex = years.length - 1;
-  const totalsByYear = new Map(years.map((year) => [year, totalRow?.valuesByYear[year] ?? null]));
-
   const cellValue = (row: ExplorerTableRow, year: number): string => {
     const amount = row.valuesByYear[year];
     if (amount === null || amount === undefined) return MISSING;
     if (!share) return formatInUnit(amount, unit);
-    const total = totalsByYear.get(year);
-    return total ? formatShare(amount / total) : MISSING;
+    return formatShare(row.shareByYear?.[year] ?? null);
   };
 
   const cellPad = { paddingTop: 11, paddingBottom: 11 };
@@ -58,7 +55,7 @@ export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLab
               ცვლილება
             </th>
             <th className={`${headCellClass} sticky right-0 z-[2] w-24 min-w-24 bg-[var(--paper)] pr-0 uppercase tracking-[0.06em]`}>
-              წილი {endYear}
+              წილი მშპ-ში {endYear}
             </th>
           </tr>
         </thead>
@@ -109,7 +106,7 @@ export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLab
               </td>
               {years.map((year) => (
                 <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={cellPad}>
-                  {share ? "100.0%" : formatInUnit(totalRow.valuesByYear[year] ?? null, unit)}
+                  {cellValue(totalRow, year)}
                 </td>
               ))}
               <td
@@ -119,7 +116,7 @@ export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLab
                 {formatShare(totalRow.change, true)}
               </td>
               <td className={`${numericCellClass} sticky right-0 z-[1] bg-[var(--paper)] pr-0 font-semibold text-[var(--ink)]`} style={cellPad}>
-                100.0%
+                {formatShare(totalRow.shareEndYear)}
               </td>
             </tr>
           ) : null}

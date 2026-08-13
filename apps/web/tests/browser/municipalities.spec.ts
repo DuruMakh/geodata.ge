@@ -378,3 +378,14 @@ test.describe("municipalities index", () => {
     expect(kpiColumns).toHaveLength(2);
   });
 });
+
+test("keeps municipality share as share of its budget", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities/04");
+  await expectMunicipalAppReady(page);
+
+  const toggle = page.getByTestId("municipal-share-toggle");
+  await expect(toggle).toHaveText("% წილი");
+  await toggle.click();
+  await expect(page.getByTestId("municipal-workspace")).toContainText("წილი მთლიან ბიუჯეტში, %");
+  await expect(page.getByTestId("municipal-workspace")).not.toContainText("მშპ");
+});
