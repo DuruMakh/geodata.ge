@@ -1,0 +1,3 @@
+year,gdp_current_prices_million_gel,gdp_current_prices_gel,valuation,accounting_standard,status,source_id,source_sheet,source_cell,source_unit,transformation,last_reviewed_at
+2010,22148.7,22148700000,market_prices,sna_2008,final_as_published,source.geostat_national_gdp_sna_2008,GDP at current prices,G26,mil. GEL,"Published one-decimal million GEL multiplied by 1,000,000; no estimate.",2026-08-13
+2010,22148.7,22148700000,market_prices,sna_2008,final_as_published,source.geostat_national_gdp_sna_2008,GDP at current prices,G26,mil. GEL,"Published one-decimal million GEL multiplied by 1,000,000; no estimate.",2026-08-13

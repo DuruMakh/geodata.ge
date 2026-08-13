@@ -16,6 +16,8 @@ import type { GlossaryEntry } from "../../lib/data/glossary";
 import { loadGlossary } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
+import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
+import type { NationalGdpFact } from "../../lib/data/nationalGdp/types";
 import type { SpendingMapping } from "../../lib/data/mappings";
 import { loadSpendingMappings } from "../../lib/data/mappings";
 import { SERVED_DATA_FILES } from "../../lib/data/servedData";
@@ -38,6 +40,7 @@ const BUDGET_FACTS_CSV = SERVED_DATA_FILES.budgetFacts;
 const ADMIN_SPENDING_FACTS_CSV = SERVED_DATA_FILES.adminSpendingFacts;
 const GLOSSARY_CSV = SERVED_DATA_FILES.glossary;
 const SOURCE_DOCUMENTS_CSV = SERVED_DATA_FILES.sourceDocuments;
+const NATIONAL_GDP_CSV = SERVED_DATA_FILES.gdpFacts;
 const ADMIN_CATEGORIES_JSON = SERVED_DATA_FILES.adminSpendingCategories;
 const TAXONOMY_DIR = "../../data/taxonomy";
 const SPENDING_FIELD_MAPPING_CSV = "../../data/mappings/spending-field-mapping.csv";
@@ -75,13 +78,14 @@ type Pipeline = {
   adminCategories: AdminSpendingCategory[];
   taxonomy: TaxonomyItem[];
   mappings: SpendingMapping[];
+  gdpFacts: NationalGdpFact[];
 };
 
 let pipelinePromise: Promise<Pipeline> | null = null;
 
 function loadPipeline(): Promise<Pipeline> {
   pipelinePromise ??= (async () => {
-    const [facts, adminFacts, glossary, sources, adminCategories, taxonomy, mappings] = await Promise.all([
+    const [facts, adminFacts, glossary, sources, adminCategories, taxonomy, mappings, gdpFacts] = await Promise.all([
       loadBudgetFactRows(BUDGET_FACTS_CSV),
       loadAdminSpendingFacts(ADMIN_SPENDING_FACTS_CSV),
       loadGlossary(GLOSSARY_CSV),
@@ -89,9 +93,10 @@ function loadPipeline(): Promise<Pipeline> {
       loadAdminSpendingCategoriesFile(ADMIN_CATEGORIES_JSON),
       loadTaxonomyFiles(TAXONOMY_DIR),
       loadSpendingMappings(SPENDING_FIELD_MAPPING_CSV),
+      loadNationalGdpFacts(NATIONAL_GDP_CSV),
     ]);
 
-    return { facts, adminFacts, glossary, sources, adminCategories, taxonomy, mappings };
+    return { facts, adminFacts, glossary, sources, adminCategories, taxonomy, mappings, gdpFacts };
   })();
 
   return pipelinePromise;
@@ -118,6 +123,15 @@ function actualOnly<T extends { basis: string }>(rows: T[]): T[] {
 }
 
 describe("data pipeline gate (real shipped data files)", () => {
+  it("covers every national budget year with one registered GDP denominator", async () => {
+    const { facts, gdpFacts, sources } = await loadPipeline();
+    const gdpByYear = new Map(gdpFacts.map((fact) => [fact.year, fact]));
+    const budgetYears = uniqueSortedYears(facts);
+    const registeredSourceIds = new Set(sources.map((source) => source.sourceId));
+
+    expect(budgetYears.filter((year) => !gdpByYear.has(year))).toEqual([]);
+    expect(gdpFacts.filter((fact) => !registeredSourceIds.has(fact.sourceId))).toEqual([]);
+  });
   it("loads every production data file through the same loaders app/page.tsx uses", async () => {
     const pipeline = await loadPipeline();
 

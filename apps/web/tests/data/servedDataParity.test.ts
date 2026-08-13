@@ -1,11 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { assertSameServedRows } from "../../lib/data/servedDataParity";
+import {
+  assertSameServedRows,
+  nationalGdpFactParityKey,
+} from "../../lib/data/servedDataParity";
 
 type Row = { id: string; amount: number; label: string | null };
 
 const keyOf = (row: Row) => row.id;
 
 describe("served data row parity", () => {
+  it("keys one national GDP fact per year", () => {
+    expect(nationalGdpFactParityKey({ year: 2025 })).toBe("2025");
+  });
   it("accepts identical rows regardless of order and key order", () => {
     const csv: Row[] = [
       { id: "a", amount: 1, label: null },

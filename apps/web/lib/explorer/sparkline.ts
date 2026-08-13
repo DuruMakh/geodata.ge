@@ -52,16 +52,7 @@ export function buildSparklinePath(
 // percentage rather than the level — which is also why it reads jagged.
 export function buildKpiShareSeries(
   row: ExplorerTableRow | null,
-  totalRow: ExplorerTableRow | null,
   years: number[],
 ): (number | null)[] {
-  if (row === null || totalRow === null) return years.map(() => null);
-
-  return years.map((year) => {
-    const value = row.valuesByYear[year];
-    const total = totalRow.valuesByYear[year];
-    if (value === null || value === undefined) return null;
-    if (total === null || total === undefined || total === 0) return null;
-    return value / total;
-  });
+  return row === null ? years.map(() => null) : years.map((year) => row.shareByYear?.[year] ?? null);
 }

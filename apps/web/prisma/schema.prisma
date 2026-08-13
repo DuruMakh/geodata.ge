@@ -34,6 +34,16 @@ enum MappingConfidence {
   unclassified
 }
 
+enum GdpAccountingStandard {
+  sna_1993
+  sna_2008
+}
+
+enum GdpStatus {
+  final_as_published
+  preliminary
+}
+
 // Mirror of data/taxonomy/{revenue-categories,spending-fields}.json merged with
 // data/glossary/category-glossary.csv (IDs are 1:1 across the three files).
 model BudgetItem {
@@ -66,6 +76,7 @@ model SourceDocument {
   sourceUrlOrFile String
   lastReviewedAt  DateTime     @db.Date
   facts           BudgetFact[]
+  gdpFacts        NationalGdpFact[]
 }
 
 model ImportRun {
@@ -85,6 +96,7 @@ model ImportRun {
   reportJson            Json
   facts                 BudgetFact[]
   adminFacts            AdminSpendingFact[]
+  gdpFacts              NationalGdpFact[]
 }
 
 // Mirror of data/mappings/spending-field-mapping.csv.
@@ -160,6 +172,24 @@ model AdminSpendingFact {
   @@unique([year, itemId])
   @@index([year, level])
   @@index([parentItemId])
+}
+
+// Mirror of data/imports/national-gdp-annual-1996-2025.csv. The year is the
+// natural key because the canonical reviewed series has one denominator per year.
+model NationalGdpFact {
+  year                Int                   @id
+  gdpCurrentPricesGel Decimal               @db.Decimal(18, 2)
+  accountingStandard GdpAccountingStandard
+  status              GdpStatus
+  sourceDocumentId    String
+  sourceDocument      SourceDocument        @relation(fields: [sourceDocumentId], references: [id])
+  sourceSheet         String
+  sourceCell          String
+  sourceUnit          String
+  transformation      String
+  lastReviewedAt      DateTime              @db.Date
+  importRunId         String?
+  importRun           ImportRun?            @relation(fields: [importRunId], references: [id])
 }
 
 enum MunicipalWarningType {

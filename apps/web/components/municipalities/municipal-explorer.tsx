@@ -251,7 +251,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               <Callout testId="no-selection-callout">არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.</Callout>
             </div>
           ) : state.chartMode === "line" ? (
-            <EditorialLineChart years={years} series={series} share={state.share} unit={UNIT_MLN} />
+            <EditorialLineChart years={years} series={series} share={state.share} unit={UNIT_MLN} shareLabel="წილი მთლიან ბიუჯეტში" />
           ) : (
             <ExplorerTable
               rows={model.rows.filter((row) => state.selectedIds.includes(row.itemId))}
@@ -261,6 +261,12 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               firstColumnLabel="ფუნქცია"
               unit={UNIT_MLN}
               share={state.share}
+              shareColumnLabel="წილი"
+              shareValueForYear={(row, year) => {
+                const amount = row.valuesByYear[year];
+                const total = model.totalRow.valuesByYear[year];
+                return amount === null || amount === undefined || !total ? null : amount / total;
+              }}
             />
           )}
 

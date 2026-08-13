@@ -1,7 +1,9 @@
 export const EXPLORER_SIDES = ["expenditure", "revenue"] as const;
 export const EXPLORER_NAVS = ["expenditure", "revenue", "analysis"] as const;
 export const CHART_MODES = ["line", "table"] as const;
-export const MEASURE_MODES = ["nominal", "share_of_total"] as const;
+import type { GdpAccountingStandard, GdpStatus } from "../data/nationalGdp/types";
+
+export const MEASURE_MODES = ["nominal", "share_of_gdp"] as const;
 
 export type ExplorerSide = (typeof EXPLORER_SIDES)[number];
 export type ExplorerNav = (typeof EXPLORER_NAVS)[number];
@@ -15,6 +17,13 @@ export type SourceMetadata = {
   sourceName: string;
   sourceUrlOrFile: string;
   lastReviewedAt: string;
+};
+
+export type GdpMetadata = {
+  gdpCurrentPricesGel: number;
+  accountingStandard: GdpAccountingStandard;
+  status: GdpStatus;
+  source: SourceMetadata;
 };
 
 export type ExplorerItem = {
@@ -53,6 +62,7 @@ export type ExplorerTableRow = {
   basisByYear: Record<number, "actual" | "planned">;
   sourceByYear: Record<number, SourceMetadata>;
   valuesByYear: Record<number, number | null>;
+  shareByYear?: Record<number, number | null>;
   change: number | null;
   shareEndYear: number | null;
 };

@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RevenuePage() {
-  const { facts, glossary, sourceDocuments } = await loadServedExplorerData();
+  const { facts, glossary, sourceDocuments, gdpFacts } = await loadServedExplorerData();
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
 
   // No adminFacts/adminCategories: the ministries scope cannot be reached from
@@ -42,6 +42,7 @@ export default async function RevenuePage() {
       facts={facts}
       glossaryEntries={Array.from(glossary.values())}
       sourceDocuments={sourceDocuments}
+      gdpFacts={gdpFacts}
       lastUpdatedAt={lastUpdatedAt}
     />
   );

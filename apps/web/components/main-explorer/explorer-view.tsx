@@ -80,8 +80,6 @@ export function ExplorerView({
   onDownloadCsv,
 }: ExplorerViewProps) {
   const noSelection = selectedIds.length === 0;
-  const sideWord = scope === "revenue" ? "შემოსავლებიდან" : "ხარჯებიდან";
-
   const series: ChartSeries[] = model.selectedItems.map((item) => {
     const pointsByYear = new Map(model.points.filter((point) => point.itemId === item.id).map((point) => [point.year, point]));
 
@@ -103,13 +101,13 @@ export function ExplorerView({
   // A non-empty selection can still have zero coverage in the active range
   // (e.g. a program series with a pre-2016 range) — say so instead of drawing
   // a fabricated empty axis or a total-only table.
-  const noRangeData = !noSelection && series.every((line) => line.vals.every((value) => value === null));
+  const noRangeData = !noSelection && model.points.length === 0;
 
   return (
     <>
       <div data-testid="explorer-workspace" className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">
         <div className="flex min-w-0 flex-col">
-          <section data-testid="chart-panel" data-mode={chartMode} data-measure={share ? "share_of_total" : "nominal"} className="border-t border-[var(--ink)] pt-4">
+          <section data-testid="chart-panel" data-mode={chartMode} data-measure={share ? "share_of_gdp" : "nominal"} className="border-t border-[var(--ink)] pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <SegmentedTabs<ChartMode>
                 ariaLabel="ხედის რეჟიმი"
@@ -122,7 +120,7 @@ export function ExplorerView({
               />
               <div className="flex items-center gap-3.5">
                 <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                  {share ? `% მთლიანი ${sideWord}` : "მლრდ ₾"}
+                  {share ? "% მშპ-ში" : "მლრდ ₾"}
                 </span>
                 <button
                   type="button"
@@ -135,7 +133,7 @@ export function ExplorerView({
                       : "border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]"
                   }`}
                 >
-                  % წილი
+                  % მშპ-ში
                 </button>
               </div>
             </div>
@@ -159,10 +157,12 @@ export function ExplorerView({
                 firstColumnLabel={FIRST_COL_LABEL[scope]}
                 unit={UNIT_BN}
                 share={share}
+                shareColumnLabel="წილი მშპ-ში"
+                shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
               />
             ) : (
               <div className="mt-5">
-                <EditorialLineChart years={model.years} series={series} share={share} unit={UNIT_BN} />
+                <EditorialLineChart years={model.years} series={series} share={share} unit={UNIT_BN} shareLabel="წილი მშპ-ში" />
               </div>
             )}
 
@@ -174,6 +174,8 @@ export function ExplorerView({
               მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო).{" "}
               <span className="font-[family-name:var(--font-numeric)]">{coverage}</span> · 12-თვიანი ფაქტობრივი შესრულება.
               {CLASSIFICATION_NOTE[scope] ? ` ${CLASSIFICATION_NOTE[scope]}` : null}
+              {Object.keys(model.gdpByYear).length > 0 ? " მშპ: საქსტატი, მიმდინარე ფასებში." : null}
+              {model.years.some((year) => model.gdpByYear[year]?.status === "preliminary") ? " 2025 წლის მშპ წინასწარია." : null}
               {lastUpdatedAt ? (
                 <>
                   {" "}ბოლო განახლება: <span className="font-[family-name:var(--font-numeric)]">{lastUpdatedAt}</span>.

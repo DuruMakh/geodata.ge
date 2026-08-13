@@ -26,11 +26,12 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Revenue overview and major tax revenue categories.
 - Expenditure overview using public-friendly spending fields such as health, education, social protection, defence, infrastructure, and similar categories.
 - Multi-year explorer with line and table views.
+- National revenue and expenditure multi-year explorers can show each series as a share of same-year nominal GDP at current prices. The reviewed annual denominator covers 1996-2025; the canonical handoff uses SNA 1993 through 2009 and SNA 2008 from 2010. This supports `% მშპ-ში` inside the budget explorers only: it does not create a separate GDP explorer or make the future GDP methodology marker live. Municipal shares and single-year composition shares remain shares of their applicable budget total.
 - Multi-year expenditure grouping by public spending fields or by ministries/major programs (ministries data exists for 2005-2025, with major-program drill-down rows partial from 2012 and contiguous 2017-2025); this is series selection, not drilldown.
 - Single-year snapshot with headline cards, treemap, Every 100 GEL, Budget Radar, Budget Field, and full ranking.
 - Municipal annual expenditure data for 2015-2025: ten main functional categories across 64 publicly served municipalities, plus the official total-payments headline. Five municipal bodies associated with occupied territories (`05`, `42`, `43`, `46`, `64`) are intentionally excluded because their budgets are not territorially attributable spending inside those municipalities. Served at `/explorer/municipalities`: an index with a municipality-grain map and ranked list, 64 municipality pages, and 11 region roll-up pages. Methodology: `docs/data-methodology/municipal-functional-annual-2015-2025.md`.
 - `მალე` markers for named future datasets (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` in the sidebar). Labels only: no routes, not clickable, no data.
-- CSV export.
+- CSV export. National multi-year exports include the same-year GDP denominator, accounting standard, publication status, GDP source metadata, and the calculated share of GDP.
 - Georgian-first UI.
 - Minimal public source label.
 - Internal source/provenance metadata.
@@ -172,4 +173,4 @@ Build the data foundation first. Visual ambition is important, but the platform 
 
 Avoid short-term UI-only hacks. The product should be architected so future versions can add more datasets, drilldown, bilingual UI, and additional budget modules without rebuilding the foundation.
 
-Implementation should follow this order: data foundation, real sample data, main explorer core with line/table modes and CSV, single-year core, and production UI polish against `DESIGN.md`. Bar mode, stacked mode, Share of GDP, and broader advanced chart controls are not part of the current production v1 scope unless explicitly re-approved. Do not start with visual richness before the data model and import validation are working.
+Implementation should follow this order: data foundation, real sample data, main explorer core with line/table modes and CSV, single-year core, and production UI polish against `DESIGN.md`. The bounded national `% მშპ-ში` measure described in section 2 is approved; bar mode, stacked mode, a separate GDP explorer, and broader advanced chart controls remain outside the current production v1 scope unless explicitly re-approved. Do not start with visual richness before the data model and import validation are working.

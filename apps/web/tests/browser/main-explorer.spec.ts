@@ -63,6 +63,8 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   await expect(page.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
   await expect(page.getByTestId("source-label")).toContainText("გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები");
   await expect(page.getByTestId("source-label")).toContainText("2005–2025");
+  await expect(page.getByTestId("source-label")).toContainText("მშპ: საქსტატი, მიმდინარე ფასებში");
+  await expect(page.getByTestId("source-label")).toContainText("2025 წლის მშპ წინასწარია");
 
   // Indicators below the chart.
   await expect(page.getByTestId("period-indicators")).toBeVisible();
@@ -224,8 +226,14 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await expect(seriesPanel.getByTestId("series-search")).toHaveAttribute("placeholder", "ძებნა");
 
   await chartPanel.getByTestId("measure-share-toggle").click();
-  await expect(chartPanel).toHaveAttribute("data-measure", "share_of_total");
+  await expect(chartPanel).toHaveAttribute("data-measure", "share_of_gdp");
+  await expect(chartPanel.getByTestId("measure-share-toggle")).toHaveText("% მშპ-ში");
   await expect(chartPanel.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("img", { name: "მრავალწლიანი დინამიკა" }).hover({ position: { x: 300, y: 100 } });
+  await expect(page.getByTestId("chart-tooltip")).toContainText("წილი მშპ-ში");
+  await chartPanel.getByTestId("chart-mode-table").click();
+  await expect(page.getByTestId("explorer-table")).toContainText("წილი მშპ-ში 2025");
+  await expect(page.getByTestId("explorer-table")).not.toContainText("100.0%");
 
   expect(consoleProblems).toEqual([]);
 });
@@ -472,11 +480,13 @@ test("CSV download uses the active filtered table data", async ({ page }) => {
   expect(csv.startsWith("\uFEFF")).toBe(true);
   const csvWithoutBom = csv.slice(1);
   expect(csvWithoutBom.split("\n")[0]).toBe(
-    "year,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at",
+    "year,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at,gdp_current_prices_gel,gdp_accounting_standard,gdp_status,gdp_source_name,gdp_source_url_or_file,gdp_last_reviewed_at,share_of_gdp",
   );
   expect(csv).toContain("spending.");
   expect(csv).toContain("expenditure.total");
   expect(csv).toContain("actual");
+  expect(csv).toContain("sna_2008");
+  expect(csv).toContain("Geostat GDP at current prices, SNA 2008");
 });
 
 test("analysis view renders the fixed single-year section order", async ({ page }) => {

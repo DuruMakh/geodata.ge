@@ -9,6 +9,7 @@ import {
   loadMunicipalitiesFromMirror,
   loadMunicipalRegionsFromMirror,
   loadMunicipalTotalFactsFromMirror,
+  loadNationalGdpFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "./mirrorRows";
 import { prisma } from "./prisma";
@@ -28,13 +29,14 @@ export async function loadLandingDataFromDb(): Promise<LoadedLandingData> {
 }
 
 export async function loadExplorerDataFromDb(): Promise<LoadedExplorerData> {
-  const [landing, adminFacts, adminCategories] = await Promise.all([
+  const [landing, adminFacts, adminCategories, gdpFacts] = await Promise.all([
     loadLandingDataFromDb(),
     loadAdminFactsFromMirror(prisma),
     loadAdminCategoriesFromMirror(prisma),
+    loadNationalGdpFactsFromMirror(prisma),
   ]);
 
-  return { ...landing, adminFacts, adminCategories };
+  return { ...landing, adminFacts, adminCategories, gdpFacts };
 }
 
 export async function loadMunicipalDataFromDb(): Promise<MunicipalData> {

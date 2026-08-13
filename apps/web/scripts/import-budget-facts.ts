@@ -11,6 +11,7 @@ import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
 import { buildImportReport } from "../lib/data/importReport";
 import { loadSpendingMappings } from "../lib/data/mappings";
+import { loadNationalGdpFacts } from "../lib/data/nationalGdp/importNationalGdp";
 import { loadMunicipalitiesFile } from "../lib/data/municipal/municipalitiesFile";
 import {
   loadMunicipalFunctionFacts,
@@ -33,6 +34,7 @@ import {
   budgetFactParityKey,
   municipalFunctionFactParityKey,
   municipalTotalFactParityKey,
+  nationalGdpFactParityKey,
 } from "../lib/data/servedDataParity";
 import { loadSourceDocuments } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
@@ -46,6 +48,7 @@ import {
   loadMunicipalitiesFromMirror,
   loadMunicipalRegionsFromMirror,
   loadMunicipalTotalFactsFromMirror,
+  loadNationalGdpFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "../lib/db/mirrorRows";
 
@@ -131,6 +134,7 @@ async function main() {
     municipalities,
     municipalFunctionFacts,
     municipalTotalFacts,
+    nationalGdpFacts,
   ] = await Promise.all([
     loadTaxonomyFiles(TAXONOMY_DIR),
     loadGlossary(SERVED_DATA_FILES.glossary),
@@ -144,6 +148,7 @@ async function main() {
     loadMunicipalitiesFile(SERVED_DATA_FILES.municipalities),
     loadMunicipalFunctionFacts(SERVED_DATA_FILES.municipalFunctionFacts),
     loadMunicipalTotalFacts(SERVED_DATA_FILES.municipalTotalFacts),
+    loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
   ]);
 
   // Same reference validation the site's data pipeline uses (allows explicit
@@ -190,8 +195,14 @@ async function main() {
   );
   assertUnique("budget fact natural key", budgetFacts.map(budgetFactParityKey));
   assertUnique("admin fact natural key", adminFacts.map(adminFactParityKey));
+  assertSubset("National GDP fact source IDs", nationalGdpFacts.map((fact) => fact.sourceId), sourceIds);
+  assertUnique("national GDP fact natural key", nationalGdpFacts.map(nationalGdpFactParityKey));
   assertAmountPrecision("Budget fact", budgetFacts);
   assertAmountPrecision("Admin fact", adminFacts);
+  assertAmountPrecision(
+    "National GDP fact",
+    nationalGdpFacts.map((fact) => ({ amountGel: fact.gdpCurrentPricesGel })),
+  );
 
   const municipalRegionIds = new Set(municipalRegions.map((region) => region.id));
   const municipalCategoryIds = new Set(municipalFunctions.map((entry) => entry.id));
@@ -234,6 +245,7 @@ async function main() {
       async (tx) => {
         await tx.budgetFact.deleteMany();
         await tx.adminSpendingFact.deleteMany();
+        await tx.nationalGdpFact.deleteMany();
         await tx.budgetMapping.deleteMany();
         await tx.budgetItem.deleteMany();
         await tx.adminSpendingCategory.deleteMany();
@@ -397,6 +409,22 @@ async function main() {
           })),
         });
 
+        await tx.nationalGdpFact.createMany({
+          data: nationalGdpFacts.map((fact) => ({
+            year: fact.year,
+            gdpCurrentPricesGel: String(fact.gdpCurrentPricesGel),
+            accountingStandard: fact.accountingStandard,
+            status: fact.status,
+            sourceDocumentId: fact.sourceId,
+            sourceSheet: fact.sourceSheet,
+            sourceCell: fact.sourceCell,
+            sourceUnit: fact.sourceUnit,
+            transformation: fact.transformation,
+            lastReviewedAt: new Date(`${fact.lastReviewedAt}T00:00:00.000Z`),
+            importRunId: run.id,
+          })),
+        });
+
         await tx.budgetMapping.createMany({
           data: mappings.map((mapping) => ({
             year: mapping.year,
@@ -413,13 +441,21 @@ async function main() {
         // read path db-mode builds use: the import only commits if the serving
         // path reproduces every CSV loader row field for field. A mapping bug
         // in any column rolls the whole import back.
-        const [mirrorFacts, mirrorGlossary, mirrorSources, mirrorAdminFacts, mirrorAdminCategories] =
+        const [
+          mirrorFacts,
+          mirrorGlossary,
+          mirrorSources,
+          mirrorAdminFacts,
+          mirrorAdminCategories,
+          mirrorNationalGdpFacts,
+        ] =
           await Promise.all([
             loadBudgetFactsFromMirror(tx),
             loadGlossaryFromMirror(tx),
             loadSourceDocumentsFromMirror(tx),
             loadAdminFactsFromMirror(tx),
             loadAdminCategoriesFromMirror(tx),
+            loadNationalGdpFactsFromMirror(tx),
           ]);
 
         const [
@@ -445,6 +481,12 @@ async function main() {
         );
         assertSameServedRows("source documents", sourceDocuments, mirrorSources, (row) => row.sourceId);
         assertSameServedRows("admin spending facts", adminFacts, mirrorAdminFacts, adminFactParityKey);
+        assertSameServedRows(
+          "national GDP facts",
+          nationalGdpFacts,
+          mirrorNationalGdpFacts,
+          nationalGdpFactParityKey,
+        );
         assertSameServedRows(
           "admin spending categories",
           adminCategories,
@@ -495,6 +537,11 @@ async function main() {
           counts: [
             { table: "BudgetFact", csvRows: budgetFacts.length, dbRows: mirrorFacts.length },
             { table: "AdminSpendingFact", csvRows: adminFacts.length, dbRows: mirrorAdminFacts.length },
+            {
+              table: "NationalGdpFact",
+              csvRows: nationalGdpFacts.length,
+              dbRows: mirrorNationalGdpFacts.length,
+            },
             { table: "BudgetItem", csvRows: taxonomy.length, dbRows: mirrorGlossary.size },
             {
               table: "AdminSpendingCategory",

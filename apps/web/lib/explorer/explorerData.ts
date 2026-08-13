@@ -1,11 +1,16 @@
 ﻿import type { GlossaryEntry } from "../data/glossary";
 import type { SourceDocumentRow } from "../data/sources";
-import type { ServedAdminFact, ServedBudgetFact } from "../servedRows";
+import type {
+  ServedAdminFact,
+  ServedBudgetFact,
+  ServedNationalGdpFact,
+} from "../servedRows";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { colorForItem } from "./colors";
 import type {
   ExpenditureGrouping,
+  GdpMetadata,
   ExplorerItem,
   ExplorerItemLevel,
   ExplorerPoint,
@@ -41,6 +46,7 @@ export type ExplorerModelInput = {
   expenditureGrouping?: ExpenditureGrouping;
   glossary: Map<string, GlossaryEntry>;
   sourceDocuments: SourceDocumentRow[];
+  gdpFacts?: ServedNationalGdpFact[];
   side: ExplorerSide;
   selectedItemIds: string[];
   startYear: number;
@@ -60,6 +66,7 @@ export type ExplorerModel = {
   topGrowth: ExplorerTableRow[];
   bottomGrowth: ExplorerTableRow[];
   hasPlannedValues: boolean;
+  gdpByYear: Record<number, GdpMetadata>;
 };
 
 function totalIdFor(side: ExplorerSide): string {
@@ -124,8 +131,16 @@ function sourceMetadataFor(sourceIds: string[], sources: Map<string, SourceDocum
   };
 }
 
-function valueForMeasure(amountGel: number, yearTotal: number, measure: MeasureMode) {
-  if (measure === "share_of_total") return yearTotal === 0 ? null : amountGel / yearTotal;
+function valueForMeasure(
+  amountGel: number,
+  year: number,
+  measure: MeasureMode,
+  gdpFactsByYear: Map<number, ServedNationalGdpFact>,
+) {
+  if (measure === "share_of_gdp") {
+    const denominator = gdpFactsByYear.get(year)?.gdpCurrentPricesGel;
+    return denominator === undefined || denominator <= 0 ? null : amountGel / denominator;
+  }
   return amountGel;
 }
 
@@ -148,8 +163,11 @@ function absoluteIncrease(row: ExplorerTableRow, startYear: number, endYear: num
   return end - start;
 }
 
-function shareChangeFor(row: ExplorerTableRow, totalRow: ExplorerTableRow | null, startYear: number): number {
-  return (row.shareEndYear ?? 0) - shareForYear(row, totalRow, startYear);
+function shareChangeFor(row: ExplorerTableRow, startYear: number, endYear: number): number | null {
+  const start = row.shareByYear?.[startYear];
+  const end = row.shareByYear?.[endYear];
+  if (start === null || start === undefined || end === null || end === undefined) return null;
+  return end - start;
 }
 
 function buildSummary(rows: ExplorerTableRow[], totalRow: ExplorerTableRow | null, years: number[]): {
@@ -180,8 +198,11 @@ function buildSummary(rows: ExplorerTableRow[], totalRow: ExplorerTableRow | nul
   const sortedIncrease = [...comparableRows].sort(
     (a, b) => (absoluteIncrease(b, startYear, endYear) ?? -Infinity) - (absoluteIncrease(a, startYear, endYear) ?? -Infinity),
   );
-  const sortedShareChange = [...comparableRows].sort(
-    (a, b) => Math.abs(shareChangeFor(b, totalRow, startYear)) - Math.abs(shareChangeFor(a, totalRow, startYear)),
+  const shareChangeRows = comparableRows.filter((row) => shareChangeFor(row, startYear, endYear) !== null);
+  const sortedShareChange = [...shareChangeRows].sort(
+    (a, b) =>
+      Math.abs(shareChangeFor(b, startYear, endYear) ?? 0) -
+      Math.abs(shareChangeFor(a, startYear, endYear) ?? 0),
   );
 
   return {
@@ -195,13 +216,6 @@ function buildSummary(rows: ExplorerTableRow[], totalRow: ExplorerTableRow | nul
     topGrowth: sortedGrowth.slice(0, 3),
     bottomGrowth: [...sortedGrowth].reverse().slice(0, 3),
   };
-}
-
-function shareForYear(row: ExplorerTableRow, totalRow: ExplorerTableRow | null, year: number): number {
-  const amount = row.valuesByYear[year];
-  const total = totalRow?.valuesByYear[year];
-  if (amount === null || amount === undefined || total === null || total === undefined || total === 0) return 0;
-  return amount / total;
 }
 
 // Every populated explorer starts with its reviewed total only. The total is
@@ -336,6 +350,18 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
   const years = Array.from(new Set(visibleFacts.map((fact) => fact.year))).sort((a, b) => a - b);
   const totalId = isMinistryGrouping ? ADMIN_SPENDING_TOTAL_ID : totalIdFor(input.side);
   const sourceDocuments = new Map(input.sourceDocuments.map((source) => [source.sourceId, source]));
+  const gdpFactsByYear = new Map((input.gdpFacts ?? []).map((fact) => [fact.year, fact]));
+  const gdpByYear = Object.fromEntries(
+    (input.gdpFacts ?? []).map((fact) => [
+      fact.year,
+      {
+        gdpCurrentPricesGel: fact.gdpCurrentPricesGel,
+        accountingStandard: fact.accountingStandard,
+        status: fact.status,
+        source: sourceMetadataFor([fact.sourceId], sourceDocuments),
+      } satisfies GdpMetadata,
+    ]),
+  );
   const baselineAmounts = new Map<string, number>();
 
   for (const fact of active) {
@@ -468,7 +494,7 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
         enLabel: item.enLabel,
         amountGel,
         basis: yearTotalFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual",
-        value: valueForMeasure(amountGel, yearTotal, input.measure),
+        value: valueForMeasure(amountGel, year, input.measure, gdpFactsByYear),
         shareOfTotal: yearTotal === 0 ? null : 1,
         percentChange: percentChangeFrom(amountGel, totalPreviousAmount(year)),
       };
@@ -484,7 +510,7 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
       enLabel: item.enLabel,
       amountGel: fact.amountGel,
       basis: fact.basis,
-      value: valueForMeasure(fact.amountGel, yearTotal, input.measure),
+      value: valueForMeasure(fact.amountGel, year, input.measure, gdpFactsByYear),
       shareOfTotal: yearTotal === 0 ? null : fact.amountGel / yearTotal,
       percentChange: percentChangeFrom(fact.amountGel, previousAmount(item.id, year)),
     };
@@ -492,6 +518,7 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
 
   const rowFor = (item: ExplorerItem): ExplorerTableRow | null => {
     const valuesByYear: Record<number, number | null> = {};
+    const shareByYear: Record<number, number | null> = {};
     const basisByYear: Record<number, "actual" | "planned"> = {};
     const sourceByYear: Record<number, SourceMetadata> = {};
     const officialInstitutionLabelByYear: Record<number, string | null> = {};
@@ -501,6 +528,12 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
         const yearFacts = totalFactsForYear(year);
         if (yearFacts.length === 0) continue;
         valuesByYear[year] = yearFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
+        shareByYear[year] = valueForMeasure(
+          valuesByYear[year] ?? 0,
+          year,
+          "share_of_gdp",
+          gdpFactsByYear,
+        );
         basisByYear[year] = yearFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual";
         sourceByYear[year] = sourceMetadataFor(yearFacts.map((fact) => fact.sourceId), sourceDocuments);
         continue;
@@ -509,6 +542,12 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
       const fact = factsByItemYear.get(`${item.id}:${year}`);
       if (!fact) continue;
       valuesByYear[year] = fact.amountGel;
+      shareByYear[year] = valueForMeasure(
+        fact.amountGel,
+        year,
+        "share_of_gdp",
+        gdpFactsByYear,
+      );
       basisByYear[year] = fact.basis;
       sourceByYear[year] = sourceMetadataFor([fact.sourceId], sourceDocuments);
       officialInstitutionLabelByYear[year] = fact.officialInstitutionLabel;
@@ -531,12 +570,9 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
       basisByYear,
       sourceByYear,
       valuesByYear,
+      shareByYear,
       change: startYear === undefined || endYear === undefined ? null : changeBetween(valuesByYear[startYear] ?? null, valuesByYear[endYear] ?? null),
-      shareEndYear: endYear === undefined ? null : (() => {
-        const amount = valuesByYear[endYear];
-        const total = totalByYear.get(endYear) ?? 0;
-        return amount === undefined || amount === null || total === 0 ? null : amount / total;
-      })(),
+      shareEndYear: endYear === undefined ? null : shareByYear[endYear] ?? null,
     };
   };
 
@@ -565,5 +601,6 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     topGrowth,
     bottomGrowth,
     hasPlannedValues: selectedPoints.some((point) => point.basis === "planned"),
+    gdpByYear,
   };
 }

@@ -545,3 +545,7 @@ PINS" — update them consciously with any legitimate data refresh, never loosen
 `tests/data/sourceCoverage.test.ts`.
 **Sibling methodologies:** `treasury-functional-expenditure-methodology-2004-2025.md` (functional
 expenditure), `ministries-expenditure-methodology.md` (organizational expenditure).
+
+## National GDP denominator
+
+The multi-year explorer's `% მშპ-ში` measure divides each revenue amount by Geostat's same-year nominal GDP at current prices. It is independent of selected series, and missing GDP is not estimated. The SNA 1993/SNA 2008 handoff, preliminary status, preserved workbooks, hashes, preparation commands, and export columns are documented in `national-nominal-gdp.md`. This denominator does not change the single-year revenue composition view.

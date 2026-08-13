@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
-import type { ExplorerTableRow } from "../../lib/explorer/types";
+import type { ExplorerTableRow, GdpMetadata } from "../../lib/explorer/types";
 
 describe("explorer CSV export", () => {
   it("starts every public CSV with the UTF-8 BOM bytes", () => {
@@ -73,5 +73,83 @@ describe("explorer CSV export", () => {
         "2025,admin_program.education.general,admin_spending.education_science_youth,major_program,32 02,Education ministry,General education,General education,250,actual,Reviewed official expenditure rows,docs/admin-spending.csv,2026-06-11",
       ].join("\n"),
     );
+  });
+
+  it("appends the reproducible GDP denominator and share for national exports", () => {
+    const rows: ExplorerTableRow[] = [
+      {
+        itemId: "spending.health",
+        parentItemId: null,
+        level: "public_field",
+        detailLabel: null,
+        kaLabel: "Health KA",
+        enLabel: "Health",
+        color: "#0071e3",
+        basisByYear: { 2025: "actual" },
+        sourceByYear: {
+          2025: {
+            sourceName: "Reviewed budget",
+            sourceUrlOrFile: "docs/budget.xlsx",
+            lastReviewedAt: "2026-08-12",
+          },
+        },
+        valuesByYear: { 2025: 250 },
+        shareByYear: { 2025: 0.125 },
+        change: null,
+        shareEndYear: 0.125,
+      },
+    ];
+    const gdpByYear: Record<number, GdpMetadata> = {
+      2025: {
+        gdpCurrentPricesGel: 2_000,
+        accountingStandard: "sna_2008",
+        status: "preliminary",
+        source: {
+          sourceName: "Reviewed nominal GDP",
+          sourceUrlOrFile: "docs/gdp.xlsx",
+          lastReviewedAt: "2026-08-13",
+        },
+      },
+    };
+
+    const csv = buildExplorerCsv(rows, [2025], gdpByYear);
+
+    expect(csv).toContain(
+      "gdp_current_prices_gel,gdp_accounting_standard,gdp_status,gdp_source_name,gdp_source_url_or_file,gdp_last_reviewed_at,share_of_gdp",
+    );
+    expect(csv).toContain(
+      ",2000,sna_2008,preliminary,Reviewed nominal GDP,docs/gdp.xlsx,2026-08-13,0.125",
+    );
+  });
+
+  it("keeps a budget row and leaves every GDP field blank when its denominator is missing", () => {
+    const rows: ExplorerTableRow[] = [
+      {
+        itemId: "spending.health",
+        parentItemId: null,
+        level: "public_field",
+        detailLabel: null,
+        kaLabel: "Health KA",
+        enLabel: "Health",
+        color: "#0071e3",
+        basisByYear: { 2025: "actual" },
+        sourceByYear: {
+          2025: {
+            sourceName: "Reviewed budget",
+            sourceUrlOrFile: "docs/budget.xlsx",
+            lastReviewedAt: "2026-08-12",
+          },
+        },
+        valuesByYear: { 2025: 250 },
+        shareByYear: { 2025: null },
+        change: null,
+        shareEndYear: null,
+      },
+    ];
+
+    const csv = buildExplorerCsv(rows, [2025], {});
+
+    expect(Array.from(new TextEncoder().encode(csv).slice(0, 3))).toEqual([0xef, 0xbb, 0xbf]);
+    expect(csv).toContain("2025,spending.health,,public_field,,,Health KA,Health,250,actual,Reviewed budget,docs/budget.xlsx,2026-08-12,,,,,,,");
   });
 });

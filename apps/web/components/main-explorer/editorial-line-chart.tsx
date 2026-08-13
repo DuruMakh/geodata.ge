@@ -21,6 +21,7 @@ type EditorialLineChartProps = {
   series: ChartSeries[];
   share: boolean;
   unit: ValueUnit;
+  shareLabel: string;
 };
 
 const W = 920;
@@ -51,7 +52,7 @@ function decimalsFor(step: number, max: number): number {
   return max;
 }
 
-export function EditorialLineChart({ years, series, share, unit }: EditorialLineChartProps) {
+export function EditorialLineChart({ years, series, share, unit, shareLabel }: EditorialLineChartProps) {
   const [hoverRaw, setHover] = useState<number | null>(null);
   const n = years.length;
   // The hover index survives range shrinks (no pointer event fires), so clamp it
@@ -244,13 +245,17 @@ export function EditorialLineChart({ years, series, share, unit }: EditorialLine
       </svg>
       {hover !== null && hoverX !== null ? (
         <div
+          data-testid="chart-tooltip"
           className="pointer-events-none absolute top-0 z-[2] flex min-w-[200px] flex-col gap-1 rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
           style={{
             left: `${hoverX}%`,
             transform: hoverX > 60 ? "translateX(calc(-100% - 12px))" : "translateX(12px)",
           }}
         >
-          <div className="mb-0.5 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">{years[hover]}</div>
+          <div className="mb-0.5 flex justify-between gap-3 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">
+            <span>{years[hover]}</span>
+            {share ? <span>{shareLabel}</span> : null}
+          </div>
           {series.map((line) => (
             <div key={line.id} className="flex items-center justify-between gap-2">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[var(--body)]">

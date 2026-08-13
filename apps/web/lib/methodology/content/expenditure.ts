@@ -113,14 +113,14 @@ export const EXPENDITURE_METHODOLOGY_CONTENT: MethodologyContent = {
   slug: "expenditure",
   titleKa: "ხარჯების მეთოდოლოგია",
   summaryKa: "როგორ ერთიანდება სახელმწიფო ბიუჯეტის ფაქტობრივი გადასახდელები მოქალაქისთვის გასაგებ სფეროებად, უწყებებად და ძირითად პროგრამებად.",
-  reviewedAt: "2026-08-11",
+  reviewedAt: "2026-08-13",
   archiveManifestId: "expenditure",
   canonicalDocuments: [
     "docs/data-methodology/treasury-functional-expenditure-methodology-2004-2025.md",
     "docs/data-methodology/ministries-expenditure-methodology.md",
     "docs/data-methodology/ministries-drilldown-programs-methodology.md",
   ],
-  disclosureKa: "წლიური თანხები და გადასახდელების ჯამები ოფიციალური წყაროებიდან მოდის. საჯარო სფეროები, ისტორიული უწყებების გაერთიანება და პროგრამების უწყვეტობა GeoData-ის განხილული კლასიფიკაციაა.",
+  disclosureKa: "წლიური თანხები და გადასახდელების ჯამები ოფიციალური წყაროებიდან მოდის. საჯარო სფეროები, ისტორიული უწყებების გაერთიანება და პროგრამების უწყვეტობა GeoData-ის განხილული კლასიფიკაციაა. მრავალწლიანი გრაფიკის წილი ითვლება საქსტატის იმავე წლის ნომინალურ მშპ-სთან, მიმდინარე ფასებში. 1996–2009 წლებში გამოყენებულია SNA 1993, ხოლო 2010 წლიდან — SNA 2008. 2025 წლის მშპ წინასწარია.",
   keyFacts: [
     { labelKa: "პერიოდი", valueKind: "coverage" },
     { labelKa: "სიხშირე", valueKind: "frequency", valueKa: "წლიური" },

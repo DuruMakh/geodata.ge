@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "sourceHashesMatch": true,
+  "sourceBytes": {
+    "sna1993": 94214,
+    "sna2008": 50098
+  },
+  "sourceHashes": {
+    "sna1993": "1F9BEFDCA89F3A635F66ABB14892386A9947BF7294045E4442832AA53E63DC8E",
+    "sna2008": "21A576C9C20434A87BCB32047CD143EEF2B8D3F3FF360442B420C76B0DA27D34"
+  },
+  "sourceFactCount": 39,
+  "canonicalFactCount": 30,
+  "canonicalYearMin": 1996,
+  "canonicalYearMax": 2025,
+  "overlapYears": [
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018
+  ]
+}

@@ -4,7 +4,11 @@ import { useEffect, useMemo } from "react";
 import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { SourceDocumentRow } from "../../lib/data/sources";
-import type { ServedAdminFact, ServedBudgetFact } from "../../lib/servedRows";
+import type {
+  ServedAdminFact,
+  ServedBudgetFact,
+  ServedNationalGdpFact,
+} from "../../lib/servedRows";
 import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
 import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { buildExplorerModel, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
@@ -28,10 +32,11 @@ type MainExplorerProps = {
   adminCategories?: AdminSpendingCategory[];
   glossaryEntries: GlossaryEntry[];
   sourceDocuments: SourceDocumentRow[];
+  gdpFacts?: ServedNationalGdpFact[];
   lastUpdatedAt: string;
 };
 
-export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, sourceDocuments, lastUpdatedAt }: MainExplorerProps) {
+export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, sourceDocuments, gdpFacts = [], lastUpdatedAt }: MainExplorerProps) {
   useEffect(() => {
     document.body.dataset.appReady = "true";
 
@@ -94,6 +99,7 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
     () =>
       buildExplorerModel({
         facts,
+        gdpFacts,
         adminFacts,
         adminCategories: adminCategoryMap,
         expenditureGrouping: grouping,
@@ -103,9 +109,9 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
         selectedItemIds: selectedIds,
         startYear: range.start,
         endYear: range.end,
-        measure: share ? "share_of_total" : "nominal",
+        measure: share ? "share_of_gdp" : "nominal",
       }),
-    [facts, adminFacts, adminCategoryMap, grouping, glossary, sourceDocuments, explorerSide, selectedIds, range.start, range.end, share],
+    [facts, gdpFacts, adminFacts, adminCategoryMap, grouping, glossary, sourceDocuments, explorerSide, selectedIds, range.start, range.end, share],
   );
 
   // Years whose ACTIVE values are planned (actual wins over planned), for the
@@ -183,7 +189,7 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
     .join(" · ");
 
   function downloadCsv() {
-    const csv = buildExplorerCsv(model.tableRows, model.years);
+    const csv = buildExplorerCsv(model.tableRows, model.years, model.gdpByYear);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");

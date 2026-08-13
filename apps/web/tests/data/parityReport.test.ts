@@ -88,6 +88,19 @@ describe("parity report", () => {
     expect(text).toContain("Parity status: FAILED");
   });
 
+  it("includes NationalGdpFact row counts in parity output", () => {
+    const report = buildParityReport({
+      counts: [{ table: "NationalGdpFact", csvRows: 30, dbRows: 29 }],
+      budgetTotalsCsv: {},
+      budgetTotalsDb: {},
+      adminTotalsCsv: {},
+      adminTotalsDb: {},
+    });
+
+    expect(report.status).toBe("failed");
+    expect(formatParityReport(report)).toContain("NationalGdpFact: csv=30 db=29");
+  });
+
   it("prints FAIL lines for keys that exist only on the database side", () => {
     const report = buildParityReport({
       counts: [],
