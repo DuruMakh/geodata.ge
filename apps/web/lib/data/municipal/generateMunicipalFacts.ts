@@ -1,9 +1,11 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
-import { readCsvRecords } from "../csv";
+import { MUNICIPAL_YEARS } from "../coverage";
+import { readCsvRecords, type CsvRecord } from "../csv";
 import { csvEscape } from "../csvEscape";
 import { aggregateFactsForEntity } from "./aggregateMunicipalFacts";
-import { municipalCategoryIdForCode } from "./functionMapping";
+import { MUNICIPAL_FUNCTION_CODES, municipalCategoryIdForCode } from "./functionMapping";
+import { loadMunicipalitiesFile } from "./municipalitiesFile";
 import { MUNICIPAL_COUNTRY_ID, type MunicipalFunctionFact, type MunicipalTotalFact } from "./types";
 
 const RAW_DIR = "../../docs/Raw Data/Municipalities/combined-annual-2015-2025";
@@ -14,6 +16,7 @@ const OUT_FUNCTIONS = "../../data/imports/municipal-function-facts-2015-2025.csv
 const OUT_TOTALS = "../../data/imports/municipal-total-facts-2015-2025.csv";
 const OUT_COUNTRY_FUNCTIONS = "../../data/imports/municipal-georgia-function-facts-2015-2025.csv";
 const OUT_COUNTRY_TOTALS = "../../data/imports/municipal-georgia-total-facts-2015-2025.csv";
+const MUNICIPALITIES = "../../data/imports/municipalities.csv";
 
 const PORTAL_SOURCE = "source.municipal_portal_archive";
 const WORKBOOK_SOURCE = "source.municipal_mof_annual_and_history_workbooks";
@@ -21,6 +24,9 @@ const WORKBOOK_SOURCE = "source.municipal_mof_annual_and_history_workbooks";
 // territories, not territorially attributable spending there. Keep them in the
 // raw archive, but never copy them into GeoData.ge's public municipal dataset.
 const EXCLUDED_MUNICIPALITY_CODES = new Set(["05", "42", "43", "46", "64"]);
+const RAW_MUNICIPALITY_COUNT = 69;
+const RAW_FUNCTION_ROW_COUNT = RAW_MUNICIPALITY_COUNT * MUNICIPAL_YEARS.length * MUNICIPAL_FUNCTION_CODES.length;
+const RAW_TOTAL_ROW_COUNT = RAW_MUNICIPALITY_COUNT * MUNICIPAL_YEARS.length;
 
 const FUNCTION_HEADER = [
   "year",
@@ -109,6 +115,116 @@ function toCsv(header: string[], rows: string[][]): string {
   return [header, ...rows].map((row) => row.map(csvEscape).join(",")).join("\n") + "\n";
 }
 
+function reportSetMismatch(
+  label: string,
+  actual: Set<string>,
+  expected: Set<string>,
+  issues: string[],
+): void {
+  const missing = [...expected].filter((value) => !actual.has(value)).sort();
+  const unknown = [...actual].filter((value) => !expected.has(value)).sort();
+  if (missing.length > 0 || unknown.length > 0) {
+    issues.push(
+      `${label} mismatch; missing: ${missing.join(", ") || "none"}; unknown: ${unknown.join(", ") || "none"}`,
+    );
+  }
+}
+
+/**
+ * Fail before aggregation unless the preserved raw package is the complete,
+ * unique 69-code annual panel approved for the Georgia aggregate.
+ */
+export function validateRawMunicipalCoverage(
+  rawFunctions: CsvRecord[],
+  rawTotals: CsvRecord[],
+  expectedMunicipalityCodes: string[],
+): void {
+  const issues: string[] = [];
+  const expectedCodes = new Set(expectedMunicipalityCodes);
+  const expectedYears = new Set(MUNICIPAL_YEARS.map(String));
+  const expectedCategories = new Set(MUNICIPAL_FUNCTION_CODES.map(municipalCategoryIdForCode));
+
+  if (expectedCodes.size !== RAW_MUNICIPALITY_COUNT) {
+    issues.push(`expected municipality-code contract must contain 69 unique codes, got ${expectedCodes.size}`);
+  }
+  if (rawFunctions.length !== RAW_FUNCTION_ROW_COUNT) {
+    issues.push(`expected 7,590 raw function rows, got ${rawFunctions.length.toLocaleString("en-US")}`);
+  }
+  if (rawTotals.length !== RAW_TOTAL_ROW_COUNT) {
+    issues.push(`expected 759 raw total rows, got ${rawTotals.length.toLocaleString("en-US")}`);
+  }
+
+  const functionCodes = new Set<string>();
+  const functionYears = new Set<string>();
+  const functionKeys = new Set<string>();
+  const functionContributors = new Map<string, Set<string>>();
+  for (const row of rawFunctions) {
+    const municipalityCode = row.municipality_code ?? "";
+    const year = String(Number(row.year));
+    const categoryId = municipalCategoryIdForCode(row.functional_code ?? "");
+    const key = `${municipalityCode}:${year}:${categoryId}`;
+    if (functionKeys.has(key)) issues.push(`duplicate raw function key ${key}`);
+    functionKeys.add(key);
+    functionCodes.add(municipalityCode);
+    functionYears.add(year);
+    const contributorKey = `${year}:${categoryId}`;
+    const contributors = functionContributors.get(contributorKey) ?? new Set<string>();
+    contributors.add(municipalityCode);
+    functionContributors.set(contributorKey, contributors);
+  }
+
+  const totalCodes = new Set<string>();
+  const totalYears = new Set<string>();
+  const totalKeys = new Set<string>();
+  const totalContributors = new Map<string, Set<string>>();
+  for (const row of rawTotals) {
+    const municipalityCode = row.municipality_code ?? "";
+    const year = String(Number(row.year));
+    const key = `${municipalityCode}:${year}`;
+    if (totalKeys.has(key)) issues.push(`duplicate raw total key ${key}`);
+    totalKeys.add(key);
+    totalCodes.add(municipalityCode);
+    totalYears.add(year);
+    const contributors = totalContributors.get(year) ?? new Set<string>();
+    contributors.add(municipalityCode);
+    totalContributors.set(year, contributors);
+  }
+
+  reportSetMismatch("raw function municipality codes", functionCodes, expectedCodes, issues);
+  reportSetMismatch("raw total municipality codes", totalCodes, expectedCodes, issues);
+  reportSetMismatch("raw function years", functionYears, expectedYears, issues);
+  reportSetMismatch("raw total years", totalYears, expectedYears, issues);
+
+  for (const municipalityCode of expectedCodes) {
+    for (const year of expectedYears) {
+      for (const categoryId of expectedCategories) {
+        const key = `${municipalityCode}:${year}:${categoryId}`;
+        if (!functionKeys.has(key)) issues.push(`missing raw function key ${key}`);
+      }
+      const totalKey = `${municipalityCode}:${year}`;
+      if (!totalKeys.has(totalKey)) issues.push(`missing raw total key ${totalKey}`);
+    }
+  }
+
+  for (const year of expectedYears) {
+    for (const categoryId of expectedCategories) {
+      const contributorKey = `${year}:${categoryId}`;
+      const contributorCount = functionContributors.get(contributorKey)?.size ?? 0;
+      if (contributorCount !== RAW_MUNICIPALITY_COUNT) {
+        issues.push(`country function ${contributorKey} must have 69 contributors, got ${contributorCount}`);
+      }
+    }
+    const totalContributorCount = totalContributors.get(year)?.size ?? 0;
+    if (totalContributorCount !== RAW_MUNICIPALITY_COUNT) {
+      issues.push(`country annual total ${year} must have 69 contributors, got ${totalContributorCount}`);
+    }
+  }
+
+  if (issues.length > 0) {
+    throw new Error(`Raw municipal coverage validation failed:\n- ${issues.join("\n- ")}`);
+  }
+}
+
 async function writeRelative(relativePath: string, content: string): Promise<void> {
   // utf8 with no BOM, matching the other data/imports files.
   await writeFile(path.resolve(process.cwd(), relativePath), content, "utf8");
@@ -120,10 +236,16 @@ export async function generateMunicipalFactCsvs(): Promise<{
   countryFunctionRows: number;
   countryTotalRows: number;
 }> {
-  const [rawFunctions, rawTotals] = await Promise.all([
+  const [rawFunctions, rawTotals, municipalities] = await Promise.all([
     readCsvRecords(RAW_FUNCTIONS),
     readCsvRecords(RAW_TOTALS),
+    loadMunicipalitiesFile(MUNICIPALITIES),
   ]);
+  validateRawMunicipalCoverage(
+    rawFunctions,
+    rawTotals,
+    [...municipalities.map((municipality) => municipality.code), ...EXCLUDED_MUNICIPALITY_CODES],
+  );
 
   const allFunctionFacts: MunicipalFunctionFact[] = rawFunctions
     .map((record) => ({

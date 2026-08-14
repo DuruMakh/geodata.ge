@@ -24,6 +24,7 @@ import {
   loadMunicipalFunctionsFile,
   loadMunicipalRegionsFile,
 } from "../lib/data/municipal/taxonomyFiles";
+import { assertMunicipalAggregateSourceIds } from "../lib/data/municipal/sourceValidation";
 import { MUNICIPAL_COUNTRY_ID } from "../lib/data/municipal/types";
 import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import { loadSourceDocuments } from "../lib/data/sources";
@@ -177,18 +178,11 @@ async function main() {
     throw new Error(`Municipal facts reference unknown source documents: ${unresolvedMunicipalSourceIds.join(", ")}`);
   }
 
-  const unresolvedCountrySourceIds = Array.from(
-    new Set(
-      [...countryFunctionFacts, ...countryTotalFacts]
-        .map((fact) => fact.sourceId)
-        .filter((sourceId) => !registeredSourceIds.has(sourceId)),
-    ),
-  ).sort();
-  if (unresolvedCountrySourceIds.length > 0) {
-    throw new Error(
-      `Georgia municipal facts reference unknown source documents: ${unresolvedCountrySourceIds.join(", ")}`,
-    );
-  }
+  assertMunicipalAggregateSourceIds(
+    "Georgia municipal facts",
+    [...countryFunctionFacts, ...countryTotalFacts].map((fact) => fact.sourceId),
+    registeredSourceIds,
+  );
 
   const expectedFunctionRows = municipalFunctions.length * municipalities.length * MUNICIPAL_YEARS.length;
   if (municipalFunctionFacts.length !== expectedFunctionRows) {

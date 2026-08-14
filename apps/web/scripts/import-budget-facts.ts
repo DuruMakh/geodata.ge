@@ -24,6 +24,7 @@ import {
   loadMunicipalFunctionsFile,
   loadMunicipalRegionsFile,
 } from "../lib/data/municipal/taxonomyFiles";
+import { assertMunicipalAggregateSourceIds } from "../lib/data/municipal/sourceValidation";
 import { MUNICIPAL_COUNTRY_ID, type MunicipalTotalFact } from "../lib/data/municipal/types";
 import {
   buildParityReport,
@@ -299,7 +300,7 @@ async function main() {
     municipalCategoryIds,
     municipalCountryCategoryIds,
   );
-  assertSubset(
+  assertMunicipalAggregateSourceIds(
     "Georgia municipal fact source IDs",
     [...municipalCountryFunctionFacts, ...municipalCountryTotalFacts].map(
       (fact) => fact.sourceId,
