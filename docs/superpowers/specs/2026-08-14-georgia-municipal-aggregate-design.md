@@ -52,7 +52,8 @@ writes two new reviewed serving files:
 Each output row uses the stable scope ID `country.georgia`. Function amounts are
 the exact annual sum across all 69 source rows for that category. Total and
 component fields follow the current roll-up rules: required amounts are summed;
-nullable components remain null only when every constituent value is null;
+nullable components are null if any constituent value is missing, so an
+incomplete sum is never presented as complete;
 `public_total_measure` and source metadata retain a shared value when all rows
 agree and an explicit mixed marker otherwise. No residual category is created
 and no value is normalized to force reconciliation.
