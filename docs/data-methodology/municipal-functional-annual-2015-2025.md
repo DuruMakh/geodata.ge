@@ -12,10 +12,14 @@ The ten main functional categories are served, on the same terms as expenditure 
 reviewed, mapped to stable `municipal.*` category IDs, and shipped as
 `data/imports/municipal-function-facts-2015-2025.csv` (7,040 rows),
 `data/imports/municipal-total-facts-2015-2025.csv` (704 rows), and a municipality registry
-`data/imports/municipalities.csv` (64 rows). These are read by the CSV serving path
+`data/imports/municipalities.csv` (64 rows). A separate Georgia aggregate is shipped as
+`data/imports/municipal-georgia-function-facts-2015-2025.csv` (110 rows) and
+`data/imports/municipal-georgia-total-facts-2015-2025.csv` (11 rows). These are read by the CSV
+serving path
 (`GEODATA_DATA_SOURCE=csv`, the default) the same way expenditure and revenue are. Prisma
-models, migration `20260802194939_municipal_dataset`, the transactional Supabase mirror import,
-and field-by-field import parity checks shipped in the earlier data-only rollout (see
+models, migrations `20260802194939_municipal_dataset` and
+`20260814000000_municipal_country_aggregate`, the transactional Supabase mirror import, and
+field-by-field import parity checks serve both entity and country facts (see
 `docs/data-methodology/database-import.md`). Migration and import are therefore not pending.
 Every CI-gated production run owned by `.github/workflows/deploy-production.yml` runs
 `npm run prisma:deploy` and `npm run data:import` unconditionally, reconverging the mirror to
@@ -23,16 +27,13 @@ the reviewed CSVs before Vercel is triggered. Manual Vercel dashboard or CLI dep
 run those Actions steps; see `docs/deployment.md`.
 
 The base municipal UI shipped through PR #38 (merge `0f4a287`) with
-`/explorer/municipalities`, 64 municipality pages, and 11 region roll-up pages. Post-deployment
+`/explorer/municipalities`, 64 municipality pages, and 11 region roll-up pages. Those entity
+counts remain unchanged. The current implementation adds one explicit
+`/explorer/municipalities/georgia` page built from all 69 reviewed municipal-budget series;
+this branch state is not evidence that the country page is deployed. Earlier post-deployment
 checks on 2026-08-06 returned HTTP 200 for the index, municipality `04`, and the Tbilisi region
 route. Those routes call `loadServedMunicipalData()`, so a db-mode build verifies the municipal
 mirror row by row.
-
-This map-upgrade branch retains those routes and replaces only the index map with the
-municipality-grain geometry described in "Municipality geometry join" below. Its production
-status remains separate from the base municipal UI: do not describe the municipality-grain map
-as live until PR #40 is merged, the production deployment is ready, and the map routes and
-interactions pass post-deployment smoke checks.
 
 The six selected-detail rows (`7.1.1`, `7.4.5.1`, `7.5.1`, `7.8.1`, `7.8.2`, `7.9.1`; 4,554 rows
 in the prepared package below) are deliberately not imported — not an oversight. Dropping them
@@ -77,9 +78,11 @@ series under codes `05` (Azhara / Upper Abkhazia), `42` (Eredvi), `43` (Kurta), 
 and `64` (Akhalgori). Source review established that these are budgets of Georgian municipal
 bodies operating outside the occupied territories and serving displaced communities, not
 territorially attributable expenditure delivered inside those occupied municipalities. By
-user decision, all five codes are excluded from the public registry, both served fact files,
-regional aggregates, rankings, and the municipalities UI. The raw research package,
-official workbooks, manifests, hashes, and validation report remain unchanged for provenance.
+user decision, all five codes are excluded from the public registry, both municipality-keyed
+served fact files, regional aggregates, rankings, routes, picker/list/map/member rows, and
+standalone CSV values. They are included only in the dedicated `country.georgia` aggregate.
+The raw research package, official workbooks, manifests, hashes, and validation report remain
+unchanged for provenance.
 
 With code `05` excluded, `region.abkhazia` has no served municipality and is omitted from the
 municipal data taxonomy. The map's reviewed occupied-area geometry is a non-interactive visual
@@ -169,6 +172,41 @@ under `data/imports/` are generated from them using the five-code exclusion abov
 | `validation-report.json` | - | Machine-readable coverage, reconciliation, warning, encoding, and output-hash checks. |
 
 The classification levels are not additive. Selected details are already included in their parent main functions. Total payments must also not be added to functional rows.
+
+## Georgia aggregate outputs and semantics
+
+The serving generator reads the preserved 69-code raw main-function and total-payment files in
+one deterministic pass. It keeps the existing 64-entity public files unchanged and writes:
+
+| File | Rows | Use |
+| --- | ---: | --- |
+| `data/imports/municipal-georgia-function-facts-2015-2025.csv` | 110 | Ten country-level functions for each year from 2015 through 2025. |
+| `data/imports/municipal-georgia-total-facts-2015-2025.csv` | 11 | One country-level public total and component record per year. |
+
+Every country row uses `scope_id = country.georgia`. Function amounts are exact sums across all
+69 reviewed source series. Required total fields are summed under the same roll-up rules as
+regions. A nullable component is null if any of its 69 constituents is missing; an incomplete
+component sum is never presented as complete. Shared source and measure metadata are retained
+when every row agrees and use explicit mixed markers otherwise. No residual category is created
+and no amount is normalized to force reconciliation.
+
+Reviewed CSVs remain the canonical human-reviewed source. Dedicated Prisma country tables mirror
+the two country files without creating a synthetic municipality. `npm run data:import` loads the
+country and existing budget facts inside the same transaction and requires field-for-field
+CSV/database parity before commit; a mismatch rolls the whole import back.
+
+Countrywide municipal KPIs and national-share denominators use the 69-series Georgia total.
+Municipality and region ranks remain calculated over the unchanged 64 municipalities and 11
+regions. The 11 region rows do not reconcile to the country row because codes `05`, `42`, `43`,
+`46`, and `64` are included only in the Georgia aggregate and have no territorial region
+assignment. Public notes on the index and country page explain that these five budgets are not
+presented as territorially attributable expenditure.
+
+The index pins `საქართველო` first in the `რეგიონები` tab, and the entity picker lists it first.
+The country heading is `როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები`. The page has no
+rank, map, member list, or previous/next entity navigation. Its CSV contains only the country
+total and ten country functions by year, identifies the scope as `country.georgia`, and exposes
+no standalone code, name, or amount for any of the five aggregate-only bodies.
 
 ## Official source families
 

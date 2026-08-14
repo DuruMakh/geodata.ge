@@ -25,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/revenue`, lastModified },
     { url: `${siteUrl}/explorer/analysis`, lastModified },
     { url: `${siteUrl}/explorer/municipalities`, lastModified },
+    { url: `${siteUrl}/explorer/municipalities/georgia`, lastModified },
     {
       url: `${siteUrl}/methodology`,
       lastModified: methodologyLastModified ? new Date(methodologyLastModified) : undefined,

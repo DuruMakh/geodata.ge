@@ -60,7 +60,10 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
     };
   }, []);
 
-  const source = level === "region" ? [props.country, ...props.regions] : props.municipalities;
+  const source = useMemo(
+    () => (level === "region" ? [props.country, ...props.regions] : props.municipalities),
+    [level, props.country, props.municipalities, props.regions],
+  );
   const rows = useMemo(() => {
     const needle = query.trim();
     if (needle === "") return source;
