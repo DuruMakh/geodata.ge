@@ -20,7 +20,7 @@ import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
-import { EntityPicker, type EntityPickerGroup } from "./entity-picker";
+import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup } from "./entity-picker";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
 
@@ -44,6 +44,7 @@ export type MunicipalExplorerProps = {
   rankByYear: Record<number, number>;
   rankOutOf: number;
   csvBasename: string;
+  pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
   prev: { label: string; href: string };
   next: { label: string; href: string };
@@ -194,8 +195,10 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
           <EntityPicker
             open={pickerOpen}
             onClose={() => setPickerOpen(false)}
+            country={props.pickerCountry}
             groups={props.pickerGroups}
             activeId={props.entityId}
+            onSelectCountry={() => router.push("/explorer/municipalities/georgia")}
             onSelectMunicipality={(code) => router.push(`/explorer/municipalities/${code}`)}
             onSelectRegion={(regionId) => router.push(`/explorer/municipalities/region/${regionId.replace("region.", "")}`)}
           />

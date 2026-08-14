@@ -306,13 +306,29 @@ test("keeps the tooltip inside the map after a narrow viewport resize", async ({
 });
 
 test.describe("municipalities index", () => {
-  test("lists all municipalities and switches grain", async ({ page }) => {
+  test("lists all municipalities and the country-first region grain", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
     await page.getByTestId("level-region").click();
-    await expect(page.getByTestId("municipal-list-row")).toHaveCount(11);
+    await expect(page.getByTestId("municipal-list-row")).toHaveCount(12);
     await expect(page).toHaveURL(/#lvl=region/);
+  });
+
+  test("puts Georgia first in the region list and routes it to the country explorer", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("level-region").click();
+
+    const rows = page.getByTestId("municipal-list-row");
+    await expect(rows).toHaveCount(12);
+    const country = rows.first();
+    await expect(country.getByTestId("municipal-row-name")).toHaveText("საქართველო");
+    await expect(country).toContainText("69 მუნიციპალური ბიუჯეტი");
+    await expect(country.locator("span").first()).toHaveText("—");
+
+    await country.click();
+    await expect(page).toHaveURL(/\/explorer\/municipalities\/georgia(#|$)/);
   });
 
   test("filters and clears the search", async ({ page }) => {

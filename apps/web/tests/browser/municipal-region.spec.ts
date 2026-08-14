@@ -117,6 +117,18 @@ test.describe("entity picker region options resolve (previously 404)", () => {
     await expect(page.getByTestId("region-member-row")).toHaveCount(12);
     await expect(page.getByTestId("entity-picker-trigger")).toContainText("იმერეთი");
   });
+
+  test("puts Georgia before the region options on a region page", async ({ page }) => {
+    await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("entity-picker-trigger").click();
+
+    const picker = page.getByTestId("entity-picker");
+    const options = picker.getByRole("option");
+    await expect(options.first()).toHaveAttribute("data-testid", "picker-country");
+    await expect(options.first()).toContainText("საქართველო");
+    await expect(options.nth(1)).toHaveAttribute("data-testid", "picker-region");
+  });
 });
 
 // Task 14: the full region-page e2e coverage the header comment above defers

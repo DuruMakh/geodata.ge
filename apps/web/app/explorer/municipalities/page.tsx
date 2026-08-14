@@ -4,6 +4,7 @@ import { PageHeader } from "../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
 import {
   buildIndexKpis,
+  buildCountryListRow,
   buildMunicipalListRows,
   latestReviewedAtForMunicipalFacts,
 } from "../../../lib/explorer/municipalData";
@@ -77,6 +78,7 @@ export default async function MunicipalitiesIndexPage() {
           legendMax={formatAmount(map.legendMaxGel)}
           municipalities={list.municipalities}
           regions={list.regions}
+          country={buildCountryListRow(countryTotalFacts, latestYear)}
           kpis={buildIndexKpis({
             municipalities,
             totalFacts,

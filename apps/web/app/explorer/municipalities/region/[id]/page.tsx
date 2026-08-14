@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../../../../components/municipalities/municipal-explorer";
 import { PageHeader } from "../../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../../lib/data/servedData";
+import { MUNICIPAL_COUNTRY_ID } from "../../../../../lib/data/municipal/types";
 import {
   aggregateFactsForEntity,
   buildCountryTotalByYear,
@@ -125,6 +126,12 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           rankByYear={rankByYear}
           rankOutOf={regions.length}
           csvBasename={`region-${id}`}
+          pickerCountry={{
+            id: MUNICIPAL_COUNTRY_ID,
+            nameKa: "საქართველო",
+            valueGel: nationalTotalByYear[latestYear] ?? 0,
+            budgetCount: 69,
+          }}
           pickerGroups={buildPickerGroups(listInput)}
           prev={{ label: prev.kaLabel, href: hrefFor(prev) }}
           next={{ label: next.kaLabel, href: hrefFor(next) }}

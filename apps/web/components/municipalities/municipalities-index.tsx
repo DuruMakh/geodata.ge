@@ -14,6 +14,7 @@ type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinGel" | "leg
   legendMax: string;
   municipalities: MunicipalListRow[];
   regions: MunicipalListRow[];
+  country: MunicipalListRow;
   kpis: MunicipalKpi[];
   latestYear: number;
   sourceNote: string;
@@ -59,7 +60,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
     };
   }, []);
 
-  const source = level === "region" ? props.regions : props.municipalities;
+  const source = level === "region" ? [props.country, ...props.regions] : props.municipalities;
   const rows = useMemo(() => {
     const needle = query.trim();
     if (needle === "") return source;
@@ -69,6 +70,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
   const max = source[0]?.valueGel ?? 1;
   const openMunicipality = (code: string) => router.push(`/explorer/municipalities/${code}`);
   const openRegion = (regionId: string) => router.push(`/explorer/municipalities/region/${regionId.replace("region.", "")}`);
+  const openCountry = () => router.push("/explorer/municipalities/georgia");
 
   return (
     <>
@@ -173,7 +175,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                   data-testid="municipal-list-row"
                   data-municipality-row-code={row.kind === "municipality" ? row.id : undefined}
                   data-active={row.kind === "municipality" && row.id === activeMunicipalityCode ? "true" : undefined}
-                  onClick={() => (row.kind === "region" ? openRegion(row.id) : openMunicipality(row.id))}
+                  onClick={() => (row.kind === "country" ? openCountry() : row.kind === "region" ? openRegion(row.id) : openMunicipality(row.id))}
                   onMouseEnter={() => {
                     if (row.kind === "municipality") setListPointerCode(row.id);
                   }}
@@ -191,7 +193,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                   }`}
                 >
                   <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                    {String(row.rank).padStart(2, "0")}
+                    {row.rank === null ? "—" : String(row.rank).padStart(2, "0")}
                   </span>
                   <span className="min-w-0">
                     <span data-testid="municipal-row-name" className="block truncate text-[12.5px] font-medium">

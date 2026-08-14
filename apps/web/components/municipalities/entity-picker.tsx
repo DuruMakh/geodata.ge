@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { MUNICIPAL_COUNTRY_ID } from "../../lib/data/municipal/types";
 import { formatAmount } from "../../lib/explorer/format";
 
 // Entity picker for the 64 municipality and 11 region pages. A plain popover
@@ -23,16 +24,26 @@ export type EntityPickerGroup = {
   members: Array<{ code: string; nameKa: string; valueGel: number }>;
 };
 
+export type EntityPickerCountry = {
+  id: typeof MUNICIPAL_COUNTRY_ID;
+  nameKa: "საქართველო";
+  valueGel: number;
+  budgetCount: 69;
+};
+
 type EntityPickerProps = {
   open: boolean;
   onClose: () => void;
+  country: EntityPickerCountry;
   groups: EntityPickerGroup[];
   activeId: string;
+  onSelectCountry: () => void;
   onSelectMunicipality: (code: string) => void;
   onSelectRegion: (regionId: string) => void;
 };
 
 type PickerOption =
+  | { id: string; kind: "country" }
   | { id: string; kind: "region"; regionId: string }
   | { id: string; kind: "municipality"; code: string };
 
@@ -40,6 +51,10 @@ type PickerOption =
 // so they never need to appear in a useMemo/useEffect dependency array.
 function regionOptionId(baseId: string, regionId: string): string {
   return `${baseId}-region-${regionId}`;
+}
+
+function countryOptionId(baseId: string): string {
+  return `${baseId}-country`;
 }
 
 function municipalityOptionId(baseId: string, code: string): string {
@@ -53,7 +68,7 @@ function focusTrigger() {
   document.querySelector<HTMLButtonElement>("[data-testid='entity-picker-trigger']")?.focus();
 }
 
-export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipality, onSelectRegion }: EntityPickerProps) {
+export function EntityPicker({ open, onClose, country, groups, activeId, onSelectCountry, onSelectMunicipality, onSelectRegion }: EntityPickerProps) {
   const [query, setQuery] = useState("");
   const [activeOptionId, setActiveOptionId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -108,7 +123,7 @@ export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipa
   // conditional early return may not sit between hook calls (Rules of Hooks).
   // groups/members are still small (11 regions, 64 municipalities total) even
   // while closed, so computing them unconditionally costs nothing measurable.
-  const filtered = useMemo(() => {
+  const filteredGroups = useMemo(() => {
     const needle = query.trim();
     if (needle === "") return groups;
 
@@ -117,16 +132,19 @@ export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipa
       .filter((group) => group.members.length > 0 || group.nameKa.includes(needle));
   }, [groups, query]);
 
+  const filteredCountry = useMemo(() => (country.nameKa.includes(query.trim()) ? country : null), [country, query]);
+
   const flatOptions = useMemo<PickerOption[]>(() => {
     const list: PickerOption[] = [];
-    for (const group of filtered) {
+    if (filteredCountry) list.push({ id: countryOptionId(baseId), kind: "country" });
+    for (const group of filteredGroups) {
       list.push({ id: regionOptionId(baseId, group.regionId), kind: "region", regionId: group.regionId });
       for (const member of group.members) {
         list.push({ id: municipalityOptionId(baseId, member.code), kind: "municipality", code: member.code });
       }
     }
     return list;
-  }, [filtered, baseId]);
+  }, [filteredCountry, filteredGroups, baseId]);
 
   // The listbox is a capped, scrollable region (see max-h-[340px] below); with
   // up to 75 options, arrowing past the visible edge must carry the highlight
@@ -138,7 +156,8 @@ export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipa
 
   function selectOption(option: PickerOption) {
     onClose();
-    if (option.kind === "region") onSelectRegion(option.regionId);
+    if (option.kind === "country") onSelectCountry();
+    else if (option.kind === "region") onSelectRegion(option.regionId);
     else onSelectMunicipality(option.code);
   }
 
@@ -169,7 +188,7 @@ export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipa
       />
       <div
         role="dialog"
-        aria-label="აირჩიე მუნიციპალიტეტი ან რეგიონი"
+        aria-label="აირჩიე საქართველო, მუნიციპალიტეტი ან რეგიონი"
         data-testid="entity-picker"
         className="absolute top-1 left-0 z-40 w-[430px] max-w-[92vw] border border-[var(--control)] bg-[var(--tile)]"
       >
@@ -200,13 +219,33 @@ export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipa
                 onClose();
               }
             }}
-            placeholder="ძებნა — მუნიციპალიტეტი ან რეგიონი"
-            aria-label="ძებნა"
+            placeholder="ძებნა — საქართველო, მუნიციპალიტეტი ან რეგიონი"
+            aria-label="ძებნა საქართველოში, მუნიციპალიტეტებში ან რეგიონებში"
             className="h-[34px] w-full rounded-[3px] border border-[var(--control)] bg-[var(--paper)] px-2.5 text-[13px] text-[var(--ink)] outline-none"
           />
         </div>
-        <div id={listboxId} role="listbox" aria-label="შედეგები" className="max-h-[340px] overflow-y-auto">
-          {filtered.map((group) => {
+        <div id={listboxId} role="listbox" aria-label="საქართველოს, მუნიციპალიტეტებისა და რეგიონების შედეგები" className="max-h-[340px] overflow-y-auto">
+          {filteredCountry ? (
+            <button
+              type="button"
+              id={countryOptionId(baseId)}
+              role="option"
+              aria-selected={countryOptionId(baseId) === activeOptionId}
+              aria-current={country.id === activeId ? "page" : undefined}
+              tabIndex={-1}
+              data-testid="picker-country"
+              onClick={() => selectOption({ id: countryOptionId(baseId), kind: "country" })}
+              className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
+                countryOptionId(baseId) === activeOptionId ? "border-l-[var(--ink)]" : "border-l-transparent"
+              } ${country.id === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
+            >
+              <span className="truncate text-[12px] font-semibold">{country.nameKa}</span>
+              <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
+                {formatAmount(country.valueGel)} · {country.budgetCount} მუნიციპალური ბიუჯეტი
+              </span>
+            </button>
+          ) : null}
+          {filteredGroups.map((group) => {
             const regionId = regionOptionId(baseId, group.regionId);
             const regionActive = regionId === activeOptionId;
 
@@ -261,7 +300,7 @@ export function EntityPicker({ open, onClose, groups, activeId, onSelectMunicipa
           })}
         </div>
         <div className="border-t border-[var(--hairline-soft)] px-3 py-2 text-[11px] text-[var(--faint)]">
-          რეგიონის დაჭერა აჩვენებს მის ჯამურ მონაცემებს
+          საქართველოს ან რეგიონის დაჭერა აჩვენებს მის ჯამურ მონაცემებს
         </div>
       </div>
     </div>
