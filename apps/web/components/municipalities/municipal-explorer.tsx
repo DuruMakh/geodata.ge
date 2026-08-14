@@ -7,6 +7,7 @@ import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } fro
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import {
   buildComparisonRows,
+  buildCountryKpis,
   buildEntityKpis,
   buildMovers,
   buildMunicipalEntityModel,
@@ -24,6 +25,15 @@ import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup } from "
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
 
+type MunicipalMetricContext =
+  | {
+      kind: "ranked";
+      nationalTotalByYear: Record<number, number>;
+      rankByYear: Record<number, number>;
+      rankOutOf: number;
+    }
+  | { kind: "country"; budgetCount: 69 };
+
 export type MunicipalExplorerProps = {
   title: string;
   triggerLabel: string;
@@ -40,14 +50,16 @@ export type MunicipalExplorerProps = {
   totalFacts: MunicipalTotalFact[];
   sourceDocuments: SourceDocumentRow[];
 
-  nationalTotalByYear: Record<number, number>;
-  rankByYear: Record<number, number>;
-  rankOutOf: number;
+  metrics?: MunicipalMetricContext;
+  nationalTotalByYear?: Record<number, number>;
+  rankByYear?: Record<number, number>;
+  rankOutOf?: number;
   csvBasename: string;
   pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
-  prev: { label: string; href: string };
-  next: { label: string; href: string };
+  navigation?: { prev: { label: string; href: string }; next: { label: string; href: string } };
+  prev?: { label: string; href: string };
+  next?: { label: string; href: string };
   sourceNote: string;
   children?: ReactNode;
 };
@@ -55,6 +67,14 @@ export type MunicipalExplorerProps = {
 export function MunicipalExplorer(props: MunicipalExplorerProps) {
   const router = useRouter();
   const { functions, functionFacts, totalFacts, sourceDocuments } = props;
+  const metrics: MunicipalMetricContext =
+    props.metrics ?? {
+      kind: "ranked",
+      nationalTotalByYear: props.nationalTotalByYear ?? {},
+      rankByYear: props.rankByYear ?? {},
+      rankOutOf: props.rankOutOf ?? 0,
+    };
+  const navigation = props.navigation ?? (props.prev && props.next ? { prev: props.prev, next: props.next } : undefined);
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const allYears = useMemo(
@@ -139,7 +159,14 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
 
   function downloadCsv() {
     const csv = buildExplorerCsv([...model.rows, model.totalRow], years);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const countryCsv =
+      metrics.kind === "country"
+        ? (() => {
+            const [header, ...rows] = csv.split("\n");
+            return [`\uFEFFentity_id,${header?.replace(/^\uFEFF/, "") ?? ""}`, ...rows.map((row) => `${props.entityId},${row}`)].join("\n");
+          })()
+        : csv;
+    const blob = new Blob([countryCsv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -204,14 +231,19 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
           />
           <div className="text-[12.5px] text-[var(--muted)]">{props.metaLine}</div>
         </div>
-        <span className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink">
-          <a href={props.prev.href} className="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-            ← {props.prev.label}
-          </a>
-          <a href={props.next.href} className="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-            {props.next.label} →
-          </a>
-        </span>
+        {navigation ? (
+          <span
+            data-testid="municipal-entity-navigation"
+            className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink"
+          >
+            <a href={navigation.prev.href} className="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
+              ← {navigation.prev.label}
+            </a>
+            <a href={navigation.next.href} className="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
+              {navigation.next.label} →
+            </a>
+          </span>
+        ) : null}
       </div>
 
       <div
@@ -335,12 +367,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       {/* All three derive from the RANGE model, so they move together with
           the chart instead of describing a span the user is not looking at. */}
       <MunicipalIndicators
-        kpis={buildEntityKpis({
-          model,
-          nationalTotalByYear: props.nationalTotalByYear,
-          rankByYear: props.rankByYear,
-          rankOutOf: props.rankOutOf,
-        })}
+        kpis={
+          metrics.kind === "country"
+            ? buildCountryKpis(model, metrics.budgetCount)
+            : buildEntityKpis({ model, ...metrics })
+        }
         movers={buildMovers(model)}
         comparison={buildComparisonRows(model)}
         startYear={state.range.start}
