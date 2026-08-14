@@ -4,6 +4,10 @@ import type { SourceDocumentRow } from "../../lib/data/sources";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 import {
   aggregateFactsForEntity,
+  MIXED_PUBLIC_TOTAL_MEASURE,
+  MIXED_SOURCE_ID,
+} from "../../lib/data/municipal/aggregateMunicipalFacts";
+import {
   buildComparisonRows,
   buildEntityKpis,
   buildIndexKpis,
@@ -13,8 +17,6 @@ import {
   buildPickerGroups,
   getDefaultMunicipalSelection,
   latestReviewedAtForMunicipalFacts,
-  MIXED_PUBLIC_TOTAL_MEASURE,
-  MIXED_SOURCE_ID,
   regionFactsFor,
 } from "../../lib/explorer/municipalData";
 import { formatAmount, MISSING } from "../../lib/explorer/format";
