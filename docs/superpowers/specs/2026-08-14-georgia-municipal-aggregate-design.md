@@ -114,8 +114,9 @@ shared selector contract.
 
 Page copy:
 
-- picker trigger: `საქართველო`;
-- H1: `როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები`;
+- picker option: `საქართველო`;
+- H1: `როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები`, with
+  `საქართველოს მუნიციპალიტეტები` as the clickable entity-picker trigger;
 - meta: `69 მუნიციპალური საბიუჯეტო ერთეული · 2015–2025`, with the year range
   derived from loaded facts rather than hardcoded in the component;
 - no rank, previous/next region navigation, map, or member-municipality list.
