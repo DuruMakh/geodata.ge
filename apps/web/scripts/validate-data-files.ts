@@ -14,6 +14,8 @@ import {
   validateMunicipalityGeometrySources,
 } from "../lib/data/municipalGeometry/source";
 import {
+  loadMunicipalCountryFunctionFacts,
+  loadMunicipalCountryTotalFacts,
   loadMunicipalFunctionFacts,
   loadMunicipalTotalFacts,
 } from "../lib/data/municipal/importMunicipalFacts";
@@ -22,6 +24,7 @@ import {
   loadMunicipalFunctionsFile,
   loadMunicipalRegionsFile,
 } from "../lib/data/municipal/taxonomyFiles";
+import { MUNICIPAL_COUNTRY_ID } from "../lib/data/municipal/types";
 import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import { loadSourceDocuments } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
@@ -65,6 +68,12 @@ async function main() {
   const municipalities = await loadMunicipalitiesFile(SERVED_DATA_FILES.municipalities);
   const municipalFunctionFacts = await loadMunicipalFunctionFacts(SERVED_DATA_FILES.municipalFunctionFacts);
   const municipalTotalFacts = await loadMunicipalTotalFacts(SERVED_DATA_FILES.municipalTotalFacts);
+  const countryFunctionFacts = await loadMunicipalCountryFunctionFacts(
+    SERVED_DATA_FILES.municipalCountryFunctionFacts,
+  );
+  const countryTotalFacts = await loadMunicipalCountryTotalFacts(
+    SERVED_DATA_FILES.municipalCountryTotalFacts,
+  );
   const report = buildImportReport("real-budget-2004-2025", facts);
   const missingGlossary = taxonomy.filter((item) => !glossary.has(item.id));
   const registeredSourceIds = new Set(sources.map((source) => source.sourceId));
@@ -90,6 +99,16 @@ async function main() {
   assertYears("Revenue", sortedYears(revenueRows.map((row) => row.year)), REVENUE_YEARS);
   assertYears("Admin spending", sortedYears(adminSpendingFacts.map((row) => row.year)), ADMIN_SPENDING_YEARS);
   assertYears("Municipal", sortedYears(municipalFunctionFacts.map((row) => row.year)), MUNICIPAL_YEARS);
+  assertYears(
+    "Georgia municipal function facts",
+    sortedYears(countryFunctionFacts.map((row) => row.year)),
+    MUNICIPAL_YEARS,
+  );
+  assertYears(
+    "Georgia municipal total facts",
+    sortedYears(countryTotalFacts.map((row) => row.year)),
+    MUNICIPAL_YEARS,
+  );
 
   const municipalCodes = new Set(municipalities.map((row) => row.code));
   const regionIds = new Set(municipalRegions.map((region) => region.id));
@@ -111,6 +130,29 @@ async function main() {
   ).sort();
   if (unknownCategories.length > 0) {
     throw new Error(`Municipal facts reference unknown categories: ${unknownCategories.join(", ")}`);
+  }
+
+  const countryCategoryIds = new Set(countryFunctionFacts.map((fact) => fact.categoryId));
+  const unknownCountryCategories = [...countryCategoryIds]
+    .filter((categoryId) => !municipalCategoryIds.has(categoryId))
+    .sort();
+  const missingCountryCategories = [...municipalCategoryIds]
+    .filter((categoryId) => !countryCategoryIds.has(categoryId))
+    .sort();
+  if (unknownCountryCategories.length > 0 || missingCountryCategories.length > 0) {
+    throw new Error(
+      `Georgia municipal categories mismatch. Unknown: ${unknownCountryCategories.join(", ") || "none"}; ` +
+        `missing: ${missingCountryCategories.join(", ") || "none"}.`,
+    );
+  }
+
+  const countryScopes = new Set(
+    [...countryFunctionFacts, ...countryTotalFacts].map((fact) => fact.municipalityCode),
+  );
+  if (countryScopes.size !== 1 || !countryScopes.has(MUNICIPAL_COUNTRY_ID)) {
+    throw new Error(
+      `Georgia municipal facts must use scope ${MUNICIPAL_COUNTRY_ID}, got ${[...countryScopes].join(", ")}.`,
+    );
   }
 
   const unknownMunicipalities = Array.from(
@@ -135,6 +177,19 @@ async function main() {
     throw new Error(`Municipal facts reference unknown source documents: ${unresolvedMunicipalSourceIds.join(", ")}`);
   }
 
+  const unresolvedCountrySourceIds = Array.from(
+    new Set(
+      [...countryFunctionFacts, ...countryTotalFacts]
+        .map((fact) => fact.sourceId)
+        .filter((sourceId) => !registeredSourceIds.has(sourceId)),
+    ),
+  ).sort();
+  if (unresolvedCountrySourceIds.length > 0) {
+    throw new Error(
+      `Georgia municipal facts reference unknown source documents: ${unresolvedCountrySourceIds.join(", ")}`,
+    );
+  }
+
   const expectedFunctionRows = municipalFunctions.length * municipalities.length * MUNICIPAL_YEARS.length;
   if (municipalFunctionFacts.length !== expectedFunctionRows) {
     throw new Error(
@@ -150,6 +205,13 @@ async function main() {
     );
   }
 
+  if (countryFunctionFacts.length !== 110) {
+    throw new Error("Georgia municipal function facts must have 110 rows");
+  }
+  if (countryTotalFacts.length !== 11) {
+    throw new Error("Georgia municipal total facts must have 11 rows");
+  }
+
   // Density alone does not prove uniqueness — 7,040 rows could still contain a
   // duplicate and a hole. The import asserts this too, but the import needs a
   // database and CI runs this gate without one.
@@ -163,6 +225,20 @@ async function main() {
   const totalKeys = municipalTotalFacts.map((total) => `${total.year}:${total.municipalityCode}`);
   if (new Set(totalKeys).size !== totalKeys.length) {
     throw new Error("Municipal total facts contain duplicate (year, municipality) keys.");
+  }
+
+  const countryFunctionKeys = countryFunctionFacts.map(
+    (fact) => `${fact.year}:${fact.municipalityCode}:${fact.categoryId}`,
+  );
+  if (new Set(countryFunctionKeys).size !== countryFunctionKeys.length) {
+    throw new Error("Georgia municipal function facts contain duplicate (year, scope, category) keys.");
+  }
+
+  const countryTotalKeys = countryTotalFacts.map(
+    (total) => `${total.year}:${total.municipalityCode}`,
+  );
+  if (new Set(countryTotalKeys).size !== countryTotalKeys.length) {
+    throw new Error("Georgia municipal total facts contain duplicate (year, scope) keys.");
   }
 
   const unusedRegions = municipalRegions
@@ -202,6 +278,8 @@ async function main() {
 
   console.log(`Validated municipal function rows: ${municipalFunctionFacts.length}`);
   console.log(`Validated municipal total rows: ${municipalTotalFacts.length}`);
+  console.log(`Validated Georgia municipal function rows: ${countryFunctionFacts.length}`);
+  console.log(`Validated Georgia municipal total rows: ${countryTotalFacts.length}`);
   console.log(`Validated municipalities: ${municipalities.length}`);
   console.log(`Validated municipality map polygons: ${municipalityGeometrySources.municipalities.features.length}`);
   console.log(`Validated taxonomy rows: ${taxonomy.length}`);

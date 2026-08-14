@@ -15,6 +15,8 @@ import {
   adminFactParityKey,
   assertSameServedRows,
   budgetFactParityKey,
+  municipalCountryFunctionFactParityKey,
+  municipalCountryTotalFactParityKey,
   municipalFunctionFactParityKey,
   municipalTotalFactParityKey,
   nationalGdpFactParityKey,
@@ -28,6 +30,8 @@ import type {
 } from "./municipal/types";
 import { loadMunicipalitiesFile } from "./municipal/municipalitiesFile";
 import {
+  loadMunicipalCountryFunctionFacts,
+  loadMunicipalCountryTotalFacts,
   loadMunicipalFunctionFacts,
   loadMunicipalTotalFacts,
 } from "./municipal/importMunicipalFacts";
@@ -50,6 +54,9 @@ export const SERVED_DATA_FILES = {
   municipalities: "../../data/imports/municipalities.csv",
   municipalFunctionFacts: "../../data/imports/municipal-function-facts-2015-2025.csv",
   municipalTotalFacts: "../../data/imports/municipal-total-facts-2015-2025.csv",
+  municipalCountryFunctionFacts:
+    "../../data/imports/municipal-georgia-function-facts-2015-2025.csv",
+  municipalCountryTotalFacts: "../../data/imports/municipal-georgia-total-facts-2015-2025.csv",
   gdpFacts: "../../data/imports/national-gdp-annual-1996-2025.csv",
 } as const;
 
@@ -98,6 +105,8 @@ export type MunicipalData = {
   municipalities: Municipality[];
   functionFacts: MunicipalFunctionFact[];
   totalFacts: MunicipalTotalFact[];
+  countryFunctionFacts: MunicipalFunctionFact[];
+  countryTotalFacts: MunicipalTotalFact[];
 };
 
 export function resolveServedDataSource(): ServedDataSource {
@@ -195,12 +204,22 @@ async function loadExplorerDataFromCsv(): Promise<LoadedExplorerData> {
 }
 
 async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
-  const [functions, regions, municipalities, functionFacts, totalFacts] = await Promise.all([
+  const [
+    functions,
+    regions,
+    municipalities,
+    functionFacts,
+    totalFacts,
+    countryFunctionFacts,
+    countryTotalFacts,
+  ] = await Promise.all([
     loadMunicipalFunctionsFile(SERVED_DATA_FILES.municipalFunctions),
     loadMunicipalRegionsFile(SERVED_DATA_FILES.municipalRegions),
     loadMunicipalitiesFile(SERVED_DATA_FILES.municipalities),
     loadMunicipalFunctionFacts(SERVED_DATA_FILES.municipalFunctionFacts),
     loadMunicipalTotalFacts(SERVED_DATA_FILES.municipalTotalFacts),
+    loadMunicipalCountryFunctionFacts(SERVED_DATA_FILES.municipalCountryFunctionFacts),
+    loadMunicipalCountryTotalFacts(SERVED_DATA_FILES.municipalCountryTotalFacts),
   ]);
 
   return {
@@ -209,6 +228,8 @@ async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
     municipalities,
     functionFacts: byYearAscending(functionFacts),
     totalFacts: byYearAscending(totalFacts),
+    countryFunctionFacts: byYearAscending(countryFunctionFacts),
+    countryTotalFacts: byYearAscending(countryTotalFacts),
   };
 }
 
@@ -273,6 +294,18 @@ function assertMunicipalParity(db: MunicipalData, csv: MunicipalData): void {
     csv.totalFacts,
     db.totalFacts,
     municipalTotalFactParityKey,
+  );
+  assertSameServedRows(
+    "Georgia municipal function facts",
+    csv.countryFunctionFacts,
+    db.countryFunctionFacts,
+    municipalCountryFunctionFactParityKey,
+  );
+  assertSameServedRows(
+    "Georgia municipal total facts",
+    csv.countryTotalFacts,
+    db.countryTotalFacts,
+    municipalCountryTotalFactParityKey,
   );
 }
 

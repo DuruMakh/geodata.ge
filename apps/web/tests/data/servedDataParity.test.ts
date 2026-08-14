@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   assertSameServedRows,
+  municipalCountryFunctionFactParityKey,
+  municipalCountryTotalFactParityKey,
   nationalGdpFactParityKey,
 } from "../../lib/data/servedDataParity";
 
@@ -11,6 +13,25 @@ const keyOf = (row: Row) => row.id;
 describe("served data row parity", () => {
   it("keys one national GDP fact per year", () => {
     expect(nationalGdpFactParityKey({ year: 2025 })).toBe("2025");
+  });
+
+  it("keys one municipal country function fact per year, scope, and category", () => {
+    expect(
+      municipalCountryFunctionFactParityKey({
+        year: 2025,
+        municipalityCode: "country.georgia",
+        categoryId: "municipal.function.education",
+      }),
+    ).toBe("2025:country.georgia:municipal.function.education");
+  });
+
+  it("keys one municipal country total fact per year and scope", () => {
+    expect(
+      municipalCountryTotalFactParityKey({
+        year: 2025,
+        municipalityCode: "country.georgia",
+      }),
+    ).toBe("2025:country.georgia");
   });
   it("accepts identical rows regardless of order and key order", () => {
     const csv: Row[] = [
