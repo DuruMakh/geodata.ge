@@ -107,9 +107,12 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
           functionFacts={own.functionFacts}
           totalFacts={own.totalFacts}
           sourceDocuments={sourceDocuments}
-          nationalTotalByYear={nationalTotalByYear}
-          rankByYear={rankByYear}
-          rankOutOf={municipalities.length}
+          metrics={{
+            kind: "ranked",
+            nationalTotalByYear,
+            rankByYear,
+            rankOutOf: municipalities.length,
+          }}
           csvBasename={`municipality-${code}`}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,
@@ -118,8 +121,10 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
             budgetCount: 69,
           }}
           pickerGroups={buildPickerGroups(listInput)}
-          prev={{ label: prev.displayNameKa, href: `/explorer/municipalities/${prev.code}` }}
-          next={{ label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` }}
+          navigation={{
+            prev: { label: prev.displayNameKa, href: `/explorer/municipalities/${prev.code}` },
+            next: { label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` },
+          }}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />
       </div>

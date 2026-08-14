@@ -25,7 +25,7 @@ import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup } from "
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
 
-type MunicipalMetricContext =
+export type MunicipalMetricContext =
   | {
       kind: "ranked";
       nationalTotalByYear: Record<number, number>;
@@ -34,7 +34,9 @@ type MunicipalMetricContext =
     }
   | { kind: "country"; budgetCount: 69 };
 
-export type MunicipalExplorerProps = {
+type MunicipalNavigation = { prev: { label: string; href: string }; next: { label: string; href: string } };
+
+type MunicipalExplorerBaseProps = {
   title: string;
   triggerLabel: string;
   metaLine: string;
@@ -50,31 +52,23 @@ export type MunicipalExplorerProps = {
   totalFacts: MunicipalTotalFact[];
   sourceDocuments: SourceDocumentRow[];
 
-  metrics?: MunicipalMetricContext;
-  nationalTotalByYear?: Record<number, number>;
-  rankByYear?: Record<number, number>;
-  rankOutOf?: number;
   csvBasename: string;
   pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
-  navigation?: { prev: { label: string; href: string }; next: { label: string; href: string } };
-  prev?: { label: string; href: string };
-  next?: { label: string; href: string };
   sourceNote: string;
   children?: ReactNode;
 };
 
+export type MunicipalExplorerProps = MunicipalExplorerBaseProps &
+  (
+    | { metrics: Extract<MunicipalMetricContext, { kind: "ranked" }>; navigation: MunicipalNavigation }
+    | { metrics: Extract<MunicipalMetricContext, { kind: "country" }>; navigation?: never }
+  );
+
 export function MunicipalExplorer(props: MunicipalExplorerProps) {
   const router = useRouter();
   const { functions, functionFacts, totalFacts, sourceDocuments } = props;
-  const metrics: MunicipalMetricContext =
-    props.metrics ?? {
-      kind: "ranked",
-      nationalTotalByYear: props.nationalTotalByYear ?? {},
-      rankByYear: props.rankByYear ?? {},
-      rankOutOf: props.rankOutOf ?? 0,
-    };
-  const navigation = props.navigation ?? (props.prev && props.next ? { prev: props.prev, next: props.next } : undefined);
+  const { metrics, navigation } = props;
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const allYears = useMemo(
@@ -163,7 +157,10 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       metrics.kind === "country"
         ? (() => {
             const [header, ...rows] = csv.split("\n");
-            return [`\uFEFFentity_id,${header?.replace(/^\uFEFF/, "") ?? ""}`, ...rows.map((row) => `${props.entityId},${row}`)].join("\n");
+            return [
+              `\uFEFFentity_id,entity_name,${header?.replace(/^\uFEFF/, "") ?? ""}`,
+              ...rows.map((row) => `${props.entityId},${props.pickerCountry.nameKa},${row}`),
+            ].join("\n");
           })()
         : csv;
     const blob = new Blob([countryCsv], { type: "text/csv;charset=utf-8" });

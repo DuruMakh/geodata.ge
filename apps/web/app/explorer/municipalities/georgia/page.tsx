@@ -5,7 +5,6 @@ import { loadServedLandingData, loadServedMunicipalData } from "../../../../lib/
 import { MUNICIPAL_COUNTRY_ID } from "../../../../lib/data/municipal/types";
 import {
   buildCountryTotalByYear,
-  buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
 } from "../../../../lib/explorer/municipalData";

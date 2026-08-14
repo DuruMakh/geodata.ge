@@ -47,6 +47,7 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
   const csvPath = await download.path();
   if (!csvPath) throw new Error("Expected a local CSV download path");
   const csv = await readFile(csvPath, "utf8");
+  expect(csv).toContain("საქართველო");
   expect(csv).toContain("country.georgia");
   for (const code of ["05", "42", "43", "46", "64"]) {
     expect(csv).not.toMatch(new RegExp(`,${code},`));

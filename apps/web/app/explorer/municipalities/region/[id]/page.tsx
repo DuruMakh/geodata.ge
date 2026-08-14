@@ -122,9 +122,12 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           functionFacts={own.functionFacts}
           totalFacts={own.totalFacts}
           sourceDocuments={sourceDocuments}
-          nationalTotalByYear={nationalTotalByYear}
-          rankByYear={rankByYear}
-          rankOutOf={regions.length}
+          metrics={{
+            kind: "ranked",
+            nationalTotalByYear,
+            rankByYear,
+            rankOutOf: regions.length,
+          }}
           csvBasename={`region-${id}`}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,
@@ -133,8 +136,10 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
             budgetCount: 69,
           }}
           pickerGroups={buildPickerGroups(listInput)}
-          prev={{ label: prev.kaLabel, href: hrefFor(prev) }}
-          next={{ label: next.kaLabel, href: hrefFor(next) }}
+          navigation={{
+            prev: { label: prev.kaLabel, href: hrefFor(prev) },
+            next: { label: next.kaLabel, href: hrefFor(next) },
+          }}
           sourceNote={`${SOURCE_NOTE_BASE}${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         >
           <div className="mt-11 border-t-2 border-[var(--ink)] pt-[22px]">
