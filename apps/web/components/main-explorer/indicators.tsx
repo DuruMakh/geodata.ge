@@ -57,7 +57,7 @@ function MoverRow({ row, rank, maxAbsChange }: MoverRowProps) {
 }
 
 export function Indicators({ model, scope }: IndicatorsProps) {
-  const { years, totalRow, tableRows, comparisonRows, topGrowth, bottomGrowth } = model;
+  const { years, totalRow, comparisonRows, topGrowth, bottomGrowth } = model;
   const startYear = years[0];
   const endYear = years.at(-1);
   if (startYear === undefined || endYear === undefined) return null;
@@ -75,9 +75,8 @@ export function Indicators({ model, scope }: IndicatorsProps) {
   const sideNoun = scope === "revenue" ? "ჯამური შემოსავლები" : "ჯამური ხარჯები";
   const showSentence = totalStart > 0 && totalEnd > 0 && totalStart !== totalEnd;
 
-  // Side KPIs rank ALL top-level scope rows — the same population as the movers
-  // board below, so identical headings never contradict each other on one screen.
-  // The comparison table further down stays scoped to the user's selection.
+  // Side KPIs, movers, and the period comparison all rank every top-level scope
+  // row. The chart and chart-mode table remain scoped to the user's selection.
   const scopeRows = comparisonRows.filter((row) => row.level !== "major_program");
   // Rows missing either endpoint have no meaningful period delta, and a delta
   // measured against a non-positive start is mostly the unwind of a correction
@@ -127,10 +126,9 @@ export function Indicators({ model, scope }: IndicatorsProps) {
     ...comparisonRows.filter((row) => row.level !== "major_program").map((row) => Math.abs(row.change ?? 0)),
     0.001,
   );
-  const comparisonSorted = tableRows
-    .filter((row) => row.level !== "total")
+  const comparisonSorted = comparisonRows
+    .filter((row) => row.level !== "major_program")
     .sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0));
-  const selectedTotal = totalRow !== null && tableRows.some((row) => row.itemId === totalRow.itemId);
 
   const comparisonCell = (value: number | null | undefined) => (value === null || value === undefined ? MISSING : formatBn(value));
 
@@ -260,7 +258,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           </thead>
           <tbody>
             {[
-              selectedTotal && totalRow ? { row: totalRow, label: totalRow.kaLabel, weight: 600, color: "var(--ink)" } : null,
+              totalRow ? { row: totalRow, label: totalRow.kaLabel, weight: 600, color: "var(--ink)" } : null,
               ...comparisonSorted.map((row) => ({ row, label: truncate(row.kaLabel, 40), weight: 500, color: row.color })),
             ]
               .filter((entry): entry is { row: ExplorerTableRow; label: string; weight: number; color: string } => entry !== null)

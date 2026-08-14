@@ -71,7 +71,9 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   await expect(page.getByTestId("period-kpi-cards")).toContainText("პერიოდის ცვლილება");
   await expect(page.getByTestId("period-movers")).toContainText("ყველაზე მზარდი");
   await expect(page.getByTestId("period-comparison")).toContainText("პერიოდის შედარება");
-  await expect(page.getByTestId("period-comparison").locator("tbody tr")).toHaveCount(1);
+  const comparison = page.getByTestId("period-comparison");
+  const availableSeries = page.getByTestId("series-selector").getByTestId("series-row");
+  await expect(comparison.locator("tbody tr")).toHaveCount(await availableSeries.count());
 
   await expectNoPageOverflow(page);
   expect(consoleProblems).toEqual([]);
@@ -415,7 +417,7 @@ test("line mode renders every series from a large shared selection", async ({ pa
   await expect(page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']")).toHaveCount(ids.length);
 });
 
-test("unchecking the total hides its table row without breaking share denominators", async ({ page }) => {
+test("period comparison keeps every revenue category when the selected series change", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/revenue");
   await expectAppReady(page);
 
@@ -428,13 +430,37 @@ test("unchecking the total hides its table row without breaking share denominato
 
   const comparison = page.getByTestId("period-comparison");
   await expect(comparison.locator("tbody tr").first()).toContainText("მთლიანი შემოსავლები");
+  const comparisonRowCount = await comparison.locator("tbody tr").count();
 
   const totalButton = page.getByTestId("series-selector").getByTitle("მთლიანი შემოსავლები");
   await totalButton.click();
 
   await expect(page.getByTestId("explorer-table")).not.toContainText("მთლიანი შემოსავლები");
   await expect(page.getByTestId("explorer-table").locator("tbody tr").first()).toContainText("%");
-  await expect(comparison.locator("tbody tr")).toHaveCount(1);
+  await expect(comparison.locator("tbody tr")).toHaveCount(comparisonRowCount);
+  await expect(comparison.locator("tbody tr").first()).toContainText("მთლიანი შემოსავლები");
+});
+
+test("ministries period comparison keeps every top-level ministry and excludes major programs", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  await page.getByTestId("grouping-ministries").click();
+  const panel = page.getByTestId("series-selector");
+  const comparisonRows = page.getByTestId("period-comparison").locator("tbody tr");
+  const topLevelRows = panel.locator('[data-level="total"], [data-level="admin_category"]');
+  const expectedRowCount = await topLevelRows.count();
+
+  await expect(comparisonRows).toHaveCount(expectedRowCount);
+
+  const collapsedMinistry = panel.locator('[data-level="admin_category"] button[aria-expanded="false"]').first();
+  await collapsedMinistry.click();
+  const firstProgram = panel.locator('[data-level="major_program"]').first();
+  await expect(firstProgram).toBeVisible();
+  await firstProgram.getByTestId("series-row-toggle").click();
+  await expect(firstProgram.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
+
+  await expect(comparisonRows).toHaveCount(expectedRowCount);
 });
 
 test("shared ministries program links restore with the parent expanded", async ({ page }) => {

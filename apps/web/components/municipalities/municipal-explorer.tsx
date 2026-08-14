@@ -282,20 +282,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
 
           {props.children}
 
-          {/* All three derive from the RANGE model, so they move together with
-              the chart instead of describing a span the user is not looking at. */}
-          <MunicipalIndicators
-            kpis={buildEntityKpis({
-              model,
-              nationalTotalByYear: props.nationalTotalByYear,
-              rankByYear: props.rankByYear,
-              rankOutOf: props.rankOutOf,
-            })}
-            movers={buildMovers(model)}
-            comparison={buildComparisonRows(model)}
-            startYear={state.range.start}
-            endYear={state.range.end}
-          />
         </div>
 
         <aside className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
@@ -342,6 +328,21 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
           </div>
         </aside>
       </div>
+
+      {/* All three derive from the RANGE model, so they move together with
+          the chart instead of describing a span the user is not looking at. */}
+      <MunicipalIndicators
+        kpis={buildEntityKpis({
+          model,
+          nationalTotalByYear: props.nationalTotalByYear,
+          rankByYear: props.rankByYear,
+          rankOutOf: props.rankOutOf,
+        })}
+        movers={buildMovers(model)}
+        comparison={buildComparisonRows(model)}
+        startYear={state.range.start}
+        endYear={state.range.end}
+      />
     </>
   );
 }
