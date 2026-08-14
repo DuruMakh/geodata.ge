@@ -661,4 +661,31 @@ test.describe("municipality page", () => {
     await expect(comparisonHeader).toHaveText("ფუნქცია");
     expect(await comparisonHeader.innerText()).toBe(await explorerHeader.innerText());
   });
+
+  test("renders municipality indicators across the page below the CSV panel", async ({ page }) => {
+    await page.setViewportSize({ width: 1600, height: 1000 });
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const workspace = page.getByTestId("municipal-workspace");
+    const indicators = page.getByTestId("period-indicators");
+    const csvButton = page.getByTestId("municipal-csv");
+
+    await expect(workspace.locator("[data-testid='period-indicators']")).toHaveCount(0);
+    await expect(indicators).toBeVisible();
+    await expect(page.getByTestId("comparison-table").locator("tbody tr")).toHaveCount(11);
+
+    const columns = await workspace.evaluate((element) => getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/));
+    const workspaceBox = await workspace.boundingBox();
+    const indicatorsBox = await indicators.boundingBox();
+    const csvBox = await csvButton.boundingBox();
+
+    expect(columns).toHaveLength(2);
+    expect(workspaceBox).not.toBeNull();
+    expect(indicatorsBox).not.toBeNull();
+    expect(csvBox).not.toBeNull();
+    expect(Math.abs(indicatorsBox!.x - workspaceBox!.x)).toBeLessThanOrEqual(1);
+    expect(Math.abs(indicatorsBox!.width - workspaceBox!.width)).toBeLessThanOrEqual(1);
+    expect(indicatorsBox!.y).toBeGreaterThanOrEqual(csvBox!.y + csvBox!.height);
+  });
 });

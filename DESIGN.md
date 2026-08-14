@@ -506,7 +506,7 @@ National columns: `<first col> | years… | ცვლილება | წილ
 
 1. Hero KPI (`პერიოდის ცვლილება`, §7.12) + three side KPIs (`ყველაზე დიდი ზრდა`, `ყველაზე ნელი ზრდა`, `ყველაზე დიდი წილი მშპ-ში`) in a `1.35fr | 1fr` grid split by a hairline. Side KPIs rank **all top-level scope items** — the same population as the movers board, so the identical headings can never contradict each other on one screen. The `ყველაზე დიდი ზრდა` GEL delta requires a positive start value (a delta measured against a negative base is a correction unwind, not growth).
 2. Movers board (top 3 / bottom 3 across all scope items).
-3. `პერიოდის შედარება` — table `<first col> | start year | ცვლილება | end year`, with the exact-labeled total row first only when it is selected, fixed layout with 44% label column. This table (only) is scoped to the user's selected series.
+3. `პერიოდის შედარება` — table `<first col> | start year | ცვლილება | end year`, with the exact-labeled total row always first, followed by every applicable top-level category in end-year value order; nested major programs are excluded. The table uses a fixed layout with a 44% label column and is independent of the user's chart/table series selection.
 
 ## 9. Single-Year Analysis (ანალიზი)
 
