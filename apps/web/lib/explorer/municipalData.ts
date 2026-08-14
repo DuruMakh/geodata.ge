@@ -21,6 +21,7 @@ import { georgianOrdinal } from "./municipalLabels";
 // while this one is municipality×function×year.
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
+const MUNICIPAL_COUNTRY_BUDGET_COUNT = 69;
 
 export type MunicipalEntityModel = {
   years: number[];
@@ -345,7 +346,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     {
       label: "მუნიციპალური ხარჯი",
       value: formatAmount(latestTotal),
-      detail: `${latestYear} · ${municipalities.length} მუნიციპალიტეტი`,
+      detail: `${latestYear} · ${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური საბიუჯეტო ერთეული`,
     },
     {
       label: `ზრდა ${firstYear}-დან`,
@@ -358,7 +359,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
       detail:
         concentration === null
           ? ""
-          : `დანარჩენი ${municipalities.length - 1} ერთეული — ${formatShare(1 - concentration)}`,
+          : `დანარჩენი ${MUNICIPAL_COUNTRY_BUDGET_COUNT - 1} ერთეული — ${formatShare(1 - concentration)}`,
     },
     {
       label: "უმსხვილესი სფერო",

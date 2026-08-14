@@ -678,7 +678,7 @@ describe("buildIndexKpis", () => {
 
   it("leads with the municipal total for the latest year", () => {
     expect(kpis()[0]!.value).toBe("2.60 მლრდ ₾");
-    expect(kpis()[0]!.detail).toBe("2025 · 3 მუნიციპალიტეტი");
+    expect(kpis()[0]!.detail).toBe("2025 · 69 მუნიციპალური საბიუჯეტო ერთეული");
   });
 
   it("reports growth from the first served year", () => {
@@ -690,7 +690,7 @@ describe("buildIndexKpis", () => {
   it("reports concentration rather than a max/min ratio", () => {
     expect(kpis()[2]!.label).toBe("თბილისის წილი");
     expect(kpis()[2]!.value).toBe("76.9%");
-    expect(kpis()[2]!.detail).toBe("დანარჩენი 2 ერთეული — 23.1%");
+    expect(kpis()[2]!.detail).toBe("დანარჩენი 68 ერთეული — 23.1%");
   });
 });
 

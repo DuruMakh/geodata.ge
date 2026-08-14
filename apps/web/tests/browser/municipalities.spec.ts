@@ -378,10 +378,13 @@ test.describe("municipalities index", () => {
     await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/04");
   });
 
-  test("shows four KPIs", async ({ page }) => {
+  test("shows four KPIs with the 69-series country descriptions", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
-    await expect(page.getByTestId("index-kpi")).toHaveCount(4);
+    const kpis = page.getByTestId("index-kpi");
+    await expect(kpis).toHaveCount(4);
+    await expect(kpis.nth(0)).toContainText("2025 · 69 მუნიციპალური საბიუჯეტო ერთეული");
+    await expect(kpis.nth(2)).toContainText("დანარჩენი 68 ერთეული");
   });
 
   test("describes municipalities on the map and in the list", async ({ page }) => {
