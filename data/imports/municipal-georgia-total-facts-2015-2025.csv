@@ -1,0 +1,12 @@
+year,scope_id,public_total_gel,public_total_measure,total_payments_gel,expenses_gel,nonfinancial_asset_growth_gel,financial_asset_growth_gel,liability_decrease_gel,functional_sum_gel,reconciliation_difference_gel,warning_amount_gel,show_warning,warning_type,basis,source_id
+2015,country.georgia,2043872100.46,portal_functional_total_fallback,,,,,,2043872100.46,,,false,none,actual,source.municipal_portal_archive
+2016,country.georgia,1964677074.87,total_payments,1964677074.87,1312393748.16,524979943.67,98054916.75,29248466.29,2002147309.67,-37470234.80,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
+2017,country.georgia,1978973176.72,total_payments,1978973176.72,1249416550.08,563296075.78,130758753.00,35501797.86,2016116246.60,-37143069.88,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
+2018,country.georgia,2239801579.70,total_payments,2239801579.70,1267025046.02,629375577.43,317395914.00,26005042.25,2273962143.43,-34160563.73,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
+2019,country.georgia,2617436406.74,total_payments,2617436406.74,1549946177.13,1032561774.61,41600.00,34886855.00,2660036253.12,-42599846.38,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
+2020,country.georgia,2662965260.10,total_payments,2662965260.10,1644807165.56,989936676.59,0.00,28221417.95,2634743842.15,28221417.95,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
+2021,country.georgia,2950220526.72,total_payments,2950220526.72,1958929489.70,965060906.75,0.00,26230130.27,2923990396.45,26230130.27,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
+2022,country.georgia,3664160091.50,total_payments,3664160091.50,2489001930.42,1127719410.66,0.00,47438750.42,3616722196.21,47437895.29,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
+2023,country.georgia,4411806853.20,total_payments,4411806853.20,2929212356.64,1409004894.65,0.00,73589601.91,4338246204.12,73560649.08,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
+2024,country.georgia,5159412203.83,mixed:public_total_measure,,,,,,5075951947.64,,,false,none,actual,source.municipal_mof_annual_and_history_workbooks
+2025,country.georgia,5640161736.23,total_payments,5640161736.23,3840061620.88,1701226964.18,399900.00,98473251.17,5640161736.23,0.00,,false,none,actual,source.municipal_mof_annual_and_history_workbooks

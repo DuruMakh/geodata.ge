@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { readCsvRecords } from "../csv";
 import { MUNICIPAL_FUNCTION_CODES } from "./functionMapping";
-import type { MunicipalFunctionFact, MunicipalTotalFact } from "./types";
+import { MUNICIPAL_COUNTRY_ID, type MunicipalFunctionFact, type MunicipalTotalFact } from "./types";
 
 const nonnegativeAmountSchema = z.string().transform((value, ctx) => {
   const trimmed = value.trim();
@@ -86,6 +86,14 @@ const municipalTotalFactRowSchema = z.object({
   source_id: z.string().min(1),
 });
 
+const municipalCountryFunctionFactRowSchema = municipalFunctionFactRowSchema
+  .omit({ municipality_code: true })
+  .extend({ scope_id: z.literal(MUNICIPAL_COUNTRY_ID) });
+
+const municipalCountryTotalFactRowSchema = municipalTotalFactRowSchema
+  .omit({ municipality_code: true })
+  .extend({ scope_id: z.literal(MUNICIPAL_COUNTRY_ID) });
+
 export async function loadMunicipalFunctionFacts(
   relativePath: string,
 ): Promise<MunicipalFunctionFact[]> {
@@ -117,6 +125,55 @@ export async function loadMunicipalTotalFacts(
     return {
       year: row.year,
       municipalityCode: row.municipality_code,
+      publicTotalGel: row.public_total_gel,
+      publicTotalMeasure: row.public_total_measure,
+      totalPaymentsGel: row.total_payments_gel,
+      expensesGel: row.expenses_gel,
+      nonfinancialAssetGrowthGel: row.nonfinancial_asset_growth_gel,
+      financialAssetGrowthGel: row.financial_asset_growth_gel,
+      liabilityDecreaseGel: row.liability_decrease_gel,
+      functionalSumGel: row.functional_sum_gel,
+      reconciliationDifferenceGel: row.reconciliation_difference_gel,
+      warningAmountGel: row.warning_amount_gel,
+      showWarning: row.show_warning === "true",
+      warningType: row.warning_type,
+      basis: row.basis,
+      sourceId: row.source_id,
+    };
+  });
+}
+
+export async function loadMunicipalCountryFunctionFacts(
+  relativePath: string,
+): Promise<MunicipalFunctionFact[]> {
+  const records = await readCsvRecords(relativePath);
+
+  return records.map((record) => {
+    const row = municipalCountryFunctionFactRowSchema.parse(record);
+
+    return {
+      year: row.year,
+      municipalityCode: row.scope_id,
+      categoryId: row.category_id,
+      functionalCode: row.functional_code,
+      amountGel: row.amount_gel,
+      basis: row.basis,
+      sourceId: row.source_id,
+    };
+  });
+}
+
+export async function loadMunicipalCountryTotalFacts(
+  relativePath: string,
+): Promise<MunicipalTotalFact[]> {
+  const records = await readCsvRecords(relativePath);
+
+  return records.map((record) => {
+    const row = municipalCountryTotalFactRowSchema.parse(record);
+
+    return {
+      year: row.year,
+      municipalityCode: row.scope_id,
       publicTotalGel: row.public_total_gel,
       publicTotalMeasure: row.public_total_measure,
       totalPaymentsGel: row.total_payments_gel,
