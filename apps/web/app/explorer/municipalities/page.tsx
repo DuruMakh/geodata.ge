@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MunicipalitiesIndexPage() {
-  const { municipalities, regions, totalFacts, functionFacts, functions } = await loadServedMunicipalData();
+  const { municipalities, regions, totalFacts, functionFacts, countryTotalFacts, countryFunctionFacts, functions } = await loadServedMunicipalData();
   const { sourceDocuments } = await loadServedLandingData();
 
   const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
@@ -77,7 +77,16 @@ export default async function MunicipalitiesIndexPage() {
           legendMax={formatAmount(map.legendMaxGel)}
           municipalities={list.municipalities}
           regions={list.regions}
-          kpis={buildIndexKpis({ municipalities, totalFacts, functionFacts, functions, firstYear, latestYear })}
+          kpis={buildIndexKpis({
+            municipalities,
+            totalFacts,
+            functionFacts,
+            countryTotalFacts,
+            countryFunctionFacts,
+            functions,
+            firstYear,
+            latestYear,
+          })}
           latestYear={latestYear}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />

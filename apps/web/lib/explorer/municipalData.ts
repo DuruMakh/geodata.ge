@@ -1,8 +1,9 @@
-import type {
-  Municipality,
-  MunicipalFunction,
-  MunicipalFunctionFact,
-  MunicipalTotalFact,
+import {
+  MUNICIPAL_COUNTRY_ID,
+  type Municipality,
+  type MunicipalFunction,
+  type MunicipalFunctionFact,
+  type MunicipalTotalFact,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
 import { MIXED_SOURCE_ID } from "../data/municipal/aggregateMunicipalFacts";
@@ -185,12 +186,12 @@ export function getDefaultMunicipalSelection(model: MunicipalEntityModel): strin
 
 export type MunicipalListRow = {
   id: string;
-  kind: "municipality" | "region";
+  kind: "municipality" | "region" | "country";
   nameKa: string;
   subtitleKa: string;
   regionId: string | null;
   valueGel: number;
-  rank: number;
+  rank: number | null;
 };
 
 export type MunicipalListInput = {
@@ -254,6 +255,20 @@ export function buildMunicipalListRows(input: MunicipalListInput): {
   return { municipalities: municipalityRows, regions: regionRows };
 }
 
+export function buildCountryListRow(totalFacts: MunicipalTotalFact[], year: number): MunicipalListRow {
+  const totalByYear = buildCountryTotalByYear(totalFacts);
+
+  return {
+    id: MUNICIPAL_COUNTRY_ID,
+    kind: "country",
+    nameKa: "საქართველო",
+    subtitleKa: "69 მუნიციპალური ბიუჯეტი",
+    regionId: null,
+    valueGel: totalByYear[year] ?? 0,
+    rank: null,
+  };
+}
+
 /** Narrow the corpus to one region's members, for a region page. */
 export function regionFactsFor(
   regionId: string,
@@ -277,13 +292,22 @@ export type MunicipalIndexKpiInput = {
   municipalities: Municipality[];
   totalFacts: MunicipalTotalFact[];
   functionFacts: MunicipalFunctionFact[];
+  countryTotalFacts: MunicipalTotalFact[];
+  countryFunctionFacts: MunicipalFunctionFact[];
   functions: MunicipalFunction[];
   firstYear: number;
   latestYear: number;
 };
 
-function sumPublicTotal(totalFacts: MunicipalTotalFact[], year: number): number {
-  return totalFacts.filter((row) => row.year === year).reduce((sum, row) => sum + row.publicTotalGel, 0);
+export function buildCountryTotalByYear(totalFacts: MunicipalTotalFact[]): Record<number, number> {
+  const totals: Record<number, number> = {};
+  for (const row of totalFacts) {
+    if (totals[row.year] !== undefined) {
+      throw new Error(`Duplicate country total for year ${row.year}`);
+    }
+    totals[row.year] = row.publicTotalGel;
+  }
+  return totals;
 }
 
 /**
@@ -292,10 +316,11 @@ function sumPublicTotal(totalFacts: MunicipalTotalFact[], year: number): number 
  * both size-independent and both derivable from served facts.
  */
 export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
-  const { municipalities, totalFacts, functionFacts, functions, firstYear, latestYear } = input;
+  const { municipalities, totalFacts, countryTotalFacts, countryFunctionFacts, functions, firstYear, latestYear } = input;
+  const countryTotalByYear = buildCountryTotalByYear(countryTotalFacts);
 
-  const latestTotal = sumPublicTotal(totalFacts, latestYear);
-  const firstTotal = sumPublicTotal(totalFacts, firstYear);
+  const latestTotal = countryTotalByYear[latestYear] ?? 0;
+  const firstTotal = countryTotalByYear[firstYear] ?? 0;
   const growth = firstTotal === 0 ? null : (latestTotal - firstTotal) / firstTotal;
 
   const largest = municipalities
@@ -309,7 +334,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
   const concentration = largest && latestTotal > 0 ? largest.valueGel / latestTotal : null;
 
   const byFunction = new Map<string, number>();
-  for (const row of functionFacts) {
+  for (const row of countryFunctionFacts) {
     if (row.year !== latestYear) continue;
     byFunction.set(row.categoryId, (byFunction.get(row.categoryId) ?? 0) + row.amountGel);
   }
@@ -423,6 +448,40 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
       // the population data this project does not have. Per-capita is an
       // explicit v1 exclusion; do not reintroduce it here.
       detail: `${georgianOrdinal(rank)} ადგილი ${input.rankOutOf}-დან`,
+    },
+  ];
+}
+
+/** The country view has no rank because it is the aggregate denominator itself. */
+export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: number): MunicipalKpi[] {
+  const startYear = model.years[0];
+  const endYear = model.years.at(-1);
+  const officialStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
+  const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
+  const growth = changeBetween(officialStart, officialEnd);
+  const largest = sortedByEndYear(model.rows, endYear)[0];
+  const largestValue = largest && endYear !== undefined ? largest.valuesByYear[endYear] ?? 0 : 0;
+
+  return [
+    {
+      label: "ოფიციალური ბიუჯეტი",
+      value: formatAmount(officialEnd),
+      detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
+    },
+    {
+      label: `ზრდა ${startYear ?? ""}-დან`,
+      value: growth === null ? MISSING : formatShare(growth, true, 0),
+      detail: `${formatAmount(officialStart)} → ${formatAmount(officialEnd)}`,
+    },
+    {
+      label: "უმსხვილესი სფერო",
+      value: officialEnd ? formatShare(largestValue / officialEnd) : MISSING,
+      detail: largest?.kaLabel ?? "",
+    },
+    {
+      label: "მუნიციპალური ბიუჯეტები",
+      value: String(budgetCount),
+      detail: "64 საჯარო გვერდი · 5 მხოლოდ საქართველოს ჯამში",
     },
   ];
 }

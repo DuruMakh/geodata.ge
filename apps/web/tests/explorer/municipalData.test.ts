@@ -9,6 +9,9 @@ import {
 } from "../../lib/data/municipal/aggregateMunicipalFacts";
 import {
   buildComparisonRows,
+  buildCountryKpis,
+  buildCountryListRow,
+  buildCountryTotalByYear,
   buildEntityKpis,
   buildIndexKpis,
   buildMovers,
@@ -533,6 +536,26 @@ function totalFor(code: string, year: number, publicTotalGel: number): Municipal
   return { ...total(year, publicTotalGel, publicTotalGel), municipalityCode: code };
 }
 
+function countryTotalsFor(totalFacts: MunicipalTotalFact[]): MunicipalTotalFact[] {
+  const totalsByYear = new Map<number, number>();
+  for (const row of totalFacts) {
+    totalsByYear.set(row.year, (totalsByYear.get(row.year) ?? 0) + row.publicTotalGel);
+  }
+  return Array.from(totalsByYear, ([year, publicTotalGel]) => totalFor("country.georgia", year, publicTotalGel));
+}
+
+function countryFunctionsFor(functionFacts: MunicipalFunctionFact[]): MunicipalFunctionFact[] {
+  const totalsByKey = new Map<string, number>();
+  for (const row of functionFacts) {
+    const key = `${row.year}|${row.categoryId}`;
+    totalsByKey.set(key, (totalsByKey.get(key) ?? 0) + row.amountGel);
+  }
+  return Array.from(totalsByKey, ([key, amountGel]) => {
+    const [year, categoryId] = key.split("|");
+    return { ...fact(Number(year), categoryId!, amountGel), municipalityCode: "country.georgia" };
+  });
+}
+
 const INDEX_TOTALS: MunicipalTotalFact[] = [
   totalFor("04", 2015, 1_000_000_000), totalFor("04", 2025, 2_000_000_000),
   totalFor("06", 2015, 200_000_000), totalFor("06", 2025, 500_000_000),
@@ -567,6 +590,43 @@ describe("buildMunicipalListRows", () => {
   it("counts a region's members in its subtitle", () => {
     const { regions } = buildMunicipalListRows(listInput);
     expect(regions[1]!.subtitleKa).toBe("2 მუნიციპალიტეტი");
+  });
+});
+
+const COUNTRY_TOTALS: MunicipalTotalFact[] = [
+  { ...total(2024, 900, 900), municipalityCode: "country.georgia" },
+  { ...total(2025, 1_000, 1_000), municipalityCode: "country.georgia" },
+];
+
+describe("Georgia country aggregate models", () => {
+  it("builds a distinct, unranked Georgia list row from the dedicated total", () => {
+    expect(buildCountryListRow(COUNTRY_TOTALS, 2025)).toMatchObject({
+      id: "country.georgia",
+      kind: "country",
+      nameKa: "საქართველო",
+      subtitleKa: "69 მუნიციპალური ბიუჯეტი",
+      rank: null,
+      valueGel: 1_000,
+    });
+  });
+
+  it("indexes one dedicated country total per year", () => {
+    expect(buildCountryTotalByYear(COUNTRY_TOTALS)).toEqual({ 2024: 900, 2025: 1_000 });
+  });
+
+  it("rejects duplicate country totals instead of silently changing a denominator", () => {
+    expect(() => buildCountryTotalByYear([...COUNTRY_TOTALS, { ...COUNTRY_TOTALS[1]! }])).toThrow(
+      /duplicate country total/i,
+    );
+  });
+
+  it("labels the country count separately from public municipality pages", () => {
+    const countryKpis = buildCountryKpis(build(), 69);
+    expect(countryKpis[3]).toEqual({
+      label: "მუნიციპალური ბიუჯეტები",
+      value: "69",
+      detail: "64 საჯარო გვერდი · 5 მხოლოდ საქართველოს ჯამში",
+    });
   });
 });
 
@@ -609,6 +669,8 @@ describe("buildIndexKpis", () => {
       municipalities: MUNICIPALITIES,
       totalFacts: INDEX_TOTALS,
       functionFacts: [],
+      countryTotalFacts: countryTotalsFor(INDEX_TOTALS),
+      countryFunctionFacts: [],
       functions: FUNCTIONS,
       firstYear: 2015,
       latestYear: 2025,
@@ -632,6 +694,41 @@ describe("buildIndexKpis", () => {
   });
 });
 
+describe("buildIndexKpis — dedicated Georgia aggregate denominator", () => {
+  const publicTotals: MunicipalTotalFact[] = [
+    { ...total(2024, 600_000_000, 600_000_000), municipalityCode: "04" },
+    { ...total(2024, 400_000_000, 400_000_000), municipalityCode: "06" },
+    { ...total(2025, 1_000_000_000, 1_000_000_000), municipalityCode: "04" },
+    { ...total(2025, 400_000_000, 400_000_000), municipalityCode: "06" },
+  ];
+  const countryTotals: MunicipalTotalFact[] = [
+    { ...total(2024, 1_500_000_000, 1_500_000_000), municipalityCode: "country.georgia" },
+    { ...total(2025, 2_000_000_000, 2_000_000_000), municipalityCode: "country.georgia" },
+  ];
+  const countryFunctions: MunicipalFunctionFact[] = [
+    { ...fact(2025, "municipal.economic_affairs", 400_000_000), municipalityCode: "country.georgia" },
+    { ...fact(2025, "municipal.education", 100_000_000), municipalityCode: "country.georgia" },
+  ];
+
+  it("uses 69-series country facts for every national measure while naming the largest public municipality", () => {
+    const kpis = buildIndexKpis({
+      municipalities: MUNICIPALITIES,
+      totalFacts: publicTotals,
+      functionFacts: [],
+      countryTotalFacts: countryTotals,
+      countryFunctionFacts: countryFunctions,
+      functions: FUNCTIONS,
+      firstYear: 2024,
+      latestYear: 2025,
+    });
+
+    expect(kpis[0]!.value).toBe("2.00 მლრდ ₾");
+    expect(kpis[1]!.value).toBe("+33%");
+    expect(kpis[2]).toMatchObject({ label: "თბილისის წილი", value: "50.0%" });
+    expect(kpis[3]).toMatchObject({ value: "20.0%", detail: "ეკონომიკური საქმიანობა" });
+  });
+});
+
 // growth's sign prefix and formatShare's differ at exactly zero: formatShare
 // (and every other change/growth KPI in the app — indicators.tsx,
 // explorer-table.tsx, main-explorer.tsx, budget-field.tsx, ranking.tsx — all
@@ -649,6 +746,8 @@ describe("buildIndexKpis — growth sign at exactly zero", () => {
       municipalities: MUNICIPALITIES,
       totalFacts: ZERO_GROWTH_TOTALS,
       functionFacts: [],
+      countryTotalFacts: countryTotalsFor(ZERO_GROWTH_TOTALS),
+      countryFunctionFacts: [],
       functions: FUNCTIONS,
       firstYear: 2015,
       latestYear: 2025,
@@ -706,6 +805,8 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
       municipalities: MUNICIPALITIES,
       totalFacts: DIVERGENT_TOTALS,
       functionFacts: [],
+      countryTotalFacts: countryTotalsFor(DIVERGENT_TOTALS),
+      countryFunctionFacts: [],
       functions: FUNCTIONS,
       firstYear: 2015,
       latestYear: 2025,
@@ -733,6 +834,8 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
       municipalities: MUNICIPALITIES,
       totalFacts: [{ ...total(2025, 300, 265), municipalityCode: "04" }],
       functionFacts,
+      countryTotalFacts: countryTotalsFor([{ ...total(2025, 300, 265), municipalityCode: "04" }]),
+      countryFunctionFacts: countryFunctionsFor(functionFacts),
       functions: FUNCTIONS,
       firstYear: 2025,
       latestYear: 2025,

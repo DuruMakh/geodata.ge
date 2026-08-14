@@ -5,6 +5,7 @@ import { PageHeader } from "../../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../../lib/data/servedData";
 import {
   aggregateFactsForEntity,
+  buildCountryTotalByYear,
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
@@ -55,7 +56,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function RegionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const regionId = `region.${id}`;
-  const { municipalities, regions, functions, functionFacts, totalFacts } = await loadServedMunicipalData();
+  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts } = await loadServedMunicipalData();
   const { sourceDocuments } = await loadServedLandingData();
 
   const region = regions.find((row) => row.id === regionId);
@@ -74,10 +75,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
     return ranks;
   }, {});
   const rank = rankByYear[latestYear] ?? 0;
-  const nationalTotalByYear = totalFacts.reduce<Record<number, number>>((totals, row) => {
-    totals[row.year] = (totals[row.year] ?? 0) + row.publicTotalGel;
-    return totals;
-  }, {});
+  const nationalTotalByYear = buildCountryTotalByYear(countryTotalFacts);
 
   const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
   // Collapse the members' rows into one entity's on the SERVER, so this page
