@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { validateRawMunicipalCoverage } from "../../../lib/data/municipal/generateMunicipalFacts";
+import { loadAdjaraBudgetAdjustments } from "../../../lib/data/municipal/importAdjaraBudgetAdjustments";
 import { loadMunicipalitiesFile } from "../../../lib/data/municipal/municipalitiesFile";
 import {
   loadMunicipalCountryFunctionFacts,
@@ -14,6 +15,7 @@ const FUNCTION_FACTS = "../../data/imports/municipal-function-facts-2015-2025.cs
 const TOTAL_FACTS = "../../data/imports/municipal-total-facts-2015-2025.csv";
 const COUNTRY_FUNCTION_FACTS = "../../data/imports/municipal-georgia-function-facts-2015-2025.csv";
 const COUNTRY_TOTAL_FACTS = "../../data/imports/municipal-georgia-total-facts-2015-2025.csv";
+const ADJARA_ADJUSTMENTS = "../../data/imports/municipal-adjara-budget-adjustments-2015-2025.csv";
 const COUNTRY_ID = "country.georgia";
 const MUNICIPALITIES = "../../data/imports/municipalities.csv";
 const FUNCTIONS = "../../data/taxonomy/municipal-functions.json";
@@ -103,10 +105,12 @@ describe("generated municipal fact files", () => {
   });
 
   it("independently aggregates every Georgia function and total component across all 69 contributors", async () => {
-    const [countryFunctions, countryTotals] = await Promise.all([
+    const [countryFunctions, countryTotals, adjustments] = await Promise.all([
       loadMunicipalCountryFunctionFacts(COUNTRY_FUNCTION_FACTS),
       loadMunicipalCountryTotalFacts(COUNTRY_TOTAL_FACTS),
+      loadAdjaraBudgetAdjustments(ADJARA_ADJUSTMENTS),
     ]);
+    const adjustmentByYear = new Map(adjustments.map((row) => [row.year, row]));
 
     expect(countryFunctions).toHaveLength(110);
     expect(countryTotals).toHaveLength(11);
@@ -126,20 +130,13 @@ describe("generated municipal fact files", () => {
       );
     }
 
-    const nullableComponents = [
-      ["totalPaymentsGel", "total_payments_gel"],
-      ["expensesGel", "expenses_gel"],
-      ["nonfinancialAssetGrowthGel", "nonfinancial_asset_growth_gel"],
-      ["financialAssetGrowthGel", "financial_asset_growth_gel"],
-      ["liabilityDecreaseGel", "liability_decrease_gel"],
-      ["reconciliationDifferenceGel", "reconciliation_difference_gel"],
-    ] as const;
-
     for (const fact of countryTotals) {
       const contributors = rawTotals.filter((row) => Number(row.year) === fact.year);
+      const adjustment = adjustmentByYear.get(fact.year)!;
       expect(contributors, String(fact.year)).toHaveLength(69);
       expect(fact.publicTotalGel, `${fact.year}:publicTotalGel`).toBeCloseTo(
-        contributors.reduce((sum, row) => sum + Number(row.public_total_gel), 0),
+        contributors.reduce((sum, row) => sum + Number(row.public_total_gel), 0) +
+          adjustment.netRepublicPaymentsGel,
         2,
       );
       expect(fact.functionalSumGel, `${fact.year}:functionalSumGel`).toBeCloseTo(
@@ -147,21 +144,29 @@ describe("generated municipal fact files", () => {
         2,
       );
 
-      for (const [factField, rawField] of nullableComponents) {
-        const expected = contributors.some((row) => row[rawField]!.trim() === "")
-          ? null
-          : contributors.reduce((sum, row) => sum + Number(row[rawField]), 0);
-        if (expected === null) {
-          expect(fact[factField], `${fact.year}:${factField}`).toBeNull();
-        } else {
-          expect(fact[factField], `${fact.year}:${factField}`).toBeCloseTo(expected, 2);
-        }
+      const expectedTotalPayments = contributors.some((row) => row.total_payments_gel.trim() === "")
+        ? null
+        : contributors.reduce((sum, row) => sum + Number(row.total_payments_gel), 0) +
+          adjustment.netRepublicPaymentsGel;
+      if (expectedTotalPayments === null) {
+        expect(fact.totalPaymentsGel, `${fact.year}:totalPaymentsGel`).toBeNull();
+      } else {
+        expect(fact.totalPaymentsGel, `${fact.year}:totalPaymentsGel`).toBeCloseTo(expectedTotalPayments, 2);
       }
+      expect(fact.expensesGel).toBeNull();
+      expect(fact.nonfinancialAssetGrowthGel).toBeNull();
+      expect(fact.financialAssetGrowthGel).toBeNull();
+      expect(fact.liabilityDecreaseGel).toBeNull();
+      expect(fact.reconciliationDifferenceGel).toBeNull();
     }
 
     expect(new Set(rawFunctions.map((row) => row.municipality_code)).size).toBe(69);
     expect(new Set(rawTotals.map((row) => row.municipality_code)).size).toBe(69);
     expect(countryTotals.some((row) => row.totalPaymentsGel === null)).toBe(true);
+    expect(countryTotals.find((row) => row.year === 2015)?.publicTotalGel).toBeCloseTo(
+      2186717489.17,
+      2,
+    );
   });
 
   it("references only registered municipalities", async () => {

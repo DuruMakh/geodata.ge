@@ -3,7 +3,11 @@ import path from "node:path";
 import { MUNICIPAL_YEARS } from "../coverage";
 import { readCsvRecords, type CsvRecord } from "../csv";
 import { csvEscape } from "../csvEscape";
-import { aggregateFactsForEntity } from "./aggregateMunicipalFacts";
+import {
+  aggregateFactsForEntity,
+  applyAdjaraBudgetAdjustment,
+} from "./aggregateMunicipalFacts";
+import { loadAdjaraBudgetAdjustments } from "./importAdjaraBudgetAdjustments";
 import { MUNICIPAL_FUNCTION_CODES, municipalCategoryIdForCode } from "./functionMapping";
 import { loadMunicipalitiesFile } from "./municipalitiesFile";
 import { MUNICIPAL_COUNTRY_ID, type MunicipalFunctionFact, type MunicipalTotalFact } from "./types";
@@ -16,6 +20,7 @@ const OUT_FUNCTIONS = "../../data/imports/municipal-function-facts-2015-2025.csv
 const OUT_TOTALS = "../../data/imports/municipal-total-facts-2015-2025.csv";
 const OUT_COUNTRY_FUNCTIONS = "../../data/imports/municipal-georgia-function-facts-2015-2025.csv";
 const OUT_COUNTRY_TOTALS = "../../data/imports/municipal-georgia-total-facts-2015-2025.csv";
+const ADJARA_ADJUSTMENTS = "../../data/imports/municipal-adjara-budget-adjustments-2015-2025.csv";
 const MUNICIPALITIES = "../../data/imports/municipalities.csv";
 
 const PORTAL_SOURCE = "source.municipal_portal_archive";
@@ -236,10 +241,11 @@ export async function generateMunicipalFactCsvs(): Promise<{
   countryFunctionRows: number;
   countryTotalRows: number;
 }> {
-  const [rawFunctions, rawTotals, municipalities] = await Promise.all([
+  const [rawFunctions, rawTotals, municipalities, adjaraAdjustments] = await Promise.all([
     readCsvRecords(RAW_FUNCTIONS),
     readCsvRecords(RAW_TOTALS),
     loadMunicipalitiesFile(MUNICIPALITIES),
+    loadAdjaraBudgetAdjustments(ADJARA_ADJUSTMENTS),
   ]);
   validateRawMunicipalCoverage(
     rawFunctions,
@@ -296,7 +302,11 @@ export async function generateMunicipalFactCsvs(): Promise<{
     (left, right) =>
       left.year - right.year || Number(left.functionalCode.slice(2)) - Number(right.functionalCode.slice(2)),
   );
-  const countryTotalFacts = country.totalFacts.sort((left, right) => left.year - right.year);
+  const countryTotalFacts = applyAdjaraBudgetAdjustment(
+    country.totalFacts,
+    adjaraAdjustments,
+    "georgia_with_adjara_consolidated_total",
+  ).sort((left, right) => left.year - right.year);
 
   const functionRows = publicFunctionFacts.map((fact) => [
     String(fact.year),

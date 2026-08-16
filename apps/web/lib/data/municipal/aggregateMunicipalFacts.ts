@@ -1,4 +1,8 @@
-import type { MunicipalFunctionFact, MunicipalTotalFact } from "./types";
+import type {
+  AdjaraBudgetAdjustment,
+  MunicipalFunctionFact,
+  MunicipalTotalFact,
+} from "./types";
 
 // Sentinels for a group field that disagrees across the municipalities being
 // rolled up. Real ids/measures never contain a colon (source ids are
@@ -7,6 +11,46 @@ import type { MunicipalFunctionFact, MunicipalTotalFact } from "./types";
 // real value and cannot be mistaken for one downstream.
 export const MIXED_SOURCE_ID = "mixed:source_id";
 export const MIXED_PUBLIC_TOTAL_MEASURE = "mixed:public_total_measure";
+export const ADJARA_CONSOLIDATED_SOURCE_ID = "source.adjara_consolidated_budget";
+
+function addMoney(left: number, right: number): number {
+  return (Math.round(left * 100) + Math.round(right * 100)) / 100;
+}
+
+/** Add Adjara's republican payments net of transfers, without inventing a function split. */
+export function applyAdjaraBudgetAdjustment(
+  totalFacts: MunicipalTotalFact[],
+  adjustments: AdjaraBudgetAdjustment[],
+  publicTotalMeasure = "adjara_consolidated_total",
+): MunicipalTotalFact[] {
+  const adjustmentByYear = new Map(adjustments.map((row) => [row.year, row]));
+
+  return totalFacts.map((total) => {
+    const adjustment = adjustmentByYear.get(total.year);
+    if (!adjustment) {
+      throw new Error(`Missing Adjara budget adjustment for ${total.year}`);
+    }
+
+    return {
+      ...total,
+      publicTotalGel: addMoney(total.publicTotalGel, adjustment.netRepublicPaymentsGel),
+      publicTotalMeasure,
+      totalPaymentsGel:
+        total.totalPaymentsGel === null
+          ? null
+          : addMoney(total.totalPaymentsGel, adjustment.netRepublicPaymentsGel),
+      expensesGel: null,
+      nonfinancialAssetGrowthGel: null,
+      financialAssetGrowthGel: null,
+      liabilityDecreaseGel: null,
+      reconciliationDifferenceGel: null,
+      warningAmountGel: null,
+      showWarning: false,
+      warningType: "none",
+      sourceId: ADJARA_CONSOLIDATED_SOURCE_ID,
+    };
+  });
+}
 
 /**
  * Sum two nullable component fields. A missing constituent makes the whole

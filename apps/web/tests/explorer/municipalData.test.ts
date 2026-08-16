@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
-import type { Municipality, MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
+import type {
+  AdjaraBudgetAdjustment,
+  Municipality,
+  MunicipalFunction,
+  MunicipalFunctionFact,
+  MunicipalTotalFact,
+} from "../../lib/data/municipal/types";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 import {
+  applyAdjaraBudgetAdjustment,
   aggregateFactsForEntity,
   MIXED_PUBLIC_TOTAL_MEASURE,
   MIXED_SOURCE_ID,
@@ -84,6 +91,33 @@ const TOTAL_FACTS: MunicipalTotalFact[] = [
   total(2016, 300, 265, true),
   total(2017, 370, 370),
 ];
+
+const ADJARA_ADJUSTMENTS: AdjaraBudgetAdjustment[] = [
+  {
+    year: 2015,
+    scopeId: "region.adjara",
+    republicPaymentsGel: 170031400,
+    municipalTransfersGel: 27186011.29,
+    netRepublicPaymentsGel: 142845388.71,
+    basis: "actual",
+    republicSourceId: "source.adjara_republic_budget_actual",
+    transferSourceId: "source.treasury_consolidated_revenue_actual",
+  },
+];
+
+describe("applyAdjaraBudgetAdjustment", () => {
+  it("adds the net republican amount once and leaves function coverage separate", () => {
+    const base = [{ ...total(2015, 216011449.37, 216011449.37), totalPaymentsGel: null }];
+    const [adjusted] = applyAdjaraBudgetAdjustment(base, ADJARA_ADJUSTMENTS);
+
+    expect(adjusted.publicTotalGel).toBeCloseTo(358856838.08, 2);
+    expect(adjusted.publicTotalMeasure).toBe("adjara_consolidated_total");
+    expect(adjusted.totalPaymentsGel).toBeNull();
+    expect(adjusted.functionalSumGel).toBe(216011449.37);
+    expect(adjusted.expensesGel).toBeNull();
+    expect(adjusted.reconciliationDifferenceGel).toBeNull();
+  });
+});
 
 function build(startYear = 2015, endYear = 2017) {
   return buildMunicipalEntityModel({
