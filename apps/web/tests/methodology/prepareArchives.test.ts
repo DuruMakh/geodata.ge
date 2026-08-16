@@ -94,6 +94,8 @@ async function createFixtureRepository() {
       await writeReviewedSource(repositoryRoot, "revenue", "2025", "docs/Raw Data/Revenue/source-c.pdf", "downloads/methodology/revenue/files/2025/source-c.pdf", "source-c"),
     ],
     municipalities: [
+      await writeReviewedSource(repositoryRoot, "municipalities", "2015", "docs/Raw Data/Municipalities/adjara-republic-budget-2015-2025/adjara-2015.pdf", "downloads/methodology/municipalities/files/2015/adjara-2015.pdf", "adjara-2015"),
+      await writeReviewedSource(repositoryRoot, "municipalities", "2016-2025", "docs/Raw Data/Municipalities/adjara-republic-budget-2015-2025/adjara-2016-2025.xlsx", "downloads/methodology/municipalities/files/2016-2025/adjara-2016-2025.xlsx", "adjara-2016-2025"),
       await writeReviewedSource(repositoryRoot, "municipalities", "2015", "docs/Raw Data/Municipalities/mof-functional-classification/source-d.xlsx", "downloads/methodology/municipalities/files/2015/source-d.xlsx", "source-d"),
       await writeReviewedSource(repositoryRoot, "municipalities", "2016-2025", "docs/Raw Data/Municipalities/mof-municipality-budget-history-2016-2025/source-e.xlsx", "downloads/methodology/municipalities/files/2016-2025/source-e.xlsx", "source-e"),
       await writeReviewedSource(repositoryRoot, "municipalities", "2022", "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022/source-f.zip", "downloads/methodology/municipalities/files/2022/source-f.zip", "source-f"),

@@ -86,9 +86,10 @@ unchanged for provenance.
 
 With code `05` excluded, `region.abkhazia` has no served municipality and is omitted from the
 municipal data taxonomy. The map's reviewed occupied-area geometry is a non-interactive visual
-overlay without public copy (see "Municipality geometry join" below). The Adjara regional
-roll-up continues to exclude the autonomous republic's own budget, which is outside this package
-entirely.
+overlay without public copy (see "Municipality geometry join" below). Adjara is the one special
+regional total: its six-municipality roll-up receives the Adjara republican budget's actual
+payments net of transfers from the republic to territorial budgets. This prevents internal
+transfers from being counted twice and does not create a separate republic entity.
 
 ### Municipality geometry join
 
@@ -154,7 +155,8 @@ separate, future candidate dataset (see
 - Basis: actual, except that no planned value is substituted when an official actual total is unavailable.
 - Functional coverage: ten main functions and six selected details that are consistently identifiable across the period.
 
-The two autonomous republic budgets are excluded.
+Abkhazia's autonomous-republic budget remains excluded. Adjara republican payments are included
+only through the consolidated `region.adjara` and `country.georgia` totals described below.
 
 ## Prepared raw outputs
 
@@ -184,18 +186,19 @@ one deterministic pass. It keeps the existing 64-entity public files unchanged a
 | `data/imports/municipal-georgia-total-facts-2015-2025.csv` | 11 | One country-level public total and component record per year. |
 
 Every country row uses `scope_id = country.georgia`. Function amounts are exact sums across all
-69 reviewed source series. Required total fields are summed under the same roll-up rules as
-regions. A nullable component is null if any of its 69 constituents is missing; an incomplete
-component sum is never presented as complete. Shared source and measure metadata are retained
-when every row agrees and use explicit mixed markers otherwise. No residual category is created
-and no amount is normalized to force reconciliation.
+69 reviewed municipal source series. The public total starts from those 69 series and adds the
+same annual net Adjara republican amount used by `region.adjara`. The optional total-payments
+field is adjusted when the 69-series base is complete; it remains null for a fallback year.
+Component fields without a reviewed transfer classification remain null rather than presenting
+an incomplete decomposition. No residual category is created and no amount is normalized to
+force reconciliation.
 
 Reviewed CSVs remain the canonical human-reviewed source. Dedicated Prisma country tables mirror
 the two country files without creating a synthetic municipality. `npm run data:import` loads the
 country and existing budget facts inside the same transaction and requires field-for-field
 CSV/database parity before commit; a mismatch rolls the whole import back.
 
-Countrywide municipal KPIs and national-share denominators use the 69-series Georgia total.
+Countrywide KPIs and national-share denominators use the adjusted Georgia total.
 Municipality and region ranks remain calculated over the unchanged 64 municipalities and 11
 regions. The 11 region rows do not reconcile to the country row because codes `05`, `42`, `43`,
 `46`, and `64` are included only in the Georgia aggregate and have no territorial region
@@ -207,6 +210,49 @@ The country heading is `როგორ ხარჯავენ ბიუჯე
 rank, map, member list, or previous/next entity navigation. Its CSV contains only the country
 total and ten country functions by year, identifies the scope as `country.georgia`, and exposes
 no standalone code, name, or amount for any of the five aggregate-only bodies.
+
+## Adjara consolidated adjustment
+
+The reviewed file
+`data/imports/municipal-adjara-budget-adjustments-2015-2025.csv` contains one row for every year
+2015–2025. Each row preserves three exact nominal-GEL values:
+
+```text
+net_republic_payments_gel
+= republic_payments_gel
+- municipal_transfers_gel
+```
+
+`republic_payments_gel` uses actual `გადასახდელები`, not the narrower `ხარჯები`. Payments include
+expenses, growth of non-financial assets, growth of financial assets excluding cash balances,
+and decrease in liabilities. Cash/deposit balance changes are not added. The 2015 actual is
+170,031.4 thousand GEL in the official Matsne table; 2016–2025 come from the reviewed Adjara
+workbook. Original files, URLs, hashes, sizes, units and review notes are retained under
+`docs/Raw Data/Municipalities/adjara-republic-budget-2015-2025/`.
+
+`municipal_transfers_gel` uses territorial-budget actual revenue from the existing Treasury
+consolidated-revenue package: code `1332` for 2015–2018, and current/special code `1.3.3.1.2`
+plus capital code `1.3.3.2.2` for 2019–2025. Reserve or project-fund rows are not subtracted
+again. The loader validates exact cent-level arithmetic, unique years and dense coverage.
+
+The verified 2015 consolidated Adjara value is:
+
+```text
+216,011,449.37 + 170,031,400.00 - 27,186,011.29 = 358,856,838.08 GEL
+```
+
+The verified 2025 consolidated Adjara value is `1,212,519,508.44` GEL. The same annual net
+amount is added once to the Georgia total; the 2025 adjusted Georgia value is
+`6,110,301,258.08` GEL.
+
+The supplied republican series does not provide a reviewed 2015–2025 crosswalk to the ten
+municipal functions. Therefore the Adjara and Georgia total line, percentages, comparisons and
+CSV total use the consolidated denominator, while the ten functions remain municipal-only.
+No proportional allocation or invented residual is used, and the public source notes disclose
+this coverage boundary.
+
+The adjustment rows have a dedicated Prisma mirror table and join the existing municipal files
+inside the same transactional import and field-for-field CSV/database parity gate.
 
 ## Official source families
 

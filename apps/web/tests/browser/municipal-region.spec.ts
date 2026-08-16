@@ -8,10 +8,9 @@ async function expectMunicipalAppReady(page: Page) {
 // workspace and the entity picker via `children`/`pickerGroups`. Two things
 // nothing in the repo exercised before this page existed:
 //
-//  - the roll-up source note (design spec §7.3): a region total sums only
-//    publicly served municipal budgets, so the page must say so out loud —
-//    აჭარა excludes the Adjara autonomous republic's own budget, and შიდა
-//    ქართლი/მცხეთა-მთიანეთი exclude bodies associated with occupied
+//  - the roll-up source note (design spec §7.3): the page must state its
+//    coverage — აჭარა consolidates the autonomous republic and its six
+//    municipalities, while შიდა ქართლი/მცხეთა-მთიანეთი exclude bodies associated with occupied
 //    territories. Without this note a region total reads as complete
 //    territorially attributed spending, which it is not.
 //  - the picker's region options (Task 10): they 404'd until this page
