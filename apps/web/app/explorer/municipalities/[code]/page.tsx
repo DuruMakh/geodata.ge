@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../../../components/municipalities/municipal-explorer";
 import { PageHeader } from "../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../lib/data/servedData";
+import { MUNICIPAL_COUNTRY_ID } from "../../../../lib/data/municipal/types";
 import {
+  buildCountryTotalByYear,
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
@@ -46,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
 
 export default async function MunicipalityPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
-  const { municipalities, regions, functions, functionFacts, totalFacts } = await loadServedMunicipalData();
+  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts } = await loadServedMunicipalData();
   const { sourceDocuments } = await loadServedLandingData();
 
   const municipality = municipalities.find((row) => row.code === code);
@@ -64,10 +66,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
     return ranks;
   }, {});
   const rank = rankByYear[latestYear] ?? 0;
-  const nationalTotalByYear = totalFacts.reduce<Record<number, number>>((totals, row) => {
-    totals[row.year] = (totals[row.year] ?? 0) + row.publicTotalGel;
-    return totals;
-  }, {});
+  const nationalTotalByYear = buildCountryTotalByYear(countryTotalFacts);
 
   // Only this municipality's rows travel to the client: ~110 function facts and
   // 11 total facts, not the 7,744-row corpus.
@@ -108,13 +107,24 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
           functionFacts={own.functionFacts}
           totalFacts={own.totalFacts}
           sourceDocuments={sourceDocuments}
-          nationalTotalByYear={nationalTotalByYear}
-          rankByYear={rankByYear}
-          rankOutOf={municipalities.length}
+          metrics={{
+            kind: "ranked",
+            nationalTotalByYear,
+            rankByYear,
+            rankOutOf: municipalities.length,
+          }}
           csvBasename={`municipality-${code}`}
+          pickerCountry={{
+            id: MUNICIPAL_COUNTRY_ID,
+            nameKa: "საქართველო",
+            valueGel: nationalTotalByYear[latestYear] ?? 0,
+            budgetCount: 69,
+          }}
           pickerGroups={buildPickerGroups(listInput)}
-          prev={{ label: prev.displayNameKa, href: `/explorer/municipalities/${prev.code}` }}
-          next={{ label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` }}
+          navigation={{
+            prev: { label: prev.displayNameKa, href: `/explorer/municipalities/${prev.code}` },
+            next: { label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` },
+          }}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />
       </div>

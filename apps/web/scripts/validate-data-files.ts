@@ -14,6 +14,8 @@ import {
   validateMunicipalityGeometrySources,
 } from "../lib/data/municipalGeometry/source";
 import {
+  loadMunicipalCountryFunctionFacts,
+  loadMunicipalCountryTotalFacts,
   loadMunicipalFunctionFacts,
   loadMunicipalTotalFacts,
 } from "../lib/data/municipal/importMunicipalFacts";
@@ -22,6 +24,7 @@ import {
   loadMunicipalFunctionsFile,
   loadMunicipalRegionsFile,
 } from "../lib/data/municipal/taxonomyFiles";
+import { assertMunicipalCountryPanel } from "../lib/data/municipal/sourceValidation";
 import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import { loadSourceDocuments } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
@@ -65,6 +68,12 @@ async function main() {
   const municipalities = await loadMunicipalitiesFile(SERVED_DATA_FILES.municipalities);
   const municipalFunctionFacts = await loadMunicipalFunctionFacts(SERVED_DATA_FILES.municipalFunctionFacts);
   const municipalTotalFacts = await loadMunicipalTotalFacts(SERVED_DATA_FILES.municipalTotalFacts);
+  const countryFunctionFacts = await loadMunicipalCountryFunctionFacts(
+    SERVED_DATA_FILES.municipalCountryFunctionFacts,
+  );
+  const countryTotalFacts = await loadMunicipalCountryTotalFacts(
+    SERVED_DATA_FILES.municipalCountryTotalFacts,
+  );
   const report = buildImportReport("real-budget-2004-2025", facts);
   const missingGlossary = taxonomy.filter((item) => !glossary.has(item.id));
   const registeredSourceIds = new Set(sources.map((source) => source.sourceId));
@@ -90,10 +99,15 @@ async function main() {
   assertYears("Revenue", sortedYears(revenueRows.map((row) => row.year)), REVENUE_YEARS);
   assertYears("Admin spending", sortedYears(adminSpendingFacts.map((row) => row.year)), ADMIN_SPENDING_YEARS);
   assertYears("Municipal", sortedYears(municipalFunctionFacts.map((row) => row.year)), MUNICIPAL_YEARS);
-
   const municipalCodes = new Set(municipalities.map((row) => row.code));
   const regionIds = new Set(municipalRegions.map((region) => region.id));
   const municipalCategoryIds = new Set(municipalFunctions.map((entry) => entry.id));
+  assertMunicipalCountryPanel({
+    functionFacts: countryFunctionFacts,
+    totalFacts: countryTotalFacts,
+    categoryIds: municipalCategoryIds,
+    registeredSourceIds,
+  });
   const municipalityGeometrySources = await loadMunicipalityGeometrySources();
 
   validateMunicipalityGeometrySources(municipalityGeometrySources, Array.from(municipalCodes));
@@ -202,6 +216,8 @@ async function main() {
 
   console.log(`Validated municipal function rows: ${municipalFunctionFacts.length}`);
   console.log(`Validated municipal total rows: ${municipalTotalFacts.length}`);
+  console.log(`Validated Georgia municipal function rows: ${countryFunctionFacts.length}`);
+  console.log(`Validated Georgia municipal total rows: ${countryTotalFacts.length}`);
   console.log(`Validated municipalities: ${municipalities.length}`);
   console.log(`Validated municipality map polygons: ${municipalityGeometrySources.municipalities.features.length}`);
   console.log(`Validated taxonomy rows: ${taxonomy.length}`);

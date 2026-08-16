@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../../../../components/municipalities/municipal-explorer";
 import { PageHeader } from "../../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../../lib/data/servedData";
+import { MUNICIPAL_COUNTRY_ID } from "../../../../../lib/data/municipal/types";
 import {
   aggregateFactsForEntity,
+  buildCountryTotalByYear,
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
@@ -55,7 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function RegionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const regionId = `region.${id}`;
-  const { municipalities, regions, functions, functionFacts, totalFacts } = await loadServedMunicipalData();
+  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts } = await loadServedMunicipalData();
   const { sourceDocuments } = await loadServedLandingData();
 
   const region = regions.find((row) => row.id === regionId);
@@ -74,10 +76,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
     return ranks;
   }, {});
   const rank = rankByYear[latestYear] ?? 0;
-  const nationalTotalByYear = totalFacts.reduce<Record<number, number>>((totals, row) => {
-    totals[row.year] = (totals[row.year] ?? 0) + row.publicTotalGel;
-    return totals;
-  }, {});
+  const nationalTotalByYear = buildCountryTotalByYear(countryTotalFacts);
 
   const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
   // Collapse the members' rows into one entity's on the SERVER, so this page
@@ -123,13 +122,24 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           functionFacts={own.functionFacts}
           totalFacts={own.totalFacts}
           sourceDocuments={sourceDocuments}
-          nationalTotalByYear={nationalTotalByYear}
-          rankByYear={rankByYear}
-          rankOutOf={regions.length}
+          metrics={{
+            kind: "ranked",
+            nationalTotalByYear,
+            rankByYear,
+            rankOutOf: regions.length,
+          }}
           csvBasename={`region-${id}`}
+          pickerCountry={{
+            id: MUNICIPAL_COUNTRY_ID,
+            nameKa: "საქართველო",
+            valueGel: nationalTotalByYear[latestYear] ?? 0,
+            budgetCount: 69,
+          }}
           pickerGroups={buildPickerGroups(listInput)}
-          prev={{ label: prev.kaLabel, href: hrefFor(prev) }}
-          next={{ label: next.kaLabel, href: hrefFor(next) }}
+          navigation={{
+            prev: { label: prev.kaLabel, href: hrefFor(prev) },
+            next: { label: next.kaLabel, href: hrefFor(next) },
+          }}
           sourceNote={`${SOURCE_NOTE_BASE}${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         >
           <div className="mt-11 border-t-2 border-[var(--ink)] pt-[22px]">

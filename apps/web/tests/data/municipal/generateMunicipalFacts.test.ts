@@ -1,18 +1,88 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
+import { validateRawMunicipalCoverage } from "../../../lib/data/municipal/generateMunicipalFacts";
 import { loadMunicipalitiesFile } from "../../../lib/data/municipal/municipalitiesFile";
 import {
+  loadMunicipalCountryFunctionFacts,
+  loadMunicipalCountryTotalFacts,
   loadMunicipalFunctionFacts,
   loadMunicipalTotalFacts,
 } from "../../../lib/data/municipal/importMunicipalFacts";
+import { readCsvRecords } from "../../../lib/data/csv";
 import { loadMunicipalFunctionsFile } from "../../../lib/data/municipal/taxonomyFiles";
 
 const FUNCTION_FACTS = "../../data/imports/municipal-function-facts-2015-2025.csv";
 const TOTAL_FACTS = "../../data/imports/municipal-total-facts-2015-2025.csv";
+const COUNTRY_FUNCTION_FACTS = "../../data/imports/municipal-georgia-function-facts-2015-2025.csv";
+const COUNTRY_TOTAL_FACTS = "../../data/imports/municipal-georgia-total-facts-2015-2025.csv";
+const COUNTRY_ID = "country.georgia";
 const MUNICIPALITIES = "../../data/imports/municipalities.csv";
 const FUNCTIONS = "../../data/taxonomy/municipal-functions.json";
+const RAW_TOTALS =
+  "../../docs/Raw Data/Municipalities/combined-annual-2015-2025/municipal-total-payments-annual-2015-2025.csv";
+const RAW_FUNCTIONS =
+  "../../docs/Raw Data/Municipalities/combined-annual-2015-2025/municipal-functional-main-annual-2015-2025.csv";
 
 const YEARS = Array.from({ length: 11 }, (_, index) => 2015 + index);
 const EXCLUDED_CODES = ["05", "42", "43", "46", "64"];
+
+let rawFunctions: Awaited<ReturnType<typeof readCsvRecords>>;
+let rawTotals: Awaited<ReturnType<typeof readCsvRecords>>;
+let expectedRawCodes: string[];
+
+beforeAll(async () => {
+  const municipalities = await loadMunicipalitiesFile(MUNICIPALITIES);
+  [rawFunctions, rawTotals] = await Promise.all([
+    readCsvRecords(RAW_FUNCTIONS),
+    readCsvRecords(RAW_TOTALS),
+  ]);
+  expectedRawCodes = [...municipalities.map((row) => row.code), ...EXCLUDED_CODES].sort();
+});
+
+describe("raw 69-series municipal generation contract", () => {
+  it("accepts the complete reviewed 69 x 11 x 10 panel", () => {
+    expect(() => validateRawMunicipalCoverage(rawFunctions, rawTotals, expectedRawCodes)).not.toThrow();
+  });
+
+  it("rejects a missing aggregate-only function row", () => {
+    const index = rawFunctions.findIndex(
+      (row) => row.municipality_code === "05" && row.year === "2015" && row.functional_code === "7.1",
+    );
+    expect(index).toBeGreaterThanOrEqual(0);
+
+    expect(() =>
+      validateRawMunicipalCoverage(rawFunctions.toSpliced(index, 1), rawTotals, expectedRawCodes),
+    ).toThrow(/7,590 raw function rows|missing raw function key/i);
+  });
+
+  it("rejects a duplicate aggregate-only function row", () => {
+    const duplicate = rawFunctions.find(
+      (row) => row.municipality_code === "64" && row.year === "2025" && row.functional_code === "7.10",
+    );
+    expect(duplicate).toBeDefined();
+
+    expect(() =>
+      validateRawMunicipalCoverage([...rawFunctions, { ...duplicate! }], rawTotals, expectedRawCodes),
+    ).toThrow(/duplicate raw function key/i);
+  });
+
+  it("rejects a missing aggregate-only total row", () => {
+    const index = rawTotals.findIndex((row) => row.municipality_code === "05" && row.year === "2015");
+    expect(index).toBeGreaterThanOrEqual(0);
+
+    expect(() =>
+      validateRawMunicipalCoverage(rawFunctions, rawTotals.toSpliced(index, 1), expectedRawCodes),
+    ).toThrow(/759 raw total rows|missing raw total key/i);
+  });
+
+  it("rejects a duplicate aggregate-only total row", () => {
+    const duplicate = rawTotals.find((row) => row.municipality_code === "64" && row.year === "2025");
+    expect(duplicate).toBeDefined();
+
+    expect(() =>
+      validateRawMunicipalCoverage(rawFunctions, [...rawTotals, { ...duplicate! }], expectedRawCodes),
+    ).toThrow(/duplicate raw total key/i);
+  });
+});
 
 describe("generated municipal fact files", () => {
   it("is dense: 10 functions x 64 municipalities x 11 years", async () => {
@@ -30,6 +100,68 @@ describe("generated municipal fact files", () => {
     expect(totals).toHaveLength(704);
     expect(new Set(keys).size).toBe(704);
     expect(totals.filter((total) => EXCLUDED_CODES.includes(total.municipalityCode))).toEqual([]);
+  });
+
+  it("independently aggregates every Georgia function and total component across all 69 contributors", async () => {
+    const [countryFunctions, countryTotals] = await Promise.all([
+      loadMunicipalCountryFunctionFacts(COUNTRY_FUNCTION_FACTS),
+      loadMunicipalCountryTotalFacts(COUNTRY_TOTAL_FACTS),
+    ]);
+
+    expect(countryFunctions).toHaveLength(110);
+    expect(countryTotals).toHaveLength(11);
+    expect(rawFunctions).toHaveLength(7590);
+    expect(rawTotals).toHaveLength(759);
+    expect(countryFunctions.every((row) => row.municipalityCode === COUNTRY_ID)).toBe(true);
+    expect(countryTotals.every((row) => row.municipalityCode === COUNTRY_ID)).toBe(true);
+
+    for (const fact of countryFunctions) {
+      const contributors = rawFunctions.filter(
+        (row) => Number(row.year) === fact.year && row.functional_code === fact.functionalCode,
+      );
+      expect(contributors, `${fact.year}:${fact.functionalCode}`).toHaveLength(69);
+      expect(fact.amountGel, `${fact.year}:${fact.functionalCode}`).toBeCloseTo(
+        contributors.reduce((sum, row) => sum + Number(row.amount_gel), 0),
+        2,
+      );
+    }
+
+    const nullableComponents = [
+      ["totalPaymentsGel", "total_payments_gel"],
+      ["expensesGel", "expenses_gel"],
+      ["nonfinancialAssetGrowthGel", "nonfinancial_asset_growth_gel"],
+      ["financialAssetGrowthGel", "financial_asset_growth_gel"],
+      ["liabilityDecreaseGel", "liability_decrease_gel"],
+      ["reconciliationDifferenceGel", "reconciliation_difference_gel"],
+    ] as const;
+
+    for (const fact of countryTotals) {
+      const contributors = rawTotals.filter((row) => Number(row.year) === fact.year);
+      expect(contributors, String(fact.year)).toHaveLength(69);
+      expect(fact.publicTotalGel, `${fact.year}:publicTotalGel`).toBeCloseTo(
+        contributors.reduce((sum, row) => sum + Number(row.public_total_gel), 0),
+        2,
+      );
+      expect(fact.functionalSumGel, `${fact.year}:functionalSumGel`).toBeCloseTo(
+        contributors.reduce((sum, row) => sum + Number(row.functional_sum_gel), 0),
+        2,
+      );
+
+      for (const [factField, rawField] of nullableComponents) {
+        const expected = contributors.some((row) => row[rawField]!.trim() === "")
+          ? null
+          : contributors.reduce((sum, row) => sum + Number(row[rawField]), 0);
+        if (expected === null) {
+          expect(fact[factField], `${fact.year}:${factField}`).toBeNull();
+        } else {
+          expect(fact[factField], `${fact.year}:${factField}`).toBeCloseTo(expected, 2);
+        }
+      }
+    }
+
+    expect(new Set(rawFunctions.map((row) => row.municipality_code)).size).toBe(69);
+    expect(new Set(rawTotals.map((row) => row.municipality_code)).size).toBe(69);
+    expect(countryTotals.some((row) => row.totalPaymentsGel === null)).toBe(true);
   });
 
   it("references only registered municipalities", async () => {
@@ -93,7 +225,7 @@ describe("generated municipal fact files", () => {
     const { readFile } = await import("node:fs/promises");
     const path = await import("node:path");
 
-    for (const file of [FUNCTION_FACTS, TOTAL_FACTS]) {
+    for (const file of [FUNCTION_FACTS, TOTAL_FACTS, COUNTRY_FUNCTION_FACTS, COUNTRY_TOTAL_FACTS]) {
       const buffer = await readFile(path.resolve(process.cwd(), file));
       expect(buffer.subarray(0, 3).toString("hex"), file).not.toBe("efbbbf");
     }

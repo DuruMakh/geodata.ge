@@ -99,6 +99,25 @@ describe("methodology catalog", () => {
     ]);
   });
 
+  it("publishes the complete 64-page and 69-series municipal boundary without changing anchors", () => {
+    const content = METHODOLOGY_CONTENT.municipalities;
+    const publicText = [
+      content.summaryKa,
+      content.disclosureKa,
+      ...content.sections.flatMap((section) => section.paragraphsKa),
+    ].join(" ");
+
+    expect(content.sections.map((section) => section.id)).toEqual(["scope", "sources", "journey", "archive"]);
+    expect(content.reviewedAt).toBe("2026-08-15");
+    expect(publicText).toContain("64 საჯარო ტერიტორიული მუნიციპალიტეტი");
+    expect(publicText).toContain("05, 42, 43, 46 და 64");
+    expect(publicText).toContain("მხოლოდ 69-სერიან საქართველოს ჯამში");
+    expect(publicText).toContain("ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი");
+    expect(publicText).toContain("11 რეგიონის ჯამები საქართველოს ჯამს არ უტოლდება");
+    expect(publicText).toContain("110 ფუნქციურ ფაქტსა და 11 წლიურ ჯამს");
+    expect(publicText).toContain("ეროვნული მუნიციპალური წილების მნიშვნელად");
+  });
+
   it("discloses the nominal-GDP denominator without opening a GDP methodology route", () => {
     for (const dataset of ["expenditure", "revenue"] as const) {
       expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("მშპ");

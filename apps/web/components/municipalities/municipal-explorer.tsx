@@ -7,6 +7,7 @@ import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } fro
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import {
   buildComparisonRows,
+  buildCountryKpis,
   buildEntityKpis,
   buildMovers,
   buildMunicipalEntityModel,
@@ -20,11 +21,22 @@ import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
-import { EntityPicker, type EntityPickerGroup } from "./entity-picker";
+import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup } from "./entity-picker";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
 
-export type MunicipalExplorerProps = {
+export type MunicipalMetricContext =
+  | {
+      kind: "ranked";
+      nationalTotalByYear: Record<number, number>;
+      rankByYear: Record<number, number>;
+      rankOutOf: number;
+    }
+  | { kind: "country"; budgetCount: 69 };
+
+type MunicipalNavigation = { prev: { label: string; href: string }; next: { label: string; href: string } };
+
+type MunicipalExplorerBaseProps = {
   title: string;
   triggerLabel: string;
   metaLine: string;
@@ -40,20 +52,23 @@ export type MunicipalExplorerProps = {
   totalFacts: MunicipalTotalFact[];
   sourceDocuments: SourceDocumentRow[];
 
-  nationalTotalByYear: Record<number, number>;
-  rankByYear: Record<number, number>;
-  rankOutOf: number;
   csvBasename: string;
+  pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
-  prev: { label: string; href: string };
-  next: { label: string; href: string };
   sourceNote: string;
   children?: ReactNode;
 };
 
+export type MunicipalExplorerProps = MunicipalExplorerBaseProps &
+  (
+    | { metrics: Extract<MunicipalMetricContext, { kind: "ranked" }>; navigation: MunicipalNavigation }
+    | { metrics: Extract<MunicipalMetricContext, { kind: "country" }>; navigation?: never }
+  );
+
 export function MunicipalExplorer(props: MunicipalExplorerProps) {
   const router = useRouter();
   const { functions, functionFacts, totalFacts, sourceDocuments } = props;
+  const { metrics, navigation } = props;
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const allYears = useMemo(
@@ -138,7 +153,17 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
 
   function downloadCsv() {
     const csv = buildExplorerCsv([...model.rows, model.totalRow], years);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const countryCsv =
+      metrics.kind === "country"
+        ? (() => {
+            const [header, ...rows] = csv.split("\n");
+            return [
+              `\uFEFFentity_id,entity_name,${header?.replace(/^\uFEFF/, "") ?? ""}`,
+              ...rows.map((row) => `${props.entityId},${props.pickerCountry.nameKa},${row}`),
+            ].join("\n");
+          })()
+        : csv;
+    const blob = new Blob([countryCsv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -194,21 +219,28 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
           <EntityPicker
             open={pickerOpen}
             onClose={() => setPickerOpen(false)}
+            country={props.pickerCountry}
             groups={props.pickerGroups}
             activeId={props.entityId}
+            onSelectCountry={() => router.push("/explorer/municipalities/georgia")}
             onSelectMunicipality={(code) => router.push(`/explorer/municipalities/${code}`)}
             onSelectRegion={(regionId) => router.push(`/explorer/municipalities/region/${regionId.replace("region.", "")}`)}
           />
           <div className="text-[12.5px] text-[var(--muted)]">{props.metaLine}</div>
         </div>
-        <span className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink">
-          <a href={props.prev.href} className="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-            ← {props.prev.label}
-          </a>
-          <a href={props.next.href} className="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-            {props.next.label} →
-          </a>
-        </span>
+        {navigation ? (
+          <span
+            data-testid="municipal-entity-navigation"
+            className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink"
+          >
+            <a href={navigation.prev.href} className="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
+              ← {navigation.prev.label}
+            </a>
+            <a href={navigation.next.href} className="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
+              {navigation.next.label} →
+            </a>
+          </span>
+        ) : null}
       </div>
 
       <div
@@ -332,12 +364,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       {/* All three derive from the RANGE model, so they move together with
           the chart instead of describing a span the user is not looking at. */}
       <MunicipalIndicators
-        kpis={buildEntityKpis({
-          model,
-          nationalTotalByYear: props.nationalTotalByYear,
-          rankByYear: props.rankByYear,
-          rankOutOf: props.rankOutOf,
-        })}
+        kpis={
+          metrics.kind === "country"
+            ? buildCountryKpis(model, metrics.budgetCount)
+            : buildEntityKpis({ model, ...metrics })
+        }
         movers={buildMovers(model)}
         comparison={buildComparisonRows(model)}
         startYear={state.range.start}

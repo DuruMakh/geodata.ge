@@ -273,3 +273,73 @@ export async function loadMunicipalTotalFactsFromMirror(
     };
   });
 }
+
+export async function loadMunicipalCountryFunctionFactsFromMirror(
+  db: MirrorClient,
+): Promise<MunicipalFunctionFact[]> {
+  const rows = await db.municipalCountryFunctionFact.findMany({
+    orderBy: [{ year: "asc" }, { scopeId: "asc" }, { categoryId: "asc" }],
+  });
+
+  if (rows.length === 0) {
+    throw new Error(
+      "The database has no Georgia municipal function facts. Run `npm run data:import` first, " +
+        "or build with GEODATA_DATA_SOURCE=csv. If the import has already succeeded, " +
+        "check the role in DATABASE_URL: the mirror tables use row level security, " +
+        "which hides all rows from non-owner roles.",
+    );
+  }
+
+  return rows.map((row) => {
+    if (row.basis !== "actual") {
+      throw new Error(
+        `Georgia municipal function fact ${row.id} must have basis=actual, got ${row.basis}`,
+      );
+    }
+
+    return {
+      year: row.year,
+      municipalityCode: row.scopeId,
+      categoryId: row.categoryId,
+      functionalCode: row.functionalCode,
+      amountGel: Number(row.amountGel),
+      basis: "actual" as const,
+      sourceId: row.sourceId,
+    };
+  });
+}
+
+export async function loadMunicipalCountryTotalFactsFromMirror(
+  db: MirrorClient,
+): Promise<MunicipalTotalFact[]> {
+  const rows = await db.municipalCountryTotalFact.findMany({
+    orderBy: [{ year: "asc" }, { scopeId: "asc" }],
+  });
+
+  return rows.map((row) => {
+    if (row.basis !== "actual") {
+      throw new Error(
+        `Georgia municipal total fact ${row.id} must have basis=actual, got ${row.basis}`,
+      );
+    }
+
+    return {
+      year: row.year,
+      municipalityCode: row.scopeId,
+      publicTotalGel: Number(row.publicTotalGel),
+      publicTotalMeasure: row.publicTotalMeasure,
+      totalPaymentsGel: decimalOrNull(row.totalPaymentsGel),
+      expensesGel: decimalOrNull(row.expensesGel),
+      nonfinancialAssetGrowthGel: decimalOrNull(row.nonfinancialAssetGrowthGel),
+      financialAssetGrowthGel: decimalOrNull(row.financialAssetGrowthGel),
+      liabilityDecreaseGel: decimalOrNull(row.liabilityDecreaseGel),
+      functionalSumGel: Number(row.functionalSumGel),
+      reconciliationDifferenceGel: decimalOrNull(row.reconciliationDifferenceGel),
+      warningAmountGel: decimalOrNull(row.warningAmountGel),
+      showWarning: row.showWarning,
+      warningType: row.warningType,
+      basis: "actual" as const,
+      sourceId: row.sourceId,
+    };
+  });
+}

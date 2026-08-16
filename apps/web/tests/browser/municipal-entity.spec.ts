@@ -285,6 +285,25 @@ test.describe("entity picker accessibility", () => {
     await expect(page).toHaveURL(/\/explorer\/municipalities\/06(#|$)/);
     await expect(page.getByTestId("entity-picker")).toBeHidden();
   });
+
+  test("puts Georgia first in the picker and keeps it searchable", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("entity-picker-trigger").click();
+
+    const picker = page.getByTestId("entity-picker");
+    const options = picker.getByRole("option");
+    await expect(options.first()).toHaveAttribute("data-testid", "picker-country");
+    await expect(options.first()).toContainText("საქართველო");
+    await expect(options.first()).toContainText("69 მუნიციპალური ბიუჯეტი");
+
+    const search = picker.getByRole("combobox");
+    await search.fill("საქართველო");
+    await expect(picker.getByRole("option")).toHaveCount(1);
+    const country = picker.getByTestId("picker-country");
+    await country.click();
+    await expect(page).toHaveURL(/\/explorer\/municipalities\/georgia(#|$)/);
+  });
 });
 
 test.describe("UNIT_MLN — first render anywhere in the repo", () => {

@@ -1,10 +1,12 @@
-import type {
-  Municipality,
-  MunicipalFunction,
-  MunicipalFunctionFact,
-  MunicipalTotalFact,
+import {
+  MUNICIPAL_COUNTRY_ID,
+  type Municipality,
+  type MunicipalFunction,
+  type MunicipalFunctionFact,
+  type MunicipalTotalFact,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
+import { MIXED_SOURCE_ID } from "../data/municipal/aggregateMunicipalFacts";
 import type { ExplorerTableRow, SourceMetadata } from "./types";
 import { colorForItem, INK } from "./colors";
 import { formatAmount, formatShare, MISSING } from "./format";
@@ -19,6 +21,7 @@ import { georgianOrdinal } from "./municipalLabels";
 // while this one is municipality×function×year.
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
+const MUNICIPAL_COUNTRY_BUDGET_COUNT = 69;
 
 export type MunicipalEntityModel = {
   years: number[];
@@ -35,22 +38,6 @@ export type MunicipalEntityInput = {
   endYear: number;
 };
 
-// Sentinels for a group field that disagrees across the municipalities being
-// rolled up. Real ids/measures never contain a colon (source ids are
-// "source.snake_case", measures are bare "snake_case" — checked against the
-// full served 2015-2025 dataset), so a "mixed:" prefix cannot collide with a
-// real value and cannot be mistaken for one downstream.
-export const MIXED_SOURCE_ID = "mixed:source_id";
-export const MIXED_PUBLIC_TOTAL_MEASURE = "mixed:public_total_measure";
-
-/**
- * Sum two nullable component fields. A missing constituent makes the whole
- * group null rather than being silently counted as zero.
- */
-function sumNullable(a: number | null, b: number | null): number | null {
-  return a === null || b === null ? null : a + b;
-}
-
 /**
  * Carry a string field through only when every constituent agrees; otherwise
  * collapse to `mixedMarker` so no single constituent's value can be mistaken
@@ -62,83 +49,7 @@ function agreeOrMixed(current: string, incoming: string, mixedMarker: string): s
   return current === incoming ? current : mixedMarker;
 }
 
-/**
- * Collapse many municipalities' facts into one entity's, for a region roll-up.
- * Called on the SERVER so a region page ships ~110 function rows like a
- * municipality page does, rather than up to twelve times that.
- *
- * What an aggregated row carries, and how, so a later caller never reaches
- * for a field by reflex and gets one arbitrary constituent's value back:
- * - `amountGel`, `publicTotalGel`, `functionalSumGel`: summed. The two
- *   totals are summed independently — never reconcile one against the other.
- * - `totalPaymentsGel`, `expensesGel`, `nonfinancialAssetGrowthGel`,
- *   `financialAssetGrowthGel`, `liabilityDecreaseGel`, and
- *   `reconciliationDifferenceGel`: summed only when every constituent has a
- *   value; if any constituent is null (e.g. a municipality on the
- *   functional-total fallback measure, which has no payment breakdown), the
- *   group's value is null rather than a sum that treats the gap as zero.
- * - `publicTotalMeasure` and `sourceId` (on both fact types): carried
- *   through only when every constituent agrees; otherwise replaced with a
- *   `mixed:` marker (`MIXED_PUBLIC_TOTAL_MEASURE` / `MIXED_SOURCE_ID`) so a
- *   caller can never read one arbitrary constituent's value as the group's.
- *   `sourceMetadataFor` does not recognise the marker and falls back to
- *   blank source fields — blank, not silently wrong.
- * - `functionalCode` and `basis` on function facts are carried from
- *   whichever row lands first: safe, because `functionalCode` is a 1:1
- *   property of `categoryId` (part of the group key) and `basis` is always
- *   the literal `"actual"` — neither can vary within a group.
- * - `showWarning` / `warningType` / `warningAmountGel` are internal
- *   municipality-grain reconciliation state, so every roll-up resets them.
- */
-export function aggregateFactsForEntity(
-  entityId: string,
-  functionFacts: MunicipalFunctionFact[],
-  totalFacts: MunicipalTotalFact[],
-): { functionFacts: MunicipalFunctionFact[]; totalFacts: MunicipalTotalFact[] } {
-  const functionByKey = new Map<string, MunicipalFunctionFact>();
-  for (const row of functionFacts) {
-    const key = `${row.year}|${row.categoryId}`;
-    const existing = functionByKey.get(key);
-    if (existing) {
-      existing.amountGel += row.amountGel;
-      existing.sourceId = agreeOrMixed(existing.sourceId, row.sourceId, MIXED_SOURCE_ID);
-      continue;
-    }
-    functionByKey.set(key, { ...row, municipalityCode: entityId });
-  }
-
-  const totalByYear = new Map<number, MunicipalTotalFact>();
-  for (const row of totalFacts) {
-    const existing = totalByYear.get(row.year);
-    if (existing) {
-      existing.publicTotalGel += row.publicTotalGel;
-      existing.functionalSumGel += row.functionalSumGel;
-      existing.totalPaymentsGel = sumNullable(existing.totalPaymentsGel, row.totalPaymentsGel);
-      existing.expensesGel = sumNullable(existing.expensesGel, row.expensesGel);
-      existing.nonfinancialAssetGrowthGel = sumNullable(existing.nonfinancialAssetGrowthGel, row.nonfinancialAssetGrowthGel);
-      existing.financialAssetGrowthGel = sumNullable(existing.financialAssetGrowthGel, row.financialAssetGrowthGel);
-      existing.liabilityDecreaseGel = sumNullable(existing.liabilityDecreaseGel, row.liabilityDecreaseGel);
-      existing.reconciliationDifferenceGel = sumNullable(existing.reconciliationDifferenceGel, row.reconciliationDifferenceGel);
-      existing.publicTotalMeasure = agreeOrMixed(existing.publicTotalMeasure, row.publicTotalMeasure, MIXED_PUBLIC_TOTAL_MEASURE);
-      existing.sourceId = agreeOrMixed(existing.sourceId, row.sourceId, MIXED_SOURCE_ID);
-      // Municipality-grain reconciliation state is not attributable to an
-      // aggregate row, so it stays reset during the roll-up.
-      continue;
-    }
-    totalByYear.set(row.year, {
-      ...row,
-      municipalityCode: entityId,
-      showWarning: false,
-      warningType: "none",
-      warningAmountGel: null,
-    });
-  }
-
-  return {
-    functionFacts: Array.from(functionByKey.values()),
-    totalFacts: Array.from(totalByYear.values()),
-  };
-}
+export { aggregateFactsForEntity, MIXED_PUBLIC_TOTAL_MEASURE, MIXED_SOURCE_ID } from "../data/municipal/aggregateMunicipalFacts";
 
 function sourceMetadataFor(sourceId: string, sources: Map<string, SourceDocumentRow>): SourceMetadata {
   const source = sources.get(sourceId);
@@ -276,12 +187,12 @@ export function getDefaultMunicipalSelection(model: MunicipalEntityModel): strin
 
 export type MunicipalListRow = {
   id: string;
-  kind: "municipality" | "region";
+  kind: "municipality" | "region" | "country";
   nameKa: string;
   subtitleKa: string;
   regionId: string | null;
   valueGel: number;
-  rank: number;
+  rank: number | null;
 };
 
 export type MunicipalListInput = {
@@ -345,6 +256,20 @@ export function buildMunicipalListRows(input: MunicipalListInput): {
   return { municipalities: municipalityRows, regions: regionRows };
 }
 
+export function buildCountryListRow(totalFacts: MunicipalTotalFact[], year: number): MunicipalListRow {
+  const totalByYear = buildCountryTotalByYear(totalFacts);
+
+  return {
+    id: MUNICIPAL_COUNTRY_ID,
+    kind: "country",
+    nameKa: "საქართველო",
+    subtitleKa: "69 მუნიციპალური ბიუჯეტი",
+    regionId: null,
+    valueGel: totalByYear[year] ?? 0,
+    rank: null,
+  };
+}
+
 /** Narrow the corpus to one region's members, for a region page. */
 export function regionFactsFor(
   regionId: string,
@@ -367,14 +292,22 @@ export type MunicipalKpi = { label: string; value: string; detail: string };
 export type MunicipalIndexKpiInput = {
   municipalities: Municipality[];
   totalFacts: MunicipalTotalFact[];
-  functionFacts: MunicipalFunctionFact[];
+  countryTotalFacts: MunicipalTotalFact[];
+  countryFunctionFacts: MunicipalFunctionFact[];
   functions: MunicipalFunction[];
   firstYear: number;
   latestYear: number;
 };
 
-function sumPublicTotal(totalFacts: MunicipalTotalFact[], year: number): number {
-  return totalFacts.filter((row) => row.year === year).reduce((sum, row) => sum + row.publicTotalGel, 0);
+export function buildCountryTotalByYear(totalFacts: MunicipalTotalFact[]): Record<number, number> {
+  const totals: Record<number, number> = {};
+  for (const row of totalFacts) {
+    if (totals[row.year] !== undefined) {
+      throw new Error(`Duplicate country total for year ${row.year}`);
+    }
+    totals[row.year] = row.publicTotalGel;
+  }
+  return totals;
 }
 
 /**
@@ -383,10 +316,11 @@ function sumPublicTotal(totalFacts: MunicipalTotalFact[], year: number): number 
  * both size-independent and both derivable from served facts.
  */
 export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
-  const { municipalities, totalFacts, functionFacts, functions, firstYear, latestYear } = input;
+  const { municipalities, totalFacts, countryTotalFacts, countryFunctionFacts, functions, firstYear, latestYear } = input;
+  const countryTotalByYear = buildCountryTotalByYear(countryTotalFacts);
 
-  const latestTotal = sumPublicTotal(totalFacts, latestYear);
-  const firstTotal = sumPublicTotal(totalFacts, firstYear);
+  const latestTotal = countryTotalByYear[latestYear] ?? 0;
+  const firstTotal = countryTotalByYear[firstYear] ?? 0;
   const growth = firstTotal === 0 ? null : (latestTotal - firstTotal) / firstTotal;
 
   const largest = municipalities
@@ -400,7 +334,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
   const concentration = largest && latestTotal > 0 ? largest.valueGel / latestTotal : null;
 
   const byFunction = new Map<string, number>();
-  for (const row of functionFacts) {
+  for (const row of countryFunctionFacts) {
     if (row.year !== latestYear) continue;
     byFunction.set(row.categoryId, (byFunction.get(row.categoryId) ?? 0) + row.amountGel);
   }
@@ -411,7 +345,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     {
       label: "მუნიციპალური ხარჯი",
       value: formatAmount(latestTotal),
-      detail: `${latestYear} · ${municipalities.length} მუნიციპალიტეტი`,
+      detail: `${latestYear} · ${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური საბიუჯეტო ერთეული`,
     },
     {
       label: `ზრდა ${firstYear}-დან`,
@@ -424,7 +358,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
       detail:
         concentration === null
           ? ""
-          : `დანარჩენი ${municipalities.length - 1} ერთეული — ${formatShare(1 - concentration)}`,
+          : `დანარჩენი ${MUNICIPAL_COUNTRY_BUDGET_COUNT - 1} ერთეული — ${formatShare(1 - concentration)}`,
     },
     {
       label: "უმსხვილესი სფერო",
@@ -514,6 +448,40 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
       // the population data this project does not have. Per-capita is an
       // explicit v1 exclusion; do not reintroduce it here.
       detail: `${georgianOrdinal(rank)} ადგილი ${input.rankOutOf}-დან`,
+    },
+  ];
+}
+
+/** The country view has no rank because it is the aggregate denominator itself. */
+export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: number): MunicipalKpi[] {
+  const startYear = model.years[0];
+  const endYear = model.years.at(-1);
+  const officialStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
+  const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
+  const growth = changeBetween(officialStart, officialEnd);
+  const largest = sortedByEndYear(model.rows, endYear)[0];
+  const largestValue = largest && endYear !== undefined ? largest.valuesByYear[endYear] ?? 0 : 0;
+
+  return [
+    {
+      label: "ოფიციალური ბიუჯეტი",
+      value: formatAmount(officialEnd),
+      detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
+    },
+    {
+      label: `ზრდა ${startYear ?? ""}-დან`,
+      value: growth === null ? MISSING : formatShare(growth, true, 0),
+      detail: `${formatAmount(officialStart)} → ${formatAmount(officialEnd)}`,
+    },
+    {
+      label: "უმსხვილესი სფერო",
+      value: officialEnd ? formatShare(largestValue / officialEnd) : MISSING,
+      detail: largest?.kaLabel ?? "",
+    },
+    {
+      label: "მუნიციპალური ბიუჯეტები",
+      value: String(budgetCount),
+      detail: "64 საჯარო გვერდი · 5 მხოლოდ საქართველოს ჯამში",
     },
   ];
 }

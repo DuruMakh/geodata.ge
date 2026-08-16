@@ -121,7 +121,7 @@ test("occupied overlays expose no interaction or public explanation", async ({ p
   await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
 });
 
-test("credits OpenStreetMap boundaries without occupied-territory copy", async ({ page }) => {
+test("credits OpenStreetMap boundaries and explains the Georgia-total territorial boundary", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
   const source = page.getByTestId("municipal-source-note");
@@ -130,7 +130,11 @@ test("credits OpenStreetMap boundaries without occupied-territory copy", async (
     "https://www.openstreetmap.org/copyright",
   );
   await expect(source).toContainText("ODbL");
-  await expect(source).not.toContainText(/ოკუპირ|Russian/i);
+  await expect(source).toContainText("საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს");
+  await expect(source).toContainText("ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ საქართველოს ჯამშია");
+  await expect(source).toContainText("მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი");
+  await expect(source).toContainText("11 რეგიონის ჯამები საქართველოს ჯამს არ უტოლდება");
+  await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
   await expect(page.getByTestId("municipality-map")).not.toContainText(/მონაცემები არ არის|no data/i);
 });
 
@@ -306,13 +310,29 @@ test("keeps the tooltip inside the map after a narrow viewport resize", async ({
 });
 
 test.describe("municipalities index", () => {
-  test("lists all municipalities and switches grain", async ({ page }) => {
+  test("lists all municipalities and the country-first region grain", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
     await page.getByTestId("level-region").click();
-    await expect(page.getByTestId("municipal-list-row")).toHaveCount(11);
+    await expect(page.getByTestId("municipal-list-row")).toHaveCount(12);
     await expect(page).toHaveURL(/#lvl=region/);
+  });
+
+  test("puts Georgia first in the region list and routes it to the country explorer", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("level-region").click();
+
+    const rows = page.getByTestId("municipal-list-row");
+    await expect(rows).toHaveCount(12);
+    const country = rows.first();
+    await expect(country.getByTestId("municipal-row-name")).toHaveText("საქართველო");
+    await expect(country).toContainText("69 მუნიციპალური ბიუჯეტი");
+    await expect(country.locator("span").first()).toHaveText("—");
+
+    await country.click();
+    await expect(page).toHaveURL(/\/explorer\/municipalities\/georgia(#|$)/);
   });
 
   test("filters and clears the search", async ({ page }) => {
@@ -358,10 +378,13 @@ test.describe("municipalities index", () => {
     await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/04");
   });
 
-  test("shows four KPIs", async ({ page }) => {
+  test("shows four KPIs with the 69-series country descriptions", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
-    await expect(page.getByTestId("index-kpi")).toHaveCount(4);
+    const kpis = page.getByTestId("index-kpi");
+    await expect(kpis).toHaveCount(4);
+    await expect(kpis.nth(0)).toContainText("2025 · 69 მუნიციპალური საბიუჯეტო ერთეული");
+    await expect(kpis.nth(2)).toContainText("დანარჩენი 68 ერთეული");
   });
 
   test("describes municipalities on the map and in the list", async ({ page }) => {

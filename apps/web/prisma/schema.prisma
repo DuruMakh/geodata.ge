@@ -202,11 +202,12 @@ enum MunicipalWarningType {
 
 // Mirror of data/taxonomy/municipal-functions.json.
 model MunicipalFunctionCategory {
-  id             String                 @id
+  id             String                         @id
   kaLabel        String
-  functionalCode String                 @unique
+  functionalCode String                         @unique
   sortOrder      Int
   facts          MunicipalFunctionFact[]
+  countryFacts   MunicipalCountryFunctionFact[]
 }
 
 // Mirror of data/taxonomy/municipal-regions.json.
@@ -280,4 +281,48 @@ model MunicipalTotalFact {
   @@unique([year, municipalityCode])
   @@index([year])
   @@index([municipalityCode])
+}
+
+// Mirror of data/imports/municipal-georgia-function-facts-2015-2025.csv.
+// scopeId is the aggregate scope (`country.georgia`), not a Municipality.
+model MunicipalCountryFunctionFact {
+  id             String                    @id
+  year           Int
+  scopeId        String
+  categoryId     String
+  category       MunicipalFunctionCategory @relation(fields: [categoryId], references: [id])
+  functionalCode String
+  amountGel      Decimal                   @db.Decimal(18, 2)
+  basis          BudgetBasis
+  sourceId       String
+
+  @@unique([year, scopeId, categoryId])
+  @@index([year])
+  @@index([scopeId])
+}
+
+// Mirror of data/imports/municipal-georgia-total-facts-2015-2025.csv.
+// Nullable components remain null when the reviewed CSV has an empty cell.
+model MunicipalCountryTotalFact {
+  id                          String               @id
+  year                        Int
+  scopeId                     String
+  publicTotalGel              Decimal              @db.Decimal(18, 2)
+  publicTotalMeasure          String
+  totalPaymentsGel            Decimal?             @db.Decimal(18, 2)
+  expensesGel                 Decimal?             @db.Decimal(18, 2)
+  nonfinancialAssetGrowthGel  Decimal?             @db.Decimal(18, 2)
+  financialAssetGrowthGel     Decimal?             @db.Decimal(18, 2)
+  liabilityDecreaseGel        Decimal?             @db.Decimal(18, 2)
+  functionalSumGel            Decimal              @db.Decimal(18, 2)
+  reconciliationDifferenceGel Decimal?             @db.Decimal(18, 2)
+  warningAmountGel            Decimal?             @db.Decimal(18, 2)
+  showWarning                 Boolean
+  warningType                 MunicipalWarningType
+  basis                       BudgetBasis
+  sourceId                    String
+
+  @@unique([year, scopeId])
+  @@index([year])
+  @@index([scopeId])
 }

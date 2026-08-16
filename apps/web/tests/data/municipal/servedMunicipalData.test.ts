@@ -17,6 +17,11 @@ describe("loadServedMunicipalData", () => {
     expect(data.municipalities).toHaveLength(64);
     expect(data.functionFacts).toHaveLength(7040);
     expect(data.totalFacts).toHaveLength(704);
+    expect(data.countryFunctionFacts).toHaveLength(110);
+    expect(data.countryTotalFacts).toHaveLength(11);
+    expect(new Set(data.countryTotalFacts.map((row) => row.municipalityCode))).toEqual(
+      new Set(["country.georgia"]),
+    );
   });
 
   it("returns facts in year-ascending order", async () => {

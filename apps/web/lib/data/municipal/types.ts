@@ -2,6 +2,8 @@
 // lib/data/municipal/ returns one of these, and lib/db/mirrorRows.ts returns
 // the identical shapes so parity compares like with like.
 
+export const MUNICIPAL_COUNTRY_ID = "country.georgia" as const;
+
 export type MunicipalFunction = {
   id: string;
   kaLabel: string;

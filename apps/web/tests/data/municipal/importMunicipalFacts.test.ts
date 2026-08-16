@@ -3,9 +3,12 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  loadMunicipalCountryFunctionFacts,
+  loadMunicipalCountryTotalFacts,
   loadMunicipalFunctionFacts,
   loadMunicipalTotalFacts,
 } from "../../../lib/data/municipal/importMunicipalFacts";
+import { MUNICIPAL_COUNTRY_ID } from "../../../lib/data/municipal/types";
 
 // readCsvRecords resolves against process.cwd(); write fixtures under it and
 // pass a relative path, the same contract the real loaders use.
@@ -20,6 +23,12 @@ const FUNCTION_HEADER =
   "year,municipality_code,category_id,functional_code,amount_gel,basis,source_id";
 const TOTAL_HEADER =
   "year,municipality_code,public_total_gel,public_total_measure,total_payments_gel,expenses_gel," +
+  "nonfinancial_asset_growth_gel,financial_asset_growth_gel,liability_decrease_gel,functional_sum_gel," +
+  "reconciliation_difference_gel,warning_amount_gel,show_warning,warning_type,basis,source_id";
+const COUNTRY_FUNCTION_HEADER =
+  "year,scope_id,category_id,functional_code,amount_gel,basis,source_id";
+const COUNTRY_TOTAL_HEADER =
+  "year,scope_id,public_total_gel,public_total_measure,total_payments_gel,expenses_gel," +
   "nonfinancial_asset_growth_gel,financial_asset_growth_gel,liability_decrease_gel,functional_sum_gel," +
   "reconciliation_difference_gel,warning_amount_gel,show_warning,warning_type,basis,source_id";
 
@@ -51,6 +60,42 @@ describe("municipal fact loaders", () => {
     const [fact] = await loadMunicipalFunctionFacts(file);
 
     expect(fact.municipalityCode).toBe("04");
+  });
+
+  it("parses country rows keyed to the stable Georgia id", async () => {
+    const [functionFile, totalFile] = await Promise.all([
+      fixture(
+        "country-functions.csv",
+        `${COUNTRY_FUNCTION_HEADER}\n2015,country.georgia,municipal.health,7.7,1.00,actual,mixed:source_id\n`,
+      ),
+      fixture(
+        "country-totals.csv",
+        `${COUNTRY_TOTAL_HEADER}\n2015,country.georgia,1.00,mixed:public_total_measure,,,,,,1.00,,,false,none,actual,mixed:source_id\n`,
+      ),
+    ]);
+
+    await expect(loadMunicipalCountryFunctionFacts(functionFile)).resolves.toMatchObject([
+      { municipalityCode: MUNICIPAL_COUNTRY_ID },
+    ]);
+    await expect(loadMunicipalCountryTotalFacts(totalFile)).resolves.toMatchObject([
+      { municipalityCode: MUNICIPAL_COUNTRY_ID },
+    ]);
+  });
+
+  it("rejects country rows outside Georgia's scope", async () => {
+    const [functionFile, totalFile] = await Promise.all([
+      fixture(
+        "country-functions.csv",
+        `${COUNTRY_FUNCTION_HEADER}\n2015,region.tbilisi,municipal.health,7.7,1.00,actual,mixed:source_id\n`,
+      ),
+      fixture(
+        "country-totals.csv",
+        `${COUNTRY_TOTAL_HEADER}\n2015,region.tbilisi,1.00,mixed:public_total_measure,,,,,,1.00,,,false,none,actual,mixed:source_id\n`,
+      ),
+    ]);
+
+    await expect(loadMunicipalCountryFunctionFacts(functionFile)).rejects.toThrow(/country\.georgia/);
+    await expect(loadMunicipalCountryTotalFacts(totalFile)).rejects.toThrow(/country\.georgia/);
   });
 
   it("rejects a non-main functional code", async () => {

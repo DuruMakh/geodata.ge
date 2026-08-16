@@ -14,6 +14,8 @@ import { loadSpendingMappings } from "../lib/data/mappings";
 import { loadNationalGdpFacts } from "../lib/data/nationalGdp/importNationalGdp";
 import { loadMunicipalitiesFile } from "../lib/data/municipal/municipalitiesFile";
 import {
+  loadMunicipalCountryFunctionFacts,
+  loadMunicipalCountryTotalFacts,
   loadMunicipalFunctionFacts,
   loadMunicipalTotalFacts,
 } from "../lib/data/municipal/importMunicipalFacts";
@@ -21,6 +23,8 @@ import {
   loadMunicipalFunctionsFile,
   loadMunicipalRegionsFile,
 } from "../lib/data/municipal/taxonomyFiles";
+import { assertMunicipalCountryPanel } from "../lib/data/municipal/sourceValidation";
+import type { MunicipalTotalFact } from "../lib/data/municipal/types";
 import {
   buildParityReport,
   buildTotalsByKey,
@@ -43,6 +47,8 @@ import {
   loadAdminFactsFromMirror,
   loadBudgetFactsFromMirror,
   loadGlossaryFromMirror,
+  loadMunicipalCountryFunctionFactsFromMirror,
+  loadMunicipalCountryTotalFactsFromMirror,
   loadMunicipalFunctionFactsFromMirror,
   loadMunicipalFunctionsFromMirror,
   loadMunicipalitiesFromMirror,
@@ -94,6 +100,23 @@ function assertAmountPrecision(label: string, rows: { amountGel: number }[]): vo
   }
 }
 
+function assertMunicipalTotalPrecision(label: string, rows: MunicipalTotalFact[]): void {
+  const values = rows.flatMap((row) =>
+    [
+      row.publicTotalGel,
+      row.totalPaymentsGel,
+      row.expensesGel,
+      row.nonfinancialAssetGrowthGel,
+      row.financialAssetGrowthGel,
+      row.liabilityDecreaseGel,
+      row.functionalSumGel,
+      row.reconciliationDifferenceGel,
+      row.warningAmountGel,
+    ].filter((value): value is number => value !== null),
+  );
+  assertAmountPrecision(label, values.map((amountGel) => ({ amountGel })));
+}
+
 // Fixed audit columns must be exact 2-decimal values; float sums may carry
 // stray precision that Decimal(18, 2) would otherwise round silently.
 function gelColumn(value: number): string {
@@ -134,6 +157,8 @@ async function main() {
     municipalities,
     municipalFunctionFacts,
     municipalTotalFacts,
+    municipalCountryFunctionFacts,
+    municipalCountryTotalFacts,
     nationalGdpFacts,
   ] = await Promise.all([
     loadTaxonomyFiles(TAXONOMY_DIR),
@@ -148,6 +173,8 @@ async function main() {
     loadMunicipalitiesFile(SERVED_DATA_FILES.municipalities),
     loadMunicipalFunctionFacts(SERVED_DATA_FILES.municipalFunctionFacts),
     loadMunicipalTotalFacts(SERVED_DATA_FILES.municipalTotalFacts),
+    loadMunicipalCountryFunctionFacts(SERVED_DATA_FILES.municipalCountryFunctionFacts),
+    loadMunicipalCountryTotalFacts(SERVED_DATA_FILES.municipalCountryTotalFacts),
     loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
   ]);
 
@@ -223,6 +250,16 @@ async function main() {
   assertUnique("municipal function fact natural key", municipalFunctionFacts.map(municipalFunctionFactParityKey));
   assertUnique("municipal total fact natural key", municipalTotalFacts.map(municipalTotalFactParityKey));
   assertAmountPrecision("Municipal function fact", municipalFunctionFacts);
+  assertMunicipalTotalPrecision("Municipal total fact", municipalTotalFacts);
+
+  assertMunicipalCountryPanel({
+    functionFacts: municipalCountryFunctionFacts,
+    totalFacts: municipalCountryTotalFacts,
+    categoryIds: municipalCategoryIds,
+    registeredSourceIds: sourceIds,
+  });
+  assertAmountPrecision("Georgia municipal function fact", municipalCountryFunctionFacts);
+  assertMunicipalTotalPrecision("Georgia municipal total fact", municipalCountryTotalFacts);
 
   const report = buildImportReport(IMPORT_LABEL, budgetFacts);
 
@@ -251,6 +288,8 @@ async function main() {
         await tx.adminSpendingCategory.deleteMany();
         await tx.municipalFunctionFact.deleteMany();
         await tx.municipalTotalFact.deleteMany();
+        await tx.municipalCountryFunctionFact.deleteMany();
+        await tx.municipalCountryTotalFact.deleteMany();
         await tx.municipality.deleteMany();
         await tx.municipalRegion.deleteMany();
         await tx.municipalFunctionCategory.deleteMany();
@@ -336,6 +375,41 @@ async function main() {
             id: municipalTotalFactParityKey(total),
             year: total.year,
             municipalityCode: total.municipalityCode,
+            publicTotalGel: total.publicTotalGel,
+            publicTotalMeasure: total.publicTotalMeasure,
+            totalPaymentsGel: total.totalPaymentsGel,
+            expensesGel: total.expensesGel,
+            nonfinancialAssetGrowthGel: total.nonfinancialAssetGrowthGel,
+            financialAssetGrowthGel: total.financialAssetGrowthGel,
+            liabilityDecreaseGel: total.liabilityDecreaseGel,
+            functionalSumGel: total.functionalSumGel,
+            reconciliationDifferenceGel: total.reconciliationDifferenceGel,
+            warningAmountGel: total.warningAmountGel,
+            showWarning: total.showWarning,
+            warningType: total.warningType,
+            basis: total.basis,
+            sourceId: total.sourceId,
+          })),
+        });
+
+        await tx.municipalCountryFunctionFact.createMany({
+          data: municipalCountryFunctionFacts.map((fact) => ({
+            id: municipalFunctionFactParityKey(fact),
+            year: fact.year,
+            scopeId: fact.municipalityCode,
+            categoryId: fact.categoryId,
+            functionalCode: fact.functionalCode,
+            amountGel: fact.amountGel,
+            basis: fact.basis,
+            sourceId: fact.sourceId,
+          })),
+        });
+
+        await tx.municipalCountryTotalFact.createMany({
+          data: municipalCountryTotalFacts.map((total) => ({
+            id: municipalTotalFactParityKey(total),
+            year: total.year,
+            scopeId: total.municipalityCode,
             publicTotalGel: total.publicTotalGel,
             publicTotalMeasure: total.publicTotalMeasure,
             totalPaymentsGel: total.totalPaymentsGel,
@@ -464,12 +538,16 @@ async function main() {
           mirrorMunicipalities,
           mirrorMunicipalFunctionFacts,
           mirrorMunicipalTotalFacts,
+          mirrorMunicipalCountryFunctionFacts,
+          mirrorMunicipalCountryTotalFacts,
         ] = await Promise.all([
           loadMunicipalFunctionsFromMirror(tx),
           loadMunicipalRegionsFromMirror(tx),
           loadMunicipalitiesFromMirror(tx),
           loadMunicipalFunctionFactsFromMirror(tx),
           loadMunicipalTotalFactsFromMirror(tx),
+          loadMunicipalCountryFunctionFactsFromMirror(tx),
+          loadMunicipalCountryTotalFactsFromMirror(tx),
         ]);
 
         assertSameServedRows("budget facts", budgetFacts, mirrorFacts, budgetFactParityKey);
@@ -523,6 +601,18 @@ async function main() {
           mirrorMunicipalTotalFacts,
           municipalTotalFactParityKey,
         );
+        assertSameServedRows(
+          "Georgia municipal function facts",
+          municipalCountryFunctionFacts,
+          mirrorMunicipalCountryFunctionFacts,
+          municipalFunctionFactParityKey,
+        );
+        assertSameServedRows(
+          "Georgia municipal total facts",
+          municipalCountryTotalFacts,
+          mirrorMunicipalCountryTotalFacts,
+          municipalTotalFactParityKey,
+        );
 
         // Totals parity for the human-readable report; counts come from the
         // row-level readback above, GEL sums from the database's own Decimal
@@ -570,6 +660,16 @@ async function main() {
               table: "MunicipalTotalFact",
               csvRows: municipalTotalFacts.length,
               dbRows: mirrorMunicipalTotalFacts.length,
+            },
+            {
+              table: "MunicipalCountryFunctionFact",
+              csvRows: municipalCountryFunctionFacts.length,
+              dbRows: mirrorMunicipalCountryFunctionFacts.length,
+            },
+            {
+              table: "MunicipalCountryTotalFact",
+              csvRows: municipalCountryTotalFacts.length,
+              dbRows: mirrorMunicipalCountryTotalFacts.length,
             },
           ],
           budgetTotalsCsv,
