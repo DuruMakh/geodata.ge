@@ -82,7 +82,6 @@ export default async function MunicipalitiesIndexPage() {
           kpis={buildIndexKpis({
             municipalities,
             totalFacts,
-            functionFacts,
             countryTotalFacts,
             countryFunctionFacts,
             functions,

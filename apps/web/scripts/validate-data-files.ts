@@ -24,8 +24,7 @@ import {
   loadMunicipalFunctionsFile,
   loadMunicipalRegionsFile,
 } from "../lib/data/municipal/taxonomyFiles";
-import { assertMunicipalAggregateSourceIds } from "../lib/data/municipal/sourceValidation";
-import { MUNICIPAL_COUNTRY_ID } from "../lib/data/municipal/types";
+import { assertMunicipalCountryPanel } from "../lib/data/municipal/sourceValidation";
 import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import { loadSourceDocuments } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
@@ -100,20 +99,15 @@ async function main() {
   assertYears("Revenue", sortedYears(revenueRows.map((row) => row.year)), REVENUE_YEARS);
   assertYears("Admin spending", sortedYears(adminSpendingFacts.map((row) => row.year)), ADMIN_SPENDING_YEARS);
   assertYears("Municipal", sortedYears(municipalFunctionFacts.map((row) => row.year)), MUNICIPAL_YEARS);
-  assertYears(
-    "Georgia municipal function facts",
-    sortedYears(countryFunctionFacts.map((row) => row.year)),
-    MUNICIPAL_YEARS,
-  );
-  assertYears(
-    "Georgia municipal total facts",
-    sortedYears(countryTotalFacts.map((row) => row.year)),
-    MUNICIPAL_YEARS,
-  );
-
   const municipalCodes = new Set(municipalities.map((row) => row.code));
   const regionIds = new Set(municipalRegions.map((region) => region.id));
   const municipalCategoryIds = new Set(municipalFunctions.map((entry) => entry.id));
+  assertMunicipalCountryPanel({
+    functionFacts: countryFunctionFacts,
+    totalFacts: countryTotalFacts,
+    categoryIds: municipalCategoryIds,
+    registeredSourceIds,
+  });
   const municipalityGeometrySources = await loadMunicipalityGeometrySources();
 
   validateMunicipalityGeometrySources(municipalityGeometrySources, Array.from(municipalCodes));
@@ -131,29 +125,6 @@ async function main() {
   ).sort();
   if (unknownCategories.length > 0) {
     throw new Error(`Municipal facts reference unknown categories: ${unknownCategories.join(", ")}`);
-  }
-
-  const countryCategoryIds = new Set(countryFunctionFacts.map((fact) => fact.categoryId));
-  const unknownCountryCategories = [...countryCategoryIds]
-    .filter((categoryId) => !municipalCategoryIds.has(categoryId))
-    .sort();
-  const missingCountryCategories = [...municipalCategoryIds]
-    .filter((categoryId) => !countryCategoryIds.has(categoryId))
-    .sort();
-  if (unknownCountryCategories.length > 0 || missingCountryCategories.length > 0) {
-    throw new Error(
-      `Georgia municipal categories mismatch. Unknown: ${unknownCountryCategories.join(", ") || "none"}; ` +
-        `missing: ${missingCountryCategories.join(", ") || "none"}.`,
-    );
-  }
-
-  const countryScopes = new Set(
-    [...countryFunctionFacts, ...countryTotalFacts].map((fact) => fact.municipalityCode),
-  );
-  if (countryScopes.size !== 1 || !countryScopes.has(MUNICIPAL_COUNTRY_ID)) {
-    throw new Error(
-      `Georgia municipal facts must use scope ${MUNICIPAL_COUNTRY_ID}, got ${[...countryScopes].join(", ")}.`,
-    );
   }
 
   const unknownMunicipalities = Array.from(
@@ -178,12 +149,6 @@ async function main() {
     throw new Error(`Municipal facts reference unknown source documents: ${unresolvedMunicipalSourceIds.join(", ")}`);
   }
 
-  assertMunicipalAggregateSourceIds(
-    "Georgia municipal facts",
-    [...countryFunctionFacts, ...countryTotalFacts].map((fact) => fact.sourceId),
-    registeredSourceIds,
-  );
-
   const expectedFunctionRows = municipalFunctions.length * municipalities.length * MUNICIPAL_YEARS.length;
   if (municipalFunctionFacts.length !== expectedFunctionRows) {
     throw new Error(
@@ -199,13 +164,6 @@ async function main() {
     );
   }
 
-  if (countryFunctionFacts.length !== 110) {
-    throw new Error("Georgia municipal function facts must have 110 rows");
-  }
-  if (countryTotalFacts.length !== 11) {
-    throw new Error("Georgia municipal total facts must have 11 rows");
-  }
-
   // Density alone does not prove uniqueness — 7,040 rows could still contain a
   // duplicate and a hole. The import asserts this too, but the import needs a
   // database and CI runs this gate without one.
@@ -219,20 +177,6 @@ async function main() {
   const totalKeys = municipalTotalFacts.map((total) => `${total.year}:${total.municipalityCode}`);
   if (new Set(totalKeys).size !== totalKeys.length) {
     throw new Error("Municipal total facts contain duplicate (year, municipality) keys.");
-  }
-
-  const countryFunctionKeys = countryFunctionFacts.map(
-    (fact) => `${fact.year}:${fact.municipalityCode}:${fact.categoryId}`,
-  );
-  if (new Set(countryFunctionKeys).size !== countryFunctionKeys.length) {
-    throw new Error("Georgia municipal function facts contain duplicate (year, scope, category) keys.");
-  }
-
-  const countryTotalKeys = countryTotalFacts.map(
-    (total) => `${total.year}:${total.municipalityCode}`,
-  );
-  if (new Set(countryTotalKeys).size !== countryTotalKeys.length) {
-    throw new Error("Georgia municipal total facts contain duplicate (year, scope) keys.");
   }
 
   const unusedRegions = municipalRegions

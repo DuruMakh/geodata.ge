@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   assertSameServedRows,
-  municipalCountryFunctionFactParityKey,
-  municipalCountryTotalFactParityKey,
+  municipalFunctionFactParityKey,
+  municipalTotalFactParityKey,
   nationalGdpFactParityKey,
 } from "../../lib/data/servedDataParity";
 
@@ -17,7 +17,7 @@ describe("served data row parity", () => {
 
   it("keys one municipal country function fact per year, scope, and category", () => {
     expect(
-      municipalCountryFunctionFactParityKey({
+      municipalFunctionFactParityKey({
         year: 2025,
         municipalityCode: "country.georgia",
         categoryId: "municipal.function.education",
@@ -27,7 +27,7 @@ describe("served data row parity", () => {
 
   it("keys one municipal country total fact per year and scope", () => {
     expect(
-      municipalCountryTotalFactParityKey({
+      municipalTotalFactParityKey({
         year: 2025,
         municipalityCode: "country.georgia",
       }),

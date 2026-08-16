@@ -292,7 +292,6 @@ export type MunicipalKpi = { label: string; value: string; detail: string };
 export type MunicipalIndexKpiInput = {
   municipalities: Municipality[];
   totalFacts: MunicipalTotalFact[];
-  functionFacts: MunicipalFunctionFact[];
   countryTotalFacts: MunicipalTotalFact[];
   countryFunctionFacts: MunicipalFunctionFact[];
   functions: MunicipalFunction[];

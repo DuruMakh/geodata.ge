@@ -6,7 +6,6 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma, PrismaClient } from "../lib/generated/prisma/client";
 import { loadAdminSpendingCategoriesFile } from "../lib/data/adminSpending/categoriesFile";
 import { loadAdminSpendingFacts } from "../lib/data/adminSpending/importAdminSpendingFacts";
-import { MUNICIPAL_YEARS } from "../lib/data/coverage";
 import { validateFoundationReferences } from "../lib/data/foundationValidation";
 import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
@@ -24,8 +23,8 @@ import {
   loadMunicipalFunctionsFile,
   loadMunicipalRegionsFile,
 } from "../lib/data/municipal/taxonomyFiles";
-import { assertMunicipalAggregateSourceIds } from "../lib/data/municipal/sourceValidation";
-import { MUNICIPAL_COUNTRY_ID, type MunicipalTotalFact } from "../lib/data/municipal/types";
+import { assertMunicipalCountryPanel } from "../lib/data/municipal/sourceValidation";
+import type { MunicipalTotalFact } from "../lib/data/municipal/types";
 import {
   buildParityReport,
   buildTotalsByKey,
@@ -37,8 +36,6 @@ import {
   adminFactParityKey,
   assertSameServedRows,
   budgetFactParityKey,
-  municipalCountryFunctionFactParityKey,
-  municipalCountryTotalFactParityKey,
   municipalFunctionFactParityKey,
   municipalTotalFactParityKey,
   nationalGdpFactParityKey,
@@ -90,14 +87,6 @@ function assertUnique(label: string, keys: string[]): void {
       throw new Error(`Duplicate ${label}: ${key}`);
     }
     seen.add(key);
-  }
-}
-
-function assertExactYears(label: string, years: number[]): void {
-  const actual = [...new Set(years)].sort((left, right) => left - right).join(",");
-  const expected = MUNICIPAL_YEARS.join(",");
-  if (actual !== expected) {
-    throw new Error(`${label} years mismatch. Expected ${expected}, got ${actual}`);
   }
 }
 
@@ -263,58 +252,12 @@ async function main() {
   assertAmountPrecision("Municipal function fact", municipalFunctionFacts);
   assertMunicipalTotalPrecision("Municipal total fact", municipalTotalFacts);
 
-  if (municipalCountryFunctionFacts.length !== 110) {
-    throw new Error("Georgia municipal function facts must have 110 rows");
-  }
-  if (municipalCountryTotalFacts.length !== 11) {
-    throw new Error("Georgia municipal total facts must have 11 rows");
-  }
-  assertExactYears(
-    "Georgia municipal function facts",
-    municipalCountryFunctionFacts.map((fact) => fact.year),
-  );
-  assertExactYears(
-    "Georgia municipal total facts",
-    municipalCountryTotalFacts.map((fact) => fact.year),
-  );
-  const municipalCountryScopes = new Set(
-    [...municipalCountryFunctionFacts, ...municipalCountryTotalFacts].map(
-      (fact) => fact.municipalityCode,
-    ),
-  );
-  if (municipalCountryScopes.size !== 1 || !municipalCountryScopes.has(MUNICIPAL_COUNTRY_ID)) {
-    throw new Error(
-      `Georgia municipal facts must use scope ${MUNICIPAL_COUNTRY_ID}, got ${[...municipalCountryScopes].join(", ")}.`,
-    );
-  }
-  const municipalCountryCategoryIds = new Set(
-    municipalCountryFunctionFacts.map((fact) => fact.categoryId),
-  );
-  assertSubset(
-    "Georgia municipal fact category IDs",
-    municipalCountryCategoryIds,
-    municipalCategoryIds,
-  );
-  assertSubset(
-    "Municipal categories missing Georgia facts",
-    municipalCategoryIds,
-    municipalCountryCategoryIds,
-  );
-  assertMunicipalAggregateSourceIds(
-    "Georgia municipal fact source IDs",
-    [...municipalCountryFunctionFacts, ...municipalCountryTotalFacts].map(
-      (fact) => fact.sourceId,
-    ),
-    sourceIds,
-  );
-  assertUnique(
-    "Georgia municipal function fact natural key",
-    municipalCountryFunctionFacts.map(municipalCountryFunctionFactParityKey),
-  );
-  assertUnique(
-    "Georgia municipal total fact natural key",
-    municipalCountryTotalFacts.map(municipalCountryTotalFactParityKey),
-  );
+  assertMunicipalCountryPanel({
+    functionFacts: municipalCountryFunctionFacts,
+    totalFacts: municipalCountryTotalFacts,
+    categoryIds: municipalCategoryIds,
+    registeredSourceIds: sourceIds,
+  });
   assertAmountPrecision("Georgia municipal function fact", municipalCountryFunctionFacts);
   assertMunicipalTotalPrecision("Georgia municipal total fact", municipalCountryTotalFacts);
 
@@ -451,7 +394,7 @@ async function main() {
 
         await tx.municipalCountryFunctionFact.createMany({
           data: municipalCountryFunctionFacts.map((fact) => ({
-            id: municipalCountryFunctionFactParityKey(fact),
+            id: municipalFunctionFactParityKey(fact),
             year: fact.year,
             scopeId: fact.municipalityCode,
             categoryId: fact.categoryId,
@@ -464,7 +407,7 @@ async function main() {
 
         await tx.municipalCountryTotalFact.createMany({
           data: municipalCountryTotalFacts.map((total) => ({
-            id: municipalCountryTotalFactParityKey(total),
+            id: municipalTotalFactParityKey(total),
             year: total.year,
             scopeId: total.municipalityCode,
             publicTotalGel: total.publicTotalGel,
@@ -662,13 +605,13 @@ async function main() {
           "Georgia municipal function facts",
           municipalCountryFunctionFacts,
           mirrorMunicipalCountryFunctionFacts,
-          municipalCountryFunctionFactParityKey,
+          municipalFunctionFactParityKey,
         );
         assertSameServedRows(
           "Georgia municipal total facts",
           municipalCountryTotalFacts,
           mirrorMunicipalCountryTotalFacts,
-          municipalCountryTotalFactParityKey,
+          municipalTotalFactParityKey,
         );
 
         // Totals parity for the human-readable report; counts come from the

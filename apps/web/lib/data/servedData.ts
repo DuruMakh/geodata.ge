@@ -15,8 +15,6 @@ import {
   adminFactParityKey,
   assertSameServedRows,
   budgetFactParityKey,
-  municipalCountryFunctionFactParityKey,
-  municipalCountryTotalFactParityKey,
   municipalFunctionFactParityKey,
   municipalTotalFactParityKey,
   nationalGdpFactParityKey,
@@ -299,13 +297,13 @@ function assertMunicipalParity(db: MunicipalData, csv: MunicipalData): void {
     "Georgia municipal function facts",
     csv.countryFunctionFacts,
     db.countryFunctionFacts,
-    municipalCountryFunctionFactParityKey,
+    municipalFunctionFactParityKey,
   );
   assertSameServedRows(
     "Georgia municipal total facts",
     csv.countryTotalFacts,
     db.countryTotalFacts,
-    municipalCountryTotalFactParityKey,
+    municipalTotalFactParityKey,
   );
 }
 

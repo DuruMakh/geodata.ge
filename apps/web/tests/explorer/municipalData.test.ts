@@ -668,7 +668,6 @@ describe("buildIndexKpis", () => {
     buildIndexKpis({
       municipalities: MUNICIPALITIES,
       totalFacts: INDEX_TOTALS,
-      functionFacts: [],
       countryTotalFacts: countryTotalsFor(INDEX_TOTALS),
       countryFunctionFacts: [],
       functions: FUNCTIONS,
@@ -714,7 +713,6 @@ describe("buildIndexKpis — dedicated Georgia aggregate denominator", () => {
     const kpis = buildIndexKpis({
       municipalities: MUNICIPALITIES,
       totalFacts: publicTotals,
-      functionFacts: [],
       countryTotalFacts: countryTotals,
       countryFunctionFacts: countryFunctions,
       functions: FUNCTIONS,
@@ -745,7 +743,6 @@ describe("buildIndexKpis — growth sign at exactly zero", () => {
     const kpis = buildIndexKpis({
       municipalities: MUNICIPALITIES,
       totalFacts: ZERO_GROWTH_TOTALS,
-      functionFacts: [],
       countryTotalFacts: countryTotalsFor(ZERO_GROWTH_TOTALS),
       countryFunctionFacts: [],
       functions: FUNCTIONS,
@@ -804,7 +801,6 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
     buildIndexKpis({
       municipalities: MUNICIPALITIES,
       totalFacts: DIVERGENT_TOTALS,
-      functionFacts: [],
       countryTotalFacts: countryTotalsFor(DIVERGENT_TOTALS),
       countryFunctionFacts: [],
       functions: FUNCTIONS,
@@ -833,7 +829,6 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
     const divergent = buildIndexKpis({
       municipalities: MUNICIPALITIES,
       totalFacts: [{ ...total(2025, 300, 265), municipalityCode: "04" }],
-      functionFacts,
       countryTotalFacts: countryTotalsFor([{ ...total(2025, 300, 265), municipalityCode: "04" }]),
       countryFunctionFacts: countryFunctionsFor(functionFacts),
       functions: FUNCTIONS,
