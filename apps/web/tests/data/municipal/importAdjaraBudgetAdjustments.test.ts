@@ -96,4 +96,12 @@ describe("Adjara budget adjustment loader", () => {
 
     await expect(loadAdjaraBudgetAdjustments(await fixture(rows))).rejects.toThrow(/two decimal places/);
   });
+
+  it("rejects an amount that overflows finite exact-cent arithmetic", async () => {
+    const rows = denseRows();
+    const overflow = "9".repeat(309);
+    rows[0] = row(2015, { republic: overflow, transfers: "0", net: overflow });
+
+    await expect(loadAdjaraBudgetAdjustments(await fixture(rows))).rejects.toThrow(/exact cent range/);
+  });
 });

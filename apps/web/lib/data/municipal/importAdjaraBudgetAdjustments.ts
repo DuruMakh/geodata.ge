@@ -12,7 +12,15 @@ const amountSchema = z.string().transform((value, ctx) => {
     });
     return z.NEVER;
   }
-  return Number(normalized);
+  const amount = Number(normalized);
+  if (!Number.isFinite(amount) || !Number.isSafeInteger(Math.round(amount * 100))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "amount must be finite and within the exact cent range",
+    });
+    return z.NEVER;
+  }
+  return amount;
 });
 
 const rowSchema = z.object({
