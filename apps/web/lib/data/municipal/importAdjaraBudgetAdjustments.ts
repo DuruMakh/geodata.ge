@@ -4,12 +4,15 @@ import { readCsvRecords } from "../csv";
 import { ADJARA_REGION_ID, type AdjaraBudgetAdjustment } from "./types";
 
 const amountSchema = z.string().transform((value, ctx) => {
-  const amount = Number(value.trim());
-  if (!Number.isFinite(amount) || amount < 0) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "amount must be finite and nonnegative" });
+  const normalized = value.trim();
+  if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "amount must be a nonnegative number with at most two decimal places",
+    });
     return z.NEVER;
   }
-  return amount;
+  return Number(normalized);
 });
 
 const rowSchema = z.object({

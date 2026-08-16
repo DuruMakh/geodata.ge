@@ -313,6 +313,13 @@ test("keeps the tooltip inside the map after a narrow viewport resize", async ({
 });
 
 test.describe("municipalities index", () => {
+  test("shows the review date of the consolidated Adjara source", async ({ page }) => {
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
+
+    await expect(page.getByTestId("explorer-shell")).toContainText("განახლდა 2026-08-16");
+  });
+
   test("lists all municipalities and the country-first region grain", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
@@ -387,7 +394,7 @@ test.describe("municipalities index", () => {
     const kpis = page.getByTestId("index-kpi");
     await expect(kpis).toHaveCount(4);
     await expect(kpis.nth(0)).toContainText("2025 · 69 მუნიციპალური საბიუჯეტო ერთეული");
-    await expect(kpis.nth(2)).toContainText("დანარჩენი 68 ერთეული");
+    await expect(kpis.nth(2)).toContainText("დანარჩენი გაერთიანებული ჯამი");
   });
 
   test("describes municipalities on the map and in the list", async ({ page }) => {

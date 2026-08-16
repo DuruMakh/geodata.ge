@@ -765,7 +765,7 @@ describe("buildIndexKpis", () => {
   it("reports concentration rather than a max/min ratio", () => {
     expect(kpis()[2]!.label).toBe("თბილისის წილი");
     expect(kpis()[2]!.value).toBe("76.9%");
-    expect(kpis()[2]!.detail).toBe("დანარჩენი 68 ერთეული — 23.1%");
+    expect(kpis()[2]!.detail).toBe("დანარჩენი გაერთიანებული ჯამი — 23.1%");
   });
 });
 

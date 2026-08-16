@@ -10,7 +10,8 @@ CREATE TABLE "MunicipalAdjaraBudgetAdjustment" (
     "republicSourceId" TEXT NOT NULL,
     "transferSourceId" TEXT NOT NULL,
 
-    CONSTRAINT "MunicipalAdjaraBudgetAdjustment_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "MunicipalAdjaraBudgetAdjustment_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "MunicipalAdjaraBudgetAdjustment_scopeId_check" CHECK ("scopeId" = 'region.adjara')
 );
 
 -- CreateIndex

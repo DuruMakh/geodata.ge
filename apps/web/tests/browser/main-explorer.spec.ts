@@ -798,6 +798,7 @@ test("hub lists four cards, all four now live", async ({ page }) => {
   await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} · [\d,]+\.\d{2} მლრდ ₾/);
   // Card 03 now carries the same contract — this is the figure this task adds.
   await expect(municipalities).toContainText(/\d{4} · [\d,]+\.\d{2} მლრდ ₾/);
+  await expect(municipalities).toContainText("2025 · 6.11 მლრდ ₾");
 
   // The card is not just styled as a link — clicking it actually lands on the
   // municipalities index.

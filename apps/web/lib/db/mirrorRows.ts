@@ -6,8 +6,9 @@ import type {
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { NationalGdpFact } from "../data/nationalGdp/types";
-import type {
-  AdjaraBudgetAdjustment,
+import {
+  ADJARA_REGION_ID,
+  type AdjaraBudgetAdjustment,
   Municipality,
   MunicipalFunction,
   MunicipalFunctionFact,
@@ -356,9 +357,14 @@ export async function loadMunicipalAdjaraBudgetAdjustmentsFromMirror(
     if (row.basis !== "actual") {
       throw new Error(`Adjara budget adjustment ${row.id} must have basis=actual, got ${row.basis}`);
     }
+    if (row.scopeId !== ADJARA_REGION_ID) {
+      throw new Error(
+        `Adjara budget adjustment ${row.id} must have scopeId=${ADJARA_REGION_ID}, got ${row.scopeId}`,
+      );
+    }
     return {
       year: row.year,
-      scopeId: "region.adjara" as const,
+      scopeId: row.scopeId,
       republicPaymentsGel: Number(row.republicPaymentsGel),
       municipalTransfersGel: Number(row.municipalTransfersGel),
       netRepublicPaymentsGel: Number(row.netRepublicPaymentsGel),

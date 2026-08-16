@@ -75,6 +75,7 @@ test.describe("region source note", () => {
     await expect(note).toContainText("ექვსი მუნიციპალიტეტის ბიუჯეტებს");
     await expect(note).toContainText("ტრანსფერები გამოკლებულია");
     await expect(note).toContainText("ფუნქციური სერიები მხოლოდ მუნიციპალიტეტების");
+    await expect(page.getByTestId("explorer-shell")).toContainText("განახლდა 2026-08-16");
     await expect(page.locator('a[href*="adjara-republic"]')).toHaveCount(0);
   });
 });

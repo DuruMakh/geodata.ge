@@ -375,7 +375,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
       detail:
         concentration === null
           ? ""
-          : `დანარჩენი ${MUNICIPAL_COUNTRY_BUDGET_COUNT - 1} ერთეული — ${formatShare(1 - concentration)}`,
+          : `დანარჩენი გაერთიანებული ჯამი — ${formatShare(1 - concentration)}`,
     },
     {
       label: "უმსხვილესი სფერო",

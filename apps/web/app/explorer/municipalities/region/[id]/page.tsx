@@ -109,7 +109,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   const lastUpdatedAt = latestReviewedAtForMunicipalFacts(
     sourceDocuments,
     members.functionFacts,
-    members.totalFacts,
+    own.totalFacts,
   );
 
   return (

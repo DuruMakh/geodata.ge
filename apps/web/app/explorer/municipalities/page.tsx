@@ -48,7 +48,11 @@ export default async function MunicipalitiesIndexPage() {
     municipalityRows: list.municipalities,
   });
 
-  const lastUpdatedAt = latestReviewedAtForMunicipalFacts(sourceDocuments, functionFacts, totalFacts);
+  const lastUpdatedAt = latestReviewedAtForMunicipalFacts(
+    sourceDocuments,
+    functionFacts,
+    [...totalFacts, ...countryTotalFacts],
+  );
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">

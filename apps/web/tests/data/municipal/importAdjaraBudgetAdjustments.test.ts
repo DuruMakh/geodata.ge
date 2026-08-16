@@ -78,4 +78,22 @@ describe("Adjara budget adjustment loader", () => {
 
     await expect(loadAdjaraBudgetAdjustments(await fixture(rows))).rejects.toThrow(/2015 arithmetic/);
   });
+
+  it("rejects blank amount cells instead of converting them to zero", async () => {
+    const rows = denseRows();
+    rows[0] = row(2015, { republic: "", transfers: "", net: "" });
+
+    await expect(loadAdjaraBudgetAdjustments(await fixture(rows))).rejects.toThrow(/amount/);
+  });
+
+  it("rejects amounts with more than two decimal places", async () => {
+    const rows = denseRows();
+    rows[0] = row(2015, {
+      republic: "170031400.001",
+      transfers: "27186011.290",
+      net: "142845388.711",
+    });
+
+    await expect(loadAdjaraBudgetAdjustments(await fixture(rows))).rejects.toThrow(/two decimal places/);
+  });
 });
