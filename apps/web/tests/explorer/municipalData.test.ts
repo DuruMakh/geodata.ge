@@ -338,6 +338,25 @@ describe("aggregateFactsForEntity", () => {
   });
 });
 
+describe("served Adjara consolidated total", () => {
+  it("produces the reviewed 2025 total from six municipalities plus the net republic amount", async () => {
+    const data = await loadServedMunicipalData();
+    const members = regionFactsFor(
+      "region.adjara",
+      data.municipalities,
+      data.functionFacts,
+      data.totalFacts,
+    );
+    const rolled = aggregateFactsForEntity("region.adjara", members.functionFacts, members.totalFacts);
+    const adjusted = applyAdjaraBudgetAdjustment(rolled.totalFacts, data.adjaraBudgetAdjustments);
+
+    expect(adjusted.find((row) => row.year === 2025)?.publicTotalGel).toBeCloseTo(
+      1212519508.44,
+      2,
+    );
+  });
+});
+
 describe("aggregateFactsForEntity — fields that must not present one constituent's value as the group's", () => {
   // region.adjara's real 2024 rows (data/imports/municipal-total-facts-2015-2025.csv):
   // Batumi (06) reports on the normal total_payments measure with every
@@ -624,6 +643,29 @@ describe("buildMunicipalListRows", () => {
   it("counts a region's members in its subtitle", () => {
     const { regions } = buildMunicipalListRows(listInput);
     expect(regions[1]!.subtitleKa).toBe("2 მუნიციპალიტეტი");
+  });
+
+  it("adds the net republican amount only to Adjara's regional row", () => {
+    const adjaraBudgetAdjustments: AdjaraBudgetAdjustment[] = [
+      {
+        year: 2025,
+        scopeId: "region.adjara",
+        republicPaymentsGel: 500_000_000,
+        municipalTransfersGel: 100_000_000,
+        netRepublicPaymentsGel: 400_000_000,
+        basis: "actual",
+        republicSourceId: "source.adjara_republic_budget_actual",
+        transferSourceId: "source.treasury_consolidated_revenue_actual",
+      },
+    ];
+    const { municipalities, regions } = buildMunicipalListRows({
+      ...listInput,
+      adjaraBudgetAdjustments,
+    });
+
+    expect(regions.find((row) => row.id === "region.adjara")?.valueGel).toBe(1_000_000_000);
+    expect(regions.find((row) => row.id === "region.tbilisi")?.valueGel).toBe(2_000_000_000);
+    expect(municipalities.find((row) => row.id === "06")?.valueGel).toBe(500_000_000);
   });
 });
 

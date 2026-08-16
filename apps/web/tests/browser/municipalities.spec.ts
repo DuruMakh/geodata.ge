@@ -131,6 +131,9 @@ test("credits OpenStreetMap boundaries and explains the Georgia-total territoria
   );
   await expect(source).toContainText("ODbL");
   await expect(source).toContainText("საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს");
+  await expect(source).toContainText("აჭარის რეგიონისა და საქართველოს ჯამებში დამატებულია");
+  await expect(source).toContainText("ტრანსფერები");
+  await expect(source).toContainText("ფუნქციური სერიები კვლავ მუნიციპალურ ხარჯებს ასახავს");
   await expect(source).toContainText("ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ საქართველოს ჯამშია");
   await expect(source).toContainText("მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი");
   await expect(source).toContainText("11 რეგიონის ჯამები საქართველოს ჯამს არ უტოლდება");

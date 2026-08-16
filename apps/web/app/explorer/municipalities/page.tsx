@@ -34,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MunicipalitiesIndexPage() {
-  const { municipalities, regions, totalFacts, functionFacts, countryTotalFacts, countryFunctionFacts, functions } = await loadServedMunicipalData();
+  const { municipalities, regions, totalFacts, functionFacts, countryTotalFacts, countryFunctionFacts, functions, adjaraBudgetAdjustments } = await loadServedMunicipalData();
   const { sourceDocuments } = await loadServedLandingData();
 
   const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
@@ -42,7 +42,7 @@ export default async function MunicipalitiesIndexPage() {
   const latestYear = years.at(-1)!;
   const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
 
-  const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year: latestYear });
+  const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear });
   const map = buildMunicipalityMapModel({
     municipalities,
     municipalityRows: list.municipalities,
@@ -89,7 +89,7 @@ export default async function MunicipalitiesIndexPage() {
             latestYear,
           })}
           latestYear={latestYear}
-          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს; ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ საქართველოს ჯამშია და მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი; ამიტომ 11 რეგიონის ჯამები საქართველოს ჯამს არ უტოლდება.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). აჭარის რეგიონისა და საქართველოს ჯამებში დამატებულია აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივი გადასახდელები და გამოკლებულია მუნიციპალიტეტებზე გადაცემული ტრანსფერები. ფუნქციური სერიები კვლავ მუნიციპალურ ხარჯებს ასახავს. საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს; ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ საქართველოს ჯამშია და მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი; ამიტომ 11 რეგიონის ჯამები საქართველოს ჯამს არ უტოლდება.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />
       </div>
     </main>

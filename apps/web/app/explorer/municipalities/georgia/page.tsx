@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { countryTotalFacts } = await loadServedMunicipalData();
   const years = Array.from(new Set(countryTotalFacts.map((row) => row.year))).sort((a, b) => a - b);
   const title = "საქართველოს მუნიციპალიტეტები — GeoData";
-  const description = `საქართველოს 69 მუნიციპალური საბიუჯეტო ერთეულის ხარჯები ფუნქციების მიხედვით, ${years[0]}–${years.at(-1)}.`;
+  const description = `საქართველოს 69 მუნიციპალური საბიუჯეტო ერთეულის და აჭარის ა.რ. გაერთიანებული გადასახდელები, შიდა ტრანსფერების გამოკლებით, ${years[0]}–${years.at(-1)}.`;
 
   return {
     title,
@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function GeorgiaMunicipalitiesPage() {
-  const { municipalities, regions, functions, totalFacts, countryFunctionFacts, countryTotalFacts } =
+  const { municipalities, regions, functions, totalFacts, countryFunctionFacts, countryTotalFacts, adjaraBudgetAdjustments } =
     await loadServedMunicipalData();
   const { sourceDocuments } = await loadServedLandingData();
 
@@ -41,7 +41,7 @@ export default async function GeorgiaMunicipalitiesPage() {
   const firstYear = years[0]!;
   const latestYear = years.at(-1)!;
   const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
-  const pickerGroups = buildPickerGroups({ municipalities, regionLabels, totalFacts, year: latestYear });
+  const pickerGroups = buildPickerGroups({ municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear });
   const nationalTotalByYear = buildCountryTotalByYear(countryTotalFacts);
   const lastUpdatedAt = latestReviewedAtForMunicipalFacts(sourceDocuments, countryFunctionFacts, countryTotalFacts);
 
@@ -63,7 +63,7 @@ export default async function GeorgiaMunicipalitiesPage() {
           title="როგორ ხარჯავენ ბიუჯეტს"
           triggerLabel="საქართველოს მუნიციპალიტეტები"
           entityId={MUNICIPAL_COUNTRY_ID}
-          metaLine={`69 მუნიციპალური საბიუჯეტო ერთეული · ${firstYear}–${latestYear}`}
+          metaLine={`69 მუნიციპალური საბიუჯეტო ერთეული + აჭარის ა.რ. · ${firstYear}–${latestYear}`}
           functions={functions}
           functionFacts={countryFunctionFacts}
           totalFacts={countryTotalFacts}
@@ -77,7 +77,7 @@ export default async function GeorgiaMunicipalitiesPage() {
             budgetCount: 69,
           }}
           pickerGroups={pickerGroups}
-          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს; ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ ამ ჯამშია და მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს და დამატებით მოიცავს აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივ გადასახდელებს, მუნიციპალიტეტებზე გადაცემული ტრანსფერების გამოკლებით. ფუნქციური სერიები მხოლოდ მუნიციპალურ კლასიფიკაციას ასახავს. ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ ამ ჯამშია და მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />
       </div>
     </main>

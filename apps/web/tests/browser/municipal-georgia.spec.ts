@@ -21,6 +21,9 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
 
   const sourceNote = page.getByTestId("municipal-source-note");
   await expect(sourceNote).toContainText("69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს");
+  await expect(sourceNote).toContainText("აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივ გადასახდელებს");
+  await expect(sourceNote).toContainText("ტრანსფერების გამოკლებით");
+  await expect(sourceNote).toContainText("ფუნქციური სერიები მხოლოდ მუნიციპალურ კლასიფიკაციას");
   await expect(sourceNote).toContainText("ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო");
   await expect(sourceNote).toContainText("ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი");
 

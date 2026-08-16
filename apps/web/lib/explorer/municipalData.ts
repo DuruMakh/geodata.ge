@@ -1,5 +1,7 @@
 import {
+  ADJARA_REGION_ID,
   MUNICIPAL_COUNTRY_ID,
+  type AdjaraBudgetAdjustment,
   type Municipality,
   type MunicipalFunction,
   type MunicipalFunctionFact,
@@ -49,7 +51,12 @@ function agreeOrMixed(current: string, incoming: string, mixedMarker: string): s
   return current === incoming ? current : mixedMarker;
 }
 
-export { aggregateFactsForEntity, MIXED_PUBLIC_TOTAL_MEASURE, MIXED_SOURCE_ID } from "../data/municipal/aggregateMunicipalFacts";
+export {
+  aggregateFactsForEntity,
+  applyAdjaraBudgetAdjustment,
+  MIXED_PUBLIC_TOTAL_MEASURE,
+  MIXED_SOURCE_ID,
+} from "../data/municipal/aggregateMunicipalFacts";
 
 function sourceMetadataFor(sourceId: string, sources: Map<string, SourceDocumentRow>): SourceMetadata {
   const source = sources.get(sourceId);
@@ -199,6 +206,7 @@ export type MunicipalListInput = {
   municipalities: Municipality[];
   regionLabels: Map<string, string>;
   totalFacts: MunicipalTotalFact[];
+  adjaraBudgetAdjustments?: AdjaraBudgetAdjustment[];
   year: number;
 };
 
@@ -211,7 +219,7 @@ export function buildMunicipalListRows(input: MunicipalListInput): {
   municipalities: MunicipalListRow[];
   regions: MunicipalListRow[];
 } {
-  const { municipalities, regionLabels, totalFacts, year } = input;
+  const { municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments = [], year } = input;
 
   const totalByCode = new Map<string, number>();
   for (const row of totalFacts) {
@@ -238,6 +246,15 @@ export function buildMunicipalListRows(input: MunicipalListInput): {
     bucket.valueGel += totalByCode.get(municipality.code) ?? 0;
     bucket.members += 1;
     byRegion.set(municipality.regionId, bucket);
+  }
+
+  const adjaraAdjustment = adjaraBudgetAdjustments.find((row) => row.year === year);
+  const adjaraBucket = byRegion.get(ADJARA_REGION_ID);
+  if (adjaraAdjustment && adjaraBucket) {
+    adjaraBucket.valueGel =
+      (Math.round(adjaraBucket.valueGel * 100) +
+        Math.round(adjaraAdjustment.netRepublicPaymentsGel * 100)) /
+      100;
   }
 
   const regionRows = Array.from(byRegion.entries())
