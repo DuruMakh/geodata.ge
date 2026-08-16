@@ -326,3 +326,18 @@ model MunicipalCountryTotalFact {
   @@index([year])
   @@index([scopeId])
 }
+
+// Mirror of data/imports/municipal-adjara-budget-adjustments-2015-2025.csv.
+model MunicipalAdjaraBudgetAdjustment {
+  id                     String      @id
+  year                   Int         @unique
+  scopeId                String
+  republicPaymentsGel    Decimal     @db.Decimal(18, 2)
+  municipalTransfersGel  Decimal     @db.Decimal(18, 2)
+  netRepublicPaymentsGel Decimal     @db.Decimal(18, 2)
+  basis                  BudgetBasis
+  republicSourceId       String
+  transferSourceId       String
+
+  @@index([scopeId])
+}

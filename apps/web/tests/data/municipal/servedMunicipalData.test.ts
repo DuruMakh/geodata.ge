@@ -19,6 +19,12 @@ describe("loadServedMunicipalData", () => {
     expect(data.totalFacts).toHaveLength(704);
     expect(data.countryFunctionFacts).toHaveLength(110);
     expect(data.countryTotalFacts).toHaveLength(11);
+    expect(data.adjaraBudgetAdjustments).toHaveLength(11);
+    expect(data.adjaraBudgetAdjustments[0]).toMatchObject({
+      year: 2015,
+      scopeId: "region.adjara",
+      netRepublicPaymentsGel: 142845388.71,
+    });
     expect(new Set(data.countryTotalFacts.map((row) => row.municipalityCode))).toEqual(
       new Set(["country.georgia"]),
     );

@@ -36,6 +36,13 @@ export function municipalTotalFactParityKey(row: {
   return [row.year, row.municipalityCode].join(":");
 }
 
+export function adjaraBudgetAdjustmentParityKey(row: {
+  year: number;
+  scopeId: string;
+}): string {
+  return [row.year, row.scopeId].join(":");
+}
+
 // Serialize with sorted top-level keys. Sorting is applied by rebuilding the
 // object (not via a JSON.stringify replacer array, which would filter keys at
 // every nesting depth and silently blank out any future nested field).

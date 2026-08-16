@@ -96,3 +96,6 @@ source.municipal_portal_archive,Archived Municipalities Analytical Portal open-d
 source.municipal_mof_annual_and_history_workbooks,MoF annual functional-classification workbooks (2020-2025) and municipality budget-history workbooks (2016-2025 total payments),docs/Raw Data/Municipalities/mof-functional-classification + docs/Raw Data/Municipalities/mof-municipality-budget-history-2016-2025,2026-07-26
 source.geostat_national_gdp_sna_1993,"Geostat GDP at current prices, SNA 1993",docs/Raw Data/GDP/national-nominal-gdp/official/GDP-at-current-prices.xlsx,2026-08-13
 source.geostat_national_gdp_sna_2008,"Geostat GDP at current prices, SNA 2008",docs/Raw Data/GDP/national-nominal-gdp/official/03_GDP-at-Current-Prices.xlsx,2026-08-13
+source.adjara_republic_budget_actual,Adjara Autonomous Republic republican budget actual payments (2015-2025),docs/Raw Data/Municipalities/adjara-republic-budget-2015-2025,2026-08-16
+source.treasury_consolidated_revenue_actual,Treasury annual consolidated-revenue reports — transfers from autonomous republic,docs/Raw Data/Revenue/2015-jan-dec-consolidated-revenue.pdf + annual 2016-2025 files,2026-08-16
+source.adjara_consolidated_budget,Reviewed consolidated Adjara calculation — municipalities plus republican payments minus internal transfers,data/imports/municipal-adjara-budget-adjustments-2015-2025.csv,2026-08-16

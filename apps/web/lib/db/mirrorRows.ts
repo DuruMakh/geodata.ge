@@ -7,6 +7,7 @@ import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { NationalGdpFact } from "../data/nationalGdp/types";
 import type {
+  AdjaraBudgetAdjustment,
   Municipality,
   MunicipalFunction,
   MunicipalFunctionFact,
@@ -340,6 +341,30 @@ export async function loadMunicipalCountryTotalFactsFromMirror(
       warningType: row.warningType,
       basis: "actual" as const,
       sourceId: row.sourceId,
+    };
+  });
+}
+
+export async function loadMunicipalAdjaraBudgetAdjustmentsFromMirror(
+  db: MirrorClient,
+): Promise<AdjaraBudgetAdjustment[]> {
+  const rows = await db.municipalAdjaraBudgetAdjustment.findMany({
+    orderBy: [{ year: "asc" }],
+  });
+
+  return rows.map((row) => {
+    if (row.basis !== "actual") {
+      throw new Error(`Adjara budget adjustment ${row.id} must have basis=actual, got ${row.basis}`);
+    }
+    return {
+      year: row.year,
+      scopeId: "region.adjara" as const,
+      republicPaymentsGel: Number(row.republicPaymentsGel),
+      municipalTransfersGel: Number(row.municipalTransfersGel),
+      netRepublicPaymentsGel: Number(row.netRepublicPaymentsGel),
+      basis: "actual" as const,
+      republicSourceId: row.republicSourceId,
+      transferSourceId: row.transferSourceId,
     };
   });
 }
