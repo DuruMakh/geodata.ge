@@ -1,0 +1,12 @@
+year,scope_id,republic_payments_gel,municipal_transfers_gel,net_republic_payments_gel,basis,republic_source_id,transfer_source_id
+2015,region.adjara,170031400.00,27186011.29,142845388.71,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual
+2016,region.adjara,186090907.42,45270220.38,140820687.04,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual
+2017,region.adjara,290727900.48,80795412.01,209932488.47,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual
+2018,region.adjara,344398969.25,68700953.98,275698015.27,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual
+2019,region.adjara,325967239.90,70174378.07,255792861.83,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual
+2020,region.adjara,291463614.96,52809487.79,238654127.17,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual
+2021,region.adjara,328398458.61,104772464.67,223625993.94,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual
+2022,region.adjara,397081505.90,135152278.97,261929226.93,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual
+2023,region.adjara,532278784.79,206573661.42,325705123.37,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual
+2024,region.adjara,663339970.39,269644886.41,393695083.98,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual
+2025,region.adjara,773471234.64,303331712.79,470139521.85,actual,source.adjara_republic_budget_actual,source.treasury_consolidated_revenue_actual

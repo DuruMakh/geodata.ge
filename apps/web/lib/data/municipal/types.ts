@@ -3,6 +3,18 @@
 // the identical shapes so parity compares like with like.
 
 export const MUNICIPAL_COUNTRY_ID = "country.georgia" as const;
+export const ADJARA_REGION_ID = "region.adjara" as const;
+
+export type AdjaraBudgetAdjustment = {
+  year: number;
+  scopeId: typeof ADJARA_REGION_ID;
+  republicPaymentsGel: number;
+  municipalTransfersGel: number;
+  netRepublicPaymentsGel: number;
+  basis: "actual";
+  republicSourceId: string;
+  transferSourceId: string;
+};
 
 export type MunicipalFunction = {
   id: string;
