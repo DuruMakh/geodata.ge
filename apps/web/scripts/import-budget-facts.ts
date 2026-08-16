@@ -13,6 +13,7 @@ import { buildImportReport } from "../lib/data/importReport";
 import { loadSpendingMappings } from "../lib/data/mappings";
 import { loadNationalGdpFacts } from "../lib/data/nationalGdp/importNationalGdp";
 import { loadMunicipalitiesFile } from "../lib/data/municipal/municipalitiesFile";
+import { loadAdjaraBudgetAdjustments } from "../lib/data/municipal/importAdjaraBudgetAdjustments";
 import {
   loadMunicipalCountryFunctionFacts,
   loadMunicipalCountryTotalFacts,
@@ -33,6 +34,7 @@ import {
 } from "../lib/data/parityReport";
 import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import {
+  adjaraBudgetAdjustmentParityKey,
   adminFactParityKey,
   assertSameServedRows,
   budgetFactParityKey,
@@ -47,6 +49,7 @@ import {
   loadAdminFactsFromMirror,
   loadBudgetFactsFromMirror,
   loadGlossaryFromMirror,
+  loadMunicipalAdjaraBudgetAdjustmentsFromMirror,
   loadMunicipalCountryFunctionFactsFromMirror,
   loadMunicipalCountryTotalFactsFromMirror,
   loadMunicipalFunctionFactsFromMirror,
@@ -159,6 +162,7 @@ async function main() {
     municipalTotalFacts,
     municipalCountryFunctionFacts,
     municipalCountryTotalFacts,
+    municipalAdjaraBudgetAdjustments,
     nationalGdpFacts,
   ] = await Promise.all([
     loadTaxonomyFiles(TAXONOMY_DIR),
@@ -175,6 +179,7 @@ async function main() {
     loadMunicipalTotalFacts(SERVED_DATA_FILES.municipalTotalFacts),
     loadMunicipalCountryFunctionFacts(SERVED_DATA_FILES.municipalCountryFunctionFacts),
     loadMunicipalCountryTotalFacts(SERVED_DATA_FILES.municipalCountryTotalFacts),
+    loadAdjaraBudgetAdjustments(SERVED_DATA_FILES.municipalAdjaraBudgetAdjustments),
     loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
   ]);
 
@@ -260,6 +265,27 @@ async function main() {
   });
   assertAmountPrecision("Georgia municipal function fact", municipalCountryFunctionFacts);
   assertMunicipalTotalPrecision("Georgia municipal total fact", municipalCountryTotalFacts);
+  assertSubset(
+    "Adjara budget adjustment source IDs",
+    municipalAdjaraBudgetAdjustments.flatMap((row) => [row.republicSourceId, row.transferSourceId]),
+    sourceIds,
+  );
+  assertUnique(
+    "Adjara budget adjustment natural key",
+    municipalAdjaraBudgetAdjustments.map(adjaraBudgetAdjustmentParityKey),
+  );
+  assertAmountPrecision(
+    "Adjara republican payments",
+    municipalAdjaraBudgetAdjustments.map((row) => ({ amountGel: row.republicPaymentsGel })),
+  );
+  assertAmountPrecision(
+    "Adjara municipal transfers",
+    municipalAdjaraBudgetAdjustments.map((row) => ({ amountGel: row.municipalTransfersGel })),
+  );
+  assertAmountPrecision(
+    "Adjara net republican payments",
+    municipalAdjaraBudgetAdjustments.map((row) => ({ amountGel: row.netRepublicPaymentsGel })),
+  );
 
   const report = buildImportReport(IMPORT_LABEL, budgetFacts);
 
@@ -290,6 +316,7 @@ async function main() {
         await tx.municipalTotalFact.deleteMany();
         await tx.municipalCountryFunctionFact.deleteMany();
         await tx.municipalCountryTotalFact.deleteMany();
+        await tx.municipalAdjaraBudgetAdjustment.deleteMany();
         await tx.municipality.deleteMany();
         await tx.municipalRegion.deleteMany();
         await tx.municipalFunctionCategory.deleteMany();
@@ -427,6 +454,20 @@ async function main() {
           })),
         });
 
+        await tx.municipalAdjaraBudgetAdjustment.createMany({
+          data: municipalAdjaraBudgetAdjustments.map((row) => ({
+            id: adjaraBudgetAdjustmentParityKey(row),
+            year: row.year,
+            scopeId: row.scopeId,
+            republicPaymentsGel: row.republicPaymentsGel,
+            municipalTransfersGel: row.municipalTransfersGel,
+            netRepublicPaymentsGel: row.netRepublicPaymentsGel,
+            basis: row.basis,
+            republicSourceId: row.republicSourceId,
+            transferSourceId: row.transferSourceId,
+          })),
+        });
+
         const run = await tx.importRun.create({
           data: {
             importLabel: report.importLabel,
@@ -540,6 +581,7 @@ async function main() {
           mirrorMunicipalTotalFacts,
           mirrorMunicipalCountryFunctionFacts,
           mirrorMunicipalCountryTotalFacts,
+          mirrorMunicipalAdjaraBudgetAdjustments,
         ] = await Promise.all([
           loadMunicipalFunctionsFromMirror(tx),
           loadMunicipalRegionsFromMirror(tx),
@@ -548,6 +590,7 @@ async function main() {
           loadMunicipalTotalFactsFromMirror(tx),
           loadMunicipalCountryFunctionFactsFromMirror(tx),
           loadMunicipalCountryTotalFactsFromMirror(tx),
+          loadMunicipalAdjaraBudgetAdjustmentsFromMirror(tx),
         ]);
 
         assertSameServedRows("budget facts", budgetFacts, mirrorFacts, budgetFactParityKey);
@@ -613,6 +656,12 @@ async function main() {
           mirrorMunicipalCountryTotalFacts,
           municipalTotalFactParityKey,
         );
+        assertSameServedRows(
+          "Adjara budget adjustments",
+          municipalAdjaraBudgetAdjustments,
+          mirrorMunicipalAdjaraBudgetAdjustments,
+          adjaraBudgetAdjustmentParityKey,
+        );
 
         // Totals parity for the human-readable report; counts come from the
         // row-level readback above, GEL sums from the database's own Decimal
@@ -670,6 +719,11 @@ async function main() {
               table: "MunicipalCountryTotalFact",
               csvRows: municipalCountryTotalFacts.length,
               dbRows: mirrorMunicipalCountryTotalFacts.length,
+            },
+            {
+              table: "MunicipalAdjaraBudgetAdjustment",
+              csvRows: municipalAdjaraBudgetAdjustments.length,
+              dbRows: mirrorMunicipalAdjaraBudgetAdjustments.length,
             },
           ],
           budgetTotalsCsv,

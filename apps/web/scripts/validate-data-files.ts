@@ -19,12 +19,16 @@ import {
   loadMunicipalFunctionFacts,
   loadMunicipalTotalFacts,
 } from "../lib/data/municipal/importMunicipalFacts";
+import { loadAdjaraBudgetAdjustments } from "../lib/data/municipal/importAdjaraBudgetAdjustments";
 import { loadMunicipalitiesFile } from "../lib/data/municipal/municipalitiesFile";
 import {
   loadMunicipalFunctionsFile,
   loadMunicipalRegionsFile,
 } from "../lib/data/municipal/taxonomyFiles";
-import { assertMunicipalCountryPanel } from "../lib/data/municipal/sourceValidation";
+import {
+  assertMunicipalAggregateSourceIds,
+  assertMunicipalCountryPanel,
+} from "../lib/data/municipal/sourceValidation";
 import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import { loadSourceDocuments } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
@@ -74,6 +78,9 @@ async function main() {
   const countryTotalFacts = await loadMunicipalCountryTotalFacts(
     SERVED_DATA_FILES.municipalCountryTotalFacts,
   );
+  const adjaraBudgetAdjustments = await loadAdjaraBudgetAdjustments(
+    SERVED_DATA_FILES.municipalAdjaraBudgetAdjustments,
+  );
   const report = buildImportReport("real-budget-2004-2025", facts);
   const missingGlossary = taxonomy.filter((item) => !glossary.has(item.id));
   const registeredSourceIds = new Set(sources.map((source) => source.sourceId));
@@ -99,6 +106,11 @@ async function main() {
   assertYears("Revenue", sortedYears(revenueRows.map((row) => row.year)), REVENUE_YEARS);
   assertYears("Admin spending", sortedYears(adminSpendingFacts.map((row) => row.year)), ADMIN_SPENDING_YEARS);
   assertYears("Municipal", sortedYears(municipalFunctionFacts.map((row) => row.year)), MUNICIPAL_YEARS);
+  assertYears(
+    "Adjara budget adjustments",
+    sortedYears(adjaraBudgetAdjustments.map((row) => row.year)),
+    MUNICIPAL_YEARS,
+  );
   const municipalCodes = new Set(municipalities.map((row) => row.code));
   const regionIds = new Set(municipalRegions.map((region) => region.id));
   const municipalCategoryIds = new Set(municipalFunctions.map((entry) => entry.id));
@@ -108,6 +120,11 @@ async function main() {
     categoryIds: municipalCategoryIds,
     registeredSourceIds,
   });
+  assertMunicipalAggregateSourceIds(
+    "Adjara budget adjustments",
+    adjaraBudgetAdjustments.flatMap((row) => [row.republicSourceId, row.transferSourceId]),
+    registeredSourceIds,
+  );
   const municipalityGeometrySources = await loadMunicipalityGeometrySources();
 
   validateMunicipalityGeometrySources(municipalityGeometrySources, Array.from(municipalCodes));
@@ -218,6 +235,7 @@ async function main() {
   console.log(`Validated municipal total rows: ${municipalTotalFacts.length}`);
   console.log(`Validated Georgia municipal function rows: ${countryFunctionFacts.length}`);
   console.log(`Validated Georgia municipal total rows: ${countryTotalFacts.length}`);
+  console.log(`Validated Adjara budget adjustment rows: ${adjaraBudgetAdjustments.length}`);
   console.log(`Validated municipalities: ${municipalities.length}`);
   console.log(`Validated municipality map polygons: ${municipalityGeometrySources.municipalities.features.length}`);
   console.log(`Validated taxonomy rows: ${taxonomy.length}`);

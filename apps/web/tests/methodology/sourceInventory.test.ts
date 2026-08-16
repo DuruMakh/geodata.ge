@@ -22,10 +22,10 @@ describe("original-source inventory", () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
     expect(inventory.expenditure).toHaveLength(77);
     expect(inventory.revenue).toHaveLength(21);
-    expect(inventory.municipalities).toHaveLength(77);
+    expect(inventory.municipalities).toHaveLength(79);
     expect(inventory.expenditure.reduce(sumBytes, 0)).toBe(53_661_484);
     expect(inventory.revenue.reduce(sumBytes, 0)).toBe(4_667_365);
-    expect(inventory.municipalities.reduce(sumBytes, 0)).toBe(3_091_526);
+    expect(inventory.municipalities.reduce(sumBytes, 0)).toBe(3_571_415);
     expect(inventory.revenue.some((row) => row.path.includes("/text/"))).toBe(false);
     expect(inventory.municipalities.some((row) => row.path.includes("combined-annual"))).toBe(false);
     expect(inventory.municipalities.some((row) => row.path.includes("geostat-population"))).toBe(false);

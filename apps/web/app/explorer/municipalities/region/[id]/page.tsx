@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../../../../components/municipalities/municipal-explorer";
 import { PageHeader } from "../../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../../lib/data/servedData";
-import { MUNICIPAL_COUNTRY_ID } from "../../../../../lib/data/municipal/types";
+import { ADJARA_REGION_ID, MUNICIPAL_COUNTRY_ID } from "../../../../../lib/data/municipal/types";
 import {
+  applyAdjaraBudgetAdjustment,
   aggregateFactsForEntity,
   buildCountryTotalByYear,
   buildMunicipalListRows,
@@ -18,8 +19,10 @@ import { formatAmount } from "../../../../../lib/explorer/format";
 const SOURCE_NOTE_BASE =
   "მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). " +
   "რეგიონის ჯამი მხოლოდ საჯაროდ მოწოდებულ მუნიციპალურ ბიუჯეტებს აერთიანებს: " +
-  "აჭარის ავტონომიური რესპუბლიკის საკუთარი ბიუჯეტი მასში არ შედის, ხოლო შიდა ქართლსა და " +
-  "მცხეთა-მთიანეთს ოკუპირებულ ტერიტორიებთან დაკავშირებული ერთეულები აკლია.";
+  "შიდა ქართლსა და მცხეთა-მთიანეთს ოკუპირებულ ტერიტორიებთან დაკავშირებული ერთეულები აკლია.";
+
+const ADJARA_SOURCE_NOTE =
+  "აჭარის გაერთიანებული ბიუჯეტი აერთიანებს აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივ გადასახდელებსა და ექვსი მუნიციპალიტეტის ბიუჯეტებს; მუნიციპალიტეტებზე გადაცემული ტრანსფერები გამოკლებულია, რათა თანხა ორჯერ არ დაითვალოს. ფუნქციური სერიები მხოლოდ მუნიციპალიტეტების კლასიფიცირებულ ხარჯებს ასახავს.";
 
 // The 11 region ids are the complete, closed set.
 export const dynamicParams = false;
@@ -37,7 +40,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
   const title = `${region.kaLabel} — მუნიციპალიტეტები — GeoData`;
-  const description = `${REGION_GENITIVE_KA[region.id] ?? region.kaLabel} მუნიციპალური ბიუჯეტები ფუნქციების მიხედვით, ${years[0]}–${years.at(-1)}.`;
+  const description =
+    region.id === ADJARA_REGION_ID
+      ? `აჭარის გაერთიანებული ბიუჯეტი — რესპუბლიკური და მუნიციპალური გადასახდელები შიდა ტრანსფერების გამოკლებით, ${years[0]}–${years.at(-1)}.`
+      : `${REGION_GENITIVE_KA[region.id] ?? region.kaLabel} მუნიციპალური ბიუჯეტები ფუნქციების მიხედვით, ${years[0]}–${years.at(-1)}.`;
 
   return {
     title,
@@ -57,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function RegionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const regionId = `region.${id}`;
-  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts } = await loadServedMunicipalData();
+  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = await loadServedMunicipalData();
   const { sourceDocuments } = await loadServedLandingData();
 
   const region = regions.find((row) => row.id === regionId);
@@ -68,10 +74,10 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   const latestYear = years.at(-1)!;
   const regionLabels = new Map(regions.map((row) => [row.id, row.kaLabel]));
 
-  const listInput = { municipalities, regionLabels, totalFacts, year: latestYear };
+  const listInput = { municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear };
   const list = buildMunicipalListRows(listInput);
   const rankByYear = years.reduce<Record<number, number>>((ranks, year) => {
-    const yearList = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year });
+    const yearList = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year });
     ranks[year] = yearList.regions.find((row) => row.id === regionId)?.rank ?? 0;
     return ranks;
   }, {});
@@ -81,7 +87,14 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
   // Collapse the members' rows into one entity's on the SERVER, so this page
   // ships ~110 function rows like a municipality page rather than up to 12×.
-  const own = aggregateFactsForEntity(regionId, members.functionFacts, members.totalFacts);
+  const rolled = aggregateFactsForEntity(regionId, members.functionFacts, members.totalFacts);
+  const own =
+    regionId === ADJARA_REGION_ID
+      ? {
+          ...rolled,
+          totalFacts: applyAdjaraBudgetAdjustment(rolled.totalFacts, adjaraBudgetAdjustments),
+        }
+      : rolled;
 
   const memberRows = list.municipalities
     .filter((row) => row.regionId === regionId)
@@ -96,7 +109,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   const lastUpdatedAt = latestReviewedAtForMunicipalFacts(
     sourceDocuments,
     members.functionFacts,
-    members.totalFacts,
+    own.totalFacts,
   );
 
   return (
@@ -114,10 +127,10 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
         />
 
         <MunicipalExplorer
-          title="როგორ ხარჯავს ბიუჯეტს"
+          title={regionId === ADJARA_REGION_ID ? "გაერთიანებული ბიუჯეტი —" : "როგორ ხარჯავს ბიუჯეტს"}
           triggerLabel={region.kaLabel}
           entityId={regionId}
-          metaLine={`${members.memberCodes.length} მუნიციპალიტეტი · ${georgianOrdinal(rank)} ადგილი ${regions.length}-დან`}
+          metaLine={`${members.memberCodes.length} მუნიციპალიტეტი · ${georgianOrdinal(rank)} ადგილი ${regions.length}-დან${regionId === ADJARA_REGION_ID ? " · შიდა ტრანსფერების გარეშე" : ""}`}
           functions={functions}
           functionFacts={own.functionFacts}
           totalFacts={own.totalFacts}
@@ -140,7 +153,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
             prev: { label: prev.kaLabel, href: hrefFor(prev) },
             next: { label: next.kaLabel, href: hrefFor(next) },
           }}
-          sourceNote={`${SOURCE_NOTE_BASE}${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          sourceNote={`${regionId === ADJARA_REGION_ID ? ADJARA_SOURCE_NOTE : SOURCE_NOTE_BASE}${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         >
           <div className="mt-11 border-t-2 border-[var(--ink)] pt-[22px]">
             <h2 className="mb-3.5 font-[family-name:var(--font-display)] text-[22px] font-semibold">

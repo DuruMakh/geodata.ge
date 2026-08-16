@@ -108,14 +108,13 @@ describe("methodology catalog", () => {
     ].join(" ");
 
     expect(content.sections.map((section) => section.id)).toEqual(["scope", "sources", "journey", "archive"]);
-    expect(content.reviewedAt).toBe("2026-08-15");
-    expect(publicText).toContain("64 საჯარო ტერიტორიული მუნიციპალიტეტი");
+    expect(content.reviewedAt).toBe("2026-08-16");
+    expect(publicText).toContain("64 საჯარო მუნიციპალიტეტი");
     expect(publicText).toContain("05, 42, 43, 46 და 64");
-    expect(publicText).toContain("მხოლოდ 69-სერიან საქართველოს ჯამში");
     expect(publicText).toContain("ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი");
-    expect(publicText).toContain("11 რეგიონის ჯამები საქართველოს ჯამს არ უტოლდება");
-    expect(publicText).toContain("110 ფუნქციურ ფაქტსა და 11 წლიურ ჯამს");
-    expect(publicText).toContain("ეროვნული მუნიციპალური წილების მნიშვნელად");
+    expect(publicText).toContain("აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივი გადასახდელები");
+    expect(publicText).toContain("ტრანსფერები");
+    expect(publicText).toContain("69 მუნიციპალურ სერიას");
   });
 
   it("discloses the nominal-GDP denominator without opening a GDP methodology route", () => {

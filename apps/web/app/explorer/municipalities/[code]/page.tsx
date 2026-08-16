@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
 
 export default async function MunicipalityPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
-  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts } = await loadServedMunicipalData();
+  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = await loadServedMunicipalData();
   const { sourceDocuments } = await loadServedLandingData();
 
   const municipality = municipalities.find((row) => row.code === code);
@@ -59,7 +59,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
   const latestYear = years.at(-1)!;
   const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
 
-  const listInput = { municipalities, regionLabels, totalFacts, year: latestYear };
+  const listInput = { municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear };
   const rankByYear = years.reduce<Record<number, number>>((ranks, year) => {
     const yearList = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year });
     ranks[year] = yearList.municipalities.find((row) => row.id === code)?.rank ?? 0;

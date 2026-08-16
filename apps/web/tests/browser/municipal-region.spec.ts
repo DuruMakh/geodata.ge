@@ -8,10 +8,9 @@ async function expectMunicipalAppReady(page: Page) {
 // workspace and the entity picker via `children`/`pickerGroups`. Two things
 // nothing in the repo exercised before this page existed:
 //
-//  - the roll-up source note (design spec §7.3): a region total sums only
-//    publicly served municipal budgets, so the page must say so out loud —
-//    აჭარა excludes the Adjara autonomous republic's own budget, and შიდა
-//    ქართლი/მცხეთა-მთიანეთი exclude bodies associated with occupied
+//  - the roll-up source note (design spec §7.3): the page must state its
+//    coverage — აჭარა consolidates the autonomous republic and its six
+//    municipalities, while შიდა ქართლი/მცხეთა-მთიანეთი exclude bodies associated with occupied
 //    territories. Without this note a region total reads as complete
 //    territorially attributed spending, which it is not.
 //  - the picker's region options (Task 10): they 404'd until this page
@@ -22,6 +21,7 @@ async function expectMunicipalAppReady(page: Page) {
 // იმერეთი: 12 member municipalities (data/imports/municipalities.csv), the
 // same region the brief's own manual verification step names.
 const REGION_URL = "http://localhost:3100/explorer/municipalities/region/imereti";
+const ADJARA_URL = "http://localhost:3100/explorer/municipalities/region/adjara";
 const LONG_REGION_URL =
   "http://localhost:3100/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti";
 
@@ -56,15 +56,27 @@ test.describe("region header responsiveness", () => {
 });
 
 test.describe("region source note", () => {
-  test("names both roll-up carve-outs — აჭარა's own budget and the occupied-territory exclusions", async ({ page }) => {
+  test("keeps the occupied-territory exclusions on ordinary regional roll-ups", async ({ page }) => {
     const response = await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);
     expect(response?.status()).toBe(200);
 
     const note = page.getByTestId("municipal-source-note");
     await expect(note).toContainText("რეგიონის ჯამი მხოლოდ საჯაროდ მოწოდებულ მუნიციპალურ ბიუჯეტებს აერთიანებს");
-    await expect(note).toContainText("აჭარის ავტონომიური რესპუბლიკის საკუთარი ბიუჯეტი მასში არ შედის");
     await expect(note).toContainText("შიდა ქართლსა და მცხეთა-მთიანეთს ოკუპირებულ ტერიტორიებთან დაკავშირებული ერთეულები აკლია");
+  });
+
+  test("identifies Adjara's consolidated total and removed internal transfers", async ({ page }) => {
+    await page.goto(ADJARA_URL);
+    await expectMunicipalAppReady(page);
+
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("გაერთიანებული ბიუჯეტი — აჭარა▾");
+    const note = page.getByTestId("municipal-source-note");
+    await expect(note).toContainText("ექვსი მუნიციპალიტეტის ბიუჯეტებს");
+    await expect(note).toContainText("ტრანსფერები გამოკლებულია");
+    await expect(note).toContainText("ფუნქციური სერიები მხოლოდ მუნიციპალიტეტების");
+    await expect(page.getByTestId("explorer-shell")).toContainText("განახლდა 2026-08-16");
+    await expect(page.locator('a[href*="adjara-republic"]')).toHaveCount(0);
   });
 });
 
@@ -175,7 +187,7 @@ test.describe("region page", () => {
     await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
     await expect(page.getByTestId("entity-picker-caret")).toHaveText("▾");
     await expect(page.getByTestId("region-member-row")).toHaveCount(12);
-    await expect(page.getByTestId("municipal-source-note").first()).toContainText("აჭარის ავტონომიური რესპუბლიკის");
+    await expect(page.getByTestId("municipal-source-note").first()).toContainText("ოკუპირებულ ტერიტორიებთან");
     await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
   });
 });

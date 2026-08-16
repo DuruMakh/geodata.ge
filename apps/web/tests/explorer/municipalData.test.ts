@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
-import type { Municipality, MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
+import type {
+  AdjaraBudgetAdjustment,
+  Municipality,
+  MunicipalFunction,
+  MunicipalFunctionFact,
+  MunicipalTotalFact,
+} from "../../lib/data/municipal/types";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 import {
+  applyAdjaraBudgetAdjustment,
   aggregateFactsForEntity,
   MIXED_PUBLIC_TOTAL_MEASURE,
   MIXED_SOURCE_ID,
@@ -84,6 +91,33 @@ const TOTAL_FACTS: MunicipalTotalFact[] = [
   total(2016, 300, 265, true),
   total(2017, 370, 370),
 ];
+
+const ADJARA_ADJUSTMENTS: AdjaraBudgetAdjustment[] = [
+  {
+    year: 2015,
+    scopeId: "region.adjara",
+    republicPaymentsGel: 170031400,
+    municipalTransfersGel: 27186011.29,
+    netRepublicPaymentsGel: 142845388.71,
+    basis: "actual",
+    republicSourceId: "source.adjara_republic_budget_actual",
+    transferSourceId: "source.treasury_consolidated_revenue_actual",
+  },
+];
+
+describe("applyAdjaraBudgetAdjustment", () => {
+  it("adds the net republican amount once and leaves function coverage separate", () => {
+    const base = [{ ...total(2015, 216011449.37, 216011449.37), totalPaymentsGel: null }];
+    const [adjusted] = applyAdjaraBudgetAdjustment(base, ADJARA_ADJUSTMENTS);
+
+    expect(adjusted.publicTotalGel).toBeCloseTo(358856838.08, 2);
+    expect(adjusted.publicTotalMeasure).toBe("adjara_consolidated_total");
+    expect(adjusted.totalPaymentsGel).toBeNull();
+    expect(adjusted.functionalSumGel).toBe(216011449.37);
+    expect(adjusted.expensesGel).toBeNull();
+    expect(adjusted.reconciliationDifferenceGel).toBeNull();
+  });
+});
 
 function build(startYear = 2015, endYear = 2017) {
   return buildMunicipalEntityModel({
@@ -301,6 +335,25 @@ describe("aggregateFactsForEntity", () => {
       expect(row.warningType).toBe("none");
       expect(row.warningAmountGel).toBeNull();
     }
+  });
+});
+
+describe("served Adjara consolidated total", () => {
+  it("produces the reviewed 2025 total from six municipalities plus the net republic amount", async () => {
+    const data = await loadServedMunicipalData();
+    const members = regionFactsFor(
+      "region.adjara",
+      data.municipalities,
+      data.functionFacts,
+      data.totalFacts,
+    );
+    const rolled = aggregateFactsForEntity("region.adjara", members.functionFacts, members.totalFacts);
+    const adjusted = applyAdjaraBudgetAdjustment(rolled.totalFacts, data.adjaraBudgetAdjustments);
+
+    expect(adjusted.find((row) => row.year === 2025)?.publicTotalGel).toBeCloseTo(
+      1212519508.44,
+      2,
+    );
   });
 });
 
@@ -591,6 +644,29 @@ describe("buildMunicipalListRows", () => {
     const { regions } = buildMunicipalListRows(listInput);
     expect(regions[1]!.subtitleKa).toBe("2 მუნიციპალიტეტი");
   });
+
+  it("adds the net republican amount only to Adjara's regional row", () => {
+    const adjaraBudgetAdjustments: AdjaraBudgetAdjustment[] = [
+      {
+        year: 2025,
+        scopeId: "region.adjara",
+        republicPaymentsGel: 500_000_000,
+        municipalTransfersGel: 100_000_000,
+        netRepublicPaymentsGel: 400_000_000,
+        basis: "actual",
+        republicSourceId: "source.adjara_republic_budget_actual",
+        transferSourceId: "source.treasury_consolidated_revenue_actual",
+      },
+    ];
+    const { municipalities, regions } = buildMunicipalListRows({
+      ...listInput,
+      adjaraBudgetAdjustments,
+    });
+
+    expect(regions.find((row) => row.id === "region.adjara")?.valueGel).toBe(1_000_000_000);
+    expect(regions.find((row) => row.id === "region.tbilisi")?.valueGel).toBe(2_000_000_000);
+    expect(municipalities.find((row) => row.id === "06")?.valueGel).toBe(500_000_000);
+  });
 });
 
 const COUNTRY_TOTALS: MunicipalTotalFact[] = [
@@ -689,7 +765,7 @@ describe("buildIndexKpis", () => {
   it("reports concentration rather than a max/min ratio", () => {
     expect(kpis()[2]!.label).toBe("თბილისის წილი");
     expect(kpis()[2]!.value).toBe("76.9%");
-    expect(kpis()[2]!.detail).toBe("დანარჩენი 68 ერთეული — 23.1%");
+    expect(kpis()[2]!.detail).toBe("დანარჩენი გაერთიანებული ჯამი — 23.1%");
   });
 });
 

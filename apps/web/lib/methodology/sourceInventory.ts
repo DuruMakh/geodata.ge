@@ -22,6 +22,7 @@ const inventoryRules = {
   expenditure: [{ root: "docs/Raw Data/Expenditure", include: () => true }],
   revenue: [{ root: "docs/Raw Data/Revenue", include: (candidatePath: string) => extension(".pdf")(candidatePath) && dirname(candidatePath) === "Revenue" }],
   municipalities: [
+    { root: "docs/Raw Data/Municipalities/adjara-republic-budget-2015-2025", include: (candidatePath: string) => [".pdf", ".xlsx"].includes(path.posix.extname(candidatePath).toLowerCase()) },
     { root: "docs/Raw Data/Municipalities/mof-functional-classification", include: extension(".xlsx") },
     { root: "docs/Raw Data/Municipalities/mof-municipality-budget-history-2016-2025", include: extension(".xlsx") },
     { root: "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022", include: topLevelExtension(".zip") },

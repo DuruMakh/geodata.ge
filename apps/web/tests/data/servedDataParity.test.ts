@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  adjaraBudgetAdjustmentParityKey,
   assertSameServedRows,
   municipalFunctionFactParityKey,
   municipalTotalFactParityKey,
@@ -11,6 +12,12 @@ type Row = { id: string; amount: number; label: string | null };
 const keyOf = (row: Row) => row.id;
 
 describe("served data row parity", () => {
+  it("keys one Adjara adjustment per year and scope", () => {
+    expect(adjaraBudgetAdjustmentParityKey({ year: 2025, scopeId: "region.adjara" })).toBe(
+      "2025:region.adjara",
+    );
+  });
+
   it("keys one national GDP fact per year", () => {
     expect(nationalGdpFactParityKey({ year: 2025 })).toBe("2025");
   });

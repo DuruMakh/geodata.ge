@@ -12,6 +12,7 @@ import type {
   ServedNationalGdpFact,
 } from "../servedRows";
 import {
+  adjaraBudgetAdjustmentParityKey,
   adminFactParityKey,
   assertSameServedRows,
   budgetFactParityKey,
@@ -20,12 +21,14 @@ import {
   nationalGdpFactParityKey,
 } from "./servedDataParity";
 import type {
+  AdjaraBudgetAdjustment,
   Municipality,
   MunicipalFunction,
   MunicipalFunctionFact,
   MunicipalRegion,
   MunicipalTotalFact,
 } from "./municipal/types";
+import { loadAdjaraBudgetAdjustments } from "./municipal/importAdjaraBudgetAdjustments";
 import { loadMunicipalitiesFile } from "./municipal/municipalitiesFile";
 import {
   loadMunicipalCountryFunctionFacts,
@@ -55,6 +58,8 @@ export const SERVED_DATA_FILES = {
   municipalCountryFunctionFacts:
     "../../data/imports/municipal-georgia-function-facts-2015-2025.csv",
   municipalCountryTotalFacts: "../../data/imports/municipal-georgia-total-facts-2015-2025.csv",
+  municipalAdjaraBudgetAdjustments:
+    "../../data/imports/municipal-adjara-budget-adjustments-2015-2025.csv",
   gdpFacts: "../../data/imports/national-gdp-annual-1996-2025.csv",
 } as const;
 
@@ -105,6 +110,7 @@ export type MunicipalData = {
   totalFacts: MunicipalTotalFact[];
   countryFunctionFacts: MunicipalFunctionFact[];
   countryTotalFacts: MunicipalTotalFact[];
+  adjaraBudgetAdjustments: AdjaraBudgetAdjustment[];
 };
 
 export function resolveServedDataSource(): ServedDataSource {
@@ -210,6 +216,7 @@ async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
     totalFacts,
     countryFunctionFacts,
     countryTotalFacts,
+    adjaraBudgetAdjustments,
   ] = await Promise.all([
     loadMunicipalFunctionsFile(SERVED_DATA_FILES.municipalFunctions),
     loadMunicipalRegionsFile(SERVED_DATA_FILES.municipalRegions),
@@ -218,6 +225,7 @@ async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
     loadMunicipalTotalFacts(SERVED_DATA_FILES.municipalTotalFacts),
     loadMunicipalCountryFunctionFacts(SERVED_DATA_FILES.municipalCountryFunctionFacts),
     loadMunicipalCountryTotalFacts(SERVED_DATA_FILES.municipalCountryTotalFacts),
+    loadAdjaraBudgetAdjustments(SERVED_DATA_FILES.municipalAdjaraBudgetAdjustments),
   ]);
 
   return {
@@ -228,6 +236,7 @@ async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
     totalFacts: byYearAscending(totalFacts),
     countryFunctionFacts: byYearAscending(countryFunctionFacts),
     countryTotalFacts: byYearAscending(countryTotalFacts),
+    adjaraBudgetAdjustments: byYearAscending(adjaraBudgetAdjustments),
   };
 }
 
@@ -304,6 +313,12 @@ function assertMunicipalParity(db: MunicipalData, csv: MunicipalData): void {
     csv.countryTotalFacts,
     db.countryTotalFacts,
     municipalTotalFactParityKey,
+  );
+  assertSameServedRows(
+    "Adjara budget adjustments",
+    csv.adjaraBudgetAdjustments,
+    db.adjaraBudgetAdjustments,
+    adjaraBudgetAdjustmentParityKey,
   );
 }
 
