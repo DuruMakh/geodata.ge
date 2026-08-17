@@ -723,4 +723,32 @@ test.describe("municipality page", () => {
     expect(Math.abs(indicatorsBox!.width - workspaceBox!.width)).toBeLessThanOrEqual(1);
     expect(indicatorsBox!.y).toBeGreaterThanOrEqual(csvBox!.y + csvBox!.height);
   });
+
+  test("matches the national mover and comparison presentation", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const movers = page.getByTestId("period-movers");
+    for (const heading of await movers.locator("h3").all()) {
+      await expect(heading).toHaveCSS("font-size", "13px");
+      await expect(heading).toHaveCSS("font-weight", "600");
+    }
+
+    const comparison = page.getByTestId("period-comparison");
+    const comparisonHeading = comparison.locator("h3");
+    await expect(comparisonHeading).toHaveCSS("font-size", "13px");
+    await expect(comparisonHeading).toHaveCSS("font-weight", "600");
+    await expect(comparison.locator("h2")).toHaveCount(0);
+    await expect(comparison.locator("p")).toHaveCount(0);
+    await expect(comparison.locator("span").filter({ hasText: /→/ })).toHaveCount(0);
+
+    const table = comparison.getByTestId("comparison-table");
+    await expect(table).toHaveClass(/table-fixed/);
+    await expect(table.locator("colgroup col")).toHaveCount(4);
+    await expect(table.locator("colgroup col").first()).toHaveClass(/w-\[44%\]/);
+    const row = table.locator("tbody tr").first();
+    await expect(row).toHaveClass(/transition-colors/);
+    await expect(row).toHaveClass(/duration-100/);
+    await expect(row).toHaveClass(/hover:bg-\[var\(--tint\)\]/);
+  });
 });

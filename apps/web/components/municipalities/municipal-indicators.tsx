@@ -11,18 +11,15 @@ function MoverRow({ mover, maxAbs }: { mover: MunicipalMover; maxAbs: number }) 
   const width = growth === null || maxAbs === 0 ? 0 : (Math.abs(growth) / maxAbs) * 100;
 
   return (
-    <div className="grid grid-cols-[24px_minmax(0,1fr)_96px_72px] items-center gap-2.5 border-b border-[var(--hairline-soft)] py-2">
-      <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">
+    <div className="grid grid-cols-[24px_minmax(0,1fr)_96px_72px] items-center gap-3 border-t border-[var(--hairline-soft)] py-2.5">
+      <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
         {String(mover.rank).padStart(2, "0")}
       </span>
-      <span className="truncate text-[12.5px]">{mover.kaLabel}</span>
-      <span className="h-[3px] bg-[var(--hairline-soft)]">
-        <span
-          className="block h-[3px]"
-          style={{ width: `${width.toFixed(0)}%`, backgroundColor: growthColor(growth) }}
-        />
+      <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[12.5px] font-medium leading-[1.4] text-[var(--ink)]">{mover.kaLabel}</span>
+      <span className="block h-[3px] overflow-hidden bg-[var(--hairline-soft)]">
+        <span className="block h-full" style={{ width: `${width.toFixed(0)}%`, backgroundColor: growthColor(growth) }} />
       </span>
-      <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]" style={{ color: growthColor(growth) }}>
+      <span className="text-right font-[family-name:var(--font-numeric)] text-xs" style={{ color: growthColor(growth) }}>
         {formatShare(growth, true)}
       </span>
     </div>
@@ -122,38 +119,41 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
           </div>
         </div>
 
-      <div data-testid="period-movers" className="mt-9 grid grid-cols-1 gap-7 border-t border-[var(--hairline)] pt-6 @min-[1100px]:grid-cols-2 @min-[1100px]:gap-x-10">
-        <div>
-          <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">ყველაზე მზარდი</div>
-          {movers.up.map((mover) => (
-            <MoverRow key={mover.kaLabel} mover={mover} maxAbs={maxAbs} />
-          ))}
+      <div data-testid="period-movers" className="mt-9 grid gap-7 border-t border-[var(--hairline)] pt-6 @min-[1100px]:grid-cols-2 @min-[1100px]:gap-x-10">
+        <div className="min-w-0">
+          <h3 className="mb-3 text-[13px] font-semibold text-[var(--ink)]">ყველაზე მზარდი</h3>
+          <div className="flex flex-col">
+            {movers.up.map((mover) => (
+              <MoverRow key={mover.kaLabel} mover={mover} maxAbs={maxAbs} />
+            ))}
+          </div>
         </div>
-        <div>
-          <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">ყველაზე ნელი ზრდა</div>
-          {movers.down.map((mover) => (
-            <MoverRow key={mover.kaLabel} mover={mover} maxAbs={maxAbs} />
-          ))}
+        <div className="min-w-0">
+          <h3 className="mb-3 text-[13px] font-semibold text-[var(--ink)]">ყველაზე ნელი ზრდა</h3>
+          <div className="flex flex-col">
+            {movers.down.map((mover) => (
+              <MoverRow key={mover.kaLabel} mover={mover} maxAbs={maxAbs} />
+            ))}
+          </div>
         </div>
       </div>
 
       <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
-        <div className="mb-3.5 flex items-baseline justify-between gap-3">
-          <h2 className="font-[family-name:var(--font-display)] text-[22px] font-semibold whitespace-nowrap">პერიოდის შედარება</h2>
-          <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-            {startYear} → {endYear}
-          </span>
-        </div>
+        <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">პერიოდის შედარება</h3>
         <div className="overflow-x-auto">
-          <table data-testid="comparison-table" className="w-full border-collapse" style={{ minWidth: 560 }}>
+          <table data-testid="comparison-table" className="w-full table-fixed border-collapse">
+            <colgroup>
+              <col className="w-[44%]" />
+              <col />
+              <col />
+              <col />
+            </colgroup>
             <thead>
               <tr>
                 {["ფუნქცია", String(startYear), "ცვლილება", String(endYear)].map((label, index) => (
                   <th
                     key={`comparison-header-${index}`}
-                    className={`border-b-2 border-[var(--ink)] pb-[7px] text-[10px] font-semibold uppercase tracking-[0.05em] text-[var(--muted)] ${
-                      index === 0 ? "text-left" : "text-right"
-                    }`}
+                    className={`border-b-2 border-[var(--ink)] ${index === 0 ? "pr-3 pt-1.5 pb-2 text-left" : index === 3 ? "pl-3 pt-1.5 pb-2 text-right" : "px-3 pt-1.5 pb-2 text-right"} text-[11px] font-semibold ${index === 1 || index === 3 ? "font-[family-name:var(--font-numeric)]" : "uppercase tracking-[0.06em]"} text-[var(--muted)]`}
                   >
                     {label}
                   </th>
@@ -164,27 +164,27 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
               {comparison.map((row) => (
                 <tr
                   key={row.kaLabel}
-                  className={`border-b border-[var(--hairline-soft)] ${row.isTotal ? "bg-[var(--tint)]" : ""}`}
+                  className={`border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)] ${row.isTotal ? "bg-[var(--tint)]" : ""}`}
                 >
-                  <td className="py-[9px]">
-                    <span className="inline-flex items-center gap-[9px]">
-                      <SwatchBar color={row.color} />
-                      <span className={`truncate text-[12.5px] ${row.isTotal ? "font-semibold" : "font-medium"}`}>
+                  <td className="py-2.5 pr-3" title={row.kaLabel}>
+                    <span className="inline-flex min-w-0 items-start gap-[9px]">
+                      <SwatchBar color={row.color} className="mt-[7px]" />
+                      <span className="text-[12.5px] leading-[1.4] text-[var(--ink)]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
                         {row.kaLabel}
                       </span>
                     </span>
                   </td>
-                  <td className="py-[9px] text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--body)]">
+                  <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--muted)]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
                     {formatAmount(row.fromGel)}
                   </td>
                   <td
                     data-testid="comparison-change-cell"
-                    className="py-[9px] text-right font-[family-name:var(--font-numeric)] text-[11.5px]"
+                    className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap"
                     style={{ color: growthColor(row.changeShare) }}
                   >
                     {formatAmount(row.changeGel)}
                   </td>
-                  <td className="py-[9px] text-right font-[family-name:var(--font-numeric)] text-[11.5px] font-semibold">
+                  <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
                     {formatAmount(row.toGel)}
                   </td>
                 </tr>
