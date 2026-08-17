@@ -547,7 +547,7 @@ Radar + list grid (`1fr 300px`, stacks on narrow). Radar: single polygon of top-
 
 ### 9.6 Budget Field
 
-Bubble scatter, viewBox 920×380: x = share of total, y = growth vs previous year, radius = `7 + sqrt(value/max)·40`, color = category token (fill at 18% opacity + 1.5px solid stroke). Zero-growth line `1px ink`; grid `hairline-soft`; y-axis line `hairline`; axis labels mono 10px. Labels (sans 11px, `body`) only on the top 3 by amount plus |change| ≥ 20% outliers, with overlap avoidance; full values in `title` tooltips. If previous-year data is missing, show the callout: `წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.`
+Bubble scatter, viewBox 920×380: x = share of total, y = growth vs previous year, radius = `6 + sqrt(value/max)·16`, color = solid category token with a 2px paper-colored separation stroke. Y-axis bounds round outward to multiples of 10 percentage points. Ordinary ranges label every 10-point interval; unusually wide historical ranges use a readable `1/2/5 × 10ⁿ` interval no smaller than 10 points, targeting about eight intervals and preventing overlapping labels. Zero-growth line `1px ink`; grid `hairline-soft`; y-axis line `hairline`; axis labels mono 10px. Labels (sans 11px, `body`) only on the top 3 by amount plus |change| ≥ 20% outliers, with overlap avoidance; full values in `title` tooltips. If previous-year data is missing, show the callout: `წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.`
 
 ### 9.7 Full Ranking
 
