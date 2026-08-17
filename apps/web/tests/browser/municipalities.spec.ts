@@ -121,22 +121,10 @@ test("occupied overlays expose no interaction or public explanation", async ({ p
   await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
 });
 
-test("credits OpenStreetMap boundaries and explains the Georgia-total territorial boundary", async ({ page }) => {
+test("keeps the municipality index free of the source note", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
-  const source = page.getByTestId("municipal-source-note");
-  await expect(source.getByRole("link", { name: /OpenStreetMap contributors/ })).toHaveAttribute(
-    "href",
-    "https://www.openstreetmap.org/copyright",
-  );
-  await expect(source).toContainText("ODbL");
-  await expect(source).toContainText("საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს");
-  await expect(source).toContainText("აჭარის რეგიონისა და საქართველოს ჯამებში დამატებულია");
-  await expect(source).toContainText("ტრანსფერები");
-  await expect(source).toContainText("ფუნქციური სერიები კვლავ მუნიციპალურ ხარჯებს ასახავს");
-  await expect(source).toContainText("ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ საქართველოს ჯამშია");
-  await expect(source).toContainText("მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი");
-  await expect(source).toContainText("11 რეგიონის ჯამები საქართველოს ჯამს არ უტოლდება");
+  await expect(page.getByTestId("municipal-source-note")).toHaveCount(0);
   await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
   await expect(page.getByTestId("municipality-map")).not.toContainText(/მონაცემები არ არის|no data/i);
 });

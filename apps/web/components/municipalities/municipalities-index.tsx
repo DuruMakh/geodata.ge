@@ -6,7 +6,7 @@ import type { MunicipalKpi, MunicipalListRow } from "../../lib/explorer/municipa
 import { formatAmount } from "../../lib/explorer/format";
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
 import { parseMunicipalLevel } from "../../lib/explorer/urlState";
-import { SourceNote, TabDivider, TextTab } from "../ui/editorial";
+import { TabDivider, TextTab } from "../ui/editorial";
 import { MunicipalityMap } from "./municipality-map";
 
 type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinGel" | "legendMaxGel"> & {
@@ -117,21 +117,6 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
             </div>
           </div>
 
-          <div className="mt-6 max-w-[640px]">
-            <SourceNote testId="municipal-source-note">
-              {props.sourceNote}{" "}
-              საზღვრები:{" "}
-              <a
-                href="https://www.openstreetmap.org/copyright"
-                target="_blank"
-                rel="noreferrer"
-                className="underline decoration-[var(--hairline)] underline-offset-2"
-              >
-                © OpenStreetMap contributors
-              </a>
-              , ODbL.
-            </SourceNote>
-          </div>
         </div>
 
         <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
