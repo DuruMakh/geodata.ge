@@ -5,13 +5,14 @@ import {
   type Municipality,
   type MunicipalFunction,
   type MunicipalFunctionFact,
+  type MunicipalPopulationFact,
   type MunicipalTotalFact,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
 import { MIXED_SOURCE_ID } from "../data/municipal/aggregateMunicipalFacts";
 import type { ExplorerTableRow, SourceMetadata } from "./types";
 import { colorForItem, INK } from "./colors";
-import { formatAmount, formatShare, MISSING } from "./format";
+import { formatAmount, formatPerResidentGel, formatShare, MISSING } from "./format";
 import { georgianOrdinal } from "./municipalLabels";
 
 // Model layer for the municipalities section.
@@ -199,6 +200,7 @@ export type MunicipalListRow = {
   subtitleKa: string;
   regionId: string | null;
   valueGel: number;
+  budgetPerResidentGel: number | null;
   rank: number | null;
 };
 
@@ -206,6 +208,7 @@ export type MunicipalListInput = {
   municipalities: Municipality[];
   regionLabels: Map<string, string>;
   totalFacts: MunicipalTotalFact[];
+  populationFacts?: MunicipalPopulationFact[];
   adjaraBudgetAdjustments?: AdjaraBudgetAdjustment[];
   year: number;
 };
@@ -219,12 +222,41 @@ export function buildMunicipalListRows(input: MunicipalListInput): {
   municipalities: MunicipalListRow[];
   regions: MunicipalListRow[];
 } {
-  const { municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments = [], year } = input;
+  const { municipalities, regionLabels, totalFacts, populationFacts, adjaraBudgetAdjustments = [], year } = input;
 
   const totalByCode = new Map<string, number>();
   for (const row of totalFacts) {
     if (row.year !== year) continue;
+    if (populationFacts && totalByCode.has(row.municipalityCode)) {
+      throw new Error(`Duplicate ${year} total for municipality ${row.municipalityCode}`);
+    }
     totalByCode.set(row.municipalityCode, (totalByCode.get(row.municipalityCode) ?? 0) + row.publicTotalGel);
+  }
+
+  const populationByCode = new Map<string, number>();
+  if (populationFacts) {
+    if (year !== 2025) throw new Error(`Population is only available for 2025, not ${year}`);
+    const municipalityCodes = new Set(municipalities.map((row) => row.code));
+    for (const row of populationFacts) {
+      if (!municipalityCodes.has(row.municipalityCode)) {
+        throw new Error(`Population has unknown municipality ${row.municipalityCode}`);
+      }
+      if (populationByCode.has(row.municipalityCode)) {
+        throw new Error(`Duplicate population for municipality ${row.municipalityCode}`);
+      }
+      if (!Number.isFinite(row.populationPersons) || row.populationPersons <= 0) {
+        throw new Error(`Population must be positive for municipality ${row.municipalityCode}`);
+      }
+      populationByCode.set(row.municipalityCode, row.populationPersons);
+    }
+    for (const municipality of municipalities) {
+      if (!populationByCode.has(municipality.code)) {
+        throw new Error(`Missing population for municipality ${municipality.code}`);
+      }
+      if (!totalByCode.has(municipality.code)) {
+        throw new Error(`Missing ${year} total for municipality ${municipality.code}`);
+      }
+    }
   }
 
   const municipalityRows = municipalities
@@ -235,15 +267,19 @@ export function buildMunicipalListRows(input: MunicipalListInput): {
       subtitleKa: regionLabels.get(municipality.regionId) ?? "",
       regionId: municipality.regionId,
       valueGel: totalByCode.get(municipality.code) ?? 0,
+      budgetPerResidentGel: populationFacts
+        ? (totalByCode.get(municipality.code) ?? 0) / populationByCode.get(municipality.code)!
+        : null,
       rank: 0,
     }))
     .sort((left, right) => right.valueGel - left.valueGel)
     .map((row, index) => ({ ...row, rank: index + 1 }));
 
-  const byRegion = new Map<string, { valueGel: number; members: number }>();
+  const byRegion = new Map<string, { valueGel: number; populationPersons: number; members: number }>();
   for (const municipality of municipalities) {
-    const bucket = byRegion.get(municipality.regionId) ?? { valueGel: 0, members: 0 };
+    const bucket = byRegion.get(municipality.regionId) ?? { valueGel: 0, populationPersons: 0, members: 0 };
     bucket.valueGel += totalByCode.get(municipality.code) ?? 0;
+    bucket.populationPersons += populationByCode.get(municipality.code) ?? 0;
     bucket.members += 1;
     byRegion.set(municipality.regionId, bucket);
   }
@@ -265,6 +301,7 @@ export function buildMunicipalListRows(input: MunicipalListInput): {
       subtitleKa: `${bucket.members} მუნიციპალიტეტი`,
       regionId,
       valueGel: bucket.valueGel,
+      budgetPerResidentGel: populationFacts ? bucket.valueGel / bucket.populationPersons : null,
       rank: 0,
     }))
     .sort((left, right) => right.valueGel - left.valueGel)
@@ -283,8 +320,21 @@ export function buildCountryListRow(totalFacts: MunicipalTotalFact[], year: numb
     subtitleKa: "69 მუნიციპალური ბიუჯეტი",
     regionId: null,
     valueGel: totalByYear[year] ?? 0,
+    budgetPerResidentGel: null,
     rank: null,
   };
+}
+
+export function buildMedianMunicipalBudgetPerResident(rows: MunicipalListRow[]): number | null {
+  const values = rows
+    .map((row) => row.budgetPerResidentGel)
+    .filter((value): value is number => value !== null)
+    .sort((left, right) => left - right);
+  if (values.length === 0) return null;
+  const middle = Math.floor(values.length / 2);
+  return values.length % 2 === 1
+    ? values[middle]!
+    : (values[middle - 1]! + values[middle]!) / 2;
 }
 
 /** Narrow the corpus to one region's members, for a region page. */
@@ -309,6 +359,7 @@ export type MunicipalKpi = { label: string; value: string; detail: string };
 export type MunicipalIndexKpiInput = {
   municipalities: Municipality[];
   totalFacts: MunicipalTotalFact[];
+  populationFacts: MunicipalPopulationFact[];
   countryTotalFacts: MunicipalTotalFact[];
   countryFunctionFacts: MunicipalFunctionFact[];
   functions: MunicipalFunction[];
@@ -328,27 +379,24 @@ export function buildCountryTotalByYear(totalFacts: MunicipalTotalFact[]): Recor
 }
 
 /**
- * The four index KPIs. Per-capita is not available (no reviewed population
- * dataset), so the third is concentration and the fourth is composition —
- * both size-independent and both derivable from served facts.
+ * The four index KPIs. The third uses the reviewed 2025 population panel.
  */
 export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
-  const { municipalities, totalFacts, countryTotalFacts, countryFunctionFacts, functions, firstYear, latestYear } = input;
+  const { municipalities, totalFacts, populationFacts, countryTotalFacts, countryFunctionFacts, functions, firstYear, latestYear } = input;
   const countryTotalByYear = buildCountryTotalByYear(countryTotalFacts);
 
   const latestTotal = countryTotalByYear[latestYear] ?? 0;
   const firstTotal = countryTotalByYear[firstYear] ?? 0;
   const growth = firstTotal === 0 ? null : (latestTotal - firstTotal) / firstTotal;
 
-  const largest = municipalities
-    .map((municipality) => ({
-      nameKa: municipality.displayNameKa,
-      valueGel: totalFacts
-        .filter((row) => row.year === latestYear && row.municipalityCode === municipality.code)
-        .reduce((sum, row) => sum + row.publicTotalGel, 0),
-    }))
-    .sort((left, right) => right.valueGel - left.valueGel)[0];
-  const concentration = largest && latestTotal > 0 ? largest.valueGel / latestTotal : null;
+  const municipalRows = buildMunicipalListRows({
+    municipalities,
+    regionLabels: new Map(),
+    totalFacts,
+    populationFacts,
+    year: latestYear,
+  }).municipalities;
+  const medianPerResident = buildMedianMunicipalBudgetPerResident(municipalRows);
 
   const byFunction = new Map<string, number>();
   for (const row of countryFunctionFacts) {
@@ -370,12 +418,9 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
       detail: `${formatAmount(firstTotal)} → ${formatAmount(latestTotal)}`,
     },
     {
-      label: largest ? `${largest.nameKa}ს წილი` : "კონცენტრაცია",
-      value: formatShare(concentration),
-      detail:
-        concentration === null
-          ? ""
-          : `დანარჩენი გაერთიანებული ჯამი — ${formatShare(1 - concentration)}`,
+      label: "მედიანური ბიუჯეტი ერთ მოსახლეზე",
+      value: formatPerResidentGel(medianPerResident),
+      detail: `${latestYear} · ${municipalities.length} მუნიციპალიტეტი`,
     },
     {
       label: "უმსხვილესი სფერო",
