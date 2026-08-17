@@ -55,6 +55,7 @@ export const SERVED_DATA_FILES = {
   municipalities: "../../data/imports/municipalities.csv",
   municipalFunctionFacts: "../../data/imports/municipal-function-facts-2015-2025.csv",
   municipalTotalFacts: "../../data/imports/municipal-total-facts-2015-2025.csv",
+  municipalPopulationFacts: "../../data/imports/municipal-population-2025.csv",
   municipalCountryFunctionFacts:
     "../../data/imports/municipal-georgia-function-facts-2015-2025.csv",
   municipalCountryTotalFacts: "../../data/imports/municipal-georgia-total-facts-2015-2025.csv",
