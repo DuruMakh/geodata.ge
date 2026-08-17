@@ -67,7 +67,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
         </div>
 
         <div data-testid="entity-kpi-grid" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-          <div className="min-w-0 @min-[1100px]:pr-11">
+          <div data-testid="entity-kpi" className="min-w-0 @min-[1100px]:pr-11">
             <Overline>პერიოდის ცვლილება</Overline>
             <p
               className="mt-3.5 whitespace-nowrap font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]"
@@ -108,13 +108,15 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
           </div>
           <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
             {sideKpis.map((kpi, index) => (
-              <div key={kpi.label} data-testid="side-kpi" className={index === 0 ? "pt-0.5 pb-3.5" : index === 2 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}>
-                <Overline>{kpi.label}</Overline>
-                <div className="mt-[7px] flex items-baseline justify-between gap-4">
-                  <span className="whitespace-nowrap font-[family-name:var(--font-display)] text-2xl font-semibold leading-[1.1] tracking-[-0.02em]">{kpi.value}</span>
-                  <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right text-xs text-[var(--muted)]" title={kpi.detail}>{kpi.detail}</span>
+              <div key={kpi.label} data-testid="entity-kpi" className={index === 0 ? "pt-0.5 pb-3.5" : index === 2 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}>
+                <div data-testid="side-kpi">
+                  <Overline>{kpi.label}</Overline>
+                  <div className="mt-[7px] flex items-baseline justify-between gap-4">
+                    <span className="whitespace-nowrap font-[family-name:var(--font-display)] text-2xl font-semibold leading-[1.1] tracking-[-0.02em]">{kpi.value}</span>
+                    <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right text-xs text-[var(--muted)]" title={kpi.detail}>{kpi.detail}</span>
+                  </div>
+                  <Sparkline values={sideSeries[index]!} color="var(--ink)" />
                 </div>
-                <Sparkline values={sideSeries[index]!} color="var(--ink)" />
               </div>
             ))}
           </div>
