@@ -19,7 +19,7 @@ const items: SnapshotItem[] = [
     amountGel: 100,
     shareOfTotal: 0.4,
     previousAmountGel: 71.43,
-    changeFromPreviousYear: 0.4,
+    changeFromPreviousYear: 0.403,
     amountChangeFromPreviousYear: 28.57,
     basis: "actual",
     source,
@@ -45,7 +45,7 @@ const items: SnapshotItem[] = [
     amountGel: 6.25,
     shareOfTotal: 0.1,
     previousAmountGel: 7.8125,
-    changeFromPreviousYear: -0.2,
+    changeFromPreviousYear: -0.235,
     amountChangeFromPreviousYear: -1.5625,
     basis: "actual",
     source,
@@ -80,7 +80,18 @@ describe("BudgetField", () => {
   it("renders the Y axis at consistent ten-percentage-point intervals", () => {
     const labels = [...renderedChart().matchAll(/<text x="44"[^>]*>([^<]+)<\/text>/g)].map((match) => match[1]);
 
-    expect(labels).toEqual(["−30%", "−20%", "−10%", "0%", "+10%", "+20%", "+30%", "+40%", "+50%"]);
+    expect(labels).toEqual([
+      "−40%",
+      "−30%",
+      "−20%",
+      "−10%",
+      "0%",
+      "+10%",
+      "+20%",
+      "+30%",
+      "+40%",
+      "+50%",
+    ]);
   });
 
   it("keeps extreme historical growth ranges readable", () => {

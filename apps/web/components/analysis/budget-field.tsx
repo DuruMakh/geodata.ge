@@ -52,11 +52,11 @@ export function BudgetField({ items }: BudgetFieldProps) {
   const y = (growth: number) => PAD_T + (1 - (growth - yMin) / (yMax - yMin)) * (H - PAD_T - PAD_B);
 
   const ySpan = yMax - yMin;
-  const roughYStep = Math.max(10, ySpan / 8);
+  const roughYStep = ySpan / 8;
   const yMagnitude = 10 ** Math.floor(Math.log10(roughYStep));
   const normalizedYStep = roughYStep / yMagnitude;
   const yMultiplier = normalizedYStep <= 1 ? 1 : normalizedYStep <= 2 ? 2 : normalizedYStep <= 5 ? 5 : 10;
-  const yStep = Math.max(10, yMultiplier * yMagnitude);
+  const yStep = ySpan <= 100 ? 10 : Math.max(10, yMultiplier * yMagnitude);
   const yTicks: number[] = [];
   for (let tick = Math.ceil(yMin / yStep) * yStep; tick <= yMax; tick += yStep) yTicks.push(tick);
   const xStep = xMax <= 20 ? 5 : 10;
