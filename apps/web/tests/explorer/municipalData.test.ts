@@ -21,6 +21,7 @@ import {
   buildCountryTotalByYear,
   buildEntityKpis,
   buildIndexKpis,
+  buildMunicipalIndicatorPresentation,
   buildMovers,
   buildMunicipalEntityModel,
   buildMunicipalListRows,
@@ -1053,6 +1054,39 @@ describe("buildEntityKpis", () => {
     // 740 would be 35.8%.
     const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rankByYear, rankOutOf: 64 });
     expect(divergent[3]!.value).toBe("40.5%");
+  });
+});
+
+describe("buildMunicipalIndicatorPresentation", () => {
+  it("uses official totals, the largest end-year function, and national totals without estimates", () => {
+    const presentation = buildMunicipalIndicatorPresentation(build(), {
+      kind: "ranked",
+      nationalTotalByYear: { 2015: 500, 2016: 740, 2017: 740 },
+    });
+
+    expect(presentation.headline.start).toBe(160);
+    expect(presentation.headline.end).toBe(370);
+    expect(presentation.headline.change).toBeCloseTo(1.3125, 6);
+    expect(presentation.headline.cagr).toBeCloseTo((370 / 160) ** (1 / 2) - 1, 6);
+    expect(presentation.sideSeries).toEqual([
+      [160, 300, 370],
+      [100 / 160, 200 / 300, 300 / 370],
+      [160 / 500, 300 / 740, 370 / 740],
+    ]);
+  });
+
+  it("keeps missing values null and gives the country budget count a flat series", () => {
+    const model = build();
+    model.totalRow.valuesByYear[2016] = null;
+
+    const presentation = buildMunicipalIndicatorPresentation(model, { kind: "country", budgetCount: 69 });
+
+    expect(presentation.sideSeries).toEqual([
+      [160, null, 370],
+      [100 / 160, null, 300 / 370],
+      [69, 69, 69],
+    ]);
+    expect(presentation.headline).toMatchObject({ start: 160, end: 370 });
   });
 });
 

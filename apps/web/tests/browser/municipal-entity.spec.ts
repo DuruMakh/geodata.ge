@@ -622,6 +622,22 @@ test.describe("municipality page", () => {
     await expect(rankKpi).not.toContainText("მე-26 ადგილი 64-დან");
   });
 
+  test("renders the municipal headline gauge and side KPI trends", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    await expect(page.getByTestId("municipal-change-gauge")).toBeVisible();
+    await expect(page.getByTestId("municipal-change-start")).toContainText(/2015/);
+    await expect(page.getByTestId("municipal-change-end")).toContainText(/2025/);
+    await expect(page.getByTestId("municipal-change-sentence")).toContainText("წლებში");
+
+    const sideKpis = page.getByTestId("side-kpi");
+    await expect(sideKpis).toHaveCount(3);
+    for (let index = 0; index < 3; index += 1) {
+      await expect(sideKpis.nth(index).locator("svg")).toHaveCount(1);
+    }
+  });
+
   test("keeps the municipal workspace stacked until its content container reaches 1100px", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(ENTITY_URL);
