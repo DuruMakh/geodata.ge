@@ -3,6 +3,7 @@ import {
   adjaraBudgetAdjustmentParityKey,
   assertSameServedRows,
   municipalFunctionFactParityKey,
+  municipalPopulationFactParityKey,
   municipalTotalFactParityKey,
   nationalGdpFactParityKey,
 } from "../../lib/data/servedDataParity";
@@ -12,6 +13,12 @@ type Row = { id: string; amount: number; label: string | null };
 const keyOf = (row: Row) => row.id;
 
 describe("served data row parity", () => {
+  it("keys one municipal population fact per year and municipality", () => {
+    expect(municipalPopulationFactParityKey({ year: 2025, municipalityCode: "04" })).toBe(
+      "2025:04",
+    );
+  });
+
   it("keys one Adjara adjustment per year and scope", () => {
     expect(adjaraBudgetAdjustmentParityKey({ year: 2025, scopeId: "region.adjara" })).toBe(
       "2025:region.adjara",

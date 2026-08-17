@@ -77,6 +77,7 @@ model SourceDocument {
   lastReviewedAt  DateTime     @db.Date
   facts           BudgetFact[]
   gdpFacts        NationalGdpFact[]
+  populationFacts MunicipalPopulationFact[]
 }
 
 model ImportRun {
@@ -97,6 +98,7 @@ model ImportRun {
   facts                 BudgetFact[]
   adminFacts            AdminSpendingFact[]
   gdpFacts              NationalGdpFact[]
+  populationFacts       MunicipalPopulationFact[]
 }
 
 // Mirror of data/mappings/spending-field-mapping.csv.
@@ -231,8 +233,33 @@ model Municipality {
   isSelfGoverningCity Boolean
   functionFacts       MunicipalFunctionFact[]
   totalFacts          MunicipalTotalFact[]
+  populationFacts     MunicipalPopulationFact[]
 
   @@index([regionId])
+}
+
+// Mirror of data/imports/municipal-population-2025.csv. Only the reviewed
+// 2025 denominator is served; the full research panel remains source evidence.
+model MunicipalPopulationFact {
+  id                 String         @id
+  year               Int
+  municipalityCode   String
+  municipality       Municipality   @relation(fields: [municipalityCode], references: [code])
+  populationThousand Decimal        @db.Decimal(10, 1)
+  populationPersons  Int
+  referenceDate      DateTime       @db.Date
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  sourceSheet        String
+  sourceCell         String
+  sourceUnit         String
+  transformation     String
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@unique([year, municipalityCode])
+  @@index([municipalityCode])
 }
 
 // Mirror of data/imports/municipal-function-facts-2015-2025.csv.

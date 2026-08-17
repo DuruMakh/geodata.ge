@@ -13,6 +13,7 @@ import {
   MunicipalFunction,
   MunicipalFunctionFact,
   MunicipalRegion,
+  MunicipalPopulationFact,
   MunicipalTotalFact,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
@@ -272,6 +273,49 @@ export async function loadMunicipalTotalFactsFromMirror(
       warningType: row.warningType,
       basis: "actual" as const,
       sourceId: row.sourceId,
+    };
+  });
+}
+
+function dateOnly(value: Date): string {
+  return value.toISOString().slice(0, 10);
+}
+
+export async function loadMunicipalPopulationFactsFromMirror(
+  db: MirrorClient,
+): Promise<MunicipalPopulationFact[]> {
+  const rows = await db.municipalPopulationFact.findMany({
+    orderBy: [{ year: "asc" }, { municipalityCode: "asc" }],
+  });
+
+  return rows.map((row) => {
+    if (row.year !== 2025) {
+      throw new Error(`Municipal population fact ${row.id} must have year=2025, got ${row.year}`);
+    }
+    if (row.sourceDocumentId !== "source.geostat_municipal_population") {
+      throw new Error(
+        `Municipal population fact ${row.id} must use source.geostat_municipal_population`,
+      );
+    }
+    const referenceDate = dateOnly(row.referenceDate);
+    if (referenceDate !== "2025-01-01") {
+      throw new Error(
+        `Municipal population fact ${row.id} must use 2025-01-01, got ${referenceDate}`,
+      );
+    }
+
+    return {
+      year: 2025,
+      municipalityCode: row.municipalityCode,
+      populationThousand: Number(row.populationThousand),
+      populationPersons: row.populationPersons,
+      referenceDate,
+      sourceId: row.sourceDocumentId,
+      sourceSheet: row.sourceSheet,
+      sourceCell: row.sourceCell,
+      sourceUnit: "(thousands)" as const,
+      transformation: row.transformation,
+      lastReviewedAt: dateOnly(row.lastReviewedAt),
     };
   });
 }
