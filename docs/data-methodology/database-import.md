@@ -29,11 +29,12 @@ the import is re-run.
 | `Municipality` | `data/imports/municipalities.csv` |
 | `MunicipalFunctionFact` | `data/imports/municipal-function-facts-2015-2025.csv` |
 | `MunicipalTotalFact` | `data/imports/municipal-total-facts-2015-2025.csv` |
+| `MunicipalPopulationFact` | `data/imports/municipal-population-2025.csv` (exactly one reviewed 2025 denominator for each of 64 public municipalities) |
 | `ImportRun` | one audit row per import run, including the full parity report |
 
 ### Municipal activation status (2026-08-06)
 
-The five municipal tables, migration `20260802194939_municipal_dataset`,
+The municipal taxonomy, registry, budget-fact, and population tables, migrations `20260802194939_municipal_dataset` and `20260818000000_municipal_population_2025`,
 transactional mirror import, and field-by-field import parity checks shipped in
 the earlier data-only rollout; migration and import are not pending. The
 Actions-owned production workflow continues to run `npm run prisma:deploy`
@@ -58,6 +59,8 @@ referential integrity (fact item IDs against taxonomy, source IDs against
 source documents, admin parents against admin categories, natural-key
 uniqueness) before touching the database.
 
+Inside the same transaction, population rows are deleted before their municipality and source parents, then recreated only after those parents exist. Every row carries the active `ImportRun` ID. The importer reads all 64 rows back through the db-mode loader and requires exact natural-key and field parity with the reviewed CSV before commit. A population count, value, provenance, or date mismatch therefore rolls back the entire import together with the other mirrored datasets; the previous mirror remains intact.
+
 ## Parity report
 
 Every run prints and stores (in `ImportRun.reportJson` and
@@ -67,7 +70,7 @@ Every run prints and stores (in `ImportRun.reportJson` and
 - budget-fact GEL totals per year/side, database vs CSV;
 - admin-spending GEL totals per year/level, database vs CSV.
 
-Beyond counts and totals, including the `NationalGdpFact` row count, the import re-reads every inserted row **through the
+Beyond counts and totals, including the `NationalGdpFact` and `MunicipalPopulationFact` row counts, the import re-reads every inserted row **through the
 same code path db-mode builds use** and compares it field by field against the
 CSV loader output — a mapping bug in any column (labels, notes, dates) fails
 the import, not a later build.
@@ -181,7 +184,7 @@ From `apps/web`, with `.env` configured:
     at import *and* on every db-mode build. This is the tier the sentence
     above describes.
   - **`NationalGdpFact`** — read by `loadServedExplorerData` and verified field by field at import and whenever the national explorer routes build in db mode.
-  - **The five municipal tables** — verified field by field at import. The
+  - **The municipal tables, including `MunicipalPopulationFact`** — verified field by field at import. The
     earlier data-only deployment had no route that called
     `loadServedMunicipalData`, so its db-mode build did not run
     `assertMunicipalParity`. The current branch's municipal index,
