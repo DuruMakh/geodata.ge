@@ -816,6 +816,7 @@ describe("buildIndexKpis", () => {
       countryFunctionFacts: [],
       functions: FUNCTIONS,
       firstYear: 2015,
+      comparisonYear: 2025,
       latestYear: 2025,
     });
 
@@ -834,6 +835,31 @@ describe("buildIndexKpis", () => {
     expect(kpis()[2]!.label).toBe("მედიანური ბიუჯეტი ერთ მოსახლეზე");
     expect(kpis()[2]!.value).toBe("2,000 ₾");
     expect(kpis()[2]!.detail).toBe("2025 · 3 მუნიციპალიტეტი");
+  });
+});
+
+describe("buildIndexKpis — fixed 2025 per-resident comparison", () => {
+  it("keeps the median on 2025 when later budget facts become available", () => {
+    const totalsWith2026 = [
+      ...INDEX_TOTALS,
+      totalFor("04", 2026, 3_000_000_000),
+      totalFor("06", 2026, 700_000_000),
+      totalFor("07", 2026, 200_000_000),
+    ];
+    const kpis = buildIndexKpis({
+      municipalities: MUNICIPALITIES,
+      totalFacts: totalsWith2026,
+      populationFacts: INDEX_POPULATION,
+      countryTotalFacts: countryTotalsFor(totalsWith2026),
+      countryFunctionFacts: [],
+      functions: FUNCTIONS,
+      firstYear: 2015,
+      comparisonYear: 2025,
+      latestYear: 2026,
+    });
+
+    expect(kpis[0]).toMatchObject({ value: "3.90 მლრდ ₾", detail: "2026 · 69 მუნიციპალური საბიუჯეტო ერთეული" });
+    expect(kpis[2]).toMatchObject({ value: "2,000 ₾", detail: "2025 · 3 მუნიციპალიტეტი" });
   });
 });
 
@@ -862,6 +888,7 @@ describe("buildIndexKpis — dedicated Georgia aggregate denominator", () => {
       countryFunctionFacts: countryFunctions,
       functions: FUNCTIONS,
       firstYear: 2024,
+      comparisonYear: 2025,
       latestYear: 2025,
     });
 
@@ -893,6 +920,7 @@ describe("buildIndexKpis — growth sign at exactly zero", () => {
       countryFunctionFacts: [],
       functions: FUNCTIONS,
       firstYear: 2015,
+      comparisonYear: 2025,
       latestYear: 2025,
     });
     expect(kpis[1]!.value).toBe("0%");
@@ -952,6 +980,7 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
       countryFunctionFacts: [],
       functions: FUNCTIONS,
       firstYear: 2015,
+      comparisonYear: 2025,
       latestYear: 2025,
     });
 
@@ -978,6 +1007,7 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
       countryFunctionFacts: countryFunctionsFor(functionFacts),
       functions: FUNCTIONS,
       firstYear: 2025,
+      comparisonYear: 2025,
       latestYear: 2025,
     });
 

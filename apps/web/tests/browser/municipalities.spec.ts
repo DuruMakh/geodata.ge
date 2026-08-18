@@ -150,6 +150,10 @@ test("map heading, legend, tooltip, and accessibility use 2025 budget per reside
   await expect(page.getByTestId("municipality-map-heading")).toContainText("ერთ მოსახლეზე");
   await expect(page.getByTestId("municipality-map-heading")).toContainText("2025");
   await expect(page.getByTestId("municipality-map-legend")).toContainText("₾");
+  await expect(page.getByTestId("municipality-map").locator("svg")).toHaveAttribute(
+    "aria-label",
+    /2025.*ერთ მოსახლეზე/,
+  );
 
   const { totalFacts, populationFacts } = await loadServedMunicipalData();
   const zugdidiTotal = totalFacts.find((row) => row.year === 2025 && row.municipalityCode === "33")!;
@@ -363,12 +367,15 @@ test.describe("municipalities index", () => {
   });
 
   test("keeps total budget primary while showing per-resident support for municipalities and regions", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
 
     const municipality = page.getByTestId("municipal-list-row").first();
     await expect(municipality.getByTestId("municipal-row-primary-amount")).toContainText(/მლნ ₾|მლრდ ₾/);
     await expect(municipality.getByTestId("municipal-row-per-resident")).toContainText("₾ ერთ მოსახლეზე");
+    await expect(municipality.getByTestId("municipal-row-per-resident")).toHaveCSS("font-size", "12px");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 
     await page.getByTestId("level-region").click();
     const regionRows = page.getByTestId("municipal-list-row");

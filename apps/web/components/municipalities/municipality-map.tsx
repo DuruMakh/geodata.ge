@@ -143,7 +143,7 @@ export function MunicipalityMap({
           ref={svgRef}
           viewBox={viewBox}
           role="group"
-          aria-label="საქართველოს მუნიციპალიტეტების ბიუჯეტის რუკა"
+          aria-label="საქართველოს მუნიციპალიტეტების 2025 წლის ბიუჯეტი ერთ მოსახლეზე"
           className="block h-auto w-full"
         >
           <defs>

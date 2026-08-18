@@ -293,7 +293,7 @@ model MunicipalPopulationFact {
 }
 ```
 
-The SQL migration must create equivalent foreign keys/indexes, enable RLS, and add the same authenticated-read policy pattern used by the municipal migrations.
+The SQL migration must create equivalent foreign keys/indexes and enable deny-all RLS, matching the repository's mirror-table security pattern. Prisma connects as the table owner; the public Data API receives no read policy.
 
 - [ ] **Step 4: Extend the transactional import and exact readback parity**
 
@@ -433,13 +433,13 @@ Municipality rows calculate `valueGel / populationPersons`. Region aggregation t
 
 - [ ] **Step 5: Replace the concentration KPI with the median KPI**
 
-Add `populationFacts` to `MunicipalIndexKpiInput`. Build 64 municipality rows for `latestYear`, calculate the median from their full-precision per-resident values, and replace KPI index 2 with:
+Add `populationFacts` and an explicit `comparisonYear = 2025` to `MunicipalIndexKpiInput`. Build 64 municipality rows for the comparison year, calculate the median from their full-precision per-resident values, and replace KPI index 2 with:
 
 ```ts
 {
   label: "მედიანური ბიუჯეტი ერთ მოსახლეზე",
   value: formatPerResidentGel(median),
-  detail: `${latestYear} · 64 მუნიციპალიტეტი`,
+  detail: `${comparisonYear} · 64 მუნიციპალიტეტი`,
 }
 ```
 

@@ -24,6 +24,7 @@ import { georgianOrdinal } from "./municipalLabels";
 // while this one is municipality×function×year.
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
+export const MUNICIPAL_PER_RESIDENT_YEAR = 2025;
 const MUNICIPAL_COUNTRY_BUDGET_COUNT = 69;
 
 export type MunicipalEntityModel = {
@@ -235,7 +236,9 @@ export function buildMunicipalListRows(input: MunicipalListInput): {
 
   const populationByCode = new Map<string, number>();
   if (populationFacts) {
-    if (year !== 2025) throw new Error(`Population is only available for 2025, not ${year}`);
+    if (year !== MUNICIPAL_PER_RESIDENT_YEAR) {
+      throw new Error(`Population is only available for ${MUNICIPAL_PER_RESIDENT_YEAR}, not ${year}`);
+    }
     const municipalityCodes = new Set(municipalities.map((row) => row.code));
     for (const row of populationFacts) {
       if (!municipalityCodes.has(row.municipalityCode)) {
@@ -364,6 +367,7 @@ export type MunicipalIndexKpiInput = {
   countryFunctionFacts: MunicipalFunctionFact[];
   functions: MunicipalFunction[];
   firstYear: number;
+  comparisonYear: number;
   latestYear: number;
 };
 
@@ -382,7 +386,7 @@ export function buildCountryTotalByYear(totalFacts: MunicipalTotalFact[]): Recor
  * The four index KPIs. The third uses the reviewed 2025 population panel.
  */
 export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
-  const { municipalities, totalFacts, populationFacts, countryTotalFacts, countryFunctionFacts, functions, firstYear, latestYear } = input;
+  const { municipalities, totalFacts, populationFacts, countryTotalFacts, countryFunctionFacts, functions, firstYear, comparisonYear, latestYear } = input;
   const countryTotalByYear = buildCountryTotalByYear(countryTotalFacts);
 
   const latestTotal = countryTotalByYear[latestYear] ?? 0;
@@ -394,7 +398,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     regionLabels: new Map(),
     totalFacts,
     populationFacts,
-    year: latestYear,
+    year: comparisonYear,
   }).municipalities;
   const medianPerResident = buildMedianMunicipalBudgetPerResident(municipalRows);
 
@@ -420,7 +424,7 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     {
       label: "მედიანური ბიუჯეტი ერთ მოსახლეზე",
       value: formatPerResidentGel(medianPerResident),
-      detail: `${latestYear} · ${municipalities.length} მუნიციპალიტეტი`,
+      detail: `${comparisonYear} · ${municipalities.length} მუნიციპალიტეტი`,
     },
     {
       label: "უმსხვილესი სფერო",
