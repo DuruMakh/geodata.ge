@@ -360,17 +360,15 @@ test.describe("municipalities index", () => {
 
     const municipality = page.getByTestId("municipal-list-row").first();
     await expect(municipality.getByTestId("municipal-row-primary-amount")).toContainText(/მლნ ₾|მლრდ ₾/);
-    await expect(municipality.getByTestId("municipal-row-per-resident")).toContainText("₾ ერთ მოსახლეზე");
-    await expect(municipality.getByTestId("municipal-row-per-resident")).toHaveCSS("font-size", "12px");
+    await expect(municipality.getByTestId("municipal-row-per-resident")).toHaveText(/^\d{1,3}(?:,\d{3})* ერთ სულზე$/);
+    await expect(municipality.getByTestId("municipal-row-per-resident")).toHaveCSS("font-size", "10px");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 
     await page.getByTestId("level-region").click();
     const regionRows = page.getByTestId("municipal-list-row");
     await expect(regionRows.first().getByTestId("municipal-row-per-resident")).toHaveCount(0);
-    for (const region of await regionRows.all()) {
-      if (await region.getByTestId("municipal-row-name").textContent() === "საქართველო") continue;
-      await expect(region.getByTestId("municipal-row-per-resident")).toContainText("₾ ერთ მოსახლეზე");
-    }
+    await expect(regionRows.nth(1).getByTestId("municipal-row-per-resident")).toHaveText(/^\d{1,3}(?:,\d{3})* ერთ სულზე$/);
+    await expect(regionRows.nth(1).getByTestId("municipal-row-per-resident")).toHaveCSS("font-size", "10px");
   });
 
   test("filters and clears the search", async ({ page }) => {

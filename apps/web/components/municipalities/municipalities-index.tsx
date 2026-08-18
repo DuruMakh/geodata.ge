@@ -200,8 +200,8 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                       {formatAmount(row.valueGel)}
                     </span>
                     {row.budgetPerResidentGel !== null ? (
-                      <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[12px] leading-[1.25] text-[var(--muted)]">
-                        {formatPerResidentGel(row.budgetPerResidentGel)} ერთ მოსახლეზე
+                      <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[10px] leading-[1.25] text-[var(--muted)]">
+                        {formatPerResidentGel(row.budgetPerResidentGel).replace(" ₾", "")} ერთ სულზე
                       </span>
                     ) : null}
                   </span>
