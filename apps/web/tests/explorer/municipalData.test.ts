@@ -22,6 +22,7 @@ import {
   buildCountryTotalByYear,
   buildEntityKpis,
   buildIndexKpis,
+  buildMunicipalIndicatorPresentation,
   buildMovers,
   buildMunicipalEntityModel,
   buildMunicipalListRows,
@@ -31,7 +32,7 @@ import {
   latestReviewedAtForMunicipalFacts,
   regionFactsFor,
 } from "../../lib/explorer/municipalData";
-import { formatAmount, MISSING } from "../../lib/explorer/format";
+import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
 
 const FUNCTIONS: MunicipalFunction[] = [
   { id: "municipal.economic_affairs", kaLabel: "ეკონომიკური საქმიანობა", functionalCode: "7.4", sortOrder: 4 },
@@ -771,6 +772,14 @@ describe("Georgia country aggregate models", () => {
       detail: "64 საჯარო გვერდი · 5 მხოლოდ საქართველოს ჯამში",
     });
   });
+
+  it("separates the country official-budget number from its GEL unit", () => {
+    const officialBudget = buildCountryKpis(build(), 69)[0]!;
+
+    expect(officialBudget.value).toBe("0.0");
+    expect(officialBudget.unit).toBe("მლნ ₾");
+    expect(officialBudget.detail).toBe("2017 · ფინანსთა სამინისტროს ჯამი");
+  });
 });
 
 describe("regionFactsFor", () => {
@@ -1042,7 +1051,8 @@ describe("buildEntityKpis", () => {
     expect(divergent[0]!.label).toBe("ოფიციალური ბიუჯეტი");
     expect(divergent[0]!.detail).toContain("ფინანსთა სამინისტროს");
     expect(model.totalRow.valuesByYear[2016]).toBe(300);
-    expect(divergent[0]!.value).toBe(formatAmount(300));
+    expect(divergent[0]!.value).toBe("0.0");
+    expect(divergent[0]!.unit).toBe("მლნ ₾");
   });
 
   it("keeps a missing official end total missing instead of rendering zero", () => {
@@ -1051,6 +1061,7 @@ describe("buildEntityKpis", () => {
     const missing = buildEntityKpis({ model, nationalTotalByYear, rankByYear, rankOutOf: 64 });
 
     expect(missing[0]!.value).toBe(MISSING);
+    expect(missing[0]!.unit).toBe("");
   });
 
   it("renders the official total's own formatted string, distinguishable from the functional one", () => {
@@ -1080,8 +1091,10 @@ describe("buildEntityKpis", () => {
       rankByYear,
       rankOutOf: 64,
     });
-    expect(divergent[0]!.value).toBe(formatAmount(350_000_000));
-    expect(divergent[0]!.value).not.toBe(formatAmount(265_000_000));
+    expect(divergent[0]!.value).toBe("350.0");
+    expect(divergent[0]!.unit).toBe("მლნ ₾");
+    expect(`${divergent[0]!.value} ${divergent[0]!.unit}`).toBe(formatAmount(350_000_000));
+    expect(`${divergent[0]!.value} ${divergent[0]!.unit}`).not.toBe(formatAmount(265_000_000));
   });
 
   it("reports growth across the selected range", () => {
@@ -1152,6 +1165,53 @@ describe("buildEntityKpis", () => {
     // 740 would be 35.8%.
     const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rankByYear, rankOutOf: 64 });
     expect(divergent[3]!.value).toBe("40.5%");
+  });
+});
+
+describe("buildMunicipalIndicatorPresentation", () => {
+  it("uses official totals, the largest end-year function, and national totals without estimates", () => {
+    const presentation = buildMunicipalIndicatorPresentation(build(), {
+      kind: "ranked",
+      nationalTotalByYear: { 2015: 500, 2016: 740, 2017: 740 },
+    });
+
+    expect(presentation.headline.start).toBe(160);
+    expect(presentation.headline.end).toBe(370);
+    expect(presentation.headline.change).toBeCloseTo(1.3125, 6);
+    expect(presentation.headline.cagr).toBeCloseTo((370 / 160) ** (1 / 2) - 1, 6);
+    expect(presentation.sideSeries).toEqual([
+      [160, 300, 370],
+      [100 / 160, 200 / 300, 300 / 370],
+      [160 / 500, 300 / 740, 370 / 740],
+    ]);
+  });
+
+  it("keeps missing values null and gives the country budget count a flat series", () => {
+    const model = build();
+    model.totalRow.valuesByYear[2016] = null;
+
+    const presentation = buildMunicipalIndicatorPresentation(model, { kind: "country", budgetCount: 69 });
+
+    expect(presentation.sideSeries).toEqual([
+      [160, null, 370],
+      [100 / 160, null, 300 / 370],
+      [69, 69, 69],
+    ]);
+    expect(presentation.headline).toMatchObject({ start: 160, end: 370 });
+  });
+
+  it("preserves a small real headline change for one-decimal percentage display", () => {
+    const model = build();
+    model.totalRow.valuesByYear[2015] = 1_000_000;
+    model.totalRow.valuesByYear[2017] = 1_000_560;
+
+    const presentation = buildMunicipalIndicatorPresentation(model, {
+      kind: "ranked",
+      nationalTotalByYear: { 2015: 2_000_000, 2016: 2_000_000, 2017: 2_000_000 },
+    });
+
+    expect(presentation.headline.change).toBeCloseTo(0.00056, 8);
+    expect(formatShare(presentation.headline.change, true)).toBe("+0.1%");
   });
 });
 
