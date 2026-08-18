@@ -11,7 +11,7 @@ import type { SourceDocumentRow } from "../data/sources";
 import { MIXED_SOURCE_ID } from "../data/municipal/aggregateMunicipalFacts";
 import type { ExplorerTableRow, SourceMetadata } from "./types";
 import { colorForItem, INK } from "./colors";
-import { formatAmount, formatShare, MISSING } from "./format";
+import { formatAmount, formatAmountParts, formatShare, MISSING } from "./format";
 import { georgianOrdinal } from "./municipalLabels";
 
 // Model layer for the municipalities section.
@@ -304,7 +304,7 @@ export function regionFactsFor(
   };
 }
 
-export type MunicipalKpi = { label: string; value: string; detail: string };
+export type MunicipalKpi = { label: string; value: string; unit?: string; detail: string };
 
 export type MunicipalIndexKpiInput = {
   municipalities: Municipality[];
@@ -475,6 +475,7 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
 
   const officialStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
   const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
+  const officialEndParts = formatAmountParts(officialEnd);
   const nationalEnd = endYear === undefined ? 0 : nationalTotalByYear[endYear] ?? 0;
   const growth = changeBetween(officialStart, officialEnd);
   const rank = endYear === undefined ? 0 : input.rankByYear[endYear] ?? 0;
@@ -485,7 +486,8 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
   return [
     {
       label: "ოფიციალური ბიუჯეტი",
-      value: formatAmount(officialEnd),
+      value: officialEndParts.num,
+      unit: officialEndParts.unit,
       detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
     },
     {
@@ -521,6 +523,7 @@ export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: numbe
   const endYear = model.years.at(-1);
   const officialStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
   const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
+  const officialEndParts = formatAmountParts(officialEnd);
   const growth = changeBetween(officialStart, officialEnd);
   const largest = sortedByEndYear(model.rows, endYear)[0];
   const largestValue = largest && endYear !== undefined ? largest.valuesByYear[endYear] ?? 0 : 0;
@@ -528,7 +531,8 @@ export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: numbe
   return [
     {
       label: "ოფიციალური ბიუჯეტი",
-      value: formatAmount(officialEnd),
+      value: officialEndParts.num,
+      unit: officialEndParts.unit,
       detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
     },
     {

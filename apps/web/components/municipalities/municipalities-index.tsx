@@ -17,7 +17,6 @@ type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinGel" | "leg
   country: MunicipalListRow;
   kpis: MunicipalKpi[];
   latestYear: number;
-  sourceNote: string;
 };
 
 export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {

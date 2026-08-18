@@ -8,10 +8,10 @@ import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
 
 function MoverRow({ mover, maxAbs }: { mover: MunicipalMover; maxAbs: number }) {
   const growth = mover.growth;
-  const width = growth === null || maxAbs === 0 ? 0 : (Math.abs(growth) / maxAbs) * 100;
+  const width = growth === null || maxAbs === 0 ? 0 : Math.max(4, (Math.abs(growth) / maxAbs) * 100);
 
   return (
-    <div className="grid grid-cols-[24px_minmax(0,1fr)_96px_72px] items-center gap-3 border-t border-[var(--hairline-soft)] py-2.5">
+    <div title={mover.kaLabel} className="grid grid-cols-[24px_minmax(0,1fr)_96px_72px] items-center gap-3 border-t border-[var(--hairline-soft)] py-2.5">
       <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
         {String(mover.rank).padStart(2, "0")}
       </span>
@@ -70,7 +70,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
               className="mt-3.5 whitespace-nowrap font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]"
               style={{ color: headline.change !== null && headline.change < 0 ? NEGATIVE : "var(--ink)" }}
             >
-              {formatShare(headline.change, true, 0)}
+              {formatShare(headline.change, true)}
             </p>
             <div className="mt-7 max-w-[480px]">
               <div data-testid="municipal-change-gauge" className="flex h-[3px] bg-[var(--hairline-soft)]">
@@ -109,7 +109,14 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
                 <div data-testid="side-kpi">
                   <Overline>{kpi.label}</Overline>
                   <div className="mt-[7px] flex items-baseline justify-between gap-4">
-                    <span className="whitespace-nowrap font-[family-name:var(--font-display)] text-2xl font-semibold leading-[1.1] tracking-[-0.02em]">{kpi.value}</span>
+                    <span className="whitespace-nowrap font-[family-name:var(--font-display)] text-2xl font-semibold leading-[1.1] tracking-[-0.02em]">
+                      {kpi.value}
+                      {kpi.unit ? (
+                        <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-xs font-medium tracking-normal text-[var(--body)]">
+                          {kpi.unit}
+                        </span>
+                      ) : null}
+                    </span>
                     <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right text-xs text-[var(--muted)]" title={kpi.detail}>{kpi.detail}</span>
                   </div>
                   <Sparkline values={sideSeries[index]!} color="var(--ink)" />
@@ -141,7 +148,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
       <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
         <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">პერიოდის შედარება</h3>
         <div className="overflow-x-auto">
-          <table data-testid="comparison-table" className="w-full table-fixed border-collapse">
+          <table data-testid="comparison-table" className="min-w-[560px] w-full table-fixed border-collapse">
             <colgroup>
               <col className="w-[44%]" />
               <col />

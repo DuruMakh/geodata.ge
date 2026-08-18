@@ -630,9 +630,17 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("municipal-change-start")).toContainText(/2015/);
     await expect(page.getByTestId("municipal-change-end")).toContainText(/2025/);
     await expect(page.getByTestId("municipal-change-sentence")).toContainText("წლებში");
+    await expect(page.getByTestId("entity-kpi").first().getByText("+120.0%", { exact: true })).toBeVisible();
 
     const sideKpis = page.getByTestId("side-kpi");
     await expect(sideKpis).toHaveCount(3);
+    const officialBudgetUnit = sideKpis.first().getByText("მლრდ ₾", { exact: true });
+    await expect(officialBudgetUnit).toHaveClass(/ml-1\.5/);
+    await expect(officialBudgetUnit).toHaveClass(/font-\[family-name:var\(--font-numeric\)\]/);
+    await expect(officialBudgetUnit).toHaveClass(/text-xs/);
+    await expect(officialBudgetUnit).toHaveClass(/font-medium/);
+    await expect(officialBudgetUnit).toHaveClass(/tracking-normal/);
+    await expect(officialBudgetUnit).toHaveClass(/text-\[var\(--body\)\]/);
     for (let index = 0; index < 3; index += 1) {
       await expect(sideKpis.nth(index).locator("svg")).toHaveCount(1);
     }
@@ -729,9 +737,23 @@ test.describe("municipality page", () => {
     await expectMunicipalAppReady(page);
 
     const movers = page.getByTestId("period-movers");
-    for (const heading of await movers.locator("h3").all()) {
+    const moverHeadings = movers.locator("h3");
+    await expect(moverHeadings).toHaveCount(2);
+    expect(await moverHeadings.allTextContents()).toEqual(["ყველაზე მზარდი", "ყველაზე ნელი ზრდა"]);
+    for (const heading of await moverHeadings.all()) {
       await expect(heading).toHaveCSS("font-size", "13px");
       await expect(heading).toHaveCSS("font-weight", "600");
+    }
+
+    const moverRows = movers.locator("[title]");
+    await expect(moverRows).toHaveCount(6);
+    for (const row of await moverRows.all()) {
+      const label = (await row.locator(":scope > span").nth(1).textContent())?.trim();
+      await expect(row).toHaveAttribute("title", label ?? "");
+      const width = await row.locator(":scope > span:nth-child(3) > span").evaluate((element) =>
+        Number.parseFloat(getComputedStyle(element).width) / Number.parseFloat(getComputedStyle(element.parentElement!).width),
+      );
+      expect(width).toBeGreaterThanOrEqual(0.04);
     }
 
     const comparison = page.getByTestId("period-comparison");
@@ -750,5 +772,33 @@ test.describe("municipality page", () => {
     await expect(row).toHaveClass(/transition-colors/);
     await expect(row).toHaveClass(/duration-100/);
     await expect(row).toHaveClass(/hover:bg-\[var\(--tint\)\]/);
+  });
+
+  test("keeps the four-column comparison readable inside a narrow viewport", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const table = page.getByTestId("comparison-table");
+    const overflow = table.locator("..");
+    const sizes = await overflow.evaluate((container) => ({
+      containerClientWidth: container.clientWidth,
+      containerScrollWidth: container.scrollWidth,
+      pageClientWidth: document.documentElement.clientWidth,
+      pageScrollWidth: document.documentElement.scrollWidth,
+      tableWidth: container.querySelector("table")!.getBoundingClientRect().width,
+    }));
+
+    expect(sizes.tableWidth).toBeGreaterThanOrEqual(560);
+    expect(sizes.containerScrollWidth).toBeGreaterThan(sizes.containerClientWidth);
+    expect(sizes.pageScrollWidth).toBe(sizes.pageClientWidth);
+
+    const boxes = await table.locator("tbody tr").first().locator("td").evaluateAll((cells) => cells.slice(1).map((cell) => {
+      const box = cell.getBoundingClientRect();
+      return { left: box.left, right: box.right };
+    }));
+    expect(boxes).toHaveLength(3);
+    expect(boxes[0]!.right).toBeLessThanOrEqual(boxes[1]!.left);
+    expect(boxes[1]!.right).toBeLessThanOrEqual(boxes[2]!.left);
   });
 });
