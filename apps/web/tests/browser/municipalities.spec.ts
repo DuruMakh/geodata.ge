@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import { loadServedMunicipalData } from "../../lib/data/servedData";
+import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 
 async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -129,17 +131,34 @@ test("keeps the municipality index free of the source note", async ({ page }) =>
   await expect(page.getByTestId("municipality-map")).not.toContainText(/მონაცემები არ არის|no data/i);
 });
 
-test("map hover and focus show only name, amount, and an arrow visibly", async ({ page }) => {
+test("map heading, legend, tooltip, and accessibility use 2025 budget per resident", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
+  await expect(page.getByTestId("municipality-map-heading")).toContainText("ერთ მოსახლეზე");
+  await expect(page.getByTestId("municipality-map-heading")).toContainText("2025");
+  await expect(page.getByTestId("municipality-map-legend")).toContainText("₾");
+  await expect(page.getByTestId("municipality-map").locator("svg")).toHaveAttribute(
+    "aria-label",
+    /2025.*ერთ მოსახლეზე/,
+  );
+
+  const { totalFacts, populationFacts } = await loadServedMunicipalData();
+  const zugdidiTotal = totalFacts.find((row) => row.year === 2025 && row.municipalityCode === "33")!;
+  const zugdidiPopulation = populationFacts.find((row) => row.municipalityCode === "33")!;
+  const perResident = formatPerResidentGel(zugdidiTotal.publicTotalGel / zugdidiPopulation.populationPersons);
+  const total = formatAmount(zugdidiTotal.publicTotalGel);
   const zugdidi = page.getByTestId("municipality-shape-33");
   await zugdidi.hover();
   const tooltip = page.getByTestId("municipality-map-tooltip");
   await expect(tooltip).toContainText("ზუგდიდი");
-  await expect(tooltip).toContainText("₾");
+  await expect(tooltip.getByTestId("municipality-map-tooltip-per-resident")).toContainText(perResident);
+  await expect(tooltip.getByTestId("municipality-map-tooltip-total")).toContainText(total);
+  expect(await tooltip.locator("[data-testid$='per-resident'], [data-testid$='total']").evaluateAll(
+    (elements) => elements.map((element) => element.getAttribute("data-testid")),
+  )).toEqual(["municipality-map-tooltip-per-resident", "municipality-map-tooltip-total"]);
   await expect(tooltip).toContainText("→");
   await expect(tooltip).not.toContainText(/Open|გახსნა/);
-  await expect(zugdidi).toHaveAccessibleName(/ზუგდიდი.*გახსნა/);
+  await expect(zugdidi).toHaveAccessibleName(new RegExp(`ზუგდიდი.*${perResident.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}.*${total.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}.*გახსნა`));
   await expect(zugdidi).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
   await expect(page.locator('[data-municipality-map-target][aria-describedby="municipality-map-tooltip"]')).toHaveCount(1);
 
@@ -328,9 +347,30 @@ test.describe("municipalities index", () => {
     await expect(country.getByTestId("municipal-row-name")).toHaveText("საქართველო");
     await expect(country).toContainText("69 მუნიციპალური ბიუჯეტი");
     await expect(country.locator("span").first()).toHaveText("—");
+    await expect(country.getByTestId("municipal-row-per-resident")).toHaveCount(0);
 
     await country.click();
     await expect(page).toHaveURL(/\/explorer\/municipalities\/georgia(#|$)/);
+  });
+
+  test("keeps total budget primary while showing per-resident support for municipalities and regions", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    await expectMunicipalAppReady(page);
+
+    const municipality = page.getByTestId("municipal-list-row").first();
+    await expect(municipality.getByTestId("municipal-row-primary-amount")).toContainText(/მლნ ₾|მლრდ ₾/);
+    await expect(municipality.getByTestId("municipal-row-per-resident")).toContainText("₾ ერთ მოსახლეზე");
+    await expect(municipality.getByTestId("municipal-row-per-resident")).toHaveCSS("font-size", "12px");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+    await page.getByTestId("level-region").click();
+    const regionRows = page.getByTestId("municipal-list-row");
+    await expect(regionRows.first().getByTestId("municipal-row-per-resident")).toHaveCount(0);
+    for (const region of await regionRows.all()) {
+      if (await region.getByTestId("municipal-row-name").textContent() === "საქართველო") continue;
+      await expect(region.getByTestId("municipal-row-per-resident")).toContainText("₾ ერთ მოსახლეზე");
+    }
   });
 
   test("filters and clears the search", async ({ page }) => {
@@ -376,13 +416,15 @@ test.describe("municipalities index", () => {
     await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/04");
   });
 
-  test("shows four KPIs with the 69-series country descriptions", async ({ page }) => {
+  test("shows four KPIs including the 2025 median budget per resident", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
     const kpis = page.getByTestId("index-kpi");
     await expect(kpis).toHaveCount(4);
     await expect(kpis.nth(0)).toContainText("2025 · 69 მუნიციპალური საბიუჯეტო ერთეული");
-    await expect(kpis.nth(2)).toContainText("დანარჩენი გაერთიანებული ჯამი");
+    await expect(kpis.nth(2)).toContainText("მედიანური ბიუჯეტი ერთ მოსახლეზე");
+    await expect(kpis.nth(2)).toContainText("1,335 ₾");
+    await expect(kpis.nth(2)).toContainText("2025 · 64 მუნიციპალიტეტი");
   });
 
   test("describes municipalities on the map and in the list", async ({ page }) => {

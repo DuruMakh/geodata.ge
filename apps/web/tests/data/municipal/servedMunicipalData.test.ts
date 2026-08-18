@@ -20,6 +20,11 @@ describe("loadServedMunicipalData", () => {
     expect(data.countryFunctionFacts).toHaveLength(110);
     expect(data.countryTotalFacts).toHaveLength(11);
     expect(data.adjaraBudgetAdjustments).toHaveLength(11);
+    expect(data.populationFacts).toHaveLength(64);
+    expect(new Set(data.populationFacts.map((row) => row.year))).toEqual(new Set([2025]));
+    expect(new Set(data.populationFacts.map((row) => row.municipalityCode))).toEqual(
+      new Set(data.municipalities.map((row) => row.code)),
+    );
     expect(data.adjaraBudgetAdjustments[0]).toMatchObject({
       year: 2015,
       scopeId: "region.adjara",

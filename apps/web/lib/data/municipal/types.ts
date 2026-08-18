@@ -38,6 +38,20 @@ export type Municipality = {
   isSelfGoverningCity: boolean;
 };
 
+export type MunicipalPopulationFact = {
+  year: 2025;
+  municipalityCode: string;
+  populationThousand: number;
+  populationPersons: number;
+  referenceDate: "2025-01-01";
+  sourceId: "source.geostat_municipal_population";
+  sourceSheet: string;
+  sourceCell: string;
+  sourceUnit: "(thousands)";
+  transformation: string;
+  lastReviewedAt: string;
+};
+
 export type MunicipalFunctionFact = {
   year: number;
   municipalityCode: string;

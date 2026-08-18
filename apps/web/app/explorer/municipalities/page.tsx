@@ -7,8 +7,9 @@ import {
   buildCountryListRow,
   buildMunicipalListRows,
   latestReviewedAtForMunicipalFacts,
+  MUNICIPAL_PER_RESIDENT_YEAR,
 } from "../../../lib/explorer/municipalData";
-import { formatAmount } from "../../../lib/explorer/format";
+import { formatPerResidentGel } from "../../../lib/explorer/format";
 import { buildMunicipalityMapModel } from "../../../lib/explorer/municipalityMapData";
 
 const TITLE = "მუნიციპალიტეტები — GeoData";
@@ -34,15 +35,19 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MunicipalitiesIndexPage() {
-  const { municipalities, regions, totalFacts, functionFacts, countryTotalFacts, countryFunctionFacts, functions, adjaraBudgetAdjustments } = await loadServedMunicipalData();
+  const { municipalities, regions, totalFacts, populationFacts, functionFacts, countryTotalFacts, countryFunctionFacts, functions, adjaraBudgetAdjustments } = await loadServedMunicipalData();
   const { sourceDocuments } = await loadServedLandingData();
 
   const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
   const firstYear = years[0]!;
   const latestYear = years.at(-1)!;
+  const comparisonYear = MUNICIPAL_PER_RESIDENT_YEAR;
+  if (!years.includes(comparisonYear)) {
+    throw new Error(`Municipal budget facts do not include comparison year ${comparisonYear}`);
+  }
   const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
 
-  const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear });
+  const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, populationFacts, adjaraBudgetAdjustments, year: comparisonYear });
   const map = buildMunicipalityMapModel({
     municipalities,
     municipalityRows: list.municipalities,
@@ -78,21 +83,23 @@ export default async function MunicipalitiesIndexPage() {
           shapes={map.shapes}
           markers={map.markers}
           occupiedAreas={map.occupiedAreas}
-          legendMin={formatAmount(map.legendMinGel)}
-          legendMax={formatAmount(map.legendMaxGel)}
+          legendMin={formatPerResidentGel(map.legendMinPerResidentGel)}
+          legendMax={formatPerResidentGel(map.legendMaxPerResidentGel)}
           municipalities={list.municipalities}
           regions={list.regions}
-          country={buildCountryListRow(countryTotalFacts, latestYear)}
+          country={buildCountryListRow(countryTotalFacts, comparisonYear)}
           kpis={buildIndexKpis({
             municipalities,
             totalFacts,
+            populationFacts,
             countryTotalFacts,
             countryFunctionFacts,
             functions,
             firstYear,
+            comparisonYear,
             latestYear,
           })}
-          latestYear={latestYear}
+          comparisonYear={comparisonYear}
         />
       </div>
     </main>

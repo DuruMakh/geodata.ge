@@ -2,9 +2,9 @@
 
 ## Purpose and boundary
 
-This methodology governs the research-only Geostat package at `docs/Raw Data/Municipalities/geostat-population-regional-gdp/`. Geostat, the National Statistics Office of Georgia, is authoritative here because it publishes both the population and regional-GDP workbooks preserved in that package.
+This methodology governs the preserved Geostat package at `docs/Raw Data/Municipalities/geostat-population-regional-gdp/`. Geostat, the National Statistics Office of Georgia, is authoritative here because it publishes both the population and regional-GDP workbooks preserved in that package.
 
-The package adds no data to `data/imports`, no database import or database content, and no application loader, route, component, chart, table, CSV export, or UI. Municipal GDP/proxies are out of scope and not present. The old Ministry of Finance portal `Population` column is unused for values and gap filling.
+The complete 2015-2025 population panel and the regional-GDP dataset remain research assets. Only the validated 64-row 2025 municipality population slice is promoted to `data/imports/municipal-population-2025.csv`, mirrored in the database, and used on the municipality index for the bounded budget-per-resident map, supporting list values, and median KPI. It does not create a historical per-capita series, detail-page measure, toggle, or export. Regional GDP remains outside application serving. Municipal GDP/proxies are out of scope and not present. The old Ministry of Finance portal `Population` column is unused for values and gap filling.
 
 ## Measures and observed coverage
 
@@ -15,6 +15,14 @@ The measure is Geostat's *Population as of 1 January by regions and self-governe
 ### Regional GDP
 
 The measure is Geostat's *Distribution of gross domestic product by regions at current prices*, sheet `regional GDP`: total regional GDP at current prices, in `mil. GEL`. The preserved workbook's observed in-window coverage is 2010-2024, so the normalized output has 165 rows: 11 canonical regions times 15 years. It does not claim coverage for 2005-2009 or 2025, because those years are absent from the preserved workbook. The source says it was last updated 2025-12-23 and links metadata at https://www.geostat.ge/media/68649/0403_060225_EN.PDF. It has no stated preliminary or revised row designation; normalized values therefore use `status = final_as_published`.
+
+## Bounded 2025 application calculation
+
+The served denominator uses `year = 2025`, `reference_date = 2025-01-01`, and `population_persons` for exactly the 64 canonical public municipalities. Its registered source ID is `source.geostat_municipal_population`. The canonical application file is generated deterministically from the preserved normalized package by `npm run data:prepare-municipal-population`; `npm run data:check-municipal-population` fails if the reviewed output is stale. No estimate or gap filling is permitted.
+
+For a municipality, `budget_per_resident_gel = 2025 public_total_gel / 2025 population_persons`. For a region, the numerator is the same displayed 2025 region total used by the list and the denominator is the exact sum of member-municipality populations. Adjara therefore uses its consolidated total after adding republican actual payments and removing transfers to its six territorial budgets. The median KPI sorts all 64 full-precision municipality results and averages the 32nd and 33rd values. Values are rounded to the nearest whole GEL only when displayed.
+
+Missing, duplicate, zero, negative, or non-finite population fails validation, as does a missing or duplicate 2025 municipal total. The Georgia aggregate receives no per-resident value because its numerator includes five aggregate-only municipal budgets without a territorial population assignment. No population reference-date label is repeated beside the map; the visible source note provides Geostat attribution while source rows retain the exact date and transformation.
 
 ## Sources and immutable captures
 
@@ -62,7 +70,9 @@ From the repository root, use the web-package commands in this order:
 ```powershell
 Set-Location apps/web
 npm run data:prepare-municipal-indicators
+npm run data:prepare-municipal-population
 npm test -- tests/data/municipalIndicators/geostatPackage.test.ts
+npm run data:check-municipal-population
 npm run check
 npm run build
 ```

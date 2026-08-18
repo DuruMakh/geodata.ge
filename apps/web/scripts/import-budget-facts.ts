@@ -13,6 +13,7 @@ import { buildImportReport } from "../lib/data/importReport";
 import { loadSpendingMappings } from "../lib/data/mappings";
 import { loadNationalGdpFacts } from "../lib/data/nationalGdp/importNationalGdp";
 import { loadMunicipalitiesFile } from "../lib/data/municipal/municipalitiesFile";
+import { loadMunicipalPopulationFacts } from "../lib/data/municipal/importMunicipalPopulation";
 import { loadAdjaraBudgetAdjustments } from "../lib/data/municipal/importAdjaraBudgetAdjustments";
 import {
   loadMunicipalCountryFunctionFacts,
@@ -40,6 +41,7 @@ import {
   budgetFactParityKey,
   municipalFunctionFactParityKey,
   municipalTotalFactParityKey,
+  municipalPopulationFactParityKey,
   nationalGdpFactParityKey,
 } from "../lib/data/servedDataParity";
 import { loadSourceDocuments } from "../lib/data/sources";
@@ -57,6 +59,7 @@ import {
   loadMunicipalitiesFromMirror,
   loadMunicipalRegionsFromMirror,
   loadMunicipalTotalFactsFromMirror,
+  loadMunicipalPopulationFactsFromMirror,
   loadNationalGdpFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "../lib/db/mirrorRows";
@@ -163,6 +166,7 @@ async function main() {
     municipalCountryFunctionFacts,
     municipalCountryTotalFacts,
     municipalAdjaraBudgetAdjustments,
+    municipalPopulationFacts,
     nationalGdpFacts,
   ] = await Promise.all([
     loadTaxonomyFiles(TAXONOMY_DIR),
@@ -180,6 +184,7 @@ async function main() {
     loadMunicipalCountryFunctionFacts(SERVED_DATA_FILES.municipalCountryFunctionFacts),
     loadMunicipalCountryTotalFacts(SERVED_DATA_FILES.municipalCountryTotalFacts),
     loadAdjaraBudgetAdjustments(SERVED_DATA_FILES.municipalAdjaraBudgetAdjustments),
+    loadMunicipalPopulationFacts(SERVED_DATA_FILES.municipalPopulationFacts),
     loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
   ]);
 
@@ -254,6 +259,20 @@ async function main() {
   );
   assertUnique("municipal function fact natural key", municipalFunctionFacts.map(municipalFunctionFactParityKey));
   assertUnique("municipal total fact natural key", municipalTotalFacts.map(municipalTotalFactParityKey));
+  assertSubset(
+    "Municipal population municipality codes",
+    municipalPopulationFacts.map((fact) => fact.municipalityCode),
+    municipalityCodes,
+  );
+  assertSubset(
+    "Municipal population source IDs",
+    municipalPopulationFacts.map((fact) => fact.sourceId),
+    sourceIds,
+  );
+  assertUnique(
+    "municipal population fact natural key",
+    municipalPopulationFacts.map(municipalPopulationFactParityKey),
+  );
   assertAmountPrecision("Municipal function fact", municipalFunctionFacts);
   assertMunicipalTotalPrecision("Municipal total fact", municipalTotalFacts);
 
@@ -314,6 +333,7 @@ async function main() {
         await tx.adminSpendingCategory.deleteMany();
         await tx.municipalFunctionFact.deleteMany();
         await tx.municipalTotalFact.deleteMany();
+        await tx.municipalPopulationFact.deleteMany();
         await tx.municipalCountryFunctionFact.deleteMany();
         await tx.municipalCountryTotalFact.deleteMany();
         await tx.municipalAdjaraBudgetAdjustment.deleteMany();
@@ -540,6 +560,24 @@ async function main() {
           })),
         });
 
+        await tx.municipalPopulationFact.createMany({
+          data: municipalPopulationFacts.map((fact) => ({
+            id: municipalPopulationFactParityKey(fact),
+            year: fact.year,
+            municipalityCode: fact.municipalityCode,
+            populationThousand: String(fact.populationThousand),
+            populationPersons: fact.populationPersons,
+            referenceDate: new Date(`${fact.referenceDate}T00:00:00.000Z`),
+            sourceDocumentId: fact.sourceId,
+            sourceSheet: fact.sourceSheet,
+            sourceCell: fact.sourceCell,
+            sourceUnit: fact.sourceUnit,
+            transformation: fact.transformation,
+            lastReviewedAt: new Date(`${fact.lastReviewedAt}T00:00:00.000Z`),
+            importRunId: run.id,
+          })),
+        });
+
         await tx.budgetMapping.createMany({
           data: mappings.map((mapping) => ({
             year: mapping.year,
@@ -582,6 +620,7 @@ async function main() {
           mirrorMunicipalCountryFunctionFacts,
           mirrorMunicipalCountryTotalFacts,
           mirrorMunicipalAdjaraBudgetAdjustments,
+          mirrorMunicipalPopulationFacts,
         ] = await Promise.all([
           loadMunicipalFunctionsFromMirror(tx),
           loadMunicipalRegionsFromMirror(tx),
@@ -591,6 +630,7 @@ async function main() {
           loadMunicipalCountryFunctionFactsFromMirror(tx),
           loadMunicipalCountryTotalFactsFromMirror(tx),
           loadMunicipalAdjaraBudgetAdjustmentsFromMirror(tx),
+          loadMunicipalPopulationFactsFromMirror(tx),
         ]);
 
         assertSameServedRows("budget facts", budgetFacts, mirrorFacts, budgetFactParityKey);
@@ -662,6 +702,12 @@ async function main() {
           mirrorMunicipalAdjaraBudgetAdjustments,
           adjaraBudgetAdjustmentParityKey,
         );
+        assertSameServedRows(
+          "municipal population facts",
+          municipalPopulationFacts,
+          mirrorMunicipalPopulationFacts,
+          municipalPopulationFactParityKey,
+        );
 
         // Totals parity for the human-readable report; counts come from the
         // row-level readback above, GEL sums from the database's own Decimal
@@ -724,6 +770,11 @@ async function main() {
               table: "MunicipalAdjaraBudgetAdjustment",
               csvRows: municipalAdjaraBudgetAdjustments.length,
               dbRows: mirrorMunicipalAdjaraBudgetAdjustments.length,
+            },
+            {
+              table: "MunicipalPopulationFact",
+              csvRows: municipalPopulationFacts.length,
+              dbRows: mirrorMunicipalPopulationFacts.length,
             },
           ],
           budgetTotalsCsv,
