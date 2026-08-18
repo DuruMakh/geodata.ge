@@ -1,7 +1,7 @@
 # Municipal Budget per Capita Design
 
-**Date:** 2026-08-18  
-**Status:** Approved design; awaiting written-spec review  
+**Date:** 2026-08-18
+**Status:** Approved design; awaiting written-spec review
 **Scope:** Add a 2025 budget-per-resident comparison to the municipalities index without changing the municipal history explorers.
 
 ## 1. Goal
