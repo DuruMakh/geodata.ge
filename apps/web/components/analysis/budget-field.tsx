@@ -3,7 +3,7 @@ import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { Callout } from "../ui/editorial";
 
 // Budget field per DESIGN.md §9.6: bubble scatter — x share of total, y growth vs
-// previous year, radius by amount; labels only on notable points.
+// previous year, compact solid radius by amount; labels only on notable points.
 
 type BudgetFieldProps = {
   items: SnapshotItem[];
@@ -15,11 +15,6 @@ const PAD_L = 52;
 const PAD_R = 24;
 const PAD_T = 18;
 const PAD_B = 36;
-
-function hexToRgba(hex: string, alpha: number): string {
-  const value = Number.parseInt(hex.slice(1), 16);
-  return `rgba(${(value >> 16) & 255},${(value >> 8) & 255},${value & 255},${alpha})`;
-}
 
 function truncate(text: string, length: number): string {
   return text.length > length ? `${text.slice(0, length - 1)}…` : text;
@@ -51,13 +46,17 @@ export function BudgetField({ items }: BudgetFieldProps) {
   const growthMin = Math.min(0, ...growths);
   const growthMax = Math.max(0, ...growths);
   const yPad = Math.max(4, (growthMax - growthMin) * 0.15);
-  const yMin = Math.floor((growthMin - yPad) / 5) * 5;
-  const yMax = Math.ceil((growthMax + yPad) / 5) * 5;
+  const yMin = Math.floor((growthMin - yPad) / 10) * 10;
+  const yMax = Math.ceil((growthMax + yPad) / 10) * 10;
   const x = (share: number) => PAD_L + (share / xMax) * (W - PAD_L - PAD_R);
   const y = (growth: number) => PAD_T + (1 - (growth - yMin) / (yMax - yMin)) * (H - PAD_T - PAD_B);
 
   const ySpan = yMax - yMin;
-  const yStep = ySpan <= 25 ? 5 : ySpan <= 50 ? 10 : ySpan <= 100 ? 20 : 50;
+  const roughYStep = ySpan / 8;
+  const yMagnitude = 10 ** Math.floor(Math.log10(roughYStep));
+  const normalizedYStep = roughYStep / yMagnitude;
+  const yMultiplier = normalizedYStep <= 1 ? 1 : normalizedYStep <= 2 ? 2 : normalizedYStep <= 5 ? 5 : 10;
+  const yStep = ySpan <= 100 ? 10 : Math.max(10, yMultiplier * yMagnitude);
   const yTicks: number[] = [];
   for (let tick = Math.ceil(yMin / yStep) * yStep; tick <= yMax; tick += yStep) yTicks.push(tick);
   const xStep = xMax <= 20 ? 5 : 10;
@@ -93,7 +92,7 @@ export function BudgetField({ items }: BudgetFieldProps) {
         ))}
         <line x1={PAD_L} x2={PAD_L} y1={PAD_T} y2={H - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
         {byAmount.map((item) => {
-          const radius = 7 + Math.sqrt(item.amountGel / maxAmount) * 40;
+          const radius = 6 + Math.sqrt(item.amountGel / maxAmount) * 16;
           const cx = x(item.shareOfTotal * 100);
           const cy = y(item.changeFromPreviousYear * 100);
 
@@ -124,7 +123,7 @@ export function BudgetField({ items }: BudgetFieldProps) {
 
           return (
             <g key={item.itemId}>
-              <circle cx={cx} cy={cy} r={radius} fill={hexToRgba(item.color, 0.18)} stroke={item.color} strokeWidth={1.5}>
+              <circle cx={cx} cy={cy} r={radius} fill={item.color} stroke="var(--paper)" strokeWidth={2}>
                 <title>
                   {`${item.kaLabel} · ${formatAmount(item.amountGel)} · წილი ${formatShare(item.shareOfTotal)} · ზრდა ${formatShare(item.changeFromPreviousYear, true)}`}
                 </title>
