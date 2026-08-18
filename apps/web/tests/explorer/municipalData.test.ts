@@ -4,6 +4,7 @@ import type {
   Municipality,
   MunicipalFunction,
   MunicipalFunctionFact,
+  MunicipalPopulationFact,
   MunicipalTotalFact,
 } from "../../lib/data/municipal/types";
 import type { SourceDocumentRow } from "../../lib/data/sources";
@@ -24,6 +25,7 @@ import {
   buildMovers,
   buildMunicipalEntityModel,
   buildMunicipalListRows,
+  buildMedianMunicipalBudgetPerResident,
   buildPickerGroups,
   getDefaultMunicipalSelection,
   latestReviewedAtForMunicipalFacts,
@@ -589,6 +591,22 @@ function totalFor(code: string, year: number, publicTotalGel: number): Municipal
   return { ...total(year, publicTotalGel, publicTotalGel), municipalityCode: code };
 }
 
+function populationFor(code: string, populationPersons: number): MunicipalPopulationFact {
+  return {
+    year: 2025,
+    municipalityCode: code,
+    populationThousand: populationPersons / 1_000,
+    populationPersons,
+    referenceDate: "2025-01-01",
+    sourceId: "source.geostat_municipal_population",
+    sourceSheet: "მოსახლეობა 1 იანვრის მდგომარეობით",
+    sourceCell: "AG1",
+    sourceUnit: "(thousands)",
+    transformation: "population_persons = population_thousand * 1000",
+    lastReviewedAt: "2026-08-18",
+  };
+}
+
 function countryTotalsFor(totalFacts: MunicipalTotalFact[]): MunicipalTotalFact[] {
   const totalsByYear = new Map<number, number>();
   for (const row of totalFacts) {
@@ -615,10 +633,17 @@ const INDEX_TOTALS: MunicipalTotalFact[] = [
   totalFor("07", 2015, 50_000_000), totalFor("07", 2025, 100_000_000),
 ];
 
+const INDEX_POPULATION: MunicipalPopulationFact[] = [
+  populationFor("04", 2_000_000),
+  populationFor("06", 250_000),
+  populationFor("07", 25_000),
+];
+
 const listInput = {
   municipalities: MUNICIPALITIES,
   regionLabels: REGION_LABELS,
   totalFacts: INDEX_TOTALS,
+  populationFacts: INDEX_POPULATION,
   year: 2025,
 };
 
@@ -627,6 +652,12 @@ describe("buildMunicipalListRows", () => {
     const { municipalities } = buildMunicipalListRows(listInput);
     expect(municipalities.map((row) => row.nameKa)).toEqual(["თბილისი", "ბათუმი", "ქობულეთი"]);
     expect(municipalities.map((row) => row.rank)).toEqual([1, 2, 3]);
+  });
+
+  it("adds 2025 budget per resident without changing total-budget order", () => {
+    const { municipalities } = buildMunicipalListRows(listInput);
+    expect(municipalities.map((row) => row.id)).toEqual(["04", "06", "07"]);
+    expect(municipalities.map((row) => row.budgetPerResidentGel)).toEqual([1_000, 2_000, 4_000]);
   });
 
   it("labels a municipality row with its region", () => {
@@ -643,6 +674,12 @@ describe("buildMunicipalListRows", () => {
   it("counts a region's members in its subtitle", () => {
     const { regions } = buildMunicipalListRows(listInput);
     expect(regions[1]!.subtitleKa).toBe("2 მუნიციპალიტეტი");
+  });
+
+  it("uses the region total and summed member population for budget per resident", () => {
+    const { regions } = buildMunicipalListRows(listInput);
+    expect(regions.find((row) => row.id === "region.tbilisi")?.budgetPerResidentGel).toBe(1_000);
+    expect(regions.find((row) => row.id === "region.adjara")?.budgetPerResidentGel).toBeCloseTo(600_000_000 / 275_000);
   });
 
   it("adds the net republican amount only to Adjara's regional row", () => {
@@ -664,8 +701,37 @@ describe("buildMunicipalListRows", () => {
     });
 
     expect(regions.find((row) => row.id === "region.adjara")?.valueGel).toBe(1_000_000_000);
+    expect(regions.find((row) => row.id === "region.adjara")?.budgetPerResidentGel).toBeCloseTo(1_000_000_000 / 275_000);
     expect(regions.find((row) => row.id === "region.tbilisi")?.valueGel).toBe(2_000_000_000);
     expect(municipalities.find((row) => row.id === "06")?.valueGel).toBe(500_000_000);
+  });
+
+  it.each([
+    ["missing", INDEX_POPULATION.slice(0, 2)],
+    ["duplicate", [...INDEX_POPULATION, INDEX_POPULATION[0]!]],
+    ["zero", INDEX_POPULATION.map((row) => row.municipalityCode === "07" ? populationFor("07", 0) : row)],
+    ["negative", INDEX_POPULATION.map((row) => row.municipalityCode === "07" ? populationFor("07", -1) : row)],
+    ["non-finite", INDEX_POPULATION.map((row) => row.municipalityCode === "07" ? populationFor("07", Number.NaN) : row)],
+  ])("rejects %s population before calculating", (_case, populationFacts) => {
+    expect(() => buildMunicipalListRows({ ...listInput, populationFacts })).toThrow(/population/i);
+  });
+
+  it("rejects duplicate 2025 totals instead of silently changing per-resident values", () => {
+    expect(() => buildMunicipalListRows({
+      ...listInput,
+      totalFacts: [...INDEX_TOTALS, { ...INDEX_TOTALS.find((row) => row.year === 2025)! }],
+    })).toThrow(/duplicate.*total/i);
+  });
+});
+
+describe("buildMedianMunicipalBudgetPerResident", () => {
+  it("returns the middle municipality for an odd-sized panel", () => {
+    expect(buildMedianMunicipalBudgetPerResident(buildMunicipalListRows(listInput).municipalities)).toBe(2_000);
+  });
+
+  it("averages the two middle municipalities for an even-sized panel", () => {
+    const rows = buildMunicipalListRows(listInput).municipalities.slice(0, 2);
+    expect(buildMedianMunicipalBudgetPerResident(rows)).toBe(1_500);
   });
 });
 
@@ -683,6 +749,7 @@ describe("Georgia country aggregate models", () => {
       subtitleKa: "69 მუნიციპალური ბიუჯეტი",
       rank: null,
       valueGel: 1_000,
+      budgetPerResidentGel: null,
     });
   });
 
@@ -744,10 +811,12 @@ describe("buildIndexKpis", () => {
     buildIndexKpis({
       municipalities: MUNICIPALITIES,
       totalFacts: INDEX_TOTALS,
+      populationFacts: INDEX_POPULATION,
       countryTotalFacts: countryTotalsFor(INDEX_TOTALS),
       countryFunctionFacts: [],
       functions: FUNCTIONS,
       firstYear: 2015,
+      comparisonYear: 2025,
       latestYear: 2025,
     });
 
@@ -762,10 +831,35 @@ describe("buildIndexKpis", () => {
     expect(kpis()[1]!.value).toBe("+108%");
   });
 
-  it("reports concentration rather than a max/min ratio", () => {
-    expect(kpis()[2]!.label).toBe("თბილისის წილი");
-    expect(kpis()[2]!.value).toBe("76.9%");
-    expect(kpis()[2]!.detail).toBe("დანარჩენი გაერთიანებული ჯამი — 23.1%");
+  it("reports the median 2025 municipal budget per resident", () => {
+    expect(kpis()[2]!.label).toBe("მედიანური ბიუჯეტი ერთ მოსახლეზე");
+    expect(kpis()[2]!.value).toBe("2,000 ₾");
+    expect(kpis()[2]!.detail).toBe("2025 · 3 მუნიციპალიტეტი");
+  });
+});
+
+describe("buildIndexKpis — fixed 2025 per-resident comparison", () => {
+  it("keeps the median on 2025 when later budget facts become available", () => {
+    const totalsWith2026 = [
+      ...INDEX_TOTALS,
+      totalFor("04", 2026, 3_000_000_000),
+      totalFor("06", 2026, 700_000_000),
+      totalFor("07", 2026, 200_000_000),
+    ];
+    const kpis = buildIndexKpis({
+      municipalities: MUNICIPALITIES,
+      totalFacts: totalsWith2026,
+      populationFacts: INDEX_POPULATION,
+      countryTotalFacts: countryTotalsFor(totalsWith2026),
+      countryFunctionFacts: [],
+      functions: FUNCTIONS,
+      firstYear: 2015,
+      comparisonYear: 2025,
+      latestYear: 2026,
+    });
+
+    expect(kpis[0]).toMatchObject({ value: "3.90 მლრდ ₾", detail: "2026 · 69 მუნიციპალური საბიუჯეტო ერთეული" });
+    expect(kpis[2]).toMatchObject({ value: "2,000 ₾", detail: "2025 · 3 მუნიციპალიტეტი" });
   });
 });
 
@@ -787,18 +881,20 @@ describe("buildIndexKpis — dedicated Georgia aggregate denominator", () => {
 
   it("uses 69-series country facts for every national measure while naming the largest public municipality", () => {
     const kpis = buildIndexKpis({
-      municipalities: MUNICIPALITIES,
+      municipalities: MUNICIPALITIES.slice(0, 2),
       totalFacts: publicTotals,
+      populationFacts: INDEX_POPULATION.slice(0, 2),
       countryTotalFacts: countryTotals,
       countryFunctionFacts: countryFunctions,
       functions: FUNCTIONS,
       firstYear: 2024,
+      comparisonYear: 2025,
       latestYear: 2025,
     });
 
     expect(kpis[0]!.value).toBe("2.00 მლრდ ₾");
     expect(kpis[1]!.value).toBe("+33%");
-    expect(kpis[2]).toMatchObject({ label: "თბილისის წილი", value: "50.0%" });
+    expect(kpis[2]).toMatchObject({ label: "მედიანური ბიუჯეტი ერთ მოსახლეზე", value: "1,050 ₾" });
     expect(kpis[3]).toMatchObject({ value: "20.0%", detail: "ეკონომიკური საქმიანობა" });
   });
 });
@@ -817,12 +913,14 @@ const ZERO_GROWTH_TOTALS: MunicipalTotalFact[] = [
 describe("buildIndexKpis — growth sign at exactly zero", () => {
   it("renders a flat total as unsigned 0%, not +0%", () => {
     const kpis = buildIndexKpis({
-      municipalities: MUNICIPALITIES,
+      municipalities: MUNICIPALITIES.slice(0, 1),
       totalFacts: ZERO_GROWTH_TOTALS,
+      populationFacts: INDEX_POPULATION.slice(0, 1),
       countryTotalFacts: countryTotalsFor(ZERO_GROWTH_TOTALS),
       countryFunctionFacts: [],
       functions: FUNCTIONS,
       firstYear: 2015,
+      comparisonYear: 2025,
       latestYear: 2025,
     });
     expect(kpis[1]!.value).toBe("0%");
@@ -875,12 +973,14 @@ describe("buildMunicipalListRows — ranks and sums publicTotalGel, not function
 describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
   const kpis = () =>
     buildIndexKpis({
-      municipalities: MUNICIPALITIES,
+      municipalities: MUNICIPALITIES.slice(0, 2),
       totalFacts: DIVERGENT_TOTALS,
+      populationFacts: INDEX_POPULATION.slice(0, 2),
       countryTotalFacts: countryTotalsFor(DIVERGENT_TOTALS),
       countryFunctionFacts: [],
       functions: FUNCTIONS,
       firstYear: 2015,
+      comparisonYear: 2025,
       latestYear: 2025,
     });
 
@@ -890,11 +990,8 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
     expect(kpis()[0]!.value).toBe("400.0 მლნ ₾");
   });
 
-  it("names the municipality that is largest by publicTotalGel", () => {
-    // ბათუმი leads on publicTotalGel (300M vs თბილისი's 100M); თბილისი would
-    // lead if concentration were computed from functionalSumGel instead.
-    expect(kpis()[2]!.label).toBe("ბათუმის წილი");
-    expect(kpis()[2]!.label).not.toBe("თბილისის წილი");
+  it("computes the median from publicTotalGel", () => {
+    expect(kpis()[2]!.value).toBe("625 ₾");
   });
 
   it("shares the largest function against the official total", () => {
@@ -903,12 +1000,14 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
       { ...fact(2025, "municipal.education", 65), municipalityCode: "06" },
     ];
     const divergent = buildIndexKpis({
-      municipalities: MUNICIPALITIES,
+      municipalities: MUNICIPALITIES.slice(0, 1),
       totalFacts: [{ ...total(2025, 300, 265), municipalityCode: "04" }],
+      populationFacts: [populationFor("04", 1)],
       countryTotalFacts: countryTotalsFor([{ ...total(2025, 300, 265), municipalityCode: "04" }]),
       countryFunctionFacts: countryFunctionsFor(functionFacts),
       functions: FUNCTIONS,
       firstYear: 2025,
+      comparisonYear: 2025,
       latestYear: 2025,
     });
 

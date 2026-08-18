@@ -21,6 +21,7 @@ import {
 } from "../lib/data/municipal/importMunicipalFacts";
 import { loadAdjaraBudgetAdjustments } from "../lib/data/municipal/importAdjaraBudgetAdjustments";
 import { loadMunicipalitiesFile } from "../lib/data/municipal/municipalitiesFile";
+import { loadMunicipalPopulationFacts } from "../lib/data/municipal/importMunicipalPopulation";
 import {
   loadMunicipalFunctionsFile,
   loadMunicipalRegionsFile,
@@ -81,6 +82,9 @@ async function main() {
   const adjaraBudgetAdjustments = await loadAdjaraBudgetAdjustments(
     SERVED_DATA_FILES.municipalAdjaraBudgetAdjustments,
   );
+  const municipalPopulationFacts = await loadMunicipalPopulationFacts(
+    SERVED_DATA_FILES.municipalPopulationFacts,
+  );
   const report = buildImportReport("real-budget-2004-2025", facts);
   const missingGlossary = taxonomy.filter((item) => !glossary.has(item.id));
   const registeredSourceIds = new Set(sources.map((source) => source.sourceId));
@@ -112,6 +116,21 @@ async function main() {
     MUNICIPAL_YEARS,
   );
   const municipalCodes = new Set(municipalities.map((row) => row.code));
+  const populationCodes = municipalPopulationFacts.map((row) => row.municipalityCode);
+  const missingPopulationCodes = [...municipalCodes].filter((code) => !populationCodes.includes(code));
+  const unexpectedPopulationCodes = populationCodes.filter((code) => !municipalCodes.has(code));
+  if (
+    municipalPopulationFacts.length !== municipalities.length ||
+    new Set(populationCodes).size !== populationCodes.length ||
+    missingPopulationCodes.length > 0 ||
+    unexpectedPopulationCodes.length > 0
+  ) {
+    throw new Error(
+      `Municipal population 2025 panel mismatch; expected ${municipalities.length} unique rows; ` +
+        `missing: ${missingPopulationCodes.join(", ") || "none"}; ` +
+        `unexpected: ${unexpectedPopulationCodes.join(", ") || "none"}`,
+    );
+  }
   const regionIds = new Set(municipalRegions.map((region) => region.id));
   const municipalCategoryIds = new Set(municipalFunctions.map((entry) => entry.id));
   assertMunicipalCountryPanel({
@@ -164,6 +183,18 @@ async function main() {
   ).sort();
   if (unresolvedMunicipalSourceIds.length > 0) {
     throw new Error(`Municipal facts reference unknown source documents: ${unresolvedMunicipalSourceIds.join(", ")}`);
+  }
+  const unresolvedPopulationSourceIds = Array.from(
+    new Set(
+      municipalPopulationFacts
+        .map((fact) => fact.sourceId)
+        .filter((sourceId) => !registeredSourceIds.has(sourceId)),
+    ),
+  ).sort();
+  if (unresolvedPopulationSourceIds.length > 0) {
+    throw new Error(
+      `Municipal population facts reference unknown source documents: ${unresolvedPopulationSourceIds.join(", ")}`,
+    );
   }
 
   const expectedFunctionRows = municipalFunctions.length * municipalities.length * MUNICIPAL_YEARS.length;
@@ -236,6 +267,7 @@ async function main() {
   console.log(`Validated Georgia municipal function rows: ${countryFunctionFacts.length}`);
   console.log(`Validated Georgia municipal total rows: ${countryTotalFacts.length}`);
   console.log(`Validated Adjara budget adjustment rows: ${adjaraBudgetAdjustments.length}`);
+  console.log(`Validated municipal population rows: ${municipalPopulationFacts.length}`);
   console.log(`Validated municipalities: ${municipalities.length}`);
   console.log(`Validated municipality map polygons: ${municipalityGeometrySources.municipalities.features.length}`);
   console.log(`Validated taxonomy rows: ${taxonomy.length}`);

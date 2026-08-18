@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatShare, formatSignedAmount, UNIT_BN, UNIT_MLN } from "../../lib/explorer/format";
+import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatPerResidentGel, formatShare, formatSignedAmount, UNIT_BN, UNIT_MLN } from "../../lib/explorer/format";
 
 describe("editorial formatters", () => {
   it("formats billions with fixed decimals and en-US grouping", () => {
@@ -14,6 +14,11 @@ describe("editorial formatters", () => {
     expect(formatAmountParts(2_190_000_000, true)).toEqual({ num: "+2.19", unit: "მლრდ ₾" });
     expect(formatAmountParts(-450_000_000, true)).toEqual({ num: "−450.0", unit: "მლნ ₾" });
     expect(formatSignedAmount(2_190_000_000)).toBe("+2.19 მლრდ ₾");
+  });
+
+  it("formats per-resident amounts as rounded whole lari", () => {
+    expect(formatPerResidentGel(1_334.6)).toBe("1,335 ₾");
+    expect(formatPerResidentGel(null)).toBe("—");
   });
 
   it("formats shares with one decimal and a true minus sign", () => {

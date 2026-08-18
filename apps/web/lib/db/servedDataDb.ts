@@ -12,6 +12,7 @@ import {
   loadMunicipalitiesFromMirror,
   loadMunicipalRegionsFromMirror,
   loadMunicipalTotalFactsFromMirror,
+  loadMunicipalPopulationFactsFromMirror,
   loadNationalGdpFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "./mirrorRows";
@@ -52,6 +53,7 @@ export async function loadMunicipalDataFromDb(): Promise<MunicipalData> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
+    populationFacts,
   ] = await Promise.all([
     loadMunicipalFunctionsFromMirror(prisma),
     loadMunicipalRegionsFromMirror(prisma),
@@ -61,6 +63,7 @@ export async function loadMunicipalDataFromDb(): Promise<MunicipalData> {
     loadMunicipalCountryFunctionFactsFromMirror(prisma),
     loadMunicipalCountryTotalFactsFromMirror(prisma),
     loadMunicipalAdjaraBudgetAdjustmentsFromMirror(prisma),
+    loadMunicipalPopulationFactsFromMirror(prisma),
   ]);
 
   return {
@@ -72,5 +75,6 @@ export async function loadMunicipalDataFromDb(): Promise<MunicipalData> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
+    populationFacts,
   };
 }

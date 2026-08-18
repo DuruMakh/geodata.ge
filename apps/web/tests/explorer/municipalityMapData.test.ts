@@ -8,40 +8,55 @@ import {
 } from "../../lib/explorer/municipalityMapData";
 
 async function loadMapInput() {
-  const { municipalities, regions, totalFacts } = await loadServedMunicipalData();
+  const { municipalities, regions, totalFacts, populationFacts } = await loadServedMunicipalData();
   const year = Math.max(...totalFacts.map((row) => row.year));
   const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
-  const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year });
+  const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, populationFacts, year });
   return { municipalities, municipalityRows: list.municipalities };
 }
 
 describe("municipality map server composition", () => {
   it("joins every polygon and marker to a registered latest-year official total", async () => {
-    const { municipalities, regions, totalFacts } = await loadServedMunicipalData();
+    const { municipalities, regions, totalFacts, populationFacts } = await loadServedMunicipalData();
     const year = Math.max(...totalFacts.map((row) => row.year));
     const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
-    const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year });
+    const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, populationFacts, year });
     const model = buildMunicipalityMapModel({ municipalities, municipalityRows: list.municipalities });
 
     expect(model.viewBox).toBe("0 0 1000 540");
     expect(model.shapes).toHaveLength(60);
     expect(model.markers).toHaveLength(5);
     expect(model.occupiedAreas).toHaveLength(2);
-    expect(model.shapes.every((shape) => shape.valueGel > 0 && shape.bucket >= 0 && shape.bucket <= 5)).toBe(true);
-    expect(model.markers.every((marker) => marker.valueGel > 0)).toBe(true);
+    expect(model.shapes.every((shape) => shape.budgetPerResidentGel > 0 && shape.totalBudgetGel > 0 && shape.bucket >= 0 && shape.bucket <= 5)).toBe(true);
+    expect(model.markers.every((marker) => marker.budgetPerResidentGel > 0 && marker.totalBudgetGel > 0)).toBe(true);
+    expect(model.legendMinPerResidentGel).toBe(Math.min(...model.shapes.map((shape) => shape.budgetPerResidentGel)));
+    expect(model.legendMaxPerResidentGel).toBe(Math.max(...model.shapes.map((shape) => shape.budgetPerResidentGel)));
     expect(new Set([...model.shapes.map((shape) => shape.code), ...model.markers.map((marker) => marker.code)]).size).toBe(64);
   });
 
   it("rejects a missing latest-year municipality value", async () => {
-    const { municipalities, regions, totalFacts } = await loadServedMunicipalData();
+    const { municipalities, regions, totalFacts, populationFacts } = await loadServedMunicipalData();
     const year = Math.max(...totalFacts.map((row) => row.year));
     const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
-    const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year });
+    const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, populationFacts, year });
     const withoutZugdidi = list.municipalities.filter((row) => row.id !== "33");
 
     expect(() => buildMunicipalityMapModel({ municipalities, municipalityRows: withoutZugdidi })).toThrow(
       /missing latest-year official total.*33/i,
     );
+  });
+
+  it("assigns color buckets from budget per resident, not total budget", async () => {
+    const { municipalities, municipalityRows } = await loadMapInput();
+    const rows = municipalityRows.map((row) => ({
+      ...row,
+      valueGel: row.id === "04" ? 1 : row.id === "33" ? 100_000 : 1_000,
+      budgetPerResidentGel: row.id === "04" ? 100_000 : row.id === "33" ? 1 : 1_000,
+    }));
+    const model = buildMunicipalityMapModel({ municipalities, municipalityRows: rows });
+
+    expect(model.shapes.find((shape) => shape.code === "04")?.bucket).toBe(5);
+    expect(model.shapes.find((shape) => shape.code === "33")?.bucket).toBe(0);
   });
 
   it("keeps the generated artifact's Tbilisi duplicate and Zugdidi relation", () => {
@@ -76,7 +91,14 @@ describe("municipality map server composition", () => {
     const { municipalities, municipalityRows } = await loadMapInput();
     const rows = municipalityRows.map((row, index) => index === 0 ? { ...row, valueGel: Number.NaN } : row);
 
-    expect(() => buildMunicipalityMapModel({ municipalities, municipalityRows: rows })).toThrow(/invalid latest-year official total/i);
+    expect(() => buildMunicipalityMapModel({ municipalities, municipalityRows: rows })).toThrow(/invalid total budget/i);
+  });
+
+  it("rejects a non-finite municipality budget per resident", async () => {
+    const { municipalities, municipalityRows } = await loadMapInput();
+    const rows = municipalityRows.map((row, index) => index === 0 ? { ...row, budgetPerResidentGel: Number.NaN } : row);
+
+    expect(() => buildMunicipalityMapModel({ municipalities, municipalityRows: rows })).toThrow(/invalid budget per resident/i);
   });
 
   it("rejects duplicate municipality registry codes", async () => {

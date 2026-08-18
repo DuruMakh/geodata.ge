@@ -7,8 +7,9 @@ import {
   buildCountryListRow,
   buildMunicipalListRows,
   latestReviewedAtForMunicipalFacts,
+  MUNICIPAL_PER_RESIDENT_YEAR,
 } from "../../../lib/explorer/municipalData";
-import { formatAmount } from "../../../lib/explorer/format";
+import { formatPerResidentGel } from "../../../lib/explorer/format";
 import { buildMunicipalityMapModel } from "../../../lib/explorer/municipalityMapData";
 
 const TITLE = "მუნიციპალიტეტები — GeoData";
@@ -34,15 +35,19 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MunicipalitiesIndexPage() {
-  const { municipalities, regions, totalFacts, functionFacts, countryTotalFacts, countryFunctionFacts, functions, adjaraBudgetAdjustments } = await loadServedMunicipalData();
+  const { municipalities, regions, totalFacts, populationFacts, functionFacts, countryTotalFacts, countryFunctionFacts, functions, adjaraBudgetAdjustments } = await loadServedMunicipalData();
   const { sourceDocuments } = await loadServedLandingData();
 
   const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
   const firstYear = years[0]!;
   const latestYear = years.at(-1)!;
+  const comparisonYear = MUNICIPAL_PER_RESIDENT_YEAR;
+  if (!years.includes(comparisonYear)) {
+    throw new Error(`Municipal budget facts do not include comparison year ${comparisonYear}`);
+  }
   const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
 
-  const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear });
+  const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, populationFacts, adjaraBudgetAdjustments, year: comparisonYear });
   const map = buildMunicipalityMapModel({
     municipalities,
     municipalityRows: list.municipalities,
@@ -78,22 +83,24 @@ export default async function MunicipalitiesIndexPage() {
           shapes={map.shapes}
           markers={map.markers}
           occupiedAreas={map.occupiedAreas}
-          legendMin={formatAmount(map.legendMinGel)}
-          legendMax={formatAmount(map.legendMaxGel)}
+          legendMin={formatPerResidentGel(map.legendMinPerResidentGel)}
+          legendMax={formatPerResidentGel(map.legendMaxPerResidentGel)}
           municipalities={list.municipalities}
           regions={list.regions}
-          country={buildCountryListRow(countryTotalFacts, latestYear)}
+          country={buildCountryListRow(countryTotalFacts, comparisonYear)}
           kpis={buildIndexKpis({
             municipalities,
             totalFacts,
+            populationFacts,
             countryTotalFacts,
             countryFunctionFacts,
             functions,
             firstYear,
+            comparisonYear,
             latestYear,
           })}
-          latestYear={latestYear}
-          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). აჭარის რეგიონისა და საქართველოს ჯამებში დამატებულია აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივი გადასახდელები და გამოკლებულია მუნიციპალიტეტებზე გადაცემული ტრანსფერები. ფუნქციური სერიები კვლავ მუნიციპალურ ხარჯებს ასახავს. საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს; ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ საქართველოს ჯამშია და მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი; ამიტომ 11 რეგიონის ჯამები საქართველოს ჯამს არ უტოლდება.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          comparisonYear={comparisonYear}
+          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო); 2025 წლის მოსახლეობა — საქსტატი. აჭარის რეგიონისა და საქართველოს ჯამებში დამატებულია აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივი გადასახდელები და გამოკლებულია მუნიციპალიტეტებზე გადაცემული ტრანსფერები. ფუნქციური სერიები კვლავ მუნიციპალურ ხარჯებს ასახავს. საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს; ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ საქართველოს ჯამშია და მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი; ამიტომ 11 რეგიონის ჯამები საქართველოს ჯამს არ უტოლდება.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />
       </div>
     </main>

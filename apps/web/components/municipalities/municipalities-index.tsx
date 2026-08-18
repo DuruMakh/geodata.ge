@@ -3,20 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { MunicipalKpi, MunicipalListRow } from "../../lib/explorer/municipalData";
-import { formatAmount } from "../../lib/explorer/format";
+import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
 import { parseMunicipalLevel } from "../../lib/explorer/urlState";
 import { SourceNote, TabDivider, TextTab } from "../ui/editorial";
 import { MunicipalityMap } from "./municipality-map";
 
-type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinGel" | "legendMaxGel"> & {
+type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResidentGel" | "legendMaxPerResidentGel"> & {
   legendMin: string;
   legendMax: string;
   municipalities: MunicipalListRow[];
   regions: MunicipalListRow[];
   country: MunicipalListRow;
   kpis: MunicipalKpi[];
-  latestYear: number;
+  comparisonYear: number;
   sourceNote: string;
 };
 
@@ -80,8 +80,8 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
       <div data-testid="municipal-index-workspace" className="grid items-start gap-10 @min-[1100px]:grid-cols-[minmax(0,1fr)_336px]">
         <div className="min-w-0">
           <div className="flex items-baseline justify-between gap-3 border-b border-[var(--hairline)] pb-2">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-              მუნიციპალიტეტები რუკაზე · {props.latestYear}
+            <span data-testid="municipality-map-heading" className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+              ბიუჯეტი ერთ მოსახლეზე · {props.comparisonYear}
             </span>
           </div>
           <div className="mt-1.5">
@@ -191,7 +191,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                   onBlur={() => {
                     if (row.kind === "municipality") setListFocusCode(null);
                   }}
-                  className={`grid w-full grid-cols-[22px_minmax(0,1fr)_66px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] ${
+                  className={`grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] ${
                     row.kind === "municipality" && row.id === activeMunicipalityCode ? "bg-[var(--tint)]" : "bg-transparent"
                   }`}
                 >
@@ -211,8 +211,15 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                       />
                     </span>
                   </span>
-                  <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]">
-                    {formatAmount(row.valueGel)}
+                  <span className="min-w-0 text-right font-[family-name:var(--font-numeric)]">
+                    <span data-testid="municipal-row-primary-amount" className="block text-[11.5px]">
+                      {formatAmount(row.valueGel)}
+                    </span>
+                    {row.budgetPerResidentGel !== null ? (
+                      <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[12px] leading-[1.25] text-[var(--muted)]">
+                        {formatPerResidentGel(row.budgetPerResidentGel)} ერთ მოსახლეზე
+                      </span>
+                    ) : null}
                   </span>
                   <span aria-hidden className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">
                     →

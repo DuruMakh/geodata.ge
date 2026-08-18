@@ -7,7 +7,8 @@ export type MunicipalityMapShape = {
   code: string;
   nameKa: string;
   d: string;
-  valueGel: number;
+  totalBudgetGel: number;
+  budgetPerResidentGel: number;
   bucket: number;
 };
 
@@ -16,7 +17,8 @@ export type MunicipalityMapMarker = {
   nameKa: string;
   x: number;
   y: number;
-  valueGel: number;
+  totalBudgetGel: number;
+  budgetPerResidentGel: number;
 };
 
 export type MunicipalityMapOccupiedArea = {
@@ -29,8 +31,8 @@ export type MunicipalityMapModel = {
   shapes: MunicipalityMapShape[];
   markers: MunicipalityMapMarker[];
   occupiedAreas: MunicipalityMapOccupiedArea[];
-  legendMinGel: number;
-  legendMaxGel: number;
+  legendMinPerResidentGel: number;
+  legendMaxPerResidentGel: number;
 };
 
 type MunicipalityMapArtifact = {
@@ -177,13 +179,25 @@ export function buildMunicipalityMapModel({
     namesByCode.set(municipality.code, municipality.displayNameKa);
   }
 
-  const valuesByCode = new Map<string, number>();
+  const valuesByCode = new Map<string, { totalBudgetGel: number; budgetPerResidentGel: number }>();
   for (const row of municipalityRows) {
     if (row.kind !== "municipality") throw new Error(`Expected municipality row for ${row.id}`);
     if (!namesByCode.has(row.id)) throw new Error(`Unknown municipality row code ${row.id}`);
     if (valuesByCode.has(row.id)) throw new Error(`Duplicate municipality row code ${row.id}`);
-    if (!Number.isFinite(row.valueGel)) throw new Error(`Invalid latest-year official total for municipality ${row.id}`);
-    valuesByCode.set(row.id, row.valueGel);
+    if (!Number.isFinite(row.valueGel) || row.valueGel <= 0) {
+      throw new Error(`Invalid total budget for municipality ${row.id}`);
+    }
+    if (
+      row.budgetPerResidentGel === null ||
+      !Number.isFinite(row.budgetPerResidentGel) ||
+      row.budgetPerResidentGel <= 0
+    ) {
+      throw new Error(`Invalid budget per resident for municipality ${row.id}`);
+    }
+    valuesByCode.set(row.id, {
+      totalBudgetGel: row.valueGel,
+      budgetPerResidentGel: row.budgetPerResidentGel,
+    });
   }
 
   const mapCodes = new Set([
@@ -195,7 +209,7 @@ export function buildMunicipalityMapModel({
     if (!valuesByCode.has(code)) throw new Error(`Missing latest-year official total for municipality ${code}`);
   }
 
-  const valueFor = (code: string): number => {
+  const valueFor = (code: string): { totalBudgetGel: number; budgetPerResidentGel: number } => {
     const value = valuesByCode.get(code);
     if (value === undefined) throw new Error(`Missing latest-year official total for municipality ${code}`);
     return value;
@@ -206,7 +220,9 @@ export function buildMunicipalityMapModel({
     return name;
   };
 
-  const polygonValues = MUNICIPALITY_MAP_ARTIFACT.municipalityPaths.map((shape) => valueFor(shape.code));
+  const polygonValues = MUNICIPALITY_MAP_ARTIFACT.municipalityPaths.map(
+    (shape) => valueFor(shape.code).budgetPerResidentGel,
+  );
   const bucketOf = quantileBucket(polygonValues);
 
   return {
@@ -215,18 +231,20 @@ export function buildMunicipalityMapModel({
       code: shape.code,
       nameKa: nameFor(shape.code),
       d: shape.d,
-      valueGel: valueFor(shape.code),
-      bucket: bucketOf(valueFor(shape.code)),
+      totalBudgetGel: valueFor(shape.code).totalBudgetGel,
+      budgetPerResidentGel: valueFor(shape.code).budgetPerResidentGel,
+      bucket: bucketOf(valueFor(shape.code).budgetPerResidentGel),
     })),
     markers: MUNICIPALITY_MAP_ARTIFACT.cityMarkers.map((marker) => ({
       code: marker.code,
       nameKa: nameFor(marker.code),
       x: marker.x,
       y: marker.y,
-      valueGel: valueFor(marker.code),
+      totalBudgetGel: valueFor(marker.code).totalBudgetGel,
+      budgetPerResidentGel: valueFor(marker.code).budgetPerResidentGel,
     })),
     occupiedAreas: MUNICIPALITY_MAP_ARTIFACT.occupiedAreas.map((area) => ({ key: area.key, d: area.d })),
-    legendMinGel: Math.min(...polygonValues),
-    legendMaxGel: Math.max(...polygonValues),
+    legendMinPerResidentGel: Math.min(...polygonValues),
+    legendMaxPerResidentGel: Math.max(...polygonValues),
   };
 }

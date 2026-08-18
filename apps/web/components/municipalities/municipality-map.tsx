@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
-import { formatAmount } from "../../lib/explorer/format";
+import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
 
-type MunicipalityMapProps = Omit<MunicipalityMapModel, "legendMinGel" | "legendMaxGel"> & {
+type MunicipalityMapProps = Omit<MunicipalityMapModel, "legendMinPerResidentGel" | "legendMaxPerResidentGel"> & {
   legendMin: string;
   legendMax: string;
   activeCode: string | null;
@@ -17,15 +17,16 @@ function isActivationKey(key: string): boolean {
   return key === "Enter" || key === " ";
 }
 
-function accessibleName(nameKa: string, valueGel: number): string {
-  return `${nameKa} · ${formatAmount(valueGel)} · მუნიციპალიტეტის გახსნა`;
+function accessibleName(nameKa: string, budgetPerResidentGel: number, totalBudgetGel: number): string {
+  return `${nameKa} · ${formatPerResidentGel(budgetPerResidentGel)} ერთ მოსახლეზე · ${formatAmount(totalBudgetGel)} მთლიანი ბიუჯეტი · მუნიციპალიტეტის გახსნა`;
 }
 
 type InteractionTarget = {
   key: `shape:${string}` | `marker:${string}`;
   code: string;
   nameKa: string;
-  valueGel: number;
+  budgetPerResidentGel: number;
+  totalBudgetGel: number;
   element: SVGGraphicsElement;
 };
 
@@ -36,8 +37,8 @@ type TooltipPosition = {
 
 const HATCH_ID = "municipality-map-no-data-hatch";
 const TOOLTIP_ID = "municipality-map-tooltip";
-const TOOLTIP_WIDTH = 200;
-const TOOLTIP_HEIGHT = 50;
+const TOOLTIP_WIDTH = 220;
+const TOOLTIP_HEIGHT = 70;
 const TOOLTIP_GAP = 8;
 const TOOLTIP_EDGE = 6;
 
@@ -142,7 +143,7 @@ export function MunicipalityMap({
           ref={svgRef}
           viewBox={viewBox}
           role="group"
-          aria-label="საქართველოს მუნიციპალიტეტების ბიუჯეტის რუკა"
+          aria-label="საქართველოს მუნიციპალიტეტების 2025 წლის ბიუჯეტი ერთ მოსახლეზე"
           className="block h-auto w-full"
         >
           <defs>
@@ -175,7 +176,7 @@ export function MunicipalityMap({
                   vectorEffect="non-scaling-stroke"
                   tabIndex={0}
                   role="link"
-                  aria-label={accessibleName(shape.nameKa, shape.valueGel)}
+                  aria-label={accessibleName(shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel)}
                   aria-describedby={describedTarget?.key === `shape:${shape.code}` ? TOOLTIP_ID : undefined}
                   className="cursor-pointer"
                   onMouseEnter={(event) => {
@@ -183,7 +184,8 @@ export function MunicipalityMap({
                       key: `shape:${shape.code}`,
                       code: shape.code,
                       nameKa: shape.nameKa,
-                      valueGel: shape.valueGel,
+                      budgetPerResidentGel: shape.budgetPerResidentGel,
+                      totalBudgetGel: shape.totalBudgetGel,
                       element: event.currentTarget,
                     });
                   }}
@@ -193,7 +195,8 @@ export function MunicipalityMap({
                       key: `shape:${shape.code}`,
                       code: shape.code,
                       nameKa: shape.nameKa,
-                      valueGel: shape.valueGel,
+                      budgetPerResidentGel: shape.budgetPerResidentGel,
+                      totalBudgetGel: shape.totalBudgetGel,
                       element: event.currentTarget,
                     });
                   }}
@@ -228,7 +231,7 @@ export function MunicipalityMap({
                 vectorEffect="non-scaling-stroke"
                 tabIndex={0}
                 role="link"
-                aria-label={accessibleName(marker.nameKa, marker.valueGel)}
+                aria-label={accessibleName(marker.nameKa, marker.budgetPerResidentGel, marker.totalBudgetGel)}
                 aria-describedby={describedTarget?.key === `marker:${marker.code}` ? TOOLTIP_ID : undefined}
                 className="cursor-pointer"
                 onMouseEnter={(event) => {
@@ -236,7 +239,8 @@ export function MunicipalityMap({
                     key: `marker:${marker.code}`,
                     code: marker.code,
                     nameKa: marker.nameKa,
-                    valueGel: marker.valueGel,
+                    budgetPerResidentGel: marker.budgetPerResidentGel,
+                    totalBudgetGel: marker.totalBudgetGel,
                     element: event.currentTarget,
                   });
                 }}
@@ -246,7 +250,8 @@ export function MunicipalityMap({
                     key: `marker:${marker.code}`,
                     code: marker.code,
                     nameKa: marker.nameKa,
-                    valueGel: marker.valueGel,
+                    budgetPerResidentGel: marker.budgetPerResidentGel,
+                    totalBudgetGel: marker.totalBudgetGel,
                     element: event.currentTarget,
                   });
                 }}
@@ -286,21 +291,24 @@ export function MunicipalityMap({
             id={TOOLTIP_ID}
             role="tooltip"
             data-testid="municipality-map-tooltip"
-            className="pointer-events-none absolute z-[2] h-[50px] w-[200px] overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
+            className="pointer-events-none absolute z-[2] h-[70px] w-[220px] overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
             style={{ left: tooltipPosition.left, top: tooltipPosition.top }}
           >
-            <div className="flex items-center justify-between gap-2 text-[12px] font-medium text-[var(--ink)]">
-              <span className="truncate">{describedTarget.nameKa}</span>
-              <span aria-hidden>→</span>
+            <div className="truncate text-[12px] font-medium text-[var(--ink)]">
+              {describedTarget.nameKa}
             </div>
-            <div className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-              {formatAmount(describedTarget.valueGel)}
+            <div data-testid="municipality-map-tooltip-per-resident" className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
+              {formatPerResidentGel(describedTarget.budgetPerResidentGel)} ერთ მოსახლეზე
             </div>
+            <div data-testid="municipality-map-tooltip-total" className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
+              {formatAmount(describedTarget.totalBudgetGel)} მთლიანი ბიუჯეტი
+            </div>
+            <span aria-hidden className="absolute top-2 right-2.5 text-[12px] text-[var(--muted)]">→</span>
           </div>
         ) : null}
       </div>
 
-      <div className="mt-2 flex flex-wrap items-center gap-3.5 border-t border-[var(--hairline-soft)] pt-2.5">
+      <div data-testid="municipality-map-legend" className="mt-2 flex flex-wrap items-center gap-3.5 border-t border-[var(--hairline-soft)] pt-2.5">
         <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{legendMin}</span>
         <span className="flex flex-none">
           {MAP_RAMP.map((fill) => (
@@ -308,6 +316,7 @@ export function MunicipalityMap({
           ))}
         </span>
         <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{legendMax}</span>
+        <span className="text-[10px] text-[var(--faint)]">ერთ მოსახლეზე</span>
         <span className="inline-flex items-center gap-1.5">
           <span aria-hidden className="h-2.5 w-2.5 rounded-full border border-[var(--tile)] bg-[var(--positive)]" />
           <span className="text-[11px] text-[var(--faint)]">თვითმმართველი ქალაქები</span>

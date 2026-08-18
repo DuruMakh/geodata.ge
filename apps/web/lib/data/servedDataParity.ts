@@ -36,6 +36,13 @@ export function municipalTotalFactParityKey(row: {
   return [row.year, row.municipalityCode].join(":");
 }
 
+export function municipalPopulationFactParityKey(row: {
+  year: number;
+  municipalityCode: string;
+}): string {
+  return [row.year, row.municipalityCode].join(":");
+}
+
 export function adjaraBudgetAdjustmentParityKey(row: {
   year: number;
   scopeId: string;

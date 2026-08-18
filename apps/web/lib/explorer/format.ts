@@ -45,6 +45,12 @@ export function formatSignedAmount(value: number | null | undefined): string {
   return `${parts.num} ${parts.unit}`;
 }
 
+/** Budget per resident in whole lari, e.g. "1,335 ₾". */
+export function formatPerResidentGel(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return MISSING;
+  return `${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value)} ₾`;
+}
+
 /** Percentage from a fraction, `decimals` digits (default 1); "−" minus; optional "+" for positives. */
 export function formatShare(fraction: number | null | undefined, signed = false, decimals = 1): string {
   if (fraction === null || fraction === undefined || !Number.isFinite(fraction)) return MISSING;
