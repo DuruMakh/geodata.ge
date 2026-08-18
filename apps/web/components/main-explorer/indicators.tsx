@@ -232,7 +232,6 @@ export function Indicators({ model, scope }: IndicatorsProps) {
 
       <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
         <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">პერიოდის შედარება</h3>
-        <p className="mb-3 text-xs text-[var(--muted)]">საწყისი მნიშვნელობა, ცვლილება და საბოლოო მნიშვნელობა (მლრდ ₾)</p>
         <table className="w-full table-fixed border-collapse">
           <colgroup>
             <col className="w-[44%]" />

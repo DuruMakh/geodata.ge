@@ -12,7 +12,7 @@ import type { SourceDocumentRow } from "../data/sources";
 import { MIXED_SOURCE_ID } from "../data/municipal/aggregateMunicipalFacts";
 import type { ExplorerTableRow, SourceMetadata } from "./types";
 import { colorForItem, INK } from "./colors";
-import { formatAmount, formatPerResidentGel, formatShare, MISSING } from "./format";
+import { formatAmount, formatAmountParts, formatPerResidentGel, formatShare, MISSING } from "./format";
 import { georgianOrdinal } from "./municipalLabels";
 
 // Model layer for the municipalities section.
@@ -357,7 +357,7 @@ export function regionFactsFor(
   };
 }
 
-export type MunicipalKpi = { label: string; value: string; detail: string };
+export type MunicipalKpi = { label: string; value: string; unit?: string; detail: string };
 
 export type MunicipalIndexKpiInput = {
   municipalities: Municipality[];
@@ -454,6 +454,15 @@ export type MunicipalEntityKpiInput = {
   rankOutOf: number;
 };
 
+export type MunicipalIndicatorPresentationMetrics =
+  | { kind: "ranked"; nationalTotalByYear: Record<number, number> }
+  | { kind: "country"; budgetCount: number };
+
+export type MunicipalIndicatorPresentation = {
+  headline: { start: number | null; end: number | null; change: number | null; cagr: number | null };
+  sideSeries: Array<Array<number | null>>;
+};
+
 /**
  * Rows ordered by end-year value, descending, missing/undefined treated as 0.
  * Shared by `buildEntityKpis` (finding the largest row) and
@@ -470,6 +479,43 @@ function sortedByEndYear(rows: ExplorerTableRow[], endYear: number | undefined):
     );
 }
 
+/** Raw values for the municipal indicators' headline and three side trends. */
+export function buildMunicipalIndicatorPresentation(
+  model: MunicipalEntityModel,
+  metrics: MunicipalIndicatorPresentationMetrics,
+): MunicipalIndicatorPresentation {
+  const startYear = model.years[0];
+  const endYear = model.years.at(-1);
+  const start = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
+  const end = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
+  const largest = sortedByEndYear(model.rows, endYear)[0];
+  const largestShare = model.years.map((year) => {
+    const value = largest?.valuesByYear[year] ?? null;
+    const total = model.totalRow.valuesByYear[year] ?? null;
+    return value === null || total === null || total <= 0 ? null : value / total;
+  });
+  const thirdSeries =
+    metrics.kind === "country"
+      ? model.years.map(() => metrics.budgetCount)
+      : model.years.map((year) => {
+          const total = model.totalRow.valuesByYear[year] ?? null;
+          const nationalTotal = metrics.nationalTotalByYear[year] ?? null;
+          return total === null || nationalTotal === null || nationalTotal <= 0 ? null : total / nationalTotal;
+        });
+
+  return {
+    headline: {
+      start,
+      end,
+      change: changeBetween(start, end),
+      cagr: start !== null && end !== null && start > 0 && end > 0 && endYear !== undefined && startYear !== undefined && endYear > startYear
+        ? (end / start) ** (1 / (endYear - startYear)) - 1
+        : null,
+    },
+    sideSeries: [model.years.map((year) => model.totalRow.valuesByYear[year] ?? null), largestShare, thirdSeries],
+  };
+}
+
 /** The four entity KPIs, for both municipality and region pages. */
 export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] {
   const { model, nationalTotalByYear } = input;
@@ -478,6 +524,7 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
 
   const officialStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
   const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
+  const officialEndParts = formatAmountParts(officialEnd);
   const nationalEnd = endYear === undefined ? 0 : nationalTotalByYear[endYear] ?? 0;
   const growth = changeBetween(officialStart, officialEnd);
   const rank = endYear === undefined ? 0 : input.rankByYear[endYear] ?? 0;
@@ -488,7 +535,8 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
   return [
     {
       label: "ოფიციალური ბიუჯეტი",
-      value: formatAmount(officialEnd),
+      value: officialEndParts.num,
+      unit: officialEndParts.unit,
       detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
     },
     {
@@ -508,11 +556,10 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
     {
       label: "წილი მუნიციპალურ ხარჯებში",
       value: nationalEnd > 0 && officialEnd !== null ? formatShare(officialEnd / nationalEnd) : MISSING,
-      // `detail` is this municipality's ordinal RANK among all municipalities —
-      // not a per-capita figure. It stands in for the per-capita KPI the
-      // reference design used (§6.4): rank is size-independent without needing
-      // the population data this project does not have. Per-capita is an
-      // explicit v1 exclusion; do not reintroduce it here.
+      // `detail` is this municipality's ordinal rank for the selected period.
+      // The index has a separate fixed-2025 per-resident comparison, so this
+      // selected-range KPI remains rank rather than implying population
+      // coverage across every year in the range.
       detail: `${georgianOrdinal(rank)} ადგილი ${input.rankOutOf}-დან`,
     },
   ];
@@ -524,6 +571,7 @@ export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: numbe
   const endYear = model.years.at(-1);
   const officialStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
   const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
+  const officialEndParts = formatAmountParts(officialEnd);
   const growth = changeBetween(officialStart, officialEnd);
   const largest = sortedByEndYear(model.rows, endYear)[0];
   const largestValue = largest && endYear !== undefined ? largest.valuesByYear[endYear] ?? 0 : 0;
@@ -531,7 +579,8 @@ export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: numbe
   return [
     {
       label: "ოფიციალური ბიუჯეტი",
-      value: formatAmount(officialEnd),
+      value: officialEndParts.num,
+      unit: officialEndParts.unit,
       detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
     },
     {

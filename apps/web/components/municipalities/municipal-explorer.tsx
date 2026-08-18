@@ -9,6 +9,7 @@ import {
   buildComparisonRows,
   buildCountryKpis,
   buildEntityKpis,
+  buildMunicipalIndicatorPresentation,
   buildMovers,
   buildMunicipalEntityModel,
   getDefaultMunicipalSelection,
@@ -117,6 +118,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
   );
 
   const years = model.years;
+  const kpis =
+    metrics.kind === "country"
+      ? buildCountryKpis(model, metrics.budgetCount)
+      : buildEntityKpis({ model, ...metrics });
+  const presentation = buildMunicipalIndicatorPresentation(model, metrics);
   const selectableRows = useMemo(() => [model.totalRow, ...model.rows], [model]);
   const series: ChartSeries[] = selectableRows
     .filter((row) => state.selectedIds.includes(row.itemId))
@@ -364,11 +370,8 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       {/* All three derive from the RANGE model, so they move together with
           the chart instead of describing a span the user is not looking at. */}
       <MunicipalIndicators
-        kpis={
-          metrics.kind === "country"
-            ? buildCountryKpis(model, metrics.budgetCount)
-            : buildEntityKpis({ model, ...metrics })
-        }
+        kpis={kpis}
+        presentation={presentation}
         movers={buildMovers(model)}
         comparison={buildComparisonRows(model)}
         startYear={state.range.start}

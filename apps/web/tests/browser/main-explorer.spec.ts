@@ -71,6 +71,7 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   await expect(page.getByTestId("period-kpi-cards")).toContainText("პერიოდის ცვლილება");
   await expect(page.getByTestId("period-movers")).toContainText("ყველაზე მზარდი");
   await expect(page.getByTestId("period-comparison")).toContainText("პერიოდის შედარება");
+  await expect(page.getByTestId("period-comparison")).not.toContainText("საწყისი მნიშვნელობა, ცვლილება და საბოლოო მნიშვნელობა (მლრდ ₾)");
   const comparison = page.getByTestId("period-comparison");
   const availableSeries = page.getByTestId("series-selector").getByTestId("series-row");
   await expect(comparison.locator("tbody tr")).toHaveCount(await availableSeries.count());
@@ -251,6 +252,7 @@ test("revenue nav reuses the identical system without a grouping switch", async 
   await expect(page.getByTestId("series-selector")).toContainText("დამატებული ღირებულების გადასახადი");
   await expect(page.getByTestId("source-label")).toContainText("შემოსავლების მონაცემები: 2005–2025");
   await expectLineChartRendered(page);
+  await expect(page.getByTestId("period-comparison")).not.toContainText("საწყისი მნიშვნელობა, ცვლილება და საბოლოო მნიშვნელობა (მლრდ ₾)");
 
   expect(consoleProblems).toEqual([]);
 });
