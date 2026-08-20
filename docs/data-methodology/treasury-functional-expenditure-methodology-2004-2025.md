@@ -1,6 +1,6 @@
 # Georgia State Budget — Treasury Functional Expenditure: Complete Data Methodology (2004–2025)
 
-Status: complete and reconciled. Landed on `main` 2026-07-05.
+Status: complete and reconciled; the 2004 extension was reviewed on 2026-08-20.
 
 This is the authoritative, standalone methodology for the functional-classification
 expenditure series in GeoData.ge — the treasury "ფუნქციონალურ ჭრილში დანახარჯები"
@@ -371,8 +371,8 @@ COVID surge 2020–2021), confirming a single consistent concept across the seri
   more than 1,000 GEL.
 - **Regression pins:** all 22 detailed years pinned in
   `apps/web/tests/data/pipelineIntegration.test.ts`.
-- **Test suite:** 222 tests pass, including referential integrity (every fact's source is
-  catalogued) and the coverage/no-negative/complete-panel checks.
+- **Test suite:** the repository's complete automated suite covers referential integrity
+  (every fact's source is catalogued), coverage, non-negative values, and complete panels.
 
 ---
 
@@ -440,10 +440,11 @@ file ends with `%%EOF`.
 
 ## 13. Document provenance
 
-Compiled 2026-07-05 from the reviewed, landed state of `main` (commit `17b0b66`),
-consolidating this project's per-era methodology notes, the source catalog, the extraction
-and mapping code, the regression pins, and the pre-landing grounding review. To export to
-Word or PDF for external distribution: `pandoc treasury-functional-expenditure-methodology-2004-2025.md -o methodology.docx`.
+Originally compiled 2026-07-05 for the reviewed 2005–2025 corpus at commit `17b0b66`,
+consolidating this project's per-era methodology notes, source catalog, extraction and mapping
+code, regression pins, and grounding review. Updated and revalidated on 2026-08-20 when the
+complete reviewed 2004 state-budget annex was added. To export to Word or PDF for external
+distribution: `pandoc treasury-functional-expenditure-methodology-2004-2025.md -o methodology.docx`.
 
 Historical changelog 2026-07-13: published facts CSVs were renamed `expenditure-facts-2004-2025.csv` / `budget-facts-2004-2025.csv` → `*-2005-2025.csv` because the then-served files contained 2005–2025 rows only. On 2026-08-20, complete reviewed 2004 expenditure facts were added and the current served filenames returned to `*-2004-2025.csv`.
 

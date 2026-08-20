@@ -7,7 +7,8 @@ with its date and rationale. The parent dataset (categories, sources, extraction
 is documented in `ministries-expenditure-methodology.md`; this document goes deep on §7 of that
 file and supersedes it wherever they disagree.
 
-Last reviewed: 2026-07-09 (program-succession continuity shipped; full suite 295 tests pass).
+Last reviewed: 2026-08-20 (program-succession continuity remains unchanged; the 2004 extension
+adds institution totals only and no program rows).
 
 ---
 

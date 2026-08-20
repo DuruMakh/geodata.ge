@@ -102,6 +102,7 @@ describe("admin spending facts", () => {
     expect(facts2004.filter((fact) => fact.level === "major_program")).toHaveLength(0);
     expect(report.sourceTotalGelByYear[2004]).toBe(1_930_210_300);
     expect(report.categoryTotalGelByYear[2004]).toBe(1_930_210_400);
+    expect(report.reconciliationDifferenceGelByYear[2004]).toBe(100);
     expect(report.reconciliationStatusByYear[2004]).toBe("passed");
   }, 30_000);
 
@@ -121,9 +122,7 @@ describe("admin spending facts", () => {
     expect(syntheticSplits2004).toHaveLength(5);
     expect(deliveredReport.sourceTotalGelByYear[2004]).toBe(1_930_210_300);
     expect(deliveredReport.categoryTotalGelByYear[2004]).toBe(1_930_210_400);
-    expect(
-      deliveredReport.categoryTotalGelByYear[2004] - deliveredReport.sourceTotalGelByYear[2004],
-    ).toBe(100);
+    expect(deliveredReport.reconciliationDifferenceGelByYear[2004]).toBe(100);
     expect(facts.filter((fact) => fact.year === 2004 && fact.level === "major_program")).toHaveLength(0);
   }, 30_000);
 

@@ -496,16 +496,22 @@ document, and why classification is validated separately (below).
 ### 8.2 Validation report
 `npm run data:validate` regenerates the facts and writes
 `data/reports/admin-spending-2004-2025-report.json`: rows, per-year reconciliation status,
-unclassified amounts, and warnings. It exits non-zero on any breach.
+source and category totals, and the signed category-minus-source reconciliation difference for
+every year. For 2004 that difference is explicitly `100` GEL, documenting the accepted rounding
+exception. Validation exits non-zero on any breach.
 
-### 8.3 Full validation (2026-07-06)
-An 8-dimension audit (reconciliation, series anomaly-scan, 2017–2025 baseline integrity, backfill
-classification, the owner-approved changes, drill-down coherence, requirements conformance,
-provenance) with every finding adversarially re-derived. Result: **the dataset conforms to the v1
-requirements.** All core requirements pass — reconciliation / no silent drops, unclassified →
-`other_costs`, stable ASCII IDs, `actual` basis, contiguous 2004–2025 category coverage, names-only
-selectable drill-down, and CSV source/basis metadata. The audit's one finding — 6 recycled codes
-leaking pre-2017 spend into modern series — was fixed (§7.4) and locked with a guard test.
+### 8.3 Validation history
+The 2026-07-06 eight-dimension audit covered the then-current 2005–2025 corpus: reconciliation,
+series anomaly scanning, 2017–2025 baseline integrity, backfill classification, owner-approved
+changes, drill-down coherence, requirements conformance, and provenance. Its one finding — six
+recycled codes leaking pre-2017 spend into modern series — was fixed (§7.4) and locked with a
+guard test.
+
+On 2026-08-20 the same gates were rerun for the 2004 extension. The complete dataset passed the
+v1 requirements: reconciliation and no silent drops, stable ASCII IDs, `actual` basis, contiguous
+2004–2025 category coverage, no fabricated 2004 major programs, names-only selectable drill-down,
+and CSV source/basis metadata. The 2004 administrative total's signed `100` GEL difference from
+the printed state-budget total is retained explicitly as source-table rounding.
 
 ---
 
