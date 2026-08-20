@@ -79,8 +79,8 @@ test("methodology hub separates live datasets from future markers", async ({ pag
   await expect(page.getByTestId("methodology-live-row")).toHaveCount(3);
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(4);
   await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
-  await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2005–2025/);
-  await expect(page.getByTestId("methodology-live-row").first()).toContainText(/77/);
+  await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
+  await expect(page.getByTestId("methodology-live-row").first()).toContainText(/79/);
 });
 
 test("sitemap publishes exactly the four live methodology routes", async ({ page }) => {
@@ -157,8 +157,11 @@ test("expenditure methodology exposes the complete layered article", async ({ pa
   await expect(page.getByRole("heading", { level: 1 })).toContainText("ხარჯები");
   await expect(page.getByTestId("methodology-disclosure")).toContainText("GeoData");
   await expect(page.getByTestId("method-journey-step")).toHaveCount(4);
-  await expect(page.getByTestId("decision-record")).toContainText("2004");
-  await expect(page.getByTestId("source-archive-row")).toHaveCount(77);
+  await expect(page.getByTestId("decision-record")).toContainText("2004–2025");
+  await expect(page.getByTestId("decision-record")).toContainText("1,930,210,300");
+  await expect(page.getByTestId("decision-record")).toContainText("ცენტრალური ბიუჯეტი");
+  await expect(page.getByTestId("decision-record")).toContainText("არ ქვეყნდება");
+  await expect(page.getByTestId("source-archive-row")).toHaveCount(79);
 
   const archiveLink = page
     .getByRole("navigation", { name: "გვერდის სარჩევი" })
@@ -210,7 +213,7 @@ test("source archives keep provenance metadata out of every public table", async
 test("dataset articles omit the public methodology blocks requested for simplification", async ({ page }) => {
   await page.goto("http://localhost:3100/methodology/expenditure");
   await expect(page.getByRole("heading", { name: "ისტორიული გადაწყვეტილებები" })).toHaveCount(0);
-  await expect(page.getByTestId("decision-record")).toContainText("2004");
+  await expect(page.getByTestId("decision-record")).toContainText("2004–2025");
 
   await page.goto("http://localhost:3100/methodology/revenue");
   await expect(page.getByRole("heading", { name: "ვალიდაცია" })).toHaveCount(0);

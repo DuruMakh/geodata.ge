@@ -14,7 +14,7 @@ A Georgian-first public budget explorer for understanding Georgia's national bud
 
 GeoData.ge is a long-term public data platform idea, but v1 is intentionally narrow: Georgia Budget Explorer.
 
-The first version focuses on annual national budget data for 2005-2025, including revenue, tax revenue, and expenditure by public spending fields. Both sides start in 2005: the project does not have reviewed 2004 sources in the served datasets (the available 2004 treasury expenditure source is central-budget scoped). The product should help users understand where public money comes from, where it goes, and how the structure changes over time.
+The first version focuses on annual national budget data: expenditure by public spending fields and ministries covers 2004-2025, while revenue and tax revenue cover 2005-2025. The 2004 expenditure series uses the reviewed full state-budget execution annex; the separate Treasury E11 PDF is central-budget scoped and is not served. The product should help users understand where public money comes from, where it goes, and how the structure changes over time.
 
 This v1 scope is deliberate. A narrow, high-quality budget explorer is more valuable than a broad but shallow data catalog.
 
@@ -22,12 +22,12 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 
 ### Included
 
-- Annual budget data for 2005-2025 for both expenditure and revenue.
+- Annual expenditure data for 2004-2025 and annual revenue data for 2005-2025.
 - Revenue overview and major tax revenue categories.
 - Expenditure overview using public-friendly spending fields such as health, education, social protection, defence, infrastructure, and similar categories.
 - Multi-year explorer with line and table views.
 - National revenue and expenditure multi-year explorers can show each series as a share of same-year nominal GDP at current prices. The reviewed annual denominator covers 1996-2025; the canonical handoff uses SNA 1993 through 2009 and SNA 2008 from 2010. This supports `% მშპ-ში` inside the budget explorers only: it does not create a separate GDP explorer or make the future GDP methodology marker live. Municipal shares and single-year composition shares remain shares of their applicable budget total.
-- Multi-year expenditure grouping by public spending fields or by ministries/major programs (ministries data exists for 2005-2025, with major-program drill-down rows partial from 2012 and contiguous 2017-2025); this is series selection, not drilldown.
+- Multi-year expenditure grouping by public spending fields or by ministries/major programs (ministries data exists for 2004-2025; 2004 has no major-program rows, while later drill-down rows are partial from 2012 and contiguous 2017-2025); this is series selection, not drilldown.
 - Single-year snapshot with headline cards, treemap, Every 100 GEL, Budget Radar, Budget Field, and full ranking.
 - Municipal annual expenditure data for 2015-2025: ten main functional categories plus the public total headline. The public entity set remains 64 municipality pages and 11 region roll-up pages under `/explorer/municipalities`. The 2025 index map uses the reviewed 1 January 2025 Geostat population denominator to color municipalities by budget per resident; municipality and region lists remain ranked by total budget and show per-resident values only as supporting context, and one KPI reports the 64-municipality median. Adjara's regional total consolidates its six municipalities with Adjara Autonomous Republic actual payments and removes transfers from the republic to territorial budgets. The explicit `/explorer/municipalities/georgia` page starts from all 69 reviewed municipal-budget series and adds the same net Adjara republican amount once. Codes `05`, `42`, `43`, `46`, and `64` remain country-aggregate-only because their budgets are not territorially attributable spending inside the named municipalities. The Georgia row has no per-resident value. The ten functional series remain municipal-only because no reviewed comparable Adjara republican function crosswalk exists; no residual or proportional allocation is invented. Municipality and region ranks remain out of 64 and 11 respectively. Methodology: `docs/data-methodology/municipal-functional-annual-2015-2025.md` and `docs/data-methodology/municipal-population-regional-gdp.md`.
 - `მალე` markers for named future datasets (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` in the sidebar). Labels only: no routes, not clickable, no data.

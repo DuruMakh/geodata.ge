@@ -69,7 +69,7 @@ import {
 loadEnv({ path: ".env.local", quiet: true });
 loadEnv({ path: ".env", quiet: true });
 
-const IMPORT_LABEL = "real-budget-2005-2025";
+const IMPORT_LABEL = "real-budget-2004-2025";
 const TAXONOMY_DIR = "../../data/taxonomy";
 const MAPPINGS_FILE = "../../data/mappings/spending-field-mapping.csv";
 

@@ -1,4 +1,17 @@
 year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,official_label_ka,official_institution_code,official_institution_label_ka,mapping_confidence,mapping_notes
+2004,admin_spending.culture,,admin_category,22040700,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.debt_service,,admin_category,291350100,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.defence,,admin_category,172009000,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.economy_sustainable_development,,admin_category,248501200,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.education_science_youth,,admin_category,67676700,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.environment_agriculture,,admin_category,76706200,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.finance,,admin_category,79007600,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.foreign_affairs,,admin_category,36959400,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.health_social_affairs,,admin_category,478506500,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.internal_affairs,,admin_category,150182500,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.justice,,admin_category,22559100,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.other_costs,,admin_category,277845400,actual,source.mof_2004_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.sport,,admin_category,6866000,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.culture,,admin_category,24630200,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.debt_service,,admin_category,282040400,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.defence,,admin_category,366765000,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.

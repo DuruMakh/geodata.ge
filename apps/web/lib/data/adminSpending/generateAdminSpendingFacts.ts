@@ -481,7 +481,20 @@ function addAmount(map: Map<string, number>, key: string, amount: number): void 
 }
 
 function leafRows(rows: OfficialExpenditureRow[]): OfficialExpenditureRow[] {
-  return rows.filter((row) => row.code && row.isLeafCode && !row.isTotal && row.actualThousandGel > 0);
+  const splitParentKeys = new Set(
+    rows
+      .filter((row) => row.code && !row.isCodedRow && row.isLeafCode && row.parentCode)
+      .map((row) => `${row.year}|${row.parentCode}`),
+  );
+
+  return rows.filter(
+    (row) =>
+      row.code &&
+      row.isLeafCode &&
+      !row.isTotal &&
+      row.actualThousandGel > 0 &&
+      !(row.isCodedRow && splitParentKeys.has(`${row.year}|${row.code}`)),
+  );
 }
 
 function programRows(rows: OfficialExpenditureRow[]): OfficialExpenditureRow[] {
@@ -577,6 +590,7 @@ export function buildAdminSpendingReport(
   const years = Array.from(new Set(rows.map((row) => row.year))).sort((a, b) => a - b);
   const sourceTotalGelByYear: Record<number, number> = {};
   const categoryTotalGelByYear: Record<number, number> = {};
+  const reconciliationDifferenceGelByYear: Record<number, number> = {};
   const reconciliationStatusByYear: Record<number, "passed" | "failed"> = {};
 
   for (const row of rows.filter((sourceRow) => sourceRow.isTotal)) {
@@ -590,8 +604,11 @@ export function buildAdminSpendingReport(
   for (const year of years) {
     const sourceTotal = sourceTotalGelByYear[year] ?? 0;
     const categoryTotal = categoryTotalGelByYear[year] ?? 0;
+    reconciliationDifferenceGelByYear[year] = categoryTotal - sourceTotal;
     reconciliationStatusByYear[year] =
-      Math.abs(sourceTotal - categoryTotal) <= ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL ? "passed" : "failed";
+      Math.abs(reconciliationDifferenceGelByYear[year]) <= ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL
+        ? "passed"
+        : "failed";
   }
 
   return {
@@ -604,6 +621,7 @@ export function buildAdminSpendingReport(
     reconciliationToleranceGel: ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL,
     sourceTotalGelByYear,
     categoryTotalGelByYear,
+    reconciliationDifferenceGelByYear,
     reconciliationStatusByYear,
   };
 }

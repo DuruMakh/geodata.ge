@@ -1,4 +1,17 @@
 year,side,item_id,amount_gel,basis,source_id,official_institution,official_program,official_subprogram,public_spending_field_id,mapping_confidence,mapping_notes
+2004,expenditure,spending.agriculture_environment,29177400,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.agriculture_environment,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.culture,32346500,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.culture,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.debt_service,291350100,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.debt_service,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.defence,158749000,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.defence,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.economic_affairs,84711200,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.economic_affairs,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.education,65292000,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.education,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.general_public_services,301711000,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.general_public_services,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.health,147362300,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.health,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.infrastructure_regional_development,198443800,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.infrastructure_regional_development,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.other_unclassified,12510400,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.other_unclassified,medium,Complete state-budget parent mapped under the reviewed old-classification rules; -100 GEL source-table rounding reconciliation retained in the residual; see review CSV.
+2004,expenditure,spending.public_order_safety,237432900,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.public_order_safety,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.social_protection,364257700,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.social_protection,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
+2004,expenditure,spending.sport,6866000,actual,source.mof_2004_expenditure_full_state_functional_actual,Old 14-group functional classification — complete state budget,,,spending.sport,medium,Complete state-budget parent mapped under the reviewed old-classification rules; see review CSV.
 2005,expenditure,spending.agriculture_environment,51441500,actual,source.mof_2005_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.agriculture_environment,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
 2005,expenditure,spending.culture,34832400,actual,source.mof_2005_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.culture,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
 2005,expenditure,spending.debt_service,282043800,actual,source.mof_2005_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.debt_service,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
@@ -12,17 +25,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2005,expenditure,spending.public_order_safety,267933500,actual,source.mof_2005_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.public_order_safety,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
 2005,expenditure,spending.social_protection,531898000,actual,source.mof_2005_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.social_protection,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
 2005,expenditure,spending.sport,6915100,actual,source.mof_2005_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.sport,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
-2005,revenue,revenue.asset_decrease,419407849,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 030000000000: old fixed-width revenue classification
-2005,revenue,revenue.excise_tax,275233685,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 010400000000: old fixed-width revenue classification
-2005,revenue,revenue.grants,54890302,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 040000000000: old fixed-width revenue classification
-2005,revenue,revenue.import_tax,123405192,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 010500000000: old fixed-width revenue classification
-2005,revenue,revenue.income_tax,290685017,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 010100000000: old fixed-width revenue classification
-2005,revenue,revenue.increase_liabilities,85316805,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 050000000000: old fixed-width revenue classification
-2005,revenue,revenue.other_revenue,313058595,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 020000000000: old fixed-width revenue classification
-2005,revenue,revenue.other_taxes,469120689,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 010700000000 + 010800000000 + 010900000000 + 011000000000 + 011100000000 + 012500000000 + 012600000000 + 012700000000 + 012800000000 + 012900000000 + 013100000000 + 013200000000 + 013300000000 + 014000000000 + 014100000000 + 014500000000: old fixed-width revenue classification
-2005,revenue,revenue.profit_tax,210301232,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 010200000000: old fixed-width revenue classification
-2005,revenue,revenue.property_tax,60372728,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 010600000000 + 013000000000: old fixed-width revenue classification
-2005,revenue,revenue.vat,987431734,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 010300000000: old fixed-width revenue classification
 2006,expenditure,spending.agriculture_environment,75780985,actual,source.mof_2006_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.agriculture_environment,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
 2006,expenditure,spending.culture,70953216,actual,source.mof_2006_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.culture,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
 2006,expenditure,spending.debt_service,334908609,actual,source.mof_2006_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.debt_service,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
@@ -36,17 +38,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2006,expenditure,spending.public_order_safety,369005656,actual,source.mof_2006_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.public_order_safety,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
 2006,expenditure,spending.social_protection,622664712,actual,source.mof_2006_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.social_protection,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
 2006,expenditure,spending.sport,982329,actual,source.mof_2006_expenditure_functional_old_classification_actual,Old 14-group functional classification,,,spending.sport,medium,Pre-COFOG old-classification group mapped to public category; see old-classification review CSV.
-2006,revenue,revenue.asset_decrease,564458259,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 030000000000: old fixed-width revenue classification
-2006,revenue,revenue.excise_tax,335622390,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010400000000: old fixed-width revenue classification
-2006,revenue,revenue.grants,131872214,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 040000000000: old fixed-width revenue classification
-2006,revenue,revenue.import_tax,132366209,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010500000000: old fixed-width revenue classification
-2006,revenue,revenue.income_tax,385945388,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010100000000: old fixed-width revenue classification
-2006,revenue,revenue.increase_liabilities,170501437,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 050000000000: old fixed-width revenue classification
-2006,revenue,revenue.other_revenue,519108357,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 020000000000: old fixed-width revenue classification
-2006,revenue,revenue.other_taxes,538500324,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010700000000 + 010800000000 + 010900000000 + 011000000000 + 011100000000 + 012500000000 + 012600000000 + 012700000000 + 012800000000 + 012900000000 + 013100000000 + 013300000000 + 014000000000 + 014100000000 + 014500000000: old fixed-width revenue classification
-2006,revenue,revenue.profit_tax,341070394,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010200000000: old fixed-width revenue classification
-2006,revenue,revenue.property_tax,85820217,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010600000000 + 013000000000: old fixed-width revenue classification
-2006,revenue,revenue.vat,1332651137,actual,source.mof_2006_revenue_form1_pdf,,,,,,Source rows 010300000000: old fixed-width revenue classification
 2007,expenditure,spending.agriculture_environment,155062944,actual,source.mof_2007_expenditure_functional_actual,Multiple official rows,,,spending.agriculture_environment,high,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 0
 2007,expenditure,spending.culture,58391145,actual,source.mof_2007_expenditure_functional_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 0
 2007,expenditure,spending.debt_service,252992479,actual,source.mof_2007_expenditure_functional_actual,Multiple official rows,,,spending.debt_service,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
@@ -60,17 +51,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2007,expenditure,spending.public_order_safety,684454476,actual,source.mof_2007_expenditure_functional_actual,Multiple official rows,,,spending.public_order_safety,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2007,expenditure,spending.social_protection,777567901,actual,source.mof_2007_expenditure_functional_actual,Multiple official rows,,,spending.social_protection,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2007,expenditure,spending.sport,35850390,actual,source.mof_2007_expenditure_functional_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2007,revenue,revenue.asset_decrease,643786983,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 03000000: old fixed-width revenue classification
-2007,revenue,revenue.excise_tax,428637040,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01040000: old fixed-width revenue classification
-2007,revenue,revenue.grants,152717591,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 04000000: old fixed-width revenue classification
-2007,revenue,revenue.import_tax,51965575,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01050000: old fixed-width revenue classification
-2007,revenue,revenue.income_tax,526747674,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01010000: old fixed-width revenue classification
-2007,revenue,revenue.increase_liabilities,288121980,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 05000000: old fixed-width revenue classification
-2007,revenue,revenue.other_revenue,880695222,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 02000000: old fixed-width revenue classification
-2007,revenue,revenue.other_taxes,747400145,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01060000 + 01900000: old fixed-width revenue classification
-2007,revenue,revenue.profit_tax,554797062,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01020000: old fixed-width revenue classification
-2007,revenue,revenue.property_tax,107886069,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01070000: old fixed-width revenue classification
-2007,revenue,revenue.vat,1973665830,actual,source.mof_2007_revenue_form1_pdf,,,,,,Source rows 01030000: old fixed-width revenue classification
 2008,expenditure,spending.agriculture_environment,100132803,actual,source.mof_2008_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.agriculture_environment,high,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 0
 2008,expenditure,spending.culture,72954605,actual,source.mof_2008_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 0
 2008,expenditure,spending.debt_service,233180382,actual,source.mof_2008_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.debt_service,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -84,17 +64,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2008,expenditure,spending.public_order_safety,983461325,actual,source.mof_2008_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.public_order_safety,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2008,expenditure,spending.social_protection,1106381766,actual,source.mof_2008_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.social_protection,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2008,expenditure,spending.sport,29151660,actual,source.mof_2008_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2008,revenue,revenue.asset_decrease,724033111,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2008,revenue,revenue.excise_tax,518479362,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2008,revenue,revenue.grants,490103598,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2008,revenue,revenue.import_tax,51880828,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2008,revenue,revenue.income_tax,1296344117,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2008,revenue,revenue.increase_liabilities,967175166,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2008,revenue,revenue.other_revenue,484129547,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2008,revenue,revenue.other_taxes,92983333,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2008,revenue,revenue.profit_tax,592119128,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2008,revenue,revenue.property_tax,131861840,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2008,revenue,revenue.vat,2068988283,actual,source.mof_2008_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2009,expenditure,spending.agriculture_environment,103913090,actual,source.mof_2009_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 6
 2009,expenditure,spending.culture,100657917,actual,source.mof_2009_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 1
 2009,expenditure,spending.debt_service,332799644,actual,source.mof_2009_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -108,17 +77,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2009,expenditure,spending.public_order_safety,859866023,actual,source.mof_2009_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.public_order_safety,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 7
 2009,expenditure,spending.social_protection,1249890116,actual,source.mof_2009_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.social_protection,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 6
 2009,expenditure,spending.sport,36762564,actual,source.mof_2009_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2009,revenue,revenue.asset_decrease,456333987,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2009,revenue,revenue.excise_tax,443236641,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2009,revenue,revenue.grants,150984579,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2009,revenue,revenue.import_tax,35911414,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2009,revenue,revenue.income_tax,1118946003,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2009,revenue,revenue.increase_liabilities,960517573,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2009,revenue,revenue.other_revenue,477619128,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2009,revenue,revenue.other_taxes,60995282,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2009,revenue,revenue.profit_tax,517652722,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2009,revenue,revenue.property_tax,160383298,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2009,revenue,revenue.vat,2051747946,actual,source.mof_2009_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2010,expenditure,spending.agriculture_environment,51000386,actual,source.mof_2010_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 5
 2010,expenditure,spending.culture,133389668,actual,source.mof_2010_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 4
 2010,expenditure,spending.debt_service,358900756,actual,source.mof_2010_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -132,17 +90,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2010,expenditure,spending.public_order_safety,836504017,actual,source.mof_2010_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.public_order_safety,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 5
 2010,expenditure,spending.social_protection,1278912818,actual,source.mof_2010_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.social_protection,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 3
 2010,expenditure,spending.sport,32677685,actual,source.mof_2010_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2010,revenue,revenue.asset_decrease,286137979,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2010,revenue,revenue.excise_tax,560820436,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2010,revenue,revenue.grants,165424278,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2010,revenue,revenue.import_tax,70382875,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2010,revenue,revenue.income_tax,1202065949,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2010,revenue,revenue.increase_liabilities,1206129868,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2010,revenue,revenue.other_revenue,524982118,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2010,revenue,revenue.other_taxes,63468462,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2010,revenue,revenue.profit_tax,575947203,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2010,revenue,revenue.property_tax,191728597,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2010,revenue,revenue.vat,2203093187,actual,source.mof_2010_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2011,expenditure,spending.agriculture_environment,110773904,actual,source.mof_2011_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 5
 2011,expenditure,spending.culture,109850137,actual,source.mof_2011_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 3; workbook financial-asset/liability supplement rows: 2
 2011,expenditure,spending.debt_service,433849792,actual,source.mof_2011_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -156,17 +103,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2011,expenditure,spending.public_order_safety,847680414,actual,source.mof_2011_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.public_order_safety,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 9
 2011,expenditure,spending.social_protection,1447953514,actual,source.mof_2011_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.social_protection,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
 2011,expenditure,spending.sport,48138924,actual,source.mof_2011_expenditure_functional_plus_execution_report_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2011,revenue,revenue.asset_decrease,355779751,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2011,revenue,revenue.excise_tax,615169601,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2011,revenue,revenue.grants,31189349,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2011,revenue,revenue.import_tax,93210822,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2011,revenue,revenue.income_tax,1551039985,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2011,revenue,revenue.increase_liabilities,444227375,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2011,revenue,revenue.other_revenue,609103584,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2011,revenue,revenue.other_taxes,38394304,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2011,revenue,revenue.profit_tax,832201278,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2011,revenue,revenue.property_tax,220390039,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2011,revenue,revenue.vat,2784346288,actual,source.mof_2011_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2012,expenditure,spending.agriculture_environment,250212621,actual,source.mof_2012_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 4
 2012,expenditure,spending.culture,140843201,actual,source.mof_2012_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 4
 2012,expenditure,spending.debt_service,378554618,actual,source.mof_2012_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -180,17 +116,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2012,expenditure,spending.public_order_safety,863663187,actual,source.mof_2012_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.public_order_safety,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 10
 2012,expenditure,spending.social_protection,1617607674,actual,source.mof_2012_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.social_protection,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
 2012,expenditure,spending.sport,58805351,actual,source.mof_2012_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2012,revenue,revenue.asset_decrease,212030143,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2012,revenue,revenue.excise_tax,659606114,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2012,revenue,revenue.grants,116165894,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2012,revenue,revenue.import_tax,90078995,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2012,revenue,revenue.income_tax,1764754287,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2012,revenue,revenue.increase_liabilities,391000742,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2012,revenue,revenue.other_revenue,728761089,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2012,revenue,revenue.other_taxes,35232917,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2012,revenue,revenue.profit_tax,850995044,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2012,revenue,revenue.property_tax,229970274,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2012,revenue,revenue.vat,3040331851,actual,source.mof_2012_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2013,expenditure,spending.agriculture_environment,253277268,actual,source.mof_2013_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 4
 2013,expenditure,spending.culture,113202051,actual,source.mof_2013_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 3
 2013,expenditure,spending.debt_service,698263052,actual,source.mof_2013_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -204,17 +129,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2013,expenditure,spending.public_order_safety,891398527,actual,source.mof_2013_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.public_order_safety,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 11
 2013,expenditure,spending.social_protection,1817486433,actual,source.mof_2013_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.social_protection,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 3
 2013,expenditure,spending.sport,52118858,actual,source.mof_2013_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.sport,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 1
-2013,revenue,revenue.asset_decrease,508793625,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2013,revenue,revenue.excise_tax,722178096,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2013,revenue,revenue.grants,97063917,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source row 13: გრანტები; no internal grant source row; grant children reconcile to total grants
-2013,revenue,revenue.import_tax,89375313,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2013,revenue,revenue.income_tax,1934342767,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2013,revenue,revenue.increase_liabilities,518265335,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2013,revenue,revenue.other_revenue,535976848,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2013,revenue,revenue.other_taxes,28059394,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2013,revenue,revenue.profit_tax,806545322,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2013,revenue,revenue.property_tax,230927186,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2013,revenue,revenue.vat,2847867516,actual,source.mof_2013_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2014,expenditure,spending.agriculture_environment,300291317,actual,source.mof_2014_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 6
 2014,expenditure,spending.culture,145770826,actual,source.mof_2014_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 5
 2014,expenditure,spending.debt_service,779134365,actual,source.mof_2014_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -228,17 +142,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2014,expenditure,spending.public_order_safety,908861541,actual,source.mof_2014_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.public_order_safety,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 9
 2014,expenditure,spending.social_protection,2175129929,actual,source.mof_2014_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.social_protection,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 6
 2014,expenditure,spending.sport,66081994,actual,source.mof_2014_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.sport,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 1
-2014,revenue,revenue.asset_decrease,189203395,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2014,revenue,revenue.excise_tax,810209110,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2014,revenue,revenue.grants,55189703,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2014,revenue,revenue.import_tax,94883250,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2014,revenue,revenue.income_tax,1938794503,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2014,revenue,revenue.increase_liabilities,1400133914,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2014,revenue,revenue.other_revenue,578071340,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2014,revenue,revenue.other_taxes,24451058,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2014,revenue,revenue.profit_tax,828823152,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2014,revenue,revenue.property_tax,245877472,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2014,revenue,revenue.vat,3298518287,actual,source.mof_2014_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2015,expenditure,spending.agriculture_environment,359029857,actual,source.mof_2015_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 9
 2015,expenditure,spending.culture,159117930,actual,source.mof_2015_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 6
 2015,expenditure,spending.debt_service,731023579,actual,source.mof_2015_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -252,17 +155,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2015,expenditure,spending.public_order_safety,966100875,actual,source.mof_2015_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.public_order_safety,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 11
 2015,expenditure,spending.social_protection,2217649338,actual,source.mof_2015_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.social_protection,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 6
 2015,expenditure,spending.sport,74584165,actual,source.mof_2015_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.sport,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
-2015,revenue,revenue.asset_decrease,427848106,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2015,revenue,revenue.excise_tax,870731815,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2015,revenue,revenue.grants,310102880,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2015,revenue,revenue.import_tax,69293961,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2015,revenue,revenue.income_tax,2223220609,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2015,revenue,revenue.increase_liabilities,1379393193,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2015,revenue,revenue.other_revenue,633418401,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2015,revenue,revenue.other_taxes,26454877,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2015,revenue,revenue.profit_tax,1025228422,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2015,revenue,revenue.property_tax,290471261,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2015,revenue,revenue.vat,3505454639,actual,source.mof_2015_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2016,expenditure,spending.agriculture_environment,393073433,actual,source.mof_2016_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 11
 2016,expenditure,spending.culture,165669746,actual,source.mof_2016_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 4
 2016,expenditure,spending.debt_service,740185741,actual,source.mof_2016_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -276,17 +168,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2016,expenditure,spending.public_order_safety,1047459865,actual,source.mof_2016_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.public_order_safety,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 8
 2016,expenditure,spending.social_protection,2410342711,actual,source.mof_2016_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.social_protection,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 6
 2016,expenditure,spending.sport,95057837,actual,source.mof_2016_expenditure_functional_plus_programmatic_supplement_actual,Multiple official rows,,,spending.sport,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 1
-2016,revenue,revenue.asset_decrease,458775581,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2016,revenue,revenue.excise_tax,1069658088,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2016,revenue,revenue.grants,297933661,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2016,revenue,revenue.import_tax,70040641,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2016,revenue,revenue.income_tax,2414050332,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2016,revenue,revenue.increase_liabilities,1460491121,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2016,revenue,revenue.other_revenue,591744082,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2016,revenue,revenue.other_taxes,526585001,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2016,revenue,revenue.profit_tax,1055936486,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2016,revenue,revenue.property_tax,363401397,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2016,revenue,revenue.vat,3286393371,actual,source.mof_2016_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2017,expenditure,spending.agriculture_environment,393739455,actual,source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 9
 2017,expenditure,spending.culture,146723679,actual,source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 6
 2017,expenditure,spending.debt_service,938985906,actual,source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -300,17 +181,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2017,expenditure,spending.public_order_safety,1086272721,actual,source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.public_order_safety,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 12
 2017,expenditure,spending.social_protection,2545519238,actual,source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.social_protection,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 8
 2017,expenditure,spending.sport,153163868,actual,source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.sport,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
-2017,revenue,revenue.asset_decrease,357917201,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2017,revenue,revenue.excise_tax,1450921949,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2017,revenue,revenue.grants,290807926,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2017,revenue,revenue.import_tax,71618886,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2017,revenue,revenue.income_tax,2918865406,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2017,revenue,revenue.increase_liabilities,1651755856,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2017,revenue,revenue.other_revenue,788612893,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2017,revenue,revenue.other_taxes,63619225,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2017,revenue,revenue.profit_tax,756555502,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2017,revenue,revenue.property_tax,394754558,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2017,revenue,revenue.vat,4122612803,actual,source.mof_2017_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2018,expenditure,spending.agriculture_environment,290654717,actual,source.mof_2018_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 5
 2018,expenditure,spending.culture,187363122,actual,source.mof_2018_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 1
 2018,expenditure,spending.debt_service,1271134794,actual,source.mof_2018_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 3
@@ -324,17 +194,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2018,expenditure,spending.public_order_safety,1173468977,actual,source.mof_2018_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.public_order_safety,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2018,expenditure,spending.social_protection,2698981529,actual,source.mof_2018_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.social_protection,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2018,expenditure,spending.sport,163061741,actual,source.mof_2018_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2018,revenue,revenue.asset_decrease,326185265,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2018,revenue,revenue.excise_tax,1465726553,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 1142: აქციზი
-2018,revenue,revenue.grants,341804345,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 13: გრანტები; net of Source row 133: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2018,revenue,revenue.import_tax,73416934,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 1151: იმპორტის გადასახადი
-2018,revenue,revenue.income_tax,3247088831,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 11111: საშემოსავლო გადასახადი
-2018,revenue,revenue.increase_liabilities,1878092629,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2018,revenue,revenue.other_revenue,909608482,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 14: სხვა შემოსავლები; net of Source row 14111: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2018,revenue,revenue.other_taxes,115373126,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 116: სხვა გადასახადები
-2018,revenue,revenue.profit_tax,736624354,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 11121: მოგების გადასახადი
-2018,revenue,revenue.property_tax,441176545,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 113: ქონების გადასახადი
-2018,revenue,revenue.vat,4426909832,actual,source.mof_2018_revenue_form1_pdf,,,,,,Source row 11411: დამატებული ღირებულების გადასახადი
 2019,expenditure,spending.agriculture_environment,400555372,actual,source.mof_2019_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.agriculture_environment,high,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 0
 2019,expenditure,spending.culture,188613209,actual,source.mof_2019_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 2
 2019,expenditure,spending.debt_service,1565132810,actual,source.mof_2019_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -348,17 +207,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2019,expenditure,spending.public_order_safety,1239476006,actual,source.mof_2019_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.public_order_safety,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2019,expenditure,spending.social_protection,3094226966,actual,source.mof_2019_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.social_protection,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 1
 2019,expenditure,spending.sport,134744033,actual,source.mof_2019_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2019,revenue,revenue.asset_decrease,356187377,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2019,revenue,revenue.excise_tax,1506675796,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
-2019,revenue,revenue.grants,423754122,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2019,revenue,revenue.import_tax,79073828,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
-2019,revenue,revenue.income_tax,3482793823,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
-2019,revenue,revenue.increase_liabilities,2338902567,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2019,revenue,revenue.other_revenue,996695060,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2019,revenue,revenue.other_taxes,-230339071,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
-2019,revenue,revenue.profit_tax,866288872,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
-2019,revenue,revenue.property_tax,474324888,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
-2019,revenue,revenue.vat,5239020666,actual,source.mof_2019_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
 2020,expenditure,spending.agriculture_environment,521990440,actual,source.mof_2020_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.agriculture_environment,high,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 0
 2020,expenditure,spending.culture,209060529,actual,source.mof_2020_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 2
 2020,expenditure,spending.debt_service,1709009239,actual,source.mof_2020_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 2
@@ -372,17 +220,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2020,expenditure,spending.public_order_safety,1236941727,actual,source.mof_2020_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.public_order_safety,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2020,expenditure,spending.social_protection,4456406387,actual,source.mof_2020_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.social_protection,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2020,expenditure,spending.sport,92930991,actual,source.mof_2020_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2020,revenue,revenue.asset_decrease,392087630,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2020,revenue,revenue.excise_tax,1619392300,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
-2020,revenue,revenue.grants,412332891,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2020,revenue,revenue.import_tax,74369017,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
-2020,revenue,revenue.income_tax,3326735089,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
-2020,revenue,revenue.increase_liabilities,7290421886,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2020,revenue,revenue.other_revenue,982090359,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2020,revenue,revenue.other_taxes,-246423796,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
-2020,revenue,revenue.profit_tax,919440581,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
-2020,revenue,revenue.property_tax,433665929,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
-2020,revenue,revenue.vat,4837233428,actual,source.mof_2020_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
 2021,expenditure,spending.agriculture_environment,693254089,actual,source.mof_2021_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 1
 2021,expenditure,spending.culture,257392429,actual,source.mof_2021_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 2
 2021,expenditure,spending.debt_service,3491052897,actual,source.mof_2021_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 3
@@ -396,17 +233,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2021,expenditure,spending.public_order_safety,1391525903,actual,source.mof_2021_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.public_order_safety,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 1
 2021,expenditure,spending.social_protection,4438478351,actual,source.mof_2021_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.social_protection,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2021,expenditure,spending.sport,142116057,actual,source.mof_2021_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2021,revenue,revenue.asset_decrease,585012107,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2021,revenue,revenue.excise_tax,1868783716,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
-2021,revenue,revenue.grants,346867959,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2021,revenue,revenue.import_tax,86361935,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
-2021,revenue,revenue.income_tax,3775673772,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
-2021,revenue,revenue.increase_liabilities,5247107182,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2021,revenue,revenue.other_revenue,1265187026,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2021,revenue,revenue.other_taxes,93568393,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
-2021,revenue,revenue.profit_tax,1015296083,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
-2021,revenue,revenue.property_tax,510729685,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
-2021,revenue,revenue.vat,6029546995,actual,source.mof_2021_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
 2022,expenditure,spending.agriculture_environment,821860289,actual,source.mof_2022_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.agriculture_environment,high,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 0
 2022,expenditure,spending.culture,353370135,actual,source.mof_2022_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 2
 2022,expenditure,spending.debt_service,1769495945,actual,source.mof_2022_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 3
@@ -420,17 +246,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2022,expenditure,spending.public_order_safety,1550734032,actual,source.mof_2022_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.public_order_safety,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2022,expenditure,spending.social_protection,4631392107,actual,source.mof_2022_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.social_protection,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2022,expenditure,spending.sport,158479304,actual,source.mof_2022_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2022,revenue,revenue.asset_decrease,580192148,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2022,revenue,revenue.excise_tax,2010227760,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
-2022,revenue,revenue.grants,265441959,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2022,revenue,revenue.import_tax,125992036,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
-2022,revenue,revenue.income_tax,5034089285,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
-2022,revenue,revenue.increase_liabilities,3753883411,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2022,revenue,revenue.other_revenue,1625096859,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2022,revenue,revenue.other_taxes,229099888,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
-2022,revenue,revenue.profit_tax,1930151409,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
-2022,revenue,revenue.property_tax,603515429,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
-2022,revenue,revenue.vat,7452868535,actual,source.mof_2022_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
 2023,expenditure,spending.agriculture_environment,787080804,actual,source.mof_2023_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.agriculture_environment,high,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 0
 2023,expenditure,spending.culture,318001281,actual,source.mof_2023_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 1
 2023,expenditure,spending.debt_service,2280672622,actual,source.mof_2023_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 3
@@ -444,17 +259,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2023,expenditure,spending.public_order_safety,1899742366,actual,source.mof_2023_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.public_order_safety,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2023,expenditure,spending.social_protection,5735021792,actual,source.mof_2023_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.social_protection,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2023,expenditure,spending.sport,190143508,actual,source.mof_2023_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2023,revenue,revenue.asset_decrease,724496687,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2023,revenue,revenue.excise_tax,2270263894,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
-2023,revenue,revenue.grants,200516597,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2023,revenue,revenue.import_tax,151212050,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
-2023,revenue,revenue.income_tax,6071356714,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
-2023,revenue,revenue.increase_liabilities,3468850964,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2023,revenue,revenue.other_revenue,2059408954,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2023,revenue,revenue.other_taxes,186037053,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
-2023,revenue,revenue.profit_tax,2018166538,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
-2023,revenue,revenue.property_tax,648341799,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
-2023,revenue,revenue.vat,8387241707,actual,source.mof_2023_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
 2024,expenditure,spending.agriculture_environment,836224290,actual,source.mof_2024_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.agriculture_environment,high,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 0
 2024,expenditure,spending.culture,329905670,actual,source.mof_2024_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 1
 2024,expenditure,spending.debt_service,2762215741,actual,source.mof_2024_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 3
@@ -468,17 +272,6 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2024,expenditure,spending.public_order_safety,2100297240,actual,source.mof_2024_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.public_order_safety,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2024,expenditure,spending.social_protection,6413435181,actual,source.mof_2024_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.social_protection,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2024,expenditure,spending.sport,229876602,actual,source.mof_2024_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2024,revenue,revenue.asset_decrease,904896963,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2024,revenue,revenue.excise_tax,2488024918,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
-2024,revenue,revenue.grants,198330607,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2024,revenue,revenue.import_tax,138902348,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
-2024,revenue,revenue.income_tax,7250478710,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
-2024,revenue,revenue.increase_liabilities,3267478812,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2024,revenue,revenue.other_revenue,2083608794,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2024,revenue,revenue.other_taxes,265524346,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
-2024,revenue,revenue.profit_tax,3117548526,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
-2024,revenue,revenue.property_tax,697679276,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
-2024,revenue,revenue.vat,9331846717,actual,source.mof_2024_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი
 2025,expenditure,spending.agriculture_environment,1173013569,actual,source.mof_2025_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.agriculture_environment,medium,PDF mapped rows: 2; workbook financial-asset/liability supplement rows: 1
 2025,expenditure,spending.culture,401152080,actual,source.mof_2025_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.culture,medium,PDF mapped rows: 4; workbook financial-asset/liability supplement rows: 0
 2025,expenditure,spending.debt_service,3039407910,actual,source.mof_2025_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.debt_service,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 3
@@ -492,14 +285,3 @@ year,side,item_id,amount_gel,basis,source_id,official_institution,official_progr
 2025,expenditure,spending.public_order_safety,2336690429,actual,source.mof_2025_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.public_order_safety,medium,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 1
 2025,expenditure,spending.social_protection,7163118461,actual,source.mof_2025_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.social_protection,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
 2025,expenditure,spending.sport,301483619,actual,source.mof_2025_expenditure_pdf_e11_plus_tavi6_supplement_actual,Multiple official rows,,,spending.sport,high,PDF mapped rows: 1; workbook financial-asset/liability supplement rows: 0
-2025,revenue,revenue.asset_decrease,961493032,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source rows 31 + 32: Source row 31: არაფინანსური აქტივების კლება; Source row 32: ფინანსური აქტივების კლება
-2025,revenue,revenue.excise_tax,2728646345,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.4.2: აქციზი
-2025,revenue,revenue.grants,122323962,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.3: გრანტები; net of Source row 1.3.3: სხვა დონის სახელმწიფო ერთეულებიდან მიღებული გრანტები
-2025,revenue,revenue.import_tax,146620436,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.5.1: იმპორტის გადასახადი
-2025,revenue,revenue.income_tax,8261217582,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.1.1.1: საშემოსავლო გადასახადი
-2025,revenue,revenue.increase_liabilities,3101893132,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 33: ვალდებულებების ზრდა
-2025,revenue,revenue.other_revenue,2646820211,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.4: სხვა შემოსავლები; net of Source row 1.4.1.1.3: შიდა სამთავრობო სექტორიდან მიღებული სხვა შემოსავალი
-2025,revenue,revenue.other_taxes,559333444,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.6: სხვა გადასახადები
-2025,revenue,revenue.profit_tax,2881352179,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.1.2.1: მოგების გადასახადი
-2025,revenue,revenue.property_tax,801093482,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.3: ქონების გადასახადი
-2025,revenue,revenue.vat,10158086603,actual,source.mof_2025_revenue_form1_pdf,,,,,,Source row 1.1.4.1.1: დამატებული ღირებულების გადასახადი

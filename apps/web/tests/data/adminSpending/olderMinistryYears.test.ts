@@ -1,13 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { classifyAdminSpendingCategory } from "../../../lib/data/adminSpending/categories";
 import {
+  ADMIN_SPENDING_CATEGORIES,
+  classifyAdminSpendingCategory,
+} from "../../../lib/data/adminSpending/categories";
+import {
+  parseAdminSpending2004Pages,
   extractAdminSpending2005Rows,
   extractAdminSpending2014Rows,
 } from "../../../lib/data/adminSpending/extractOlderMinistryYears";
+import { extractAdminSpendingOfficialRows } from "../../../lib/data/adminSpending/extractWorkbooks";
 import {
   ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL,
   generateAdminSpendingFacts,
 } from "../../../lib/data/adminSpending/generateAdminSpendingFacts";
+import { readCsvRecords } from "../../../lib/data/csv";
+import { readPdfTextPages } from "../../../lib/data/realExpenditurePdf/phase1Pilot";
 import { transliterateAcadNusx } from "../../../lib/data/adminSpending/transliterateAcadNusx";
 import type { OfficialExpenditureRow } from "../../../lib/data/realExpenditure/types";
 
@@ -143,6 +150,135 @@ describe("2005 ministry-total extraction", () => {
       (fact) => fact.level === "major_program" && fact.year === 2005,
     );
     expect(programFacts).toHaveLength(0);
+  });
+});
+
+describe("2004 ministry-total extraction", () => {
+  const rows = extractAdminSpendingOfficialRows().filter((row) => row.year === 2004);
+  const officialInstitutionRows = rows.filter((row) => row.isCodedRow && !row.isTotal);
+  const syntheticSplitRows = rows.filter((row) => !row.isCodedRow && !row.isTotal);
+  const totalRow = rows.find((row) => row.isTotal);
+
+  it("derives the reviewed institution handoff from annex pages 2-231", async () => {
+    const pdf = await readPdfTextPages(
+      "../../docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2004-annual-execution-annex.pdf",
+    );
+    const parsed = parseAdminSpending2004Pages(pdf.pages);
+    const reviewRows = await readCsvRecords(
+      "../../data/mappings/review/admin-spending-institution-review-2004.csv",
+    );
+
+    expect(parsed).toHaveLength(47);
+    expect(parsed[0]).toMatchObject({ code: "01 00", pageNumber: 2, actualThousandGel: 14_603.4 });
+    expect(parsed.find((row) => row.code === "21 00")).toMatchObject({ pageNumber: 16, actualThousandGel: 535.9 });
+    expect(parsed.at(-1)).toMatchObject({ code: "47 00", pageNumber: 230, actualThousandGel: 228.5 });
+    expect(
+      parsed.map((row) => ({
+        code: row.code,
+        label: row.labelKa,
+        approved: row.approvedPlanThousandGel,
+        actual: row.actualThousandGel,
+        page: row.pageNumber,
+      })),
+    ).toEqual(
+      reviewRows.map((row) => ({
+        code: row.official_code,
+        label: row.official_label_ka,
+        approved: Number(row.approved_plan_thousand_gel),
+        actual: Number(row.actual_thousand_gel),
+        page: Number(row.source_page),
+      })),
+    );
+  }, 30_000);
+
+  it("preserves all 47 official institutions with source-page provenance and the printed rounding", () => {
+    const defenceRow = officialInstitutionRows.find((row) => row.code === "26 00");
+
+    expect(officialInstitutionRows).toHaveLength(47);
+    expect(new Set(officialInstitutionRows.map((row) => row.code)).size).toBe(47);
+    expect(officialInstitutionRows.every((row) => row.isLeafCode)).toBe(true);
+    expect(officialInstitutionRows.every((row) => row.institutionCode === row.code)).toBe(true);
+    expect(officialInstitutionRows.every((row) => row.rowNumber >= 2 && row.rowNumber <= 231)).toBe(true);
+    expect(defenceRow?.actualThousandGel).toBe(172_009.0);
+    expect(totalRow?.actualThousandGel).toBe(1_930_210.3);
+    expect(officialInstitutionRows.reduce((sum, row) => sum + row.actualThousandGel, 0)).toBeCloseTo(1_930_210.4, 1);
+  });
+
+  it("keeps source-backed classification splits distinct and exactly additive to their official parents", () => {
+    const splitTotalFor = (parentCode: string) =>
+      syntheticSplitRows
+        .filter((row) => row.parentCode === parentCode)
+        .reduce((sum, row) => sum + row.actualThousandGel, 0);
+    const sourceAmountFor = (code: string) =>
+      officialInstitutionRows.find((row) => row.code === code)?.actualThousandGel;
+
+    expect(syntheticSplitRows).toHaveLength(5);
+    expect(syntheticSplitRows.every((row) => row.isLeafCode && row.code?.startsWith("synthetic:"))).toBe(true);
+    expect(syntheticSplitRows.every((row) => row.institutionCode === row.parentCode)).toBe(true);
+    expect(Object.fromEntries(syntheticSplitRows.map((row) => [row.code, row.rowNumber]))).toEqual({
+      "synthetic:22_00:finance": 16,
+      "synthetic:22_00:debt": 19,
+      "synthetic:22_00:transfers": 20,
+      "synthetic:30_00:culture": 115,
+      "synthetic:30_00:sport": 116,
+    });
+    expect(splitTotalFor("22 00")).toBe(sourceAmountFor("22 00"));
+    expect(splitTotalFor("30 00")).toBe(sourceAmountFor("30 00"));
+  });
+
+  it("pins the five 2004 synthetic split amounts from the annex", () => {
+    expect(Object.fromEntries(syntheticSplitRows.map((row) => [row.code, Number(row.actualThousandGel.toFixed(1))]))).toEqual({
+      "synthetic:22_00:finance": 79_007.6,
+      "synthetic:22_00:debt": 291_350.1,
+      "synthetic:22_00:transfers": 128_234.0,
+      "synthetic:30_00:culture": 22_040.7,
+      "synthetic:30_00:sport": 6_866.0,
+    });
+  });
+
+  it("does not suppress the same official code in another year", () => {
+    const nextYearFinance = {
+      ...institutionRow(2005, "საქართველოს ფინანსთა სამინისტრო"),
+      code: "22 00",
+      institutionCode: "22 00",
+    };
+    const facts = generateAdminSpendingFacts([...rows, nextYearFinance]);
+
+    expect(
+      facts.find((fact) => fact.year === 2005 && fact.itemId === "admin_spending.finance")?.amountGel,
+    ).toBe(100_000);
+  });
+
+  it("reconciles the category facts within GEL 100 and emits no 2004 programs", () => {
+    const facts = generateAdminSpendingFacts(rows);
+    const categoryFacts = facts.filter((fact) => fact.level === "admin_category" && fact.year === 2004);
+    const programFacts = facts.filter((fact) => fact.level === "major_program" && fact.year === 2004);
+    const categorySum = categoryFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
+    const sourceTotal = Math.round((totalRow?.actualThousandGel ?? 0) * 1000);
+
+    expect(Math.abs(categorySum - sourceTotal)).toBe(100);
+    expect(programFacts).toHaveLength(0);
+  });
+
+  it("reviews every official code exactly once against an existing admin category", async () => {
+    const reviewRows = await readCsvRecords(
+      "../../data/mappings/review/admin-spending-institution-review-2004.csv",
+    );
+    const reviewedCategoryIds = new Set(ADMIN_SPENDING_CATEGORIES.map((category) => category.id));
+
+    expect(reviewRows).toHaveLength(47);
+    expect(reviewRows.map((row) => row.official_code).sort()).toEqual(
+      officialInstitutionRows.map((row) => row.code).sort(),
+    );
+    expect(new Set(reviewRows.map((row) => row.official_code)).size).toBe(47);
+    expect(reviewRows.every((row) => reviewedCategoryIds.has(row.admin_spending_category_id))).toBe(true);
+    expect(reviewRows.every((row) => row.mapping_confidence && row.mapping_notes)).toBe(true);
+    expect(
+      reviewRows.every((reviewRow) => {
+        const sourceRow = officialInstitutionRows.find((row) => row.code === reviewRow.official_code);
+        return sourceRow && classifyAdminSpendingCategory(sourceRow) === reviewRow.admin_spending_category_id;
+      }),
+    ).toBe(true);
   });
 });
 

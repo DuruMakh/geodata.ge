@@ -1,18 +1,16 @@
-# 2005-2006 Expenditure Final Data Methodology (pre-COFOG old classification)
+# 2004-2006 Expenditure Final Data Methodology (pre-COFOG old classification)
 
-Status: implemented and reconciled (2026-07-04)
+Status: implemented and reconciled (reviewed 2026-08-20)
 
-Scope: national budget expenditure, actual execution, 2005 and 2006
+Scope: national budget expenditure, actual execution, 2004–2006
 
-2005 and 2006 predate Georgia's adoption of the COFOG functional
-classification (which begins in 2007, see
-`2007-2016-expenditure-final-methodology.md`). Their treasury E11 tables use
-the older **14-group functional classification**, so they need a dedicated
-parser and a dedicated group -> public-category mapping rather than the COFOG
-pipeline. 2004 is deliberately **not loaded**: its treasury E11 is
-central-budget scoped (~1.51B GEL) rather than the full state budget (~1.93B),
-so it would understate the year against the rest of the series; the source PDF
-stays recognized for a possible later revisit.
+2004–2006 predate Georgia's adoption of the COFOG functional classification
+(which begins in 2007, see `2007-2016-expenditure-final-methodology.md`). The
+2005–2006 Treasury E11 tables use the older **14-group functional
+classification**, so they need a dedicated parser and a dedicated group ->
+public-category mapping rather than the COFOG pipeline. For 2004, the complete
+state-budget execution annex, rather than the narrower central-budget Treasury
+E11, supplies the functional parents and exact carve-outs.
 
 ## 1. Sources
 
@@ -105,6 +103,11 @@ for review.
 ## 4. Reconciliation results
 
 ```text
+2004
+  Category total = official payments total = 1,930,210,300 GEL (difference 0)
+  Rounded full-state groups = 1,930,210,400 GEL; -100 GEL is applied only to other/unclassified
+  Exact annex carve-outs: sport 6,866,000; debt operations 291,350,100;
+  intergovernmental transfers 128,234,000 GEL
 2005
   Category total = official payments total = 2,626,507,300 GEL (difference 0)
 2006
@@ -123,6 +126,7 @@ Regression pins live in `apps/web/tests/data/pipelineIntegration.test.ts`.
 
 ```powershell
 cd apps/web
+npm run data:generate-final-2004-expenditure
 npm run data:generate-final-2005-expenditure
 npm run data:generate-final-2006-expenditure
 npm run data:compose-budget-facts
@@ -130,10 +134,14 @@ npm run data:validate
 npm test
 ```
 
-## 6. 2004
+## 6. 2004 complete-state mapping
 
-2004 remains unloaded (central-budget scope, see above). To revisit: the 2004
-treasury E11 (`.../treasury.ge/2004-...pdf`) is the central budget only; a full
-state-budget functional table would need to be sourced from the 2004 execution
-report (mof.ge doc 8909, year page /5039 -> /5045) or reconstructed, and the
-scope caveat resolved, before 2004 could join the series consistently.
+The complete execution annex's functional table on page 232 is the canonical 2004 source.
+All fourteen full-state parents use the same reviewed group-to-category mapping as the
+2005–2006 old classification. The source-derived sport, debt, and intergovernmental-transfer
+lines are carved out exactly before their parent remainders are classified. The annex's
+rounded group values are GEL 100 above the printed GEL 1,930,210,300 total; the explicit
+negative GEL 100 adjustment is confined to `spending.other_unclassified`.
+
+The separate Treasury E11 remains archived as central-budget-only corroboration. It supplies
+neither a served 2004 fact nor a generated mapping-review amount.

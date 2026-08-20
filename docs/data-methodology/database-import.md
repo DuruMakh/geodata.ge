@@ -21,8 +21,8 @@ the import is re-run.
 | `AdminSpendingCategory` | `data/taxonomy/admin-spending-categories.json` |
 | `SourceDocument` | `data/sources/source-documents.csv` |
 | `BudgetMapping` | `data/mappings/spending-field-mapping.csv` |
-| `BudgetFact` | `data/imports/budget-facts-2005-2025.csv` |
-| `AdminSpendingFact` | `data/imports/admin-spending-facts-2005-2025.csv` (admin categories + major-program drill-down rows) |
+| `BudgetFact` | `data/imports/budget-facts-2004-2025.csv` (expenditure 2004–2025; revenue 2005–2025) |
+| `AdminSpendingFact` | `data/imports/admin-spending-facts-2004-2025.csv` (admin categories + major-program drill-down rows) |
 | `NationalGdpFact` | `data/imports/national-gdp-annual-1996-2025.csv` (one reviewed nominal-GDP denominator per year) |
 | `MunicipalFunctionCategory` | `data/taxonomy/municipal-functions.json` |
 | `MunicipalRegion` | `data/taxonomy/municipal-regions.json` |

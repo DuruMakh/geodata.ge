@@ -518,12 +518,11 @@ npm test
 
 ## 6. Notes for the remaining years (2004-2006)
 
-- 2005 and 2006 are now detailed via the pre-COFOG old 14-group
-  classification — see `2005-2006-old-classification-expenditure-methodology.md`.
-- 2004 is deliberately not loaded: its treasury E11 is central-budget scoped
-  (~1.51B) rather than the full state budget (~1.93B). The source PDF stays
-  recognized in `EXPENDITURE_SOURCE_YEARS`; revisiting it needs a
-  state-budget functional source and a scope-caveat decision.
+- 2004–2006 are detailed via the pre-COFOG old 14-group classification — see
+  `2005-2006-old-classification-expenditure-methodology.md`.
+- 2004 uses the complete state-budget execution annex (functional table p.232;
+  printed total GEL 1,930,210,300). The separate Treasury E11 is central-budget
+  scoped (~GEL 1.51bn), so it is retained only as corroboration and is not served.
 - The `excel-fact-files-2004-2025/<year>-fact.xlsx` files for pre-2017 years
   are budget-law annexes (plan data, prior-year facts). Do not use them as
   actual-execution sources without checking the column headers.

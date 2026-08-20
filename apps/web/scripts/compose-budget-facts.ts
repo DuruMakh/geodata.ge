@@ -67,7 +67,7 @@ async function main() {
   const importsDir = path.resolve(process.cwd(), "../../data/imports");
   const reportsDir = path.resolve(process.cwd(), "../../data/reports");
   const report = {
-    importLabel: "budget-facts-2005-2025",
+    importLabel: "budget-facts-2004-2025",
     expenditureYears,
     detailedExpenditureYears,
     revenueYears,
@@ -80,12 +80,12 @@ async function main() {
   await mkdir(importsDir, { recursive: true });
   await mkdir(reportsDir, { recursive: true });
   await writeFile(
-    path.join(importsDir, "expenditure-facts-2005-2025.csv"),
+    path.join(importsDir, "expenditure-facts-2004-2025.csv"),
     budgetFactsToCsv(budgetRowsToCsvRows(expenditureRows)),
     "utf8",
   );
-  await writeFile(path.join(importsDir, "budget-facts-2005-2025.csv"), budgetFactsToCsv(rows), "utf8");
-  await writeFile(path.join(reportsDir, "budget-facts-2005-2025-compose-report.json"), JSON.stringify(report, null, 2), "utf8");
+  await writeFile(path.join(importsDir, "budget-facts-2004-2025.csv"), budgetFactsToCsv(rows), "utf8");
+  await writeFile(path.join(reportsDir, "budget-facts-2004-2025-compose-report.json"), JSON.stringify(report, null, 2), "utf8");
 
   console.log(`Composed budget fact rows: ${rows.length}`);
 }
@@ -96,5 +96,4 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     process.exit(1);
   });
 }
-
 

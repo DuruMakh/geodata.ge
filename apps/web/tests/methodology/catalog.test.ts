@@ -1,4 +1,5 @@
 import path from "node:path";
+import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import type { MunicipalTotalFact } from "../../lib/data/municipal/types";
 import {
@@ -123,14 +124,25 @@ describe("methodology catalog", () => {
       expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("მიმდინარე ფასებში");
       expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("2010 წლიდან — SNA 2008");
       expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("2025 წლის მშპ წინასწარია");
-      expect(METHODOLOGY_CONTENT[dataset].reviewedAt).toBe("2026-08-13");
     }
+    expect(METHODOLOGY_CONTENT.expenditure.reviewedAt).toBe("2026-08-20");
+    expect(METHODOLOGY_CONTENT.revenue.reviewedAt).toBe("2026-08-13");
 
     expect(FUTURE_METHODOLOGY_DATASETS.find((entry) => entry.titleKa === "მშპ")).toEqual({
       titleKa: "მშპ",
       href: null,
       state: "future",
     });
+  });
+
+  it("publishes the year-specific functional expenditure source boundary", () => {
+    const sourceText = METHODOLOGY_CONTENT.expenditure.sections
+      .find((section) => section.id === "sources")
+      ?.paragraphsKa.join(" ") ?? "";
+
+    expect(sourceText).toContain("2004 წლის სრული სახელმწიფო ბიუჯეტის შესრულების დანართიდან");
+    expect(sourceText).toContain("2005–2025 წლებში — ხაზინის E11 ფორმებიდან");
+    expect(sourceText).toContain("დამხმარე შემოწმებაა");
   });
 
   it("retains the complete SHA-256 coverage of the published revenue originals in methodology provenance", async () => {
@@ -156,6 +168,47 @@ describe("methodology catalog", () => {
       uncovered: [],
       unknownPublicIds: [],
     });
+  });
+
+  it("keeps the canonical 2004 expenditure methodology coverage and source registry current", async () => {
+    const [ministries, functional, drilldown, register] = await Promise.all([
+      readFile(path.join(repositoryRoot, "docs/data-methodology/ministries-expenditure-methodology.md"), "utf8"),
+      readFile(path.join(repositoryRoot, "docs/data-methodology/treasury-functional-expenditure-methodology-2004-2025.md"), "utf8"),
+      readFile(path.join(repositoryRoot, "docs/data-methodology/ministries-drilldown-programs-methodology.md"), "utf8"),
+      readFile(path.join(repositoryRoot, "data/methodology/decision-register.csv"), "utf8"),
+    ]);
+
+    expect(ministries).toContain("all 22 resolve");
+    expect(ministries).toContain("`source.mof_2004_programmatic_fact_actual`");
+    expect(ministries).toContain("2004-annual-execution-annex.pdf");
+    expect(ministries).toMatch(/\*\*All 22\s+years pass\*\*/);
+    expect(drilldown).toContain("22/22 years ≤1,000");
+    expect(functional).toContain("All 22 detailed years");
+    expect(functional).toContain("Old 14-group → public category (2004–2006)");
+    expect(functional).toContain("year2004StateBudget.ts");
+    expect(register).toContain("6b. Old 14-group → public category (2004–2006)");
+  });
+
+  it("does not leave current 2004 coverage claims at the pre-feature boundary", async () => {
+    const [design, totalOnlyFacts, sourceRegistry, groupC, ministries, oldClassification] = await Promise.all([
+      readFile(path.join(repositoryRoot, "DESIGN.md"), "utf8"),
+      readFile(path.join(repositoryRoot, "apps/web/lib/data/totalOnlyBudgetFacts.ts"), "utf8"),
+      readFile(path.join(repositoryRoot, "apps/web/lib/data/realExpenditurePdf/expenditureSourcesByYear.ts"), "utf8"),
+      readFile(path.join(repositoryRoot, "docs/data-methodology/group-c-annual-report-ministries-methodology.md"), "utf8"),
+      readFile(path.join(repositoryRoot, "docs/data-methodology/ministries-expenditure-methodology.md"), "utf8"),
+      readFile(path.join(repositoryRoot, "docs/data-methodology/2005-2006-old-classification-expenditure-methodology.md"), "utf8"),
+    ]);
+
+    expect(design).toContain("Expenditure by public spending fields: **2004–2025**");
+    expect(design).toContain("Expenditure by ministries (administrative view): **2004–2025**");
+    expect(totalOnlyFacts).toContain("2004 expenditure is now detailed via the complete state-budget execution annex");
+    expect(sourceRegistry).toContain("2005-2025 E11-era registry");
+    expect(sourceRegistry).toContain("year2004StateBudget.ts");
+    expect(groupC).toContain("2004–2025 contiguously (22 reconciling years)");
+    expect(groupC).not.toContain("Only 2004 remains");
+    expect(ministries).toContain("2004 is the sole rounding exception");
+    expect(ministries).toContain("Sport / Culture de-merge (2004, 2018–2024)");
+    expect(oldClassification).toContain("npm run data:generate-final-2004-expenditure");
   });
 
   it.each([

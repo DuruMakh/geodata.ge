@@ -279,9 +279,9 @@ export function parseAdminWorkbookRows(input: ParseSheetInput): OfficialExpendit
 
 export function extractAdminSpendingOfficialRows(warnings?: string[]): OfficialExpenditureRow[] {
   return [...ADMIN_SPENDING_YEARS].sort((a, b) => a - b).flatMap((year) => {
-    // 2005 and 2014 do not follow the generic "<year>-fact.xlsx, tavi 6" shape (2005 is
-    // AcadNusx ministry-totals with a bundled Finance line; 2014's actuals live in the 2015
-    // workbook). They have dedicated extractors.
+    // 2004, 2005 and 2014 do not follow the generic "<year>-fact.xlsx, tavi 6" shape (2004 is
+    // a reviewed PDF ministry-total handoff; 2005 is AcadNusx ministry totals with a bundled
+    // Finance line; 2014's actuals live in the 2015 workbook). They have dedicated extractors.
     // Group C years come from the official annual-execution-report PDFs (pre-parsed to a
     // staging CSV), not from a <year>-fact.xlsx workbook.
     const annualReportExtractor = ANNUAL_REPORT_YEAR_EXTRACTORS[year];

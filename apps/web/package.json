@@ -42,6 +42,7 @@
     "data:extract-expenditure-pdf-2023": "tsx scripts/extract-expenditure-pdf-pilot.ts --year 2023",
     "data:extract-expenditure-pdf-2024": "tsx scripts/extract-expenditure-pdf-pilot.ts --year 2024",
     "data:generate-final-2025-expenditure": "tsx scripts/generate-final-2025-expenditure-data.ts",
+    "data:generate-final-2004-expenditure": "tsx scripts/generate-final-old-classification-expenditure.ts --year 2004",
     "data:generate-final-2005-expenditure": "tsx scripts/generate-final-old-classification-expenditure.ts --year 2005",
     "data:generate-final-2006-expenditure": "tsx scripts/generate-final-old-classification-expenditure.ts --year 2006",
     "data:generate-final-2007-expenditure": "tsx scripts/generate-final-2025-expenditure-data.ts --year 2007",

@@ -35,5 +35,6 @@ export type AdminSpendingReport = {
   reconciliationToleranceGel: number;
   sourceTotalGelByYear: Record<number, number>;
   categoryTotalGelByYear: Record<number, number>;
+  reconciliationDifferenceGelByYear: Record<number, number>;
   reconciliationStatusByYear: Record<number, "passed" | "failed">;
 };

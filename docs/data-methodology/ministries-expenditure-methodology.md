@@ -1,4 +1,4 @@
-# Ministries Expenditure — Full Methodology (2005–2025)
+# Ministries Expenditure — Full Methodology (2004–2025)
 
 **Status:** authoritative reference for the *ministries* (organizational) expenditure dataset.
 Covers what the data is, where each year comes from, how it is processed, and every
@@ -8,7 +8,7 @@ processing-group notes (`2005-2014-ministries-expenditure-methodology.md`,
 appendices. Where any older note disagrees with this document or with
 `apps/web/lib/data/adminSpending/categories.ts`, **this document and the code are authoritative.**
 
-Last reviewed: 2026-07-09 (program successions shipped — see
+Last reviewed: 2026-08-20 (2004 complete-annex inclusion and program successions — see
 `ministries-drilldown-programs-methodology.md`, the authoritative deep-dive on the §7
 drill-down; §7 here is the summary).
 
@@ -30,7 +30,8 @@ organizational answers *"which ministry spent it?"*. They do **not** reconcile t
 line-by-line (a single ministry funds several functions and vice-versa), but both reconcile to
 the same year grand total.
 
-**Coverage:** contiguous **2005–2025** (21 years). 2004 is excluded (see §6.11). In the
+**Coverage:** contiguous **2004–2025** (22 years). The 2004 administrative categories use the
+complete state-budget execution annex (see §6.11). In the
 multi-year explorer the ministries and their major programs appear as **selectable series**
 (this is series selection, not clickable drill-down), and major programs are shown **by name
 only** (§7.5).
@@ -53,16 +54,17 @@ GEL. The basis is always `actual` (planned figures are never used for public val
 | Family | Format | Years | Notes |
 |---|---|---|---|
 | **Excel fact workbooks** | `.xlsx` (`excel-fact-files-2004-2025/<year>-fact.xlsx`) | 2005, 2013, 2014, 2017–2025 | Reviewed workbooks with the full organizational table. 2014's actuals live in the **2015** workbook (see §5.3). |
-| **Annual budget-execution reports** | `.pdf` (`annual-execution-reports/…`) | 2006–2012, 2015, 2016 | Official year-end execution reports. The only real organizational source for these years. Parsed with a bespoke table parser (§4.2). |
+| **Annual budget-execution reports** | `.pdf` (`annual-execution-reports/…`) | 2004, 2006–2012, 2015, 2016 | Official year-end execution reports. The only real organizational source for these years. Parsed with a bespoke table parser (§4.2). |
 
 ### 2.2 Per-year source registry
 
 Every year's rows carry a `sourceId` that resolves to a row in
-`data/sources/source-documents.csv` (validated: all 21 resolve, all files exist on disk, all
+`data/sources/source-documents.csv` (validated: all 22 resolve, all files exist on disk, all
 SHA-256 hashes match the appendix tables in the two group docs).
 
 | Year | `sourceId` | Source file | Approach |
 |---|---|---|---|
+| 2004 | `source.mof_2004_programmatic_fact_actual` | `annual-execution-reports/2004-annual-execution-annex.pdf` | Complete execution annex, pp. 2–231; `extractOlderMinistryYears.ts` (§6.11) |
 | 2005 | `mof_2005_programmatic_fact_actual` | `excel-fact-files/2005-fact.xlsx` | AcadNusx, ministry-totals (§5.4) |
 | 2006 | `mof_2006_programmatic_fact_actual` | `annual-execution-reports/2006-annual-execution-report.pdf` | Legacy PDF (§5.5) |
 | 2007 | `mof_2007_programmatic_fact_actual` | `…/2007-annual-execution-report.pdf` | Legacy PDF |
@@ -81,9 +83,11 @@ SHA-256 hashes match the appendix tables in the two group docs).
 
 The organizational grand total (row `00 00`) is the **payments** total — it includes
 financial-asset growth and liability reduction (debt principal), i.e. the same basis as the
-2017–2025 baseline. It runs ~5–10 % higher than the functional-classification total (which
-excludes some of those), so the two datasets have deliberately different year totals. The 21
-totals climb steadily: **2005 ≈ 2.61 B GEL → 2025 ≈ 27.72 B GEL**.
+2017–2025 baseline. For 2005–2025 it runs ~5–10 % higher than the
+functional-classification total (which excludes some of those), so the two datasets have
+deliberately different year totals. **2004 is the sole rounding exception:** both views use
+the complete annex, with administrative categories GEL 100 above the printed total because its
+47 official roots are rounded. The 22 totals run from **2004 ≈ 1.93 B GEL → 2025 ≈ 27.72 B GEL**.
 
 ---
 
@@ -145,7 +149,7 @@ raw sources ──► extraction ──► OfficialExpenditureRow[] ──► ge
 `OfficialExpenditureRow[]` for all years. It dispatches per year:
 
 - **xlsx years** (2013, 2017–2025) → `parseTavi6Rows` (the shared workbook parser).
-- **2005, 2014** → `extractOlderMinistryYears.ts` (AcadNusx totals; 2015-workbook column).
+- **2004, 2005, 2014** → `extractOlderMinistryYears.ts` (2004 complete annex; AcadNusx totals; 2015-workbook column).
 - **2006–2012, 2015, 2016** → `extractAnnualReportYears.ts` (reads the pre-extracted staging CSV).
 
 Every row carries: year, code (`NN NN…`), depth, institution label, program label, `isLeafCode`,
@@ -291,7 +295,7 @@ to `environment_agriculture` for `row.year <= 2017`. From 2018 it merged with ag
 (`გარემოს დაცვისა`) and the modern rule handles it. The phrase is unique to ≤2017 and does **not**
 match the 2013 Energy ministry (`ენერგეტიკისა და ბუნებრივი რესურსების`), which stays in `economy`.
 
-### 6.3 Sport / Culture de-merge (2018–2024)
+### 6.3 Sport / Culture de-merge (2004, 2018–2024)
 Georgia repeatedly combined these ministries: **Culture + Sport** (2018, 2022–2024) and an
 **Education + Science + Culture + Sport mega-ministry** (2019–2021). Left alone, Sport would be 0
 for 2018–2024 and Culture 0 for 2019–2021. Owner decision: **full de-merge.** A program-level rule
@@ -301,10 +305,12 @@ for 2018–2024 and Culture 0 for 2019–2021. Owner decision: **full de-merge.*
 - **mixed** culture+sport (no education/science term) → `culture` (the primary sector);
 - ministry apparatus + all general education/science → stay with the parent.
 
-Both series are now continuous 2005–2025. Reconciliation is unaffected (leaves only move between
-categories). **Gotcha guarded:** `ტრანსპორტ` (transport) contains the substring `სპორტ` (sport) —
-stripped before the sport test so the school-transport program is not mis-routed. Youth needs no
-action: in the modern taxonomy it is part of the "Education, science & youth" category already.
+The complete 2004 annex also has a combined Culture/Sport root: its exact sport source leaf and
+the additive culture remainder are split separately in §6.11. Both series are now continuous
+2004–2025. Reconciliation is unaffected (leaves only move between categories). **Gotcha
+guarded:** `ტრანსპორტ` (transport) contains the substring `სპორტ` (sport) — stripped before the
+sport test so the school-transport program is not mis-routed. Youth needs no action: in the
+modern taxonomy it is part of the "Education, science & youth" category already.
 
 ### 6.4 Penitentiary / Corrections → Justice (2009–2013)
 Matched by the shared token stem `სასჯელაღსრულებ`, which covers both the pre-2014 spelling
@@ -341,10 +347,18 @@ courts, State Security Service, Public Broadcaster — and the state-wide transf
 also sit in `other_costs`, consistent with the 2017–2025 baseline. This is why `other_costs` is
 visibly larger before 2017. No genuine functional ministry is hidden there (validated §8).
 
-### 6.11 2004 — excluded (scope)
-2004 has only a *central*-budget organizational annex (narrower than the state budget, pre-COFOG);
-the repo "2004-fact.pdf" is actually the treasury functional PDF. Owner decision: exclude for now.
-Revisit as a scope decision, not an extraction gap.
+### 6.11 2004 — complete state-budget administrative inclusion
+The canonical `2004-annual-execution-annex.pdf` organizational table is pages 2–231 (SHA-256
+`C999654E8C2A430778E48FE67C1BFC7D15DC30F76A60CEEF4477614A31849889`). It contains 47 official
+institution roots, each retained as an auditable source leaf. Their rounded actuals sum to
+GEL 1,930,210,400 and the printed page-231 state-budget total is GEL 1,930,210,300: a GEL 100
+rounding difference, within the existing GEL 1,000 reconciliation tolerance.
+
+Five separately identifiable, source-backed split leaves replace only their same-year official
+parents: Finance remainder, debt service, territorial transfers, Culture remainder, and Sport.
+They remain exactly additive to the two official parent totals. All 2004 facts are `actual`; the
+annex has no depth-2 program rows, so the public 2004 major-program count is zero. The separate
+Treasury E11 is central-budget-only corroboration and supplies no administrative fact.
 
 ---
 
@@ -472,7 +486,7 @@ Development ministry until 2009): the drill-down follows the *program*, the cate
 ## 8. Reconciliation & validation
 
 ### 8.1 The reconciliation gate — and its limitation
-Every year's category sum must equal the source `00 00` grand total within 1 000 GEL. **All 21
+Every year's category sum must equal the source `00 00` grand total within 1 000 GEL. **All 22
 years pass** (per-year deltas 0–600 GEL, pure thousand-GEL rounding). **Important limitation:** the
 gate only checks the year *total*. An internally-consistent **mis-split** (money in the wrong
 category, but the year total still correct) passes undetected. This is why every hardcoded split
@@ -482,16 +496,22 @@ document, and why classification is validated separately (below).
 ### 8.2 Validation report
 `npm run data:validate` regenerates the facts and writes
 `data/reports/admin-spending-2004-2025-report.json`: rows, per-year reconciliation status,
-unclassified amounts, and warnings. It exits non-zero on any breach.
+source and category totals, and the signed category-minus-source reconciliation difference for
+every year. For 2004 that difference is explicitly `100` GEL, documenting the accepted rounding
+exception. Validation exits non-zero on any breach.
 
-### 8.3 Full validation (2026-07-06)
-An 8-dimension audit (reconciliation, series anomaly-scan, 2017–2025 baseline integrity, backfill
-classification, the owner-approved changes, drill-down coherence, requirements conformance,
-provenance) with every finding adversarially re-derived. Result: **the dataset conforms to the v1
-requirements.** All core requirements pass — reconciliation / no silent drops, unclassified →
-`other_costs`, stable ASCII IDs, `actual` basis, contiguous 2005–2025 coverage, names-only
-selectable drill-down, and CSV source/basis metadata. The audit's one finding — 6 recycled codes
-leaking pre-2017 spend into modern series — was fixed (§7.4) and locked with a guard test.
+### 8.3 Validation history
+The 2026-07-06 eight-dimension audit covered the then-current 2005–2025 corpus: reconciliation,
+series anomaly scanning, 2017–2025 baseline integrity, backfill classification, owner-approved
+changes, drill-down coherence, requirements conformance, and provenance. Its one finding — six
+recycled codes leaking pre-2017 spend into modern series — was fixed (§7.4) and locked with a
+guard test.
+
+On 2026-08-20 the same gates were rerun for the 2004 extension. The complete dataset passed the
+v1 requirements: reconciliation and no silent drops, stable ASCII IDs, `actual` basis, contiguous
+2004–2025 category coverage, no fabricated 2004 major programs, names-only selectable drill-down,
+and CSV source/basis metadata. The 2004 administrative total's signed `100` GEL difference from
+the printed state-budget total is retained explicitly as source-table rounding.
 
 ---
 
@@ -509,7 +529,7 @@ leaking pre-2017 spend into modern series — was fixed (§7.4) and locked with 
    2012. 2005 is totals-only.
 4. **Classifier keys on institution labels** — a new year with an unforeseen label spelling could
    mis-route; always re-run the anomaly-scan (below) after adding a year.
-5. **2004 excluded** — scope decision (§6.11).
+5. **2004 has no major-program rows** — the complete annex is institution-level (§6.11).
 6. **Combined-ministry splits are functional overlays on organizational data** — the Sport/Culture
    de-merge (§6.3) and the 2005–2009 culture/sport & finance splits impose a functional split on a
    genuinely-combined ministry line. Defensible and owner-approved, but a modeling choice, not a

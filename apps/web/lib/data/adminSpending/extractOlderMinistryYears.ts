@@ -1,15 +1,21 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
+import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
 import { cellText, numericCell, type MatrixCell } from "../parsing/cellUtils";
 import { contextFor } from "../parsing/hierarchyContext";
 import { sheetToMatrix } from "../parsing/workbookMatrix";
 import { codeDepth, findLeafCodes, normalizeOfficialCode, parentCodeFor } from "../realExpenditure/hierarchy";
 import type { OfficialExpenditureRow } from "../realExpenditure/types";
+import type { ExpenditurePdfPageText } from "../realExpenditurePdf/phase1Pilot";
 import { transliterateAcadNusx } from "./transliterateAcadNusx";
 
 /**
- * Extractors for the two pre-2017 ministries-expenditure years that do NOT fit the generic
+ * Extractors for the pre-2017 ministries-expenditure years that do NOT fit the generic
  * "<year>-fact.xlsx, tavi 6, leaf aggregation" path:
+ *
+ *  - 2004: the complete state-budget annex is a 317-page PDF. Its 47 institution totals are
+ *    parsed and human-reviewed into a narrow CSV handoff for synchronous regeneration.
  *
  *  - 2005: the workbook stores AcadNusx-transliterated labels and only ministry TOTALS
  *    (sub-program detail is incomplete), so we transliterate and aggregate at the institution
@@ -23,6 +29,251 @@ import { transliterateAcadNusx } from "./transliterateAcadNusx";
  */
 
 const WORKBOOK_DIR = "../../docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025";
+
+// ---------------------------------------------------------------------------
+// 2004 — reviewed ministry totals from the complete state-budget annex
+// ---------------------------------------------------------------------------
+
+const Y2004_SOURCE_ID = "source.mof_2004_programmatic_fact_actual";
+const Y2004_SOURCE_PATH =
+  "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2004-annual-execution-annex.pdf";
+const Y2004_REVIEW_PATH = "../../data/mappings/review/admin-spending-institution-review-2004.csv";
+const Y2004_PRINTED_TOTAL_THOUSAND_GEL = 1930210.3;
+const Y2004_FINANCE_CODE = "22 00";
+const Y2004_CULTURE_CODE = "30 00";
+const Y2004_DEBT_SERVICE_THOUSAND_GEL = 291350.1;
+const Y2004_INTERGOVERNMENTAL_TRANSFERS_THOUSAND_GEL = 128234.0;
+const Y2004_SPORT_THOUSAND_GEL = 6866.0;
+const Y2004_DEBT_SERVICE_PAGE = 19;
+const Y2004_INTERGOVERNMENTAL_TRANSFERS_PAGE = 20;
+const Y2004_SPORT_PAGE = 116;
+const Y2004_STATE_WIDE_DEBT_LABEL =
+  "საერთო-სახელმწიფოებრივი მნიშვნელობის გადასახდელები – სახელმწიფო ვალდებულებების მომსახურება და დაფარვა";
+const Y2004_STATE_WIDE_OTHER_LABEL =
+  "საერთო-სახელმწიფოებრივი მნიშვნელობის გადასახდელები – ტრანსფერები და სხვა გადასახდელები";
+
+export type AdminSpending2004Institution = {
+  code: string;
+  labelKa: string;
+  approvedPlanThousandGel: number;
+  actualThousandGel: number;
+  pageNumber: number;
+};
+
+type AdminSpending2004ReviewRow = {
+  year: string;
+  source_id: string;
+  official_code: string;
+  official_label_ka: string;
+  approved_plan_thousand_gel: string;
+  actual_thousand_gel: string;
+  source_page: string;
+  admin_spending_category_id: string;
+  mapping_confidence: string;
+  mapping_notes: string;
+};
+
+function parseThousandGel(value: string): number {
+  return Number(value.replaceAll(" ", "").replace(",", "."));
+}
+
+/**
+ * Parse the 47 top-level organizational rows from annex pages 2-231. This pure parser is used to
+ * verify the reviewed CSV handoff against the immutable PDF; the synchronous admin generator reads
+ * that reviewed handoff so it does not need to parse a 317-page PDF on every regeneration.
+ */
+export function parseAdminSpending2004Pages(pages: ExpenditurePdfPageText[]): AdminSpending2004Institution[] {
+  const institutions: AdminSpending2004Institution[] = [];
+
+  for (const page of pages.filter((candidate) => candidate.pageNumber >= 2 && candidate.pageNumber <= 231)) {
+    const pattern = /^(\d{2}) 00\s+([\s\S]*?) ([\d ]+,\d) ([\d ]+,\d)$/gm;
+    for (const match of page.text.matchAll(pattern)) {
+      institutions.push({
+        code: `${match[1]} 00`,
+        labelKa: transliterateAcadNusx(match[2].replace(/\s+/g, " ").trim()),
+        approvedPlanThousandGel: parseThousandGel(match[3]),
+        actualThousandGel: parseThousandGel(match[4]),
+        pageNumber: page.pageNumber,
+      });
+    }
+  }
+
+  const codes = institutions.map((row) => row.code);
+  if (institutions.length !== 47 || new Set(codes).size !== 47) {
+    throw new Error(`2004 annex: expected 47 unique top-level institutions, found ${institutions.length}`);
+  }
+  for (let code = 1; code <= 47; code += 1) {
+    const expected = `${String(code).padStart(2, "0")} 00`;
+    if (!codes.includes(expected)) throw new Error(`2004 annex: missing top-level institution ${expected}`);
+  }
+
+  return institutions;
+}
+
+function reviewed2004Institutions(): AdminSpending2004Institution[] {
+  const file = path.resolve(process.cwd(), Y2004_REVIEW_PATH);
+  const reviewRows = parse(readFileSync(file, "utf8"), {
+    columns: true,
+    skip_empty_lines: true,
+    trim: true,
+  }) as AdminSpending2004ReviewRow[];
+
+  if (reviewRows.length !== 47 || new Set(reviewRows.map((row) => row.official_code)).size !== 47) {
+    throw new Error(`2004 institution review: expected 47 unique official rows, found ${reviewRows.length}`);
+  }
+
+  return reviewRows.map((row) => {
+    if (row.year !== "2004" || row.source_id !== Y2004_SOURCE_ID) {
+      throw new Error(`2004 institution review: unexpected provenance for ${row.official_code}`);
+    }
+    return {
+      code: row.official_code,
+      labelKa: row.official_label_ka,
+      approvedPlanThousandGel: Number(row.approved_plan_thousand_gel),
+      actualThousandGel: Number(row.actual_thousand_gel),
+      pageNumber: Number(row.source_page),
+    };
+  });
+}
+
+function make2004Row(input: {
+  code: string;
+  label: string;
+  actual: number;
+  approved: number | null;
+  pageNumber: number;
+  parentCode: string | null;
+  institutionCode?: string | null;
+  isTotal?: boolean;
+  isCodedRow?: boolean;
+  isLeafCode?: boolean;
+}): OfficialExpenditureRow {
+  return {
+    year: 2004,
+    sourceId: Y2004_SOURCE_ID,
+    workbookPath: Y2004_SOURCE_PATH,
+    sheetName: "annex pages 2-231",
+    rowNumber: input.pageNumber,
+    code: input.code,
+    parentCode: input.parentCode,
+    depth: input.isTotal ? 0 : 1,
+    institutionCode: input.isTotal ? null : input.institutionCode ?? input.code,
+    institutionLabelKa: input.isTotal ? null : input.label,
+    programCode: null,
+    programLabelKa: null,
+    subprogramCode: null,
+    subprogramLabelKa: null,
+    isTotal: input.isTotal ?? false,
+    isCodedRow: input.isCodedRow ?? true,
+    isLeafCode: input.isLeafCode ?? !input.isTotal,
+    labelKa: input.label,
+    approvedPlanThousandGel: input.approved,
+    revisedPlanThousandGel: null,
+    actualThousandGel: input.actual,
+    executionPercent: null,
+  };
+}
+
+function make2004SyntheticSplit(input: {
+  key: string;
+  parentCode: string;
+  label: string;
+  actual: number;
+  pageNumber: number;
+}): OfficialExpenditureRow {
+  return make2004Row({
+    code: `synthetic:${input.parentCode.replace(" ", "_")}:${input.key}`,
+    label: input.label,
+    actual: input.actual,
+    approved: null,
+    pageNumber: input.pageNumber,
+    parentCode: input.parentCode,
+    institutionCode: input.parentCode,
+    isCodedRow: false,
+    isLeafCode: true,
+  });
+}
+
+export function extractAdminSpending2004Rows(): OfficialExpenditureRow[] {
+  const institutions = reviewed2004Institutions();
+  const rows: OfficialExpenditureRow[] = [
+    make2004Row({
+      code: "00 00",
+      label: "საქართველოს სახელმწიფო ბიუჯეტის გადასახდელები და ხარჯები",
+      actual: Y2004_PRINTED_TOTAL_THOUSAND_GEL,
+      approved: 1926355.6,
+      pageNumber: 231,
+      parentCode: null,
+      isTotal: true,
+      isLeafCode: false,
+    }),
+  ];
+
+  for (const institution of institutions) {
+    rows.push(
+      make2004Row({
+        code: institution.code,
+        label: institution.labelKa,
+        actual: institution.actualThousandGel,
+        approved: institution.approvedPlanThousandGel,
+        pageNumber: institution.pageNumber,
+        parentCode: "00 00",
+        isLeafCode: true,
+      }),
+    );
+
+    if (institution.code === Y2004_FINANCE_CODE) {
+      const financeProper =
+        institution.actualThousandGel -
+        Y2004_DEBT_SERVICE_THOUSAND_GEL -
+        Y2004_INTERGOVERNMENTAL_TRANSFERS_THOUSAND_GEL;
+      rows.push(
+        make2004SyntheticSplit({
+          key: "finance",
+          parentCode: institution.code,
+          label: institution.labelKa,
+          actual: financeProper,
+          pageNumber: institution.pageNumber,
+        }),
+        make2004SyntheticSplit({
+          key: "debt",
+          parentCode: institution.code,
+          label: Y2004_STATE_WIDE_DEBT_LABEL,
+          actual: Y2004_DEBT_SERVICE_THOUSAND_GEL,
+          pageNumber: Y2004_DEBT_SERVICE_PAGE,
+        }),
+        make2004SyntheticSplit({
+          key: "transfers",
+          parentCode: institution.code,
+          label: Y2004_STATE_WIDE_OTHER_LABEL,
+          actual: Y2004_INTERGOVERNMENTAL_TRANSFERS_THOUSAND_GEL,
+          pageNumber: Y2004_INTERGOVERNMENTAL_TRANSFERS_PAGE,
+        }),
+      );
+    }
+
+    if (institution.code === Y2004_CULTURE_CODE) {
+      rows.push(
+        make2004SyntheticSplit({
+          key: "culture",
+          parentCode: institution.code,
+          label: "საქართველოს კულტურისა და ძეგლთა დაცვის სამინისტრო",
+          actual: institution.actualThousandGel - Y2004_SPORT_THOUSAND_GEL,
+          pageNumber: institution.pageNumber,
+        }),
+        make2004SyntheticSplit({
+          key: "sport",
+          parentCode: institution.code,
+          label: "სპორტის დეპარტამენტი",
+          actual: Y2004_SPORT_THOUSAND_GEL,
+          pageNumber: Y2004_SPORT_PAGE,
+        }),
+      );
+    }
+  }
+
+  return rows;
+}
 
 function readMatrix(fileName: string, sheetName: string): MatrixCell[][] {
   const file = path.resolve(process.cwd(), path.join(WORKBOOK_DIR, fileName));
@@ -278,6 +529,7 @@ export function extractAdminSpending2014Rows(): OfficialExpenditureRow[] {
 }
 
 export const OLDER_MINISTRY_YEAR_EXTRACTORS: Record<number, () => OfficialExpenditureRow[]> = {
+  2004: extractAdminSpending2004Rows,
   2005: extractAdminSpending2005Rows,
   2014: extractAdminSpending2014Rows,
 };
