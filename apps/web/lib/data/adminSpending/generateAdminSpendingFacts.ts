@@ -481,7 +481,20 @@ function addAmount(map: Map<string, number>, key: string, amount: number): void 
 }
 
 function leafRows(rows: OfficialExpenditureRow[]): OfficialExpenditureRow[] {
-  return rows.filter((row) => row.code && row.isLeafCode && !row.isTotal && row.actualThousandGel > 0);
+  const splitParentKeys = new Set(
+    rows
+      .filter((row) => row.code && !row.isCodedRow && row.isLeafCode && row.parentCode)
+      .map((row) => `${row.year}|${row.parentCode}`),
+  );
+
+  return rows.filter(
+    (row) =>
+      row.code &&
+      row.isLeafCode &&
+      !row.isTotal &&
+      row.actualThousandGel > 0 &&
+      !(row.isCodedRow && splitParentKeys.has(`${row.year}|${row.code}`)),
+  );
 }
 
 function programRows(rows: OfficialExpenditureRow[]): OfficialExpenditureRow[] {

@@ -24,8 +24,8 @@ export const REVENUE_YEARS = [...REVENUE_TOTAL_ONLY_YEARS, ...REVENUE_DETAILED_Y
 // 2014 actuals are recovered from the 2015 workbook's col_4; 2005 is an AcadNusx
 // ministry-totals year (see extractOlderMinistryYears). Group C years are extracted from
 // the official annual-execution-report PDFs (see extractAnnualReportYears). 2006-2011 are
-// legacy AcadNusx reports. Only 2004 (Group D) remains — a scope decision, not extraction.
-export const ADMIN_SPENDING_YEARS = [2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, ...inclusiveYears(2017, APP_END_YEAR)];
+// legacy AcadNusx reports. 2004 is a reviewed ministry-total handoff from the complete annex.
+export const ADMIN_SPENDING_YEARS = inclusiveYears(2004, APP_END_YEAR);
 
 // Municipal coverage. 2015 is the first year the archived portal publishes a
 // complete twelve-month functional series for the 69-unit raw package; the

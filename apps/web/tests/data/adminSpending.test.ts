@@ -91,6 +91,19 @@ describe("admin spending facts", () => {
     expect(unresolvedSourceIds).toEqual([]);
   }, 30_000);
 
+  it("adds 2004 as an institution-total year without creating major programs", () => {
+    const rows = extractAdminSpendingOfficialRows();
+    const facts = generateAdminSpendingFacts(rows);
+    const report = buildAdminSpendingReport(rows, facts);
+    const facts2004 = facts.filter((fact) => fact.year === 2004);
+
+    expect(facts2004.filter((fact) => fact.level === "admin_category").length).toBeGreaterThan(0);
+    expect(facts2004.filter((fact) => fact.level === "major_program")).toHaveLength(0);
+    expect(report.sourceTotalGelByYear[2004]).toBe(1_930_210_300);
+    expect(report.categoryTotalGelByYear[2004]).toBe(1_930_210_400);
+    expect(report.reconciliationStatusByYear[2004]).toBe("passed");
+  }, 30_000);
+
   it("resolves every generated admin-spending fact source ID to a registered source document", async () => {
     const facts = await loadAdminSpendingFacts("../../data/imports/admin-spending-facts-2005-2025.csv");
     const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
