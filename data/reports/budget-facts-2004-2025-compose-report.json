@@ -49,6 +49,7 @@
     2025
   ],
   "revenueYears": [
+    2004,
     2005,
     2006,
     2007,
@@ -72,7 +73,7 @@
     2025
   ],
   "expenditureRows": 286,
-  "revenueRows": 231,
-  "totalRows": 517,
+  "revenueRows": 241,
+  "totalRows": 527,
   "totalOnlyRows": []
 }

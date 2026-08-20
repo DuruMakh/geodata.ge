@@ -17,7 +17,8 @@ for deeper provenance detail:
 - `2025-expenditure-final-methodology.md` (the original confirmed 2017–2025 process)
 
 Sibling methodologies for the app's other datasets: `revenue-methodology.md` (the receipts side —
-consolidated-budget revenue from treasury Form #1, 2005–2025) and
+consolidated-budget revenue from 2004–2025; the 2004 annual-report panel omits the unavailable
+comparable liabilities amount, while 2005–2025 uses Treasury Form #1) and
 `ministries-expenditure-methodology.md` (the organizational expenditure lens).
 
 One-line integrity claim: **every published year reproduces byte-identical from

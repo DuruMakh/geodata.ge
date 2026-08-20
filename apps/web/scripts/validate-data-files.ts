@@ -64,7 +64,7 @@ async function main() {
   const sources = await loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments);
   const mappings = await loadSpendingMappings("../../data/mappings/spending-field-mapping.csv");
   const expenditureRows = await loadBudgetFactRows("../../data/imports/expenditure-facts-2004-2025.csv");
-  const revenueRows = await loadBudgetFactRows("../../data/imports/revenue-facts-2005-2025.csv");
+  const revenueRows = await loadBudgetFactRows("../../data/imports/revenue-facts-2004-2025.csv");
   const facts = await loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts);
   const adminSpendingFacts = await loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts);
   const nationalGdpFacts = await loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts);

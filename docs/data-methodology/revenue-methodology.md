@@ -1,12 +1,12 @@
-# Consolidated Revenue — Full Methodology (2005–2025)
+# Consolidated Revenue — Full Methodology (2004–2025)
 
 **Status:** authoritative reference for the *revenue* (receipts) dataset — the revenue side of the
 explorer. Covers what the data is, where each year comes from, how it is parsed, every mapping
 decision with its rationale, the validation gates, and how the facts are promoted into
-`data/imports/revenue-facts-2005-2025.csv`. Where this document disagrees with the code,
+`data/imports/revenue-facts-2004-2025.csv`. Where this document disagrees with the code,
 **the code is authoritative** (`apps/web/lib/data/realRevenue/*.ts`).
 
-Last reviewed: 2026-07-13 (authored from the pipeline code and the shipped data during the July
+Last reviewed: 2026-08-20 (authored from the pipeline code and the shipped data during the July
 2026 documentation audit; the shipped CSV was independently re-validated against the 21 source
 PDFs in the 2026-07 data review, and the one defect found — a stale 2013 staging file — was fixed
 by regenerating staging).
@@ -16,14 +16,15 @@ by regenerating staging).
 ## 1. What this dataset is
 
 GeoData.ge's revenue side shows Georgia's **consolidated budget receipts** (ნაერთი ბიუჯეტის
-შემოსულობები) by top-level revenue category, annually for **2005–2025** (21 years), always on the
+შემოსულობები) by top-level revenue category, annually for **2004–2025** (22 years), always on the
 **actual** (cash-executed) basis. Planned figures are parsed where the source carries them but are
 never published.
 
-Each year carries exactly **11 facts** (21 × 11 = 231 rows in the CSV): seven tax categories,
+The 2005–2025 panel carries exactly **11 facts per year** (231 rows): seven tax categories,
 grants, other revenue, and two financing-receipt categories (decrease in assets, increase in
-liabilities). Summed, the 11 facts equal the official **final receipts** of the consolidated
-budget for that year — receipts run from **≈ 3.29 B GEL (2005) to ≈ 32.37 B GEL (2025)**.
+liabilities). The reviewed 2004 annual report supplies the same categories except increase in
+liabilities, so 2004 carries **10 facts** and sums to the report's official revenue-and-grants
+total of **2,283,035,800 GEL**. The missing liability amount is neither estimated nor stored as zero.
 
 Two perimeter choices define the dataset (both detailed in §6):
 
@@ -38,7 +39,15 @@ Two perimeter choices define the dataset (both detailed in §6):
 
 ## 2. Source data & collection
 
-### 2.1 One source family: Treasury "Form #1" receipts statements
+### 2.1 Official annual-report and Treasury Form #1 sources
+
+For 2004, the source is page 19 of the Ministry of Finance annual budget execution report,
+`docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2004-annual-execution-report.pdf`.
+Its consolidated-budget table supplies the ten published revenue-and-grants facts. It does not
+supply the comparable consolidated increase-in-liabilities amount (§5.6). The table is explicitly
+labelled as excluding budget organizations' social contributions. The source does not establish
+whether this perimeter is exactly comparable with the 2005–2025 Form #1 perimeter; treat this as a
+cross-era comparability limitation.
 
 Every year 2005–2025 is extracted from the same official document type: the State Treasury's
 **Form #1** (ფორმა #1) January–December consolidated-budget receipts statement — a per-code table
@@ -47,7 +56,7 @@ per row: **state budget, territorial-unit budgets, and total (consolidated)**. A
 committed under `docs/Raw Data/Revenue/<year>-jan-dec-consolidated-revenue.pdf`.
 
 The source list is generated, not hand-maintained: `realRevenuePdfSources` in
-`apps/web/lib/data/realRevenue/extractWorkbooks.ts` maps `REVENUE_YEARS` (2005–2025, from
+`apps/web/lib/data/realRevenue/extractWorkbooks.ts` maps `REVENUE_SOURCE_YEARS` (2005–2025, from
 `lib/data/coverage.ts`; `REVENUE_START_YEAR = 2005`, end pinned to `APP_END_YEAR`) onto that fixed
 path pattern and the source ID pattern `source.mof_<year>_revenue_form1_pdf`.
 
@@ -57,10 +66,10 @@ instead (`textPath` in the source entry). All other years are text-extracted fro
 time. The sidecar mechanism is locked by a test ("uses the reviewed text sidecar for 2005 revenue
 extraction", `tests/data/realRevenue/extractWorkbooks.test.ts`).
 
-**Registry.** All 21 PDFs are registered in `data/sources/source-documents.csv`
+**Registry.** The annual report and all 21 Form #1 PDFs are registered in `data/sources/source-documents.csv`
 (review dates: 2005–2016 on 2026-06-28, 2017–2022 on 2026-06-09, 2023–2025 on 2026-05-13), and
-`tests/data/sourceCoverage.test.ts` asserts every `REVENUE_SOURCE_YEARS` PDF exists on disk — and
-that a 2004 PDF deliberately does **not** (§5.6). All 21 PDFs are also listed in
+`tests/data/sourceCoverage.test.ts` asserts every `REVENUE_SOURCE_YEARS` PDF and the reviewed
+2004 annual report exist on disk. All 22 PDFs are also listed in
 `data/methodology/source-archives/revenue.csv` with byte size and SHA-256, and archive generation
 revalidates those current repository bytes. This publication registry was created from the
 committed originals in 2026, so it is not contemporaneous proof of the bytes retrieved on the
@@ -155,7 +164,7 @@ The import report separately counts retained negative revenue rows as a warning
 ## 4. Pipeline architecture
 
 ```
-Form #1 PDFs (+ 4 reviewed text sidecars)
+2004 annual-report handoff + Form #1 PDFs (+ 4 reviewed text sidecars)
         │  pdf-parse text (async)
         ▼
 parseTreasuryPdfRows ──► OfficialRevenueRow[] (year, sourceCode, labelKa, section,
@@ -164,13 +173,13 @@ parseTreasuryPdfRows ──► OfficialRevenueRow[] (year, sourceCode, labelKa, 
         ├── npm run data:extract-revenue  ──► data/staging/revenue-official-rows-2005-2025.csv   (review artifact)
         │
         └── npm run data:generate-revenue-facts
-                ├─ generateRevenueFacts ──► 231 facts
+                ├─ YEAR_2004_REVENUE_FACTS + generateRevenueFacts ──► 241 facts
                 ├─ validateRealRevenueFacts ──► per-year receipts reconciliation (±10 GEL) — hard gate
-                ├─ writes data/imports/revenue-facts-2005-2025.csv
-                └─ writes data/reports/real-revenue-2005-2025-report.json
+                ├─ writes data/imports/revenue-facts-2004-2025.csv
+                └─ writes data/reports/real-revenue-2004-2025-report.json
                           + revenue-pdf-vs-workbook-2005-2025-report.json
 
-npm run data:compose-budget-facts ──► data/imports/budget-facts-2004-2025.csv (revenue 2005–2025 + expenditure 2004–2025)
+npm run data:compose-budget-facts ──► data/imports/budget-facts-2004-2025.csv (revenue and expenditure 2004–2025)
 npm run data:validate             ──► coverage / referential-integrity / staleness gate
 app build (app/page.tsx, the app/explorer routes) reads the composed CSV
 ```
@@ -232,7 +241,8 @@ warnings surface in the same run (workbook rows are not staged).
 
 `scripts/generate-real-revenue-facts.ts` re-extracts, then:
 
-1. **Generates the 231 facts** (`generateRevenueFacts`, `lib/data/realRevenue/generateFacts.ts`).
+1. **Generates 241 facts**: ten reviewed 2004 facts from `year2004Revenue.ts` plus 231 Form #1
+   facts from `generateRevenueFacts` (`lib/data/realRevenue/generateFacts.ts`).
    Years containing old fixed-width codes take the old-code mapping (§5.4–§5.5); all other years
    take the modern mapping table (§3.1) with **undotted fallbacks** (`1.1.4.1.1` also matches
    `11411`, etc.) so 2008–2018 resolve through the same table, plus the netting and residual
@@ -241,7 +251,7 @@ warnings surface in the same run (workbook rows are not staged).
    currently none (the detailed set is all of 2005–2025), so the single curated entry
    (2006 `revenue.total`, `lib/data/totalOnlyBudgetFacts.ts`) is filtered out of the CSV and
    survives only as the independent reconciliation anchor used by the integration tests (§8.3).
-3. **Validates** (§8.1) and writes `data/reports/real-revenue-2005-2025-report.json`; if any year
+3. **Validates** (§8.1) and writes `data/reports/real-revenue-2004-2025-report.json`; if any year
    fails, the script **exits non-zero without shipping** — but note the CSV is written before the
    check, so never commit a red run's output.
 4. **Writes the cross-check report** `data/reports/revenue-pdf-vs-workbook-2005-2025-report.json`
@@ -255,7 +265,7 @@ rejects notes containing such glyphs, so this guard is what keeps mojibake years
 ### 4.5 Composition and promotion
 
 `npm run data:compose-budget-facts` (`scripts/compose-budget-facts.ts`) merges
-`revenue-facts-2005-2025.csv` with the per-year expenditure CSVs into
+`revenue-facts-2004-2025.csv` with the per-year expenditure CSVs into
 `data/imports/budget-facts-2004-2025.csv` (sorted year → side → item), which is what the app
 loads at build time (`app/page.tsx` for the landing figures, `app/explorer/page.tsx` for the
 budget hub's card figures, and `app/explorer/{expenditure,revenue,analysis}/page.tsx` for the
@@ -337,12 +347,25 @@ national figure. 2006 additionally has a curated official receipts total —
 **4,537,916,325 GEL** (source PDF p. 22, `lib/data/totalOnlyBudgetFacts.ts`) — kept as an
 independent cross-anchor (§8.3).
 
-### 5.6 2004 — excluded (scope)
+### 5.6 2004 — annual-report partial panel
 
-The revenue series deliberately starts at 2005 (`REVENUE_START_YEAR`). No 2004 Form #1 is
-committed, and `tests/data/sourceCoverage.test.ts` asserts the absence ("intentionally excludes
-2004 revenue"). Expenditure is separately served from 2004 because it has a complete state-budget
-execution annex; that does not create a 2004 revenue source or change this revenue limitation.
+The reviewed Ministry of Finance annual report supplies a consolidated-budget revenue-and-grants
+table on page 19. `year2004Revenue.ts` publishes six tax categories, including property tax, and
+derives `revenue.other_taxes` as the residual needed to preserve the official tax total:
+
+`1,811,195,900 - (628,158,100 + 268,649,900 + 161,589,700 + 163,771,500 + 100,138,000 + 29,107,500) = 459,781,200 GEL`.
+
+This residual absorbs every tax-total component outside those six categories,
+including the source's printed other-taxes line and special-state-fund tax receipts. It is therefore
+not the directly printed **134,094,000 GEL** other-taxes row. Grants, other revenue, and capital
+revenue (served as `revenue.asset_decrease`) complete the ten published facts, which sum exactly to
+**2,283,035,800 GEL**.
+
+The source table is explicitly labelled as excluding budget organizations' social contributions,
+and the source does not establish whether this perimeter is exactly comparable with the 2005–2025
+Form #1 perimeter. The report also does not contain the comparable consolidated Form #1 increase-
+in-liabilities amount. That series therefore has no 2004 point; the missing amount is neither zero
+nor an estimate, and it is excluded from the derived 2004 total.
 
 ---
 
@@ -444,7 +467,8 @@ rounding headroom on whole-GEL rounding of 11 facts). The validator also re-asse
 official total row, all 11 fact IDs, the internal-flow rows (or the 2013-style grant-children
 evidence), and the receipt source rows. Any breach marks the year `failed`, is written into the
 report's `warnings`, and `data:generate-revenue-facts` exits non-zero. The report
-(`data/reports/real-revenue-2005-2025-report.json`) shows the full arithmetic per year: gross
+(`data/reports/real-revenue-2004-2025-report.json`) shows the full arithmetic for the Form #1 years
+and separately records the reviewed 2004 partial rows: gross
 totals, both internal-flow removals, net official revenue, asset/liability components, final
 receipts vs. generated receipts, and per-year pass/fail.
 
@@ -457,7 +481,8 @@ the 2026-07 review were for.
 ### 8.2 Loader- and foundation-level gates
 
 Re-run on every `npm run data:validate` and inside the test suite (§4.5): exact year coverage
-(2005–2025, no gaps, no extras), `revenue.*` ID discipline, taxonomy/glossary/source-registry
+(2004–2025, no gaps, no extras), the documented ten-category 2004 panel and complete eleven-category
+2005–2025 panels, `revenue.*` ID discipline, taxonomy/glossary/source-registry
 referential integrity, negative-amount asymmetry, mojibake rejection in notes, and the
 composed-file staleness check.
 
@@ -469,7 +494,8 @@ throughout: column-order detection, date/page-furniture immunity, wrapped 12-dig
 exemption, sidecar usage, optional-workbook skipping, tavi-1 header/section/warning behavior, and
 every validator failure mode. On top, `tests/data/pipelineIntegration.test.ts` gates the
 **shipped CSVs** end-to-end with the same loaders the app uses: one fact per
-(year, item, basis); a complete 11-category panel every year; the 2006 detailed sum reconciled to
+(year, item, basis); a ten-category panel in 2004 and complete 11-category panels in 2005–2025;
+the 2006 detailed sum reconciled to
 the curated official total (±10 GEL); the exact set of negative revenue facts pinned; and the
 derived explorer totals for the two most recent years pinned to the GEL ("INTENTIONAL REGRESSION
 PINS" — update them consciously with any legitimate data refresh, never loosen).
@@ -539,7 +565,7 @@ PINS" — update them consciously with any legitimate data refresh, never loosen
 `apps/web/lib/data/{coverage,factCsv,totalOnlyBudgetFacts,importBudgetFacts,importReport,foundationValidation}.ts`,
 `apps/web/lib/data/parsing/cellUtils.ts`.
 **Data:** `docs/Raw Data/Revenue/` (+ `text/` sidecars), `data/staging/revenue-official-rows-2005-2025.csv`,
-`data/imports/revenue-facts-2005-2025.csv`, `data/imports/budget-facts-2004-2025.csv`,
+`data/imports/revenue-facts-2004-2025.csv`, `data/imports/budget-facts-2004-2025.csv`,
 `data/taxonomy/revenue-categories.json`, `data/sources/source-documents.csv`.
 **Tests:** `apps/web/tests/data/realRevenue/*.test.ts`, `tests/data/pipelineIntegration.test.ts`,
 `tests/data/sourceCoverage.test.ts`.

@@ -57,7 +57,7 @@ async function main() {
         loadBudgetFactRows(`../../data/imports/expenditure-facts-${year}-final.csv`),
       ),
     ),
-    loadBudgetFactRows("../../data/imports/revenue-facts-2005-2025.csv"),
+    loadBudgetFactRows("../../data/imports/revenue-facts-2004-2025.csv"),
   ]);
   const expenditureRows = [
     ...csvRowsToBudgetRows(TOTAL_ONLY_BUDGET_FACTS.filter((row) => row.side === "expenditure")),
@@ -96,4 +96,3 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     process.exit(1);
   });
 }
-

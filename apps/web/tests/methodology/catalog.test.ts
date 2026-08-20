@@ -126,7 +126,7 @@ describe("methodology catalog", () => {
       expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("2025 წლის მშპ წინასწარია");
     }
     expect(METHODOLOGY_CONTENT.expenditure.reviewedAt).toBe("2026-08-20");
-    expect(METHODOLOGY_CONTENT.revenue.reviewedAt).toBe("2026-08-13");
+    expect(METHODOLOGY_CONTENT.revenue.reviewedAt).toBe("2026-08-20");
 
     expect(FUTURE_METHODOLOGY_DATASETS.find((entry) => entry.titleKa === "მშპ")).toEqual({
       titleKa: "მშპ",
@@ -155,10 +155,36 @@ describe("methodology catalog", () => {
     );
     const publicText = [disclosure?.titleKa, disclosure?.summaryKa, ...(disclosure?.detailKa ?? [])].join(" ");
 
-    expect(manifest).toHaveLength(21);
+    expect(manifest).toHaveLength(22);
     expect(publicText).toContain(`ყველა ${manifest.length} გამოქვეყნებულ PDF-ს SHA-256 აქვს`);
+    expect(manifest.some((row) => row.years.includes(2004) && row.official_filename === "2004-annual-execution-report.pdf")).toBe(true);
     expect(publicText).not.toContain("არ აქვთ");
     expect(publicText).not.toContain("ჯერ არ არსებობს");
+  });
+
+  it("discloses the partial 2004 revenue panel without inventing liabilities", () => {
+    const publicText = [
+      METHODOLOGY_CONTENT.revenue.disclosureKa,
+      ...METHODOLOGY_CONTENT.revenue.decisions.flatMap((entry) => [entry.titleKa, entry.summaryKa, ...entry.detailKa]),
+    ].join(" ");
+
+    expect(publicText).toContain("2004");
+    expect(publicText).toContain("ვალდებულებების ზრდა");
+    expect(publicText).toContain("არ არის ხელმისაწვდომი");
+    expect(publicText).toContain("სოციალურ შენატანებს არ მოიცავს");
+    expect(publicText).toContain("459,781,200");
+    expect(publicText).toContain("ზუსტი პერიმეტრული შესადარისობა წყაროდან ვერ დასტურდება");
+  });
+
+  it("documents the exact 2004 revenue perimeter and residual transformation", async () => {
+    const canonical = await readFile(path.join(repositoryRoot, "docs/data-methodology/revenue-methodology.md"), "utf8");
+
+    expect(canonical).toContain("budget organizations' social contributions");
+    expect(canonical).toContain("1,811,195,900");
+    expect(canonical).toContain("459,781,200");
+    expect(canonical).toContain("628,158,100 + 268,649,900 + 161,589,700 + 163,771,500 + 100,138,000 + 29,107,500");
+    expect(canonical).toContain("does not establish whether this perimeter is exactly comparable");
+    expect(canonical).not.toContain("a complete 11-category panel every year");
   });
 
   it("covers every canonical decision exactly through a public entry", async () => {
@@ -186,6 +212,8 @@ describe("methodology catalog", () => {
     expect(functional).toContain("All 22 detailed years");
     expect(functional).toContain("Old 14-group → public category (2004–2006)");
     expect(functional).toContain("year2004StateBudget.ts");
+    expect(functional).toContain("revenue from 2004–2025");
+    expect(METHODOLOGY_CONTENT.expenditure.sections.find((section) => section.id === "scope")?.paragraphsKa.join(" ")).toContain("შემოსავლების ცალკე სერია 2004–2025");
     expect(register).toContain("6b. Old 14-group → public category (2004–2006)");
   });
 

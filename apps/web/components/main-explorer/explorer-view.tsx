@@ -174,6 +174,7 @@ export function ExplorerView({
               მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო).{" "}
               <span className="font-[family-name:var(--font-numeric)]">{coverage}</span> · 12-თვიანი ფაქტობრივი შესრულება.
               {CLASSIFICATION_NOTE[scope] ? ` ${CLASSIFICATION_NOTE[scope]}` : null}
+              {scope === "revenue" ? " 2004 წლის ვალდებულებების ზრდა არ არის ხელმისაწვდომი და 2004 წლის ჯამში არ შედის." : null}
               {Object.keys(model.gdpByYear).length > 0 ? " მშპ: საქსტატი, მიმდინარე ფასებში." : null}
               {model.years.some((year) => model.gdpByYear[year]?.status === "preliminary") ? " 2025 წლის მშპ წინასწარია." : null}
               {lastUpdatedAt ? (
