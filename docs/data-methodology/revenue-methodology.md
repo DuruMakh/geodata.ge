@@ -350,12 +350,12 @@ independent cross-anchor (§8.3).
 ### 5.6 2004 — annual-report partial panel
 
 The reviewed Ministry of Finance annual report supplies a consolidated-budget revenue-and-grants
-table on page 19. `year2004Revenue.ts` publishes its six named tax categories, separates property
-tax, and derives `revenue.other_taxes` as the residual needed to preserve the official tax total:
+table on page 19. `year2004Revenue.ts` publishes six tax categories, including property tax, and
+derives `revenue.other_taxes` as the residual needed to preserve the official tax total:
 
 `1,811,195,900 - (628,158,100 + 268,649,900 + 161,589,700 + 163,771,500 + 100,138,000 + 29,107,500) = 459,781,200 GEL`.
 
-This residual absorbs every tax-total component outside those six named taxes and property tax,
+This residual absorbs every tax-total component outside those six categories,
 including the source's printed other-taxes line and special-state-fund tax receipts. It is therefore
 not the directly printed **134,094,000 GEL** other-taxes row. Grants, other revenue, and capital
 revenue (served as `revenue.asset_decrease`) complete the ten published facts, which sum exactly to

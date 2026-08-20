@@ -27,4 +27,3 @@ Extend the national revenue explorer to 2004 using the reviewed Ministry of Fina
 - Assert the 2004 panel contains no liabilities fact.
 - Assert all 2005–2025 revenue facts remain unchanged after deterministic regeneration.
 - Keep the existing 11-category completeness rule for 2005–2025; apply a documented ten-category rule only to 2004.
-
