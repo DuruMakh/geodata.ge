@@ -1,4 +1,5 @@
 import path from "node:path";
+import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import type { MunicipalTotalFact } from "../../lib/data/municipal/types";
 import {
@@ -156,6 +157,25 @@ describe("methodology catalog", () => {
       uncovered: [],
       unknownPublicIds: [],
     });
+  });
+
+  it("keeps the canonical 2004 expenditure methodology coverage and source registry current", async () => {
+    const [ministries, functional, drilldown, register] = await Promise.all([
+      readFile(path.join(repositoryRoot, "docs/data-methodology/ministries-expenditure-methodology.md"), "utf8"),
+      readFile(path.join(repositoryRoot, "docs/data-methodology/treasury-functional-expenditure-methodology-2004-2025.md"), "utf8"),
+      readFile(path.join(repositoryRoot, "docs/data-methodology/ministries-drilldown-programs-methodology.md"), "utf8"),
+      readFile(path.join(repositoryRoot, "data/methodology/decision-register.csv"), "utf8"),
+    ]);
+
+    expect(ministries).toContain("all 22 resolve");
+    expect(ministries).toContain("`source.mof_2004_programmatic_fact_actual`");
+    expect(ministries).toContain("2004-annual-execution-annex.pdf");
+    expect(ministries).toMatch(/\*\*All 22\s+years pass\*\*/);
+    expect(drilldown).toContain("22/22 years ≤1,000");
+    expect(functional).toContain("All 22 detailed years");
+    expect(functional).toContain("Old 14-group → public category (2004–2006)");
+    expect(functional).toContain("year2004StateBudget.ts");
+    expect(register).toContain("6b. Old 14-group → public category (2004–2006)");
   });
 
   it.each([

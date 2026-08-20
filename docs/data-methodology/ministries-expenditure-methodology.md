@@ -54,16 +54,17 @@ GEL. The basis is always `actual` (planned figures are never used for public val
 | Family | Format | Years | Notes |
 |---|---|---|---|
 | **Excel fact workbooks** | `.xlsx` (`excel-fact-files-2004-2025/<year>-fact.xlsx`) | 2005, 2013, 2014, 2017–2025 | Reviewed workbooks with the full organizational table. 2014's actuals live in the **2015** workbook (see §5.3). |
-| **Annual budget-execution reports** | `.pdf` (`annual-execution-reports/…`) | 2006–2012, 2015, 2016 | Official year-end execution reports. The only real organizational source for these years. Parsed with a bespoke table parser (§4.2). |
+| **Annual budget-execution reports** | `.pdf` (`annual-execution-reports/…`) | 2004, 2006–2012, 2015, 2016 | Official year-end execution reports. The only real organizational source for these years. Parsed with a bespoke table parser (§4.2). |
 
 ### 2.2 Per-year source registry
 
 Every year's rows carry a `sourceId` that resolves to a row in
-`data/sources/source-documents.csv` (validated: all 21 resolve, all files exist on disk, all
+`data/sources/source-documents.csv` (validated: all 22 resolve, all files exist on disk, all
 SHA-256 hashes match the appendix tables in the two group docs).
 
 | Year | `sourceId` | Source file | Approach |
 |---|---|---|---|
+| 2004 | `source.mof_2004_programmatic_fact_actual` | `annual-execution-reports/2004-annual-execution-annex.pdf` | Complete execution annex, pp. 2–231; `extractOlderMinistryYears.ts` (§6.11) |
 | 2005 | `mof_2005_programmatic_fact_actual` | `excel-fact-files/2005-fact.xlsx` | AcadNusx, ministry-totals (§5.4) |
 | 2006 | `mof_2006_programmatic_fact_actual` | `annual-execution-reports/2006-annual-execution-report.pdf` | Legacy PDF (§5.5) |
 | 2007 | `mof_2007_programmatic_fact_actual` | `…/2007-annual-execution-report.pdf` | Legacy PDF |
@@ -83,8 +84,8 @@ SHA-256 hashes match the appendix tables in the two group docs).
 The organizational grand total (row `00 00`) is the **payments** total — it includes
 financial-asset growth and liability reduction (debt principal), i.e. the same basis as the
 2017–2025 baseline. It runs ~5–10 % higher than the functional-classification total (which
-excludes some of those), so the two datasets have deliberately different year totals. The 21
-totals climb steadily: **2005 ≈ 2.61 B GEL → 2025 ≈ 27.72 B GEL**.
+excludes some of those), so the two datasets have deliberately different year totals. The 22
+totals run from **2004 ≈ 1.93 B GEL → 2025 ≈ 27.72 B GEL**.
 
 ---
 
@@ -146,7 +147,7 @@ raw sources ──► extraction ──► OfficialExpenditureRow[] ──► ge
 `OfficialExpenditureRow[]` for all years. It dispatches per year:
 
 - **xlsx years** (2013, 2017–2025) → `parseTavi6Rows` (the shared workbook parser).
-- **2005, 2014** → `extractOlderMinistryYears.ts` (AcadNusx totals; 2015-workbook column).
+- **2004, 2005, 2014** → `extractOlderMinistryYears.ts` (2004 complete annex; AcadNusx totals; 2015-workbook column).
 - **2006–2012, 2015, 2016** → `extractAnnualReportYears.ts` (reads the pre-extracted staging CSV).
 
 Every row carries: year, code (`NN NN…`), depth, institution label, program label, `isLeafCode`,
@@ -481,7 +482,7 @@ Development ministry until 2009): the drill-down follows the *program*, the cate
 ## 8. Reconciliation & validation
 
 ### 8.1 The reconciliation gate — and its limitation
-Every year's category sum must equal the source `00 00` grand total within 1 000 GEL. **All 21
+Every year's category sum must equal the source `00 00` grand total within 1 000 GEL. **All 22
 years pass** (per-year deltas 0–600 GEL, pure thousand-GEL rounding). **Important limitation:** the
 gate only checks the year *total*. An internally-consistent **mis-split** (money in the wrong
 category, but the year total still correct) passes undetected. This is why every hardcoded split

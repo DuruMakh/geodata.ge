@@ -69,8 +69,9 @@ Two official documents are combined:
    Downloaded from **mof.ge** (live for 2017+, recovered from the Internet Archive for the
    older years); committed under `docs/Raw Data/Expenditure/mof.ge/`.
 
-Two eras are special: **2007** and **2005–2006** use an older economic classification
-whose functional blocks already contain lending and debt repayment, so their E11 grand
+Two eras are special: **2004–2006** use the older 14-group functional classification.
+For 2004, the complete execution annex supplies the full-state table; for 2005–2006,
+the E11 functional blocks already contain lending and debt repayment, so their E11 grand
 total *is* the whole payments concept and **no supplement is needed** (the report is used
 only to confirm the total). See §4.
 
@@ -96,7 +97,7 @@ Guardrails, applied to every year:
   the official total by more than 1,000 GEL. You cannot fabricate 13 category numbers that
   sum *exactly* to the official total unless they trace to real parsed rows, so
   reconciliation is a hard integrity check, not a soft one.
-- **Regression pins.** All 21 detailed years have committed total pins in
+- **Regression pins.** All 22 detailed years have committed total pins in
   `apps/web/tests/data/pipelineIntegration.test.ts`; the shipped CSVs cannot drift silently.
 - **Reproducibility.** Regenerating every year from source leaves the working tree
   git-clean — the shipped data *is* the pipeline's output from the official documents,
@@ -253,7 +254,7 @@ The E11 functional (COFOG) codes map deterministically to the 13 public categori
 | 7.9 | education |
 | 7.10 | social protection |
 
-### 6b. Old 14-group → public category (2005–2006)
+### 6b. Old 14-group → public category (2004–2006)
 
 The pre-COFOG groups are the predecessors of the COFOG divisions, so the mapping is the
 direct analogue (`oldClassificationExpenditurePdf.ts`). Each group maps to a dominant
@@ -368,7 +369,7 @@ COVID surge 2020–2021), confirming a single consistent concept across the seri
 - **Hash gate:** each treasury E11 PDF is SHA-256-checked before parsing.
 - **Reconciliation gate:** the composition aborts if a year misses its official total by
   more than 1,000 GEL.
-- **Regression pins:** all 21 detailed years pinned in
+- **Regression pins:** all 22 detailed years pinned in
   `apps/web/tests/data/pipelineIntegration.test.ts`.
 - **Test suite:** 222 tests pass, including referential integrity (every fact's source is
   catalogued) and the coverage/no-negative/complete-panel checks.
@@ -425,7 +426,8 @@ file ends with `%%EOF`.
 | Legacy-font canonical labels (2012–2014, + 2008–2011 codes) | `apps/web/lib/data/realExpenditurePdf/cofogCanonicalLabels.ts` |
 | 2008–2011 organizational supplement parser | `apps/web/lib/data/realExpenditurePdf/legacyAnnualReportPdf.ts` |
 | 2012+ programmatic Chapter VI parser | `apps/web/lib/data/realExpenditurePdf/tavi6ProgrammaticPdf.ts` |
-| Old 14-group parser + mapping (2005–2006) | `apps/web/lib/data/realExpenditurePdf/oldClassificationExpenditurePdf.ts` |
+| 2004 complete-state parser | `apps/web/lib/data/realExpenditurePdf/year2004StateBudget.ts` |
+| Old 14-group parser + mapping (2004–2006) | `apps/web/lib/data/realExpenditurePdf/oldClassificationExpenditurePdf.ts` |
 | COFOG → public category rules | `apps/web/lib/data/realExpenditurePdf/publicMapping.ts` |
 | Keyword / supplement mapping | `apps/web/lib/data/realExpenditure/candidateMapping.ts` |
 | Extraction scripts | `apps/web/scripts/extract-expenditure-pdf-pilot.ts`, `generate-final-2025-expenditure-data.ts`, `generate-final-old-classification-expenditure.ts` |

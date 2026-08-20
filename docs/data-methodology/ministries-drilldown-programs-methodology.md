@@ -289,7 +289,7 @@ possible 2006–2025 natively-joined range with a single identity from day one (
 
 ## 9. Verification & maintenance
 
-**Automated guards** (all in `apps/web/tests/data/`): reconciliation gate (21/21 years ≤1,000
+**Automated guards** (all in `apps/web/tests/data/`): reconciliation gate (22/22 years ≤1,000
 GEL); category facts unaffected by drill-down changes; join-completeness (every join entry
 materializes exactly once) + per-year joined-sum value locks; succession structure (disjoint
 ranges, chain-final targets, anchored canonicals, one fact per year+identity), per-chain
