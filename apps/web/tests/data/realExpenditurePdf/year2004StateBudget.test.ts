@@ -27,25 +27,24 @@ const expectedSpendingFieldIds = [
 describe("2004 complete state-budget functional expenditure", () => {
   let annexPages: ExpenditurePdfPageText[];
   let centralPages: ExpenditurePdfPageText[];
+  let result: Awaited<ReturnType<typeof loadYear2004StateBudget>>;
 
   beforeAll(async () => {
-    [annexPages, centralPages] = await Promise.all([
+    [annexPages, centralPages, result] = await Promise.all([
       readPdfTextPages(annexFile).then((pdf) => pdf.pages),
       readPdfTextPages(centralFile).then((pdf) => pdf.pages),
+      loadYear2004StateBudget(),
     ]);
-  });
+  }, 30_000);
 
-  it("parses the complete state-budget actual column and preserves the reviewed source pins", async () => {
-    const result = await loadYear2004StateBudget();
-
+  it("parses the complete state-budget actual column and preserves the reviewed source pins", () => {
     expect(result.grandTotalGel).toBe(1_930_210_300);
     expect(result.groupTotalsGel.get(5)).toBe(147_362_300);
     expect(result.groupTotalsGel.get(6)).toBe(364_257_700);
     expect(result.groupTotalsGel.get(12)).toBe(67_416_800);
   });
 
-  it("maps every public spending field exactly once without emitting a central-budget total", async () => {
-    const result = await loadYear2004StateBudget();
+  it("maps every public spending field exactly once without emitting a central-budget total", () => {
     const factIds = result.facts.map((row) => row.item_id).sort();
     const amounts = result.facts.map((row) => Number(row.amount_gel));
 
@@ -60,8 +59,7 @@ describe("2004 complete state-budget functional expenditure", () => {
     expect(amounts).not.toContain(1_514_348_500);
   });
 
-  it("keeps the printed rounding difference explicit and only in the residual category", async () => {
-    const result = await loadYear2004StateBudget();
+  it("keeps the printed rounding difference explicit and only in the residual category", () => {
     const roundedGroupTotalGel = [...result.groupTotalsGel.values()].reduce((sum, amount) => sum + amount, 0);
     const residualFact = result.facts.find((row) => row.item_id === "spending.other_unclassified");
 
@@ -75,13 +73,24 @@ describe("2004 complete state-budget functional expenditure", () => {
     );
   });
 
-  it("pins the exact supporting carve-outs rather than absorbing a wrong column into parent remainders", async () => {
-    const result = await loadYear2004StateBudget();
+  it("pins the exact supporting carve-outs rather than absorbing a wrong column into parent remainders", () => {
     const reviewAmount = (code: string) => result.reviewRows.find((row) => row.code === code)?.actualGel;
 
     expect(reviewAmount("8.1.1")).toBe(6_866_000);
     expect(reviewAmount("14.1.0")).toBe(291_350_100);
     expect(reviewAmount("14.2.0")).toBe(128_234_000);
+  });
+
+  it("attributes annex-derived carve-outs to the annex source", () => {
+    const carveOutProvenance = result.reviewRows
+      .filter((row) => ["8.1.1", "14.1.0", "14.2.0"].includes(row.code))
+      .map((row) => ({ code: row.code, sourceId: row.sourceId }));
+
+    expect(carveOutProvenance).toEqual([
+      { code: "8.1.1", sourceId: "source.mof_2004_expenditure_full_state_functional_actual" },
+      { code: "14.1.0", sourceId: "source.mof_2004_expenditure_full_state_functional_actual" },
+      { code: "14.2.0", sourceId: "source.mof_2004_expenditure_full_state_functional_actual" },
+    ]);
   });
 
   it("rejects a missing full-state functional group", () => {

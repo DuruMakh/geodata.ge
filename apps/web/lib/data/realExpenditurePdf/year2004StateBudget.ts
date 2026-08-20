@@ -225,7 +225,7 @@ export function parseYear2004StateBudget(input: {
       addCategory(carveOut.field, carveOut.amountGel);
       reviewRows.push({
         year: 2004,
-        sourceId: year2004StateBudgetSources.centralSupporting.sourceId,
+        sourceId: year2004StateBudgetSources.fullState.sourceId,
         code: carveOut.code,
         labelKa: carveOut.labelKa,
         actualGel: carveOut.amountGel,

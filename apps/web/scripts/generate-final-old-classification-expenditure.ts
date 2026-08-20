@@ -110,10 +110,18 @@ async function main() {
             year2004StateBudgetSources.fullState.sourceFile,
             year2004StateBudgetSources.centralSupporting.sourceFile,
           ],
+          sourceRoles: {
+            completeExecutionAnnex:
+              "Supplies the full-state parent/grand totals and the exact central-budget detail rows used for carve-outs.",
+            treasuryCentralE11:
+              "Corroborates the narrower central-budget scope and parent aggregates only; supplies no review-row amount.",
+          },
           scope: {
             publicFacts: "Complete 2004 state-budget actual from annex page 232.",
             supportingCarveOuts:
-              "Central-budget detail is used only for exact sport, debt, and intergovernmental-transfer carve-outs.",
+              "Exact sport, debt, and intergovernmental-transfer carve-outs come from central-budget detail rows inside the complete execution annex.",
+            centralCorroboration:
+              "The separate Treasury E11 PDF is used only for central-scope and parent-aggregate corroboration.",
             excluded:
               "The central-budget grand total is narrower than the complete state budget and is never emitted.",
           },
