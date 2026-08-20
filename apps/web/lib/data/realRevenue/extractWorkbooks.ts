@@ -2,7 +2,7 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { PDFParse } from "pdf-parse";
-import { REVENUE_YEARS } from "../coverage";
+import { REVENUE_SOURCE_YEARS } from "../coverage";
 import { readWorkbookMatrix } from "../parsing/workbookMatrix";
 import { parseTavi1Rows } from "./parseTavi1Rows";
 import { parseTreasuryPdfRows } from "./parseTreasuryPdfRows";
@@ -29,7 +29,7 @@ export const realRevenueSources: RealRevenueSource[] = [
   },
 ];
 
-export const realRevenuePdfSources: RealRevenuePdfSource[] = REVENUE_YEARS.map((year) => ({
+export const realRevenuePdfSources: RealRevenuePdfSource[] = REVENUE_SOURCE_YEARS.map((year) => ({
   year,
   sourceId: `source.mof_${year}_revenue_form1_pdf`,
   pdfPath: `../../docs/Raw Data/Revenue/${year}-jan-dec-consolidated-revenue.pdf`,

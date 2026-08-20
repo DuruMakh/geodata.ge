@@ -14,7 +14,7 @@ A Georgian-first public budget explorer for understanding Georgia's national bud
 
 GeoData.ge is a long-term public data platform idea, but v1 is intentionally narrow: Georgia Budget Explorer.
 
-The first version focuses on annual national budget data: expenditure by public spending fields and ministries covers 2004-2025, while revenue and tax revenue cover 2005-2025. The 2004 expenditure series uses the reviewed full state-budget execution annex; the separate Treasury E11 PDF is central-budget scoped and is not served. The product should help users understand where public money comes from, where it goes, and how the structure changes over time.
+The first version focuses on annual national budget data: expenditure by public spending fields and ministries and revenue both cover 2004-2025. The 2004 expenditure series uses the reviewed full state-budget execution annex; the separate Treasury E11 PDF is central-budget scoped and is not served. The 2004 revenue panel uses the annual report's consolidated revenue-and-grants table and intentionally omits the unavailable comparable increase-in-liabilities amount. The product should help users understand where public money comes from, where it goes, and how the structure changes over time.
 
 This v1 scope is deliberate. A narrow, high-quality budget explorer is more valuable than a broad but shallow data catalog.
 
@@ -22,7 +22,7 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 
 ### Included
 
-- Annual expenditure data for 2004-2025 and annual revenue data for 2005-2025.
+- Annual expenditure and revenue data for 2004-2025. The 2004 revenue total covers revenue and grants; increase in liabilities starts in 2005 and is neither estimated nor treated as zero for 2004.
 - Revenue overview and major tax revenue categories.
 - Expenditure overview using public-friendly spending fields such as health, education, social protection, defence, infrastructure, and similar categories.
 - Multi-year explorer with line and table views.

@@ -9,6 +9,7 @@ import {
   EXPENDITURE_TOTAL_ONLY_YEARS,
   EXPENDITURE_YEARS,
   REVENUE_TOTAL_ONLY_YEARS,
+  REVENUE_PARTIAL_YEARS,
   REVENUE_YEARS,
 } from "../../lib/data/coverage";
 import { validateFoundationReferences } from "../../lib/data/foundationValidation";
@@ -319,7 +320,10 @@ describe("data pipeline gate (real shipped data files)", () => {
         .filter((fact) => fact.year === year)
         .map((fact) => fact.itemId)
         .sort();
-      expect(itemIds, `revenue ${year}`).toEqual(expectedRevenueIds);
+      const expectedIds = REVENUE_PARTIAL_YEARS.includes(year)
+        ? expectedRevenueIds.filter((itemId) => itemId !== "revenue.increase_liabilities")
+        : expectedRevenueIds;
+      expect(itemIds, `revenue ${year}`).toEqual(expectedIds);
     }
   });
 

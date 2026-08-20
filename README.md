@@ -9,9 +9,9 @@ Read first:
 - `docs/superpowers/specs/2026-05-10-geodata-budget-v1-design.md`
 - `DESIGN.md` (for any UI work)
 
-V1 focuses on annual national budget data: expenditure for 2004-2025 and revenue for 2005-2025, reviewed data ingestion, public spending-field taxonomy, revenue categories, ministry-level expenditure series, CSV export, and clear budget visualizations.
+V1 focuses on annual national budget data for 2004-2025, reviewed data ingestion, public spending-field taxonomy, revenue categories, ministry-level expenditure series, CSV export, and clear budget visualizations.
 
-Current loaded coverage: revenue is complete for 2005-2025; expenditure has detailed public-field and ministry-category data for 2004-2025. The served 2004 expenditure total is the full state-budget execution-annex total of GEL 1,930,210,300; the separate Treasury E11 PDF is central-budget scoped and not served.
+Current loaded coverage: expenditure has detailed public-field and ministry-category data for 2004-2025. Revenue covers 2004-2025; the 2004 annual report supplies ten revenue-and-grants categories totaling GEL 2,283,035,800, while the unavailable comparable increase-in-liabilities amount is omitted rather than estimated or treated as zero. The served 2004 expenditure total is the full state-budget execution-annex total of GEL 1,930,210,300; the separate Treasury E11 PDF is central-budget scoped and not served.
 
 ## Development
 

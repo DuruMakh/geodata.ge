@@ -4,7 +4,7 @@ import { loadGlossary } from "../../lib/data/glossary";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
 import { loadSourceDocuments } from "../../lib/data/sources";
-import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_DETAILED_YEARS, REVENUE_TOTAL_ONLY_YEARS, REVENUE_YEARS } from "../../lib/data/coverage";
+import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_TOTAL_ONLY_YEARS, REVENUE_YEARS } from "../../lib/data/coverage";
 import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
@@ -119,6 +119,7 @@ describe("explorer integration with real CSV data", () => {
     const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
     const revenueFacts = facts.filter((fact) => fact.side === "revenue");
     const expectedReceiptsByYear = new Map([
+      [2004, 2283035800],
       [2005, 3289223828],
       [2006, 4537916326],
       [2007, 6356421171],
@@ -142,6 +143,7 @@ describe("explorer integration with real CSV data", () => {
       [2025, 32368880408],
     ]);
     const expectedNetRevenueByYear = new Map([
+      [2004, 2210296000],
       [2005, 2784499174],
       [2006, 3802956630],
       [2007, 5424512208],
@@ -167,7 +169,7 @@ describe("explorer integration with real CSV data", () => {
 
     const totalOnlyRevenueByYear = new Map<number, number>();
 
-    expect([...expectedReceiptsByYear.keys()]).toEqual(REVENUE_DETAILED_YEARS);
+    expect([...expectedReceiptsByYear.keys()]).toEqual(REVENUE_YEARS);
     expect([...totalOnlyRevenueByYear.keys()]).toEqual(REVENUE_TOTAL_ONLY_YEARS);
 
     for (const [year, expectedReceiptsGel] of totalOnlyRevenueByYear) {
@@ -182,7 +184,8 @@ describe("explorer integration with real CSV data", () => {
       const yearFacts = revenueFacts.filter((fact) => fact.year === year);
       const netRevenueFacts = yearFacts.filter((fact) => !["revenue.asset_decrease", "revenue.increase_liabilities"].includes(fact.itemId));
 
-      expect(yearFacts).toHaveLength(11);
+      expect(yearFacts).toHaveLength(year === 2004 ? 10 : 11);
+      expect(yearFacts.some((fact) => fact.itemId === "revenue.increase_liabilities")).toBe(year !== 2004);
       expect(yearFacts.reduce((sum, fact) => sum + fact.amountGel, 0)).toBe(expectedReceiptsGel);
       expect(netRevenueFacts.reduce((sum, fact) => sum + fact.amountGel, 0)).toBe(expectedNetRevenueByYear.get(year));
     }

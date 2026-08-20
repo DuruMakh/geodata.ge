@@ -250,7 +250,8 @@ test("revenue nav reuses the identical system without a grouping switch", async 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება საქართველოს ბიუჯეტი");
   await expect(page.getByTestId("grouping-fields")).toHaveCount(0);
   await expect(page.getByTestId("series-selector")).toContainText("დამატებული ღირებულების გადასახადი");
-  await expect(page.getByTestId("source-label")).toContainText("შემოსავლების მონაცემები: 2005–2025");
+  await expect(page.getByTestId("source-label")).toContainText("შემოსავლების მონაცემები: 2004–2025");
+  await expect(page.getByTestId("source-label")).toContainText("2004 წლის ვალდებულებების ზრდა არ არის ხელმისაწვდომი");
   await expectLineChartRendered(page);
   await expect(page.getByTestId("period-comparison")).not.toContainText("საწყისი მნიშვნელობა, ცვლილება და საბოლოო მნიშვნელობა (მლრდ ₾)");
 
@@ -380,7 +381,7 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
 
   await page.goto("http://localhost:3100/explorer/revenue");
   await expectAppReady(page);
-  await expect(page.getByTestId("year-range-strip")).toContainText("2005–2025");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
 
   expect(consoleProblems).toEqual([]);
 });

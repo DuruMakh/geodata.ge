@@ -126,7 +126,7 @@ describe("methodology catalog", () => {
       expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("2025 წლის მშპ წინასწარია");
     }
     expect(METHODOLOGY_CONTENT.expenditure.reviewedAt).toBe("2026-08-20");
-    expect(METHODOLOGY_CONTENT.revenue.reviewedAt).toBe("2026-08-13");
+    expect(METHODOLOGY_CONTENT.revenue.reviewedAt).toBe("2026-08-20");
 
     expect(FUTURE_METHODOLOGY_DATASETS.find((entry) => entry.titleKa === "მშპ")).toEqual({
       titleKa: "მშპ",
@@ -155,10 +155,22 @@ describe("methodology catalog", () => {
     );
     const publicText = [disclosure?.titleKa, disclosure?.summaryKa, ...(disclosure?.detailKa ?? [])].join(" ");
 
-    expect(manifest).toHaveLength(21);
+    expect(manifest).toHaveLength(22);
     expect(publicText).toContain(`ყველა ${manifest.length} გამოქვეყნებულ PDF-ს SHA-256 აქვს`);
+    expect(manifest.some((row) => row.years.includes(2004) && row.official_filename === "2004-annual-execution-report.pdf")).toBe(true);
     expect(publicText).not.toContain("არ აქვთ");
     expect(publicText).not.toContain("ჯერ არ არსებობს");
+  });
+
+  it("discloses the partial 2004 revenue panel without inventing liabilities", () => {
+    const publicText = [
+      METHODOLOGY_CONTENT.revenue.disclosureKa,
+      ...METHODOLOGY_CONTENT.revenue.decisions.flatMap((entry) => [entry.titleKa, entry.summaryKa, ...entry.detailKa]),
+    ].join(" ");
+
+    expect(publicText).toContain("2004");
+    expect(publicText).toContain("ვალდებულებების ზრდა");
+    expect(publicText).toContain("არ არის ხელმისაწვდომი");
   });
 
   it("covers every canonical decision exactly through a public entry", async () => {

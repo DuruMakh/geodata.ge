@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { REVENUE_YEARS } from "../../../lib/data/coverage";
+import { REVENUE_SOURCE_YEARS } from "../../../lib/data/coverage";
 import type { RealRevenueFactCsvRow } from "../../../lib/data/realRevenue/generateFacts";
 import type { OfficialRevenueRow } from "../../../lib/data/realRevenue/types";
 import { validateRealRevenueFacts } from "../../../lib/data/realRevenue/validateRealRevenue";
@@ -144,8 +144,8 @@ const validFacts = [
 ];
 
 describe("validateRealRevenueFacts", () => {
-  it("reports revenue coverage for 2005-2025 without 2004", () => {
-    const rows: OfficialRevenueRow[] = REVENUE_YEARS.map((year) => ({
+  it("reports Form #1 validation coverage for 2005-2025 without the separate 2004 handoff", () => {
+    const rows: OfficialRevenueRow[] = REVENUE_SOURCE_YEARS.map((year) => ({
       year,
       sourceId: `source.mof_${year}_revenue_form1_pdf`,
       workbookPath: `docs/Raw Data/Revenue/${year}-jan-dec-consolidated-revenue.pdf`,
@@ -160,7 +160,7 @@ describe("validateRealRevenueFacts", () => {
       section: "revenues",
       consolidatedActualGel: 1000000,
     }));
-    const facts: RealRevenueFactCsvRow[] = REVENUE_YEARS.map((year) => ({
+    const facts: RealRevenueFactCsvRow[] = REVENUE_SOURCE_YEARS.map((year) => ({
       year,
       side: "revenue",
       item_id: "revenue.other_revenue",
@@ -175,10 +175,10 @@ describe("validateRealRevenueFacts", () => {
       mapping_notes: "test row",
     }));
 
-    const report = validateRealRevenueFacts(rows, facts, REVENUE_YEARS);
+    const report = validateRealRevenueFacts(rows, facts, REVENUE_SOURCE_YEARS);
 
     expect(report.importLabel).toBe("real-revenue-2005-2025");
-    expect(report.years).toEqual(REVENUE_YEARS);
+    expect(report.years).toEqual(REVENUE_SOURCE_YEARS);
     expect(report.years).not.toContain(2004);
   });
   it("passes when detailed generated facts reconcile to final receipts without opening balance rows", () => {

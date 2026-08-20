@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_SOURCE_YEARS, EXPENDITURE_TOTAL_ONLY_YEARS, REVENUE_DETAILED_YEARS, REVENUE_SOURCE_YEARS, REVENUE_TOTAL_ONLY_YEARS, REVENUE_YEARS, inclusiveYears } from "../../lib/data/coverage";
+import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_SOURCE_YEARS, EXPENDITURE_TOTAL_ONLY_YEARS, REVENUE_DETAILED_YEARS, REVENUE_PARTIAL_YEARS, REVENUE_SOURCE_YEARS, REVENUE_TOTAL_ONLY_YEARS, REVENUE_YEARS, inclusiveYears } from "../../lib/data/coverage";
 import { loadSourceDocuments } from "../../lib/data/sources";
 
 const repoRoot = path.resolve(process.cwd(), "../..");
@@ -32,6 +32,10 @@ describe("2004-2025 source coverage", () => {
       {
         sourceId: "source.mof_2004_programmatic_fact_actual",
         sourceUrlOrFile: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2004-annual-execution-annex.pdf",
+      },
+      {
+        sourceId: "source.mof_2004_revenue_annual_execution_report",
+        sourceUrlOrFile: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2004-annual-execution-report.pdf",
       },
     ];
     const expectedArchivedFiles = [
@@ -69,20 +73,22 @@ describe("2004-2025 source coverage", () => {
     expect(missing).toEqual([]);
   });
 
-  it("has revenue PDFs for 2005-2025 and intentionally excludes 2004 revenue", () => {
+  it("has Form #1 revenue PDFs for 2005-2025 and the reviewed 2004 annual report", () => {
     const missing = REVENUE_SOURCE_YEARS.filter(
       (year) => !fs.existsSync(repoFile(`docs/Raw Data/Revenue/${year}-jan-dec-consolidated-revenue.pdf`)),
     );
 
     expect(fs.existsSync(repoFile("docs/Raw Data/Revenue/2004-jan-dec-consolidated-revenue.pdf"))).toBe(false);
+    expect(fs.existsSync(repoFile("docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2004-annual-execution-report.pdf"))).toBe(true);
     expect(missing).toEqual([]);
   });
   it("documents explicit old-year coverage tiers", () => {
     expect(EXPENDITURE_TOTAL_ONLY_YEARS).toEqual([]);
     expect(EXPENDITURE_DETAILED_YEARS).toEqual(inclusiveYears(2004, 2025));
     expect(REVENUE_TOTAL_ONLY_YEARS).toEqual([]);
+    expect(REVENUE_PARTIAL_YEARS).toEqual([2004]);
     expect(REVENUE_DETAILED_YEARS[0]).toBe(2005);
-    expect(REVENUE_YEARS[0]).toBe(2005);
+    expect(REVENUE_YEARS[0]).toBe(2004);
     // Ministries backfill: 2004 is the reviewed complete-annex handoff; 2005 uses AcadNusx
     // ministry totals; 2006-2012 use Group C annual-execution reports; 2013/2014 use
     // organizational actuals; and 2015/2016 use tavi-VI reports.

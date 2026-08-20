@@ -1,4 +1,14 @@
 year,side,item_id,amount_gel,basis,source_id,official_institution,official_program,official_subprogram,public_spending_field_id,mapping_confidence,mapping_notes
+2004,revenue,revenue.vat,628158100,actual,source.mof_2004_revenue_annual_execution_report,,,,,,"Source: 2004 annual budget execution report, page 19: VAT"
+2004,revenue,revenue.income_tax,268649900,actual,source.mof_2004_revenue_annual_execution_report,,,,,,"Source: 2004 annual budget execution report, page 19: income tax"
+2004,revenue,revenue.profit_tax,161589700,actual,source.mof_2004_revenue_annual_execution_report,,,,,,"Source: 2004 annual budget execution report, page 19: profit tax"
+2004,revenue,revenue.excise_tax,163771500,actual,source.mof_2004_revenue_annual_execution_report,,,,,,"Source: 2004 annual budget execution report, page 19: excise tax"
+2004,revenue,revenue.import_tax,100138000,actual,source.mof_2004_revenue_annual_execution_report,,,,,,"Source: 2004 annual budget execution report, page 19: import tax"
+2004,revenue,revenue.property_tax,29107500,actual,source.mof_2004_revenue_annual_execution_report,,,,,,"Source: 2004 annual budget execution report, page 19: property tax"
+2004,revenue,revenue.other_taxes,459781200,actual,source.mof_2004_revenue_annual_execution_report,,,,,,"Source: 2004 annual budget execution report, page 19: other taxes, derived as official tax total less named tax categories"
+2004,revenue,revenue.grants,124704300,actual,source.mof_2004_revenue_annual_execution_report,,,,,,"Source: 2004 annual budget execution report, page 19: grants"
+2004,revenue,revenue.other_revenue,274395800,actual,source.mof_2004_revenue_annual_execution_report,,,,,,"Source: 2004 annual budget execution report, page 19: other non-tax revenue"
+2004,revenue,revenue.asset_decrease,72739800,actual,source.mof_2004_revenue_annual_execution_report,,,,,,"Source: 2004 annual budget execution report, page 19: capital revenue"
 2005,revenue,revenue.vat,987431734,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 010300000000: old fixed-width revenue classification
 2005,revenue,revenue.income_tax,290685017,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 010100000000: old fixed-width revenue classification
 2005,revenue,revenue.profit_tax,210301232,actual,source.mof_2005_revenue_form1_pdf,,,,,,Source rows 010200000000: old fixed-width revenue classification

@@ -10,6 +10,7 @@ export type OriginalSourceInventoryRow = {
 type InventoryRule = {
   root: string;
   include: (path: string) => boolean;
+  optionalRoot?: boolean;
 };
 
 const extension = (expectedExtension: string) => (candidatePath: string) =>
@@ -20,7 +21,14 @@ const topLevelExtension = (expectedExtension: string) => (candidatePath: string)
 
 const inventoryRules = {
   expenditure: [{ root: "docs/Raw Data/Expenditure", include: () => true }],
-  revenue: [{ root: "docs/Raw Data/Revenue", include: (candidatePath: string) => extension(".pdf")(candidatePath) && dirname(candidatePath) === "Revenue" }],
+  revenue: [
+    { root: "docs/Raw Data/Revenue", include: (candidatePath: string) => extension(".pdf")(candidatePath) && dirname(candidatePath) === "Revenue" },
+    {
+      root: "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports",
+      include: (candidatePath: string) => path.posix.basename(candidatePath) === "2004-annual-execution-report.pdf",
+      optionalRoot: true,
+    },
+  ],
   municipalities: [
     { root: "docs/Raw Data/Municipalities/adjara-republic-budget-2015-2025", include: (candidatePath: string) => [".pdf", ".xlsx"].includes(path.posix.extname(candidatePath).toLowerCase()) },
     { root: "docs/Raw Data/Municipalities/mof-functional-classification", include: extension(".xlsx") },
@@ -39,7 +47,13 @@ function repositoryPath(...segments: string[]) {
 
 async function enumerateRule(repositoryRoot: string, rule: InventoryRule): Promise<OriginalSourceInventoryRow[]> {
   const rootPath = path.join(repositoryRoot, ...rule.root.split("/"));
-  const rootStat = await lstat(rootPath);
+  let rootStat;
+  try {
+    rootStat = await lstat(rootPath);
+  } catch (error) {
+    if (rule.optionalRoot && (error as NodeJS.ErrnoException).code === "ENOENT") return [];
+    throw error;
+  }
   if (rootStat.isSymbolicLink()) {
     throw new Error(`Approved source inventory root cannot be a symlink: ${rule.root}`);
   }

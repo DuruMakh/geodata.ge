@@ -43,7 +43,7 @@ test("public header keeps landing active and leaves methodology navigation inact
       "/explorer",
     );
     await expect(header.locator("[aria-current]")).toHaveCount(0);
-    await expect(header).toContainText("2005–2025");
+    await expect(header).toContainText("2004–2025");
 
     const headerBox = await header.boundingBox();
     const headingBox = await page.getByRole("heading", { level: 1 }).boundingBox();
