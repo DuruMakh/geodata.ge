@@ -62,7 +62,7 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   await expect(page.getByTestId("series-selector")).toContainText("სერიები");
   await expect(page.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
   await expect(page.getByTestId("source-label")).toContainText("გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები");
-  await expect(page.getByTestId("source-label")).toContainText("2005–2025");
+  await expect(page.getByTestId("source-label").getByText("ხარჯვითი მონაცემები: 2004–2025", { exact: true })).toBeVisible();
   await expect(page.getByTestId("source-label")).toContainText("მშპ: საქსტატი, მიმდინარე ფასებში");
   await expect(page.getByTestId("source-label")).toContainText("2025 წლის მშპ წინასწარია");
 
@@ -329,12 +329,68 @@ test("ministries grouping expands nested programs by name only", async ({ page }
   expect(consoleProblems).toEqual([]);
 });
 
+test("2004 expenditure is complete across functions, ministries, GDP share, and CSV exports", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+  const { readFile } = await import("node:fs/promises");
+
+  async function downloadCsv() {
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByTestId("series-csv").click();
+    const download = await downloadPromise;
+    const path = await download.path();
+    if (!path) throw new Error("Expected a local CSV download path");
+    return (await readFile(path)).toString("utf8");
+  }
+
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const fields = page.getByTestId("series-selector");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
+  await expect(fields.locator('[data-level="public_field"]')).toHaveCount(13);
+  await expect(fields.getByTitle("ჯანდაცვა")).toBeVisible();
+  await expect(fields.getByTitle("სოციალური დაცვა")).toBeVisible();
+  await expect(fields.getByTitle(/ცენტრალური ბიუჯეტი/)).toHaveCount(0);
+
+  await page.getByTestId("chart-mode-table").click();
+  await expect(page.getByTestId("explorer-table")).toContainText("2004");
+  await expect(page.getByTestId("explorer-table")).toContainText("1.93");
+
+  await page.getByTestId("measure-share-toggle").click();
+  await expect(page.getByTestId("explorer-table")).toContainText("19.6%");
+
+  const functionalCsv = await downloadCsv();
+  expect(functionalCsv).toContain("2004,expenditure.total,,total,,,მთლიანი ხარჯი,Total expenditure,1930210300,actual");
+  expect(functionalCsv).toContain("2004-annual-execution-annex.pdf");
+  expect(functionalCsv).toContain(",9824300000,sna_1993,final_as_published,");
+  expect(functionalCsv).not.toContain("1500000000");
+
+  await fields.getByTestId("grouping-ministries").click();
+  await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
+  await fields.getByTestId("series-toggle-all").click();
+  await fields.getByTestId("series-toggle-all").click();
+  const ministryCsv = await downloadCsv();
+  const ministry2004Rows = ministryCsv.split("\n").filter((row) => row.startsWith("2004,"));
+  expect(ministry2004Rows).not.toHaveLength(0);
+  expect(ministry2004Rows).toContainEqual(expect.stringContaining("admin_spending.defence"));
+  expect(ministry2004Rows).toContainEqual(expect.stringContaining(",admin_category,"));
+  expect(ministry2004Rows.join("\n")).toContain(",172009000,actual,");
+  expect(ministry2004Rows.join("\n")).not.toContain(",major_program,");
+  expect(ministry2004Rows.join("\n")).toContain("2004-annual-execution-annex.pdf");
+
+  await page.goto("http://localhost:3100/explorer/revenue");
+  await expectAppReady(page);
+  await expect(page.getByTestId("year-range-strip")).toContainText("2005–2025");
+
+  expect(consoleProblems).toEqual([]);
+});
+
 test("range strip supports chips and dragging handles", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   const strip = page.getByTestId("year-range-strip");
-  await expect(strip).toContainText("2005–2025");
+  await expect(strip).toContainText("2004–2025");
   await expect(strip).toContainText("10წ");
 
   // Late font loads shift the layout on slow CI runners; settle before
@@ -354,7 +410,7 @@ test("range strip supports chips and dragging handles", async ({ page }) => {
   await expect(strip).toContainText("2015–2025");
 
   await strip.getByRole("button", { name: "ყველა" }).click();
-  await expect(strip).toContainText("2005–2025");
+  await expect(strip).toContainText("2004–2025");
 });
 
 test("URL hash round-trips explorer state", async ({ page }) => {
