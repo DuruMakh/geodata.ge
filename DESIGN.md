@@ -40,8 +40,8 @@ Every visual decision should support a focused budget product, not a generic das
 
 Year ranges in the UI always derive from loaded facts. Current reviewed coverage:
 
-- Expenditure by public spending fields: **2005–2025** (13 fields per year, 12-month actual execution).
-- Expenditure by ministries (administrative view): **2005–2025** categories; major-program drill-down rows exist from 2012 (partial) and are contiguous 2017–2025.
+- Expenditure by public spending fields: **2004–2025** (13 fields per year, 12-month actual execution).
+- Expenditure by ministries (administrative view): **2004–2025** categories; major-program drill-down rows exist from 2012 (partial) and are contiguous 2017–2025.
 - Revenue: **2005–2025** (11 top-level categories).
 - Municipal expenditure by functional category: **2015–2025** (10 main functions plus the public total headline). The public entity set is 64 municipalities across 11 data-bearing regions. Adjara's total combines its six municipalities with Adjara republican actual payments net of transfers to territorial budgets. The separate Georgia scope aggregates all 69 reviewed municipal-budget series and adds the same net Adjara amount once; the 110 function rows remain municipal-only. Five occupied-territory-associated bodies appear only inside that country aggregate. Implemented in this branch at `/explorer/municipalities` (§20); production deployment remains unverified as described above.
 - All current facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned facts ever load.
@@ -229,7 +229,7 @@ Rules:
 - Negative letter-spacing only at ≥16px.
 - Emphasis inside data = weight 600 (e.g. latest-year column), never color-only.
 - Unit suffixes on serif values (`მლრდ ₾`) are mono 12–13px in `body` color, not serif.
-- Year ranges are one style everywhere: an **unspaced en dash** (`2005–2025`, U+2013). Not an em dash, not spaced. This covers the coverage label (§6.2), the source note (§7.10), and the range strip (§7.4).
+- Year ranges are one style everywhere: an **unspaced en dash** (`2004–2025`, U+2013). Not an em dash, not spaced. This covers the coverage label (§6.2), the source note (§7.10), and the range strip (§7.4).
 
 ## 6. Layout System
 
@@ -273,7 +273,7 @@ On the section routes, under the page title, sits the **deck line**: a mono lead
 The section lives in the route (§6.2). Everything else about a screen serializes into the URL hash so any view is shareable:
 
 ```text
-/explorer/expenditure#g=fields&m=line&sh=1&r=2005-2025&sel=id1,id2   (explorer sections)
+/explorer/expenditure#g=fields&m=line&sh=1&r=2004-2025&sel=id1,id2   (explorer sections)
 /explorer/analysis#as=expenditure&ag=ministries&ay=2024              (analysis)
 ```
 
@@ -422,7 +422,7 @@ Sans 12px, muted, plain paragraph under the primary panel and at the end of the 
 მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო). <coverage note> · 12-თვიანი ფაქტობრივი შესრულება. <classification note> ბოლო განახლება: YYYY-MM-DD.
 ```
 
-Coverage notes state actual loaded ranges (e.g. `ხარჯვითი მონაცემები: 2005–2025`, `შემოსავლების მონაცემები: 2005–2025`).
+Coverage notes state actual loaded ranges (e.g. `ხარჯვითი მონაცემები: 2004–2025`, `შემოსავლების მონაცემები: 2005–2025`).
 
 The classification note is a required data-trust disclosure — year totals are official, but the category split is GeoData's own mapping and must say so on every expenditure surface:
 
@@ -454,7 +454,7 @@ The third is deliberately a different metric: the KPI states a percentage, so th
 The first indicator (`პერიოდის ცვლილება`) is a hero block: overline, serif 62px value (accent-negative if the period change is negative), then a 3px two-segment gauge (ink = base year total share, accent = delta), mono `year · amount` labels at both ends, and an editorial sentence with mono-set delta and CAGR values:
 
 ```text
-2005–2025 წლებში ჯამური ხარჯები გაიზარდა X მლრდ ₾-ით — საშუალო წლიური ზრდა +Y%.
+2004–2025 წლებში ჯამური ხარჯები გაიზარდა X მლრდ ₾-ით — საშუალო წლიური ზრდა +Y%.
 ```
 
 ### 7.13 Mover Row

@@ -226,6 +226,16 @@ describe("2004 ministry-total extraction", () => {
     expect(splitTotalFor("30 00")).toBe(sourceAmountFor("30 00"));
   });
 
+  it("pins the five 2004 synthetic split amounts from the annex", () => {
+    expect(Object.fromEntries(syntheticSplitRows.map((row) => [row.code, Number(row.actualThousandGel.toFixed(1))]))).toEqual({
+      "synthetic:22_00:finance": 79_007.6,
+      "synthetic:22_00:debt": 291_350.1,
+      "synthetic:22_00:transfers": 128_234.0,
+      "synthetic:30_00:culture": 22_040.7,
+      "synthetic:30_00:sport": 6_866.0,
+    });
+  });
+
   it("does not suppress the same official code in another year", () => {
     const nextYearFinance = {
       ...institutionRow(2005, "საქართველოს ფინანსთა სამინისტრო"),

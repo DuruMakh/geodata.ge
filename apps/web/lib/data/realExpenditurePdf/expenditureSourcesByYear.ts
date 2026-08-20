@@ -10,13 +10,9 @@ import { EXPENDITURE_DETAILED_YEARS } from "../coverage";
 // every source before parsing, so a half-updated digest fails loudly rather
 // than silently — but pickTavi6Sheet had already drifted between the copies,
 // which would not have failed loudly. One definition, imported by both.
-// 2005-2025. A 2004 entry used to sit here, but requestedYear() rejects any
-// year outside EXPENDITURE_DETAILED_YEARS (lib/data/coverage.ts), which starts
-// at 2005, so it was unreachable from either script — a digest and source paths
-// that read as live provenance while nothing could ever select them. The
-// project has no reviewed 2004 sources in the served datasets (AGENTS.md); if
-// that changes, restore the entry alongside the coverage-year change that makes
-// it selectable.
+// 2005-2025 E11-era registry. The 2004 complete state-budget annex has a
+// distinct old-classification parser in year2004StateBudget.ts, so it does not
+// belong in this E11/supplement configuration table.
 export const expenditureSourcesByYear = {
   2005: {
     year: 2005,

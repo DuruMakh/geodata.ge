@@ -1,17 +1,16 @@
 # 2004-2006 Expenditure Final Data Methodology (pre-COFOG old classification)
 
-Status: implemented and reconciled (2026-07-04)
+Status: implemented and reconciled (reviewed 2026-08-20)
 
 Scope: national budget expenditure, actual execution, 2004–2006
 
-2004–2006 predate Georgia's adoption of the COFOG functional
-classification (which begins in 2007, see
-`2007-2016-expenditure-final-methodology.md`). Their treasury E11 tables use
-the older **14-group functional classification**, so they need a dedicated
-parser and a dedicated group -> public-category mapping rather than the COFOG
-pipeline. For 2004, the complete state-budget execution annex, rather than the
-narrower central-budget Treasury E11, supplies the functional parents and exact
-carve-outs.
+2004–2006 predate Georgia's adoption of the COFOG functional classification
+(which begins in 2007, see `2007-2016-expenditure-final-methodology.md`). The
+2005–2006 Treasury E11 tables use the older **14-group functional
+classification**, so they need a dedicated parser and a dedicated group ->
+public-category mapping rather than the COFOG pipeline. For 2004, the complete
+state-budget execution annex, rather than the narrower central-budget Treasury
+E11, supplies the functional parents and exact carve-outs.
 
 ## 1. Sources
 
@@ -127,6 +126,7 @@ Regression pins live in `apps/web/tests/data/pipelineIntegration.test.ts`.
 
 ```powershell
 cd apps/web
+npm run data:generate-final-2004-expenditure
 npm run data:generate-final-2005-expenditure
 npm run data:generate-final-2006-expenditure
 npm run data:compose-budget-facts

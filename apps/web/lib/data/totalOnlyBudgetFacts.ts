@@ -40,8 +40,7 @@ export const TOTAL_ONLY_BUDGET_FACT_REPORT = {
   })),
   notes: [
     "Explicit total rows are used only where detailed old-year parsing is not source-safe enough for public categories.",
-    "2005 and 2006 expenditure are now detailed via the old 14-group classification (see the old-classification review CSVs); 2005 uses the broader payments total 2,626,507.3 thousand GEL. 2004 expenditure is deliberately not loaded (central-budget scope).",
+    "2004 expenditure is now detailed via the complete state-budget execution annex; 2005 and 2006 are detailed via the old 14-group classification (see the old-classification review CSVs). The 2005 series uses the broader payments total 2,626,507.3 thousand GEL.",
   ],
 } as const;
-
 

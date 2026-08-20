@@ -1,5 +1,6 @@
 ﻿import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -102,6 +103,28 @@ describe("admin spending facts", () => {
     expect(report.sourceTotalGelByYear[2004]).toBe(1_930_210_300);
     expect(report.categoryTotalGelByYear[2004]).toBe(1_930_210_400);
     expect(report.reconciliationStatusByYear[2004]).toBe("passed");
+  }, 30_000);
+
+  it("keeps the delivered 2004 admin reconciliation report equal to fresh generation", async () => {
+    const rows = extractAdminSpendingOfficialRows();
+    const facts = generateAdminSpendingFacts(rows);
+    const freshReport = buildAdminSpendingReport(rows, facts);
+    const deliveredReport = JSON.parse(
+      await readFile("../../data/reports/admin-spending-2004-2025-report.json", "utf8"),
+    );
+    const rows2004 = rows.filter((row) => row.year === 2004);
+    const officialRoots2004 = rows2004.filter((row) => row.isCodedRow && !row.isTotal);
+    const syntheticSplits2004 = rows2004.filter((row) => !row.isCodedRow && !row.isTotal);
+
+    expect(deliveredReport).toEqual(freshReport);
+    expect(officialRoots2004).toHaveLength(47);
+    expect(syntheticSplits2004).toHaveLength(5);
+    expect(deliveredReport.sourceTotalGelByYear[2004]).toBe(1_930_210_300);
+    expect(deliveredReport.categoryTotalGelByYear[2004]).toBe(1_930_210_400);
+    expect(
+      deliveredReport.categoryTotalGelByYear[2004] - deliveredReport.sourceTotalGelByYear[2004],
+    ).toBe(100);
+    expect(facts.filter((fact) => fact.year === 2004 && fact.level === "major_program")).toHaveLength(0);
   }, 30_000);
 
   it("resolves every generated admin-spending fact source ID to a registered source document", async () => {

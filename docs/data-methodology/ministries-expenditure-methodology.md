@@ -8,7 +8,7 @@ processing-group notes (`2005-2014-ministries-expenditure-methodology.md`,
 appendices. Where any older note disagrees with this document or with
 `apps/web/lib/data/adminSpending/categories.ts`, **this document and the code are authoritative.**
 
-Last reviewed: 2026-07-09 (program successions shipped — see
+Last reviewed: 2026-08-20 (2004 complete-annex inclusion and program successions — see
 `ministries-drilldown-programs-methodology.md`, the authoritative deep-dive on the §7
 drill-down; §7 here is the summary).
 
@@ -83,9 +83,11 @@ SHA-256 hashes match the appendix tables in the two group docs).
 
 The organizational grand total (row `00 00`) is the **payments** total — it includes
 financial-asset growth and liability reduction (debt principal), i.e. the same basis as the
-2017–2025 baseline. It runs ~5–10 % higher than the functional-classification total (which
-excludes some of those), so the two datasets have deliberately different year totals. The 22
-totals run from **2004 ≈ 1.93 B GEL → 2025 ≈ 27.72 B GEL**.
+2017–2025 baseline. For 2005–2025 it runs ~5–10 % higher than the
+functional-classification total (which excludes some of those), so the two datasets have
+deliberately different year totals. **2004 is the sole rounding exception:** both views use
+the complete annex, with administrative categories GEL 100 above the printed total because its
+47 official roots are rounded. The 22 totals run from **2004 ≈ 1.93 B GEL → 2025 ≈ 27.72 B GEL**.
 
 ---
 
@@ -293,7 +295,7 @@ to `environment_agriculture` for `row.year <= 2017`. From 2018 it merged with ag
 (`გარემოს დაცვისა`) and the modern rule handles it. The phrase is unique to ≤2017 and does **not**
 match the 2013 Energy ministry (`ენერგეტიკისა და ბუნებრივი რესურსების`), which stays in `economy`.
 
-### 6.3 Sport / Culture de-merge (2018–2024)
+### 6.3 Sport / Culture de-merge (2004, 2018–2024)
 Georgia repeatedly combined these ministries: **Culture + Sport** (2018, 2022–2024) and an
 **Education + Science + Culture + Sport mega-ministry** (2019–2021). Left alone, Sport would be 0
 for 2018–2024 and Culture 0 for 2019–2021. Owner decision: **full de-merge.** A program-level rule
@@ -303,10 +305,12 @@ for 2018–2024 and Culture 0 for 2019–2021. Owner decision: **full de-merge.*
 - **mixed** culture+sport (no education/science term) → `culture` (the primary sector);
 - ministry apparatus + all general education/science → stay with the parent.
 
-Both series are now continuous 2005–2025. Reconciliation is unaffected (leaves only move between
-categories). **Gotcha guarded:** `ტრანსპორტ` (transport) contains the substring `სპორტ` (sport) —
-stripped before the sport test so the school-transport program is not mis-routed. Youth needs no
-action: in the modern taxonomy it is part of the "Education, science & youth" category already.
+The complete 2004 annex also has a combined Culture/Sport root: its exact sport source leaf and
+the additive culture remainder are split separately in §6.11. Both series are now continuous
+2004–2025. Reconciliation is unaffected (leaves only move between categories). **Gotcha
+guarded:** `ტრანსპორტ` (transport) contains the substring `სპორტ` (sport) — stripped before the
+sport test so the school-transport program is not mis-routed. Youth needs no action: in the
+modern taxonomy it is part of the "Education, science & youth" category already.
 
 ### 6.4 Penitentiary / Corrections → Justice (2009–2013)
 Matched by the shared token stem `სასჯელაღსრულებ`, which covers both the pre-2014 spelling

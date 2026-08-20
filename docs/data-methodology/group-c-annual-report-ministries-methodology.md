@@ -24,8 +24,9 @@ total.
 > - **Sport/Culture de-merge for 2018–2024**: the combined Culture+Sport ministry (2018, 2022–2024)
 >   and the Education mega-ministry (2019–2021) bundled Sport (and, in the mega-ministry, Culture) into
 >   the parent. A program-level rule now routes clearly-sport programs → Sport and clearly-culture →
->   Culture (mixed culture+sport → Culture; apparatus and general education/science stay put), so both
->   series are continuous 2005–2025. Reconciliation is unaffected (leaves only move between categories).
+>   Culture (mixed culture+sport → Culture; apparatus and general education/science stay put). The
+>   complete 2004 annex separately splits its combined Culture/Sport root, so both series are
+>   continuous 2004–2025. Reconciliation is unaffected (leaves only move between categories).
 > - Bug fixes: penitentiary token stem (`სასჯელაღსრულებ`, 2009–2013 → Justice) and the drill-down
 >   `qualifyingIds` threshold now measured over 2017+ rows only.
 
@@ -128,7 +129,7 @@ report's own `00 00` row.
 | 2007 | `2007-annual-execution-report.pdf` | `557a2e620f32149680c15bee4714cde10571a16fe7b8ff5fb2dce5fbdbaff26c` | **Shipped** — plan/actual/% layout; synth 00 00 = 5,237,131.1k; Finance 25 00 three-way (debt 249,205.0 / proper 107,992.1 / rest→Other); culture split (sport 8,682.6, youth 70.0); detail-section pass recovers the 13 legacy-join component rows (roads 26 14, social 35 26, health 35 27, education 32 03/32 05, higher-ed 32 10/32 15/32 20, foreign 28 xx, courts 09 02, IDP 34 04). |
 | 2006 | `2006-annual-execution-report.pdf` | `306841dbd25c9a7becb071aa0307d8e4e37ff3817e3555d8b503a279507f50b3` | **Shipped** — split codes rejoined; synth 00 00 = 3,822,512.6k; Finance 25 00 three-way (debt 334,908.6 / proper 80,502.2 / rest→Other); culture split (sport 4,705.3, youth 70.0); detail-section pass recovers the 12 legacy-join component rows incl. the Social Insurance Fund 35 22 (630,504.7k) split per the narrative (health 123.5M). |
 
-**Group C is complete: the ministries dataset covers 2005–2025 contiguously (21 reconciling years).** Only 2004 remains (Group D — a scope decision, not an extraction gap).
+**Group C remains the detailed 2006–2012, 2015, 2016 appendix. The complete ministries dataset now covers 2004–2025 contiguously (22 reconciling years); 2004 is supplied by the complete-annex extractor documented in the authoritative methodology.**
 
 ## Finance three-way split (2006–2009)
 

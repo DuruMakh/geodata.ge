@@ -91,7 +91,7 @@ Guardrails, applied to every year:
 - **SHA-256 verification.** Each E11 PDF's hash is checked against a pinned value before
   parsing; a mismatch aborts the run. (Hashes in §5.)
 - **Deterministic mapping.** Functional codes and reviewed keyword rules — no manual
-  per-row entry except the two 2008 whole-budget aggregates (§7.6), which cross-check to
+  per-row entry except the two 2008 whole-budget aggregates (§7.7), which cross-check to
   the report's own stated totals.
 - **Reconciliation gate.** The composition script throws if the final total differs from
   the official total by more than 1,000 GEL. You cannot fabricate 13 category numbers that
@@ -146,7 +146,7 @@ reconciliation to the report's published financial-assets / liabilities figures.
 2008–2010 reports use a legacy ASCII-transliteration Georgian font (converted with a
 LitNusx letter map). **2008** prints no per-organization financial rows at all — its
 whole-budget aggregates (loans, equity, external/domestic debt repayment) are taken from
-the report's Tavi I balance and financial-assets chapter (§7.6).
+the report's Tavi I balance and financial-assets chapter (§7.7).
 
 ### Era 4 — 2007 (first COFOG year, old economic classification, no supplement)
 
@@ -296,53 +296,53 @@ total exactly.
 document (~GEL 1.5bn), not a competing full-state total. It remains archived for scope and
 parent corroboration but supplies no generated review-row amount.
 
-**7.2 — 2005 uses the payments column, not the narrower expenditure column.** The 2005
+**7.3 — 2005 uses the payments column, not the narrower expenditure column.** The 2005
 E11 grand row carries both `გადასახდელები` (payments, incl. lending/debt, 2,626,507.3k)
 and a narrower 12-month expenditure column (2,618,557.0k). Payments is used, for
 consistency with the 2007+ concept.
 
-**7.3 — 2009 tax-arrears clearance → general public services.** The 182.9M GEL row
+**7.4 — 2009 tax-arrears clearance → general public services.** The 182.9M GEL row
 "ორგანიზაციების წინა წლებში წარმოქმნილი საგადასახადო დავალიანებების დაფარვა" is the
 state returning organizations' accumulated tax refund/overpayment claims — a
 fiscal-administration operation under the Ministry of Finance, not sovereign debt service
 and not attributable to a single sector. **Owner-reviewed:** corrected from an initial
 debt-service classification to general public services.
 
-**7.4 — 2012 disaster-fund financial-assets row (700,000 GEL) stays in other/unclassified.**
+**7.5 — 2012 disaster-fund financial-assets row (700,000 GEL) stays in other/unclassified.**
 "სტიქიის შედეგების ლიკვიდაცია" — the label alone cannot distinguish infrastructure
 restoration from household support. **Owner decision:** kept in other/unclassified. (This
 is the only nonzero other/unclassified in 2007–2016.)
 
-**7.5 — GIZ/KfW donor-coordination rows → infrastructure & regional development.**
+**7.6 — GIZ/KfW donor-coordination rows → infrastructure & regional development.**
 Bilateral/regional donor project rows (ორმხრივი, რეგიონალური და რეგიონთაშორისი
 პროექტები; KfW office co-financing). **Owner decision:** keywords `რეგიონთაშორისი პროექტ`,
 `kfw`.
 
-**7.6 — 2008 whole-budget financial aggregates → economic affairs / debt service.** The
+**7.7 — 2008 whole-budget financial aggregates → economic affairs / debt service.** The
 2008 report has no per-organization financial rows, only whole-budget aggregates: loans
 issued 142,620.2k + equity 57,092.9k (= the report's net financial-assets growth) →
 **economic affairs** (documented enterprise-support programs — "იაფი კრედიტი", SOE
 equity); external 58,633.3k + domestic 52,400.0k debt repayment (= liabilities decrease)
 → **debt service**.
 
-**7.7 — 2011 arrears/court-judgment fund → public order & safety.** "წინა წლებში
+**7.8 — 2011 arrears/court-judgment fund → public order & safety.** "წინა წლებში
 წარმოქმნილი დავალიანების დაფარვისა და სასამართლო გადაწყვეტილებების აღსრულების ფონდი" —
 mapped consistently with how the same fund is treated in the shipped 2012–2016 years.
 
-**7.8 — 2014–2016 arrears reclassification (other/unclassified → 0).** 19 supplement
+**7.9 — 2014–2016 arrears reclassification (other/unclassified → 0).** 19 supplement
 arrears rows initially unclassified were individually reviewed and covered by extended
 keyword rules (e.g. შეიარაღებული ძალ→defence; სასწავლო/საგანმანათლებლო→education;
 პატიმრობ→public order; ეპიდზედამხედველ→health; ფერმერ→agriculture; აეროპორტ/საჰაერო
 ხომალდ→infrastructure — the 2.5M 2014 airport takeoff/landing reimbursement follows the
 7.4.5 air-transport convention). other/unclassified is 0 for 2013–2016.
 
-**7.9 — 2008–2011 supplement reclassification (other/unclassified → 0).** The same
+**7.10 — 2008–2011 supplement reclassification (other/unclassified → 0).** The same
 keyword-review approach cleared all residual arrears rows for 2008–2011 (SOE agency
 "საწარმოთა მართვის სააგენტო"→economic affairs; energy/water donor projects→infrastructure;
 etc.); all keyword additions verified byte-identical no-ops for the already-shipped
 2012–2016 outputs.
 
-**7.10 — category splits are GeoData's mapping, not official categorization (disclosure).**
+**7.11 — category splits are GeoData's mapping, not official categorization (disclosure).**
 The annual totals are official and exact; the 13-category breakdown is GeoData's reviewed
 mapping from the official functional/COFOG codes. This is disclosed in-app in the data
 note: "წლიური ჯამები ოფიციალურ წყაროებს ეყრდნობა; კატეგორიებად დაყოფა GeoData-ის
@@ -379,9 +379,9 @@ COVID surge 2020–2021), confirming a single consistent concept across the seri
 ## 10. Limitations & disclosure
 
 - **Categories are a mapping, not official taxonomy.** Totals are official; the 13-category
-  split is GeoData's documented, reviewed mapping (§6, §7.10).
+  split is GeoData's documented, reviewed mapping (§6, §7.11).
 - **other/unclassified** is 0 for 2007–2011 and 2013–2016; 700,000 GEL in 2012 (one
-  reviewed disaster-fund row, §7.4); and the residual of the old group 14 in 2005
+  reviewed disaster-fund row, §7.5); and the residual of the old group 14 in 2005
   (2.06M / 0.08%) and 2006 (20.41M / 0.53%) — genuinely unclassified in the source.
 - **2004 uses the complete execution annex, not the central-only E11** (§7.1–§7.2).
 - **2013's supplement** is the in-repo Chapter VI PDF (`final-fact-files-2004-2025/2013-fact.pdf`,
