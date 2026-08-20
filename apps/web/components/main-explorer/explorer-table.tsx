@@ -2,6 +2,7 @@ import type { ExplorerTableRow } from "../../lib/explorer/types";
 import { formatInUnit, formatShare, MISSING, type ValueUnit } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { SwatchBar } from "../ui/editorial";
+import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 
 // Table mode per DESIGN.md §8.4: newspaper anatomy — 2px ink rules on the header and
 // total row, mono right-aligned numerals, sticky label/change/share columns.
@@ -41,8 +42,16 @@ export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLab
   const minWidth = 320 + years.length * 78 + 208;
 
   return (
-    <div data-testid="explorer-table" className="mt-[18px] overflow-x-auto">
-      <table className="w-full border-collapse" style={{ minWidth }}>
+    <div className="mt-[18px]">
+      <HorizontalScrollHint testId="table-scroll-hint" />
+      <div
+        data-testid="explorer-table"
+        role="region"
+        tabIndex={0}
+        aria-label="მრავალწლიანი ცხრილი — ჰორიზონტალურად გადაადგილებადი"
+        className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+      >
+        <table className="w-full border-collapse" style={{ minWidth }}>
         <thead>
           <tr>
             <th className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]">
@@ -123,7 +132,8 @@ export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLab
             </tr>
           ) : null}
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   );
 }

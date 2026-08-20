@@ -121,7 +121,7 @@ export function RangeStrip({ years, range, onChange }: RangeStripProps) {
   }
 
   const handleClass =
-    "absolute top-1 size-[15px] cursor-pointer rounded-full border-2 border-[var(--accent)] bg-[var(--paper)] p-0 shadow-[0_1px_3px_rgba(30,27,22,0.15)] -translate-x-1/2";
+    "absolute -top-1 size-[30px] -translate-x-1/2 cursor-pointer rounded-full border-0 bg-transparent p-0 before:absolute before:top-1/2 before:left-1/2 before:size-[15px] before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border-2 before:border-[var(--accent)] before:bg-[var(--paper)] before:shadow-[0_1px_3px_rgba(30,27,22,0.15)] before:content-['']";
 
   return (
     <div data-testid="year-range-strip" className="mt-[22px] border-t border-[var(--hairline)] pt-4">

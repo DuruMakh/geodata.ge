@@ -4,6 +4,7 @@ import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
 import { SwatchBar } from "../ui/editorial";
+import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 
 // Bespoke SVG line chart per DESIGN.md §8.3: chart sits directly on paper, dot
 // lattice for the grid, ink baseline at zero, mono axis labels, hover crosshair + tooltip.
@@ -122,13 +123,21 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
     // shrinks to fit instead — an approved trade of label size for a whole chart
     // (DESIGN.md §12). Below 900px the sidebar is a top bar and the column is wide
     // again, so phones keep the scroll.
-    <div data-testid="chart-frame" className="overflow-x-auto">
+    <>
+      <HorizontalScrollHint testId="chart-scroll-hint" />
+      <div
+        data-testid="chart-frame"
+        role="region"
+        tabIndex={0}
+        aria-label="მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი"
+        className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+      >
       <div className="relative min-w-[720px] min-[900px]:max-[1020px]:min-w-0">
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
         aria-label="მრავალწლიანი დინამიკა"
-        className="block h-auto w-full touch-pan-y"
+        className="block h-auto w-full"
         onPointerMove={handlePointerMove}
         onPointerLeave={() => setHover(null)}
       >
@@ -270,6 +279,7 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
         </div>
       ) : null}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
