@@ -20,10 +20,10 @@ afterEach(async () => {
 describe("original-source inventory", () => {
   it("includes every approved original and no prepared derivative", async () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
-    expect(inventory.expenditure).toHaveLength(77);
+    expect(inventory.expenditure).toHaveLength(79);
     expect(inventory.revenue).toHaveLength(21);
     expect(inventory.municipalities).toHaveLength(79);
-    expect(inventory.expenditure.reduce(sumBytes, 0)).toBe(53_661_484);
+    expect(inventory.expenditure.reduce(sumBytes, 0)).toBe(58_628_862);
     expect(inventory.revenue.reduce(sumBytes, 0)).toBe(4_667_365);
     expect(inventory.municipalities.reduce(sumBytes, 0)).toBe(3_571_415);
     expect(inventory.revenue.some((row) => row.path.includes("/text/"))).toBe(false);
@@ -60,6 +60,29 @@ describe("original-source inventory", () => {
       const manifest = await loadReviewedSourceManifest(REPOSITORY_ROOT, datasetId);
       expect(manifest.map((row) => row.repository_source_path).toSorted()).toEqual(expected.map((row) => row.path));
     }
+  });
+
+  it("publishes the complete 2004 execution-report downloads", async () => {
+    const manifest = await loadReviewedSourceManifest(REPOSITORY_ROOT, "expenditure");
+
+    expect(
+      manifest
+        .filter((row) => row.year === "2004" && row.repository_source_path.includes("annual-execution-reports/2004-annual-execution"))
+        .map((row) => ({ sourceId: row.source_id, downloadHref: row.downloadHref, byteSize: row.byte_size, sha256: row.sha256 })),
+    ).toEqual([
+      {
+        sourceId: "source.mof.expenditure.2004.mof_annual_execution_annex",
+        downloadHref: "/downloads/methodology/expenditure/files/2004/mof-annual-execution-annex.pdf",
+        byteSize: 4_169_590,
+        sha256: "c999654e8c2a430778e48fe67c1bfc7d15dc30f76a60ceef4477614a31849889",
+      },
+      {
+        sourceId: "source.mof.expenditure.2004.mof_annual_execution_overview",
+        downloadHref: "/downloads/methodology/expenditure/files/2004/mof-annual-execution-report.pdf",
+        byteSize: 797_788,
+        sha256: "9e368ddd2e873aa020c552a1e8a2d26115cd8e2dd39e97fe5eb7a384d5b5d52e",
+      },
+    ]);
   });
 
   it("rejects symlinks inside an approved inventory root", async () => {
