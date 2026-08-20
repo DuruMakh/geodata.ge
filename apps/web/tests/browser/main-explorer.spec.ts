@@ -386,6 +386,32 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
   expect(consoleProblems).toEqual([]);
 });
 
+test("2004 revenue total excludes an unavailable liability value in tables and CSV", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+  const { readFile } = await import("node:fs/promises");
+
+  await page.goto("http://localhost:3100/explorer/revenue#m=table&r=2004-2005&sel=revenue.total,revenue.increase_liabilities");
+  await expectAppReady(page);
+
+  const table = page.getByTestId("explorer-table");
+  const totalRow = table.getByRole("row").filter({ hasText: "მთლიანი შემოსავლები" });
+  const liabilitiesRow = table.getByRole("row").filter({ hasText: "ვალდებულებების ზრდა" });
+  await expect(totalRow).toContainText("2.28");
+  await expect(liabilitiesRow).toContainText("—");
+  await expect(liabilitiesRow).toContainText("0.09");
+
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByTestId("series-csv").click();
+  const download = await downloadPromise;
+  const downloadPath = await download.path();
+  if (!downloadPath) throw new Error("Expected a local CSV download path");
+  const csv = (await readFile(downloadPath)).toString("utf8");
+  expect(csv).toContain("2004,revenue.total");
+  expect(csv).not.toContain("2004,revenue.increase_liabilities");
+
+  expect(consoleProblems).toEqual([]);
+});
+
 test("range strip supports chips and dragging handles", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("http://localhost:3100/explorer/expenditure");

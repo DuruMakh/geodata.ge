@@ -44,7 +44,10 @@ Two perimeter choices define the dataset (both detailed in §6):
 For 2004, the source is page 19 of the Ministry of Finance annual budget execution report,
 `docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2004-annual-execution-report.pdf`.
 Its consolidated-budget table supplies the ten published revenue-and-grants facts. It does not
-supply the comparable consolidated increase-in-liabilities amount (§5.6).
+supply the comparable consolidated increase-in-liabilities amount (§5.6). The table is explicitly
+labelled as excluding budget organizations' social contributions. The source does not establish
+whether this perimeter is exactly comparable with the 2005–2025 Form #1 perimeter; treat this as a
+cross-era comparability limitation.
 
 Every year 2005–2025 is extracted from the same official document type: the State Treasury's
 **Form #1** (ფორმა #1) January–December consolidated-budget receipts statement — a per-code table
@@ -347,11 +350,22 @@ independent cross-anchor (§8.3).
 ### 5.6 2004 — annual-report partial panel
 
 The reviewed Ministry of Finance annual report supplies a consolidated-budget revenue-and-grants
-table on page 19. `year2004Revenue.ts` preserves its seven tax categories, grants, other revenue,
-and capital revenue (served as `revenue.asset_decrease`). The ten facts sum exactly to
-**2,283,035,800 GEL**. The report does not contain the comparable consolidated Form #1 increase-in-
-liabilities amount. That series therefore has no 2004 point; the missing amount is neither zero nor
-an estimate, and it is excluded from the derived 2004 total.
+table on page 19. `year2004Revenue.ts` publishes its six named tax categories, separates property
+tax, and derives `revenue.other_taxes` as the residual needed to preserve the official tax total:
+
+`1,811,195,900 - (628,158,100 + 268,649,900 + 161,589,700 + 163,771,500 + 100,138,000 + 29,107,500) = 459,781,200 GEL`.
+
+This residual absorbs every tax-total component outside those six named taxes and property tax,
+including the source's printed other-taxes line and special-state-fund tax receipts. It is therefore
+not the directly printed **134,094,000 GEL** other-taxes row. Grants, other revenue, and capital
+revenue (served as `revenue.asset_decrease`) complete the ten published facts, which sum exactly to
+**2,283,035,800 GEL**.
+
+The source table is explicitly labelled as excluding budget organizations' social contributions,
+and the source does not establish whether this perimeter is exactly comparable with the 2005–2025
+Form #1 perimeter. The report also does not contain the comparable consolidated Form #1 increase-
+in-liabilities amount. That series therefore has no 2004 point; the missing amount is neither zero
+nor an estimate, and it is excluded from the derived 2004 total.
 
 ---
 
@@ -480,7 +494,8 @@ throughout: column-order detection, date/page-furniture immunity, wrapped 12-dig
 exemption, sidecar usage, optional-workbook skipping, tavi-1 header/section/warning behavior, and
 every validator failure mode. On top, `tests/data/pipelineIntegration.test.ts` gates the
 **shipped CSVs** end-to-end with the same loaders the app uses: one fact per
-(year, item, basis); a complete 11-category panel every year; the 2006 detailed sum reconciled to
+(year, item, basis); a ten-category panel in 2004 and complete 11-category panels in 2005–2025;
+the 2006 detailed sum reconciled to
 the curated official total (±10 GEL); the exact set of negative revenue facts pinned; and the
 derived explorer totals for the two most recent years pinned to the GEL ("INTENTIONAL REGRESSION
 PINS" — update them consciously with any legitimate data refresh, never loosen).
