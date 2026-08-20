@@ -197,6 +197,7 @@ describe("2004 ministry-total extraction", () => {
     expect(officialInstitutionRows).toHaveLength(47);
     expect(new Set(officialInstitutionRows.map((row) => row.code)).size).toBe(47);
     expect(officialInstitutionRows.every((row) => row.isLeafCode)).toBe(true);
+    expect(officialInstitutionRows.every((row) => row.institutionCode === row.code)).toBe(true);
     expect(officialInstitutionRows.every((row) => row.rowNumber >= 2 && row.rowNumber <= 231)).toBe(true);
     expect(defenceRow?.actualThousandGel).toBe(172_009.0);
     expect(totalRow?.actualThousandGel).toBe(1_930_210.3);
@@ -213,6 +214,14 @@ describe("2004 ministry-total extraction", () => {
 
     expect(syntheticSplitRows).toHaveLength(5);
     expect(syntheticSplitRows.every((row) => row.isLeafCode && row.code?.startsWith("synthetic:"))).toBe(true);
+    expect(syntheticSplitRows.every((row) => row.institutionCode === row.parentCode)).toBe(true);
+    expect(Object.fromEntries(syntheticSplitRows.map((row) => [row.code, row.rowNumber]))).toEqual({
+      "synthetic:22_00:finance": 16,
+      "synthetic:22_00:debt": 19,
+      "synthetic:22_00:transfers": 20,
+      "synthetic:30_00:culture": 115,
+      "synthetic:30_00:sport": 116,
+    });
     expect(splitTotalFor("22 00")).toBe(sourceAmountFor("22 00"));
     expect(splitTotalFor("30 00")).toBe(sourceAmountFor("30 00"));
   });

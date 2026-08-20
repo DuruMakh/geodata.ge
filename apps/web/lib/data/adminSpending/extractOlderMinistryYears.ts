@@ -44,6 +44,9 @@ const Y2004_CULTURE_CODE = "30 00";
 const Y2004_DEBT_SERVICE_THOUSAND_GEL = 291350.1;
 const Y2004_INTERGOVERNMENTAL_TRANSFERS_THOUSAND_GEL = 128234.0;
 const Y2004_SPORT_THOUSAND_GEL = 6866.0;
+const Y2004_DEBT_SERVICE_PAGE = 19;
+const Y2004_INTERGOVERNMENTAL_TRANSFERS_PAGE = 20;
+const Y2004_SPORT_PAGE = 116;
 const Y2004_STATE_WIDE_DEBT_LABEL =
   "საერთო-სახელმწიფოებრივი მნიშვნელობის გადასახდელები – სახელმწიფო ვალდებულებების მომსახურება და დაფარვა";
 const Y2004_STATE_WIDE_OTHER_LABEL =
@@ -140,6 +143,7 @@ function make2004Row(input: {
   approved: number | null;
   pageNumber: number;
   parentCode: string | null;
+  institutionCode?: string | null;
   isTotal?: boolean;
   isCodedRow?: boolean;
   isLeafCode?: boolean;
@@ -153,7 +157,7 @@ function make2004Row(input: {
     code: input.code,
     parentCode: input.parentCode,
     depth: input.isTotal ? 0 : 1,
-    institutionCode: input.isTotal ? null : input.parentCode ?? input.code,
+    institutionCode: input.isTotal ? null : input.institutionCode ?? input.code,
     institutionLabelKa: input.isTotal ? null : input.label,
     programCode: null,
     programLabelKa: null,
@@ -184,6 +188,7 @@ function make2004SyntheticSplit(input: {
     approved: null,
     pageNumber: input.pageNumber,
     parentCode: input.parentCode,
+    institutionCode: input.parentCode,
     isCodedRow: false,
     isLeafCode: true,
   });
@@ -235,14 +240,14 @@ export function extractAdminSpending2004Rows(): OfficialExpenditureRow[] {
           parentCode: institution.code,
           label: Y2004_STATE_WIDE_DEBT_LABEL,
           actual: Y2004_DEBT_SERVICE_THOUSAND_GEL,
-          pageNumber: institution.pageNumber,
+          pageNumber: Y2004_DEBT_SERVICE_PAGE,
         }),
         make2004SyntheticSplit({
           key: "transfers",
           parentCode: institution.code,
           label: Y2004_STATE_WIDE_OTHER_LABEL,
           actual: Y2004_INTERGOVERNMENTAL_TRANSFERS_THOUSAND_GEL,
-          pageNumber: institution.pageNumber,
+          pageNumber: Y2004_INTERGOVERNMENTAL_TRANSFERS_PAGE,
         }),
       );
     }
@@ -261,7 +266,7 @@ export function extractAdminSpending2004Rows(): OfficialExpenditureRow[] {
           parentCode: institution.code,
           label: "სპორტის დეპარტამენტი",
           actual: Y2004_SPORT_THOUSAND_GEL,
-          pageNumber: institution.pageNumber,
+          pageNumber: Y2004_SPORT_PAGE,
         }),
       );
     }
