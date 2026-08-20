@@ -210,7 +210,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               aria-expanded={pickerOpen}
               aria-haspopup="dialog"
               onClick={() => setPickerOpen((current) => !current)}
-              className="group cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]"
+              className="group inline-block max-w-full truncate align-bottom cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)] min-[768px]:overflow-visible min-[768px]:whitespace-normal"
             >
               {props.triggerLabel}
               <span
@@ -254,8 +254,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
         className="mt-7 grid items-start gap-10 border-t border-[var(--ink)] pt-5 @min-[1100px]:grid-cols-[minmax(0,1fr)_340px]"
       >
         <div className="min-w-0">
-          <div className="mb-[18px] flex items-center justify-between gap-5">
-            <span className="flex items-baseline gap-4">
+          <div
+            data-testid="municipal-chart-controls"
+            className="mb-[18px] flex flex-col items-start gap-3 min-[520px]:flex-row min-[520px]:items-center min-[520px]:justify-between min-[520px]:gap-5"
+          >
+            <span className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 [&_button]:min-h-9">
               <SegmentedTabs<ChartMode>
                 ariaLabel="ხედის რეჟიმი"
                 value={state.chartMode}
@@ -265,7 +268,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                   { value: "table", label: "ცხრილი", testId: "municipal-mode-table" },
                 ]}
               />
-              <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
+              <span className="min-w-0 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
                 {state.share ? "წილი მთლიან ბიუჯეტში, %" : "მთლიანი ბიუჯეტი · მლნ ₾"}
               </span>
             </span>
@@ -274,7 +277,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               data-testid="municipal-share-toggle"
               aria-pressed={state.share}
               onClick={() => state.setShare(!state.share)}
-              className={`inline-flex h-[27px] cursor-pointer items-center rounded-full border px-3 text-[11.5px] ${
+              className={`inline-flex min-h-9 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full border px-3 text-[11.5px] ${
                 state.share
                   ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]"
                   : "border-[var(--control)] text-[var(--muted)]"

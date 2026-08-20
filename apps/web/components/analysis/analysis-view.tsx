@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 import type { SingleYearSnapshotModel } from "../../lib/explorer/types";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
 import { NEGATIVE } from "../../lib/explorer/colors";
@@ -38,6 +40,18 @@ export function AnalysisView({
   onGroupingChange,
   onYearChange,
 }: AnalysisViewProps) {
+  const yearStripRef = useRef<HTMLDivElement>(null);
+  const activeYearRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const strip = yearStripRef.current;
+    const active = activeYearRef.current;
+    if (!strip || !active) return;
+
+    const left = active.offsetLeft - (strip.clientWidth - active.offsetWidth) / 2;
+    strip.scrollTo({ left: Math.max(0, left), behavior: "auto" });
+  }, [grouping, side, year]);
+
   const structureTitle =
     side === "revenue"
       ? "სტრუქტურა კატეგორიების მიხედვით"
@@ -46,18 +60,20 @@ export function AnalysisView({
         : "სტრუქტურა სფეროების მიხედვით";
 
   return (
-    <div data-testid="single-year-snapshot">
+    <div data-testid="single-year-snapshot" className="min-w-0">
       <section className="border-t border-[var(--ink)] pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-[18px]">
-            <TextTab label="ხარჯები" active={side === "expenditure"} onClick={() => onSideChange("expenditure")} testId="analysis-side-expenditure" />
-            <TextTab label="შემოსავლები" active={side === "revenue"} onClick={() => onSideChange("revenue")} testId="analysis-side-revenue" />
+          <div data-testid="analysis-tab-groups" className="flex min-w-0 flex-wrap items-center gap-x-[18px] gap-y-3">
+            <span className="flex items-center gap-[18px]">
+              <TextTab label="ხარჯები" active={side === "expenditure"} onClick={() => onSideChange("expenditure")} testId="analysis-side-expenditure" />
+              <TextTab label="შემოსავლები" active={side === "revenue"} onClick={() => onSideChange("revenue")} testId="analysis-side-revenue" />
+            </span>
             {side === "expenditure" ? (
-              <>
-                <TabDivider />
+              <span className="flex items-center gap-[18px]">
+                <span className="hidden min-[480px]:inline"><TabDivider /></span>
                 <TextTab label="სფეროები" active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="analysis-grouping-fields" />
                 <TextTab label="უწყებები" active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="analysis-grouping-ministries" />
-              </>
+              </span>
             ) : null}
           </div>
           <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
@@ -65,7 +81,7 @@ export function AnalysisView({
           </span>
         </div>
 
-        <div data-testid="analysis-year-selector" className="mt-4 flex items-baseline gap-4 overflow-x-auto pb-0.5">
+        <div ref={yearStripRef} data-testid="analysis-year-selector" className="mt-4 flex items-baseline gap-4 overflow-x-auto pb-0.5">
           {years.map((candidate) => {
             const active = candidate === year;
 
@@ -75,7 +91,8 @@ export function AnalysisView({
                 type="button"
                 aria-pressed={active}
                 onClick={() => onYearChange(candidate)}
-                className={`cursor-pointer whitespace-nowrap border-b-2 px-[3px] pt-1.5 pb-[7px] font-[family-name:var(--font-numeric)] text-xs ${
+                ref={active ? activeYearRef : undefined}
+                className={`min-h-9 shrink-0 cursor-pointer whitespace-nowrap border-b-2 px-[3px] pt-1.5 pb-[7px] font-[family-name:var(--font-numeric)] text-xs ${
                   active ? "border-[var(--accent)] font-semibold text-[var(--ink)]" : "border-transparent font-normal text-[var(--muted)] hover:text-[var(--ink)]"
                 }`}
               >
@@ -100,12 +117,12 @@ export function AnalysisView({
               <div key={card.id} className="min-w-0">
                 <Overline>{card.label}</Overline>
                 <p
-                  className="mt-2.5 whitespace-nowrap font-[family-name:var(--font-display)] text-[34px] font-semibold leading-[1.1] tracking-[-0.02em]"
+                  className="mt-2.5 flex min-w-0 flex-wrap items-baseline gap-x-1.5 font-[family-name:var(--font-display)] text-[34px] font-semibold leading-[1.1] tracking-[-0.02em]"
                   style={{ color: card.negative ? NEGATIVE : "var(--ink)" }}
                 >
-                  {card.value}
+                  <span className="max-w-full break-words">{card.value}</span>
                   {card.unit ? (
-                    <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-[13px] font-medium tracking-normal text-[var(--body)]">
+                    <span className="max-w-full break-words font-[family-name:var(--font-numeric)] text-[13px] font-medium tracking-normal text-[var(--body)]">
                       {card.unit}
                     </span>
                   ) : null}

@@ -344,7 +344,7 @@ Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: redu
 
 **Accessibility, and the deviations on record.**
 
-- The toggle exposes `aria-expanded` and a label that flips between `პანელის ჩაკეცვა` and `პანელის გაშლა`. It carries **no `aria-controls`**. On desktop the collapse unmounts the nav, so there is no element to point at; below 900px that is not true — the nav stays mounted and is merely `display:none` — so this is a real gap at mobile widths, not a fully justified omission. Closing it means giving the nav a stable id and keeping it mounted in both desktop states.
+- The toggle exposes `aria-expanded` and a label that flips between `პანელის ჩაკეცვა` and `პანელის გაშლა`. Below 900px it points with `aria-controls` to the mounted `data-sidebar-navigation` panel; the collapsed desktop rail omits `aria-controls` because that panel is unmounted.
 - There is **no focus trap** on the mobile panel, by decision. A trap is the contract for a modal that covers the page; this panel is in flow and obscures nothing, so trapping would strand keyboard users in a region they can simply tab past. `Escape` to close plus focus return to the trigger is the whole contract.
 
 **Breadcrumb page header** (`page-header.tsx`). One row with a `2px ink` bottom rule, rendered per route (the final crumb differs per route, and a server layout cannot read the child route). Crumbs: sans 10.5px uppercase 600 in `muted`, current crumb in `ink`, separators `/` in accent. `მთავარი` links to `/`; `მონაცემები` is plain text with no route; `ბიუჯეტი` links to the hub on section routes and is plain text on the hub. Right slot: the mono 10.5px `faint` coverage label of §6.2 — the loaded range of the route's active scope, so it tracks the grouping, and the union of both sides on the hub.
@@ -587,7 +587,7 @@ breakpoints:
 
 At `<1100px`: workspace becomes one column; aside moves below the chart, loses its left border, gains a `2px ink` top rule; headline stats/KPIs become two columns; hero + side KPIs stack (side column gains a hairline top rule); movers board stacks; radar/every-100 side lists wrap below.
 
-Mobile (<768px): page padding `24px 20px 64px`; page title 30px; hero value 44px; year selector scrolls horizontally; tables scroll horizontally (min-width preserved, sticky columns active); Every 100 GEL stays 10×10 — shrink cells, never cell count; controls ≥30px tall (prefer 36px+).
+Mobile (<768px): page padding `24px 20px 64px`; page title 30px; hero value 44px; year selector scrolls horizontally; tables scroll horizontally (min-width preserved, sticky columns active); intentionally wide charts and tables show the mono instruction `მეტი მონაცემისთვის გადაასრიალე ჰორიზონტალურად`; their scrolling container is keyboard-focusable, visibly focused, and accessibly named; Every 100 GEL stays 10×10 — shrink cells, never cell count; controls ≥30px tall (prefer 36px+).
 
 Breakpoint behavior keys off the page container width (ResizeObserver or CSS container/media queries), matching the reference prototype.
 
@@ -599,7 +599,7 @@ The workspace's own breakpoints measure the **content column**, not the viewport
 
 ## 13. Accessibility
 
-- All controls have accessible names; toggles expose pressed/selected state (`aria-pressed`, `aria-checked`, `aria-expanded`); slider handles expose `role="slider"` with value attributes and keyboard support.
+- All controls have accessible names; toggles expose pressed/selected state (`aria-pressed`, `aria-checked`, `aria-expanded`); slider handles expose `role="slider"` with value attributes and keyboard support. Slider handles keep the 15 px visual dot but expose a 30 × 30 px interactive target.
 - SVG charts: `role="img"` + Georgian accessible label; SVG-only data must also exist in table/tooltip/summary.
 - Focus visible (accent ring) on paper.
 - Never color-only meaning: swatch + label + value.

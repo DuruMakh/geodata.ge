@@ -330,12 +330,18 @@ test("ministries grouping expands nested programs by name only", async ({ page }
 });
 
 test("range strip supports chips and dragging handles", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
 
   const strip = page.getByTestId("year-range-strip");
   await expect(strip).toContainText("2005–2025");
   await expect(strip).toContainText("10წ");
+  for (const testId of ["range-start-handle", "range-end-handle"]) {
+    const box = await strip.getByTestId(testId).boundingBox();
+    expect(box?.width ?? 0).toBeGreaterThanOrEqual(30);
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(30);
+  }
 
   // Late font loads shift the layout on slow CI runners; settle before
   // measuring, and let hover()'s stability checks position the pointer.
@@ -589,7 +595,135 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   await expect(page.getByTestId("every-100-grid").locator("[data-cell='gel']")).toHaveCount(100);
   await expectNoPageOverflow(page);
 
+  for (const width of [320, 375]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("http://localhost:3100/explorer/analysis");
+    await expectAppReady(page);
+
+    const selector = page.getByTestId("analysis-year-selector");
+    const yearButtons = selector.locator("button");
+    const activeYear = selector.locator("button[aria-pressed='true']");
+
+    const metrics = await selector.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+    }));
+    expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
+
+    const boxes = await yearButtons.evaluateAll((buttons) =>
+      buttons.map((button) => {
+        const box = button.getBoundingClientRect();
+        return { left: box.left, right: box.right, width: box.width };
+      }),
+    );
+    expect(boxes.every((box) => box.width >= 36)).toBe(true);
+    for (let index = 1; index < boxes.length; index += 1) {
+      expect(boxes[index]!.left).toBeGreaterThanOrEqual(boxes[index - 1]!.right);
+    }
+
+    const activeBox = await activeYear.boundingBox();
+    const selectorBox = await selector.boundingBox();
+    expect(activeBox).not.toBeNull();
+    expect(selectorBox).not.toBeNull();
+    expect(activeBox!.x).toBeGreaterThanOrEqual(selectorBox!.x);
+    expect(activeBox!.x + activeBox!.width).toBeLessThanOrEqual(selectorBox!.x + selectorBox!.width);
+
+    const tabGroups = page.getByTestId("analysis-tab-groups");
+    expect(await tabGroups.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+    const snapshot = page.getByTestId("single-year-snapshot");
+    expect(await snapshot.evaluate((element) => getComputedStyle(element).overflowX)).not.toBe("clip");
+
+    for (const sideTestId of ["analysis-side-expenditure", "analysis-side-revenue"]) {
+      await page.getByTestId(sideTestId).click();
+
+      const headlineCards = page.locator("[data-testid='single-year-snapshot'] > div[class*='grid-cols-2'] > div");
+      await expect(headlineCards).toHaveCount(4);
+
+      for (let index = 0; index < (await headlineCards.count()); index += 1) {
+        const card = headlineCards.nth(index);
+        const value = card.locator("p").first();
+        const unit = value.locator("span");
+        const unitCount = await unit.count();
+
+        const [valueMetrics, cardMetrics, rootMetrics] = await Promise.all([
+          value.evaluate((element) => ({
+            clientWidth: element.clientWidth,
+            scrollWidth: element.scrollWidth,
+            left: element.getBoundingClientRect().left,
+            right: element.getBoundingClientRect().right,
+          })),
+          card.evaluate((element) => ({
+            left: element.getBoundingClientRect().left,
+            right: element.getBoundingClientRect().right,
+          })),
+          snapshot.evaluate((element) => ({
+            left: element.getBoundingClientRect().left,
+            right: element.getBoundingClientRect().right,
+          })),
+        ]);
+
+        expect(valueMetrics.scrollWidth).toBeLessThanOrEqual(valueMetrics.clientWidth);
+        expect(valueMetrics.left).toBeGreaterThanOrEqual(Math.max(cardMetrics.left, rootMetrics.left));
+        expect(valueMetrics.right).toBeLessThanOrEqual(Math.min(cardMetrics.right, rootMetrics.right));
+        for (let unitIndex = 0; unitIndex < unitCount; unitIndex += 1) {
+          const unitMetrics = await unit.nth(unitIndex).evaluate((element) => ({
+            visible: element.checkVisibility(),
+            left: element.getBoundingClientRect().left,
+            right: element.getBoundingClientRect().right,
+          }));
+          expect(unitMetrics.visible).toBe(true);
+          expect(unitMetrics.left).toBeGreaterThanOrEqual(Math.max(valueMetrics.left, cardMetrics.left, rootMetrics.left));
+          expect(unitMetrics.right).toBeLessThanOrEqual(Math.min(valueMetrics.right, cardMetrics.right, rootMetrics.right));
+        }
+      }
+    }
+
+    await expectNoPageOverflow(page);
+  }
+
   expect(consoleProblems).toEqual([]);
+});
+
+test("mobile chart and table explain their contained horizontal scroll", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const chart = page.getByTestId("chart-frame");
+  await expect(page.getByTestId("chart-scroll-hint")).toBeVisible();
+  await expect(chart).toHaveAttribute("tabindex", "0");
+  await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი");
+  expect(await chart.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+
+  await page.getByTestId("chart-mode-table").click();
+  const table = page.getByTestId("explorer-table");
+  await expect(page.getByTestId("table-scroll-hint")).toBeVisible();
+  await expect(table).toHaveAttribute("tabindex", "0");
+  await expect(table).toHaveAttribute("aria-label", "მრავალწლიანი ცხრილი — ჰორიზონტალურად გადაადგილებადი");
+  expect(await table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+
+  await expectNoPageOverflow(page);
+});
+
+test("mobile chart accepts a horizontal touch drag", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  const chart = page.getByTestId("chart-frame");
+  expect(await chart.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  expect(await chart.evaluate((element) => element.scrollLeft)).toBe(0);
+
+  const box = await chart.boundingBox();
+  expect(box).not.toBeNull();
+
+  const cdp = await page.context().newCDPSession(page);
+  const y = box!.y + Math.min(100, box!.height / 2);
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: box!.x + box!.width - 32, y }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: box!.x + 32, y }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+
+  await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
 });
 
 test("captures editorial desktop and mobile screenshots", async ({ page }) => {
@@ -725,6 +859,11 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
 
   const toggle = page.getByTestId("sidebar-toggle");
   const revenueLink = page.getByTestId("section-link-revenue");
+  const toggleBox = await toggle.boundingBox();
+  expect(toggleBox?.width ?? 0).toBeGreaterThanOrEqual(36);
+  expect(toggleBox?.height ?? 0).toBeGreaterThanOrEqual(36);
+  await expect(toggle).toHaveAttribute("aria-controls", "data-sidebar-navigation");
+  await expect(page.locator("#data-sidebar-navigation")).toHaveCount(1);
 
   // Tripwire: the sidebar used to ship on phones as a 232px ink column stacked
   // above the content. That state overflows nothing, so the mobile-overflow test

@@ -801,4 +801,47 @@ test.describe("municipality page", () => {
     expect(boxes[0]!.right).toBeLessThanOrEqual(boxes[1]!.left);
     expect(boxes[1]!.right).toBeLessThanOrEqual(boxes[2]!.left);
   });
+
+  test("keeps municipal chart controls readable on narrow phones", async ({ page }) => {
+    for (const path of [
+      "/explorer/municipalities/04",
+      "/explorer/municipalities/region/kakheti",
+      "/explorer/municipalities/georgia",
+    ]) {
+      for (const width of [320, 375, 390, 430]) {
+        await page.setViewportSize({ width, height: 844 });
+        await page.goto(`http://localhost:3100${path}`);
+        await expectMunicipalAppReady(page);
+
+        const controls = page.getByTestId("municipal-chart-controls");
+        const shareToggle = page.getByTestId("municipal-share-toggle");
+        await expect(controls).toBeVisible();
+        await expect(shareToggle).toHaveText("% წილი");
+
+        const geometry = await controls.evaluate((element) => {
+          const bounds = element.getBoundingClientRect();
+          return {
+            left: bounds.left,
+            right: bounds.right,
+            viewport: document.documentElement.clientWidth,
+            pageWidth: document.documentElement.scrollWidth,
+          };
+        });
+        expect(geometry.left).toBeGreaterThanOrEqual(0);
+        expect(geometry.right).toBeLessThanOrEqual(geometry.viewport);
+        expect(geometry.pageWidth).toBe(geometry.viewport);
+
+        const toggleBox = await shareToggle.boundingBox();
+        expect(toggleBox?.height ?? 0).toBeGreaterThanOrEqual(36);
+        await expect(shareToggle).toHaveCSS("white-space", "nowrap");
+
+        for (const testId of ["municipal-mode-line", "municipal-mode-table"]) {
+          const mode = page.getByTestId(testId);
+          const modeBox = await mode.boundingBox();
+          expect(modeBox?.height ?? 0).toBeGreaterThanOrEqual(36);
+          await expect(mode).toHaveCSS("min-height", "36px");
+        }
+      }
+    }
+  });
 });

@@ -13,6 +13,7 @@ import { SectionNav } from "./section-nav";
 const TEASERS = ["უმუშევრობა", "ინფლაცია", "ეკონომიკური ზრდა", "დემოგრაფია"];
 const STORAGE_KEY = "geodata:sidebar-collapsed";
 const DESKTOP_MIN_WIDTH = 900;
+const MOBILE_NAV_ID = "data-sidebar-navigation";
 
 export function DataSidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -118,9 +119,10 @@ export function DataSidebar() {
           type="button"
           data-testid="sidebar-toggle"
           aria-expanded={navVisible}
+          aria-controls={!isDesktop ? MOBILE_NAV_ID : undefined}
           aria-label={navVisible ? "პანელის ჩაკეცვა" : "პანელის გაშლა"}
           onClick={handleToggle}
-          className="size-[26px] flex-none cursor-pointer rounded-[3px] border border-[rgba(247,242,233,0.18)] font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"
+          className="size-9 flex-none cursor-pointer rounded-[3px] border border-[rgba(247,242,233,0.18)] font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink-fg-muted)] hover:text-[var(--paper)] min-[900px]:size-[26px]"
         >
           {navVisible ? "«" : "»"}
         </button>
@@ -144,7 +146,7 @@ export function DataSidebar() {
           </Link>
         </>
       ) : (
-        <div className={sheetOpen ? "flex flex-1 flex-col" : "hidden flex-1 min-[900px]:flex min-[900px]:flex-col"}>
+        <div id={MOBILE_NAV_ID} className={sheetOpen ? "flex flex-1 flex-col" : "hidden flex-1 min-[900px]:flex min-[900px]:flex-col"}>
           <div aria-hidden className="mt-4 mb-3.5 h-px bg-[rgba(247,242,233,0.12)]" />
           <p className="mb-3 font-[family-name:var(--font-numeric)] text-[9.5px] tracking-[0.12em] text-[var(--ink-fg-faint)]">
             მონაცემები /
