@@ -117,7 +117,7 @@ model BudgetMapping {
   @@index([publicSpendingFieldId])
 }
 
-// Mirror of data/imports/budget-facts-2005-2025.csv.
+// Mirror of data/imports/budget-facts-2004-2025.csv.
 // id is deterministic: `${year}:${side}:${itemId}:${basis}`.
 // itemId is deliberately NOT a foreign key: the CSV contract also allows
 // explicit `revenue.total` / `expenditure.total` rows that have no taxonomy
@@ -146,7 +146,7 @@ model BudgetFact {
   @@index([itemId])
 }
 
-// Mirror of data/imports/admin-spending-facts-2005-2025.csv (ministries dataset,
+// Mirror of data/imports/admin-spending-facts-2004-2025.csv (ministries dataset,
 // admin_category rows plus major_program drill-down rows).
 // id is deterministic: `${year}:${itemId}`.
 // sourceId is deliberately NOT a foreign key: the CSV contract allows

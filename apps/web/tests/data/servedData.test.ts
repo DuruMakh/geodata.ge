@@ -4,6 +4,7 @@ import {
   loadServedLandingData,
   resetServedDataCacheForTests,
   resolveServedDataSource,
+  SERVED_DATA_FILES,
 } from "../../lib/data/servedData";
 
 const originalDataSource = process.env.GEODATA_DATA_SOURCE;
@@ -45,6 +46,11 @@ describe("served data source resolution", () => {
 });
 
 describe("csv served data", () => {
+  it("uses truthful 2004-2025 filenames for expenditure and admin facts", () => {
+    expect(SERVED_DATA_FILES.budgetFacts).toBe("../../data/imports/budget-facts-2004-2025.csv");
+    expect(SERVED_DATA_FILES.adminSpendingFacts).toBe("../../data/imports/admin-spending-facts-2004-2025.csv");
+  });
+
   it("loads the full landing dataset from the reviewed CSVs", async () => {
     delete process.env.GEODATA_DATA_SOURCE;
     const landing = await loadServedLandingData();

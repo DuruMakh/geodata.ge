@@ -358,6 +358,14 @@ describe("data pipeline gate (real shipped data files)", () => {
     }
 
     expect(mismatches).toEqual([]);
+
+    const functional2004TotalGel = sumAmountGel(
+      actualOnly(expenditureCategoryFacts(facts)).filter((fact) => fact.year === 2004),
+    );
+    const admin2004TotalGel = sumAmountGel(
+      actualOnly(adminFacts).filter((fact) => fact.level === "admin_category" && fact.year === 2004),
+    );
+    expect(Math.abs(functional2004TotalGel - admin2004TotalGel)).toBeLessThanOrEqual(2_000);
   });
 
   it("keeps every major program within its admin category envelope", async () => {
@@ -423,6 +431,7 @@ describe("data pipeline gate (real shipped data files)", () => {
         ),
       );
 
+    expect(totalFor("expenditure", 2004)).toBe(1_930_210_300);
     expect(totalFor("expenditure", 2024)).toBe(25_946_342_918);
     expect(totalFor("expenditure", 2025)).toBe(27_723_319_039);
     // Revenue totals are consolidated receipts: the nine net-revenue categories
@@ -467,8 +476,8 @@ describe("data pipeline gate (real shipped data files)", () => {
 
     // 2017-2023 (pinned 2026-07): E11 functional PDF plus tavi-6 workbook
     // financial-asset/liability supplements. These reconcile at generation
-    // time; pinning here closes the regression gap so all 21 detailed years
-    // (2005-2025) are guarded, not just the endpoints.
+    // time; pinning here closes the regression gap so all 22 detailed years
+    // (2004-2025) are guarded, not just the endpoints.
     expect(totalFor("expenditure", 2017)).toBe(11_764_835_158);
     expect(totalFor("expenditure", 2018)).toBe(12_590_181_621);
     expect(totalFor("expenditure", 2019)).toBe(13_469_688_961);
