@@ -170,7 +170,7 @@ parseTreasuryPdfRows ──► OfficialRevenueRow[] (year, sourceCode, labelKa, 
                 └─ writes data/reports/real-revenue-2005-2025-report.json
                           + revenue-pdf-vs-workbook-2005-2025-report.json
 
-npm run data:compose-budget-facts ──► data/imports/budget-facts-2005-2025.csv (revenue + expenditure)
+npm run data:compose-budget-facts ──► data/imports/budget-facts-2004-2025.csv (revenue 2005–2025 + expenditure 2004–2025)
 npm run data:validate             ──► coverage / referential-integrity / staleness gate
 app build (app/page.tsx, the app/explorer routes) reads the composed CSV
 ```
@@ -256,7 +256,7 @@ rejects notes containing such glyphs, so this guard is what keeps mojibake years
 
 `npm run data:compose-budget-facts` (`scripts/compose-budget-facts.ts`) merges
 `revenue-facts-2005-2025.csv` with the per-year expenditure CSVs into
-`data/imports/budget-facts-2005-2025.csv` (sorted year → side → item), which is what the app
+`data/imports/budget-facts-2004-2025.csv` (sorted year → side → item), which is what the app
 loads at build time (`app/page.tsx` for the landing figures, `app/explorer/page.tsx` for the
 budget hub's card figures, and `app/explorer/{expenditure,revenue,analysis}/page.tsx` for the
 explorer itself; the explorer synthesizes the "Total revenue / შემოსავლები სულ" series — there is
@@ -272,7 +272,7 @@ the negative-expenditure ban / negative-revenue allowance, and the mojibake-glyp
 ### 4.6 Deferred database import (`npm run data:import`)
 
 `scripts/import-budget-facts.ts` is the designed hand-off to a database and currently a **no-op
-by intent**: it loads the composed `data/imports/budget-facts-2005-2025.csv` through the same
+by intent**: it loads the composed `data/imports/budget-facts-2004-2025.csv` through the same
 validating loader, builds the summary import report (`buildImportReport` — row counts,
 revenue/expenditure totals, unclassified share, retained-negative-revenue warnings), prints the
 report as JSON, and then prints "Database insert is intentionally deferred until Supabase
@@ -341,8 +341,8 @@ independent cross-anchor (§8.3).
 
 The revenue series deliberately starts at 2005 (`REVENUE_START_YEAR`). No 2004 Form #1 is
 committed, and `tests/data/sourceCoverage.test.ts` asserts the absence ("intentionally excludes
-2004 revenue"). This mirrors the expenditure scope decision (the repo's 2004 treasury source is
-central-budget scoped; see `lib/data/coverage.ts` and the treasury-functional methodology §7.1).
+2004 revenue"). Expenditure is separately served from 2004 because it has a complete state-budget
+execution annex; that does not create a 2004 revenue source or change this revenue limitation.
 
 ---
 
@@ -539,7 +539,7 @@ PINS" — update them consciously with any legitimate data refresh, never loosen
 `apps/web/lib/data/{coverage,factCsv,totalOnlyBudgetFacts,importBudgetFacts,importReport,foundationValidation}.ts`,
 `apps/web/lib/data/parsing/cellUtils.ts`.
 **Data:** `docs/Raw Data/Revenue/` (+ `text/` sidecars), `data/staging/revenue-official-rows-2005-2025.csv`,
-`data/imports/revenue-facts-2005-2025.csv`, `data/imports/budget-facts-2005-2025.csv`,
+`data/imports/revenue-facts-2005-2025.csv`, `data/imports/budget-facts-2004-2025.csv`,
 `data/taxonomy/revenue-categories.json`, `data/sources/source-documents.csv`.
 **Tests:** `apps/web/tests/data/realRevenue/*.test.ts`, `tests/data/pipelineIntegration.test.ts`,
 `tests/data/sourceCoverage.test.ts`.

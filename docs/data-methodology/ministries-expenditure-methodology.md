@@ -1,4 +1,4 @@
-# Ministries Expenditure — Full Methodology (2005–2025)
+# Ministries Expenditure — Full Methodology (2004–2025)
 
 **Status:** authoritative reference for the *ministries* (organizational) expenditure dataset.
 Covers what the data is, where each year comes from, how it is processed, and every
@@ -30,7 +30,8 @@ organizational answers *"which ministry spent it?"*. They do **not** reconcile t
 line-by-line (a single ministry funds several functions and vice-versa), but both reconcile to
 the same year grand total.
 
-**Coverage:** contiguous **2005–2025** (21 years). 2004 is excluded (see §6.11). In the
+**Coverage:** contiguous **2004–2025** (22 years). The 2004 administrative categories use the
+complete state-budget execution annex (see §6.11). In the
 multi-year explorer the ministries and their major programs appear as **selectable series**
 (this is series selection, not clickable drill-down), and major programs are shown **by name
 only** (§7.5).
@@ -341,10 +342,18 @@ courts, State Security Service, Public Broadcaster — and the state-wide transf
 also sit in `other_costs`, consistent with the 2017–2025 baseline. This is why `other_costs` is
 visibly larger before 2017. No genuine functional ministry is hidden there (validated §8).
 
-### 6.11 2004 — excluded (scope)
-2004 has only a *central*-budget organizational annex (narrower than the state budget, pre-COFOG);
-the repo "2004-fact.pdf" is actually the treasury functional PDF. Owner decision: exclude for now.
-Revisit as a scope decision, not an extraction gap.
+### 6.11 2004 — complete state-budget administrative inclusion
+The canonical `2004-annual-execution-annex.pdf` organizational table is pages 2–231 (SHA-256
+`C999654E8C2A430778E48FE67C1BFC7D15DC30F76A60CEEF4477614A31849889`). It contains 47 official
+institution roots, each retained as an auditable source leaf. Their rounded actuals sum to
+GEL 1,930,210,400 and the printed page-231 state-budget total is GEL 1,930,210,300: a GEL 100
+rounding difference, within the existing GEL 1,000 reconciliation tolerance.
+
+Five separately identifiable, source-backed split leaves replace only their same-year official
+parents: Finance remainder, debt service, territorial transfers, Culture remainder, and Sport.
+They remain exactly additive to the two official parent totals. All 2004 facts are `actual`; the
+annex has no depth-2 program rows, so the public 2004 major-program count is zero. The separate
+Treasury E11 is central-budget-only corroboration and supplies no administrative fact.
 
 ---
 
@@ -489,7 +498,7 @@ An 8-dimension audit (reconciliation, series anomaly-scan, 2017–2025 baseline 
 classification, the owner-approved changes, drill-down coherence, requirements conformance,
 provenance) with every finding adversarially re-derived. Result: **the dataset conforms to the v1
 requirements.** All core requirements pass — reconciliation / no silent drops, unclassified →
-`other_costs`, stable ASCII IDs, `actual` basis, contiguous 2005–2025 coverage, names-only
+`other_costs`, stable ASCII IDs, `actual` basis, contiguous 2004–2025 category coverage, names-only
 selectable drill-down, and CSV source/basis metadata. The audit's one finding — 6 recycled codes
 leaking pre-2017 spend into modern series — was fixed (§7.4) and locked with a guard test.
 
@@ -509,7 +518,7 @@ leaking pre-2017 spend into modern series — was fixed (§7.4) and locked with 
    2012. 2005 is totals-only.
 4. **Classifier keys on institution labels** — a new year with an unforeseen label spelling could
    mis-route; always re-run the anomaly-scan (below) after adding a year.
-5. **2004 excluded** — scope decision (§6.11).
+5. **2004 has no major-program rows** — the complete annex is institution-level (§6.11).
 6. **Combined-ministry splits are functional overlays on organizational data** — the Sport/Culture
    de-merge (§6.3) and the 2005–2009 culture/sport & finance splits impose a functional split on a
    genuinely-combined ministry line. Defensible and owner-approved, but a modeling choice, not a

@@ -30,8 +30,9 @@ official state-budget payments total within 1,000 GEL on multi-billion-GEL budge
 
 - **Dataset:** Georgia national **state budget** expenditure, **actual (cash) execution**,
   **functional** classification, annual.
-- **Coverage:** detailed public-category data for **2005–2025** (21 continuous years).
-  **2004 is deliberately not loaded** — see §7.1.
+- **Coverage:** detailed public-category data for **2004–2025** (22 continuous years).
+  The 2004 functional facts come from the complete state-budget execution annex; the
+  separate central-budget Treasury E11 PDF is retained as corroboration but is not served.
 - **Accounting concept — "payments" (გადასახდელები):** every year measures the full
   payments concept, i.e. expenses **plus** non-financial asset growth **plus** financial
   asset growth (net lending) **plus** liabilities decrease (debt repayment). This is the
@@ -155,7 +156,7 @@ concept and **no supplement exists or is needed**; the execution report contribu
 the reconciliation total. State debt sits in functional code 7016 and maps through the
 existing 7.1.6 → debt-service rule.
 
-### Era 5 — 2005–2006 (pre-COFOG 14-group classification)
+### Era 5 — 2004–2006 (pre-COFOG 14-group classification)
 
 These predate COFOG entirely and use the **old 14-group functional classification**
 (`01`…`14`). A dedicated parser and a dedicated group→category mapping are used (§6b).
@@ -164,12 +165,25 @@ again there is **no supplement** — the report is used only to confirm the paym
 2006 is Unicode with GEL amounts; 2005 uses the legacy transliteration font with
 thousand-GEL amounts.
 
-### 2004 — not loaded
+### 2004 — complete state-budget execution annex
 
-The 2004 treasury E11 is **central-budget scope only** (~1.51B GEL), not the full state
-budget (~1.93B), because of the 2004 budget-system reform. Loading it would show a
-misleading ~28% dip against every other (state-budget) year, so it is deliberately
-excluded. The source PDF stays catalogued for a possible future revisit (§7.1).
+The canonical source is `2004-annual-execution-annex.pdf` (SHA-256
+`C999654E8C2A430778E48FE67C1BFC7D15DC30F76A60CEEF4477614A31849889`). Its
+organizational annex is pages **2–231** and its complete functional table is page **232**.
+The latter supplies fourteen rounded full-state functional groups and the printed state-budget
+payments total: **GEL 1,930,210,300**. The group values sum to GEL 1,930,210,400, so the
+reviewed mapping applies the explicit **-GEL 100** source-table rounding adjustment only to
+`spending.other_unclassified`, yielding the printed total exactly.
+
+### 2004 — central-only Treasury E11 is not served
+
+The archived Treasury E11 PDF (SHA-256
+`33EE4A12881FB6AA6B3D7221ABBF8FEB61F1764B448B6F8A76155CC24AF67A97`) is a
+central-budget-only document of roughly GEL 1.5bn. It is not the full state budget and is
+therefore not served as a 2004 fact. It corroborates scope and parent groups only; no generated
+review-row amount comes from it. Exact annex-derived carve-outs are sport (GEL 6,866,000),
+external and domestic debt operations together (GEL 291,350,100), and intergovernmental
+transfers (GEL 128,234,000).
 
 ---
 
@@ -183,6 +197,7 @@ the official payments total.
 
 | Year | Era | E11 SHA-256 (treasury) | Supplement / verify source | Final total (GEL) | diff (GEL) |
 |---|---|---|---|---|---|
+| 2004 | 5 | 33EE4A12… (central-only, not served) | complete execution annex, p.232, SHA-256 `C999654E…49889` | 1,930,210,300 | 0 |
 | 2005 | 5 | BFC38ACB… | 2005 execution report (mof.ge doc 8907) — total only | 2,626,507,300 | 0 |
 | 2006 | 5 | 5088EDA0… | 2006 execution report (mof.ge doc 8905) — total only | 3,822,512,626 | 0 |
 | 2007 | 4 | F3CC7E9C… | 2007 execution report (mof.ge doc 8903) — total only | 5,237,131,090 | 10 |
@@ -209,7 +224,7 @@ Full SHA-256 hashes of the supplement PDFs (2005–2016) and the exact Internet 
 capture URLs are in the per-era docs and the machine-readable catalog
 `data/sources/source-documents.csv`. The treasury E11 origin is
 `https://treasury.ge/…` (12-month functional statements); the 2004 E11 is catalogued as
-`source.mof_2004_expenditure_pdf_form_e11_actual` but not loaded.
+`source.mof_2004_expenditure_pdf_form_e11_actual` but not served as a fact.
 
 ---
 
@@ -269,9 +284,16 @@ Every non-mechanical choice, with its reasoning. Totals are invariant under
 reclassification — none of these move a year's grand total; they only shift money between
 categories (except 7.1, a scope decision).
 
-**7.1 — 2004 excluded (scope).** The 2004 treasury E11 is central-budget only (1.51B) vs
-the full state budget (~1.93B). Loading it would show a misleading dip. Kept out; source
-stays catalogued.
+**7.1 — 2004 complete state-budget functional inclusion.** The canonical execution annex's
+page 232 has the complete state-budget functional table and its GEL 1,930,210,300 printed
+payments total. The reviewed old-classification mapping uses its fourteen full-state parents;
+the three exact carve-outs above are also read from that annex. The rounded parents total
+GEL 1,930,210,400, so -GEL 100 is applied only to other/unclassified to preserve the printed
+total exactly.
+
+**7.2 — 2004 central-only Treasury E11 is not served.** The E11 is a narrower central-budget
+document (~GEL 1.5bn), not a competing full-state total. It remains archived for scope and
+parent corroboration but supplies no generated review-row amount.
 
 **7.2 — 2005 uses the payments column, not the narrower expenditure column.** The 2005
 E11 grand row carries both `გადასახდელები` (payments, incl. lending/debt, 2,626,507.3k)
@@ -360,7 +382,7 @@ COVID surge 2020–2021), confirming a single consistent concept across the seri
 - **other/unclassified** is 0 for 2007–2011 and 2013–2016; 700,000 GEL in 2012 (one
   reviewed disaster-fund row, §7.4); and the residual of the old group 14 in 2005
   (2.06M / 0.08%) and 2006 (20.41M / 0.53%) — genuinely unclassified in the source.
-- **2004 is not loaded** (§7.1).
+- **2004 uses the complete execution annex, not the central-only E11** (§7.1–§7.2).
 - **2013's supplement** is the in-repo Chapter VI PDF (`final-fact-files-2004-2025/2013-fact.pdf`,
   which is itself the 2013 annual report Chapter VI), not a separately re-downloaded file.
 
@@ -410,7 +432,7 @@ file ends with `%%EOF`.
 | Compose / import | `apps/web/scripts/compose-budget-facts.ts` |
 | Regression pins | `apps/web/tests/data/pipelineIntegration.test.ts` |
 | Machine-readable source catalog | `data/sources/source-documents.csv` |
-| Published facts | `data/imports/expenditure-facts-2005-2025.csv`, `budget-facts-2005-2025.csv` |
+| Published facts | `data/imports/expenditure-facts-2004-2025.csv`, `budget-facts-2004-2025.csv` |
 
 ---
 
@@ -421,7 +443,7 @@ consolidating this project's per-era methodology notes, the source catalog, the 
 and mapping code, the regression pins, and the pre-landing grounding review. To export to
 Word or PDF for external distribution: `pandoc treasury-functional-expenditure-methodology-2004-2025.md -o methodology.docx`.
 
-Changelog 2026-07-13: published facts CSVs renamed `expenditure-facts-2004-2025.csv` / `budget-facts-2004-2025.csv` → `*-2005-2025.csv` — the files ship 2005–2025 rows only (2004 was deliberately removed), so the filenames now match actual coverage. Data content unchanged.
+Historical changelog 2026-07-13: published facts CSVs were renamed `expenditure-facts-2004-2025.csv` / `budget-facts-2004-2025.csv` → `*-2005-2025.csv` because the then-served files contained 2005–2025 rows only. On 2026-08-20, complete reviewed 2004 expenditure facts were added and the current served filenames returned to `*-2004-2025.csv`.
 
 ## 14. National GDP denominator
 

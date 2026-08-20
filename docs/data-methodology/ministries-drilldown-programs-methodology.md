@@ -16,7 +16,7 @@ Last reviewed: 2026-07-09 (program-succession continuity shipped; full suite 295
 Under each administrative category (ministry group), the explorer offers the ministry's **major
 programs** as selectable series — the depth-2 tavi-VI programs (e.g. `27 02` მოსახლეობის
 სოციალური დაცვა). Internally these are `major_program` facts in
-`data/imports/admin-spending-facts-2005-2025.csv`.
+`data/imports/admin-spending-facts-2004-2025.csv`.
 
 The core design promise: **one series = one program, shown continuously for as long as it
 existed**, no matter how many times its tavi-VI code changed. Georgia's organizational codes are
@@ -283,7 +283,7 @@ possible 2006–2025 natively-joined range with a single identity from day one (
 | 2026-07-06 | Semantic-era leak audit (6 codes, ~196M) fixed; partial-reuse rule ("cover only truly-different years"); threshold measured over 2017+ rows only; IDP→health 2005–2018; env→env_agri ≤2017; Sport/Culture full de-merge 2018–2024 | owner + adversarial review |
 | 2026-07-07 | 2015 drill-down enabled (was wrongly off); 30 01 era back to 2012; legacy joins: nine series 2006–2011, Tier A/B perimeters, 2006 fund split, NOT-joined list; post-review hardening (label last-fact-wins, join-completeness guard, value locks) | owner |
 | 2026-07-09 | **Successions:** every program shown as ONE continuous series across code changes — 20 canonical chains (§5.1), incl. the state-wide rotation (resolving that open question) and the reversal of the "drop 2016 MC" call; perimeter changes (30 01 border split) explicitly NOT joined; 34 recovered points value-locked | owner ("successors should be shown as a continuous single program") |
-| 2026-07-13 | Import CSV renamed `admin-spending-facts-2004-2025.csv` → `admin-spending-facts-2005-2025.csv` (file ships 2005–2025 only; name now matches coverage; data unchanged) | audit follow-up |
+| 2026-07-13 | Historical: import CSV was renamed `admin-spending-facts-2004-2025.csv` → `admin-spending-facts-2005-2025.csv` when it shipped 2005–2025 rows only. On 2026-08-20, reviewed 2004 administrative categories were added and the current filename returned to `admin-spending-facts-2004-2025.csv`; 2004 still has zero major-program rows. | audit follow-up |
 
 ---
 
