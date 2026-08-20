@@ -1,0 +1,56 @@
+{
+  "year": 2004,
+  "finalSourceId": "source.mof_2004_expenditure_full_state_functional_actual",
+  "grandTotalGel": 1930210300,
+  "officialTotalGel": 1930210300,
+  "differenceGel": 0,
+  "roundingAdjustmentGel": -100,
+  "finalTotalGel": 1930210300,
+  "categoryCount": 13,
+  "groupTotalsGel": {
+    "1": 301711000,
+    "2": 158749000,
+    "3": 237432900,
+    "4": 65292000,
+    "5": 147362300,
+    "6": 364257700,
+    "7": 2793000,
+    "8": 39212500,
+    "9": 78386200,
+    "10": 29177400,
+    "11": 1526400,
+    "12": 67416800,
+    "13": 4798600,
+    "14": 432094600
+  },
+  "categoryTotalsGel": {
+    "spending.general_public_services": 301711000,
+    "spending.defence": 158749000,
+    "spending.public_order_safety": 237432900,
+    "spending.education": 65292000,
+    "spending.health": 147362300,
+    "spending.social_protection": 364257700,
+    "spending.infrastructure_regional_development": 198443800,
+    "spending.sport": 6866000,
+    "spending.culture": 32346500,
+    "spending.economic_affairs": 84711200,
+    "spending.agriculture_environment": 29177400,
+    "spending.debt_service": 291350100,
+    "spending.other_unclassified": 12510400
+  },
+  "reviewRowCount": 17,
+  "sources": [
+    "docs/Raw Data/Expenditure/mof.ge/annual-execution-reports/2004-annual-execution-annex.pdf",
+    "docs/Raw Data/Expenditure/treasury.ge/2004-12-month-state-budget-functional-expenditure.pdf"
+  ],
+  "scope": {
+    "publicFacts": "Complete 2004 state-budget actual from annex page 232.",
+    "supportingCarveOuts": "Central-budget detail is used only for exact sport, debt, and intergovernmental-transfer carve-outs.",
+    "excluded": "The central-budget grand total is narrower than the complete state budget and is never emitted."
+  },
+  "notes": [
+    "Pre-COFOG 14-group functional classification mapped to public spending categories.",
+    "Complete state-budget group totals are never prorated; only exact source-backed carve-outs are subtracted.",
+    "-100 GEL source-table rounding adjustment is retained in spending.other_unclassified."
+  ]
+}
