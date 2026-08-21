@@ -1,8 +1,11 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { MUNICIPAL_COUNTRY_ID } from "../../lib/data/municipal/types";
 import { formatAmount } from "../../lib/explorer/format";
+import { municipalEntityHref } from "../../lib/seo/internalLinks";
 
 // Entity picker for the 64 municipality and 11 region pages. A plain popover
 // with focus return, not a command palette: ⌘K is a shortcut onto the same
@@ -37,9 +40,6 @@ type EntityPickerProps = {
   country: EntityPickerCountry;
   groups: EntityPickerGroup[];
   activeId: string;
-  onSelectCountry: () => void;
-  onSelectMunicipality: (code: string) => void;
-  onSelectRegion: (regionId: string) => void;
 };
 
 type PickerOption =
@@ -68,7 +68,8 @@ function focusTrigger() {
   document.querySelector<HTMLButtonElement>("[data-testid='entity-picker-trigger']")?.focus();
 }
 
-export function EntityPicker({ open, onClose, country, groups, activeId, onSelectCountry, onSelectMunicipality, onSelectRegion }: EntityPickerProps) {
+export function EntityPicker({ open, onClose, country, groups, activeId }: EntityPickerProps) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [activeOptionId, setActiveOptionId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -156,9 +157,9 @@ export function EntityPicker({ open, onClose, country, groups, activeId, onSelec
 
   function selectOption(option: PickerOption) {
     onClose();
-    if (option.kind === "country") onSelectCountry();
-    else if (option.kind === "region") onSelectRegion(option.regionId);
-    else onSelectMunicipality(option.code);
+    if (option.kind === "country") router.push(municipalEntityHref("country", country.id));
+    else if (option.kind === "region") router.push(municipalEntityHref("region", option.regionId));
+    else router.push(municipalEntityHref("municipality", option.code));
   }
 
   function moveActive(delta: 1 | -1) {
@@ -226,15 +227,15 @@ export function EntityPicker({ open, onClose, country, groups, activeId, onSelec
         </div>
         <div id={listboxId} role="listbox" aria-label="საქართველოს, მუნიციპალიტეტებისა და რეგიონების შედეგები" className="max-h-[340px] overflow-y-auto">
           {filteredCountry ? (
-            <button
-              type="button"
+            <Link
+              href={municipalEntityHref("country", country.id)}
               id={countryOptionId(baseId)}
               role="option"
               aria-selected={countryOptionId(baseId) === activeOptionId}
               aria-current={country.id === activeId ? "page" : undefined}
               tabIndex={-1}
               data-testid="picker-country"
-              onClick={() => selectOption({ id: countryOptionId(baseId), kind: "country" })}
+              onClick={onClose}
               className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
                 countryOptionId(baseId) === activeOptionId ? "border-l-[var(--ink)]" : "border-l-transparent"
               } ${country.id === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
@@ -243,7 +244,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, onSelec
               <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
                 {formatAmount(country.valueGel)} · {country.budgetCount} მუნიციპალური ბიუჯეტი
               </span>
-            </button>
+            </Link>
           ) : null}
           {filteredGroups.map((group) => {
             const regionId = regionOptionId(baseId, group.regionId);
@@ -251,15 +252,15 @@ export function EntityPicker({ open, onClose, country, groups, activeId, onSelec
 
             return (
               <div key={group.regionId}>
-                <button
-                  type="button"
+                <Link
+                  href={municipalEntityHref("region", group.regionId)}
                   id={regionId}
                   role="option"
                   aria-selected={regionActive}
                   aria-current={group.regionId === activeId ? "page" : undefined}
                   tabIndex={-1}
                   data-testid="picker-region"
-                  onClick={() => selectOption({ id: regionId, kind: "region", regionId: group.regionId })}
+                  onClick={onClose}
                   className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
                     regionActive ? "border-l-[var(--ink)]" : "border-l-transparent"
                   } ${group.regionId === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
@@ -268,22 +269,22 @@ export function EntityPicker({ open, onClose, country, groups, activeId, onSelec
                   <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
                     {formatAmount(group.valueGel)} · {group.members.length}
                   </span>
-                </button>
+                </Link>
                 {group.members.map((member) => {
                   const memberId = municipalityOptionId(baseId, member.code);
                   const memberActive = memberId === activeOptionId;
 
                   return (
-                    <button
+                    <Link
                       key={member.code}
+                      href={municipalEntityHref("municipality", member.code)}
                       id={memberId}
-                      type="button"
                       role="option"
                       aria-selected={memberActive}
                       aria-current={member.code === activeId ? "page" : undefined}
                       tabIndex={-1}
                       data-testid="picker-municipality"
-                      onClick={() => selectOption({ id: memberId, kind: "municipality", code: member.code })}
+                      onClick={onClose}
                       className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--row-border)] border-l-2 py-[7px] pr-3 pl-[26px] text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:bg-[var(--tint)] hover:text-[var(--accent)] ${
                         memberActive ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"
                       } ${member.code === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
@@ -292,7 +293,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, onSelec
                       <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
                         {formatAmount(member.valueGel)}
                       </span>
-                    </button>
+                    </Link>
                   );
                 })}
               </div>

@@ -1,5 +1,6 @@
-import Link from "next/link";
 import type { MethodologyArchiveSummary, MethodologyContent } from "../../lib/methodology/types";
+import type { BreadcrumbItem } from "../../lib/seo/structuredData";
+import { BreadcrumbTrail } from "../seo/breadcrumb-json-ld";
 import { DecisionRecord } from "./decision-record";
 import { MethodJourney } from "./method-journey";
 import { SourceArchive, type PublicSourceManifestRow } from "./source-archive";
@@ -9,6 +10,8 @@ type MethodologyArticleProps = {
   coverage: { firstYear: number; lastYear: number };
   rows: readonly PublicSourceManifestRow[];
   archiveSummary: MethodologyArchiveSummary;
+  processedDataHref: `/downloads/data/${string}.csv`;
+  breadcrumbItems: readonly BreadcrumbItem[];
 };
 
 function firstParagraphByKind(
@@ -23,7 +26,7 @@ function sectionAnchorId(section: MethodologyContent["sections"][number]) {
   return section.kind === "archive" ? "source-archive" : section.id;
 }
 
-export function MethodologyArticle({ content, coverage, rows, archiveSummary }: MethodologyArticleProps) {
+export function MethodologyArticle({ content, coverage, rows, archiveSummary, processedDataHref, breadcrumbItems }: MethodologyArticleProps) {
   const journeyDescriptions = [
     firstParagraphByKind(content, "archive", content.summaryKa),
     firstParagraphByKind(content, "sources", content.summaryKa),
@@ -33,13 +36,7 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary }: 
 
   return (
     <main className="@container mx-auto w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-12">
-      <nav aria-label="Breadcrumb" className="border-t-2 border-[var(--ink)] pt-3 text-[11px] text-[var(--muted)]">
-        <Link href="/methodology" className="underline underline-offset-4 hover:text-[var(--accent)]">
-          მეთოდოლოგია
-        </Link>
-        <span aria-hidden="true" className="mx-2">/</span>
-        <span>{content.titleKa}</span>
-      </nav>
+      <BreadcrumbTrail items={breadcrumbItems} />
 
       <header className="border-b-2 border-[var(--ink)] pb-10 pt-9 min-[768px]:pb-14 min-[768px]:pt-12">
         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">მონაცემთა ტექნიკური საველე წიგნი</p>
@@ -62,6 +59,20 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary }: 
           </div>
         ))}
       </dl>
+
+      <div className="border-b border-[var(--ink)] py-6">
+        <a
+          data-testid="processed-dataset-download"
+          href={processedDataHref}
+          download
+          className="inline-flex items-center gap-2 text-[13px] font-semibold text-[var(--accent)] underline underline-offset-4"
+        >
+          სრული დამუშავებული მონაცემები — CSV
+        </a>
+        <p className="mt-2 text-[11.5px] leading-relaxed text-[var(--muted)]">
+          UTF-8 / Excel თავსებადი · CC BY 4.0 · წყაროსა და ფაქტი/გეგმის მეტამონაცემებით
+        </p>
+      </div>
 
       <aside
         data-testid="methodology-disclosure"

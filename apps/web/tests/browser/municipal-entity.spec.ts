@@ -666,7 +666,7 @@ test.describe("municipality page", () => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
     const description = page.locator('meta[name="description"]');
-    await expect(description).toHaveAttribute("content", /თბილისი — მუნიციპალური ბიუჯეტი/);
+    await expect(description).toHaveAttribute("content", /ქალაქ თბილისის მუნიციპალიტეტის ფაქტობრივი ბიუჯეტი/);
     await expect(description).not.toHaveAttribute("content", /მუნიციპალიტეტიის/);
   });
 

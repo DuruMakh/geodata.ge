@@ -55,20 +55,25 @@ test("public header keeps landing active and leaves methodology navigation inact
   }
 });
 
-for (const path of [
-  "/explorer",
-  "/explorer/expenditure",
-  "/explorer/revenue",
-  "/explorer/analysis",
-  "/explorer/municipalities",
-  "/explorer/municipalities/04",
-  "/explorer/municipalities/region/imereti",
+for (const { path, methodologyHref } of [
+  { path: "/explorer", methodologyHref: null },
+  { path: "/explorer/expenditure", methodologyHref: "/methodology/expenditure" },
+  { path: "/explorer/revenue", methodologyHref: "/methodology/revenue" },
+  { path: "/explorer/analysis", methodologyHref: "/methodology/expenditure" },
+  { path: "/explorer/municipalities", methodologyHref: null },
+  { path: "/explorer/municipalities/04", methodologyHref: "/methodology/municipalities" },
+  { path: "/explorer/municipalities/region/imereti", methodologyHref: "/methodology/municipalities" },
 ] as const) {
-  test(`${path} has no methodology promotion or link`, async ({ page }) => {
+  test(`${path} exposes only its applicable contextual methodology link`, async ({ page }) => {
     await page.goto(`http://localhost:3100${path}`);
 
     await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
-    await expect(page.locator('a[href^="/methodology"]')).toHaveCount(0);
+    const methodologyLinks = page.locator('a[href^="/methodology"]');
+    if (methodologyHref === null) {
+      await expect(methodologyLinks).toHaveCount(0);
+    } else {
+      await expect(methodologyLinks.first()).toHaveAttribute("href", methodologyHref);
+    }
     await expect(page.locator("footer")).toHaveCount(0);
   });
 }
@@ -109,7 +114,9 @@ test("future routes stay on the static 404 surface and out of navigation", async
     await expect(page.locator("body")).toContainText("This page could not be found.");
     await expect(page.locator(`link[rel="canonical"][href*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.locator(`meta[property="og:url"][content*="/methodology/${slug}"]`)).toHaveCount(0);
-    await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
+    await expect(page.getByTestId("site-json-ld")).toHaveCount(1);
+    await expect(page.getByTestId("breadcrumb-json-ld")).toHaveCount(0);
+    await expect(page.getByTestId("dataset-json-ld")).toHaveCount(0);
   }
 
   await page.goto("http://localhost:3100/methodology");

@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { MunicipalKpi, MunicipalListRow } from "../../lib/explorer/municipalData";
 import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
 import { parseMunicipalLevel } from "../../lib/explorer/urlState";
+import { municipalEntityHref } from "../../lib/seo/internalLinks";
 import { TabDivider, TextTab } from "../ui/editorial";
 import { MunicipalityMap } from "./municipality-map";
 
@@ -71,8 +73,6 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
 
   const max = source[0]?.valueGel ?? 1;
   const openMunicipality = (code: string) => router.push(`/explorer/municipalities/${code}`);
-  const openRegion = (regionId: string) => router.push(`/explorer/municipalities/region/${regionId.replace("region.", "")}`);
-  const openCountry = () => router.push("/explorer/municipalities/georgia");
 
   return (
     <>
@@ -156,13 +156,12 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
           ) : (
             <div className="mt-1.5 max-h-[620px] overflow-y-auto">
               {rows.map((row) => (
-                <button
+                <Link
                   key={row.id}
-                  type="button"
+                  href={municipalEntityHref(row.kind, row.id)}
                   data-testid="municipal-list-row"
                   data-municipality-row-code={row.kind === "municipality" ? row.id : undefined}
                   data-active={row.kind === "municipality" && row.id === activeMunicipalityCode ? "true" : undefined}
-                  onClick={() => (row.kind === "country" ? openCountry() : row.kind === "region" ? openRegion(row.id) : openMunicipality(row.id))}
                   onMouseEnter={() => {
                     if (row.kind === "municipality") setListPointerCode(row.id);
                   }}
@@ -208,7 +207,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                   <span aria-hidden className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">
                     →
                   </span>
-                </button>
+                </Link>
               ))}
             </div>
           )}

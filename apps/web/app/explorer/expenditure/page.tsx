@@ -1,33 +1,17 @@
 import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
+import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
-import { firstServedYear } from "../../../lib/explorer/coverage";
+import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 
-const TITLE = "ხარჯები — Fiscal.ge";
-const DESCRIPTION_STEM = "საქართველოს ბიუჯეტის ხარჯები სფეროებისა და უწყებების ჭრილში";
-
-// The coverage start is read from the served facts, not written into the string:
-// a hardcoded year keeps asserting itself in search results and link previews
-// after the data moves (AGENTS.md, "UX and Visual Guardrails").
 export async function generateMetadata(): Promise<Metadata> {
   const { facts } = await loadServedLandingData();
-  const firstYear = firstServedYear(facts, "expenditure");
-  const description =
-    firstYear === null ? `${DESCRIPTION_STEM}.` : `${DESCRIPTION_STEM}, ${firstYear} წლიდან დღემდე.`;
-
-  return {
-    title: TITLE,
-    description,
-    alternates: { canonical: "/explorer/expenditure" },
-    openGraph: {
-      type: "website",
-      siteName: "Fiscal.ge",
-      locale: "ka_GE",
-      url: "/explorer/expenditure",
-      title: TITLE,
-      description,
-    },
-  };
+  const { firstYear, lastYear } = coverageFromYears(facts.filter((fact) => fact.side === "expenditure"));
+  return fiscalMetadata({
+    title: `საქართველოს ბიუჯეტის ხარჯები ${firstYear}–${lastYear} | Fiscal.ge`,
+    description: `საქართველოს სახელმწიფო ბიუჯეტის ფაქტობრივი ხარჯები სფეროებისა და უწყებების მიხედვით, ${firstYear}–${lastYear}.`,
+    path: "/explorer/expenditure",
+  });
 }
 
 export default async function ExpenditurePage() {
@@ -35,15 +19,18 @@ export default async function ExpenditurePage() {
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
 
   return (
-    <MainExplorer
-      nav="expenditure"
-      facts={facts}
-      adminFacts={adminFacts}
-      adminCategories={adminCategories}
-      glossaryEntries={Array.from(glossary.values())}
-      sourceDocuments={sourceDocuments}
-      gdpFacts={gdpFacts}
-      lastUpdatedAt={lastUpdatedAt}
-    />
+    <>
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "ხარჯები", path: "/explorer/expenditure" }]} />
+      <MainExplorer
+        nav="expenditure"
+        facts={facts}
+        adminFacts={adminFacts}
+        adminCategories={adminCategories}
+        glossaryEntries={Array.from(glossary.values())}
+        sourceDocuments={sourceDocuments}
+        gdpFacts={gdpFacts}
+        lastUpdatedAt={lastUpdatedAt}
+      />
+    </>
   );
 }

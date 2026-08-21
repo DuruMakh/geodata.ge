@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MunicipalExplorer } from "../../../../components/municipalities/municipal-explorer";
+import { BreadcrumbJsonLd } from "../../../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../lib/data/servedData";
 import { MUNICIPAL_COUNTRY_ID } from "../../../../lib/data/municipal/types";
@@ -8,28 +9,19 @@ import {
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
 } from "../../../../lib/explorer/municipalData";
+import { coverageFromYears, fiscalMetadata } from "../../../../lib/seo/metadata";
+import { municipalitiesIntroduction } from "../../../../lib/seo/content";
 
 const ROUTE = "/explorer/municipalities/georgia";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { countryTotalFacts } = await loadServedMunicipalData();
-  const years = Array.from(new Set(countryTotalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const title = "საქართველოს მუნიციპალიტეტები — Fiscal.ge";
-  const description = `საქართველოს 69 მუნიციპალური საბიუჯეტო ერთეულის და აჭარის ა.რ. გაერთიანებული გადასახდელები, შიდა ტრანსფერების გამოკლებით, ${years[0]}–${years.at(-1)}.`;
-
-  return {
-    title,
-    description,
-    alternates: { canonical: ROUTE },
-    openGraph: {
-      type: "website",
-      siteName: "Fiscal.ge",
-      locale: "ka_GE",
-      url: ROUTE,
-      title,
-      description,
-    },
-  };
+  const { firstYear, lastYear } = coverageFromYears(countryTotalFacts);
+  return fiscalMetadata({
+    title: `საქართველოს მუნიციპალური ბიუჯეტების ჯამი ${firstYear}–${lastYear} | Fiscal.ge`,
+    description: `საქართველოს 69 მუნიციპალური საბიუჯეტო ერთეულის და აჭარის ა.რ. გაერთიანებული გადასახდელები, შიდა ტრანსფერების გამოკლებით, ${firstYear}–${lastYear}.`,
+    path: ROUTE,
+  });
 }
 
 export default async function GeorgiaMunicipalitiesPage() {
@@ -47,6 +39,7 @@ export default async function GeorgiaMunicipalitiesPage() {
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }, { name: "საქართველო", path: ROUTE }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[
@@ -78,6 +71,7 @@ export default async function GeorgiaMunicipalitiesPage() {
           }}
           pickerGroups={pickerGroups}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს და დამატებით მოიცავს აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივ გადასახდელებს, მუნიციპალიტეტებზე გადაცემული ტრანსფერების გამოკლებით. ფუნქციური სერიები მხოლოდ მუნიციპალურ კლასიფიკაციას ასახავს. ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ ამ ჯამშია და მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          introduction={municipalitiesIntroduction({ firstYear, lastYear: latestYear })}
         />
       </div>
     </main>

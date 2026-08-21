@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
 import type { SourceDocumentRow } from "../../lib/data/sources";
@@ -22,6 +21,7 @@ import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { SeoIntroduction } from "../seo/seo-introduction";
 import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup } from "./entity-picker";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
@@ -57,6 +57,7 @@ type MunicipalExplorerBaseProps = {
   pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
   sourceNote: string;
+  introduction: string;
   children?: ReactNode;
 };
 
@@ -67,7 +68,6 @@ export type MunicipalExplorerProps = MunicipalExplorerBaseProps &
   );
 
 export function MunicipalExplorer(props: MunicipalExplorerProps) {
-  const router = useRouter();
   const { functions, functionFacts, totalFacts, sourceDocuments } = props;
   const { metrics, navigation } = props;
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -228,9 +228,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             country={props.pickerCountry}
             groups={props.pickerGroups}
             activeId={props.entityId}
-            onSelectCountry={() => router.push("/explorer/municipalities/georgia")}
-            onSelectMunicipality={(code) => router.push(`/explorer/municipalities/${code}`)}
-            onSelectRegion={(regionId) => router.push(`/explorer/municipalities/region/${regionId.replace("region.", "")}`)}
           />
           <div className="text-[12.5px] text-[var(--muted)]">{props.metaLine}</div>
         </div>
@@ -247,6 +244,10 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             </a>
           </span>
         ) : null}
+      </div>
+
+      <div className="mt-5">
+        <SeoIntroduction text={props.introduction} methodologyHref="/methodology/municipalities" />
       </div>
 
       <div
