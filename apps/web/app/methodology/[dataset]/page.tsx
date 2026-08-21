@@ -108,6 +108,7 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
         coverage={coverage}
         rows={publicRows}
         archiveSummary={archiveSummaries[dataset]}
+        processedDataHref={DATASET_DOWNLOADS[dataset]}
       />
       <div className="mx-auto w-full max-w-[1240px] px-5 min-[768px]:px-7">
         <SiteFooter updatedAt={updatedAt} />

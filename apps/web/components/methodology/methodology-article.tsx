@@ -9,6 +9,7 @@ type MethodologyArticleProps = {
   coverage: { firstYear: number; lastYear: number };
   rows: readonly PublicSourceManifestRow[];
   archiveSummary: MethodologyArchiveSummary;
+  processedDataHref: `/downloads/data/${string}.csv`;
 };
 
 function firstParagraphByKind(
@@ -23,7 +24,7 @@ function sectionAnchorId(section: MethodologyContent["sections"][number]) {
   return section.kind === "archive" ? "source-archive" : section.id;
 }
 
-export function MethodologyArticle({ content, coverage, rows, archiveSummary }: MethodologyArticleProps) {
+export function MethodologyArticle({ content, coverage, rows, archiveSummary, processedDataHref }: MethodologyArticleProps) {
   const journeyDescriptions = [
     firstParagraphByKind(content, "archive", content.summaryKa),
     firstParagraphByKind(content, "sources", content.summaryKa),
@@ -62,6 +63,20 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary }: 
           </div>
         ))}
       </dl>
+
+      <div className="border-b border-[var(--ink)] py-6">
+        <a
+          data-testid="processed-dataset-download"
+          href={processedDataHref}
+          download
+          className="inline-flex items-center gap-2 text-[13px] font-semibold text-[var(--accent)] underline underline-offset-4"
+        >
+          სრული დამუშავებული მონაცემები — CSV
+        </a>
+        <p className="mt-2 text-[11.5px] leading-relaxed text-[var(--muted)]">
+          UTF-8 / Excel თავსებადი · CC BY 4.0 · წყაროსა და ფაქტი/გეგმის მეტამონაცემებით
+        </p>
+      </div>
 
       <aside
         data-testid="methodology-disclosure"
