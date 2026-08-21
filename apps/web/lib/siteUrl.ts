@@ -8,10 +8,18 @@
 //    fiscal.ge). Preview builds also get the
 //    production domain here, so preview canonicals point at production.
 // 3. http://localhost:3000 — local dev fallback.
+function normalizeHttpsOrigin(value: string): string {
+  const url = new URL(value);
+  if (url.protocol !== "https:" || url.pathname !== "/" || url.search || url.hash) {
+    throw new Error("NEXT_PUBLIC_SITE_URL must be an HTTPS origin without a path, query, or hash");
+  }
+  return url.origin;
+}
+
 export function resolveSiteUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (explicit) {
-    return explicit.replace(/\/+$/, "");
+    return normalizeHttpsOrigin(explicit);
   }
   const vercelProductionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
   if (vercelProductionHost) {
