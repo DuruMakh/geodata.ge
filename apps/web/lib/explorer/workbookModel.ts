@@ -84,6 +84,13 @@ function readableValue(measure: WorkbookMeasure, point: WorkbookPoint | null | u
   return measure.kind === "percentage" ? point.measureValue ?? null : point.amountGel / measure.readableScale;
 }
 
+function subtitleKa(rows: WorkbookReadableRow[], years: number[], unitLabelKa: string): string {
+  const bases = new Set(Object.values(rows.flatMap((row) => Object.values(row.basisByYear))).filter((basis): basis is WorkbookBasis => basis !== null));
+  const basis = bases.size > 1 ? "ფაქტი და გეგმა" : bases.has("planned") ? "გეგმა" : "ფაქტი";
+  const period = years.length > 0 ? `${years[0]}–${years.at(-1)}` : "პერიოდი არ არის";
+  return `${period} · ${basis} · ${unitLabelKa}`;
+}
+
 export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookExportModel {
   const years = [...input.years];
   const rows = input.series.map<WorkbookReadableRow>((series) => {
@@ -139,7 +146,7 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
     sheetNames: ["მარტივი ცხრილი", "მონაცემები"],
     readable: {
       titleKa: input.titleKa,
-      subtitleKa: input.groupLabelKa,
+      subtitleKa: subtitleKa(rows, years, input.measure.unitLabelKa),
       unitLabelKa: input.measure.unitLabelKa,
       years,
       rows,

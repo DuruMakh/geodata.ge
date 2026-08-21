@@ -5,7 +5,10 @@ const XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.s
 const AMOUNT_NUMBER_FORMAT = "#,##0.0;[Red](#,##0.0);–";
 const PERCENTAGE_NUMBER_FORMAT = "0.0%;[Red](0.0%);–";
 const PLANNED_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFF1EADC" } };
-const SOURCE_LINK_COLUMN = 5;
+const GROUP_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFFDF7EA" } };
+const INK_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FF1E1B16" } };
+const PAPER_COLOR = { argb: "FFF7F2E9" };
+const SOURCE_LINK_COLUMN = 3;
 
 function columnLetter(column: number): string {
   let remaining = column;
@@ -19,7 +22,7 @@ function columnLetter(column: number): string {
 }
 
 function readableNumberFormat(isPercentage: boolean, isPlanned: boolean): string {
-  if (isPlanned) return isPercentage ? '0.0% "გეგმა"' : '#,##0.0 "გეგმა"';
+  if (isPlanned) return isPercentage ? '0.0% "გეგმა";[Red](0.0%) "გეგმა";–' : '#,##0.0 "გეგმა";[Red](#,##0.0) "გეგმა";–';
   return isPercentage ? PERCENTAGE_NUMBER_FORMAT : AMOUNT_NUMBER_FORMAT;
 }
 
@@ -31,8 +34,8 @@ function writeReadableRow(
   isPercentage: boolean,
 ): void {
   const label = worksheet.getCell(rowNumber, 1);
-  label.value = row.labelKa;
-  label.alignment = { vertical: "middle", indent: row.kind === "item" && row.parentLabelKa ? 1 : 0 };
+  label.value = row.kind === "item" && row.parentLabelKa ? `${row.parentLabelKa} — ${row.labelKa}` : row.labelKa;
+  label.alignment = { vertical: "middle", wrapText: true, indent: row.kind === "item" && row.parentLabelKa ? 1 : 0 };
 
   for (const [index, year] of years.entries()) {
     const cell = worksheet.getCell(rowNumber, index + 2);
@@ -54,6 +57,16 @@ function writeReadableRow(
     const lastValueCell = worksheet.getCell(rowNumber, years.length + 1).address;
     changeCell.value = { formula: `${lastValueCell}/${firstValueCell}-1`, result: row.change };
   }
+
+  if (row.kind === "total" || row.kind === "group") {
+    for (let column = 1; column <= years.length + 2; column += 1) {
+      const cell = worksheet.getCell(rowNumber, column);
+      cell.font = { bold: true };
+      if (row.kind === "total") cell.fill = PLANNED_FILL;
+      if (row.kind === "group") cell.fill = GROUP_FILL;
+    }
+  }
+  if (row.kind === "total") worksheet.getRow(rowNumber).border = { bottom: { style: "medium", color: { argb: "FF1E1B16" } } };
 }
 
 function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel["readable"]): void {
@@ -65,36 +78,53 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
   worksheet.mergeCells(`A2:${lastColumnLetter}2`);
   worksheet.getCell("A1").value = readable.titleKa;
   worksheet.getCell("A2").value = readable.subtitleKa;
-  worksheet.getCell("A1").font = { bold: true, size: 16 };
-  worksheet.getCell("A2").font = { italic: true };
+  for (let column = 1; column <= lastColumn; column += 1) {
+    const titleCell = worksheet.getCell(1, column);
+    titleCell.fill = INK_FILL;
+    titleCell.font = { bold: true, size: 16, color: PAPER_COLOR };
+  }
+  worksheet.getCell("A2").alignment = { vertical: "middle", wrapText: true };
 
-  const headers = ["კატეგორია", ...readable.years, "პერიოდის ცვლილება"];
+  const headers = ["კატეგორია", ...readable.years, `ცვლილება ${readable.years[0]}–${readable.years.at(-1)}`];
   headers.forEach((header, index) => {
     const cell = worksheet.getCell(3, index + 1);
     cell.value = header;
-    cell.font = { bold: true };
+    cell.fill = INK_FILL;
+    cell.font = { bold: true, color: PAPER_COLOR };
     cell.alignment = { horizontal: index === 0 ? "left" : "right", vertical: "middle" };
   });
 
   readable.rows.forEach((row, index) => writeReadableRow(worksheet, index + 4, row, readable.years, isPercentage));
 
-  const noteRow = readable.rows.length + 5;
+  const noteRow = readable.rows.length + 4;
   worksheet.getCell(noteRow, 1).value = `ერთეული: ${readable.unitLabelKa}`;
+  const sourceHeaderRow = noteRow + 1;
+  ["წელი", "ოფიციალური წყარო", "ფაილის ჩამოტვირთვა", "მოპოვებულია"].forEach((header, index) => {
+    const cell = worksheet.getCell(sourceHeaderRow, index + 1);
+    cell.value = header;
+    cell.fill = INK_FILL;
+    cell.font = { bold: true, color: PAPER_COLOR };
+    cell.alignment = { vertical: "middle", wrapText: true };
+  });
   readable.sources.forEach((source, index) => {
-    const rowNumber = noteRow + index + 1;
+    const rowNumber = sourceHeaderRow + index + 1;
     worksheet.getCell(rowNumber, 1).value = source.years.join(", ");
     worksheet.getCell(rowNumber, 2).value = source.titleKa;
-    worksheet.getCell(rowNumber, 3).value = source.organizationKa;
-    worksheet.getCell(rowNumber, 4).value = source.retrievedAt;
     worksheet.getCell(rowNumber, SOURCE_LINK_COLUMN).value = {
       text: source.absoluteUrl,
       hyperlink: source.absoluteUrl,
       tooltip: source.titleKa,
     };
+    worksheet.getCell(rowNumber, 4).value = source.retrievedAt;
+    worksheet.getCell(rowNumber, 2).alignment = { vertical: "middle", wrapText: true };
+    worksheet.getCell(rowNumber, SOURCE_LINK_COLUMN).alignment = { vertical: "middle", wrapText: true };
   });
 
-  worksheet.getColumn(1).width = 42;
-  for (let column = 2; column <= Math.max(lastColumn, SOURCE_LINK_COLUMN); column += 1) worksheet.getColumn(column).width = 18;
+  worksheet.getColumn(1).width = 46;
+  for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = 18;
+  worksheet.getColumn(2).width = Math.max(worksheet.getColumn(2).width ?? 0, 34);
+  worksheet.getColumn(3).width = Math.max(worksheet.getColumn(3).width ?? 0, 42);
+  worksheet.getColumn(4).width = Math.max(worksheet.getColumn(4).width ?? 0, 16);
 }
 
 function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel["analysis"]): void {

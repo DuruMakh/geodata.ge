@@ -52,6 +52,7 @@ describe("buildWorkbookExportModel", () => {
 
     expect(model.filename).toBe("fiscal-revenue-2020-2021.xlsx");
     expect(model.sheetNames).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+    expect(model.readable.subtitleKa).toBe("2020–2021 · ფაქტი და გეგმა · მილიონი ₾");
     expect(model.readable.years).toEqual([2020, 2021]);
     expect(model.readable.rows.map((row) => row.labelKa)).toEqual([
       "გადასახადები სულ",

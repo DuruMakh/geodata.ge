@@ -18,7 +18,7 @@ const readableRows: WorkbookReadableRow[] = [
     kind: "item",
     parentLabelKa: "გადასახადები",
     labelKa: "დამატებული ღირებულების გადასახადი",
-    valuesByYear: { 2020: 100, 2021: 120, 2022: 150 },
+    valuesByYear: { 2020: 100, 2021: -120, 2022: 150 },
     basisByYear: { 2020: "actual", 2021: "planned", 2022: "actual" },
     change: 0.5,
   },
@@ -37,7 +37,7 @@ const approvedModelFixture: WorkbookExportModel = {
   sheetNames: ["მარტივი ცხრილი", "მონაცემები"],
   readable: {
     titleKa: "საქართველოს საგადასახადო შემოსავლები",
-    subtitleKa: "გადასახადები",
+    subtitleKa: "2020–2022 · ფაქტი და გეგმა · მილიონი ₾",
     unitLabelKa: "მილიონი ₾",
     years: [2020, 2021, 2022],
     rows: readableRows,
@@ -71,11 +71,11 @@ function modelWithYears(years: number[]): WorkbookExportModel {
 }
 
 function expectSourceMetadata(readable: ExcelJS.Worksheet) {
+  expect(readable.getRow(17).values).toEqual([undefined, "წელი", "ოფიციალური წყარო", "ფაილის ჩამოტვირთვა", "მოპოვებულია"]);
   expect(readable.getCell("A18").value).toBe("2020");
   expect(readable.getCell("B18").value).toBe("2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები");
-  expect(readable.getCell("C18").value).toBe("საქართველოს ფინანსთა სამინისტრო");
+  expect(readable.getCell("C18").value).toMatchObject({ hyperlink: sourceUrl });
   expect(readable.getCell("D18").value).toBe("2026-06-09");
-  expect(readable.getCell("E18").value).toMatchObject({ hyperlink: sourceUrl });
 }
 
 describe("createWorkbookBuffer", () => {
@@ -87,8 +87,18 @@ describe("createWorkbookBuffer", () => {
 
     const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
     expect(readable.getCell("A1").value).toBe("საქართველოს საგადასახადო შემოსავლები");
+    expect(readable.getCell("A2").value).toBe("2020–2022 · ფაქტი და გეგმა · მილიონი ₾");
     expect(readable.getCell("B3").value).toBe(2020);
+    expect(readable.getCell("E3").value).toBe("ცვლილება 2020–2022");
     expect(readable.getCell("B3").alignment?.horizontal).toBe("right");
+    expect(readable.getCell("A1").fill).toMatchObject({ fgColor: { argb: "FF1E1B16" } });
+    expect(readable.getCell("A3").fill).toMatchObject({ fgColor: { argb: "FF1E1B16" } });
+    expect(readable.getCell("A4").font?.bold).toBe(true);
+    expect(readable.getCell("A4").fill).toMatchObject({ fgColor: { argb: "FFF1EADC" } });
+    expect(readable.getCell("A6").font?.bold).toBe(true);
+    expect(readable.getCell("A6").fill).toMatchObject({ fgColor: { argb: "FFFDF7EA" } });
+    expect(readable.getCell("A5").alignment?.wrapText).toBe(true);
+    expect(readable.getColumn(1).width).toBeGreaterThanOrEqual(42);
     expect(readable.views[0]).toMatchObject({ state: "frozen", xSplit: 1, ySplit: 3 });
 
     const analysis = workbook.getWorksheet("მონაცემები")!;
@@ -110,11 +120,13 @@ describe("createWorkbookBuffer", () => {
     const analysis = workbook.getWorksheet("მონაცემები")!;
 
     expect(readable.getCell("C5").type).toBe(ExcelJS.ValueType.Number);
-    expect(readable.getCell("C5").numFmt).toBe('#,##0.0 "გეგმა"');
+    expect(readable.getCell("C5").value).toBe(-120);
+    expect(readable.getCell("C5").numFmt).toBe('#,##0.0 "გეგმა";[Red](#,##0.0) "გეგმა";–');
     expect(readable.getCell("C5").fill).toMatchObject({ type: "pattern", fgColor: { argb: "FFF1EADC" } });
+    expect(readable.getCell("A5").value).toBe("გადასახადები — დამატებული ღირებულების გადასახადი");
     expect(readable.getCell("A5").alignment?.indent).toBe(1);
     expect(readable.getCell("E4").value).toMatchObject({ formula: "D4/B4-1", result: 0.5 });
-    expect(readable.getCell("E18").value).toMatchObject({ hyperlink: sourceUrl });
+    expect(readable.getCell("C18").value).toMatchObject({ hyperlink: sourceUrl });
     expect(analysis.getTables()).toHaveLength(1);
     const table = analysis.getTable("FiscalExportData") as unknown as { table: { columns: Array<{ filterButton: boolean }> } };
     expect(table.table.columns.map((column) => column.filterButton)).toEqual([true, true, true, true, true]);
@@ -144,5 +156,14 @@ describe("createWorkbookBuffer", () => {
     const workbook = await loadWorkbook(modelWithYears([2020, 2021]));
 
     expectSourceMetadata(workbook.getWorksheet("მარტივი ცხრილი")!);
+  });
+
+  it("keeps a program-only selection connected to its parent", async () => {
+    const workbook = await loadWorkbook({
+      ...approvedModelFixture,
+      readable: { ...approvedModelFixture.readable, rows: [readableRows[1]!] },
+    });
+
+    expect(workbook.getWorksheet("მარტივი ცხრილი")!.getCell("A4").value).toBe("გადასახადები — დამატებული ღირებულების გადასახადი");
   });
 });
