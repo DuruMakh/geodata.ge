@@ -13,6 +13,7 @@ import {
 import { formatPerResidentGel } from "../../../lib/explorer/format";
 import { buildMunicipalityMapModel } from "../../../lib/explorer/municipalityMapData";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
+import { municipalitiesIntroduction } from "../../../lib/seo/content";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { totalFacts } = await loadServedMunicipalData();
@@ -66,7 +67,7 @@ export default async function MunicipalitiesIndexPage() {
           რას ხარჯავენ საქართველოს მუნიციპალიტეტები
         </h1>
         <p className="mb-[26px] max-w-[560px] text-[13.5px] leading-relaxed text-[var(--body)]">
-          აირჩიე მუნიციპალიტეტი რუკაზე ან სიაში — გაიხსნება შესაბამისი ბიუჯეტის სრული ისტორია ფუნქციების მიხედვით.
+          {municipalitiesIntroduction({ firstYear, lastYear: latestYear })}
         </p>
 
         <MunicipalitiesIndex

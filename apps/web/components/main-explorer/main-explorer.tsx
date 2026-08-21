@@ -19,6 +19,8 @@ import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import type { ExplorerNav, ExplorerScope } from "../../lib/explorer/types";
 import { AnalysisView } from "../analysis/analysis-view";
 import { PageHeader } from "../shell/page-header";
+import { SeoIntroduction } from "../seo/seo-introduction";
+import { analysisIntroduction, expenditureIntroduction, revenueIntroduction } from "../../lib/seo/content";
 import { ExplorerView } from "./explorer-view";
 import { useExplorerState } from "./use-explorer-state";
 
@@ -188,6 +190,11 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
   ]
     .filter(Boolean)
     .join(" · ");
+  const seoIntroduction = isAnalysis
+    ? analysisIntroduction(analysisYears.at(-1) ?? 0)
+    : nav === "revenue"
+      ? revenueIntroduction({ firstYear: coverageYears[0]!, lastYear: coverageYears.at(-1)! })
+      : expenditureIntroduction({ firstYear: coverageYears[0]!, lastYear: coverageYears.at(-1)! });
 
   function downloadCsv() {
     const csv = buildExplorerCsv(model.tableRows, model.years, model.gdpByYear);
@@ -237,6 +244,11 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
             </>
           ) : null}
         </p>
+
+        <SeoIntroduction
+          text={seoIntroduction}
+          methodologyHref={nav === "revenue" ? "/methodology/revenue" : "/methodology/expenditure"}
+        />
 
         {analysisModel ? (
           <AnalysisView

@@ -17,6 +17,7 @@ import {
   fiscalMetadata,
   municipalityBudgetTitleKa,
 } from "../../../../lib/seo/metadata";
+import { municipalityIntroduction } from "../../../../lib/seo/content";
 
 // The 64 codes are the complete, closed set. Without this, an unknown code is
 // left to request-time rendering instead of failing at build.
@@ -122,6 +123,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
             next: { label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` },
           }}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          introduction={municipalityIntroduction({ nameKa: municipality.nameKa, firstYear, lastYear: latestYear })}
         />
       </div>
     </main>

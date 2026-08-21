@@ -184,6 +184,20 @@ export function LandingPage({ model }: { model: LandingModel }) {
           </Link>
         </section>
 
+        <section className="mt-14 border-t-2 border-[var(--ink)] pt-[22px]" aria-labelledby="about-fiscal-title">
+          <h2 id="about-fiscal-title" className="font-[family-name:var(--font-display)] text-[22px] font-semibold">
+            რა არის Fiscal.ge?
+          </h2>
+          <p className="mt-4 max-w-[760px] text-[13.5px] leading-[1.8] text-[var(--body)]">
+            Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ,
+            მრავალწლიან მონაცემებს. ოფიციალური სამართლებრივი დოკუმენტი უცვლელად რჩება პირველწყაროდ;
+            Fiscal.ge მონაცემებს ადარებად, გასაგებად და ჩამოსატვირთად აწყობს.
+          </p>
+          <Link href="/methodology" className="mt-3 inline-flex text-[12.5px] text-[var(--accent)] underline underline-offset-4">
+            პირველწყაროები და მეთოდოლოგია
+          </Link>
+        </section>
+
         <MethodologyPromo
           href="/methodology"
           titleKa="როგორ იქცევა ოფიციალური წყარო ღია მონაცემად"

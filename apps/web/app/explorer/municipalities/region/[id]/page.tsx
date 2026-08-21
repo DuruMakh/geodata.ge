@@ -17,6 +17,7 @@ import {
 import { georgianOrdinal, REGION_GENITIVE_KA } from "../../../../../lib/explorer/municipalLabels";
 import { formatAmount } from "../../../../../lib/explorer/format";
 import { coverageFromYears, fiscalMetadata } from "../../../../../lib/seo/metadata";
+import { regionIntroduction } from "../../../../../lib/seo/content";
 
 const SOURCE_NOTE_BASE =
   "მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). " +
@@ -150,6 +151,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
             next: { label: next.kaLabel, href: hrefFor(next) },
           }}
           sourceNote={`${regionId === ADJARA_REGION_ID ? ADJARA_SOURCE_NOTE : SOURCE_NOTE_BASE}${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          introduction={regionIntroduction({ genitiveNameKa: REGION_GENITIVE_KA[regionId] ?? region.kaLabel, firstYear, lastYear: latestYear })}
         >
           <div className="mt-11 border-t-2 border-[var(--ink)] pt-[22px]">
             <h2 className="mb-3.5 font-[family-name:var(--font-display)] text-[22px] font-semibold">
