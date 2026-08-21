@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo } from "react";
 import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
@@ -273,6 +274,12 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
             onDownloadCsv={downloadCsv}
           />
         )}
+        <Link
+          href={nav === "revenue" ? "/methodology/revenue" : "/methodology/expenditure"}
+          className="mt-7 inline-flex text-[12px] text-[var(--muted)] underline underline-offset-4 hover:text-[var(--accent)]"
+        >
+          მონაცემთა მეთოდოლოგია და პირველწყაროები
+        </Link>
       </div>
     </main>
   );

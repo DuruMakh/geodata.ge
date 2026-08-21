@@ -135,7 +135,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
                   <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{model.revMax}</span>
                 </div>
               </div>
-              <PathCardLink href="/explorer">ექსპლორერის გახსნა</PathCardLink>
+              <PathCardLink href="/explorer/expenditure">ხარჯების ექსპლორერი</PathCardLink>
             </div>
 
             <div className="flex flex-col gap-3 border-t border-[var(--hairline)] pt-4">
@@ -173,9 +173,15 @@ export function LandingPage({ model }: { model: LandingModel }) {
                   </div>
                 ))}
               </div>
-              <PathCardLink href="/explorer">ჩამოტვირთვა ექსპლორერიდან</PathCardLink>
+              <PathCardLink href="/explorer/revenue">შემოსავლების მონაცემები</PathCardLink>
             </div>
           </div>
+          <Link
+            href="/explorer/municipalities"
+            className="mt-8 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
+          >
+            საქართველოს მუნიციპალიტეტების ბიუჯეტები →
+          </Link>
         </section>
 
         <MethodologyPromo

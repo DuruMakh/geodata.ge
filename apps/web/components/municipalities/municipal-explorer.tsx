@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
 import type { SourceDocumentRow } from "../../lib/data/sources";
@@ -67,7 +66,6 @@ export type MunicipalExplorerProps = MunicipalExplorerBaseProps &
   );
 
 export function MunicipalExplorer(props: MunicipalExplorerProps) {
-  const router = useRouter();
   const { functions, functionFacts, totalFacts, sourceDocuments } = props;
   const { metrics, navigation } = props;
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -228,9 +226,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             country={props.pickerCountry}
             groups={props.pickerGroups}
             activeId={props.entityId}
-            onSelectCountry={() => router.push("/explorer/municipalities/georgia")}
-            onSelectMunicipality={(code) => router.push(`/explorer/municipalities/${code}`)}
-            onSelectRegion={(regionId) => router.push(`/explorer/municipalities/region/${regionId.replace("region.", "")}`)}
           />
           <div className="text-[12.5px] text-[var(--muted)]">{props.metaLine}</div>
         </div>
@@ -365,6 +360,12 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               className="mt-3.5 block text-[12px] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
             >
               ← ყველა მუნიციპალიტეტი
+            </Link>
+            <Link
+              href="/methodology/municipalities"
+              className="mt-2.5 block text-[12px] text-[var(--muted)] underline underline-offset-4 hover:text-[var(--accent)]"
+            >
+              მეთოდოლოგია და პირველწყაროები
             </Link>
           </div>
         </aside>
