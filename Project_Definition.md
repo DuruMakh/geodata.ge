@@ -1,10 +1,10 @@
-# GeoData.ge - Project Definition
+# Fiscal.ge - Project Definition
 
 ## 1. Project Overview
 
 ### Project Name
 
-GeoData.ge
+Fiscal.ge
 
 ### One-Line Description
 
@@ -12,7 +12,7 @@ A Georgian-first public budget explorer for understanding Georgia's national bud
 
 ### Current Product Focus
 
-GeoData.ge is a long-term public data platform idea, but v1 is intentionally narrow: Georgia Budget Explorer.
+Fiscal.ge is a long-term public data platform idea, but v1 is intentionally narrow: Georgia Budget Explorer.
 
 The first version focuses on annual national budget data: expenditure by public spending fields and ministries and revenue both cover 2004-2025. The 2004 expenditure series uses the reviewed full state-budget execution annex; the separate Treasury E11 PDF is central-budget scoped and is not served. The 2004 revenue panel uses the annual report's consolidated revenue-and-grants table and intentionally omits the unavailable comparable increase-in-liabilities amount. The product should help users understand where public money comes from, where it goes, and how the structure changes over time.
 
@@ -74,7 +74,7 @@ The first release should primarily serve people who currently need to read offic
 
 ## 4. Value Proposition
 
-GeoData.ge v1 makes Georgia's national budget easier to understand and reuse.
+Fiscal.ge v1 makes Georgia's national budget easier to understand and reuse.
 
 The product solves these problems:
 
@@ -84,7 +84,7 @@ The product solves these problems:
 - Public-facing budget visualizations are limited.
 - It is hard to quickly understand how revenue and expenditure change over time.
 
-GeoData.ge improves this by:
+Fiscal.ge improves this by:
 
 - Normalizing reviewed budget data.
 - Showing multi-year trends.

@@ -19,7 +19,7 @@ export type MethodologyDecision = {
   id: string;
   groupKa: string;
   titleKa: string;
-  statusKa: "ოფიციალური ფაქტი" | "GeoData-ის გადაწყვეტილება" | "შეზღუდვა";
+  statusKa: "ოფიციალური ფაქტი" | "Fiscal.ge-ის გადაწყვეტილება" | "შეზღუდვა";
   summaryKa: string;
   detailKa: readonly string[];
   canonicalDecisionIds: readonly string[];

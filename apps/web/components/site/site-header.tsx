@@ -19,7 +19,7 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
       className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2 border-b-2 border-[var(--ink)] pb-3.5 min-[768px]:gap-5"
     >
       <span className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em]">
-        GeoData
+        Fiscal.ge
       </span>
       <nav aria-label="ნავიგაცია" className="flex gap-4 min-[768px]:gap-[26px]">
         <Link

@@ -12,7 +12,7 @@ import {
 import { formatPerResidentGel } from "../../../lib/explorer/format";
 import { buildMunicipalityMapModel } from "../../../lib/explorer/municipalityMapData";
 
-const TITLE = "მუნიციპალიტეტები — GeoData";
+const TITLE = "მუნიციპალიტეტები — Fiscal.ge";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { totalFacts } = await loadServedMunicipalData();
@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: "/explorer/municipalities" },
     openGraph: {
       type: "website",
-      siteName: "GeoData.ge",
+      siteName: "Fiscal.ge",
       locale: "ka_GE",
       url: "/explorer/municipalities",
       title: TITLE,

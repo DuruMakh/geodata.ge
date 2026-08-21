@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!region) return {};
 
   const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const title = `${region.kaLabel} — მუნიციპალიტეტები — GeoData`;
+  const title = `${region.kaLabel} — მუნიციპალიტეტები — Fiscal.ge`;
   const description =
     region.id === ADJARA_REGION_ID
       ? `აჭარის გაერთიანებული ბიუჯეტი — რესპუბლიკური და მუნიციპალური გადასახდელები შიდა ტრანსფერების გამოკლებით, ${years[0]}–${years.at(-1)}.`
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     alternates: { canonical: `/explorer/municipalities/region/${id}` },
     openGraph: {
       type: "website",
-      siteName: "GeoData.ge",
+      siteName: "Fiscal.ge",
       locale: "ka_GE",
       url: `/explorer/municipalities/region/${id}`,
       title,

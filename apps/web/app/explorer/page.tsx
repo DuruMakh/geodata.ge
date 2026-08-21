@@ -7,15 +7,15 @@ import { buildHubCards } from "../../lib/explorer/hubCards";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 
 export const metadata: Metadata = {
-  title: "ბიუჯეტი — GeoData",
+  title: "ბიუჯეტი — Fiscal.ge",
   description: "საქართველოს ბიუჯეტის მონაცემები: შემოსავლები, ხარჯები და ერთი წლის ანალიზი.",
   alternates: { canonical: "/explorer" },
   openGraph: {
     type: "website",
-    siteName: "GeoData.ge",
+    siteName: "Fiscal.ge",
     locale: "ka_GE",
     url: "/explorer",
-    title: "ბიუჯეტი — GeoData",
+    title: "ბიუჯეტი — Fiscal.ge",
     description: "საქართველოს ბიუჯეტის მონაცემები: შემოსავლები, ხარჯები და ერთი წლის ანალიზი.",
   },
 };

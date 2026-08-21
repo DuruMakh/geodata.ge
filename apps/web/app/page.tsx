@@ -4,15 +4,15 @@ import { loadServedLandingData } from "../lib/data/servedData";
 import { buildLandingModel } from "../lib/landing/landingData";
 
 export const metadata: Metadata = {
-  title: "GeoData — საქართველოს ბიუჯეტის ექსპლორერი",
+  title: "Fiscal.ge — საქართველოს ბიუჯეტის ექსპლორერი",
   description: "გადამოწმებული ოფიციალური საბიუჯეტო მონაცემები: მრავალწლიანი დინამიკა, ერთი წლის სურათი და ღია CSV.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    siteName: "GeoData.ge",
+    siteName: "Fiscal.ge",
     locale: "ka_GE",
     url: "/",
-    title: "GeoData — საქართველოს ბიუჯეტის ექსპლორერი",
+    title: "Fiscal.ge — საქართველოს ბიუჯეტის ექსპლორერი",
     description: "გადამოწმებული ოფიციალური საბიუჯეტო მონაცემები: მრავალწლიანი დინამიკა, ერთი წლის სურათი და ღია CSV.",
   },
 };

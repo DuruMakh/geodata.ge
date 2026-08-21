@@ -35,7 +35,7 @@ function validatedDataset(value: string): MethodologyDatasetId {
 export async function generateMetadata({ params }: MethodologyDatasetPageProps): Promise<Metadata> {
   const dataset = validatedDataset((await params).dataset);
   const content = METHODOLOGY_CONTENT[dataset];
-  const title = `${content.titleKa} — GeoData`;
+  const title = `${content.titleKa} — Fiscal.ge`;
   const canonical = `/methodology/${dataset}`;
 
   return {
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: MethodologyDatasetPageProps):
     alternates: { canonical },
     openGraph: {
       type: "article",
-      siteName: "GeoData.ge",
+      siteName: "Fiscal.ge",
       locale: "ka_GE",
       url: canonical,
       title,

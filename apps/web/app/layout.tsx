@@ -26,11 +26,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(resolveSiteUrl()),
-  title: "GeoData.ge Budget Explorer",
+  title: "Fiscal.ge Budget Explorer",
   description: "Georgian-first public budget explorer for Georgia.",
   openGraph: {
     type: "website",
-    siteName: "GeoData.ge",
+    siteName: "Fiscal.ge",
     locale: "ka_GE",
   },
 };

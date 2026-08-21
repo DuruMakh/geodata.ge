@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
   if (!municipality) return {};
 
   const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const title = `${municipality.displayNameKa} — მუნიციპალიტეტები — GeoData`;
+  const title = `${municipality.displayNameKa} — მუნიციპალიტეტები — Fiscal.ge`;
   const description = `${municipality.displayNameKa} — მუნიციპალური ბიუჯეტი ფუნქციების მიხედვით, ${years[0]}–${years.at(-1)}.`;
 
   return {
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
     alternates: { canonical: `/explorer/municipalities/${code}` },
     openGraph: {
       type: "website",
-      siteName: "GeoData.ge",
+      siteName: "Fiscal.ge",
       locale: "ka_GE",
       url: `/explorer/municipalities/${code}`,
       title,

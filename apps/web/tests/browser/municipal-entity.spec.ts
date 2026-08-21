@@ -573,7 +573,7 @@ test.describe("municipality page", () => {
     const downloadPromise = page.waitForEvent("download");
     await page.getByTestId("municipal-csv").click();
     const download = await downloadPromise;
-    expect(download.suggestedFilename()).toMatch(/^geodata-municipality-04-\d{4}-\d{4}\.csv$/);
+    expect(download.suggestedFilename()).toMatch(/^fiscal-municipality-04-\d{4}-\d{4}\.csv$/);
     const path = await download.path();
     const csv = await readFile(path!, "utf8");
     const total2016 = csv.split("\n").find((row) => row.startsWith("2016,municipal.total,"));

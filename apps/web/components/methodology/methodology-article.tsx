@@ -67,7 +67,7 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary }: 
         data-testid="methodology-disclosure"
         className="my-10 border-l-2 border-[var(--accent)] bg-[var(--tint)] px-5 py-5 min-[768px]:my-14 min-[768px]:px-7"
       >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--accent)]">ოფიციალური ფაქტი და GeoData-ის მეთოდი</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--accent)]">ოფიციალური ფაქტი და Fiscal.ge-ის მეთოდი</p>
         <p className="mt-3 max-w-[920px] text-[13.5px] leading-[1.75] text-[var(--body)]">{content.disclosureKa}</p>
       </aside>
 

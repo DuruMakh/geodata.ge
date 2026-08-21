@@ -173,7 +173,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `geodata-${props.csvBasename}-${state.range.start}-${state.range.end}.csv`;
+    link.download = `fiscal-${props.csvBasename}-${state.range.start}-${state.range.end}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   }

@@ -8,15 +8,15 @@ export function SiteFooter({ updatedAt }: { updatedAt: string }) {
       <div data-testid="landing-footer">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-9">
           <div className="flex flex-col gap-2.5">
-            <span className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em]">GeoData</span>
+            <span className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em]">Fiscal.ge</span>
             <p className="max-w-[260px] text-pretty text-[12.5px] leading-relaxed text-[var(--body)]">
               საქართველოს ბიუჯეტი — ნათლად, გადამოწმებულად, ღიად.
             </p>
             <a
-              href="mailto:info@geodata.ge"
+              href="mailto:info@fiscal.ge"
               className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--accent)] underline underline-offset-[3px]"
             >
-              info@geodata.ge
+              info@fiscal.ge
             </a>
           </div>
           <div className="flex flex-col gap-[9px]">
@@ -43,7 +43,7 @@ export function SiteFooter({ updatedAt }: { updatedAt: string }) {
           </div>
         </div>
         <div className="mt-[30px] flex flex-wrap justify-between gap-4 border-t border-[var(--hairline-soft)] pt-3.5">
-          <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">© 2026 GeoData.ge</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">© 2026 Fiscal.ge</span>
           <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">CC BY 4.0</span>
         </div>
       </div>

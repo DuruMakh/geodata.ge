@@ -7,7 +7,7 @@ import { ComingSoonBadge } from "../ui/editorial";
 import { SectionNav } from "./section-nav";
 
 // Platform sidebar (DESIGN.md §6.7). Two desktop states — 232px expanded and a
-// 52px reading rail — plus a top bar with a sheet below 900px. GeoData is a data
+// 52px reading rail — plus a top bar with a sheet below 900px. Fiscal.ge is a data
 // platform whose first dataset is the budget; teaser rows are markers only.
 
 const TEASERS = ["უმუშევრობა", "ინფლაცია", "ეკონომიკური ზრდა", "დემოგრაფია"];
@@ -108,7 +108,7 @@ export function DataSidebar() {
       <div className="flex items-center justify-between gap-2.5">
         {railed ? null : (
           <Link href="/" className="flex flex-col gap-0.5 no-underline">
-            <span className="font-[family-name:var(--font-display)] text-base font-bold text-[var(--paper)]">GeoData</span>
+            <span className="font-[family-name:var(--font-display)] text-base font-bold text-[var(--paper)]">Fiscal.ge</span>
             <span className="font-[family-name:var(--font-numeric)] text-[8.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]">
               ღია მონაცემები
             </span>

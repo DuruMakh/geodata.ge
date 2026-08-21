@@ -14,7 +14,7 @@ const ROUTE = "/explorer/municipalities/georgia";
 export async function generateMetadata(): Promise<Metadata> {
   const { countryTotalFacts } = await loadServedMunicipalData();
   const years = Array.from(new Set(countryTotalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const title = "საქართველოს მუნიციპალიტეტები — GeoData";
+  const title = "საქართველოს მუნიციპალიტეტები — Fiscal.ge";
   const description = `საქართველოს 69 მუნიციპალური საბიუჯეტო ერთეულის და აჭარის ა.რ. გაერთიანებული გადასახდელები, შიდა ტრანსფერების გამოკლებით, ${years[0]}–${years.at(-1)}.`;
 
   return {
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: ROUTE },
     openGraph: {
       type: "website",
-      siteName: "GeoData.ge",
+      siteName: "Fiscal.ge",
       locale: "ka_GE",
       url: ROUTE,
       title,

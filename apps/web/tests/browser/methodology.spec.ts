@@ -155,7 +155,7 @@ test("expenditure methodology exposes the complete layered article", async ({ pa
   await page.goto("http://localhost:3100/methodology/expenditure");
 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("ხარჯები");
-  await expect(page.getByTestId("methodology-disclosure")).toContainText("GeoData");
+  await expect(page.getByTestId("methodology-disclosure")).toContainText("Fiscal.ge");
   await expect(page.getByTestId("method-journey-step")).toHaveCount(4);
   await expect(page.getByTestId("decision-record")).toContainText("2004–2025");
   await expect(page.getByTestId("decision-record")).toContainText("1,930,210,300");
