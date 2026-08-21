@@ -106,10 +106,10 @@ A branch implementation, merged commit, green deploy-trigger workflow, or accept
 - Multi-year institutions and major programs are selectable series, not clickable drilldown.
 - Use stable lowercase ASCII category IDs; Georgian and English labels are display data, not identifiers.
 - Public expenditure fields come from reviewed mappings over official rows. Preserve every official row. Assign uncertain rows explicitly to `spending.other_unclassified` and retain mapping confidence and notes.
-- Store `basis = actual | planned`. When both exist for an item and year, actual wins in public charts, tables, and CSV; active planned values remain visibly marked.
+- Store `basis = actual | planned`. When both exist for an item and year, actual wins in public charts, tables, and Excel workbooks; active planned values remain visibly marked.
 - Every import must produce validation and reconciliation evidence.
-- CSV exports retain source and basis metadata.
-- Georgian CSVs intended for direct opening in Microsoft Excel must use UTF-8 with BOM and automated encoding regression coverage. Prefer a native XLSX companion when spreadsheet auto-conversion could alter identifiers.
+- Public Excel workbooks retain basis status and validated public-archive source hyperlinks; they do not expose internal metadata columns.
+- Georgian methodology manifest CSVs intended for direct opening in Microsoft Excel must use UTF-8 with BOM and automated encoding regression coverage. Public explorer downloads are native `.xlsx` workbooks.
 - Municipal codes `05`, `42`, `43`, `46`, and `64` remain excluded because their budgets are not territorially attributable spending inside those municipalities.
 
 ## UI Contract

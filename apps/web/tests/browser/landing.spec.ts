@@ -45,6 +45,11 @@ test("landing renders the site v2 structure with live data", async ({ page }) =>
   await expect(paths.getByText("მარტივი ცხრილი", { exact: true })).toBeVisible();
   await expect(paths.getByText("მონაცემები", { exact: true })).toBeVisible();
   await expect(paths.getByText(/year,category_id|amount_gel/)).toHaveCount(0);
+  const previewRow = paths.getByTestId("excel-preview").getByRole("row").nth(1);
+  await expect(previewRow.getByRole("rowheader")).not.toBeEmpty();
+  await expect(previewRow.getByRole("cell")).toHaveCount(2);
+  await expect(previewRow.getByRole("cell").nth(0)).not.toBeEmpty();
+  await expect(previewRow.getByRole("cell").nth(1)).not.toBeEmpty();
 
   const footer = page.getByTestId("landing-footer");
   await expect(footer).toContainText("Fiscal.ge");

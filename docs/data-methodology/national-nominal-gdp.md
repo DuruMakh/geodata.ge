@@ -48,4 +48,4 @@ The check command regenerates all three artifacts in memory and requires an exac
 
 `npm run data:validate` additionally requires one positive, unique, source-registered denominator for every served national budget year. `npm run data:import` mirrors the canonical rows transactionally into `NationalGdpFact`, reads them back through the database serving path, and compares every field against the reviewed CSV before commit.
 
-National CSV downloads append `gdp_current_prices_gel`, `gdp_accounting_standard`, `gdp_status`, GDP source metadata, and `share_of_gdp`, allowing every displayed ratio to be reproduced. Georgian CSV output retains the UTF-8 BOM required for direct Excel opening.
+National Excel workbooks retain the full GEL amount and add `მშპ-ის წილი (%)` only when the visitor selects `% მშპ-ში`; they link the validated GDP source workbook without exposing denominator, accounting-standard, publication-status, or source-metadata columns. The reviewed canonical GDP CSV remains an internal data artifact and retains its validation fields and UTF-8 BOM for direct Excel opening.

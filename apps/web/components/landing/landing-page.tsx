@@ -170,20 +170,28 @@ export function LandingPage({ model }: { model: LandingModel }) {
                     </span>
                   ))}
                 </div>
-                <div className="mt-2 grid grid-cols-3 gap-x-2 text-[10.5px] font-[family-name:var(--font-numeric)]">
-                  {model.excelPreview.headers.map((header, index) => (
-                    <div key={header} className={index === 0 ? "text-[var(--muted)]" : "text-right text-[var(--muted)]"}>
-                      {header}
-                    </div>
-                  ))}
-                  {model.excelPreview.rows.map(([label, previousValue, latestValue]) => (
-                    <div key={label} className="contents text-[var(--body)]">
-                      <div className="truncate">{label}</div>
-                      <div className="text-right">{previousValue.toLocaleString("en-US")}</div>
-                      <div className="text-right">{latestValue.toLocaleString("en-US")}</div>
-                    </div>
-                  ))}
-                </div>
+                <table data-testid="excel-preview" className="mt-2 w-full text-[10.5px] font-[family-name:var(--font-numeric)]">
+                  <thead className="text-[var(--muted)]">
+                    <tr>
+                      {model.excelPreview.headers.map((header, index) => (
+                        <th key={header} scope="col" className={index === 0 ? "text-left font-normal" : "text-right font-normal"}>
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="text-[var(--body)]">
+                    {model.excelPreview.rows.map(([label, previousValue, latestValue]) => (
+                      <tr key={label}>
+                        <th scope="row" className="max-w-[120px] truncate text-left font-normal">
+                          {label}
+                        </th>
+                        <td className="text-right">{previousValue.toLocaleString("en-US")}</td>
+                        <td className="text-right">{latestValue.toLocaleString("en-US")}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
               <PathCardLink href="/explorer">ექსპლორერში ჩამოტვირთვა</PathCardLink>
             </div>
