@@ -1,4 +1,6 @@
+import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
+import ExcelJS from "exceljs";
 
 function collectConsoleProblems(page: Page) {
   const consoleProblems: string[] = [];
@@ -23,6 +25,18 @@ async function expectNoPageOverflow(page: Page) {
 
 async function expectAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+}
+
+async function downloadWorkbook(page: Page) {
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByTestId("series-excel").click();
+  const download = await downloadPromise;
+  const path = await download.path();
+  if (!path) throw new Error("Expected a local XLSX download path");
+  const bytes = await readFile(path);
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(Uint8Array.from(bytes).buffer);
+  return { download, workbook };
 }
 
 async function expectSidebarWidth(page: Page, width: number) {
@@ -330,18 +344,8 @@ test("ministries grouping expands nested programs by name only", async ({ page }
   expect(consoleProblems).toEqual([]);
 });
 
-test("2004 expenditure is complete across functions, ministries, GDP share, and CSV exports", async ({ page }) => {
+test("2004 expenditure is complete across functions, ministries, GDP share, and Excel exports", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
-  const { readFile } = await import("node:fs/promises");
-
-  async function downloadCsv() {
-    const downloadPromise = page.waitForEvent("download");
-    await page.getByTestId("series-csv").click();
-    const download = await downloadPromise;
-    const path = await download.path();
-    if (!path) throw new Error("Expected a local CSV download path");
-    return (await readFile(path)).toString("utf8");
-  }
 
   await page.goto("http://localhost:3100/explorer/expenditure");
   await expectAppReady(page);
@@ -360,24 +364,31 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
   await page.getByTestId("measure-share-toggle").click();
   await expect(page.getByTestId("explorer-table")).toContainText("19.6%");
 
-  const functionalCsv = await downloadCsv();
-  expect(functionalCsv).toContain("2004,expenditure.total,,total,,,მთლიანი ხარჯი,Total expenditure,1930210300,actual");
-  expect(functionalCsv).toContain("2004-annual-execution-annex.pdf");
-  expect(functionalCsv).toContain(",9824300000,sna_1993,final_as_published,");
-  expect(functionalCsv).not.toContain("1500000000");
+  const functionalExport = await downloadWorkbook(page);
+  expect(functionalExport.download.suggestedFilename()).toMatch(/^fiscal-fields-\d{4}-\d{4}\.xlsx$/);
+  expect(functionalExport.workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+  const functionalRows = functionalExport.workbook.getWorksheet("მონაცემები")!.getRows(2, 30) ?? [];
+  expect(functionalRows.map((row) => row.values)).toContainEqual([
+    undefined,
+    2004,
+    "ხარჯები",
+    "მთლიანი ხარჯი",
+    1_930_210_300,
+    "ფაქტი",
+    1_930_210_300 / 9_824_300_000,
+  ]);
+  expect(JSON.stringify(functionalExport.workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues())).not.toContain("1500000000");
 
   await fields.getByTestId("grouping-ministries").click();
   await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
   await fields.getByTestId("series-toggle-all").click();
   await fields.getByTestId("series-toggle-all").click();
-  const ministryCsv = await downloadCsv();
-  const ministry2004Rows = ministryCsv.split("\n").filter((row) => row.startsWith("2004,"));
-  expect(ministry2004Rows).not.toHaveLength(0);
-  expect(ministry2004Rows).toContainEqual(expect.stringContaining("admin_spending.defence"));
-  expect(ministry2004Rows).toContainEqual(expect.stringContaining(",admin_category,"));
-  expect(ministry2004Rows.join("\n")).toContain(",172009000,actual,");
-  expect(ministry2004Rows.join("\n")).not.toContain(",major_program,");
-  expect(ministry2004Rows.join("\n")).toContain("2004-annual-execution-annex.pdf");
+  const ministryExport = await downloadWorkbook(page);
+  expect(ministryExport.download.suggestedFilename()).toMatch(/^fiscal-ministries-\d{4}-\d{4}\.xlsx$/);
+  const ministryRows = ministryExport.workbook.getWorksheet("მონაცემები")!.getRows(2, 2000) ?? [];
+  const ministry2004Rows = ministryRows.filter((row) => row.getCell(1).value === 2004);
+  expect(ministry2004Rows.length).toBeGreaterThan(0);
+  expect(ministry2004Rows.some((row) => row.getCell(4).value === 172_009_000)).toBe(true);
 
   await page.goto("http://localhost:3100/explorer/revenue");
   await expectAppReady(page);
@@ -386,9 +397,8 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
   expect(consoleProblems).toEqual([]);
 });
 
-test("2004 revenue total excludes an unavailable liability value in tables and CSV", async ({ page }) => {
+test("2004 revenue total excludes an unavailable liability value in tables and Excel", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
-  const { readFile } = await import("node:fs/promises");
 
   await page.goto("http://localhost:3100/explorer/revenue#m=table&r=2004-2005&sel=revenue.total,revenue.increase_liabilities");
   await expectAppReady(page);
@@ -400,14 +410,12 @@ test("2004 revenue total excludes an unavailable liability value in tables and C
   await expect(liabilitiesRow).toContainText("—");
   await expect(liabilitiesRow).toContainText("0.09");
 
-  const downloadPromise = page.waitForEvent("download");
-  await page.getByTestId("series-csv").click();
-  const download = await downloadPromise;
-  const downloadPath = await download.path();
-  if (!downloadPath) throw new Error("Expected a local CSV download path");
-  const csv = (await readFile(downloadPath)).toString("utf8");
-  expect(csv).toContain("2004,revenue.total");
-  expect(csv).not.toContain("2004,revenue.increase_liabilities");
+  const revenueExport = await downloadWorkbook(page);
+  expect(revenueExport.download.suggestedFilename()).toMatch(/^fiscal-revenue-\d{4}-\d{4}\.xlsx$/);
+  expect(revenueExport.workbook.getWorksheet("მარტივი ცხრილი")!.getCell("A4").value).toBe("მთლიანი შემოსავლები");
+  const exportedRows = revenueExport.workbook.getWorksheet("მონაცემები")!.getRows(2, 20) ?? [];
+  expect(exportedRows.some((row) => row.getCell(1).value === 2004 && row.getCell(3).value === "ვალდებულებების ზრდა")).toBe(false);
+  expect(exportedRows.some((row) => row.getCell(1).value === 2005 && row.getCell(3).value === "ვალდებულებების ზრდა")).toBe(true);
 
   expect(consoleProblems).toEqual([]);
 });
@@ -574,36 +582,75 @@ test("shared ministries program links restore with the parent expanded", async (
   await expect(restored).toBeVisible();
 });
 
-test("CSV download uses the active filtered table data", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+test("Excel download uses only the selected range and series", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure#r=2020-2021&sel=spending.social_protection");
   await expectAppReady(page);
 
   const socialProtectionButton = page.getByTestId("series-selector").getByTitle("სოციალური დაცვა");
-  await socialProtectionButton.click();
   await expect(socialProtectionButton).toHaveAttribute("aria-pressed", "true");
+  await page.getByTestId("series-search").fill("ჯანდაცვა");
 
-  const downloadPromise = page.waitForEvent("download");
-  await page.getByTestId("series-csv").click();
-  const download = await downloadPromise;
-  const path = await download.path();
-  if (!path) throw new Error("Expected a local CSV download path");
+  await expect(page.getByTestId("series-csv")).toHaveCount(0);
+  const { download, workbook } = await downloadWorkbook(page);
+  expect(download.suggestedFilename()).toBe("fiscal-fields-2020-2021.xlsx");
+  expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+  expect(workbook.getWorksheet("მარტივი ცხრილი")!.getRow(3).values).toEqual([
+    undefined,
+    "კატეგორია",
+    2020,
+    2021,
+    "პერიოდის ცვლილება",
+  ]);
+  const dataRows = (workbook.getWorksheet("მონაცემები")!.getRows(2, 10) ?? []).filter((row) => row.getCell(1).value !== null);
+  expect([...new Set(dataRows.map((row) => row.getCell(1).value))]).toEqual([2020, 2021]);
+  expect([...new Set(dataRows.map((row) => row.getCell(3).value))]).toEqual(["სოციალური დაცვა"]);
+  expect(JSON.stringify(workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues())).not.toContain("geostat.ge");
+});
 
-  const { readFile } = await import("node:fs/promises");
-  const csvBytes = await readFile(path);
-  const csv = csvBytes.toString("utf8");
+test("Excel button shows working and retryable error states", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
 
-  expect(download.suggestedFilename()).toContain("fiscal-fields-");
-  expect(Array.from(csvBytes.subarray(0, 3))).toEqual([0xef, 0xbb, 0xbf]);
-  expect(csv.startsWith("\uFEFF")).toBe(true);
-  const csvWithoutBom = csv.slice(1);
-  expect(csvWithoutBom.split("\n")[0]).toBe(
-    "year,category_id,parent_item_id,level,detail_label,official_institution_label,ka_label,en_label,amount_gel,basis,source_name,source_url_or_file,last_reviewed_at,gdp_current_prices_gel,gdp_accounting_standard,gdp_status,gdp_source_name,gdp_source_url_or_file,gdp_last_reviewed_at,share_of_gdp",
-  );
-  expect(csv).toContain("spending.");
-  expect(csv).toContain("expenditure.total");
-  expect(csv).toContain("actual");
-  expect(csv).toContain("sna_2008");
-  expect(csv).toContain("Geostat GDP at current prices, SNA 2008");
+  await page.evaluate(() => {
+    const realCreateObjectURL = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = () => {
+      URL.createObjectURL = realCreateObjectURL;
+      throw new Error("induced workbook download failure");
+    };
+  });
+
+  const button = page.getByTestId("series-excel");
+  await button.click();
+  await expect(button).toHaveText("Excel მზადდება…");
+  await expect(button).toBeDisabled();
+  await expect(page.getByText("ფაილი ვერ მომზადდა — სცადეთ თავიდან.")).toBeVisible();
+
+  const retry = await downloadWorkbook(page);
+  expect(retry.download.suggestedFilename()).toMatch(/^fiscal-fields-\d{4}-\d{4}\.xlsx$/);
+  await expect(page.getByText("ფაილი ვერ მომზადდა — სცადეთ თავიდან.")).toHaveCount(0);
+
+  await page.getByTestId("series-toggle-all").click();
+  await expect(button).toBeDisabled();
+});
+
+test("GDP share Excel download adds the analysis column and official sources", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure#r=2020-2021&sel=expenditure.total");
+  await expectAppReady(page);
+  await page.getByTestId("measure-share-toggle").click();
+
+  const { workbook } = await downloadWorkbook(page);
+  expect(workbook.getWorksheet("მონაცემები")!.getRow(1).values).toEqual([
+    undefined,
+    "წელი",
+    "მთავარი ჯგუფი",
+    "კატეგორია",
+    "თანხა (₾)",
+    "სტატუსი",
+    "მშპ-ის წილი (%)",
+  ]);
+  const readableText = JSON.stringify(workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues());
+  expect(readableText).toContain("https://www.geostat.ge/");
+  expect(readableText).not.toMatch(/docs[\\/]Raw Data|national-gdp-annual/);
 });
 
 test("analysis view renders the fixed single-year section order", async ({ page }) => {

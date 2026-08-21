@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
 import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
 import { firstServedYear } from "../../../lib/explorer/coverage";
+import { loadGdpWorkbookSources, loadWorkbookSources } from "../../../lib/methodology/workbookSources";
+import { resolveSiteUrl } from "../../../lib/siteUrl";
 
 const TITLE = "ხარჯები — Fiscal.ge";
 const DESCRIPTION_STEM = "საქართველოს ბიუჯეტის ხარჯები სფეროებისა და უწყებების ჭრილში";
@@ -31,7 +33,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ExpenditurePage() {
-  const { facts, glossary, sourceDocuments, adminFacts, adminCategories, gdpFacts } = await loadServedExplorerData();
+  const [{ facts, glossary, sourceDocuments, adminFacts, adminCategories, gdpFacts }, workbookSources, gdpWorkbookSources] =
+    await Promise.all([
+      loadServedExplorerData(),
+      loadWorkbookSources("expenditure"),
+      loadGdpWorkbookSources(),
+    ]);
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
 
   return (
@@ -43,6 +50,9 @@ export default async function ExpenditurePage() {
       glossaryEntries={Array.from(glossary.values())}
       sourceDocuments={sourceDocuments}
       gdpFacts={gdpFacts}
+      workbookSources={workbookSources}
+      gdpWorkbookSources={gdpWorkbookSources}
+      siteOrigin={resolveSiteUrl()}
       lastUpdatedAt={lastUpdatedAt}
     />
   );

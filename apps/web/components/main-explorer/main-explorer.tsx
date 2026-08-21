@@ -10,13 +10,20 @@ import type {
   ServedNationalGdpFact,
 } from "../../lib/servedRows";
 import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
-import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { buildExplorerModel, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import type { ExplorerNav, ExplorerScope } from "../../lib/explorer/types";
+import {
+  buildWorkbookExportModel,
+  type WorkbookExportInput,
+  type WorkbookPublicSource,
+  type WorkbookSeries,
+} from "../../lib/explorer/workbookModel";
+import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { AnalysisView } from "../analysis/analysis-view";
+import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { PageHeader } from "../shell/page-header";
 import { ExplorerView } from "./explorer-view";
 import { useExplorerState } from "./use-explorer-state";
@@ -33,10 +40,13 @@ type MainExplorerProps = {
   glossaryEntries: GlossaryEntry[];
   sourceDocuments: SourceDocumentRow[];
   gdpFacts?: ServedNationalGdpFact[];
+  workbookSources?: WorkbookPublicSource[];
+  gdpWorkbookSources?: WorkbookPublicSource[];
+  siteOrigin?: string;
   lastUpdatedAt: string;
 };
 
-export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, sourceDocuments, gdpFacts = [], lastUpdatedAt }: MainExplorerProps) {
+export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, sourceDocuments, gdpFacts = [], workbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
   useEffect(() => {
     document.body.dataset.appReady = "true";
 
@@ -188,15 +198,45 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
     .filter(Boolean)
     .join(" · ");
 
-  function downloadCsv() {
-    const csv = buildExplorerCsv(model.tableRows, model.years, model.gdpByYear);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `fiscal-${scope}-${range.start}-${range.end}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
+  function buildWorkbookInput(): WorkbookExportInput {
+    const labelById = new Map(model.items.map((item) => [item.id, item.kaLabel]));
+    const series = model.tableRows.map<WorkbookSeries>((row) => {
+      const pointsByYear: WorkbookSeries["pointsByYear"] = {};
+      for (const year of model.years) {
+        const amountGel = row.valuesByYear[year];
+        const basis = row.basisByYear[year];
+        pointsByYear[year] = amountGel === null || amountGel === undefined || basis === undefined
+          ? null
+          : {
+              amountGel,
+              measureValue: share ? row.shareByYear?.[year] : undefined,
+              basis,
+            };
+      }
+
+      return {
+        id: row.itemId,
+        kind: row.itemId === model.totalRow?.itemId ? "total" : row.level === "admin_category" ? "group" : "item",
+        parentLabelKa: row.parentItemId ? labelById.get(row.parentItemId) ?? null : null,
+        labelKa: row.kaLabel,
+        pointsByYear,
+      };
+    });
+
+    const groupLabelKa = scope === "revenue" ? "შემოსავლები" : scope === "ministries" ? "უწყებები" : "ხარჯები";
+    return {
+      filenameBase: scope,
+      titleKa: screenTitle,
+      groupLabelKa,
+      years: model.years,
+      measure: share
+        ? { kind: "percentage", unitLabelKa: "% მშპ-ში", analysisHeaderKa: "მშპ-ის წილი (%)" }
+        : { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
+      totalId: model.totalRow?.itemId ?? null,
+      series,
+      sources: share ? [...workbookSources, ...gdpWorkbookSources] : workbookSources,
+      siteOrigin: siteOrigin ?? window.location.origin,
+    };
   }
 
   return (
@@ -270,7 +310,13 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
             onSelectionChange={setSelectedSeries}
             onToggleSeries={toggleSeries}
             onToggleExpanded={toggleMinistryExpanded}
-            onDownloadCsv={downloadCsv}
+            downloadAction={
+              <ExcelDownloadButton
+                testId="series-excel"
+                disabled={model.tableRows.length === 0}
+                onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildWorkbookInput()))}
+              />
+            }
           />
         )}
       </div>

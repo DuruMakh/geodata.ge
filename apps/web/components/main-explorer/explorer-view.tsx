@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import { UNIT_BN } from "../../lib/explorer/format";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
@@ -33,7 +34,7 @@ type ExplorerViewProps = {
   onSelectionChange: (itemIds: string[]) => void;
   onToggleSeries: (itemId: string) => void;
   onToggleExpanded: (itemId: string) => void;
-  onDownloadCsv: () => void;
+  downloadAction: ReactNode;
 };
 
 const COVERAGE_NOTE: Record<ExplorerScope, string> = {
@@ -77,7 +78,7 @@ export function ExplorerView({
   onSelectionChange,
   onToggleSeries,
   onToggleExpanded,
-  onDownloadCsv,
+  downloadAction,
 }: ExplorerViewProps) {
   const noSelection = selectedIds.length === 0;
   const series: ChartSeries[] = model.selectedItems.map((item) => {
@@ -201,7 +202,7 @@ export function ExplorerView({
           onSelectionChange={onSelectionChange}
           onToggle={onToggleSeries}
           onToggleExpanded={onToggleExpanded}
-          onDownloadCsv={onDownloadCsv}
+          downloadAction={downloadAction}
         />
       </div>
 

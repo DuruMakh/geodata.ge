@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
 import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
 import { firstServedYear } from "../../../lib/explorer/coverage";
+import { loadGdpWorkbookSources, loadWorkbookSources } from "../../../lib/methodology/workbookSources";
+import { resolveSiteUrl } from "../../../lib/siteUrl";
 
 const TITLE = "შემოსავლები — Fiscal.ge";
 const DESCRIPTION_STEM = "საქართველოს ბიუჯეტის შემოსავლები — გადასახადები, გრანტები და სხვა შემოსულობები";
@@ -31,7 +33,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RevenuePage() {
-  const { facts, glossary, sourceDocuments, gdpFacts } = await loadServedExplorerData();
+  const [{ facts, glossary, sourceDocuments, gdpFacts }, workbookSources, gdpWorkbookSources] = await Promise.all([
+    loadServedExplorerData(),
+    loadWorkbookSources("revenue"),
+    loadGdpWorkbookSources(),
+  ]);
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
 
   // No adminFacts/adminCategories: the ministries scope cannot be reached from
@@ -43,6 +49,9 @@ export default async function RevenuePage() {
       glossaryEntries={Array.from(glossary.values())}
       sourceDocuments={sourceDocuments}
       gdpFacts={gdpFacts}
+      workbookSources={workbookSources}
+      gdpWorkbookSources={gdpWorkbookSources}
+      siteOrigin={resolveSiteUrl()}
       lastUpdatedAt={lastUpdatedAt}
     />
   );
