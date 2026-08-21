@@ -18,7 +18,7 @@ export type WorkbookPublicSource = {
   years: number[];
   titleKa: string;
   organizationKa: string;
-  downloadHref: `/downloads/methodology/${string}`;
+  downloadHref: `/downloads/methodology/${string}` | `https://${string}`;
   retrievedAt: string;
 };
 
@@ -66,7 +66,11 @@ export type WorkbookExportModel = {
 
 const statusKa = (basis: WorkbookBasis) => (basis === "planned" ? "გეგმა" : "ფაქტი");
 
-export function absoluteWorkbookSourceUrl(siteOrigin: string, downloadHref: string): string {
+export function absoluteWorkbookSourceUrl(
+  siteOrigin: string,
+  downloadHref: WorkbookPublicSource["downloadHref"],
+): string {
+  if (downloadHref.startsWith("https://")) return downloadHref;
   return `${siteOrigin.replace(/\/+$/, "")}/${downloadHref.replace(/^\/+/, "")}`;
 }
 

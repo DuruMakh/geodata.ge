@@ -80,6 +80,12 @@ describe("buildWorkbookExportModel", () => {
     );
   });
 
+  it("preserves an official HTTPS source URL without a site-origin prefix", () => {
+    expect(absoluteWorkbookSourceUrl("https://fiscal.ge/", "https://www.geostat.ge/media/27798/GDP-at-current-prices.xlsx")).toBe(
+      "https://www.geostat.ge/media/27798/GDP-at-current-prices.xlsx",
+    );
+  });
+
   it("merges active-year coverage for duplicate source URLs", () => {
     const model = buildWorkbookExportModel({
       ...input,
