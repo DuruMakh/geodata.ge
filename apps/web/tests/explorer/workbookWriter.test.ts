@@ -99,6 +99,9 @@ describe("createWorkbookBuffer", () => {
     expect(readable.getCell("A6").fill).toMatchObject({ fgColor: { argb: "FFFDF7EA" } });
     expect(readable.getCell("A5").alignment?.wrapText).toBe(true);
     expect(readable.getColumn(1).width).toBeGreaterThanOrEqual(42);
+    expect(readable.getColumn(2).width).toBe(18);
+    expect(readable.getColumn(3).width).toBe(18);
+    expect(readable.getColumn(4).width).toBe(18);
     expect(readable.views[0]).toMatchObject({ state: "frozen", xSplit: 1, ySplit: 3 });
 
     const analysis = workbook.getWorksheet("მონაცემები")!;
@@ -127,6 +130,9 @@ describe("createWorkbookBuffer", () => {
     expect(readable.getCell("A5").alignment?.indent).toBe(1);
     expect(readable.getCell("E4").value).toMatchObject({ formula: "D4/B4-1", result: 0.5 });
     expect(readable.getCell("C18").value).toMatchObject({ hyperlink: sourceUrl });
+    expect(readable.getCell("B18").alignment?.wrapText).toBe(true);
+    expect(readable.getCell("C18").alignment?.wrapText).toBe(true);
+    expect(readable.getRow(18).height).toBeGreaterThanOrEqual(30);
     expect(analysis.getTables()).toHaveLength(1);
     const table = analysis.getTable("FiscalExportData") as unknown as { table: { columns: Array<{ filterButton: boolean }> } };
     expect(table.table.columns.map((column) => column.filterButton)).toEqual([true, true, true, true, true]);

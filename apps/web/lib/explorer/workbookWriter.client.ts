@@ -118,13 +118,11 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
     worksheet.getCell(rowNumber, 4).value = source.retrievedAt;
     worksheet.getCell(rowNumber, 2).alignment = { vertical: "middle", wrapText: true };
     worksheet.getCell(rowNumber, SOURCE_LINK_COLUMN).alignment = { vertical: "middle", wrapText: true };
+    worksheet.getRow(rowNumber).height = 30;
   });
 
   worksheet.getColumn(1).width = 46;
   for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = 18;
-  worksheet.getColumn(2).width = Math.max(worksheet.getColumn(2).width ?? 0, 34);
-  worksheet.getColumn(3).width = Math.max(worksheet.getColumn(3).width ?? 0, 42);
-  worksheet.getColumn(4).width = Math.max(worksheet.getColumn(4).width ?? 0, 16);
 }
 
 function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel["analysis"]): void {
