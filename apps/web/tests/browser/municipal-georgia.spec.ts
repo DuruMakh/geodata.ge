@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
+import ExcelJS from "exceljs";
 
 const COUNTRY_URL = `${process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100"}/explorer/municipalities/georgia`;
 
@@ -7,8 +8,19 @@ async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
 
+async function downloadMunicipalWorkbook(page: Page) {
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByTestId("municipal-excel").click();
+  const download = await downloadPromise;
+  const path = await download.path();
+  if (!path) throw new Error("Expected a local XLSX download path");
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(Uint8Array.from(await readFile(path)).buffer);
+  return { download, workbook };
+}
+
 test("Georgia municipal aggregate is a country-only explorer", async ({ page }) => {
-  const response = await page.goto(COUNTRY_URL);
+  const response = await page.goto(`${COUNTRY_URL}#r=2020-2021`);
   expect(response?.status()).toBe(200);
   await expectMunicipalAppReady(page);
 
@@ -43,18 +55,34 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
   await expect(page.getByTestId("region-member-row")).toHaveCount(0);
   await expect(page.getByTestId("municipal-entity-navigation")).toHaveCount(0);
 
-  const downloadPromise = page.waitForEvent("download");
-  await page.getByTestId("municipal-csv").click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/^fiscal-municipalities-georgia-\d{4}-\d{4}\.csv$/);
-  const csvPath = await download.path();
-  if (!csvPath) throw new Error("Expected a local CSV download path");
-  const csvBytes = await readFile(csvPath);
-  expect([...csvBytes.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
-  const csv = csvBytes.toString("utf8");
-  expect(csv).toContain("საქართველო");
-  expect(csv).toContain("country.georgia");
+  const { download, workbook } = await downloadMunicipalWorkbook(page);
+  expect(download.suggestedFilename()).toBe("fiscal-municipalities-georgia-2020-2021.xlsx");
+  expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+  const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
+  expect(readable.getCell("A1").value).toBe("საქართველო");
+  expect(readable.getRow(3).values).toEqual([
+    undefined,
+    "კატეგორია",
+    2020,
+    2021,
+    "პერიოდის ცვლილება",
+  ]);
+  const analysis = workbook.getWorksheet("მონაცემები")!;
+  const analysisRows = (analysis.getRows(2, 10) ?? []).filter((row) => row.getCell(1).value !== null);
+  expect(analysisRows.map((row) => row.getCell(1).value)).toEqual([2020, 2021]);
+
+  const workbookValues = workbook.worksheets.map((sheet) => sheet.getSheetValues());
+  const workbookText = workbookValues.flat(Infinity).map(String);
+  const workbookJson = JSON.stringify(workbookValues);
+  expect(workbookJson).not.toContain("country.georgia");
   for (const code of ["05", "42", "43", "46", "64"]) {
-    expect(csv).not.toMatch(new RegExp(`,${code},`));
+    expect(workbookText).not.toContain(code);
+    expect(workbookJson).not.toContain(`municipality-budget-history-${code}.xlsx`);
   }
+  const hyperlinks = readable.getSheetValues().flatMap((row) =>
+    Array.isArray(row)
+      ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+      : [],
+  );
+  expect(hyperlinks.some((value) => value.includes("/downloads/methodology/municipalities/"))).toBe(true);
 });

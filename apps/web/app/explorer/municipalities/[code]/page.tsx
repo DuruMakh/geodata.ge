@@ -11,6 +11,8 @@ import {
   latestReviewedAtForMunicipalFacts,
 } from "../../../../lib/explorer/municipalData";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
+import { loadWorkbookSources } from "../../../../lib/methodology/workbookSources";
+import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
 // The 64 codes are the complete, closed set. Without this, an unknown code is
 // left to request-time rendering instead of failing at build.
@@ -48,8 +50,13 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
 
 export default async function MunicipalityPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
-  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = await loadServedMunicipalData();
-  const { sourceDocuments } = await loadServedLandingData();
+  const [servedMunicipalData, landingData, workbookSources] = await Promise.all([
+    loadServedMunicipalData(),
+    loadServedLandingData(),
+    loadWorkbookSources("municipalities"),
+  ]);
+  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = servedMunicipalData;
+  const { sourceDocuments } = landingData;
 
   const municipality = municipalities.find((row) => row.code === code);
   if (!municipality) notFound();
@@ -113,7 +120,9 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
             rankByYear,
             rankOutOf: municipalities.length,
           }}
-          csvBasename={`municipality-${code}`}
+          workbookBasename={`municipality-${code}`}
+          workbookSources={workbookSources}
+          siteOrigin={resolveSiteUrl()}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,
             nameKa: "საქართველო",

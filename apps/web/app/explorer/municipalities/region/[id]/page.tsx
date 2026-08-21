@@ -15,6 +15,8 @@ import {
 } from "../../../../../lib/explorer/municipalData";
 import { georgianOrdinal, REGION_GENITIVE_KA } from "../../../../../lib/explorer/municipalLabels";
 import { formatAmount } from "../../../../../lib/explorer/format";
+import { loadWorkbookSources } from "../../../../../lib/methodology/workbookSources";
+import { resolveSiteUrl } from "../../../../../lib/siteUrl";
 
 const SOURCE_NOTE_BASE =
   "მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). " +
@@ -63,8 +65,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function RegionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const regionId = `region.${id}`;
-  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = await loadServedMunicipalData();
-  const { sourceDocuments } = await loadServedLandingData();
+  const [servedMunicipalData, landingData, workbookSources] = await Promise.all([
+    loadServedMunicipalData(),
+    loadServedLandingData(),
+    loadWorkbookSources("municipalities"),
+  ]);
+  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = servedMunicipalData;
+  const { sourceDocuments } = landingData;
 
   const region = regions.find((row) => row.id === regionId);
   if (!region) notFound();
@@ -141,7 +148,9 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
             rankByYear,
             rankOutOf: regions.length,
           }}
-          csvBasename={`region-${id}`}
+          workbookBasename={`region-${id}`}
+          workbookSources={workbookSources}
+          siteOrigin={resolveSiteUrl()}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,
             nameKa: "საქართველო",

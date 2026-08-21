@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
+import ExcelJS from "exceljs";
 
 // Municipality entity pages (Task 11). Three things nothing in the repo
 // exercised before this page existed:
@@ -38,6 +39,17 @@ const ALL_FUNCTIONS = [
 
 async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+}
+
+async function downloadMunicipalWorkbook(page: Page) {
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByTestId("municipal-excel").click();
+  const download = await downloadPromise;
+  const path = await download.path();
+  if (!path) throw new Error("Expected a local XLSX download path");
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(Uint8Array.from(await readFile(path)).buffer);
+  return { download, workbook };
 }
 
 test.describe("hash sanitising", () => {
@@ -567,25 +579,51 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("series-toggle-all")).toHaveAttribute("aria-checked", "true");
   });
 
-  test("offers a CSV download", async ({ page }) => {
-    await page.goto(ENTITY_URL);
+  test("downloads the selected range and series as a sourced percentage workbook", async ({ page }) => {
+    await page.goto(`${ENTITY_URL}#r=2020-2021&sh=1&sel=municipal.total,municipal.education`);
     await expectMunicipalAppReady(page);
-    const downloadPromise = page.waitForEvent("download");
-    await page.getByTestId("municipal-csv").click();
-    const download = await downloadPromise;
-    expect(download.suggestedFilename()).toMatch(/^fiscal-municipality-04-\d{4}-\d{4}\.csv$/);
-    const path = await download.path();
-    const csv = await readFile(path!, "utf8");
-    const total2016 = csv.split("\n").find((row) => row.startsWith("2016,municipal.total,"));
-    expect(total2016).toContain("832409547.15");
+    await page.getByTestId("series-search").fill("ჯანდაცვა");
+
+    const { download, workbook } = await downloadMunicipalWorkbook(page);
+    expect(download.suggestedFilename()).toBe("fiscal-municipality-04-2020-2021.xlsx");
+    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+
+    const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
+    expect(readable.getRow(3).values).toEqual([
+      undefined,
+      "კატეგორია",
+      2020,
+      2021,
+      "პერიოდის ცვლილება",
+    ]);
+    expect([readable.getCell("A4").value, readable.getCell("A5").value]).toEqual([
+      "მთლიანი ბიუჯეტი",
+      "განათლება",
+    ]);
+    expect(readable.getCell("B4").value).toBe(1);
+    expect(readable.getCell("B5").value).toBeCloseTo(148_386_753.36 / 1_080_555_805.54);
+
+    const analysis = workbook.getWorksheet("მონაცემები")!;
+    const analysisRows = (analysis.getRows(2, 20) ?? []).filter((row) => row.getCell(1).value !== null);
+    expect(analysis.getRow(1).values).toContain("წილი მთლიან ბიუჯეტში (%)");
+    expect(analysisRows.map((row) => row.getCell(1).value)).toEqual([2020, 2021]);
+    expect(analysisRows.map((row) => row.getCell(3).value)).toEqual(["განათლება", "განათლება"]);
+    expect(analysis.getCell("D2").value).toBe(148_386_753.36);
+    expect(analysis.getCell("F2").value).toBeCloseTo(148_386_753.36 / 1_080_555_805.54);
+
+    const hyperlinks = readable.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx");
   });
 
   test("uses the same export control treatment as the national explorer", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
-    const classes = await page.getByTestId("municipal-csv").getAttribute("class");
-    expect(classes).toContain("mt-[18px]");
+    const classes = await page.getByTestId("municipal-excel").getAttribute("class");
     expect(classes).toContain("h-[38px]");
     expect(classes).toContain("w-full");
     expect(classes).toContain("bg-[var(--ink)]");
@@ -705,14 +743,14 @@ test.describe("municipality page", () => {
     expect(await comparisonHeader.innerText()).toBe(await explorerHeader.innerText());
   });
 
-  test("renders municipality indicators across the page below the CSV panel", async ({ page }) => {
+  test("renders municipality indicators across the page below the Excel panel", async ({ page }) => {
     await page.setViewportSize({ width: 1600, height: 1000 });
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
     const workspace = page.getByTestId("municipal-workspace");
     const indicators = page.getByTestId("period-indicators");
-    const csvButton = page.getByTestId("municipal-csv");
+    const excelButton = page.getByTestId("municipal-excel");
 
     await expect(workspace.locator("[data-testid='period-indicators']")).toHaveCount(0);
     await expect(indicators).toBeVisible();
@@ -721,15 +759,15 @@ test.describe("municipality page", () => {
     const columns = await workspace.evaluate((element) => getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/));
     const workspaceBox = await workspace.boundingBox();
     const indicatorsBox = await indicators.boundingBox();
-    const csvBox = await csvButton.boundingBox();
+    const excelBox = await excelButton.boundingBox();
 
     expect(columns).toHaveLength(2);
     expect(workspaceBox).not.toBeNull();
     expect(indicatorsBox).not.toBeNull();
-    expect(csvBox).not.toBeNull();
+    expect(excelBox).not.toBeNull();
     expect(Math.abs(indicatorsBox!.x - workspaceBox!.x)).toBeLessThanOrEqual(1);
     expect(Math.abs(indicatorsBox!.width - workspaceBox!.width)).toBeLessThanOrEqual(1);
-    expect(indicatorsBox!.y).toBeGreaterThanOrEqual(csvBox!.y + csvBox!.height);
+    expect(indicatorsBox!.y).toBeGreaterThanOrEqual(excelBox!.y + excelBox!.height);
   });
 
   test("matches the national mover and comparison presentation", async ({ page }) => {

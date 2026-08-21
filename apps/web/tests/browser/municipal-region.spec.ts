@@ -1,7 +1,20 @@
+import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
+import ExcelJS from "exceljs";
 
 async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+}
+
+async function downloadMunicipalWorkbook(page: Page) {
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByTestId("municipal-excel").click();
+  const download = await downloadPromise;
+  const path = await download.path();
+  if (!path) throw new Error("Expected a local XLSX download path");
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(Uint8Array.from(await readFile(path)).buffer);
+  return { download, workbook };
 }
 
 // Region roll-up pages (Task 12) — reuse Task 11's MunicipalExplorer
@@ -81,6 +94,37 @@ test.describe("region source note", () => {
 });
 
 test.describe("region roll-up page", () => {
+  test("downloads only the active range with readable millions and full-GEL analysis", async ({ page }) => {
+    await page.goto(`${ADJARA_URL}#r=2020-2021`);
+    await expectMunicipalAppReady(page);
+
+    const { download, workbook } = await downloadMunicipalWorkbook(page);
+    expect(download.suggestedFilename()).toBe("fiscal-region-adjara-2020-2021.xlsx");
+    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+
+    const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
+    expect(readable.getRow(3).values).toEqual([
+      undefined,
+      "კატეგორია",
+      2020,
+      2021,
+      "პერიოდის ცვლილება",
+    ]);
+    expect(readable.getCell("A4").value).toBe("მთლიანი ბიუჯეტი");
+    expect(readable.getCell("B4").value).toBeGreaterThan(1);
+
+    const analysis = workbook.getWorksheet("მონაცემები")!;
+    const analysisRows = (analysis.getRows(2, 10) ?? []).filter((row) => row.getCell(1).value !== null);
+    expect(analysisRows.map((row) => row.getCell(1).value)).toEqual([2020, 2021]);
+    expect(analysis.getCell("D2").value).toBeCloseTo(Number(readable.getCell("B4").value) * 1_000_000);
+    const hyperlinks = readable.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx");
+  });
+
   test("renders every member, the roll-up chart, and suppresses the per-member divergence callout", async ({ page }) => {
     const response = await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);

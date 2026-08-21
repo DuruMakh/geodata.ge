@@ -8,6 +8,8 @@ import {
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
 } from "../../../../lib/explorer/municipalData";
+import { loadWorkbookSources } from "../../../../lib/methodology/workbookSources";
+import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
 const ROUTE = "/explorer/municipalities/georgia";
 
@@ -33,9 +35,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function GeorgiaMunicipalitiesPage() {
+  const [servedMunicipalData, landingData, workbookSources] = await Promise.all([
+    loadServedMunicipalData(),
+    loadServedLandingData(),
+    loadWorkbookSources("municipalities"),
+  ]);
   const { municipalities, regions, functions, totalFacts, countryFunctionFacts, countryTotalFacts, adjaraBudgetAdjustments } =
-    await loadServedMunicipalData();
-  const { sourceDocuments } = await loadServedLandingData();
+    servedMunicipalData;
+  const { sourceDocuments } = landingData;
 
   const years = Array.from(new Set(countryTotalFacts.map((row) => row.year))).sort((a, b) => a - b);
   const firstYear = years[0]!;
@@ -69,7 +76,9 @@ export default async function GeorgiaMunicipalitiesPage() {
           totalFacts={countryTotalFacts}
           sourceDocuments={sourceDocuments}
           metrics={{ kind: "country", budgetCount: 69 }}
-          csvBasename="municipalities-georgia"
+          workbookBasename="municipalities-georgia"
+          workbookSources={workbookSources}
+          siteOrigin={resolveSiteUrl()}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,
             nameKa: "საქართველო",
