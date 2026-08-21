@@ -5,7 +5,7 @@
 // 1. NEXT_PUBLIC_SITE_URL — explicit override, wins everywhere.
 // 2. VERCEL_PROJECT_PRODUCTION_URL — set by Vercel builds to the project's
 //    shortest production domain (the custom domain once one is attached,
-//    geodata-ge.vercel.app until then). Preview builds also get the
+//    fiscal.ge). Preview builds also get the
 //    production domain here, so preview canonicals point at production.
 // 3. http://localhost:3000 — local dev fallback.
 export function resolveSiteUrl(): string {

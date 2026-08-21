@@ -14,7 +14,7 @@ export function MethodologyHub({ liveEntries }: { liveEntries: readonly Methodol
             მეთოდოლოგია და პირველწყაროები
           </h1>
           <p className="mt-6 max-w-[570px] text-pretty text-[15px] leading-[1.75] text-[var(--body)]">
-            ნახეთ, რომელი ოფიციალური დოკუმენტებიდან იქმნება GeoData-ს მონაცემები, რა გადაწყვეტილებებია მიღებული დამუშავებისას და როგორ მოწმდება შედეგი.
+            ნახეთ, რომელი ოფიციალური დოკუმენტებიდან იქმნება Fiscal.ge-ს მონაცემები, რა გადაწყვეტილებებია მიღებული დამუშავებისას და როგორ მოწმდება შედეგი.
           </p>
           <Link
             href="#datasets"

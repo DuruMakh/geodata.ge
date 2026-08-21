@@ -3,7 +3,7 @@ import { MainExplorer } from "../../../components/main-explorer/main-explorer";
 import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
 import { firstServedYear } from "../../../lib/explorer/coverage";
 
-const TITLE = "შემოსავლები — GeoData";
+const TITLE = "შემოსავლები — Fiscal.ge";
 const DESCRIPTION_STEM = "საქართველოს ბიუჯეტის შემოსავლები — გადასახადები, გრანტები და სხვა შემოსულობები";
 
 // The coverage start is read from the served facts, not written into the string:
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: "/explorer/revenue" },
     openGraph: {
       type: "website",
-      siteName: "GeoData.ge",
+      siteName: "Fiscal.ge",
       locale: "ka_GE",
       url: "/explorer/revenue",
       title: TITLE,

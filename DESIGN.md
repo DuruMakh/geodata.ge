@@ -1,15 +1,15 @@
-# GeoData.ge Design System — Editorial
+# Fiscal.ge Design System — Editorial
 
 Version: 4.1
 Last updated: 2026-08-07
-Status: Production visual system for GeoData.ge Budget Explorer v1
+Status: Production visual system for Fiscal.ge Budget Explorer v1
 Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
 ---
 
 ## 1. Source of Truth
 
-This file defines the production design system for GeoData.ge v1. It **replaces DESIGN.md v3.x (the Apple-like Light/Night system) in full**. The editorial direction is the approved production direction.
+This file defines the production design system for Fiscal.ge v1. It **replaces DESIGN.md v3.x (the Apple-like Light/Night system) in full**. The editorial direction is the approved production direction.
 
 `DESIGN.md` v4.1 is the canonical visual and behavioral source of truth. The earlier `editorial-v2` HTML prototype package was intentionally removed as superseded in 2026-08. Retained concept files under `docs/Design HTML files/` are contextual inputs only unless a current product spec explicitly promotes them; they do not override this file or current route contracts.
 
@@ -26,7 +26,7 @@ Superseded and must not appear in production:
 
 ## 2. Product Scope Boundary
 
-GeoData.ge v1 is a Georgian-first national budget explorer for annual data. It is not a broad public-data catalog.
+Fiscal.ge v1 is a Georgian-first national budget explorer for annual data. It is not a broad public-data catalog.
 
 V1 includes: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, CSV export, Georgian-first UI, minimal public source label, internal provenance metadata.
 
@@ -321,7 +321,7 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 
 **Sidebar (expanded, ≥900px).** 232px, `ink` background, radius 0, sticky at `top: 0` with full viewport height so it holds while the long explorer page scrolls. Dividers on ink are `rgba(247,242,233,0.12)`; the active row background is `rgba(247,242,233,0.07)`.
 
-- Brand block → `/`: serif `GeoData` in `paper`, mono `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`.
+- Brand block → `/`: serif `Fiscal.ge` in `paper`, mono `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
 - `ბიუჯეტი` — the active dataset: `2px accent` left border, active-row background, sans 12.5/600 in `paper`. Not a link; it is where you already are.
 - Its four sections nest beneath it (below).
@@ -370,7 +370,7 @@ Specs below are contracts; visual proof lives in the reference files.
 
 The public-site header appears on the landing page (§19), the methodology hub, and every live dataset methodology route. Surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs. The landing and methodology surfaces use one shared component.
 
-Baseline-aligned row: serif brand left (`GeoData`), nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `ექსპლორერი` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
+Baseline-aligned row: serif brand left (`Fiscal.ge`), nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `ექსპლორერი` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
 
 ### 7.2a Mode Control
 
@@ -424,10 +424,10 @@ Sans 12px, muted, plain paragraph under the primary panel and at the end of the 
 
 Coverage notes state actual loaded ranges (e.g. `ხარჯვითი მონაცემები: 2004–2025`, `შემოსავლების მონაცემები: 2005–2025`).
 
-The classification note is a required data-trust disclosure — year totals are official, but the category split is GeoData's own mapping and must say so on every expenditure surface:
+The classification note is a required data-trust disclosure — year totals are official, but the category split is Fiscal.ge's own mapping and must say so on every expenditure surface:
 
-- fields: `კატეგორიებად დაყოფა GeoData-ის კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით.`
-- ministries: `უწყებრივი დაჯგუფება GeoData-ისაა ბიუჯეტის შესრულების ანგარიშების პროგრამული კლასიფიკაციის მიხედვით.`
+- fields: `კატეგორიებად დაყოფა Fiscal.ge-ის კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით.`
+- ministries: `უწყებრივი დაჯგუფება Fiscal.ge-ისაა ბიუჯეტის შესრულების ანგარიშების პროგრამული კლასიფიკაციის მიხედვით.`
 - revenue: none (revenue categories are the official budget-classification lines).
 
 ### 7.11 KPI Block
@@ -708,7 +708,7 @@ Section order (top to bottom):
 2. **Hero — living relief** — Three.js dotted map of Georgia (exact ADM0 outline, analytic elevation, population-scaled city squares emitting ripple waves, Tbilisi national pulse every 45s, peak labels Shkhara/Mkinvartsveri, city hover readout, mouse parallax). **The map is the hero's main subject and is maximized**: the figure is full-bleed (spans the viewport, escaping the 1240px column) and the camera keeps the reference's viewing angle but fits its distance at runtime so the country's real dot bounds fill the canvas at any aspect (margins ≈9%/6%, refit on resize). Headline (`როგორ ივსება და იხარჯება საქართველოს ბიუჯეტი`) overlays top-right on ≥768px, staying in the content grid, and sits above the map on mobile; CTA `დაიწყე ბიუჯეტით` → `/explorer`. The hero's height is not fixed: the camera fits inside a fixed virtual frame (340px <768, 500px <1100, `min(78vh, 820px)` ≥1100), then the canvas is cropped to the map's projected vertical band via a camera view offset — the map never rescales, and the key-numbers section starts immediately under the last dots. The headline overlay's measured height is a hard floor so the copy can never overflow into the stats. `prefers-reduced-motion` renders a still frame; WebGL failure shows a mono fallback note.
 3. **Key numbers** — three hardcoded country figures (population 3.7 მლნ, area 69.7 ათ. კმ², nominal GDP 104.6 მლრდ ₾ · 2025 preliminary, per Geostat), serif 46px values, maintained by hand in `landing-page.tsx`. The section sits 40/56px below the full-bleed hero.
 4. **სამი გზა მონაცემებამდე** — three rule-topped cards, all data live: 01 multi-year explorer (total-revenue + VAT sparkline) → `/explorer`; 02 single-year picture (30-cell expenditure waffle, §4.2 colors) → `/explorer/analysis`; 03 open CSV (real header + two active-fact rows in a tint block) → `/explorer`.
-5. **Footer** — brand + tagline + `info@geodata.ge`; nav links (explorer, analysis, methodology); data/license notes (source, last-updated date, CC BY 4.0); mono bottom bar. This adds the methodology link only; a broader footer redesign is outside the methodology scope.
+5. **Footer** — brand + tagline + `info@fiscal.ge`; nav links (explorer, analysis, methodology); data/license notes (source, last-updated date, CC BY 4.0); mono bottom bar. This adds the methodology link only; a broader footer redesign is outside the methodology scope.
 
 Landing QA: waffle renders exactly 30 cells; sparkline endpoints match the loaded revenue range; CSV preview shows real active-fact rows; hero canvas mounts or the fallback note shows; no cards or shadows.
 
@@ -736,6 +736,6 @@ Approved visual and behavioral specification: `docs/superpowers/specs/2026-08-11
 
 The public structure is `/methodology` plus live category pages for expenditure, revenue, and municipalities. Methodology is not a top-header item. Discovery comes from the current landing footer's methodology link, a substantial context-aware editorial section at the end of main data surfaces, and compact contextual links on municipality and region detail pages. This scope does not globalize or redesign the footer; where a current footer exists, the editorial section precedes it.
 
-Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards. Category pages use layered, curated public explanation, an explicit official-versus-GeoData disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only.
+Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only.
 
 The approved public visibility is dataset-specific: expenditure hides its historical-decision group; revenue hides its validation group, technical appendix, and later classification, validation, and limitations sections; municipalities hide the full decision record, appendix, and later classification, validation, and limitations sections. Archive tables visibly show `Year | Original source/file | Format | Size | Download`.

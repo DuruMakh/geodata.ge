@@ -50,11 +50,11 @@ const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
 };
 
 // Classification-authorship disclosure (DESIGN.md §7.10): year totals are official;
-// the category split is GeoData's own mapping and must say so. Revenue categories
+// the category split is Fiscal.ge's own mapping and must say so. Revenue categories
 // are the official budget-classification lines, so no disclosure is needed there.
 const CLASSIFICATION_NOTE: Record<ExplorerScope, string | null> = {
-  fields: "კატეგორიებად დაყოფა GeoData-ის კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით.",
-  ministries: "უწყებრივი დაჯგუფება GeoData-ისაა ბიუჯეტის შესრულების ანგარიშების პროგრამული კლასიფიკაციის მიხედვით.",
+  fields: "კატეგორიებად დაყოფა Fiscal.ge-ის კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით.",
+  ministries: "უწყებრივი დაჯგუფება Fiscal.ge-ისაა ბიუჯეტის შესრულების ანგარიშების პროგრამული კლასიფიკაციის მიხედვით.",
   revenue: null,
 };
 

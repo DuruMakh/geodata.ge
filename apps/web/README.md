@@ -1,6 +1,6 @@
-# GeoData.ge Web App
+# Fiscal.ge Web App
 
-Next.js app for GeoData.ge: the landing page at `/` (living-relief hero, three paths to the data) and the Budget Explorer behind the platform shell at `/explorer` — a hub plus one route per section: `/explorer/expenditure`, `/explorer/revenue`, `/explorer/analysis` (multi-year explorer, single-year analysis, CSV export).
+Next.js app for Fiscal.ge: the landing page at `/` (living-relief hero, three paths to the data) and the Budget Explorer behind the platform shell at `/explorer` — a hub plus one route per section: `/explorer/expenditure`, `/explorer/revenue`, `/explorer/analysis` (multi-year explorer, single-year analysis, CSV export).
 
 Product scope, agent rules, data rules, and the design system live at the repo root — read those before changing this app:
 

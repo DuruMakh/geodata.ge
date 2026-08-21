@@ -1,6 +1,6 @@
-# GeoData.ge
+# Fiscal.ge
 
-GeoData.ge v1 is a Georgian-first Georgia Budget Explorer.
+Fiscal.ge v1 is a Georgian-first Georgia Budget Explorer.
 
 Read first:
 
@@ -31,7 +31,7 @@ Database commands (`npm run prisma:migrate`, `npm run data:import`, builds with 
 
 ## Deployment
 
-The site deploys to Vercel (project `geodata-ge`): production at https://geodata-ge.vercel.app updates via the *Deploy production* GitHub Actions workflow after CI passes on `main` (direct pushes no longer auto-deploy); other branches get preview deployments. See `docs/deployment.md` for the pipeline, rollback, environment variables, and custom-domain steps.
+The site deploys to Vercel (project `geodata-ge`): production at https://fiscal.ge updates via the *Deploy production* GitHub Actions workflow after CI passes on `main` (direct pushes no longer auto-deploy); other branches get preview deployments. See `docs/deployment.md` for the pipeline, rollback, environment variables, and custom-domain steps.
 
 ## Data Foundation
 

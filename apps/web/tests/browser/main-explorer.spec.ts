@@ -592,7 +592,7 @@ test("CSV download uses the active filtered table data", async ({ page }) => {
   const csvBytes = await readFile(path);
   const csv = csvBytes.toString("utf8");
 
-  expect(download.suggestedFilename()).toContain("geodata-fields-");
+  expect(download.suggestedFilename()).toContain("fiscal-fields-");
   expect(Array.from(csvBytes.subarray(0, 3))).toEqual([0xef, 0xbb, 0xbf]);
   expect(csv.startsWith("\uFEFF")).toBe(true);
   const csvWithoutBom = csv.slice(1);

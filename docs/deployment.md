@@ -11,7 +11,7 @@ check, and connecting the custom domain.
 | --- | --- |
 | Team | `durumakh-1974s-projects` |
 | Project | `geodata-ge` |
-| Production URL | https://geodata-ge.vercel.app (until the custom domain is attached) |
+| Production URL | https://fiscal.ge |
 | Git repository | `github.com/DuruMakh/geodata.ge` (git-connected) |
 | Root Directory | `apps/web` |
 | Framework preset | Next.js (default build/install commands) |
@@ -89,7 +89,7 @@ error — updating fixes auth) and `vercel login` as the project owner. Run from
 the repo root; `vercel link --repo` links the checkout to the `geodata-ge`
 project.
 
-- Inspect production: `vercel inspect https://geodata-ge.vercel.app --logs`
+- Inspect production: `vercel inspect https://fiscal.ge --logs`
 - List deployments: `vercel ls geodata-ge`
 - Manual production deploy from local checkout: `vercel deploy --prod`
   (normally unnecessary — the *Deploy production* workflow owns production;
@@ -193,7 +193,7 @@ before rerunning.
 
 1. Buy the domain at any registrar.
 2. Vercel dashboard → `geodata-ge` → Settings → Domains → *Add* → enter the
-   apex domain (e.g. `geodata.ge`). Also add `www.<domain>` and set it to
+   apex domain (currently `fiscal.ge`). Also add `www.<domain>` and set it to
    redirect to the apex (Vercel offers this in the add-domain flow).
 3. Configure DNS at the registrar exactly as the Domains page instructs
    (either an `A`/`CNAME` record pair or switching nameservers to Vercel).

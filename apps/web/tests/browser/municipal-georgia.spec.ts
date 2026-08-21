@@ -46,7 +46,7 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
   const downloadPromise = page.waitForEvent("download");
   await page.getByTestId("municipal-csv").click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/^geodata-municipalities-georgia-\d{4}-\d{4}\.csv$/);
+  expect(download.suggestedFilename()).toMatch(/^fiscal-municipalities-georgia-\d{4}-\d{4}\.csv$/);
   const csvPath = await download.path();
   if (!csvPath) throw new Error("Expected a local CSV download path");
   const csvBytes = await readFile(csvPath);

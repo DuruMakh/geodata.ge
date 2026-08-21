@@ -7,8 +7,8 @@ import { buildLandingModel } from "../../lib/landing/landingData";
 import { buildMethodologyHubEntries } from "../../lib/methodology/catalog";
 import { loadGeneratedArchiveSummaries } from "../../lib/methodology/prepareArchives";
 
-const title = "მეთოდოლოგია და პირველწყაროები — GeoData";
-const description = "GeoData-ს საჯარო მეთოდოლოგია, მონაცემთა დამუშავების გადაწყვეტილებები და უცვლელი ოფიციალური პირველწყაროები.";
+const title = "მეთოდოლოგია და პირველწყაროები — Fiscal.ge";
+const description = "Fiscal.ge-ს საჯარო მეთოდოლოგია, მონაცემთა დამუშავების გადაწყვეტილებები და უცვლელი ოფიციალური პირველწყაროები.";
 
 export const metadata: Metadata = {
   title,
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/methodology" },
   openGraph: {
     type: "website",
-    siteName: "GeoData.ge",
+    siteName: "Fiscal.ge",
     locale: "ka_GE",
     url: "/methodology",
     title,

@@ -194,7 +194,7 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `geodata-${scope}-${range.start}-${range.end}.csv`;
+    link.download = `fiscal-${scope}-${range.start}-${range.end}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   }

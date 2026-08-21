@@ -21,10 +21,10 @@ afterEach(() => {
 describe("resolveSiteUrl", () => {
   it("prefers NEXT_PUBLIC_SITE_URL and strips trailing slashes", () => {
     setEnv({
-      NEXT_PUBLIC_SITE_URL: "https://geodata.ge/",
+      NEXT_PUBLIC_SITE_URL: "https://fiscal.ge/",
       VERCEL_PROJECT_PRODUCTION_URL: "geodata-ge.vercel.app",
     });
-    expect(resolveSiteUrl()).toBe("https://geodata.ge");
+    expect(resolveSiteUrl()).toBe("https://fiscal.ge");
   });
 
   it("falls back to the Vercel production host with https", () => {

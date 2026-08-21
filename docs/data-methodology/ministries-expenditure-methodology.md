@@ -16,7 +16,7 @@ drill-down; §7 here is the summary).
 
 ## 1. What this dataset is
 
-GeoData.ge exposes national-budget **expenditure** two ways:
+Fiscal.ge exposes national-budget **expenditure** two ways:
 
 1. **Public spending fields** (functional / COFOG-like: health, education, defence, …) — the
    default single-year and multi-year view.

@@ -5,15 +5,15 @@ import { loadServedExplorerData } from "../../../lib/data/servedData";
 const DESCRIPTION = "ერთი წლის ბიუჯეტის სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾.";
 
 export const metadata: Metadata = {
-  title: "ანალიზი — GeoData",
+  title: "ანალიზი — Fiscal.ge",
   description: DESCRIPTION,
   alternates: { canonical: "/explorer/analysis" },
   openGraph: {
     type: "website",
-    siteName: "GeoData.ge",
+    siteName: "Fiscal.ge",
     locale: "ka_GE",
     url: "/explorer/analysis",
-    title: "ანალიზი — GeoData",
+    title: "ანალიზი — Fiscal.ge",
     description: DESCRIPTION,
   },
 };

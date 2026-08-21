@@ -19,7 +19,9 @@ test("landing renders the site v2 structure with live data", async ({ page }) =>
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto("http://localhost:3100");
 
+  await expect(page).toHaveTitle("Fiscal.ge — საქართველოს ბიუჯეტის ექსპლორერი");
   await expect(page.getByTestId("landing-shell")).toBeVisible();
+  await expect(page.getByTestId("landing-header")).toContainText("Fiscal.ge");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება და იხარჯება საქართველოს ბიუჯეტი");
 
   // Hero: after hydration the WebGL scene mounts a canvas; if init fails the
@@ -40,7 +42,10 @@ test("landing renders the site v2 structure with live data", async ({ page }) =>
   await expect(paths.getByTestId("waffle-grid").locator("div")).toHaveCount(30);
   await expect(paths).toContainText("year,category_id,ka_label,amount_gel,basis");
 
-  await expect(page.getByTestId("landing-footer")).toContainText("CC BY 4.0");
+  const footer = page.getByTestId("landing-footer");
+  await expect(footer).toContainText("Fiscal.ge");
+  await expect(footer.getByRole("link", { name: "info@fiscal.ge" })).toHaveAttribute("href", "mailto:info@fiscal.ge");
+  await expect(footer).toContainText("CC BY 4.0");
 
   await capture(page, "landing-desktop");
 });
