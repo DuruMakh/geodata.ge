@@ -11,27 +11,16 @@ import {
 } from "../../../lib/explorer/municipalData";
 import { formatPerResidentGel } from "../../../lib/explorer/format";
 import { buildMunicipalityMapModel } from "../../../lib/explorer/municipalityMapData";
-
-const TITLE = "მუნიციპალიტეტები — Fiscal.ge";
+import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { totalFacts } = await loadServedMunicipalData();
-  const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const description = `საქართველოს მუნიციპალიტეტების ბიუჯეტები ფუნქციების მიხედვით, ${years[0]} წლიდან დღემდე.`;
-
-  return {
-    title: TITLE,
-    description,
-    alternates: { canonical: "/explorer/municipalities" },
-    openGraph: {
-      type: "website",
-      siteName: "Fiscal.ge",
-      locale: "ka_GE",
-      url: "/explorer/municipalities",
-      title: TITLE,
-      description,
-    },
-  };
+  const { firstYear, lastYear } = coverageFromYears(totalFacts);
+  return fiscalMetadata({
+    title: `საქართველოს მუნიციპალიტეტების ბიუჯეტები ${firstYear}–${lastYear} | Fiscal.ge`,
+    description: `საქართველოს მუნიციპალიტეტების ფაქტობრივი ბიუჯეტები ფუნქციების მიხედვით, ${firstYear}–${lastYear}.`,
+    path: "/explorer/municipalities",
+  });
 }
 
 export default async function MunicipalitiesIndexPage() {

@@ -1,21 +1,14 @@
-import type { Metadata } from "next";
 import { LandingPage } from "../components/landing/landing-page";
 import { loadServedLandingData } from "../lib/data/servedData";
 import { buildLandingModel } from "../lib/landing/landingData";
+import { fiscalMetadata } from "../lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Fiscal.ge — საქართველოს ბიუჯეტის ექსპლორერი",
-  description: "გადამოწმებული ოფიციალური საბიუჯეტო მონაცემები: მრავალწლიანი დინამიკა, ერთი წლის სურათი და ღია CSV.",
-  alternates: { canonical: "/" },
-  openGraph: {
-    type: "website",
-    siteName: "Fiscal.ge",
-    locale: "ka_GE",
-    url: "/",
-    title: "Fiscal.ge — საქართველოს ბიუჯეტის ექსპლორერი",
-    description: "გადამოწმებული ოფიციალური საბიუჯეტო მონაცემები: მრავალწლიანი დინამიკა, ერთი წლის სურათი და ღია CSV.",
-  },
-};
+export const metadata = fiscalMetadata({
+  title: "საქართველოს ბიუჯეტი და მუნიციპალური მონაცემები | Fiscal.ge",
+  description:
+    "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებული მონაცემები: მრავალწლიანი დინამიკა, ერთი წლის ანალიზი და ღია CSV.",
+  path: "/",
+});
 
 export default async function Home() {
   const { facts, glossary, sourceDocuments } = await loadServedLandingData();

@@ -12,6 +12,7 @@ import {
 import { loadGeneratedArchiveSummaries } from "../../../lib/methodology/prepareArchives";
 import { loadReviewedSourceManifest } from "../../../lib/methodology/sourceManifest";
 import type { MethodologyDatasetId } from "../../../lib/methodology/types";
+import { fiscalMetadata } from "../../../lib/seo/metadata";
 
 type MethodologyDatasetPageProps = {
   params: Promise<{ dataset: string }>;
@@ -35,22 +36,15 @@ function validatedDataset(value: string): MethodologyDatasetId {
 export async function generateMetadata({ params }: MethodologyDatasetPageProps): Promise<Metadata> {
   const dataset = validatedDataset((await params).dataset);
   const content = METHODOLOGY_CONTENT[dataset];
-  const title = `${content.titleKa} — Fiscal.ge`;
-  const canonical = `/methodology/${dataset}`;
+  const title = `${content.titleKa} — მეთოდოლოგია და მონაცემები | Fiscal.ge`;
+  const canonical: `/methodology/${MethodologyDatasetId}` = `/methodology/${dataset}`;
 
-  return {
+  return fiscalMetadata({
     title,
     description: content.summaryKa,
-    alternates: { canonical },
-    openGraph: {
-      type: "article",
-      siteName: "Fiscal.ge",
-      locale: "ka_GE",
-      url: canonical,
-      title,
-      description: content.summaryKa,
-    },
-  };
+    path: canonical,
+    type: "article",
+  });
 }
 
 export default async function MethodologyDatasetPage({ params }: MethodologyDatasetPageProps) {

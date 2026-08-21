@@ -15,6 +15,7 @@ import {
 } from "../../../../../lib/explorer/municipalData";
 import { georgianOrdinal, REGION_GENITIVE_KA } from "../../../../../lib/explorer/municipalLabels";
 import { formatAmount } from "../../../../../lib/explorer/format";
+import { coverageFromYears, fiscalMetadata } from "../../../../../lib/seo/metadata";
 
 const SOURCE_NOTE_BASE =
   "მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). " +
@@ -38,26 +39,19 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const region = regions.find((row) => row.id === `region.${id}`);
   if (!region) return {};
 
-  const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const title = `${region.kaLabel} — მუნიციპალიტეტები — Fiscal.ge`;
+  const { firstYear, lastYear } = coverageFromYears(totalFacts);
+  const regionName = REGION_GENITIVE_KA[region.id] ?? region.kaLabel;
+  const title = `${regionName} მუნიციპალიტეტების ბიუჯეტები ${firstYear}–${lastYear} | Fiscal.ge`;
   const description =
     region.id === ADJARA_REGION_ID
-      ? `აჭარის გაერთიანებული ბიუჯეტი — რესპუბლიკური და მუნიციპალური გადასახდელები შიდა ტრანსფერების გამოკლებით, ${years[0]}–${years.at(-1)}.`
-      : `${REGION_GENITIVE_KA[region.id] ?? region.kaLabel} მუნიციპალური ბიუჯეტები ფუნქციების მიხედვით, ${years[0]}–${years.at(-1)}.`;
+      ? `აჭარის გაერთიანებული ფაქტობრივი ბიუჯეტი — რესპუბლიკური და მუნიციპალური გადასახდელები შიდა ტრანსფერების გამოკლებით, ${firstYear}–${lastYear}.`
+      : `${regionName} მუნიციპალური ბიუჯეტები ფუნქციების მიხედვით, ${firstYear}–${lastYear}.`;
 
-  return {
+  return fiscalMetadata({
     title,
     description,
-    alternates: { canonical: `/explorer/municipalities/region/${id}` },
-    openGraph: {
-      type: "website",
-      siteName: "Fiscal.ge",
-      locale: "ka_GE",
-      url: `/explorer/municipalities/region/${id}`,
-      title,
-      description,
-    },
-  };
+    path: `/explorer/municipalities/region/${id}`,
+  });
 }
 
 export default async function RegionPage({ params }: { params: Promise<{ id: string }> }) {

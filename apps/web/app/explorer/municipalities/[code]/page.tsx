@@ -11,6 +11,11 @@ import {
   latestReviewedAtForMunicipalFacts,
 } from "../../../../lib/explorer/municipalData";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
+import {
+  coverageFromYears,
+  fiscalMetadata,
+  municipalityBudgetTitleKa,
+} from "../../../../lib/seo/metadata";
 
 // The 64 codes are the complete, closed set. Without this, an unknown code is
 // left to request-time rendering instead of failing at build.
@@ -27,23 +32,12 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
   const municipality = municipalities.find((row) => row.code === code);
   if (!municipality) return {};
 
-  const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const title = `${municipality.displayNameKa} — მუნიციპალიტეტები — Fiscal.ge`;
-  const description = `${municipality.displayNameKa} — მუნიციპალური ბიუჯეტი ფუნქციების მიხედვით, ${years[0]}–${years.at(-1)}.`;
-
-  return {
-    title,
-    description,
-    alternates: { canonical: `/explorer/municipalities/${code}` },
-    openGraph: {
-      type: "website",
-      siteName: "Fiscal.ge",
-      locale: "ka_GE",
-      url: `/explorer/municipalities/${code}`,
-      title,
-      description,
-    },
-  };
+  const { firstYear, lastYear } = coverageFromYears(totalFacts);
+  return fiscalMetadata({
+    title: municipalityBudgetTitleKa(municipality.nameKa, firstYear, lastYear),
+    description: `${municipality.nameKa}ს ფაქტობრივი ბიუჯეტი ფუნქციების მიხედვით, ${firstYear}–${lastYear}.`,
+    path: `/explorer/municipalities/${code}`,
+  });
 }
 
 export default async function MunicipalityPage({ params }: { params: Promise<{ code: string }> }) {

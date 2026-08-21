@@ -1,22 +1,17 @@
 import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
 import { loadServedExplorerData } from "../../../lib/data/servedData";
+import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 
-const DESCRIPTION = "ერთი წლის ბიუჯეტის სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾.";
-
-export const metadata: Metadata = {
-  title: "ანალიზი — Fiscal.ge",
-  description: DESCRIPTION,
-  alternates: { canonical: "/explorer/analysis" },
-  openGraph: {
-    type: "website",
-    siteName: "Fiscal.ge",
-    locale: "ka_GE",
-    url: "/explorer/analysis",
-    title: "ანალიზი — Fiscal.ge",
-    description: DESCRIPTION,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { facts } = await loadServedExplorerData();
+  const { lastYear } = coverageFromYears(facts);
+  return fiscalMetadata({
+    title: `საქართველოს ბიუჯეტის ანალიზი — ${lastYear} ფაქტი | Fiscal.ge`,
+    description: `${lastYear} წლის ბიუჯეტის ფაქტობრივი სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾.`,
+    path: "/explorer/analysis",
+  });
+}
 
 export default async function AnalysisPage() {
   const { facts, glossary, sourceDocuments, adminFacts, adminCategories } = await loadServedExplorerData();

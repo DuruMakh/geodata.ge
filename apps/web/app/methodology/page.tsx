@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import path from "node:path";
 import { MethodologyHub } from "../../components/methodology/methodology-hub";
 import { SiteFooter } from "../../components/site/site-footer";
@@ -6,23 +5,15 @@ import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/s
 import { buildLandingModel } from "../../lib/landing/landingData";
 import { buildMethodologyHubEntries } from "../../lib/methodology/catalog";
 import { loadGeneratedArchiveSummaries } from "../../lib/methodology/prepareArchives";
+import { fiscalMetadata } from "../../lib/seo/metadata";
 
-const title = "მეთოდოლოგია და პირველწყაროები — Fiscal.ge";
 const description = "Fiscal.ge-ს საჯარო მეთოდოლოგია, მონაცემთა დამუშავების გადაწყვეტილებები და უცვლელი ოფიციალური პირველწყაროები.";
 
-export const metadata: Metadata = {
-  title,
+export const metadata = fiscalMetadata({
+  title: "ბიუჯეტის მონაცემთა მეთოდოლოგია და პირველწყაროები | Fiscal.ge",
   description,
-  alternates: { canonical: "/methodology" },
-  openGraph: {
-    type: "website",
-    siteName: "Fiscal.ge",
-    locale: "ka_GE",
-    url: "/methodology",
-    title,
-    description,
-  },
-};
+  path: "/methodology",
+});
 
 export default async function MethodologyPage() {
   const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");

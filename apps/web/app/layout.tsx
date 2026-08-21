@@ -26,13 +26,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(resolveSiteUrl()),
-  title: "Fiscal.ge Budget Explorer",
-  description: "Georgian-first public budget explorer for Georgia.",
-  openGraph: {
-    type: "website",
-    siteName: "Fiscal.ge",
-    locale: "ka_GE",
-  },
+  title: { default: "Fiscal.ge", template: "%s" },
+  description:
+    "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებული, მრავალწლიანი და ღია მონაცემები.",
 };
 
 export default function RootLayout({

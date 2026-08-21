@@ -1,24 +1,17 @@
-import type { Metadata } from "next";
 import { BudgetHub } from "../../components/hub/budget-hub";
 import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect";
 import { PageHeader } from "../../components/shell/page-header";
 import { SourceNote } from "../../components/ui/editorial";
 import { buildHubCards } from "../../lib/explorer/hubCards";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { fiscalMetadata } from "../../lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "ბიუჯეტი — Fiscal.ge",
-  description: "საქართველოს ბიუჯეტის მონაცემები: შემოსავლები, ხარჯები და ერთი წლის ანალიზი.",
-  alternates: { canonical: "/explorer" },
-  openGraph: {
-    type: "website",
-    siteName: "Fiscal.ge",
-    locale: "ka_GE",
-    url: "/explorer",
-    title: "ბიუჯეტი — Fiscal.ge",
-    description: "საქართველოს ბიუჯეტის მონაცემები: შემოსავლები, ხარჯები და ერთი წლის ანალიზი.",
-  },
-};
+export const metadata = fiscalMetadata({
+  title: "საქართველოს ბიუჯეტის მონაცემები | Fiscal.ge",
+  description:
+    "საქართველოს ბიუჯეტის გადამოწმებული მონაცემები: შემოსავლები, ხარჯები, მუნიციპალიტეტები და ერთი წლის ანალიზი.",
+  path: "/explorer",
+});
 
 export default async function ExplorerHubPage() {
   const { facts, sourceDocuments } = await loadServedLandingData();
