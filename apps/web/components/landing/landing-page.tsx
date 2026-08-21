@@ -157,23 +157,35 @@ export function LandingPage({ model }: { model: LandingModel }) {
             </div>
 
             <div className="flex flex-col gap-3 border-t border-[var(--hairline)] pt-4">
-              <PathCardLabel index="03">ღია CSV</PathCardLabel>
+              <PathCardLabel index="03">Excel მონაცემები</PathCardLabel>
               <p className="text-pretty text-[13.5px] leading-relaxed text-[var(--body)]">
-                ჩამოტვირთე ზუსტად ის მონაცემები, რასაც ხედავ — წყაროსა და სტატუსის მეტამონაცემებით.
+                ექსპლორერში შერჩეული მონაცემები ჩამოტვირთე ერთ Excel ფაილად — წასაკითხად და ანალიზისთვის.
               </p>
-              <div className="mt-1.5 flex max-w-[340px] flex-col gap-1.5 bg-[var(--tint)] px-3.5 py-3">
-                {model.csvLines.map((line, index) => (
-                  <div
-                    key={index}
-                    className={`overflow-hidden text-ellipsis whitespace-nowrap font-[family-name:var(--font-numeric)] text-[10.5px] ${
-                      index === 0 ? "text-[var(--muted)]" : "text-[var(--body)]"
-                    }`}
-                  >
-                    {line}
-                  </div>
-                ))}
+              <div className="mt-1.5 max-w-[340px] bg-[var(--tint)] px-3.5 py-3">
+                <div className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
+                  {model.excelPreview.sheetNames.map((sheetName, index) => (
+                    <span key={sheetName}>
+                      {index > 0 ? " · " : null}
+                      <span>{sheetName}</span>
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-2 grid grid-cols-3 gap-x-2 text-[10.5px] font-[family-name:var(--font-numeric)]">
+                  {model.excelPreview.headers.map((header, index) => (
+                    <div key={header} className={index === 0 ? "text-[var(--muted)]" : "text-right text-[var(--muted)]"}>
+                      {header}
+                    </div>
+                  ))}
+                  {model.excelPreview.rows.map(([label, previousValue, latestValue]) => (
+                    <div key={label} className="contents text-[var(--body)]">
+                      <div className="truncate">{label}</div>
+                      <div className="text-right">{previousValue.toLocaleString("en-US")}</div>
+                      <div className="text-right">{latestValue.toLocaleString("en-US")}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <PathCardLink href="/explorer">ჩამოტვირთვა ექსპლორერიდან</PathCardLink>
+              <PathCardLink href="/explorer">ექსპლორერში ჩამოტვირთვა</PathCardLink>
             </div>
           </div>
         </section>

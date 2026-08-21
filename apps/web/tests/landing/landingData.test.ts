@@ -71,11 +71,9 @@ describe("landing model", () => {
     expect(model.waffleCells.filter((color) => color === model.waffleCells[0])).toHaveLength(21);
   });
 
-  it("previews the CSV with real rows, glossary labels, and an elision marker", () => {
-    // The preview is an abridged cut of the 13-column export: a subset of the
-    // real header columns in the same relative order, ellipsis marking the rest.
-    expect(model.csvLines[0]).toBe("year,category_id,ka_label,amount_gel,basis,…");
-    expect(model.csvLines[1]).toBe("2025,revenue.vat,დღგ,900,actual,…");
-    expect(model.csvLines[2]).toBe("2025,spending.social_protection,სოციალური დაცვა,700,actual,…");
+  it("previews the two-sheet Excel workbook with real labels and the latest two years", () => {
+    expect(model.excelPreview.sheetNames).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+    expect(model.excelPreview.headers).toEqual(["კატეგორია", "2024", "2025"]);
+    expect(model.excelPreview.rows).toEqual([["სოციალური დაცვა", 600, 700]]);
   });
 });

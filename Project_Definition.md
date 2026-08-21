@@ -31,7 +31,7 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Single-year snapshot with headline cards, treemap, Every 100 GEL, Budget Radar, Budget Field, and full ranking.
 - Municipal annual expenditure data for 2015-2025: ten main functional categories plus the public total headline. The public entity set remains 64 municipality pages and 11 region roll-up pages under `/explorer/municipalities`. The 2025 index map uses the reviewed 1 January 2025 Geostat population denominator to color municipalities by budget per resident; municipality and region lists remain ranked by total budget and show per-resident values only as supporting context, and one KPI reports the 64-municipality median. Adjara's regional total consolidates its six municipalities with Adjara Autonomous Republic actual payments and removes transfers from the republic to territorial budgets. The explicit `/explorer/municipalities/georgia` page starts from all 69 reviewed municipal-budget series and adds the same net Adjara republican amount once. Codes `05`, `42`, `43`, `46`, and `64` remain country-aggregate-only because their budgets are not territorially attributable spending inside the named municipalities. The Georgia row has no per-resident value. The ten functional series remain municipal-only because no reviewed comparable Adjara republican function crosswalk exists; no residual or proportional allocation is invented. Municipality and region ranks remain out of 64 and 11 respectively. Methodology: `docs/data-methodology/municipal-functional-annual-2015-2025.md` and `docs/data-methodology/municipal-population-regional-gdp.md`.
 - `მალე` markers for named future datasets (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` in the sidebar). Labels only: no routes, not clickable, no data.
-- CSV export. National multi-year exports include the same-year GDP denominator, accounting standard, publication status, GDP source metadata, and the calculated share of GDP.
+- Excel workbook export. Each explorer has one `Excel ჩამოტვირთვა` action for the active range, selected series, grouping, and measure; it downloads a Fiscal.ge `.xlsx` file with `მარტივი ცხრილი` and `მონაცემები` sheets. The readable table starts on row 3 with right-aligned years, while the analysis sheet uses the Georgian headers `წელი`, `მთავარი ჯგუფი`, `კატეგორია`, `თანხა (₾)`, and `სტატუსი`; relevant validated public-archive sources are linked in the workbook. There is no public explorer CSV action. National multi-year workbooks include the same-year GDP denominator, accounting standard, publication status, GDP source metadata, and the calculated share of GDP. Methodology manifest CSVs remain unchanged.
 - Georgian-first UI.
 - Minimal public source label.
 - Internal source/provenance metadata.
@@ -89,7 +89,7 @@ Fiscal.ge improves this by:
 - Normalizing reviewed budget data.
 - Showing multi-year trends.
 - Providing single-year visual explanations.
-- Allowing CSV download.
+- Allowing readable Excel workbook download.
 - Keeping planned/actual status and source metadata in the data layer.
 
 ## 5. Data Direction
@@ -128,11 +128,11 @@ Public UI should include a small source label, such as:
 Data: reviewed official budget documents. Last updated: YYYY-MM-DD.
 ```
 
-CSV exports should include source/basis metadata. Planned years should be visibly marked with a subtle badge or chart marker.
+Excel workbooks should link relevant validated public-archive sources and preserve basis information. Planned years should be visibly marked with a subtle badge, chart marker, or workbook marker.
 
-CSV metadata should be exported as columns, including year, category ID, Georgian label, English label, GEL amount, basis, source name, source file or URL, and last reviewed date.
+The workbook's `მონაცემები` sheet should use readable Georgian columns for year, grouping, category, GEL amount, and status; it must not expose internal identifiers, repository paths, or review metadata.
 
-When actual data arrives for a planned year, actual data becomes the active public value. If planned and actual values both exist internally for the same item/year, actual wins in public charts, tables, and CSV.
+When actual data arrives for a planned year, actual data becomes the active public value. If planned and actual values both exist internally for the same item/year, actual wins in public charts, tables, and Excel workbooks.
 
 ## 7. Visual Direction
 
@@ -173,4 +173,4 @@ Build the data foundation first. Visual ambition is important, but the platform 
 
 Avoid short-term UI-only hacks. The product should be architected so future versions can add more datasets, drilldown, bilingual UI, and additional budget modules without rebuilding the foundation.
 
-Implementation should follow this order: data foundation, real sample data, main explorer core with line/table modes and CSV, single-year core, and production UI polish against `DESIGN.md`. The bounded national `% მშპ-ში` measure described in section 2 is approved; bar mode, stacked mode, a separate GDP explorer, and broader advanced chart controls remain outside the current production v1 scope unless explicitly re-approved. Do not start with visual richness before the data model and import validation are working.
+Implementation should follow this order: data foundation, real sample data, main explorer core with line/table modes and Excel workbook export, single-year core, and production UI polish against `DESIGN.md`. The bounded national `% მშპ-ში` measure described in section 2 is approved; bar mode, stacked mode, a separate GDP explorer, and broader advanced chart controls remain outside the current production v1 scope unless explicitly re-approved. Do not start with visual richness before the data model and import validation are working.

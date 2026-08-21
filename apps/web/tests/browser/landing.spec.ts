@@ -7,6 +7,7 @@ import { join } from "node:path";
 // (or the fallback message shows) rather than pixel content.
 
 const artifactDir = join(process.cwd(), "test-results", "visual-reference");
+const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
 
 async function capture(page: Page, name: string) {
   await mkdir(artifactDir, { recursive: true });
@@ -17,7 +18,7 @@ async function capture(page: Page, name: string) {
 
 test("landing renders the site v2 structure with live data", async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto("http://localhost:3100");
+  await page.goto(baseUrl);
 
   await expect(page).toHaveTitle("Fiscal.ge — საქართველოს ბიუჯეტის ექსპლორერი");
   await expect(page.getByTestId("landing-shell")).toBeVisible();
@@ -36,11 +37,14 @@ test("landing renders the site v2 structure with live data", async ({ page }) =>
   await expect(keyNumbers).toContainText("69.7");
   await expect(keyNumbers).toContainText("104.6");
 
-  // Three paths: sparkline, exactly 30 waffle cells, CSV preview header.
+  // Three paths: sparkline, exactly 30 waffle cells, Excel workbook preview.
   const paths = page.getByTestId("three-paths");
   await expect(paths.locator("svg polyline").first()).toBeVisible();
   await expect(paths.getByTestId("waffle-grid").locator("div")).toHaveCount(30);
-  await expect(paths).toContainText("year,category_id,ka_label,amount_gel,basis");
+  await expect(paths.getByText("Excel მონაცემები")).toBeVisible();
+  await expect(paths.getByText("მარტივი ცხრილი", { exact: true })).toBeVisible();
+  await expect(paths.getByText("მონაცემები", { exact: true })).toBeVisible();
+  await expect(paths.getByText(/year,category_id|amount_gel/)).toHaveCount(0);
 
   const footer = page.getByTestId("landing-footer");
   await expect(footer).toContainText("Fiscal.ge");
@@ -51,7 +55,7 @@ test("landing renders the site v2 structure with live data", async ({ page }) =>
 });
 
 test("landing nav and cards lead into the explorer", async ({ page }) => {
-  await page.goto("http://localhost:3100");
+  await page.goto(baseUrl);
 
   // Header nav → the budget hub. The hub itself writes nothing into the hash,
   // but a shared link can arrive carrying one, so tolerate an optional hash.
@@ -72,7 +76,7 @@ test("landing nav and cards lead into the explorer", async ({ page }) => {
 
 test("landing on mobile shows the hero text above the map and hides the year range", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://localhost:3100");
+  await page.goto(baseUrl);
 
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByTestId("hero-cta")).toBeVisible();
@@ -82,7 +86,7 @@ test("landing on mobile shows the hero text above the map and hides the year ran
 });
 
 test("methodology is in the footer but never the landing header", async ({ page }) => {
-  await page.goto("http://localhost:3100/");
+  await page.goto(`${baseUrl}/`);
   await expect(page.getByTestId("landing-header").getByRole("link", { name: "მეთოდოლოგია" })).toHaveCount(0);
   await expect(page.getByTestId("site-footer").getByRole("link", { name: "მეთოდოლოგია" })).toHaveAttribute(
     "href",
