@@ -49,6 +49,7 @@ export type WorkbookReadableRow = {
 
 export type WorkbookExportModel = {
   filename: string;
+  sheetNames: readonly ["მარტივი ცხრილი", "მონაცემები"];
   readable: {
     titleKa: string;
     subtitleKa: string;
@@ -114,12 +115,16 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
     }
   }
 
-  const sources = [...new Map(
-    input.sources
-      .map((source) => ({ ...source, years: source.years.filter((year) => years.includes(year)) }))
-      .filter((source) => source.years.length > 0)
-      .map((source) => [source.downloadHref, source] as const),
-  ).values()].sort((left, right) => (left.years[0] ?? 0) - (right.years[0] ?? 0)).map((source) => ({
+  const sourcesByHref = new Map<string, WorkbookPublicSource>();
+  for (const source of input.sources) {
+    const activeYears = source.years.filter((year) => years.includes(year));
+    if (activeYears.length === 0) continue;
+    const existing = sourcesByHref.get(source.downloadHref);
+    sourcesByHref.set(source.downloadHref, existing
+      ? { ...existing, years: [...new Set([...existing.years, ...activeYears])].sort((left, right) => left - right) }
+      : { ...source, years: [...new Set(activeYears)].sort((left, right) => left - right) });
+  }
+  const sources = [...sourcesByHref.values()].sort((left, right) => (left.years[0] ?? 0) - (right.years[0] ?? 0)).map((source) => ({
     ...source,
     absoluteUrl: absoluteWorkbookSourceUrl(input.siteOrigin, source.downloadHref),
   }));
@@ -127,6 +132,7 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
   const range = years.length > 0 ? `-${years[0]}-${years.at(-1)}` : "";
   return {
     filename: `fiscal-${input.filenameBase}${range}.xlsx`,
+    sheetNames: ["მარტივი ცხრილი", "მონაცემები"],
     readable: {
       titleKa: input.titleKa,
       subtitleKa: input.groupLabelKa,

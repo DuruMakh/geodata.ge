@@ -51,6 +51,7 @@ describe("buildWorkbookExportModel", () => {
     const model = buildWorkbookExportModel(input);
 
     expect(model.filename).toBe("fiscal-revenue-2020-2021.xlsx");
+    expect(model.sheetNames).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
     expect(model.readable.years).toEqual([2020, 2021]);
     expect(model.readable.rows.map((row) => row.labelKa)).toEqual([
       "გადასახადები სულ",
@@ -77,6 +78,15 @@ describe("buildWorkbookExportModel", () => {
     expect(absoluteWorkbookSourceUrl("https://fiscal.ge/", source.downloadHref)).toBe(
       "https://fiscal.ge/downloads/methodology/revenue/files/2020/mof-revenue-form-1.pdf",
     );
+  });
+
+  it("merges active-year coverage for duplicate source URLs", () => {
+    const model = buildWorkbookExportModel({
+      ...input,
+      sources: [source, { ...source, years: [2021] }],
+    });
+    expect(model.readable.sources).toHaveLength(1);
+    expect(model.readable.sources[0]?.years).toEqual([2020, 2021]);
   });
 
   it("preserves missing years and real zero values", () => {
