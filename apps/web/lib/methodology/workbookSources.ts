@@ -21,6 +21,24 @@ export function projectWorkbookSources(
   }));
 }
 
+const municipalHistoryHrefPattern = /\/mof-municipality-budget-history-(\d{2})\.xlsx$/;
+const adjaraRepublicHrefPattern = /\/adjara-republic-actual-payments\.(?:pdf|xlsx)$/;
+
+export function scopeMunicipalWorkbookSources(
+  sources: readonly WorkbookPublicSource[],
+  scope: {
+    municipalityCodes: readonly string[];
+    includeAdjaraRepublic: boolean;
+  },
+): WorkbookPublicSource[] {
+  const includedCodes = new Set(scope.municipalityCodes);
+  return sources.filter((source) => {
+    const historyCode = municipalHistoryHrefPattern.exec(source.downloadHref)?.[1];
+    if (historyCode !== undefined) return includedCodes.has(historyCode);
+    return scope.includeAdjaraRepublic || !adjaraRepublicHrefPattern.test(source.downloadHref);
+  });
+}
+
 const gdpWorkbookSourceRowSchema = z.object({
   accounting_standard: z.enum(["sna_1993", "sna_2008"]),
   retrieved_file_url: z.string().url().startsWith("https://"),

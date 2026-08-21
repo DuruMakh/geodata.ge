@@ -33,10 +33,10 @@ async function downloadMunicipalWorkbook(page: Page) {
 
 // იმერეთი: 12 member municipalities (data/imports/municipalities.csv), the
 // same region the brief's own manual verification step names.
-const REGION_URL = "http://localhost:3100/explorer/municipalities/region/imereti";
-const ADJARA_URL = "http://localhost:3100/explorer/municipalities/region/adjara";
-const LONG_REGION_URL =
-  "http://localhost:3100/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const REGION_URL = `${BASE_URL}/explorer/municipalities/region/imereti`;
+const ADJARA_URL = `${BASE_URL}/explorer/municipalities/region/adjara`;
+const LONG_REGION_URL = `${BASE_URL}/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti`;
 
 test.describe("region header responsiveness", () => {
   for (const viewport of [
@@ -123,6 +123,9 @@ test.describe("region roll-up page", () => {
         : [],
     );
     expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx");
+    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-06.xlsx");
+    expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-12.xlsx");
+    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx");
   });
 
   test("renders every member, the roll-up chart, and suppresses the per-member divergence callout", async ({ page }) => {
@@ -159,7 +162,7 @@ test.describe("region roll-up page", () => {
 
 test.describe("entity picker region options resolve (previously 404)", () => {
   test("selecting a region option from a municipality page's picker navigates to a real, fully-rendered region page", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities/04"); // თბილისი
+    await page.goto(`${BASE_URL}/explorer/municipalities/04`); // თბილისი
     await expectMunicipalAppReady(page);
     await page.getByTestId("entity-picker-trigger").click();
 

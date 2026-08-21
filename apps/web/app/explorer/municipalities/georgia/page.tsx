@@ -8,7 +8,7 @@ import {
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
 } from "../../../../lib/explorer/municipalData";
-import { loadWorkbookSources } from "../../../../lib/methodology/workbookSources";
+import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
 import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
 const ROUTE = "/explorer/municipalities/georgia";
@@ -43,6 +43,13 @@ export default async function GeorgiaMunicipalitiesPage() {
   const { municipalities, regions, functions, totalFacts, countryFunctionFacts, countryTotalFacts, adjaraBudgetAdjustments } =
     servedMunicipalData;
   const { sourceDocuments } = landingData;
+  const entityWorkbookSources = scopeMunicipalWorkbookSources(
+    workbookSources,
+    {
+      municipalityCodes: municipalities.map((municipality) => municipality.code),
+      includeAdjaraRepublic: true,
+    },
+  );
 
   const years = Array.from(new Set(countryTotalFacts.map((row) => row.year))).sort((a, b) => a - b);
   const firstYear = years[0]!;
@@ -77,7 +84,7 @@ export default async function GeorgiaMunicipalitiesPage() {
           sourceDocuments={sourceDocuments}
           metrics={{ kind: "country", budgetCount: 69 }}
           workbookBasename="municipalities-georgia"
-          workbookSources={workbookSources}
+          workbookSources={entityWorkbookSources}
           siteOrigin={resolveSiteUrl()}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,

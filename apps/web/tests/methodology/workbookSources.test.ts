@@ -5,6 +5,7 @@ import {
   projectGdpWorkbookSources,
   projectWorkbookSources,
   resetWorkbookSourceCacheForTests,
+  scopeMunicipalWorkbookSources,
 } from "../../lib/methodology/workbookSources";
 
 const gdpRows = [
@@ -82,6 +83,39 @@ describe("loadWorkbookSources", () => {
   it("memoizes the promise per dataset", () => {
     resetWorkbookSourceCacheForTests();
     expect(loadWorkbookSources("revenue")).toBe(loadWorkbookSources("revenue"));
+  });
+});
+
+describe("scopeMunicipalWorkbookSources", () => {
+  it("keeps shared sources and only histories for the requested municipality codes", () => {
+    const shared = {
+      years: [2020],
+      titleKa: "2020 წლის მუნიციპალური ბიუჯეტების ფუნქციური კლასიფიკაცია",
+      organizationKa: "საქართველოს ფინანსთა სამინისტრო",
+      downloadHref: "/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx" as const,
+      retrievedAt: "2026-07-26",
+    };
+    const history = (code: string) => ({
+      ...shared,
+      titleKa: `${code} მუნიციპალიტეტის ისტორია`,
+      downloadHref: `/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-${code}.xlsx` as const,
+    });
+    const adjaraRepublic = {
+      ...shared,
+      titleKa: "აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივი გადასახდელები",
+      downloadHref: "/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx" as const,
+    };
+
+    const scoped = scopeMunicipalWorkbookSources(
+      [shared, adjaraRepublic, history("04"), history("05"), history("06")],
+      { municipalityCodes: ["04", "06"], includeAdjaraRepublic: false },
+    );
+
+    expect(scoped).toEqual([shared, history("04"), history("06")]);
+    expect(scopeMunicipalWorkbookSources(
+      [shared, adjaraRepublic, history("06")],
+      { municipalityCodes: ["06"], includeAdjaraRepublic: true },
+    )).toEqual([shared, adjaraRepublic, history("06")]);
   });
 });
 

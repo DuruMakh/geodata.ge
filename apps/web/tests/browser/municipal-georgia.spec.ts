@@ -85,4 +85,6 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
       : [],
   );
   expect(hyperlinks.some((value) => value.includes("/downloads/methodology/municipalities/"))).toBe(true);
+  expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx");
+  expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx");
 });

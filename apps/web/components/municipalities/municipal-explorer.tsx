@@ -44,8 +44,6 @@ export type MunicipalMetricContext =
 
 type MunicipalNavigation = { prev: { label: string; href: string }; next: { label: string; href: string } };
 
-const GEORGIA_AGGREGATE_ONLY_CODES = ["05", "42", "43", "46", "64"];
-
 type MunicipalExplorerBaseProps = {
   title: string;
   triggerLabel: string;
@@ -202,14 +200,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
         pointsByYear,
       };
     });
-    const workbookSources = metrics.kind === "country"
-      ? props.workbookSources.filter((source) =>
-          !GEORGIA_AGGREGATE_ONLY_CODES.some((code) =>
-            source.downloadHref.endsWith(`municipality-budget-history-${code}.xlsx`),
-          ),
-        )
-      : props.workbookSources;
-
     return {
       filenameBase: props.workbookBasename,
       titleKa: metrics.kind === "country" ? props.pickerCountry.nameKa : props.triggerLabel,
@@ -224,7 +214,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
         : { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
       totalId: model.totalRow.itemId,
       series: workbookSeries,
-      sources: workbookSources,
+      sources: props.workbookSources,
       siteOrigin: props.siteOrigin,
     };
   }

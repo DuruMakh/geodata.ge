@@ -23,7 +23,8 @@ import ExcelJS from "exceljs";
 //
 // Full section e2e coverage is Task 14's; this pins the specific gaps above.
 
-const ENTITY_URL = "http://localhost:3100/explorer/municipalities/04"; // თბილისი
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const ENTITY_URL = `${BASE_URL}/explorer/municipalities/04`; // თბილისი
 const ALL_FUNCTIONS = [
   "municipal.general_public_services",
   "municipal.defence",
@@ -617,6 +618,9 @@ test.describe("municipality page", () => {
         : [],
     );
     expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx");
+    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx");
+    expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-05.xlsx");
+    expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx");
   });
 
   test("uses the same export control treatment as the national explorer", async ({ page }) => {
@@ -652,7 +656,7 @@ test.describe("municipality page", () => {
   });
 
   test("uses the historical range-end rank rather than the latest-year rank", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities/18#r=2015-2015");
+    await page.goto(`${BASE_URL}/explorer/municipalities/18#r=2015-2015`);
     await expectMunicipalAppReady(page);
 
     const rankKpi = page.getByTestId("entity-kpi").filter({ hasText: "წილი მუნიციპალურ ხარჯებში" });
@@ -848,7 +852,7 @@ test.describe("municipality page", () => {
     ]) {
       for (const width of [320, 375, 390, 430]) {
         await page.setViewportSize({ width, height: 844 });
-        await page.goto(`http://localhost:3100${path}`);
+        await page.goto(`${BASE_URL}${path}`);
         await expectMunicipalAppReady(page);
 
         const controls = page.getByTestId("municipal-chart-controls");

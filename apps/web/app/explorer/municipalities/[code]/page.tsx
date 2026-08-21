@@ -11,7 +11,7 @@ import {
   latestReviewedAtForMunicipalFacts,
 } from "../../../../lib/explorer/municipalData";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
-import { loadWorkbookSources } from "../../../../lib/methodology/workbookSources";
+import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
 import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
 // The 64 codes are the complete, closed set. Without this, an unknown code is
@@ -60,6 +60,10 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
 
   const municipality = municipalities.find((row) => row.code === code);
   if (!municipality) notFound();
+  const entityWorkbookSources = scopeMunicipalWorkbookSources(workbookSources, {
+    municipalityCodes: [code],
+    includeAdjaraRepublic: false,
+  });
 
   const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
   const firstYear = years[0]!;
@@ -121,7 +125,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
             rankOutOf: municipalities.length,
           }}
           workbookBasename={`municipality-${code}`}
-          workbookSources={workbookSources}
+          workbookSources={entityWorkbookSources}
           siteOrigin={resolveSiteUrl()}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,

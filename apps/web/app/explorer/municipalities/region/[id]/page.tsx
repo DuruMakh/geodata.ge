@@ -15,7 +15,7 @@ import {
 } from "../../../../../lib/explorer/municipalData";
 import { georgianOrdinal, REGION_GENITIVE_KA } from "../../../../../lib/explorer/municipalLabels";
 import { formatAmount } from "../../../../../lib/explorer/format";
-import { loadWorkbookSources } from "../../../../../lib/methodology/workbookSources";
+import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../../lib/methodology/workbookSources";
 import { resolveSiteUrl } from "../../../../../lib/siteUrl";
 
 const SOURCE_NOTE_BASE =
@@ -92,6 +92,10 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   const nationalTotalByYear = buildCountryTotalByYear(countryTotalFacts);
 
   const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
+  const entityWorkbookSources = scopeMunicipalWorkbookSources(workbookSources, {
+    municipalityCodes: members.memberCodes,
+    includeAdjaraRepublic: regionId === ADJARA_REGION_ID,
+  });
   // Collapse the members' rows into one entity's on the SERVER, so this page
   // ships ~110 function rows like a municipality page rather than up to 12×.
   const rolled = aggregateFactsForEntity(regionId, members.functionFacts, members.totalFacts);
@@ -149,7 +153,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
             rankOutOf: regions.length,
           }}
           workbookBasename={`region-${id}`}
-          workbookSources={workbookSources}
+          workbookSources={entityWorkbookSources}
           siteOrigin={resolveSiteUrl()}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,
