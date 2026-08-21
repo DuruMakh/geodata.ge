@@ -1,9 +1,13 @@
 # Fiscal.ge SEO Baseline
 
-Baseline date: `YYYY-MM-DD`  
-Search Console property: `fiscal.ge`  
-Export range: `YYYY-MM-DD` through `YYYY-MM-DD`  
-Production commit: `<merge SHA>`  
+Baseline date: `YYYY-MM-DD`
+
+Search Console property: `fiscal.ge`
+
+Export range: `YYYY-MM-DD` through `YYYY-MM-DD`
+
+Production commit: `<merge SHA>`
+
 Production deployment: `<Vercel deployment ID>`
 
 ## Indexing

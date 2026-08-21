@@ -1,7 +1,9 @@
 # Fiscal.ge SEO Performance Baseline
 
-Audit date: 2026-08-21  
-Production origin: `https://fiscal.ge`  
+Audit date: 2026-08-21
+
+Production origin: `https://fiscal.ge`
+
 Purpose: pre-SEO payload baseline; field Core Web Vitals require Search Console data.
 
 | Route | Decompressed HTML characters | Brotli response bytes |
