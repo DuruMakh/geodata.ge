@@ -193,4 +193,15 @@ describe("createWorkbookBuffer", () => {
     expect(longHeight).toBeGreaterThan(shortHeight);
     expect(longHeight).toBeGreaterThanOrEqual(60);
   });
+
+  it("gives a 119-character public URL seven readable wrapped lines", async () => {
+    const longUrl = "https://fiscal.ge/downloads/methodology/revenue/files/2020/-long-public-archive-name-with-validated-source-document.pdf";
+    expect(longUrl).toHaveLength(119);
+    const workbook = await loadWorkbook({
+      ...approvedModelFixture,
+      readable: { ...approvedModelFixture.readable, sources: [{ ...approvedModelFixture.readable.sources[0]!, absoluteUrl: longUrl }] },
+    });
+
+    expect(workbook.getWorksheet("მარტივი ცხრილი")!.getRow(18).height).toBeGreaterThanOrEqual(105);
+  });
 });

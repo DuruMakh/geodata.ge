@@ -28,7 +28,7 @@ function readableNumberFormat(isPercentage: boolean, isPlanned: boolean): string
 }
 
 function sourceRowHeight(titleKa: string, absoluteUrl: string): number {
-  const charactersPerLine = Math.floor(SOURCE_TEXT_COLUMN_WIDTH * 1.25);
+  const charactersPerLine = SOURCE_TEXT_COLUMN_WIDTH;
   const lines = Math.max(Math.ceil(titleKa.length / charactersPerLine), Math.ceil(absoluteUrl.length / charactersPerLine));
   return Math.max(30, lines * 15);
 }
