@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
+import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 
@@ -20,13 +21,16 @@ export default async function RevenuePage() {
   // No adminFacts/adminCategories: the ministries scope cannot be reached from
   // this route, so shipping the admin corpus here is dead payload.
   return (
-    <MainExplorer
-      nav="revenue"
-      facts={facts}
-      glossaryEntries={Array.from(glossary.values())}
-      sourceDocuments={sourceDocuments}
-      gdpFacts={gdpFacts}
-      lastUpdatedAt={lastUpdatedAt}
-    />
+    <>
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "შემოსავლები", path: "/explorer/revenue" }]} />
+      <MainExplorer
+        nav="revenue"
+        facts={facts}
+        glossaryEntries={Array.from(glossary.values())}
+        sourceDocuments={sourceDocuments}
+        gdpFacts={gdpFacts}
+        lastUpdatedAt={lastUpdatedAt}
+      />
+    </>
   );
 }

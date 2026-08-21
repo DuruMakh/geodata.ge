@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
+import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 
@@ -18,15 +19,18 @@ export default async function ExpenditurePage() {
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
 
   return (
-    <MainExplorer
-      nav="expenditure"
-      facts={facts}
-      adminFacts={adminFacts}
-      adminCategories={adminCategories}
-      glossaryEntries={Array.from(glossary.values())}
-      sourceDocuments={sourceDocuments}
-      gdpFacts={gdpFacts}
-      lastUpdatedAt={lastUpdatedAt}
-    />
+    <>
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "ხარჯები", path: "/explorer/expenditure" }]} />
+      <MainExplorer
+        nav="expenditure"
+        facts={facts}
+        adminFacts={adminFacts}
+        adminCategories={adminCategories}
+        glossaryEntries={Array.from(glossary.values())}
+        sourceDocuments={sourceDocuments}
+        gdpFacts={gdpFacts}
+        lastUpdatedAt={lastUpdatedAt}
+      />
+    </>
   );
 }

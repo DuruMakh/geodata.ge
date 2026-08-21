@@ -1,4 +1,5 @@
 import { BudgetHub } from "../../components/hub/budget-hub";
+import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect";
 import { PageHeader } from "../../components/shell/page-header";
 import { SourceNote } from "../../components/ui/editorial";
@@ -38,6 +39,7 @@ export default async function ExplorerHubPage() {
       data-testid="explorer-shell"
       className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"
     >
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }]} />
       <div className="mx-auto max-w-[1180px]">
         <LegacyHashRedirect />
         <PageHeader

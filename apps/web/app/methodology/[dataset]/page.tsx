@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import path from "node:path";
 import { MethodologyArticle } from "../../../components/methodology/methodology-article";
+import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../../components/seo/json-ld";
 import { SiteFooter } from "../../../components/site/site-footer";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
 import {
@@ -13,6 +15,8 @@ import { loadGeneratedArchiveSummaries } from "../../../lib/methodology/prepareA
 import { loadReviewedSourceManifest } from "../../../lib/methodology/sourceManifest";
 import type { MethodologyDatasetId } from "../../../lib/methodology/types";
 import { fiscalMetadata } from "../../../lib/seo/metadata";
+import { datasetJsonLd } from "../../../lib/seo/structuredData";
+import { resolveSiteUrl } from "../../../lib/siteUrl";
 
 type MethodologyDatasetPageProps = {
   params: Promise<{ dataset: string }>;
@@ -32,6 +36,12 @@ function validatedDataset(value: string): MethodologyDatasetId {
   if (!isMethodologyDatasetId(value)) notFound();
   return value;
 }
+
+const DATASET_DOWNLOADS = {
+  expenditure: "/downloads/data/national-expenditure.csv",
+  revenue: "/downloads/data/national-revenue.csv",
+  municipalities: "/downloads/data/municipal-expenditure.csv",
+} as const;
 
 export async function generateMetadata({ params }: MethodologyDatasetPageProps): Promise<Metadata> {
   const dataset = validatedDataset((await params).dataset);
@@ -73,6 +83,26 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
 
   return (
     <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "მთავარი", path: "/" },
+          { name: "მეთოდოლოგია", path: "/methodology" },
+          { name: content.titleKa, path: `/methodology/${dataset}` },
+        ]}
+      />
+      <JsonLd
+        data={datasetJsonLd({
+          origin: resolveSiteUrl(),
+          path: `/methodology/${dataset}`,
+          name: content.titleKa,
+          description: content.summaryKa,
+          firstYear: coverage.firstYear,
+          lastYear: coverage.lastYear,
+          dateModified: content.reviewedAt,
+          downloadPath: DATASET_DOWNLOADS[dataset],
+        })}
+        testId="dataset-json-ld"
+      />
       <MethodologyArticle
         content={content}
         coverage={coverage}

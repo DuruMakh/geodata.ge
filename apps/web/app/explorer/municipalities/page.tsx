@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MunicipalitiesIndex } from "../../../components/municipalities/municipalities-index";
+import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
 import {
@@ -50,6 +51,7 @@ export default async function MunicipalitiesIndexPage() {
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[

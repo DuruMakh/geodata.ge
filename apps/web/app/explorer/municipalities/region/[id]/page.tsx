@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../../../../components/municipalities/municipal-explorer";
+import { BreadcrumbJsonLd } from "../../../../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../../lib/data/servedData";
 import { ADJARA_REGION_ID, MUNICIPAL_COUNTRY_ID } from "../../../../../lib/data/municipal/types";
@@ -108,6 +109,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }, { name: region.kaLabel, path: `/explorer/municipalities/region/${id}` }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[

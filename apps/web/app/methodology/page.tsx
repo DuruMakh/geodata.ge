@@ -1,11 +1,15 @@
 import path from "node:path";
 import { MethodologyHub } from "../../components/methodology/methodology-hub";
+import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { SiteFooter } from "../../components/site/site-footer";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 import { buildLandingModel } from "../../lib/landing/landingData";
 import { buildMethodologyHubEntries } from "../../lib/methodology/catalog";
 import { loadGeneratedArchiveSummaries } from "../../lib/methodology/prepareArchives";
 import { fiscalMetadata } from "../../lib/seo/metadata";
+import { dataCatalogJsonLd } from "../../lib/seo/structuredData";
+import { resolveSiteUrl } from "../../lib/siteUrl";
 
 const description = "Fiscal.ge-ს საჯარო მეთოდოლოგია, მონაცემთა დამუშავების გადაწყვეტილებები და უცვლელი ოფიციალური პირველწყაროები.";
 
@@ -31,6 +35,15 @@ export default async function MethodologyPage() {
 
   return (
     <>
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "მეთოდოლოგია", path: "/methodology" }]} />
+      <JsonLd
+        data={dataCatalogJsonLd(resolveSiteUrl(), [
+          "/methodology/expenditure",
+          "/methodology/revenue",
+          "/methodology/municipalities",
+        ])}
+        testId="catalog-json-ld"
+      />
       <MethodologyHub liveEntries={liveEntries} />
       <div className="mx-auto w-full max-w-[1240px] px-5 min-[768px]:px-7">
         <SiteFooter updatedAt={landingModel.updatedAt} />
