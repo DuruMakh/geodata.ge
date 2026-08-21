@@ -187,6 +187,17 @@ describe("methodology catalog", () => {
     expect(canonical).not.toContain("a complete 11-category panel every year");
   });
 
+  it("uses the current Fiscal.ge brand in every canonical methodology document", async () => {
+    const canonicalDocuments = new Set(
+      Object.values(METHODOLOGY_CONTENT).flatMap((content) => content.canonicalDocuments),
+    );
+
+    for (const document of canonicalDocuments) {
+      const canonical = await readFile(path.join(repositoryRoot, document), "utf8");
+      expect(canonical, document).not.toMatch(/\bGeoData(?:\.ge)?\b/);
+    }
+  });
+
   it("covers every canonical decision exactly through a public entry", async () => {
     const result = await validateDecisionCoverage();
     expect(result).toEqual({

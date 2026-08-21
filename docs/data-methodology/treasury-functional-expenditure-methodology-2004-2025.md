@@ -3,7 +3,7 @@
 Status: complete and reconciled; the 2004 extension was reviewed on 2026-08-20.
 
 This is the authoritative, standalone methodology for the functional-classification
-expenditure series in GeoData.ge — the treasury "ფუნქციონალურ ჭრილში დანახარჯები"
+expenditure series in Fiscal.ge — the treasury "ფუნქციონალურ ჭრილში დანახარჯები"
 (form E11) data, mapped to public spending categories, for every fiscal year the app
 carries. It documents, per year: which official documents were used, where they came
 from, how they were parsed, how the numbers were reconciled to the official totals, and
@@ -343,10 +343,10 @@ keyword-review approach cleared all residual arrears rows for 2008–2011 (SOE a
 etc.); all keyword additions verified byte-identical no-ops for the already-shipped
 2012–2016 outputs.
 
-**7.11 — category splits are GeoData's mapping, not official categorization (disclosure).**
-The annual totals are official and exact; the 13-category breakdown is GeoData's reviewed
+**7.11 — category splits are Fiscal.ge's mapping, not official categorization (disclosure).**
+The annual totals are official and exact; the 13-category breakdown is Fiscal.ge's reviewed
 mapping from the official functional/COFOG codes. This is disclosed in-app in the data
-note: "წლიური ჯამები ოფიციალურ წყაროებს ეყრდნობა; კატეგორიებად დაყოფა GeoData-ის
+note: "წლიური ჯამები ოფიციალურ წყაროებს ეყრდნობა; კატეგორიებად დაყოფა Fiscal.ge-ის
 კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით."
 
 ---
@@ -380,7 +380,7 @@ COVID surge 2020–2021), confirming a single consistent concept across the seri
 ## 10. Limitations & disclosure
 
 - **Categories are a mapping, not official taxonomy.** Totals are official; the 13-category
-  split is GeoData's documented, reviewed mapping (§6, §7.11).
+  split is Fiscal.ge's documented, reviewed mapping (§6, §7.11).
 - **other/unclassified** is 0 for 2007–2011 and 2013–2016; 700,000 GEL in 2012 (one
   reviewed disaster-fund row, §7.5); and the residual of the old group 14 in 2005
   (2.06M / 0.08%) and 2006 (20.41M / 0.53%) — genuinely unclassified in the source.

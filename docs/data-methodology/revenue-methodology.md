@@ -15,7 +15,7 @@ by regenerating staging).
 
 ## 1. What this dataset is
 
-GeoData.ge's revenue side shows Georgia's **consolidated budget receipts** (ნაერთი ბიუჯეტის
+Fiscal.ge's revenue side shows Georgia's **consolidated budget receipts** (ნაერთი ბიუჯეტის
 შემოსულობები) by top-level revenue category, annually for **2004–2025** (22 years), always on the
 **actual** (cash-executed) basis. Planned figures are parsed where the source carries them but are
 never published.
