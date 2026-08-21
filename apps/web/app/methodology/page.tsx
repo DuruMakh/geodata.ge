@@ -1,6 +1,5 @@
 import path from "node:path";
 import { MethodologyHub } from "../../components/methodology/methodology-hub";
-import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { SiteFooter } from "../../components/site/site-footer";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
@@ -35,7 +34,6 @@ export default async function MethodologyPage() {
 
   return (
     <>
-      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "მეთოდოლოგია", path: "/methodology" }]} />
       <JsonLd
         data={dataCatalogJsonLd(resolveSiteUrl(), [
           "/methodology/expenditure",
@@ -44,7 +42,10 @@ export default async function MethodologyPage() {
         ])}
         testId="catalog-json-ld"
       />
-      <MethodologyHub liveEntries={liveEntries} />
+      <MethodologyHub
+        liveEntries={liveEntries}
+        breadcrumbItems={[{ name: "მთავარი", path: "/" }, { name: "მეთოდოლოგია", path: "/methodology" }]}
+      />
       <div className="mx-auto w-full max-w-[1240px] px-5 min-[768px]:px-7">
         <SiteFooter updatedAt={landingModel.updatedAt} />
       </div>

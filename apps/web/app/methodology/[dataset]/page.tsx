@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import path from "node:path";
 import { MethodologyArticle } from "../../../components/methodology/methodology-article";
-import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../../components/seo/json-ld";
 import { SiteFooter } from "../../../components/site/site-footer";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
@@ -83,13 +82,6 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
 
   return (
     <>
-      <BreadcrumbJsonLd
-        items={[
-          { name: "მთავარი", path: "/" },
-          { name: "მეთოდოლოგია", path: "/methodology" },
-          { name: content.titleKa, path: `/methodology/${dataset}` },
-        ]}
-      />
       <JsonLd
         data={datasetJsonLd({
           origin: resolveSiteUrl(),
@@ -109,6 +101,11 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
         rows={publicRows}
         archiveSummary={archiveSummaries[dataset]}
         processedDataHref={DATASET_DOWNLOADS[dataset]}
+        breadcrumbItems={[
+          { name: "მთავარი", path: "/" },
+          { name: "მეთოდოლოგია", path: "/methodology" },
+          { name: content.titleKa, path: `/methodology/${dataset}` },
+        ]}
       />
       <div className="mx-auto w-full max-w-[1240px] px-5 min-[768px]:px-7">
         <SiteFooter updatedAt={updatedAt} />

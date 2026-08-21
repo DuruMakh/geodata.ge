@@ -43,3 +43,23 @@ test("methodology exposes a stable processed-data download", async ({ page, requ
   expect(response.ok()).toBe(true);
   expect((await response.body()).subarray(0, 3)).toEqual(Buffer.from([0xef, 0xbb, 0xbf]));
 });
+
+for (const [route, expectedLabels] of [
+  ["/about", ["მთავარი", "Fiscal.ge-ის შესახებ"]],
+  ["/methodology", ["მთავარი", "მეთოდოლოგია"]],
+  ["/methodology/expenditure", ["მთავარი", "მეთოდოლოგია", "ხარჯების მეთოდოლოგია"]],
+] as const) {
+  test(`${route} keeps visible and structured breadcrumbs aligned`, async ({ page }) => {
+    await page.goto(`${BASE_URL}${route}`);
+    const visibleLabels = await page
+      .locator('nav[aria-label="Breadcrumb"] [data-breadcrumb-label]')
+      .allTextContents();
+    const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
+    const structuredLabels = JSON.parse(structured ?? "{}").itemListElement.map(
+      (item: { name: string }) => item.name,
+    );
+
+    expect(visibleLabels).toEqual([...expectedLabels]);
+    expect(structuredLabels).toEqual([...expectedLabels]);
+  });
+}

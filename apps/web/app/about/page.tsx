@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { BreadcrumbTrail } from "../../components/seo/breadcrumb-json-ld";
 import { SiteFooter } from "../../components/site/site-footer";
 import { SiteHeader } from "../../components/site/site-header";
 import { loadServedLandingData } from "../../lib/data/servedData";
@@ -40,10 +40,10 @@ export default async function AboutPage() {
   const model = buildLandingModel(await loadServedLandingData());
   return (
     <div className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]">
-      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "Fiscal.ge-ის შესახებ", path: "/about" }]} />
       <div className="mx-auto max-w-[1240px]">
         <SiteHeader yearsLabel={model.yearsLabel} testId="about-header" />
         <main className="pt-10 min-[768px]:pt-16">
+          <BreadcrumbTrail items={[{ name: "მთავარი", path: "/" }, { name: "Fiscal.ge-ის შესახებ", path: "/about" }]} />
           <header className="border-t-2 border-[var(--ink)] pt-8">
             <h1 className="max-w-[860px] font-[family-name:var(--font-display)] text-[38px] font-semibold leading-[1.12] min-[768px]:text-[52px]">
               Fiscal.ge-ის შესახებ
