@@ -63,6 +63,21 @@ async function loadWorkbook(model: WorkbookExportModel) {
   return workbook;
 }
 
+function modelWithYears(years: number[]): WorkbookExportModel {
+  return {
+    ...approvedModelFixture,
+    readable: { ...approvedModelFixture.readable, years },
+  };
+}
+
+function expectSourceMetadata(readable: ExcelJS.Worksheet) {
+  expect(readable.getCell("A18").value).toBe("2020");
+  expect(readable.getCell("B18").value).toBe("2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები");
+  expect(readable.getCell("C18").value).toBe("საქართველოს ფინანსთა სამინისტრო");
+  expect(readable.getCell("D18").value).toBe("2026-06-09");
+  expect(readable.getCell("E18").value).toMatchObject({ hyperlink: sourceUrl });
+}
+
 describe("createWorkbookBuffer", () => {
   it("writes the approved two-sheet workbook", async () => {
     const workbook = await loadWorkbook(approvedModelFixture);
@@ -117,5 +132,17 @@ describe("createWorkbookBuffer", () => {
     });
 
     expect(workbook.getWorksheet("მონაცემები")!.getCell("F1").value).toBe("მშპ-ის წილი (%)");
+  });
+
+  it("keeps one-year source metadata in distinct cells", async () => {
+    const workbook = await loadWorkbook(modelWithYears([2020]));
+
+    expectSourceMetadata(workbook.getWorksheet("მარტივი ცხრილი")!);
+  });
+
+  it("keeps two-year source metadata in distinct cells", async () => {
+    const workbook = await loadWorkbook(modelWithYears([2020, 2021]));
+
+    expectSourceMetadata(workbook.getWorksheet("მარტივი ცხრილი")!);
   });
 });

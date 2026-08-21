@@ -5,6 +5,7 @@ const XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.s
 const AMOUNT_NUMBER_FORMAT = "#,##0.0;[Red](#,##0.0);–";
 const PERCENTAGE_NUMBER_FORMAT = "0.0%;[Red](0.0%);–";
 const PLANNED_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFF1EADC" } };
+const SOURCE_LINK_COLUMN = 5;
 
 function columnLetter(column: number): string {
   let remaining = column;
@@ -85,7 +86,7 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
     worksheet.getCell(rowNumber, 2).value = source.titleKa;
     worksheet.getCell(rowNumber, 3).value = source.organizationKa;
     worksheet.getCell(rowNumber, 4).value = source.retrievedAt;
-    worksheet.getCell(rowNumber, lastColumn).value = {
+    worksheet.getCell(rowNumber, SOURCE_LINK_COLUMN).value = {
       text: source.absoluteUrl,
       hyperlink: source.absoluteUrl,
       tooltip: source.titleKa,
@@ -93,7 +94,7 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
   });
 
   worksheet.getColumn(1).width = 42;
-  for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = 18;
+  for (let column = 2; column <= Math.max(lastColumn, SOURCE_LINK_COLUMN); column += 1) worksheet.getColumn(column).width = 18;
 }
 
 function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel["analysis"]): void {
