@@ -35,6 +35,8 @@ jobs:
   e2e:
     name: Browser tests (Playwright)
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SITE_URL: https://fiscal.ge
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
