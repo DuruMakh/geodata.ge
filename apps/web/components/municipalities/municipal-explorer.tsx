@@ -367,12 +367,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             >
               ← ყველა მუნიციპალიტეტი
             </Link>
-            <Link
-              href="/methodology/municipalities"
-              className="mt-2.5 block text-[12px] text-[var(--muted)] underline underline-offset-4 hover:text-[var(--accent)]"
-            >
-              მეთოდოლოგია და პირველწყაროები
-            </Link>
           </div>
         </aside>
       </div>
