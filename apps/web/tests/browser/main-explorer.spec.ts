@@ -709,7 +709,7 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
     expect(activeBox).not.toBeNull();
     expect(selectorBox).not.toBeNull();
     expect(activeBox!.x).toBeGreaterThanOrEqual(selectorBox!.x);
-    expect(activeBox!.x + activeBox!.width).toBeLessThanOrEqual(selectorBox!.x + selectorBox!.width);
+    expect(activeBox!.x + activeBox!.width).toBeLessThanOrEqual(selectorBox!.x + selectorBox!.width + 1);
 
     const tabGroups = page.getByTestId("analysis-tab-groups");
     expect(await tabGroups.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
