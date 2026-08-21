@@ -60,6 +60,7 @@ test("renders 65 globally ordered accessible map targets and two inert overlays"
   expect(tbilisiIndexes).toHaveLength(2);
   expect(tbilisiIndexes[1]).toBe(tbilisiIndexes[0] + 1);
 
+  await map.scrollIntoViewIfNeeded();
   const markersAreTopmostAtTheirCenters = await map.locator("[data-municipality-marker]").evaluateAll((markers) =>
     markers.every((marker) => {
       const box = marker.getBoundingClientRect();
@@ -429,7 +430,7 @@ test.describe("municipalities index", () => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
     await expect(page.locator("main > div > p").first()).toContainText(
-      "აირჩიე მუნიციპალიტეტი რუკაზე ან სიაში",
+      "საქართველოს მუნიციპალიტეტების ბიუჯეტები წარმოდგენილია 2015–2025 წლების ფაქტობრივი შესრულებით",
     );
   });
 
