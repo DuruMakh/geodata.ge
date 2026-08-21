@@ -9,6 +9,7 @@ const GROUP_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColo
 const INK_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FF1E1B16" } };
 const PAPER_COLOR = { argb: "FFF7F2E9" };
 const SOURCE_LINK_COLUMN = 3;
+const SOURCE_TEXT_COLUMN_WIDTH = 18;
 
 function columnLetter(column: number): string {
   let remaining = column;
@@ -24,6 +25,12 @@ function columnLetter(column: number): string {
 function readableNumberFormat(isPercentage: boolean, isPlanned: boolean): string {
   if (isPlanned) return isPercentage ? '0.0% "გეგმა";[Red](0.0%) "გეგმა";–' : '#,##0.0 "გეგმა";[Red](#,##0.0) "გეგმა";–';
   return isPercentage ? PERCENTAGE_NUMBER_FORMAT : AMOUNT_NUMBER_FORMAT;
+}
+
+function sourceRowHeight(titleKa: string, absoluteUrl: string): number {
+  const charactersPerLine = Math.floor(SOURCE_TEXT_COLUMN_WIDTH * 1.25);
+  const lines = Math.max(Math.ceil(titleKa.length / charactersPerLine), Math.ceil(absoluteUrl.length / charactersPerLine));
+  return Math.max(30, lines * 15);
 }
 
 function writeReadableRow(
@@ -118,11 +125,11 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
     worksheet.getCell(rowNumber, 4).value = source.retrievedAt;
     worksheet.getCell(rowNumber, 2).alignment = { vertical: "middle", wrapText: true };
     worksheet.getCell(rowNumber, SOURCE_LINK_COLUMN).alignment = { vertical: "middle", wrapText: true };
-    worksheet.getRow(rowNumber).height = 30;
+    worksheet.getRow(rowNumber).height = sourceRowHeight(source.titleKa, source.absoluteUrl);
   });
 
   worksheet.getColumn(1).width = 46;
-  for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = 18;
+  for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = SOURCE_TEXT_COLUMN_WIDTH;
 }
 
 function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel["analysis"]): void {

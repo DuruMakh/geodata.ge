@@ -132,7 +132,7 @@ describe("createWorkbookBuffer", () => {
     expect(readable.getCell("C18").value).toMatchObject({ hyperlink: sourceUrl });
     expect(readable.getCell("B18").alignment?.wrapText).toBe(true);
     expect(readable.getCell("C18").alignment?.wrapText).toBe(true);
-    expect(readable.getRow(18).height).toBeGreaterThanOrEqual(30);
+    expect(readable.getRow(18).height).toBeGreaterThanOrEqual(60);
     expect(analysis.getTables()).toHaveLength(1);
     const table = analysis.getTable("FiscalExportData") as unknown as { table: { columns: Array<{ filterButton: boolean }> } };
     expect(table.table.columns.map((column) => column.filterButton)).toEqual([true, true, true, true, true]);
@@ -171,5 +171,26 @@ describe("createWorkbookBuffer", () => {
     });
 
     expect(workbook.getWorksheet("მარტივი ცხრილი")!.getCell("A4").value).toBe("გადასახადები — დამატებული ღირებულების გადასახადი");
+  });
+
+  it("gives longer wrapped source text more room than a short source", async () => {
+    const shortWorkbook = await loadWorkbook({
+      ...approvedModelFixture,
+      readable: {
+        ...approvedModelFixture.readable,
+        sources: [{
+          ...approvedModelFixture.readable.sources[0]!,
+          titleKa: "მოკლე წყარო",
+          absoluteUrl: "https://fiscal.ge/a.pdf",
+        }],
+      },
+    });
+    const longWorkbook = await loadWorkbook(approvedModelFixture);
+
+    const shortHeight = shortWorkbook.getWorksheet("მარტივი ცხრილი")!.getRow(18).height!;
+    const longHeight = longWorkbook.getWorksheet("მარტივი ცხრილი")!.getRow(18).height!;
+    expect(shortHeight).toBeGreaterThanOrEqual(30);
+    expect(longHeight).toBeGreaterThan(shortHeight);
+    expect(longHeight).toBeGreaterThanOrEqual(60);
   });
 });
