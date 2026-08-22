@@ -1,5 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import type { SnapshotItem } from "../../lib/explorer/types";
-import { formatAmount, formatShare } from "../../lib/explorer/format";
+import { formatAmount } from "../../lib/explorer/format";
 import { Callout } from "../ui/editorial";
 
 // Budget field per DESIGN.md §9.6: bubble scatter — x share of total, y growth vs
@@ -17,6 +20,7 @@ const PAD_T = 18;
 const PAD_B = 36;
 
 export function BudgetField({ items }: BudgetFieldProps) {
+  const [activeId, setActiveId] = useState<string | null>(null);
   // Negative rows have no meaningful share/size geometry; growth from a
   // non-positive base is already null upstream, but guard the amount too.
   const withGrowth = items.filter(
@@ -61,13 +65,17 @@ export function BudgetField({ items }: BudgetFieldProps) {
 
   const maxAmount = Math.max(...withGrowth.map((item) => item.amountGel), 1);
   const byAmount = [...withGrowth].sort((a, b) => b.amountGel - a.amountGel);
+  const activeItem = byAmount.find((item) => item.itemId === activeId) ?? null;
+  const activeX = activeItem === null ? null : (x(activeItem.shareOfTotal * 100) / W) * 100;
+  const activeY = activeItem === null ? null : (y(activeItem.changeFromPreviousYear * 100) / H) * 100;
 
   return (
     <div data-testid="budget-field" className="mt-9 border-t border-[var(--hairline)] pt-6">
       <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის ველი</h3>
       <p className="mb-4 text-xs text-[var(--muted)]">x — წილი მთლიანიდან · y — ზრდა წინა წელთან · ზომა — მოცულობა</p>
       <div className="overflow-x-auto">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="ბიუჯეტის ველი" className="block h-auto w-full min-w-[720px]">
+      <div className="relative min-w-[720px]">
+      <svg viewBox={`0 0 ${W} ${H}`} role="group" aria-label="ბიუჯეტის ველი" className="block h-auto w-full">
         {yTicks.map((tick) => (
           <g key={`y-${tick}`}>
             <line x1={PAD_L} x2={W - PAD_R} y1={y(tick)} y2={y(tick)} stroke={tick === 0 ? "#1E1B16" : "#E7DECF"} strokeWidth={1} />
@@ -89,15 +97,44 @@ export function BudgetField({ items }: BudgetFieldProps) {
 
           return (
             <g key={item.itemId}>
-              <circle cx={cx} cy={cy} r={radius} fill={item.color} stroke="var(--paper)" strokeWidth={2}>
-                <title>
-                  {`${item.kaLabel} · ${formatAmount(item.amountGel)} · წილი ${formatShare(item.shareOfTotal)} · ზრდა ${formatShare(item.changeFromPreviousYear, true)}`}
-                </title>
+              <circle
+                cx={cx}
+                cy={cy}
+                r={radius}
+                fill={item.color}
+                stroke="var(--paper)"
+                strokeWidth={2}
+                role="img"
+                tabIndex={0}
+                aria-label={`${item.kaLabel} · ${formatAmount(item.amountGel)}`}
+                onPointerEnter={() => setActiveId(item.itemId)}
+                onPointerLeave={() => setActiveId(null)}
+                onFocus={() => setActiveId(item.itemId)}
+                onBlur={() => setActiveId(null)}
+              >
+                <title>{`${item.kaLabel} · ${formatAmount(item.amountGel)}`}</title>
               </circle>
             </g>
           );
         })}
       </svg>
+      {activeItem !== null && activeX !== null && activeY !== null ? (
+        <div
+          data-testid="budget-field-tooltip"
+          className="pointer-events-none absolute z-[2] max-w-[240px] rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
+          style={{
+            left: `${activeX}%`,
+            top: `${activeY}%`,
+            transform: `${activeX > 60 ? "translateX(calc(-100% - 10px))" : "translateX(10px)"} ${activeY > 50 ? "translateY(calc(-100% - 10px))" : "translateY(10px)"}`,
+          }}
+        >
+          <div className="text-[11px] font-medium text-[var(--body)]">{activeItem.kaLabel}</div>
+          <div className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
+            {formatAmount(activeItem.amountGel)}
+          </div>
+        </div>
+      ) : null}
+      </div>
       </div>
     </div>
   );
