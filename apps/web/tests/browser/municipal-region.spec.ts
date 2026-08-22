@@ -34,6 +34,7 @@ async function downloadMunicipalWorkbook(page: Page) {
 // იმერეთი: 12 member municipalities (data/imports/municipalities.csv), the
 // same region the brief's own manual verification step names.
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
 const REGION_URL = `${BASE_URL}/explorer/municipalities/region/imereti`;
 const ADJARA_URL = `${BASE_URL}/explorer/municipalities/region/adjara`;
 const LONG_REGION_URL = `${BASE_URL}/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti`;
@@ -122,12 +123,12 @@ test.describe("region roll-up page", () => {
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
     );
-    expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx");
-    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-06.xlsx");
-    expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-12.xlsx");
-    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx");
-    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/revenue/files/2020/mof-revenue-form-1.pdf");
-    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/revenue/files/2021/mof-revenue-form-1.pdf");
+    expect(hyperlinks).not.toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-06.xlsx`);
+    expect(hyperlinks).not.toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-12.xlsx`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/revenue/files/2020/mof-revenue-form-1.pdf`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/revenue/files/2021/mof-revenue-form-1.pdf`);
   });
 
   test("renders every member, the roll-up chart, and suppresses the per-member divergence callout", async ({ page }) => {

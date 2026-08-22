@@ -24,6 +24,7 @@ import ExcelJS from "exceljs";
 // Full section e2e coverage is Task 14's; this pins the specific gaps above.
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
 const ENTITY_URL = `${BASE_URL}/explorer/municipalities/04`; // თბილისი
 const ALL_FUNCTIONS = [
   "municipal.general_public_services",
@@ -619,10 +620,10 @@ test.describe("municipality page", () => {
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
     );
-    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx");
-    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx");
-    expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-05.xlsx");
-    expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx");
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx`);
+    expect(hyperlinks).not.toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-05.xlsx`);
+    expect(hyperlinks).not.toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx`);
   });
 
   test("2015 total-only uses the portal fallback without a history workbook", async ({ page }) => {
@@ -635,7 +636,7 @@ test.describe("municipality page", () => {
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
     );
-    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2015-2019/municipalities-portal-functionals.zip");
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2015-2019/municipalities-portal-functionals.zip`);
     expect(hyperlinks.some((value) => value.includes("budget-history-04"))).toBe(false);
   });
 
@@ -649,7 +650,7 @@ test.describe("municipality page", () => {
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
     );
-    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx");
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx`);
     expect(hyperlinks.some((value) => value.includes("municipalities-portal-functionals"))).toBe(false);
   });
 
@@ -687,7 +688,7 @@ test.describe("municipality page", () => {
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
     );
-    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2024/mof-functional-classification.xlsx");
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2024/mof-functional-classification.xlsx`);
     expect(hyperlinks.some((value) => value.includes("budget-history-11.xlsx"))).toBe(false);
   });
 

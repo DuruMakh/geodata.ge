@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
-const SOURCE_ORIGIN = "http://localhost:3000";
+const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
 
 async function downloadWorkbook(page: Page) {
   const downloadPromise = page.waitForEvent("download");

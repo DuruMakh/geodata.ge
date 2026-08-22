@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 
 const COUNTRY_URL = `${process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100"}/explorer/municipalities/georgia`;
+const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
 
 async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -80,10 +81,10 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
       : [],
   );
   expect(hyperlinks.some((value) => value.includes("/downloads/methodology/municipalities/"))).toBe(true);
-  expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx");
-  expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx");
+  expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx`);
+  expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx`);
   for (const code of ["05", "42", "43", "46", "64"]) {
-    expect(hyperlinks).toContain(`http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-${code}.xlsx`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-${code}.xlsx`);
   }
   expect(workbookJson).not.toContain("country.georgia");
 });
