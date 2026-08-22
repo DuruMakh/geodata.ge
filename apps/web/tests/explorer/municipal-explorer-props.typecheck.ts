@@ -15,7 +15,6 @@ const common = {
   pickerCountry: { id: "country.georgia" as const, nameKa: "საქართველო" as const, valueGel: 0, budgetCount: 69 as const },
   pickerGroups: [],
   sourceNote: "source",
-  introduction: "introduction",
 };
 
 const country: MunicipalExplorerProps = {

@@ -74,21 +74,24 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
   if (maxValue <= 0 && minValue >= 0) maxValue = 1;
   const posSpan = maxValue > 0 ? niceMax(maxValue) : 0;
   const negSpan = minValue < 0 ? niceMax(-minValue) : 0;
-  const step = Math.max(posSpan, negSpan) / 4;
+  const rawStep = Math.max(posSpan, negSpan) / 4;
+  const amountQuantum = unit.divisor / 10 ** unit.decimals;
+  const step = share
+    ? rawStep
+    : Math.max(amountQuantum, Math.ceil(rawStep / amountQuantum - 1e-9) * amountQuantum);
   const top = posSpan > 0 ? Math.ceil(posSpan / step - 1e-9) * step : 0;
   const bottom = negSpan > 0 ? -Math.ceil(negSpan / step - 1e-9) * step : 0;
   const span = top - bottom;
 
   const x = (index: number) => PAD_L + (n <= 1 ? (W - PAD_L - PAD_R) / 2 : (index * (W - PAD_L - PAD_R)) / (n - 1));
   const y = (value: number) => PAD_T + ((top - value) / span) * (H - PAD_T - PAD_B);
-  // Axis precision follows the gridline step so small-magnitude series (single
-  // programs, share mode) never produce duplicate or all-zero labels.
+  // Share precision follows the gridline step. Amount steps are quantized above
+  // so the shared unit formatter stays canonical without duplicate labels.
   const shareDigits = decimalsFor(step, 2);
-  const unitDigits = Math.max(1, decimalsFor(step / unit.divisor, 4));
   const formatAxis = (value: number) =>
     (share
       ? `${value.toFixed(shareDigits)}%`
-      : `${(value / unit.divisor).toLocaleString("en-US", { maximumFractionDigits: unitDigits })} ${unit.label}`
+      : `${formatInUnit(value, unit)} ${unit.label}`
     ).replace("-", "−");
 
   const formatValue = (value: number | null) =>

@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
 import type { SingleYearSnapshotModel } from "../../lib/explorer/types";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
 import { NEGATIVE } from "../../lib/explorer/colors";
@@ -40,18 +38,6 @@ export function AnalysisView({
   onGroupingChange,
   onYearChange,
 }: AnalysisViewProps) {
-  const yearStripRef = useRef<HTMLDivElement>(null);
-  const activeYearRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const strip = yearStripRef.current;
-    const active = activeYearRef.current;
-    if (!strip || !active) return;
-
-    const left = active.offsetLeft - (strip.clientWidth - active.offsetWidth) / 2;
-    strip.scrollTo({ left: Math.max(0, left), behavior: "auto" });
-  }, [grouping, side, year]);
-
   const structureTitle =
     side === "revenue"
       ? "სტრუქტურა კატეგორიების მიხედვით"
@@ -81,7 +67,7 @@ export function AnalysisView({
           </span>
         </div>
 
-        <div ref={yearStripRef} data-testid="analysis-year-selector" className="mt-4 flex items-baseline gap-4 overflow-x-auto pb-0.5">
+        <div data-testid="analysis-year-selector" className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1 pb-0.5">
           {years.map((candidate) => {
             const active = candidate === year;
 
@@ -91,7 +77,6 @@ export function AnalysisView({
                 type="button"
                 aria-pressed={active}
                 onClick={() => onYearChange(candidate)}
-                ref={active ? activeYearRef : undefined}
                 className={`min-h-9 shrink-0 cursor-pointer whitespace-nowrap border-b-2 px-[3px] pt-1.5 pb-[7px] font-[family-name:var(--font-numeric)] text-xs ${
                   active ? "border-[var(--accent)] font-semibold text-[var(--ink)]" : "border-transparent font-normal text-[var(--muted)] hover:text-[var(--ink)]"
                 }`}

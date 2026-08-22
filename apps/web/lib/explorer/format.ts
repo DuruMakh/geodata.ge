@@ -1,5 +1,5 @@
 // Editorial number formatting (DESIGN.md §11): en-US grouping, fixed decimals
-// (bn: 2, mln: 1, %: 1), minus sign is "−" (U+2212), em dash "—" for missing values.
+// (bn: 1, mln: 0, %: 1), minus sign is "−" (U+2212), em dash "—" for missing values.
 
 const BILLION = 1_000_000_000;
 const MILLION = 1_000_000;
@@ -13,11 +13,11 @@ function fixed(value: number, decimals: number): string {
   }).format(value);
 }
 
-/** Chart/table cell value in the active unit: billions with 2 decimals. */
+/** Chart/table cell value in the active unit: billions with 1 decimal. */
 export function formatBn(value: number | null | undefined): string {
   if (value === null || value === undefined) return MISSING;
   // Intl emits ASCII "-"; the module contract is U+2212 (sign is always leading).
-  return fixed(value / BILLION, 2).replace("-", "−");
+  return fixed(value / BILLION, 1).replace("-", "−");
 }
 
 export type AmountParts = { num: string; unit: string };
@@ -27,18 +27,18 @@ export function formatAmountParts(value: number | null | undefined, signed = fal
   if (value === null || value === undefined) return { num: MISSING, unit: "" };
   const sign = signed ? (value >= 0 ? "+" : "−") : value < 0 ? "−" : "";
   const abs = Math.abs(value);
-  if (abs >= 0.9995 * BILLION) return { num: sign + fixed(abs / BILLION, 2), unit: "მლრდ ₾" };
-  return { num: sign + fixed(abs / MILLION, 1), unit: "მლნ ₾" };
+  if (abs >= 0.9995 * BILLION) return { num: sign + fixed(abs / BILLION, 1), unit: "მლრდ ₾" };
+  return { num: sign + fixed(abs / MILLION, 0), unit: "მლნ ₾" };
 }
 
-/** Full amount string with unit, e.g. "26.50 მლრდ ₾". */
+/** Full amount string with unit, e.g. "26.5 მლრდ ₾". */
 export function formatAmount(value: number | null | undefined): string {
   if (value === null || value === undefined) return MISSING;
   const parts = formatAmountParts(value);
   return `${parts.num} ${parts.unit}`;
 }
 
-/** Signed full amount string, e.g. "+2.19 მლრდ ₾". */
+/** Signed full amount string, e.g. "+2.2 მლრდ ₾". */
 export function formatSignedAmount(value: number | null | undefined): string {
   if (value === null || value === undefined) return MISSING;
   const parts = formatAmountParts(value, true);
@@ -67,8 +67,8 @@ export function formatShare(fraction: number | null | undefined, signed = false,
  */
 export type ValueUnit = { divisor: number; label: string; decimals: number };
 
-export const UNIT_BN: ValueUnit = { divisor: BILLION, label: "მლრდ", decimals: 2 };
-export const UNIT_MLN: ValueUnit = { divisor: MILLION, label: "მლნ", decimals: 1 };
+export const UNIT_BN: ValueUnit = { divisor: BILLION, label: "მლრდ", decimals: 1 };
+export const UNIT_MLN: ValueUnit = { divisor: MILLION, label: "მლნ", decimals: 0 };
 
 /** Cell value in the given unit. UNIT_BN is byte-identical to formatBn. */
 export function formatInUnit(value: number | null | undefined, unit: ValueUnit): string {

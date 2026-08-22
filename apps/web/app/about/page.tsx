@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { BreadcrumbTrail } from "../../components/seo/breadcrumb-json-ld";
 import { SiteFooter } from "../../components/site/site-footer";
 import { SiteHeader } from "../../components/site/site-header";
@@ -65,9 +64,6 @@ export default async function AboutPage() {
                 შესაძლო შეცდომა ან მონაცემთან დაკავშირებული შეკითხვა გამოგვიგზავნეთ მისამართზე{" "}
                 <a href="mailto:info@fiscal.ge" className="text-[var(--accent)] underline underline-offset-4">info@fiscal.ge</a>.
               </p>
-              <Link href="/methodology" className="mt-3 inline-flex text-[12.5px] text-[var(--accent)] underline underline-offset-4">
-                მეთოდოლოგია და პირველწყაროები
-              </Link>
             </section>
           </div>
         </main>

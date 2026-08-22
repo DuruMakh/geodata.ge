@@ -776,7 +776,7 @@ describe("Georgia country aggregate models", () => {
   it("separates the country official-budget number from its GEL unit", () => {
     const officialBudget = buildCountryKpis(build(), 69)[0]!;
 
-    expect(officialBudget.value).toBe("0.0");
+    expect(officialBudget.value).toBe("0");
     expect(officialBudget.unit).toBe("მლნ ₾");
     expect(officialBudget.detail).toBe("2017 · ფინანსთა სამინისტროს ჯამი");
   });
@@ -830,7 +830,7 @@ describe("buildIndexKpis", () => {
     });
 
   it("leads with the municipal total for the latest year", () => {
-    expect(kpis()[0]!.value).toBe("2.60 მლრდ ₾");
+    expect(kpis()[0]!.value).toBe("2.6 მლრდ ₾");
     expect(kpis()[0]!.detail).toBe("2025 · 69 მუნიციპალური საბიუჯეტო ერთეული");
   });
 
@@ -867,7 +867,7 @@ describe("buildIndexKpis — fixed 2025 per-resident comparison", () => {
       latestYear: 2026,
     });
 
-    expect(kpis[0]).toMatchObject({ value: "3.90 მლრდ ₾", detail: "2026 · 69 მუნიციპალური საბიუჯეტო ერთეული" });
+    expect(kpis[0]).toMatchObject({ value: "3.9 მლრდ ₾", detail: "2026 · 69 მუნიციპალური საბიუჯეტო ერთეული" });
     expect(kpis[2]).toMatchObject({ value: "2,000 ₾", detail: "2025 · 3 მუნიციპალიტეტი" });
   });
 });
@@ -901,7 +901,7 @@ describe("buildIndexKpis — dedicated Georgia aggregate denominator", () => {
       latestYear: 2025,
     });
 
-    expect(kpis[0]!.value).toBe("2.00 მლრდ ₾");
+    expect(kpis[0]!.value).toBe("2.0 მლრდ ₾");
     expect(kpis[1]!.value).toBe("+33%");
     expect(kpis[2]).toMatchObject({ label: "მედიანური ბიუჯეტი ერთ მოსახლეზე", value: "1,050 ₾" });
     expect(kpis[3]).toMatchObject({ value: "20.0%", detail: "ეკონომიკური საქმიანობა" });
@@ -996,7 +996,7 @@ describe("buildIndexKpis — uses publicTotalGel, not functionalSumGel", () => {
   it("leads with the sum of publicTotalGel", () => {
     // publicTotalGel: 100M + 300M = 400M. Reading functionalSumGel instead
     // would sum to 900M + 50M = 950M.
-    expect(kpis()[0]!.value).toBe("400.0 მლნ ₾");
+    expect(kpis()[0]!.value).toBe("400 მლნ ₾");
   });
 
   it("computes the median from publicTotalGel", () => {
@@ -1040,7 +1040,7 @@ describe("buildEntityKpis", () => {
     // checks the label, the detail's ფინანსთა სამინისტროს wording, and the
     // model's two raw totals — it does NOT discriminate on `.value` itself:
     // at this fixture's toy-number scale formatAmount(300) and
-    // formatAmount(265) both round to the identical "0.0 მლნ ₾" string, so
+    // formatAmount(265) both round to the identical "0 მლნ ₾" string, so
     // the last assertion below would still pass even if the KPI read the
     // functional total instead. The adjacent test right below this one (GEL-
     // realistic magnitude) is the one that actually catches an
@@ -1051,7 +1051,7 @@ describe("buildEntityKpis", () => {
     expect(divergent[0]!.label).toBe("ოფიციალური ბიუჯეტი");
     expect(divergent[0]!.detail).toContain("ფინანსთა სამინისტროს");
     expect(model.totalRow.valuesByYear[2016]).toBe(300);
-    expect(divergent[0]!.value).toBe("0.0");
+    expect(divergent[0]!.value).toBe("0");
     expect(divergent[0]!.unit).toBe("მლნ ₾");
   });
 
@@ -1066,7 +1066,7 @@ describe("buildEntityKpis", () => {
 
   it("renders the official total's own formatted string, distinguishable from the functional one", () => {
     // At the fixture's 100s-scale magnitude, formatAmount(300) and
-    // formatAmount(265) both round to the same "0.0 მლნ ₾" string, so the test
+    // formatAmount(265) both round to the same "0 მლნ ₾" string, so the test
     // above cannot actually tell, from divergent[0].value alone, whether the
     // KPI read officialTotalByYear or totalRow — only that its raw output
     // equals formatAmount(300), which a functionalEnd-based value would ALSO
@@ -1091,7 +1091,7 @@ describe("buildEntityKpis", () => {
       rankByYear,
       rankOutOf: 64,
     });
-    expect(divergent[0]!.value).toBe("350.0");
+    expect(divergent[0]!.value).toBe("350");
     expect(divergent[0]!.unit).toBe("მლნ ₾");
     expect(`${divergent[0]!.value} ${divergent[0]!.unit}`).toBe(formatAmount(350_000_000));
     expect(`${divergent[0]!.value} ${divergent[0]!.unit}`).not.toBe(formatAmount(265_000_000));

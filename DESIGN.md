@@ -408,7 +408,7 @@ Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, 
 
 Excel remains dataset-owned below the selector and is not part of the shared selector contract.
 
-Full-width block, h38, ink bg, paper text, sans 12.5/600, radius 2px. Hover: opacity 0.85. Label: `Excel ჩამოტვირთვა`; while creating the file it is disabled and reads `Excel მზადდება…`; failures show `ფაილი ვერ მომზადდა — სცადეთ თავიდან.` below the action. There is one public action, no public explorer CSV action or format menu. It creates a Fiscal.ge `.xlsx` file for the active range, selected series, grouping, and measure; selector search never narrows it. The three visible sheets are `მარტივი ცხრილი`, `მონაცემები`, and `წყაროები` (§15).
+Full-width block, h38, ink bg, paper text, sans 12.5/600, radius 2px. Hover: opacity 0.85. Label: `ჩამოტვირთვა`; while creating the file it is disabled and reads `Excel მზადდება…`; failures show `ფაილი ვერ მომზადდა — სცადეთ თავიდან.` below the action. There is one public action, no public explorer CSV action or format menu. It creates a Fiscal.ge `.xlsx` file for the active range, selected series, grouping, and measure; selector search never narrows it. The three visible sheets are `მარტივი ცხრილი`, `მონაცემები`, and `წყაროები` (§15).
 
 ### 7.9 Callout / Notice
 
@@ -525,7 +525,7 @@ Canonical contract: this section and the reusable component contracts in §7. Or
 
 ### 9.1 Year Selector
 
-Horizontal row of mono 12px year buttons (scrolls on narrow screens). Active: ink 600 + 2px accent underline. Planned year: mono superscript tag `გეგმა` in faint next to the label; keep the tag in the active state.
+Wrapping row of mono 12px year buttons. Keep all years on one line when space permits; on narrower screens continue the sequence on additional lines without horizontal scrolling. Active: ink 600 + 2px accent underline. Planned year: mono superscript tag `გეგმა` in faint next to the label; keep the tag in the active state.
 
 ### 9.2 Headline Stats
 
@@ -547,7 +547,7 @@ Radar + list grid (`1fr 300px`, stacks on narrow). Radar: single polygon of top-
 
 ### 9.6 Budget Field
 
-Bubble scatter, viewBox 920×380: x = share of total, y = growth vs previous year, radius = `6 + sqrt(value/max)·16`, color = solid category token with a 2px paper-colored separation stroke. Y-axis bounds round outward to multiples of 10 percentage points. Ordinary ranges up to a 100-point span label every 10-point interval; unusually wide historical ranges use a readable `1/2/5 × 10ⁿ` interval no smaller than 10 points, targeting about eight intervals and preventing overlapping labels. Zero-growth line `1px ink`; grid `hairline-soft`; y-axis line `hairline`; axis labels mono 10px. Labels (sans 11px, `body`) only on the top 3 by amount plus |change| ≥ 20% outliers, with overlap avoidance; full values in `title` tooltips. If previous-year data is missing, show the callout: `წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.`
+Bubble scatter, viewBox 920×380: x = share of total, y = growth vs previous year, radius = `6 + sqrt(value/max)·16`, color = solid category token with a 2px paper-colored separation stroke. Y-axis bounds round outward to multiples of 10 percentage points. Ordinary ranges up to a 100-point span label every 10-point interval; unusually wide historical ranges use a readable `1/2/5 × 10ⁿ` interval no smaller than 10 points, targeting about eight intervals and preventing overlapping labels. Zero-growth line `1px ink`; grid `hairline-soft`; y-axis line `hairline`; axis labels mono 10px. Category names are not printed beside circles; full category, amount, share, and growth values live in each circle's `title` tooltip. If previous-year data is missing, show the callout: `წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.`
 
 ### 9.7 Full Ranking
 
@@ -563,9 +563,9 @@ No separate revenue direction. Same shell, tokens, controls, chart/table treatme
 
 Voice: precise, civic, archival. Georgian is primary; English only for compact technical labels (`Excel`).
 
-Canonical terms: `ხარჯები`, `შემოსავლები`, `ანალიზი`, `სერიები`, `ხაზი`, `ცხრილი`, `სფეროები`, `უწყებები`, `% მშპ-ში` (national multi-year), `% წილი` (municipal), `დიაპაზონი`, `მთლიანი ხარჯი`, `მთლიანი შემოსავლები`, `მთლიანი ბიუჯეტი`, `სულ` (single-year analysis), `ძირითადი ინდიკატორები`, `პერიოდის ცვლილება`, `ყველაზე მზარდი`, `ყველაზე ნელი ზრდა`, `პერიოდის შედარება`, `სტრუქტურა სფეროების მიხედვით`, `ყოველი 100 ლარი`, `ბიუჯეტის რადარი`, `ბიუჯეტის ველი`, `სრული რეიტინგი`, `Excel ჩამოტვირთვა`, `გეგმა`.
+Canonical terms: `ხარჯები`, `შემოსავლები`, `ანალიზი`, `სერიები`, `ხაზი`, `ცხრილი`, `სფეროები`, `უწყებები`, `% მშპ-ში` (national multi-year), `% წილი` (municipal), `დიაპაზონი`, `მთლიანი ხარჯი`, `მთლიანი შემოსავლები`, `მთლიანი ბიუჯეტი`, `სულ` (single-year analysis), `ძირითადი ინდიკატორები`, `პერიოდის ცვლილება`, `ყველაზე მზარდი`, `ყველაზე ნელი ზრდა`, `პერიოდის შედარება`, `სტრუქტურა სფეროების მიხედვით`, `ყოველი 100 ლარი`, `ბიუჯეტის რადარი`, `ბიუჯეტის ველი`, `სრული რეიტინგი`, `ჩამოტვირთვა`, `გეგმა`.
 
-Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US` grouping, fixed decimals (bn: 2, mln: 1, %: 1). Amounts ≥ ~1bn display in `მლრდ ₾`, below in `მლნ ₾`. Negative sign is `−` (minus, not hyphen) in deltas.
+Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US` grouping, fixed decimals (bn: 1, mln: 0, %: 1). Amounts ≥ ~1bn display in `მლრდ ₾`, below in `მლნ ₾`. Negative sign is `−` (minus, not hyphen) in deltas.
 
 Page titles are editorial sentences, not labels: `როგორ იხარჯება საქართველოს ბიუჯეტი`, `როგორ ივსება საქართველოს ბიუჯეტი`, `<year> წლის ბიუჯეტის სურათი — სად მიდის საჯარო ფული / საიდან მოდის საჯარო ფული`.
 
@@ -728,13 +728,13 @@ The Georgia page's total and function rows are dedicated `country.georgia` facts
 
 **One public total.** `მთლიანი ბიუჯეტი` uses `public_total_gel` in the selector, chart, table, KPIs, comparisons, percentage denominator, and Excel total row. For Adjara and Georgia this is the consolidated total. The ten functions remain unchanged and municipality-classified only; their shares can sum below or above 100%. No residual category, proportional republic allocation, or reconciliation warning appears in the explorer. The Georgia workbook uses the public entity label `საქართველო` and contains only the country total and ten country-level functions for each year; it never exposes the internal identifier `country.georgia`, a standalone value or selectable entity for an aggregate-only code, or an Adjara republic entity. Its `წყაროები` sheet may cite the underlying official originals, including those five aggregate-only bodies, solely as provenance rather than public data rows.
 
-**Unit: `მლნ ₾`, not `მლრდ ₾`.** Municipal budgets run one to three orders of magnitude below the national totals the rest of the explorer charts in billions; a billions axis would round most municipal functions to `0.0`. The municipal chart and table pass `UNIT_MLN` (`lib/explorer/format.ts` — one decimal, million GEL) to the same `EditorialLineChart`/`ExplorerTable` the budget explorer passes `UNIT_BN` to. KPI values, list rows, and the entity picker use `formatAmount`, which already auto-selects `მლნ ₾` below ~1bn GEL on its own.
+**Unit: `მლნ ₾`, not `მლრდ ₾`.** Municipal budgets run one to three orders of magnitude below the national totals the rest of the explorer charts in billions; a billions axis would hide most municipal functions after rounding. The municipal chart and table pass `UNIT_MLN` (`lib/explorer/format.ts` — whole million GEL) to the same `EditorialLineChart`/`ExplorerTable` the budget explorer passes `UNIT_BN` to. KPI values, list rows, and the entity picker use `formatAmount`, which already auto-selects `მლნ ₾` below ~1bn GEL on its own.
 
 ## 21. Methodology Surfaces
 
 Approved visual and behavioral specification: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`. Approved preview: `design-shotgun/methodology-portal-2026-08-11/variant-d.html` (Editorial Fieldbook).
 
-The public structure is `/methodology` plus live category pages for expenditure, revenue, and municipalities. Methodology is not a top-header item. Discovery comes from the current landing footer's methodology link, a substantial context-aware editorial section at the end of main data surfaces, and compact contextual links on municipality and region detail pages. This scope does not globalize or redesign the footer; where a current footer exists, the editorial section precedes it.
+The public structure is `/methodology` plus live category pages for expenditure, revenue, and municipalities. Methodology is not a top-header item. Discovery comes from the current landing footer's methodology link. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content.
 
 Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only.
 

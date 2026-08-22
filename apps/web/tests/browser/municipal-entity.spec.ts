@@ -402,17 +402,14 @@ test.describe("municipality page", () => {
     await page.getByTestId("municipal-mode-table").click();
     const table = page.getByTestId("explorer-table");
     await expect(table).toBeVisible();
-    // The regression this guards: in billions every municipal cell reads 0.00.
+    // The regression this guards: in billions every municipal cell reads 0.0.
     // Checked cell by cell, not as a substring of the table's full text: this
-    // municipality's თავდაცვა (defence) row is genuinely 0.0 for every loaded
-    // year, and eleven adjacent, individually-correct "0.0" cells concatenate
-    // to "...0.00.00.0...", which itself contains "0.00" — a naive substring
-    // check on the whole table would fail here even though every cell is
-    // individually correct. UNIT_MLN always renders exactly one decimal, so a
-    // real cell can never be the two-decimal string "0.00".
+    // municipality's თავდაცვა (defence) row genuinely rounds to 0 for every
+    // loaded year, so the check stays cell-by-cell. UNIT_MLN renders whole
+    // millions, so a correct cell can never be the decimal string "0.0".
     const cells = await table.locator("tbody td").allTextContents();
     for (const cell of cells) {
-      expect(cell).not.toBe("0.00");
+      expect(cell).not.toBe("0.0");
     }
   });
 
@@ -536,7 +533,7 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("series-row").first().getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
   });
 
-  test("keeps methodology promotion on the municipalities index, not an individual page", async ({ page }) => {
+  test("omits the compact methodology link from an individual page", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 

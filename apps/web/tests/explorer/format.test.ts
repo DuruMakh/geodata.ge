@@ -2,18 +2,25 @@ import { describe, expect, it } from "vitest";
 import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatPerResidentGel, formatShare, formatSignedAmount, UNIT_BN, UNIT_MLN } from "../../lib/explorer/format";
 
 describe("editorial formatters", () => {
-  it("formats billions with fixed decimals and en-US grouping", () => {
-    expect(formatBn(26_500_000_000)).toBe("26.50");
-    expect(formatBn(1_234_500_000_000)).toBe("1,234.50");
+  it("formats billions with one decimal and en-US grouping", () => {
+    expect(formatBn(26_500_000_000)).toBe("26.5");
+    expect(formatBn(1_234_500_000_000)).toBe("1,234.5");
     expect(formatBn(null)).toBe("—");
   });
 
   it("chooses მლრდ or მლნ by magnitude", () => {
-    expect(formatAmount(26_500_000_000)).toBe("26.50 მლრდ ₾");
-    expect(formatAmount(450_000_000)).toBe("450.0 მლნ ₾");
-    expect(formatAmountParts(2_190_000_000, true)).toEqual({ num: "+2.19", unit: "მლრდ ₾" });
-    expect(formatAmountParts(-450_000_000, true)).toEqual({ num: "−450.0", unit: "მლნ ₾" });
-    expect(formatSignedAmount(2_190_000_000)).toBe("+2.19 მლრდ ₾");
+    expect(formatAmount(26_500_000_000)).toBe("26.5 მლრდ ₾");
+    expect(formatAmount(450_400_000)).toBe("450 მლნ ₾");
+    expect(formatAmountParts(2_190_000_000, true)).toEqual({ num: "+2.2", unit: "მლრდ ₾" });
+    expect(formatAmountParts(-450_400_000, true)).toEqual({ num: "−450", unit: "მლნ ₾" });
+    expect(formatSignedAmount(2_190_000_000)).toBe("+2.2 მლრდ ₾");
+  });
+
+  it("switches units at the rounded-billion boundary", () => {
+    expect(formatAmount(999_499_999)).toBe("999 მლნ ₾");
+    expect(formatAmount(999_500_000)).toBe("1.0 მლრდ ₾");
+    expect(formatAmount(-999_499_999)).toBe("−999 მლნ ₾");
+    expect(formatAmount(-999_500_000)).toBe("−1.0 მლრდ ₾");
   });
 
   it("formats per-resident amounts as rounded whole lari", () => {
@@ -45,12 +52,12 @@ describe("formatInUnit", () => {
 
   it("renders municipal magnitudes legibly in millions", () => {
     // ლენტეხი's 2025 total: 0.02 in billions, which is why the unit is a parameter.
-    expect(formatInUnit(16_900_000, UNIT_MLN)).toBe("16.9");
-    expect(formatInUnit(2_108_000_000, UNIT_MLN)).toBe("2,108.0");
+    expect(formatInUnit(16_900_000, UNIT_MLN)).toBe("17");
+    expect(formatInUnit(2_108_000_000, UNIT_MLN)).toBe("2,108");
   });
 
   it("uses U+2212 for negatives and an em dash for missing values", () => {
-    expect(formatInUnit(-16_900_000, UNIT_MLN)).toBe("−16.9");
+    expect(formatInUnit(-16_900_000, UNIT_MLN)).toBe("−17");
     expect(formatInUnit(null, UNIT_MLN)).toBe("—");
     expect(formatInUnit(undefined, UNIT_BN)).toBe("—");
   });

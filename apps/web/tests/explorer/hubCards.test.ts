@@ -69,8 +69,8 @@ describe("buildHubCards", () => {
     expect(cards[0].footer).toContain("2025");
     // 2025 expenditure carries an explicit total row, so the card reads it
     // rather than the 2bn category sum — see the parity test below.
-    expect(cards[0].footer).toContain("9.00");
-    expect(cards[1].footer).toContain("4.00");
+    expect(cards[0].footer).toContain("9.0");
+    expect(cards[1].footer).toContain("4.0");
   });
 
   it("gives live cards a real series to draw", () => {
@@ -98,7 +98,7 @@ describe("buildHubCards", () => {
     // over the category sum, so the hub has to agree or the same year reads
     // differently on the card and on the page behind it. 2.00 would be the bare
     // category sum; 11.00 would be the sum with the total double-counted in.
-    expect(cards[0].footer).toBe("2025 · 9.00 მლრდ ₾");
+    expect(cards[0].footer).toBe("2025 · 9.0 მლრდ ₾");
     // The total row is still not a category.
     expect(cards[3].footer).toContain("1 კატეგორია");
   });
@@ -122,7 +122,7 @@ describe("buildHubCards", () => {
     // `.format(5.625)` -> "5.63"), not down. "5.62" is what the *real* 2025
     // total (5,624,861,932.94, not a tie) renders as on the live index page —
     // it does not apply to this fixture's rounder synthetic figure.
-    expect(card.footer).toBe("2025 · 5.63 მლრდ ₾");
+    expect(card.footer).toBe("2025 · 5.6 მლრდ ₾");
     // A side total is drawn in INK. ACCENT is byte-identical to the
     // spending.social_protection and revenue.vat tokens, so a total drawn in it
     // wears another category's colour (DESIGN.md §4.2). Two hub sparklines

@@ -14,7 +14,6 @@ import {
 } from "../../../../lib/explorer/municipalData";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
-import { municipalityIntroduction } from "../../../../lib/seo/content";
 import {
   coverageFromYears,
   fiscalMetadata,
@@ -143,7 +142,6 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
             next: { label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` },
           }}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
-          introduction={municipalityIntroduction({ nameKa: municipality.nameKa, firstYear, lastYear: latestYear })}
         />
       </div>
     </main>

@@ -11,7 +11,6 @@ import {
   latestReviewedAtForMunicipalFacts,
 } from "../../../../lib/explorer/municipalData";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
-import { municipalitiesIntroduction } from "../../../../lib/seo/content";
 import { coverageFromYears, fiscalMetadata } from "../../../../lib/seo/metadata";
 import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
@@ -97,7 +96,6 @@ export default async function GeorgiaMunicipalitiesPage() {
           }}
           pickerGroups={pickerGroups}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს და დამატებით მოიცავს აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივ გადასახდელებს, მუნიციპალიტეტებზე გადაცემული ტრანსფერების გამოკლებით. ფუნქციური სერიები მხოლოდ მუნიციპალურ კლასიფიკაციას ასახავს. ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ ამ ჯამშია და მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
-          introduction={municipalitiesIntroduction({ firstYear, lastYear: latestYear })}
         />
       </div>
     </main>

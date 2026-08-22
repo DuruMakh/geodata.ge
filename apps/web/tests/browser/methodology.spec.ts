@@ -55,25 +55,21 @@ test("public header keeps landing active and leaves methodology navigation inact
   }
 });
 
-for (const { path, methodologyHref } of [
-  { path: "/explorer", methodologyHref: null },
-  { path: "/explorer/expenditure", methodologyHref: "/methodology/expenditure" },
-  { path: "/explorer/revenue", methodologyHref: "/methodology/revenue" },
-  { path: "/explorer/analysis", methodologyHref: "/methodology/expenditure" },
-  { path: "/explorer/municipalities", methodologyHref: null },
-  { path: "/explorer/municipalities/04", methodologyHref: "/methodology/municipalities" },
-  { path: "/explorer/municipalities/region/imereti", methodologyHref: "/methodology/municipalities" },
+for (const path of [
+  "/explorer",
+  "/explorer/expenditure",
+  "/explorer/revenue",
+  "/explorer/analysis",
+  "/explorer/municipalities",
+  "/explorer/municipalities/04",
+  "/explorer/municipalities/region/imereti",
 ] as const) {
-  test(`${path} exposes only its applicable contextual methodology link`, async ({ page }) => {
+  test(`${path} omits inline methodology links`, async ({ page }) => {
     await page.goto(`http://localhost:3100${path}`);
 
     await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
     const methodologyLinks = page.locator('a[href^="/methodology"]');
-    if (methodologyHref === null) {
-      await expect(methodologyLinks).toHaveCount(0);
-    } else {
-      await expect(methodologyLinks.first()).toHaveAttribute("href", methodologyHref);
-    }
+    await expect(methodologyLinks).toHaveCount(0);
     await expect(page.locator("footer")).toHaveCount(0);
   });
 }
@@ -201,6 +197,23 @@ for (const dataset of ["expenditure", "revenue", "municipalities"] as const) {
     ).toBe(true);
   });
 }
+
+test("regular content pages do not repeat the methodology promotion", async ({ page }) => {
+  for (const path of [
+    "/explorer/expenditure",
+    "/explorer/revenue",
+    "/explorer/analysis",
+    "/explorer/municipalities",
+    "/explorer/municipalities/04",
+    "/explorer/municipalities/region/adjara",
+    "/explorer/municipalities/georgia",
+    "/about",
+  ]) {
+    await page.goto(`http://localhost:3100${path}`);
+    await expect(page.getByTestId("seo-introduction")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "მეთოდოლოგია და პირველწყაროები", exact: true })).toHaveCount(0);
+  }
+});
 
 test("source archives keep provenance metadata out of every public table", async ({ page }) => {
   for (const dataset of ["expenditure", "revenue", "municipalities"] as const) {
