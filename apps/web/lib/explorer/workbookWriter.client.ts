@@ -7,9 +7,9 @@ const PERCENTAGE_NUMBER_FORMAT = "0.0%;[Red](0.0%);–";
 const PLANNED_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFF1EADC" } };
 const GROUP_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFFDF7EA" } };
 const INK_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FF1E1B16" } };
+const TITLE_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFF1EADC" } };
+const INK_COLOR = { argb: "FF1E1B16" };
 const PAPER_COLOR = { argb: "FFF7F2E9" };
-const SOURCE_LINK_COLUMN = 3;
-const SOURCE_TEXT_COLUMN_WIDTH = 18;
 
 function columnLetter(column: number): string {
   let remaining = column;
@@ -27,10 +27,31 @@ function readableNumberFormat(isPercentage: boolean, isPlanned: boolean): string
   return isPercentage ? PERCENTAGE_NUMBER_FORMAT : AMOUNT_NUMBER_FORMAT;
 }
 
-function sourceRowHeight(titleKa: string, absoluteUrl: string): number {
-  const charactersPerLine = SOURCE_TEXT_COLUMN_WIDTH;
-  const lines = Math.max(Math.ceil(titleKa.length / charactersPerLine), Math.ceil(absoluteUrl.length / charactersPerLine));
-  return Math.max(30, lines * 15);
+function sourceRowHeight(titleKa: string, organizationKa: string): number {
+  const lines = Math.max(Math.ceil(titleKa.length / 36), Math.ceil(organizationKa.length / 24));
+  return Math.max(24, lines * 15);
+}
+
+function formatYearRanges(years: number[]): string {
+  const sorted = [...new Set(years)].sort((left, right) => left - right);
+  const ranges: string[] = [];
+  for (let index = 0; index < sorted.length;) {
+    const start = sorted[index]!;
+    let end = start;
+    while (index + 1 < sorted.length && sorted[index + 1] === end + 1) {
+      index += 1;
+      end = sorted[index]!;
+    }
+    ranges.push(start === end ? String(start) : `${start}–${end}`);
+    index += 1;
+  }
+  return ranges.join(", ");
+}
+
+function sourceFileFormat(absoluteUrl: string): string {
+  const filename = new URL(absoluteUrl).pathname.split("/").at(-1) ?? "";
+  const extension = filename.includes(".") ? filename.split(".").at(-1) : undefined;
+  return extension ? extension.toUpperCase() : "ფაილი";
 }
 
 function writeReadableRow(
@@ -87,8 +108,8 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
   worksheet.getCell("A2").value = readable.subtitleKa;
   for (let column = 1; column <= lastColumn; column += 1) {
     const titleCell = worksheet.getCell(1, column);
-    titleCell.fill = INK_FILL;
-    titleCell.font = { bold: true, size: 16, color: PAPER_COLOR };
+    titleCell.fill = TITLE_FILL;
+    titleCell.font = { bold: true, size: 16, color: INK_COLOR };
   }
   worksheet.getCell("A2").alignment = { vertical: "middle", wrapText: true };
 
@@ -105,31 +126,57 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
 
   const noteRow = readable.rows.length + 4;
   worksheet.getCell(noteRow, 1).value = `ერთეული: ${readable.unitLabelKa}`;
-  const sourceHeaderRow = noteRow + 1;
-  ["წელი", "ოფიციალური წყარო", "ფაილის ჩამოტვირთვა", "მოპოვებულია"].forEach((header, index) => {
-    const cell = worksheet.getCell(sourceHeaderRow, index + 1);
+
+  worksheet.getColumn(1).width = 46;
+  for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = 18;
+}
+
+function writeSourcesSheet(
+  worksheet: Worksheet,
+  sources: WorkbookExportModel["sources"],
+  years: number[],
+): void {
+  worksheet.mergeCells("A1:E1");
+  worksheet.mergeCells("A2:E2");
+  worksheet.getCell("A1").value = "წყაროები";
+  worksheet.getCell("A2").value = `${formatYearRanges(years)} · ოფიციალური პირველწყაროები`;
+  for (let column = 1; column <= 5; column += 1) {
+    const titleCell = worksheet.getCell(1, column);
+    titleCell.fill = TITLE_FILL;
+    titleCell.font = { bold: true, size: 16, color: INK_COLOR };
+  }
+  worksheet.getCell("A2").alignment = { vertical: "middle", wrapText: true };
+
+  ["პერიოდი", "ოფიციალური წყარო", "ორგანიზაცია", "ფაილი", "მოპოვებულია"].forEach((header, index) => {
+    const cell = worksheet.getCell(3, index + 1);
     cell.value = header;
     cell.fill = INK_FILL;
     cell.font = { bold: true, color: PAPER_COLOR };
     cell.alignment = { vertical: "middle", wrapText: true };
   });
-  readable.sources.forEach((source, index) => {
-    const rowNumber = sourceHeaderRow + index + 1;
-    worksheet.getCell(rowNumber, 1).value = source.years.join(", ");
+
+  sources.forEach((source, index) => {
+    const rowNumber = index + 4;
+    worksheet.getCell(rowNumber, 1).value = formatYearRanges(source.years);
     worksheet.getCell(rowNumber, 2).value = source.titleKa;
-    worksheet.getCell(rowNumber, SOURCE_LINK_COLUMN).value = {
-      text: source.absoluteUrl,
+    worksheet.getCell(rowNumber, 3).value = source.organizationKa;
+    worksheet.getCell(rowNumber, 4).value = {
+      text: "ფაილის ჩამოტვირთვა",
       hyperlink: source.absoluteUrl,
-      tooltip: source.titleKa,
+      tooltip: `${source.titleKa} · ${sourceFileFormat(source.absoluteUrl)}`,
     };
-    worksheet.getCell(rowNumber, 4).value = source.retrievedAt;
-    worksheet.getCell(rowNumber, 2).alignment = { vertical: "middle", wrapText: true };
-    worksheet.getCell(rowNumber, SOURCE_LINK_COLUMN).alignment = { vertical: "middle", wrapText: true };
-    worksheet.getRow(rowNumber).height = sourceRowHeight(source.titleKa, source.absoluteUrl);
+    worksheet.getCell(rowNumber, 4).font = { color: { argb: "FF0563C1" }, underline: true };
+    worksheet.getCell(rowNumber, 5).value = source.retrievedAt;
+    for (let column = 1; column <= 5; column += 1) {
+      worksheet.getCell(rowNumber, column).alignment = { vertical: "top", wrapText: true };
+    }
+    worksheet.getRow(rowNumber).height = sourceRowHeight(source.titleKa, source.organizationKa);
   });
 
-  worksheet.getColumn(1).width = 46;
-  for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = SOURCE_TEXT_COLUMN_WIDTH;
+  [18, 42, 30, 22, 14].forEach((width, index) => {
+    worksheet.getColumn(index + 1).width = width;
+  });
+  worksheet.autoFilter = { from: "A3", to: `E${Math.max(3, sources.length + 3)}` };
 }
 
 function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel["analysis"]): void {
@@ -172,9 +219,13 @@ export async function createWorkbookBuffer(model: WorkbookExportModel): Promise<
   const analysis = workbook.addWorksheet(model.sheetNames[1], {
     views: [{ state: "frozen", ySplit: 1, topLeftCell: "A2" }],
   });
+  const sources = workbook.addWorksheet(model.sheetNames[2], {
+    views: [{ state: "frozen", ySplit: 3, topLeftCell: "A4" }],
+  });
 
   writeReadableSheet(readable, model.readable);
   writeAnalysisSheet(analysis, model.analysis);
+  writeSourcesSheet(sources, model.sources, model.readable.years);
 
   const bytes = await workbook.xlsx.writeBuffer();
   return new Uint8Array(bytes).buffer;

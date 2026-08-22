@@ -101,7 +101,7 @@ test.describe("region roll-up page", () => {
 
     const { download, workbook } = await downloadMunicipalWorkbook(page);
     expect(download.suggestedFilename()).toBe("fiscal-region-adjara-2020-2021.xlsx");
-    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
 
     const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
     expect(readable.getRow(3).values).toEqual([
@@ -118,7 +118,7 @@ test.describe("region roll-up page", () => {
     const analysisRows = (analysis.getRows(2, 10) ?? []).filter((row) => row.getCell(1).value !== null);
     expect(analysisRows.map((row) => row.getCell(1).value)).toEqual([2020, 2021]);
     expect(analysis.getCell("D2").value).toBeCloseTo(Number(readable.getCell("B4").value) * 1_000_000);
-    const hyperlinks = readable.getSheetValues().flatMap((row) =>
+    const hyperlinks = workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
       Array.isArray(row)
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],

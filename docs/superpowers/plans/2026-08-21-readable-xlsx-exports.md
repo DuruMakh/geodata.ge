@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace public explorer CSV downloads with one Fiscal.ge `.xlsx` workbook containing a formatted `მარტივი ცხრილი` sheet and a filterable `მონაცემები` sheet.
+**Goal:** Replace public explorer CSV downloads with one Fiscal.ge `.xlsx` workbook containing formatted `მარტივი ცხრილი`, filterable `მონაცემები`, and dedicated `წყაროები` sheets.
 
 **Architecture:** Normalize national and municipal explorer rows into one pure workbook model, then serialize that model in the browser through a lazily imported ExcelJS writer. Server routes project validated methodology manifests into compact public-source metadata and pass the resolved site origin to client explorers; no API route or server-side file generation is added.
 
@@ -14,7 +14,7 @@
 
 - Start implementation from Fiscal.ge `main` at merge commit `2c5c1403` or later; preserve the committed specification.
 - Keep one public action labelled `Excel ჩამოტვირთვა`; do not add a public CSV action or file-format menu.
-- Every workbook has exactly two visible sheets in this order: `მარტივი ცხრილი`, `მონაცემები`.
+- Every workbook has exactly three visible sheets in this order: `მარტივი ცხრილი`, `მონაცემები`, `წყაროები`.
 - `მარტივი ცხრილი` starts its table on row 3; year headings and numeric values are right-aligned.
 - `მონაცემები` uses Georgian headers and never exposes category IDs, parent IDs, English labels, source IDs, hashes, review notes, or repository paths.
 - Build source hyperlinks from the resolved site origin plus validated `downloadHref`; never hardcode Fiscal.ge or a Vercel hostname in workbook-generation code.
@@ -119,7 +119,7 @@ const input: WorkbookExportInput = {
 };
 
 describe("buildWorkbookExportModel", () => {
-  it("builds two-sheet content without public IDs or duplicate sources", () => {
+  it("builds three-sheet content without public IDs or duplicate sources", () => {
     const model = buildWorkbookExportModel(input);
 
     expect(model.filename).toBe("fiscal-revenue-2020-2021.xlsx");
@@ -136,7 +136,7 @@ describe("buildWorkbookExportModel", () => {
       "სტატუსი",
     ]);
     expect(model.analysis.rows[0]).not.toContain("revenue.vat");
-    expect(model.readable.sources).toHaveLength(1);
+    expect(model.sources).toHaveLength(1);
   });
 
   it("leaves change blank for a negative starting value", () => {
@@ -452,7 +452,7 @@ import ExcelJS from "exceljs";
 import { describe, expect, it } from "vitest";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 
-it("writes the approved two-sheet workbook", async () => {
+it("writes the approved three-sheet workbook", async () => {
   const buffer = await createWorkbookBuffer(approvedModelFixture);
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(buffer);
@@ -460,6 +460,7 @@ it("writes the approved two-sheet workbook", async () => {
   expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual([
     "მარტივი ცხრილი",
     "მონაცემები",
+    "წყაროები",
   ]);
   expect(workbook.views[0]?.activeTab).toBe(0);
 
@@ -513,9 +514,13 @@ export async function createWorkbookBuffer(model: WorkbookExportModel): Promise<
   const analysis = workbook.addWorksheet("მონაცემები", {
     views: [{ state: "frozen", ySplit: 1, topLeftCell: "A2" }],
   });
+  const sources = workbook.addWorksheet("წყაროები", {
+    views: [{ state: "frozen", ySplit: 3, topLeftCell: "A4" }],
+  });
 
   writeReadableSheet(readable, model.readable);
   writeAnalysisSheet(analysis, model.analysis);
+  writeSourcesSheet(sources, model.sources, model.readable.years);
 
   const bytes = await workbook.xlsx.writeBuffer();
   return new Uint8Array(bytes).buffer;
@@ -544,8 +549,9 @@ Implement `writeReadableSheet` with these exact workbook mechanics:
 - format percentages as `0.0%;[Red](0.0%);–`;
 - indent `kind: "item"` rows with a parent label;
 - keep planned cells numeric and make the marker visible through a per-cell number format suffix: `#,##0.0 "გეგმა"` for amounts or `0.0% "გეგმა"` for percentages, plus the approved faint planned-cell fill;
-- write sources after the reading note;
-- assign hyperlink cells as `{ text: source.absoluteUrl, hyperlink: source.absoluteUrl, tooltip: source.titleKa }`.
+- keep sources off the readable sheet;
+- write `წყაროები` with `პერიოდი | ოფიციალური წყარო | ორგანიზაცია | ფაილი | მოპოვებულია`;
+- compress consecutive years into ranges and assign D-column hyperlinks as `{ text: "ფაილის ჩამოტვირთვა", hyperlink: source.absoluteUrl, tooltip: `${source.titleKa} · ${fileFormat}` }`.
 
 Implement `writeAnalysisSheet` with `worksheet.addTable({ name: "FiscalExportData", ref: "A1", headerRow: true, ... })`, filter buttons on every column, full numeric GEL values, and no totals row.
 
@@ -554,7 +560,8 @@ Implement `writeAnalysisSheet` with `worksheet.addTable({ name: "FiscalExportDat
 Assert:
 
 ```ts
-expect(readable.getCell("E18").value).toMatchObject({
+expect(sources.getCell("D4").value).toMatchObject({
+  text: "ფაილის ჩამოტვირთვა",
   hyperlink: "https://fiscal.ge/downloads/methodology/revenue/files/2020/mof-revenue-form-1.pdf",
 });
 expect(analysis.getTables()).toHaveLength(1);
@@ -890,7 +897,7 @@ Change `csvLines` to:
 
 ```ts
 type ExcelPreview = {
-  sheetNames: ["მარტივი ცხრილი", "მონაცემები"];
+  sheetNames: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"];
   headers: ["კატეგორია", string, string];
   rows: Array<[string, number, number]>;
 };
@@ -903,7 +910,7 @@ Populate it from the same active facts already used by `buildLandingData`; use t
 Document:
 
 - one `Excel ჩამოტვირთვა` action;
-- two sheet names and exact Georgian analysis headers;
+- three sheet names and exact Georgian analysis headers;
 - table beginning on row 3 and right-aligned years;
 - source hyperlinks from the validated public archive;
 - no public explorer CSV action;

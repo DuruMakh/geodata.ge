@@ -47,11 +47,11 @@ const input: WorkbookExportInput = {
 };
 
 describe("buildWorkbookExportModel", () => {
-  it("builds two-sheet content without public IDs or duplicate sources", () => {
+  it("builds three-sheet content without public IDs or duplicate sources", () => {
     const model = buildWorkbookExportModel(input);
 
     expect(model.filename).toBe("fiscal-revenue-2020-2021.xlsx");
-    expect(model.sheetNames).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+    expect(model.sheetNames).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
     expect(model.readable.subtitleKa).toBe("2020–2021 · ფაქტი და გეგმა · მილიონი ₾");
     expect(model.readable.years).toEqual([2020, 2021]);
     expect(model.readable.rows.map((row) => row.labelKa)).toEqual([
@@ -66,7 +66,8 @@ describe("buildWorkbookExportModel", () => {
       "სტატუსი",
     ]);
     expect(model.analysis.rows[0]).not.toContain("revenue.vat");
-    expect(model.readable.sources).toHaveLength(1);
+    expect(model.sources).toHaveLength(1);
+    expect(model.readable).not.toHaveProperty("sources");
     expect(model.analysis.rows).toContainEqual([2021, "გადასახადები", "დამატებული ღირებულების გადასახადი", 30, "გეგმა"]);
   });
 
@@ -92,8 +93,8 @@ describe("buildWorkbookExportModel", () => {
       ...input,
       sources: [source, { ...source, years: [2021] }],
     });
-    expect(model.readable.sources).toHaveLength(1);
-    expect(model.readable.sources[0]?.years).toEqual([2020, 2021]);
+    expect(model.sources).toHaveLength(1);
+    expect(model.sources[0]?.years).toEqual([2020, 2021]);
   });
 
   it("preserves missing years and real zero values", () => {

@@ -21,8 +21,8 @@ async function ready(page: Page) {
 }
 
 function sourceLinks(workbook: ExcelJS.Workbook): string[] {
-  const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
-  return readable.getSheetValues().flatMap((row) =>
+  const sources = workbook.getWorksheet("წყაროები")!;
+  return sources.getSheetValues().flatMap((row) =>
     Array.isArray(row)
       ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [String(cell.hyperlink)] : [])
       : [],
@@ -60,9 +60,9 @@ test("2014 ministries cite 2015-fact.xlsx with applicability year 2014", async (
   await ready(page);
   await page.getByTestId("grouping-ministries").click();
   const workbook = await downloadWorkbook(page);
-  const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
+  const sources = workbook.getWorksheet("წყაროები")!;
   const links = sourceLinks(workbook);
-  const applicabilityRow = readable.getSheetValues().find((row) => row && JSON.stringify(row).includes("/2015/mof-excel-fact.xlsx"));
+  const applicabilityRow = sources.getSheetValues().find((row) => row && JSON.stringify(row).includes("/2015/mof-excel-fact.xlsx"));
   expect(Array.isArray(applicabilityRow)).toBe(true);
   if (!Array.isArray(applicabilityRow)) throw new Error("Expected the 2014 source row");
   expect(applicabilityRow[1]).toBe("2014");

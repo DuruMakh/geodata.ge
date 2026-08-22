@@ -1,6 +1,6 @@
 # Fiscal.ge readable Excel exports design
 
-**Status:** Approved 2026-08-21
+**Status:** Approved 2026-08-21; source-sheet and title-band amendment approved 2026-08-22
 
 **Production baseline:** Fiscal.ge rebrand PR #64, merged as `2c5c1403`
 
@@ -8,10 +8,11 @@
 
 Fiscal.ge currently downloads a long-form CSV whose identifiers and provenance columns are useful for systems but inconvenient for people working in Excel. Public explorer downloads will become one `.xlsx` workbook that serves both quick reading and separate analysis without exposing repository paths or database-style column names.
 
-Every workbook has two visible sheets:
+Every workbook has three visible sheets:
 
 1. `მარტივი ცხრილი` — a formatted years-across view for reading and comparison;
-2. `მონაცემები` — a compact row-based table for filtering, calculations, and pivot tables.
+2. `მონაცემები` — a compact row-based table for filtering, calculations, and pivot tables;
+3. `წყაროები` — a clean, dedicated list of the relevant downloadable public originals.
 
 The design applies to national expenditure fields, ministry/program expenditure, national revenue, municipality and region pages, and the Georgia municipal aggregate. It establishes reusable rules for future Fiscal.ge datasets without forcing irrelevant empty columns into every workbook.
 
@@ -52,8 +53,7 @@ The sheet opens by default and follows this exact order:
 3. table header immediately below the subtitle;
 4. selected total row first, when the total is part of the active selection;
 5. selected category rows;
-6. one short reading note;
-7. deduplicated public source list.
+6. one short reading note.
 
 There is no blank row or redundant `მონაცემები` section label between the subtitle and table header.
 
@@ -81,26 +81,9 @@ The table uses categories as rows and years as columns. Year headings are right-
 - Missing years stay blank; rows are not discarded merely because they have partial coverage.
 - The displayed ordering follows the explorer model rather than re-sorting independently inside the export.
 
-### 3.4 Sources
+### 3.4 Source separation
 
-The source section contains one row per distinct relevant public original, deduplicated across categories. It displays:
-
-```text
-წელი | ოფიციალური წყარო | ფაილის ჩამოტვირთვა | მოპოვებულია
-```
-
-Rules:
-
-- source titles come from the reviewed methodology archive manifest;
-- links target the downloadable original stored under `/downloads/methodology/...`;
-- links are absolute, clickable Excel hyperlinks;
-- the displayed URL is the public URL, not `docs/Raw Data/...` or another repository path;
-- the origin comes from the shared production site resolver and is passed into workbook generation;
-- neither `fiscal.ge` nor a Vercel alias is hardcoded in the workbook writer;
-- source rows cover the selected years and are sorted oldest-to-newest to match the years-across table;
-- internal source IDs, hashes, review notes, and repeated per-observation provenance do not appear here.
-
-Fiscal.ge methodology manifests and original ZIP/file downloads remain unchanged. Their manifest CSVs are archive-integrity artifacts, not explorer dataset exports, and stay in their current formats.
+`მარტივი ცხრილი` contains no source appendix. All provenance links move to the dedicated `წყაროები` sheet so the years-across table remains visually compact.
 
 ## 4. Sheet 2 — `მონაცემები`
 
@@ -146,11 +129,32 @@ No generic column is emitted empty across an entire workbook.
 - Ministry/program hierarchy is expressed through `მთავარი ჯგუფი` and `კატეგორია`; no code column is reintroduced.
 - Filter buttons remain visible, the header row is frozen, and numeric columns are right-aligned.
 
-## 5. Reusable export model
+## 5. Sheet 3 — `წყაროები`
+
+The sheet contains one row per distinct relevant public original, deduplicated across categories. It displays:
+
+```text
+პერიოდი | ოფიციალური წყარო | ორგანიზაცია | ფაილი | მოპოვებულია
+```
+
+Rules:
+
+- continuous coverage is compressed to a range such as `2015–2019`; discontinuous coverage is shown as compact ranges rather than a comma-separated year list;
+- source titles and organizations come from the reviewed methodology archive manifest;
+- the visible hyperlink text is `ფაილის ჩამოტვირთვა`, while the hyperlink targets the absolute downloadable original under `/downloads/methodology/...` or the reviewed external official URL;
+- raw URLs, `docs/Raw Data/...`, and repository paths do not occupy visible cells;
+- the origin comes from the shared production site resolver and is passed into workbook generation;
+- neither `fiscal.ge` nor a Vercel alias is hardcoded in the workbook writer;
+- source rows cover only the selected years and are sorted oldest-to-newest;
+- internal source IDs, hashes, review notes, and repeated per-observation provenance do not appear here.
+
+Fiscal.ge methodology manifests and original ZIP/file downloads remain unchanged. Their manifest CSVs are archive-integrity artifacts, not explorer dataset exports, and stay in their current formats.
+
+## 6. Reusable export model
 
 Workbook generation is split into two independent units.
 
-### 5.1 Pure workbook model
+### 6.1 Pure workbook model
 
 A pure, library-independent builder receives explorer rows and returns a typed model containing:
 
@@ -164,9 +168,9 @@ A pure, library-independent builder receives explorer rows and returns a typed m
 
 National and municipal pages adapt their current explorer models into this shared shape. Future datasets implement the same boundary instead of adding conditions throughout the XLSX writer.
 
-### 5.2 XLSX writer
+### 6.2 XLSX writer
 
-One client-safe writer converts the typed model into the approved two-sheet workbook. It owns only workbook mechanics:
+One client-safe writer converts the typed model into the approved three-sheet workbook. It owns only workbook mechanics:
 
 - sheet creation and ordering;
 - formulas;
@@ -177,9 +181,9 @@ One client-safe writer converts the typed model into the approved two-sheet work
 
 The writer does not know how budget categories, municipality aggregates, or methodology manifests are loaded.
 
-## 6. Technical approach
+## 7. Technical approach
 
-### 6.1 Browser generation
+### 7.1 Browser generation
 
 The deployed site remains fully static. XLSX files are generated in the browser from data already loaded for the active explorer; no API route, server write, stored user export, or new public API is added.
 
@@ -193,7 +197,7 @@ The existing Blob-and-anchor download pattern remains. The MIME type is:
 application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 ```
 
-### 6.2 Public source metadata
+### 7.2 Public source metadata
 
 Server route code loads validated methodology archive rows and passes a compact export-source model to the client:
 
@@ -205,7 +209,7 @@ Server route code loads validated methodology archive rows and passes a compact 
 
 The client receives the resolved production site origin separately and constructs absolute hyperlinks. Missing source coverage for a live export year is a validation/test failure; the writer never falls back to a repository path.
 
-### 6.3 Component boundaries
+### 7.3 Component boundaries
 
 Expected implementation units:
 
@@ -218,23 +222,23 @@ Expected implementation units:
 
 The current CSV exporter and direct CSV download handlers are removed when no public consumer remains. Canonical reviewed CSV imports, methodology manifests, data validation, and database parity are untouched.
 
-## 7. Visual contract
+## 8. Visual contract
 
 The approved prototype establishes the workbook treatment:
 
 - Fiscal warm paper, ink, terracotta, and restrained rules;
 - Georgian-first labels;
-- dark title and header bands;
+- cream title bands with dark text, plus dark table-header bands;
 - total row visually separated;
 - no decorative chart, dashboard, card grid, or unnecessary worksheet;
 - `მარტივი ცხრილი` begins its data table on row 3;
 - year headings and numeric values share right alignment;
-- source URLs are readable and visually identified as links;
+- source links live only on `წყაროები` and use a clean visible download label rather than raw URL text;
 - `მონაცემები` is compact, filterable, and free of database-style names.
 
 The workbook must remain usable in Microsoft Excel and Google Sheets. Styling is allowed to degrade gracefully in other compatible spreadsheet applications, but values, formulas, sheet names, filters, and hyperlinks must survive.
 
-## 8. Accessibility and failure behavior
+## 9. Accessibility and failure behavior
 
 - The web download action retains visible keyboard focus and an accessible name that includes Excel.
 - Busy and error states are announced through an appropriate live region without moving focus.
@@ -244,9 +248,9 @@ The workbook must remain usable in Microsoft Excel and Google Sheets. Styling is
 - Negative values use both parentheses and color.
 - Source hyperlinks expose the source title and file format in their accessible spreadsheet text or tooltip.
 
-## 9. Verification and acceptance criteria
+## 10. Verification and acceptance criteria
 
-### 9.1 Pure model tests
+### 10.1 Pure model tests
 
 - years are derived from the active range;
 - search text does not change export rows;
@@ -259,11 +263,11 @@ The workbook must remain usable in Microsoft Excel and Google Sheets. Styling is
 - optional measure columns appear only when applicable;
 - source rows are deduplicated and contain no repository path.
 
-### 9.2 XLSX tests
+### 10.2 XLSX tests
 
 Read the generated workbook back with ExcelJS and assert:
 
-- exact sheet order and names: `მარტივი ცხრილი`, `მონაცემები`;
+- exact sheet order and names: `მარტივი ცხრილი`, `მონაცემები`, `წყაროები`;
 - first sheet is active;
 - readable table starts on row 3;
 - year headers are right-aligned;
@@ -276,7 +280,7 @@ Read the generated workbook back with ExcelJS and assert:
 - no cell contains `docs/Raw Data`, a source ID, or a repository path;
 - workbook filename begins with `fiscal-` and ends with `.xlsx`.
 
-### 9.3 Surface coverage
+### 10.3 Surface coverage
 
 Browser tests download and parse representative workbooks for:
 
@@ -291,7 +295,7 @@ Browser tests download and parse representative workbooks for:
 
 Tests verify the active year range, selected series, sheet names, source links, filename, and absence of a public CSV download action.
 
-### 9.4 Engineering and release gates
+### 10.4 Engineering and release gates
 
 - dependency audit after adding ExcelJS;
 - lint;
@@ -305,17 +309,17 @@ Tests verify the active year range, selected series, sheet names, source links, 
 - live Fiscal.ge page checks and representative `.xlsx` downloads;
 - downloaded workbooks opened in Microsoft Excel for a final manual smoke check.
 
-## 10. Documentation updates
+## 11. Documentation updates
 
 Implementation updates current authoritative documents together:
 
-- `Project_Definition.md` changes the public export from CSV to the approved two-sheet Excel workbook;
+- `Project_Definition.md` changes the public export from CSV to the approved three-sheet Excel workbook;
 - `DESIGN.md` replaces the CSV button/metadata contract with this Excel contract;
 - landing-page copy and preview stop presenting the explorer export as CSV;
 - relevant browser tests and user-facing filenames use Fiscal.ge naming;
 - methodology archive manifest/ZIP documentation remains unchanged.
 
-## 11. Out of scope
+## 12. Out of scope
 
 - changing reviewed facts, mappings, classifications, or source files;
 - changing methodology archive manifests or original-file publication;

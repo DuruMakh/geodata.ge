@@ -58,7 +58,7 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
 
   const { download, workbook } = await downloadMunicipalWorkbook(page);
   expect(download.suggestedFilename()).toBe("fiscal-municipalities-georgia-2020-2021.xlsx");
-  expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+  expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
   const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
   expect(readable.getCell("A1").value).toBe("საქართველო");
   expect(readable.getRow(3).values).toEqual([
@@ -75,7 +75,7 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
   const workbookValues = workbook.worksheets.map((sheet) => sheet.getSheetValues());
   const workbookJson = JSON.stringify(workbookValues);
   expect(workbookJson).not.toContain("country.georgia");
-  const hyperlinks = readable.getSheetValues().flatMap((row) =>
+  const hyperlinks = workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
     Array.isArray(row)
       ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
       : [],

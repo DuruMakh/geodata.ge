@@ -159,7 +159,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
             <div className="flex flex-col gap-3 border-t border-[var(--hairline)] pt-4">
               <PathCardLabel index="03">Excel მონაცემები</PathCardLabel>
               <p className="text-pretty text-[13.5px] leading-relaxed text-[var(--body)]">
-                ექსპლორერში შერჩეული მონაცემები ჩამოტვირთე ერთ Excel ფაილად — წასაკითხად და ანალიზისთვის.
+                ექსპლორერში შერჩეული მონაცემები ჩამოტვირთე ერთ Excel ფაილად — წასაკითხად, ანალიზისთვის და წყაროების გადასამოწმებლად.
               </p>
               <div className="mt-1.5 max-w-[340px] bg-[var(--tint)] px-3.5 py-3">
                 <div className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">

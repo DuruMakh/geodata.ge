@@ -366,7 +366,7 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
 
   const functionalExport = await downloadWorkbook(page);
   expect(functionalExport.download.suggestedFilename()).toMatch(/^fiscal-fields-\d{4}-\d{4}\.xlsx$/);
-  expect(functionalExport.workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+  expect(functionalExport.workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
   const functionalRows = functionalExport.workbook.getWorksheet("მონაცემები")!.getRows(2, 30) ?? [];
   expect(functionalRows.map((row) => row.values)).toContainEqual([
     undefined,
@@ -593,7 +593,7 @@ test("Excel download uses only the selected range and series", async ({ page }) 
   await expect(page.getByTestId("series-csv")).toHaveCount(0);
   const { download, workbook } = await downloadWorkbook(page);
   expect(download.suggestedFilename()).toBe("fiscal-fields-2020-2021.xlsx");
-  expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+  expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
   expect(workbook.getWorksheet("მარტივი ცხრილი")!.getRow(3).values).toEqual([
     undefined,
     "კატეგორია",
@@ -657,8 +657,10 @@ test("GDP share Excel download adds the analysis column and official sources", a
   expect(analysis.getCell("F2").value).toEqual(expect.any(Number));
   expect(analysis.getCell("F2").numFmt).toBe("0.0%");
   const readableText = JSON.stringify(workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues());
-  expect(readableText).toContain("https://www.geostat.ge/");
-  expect(readableText).not.toMatch(/docs[\\/]Raw Data|national-gdp-annual/);
+  const sourceText = JSON.stringify(workbook.getWorksheet("წყაროები")!.getSheetValues());
+  expect(readableText).not.toContain("https://www.geostat.ge/");
+  expect(sourceText).toContain("https://www.geostat.ge/");
+  expect(sourceText).not.toMatch(/docs[\\/]Raw Data|national-gdp-annual/);
 });
 
 test("analysis view renders the fixed single-year section order", async ({ page }) => {

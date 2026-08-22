@@ -71,8 +71,8 @@ describe("landing model", () => {
     expect(model.waffleCells.filter((color) => color === model.waffleCells[0])).toHaveLength(21);
   });
 
-  it("previews the two-sheet Excel workbook with real labels and the latest two years", () => {
-    expect(model.excelPreview.sheetNames).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+  it("previews the three-sheet Excel workbook with real labels and the latest two years", () => {
+    expect(model.excelPreview.sheetNames).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
     expect(model.excelPreview.headers).toEqual(["კატეგორია", "2024", "2025"]);
     expect(model.excelPreview.rows).toEqual([["სოციალური დაცვა", 600, 700]]);
   });

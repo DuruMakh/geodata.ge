@@ -49,19 +49,19 @@ export type WorkbookReadableRow = {
 
 export type WorkbookExportModel = {
   filename: string;
-  sheetNames: readonly ["მარტივი ცხრილი", "მონაცემები"];
+  sheetNames: readonly ["მარტივი ცხრილი", "მონაცემები", "წყაროები"];
   readable: {
     titleKa: string;
     subtitleKa: string;
     unitLabelKa: string;
     years: number[];
     rows: WorkbookReadableRow[];
-    sources: Array<WorkbookPublicSource & { absoluteUrl: string }>;
   };
   analysis: {
     headers: string[];
     rows: Array<Array<string | number | null>>;
   };
+  sources: Array<WorkbookPublicSource & { absoluteUrl: string }>;
 };
 
 const statusKa = (basis: WorkbookBasis) => (basis === "planned" ? "გეგმა" : "ფაქტი");
@@ -143,15 +143,15 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
   const range = years.length > 0 ? `-${years[0]}-${years.at(-1)}` : "";
   return {
     filename: `fiscal-${input.filenameBase}${range}.xlsx`,
-    sheetNames: ["მარტივი ცხრილი", "მონაცემები"],
+    sheetNames: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"],
     readable: {
       titleKa: input.titleKa,
       subtitleKa: subtitleKa(rows, years, input.measure.unitLabelKa),
       unitLabelKa: input.measure.unitLabelKa,
       years,
       rows,
-      sources,
     },
     analysis: { headers, rows: analysisRows },
+    sources,
   };
 }

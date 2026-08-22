@@ -31,7 +31,7 @@ describe("Georgian SEO introductions", () => {
     ).toContain("ქალაქ თბილისის მუნიციპალიტეტის ბიუჯეტი");
   });
 
-  it("describes national and municipal explorer downloads as the two-sheet Excel workbook", () => {
+  it("describes national and municipal explorer downloads as the three-sheet Excel workbook", () => {
     const introductions = [
       expenditureIntroduction({ firstYear: 2004, lastYear: 2025 }),
       revenueIntroduction({ firstYear: 2004, lastYear: 2025 }),
@@ -42,6 +42,7 @@ describe("Georgian SEO introductions", () => {
       expect(text).toContain("Excel");
       expect(text).toContain("მარტივი ცხრილი");
       expect(text).toContain("მონაცემები");
+      expect(text).toContain("წყაროები");
       expect(text).not.toContain("CSV");
     }
   });

@@ -10,7 +10,7 @@ import { colorForItem } from "../explorer/colors";
 // from the same active facts the explorer renders, so both screens always agree.
 
 export type ExcelPreview = {
-  sheetNames: ["მარტივი ცხრილი", "მონაცემები"];
+  sheetNames: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"];
   headers: ["კატეგორია", string, string];
   rows: Array<[string, number, number]>;
 };
@@ -103,7 +103,7 @@ export function buildLandingModel({ facts, glossary, sourceDocuments }: BuildLan
     .slice(0, 1)
     .map((row) => [glossary.get(row.itemId)?.kaLabel ?? row.itemId, row.values[0], row.values[1]] as [string, number, number]);
   const excelPreview: ExcelPreview = {
-    sheetNames: ["მარტივი ცხრილი", "მონაცემები"],
+    sheetNames: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"],
     headers: ["კატეგორია", String(previousYear), String(latestYear)],
     rows: previewRows,
   };

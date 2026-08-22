@@ -588,7 +588,7 @@ test.describe("municipality page", () => {
 
     const { download, workbook } = await downloadMunicipalWorkbook(page);
     expect(download.suggestedFilename()).toBe("fiscal-municipality-04-2020-2021.xlsx");
-    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
 
     const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
     expect(readable.getRow(3).values).toEqual([
@@ -615,7 +615,7 @@ test.describe("municipality page", () => {
     expect(analysis.getCell("F2").numFmt).toBe("0.0%");
     expect(analysis.getCell("F2").value).toBeCloseTo(148_386_753.36 / 1_080_555_805.54);
 
-    const hyperlinks = readable.getSheetValues().flatMap((row) =>
+    const hyperlinks = workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
       Array.isArray(row)
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
@@ -630,8 +630,8 @@ test.describe("municipality page", () => {
     await page.goto(`${ENTITY_URL}#r=2015-2015&sel=municipal.total`);
     await expectMunicipalAppReady(page);
     const { workbook } = await downloadMunicipalWorkbook(page);
-    const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
-    const hyperlinks = readable.getSheetValues().flatMap((row) =>
+    const sources = workbook.getWorksheet("წყაროები")!;
+    const hyperlinks = sources.getSheetValues().flatMap((row) =>
       Array.isArray(row)
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
@@ -644,8 +644,8 @@ test.describe("municipality page", () => {
     await page.goto(`${ENTITY_URL}#r=2016-2016&sel=municipal.total`);
     await expectMunicipalAppReady(page);
     const { workbook } = await downloadMunicipalWorkbook(page);
-    const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
-    const hyperlinks = readable.getSheetValues().flatMap((row) =>
+    const sources = workbook.getWorksheet("წყაროები")!;
+    const hyperlinks = sources.getSheetValues().flatMap((row) =>
       Array.isArray(row)
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
@@ -658,7 +658,7 @@ test.describe("municipality page", () => {
     await page.goto(`${ENTITY_URL}#r=2020-2020&sel=municipal.education`);
     await expectMunicipalAppReady(page);
     const nominal = await downloadMunicipalWorkbook(page);
-    const nominalLinks = nominal.workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues().flatMap((row) =>
+    const nominalLinks = nominal.workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
       Array.isArray(row)
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
@@ -670,7 +670,7 @@ test.describe("municipality page", () => {
     await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-share-toggle").click();
     const percentage = await downloadMunicipalWorkbook(page);
-    const percentageLinks = percentage.workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues().flatMap((row) =>
+    const percentageLinks = percentage.workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
       Array.isArray(row)
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
@@ -683,7 +683,7 @@ test.describe("municipality page", () => {
     await page.goto(`${BASE_URL}/explorer/municipalities/11#r=2024-2024&sel=municipal.total`);
     await expectMunicipalAppReady(page);
     const { workbook } = await downloadMunicipalWorkbook(page);
-    const hyperlinks = workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues().flatMap((row) =>
+    const hyperlinks = workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
       Array.isArray(row)
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],

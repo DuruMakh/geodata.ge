@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import { strFromU8, unzipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 import type { WorkbookExportModel, WorkbookReadableRow } from "../../lib/explorer/workbookModel";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
@@ -34,26 +35,26 @@ const readableRows: WorkbookReadableRow[] = [
 
 const approvedModelFixture: WorkbookExportModel = {
   filename: "fiscal-revenue-2020-2022.xlsx",
-  sheetNames: ["მარტივი ცხრილი", "მონაცემები"],
+  sheetNames: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"],
   readable: {
     titleKa: "საქართველოს საგადასახადო შემოსავლები",
     subtitleKa: "2020–2022 · ფაქტი და გეგმა · მილიონი ₾",
     unitLabelKa: "მილიონი ₾",
     years: [2020, 2021, 2022],
     rows: readableRows,
-    sources: [{
-      years: [2020],
-      titleKa: "2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები",
-      organizationKa: "საქართველოს ფინანსთა სამინისტრო",
-      downloadHref: "/downloads/methodology/revenue/files/2020/mof-revenue-form-1.pdf",
-      retrievedAt: "2026-06-09",
-      absoluteUrl: sourceUrl,
-    }],
   },
   analysis: {
     headers: ["წელი", "მთავარი ჯგუფი", "კატეგორია", "თანხა (₾)", "სტატუსი"],
     rows: [[2020, "გადასახადები", "დამატებული ღირებულების გადასახადი", 1_212_500_000, "ფაქტი"]],
   },
+  sources: [{
+    years: [2020],
+    titleKa: "2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები",
+    organizationKa: "საქართველოს ფინანსთა სამინისტრო",
+    downloadHref: "/downloads/methodology/revenue/files/2020/mof-revenue-form-1.pdf",
+    retrievedAt: "2026-06-09",
+    absoluteUrl: sourceUrl,
+  }],
 };
 
 async function loadWorkbook(model: WorkbookExportModel) {
@@ -70,19 +71,21 @@ function modelWithYears(years: number[]): WorkbookExportModel {
   };
 }
 
-function expectSourceMetadata(readable: ExcelJS.Worksheet) {
-  expect(readable.getRow(17).values).toEqual([undefined, "წელი", "ოფიციალური წყარო", "ფაილის ჩამოტვირთვა", "მოპოვებულია"]);
-  expect(readable.getCell("A18").value).toBe("2020");
-  expect(readable.getCell("B18").value).toBe("2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები");
-  expect(readable.getCell("C18").value).toMatchObject({ hyperlink: sourceUrl });
-  expect(readable.getCell("D18").value).toBe("2026-06-09");
+function expectSourceMetadata(sources: ExcelJS.Worksheet) {
+  expect(sources.getRow(3).values).toEqual([undefined, "პერიოდი", "ოფიციალური წყარო", "ორგანიზაცია", "ფაილი", "მოპოვებულია"]);
+  expect(sources.getCell("A4").value).toBe("2020");
+  expect(sources.getCell("B4").value).toBe("2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები");
+  expect(sources.getCell("C4").value).toBe("საქართველოს ფინანსთა სამინისტრო");
+  expect(sources.getCell("D4").value).toMatchObject({ text: "ფაილის ჩამოტვირთვა", hyperlink: sourceUrl });
+  expect(sources.getCell("D4").font).toMatchObject({ color: { argb: "FF0563C1" }, underline: true });
+  expect(sources.getCell("E4").value).toBe("2026-06-09");
 }
 
 describe("createWorkbookBuffer", () => {
-  it("writes the approved two-sheet workbook", async () => {
+  it("writes the approved three-sheet workbook with a cream title and separate sources", async () => {
     const workbook = await loadWorkbook(approvedModelFixture);
 
-    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები"]);
+    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
     expect(workbook.views[0]?.activeTab).toBe(0);
 
     const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
@@ -91,7 +94,8 @@ describe("createWorkbookBuffer", () => {
     expect(readable.getCell("B3").value).toBe(2020);
     expect(readable.getCell("E3").value).toBe("ცვლილება 2020–2022");
     expect(readable.getCell("B3").alignment?.horizontal).toBe("right");
-    expect(readable.getCell("A1").fill).toMatchObject({ fgColor: { argb: "FF1E1B16" } });
+    expect(readable.getCell("A1").fill).toMatchObject({ fgColor: { argb: "FFF1EADC" } });
+    expect(readable.getCell("A1").font).toMatchObject({ color: { argb: "FF1E1B16" } });
     expect(readable.getCell("A3").fill).toMatchObject({ fgColor: { argb: "FF1E1B16" } });
     expect(readable.getCell("A4").font?.bold).toBe(true);
     expect(readable.getCell("A4").fill).toMatchObject({ fgColor: { argb: "FFF1EADC" } });
@@ -103,6 +107,7 @@ describe("createWorkbookBuffer", () => {
     expect(readable.getColumn(3).width).toBe(18);
     expect([1, 2, 3, 4, 5].map((column) => readable.getColumn(column).width)).toEqual([46, 18, 18, 18, 18]);
     expect(readable.views[0]).toMatchObject({ state: "frozen", xSplit: 1, ySplit: 3 });
+    expect(readable.getCell("A17").value).toBeNull();
 
     const analysis = workbook.getWorksheet("მონაცემები")!;
     expect(analysis.getRow(1).values).toEqual([
@@ -119,6 +124,22 @@ describe("createWorkbookBuffer", () => {
     expect(analysis.getCell("C2").alignment).toMatchObject({ vertical: "top", wrapText: true });
     expect(analysis.getCell("D2").numFmt).toBe("#,##0.00;[Red](#,##0.00);–");
     expect(JSON.stringify(analysis.getRow(1).values)).not.toContain("კატეგორიის კოდი");
+
+    const sources = workbook.getWorksheet("წყაროები")!;
+    expectSourceMetadata(sources);
+    expect(sources.getCell("A1").value).toBe("წყაროები");
+    expect(sources.getCell("A1").fill).toMatchObject({ fgColor: { argb: "FFF1EADC" } });
+    expect(sources.getCell("A3").fill).toMatchObject({ fgColor: { argb: "FF1E1B16" } });
+    expect(sources.views[0]).toMatchObject({ state: "frozen", ySplit: 3 });
+  });
+
+  it("keeps the source title and file format in the hyperlink tooltip", async () => {
+    const bytes = new Uint8Array(await createWorkbookBuffer(approvedModelFixture));
+    const sourceSheetXml = strFromU8(unzipSync(bytes)["xl/worksheets/sheet3.xml"]!);
+
+    expect(sourceSheetXml).toContain(
+      'tooltip="2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები · PDF"',
+    );
   });
 
   it("keeps planned values numeric while preserving readable source and table details", async () => {
@@ -133,10 +154,10 @@ describe("createWorkbookBuffer", () => {
     expect(readable.getCell("A5").value).toBe("გადასახადები — დამატებული ღირებულების გადასახადი");
     expect(readable.getCell("A5").alignment?.indent).toBe(1);
     expect(readable.getCell("E4").value).toMatchObject({ formula: "D4/B4-1", result: 0.5 });
-    expect(readable.getCell("C18").value).toMatchObject({ hyperlink: sourceUrl });
-    expect(readable.getCell("B18").alignment?.wrapText).toBe(true);
-    expect(readable.getCell("C18").alignment?.wrapText).toBe(true);
-    expect(readable.getRow(18).height).toBeGreaterThanOrEqual(60);
+    const sources = workbook.getWorksheet("წყაროები")!;
+    expect(sources.getCell("D4").value).toMatchObject({ text: "ფაილის ჩამოტვირთვა", hyperlink: sourceUrl });
+    expect(sources.getCell("B4").alignment?.wrapText).toBe(true);
+    expect(sources.getCell("C4").alignment?.wrapText).toBe(true);
     expect(analysis.getTables()).toHaveLength(1);
     const table = analysis.getTable("FiscalExportData") as unknown as { table: { columns: Array<{ filterButton: boolean }> } };
     expect(table.table.columns.map((column) => column.filterButton)).toEqual([true, true, true, true, true]);
@@ -164,7 +185,7 @@ describe("createWorkbookBuffer", () => {
     const workbook = await loadWorkbook(modelWithYears([2020]));
 
     const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
-    expectSourceMetadata(readable);
+    expectSourceMetadata(workbook.getWorksheet("წყაროები")!);
     expect(readable.getCell("A1").value).toBe("საქართველოს საგადასახადო შემოსავლები");
     expect(readable.model.merges).toContain("A1:D1");
     expect(readable.getColumn(4).width).toBe(18);
@@ -173,7 +194,7 @@ describe("createWorkbookBuffer", () => {
   it("keeps two-year source metadata in distinct cells", async () => {
     const workbook = await loadWorkbook(modelWithYears([2020, 2021]));
 
-    expectSourceMetadata(workbook.getWorksheet("მარტივი ცხრილი")!);
+    expectSourceMetadata(workbook.getWorksheet("წყაროები")!);
   });
 
   it("keeps a program-only selection connected to its parent", async () => {
@@ -190,31 +211,36 @@ describe("createWorkbookBuffer", () => {
       ...approvedModelFixture,
       readable: {
         ...approvedModelFixture.readable,
-        sources: [{
-          ...approvedModelFixture.readable.sources[0]!,
+        rows: approvedModelFixture.readable.rows,
+      },
+      sources: [{
+          ...approvedModelFixture.sources[0]!,
           titleKa: "მოკლე წყარო",
           absoluteUrl: "https://fiscal.ge/a.pdf",
-        }],
-      },
+      }],
     });
-    const longWorkbook = await loadWorkbook(approvedModelFixture);
+    const longWorkbook = await loadWorkbook({
+      ...approvedModelFixture,
+      sources: [{
+        ...approvedModelFixture.sources[0]!,
+        titleKa: "2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლების ოფიციალური და სრულად გადამოწმებული პირველწყარო",
+      }],
+    });
 
-    const shortHeight = shortWorkbook.getWorksheet("მარტივი ცხრილი")!.getRow(18).height!;
-    const longHeight = longWorkbook.getWorksheet("მარტივი ცხრილი")!.getRow(18).height!;
-    expect(shortHeight).toBeGreaterThanOrEqual(30);
+    const shortHeight = shortWorkbook.getWorksheet("წყაროები")!.getRow(4).height!;
+    const longHeight = longWorkbook.getWorksheet("წყაროები")!.getRow(4).height!;
+    expect(shortHeight).toBeGreaterThanOrEqual(24);
     expect(longHeight).toBeGreaterThan(shortHeight);
-    expect(longHeight).toBeGreaterThanOrEqual(60);
+    expect(longHeight).toBeGreaterThanOrEqual(30);
   });
 
-  it("gives a 119-character public URL seven readable wrapped lines", async () => {
-    const longUrl = "https://fiscal.ge/downloads/methodology/revenue/files/2020/-long-public-archive-name-with-validated-source-document.pdf";
-    expect(longUrl).toHaveLength(119);
+  it("compresses continuous and discontinuous source years into readable ranges", async () => {
     const workbook = await loadWorkbook({
       ...approvedModelFixture,
-      readable: { ...approvedModelFixture.readable, sources: [{ ...approvedModelFixture.readable.sources[0]!, absoluteUrl: longUrl }] },
+      sources: [{ ...approvedModelFixture.sources[0]!, years: [2015, 2016, 2017, 2018, 2019, 2021, 2022] }],
     });
 
-    expect(workbook.getWorksheet("მარტივი ცხრილი")!.getRow(18).height).toBeGreaterThanOrEqual(105);
+    expect(workbook.getWorksheet("წყაროები")!.getCell("A4").value).toBe("2015–2019, 2021–2022");
   });
 
   it("keeps planned zeros numeric with visible amount and percentage markers", async () => {
