@@ -31,6 +31,21 @@ describe("Georgian SEO introductions", () => {
     ).toContain("ქალაქ თბილისის მუნიციპალიტეტის ბიუჯეტი");
   });
 
+  it("describes national and municipal explorer downloads as the two-sheet Excel workbook", () => {
+    const introductions = [
+      expenditureIntroduction({ firstYear: 2004, lastYear: 2025 }),
+      revenueIntroduction({ firstYear: 2004, lastYear: 2025 }),
+      municipalityIntroduction({ nameKa: "ქალაქ თბილისის მუნიციპალიტეტი", firstYear: 2015, lastYear: 2025 }),
+    ];
+
+    for (const text of introductions) {
+      expect(text).toContain("Excel");
+      expect(text).toContain("მარტივი ცხრილი");
+      expect(text).toContain("მონაცემები");
+      expect(text).not.toContain("CSV");
+    }
+  });
+
   it("keeps core introductions concise enough for the analytical page", () => {
     const texts = [
       expenditureIntroduction({ firstYear: 2004, lastYear: 2025 }),
