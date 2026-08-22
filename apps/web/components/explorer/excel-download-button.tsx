@@ -28,13 +28,20 @@ export function ExcelDownloadButton({ testId, disabled, onDownload }: ExcelDownl
         type="button"
         data-testid={testId}
         disabled={disabled || status === "working"}
+        aria-busy={status === "working"}
         onClick={start}
         className="h-[38px] w-full cursor-pointer rounded-[2px] bg-[var(--ink)] text-[12.5px] font-semibold text-[var(--paper)] transition-opacity duration-150 hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-55"
       >
         {status === "working" ? "Excel მზადდება…" : "Excel ჩამოტვირთვა"}
       </button>
-      <p aria-live="polite" className="mt-2 min-h-4 text-[11px] text-[var(--negative)]">
-        {status === "error" ? "ფაილი ვერ მომზადდა — სცადეთ თავიდან." : ""}
+      <p role="status" aria-live="polite" aria-atomic="true" className="mt-2 min-h-4 text-[11px] text-[var(--negative)]">
+        {status === "working" ? (
+          <span className="sr-only">Excel მზადდება…</span>
+        ) : status === "error" ? (
+          "ფაილი ვერ მომზადდა — სცადეთ თავიდან."
+        ) : (
+          ""
+        )}
       </p>
     </div>
   );

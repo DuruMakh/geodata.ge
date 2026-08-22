@@ -620,14 +620,19 @@ test("Excel button shows working and retryable error states", async ({ page }) =
   });
 
   const button = page.getByTestId("series-excel");
+  const announcement = page.getByRole("status");
   await button.click();
   await expect(button).toHaveText("Excel მზადდება…");
   await expect(button).toBeDisabled();
-  await expect(page.getByText("ფაილი ვერ მომზადდა — სცადეთ თავიდან.")).toBeVisible();
+  await expect(button).toHaveAttribute("aria-busy", "true");
+  await expect(announcement).toHaveText("Excel მზადდება…");
+  await expect(announcement).toHaveText("ფაილი ვერ მომზადდა — სცადეთ თავიდან.");
+  await expect(button).toHaveAttribute("aria-busy", "false");
 
   const retry = await downloadWorkbook(page);
   expect(retry.download.suggestedFilename()).toMatch(/^fiscal-fields-\d{4}-\d{4}\.xlsx$/);
-  await expect(page.getByText("ფაილი ვერ მომზადდა — სცადეთ თავიდან.")).toHaveCount(0);
+  await expect(announcement).toBeEmpty();
+  await expect(button).toHaveAttribute("aria-busy", "false");
 
   await page.getByTestId("series-toggle-all").click();
   await expect(button).toBeDisabled();
