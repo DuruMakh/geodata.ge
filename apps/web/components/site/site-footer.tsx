@@ -30,6 +30,9 @@ export function SiteFooter({ updatedAt }: { updatedAt: string }) {
             <Link href="/methodology" className="text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
               მეთოდოლოგია
             </Link>
+            <Link href="/about" className="text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
+              Fiscal.ge-ის შესახებ
+            </Link>
           </div>
           <div className="flex max-w-[340px] flex-col gap-[9px]">
             <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">მონაცემები</span>

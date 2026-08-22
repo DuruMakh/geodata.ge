@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import path from "node:path";
 import { MethodologyArticle } from "../../../components/methodology/methodology-article";
+import { JsonLd } from "../../../components/seo/json-ld";
 import { SiteFooter } from "../../../components/site/site-footer";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
 import {
@@ -12,6 +13,9 @@ import {
 import { loadGeneratedArchiveSummaries } from "../../../lib/methodology/prepareArchives";
 import { loadReviewedSourceManifest } from "../../../lib/methodology/sourceManifest";
 import type { MethodologyDatasetId } from "../../../lib/methodology/types";
+import { fiscalMetadata } from "../../../lib/seo/metadata";
+import { datasetJsonLd } from "../../../lib/seo/structuredData";
+import { resolveSiteUrl } from "../../../lib/siteUrl";
 
 type MethodologyDatasetPageProps = {
   params: Promise<{ dataset: string }>;
@@ -32,25 +36,24 @@ function validatedDataset(value: string): MethodologyDatasetId {
   return value;
 }
 
+const DATASET_DOWNLOADS = {
+  expenditure: "/downloads/data/national-expenditure.csv",
+  revenue: "/downloads/data/national-revenue.csv",
+  municipalities: "/downloads/data/municipal-expenditure.csv",
+} as const;
+
 export async function generateMetadata({ params }: MethodologyDatasetPageProps): Promise<Metadata> {
   const dataset = validatedDataset((await params).dataset);
   const content = METHODOLOGY_CONTENT[dataset];
-  const title = `${content.titleKa} — Fiscal.ge`;
-  const canonical = `/methodology/${dataset}`;
+  const title = `${content.titleKa} — მეთოდოლოგია და მონაცემები | Fiscal.ge`;
+  const canonical: `/methodology/${MethodologyDatasetId}` = `/methodology/${dataset}`;
 
-  return {
+  return fiscalMetadata({
     title,
     description: content.summaryKa,
-    alternates: { canonical },
-    openGraph: {
-      type: "article",
-      siteName: "Fiscal.ge",
-      locale: "ka_GE",
-      url: canonical,
-      title,
-      description: content.summaryKa,
-    },
-  };
+    path: canonical,
+    type: "article",
+  });
 }
 
 export default async function MethodologyDatasetPage({ params }: MethodologyDatasetPageProps) {
@@ -79,11 +82,30 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
 
   return (
     <>
+      <JsonLd
+        data={datasetJsonLd({
+          origin: resolveSiteUrl(),
+          path: `/methodology/${dataset}`,
+          name: content.titleKa,
+          description: content.summaryKa,
+          firstYear: coverage.firstYear,
+          lastYear: coverage.lastYear,
+          dateModified: content.reviewedAt,
+          downloadPath: DATASET_DOWNLOADS[dataset],
+        })}
+        testId="dataset-json-ld"
+      />
       <MethodologyArticle
         content={content}
         coverage={coverage}
         rows={publicRows}
         archiveSummary={archiveSummaries[dataset]}
+        processedDataHref={DATASET_DOWNLOADS[dataset]}
+        breadcrumbItems={[
+          { name: "მთავარი", path: "/" },
+          { name: "მეთოდოლოგია", path: "/methodology" },
+          { name: content.titleKa, path: `/methodology/${dataset}` },
+        ]}
       />
       <div className="mx-auto w-full max-w-[1240px] px-5 min-[768px]:px-7">
         <SiteFooter updatedAt={updatedAt} />

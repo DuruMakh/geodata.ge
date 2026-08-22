@@ -1,12 +1,21 @@
 import Link from "next/link";
 import { FUTURE_METHODOLOGY_DATASETS } from "../../lib/methodology/catalog";
 import type { MethodologyHubEntry } from "../../lib/methodology/types";
+import type { BreadcrumbItem } from "../../lib/seo/structuredData";
+import { BreadcrumbTrail } from "../seo/breadcrumb-json-ld";
 import { ComingSoonBadge } from "../ui/editorial";
 import { OpenDocumentVisual } from "./document-visuals";
 
-export function MethodologyHub({ liveEntries }: { liveEntries: readonly MethodologyHubEntry[] }) {
+export function MethodologyHub({
+  liveEntries,
+  breadcrumbItems,
+}: {
+  liveEntries: readonly MethodologyHubEntry[];
+  breadcrumbItems: readonly BreadcrumbItem[];
+}) {
   return (
     <main data-testid="methodology-hub" className="mx-auto w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-14">
+      <BreadcrumbTrail items={breadcrumbItems} />
       <section className="grid items-center gap-10 border-b-2 border-[var(--ink)] pb-14 min-[860px]:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] min-[860px]:gap-16 min-[860px]:pb-20">
         <div className="max-w-[620px]">
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">ღია მონაცემების საფუძველი</p>

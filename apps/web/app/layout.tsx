@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Sans_Georgian, Noto_Serif_Georgian } from "next/font/google";
+import { JsonLd } from "../components/seo/json-ld";
 import { resolveSiteUrl } from "../lib/siteUrl";
+import { siteJsonLd } from "../lib/seo/structuredData";
 import "./globals.css";
 
 const notoSansGeorgian = Noto_Sans_Georgian({
@@ -26,13 +28,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(resolveSiteUrl()),
-  title: "Fiscal.ge Budget Explorer",
-  description: "Georgian-first public budget explorer for Georgia.",
-  openGraph: {
-    type: "website",
-    siteName: "Fiscal.ge",
-    locale: "ka_GE",
-  },
+  title: { default: "Fiscal.ge", template: "%s" },
+  description:
+    "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებული, მრავალწლიანი და ღია მონაცემები.",
 };
 
 export default function RootLayout({
@@ -45,7 +43,10 @@ export default function RootLayout({
       lang="ka"
       className={`h-full antialiased ${notoSansGeorgian.variable} ${notoSerifGeorgian.variable} ${geistMono.variable}`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <JsonLd data={siteJsonLd(resolveSiteUrl())} testId="site-json-ld" />
+        {children}
+      </body>
     </html>
   );
 }

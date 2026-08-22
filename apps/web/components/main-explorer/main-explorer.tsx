@@ -25,6 +25,8 @@ import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { AnalysisView } from "../analysis/analysis-view";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { PageHeader } from "../shell/page-header";
+import { SeoIntroduction } from "../seo/seo-introduction";
+import { analysisIntroduction, expenditureIntroduction, revenueIntroduction } from "../../lib/seo/content";
 import { ExplorerView } from "./explorer-view";
 import { useExplorerState } from "./use-explorer-state";
 
@@ -198,6 +200,11 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
   ]
     .filter(Boolean)
     .join(" · ");
+  const seoIntroduction = isAnalysis
+    ? analysisIntroduction(analysisYears.at(-1) ?? 0)
+    : nav === "revenue"
+      ? revenueIntroduction({ firstYear: coverageYears[0]!, lastYear: coverageYears.at(-1)! })
+      : expenditureIntroduction({ firstYear: coverageYears[0]!, lastYear: coverageYears.at(-1)! });
 
   function buildWorkbookInput(): WorkbookExportInput {
     const labelById = new Map(model.items.map((item) => [item.id, item.kaLabel]));
@@ -279,6 +286,11 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
             </>
           ) : null}
         </p>
+
+        <SeoIntroduction
+          text={seoIntroduction}
+          methodologyHref={nav === "revenue" ? "/methodology/revenue" : "/methodology/expenditure"}
+        />
 
         {analysisModel ? (
           <AnalysisView

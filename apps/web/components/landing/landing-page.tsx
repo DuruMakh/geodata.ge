@@ -135,7 +135,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
                   <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{model.revMax}</span>
                 </div>
               </div>
-              <PathCardLink href="/explorer">ექსპლორერის გახსნა</PathCardLink>
+              <PathCardLink href="/explorer/expenditure">ხარჯების ექსპლორერი</PathCardLink>
             </div>
 
             <div className="flex flex-col gap-3 border-t border-[var(--hairline)] pt-4">
@@ -193,9 +193,29 @@ export function LandingPage({ model }: { model: LandingModel }) {
                   </tbody>
                 </table>
               </div>
-              <PathCardLink href="/explorer">ექსპლორერში ჩამოტვირთვა</PathCardLink>
+              <PathCardLink href="/explorer/revenue">შემოსავლების მონაცემები</PathCardLink>
             </div>
           </div>
+          <Link
+            href="/explorer/municipalities"
+            className="mt-8 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
+          >
+            საქართველოს მუნიციპალიტეტების ბიუჯეტები →
+          </Link>
+        </section>
+
+        <section className="mt-14 border-t-2 border-[var(--ink)] pt-[22px]" aria-labelledby="about-fiscal-title">
+          <h2 id="about-fiscal-title" className="font-[family-name:var(--font-display)] text-[22px] font-semibold">
+            რა არის Fiscal.ge?
+          </h2>
+          <p className="mt-4 max-w-[760px] text-[13.5px] leading-[1.8] text-[var(--body)]">
+            Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ,
+            მრავალწლიან მონაცემებს. ოფიციალური სამართლებრივი დოკუმენტი უცვლელად რჩება პირველწყაროდ;
+            Fiscal.ge მონაცემებს ადარებად, გასაგებად და ჩამოსატვირთად აწყობს.
+          </p>
+          <Link href="/methodology" className="mt-3 inline-flex text-[12.5px] text-[var(--accent)] underline underline-offset-4">
+            პირველწყაროები და მეთოდოლოგია
+          </Link>
         </section>
 
         <MethodologyPromo

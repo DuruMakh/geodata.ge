@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../../../components/municipalities/municipal-explorer";
+import { BreadcrumbJsonLd } from "../../../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../lib/data/servedData";
 import { MUNICIPAL_COUNTRY_ID } from "../../../../lib/data/municipal/types";
@@ -12,6 +13,12 @@ import {
 } from "../../../../lib/explorer/municipalData";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
+import { municipalityIntroduction } from "../../../../lib/seo/content";
+import {
+  coverageFromYears,
+  fiscalMetadata,
+  municipalityBudgetTitleKa,
+} from "../../../../lib/seo/metadata";
 import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
 // The 64 codes are the complete, closed set. Without this, an unknown code is
@@ -29,23 +36,12 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
   const municipality = municipalities.find((row) => row.code === code);
   if (!municipality) return {};
 
-  const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const title = `${municipality.displayNameKa} — მუნიციპალიტეტები — Fiscal.ge`;
-  const description = `${municipality.displayNameKa} — მუნიციპალური ბიუჯეტი ფუნქციების მიხედვით, ${years[0]}–${years.at(-1)}.`;
-
-  return {
-    title,
-    description,
-    alternates: { canonical: `/explorer/municipalities/${code}` },
-    openGraph: {
-      type: "website",
-      siteName: "Fiscal.ge",
-      locale: "ka_GE",
-      url: `/explorer/municipalities/${code}`,
-      title,
-      description,
-    },
-  };
+  const { firstYear, lastYear } = coverageFromYears(totalFacts);
+  return fiscalMetadata({
+    title: municipalityBudgetTitleKa(municipality.nameKa, firstYear, lastYear),
+    description: `${municipality.nameKa}ს ფაქტობრივი ბიუჯეტი ფუნქციების მიხედვით, ${firstYear}–${lastYear}.`,
+    path: `/explorer/municipalities/${code}`,
+  });
 }
 
 export default async function MunicipalityPage({ params }: { params: Promise<{ code: string }> }) {
@@ -98,6 +94,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }, { name: municipality.displayNameKa, path: `/explorer/municipalities/${code}` }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[
@@ -141,6 +138,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
             next: { label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` },
           }}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          introduction={municipalityIntroduction({ nameKa: municipality.nameKa, firstYear, lastYear: latestYear })}
         />
       </div>
     </main>

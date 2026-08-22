@@ -20,7 +20,7 @@ test("landing renders the site v2 structure with live data", async ({ page }) =>
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto(baseUrl);
 
-  await expect(page).toHaveTitle("Fiscal.ge — საქართველოს ბიუჯეტის ექსპლორერი");
+  await expect(page).toHaveTitle("საქართველოს ბიუჯეტი და მუნიციპალური მონაცემები | Fiscal.ge");
   await expect(page.getByTestId("landing-shell")).toBeVisible();
   await expect(page.getByTestId("landing-header")).toContainText("Fiscal.ge");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება და იხარჯება საქართველოს ბიუჯეტი");

@@ -27,6 +27,11 @@ describe("resolveSiteUrl", () => {
     expect(resolveSiteUrl()).toBe("https://fiscal.ge");
   });
 
+  it("rejects an explicit site URL that is not a bare HTTPS origin", () => {
+    setEnv({ NEXT_PUBLIC_SITE_URL: "https://fiscal.ge/explorer" });
+    expect(() => resolveSiteUrl()).toThrow(/HTTPS origin without a path/i);
+  });
+
   it("falls back to the Vercel production host with https", () => {
     setEnv({ VERCEL_PROJECT_PRODUCTION_URL: "geodata-ge.vercel.app" });
     expect(resolveSiteUrl()).toBe("https://geodata-ge.vercel.app");

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MunicipalitiesIndex } from "../../../components/municipalities/municipalities-index";
+import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
 import {
@@ -11,27 +12,17 @@ import {
 } from "../../../lib/explorer/municipalData";
 import { formatPerResidentGel } from "../../../lib/explorer/format";
 import { buildMunicipalityMapModel } from "../../../lib/explorer/municipalityMapData";
-
-const TITLE = "მუნიციპალიტეტები — Fiscal.ge";
+import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
+import { municipalitiesIntroduction } from "../../../lib/seo/content";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { totalFacts } = await loadServedMunicipalData();
-  const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const description = `საქართველოს მუნიციპალიტეტების ბიუჯეტები ფუნქციების მიხედვით, ${years[0]} წლიდან დღემდე.`;
-
-  return {
-    title: TITLE,
-    description,
-    alternates: { canonical: "/explorer/municipalities" },
-    openGraph: {
-      type: "website",
-      siteName: "Fiscal.ge",
-      locale: "ka_GE",
-      url: "/explorer/municipalities",
-      title: TITLE,
-      description,
-    },
-  };
+  const { firstYear, lastYear } = coverageFromYears(totalFacts);
+  return fiscalMetadata({
+    title: `საქართველოს მუნიციპალიტეტების ბიუჯეტები ${firstYear}–${lastYear} | Fiscal.ge`,
+    description: `საქართველოს მუნიციპალიტეტების ფაქტობრივი ბიუჯეტები ფუნქციების მიხედვით, ${firstYear}–${lastYear}.`,
+    path: "/explorer/municipalities",
+  });
 }
 
 export default async function MunicipalitiesIndexPage() {
@@ -61,6 +52,7 @@ export default async function MunicipalitiesIndexPage() {
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[
@@ -75,7 +67,7 @@ export default async function MunicipalitiesIndexPage() {
           რას ხარჯავენ საქართველოს მუნიციპალიტეტები
         </h1>
         <p className="mb-[26px] max-w-[560px] text-[13.5px] leading-relaxed text-[var(--body)]">
-          აირჩიე მუნიციპალიტეტი რუკაზე ან სიაში — გაიხსნება შესაბამისი ბიუჯეტის სრული ისტორია ფუნქციების მიხედვით.
+          {municipalitiesIntroduction({ firstYear, lastYear: latestYear })}
         </p>
 
         <MunicipalitiesIndex

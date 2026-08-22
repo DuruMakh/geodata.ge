@@ -104,7 +104,7 @@ Production builds from the Supabase mirror; previews and local dev need none.
 | --- | --- | --- |
 | `DATABASE_URL` | Production only | Supabase pooled connection (port 6543, `?pgbouncer=true`) |
 | `GEODATA_DATA_SOURCE` | Production only | `db` |
-| `NEXT_PUBLIC_SITE_URL` | optional, normally unset | canonical site origin override (below) |
+| `NEXT_PUBLIC_SITE_URL` | Production only | canonical site origin, exactly `https://fiscal.ge` |
 
 - The db-mode build renders from the mirror and re-verifies it row-by-row
   against the checkout's CSVs; see
@@ -114,11 +114,10 @@ Production builds from the Supabase mirror; previews and local dev need none.
   redeploy; production then builds straight from the reviewed CSVs with no
   database involved. Both modes are guaranteed identical by the parity
   checks.
-- **`NEXT_PUBLIC_SITE_URL`** (optional): overrides the canonical site origin
-  used in Open Graph URLs, canonicals, `robots.txt`, and `sitemap.xml`
-  (`apps/web/lib/siteUrl.ts`). Normally unset — the build uses Vercel's
-  `VERCEL_PROJECT_PRODUCTION_URL`, which automatically becomes the custom
-  domain once one is attached.
+- **`NEXT_PUBLIC_SITE_URL`**: set to exactly `https://fiscal.ge` in Production.
+  It owns Open Graph URLs, canonicals, `robots.txt`, and `sitemap.xml`
+  (`apps/web/lib/siteUrl.ts`) independently of Vercel alias ordering. The value
+  must be a bare HTTPS origin without a path, query, or fragment.
 
 ## GitHub Actions credentials
 
@@ -202,9 +201,10 @@ before rerunning.
    production (dashboard → Deployments → ⋯ → *Redeploy*, or Actions →
    *Deploy production* → *Run workflow*) so canonicals, `robots.txt`, and
    `sitemap.xml` pick up the new domain via `VERCEL_PROJECT_PRODUCTION_URL`.
-5. `https://geodata-ge.vercel.app` keeps working as an alias; its pages point
-   their canonical URLs at the custom domain, so search engines index only the
-   domain.
+5. `https://geodata-ge.vercel.app` is outside the production SEO contract. The
+   owner will configure it separately as a preview surface; do not use it as
+   production deployment evidence and do not redirect it as part of Fiscal.ge
+   SEO work.
 
 ## SEO and headers
 
