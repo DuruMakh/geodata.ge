@@ -39,7 +39,13 @@ server-side at request time.
      converging the Supabase mirror to the checkout — unconditionally, on
      every deploy (the import is idempotent; the parity report is in the
      workflow log);
-  3. it POSTs the Vercel deploy hook, and Vercel builds latest `main` with
+  3. it runs the db-mode build itself (`GEODATA_DATA_SOURCE=db npm run
+     build`, over the pooled `DATABASE_URL`), so the exact build Vercel is
+     about to run is proven before the hook fires — nothing earlier in the
+     pipeline exercises that path for this commit, because PR CI builds only
+     in CSV mode and `db-health.yml` runs on a weekly schedule rather than per
+     commit;
+  4. it POSTs the Vercel deploy hook, and Vercel builds latest `main` with
      `GEODATA_DATA_SOURCE=db`, regenerating and validating the methodology
      archives in `prebuild`, and re-verifying the mirror row-by-row during the
      build.
@@ -137,16 +143,22 @@ nothing here can take the site down.
 
 **A green *Deploy production* run does not mean the deploy landed.** The final
 step POSTs the deploy hook and `curl -f` only proves Vercel accepted the
-trigger; the db-mode build that re-verifies the mirror and produces the site
-runs asynchronously, after the workflow has already gone green. So a paused
-pooler at build time, a stale Vercel Production `DATABASE_URL`, or any build
-error surfaces *only* as the Vercel failed-deployment email in the table below
-— and with `main` auto-deploy off, nothing retries on its own. Confirm a
-release by checking the deployment in the Vercel dashboard, not by the green
-check in the Actions tab. (Closing this gap means polling
-`GET /v13/deployments/{id}` with the hook's returned job id until
-`READY`/`ERROR`, which needs a `VERCEL_TOKEN` secret this pipeline does not
-currently hold.)
+trigger; Vercel then builds asynchronously, after the workflow has already
+gone green. Confirm a release by checking the deployment in the Vercel
+dashboard, not by the green check in the Actions tab. (Closing this gap means
+polling `GET /v13/deployments/{id}` with the hook's returned job id — which
+the workflow now extracts and prints — until `READY`/`ERROR`, and that needs a
+`VERCEL_TOKEN` secret this pipeline does not currently hold.)
+
+What a green run *does* now prove is that the build works: the workflow runs
+`GEODATA_DATA_SOURCE=db npm run build` against the converged mirror before it
+fires the hook. A code-level db-mode failure — a `mirrorRows.ts` mapping gap, a
+parity assertion, a pooler-only query problem — therefore fails the workflow
+red rather than surfacing later as a Vercel email. What remains outside that
+gate is environment drift between the runner and Vercel: a pooler paused
+between the two builds, or a stale Vercel Production `DATABASE_URL`. Those
+still show up only as the Vercel failed-deployment email in the table below,
+and with `main` auto-deploy off nothing retries on its own.
 
 | Failure | Symptom | Response |
 | --- | --- | --- |
