@@ -101,7 +101,7 @@ describe("createWorkbookBuffer", () => {
     expect(readable.getColumn(1).width).toBeGreaterThanOrEqual(42);
     expect(readable.getColumn(2).width).toBe(18);
     expect(readable.getColumn(3).width).toBe(18);
-    expect(readable.getColumn(4).width).toBe(18);
+    expect(readable.getColumn(4).width).toBe(16);
     expect(readable.views[0]).toMatchObject({ state: "frozen", xSplit: 1, ySplit: 3 });
 
     const analysis = workbook.getWorksheet("მონაცემები")!;
@@ -114,6 +114,10 @@ describe("createWorkbookBuffer", () => {
       "სტატუსი",
     ]);
     expect(analysis.getCell("D2").type).toBe(ExcelJS.ValueType.Number);
+    expect([1, 2, 3, 4, 5].map((column) => analysis.getColumn(column).width)).toEqual([10, 28, 42, 18, 12]);
+    expect(analysis.getCell("B2").alignment).toMatchObject({ vertical: "top", wrapText: true });
+    expect(analysis.getCell("C2").alignment).toMatchObject({ vertical: "top", wrapText: true });
+    expect(analysis.getCell("D2").numFmt).toBe("#,##0.00;[Red](#,##0.00);–");
     expect(JSON.stringify(analysis.getRow(1).values)).not.toContain("კატეგორიის კოდი");
   });
 
@@ -124,7 +128,7 @@ describe("createWorkbookBuffer", () => {
 
     expect(readable.getCell("C5").type).toBe(ExcelJS.ValueType.Number);
     expect(readable.getCell("C5").value).toBe(-120);
-    expect(readable.getCell("C5").numFmt).toBe('#,##0.0 "გეგმა";[Red](#,##0.0) "გეგმა";–');
+    expect(readable.getCell("C5").numFmt).toBe('#,##0.0 "გეგმა";[Red](#,##0.0) "გეგმა";0.0 "გეგმა"');
     expect(readable.getCell("C5").fill).toMatchObject({ type: "pattern", fgColor: { argb: "FFF1EADC" } });
     expect(readable.getCell("A5").value).toBe("გადასახადები — დამატებული ღირებულების გადასახადი");
     expect(readable.getCell("A5").alignment?.indent).toBe(1);
@@ -153,12 +157,17 @@ describe("createWorkbookBuffer", () => {
     expect(analysis.getCell("F1").value).toBe("მშპ-ის წილი (%)");
     expect(analysis.getCell("F2").value).toBe(0.025);
     expect(analysis.getCell("F2").numFmt).toBe("0.0%");
+    expect(analysis.getColumn(6).width).toBe(16);
   });
 
   it("keeps one-year source metadata in distinct cells", async () => {
     const workbook = await loadWorkbook(modelWithYears([2020]));
 
-    expectSourceMetadata(workbook.getWorksheet("მარტივი ცხრილი")!);
+    const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
+    expectSourceMetadata(readable);
+    expect(readable.getCell("A1").value).toBe("საქართველოს საგადასახადო შემოსავლები");
+    expect(readable.model.merges).toContain("A1:D1");
+    expect(readable.getColumn(4).width).toBe(16);
   });
 
   it("keeps two-year source metadata in distinct cells", async () => {
@@ -206,5 +215,28 @@ describe("createWorkbookBuffer", () => {
     });
 
     expect(workbook.getWorksheet("მარტივი ცხრილი")!.getRow(18).height).toBeGreaterThanOrEqual(105);
+  });
+
+  it("keeps planned zeros numeric with visible amount and percentage markers", async () => {
+    const amountWorkbook = await loadWorkbook({
+      ...approvedModelFixture,
+      readable: {
+        ...approvedModelFixture.readable,
+        rows: [{ ...readableRows[1]!, valuesByYear: { 2020: 0, 2021: 0, 2022: 0 }, basisByYear: { 2020: "planned", 2021: "planned", 2022: "planned" } }],
+      },
+    });
+    const percentageWorkbook = await loadWorkbook({
+      ...approvedModelFixture,
+      readable: {
+        ...approvedModelFixture.readable,
+        unitLabelKa: "% მშპ-ში",
+        rows: [{ ...readableRows[1]!, valuesByYear: { 2020: 0, 2021: 0, 2022: 0 }, basisByYear: { 2020: "planned", 2021: "planned", 2022: "planned" } }],
+      },
+    });
+
+    expect(amountWorkbook.getWorksheet("მარტივი ცხრილი")!.getCell("B4").value).toBe(0);
+    expect(amountWorkbook.getWorksheet("მარტივი ცხრილი")!.getCell("B4").numFmt).toContain("გეგმა");
+    expect(percentageWorkbook.getWorksheet("მარტივი ცხრილი")!.getCell("B4").value).toBe(0);
+    expect(percentageWorkbook.getWorksheet("მარტივი ცხრილი")!.getCell("B4").numFmt).toContain("გეგმა");
   });
 });

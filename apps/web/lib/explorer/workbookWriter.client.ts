@@ -23,7 +23,7 @@ function columnLetter(column: number): string {
 }
 
 function readableNumberFormat(isPercentage: boolean, isPlanned: boolean): string {
-  if (isPlanned) return isPercentage ? '0.0% "გეგმა";[Red](0.0%) "გეგმა";–' : '#,##0.0 "გეგმა";[Red](#,##0.0) "გეგმა";–';
+  if (isPlanned) return isPercentage ? '0.0% "გეგმა";[Red](0.0%) "გეგმა";0.0% "გეგმა"' : '#,##0.0 "გეგმა";[Red](#,##0.0) "გეგმა";0.0 "გეგმა"';
   return isPercentage ? PERCENTAGE_NUMBER_FORMAT : AMOUNT_NUMBER_FORMAT;
 }
 
@@ -77,7 +77,7 @@ function writeReadableRow(
 }
 
 function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel["readable"]): void {
-  const lastColumn = readable.years.length + 2;
+  const lastColumn = Math.max(readable.years.length + 2, 4);
   const lastColumnLetter = columnLetter(lastColumn);
   const isPercentage = readable.unitLabelKa.includes("%");
 
@@ -130,6 +130,7 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
 
   worksheet.getColumn(1).width = 46;
   for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = SOURCE_TEXT_COLUMN_WIDTH;
+  worksheet.getColumn(4).width = 16;
 }
 
 function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel["analysis"]): void {
@@ -146,6 +147,17 @@ function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel[
   for (const column of percentageColumns) {
     for (let row = 2; row <= analysis.rows.length + 1; row += 1) worksheet.getCell(row, column).numFmt = "0.0%";
   }
+  const widths = [10, 28, 42, 18, 12, 16];
+  analysis.headers.forEach((_, index) => {
+    const column = index + 1;
+    worksheet.getColumn(column).width = widths[index] ?? 18;
+    const header = worksheet.getCell(1, column);
+    header.alignment = { vertical: "top", wrapText: true };
+    if (column === 2 || column === 3) {
+      for (let row = 2; row <= analysis.rows.length + 1; row += 1) worksheet.getCell(row, column).alignment = { vertical: "top", wrapText: true };
+    }
+  });
+  for (let row = 2; row <= analysis.rows.length + 1; row += 1) worksheet.getCell(row, 4).numFmt = "#,##0.00;[Red](#,##0.00);–";
 }
 
 export async function createWorkbookBuffer(model: WorkbookExportModel): Promise<ArrayBuffer> {
