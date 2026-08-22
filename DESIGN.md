@@ -547,7 +547,7 @@ Radar + list grid (`1fr 300px`, stacks on narrow). Radar: single polygon of top-
 
 ### 9.6 Budget Field
 
-Bubble scatter, viewBox 920×380: x = share of total, y = growth vs previous year, radius = `6 + sqrt(value/max)·16`, color = solid category token with a 2px paper-colored separation stroke. Y-axis bounds round outward to multiples of 10 percentage points. Ordinary ranges up to a 100-point span label every 10-point interval; unusually wide historical ranges use a readable `1/2/5 × 10ⁿ` interval no smaller than 10 points, targeting about eight intervals and preventing overlapping labels. Zero-growth line `1px ink`; grid `hairline-soft`; y-axis line `hairline`; axis labels mono 10px. Category names are not printed beside circles; full category, amount, share, and growth values live in each circle's `title` tooltip. If previous-year data is missing, show the callout: `წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.`
+Bubble scatter, viewBox 920×380: x = share of total, y = growth vs previous year, radius = `6 + sqrt(value/max)·16`, color = solid category token with a 2px paper-colored separation stroke. Y-axis bounds round outward to multiples of 10 percentage points. Ordinary ranges up to a 100-point span label every 10-point interval; unusually wide historical ranges use a readable `1/2/5 × 10ⁿ` interval no smaller than 10 points, targeting about eight intervals and preventing overlapping labels. Zero-growth line `1px ink`; grid `hairline-soft`; y-axis line `hairline`; axis labels mono 10px. Category names are not printed beside circles; hovering or keyboard-focusing a circle shows its full category name and amount in the chart tooltip. The SVG is an accessible named group and every focusable circle is a named image, so assistive technology can identify points individually. If previous-year data is missing, show the callout: `წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.`
 
 ### 9.7 Full Ranking
 
@@ -600,7 +600,7 @@ The workspace's own breakpoints measure the **content column**, not the viewport
 ## 13. Accessibility
 
 - All controls have accessible names; toggles expose pressed/selected state (`aria-pressed`, `aria-checked`, `aria-expanded`); slider handles expose `role="slider"` with value attributes and keyboard support. Slider handles keep the 15 px visual dot but expose a 30 × 30 px interactive target.
-- SVG charts: `role="img"` + Georgian accessible label; SVG-only data must also exist in table/tooltip/summary.
+- Static SVG charts: `role="img"` + Georgian accessible label. Charts with focusable data points use a named `group` with individually named point images instead. SVG-only data must also exist in table/tooltip/summary.
 - Focus visible (accent ring) on paper.
 - Never color-only meaning: swatch + label + value.
 - Respect `prefers-reduced-motion`.

@@ -717,6 +717,28 @@ test("analysis view renders the fixed single-year section order", async ({ page 
   expect(consoleProblems).toEqual([]);
 });
 
+test("budget field identifies a circle with its category and amount on hover and focus", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/analysis");
+  await expectAppReady(page);
+
+  const field = page.getByTestId("budget-field");
+  await expect(field.getByRole("group", { name: "ბიუჯეტის ველი" })).toBeVisible();
+  const point = field.getByRole("img", { name: "სოციალური დაცვა · 7.2 მლრდ ₾" });
+
+  await point.hover();
+
+  const tooltip = page.getByTestId("budget-field-tooltip");
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toContainText("სოციალური დაცვა");
+  await expect(tooltip).toContainText("7.2 მლრდ ₾");
+  await expect(tooltip).not.toContainText(/წილი|ზრდა/);
+
+  await page.getByRole("heading", { name: "ბიუჯეტის ველი" }).hover();
+  await expect(tooltip).toHaveCount(0);
+  await point.focus();
+  await expect(tooltip).toBeVisible();
+});
+
 test("mobile explorer and analysis layouts have no page overflow", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
   await page.setViewportSize({ width: 390, height: 844 });
