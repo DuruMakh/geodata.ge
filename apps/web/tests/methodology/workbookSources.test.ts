@@ -215,6 +215,13 @@ describe("scopeMunicipalWorkbookSources", () => {
     expect(khulo.some((source) => source.downloadHref.includes("2024/mof-functional-classification"))).toBe(true);
     expect(tbilisi.some((source) => source.downloadHref.includes("2024/mof-functional-classification"))).toBe(false);
   });
+
+  it("limits the municipal total portal fallback to applicability year 2015", async () => {
+    resetWorkbookSourceCacheForTests();
+    const totals = await loadWorkbookSources("municipalities", "municipal-total");
+    const portal = totals.find((source) => source.downloadHref.includes("municipalities-portal-functionals"));
+    expect(portal?.years).toEqual([2015]);
+  });
 });
 
 describe("projectGdpWorkbookSources", () => {

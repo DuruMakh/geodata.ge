@@ -599,7 +599,7 @@ test("Excel download uses only the selected range and series", async ({ page }) 
     "კატეგორია",
     2020,
     2021,
-    "პერიოდის ცვლილება",
+    "ცვლილება 2020–2021",
   ]);
   const dataRows = (workbook.getWorksheet("მონაცემები")!.getRows(2, 10) ?? []).filter((row) => row.getCell(1).value !== null);
   expect([...new Set(dataRows.map((row) => row.getCell(1).value))]).toEqual([2020, 2021]);

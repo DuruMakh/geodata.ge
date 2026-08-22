@@ -637,6 +637,20 @@ test.describe("municipality page", () => {
     expect(hyperlinks.some((value) => value.includes("budget-history-04"))).toBe(false);
   });
 
+  test("2016 total-only uses the municipality history without the 2015 portal fallback", async ({ page }) => {
+    await page.goto(`${ENTITY_URL}#r=2016-2016&sel=municipal.total`);
+    await expectMunicipalAppReady(page);
+    const { workbook } = await downloadMunicipalWorkbook(page);
+    const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
+    const hyperlinks = readable.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx");
+    expect(hyperlinks.some((value) => value.includes("municipalities-portal-functionals"))).toBe(false);
+  });
+
   test("nominal function-only excludes total histories while percentage function-only keeps the denominator sources", async ({ page }) => {
     await page.goto(`${ENTITY_URL}#r=2020-2020&sel=municipal.education`);
     await expectMunicipalAppReady(page);

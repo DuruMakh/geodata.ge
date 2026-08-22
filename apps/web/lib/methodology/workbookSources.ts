@@ -108,7 +108,9 @@ function roleRows(
     return rows.filter((row) => row.source_id === "source.mof.municipalities.2015_2019.portal_functionals" || row.source_id.endsWith("functional_classification"));
   }
   if (role === "municipal-total") {
-    return rows.filter((row) => row.source_id.includes("budget_history") || row.source_id === "source.mof.municipalities.2015_2019.portal_functionals" || row.source_id === "source.mof.municipalities.2024.functional_classification" || row.source_id.includes("adjara.republic"));
+    return rows
+      .filter((row) => row.source_id.includes("budget_history") || row.source_id === "source.mof.municipalities.2015_2019.portal_functionals" || row.source_id === "source.mof.municipalities.2024.functional_classification" || row.source_id.includes("adjara.republic"))
+      .map((row) => row.source_id === "source.mof.municipalities.2015_2019.portal_functionals" ? { ...row, years: [2015] } : row);
   }
   if (role === "expenditure-ministries") {
     const ids = new Set(Object.values(MINISTRY_LINEAGE).flat());
