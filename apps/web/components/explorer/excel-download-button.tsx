@@ -32,7 +32,7 @@ export function ExcelDownloadButton({ testId, disabled, onDownload }: ExcelDownl
         onClick={start}
         className="h-[38px] w-full cursor-pointer rounded-[2px] bg-[var(--ink)] text-[12.5px] font-semibold text-[var(--paper)] transition-opacity duration-150 hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-55"
       >
-        {status === "working" ? "Excel მზადდება…" : "Excel ჩამოტვირთვა"}
+        {status === "working" ? "Excel მზადდება…" : "ჩამოტვირთვა"}
       </button>
       <p role="status" aria-live="polite" aria-atomic="true" className="mt-2 min-h-4 text-[11px] text-[var(--negative)]">
         {status === "working" ? (

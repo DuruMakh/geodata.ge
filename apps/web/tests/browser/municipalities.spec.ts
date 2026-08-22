@@ -132,11 +132,10 @@ test("keeps the municipality index free of the source note", async ({ page }) =>
   await expect(page.getByTestId("municipality-map")).not.toContainText(/მონაცემები არ არის|no data/i);
 });
 
-test("map heading, legend, tooltip, and accessibility use 2025 budget per resident", async ({ page }) => {
+test("map omits the redundant heading while its legend, tooltip, and accessibility retain the measure", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
-  await expect(page.getByTestId("municipality-map-heading")).toContainText("ერთ მოსახლეზე");
-  await expect(page.getByTestId("municipality-map-heading")).toContainText("2025");
+  await expect(page.getByTestId("municipality-map-heading")).toHaveCount(0);
   await expect(page.getByTestId("municipality-map-legend")).toContainText("₾");
   await expect(page.getByTestId("municipality-map").locator("svg")).toHaveAttribute(
     "aria-label",
@@ -426,12 +425,11 @@ test.describe("municipalities index", () => {
     await expect(kpis.nth(2)).toContainText("2025 · 64 მუნიციპალიტეტი");
   });
 
-  test("describes municipalities on the map and in the list", async ({ page }) => {
+  test("starts directly with the municipal comparison workspace", async ({ page }) => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
-    await expect(page.locator("main > div > p").first()).toContainText(
-      "საქართველოს მუნიციპალიტეტების ბიუჯეტები წარმოდგენილია 2015–2025 წლების ფაქტობრივი შესრულებით",
-    );
+    await expect(page.getByTestId("municipal-index-workspace")).toBeVisible();
+    await expect(page.getByText("საქართველოს მუნიციპალიტეტების ბიუჯეტები წარმოდგენილია", { exact: false })).toHaveCount(0);
   });
 
   test("keeps the index workspace stacked until its content container reaches 1100px", async ({ page }) => {

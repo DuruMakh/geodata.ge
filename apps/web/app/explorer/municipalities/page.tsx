@@ -13,7 +13,6 @@ import {
 import { formatPerResidentGel } from "../../../lib/explorer/format";
 import { buildMunicipalityMapModel } from "../../../lib/explorer/municipalityMapData";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
-import { municipalitiesIntroduction } from "../../../lib/seo/content";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { totalFacts } = await loadServedMunicipalData();
@@ -66,10 +65,6 @@ export default async function MunicipalitiesIndexPage() {
         <h1 className="mt-[34px] mb-2.5 max-w-[640px] font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[36px]">
           რას ხარჯავენ საქართველოს მუნიციპალიტეტები
         </h1>
-        <p className="mb-[26px] max-w-[560px] text-[13.5px] leading-relaxed text-[var(--body)]">
-          {municipalitiesIntroduction({ firstYear, lastYear: latestYear })}
-        </p>
-
         <MunicipalitiesIndex
           viewBox={map.viewBox}
           shapes={map.shapes}
@@ -91,7 +86,6 @@ export default async function MunicipalitiesIndexPage() {
             comparisonYear,
             latestYear,
           })}
-          comparisonYear={comparisonYear}
         />
       </div>
     </main>

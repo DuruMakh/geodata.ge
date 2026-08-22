@@ -28,7 +28,6 @@ import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
-import { SeoIntroduction } from "../seo/seo-introduction";
 import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup } from "./entity-picker";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
@@ -68,7 +67,6 @@ type MunicipalExplorerBaseProps = {
   pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
   sourceNote: string;
-  introduction: string;
   children?: ReactNode;
 };
 
@@ -294,10 +292,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             </a>
           </span>
         ) : null}
-      </div>
-
-      <div className="mt-5">
-        <SeoIntroduction text={props.introduction} methodologyHref="/methodology/municipalities" />
       </div>
 
       <div

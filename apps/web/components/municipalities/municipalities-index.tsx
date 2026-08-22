@@ -18,7 +18,6 @@ type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResident
   regions: MunicipalListRow[];
   country: MunicipalListRow;
   kpis: MunicipalKpi[];
-  comparisonYear: number;
 };
 
 export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
@@ -78,12 +77,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
     <>
       <div data-testid="municipal-index-workspace" className="grid items-start gap-10 @min-[1100px]:grid-cols-[minmax(0,1fr)_336px]">
         <div className="min-w-0">
-          <div className="flex items-baseline justify-between gap-3 border-b border-[var(--hairline)] pb-2">
-            <span data-testid="municipality-map-heading" className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-              ბიუჯეტი ერთ მოსახლეზე · {props.comparisonYear}
-            </span>
-          </div>
-          <div className="mt-1.5">
+          <div>
             <MunicipalityMap
               viewBox={props.viewBox}
               shapes={props.shapes}

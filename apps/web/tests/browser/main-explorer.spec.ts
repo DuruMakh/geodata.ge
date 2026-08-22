@@ -359,7 +359,7 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
 
   await page.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table")).toContainText("2004");
-  await expect(page.getByTestId("explorer-table")).toContainText("1.93");
+  await expect(page.getByTestId("explorer-table")).toContainText("1.9");
 
   await page.getByTestId("measure-share-toggle").click();
   await expect(page.getByTestId("explorer-table")).toContainText("19.6%");
@@ -406,9 +406,9 @@ test("2004 revenue total excludes an unavailable liability value in tables and E
   const table = page.getByTestId("explorer-table");
   const totalRow = table.getByRole("row").filter({ hasText: "მთლიანი შემოსავლები" });
   const liabilitiesRow = table.getByRole("row").filter({ hasText: "ვალდებულებების ზრდა" });
-  await expect(totalRow).toContainText("2.28");
+  await expect(totalRow).toContainText("2.3");
   await expect(liabilitiesRow).toContainText("—");
-  await expect(liabilitiesRow).toContainText("0.09");
+  await expect(liabilitiesRow).toContainText("0.1");
 
   const revenueExport = await downloadWorkbook(page);
   expect(revenueExport.download.suggestedFilename()).toMatch(/^fiscal-revenue-\d{4}-\d{4}\.xlsx$/);
@@ -621,6 +621,7 @@ test("Excel button shows working and retryable error states", async ({ page }) =
 
   const button = page.getByTestId("series-excel");
   const announcement = page.getByRole("status");
+  await expect(button).toHaveText("ჩამოტვირთვა");
   await button.click();
   await expect(button).toHaveText("Excel მზადდება…");
   await expect(button).toBeDisabled();
@@ -748,18 +749,16 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
       clientWidth: element.clientWidth,
       scrollWidth: element.scrollWidth,
     }));
-    expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
+    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth);
 
     const boxes = await yearButtons.evaluateAll((buttons) =>
       buttons.map((button) => {
         const box = button.getBoundingClientRect();
-        return { left: box.left, right: box.right, width: box.width };
+        return { left: box.left, right: box.right, top: box.top, width: box.width };
       }),
     );
     expect(boxes.every((box) => box.width >= 36)).toBe(true);
-    for (let index = 1; index < boxes.length; index += 1) {
-      expect(boxes[index]!.left).toBeGreaterThanOrEqual(boxes[index - 1]!.right);
-    }
+    expect(new Set(boxes.map((box) => Math.round(box.top))).size).toBeGreaterThan(1);
 
     const activeBox = await activeYear.boundingBox();
     const selectorBox = await selector.boundingBox();
@@ -1075,11 +1074,11 @@ test("hub lists four cards, all four now live", async ({ page }) => {
 
   // Absence alone would pass on a hub whose footers all came back null, so also
   // assert a real figure is there. The shape, not the figure: the number moves
-  // with every dataset update, the "<year> · <n.nn> მლრდ ₾" contract does not.
-  await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} · [\d,]+\.\d{2} მლრდ ₾/);
+  // with every dataset update, the "<year> · <n.n> მლრდ ₾" contract does not.
+  await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} · [\d,]+\.\d მლრდ ₾/);
   // Card 03 now carries the same contract — this is the figure this task adds.
-  await expect(municipalities).toContainText(/\d{4} · [\d,]+\.\d{2} მლრდ ₾/);
-  await expect(municipalities).toContainText("2025 · 6.11 მლრდ ₾");
+  await expect(municipalities).toContainText(/\d{4} · [\d,]+\.\d მლრდ ₾/);
+  await expect(municipalities).toContainText("2025 · 6.1 მლრდ ₾");
 
   // The card is not just styled as a link — clicking it actually lands on the
   // municipalities index.

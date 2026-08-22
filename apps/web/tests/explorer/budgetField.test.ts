@@ -77,6 +77,18 @@ describe("BudgetField", () => {
     expect(circles.map((circle) => Number(attribute(circle, "stroke-width")))).toEqual([2, 2, 2]);
   });
 
+  it("keeps category names in circle tooltips instead of permanent chart labels", () => {
+    const markup = renderedChart();
+    const visibleText = [...markup.matchAll(/<text\b[^>]*>([^<]+)<\/text>/g)].map((match) => match[1]);
+
+    expect(visibleText).not.toContain("ყველაზე დიდი");
+    expect(visibleText).not.toContain("მეოთხედი");
+    expect(visibleText).not.toContain("ყველაზე მცირე");
+    expect(markup).toContain("<title>ყველაზე დიდი ·");
+    expect(markup).toContain("<title>მეოთხედი ·");
+    expect(markup).toContain("<title>ყველაზე მცირე ·");
+  });
+
   it("renders the Y axis at consistent ten-percentage-point intervals", () => {
     const labels = [...renderedChart().matchAll(/<text x="44"[^>]*>([^<]+)<\/text>/g)].map((match) => match[1]);
 
