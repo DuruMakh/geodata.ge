@@ -155,7 +155,8 @@ function readGeographyRows(): GeographyRow[] {
 }
 
 function readWorkbook(fileName: string, sheetName: string): SourceWorkbook {
-  const workbook = XLSX.readFile(path.join(officialDir, fileName), {
+  const workbook = XLSX.read(fs.readFileSync(path.join(officialDir, fileName)), {
+    type: "buffer",
     cellDates: false,
   });
 
@@ -804,9 +805,9 @@ describe("Geostat population and regional GDP research package", () => {
 
   it("matches every XLSX review-sheet field and type to the CSV artifacts", async () => {
     await buildPackage(true);
-    const workbook = XLSX.readFile(
-      path.join(packageDir, "municipal-population-and-regional-gdp.xlsx"),
-      { cellDates: true },
+    const workbook = XLSX.read(
+      fs.readFileSync(path.join(packageDir, "municipal-population-and-regional-gdp.xlsx")),
+      { type: "buffer", cellDates: true },
     );
 
     expect(workbook.SheetNames).toEqual([

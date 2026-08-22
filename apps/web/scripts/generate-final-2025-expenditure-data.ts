@@ -1,4 +1,5 @@
 ﻿import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
@@ -98,7 +99,7 @@ async function readWorkbookRows(): Promise<ReturnType<typeof parseAdminWorkbookR
     });
   }
 
-  const workbook = XLSX.readFile(repoPath(source.workbookPath), { cellDates: false });
+  const workbook = XLSX.read(readFileSync(repoPath(source.workbookPath)), { type: "buffer", cellDates: false });
   const sheetName = pickTavi6Sheet(workbook, source.year);
   const sheet = workbook.Sheets[sheetName];
   if (!sheet) throw new Error(`Missing selected workbook sheet: ${sheetName}`);

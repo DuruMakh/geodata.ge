@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
@@ -417,7 +418,7 @@ export function reconcileNationalValues(
 }
 
 function readMatrix(filePath: string, sheetName: string): SheetMatrix {
-  const workbook = XLSX.readFile(filePath, { cellDates: false });
+  const workbook = XLSX.read(readFileSync(filePath), { type: "buffer", cellDates: false });
   const sheet = workbook.Sheets[sheetName];
   if (!sheet) throw new Error(`Missing source sheet ${sheetName} in ${filePath}`);
   const sheetRange = sheet["!ref"];

@@ -6,7 +6,6 @@ import { validateFoundationReferences } from "../lib/data/foundationValidation";
 import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
 import { buildImportReport } from "../lib/data/importReport";
-import { loadSpendingMappings } from "../lib/data/mappings";
 import { loadNationalGdpFacts } from "../lib/data/nationalGdp/importNationalGdp";
 import { checkMunicipalityGeometryOutputs } from "../lib/data/municipalGeometry/prepareMunicipalGeometry";
 import {
@@ -62,7 +61,6 @@ async function main() {
   // cross-checks.
   const glossary = await loadGlossary(SERVED_DATA_FILES.glossary);
   const sources = await loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments);
-  const mappings = await loadSpendingMappings("../../data/mappings/spending-field-mapping.csv");
   const expenditureRows = await loadBudgetFactRows("../../data/imports/expenditure-facts-2004-2025.csv");
   const revenueRows = await loadBudgetFactRows("../../data/imports/revenue-facts-2004-2025.csv");
   const facts = await loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts);
@@ -238,7 +236,7 @@ async function main() {
     throw new Error(`Missing glossary rows: ${missingGlossary.map((item) => item.id).join(", ")}`);
   }
 
-  validateFoundationReferences({ taxonomy, sources, mappings, facts });
+  validateFoundationReferences({ taxonomy, sources, facts });
   if (unresolvedAdminSpendingSourceIds.length > 0) {
     throw new Error(
       `Admin spending facts reference unknown source documents: ${unresolvedAdminSpendingSourceIds.join(", ")}`,
@@ -273,7 +271,6 @@ async function main() {
   console.log(`Validated taxonomy rows: ${taxonomy.length}`);
   console.log(`Validated glossary rows: ${glossary.size}`);
   console.log(`Validated source rows: ${sources.length}`);
-  console.log(`Validated mapping rows: ${mappings.length}`);
   console.log(`Validated fact rows: ${facts.length}`);
   console.log(`Validated admin spending fact rows: ${adminSpendingFacts.length}`);
   console.log(`Validated national GDP fact rows: ${nationalGdpFacts.length}`);

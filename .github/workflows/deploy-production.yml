@@ -5,9 +5,15 @@ name: Deploy production
 # main is disabled in apps/web/vercel.json, so production only updates when
 # this workflow succeeds: CI green on main -> converge the Supabase mirror to
 # the checkout (migrations + parity-checked import, unconditionally — the
-# import is idempotent) -> POST the Vercel deploy hook, whose db-mode build
-# re-verifies the mirror row-by-row. Any failure leaves production serving
-# its previous deploy.
+# import is idempotent) -> run the db-mode build here, which re-verifies the
+# mirror row-by-row over the pooled connection -> POST the Vercel deploy hook,
+# whose own build repeats that verification. Any failure leaves production
+# serving its previous deploy.
+#
+# The build gate is deliberately AFTER the import: it reads the mirror and
+# asserts it matches this checkout's CSVs, so it can only pass once the mirror
+# has been converged. The import is transactional and idempotent, so a build
+# failure here leaves the mirror correct-and-converged, not half-written.
 
 on:
   workflow_run:
@@ -61,12 +67,37 @@ jobs:
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: npm run data:import
-      # Fire-and-forget by design: -f proves only that Vercel accepted the
-      # trigger. The db-mode build runs after this job goes green, so a green
-      # run is NOT proof the deploy landed — see the runbook note in
-      # docs/deployment.md. Closing that gap needs a VERCEL_TOKEN secret to poll
-      # GET /v13/deployments/{id}.
+      # Prove the build Vercel is about to run, before triggering it. Nothing
+      # earlier exercises this path for this commit: PR CI builds only in csv
+      # mode (playwright.config.ts webServer), and db-health.yml runs weekly
+      # against whatever main happened to be. The db path differs in ways that
+      # matter — it reads over the POOLED DATABASE_URL (the import above uses
+      # DIRECT_URL) and runs the full row-by-row parity check in
+      # lib/data/servedData.ts. Building here turns a broken db path into a red
+      # job instead of a Vercel-side failure that nobody is told about: the
+      # hook below never fires, and production keeps serving its previous
+      # deploy — which it would have done anyway, but now visibly.
+      - name: Verify the production build against the mirror
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GEODATA_DATA_SOURCE: db
+        run: npm run build
+      # Still not proof the deploy LANDED: Vercel builds asynchronously after
+      # accepting the hook. What changed is that the build itself is now known
+      # good, so an accepted hook that never goes live is an infrastructure
+      # problem rather than a code one. Closing the last gap needs a
+      # VERCEL_TOKEN secret to poll GET /v13/deployments/{id} — see the runbook
+      # note in docs/deployment.md.
       - name: Trigger Vercel production build
         env:
           VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
-        run: curl -fsS --retry 3 --max-time 60 -X POST "$VERCEL_DEPLOY_HOOK_URL"
+        run: |
+          response="$(curl -fsS --retry 3 --max-time 60 -X POST "$VERCEL_DEPLOY_HOOK_URL")"
+          # -f covers the HTTP status; this covers a 2xx whose body is not the
+          # job envelope the hook is documented to return.
+          job_id="$(printf '%s' "$response" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s)?.job?.id??"")}catch{}})')"
+          if [ -z "$job_id" ]; then
+            echo "Deploy hook returned no job id; body was: $response" >&2
+            exit 1
+          fi
+          echo "Vercel deploy job: $job_id"

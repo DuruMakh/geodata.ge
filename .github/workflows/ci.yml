@@ -29,8 +29,15 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run data:validate
-      - name: Audit production dependencies
-        run: npm audit --omit=dev --audit-level=high
+      # Deliberately NOT --omit=dev. The data pipeline's file parsers (xlsx,
+      # pdf-parse) are devDependencies, and the data:validate step above runs
+      # them over official workbooks and PDFs inside this job — so scoping the
+      # audit to production dependencies exempted exactly the code that reads
+      # outside files. `xlsx` is installed from the SheetJS CDN (see
+      # package.json): the npm registry copy is abandoned at 0.18.5 and carries
+      # two unpatchable high advisories.
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
 
   e2e:
     name: Browser tests (Playwright)

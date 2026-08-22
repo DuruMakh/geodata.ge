@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
+import { sourceDocumentsFor } from "../../../lib/data/sources";
 import { loadGdpWorkbookSources, loadWorkbookSources } from "../../../lib/methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 import { resolveSiteUrl } from "../../../lib/siteUrl";
@@ -22,6 +23,13 @@ export default async function RevenuePage() {
     loadWorkbookSources("revenue", "revenue"),
     loadGdpWorkbookSources(),
   ]);
+  // `nav` fixes explorerSide to "revenue" here, so the 286 expenditure rows can
+  // never be rendered on this route — 53 KB of dead payload, the same reasoning
+  // the adminFacts note below already applies to the admin corpus.
+  const ownFacts = facts.filter((fact) => fact.side === "revenue");
+  // Computed from the full registry, before the narrowing below: this is the
+  // displayed "განახლდა" date and narrowing it here would change what the page
+  // shows, not just what it ships.
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
 
   // No adminFacts/adminCategories: the ministries scope cannot be reached from
@@ -31,9 +39,9 @@ export default async function RevenuePage() {
       <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "შემოსავლები", path: "/explorer/revenue" }]} />
       <MainExplorer
         nav="revenue"
-        facts={facts}
+        facts={ownFacts}
         glossaryEntries={Array.from(glossary.values())}
-        sourceDocuments={sourceDocuments}
+        sourceDocuments={sourceDocumentsFor(sourceDocuments, [...ownFacts, ...gdpFacts])}
         gdpFacts={gdpFacts}
         workbookSources={workbookSources}
         gdpWorkbookSources={gdpWorkbookSources}

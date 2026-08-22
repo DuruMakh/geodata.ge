@@ -277,7 +277,7 @@ export function extractAdminSpending2004Rows(): OfficialExpenditureRow[] {
 
 function readMatrix(fileName: string, sheetName: string): MatrixCell[][] {
   const file = path.resolve(process.cwd(), path.join(WORKBOOK_DIR, fileName));
-  const workbook = XLSX.readFile(file, { cellDates: false });
+  const workbook = XLSX.read(readFileSync(file), { type: "buffer", cellDates: false });
   const sheet = workbook.Sheets[sheetName];
   if (!sheet) throw new Error(`Missing sheet "${sheetName}" in ${fileName}. Available: ${workbook.SheetNames.join(", ")}`);
   return sheetToMatrix(sheet);
