@@ -19,8 +19,6 @@ import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
 import type { NationalGdpFact } from "../../lib/data/nationalGdp/types";
-import type { SpendingMapping } from "../../lib/data/mappings";
-import { loadSpendingMappings } from "../../lib/data/mappings";
 import { SERVED_DATA_FILES } from "../../lib/data/servedData";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import { loadSourceDocuments } from "../../lib/data/sources";
@@ -44,7 +42,6 @@ const SOURCE_DOCUMENTS_CSV = SERVED_DATA_FILES.sourceDocuments;
 const NATIONAL_GDP_CSV = SERVED_DATA_FILES.gdpFacts;
 const ADMIN_CATEGORIES_JSON = SERVED_DATA_FILES.adminSpendingCategories;
 const TAXONOMY_DIR = "../../data/taxonomy";
-const SPENDING_FIELD_MAPPING_CSV = "../../data/mappings/spending-field-mapping.csv";
 
 // Tolerance reused from the revenue pipeline: mirrors the unexported
 // `roundingToleranceGel` (10 GEL) in lib/data/realRevenue/validateRealRevenue.ts
@@ -78,7 +75,6 @@ type Pipeline = {
   sources: SourceDocumentRow[];
   adminCategories: AdminSpendingCategory[];
   taxonomy: TaxonomyItem[];
-  mappings: SpendingMapping[];
   gdpFacts: NationalGdpFact[];
 };
 
@@ -86,18 +82,17 @@ let pipelinePromise: Promise<Pipeline> | null = null;
 
 function loadPipeline(): Promise<Pipeline> {
   pipelinePromise ??= (async () => {
-    const [facts, adminFacts, glossary, sources, adminCategories, taxonomy, mappings, gdpFacts] = await Promise.all([
+    const [facts, adminFacts, glossary, sources, adminCategories, taxonomy, gdpFacts] = await Promise.all([
       loadBudgetFactRows(BUDGET_FACTS_CSV),
       loadAdminSpendingFacts(ADMIN_SPENDING_FACTS_CSV),
       loadGlossary(GLOSSARY_CSV),
       loadSourceDocuments(SOURCE_DOCUMENTS_CSV),
       loadAdminSpendingCategoriesFile(ADMIN_CATEGORIES_JSON),
       loadTaxonomyFiles(TAXONOMY_DIR),
-      loadSpendingMappings(SPENDING_FIELD_MAPPING_CSV),
       loadNationalGdpFacts(NATIONAL_GDP_CSV),
     ]);
 
-    return { facts, adminFacts, glossary, sources, adminCategories, taxonomy, mappings, gdpFacts };
+    return { facts, adminFacts, glossary, sources, adminCategories, taxonomy, gdpFacts };
   })();
 
   return pipelinePromise;
@@ -141,7 +136,6 @@ describe("data pipeline gate (real shipped data files)", () => {
     expect(pipeline.glossary.size).toBeGreaterThan(0);
     expect(pipeline.sources.length).toBeGreaterThan(0);
     expect(pipeline.taxonomy.length).toBeGreaterThan(0);
-    expect(pipeline.mappings.length).toBeGreaterThan(0);
     expect(pipeline.adminCategories.length).toBeGreaterThan(0);
 
     for (const category of pipeline.adminCategories) {
@@ -181,10 +175,10 @@ describe("data pipeline gate (real shipped data files)", () => {
   });
 
   it("resolves every fact reference against taxonomy, glossary, and source documents with no orphans", async () => {
-    const { facts, adminFacts, glossary, sources, taxonomy, mappings } = await loadPipeline();
+    const { facts, adminFacts, glossary, sources, taxonomy } = await loadPipeline();
 
     // Taxonomy + source referential integrity, using the shared production validator.
-    expect(() => validateFoundationReferences({ taxonomy, sources, mappings, facts })).not.toThrow();
+    expect(() => validateFoundationReferences({ taxonomy, sources, facts })).not.toThrow();
 
     // Every non-total fact item must have a glossary entry (totals get hardcoded labels).
     const factItemIdsWithoutGlossary = Array.from(

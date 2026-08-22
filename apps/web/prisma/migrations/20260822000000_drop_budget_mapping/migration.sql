@@ -1,0 +1,15 @@
+-- Drop the vestigial BudgetMapping audit table.
+--
+-- It mirrored data/mappings/spending-field-mapping.csv, which never held more
+-- than three rows whose own mapping_notes read "Sample row for foundation
+-- validation". Nothing under app/, components/ or lib/ ever read the table,
+-- and the import verified only its row count (never its field values), so it
+-- was the one mirror table a corrupted row could pass through unnoticed —
+-- documented as "the weakest tier" in docs/data-methodology/database-import.md.
+--
+-- The real reviewed institution->field decisions live in
+-- data/mappings/review/*.csv and are consumed by the fact generators; the
+-- resulting assignment is carried per fact on BudgetFact.publicSpendingFieldId
+-- / mappingConfidence / mappingNotes, which are unchanged. Nothing a visitor
+-- sees depended on this table.
+DROP TABLE "BudgetMapping";

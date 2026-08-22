@@ -55,7 +55,6 @@ model BudgetItem {
   sortOrder   Int
   description String
   notes       String
-  mappings    BudgetMapping[] @relation("PublicSpendingField")
 
   @@index([side, level])
 }
@@ -99,22 +98,6 @@ model ImportRun {
   adminFacts            AdminSpendingFact[]
   gdpFacts              NationalGdpFact[]
   populationFacts       MunicipalPopulationFact[]
-}
-
-// Mirror of data/mappings/spending-field-mapping.csv.
-model BudgetMapping {
-  id                    String            @id @default(cuid())
-  year                  Int
-  officialInstitution   String
-  officialProgram       String?
-  officialSubprogram    String?
-  publicSpendingFieldId String
-  publicSpendingField   BudgetItem        @relation("PublicSpendingField", fields: [publicSpendingFieldId], references: [id])
-  confidence            MappingConfidence
-  notes                 String
-
-  @@index([year])
-  @@index([publicSpendingFieldId])
 }
 
 // Mirror of data/imports/budget-facts-2004-2025.csv.

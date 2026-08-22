@@ -20,7 +20,6 @@ the import is re-run.
 | `BudgetItem` | `data/taxonomy/revenue-categories.json` + `spending-fields.json`, merged with `data/glossary/category-glossary.csv` (IDs are 1:1) |
 | `AdminSpendingCategory` | `data/taxonomy/admin-spending-categories.json` |
 | `SourceDocument` | `data/sources/source-documents.csv` |
-| `BudgetMapping` | `data/mappings/spending-field-mapping.csv` |
 | `BudgetFact` | `data/imports/budget-facts-2004-2025.csv` (expenditure and revenue 2004–2025; 2004 revenue omits unavailable liabilities) |
 | `AdminSpendingFact` | `data/imports/admin-spending-facts-2004-2025.csv` (admin categories + major-program drill-down rows) |
 | `NationalGdpFact` | `data/imports/national-gdp-annual-1996-2025.csv` (one reviewed nominal-GDP denominator per year) |
@@ -190,14 +189,17 @@ From `apps/web`, with `.env` configured:
     `assertMunicipalParity`. The current branch's municipal index,
     municipality, and region routes do call that loader, so db-mode builds of
     this code verify the municipal rows at build time as well.
-  - **`BudgetMapping`** — the weakest tier, and it predates the municipal
-    work. No reader anywhere under `app/`, `components/` or `lib/`, and the
-    import checks only its **row count** (`tx.budgetMapping.count()`), never
-    its field values. A corrupted mapping row would pass both the import and
-    every build. Low impact today — it is an audit table, and served
-    `BudgetFact` rows already carry their resolved `publicSpendingFieldId`
-    from the CSV pipeline, so nothing a visitor sees depends on it — but do
-    not read the first tier as covering it.
+  Every mirror table now falls into one of the tiers above. `BudgetMapping`
+  used to sit below all of them — no reader anywhere under `app/`,
+  `components/` or `lib/`, and only a row-count check at import — and it was
+  dropped in migration `20260822000000_drop_budget_mapping`. Its source file
+  (`data/mappings/spending-field-mapping.csv`) never held more than three rows
+  labelled "Sample row for foundation validation". The reviewed
+  institution→field decisions it was standing in for live in
+  `data/mappings/review/*.csv`, are consumed by the fact generators, and reach
+  the mirror as `BudgetFact.publicSpendingFieldId` / `mappingConfidence` /
+  `mappingNotes` — which are verified field by field like the rest of the
+  first tier.
 - Database unreachable at build time → the build fails loudly; either resume
   the Supabase project and rebuild, or build with `GEODATA_DATA_SOURCE=csv`.
 - Database empty (import never run) → the db-mode build fails with a clear

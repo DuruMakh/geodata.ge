@@ -10,7 +10,6 @@ import { validateFoundationReferences } from "../lib/data/foundationValidation";
 import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
 import { buildImportReport } from "../lib/data/importReport";
-import { loadSpendingMappings } from "../lib/data/mappings";
 import { loadNationalGdpFacts } from "../lib/data/nationalGdp/importNationalGdp";
 import { loadMunicipalitiesFile } from "../lib/data/municipal/municipalitiesFile";
 import { loadMunicipalPopulationFacts } from "../lib/data/municipal/importMunicipalPopulation";
@@ -71,7 +70,6 @@ loadEnv({ path: ".env", quiet: true });
 
 const IMPORT_LABEL = "real-budget-2004-2025";
 const TAXONOMY_DIR = "../../data/taxonomy";
-const MAPPINGS_FILE = "../../data/mappings/spending-field-mapping.csv";
 
 class ParityFailedError extends Error {
   constructor(readonly parity: ParityReport) {
@@ -155,7 +153,6 @@ async function main() {
     glossary,
     adminCategories,
     sourceDocuments,
-    mappings,
     budgetFacts,
     adminFacts,
     municipalFunctions,
@@ -173,7 +170,6 @@ async function main() {
     loadGlossary(SERVED_DATA_FILES.glossary),
     loadAdminSpendingCategoriesFile(SERVED_DATA_FILES.adminSpendingCategories),
     loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments),
-    loadSpendingMappings(MAPPINGS_FILE),
     loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts),
     loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts),
     loadMunicipalFunctionsFile(SERVED_DATA_FILES.municipalFunctions),
@@ -191,7 +187,7 @@ async function main() {
   // Same reference validation the site's data pipeline uses (allows explicit
   // revenue.total / expenditure.total fact rows), plus the checks specific to
   // the datasets this import adds on top.
-  validateFoundationReferences({ taxonomy, sources: sourceDocuments, mappings, facts: budgetFacts });
+  validateFoundationReferences({ taxonomy, sources: sourceDocuments, facts: budgetFacts });
 
   const taxonomyIds = new Set(taxonomy.map((item) => item.id));
   const glossaryIds = new Set(glossary.keys());
@@ -328,7 +324,6 @@ async function main() {
         await tx.budgetFact.deleteMany();
         await tx.adminSpendingFact.deleteMany();
         await tx.nationalGdpFact.deleteMany();
-        await tx.budgetMapping.deleteMany();
         await tx.budgetItem.deleteMany();
         await tx.adminSpendingCategory.deleteMany();
         await tx.municipalFunctionFact.deleteMany();
@@ -578,18 +573,6 @@ async function main() {
           })),
         });
 
-        await tx.budgetMapping.createMany({
-          data: mappings.map((mapping) => ({
-            year: mapping.year,
-            officialInstitution: mapping.officialInstitution,
-            officialProgram: mapping.officialProgram,
-            officialSubprogram: mapping.officialSubprogram,
-            publicSpendingFieldId: mapping.publicSpendingFieldId,
-            confidence: mapping.mappingConfidence,
-            notes: mapping.mappingNotes,
-          })),
-        });
-
         // Row-level verification INSIDE the transaction, through the exact
         // read path db-mode builds use: the import only commits if the serving
         // path reproduces every CSV loader row field for field. A mapping bug
@@ -712,10 +695,9 @@ async function main() {
         // Totals parity for the human-readable report; counts come from the
         // row-level readback above, GEL sums from the database's own Decimal
         // aggregation to prove storage fidelity.
-        const [dbBudgetTotals, dbAdminTotals, dbMappings] = await Promise.all([
+        const [dbBudgetTotals, dbAdminTotals] = await Promise.all([
           tx.budgetFact.groupBy({ by: ["year", "side"], _sum: { amountGel: true } }),
           tx.adminSpendingFact.groupBy({ by: ["year", "level"], _sum: { amountGel: true } }),
-          tx.budgetMapping.count(),
         ]);
 
         const parityInTx = buildParityReport({
@@ -734,7 +716,6 @@ async function main() {
               dbRows: mirrorAdminCategories.length,
             },
             { table: "SourceDocument", csvRows: sourceDocuments.length, dbRows: mirrorSources.length },
-            { table: "BudgetMapping", csvRows: mappings.length, dbRows: dbMappings },
             {
               table: "MunicipalFunctionCategory",
               csvRows: municipalFunctions.length,
