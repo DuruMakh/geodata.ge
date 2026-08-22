@@ -1,4 +1,5 @@
 ﻿import { mkdir, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import * as XLSX from "xlsx";
 import {
@@ -72,7 +73,7 @@ async function readWorkbookGrandTotalActualGel(): Promise<number | null> {
     return tavi6ProgrammaticPdfTotalActualGel(rows);
   }
 
-  const workbook = XLSX.readFile(repoPath(source.workbookPath), { cellDates: false });
+  const workbook = XLSX.read(readFileSync(repoPath(source.workbookPath)), { type: "buffer", cellDates: false });
   const sheetName = pickTavi6Sheet(workbook, source.year);
   const sheet = workbook.Sheets[sheetName];
   if (!sheet) return null;

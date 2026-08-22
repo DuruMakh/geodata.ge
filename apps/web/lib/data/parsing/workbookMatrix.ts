@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import * as XLSX from "xlsx";
 import { pickSheetName, type MatrixCell, type PickSheetNameOptions } from "./cellUtils";
 
@@ -19,7 +20,11 @@ export function readWorkbookMatrix(
   workbookFile: string,
   options: PickSheetNameOptions,
 ): { sheetName: string; matrix: MatrixCell[][] } {
-  const workbook = XLSX.readFile(workbookFile, { cellDates: false });
+  // xlsx 0.20's ESM build has no implicit node:fs binding, so XLSX.readFile
+  // needs set_fs() first. Reading the bytes here and handing them to
+  // XLSX.read instead keeps the parser fs-free — the same form
+  // lib/data/nationalGdp/prepareNationalGdp.ts already uses.
+  const workbook = XLSX.read(readFileSync(workbookFile), { type: "buffer", cellDates: false });
   const sheetName = pickSheetName(workbook, options);
   const sheet = workbook.Sheets[sheetName];
 
