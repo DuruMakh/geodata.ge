@@ -28,7 +28,7 @@ Superseded and must not appear in production:
 
 Fiscal.ge v1 is a Georgian-first national budget explorer for annual data. It is not a broad public-data catalog.
 
-V1 includes: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, CSV export, Georgian-first UI, minimal public source label, internal provenance metadata.
+V1 includes: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, Excel workbook export, Georgian-first UI, minimal public source label, internal provenance metadata.
 
 V1 excludes: data catalog, capital/debt explorers, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown).
 
@@ -404,11 +404,11 @@ The shared selector order is: optional grouping tabs, search, an action/status r
 
 Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. The placeholder is `ძებნა` in both fields and ministries grouping. A query with no matches shows `0 შედეგი — შეცვალე საძიებო ტექსტი.` While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs (their caret is locked open); a ministry matched by name still honors its caret and expands to all of its programs. The query is panel-local state and resets on ANY scope switch — nav (ხარჯები↔შემოსავლები) and grouping alike; typing must not re-render the chart.
 
-### 7.8 CSV Button
+### 7.8 Excel Button
 
-CSV remains dataset-owned below the selector and is not part of the shared selector contract.
+Excel remains dataset-owned below the selector and is not part of the shared selector contract.
 
-Full-width block, h38, ink bg, paper text, sans 12.5/600, radius 2px. Hover: opacity 0.85. Label: `CSV ჩამოტვირთვა`. Must export exactly the visible filtered dataset with the metadata columns of §15.
+Full-width block, h38, ink bg, paper text, sans 12.5/600, radius 2px. Hover: opacity 0.85. Label: `Excel ჩამოტვირთვა`; while creating the file it is disabled and reads `Excel მზადდება…`; failures show `ფაილი ვერ მომზადდა — სცადეთ თავიდან.` below the action. There is one public action, no public explorer CSV action or format menu. It creates a Fiscal.ge `.xlsx` file for the active range, selected series, grouping, and measure; selector search never narrows it. The three visible sheets are `მარტივი ცხრილი`, `მონაცემები`, and `წყაროები` (§15).
 
 ### 7.9 Callout / Notice
 
@@ -478,7 +478,7 @@ workspace:
   gap: "40px"
 ```
 
-Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline, grouping tabs (expenditure only, §7.2b), search, action-left/status-right row, series rows (scroll ≤430px), dataset-owned CSV button.
+Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline, grouping tabs (expenditure only, §7.2b), search, action-left/status-right row, series rows (scroll ≤430px), dataset-owned Excel button.
 
 ### 8.3 Line Chart
 
@@ -557,13 +557,13 @@ Table columns: `<scope header> | მლრდ ₾ | წილი | ცვლი�
 
 ## 10. Revenue Adaptation
 
-No separate revenue direction. Same shell, tokens, controls, chart/table treatment, analysis order, CSV and source patterns. Change only labels, taxonomy, revenue series tokens (§4.2), source wording, tooltips, CSV metadata.
+No separate revenue direction. Same shell, tokens, controls, chart/table treatment, analysis order, Excel and source patterns. Change only labels, taxonomy, revenue series tokens (§4.2), source wording, tooltips, and meaningful workbook columns.
 
 ## 11. Content and Copy
 
-Voice: precise, civic, archival. Georgian is primary; English only for compact technical labels (`CSV`).
+Voice: precise, civic, archival. Georgian is primary; English only for compact technical labels (`Excel`).
 
-Canonical terms: `ხარჯები`, `შემოსავლები`, `ანალიზი`, `სერიები`, `ხაზი`, `ცხრილი`, `სფეროები`, `უწყებები`, `% მშპ-ში` (national multi-year), `% წილი` (municipal), `დიაპაზონი`, `მთლიანი ხარჯი`, `მთლიანი შემოსავლები`, `მთლიანი ბიუჯეტი`, `სულ` (single-year analysis), `ძირითადი ინდიკატორები`, `პერიოდის ცვლილება`, `ყველაზე მზარდი`, `ყველაზე ნელი ზრდა`, `პერიოდის შედარება`, `სტრუქტურა სფეროების მიხედვით`, `ყოველი 100 ლარი`, `ბიუჯეტის რადარი`, `ბიუჯეტის ველი`, `სრული რეიტინგი`, `CSV ჩამოტვირთვა`, `გეგმა`.
+Canonical terms: `ხარჯები`, `შემოსავლები`, `ანალიზი`, `სერიები`, `ხაზი`, `ცხრილი`, `სფეროები`, `უწყებები`, `% მშპ-ში` (national multi-year), `% წილი` (municipal), `დიაპაზონი`, `მთლიანი ხარჯი`, `მთლიანი შემოსავლები`, `მთლიანი ბიუჯეტი`, `სულ` (single-year analysis), `ძირითადი ინდიკატორები`, `პერიოდის ცვლილება`, `ყველაზე მზარდი`, `ყველაზე ნელი ზრდა`, `პერიოდის შედარება`, `სტრუქტურა სფეროების მიხედვით`, `ყოველი 100 ლარი`, `ბიუჯეტის რადარი`, `ბიუჯეტის ველი`, `სრული რეიტინგი`, `Excel ჩამოტვირთვა`, `გეგმა`.
 
 Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US` grouping, fixed decimals (bn: 2, mln: 1, %: 1). Amounts ≥ ~1bn display in `მლრდ ₾`, below in `მლნ ₾`. Negative sign is `−` (minus, not hyphen) in deltas.
 
@@ -622,9 +622,9 @@ The sidebar's width transition runs at `base` and is gated on `prefers-reduced-m
 
 ## 15. Data and Trust Presentation
 
-Every analytical view exposes: active side, view, year/period, unit, measure, source note. Planned years get the `გეგმა` tag near the year context and a subtle marker in charts. When planned and actual both exist, actual wins in UI and CSV.
+Every analytical view exposes: active side, view, year/period, unit, measure, source note. Planned years get the `გეგმა` tag near the year context and a subtle marker in charts. When planned and actual both exist, actual wins in UI and the Excel workbook.
 
-CSV metadata columns: `year, category_id, parent_item_id, level, detail_label, official_institution_label, ka_label, en_label, amount_gel, basis, source_name, source_url_or_file, last_reviewed_at`.
+Each workbook has exactly three visible sheets, in order: `მარტივი ცხრილი`, `მონაცემები`, and `წყაროები`. `მარტივი ცხრილი` opens first and places its category-by-year table directly on row 3; its top title band is cream with dark text, while the table header remains ink with paper text. Year headings and numeric values are right-aligned, with the first column and header rows frozen. `მონაცემები` is a filterable row-based table with the exact Georgian headers `წელი`, `მთავარი ჯგუფი`, `კატეგორია`, `თანხა (₾)`, and `სტატუსი`; `% მშპ-ში` may add `მშპ-ის წილი (%)`. It contains no internal IDs, repository paths, English labels, review dates, hashes, or source metadata columns. `წყაროები` contains the relevant validated public-archive originals with compressed year ranges, source organization, retrieval date, and a clean `ფაილის ჩამოტვირთვა` hyperlink label; raw URLs do not occupy visible cells. The filename is `fiscal-{scope}-{startYear}-{endYear}.xlsx`. Methodology manifest CSVs remain archive-integrity artifacts and are unchanged.
 
 ## 16. Implementation Tokens
 
@@ -662,7 +662,7 @@ Do:
 - Keep the single measure toggle (`% მშპ-ში` nationally; `% წილი` municipally) as the only pill.
 - Keep the analysis sections in the fixed order of §9.
 - Reuse the identical system for revenue.
-- Keep the CSV button visible and bound to active filters.
+- Keep the Excel button visible and bound to the active range and selection.
 - Show source/update context on every analytical view.
 - Derive every year range from loaded data.
 
@@ -690,7 +690,7 @@ Do not:
 8. Analysis order: controls → year selector → 4 headlines → structure → 100 GEL → radar → field → ranking → source.
 9. Every 100 GEL renders exactly 100 cells, allocations sum to 100.
 10. Headline stats are exactly four, card-free.
-11. CSV exports the visible filtered dataset with metadata columns.
+11. Excel workbooks use the active range and selection, the approved three-sheet structure, and public-archive source hyperlinks on `წყაროები`.
 12. Source note present with actual coverage ranges; planned years tagged `გეგმა` when planned data exists.
 13. Georgian labels don't clip at any breakpoint.
 14. Revenue reuses the identical system.
@@ -707,10 +707,10 @@ Section order (top to bottom):
 1. **Header** — editorial header (§7.1) with page links instead of tabs: `მთავარი` (active, accent underline) and `ექსპლორერი` → `/explorer`; right slot shows the mono revenue year range (hidden on mobile).
 2. **Hero — living relief** — Three.js dotted map of Georgia (exact ADM0 outline, analytic elevation, population-scaled city squares emitting ripple waves, Tbilisi national pulse every 45s, peak labels Shkhara/Mkinvartsveri, city hover readout, mouse parallax). **The map is the hero's main subject and is maximized**: the figure is full-bleed (spans the viewport, escaping the 1240px column) and the camera keeps the reference's viewing angle but fits its distance at runtime so the country's real dot bounds fill the canvas at any aspect (margins ≈9%/6%, refit on resize). Headline (`როგორ ივსება და იხარჯება საქართველოს ბიუჯეტი`) overlays top-right on ≥768px, staying in the content grid, and sits above the map on mobile; CTA `დაიწყე ბიუჯეტით` → `/explorer`. The hero's height is not fixed: the camera fits inside a fixed virtual frame (340px <768, 500px <1100, `min(78vh, 820px)` ≥1100), then the canvas is cropped to the map's projected vertical band via a camera view offset — the map never rescales, and the key-numbers section starts immediately under the last dots. The headline overlay's measured height is a hard floor so the copy can never overflow into the stats. `prefers-reduced-motion` renders a still frame; WebGL failure shows a mono fallback note.
 3. **Key numbers** — three hardcoded country figures (population 3.7 მლნ, area 69.7 ათ. კმ², nominal GDP 104.6 მლრდ ₾ · 2025 preliminary, per Geostat), serif 46px values, maintained by hand in `landing-page.tsx`. The section sits 40/56px below the full-bleed hero.
-4. **სამი გზა მონაცემებამდე** — three rule-topped cards, all data live: 01 multi-year explorer (total-revenue + VAT sparkline) → `/explorer`; 02 single-year picture (30-cell expenditure waffle, §4.2 colors) → `/explorer/analysis`; 03 open CSV (real header + two active-fact rows in a tint block) → `/explorer`.
+4. **სამი გზა მონაცემებამდე** — three rule-topped cards, all data live: 01 multi-year explorer (total-revenue + VAT sparkline) → `/explorer`; 02 single-year picture (30-cell expenditure waffle, §4.2 colors) → `/explorer/analysis`; 03 `Excel მონაცემები` (the three sheet names plus a real category row across the latest two available years in a tint block) → `/explorer`.
 5. **Footer** — brand + tagline + `info@fiscal.ge`; nav links (explorer, analysis, methodology); data/license notes (source, last-updated date, CC BY 4.0); mono bottom bar. This adds the methodology link only; a broader footer redesign is outside the methodology scope.
 
-Landing QA: waffle renders exactly 30 cells; sparkline endpoints match the loaded revenue range; CSV preview shows real active-fact rows; hero canvas mounts or the fallback note shows; no cards or shadows.
+Landing QA: waffle renders exactly 30 cells; sparkline endpoints match the loaded revenue range; Excel preview shows the three sheet names, one real category label, and two real active-fact year values; hero canvas mounts or the fallback note shows; no cards or shadows.
 
 ## 20. Municipal Surfaces
 
@@ -720,13 +720,13 @@ Reference implementation: `apps/web/components/municipalities/`, routes under `a
 
 **Index list hierarchy.** Municipality and region rows remain ranked and sorted by displayed total budget; rank numbers, bars, and primary formatted amounts all continue to use that total. A smaller whole-GEL budget-per-resident line is supporting context only. Region values divide the displayed region total by the summed 2025 population of member municipalities, so Adjara uses its consolidated numerator. The Georgia row remains first on the Regions tab and has no per-resident value because its numerator contains five aggregate-only budgets with no territorial population assignment. The KPI strip reports the median of the 64 municipality-level 2025 per-resident values.
 
-The two reviewed occupied-area overlays render above the municipality fills as pale, non-interactive SVG paths with no public label, tooltip, link, keyboard focus, map text, or legend entry. The source note links `© OpenStreetMap contributors` to `https://www.openstreetmap.org/copyright` and states `ODbL` without adding occupied-territory wording. Natural Earth overlay provenance remains repository documentation because that source is public domain. Codes `05`, `42`, `43`, `46`, and `64` remain excluded from the public registry, standalone facts, regional aggregates, rankings, picker/list/map/member rows, and standalone CSV values. Their raw budgets belong to Georgian municipal bodies operating outside those territories and serving displaced communities, so they are not territorially attributable spending inside the named municipalities; they appear only inside the dedicated Georgia aggregate. Full geometry and licence provenance is documented in `docs/data-methodology/municipal-functional-annual-2015-2025.md`; the approved behavior is specified in `docs/superpowers/specs/2026-08-07-municipality-map-upgrade-design.md`.
+The two reviewed occupied-area overlays render above the municipality fills as pale, non-interactive SVG paths with no public label, tooltip, link, keyboard focus, map text, or legend entry. The source note links `© OpenStreetMap contributors` to `https://www.openstreetmap.org/copyright` and states `ODbL` without adding occupied-territory wording. Natural Earth overlay provenance remains repository documentation because that source is public domain. Codes `05`, `42`, `43`, `46`, and `64` remain excluded from the public registry, standalone facts, regional aggregates, rankings, picker/list/map/member rows, and standalone Excel values. Their raw budgets belong to Georgian municipal bodies operating outside those territories and serving displaced communities, so they are not territorially attributable spending inside the named municipalities; they appear only inside the dedicated Georgia aggregate. Full geometry and licence provenance is documented in `docs/data-methodology/municipal-functional-annual-2015-2025.md`; the approved behavior is specified in `docs/superpowers/specs/2026-08-07-municipality-map-upgrade-design.md`.
 
-**Georgia aggregate.** `/explorer/municipalities/georgia` reuses the municipal chart, table, `% წილი`, range, selector, comparisons, movers, and CSV surfaces over the 69-series country aggregate plus Adjara republican actual payments net of transfers to territorial budgets. In the index's `რეგიონები` tab, `საქართველო` is pinned before the 11 value-ranked region rows; in the entity picker it is the first option, before all regions and municipalities. The exact H1 is `როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები`, with `საქართველოს მუნიციპალიტეტები` as the picker trigger. The country page states `69 მუნიციპალური საბიუჯეტო ერთეული + აჭარის ა.რ.`, derives `2015–2025` from loaded facts, selects only `მთლიანი ბიუჯეტი` by default, and has no fake rank, map, member list, or previous/next navigation.
+**Georgia aggregate.** `/explorer/municipalities/georgia` reuses the municipal chart, table, `% წილი`, range, selector, comparisons, movers, and Excel surfaces over the 69-series country aggregate plus Adjara republican actual payments net of transfers to territorial budgets. In the index's `რეგიონები` tab, `საქართველო` is pinned before the 11 value-ranked region rows; in the entity picker it is the first option, before all regions and municipalities. The exact H1 is `როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები`, with `საქართველოს მუნიციპალიტეტები` as the picker trigger. The country page states `69 მუნიციპალური საბიუჯეტო ერთეული + აჭარის ა.რ.`, derives `2015–2025` from loaded facts, selects only `მთლიანი ბიუჯეტი` by default, and has no fake rank, map, member list, or previous/next navigation.
 
 The Georgia page's total and function rows are dedicated `country.georgia` facts, not a synthetic municipality. Countrywide totals and municipality/region shares use the adjusted country denominator. Municipality and region ranks remain 64/11. The 11 region rows do not reconcile to the Georgia row because codes `05`, `42`, `43`, `46`, and `64` have no territorial region assignment and are included only in the country aggregate; both the index and country source notes explain this boundary. Adjara remains one region, not an extra republic entity.
 
-**One public total.** `მთლიანი ბიუჯეტი` uses `public_total_gel` in the selector, chart, table, KPIs, comparisons, percentage denominator, and numeric CSV total row. For Adjara and Georgia this is the consolidated total. The ten functions remain unchanged and municipality-classified only; their shares can sum below or above 100%. No residual category, proportional republic allocation, or reconciliation warning appears in the explorer. The Georgia CSV contains only the country total and ten country-level functions for each year, identifies the entity as `საქართველო` / `country.georgia`, and never exposes a standalone value or label for an aggregate-only code or Adjara republic entity.
+**One public total.** `მთლიანი ბიუჯეტი` uses `public_total_gel` in the selector, chart, table, KPIs, comparisons, percentage denominator, and Excel total row. For Adjara and Georgia this is the consolidated total. The ten functions remain unchanged and municipality-classified only; their shares can sum below or above 100%. No residual category, proportional republic allocation, or reconciliation warning appears in the explorer. The Georgia workbook uses the public entity label `საქართველო` and contains only the country total and ten country-level functions for each year; it never exposes the internal identifier `country.georgia`, a standalone value or selectable entity for an aggregate-only code, or an Adjara republic entity. Its `წყაროები` sheet may cite the underlying official originals, including those five aggregate-only bodies, solely as provenance rather than public data rows.
 
 **Unit: `მლნ ₾`, not `მლრდ ₾`.** Municipal budgets run one to three orders of magnitude below the national totals the rest of the explorer charts in billions; a billions axis would round most municipal functions to `0.0`. The municipal chart and table pass `UNIT_MLN` (`lib/explorer/format.ts` — one decimal, million GEL) to the same `EditorialLineChart`/`ExplorerTable` the budget explorer passes `UNIT_BN` to. KPI values, list rows, and the entity picker use `formatAmount`, which already auto-selects `მლნ ₾` below ~1bn GEL on its own.
 

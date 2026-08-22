@@ -1,7 +1,20 @@
+import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
+import ExcelJS from "exceljs";
 
 async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+}
+
+async function downloadMunicipalWorkbook(page: Page) {
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByTestId("municipal-excel").click();
+  const download = await downloadPromise;
+  const path = await download.path();
+  if (!path) throw new Error("Expected a local XLSX download path");
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(Uint8Array.from(await readFile(path)).buffer);
+  return { download, workbook };
 }
 
 // Region roll-up pages (Task 12) — reuse Task 11's MunicipalExplorer
@@ -20,10 +33,11 @@ async function expectMunicipalAppReady(page: Page) {
 
 // იმერეთი: 12 member municipalities (data/imports/municipalities.csv), the
 // same region the brief's own manual verification step names.
-const REGION_URL = "http://localhost:3100/explorer/municipalities/region/imereti";
-const ADJARA_URL = "http://localhost:3100/explorer/municipalities/region/adjara";
-const LONG_REGION_URL =
-  "http://localhost:3100/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
+const REGION_URL = `${BASE_URL}/explorer/municipalities/region/imereti`;
+const ADJARA_URL = `${BASE_URL}/explorer/municipalities/region/adjara`;
+const LONG_REGION_URL = `${BASE_URL}/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti`;
 
 test.describe("region header responsiveness", () => {
   for (const viewport of [
@@ -81,6 +95,42 @@ test.describe("region source note", () => {
 });
 
 test.describe("region roll-up page", () => {
+  test("downloads only the active range with readable millions and full-GEL analysis", async ({ page }) => {
+    await page.goto(`${ADJARA_URL}#r=2020-2021`);
+    await expectMunicipalAppReady(page);
+
+    const { download, workbook } = await downloadMunicipalWorkbook(page);
+    expect(download.suggestedFilename()).toBe("fiscal-region-adjara-2020-2021.xlsx");
+    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
+
+    const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
+    expect(readable.getRow(3).values).toEqual([
+      undefined,
+      "კატეგორია",
+      2020,
+      2021,
+      "ცვლილება 2020–2021",
+    ]);
+    expect(readable.getCell("A4").value).toBe("მთლიანი ბიუჯეტი");
+    expect(readable.getCell("B4").value).toBeGreaterThan(1);
+
+    const analysis = workbook.getWorksheet("მონაცემები")!;
+    const analysisRows = (analysis.getRows(2, 10) ?? []).filter((row) => row.getCell(1).value !== null);
+    expect(analysisRows.map((row) => row.getCell(1).value)).toEqual([2020, 2021]);
+    expect(analysis.getCell("D2").value).toBeCloseTo(Number(readable.getCell("B4").value) * 1_000_000);
+    const hyperlinks = workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(hyperlinks).not.toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-06.xlsx`);
+    expect(hyperlinks).not.toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-12.xlsx`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/revenue/files/2020/mof-revenue-form-1.pdf`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/revenue/files/2021/mof-revenue-form-1.pdf`);
+  });
+
   test("renders every member, the roll-up chart, and suppresses the per-member divergence callout", async ({ page }) => {
     const response = await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);
@@ -115,7 +165,7 @@ test.describe("region roll-up page", () => {
 
 test.describe("entity picker region options resolve (previously 404)", () => {
   test("selecting a region option from a municipality page's picker navigates to a real, fully-rendered region page", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities/04"); // თბილისი
+    await page.goto(`${BASE_URL}/explorer/municipalities/04`); // თბილისი
     await expectMunicipalAppReady(page);
     await page.getByTestId("entity-picker-trigger").click();
 

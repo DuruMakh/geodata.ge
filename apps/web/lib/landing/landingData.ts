@@ -6,8 +6,14 @@ import { isDerivedTotalItemId } from "../explorer/explorerData";
 import { colorForItem } from "../explorer/colors";
 
 // Server-side model for the landing page (GeoData Site v2 design): the revenue
-// sparkline, the 30-cell expenditure waffle, and the CSV preview are computed
+// sparkline, the 30-cell expenditure waffle, and the Excel preview are computed
 // from the same active facts the explorer renders, so both screens always agree.
+
+export type ExcelPreview = {
+  sheetNames: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"];
+  headers: ["კატეგორია", string, string];
+  rows: Array<[string, number, number]>;
+};
 
 export type LandingModel = {
   revMin: number;
@@ -20,7 +26,7 @@ export type LandingModel = {
   sparkEndX: string;
   sparkEndY: string;
   waffleCells: string[];
-  csvLines: [string, string, string];
+  excelPreview: ExcelPreview;
 };
 
 type BuildLandingModelInput = {
@@ -85,18 +91,22 @@ export function buildLandingModel({ facts, glossary, sourceDocuments }: BuildLan
     for (let k = 0; k < (floors[index] ?? 0); k++) waffleCells.push(color);
   });
 
-  // CSV preview: an abridged cut of the export — these five columns are a
-  // subset of the real 13-column header (csvExport.ts) in the same relative
-  // order; the trailing ellipsis marks the elided metadata columns. One
-  // revenue and one expenditure row, labels from the glossary, basis from
-  // the active fact.
-  const vatFact = revenueFacts.find((fact) => fact.year === revMax && fact.itemId === "revenue.vat");
-  const socialFact = expenditureFacts.find((fact) => fact.year === expMax && fact.itemId === "spending.social_protection");
-  const csvRow = (fact: ServedBudgetFact | undefined) =>
-    fact
-      ? `${fact.year},${fact.itemId},${glossary.get(fact.itemId)?.kaLabel ?? fact.itemId},${fact.amountGel},${fact.basis},…`
-      : "";
-  const csvLines: [string, string, string] = ["year,category_id,ka_label,amount_gel,basis,…", csvRow(vatFact), csvRow(socialFact)];
+  const [previousYear = "", latestYear = ""] = expenditureYears.slice(-2);
+  const previewFacts = expenditureFacts.filter((fact) => fact.year === previousYear || fact.year === latestYear);
+  const previewRows = Array.from(new Set(previewFacts.map((fact) => fact.itemId)))
+    .map((itemId) => {
+      const values = [previousYear, latestYear].map((year) => previewFacts.find((fact) => fact.itemId === itemId && fact.year === year)?.amountGel);
+      return { itemId, values };
+    })
+    .filter((row): row is { itemId: string; values: [number, number] } => row.values[0] !== undefined && row.values[1] !== undefined)
+    .sort((a, b) => b.values[1] - a.values[1])
+    .slice(0, 1)
+    .map((row) => [glossary.get(row.itemId)?.kaLabel ?? row.itemId, row.values[0], row.values[1]] as [string, number, number]);
+  const excelPreview: ExcelPreview = {
+    sheetNames: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"],
+    headers: ["კატეგორია", String(previousYear), String(latestYear)],
+    rows: previewRows,
+  };
 
   return {
     revMin,
@@ -109,6 +119,6 @@ export function buildLandingModel({ facts, glossary, sourceDocuments }: BuildLan
     sparkEndX: px(revenueYears.length - 1),
     sparkEndY: py(totals.at(-1) ?? 0),
     waffleCells: waffleCells.slice(0, WAFFLE_CELLS),
-    csvLines,
+    excelPreview,
   };
 }

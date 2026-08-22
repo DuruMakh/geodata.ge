@@ -157,21 +157,41 @@ export function LandingPage({ model }: { model: LandingModel }) {
             </div>
 
             <div className="flex flex-col gap-3 border-t border-[var(--hairline)] pt-4">
-              <PathCardLabel index="03">ღია CSV</PathCardLabel>
+              <PathCardLabel index="03">Excel მონაცემები</PathCardLabel>
               <p className="text-pretty text-[13.5px] leading-relaxed text-[var(--body)]">
-                ჩამოტვირთე ზუსტად ის მონაცემები, რასაც ხედავ — წყაროსა და სტატუსის მეტამონაცემებით.
+                ექსპლორერში შერჩეული მონაცემები ჩამოტვირთე ერთ Excel ფაილად — წასაკითხად, ანალიზისთვის და წყაროების გადასამოწმებლად.
               </p>
-              <div className="mt-1.5 flex max-w-[340px] flex-col gap-1.5 bg-[var(--tint)] px-3.5 py-3">
-                {model.csvLines.map((line, index) => (
-                  <div
-                    key={index}
-                    className={`overflow-hidden text-ellipsis whitespace-nowrap font-[family-name:var(--font-numeric)] text-[10.5px] ${
-                      index === 0 ? "text-[var(--muted)]" : "text-[var(--body)]"
-                    }`}
-                  >
-                    {line}
-                  </div>
-                ))}
+              <div className="mt-1.5 max-w-[340px] bg-[var(--tint)] px-3.5 py-3">
+                <div className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
+                  {model.excelPreview.sheetNames.map((sheetName, index) => (
+                    <span key={sheetName}>
+                      {index > 0 ? " · " : null}
+                      <span>{sheetName}</span>
+                    </span>
+                  ))}
+                </div>
+                <table data-testid="excel-preview" className="mt-2 w-full text-[10.5px] font-[family-name:var(--font-numeric)]">
+                  <thead className="text-[var(--muted)]">
+                    <tr>
+                      {model.excelPreview.headers.map((header, index) => (
+                        <th key={header} scope="col" className={index === 0 ? "text-left font-normal" : "text-right font-normal"}>
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="text-[var(--body)]">
+                    {model.excelPreview.rows.map(([label, previousValue, latestValue]) => (
+                      <tr key={label}>
+                        <th scope="row" className="max-w-[120px] truncate text-left font-normal">
+                          {label}
+                        </th>
+                        <td className="text-right">{previousValue.toLocaleString("en-US")}</td>
+                        <td className="text-right">{latestValue.toLocaleString("en-US")}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
               <PathCardLink href="/explorer/revenue">შემოსავლების მონაცემები</PathCardLink>
             </div>

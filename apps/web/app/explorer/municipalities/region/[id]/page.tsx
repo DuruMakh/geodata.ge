@@ -16,8 +16,10 @@ import {
 } from "../../../../../lib/explorer/municipalData";
 import { georgianOrdinal, REGION_GENITIVE_KA } from "../../../../../lib/explorer/municipalLabels";
 import { formatAmount } from "../../../../../lib/explorer/format";
-import { coverageFromYears, fiscalMetadata } from "../../../../../lib/seo/metadata";
+import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../../lib/methodology/workbookSources";
 import { regionIntroduction } from "../../../../../lib/seo/content";
+import { coverageFromYears, fiscalMetadata } from "../../../../../lib/seo/metadata";
+import { resolveSiteUrl } from "../../../../../lib/siteUrl";
 
 const SOURCE_NOTE_BASE =
   "მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). " +
@@ -59,8 +61,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function RegionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const regionId = `region.${id}`;
-  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = await loadServedMunicipalData();
-  const { sourceDocuments } = await loadServedLandingData();
+  const [servedMunicipalData, landingData, functionalWorkbookSources, workbookSources, adjustmentWorkbookSources] = await Promise.all([
+    loadServedMunicipalData(),
+    loadServedLandingData(),
+    loadWorkbookSources("municipalities", "municipal-functional"),
+    loadWorkbookSources("municipalities", "municipal-total"),
+    loadWorkbookSources("revenue", "revenue"),
+  ]);
+  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = servedMunicipalData;
+  const { sourceDocuments } = landingData;
 
   const region = regions.find((row) => row.id === regionId);
   if (!region) notFound();
@@ -81,6 +90,10 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   const nationalTotalByYear = buildCountryTotalByYear(countryTotalFacts);
 
   const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
+  const entityWorkbookSources = scopeMunicipalWorkbookSources(workbookSources, {
+    municipalityCodes: members.memberCodes,
+    includeAdjaraRepublic: regionId === ADJARA_REGION_ID,
+  });
   // Collapse the members' rows into one entity's on the SERVER, so this page
   // ships ~110 function rows like a municipality page rather than up to 12×.
   const rolled = aggregateFactsForEntity(regionId, members.functionFacts, members.totalFacts);
@@ -138,7 +151,11 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
             rankByYear,
             rankOutOf: regions.length,
           }}
-          csvBasename={`region-${id}`}
+          workbookBasename={`region-${id}`}
+          workbookSources={entityWorkbookSources}
+          functionalWorkbookSources={functionalWorkbookSources}
+          supplementalWorkbookSources={regionId === ADJARA_REGION_ID ? adjustmentWorkbookSources : []}
+          siteOrigin={resolveSiteUrl()}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,
             nameKa: "საქართველო",

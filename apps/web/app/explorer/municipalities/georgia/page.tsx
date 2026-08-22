@@ -9,8 +9,10 @@ import {
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
 } from "../../../../lib/explorer/municipalData";
-import { coverageFromYears, fiscalMetadata } from "../../../../lib/seo/metadata";
+import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
 import { municipalitiesIntroduction } from "../../../../lib/seo/content";
+import { coverageFromYears, fiscalMetadata } from "../../../../lib/seo/metadata";
+import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
 const ROUTE = "/explorer/municipalities/georgia";
 
@@ -25,9 +27,24 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function GeorgiaMunicipalitiesPage() {
+  const [servedMunicipalData, landingData, functionalWorkbookSources, workbookSources, adjustmentWorkbookSources] = await Promise.all([
+    loadServedMunicipalData(),
+    loadServedLandingData(),
+    loadWorkbookSources("municipalities", "municipal-functional"),
+    loadWorkbookSources("municipalities", "municipal-total"),
+    loadWorkbookSources("revenue", "revenue"),
+  ]);
   const { municipalities, regions, functions, totalFacts, countryFunctionFacts, countryTotalFacts, adjaraBudgetAdjustments } =
-    await loadServedMunicipalData();
-  const { sourceDocuments } = await loadServedLandingData();
+    servedMunicipalData;
+  const { sourceDocuments } = landingData;
+  const entityWorkbookSources = scopeMunicipalWorkbookSources(
+    workbookSources,
+    {
+      municipalityCodes: municipalities.map((municipality) => municipality.code),
+      includeAdjaraRepublic: true,
+      includeAggregateOnlyCodes: true,
+    },
+  );
 
   const years = Array.from(new Set(countryTotalFacts.map((row) => row.year))).sort((a, b) => a - b);
   const firstYear = years[0]!;
@@ -62,7 +79,11 @@ export default async function GeorgiaMunicipalitiesPage() {
           totalFacts={countryTotalFacts}
           sourceDocuments={sourceDocuments}
           metrics={{ kind: "country", budgetCount: 69 }}
-          csvBasename="municipalities-georgia"
+          workbookBasename="municipalities-georgia"
+          workbookSources={entityWorkbookSources}
+          functionalWorkbookSources={functionalWorkbookSources}
+          supplementalWorkbookSources={adjustmentWorkbookSources}
+          siteOrigin={resolveSiteUrl()}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,
             nameKa: "საქართველო",

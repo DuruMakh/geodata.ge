@@ -80,9 +80,10 @@ bodies operating outside the occupied territories and serving displaced communit
 territorially attributable expenditure delivered inside those occupied municipalities. By
 user decision, all five codes are excluded from the public registry, both municipality-keyed
 served fact files, regional aggregates, rankings, routes, picker/list/map/member rows, and
-standalone CSV values. They are included only in the dedicated `country.georgia` aggregate.
-The raw research package, official workbooks, manifests, hashes, and validation report remain
-unchanged for provenance.
+standalone public workbook rows or selectable entities. They contribute only to the public
+`საქართველო` aggregate. Their underlying official originals may appear on that workbook's
+`წყაროები` sheet as provenance, not as public data rows. The raw research package,
+official workbooks, manifests, hashes, and validation report remain unchanged for provenance.
 
 With code `05` excluded, `region.abkhazia` has no served municipality and is omitted from the
 municipal data taxonomy. The map's reviewed occupied-area geometry is a non-interactive visual
@@ -207,9 +208,12 @@ presented as territorially attributable expenditure.
 
 The index pins `საქართველო` first in the `რეგიონები` tab, and the entity picker lists it first.
 The country heading is `როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები`. The page has no
-rank, map, member list, or previous/next entity navigation. Its CSV contains only the country
-total and ten country functions by year, identifies the scope as `country.georgia`, and exposes
-no standalone code, name, or amount for any of the five aggregate-only bodies.
+rank, map, member list, or previous/next entity navigation. Its three-sheet Excel workbook uses
+the public label `საქართველო` and exposes only the country total and ten country functions by
+year. It never exposes the internal identifier `country.georgia`, a standalone code, name, or
+amount for any of the five aggregate-only bodies, or an Adjara republic entity. Its `წყაროები`
+sheet may cite their underlying official originals for complete provenance; source
+citations are not public data rows.
 
 ## Adjara consolidated adjustment
 
@@ -247,7 +251,7 @@ amount is added once to the Georgia total; the 2025 adjusted Georgia value is
 
 The supplied republican series does not provide a reviewed 2015–2025 crosswalk to the ten
 municipal functions. Therefore the Adjara and Georgia total line, percentages, comparisons and
-CSV total use the consolidated denominator, while the ten functions remain municipal-only.
+Excel workbook total use the consolidated denominator, while the ten functions remain municipal-only.
 No proportional allocation or invented residual is used, and the public source notes disclose
 this coverage boundary.
 
@@ -300,7 +304,7 @@ The public interface uses `public_total_gel` as `მთლიანი ბიუ
 
 For 2016-2019, the official total and functional rows may come from different archived MoF publication versions. For later years, total payments may include financial-asset growth and liability decrease that are not distributed across the ten functions. No category is adjusted and no residual series is created.
 
-Reconciliation fields and warning types remain internal quality-control data. The explorer does not render a warning. A future municipal CSV enhancement should carry this explanation as metadata; that narrative CSV enhancement is deferred.
+Reconciliation fields and warning types remain internal quality-control data. The explorer does not render a warning, and the approved three-sheet Excel workbook does not expose reconciliation metadata; the existing public source note explains the coverage boundary.
 
 The finalized package has the following internal validation classifications:
 
@@ -338,9 +342,9 @@ The functional CSVs retain stable lowercase ASCII category identifiers, official
 
 ## Encoding
 
-All Excel-facing CSV outputs are UTF-8 with the three-byte BOM prefix `EF BB BF`. This prevents Windows Excel from guessing a legacy encoding and displaying Georgian text as mojibake.
+Canonical municipal CSV artifacts intended for direct Excel review are UTF-8 with the three-byte BOM prefix `EF BB BF`. This prevents Windows Excel from guessing a legacy encoding and displaying Georgian text as mojibake.
 
-The native XLSX workbook is the preferred human-review artifact. Georgian text and identifier columns are stored as typed workbook values.
+The public explorer download is the approved native three-sheet XLSX workbook. Internal identifiers remain in canonical data artifacts and are not exposed in its public sheets; relevant public originals appear only on `წყაროები`.
 
 ## Validation
 

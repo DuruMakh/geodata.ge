@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { ExplorerItem, ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { formatAmount } from "../../lib/explorer/format";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
@@ -78,7 +78,7 @@ type SeriesPanelProps = {
   onSelectionChange: (itemIds: string[]) => void;
   onToggle: (itemId: string) => void;
   onToggleExpanded: (itemId: string) => void;
-  onDownloadCsv: () => void;
+  downloadAction: ReactNode;
 };
 
 export function SeriesPanel({
@@ -94,7 +94,7 @@ export function SeriesPanel({
   onSelectionChange,
   onToggle,
   onToggleExpanded,
-  onDownloadCsv,
+  downloadAction,
 }: SeriesPanelProps) {
   // The query is panel-local so keystrokes re-render only this aside — the parent
   // keys this component by scope, which also resets the search on nav/grouping
@@ -163,14 +163,7 @@ export function SeriesPanel({
         })}
       </SeriesSelector>
 
-      <button
-        type="button"
-        data-testid="series-csv"
-        onClick={onDownloadCsv}
-        className="mt-[18px] h-[38px] w-full cursor-pointer rounded-[2px] bg-[var(--ink)] text-[12.5px] font-semibold text-[var(--paper)] transition-opacity duration-150 hover:opacity-85"
-      >
-        CSV ჩამოტვირთვა
-      </button>
+      {downloadAction}
     </aside>
   );
 }

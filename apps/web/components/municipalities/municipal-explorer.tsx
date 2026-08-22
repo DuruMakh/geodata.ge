@@ -13,9 +13,16 @@ import {
   buildMunicipalEntityModel,
   getDefaultMunicipalSelection,
 } from "../../lib/explorer/municipalData";
-import { buildExplorerCsv } from "../../lib/explorer/csvExport";
 import { formatAmount, UNIT_MLN } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
+import {
+  buildWorkbookExportModel,
+  type WorkbookExportInput,
+  type WorkbookPublicSource,
+  type WorkbookSeries,
+} from "../../lib/explorer/workbookModel";
+import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
+import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -53,7 +60,11 @@ type MunicipalExplorerBaseProps = {
   totalFacts: MunicipalTotalFact[];
   sourceDocuments: SourceDocumentRow[];
 
-  csvBasename: string;
+  workbookBasename: string;
+  workbookSources: WorkbookPublicSource[];
+  functionalWorkbookSources?: WorkbookPublicSource[];
+  supplementalWorkbookSources?: WorkbookPublicSource[];
+  siteOrigin: string;
   pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
   sourceNote: string;
@@ -157,25 +168,64 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
     state.setSelectedIds(hasSelection ? [] : selectableRows.map((row) => row.itemId));
   }
 
-  function downloadCsv() {
-    const csv = buildExplorerCsv([...model.rows, model.totalRow], years);
-    const countryCsv =
-      metrics.kind === "country"
-        ? (() => {
-            const [header, ...rows] = csv.split("\n");
-            return [
-              `\uFEFFentity_id,entity_name,${header?.replace(/^\uFEFF/, "") ?? ""}`,
-              ...rows.map((row) => `${props.entityId},${props.pickerCountry.nameKa},${row}`),
-            ].join("\n");
-          })()
-        : csv;
-    const blob = new Blob([countryCsv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `fiscal-${props.csvBasename}-${state.range.start}-${state.range.end}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
+  function buildWorkbookInput(): WorkbookExportInput {
+    const selectedRows = [model.totalRow, ...model.rows].filter((row) =>
+      state.selectedIds.includes(row.itemId),
+    );
+    const years = allYears.filter(
+      (year) => year >= state.range.start && year <= state.range.end,
+    );
+    const workbookSeries = selectedRows.map<WorkbookSeries>((row) => {
+      const pointsByYear: WorkbookSeries["pointsByYear"] = {};
+      for (const year of years) {
+        const amountGel = row.valuesByYear[year];
+        const basis = row.basisByYear[year];
+        const total = model.totalRow.valuesByYear[year];
+        pointsByYear[year] = amountGel === null || amountGel === undefined || basis === undefined
+          ? null
+          : {
+              amountGel,
+              measureValue: state.share
+                ? total === null || total === undefined || total === 0
+                  ? null
+                  : amountGel / total
+                : undefined,
+              basis,
+            };
+      }
+
+      return {
+        id: row.itemId,
+        kind: row.itemId === model.totalRow.itemId ? "total" : "item",
+        parentLabelKa: null,
+        labelKa: row.kaLabel,
+        pointsByYear,
+      };
+    });
+    const hasFunctionSeries = selectedRows.some((row) => row.itemId !== model.totalRow.itemId);
+    const hasTotalSeries = selectedRows.some((row) => row.itemId === model.totalRow.itemId);
+    const useTotalSources = hasTotalSeries || (state.share && hasFunctionSeries);
+    return {
+      filenameBase: props.workbookBasename,
+      titleKa: metrics.kind === "country" ? props.pickerCountry.nameKa : props.triggerLabel,
+      groupLabelKa: "მუნიციპალური ხარჯები",
+      years,
+      measure: state.share
+        ? {
+            kind: "percentage",
+            unitLabelKa: "% წილი",
+            analysisHeaderKa: "წილი მთლიან ბიუჯეტში (%)",
+          }
+        : { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
+      totalId: model.totalRow.itemId,
+      series: workbookSeries,
+      sources: [
+        ...(hasFunctionSeries ? props.functionalWorkbookSources ?? [] : []),
+        ...(useTotalSources ? props.workbookSources : []),
+        ...(useTotalSources ? props.supplementalWorkbookSources ?? [] : []),
+      ],
+      siteOrigin: props.siteOrigin,
+    };
   }
 
   useEffect(() => {
@@ -352,14 +402,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
                 />
               ))}
             </SeriesSelector>
-            <button
-              type="button"
-              data-testid="municipal-csv"
-              onClick={downloadCsv}
-              className="mt-[18px] h-[38px] w-full cursor-pointer rounded-[2px] bg-[var(--ink)] text-[12.5px] font-semibold text-[var(--paper)] transition-opacity duration-150 hover:opacity-85"
-            >
-              CSV ჩამოტვირთვა
-            </button>
+            <ExcelDownloadButton
+              testId="municipal-excel"
+              disabled={state.selectedIds.length === 0}
+              onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildWorkbookInput()))}
+            />
 
             <Link
               href="/explorer/municipalities"

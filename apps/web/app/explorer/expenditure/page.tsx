@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
+import { loadGdpWorkbookSources, loadWorkbookSources } from "../../../lib/methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
+import { resolveSiteUrl } from "../../../lib/siteUrl";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { facts } = await loadServedLandingData();
@@ -15,7 +17,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ExpenditurePage() {
-  const { facts, glossary, sourceDocuments, adminFacts, adminCategories, gdpFacts } = await loadServedExplorerData();
+  const [{ facts, glossary, sourceDocuments, adminFacts, adminCategories, gdpFacts }, workbookSources, adminWorkbookSources, gdpWorkbookSources] =
+    await Promise.all([
+      loadServedExplorerData(),
+      loadWorkbookSources("expenditure", "expenditure-fields"),
+      loadWorkbookSources("expenditure", "expenditure-ministries"),
+      loadGdpWorkbookSources(),
+    ]);
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
 
   return (
@@ -29,6 +37,10 @@ export default async function ExpenditurePage() {
         glossaryEntries={Array.from(glossary.values())}
         sourceDocuments={sourceDocuments}
         gdpFacts={gdpFacts}
+        workbookSources={workbookSources}
+        adminWorkbookSources={adminWorkbookSources}
+        gdpWorkbookSources={gdpWorkbookSources}
+        siteOrigin={resolveSiteUrl()}
         lastUpdatedAt={lastUpdatedAt}
       />
     </>

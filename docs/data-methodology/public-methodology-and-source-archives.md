@@ -16,7 +16,7 @@ The initial approved inventory is 175 untouched originals totalling 61,420,375 b
 
 The originals under `docs/Raw Data/` are immutable. Never normalize, re-encode, rename in place, or otherwise rewrite a published original. Add a newly captured upstream file as a new original and update the reviewed manifest; if an upstream correction supersedes a file, retain the earlier bytes unless a separate reviewed removal decision says otherwise.
 
-Prepared GeoData CSV, text, validation, and geometry artifacts are not upstream originals and must never be described or published as such. Explorer CSV exports remain on their explorer surfaces.
+Prepared GeoData CSV, text, validation, and geometry artifacts are not upstream originals and must never be described or published as such. Explorer Excel workbooks remain on their explorer surfaces; methodology manifest CSVs remain archive artifacts with their existing contract.
 
 ## Reviewed manifest contract
 

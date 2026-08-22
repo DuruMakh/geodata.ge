@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
+import ExcelJS from "exceljs";
 
 // Municipality entity pages (Task 11). Three things nothing in the repo
 // exercised before this page existed:
@@ -22,7 +23,9 @@ import { expect, test, type Page } from "@playwright/test";
 //
 // Full section e2e coverage is Task 14's; this pins the specific gaps above.
 
-const ENTITY_URL = "http://localhost:3100/explorer/municipalities/04"; // თბილისი
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
+const ENTITY_URL = `${BASE_URL}/explorer/municipalities/04`; // თბილისი
 const ALL_FUNCTIONS = [
   "municipal.general_public_services",
   "municipal.defence",
@@ -38,6 +41,17 @@ const ALL_FUNCTIONS = [
 
 async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+}
+
+async function downloadMunicipalWorkbook(page: Page) {
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByTestId("municipal-excel").click();
+  const download = await downloadPromise;
+  const path = await download.path();
+  if (!path) throw new Error("Expected a local XLSX download path");
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(Uint8Array.from(await readFile(path)).buffer);
+  return { download, workbook };
 }
 
 test.describe("hash sanitising", () => {
@@ -567,25 +581,122 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("series-toggle-all")).toHaveAttribute("aria-checked", "true");
   });
 
-  test("offers a CSV download", async ({ page }) => {
-    await page.goto(ENTITY_URL);
+  test("downloads the selected range and series as a sourced percentage workbook", async ({ page }) => {
+    await page.goto(`${ENTITY_URL}#r=2020-2021&sh=1&sel=municipal.total,municipal.education`);
     await expectMunicipalAppReady(page);
-    const downloadPromise = page.waitForEvent("download");
-    await page.getByTestId("municipal-csv").click();
-    const download = await downloadPromise;
-    expect(download.suggestedFilename()).toMatch(/^fiscal-municipality-04-\d{4}-\d{4}\.csv$/);
-    const path = await download.path();
-    const csv = await readFile(path!, "utf8");
-    const total2016 = csv.split("\n").find((row) => row.startsWith("2016,municipal.total,"));
-    expect(total2016).toContain("832409547.15");
+    await page.getByTestId("series-search").fill("ჯანდაცვა");
+
+    const { download, workbook } = await downloadMunicipalWorkbook(page);
+    expect(download.suggestedFilename()).toBe("fiscal-municipality-04-2020-2021.xlsx");
+    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
+
+    const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
+    expect(readable.getRow(3).values).toEqual([
+      undefined,
+      "კატეგორია",
+      2020,
+      2021,
+      "ცვლილება 2020–2021",
+    ]);
+    expect([readable.getCell("A4").value, readable.getCell("A5").value]).toEqual([
+      "მთლიანი ბიუჯეტი",
+      "განათლება",
+    ]);
+    expect(readable.getCell("B4").value).toBe(1);
+    expect(readable.getCell("B5").value).toBeCloseTo(148_386_753.36 / 1_080_555_805.54);
+
+    const analysis = workbook.getWorksheet("მონაცემები")!;
+    const analysisRows = (analysis.getRows(2, 20) ?? []).filter((row) => row.getCell(1).value !== null);
+    expect(analysis.getRow(1).values).toContain("წილი მთლიან ბიუჯეტში (%)");
+    expect(analysisRows.map((row) => row.getCell(1).value)).toEqual([2020, 2021]);
+    expect(analysisRows.map((row) => row.getCell(3).value)).toEqual(["განათლება", "განათლება"]);
+    expect(analysis.getCell("D2").value).toBe(148_386_753.36);
+    expect(analysis.getCell("F2").value).toBeCloseTo(148_386_753.36 / 1_080_555_805.54);
+    expect(analysis.getCell("F2").numFmt).toBe("0.0%");
+    expect(analysis.getCell("F2").value).toBeCloseTo(148_386_753.36 / 1_080_555_805.54);
+
+    const hyperlinks = workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx`);
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx`);
+    expect(hyperlinks).not.toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-05.xlsx`);
+    expect(hyperlinks).not.toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx`);
+  });
+
+  test("2015 total-only uses the portal fallback without a history workbook", async ({ page }) => {
+    await page.goto(`${ENTITY_URL}#r=2015-2015&sel=municipal.total`);
+    await expectMunicipalAppReady(page);
+    const { workbook } = await downloadMunicipalWorkbook(page);
+    const sources = workbook.getWorksheet("წყაროები")!;
+    const hyperlinks = sources.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2015-2019/municipalities-portal-functionals.zip`);
+    expect(hyperlinks.some((value) => value.includes("budget-history-04"))).toBe(false);
+  });
+
+  test("2016 total-only uses the municipality history without the 2015 portal fallback", async ({ page }) => {
+    await page.goto(`${ENTITY_URL}#r=2016-2016&sel=municipal.total`);
+    await expectMunicipalAppReady(page);
+    const { workbook } = await downloadMunicipalWorkbook(page);
+    const sources = workbook.getWorksheet("წყაროები")!;
+    const hyperlinks = sources.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx`);
+    expect(hyperlinks.some((value) => value.includes("municipalities-portal-functionals"))).toBe(false);
+  });
+
+  test("nominal function-only excludes total histories while percentage function-only keeps the denominator sources", async ({ page }) => {
+    await page.goto(`${ENTITY_URL}#r=2020-2020&sel=municipal.education`);
+    await expectMunicipalAppReady(page);
+    const nominal = await downloadMunicipalWorkbook(page);
+    const nominalLinks = nominal.workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(nominalLinks.some((value) => value.includes("mof-functional-classification.xlsx"))).toBe(true);
+    expect(nominalLinks.some((value) => value.includes("budget-history-04.xlsx"))).toBe(false);
+
+    await page.goto(`${ENTITY_URL}#r=2020-2020&sel=municipal.education`);
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("municipal-share-toggle").click();
+    const percentage = await downloadMunicipalWorkbook(page);
+    const percentageLinks = percentage.workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(percentageLinks.some((value) => value.includes("mof-functional-classification.xlsx"))).toBe(true);
+    expect(percentageLinks.some((value) => value.includes("budget-history-04.xlsx"))).toBe(true);
+  });
+
+  test("Khulo 2024 total cites the functional fallback instead of its history workbook", async ({ page }) => {
+    await page.goto(`${BASE_URL}/explorer/municipalities/11#r=2024-2024&sel=municipal.total`);
+    await expectMunicipalAppReady(page);
+    const { workbook } = await downloadMunicipalWorkbook(page);
+    const hyperlinks = workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2024/mof-functional-classification.xlsx`);
+    expect(hyperlinks.some((value) => value.includes("budget-history-11.xlsx"))).toBe(false);
   });
 
   test("uses the same export control treatment as the national explorer", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
-    const classes = await page.getByTestId("municipal-csv").getAttribute("class");
-    expect(classes).toContain("mt-[18px]");
+    const classes = await page.getByTestId("municipal-excel").getAttribute("class");
     expect(classes).toContain("h-[38px]");
     expect(classes).toContain("w-full");
     expect(classes).toContain("bg-[var(--ink)]");
@@ -614,7 +725,7 @@ test.describe("municipality page", () => {
   });
 
   test("uses the historical range-end rank rather than the latest-year rank", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities/18#r=2015-2015");
+    await page.goto(`${BASE_URL}/explorer/municipalities/18#r=2015-2015`);
     await expectMunicipalAppReady(page);
 
     const rankKpi = page.getByTestId("entity-kpi").filter({ hasText: "წილი მუნიციპალურ ხარჯებში" });
@@ -705,14 +816,14 @@ test.describe("municipality page", () => {
     expect(await comparisonHeader.innerText()).toBe(await explorerHeader.innerText());
   });
 
-  test("renders municipality indicators across the page below the CSV panel", async ({ page }) => {
+  test("renders municipality indicators across the page below the Excel panel", async ({ page }) => {
     await page.setViewportSize({ width: 1600, height: 1000 });
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
     const workspace = page.getByTestId("municipal-workspace");
     const indicators = page.getByTestId("period-indicators");
-    const csvButton = page.getByTestId("municipal-csv");
+    const excelButton = page.getByTestId("municipal-excel");
 
     await expect(workspace.locator("[data-testid='period-indicators']")).toHaveCount(0);
     await expect(indicators).toBeVisible();
@@ -721,15 +832,15 @@ test.describe("municipality page", () => {
     const columns = await workspace.evaluate((element) => getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/));
     const workspaceBox = await workspace.boundingBox();
     const indicatorsBox = await indicators.boundingBox();
-    const csvBox = await csvButton.boundingBox();
+    const excelBox = await excelButton.boundingBox();
 
     expect(columns).toHaveLength(2);
     expect(workspaceBox).not.toBeNull();
     expect(indicatorsBox).not.toBeNull();
-    expect(csvBox).not.toBeNull();
+    expect(excelBox).not.toBeNull();
     expect(Math.abs(indicatorsBox!.x - workspaceBox!.x)).toBeLessThanOrEqual(1);
     expect(Math.abs(indicatorsBox!.width - workspaceBox!.width)).toBeLessThanOrEqual(1);
-    expect(indicatorsBox!.y).toBeGreaterThanOrEqual(csvBox!.y + csvBox!.height);
+    expect(indicatorsBox!.y).toBeGreaterThanOrEqual(excelBox!.y + excelBox!.height);
   });
 
   test("matches the national mover and comparison presentation", async ({ page }) => {
@@ -810,7 +921,7 @@ test.describe("municipality page", () => {
     ]) {
       for (const width of [320, 375, 390, 430]) {
         await page.setViewportSize({ width, height: 844 });
-        await page.goto(`http://localhost:3100${path}`);
+        await page.goto(`${BASE_URL}${path}`);
         await expectMunicipalAppReady(page);
 
         const controls = page.getByTestId("municipal-chart-controls");
