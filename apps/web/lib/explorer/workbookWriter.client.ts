@@ -130,7 +130,6 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
 
   worksheet.getColumn(1).width = 46;
   for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = SOURCE_TEXT_COLUMN_WIDTH;
-  worksheet.getColumn(4).width = 16;
 }
 
 function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel["analysis"]): void {

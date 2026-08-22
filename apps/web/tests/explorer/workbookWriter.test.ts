@@ -101,7 +101,7 @@ describe("createWorkbookBuffer", () => {
     expect(readable.getColumn(1).width).toBeGreaterThanOrEqual(42);
     expect(readable.getColumn(2).width).toBe(18);
     expect(readable.getColumn(3).width).toBe(18);
-    expect(readable.getColumn(4).width).toBe(16);
+    expect([1, 2, 3, 4, 5].map((column) => readable.getColumn(column).width)).toEqual([46, 18, 18, 18, 18]);
     expect(readable.views[0]).toMatchObject({ state: "frozen", xSplit: 1, ySplit: 3 });
 
     const analysis = workbook.getWorksheet("მონაცემები")!;
@@ -167,7 +167,7 @@ describe("createWorkbookBuffer", () => {
     expectSourceMetadata(readable);
     expect(readable.getCell("A1").value).toBe("საქართველოს საგადასახადო შემოსავლები");
     expect(readable.model.merges).toContain("A1:D1");
-    expect(readable.getColumn(4).width).toBe(16);
+    expect(readable.getColumn(4).width).toBe(18);
   });
 
   it("keeps two-year source metadata in distinct cells", async () => {
