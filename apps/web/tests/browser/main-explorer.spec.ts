@@ -648,6 +648,9 @@ test("GDP share Excel download adds the analysis column and official sources", a
     "სტატუსი",
     "მშპ-ის წილი (%)",
   ]);
+  const analysis = workbook.getWorksheet("მონაცემები")!;
+  expect(analysis.getCell("F2").value).toEqual(expect.any(Number));
+  expect(analysis.getCell("F2").numFmt).toBe("0.0%");
   const readableText = JSON.stringify(workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues());
   expect(readableText).toContain("https://www.geostat.ge/");
   expect(readableText).not.toMatch(/docs[\\/]Raw Data|national-gdp-annual/);

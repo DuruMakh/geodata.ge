@@ -149,7 +149,10 @@ describe("createWorkbookBuffer", () => {
       },
     });
 
-    expect(workbook.getWorksheet("მონაცემები")!.getCell("F1").value).toBe("მშპ-ის წილი (%)");
+    const analysis = workbook.getWorksheet("მონაცემები")!;
+    expect(analysis.getCell("F1").value).toBe("მშპ-ის წილი (%)");
+    expect(analysis.getCell("F2").value).toBe(0.025);
+    expect(analysis.getCell("F2").numFmt).toBe("0.0%");
   });
 
   it("keeps one-year source metadata in distinct cells", async () => {

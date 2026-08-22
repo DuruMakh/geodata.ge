@@ -142,6 +142,10 @@ function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel[
     columns: analysis.headers.map((name) => ({ name, filterButton: true })),
     rows: analysis.rows,
   });
+  const percentageColumns = analysis.headers.flatMap((header, index) => header.endsWith("(%)") ? [index + 1] : []);
+  for (const column of percentageColumns) {
+    for (let row = 2; row <= analysis.rows.length + 1; row += 1) worksheet.getCell(row, column).numFmt = "0.0%";
+  }
 }
 
 export async function createWorkbookBuffer(model: WorkbookExportModel): Promise<ArrayBuffer> {

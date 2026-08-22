@@ -611,6 +611,8 @@ test.describe("municipality page", () => {
     expect(analysisRows.map((row) => row.getCell(3).value)).toEqual(["განათლება", "განათლება"]);
     expect(analysis.getCell("D2").value).toBe(148_386_753.36);
     expect(analysis.getCell("F2").value).toBeCloseTo(148_386_753.36 / 1_080_555_805.54);
+    expect(analysis.getCell("F2").numFmt).toBe("0.0%");
+    expect(analysis.getCell("F2").value).toBeCloseTo(148_386_753.36 / 1_080_555_805.54);
 
     const hyperlinks = readable.getSheetValues().flatMap((row) =>
       Array.isArray(row)
