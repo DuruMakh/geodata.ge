@@ -64,6 +64,45 @@ describe("projectWorkbookSources", () => {
     expect(JSON.stringify(projected)).not.toContain("docs/Raw Data");
     expect(JSON.stringify(projected)).not.toContain("source.mof");
   });
+
+  it("deduplicates validated originals by content hash with a deterministic preference", () => {
+    const base = {
+      dataset_id: "expenditure" as const,
+      year: "2025",
+      years: [2025],
+      source_organization: "საქართველოს ფინანსთა სამინისტრო",
+      official_filename: "2025-fact.xlsx",
+      official_url_or_archive_url: "Repository archive",
+      repository_source_path: "docs/Raw Data/Expenditure/2025-fact.xlsx",
+      media_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      byte_size: 10,
+      sha256: "b".repeat(64),
+      retrieved_at: "2026-05-14",
+      retrieved_at_basis: "repository_first_commit_proxy" as const,
+      license_id: "official-public-document-no-explicit-license",
+      attribution_text: "საქართველოს ფინანსთა სამინისტრო",
+      redistribution_status: "repository_owner_approved" as const,
+      notes: "",
+    };
+    const finalFact = {
+      ...base,
+      source_id: "source.mof.expenditure.2025.mof_final_fact",
+      display_title_ka: "Final fact",
+      public_download_path: "downloads/methodology/expenditure/files/2025/mof-final-fact.xlsx",
+      downloadHref: "/downloads/methodology/expenditure/files/2025/mof-final-fact.xlsx" as const,
+    };
+    const excelFact = {
+      ...base,
+      source_id: "source.mof.expenditure.2025.mof_excel_fact",
+      display_title_ka: "Excel fact",
+      public_download_path: "downloads/methodology/expenditure/files/2025/mof-excel-fact.xlsx",
+      downloadHref: "/downloads/methodology/expenditure/files/2025/mof-excel-fact.xlsx" as const,
+    };
+
+    expect(projectWorkbookSources([finalFact, excelFact])).toEqual([
+      expect.objectContaining({ downloadHref: excelFact.downloadHref, titleKa: "Excel fact" }),
+    ]);
+  });
 });
 
 describe("loadWorkbookSources", () => {
@@ -83,6 +122,23 @@ describe("loadWorkbookSources", () => {
   it("memoizes the promise per dataset", () => {
     resetWorkbookSourceCacheForTests();
     expect(loadWorkbookSources("revenue")).toBe(loadWorkbookSources("revenue"));
+  });
+
+  it("returns role-scoped national and municipal source sets", async () => {
+    resetWorkbookSourceCacheForTests();
+    const revenue = await loadWorkbookSources("revenue", "revenue");
+    const fields = await loadWorkbookSources("expenditure", "expenditure-fields");
+    const ministries = await loadWorkbookSources("expenditure", "expenditure-ministries");
+    const functional = await loadWorkbookSources("municipalities", "municipal-functional");
+    const totals = await loadWorkbookSources("municipalities", "municipal-total");
+
+    expect(revenue).toHaveLength(22);
+    expect(fields.some((source) => source.downloadHref.includes("mof-final-fact"))).toBe(false);
+    expect(fields.every((source) => /treasury-e11|annual-execution|mof-excel-fact/.test(source.downloadHref))).toBe(true);
+    expect(ministries.every((source) => source.downloadHref.includes("mof-excel-fact"))).toBe(true);
+    expect(ministries.some((source) => source.downloadHref.includes("treasury-e11"))).toBe(false);
+    expect(functional.every((source) => !source.downloadHref.includes("budget-history"))).toBe(true);
+    expect(totals.some((source) => source.downloadHref.includes("budget-history-04"))).toBe(true);
   });
 });
 

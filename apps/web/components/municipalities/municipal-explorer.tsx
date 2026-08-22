@@ -62,6 +62,7 @@ type MunicipalExplorerBaseProps = {
 
   workbookBasename: string;
   workbookSources: WorkbookPublicSource[];
+  functionalWorkbookSources?: WorkbookPublicSource[];
   siteOrigin: string;
   pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
@@ -200,6 +201,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
         pointsByYear,
       };
     });
+    const hasFunctionSeries = selectedRows.some((row) => row.itemId !== model.totalRow.itemId);
     return {
       filenameBase: props.workbookBasename,
       titleKa: metrics.kind === "country" ? props.pickerCountry.nameKa : props.triggerLabel,
@@ -214,7 +216,9 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
         : { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
       totalId: model.totalRow.itemId,
       series: workbookSeries,
-      sources: props.workbookSources,
+      sources: hasFunctionSeries
+        ? [...(props.functionalWorkbookSources ?? []), ...props.workbookSources]
+        : props.workbookSources,
       siteOrigin: props.siteOrigin,
     };
   }

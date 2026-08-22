@@ -41,12 +41,13 @@ type MainExplorerProps = {
   sourceDocuments: SourceDocumentRow[];
   gdpFacts?: ServedNationalGdpFact[];
   workbookSources?: WorkbookPublicSource[];
+  adminWorkbookSources?: WorkbookPublicSource[];
   gdpWorkbookSources?: WorkbookPublicSource[];
   siteOrigin?: string;
   lastUpdatedAt: string;
 };
 
-export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, sourceDocuments, gdpFacts = [], workbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
+export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, sourceDocuments, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
   useEffect(() => {
     document.body.dataset.appReady = "true";
 
@@ -234,7 +235,9 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
         : { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
       totalId: model.totalRow?.itemId ?? null,
       series,
-      sources: share ? [...workbookSources, ...gdpWorkbookSources] : workbookSources,
+      sources: share
+        ? [...(scope === "ministries" ? adminWorkbookSources : workbookSources), ...gdpWorkbookSources]
+        : scope === "ministries" ? adminWorkbookSources : workbookSources,
       siteOrigin: siteOrigin ?? window.location.origin,
     };
   }

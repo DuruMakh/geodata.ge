@@ -35,10 +35,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function GeorgiaMunicipalitiesPage() {
-  const [servedMunicipalData, landingData, workbookSources] = await Promise.all([
+  const [servedMunicipalData, landingData, functionalWorkbookSources, workbookSources] = await Promise.all([
     loadServedMunicipalData(),
     loadServedLandingData(),
-    loadWorkbookSources("municipalities"),
+    loadWorkbookSources("municipalities", "municipal-functional"),
+    loadWorkbookSources("municipalities", "municipal-total"),
   ]);
   const { municipalities, regions, functions, totalFacts, countryFunctionFacts, countryTotalFacts, adjaraBudgetAdjustments } =
     servedMunicipalData;
@@ -85,6 +86,7 @@ export default async function GeorgiaMunicipalitiesPage() {
           metrics={{ kind: "country", budgetCount: 69 }}
           workbookBasename="municipalities-georgia"
           workbookSources={entityWorkbookSources}
+          functionalWorkbookSources={functionalWorkbookSources}
           siteOrigin={resolveSiteUrl()}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,

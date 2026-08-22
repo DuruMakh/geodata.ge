@@ -9,16 +9,69 @@ import {
 } from "./sourceManifest";
 import type { MethodologyDatasetId } from "./types";
 
+export type WorkbookSourceRole =
+  | "revenue"
+  | "expenditure-fields"
+  | "expenditure-ministries"
+  | "municipal-functional"
+  | "municipal-total";
+
 export function projectWorkbookSources(
   rows: readonly ValidatedSourceManifestRow[],
 ): WorkbookPublicSource[] {
-  return rows.map((row) => ({
-    years: row.years,
+  const preferred = new Map<string, { row: ValidatedSourceManifestRow; years: Set<number> }>();
+  for (const row of rows) {
+    const existing = preferred.get(row.sha256);
+    if (!existing) {
+      preferred.set(row.sha256, { row, years: new Set(row.years) });
+    } else {
+      for (const year of row.years) existing.years.add(year);
+      if (sourcePreference(row) < sourcePreference(existing.row)) existing.row = row;
+    }
+  }
+  return [...preferred.values()].map(({ row, years }) => ({
+    years: [...years].sort((left, right) => left - right),
     titleKa: row.display_title_ka,
     organizationKa: row.source_organization,
     downloadHref: row.downloadHref,
     retrievedAt: row.retrieved_at,
   }));
+}
+
+function sourcePreference(row: ValidatedSourceManifestRow): number {
+  if (row.source_id.includes("mof_excel_fact")) return 0;
+  if (row.source_id.includes("mof_final_fact")) return 1;
+  return 2;
+}
+
+function yearOf(row: ValidatedSourceManifestRow): number {
+  return row.years[0] ?? Number(row.year.slice(0, 4));
+}
+
+function roleRows(
+  datasetId: MethodologyDatasetId,
+  rows: readonly ValidatedSourceManifestRow[],
+  role: WorkbookSourceRole,
+): readonly ValidatedSourceManifestRow[] {
+  if (role === "revenue") return rows;
+  if (role === "municipal-functional") {
+    return rows.filter((row) => row.source_id.includes("functional_classification") || row.source_id.includes("portal_functional"));
+  }
+  if (role === "municipal-total") {
+    return rows.filter((row) => row.source_id.includes("budget_history") || row.source_id.includes("adjara.republic"));
+  }
+  if (role === "expenditure-ministries") {
+    return rows.filter((row) => row.source_id.includes("mof_excel_fact"));
+  }
+  if (datasetId !== "expenditure") return rows;
+
+  return rows.filter((row) => {
+    const year = yearOf(row);
+    if (year === 2004) return row.source_id.includes("mof_annual_execution_annex");
+    if (year <= 2007) return row.source_id.includes("treasury_e11");
+    if (year <= 2016) return row.source_id.includes("treasury_e11") || row.source_id.includes("mof_annual_execution");
+    return row.source_id.includes("treasury_e11") || row.source_id.includes("mof_excel_fact");
+  });
 }
 
 const municipalHistoryHrefPattern = /\/mof-municipality-budget-history-(\d{2})\.xlsx$/;
@@ -77,13 +130,16 @@ let gdpWorkbookSourcesPromise: Promise<WorkbookPublicSource[]> | undefined;
 
 export function loadWorkbookSources(
   datasetId: MethodologyDatasetId,
+  role: WorkbookSourceRole = datasetId === "revenue" ? "revenue" : datasetId === "municipalities" ? "municipal-functional" : "expenditure-fields",
 ): Promise<WorkbookPublicSource[]> {
-  const existing = cache.get(datasetId);
+  const cacheKey = `${datasetId}:${role}` as MethodologyDatasetId;
+  const existing = cache.get(cacheKey);
   if (existing) return existing;
 
   const repositoryRoot = path.resolve(process.cwd(), "../..");
-  const pending = loadReviewedSourceManifest(repositoryRoot, datasetId).then(projectWorkbookSources);
-  cache.set(datasetId, pending);
+  const pending = loadReviewedSourceManifest(repositoryRoot, datasetId)
+    .then((rows) => projectWorkbookSources(roleRows(datasetId, rows, role)));
+  cache.set(cacheKey, pending);
   return pending;
 }
 

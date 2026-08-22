@@ -35,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RevenuePage() {
   const [{ facts, glossary, sourceDocuments, gdpFacts }, workbookSources, gdpWorkbookSources] = await Promise.all([
     loadServedExplorerData(),
-    loadWorkbookSources("revenue"),
+    loadWorkbookSources("revenue", "revenue"),
     loadGdpWorkbookSources(),
   ]);
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
