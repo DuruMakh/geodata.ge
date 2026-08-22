@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
-import { UNIT_BN } from "../../lib/explorer/format";
+import type { ValueUnit } from "../../lib/explorer/format";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
@@ -18,6 +18,8 @@ import type { ResolvedRange } from "./use-explorer-state";
 type ExplorerViewProps = {
   model: ExplorerModel;
   scope: ExplorerScope;
+  /** Derived once from the full corpus by MainExplorer, so the range strip cannot reformat cells mid-drag. */
+  unit: ValueUnit;
   showGrouping: boolean;
   grouping: ExpenditureGrouping;
   chartMode: ChartMode;
@@ -62,6 +64,7 @@ const CLASSIFICATION_NOTE: Record<ExplorerScope, string | null> = {
 export function ExplorerView({
   model,
   scope,
+  unit,
   showGrouping,
   grouping,
   chartMode,
@@ -156,14 +159,14 @@ export function ExplorerView({
                 showTotal={Boolean(model.totalRow && selectedIds.includes(model.totalRow.itemId))}
                 years={model.years}
                 firstColumnLabel={FIRST_COL_LABEL[scope]}
-                unit={UNIT_BN}
+                unit={unit}
                 share={share}
                 shareColumnLabel="წილი მშპ-ში"
                 shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
               />
             ) : (
               <div className="mt-5">
-                <EditorialLineChart years={model.years} series={series} share={share} unit={UNIT_BN} shareLabel="წილი მშპ-ში" />
+                <EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel="წილი მშპ-ში" />
               </div>
             )}
 

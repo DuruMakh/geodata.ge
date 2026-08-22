@@ -13,11 +13,15 @@ function fixed(value: number, decimals: number): string {
   }).format(value);
 }
 
-/** Chart/table cell value in the active unit: billions with 1 decimal. */
+/**
+ * Chart/table cell value in the active unit: billions with 1 decimal.
+ *
+ * Delegates rather than reimplements, so the two can never drift on the
+ * below-threshold floor — the analysis ranking and the period comparison read
+ * real amounts through here.
+ */
 export function formatBn(value: number | null | undefined): string {
-  if (value === null || value === undefined) return MISSING;
-  // Intl emits ASCII "-"; the module contract is U+2212 (sign is always leading).
-  return fixed(value / BILLION, 1).replace("-", "−");
+  return formatInUnit(value, UNIT_BN);
 }
 
 export type AmountParts = { num: string; unit: string };
@@ -28,7 +32,16 @@ export function formatAmountParts(value: number | null | undefined, signed = fal
   const sign = signed ? (value >= 0 ? "+" : "−") : value < 0 ? "−" : "";
   const abs = Math.abs(value);
   if (abs >= 0.9995 * BILLION) return { num: sign + fixed(abs / BILLION, 1), unit: "მლრდ ₾" };
-  return { num: sign + fixed(abs / MILLION, 0), unit: "მლნ ₾" };
+
+  // Three significant digits. A standalone amount carries its own unit label,
+  // so precision can follow the value here — unlike a column, which shares one
+  // unit across every cell and gets its decimals from unitFor instead.
+  const millions = abs / MILLION;
+  const decimals = millions >= 100 ? 0 : millions >= 10 ? 1 : 2;
+  if (abs > 0 && Number(millions.toFixed(decimals)) === 0) {
+    return { num: value < 0 ? ">−0.01" : "<0.01", unit: "მლნ ₾" };
+  }
+  return { num: sign + fixed(millions, decimals), unit: "მლნ ₾" };
 }
 
 /** Full amount string with unit, e.g. "26.5 მლრდ ₾". */
@@ -70,8 +83,47 @@ export type ValueUnit = { divisor: number; label: string; decimals: number };
 export const UNIT_BN: ValueUnit = { divisor: BILLION, label: "მლრდ", decimals: 1 };
 export const UNIT_MLN: ValueUnit = { divisor: MILLION, label: "მლნ", decimals: 0 };
 
+/**
+ * The fewest decimals (0..cap) that keep every non-zero value in `values`
+ * distinguishable from zero once scaled into `base`.
+ *
+ * A column and a chart axis share one unit across every cell — that is what
+ * makes them comparable — so the precision has to be decided once, from the
+ * data, rather than per value. Derive it from everything the surface can show
+ * (all series, all years), never from the current selection: the range strip
+ * and the series toggles would otherwise reformat every number mid-gesture.
+ *
+ * The cap is 2 because a third decimal lengthens every large cell to rescue a
+ * handful of small ones; formatInUnit floors whatever still rounds away.
+ */
+export function unitFor(values: readonly number[], base: ValueUnit, cap = 2): ValueUnit {
+  let smallest = Infinity;
+  for (const value of values) {
+    const magnitude = Math.abs(value);
+    if (magnitude > 0 && magnitude < smallest) smallest = magnitude;
+  }
+  if (!Number.isFinite(smallest)) return base;
+
+  const scaled = smallest / base.divisor;
+  for (let decimals = 0; decimals <= cap; decimals += 1) {
+    if (Number(scaled.toFixed(decimals)) !== 0) return { ...base, decimals };
+  }
+  return { ...base, decimals: cap };
+}
+
 /** Cell value in the given unit. UNIT_BN is byte-identical to formatBn. */
 export function formatInUnit(value: number | null | undefined, unit: ValueUnit): string {
   if (value === null || value === undefined) return MISSING;
-  return fixed(value / unit.divisor, unit.decimals).replace("-", "−");
+  const scaled = value / unit.divisor;
+
+  // A funded line must never print the same as an unfunded one. unitFor already
+  // spends the decimals that keep a surface's own values apart; this catches
+  // what is left below its cap (five municipalities hold amounts under 5,000 ₾)
+  // rather than letting them read as "nothing was spent".
+  if (value !== 0 && Number(scaled.toFixed(unit.decimals)) === 0) {
+    const floor = (10 ** -unit.decimals).toFixed(unit.decimals);
+    return value < 0 ? `>−${floor}` : `<${floor}`;
+  }
+
+  return fixed(scaled, unit.decimals).replace("-", "−");
 }

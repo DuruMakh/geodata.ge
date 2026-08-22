@@ -565,7 +565,15 @@ Voice: precise, civic, archival. Georgian is primary; English only for compact t
 
 Canonical terms: `ხარჯები`, `შემოსავლები`, `ანალიზი`, `სერიები`, `ხაზი`, `ცხრილი`, `სფეროები`, `უწყებები`, `% მშპ-ში` (national multi-year), `% წილი` (municipal), `დიაპაზონი`, `მთლიანი ხარჯი`, `მთლიანი შემოსავლები`, `მთლიანი ბიუჯეტი`, `სულ` (single-year analysis), `ძირითადი ინდიკატორები`, `პერიოდის ცვლილება`, `ყველაზე მზარდი`, `ყველაზე ნელი ზრდა`, `პერიოდის შედარება`, `სტრუქტურა სფეროების მიხედვით`, `ყოველი 100 ლარი`, `ბიუჯეტის რადარი`, `ბიუჯეტის ველი`, `სრული რეიტინგი`, `ჩამოტვირთვა`, `გეგმა`.
 
-Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US` grouping, fixed decimals (bn: 1, mln: 0, %: 1). Amounts ≥ ~1bn display in `მლრდ ₾`, below in `მლნ ₾`. Negative sign is `−` (minus, not hyphen) in deltas.
+Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US` grouping and a `−` (minus, not hyphen) sign. Amounts ≥ ~1bn display in `მლრდ ₾`, below in `მლნ ₾`. Percentages carry 1 decimal.
+
+**A funded line never renders the same as an unfunded one.** Precision is derived, not fixed, and that rule is what decides it:
+
+- **Columns and chart axes** share one unit across every cell, which is what makes them comparable, so `unitFor()` picks the decimals once from every value the surface can show — all series, all years, never the current selection or range, or the numbers would reformat while the reader drags the range strip. It takes the fewest decimals that keep the surface's smallest non-zero value distinguishable from zero, up to a per-scope cap: **1** for fields and revenue, which are genuinely billions-scale, and **2** for municipalities (1 on 39 of the 64 pages, 2 on the other 25) and for ministries, whose drill-down programs are billions-scale only in name — at 1 decimal 45 of them collapse into 16 distinct values.
+- **Standalone amounts** (KPI values, series rows, movers, tooltips) carry their own unit label, so they vary per value at three significant digits — `450 მლნ ₾`, `26.8 მლნ ₾`, `0.42 მლნ ₾`.
+- **Below either threshold**, `formatInUnit` and `formatAmountParts` floor to `<0.01` (`>−0.01` when negative) rather than printing a zero. Five municipalities hold amounts under 5,000 ₾; a genuine zero still prints `0.00`.
+
+`tests/explorer/formatInvariants.test.ts` asserts this against the reviewed corpus, per surface. Fixture-based assertions cannot catch a regression here — the 2026-08 one (ონი 2025 health, 133,333 ₾ shown as `0`) passed every unit test in `format.test.ts`.
 
 Page titles are editorial sentences, not labels: `როგორ იხარჯება საქართველოს ბიუჯეტი`, `როგორ ივსება საქართველოს ბიუჯეტი`, `<year> წლის ბიუჯეტის სურათი — სად მიდის საჯარო ფული / საიდან მოდის საჯარო ფული`.
 

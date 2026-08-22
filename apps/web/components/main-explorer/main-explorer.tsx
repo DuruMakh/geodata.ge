@@ -12,7 +12,7 @@ import type {
 import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
 import { buildExplorerModel, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
-import { formatAmount, formatShare } from "../../lib/explorer/format";
+import { formatAmount, formatShare, unitFor, UNIT_BN } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import type { ExplorerNav, ExplorerScope } from "../../lib/explorer/types";
 import {
@@ -105,6 +105,31 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
 
     return totals;
   }, [facts, adminFacts]);
+
+  // Decided once per scope from the whole corpus, not from the visible range or
+  // the selection: the chart axis and every table cell share one unit, so the
+  // precision has to hold still while the reader drags the range strip.
+  //
+  // Fields and revenue cap at one decimal: they are genuinely billions-scale, so
+  // a second decimal lengthens every cell to resolve a handful of outliers, and
+  // the smallest rows floor to "<0.1" instead — still legible as funded.
+  //
+  // Ministries keeps two. Its drill-down programs are billions-scale only in
+  // name (most sit between 0.02 and 0.5), so one decimal collapses 45 of them
+  // into 16 distinct values and floors 126 of 852 rows — a ranked table that
+  // cannot rank. The two scopes never share a table, so the difference is never
+  // visible side by side.
+  const unit = useMemo(
+    () =>
+      scope === "ministries"
+        ? unitFor(adminFacts.map((fact) => fact.amountGel), UNIT_BN, 2)
+        : unitFor(
+            facts.filter((fact) => fact.side === explorerSide).map((fact) => fact.amountGel),
+            UNIT_BN,
+            1,
+          ),
+    [facts, adminFacts, scope, explorerSide],
+  );
 
   const model = useMemo(
     () =>
@@ -296,6 +321,7 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
           <ExplorerView
             model={model}
             scope={scope}
+            unit={unit}
             showGrouping={nav === "expenditure"}
             grouping={grouping}
             chartMode={chartMode}

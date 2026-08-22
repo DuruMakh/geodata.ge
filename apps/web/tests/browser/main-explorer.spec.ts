@@ -406,6 +406,8 @@ test("2004 revenue total excludes an unavailable liability value in tables and E
   const table = page.getByTestId("explorer-table");
   const totalRow = table.getByRole("row").filter({ hasText: "მთლიანი შემოსავლები" });
   const liabilitiesRow = table.getByRole("row").filter({ hasText: "ვალდებულებების ზრდა" });
+  // One decimal: national scopes cap there (DESIGN.md §11). 2004 total
+  // 2,283,035,800 ₾ and 2005 liabilities 85,316,805 ₾.
   await expect(totalRow).toContainText("2.3");
   await expect(liabilitiesRow).toContainText("—");
   await expect(liabilitiesRow).toContainText("0.1");
