@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
+import { sourceDocumentsFor } from "../../../lib/data/sources";
 import { loadGdpWorkbookSources, loadWorkbookSources } from "../../../lib/methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 import { resolveSiteUrl } from "../../../lib/siteUrl";
@@ -24,6 +25,13 @@ export default async function ExpenditurePage() {
       loadWorkbookSources("expenditure", "expenditure-ministries"),
       loadGdpWorkbookSources(),
     ]);
+  // Same reasoning the revenue route already applies to the admin corpus: this
+  // route's explorerSide is fixed to "expenditure" by `nav`, so the 241 revenue
+  // rows can never be rendered here and were 35 KB of dead RSC payload.
+  const ownFacts = facts.filter((fact) => fact.side === "expenditure");
+  // Computed from the full registry, before the narrowing below: this is the
+  // displayed "განახლდა" date and narrowing it here would change what the page
+  // shows, not just what it ships.
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
 
   return (
@@ -31,11 +39,11 @@ export default async function ExpenditurePage() {
       <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "ხარჯები", path: "/explorer/expenditure" }]} />
       <MainExplorer
         nav="expenditure"
-        facts={facts}
+        facts={ownFacts}
         adminFacts={adminFacts}
         adminCategories={adminCategories}
         glossaryEntries={Array.from(glossary.values())}
-        sourceDocuments={sourceDocuments}
+        sourceDocuments={sourceDocumentsFor(sourceDocuments, [...ownFacts, ...adminFacts, ...gdpFacts])}
         gdpFacts={gdpFacts}
         workbookSources={workbookSources}
         adminWorkbookSources={adminWorkbookSources}
