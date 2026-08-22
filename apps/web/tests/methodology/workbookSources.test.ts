@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import path from "node:path";
 import {
   loadGdpWorkbookSources,
   loadWorkbookSources,
@@ -7,6 +8,7 @@ import {
   resetWorkbookSourceCacheForTests,
   scopeMunicipalWorkbookSources,
 } from "../../lib/methodology/workbookSources";
+import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
 
 const gdpRows = [
   {
@@ -102,6 +104,11 @@ describe("projectWorkbookSources", () => {
     expect(projectWorkbookSources([finalFact, excelFact])).toEqual([
       expect.objectContaining({ downloadHref: excelFact.downloadHref, titleKa: "Excel fact" }),
     ]);
+
+    expect(projectWorkbookSources([
+      { ...finalFact, source_id: "source.z" },
+      { ...finalFact, source_id: "source.a", display_title_ka: "Lexically first" },
+    ])).toEqual([expect.objectContaining({ titleKa: "Lexically first" })]);
   });
 });
 
@@ -133,12 +140,37 @@ describe("loadWorkbookSources", () => {
     const totals = await loadWorkbookSources("municipalities", "municipal-total");
 
     expect(revenue).toHaveLength(22);
-    expect(fields.some((source) => source.downloadHref.includes("mof-final-fact"))).toBe(false);
-    expect(fields.every((source) => /treasury-e11|annual-execution|mof-excel-fact/.test(source.downloadHref))).toBe(true);
-    expect(ministries.every((source) => source.downloadHref.includes("mof-excel-fact"))).toBe(true);
-    expect(ministries.some((source) => source.downloadHref.includes("treasury-e11"))).toBe(false);
+    expect(fields.some((source) => source.downloadHref.includes("2013/mof-final-fact.pdf"))).toBe(true);
+    expect(fields.some((source) => source.downloadHref.includes("2012/mof-final-fact"))).toBe(false);
+    expect(ministries.some((source) => source.downloadHref.includes("2004/mof-annual-execution-annex"))).toBe(true);
+    expect(ministries.some((source) => source.downloadHref.includes("2014/mof-excel-fact"))).toBe(false);
+    expect(ministries.some((source) => source.downloadHref.includes("2015/mof-excel-fact"))).toBe(true);
+    expect(ministries.some((source) => source.downloadHref.includes("2010/mof-annual-execution"))).toBe(true);
     expect(functional.every((source) => !source.downloadHref.includes("budget-history"))).toBe(true);
     expect(totals.some((source) => source.downloadHref.includes("budget-history-04"))).toBe(true);
+  });
+
+  it("covers every explicit national lineage year and real duplicate manifest content", async () => {
+    resetWorkbookSourceCacheForTests();
+    const fields = await loadWorkbookSources("expenditure", "expenditure-fields");
+    const ministries = await loadWorkbookSources("expenditure", "expenditure-ministries");
+    for (let year = 2004; year <= 2025; year += 1) {
+      expect(fields.some((source) => source.years.includes(year))).toBe(true);
+      expect(ministries.some((source) => source.years.includes(year))).toBe(true);
+    }
+    const rows = await loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "expenditure");
+    const duplicateHashRows = rows.filter((row) => row.sha256 === "b0039981526ea083f59704fe27bd670784b3b67512b07cc3307366d09f71c8f4");
+    expect(duplicateHashRows.map((row) => row.source_id)).toEqual([
+      "source.mof.expenditure.2005.mof_excel_fact",
+      "source.mof.expenditure.2005.mof_final_fact",
+    ]);
+    expect(projectWorkbookSources(duplicateHashRows)).toEqual([
+      expect.objectContaining({ downloadHref: "/downloads/methodology/expenditure/files/2005/mof-excel-fact.xlsx" }),
+    ]);
+    expect(ministries.filter((source) => source.downloadHref.includes("2005/mof-")).map((source) => source.downloadHref)).toEqual([
+      "/downloads/methodology/expenditure/files/2005/mof-annual-execution.pdf",
+      "/downloads/methodology/expenditure/files/2005/mof-excel-fact.xlsx",
+    ]);
   });
 });
 
@@ -167,11 +199,21 @@ describe("scopeMunicipalWorkbookSources", () => {
       { municipalityCodes: ["04", "06"], includeAdjaraRepublic: false },
     );
 
-    expect(scoped).toEqual([shared, history("04"), history("06")]);
+    expect(scoped).toEqual([history("04"), history("06")]);
     expect(scopeMunicipalWorkbookSources(
       [shared, adjaraRepublic, history("06")],
       { municipalityCodes: ["06"], includeAdjaraRepublic: true },
-    )).toEqual([shared, adjaraRepublic, history("06")]);
+    )).toEqual([adjaraRepublic, history("06")]);
+  });
+
+  it("keeps 2015 portal totals and the Khulo 2024 functional fallback only for code 11", async () => {
+    resetWorkbookSourceCacheForTests();
+    const totals = await loadWorkbookSources("municipalities", "municipal-total");
+    const khulo = scopeMunicipalWorkbookSources(totals, { municipalityCodes: ["11"], includeAdjaraRepublic: false });
+    const tbilisi = scopeMunicipalWorkbookSources(totals, { municipalityCodes: ["04"], includeAdjaraRepublic: false });
+    expect(khulo.some((source) => source.downloadHref.includes("2015-2019/municipalities-portal-functionals"))).toBe(true);
+    expect(khulo.some((source) => source.downloadHref.includes("2024/mof-functional-classification"))).toBe(true);
+    expect(tbilisi.some((source) => source.downloadHref.includes("2024/mof-functional-classification"))).toBe(false);
   });
 });
 

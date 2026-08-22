@@ -65,20 +65,15 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
     "კატეგორია",
     2020,
     2021,
-    "პერიოდის ცვლილება",
+    "ცვლილება 2020–2021",
   ]);
   const analysis = workbook.getWorksheet("მონაცემები")!;
   const analysisRows = (analysis.getRows(2, 10) ?? []).filter((row) => row.getCell(1).value !== null);
   expect(analysisRows.map((row) => row.getCell(1).value)).toEqual([2020, 2021]);
 
   const workbookValues = workbook.worksheets.map((sheet) => sheet.getSheetValues());
-  const workbookText = workbookValues.flat(Infinity).map(String);
   const workbookJson = JSON.stringify(workbookValues);
   expect(workbookJson).not.toContain("country.georgia");
-  for (const code of ["05", "42", "43", "46", "64"]) {
-    expect(workbookText).not.toContain(code);
-    expect(workbookJson).not.toContain(`municipality-budget-history-${code}.xlsx`);
-  }
   const hyperlinks = readable.getSheetValues().flatMap((row) =>
     Array.isArray(row)
       ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
@@ -87,4 +82,8 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
   expect(hyperlinks.some((value) => value.includes("/downloads/methodology/municipalities/"))).toBe(true);
   expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx");
   expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx");
+  for (const code of ["05", "42", "43", "46", "64"]) {
+    expect(hyperlinks).toContain(`http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-${code}.xlsx`);
+  }
+  expect(workbookJson).not.toContain("country.georgia");
 });

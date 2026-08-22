@@ -63,6 +63,7 @@ type MunicipalExplorerBaseProps = {
   workbookBasename: string;
   workbookSources: WorkbookPublicSource[];
   functionalWorkbookSources?: WorkbookPublicSource[];
+  supplementalWorkbookSources?: WorkbookPublicSource[];
   siteOrigin: string;
   pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
@@ -202,6 +203,8 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       };
     });
     const hasFunctionSeries = selectedRows.some((row) => row.itemId !== model.totalRow.itemId);
+    const hasTotalSeries = selectedRows.some((row) => row.itemId === model.totalRow.itemId);
+    const useTotalSources = hasTotalSeries || (state.share && hasFunctionSeries);
     return {
       filenameBase: props.workbookBasename,
       titleKa: metrics.kind === "country" ? props.pickerCountry.nameKa : props.triggerLabel,
@@ -216,9 +219,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
         : { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
       totalId: model.totalRow.itemId,
       series: workbookSeries,
-      sources: hasFunctionSeries
-        ? [...(props.functionalWorkbookSources ?? []), ...props.workbookSources]
-        : props.workbookSources,
+      sources: [
+        ...(hasFunctionSeries ? props.functionalWorkbookSources ?? [] : []),
+        ...(useTotalSources ? props.workbookSources : []),
+        ...(useTotalSources ? props.supplementalWorkbookSources ?? [] : []),
+      ],
       siteOrigin: props.siteOrigin,
     };
   }

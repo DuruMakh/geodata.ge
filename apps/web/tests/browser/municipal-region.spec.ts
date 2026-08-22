@@ -108,7 +108,7 @@ test.describe("region roll-up page", () => {
       "კატეგორია",
       2020,
       2021,
-      "პერიოდის ცვლილება",
+      "ცვლილება 2020–2021",
     ]);
     expect(readable.getCell("A4").value).toBe("მთლიანი ბიუჯეტი");
     expect(readable.getCell("B4").value).toBeGreaterThan(1);
@@ -122,10 +122,12 @@ test.describe("region roll-up page", () => {
         ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
         : [],
     );
-    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx");
+    expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx");
     expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-06.xlsx");
     expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-12.xlsx");
     expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx");
+    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/revenue/files/2020/mof-revenue-form-1.pdf");
+    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/revenue/files/2021/mof-revenue-form-1.pdf");
   });
 
   test("renders every member, the roll-up chart, and suppresses the per-member divergence callout", async ({ page }) => {

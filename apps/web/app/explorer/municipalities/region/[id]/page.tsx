@@ -65,11 +65,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function RegionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const regionId = `region.${id}`;
-  const [servedMunicipalData, landingData, functionalWorkbookSources, workbookSources] = await Promise.all([
+  const [servedMunicipalData, landingData, functionalWorkbookSources, workbookSources, adjustmentWorkbookSources] = await Promise.all([
     loadServedMunicipalData(),
     loadServedLandingData(),
     loadWorkbookSources("municipalities", "municipal-functional"),
     loadWorkbookSources("municipalities", "municipal-total"),
+    loadWorkbookSources("revenue", "revenue"),
   ]);
   const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = servedMunicipalData;
   const { sourceDocuments } = landingData;
@@ -156,6 +157,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           workbookBasename={`region-${id}`}
           workbookSources={entityWorkbookSources}
           functionalWorkbookSources={functionalWorkbookSources}
+          supplementalWorkbookSources={regionId === ADJARA_REGION_ID ? adjustmentWorkbookSources : []}
           siteOrigin={resolveSiteUrl()}
           pickerCountry={{
             id: MUNICIPAL_COUNTRY_ID,

@@ -595,7 +595,7 @@ test.describe("municipality page", () => {
       "კატეგორია",
       2020,
       2021,
-      "პერიოდის ცვლილება",
+      "ცვლილება 2020–2021",
     ]);
     expect([readable.getCell("A4").value, readable.getCell("A5").value]).toEqual([
       "მთლიანი ბიუჯეტი",
@@ -621,6 +621,58 @@ test.describe("municipality page", () => {
     expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx");
     expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-05.xlsx");
     expect(hyperlinks).not.toContain("http://localhost:3000/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx");
+  });
+
+  test("2015 total-only uses the portal fallback without a history workbook", async ({ page }) => {
+    await page.goto(`${ENTITY_URL}#r=2015-2015&sel=municipal.total`);
+    await expectMunicipalAppReady(page);
+    const { workbook } = await downloadMunicipalWorkbook(page);
+    const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
+    const hyperlinks = readable.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2015-2019/municipalities-portal-functionals.zip");
+    expect(hyperlinks.some((value) => value.includes("budget-history-04"))).toBe(false);
+  });
+
+  test("nominal function-only excludes total histories while percentage function-only keeps the denominator sources", async ({ page }) => {
+    await page.goto(`${ENTITY_URL}#r=2020-2020&sel=municipal.education`);
+    await expectMunicipalAppReady(page);
+    const nominal = await downloadMunicipalWorkbook(page);
+    const nominalLinks = nominal.workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(nominalLinks.some((value) => value.includes("mof-functional-classification.xlsx"))).toBe(true);
+    expect(nominalLinks.some((value) => value.includes("budget-history-04.xlsx"))).toBe(false);
+
+    await page.goto(`${ENTITY_URL}#r=2020-2020&sel=municipal.education`);
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("municipal-share-toggle").click();
+    const percentage = await downloadMunicipalWorkbook(page);
+    const percentageLinks = percentage.workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(percentageLinks.some((value) => value.includes("mof-functional-classification.xlsx"))).toBe(true);
+    expect(percentageLinks.some((value) => value.includes("budget-history-04.xlsx"))).toBe(true);
+  });
+
+  test("Khulo 2024 total cites the functional fallback instead of its history workbook", async ({ page }) => {
+    await page.goto(`${BASE_URL}/explorer/municipalities/11#r=2024-2024&sel=municipal.total`);
+    await expectMunicipalAppReady(page);
+    const { workbook } = await downloadMunicipalWorkbook(page);
+    const hyperlinks = workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues().flatMap((row) =>
+      Array.isArray(row)
+        ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+        : [],
+    );
+    expect(hyperlinks).toContain("http://localhost:3000/downloads/methodology/municipalities/files/2024/mof-functional-classification.xlsx");
+    expect(hyperlinks.some((value) => value.includes("budget-history-11.xlsx"))).toBe(false);
   });
 
   test("uses the same export control treatment as the national explorer", async ({ page }) => {
