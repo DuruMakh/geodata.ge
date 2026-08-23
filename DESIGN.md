@@ -397,7 +397,7 @@ Specs below are contracts; visual proof lives in the reference files.
 
 The public-site header appears on the landing page (§19), the methodology hub, and every live dataset methodology route. Surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs. The landing and methodology surfaces use one shared component.
 
-Baseline-aligned row: serif brand left (`Fiscal.ge`), nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `ექსპლორერი` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
+Baseline-aligned row: serif brand left (`Fiscal.ge`), nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
 
 ### 7.2a Mode Control
 
@@ -631,7 +631,7 @@ Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US
 
 `tests/explorer/formatInvariants.test.ts` asserts this against the reviewed corpus, per surface. Fixture-based assertions cannot catch a regression here — the 2026-08 one (ონი 2025 health, 133,333 ₾ shown as `0`) passed every unit test in `format.test.ts`.
 
-Page titles are editorial sentences, not labels: `როგორ იხარჯება საქართველოს ბიუჯეტი`, `როგორ ივსება საქართველოს ბიუჯეტი`, `<year> წლის ბიუჯეტის სურათი — სად მიდის საჯარო ფული / საიდან მოდის საჯარო ფული`.
+Page titles are editorial sentences, not labels: `როგორ იხარჯება საქართველოს ბიუჯეტი`, `როგორ ფინანსდება საქართველოს ბიუჯეტი`, `<year> წლის ბიუჯეტის სურათი — სად მიდის საჯარო ფული / საიდან მოდის საჯარო ფული`.
 
 Empty/error copy explains what happened and what to do, e.g.:
 
@@ -764,17 +764,29 @@ Do not:
 
 ## 19. Landing Page (მთავარი)
 
-Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implementation: `apps/web/components/landing/`, geo data in `apps/web/lib/landing/georgiaGeo.ts`, budget-derived values computed server-side in `apps/web/lib/landing/landingData.ts` from the same active facts as the explorer.
+Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implementation: `apps/web/components/landing/`, geo data in `apps/web/lib/landing/georgiaGeo.ts`, and compact budget-derived summaries in `apps/web/lib/landing/landingData.ts` from the same active facts as the explorer.
 
-Section order (top to bottom):
+Section order is fixed: shared header → living-relief hero → country figures → expenditure → revenue → municipalities → methodology and first sources → retained footer.
 
-1. **Header** — editorial header (§7.1) with page links instead of tabs: `მთავარი` (active, accent underline) and `ექსპლორერი` → `/explorer`; right slot shows the mono revenue year range (hidden on mobile).
-2. **Hero — living relief** — Three.js dotted map of Georgia (exact ADM0 outline, analytic elevation, population-scaled city squares emitting ripple waves, Tbilisi national pulse every 45s, peak labels Shkhara/Mkinvartsveri, city hover readout, mouse parallax). **The map is the hero's main subject and is maximized**: the figure is full-bleed (spans the viewport, escaping the 1240px column) and the camera keeps the reference's viewing angle but fits its distance at runtime so the country's real dot bounds fill the canvas at any aspect (margins ≈9%/6%, refit on resize). Headline (`როგორ ივსება და იხარჯება საქართველოს ბიუჯეტი`) overlays top-right on ≥768px, staying in the content grid, and sits above the map on mobile; CTA `დაიწყე ბიუჯეტით` → `/explorer`. The hero's height is not fixed: the camera fits inside a fixed virtual frame (340px <768, 500px <1100, `min(78vh, 820px)` ≥1100), then the canvas is cropped to the map's projected vertical band via a camera view offset — the map never rescales, and the key-numbers section starts immediately under the last dots. The headline overlay's measured height is a hard floor so the copy can never overflow into the stats. `prefers-reduced-motion` renders a still frame; WebGL failure shows a mono fallback note.
-3. **Key numbers** — three hardcoded country figures (population 3.7 მლნ, area 69.7 ათ. კმ², nominal GDP 104.6 მლრდ ₾ · 2025 preliminary, per Geostat), serif 46px values, maintained by hand in `landing-page.tsx`. The section sits 40/56px below the full-bleed hero.
-4. **სამი გზა მონაცემებამდე** — three rule-topped cards, all data live: 01 multi-year explorer (total-revenue + VAT sparkline) → `/explorer`; 02 single-year picture (30-cell expenditure waffle, §4.2 colors) → `/explorer/analysis`; 03 `Excel მონაცემები` (the three sheet names plus a real category row across the latest two available years in a tint block) → `/explorer`.
-5. **Footer** — brand + tagline + `info@fiscal.ge`; nav links (explorer, analysis, methodology); data/license notes (source, last-updated date, CC BY 4.0); mono bottom bar. This adds the methodology link only; a broader footer redesign is outside the methodology scope.
+**Header and hero.** The header keeps `Fiscal.ge`, `მთავარი` as the active page, and `მონაცემები` → `/explorer`; its right slot shows the mono revenue year range and hides it on mobile. The living-relief map remains the full-bleed primary visual with its existing geometry, camera fitting, city behavior, reduced-motion still frame, accessible description, and WebGL fallback. Visible hero copy is exactly `საქართველოს მონაცემების პლატფორმა`, H1 `საქართველო ციფრებში`, and CTA `გაეცანი მონაცემებს` → `#data`. The figure is 330px below 768px, 500px from 768px, and `clamp(560px, 78vh, 820px)` from 1100px.
 
-Landing QA: waffle renders exactly 30 cells; sparkline endpoints match the loaded revenue range; Excel preview shows the three sheet names, one real category label, and two real active-fact year values; hero canvas mounts or the fallback note shows; no cards or shadows.
+**Country figures.** Three maintained snapshots remain in one row: `მოსახლეობა` — `3.9 მლნ`, `2026 წლის 1 იანვარი · საქსტატი`; `ფართობი` — `69.7 ათ. კმ²`, `საქართველოს ტერიტორია`; `ეკონომიკის ზომა` — `104.6 მლრდ ₾`, `ნომინალური მშპ · 2025, წინასწარი`. A narrow mobile caption may shorten visually, but assistive technology retains the full caption.
+
+**Annual data ledger.** `#data` retains its strong top rule but has no annual masthead, shared-year label, or reserved masthead spacing: section `01` begins immediately below the rule. Each of the three repeated ledger sections contains, in order: decorative index; dataset overline; question-led H2; concise latest-year description; real explorer link; an applicable total between two strong ink rules; latest year and truthful actual/planned/mixed status; and a semantic table of exactly four latest-year rows with amount and share. The first dataset section has no ordinary top border, avoiding a doubled rule; later dataset sections retain their hairline top borders. There is no post-hero graphic, chart, map, canvas, SVG data visualization, prior-year comparison, change callout, old three-path card, About block, Excel preview, or separate methodology promotion.
+
+The exact dataset contracts are:
+
+1. `სახელმწიფო ხარჯები`; H2 `როგორ იხარჯება საქართველოს ბიუჯეტი`; total `მთლიანი ხარჯი`; first column `სფერო`; `ხარჯების მონაცემები →` → `/explorer/expenditure`.
+2. `სახელმწიფო შემოსავლები`; H2 `როგორ ფინანსდება საქართველოს ბიუჯეტი`; total `მთლიანი შემოსავლები`; first column `მუხლი`; `შემოსავლების მონაცემები →` → `/explorer/revenue`.
+3. `მუნიციპალური ბიუჯეტები`; H2 `როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები`; total `საქართველოს მუნიციპალური ჯამი`; first column `უდიდესი მუნიციპალური ბიუჯეტები`; `მუნიციპალური მონაცემები →` → `/explorer/municipalities`.
+
+National sections apply actual-over-planned selection before deriving the latest year, applicable total, status, and descending top four; stable category ID breaks ties. Municipal latest year and denominator come from the reviewed `country.georgia` public-total fact, while the descending top four come from all eligible public municipality totals for that year; municipality code breaks ties. The municipal total is never the sum of the four displayed rows. All labels come from the reviewed glossary or municipality registry; amounts use `formatAmount` and shares use the one-decimal `formatShare` contract.
+
+**Methodology and footer.** The single fourth ledger section is index `04`, H2 `მეთოდოლოგია და პირველწყაროები`, the introduction `თითოეული რიცხვი უკავშირდება ოფიციალურ წყაროს, კლასიფიკაციის წესსა და გადამოწმების შედეგს.`, and four steps: official-document preservation; classification and transformation rule; reconciliation and quality check; downloadable data. `მეთოდოლოგიის ნახვა →` links to `/methodology`. The retained footer follows immediately with its contact, navigation, source/update, and CC BY 4.0 trust information.
+
+**Responsive contract.** At ≥850px, each ledger reads index → copy → data in three columns and the three tables align. Below 850px, each ledger and the methodology section stack in DOM order; total and year remain on one row where space permits; the three country figures remain one compact row; tables stay inside their parent without horizontal scrolling. At ≤380px, side padding and type scale tighten, country-stat units become block-level, and a 320px viewport must have `scrollWidth === clientWidth`.
+
+Landing QA: verify exact copy, metadata, destination links, ordered H2s, data-derived total/year/status and four rows for each dataset; verify hero canvas or fallback; verify the absence of old paths/About/promo and all post-hero SVG/canvas graphics; at desktop, 390px, and 320px verify one-row figures, strong total rules, consistent ledger rhythm, semantic tables, unit wrap, table containment, and zero document overflow.
 
 ## 20. Municipal Surfaces
 
@@ -802,7 +814,7 @@ The Georgia page's total and function rows are dedicated `country.georgia` facts
 
 Approved visual and behavioral specification: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`. Approved preview: `design-shotgun/methodology-portal-2026-08-11/variant-d.html` (Editorial Fieldbook).
 
-The public structure is `/methodology` plus live category pages for expenditure, revenue, and municipalities. Methodology is not a top-header item. Discovery comes from the site footer's methodology link — on the landing page and, since every `/explorer` route renders `SiteFooter` too (§6.7), on the data surfaces as well. Explorer and about pages still do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link is the only path, and it sits below the content rather than inside it.
+The public structure is `/methodology` plus live category pages for expenditure, revenue, and municipalities. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
 
 Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only.
 

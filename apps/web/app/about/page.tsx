@@ -2,7 +2,7 @@ import { BreadcrumbTrail } from "../../components/seo/breadcrumb-json-ld";
 import { SiteFooter } from "../../components/site/site-footer";
 import { SiteHeader } from "../../components/site/site-header";
 import { loadServedLandingData } from "../../lib/data/servedData";
-import { buildLandingModel } from "../../lib/landing/landingData";
+import { buildLandingContext } from "../../lib/landing/landingData";
 import { fiscalMetadata } from "../../lib/seo/metadata";
 
 export const metadata = fiscalMetadata({
@@ -36,7 +36,7 @@ const sections = [
 ] as const;
 
 export default async function AboutPage() {
-  const model = buildLandingModel(await loadServedLandingData());
+  const model = buildLandingContext(await loadServedLandingData());
   return (
     <div className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]">
       <div className="mx-auto max-w-[1240px]">

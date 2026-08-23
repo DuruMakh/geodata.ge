@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { DataSidebar } from "../../components/shell/data-sidebar";
 import { SiteFooter } from "../../components/site/site-footer";
 import { loadServedLandingData } from "../../lib/data/servedData";
-import { buildLandingModel } from "../../lib/landing/landingData";
+import { buildLandingContext } from "../../lib/landing/landingData";
 
 // Explorer shell (DESIGN.md §6.7). A flex row rather than a fixed grid: the
 // sidebar owns its own width, so collapsing it reflows the content with no
@@ -13,7 +13,7 @@ import { buildLandingModel } from "../../lib/landing/landingData";
 // design — the only link to the methodology these ~85 routes have. Its padding
 // matches the pages' own so the rule lines up with the content above it.
 export default async function ExplorerLayout({ children }: { children: ReactNode }) {
-  const { updatedAt } = buildLandingModel(await loadServedLandingData());
+  const { updatedAt } = buildLandingContext(await loadServedLandingData());
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--paper)] min-[900px]:flex-row">

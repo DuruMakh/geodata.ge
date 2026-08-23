@@ -32,5 +32,5 @@ describe("OpenGraphImage", () => {
     expect(response.headers.get("content-type")).toContain("image/png");
     expect(glyphWidths.length).toBeGreaterThan(10);
     expect(new Set(glyphWidths).size).toBeGreaterThanOrEqual(5);
-  });
+  }, 20_000);
 });

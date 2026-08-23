@@ -215,7 +215,7 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
     ? `${analysisModel.year} წლის ბიუჯეტის სურათი — ${analysisSide === "expenditure" ? "სად მიდის საჯარო ფული" : "საიდან მოდის საჯარო ფული"}`
     : nav === "expenditure"
       ? "როგორ იხარჯება საქართველოს ბიუჯეტი"
-      : "როგორ ივსება საქართველოს ბიუჯეტი";
+      : "როგორ ფინანსდება საქართველოს ბიუჯეტი";
   const sectionLabel = isAnalysis ? "ანალიზი" : nav === "revenue" ? "შემოსავლები" : "ხარჯები";
   const coverageYears = isAnalysis ? analysisYears : scopeYears;
   const coverage = [

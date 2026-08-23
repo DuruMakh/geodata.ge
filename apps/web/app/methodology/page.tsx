@@ -3,7 +3,7 @@ import { MethodologyHub } from "../../components/methodology/methodology-hub";
 import { JsonLd } from "../../components/seo/json-ld";
 import { SiteFooter } from "../../components/site/site-footer";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
-import { buildLandingModel } from "../../lib/landing/landingData";
+import { buildLandingContext } from "../../lib/landing/landingData";
 import { buildMethodologyHubEntries } from "../../lib/methodology/catalog";
 import { loadGeneratedArchiveSummaries } from "../../lib/methodology/prepareArchives";
 import { fiscalMetadata } from "../../lib/seo/metadata";
@@ -30,7 +30,7 @@ export default async function MethodologyPage() {
     municipalFacts: municipalData.totalFacts,
     archives,
   });
-  const landingModel = buildLandingModel(landingData);
+  const landingModel = buildLandingContext(landingData);
 
   return (
     <>

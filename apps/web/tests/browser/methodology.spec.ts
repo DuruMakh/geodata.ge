@@ -28,20 +28,18 @@ test("public header keeps landing active and leaves methodology navigation inact
   const landingHeaderBox = await landingHeader.boundingBox();
   expect(landingHeaderBox).not.toBeNull();
 
-  for (const path of [
-    "/methodology",
-    "/methodology/expenditure",
-    "/methodology/revenue",
-    "/methodology/municipalities",
+  for (const [path, testId] of [
+    ["/methodology", "methodology-header"],
+    ["/methodology/expenditure", "methodology-header"],
+    ["/methodology/revenue", "methodology-header"],
+    ["/methodology/municipalities", "methodology-header"],
+    ["/about", "about-header"],
   ] as const) {
     await page.goto(`http://localhost:3100${path}`);
-    const header = page.getByTestId("methodology-header");
+    const header = page.getByTestId(testId);
     await expect(header).toBeVisible();
     await expect(header.getByRole("link", { name: "მთავარი" })).toHaveAttribute("href", "/");
-    await expect(header.getByRole("link", { name: "ექსპლორერი" })).toHaveAttribute(
-      "href",
-      "/explorer",
-    );
+    await expect(header.getByRole("link", { name: "მონაცემები", exact: true })).toHaveAttribute("href", "/explorer");
     await expect(header.locator("[aria-current]")).toHaveCount(0);
     await expect(header).toContainText("2004–2025");
 
@@ -340,21 +338,52 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
   ).toEqual({ body: 390, viewport: 390 });
 
   await page.goto("http://localhost:3100/");
-  const promotion = page.getByTestId("methodology-promo");
-  const promotionVisual = promotion.getByRole("img", { name: "სამი გადაფარული პირველწყაროს დოკუმენტი" });
-  const promotionTitle = promotion.getByRole("heading", { level: 2 });
+  const methodology = page.getByTestId("landing-methodology");
+  const methodologyTitle = methodology.getByRole("heading", { level: 2 });
+  const methodologyList = methodology.locator("ol");
   const footer = page.getByTestId("site-footer");
-  const promotionBox = await promotion.boundingBox();
-  const promotionVisualBox = await promotionVisual.boundingBox();
-  const promotionTitleBox = await promotionTitle.boundingBox();
-  const footerBox = await footer.boundingBox();
-  expect(promotionBox).not.toBeNull();
-  expect(promotionVisualBox).not.toBeNull();
-  expect(promotionTitleBox).not.toBeNull();
-  expect(footerBox).not.toBeNull();
-  expect(promotionBox!.height).toBeGreaterThan(500);
-  expect(promotionTitleBox!.y).toBeGreaterThanOrEqual(promotionVisualBox!.y + promotionVisualBox!.height);
-  expect(footerBox!.y).toBeGreaterThanOrEqual(promotionBox!.y + promotionBox!.height);
+  await expect(methodology).toBeVisible();
+  await expect(methodologyTitle).toBeVisible();
+  await expect(methodologyList).toBeVisible();
+  await expect(footer).toBeVisible();
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  });
+  const geometry = await page.evaluate(() => {
+    const section = document.querySelector<HTMLElement>('[data-testid="landing-methodology"]');
+    const title = section?.querySelector<HTMLElement>("h2");
+    const list = section?.querySelector<HTMLOListElement>("ol");
+    const footerElement = document.querySelector<HTMLElement>('[data-testid="site-footer"]');
+    if (!section || !title || !list || !footerElement) return null;
+
+    const box = (element: Element) => {
+      const rect = element.getBoundingClientRect();
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    };
+
+    return {
+      methodology: box(section),
+      title: box(title),
+      list: box(list),
+      footer: box(footerElement),
+      overflow: {
+        body: document.body.scrollWidth,
+        viewport: document.documentElement.clientWidth,
+      },
+    };
+  });
+  expect(geometry).not.toBeNull();
+  if (!geometry) throw new Error("Landing methodology geometry was not found");
+  expect(geometry.methodology.x).toBeGreaterThanOrEqual(0);
+  expect(geometry.methodology.x + geometry.methodology.width).toBeLessThanOrEqual(390);
+  expect(geometry.title.x).toBeGreaterThanOrEqual(0);
+  expect(geometry.title.x + geometry.title.width).toBeLessThanOrEqual(390);
+  expect(geometry.list.x).toBeGreaterThanOrEqual(0);
+  expect(geometry.list.x + geometry.list.width).toBeLessThanOrEqual(390);
+  expect(geometry.list.y).toBeGreaterThanOrEqual(geometry.title.y + geometry.title.height);
+  expect(geometry.footer.y).toBeGreaterThanOrEqual(geometry.methodology.y + geometry.methodology.height);
+  expect(geometry.overflow).toEqual({ body: 390, viewport: 390 });
 });
 
 test("methodology keyboard controls expose native behavior and visible focus", async ({ page }) => {
