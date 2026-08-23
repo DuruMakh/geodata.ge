@@ -2,7 +2,6 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { REVENUE_DETAILED_YEARS, REVENUE_YEARS } from "../lib/data/coverage";
 import { budgetFactsToCsv } from "../lib/data/factCsv";
-import { TOTAL_ONLY_BUDGET_FACTS, TOTAL_ONLY_BUDGET_FACT_REPORT } from "../lib/data/totalOnlyBudgetFacts";
 import { extractOfficialRevenueRows, extractOfficialWorkbookRevenueRows } from "../lib/data/realRevenue/extractWorkbooks";
 import { generateLegacyAggregateRevenueFacts, generateRevenueFacts, type RealRevenueFactCsvRow } from "../lib/data/realRevenue/generateFacts";
 import { validateRealRevenueFacts } from "../lib/data/realRevenue/validateRealRevenue";
@@ -37,7 +36,6 @@ async function main() {
   const detailedOfficialRows = officialRows.filter((row) => REVENUE_DETAILED_YEARS.includes(row.year));
   const facts = [
     ...YEAR_2004_REVENUE_FACTS,
-    ...TOTAL_ONLY_BUDGET_FACTS.filter((row) => row.side === "revenue" && !REVENUE_DETAILED_YEARS.includes(row.year)),
     ...generateRevenueFacts(detailedOfficialRows),
   ];
   const report = {
@@ -49,9 +47,6 @@ async function main() {
     importLabel: "real-revenue-2004-2025",
     years: REVENUE_YEARS,
     partialRows: YEAR_2004_REVENUE_FACTS,
-    totalOnlyRows: TOTAL_ONLY_BUDGET_FACT_REPORT.rows.filter(
-      (row) => row.side === "revenue" && !REVENUE_DETAILED_YEARS.includes(row.year),
-    ),
   };
   const parserWarnings: string[] = [];
   const workbookRows = extractOfficialWorkbookRevenueRows(parserWarnings);

@@ -247,15 +247,18 @@ warnings surface in the same run (workbook rows are not staged).
    take the modern mapping table (§3.1) with **undotted fallbacks** (`1.1.4.1.1` also matches
    `11411`, etc.) so 2008–2018 resolve through the same table, plus the netting and residual
    rules of §6. A missing required row **throws** — a year cannot silently ship incomplete.
-2. **Prepends total-only fallbacks** for any revenue year outside `REVENUE_DETAILED_YEARS` —
-   currently none (the detailed set is all of 2005–2025), so the single curated entry
-   (2006 `revenue.total`, `lib/data/totalOnlyBudgetFacts.ts`) is filtered out of the CSV and
-   survives only as the independent reconciliation anchor used by the integration tests (§8.3).
-3. **Validates** (§8.1) and writes `data/reports/real-revenue-2004-2025-report.json`; if any year
+2. **Validates** (§8.1) and writes `data/reports/real-revenue-2004-2025-report.json`; if any year
    fails, the script **exits non-zero without shipping** — but note the CSV is written before the
    check, so never commit a red run's output.
-4. **Writes the cross-check report** `data/reports/revenue-pdf-vs-workbook-2005-2025-report.json`
+3. **Writes the cross-check report** `data/reports/revenue-pdf-vs-workbook-2005-2025-report.json`
    (§7). Reports are gitignored (regenerated artifacts); the CSVs are committed.
+
+There is no total-only coverage tier. Every shipped revenue year is detailed
+(2005–2025) or explicitly partial (2004). The official 2006 consolidated
+receipts total is retained in `apps/web/lib/data/officialTotalBenchmarks.ts` as
+a reconciliation benchmark: the detailed 2006 facts must sum back to it within
+the revenue rounding tolerance, asserted in
+`apps/web/tests/data/pipelineIntegration.test.ts`.
 
 `mapping_notes` are built from `sourceCodeDisplayLabels`, a fixed code→Georgian-label table, with
 a glyph guard: if a source label contains mojibake glyphs (`ʰ–˿`, §5.1) and has no
@@ -344,7 +347,7 @@ illustrates why the consolidated column is the published one: 2005 income tax is
 in the state-budget column and 290,689,679 GEL in the territorial column — income tax then
 accrued to territorial budgets — so only the consolidated 290,685,017 GEL is a meaningful
 national figure. 2006 additionally has a curated official receipts total —
-**4,537,916,325 GEL** (source PDF p. 22, `lib/data/totalOnlyBudgetFacts.ts`) — kept as an
+**4,537,916,325 GEL** (source PDF p. 22, `lib/data/officialTotalBenchmarks.ts`) — kept as an
 independent cross-anchor (§8.3).
 
 ### 5.6 2004 — annual-report partial panel
@@ -562,7 +565,7 @@ PINS" — update them consciously with any legitimate data refresh, never loosen
 
 **Key files:** `apps/web/lib/data/realRevenue/{types,extractWorkbooks,parseTreasuryPdfRows,parseTavi1Rows,generateFacts,validateRealRevenue}.ts`,
 `apps/web/scripts/{extract-real-revenue,generate-real-revenue-facts,compose-budget-facts,validate-data-files,import-budget-facts}.ts`,
-`apps/web/lib/data/{coverage,factCsv,totalOnlyBudgetFacts,importBudgetFacts,importReport,foundationValidation}.ts`,
+`apps/web/lib/data/{coverage,factCsv,officialTotalBenchmarks,importBudgetFacts,importReport,foundationValidation}.ts`,
 `apps/web/lib/data/parsing/cellUtils.ts`.
 **Data:** `docs/Raw Data/Revenue/` (+ `text/` sidecars), `data/staging/revenue-official-rows-2005-2025.csv`,
 `data/imports/revenue-facts-2004-2025.csv`, `data/imports/budget-facts-2004-2025.csv`,

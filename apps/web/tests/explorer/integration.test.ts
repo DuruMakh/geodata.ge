@@ -3,7 +3,7 @@ import { loadAdminSpendingFacts } from "../../lib/data/adminSpending/importAdmin
 import { loadGlossary } from "../../lib/data/glossary";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
-import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_TOTAL_ONLY_YEARS, REVENUE_YEARS } from "../../lib/data/coverage";
+import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_YEARS } from "../../lib/data/coverage";
 import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
@@ -160,18 +160,7 @@ describe("explorer integration with real CSV data", () => {
       [2025, 28305494244],
     ]);
 
-    const totalOnlyRevenueByYear = new Map<number, number>();
-
     expect([...expectedReceiptsByYear.keys()]).toEqual(REVENUE_YEARS);
-    expect([...totalOnlyRevenueByYear.keys()]).toEqual(REVENUE_TOTAL_ONLY_YEARS);
-
-    for (const [year, expectedReceiptsGel] of totalOnlyRevenueByYear) {
-      const yearFacts = revenueFacts.filter((fact) => fact.year === year);
-
-      expect(yearFacts).toHaveLength(1);
-      expect(yearFacts[0]?.itemId).toBe("revenue.total");
-      expect(yearFacts[0]?.amountGel).toBe(expectedReceiptsGel);
-    }
 
     for (const [year, expectedReceiptsGel] of expectedReceiptsByYear) {
       const yearFacts = revenueFacts.filter((fact) => fact.year === year);
