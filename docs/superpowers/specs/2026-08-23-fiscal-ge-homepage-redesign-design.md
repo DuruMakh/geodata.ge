@@ -127,7 +127,7 @@ Each of the first three post-hero sections uses the same editorial ledger struct
 
 There are no post-hero charts, maps, canvases, SVG data graphics, sparklines, waffle grids, Excel previews, prior-year totals, arrows, percentage-change callouts, or decorative illustrations.
 
-The annual masthead may show `ბოლო ხელმისაწვდომი წელი · {year}` only when all three datasets currently share the same latest year. If they differ, it shows the neutral `ბოლო ხელმისაწვდომი მონაცემები`; each section's own year remains authoritative.
+There is no annual masthead above the dataset sections. The `#data` anchor and its strong top rule remain, but the complete masthead row, both masthead texts, and its reserved padding are removed so section `01` begins immediately. Each section's own year and basis/status remain authoritative inside its total block.
 
 Every amount, share, year, row label, ordering decision, and basis label comes from the served, reviewed data. The prototype's 2025 values are illustrative snapshots only.
 
@@ -294,7 +294,6 @@ The new content is server-rendered and adds no new client-side visualization lib
 ## 10. Accessibility
 
 - The page has one H1. Each dataset and methodology section has an H2 associated with its `<section>`.
-- The annual masthead is a visual label, not a competing heading level.
 - Decorative index numbers are hidden from assistive technology.
 - Each data list uses a semantic table with column headers and row headers; its accessible name identifies the dataset and year.
 - Amount and share columns remain understandable without color.
@@ -385,6 +384,7 @@ The implementation may be accepted when:
 - the production homepage matches the approved Variant J hierarchy and responsive intent;
 - all exact Georgian labels and headings in this specification are present;
 - only the population figure changes among the three hero statistics, and it displays as `3.9 მლნ` with the 2026 date/source;
+- the annual masthead and its empty spacing are absent, while the `#data` anchor/top rule lead directly into section `01`;
 - each data section renders only its own latest available year, one prominent applicable total, and four latest-year rows;
 - all budget and municipal values are served-fact-derived rather than hardcoded;
 - the municipality list is correctly identified and computed as the largest municipal budgets;
