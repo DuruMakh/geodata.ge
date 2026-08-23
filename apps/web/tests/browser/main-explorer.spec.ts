@@ -261,7 +261,7 @@ test("revenue nav reuses the identical system without a grouping switch", async 
   await page.goto("http://localhost:3100/explorer/revenue");
   await expectAppReady(page);
 
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება საქართველოს ბიუჯეტი");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ფინანსდება საქართველოს ბიუჯეტი");
   await expect(page.getByTestId("grouping-fields")).toHaveCount(0);
   await expect(page.getByTestId("series-selector")).toContainText("დამატებული ღირებულების გადასახადი");
   await expect(page.getByTestId("source-label")).toContainText("შემოსავლების მონაცემები: 2004–2025");
@@ -283,7 +283,7 @@ test("sidebar section links move between sections in-app", async ({ page }) => {
 
   await sidebar.getByTestId("section-link-revenue").click();
   await expect(page).toHaveURL(/\/explorer\/revenue/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება საქართველოს ბიუჯეტი");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ფინანსდება საქართველოს ბიუჯეტი");
   await expect(page.getByTestId("series-selector")).toContainText("დამატებული ღირებულების გადასახადი");
   await expect(sidebar.getByTestId("section-link-revenue")).toHaveAttribute("aria-current", "page");
   await expect(sidebar.getByTestId("section-link-expenditure")).not.toHaveAttribute("aria-current", "page");
@@ -469,7 +469,7 @@ test("URL hash round-trips explorer state", async ({ page }) => {
   await page.reload();
   await expectAppReady(page);
 
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ივსება საქართველოს ბიუჯეტი");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ფინანსდება საქართველოს ბიუჯეტი");
   await expect(page.getByTestId("explorer-table")).toBeVisible();
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2020");
   await expect(page.getByTestId("series-selector").getByTitle("მთლიანი შემოსავლები")).toHaveAttribute("aria-pressed", "true");

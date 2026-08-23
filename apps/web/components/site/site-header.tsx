@@ -34,7 +34,7 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
           aria-current={active === "explorer" ? "page" : undefined}
           className={navLinkClass(active === "explorer")}
         >
-          ექსპლორერი
+          მონაცემები
         </Link>
       </nav>
       <span className="hidden font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)] min-[768px]:inline">

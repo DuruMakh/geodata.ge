@@ -28,20 +28,18 @@ test("public header keeps landing active and leaves methodology navigation inact
   const landingHeaderBox = await landingHeader.boundingBox();
   expect(landingHeaderBox).not.toBeNull();
 
-  for (const path of [
-    "/methodology",
-    "/methodology/expenditure",
-    "/methodology/revenue",
-    "/methodology/municipalities",
+  for (const [path, testId] of [
+    ["/methodology", "methodology-header"],
+    ["/methodology/expenditure", "methodology-header"],
+    ["/methodology/revenue", "methodology-header"],
+    ["/methodology/municipalities", "methodology-header"],
+    ["/about", "about-header"],
   ] as const) {
     await page.goto(`http://localhost:3100${path}`);
-    const header = page.getByTestId("methodology-header");
+    const header = page.getByTestId(testId);
     await expect(header).toBeVisible();
     await expect(header.getByRole("link", { name: "მთავარი" })).toHaveAttribute("href", "/");
-    await expect(header.getByRole("link", { name: "ექსპლორერი" })).toHaveAttribute(
-      "href",
-      "/explorer",
-    );
+    await expect(header.getByRole("link", { name: "მონაცემები", exact: true })).toHaveAttribute("href", "/explorer");
     await expect(header.locator("[aria-current]")).toHaveCount(0);
     await expect(header).toContainText("2004–2025");
 

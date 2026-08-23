@@ -107,7 +107,9 @@ test("landing renders the approved latest-year data composition", async ({ page 
 
 test("landing data and methodology links use real destinations", async ({ page }) => {
   await page.goto(baseUrl);
-  await expect(page.getByTestId("landing-header").locator('a[href="/explorer"]')).toBeVisible();
+  const dataNav = page.getByTestId("landing-header").getByRole("link", { name: "მონაცემები", exact: true });
+  await expect(dataNav).toHaveAttribute("href", "/explorer");
+  await expect(page.getByTestId("landing-header").getByRole("link", { name: "ექსპლორერი", exact: true })).toHaveCount(0);
   await page.getByTestId("hero-cta").click();
   await expect(page).toHaveURL(/\/#data$/);
   await expect(page.getByTestId("landing-data")).toBeInViewport();

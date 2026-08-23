@@ -370,7 +370,7 @@ Specs below are contracts; visual proof lives in the reference files.
 
 The public-site header appears on the landing page (§19), the methodology hub, and every live dataset methodology route. Surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs. The landing and methodology surfaces use one shared component.
 
-Baseline-aligned row: serif brand left (`Fiscal.ge`), nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `ექსპლორერი` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
+Baseline-aligned row: serif brand left (`Fiscal.ge`), nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
 
 ### 7.2a Mode Control
 
@@ -575,7 +575,7 @@ Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US
 
 `tests/explorer/formatInvariants.test.ts` asserts this against the reviewed corpus, per surface. Fixture-based assertions cannot catch a regression here — the 2026-08 one (ონი 2025 health, 133,333 ₾ shown as `0`) passed every unit test in `format.test.ts`.
 
-Page titles are editorial sentences, not labels: `როგორ იხარჯება საქართველოს ბიუჯეტი`, `როგორ ივსება საქართველოს ბიუჯეტი`, `<year> წლის ბიუჯეტის სურათი — სად მიდის საჯარო ფული / საიდან მოდის საჯარო ფული`.
+Page titles are editorial sentences, not labels: `როგორ იხარჯება საქართველოს ბიუჯეტი`, `როგორ ფინანსდება საქართველოს ბიუჯეტი`, `<year> წლის ბიუჯეტის სურათი — სად მიდის საჯარო ფული / საიდან მოდის საჯარო ფული`.
 
 Empty/error copy explains what happened and what to do, e.g.:
 
