@@ -29,13 +29,13 @@ describe("budgetRowsToCsvRows", () => {
       importRow(2025, "spending.health"),
       importRow(2004, "spending.defense"),
       importRow(2004, "spending.agriculture"),
-      importRow(2004, "tax.income", "revenue"),
+      importRow(2004, "revenue.income", "revenue"),
     ]);
 
     expect(sorted.map((row) => `${row.year}:${row.side}:${row.item_id}`)).toEqual([
       "2004:expenditure:spending.agriculture",
       "2004:expenditure:spending.defense",
-      "2004:revenue:tax.income",
+      "2004:revenue:revenue.income",
       "2025:expenditure:spending.health",
     ]);
   });
