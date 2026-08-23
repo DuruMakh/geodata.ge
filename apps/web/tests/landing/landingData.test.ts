@@ -116,7 +116,6 @@ describe("landing model", () => {
   it("keeps shared context and independently derived latest years", () => {
     expect(model.yearsLabel).toBe("2004–2024");
     expect(model.updatedAt).toBe("2026-06-01");
-    expect(model.commonLatestYear).toBeNull();
   });
 
   it("uses the Georgia aggregate and ranks every eligible municipality", () => {

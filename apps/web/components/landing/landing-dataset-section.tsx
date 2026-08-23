@@ -39,7 +39,9 @@ export function LandingDatasetSection({
     <section
       data-testid={`landing-dataset-${kind}`}
       aria-labelledby={headingId}
-      className="grid gap-5 border-t border-[var(--hairline)] py-8 min-[850px]:grid-cols-[52px_minmax(230px,0.82fr)_minmax(0,1.35fr)] min-[850px]:gap-8 min-[850px]:py-11"
+      className={`grid gap-5 py-8 min-[850px]:grid-cols-[52px_minmax(230px,0.82fr)_minmax(0,1.35fr)] min-[850px]:gap-8 min-[850px]:py-11 ${
+        kind === "expenditure" ? "" : "border-t border-[var(--hairline)]"
+      }`}
     >
       <div
         data-testid="landing-dataset-index"

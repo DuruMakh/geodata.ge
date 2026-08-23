@@ -37,7 +37,6 @@ export type LandingModel = LandingContext & {
   expenditure: LandingDatasetSummary;
   revenue: LandingDatasetSummary;
   municipalities: LandingDatasetSummary;
-  commonLatestYear: number | null;
 };
 
 type BuildLandingModelInput = {
@@ -159,16 +158,11 @@ export function buildLandingModel({
   const expenditure = buildNationalSummary(active, glossary, "expenditure");
   const revenue = buildNationalSummary(active, glossary, "revenue");
   const municipalSummary = buildMunicipalSummary(municipalities, municipalTotalFacts, municipalCountryTotalFacts);
-  const commonLatestYear =
-    expenditure.latestYear === revenue.latestYear && revenue.latestYear === municipalSummary.latestYear
-      ? expenditure.latestYear
-      : null;
 
   return {
     ...context,
     expenditure,
     revenue,
     municipalities: municipalSummary,
-    commonLatestYear,
   };
 }

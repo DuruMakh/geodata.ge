@@ -113,15 +113,6 @@ export function LandingPage({ model }: { model: LandingModel }) {
         </section>
 
         <div id="data" data-testid="landing-data" className="mt-14 scroll-mt-4 border-t-2 border-[var(--ink)]">
-          <div data-testid="landing-data-header" className="flex flex-wrap items-end justify-between gap-3 py-5">
-            <p className="font-[family-name:var(--font-display)] text-[22px] font-semibold">საჯარო ფინანსების წლიური</p>
-            <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">
-              {model.commonLatestYear === null
-                ? "ბოლო ხელმისაწვდომი მონაცემები"
-                : `ბოლო ხელმისაწვდომი წელი · ${model.commonLatestYear}`}
-            </span>
-          </div>
-
           <LandingDatasetSection
             kind="expenditure"
             index="01"

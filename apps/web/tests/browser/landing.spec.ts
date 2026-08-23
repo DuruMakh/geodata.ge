@@ -108,7 +108,22 @@ test("landing renders the approved latest-year data composition", async ({ page 
     "როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები",
     "მეთოდოლოგია და პირველწყაროები",
   ]);
-  await expect(page.getByTestId("landing-data-header")).toContainText("ბოლო ხელმისაწვდომი წელი · 2025");
+  const landingData = page.getByTestId("landing-data");
+  const expenditureSection = page.getByTestId("landing-dataset-expenditure");
+  await expect(page.getByTestId("landing-data-header")).toHaveCount(0);
+  await expect(page.getByText("საჯარო ფინანსების წლიური", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("ბოლო ხელმისაწვდომი წელი · 2025", { exact: true })).toHaveCount(0);
+  await expect(landingData.locator(':scope > [data-testid="landing-dataset-expenditure"]')).toHaveCount(1);
+  expect(
+    await landingData.locator(":scope > *").evaluateAll((elements) => elements.map((element) => element.getAttribute("data-testid"))),
+  ).toEqual([
+    "landing-dataset-expenditure",
+    "landing-dataset-revenue",
+    "landing-dataset-municipalities",
+    "landing-methodology",
+  ]);
+  await expect(landingData).toHaveCSS("border-top-width", "2px");
+  await expect(expenditureSection).toHaveCSS("border-top-width", "0px");
 
   for (const testId of [
     "landing-dataset-expenditure",
