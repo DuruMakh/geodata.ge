@@ -141,3 +141,55 @@ In-app-browser comparison at an explicit 1640×900 desktop viewport, using the s
 - No P0, P1, or P2 differences found.
 
 final result: passed
+
+## Fiscal.ge Homepage Redesign QA — 2026-08-23
+
+### Source and implementation evidence
+
+- Approved source: `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\design-shotgun\homepage-below-hero-2026-08-23\variant-j.html`.
+- Source viewport captures: `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\source-desktop.png`, `source-390.png`, and `source-320.png`.
+- Final production implementation captures: `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\implementation-production-desktop.png`, `implementation-production-390.png`, and `implementation-production-320.png`.
+- Viewports were 1366×768, 390×844, and 320×844 CSS pixels. Every viewport capture has the same pixel dimensions as its CSS viewport, so source and implementation are normalized at 1 CSS pixel to 1 image pixel with no scaling.
+- Full-page source/implementation sizes were 1366×2763 / 1366×2505, 390×2966 / 390×3689, and 320×2992 / 320×3902 pixels. Full-page composites are top-aligned at the same viewport width and density with a 16px paper-colored gutter; neither side is rescaled.
+
+### Full-view comparison evidence
+
+- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-desktop-full.png`
+- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-390-full.png`
+- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-320-full.png`
+- First-viewport comparisons are `comparison-final-desktop-viewport.png`, `comparison-final-390-viewport.png`, and `comparison-final-320-viewport.png` in the same directory.
+
+The full-page evidence covers the entire fixed order: header, preserved living-relief hero, one-row country figures, annual masthead, expenditure, revenue, municipalities, the single methodology ledger, and the retained production footer. The implementation is taller on narrow screens because the real footer retains its complete navigation, source, update, contact, and licence content; Variant J has only a two-item prototype footer. This is an approved product-content difference, not a layout defect.
+
+### Focused-region evidence
+
+- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-desktop-data.png`
+- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-390-data.png`
+- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-320-data.png`
+
+These anchor-aligned captures compare the annual masthead, section 01 copy, double-rule total, latest-year/status block, and four-row semantic table at all three widths. They make the responsive index → copy → data order, table fit, amount formatting, and rule hierarchy readable without relying on the resized full-page composites.
+
+### Findings
+
+No actionable P0, P1, or P2 mismatch remains within Task 2's approved homepage-composition boundary.
+
+- Typography: the implementation preserves the serif display hierarchy, Georgian sans overlines/body, mono years and table values, balanced H1/H2 wrapping, and readable 320px table scale. No Georgian text clips or collides.
+- Spacing and rhythm: desktop reads index → copy → data; 390px and 320px stack in DOM order. All three ledgers repeat the same spacing, total rules, and table rhythm. The methodology section follows the same numbered structure and the footer begins only after it.
+- Tokens and colors: paper, ink, body/muted/faint tiers, hairlines, and terracotta links/indexes use the canonical production tokens. There are no cards, shadows, post-hero graphics, or new decorative effects.
+- Asset fidelity: the source's schematic dotted terrain is intentionally not copied. The approved production living-relief WebGL hero is preserved with its real Georgia geometry, elevation, city marker, accessible figure label, and fallback contract; no raster or placeholder asset was introduced.
+- Copy and data: hero, country figures, ordered H2s, links, methodology steps, totals, years, basis labels, top-four rows, and shares match the approved contract. Static prototype amounts were not copied; production uses served facts and the existing amount/share formatters.
+- Responsive containment: automated and browser-computed checks found `scrollWidth === clientWidth` at 1366, 390, and 320 pixels. The country figures stay in one row, units wrap at 320px, and every table remains within its parent without horizontal scrolling.
+- Accessibility: one H1, section-associated H2s, semantic tables with row/column headers and dataset/year labels, assistive-only full mobile captions, decorative indexes hidden from assistive technology, and keyboard-visible direct links were confirmed. Color is not required to understand amount, share, year, or status.
+- The shared header still displays `ექსპლორერი` in this Task 2 capture while Variant J displays `მონაცემები`. The approved implementation plan assigns that copy-only shared-header change to Task 3, so it was not pulled into this task's bounded file set or classified as a Task 2 fidelity defect.
+
+### Console and interaction checks
+
+Fresh checks against the production build at each viewport found no console warnings, console errors, or uncaught page errors. The hero CTA reached `#data` with the annual region in view. Two Tab presses from that anchor placed a visible keyboard focus on the revenue dataset link; Enter reached `/explorer/revenue`, where the explorer shell rendered. The focused Playwright file separately passed all four cases covering metadata/copy, canvas-or-fallback, real destinations, ordered sections, obsolete-surface removal, 390px/320px geometry, methodology discovery, and screenshot capture.
+
+### Comparison history
+
+- Pass 1 used the required focused-browser captures from the development server. The page composition and containment were correct, but the development-only Next `N` badge obscured section 01 in the implementation evidence. This was recorded as a P2 evidence defect, not a production UI defect.
+- Fix: built the optimized static application, served it with `next start`, and recaptured every viewport, full page, and focused annual state from the production server.
+- Pass 2: the badge is absent, no content is obscured, and repeated inspection of typography, rhythm, tokens, asset fidelity, copy, tables, footer, responsive containment, focus, links, and console state found no remaining actionable P0/P1/P2 mismatch within Task 2.
+
+final result: passed

@@ -1,45 +1,48 @@
 import Link from "next/link";
 import type { LandingModel } from "../../lib/landing/landingData";
-import { MethodologyPromo } from "../methodology/methodology-promo";
 import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
 import { HeroReliefLazy } from "./hero-relief-lazy";
+import { LandingDatasetSection } from "./landing-dataset-section";
 
-// Landing page (GeoData Site v2 design): header, living-relief hero, key country
-// numbers, the three paths to the data, and the site footer. Static figures
-// (population, area, GDP) are maintained here by hand; everything budget-derived
-// comes from LandingModel so the landing always matches the explorer.
-
+// Country snapshots are maintained by hand; every budget value below them is
+// derived from the same active facts as the matching explorer.
 const KEY_NUMBERS = [
-  { label: "მოსახლეობა", value: "3.7", unit: "მლნ", caption: "მუდმივი მოსახლეობა" },
-  { label: "ფართობი", value: "69.7", unit: "ათ. კმ²", caption: "ზღვის დონიდან 0–5193 მ" },
-  // Geostat preliminary 2025 nominal GDP: 104.6 bln GEL (+12.4% YoY).
-  { label: "ეკონომიკის ზომა", value: "104.6", unit: "მლრდ ₾", caption: "ნომინალური მშპ · 2025, წინასწარი" },
+  {
+    label: "მოსახლეობა",
+    value: "3.9",
+    unit: "მლნ",
+    caption: "2026 წლის 1 იანვარი · საქსტატი",
+    mobileCaption: "2026 · საქსტატი",
+    unitTestId: "population-unit",
+  },
+  {
+    label: "ფართობი",
+    value: "69.7",
+    unit: "ათ. კმ²",
+    caption: "საქართველოს ტერიტორია",
+    mobileCaption: "ტერიტორია",
+    unitTestId: "area-unit",
+  },
+  {
+    label: "ეკონომიკის ზომა",
+    value: "104.6",
+    unit: "მლრდ ₾",
+    caption: "ნომინალური მშპ · 2025, წინასწარი",
+    mobileCaption: "მშპ · 2025",
+    unitTestId: "gdp-unit",
+  },
 ] as const;
-
-const ANALYSIS_HREF = "/explorer/analysis";
 
 const HERO_ARIA_LABEL =
   "საქართველოს ზუსტი რუკა ცოცხალ რელიეფად: მთავარი ქალაქები მოსახლეობის ზომის კვადრატებით უშვებენ ტალღებს; კავკასიონი მუქდება სიმაღლესთან ერთად";
 
-function PathCardLabel({ index, children }: { index: string; children: React.ReactNode }) {
-  return (
-    <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-      <span className="font-[family-name:var(--font-numeric)] text-[var(--faint)]">{index}</span> · {children}
-    </div>
-  );
-}
-
-function PathCardLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="mt-auto self-start text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]"
-    >
-      {children}
-    </Link>
-  );
-}
+const METHODOLOGY_STEPS = [
+  "ოფიციალური დოკუმენტის შენარჩუნება",
+  "კლასიფიკაცია და გარდაქმნის წესი",
+  "შეჯერება და ხარისხის შემოწმება",
+  "ჩამოსატვირთი მონაცემები",
+] as const;
 
 export function LandingPage({ model }: { model: LandingModel }) {
   return (
@@ -56,27 +59,25 @@ export function LandingPage({ model }: { model: LandingModel }) {
             className="pb-[18px] pt-7 min-[768px]:pointer-events-none min-[768px]:absolute min-[768px]:right-0 min-[768px]:top-[42px] min-[768px]:z-10 min-[768px]:flex min-[768px]:w-[340px] min-[768px]:flex-col min-[768px]:items-end min-[768px]:p-0 min-[768px]:text-right min-[1100px]:w-[470px]"
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[11px]">
-              ეროვნული სტატისტიკის პლატფორმა
+              საქართველოს მონაცემების პლატფორმა
             </p>
-            <h1 className="mt-2.5 text-pretty font-[family-name:var(--font-display)] text-[31px] font-semibold leading-[1.16] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-balance min-[768px]:text-[28px] min-[1100px]:text-[40px]">
-              როგორ ივსება და იხარჯება საქართველოს ბიუჯეტი
+            <h1 className="mt-2.5 text-pretty font-[family-name:var(--font-display)] text-[33px] font-semibold leading-[1.12] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-[30px] min-[1100px]:text-[40px]">
+              საქართველო ციფრებში
             </h1>
             <div className="mt-3.5 min-[768px]:pointer-events-auto min-[768px]:mt-5">
               <Link
-                href="/explorer"
+                href="#data"
                 data-testid="hero-cta"
                 className="text-[12px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222] min-[768px]:text-[12.5px]"
               >
-                დაიწყე ბიუჯეტით
+                გაეცანი მონაცემებს
               </Link>
             </div>
           </div>
-          {/* Full-bleed: the map is the hero — it escapes the 1240px column and
-              spans the whole viewport; the headline stays in the content grid. */}
           <figure
             role="img"
             aria-label={HERO_ARIA_LABEL}
-            className="relative m-0 ml-[calc(50%-50vw)] h-[340px] w-screen min-w-0 overflow-hidden p-0 min-[768px]:h-[500px] min-[1100px]:h-[clamp(560px,78vh,820px)]"
+            className="relative m-0 ml-[calc(50%-50vw)] h-[330px] w-screen min-w-0 overflow-hidden p-0 min-[768px]:h-[500px] min-[1100px]:h-[clamp(560px,78vh,820px)]"
           >
             <HeroReliefLazy />
           </figure>
@@ -84,145 +85,120 @@ export function LandingPage({ model }: { model: LandingModel }) {
 
         <section
           data-testid="key-numbers"
-          className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-8 border-t border-[var(--hairline-soft)] pt-[18px]"
+          className="grid grid-cols-3 gap-3 border-t border-[var(--hairline-soft)] pt-[18px] min-[768px]:gap-8"
         >
           {KEY_NUMBERS.map((entry) => (
-            <div key={entry.label}>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{entry.label}</div>
-              <div className="mt-2.5 font-[family-name:var(--font-display)] text-[46px] font-semibold leading-[1.05] tracking-[-0.02em]">
-                {entry.value} <span className="text-[25px]">{entry.unit}</span>
+            <div key={entry.label} data-country-stat className="min-w-0">
+              <div className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] min-[768px]:text-[11px] min-[768px]:tracking-[0.08em]">
+                {entry.label}
               </div>
-              <div className="mt-2 text-[12px] leading-normal text-[var(--muted)]">{entry.caption}</div>
+              <div className="mt-2 font-[family-name:var(--font-display)] text-[clamp(22px,7vw,46px)] font-semibold leading-[1.05] tracking-[-0.02em]">
+                {entry.value}{" "}
+                <span
+                  data-testid={entry.unitTestId}
+                  className="text-[clamp(11px,3vw,25px)] max-[380px]:mt-1 max-[380px]:block"
+                >
+                  {entry.unit}
+                </span>
+              </div>
+              <div className="mt-2 text-[9px] leading-snug text-[var(--muted)] min-[768px]:text-[12px]">
+                <span className="hidden min-[381px]:inline">{entry.caption}</span>
+                <span aria-hidden="true" className="min-[381px]:hidden">
+                  {entry.mobileCaption}
+                </span>
+                <span className="sr-only min-[381px]:hidden">{entry.caption}</span>
+              </div>
             </div>
           ))}
         </section>
 
-        <section data-testid="three-paths" className="mt-14 border-t-2 border-[var(--ink)] pt-[22px]">
-          <h2 className="mb-[26px] font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-[-0.01em]">
-            სამი გზა მონაცემებამდე
-          </h2>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-9">
-            <div className="flex flex-col gap-3 border-t border-[var(--hairline)] pt-4">
-              <PathCardLabel index="01">მრავალწლიანი ექსპლორერი</PathCardLabel>
-              <p className="text-pretty text-[13.5px] leading-relaxed text-[var(--body)]">
-                ხაზები და ცხრილები {model.revMin} წლიდან დღემდე: აირჩიე კატეგორიები, შეადარე პერიოდები, ნახე წილები.
-              </p>
-              <div className="mt-1.5">
-                <svg viewBox="0 0 260 84" className="block h-auto w-full max-w-[340px]" role="img" aria-label="ჯამური შემოსავლების დინამიკა">
-                  {model.sparkVat ? (
-                    <polyline
-                      points={model.sparkVat}
-                      fill="none"
-                      stroke="var(--accent)"
-                      strokeWidth="1.5"
-                      strokeLinejoin="round"
-                      strokeLinecap="round"
-                      opacity="0.75"
-                    />
-                  ) : null}
-                  <polyline
-                    points={model.sparkTotal}
-                    fill="none"
-                    stroke="var(--ink)"
-                    strokeWidth="1.8"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                  />
-                  <circle cx={model.sparkEndX} cy={model.sparkEndY} r="2.6" fill="var(--ink)" />
-                </svg>
-                <div className="mt-1 flex max-w-[340px] justify-between">
-                  <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{model.revMin}</span>
-                  <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{model.revMax}</span>
-                </div>
-              </div>
-              <PathCardLink href="/explorer/expenditure">ხარჯების ექსპლორერი</PathCardLink>
-            </div>
-
-            <div className="flex flex-col gap-3 border-t border-[var(--hairline)] pt-4">
-              <PathCardLabel index="02">ერთი წლის სურათი</PathCardLabel>
-              <p className="text-pretty text-[13.5px] leading-relaxed text-[var(--body)]">
-                სტრუქტურა, ყოველი 100 ლარი, რადარი და სრული რეიტინგი — ერთი წლის ბიუჯეტი ერთ გვერდზე.
-              </p>
-              <div className="mt-1.5 max-w-[340px]">
-                <div data-testid="waffle-grid" className="grid grid-cols-10 gap-1">
-                  {model.waffleCells.map((color, index) => (
-                    <div key={index} className="aspect-square" style={{ backgroundColor: color }} />
-                  ))}
-                </div>
-                <div className="mt-1.5 font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">
-                  ხარჯების სტრუქტურა · {model.expMax}
-                </div>
-              </div>
-              <PathCardLink href={ANALYSIS_HREF}>სურათის ნახვა</PathCardLink>
-            </div>
-
-            <div className="flex flex-col gap-3 border-t border-[var(--hairline)] pt-4">
-              <PathCardLabel index="03">Excel მონაცემები</PathCardLabel>
-              <p className="text-pretty text-[13.5px] leading-relaxed text-[var(--body)]">
-                ექსპლორერში შერჩეული მონაცემები ჩამოტვირთე ერთ Excel ფაილად — წასაკითხად, ანალიზისთვის და წყაროების გადასამოწმებლად.
-              </p>
-              <div className="mt-1.5 max-w-[340px] bg-[var(--tint)] px-3.5 py-3">
-                <div className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-                  {model.excelPreview.sheetNames.map((sheetName, index) => (
-                    <span key={sheetName}>
-                      {index > 0 ? " · " : null}
-                      <span>{sheetName}</span>
-                    </span>
-                  ))}
-                </div>
-                <table data-testid="excel-preview" className="mt-2 w-full text-[10.5px] font-[family-name:var(--font-numeric)]">
-                  <thead className="text-[var(--muted)]">
-                    <tr>
-                      {model.excelPreview.headers.map((header, index) => (
-                        <th key={header} scope="col" className={index === 0 ? "text-left font-normal" : "text-right font-normal"}>
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="text-[var(--body)]">
-                    {model.excelPreview.rows.map(([label, previousValue, latestValue]) => (
-                      <tr key={label}>
-                        <th scope="row" className="max-w-[120px] truncate text-left font-normal">
-                          {label}
-                        </th>
-                        <td className="text-right">{previousValue.toLocaleString("en-US")}</td>
-                        <td className="text-right">{latestValue.toLocaleString("en-US")}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <PathCardLink href="/explorer/revenue">შემოსავლების მონაცემები</PathCardLink>
-            </div>
+        <div id="data" data-testid="landing-data" className="mt-14 scroll-mt-4 border-t-2 border-[var(--ink)]">
+          <div data-testid="landing-data-header" className="flex flex-wrap items-end justify-between gap-3 py-5">
+            <p className="font-[family-name:var(--font-display)] text-[22px] font-semibold">საჯარო ფინანსების წლიური</p>
+            <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">
+              {model.commonLatestYear === null
+                ? "ბოლო ხელმისაწვდომი მონაცემები"
+                : `ბოლო ხელმისაწვდომი წელი · ${model.commonLatestYear}`}
+            </span>
           </div>
-          <Link
+
+          <LandingDatasetSection
+            kind="expenditure"
+            index="01"
+            overline="სახელმწიფო ხარჯები"
+            heading="როგორ იხარჯება საქართველოს ბიუჯეტი"
+            description={`ნახე ${model.expenditure.latestYear} წლის ხარჯები სფეროების, სამინისტროებისა და ძირითადი პროგრამების მიხედვით.`}
+            href="/explorer/expenditure"
+            linkLabel="ხარჯების მონაცემები →"
+            totalLabel="მთლიანი ხარჯი"
+            firstColumnLabel="სფერო"
+            summary={model.expenditure}
+          />
+          <LandingDatasetSection
+            kind="revenue"
+            index="02"
+            overline="სახელმწიფო შემოსავლები"
+            heading="როგორ ფინანსდება საქართველოს ბიუჯეტი"
+            description={`ნახე ${model.revenue.latestYear} წლის გადასახადები, გრანტები, სხვა შემოსავლები და ვალდებულებები.`}
+            href="/explorer/revenue"
+            linkLabel="შემოსავლების მონაცემები →"
+            totalLabel="მთლიანი შემოსავლები"
+            firstColumnLabel="მუხლი"
+            summary={model.revenue}
+          />
+          <LandingDatasetSection
+            kind="municipalities"
+            index="03"
+            overline="მუნიციპალური ბიუჯეტები"
+            heading="როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები"
+            description={`64 მუნიციპალიტეტისა და 11 რეგიონის ${model.municipalities.latestYear} წლის ბიუჯეტები.`}
             href="/explorer/municipalities"
-            className="mt-8 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
+            linkLabel="მუნიციპალური მონაცემები →"
+            totalLabel="საქართველოს მუნიციპალური ჯამი"
+            firstColumnLabel="უდიდესი მუნიციპალური ბიუჯეტები"
+            summary={model.municipalities}
+          />
+
+          <section
+            data-testid="landing-methodology"
+            aria-labelledby="landing-methodology-title"
+            className="grid gap-5 border-t border-[var(--hairline)] py-8 min-[850px]:grid-cols-[52px_minmax(230px,0.82fr)_minmax(0,1.35fr)] min-[850px]:gap-8 min-[850px]:py-11"
           >
-            საქართველოს მუნიციპალიტეტების ბიუჯეტები →
-          </Link>
-        </section>
-
-        <section className="mt-14 border-t-2 border-[var(--ink)] pt-[22px]" aria-labelledby="about-fiscal-title">
-          <h2 id="about-fiscal-title" className="font-[family-name:var(--font-display)] text-[22px] font-semibold">
-            რა არის Fiscal.ge?
-          </h2>
-          <p className="mt-4 max-w-[760px] text-[13.5px] leading-[1.8] text-[var(--body)]">
-            Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ,
-            მრავალწლიან მონაცემებს. ოფიციალური სამართლებრივი დოკუმენტი უცვლელად რჩება პირველწყაროდ;
-            Fiscal.ge მონაცემებს ადარებად, გასაგებად და ჩამოსატვირთად აწყობს.
-          </p>
-          <Link href="/methodology" className="mt-3 inline-flex text-[12.5px] text-[var(--accent)] underline underline-offset-4">
-            პირველწყაროები და მეთოდოლოგია
-          </Link>
-        </section>
-
-        <MethodologyPromo
-          href="/methodology"
-          titleKa="როგორ იქცევა ოფიციალური წყარო ღია მონაცემად"
-          bodyKa="გაეცანით თითოეული კრებულის სრულ მეთოდოლოგიას, გადამოწმების წესებსა და უცვლელ ოფიციალურ დოკუმენტებს."
-        />
+            <div aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[12px] text-[var(--accent)]">
+              04
+            </div>
+            <h2
+              id="landing-methodology-title"
+              className="font-[family-name:var(--font-display)] text-[26px] font-semibold leading-[1.16]"
+            >
+              მეთოდოლოგია და პირველწყაროები
+            </h2>
+            <div>
+              <p className="text-[13px] leading-[1.75] text-[var(--body)]">
+                თითოეული რიცხვი უკავშირდება ოფიციალურ წყაროს, კლასიფიკაციის წესსა და გადამოწმების შედეგს.
+              </p>
+              <ol className="mt-5 border-t border-[var(--hairline-soft)]">
+                {METHODOLOGY_STEPS.map((label, index) => (
+                  <li
+                    key={label}
+                    className="grid grid-cols-[28px_1fr] gap-3 border-b border-[var(--hairline-soft)] py-2.5 text-[11.5px] text-[var(--body)]"
+                  >
+                    <span aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[var(--faint)]">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span>{label}</span>
+                  </li>
+                ))}
+              </ol>
+              <Link
+                href="/methodology"
+                className="mt-4 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
+              >
+                მეთოდოლოგიის ნახვა →
+              </Link>
+            </div>
+          </section>
+        </div>
 
         <SiteFooter updatedAt={model.updatedAt} />
       </div>
