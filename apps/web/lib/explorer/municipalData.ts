@@ -9,8 +9,7 @@ import {
   type MunicipalTotalFact,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
-import { MIXED_SOURCE_ID } from "../data/municipal/aggregateMunicipalFacts";
-import type { ExplorerTableRow, SourceMetadata } from "./types";
+import type { ExplorerTableRow } from "./types";
 import { colorForItem, INK } from "./colors";
 import { formatAmount, formatAmountParts, formatPerResidentGel, formatShare, MISSING } from "./format";
 import { georgianOrdinal } from "./municipalLabels";
@@ -25,7 +24,7 @@ import { georgianOrdinal } from "./municipalLabels";
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
 export const MUNICIPAL_PER_RESIDENT_YEAR = 2025;
-const MUNICIPAL_COUNTRY_BUDGET_COUNT = 69;
+export const MUNICIPAL_COUNTRY_BUDGET_COUNT = 69;
 
 export type MunicipalEntityModel = {
   years: number[];
@@ -37,21 +36,9 @@ export type MunicipalEntityInput = {
   functions: MunicipalFunction[];
   functionFacts: MunicipalFunctionFact[];
   totalFacts: MunicipalTotalFact[];
-  sourceDocuments: SourceDocumentRow[];
   startYear: number;
   endYear: number;
 };
-
-/**
- * Carry a string field through only when every constituent agrees; otherwise
- * collapse to `mixedMarker` so no single constituent's value can be mistaken
- * for the group's. Idempotent across a fold: once a group is marked mixed,
- * `current` is the marker itself, which never equals a real incoming value,
- * so it stays mixed.
- */
-function agreeOrMixed(current: string, incoming: string, mixedMarker: string): string {
-  return current === incoming ? current : mixedMarker;
-}
 
 export {
   aggregateFactsForEntity,
@@ -59,15 +46,6 @@ export {
   MIXED_PUBLIC_TOTAL_MEASURE,
   MIXED_SOURCE_ID,
 } from "../data/municipal/aggregateMunicipalFacts";
-
-function sourceMetadataFor(sourceId: string, sources: Map<string, SourceDocumentRow>): SourceMetadata {
-  const source = sources.get(sourceId);
-  return {
-    sourceName: source?.sourceName ?? "",
-    sourceUrlOrFile: source?.sourceUrlOrFile ?? "",
-    lastReviewedAt: source?.lastReviewedAt ?? "",
-  };
-}
 
 export function latestReviewedAtForMunicipalFacts(
   sourceDocuments: SourceDocumentRow[],
@@ -89,33 +67,23 @@ function changeBetween(start: number | null, end: number | null): number | null 
 }
 
 export function buildMunicipalEntityModel(input: MunicipalEntityInput): MunicipalEntityModel {
-  const { functions, functionFacts, totalFacts, sourceDocuments, startYear, endYear } = input;
+  const { functions, functionFacts, totalFacts, startYear, endYear } = input;
 
-  const sources = new Map(sourceDocuments.map((source) => [source.sourceId, source]));
   const years = Array.from(new Set(totalFacts.map((row) => row.year)))
     .filter((year) => year >= startYear && year <= endYear)
     .sort((a, b) => a - b);
   const inRange = new Set(years);
 
   const amounts = new Map<string, number>();
-  const sourceIds = new Map<string, string>();
   for (const row of functionFacts) {
     if (!inRange.has(row.year)) continue;
-    const key = `${row.categoryId}|${row.year}`;
-    amounts.set(key, (amounts.get(key) ?? 0) + row.amountGel);
-    sourceIds.set(key, row.sourceId);
+    amounts.set(`${row.categoryId}|${row.year}`, (amounts.get(`${row.categoryId}|${row.year}`) ?? 0) + row.amountGel);
   }
 
   const officialTotalByYear: Record<number, number> = {};
-  const officialSourceIdByYear = new Map<number, string>();
   for (const row of totalFacts) {
     if (!inRange.has(row.year)) continue;
     officialTotalByYear[row.year] = (officialTotalByYear[row.year] ?? 0) + row.publicTotalGel;
-    const currentSourceId = officialSourceIdByYear.get(row.year);
-    officialSourceIdByYear.set(
-      row.year,
-      currentSourceId === undefined ? row.sourceId : agreeOrMixed(currentSourceId, row.sourceId, MIXED_SOURCE_ID),
-    );
   }
 
   const firstYear = years[0];
@@ -126,7 +94,6 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
   const rows: ExplorerTableRow[] = ordered.map((fn, index) => {
     const valuesByYear: Record<number, number | null> = {};
     const basisByYear: Record<number, "actual" | "planned"> = {};
-    const sourceByYear: Record<number, SourceMetadata> = {};
 
     for (const year of years) {
       const key = `${fn.id}|${year}`;
@@ -134,7 +101,6 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
       // outside coverage — null, not zero. A served zero stays zero.
       valuesByYear[year] = amounts.has(key) ? amounts.get(key)! : null;
       basisByYear[year] = "actual";
-      sourceByYear[year] = sourceMetadataFor(sourceIds.get(key) ?? "", sources);
     }
 
     const endValue = lastYear === undefined ? null : valuesByYear[lastYear] ?? null;
@@ -144,12 +110,10 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
       itemId: fn.id,
       parentItemId: null,
       level: "municipal_function",
-      detailLabel: null,
       kaLabel: fn.kaLabel,
       enLabel: "",
       color: colorForItem(fn.id, index),
       basisByYear,
-      sourceByYear,
       valuesByYear,
       change: changeBetween(
         firstYear === undefined ? null : valuesByYear[firstYear] ?? null,
@@ -161,23 +125,19 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
 
   const totalValuesByYear: Record<number, number | null> = {};
   const totalBasisByYear: Record<number, "actual" | "planned"> = {};
-  const totalSourceByYear: Record<number, SourceMetadata> = {};
   for (const year of years) {
     totalValuesByYear[year] = officialTotalByYear[year] ?? null;
     totalBasisByYear[year] = "actual";
-    totalSourceByYear[year] = sourceMetadataFor(officialSourceIdByYear.get(year) ?? "", sources);
   }
 
   const totalRow: ExplorerTableRow = {
     itemId: MUNICIPAL_TOTAL_ITEM_ID,
     parentItemId: null,
     level: "total",
-    detailLabel: null,
     kaLabel: "მთლიანი ბიუჯეტი",
     enLabel: "Total",
     color: INK,
     basisByYear: totalBasisByYear,
-    sourceByYear: totalSourceByYear,
     valuesByYear: totalValuesByYear,
     change: changeBetween(
       firstYear === undefined ? null : totalValuesByYear[firstYear] ?? null,

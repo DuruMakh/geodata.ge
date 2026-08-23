@@ -13,17 +13,10 @@ export type ExpenditureGrouping = "fields" | "ministries";
 export type ExplorerScope = "fields" | "ministries" | "revenue";
 export type ExplorerItemLevel = "total" | "public_field" | "admin_category" | "major_program" | "municipal_function";
 
-export type SourceMetadata = {
-  sourceName: string;
-  sourceUrlOrFile: string;
-  lastReviewedAt: string;
-};
-
 export type GdpMetadata = {
   gdpCurrentPricesGel: number;
   accountingStandard: GdpAccountingStandard;
   status: GdpStatus;
-  source: SourceMetadata;
 };
 
 export type ExplorerItem = {
@@ -31,48 +24,33 @@ export type ExplorerItem = {
   side: ExplorerSide;
   parentItemId: string | null;
   level: ExplorerItemLevel;
-  detailLabel: string | null;
   kaLabel: string;
   enLabel: string;
   color: string;
   sortOrder: number;
 };
 
+// The chart reads value/basis per (item, year); nothing renders a point's own
+// labels or its derived amount, share or percent change.
 export type ExplorerPoint = {
   year: number;
   itemId: string;
-  kaLabel: string;
-  enLabel: string;
-  amountGel: number;
   basis: "actual" | "planned";
   value: number | null;
-  shareOfTotal: number | null;
-  percentChange: number | null;
 };
 
 export type ExplorerTableRow = {
   itemId: string;
   parentItemId: string | null;
   level: ExplorerItemLevel;
-  detailLabel: string | null;
-  officialInstitutionLabelByYear?: Record<number, string | null>;
   kaLabel: string;
   enLabel: string;
   color: string;
   basisByYear: Record<number, "actual" | "planned">;
-  sourceByYear: Record<number, SourceMetadata>;
   valuesByYear: Record<number, number | null>;
   shareByYear?: Record<number, number | null>;
   change: number | null;
   shareEndYear: number | null;
-};
-
-export type PeriodSummary = {
-  totalChange: number | null;
-  largestGelIncrease: ExplorerTableRow | null;
-  fastestGrowth: ExplorerTableRow | null;
-  lowestGrowth: ExplorerTableRow | null;
-  biggestShareChange: ExplorerTableRow | null;
 };
 
 export type SnapshotItem = {
@@ -86,7 +64,6 @@ export type SnapshotItem = {
   changeFromPreviousYear: number | null;
   amountChangeFromPreviousYear: number | null;
   basis: "actual" | "planned";
-  source: SourceMetadata;
 };
 
 export type Every100Item = {
@@ -115,7 +92,6 @@ export type SingleYearSnapshotModel = {
   totalGel: number;
   basis: "actual" | "planned";
   hasPlannedValues: boolean;
-  source: SourceMetadata | null;
   headlineCards: SnapshotHeadline[];
   items: SnapshotItem[];
   every100: Every100Item[];

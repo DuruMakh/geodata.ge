@@ -8,7 +8,7 @@ import type {
   MunicipalTotalFact,
 } from "../../lib/data/municipal/types";
 import type { SourceDocumentRow } from "../../lib/data/sources";
-import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { loadServedMunicipalData } from "../../lib/data/servedData";
 import {
   applyAdjaraBudgetAdjustment,
   aggregateFactsForEntity,
@@ -127,7 +127,6 @@ function build(startYear = 2015, endYear = 2017) {
     functions: FUNCTIONS,
     functionFacts: FUNCTION_FACTS,
     totalFacts: TOTAL_FACTS,
-    sourceDocuments: SOURCES,
     startYear,
     endYear,
   });
@@ -199,54 +198,18 @@ describe("getDefaultMunicipalSelection", () => {
   });
 });
 
-describe("buildMunicipalEntityModel total row source attribution", () => {
-  const MULTI_SOURCE_DOCS: SourceDocumentRow[] = [
-    ...SOURCES,
-    {
-      sourceId: "source.municipal_mof_annual_and_history_workbooks",
-      sourceName: "წლიური და საარქივო პუბლიკაციები",
-      sourceUrlOrFile: "mof.gov.ge",
-      lastReviewedAt: "2026-08-01",
-    },
-  ];
+// The model no longer carries per-year source metadata — nothing ever rendered
+// it — but the provenance itself is still worth pinning: Tbilisi's 2016 official
+// total comes from the annual and archive workbooks, not that year's execution
+// report. The displayed review date is covered by latestReviewedAtForMunicipalFacts
+// below, which is the only source fact that reaches the UI.
+describe("municipal official-total provenance", () => {
+  it("cites the annual and archive workbooks for the real 2016 Tbilisi official total", async () => {
+    const { totalFacts } = await loadServedMunicipalData();
+    const tbilisi2016 = totalFacts.filter((row) => row.municipalityCode === "04" && row.year === 2016);
 
-  const MULTI_SOURCE_TOTAL_FACTS: MunicipalTotalFact[] = [
-    total(2015, 160, 160),
-    { ...total(2016, 300, 265, true), sourceId: "source.municipal_mof_annual_and_history_workbooks" },
-    { ...total(2017, 370, 370), sourceId: "source.municipal_mof_annual_and_history_workbooks" },
-  ];
-
-  it("attributes the official total to the official-total facts", () => {
-    const model = buildMunicipalEntityModel({
-      functions: FUNCTIONS,
-      functionFacts: FUNCTION_FACTS,
-      totalFacts: MULTI_SOURCE_TOTAL_FACTS,
-      sourceDocuments: MULTI_SOURCE_DOCS,
-      startYear: 2015,
-      endYear: 2017,
-    });
-
-    expect(model.totalRow.sourceByYear[2016].sourceName).toBe("წლიური და საარქივო პუბლიკაციები");
-    expect(model.totalRow.sourceByYear[2017].sourceName).toBe("წლიური და საარქივო პუბლიკაციები");
-  });
-
-  it("uses the real 2016 Tbilisi official-total provenance", async () => {
-    const [{ functions, functionFacts, totalFacts }, { sourceDocuments }] = await Promise.all([
-      loadServedMunicipalData(),
-      loadServedLandingData(),
-    ]);
-    const model = buildMunicipalEntityModel({
-      functions,
-      functionFacts: functionFacts.filter((row) => row.municipalityCode === "04"),
-      totalFacts: totalFacts.filter((row) => row.municipalityCode === "04"),
-      sourceDocuments,
-      startYear: 2016,
-      endYear: 2016,
-    });
-
-    expect(model.totalRow.sourceByYear[2016].sourceName).toBe(
-      sourceDocuments.find((row) => row.sourceId === "source.municipal_mof_annual_and_history_workbooks")?.sourceName,
-    );
+    expect(tbilisi2016.length).toBeGreaterThan(0);
+    expect(tbilisi2016.every((row) => row.sourceId === "source.municipal_mof_annual_and_history_workbooks")).toBe(true);
   });
 });
 
@@ -470,11 +433,8 @@ describe("aggregateFactsForEntity — fields that must not present one constitue
 // Real served data never disagrees here: source_id is uniform within every
 // year across all 64 municipalities (data/imports/municipal-function-facts-
 // 2015-2025.csv and .../municipal-total-facts-2015-2025.csv), so a genuine
-// region never reaches the mixed branch today. That made the FUNCTION-fact
-// loop's own `agreeOrMixed` call on sourceId (municipalData.ts, inside the
-// `for (const row of functionFacts)` merge branch) provably untested by every
-// fixture above it: delete that one line and every existing test still
-// passes, because they all agree on sourceId. Nothing above folds 3 or more
+// region never reaches the mixed branch today, so the fixtures below are the
+// only thing that exercises it. Nothing above folds 3 or more
 // constituents either — every prior multi-municipality fixture uses exactly
 // two. Regions are exactly where a real 3+ fold happens. These fixtures are
 // deliberately constructed disagreements, for exactly those two reasons.
@@ -1088,7 +1048,6 @@ describe("buildEntityKpis", () => {
       functions: FUNCTIONS,
       functionFacts: FUNCTION_FACTS,
       totalFacts: bigTotalFacts,
-      sourceDocuments: SOURCES,
       startYear: 2015,
       endYear: 2016,
     });
@@ -1245,7 +1204,6 @@ describe("buildMovers", () => {
       functions: FUNCTIONS,
       functionFacts: zeroStartFacts,
       totalFacts: TOTAL_FACTS,
-      sourceDocuments: SOURCES,
       startYear: 2015,
       endYear: 2017,
     });

@@ -131,7 +131,7 @@ test("national selector treats a pinned total search as a match and reports genu
   const panel = page.getByTestId("series-selector");
   const search = panel.getByTestId("series-search");
   const totalLabel = await panel.locator('[data-level="total"] [data-testid="series-label"]').innerText();
-  const emptyState = panel.getByText(/^0 შედეგი/);
+  const emptyState = panel.getByText(/^კატეგორია ვერ მოიძებნა/);
 
   await search.fill(totalLabel);
   await expect(panel.getByTestId("series-row")).toHaveCount(1);
@@ -326,18 +326,39 @@ test("ministries grouping expands nested programs by name only", async ({ page }
   await expect(seriesSelector.locator('[data-level="major_program"]')).toHaveCount(0);
 
   // Expand the first ministry with programs.
-  const caret = seriesSelector.locator('[data-level="admin_category"] button[aria-expanded="false"]').first();
+  const ministry = seriesSelector
+    .locator('[data-level="admin_category"]')
+    .filter({ has: page.locator("button[aria-expanded]") })
+    .first();
+  const caret = ministry.locator("button[aria-expanded]");
   await caret.click();
   const firstProgram = seriesSelector.locator('[data-level="major_program"]').first();
   await expect(firstProgram).toBeVisible();
+  const topLevelCount = await seriesSelector.locator('[data-level="total"], [data-level="admin_category"]').count();
+  const status = seriesSelector.getByTestId("series-status");
+  await expect(status).toContainText(`ძირითადი 1 / ${topLevelCount} · პროგრამები 0`);
 
   // Programs are shown by NAME only — the official tavi-VI code is not surfaced.
   const programText = (await firstProgram.textContent()) ?? "";
   expect(programText).not.toMatch(/\d{2} \d{2}/);
+  const programName = (await firstProgram.getByTestId("series-label").textContent())?.trim().slice(0, 20);
+  if (!programName) throw new Error("Expected a program name");
+
+  // A selected child stays counted when its parent is collapsed. Clear-all
+  // removes it; select-all then covers only the visible top-level domain.
+  await firstProgram.getByTestId("series-row-toggle").click();
+  await expect(status).toContainText(`ძირითადი 1 / ${topLevelCount} · პროგრამები 1`);
+  await caret.click();
+  await expect(seriesSelector.locator('[data-level="major_program"]')).toHaveCount(0);
+  await expect(status).toContainText(`ძირითადი 1 / ${topLevelCount} · პროგრამები 1`);
+
+  const bulk = seriesSelector.getByTestId("series-toggle-all");
+  await bulk.click();
+  await expect(status).toContainText(`ძირითადი 0 / ${topLevelCount} · პროგრამები 0`);
+  await bulk.click();
+  await expect(status).toContainText(`ძირითადი ${topLevelCount} / ${topLevelCount} · პროგრამები 0`);
 
   // Searching by program name keeps the parent and auto-expands to matches.
-  const programName = (await firstProgram.locator("span.line-clamp-2").textContent())?.trim().slice(0, 20);
-  if (!programName) throw new Error("Expected a program name");
   await page.getByTestId("series-search").fill(programName);
   await expect(seriesSelector.locator('[data-level="major_program"]').first()).toBeVisible();
 
@@ -962,13 +983,97 @@ test("chart draws a dot lattice instead of horizontal gridlines", async ({ page 
   // A single-year range gives the lattice no interval to divide, so it drops out
   // entirely and the hairline rules have to come back — without them the axis
   // labels sit against blank paper with nothing to read a value against.
-  await page.getByRole("button", { name: "1წ", exact: true }).click();
+  await page.getByTestId("range-start-handle").press("End");
   await expect(chart.getByTestId("chart-dot-lattice")).toHaveCount(0);
 
   const singleYearStrokes = await chart.locator("svg line").evaluateAll((lines) =>
     lines.map((line) => line.getAttribute("stroke")),
   );
   expect(singleYearStrokes).toContain("#E7DECF");
+});
+
+test("a single-year range states that it has no period instead of reporting 0.0% everywhere", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  await expect(page.getByTestId("period-kpi-cards")).toBeVisible();
+
+  // The 1წ chip is gone, but the rail still reaches a one-year range. Every
+  // figure in ძირითადი ინდიკატორები is a start-to-end delta, so this used to
+  // render a headline 0.0%, six 4%-wide green growth bars, and one category
+  // named both the largest and the slowest growing.
+  await page.getByTestId("range-start-handle").press("End");
+
+  await expect(page.getByTestId("period-single-year-note")).toBeVisible();
+  await expect(page.getByTestId("period-movers")).toHaveCount(0);
+  await expect(page.getByTestId("period-comparison")).toHaveCount(0);
+
+  // Only the delta-derived figures go. A point-in-time KPI is still a fact
+  // about the chosen year, so it stays — the two growth KPIs do not.
+  const kpis = page.getByTestId("period-kpi-cards");
+  await expect(kpis).toContainText("ყველაზე დიდი წილი მშპ-ში");
+  await expect(kpis).not.toContainText("ყველაზე დიდი ზრდა");
+  await expect(kpis).not.toContainText("ყველაზე ნელი ზრდა");
+  await expect(kpis).not.toContainText("პერიოდის ცვლილება");
+});
+
+test("ships no source-document registry in the explorer payload", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  // Every route used to hand its client explorer a narrowed copy of the source
+  // registry so the model builders could stamp a SourceMetadata onto every
+  // row-year and point — fields no component ever read. Measured at 44 records
+  // and ~15 KB on this route alone. lastUpdatedAt is the only source fact the
+  // UI shows, and it is computed server-side.
+  const occurrences = await page.evaluate(() =>
+    [...document.querySelectorAll("script")].reduce(
+      (count, script) => count + ((script.textContent ?? "").split("sourceUrlOrFile").length - 1),
+      0,
+    ),
+  );
+
+  expect(occurrences).toBe(0);
+});
+
+test("every explorer route family renders the site footer", async ({ page }) => {
+  // These are the site's main SEO landing targets, and the footer carries the
+  // CC BY 4.0 licence, the contact address and the methodology link. Under the
+  // owner's navigation design the footer is the only place the methodology
+  // route appears on data pages, so without it ~85 pages have no path there.
+  for (const route of [
+    "/explorer",
+    "/explorer/expenditure",
+    "/explorer/revenue",
+    "/explorer/analysis",
+    "/explorer/municipalities",
+    "/explorer/municipalities/71",
+    "/explorer/municipalities/georgia",
+  ]) {
+    await page.goto(`http://localhost:3100${route}`);
+
+    const footer = page.getByTestId("site-footer");
+    await expect(footer, route).toBeVisible();
+    await expect(footer.getByRole("link", { name: "მეთოდოლოგია" }), route).toBeVisible();
+    await expect(footer, route).toContainText("CC BY 4.0");
+    await expect(footer, route).toContainText("info@fiscal.ge");
+  }
+});
+
+test("exposes the explorer breadcrumb as a navigation landmark", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/expenditure");
+  await expectAppReady(page);
+
+  // BreadcrumbTrail next door already does this correctly on /about and the
+  // methodology pages. PageHeader — used on every explorer route including all
+  // 76 municipal pages — rendered the same information as a paragraph of spans
+  // with an unhidden "/" separator and the current page marked by colour alone.
+  const header = page.getByTestId("explorer-header");
+  const trail = header.getByRole("navigation", { name: "Breadcrumb" });
+
+  await expect(trail).toBeVisible();
+  await expect(trail.locator("[aria-current='page']")).toHaveText("ხარჯები");
+  await expect(trail.locator("span[aria-hidden='true']").first()).toHaveText("/");
 });
 
 test("sidebar collapses to a rail and remembers the choice", async ({ page }) => {

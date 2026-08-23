@@ -90,8 +90,6 @@ function agreeOrMixed(current: string, incoming: string, mixedMarker: string): s
  *   through only when every constituent agrees; otherwise replaced with a
  *   `mixed:` marker (`MIXED_PUBLIC_TOTAL_MEASURE` / `MIXED_SOURCE_ID`) so a
  *   caller can never read one arbitrary constituent's value as the group's.
- *   `sourceMetadataFor` does not recognise the marker and falls back to
- *   blank source fields — blank, not silently wrong.
  * - `functionalCode` and `basis` on function facts are carried from
  *   whichever row lands first: safe, because `functionalCode` is a 1:1
  *   property of `categoryId` (part of the group key) and `basis` is always

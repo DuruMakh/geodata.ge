@@ -14,6 +14,8 @@ type IndicatorsProps = {
   scope: ExplorerScope;
 };
 
+export const NO_PERIOD_NOTE = "ერთწლიან პერიოდში ცვლილება არ იზომება — აირჩიე ერთ წელზე მეტი დიაპაზონი.";
+
 const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
   fields: "სფერო",
   ministries: "უწყება",
@@ -62,6 +64,12 @@ export function Indicators({ model, scope }: IndicatorsProps) {
   const endYear = years.at(-1);
   if (startYear === undefined || endYear === undefined) return null;
 
+  // A range of one year has no start-to-end delta, so every delta-derived figure
+  // here would read exactly zero — a headline 0.0%, movers falling back to row
+  // order, and one category named both the largest and the slowest growing.
+  // Only those blocks go; a point-in-time KPI is still a fact about the year.
+  const singleYear = startYear === endYear;
+
   const totalStart = totalRow?.valuesByYear[startYear] ?? 0;
   const totalEnd = totalRow?.valuesByYear[endYear] ?? 0;
   const totalChange = totalRow?.change ?? null;
@@ -97,6 +105,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
 
   const sideKpis = [
     {
+      isDelta: true,
       label: "ყველაზე დიდი ზრდა",
       value: biggestParts.num,
       unit: biggestParts.unit,
@@ -105,6 +114,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       spark: biggestIncrease ? { values: seriesValues(biggestIncrease.row) ?? [], color: biggestIncrease.row.color } : null,
     },
     {
+      isDelta: true,
       label: "ყველაზე ნელი ზრდა",
       value: slowest ? formatShare(slowest.change, true) : MISSING,
       unit: "",
@@ -113,6 +123,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       spark: slowest ? { values: seriesValues(slowest) ?? [], color: slowest.color } : null,
     },
     {
+      isDelta: false,
       label: "ყველაზე დიდი წილი მშპ-ში",
       value: largestShare ? formatShare(largestShare.shareEndYear) : MISSING,
       unit: "",
@@ -120,7 +131,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       detail: largestShare ? `${truncate(largestShare.kaLabel, 40)}, ${endYear}` : MISSING,
       spark: largestShare ? { values: buildKpiShareSeries(largestShare, years), color: ACCENT } : null,
     },
-  ];
+  ].filter((kpi) => !singleYear || !kpi.isDelta);
 
   const maxAbsChange = Math.max(
     ...comparisonRows.filter((row) => row.level !== "major_program").map((row) => Math.abs(row.change ?? 0)),
@@ -137,11 +148,19 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SectionTitle>ძირითადი ინდიკატორები</SectionTitle>
         <p className="text-[12.5px] text-[var(--muted)]">
-          არჩეული პერიოდი: <span className="font-[family-name:var(--font-numeric)]">{startYear}–{endYear}</span>
+          არჩეული პერიოდი: <span className="font-[family-name:var(--font-numeric)]">{singleYear ? startYear : `${startYear}–${endYear}`}</span>
         </p>
       </div>
 
       <div data-testid="period-kpi-cards" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        {singleYear ? (
+          // No overline: it would title a block that has no value under it.
+          <div className="min-w-0 @min-[1100px]:pr-11">
+            <p data-testid="period-single-year-note" className="max-w-[420px] text-[13px] leading-relaxed text-[var(--muted)]">
+              {NO_PERIOD_NOTE}
+            </p>
+          </div>
+        ) : (
         <div className="min-w-0 @min-[1100px]:pr-11">
           <Overline>პერიოდის ცვლილება</Overline>
           <p
@@ -181,6 +200,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
             ) : null}
           </div>
         </div>
+        )}
         <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
           {sideKpis.map((kpi, index) => (
             <div
@@ -211,6 +231,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
         </div>
       </div>
 
+      {singleYear ? null : (
       <div data-testid="period-movers" className="mt-9 grid gap-7 border-t border-[var(--hairline)] pt-6 @min-[1100px]:grid-cols-2 @min-[1100px]:gap-x-10">
         <div className="min-w-0">
           <h3 className="mb-3 text-[13px] font-semibold text-[var(--ink)]">ყველაზე მზარდი</h3>
@@ -229,7 +250,9 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           </div>
         </div>
       </div>
+      )}
 
+      {singleYear ? null : (
       <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
         <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">პერიოდის შედარება</h3>
         <table className="w-full table-fixed border-collapse">
@@ -294,6 +317,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           </tbody>
         </table>
       </div>
+      )}
     </section>
   );
 }

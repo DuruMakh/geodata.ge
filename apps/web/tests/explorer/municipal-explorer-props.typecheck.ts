@@ -8,7 +8,6 @@ const common = {
   functions: [],
   functionFacts: [],
   totalFacts: [],
-  sourceDocuments: [],
   workbookBasename: "workbook",
   workbookSources: [],
   siteOrigin: "https://fiscal.ge",

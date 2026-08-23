@@ -132,6 +132,63 @@ test.describe("hash sanitising", () => {
 });
 
 test.describe("entity picker accessibility", () => {
+  test("answers a non-matching query instead of collapsing to a 0px void", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("entity-picker-trigger").click();
+
+    const picker = page.getByTestId("entity-picker");
+    const listbox = picker.getByRole("listbox");
+    await expect(listbox).toBeVisible();
+    await picker.getByRole("combobox").fill("zzzqqq");
+
+    // The other two search surfaces both answer: the series panel shows
+    // "კატეგორია ვერ მოიძებნა" and the index list "ვერაფერი მოიძებნა" with a clear
+    // button. The picker — reachable from every one of the 76 municipal pages
+    // by click or ⌘K — rendered a 0-height listbox with no options, no count
+    // and no way to clear the query other than selecting the text.
+    await expect(listbox.getByRole("option")).toHaveCount(0);
+    const empty = page.getByTestId("picker-empty");
+    await expect(empty).toBeVisible();
+    await expect(picker.getByRole("status")).toContainText("ვერაფერი მოიძებნა");
+
+    await empty.getByRole("button", { name: "ძებნის გასუფთავება" }).click();
+    await expect(listbox.getByRole("option").first()).toBeVisible();
+  });
+
+  test("Tab reaches the empty-state clear action and Enter restores the picker", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("entity-picker-trigger").click();
+
+    const picker = page.getByTestId("entity-picker");
+    const input = picker.getByRole("combobox");
+    await input.fill("zzzqqq");
+    await input.press("Tab");
+
+    const clear = picker.getByRole("button", { name: "ძებნის გასუფთავება" });
+    await expect(clear).toBeFocused();
+    await clear.press("Enter");
+    await expect(picker.getByRole("option").first()).toBeVisible();
+    await expect(input).toBeFocused();
+  });
+
+  test("Tab from the empty-state action closes the picker and continues through the page", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+    await page.getByTestId("entity-picker-trigger").click();
+
+    const picker = page.getByTestId("entity-picker");
+    await picker.getByRole("combobox").fill("zzzqqq");
+    await picker.getByRole("combobox").press("Tab");
+    const clear = picker.getByRole("button", { name: "ძებნის გასუფთავება" });
+    await expect(clear).toBeFocused();
+
+    await clear.press("Tab");
+    await expect(picker).toBeHidden();
+    await expect(page.getByTestId("municipal-entity-navigation").locator("a").first()).toBeFocused();
+  });
+
   test("picker rows expose hover feedback", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
@@ -173,7 +230,7 @@ test.describe("entity picker accessibility", () => {
     await expect(trigger).toHaveCSS("border-bottom-width", "1px");
     await expect(trigger).toHaveCSS("transition-duration", "0.1s");
     await expect(caret).toHaveText("▾");
-    await expect(caret).toHaveCSS("color", "rgb(201, 190, 169)");
+    await expect(caret).toHaveCSS("color", "rgb(149, 132, 106)");
 
     await trigger.hover();
     await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
@@ -548,6 +605,38 @@ test.describe("municipality page", () => {
     await expect(changes).toHaveCount(11);
     await expect(changes.first()).not.toContainText("%");
     await expect(changes.first()).toContainText("₾");
+
+    // The column sits between the 2015 and 2025 level columns in the same
+    // typographic style, so direction has to survive without colour: grayscale,
+    // print and colourblind readers otherwise read three levels in a row.
+    const texts = await changes.allInnerTexts();
+    expect(texts.filter((text) => /^[+−]/.test(text.trim()))).toHaveLength(texts.length);
+  });
+
+  test("keeps a sign on a real municipal change below the display threshold", async ({ page }) => {
+    await page.goto(`${BASE_URL}/explorer/municipalities/06#r=2016-2021`);
+    await expectMunicipalAppReady(page);
+
+    const defenceRow = page.getByTestId("period-comparison").locator("tbody tr").filter({ hasText: "თავდაცვა" });
+    await expect(defenceRow.getByTestId("comparison-change-cell")).toHaveText("+<0.01 მლნ ₾");
+  });
+
+  test("a single-year range states that it has no period instead of reporting 0.0% everywhere", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    await expect(page.getByTestId("entity-kpi-grid")).toBeVisible();
+
+    await page.getByTestId("range-start-handle").press("End");
+
+    await expect(page.getByTestId("period-single-year-note")).toBeVisible();
+    await expect(page.getByTestId("period-movers")).toHaveCount(0);
+    await expect(page.getByTestId("period-comparison")).toHaveCount(0);
+
+    // All three municipal side KPIs are point-in-time (level, rank, share), so
+    // the grid survives — #r=2015-2015 is a supported way to read the 2015 rank.
+    await expect(page.getByTestId("entity-kpi-grid")).toBeVisible();
+    await expect(page.getByTestId("period-indicators")).not.toContainText("პერიოდის ცვლილება");
   });
 
   test("treats a pinned total search as a match and reports genuine misses", async ({ page }) => {
@@ -557,7 +646,7 @@ test.describe("municipality page", () => {
     const panel = page.getByTestId("series-selector");
     const search = panel.getByTestId("series-search");
     const totalLabel = await panel.locator('[data-level="total"] [data-testid="series-label"]').innerText();
-    const emptyState = panel.getByText(/^0 შედეგი/);
+    const emptyState = panel.getByText(/^კატეგორია ვერ მოიძებნა/);
 
     await search.fill(totalLabel);
     await expect(panel.getByTestId("series-row")).toHaveCount(1);

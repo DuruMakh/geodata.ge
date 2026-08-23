@@ -118,6 +118,30 @@ describe("editorial design system tokens", () => {
     }
   });
 
+  it("keeps non-text UI boundaries above the WCAG 1.4.11 3:1 floor", () => {
+    const paper = token("--paper");
+    const tint = token("--tint");
+    const accent = token("--accent");
+    const control = token("--control");
+
+    // SC 1.4.11 governs focus indicators and control boundaries at 3:1 — the
+    // same standard DESIGN.md §6.7 cites for the მალე badge border. --control
+    // draws the unchecked series checkboxes, the search underline, the
+    // segmented frame and the measure pill; the focus ring is drawn in
+    // --accent. Both used to sit under the floor (1.65:1 and, at 0.4 alpha,
+    // 1.82:1); the first control repair still measured only 2.95:1 on a tinted
+    // hover row. Text assertions cannot catch either graphical failure.
+    expect(contrastRatio(accent, paper)).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(control, paper)).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(control, tint)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("draws the focus ring at full opacity so it keeps the contrast the token measures", () => {
+    // An alpha on the ring composites it toward paper and silently undoes the
+    // assertion above — the token can pass 3:1 while the painted ring does not.
+    expect(globalsCss).not.toMatch(/outline: 2px solid rgba\(/);
+  });
+
   it("does not reintroduce superseded theme systems", () => {
     expect(globalsCss).not.toContain("#0071e3");
     expect(globalsCss).not.toContain('[data-theme="night"]');
@@ -140,7 +164,7 @@ describe("municipality map focus", () => {
 
   it("keeps one app-wide focus ring for controls, links, and disclosures", () => {
     expect(globalsCss).toContain(
-      "button:focus-visible,\nselect:focus-visible,\ninput:focus-visible,\na:focus-visible,\nsummary:focus-visible {\n  outline: 2px solid rgba(179, 64, 42, 0.4);\n  outline-offset: 2px;\n}",
+      "button:focus-visible,\nselect:focus-visible,\ninput:focus-visible,\na:focus-visible,\nsummary:focus-visible {\n  outline: 2px solid var(--accent);\n  outline-offset: 2px;\n}",
     );
   });
 });

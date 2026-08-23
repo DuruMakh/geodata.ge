@@ -16,16 +16,13 @@ export const metadata = fiscalMetadata({
 
 export default async function ExplorerHubPage() {
   const { facts, sourceDocuments } = await loadServedLandingData();
-  const { countryTotalFacts, municipalities, regions } = await loadServedMunicipalData();
+  const { countryTotalFacts } = await loadServedMunicipalData();
   const municipalTotals = new Map<number, number>();
   for (const row of countryTotalFacts) {
     municipalTotals.set(row.year, row.publicTotalGel);
   }
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
-  const cards = buildHubCards(facts, municipalTotals, {
-    municipalities: municipalities.length,
-    regions: regions.length,
-  });
+  const cards = buildHubCards(facts, municipalTotals);
   const years = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
   const coverage = [
     years.length > 0 ? `${years[0]}–${years.at(-1)}` : "",

@@ -53,18 +53,17 @@ const MUNICIPAL_TOTALS = new Map([
 // regions, but tests below deliberately use a different pair (see the
 // "does not hardcode" test) so a description that quietly ignores this input
 // and falls back to a literal cannot pass unnoticed.
-const MUNICIPAL_COUNTS = { municipalities: 64, regions: 11 };
 
 describe("buildHubCards", () => {
   it("orders expenditure, revenue, municipalities, analysis", () => {
-    const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, MUNICIPAL_COUNTS);
+    const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS);
 
     expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "შემოსავლები", "მუნიციპალიტეტები", "ანალიზი"]);
     expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04"]);
   });
 
   it("derives each live card's footer from the latest year", () => {
-    const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, MUNICIPAL_COUNTS);
+    const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS);
 
     expect(cards[0].footer).toContain("2025");
     // 2025 expenditure carries an explicit total row, so the card reads it
@@ -74,7 +73,7 @@ describe("buildHubCards", () => {
   });
 
   it("gives live cards a real series to draw", () => {
-    const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, MUNICIPAL_COUNTS);
+    const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS);
 
     expect(cards[0].series).toEqual([1_000_000_000, 9_000_000_000]);
     expect(cards[1].series).toEqual([3_000_000_000, 4_000_000_000]);
@@ -84,7 +83,7 @@ describe("buildHubCards", () => {
     const cards = buildHubCards([
       fact("expenditure", "spending.health", 2020, 1_000_000_000),
       fact("expenditure", "spending.health", 2022, 3_000_000_000),
-    ], MUNICIPAL_TOTALS, MUNICIPAL_COUNTS);
+    ], MUNICIPAL_TOTALS);
 
     // Dropping 2021 would re-space the two surviving points evenly and stop the
     // sparkline's x axis being time; the gap has to reach it as a null.
@@ -92,7 +91,7 @@ describe("buildHubCards", () => {
   });
 
   it("lets an explicit total row win its year, the way the section pages do", () => {
-    const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, MUNICIPAL_COUNTS);
+    const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS);
 
     // singleYear.ts and explorerData.ts both prefer an explicit `<side>.total`
     // over the category sum, so the hub has to agree or the same year reads
@@ -104,7 +103,7 @@ describe("buildHubCards", () => {
   });
 
   it("lets an actual value beat a planned value for the same year and item", () => {
-    const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, MUNICIPAL_COUNTS);
+    const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS);
 
     // 2025 VAT is planned 9bn then actual 4bn. Keeping the planned row, or
     // summing both, would put an unreviewed figure on the hub's revenue card.
@@ -112,7 +111,7 @@ describe("buildHubCards", () => {
   });
 
   it("makes card 03 a live destination once municipal data is routed", () => {
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, MUNICIPAL_COUNTS)[2]!;
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS)[2]!;
 
     expect(card.href).toBe("/explorer/municipalities");
     expect(card.comingSoon).toBe(false);
@@ -131,18 +130,20 @@ describe("buildHubCards", () => {
     expect(card.seriesColor).not.toBe(ACCENT);
   });
 
-  it("derives card 03's description from the municipal counts handed in, not a hardcoded figure", () => {
-    // A different pair from the real 64/11 registry values: a description that
-    // silently ignored municipalCounts and kept a hardcoded "64 ... 11" string
-    // would still pass every other test in this file, so only a mismatched
-    // fixture can catch it.
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, { municipalities: 7, regions: 3 })[2]!;
+  it("names the grain the figure is actually built from, not the 64 served municipalities", () => {
+    // The card's figure is countryTotalFacts — the national roll-up, which
+    // includes five excluded budget units and the Adjara A.R. republican
+    // payments. Describing it as "64 მუნიციპალიტეტი და 11 რეგიონი" overstated
+    // the local-budget total those entities sum to by 8.6%. The destination
+    // page states 69 საბიუჯეტო ერთეული; the card now matches it.
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS)[2]!;
 
-    expect(card.description).toBe("7 მუნიციპალიტეტი და 3 რეგიონი — რაში იხარჯება ადგილობრივი ბიუჯეტები.");
+    expect(card.description).toBe("69 მუნიციპალური საბიუჯეტო ერთეული — რაში იხარჯება ადგილობრივი ბიუჯეტები.");
+    expect(card.description).not.toContain("მუნიციპალიტეტი და");
   });
 
   it("points the analysis card at the route it actually opens", () => {
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, MUNICIPAL_COUNTS)[3];
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS)[3];
 
     expect(card.href).toBe("/explorer/analysis");
     expect(card.comingSoon).toBe(false);

@@ -81,18 +81,63 @@ export function MunicipalityMap({
   const activeTarget = focusTarget ?? pointerTarget;
   const describedTarget =
     activeTarget?.code === activeCode && tooltipPosition !== null ? activeTarget : null;
+  // Tbilisi (04) is the only entity the artifact carries as both a polygon and a
+  // self-governing-city marker. The legend names the green dot
+  // "თვითმმართველი ქალაქები", so the marker is the encoding that gets the
+  // accessible name; its polygon stays drawn — removing it would leave a hole in
+  // the map — but as decoration, not a second stop announcing the same
+  // municipality twice.
+  const markerCodes = useMemo(() => new Set(markers.map((marker) => marker.code)), [markers]);
+  const decorativeShapes = useMemo(() => shapes.filter((shape) => markerCodes.has(shape.code)), [markerCodes, shapes]);
   const orderedTargets = useMemo(
     () =>
       [
-        ...shapes.map((shape) => ({ kind: "shape" as const, nameKa: shape.nameKa, shape })),
+        ...shapes
+          .filter((shape) => !markerCodes.has(shape.code))
+          .map((shape) => ({ kind: "shape" as const, nameKa: shape.nameKa, shape })),
         ...markers.map((marker) => ({ kind: "marker" as const, nameKa: marker.nameKa, marker })),
       ].toSorted(
         (left, right) =>
           left.nameKa.localeCompare(right.nameKa, "ka") ||
           (left.kind === right.kind ? 0 : left.kind === "shape" ? -1 : 1),
       ),
-    [markers, shapes],
+    [markerCodes, markers, shapes],
   );
+
+  // Roving tabindex. Sixty-five independently focusable targets put the whole
+  // map between the page and the ranked list with no way past it; the picker
+  // already avoids exactly this. One stop enters the group, arrow keys move
+  // inside it, and the last visited target keeps the stop.
+  const [rovingIndex, setRovingIndex] = useState(0);
+
+  const moveRoving = (from: number, key: string): number | null => {
+    const last = orderedTargets.length - 1;
+    if (key === "ArrowRight" || key === "ArrowDown") return Math.min(from + 1, last);
+    if (key === "ArrowLeft" || key === "ArrowUp") return Math.max(from - 1, 0);
+    if (key === "Home") return 0;
+    if (key === "End") return last;
+    return null;
+  };
+
+  const handleTargetKeyDown = (index: number, code: string, event: React.KeyboardEvent<SVGGraphicsElement>) => {
+    if (isActivationKey(event.key)) {
+      event.preventDefault();
+      onOpenMunicipality(code);
+      return;
+    }
+
+    const next = moveRoving(index, event.key);
+    if (next === null) return;
+    // preventDefault before the no-move check: at the group edges Home/End and
+    // the arrows still resolve to the current index, and letting them through
+    // there scrolls the page out from under the target that just kept focus.
+    event.preventDefault();
+    if (next === index) return;
+    setRovingIndex(next);
+    svgRef.current
+      ?.querySelectorAll<SVGGraphicsElement>("[data-municipality-map-target]")
+      [next]?.focus();
+  };
 
   const positionTooltip = (target: InteractionTarget) => {
     if (svgRef.current === null) return;
@@ -112,7 +157,11 @@ export function MunicipalityMap({
     onActiveCodeChange(focusTarget?.code ?? null);
   };
 
-  const activateFocusTarget = (target: InteractionTarget) => {
+  const activateFocusTarget = (target: InteractionTarget, index: number) => {
+    // Keep the tab stop on whatever was focused last, however it got focus.
+    // Tracking arrow keys alone sent Tab back to the last *arrow-key* target,
+    // so clicking a municipality and tabbing away returned somewhere else.
+    setRovingIndex(index);
     setFocusTarget(target);
     positionTooltip(target);
     onActiveCodeChange(target.code);
@@ -153,7 +202,46 @@ export function MunicipalityMap({
             </pattern>
           </defs>
 
-          {orderedTargets.map((target) => {
+          {decorativeShapes.map((shape) => {
+            const active = shape.code === activeCode;
+
+            return (
+              <path
+                key={`decorative:${shape.code}`}
+                data-testid={`municipality-shape-${shape.code}`}
+                data-municipality-shape=""
+                data-municipality-code={shape.code}
+                data-active={active ? "true" : undefined}
+                // Pointer-interactive and co-highlighting with its marker, but
+                // deliberately not a map target: no tab stop and no second
+                // accessible name for the same municipality.
+                aria-hidden
+                d={shape.d}
+                fill={MAP_RAMP[shape.bucket]}
+                fillRule="evenodd"
+                clipRule="evenodd"
+                stroke={active ? "var(--ink)" : "var(--hairline-soft)"}
+                strokeWidth={active ? 2.2 : 0.7}
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+                className="cursor-pointer"
+                onMouseEnter={(event) => {
+                  activatePointerTarget({
+                    key: `shape:${shape.code}`,
+                    code: shape.code,
+                    nameKa: shape.nameKa,
+                    budgetPerResidentGel: shape.budgetPerResidentGel,
+                    totalBudgetGel: shape.totalBudgetGel,
+                    element: event.currentTarget,
+                  });
+                }}
+                onMouseLeave={clearPointerTarget}
+                onClick={() => onOpenMunicipality(shape.code)}
+              />
+            );
+          })}
+
+          {orderedTargets.map((target, targetIndex) => {
             if (target.kind === "shape") {
               const { shape } = target;
               const active = shape.code === activeCode;
@@ -174,7 +262,7 @@ export function MunicipalityMap({
                   strokeWidth={active ? 2.2 : 0.7}
                   strokeLinejoin="round"
                   vectorEffect="non-scaling-stroke"
-                  tabIndex={0}
+                  tabIndex={targetIndex === rovingIndex ? 0 : -1}
                   role="link"
                   aria-label={accessibleName(shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel)}
                   aria-describedby={describedTarget?.key === `shape:${shape.code}` ? TOOLTIP_ID : undefined}
@@ -198,15 +286,11 @@ export function MunicipalityMap({
                       budgetPerResidentGel: shape.budgetPerResidentGel,
                       totalBudgetGel: shape.totalBudgetGel,
                       element: event.currentTarget,
-                    });
+                    }, targetIndex);
                   }}
                   onBlur={clearFocusTarget}
                   onClick={() => onOpenMunicipality(shape.code)}
-                  onKeyDown={(event) => {
-                    if (!isActivationKey(event.key)) return;
-                    event.preventDefault();
-                    onOpenMunicipality(shape.code);
-                  }}
+                  onKeyDown={(event) => handleTargetKeyDown(targetIndex, shape.code, event)}
                 />
               );
             }
@@ -229,7 +313,7 @@ export function MunicipalityMap({
                 stroke="var(--tile)"
                 strokeWidth={active ? 2.2 : 1.2}
                 vectorEffect="non-scaling-stroke"
-                tabIndex={0}
+                tabIndex={targetIndex === rovingIndex ? 0 : -1}
                 role="link"
                 aria-label={accessibleName(marker.nameKa, marker.budgetPerResidentGel, marker.totalBudgetGel)}
                 aria-describedby={describedTarget?.key === `marker:${marker.code}` ? TOOLTIP_ID : undefined}
@@ -253,15 +337,11 @@ export function MunicipalityMap({
                     budgetPerResidentGel: marker.budgetPerResidentGel,
                     totalBudgetGel: marker.totalBudgetGel,
                     element: event.currentTarget,
-                  });
+                  }, targetIndex);
                 }}
                 onBlur={clearFocusTarget}
                 onClick={() => onOpenMunicipality(marker.code)}
-                onKeyDown={(event) => {
-                  if (!isActivationKey(event.key)) return;
-                  event.preventDefault();
-                  onOpenMunicipality(marker.code);
-                }}
+                onKeyDown={(event) => handleTargetKeyDown(targetIndex, marker.code, event)}
               />
             );
           })}

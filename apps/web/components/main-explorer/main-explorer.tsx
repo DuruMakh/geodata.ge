@@ -3,14 +3,13 @@
 import { useEffect, useMemo } from "react";
 import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
-import type { SourceDocumentRow } from "../../lib/data/sources";
 import type {
   ServedAdminFact,
   ServedBudgetFact,
   ServedNationalGdpFact,
 } from "../../lib/servedRows";
 import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
-import { buildExplorerModel, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
+import { buildExplorerModel, isDerivedTotalItemId, type ExplorerModel } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 import { formatAmount, formatShare, unitFor, UNIT_BN } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
@@ -38,7 +37,6 @@ type MainExplorerProps = {
   adminFacts?: ServedAdminFact[];
   adminCategories?: AdminSpendingCategory[];
   glossaryEntries: GlossaryEntry[];
-  sourceDocuments: SourceDocumentRow[];
   gdpFacts?: ServedNationalGdpFact[];
   workbookSources?: WorkbookPublicSource[];
   adminWorkbookSources?: WorkbookPublicSource[];
@@ -47,7 +45,7 @@ type MainExplorerProps = {
   lastUpdatedAt: string;
 };
 
-export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, sourceDocuments, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
+export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
   useEffect(() => {
     document.body.dataset.appReady = "true";
 
@@ -131,24 +129,29 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
     [facts, adminFacts, scope, explorerSide],
   );
 
-  const model = useMemo(
-    () =>
-      buildExplorerModel({
-        facts,
-        gdpFacts,
-        adminFacts,
-        adminCategories: adminCategoryMap,
-        expenditureGrouping: grouping,
-        glossary,
-        sourceDocuments,
-        side: explorerSide,
-        selectedItemIds: selectedIds,
-        startYear: range.start,
-        endYear: range.end,
-        measure: share ? "share_of_gdp" : "nominal",
-      }),
-    [facts, gdpFacts, adminFacts, adminCategoryMap, grouping, glossary, sourceDocuments, explorerSide, selectedIds, range.start, range.end, share],
-  );
+  // Mirror of the analysisModel optimisation below: nav is fixed by the route, so
+  // on /explorer/analysis the only consumer of this model — ExplorerView, and
+  // buildWorkbookInput inside it — never renders, yet the full multi-year model
+  // rebuilt on every side, grouping and year change. Null off-route; the render
+  // narrows on the model itself.
+  const isAnalysis = nav === "analysis";
+  const model = useMemo(() => {
+    if (isAnalysis) return null;
+
+    return buildExplorerModel({
+      facts,
+      gdpFacts,
+      adminFacts,
+      adminCategories: adminCategoryMap,
+      expenditureGrouping: grouping,
+      glossary,
+      side: explorerSide,
+      selectedItemIds: selectedIds,
+      startYear: range.start,
+      endYear: range.end,
+      measure: share ? "share_of_gdp" : "nominal",
+    });
+  }, [isAnalysis, facts, gdpFacts, adminFacts, adminCategoryMap, grouping, glossary, explorerSide, selectedIds, range.start, range.end, share]);
 
   // Years whose ACTIVE values are planned (actual wins over planned), for the
   // analysis year selector's გეგმა tags. Admin facts are actual-only by contract,
@@ -162,7 +165,6 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
     return planned;
   }, [facts, analysisSide, analysisGrouping]);
 
-  const isAnalysis = nav === "analysis";
   // Only the analysis route renders this, and nav is a prop fixed by the route,
   // so the other two sections were building and discarding a full snapshot model
   // on every mount. Null off-route; every read below narrows on the model itself.
@@ -175,12 +177,11 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
             adminCategories: adminCategoryMap,
             grouping: analysisGrouping,
             glossary,
-            sourceDocuments,
             side: analysisSide,
             year: analysisYear ?? analysisYears.at(-1) ?? 0,
           })
         : null,
-    [isAnalysis, facts, adminFacts, adminCategoryMap, analysisGrouping, glossary, sourceDocuments, analysisSide, analysisYear, analysisYears],
+    [isAnalysis, facts, adminFacts, adminCategoryMap, analysisGrouping, glossary, analysisSide, analysisYear, analysisYears],
   );
 
   const deck = useMemo(() => {
@@ -223,7 +224,7 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
   ]
     .filter(Boolean)
     .join(" · ");
-  function buildWorkbookInput(): WorkbookExportInput {
+  function buildWorkbookInput(model: ExplorerModel): WorkbookExportInput {
     const labelById = new Map(model.items.map((item) => [item.id, item.kaLabel]));
     const series = model.tableRows.map<WorkbookSeries>((row) => {
       const pointsByYear: WorkbookSeries["pointsByYear"] = {};
@@ -317,7 +318,7 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
             onGroupingChange={setAnalysisGrouping}
             onYearChange={setAnalysisYear}
           />
-        ) : (
+        ) : model ? (
           <ExplorerView
             model={model}
             scope={scope}
@@ -342,11 +343,11 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
               <ExcelDownloadButton
                 testId="series-excel"
                 disabled={model.tableRows.length === 0}
-                onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildWorkbookInput()))}
+                onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildWorkbookInput(model)))}
               />
             }
           />
-        )}
+        ) : null}
       </div>
     </main>
   );

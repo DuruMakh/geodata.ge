@@ -213,10 +213,10 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
               } else if (event.key === "Enter") {
                 event.preventDefault();
                 selectActive();
-              } else if (event.key === "Tab") {
+              } else if (event.key === "Tab" && (flatOptions.length > 0 || event.shiftKey)) {
                 // This is not a focus trap. Let the browser advance focus,
-                // but remove the non-modal popover and its click catcher so
-                // the newly focused page control is not left behind an overlay.
+                // but keep an empty picker mounted for one forward Tab so its
+                // visible clear-search action is keyboard reachable.
                 onClose();
               }
             }}
@@ -300,6 +300,29 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
             );
           })}
         </div>
+        {/* Outside the listbox on purpose: a listbox may own only option/group
+            children. With no options the listbox is simply empty, and one
+            forward Tab from the combobox reaches this sibling action. */}
+        {flatOptions.length === 0 ? (
+          <div data-testid="picker-empty" className="px-3 py-[26px] text-center">
+            <div role="status" className="text-[13px] text-[var(--body)]">ვერაფერი მოიძებნა</div>
+            <button
+              type="button"
+              onKeyDown={(event) => {
+                if (event.key === "Tab" && !event.shiftKey) onClose();
+              }}
+              onClick={() => {
+                setQuery("");
+                // The button unmounts with the empty state; without this, focus
+                // falls to <body> and the next keystroke misses the picker.
+                inputRef.current?.focus();
+              }}
+              className="mt-3 inline-flex h-[30px] cursor-pointer items-center rounded-[3px] border border-[var(--control)] px-3 text-[12px] text-[var(--accent)]"
+            >
+              ძებნის გასუფთავება
+            </button>
+          </div>
+        ) : null}
         <div className="border-t border-[var(--hairline-soft)] px-3 py-2 text-[11px] text-[var(--faint)]">
           საქართველოს ან რეგიონის დაჭერა აჩვენებს მის ჯამურ მონაცემებს
         </div>
