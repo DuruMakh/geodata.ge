@@ -25,6 +25,47 @@ function selectionIds(value: string): string[] {
   return [...new Set(value.split(",").filter(Boolean))];
 }
 
+// The budget explorer and the municipalities section share four hash keys —
+// m mode, sh share, r range, sel selection — so there is one vocabulary in the
+// URL spec (DESIGN.md §6.3). Both sections read and write them through these
+// two helpers; each section adds only its own keys on top.
+type SharedHashState = {
+  chartMode?: ChartMode;
+  share?: boolean;
+  range?: { start: number; end: number };
+  selection?: string[];
+};
+
+function parseSharedHashKeys(params: URLSearchParams): SharedHashState {
+  const state: SharedHashState = {};
+
+  const mode = params.get("m");
+  if (mode === "line" || mode === "table") state.chartMode = mode;
+
+  if (params.get("sh") === "1") state.share = true;
+
+  const range = params.get("r");
+  if (range && /^\d{4}-\d{4}$/.test(range)) {
+    const [start = 0, end = 0] = range.split("-").map(Number);
+    state.range = { start, end };
+  }
+
+  const selection = params.get("sel");
+  if (selection !== null) state.selection = selectionIds(selection);
+
+  return state;
+}
+
+function writeSharedHashKeys(
+  params: URLSearchParams,
+  input: { chartMode: ChartMode; share: boolean; rangeStart: number; rangeEnd: number; selectedIds: string[] },
+): void {
+  params.set("m", input.chartMode);
+  if (input.share) params.set("sh", "1");
+  params.set("r", `${input.rangeStart}-${input.rangeEnd}`);
+  params.set("sel", input.selectedIds.join(","));
+}
+
 export function parseExplorerHash(hash: string, nav: ExplorerNav): ExplorerUrlState {
   const state: ExplorerUrlState = {};
 
@@ -33,11 +74,6 @@ export function parseExplorerHash(hash: string, nav: ExplorerNav): ExplorerUrlSt
 
     const grouping = params.get("g");
     if (grouping === "fields" || grouping === "ministries") state.grouping = grouping;
-
-    const mode = params.get("m");
-    if (mode === "line" || mode === "table") state.chartMode = mode;
-
-    if (params.get("sh") === "1") state.share = true;
 
     const analysisSide = params.get("as");
     if (analysisSide === "expenditure" || analysisSide === "revenue") state.analysisSide = analysisSide;
@@ -51,14 +87,11 @@ export function parseExplorerHash(hash: string, nav: ExplorerNav): ExplorerUrlSt
     const explorerNav = nav === "revenue" ? "revenue" : "expenditure";
     const scope = scopeFor(explorerNav, state.grouping ?? "fields");
 
-    const range = params.get("r");
-    if (range && /^\d{4}-\d{4}$/.test(range)) {
-      const [start = 0, end = 0] = range.split("-").map(Number);
-      state.range = { scope, start, end };
-    }
-
-    const selection = params.get("sel");
-    if (selection !== null) state.selection = { scope, ids: selectionIds(selection) };
+    const shared = parseSharedHashKeys(params);
+    if (shared.chartMode !== undefined) state.chartMode = shared.chartMode;
+    if (shared.share !== undefined) state.share = shared.share;
+    if (shared.range) state.range = { scope, start: shared.range.start, end: shared.range.end };
+    if (shared.selection) state.selection = { scope, ids: shared.selection };
   } catch {
     return state;
   }
@@ -90,10 +123,7 @@ export function serializeExplorerHash(input: SerializeExplorerInput): string {
   }
 
   if (input.nav === "expenditure") params.set("g", input.grouping);
-  params.set("m", input.chartMode);
-  if (input.share) params.set("sh", "1");
-  params.set("r", `${input.rangeStart}-${input.rangeEnd}`);
-  params.set("sel", input.selectedIds.join(","));
+  writeSharedHashKeys(params, input);
   return params.toString();
 }
 
@@ -122,32 +152,14 @@ export function stripNavFromHash(hash: string): string {
 // m mode, sh share, r range, sel selection — so there is one vocabulary in the
 // URL spec (DESIGN.md §6.3), plus lvl which exists only on the index.
 
-export type MunicipalUrlState = {
-  chartMode?: ChartMode;
-  share?: boolean;
-  range?: { start: number; end: number };
-  selection?: string[];
-};
+export type MunicipalUrlState = SharedHashState;
 
 export function parseMunicipalHash(hash: string): MunicipalUrlState {
   const state: MunicipalUrlState = {};
 
   try {
     const params = new URLSearchParams(hash.replace(/^#/, ""));
-
-    const mode = params.get("m");
-    if (mode === "line" || mode === "table") state.chartMode = mode;
-
-    if (params.get("sh") === "1") state.share = true;
-
-    const range = params.get("r");
-    if (range && /^\d{4}-\d{4}$/.test(range)) {
-      const [start = 0, end = 0] = range.split("-").map(Number);
-      state.range = { start, end };
-    }
-
-    const selection = params.get("sel");
-    if (selection !== null) state.selection = selectionIds(selection);
+    return parseSharedHashKeys(params);
   } catch {
     return state;
   }
@@ -163,10 +175,7 @@ export function serializeMunicipalHash(input: {
   selectedIds: string[];
 }): string {
   const params = new URLSearchParams();
-  params.set("m", input.chartMode);
-  if (input.share) params.set("sh", "1");
-  params.set("r", `${input.rangeStart}-${input.rangeEnd}`);
-  params.set("sel", input.selectedIds.join(","));
+  writeSharedHashKeys(params, input);
   return params.toString();
 }
 
