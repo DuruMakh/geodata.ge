@@ -67,7 +67,12 @@ export function pickSheetName(
     if (candidate) return candidate;
   }
 
-  if (options.defaultToFirstSheet) return available[0];
+  // Declared `: string`, so an empty workbook must fall through to the
+  // descriptive throw below rather than hand back undefined.
+  if (options.defaultToFirstSheet) {
+    const firstSheet = available[0];
+    if (firstSheet !== undefined) return firstSheet;
+  }
 
   throw new Error(
     `Could not find ${options.sheetDescription ?? "sheet"}. Available sheets: ${available.join(", ")}`,

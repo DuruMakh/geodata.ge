@@ -88,4 +88,10 @@ describe("pickSheetName", () => {
       "Could not find revenue sheet. Available sheets: ბალანსი, VI თავი, tavi I",
     );
   });
+
+  it("throws instead of returning undefined when the workbook has no sheets", () => {
+    expect(() =>
+      pickSheetName({ SheetNames: [] }, { defaultToFirstSheet: true, sheetDescription: "revenue sheet" }),
+    ).toThrow("Could not find revenue sheet. Available sheets: ");
+  });
 });
