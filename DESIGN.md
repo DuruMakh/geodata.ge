@@ -80,7 +80,7 @@ colors:
   hairline: "#D9CFBE"     # section sub-rules, aside border
   hairline-soft: "#E7DECF" # row borders, chart grid, bar tracks
   row-border: "#EDE4D3"   # series-panel row borders
-  control: "#C9BEA9"      # control borders (checkbox, pill, search underline)
+  control: "#95846A"      # control borders (checkbox, pill, search underline)
   accent: "#B3402A"       # terracotta: active states, focus, negative values
   positive: "#1F6E56"     # positive change
   negative: "#B3402A"     # negative change (shared with accent by design)
@@ -95,7 +95,8 @@ Rules:
 - The two `ink-fg-*` tokens exist only on the `ink` shell surface (§6.7); never use them on paper. **These lines are the single definition of both hex values** — §16 mirrors the paper tokens only, so a value change is one edit here plus one in `apps/web/app/globals.css`.
 - Both ink tokens clear WCAG AA on `ink`: `ink-fg-faint` measures **4.77:1** for the 8.5–9.5px text it carries (brand sub-line, `მონაცემები /` overline, rail label, `მალე` badge) and `ink-fg-muted` measures **6.34:1** for its 12–12.5px labels. They are a deliberate two-step hierarchy — an ~8.5 CIE L\* gap, so faint still reads dimmer than muted. Any future move has to keep **both** above 4.5:1 **and** that gap; raising one alone collapses the pair. (The pair was raised from `#7A7060` / `#8F8676`, where faint sat at 3.53:1.)
 - The paper pair answers to the same floor: `faint` measures **4.52:1** on `paper` and **4.83:1** on `tile`, and `muted` **5.54:1** / **5.92:1**. `faint` is the dimmest paper tier, not decoration — it carries the page-header coverage line (10.5px), hub card footers (10px) and the `გეგმა` planned tag (9px), all small text, all owed 4.5:1. `tests/explorer/themeTokens.test.ts` asserts both, mirroring the ink-pair guard. (The token was darkened from `#A89C88`, which sat at 2.42:1. The paper two-step is necessarily tighter than the ink pair's — `muted` is itself only 5.54:1, so the L\* gap is ~5.6, not 8.5. Restoring a wider step means moving `muted` down first.)
-- Focus rings: `2px solid rgba(179,64,42,0.4)`, offset 2px.
+- Non-text UI boundaries answer to WCAG 2.1 SC 1.4.11's **3:1**, the same floor §6.7 cites for the `მალე` badge border. `control` measures **3.25:1** on `paper` and **3.03:1** on `tint`; the focus ring, drawn in solid `accent`, measures **5.11:1** on `paper`. Both sat below the floor until this was pinned — `control` at `#C9BEA9` was 1.65:1, the first repair `#97866C` still reached only 2.95:1 on a tinted hover row, and the ring at 0.4 alpha composited to `rgb(220,171,157)`, 1.82:1 — while every 4.5:1 text assertion stayed green. `tests/explorer/themeTokens.test.ts` therefore asserts the actual `paper` and `tint` backgrounds as well as the solid ring.
+- Focus rings: `2px solid var(--accent)`, offset 2px. No alpha: an alpha composites the ring toward `paper` and silently undoes the ratio the token measures.
 - Selection highlight: `rgba(179,64,42,0.16)`.
 - Scrollbars: thin, `control`-colored thumb on transparent track.
 
@@ -111,7 +112,7 @@ series:
   spending.social_protection: "#B3402A"
   spending.health: "#1F6E56"
   spending.education: "#3D5A98"
-  spending.infrastructure_regional_development: "#B08A2E"
+  spending.infrastructure_regional_development: "#A5822B"
   spending.defence: "#7A4E8C"
   spending.public_order_safety: "#4A707A"
   spending.economic_affairs: "#C26E4C"
@@ -120,7 +121,7 @@ series:
   spending.sport: "#8A7B65"
   spending.general_public_services: "#5B5347"
   spending.debt_service: "#8C5A32"
-  spending.other_unclassified: "#A89C88"
+  spending.other_unclassified: "#94856D"
 ```
 
 Revenue:
@@ -130,7 +131,7 @@ series:
   revenue.vat: "#B3402A"
   revenue.income_tax: "#3D5A98"
   revenue.profit_tax: "#1F6E56"
-  revenue.excise_tax: "#B08A2E"
+  revenue.excise_tax: "#A5822B"
   revenue.import_tax: "#C26E4C"
   revenue.property_tax: "#7A4E8C"
   revenue.other_taxes: "#8A7B65"
@@ -146,7 +147,7 @@ Ministries (administrative view) keep stable per-ministry assignments:
 series:
   admin_spending.health_social_affairs: "#B3402A"
   admin_spending.education_science_youth: "#3D5A98"
-  admin_spending.regional_development_infrastructure: "#B08A2E"
+  admin_spending.regional_development_infrastructure: "#A5822B"
   admin_spending.defence: "#7A4E8C"
   admin_spending.internal_affairs: "#4A707A"
   admin_spending.environment_agriculture: "#2F4B3A"
@@ -157,13 +158,34 @@ series:
   admin_spending.culture: "#9C3D5E"
   admin_spending.sport: "#8A7B65"
   admin_spending.debt_service: "#8C5A32"
-  admin_spending.other_costs: "#A89C88"
+  admin_spending.other_costs: "#94856D"
 ```
 
-Open-ended sets (major programs, any future ministry not listed) use index-based assignment cycling through the editorial palette:
+Major programs are **derived from their parent ministry's colour**, not assigned
+from a palette: same hue, stepped through lightness and saturation so a line's
+parentage is legible from its colour alone. Each step is a fraction of the
+headroom between the parent and the edge of the readable band (lightness 22–78,
+saturation 14–84), so no shade is ever clamped flat against a sibling — three
+ministry tokens (`#94856D`, `#8A7B65`, `#5B5347`) sit within 2° of hue and are
+told apart by lightness alone. With every ministries series selected this yields
+63 distinct colours.
+
+The resolved displayed parent colour is the input, including for a future
+ministry that falls back to the open-ended palette. Later sibling cycles use
+progressively smaller steps and collision nudges; at least 24 siblings under one
+parent remain distinct without changing the current corpus's first eight shades.
+Every derived shade clears 3:1 on both `paper` and the `tint` used by selected
+and hovered series rows.
+
+The programs must not cycle the editorial palette: it holds the very hexes the
+categories use, so a program could draw as its own parent.
+
+Any future ministry not listed above still uses index-based assignment cycling
+through the editorial palette, as do the other open-ended sets (single-year
+snapshot, landing, municipal rows):
 
 ```text
-#B3402A #1F6E56 #3D5A98 #B08A2E #7A4E8C #4A707A #C26E4C #2F4B3A #9C3D5E #8A7B65 #5B5347 #8C5A32 #4E5D74 #A89C88
+#B3402A #1F6E56 #3D5A98 #A5822B #7A4E8C #4A707A #C26E4C #2F4B3A #9C3D5E #8A7B65 #5B5347 #8C5A32 #4E5D74 #94856D
 ```
 
 Municipal functions (`municipal.*`) reuse the semantic colour of the same concept
@@ -174,7 +196,7 @@ on the budget side, so a category keeps one colour across the whole site:
 | `municipal.social_protection` | `#B3402A` | `spending.social_protection` |
 | `municipal.health` | `#1F6E56` | `spending.health` |
 | `municipal.education` | `#3D5A98` | `spending.education` |
-| `municipal.housing_communal` | `#B08A2E` | `spending.infrastructure_regional_development` |
+| `municipal.housing_communal` | `#A5822B` | `spending.infrastructure_regional_development` |
 | `municipal.defence` | `#7A4E8C` | `spending.defence` |
 | `municipal.public_order_safety` | `#4A707A` | `spending.public_order_safety` |
 | `municipal.economic_affairs` | `#C26E4C` | `spending.economic_affairs` |
@@ -186,6 +208,7 @@ Rules:
 
 - Never assign `accent` meaning beyond "active/negative" in UI chrome; as a series color it belongs only to the categories listed above.
 - Never use color alone; pair with the 14×3px swatch bar, label, and value.
+- Every fixed and derived series colour clears the 3:1 graphical-object floor on both `paper` and `tint`, where selected rows, swatches, and checkbox fills appear; the former `#B08A2E` and `#A89C88` tokens were darkened to `#A5822B` and `#94856D` for that reason.
 
 ## 5. Typography
 
@@ -279,7 +302,7 @@ The section lives in the route (§6.2). Everything else about a screen serialize
 
 Keys: `g` grouping (expenditure only), `m` mode, `sh` share measure, `r` range, `sel` selection; `as` analysis side, `ag` analysis grouping, `ay` analysis year. The hash never carries `nav`.
 
-Restore on load with validation (unknown values fall back to defaults; ranges clamp to loaded years).
+Restore on load with validation (unknown values fall back to defaults; ranges clamp to loaded years; repeated selection IDs collapse to their first occurrence).
 
 Links shared before the route split still work: `/explorer#nav=expenditure|revenue|analysis` is honored once by a client component mounted on the hub, which reads the hash on mount and `router.replace`s to the matching route with `nav` stripped and the rest of the hash preserved.
 
@@ -349,6 +372,10 @@ Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: redu
 
 **Breadcrumb page header** (`page-header.tsx`). One row with a `2px ink` bottom rule, rendered per route (the final crumb differs per route, and a server layout cannot read the child route). Crumbs: sans 10.5px uppercase 600 in `muted`, current crumb in `ink`, separators `/` in accent. `მთავარი` links to `/`; `მონაცემები` is plain text with no route; `ბიუჯეტი` links to the hub on section routes and is plain text on the hub. Right slot: the mono 10.5px `faint` coverage label of §6.2 — the loaded range of the route's active scope, so it tracks the grouping, and the union of both sides on the hub.
 
+The crumbs carry `BreadcrumbTrail`'s semantics, not its markup: a `<nav aria-label="Breadcrumb">` landmark, `aria-hidden` separators, and `aria-current="page"` on the final crumb. They deliberately do **not** reuse the component itself — `BreadcrumbTrail` renders its own `BreadcrumbJsonLd`, and these routes already emit one, so reusing it would ship two structured-data blocks per page. Marking the current page by colour alone, in a paragraph of spans, is what this replaced: on the site's largest set of routes the trail was not a landmark and read as a run-on string with the slashes announced.
+
+**Footer.** Every `/explorer` route renders `SiteFooter` (§19) at the foot of the content column — inside it, not beside the sidebar — with the pages' own horizontal padding so its rule lines up with the content above. These routes are the site's main SEO landing targets, and the footer is where the CC BY 4.0 licence, the contact address and the methodology link live (§21); without it ~85 pages ended with no licence, no way to report an error and no route to the methodology. `updatedAt` comes from the landing model, the same site-wide review date the methodology and about pages show.
+
 **Budget hub (`/explorer`).** Breadcrumb, serif H1 `საქართველოს ბიუჯეტი`, lead paragraph, then four cards in a 2×2 grid (one column below 768px, max-width 860px), then the standard source note (§7.10). Card anatomy, in order: mono index in accent with `→` right-aligned, serif 18px title, 11.5px `muted` description, graphic, mono 10px `faint` footer.
 
 | # | Card | Graphic | Footer | Links to |
@@ -386,9 +413,15 @@ Text-only, sans 12.5px; active = ink 600 with `text-decoration: underline`, 2px 
 
 Height 27px, pill radius, 1px `control` border, transparent bg, muted text. Active: ink bg, paper text, ink border, `aria-pressed`. This is the only pill in the national multi-year explorer. Active `% მშპ-ში` divides every national revenue or expenditure amount, including the derived total, by Geostat's same-year nominal GDP at current prices. The denominator is independent of series selection. Missing same-year GDP renders a gap. Municipal explorers retain their `% წილი` pill as share of the active municipality, region, or Georgia budget total, and single-year analysis retains composition shares. There is no separate GDP explorer page.
 
-### 7.4 Range Quick Chips (1წ / 5წ / 10წ / ყველა)
+### 7.4 Range Quick Chips (5წ / 10წ / ყველა)
 
 Mono 11px text links; active = ink 600 underlined (accent underline); inactive = muted 400. `5წ` shows only when >5 loaded years, `10წ` only when >10.
+
+There is **no one-year chip**. Every figure in `ძირითადი ინდიკატორები` is a
+start-to-end delta, so a range of one year zeroed the entire section — a headline
+`0.0%`, movers falling back to row order, and a single category named both the
+largest and the slowest growing. The rail handles can still collapse the range to
+one year, which is what the §8.5 guard covers.
 
 ### 7.5 Range Slider
 
@@ -400,9 +433,17 @@ Row: 1px `row-border` bottom border; hover/selected bg `tint`; a 2px accent left
 
 ### 7.7 Search
 
-The shared selector order is: optional grouping tabs, search, an action/status row, then the series list. The action/status row places `გასუფთავება` / `ყველას მონიშვნა` on the left and `სერიები {selected} / {all}` on the right. The bulk indicator is a three-state checkbox: empty (`aria-checked="false"`), partial with a centered ink dash (`aria-checked="mixed"`), or ink-filled with a paper checkmark (`aria-checked="true"`). Empty selects all; partial and full states clear all. Search never scopes the count or bulk action; selection remains unlimited.
+The shared selector order is: optional grouping tabs, search, an action/status row, then the series list. The action/status row places `გასუფთავება` / `ყველას მონიშვნა` on the left. Ordinary scopes show `სერიები {selected} / {all}` on the right; ministries show `ძირითადი {selected} / {all} · პროგრამები {selectedPrograms}`. The bulk indicator is a three-state checkbox: empty (`aria-checked="false"`), partial with a centered ink dash (`aria-checked="mixed"`), or ink-filled with a paper checkmark (`aria-checked="true"`). Empty selects all; partial and full states clear all. Search never scopes the count or bulk action; selection remains unlimited.
+Both the count's denominator and the bulk action cover the **top-level rows
+only** — the total and its categories, the rows the panel lists before any caret
+is opened. Collapsed major programs are neither counted nor selected by
+`ყველას მონიშვნა`, so the ministries' `ძირითადი` denominator reads `/ 15`, not
+`/ 63`. The separate `პროგრამები` figure counts every selected program, including
+one whose caret is later collapsed, so the status never understates the chart.
+A program is still selectable individually once its caret is open; `გასუფთავება`
+clears everything, programs included.
 
-Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. The placeholder is `ძებნა` in both fields and ministries grouping. A query with no matches shows `0 შედეგი — შეცვალე საძიებო ტექსტი.` While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs (their caret is locked open); a ministry matched by name still honors its caret and expands to all of its programs. The query is panel-local state and resets on ANY scope switch — nav (ხარჯები↔შემოსავლები) and grouping alike; typing must not re-render the chart.
+Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. The placeholder is `ძებნა` in both fields and ministries grouping. A query with no matches shows `კატეგორია ვერ მოიძებნა — შეცვალე საძიებო ტექსტი.` The total row stays pinned regardless of the query, so this message names the categories that missed rather than claiming zero results — it would otherwise render directly above a visible `მთლიანი ხარჯი`. While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs (their caret is locked open); a ministry matched by name still honors its caret and expands to all of its programs. The query is panel-local state and resets on ANY scope switch — nav (ხარჯები↔შემოსავლები) and grouping alike; typing must not re-render the chart.
 
 ### 7.8 Excel Button
 
@@ -482,11 +523,11 @@ Left: segmented control + unit note + measure pill row → chart or table → ra
 
 ### 8.3 Line Chart
 
-SVG on paper (no plot frame), viewBox 920×320: a dot lattice for the grid (below), `1px ink` line at zero, 1px `hairline` y-axis line; axis labels mono 11px muted (y labels right-aligned outside the plot, 74px left padding); year labels thinned to ≤12 (first anchored start, last anchored end); series polylines 2.2px round-joined with a 3.5px dot on the final point only; no in-plot direct labels. Hover/pointer: 1px `control` vertical guide, ring markers (paper fill, 2px series stroke), tooltip (tile bg, 1px hairline border, radius 3, tooltip shadow, mono year + swatch/label/value rows; flips side past 60% width). `role="img"` + Georgian aria-label. SVG text sets fonts via `style` (the `font-family` presentation attribute does not resolve `var()`).
+SVG on paper (no plot frame), viewBox 920×320: a dot lattice for the grid (below), `1px ink` line at zero, 1px `hairline` y-axis line; axis labels mono 11px muted (y labels right-aligned outside the plot, 74px left padding); year labels thinned to ≤12 (first anchored start, last anchored end); series polylines 2.2px round-joined with a 3.5px dot on the final point only; no in-plot direct labels. Hover/pointer: 1px `#C9BEA9` vertical guide (the same chart-local hex as the lattice, §below), ring markers (paper fill, 2px series stroke), tooltip (tile bg, 1px hairline border, radius 3, tooltip shadow, mono year + swatch/label/value rows; flips side past 60% width). The tooltip is bounded because selection is unlimited: series with no value at the hovered year are dropped rather than shown as `—`, the rest are ranked by value descending, at most 10 are listed, and any remainder becomes a `+N სხვა` line. It is capped at the height of the plot it sits in, since the chart's `overflow-x` frame would otherwise clip it. `role="img"` + Georgian aria-label. SVG text sets fonts via `style` (the `font-family` presentation attribute does not resolve `var()`).
 
 **Dot lattice.** It replaces the horizontal gridlines outright — the dot field *is* the grid, not decoration behind one.
 
-- `#C9BEA9` (the `control` value) at opacity 0.6, radius 0.7. Literal hex, matching the rest of this chart: `var()` does not resolve in SVG presentation attributes.
+- `#C9BEA9` at opacity 0.6, radius 0.7. Literal hex, matching the rest of this chart: `var()` does not resolve in SVG presentation attributes. This was once the `control` value and is now chart-local: `control` darkened to `#95846A` to clear the 3:1 non-text floor on both paper and tint (§4.1), which governs control boundaries, not grid decoration. Darkening the lattice with it would turn the dot field into a tone.
 - Pitch is derived from the active scale, never fixed: **2 columns per year interval** (`plotWidth / (2 × (n − 1))`) and **3 rows per gridline step** (`stepPx / 3`), so every third row lands exactly on a labelled y value and every second column on a year.
 - Density guards: a sub-division pitch below 12px falls back to one column per year, or one row per step, independently. A negative domain can produce many gridline steps, and dots must never smear into a tone. With `n ≤ 1` there is no interval to divide and no lattice is drawn.
 - Drawn as one `<pattern patternUnits="userSpaceOnUse">` with the circle at the tile center and the pattern origin offset back by half a pitch, so dot centers land exactly on the plot's grid intersections with no edge clipping — a pattern, not ~500 `<circle>` elements.
@@ -505,9 +546,24 @@ National columns: `<first col> | years… | ცვლილება | წილ
 
 ### 8.5 Below-Chart Sections (`ძირითადი ინდიკატორები`, order fixed)
 
+When the selected range covers a single year (`start === end`, reachable through
+the rail handles or a `#r=YYYY-YYYY` hash), the **delta-derived blocks stand
+down** and the hero is replaced by one muted line —
+`ერთწლიან პერიოდში ცვლილება არ იზომება — აირჩიე ერთ წელზე მეტი დიაპაზონი.`
+Reporting a start-to-end delta of zero as a finding reads as a data error on a
+public finance site.
+
+What goes: the hero (`პერიოდის ცვლილება`), the movers board, the period
+comparison, and any side KPI that is itself a delta (`ყველაზე დიდი ზრდა`,
+`ყველაზე ნელი ზრდა`). What stays: every **point-in-time** KPI, because it is
+still a fact about the chosen year — `ყველაზე დიდი წილი მშპ-ში` nationally, and
+all three municipal side KPIs (level, rank, share). `#r=2015-2015` is a supported
+way to read a municipality's 2015 rank, so the municipal KPI grid must survive.
+The range caption prints the single year rather than `YYYY–YYYY`.
+
 1. Hero KPI (`პერიოდის ცვლილება`, §7.12) + three side KPIs (`ყველაზე დიდი ზრდა`, `ყველაზე ნელი ზრდა`, `ყველაზე დიდი წილი მშპ-ში`) in a `1.35fr | 1fr` grid split by a hairline. Side KPIs rank **all top-level scope items** — the same population as the movers board, so the identical headings can never contradict each other on one screen. The `ყველაზე დიდი ზრდა` GEL delta requires a positive start value (a delta measured against a negative base is a correction unwind, not growth).
 2. Movers board (top 3 / bottom 3 across all scope items).
-3. `პერიოდის შედარება` — table `<first col> | start year | ცვლილება | end year`, with the exact-labeled total row always first, followed by every applicable top-level category in end-year value order; nested major programs are excluded. The table uses a fixed layout with a 44% label column and is independent of the user's chart/table series selection.
+3. `პერიოდის შედარება` — table `<first col> | start year | ცვლილება | end year`. The `ცვლილება` column is a delta sitting between two level columns in the same typographic style, so it always carries an explicit `+`/`−` on both the national and municipal surfaces; colour reinforces direction but is never the only cue (grayscale, print and colourblind readers). Rows: the exact-labeled total row always first, followed by every applicable top-level category in end-year value order; nested major programs are excluded. The table uses a fixed layout with a 44% label column and is independent of the user's chart/table series selection.
 
 ## 9. Single-Year Analysis (ანალიზი)
 
@@ -571,7 +627,7 @@ Units always shown: `მლრდ ₾`, `მლნ ₾`, `%`. Numbers use `en-US
 
 - **Columns and chart axes** share one unit across every cell, which is what makes them comparable, so `unitFor()` picks the decimals once from every value the surface can show — all series, all years, never the current selection or range, or the numbers would reformat while the reader drags the range strip. It takes the fewest decimals that keep the surface's smallest non-zero value distinguishable from zero, up to a per-scope cap: **1** for fields and revenue, which are genuinely billions-scale, and **2** for municipalities (1 on 39 of the 64 pages, 2 on the other 25) and for ministries, whose drill-down programs are billions-scale only in name — at 1 decimal 45 of them collapse into 16 distinct values.
 - **Standalone amounts** (KPI values, series rows, movers, tooltips) carry their own unit label, so they vary per value at three significant digits — `450 მლნ ₾`, `26.8 მლნ ₾`, `0.42 მლნ ₾`.
-- **Below either threshold**, `formatInUnit` and `formatAmountParts` floor to `<0.01` (`>−0.01` when negative) rather than printing a zero. Five municipalities hold amounts under 5,000 ₾; a genuine zero still prints `0.00`.
+- **Below either threshold**, `formatInUnit` and `formatAmountParts` floor to `<0.01` (`>−0.01` when negative) rather than printing a zero. Signed deltas keep their direction there too: a small positive change renders `+<0.01`, never the unsigned level form. Five municipalities hold amounts under 5,000 ₾; a genuine zero still prints `0.00`.
 
 `tests/explorer/formatInvariants.test.ts` asserts this against the reviewed corpus, per surface. Fixture-based assertions cannot catch a regression here — the 2026-08 one (ონი 2025 health, 133,333 ₾ shown as `0`) passed every unit test in `format.test.ts`.
 
@@ -648,7 +704,7 @@ Each workbook has exactly three visible sheets, in order: `მარტივი
   --hairline: #D9CFBE;
   --hairline-soft: #E7DECF;
   --row-border: #EDE4D3;
-  --control: #C9BEA9;
+  --control: #95846A;
   --accent: #B3402A;
   --positive: #1F6E56;
   --negative: #B3402A;
@@ -736,9 +792,13 @@ Landing QA: verify exact copy, metadata, destination links, ordered H2s, data-de
 
 Reference implementation: `apps/web/components/municipalities/`, routes under `apps/web/app/explorer/municipalities/`. The section reuses the shell (§6.7) and the existing explorer machinery — `EditorialLineChart`, `RangeStrip`, `Callout`, `SourceNote`, `SwatchBar` — rather than inventing new surface types; `municipality-map.tsx` is the dedicated static SVG map component.
 
-**Municipality-grain static SVG map.** The index choropleth renders a deterministic, vendored OpenStreetMap snapshot as 60 municipality polygons plus five green city markers: Tbilisi `04`, Batumi `06`, Kutaisi `20`, Poti `32`, and Rustavi `48`. Codes `06`, `20`, `32`, and `48` are marker-only; Tbilisi `04` is the sole polygon-plus-marker duplicate; the union is exactly the 64 publicly served municipality codes. Each polygon or marker opens `/explorer/municipalities/[code]` directly. The six-step terracotta ramp is quantile-classed by 2025 budget per resident, using the reviewed 1 January 2025 Geostat population denominator. Legend endpoints and the tooltip's primary value use whole-GEL budget per resident; the tooltip retains total budget as muted supporting context and its accessible name includes both values. The map heading names the measure and year without a separate population-date label. Pointer and keyboard activity synchronizes the exact municipality between map and ranked list; switching to the Regions list leaves the map at municipality grain and region rows remain inert toward map highlighting.
+**Municipality-grain static SVG map.** The index choropleth renders a deterministic, vendored OpenStreetMap snapshot as 60 municipality polygons plus five green city markers: Tbilisi `04`, Batumi `06`, Kutaisi `20`, Poti `32`, and Rustavi `48`. Codes `06`, `20`, `32`, and `48` are marker-only; Tbilisi `04` is the sole polygon-plus-marker duplicate; the union is exactly the 64 publicly served municipality codes. Each polygon or marker opens `/explorer/municipalities/[code]` directly. The map is **one tab stop**, not 65: targets carry a roving `tabindex`, so Tab enters the group and arrow keys (plus Home/End) move within it — the ranked list below is reachable without traversing the whole map. Tbilisi resolves to a single accessible target: the green marker is the encoding the legend names, so the `04` polygon stays drawn and pointer-interactive, co-highlighting with its marker and opening the same page on click, but is `aria-hidden` and unfocusable. That leaves **64 map targets**, one per served municipality, each announced once. The six-step terracotta ramp is quantile-classed by 2025 budget per resident, using the reviewed 1 January 2025 Geostat population denominator. Legend endpoints and the tooltip's primary value use whole-GEL budget per resident; the tooltip retains total budget as muted supporting context and its accessible name includes both values. The map carries no separate heading — the legend, tooltip and the SVG's accessible name already state the measure, and the index source note names the measure and its year in prose. Pointer and keyboard activity synchronizes the exact municipality between map and ranked list; switching to the Regions list leaves the map at municipality grain and region rows remain inert toward map highlighting.
 
 **Index list hierarchy.** Municipality and region rows remain ranked and sorted by displayed total budget; rank numbers, bars, and primary formatted amounts all continue to use that total. A smaller whole-GEL budget-per-resident line is supporting context only. Region values divide the displayed region total by the summed 2025 population of member municipalities, so Adjara uses its consolidated numerator. The Georgia row remains first on the Regions tab and has no per-resident value because its numerator contains five aggregate-only budgets with no territorial population assignment. The KPI strip reports the median of the 64 municipality-level 2025 per-resident values.
+
+**Index source note.** The index closes with the standard `SourceNote` (§7.10), like every other data surface: it names the Ministry of Finance as the source, states that the map encodes budget per resident for 2025, and explains the 64-vs-69 split — the map and list cover the 64 served municipalities while the pinned `საქართველო` row is the 69-unit roll-up plus Adjara republican payments, which is why the region rows do not sum to it. Its review date comes from `latestReviewedAtForMunicipalFacts`. This is the note, not a methodology link: per §21 the methodology route reaches these pages through the footer only.
+
+**Search surfaces answer.** All three — the series panel, the index list, and the entity picker — respond to a non-matching query rather than going blank. The picker renders the index's own empty state after its empty listbox (`ვერაფერი მოიძებნა` as a live status plus a `ძებნის გასუფთავება` button); before this it collapsed to a 0-height listbox with no options, no count, and no way to clear the query except selecting the text. A forward Tab from the combobox reaches that button, Enter clears the query and returns focus to the combobox, and the next forward Tab closes the non-modal picker and continues through the page.
 
 The two reviewed occupied-area overlays render above the municipality fills as pale, non-interactive SVG paths with no public label, tooltip, link, keyboard focus, map text, or legend entry. The source note links `© OpenStreetMap contributors` to `https://www.openstreetmap.org/copyright` and states `ODbL` without adding occupied-territory wording. Natural Earth overlay provenance remains repository documentation because that source is public domain. Codes `05`, `42`, `43`, `46`, and `64` remain excluded from the public registry, standalone facts, regional aggregates, rankings, picker/list/map/member rows, and standalone Excel values. Their raw budgets belong to Georgian municipal bodies operating outside those territories and serving displaced communities, so they are not territorially attributable spending inside the named municipalities; they appear only inside the dedicated Georgia aggregate. Full geometry and licence provenance is documented in `docs/data-methodology/municipal-functional-annual-2015-2025.md`; the approved behavior is specified in `docs/superpowers/specs/2026-08-07-municipality-map-upgrade-design.md`.
 
@@ -754,7 +814,7 @@ The Georgia page's total and function rows are dedicated `country.georgia` facts
 
 Approved visual and behavioral specification: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`. Approved preview: `design-shotgun/methodology-portal-2026-08-11/variant-d.html` (Editorial Fieldbook).
 
-The public structure is `/methodology` plus live category pages for expenditure, revenue, and municipalities. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained footer methodology link. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content.
+The public structure is `/methodology` plus live category pages for expenditure, revenue, and municipalities. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
 
 Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only.
 

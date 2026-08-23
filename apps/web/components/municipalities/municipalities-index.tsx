@@ -8,7 +8,7 @@ import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
 import { parseMunicipalLevel } from "../../lib/explorer/urlState";
 import { municipalEntityHref } from "../../lib/seo/internalLinks";
-import { TabDivider, TextTab } from "../ui/editorial";
+import { SourceNote, TabDivider, TextTab } from "../ui/editorial";
 import { MunicipalityMap } from "./municipality-map";
 
 type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResidentGel" | "legendMaxPerResidentGel"> & {
@@ -18,6 +18,7 @@ type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResident
   regions: MunicipalListRow[];
   country: MunicipalListRow;
   kpis: MunicipalKpi[];
+  sourceNote: string;
 };
 
 export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
@@ -206,6 +207,24 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
             </div>
           )}
         </div>
+      </div>
+      <div className="mt-9 border-t border-[var(--hairline)] pt-4">
+        <SourceNote testId="municipal-source-note">
+          {props.sourceNote}{" "}
+          {/* The choropleth is a vendored OSM derivative, so ODbL §4.3 attribution
+              belongs wherever it is publicly used. Fixed text, so it lives here
+              rather than being threaded through the page as data. */}
+          საზღვრები:{" "}
+          <a
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2 hover:text-[var(--accent)]"
+          >
+            © OpenStreetMap contributors
+          </a>{" "}
+          (ODbL).
+        </SourceNote>
       </div>
     </>
   );

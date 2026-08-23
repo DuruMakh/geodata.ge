@@ -51,6 +51,15 @@ describe("parseExplorerHash", () => {
 
     expect(state.selection?.scope).toBe("fields");
   });
+
+  it("deduplicates shared selections while preserving their first-seen order", () => {
+    const state = parseExplorerHash(
+      "#g=ministries&sel=admin_spending.total,admin_program.general_education,admin_spending.total",
+      "expenditure",
+    );
+
+    expect(state.selection?.ids).toEqual(["admin_spending.total", "admin_program.general_education"]);
+  });
 });
 
 describe("readLegacyNav", () => {
@@ -112,6 +121,13 @@ describe("municipal hash state", () => {
 
   it("restores a deliberately empty selection as empty", () => {
     expect(parseMunicipalHash("#sel=").selection).toEqual([]);
+  });
+
+  it("deduplicates repeated municipal selections", () => {
+    expect(parseMunicipalHash("#sel=municipal.health,municipal.education,municipal.health").selection).toEqual([
+      "municipal.health",
+      "municipal.education",
+    ]);
   });
 
   it("reads the index level, defaulting to municipalities", () => {

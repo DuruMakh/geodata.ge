@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
-import type { SourceDocumentRow } from "../../lib/data/sources";
 import {
   buildComparisonRows,
   buildCountryKpis,
@@ -57,7 +56,6 @@ type MunicipalExplorerBaseProps = {
   functions: MunicipalFunction[];
   functionFacts: MunicipalFunctionFact[];
   totalFacts: MunicipalTotalFact[];
-  sourceDocuments: SourceDocumentRow[];
 
   workbookBasename: string;
   workbookSources: WorkbookPublicSource[];
@@ -77,7 +75,7 @@ export type MunicipalExplorerProps = MunicipalExplorerBaseProps &
   );
 
 export function MunicipalExplorer(props: MunicipalExplorerProps) {
-  const { functions, functionFacts, totalFacts, sourceDocuments } = props;
+  const { functions, functionFacts, totalFacts } = props;
   const { metrics, navigation } = props;
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -96,11 +94,10 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
         functions,
         functionFacts,
         totalFacts,
-        sourceDocuments,
         startYear: firstYear,
         endYear: lastYear,
       }),
-    [functions, functionFacts, totalFacts, sourceDocuments, firstYear, lastYear],
+    [functions, functionFacts, totalFacts, firstYear, lastYear],
   );
 
   const knownIds = useMemo(
@@ -133,11 +130,10 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
         functions,
         functionFacts,
         totalFacts,
-        sourceDocuments,
         startYear: state.range.start,
         endYear: state.range.end,
       }),
-    [functions, functionFacts, totalFacts, sourceDocuments, state.range.start, state.range.end],
+    [functions, functionFacts, totalFacts, state.range.start, state.range.end],
   );
 
   const years = model.years;

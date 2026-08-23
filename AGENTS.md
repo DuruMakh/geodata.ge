@@ -118,7 +118,7 @@ A branch implementation, merged commit, green deploy-trigger workflow, or accept
 - Derive year ranges and defaults from loaded facts; do not hardcode coverage.
 - Preserve readable Georgian text, accessible chart labels, distinguishable stable category colors, and data comprehension.
 - Only the applicable total is selected by default; it remains first, selectable, and removable.
-- Series selection is unlimited. Optional grouping tabs precede search; the next row places `გასუფთავება` / `ყველას მონიშვნა` on the left and `სერიები {selected} / {all}` on the right. Search never scopes the bulk action or denominator.
+- Series selection is unlimited. Optional grouping tabs precede search; the next row places `გასუფთავება` / `ყველას მონიშვნა` on the left. Ordinary scopes show `სერიები {selected} / {all}` on the right; ministries show `ძირითადი {selected} / {all} · პროგრამები {selectedPrograms}` so a selected program is never hidden by the top-level bulk count. Search never scopes the bulk action or denominator.
 
 ## Workflow and Delivery
 

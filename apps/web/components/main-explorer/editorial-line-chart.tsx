@@ -35,6 +35,31 @@ const PAD_T = 16;
 const PAD_B = 26;
 const DOT_R = 0.7;
 
+export type TooltipRow = { id: string; label: string; color: string; value: number };
+
+// Series selection is unlimited (AGENTS.md UI contract), so the hover readout
+// cannot be one row per series: at 63 it measured 1327px against a 334px chart,
+// clipped by the frame's own overflow-x, with a third of its rows reading "—"
+// for years the series has no data. Rank by value and keep the head — a reader
+// pointing at the chart is asking which lines are on top here.
+export const TOOLTIP_ROW_CAP = 10;
+
+export function buildTooltipRows(
+  series: ChartSeries[],
+  hover: number,
+  cap: number = TOOLTIP_ROW_CAP,
+): { rows: TooltipRow[]; hidden: number } {
+  const present: TooltipRow[] = [];
+  for (const line of series) {
+    const value = line.vals[hover];
+    if (value === null || value === undefined) continue;
+    present.push({ id: line.id, label: line.label, color: line.color, value });
+  }
+  present.sort((a, b) => b.value - a.value);
+
+  return { rows: present.slice(0, cap), hidden: Math.max(0, present.length - cap) };
+}
+
 function niceMax(rawMax: number): number {
   const raw = rawMax * 1.12;
   const magnitude = 10 ** Math.floor(Math.log10(raw));
@@ -120,6 +145,7 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
   }
 
   const hoverX = hover === null ? null : (x(hover) / W) * 100;
+  const tooltip = hover === null ? null : buildTooltipRows(series, hover);
 
   return (
     // Scroll instead of shrink on narrow screens: an unbounded w-full SVG scales
@@ -259,10 +285,10 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
           );
         })}
       </svg>
-      {hover !== null && hoverX !== null ? (
+      {hover !== null && hoverX !== null && tooltip !== null ? (
         <div
           data-testid="chart-tooltip"
-          className="pointer-events-none absolute top-0 z-[2] flex min-w-[200px] flex-col gap-1 rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
+          className="pointer-events-none absolute top-0 z-[2] flex max-h-full min-w-[200px] flex-col gap-1 overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
           style={{
             left: `${hoverX}%`,
             transform: hoverX > 60 ? "translateX(calc(-100% - 12px))" : "translateX(12px)",
@@ -272,17 +298,20 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
             <span>{years[hover]}</span>
             {share ? <span>{shareLabel}</span> : null}
           </div>
-          {series.map((line) => (
-            <div key={line.id} className="flex items-center justify-between gap-2">
+          {tooltip.rows.map((row) => (
+            <div key={row.id} className="flex items-center justify-between gap-2">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[var(--body)]">
-                <SwatchBar color={line.color} className="!w-3" />
-                <span className="max-w-[190px] overflow-hidden text-ellipsis whitespace-nowrap">{line.label}</span>
+                <SwatchBar color={row.color} className="!w-3" />
+                <span className="max-w-[190px] overflow-hidden text-ellipsis whitespace-nowrap">{row.label}</span>
               </span>
               <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
-                {formatValue(line.vals[hover] ?? null)}
+                {formatValue(row.value)}
               </span>
             </div>
           ))}
+          {tooltip.hidden > 0 ? (
+            <div className="pt-0.5 text-[10.5px] text-[var(--muted)]">+{tooltip.hidden} სხვა</div>
+          ) : null}
         </div>
       ) : null}
       </div>

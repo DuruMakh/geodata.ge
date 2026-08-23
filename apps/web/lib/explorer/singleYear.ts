@@ -1,7 +1,6 @@
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import type { GlossaryEntry } from "../data/glossary";
-import type { SourceDocumentRow } from "../data/sources";
 import type { ServedAdminFact, ServedBudgetFact } from "../servedRows";
 import { colorForItem, OTHER_COLOR } from "./colors";
 import { formatAmountParts, formatShare, MISSING } from "./format";
@@ -12,7 +11,6 @@ import type {
   SingleYearSnapshotModel,
   SnapshotHeadline,
   SnapshotItem,
-  SourceMetadata,
 } from "./types";
 
 export type SingleYearSnapshotInput = {
@@ -21,7 +19,6 @@ export type SingleYearSnapshotInput = {
   adminCategories?: Map<string, AdminSpendingCategory>;
   grouping?: ExpenditureGrouping;
   glossary: Map<string, GlossaryEntry>;
-  sourceDocuments: SourceDocumentRow[];
   side: ExplorerSide;
   year: number;
 };
@@ -44,31 +41,6 @@ function labelsFor(id: string, glossary: Map<string, GlossaryEntry>) {
 
 function totalIdFor(side: ExplorerSide): string {
   return side === "revenue" ? "revenue.total" : "expenditure.total";
-}
-
-function sourceMetadataFor(sourceIds: string[], sources: Map<string, SourceDocumentRow>): SourceMetadata {
-  const rows = sourceIds
-    .map((sourceId) => sources.get(sourceId))
-    .filter((source): source is SourceDocumentRow => Boolean(source));
-  const uniqueNames = Array.from(new Set(rows.map((source) => source.sourceName)));
-  const uniqueFiles = Array.from(new Set(rows.map((source) => source.sourceUrlOrFile)));
-
-  return {
-    sourceName: uniqueNames.length === 1 && uniqueFiles.length === 1 ? uniqueNames[0] ?? "" : "Multiple reviewed official sources",
-    sourceUrlOrFile: uniqueFiles.join("; "),
-    lastReviewedAt: rows.map((source) => source.lastReviewedAt).sort().at(-1) ?? "",
-  };
-}
-
-function sourceMetadataFromItems(items: SnapshotItem[]): SourceMetadata {
-  const uniqueNames = Array.from(new Set(items.map((item) => item.source.sourceName)));
-  const uniqueFiles = Array.from(new Set(items.map((item) => item.source.sourceUrlOrFile)));
-
-  return {
-    sourceName: uniqueNames.length === 1 && uniqueFiles.length === 1 ? uniqueNames[0] ?? "" : "Multiple reviewed official sources",
-    sourceUrlOrFile: uniqueFiles.join("; "),
-    lastReviewedAt: items.map((item) => item.source.lastReviewedAt).sort().at(-1) ?? "",
-  };
 }
 
 function emptyReasonFor(side: ExplorerSide): string {
@@ -158,7 +130,6 @@ function buildRadarItems(items: SnapshotItem[]): SnapshotItem[] {
       changeFromPreviousYear: changeFromPrevious(amountGel, previousAmountGel),
       amountChangeFromPreviousYear: previousAmountGel === null ? null : amountGel - previousAmountGel,
       basis: omitted.some((item) => item.basis === "planned") ? "planned" : "actual",
-      source: sourceMetadataFromItems(omitted),
     },
   ];
 }
@@ -219,7 +190,6 @@ function headlineCards(totalGel: number, year: number, items: SnapshotItem[]): S
 export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): SingleYearSnapshotModel {
   const grouping: ExpenditureGrouping = input.side === "expenditure" ? input.grouping ?? "fields" : "fields";
   const isMinistryGrouping = input.side === "expenditure" && grouping === "ministries";
-  const sourceDocuments = new Map(input.sourceDocuments.map((source) => [source.sourceId, source]));
 
   const active: SnapshotFact[] = isMinistryGrouping
     ? (input.adminFacts ?? [])
@@ -250,7 +220,6 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
       totalGel: 0,
       basis: "actual",
       hasPlannedValues: false,
-      source: null,
       headlineCards: headlineCards(0, input.year, []),
       items: [],
       every100: [],
@@ -265,7 +234,6 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
   const previousFacts = previousYear === null ? [] : active.filter((fact) => fact.year === previousYear && fact.itemId !== totalIdFor(input.side));
   const previousByItemId = new Map(previousFacts.map((fact) => [fact.itemId, fact.amountGel]));
   const totalGel = totalFact?.amountGel ?? detailFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
-  const modelSource = sourceMetadataFor((totalFact ? [totalFact] : detailFacts).map((fact) => fact.sourceId), sourceDocuments);
 
   // Every official row is a model item — including zero and negative rows (e.g.
   // revenue.other_taxes 2019-2020) — so the ranking, category counts, and the
@@ -286,7 +254,6 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
         changeFromPreviousYear: changeFromPrevious(fact.amountGel, previousAmountGel),
         amountChangeFromPreviousYear: previousAmountGel === null ? null : fact.amountGel - previousAmountGel,
         basis: fact.basis,
-        source: sourceMetadataFor([fact.sourceId], sourceDocuments),
       };
     })
     .sort((a, b) => b.amountGel - a.amountGel);
@@ -300,7 +267,6 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
     totalGel,
     basis: yearFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual",
     hasPlannedValues: yearFacts.some((fact) => fact.basis === "planned"),
-    source: modelSource,
     headlineCards: headlineCards(totalGel, input.year, items),
     items,
     every100: wholeGelFrom100(drawnItems),

@@ -39,7 +39,7 @@ export function formatAmountParts(value: number | null | undefined, signed = fal
   const millions = abs / MILLION;
   const decimals = millions >= 100 ? 0 : millions >= 10 ? 1 : 2;
   if (abs > 0 && Number(millions.toFixed(decimals)) === 0) {
-    return { num: value < 0 ? ">−0.01" : "<0.01", unit: "მლნ ₾" };
+    return { num: value < 0 ? ">−0.01" : signed ? "+<0.01" : "<0.01", unit: "მლნ ₾" };
   }
   return { num: sign + fixed(millions, decimals), unit: "მლნ ₾" };
 }

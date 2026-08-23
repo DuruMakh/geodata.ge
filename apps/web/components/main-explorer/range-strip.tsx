@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import type { ResolvedRange } from "./use-explorer-state";
 
-// Range strip per DESIGN.md §7.4–7.5: mono quick chips (1წ/5წ/10წ/ყველა) and a
+// Range strip per DESIGN.md §7.4–7.5: mono quick chips (5წ/10წ/ყველა) and a
 // 24px rail with year ticks and two accessible slider handles.
 
 type RangeStripProps = {
@@ -21,8 +21,10 @@ export function RangeStrip({ years, range, onChange }: RangeStripProps) {
   const span = Math.max(max - min, 1);
   const pct = (year: number) => `${(((year - min) / span) * 100).toFixed(2)}%`;
 
+  // No one-year chip: every figure in ძირითადი ინდიკატორები is a start-to-end
+  // delta, so a range of one year zeroes the whole section. The rail handles can
+  // still reach that range, which is what the Indicators guard covers.
   const chips = [
-    { label: "1წ", start: max, show: true },
     { label: "5წ", start: years[Math.max(years.length - 5, 0)] ?? min, show: years.length > 5 },
     { label: "10წ", start: years[Math.max(years.length - 10, 0)] ?? min, show: years.length > 10 },
     { label: "ყველა", start: min, show: true },

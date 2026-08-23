@@ -1,4 +1,5 @@
 import type { ServedBudgetFact } from "../servedRows";
+import { MUNICIPAL_COUNTRY_BUDGET_COUNT } from "./municipalData";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { isDerivedTotalItemId } from "./explorerData";
 import { formatAmount } from "./format";
@@ -56,7 +57,6 @@ function categoryCount(facts: ServedBudgetFact[], side: "expenditure" | "revenue
 export function buildHubCards(
   facts: ServedBudgetFact[],
   municipalTotals: Map<number, number>,
-  municipalCounts: { municipalities: number; regions: number },
 ): HubCardModel[] {
   const expenditure = totalsByYear(facts, "expenditure");
   const revenue = totalsByYear(facts, "revenue");
@@ -110,7 +110,12 @@ export function buildHubCards(
     {
       index: "03",
       title: BUDGET_SECTIONS.municipalities.label,
-      description: `${municipalCounts.municipalities} მუნიციპალიტეტი და ${municipalCounts.regions} რეგიონი — რაში იხარჯება ადგილობრივი ბიუჯეტები.`,
+      // The figure beside this is countryTotalFacts — the national roll-up,
+      // which carries five excluded budget units and the Adjara A.R. republican
+      // payments on top of the 64 served municipalities. Naming those 64 here
+      // overstated what they sum to by 8.6%; this is the wording the
+      // destination page and buildIndexKpis already use.
+      description: `${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური საბიუჯეტო ერთეული — რაში იხარჯება ადგილობრივი ბიუჯეტები.`,
       href: BUDGET_SECTIONS.municipalities.href,
       comingSoon: BUDGET_SECTIONS.municipalities.href === null,
       series: municipal.series,

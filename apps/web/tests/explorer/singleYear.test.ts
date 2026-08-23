@@ -1,7 +1,6 @@
 ﻿import { describe, expect, it } from "vitest";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
-import type { SourceDocumentRow } from "../../lib/data/sources";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
 const glossary = new Map<string, GlossaryEntry>([
@@ -10,27 +9,6 @@ const glossary = new Map<string, GlossaryEntry>([
   ["spending.defense", { id: "spending.defense", kaLabel: "თავდაცვა", enLabel: "Defense", description: "", notes: "" }],
   ["revenue.vat", { id: "revenue.vat", kaLabel: "დღგ", enLabel: "VAT", description: "", notes: "" }],
 ]);
-
-const sourceDocuments: SourceDocumentRow[] = [
-  {
-    sourceId: "source.execution",
-    sourceName: "Reviewed execution report",
-    sourceUrlOrFile: "docs/execution",
-    lastReviewedAt: "2026-05-10",
-  },
-  {
-    sourceId: "source.audit",
-    sourceName: "Reviewed audit table",
-    sourceUrlOrFile: "docs/audit",
-    lastReviewedAt: "2026-05-12",
-  },
-  {
-    sourceId: "source.tail",
-    sourceName: "Reviewed tail source",
-    sourceUrlOrFile: "docs/tail",
-    lastReviewedAt: "2026-05-13",
-  },
-];
 
 function fact(row: Partial<BudgetFactImportRow> & Pick<BudgetFactImportRow, "year" | "side" | "itemId" | "amountGel">): BudgetFactImportRow {
   return {
@@ -62,7 +40,6 @@ describe("single-year snapshot model", () => {
     const model = buildSingleYearSnapshotModel({
       facts,
       glossary,
-      sourceDocuments,
       side: "expenditure",
       year: 2025,
     });
@@ -85,18 +62,12 @@ describe("single-year snapshot model", () => {
     expect(model.items.find((item) => item.itemId === "spending.education")?.amountChangeFromPreviousYear).toBe(150);
     expect(model.items.find((item) => item.itemId === "spending.defense")?.changeFromPreviousYear).toBe(1);
     expect(model.headlineCards.map((card) => card.id)).toEqual(["total", "largest", "fastest_growth", "largest_increase"]);
-    expect(model.source).toEqual({
-      sourceName: "Multiple reviewed official sources",
-      sourceUrlOrFile: "docs/execution; docs/audit",
-      lastReviewedAt: "2026-05-12",
-    });
   });
 
   it("allocates every100 whole GEL so the total is exactly 100", () => {
     const model = buildSingleYearSnapshotModel({
       facts,
       glossary,
-      sourceDocuments,
       side: "expenditure",
       year: 2025,
     });
@@ -116,7 +87,6 @@ describe("single-year snapshot model", () => {
         fact({ year: 2026, side: "expenditure", itemId: "spending.education", amountGel: 0 }),
       ],
       glossary,
-      sourceDocuments,
       side: "expenditure",
       year: 2026,
     });
@@ -138,7 +108,6 @@ describe("single-year snapshot model", () => {
         fact({ year: 2026, side: "revenue", itemId: "revenue.other_taxes", amountGel: -50 }),
       ],
       glossary,
-      sourceDocuments,
       side: "revenue",
       year: 2026,
     });
@@ -154,26 +123,7 @@ describe("single-year snapshot model", () => {
     expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
   });
 
-  it("keeps a single source label when all facts resolve to the same official source", () => {
-    const model = buildSingleYearSnapshotModel({
-      facts: [
-        fact({ year: 2026, side: "expenditure", itemId: "spending.health", amountGel: 100, sourceId: "source.execution" }),
-        fact({ year: 2026, side: "expenditure", itemId: "spending.education", amountGel: 200, sourceId: "source.execution" }),
-      ],
-      glossary,
-      sourceDocuments,
-      side: "expenditure",
-      year: 2026,
-    });
-
-    expect(model.source).toEqual({
-      sourceName: "Reviewed execution report",
-      sourceUrlOrFile: "docs/execution",
-      lastReviewedAt: "2026-05-10",
-    });
-  });
-
-  it("aggregates snapshot.other source metadata from omitted tail items only", () => {
+  it("collapses the omitted tail into a single snapshot.other radar item", () => {
     const manyFacts = Array.from({ length: 9 }, (_, index) =>
       fact({
         year: 2026,
@@ -187,25 +137,19 @@ describe("single-year snapshot model", () => {
     const model = buildSingleYearSnapshotModel({
       facts: manyFacts,
       glossary,
-      sourceDocuments,
       side: "expenditure",
       year: 2026,
     });
     const other = model.radarItems.find((item) => item.itemId === "snapshot.other");
 
     expect(model.radarItems).toHaveLength(8);
-    expect(other?.source).toEqual({
-      sourceName: "Reviewed tail source",
-      sourceUrlOrFile: "docs/tail",
-      lastReviewedAt: "2026-05-13",
-    });
+    expect(other?.amountGel).toBe(manyFacts.slice(7).reduce((sum, row) => sum + row.amountGel, 0));
   });
 
   it("marks growth unavailable when no previous year exists", () => {
     const model = buildSingleYearSnapshotModel({
       facts,
       glossary,
-      sourceDocuments,
       side: "expenditure",
       year: 2023,
     });
@@ -220,30 +164,22 @@ describe("single-year snapshot model", () => {
     const model = buildSingleYearSnapshotModel({
       facts,
       glossary,
-      sourceDocuments,
       side: "revenue",
       year: 2024,
     });
 
     expect(model.items).toEqual([]);
-    expect(model.source).toBeNull();
     expect(model.emptyReason).toBe("ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული.");
   });
-  it("shows source-backed totals-only years without category breakdowns", () => {
+  it("shows totals-only years without category breakdowns", () => {
     const model = buildSingleYearSnapshotModel({
       facts: [fact({ year: 2005, side: "expenditure", itemId: "expenditure.total", amountGel: 2000, publicSpendingFieldId: null, mappingConfidence: null })],
       glossary,
-      sourceDocuments,
       side: "expenditure",
       year: 2005,
     });
 
     expect(model.totalGel).toBe(2000);
-    expect(model.source).toEqual({
-      sourceName: "Reviewed execution report",
-      sourceUrlOrFile: "docs/execution",
-      lastReviewedAt: "2026-05-10",
-    });
     expect(model.items).toEqual([]);
     expect(model.rankingRows).toEqual([]);
     expect(model.every100).toEqual([]);

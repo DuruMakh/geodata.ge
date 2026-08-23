@@ -4,12 +4,6 @@ import { describe, expect, it } from "vitest";
 import { BudgetField } from "../../components/analysis/budget-field";
 import type { SnapshotItem } from "../../lib/explorer/types";
 
-const source = {
-  sourceName: "Official budget fixture",
-  sourceUrlOrFile: "fixture.csv",
-  lastReviewedAt: "2026-08-18",
-};
-
 const items: SnapshotItem[] = [
   {
     itemId: "largest",
@@ -22,7 +16,6 @@ const items: SnapshotItem[] = [
     changeFromPreviousYear: 0.403,
     amountChangeFromPreviousYear: 28.57,
     basis: "actual",
-    source,
   },
   {
     itemId: "quarter",
@@ -35,7 +28,6 @@ const items: SnapshotItem[] = [
     changeFromPreviousYear: 0,
     amountChangeFromPreviousYear: 0,
     basis: "actual",
-    source,
   },
   {
     itemId: "smallest",
@@ -48,7 +40,6 @@ const items: SnapshotItem[] = [
     changeFromPreviousYear: -0.235,
     amountChangeFromPreviousYear: -1.5625,
     basis: "actual",
-    source,
   },
 ];
 

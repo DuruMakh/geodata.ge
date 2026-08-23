@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { loadServedExplorerData } from "../../../lib/data/servedData";
-import { referencedSourceIds, sourceDocumentsFor } from "../../../lib/data/sources";
+import { referencedSourceIds } from "../../../lib/data/sources";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -41,7 +41,6 @@ export default async function AnalysisPage() {
         adminFacts={ownAdminFacts}
         adminCategories={adminCategories}
         glossaryEntries={Array.from(glossary.values())}
-        sourceDocuments={sourceDocumentsFor(sourceDocuments, [...facts, ...ownAdminFacts])}
         lastUpdatedAt={lastUpdatedAt}
       />
     </>

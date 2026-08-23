@@ -65,6 +65,17 @@ export function buildSeriesPanelRows(items: ExplorerItem[], query: string, expan
   return rows;
 }
 
+/**
+ * The rows the panel lists before any caret is opened. The bulk control and the
+ * counter both run over this set: on ministries `items` carries 63 entries but
+ * only the total and its 14 categories are ever listed, so a denominator over
+ * every level makes "სერიები 1 / 63" reconcile with nothing on screen — and one
+ * click on ყველას მონიშვნა charts 48 programs the reader never saw.
+ */
+export function topLevelIds(items: ExplorerItem[]): string[] {
+  return items.filter((item) => item.level !== "major_program").map((item) => item.id);
+}
+
 type SeriesPanelProps = {
   items: ExplorerItem[];
   rows: ExplorerTableRow[];
@@ -102,7 +113,12 @@ export function SeriesPanel({
   const [query, setQuery] = useState("");
   const valuesByItem = new Map(rows.map((row) => [row.itemId, row]));
   const panelRows = buildSeriesPanelRows(items, query, expandedIds);
-  const selectableIds = items.map((item) => item.id);
+  const bulkIds = topLevelIds(items);
+  const programIds = new Set(items.filter((item) => item.level === "major_program").map((item) => item.id));
+  const selectedTopLevelCount = selectedIds.filter((itemId) => bulkIds.includes(itemId)).length;
+  const selectedProgramCount = selectedIds.filter((itemId) => programIds.has(itemId)).length;
+  // Unscoped on purpose: გასუფთავება has to be able to clear a program the user
+  // opened a caret to select, even though the counter no longer counts it.
   const hasSelection = selectedIds.length > 0;
   const isMinistries = scope === "ministries";
   const normalizedQuery = query.trim().toLowerCase();
@@ -110,7 +126,7 @@ export function SeriesPanel({
     normalizedQuery === "" ||
     Boolean(items.find((item) => item.level === "total" && matches(item, normalizedQuery))) ||
     panelRows.some((row) => row.item.level !== "total");
-  const allSelected = selectableIds.every((itemId) => selectedIds.includes(itemId));
+  const allSelected = bulkIds.every((itemId) => selectedIds.includes(itemId));
 
   return (
     <aside
@@ -129,11 +145,13 @@ export function SeriesPanel({
         query={query}
         onQueryChange={setQuery}
         searchPlaceholder="ძებნა"
-        selectedCount={selectedIds.length}
-        totalCount={selectableIds.length}
+        countLabel={isMinistries ? "ძირითადი" : "სერიები"}
+        selectedCount={selectedTopLevelCount}
+        totalCount={bulkIds.length}
+        supplementalSelected={isMinistries ? { label: "პროგრამები", count: selectedProgramCount } : undefined}
         hasSelection={hasSelection}
         allSelected={allSelected}
-        onToggleAll={() => onSelectionChange(hasSelection ? [] : selectableIds)}
+        onToggleAll={() => onSelectionChange(hasSelection ? [] : bulkIds)}
         hasVisibleMatches={hasVisibleMatches}
       >
         {panelRows.map(({ item, isProgram, hasChildren, expanded, caretLocked }) => {

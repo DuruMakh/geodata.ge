@@ -1,8 +1,9 @@
 import type { MunicipalComparisonRow, MunicipalIndicatorPresentation, MunicipalKpi, MunicipalMover } from "../../lib/explorer/municipalData";
-import { formatAmount, formatAmountParts, formatShare } from "../../lib/explorer/format";
+import { formatAmount, formatAmountParts, formatShare, formatSignedAmount } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { Sparkline } from "../ui/sparkline";
 import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
+import { NO_PERIOD_NOTE } from "../main-explorer/indicators";
 
 // KPI row (DESIGN.md §7.11), movers board (§7.13) and the period comparison.
 
@@ -42,6 +43,11 @@ type MunicipalIndicatorsProps = {
 };
 
 export function MunicipalIndicators({ kpis, movers, comparison, presentation, startYear, endYear }: MunicipalIndicatorsProps) {
+  // Same degenerate case as the national section (indicators.tsx): a one-year
+  // range leaves every delta at zero. All three side KPIs here are point-in-time
+  // (level, rank, share), so only the hero, movers and comparison stand down —
+  // `#r=2015-2015` is a supported way to read that year's rank.
+  const singleYear = startYear === endYear;
   const maxAbs = Math.max(
     ...[...movers.up, ...movers.down].map((mover) => Math.abs(mover.growth ?? 0)),
     Number.EPSILON,
@@ -59,11 +65,18 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <SectionTitle>ძირითადი ინდიკატორები</SectionTitle>
           <p className="text-[12.5px] text-[var(--muted)]">
-            არჩეული პერიოდი: <span className="font-[family-name:var(--font-numeric)]">{startYear}–{endYear}</span>
+            არჩეული პერიოდი: <span className="font-[family-name:var(--font-numeric)]">{singleYear ? startYear : `${startYear}–${endYear}`}</span>
           </p>
         </div>
 
         <div data-testid="entity-kpi-grid" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+          {singleYear ? (
+            <div className="min-w-0 @min-[1100px]:pr-11">
+              <p data-testid="period-single-year-note" className="max-w-[420px] text-[13px] leading-relaxed text-[var(--muted)]">
+                {NO_PERIOD_NOTE}
+              </p>
+            </div>
+          ) : (
           <div data-testid="entity-kpi" className="min-w-0 @min-[1100px]:pr-11">
             <Overline>პერიოდის ცვლილება</Overline>
             <p
@@ -103,6 +116,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
               ) : null}
             </div>
           </div>
+          )}
           <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
             {sideKpis.map((kpi, index) => (
               <div key={kpi.label} data-testid="entity-kpi" className={index === 0 ? "pt-0.5 pb-3.5" : index === 2 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}>
@@ -126,6 +140,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
           </div>
         </div>
 
+      {singleYear ? null : (
       <div data-testid="period-movers" className="mt-9 grid gap-7 border-t border-[var(--hairline)] pt-6 @min-[1100px]:grid-cols-2 @min-[1100px]:gap-x-10">
         <div className="min-w-0">
           <h3 className="mb-3 text-[13px] font-semibold text-[var(--ink)]">ყველაზე მზარდი</h3>
@@ -144,7 +159,9 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
           </div>
         </div>
       </div>
+      )}
 
+      {singleYear ? null : (
       <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
         <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">პერიოდის შედარება</h3>
         <div className="overflow-x-auto">
@@ -189,7 +206,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
                     className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap"
                     style={{ color: growthColor(row.changeShare) }}
                   >
-                    {formatAmount(row.changeGel)}
+                    {formatSignedAmount(row.changeGel)}
                   </td>
                   <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
                     {formatAmount(row.toGel)}
@@ -200,6 +217,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
           </table>
         </div>
       </div>
+      )}
     </section>
   );
 }

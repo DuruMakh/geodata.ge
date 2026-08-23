@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { MainExplorer } from "../../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { loadServedExplorerData, loadServedLandingData } from "../../../lib/data/servedData";
-import { sourceDocumentsFor } from "../../../lib/data/sources";
 import { loadGdpWorkbookSources, loadWorkbookSources } from "../../../lib/methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 import { resolveSiteUrl } from "../../../lib/siteUrl";
@@ -41,7 +40,6 @@ export default async function RevenuePage() {
         nav="revenue"
         facts={ownFacts}
         glossaryEntries={Array.from(glossary.values())}
-        sourceDocuments={sourceDocumentsFor(sourceDocuments, [...ownFacts, ...gdpFacts])}
         gdpFacts={gdpFacts}
         workbookSources={workbookSources}
         gdpWorkbookSources={gdpWorkbookSources}
