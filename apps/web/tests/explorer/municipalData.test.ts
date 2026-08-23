@@ -30,6 +30,9 @@ import {
   buildPickerGroups,
   getDefaultMunicipalSelection,
   latestReviewedAtForMunicipalFacts,
+  MUNICIPAL_AGGREGATE_ONLY_COUNT,
+  MUNICIPAL_COUNTRY_BUDGET_COUNT,
+  MUNICIPAL_PUBLIC_PAGE_COUNT,
   regionFactsFor,
 } from "../../lib/explorer/municipalData";
 import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
@@ -1294,5 +1297,19 @@ describe("municipal KPI sets", () => {
 
     expect(country.standing.label).toBe("მუნიციპალური ბიუჯეტები");
     expect(country.standing.value).toBe("69");
+  });
+});
+
+describe("municipal budget counts", () => {
+  it("keeps the public, aggregate-only and total counts arithmetically consistent", () => {
+    expect(MUNICIPAL_PUBLIC_PAGE_COUNT + MUNICIPAL_AGGREGATE_ONLY_COUNT).toBe(MUNICIPAL_COUNTRY_BUDGET_COUNT);
+    expect(MUNICIPAL_COUNTRY_BUDGET_COUNT).toBe(69);
+  });
+
+  it("matches the excluded municipal codes the fact generator drops", () => {
+    // Municipal codes 05, 42, 43, 46 and 64 are budgets that are not
+    // territorially attributable spending inside those municipalities, so they
+    // have no public page and appear only inside the Georgia total.
+    expect(MUNICIPAL_AGGREGATE_ONLY_COUNT).toBe(5);
   });
 });

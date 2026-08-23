@@ -38,7 +38,7 @@ export type MunicipalMetricContext =
       rankByYear: Record<number, number>;
       rankOutOf: number;
     }
-  | { kind: "country"; budgetCount: 69 };
+  | { kind: "country"; budgetCount: number };
 
 type MunicipalNavigation = { prev: { label: string; href: string }; next: { label: string; href: string } };
 

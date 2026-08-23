@@ -24,7 +24,16 @@ import { georgianOrdinal } from "./municipalLabels";
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
 export const MUNICIPAL_PER_RESIDENT_YEAR = 2025;
-export const MUNICIPAL_COUNTRY_BUDGET_COUNT = 69;
+
+// Municipal budget-unit counts. 64 municipalities get a public page; five
+// occupied-territory bodies (codes 05, 42, 43, 46, 64 — see
+// lib/data/municipal/generateMunicipalFacts.ts) are excluded from the public
+// list because their budgets are not territorially attributable spending, and
+// appear only inside the Georgia total. Every Georgian string that states one
+// of these numbers interpolates it from here.
+export const MUNICIPAL_PUBLIC_PAGE_COUNT = 64;
+export const MUNICIPAL_AGGREGATE_ONLY_COUNT = 5;
+export const MUNICIPAL_COUNTRY_BUDGET_COUNT = MUNICIPAL_PUBLIC_PAGE_COUNT + MUNICIPAL_AGGREGATE_ONLY_COUNT;
 
 export type MunicipalEntityModel = {
   years: number[];
@@ -280,7 +289,7 @@ export function buildCountryListRow(totalFacts: MunicipalTotalFact[], year: numb
     id: MUNICIPAL_COUNTRY_ID,
     kind: "country",
     nameKa: "საქართველო",
-    subtitleKa: "69 მუნიციპალური ბიუჯეტი",
+    subtitleKa: `${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური ბიუჯეტი`,
     regionId: null,
     valueGel: totalByYear[year] ?? 0,
     budgetPerResidentGel: null,
@@ -550,7 +559,7 @@ export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: numbe
     standing: {
       label: "მუნიციპალური ბიუჯეტები",
       value: String(budgetCount),
-      detail: "64 საჯარო გვერდი · 5 მხოლოდ საქართველოს ჯამში",
+      detail: `${MUNICIPAL_PUBLIC_PAGE_COUNT} საჯარო გვერდი · ${MUNICIPAL_AGGREGATE_ONLY_COUNT} მხოლოდ საქართველოს ჯამში`,
     },
   };
 }
