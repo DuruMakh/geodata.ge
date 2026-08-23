@@ -64,13 +64,18 @@ for (const path of [
   "/explorer/municipalities/04",
   "/explorer/municipalities/region/imereti",
 ] as const) {
-  test(`${path} omits inline methodology links`, async ({ page }) => {
+  test(`${path} keeps the methodology link in the footer rather than inline`, async ({ page }) => {
     await page.goto(`http://localhost:3100${path}`);
 
+    // The owner's design puts the methodology route in the footer and in the
+    // lowest section of the main pages, not on every data surface. Until the
+    // explorer had a footer at all, that left these routes with no path to it.
     await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
-    const methodologyLinks = page.locator('a[href^="/methodology"]');
-    await expect(methodologyLinks).toHaveCount(0);
-    await expect(page.locator("footer")).toHaveCount(0);
+
+    const footer = page.locator("footer");
+    await expect(footer).toHaveCount(1);
+    await expect(footer.locator('a[href^="/methodology"]')).toHaveCount(1);
+    await expect(page.locator('a[href^="/methodology"]')).toHaveCount(1);
   });
 }
 

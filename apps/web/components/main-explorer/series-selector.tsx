@@ -8,8 +8,10 @@ type SeriesSelectorProps = {
   query: string;
   onQueryChange: (query: string) => void;
   searchPlaceholder: string;
+  countLabel?: string;
   selectedCount: number;
   totalCount: number;
+  supplementalSelected?: { label: string; count: number };
   hasSelection: boolean;
   allSelected: boolean;
   onToggleAll: () => void;
@@ -22,8 +24,10 @@ export function SeriesSelector({
   query,
   onQueryChange,
   searchPlaceholder,
+  countLabel = "სერიები",
   selectedCount,
   totalCount,
+  supplementalSelected,
   hasSelection,
   allSelected,
   onToggleAll,
@@ -82,16 +86,24 @@ export function SeriesSelector({
           data-testid="series-status"
           className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]"
         >
-          სერიები{" "}
+          {countLabel}{" "}
           <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
             {selectedCount} / {totalCount}
           </span>
+          {supplementalSelected ? (
+            <>
+              {" · "}{supplementalSelected.label}{" "}
+              <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
+                {supplementalSelected.count}
+              </span>
+            </>
+          ) : null}
         </span>
       </div>
 
       {!hasVisibleMatches ? (
         <p className="border-b border-[var(--row-border)] px-1 py-3 text-xs text-[var(--muted)]">
-          0 შედეგი — შეცვალე საძიებო ტექსტი.
+          კატეგორია ვერ მოიძებნა — შეცვალე საძიებო ტექსტი.
         </p>
       ) : null}
 

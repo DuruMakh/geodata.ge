@@ -21,6 +21,10 @@ export function scopeFor(nav: "expenditure" | "revenue", grouping: ExpenditureGr
   return grouping === "ministries" ? "ministries" : "fields";
 }
 
+function selectionIds(value: string): string[] {
+  return [...new Set(value.split(",").filter(Boolean))];
+}
+
 export function parseExplorerHash(hash: string, nav: ExplorerNav): ExplorerUrlState {
   const state: ExplorerUrlState = {};
 
@@ -54,7 +58,7 @@ export function parseExplorerHash(hash: string, nav: ExplorerNav): ExplorerUrlSt
     }
 
     const selection = params.get("sel");
-    if (selection !== null) state.selection = { scope, ids: selection.split(",").filter(Boolean) };
+    if (selection !== null) state.selection = { scope, ids: selectionIds(selection) };
   } catch {
     return state;
   }
@@ -143,7 +147,7 @@ export function parseMunicipalHash(hash: string): MunicipalUrlState {
     }
 
     const selection = params.get("sel");
-    if (selection !== null) state.selection = selection.split(",").filter(Boolean);
+    if (selection !== null) state.selection = selectionIds(selection);
   } catch {
     return state;
   }

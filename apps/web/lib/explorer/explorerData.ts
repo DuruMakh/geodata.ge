@@ -1,5 +1,4 @@
 ﻿import type { GlossaryEntry } from "../data/glossary";
-import type { SourceDocumentRow } from "../data/sources";
 import type {
   ServedAdminFact,
   ServedBudgetFact,
@@ -7,7 +6,7 @@ import type {
 } from "../servedRows";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import { chooseActivePublicFacts } from "../data/activeFacts";
-import { colorForItem } from "./colors";
+import { colorForItem, colorForProgram, OTHER_COLOR } from "./colors";
 import type {
   ExpenditureGrouping,
   GdpMetadata,
@@ -17,8 +16,6 @@ import type {
   ExplorerSide,
   ExplorerTableRow,
   MeasureMode,
-  PeriodSummary,
-  SourceMetadata,
 } from "./types";
 
 const SERIES_ORDER_BASE_YEAR = 2025;
@@ -35,8 +32,6 @@ type ModelFact = {
   sourceId: string;
   kaLabel: string | null;
   enLabel: string | null;
-  detailLabel: string | null;
-  officialInstitutionLabel: string | null;
 };
 
 export type ExplorerModelInput = {
@@ -45,7 +40,6 @@ export type ExplorerModelInput = {
   adminCategories?: Map<string, AdminSpendingCategory>;
   expenditureGrouping?: ExpenditureGrouping;
   glossary: Map<string, GlossaryEntry>;
-  sourceDocuments: SourceDocumentRow[];
   gdpFacts?: ServedNationalGdpFact[];
   side: ExplorerSide;
   selectedItemIds: string[];
@@ -62,7 +56,6 @@ export type ExplorerModel = {
   tableRows: ExplorerTableRow[];
   totalRow: ExplorerTableRow | null;
   comparisonRows: ExplorerTableRow[];
-  summary: PeriodSummary;
   topGrowth: ExplorerTableRow[];
   bottomGrowth: ExplorerTableRow[];
   hasPlannedValues: boolean;
@@ -109,28 +102,6 @@ function adminLabelsFor(id: string, fact: ModelFact | undefined, categories: Map
   };
 }
 
-function sourceIdsFor(sourceIds: string[]): string[] {
-  return sourceIds.flatMap((sourceId) => sourceId.split(";").map((id) => id.trim()).filter(Boolean));
-}
-
-function sourceMetadataFor(sourceIds: string[], sources: Map<string, SourceDocumentRow>): SourceMetadata {
-  const normalizedSourceIds = sourceIdsFor(sourceIds);
-  const rows = normalizedSourceIds
-    .map((sourceId) => sources.get(sourceId))
-    .filter((source): source is SourceDocumentRow => Boolean(source));
-  const uniqueRows = Array.from(
-    new Map(rows.map((source) => [`${source.sourceName}\0${source.sourceUrlOrFile}\0${source.lastReviewedAt}`, source])).values(),
-  );
-  const uniqueNames = Array.from(new Set(rows.map((source) => source.sourceName)));
-  const uniqueFiles = Array.from(new Set(rows.map((source) => source.sourceUrlOrFile)));
-
-  return {
-    sourceName: uniqueRows.length <= 1 ? uniqueNames[0] ?? "" : "Multiple reviewed official sources",
-    sourceUrlOrFile: uniqueFiles.join("; "),
-    lastReviewedAt: rows.map((source) => source.lastReviewedAt).sort().at(-1) ?? "",
-  };
-}
-
 function valueForMeasure(
   amountGel: number,
   year: number,
@@ -144,75 +115,33 @@ function valueForMeasure(
   return amountGel;
 }
 
-// Percent change from a non-positive base is not meaningful for display.
-function percentChangeFrom(amountGel: number, previousAmountGel: number | null): number | null {
-  if (previousAmountGel === null || previousAmountGel <= 0) return null;
-  return (amountGel - previousAmountGel) / previousAmountGel;
-}
-
 // Change from a non-positive base is not meaningful for display.
 function changeBetween(startValue: number | null, endValue: number | null): number | null {
   if (startValue === null || endValue === null || startValue <= 0) return null;
   return (endValue - startValue) / startValue;
 }
 
-function absoluteIncrease(row: ExplorerTableRow, startYear: number, endYear: number): number | null {
-  const start = row.valuesByYear[startYear];
-  const end = row.valuesByYear[endYear];
-  if (start === null || start === undefined || end === null || end === undefined) return null;
-  return end - start;
-}
-
-function shareChangeFor(row: ExplorerTableRow, startYear: number, endYear: number): number | null {
-  const start = row.shareByYear?.[startYear];
-  const end = row.shareByYear?.[endYear];
-  if (start === null || start === undefined || end === null || end === undefined) return null;
-  return end - start;
-}
-
-function buildSummary(rows: ExplorerTableRow[], totalRow: ExplorerTableRow | null, years: number[]): {
-  summary: PeriodSummary;
+// The movers boards are all this ever fed the UI. The PeriodSummary that used to
+// sit beside them — totalChange, largestGelIncrease, fastestGrowth, lowestGrowth,
+// biggestShareChange — had no consumer outside its own tests, and computing
+// biggestShareChange meant two extra sorts of every comparable row per rebuild.
+function buildGrowthBoards(rows: ExplorerTableRow[], years: number[]): {
   topGrowth: ExplorerTableRow[];
   bottomGrowth: ExplorerTableRow[];
 } {
   const startYear = years[0];
   const endYear = years.at(-1);
 
-  if (startYear === undefined || endYear === undefined) {
-    return {
-      summary: {
-        totalChange: null,
-        largestGelIncrease: null,
-        fastestGrowth: null,
-        lowestGrowth: null,
-        biggestShareChange: null,
-      },
-      topGrowth: [],
-      bottomGrowth: [],
-    };
-  }
+  if (startYear === undefined || endYear === undefined) return { topGrowth: [], bottomGrowth: [] };
 
-  const comparableRows = rows.filter((row) => row.valuesByYear[startYear] !== undefined && row.valuesByYear[endYear] !== undefined);
-  const growthRows = comparableRows.filter((row) => row.change !== null);
-  const sortedGrowth = [...growthRows].sort((a, b) => (b.change ?? -Infinity) - (a.change ?? -Infinity));
-  const sortedIncrease = [...comparableRows].sort(
-    (a, b) => (absoluteIncrease(b, startYear, endYear) ?? -Infinity) - (absoluteIncrease(a, startYear, endYear) ?? -Infinity),
-  );
-  const shareChangeRows = comparableRows.filter((row) => shareChangeFor(row, startYear, endYear) !== null);
-  const sortedShareChange = [...shareChangeRows].sort(
-    (a, b) =>
-      Math.abs(shareChangeFor(b, startYear, endYear) ?? 0) -
-      Math.abs(shareChangeFor(a, startYear, endYear) ?? 0),
-  );
+  const sortedGrowth = rows
+    .filter(
+      (row) =>
+        row.valuesByYear[startYear] !== undefined && row.valuesByYear[endYear] !== undefined && row.change !== null,
+    )
+    .sort((a, b) => (b.change ?? -Infinity) - (a.change ?? -Infinity));
 
   return {
-    summary: {
-      totalChange: totalRow?.change ?? null,
-      largestGelIncrease: sortedIncrease[0] ?? null,
-      fastestGrowth: sortedGrowth[0] ?? null,
-      lowestGrowth: sortedGrowth.at(-1) ?? null,
-      biggestShareChange: sortedShareChange[0] ?? null,
-    },
     topGrowth: sortedGrowth.slice(0, 3),
     bottomGrowth: [...sortedGrowth].reverse().slice(0, 3),
   };
@@ -270,8 +199,6 @@ function publicFactForModel(fact: ServedBudgetFact): ModelFact {
     sourceId: fact.sourceId,
     kaLabel: null,
     enLabel: null,
-    detailLabel: null,
-    officialInstitutionLabel: null,
   };
 }
 
@@ -287,13 +214,11 @@ function adminFactForModel(fact: ServedAdminFact): ModelFact {
     amountGel: fact.amountGel,
     basis: fact.basis,
     sourceId: fact.sourceId,
-    kaLabel: fact.level === "major_program" ? label : null,
-    enLabel: fact.level === "major_program" ? label : null,
     // Drill-down programs are shown by NAME only — the official tavi-VI code (which fragments
     // across reorganizations, e.g. sport development moving 39 02→33 05→32 12→…) is intentionally
     // not surfaced in the explorer. officialCode stays in the facts CSV for provenance.
-    detailLabel: null,
-    officialInstitutionLabel: fact.level === "major_program" ? fact.officialInstitutionLabelKa : null,
+    kaLabel: fact.level === "major_program" ? label : null,
+    enLabel: fact.level === "major_program" ? label : null,
   };
 }
 
@@ -319,25 +244,6 @@ function ministryItemIds(active: ModelFact[], baselineAmounts: Map<string, numbe
   ];
 }
 
-// Largest entry strictly below `year` in an ascending, deduplicated array.
-function latestYearBelow(years: number[], year: number): number | null {
-  let low = 0;
-  let high = years.length - 1;
-  let found: number | null = null;
-
-  while (low <= high) {
-    const mid = (low + high) >> 1;
-    if (years[mid] < year) {
-      found = years[mid];
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
-  }
-
-  return found;
-}
-
 export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
   const isMinistryGrouping = input.side === "expenditure" && input.expenditureGrouping === "ministries";
   const active = isMinistryGrouping
@@ -349,7 +255,6 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
   const visibleDetailFacts = visibleFacts.filter((fact) => !isPublicTotalFact(fact));
   const years = Array.from(new Set(visibleFacts.map((fact) => fact.year))).sort((a, b) => a - b);
   const totalId = isMinistryGrouping ? ADMIN_SPENDING_TOTAL_ID : totalIdFor(input.side);
-  const sourceDocuments = new Map(input.sourceDocuments.map((source) => [source.sourceId, source]));
   const gdpFactsByYear = new Map((input.gdpFacts ?? []).map((fact) => [fact.year, fact]));
   const gdpByYear = Object.fromEntries(
     (input.gdpFacts ?? []).map((fact) => [
@@ -358,7 +263,6 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
         gdpCurrentPricesGel: fact.gdpCurrentPricesGel,
         accountingStandard: fact.accountingStandard,
         status: fact.status,
-        source: sourceMetadataFor([fact.sourceId], sourceDocuments),
       } satisfies GdpMetadata,
     ]),
   );
@@ -384,16 +288,37 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
   for (const fact of active) {
     factsByItem.set(fact.itemId, fact);
   }
-  const items = itemIds.map((id, index) => ({
-    id,
-    side: sideForItemId(id),
-    parentItemId: id === totalId ? null : factsByItem.get(id)?.parentItemId ?? null,
-    level: id === totalId ? "total" : factsByItem.get(id)?.level ?? "public_field",
-    detailLabel: id === totalId ? null : factsByItem.get(id)?.detailLabel ?? null,
-    ...(isMinistryGrouping ? adminLabelsFor(id, factsByItem.get(id), input.adminCategories ?? new Map()) : labelsFor(id, input.side, input.glossary)),
-    color: colorForItem(id, index),
-    sortOrder: index + 1,
-  }));
+  // A program is coloured from its ministry's hue, so it needs its position among
+  // its own siblings — not its position in the flat item list.
+  const programOrdinals = new Map<string, number>();
+  const programsPerParent = new Map<string, number>();
+  for (const id of itemIds) {
+    const fact = factsByItem.get(id);
+    if (fact?.level !== "major_program" || !fact.parentItemId) continue;
+    const seen = programsPerParent.get(fact.parentItemId) ?? 0;
+    programOrdinals.set(id, seen);
+    programsPerParent.set(fact.parentItemId, seen + 1);
+  }
+  const baseColorsByItemId = new Map(itemIds.map((id, index) => [id, colorForItem(id, index)]));
+
+  const items = itemIds.map((id, index) => {
+    const fact = factsByItem.get(id);
+    const parentItemId = id === totalId ? null : fact?.parentItemId ?? null;
+    const programOrdinal = programOrdinals.get(id);
+
+    return {
+      id,
+      side: sideForItemId(id),
+      parentItemId,
+      level: id === totalId ? "total" : fact?.level ?? "public_field",
+      ...(isMinistryGrouping ? adminLabelsFor(id, fact, input.adminCategories ?? new Map()) : labelsFor(id, input.side, input.glossary)),
+      color:
+        parentItemId !== null && programOrdinal !== undefined
+          ? colorForProgram(baseColorsByItemId.get(parentItemId) ?? OTHER_COLOR, programOrdinal)
+          : baseColorsByItemId.get(id) ?? colorForItem(id, index),
+      sortOrder: index + 1,
+    };
+  });
   const selectedItems = items.filter((item) => input.selectedItemIds.includes(item.id));
   const factsByItemYear = new Map<string, ModelFact>();
   const totalByYear = new Map<number, number>();
@@ -415,12 +340,13 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     totalByYear.set(year, fact.amountGel);
   }
 
-  // Prior-year lookups are called once per (series, year) cell. Rescanning
-  // `active` inside them made a table of S series over Y years cost S x Y x
-  // |active| element visits, and |active| itself grows with items x years — so
-  // the term was effectively cubic in dataset breadth. These indexes are built
-  // once per model and make each lookup O(log n). Note they cover ALL active
-  // years, not just the visible range: the prior year is often outside it.
+  // Indexed once per model: totalFactsForYear is called once per (series, year)
+  // cell, and rescanning `active` inside it made a table of S series over Y
+  // years cost S x Y x |active| element visits.
+  //
+  // The prior-year indexes that used to sit beside this one went with
+  // ExplorerPoint.percentChange — they existed only to serve it, and no
+  // component ever read it.
   const detailFactsForTotalsByYear = new Map<number, ModelFact[]>();
 
   for (const fact of detailFactsForTotals) {
@@ -428,31 +354,6 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     if (yearFacts) yearFacts.push(fact);
     else detailFactsForTotalsByYear.set(fact.year, [fact]);
   }
-
-  // First fact wins per item-year, matching the .find() this replaced.
-  const activeYearsByItem = new Map<string, number[]>();
-  const activeAmountByItemYear = new Map<string, number>();
-
-  for (const fact of active) {
-    const key = `${fact.itemId}:${fact.year}`;
-    if (activeAmountByItemYear.has(key)) continue;
-    activeAmountByItemYear.set(key, fact.amountGel);
-    const itemYears = activeYearsByItem.get(fact.itemId);
-    if (itemYears) itemYears.push(fact.year);
-    else activeYearsByItem.set(fact.itemId, [fact.year]);
-  }
-
-  for (const itemYears of activeYearsByItem.values()) itemYears.sort((a, b) => a - b);
-
-  const detailActive = active.filter((fact) => !isPublicTotalFact(fact) && (!isMinistryGrouping || fact.level === "admin_category"));
-  const explicitTotalActive = new Map(active.filter(isPublicTotalFact).map((fact) => [fact.year, fact]));
-  const detailActiveSumByYear = new Map<number, number>();
-
-  for (const fact of detailActive) {
-    detailActiveSumByYear.set(fact.year, (detailActiveSumByYear.get(fact.year) ?? 0) + fact.amountGel);
-  }
-
-  const totalActiveYears = Array.from(new Set([...detailActive.map((fact) => fact.year), ...explicitTotalActive.keys()])).sort((a, b) => a - b);
 
   // Returns a copy: the array in the index is shared across every call for the
   // same year, and the sibling branch hands back a fresh one, so returning the
@@ -465,38 +366,16 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     return yearFacts ? [...yearFacts] : [];
   };
 
-  const previousAmount = (itemId: string, year: number): number | null => {
-    const itemYears = activeYearsByItem.get(itemId);
-    if (!itemYears) return null;
-    const previousYear = latestYearBelow(itemYears, year);
-    if (previousYear === null) return null;
-    return activeAmountByItemYear.get(`${itemId}:${previousYear}`) ?? null;
-  };
-
-  const totalPreviousAmount = (year: number): number | null => {
-    const previousYear = latestYearBelow(totalActiveYears, year);
-    if (previousYear === null) return null;
-    return explicitTotalActive.get(previousYear)?.amountGel ?? detailActiveSumByYear.get(previousYear) ?? 0;
-  };
-
   const pointFor = (item: ExplorerItem, year: number): ExplorerPoint | null => {
-    const yearTotal = totalByYear.get(year) ?? 0;
-
     if (item.id === totalId) {
       const yearTotalFacts = totalFactsForYear(year);
       if (yearTotalFacts.length === 0) return null;
-      const amountGel = yearTotal;
 
       return {
         year,
         itemId: item.id,
-        kaLabel: item.kaLabel,
-        enLabel: item.enLabel,
-        amountGel,
         basis: yearTotalFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual",
-        value: valueForMeasure(amountGel, year, input.measure, gdpFactsByYear),
-        shareOfTotal: yearTotal === 0 ? null : 1,
-        percentChange: percentChangeFrom(amountGel, totalPreviousAmount(year)),
+        value: valueForMeasure(totalByYear.get(year) ?? 0, year, input.measure, gdpFactsByYear),
       };
     }
 
@@ -506,13 +385,8 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     return {
       year,
       itemId: item.id,
-      kaLabel: item.kaLabel,
-      enLabel: item.enLabel,
-      amountGel: fact.amountGel,
       basis: fact.basis,
       value: valueForMeasure(fact.amountGel, year, input.measure, gdpFactsByYear),
-      shareOfTotal: yearTotal === 0 ? null : fact.amountGel / yearTotal,
-      percentChange: percentChangeFrom(fact.amountGel, previousAmount(item.id, year)),
     };
   };
 
@@ -520,8 +394,6 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     const valuesByYear: Record<number, number | null> = {};
     const shareByYear: Record<number, number | null> = {};
     const basisByYear: Record<number, "actual" | "planned"> = {};
-    const sourceByYear: Record<number, SourceMetadata> = {};
-    const officialInstitutionLabelByYear: Record<number, string | null> = {};
 
     for (const year of years) {
       if (item.id === totalId) {
@@ -535,7 +407,6 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
           gdpFactsByYear,
         );
         basisByYear[year] = yearFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual";
-        sourceByYear[year] = sourceMetadataFor(yearFacts.map((fact) => fact.sourceId), sourceDocuments);
         continue;
       }
 
@@ -549,8 +420,6 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
         gdpFactsByYear,
       );
       basisByYear[year] = fact.basis;
-      sourceByYear[year] = sourceMetadataFor([fact.sourceId], sourceDocuments);
-      officialInstitutionLabelByYear[year] = fact.officialInstitutionLabel;
     }
 
     if (Object.keys(valuesByYear).length === 0) return null;
@@ -562,13 +431,10 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
       itemId: item.id,
       parentItemId: item.parentItemId,
       level: item.level,
-      detailLabel: item.detailLabel,
-      officialInstitutionLabelByYear,
       kaLabel: item.kaLabel,
       enLabel: item.enLabel,
       color: item.color,
       basisByYear,
-      sourceByYear,
       valuesByYear,
       shareByYear,
       change: startYear === undefined || endYear === undefined ? null : changeBetween(valuesByYear[startYear] ?? null, valuesByYear[endYear] ?? null),
@@ -587,7 +453,7 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
   // Movers and summary rank top-level scope items only; ministry major programs
   // stay selectable series but must not compete with their own parent categories.
   const summaryRows = allItemRows.filter((row) => row.level !== "major_program");
-  const { summary, topGrowth, bottomGrowth } = buildSummary(summaryRows, totalRow, years);
+  const { topGrowth, bottomGrowth } = buildGrowthBoards(summaryRows, years);
 
   return {
     years,
@@ -597,7 +463,6 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     tableRows: selectedRows,
     totalRow,
     comparisonRows: allItemRows,
-    summary,
     topGrowth,
     bottomGrowth,
     hasPlannedValues: selectedPoints.some((point) => point.basis === "planned"),

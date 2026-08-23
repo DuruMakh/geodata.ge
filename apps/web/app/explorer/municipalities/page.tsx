@@ -8,6 +8,7 @@ import {
   buildCountryListRow,
   buildMunicipalListRows,
   latestReviewedAtForMunicipalFacts,
+  MUNICIPAL_COUNTRY_BUDGET_COUNT,
   MUNICIPAL_PER_RESIDENT_YEAR,
 } from "../../../lib/explorer/municipalData";
 import { formatPerResidentGel } from "../../../lib/explorer/format";
@@ -75,6 +76,7 @@ export default async function MunicipalitiesIndexPage() {
           municipalities={list.municipalities}
           regions={list.regions}
           country={buildCountryListRow(countryTotalFacts, comparisonYear)}
+          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). რუკა ბიუჯეტს ერთ მოსახლეზე ასახავს (${comparisonYear}). რუკა და მუნიციპალიტეტების სია ${municipalities.length} მუნიციპალიტეტს მოიცავს, „საქართველოს“ ჯამი კი ${MUNICIPAL_COUNTRY_BUDGET_COUNT} ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს და დამატებით მოიცავს აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივ გადასახდელებს — ამიტომ რეგიონების ჯამი ქვეყნის ჯამზე ნაკლებია.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
           kpis={buildIndexKpis({
             municipalities,
             totalFacts,

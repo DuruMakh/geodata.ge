@@ -1,12 +1,14 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { buildSeriesPanelRows } from "../../components/main-explorer/series-panel";
+import { buildSeriesPanelRows, SeriesPanel, topLevelIds } from "../../components/main-explorer/series-panel";
+import { SeriesSelector } from "../../components/main-explorer/series-selector";
 import type { ExplorerItem } from "../../lib/explorer/types";
 
 function item(partial: Partial<ExplorerItem> & Pick<ExplorerItem, "id" | "kaLabel" | "level">): ExplorerItem {
   return {
     side: "expenditure",
     parentItemId: null,
-    detailLabel: null,
     enLabel: partial.kaLabel,
     color: "#B3402A",
     sortOrder: 1,
@@ -78,5 +80,79 @@ describe("series panel rows", () => {
   it("keeps the total first while search filters categories", () => {
     expect(buildSeriesPanelRows(items, "health", []).map((row) => row.item.id)).toEqual(["admin_spending.total", "admin_spending.health"]);
     expect(buildSeriesPanelRows(items, "does-not-exist", []).map((row) => row.item.id)).toEqual(["admin_spending.total"]);
+  });
+});
+
+// The bulk control and primary denominator share one domain: the rows the panel
+// lists before any caret is opened. A separate program count keeps selected
+// children visible without making ყველას მონიშვნა chart collapsed programs.
+describe("bulk selection domain", () => {
+  it("counts the total and its categories, never the collapsed programs", () => {
+    expect(topLevelIds(items)).toEqual(["admin_spending.total", "admin_spending.education", "admin_spending.health"]);
+  });
+
+  it("stays the same when a ministry is expanded", () => {
+    const expanded = buildSeriesPanelRows(items, "", ["admin_spending.education"]);
+
+    expect(expanded).toHaveLength(5);
+    expect(topLevelIds(items)).toHaveLength(3);
+  });
+
+  it("reports selected top-level rows and programs as separate counts", () => {
+    const markup = renderToStaticMarkup(
+      createElement(SeriesPanel, {
+        items,
+        rows: [],
+        scope: "ministries",
+        showGrouping: true,
+        grouping: "ministries",
+        selectedIds: ["admin_spending.total", "admin_program.general_education"],
+        endYear: 2025,
+        expandedIds: ["admin_spending.education"],
+        onGroupingChange: () => {},
+        onSelectionChange: () => {},
+        onToggle: () => {},
+        onToggleExpanded: () => {},
+        downloadAction: createElement("div"),
+      }),
+    );
+    const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+
+    expect(visibleText).toContain("ძირითადი 1 / 3 · პროგრამები 1");
+  });
+});
+
+// buildSeriesPanelRows pins the total regardless of the query (asserted above),
+// so the empty state cannot claim there is nothing to see — it has to name the
+// thing that actually missed.
+describe("empty state", () => {
+  function emptyStateMarkup(): string {
+    // SeriesSelector requires children, so they belong in the props value —
+    // tests are collected as .ts only, so JSX is not available here.
+    const props = {
+      query: "zzzqqq",
+      onQueryChange: () => {},
+      searchPlaceholder: "ძებნა",
+      selectedCount: 1,
+      totalCount: 15,
+      hasSelection: true,
+      allSelected: false,
+      onToggleAll: () => {},
+      hasVisibleMatches: false,
+      children: createElement("div", null, "მთლიანი ხარჯი"),
+    };
+
+    return renderToStaticMarkup(createElement(SeriesSelector, props));
+  }
+
+  it("does not claim zero results while the pinned total is still listed", () => {
+    const markup = emptyStateMarkup();
+
+    expect(markup).toContain("მთლიანი ხარჯი");
+    expect(markup).not.toContain("0 შედეგი");
+  });
+
+  it("says the query matched no categories", () => {
+    expect(emptyStateMarkup()).toContain("კატეგორია");
   });
 });

@@ -21,7 +21,39 @@ function contrastRatio(foreground: string, background: string): number {
   return (values[0] + 0.05) / (values[1] + 0.05);
 }
 
-test("renders 65 globally ordered accessible map targets and two inert overlays", async ({ page }) => {
+test("states where the index figures come from and what the map measures", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+
+  // The page publishes a choropleth, four fiscal KPIs and 64 ranked budgets.
+  // Every other data surface carries a source note; this one had none, and #68
+  // also removed the intro paragraph and the map's measure-and-year heading, so
+  // the ramp legend read only "ერთ მოსახლეზე" with no year attached.
+  const note = page.getByTestId("municipal-source-note");
+  await expect(note).toBeVisible();
+  await expect(note).toContainText("საქართველოს ფინანსთა სამინისტრო");
+  await expect(note).toContainText("ბოლო განახლება");
+
+  // Region rows sum the 64 served municipalities and sit directly beneath a
+  // "საქართველო" row built from the 69-unit roll-up; say why they differ.
+  await expect(note).toContainText("69");
+  await expect(note).toContainText("64");
+
+  // #68 removed the visible map heading on purpose and a test below locks that
+  // in, so the measure and its year are stated here rather than reinstated
+  // above the choropleth.
+  await expect(note).toContainText("ერთ მოსახლეზე");
+  await expect(note).toContainText("2025");
+
+  // The choropleth is a vendored OSM derivative, so ODbL §4.3 attribution rides
+  // on the note wherever the map is publicly used — DESIGN.md §20 specifies the
+  // link and the licence name here, not on the methodology page alone.
+  const attribution = note.getByRole("link", { name: /OpenStreetMap/ });
+  await expect(attribution).toHaveAttribute("href", "https://www.openstreetmap.org/copyright");
+  await expect(note).toContainText("ODbL");
+});
+
+test("renders 64 globally ordered accessible map targets behind one tab stop", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
   const map = page.getByTestId("municipality-map");
@@ -30,7 +62,11 @@ test("renders 65 globally ordered accessible map targets and two inert overlays"
   await expect(map.locator("[data-occupied-overlay]")).toHaveCount(2);
 
   const targets = map.locator("[data-municipality-map-target]");
-  await expect(targets).toHaveCount(65);
+  // One target per municipality. Tbilisi (04) is the only entity the artifact
+  // carries as both a polygon and a self-governing-city marker; the marker is
+  // the encoding the legend names, so the polygon stays drawn but is not a
+  // second focus stop announcing the same name.
+  await expect(targets).toHaveCount(64);
   const targetMetadata = await targets.evaluateAll((elements) =>
     elements.map((element) => {
       const label = element.getAttribute("aria-label") ?? "";
@@ -45,20 +81,21 @@ test("renders 65 globally ordered accessible map targets and two inert overlays"
   );
   const codes = targetMetadata.map(({ code }) => code);
   expect(new Set(codes).size).toBe(64);
-  expect(codes).toHaveLength(65);
+  expect(codes).toHaveLength(64);
   expect(targetMetadata.every(({ role }) => role === "link")).toBe(true);
-  expect(targetMetadata.every(({ tabIndex }) => tabIndex === "0")).toBe(true);
+
+  // Roving tabindex: the map is one stop on the way to the ranked list, not 65.
+  // The picker component already avoids this — its comment says "Tab must not
+  // stop at all ~75 of them one by one" — and the map now matches it.
+  expect(targetMetadata.filter(({ tabIndex }) => tabIndex === "0")).toHaveLength(1);
+  expect(targetMetadata.filter(({ tabIndex }) => tabIndex === "-1")).toHaveLength(63);
   expect(
     targetMetadata.every(({ label }) => /[\u10A0-\u10FF].+მუნიციპალიტეტის გახსნა$/.test(label)),
   ).toBe(true);
 
   const names = targetMetadata.map(({ name }) => name);
   expect(names).toEqual(names.toSorted((left, right) => left.localeCompare(right, "ka")));
-  const tbilisiIndexes = targetMetadata
-    .map(({ code }, index) => (code === "04" ? index : -1))
-    .filter((index) => index >= 0);
-  expect(tbilisiIndexes).toHaveLength(2);
-  expect(tbilisiIndexes[1]).toBe(tbilisiIndexes[0] + 1);
+  expect(targetMetadata.filter(({ code }) => code === "04")).toHaveLength(1);
 
   await map.scrollIntoViewIfNeeded();
   const markersAreTopmostAtTheirCenters = await map.locator("[data-municipality-marker]").evaluateAll((markers) =>
@@ -81,6 +118,32 @@ test("renders 65 globally ordered accessible map targets and two inert overlays"
     );
   });
   expect(overlaysFollowTargets).toBe(true);
+});
+
+test("moves between map targets with arrow keys instead of 65 tab stops", async ({ page }) => {
+  await page.goto("http://localhost:3100/explorer/municipalities");
+  await expectMunicipalAppReady(page);
+
+  const map = page.getByTestId("municipality-map");
+  const first = map.locator("[data-municipality-map-target]").first();
+  await first.focus();
+
+  const focusedCode = () => page.evaluate(() => document.activeElement?.getAttribute("data-municipality-code") ?? null);
+  const start = await focusedCode();
+
+  await page.keyboard.press("ArrowRight");
+  const next = await focusedCode();
+  expect(next).not.toBe(start);
+
+  await page.keyboard.press("ArrowLeft");
+  expect(await focusedCode()).toBe(start);
+
+  await page.keyboard.press("End");
+  const last = await focusedCode();
+  expect(last).not.toBe(start);
+
+  await page.keyboard.press("Home");
+  expect(await focusedCode()).toBe(start);
 });
 
 test("polygon and marker clicks open municipality pages directly", async ({ page }) => {
@@ -124,10 +187,9 @@ test("occupied overlays expose no interaction or public explanation", async ({ p
   await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
 });
 
-test("keeps the municipality index free of the source note", async ({ page }) => {
+test("keeps occupied-area and no-data wording out of the map itself", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
-  await expect(page.getByTestId("municipal-source-note")).toHaveCount(0);
   await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
   await expect(page.getByTestId("municipality-map")).not.toContainText(/მონაცემები არ არის|no data/i);
 });
@@ -180,11 +242,14 @@ test("Tbilisi path and marker activate together while only the map-origin target
   const path = page.getByTestId("municipality-shape-04");
   const marker = page.getByTestId("municipality-marker-04");
 
-  await path.focus();
+  // The polygon co-highlights with its marker on hover and still opens Tbilisi
+  // on click, but it is aria-hidden and unfocusable: one municipality, one
+  // accessible name, one stop.
+  await path.dispatchEvent("mouseover");
   await expect(path).toHaveAttribute("data-active", "true");
   await expect(marker).toHaveAttribute("data-active", "true");
-  await expect(path).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
-  await expect(marker).not.toHaveAttribute("aria-describedby");
+  await expect(path).toHaveAttribute("aria-hidden", "true");
+  await expect(path).not.toHaveAttribute("tabindex");
 
   await marker.focus();
   await expect(path).toHaveAttribute("data-active", "true");

@@ -13,7 +13,7 @@
   --hairline: #D9CFBE;
   --hairline-soft: #E7DECF;
   --row-border: #EDE4D3;
-  --control: #C9BEA9;
+  --control: #95846A;
   --accent: #B3402A;
   --positive: #1F6E56;
   --negative: #B3402A;
@@ -81,7 +81,7 @@ select:focus-visible,
 input:focus-visible,
 a:focus-visible,
 summary:focus-visible {
-  outline: 2px solid rgba(179, 64, 42, 0.4);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 

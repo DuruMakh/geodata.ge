@@ -4,7 +4,6 @@ import { MunicipalExplorer } from "../../../../components/municipalities/municip
 import { BreadcrumbJsonLd } from "../../../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../lib/data/servedData";
-import { sourceDocumentsFor } from "../../../../lib/data/sources";
 import { MUNICIPAL_COUNTRY_ID } from "../../../../lib/data/municipal/types";
 import {
   buildCountryTotalByYear,
@@ -115,11 +114,6 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
           functions={functions}
           functionFacts={own.functionFacts}
           totalFacts={own.totalFacts}
-          // Narrowed to the documents these rows cite: the full 104-row
-          // registry is ~31 KB, embedded once per static page. lastUpdatedAt
-          // above is computed from the unnarrowed registry, so the displayed
-          // date is unchanged.
-          sourceDocuments={sourceDocumentsFor(sourceDocuments, [...own.functionFacts, ...own.totalFacts])}
           metrics={{
             kind: "ranked",
             nationalTotalByYear,

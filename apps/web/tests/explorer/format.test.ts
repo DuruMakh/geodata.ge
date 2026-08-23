@@ -34,6 +34,11 @@ describe("editorial formatters", () => {
     expect(formatAmount(0)).toBe("0.00 მლნ ₾");
   });
 
+  it("keeps the direction sign on a signed amount below the display threshold", () => {
+    expect(formatSignedAmount(67.79)).toBe("+<0.01 მლნ ₾");
+    expect(formatSignedAmount(-67.79)).toBe(">−0.01 მლნ ₾");
+  });
+
   it("switches units at the rounded-billion boundary", () => {
     expect(formatAmount(999_499_999)).toBe("999 მლნ ₾");
     expect(formatAmount(999_500_000)).toBe("1.0 მლრდ ₾");

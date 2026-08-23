@@ -3,7 +3,6 @@ import { buildExplorerModel, getDefaultSelection, isDerivedTotalItemId } from ".
 import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
-import type { SourceDocumentRow } from "../../lib/data/sources";
 import type { ServedNationalGdpFact } from "../../lib/servedRows";
 
 const glossary = new Map<string, GlossaryEntry>([
@@ -21,27 +20,6 @@ const facts: BudgetFactImportRow[] = [
   { year: 2024, side: "expenditure", itemId: "spending.education", amountGel: 300, basis: "actual", sourceId: "source.one", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: "spending.education", mappingConfidence: "high", mappingNotes: "" },
   { year: 2025, side: "expenditure", itemId: "spending.education", amountGel: 300, basis: "actual", sourceId: "source.two", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: "spending.education", mappingConfidence: "high", mappingNotes: "" },
   { year: 2025, side: "revenue", itemId: "revenue.vat", amountGel: 500, basis: "planned", sourceId: "source.two", officialInstitution: null, officialProgram: null, officialSubprogram: null, publicSpendingFieldId: null, mappingConfidence: null, mappingNotes: "" },
-];
-
-const sourceDocuments: SourceDocumentRow[] = [
-  {
-    sourceId: "source.one",
-    sourceName: "Reviewed 2024 execution",
-    sourceUrlOrFile: "docs/source-2024",
-    lastReviewedAt: "2026-05-10",
-  },
-  {
-    sourceId: "source.two",
-    sourceName: "Reviewed 2025 planned budget scenario",
-    sourceUrlOrFile: "docs/source-2025-plan",
-    lastReviewedAt: "2026-05-11",
-  },
-  {
-    sourceId: "source.gdp",
-    sourceName: "Reviewed nominal GDP",
-    sourceUrlOrFile: "docs/gdp.xlsx",
-    lastReviewedAt: "2026-08-13",
-  },
 ];
 
 const gdpFacts: ServedNationalGdpFact[] = [
@@ -152,7 +130,6 @@ describe("main explorer data model", () => {
     const model = buildExplorerModel({
       facts,
       glossary,
-      sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["expenditure.total"],
       startYear: 2024,
@@ -167,19 +144,12 @@ describe("main explorer data model", () => {
       expect.objectContaining({ year: 2025, value: 450, basis: "planned" }),
     ]);
     expect(model.hasPlannedValues).toBe(true);
-    expect(model.tableRows.find((row) => row.itemId === "expenditure.total")?.sourceByYear[2025]).toEqual({
-      sourceName: "Reviewed 2025 planned budget scenario",
-      sourceUrlOrFile: "docs/source-2025-plan",
-      lastReviewedAt: "2026-05-11",
-    });
-    expect(model.summary.biggestShareChange).not.toBeNull();
   });
 
   it("uses readable Georgian labels for derived total series", () => {
     const expenditureModel = buildExplorerModel({
       facts,
       glossary,
-      sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["expenditure.total"],
       startYear: 2024,
@@ -189,7 +159,6 @@ describe("main explorer data model", () => {
     const revenueModel = buildExplorerModel({
       facts,
       glossary,
-      sourceDocuments,
       side: "revenue",
       selectedItemIds: ["revenue.total"],
       startYear: 2025,
@@ -203,7 +172,6 @@ describe("main explorer data model", () => {
       adminCategories: new Map(),
       expenditureGrouping: "ministries",
       glossary,
-      sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["admin_spending.total"],
       startYear: 2024,
@@ -223,7 +191,6 @@ describe("main explorer data model", () => {
     const model = buildExplorerModel({
       facts,
       glossary,
-      sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["spending.health"],
       startYear: 2024,
@@ -255,7 +222,6 @@ describe("main explorer data model", () => {
     const expenditureModel = buildExplorerModel({
       facts: localFacts,
       glossary,
-      sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["expenditure.total"],
       startYear: 2024,
@@ -265,7 +231,6 @@ describe("main explorer data model", () => {
     const revenueModel = buildExplorerModel({
       facts: localFacts,
       glossary,
-      sourceDocuments,
       side: "revenue",
       selectedItemIds: ["revenue.total"],
       startYear: 2024,
@@ -294,7 +259,6 @@ describe("main explorer data model", () => {
       adminCategories,
       expenditureGrouping: "ministries",
       glossary,
-      sourceDocuments,
       side: "expenditure",
       selectedItemIds: [
         "admin_spending.total",
@@ -315,10 +279,10 @@ describe("main explorer data model", () => {
       "admin_program.education.general",
     ]);
     expect(model.items.find((item) => item.id === "admin_spending.total")).toEqual(
-      expect.objectContaining({ parentItemId: null, level: "total", detailLabel: null }),
+      expect.objectContaining({ parentItemId: null, level: "total" }),
     );
     expect(model.items.find((item) => item.id === "admin_spending.health_social_affairs")).toEqual(
-      expect.objectContaining({ parentItemId: null, level: "admin_category", detailLabel: null, enLabel: "Health ministry" }),
+      expect.objectContaining({ parentItemId: null, level: "admin_category", enLabel: "Health ministry" }),
     );
     expect(model.items.find((item) => item.id === "admin_program.education.general")).toEqual(
       expect.objectContaining({
@@ -327,7 +291,6 @@ describe("main explorer data model", () => {
         kaLabel: "General education",
         enLabel: "General education",
         // Drill-down programs are surfaced by name only; the official code is not shown.
-        detailLabel: null,
       }),
     );
     expect(model.items.some((item) => item.id.startsWith("spending."))).toBe(false);
@@ -361,7 +324,6 @@ describe("main explorer data model", () => {
       adminCategories,
       expenditureGrouping: "ministries",
       glossary,
-      sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["admin_spending.total", "admin_program.education.general"],
       startYear: 2025,
@@ -375,36 +337,10 @@ describe("main explorer data model", () => {
     );
   });
 
-  it("treats the biggest share-of-GDP change as the largest movement in either direction", () => {
-    const localFacts: BudgetFactImportRow[] = [
-      { ...facts[0], itemId: "spending.health", amountGel: 900 },
-      { ...facts[1], itemId: "spending.health", amountGel: 100 },
-      { ...facts[2], itemId: "spending.education", amountGel: 100 },
-      { ...facts[3], itemId: "spending.education", amountGel: 250 },
-      { ...facts[2], itemId: "spending.social", amountGel: 100 },
-      { ...facts[3], itemId: "spending.social", amountGel: 150 },
-    ];
-
-    const model = buildExplorerModel({
-      facts: localFacts,
-      glossary,
-      sourceDocuments,
-      side: "expenditure",
-      selectedItemIds: ["expenditure.total"],
-      startYear: 2024,
-      endYear: 2025,
-      measure: "nominal",
-      gdpFacts,
-    });
-
-    expect(model.summary.biggestShareChange?.itemId).toBe("spending.health");
-  });
-
-  it("calculates share of GDP and keeps per-point nominal percent change", () => {
+  it("calculates share of GDP", () => {
     const shareModel = buildExplorerModel({
       facts,
       glossary,
-      sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["spending.health"],
       startYear: 2024,
@@ -413,8 +349,6 @@ describe("main explorer data model", () => {
       gdpFacts,
     });
 
-    expect(shareModel.points[0]?.percentChange).toBeNull();
-    expect(shareModel.points[1]?.percentChange).toBe(0.5);
     expect(shareModel.points[1]?.value).toBeCloseTo(0.075, 4);
   });
 
@@ -428,7 +362,6 @@ describe("main explorer data model", () => {
         facts: localFacts,
         gdpFacts,
         glossary,
-        sourceDocuments,
         side: "expenditure",
         selectedItemIds,
         startYear: 2025,
@@ -446,7 +379,6 @@ describe("main explorer data model", () => {
     expect(one.gdpByYear[2025]).toMatchObject({
       gdpCurrentPricesGel: 2_000,
       status: "preliminary",
-      source: { sourceName: "Reviewed nominal GDP" },
     });
   });
 
@@ -455,7 +387,6 @@ describe("main explorer data model", () => {
       facts,
       gdpFacts: gdpFacts.filter((row) => row.year !== 2025),
       glossary,
-      sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["spending.health"],
       startYear: 2024,
@@ -465,8 +396,6 @@ describe("main explorer data model", () => {
 
     expect(model.points.find((point) => point.year === 2025)?.value).toBeNull();
     expect(model.tableRows[0]?.shareByYear?.[2025]).toBeNull();
-    expect(model.points.find((point) => point.year === 2025)?.amountGel).toBe(150);
-    expect(model.summary.biggestShareChange).toBeNull();
   });
 
   it("preserves negative revenue corrections as negative GDP shares", () => {
@@ -474,7 +403,6 @@ describe("main explorer data model", () => {
       facts: [{ ...facts[4], amountGel: -20 }],
       gdpFacts,
       glossary,
-      sourceDocuments,
       side: "revenue",
       selectedItemIds: ["revenue.vat"],
       startYear: 2025,
@@ -495,7 +423,6 @@ describe("main explorer data model", () => {
     const model = buildExplorerModel({
       facts: localFacts,
       glossary,
-      sourceDocuments,
       side: "expenditure",
       selectedItemIds: ["expenditure.total"],
       startYear: 2004,
@@ -504,17 +431,12 @@ describe("main explorer data model", () => {
     });
 
     expect(model.years).toEqual([2004, 2005, 2006]);
-    expect(model.points.map((point) => [point.year, point.amountGel])).toEqual([
+    expect(model.points.map((point) => [point.year, point.value])).toEqual([
       [2004, 1000],
       [2005, 1100],
       [2006, 1200],
     ]);
     expect(model.items.map((item) => item.id)).toEqual(["expenditure.total", "spending.education", "spending.health"]);
     expect(model.comparisonRows.map((row) => row.itemId)).toEqual(["spending.education", "spending.health"]);
-    expect(model.totalRow?.sourceByYear[2004]).toEqual({
-      sourceName: "Reviewed 2024 execution",
-      sourceUrlOrFile: "docs/source-2024",
-      lastReviewedAt: "2026-05-10",
-    });
   });
 });
