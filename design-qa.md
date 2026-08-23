@@ -147,25 +147,26 @@ final result: passed
 ### Source and implementation evidence
 
 - Approved source: `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\design-shotgun\homepage-below-hero-2026-08-23\variant-j.html`.
-- Source viewport captures: `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\source-desktop.png`, `source-390.png`, and `source-320.png`.
-- Final production implementation captures: `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\implementation-production-desktop.png`, `implementation-production-390.png`, and `implementation-production-320.png`.
+- Stable evidence root: `C:\Users\Mylaptop\.codex\visualizations\2026\08\23\01a02e01-a48a-79e3-b3f8-181357f18f4d\homepage-redesign-qa`.
+- Source viewport captures: `C:\Users\Mylaptop\.codex\visualizations\2026\08\23\01a02e01-a48a-79e3-b3f8-181357f18f4d\homepage-redesign-qa\source-desktop.png`, `source-390.png`, and `source-320.png`.
+- Final production implementation captures: `C:\Users\Mylaptop\.codex\visualizations\2026\08\23\01a02e01-a48a-79e3-b3f8-181357f18f4d\homepage-redesign-qa\implementation-production-desktop.png`, `implementation-production-390.png`, and `implementation-production-320.png`.
 - Viewports were 1366×768, 390×844, and 320×844 CSS pixels. Every viewport capture has the same pixel dimensions as its CSS viewport, so source and implementation are normalized at 1 CSS pixel to 1 image pixel with no scaling.
 - Full-page source/implementation sizes were 1366×2763 / 1366×2505, 390×2966 / 390×3689, and 320×2992 / 320×3902 pixels. Full-page composites are top-aligned at the same viewport width and density with a 16px paper-colored gutter; neither side is rescaled.
 
 ### Full-view comparison evidence
 
-- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-desktop-full.png`
-- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-390-full.png`
-- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-320-full.png`
+- `C:\Users\Mylaptop\.codex\visualizations\2026\08\23\01a02e01-a48a-79e3-b3f8-181357f18f4d\homepage-redesign-qa\comparison-final-desktop-full.png`
+- `C:\Users\Mylaptop\.codex\visualizations\2026\08\23\01a02e01-a48a-79e3-b3f8-181357f18f4d\homepage-redesign-qa\comparison-final-390-full.png`
+- `C:\Users\Mylaptop\.codex\visualizations\2026\08\23\01a02e01-a48a-79e3-b3f8-181357f18f4d\homepage-redesign-qa\comparison-final-320-full.png`
 - First-viewport comparisons are `comparison-final-desktop-viewport.png`, `comparison-final-390-viewport.png`, and `comparison-final-320-viewport.png` in the same directory.
 
 The full-page evidence covers the entire fixed order: header, preserved living-relief hero, one-row country figures, annual masthead, expenditure, revenue, municipalities, the single methodology ledger, and the retained production footer. The implementation is taller on narrow screens because the real footer retains its complete navigation, source, update, contact, and licence content; Variant J has only a two-item prototype footer. This is an approved product-content difference, not a layout defect.
 
 ### Focused-region evidence
 
-- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-desktop-data.png`
-- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-390-data.png`
-- `C:\Users\Mylaptop\.codex\worktrees\b9c1\Geodata.ge\apps\web\test-results\homepage-redesign-qa\comparison-final-320-data.png`
+- `C:\Users\Mylaptop\.codex\visualizations\2026\08\23\01a02e01-a48a-79e3-b3f8-181357f18f4d\homepage-redesign-qa\comparison-final-desktop-data.png`
+- `C:\Users\Mylaptop\.codex\visualizations\2026\08\23\01a02e01-a48a-79e3-b3f8-181357f18f4d\homepage-redesign-qa\comparison-final-390-data.png`
+- `C:\Users\Mylaptop\.codex\visualizations\2026\08\23\01a02e01-a48a-79e3-b3f8-181357f18f4d\homepage-redesign-qa\comparison-final-320-data.png`
 
 These anchor-aligned captures compare the annual masthead, section 01 copy, double-rule total, latest-year/status block, and four-row semantic table at all three widths. They make the responsive index → copy → data order, table fit, amount formatting, and rule hierarchy readable without relying on the resized full-page composites.
 
@@ -191,5 +192,6 @@ Fresh checks against the production build at each viewport found no console warn
 - Pass 1 used the required focused-browser captures from the development server. The page composition and containment were correct, but the development-only Next `N` badge obscured section 01 in the implementation evidence. This was recorded as a P2 evidence defect, not a production UI defect.
 - Fix: built the optimized static application, served it with `next start`, and recaptured every viewport, full page, and focused annual state from the production server.
 - Pass 2: the badge is absent, no content is obscured, and repeated inspection of typography, rhythm, tokens, asset fidelity, copy, tables, footer, responsive containment, focus, links, and console state found no remaining actionable P0/P1/P2 mismatch within Task 2.
+- Fix round 1: after the covering Playwright run completed, all 18 source/implementation captures and nine comparisons were regenerated directly in the stable visualization workspace. `Test-Path` returned `True` and every file had a non-zero size (27/27). All nine regenerated comparison PNGs were visually inspected again; typography, clipping, spacing, responsive containment, source fidelity, and the prior final result remain unchanged.
 
 final result: passed

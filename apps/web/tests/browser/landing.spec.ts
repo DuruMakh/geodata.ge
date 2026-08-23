@@ -61,6 +61,7 @@ test("landing renders the approved latest-year data composition", async ({ page 
   await expect(figures).toContainText("2026 წლის 1 იანვარი · საქსტატი");
   await expect(figures).toContainText("69.7");
   await expect(figures).toContainText("104.6");
+  await expectNoPageOverflow(page);
 
   const orderedHeadings = await page.locator("#data h2").allTextContents();
   expect(orderedHeadings).toEqual([
@@ -78,7 +79,7 @@ test("landing renders the approved latest-year data composition", async ({ page 
   ]) {
     const section = page.getByTestId(testId);
     await expect(section.getByTestId("landing-dataset-total")).toBeVisible();
-    await expect(section.locator("tbody tr")).toHaveCount(4);
+    await expectDatasetTableFits(page, testId);
     await expect(section.locator("tbody tr").first().getByRole("rowheader")).not.toBeEmpty();
     await expect(section.locator("tbody tr").first().getByRole("cell")).toHaveCount(2);
     const latestYear = await section.getByTestId("landing-dataset-total").locator("strong").textContent();
