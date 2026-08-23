@@ -73,4 +73,4 @@ configuration, and unrelated files were not changed.
 
 ## Commit
 
-Pending local commit.
+`69c13fc4d8eb18923d104d3473d2ca03f7ae46eb` — `Remove homepage annual masthead`
