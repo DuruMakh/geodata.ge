@@ -123,18 +123,19 @@ const sourceDocuments: SourceDocumentRow[] = [
 const facts: ServedBudgetFact[] = [
   { year: 2025, side: "expenditure", itemId: "spending.alpha", amountGel: 400, basis: "planned", sourceId: "source.a" },
   { year: 2025, side: "expenditure", itemId: "spending.alpha", amountGel: 40, basis: "actual", sourceId: "source.a" },
-  { year: 2025, side: "expenditure", itemId: "spending.beta", amountGel: 40, basis: "planned", sourceId: "source.a" },
+  { year: 2025, side: "expenditure", itemId: "spending.beta", amountGel: 40, basis: "actual", sourceId: "source.a" },
   { year: 2025, side: "expenditure", itemId: "spending.gamma", amountGel: 30, basis: "actual", sourceId: "source.a" },
   { year: 2025, side: "expenditure", itemId: "spending.delta", amountGel: 20, basis: "actual", sourceId: "source.a" },
   { year: 2025, side: "expenditure", itemId: "spending.epsilon", amountGel: 10, basis: "actual", sourceId: "source.a" },
-  { year: 2025, side: "expenditure", itemId: "expenditure.total", amountGel: 999, basis: "actual", sourceId: "source.a" },
+  { year: 2025, side: "expenditure", itemId: "expenditure.total", amountGel: 999, basis: "planned", sourceId: "source.a" },
+  { year: 2026, side: "expenditure", itemId: "expenditure.total", amountGel: 1_100, basis: "actual", sourceId: "source.a" },
   { year: 2004, side: "revenue", itemId: "revenue.alpha", amountGel: 1, basis: "actual", sourceId: "source.a" },
   { year: 2024, side: "revenue", itemId: "revenue.alpha", amountGel: 50, basis: "planned", sourceId: "source.a" },
   { year: 2024, side: "revenue", itemId: "revenue.beta", amountGel: 20, basis: "planned", sourceId: "source.a" },
   { year: 2024, side: "revenue", itemId: "revenue.gamma", amountGel: 15, basis: "planned", sourceId: "source.a" },
   { year: 2024, side: "revenue", itemId: "revenue.delta", amountGel: 10, basis: "planned", sourceId: "source.a" },
   { year: 2024, side: "revenue", itemId: "revenue.epsilon", amountGel: 5, basis: "planned", sourceId: "source.a" },
-  { year: 2024, side: "revenue", itemId: "revenue.total", amountGel: 100, basis: "planned", sourceId: "source.a" },
+  { year: 2026, side: "revenue", itemId: "revenue.total", amountGel: 120, basis: "actual", sourceId: "source.a" },
 ];
 
 const municipalities: Municipality[] = [
@@ -180,7 +181,7 @@ const municipalCountryTotalFacts = [municipalTotal(2025, "country.georgia", 900)
 
 - [ ] **Step 2: Write failing summary-contract tests**
 
-Add these assertions. They intentionally prove that a non-city can rank first, equal amounts use stable IDs, derived totals are ignored, planned duplicates lose to actuals, and absent facts do not become zero rows:
+Add these assertions. They intentionally prove that a non-city can rank first, equal amounts use stable IDs, explicit totals stay out of ranking rows but remain the applicable total, a total-only future year does not advance a section, planned duplicates lose to actuals, and absent facts do not become zero rows:
 
 ```ts
 describe("landing model", () => {
@@ -193,8 +194,8 @@ describe("landing model", () => {
     municipalCountryTotalFacts,
   });
 
-  it("derives national latest years after actual-over-planned selection", () => {
-    expect(model.expenditure).toMatchObject({ latestYear: 2025, totalGel: 140, basis: "mixed" });
+  it("uses the active explicit total for the latest detail year", () => {
+    expect(model.expenditure).toMatchObject({ latestYear: 2025, totalGel: 999, basis: "mixed" });
     expect(model.expenditure.rows.map((row) => row.id)).toEqual([
       "spending.alpha",
       "spending.beta",
@@ -202,10 +203,15 @@ describe("landing model", () => {
       "spending.delta",
     ]);
     expect(model.expenditure.rows[0]).toMatchObject({ labelKa: "ალფა", amountGel: 40 });
-    expect(model.expenditure.rows[0]!.share).toBeCloseTo(40 / 140);
+    expect(model.expenditure.rows[0]!.share).toBeCloseTo(40 / 999);
+  });
 
+  it("falls back to the latest detail sum when an explicit total is absent", () => {
     expect(model.revenue).toMatchObject({ latestYear: 2024, totalGel: 100, basis: "planned" });
     expect(model.revenue.rows).toHaveLength(4);
+  });
+
+  it("keeps shared context and independently derived latest years", () => {
     expect(model.yearsLabel).toBe("2004–2024");
     expect(model.updatedAt).toBe("2026-06-01");
     expect(model.commonLatestYear).toBeNull();
@@ -299,15 +305,17 @@ function buildNationalSummary(
   glossary: Map<string, GlossaryEntry>,
   side: ServedBudgetFact["side"],
 ): LandingDatasetSummary {
-  const sideFacts = activeFacts.filter((fact) => fact.side === side && !isDerivedTotalItemId(fact.itemId));
-  const latestYear = sideFacts.map((fact) => fact.year).sort((left, right) => left - right).at(-1) ?? 0;
-  const latestFacts = sideFacts.filter((fact) => fact.year === latestYear);
-  const totalGel = latestFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
+  const detailFacts = activeFacts.filter((fact) => fact.side === side && !isDerivedTotalItemId(fact.itemId));
+  const latestYear = detailFacts.map((fact) => fact.year).sort((left, right) => left - right).at(-1) ?? 0;
+  const latestFacts = detailFacts.filter((fact) => fact.year === latestYear);
+  const totalId = side === "revenue" ? "revenue.total" : "expenditure.total";
+  const explicitTotal = activeFacts.find((fact) => fact.year === latestYear && fact.itemId === totalId);
+  const totalGel = explicitTotal?.amountGel ?? latestFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
 
   return {
     latestYear,
     totalGel,
-    basis: basisStatus(latestFacts),
+    basis: basisStatus(explicitTotal ? [...latestFacts, explicitTotal] : latestFacts),
     rows: latestFacts
       .slice()
       .sort((left, right) => right.amountGel - left.amountGel || left.itemId.localeCompare(right.itemId))
@@ -355,10 +363,14 @@ function buildMunicipalSummary(
 }
 ```
 
-Inside `buildLandingModel`, call `chooseActivePublicFacts(facts)` once, preserve the current derived-total filter for the temporary legacy calculations, and create the final summaries:
+Inside `buildLandingModel`, call `chooseActivePublicFacts(facts)` once, keep derived totals out of the lightweight landing context, and pass all active facts to the national summaries so they can apply explicit-total precedence:
 
 ```ts
-const active = chooseActivePublicFacts(facts).filter((fact) => !isDerivedTotalItemId(fact.itemId));
+const active = chooseActivePublicFacts(facts);
+const context = buildLandingContextFromActive(
+  active.filter((fact) => !isDerivedTotalItemId(fact.itemId)),
+  sourceDocuments,
+);
 const expenditure = buildNationalSummary(active, glossary, "expenditure");
 const revenue = buildNationalSummary(active, glossary, "revenue");
 const municipalSummary = buildMunicipalSummary(

@@ -60,15 +60,17 @@ function buildNationalSummary(
   glossary: Map<string, GlossaryEntry>,
   side: ServedBudgetFact["side"],
 ): LandingDatasetSummary {
-  const sideFacts = activeFacts.filter((fact) => fact.side === side && !isDerivedTotalItemId(fact.itemId));
-  const latestYear = sideFacts.map((fact) => fact.year).sort((left, right) => left - right).at(-1) ?? 0;
-  const latestFacts = sideFacts.filter((fact) => fact.year === latestYear);
-  const totalGel = latestFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
+  const detailFacts = activeFacts.filter((fact) => fact.side === side && !isDerivedTotalItemId(fact.itemId));
+  const latestYear = detailFacts.map((fact) => fact.year).sort((left, right) => left - right).at(-1) ?? 0;
+  const latestFacts = detailFacts.filter((fact) => fact.year === latestYear);
+  const totalId = side === "revenue" ? "revenue.total" : "expenditure.total";
+  const explicitTotal = activeFacts.find((fact) => fact.year === latestYear && fact.itemId === totalId);
+  const totalGel = explicitTotal?.amountGel ?? latestFacts.reduce((sum, fact) => sum + fact.amountGel, 0);
 
   return {
     latestYear,
     totalGel,
-    basis: basisStatus(latestFacts),
+    basis: basisStatus(explicitTotal ? [...latestFacts, explicitTotal] : latestFacts),
     rows: latestFacts
       .slice()
       .sort((left, right) => right.amountGel - left.amountGel || left.itemId.localeCompare(right.itemId))
@@ -149,8 +151,11 @@ export function buildLandingModel({
   municipalTotalFacts,
   municipalCountryTotalFacts,
 }: BuildLandingModelInput): LandingModel {
-  const active = chooseActivePublicFacts(facts).filter((fact) => !isDerivedTotalItemId(fact.itemId));
-  const context = buildLandingContextFromActive(active, sourceDocuments);
+  const active = chooseActivePublicFacts(facts);
+  const context = buildLandingContextFromActive(
+    active.filter((fact) => !isDerivedTotalItemId(fact.itemId)),
+    sourceDocuments,
+  );
   const expenditure = buildNationalSummary(active, glossary, "expenditure");
   const revenue = buildNationalSummary(active, glossary, "revenue");
   const municipalSummary = buildMunicipalSummary(municipalities, municipalTotalFacts, municipalCountryTotalFacts);
