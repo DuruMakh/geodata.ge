@@ -1,4 +1,4 @@
-import type { MunicipalComparisonRow, MunicipalIndicatorPresentation, MunicipalKpi, MunicipalMover } from "../../lib/explorer/municipalData";
+import type { MunicipalComparisonRow, MunicipalIndicatorPresentation, MunicipalKpiSet, MunicipalMover } from "../../lib/explorer/municipalData";
 import { formatAmount, formatAmountParts, formatShare, formatSignedAmount } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { Sparkline } from "../ui/sparkline";
@@ -34,7 +34,7 @@ function growthColor(growth: number | null): string {
 }
 
 type MunicipalIndicatorsProps = {
-  kpis: MunicipalKpi[];
+  kpis: MunicipalKpiSet;
   movers: { up: MunicipalMover[]; down: MunicipalMover[] };
   comparison: MunicipalComparisonRow[];
   presentation: MunicipalIndicatorPresentation;
@@ -58,7 +58,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
   const grew = (headline.end ?? 0) >= (headline.start ?? 0);
   const deltaParts = formatAmountParts(Math.abs((headline.end ?? 0) - (headline.start ?? 0)));
   const showSentence = headline.start !== null && headline.end !== null && headline.start !== headline.end;
-  const sideKpis = [kpis[0]!, kpis[2]!, kpis[3]!];
+  const sideKpis = [kpis.official, kpis.largestField, kpis.standing];
 
   return (
     <section data-testid="period-indicators" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">

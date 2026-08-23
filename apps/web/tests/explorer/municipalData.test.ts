@@ -726,7 +726,7 @@ describe("Georgia country aggregate models", () => {
 
   it("labels the country count separately from public municipality pages", () => {
     const countryKpis = buildCountryKpis(build(), 69);
-    expect(countryKpis[3]).toEqual({
+    expect(countryKpis.standing).toEqual({
       label: "მუნიციპალური ბიუჯეტები",
       value: "69",
       detail: "64 საჯარო გვერდი · 5 მხოლოდ საქართველოს ჯამში",
@@ -734,7 +734,7 @@ describe("Georgia country aggregate models", () => {
   });
 
   it("separates the country official-budget number from its GEL unit", () => {
-    const officialBudget = buildCountryKpis(build(), 69)[0]!;
+    const officialBudget = buildCountryKpis(build(), 69).official;
 
     // The fixture total is a handful of lari, far below the მლნ resolution, so
     // it floors rather than printing "0" — a funded budget must never render
@@ -1012,14 +1012,14 @@ describe("buildEntityKpis", () => {
     // leaves, so do not delete it as "redundant" with this one.
     const model = build(2015, 2016);
     const divergent = buildEntityKpis({ model, nationalTotalByYear, rankByYear, rankOutOf: 64 });
-    expect(divergent[0]!.label).toBe("ოფიციალური ბიუჯეტი");
-    expect(divergent[0]!.detail).toContain("ფინანსთა სამინისტროს");
+    expect(divergent.official.label).toBe("ოფიციალური ბიუჯეტი");
+    expect(divergent.official.detail).toContain("ფინანსთა სამინისტროს");
     expect(model.totalRow.valuesByYear[2016]).toBe(300);
     // 300 ₾ is non-zero, so it floors instead of printing "0"; what this test
     // guards is that the KPI reads the official total rather than the
     // functional sum, which the value below still shows.
-    expect(divergent[0]!.value).toBe("<0.01");
-    expect(divergent[0]!.unit).toBe("მლნ ₾");
+    expect(divergent.official.value).toBe("<0.01");
+    expect(divergent.official.unit).toBe("მლნ ₾");
   });
 
   it("keeps a missing official end total missing instead of rendering zero", () => {
@@ -1027,8 +1027,8 @@ describe("buildEntityKpis", () => {
     model.totalRow.valuesByYear[2017] = null;
     const missing = buildEntityKpis({ model, nationalTotalByYear, rankByYear, rankOutOf: 64 });
 
-    expect(missing[0]!.value).toBe(MISSING);
-    expect(missing[0]!.unit).toBe("");
+    expect(missing.official.value).toBe(MISSING);
+    expect(missing.official.unit).toBe("");
   });
 
   it("renders the official total's own formatted string, distinguishable from the functional one", () => {
@@ -1057,30 +1057,30 @@ describe("buildEntityKpis", () => {
       rankByYear,
       rankOutOf: 64,
     });
-    expect(divergent[0]!.value).toBe("350");
-    expect(divergent[0]!.unit).toBe("მლნ ₾");
-    expect(`${divergent[0]!.value} ${divergent[0]!.unit}`).toBe(formatAmount(350_000_000));
-    expect(`${divergent[0]!.value} ${divergent[0]!.unit}`).not.toBe(formatAmount(265_000_000));
+    expect(divergent.official.value).toBe("350");
+    expect(divergent.official.unit).toBe("მლნ ₾");
+    expect(`${divergent.official.value} ${divergent.official.unit}`).toBe(formatAmount(350_000_000));
+    expect(`${divergent.official.value} ${divergent.official.unit}`).not.toBe(formatAmount(265_000_000));
   });
 
   it("reports growth across the selected range", () => {
-    expect(kpis()[1]!.label).toBe("ზრდა 2015-დან");
+    expect(kpis().growth.label).toBe("ზრდა 2015-დან");
   });
 
   it("computes growth from the official total", () => {
     const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rankByYear, rankOutOf: 64 });
-    expect(divergent[1]!.value).toBe("+88%");
-    expect(divergent[1]!.detail).toBe(`${formatAmount(160)} → ${formatAmount(300)}`);
+    expect(divergent.growth.value).toBe("+88%");
+    expect(divergent.growth.detail).toBe(`${formatAmount(160)} → ${formatAmount(300)}`);
   });
 
   it("names the largest function and its share", () => {
-    expect(kpis()[2]!.label).toBe("უმსხვილესი სფერო");
-    expect(kpis()[2]!.detail).toBe("ეკონომიკური საქმიანობა");
+    expect(kpis().largestField.label).toBe("უმსხვილესი სფერო");
+    expect(kpis().largestField.detail).toBe("ეკონომიკური საქმიანობა");
   });
 
   it("reports the municipality's share of the national municipal total, not a per-capita figure", () => {
-    expect(kpis()[3]!.label).toBe("წილი მუნიციპალურ ხარჯებში");
-    expect(kpis()[3]!.value).toBe("50.0%");
+    expect(kpis().standing.label).toBe("წილი მუნიციპალურ ხარჯებში");
+    expect(kpis().standing.value).toBe("50.0%");
   });
 
   it("uses the selected range-end year's national total for the national share", () => {
@@ -1091,13 +1091,13 @@ describe("buildEntityKpis", () => {
       rankOutOf: 64,
     });
 
-    expect(clipped[3]!.value).toBe("50.0%");
+    expect(clipped.standing.value).toBe("50.0%");
   });
 
   // `rankByYear` is a real input read by this KPI's detail, not dead weight on
   // the interface: first place reads პირველი, never მე-1 (georgianOrdinal, Task 3).
   it("names the placement with the georgian ordinal of rank, not just the count it is out of", () => {
-    expect(kpis()[3]!.detail).toBe("პირველი ადგილი 64-დან");
+    expect(kpis().standing.detail).toBe("პირველი ადგილი 64-დან");
   });
 
   it("switches to მე-N for any rank other than first", () => {
@@ -1107,7 +1107,7 @@ describe("buildEntityKpis", () => {
       rankByYear: { 2015: 5, 2016: 5, 2017: 5 },
       rankOutOf: 64,
     });
-    expect(fifth[3]!.detail).toBe("მე-5 ადგილი 64-დან");
+    expect(fifth.standing.detail).toBe("მე-5 ადგილი 64-დან");
   });
 
   it("uses the selected range-end year's rank", () => {
@@ -1118,19 +1118,19 @@ describe("buildEntityKpis", () => {
       rankOutOf: 64,
     });
 
-    expect(historical[3]!.detail).toBe("მე-26 ადგილი 64-დან");
+    expect(historical.standing.detail).toBe("მე-26 ადგილი 64-დან");
   });
 
   it("shares the largest function against the official total", () => {
     const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rankByYear, rankOutOf: 64 });
-    expect(divergent[2]!.value).toBe("66.7%");
+    expect(divergent.largestField.value).toBe("66.7%");
   });
 
   it("shares the national-total KPI against the official total, not the functional one", () => {
     // official (300) / nationalTotalByYear[2016] (740) = 40.5%; functional (265) /
     // 740 would be 35.8%.
     const divergent = buildEntityKpis({ model: build(2015, 2016), nationalTotalByYear, rankByYear, rankOutOf: 64 });
-    expect(divergent[3]!.value).toBe("40.5%");
+    expect(divergent.standing.value).toBe("40.5%");
   });
 });
 
@@ -1264,5 +1264,35 @@ describe("buildPickerGroups", () => {
     const groups = buildPickerGroups(listInput);
     expect(groups).toHaveLength(2);
     expect(groups.every((group) => group.members.length > 0)).toBe(true);
+  });
+});
+
+describe("municipal KPI sets", () => {
+  const nationalTotalByYear = { 2016: 740, 2017: 740 };
+  const rankByYear = { 2015: 1, 2016: 1, 2017: 1 };
+
+  it("names every card so consumers never index positionally", () => {
+    const entity = buildEntityKpis({ model: build(), nationalTotalByYear, rankByYear, rankOutOf: 64 });
+    const country = buildCountryKpis(build(), 69);
+
+    expect(Object.keys(entity)).toEqual(["official", "growth", "largestField", "standing"]);
+    expect(Object.keys(country)).toEqual(["official", "growth", "largestField", "standing"]);
+  });
+
+  it("computes the three shared cards identically for entity and country views", () => {
+    const model = build();
+    const entity = buildEntityKpis({ model, nationalTotalByYear, rankByYear, rankOutOf: 64 });
+    const country = buildCountryKpis(model, 69);
+
+    expect(country.official).toEqual(entity.official);
+    expect(country.growth).toEqual(entity.growth);
+    expect(country.largestField).toEqual(entity.largestField);
+  });
+
+  it("differs only in the standing card", () => {
+    const country = buildCountryKpis(build(), 69);
+
+    expect(country.standing.label).toBe("მუნიციპალური ბიუჯეტები");
+    expect(country.standing.value).toBe("69");
   });
 });
