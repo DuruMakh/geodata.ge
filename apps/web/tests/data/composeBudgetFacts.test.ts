@@ -2,10 +2,14 @@ import { describe, expect, it } from "vitest";
 import { budgetRowsToCsvRows } from "../../scripts/compose-budget-facts";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 
-function importRow(year: number, itemId: string): BudgetFactImportRow {
+function importRow(
+  year: number,
+  itemId: string,
+  side: BudgetFactImportRow["side"] = "expenditure"
+): BudgetFactImportRow {
   return {
     year,
-    side: "expenditure",
+    side,
     itemId,
     amountGel: 1,
     basis: "actual",
@@ -25,12 +29,14 @@ describe("budgetRowsToCsvRows", () => {
       importRow(2025, "spending.health"),
       importRow(2004, "spending.defense"),
       importRow(2004, "spending.agriculture"),
+      importRow(2004, "tax.income", "revenue"),
     ]);
 
-    expect(sorted.map((row) => `${row.year}:${row.item_id}`)).toEqual([
-      "2004:spending.agriculture",
-      "2004:spending.defense",
-      "2025:spending.health",
+    expect(sorted.map((row) => `${row.year}:${row.side}:${row.item_id}`)).toEqual([
+      "2004:expenditure:spending.agriculture",
+      "2004:expenditure:spending.defense",
+      "2004:revenue:tax.income",
+      "2025:expenditure:spending.health",
     ]);
   });
 
