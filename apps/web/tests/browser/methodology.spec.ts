@@ -333,21 +333,35 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
   ).toEqual({ body: 390, viewport: 390 });
 
   await page.goto("http://localhost:3100/");
-  const promotion = page.getByTestId("methodology-promo");
-  const promotionVisual = promotion.getByRole("img", { name: "სამი გადაფარული პირველწყაროს დოკუმენტი" });
-  const promotionTitle = promotion.getByRole("heading", { level: 2 });
+  const methodology = page.getByTestId("landing-methodology");
+  const methodologyTitle = methodology.getByRole("heading", { level: 2 });
+  const methodologyList = methodology.locator("ol");
   const footer = page.getByTestId("site-footer");
-  const promotionBox = await promotion.boundingBox();
-  const promotionVisualBox = await promotionVisual.boundingBox();
-  const promotionTitleBox = await promotionTitle.boundingBox();
+  await expect(methodology).toBeVisible();
+  await expect(methodologyTitle).toBeVisible();
+  await expect(methodologyList).toBeVisible();
+  const methodologyBox = await methodology.boundingBox();
+  const methodologyTitleBox = await methodologyTitle.boundingBox();
+  const methodologyListBox = await methodologyList.boundingBox();
   const footerBox = await footer.boundingBox();
-  expect(promotionBox).not.toBeNull();
-  expect(promotionVisualBox).not.toBeNull();
-  expect(promotionTitleBox).not.toBeNull();
+  expect(methodologyBox).not.toBeNull();
+  expect(methodologyTitleBox).not.toBeNull();
+  expect(methodologyListBox).not.toBeNull();
   expect(footerBox).not.toBeNull();
-  expect(promotionBox!.height).toBeGreaterThan(500);
-  expect(promotionTitleBox!.y).toBeGreaterThanOrEqual(promotionVisualBox!.y + promotionVisualBox!.height);
-  expect(footerBox!.y).toBeGreaterThanOrEqual(promotionBox!.y + promotionBox!.height);
+  expect(methodologyBox!.x).toBeGreaterThanOrEqual(0);
+  expect(methodologyBox!.x + methodologyBox!.width).toBeLessThanOrEqual(390);
+  expect(methodologyTitleBox!.x).toBeGreaterThanOrEqual(0);
+  expect(methodologyTitleBox!.x + methodologyTitleBox!.width).toBeLessThanOrEqual(390);
+  expect(methodologyListBox!.x).toBeGreaterThanOrEqual(0);
+  expect(methodologyListBox!.x + methodologyListBox!.width).toBeLessThanOrEqual(390);
+  expect(methodologyListBox!.y).toBeGreaterThanOrEqual(methodologyTitleBox!.y + methodologyTitleBox!.height);
+  expect(footerBox!.y).toBeGreaterThanOrEqual(methodologyBox!.y + methodologyBox!.height);
+  expect(
+    await page.evaluate(() => ({
+      body: document.body.scrollWidth,
+      viewport: document.documentElement.clientWidth,
+    })),
+  ).toEqual({ body: 390, viewport: 390 });
 });
 
 test("methodology keyboard controls expose native behavior and visible focus", async ({ page }) => {
