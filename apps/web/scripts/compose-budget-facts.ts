@@ -28,7 +28,9 @@ function csvRowsToBudgetRows(rows: BudgetFactCsvRow[]): BudgetFactImportRow[] {
   }));
 }
 export function budgetRowsToCsvRows(rows: BudgetFactImportRow[]): BudgetFactCsvRow[] {
-  return rows
+  // Copy first: this is exported and called twice from main(), and the second
+  // caller still holds a reference to the array it passed in.
+  return [...rows]
     .sort((a, b) => {
       if (a.year !== b.year) return a.year - b.year;
       if (a.side !== b.side) return a.side.localeCompare(b.side);
