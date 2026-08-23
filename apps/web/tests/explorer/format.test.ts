@@ -16,6 +16,24 @@ describe("editorial formatters", () => {
     expect(formatSignedAmount(2_190_000_000)).toBe("+2.2 მლრდ ₾");
   });
 
+  // Standalone amounts carry their own unit label, so unlike a shared column
+  // they can vary precision per value. Three significant digits keeps a KPI
+  // short while a small series-panel row stays readable instead of collapsing
+  // to "0 მლნ ₾" (ონი 2025 social protection, 421,165 ₾).
+  it("keeps three significant digits in მლნ", () => {
+    expect(formatAmount(450_400_000)).toBe("450 მლნ ₾");
+    expect(formatAmount(26_763_674)).toBe("26.8 მლნ ₾");
+    expect(formatAmount(8_223_393)).toBe("8.22 მლნ ₾");
+    expect(formatAmount(421_165)).toBe("0.42 მლნ ₾");
+    expect(formatAmount(133_333)).toBe("0.13 მლნ ₾");
+  });
+
+  it("floors a small standalone amount instead of printing zero", () => {
+    expect(formatAmount(1_295)).toBe("<0.01 მლნ ₾");
+    expect(formatAmount(-1_295)).toBe(">−0.01 მლნ ₾");
+    expect(formatAmount(0)).toBe("0.00 მლნ ₾");
+  });
+
   it("switches units at the rounded-billion boundary", () => {
     expect(formatAmount(999_499_999)).toBe("999 მლნ ₾");
     expect(formatAmount(999_500_000)).toBe("1.0 მლრდ ₾");

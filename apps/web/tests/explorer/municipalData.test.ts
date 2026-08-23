@@ -776,7 +776,11 @@ describe("Georgia country aggregate models", () => {
   it("separates the country official-budget number from its GEL unit", () => {
     const officialBudget = buildCountryKpis(build(), 69)[0]!;
 
-    expect(officialBudget.value).toBe("0");
+    // The fixture total is a handful of lari, far below the მლნ resolution, so
+    // it floors rather than printing "0" — a funded budget must never render
+    // the same as an unfunded one. The split of number from unit is the point
+    // of this test and is unaffected.
+    expect(officialBudget.value).toBe("<0.01");
     expect(officialBudget.unit).toBe("მლნ ₾");
     expect(officialBudget.detail).toBe("2017 · ფინანსთა სამინისტროს ჯამი");
   });
@@ -1051,7 +1055,10 @@ describe("buildEntityKpis", () => {
     expect(divergent[0]!.label).toBe("ოფიციალური ბიუჯეტი");
     expect(divergent[0]!.detail).toContain("ფინანსთა სამინისტროს");
     expect(model.totalRow.valuesByYear[2016]).toBe(300);
-    expect(divergent[0]!.value).toBe("0");
+    // 300 ₾ is non-zero, so it floors instead of printing "0"; what this test
+    // guards is that the KPI reads the official total rather than the
+    // functional sum, which the value below still shows.
+    expect(divergent[0]!.value).toBe("<0.01");
     expect(divergent[0]!.unit).toBe("მლნ ₾");
   });
 

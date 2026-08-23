@@ -13,7 +13,7 @@ import {
   buildMunicipalEntityModel,
   getDefaultMunicipalSelection,
 } from "../../lib/explorer/municipalData";
-import { formatAmount, UNIT_MLN } from "../../lib/explorer/format";
+import { formatAmount, unitFor, UNIT_MLN } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
 import {
   buildWorkbookExportModel,
@@ -108,6 +108,20 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
     [fullModel],
   );
   const defaults = useMemo(() => getDefaultMunicipalSelection(fullModel), [fullModel]);
+  // Precision is decided once, from the full span rather than the selection, so
+  // dragging the range or toggling a series never reformats the numbers under
+  // the reader. Small functions (ონი health, 133,333 ₾) would otherwise share a
+  // cell value with the genuinely unfunded ones.
+  const unit = useMemo(
+    () =>
+      unitFor(
+        [fullModel.totalRow, ...fullModel.rows].flatMap((row) =>
+          Object.values(row.valuesByYear).filter((value): value is number => value !== null),
+        ),
+        UNIT_MLN,
+      ),
+    [fullModel],
+  );
   const state = useMunicipalState(allYears, defaults, knownIds);
 
   // REBUILT on every range change. Filtering the full model's years instead
@@ -337,7 +351,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               <Callout testId="no-selection-callout">არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.</Callout>
             </div>
           ) : state.chartMode === "line" ? (
-            <EditorialLineChart years={years} series={series} share={state.share} unit={UNIT_MLN} shareLabel="წილი მთლიან ბიუჯეტში" />
+            <EditorialLineChart years={years} series={series} share={state.share} unit={unit} shareLabel="წილი მთლიან ბიუჯეტში" />
           ) : (
             <ExplorerTable
               rows={model.rows.filter((row) => state.selectedIds.includes(row.itemId))}
@@ -345,7 +359,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               showTotal={state.selectedIds.includes(model.totalRow.itemId)}
               years={years}
               firstColumnLabel="ფუნქცია"
-              unit={UNIT_MLN}
+              unit={unit}
               share={state.share}
               shareColumnLabel="წილი"
               shareValueForYear={(row, year) => {

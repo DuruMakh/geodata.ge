@@ -85,13 +85,17 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
 
   const x = (index: number) => PAD_L + (n <= 1 ? (W - PAD_L - PAD_R) / 2 : (index * (W - PAD_L - PAD_R)) / (n - 1));
   const y = (value: number) => PAD_T + ((top - value) / span) * (H - PAD_T - PAD_B);
-  // Share precision follows the gridline step. Amount steps are quantized above
-  // so the shared unit formatter stays canonical without duplicate labels.
+  // Axis precision follows the gridline STEP, not the unit's data-derived
+  // decimals. The unit carries enough precision for the smallest value in the
+  // table (which is what sets amountQuantum above, so a small series still gets
+  // a readable domain); the axis only ever prints multiples of the step, so
+  // borrowing those decimals would render a 12.5 gridline as "12.50".
   const shareDigits = decimalsFor(step, 2);
+  const axisUnit = { ...unit, decimals: decimalsFor(step / unit.divisor, 4) };
   const formatAxis = (value: number) =>
     (share
       ? `${value.toFixed(shareDigits)}%`
-      : `${formatInUnit(value, unit)} ${unit.label}`
+      : `${formatInUnit(value, axisUnit)} ${unit.label}`
     ).replace("-", "−");
 
   const formatValue = (value: number | null) =>
