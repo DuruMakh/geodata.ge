@@ -1,11 +1,11 @@
 import { SiteHeader } from "../../components/site/site-header";
 import { loadServedLandingData } from "../../lib/data/servedData";
-import { buildLandingModel } from "../../lib/landing/landingData";
+import { buildLandingContext } from "../../lib/landing/landingData";
 
 export default async function MethodologyLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const model = buildLandingModel(await loadServedLandingData());
+  const model = buildLandingContext(await loadServedLandingData());
 
   return (
     <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)]">

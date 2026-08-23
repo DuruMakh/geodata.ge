@@ -1,5 +1,5 @@
 import { LandingPage } from "../components/landing/landing-page";
-import { loadServedLandingData } from "../lib/data/servedData";
+import { loadServedLandingData, loadServedMunicipalData } from "../lib/data/servedData";
 import { buildLandingModel } from "../lib/landing/landingData";
 import { fiscalMetadata } from "../lib/seo/metadata";
 
@@ -11,8 +11,16 @@ export const metadata = fiscalMetadata({
 });
 
 export default async function Home() {
-  const { facts, glossary, sourceDocuments } = await loadServedLandingData();
-  const model = buildLandingModel({ facts, glossary, sourceDocuments });
+  const [landingData, municipalData] = await Promise.all([
+    loadServedLandingData(),
+    loadServedMunicipalData(),
+  ]);
+  const model = buildLandingModel({
+    ...landingData,
+    municipalities: municipalData.municipalities,
+    municipalTotalFacts: municipalData.totalFacts,
+    municipalCountryTotalFacts: municipalData.countryTotalFacts,
+  });
 
   return <LandingPage model={model} />;
 }
