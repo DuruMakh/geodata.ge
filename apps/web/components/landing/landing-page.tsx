@@ -59,7 +59,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
             className="pb-[18px] pt-7 min-[768px]:pointer-events-none min-[768px]:absolute min-[768px]:right-0 min-[768px]:top-[42px] min-[768px]:z-10 min-[768px]:flex min-[768px]:w-[340px] min-[768px]:flex-col min-[768px]:items-end min-[768px]:p-0 min-[768px]:text-right min-[1100px]:w-[470px]"
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[11px]">
-              საქართველოს მონაცემების პლატფორმა
+              საქართველოს მონაცემების პორტალი
             </p>
             <h1 className="mt-2.5 text-pretty font-[family-name:var(--font-display)] text-[33px] font-semibold leading-[1.12] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-[30px] min-[1100px]:text-[40px]">
               საქართველო ციფრებში

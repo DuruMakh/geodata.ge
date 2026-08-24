@@ -14,7 +14,7 @@
 
 - Keep the current v1 scope: national expenditure, national revenue, municipal budgets, and methodology only.
 - Preserve the warm editorial system and existing living-relief hero; do not introduce shadcn, cards, shadows, a new visualization library, or another post-hero graphic.
-- Exact hero copy is `საქართველოს მონაცემების პლატფორმა`, `საქართველო ციფრებში`, and `გაეცანი მონაცემებს`.
+- Exact hero copy is `საქართველოს მონაცემების პორტალი`, `საქართველო ციფრებში`, and `გაეცანი მონაცემებს`.
 - Keep area at `69.7 ათ. კმ²` and nominal GDP at `104.6 მლრდ ₾`; update only population to `3.9 მლნ` with `2026 წლის 1 იანვარი · საქსტატი`.
 - Post-hero order is expenditure → revenue → municipalities → methodology → existing footer.
 - Each data section renders only its independently derived latest year, one prominent applicable total, and exactly four latest-year rows when the reviewed corpus supplies at least four.
@@ -485,7 +485,7 @@ test("landing renders the approved latest-year data composition", async ({ page 
     "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებული მონაცემები — ხარჯები, შემოსავლები, მუნიციპალიტეტები, მეთოდოლოგია და ჩამოსატვირთი მონაცემები.",
   );
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("საქართველო ციფრებში");
-  await expect(page.getByText("საქართველოს მონაცემების პლატფორმა", { exact: true })).toBeVisible();
+  await expect(page.getByText("საქართველოს მონაცემების პორტალი", { exact: true })).toBeVisible();
   await expect(page.getByTestId("hero-cta")).toHaveText("გაეცანი მონაცემებს");
   await expect(page.getByTestId("hero-cta")).toHaveAttribute("href", "#data");
   await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
@@ -723,7 +723,7 @@ const KEY_NUMBERS = [
 
 ```tsx
 <p className="text-[10px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[11px]">
-  საქართველოს მონაცემების პლატფორმა
+  საქართველოს მონაცემების პორტალი
 </p>
 <h1 className="mt-2.5 text-pretty font-[family-name:var(--font-display)] text-[33px] font-semibold leading-[1.12] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-[30px] min-[1100px]:text-[40px]">
   საქართველო ციფრებში

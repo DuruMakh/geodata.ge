@@ -90,7 +90,7 @@ The living-relief hero remains the primary visual subject. Its geometry, city be
 
 Exact visible copy:
 
-- overline: `საქართველოს მონაცემების პლატფორმა`;
+- overline: `საქართველოს მონაცემების პორტალი`;
 - H1: `საქართველო ციფრებში`;
 - CTA: `გაეცანი მონაცემებს`.
 

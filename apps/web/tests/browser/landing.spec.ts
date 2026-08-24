@@ -89,7 +89,7 @@ test("landing renders the approved latest-year data composition", async ({ page 
     "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებული მონაცემები — ხარჯები, შემოსავლები, მუნიციპალიტეტები, მეთოდოლოგია და ჩამოსატვირთი მონაცემები.",
   );
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("საქართველო ციფრებში");
-  await expect(page.getByText("საქართველოს მონაცემების პლატფორმა", { exact: true })).toBeVisible();
+  await expect(page.getByText("საქართველოს მონაცემების პორტალი", { exact: true })).toBeVisible();
   await expect(page.getByTestId("hero-cta")).toHaveText("გაეცანი მონაცემებს");
   await expect(page.getByTestId("hero-cta")).toHaveAttribute("href", "#data");
   await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
