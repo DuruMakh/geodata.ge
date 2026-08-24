@@ -4,8 +4,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import * as XLSX from "xlsx";
 
+import { assertGeneratedArtifactMatches } from "../../../lib/data/generatedArtifacts";
 import {
-  assertGeneratedArtifactMatches,
   prepareNationalGdp,
   validateGdpWorkbookTitle,
   validateNationalGdpSeries,
@@ -63,9 +63,19 @@ describe("prepareNationalGdp", () => {
     const artifactPath = path.join(tempDirectory, "artifact.csv");
     await fs.writeFile(artifactPath, "stale\n", "utf8");
 
-    await expect(assertGeneratedArtifactMatches(artifactPath, "generated\n")).rejects.toThrow(
-      "Generated national GDP artifact is stale",
-    );
+    await expect(
+      assertGeneratedArtifactMatches("national GDP", artifactPath, "generated\n"),
+    ).rejects.toThrow("Generated national GDP artifact is stale");
+  });
+
+  it("names the dataset in the staleness error so one generator is never blamed for another", async () => {
+    const tempDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "geodata-label-check-"));
+    const artifactPath = path.join(tempDirectory, "artifact.csv");
+    await fs.writeFile(artifactPath, "stale\n", "utf8");
+
+    await expect(
+      assertGeneratedArtifactMatches("Geostat municipal indicators", artifactPath, "generated\n"),
+    ).rejects.toThrow("Generated Geostat municipal indicators artifact is stale");
   });
 
   it("rejects unexpected workbook titles and units", () => {
