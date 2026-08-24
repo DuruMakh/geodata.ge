@@ -4,27 +4,89 @@ import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
 const BASE_URL = process.env.SEO_BASE_URL ?? "http://localhost:3100";
 
 const representativeRoutes = [
-  "/",
-  "/explorer/expenditure",
-  "/explorer/revenue",
-  "/explorer/analysis",
-  "/explorer/municipalities",
-  "/explorer/municipalities/tbilisi",
-  "/explorer/municipalities/region/imereti",
-  "/methodology",
-  "/methodology/expenditure",
-  "/about",
+  { route: "/", canonical: "https://fiscal.ge/" },
+  { route: "/explorer/expenditure", canonical: "https://fiscal.ge/explorer/expenditure" },
+  { route: "/explorer/revenue", canonical: "https://fiscal.ge/explorer/revenue" },
+  { route: "/explorer/analysis", canonical: "https://fiscal.ge/explorer/analysis" },
+  { route: "/explorer/municipalities", canonical: "https://fiscal.ge/explorer/municipalities" },
+  { route: "/explorer/municipalities/tbilisi", canonical: "https://fiscal.ge/explorer/municipalities/tbilisi" },
+  { route: "/explorer/municipalities/region/imereti", canonical: "https://fiscal.ge/explorer/municipalities/region/imereti" },
+  { route: "/explorer/municipalities/georgia", canonical: "https://fiscal.ge/explorer/municipalities/georgia" },
+  { route: "/methodology", canonical: "https://fiscal.ge/methodology" },
+  { route: "/methodology/expenditure", canonical: "https://fiscal.ge/methodology/expenditure" },
+  { route: "/about", canonical: "https://fiscal.ge/about" },
 ] as const;
 
-for (const route of representativeRoutes) {
+for (const { route, canonical } of representativeRoutes) {
   test(`${route} exposes Fiscal.ge search metadata`, async ({ page }) => {
     await page.goto(`${BASE_URL}${route}`);
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /^https:\/\/fiscal\.ge/);
+    const canonicalLink = page.locator('link[rel="canonical"]');
+    const openGraphUrl = page.locator('meta[property="og:url"]');
+    await expect(canonicalLink).toHaveCount(1);
+    await expect(openGraphUrl).toHaveCount(1);
+    await expect(canonicalLink).toHaveAttribute("href", canonical);
+    await expect(openGraphUrl).toHaveAttribute("content", canonical);
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /^https:\/\/fiscal\.ge\//);
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
     await expect(page.locator('script[type="application/ld+json"]')).not.toHaveCount(0);
   });
 }
+
+test("explorer datasets publish stable ids and downloadable CSV distributions", async ({ page, request }) => {
+  for (const { route, downloadPath } of [
+    { route: "/explorer/expenditure", downloadPath: "/downloads/data/national-expenditure.csv" },
+    { route: "/explorer/revenue", downloadPath: "/downloads/data/national-revenue.csv" },
+    { route: "/explorer/municipalities", downloadPath: "/downloads/data/municipal-expenditure.csv" },
+  ] as const) {
+    await page.goto(`${BASE_URL}${route}`);
+    const node = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
+    expect(node["@id"]).toBe(`https://fiscal.ge${route}#dataset`);
+    expect(node.distribution).toEqual([
+      expect.objectContaining({
+        "@type": "DataDownload",
+        contentUrl: `https://fiscal.ge${downloadPath}`,
+      }),
+    ]);
+    expect((await request.get(`${BASE_URL}${downloadPath}`)).status()).toBe(200);
+  }
+});
+
+test("entity datasets use final URLs and omit unavailable workbook distributions", async ({ page }) => {
+  for (const route of [
+    "/explorer/municipalities/tbilisi",
+    "/explorer/municipalities/region/imereti",
+    "/explorer/municipalities/georgia",
+  ] as const) {
+    await page.goto(`${BASE_URL}${route}`);
+    const node = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
+    expect(node["@id"]).toBe(`https://fiscal.ge${route}#dataset`);
+    expect(node).not.toHaveProperty("distribution");
+  }
+
+  await page.goto(`${BASE_URL}/explorer/analysis`);
+  await expect(page.getByTestId("explorer-dataset-json-ld")).toHaveCount(0);
+});
+
+test("site Organization schema publishes the square SVG logo without unverified graph claims", async ({ page, request }) => {
+  await page.goto(`${BASE_URL}/`);
+  const raw = await page.getByTestId("site-json-ld").textContent() ?? "{}";
+  const graph = JSON.parse(raw);
+  const organization = graph["@graph"].find(
+    (node: { "@type"?: string }) => node["@type"] === "Organization",
+  );
+  expect(organization.logo).toEqual({
+    "@type": "ImageObject",
+    url: "https://fiscal.ge/fiscal-ge-logo.svg",
+    width: 512,
+    height: 512,
+  });
+  expect(raw).not.toContain("sameAs");
+  expect(raw).not.toContain("SearchAction");
+
+  const logo = await request.get(`${BASE_URL}/fiscal-ge-logo.svg`);
+  expect(logo.status()).toBe(200);
+  expect(logo.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
+});
 
 test("municipality navigation uses crawlable links", async ({ page }) => {
   await page.goto(`${BASE_URL}/explorer/municipalities`);

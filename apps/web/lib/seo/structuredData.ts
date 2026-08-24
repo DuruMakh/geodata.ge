@@ -14,6 +14,18 @@ export type DatasetJsonLdInput = {
   downloadPath: `/downloads/data/${string}.csv`;
 };
 
+export type ExplorerDatasetJsonLdInput = {
+  origin: string;
+  path: `/${string}`;
+  name: string;
+  description: string;
+  firstYear: number;
+  lastYear: number;
+  dateModified: string;
+  spatialCoverageName: string;
+  downloadPath?: `/downloads/data/${string}.csv`;
+};
+
 function absoluteUrl(origin: string, path: string): string {
   return new URL(path, origin).href;
 }
@@ -32,6 +44,14 @@ export function siteJsonLd(origin: string) {
         name: "Fiscal.ge",
         url: origin,
         email: "info@fiscal.ge",
+        description:
+          "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად აქვეყნებს.",
+        logo: {
+          "@type": "ImageObject",
+          url: `${origin}/fiscal-ge-logo.svg`,
+          width: 512,
+          height: 512,
+        },
       },
       {
         "@type": "WebSite",
@@ -101,5 +121,38 @@ export function datasetJsonLd(input: DatasetJsonLdInput) {
         contentUrl: absoluteUrl(input.origin, input.downloadPath),
       },
     ],
+  };
+}
+
+export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
+  if (input.description.length < 50) {
+    throw new Error("Dataset description must contain at least 50 characters");
+  }
+  const url = absoluteUrl(input.origin, input.path);
+  return {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "@id": `${url}#dataset`,
+    name: input.name,
+    description: input.description,
+    url,
+    inLanguage: "ka",
+    temporalCoverage: `${input.firstYear}/${input.lastYear}`,
+    spatialCoverage: { "@type": "Place", name: input.spatialCoverageName },
+    dateModified: input.dateModified,
+    creator: { "@id": `${input.origin}/#organization` },
+    publisher: { "@id": `${input.origin}/#organization` },
+    license: "https://creativecommons.org/licenses/by/4.0/",
+    ...(input.downloadPath
+      ? {
+          distribution: [
+            {
+              "@type": "DataDownload",
+              encodingFormat: "text/csv",
+              contentUrl: absoluteUrl(input.origin, input.downloadPath),
+            },
+          ],
+        }
+      : {}),
   };
 }

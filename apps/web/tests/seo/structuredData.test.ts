@@ -3,6 +3,7 @@ import {
   breadcrumbJsonLd,
   dataCatalogJsonLd,
   datasetJsonLd,
+  explorerDatasetJsonLd,
   serializeJsonLd,
   siteJsonLd,
 } from "../../lib/seo/structuredData";
@@ -23,6 +24,66 @@ describe("Fiscal.ge structured data", () => {
         }),
       ]),
     );
+    const organization = graph["@graph"].find((node) => node["@type"] === "Organization");
+    expect(organization).toMatchObject({
+      description:
+        "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად აქვეყნებს.",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://fiscal.ge/fiscal-ge-logo.svg",
+        width: 512,
+        height: 512,
+      },
+    });
+    expect(serializeJsonLd(graph)).not.toContain("sameAs");
+    expect(serializeJsonLd(graph)).not.toContain("SearchAction");
+  });
+
+  it("describes stable explorer downloads with stable dataset ids", () => {
+    const data = explorerDatasetJsonLd({
+      origin: "https://fiscal.ge",
+      path: "/explorer/expenditure",
+      name: "საქართველოს სახელმწიფო ბიუჯეტის ხარჯები",
+      description:
+        "საქართველოს სახელმწიფო ბიუჯეტის ფაქტობრივი ხარჯების გადამოწმებული მრავალწლიანი მონაცემები სფეროების მიხედვით.",
+      firstYear: 2004,
+      lastYear: 2025,
+      dateModified: "2026-08-20",
+      spatialCoverageName: "საქართველო",
+      downloadPath: "/downloads/data/national-expenditure.csv",
+    });
+    expect(JSON.parse(serializeJsonLd(data))).toMatchObject({
+      "@type": "Dataset",
+      "@id": "https://fiscal.ge/explorer/expenditure#dataset",
+      url: "https://fiscal.ge/explorer/expenditure",
+      creator: { "@id": "https://fiscal.ge/#organization" },
+      publisher: { "@id": "https://fiscal.ge/#organization" },
+      temporalCoverage: "2004/2025",
+      spatialCoverage: { "@type": "Place", name: "საქართველო" },
+      distribution: [
+        expect.objectContaining({
+          contentUrl: "https://fiscal.ge/downloads/data/national-expenditure.csv",
+        }),
+      ],
+    });
+  });
+
+  it("omits distribution from client-generated entity datasets", () => {
+    const data = explorerDatasetJsonLd({
+      origin: "https://fiscal.ge",
+      path: "/explorer/municipalities/tbilisi",
+      name: "ქალაქ თბილისის მუნიციპალიტეტის ბიუჯეტი",
+      description:
+        "ქალაქ თბილისის მუნიციპალიტეტის ფაქტობრივი ბიუჯეტის გადამოწმებული მრავალწლიანი მონაცემები ფუნქციების მიხედვით.",
+      firstYear: 2015,
+      lastYear: 2025,
+      dateModified: "2026-08-16",
+      spatialCoverageName: "ქალაქ თბილისის მუნიციპალიტეტი",
+    });
+    expect(JSON.parse(serializeJsonLd(data))).toMatchObject({
+      "@id": "https://fiscal.ge/explorer/municipalities/tbilisi#dataset",
+    });
+    expect(data).not.toHaveProperty("distribution");
   });
 
   it("uses absolute ordered breadcrumb URLs", () => {

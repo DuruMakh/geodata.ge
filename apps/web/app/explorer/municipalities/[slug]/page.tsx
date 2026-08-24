@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../../../components/municipalities/municipal-explorer";
 import { BreadcrumbJsonLd } from "../../../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../../../components/seo/json-ld";
 import { PageHeader } from "../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../lib/data/servedData";
 import { MUNICIPAL_COUNTRY_ID } from "../../../../lib/data/municipal/types";
@@ -11,6 +12,7 @@ import {
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
+  MUNICIPAL_PUBLIC_PAGE_COUNT,
 } from "../../../../lib/explorer/municipalData";
 import { formatAmount, formatShare } from "../../../../lib/explorer/format";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
@@ -25,6 +27,8 @@ import {
   fiscalMetadata,
   municipalityBudgetTitleKa,
 } from "../../../../lib/seo/metadata";
+import { municipalityDescriptionKa } from "../../../../lib/seo/municipalMetadata";
+import { explorerDatasetJsonLd } from "../../../../lib/seo/structuredData";
 import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
 // The 64 public slugs are the complete, closed set. Without this, an unknown
@@ -41,17 +45,64 @@ function requiredMunicipalityCode(slug: string): string {
   return code;
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
-  const code = requiredMunicipalityCode(slug);
-  const { municipalities, totalFacts } = await loadServedMunicipalData();
+function buildMunicipalityPageFacts(
+  servedMunicipalData: Awaited<ReturnType<typeof loadServedMunicipalData>>,
+  code: string,
+) {
+  const { municipalities, regions, functions, functionFacts, totalFacts } = servedMunicipalData;
   const municipality = municipalities.find((row) => row.code === code);
   if (!municipality) notFound();
 
-  const { firstYear, lastYear } = coverageFromYears(totalFacts);
+  const { firstYear, lastYear: latestYear } = coverageFromYears(totalFacts);
+  const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
+  const rankByYear = Array.from(new Set(totalFacts.map((row) => row.year))).reduce<Record<number, number>>(
+    (ranks, year) => {
+      const yearList = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year });
+      ranks[year] = yearList.municipalities.find((row) => row.id === code)?.rank ?? 0;
+      return ranks;
+    },
+    {},
+  );
+  const own = {
+    functionFacts: functionFacts.filter((row) => row.municipalityCode === code),
+    totalFacts: totalFacts.filter((row) => row.municipalityCode === code),
+  };
+  const latestTotal = own.totalFacts.find((row) => row.year === latestYear)!;
+  const largestFunctionFact = own.functionFacts
+    .filter((row) => row.year === latestYear)
+    .sort((left, right) => right.amountGel - left.amountGel)[0]!;
+  const largestFunction = functions.find((row) => row.id === largestFunctionFact.categoryId)!;
+
+  return {
+    municipality,
+    firstYear,
+    latestYear,
+    regionLabels,
+    rankByYear,
+    rank: rankByYear[latestYear] ?? 0,
+    own,
+    latestTotal,
+    largestFunctionFact,
+    largestFunction,
+  };
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const code = requiredMunicipalityCode(slug);
+  const facts = buildMunicipalityPageFacts(await loadServedMunicipalData(), code);
   return fiscalMetadata({
-    title: municipalityBudgetTitleKa(municipality.nameKa, firstYear, lastYear),
-    description: `${municipality.nameKa}ს ფაქტობრივი ბიუჯეტი ფუნქციების მიხედვით, ${firstYear}–${lastYear}.`,
+    title: municipalityBudgetTitleKa(facts.municipality.nameKa, facts.firstYear, facts.latestYear),
+    description: municipalityDescriptionKa({
+      nameKa: facts.municipality.nameKa,
+      firstYear: facts.firstYear,
+      latestYear: facts.latestYear,
+      latestTotalGel: facts.latestTotal.publicTotalGel,
+      rank: facts.rank,
+      rankOutOf: MUNICIPAL_PUBLIC_PAGE_COUNT,
+      largestCategoryKa: facts.largestFunction.kaLabel,
+      largestCategoryShare: facts.largestFunctionFact.amountGel / facts.latestTotal.publicTotalGel,
+    }),
     path: municipalityHrefForCode(code),
   });
 }
@@ -65,45 +116,32 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ s
     loadWorkbookSources("municipalities", "municipal-functional"),
     loadWorkbookSources("municipalities", "municipal-total"),
   ]);
-  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = servedMunicipalData;
+  const { municipalities, regions, functions, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = servedMunicipalData;
   const { sourceDocuments } = landingData;
-
-  const municipality = municipalities.find((row) => row.code === code);
-  if (!municipality) notFound();
+  const {
+    municipality,
+    firstYear,
+    latestYear,
+    regionLabels,
+    rankByYear,
+    rank,
+    own,
+    latestTotal,
+    largestFunctionFact,
+    largestFunction,
+  } = buildMunicipalityPageFacts(servedMunicipalData, code);
   const entityWorkbookSources = scopeMunicipalWorkbookSources(workbookSources, {
     municipalityCodes: [code],
     includeAdjaraRepublic: false,
   });
 
-  const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const firstYear = years[0]!;
-  const latestYear = years.at(-1)!;
-  const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
   const region = regions.find((row) => row.id === municipality.regionId)!;
   const regionSlug = region.id.replace("region.", "");
   const regionPath = `/explorer/municipalities/region/${regionSlug}` as const;
   const regionBreadcrumbLabel = region.id === "region.tbilisi" ? "თბილისის რეგიონი" : region.kaLabel;
 
   const listInput = { municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear };
-  const rankByYear = years.reduce<Record<number, number>>((ranks, year) => {
-    const yearList = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, year });
-    ranks[year] = yearList.municipalities.find((row) => row.id === code)?.rank ?? 0;
-    return ranks;
-  }, {});
-  const rank = rankByYear[latestYear] ?? 0;
   const nationalTotalByYear = buildCountryTotalByYear(countryTotalFacts);
-
-  // Only this municipality's rows travel to the client: ~110 function facts and
-  // 11 total facts, not the 7,744-row corpus.
-  const own = {
-    functionFacts: functionFacts.filter((row) => row.municipalityCode === code),
-    totalFacts: totalFacts.filter((row) => row.municipalityCode === code),
-  };
-  const latestTotal = own.totalFacts.find((row) => row.year === latestYear)!;
-  const largestFunctionFact = own.functionFacts
-    .filter((row) => row.year === latestYear)
-    .sort((left, right) => right.amountGel - left.amountGel)[0]!;
-  const largestFunction = functions.find((row) => row.id === largestFunctionFact.categoryId)!;
   const summary =
     `${municipality.nameKa}ს ბიუჯეტი ${latestYear} წელს ${formatAmount(latestTotal.publicTotalGel)} იყო — ` +
     `${municipalities.length} მუნიციპალიტეტს შორის ${georgianOrdinal(rank)} ადგილი. ` +
@@ -118,9 +156,32 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ s
   const next = ordered[(index + 1) % ordered.length]!;
 
   const lastUpdatedAt = latestReviewedAtForMunicipalFacts(sourceDocuments, own.functionFacts, own.totalFacts);
+  const description = municipalityDescriptionKa({
+    nameKa: municipality.nameKa,
+    firstYear,
+    latestYear,
+    latestTotalGel: latestTotal.publicTotalGel,
+    rank,
+    rankOutOf: MUNICIPAL_PUBLIC_PAGE_COUNT,
+    largestCategoryKa: largestFunction.kaLabel,
+    largestCategoryShare: largestFunctionFact.amountGel / latestTotal.publicTotalGel,
+  });
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+      <JsonLd
+        data={explorerDatasetJsonLd({
+          origin: resolveSiteUrl(),
+          path: municipalityHrefForCode(code),
+          name: `${municipality.nameKa}ს ბიუჯეტი`,
+          description,
+          firstYear,
+          lastYear: latestYear,
+          dateModified: lastUpdatedAt,
+          spatialCoverageName: municipality.nameKa,
+        })}
+        testId="explorer-dataset-json-ld"
+      />
       <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }, { name: regionBreadcrumbLabel, path: regionPath }, { name: municipality.displayNameKa, path: municipalityHrefForCode(code) }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader

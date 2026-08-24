@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../../../../components/municipalities/municipal-explorer";
 import { BreadcrumbJsonLd } from "../../../../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../../../../components/seo/json-ld";
 import { PageHeader } from "../../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../../lib/data/servedData";
 import { ADJARA_REGION_ID, MUNICIPAL_COUNTRY_ID } from "../../../../../lib/data/municipal/types";
@@ -20,6 +21,12 @@ import { municipalityHrefForCode } from "../../../../../lib/explorer/municipalit
 import { formatAmount, formatShare } from "../../../../../lib/explorer/format";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../../lib/methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../../../../../lib/seo/metadata";
+import {
+  adjaraDescriptionKa,
+  regionBudgetTitleKa,
+  regionDescriptionKa,
+} from "../../../../../lib/seo/municipalMetadata";
+import { explorerDatasetJsonLd } from "../../../../../lib/seo/structuredData";
 import { resolveSiteUrl } from "../../../../../lib/siteUrl";
 
 const SOURCE_NOTE_BASE =
@@ -38,22 +45,88 @@ export async function generateStaticParams() {
   return regions.map((region) => ({ id: region.id.replace("region.", "") }));
 }
 
+function buildRegionPageFacts(
+  servedMunicipalData: Awaited<ReturnType<typeof loadServedMunicipalData>>,
+  regionId: string,
+) {
+  const { municipalities, regions, functions, functionFacts, totalFacts, adjaraBudgetAdjustments } =
+    servedMunicipalData;
+  const region = regions.find((row) => row.id === regionId);
+  if (!region) notFound();
+
+  const { firstYear, lastYear: latestYear } = coverageFromYears(totalFacts);
+  const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
+  const regionLabels = new Map(regions.map((row) => [row.id, row.kaLabel]));
+  const listInput = { municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear };
+  const list = buildMunicipalListRows(listInput);
+  const rankByYear = years.reduce<Record<number, number>>((ranks, year) => {
+    const yearList = buildMunicipalListRows({
+      municipalities,
+      regionLabels,
+      totalFacts,
+      adjaraBudgetAdjustments,
+      year,
+    });
+    ranks[year] = yearList.regions.find((row) => row.id === regionId)?.rank ?? 0;
+    return ranks;
+  }, {});
+  const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
+  const rolled = aggregateFactsForEntity(regionId, members.functionFacts, members.totalFacts);
+  const own =
+    regionId === ADJARA_REGION_ID
+      ? {
+          ...rolled,
+          totalFacts: applyAdjaraBudgetAdjustment(rolled.totalFacts, adjaraBudgetAdjustments),
+        }
+      : rolled;
+  const latestTotal = own.totalFacts.find((row) => row.year === latestYear)!;
+  const largestFunctionFact = own.functionFacts
+    .filter((row) => row.year === latestYear)
+    .sort((left, right) => right.amountGel - left.amountGel)[0]!;
+  const largestFunction = functions.find((row) => row.id === largestFunctionFact.categoryId)!;
+
+  return {
+    region,
+    firstYear,
+    latestYear,
+    regionLabels,
+    listInput,
+    list,
+    rankByYear,
+    rank: rankByYear[latestYear] ?? 0,
+    members,
+    own,
+    latestTotal,
+    largestFunctionFact,
+    largestFunction,
+    regionName: REGION_GENITIVE_KA[regionId] ?? region.kaLabel,
+  };
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const { regions, totalFacts } = await loadServedMunicipalData();
-  const region = regions.find((row) => row.id === `region.${id}`);
-  if (!region) return {};
-
-  const { firstYear, lastYear } = coverageFromYears(totalFacts);
-  const regionName = REGION_GENITIVE_KA[region.id] ?? region.kaLabel;
-  const title = `${regionName} მუნიციპალიტეტების ბიუჯეტები ${firstYear}–${lastYear} | Fiscal.ge`;
+  const regionId = `region.${id}`;
+  const facts = buildRegionPageFacts(await loadServedMunicipalData(), regionId);
+  const common = {
+    nameKa: facts.regionName,
+    firstYear: facts.firstYear,
+    latestYear: facts.latestYear,
+    latestTotalGel: facts.latestTotal.publicTotalGel,
+    rank: facts.rank,
+    rankOutOf: 11 as const,
+  };
   const description =
-    region.id === ADJARA_REGION_ID
-      ? `აჭარის გაერთიანებული ფაქტობრივი ბიუჯეტი — რესპუბლიკური და მუნიციპალური გადასახდელები შიდა ტრანსფერების გამოკლებით, ${firstYear}–${lastYear}.`
-      : `${regionName} მუნიციპალური ბიუჯეტები ფუნქციების მიხედვით, ${firstYear}–${lastYear}.`;
+    regionId === ADJARA_REGION_ID
+      ? adjaraDescriptionKa(common)
+      : regionDescriptionKa({
+          ...common,
+          largestCategoryKa: facts.largestFunction.kaLabel,
+          largestCategoryShare:
+            facts.largestFunctionFact.amountGel / facts.latestTotal.publicTotalGel,
+        });
 
   return fiscalMetadata({
-    title,
+    title: regionBudgetTitleKa(facts.regionName, facts.firstYear, facts.latestYear),
     description,
     path: `/explorer/municipalities/region/${id}`,
   });
@@ -69,48 +142,28 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
     loadWorkbookSources("municipalities", "municipal-total"),
     loadWorkbookSources("revenue", "revenue"),
   ]);
-  const { municipalities, regions, functions, functionFacts, totalFacts, countryTotalFacts, adjaraBudgetAdjustments } = servedMunicipalData;
+  const { regions, functions, countryTotalFacts } = servedMunicipalData;
   const { sourceDocuments } = landingData;
-
-  const region = regions.find((row) => row.id === regionId);
-  if (!region) notFound();
-
-  const years = Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const firstYear = years[0]!;
-  const latestYear = years.at(-1)!;
-  const regionLabels = new Map(regions.map((row) => [row.id, row.kaLabel]));
-
-  const listInput = { municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear };
-  const list = buildMunicipalListRows(listInput);
-  const rankByYear = years.reduce<Record<number, number>>((ranks, year) => {
-    const yearList = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year });
-    ranks[year] = yearList.regions.find((row) => row.id === regionId)?.rank ?? 0;
-    return ranks;
-  }, {});
-  const rank = rankByYear[latestYear] ?? 0;
+  const {
+    region,
+    firstYear,
+    latestYear,
+    listInput,
+    list,
+    rankByYear,
+    rank,
+    members,
+    own,
+    latestTotal,
+    largestFunctionFact,
+    largestFunction,
+    regionName,
+  } = buildRegionPageFacts(servedMunicipalData, regionId);
   const nationalTotalByYear = buildCountryTotalByYear(countryTotalFacts);
-
-  const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
   const entityWorkbookSources = scopeMunicipalWorkbookSources(workbookSources, {
     municipalityCodes: members.memberCodes,
     includeAdjaraRepublic: regionId === ADJARA_REGION_ID,
   });
-  // Collapse the members' rows into one entity's on the SERVER, so this page
-  // ships ~110 function rows like a municipality page rather than up to 12×.
-  const rolled = aggregateFactsForEntity(regionId, members.functionFacts, members.totalFacts);
-  const own =
-    regionId === ADJARA_REGION_ID
-      ? {
-          ...rolled,
-          totalFacts: applyAdjaraBudgetAdjustment(rolled.totalFacts, adjaraBudgetAdjustments),
-        }
-      : rolled;
-  const latestTotal = own.totalFacts.find((row) => row.year === latestYear)!;
-  const largestFunctionFact = own.functionFacts
-    .filter((row) => row.year === latestYear)
-    .sort((left, right) => right.amountGel - left.amountGel)[0]!;
-  const largestFunction = functions.find((row) => row.id === largestFunctionFact.categoryId)!;
-  const regionName = REGION_GENITIVE_KA[regionId] ?? region.kaLabel;
   const summary =
     regionId === ADJARA_REGION_ID
       ? `აჭარის გაერთიანებული ბიუჯეტი ${latestYear} წელს ${formatAmount(latestTotal.publicTotalGel)} იყო — ${regions.length} რეგიონს შორის ${georgianOrdinal(rank)} ადგილი. ჯამი აერთიანებს ${members.memberCodes.length} მუნიციპალიტეტსა და აჭარის ა.რ. რესპუბლიკურ ბიუჯეტს, შიდა ტრანსფერების გამოკლებით.`
@@ -131,9 +184,38 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
     members.functionFacts,
     own.totalFacts,
   );
+  const commonDescriptionInput = {
+    nameKa: regionName,
+    firstYear,
+    latestYear,
+    latestTotalGel: latestTotal.publicTotalGel,
+    rank,
+    rankOutOf: 11 as const,
+  };
+  const description =
+    regionId === ADJARA_REGION_ID
+      ? adjaraDescriptionKa(commonDescriptionInput)
+      : regionDescriptionKa({
+          ...commonDescriptionInput,
+          largestCategoryKa: largestFunction.kaLabel,
+          largestCategoryShare: largestFunctionFact.amountGel / latestTotal.publicTotalGel,
+        });
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+      <JsonLd
+        data={explorerDatasetJsonLd({
+          origin: resolveSiteUrl(),
+          path: `/explorer/municipalities/region/${id}`,
+          name: `${regionName} ბიუჯეტი`,
+          description,
+          firstYear,
+          lastYear: latestYear,
+          dateModified: lastUpdatedAt,
+          spatialCoverageName: region.kaLabel,
+        })}
+        testId="explorer-dataset-json-ld"
+      />
       <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }, { name: region.kaLabel, path: `/explorer/municipalities/region/${id}` }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader

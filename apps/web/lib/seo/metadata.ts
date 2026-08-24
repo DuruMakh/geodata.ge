@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { resolveSiteUrl } from "../siteUrl";
 
 const SOCIAL_IMAGE = {
   url: "/opengraph-image",
@@ -31,15 +32,16 @@ export function fiscalMetadata({
   path,
   type = "website",
 }: FiscalMetadataInput): Metadata {
+  const absolute = new URL(path, `${resolveSiteUrl()}/`).href;
   return {
     title,
     description,
-    alternates: { canonical: path },
+    alternates: { canonical: absolute },
     openGraph: {
       type,
       siteName: "Fiscal.ge",
       locale: "ka_GE",
-      url: path,
+      url: absolute,
       title,
       description,
       images: [SOCIAL_IMAGE],

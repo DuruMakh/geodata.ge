@@ -1,9 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   coverageFromYears,
   fiscalMetadata,
   municipalityBudgetTitleKa,
 } from "../../lib/seo/metadata";
+
+beforeAll(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge"));
+afterAll(() => vi.unstubAllEnvs());
 
 describe("Fiscal.ge SEO metadata", () => {
   it("derives coverage without assuming input order", () => {
@@ -25,14 +28,24 @@ describe("Fiscal.ge SEO metadata", () => {
       path: "/explorer/expenditure",
     });
 
-    expect(metadata.alternates?.canonical).toBe("/explorer/expenditure");
+    expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/expenditure");
     expect(metadata.openGraph).toMatchObject({
       siteName: "Fiscal.ge",
       locale: "ka_GE",
-      url: "/explorer/expenditure",
+      url: "https://fiscal.ge/explorer/expenditure",
       images: [expect.objectContaining({ width: 1200, height: 630 })],
     });
     expect(metadata.twitter).toMatchObject({ card: "summary_large_image" });
+  });
+
+  it("keeps the canonical root slash in absolute root metadata", () => {
+    const metadata = fiscalMetadata({
+      title: "Fiscal.ge",
+      description: "საქართველოს ბიუჯეტის გადამოწმებული მონაცემები.",
+      path: "/",
+    });
+    expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/");
+    expect(metadata.openGraph).toMatchObject({ url: "https://fiscal.ge/" });
   });
 
   it("uses the full official municipality name for possessive budget copy", () => {
