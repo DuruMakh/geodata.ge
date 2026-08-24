@@ -125,7 +125,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
     {
       isDelta: false,
       label: "ყველაზე დიდი წილი მშპ-ში",
-      value: largestShare ? formatShare(largestShare.shareEndYear) : MISSING,
+      value: largestShare ? formatShare(largestShare.shareByYear?.[endYear] ?? null) : MISSING,
       unit: "",
       color: "var(--ink)",
       detail: largestShare ? `${truncate(largestShare.kaLabel, 40)}, ${endYear}` : MISSING,

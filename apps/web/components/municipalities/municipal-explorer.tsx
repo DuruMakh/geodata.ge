@@ -13,6 +13,7 @@ import {
   getDefaultMunicipalSelection,
 } from "../../lib/explorer/municipalData";
 import { formatAmount, unitFor, UNIT_MLN } from "../../lib/explorer/format";
+import { shareOfTotal } from "../../lib/explorer/share";
 import type { ChartMode } from "../../lib/explorer/types";
 import {
   buildWorkbookExportModel,
@@ -49,7 +50,7 @@ type MunicipalExplorerBaseProps = {
   entityId: string;
 
   // Raw facts, already narrowed (and, for a region, aggregated) by the route.
-  // NOT a prebuilt model: change, shareEndYear, the KPIs, the movers and the
+  // NOT a prebuilt model: change, the share column, the KPIs, the movers and the
   // comparison table are all functions of the selected range, which is client
   // state. Handing over one full-span model and filtering its years array would
   // leave all five describing a period the reader is not looking at.
@@ -122,7 +123,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
   const state = useMunicipalState(allYears, defaults, knownIds);
 
   // REBUILT on every range change. Filtering the full model's years instead
-  // would leave change, shareEndYear, the movers and the comparison describing
+  // would leave change, the share column, the movers and the comparison describing
   // the whole span while the year columns describe the selection.
   const model = useMemo(
     () =>
@@ -358,11 +359,9 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               unit={unit}
               share={state.share}
               shareColumnLabel="წილი"
-              shareValueForYear={(row, year) => {
-                const amount = row.valuesByYear[year];
-                const total = model.totalRow.valuesByYear[year];
-                return amount === null || amount === undefined || !total ? null : amount / total;
-              }}
+              shareValueForYear={(row, year) =>
+                shareOfTotal(row.valuesByYear[year], model.totalRow.valuesByYear[year])
+              }
             />
           )}
 

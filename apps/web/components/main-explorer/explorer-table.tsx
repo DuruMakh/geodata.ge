@@ -106,7 +106,7 @@ export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLab
                 {formatShare(row.change, true)}
               </td>
               <td className={`${numericCellClass} sticky right-0 z-[1] bg-[var(--paper)] pr-0 text-[var(--muted)]`} style={cellPad}>
-                {formatShare(row.shareEndYear)}
+                {endYear === undefined ? MISSING : formatShare(shareValueForYear(row, endYear))}
               </td>
             </tr>
           ))}
@@ -127,7 +127,7 @@ export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLab
                 {formatShare(totalRow.change, true)}
               </td>
               <td className={`${numericCellClass} sticky right-0 z-[1] bg-[var(--paper)] pr-0 font-semibold text-[var(--ink)]`} style={cellPad}>
-                {formatShare(totalRow.shareEndYear)}
+                {endYear === undefined ? MISSING : formatShare(shareValueForYear(totalRow, endYear))}
               </td>
             </tr>
           ) : null}
