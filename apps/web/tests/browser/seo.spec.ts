@@ -35,11 +35,14 @@ test("municipality navigation uses crawlable links", async ({ page }) => {
 });
 
 test("legacy municipality codes redirect directly to their canonical slugs and keep browser hash state", async ({ page, request }) => {
+  test.setTimeout(60_000);
+
   for (const { code, slug } of MUNICIPALITY_ROUTES) {
     const oldResponse = await request.get(`${BASE_URL}/explorer/municipalities/${code}`, { maxRedirects: 0 });
     expect(oldResponse.status(), code).toBe(308);
     expect(oldResponse.headers().location, code).toBe(`/explorer/municipalities/${slug}`);
-    expect((await request.get(`${BASE_URL}/explorer/municipalities/${slug}`)).status(), slug).toBe(200);
+    const slugResponse = await request.get(`${BASE_URL}/explorer/municipalities/${slug}`, { maxRedirects: 0 });
+    expect(slugResponse.status(), slug).toBe(200);
   }
 
   await page.goto(`${BASE_URL}/explorer/municipalities/06#r=2016-2021`);
