@@ -6,9 +6,7 @@ import type { AdminSpendingCategory, AdminSpendingFact } from "../../lib/data/ad
 import {
   ADMIN_SPENDING_YEARS,
   EXPENDITURE_DETAILED_YEARS,
-  EXPENDITURE_TOTAL_ONLY_YEARS,
   EXPENDITURE_YEARS,
-  REVENUE_TOTAL_ONLY_YEARS,
   REVENUE_PARTIAL_YEARS,
   REVENUE_YEARS,
 } from "../../lib/data/coverage";
@@ -24,7 +22,7 @@ import type { SourceDocumentRow } from "../../lib/data/sources";
 import { loadSourceDocuments } from "../../lib/data/sources";
 import type { TaxonomyItem } from "../../lib/data/taxonomy";
 import { loadTaxonomyFiles } from "../../lib/data/taxonomy";
-import { TOTAL_ONLY_BUDGET_FACTS } from "../../lib/data/totalOnlyBudgetFacts";
+import { officialTotalBenchmark } from "../../lib/data/officialTotalBenchmarks";
 
 // End-to-end gate over the REAL production data files that app/page.tsx ships at
 // build time. Every path below matches the corresponding loader call in
@@ -150,22 +148,19 @@ describe("data pipeline gate (real shipped data files)", () => {
     const { facts } = await loadPipeline();
     const expenditure = facts.filter((fact) => fact.side === "expenditure");
     const detailedYears = uniqueSortedYears(expenditure.filter((fact) => fact.itemId.startsWith("spending.")));
-    const totalOnlyYears = uniqueSortedYears(expenditure.filter((fact) => fact.itemId === EXPENDITURE_TOTAL_ITEM_ID));
 
     expect(uniqueSortedYears(expenditure)).toEqual([...EXPENDITURE_YEARS].sort((a, b) => a - b));
     expect(detailedYears).toEqual(EXPENDITURE_DETAILED_YEARS);
-    expect(totalOnlyYears).toEqual(EXPENDITURE_TOTAL_ONLY_YEARS);
   });
 
   it("matches revenue year coverage in coverage.ts exactly", async () => {
     const { facts } = await loadPipeline();
     const revenue = revenueFacts(facts);
-    const totalRowYears = uniqueSortedYears(revenue.filter((fact) => fact.itemId === REVENUE_TOTAL_ITEM_ID));
 
     expect(uniqueSortedYears(revenue)).toEqual(REVENUE_YEARS);
-    // REVENUE_TOTAL_ONLY_YEARS is empty: the shipped CSV must not carry any
-    // revenue.total rows because every revenue year is fully detailed.
-    expect(totalRowYears).toEqual(REVENUE_TOTAL_ONLY_YEARS);
+    // Every revenue year is fully detailed: the shipped CSV must carry no
+    // revenue.total rows at all.
+    expect(revenue.filter((fact) => fact.itemId === REVENUE_TOTAL_ITEM_ID)).toEqual([]);
   });
 
   it("matches admin spending year coverage in coverage.ts exactly", async () => {
@@ -265,32 +260,12 @@ describe("data pipeline gate (real shipped data files)", () => {
     expect(Array.from(duplicateAdminKeys)).toEqual([]);
   });
 
-  it("keeps total-only expenditure years to exactly the official total row", async () => {
+  it("never ships an explicit expenditure total row: totals are derived by summing categories", async () => {
     const { facts } = await loadPipeline();
     const expenditure = facts.filter((fact) => fact.side === "expenditure");
 
-    for (const year of EXPENDITURE_TOTAL_ONLY_YEARS) {
-      const yearRows = expenditure.filter((fact) => fact.year === year);
-
-      expect(yearRows).toHaveLength(1);
-      expect(yearRows[0]?.itemId).toBe(EXPENDITURE_TOTAL_ITEM_ID);
-      expect(yearRows[0]?.basis).toBe("actual");
-
-      // The shipped CSV row must carry the same officially evidenced amount as
-      // the curated total-only constant in lib/data/totalOnlyBudgetFacts.ts.
-      const curated = TOTAL_ONLY_BUDGET_FACTS.find(
-        (row) => row.year === year && row.side === "expenditure" && row.item_id === EXPENDITURE_TOTAL_ITEM_ID,
-      );
-      expect(curated).toBeDefined();
-      expect(yearRows[0]?.amountGel).toBe(Number(curated?.amount_gel));
-    }
-
-    // Detailed years must NOT carry an explicit total row: the app derives
-    // their totals by summing the category facts.
-    const totalRowsInDetailedYears = expenditure.filter(
-      (fact) => fact.itemId === EXPENDITURE_TOTAL_ITEM_ID && EXPENDITURE_DETAILED_YEARS.includes(fact.year),
-    );
-    expect(totalRowsInDetailedYears).toEqual([]);
+    const totalRows = expenditure.filter((fact) => fact.itemId === EXPENDITURE_TOTAL_ITEM_ID);
+    expect(totalRows).toEqual([]);
   });
 
   it("carries a complete category panel for every detailed year on both sides", async () => {
@@ -398,16 +373,13 @@ describe("data pipeline gate (real shipped data files)", () => {
   it("reconciles 2006 revenue receipts against the curated official total", async () => {
     const { facts } = await loadPipeline();
 
-    // lib/data/totalOnlyBudgetFacts.ts preserves the official 2006 consolidated
-    // receipts total; the detailed 2006 revenue facts shipped in the CSV must
-    // sum to it within the revenue pipeline's rounding tolerance.
-    const curated2006Total = TOTAL_ONLY_BUDGET_FACTS.find(
-      (row) => row.year === 2006 && row.side === "revenue" && row.item_id === REVENUE_TOTAL_ITEM_ID,
-    );
-    expect(curated2006Total).toBeDefined();
+    // lib/data/officialTotalBenchmarks.ts preserves the official 2006
+    // consolidated receipts total; the detailed 2006 revenue facts shipped in
+    // the CSV must sum to it within the revenue pipeline's rounding tolerance.
+    const curated2006Total = officialTotalBenchmark(2006, "revenue", REVENUE_TOTAL_ITEM_ID);
 
     const detailed2006Sum = sumAmountGel(actualOnly(revenueFacts(facts)).filter((fact) => fact.year === 2006));
-    const differenceGel = Math.abs(detailed2006Sum - Number(curated2006Total?.amount_gel));
+    const differenceGel = Math.abs(detailed2006Sum - curated2006Total.amountGel);
 
     expect(differenceGel).toBeLessThanOrEqual(REVENUE_ROUNDING_TOLERANCE_GEL);
   });

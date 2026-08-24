@@ -277,10 +277,6 @@ export async function loadMunicipalTotalFactsFromMirror(
   });
 }
 
-function dateOnly(value: Date): string {
-  return value.toISOString().slice(0, 10);
-}
-
 export async function loadMunicipalPopulationFactsFromMirror(
   db: MirrorClient,
 ): Promise<MunicipalPopulationFact[]> {
@@ -297,7 +293,7 @@ export async function loadMunicipalPopulationFactsFromMirror(
         `Municipal population fact ${row.id} must use source.geostat_municipal_population`,
       );
     }
-    const referenceDate = dateOnly(row.referenceDate);
+    const referenceDate = isoDate(row.referenceDate);
     if (referenceDate !== "2025-01-01") {
       throw new Error(
         `Municipal population fact ${row.id} must use 2025-01-01, got ${referenceDate}`,
@@ -315,7 +311,7 @@ export async function loadMunicipalPopulationFactsFromMirror(
       sourceCell: row.sourceCell,
       sourceUnit: "(thousands)" as const,
       transformation: row.transformation,
-      lastReviewedAt: dateOnly(row.lastReviewedAt),
+      lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
 }

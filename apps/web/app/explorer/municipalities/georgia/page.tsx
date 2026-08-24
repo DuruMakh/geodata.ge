@@ -8,6 +8,7 @@ import {
   buildCountryTotalByYear,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
+  MUNICIPAL_COUNTRY_BUDGET_COUNT,
 } from "../../../../lib/explorer/municipalData";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../../../../lib/seo/metadata";
@@ -20,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { firstYear, lastYear } = coverageFromYears(countryTotalFacts);
   return fiscalMetadata({
     title: `საქართველოს მუნიციპალური ბიუჯეტების ჯამი ${firstYear}–${lastYear} | Fiscal.ge`,
-    description: `საქართველოს 69 მუნიციპალური საბიუჯეტო ერთეულის და აჭარის ა.რ. გაერთიანებული გადასახდელები, შიდა ტრანსფერების გამოკლებით, ${firstYear}–${lastYear}.`,
+    description: `საქართველოს ${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური საბიუჯეტო ერთეულის და აჭარის ა.რ. გაერთიანებული გადასახდელები, შიდა ტრანსფერების გამოკლებით, ${firstYear}–${lastYear}.`,
     path: ROUTE,
   });
 }
@@ -72,11 +73,11 @@ export default async function GeorgiaMunicipalitiesPage() {
           title="როგორ ხარჯავენ ბიუჯეტს"
           triggerLabel="საქართველოს მუნიციპალიტეტები"
           entityId={MUNICIPAL_COUNTRY_ID}
-          metaLine={`69 მუნიციპალური საბიუჯეტო ერთეული + აჭარის ა.რ. · ${firstYear}–${latestYear}`}
+          metaLine={`${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური საბიუჯეტო ერთეული + აჭარის ა.რ. · ${firstYear}–${latestYear}`}
           functions={functions}
           functionFacts={countryFunctionFacts}
           totalFacts={countryTotalFacts}
-          metrics={{ kind: "country", budgetCount: 69 }}
+          metrics={{ kind: "country", budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT }}
           workbookBasename="municipalities-georgia"
           workbookSources={entityWorkbookSources}
           functionalWorkbookSources={functionalWorkbookSources}
@@ -86,10 +87,10 @@ export default async function GeorgiaMunicipalitiesPage() {
             id: MUNICIPAL_COUNTRY_ID,
             nameKa: "საქართველო",
             valueGel: nationalTotalByYear[latestYear] ?? 0,
-            budgetCount: 69,
+            budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
           }}
           pickerGroups={pickerGroups}
-          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). საქართველოს ჯამი 69 ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს და დამატებით მოიცავს აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივ გადასახდელებს, მუნიციპალიტეტებზე გადაცემული ტრანსფერების გამოკლებით. ფუნქციური სერიები მხოლოდ მუნიციპალურ კლასიფიკაციას ასახავს. ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ ამ ჯამშია და მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
+          sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო). საქართველოს ჯამი ${MUNICIPAL_COUNTRY_BUDGET_COUNT} ოფიციალურ მუნიციპალურ საბიუჯეტო ერთეულს აერთიანებს და დამატებით მოიცავს აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივ გადასახდელებს, მუნიციპალიტეტებზე გადაცემული ტრანსფერების გამოკლებით. ფუნქციური სერიები მხოლოდ მუნიციპალურ კლასიფიკაციას ასახავს. ხუთი ოკუპირებულ ტერიტორიებთან დაკავშირებული ორგანო მხოლოდ ამ ჯამშია და მათი ხარჯი ტერიტორიულად მიკუთვნებულ ხარჯად არ არის წარმოდგენილი.${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />
       </div>
     </main>

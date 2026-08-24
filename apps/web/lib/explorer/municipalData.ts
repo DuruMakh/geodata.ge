@@ -24,7 +24,16 @@ import { georgianOrdinal } from "./municipalLabels";
 
 export const MUNICIPAL_TOTAL_ITEM_ID = "municipal.total";
 export const MUNICIPAL_PER_RESIDENT_YEAR = 2025;
-export const MUNICIPAL_COUNTRY_BUDGET_COUNT = 69;
+
+// Municipal budget-unit counts. 64 municipalities get a public page; five
+// occupied-territory bodies (codes 05, 42, 43, 46, 64 — see
+// lib/data/municipal/generateMunicipalFacts.ts) are excluded from the public
+// list because their budgets are not territorially attributable spending, and
+// appear only inside the Georgia total. Every Georgian string that states one
+// of these numbers interpolates it from here.
+export const MUNICIPAL_PUBLIC_PAGE_COUNT = 64;
+export const MUNICIPAL_AGGREGATE_ONLY_COUNT = 5;
+export const MUNICIPAL_COUNTRY_BUDGET_COUNT = MUNICIPAL_PUBLIC_PAGE_COUNT + MUNICIPAL_AGGREGATE_ONLY_COUNT;
 
 export type MunicipalEntityModel = {
   years: number[];
@@ -280,7 +289,7 @@ export function buildCountryListRow(totalFacts: MunicipalTotalFact[], year: numb
     id: MUNICIPAL_COUNTRY_ID,
     kind: "country",
     nameKa: "საქართველო",
-    subtitleKa: "69 მუნიციპალური ბიუჯეტი",
+    subtitleKa: `${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური ბიუჯეტი`,
     regionId: null,
     valueGel: totalByYear[year] ?? 0,
     budgetPerResidentGel: null,
@@ -476,44 +485,62 @@ export function buildMunicipalIndicatorPresentation(
   };
 }
 
-/** The four entity KPIs, for both municipality and region pages. */
-export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] {
-  const { model, nationalTotalByYear } = input;
+export type MunicipalKpiSet = {
+  official: MunicipalKpi;
+  growth: MunicipalKpi;
+  largestField: MunicipalKpi;
+  standing: MunicipalKpi;
+};
+
+/**
+ * The three cards every municipal view shares. Only the fourth — standing —
+ * differs: entity pages show rank, the country page shows the budget count.
+ */
+function buildSharedMunicipalKpis(model: MunicipalEntityModel): Omit<MunicipalKpiSet, "standing"> {
   const startYear = model.years[0];
   const endYear = model.years.at(-1);
-
   const officialStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
   const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
   const officialEndParts = formatAmountParts(officialEnd);
-  const nationalEnd = endYear === undefined ? 0 : nationalTotalByYear[endYear] ?? 0;
   const growth = changeBetween(officialStart, officialEnd);
-  const rank = endYear === undefined ? 0 : input.rankByYear[endYear] ?? 0;
-
   const largest = sortedByEndYear(model.rows, endYear)[0];
   const largestValue = largest && endYear !== undefined ? largest.valuesByYear[endYear] ?? 0 : 0;
 
-  return [
-    {
+  return {
+    official: {
       label: "ოფიციალური ბიუჯეტი",
       value: officialEndParts.num,
       unit: officialEndParts.unit,
       detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
     },
-    {
+    growth: {
       label: `ზრდა ${startYear ?? ""}-დან`,
       // MISSING and the U+2212 minus come from format.ts — never hand-write
       // either (Global Constraints). formatShare's third argument is the
-      // decimal count; Task 6 added it so a 0-decimal signed percent does not
-      // have to build its own sign. Zero growth renders "0%", not "+0%".
+      // decimal count, so a 0-decimal signed percent does not have to build its
+      // own sign. Zero growth renders "0%", not "+0%".
       value: growth === null ? MISSING : formatShare(growth, true, 0),
       detail: `${formatAmount(officialStart)} → ${formatAmount(officialEnd)}`,
     },
-    {
+    largestField: {
       label: "უმსხვილესი სფერო",
       value: officialEnd ? formatShare(largestValue / officialEnd) : MISSING,
       detail: largest?.kaLabel ?? "",
     },
-    {
+  };
+}
+
+/** The four entity KPIs, for both municipality and region pages. */
+export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpiSet {
+  const { model, nationalTotalByYear } = input;
+  const endYear = model.years.at(-1);
+  const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
+  const nationalEnd = endYear === undefined ? 0 : nationalTotalByYear[endYear] ?? 0;
+  const rank = endYear === undefined ? 0 : input.rankByYear[endYear] ?? 0;
+
+  return {
+    ...buildSharedMunicipalKpis(model),
+    standing: {
       label: "წილი მუნიციპალურ ხარჯებში",
       value: nationalEnd > 0 && officialEnd !== null ? formatShare(officialEnd / nationalEnd) : MISSING,
       // `detail` is this municipality's ordinal rank for the selected period.
@@ -522,43 +549,19 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpi[] 
       // coverage across every year in the range.
       detail: `${georgianOrdinal(rank)} ადგილი ${input.rankOutOf}-დან`,
     },
-  ];
+  };
 }
 
 /** The country view has no rank because it is the aggregate denominator itself. */
-export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: number): MunicipalKpi[] {
-  const startYear = model.years[0];
-  const endYear = model.years.at(-1);
-  const officialStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
-  const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
-  const officialEndParts = formatAmountParts(officialEnd);
-  const growth = changeBetween(officialStart, officialEnd);
-  const largest = sortedByEndYear(model.rows, endYear)[0];
-  const largestValue = largest && endYear !== undefined ? largest.valuesByYear[endYear] ?? 0 : 0;
-
-  return [
-    {
-      label: "ოფიციალური ბიუჯეტი",
-      value: officialEndParts.num,
-      unit: officialEndParts.unit,
-      detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
-    },
-    {
-      label: `ზრდა ${startYear ?? ""}-დან`,
-      value: growth === null ? MISSING : formatShare(growth, true, 0),
-      detail: `${formatAmount(officialStart)} → ${formatAmount(officialEnd)}`,
-    },
-    {
-      label: "უმსხვილესი სფერო",
-      value: officialEnd ? formatShare(largestValue / officialEnd) : MISSING,
-      detail: largest?.kaLabel ?? "",
-    },
-    {
+export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: number): MunicipalKpiSet {
+  return {
+    ...buildSharedMunicipalKpis(model),
+    standing: {
       label: "მუნიციპალური ბიუჯეტები",
       value: String(budgetCount),
-      detail: "64 საჯარო გვერდი · 5 მხოლოდ საქართველოს ჯამში",
+      detail: `${MUNICIPAL_PUBLIC_PAGE_COUNT} საჯარო გვერდი · ${MUNICIPAL_AGGREGATE_ONLY_COUNT} მხოლოდ საქართველოს ჯამში`,
     },
-  ];
+  };
 }
 
 /**

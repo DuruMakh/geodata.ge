@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
   loadMunicipalAdjaraBudgetAdjustmentsFromMirror,
   loadMunicipalPopulationFactsFromMirror,
@@ -91,5 +91,29 @@ describe("municipal population mirror reader", () => {
         mirrorWithPopulation({ referenceDate: new Date("2024-11-14T00:00:00.000Z") }),
       ),
     ).rejects.toThrow(/2025-01-01/);
+  });
+});
+
+// Captured before any mutation. Deleting process.env.TZ does NOT restore the
+// system zone on Node 24 — the last assigned value sticks — so restore by
+// assignment, falling back to the resolved system zone when TZ was never set.
+const ORIGINAL_TZ = process.env.TZ ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+describe("municipal population mirror date conversion", () => {
+  afterEach(() => {
+    process.env.TZ = ORIGINAL_TZ;
+  });
+
+  it("keeps the calendar date when the driver returns local midnight in a UTC+ zone", async () => {
+    process.env.TZ = "Asia/Tbilisi";
+
+    await expect(
+      loadMunicipalPopulationFactsFromMirror(
+        mirrorWithPopulation({
+          referenceDate: new Date(2025, 0, 1),
+          lastReviewedAt: new Date(2026, 7, 3),
+        }),
+      ),
+    ).resolves.toMatchObject([{ referenceDate: "2025-01-01", lastReviewedAt: "2026-08-03" }]);
   });
 });

@@ -2,33 +2,17 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { budgetFactsToCsv, type BudgetFactCsvRow } from "../lib/data/factCsv";
-import { TOTAL_ONLY_BUDGET_FACTS, TOTAL_ONLY_BUDGET_FACT_REPORT } from "../lib/data/totalOnlyBudgetFacts";
-import { EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_TOTAL_ONLY_YEARS, REVENUE_YEARS } from "../lib/data/coverage";
+import { EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_YEARS } from "../lib/data/coverage";
 import { loadBudgetFactRows, type BudgetFactImportRow } from "../lib/data/importBudgetFacts";
 
 const expenditureYears = EXPENDITURE_YEARS;
 const detailedExpenditureYears = EXPENDITURE_DETAILED_YEARS;
 const revenueYears = REVENUE_YEARS;
 
-
-function csvRowsToBudgetRows(rows: BudgetFactCsvRow[]): BudgetFactImportRow[] {
-  return rows.map((row) => ({
-    year: row.year,
-    side: row.side,
-    itemId: row.item_id,
-    amountGel: Number(row.amount_gel),
-    basis: row.basis,
-    sourceId: row.source_id,
-    officialInstitution: row.official_institution || null,
-    officialProgram: row.official_program || null,
-    officialSubprogram: row.official_subprogram || null,
-    publicSpendingFieldId: row.public_spending_field_id || null,
-    mappingConfidence: row.mapping_confidence === "" ? null : (row.mapping_confidence as BudgetFactImportRow["mappingConfidence"]),
-    mappingNotes: row.mapping_notes,
-  }));
-}
 export function budgetRowsToCsvRows(rows: BudgetFactImportRow[]): BudgetFactCsvRow[] {
-  return rows
+  // Copy first: this is exported and called twice from main(), and the second
+  // caller still holds a reference to the array it passed in.
+  return [...rows]
     .sort((a, b) => {
       if (a.year !== b.year) return a.year - b.year;
       if (a.side !== b.side) return a.side.localeCompare(b.side);
@@ -59,10 +43,7 @@ async function main() {
     ),
     loadBudgetFactRows("../../data/imports/revenue-facts-2004-2025.csv"),
   ]);
-  const expenditureRows = [
-    ...csvRowsToBudgetRows(TOTAL_ONLY_BUDGET_FACTS.filter((row) => row.side === "expenditure")),
-    ...expenditureRowsByYear.flat(),
-  ];
+  const expenditureRows = expenditureRowsByYear.flat();
   const rows = budgetRowsToCsvRows([...expenditureRows, ...revenueRows]);
   const importsDir = path.resolve(process.cwd(), "../../data/imports");
   const reportsDir = path.resolve(process.cwd(), "../../data/reports");
@@ -74,7 +55,6 @@ async function main() {
     expenditureRows: expenditureRows.length,
     revenueRows: revenueRows.length,
     totalRows: rows.length,
-    totalOnlyRows: TOTAL_ONLY_BUDGET_FACT_REPORT.rows.filter((row) => row.side !== "revenue" || REVENUE_TOTAL_ONLY_YEARS.includes(row.year)),
   };
 
   await mkdir(importsDir, { recursive: true });

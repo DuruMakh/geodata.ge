@@ -141,3 +141,38 @@ describe("municipal hash state", () => {
     expect(() => parseMunicipalHash("#%%%")).not.toThrow();
   });
 });
+
+describe("shared hash vocabulary", () => {
+  it("reads m, sh, r and sel identically on both sections", () => {
+    const hash = "#g=fields&m=table&sh=1&r=2010-2020&sel=a,b,a";
+
+    const explorer = parseExplorerHash(hash, "expenditure");
+    const municipal = parseMunicipalHash(hash);
+
+    expect(municipal.chartMode).toBe(explorer.chartMode);
+    expect(municipal.share).toBe(explorer.share);
+    expect(municipal.range?.start).toBe(explorer.range?.start);
+    expect(municipal.range?.end).toBe(explorer.range?.end);
+    expect(municipal.selection).toEqual(explorer.selection?.ids);
+  });
+
+  it("writes m, sh, r and sel identically on both sections", () => {
+    const shared = { chartMode: "line" as const, share: false, rangeStart: 2015, rangeEnd: 2025, selectedIds: ["x", "y"] };
+
+    const explorer = new URLSearchParams(
+      serializeExplorerHash({
+        nav: "revenue",
+        grouping: "fields",
+        analysisSide: "expenditure",
+        analysisGrouping: "fields",
+        analysisYear: null,
+        ...shared,
+      }),
+    );
+    const municipal = new URLSearchParams(serializeMunicipalHash(shared));
+
+    for (const key of ["m", "sh", "r", "sel"]) {
+      expect(municipal.get(key)).toBe(explorer.get(key));
+    }
+  });
+});

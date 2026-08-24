@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_SOURCE_YEARS, EXPENDITURE_TOTAL_ONLY_YEARS, REVENUE_DETAILED_YEARS, REVENUE_PARTIAL_YEARS, REVENUE_SOURCE_YEARS, REVENUE_TOTAL_ONLY_YEARS, REVENUE_YEARS, inclusiveYears } from "../../lib/data/coverage";
+import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_SOURCE_YEARS, REVENUE_DETAILED_YEARS, REVENUE_PARTIAL_YEARS, REVENUE_SOURCE_YEARS, REVENUE_YEARS, inclusiveYears } from "../../lib/data/coverage";
 import { loadSourceDocuments } from "../../lib/data/sources";
 
 const repoRoot = path.resolve(process.cwd(), "../..");
@@ -83,9 +83,7 @@ describe("2004-2025 source coverage", () => {
     expect(missing).toEqual([]);
   });
   it("documents explicit old-year coverage tiers", () => {
-    expect(EXPENDITURE_TOTAL_ONLY_YEARS).toEqual([]);
     expect(EXPENDITURE_DETAILED_YEARS).toEqual(inclusiveYears(2004, 2025));
-    expect(REVENUE_TOTAL_ONLY_YEARS).toEqual([]);
     expect(REVENUE_PARTIAL_YEARS).toEqual([2004]);
     expect(REVENUE_DETAILED_YEARS[0]).toBe(2005);
     expect(REVENUE_YEARS[0]).toBe(2004);

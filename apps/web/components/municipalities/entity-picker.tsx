@@ -31,7 +31,7 @@ export type EntityPickerCountry = {
   id: typeof MUNICIPAL_COUNTRY_ID;
   nameKa: "საქართველო";
   valueGel: number;
-  budgetCount: 69;
+  budgetCount: number;
 };
 
 type EntityPickerProps = {

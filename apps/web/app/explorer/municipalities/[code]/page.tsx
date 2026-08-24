@@ -10,6 +10,7 @@ import {
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
+  MUNICIPAL_COUNTRY_BUDGET_COUNT,
 } from "../../../../lib/explorer/municipalData";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
@@ -128,7 +129,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
             id: MUNICIPAL_COUNTRY_ID,
             nameKa: "საქართველო",
             valueGel: nationalTotalByYear[latestYear] ?? 0,
-            budgetCount: 69,
+            budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
           }}
           pickerGroups={buildPickerGroups(listInput)}
           navigation={{

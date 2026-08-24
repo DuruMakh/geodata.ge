@@ -7,17 +7,15 @@ export const APP_END_YEAR = 2025;
 export const REVENUE_START_YEAR = 2005;
 
 export const EXPENDITURE_SOURCE_YEARS = inclusiveYears(APP_START_YEAR, APP_END_YEAR);
-export const EXPENDITURE_TOTAL_ONLY_YEARS: number[] = [];
 export const EXPENDITURE_DETAILED_YEARS = inclusiveYears(APP_START_YEAR, APP_END_YEAR);
-export const EXPENDITURE_YEARS = [...EXPENDITURE_TOTAL_ONLY_YEARS, ...EXPENDITURE_DETAILED_YEARS];
+export const EXPENDITURE_YEARS = [...EXPENDITURE_DETAILED_YEARS];
 
 export const REVENUE_SOURCE_YEARS = inclusiveYears(REVENUE_START_YEAR, APP_END_YEAR);
-export const REVENUE_TOTAL_ONLY_YEARS: number[] = [];
 // The 2004 annual report provides ten comparable consolidated revenue-and-grants
 // categories but not the Form #1 increase-in-liabilities row.
 export const REVENUE_PARTIAL_YEARS = [2004];
 export const REVENUE_DETAILED_YEARS = inclusiveYears(2005, APP_END_YEAR);
-export const REVENUE_YEARS = [...REVENUE_TOTAL_ONLY_YEARS, ...REVENUE_PARTIAL_YEARS, ...REVENUE_DETAILED_YEARS].sort((a, b) => a - b);
+export const REVENUE_YEARS = [...REVENUE_PARTIAL_YEARS, ...REVENUE_DETAILED_YEARS].sort((a, b) => a - b);
 
 // Ministries (organizational) coverage. 2017-2025 is the confirmed baseline.
 // 2013 is a drop-in (its workbook is the full tavi 6 actuals table).

@@ -12,6 +12,7 @@ import {
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
+  MUNICIPAL_COUNTRY_BUDGET_COUNT,
   regionFactsFor,
 } from "../../../../../lib/explorer/municipalData";
 import { georgianOrdinal, REGION_GENITIVE_KA } from "../../../../../lib/explorer/municipalLabels";
@@ -158,7 +159,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
             id: MUNICIPAL_COUNTRY_ID,
             nameKa: "საქართველო",
             valueGel: nationalTotalByYear[latestYear] ?? 0,
-            budgetCount: 69,
+            budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
           }}
           pickerGroups={buildPickerGroups(listInput)}
           navigation={{

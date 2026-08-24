@@ -229,9 +229,9 @@ describe("methodology catalog", () => {
   });
 
   it("does not leave current 2004 coverage claims at the pre-feature boundary", async () => {
-    const [design, totalOnlyFacts, sourceRegistry, groupC, ministries, oldClassification] = await Promise.all([
+    const [design, functionalMethodology, sourceRegistry, groupC, ministries, oldClassification] = await Promise.all([
       readFile(path.join(repositoryRoot, "DESIGN.md"), "utf8"),
-      readFile(path.join(repositoryRoot, "apps/web/lib/data/totalOnlyBudgetFacts.ts"), "utf8"),
+      readFile(path.join(repositoryRoot, "docs/data-methodology/treasury-functional-expenditure-methodology-2004-2025.md"), "utf8"),
       readFile(path.join(repositoryRoot, "apps/web/lib/data/realExpenditurePdf/expenditureSourcesByYear.ts"), "utf8"),
       readFile(path.join(repositoryRoot, "docs/data-methodology/group-c-annual-report-ministries-methodology.md"), "utf8"),
       readFile(path.join(repositoryRoot, "docs/data-methodology/ministries-expenditure-methodology.md"), "utf8"),
@@ -240,7 +240,7 @@ describe("methodology catalog", () => {
 
     expect(design).toContain("Expenditure by public spending fields: **2004–2025**");
     expect(design).toContain("Expenditure by ministries (administrative view): **2004–2025**");
-    expect(totalOnlyFacts).toContain("2004 expenditure is now detailed via the complete state-budget execution annex");
+    expect(functionalMethodology).toContain("The 2004 functional facts come from the complete state-budget execution annex");
     expect(sourceRegistry).toContain("2005-2025 E11-era registry");
     expect(sourceRegistry).toContain("year2004StateBudget.ts");
     expect(groupC).toContain("2004–2025 contiguously (22 reconciling years)");
