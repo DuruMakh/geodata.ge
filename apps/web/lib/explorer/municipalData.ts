@@ -13,6 +13,7 @@ import type { ExplorerTableRow } from "./types";
 import { colorForItem, INK } from "./colors";
 import { formatAmount, formatAmountParts, formatPerResidentGel, formatShare, MISSING } from "./format";
 import { georgianOrdinal } from "./municipalLabels";
+import { shareOfTotal } from "./share";
 
 // Model layer for the municipalities section.
 //
@@ -158,6 +159,25 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
 /** The official total is the only pristine municipal selection. */
 export function getDefaultMunicipalSelection(model: MunicipalEntityModel): string[] {
   return model.years.length === 0 ? [] : [model.totalRow.itemId];
+}
+
+/**
+ * A municipal row's share of the official MoF total for that year.
+ *
+ * One definition for every municipal surface that renders a share — the table
+ * column, the chart series, the Excel workbook, and the two route summaries.
+ * Returns a fraction; the chart multiplies by 100 at its own call site because
+ * its axis is in percentage points.
+ *
+ * The functions do not cover the whole official total, so these shares
+ * deliberately do not sum to 1 — the uncovered gap is real and stays visible.
+ */
+export function municipalShareValueForYear(
+  model: MunicipalEntityModel,
+  row: ExplorerTableRow,
+  year: number,
+): number | null {
+  return shareOfTotal(row.valuesByYear[year], model.totalRow.valuesByYear[year]);
 }
 
 export type MunicipalListRow = {

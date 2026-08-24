@@ -11,9 +11,9 @@ import {
   buildMovers,
   buildMunicipalEntityModel,
   getDefaultMunicipalSelection,
+  municipalShareValueForYear,
 } from "../../lib/explorer/municipalData";
 import { formatAmount, unitFor, UNIT_MLN } from "../../lib/explorer/format";
-import { shareOfTotal } from "../../lib/explorer/share";
 import type { ChartMode } from "../../lib/explorer/types";
 import {
   buildWorkbookExportModel,
@@ -153,8 +153,10 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       color: row.color,
       vals: years.map((year) => {
         const value = row.valuesByYear[year] ?? null;
-        const total = model.totalRow.valuesByYear[year] ?? null;
-        return !state.share ? value : value === null || !total ? null : (value / total) * 100;
+        if (!state.share) return value;
+        // The chart axis is in percentage points, not fractions.
+        const share = municipalShareValueForYear(model, row, year);
+        return share === null ? null : share * 100;
       }),
       planned: years.map(() => false),
     }));
@@ -190,16 +192,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       for (const year of years) {
         const amountGel = row.valuesByYear[year];
         const basis = row.basisByYear[year];
-        const total = model.totalRow.valuesByYear[year];
         pointsByYear[year] = amountGel === null || amountGel === undefined || basis === undefined
           ? null
           : {
               amountGel,
-              measureValue: state.share
-                ? total === null || total === undefined || total === 0
-                  ? null
-                  : amountGel / total
-                : undefined,
+              measureValue: state.share ? municipalShareValueForYear(model, row, year) : undefined,
               basis,
             };
       }
@@ -360,9 +357,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               unit={unit}
               share={state.share}
               shareColumnLabel="წილი"
-              shareValueForYear={(row, year) =>
-                shareOfTotal(row.valuesByYear[year], model.totalRow.valuesByYear[year])
-              }
+              shareValueForYear={(row, year) => municipalShareValueForYear(model, row, year)}
             />
           )}
 
