@@ -32,6 +32,14 @@ export type MethodologyContent = {
   summaryKa: string;
   reviewedAt: string;
   archiveManifestId: MethodologyDatasetId;
+  // Where this dataset's coverage years come from. Declared rather than inferred:
+  // the previous derivation filtered budget facts by `fact.side === id`, which
+  // worked only because two of three dataset ids happened to equal the two
+  // BudgetSide values. The next four datasets (ინფლაცია, მშპ, მოსახლეობა,
+  // უმუშევრობა) are not budget sides.
+  coverageSource:
+    | { kind: "budgetSide"; side: ServedBudgetFact["side"] }
+    | { kind: "municipalTotals" };
   canonicalDocuments: readonly string[];
   disclosureKa: string;
   keyFacts: readonly {

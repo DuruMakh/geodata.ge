@@ -130,6 +130,7 @@ export const EXPENDITURE_METHODOLOGY_CONTENT: MethodologyContent = {
   summaryKa: "როგორ ერთიანდება სახელმწიფო ბიუჯეტის ფაქტობრივი გადასახდელები მოქალაქისთვის გასაგებ სფეროებად, უწყებებად და ძირითად პროგრამებად.",
   reviewedAt: "2026-08-20",
   archiveManifestId: "expenditure",
+  coverageSource: { kind: "budgetSide", side: "expenditure" },
   canonicalDocuments: [
     "docs/data-methodology/treasury-functional-expenditure-methodology-2004-2025.md",
     "docs/data-methodology/ministries-expenditure-methodology.md",
