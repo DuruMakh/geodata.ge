@@ -8,7 +8,7 @@ export const REVENUE_START_YEAR = 2005;
 
 export const EXPENDITURE_SOURCE_YEARS = inclusiveYears(APP_START_YEAR, APP_END_YEAR);
 export const EXPENDITURE_DETAILED_YEARS = inclusiveYears(APP_START_YEAR, APP_END_YEAR);
-export const EXPENDITURE_YEARS = EXPENDITURE_DETAILED_YEARS;
+export const EXPENDITURE_YEARS = [...EXPENDITURE_DETAILED_YEARS];
 
 export const REVENUE_SOURCE_YEARS = inclusiveYears(REVENUE_START_YEAR, APP_END_YEAR);
 // The 2004 annual report provides ten comparable consolidated revenue-and-grants
