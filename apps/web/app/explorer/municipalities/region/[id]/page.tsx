@@ -16,7 +16,7 @@ import {
   regionFactsFor,
 } from "../../../../../lib/explorer/municipalData";
 import { georgianOrdinal, REGION_GENITIVE_KA } from "../../../../../lib/explorer/municipalLabels";
-import { formatAmount } from "../../../../../lib/explorer/format";
+import { formatAmount, formatShare } from "../../../../../lib/explorer/format";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../../lib/methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../../../../../lib/seo/metadata";
 import { resolveSiteUrl } from "../../../../../lib/siteUrl";
@@ -104,6 +104,16 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
           totalFacts: applyAdjaraBudgetAdjustment(rolled.totalFacts, adjaraBudgetAdjustments),
         }
       : rolled;
+  const latestTotal = own.totalFacts.find((row) => row.year === latestYear)!;
+  const largestFunctionFact = own.functionFacts
+    .filter((row) => row.year === latestYear)
+    .sort((left, right) => right.amountGel - left.amountGel)[0]!;
+  const largestFunction = functions.find((row) => row.id === largestFunctionFact.categoryId)!;
+  const regionName = REGION_GENITIVE_KA[regionId] ?? region.kaLabel;
+  const summary =
+    regionId === ADJARA_REGION_ID
+      ? `აჭარის გაერთიანებული ბიუჯეტი ${latestYear} წელს ${formatAmount(latestTotal.publicTotalGel)} იყო — ${regions.length} რეგიონს შორის ${georgianOrdinal(rank)} ადგილი. ჯამი აერთიანებს ${members.memberCodes.length} მუნიციპალიტეტსა და აჭარის ა.რ. რესპუბლიკურ ბიუჯეტს, შიდა ტრანსფერების გამოკლებით.`
+      : `${regionName} მუნიციპალიტეტების ჯამური ბიუჯეტი ${latestYear} წელს ${formatAmount(latestTotal.publicTotalGel)} იყო — ${regions.length} რეგიონს შორის ${georgianOrdinal(rank)} ადგილი. ყველაზე დიდი ფუნქციური მიმართულებაა ${largestFunction.kaLabel}, რომელიც ბიუჯეტის ${formatShare(largestFunctionFact.amountGel / latestTotal.publicTotalGel)}-ს შეადგენს.`;
 
   const memberRows = list.municipalities
     .filter((row) => row.regionId === regionId)
@@ -166,6 +176,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
             prev: { label: prev.kaLabel, href: hrefFor(prev) },
             next: { label: next.kaLabel, href: hrefFor(next) },
           }}
+          summary={summary}
           sourceNote={`${regionId === ADJARA_REGION_ID ? ADJARA_SOURCE_NOTE : SOURCE_NOTE_BASE}${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         >
           <div className="mt-11 border-t-2 border-[var(--ink)] pt-[22px]">

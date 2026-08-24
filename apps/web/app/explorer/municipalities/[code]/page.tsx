@@ -12,6 +12,7 @@ import {
   latestReviewedAtForMunicipalFacts,
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
 } from "../../../../lib/explorer/municipalData";
+import { formatAmount, formatShare } from "../../../../lib/explorer/format";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
 import {
@@ -66,6 +67,10 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
   const firstYear = years[0]!;
   const latestYear = years.at(-1)!;
   const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
+  const region = regions.find((row) => row.id === municipality.regionId)!;
+  const regionSlug = region.id.replace("region.", "");
+  const regionPath = `/explorer/municipalities/region/${regionSlug}` as const;
+  const regionBreadcrumbLabel = region.id === "region.tbilisi" ? "თბილისის რეგიონი" : region.kaLabel;
 
   const listInput = { municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear };
   const rankByYear = years.reduce<Record<number, number>>((ranks, year) => {
@@ -82,6 +87,16 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
     functionFacts: functionFacts.filter((row) => row.municipalityCode === code),
     totalFacts: totalFacts.filter((row) => row.municipalityCode === code),
   };
+  const latestTotal = own.totalFacts.find((row) => row.year === latestYear)!;
+  const largestFunctionFact = own.functionFacts
+    .filter((row) => row.year === latestYear)
+    .sort((left, right) => right.amountGel - left.amountGel)[0]!;
+  const largestFunction = functions.find((row) => row.id === largestFunctionFact.categoryId)!;
+  const summary =
+    `${municipality.nameKa}ს ბიუჯეტი ${latestYear} წელს ${formatAmount(latestTotal.publicTotalGel)} იყო — ` +
+    `${municipalities.length} მუნიციპალიტეტს შორის ${georgianOrdinal(rank)} ადგილი. ` +
+    `ყველაზე დიდი ფუნქციური მიმართულებაა ${largestFunction.kaLabel}, რომელიც ბიუჯეტის ` +
+    `${formatShare(largestFunctionFact.amountGel / latestTotal.publicTotalGel)}-ს შეადგენს.`;
 
   // Prev/next walk the registry's official sort order, which is roughly
   // region-grouped in the source, so stepping through stays geographic.
@@ -94,7 +109,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
-      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }, { name: municipality.displayNameKa, path: `/explorer/municipalities/${code}` }]} />
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }, { name: regionBreadcrumbLabel, path: regionPath }, { name: municipality.displayNameKa, path: `/explorer/municipalities/${code}` }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[
@@ -102,6 +117,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
             { label: "მონაცემები" },
             { label: "ბიუჯეტი", href: "/explorer" },
             { label: "მუნიციპალიტეტები", href: "/explorer/municipalities" },
+            { label: regionBreadcrumbLabel, href: regionPath },
             { label: municipality.displayNameKa },
           ]}
           coverage={[`${firstYear}–${latestYear}`, lastUpdatedAt ? `განახლდა ${lastUpdatedAt}` : ""].filter(Boolean).join(" · ")}
@@ -136,6 +152,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
             prev: { label: prev.displayNameKa, href: `/explorer/municipalities/${prev.code}` },
             next: { label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` },
           }}
+          summary={summary}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
         />
       </div>

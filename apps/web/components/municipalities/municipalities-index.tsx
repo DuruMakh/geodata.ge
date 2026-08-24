@@ -61,18 +61,90 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
     };
   }, []);
 
-  const source = useMemo(
-    () => (level === "region" ? [props.country, ...props.regions] : props.municipalities),
-    [level, props.country, props.municipalities, props.regions],
+  const sources = useMemo(
+    () => ({ muni: props.municipalities, region: [props.country, ...props.regions] }),
+    [props.country, props.municipalities, props.regions],
   );
-  const rows = useMemo(() => {
+  const rowsByLevel = useMemo(() => {
     const needle = query.trim();
-    if (needle === "") return source;
-    return source.filter((row) => row.nameKa.includes(needle) || row.subtitleKa.includes(needle));
-  }, [source, query]);
+    if (needle === "") return sources;
+    const filter = (rows: MunicipalListRow[]) =>
+      rows.filter((row) => row.nameKa.includes(needle) || row.subtitleKa.includes(needle));
+    return { muni: filter(sources.muni), region: filter(sources.region) };
+  }, [sources, query]);
+  const source = sources[level];
+  const rows = rowsByLevel[level];
 
-  const max = source[0]?.valueGel ?? 1;
   const openMunicipality = (code: string) => router.push(`/explorer/municipalities/${code}`);
+
+  function renderRowsFor(panelLevel: "muni" | "region") {
+    const panelRows = rowsByLevel[panelLevel];
+    const max = sources[panelLevel][0]?.valueGel ?? 1;
+    const activePanel = panelLevel === level;
+
+    return (
+      <div
+        data-testid={`municipal-list-${panelLevel}`}
+        hidden={!activePanel}
+        className="mt-1.5 max-h-[620px] overflow-y-auto"
+      >
+        {panelRows.map((row) => (
+          <Link
+            key={row.id}
+            href={municipalEntityHref(row.kind, row.id)}
+            data-testid={activePanel ? "municipal-list-row" : undefined}
+            data-municipality-row-code={row.kind === "municipality" ? row.id : undefined}
+            data-active={row.kind === "municipality" && row.id === activeMunicipalityCode ? "true" : undefined}
+            onMouseEnter={() => {
+              if (row.kind === "municipality") setListPointerCode(row.id);
+            }}
+            onMouseLeave={() => {
+              if (row.kind === "municipality") setListPointerCode(null);
+            }}
+            onFocus={() => {
+              if (row.kind === "municipality") setListFocusCode(row.id);
+            }}
+            onBlur={() => {
+              if (row.kind === "municipality") setListFocusCode(null);
+            }}
+            className={`grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] ${
+              row.kind === "municipality" && row.id === activeMunicipalityCode ? "bg-[var(--tint)]" : "bg-transparent"
+            }`}
+          >
+            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
+              {row.rank === null ? "—" : String(row.rank).padStart(2, "0")}
+            </span>
+            <span className="min-w-0">
+              <span data-testid="municipal-row-name" className="block truncate text-[12.5px] font-medium">
+                {row.nameKa}
+              </span>
+              <span className="block truncate text-[10.5px] text-[var(--faint)]">{row.subtitleKa}</span>
+              <span className="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
+                <span
+                  data-testid="municipal-row-bar"
+                  className="block h-[3px] bg-[var(--accent)]"
+                  style={{ width: `${((row.valueGel / max) * 100).toFixed(1)}%` }}
+                />
+              </span>
+            </span>
+            <span className="min-w-0 text-right font-[family-name:var(--font-numeric)]">
+              <span data-testid="municipal-row-primary-amount" className="block text-[11.5px]">
+                {formatAmount(row.valueGel)}
+              </span>
+              {row.budgetPerResidentGel !== null ? (
+                <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[10px] leading-[1.25] text-[var(--muted)]">
+                  {formatPerResidentGel(row.budgetPerResidentGel).replace(" ₾", "")} ერთ სულზე
+                </span>
+              ) : null}
+            </span>
+            <span aria-hidden className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">
+              →
+            </span>
+          </Link>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -149,62 +221,10 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               </button>
             </div>
           ) : (
-            <div className="mt-1.5 max-h-[620px] overflow-y-auto">
-              {rows.map((row) => (
-                <Link
-                  key={row.id}
-                  href={municipalEntityHref(row.kind, row.id)}
-                  data-testid="municipal-list-row"
-                  data-municipality-row-code={row.kind === "municipality" ? row.id : undefined}
-                  data-active={row.kind === "municipality" && row.id === activeMunicipalityCode ? "true" : undefined}
-                  onMouseEnter={() => {
-                    if (row.kind === "municipality") setListPointerCode(row.id);
-                  }}
-                  onMouseLeave={() => {
-                    if (row.kind === "municipality") setListPointerCode(null);
-                  }}
-                  onFocus={() => {
-                    if (row.kind === "municipality") setListFocusCode(row.id);
-                  }}
-                  onBlur={() => {
-                    if (row.kind === "municipality") setListFocusCode(null);
-                  }}
-                  className={`grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] ${
-                    row.kind === "municipality" && row.id === activeMunicipalityCode ? "bg-[var(--tint)]" : "bg-transparent"
-                  }`}
-                >
-                  <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                    {row.rank === null ? "—" : String(row.rank).padStart(2, "0")}
-                  </span>
-                  <span className="min-w-0">
-                    <span data-testid="municipal-row-name" className="block truncate text-[12.5px] font-medium">
-                      {row.nameKa}
-                    </span>
-                    <span className="block truncate text-[10.5px] text-[var(--faint)]">{row.subtitleKa}</span>
-                    <span className="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
-                      <span
-                        data-testid="municipal-row-bar"
-                        className="block h-[3px] bg-[var(--accent)]"
-                        style={{ width: `${((row.valueGel / max) * 100).toFixed(1)}%` }}
-                      />
-                    </span>
-                  </span>
-                  <span className="min-w-0 text-right font-[family-name:var(--font-numeric)]">
-                    <span data-testid="municipal-row-primary-amount" className="block text-[11.5px]">
-                      {formatAmount(row.valueGel)}
-                    </span>
-                    {row.budgetPerResidentGel !== null ? (
-                      <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[10px] leading-[1.25] text-[var(--muted)]">
-                        {formatPerResidentGel(row.budgetPerResidentGel).replace(" ₾", "")} ერთ სულზე
-                      </span>
-                    ) : null}
-                  </span>
-                  <span aria-hidden className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">
-                    →
-                  </span>
-                </Link>
-              ))}
-            </div>
+            <>
+              {renderRowsFor("muni")}
+              {renderRowsFor("region")}
+            </>
           )}
         </div>
       </div>

@@ -929,6 +929,25 @@ test.describe("municipality page", () => {
     expect(indicatorsBox!.y).toBeGreaterThanOrEqual(excelBox!.y + excelBox!.height);
   });
 
+  test("places a data-derived entity summary below the chart source and before the indicators", async ({ page }) => {
+    await page.goto(ENTITY_URL);
+    await expectMunicipalAppReady(page);
+
+    const summary = page.getByTestId("municipal-entity-summary");
+    await expect(summary).toHaveText(
+      "ქალაქ თბილისის მუნიციპალიტეტის ბიუჯეტი 2025 წელს 2.1 მლრდ ₾ იყო — 64 მუნიციპალიტეტს შორის პირველი ადგილი. ყველაზე დიდი ფუნქციური მიმართულებაა ეკონომიკური საქმიანობა, რომელიც ბიუჯეტის 34.9%-ს შეადგენს.",
+    );
+
+    const sourceBox = await page.getByTestId("municipal-source-note").boundingBox();
+    const summaryBox = await summary.boundingBox();
+    const indicatorsBox = await page.getByTestId("period-indicators").boundingBox();
+    expect(sourceBox).not.toBeNull();
+    expect(summaryBox).not.toBeNull();
+    expect(indicatorsBox).not.toBeNull();
+    expect(summaryBox!.y).toBeGreaterThanOrEqual(sourceBox!.y + sourceBox!.height);
+    expect(indicatorsBox!.y).toBeGreaterThanOrEqual(summaryBox!.y + summaryBox!.height);
+  });
+
   test("matches the national mover and comparison presentation", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
