@@ -51,6 +51,18 @@ test("explorer datasets publish stable ids and downloadable CSV distributions", 
   }
 });
 
+test("only third-party methodology source originals send a noindex header", async ({ request }) => {
+  const original = await request.get(
+    `${BASE_URL}/downloads/methodology/expenditure/files/2004/mof-annual-execution-annex.pdf`,
+  );
+  const processed = await request.get(`${BASE_URL}/downloads/data/national-expenditure.csv`);
+  const methodologyPage = await request.get(`${BASE_URL}/methodology/expenditure`);
+
+  expect(original.headers()["x-robots-tag"]).toBe("noindex, follow");
+  expect(processed.headers()["x-robots-tag"]).toBeUndefined();
+  expect(methodologyPage.headers()["x-robots-tag"]).toBeUndefined();
+});
+
 test("entity datasets use final URLs and omit unavailable workbook distributions", async ({ page }) => {
   for (const route of [
     "/explorer/municipalities/tbilisi",
@@ -90,9 +102,12 @@ test("site Organization schema publishes the square SVG logo without unverified 
 
 test("municipality navigation uses crawlable links", async ({ page }) => {
   await page.goto(`${BASE_URL}/explorer/municipalities`);
-  await expect(page.getByTestId("municipal-list-row").first()).toHaveAttribute(
-    "href",
-    /\/explorer\/municipalities\/[a-z][a-z0-9-]*$/,
+  const municipalityHrefs = await page
+    .getByTestId("municipal-list-row")
+    .evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+  expect(municipalityHrefs).toHaveLength(64);
+  expect(new Set(municipalityHrefs)).toEqual(
+    new Set(MUNICIPALITY_ROUTES.map(({ slug }) => `/explorer/municipalities/${slug}`)),
   );
 });
 
@@ -129,8 +144,15 @@ test("municipality index server-renders the existing country and region tab link
   const html = await response.text();
   const countryHrefs = html.match(/href="\/explorer\/municipalities\/georgia"/g) ?? [];
   const regionHrefs = html.match(/href="\/explorer\/municipalities\/region\/[^\"]+"/g) ?? [];
+  const municipalityHrefs = [
+    ...html.matchAll(/href="(\/explorer\/municipalities\/(?!georgia")[a-z][a-z0-9-]*)"/g),
+  ].map((match) => match[1]);
   expect(countryHrefs).toHaveLength(1);
   expect(regionHrefs).toHaveLength(11);
+  expect(municipalityHrefs).toHaveLength(64);
+  expect(new Set(municipalityHrefs)).toEqual(
+    new Set(MUNICIPALITY_ROUTES.map(({ slug }) => `/explorer/municipalities/${slug}`)),
+  );
   expect(html).toMatch(/data-testid="municipal-list-region"[^>]* hidden=""/);
 
   await page.goto(`${BASE_URL}/explorer/municipalities`);

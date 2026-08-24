@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/downloads/methodology/:dataset/files/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, follow" }],
+      },
+      {
         source: "/(.*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
