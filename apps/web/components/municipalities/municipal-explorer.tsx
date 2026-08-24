@@ -65,6 +65,7 @@ type MunicipalExplorerBaseProps = {
   pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
   sourceNote: string;
+  summary?: string;
   children?: ReactNode;
 };
 
@@ -375,6 +376,15 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
           <div className="mt-5 max-w-[640px]">
             <SourceNote testId="municipal-source-note">{props.sourceNote}</SourceNote>
           </div>
+
+          {props.summary ? (
+            <p
+              data-testid="municipal-entity-summary"
+              className="mt-5 max-w-[740px] border-l-2 border-[var(--accent)] bg-[var(--tint)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--body)]"
+            >
+              {props.summary}
+            </p>
+          ) : null}
 
           {props.children}
 

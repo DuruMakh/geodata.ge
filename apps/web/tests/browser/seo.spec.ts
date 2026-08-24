@@ -33,6 +33,98 @@ test("municipality navigation uses crawlable links", async ({ page }) => {
   );
 });
 
+test("municipality index server-renders the existing country and region tab links", async ({ page, request }) => {
+  const response = await request.get(`${BASE_URL}/explorer/municipalities`);
+  expect(response.ok()).toBe(true);
+  const html = await response.text();
+  const countryHrefs = html.match(/href="\/explorer\/municipalities\/georgia"/g) ?? [];
+  const regionHrefs = html.match(/href="\/explorer\/municipalities\/region\/[^\"]+"/g) ?? [];
+  expect(countryHrefs).toHaveLength(1);
+  expect(regionHrefs).toHaveLength(11);
+  expect(html).toMatch(/data-testid="municipal-list-region"[^>]* hidden=""/);
+
+  await page.goto(`${BASE_URL}/explorer/municipalities`);
+
+  const country = page.locator('a[href="/explorer/municipalities/georgia"]');
+  const regions = page.locator('a[href^="/explorer/municipalities/region/"]');
+  await expect(country).toHaveCount(1);
+  await expect(regions).toHaveCount(11);
+  await expect(country).toBeHidden();
+  await expect(regions.first()).toBeHidden();
+  await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
+
+  await page.getByTestId("level-region").click();
+  await expect(country).toBeVisible();
+  await expect(regions.first()).toBeVisible();
+  await expect(page.getByTestId("municipal-list-row")).toHaveCount(12);
+});
+
+test("municipality breadcrumbs include the region in visible and structured hierarchy", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer/municipalities/21`);
+
+  const visibleLabels = await page
+    .locator('nav[aria-label="Breadcrumb"] a, nav[aria-label="Breadcrumb"] [aria-current="page"]')
+    .allTextContents();
+  const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
+  const structuredLabels = JSON.parse(structured ?? "{}").itemListElement.map(
+    (item: { name: string }) => item.name,
+  );
+
+  expect(visibleLabels).toEqual([
+    "მთავარი",
+    "ბიუჯეტი",
+    "მუნიციპალიტეტები",
+    "იმერეთი",
+    "ჭიათურა",
+  ]);
+  expect(structuredLabels).toEqual([
+    "მთავარი",
+    "ბიუჯეტი",
+    "მუნიციპალიტეტები",
+    "იმერეთი",
+    "ჭიათურა",
+  ]);
+  await expect(page.locator('nav[aria-label="Breadcrumb"] a', { hasText: "იმერეთი" })).toHaveAttribute(
+    "href",
+    "/explorer/municipalities/region/imereti",
+  );
+});
+
+test("Tbilisi municipality breadcrumbs distinguish the region from the city", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer/municipalities/04`);
+
+  const expectedLabels = [
+    "მთავარი",
+    "ბიუჯეტი",
+    "მუნიციპალიტეტები",
+    "თბილისის რეგიონი",
+    "თბილისი",
+  ];
+  const visibleLabels = await page
+    .locator('nav[aria-label="Breadcrumb"] a, nav[aria-label="Breadcrumb"] [aria-current="page"]')
+    .allTextContents();
+  const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
+  const structuredLabels = JSON.parse(structured ?? "{}").itemListElement.map(
+    (item: { name: string }) => item.name,
+  );
+
+  expect(visibleLabels).toEqual(expectedLabels);
+  expect(structuredLabels).toEqual(expectedLabels);
+  await expect(page.locator('nav[aria-label="Breadcrumb"] a', { hasText: "თბილისის რეგიონი" })).toHaveAttribute(
+    "href",
+    "/explorer/municipalities/region/tbilisi",
+  );
+});
+
+test("explorer hub explains the reviewed data scope and available actions", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer`);
+
+  const introduction = page.getByTestId("explorer-hub-introduction");
+  await expect(introduction).toHaveText(
+    "Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ ფაქტობრივ მონაცემებს. შეადარეთ წლები, სფეროები და მუნიციპალიტეტები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.",
+  );
+});
+
 test("methodology exposes a stable processed-data download", async ({ page, request }) => {
   await page.goto(`${BASE_URL}/methodology/expenditure`);
   await expect(page.getByTestId("processed-dataset-download")).toHaveAttribute(

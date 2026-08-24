@@ -46,8 +46,12 @@ export default async function ExplorerHubPage() {
         <h1 className="mt-[22px] mb-2 font-[family-name:var(--font-display)] text-[34px] font-semibold leading-[1.15] tracking-[-0.01em]">
           საქართველოს ბიუჯეტი
         </h1>
-        <p className="mb-[26px] max-w-[560px] text-[13.5px] leading-relaxed text-[var(--body)]">
-          აირჩიეთ განყოფილება — ხარჯები, შემოსავლები, მუნიციპალიტეტების ბიუჯეტები ან ანალიზი.
+        <p
+          data-testid="explorer-hub-introduction"
+          className="mb-[26px] max-w-[640px] text-[13.5px] leading-relaxed text-[var(--body)]"
+        >
+          Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ ფაქტობრივ მონაცემებს.
+          {" "}შეადარეთ წლები, სფეროები და მუნიციპალიტეტები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.
         </p>
         <BudgetHub cards={cards} />
         <div className="mt-[26px] max-w-[860px]">

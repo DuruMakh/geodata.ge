@@ -91,6 +91,12 @@ test.describe("region source note", () => {
     await expect(note).toContainText("ფუნქციური სერიები მხოლოდ მუნიციპალიტეტების");
     await expect(page.getByTestId("explorer-shell")).toContainText("განახლდა 2026-08-16");
     await expect(page.locator('a[href*="adjara-republic"]')).toHaveCount(0);
+
+    const summary = page.getByTestId("municipal-entity-summary");
+    await expect(summary).toContainText("6 მუნიციპალიტეტსა და აჭარის ა.რ. რესპუბლიკურ ბიუჯეტს");
+    await expect(summary).toContainText("შიდა ტრანსფერების გამოკლებით");
+    await expect(summary).not.toContainText("ყველაზე დიდი ფუნქციური მიმართულებაა");
+    await expect(summary).not.toContainText("%");
   });
 });
 
@@ -160,6 +166,25 @@ test.describe("region roll-up page", () => {
 
     await expect(page.getByTestId("explorer-shell")).toContainText("12 მუნიციპალიტეტი");
     await expect(page.getByTestId("explorer-shell")).toContainText("ადგილი 11-დან");
+  });
+
+  test("places a region-specific summary below the chart source and before the indicators", async ({ page }) => {
+    await page.goto(REGION_URL);
+    await expectMunicipalAppReady(page);
+
+    const summary = page.getByTestId("municipal-entity-summary");
+    await expect(summary).toHaveText(
+      "იმერეთის მუნიციპალიტეტების ჯამური ბიუჯეტი 2025 წელს 606 მლნ ₾ იყო — 11 რეგიონს შორის მე-3 ადგილი. ყველაზე დიდი ფუნქციური მიმართულებაა ეკონომიკური საქმიანობა, რომელიც ბიუჯეტის 25.6%-ს შეადგენს.",
+    );
+
+    const sourceBox = await page.getByTestId("municipal-source-note").boundingBox();
+    const summaryBox = await summary.boundingBox();
+    const indicatorsBox = await page.getByTestId("period-indicators").boundingBox();
+    expect(sourceBox).not.toBeNull();
+    expect(summaryBox).not.toBeNull();
+    expect(indicatorsBox).not.toBeNull();
+    expect(summaryBox!.y).toBeGreaterThanOrEqual(sourceBox!.y + sourceBox!.height);
+    expect(indicatorsBox!.y).toBeGreaterThanOrEqual(summaryBox!.y + summaryBox!.height);
   });
 });
 
