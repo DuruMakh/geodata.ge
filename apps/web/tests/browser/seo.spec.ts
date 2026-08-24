@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
 
 const BASE_URL = process.env.SEO_BASE_URL ?? "http://localhost:3100";
 
@@ -8,7 +9,7 @@ const representativeRoutes = [
   "/explorer/revenue",
   "/explorer/analysis",
   "/explorer/municipalities",
-  "/explorer/municipalities/04",
+  "/explorer/municipalities/tbilisi",
   "/explorer/municipalities/region/imereti",
   "/methodology",
   "/methodology/expenditure",
@@ -29,8 +30,32 @@ test("municipality navigation uses crawlable links", async ({ page }) => {
   await page.goto(`${BASE_URL}/explorer/municipalities`);
   await expect(page.getByTestId("municipal-list-row").first()).toHaveAttribute(
     "href",
-    /\/explorer\/municipalities\/\d+/,
+    /\/explorer\/municipalities\/[a-z][a-z0-9-]*$/,
   );
+});
+
+test("legacy municipality codes redirect directly to their canonical slugs and keep browser hash state", async ({ page, request }) => {
+  for (const { code, slug } of MUNICIPALITY_ROUTES) {
+    const oldResponse = await request.get(`${BASE_URL}/explorer/municipalities/${code}`, { maxRedirects: 0 });
+    expect(oldResponse.status(), code).toBe(308);
+    expect(oldResponse.headers().location, code).toBe(`/explorer/municipalities/${slug}`);
+    expect((await request.get(`${BASE_URL}/explorer/municipalities/${slug}`)).status(), slug).toBe(200);
+  }
+
+  await page.goto(`${BASE_URL}/explorer/municipalities/06#r=2016-2021`);
+  await expect(page).toHaveURL((url) =>
+    url.pathname === "/explorer/municipalities/batumi" && url.hash === "#r=2016-2021",
+  );
+  expect((await request.get(`${BASE_URL}/explorer/municipalities/unknown`)).status()).toBe(404);
+});
+
+test("sitemap publishes every municipality slug and no numeric municipality page", async ({ request }) => {
+  const xml = await (await request.get(`${BASE_URL}/sitemap.xml`)).text();
+  const paths = [...xml.matchAll(/<loc>https:\/\/[^/]+([^<]+)<\/loc>/g)].map((match) => match[1]);
+  const municipalityPaths = paths.filter((path) => /^\/explorer\/municipalities\/(?!georgia$|region\/)/.test(path));
+
+  expect(municipalityPaths).toEqual(MUNICIPALITY_ROUTES.map(({ slug }) => `/explorer/municipalities/${slug}`));
+  expect(municipalityPaths.some((path) => /\/\d{2}$/.test(path))).toBe(false);
 });
 
 test("municipality index server-renders the existing country and region tab links", async ({ page, request }) => {
@@ -60,7 +85,7 @@ test("municipality index server-renders the existing country and region tab link
 });
 
 test("municipality breadcrumbs include the region in visible and structured hierarchy", async ({ page }) => {
-  await page.goto(`${BASE_URL}/explorer/municipalities/21`);
+  await page.goto(`${BASE_URL}/explorer/municipalities/chiatura`);
 
   const visibleLabels = await page
     .locator('nav[aria-label="Breadcrumb"] a, nav[aria-label="Breadcrumb"] [aria-current="page"]')
@@ -91,7 +116,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
 });
 
 test("Tbilisi municipality breadcrumbs distinguish the region from the city", async ({ page }) => {
-  await page.goto(`${BASE_URL}/explorer/municipalities/04`);
+  await page.goto(`${BASE_URL}/explorer/municipalities/tbilisi`);
 
   const expectedLabels = [
     "მთავარი",

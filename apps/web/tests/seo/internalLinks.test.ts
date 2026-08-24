@@ -9,7 +9,7 @@ describe("municipal SEO destinations", () => {
     expect(municipalEntityHref("region", "region.imereti")).toBe(
       "/explorer/municipalities/region/imereti",
     );
-    expect(municipalEntityHref("municipality", "04")).toBe("/explorer/municipalities/04");
+    expect(municipalEntityHref("municipality", "04")).toBe("/explorer/municipalities/tbilisi");
   });
 
   it("rejects malformed region IDs instead of publishing a plausible broken link", () => {

@@ -190,7 +190,7 @@ test.describe("region roll-up page", () => {
 
 test.describe("entity picker region options resolve (previously 404)", () => {
   test("selecting a region option from a municipality page's picker navigates to a real, fully-rendered region page", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explorer/municipalities/04`); // თბილისი
+    await page.goto(`${BASE_URL}/explorer/municipalities/tbilisi`); // თბილისი
     await expectMunicipalAppReady(page);
     await page.getByTestId("entity-picker-trigger").click();
 

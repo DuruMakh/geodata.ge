@@ -16,6 +16,7 @@ import {
   regionFactsFor,
 } from "../../../../../lib/explorer/municipalData";
 import { georgianOrdinal, REGION_GENITIVE_KA } from "../../../../../lib/explorer/municipalLabels";
+import { municipalityHrefForCode } from "../../../../../lib/explorer/municipalityRoutes";
 import { formatAmount, formatShare } from "../../../../../lib/explorer/format";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../../lib/methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../../../../../lib/seo/metadata";
@@ -186,7 +187,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
             {memberRows.map((member) => (
               <a
                 key={member.id}
-                href={`/explorer/municipalities/${member.id}`}
+                href={municipalityHrefForCode(member.id)}
                 data-testid="region-member-row"
                 className="grid grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-2.5 border-b border-[var(--hairline-soft)] py-2 text-[var(--ink)] no-underline hover:bg-[var(--tint)]"
               >

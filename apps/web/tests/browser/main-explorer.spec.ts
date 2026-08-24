@@ -1047,7 +1047,7 @@ test("every explorer route family renders the site footer", async ({ page }) => 
     "/explorer/revenue",
     "/explorer/analysis",
     "/explorer/municipalities",
-    "/explorer/municipalities/71",
+    "/explorer/municipalities/oni",
     "/explorer/municipalities/georgia",
   ]) {
     await page.goto(`http://localhost:3100${route}`);

@@ -25,7 +25,7 @@ import ExcelJS from "exceljs";
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
 const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
-const ENTITY_URL = `${BASE_URL}/explorer/municipalities/04`; // თბილისი
+const ENTITY_URL = `${BASE_URL}/explorer/municipalities/tbilisi`; // თბილისი
 const ALL_FUNCTIONS = [
   "municipal.general_public_services",
   "municipal.defence",
@@ -353,7 +353,7 @@ test.describe("entity picker accessibility", () => {
 
     // Batumi's own page re-serialises its default hash state (#m=line&r=...)
     // as soon as it mounts, so the URL is not bare — only the path is pinned.
-    await expect(page).toHaveURL(/\/explorer\/municipalities\/06(#|$)/);
+    await expect(page).toHaveURL(/\/explorer\/municipalities\/batumi(#|$)/);
     await expect(page.getByTestId("entity-picker")).toBeHidden();
   });
 
@@ -614,7 +614,7 @@ test.describe("municipality page", () => {
   });
 
   test("keeps a sign on a real municipal change below the display threshold", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explorer/municipalities/06#r=2016-2021`);
+    await page.goto(`${BASE_URL}/explorer/municipalities/batumi#r=2016-2021`);
     await expectMunicipalAppReady(page);
 
     const defenceRow = page.getByTestId("period-comparison").locator("tbody tr").filter({ hasText: "თავდაცვა" });
@@ -766,7 +766,7 @@ test.describe("municipality page", () => {
   });
 
   test("Khulo 2024 total cites the functional fallback instead of its history workbook", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explorer/municipalities/11#r=2024-2024&sel=municipal.total`);
+    await page.goto(`${BASE_URL}/explorer/municipalities/khulo#r=2024-2024&sel=municipal.total`);
     await expectMunicipalAppReady(page);
     const { workbook } = await downloadMunicipalWorkbook(page);
     const hyperlinks = workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
@@ -811,7 +811,7 @@ test.describe("municipality page", () => {
   });
 
   test("uses the historical range-end rank rather than the latest-year rank", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explorer/municipalities/18#r=2015-2015`);
+    await page.goto(`${BASE_URL}/explorer/municipalities/sighnaghi#r=2015-2015`);
     await expectMunicipalAppReady(page);
 
     const rankKpi = page.getByTestId("entity-kpi").filter({ hasText: "წილი მუნიციპალურ ხარჯებში" });
@@ -1020,7 +1020,7 @@ test.describe("municipality page", () => {
 
   test("keeps municipal chart controls readable on narrow phones", async ({ page }) => {
     for (const path of [
-      "/explorer/municipalities/04",
+      "/explorer/municipalities/tbilisi",
       "/explorer/municipalities/region/kakheti",
       "/explorer/municipalities/georgia",
     ]) {

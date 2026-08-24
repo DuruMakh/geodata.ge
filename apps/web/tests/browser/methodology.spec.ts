@@ -59,7 +59,7 @@ for (const path of [
   "/explorer/revenue",
   "/explorer/analysis",
   "/explorer/municipalities",
-  "/explorer/municipalities/04",
+  "/explorer/municipalities/tbilisi",
   "/explorer/municipalities/region/imereti",
 ] as const) {
   test(`${path} keeps the methodology link in the footer rather than inline`, async ({ page }) => {
@@ -207,7 +207,7 @@ test("regular content pages do not repeat the methodology promotion", async ({ p
     "/explorer/revenue",
     "/explorer/analysis",
     "/explorer/municipalities",
-    "/explorer/municipalities/04",
+    "/explorer/municipalities/tbilisi",
     "/explorer/municipalities/region/adjara",
     "/explorer/municipalities/georgia",
     "/about",

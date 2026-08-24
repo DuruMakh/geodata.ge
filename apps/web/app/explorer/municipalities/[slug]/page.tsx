@@ -14,6 +14,11 @@ import {
 } from "../../../../lib/explorer/municipalData";
 import { formatAmount, formatShare } from "../../../../lib/explorer/format";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
+import {
+  MUNICIPALITY_ROUTES,
+  municipalityCodeForSlug,
+  municipalityHrefForCode,
+} from "../../../../lib/explorer/municipalityRoutes";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
 import {
   coverageFromYears,
@@ -22,31 +27,38 @@ import {
 } from "../../../../lib/seo/metadata";
 import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
-// The 64 codes are the complete, closed set. Without this, an unknown code is
-// left to request-time rendering instead of failing at build.
+// The 64 public slugs are the complete, closed set. Without this, an unknown
+// slug is left to request-time rendering instead of failing at build.
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  const { municipalities } = await loadServedMunicipalData();
-  return municipalities.map((municipality) => ({ code: municipality.code }));
+  return MUNICIPALITY_ROUTES.map(({ slug }) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ code: string }> }): Promise<Metadata> {
-  const { code } = await params;
+function requiredMunicipalityCode(slug: string): string {
+  const code = municipalityCodeForSlug(slug);
+  if (!code) notFound();
+  return code;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const code = requiredMunicipalityCode(slug);
   const { municipalities, totalFacts } = await loadServedMunicipalData();
   const municipality = municipalities.find((row) => row.code === code);
-  if (!municipality) return {};
+  if (!municipality) notFound();
 
   const { firstYear, lastYear } = coverageFromYears(totalFacts);
   return fiscalMetadata({
     title: municipalityBudgetTitleKa(municipality.nameKa, firstYear, lastYear),
     description: `${municipality.nameKa}ს ფაქტობრივი ბიუჯეტი ფუნქციების მიხედვით, ${firstYear}–${lastYear}.`,
-    path: `/explorer/municipalities/${code}`,
+    path: municipalityHrefForCode(code),
   });
 }
 
-export default async function MunicipalityPage({ params }: { params: Promise<{ code: string }> }) {
-  const { code } = await params;
+export default async function MunicipalityPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const code = requiredMunicipalityCode(slug);
   const [servedMunicipalData, landingData, functionalWorkbookSources, workbookSources] = await Promise.all([
     loadServedMunicipalData(),
     loadServedLandingData(),
@@ -109,7 +121,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
-      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }, { name: regionBreadcrumbLabel, path: regionPath }, { name: municipality.displayNameKa, path: `/explorer/municipalities/${code}` }]} />
+      <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }, { name: regionBreadcrumbLabel, path: regionPath }, { name: municipality.displayNameKa, path: municipalityHrefForCode(code) }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[
@@ -149,8 +161,8 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
           }}
           pickerGroups={buildPickerGroups(listInput)}
           navigation={{
-            prev: { label: prev.displayNameKa, href: `/explorer/municipalities/${prev.code}` },
-            next: { label: next.displayNameKa, href: `/explorer/municipalities/${next.code}` },
+            prev: { label: prev.displayNameKa, href: municipalityHrefForCode(prev.code) },
+            next: { label: next.displayNameKa, href: municipalityHrefForCode(next.code) },
           }}
           summary={summary}
           sourceNote={`მონაცემები: ადგილობრივი თვითმმართველი ერთეულების ბიუჯეტების შესრულების ანგარიშები (საქართველოს ფინანსთა სამინისტრო).${lastUpdatedAt ? ` ბოლო განახლება: ${lastUpdatedAt}.` : ""}`}
