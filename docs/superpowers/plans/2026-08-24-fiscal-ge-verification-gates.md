@@ -4,7 +4,7 @@
 
 **Goal:** Close the paths through which stale data or a broken build passes every gate unnoticed, and finish the previous remediation plan's unshipped Stage D by removing the dual-meaning `shareEndYear` field.
 
-**Architecture:** Two branches. Branch 1 adds a deterministic `--check` mode to the Geostat package generator, wires it and the existing geometry check into `data:validate`, removes the unit suite's write side effect, adds a build plus a tracked-tree cleanliness guard to CI, and replaces a `dataset id === budget side` string coincidence with a declared coverage source. Branch 2 removes `shareEndYear` from `ExplorerTableRow` so the table's final share column derives through the `shareValueForYear` callback it already receives.
+**Architecture:** Two branches. Branch 1 adds a deterministic `--check` mode to the Geostat package generator, wires it into `data:validate`, removes the unit suite's write side effect, adds a build plus a tracked-tree cleanliness guard to CI, and replaces a `dataset id === budget side` string coincidence with a declared coverage source. Branch 2 removes `shareEndYear` from `ExplorerTableRow` so the table's final share column derives through the `shareValueForYear` callback it already receives.
 
 **Tech Stack:** Next.js 16, strict TypeScript, Tailwind v4, Vitest (node environment, `tests/**/*.test.ts`, run with `--pool=forks --maxWorkers=1`), Playwright, Prisma 7 / Supabase mirror, GitHub Actions.
 
@@ -34,7 +34,7 @@
 | `apps/web/lib/data/municipalIndicators/prepareGeostatPackage.ts` | **Modify.** Hoist the validation JSON string; add the `else` branch that asserts the three committed artifacts match. |
 | `apps/web/tests/data/municipalIndicators/geostatPackage.test.ts` | **Modify.** Flip both `buildPackage(true)` calls to `false`; add a check-mode regression guard. |
 | `apps/web/scripts/prepare-geostat-municipal-indicators.ts` | **Modify.** Require exactly one of `--write` / `--check`. |
-| `apps/web/package.json` | **Modify.** `data:prepare-municipal-indicators` gains `--write`; add `data:check-municipal-indicators`; `data:validate` gains it and `data:check-municipality-geometry`. |
+| `apps/web/package.json` | **Modify.** `data:prepare-municipal-indicators` gains `--write`; add `data:check-municipal-indicators`; `data:validate` gains it. |
 | `.github/workflows/ci.yml` | **Modify.** Add `npm run build` and the tracked-tree cleanliness guard to the `checks` job. |
 | `apps/web/lib/methodology/types.ts` | **Modify.** Add `coverageSource` to `MethodologyContent`. |
 | `apps/web/lib/methodology/content/{expenditure,revenue,municipalities}.ts` | **Modify.** Declare `coverageSource`. |
@@ -525,10 +525,10 @@ and change `data:validate` from:
 to:
 
 ```json
-    "data:validate": "tsx scripts/validate-data-files.ts && npm run data:check-national-gdp && npm run data:check-municipal-population && npm run data:check-municipal-indicators && npm run data:check-municipality-geometry && npm run data:check-methodology-archives && npm run data:check-public-datasets",
+    "data:validate": "tsx scripts/validate-data-files.ts && npm run data:check-national-gdp && npm run data:check-municipal-indicators && npm run data:check-municipal-population && npm run data:check-methodology-archives && npm run data:check-public-datasets",
 ```
 
-`data:check-municipality-geometry` already exists and already implements `--check`; it was simply never wired in. That is spec finding N2.
+**Corrected in review.** An earlier revision also appended `&& npm run data:check-municipality-geometry` here, on the strength of spec finding N2. That finding was false — `validate-data-files.ts:148` already gates the geometry artifact — so the duplicate was removed. Note also that `data:check-municipal-indicators` runs **before** `data:check-municipal-population`: the population generator reads the geostat CSV as its input, so checking it first would report the wrong root cause on geostat drift.
 
 - [ ] **Step 4: Run the full data validation**
 
@@ -866,7 +866,7 @@ Implements branch 1 of `docs/superpowers/specs/2026-08-24-fiscal-ge-verification
 
 - **The unit suite wrote to three tracked data artifacts.** Two tests in `geostatPackage.test.ts` called `buildGeostatPackage({ write: true })`, overwriting the committed Geostat package and then asserting against the files they had just produced. The population CSV feeds the served per-resident denominator, so generator drift silently rewrote a published input and the suite still passed.
 - **The Geostat package had no check mode**, so `data:validate` never verified it.
-- **`data:check-municipality-geometry` already existed but was never wired into `data:validate`**, despite the artifact being read at module scope on every build.
+- **The Geostat package had no check mode**, so `data:validate` never verified it, and the check now runs ahead of the population check that consumes its output.
 - **The `checks` CI job was named "Lint, typecheck, tests, data, build" but ran no build.** The build does happen in the required `e2e` job, inside Playwright's `webServer`, where a failure surfaces as a server timeout. This adds a direct build step and a tracked-tree cleanliness guard.
 - **Methodology coverage was derived from `fact.side === id`**, a string coincidence that would break on the first non-budget-side dataset.
 

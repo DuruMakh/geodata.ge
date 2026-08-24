@@ -47,7 +47,11 @@ jobs:
       # data/reports/ stays invisible here — but unlike `git diff` it also reports
       # NEW files and staged changes, which is the case this guard exists for: a
       # test or script creating a file under a tracked, non-ignored path.
+      # `always()` on purpose: a failing step is exactly when a test is most
+      # likely to have left the tree dirty (an aborted tamper/restore), so the
+      # guard has to run even then or it reports nothing in the case it is for.
       - name: Fail if the job wrote into the repository
+        if: always()
         working-directory: ${{ github.workspace }}
         run: |
           if [ -n "$(git status --porcelain)" ]; then

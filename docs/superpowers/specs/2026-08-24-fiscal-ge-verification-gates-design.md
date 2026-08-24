@@ -40,8 +40,15 @@ Every claim below was re-verified against the working tree at `275188c32`. The a
 
 All three are tracked. Both tests then read those paths back and assert against them, so the assertions describe files the test itself just produced. The first file is the upstream input to `scripts/prepare-municipal-population-2025.ts`, which produces the served population denominator behind every budget-per-resident figure. Generator drift therefore rewrites a published denominator's source and the suite still passes.
 
-**N2 — `data:check-municipality-geometry` exists but is not part of `data:validate`.**
-`scripts/prepare-municipality-geometry.ts` already implements a `--check` mode and `package.json` already exposes it. `data:validate` runs `validate-data-files`, `check-national-gdp`, `check-municipal-population`, `check-methodology-archives` and `check-public-datasets`, and stops. The geometry artifact is read with `readFileSync` at module scope in `lib/explorer/municipalityMapData.ts` on every build.
+**N2 — WITHDRAWN. The geometry artifact was already gated.**
+
+This finding originally read: "`data:check-municipality-geometry` exists but is not part of `data:validate`." **That was false**, and the error is instructive enough to leave on the record rather than delete.
+
+It came from reading the `data:validate` chain in `package.json` and noting that the standalone `data:check-municipality-geometry` script name did not appear in it. The chain's *first* member, `scripts/validate-data-files.ts`, calls `checkMunicipalityGeometryOutputs()` at line 148 — the same function the standalone script invokes. `tests/data/municipalGeometry/dataValidateGeometry.test.ts` has asserted this since before this branch: it corrupts the tracked geometry artifact, runs `npm run data:validate`, and requires a non-zero exit with `Stale municipality geometry artifact`.
+
+So the geometry gate was never missing, and no wiring was needed. The lesson is the one this spec applies to the audit it reviews: a script name absent from a chain is not evidence that its behavior is absent — the members of the chain have to be read.
+
+Caught in whole-branch review; the redundant `&& npm run data:check-municipality-geometry` added in Stage D1 was removed again in the same review pass.
 
 ### 2.3 Facts that shape the design
 
@@ -54,7 +61,7 @@ All three are tracked. Both tests then read those paths back and assert against 
 The work succeeds when all of the following hold:
 
 1. `npm test` leaves the tracked working tree clean; no test writes to a tracked file.
-2. `npm run data:validate` fails if either the geostat package artifacts or the municipality geometry artifact is stale relative to its generator.
+2. `npm run data:validate` fails if the geostat package artifacts are stale relative to their generator. (The municipality geometry artifact was already gated — see the withdrawn N2.)
 3. The `checks` CI job runs a production build, and its name accurately describes its steps.
 4. Any tracked-file mutation introduced by lint, tests, data validation or the build fails CI.
 5. Adding a fourth methodology dataset that is not a budget side fails typecheck until it declares where its coverage years come from, instead of throwing at build time.
@@ -67,7 +74,7 @@ The work succeeds when all of the following hold:
 ### 4.1 Included
 
 - A `--check` mode for the Geostat municipal-indicators package, wired into `data:validate` (audit L4, finding N1).
-- Wiring the existing municipality-geometry check into `data:validate` (finding N2).
+- ~~Wiring the existing municipality-geometry check into `data:validate` (finding N2).~~ **Withdrawn** — already gated via `validate-data-files.ts:148`.
 - Removing the write side effect from the two Geostat tests.
 - Adding `npm run build` and a tracked-tree cleanliness guard to the CI `checks` job (audit H3).
 - Replacing the `dataset id === budget side` coincidence in methodology coverage derivation with a declared source (audit M4).
@@ -114,7 +121,7 @@ export async function assertGeneratedArtifactMatches(
 
 ### 5.2 D2 — municipality geometry check
 
-`data:validate` appends `&& npm run data:check-municipality-geometry`. No source change; the check mode already exists.
+**Withdrawn.** `validate-data-files.ts:148`, the first member of the `data:validate` chain, already calls `checkMunicipalityGeometryOutputs()`, and `tests/data/municipalGeometry/dataValidateGeometry.test.ts` already asserts that a stale artifact fails `npm run data:validate`. No change needed. See the withdrawn N2 in section 2.2.
 
 ### 5.3 D3 — CI contract
 
@@ -202,7 +209,7 @@ Every change is test-first: write the failing assertion, observe the named failu
 | D1 check branch | `buildGeostatPackage({ write: false })` rejects when a committed artifact does not match generated content. |
 | D1 script | The script rejects zero flags and rejects both flags together. |
 | D1 tests | The two flipped tests pass against committed files with no write. |
-| D2 | Covered by running `npm run data:validate` and observing the geometry check execute. |
+
 | D3 | Observed on the branch's own CI run: the build step appears and passes, and the cleanliness guard passes. |
 | D4 | A synthetic fourth `MethodologyDatasetId` without a `coverageSource` fails typecheck; the three live datasets derive unchanged coverage. |
 | Stage D | The two moved guarantees fail before the mechanism exists, then pass. |
