@@ -215,7 +215,7 @@ describe("explorer integration with real CSV data", () => {
       expect(amountGel).not.toBeNull();
       expect(point.value).toBeCloseTo((amountGel ?? 0) / (gdpByYear.get(point.year) ?? 1), 12);
     }
-    expect(model.totalRow?.shareEndYear).toBeCloseTo(
+    expect(model.totalRow?.shareByYear?.[2025]).toBeCloseTo(
       27_723_319_039 / 104_598_100_000,
       12,
     );
