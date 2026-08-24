@@ -438,7 +438,6 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
       valuesByYear,
       shareByYear,
       change: startYear === undefined || endYear === undefined ? null : changeBetween(valuesByYear[startYear] ?? null, valuesByYear[endYear] ?? null),
-      shareEndYear: endYear === undefined ? null : shareByYear[endYear] ?? null,
     };
   };
 

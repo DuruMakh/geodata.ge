@@ -1268,11 +1268,15 @@ git add apps/web/lib apps/web/components/municipalities apps/web/app/explorer/mu
 
 ---
 
-# Stage D — Share semantics (BLOCKED)
+# Stage D — Share semantics (COMPLETED 2026-08-24)
 
 Findings 14, 10, and the targeted part of 23.
 
-> **Do not start Stage D until `codex/homepage-redesign` has merged into `main` or has been deliberately synchronised.** Stage D edits `apps/web/components/main-explorer/main-explorer.tsx`, which that branch also edits, and the branches additionally carry a real semantic conflict in `DESIGN.md`. Re-run Task 0 Step 1 to check.
+> **Stage D status: completed 2026-08-24** on branch `codex/fiscal-ge-share-semantics`, under `docs/superpowers/plans/2026-08-24-fiscal-ge-verification-gates.md` Tasks 7-11. The stated blocker below — overlap with `codex/homepage-redesign` on `main-explorer.tsx` — cleared when that branch merged as PR #72. `shareEndYear` no longer exists on `ExplorerTableRow`; both sections derive the final share column through the `shareValueForYear` callback, and `lib/explorer/share.ts` holds the single `shareOfTotal` definition.
+>
+> The delivered shape differs from the sketch below in one way worth recording: rather than removing the field and repairing the fallout, the work first rewrote the three test assertions that referenced it onto the surviving mechanism, proving both produced identical values, and only then deleted the field. Two of those assertions encode product rules — the national total row shows share of GDP rather than 100%, and the municipal function rows deliberately do not sum to the official total — which would have been lost had they been deleted alongside the field.
+
+> **Original blocker, retained for provenance:** Do not start Stage D until `codex/homepage-redesign` has merged into `main` or has been deliberately synchronised. Stage D edits `apps/web/components/main-explorer/main-explorer.tsx`, which that branch also edits, and the branches additionally carry a real semantic conflict in `DESIGN.md`. Re-run Task 0 Step 1 to check.
 
 **Correction to the original audit, carried forward from the re-audit:** the original finding 10 claimed the chart, table, and workbook currently disagree about the same cell. They do not — the three intentionally use different boundary units (percent for the chart, fraction for the table and for Excel, because Excel percentage formatting expects fractions), and the browser tests already pin the workbook values. The real problem is the one finding 14 names: `shareEndYear` carries **share of GDP** when `explorerData.ts` fills it and **share of the entity's own total** when `municipalData.ts` fills it, on the same `ExplorerTableRow` type, with correctness resting entirely on each caller passing a matching `shareColumnLabel` prop. This stage removes the ambiguous field rather than renaming around it.
 
@@ -1498,6 +1502,6 @@ Do not fold this into a feature, into the homepage work, or into this remediatio
 1. Stage A — mergeable immediately. Six files, zero homepage overlap.
 2. Stage B — mergeable after A. Touches data scripts, coverage constants, committed report artifacts, and `urlState.ts`.
 3. Stage C — mergeable after B. Requires `npm run test:browser`.
-4. Stage D — **blocked** until `codex/homepage-redesign` merges or is deliberately synchronised. Re-check Task 0 Step 1 before starting.
+4. Stage D — **completed 2026-08-24** on `codex/fiscal-ge-share-semantics`. The `codex/homepage-redesign` blocker cleared when that branch merged as PR #72.
 
 Each stage ends green on `npm run check` + `npm run build` (Stages C and D also on `npm run test:browser`), and CI must be green before any merge. Do not push or open a PR without explicit authorization.

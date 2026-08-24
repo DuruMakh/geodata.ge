@@ -374,8 +374,10 @@ describe("main explorer data model", () => {
 
     expect(one.points.find((point) => point.itemId === "spending.health")?.value).toBe(0.125);
     expect(many.points.find((point) => point.itemId === "spending.health")?.value).toBe(0.125);
-    expect(one.totalRow?.shareEndYear).toBe(0.375);
-    expect(one.totalRow?.shareEndYear).not.toBe(1);
+    // The total row's share column reports share of GDP, not a self-referential
+    // 100%. Asserted on shareByYear, which is the mechanism the table reads.
+    expect(one.totalRow?.shareByYear?.[2025]).toBe(0.375);
+    expect(one.totalRow?.shareByYear?.[2025]).not.toBe(1);
     expect(one.gdpByYear[2025]).toMatchObject({
       gdpCurrentPricesGel: 2_000,
       status: "preliminary",

@@ -113,7 +113,6 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
     }
 
     const endValue = lastYear === undefined ? null : valuesByYear[lastYear] ?? null;
-    const endTotal = lastYear === undefined ? null : officialTotalByYear[lastYear] ?? null;
 
     return {
       itemId: fn.id,
@@ -128,7 +127,6 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
         firstYear === undefined ? null : valuesByYear[firstYear] ?? null,
         endValue,
       ),
-      shareEndYear: endValue !== null && endTotal ? endValue / endTotal : null,
     };
   });
 
@@ -152,7 +150,6 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
       firstYear === undefined ? null : totalValuesByYear[firstYear] ?? null,
       lastYear === undefined ? null : totalValuesByYear[lastYear] ?? null,
     ),
-    shareEndYear: 1,
   };
 
   return { years, rows, totalRow };

@@ -1275,7 +1275,9 @@ In `apps/web/lib/explorer/types.ts`, delete line 53 from `ExplorerTableRow`:
 npm run typecheck --prefix apps/web
 ```
 
-Expected: FAIL, listing exactly `lib/explorer/explorerData.ts`, `lib/explorer/municipalData.ts` (twice) and `tests/explorer/indicators.test.ts`. If any other file appears, stop — a consumer was missed in Task 9.
+Expected: FAIL, listing `lib/explorer/explorerData.ts`, `lib/explorer/municipalData.ts` and `tests/explorer/indicators.test.ts`. If any other file appears, stop — a consumer was missed in Task 9.
+
+**Corrected during execution.** Typecheck reports three sites, not four: `municipalData.ts`'s row-level emission sits in an object literal returned from an unannotated `.map()` callback, where TypeScript's excess-property check does not fire. Typecheck is therefore a useful diagnostic but not a complete inventory. Use `grep -rn "shareEndYear" apps/web --include=*.ts --include=*.tsx` as the ground truth before editing, and again at Step 7 to confirm none survives.
 
 - [ ] **Step 3: Stop emitting the field in the national builder**
 

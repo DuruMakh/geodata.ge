@@ -35,7 +35,10 @@ import {
   MUNICIPAL_PUBLIC_PAGE_COUNT,
   regionFactsFor,
 } from "../../lib/explorer/municipalData";
+import type { MunicipalEntityModel } from "../../lib/explorer/municipalData";
 import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
+import { shareOfTotal } from "../../lib/explorer/share";
+import type { ExplorerTableRow } from "../../lib/explorer/types";
 
 const FUNCTIONS: MunicipalFunction[] = [
   { id: "municipal.economic_affairs", kaLabel: "ეკონომიკური საქმიანობა", functionalCode: "7.4", sortOrder: 4 },
@@ -135,6 +138,10 @@ function build(startYear = 2015, endYear = 2017) {
   });
 }
 
+// Mirrors the shareValueForYear callback municipal-explorer.tsx supplies.
+const shareFor = (model: MunicipalEntityModel, row: ExplorerTableRow, year: number) =>
+  shareOfTotal(row.valuesByYear[year], model.totalRow.valuesByYear[year]);
+
 describe("buildMunicipalEntityModel", () => {
   it("emits one row per function, in taxonomy sort order", () => {
     expect(build().rows.map((row) => row.itemId)).toEqual([
@@ -153,16 +160,21 @@ describe("buildMunicipalEntityModel", () => {
     expect(model.totalRow.itemId).toBe("municipal.total");
     expect(model.totalRow.kaLabel).toBe("მთლიანი ბიუჯეტი");
     expect(model.totalRow.valuesByYear[2016]).toBe(300);
-    expect(model.totalRow.shareEndYear).toBe(1);
+    expect(shareFor(model, model.totalRow, 2016)).toBe(1);
   });
 
   it("keeps function values unchanged and divides their shares by the official total", () => {
     const model = build(2016, 2016);
     const economic = model.rows.find((row) => row.itemId === "municipal.economic_affairs")!;
-    const shareSum = model.rows.reduce((sum, row) => sum + (row.shareEndYear ?? 0), 0);
+    const shareSum = model.rows.reduce(
+      (sum, row) => sum + (shareFor(model, row, 2016) ?? 0),
+      0,
+    );
 
     expect(economic.valuesByYear[2016]).toBe(200);
-    expect(economic.shareEndYear).toBeCloseTo(200 / 300, 6);
+    expect(shareFor(model, economic, 2016)).toBeCloseTo(200 / 300, 6);
+    // The functions do not cover the whole official total; the gap is real and
+    // must stay visible.
     expect(shareSum).toBeCloseTo(265 / 300, 6);
     expect(shareSum).not.toBeCloseTo(1, 6);
   });
