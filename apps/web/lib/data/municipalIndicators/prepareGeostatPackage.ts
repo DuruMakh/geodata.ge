@@ -5,6 +5,9 @@ import path from "node:path";
 import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
 import { csvEscape } from "../csvEscape";
+import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
+
+const GEOSTAT_ARTIFACT_LABEL = "Geostat municipal indicators";
 
 export type PopulationRow = {
   year: number;
@@ -968,10 +971,25 @@ export async function buildGeostatPackage(
     normalized_values_reconcile: normalizedValuesReconcile,
   };
 
+  const validationJson = `${JSON.stringify(validation, null, 2)}\n`;
+  const artifacts = [
+    { filePath: paths.populationOutput, content: populationCsv },
+    { filePath: paths.gdpOutput, content: gdpCsv },
+    { filePath: paths.validationOutput, content: validationJson },
+  ];
+
   if (options.write) {
-    await fs.writeFile(paths.populationOutput, populationCsv, "utf8");
-    await fs.writeFile(paths.gdpOutput, gdpCsv, "utf8");
-    await fs.writeFile(paths.validationOutput, `${JSON.stringify(validation, null, 2)}\n`, "utf8");
+    await Promise.all(
+      artifacts.map((artifact) => fs.writeFile(artifact.filePath, artifact.content, "utf8")),
+    );
+  } else {
+    // Check mode is the gate: the committed package is only trustworthy if it is
+    // byte-identical to what this generator produces from the preserved sources.
+    await Promise.all(
+      artifacts.map((artifact) =>
+        assertGeneratedArtifactMatches(GEOSTAT_ARTIFACT_LABEL, artifact.filePath, artifact.content),
+      ),
+    );
   }
 
   return { populationRows, regionalGdpRows, geographyRows, validation };

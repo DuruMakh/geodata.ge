@@ -748,7 +748,7 @@ describe("Geostat population and regional GDP research package", () => {
   });
 
   it("writes Excel-readable artifacts with independently verified provenance", async () => {
-    await buildPackage(true);
+    await buildPackage(false);
 
     for (const fileName of excelCsvFiles) {
       const bytes = fs.readFileSync(path.join(packageDir, fileName));
@@ -804,7 +804,7 @@ describe("Geostat population and regional GDP research package", () => {
   });
 
   it("matches every XLSX review-sheet field and type to the CSV artifacts", async () => {
-    await buildPackage(true);
+    await buildPackage(false);
     const workbook = XLSX.read(
       fs.readFileSync(path.join(packageDir, "municipal-population-and-regional-gdp.xlsx")),
       { type: "buffer", cellDates: true },
@@ -893,5 +893,20 @@ describe("Geostat population and regional GDP research package", () => {
           String(row[1]).includes("21"),
       ),
     ).toBe(true);
+  });
+
+  it("validates the committed artifacts in check mode and writes nothing", async () => {
+    const artifactPaths = [
+      path.join(packageDir, "municipal-population-annual-2015-2025.csv"),
+      path.join(packageDir, "regional-gdp-annual-2005-2025-available-years.csv"),
+      path.join(packageDir, "validation-report.json"),
+    ];
+    const before = artifactPaths.map((filePath) => fs.readFileSync(filePath));
+
+    await expect(buildPackage(false)).resolves.toBeDefined();
+
+    for (const [index, filePath] of artifactPaths.entries()) {
+      expect(fs.readFileSync(filePath).equals(before[index]!)).toBe(true);
+    }
   });
 });
