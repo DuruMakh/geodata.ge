@@ -14,7 +14,6 @@ function row(shareByYear: Record<number, number | null>): ExplorerTableRow {
     valuesByYear: {},
     shareByYear,
     change: null,
-    shareEndYear: null,
   };
 }
 

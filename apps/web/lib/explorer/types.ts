@@ -50,7 +50,6 @@ export type ExplorerTableRow = {
   valuesByYear: Record<number, number | null>;
   shareByYear?: Record<number, number | null>;
   change: number | null;
-  shareEndYear: number | null;
 };
 
 export type SnapshotItem = {
