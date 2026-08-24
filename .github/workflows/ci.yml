@@ -29,6 +29,10 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run data:validate
+      # The e2e job also builds, inside Playwright's webServer. This runs the
+      # build directly so a build failure reports as a build failure instead of
+      # as a webServer timeout, and so the job name above stays true.
+      - run: npm run build
       # Deliberately NOT --omit=dev. The data pipeline's file parsers (xlsx,
       # pdf-parse) are devDependencies, and the data:validate step above runs
       # them over official workbooks and PDFs inside this job — so scoping the
@@ -38,6 +42,12 @@ jobs:
       # two unpatchable high advisories.
       - name: Audit dependencies
         run: npm audit --audit-level=high
+      # Nothing in this job may modify a tracked file. Generated outputs under
+      # public/downloads/ and data/reports/ are gitignored, so only a real
+      # regression — a test or script writing into the repo — trips this.
+      - name: Fail if any tracked file was modified
+        working-directory: ${{ github.workspace }}
+        run: git diff --exit-code
 
   e2e:
     name: Browser tests (Playwright)
