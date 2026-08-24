@@ -27,15 +27,22 @@ export const FUTURE_METHODOLOGY_DATASETS = [
   { titleKa: "უმუშევრობა", href: null, state: "future" },
 ] as const;
 
+function assertNever(value: never): never {
+  throw new Error(`Unhandled methodology coverage source: ${JSON.stringify(value)}`);
+}
+
 export function deriveMethodologyCoverage(
   id: MethodologyDatasetId,
   budgetFacts: readonly ServedBudgetFact[],
   municipalFacts: readonly MunicipalTotalFact[],
 ): { firstYear: number; lastYear: number } {
+  const source = METHODOLOGY_CONTENT[id].coverageSource;
   const years =
-    id === "municipalities"
+    source.kind === "municipalTotals"
       ? municipalFacts.map((fact) => fact.year)
-      : budgetFacts.filter((fact) => fact.side === id).map((fact) => fact.year);
+      : source.kind === "budgetSide"
+        ? budgetFacts.filter((fact) => fact.side === source.side).map((fact) => fact.year)
+        : assertNever(source);
 
   if (years.length === 0) {
     throw new Error(`No served years for live methodology dataset: ${id}`);

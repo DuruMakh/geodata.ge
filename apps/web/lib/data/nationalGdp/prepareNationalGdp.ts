@@ -5,6 +5,7 @@ import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
 
 import { csvEscape } from "../csvEscape";
+import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import type {
   GdpAccountingStandard,
   NationalGdpFact,
@@ -214,16 +215,6 @@ export function validateNationalGdpSeries(
   return overlapYears;
 }
 
-export async function assertGeneratedArtifactMatches(
-  filePath: string,
-  expectedContent: string,
-): Promise<void> {
-  const actualContent = await fs.readFile(filePath, "utf8");
-  if (actualContent !== expectedContent) {
-    throw new Error(`Generated national GDP artifact is stale: ${path.relative(REPO_ROOT, filePath)}`);
-  }
-}
-
 export async function prepareNationalGdp({
   write,
 }: {
@@ -325,7 +316,9 @@ export async function prepareNationalGdp({
     await Promise.all(artifacts.map((artifact) => fs.writeFile(artifact.filePath, artifact.content, "utf8")));
   } else {
     await Promise.all(
-      artifacts.map((artifact) => assertGeneratedArtifactMatches(artifact.filePath, artifact.content)),
+      artifacts.map((artifact) =>
+        assertGeneratedArtifactMatches("national GDP", artifact.filePath, artifact.content),
+      ),
     );
   }
 

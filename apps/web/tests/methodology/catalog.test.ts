@@ -14,6 +14,7 @@ import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest
 import type {
   DecisionRegisterRow,
   MethodologyArchiveSummary,
+  MethodologyContent,
 } from "../../lib/methodology/types";
 import type { ServedBudgetFact } from "../../lib/servedRows";
 
@@ -289,6 +290,30 @@ describe("methodology catalog", () => {
     expect(deriveMethodologyCoverage("expenditure", budgetFacts, municipalFacts)).toEqual({ firstYear: 2005, lastYear: 2025 });
     expect(deriveMethodologyCoverage("revenue", budgetFacts, municipalFacts)).toEqual({ firstYear: 2005, lastYear: 2025 });
     expect(deriveMethodologyCoverage("municipalities", budgetFacts, municipalFacts)).toEqual({ firstYear: 2015, lastYear: 2025 });
+  });
+
+  it("declares where every live dataset's coverage years come from", () => {
+    expect(METHODOLOGY_CONTENT.expenditure.coverageSource).toEqual({
+      kind: "budgetSide",
+      side: "expenditure",
+    });
+    expect(METHODOLOGY_CONTENT.revenue.coverageSource).toEqual({
+      kind: "budgetSide",
+      side: "revenue",
+    });
+    expect(METHODOLOGY_CONTENT.municipalities.coverageSource).toEqual({
+      kind: "municipalTotals",
+    });
+  });
+
+  it("will not accept a methodology dataset that omits its coverage source", () => {
+    const incomplete = {
+      ...METHODOLOGY_CONTENT.expenditure,
+      // @ts-expect-error - coverageSource is required; a new dataset must declare it
+      coverageSource: undefined,
+    } satisfies MethodologyContent;
+
+    expect(incomplete.id).toBe("expenditure");
   });
 
   it("rejects live datasets without served years", () => {

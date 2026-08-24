@@ -49,6 +49,7 @@ export const MUNICIPALITIES_METHODOLOGY_CONTENT: MethodologyContent = {
   summaryKa: "როგორ ერთიანდება 64 საჯარო მუნიციპალიტეტის ხარჯი, აჭარის რესპუბლიკური გადასახდელები და 69-სერიანი საქართველოს ჯამი ისე, რომ შიდა ტრანსფერები ორჯერ არ დაითვალოს.",
   reviewedAt: "2026-08-16",
   archiveManifestId: "municipalities",
+  coverageSource: { kind: "municipalTotals" },
   canonicalDocuments: ["docs/data-methodology/municipal-functional-annual-2015-2025.md"],
   disclosureKa: "მუნიციპალური თანხები და ფუნქციური კოდები ოფიციალურ წყაროებს ეფუძნება. აჭარისა და საქართველოს ჯამებში აჭარის რესპუბლიკური გადასახდელები ემატება ტრანსფერების გამოკლებით; ათი ფუნქცია კვლავ მუნიციპალურ კლასიფიკაციას ასახავს. საჯარო 64-კოდიანი რეესტრი და ხუთი კოდის მხოლოდ საქართველოს ჯამში ჩართვა Fiscal.ge-ის განხილული გადაწყვეტილებებია.",
   keyFacts: [

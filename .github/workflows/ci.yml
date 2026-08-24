@@ -29,6 +29,10 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run data:validate
+      # The e2e job also builds, inside Playwright's webServer. This runs the
+      # build directly so a build failure reports as a build failure instead of
+      # as a webServer timeout, and so the job name above stays true.
+      - run: npm run build
       # Deliberately NOT --omit=dev. The data pipeline's file parsers (xlsx,
       # pdf-parse) are devDependencies, and the data:validate step above runs
       # them over official workbooks and PDFs inside this job — so scoping the
@@ -38,6 +42,23 @@ jobs:
       # two unpatchable high advisories.
       - name: Audit dependencies
         run: npm audit --audit-level=high
+      # Nothing in this job may write into the repository. `git status --porcelain`
+      # respects .gitignore, so the generated output under public/downloads/ and
+      # data/reports/ stays invisible here — but unlike `git diff` it also reports
+      # NEW files and staged changes, which is the case this guard exists for: a
+      # test or script creating a file under a tracked, non-ignored path.
+      # `always()` on purpose: a failing step is exactly when a test is most
+      # likely to have left the tree dirty (an aborted tamper/restore), so the
+      # guard has to run even then or it reports nothing in the case it is for.
+      - name: Fail if the job wrote into the repository
+        if: always()
+        working-directory: ${{ github.workspace }}
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "The checks job modified the repository:"
+            git status --porcelain
+            exit 1
+          fi
 
   e2e:
     name: Browser tests (Playwright)

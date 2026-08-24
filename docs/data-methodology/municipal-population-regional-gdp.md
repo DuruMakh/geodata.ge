@@ -70,6 +70,7 @@ From the repository root, use the web-package commands in this order:
 ```powershell
 Set-Location apps/web
 npm run data:prepare-municipal-indicators
+npm run data:check-municipal-indicators
 npm run data:prepare-municipal-population
 npm test -- tests/data/municipalIndicators/geostatPackage.test.ts
 npm run data:check-municipal-population
@@ -77,7 +78,7 @@ npm run check
 npm run build
 ```
 
-The preparation command regenerates only the two normalized CSVs and `validation-report.json` from the preserved source captures plus the reviewed geography and population-component maps. The focused test checks complete manifest facts and mutation rejection, component-rule failures, all 21 source-cell sums, both national reconciliations, CSV BOMs and Georgian text, and exact four-sheet XLSX semantic parity for every CSV field and value type. `npm run check` and `npm run build` are the repository-wide validation and production-build gates.
+The preparation command regenerates only the two normalized CSVs and `validation-report.json` from the preserved source captures plus the reviewed geography and population-component maps. `npm run data:check-municipal-indicators` regenerates the same three artifacts in memory and fails if any committed file differs byte-for-byte; it runs inside `npm run data:validate`, so a drifted package fails the repository-wide gate rather than being silently rewritten by the test suite. The focused test checks complete manifest facts and mutation rejection, component-rule failures, all 21 source-cell sums, both national reconciliations, CSV BOMs and Georgian text, and exact four-sheet XLSX semantic parity for every CSV field and value type. `npm run check` and `npm run build` are the repository-wide validation and production-build gates.
 
 Author the XLSX review workbook separately, after the preparation command, with the git-ignored SDD support builder `.superpowers/sdd/2026-08-03-municipal-population-regional-gdp-collection/build-review-workbook.mjs` and its bundled workspace `@oai/artifact-tool` runtime. The builder reads the generated CSVs and geography map, writes the four review sheets, and is neither a committed project dependency nor part of `npm run data:prepare-municipal-indicators`. Inspect its key workbook ranges, scan for formula errors, render all four sheets, and visually verify legibility and layout before accepting the workbook; do not commit the builder, runtime junction, or render previews.
 
