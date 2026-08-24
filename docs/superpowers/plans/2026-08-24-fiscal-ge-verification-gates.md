@@ -593,13 +593,22 @@ In `.github/workflows/ci.yml`, in the `checks` job, insert after the `- run: npm
 Then add this as the final step of the `checks` job, after the `Audit dependencies` step:
 
 ```yaml
-      # Nothing in this job may modify a tracked file. Generated outputs under
-      # public/downloads/ and data/reports/ are gitignored, so only a real
-      # regression — a test or script writing into the repo — trips this.
-      - name: Fail if any tracked file was modified
+      # Nothing in this job may write into the repository. `git status --porcelain`
+      # respects .gitignore, so the generated output under public/downloads/ and
+      # data/reports/ stays invisible here — but unlike `git diff` it also reports
+      # NEW files and staged changes, which is the case this guard exists for: a
+      # test or script creating a file under a tracked, non-ignored path.
+      - name: Fail if the job wrote into the repository
         working-directory: ${{ github.workspace }}
-        run: git diff --exit-code
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "The checks job modified the repository:"
+            git status --porcelain
+            exit 1
+          fi
 ```
+
+**Revised in review.** The plan originally mandated `git diff --exit-code`. Review found that misses the guard's most important case: `git diff` never reports untracked paths, so a script creating a *new* file under `data/imports/` or `docs/` — neither gitignored — would not have tripped it at all. It also hides staged changes, since bare `git diff` compares the working tree to the index. `git status --porcelain` still respects `.gitignore` but reports new and staged entries too.
 
 - [ ] **Step 2: Verify the workflow file parses**
 

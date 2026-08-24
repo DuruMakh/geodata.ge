@@ -124,12 +124,17 @@ In `.github/workflows/ci.yml`, the `checks` job gains two steps after `npm run d
 2. A final tracked-tree cleanliness guard, run from the repository workspace root rather than the `apps/web` default working directory:
 
 ```yaml
-      - name: Fail if any tracked file was modified
+      - name: Fail if the job wrote into the repository
         working-directory: ${{ github.workspace }}
-        run: git diff --exit-code
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "The checks job modified the repository:"
+            git status --porcelain
+            exit 1
+          fi
 ```
 
-`git diff --exit-code` reports only modifications to tracked files, so the gitignored `prebuild` and `next build` outputs listed in section 2.3 cannot trip it. The guard is placed last so it covers lint, tests, data validation and the build in one step; its diff output names the changed files, which is sufficient attribution.
+`git status --porcelain` respects `.gitignore`, so the gitignored `prebuild` and `next build` outputs listed in section 2.3 cannot trip it — while still reporting new and staged files, which `git diff --exit-code` silently misses. That gap was found in review of the shipped guard: `git diff` never reports untracked paths, so a script creating a new file under `data/imports/` or `docs/` would not have tripped the original at all, and bare `git diff` also hides anything a step has staged. The guard is placed last so it covers lint, tests, data validation and the build in one step; its output names the changed files, which is sufficient attribution.
 
 This duplicates the build already performed in the required `e2e` job, at a cost of roughly two to four minutes of CI per pull request. That cost is accepted deliberately in exchange for a direct build signal that does not depend on the Playwright server lifecycle.
 

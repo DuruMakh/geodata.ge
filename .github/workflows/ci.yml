@@ -42,12 +42,19 @@ jobs:
       # two unpatchable high advisories.
       - name: Audit dependencies
         run: npm audit --audit-level=high
-      # Nothing in this job may modify a tracked file. Generated outputs under
-      # public/downloads/ and data/reports/ are gitignored, so only a real
-      # regression — a test or script writing into the repo — trips this.
-      - name: Fail if any tracked file was modified
+      # Nothing in this job may write into the repository. `git status --porcelain`
+      # respects .gitignore, so the generated output under public/downloads/ and
+      # data/reports/ stays invisible here — but unlike `git diff` it also reports
+      # NEW files and staged changes, which is the case this guard exists for: a
+      # test or script creating a file under a tracked, non-ignored path.
+      - name: Fail if the job wrote into the repository
         working-directory: ${{ github.workspace }}
-        run: git diff --exit-code
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "The checks job modified the repository:"
+            git status --porcelain
+            exit 1
+          fi
 
   e2e:
     name: Browser tests (Playwright)
