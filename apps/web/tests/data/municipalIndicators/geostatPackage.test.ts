@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs";
+import fsPromises from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import * as XLSX from "xlsx";
 
 const repoRoot = path.resolve(process.cwd(), "../..");
@@ -907,6 +908,34 @@ describe("Geostat population and regional GDP research package", () => {
 
     for (const [index, filePath] of artifactPaths.entries()) {
       expect(fs.readFileSync(filePath).equals(before[index]!)).toBe(true);
+    }
+  });
+
+  it("rejects in check mode when a committed artifact does not match generated content", async () => {
+    // Proves the check-mode gate in buildGeostatPackage actually fires: intercept the
+    // disk read for exactly one committed artifact so the byte-for-byte comparison sees
+    // altered content, while every other read (source workbooks, crosswalks, the other
+    // two artifacts) passes through untouched. No tracked file is written.
+    const staleArtifactPath = path.join(packageDir, "validation-report.json");
+    type ReadFileFn = (...args: unknown[]) => Promise<unknown>;
+    const fsPromisesUntyped = fsPromises as unknown as { readFile: ReadFileFn };
+    const originalReadFile = fsPromisesUntyped.readFile;
+    const spy = vi
+      .spyOn(fsPromisesUntyped, "readFile")
+      .mockImplementation(async (...args: unknown[]) => {
+        const [target] = args;
+        if (typeof target === "string" && target === staleArtifactPath) {
+          return "TAMPERED_FOR_TEST: this content can never match generator output\n";
+        }
+        return originalReadFile(...args);
+      });
+
+    try {
+      await expect(buildPackage(false)).rejects.toThrow(
+        `Generated Geostat municipal indicators artifact is stale: ${path.relative(repoRoot, staleArtifactPath)}`,
+      );
+    } finally {
+      spy.mockRestore();
     }
   });
 });
