@@ -1,7 +1,50 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
 
 const BASE_URL = process.env.SEO_BASE_URL ?? "http://localhost:3100";
+
+async function expectMinimumTarget(locator: Locator, size = 24) {
+  const box = await locator.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.width).toBeGreaterThanOrEqual(size);
+  expect(box!.height).toBeGreaterThanOrEqual(size);
+}
+
+async function expectNonOverlappingTargets(locator: Locator) {
+  const boxes = await Promise.all((await locator.all()).map((target) => target.boundingBox()));
+  expect(boxes.every((box) => box !== null)).toBe(true);
+
+  for (let first = 0; first < boxes.length; first += 1) {
+    for (let second = first + 1; second < boxes.length; second += 1) {
+      const a = boxes[first]!;
+      const b = boxes[second]!;
+      const overlaps = a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+      expect(overlaps, `targets ${first} and ${second} overlap`).toBe(false);
+    }
+  }
+}
+
+async function expectKeyboardFocusOrder(page: Page, locator: Locator) {
+  const links = await locator.all();
+  await links[0]!.focus();
+
+  for (let index = 0; index < links.length; index += 1) {
+    if (index > 0) await page.keyboard.press("Tab");
+    const link = links[index]!;
+    await expect(link).toBeFocused();
+    expect(await link.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
+    const outline = await link.evaluate((element) => getComputedStyle(element).outline);
+    expect(outline).not.toBe("none");
+  }
+}
+
+async function expectNoPageOverflow(page: Page) {
+  const { clientWidth, scrollWidth } = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+  expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
+}
 
 const representativeRoutes = [
   { route: "/", canonical: "https://fiscal.ge/" },
@@ -62,6 +105,31 @@ test("only third-party methodology source originals send a noindex header", asyn
   expect(original.headers()["x-robots-tag"]).toBe("noindex, follow");
   expect(processed.headers()["x-robots-tag"]).toBeUndefined();
   expect(methodologyPage.headers()["x-robots-tag"]).toBeUndefined();
+});
+
+test("breadcrumb links keep non-overlapping 24px mobile targets and keyboard focus", async ({ page }) => {
+  for (const viewport of [
+    { width: 375, height: 812 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+
+    for (const route of ["/methodology/expenditure", "/explorer/expenditure"] as const) {
+      await page.goto(`${BASE_URL}${route}`);
+      const breadcrumb = route.startsWith("/explorer")
+        ? page.getByTestId("explorer-header").getByRole("navigation", { name: "Breadcrumb" })
+        : page.getByRole("navigation", { name: "Breadcrumb" });
+      const links = breadcrumb.getByRole("link");
+
+      expect(await links.count()).toBeGreaterThan(0);
+      for (const link of await links.all()) {
+        await expectMinimumTarget(link);
+      }
+      await expectKeyboardFocusOrder(page, links);
+      await expectNonOverlappingTargets(links);
+      await expectNoPageOverflow(page);
+    }
+  }
 });
 
 test("entity datasets use final URLs and omit unavailable workbook distributions", async ({ page }) => {

@@ -24,6 +24,27 @@ async function expectNoPageOverflow(page: Page) {
   expect(width.scroll).toBe(width.client);
 }
 
+async function expectMinimumTarget(locator: Locator, size = 24) {
+  const box = await locator.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.width).toBeGreaterThanOrEqual(size);
+  expect(box!.height).toBeGreaterThanOrEqual(size);
+}
+
+async function expectNonOverlappingTargets(locator: Locator) {
+  const boxes = await Promise.all((await locator.all()).map((target) => target.boundingBox()));
+  expect(boxes.every((box) => box !== null)).toBe(true);
+
+  for (let first = 0; first < boxes.length; first += 1) {
+    for (let second = first + 1; second < boxes.length; second += 1) {
+      const a = boxes[first]!;
+      const b = boxes[second]!;
+      const overlaps = a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+      expect(overlaps, `targets ${first} and ${second} overlap`).toBe(false);
+    }
+  }
+}
+
 async function expectVisibleFocusOutline(locator: Locator) {
   await locator.focus();
   await expect(locator).toBeFocused();
@@ -38,6 +59,26 @@ async function expectVisibleFocusOutline(locator: Locator) {
   expect(outline.style).not.toBe("none");
   expect(outline.width).toBeGreaterThan(0);
   expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
+}
+
+async function expectKeyboardFocusOrder(page: Page, locator: Locator) {
+  const links = await locator.all();
+  await links[0]!.focus();
+
+  for (let index = 0; index < links.length; index += 1) {
+    if (index > 0) await page.keyboard.press("Tab");
+    const link = links[index]!;
+    await expect(link).toBeFocused();
+    const outline = await link.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        focusVisible: element.matches(":focus-visible"),
+        outline: style.outline,
+      };
+    });
+    expect(outline.focusVisible).toBe(true);
+    expect(outline.outline).not.toBe("none");
+  }
 }
 
 async function expectDatasetTableFits(page: Page, testId: string) {
@@ -268,4 +309,23 @@ test("methodology is in the footer but never the landing header", async ({ page 
   );
   await expect(page.getByTestId("landing-methodology")).toBeVisible();
   await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
+});
+
+test("footer links keep non-overlapping 24px mobile targets and keyboard focus", async ({ page }) => {
+  for (const viewport of [
+    { width: 375, height: 812 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto(baseUrl);
+
+    const links = page.getByTestId("site-footer").getByRole("link");
+    expect(await links.count()).toBe(5);
+    for (const link of await links.all()) {
+      await expectMinimumTarget(link);
+    }
+    await expectKeyboardFocusOrder(page, links);
+    await expectNonOverlappingTargets(links);
+    await expectNoPageOverflow(page);
+  }
 });
