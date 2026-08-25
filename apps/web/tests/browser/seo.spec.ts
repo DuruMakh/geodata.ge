@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
+import { computedCssColorAlpha } from "./focus-outline";
 
 const BASE_URL = process.env.SEO_BASE_URL ?? "http://localhost:3100";
 
@@ -50,8 +51,7 @@ async function expectKeyboardFocusOrder(page: Page, locator: Locator) {
       expect(await link.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
       expect(outline.style).not.toBe("none");
       expect(outline.width).toBeGreaterThan(0);
-      expect(outline.color).not.toBe("transparent");
-      expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
+      expect(computedCssColorAlpha(outline.color)).toBeGreaterThan(0);
       reachedTarget = true;
       break;
     }
@@ -59,6 +59,11 @@ async function expectKeyboardFocusOrder(page: Page, locator: Locator) {
     expect(reachedTarget, `target ${index} was not reached by Tab`).toBe(true);
   }
 }
+
+test("outline alpha parser rejects fully transparent colored outlines", () => {
+  expect(computedCssColorAlpha("rgba(255, 0, 0, 0)")).toBe(0);
+  expect(computedCssColorAlpha("rgb(255 0 0 / 0%)")).toBe(0);
+});
 
 async function expectNoPageOverflow(page: Page) {
   const { clientWidth, scrollWidth } = await page.evaluate(() => ({
@@ -130,9 +135,12 @@ test("only third-party methodology source originals send a noindex header", asyn
 });
 
 test("breadcrumb links keep non-overlapping 24px mobile targets and keyboard focus", async ({ page }) => {
+  test.setTimeout(90_000);
+
   for (const viewport of [
     { width: 375, height: 812 },
     { width: 390, height: 844 },
+    { width: 767, height: 844 },
   ]) {
     await page.setViewportSize(viewport);
 

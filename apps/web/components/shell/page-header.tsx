@@ -31,7 +31,7 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
             <span key={crumb.label}>
               {index > 0 ? <span aria-hidden="true" className="mx-1.5 text-[var(--accent)]">/</span> : null}
               {crumb.href ? (
-                <Link href={crumb.href} className="max-[767px]:inline-flex max-[767px]:min-h-6 max-[767px]:items-center text-[var(--muted)] no-underline hover:text-[var(--ink)] hover:underline">
+                <Link href={crumb.href} className="max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center text-[var(--muted)] no-underline hover:text-[var(--ink)] hover:underline">
                   {crumb.label}
                 </Link>
               ) : (

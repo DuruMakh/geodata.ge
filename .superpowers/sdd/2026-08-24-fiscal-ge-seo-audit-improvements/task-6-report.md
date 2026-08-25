@@ -146,3 +146,38 @@ npx.cmd playwright test --config=.task-6-playwright.config.ts tests/browser/seo.
 Result: exit 0, 2 passed (12.0s).
 
 The same isolated configuration then ran both browser files: exit 0, 35 passed (1.2m).
+
+## Fix round 2 — alpha and breakpoint follow-up
+
+### Transparent-outline RED/GREEN evidence
+
+The old literal-color predicate accepted a fully transparent coloured outline:
+
+```text
+color: rgba(255, 0, 0, 0)
+oldPredicateAcceptsColor: true
+```
+
+Both browser specs now use the shared `tests/browser/focus-outline.ts` helper. It parses the final alpha component of browser-normalized CSS colour output (including percentage alpha) and requires alpha greater than zero. Its direct regression test rejects both `rgba(255, 0, 0, 0)` and the equivalent normalized `rgb(255 0 0 / 0%)`. Focus checks continue to require sequential Tab traversal, `:focus-visible`, non-`none` outline style, and a positive outline width.
+
+### 767px boundary
+
+`max-[767px]` applies strictly below 767px in Tailwind's generated range syntax, so it omitted integer CSS width 767. Every mobile target layout utility now uses `max-[768px]`, which covers 767px while keeping 1440px unchanged. The focused geometry loops now cover 375×812, 390×844, and 767×844 for BreadcrumbTrail, PageHeader (including Tbilisi), and SiteFooter. Every target remained at least 24×24 CSS pixels with no pairwise overlap or document overflow.
+
+### Refreshed retained desktop evidence
+
+The 1440px `after` screenshots were recaptured after the `max-[768px]` correction. Screenshot binaries remain only in the ignored SDD workspace and were not staged or committed.
+
+| Surface | Before SHA-256 | After SHA-256 | Dimensions | Changed pixels |
+| --- | --- | --- | --- | --- |
+| Tbilisi PageHeader | `2797F5C0EEFF66C2F790949385EEA7FB3FE34BB916D09F4D415955D0F1219C0A` | `2797F5C0EEFF66C2F790949385EEA7FB3FE34BB916D09F4D415955D0F1219C0A` | 1140×48 | 0 |
+| SiteFooter | `BADA2A7B162766E096581665B55E31C766308421445BE4BB985F762D72958487` | `BADA2A7B162766E096581665B55E31C766308421445BE4BB985F762D72958487` | 1240×263 | 0 |
+
+The file paths remain the Fix round 1 before/after paths above. Matching SHA-256 values and zero decoded-pixel changes prove the desktop render is unchanged.
+
+### Fix-round verification
+
+The isolated temporary no-web-server Playwright configuration ran with `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`, `SEO_BASE_URL=http://localhost:3106`, and `PLAYWRIGHT_BASE_URL=http://localhost:3106`.
+
+- Focused alpha plus 375/390/767 geometry run: exit 0, 3 passed (32.5s).
+- Full `seo.spec.ts` and `landing.spec.ts` run: exit 0, 36 passed (2.9m).
