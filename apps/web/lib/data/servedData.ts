@@ -305,9 +305,9 @@ export const MUNICIPAL_PARITY_CHECKS: {
 };
 
 // glossary is a Map rather than a row array, so it cannot sit in a mapped type
-// over row arrays; assertLandingParity checks it by hand below and
-// tests/data/servedDataParityCoverage.test.ts asserts that hand-check is the
-// only exception.
+// over row arrays; assertExplorerParity checks it by hand below. Nothing at
+// runtime enumerates this type, so completeness here rests entirely on the
+// Omit — widening it is the one way to serve an unverified explorer dataset.
 type ExplorerRowFields = Omit<LoadedExplorerData, "glossary">;
 
 export const EXPLORER_ROW_PARITY_CHECKS: {

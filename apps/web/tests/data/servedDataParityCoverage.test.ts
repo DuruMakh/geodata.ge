@@ -6,19 +6,15 @@ import {
   resetServedDataCacheForTests,
 } from "../../lib/data/servedData";
 
-// glossary is a Map, not a row array, so it is parity-checked by hand inside
-// assertLandingParity rather than through the table. Any OTHER field that is
-// neither in the table nor listed here is unverified data reaching production.
-const HANDLED_OUTSIDE_THE_TABLES = new Set(["glossary"]);
-
 describe("served data parity coverage", () => {
   it("checks every municipal dataset the site serves", async () => {
     resetServedDataCacheForTests();
     const municipal = await loadServedMunicipalData();
 
-    const unchecked = Object.keys(municipal).filter(
-      (field) => !(field in MUNICIPAL_PARITY_CHECKS) && !HANDLED_OUTSIDE_THE_TABLES.has(field),
-    );
+    // Every MunicipalData field is a row array, so every one of them belongs in
+    // the table. A field here that the table does not name is unverified data
+    // reaching production.
+    const unchecked = Object.keys(municipal).filter((field) => !(field in MUNICIPAL_PARITY_CHECKS));
 
     expect(unchecked).toEqual([]);
   });
