@@ -149,6 +149,34 @@ function byYearAscending<T extends { year: number }>(rows: T[]): T[] {
   return [...rows].sort((left, right) => left.year - right.year);
 }
 
+// The ordering contract, applied on BOTH serving paths.
+//
+// The csv path used to apply byYearAscending inline in its loaders and the db
+// path applied nothing, leaving the db path's guarantee to the ORDER BY inside
+// lib/db/mirrorRows.ts. Parity compares by key and is order-insensitive
+// (servedDataParity.ts), so a dropped ORDER BY would reach production with
+// every gate green and mislabel each joined ministry series. Routing both
+// paths through one function makes the contract hold regardless of the query.
+export function orderExplorerDataForServing(data: LoadedExplorerData): LoadedExplorerData {
+  return {
+    ...data,
+    adminFacts: byYearAscending(data.adminFacts),
+    gdpFacts: byYearAscending(data.gdpFacts),
+  };
+}
+
+export function orderMunicipalDataForServing(data: MunicipalData): MunicipalData {
+  return {
+    ...data,
+    functionFacts: byYearAscending(data.functionFacts),
+    totalFacts: byYearAscending(data.totalFacts),
+    countryFunctionFacts: byYearAscending(data.countryFunctionFacts),
+    countryTotalFacts: byYearAscending(data.countryTotalFacts),
+    adjaraBudgetAdjustments: byYearAscending(data.adjaraBudgetAdjustments),
+    populationFacts: byYearAscending(data.populationFacts),
+  };
+}
+
 // Projection to the served rows. The return annotations are the drift guard:
 // widen an ingestion union and assigning it here stops typechecking.
 function toServedBudgetFact(fact: BudgetFactImportRow): ServedBudgetFact {
@@ -204,12 +232,7 @@ async function loadExplorerDataFromCsv(): Promise<LoadedExplorerData> {
     loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
   ]);
 
-  return {
-    ...landing,
-    adminFacts: byYearAscending(adminFacts),
-    adminCategories,
-    gdpFacts: byYearAscending(gdpFacts),
-  };
+  return orderExplorerDataForServing({ ...landing, adminFacts, adminCategories, gdpFacts });
 }
 
 async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
@@ -235,18 +258,67 @@ async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
     loadMunicipalPopulationFacts(SERVED_DATA_FILES.municipalPopulationFacts),
   ]);
 
-  return {
+  return orderMunicipalDataForServing({
     functions,
     regions,
     municipalities,
-    functionFacts: byYearAscending(functionFacts),
-    totalFacts: byYearAscending(totalFacts),
-    countryFunctionFacts: byYearAscending(countryFunctionFacts),
-    countryTotalFacts: byYearAscending(countryTotalFacts),
-    adjaraBudgetAdjustments: byYearAscending(adjaraBudgetAdjustments),
-    populationFacts: byYearAscending(populationFacts),
-  };
+    functionFacts,
+    totalFacts,
+    countryFunctionFacts,
+    countryTotalFacts,
+    adjaraBudgetAdjustments,
+    populationFacts,
+  });
 }
+
+// One parity check per served dataset. The mapped types are the guard: adding a
+// field to MunicipalData or LoadedExplorerData without adding its entry here is
+// a typecheck error, not a silent hole. Before this, an unchecked dataset
+// compiled, passed every test, and reached production unverified — parity only
+// protects the datasets it is called on.
+type ParityCheck<TRow> = { label: string; keyOf: (row: TRow) => string };
+
+export const MUNICIPAL_PARITY_CHECKS: {
+  [K in keyof MunicipalData]: ParityCheck<MunicipalData[K][number]>;
+} = {
+  functions: { label: "municipal functions", keyOf: (row) => row.id },
+  regions: { label: "municipal regions", keyOf: (row) => row.id },
+  municipalities: { label: "municipalities", keyOf: (row) => row.code },
+  functionFacts: { label: "municipal function facts", keyOf: municipalFunctionFactParityKey },
+  totalFacts: { label: "municipal total facts", keyOf: municipalTotalFactParityKey },
+  countryFunctionFacts: {
+    label: "Georgia municipal function facts",
+    keyOf: municipalFunctionFactParityKey,
+  },
+  countryTotalFacts: {
+    label: "Georgia municipal total facts",
+    keyOf: municipalTotalFactParityKey,
+  },
+  adjaraBudgetAdjustments: {
+    label: "Adjara budget adjustments",
+    keyOf: adjaraBudgetAdjustmentParityKey,
+  },
+  populationFacts: {
+    label: "municipal population facts",
+    keyOf: municipalPopulationFactParityKey,
+  },
+};
+
+// glossary is a Map rather than a row array, so it cannot sit in a mapped type
+// over row arrays; assertExplorerParity checks it by hand below. Nothing at
+// runtime enumerates this type, so completeness here rests entirely on the
+// Omit — widening it is the one way to serve an unverified explorer dataset.
+type ExplorerRowFields = Omit<LoadedExplorerData, "glossary">;
+
+export const EXPLORER_ROW_PARITY_CHECKS: {
+  [K in keyof ExplorerRowFields]: ParityCheck<ExplorerRowFields[K][number]>;
+} = {
+  facts: { label: "budget facts", keyOf: budgetFactParityKey },
+  sourceDocuments: { label: "source documents", keyOf: (row) => row.sourceId },
+  adminFacts: { label: "admin spending facts", keyOf: adminFactParityKey },
+  adminCategories: { label: "admin spending categories", keyOf: (row) => row.id },
+  gdpFacts: { label: "national GDP facts", keyOf: nationalGdpFactParityKey },
+};
 
 // The database is only served after proving it still matches the reviewed
 // CSVs in this checkout, row by row. This catches a stale mirror (CSVs merged
@@ -264,6 +336,35 @@ function assertLandingParity(db: LoadedLandingData, csv: LoadedLandingData): voi
   assertSameServedRows("source documents", csv.sourceDocuments, db.sourceDocuments, (row) => row.sourceId);
 }
 
+// The loops below cannot correlate the key type across iterations, so each row
+// array is widened to object[] at the call site. The two declarations above are
+// where the type safety lives; these are just the walks. Two small explicit
+// loops rather than one generic helper — the shared version needed a
+// ParityCheck<never> parameter and a Record<string, unknown> cast on the data,
+// which cost more comprehension than it saved.
+function assertExplorerParity(db: LoadedExplorerData, csv: LoadedExplorerData): void {
+  assertSameServedRows(
+    "glossary entries",
+    [...csv.glossary.values()],
+    [...db.glossary.values()],
+    (row) => row.id,
+  );
+
+  for (const [field, check] of Object.entries(EXPLORER_ROW_PARITY_CHECKS)) {
+    const rowCheck = check as ParityCheck<object>;
+    const key = field as keyof ExplorerRowFields;
+    assertSameServedRows(rowCheck.label, csv[key] as object[], db[key] as object[], rowCheck.keyOf);
+  }
+}
+
+function assertMunicipalParity(db: MunicipalData, csv: MunicipalData): void {
+  for (const [field, check] of Object.entries(MUNICIPAL_PARITY_CHECKS)) {
+    const rowCheck = check as ParityCheck<object>;
+    const key = field as keyof MunicipalData;
+    assertSameServedRows(rowCheck.label, csv[key] as object[], db[key] as object[], rowCheck.keyOf);
+  }
+}
+
 async function loadServedLandingDataUncached(): Promise<LoadedLandingData> {
   if (resolveServedDataSource() === "db") {
     const { loadLandingDataFromDb } = await import("../db/servedDataDb");
@@ -279,61 +380,11 @@ async function loadServedExplorerDataUncached(): Promise<LoadedExplorerData> {
   if (resolveServedDataSource() === "db") {
     const { loadExplorerDataFromDb } = await import("../db/servedDataDb");
     const [db, csv] = await Promise.all([loadExplorerDataFromDb(), loadExplorerDataFromCsv()]);
-    assertLandingParity(db, csv);
-    assertSameServedRows("admin spending facts", csv.adminFacts, db.adminFacts, adminFactParityKey);
-    assertSameServedRows("admin spending categories", csv.adminCategories, db.adminCategories, (row) => row.id);
-    assertSameServedRows(
-      "national GDP facts",
-      csv.gdpFacts,
-      db.gdpFacts,
-      nationalGdpFactParityKey,
-    );
-    return db;
+    assertExplorerParity(db, csv);
+    return orderExplorerDataForServing(db);
   }
 
   return loadExplorerDataFromCsv();
-}
-
-function assertMunicipalParity(db: MunicipalData, csv: MunicipalData): void {
-  assertSameServedRows("municipal functions", csv.functions, db.functions, (row) => row.id);
-  assertSameServedRows("municipal regions", csv.regions, db.regions, (row) => row.id);
-  assertSameServedRows("municipalities", csv.municipalities, db.municipalities, (row) => row.code);
-  assertSameServedRows(
-    "municipal function facts",
-    csv.functionFacts,
-    db.functionFacts,
-    municipalFunctionFactParityKey,
-  );
-  assertSameServedRows(
-    "municipal total facts",
-    csv.totalFacts,
-    db.totalFacts,
-    municipalTotalFactParityKey,
-  );
-  assertSameServedRows(
-    "Georgia municipal function facts",
-    csv.countryFunctionFacts,
-    db.countryFunctionFacts,
-    municipalFunctionFactParityKey,
-  );
-  assertSameServedRows(
-    "Georgia municipal total facts",
-    csv.countryTotalFacts,
-    db.countryTotalFacts,
-    municipalTotalFactParityKey,
-  );
-  assertSameServedRows(
-    "Adjara budget adjustments",
-    csv.adjaraBudgetAdjustments,
-    db.adjaraBudgetAdjustments,
-    adjaraBudgetAdjustmentParityKey,
-  );
-  assertSameServedRows(
-    "municipal population facts",
-    csv.populationFacts,
-    db.populationFacts,
-    municipalPopulationFactParityKey,
-  );
 }
 
 async function loadServedMunicipalDataUncached(): Promise<MunicipalData> {
@@ -341,7 +392,7 @@ async function loadServedMunicipalDataUncached(): Promise<MunicipalData> {
     const { loadMunicipalDataFromDb } = await import("../db/servedDataDb");
     const [db, csv] = await Promise.all([loadMunicipalDataFromDb(), loadMunicipalDataFromCsv()]);
     assertMunicipalParity(db, csv);
-    return db;
+    return orderMunicipalDataForServing(db);
   }
 
   return loadMunicipalDataFromCsv();

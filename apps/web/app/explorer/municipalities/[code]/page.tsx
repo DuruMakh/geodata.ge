@@ -14,6 +14,7 @@ import {
 } from "../../../../lib/explorer/municipalData";
 import { formatAmount, formatShare } from "../../../../lib/explorer/format";
 import { georgianOrdinal } from "../../../../lib/explorer/municipalLabels";
+import { shareOfTotal } from "../../../../lib/explorer/share";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
 import {
   coverageFromYears,
@@ -96,7 +97,7 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ c
     `${municipality.nameKa}ს ბიუჯეტი ${latestYear} წელს ${formatAmount(latestTotal.publicTotalGel)} იყო — ` +
     `${municipalities.length} მუნიციპალიტეტს შორის ${georgianOrdinal(rank)} ადგილი. ` +
     `ყველაზე დიდი ფუნქციური მიმართულებაა ${largestFunction.kaLabel}, რომელიც ბიუჯეტის ` +
-    `${formatShare(largestFunctionFact.amountGel / latestTotal.publicTotalGel)}-ს შეადგენს.`;
+    `${formatShare(shareOfTotal(largestFunctionFact.amountGel, latestTotal.publicTotalGel))}-ს შეადგენს.`;
 
   // Prev/next walk the registry's official sort order, which is roughly
   // region-grouped in the source, so stepping through stays geographic.
