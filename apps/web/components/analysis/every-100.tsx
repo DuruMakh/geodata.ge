@@ -20,7 +20,7 @@ export function Every100Gel({ items }: Every100Props) {
 
   return (
     <div data-testid="every-100-gel" className="mt-9 border-t border-[var(--hairline)] pt-6">
-      <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ყოველი 100 ლარი</h3>
+      <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ყოველი 100 ლარი</h2>
       <p className="mb-4 text-xs text-[var(--muted)]">
         ზუსტად 100 უჯრა · მთელი ლარები, ჯამი — 100
         {zeroCount > 0 ? ` · ${zeroCount} კატეგორია მრგვალდება 0 ₾-მდე` : ""}

@@ -31,7 +31,7 @@ export function BudgetField({ items }: BudgetFieldProps) {
   if (withGrowth.length === 0) {
     return (
       <div data-testid="budget-field" className="mt-9 border-t border-[var(--hairline)] pt-6">
-        <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის ველი</h3>
+        <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის ველი</h2>
         <p className="mb-4 text-xs text-[var(--muted)]">x — წილი მთლიანიდან · y — ზრდა წინა წელთან · ზომა — მოცულობა</p>
         <Callout>
           წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.
@@ -71,7 +71,7 @@ export function BudgetField({ items }: BudgetFieldProps) {
 
   return (
     <div data-testid="budget-field" className="mt-9 border-t border-[var(--hairline)] pt-6">
-      <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის ველი</h3>
+      <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის ველი</h2>
       <p className="mb-4 text-xs text-[var(--muted)]">x — წილი მთლიანიდან · y — ზრდა წინა წელთან · ზომა — მოცულობა</p>
       <div className="overflow-x-auto">
       <div className="relative min-w-[720px]">

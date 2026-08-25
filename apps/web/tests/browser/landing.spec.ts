@@ -138,6 +138,20 @@ test("landing renders the approved latest-year data composition", async ({ page 
     const latestYear = await section.getByTestId("landing-dataset-total").locator("strong").textContent();
     await expect(section.locator("thead th").nth(1)).toHaveText(latestYear!);
   }
+  await expect(page.getByTestId("landing-dataset-expenditure").locator("table caption")).toHaveText(
+    "როგორ იხარჯება საქართველოს ბიუჯეტი — 2025 წლის მონაცემები",
+  );
+  await expect(
+    page.getByTestId("landing-dataset-expenditure").getByRole("table", {
+      name: "როგორ იხარჯება საქართველოს ბიუჯეტი — 2025 წლის მონაცემები",
+    }),
+  ).toHaveCount(1);
+  await expect(page.getByTestId("landing-dataset-revenue").locator("table caption")).toHaveText(
+    "როგორ ფინანსდება საქართველოს ბიუჯეტი — 2025 წლის მონაცემები",
+  );
+  await expect(page.getByTestId("landing-dataset-municipalities").locator("table caption")).toHaveText(
+    "როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები — 2025 წლის მონაცემები",
+  );
 
   await expect(page.getByTestId("landing-dataset-expenditure").getByRole("link")).toHaveAttribute("href", "/explorer/expenditure");
   await expect(page.getByTestId("landing-dataset-revenue").getByRole("link")).toHaveAttribute("href", "/explorer/revenue");

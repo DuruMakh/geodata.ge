@@ -219,10 +219,15 @@ test("regular content pages do not repeat the methodology promotion", async ({ p
 });
 
 test("source archives keep provenance metadata out of every public table", async ({ page }) => {
-  for (const dataset of ["expenditure", "revenue", "municipalities"] as const) {
+  for (const [dataset, datasetTitle] of [
+    ["expenditure", "ხარჯების მეთოდოლოგია"],
+    ["revenue", "შემოსავლების მეთოდოლოგია"],
+    ["municipalities", "მუნიციპალიტეტების მეთოდოლოგია"],
+  ] as const) {
     await page.goto(`http://localhost:3100/methodology/${dataset}#source-archive`);
     const archive = page.getByTestId("source-archive");
 
+    await expect(archive.locator("table caption")).toHaveText(`${datasetTitle} — პირველწყაროების არქივი`);
     await expect(archive.locator("thead")).not.toContainText("თარიღი");
     await expect(archive.locator("thead")).not.toContainText("SHA-256");
     await expect(archive).not.toContainText("უახლესი ჩანაწერის თარიღი");

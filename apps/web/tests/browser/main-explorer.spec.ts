@@ -235,6 +235,9 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await expect(page.getByTestId("explorer-table")).toBeVisible();
   await expect(page.getByTestId("explorer-table")).toContainText("მთლიანი ხარჯი");
   await expect(page.getByTestId("explorer-table")).toContainText("ცვლილება");
+  await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
+    "ხარჯვითი მონაცემები — ხარჯები ლარში, 2004–2025",
+  );
 
   await chartPanel.getByTestId("chart-mode-line").click();
   await expect(page.getByTestId("chart-frame")).toBeVisible();
@@ -251,6 +254,9 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await chartPanel.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table")).toContainText("წილი მშპ-ში 2025");
   await expect(page.getByTestId("explorer-table")).not.toContainText("100.0%");
+  await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
+    "უწყებრივი მონაცემები — წილი მშპ-ში, 2004–2025",
+  );
 
   expect(consoleProblems).toEqual([]);
 });
@@ -493,6 +499,12 @@ test("URL hash round-trips explorer state", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ფინანსდება საქართველოს ბიუჯეტი");
   await expect(page.getByTestId("explorer-table")).toBeVisible();
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2020");
+  await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
+    "შემოსავლების მონაცემები — წილი მშპ-ში, 2010–2020",
+  );
+  await expect(page.getByTestId("period-comparison").locator("caption")).toHaveText(
+    "შემოსავლები საბიუჯეტო მუხლების მიხედვით — პერიოდის შედარება, 2010–2020",
+  );
   await expect(page.getByTestId("series-selector").getByTitle("მთლიანი შემოსავლები")).toHaveAttribute("aria-pressed", "true");
 });
 
@@ -695,6 +707,8 @@ test("analysis view renders the fixed single-year section order", async ({ page 
 
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("ბიუჯეტის სურათი");
+  await expect(page.locator("main h1")).toHaveCount(1);
+  await expect(page.locator("main h2")).toHaveCount(5);
 
   await expect(page.getByTestId("analysis-year-selector")).toContainText("2025");
   await expect(page.getByTestId("snapshot-treemap")).toBeVisible();
@@ -706,6 +720,9 @@ test("analysis view renders the fixed single-year section order", async ({ page 
   await expect(page.getByTestId("budget-radar")).toBeVisible();
   await expect(page.getByTestId("budget-field")).toBeVisible();
   await expect(page.getByTestId("single-year-ranking")).toBeVisible();
+  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
+    "ხარჯები სფეროების მიხედვით — სრული რეიტინგი, 2025",
+  );
 
   const sectionOrder = await page.evaluate(() => {
     const ids = ["snapshot-treemap", "every-100-gel", "budget-radar", "budget-field", "single-year-ranking"];
@@ -730,12 +747,23 @@ test("analysis view renders the fixed single-year section order", async ({ page 
   // Revenue side reuses the same layout.
   await page.getByTestId("analysis-side-revenue").click();
   await expect(page.getByTestId("single-year-ranking")).toContainText("დამატებული ღირებულების გადასახადი");
+  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
+    "შემოსავლები კატეგორიების მიხედვით — სრული რეიტინგი, 2025",
+  );
   await expect(page.getByTestId("analysis-grouping-fields")).toHaveCount(0);
+
+  await page.getByTestId("analysis-year-selector").getByRole("button", { name: "2024", exact: true }).click();
+  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
+    "შემოსავლები კატეგორიების მიხედვით — სრული რეიტინგი, 2024",
+  );
 
   // Ministries grouping in analysis (categories only).
   await page.getByTestId("analysis-side-expenditure").click();
   await page.getByTestId("analysis-grouping-ministries").click();
   await expect(page.getByTestId("snapshot-treemap")).toContainText("სტრუქტურა უწყებების მიხედვით");
+  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
+    "ხარჯები უწყებების მიხედვით — სრული რეიტინგი, 2024",
+  );
 
   expect(consoleProblems).toEqual([]);
 });
@@ -1182,6 +1210,10 @@ test("hub lists four cards, all four now live", async ({ page }) => {
   await expectAppReady(page);
 
   await expect(page.getByTestId("hub-card")).toHaveCount(4);
+  await expect(page.getByTestId("hub-card").locator("h2")).toHaveCount(4);
+  for (const card of await page.getByTestId("hub-card").all()) {
+    await expect(card.locator("h2")).toHaveCount(1);
+  }
   // Scoped to the hub: the sidebar carries a ხარჯები link too, and an unscoped
   // role query would trip Playwright's strict mode.
   await expect(page.getByTestId("budget-hub").getByRole("link", { name: /ხარჯები/ })).toHaveAttribute(

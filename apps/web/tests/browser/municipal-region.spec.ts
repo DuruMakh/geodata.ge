@@ -53,7 +53,7 @@ test.describe("region header responsiveness", () => {
 
       const heading = page.getByRole("heading", { level: 1 });
       await expect(heading).toHaveText(
-        "როგორ ხარჯავს ბიუჯეტს რაჭა-ლეჩხუმი და ქვემო სვანეთი▾",
+        "როგორ ხარჯავს ბიუჯეტს რაჭა-ლეჩხუმი და ქვემო სვანეთი",
       );
 
       const headingBox = await heading.boundingBox();
@@ -84,7 +84,7 @@ test.describe("region source note", () => {
     await page.goto(ADJARA_URL);
     await expectMunicipalAppReady(page);
 
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("გაერთიანებული ბიუჯეტი — აჭარა▾");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("გაერთიანებული ბიუჯეტი — აჭარა");
     const note = page.getByTestId("municipal-source-note");
     await expect(note).toContainText("ექვსი მუნიციპალიტეტის ბიუჯეტებს");
     await expect(note).toContainText("ტრანსფერები გამოკლებულია");
@@ -251,7 +251,7 @@ test.describe("region page", () => {
     await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);
 
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ხარჯავს ბიუჯეტს იმერეთი▾");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ხარჯავს ბიუჯეტს იმერეთი");
     await expect(page.getByTestId("compact-methodology-link")).toHaveCount(0);
   });
 
@@ -260,7 +260,9 @@ test.describe("region page", () => {
     await expectMunicipalAppReady(page);
     const trigger = page.getByTestId("entity-picker-trigger");
     await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
-    await expect(page.getByTestId("entity-picker-caret")).toHaveText("▾");
+    const caret = trigger.locator("span[aria-hidden='true']");
+    await expect(caret).toHaveText("");
+    await expect(caret).toHaveCSS("border-top-width", "5px");
     await expect(page.getByTestId("region-member-row")).toHaveCount(12);
     await expect(page.getByTestId("municipal-source-note").first()).toContainText("ოკუპირებულ ტერიტორიებთან");
     await expect(page.getByTestId("divergence-callout")).toHaveCount(0);

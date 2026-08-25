@@ -274,12 +274,11 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             >
               {props.triggerLabel}
               <span
-                data-testid="entity-picker-caret"
-                aria-hidden
-                className="ml-1 inline-block align-middle text-[0.35em] text-[var(--control)] transition-colors duration-100 group-hover:text-[var(--accent)]"
-              >
-                {pickerOpen ? "▴" : "▾"}
-              </span>
+                aria-hidden="true"
+                className={`ml-1 inline-block h-0 w-0 border-x-[4px] border-x-transparent ${
+                  pickerOpen ? "border-b-[5px] border-b-current" : "border-t-[5px] border-t-current"
+                }`}
+              />
             </button>
           </h1>
           <EntityPicker
@@ -352,6 +351,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
             <EditorialLineChart years={years} series={series} share={state.share} unit={unit} shareLabel="წილი მთლიან ბიუჯეტში" />
           ) : (
             <ExplorerTable
+              caption={`${props.triggerLabel} — ${state.share ? "წილი მთლიან ბიუჯეტში" : "ხარჯები ლარში"}, ${state.range.start}–${state.range.end}`}
               rows={model.rows.filter((row) => state.selectedIds.includes(row.itemId))}
               totalRow={model.totalRow}
               showTotal={state.selectedIds.includes(model.totalRow.itemId)}
@@ -434,6 +434,7 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       {/* All three derive from the RANGE model, so they move together with
           the chart instead of describing a span the user is not looking at. */}
       <MunicipalIndicators
+        entityLabel={props.triggerLabel}
         kpis={kpis}
         presentation={presentation}
         movers={buildMovers(model)}

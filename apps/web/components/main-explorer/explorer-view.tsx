@@ -154,6 +154,7 @@ export function ExplorerView({
               </div>
             ) : chartMode === "table" ? (
               <ExplorerTable
+                caption={`${COVERAGE_NOTE[scope]} — ${share ? "წილი მშპ-ში" : scope === "revenue" ? "შემოსავლები ლარში" : "ხარჯები ლარში"}, ${range.start}–${range.end}`}
                 rows={model.tableRows.filter((row) => row.level !== "total")}
                 totalRow={model.totalRow}
                 showTotal={Boolean(model.totalRow && selectedIds.includes(model.totalRow.itemId))}

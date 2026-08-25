@@ -26,6 +26,7 @@ for (const { route, canonical } of representativeRoutes) {
     await expect(openGraphUrl).toHaveCount(1);
     await expect(canonicalLink).toHaveAttribute("href", canonical);
     await expect(openGraphUrl).toHaveAttribute("content", canonical);
+    await expect(page.locator("main h1")).toHaveCount(1);
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /^https:\/\/fiscal\.ge\//);
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
     await expect(page.locator('script[type="application/ld+json"]')).not.toHaveCount(0);

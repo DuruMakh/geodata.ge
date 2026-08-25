@@ -222,15 +222,20 @@ test.describe("entity picker accessibility", () => {
     await expectMunicipalAppReady(page);
 
     const trigger = page.getByTestId("entity-picker-trigger");
-    const caret = page.getByTestId("entity-picker-caret");
+    const caret = trigger.locator("span[aria-hidden='true']");
     const restingBox = await trigger.boundingBox();
+
+    await expect(page.locator("h1")).not.toContainText(/[▾▴]/);
+    await expect(page.locator("main h1")).toHaveText("როგორ ხარჯავს ბიუჯეტს თბილისი");
 
     await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
     await expect(trigger).toHaveCSS("border-bottom-style", "dashed");
     await expect(trigger).toHaveCSS("border-bottom-width", "1px");
     await expect(trigger).toHaveCSS("transition-duration", "0.1s");
-    await expect(caret).toHaveText("▾");
-    await expect(caret).toHaveCSS("color", "rgb(149, 132, 106)");
+    await expect(caret).toHaveText("");
+    await expect(caret).toHaveCSS("border-top-width", "5px");
+    await expect(caret).toHaveCSS("border-bottom-width", "0px");
+    await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
 
     await trigger.hover();
     await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
@@ -238,7 +243,9 @@ test.describe("entity picker accessibility", () => {
 
     await trigger.click();
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
-    await expect(caret).toHaveText("▴");
+    await expect(caret).toHaveText("");
+    await expect(caret).toHaveCSS("border-top-width", "0px");
+    await expect(caret).toHaveCSS("border-bottom-width", "5px");
   });
 
   test("opening moves focus into the search input", async ({ page }) => {
@@ -459,6 +466,10 @@ test.describe("municipality page", () => {
     await page.getByTestId("municipal-mode-table").click();
     const table = page.getByTestId("explorer-table");
     await expect(table).toBeVisible();
+    await expect(table.locator("caption")).toHaveText("თბილისი — ხარჯები ლარში, 2015–2025");
+    await expect(page.getByTestId("comparison-table").locator("caption")).toHaveText(
+      "თბილისი — პერიოდის შედარება, 2015–2025",
+    );
     // The regression this guards: in billions every municipal cell reads 0.0.
     // Checked cell by cell, not as a substring of the table's full text: this
     // municipality's თავდაცვა (defence) row genuinely rounds to 0 for every
@@ -468,6 +479,19 @@ test.describe("municipality page", () => {
     for (const cell of cells) {
       expect(cell).not.toBe("0.0");
     }
+
+    await page.getByTestId("municipal-share-toggle").click();
+    await expect(table.locator("caption")).toHaveText("თბილისი — წილი მთლიან ბიუჯეტში, 2015–2025");
+
+    await page.goto(`${ENTITY_URL}#m=table&sh=1&r=2020-2024`);
+    await page.reload();
+    await expectMunicipalAppReady(page);
+    await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
+      "თბილისი — წილი მთლიან ბიუჯეტში, 2020–2024",
+    );
+    await expect(page.getByTestId("comparison-table").locator("caption")).toHaveText(
+      "თბილისი — პერიოდის შედარება, 2020–2024",
+    );
   });
 
   test("renders the official total and every selected municipal line", async ({ page }) => {

@@ -34,6 +34,7 @@ function growthColor(growth: number | null): string {
 }
 
 type MunicipalIndicatorsProps = {
+  entityLabel: string;
   kpis: MunicipalKpiSet;
   movers: { up: MunicipalMover[]; down: MunicipalMover[] };
   comparison: MunicipalComparisonRow[];
@@ -42,7 +43,7 @@ type MunicipalIndicatorsProps = {
   endYear: number;
 };
 
-export function MunicipalIndicators({ kpis, movers, comparison, presentation, startYear, endYear }: MunicipalIndicatorsProps) {
+export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, presentation, startYear, endYear }: MunicipalIndicatorsProps) {
   // Same degenerate case as the national section (indicators.tsx): a one-year
   // range leaves every delta at zero. All three side KPIs here are point-in-time
   // (level, rank, share), so only the hero, movers and comparison stand down —
@@ -166,6 +167,7 @@ export function MunicipalIndicators({ kpis, movers, comparison, presentation, st
         <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">პერიოდის შედარება</h3>
         <div className="overflow-x-auto">
           <table data-testid="comparison-table" className="min-w-[560px] w-full table-fixed border-collapse">
+            <caption className="sr-only">{`${entityLabel} — პერიოდის შედარება, ${startYear}–${endYear}`}</caption>
             <colgroup>
               <col className="w-[44%]" />
               <col />

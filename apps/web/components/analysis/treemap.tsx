@@ -87,7 +87,7 @@ export function StructureTreemap({ items, title, yearLabel }: StructureTreemapPr
 
   return (
     <div data-testid="snapshot-treemap" className="mt-9 border-t border-[var(--hairline)] pt-6">
-      <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">{title}</h3>
+      <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">{title}</h2>
       <p className="mb-4 text-xs text-[var(--muted)]">
         <span className="font-[family-name:var(--font-numeric)]">{yearLabel}</span> · წილი მთლიანიდან
       </p>

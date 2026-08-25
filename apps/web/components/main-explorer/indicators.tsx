@@ -22,6 +22,12 @@ const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
   revenue: "საბიუჯეტო მუხლი",
 };
 
+const SCOPE_LABEL: Record<ExplorerScope, string> = {
+  fields: "ხარჯები სფეროების მიხედვით",
+  ministries: "ხარჯები უწყებების მიხედვით",
+  revenue: "შემოსავლები საბიუჯეტო მუხლების მიხედვით",
+};
+
 function truncate(text: string, length: number): string {
   return text.length > length ? `${text.slice(0, length - 1)}…` : text;
 }
@@ -256,6 +262,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
         <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">პერიოდის შედარება</h3>
         <table className="w-full table-fixed border-collapse">
+          <caption className="sr-only">{`${SCOPE_LABEL[scope]} — პერიოდის შედარება, ${startYear}–${endYear}`}</caption>
           <colgroup>
             <col className="w-[44%]" />
             <col />

@@ -41,7 +41,7 @@ export function BudgetRadar({ items }: BudgetRadarProps) {
 
   return (
     <div data-testid="budget-radar" className="mt-9 border-t border-[var(--hairline)] pt-6">
-      <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის რადარი</h3>
+      <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის რადარი</h2>
       <p className="mb-4 text-xs text-[var(--muted)]">წილები · ზედა კატეგორიები · მხოლოდ ვიზუალური</p>
       <div className="grid items-center gap-6 @min-[1100px]:grid-cols-[minmax(0,1fr)_300px] @min-[1100px]:gap-12">
         <svg viewBox="0 0 420 316" role="img" aria-label="ბიუჯეტის რადარი" className="block h-auto w-full max-w-[460px]">

@@ -10,24 +10,30 @@ type FullRankingProps = {
   rows: SnapshotItem[];
   side: ExplorerSide;
   grouping: ExpenditureGrouping;
+  year: number;
 };
 
 function truncate(text: string, length: number): string {
   return text.length > length ? `${text.slice(0, length - 1)}…` : text;
 }
 
-export function FullRanking({ rows, side, grouping }: FullRankingProps) {
+export function FullRanking({ rows, side, grouping, year }: FullRankingProps) {
   const header = side === "revenue" ? "კატეგორია" : grouping === "ministries" ? "უწყება" : "სფერო";
+  const caption =
+    side === "revenue"
+      ? `შემოსავლები კატეგორიების მიხედვით — სრული რეიტინგი, ${year}`
+      : `ხარჯები ${grouping === "ministries" ? "უწყებების" : "სფეროების"} მიხედვით — სრული რეიტინგი, ${year}`;
   const maxShare = Math.max(...rows.map((row) => row.shareOfTotal), 0.001);
   const headCell =
     "border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-[9px] text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] whitespace-nowrap";
 
   return (
     <div data-testid="single-year-ranking" className="mt-9 border-t border-[var(--hairline)] pt-6">
-      <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">სრული რეიტინგი</h3>
+      <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">სრული რეიტინგი</h2>
       <p className="mb-3 text-xs text-[var(--muted)]">დალაგებულია მოცულობით, კლებადობით</p>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[720px] border-collapse">
+          <caption className="sr-only">{caption}</caption>
           <thead>
             <tr>
               <th className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)]">

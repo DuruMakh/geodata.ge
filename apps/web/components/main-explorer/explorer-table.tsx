@@ -8,6 +8,7 @@ import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 // total row, mono right-aligned numerals, sticky label/change/share columns.
 
 type ExplorerTableProps = {
+  caption: string;
   rows: ExplorerTableRow[];
   totalRow: ExplorerTableRow | null;
   showTotal: boolean;
@@ -28,7 +29,7 @@ function changeColor(change: number | null): string {
   return change >= 0 ? POSITIVE : NEGATIVE;
 }
 
-export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLabel, unit, share, shareColumnLabel, shareValueForYear }: ExplorerTableProps) {
+export function ExplorerTable({ caption, rows, totalRow, showTotal, years, firstColumnLabel, unit, share, shareColumnLabel, shareValueForYear }: ExplorerTableProps) {
   const endYear = years.at(-1);
   const lastIndex = years.length - 1;
   const cellValue = (row: ExplorerTableRow, year: number): string => {
@@ -52,6 +53,7 @@ export function ExplorerTable({ rows, totalRow, showTotal, years, firstColumnLab
         className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
         <table className="w-full border-collapse" style={{ minWidth }}>
+        <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
             <th className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]">

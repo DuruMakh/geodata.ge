@@ -19,6 +19,7 @@ export type PublicSourceManifestRow = Pick<
 
 type SourceArchiveProps = {
   datasetId: MethodologyDatasetId;
+  datasetLabel: string;
   rows: readonly PublicSourceManifestRow[];
   summary: MethodologyArchiveSummary;
 };
@@ -34,7 +35,7 @@ function formatBytes(bytes: number) {
   return `${bytes} B`;
 }
 
-export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) {
+export function SourceArchive({ datasetId, datasetLabel, rows, summary }: SourceArchiveProps) {
   const [query, setQuery] = useState("");
   const [year, setYear] = useState<number | null>(null);
   const years = useMemo(
@@ -112,6 +113,7 @@ export function SourceArchive({ datasetId, rows, summary }: SourceArchiveProps) 
 
       <div className="mt-7 overflow-x-auto border-t-2 border-[var(--ink)]">
         <table className="w-full min-w-[760px] border-collapse text-left text-[11.5px]">
+          <caption className="sr-only">{`${datasetLabel} — პირველწყაროების არქივი`}</caption>
           <thead>
             <tr className="border-b border-[var(--ink)] text-[9.5px] uppercase tracking-[0.05em] text-[var(--muted)]">
               <th className="px-2 py-3 font-semibold">წელი</th>
