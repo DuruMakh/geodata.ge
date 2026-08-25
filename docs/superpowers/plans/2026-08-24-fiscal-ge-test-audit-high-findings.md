@@ -2,6 +2,13 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status:** COMPLETE. All four tasks shipped 2026-08-25 on `claude/admiring-cohen-6f2357`:
+Task 1 `8cd0cbd0c` + `8c8caeb89`, Task 2 `6027c5460`, Task 3 `f488c1419`, Task 4 `62dbed292` +
+`abacfe96b`. Verified: 814 unit tests, 193/193 browser with no spec edited, build 93/93 routes.
+Task 5 (F18) was optional and remains open. Two items stayed open by design: the contravariance
+hole in `ParityCheck.keyOf` (a check wired to the wrong key function still typechecks), and the
+hardcoded 30s hook timeout in `tests/data/realExpenditurePdf/year2004StateBudget.test.ts`.
+
 **Goal:** Close the four high-severity findings from the 2026-08-24 testing audit — the places where a wrong fiscal figure can reach a reader with every existing gate green.
 
 **Architecture:** Three of the four findings share one root cause: `lib/explorer/` holds correct, tested arithmetic helpers that the rendering code bypasses with inline copies. Tasks 1 and 4 move that arithmetic back into `lib/` and delete the copies, so the existing tests start covering the real code paths. Tasks 2 and 3 close the two gaps the CSV↔database parity check is structurally blind to: row *order* (parity matches by key, order-insensitive) and dataset *coverage* (parity only protects the datasets it is called on). Both are fixed structurally — a shared ordering function and a mapped type that makes an unchecked dataset a typecheck error — rather than by adding a test that could itself be deleted.
