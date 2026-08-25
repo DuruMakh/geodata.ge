@@ -149,6 +149,34 @@ function byYearAscending<T extends { year: number }>(rows: T[]): T[] {
   return [...rows].sort((left, right) => left.year - right.year);
 }
 
+// The ordering contract, applied on BOTH serving paths.
+//
+// The csv path used to apply byYearAscending inline in its loaders and the db
+// path applied nothing, leaving the db path's guarantee to the ORDER BY inside
+// lib/db/mirrorRows.ts. Parity compares by key and is order-insensitive
+// (servedDataParity.ts), so a dropped ORDER BY would reach production with
+// every gate green and mislabel each joined ministry series. Routing both
+// paths through one function makes the contract hold regardless of the query.
+export function orderExplorerDataForServing(data: LoadedExplorerData): LoadedExplorerData {
+  return {
+    ...data,
+    adminFacts: byYearAscending(data.adminFacts),
+    gdpFacts: byYearAscending(data.gdpFacts),
+  };
+}
+
+export function orderMunicipalDataForServing(data: MunicipalData): MunicipalData {
+  return {
+    ...data,
+    functionFacts: byYearAscending(data.functionFacts),
+    totalFacts: byYearAscending(data.totalFacts),
+    countryFunctionFacts: byYearAscending(data.countryFunctionFacts),
+    countryTotalFacts: byYearAscending(data.countryTotalFacts),
+    adjaraBudgetAdjustments: byYearAscending(data.adjaraBudgetAdjustments),
+    populationFacts: byYearAscending(data.populationFacts),
+  };
+}
+
 // Projection to the served rows. The return annotations are the drift guard:
 // widen an ingestion union and assigning it here stops typechecking.
 function toServedBudgetFact(fact: BudgetFactImportRow): ServedBudgetFact {
@@ -204,12 +232,7 @@ async function loadExplorerDataFromCsv(): Promise<LoadedExplorerData> {
     loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
   ]);
 
-  return {
-    ...landing,
-    adminFacts: byYearAscending(adminFacts),
-    adminCategories,
-    gdpFacts: byYearAscending(gdpFacts),
-  };
+  return orderExplorerDataForServing({ ...landing, adminFacts, adminCategories, gdpFacts });
 }
 
 async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
@@ -235,17 +258,17 @@ async function loadMunicipalDataFromCsv(): Promise<MunicipalData> {
     loadMunicipalPopulationFacts(SERVED_DATA_FILES.municipalPopulationFacts),
   ]);
 
-  return {
+  return orderMunicipalDataForServing({
     functions,
     regions,
     municipalities,
-    functionFacts: byYearAscending(functionFacts),
-    totalFacts: byYearAscending(totalFacts),
-    countryFunctionFacts: byYearAscending(countryFunctionFacts),
-    countryTotalFacts: byYearAscending(countryTotalFacts),
-    adjaraBudgetAdjustments: byYearAscending(adjaraBudgetAdjustments),
-    populationFacts: byYearAscending(populationFacts),
-  };
+    functionFacts,
+    totalFacts,
+    countryFunctionFacts,
+    countryTotalFacts,
+    adjaraBudgetAdjustments,
+    populationFacts,
+  });
 }
 
 // The database is only served after proving it still matches the reviewed
@@ -288,7 +311,7 @@ async function loadServedExplorerDataUncached(): Promise<LoadedExplorerData> {
       db.gdpFacts,
       nationalGdpFactParityKey,
     );
-    return db;
+    return orderExplorerDataForServing(db);
   }
 
   return loadExplorerDataFromCsv();
@@ -341,7 +364,7 @@ async function loadServedMunicipalDataUncached(): Promise<MunicipalData> {
     const { loadMunicipalDataFromDb } = await import("../db/servedDataDb");
     const [db, csv] = await Promise.all([loadMunicipalDataFromDb(), loadMunicipalDataFromCsv()]);
     assertMunicipalParity(db, csv);
-    return db;
+    return orderMunicipalDataForServing(db);
   }
 
   return loadMunicipalDataFromCsv();
