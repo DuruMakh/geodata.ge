@@ -362,6 +362,13 @@ test.describe("entity picker accessibility", () => {
     // as soon as it mounts, so the URL is not bare — only the path is pinned.
     await expect(page).toHaveURL(/\/explorer\/municipalities\/batumi(#|$)/);
     await expect(page.getByTestId("entity-picker")).toBeHidden();
+
+    await page.getByTestId("municipal-mode-table").click();
+    await expect(
+      page.getByTestId("explorer-table").getByRole("table", {
+        name: /ბათუმი — ხარჯები ლარში/,
+      }),
+    ).toHaveCount(1);
   });
 
   test("puts Georgia first in the picker and keeps it searchable", async ({ page }) => {
