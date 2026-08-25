@@ -136,8 +136,9 @@ function build(startYear = 2015, endYear = 2017) {
   });
 }
 
-// The production callback itself, not a copy: municipal-explorer.tsx and the
-// two municipality routes all render shares through this function.
+// The production callback itself, not a copy: the table column, the chart
+// series, and the Excel workbook in municipal-explorer.tsx all render shares
+// through this function.
 const shareFor = municipalShareValueForYear;
 
 describe("buildMunicipalEntityModel", () => {
