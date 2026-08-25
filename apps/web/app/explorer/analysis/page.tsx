@@ -3,6 +3,7 @@ import { MainExplorer } from "../../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
 import { loadServedExplorerData } from "../../../lib/data/servedData";
 import { referencedSourceIds } from "../../../lib/data/sources";
+import { projectAdminFact, projectBudgetFact } from "../../../lib/explorer/clientData";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -37,8 +38,8 @@ export default async function AnalysisPage() {
       <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "ანალიზი", path: "/explorer/analysis" }]} />
       <MainExplorer
         nav="analysis"
-        facts={facts}
-        adminFacts={ownAdminFacts}
+        facts={facts.map(projectBudgetFact)}
+        adminFacts={ownAdminFacts.map(projectAdminFact)}
         adminCategories={adminCategories}
         glossaryEntries={Array.from(glossary.values())}
         lastUpdatedAt={lastUpdatedAt}

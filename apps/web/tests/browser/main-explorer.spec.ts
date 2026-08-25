@@ -658,10 +658,26 @@ test("Excel button shows working and retryable error states", async ({ page }) =
   const announcement = page.getByRole("status");
   await expect(button).toHaveText("ჩამოტვირთვა");
   await button.click();
-  await expect(button).toHaveText("Excel მზადდება…");
-  await expect(button).toBeDisabled();
-  await expect(button).toHaveAttribute("aria-busy", "true");
-  await expect(announcement).toHaveText("Excel მზადდება…");
+  // The forced error can settle between separate locator assertions once the
+  // workbook chunk is warm. Read the transient working state atomically so the
+  // test still proves all four signals without racing itself.
+  await expect
+    .poll(
+      () =>
+        button.evaluate((element) => ({
+          text: element.textContent,
+          disabled: (element as HTMLButtonElement).disabled,
+          busy: element.getAttribute("aria-busy"),
+          announcement: element.parentElement?.querySelector("[role='status']")?.textContent,
+        })),
+      { intervals: [1, 2, 5, 10, 20] },
+    )
+    .toEqual({
+      text: "Excel მზადდება…",
+      disabled: true,
+      busy: "true",
+      announcement: "Excel მზადდება…",
+    });
   await expect(announcement).toHaveText("ფაილი ვერ მომზადდა — სცადეთ თავიდან.");
   await expect(button).toHaveAttribute("aria-busy", "false");
 
@@ -1045,23 +1061,29 @@ test("a single-year range states that it has no period instead of reporting 0.0%
   await expect(kpis).not.toContainText("პერიოდის ცვლილება");
 });
 
-test("ships no source-document registry in the explorer payload", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
-  await expectAppReady(page);
+test("ships no server-only provenance fields in explorer payloads", async ({ page }) => {
+  for (const route of ["/explorer/expenditure", "/explorer/revenue", "/explorer/analysis"]) {
+    await page.goto(`http://localhost:3100${route}`);
+    await expectAppReady(page);
 
-  // Every route used to hand its client explorer a narrowed copy of the source
-  // registry so the model builders could stamp a SourceMetadata onto every
-  // row-year and point — fields no component ever read. Measured at 44 records
-  // and ~15 KB on this route alone. lastUpdatedAt is the only source fact the
-  // UI shows, and it is computed server-side.
-  const occurrences = await page.evaluate(() =>
-    [...document.querySelectorAll("script")].reduce(
-      (count, script) => count + ((script.textContent ?? "").split("sourceUrlOrFile").length - 1),
-      0,
-    ),
-  );
+    // lastUpdatedAt and workbook source links are computed from the complete
+    // server rows before projection. Per-row source ids and original institution
+    // labels have no browser consumer and must not be repeated through RSC.
+    const occurrences = await page.evaluate(() => {
+      const payload = [...document.querySelectorAll("script")].map((script) => script.textContent ?? "").join("\n");
+      return {
+        sourceRegistry: payload.split("sourceUrlOrFile").length - 1,
+        sourceIds: payload.split("sourceId").length - 1,
+        officialInstitutionLabels: payload.split("officialInstitutionLabelKa").length - 1,
+      };
+    });
 
-  expect(occurrences).toBe(0);
+    expect(occurrences, route).toEqual({
+      sourceRegistry: 0,
+      sourceIds: 0,
+      officialInstitutionLabels: 0,
+    });
+  }
 });
 
 test("every explorer route family renders the site footer", async ({ page }) => {

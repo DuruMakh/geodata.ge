@@ -17,6 +17,7 @@ const notoSerifGeorgian = Noto_Serif_Georgian({
   weight: ["400", "500", "600", "700"],
   variable: "--font-noto-serif-georgian",
   display: "swap",
+  preload: false,
 });
 
 const geistMono = Geist_Mono({
@@ -24,6 +25,7 @@ const geistMono = Geist_Mono({
   weight: ["400", "500", "600"],
   variable: "--font-geist-mono",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {

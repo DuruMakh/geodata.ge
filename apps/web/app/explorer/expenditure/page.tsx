@@ -7,6 +7,7 @@ import { loadGdpWorkbookSources, loadWorkbookSources } from "../../../lib/method
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 import { explorerDatasetJsonLd } from "../../../lib/seo/structuredData";
 import { resolveSiteUrl } from "../../../lib/siteUrl";
+import { projectAdminFact, projectBudgetFact, projectGdpFact } from "../../../lib/explorer/clientData";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { facts } = await loadServedLandingData();
@@ -55,11 +56,11 @@ export default async function ExpenditurePage() {
       <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "ხარჯები", path: "/explorer/expenditure" }]} />
       <MainExplorer
         nav="expenditure"
-        facts={ownFacts}
-        adminFacts={adminFacts}
+        facts={ownFacts.map(projectBudgetFact)}
+        adminFacts={adminFacts.map(projectAdminFact)}
         adminCategories={adminCategories}
         glossaryEntries={Array.from(glossary.values())}
-        gdpFacts={gdpFacts}
+        gdpFacts={gdpFacts.map(projectGdpFact)}
         workbookSources={workbookSources}
         adminWorkbookSources={adminWorkbookSources}
         gdpWorkbookSources={gdpWorkbookSources}
