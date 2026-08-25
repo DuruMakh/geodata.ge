@@ -164,10 +164,14 @@ export function getDefaultMunicipalSelection(model: MunicipalEntityModel): strin
 /**
  * A municipal row's share of the official MoF total for that year.
  *
- * One definition for every municipal surface that renders a share — the table
- * column, the chart series, the Excel workbook, and the two route summaries.
- * Returns a fraction; the chart multiplies by 100 at its own call site because
- * its axis is in percentage points.
+ * One definition for the three surfaces that render a share from a model row:
+ * the table column, the chart series, and the Excel workbook. Returns a
+ * fraction; the chart multiplies by 100 at its own call site because its axis
+ * is in percentage points.
+ *
+ * The two municipality route summaries share the same arithmetic but call
+ * shareOfTotal directly — they hold raw facts, not model rows, so there is no
+ * model for them to pass here.
  *
  * The functions do not cover the whole official total, so these shares
  * deliberately do not sum to 1 — the uncovered gap is real and stays visible.
