@@ -181,3 +181,40 @@ The isolated temporary no-web-server Playwright configuration ran with `NEXT_PUB
 
 - Focused alpha plus 375/390/767 geometry run: exit 0, 3 passed (32.5s).
 - Full `seo.spec.ts` and `landing.spec.ts` run: exit 0, 36 passed (2.9m).
+
+## Fix round 3 — syntax-aware outline alpha parsing
+
+The numeric-token parser was too broad: it returned 1 for `oklab(none none none / 0)` and could treat the `-3` in `display-p3` as a colour component, returning 0 for opaque `color(display-p3 1 0 0)`.
+
+### RED
+
+The expanded parser regression ran before the helper change and failed as intended:
+
+```text
+Expected: 0
+Received: 1
+computedCssColorAlpha("oklab(none none none / 0)")
+```
+
+### GREEN
+
+`computedCssColorAlpha` now follows only the computed-colour syntaxes needed by the focus contract:
+
+- explicit slash alpha takes precedence and supports number or percentage values;
+- legacy comma-form `rgba(...)` reads its fourth component; and
+- all opaque syntaxes without either alpha form return 1.
+
+Parsed numeric alpha is clamped to the valid 0–1 range; an unexpected non-numeric alpha falls back to opaque rather than inventing transparency. Regression coverage verifies:
+
+- `rgba(255, 0, 0, 0)` → 0;
+- `rgb(255 0 0 / 0%)` → 0;
+- `oklab(none none none / 0)` → 0; and
+- `color(display-p3 1 0 0)` → 1.
+
+No production geometry/CSS or screenshot artifact changed in this round.
+
+### Fix-round verification
+
+- Parser-only regression: exit 0, 1 passed (1.7s).
+- Isolated parser plus geometry/focus run: exit 0, 3 passed (34.5s).
+- Full isolated `seo.spec.ts` and `landing.spec.ts` run: exit 0, 36 passed (2.5m).

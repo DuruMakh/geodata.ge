@@ -63,6 +63,8 @@ async function expectKeyboardFocusOrder(page: Page, locator: Locator) {
 test("outline alpha parser rejects fully transparent colored outlines", () => {
   expect(computedCssColorAlpha("rgba(255, 0, 0, 0)")).toBe(0);
   expect(computedCssColorAlpha("rgb(255 0 0 / 0%)")).toBe(0);
+  expect(computedCssColorAlpha("oklab(none none none / 0)")).toBe(0);
+  expect(computedCssColorAlpha("color(display-p3 1 0 0)")).toBe(1);
 });
 
 async function expectNoPageOverflow(page: Page) {
