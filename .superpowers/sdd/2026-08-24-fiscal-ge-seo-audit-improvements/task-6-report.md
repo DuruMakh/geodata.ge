@@ -95,3 +95,54 @@ The aggregate run otherwise reported 94 passing suites, 799 passing tests, and 7
 - Test helper rectangle logic uses Playwright's actual `x/y/width/height` shape and passed typecheck.
 - No target overlaps, no document overflow, and no email-width fallback was required.
 - `git diff --check` is clean.
+
+## Fix round 1 — review follow-up
+
+### Stronger keyboard and route coverage
+
+The previous target tests programmatically focused the first link in each area. They now require the natural post-navigation state (`document.activeElement === document.body`) and reach **every** target, including the first, through sequential `Tab` presses. Each focused target proves all of the following:
+
+- it was not skipped in target order;
+- it matches `:focus-visible`;
+- its outline style is not `none`;
+- its outline width is greater than zero; and
+- its outline color is neither `transparent` nor fully transparent `rgba(0, 0, 0, 0)`.
+
+The breadcrumb geometry test now also covers `/explorer/municipalities/tbilisi`, the representative longest PageHeader trail, at 375×812 and 390×844. It checks all four linked crumbs as well as the existing public breadcrumb and ordinary explorer header routes for the 24px minimum, pairwise non-overlap, and document overflow.
+
+### Desktop correction and retained visual proof
+
+The initial unconditional `inline-flex min-h-6 items-center` approach was not desktop-neutral. Relative to the parent commit, it expanded the 1440px Tbilisi PageHeader link from 14px to 24px and the first footer link from 16.5px to 24px. Applying only the minimum-height rule at the mobile breakpoint still left the PageHeader link at 15.75px because unconditional `inline-flex` changed its desktop line box.
+
+The final correction scopes **all** target-layout utilities (`inline-flex`, `min-h-6`, `items-center`, and footer `self-start`) to `max-[767px]`. This preserves the 24px mobile targets while restoring native desktop link layout.
+
+Retained, independently inspectable 1440px screenshot pairs:
+
+- Before PageHeader: `.superpowers/sdd/2026-08-24-fiscal-ge-seo-audit-improvements/task-6-visual-round1/before/page-header-tbilisi-1440.png`
+- After PageHeader: `.superpowers/sdd/2026-08-24-fiscal-ge-seo-audit-improvements/task-6-visual-round1/after/page-header-tbilisi-1440.png`
+- Before footer: `.superpowers/sdd/2026-08-24-fiscal-ge-seo-audit-improvements/task-6-visual-round1/before/site-footer-1440.png`
+- After footer: `.superpowers/sdd/2026-08-24-fiscal-ge-seo-audit-improvements/task-6-visual-round1/after/site-footer-1440.png`
+
+The `before` pair was rendered from the parent commit through a temporary source restore while the worktree was clean; all Task 6 sources were then restored from `HEAD`. No stash was needed or created. The final exact raw-pixel comparison is:
+
+| Surface | Before / after dimensions | Changed pixels | Mean absolute channel difference | Final link height |
+| --- | --- | --- | --- | --- |
+| Tbilisi PageHeader | 1140×48 / 1140×48 | 0 (0%) | 0 | 14px |
+| SiteFooter | 1240×263 / 1240×263 | 0 (0%) | 0 | 16.5px |
+
+This is stronger than visual inspection alone: the final desktop images are byte-for-byte identical at decoded-pixel level.
+
+### Fix-round verification
+
+The normal Playwright configuration tried to create a second development server because port 3100 was not reusable at that moment. To keep port 3100 untouched and test only the existing isolated 3106 server, a temporary no-web-server Playwright configuration was used and removed immediately after the run.
+
+```powershell
+$env:NEXT_PUBLIC_SITE_URL = 'https://fiscal.ge'
+$env:SEO_BASE_URL = 'http://localhost:3106'
+$env:PLAYWRIGHT_BASE_URL = 'http://localhost:3106'
+npx.cmd playwright test --config=.task-6-playwright.config.ts tests/browser/seo.spec.ts tests/browser/landing.spec.ts --grep '24px mobile targets'
+```
+
+Result: exit 0, 2 passed (12.0s).
+
+The same isolated configuration then ran both browser files: exit 0, 35 passed (1.2m).

@@ -63,21 +63,37 @@ async function expectVisibleFocusOutline(locator: Locator) {
 
 async function expectKeyboardFocusOrder(page: Page, locator: Locator) {
   const links = await locator.all();
-  await links[0]!.focus();
+  expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
 
   for (let index = 0; index < links.length; index += 1) {
-    if (index > 0) await page.keyboard.press("Tab");
     const link = links[index]!;
-    await expect(link).toBeFocused();
-    const outline = await link.evaluate((element) => {
-      const style = getComputedStyle(element);
-      return {
-        focusVisible: element.matches(":focus-visible"),
-        outline: style.outline,
-      };
-    });
-    expect(outline.focusVisible).toBe(true);
-    expect(outline.outline).not.toBe("none");
+    let reachedTarget = false;
+
+    for (let tab = 0; tab < 100; tab += 1) {
+      await page.keyboard.press("Tab");
+      const focusedIndex = await locator.evaluateAll((elements) => elements.findIndex((element) => element === document.activeElement));
+      expect(focusedIndex, `target ${index} was skipped in keyboard order`).not.toBeGreaterThan(index);
+      if (focusedIndex !== index) continue;
+
+      await expect(link).toBeFocused();
+      const outline = await link.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          color: style.outlineColor,
+          style: style.outlineStyle,
+          width: Number.parseFloat(style.outlineWidth),
+        };
+      });
+      expect(await link.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
+      expect(outline.style).not.toBe("none");
+      expect(outline.width).toBeGreaterThan(0);
+      expect(outline.color).not.toBe("transparent");
+      expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
+      reachedTarget = true;
+      break;
+    }
+
+    expect(reachedTarget, `target ${index} was not reached by Tab`).toBe(true);
   }
 }
 

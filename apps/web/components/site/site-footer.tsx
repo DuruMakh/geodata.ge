@@ -14,23 +14,23 @@ export function SiteFooter({ updatedAt }: { updatedAt: string }) {
             </p>
             <a
               href="mailto:info@fiscal.ge"
-              className="inline-flex min-h-6 items-center self-start font-[family-name:var(--font-numeric)] text-[11px] text-[var(--accent)] underline underline-offset-[3px]"
+              className="max-[767px]:inline-flex max-[767px]:min-h-6 max-[767px]:items-center max-[767px]:self-start font-[family-name:var(--font-numeric)] text-[11px] text-[var(--accent)] underline underline-offset-[3px]"
             >
               info@fiscal.ge
             </a>
           </div>
           <div className="flex flex-col gap-[9px]">
             <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">ნავიგაცია</span>
-            <Link href="/explorer" className="inline-flex min-h-6 items-center self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
+            <Link href="/explorer" className="max-[767px]:inline-flex max-[767px]:min-h-6 max-[767px]:items-center max-[767px]:self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
               მრავალწლიანი ექსპლორერი
             </Link>
-            <Link href={ANALYSIS_HREF} className="inline-flex min-h-6 items-center self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
+            <Link href={ANALYSIS_HREF} className="max-[767px]:inline-flex max-[767px]:min-h-6 max-[767px]:items-center max-[767px]:self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
               ერთი წლის სურათი
             </Link>
-            <Link href="/methodology" className="inline-flex min-h-6 items-center self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
+            <Link href="/methodology" className="max-[767px]:inline-flex max-[767px]:min-h-6 max-[767px]:items-center max-[767px]:self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
               მეთოდოლოგია
             </Link>
-            <Link href="/about" className="inline-flex min-h-6 items-center self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
+            <Link href="/about" className="max-[767px]:inline-flex max-[767px]:min-h-6 max-[767px]:items-center max-[767px]:self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
               Fiscal.ge-ის შესახებ
             </Link>
           </div>
