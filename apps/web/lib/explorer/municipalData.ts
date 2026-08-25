@@ -12,6 +12,7 @@ import type { SourceDocumentRow } from "../data/sources";
 import type { ExplorerTableRow } from "./types";
 import { colorForItem, INK } from "./colors";
 import { formatAmount, formatAmountParts, formatPerResidentGel, formatShare, MISSING } from "./format";
+import { compoundAnnualGrowth } from "./indicators";
 import { georgianOrdinal } from "./municipalLabels";
 import { shareOfTotal } from "./share";
 
@@ -498,9 +499,7 @@ export function buildMunicipalIndicatorPresentation(
       start,
       end,
       change: changeBetween(start, end),
-      cagr: start !== null && end !== null && start > 0 && end > 0 && endYear !== undefined && startYear !== undefined && endYear > startYear
-        ? (end / start) ** (1 / (endYear - startYear)) - 1
-        : null,
+      cagr: compoundAnnualGrowth(start, end, startYear, endYear),
     },
     sideSeries: [model.years.map((year) => model.totalRow.valuesByYear[year] ?? null), largestShare, thirdSeries],
   };
