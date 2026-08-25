@@ -89,6 +89,14 @@ describe("compoundAnnualGrowth", () => {
     expect(compoundAnnualGrowth(100, 200, undefined, 2025)).toBeNull();
     expect(compoundAnnualGrowth(100, 200, 2020, undefined)).toBeNull();
   });
+
+  // NaN is unordered, so a `<=` guard would pass it through to the arithmetic
+  // and return NaN — the caller renders that as an empty growth clause instead
+  // of omitting the clause. Both inlined call sites returned null here.
+  it("has no rate for a NaN endpoint", () => {
+    expect(compoundAnnualGrowth(Number.NaN, 200, 2020, 2025)).toBeNull();
+    expect(compoundAnnualGrowth(100, Number.NaN, 2020, 2025)).toBeNull();
+  });
 });
 
 describe("rankPeriodDeltas", () => {
@@ -129,6 +137,10 @@ describe("rankPeriodDeltas", () => {
         valuedRow("noEnd", { 2020: 100 }),
         valuedRow("noStart", { 2025: 400 }),
         valuedRow("nullEnd", { 2020: 100, 2025: null }),
+        // An explicit null is a different shape from an absent key and a real
+        // one: buildMunicipalEntityModel writes null for a year outside the
+        // row's coverage rather than leaving the key off.
+        valuedRow("nullStart", { 2020: null, 2025: 400 }),
         valuedRow("real", { 2020: 100, 2025: 400 }),
       ],
       2020,

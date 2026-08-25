@@ -22,7 +22,11 @@ export function compoundAnnualGrowth(
   endYear: number | undefined,
 ): number | null {
   if (start === null || end === null || startYear === undefined || endYear === undefined) return null;
-  if (start <= 0 || end <= 0 || endYear <= startYear) return null;
+  // Written as negated `>` rather than `<=` so a NaN endpoint returns null, the
+  // way both inlined call sites did. NaN is unordered, so `NaN <= 0` is false
+  // while `!(NaN > 0)` is true — `<=` would let a NaN through to the arithmetic
+  // and render an empty growth clause instead of omitting the clause entirely.
+  if (!(start > 0) || !(end > 0) || !(endYear > startYear)) return null;
   return (end / start) ** (1 / (endYear - startYear)) - 1;
 }
 
