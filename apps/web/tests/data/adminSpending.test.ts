@@ -13,6 +13,7 @@ import { LEGACY_PROGRAM_JOINS } from "../../lib/data/adminSpending/legacyProgram
 import { loadAdminSpendingFacts } from "../../lib/data/adminSpending/importAdminSpendingFacts";
 import { ADMIN_SPENDING_YEARS } from "../../lib/data/coverage";
 import { readCsvRecords } from "../../lib/data/csv";
+import type { AdminSpendingFact } from "../../lib/data/adminSpending/types";
 import type { OfficialExpenditureRow } from "../../lib/data/realExpenditure/types";
 import { loadSourceDocuments } from "../../lib/data/sources";
 
@@ -73,16 +74,32 @@ function programRow(
   });
 }
 
+// Extraction re-reads ten XLSX fact workbooks (~4.1 MB) and re-runs the dedicated extractors
+// for the other twelve years, which costs seconds per call; generation over the full row set is
+// not free either. Both are pure over the on-disk sources, so the whole file shares one pass of
+// each. Callers must treat the returned arrays as read-only.
+let cachedOfficialRows: OfficialExpenditureRow[] | null = null;
+function officialRows(): OfficialExpenditureRow[] {
+  cachedOfficialRows ??= extractAdminSpendingOfficialRows();
+  return cachedOfficialRows;
+}
+
+let cachedFacts: AdminSpendingFact[] | null = null;
+function allFacts(): AdminSpendingFact[] {
+  cachedFacts ??= generateAdminSpendingFacts(officialRows());
+  return cachedFacts;
+}
+
 describe("admin spending facts", () => {
   it("extracts admin spending rows from the 2004-2025 Excel fact folder", () => {
-    const rows = extractAdminSpendingOfficialRows();
+    const rows = officialRows();
     const years = Array.from(new Set(rows.map((row) => row.year))).sort((a, b) => a - b);
 
     expect(years).toEqual(ADMIN_SPENDING_YEARS);
   }, 30_000);
 
   it("resolves every extracted admin-spending source ID to a registered source document", async () => {
-    const rows = extractAdminSpendingOfficialRows();
+    const rows = officialRows();
     const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
     const registeredSourceIds = new Set(sources.map((source) => source.sourceId));
     const unresolvedSourceIds = Array.from(
@@ -93,8 +110,8 @@ describe("admin spending facts", () => {
   }, 30_000);
 
   it("adds 2004 as an institution-total year without creating major programs", () => {
-    const rows = extractAdminSpendingOfficialRows();
-    const facts = generateAdminSpendingFacts(rows);
+    const rows = officialRows();
+    const facts = allFacts();
     const report = buildAdminSpendingReport(rows, facts);
     const facts2004 = facts.filter((fact) => fact.year === 2004);
 
@@ -107,8 +124,8 @@ describe("admin spending facts", () => {
   }, 30_000);
 
   it("keeps the delivered 2004 admin reconciliation report equal to fresh generation", async () => {
-    const rows = extractAdminSpendingOfficialRows();
-    const facts = generateAdminSpendingFacts(rows);
+    const rows = officialRows();
+    const facts = allFacts();
     const freshReport = buildAdminSpendingReport(rows, facts);
     const deliveredReport = JSON.parse(
       await readFile("../../data/reports/admin-spending-2004-2025-report.json", "utf8"),
@@ -269,9 +286,7 @@ describe("admin spending facts", () => {
   });
 
   it("generates the corrected identities for real reused program codes", () => {
-    const programFacts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
-      (fact) => fact.level === "major_program",
-    );
+    const programFacts = allFacts().filter((fact) => fact.level === "major_program");
     const educationFacts = programFacts.filter(
       (fact) =>
         fact.officialCode === "32 02" &&
@@ -325,9 +340,7 @@ describe("admin spending facts", () => {
   }, 30_000);
 
   it("shows only programs that survive into the 2017-2025 series (drops abolished programs)", () => {
-    const programFacts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
-      (fact) => fact.level === "major_program",
-    );
+    const programFacts = allFacts().filter((fact) => fact.level === "major_program");
     const yearsForCode = (officialCode: string) =>
       programFacts
         .filter((fact) => fact.officialCode === officialCode)
@@ -370,9 +383,7 @@ describe("admin spending facts", () => {
     // backfill row (e.g. an abolished 2012 program) cannot push a below-threshold 2017-2025
     // program that happens to share its code into the major-program set. Every surfaced identity
     // must reach the 100M threshold within its own 2017-2025 rows.
-    const programFacts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
-      (fact) => fact.level === "major_program",
-    );
+    const programFacts = allFacts().filter((fact) => fact.level === "major_program");
     const modernMaxByItem = new Map<string, number>();
     for (const fact of programFacts) {
       if (fact.year >= 2017) modernMaxByItem.set(fact.itemId, Math.max(modernMaxByItem.get(fact.itemId) ?? 0, fact.amountGel));
@@ -388,9 +399,7 @@ describe("admin spending facts", () => {
   }, 30_000);
 
   it("de-merges Sport and Culture out of the 2018-2024 combined ministries (no series holes)", () => {
-    const facts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
-      (fact) => fact.level === "admin_category",
-    );
+    const facts = allFacts().filter((fact) => fact.level === "admin_category");
     const cat = (year: number, id: string) =>
       facts.find((f) => f.year === year && f.itemId === `admin_spending.${id}`)?.amountGel ?? 0;
 
@@ -436,9 +445,7 @@ describe("admin spending facts", () => {
   });
 
   it("splits recycled program codes so no pre-2017 legacy program leaks into a modern drill-down series", () => {
-    const programFacts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
-      (fact) => fact.level === "major_program",
-    );
+    const programFacts = allFacts().filter((fact) => fact.level === "major_program");
     const yearsFor = (code: string) =>
       programFacts.filter((f) => f.officialCode === code).map((f) => f.year).sort((a, b) => a - b);
 
@@ -505,9 +512,7 @@ describe("admin spending facts", () => {
       "09 01", "24 01", "25 02", "25 04", "26 01", "26 02", "27 02", "27 03", "27 06", "28 01",
       "29 01", "29 02", "30 01", "32 02", "32 04", "57 14",
     ]);
-    const programFacts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
-      (fact) => fact.level === "major_program",
-    );
+    const programFacts = allFacts().filter((fact) => fact.level === "major_program");
     const byItem = new Map<string, { code: string; pre: Set<string>; modern: Set<string> }>();
     for (const fact of programFacts) {
       // Key the allowlist on the identity's MODERN code (embedded in the itemId): pre-2012
@@ -530,7 +535,7 @@ describe("admin spending facts", () => {
   }, 30_000);
 
   it("joins owner-approved pre-2012 organizational lines into modern program series (drill-down only)", () => {
-    const facts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows());
+    const facts = allFacts();
     const programFacts = facts.filter((fact) => fact.level === "major_program");
     const factAt = (year: number, officialCode: string) =>
       programFacts.find((fact) => fact.year === year && fact.officialCode === officialCode);
@@ -609,9 +614,7 @@ describe("admin spending facts", () => {
 
   it("routes the pre-2014 Corrections/Penitentiary ministry to justice (not other_costs)", () => {
     const categoryByYear = (year: number) => {
-      const facts = generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
-        (fact) => fact.level === "admin_category" && fact.year === year,
-      );
+      const facts = allFacts().filter((fact) => fact.level === "admin_category" && fact.year === year);
       return Object.fromEntries(facts.map((fact) => [fact.itemId, fact.amountGel]));
     };
     // The 2009-2013 ministry label uses "სასჯელაღსრულების" (no trailing "ა"); justice must still
