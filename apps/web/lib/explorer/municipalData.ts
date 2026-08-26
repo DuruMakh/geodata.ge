@@ -12,7 +12,9 @@ import type { SourceDocumentRow } from "../data/sources";
 import type { ExplorerTableRow } from "./types";
 import { colorForItem, INK } from "./colors";
 import { formatAmount, formatAmountParts, formatPerResidentGel, formatShare, MISSING } from "./format";
+import { compoundAnnualGrowth } from "./indicators";
 import { georgianOrdinal } from "./municipalLabels";
+import { shareOfTotal } from "./share";
 
 // Model layer for the municipalities section.
 //
@@ -158,6 +160,29 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
 /** The official total is the only pristine municipal selection. */
 export function getDefaultMunicipalSelection(model: MunicipalEntityModel): string[] {
   return model.years.length === 0 ? [] : [model.totalRow.itemId];
+}
+
+/**
+ * A municipal row's share of the official MoF total for that year.
+ *
+ * One definition for the three surfaces that render a share from a model row:
+ * the table column, the chart series, and the Excel workbook. Returns a
+ * fraction; the chart multiplies by 100 at its own call site because its axis
+ * is in percentage points.
+ *
+ * The two municipality route summaries share the same arithmetic but call
+ * shareOfTotal directly — they hold raw facts, not model rows, so there is no
+ * model for them to pass here.
+ *
+ * The functions do not cover the whole official total, so these shares
+ * deliberately do not sum to 1 — the uncovered gap is real and stays visible.
+ */
+export function municipalShareValueForYear(
+  model: MunicipalEntityModel,
+  row: ExplorerTableRow,
+  year: number,
+): number | null {
+  return shareOfTotal(row.valuesByYear[year], model.totalRow.valuesByYear[year]);
 }
 
 export type MunicipalListRow = {
@@ -474,9 +499,7 @@ export function buildMunicipalIndicatorPresentation(
       start,
       end,
       change: changeBetween(start, end),
-      cagr: start !== null && end !== null && start > 0 && end > 0 && endYear !== undefined && startYear !== undefined && endYear > startYear
-        ? (end / start) ** (1 / (endYear - startYear)) - 1
-        : null,
+      cagr: compoundAnnualGrowth(start, end, startYear, endYear),
     },
     sideSeries: [model.years.map((year) => model.totalRow.valuesByYear[year] ?? null), largestShare, thirdSeries],
   };

@@ -1,6 +1,7 @@
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { ACCENT, NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
+import { compoundAnnualGrowth, rankPeriodDeltas } from "../../lib/explorer/indicators";
 import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
 import { Sparkline } from "../ui/sparkline";
 import { formatAmount, formatAmountParts, formatBn, formatShare, MISSING } from "../../lib/explorer/format";
@@ -82,8 +83,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
   const gaugeMax = Math.max(totalStart, totalEnd);
   const gaugeBase = gaugeMax > 0 ? Math.min(totalStart, totalEnd) / gaugeMax : 0;
   const grew = totalEnd >= totalStart;
-  const cagr =
-    totalStart > 0 && totalEnd > 0 && endYear > startYear ? (totalEnd / totalStart) ** (1 / (endYear - startYear)) - 1 : null;
+  const cagr = compoundAnnualGrowth(totalStart, totalEnd, startYear, endYear);
   // The sentence already states the direction (გაიზარდა/შემცირდა), so the amount is unsigned.
   const deltaParts = formatAmountParts(Math.abs(totalEnd - totalStart));
   const sideNoun = scope === "revenue" ? "ჯამური შემოსავლები" : "ჯამური ხარჯები";
@@ -92,16 +92,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
   // Side KPIs, movers, and the period comparison all rank every top-level scope
   // row. The chart and chart-mode table remain scoped to the user's selection.
   const scopeRows = comparisonRows.filter((row) => row.level !== "major_program");
-  // Rows missing either endpoint have no meaningful period delta, and a delta
-  // measured against a non-positive start is mostly the unwind of a correction
-  // (e.g. revenue.other_taxes 2020→2021) — exclude both.
-  const withDelta = scopeRows.flatMap((row) => {
-    const startValue = row.valuesByYear[startYear];
-    const endValue = row.valuesByYear[endYear];
-    if (startValue === undefined || startValue === null || startValue <= 0 || endValue === undefined || endValue === null) return [];
-    return [{ row, delta: endValue - startValue }];
-  });
-  const biggestIncrease = [...withDelta].sort((a, b) => b.delta - a.delta)[0] ?? null;
+  const biggestIncrease = rankPeriodDeltas(scopeRows, startYear, endYear)[0] ?? null;
   const biggestParts = biggestIncrease ? formatAmountParts(biggestIncrease.delta, true) : { num: MISSING, unit: "" };
   const slowest = scopeRows.filter((row) => row.change !== null).sort((a, b) => (a.change ?? 0) - (b.change ?? 0))[0] ?? null;
   const largestShare = [...scopeRows].sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0))[0] ?? null;

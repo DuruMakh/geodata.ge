@@ -19,6 +19,7 @@ import {
 import { georgianOrdinal, REGION_GENITIVE_KA } from "../../../../../lib/explorer/municipalLabels";
 import { municipalityHrefForCode } from "../../../../../lib/explorer/municipalityRoutes";
 import { formatAmount, formatShare } from "../../../../../lib/explorer/format";
+import { shareOfTotal } from "../../../../../lib/explorer/share";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../../lib/methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../../../../../lib/seo/metadata";
 import {
@@ -167,7 +168,7 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   const summary =
     regionId === ADJARA_REGION_ID
       ? `აჭარის გაერთიანებული ბიუჯეტი ${latestYear} წელს ${formatAmount(latestTotal.publicTotalGel)} იყო — ${regions.length} რეგიონს შორის ${georgianOrdinal(rank)} ადგილი. ჯამი აერთიანებს ${members.memberCodes.length} მუნიციპალიტეტსა და აჭარის ა.რ. რესპუბლიკურ ბიუჯეტს, შიდა ტრანსფერების გამოკლებით.`
-      : `${regionName} მუნიციპალიტეტების ჯამური ბიუჯეტი ${latestYear} წელს ${formatAmount(latestTotal.publicTotalGel)} იყო — ${regions.length} რეგიონს შორის ${georgianOrdinal(rank)} ადგილი. ყველაზე დიდი ფუნქციური მიმართულებაა ${largestFunction.kaLabel}, რომელიც ბიუჯეტის ${formatShare(largestFunctionFact.amountGel / latestTotal.publicTotalGel)}-ს შეადგენს.`;
+      : `${regionName} მუნიციპალიტეტების ჯამური ბიუჯეტი ${latestYear} წელს ${formatAmount(latestTotal.publicTotalGel)} იყო — ${regions.length} რეგიონს შორის ${georgianOrdinal(rank)} ადგილი. ყველაზე დიდი ფუნქციური მიმართულებაა ${largestFunction.kaLabel}, რომელიც ბიუჯეტის ${formatShare(shareOfTotal(largestFunctionFact.amountGel, latestTotal.publicTotalGel))}-ს შეადგენს.`;
 
   const memberRows = list.municipalities
     .filter((row) => row.regionId === regionId)

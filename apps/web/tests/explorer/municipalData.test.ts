@@ -33,12 +33,10 @@ import {
   MUNICIPAL_AGGREGATE_ONLY_COUNT,
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
   MUNICIPAL_PUBLIC_PAGE_COUNT,
+  municipalShareValueForYear,
   regionFactsFor,
 } from "../../lib/explorer/municipalData";
-import type { MunicipalEntityModel } from "../../lib/explorer/municipalData";
 import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
-import { shareOfTotal } from "../../lib/explorer/share";
-import type { ExplorerTableRow } from "../../lib/explorer/types";
 
 const FUNCTIONS: MunicipalFunction[] = [
   { id: "municipal.economic_affairs", kaLabel: "ეკონომიკური საქმიანობა", functionalCode: "7.4", sortOrder: 4 },
@@ -138,9 +136,10 @@ function build(startYear = 2015, endYear = 2017) {
   });
 }
 
-// Mirrors the shareValueForYear callback municipal-explorer.tsx supplies.
-const shareFor = (model: MunicipalEntityModel, row: ExplorerTableRow, year: number) =>
-  shareOfTotal(row.valuesByYear[year], model.totalRow.valuesByYear[year]);
+// The production callback itself, not a copy: the table column, the chart
+// series, and the Excel workbook in municipal-explorer.tsx all render shares
+// through this function.
+const shareFor = municipalShareValueForYear;
 
 describe("buildMunicipalEntityModel", () => {
   it("emits one row per function, in taxonomy sort order", () => {
@@ -1323,5 +1322,27 @@ describe("municipal budget counts", () => {
     // territorially attributable spending inside those municipalities, so they
     // have no public page and appear only inside the Georgia total.
     expect(MUNICIPAL_AGGREGATE_ONLY_COUNT).toBe(5);
+  });
+});
+
+describe("municipalShareValueForYear", () => {
+  it("divides the row's value by the official total for that year", () => {
+    const model = build(2016, 2016);
+    const economic = model.rows.find((row) => row.itemId === "municipal.economic_affairs")!;
+
+    expect(municipalShareValueForYear(model, economic, 2016)).toBeCloseTo(200 / 300, 12);
+  });
+
+  it("has no share for a year the row does not cover", () => {
+    const model = build(2015, 2017);
+    const economic = model.rows.find((row) => row.itemId === "municipal.economic_affairs")!;
+
+    expect(municipalShareValueForYear(model, economic, 1999)).toBeNull();
+  });
+
+  it("gives the total row a share of exactly 1", () => {
+    const model = build(2016, 2016);
+
+    expect(municipalShareValueForYear(model, model.totalRow, 2016)).toBe(1);
   });
 });
