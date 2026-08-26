@@ -1,16 +1,16 @@
 # Remaining Fiscal.ge SEO audit verification
 
 Plan date: 2026-08-24
-Final local verification date: 2026-08-26
+Final local verification date: 2026-08-27
 Branch: `codex/fiscal-seo-audit-improvements`
 Synchronized `origin/main`: `bd0fed730870e8379c9c772f5e0a2e9b5bccea5d`
 Merge commit: `9ccd532a8c31b2a7f0e090279d3210bde078e744`
-Implementation and test boundary: `c14ab8a997e4ce28062f09eefdd2e926bca5536e`
+Implementation and test boundary: `b2e1678fe87f7762d650ae6353c403b6e96f67d8`
 Site URL used for every final build and test process: `https://fiscal.ge`
 
 ## Outcome and evidence boundary
 
-The remaining local SEO audit and the final whole-branch review are verified at the implementation boundary above. The feature branch contains current `origin/main`, the repository check, production build, complete production-browser suite, focused SEO/browser checks, output measurement, cold font comparison and Git checks all passed. The production build generated 93/93 static pages.
+The remaining local SEO audit, the final whole-branch review and its state-aware source-archive caption fix are verified at the implementation boundary above. The feature branch contains current `origin/main`; the repository check, production build, complete production-browser suite, focused SEO/browser checks, output measurement, cold font comparison and Git checks all passed. The production build generated 93/93 static pages.
 
 This is local evidence only. Live production, Vercel deployment state, DNS, Search Console, push, pull request, merge to `main` and deployment were not verified or performed.
 
