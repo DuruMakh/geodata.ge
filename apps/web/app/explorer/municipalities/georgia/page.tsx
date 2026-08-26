@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MunicipalExplorer } from "../../../../components/municipalities/municipal-explorer";
 import { BreadcrumbJsonLd } from "../../../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../../../components/seo/json-ld";
 import { PageHeader } from "../../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../../lib/data/servedData";
 import { MUNICIPAL_COUNTRY_ID } from "../../../../lib/data/municipal/types";
@@ -12,16 +13,37 @@ import {
 } from "../../../../lib/explorer/municipalData";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../../../../lib/methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../../../../lib/seo/metadata";
+import { georgiaDescriptionKa } from "../../../../lib/seo/municipalMetadata";
+import { explorerDatasetJsonLd } from "../../../../lib/seo/structuredData";
 import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
 const ROUTE = "/explorer/municipalities/georgia";
 
+function buildGeorgiaPageFacts(
+  servedMunicipalData: Awaited<ReturnType<typeof loadServedMunicipalData>>,
+) {
+  const { firstYear, lastYear: latestYear } = coverageFromYears(
+    servedMunicipalData.countryTotalFacts,
+  );
+  return {
+    firstYear,
+    latestYear,
+    latestTotal: servedMunicipalData.countryTotalFacts.find((row) => row.year === latestYear)!,
+  };
+}
+
 export async function generateMetadata(): Promise<Metadata> {
-  const { countryTotalFacts } = await loadServedMunicipalData();
-  const { firstYear, lastYear } = coverageFromYears(countryTotalFacts);
+  const { firstYear, latestYear, latestTotal } = buildGeorgiaPageFacts(
+    await loadServedMunicipalData(),
+  );
   return fiscalMetadata({
-    title: `საქართველოს მუნიციპალური ბიუჯეტების ჯამი ${firstYear}–${lastYear} | Fiscal.ge`,
-    description: `საქართველოს ${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური საბიუჯეტო ერთეულის და აჭარის ა.რ. გაერთიანებული გადასახდელები, შიდა ტრანსფერების გამოკლებით, ${firstYear}–${lastYear}.`,
+    title: `საქართველოს მუნიციპალური ბიუჯეტების ჯამი ${firstYear}–${latestYear} | Fiscal.ge`,
+    description: georgiaDescriptionKa({
+      firstYear,
+      latestYear,
+      latestTotalGel: latestTotal.publicTotalGel,
+      budgetUnitCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
+    }),
     path: ROUTE,
   });
 }
@@ -37,6 +59,7 @@ export default async function GeorgiaMunicipalitiesPage() {
   const { municipalities, regions, functions, totalFacts, countryFunctionFacts, countryTotalFacts, adjaraBudgetAdjustments } =
     servedMunicipalData;
   const { sourceDocuments } = landingData;
+  const { firstYear, latestYear, latestTotal } = buildGeorgiaPageFacts(servedMunicipalData);
   const entityWorkbookSources = scopeMunicipalWorkbookSources(
     workbookSources,
     {
@@ -46,16 +69,32 @@ export default async function GeorgiaMunicipalitiesPage() {
     },
   );
 
-  const years = Array.from(new Set(countryTotalFacts.map((row) => row.year))).sort((a, b) => a - b);
-  const firstYear = years[0]!;
-  const latestYear = years.at(-1)!;
   const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
   const pickerGroups = buildPickerGroups({ municipalities, regionLabels, totalFacts, adjaraBudgetAdjustments, year: latestYear });
   const nationalTotalByYear = buildCountryTotalByYear(countryTotalFacts);
   const lastUpdatedAt = latestReviewedAtForMunicipalFacts(sourceDocuments, countryFunctionFacts, countryTotalFacts);
+  const description = georgiaDescriptionKa({
+    firstYear,
+    latestYear,
+    latestTotalGel: latestTotal.publicTotalGel,
+    budgetUnitCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
+  });
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+      <JsonLd
+        data={explorerDatasetJsonLd({
+          origin: resolveSiteUrl(),
+          path: ROUTE,
+          name: "საქართველოს მუნიციპალური ბიუჯეტების ჯამი",
+          description,
+          firstYear,
+          lastYear: latestYear,
+          dateModified: lastUpdatedAt,
+          spatialCoverageName: "საქართველო",
+        })}
+        testId="explorer-dataset-json-ld"
+      />
       <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }, { name: "საქართველო", path: ROUTE }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader

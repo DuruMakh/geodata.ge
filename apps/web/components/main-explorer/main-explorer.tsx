@@ -4,10 +4,10 @@ import { useEffect, useMemo } from "react";
 import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type {
-  ServedAdminFact,
-  ServedBudgetFact,
-  ServedNationalGdpFact,
-} from "../../lib/servedRows";
+  ClientAdminFact,
+  ClientBudgetFact,
+  ClientNationalGdpFact,
+} from "../../lib/explorer/clientData";
 import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
 import { buildExplorerModel, isDerivedTotalItemId, type ExplorerModel } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
@@ -29,15 +29,15 @@ import { useExplorerState } from "./use-explorer-state";
 
 type MainExplorerProps = {
   nav: ExplorerNav;
-  facts: ServedBudgetFact[];
+  facts: ClientBudgetFact[];
   // Optional because the ministries scope is unreachable on the revenue route:
   // scopeFor() returns "revenue" before it consults grouping (urlState.ts), so
   // not even a #g=ministries deep link can switch. Omitting them there keeps the
   // whole admin corpus out of that route's RSC payload.
-  adminFacts?: ServedAdminFact[];
+  adminFacts?: ClientAdminFact[];
   adminCategories?: AdminSpendingCategory[];
   glossaryEntries: GlossaryEntry[];
-  gdpFacts?: ServedNationalGdpFact[];
+  gdpFacts?: ClientNationalGdpFact[];
   workbookSources?: WorkbookPublicSource[];
   adminWorkbookSources?: WorkbookPublicSource[];
   gdpWorkbookSources?: WorkbookPublicSource[];

@@ -86,8 +86,8 @@ export function LandingDatasetSection({
         <div className="min-w-0 overflow-hidden">
           <table
             className="mt-3 w-full table-fixed text-[11px] max-[380px]:text-[10px]"
-            aria-label={`${heading} — ${summary.latestYear}`}
           >
+            <caption className="sr-only">{`${heading} — ${summary.latestYear} წლის მონაცემები`}</caption>
             <colgroup>
               <col className="w-[52%]" />
               <col className="w-[30%]" />

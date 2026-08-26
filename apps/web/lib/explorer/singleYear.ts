@@ -1,7 +1,7 @@
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import type { GlossaryEntry } from "../data/glossary";
-import type { ServedAdminFact, ServedBudgetFact } from "../servedRows";
+import type { ClientAdminFact, ClientBudgetFact } from "./clientData";
 import { colorForItem, OTHER_COLOR } from "./colors";
 import { formatAmountParts, formatShare, MISSING } from "./format";
 import type {
@@ -14,8 +14,8 @@ import type {
 } from "./types";
 
 export type SingleYearSnapshotInput = {
-  facts: ServedBudgetFact[];
-  adminFacts?: ServedAdminFact[];
+  facts: ClientBudgetFact[];
+  adminFacts?: ClientAdminFact[];
   adminCategories?: Map<string, AdminSpendingCategory>;
   grouping?: ExpenditureGrouping;
   glossary: Map<string, GlossaryEntry>;
@@ -28,7 +28,6 @@ type SnapshotFact = {
   itemId: string;
   amountGel: number;
   basis: "actual" | "planned";
-  sourceId: string;
 };
 
 function labelsFor(id: string, glossary: Map<string, GlossaryEntry>) {
@@ -194,10 +193,10 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
   const active: SnapshotFact[] = isMinistryGrouping
     ? (input.adminFacts ?? [])
         .filter((fact) => fact.level === "admin_category")
-        .map((fact) => ({ year: fact.year, itemId: fact.itemId, amountGel: fact.amountGel, basis: fact.basis, sourceId: fact.sourceId }))
+        .map((fact) => ({ year: fact.year, itemId: fact.itemId, amountGel: fact.amountGel, basis: fact.basis }))
     : chooseActivePublicFacts(input.facts)
         .filter((fact) => fact.side === input.side)
-        .map((fact) => ({ year: fact.year, itemId: fact.itemId, amountGel: fact.amountGel, basis: fact.basis, sourceId: fact.sourceId }));
+        .map((fact) => ({ year: fact.year, itemId: fact.itemId, amountGel: fact.amountGel, basis: fact.basis }));
 
   const labelFor = (itemId: string) => {
     if (!isMinistryGrouping) return labelsFor(itemId, input.glossary);

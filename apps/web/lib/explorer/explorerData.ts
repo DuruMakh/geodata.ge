@@ -1,9 +1,9 @@
 ﻿import type { GlossaryEntry } from "../data/glossary";
 import type {
-  ServedAdminFact,
-  ServedBudgetFact,
-  ServedNationalGdpFact,
-} from "../servedRows";
+  ClientAdminFact,
+  ClientBudgetFact,
+  ClientNationalGdpFact,
+} from "./clientData";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { colorForItem, colorForProgram, OTHER_COLOR } from "./colors";
@@ -29,18 +29,17 @@ type ModelFact = {
   level: ExplorerItemLevel;
   amountGel: number;
   basis: "actual" | "planned";
-  sourceId: string;
   kaLabel: string | null;
   enLabel: string | null;
 };
 
 export type ExplorerModelInput = {
-  facts: ServedBudgetFact[];
-  adminFacts?: ServedAdminFact[];
+  facts: ClientBudgetFact[];
+  adminFacts?: ClientAdminFact[];
   adminCategories?: Map<string, AdminSpendingCategory>;
   expenditureGrouping?: ExpenditureGrouping;
   glossary: Map<string, GlossaryEntry>;
-  gdpFacts?: ServedNationalGdpFact[];
+  gdpFacts?: ClientNationalGdpFact[];
   side: ExplorerSide;
   selectedItemIds: string[];
   startYear: number;
@@ -106,7 +105,7 @@ function valueForMeasure(
   amountGel: number,
   year: number,
   measure: MeasureMode,
-  gdpFactsByYear: Map<number, ServedNationalGdpFact>,
+  gdpFactsByYear: Map<number, ClientNationalGdpFact>,
 ) {
   if (measure === "share_of_gdp") {
     const denominator = gdpFactsByYear.get(year)?.gdpCurrentPricesGel;
@@ -152,9 +151,9 @@ function buildGrowthBoards(rows: ExplorerTableRow[], years: number[]): {
 // selection.
 export function getDefaultSelection(
   side: ExplorerSide,
-  facts: ServedBudgetFact[],
+  facts: ClientBudgetFact[],
   expenditureGrouping: ExpenditureGrouping = "fields",
-  adminFacts: ServedAdminFact[] = [],
+  adminFacts: ClientAdminFact[] = [],
 ): string[] {
   const totalId =
     side === "revenue"
@@ -187,7 +186,7 @@ function compareBaselineAmountDesc(leftId: string, rightId: string, baselineAmou
   return leftId.localeCompare(rightId);
 }
 
-function publicFactForModel(fact: ServedBudgetFact): ModelFact {
+function publicFactForModel(fact: ClientBudgetFact): ModelFact {
   return {
     year: fact.year,
     side: fact.side,
@@ -196,13 +195,12 @@ function publicFactForModel(fact: ServedBudgetFact): ModelFact {
     level: "public_field",
     amountGel: fact.amountGel,
     basis: fact.basis,
-    sourceId: fact.sourceId,
     kaLabel: null,
     enLabel: null,
   };
 }
 
-function adminFactForModel(fact: ServedAdminFact): ModelFact {
+function adminFactForModel(fact: ClientAdminFact): ModelFact {
   const label = fact.officialLabelKa ?? fact.itemId;
 
   return {
@@ -213,7 +211,6 @@ function adminFactForModel(fact: ServedAdminFact): ModelFact {
     level: fact.level,
     amountGel: fact.amountGel,
     basis: fact.basis,
-    sourceId: fact.sourceId,
     // Drill-down programs are shown by NAME only — the official tavi-VI code (which fragments
     // across reorganizations, e.g. sport development moving 39 02→33 05→32 12→…) is intentionally
     // not surfaced in the explorer. officialCode stays in the facts CSV for provenance.

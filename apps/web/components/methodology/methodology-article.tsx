@@ -129,7 +129,7 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
                 />
               ) : null}
               {section.kind === "archive" ? (
-                <SourceArchive datasetId={content.archiveManifestId} rows={rows} summary={archiveSummary} />
+                <SourceArchive datasetId={content.archiveManifestId} datasetLabel={content.titleKa} rows={rows} summary={archiveSummary} />
               ) : null}
             </section>
           ))}

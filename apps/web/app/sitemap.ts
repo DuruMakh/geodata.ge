@@ -1,12 +1,13 @@
 import type { MetadataRoute } from "next";
 import { loadServedLandingData, loadServedMunicipalData } from "../lib/data/servedData";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../lib/methodology/catalog";
+import { MUNICIPALITY_ROUTES } from "../lib/explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../lib/siteUrl";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
   const { sourceDocuments } = await loadServedLandingData();
-  const { municipalities, regions } = await loadServedMunicipalData();
+  const { regions } = await loadServedMunicipalData();
   const lastReviewedAt = sourceDocuments
     .map((source) => source.lastReviewedAt)
     .sort()
@@ -35,12 +36,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}/methodology/${id}`,
       lastModified: new Date(METHODOLOGY_CONTENT[id].reviewedAt),
     })),
-    // The 64 municipality pages and 11 region roll-ups: the same complete,
-    // closed sets app/explorer/municipalities/[code]/page.tsx and
-    // .../region/[id]/page.tsx build generateStaticParams from, never a
-    // hardcoded list.
-    ...municipalities.map((municipality) => ({
-      url: `${siteUrl}/explorer/municipalities/${municipality.code}`,
+    // The 64 municipality pages and 11 region roll-ups are complete, closed
+    // sets. Municipality public identities are stable slugs; numeric codes
+    // remain source-data identities only.
+    ...MUNICIPALITY_ROUTES.map(({ slug }) => ({
+      url: `${siteUrl}/explorer/municipalities/${slug}`,
       lastModified,
     })),
     ...regions.map((region) => ({

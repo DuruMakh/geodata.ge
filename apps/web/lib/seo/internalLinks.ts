@@ -1,3 +1,5 @@
+import { municipalityHrefForCode } from "../explorer/municipalityRoutes";
+
 export type MunicipalEntityKind = "country" | "region" | "municipality";
 
 export function municipalEntityHref(kind: MunicipalEntityKind, id: string): string {
@@ -6,5 +8,5 @@ export function municipalEntityHref(kind: MunicipalEntityKind, id: string): stri
     if (!id.startsWith("region.")) throw new Error(`Region id must start with region.: ${id}`);
     return `/explorer/municipalities/region/${id.slice("region.".length)}`;
   }
-  return `/explorer/municipalities/${id}`;
+  return municipalityHrefForCode(id);
 }

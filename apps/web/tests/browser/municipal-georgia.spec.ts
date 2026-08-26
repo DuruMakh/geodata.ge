@@ -26,7 +26,7 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
   await expectMunicipalAppReady(page);
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები▾",
+    "როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები",
   );
   await expect(page.getByTestId("explorer-shell")).toContainText(
     "69 მუნიციპალური საბიუჯეტო ერთეული + აჭარის ა.რ. · 2015–2025",

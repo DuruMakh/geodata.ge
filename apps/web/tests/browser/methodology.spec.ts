@@ -59,7 +59,7 @@ for (const path of [
   "/explorer/revenue",
   "/explorer/analysis",
   "/explorer/municipalities",
-  "/explorer/municipalities/04",
+  "/explorer/municipalities/tbilisi",
   "/explorer/municipalities/region/imereti",
 ] as const) {
   test(`${path} keeps the methodology link in the footer rather than inline`, async ({ page }) => {
@@ -207,7 +207,7 @@ test("regular content pages do not repeat the methodology promotion", async ({ p
     "/explorer/revenue",
     "/explorer/analysis",
     "/explorer/municipalities",
-    "/explorer/municipalities/04",
+    "/explorer/municipalities/tbilisi",
     "/explorer/municipalities/region/adjara",
     "/explorer/municipalities/georgia",
     "/about",
@@ -218,11 +218,19 @@ test("regular content pages do not repeat the methodology promotion", async ({ p
   }
 });
 
-test("source archives keep provenance metadata out of every public table", async ({ page }) => {
-  for (const dataset of ["expenditure", "revenue", "municipalities"] as const) {
+test("source archives describe the full coverage and selected year without exposing provenance metadata", async ({ page }) => {
+  for (const [dataset, datasetTitle, coverage] of [
+    ["expenditure", "ხარჯების მეთოდოლოგია", "2004–2025"],
+    ["revenue", "შემოსავლების მეთოდოლოგია", "2004–2025"],
+    ["municipalities", "მუნიციპალიტეტების მეთოდოლოგია", "2015–2025"],
+  ] as const) {
     await page.goto(`http://localhost:3100/methodology/${dataset}#source-archive`);
     const archive = page.getByTestId("source-archive");
+    const caption = archive.locator("table caption");
 
+    await expect(caption).toHaveText(`${datasetTitle} — პირველწყაროების არქივი, ${coverage} წლები`);
+    await archive.getByRole("button", { name: "2025", exact: true }).click();
+    await expect(caption).toHaveText(`${datasetTitle} — პირველწყაროების არქივი, 2025 წელი`);
     await expect(archive.locator("thead")).not.toContainText("თარიღი");
     await expect(archive.locator("thead")).not.toContainText("SHA-256");
     await expect(archive).not.toContainText("უახლესი ჩანაწერის თარიღი");

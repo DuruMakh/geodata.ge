@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MunicipalitiesIndex } from "../../../components/municipalities/municipalities-index";
 import { BreadcrumbJsonLd } from "../../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../../components/seo/json-ld";
 import { PageHeader } from "../../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
 import {
@@ -14,6 +15,8 @@ import {
 import { formatPerResidentGel } from "../../../lib/explorer/format";
 import { buildMunicipalityMapModel } from "../../../lib/explorer/municipalityMapData";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
+import { explorerDatasetJsonLd } from "../../../lib/seo/structuredData";
+import { resolveSiteUrl } from "../../../lib/siteUrl";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { totalFacts } = await loadServedMunicipalData();
@@ -52,6 +55,20 @@ export default async function MunicipalitiesIndexPage() {
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+      <JsonLd
+        data={explorerDatasetJsonLd({
+          origin: resolveSiteUrl(),
+          path: "/explorer/municipalities",
+          name: "საქართველოს მუნიციპალიტეტების ბიუჯეტები",
+          description: `საქართველოს მუნიციპალიტეტების ფაქტობრივი ბიუჯეტები ფუნქციების მიხედვით, ${firstYear}–${latestYear}.`,
+          firstYear,
+          lastYear: latestYear,
+          dateModified: lastUpdatedAt,
+          spatialCoverageName: "საქართველო",
+          downloadPath: "/downloads/data/municipal-expenditure.csv",
+        })}
+        testId="explorer-dataset-json-ld"
+      />
       <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "მუნიციპალიტეტები", path: "/explorer/municipalities" }]} />
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader

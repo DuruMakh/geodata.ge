@@ -20,13 +20,13 @@ function CardBody({ card }: { card: HubCardModel }) {
           </span>
         )}
       </div>
-      <p
+      <h2
         className={`font-[family-name:var(--font-display)] text-[18px] font-semibold ${
           card.comingSoon ? "text-[var(--muted)]" : "text-[var(--ink)]"
         }`}
       >
         {card.title}
-      </p>
+      </h2>
       <p className="text-[11.5px] leading-normal text-[var(--muted)]">{card.description}</p>
       {card.series && card.seriesColor ? (
         <Sparkline values={card.series} color={card.seriesColor} width={200} height={34} />

@@ -7,6 +7,7 @@ import type { MunicipalKpi, MunicipalListRow } from "../../lib/explorer/municipa
 import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
 import { parseMunicipalLevel } from "../../lib/explorer/urlState";
+import { municipalityHrefForCode } from "../../lib/explorer/municipalityRoutes";
 import { municipalEntityHref } from "../../lib/seo/internalLinks";
 import { SourceNote, TabDivider, TextTab } from "../ui/editorial";
 import { MunicipalityMap } from "./municipality-map";
@@ -75,7 +76,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
   const source = sources[level];
   const rows = rowsByLevel[level];
 
-  const openMunicipality = (code: string) => router.push(`/explorer/municipalities/${code}`);
+  const openMunicipality = (code: string) => router.push(municipalityHrefForCode(code));
 
   function renderRowsFor(panelLevel: "muni" | "region") {
     const panelRows = rowsByLevel[panelLevel];

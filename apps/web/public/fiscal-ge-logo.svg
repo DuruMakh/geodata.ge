@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="title">
+  <title id="title">Fiscal.ge</title>
+  <rect width="512" height="512" fill="#F7F2E9"/>
+  <rect x="48" y="48" width="416" height="16" fill="#1E1B16"/>
+  <path fill="#1E1B16" d="M112 128h260v64H184v72h164v64H184v136h-72z"/>
+  <rect x="348" y="264" width="52" height="200" fill="#B3402A"/>
+</svg>

@@ -25,7 +25,7 @@ import ExcelJS from "exceljs";
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
 const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
-const ENTITY_URL = `${BASE_URL}/explorer/municipalities/04`; // თბილისი
+const ENTITY_URL = `${BASE_URL}/explorer/municipalities/tbilisi`; // თბილისი
 const ALL_FUNCTIONS = [
   "municipal.general_public_services",
   "municipal.defence",
@@ -222,15 +222,20 @@ test.describe("entity picker accessibility", () => {
     await expectMunicipalAppReady(page);
 
     const trigger = page.getByTestId("entity-picker-trigger");
-    const caret = page.getByTestId("entity-picker-caret");
+    const caret = trigger.locator("span[aria-hidden='true']");
     const restingBox = await trigger.boundingBox();
+
+    await expect(page.locator("h1")).not.toContainText(/[▾▴]/);
+    await expect(page.locator("main h1")).toHaveText("როგორ ხარჯავს ბიუჯეტს თბილისი");
 
     await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
     await expect(trigger).toHaveCSS("border-bottom-style", "dashed");
     await expect(trigger).toHaveCSS("border-bottom-width", "1px");
     await expect(trigger).toHaveCSS("transition-duration", "0.1s");
-    await expect(caret).toHaveText("▾");
-    await expect(caret).toHaveCSS("color", "rgb(149, 132, 106)");
+    await expect(caret).toHaveText("");
+    await expect(caret).toHaveCSS("border-top-width", "5px");
+    await expect(caret).toHaveCSS("border-bottom-width", "0px");
+    await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
 
     await trigger.hover();
     await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
@@ -238,7 +243,9 @@ test.describe("entity picker accessibility", () => {
 
     await trigger.click();
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
-    await expect(caret).toHaveText("▴");
+    await expect(caret).toHaveText("");
+    await expect(caret).toHaveCSS("border-top-width", "0px");
+    await expect(caret).toHaveCSS("border-bottom-width", "5px");
   });
 
   test("opening moves focus into the search input", async ({ page }) => {
@@ -353,8 +360,15 @@ test.describe("entity picker accessibility", () => {
 
     // Batumi's own page re-serialises its default hash state (#m=line&r=...)
     // as soon as it mounts, so the URL is not bare — only the path is pinned.
-    await expect(page).toHaveURL(/\/explorer\/municipalities\/06(#|$)/);
+    await expect(page).toHaveURL(/\/explorer\/municipalities\/batumi(#|$)/);
     await expect(page.getByTestId("entity-picker")).toBeHidden();
+
+    await page.getByTestId("municipal-mode-table").click();
+    await expect(
+      page.getByTestId("explorer-table").getByRole("table", {
+        name: /ბათუმი — ხარჯები ლარში/,
+      }),
+    ).toHaveCount(1);
   });
 
   test("puts Georgia first in the picker and keeps it searchable", async ({ page }) => {
@@ -459,6 +473,10 @@ test.describe("municipality page", () => {
     await page.getByTestId("municipal-mode-table").click();
     const table = page.getByTestId("explorer-table");
     await expect(table).toBeVisible();
+    await expect(table.locator("caption")).toHaveText("თბილისი — ხარჯები ლარში, 2015–2025");
+    await expect(page.getByTestId("comparison-table").locator("caption")).toHaveText(
+      "თბილისი — პერიოდის შედარება, 2015–2025",
+    );
     // The regression this guards: in billions every municipal cell reads 0.0.
     // Checked cell by cell, not as a substring of the table's full text: this
     // municipality's თავდაცვა (defence) row genuinely rounds to 0 for every
@@ -468,6 +486,19 @@ test.describe("municipality page", () => {
     for (const cell of cells) {
       expect(cell).not.toBe("0.0");
     }
+
+    await page.getByTestId("municipal-share-toggle").click();
+    await expect(table.locator("caption")).toHaveText("თბილისი — წილი მთლიან ბიუჯეტში, 2015–2025");
+
+    await page.goto(`${ENTITY_URL}#m=table&sh=1&r=2020-2024`);
+    await page.reload();
+    await expectMunicipalAppReady(page);
+    await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
+      "თბილისი — წილი მთლიან ბიუჯეტში, 2020–2024",
+    );
+    await expect(page.getByTestId("comparison-table").locator("caption")).toHaveText(
+      "თბილისი — პერიოდის შედარება, 2020–2024",
+    );
   });
 
   test("renders the official total and every selected municipal line", async ({ page }) => {
@@ -614,7 +645,7 @@ test.describe("municipality page", () => {
   });
 
   test("keeps a sign on a real municipal change below the display threshold", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explorer/municipalities/06#r=2016-2021`);
+    await page.goto(`${BASE_URL}/explorer/municipalities/batumi#r=2016-2021`);
     await expectMunicipalAppReady(page);
 
     const defenceRow = page.getByTestId("period-comparison").locator("tbody tr").filter({ hasText: "თავდაცვა" });
@@ -766,7 +797,7 @@ test.describe("municipality page", () => {
   });
 
   test("Khulo 2024 total cites the functional fallback instead of its history workbook", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explorer/municipalities/11#r=2024-2024&sel=municipal.total`);
+    await page.goto(`${BASE_URL}/explorer/municipalities/khulo#r=2024-2024&sel=municipal.total`);
     await expectMunicipalAppReady(page);
     const { workbook } = await downloadMunicipalWorkbook(page);
     const hyperlinks = workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
@@ -811,7 +842,7 @@ test.describe("municipality page", () => {
   });
 
   test("uses the historical range-end rank rather than the latest-year rank", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explorer/municipalities/18#r=2015-2015`);
+    await page.goto(`${BASE_URL}/explorer/municipalities/sighnaghi#r=2015-2015`);
     await expectMunicipalAppReady(page);
 
     const rankKpi = page.getByTestId("entity-kpi").filter({ hasText: "წილი მუნიციპალურ ხარჯებში" });
@@ -1020,7 +1051,7 @@ test.describe("municipality page", () => {
 
   test("keeps municipal chart controls readable on narrow phones", async ({ page }) => {
     for (const path of [
-      "/explorer/municipalities/04",
+      "/explorer/municipalities/tbilisi",
       "/explorer/municipalities/region/kakheti",
       "/explorer/municipalities/georgia",
     ]) {

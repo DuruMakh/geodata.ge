@@ -121,7 +121,7 @@ export function AnalysisView({
           <Every100Gel items={model.every100} />
           <BudgetRadar items={model.radarItems} />
           <BudgetField items={model.items} />
-          <FullRanking rows={model.rankingRows} side={side} grouping={grouping} />
+          <FullRanking rows={model.rankingRows} side={side} grouping={grouping} year={model.year} />
 
           <div className="mt-[26px]">
             <SourceNote testId="source-label">

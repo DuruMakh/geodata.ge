@@ -150,12 +150,12 @@ test("polygon and marker clicks open municipality pages directly", async ({ page
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
   await page.getByTestId("municipality-shape-33").click();
-  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/33");
+  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/zugdidi");
 
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
   await page.getByTestId("municipality-marker-06").click();
-  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/06");
+  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/batumi");
 });
 
 test("Enter activates a polygon and Space activates a marker", async ({ page }) => {
@@ -163,14 +163,14 @@ test("Enter activates a polygon and Space activates a marker", async ({ page }) 
   await expectMunicipalAppReady(page);
   await page.getByTestId("municipality-shape-33").focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/33");
+  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/zugdidi");
 
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
   const before = await page.evaluate(() => window.scrollY);
   await page.getByTestId("municipality-marker-06").focus();
   await page.keyboard.press("Space");
-  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/06");
+  await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/batumi");
   expect(await page.evaluate(() => window.scrollY)).toBe(before);
 });
 
@@ -476,7 +476,7 @@ test.describe("municipalities index", () => {
     await page.goto("http://localhost:3100/explorer/municipalities");
     await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-list-row").first().click();
-    await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/04");
+    await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/tbilisi");
   });
 
   test("shows four KPIs including the 2025 median budget per resident", async ({ page }) => {
@@ -515,7 +515,7 @@ test.describe("municipalities index", () => {
 });
 
 test("keeps municipality share as share of its budget", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities/04");
+  await page.goto("http://localhost:3100/explorer/municipalities/tbilisi");
   await expectMunicipalAppReady(page);
 
   await page.getByRole("button", { name: "ცხრილი" }).click();

@@ -235,6 +235,9 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await expect(page.getByTestId("explorer-table")).toBeVisible();
   await expect(page.getByTestId("explorer-table")).toContainText("მთლიანი ხარჯი");
   await expect(page.getByTestId("explorer-table")).toContainText("ცვლილება");
+  await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
+    "ხარჯვითი მონაცემები — ხარჯები ლარში, 2004–2025",
+  );
 
   await chartPanel.getByTestId("chart-mode-line").click();
   await expect(page.getByTestId("chart-frame")).toBeVisible();
@@ -251,6 +254,9 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await chartPanel.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table")).toContainText("წილი მშპ-ში 2025");
   await expect(page.getByTestId("explorer-table")).not.toContainText("100.0%");
+  await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
+    "უწყებრივი მონაცემები — წილი მშპ-ში, 2004–2025",
+  );
 
   expect(consoleProblems).toEqual([]);
 });
@@ -493,6 +499,12 @@ test("URL hash round-trips explorer state", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ფინანსდება საქართველოს ბიუჯეტი");
   await expect(page.getByTestId("explorer-table")).toBeVisible();
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2020");
+  await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
+    "შემოსავლების მონაცემები — წილი მშპ-ში, 2010–2020",
+  );
+  await expect(page.getByTestId("period-comparison").locator("caption")).toHaveText(
+    "შემოსავლები საბიუჯეტო მუხლების მიხედვით — პერიოდის შედარება, 2010–2020",
+  );
   await expect(page.getByTestId("series-selector").getByTitle("მთლიანი შემოსავლები")).toHaveAttribute("aria-pressed", "true");
 });
 
@@ -645,13 +657,55 @@ test("Excel button shows working and retryable error states", async ({ page }) =
   const button = page.getByTestId("series-excel");
   const announcement = page.getByRole("status");
   await expect(button).toHaveText("ჩამოტვირთვა");
+  await page.evaluate(() => {
+    const target = document.querySelector<HTMLButtonElement>("[data-testid='series-excel']");
+    const live = target?.parentElement?.querySelector<HTMLElement>("[role='status']");
+    if (!target || !live) throw new Error("Expected the Excel button and live status");
+
+    type ExcelState = { text: string; disabled: boolean; busy: string | null; announcement: string };
+    const tracked = window as typeof window & {
+      __excelStates?: ExcelState[];
+      __excelStateObserver?: MutationObserver;
+    };
+    tracked.__excelStates = [];
+    const record = () => {
+      const state = {
+        text: target.textContent ?? "",
+        disabled: target.disabled,
+        busy: target.getAttribute("aria-busy"),
+        announcement: live.textContent ?? "",
+      };
+      const previous = tracked.__excelStates?.at(-1);
+      if (JSON.stringify(previous) !== JSON.stringify(state)) tracked.__excelStates?.push(state);
+    };
+    tracked.__excelStateObserver = new MutationObserver(record);
+    tracked.__excelStateObserver.observe(target, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+    tracked.__excelStateObserver.observe(live, { childList: true, subtree: true, characterData: true });
+    record();
+  });
+
   await button.click();
-  await expect(button).toHaveText("Excel მზადდება…");
-  await expect(button).toBeDisabled();
-  await expect(button).toHaveAttribute("aria-busy", "true");
-  await expect(announcement).toHaveText("Excel მზადდება…");
   await expect(announcement).toHaveText("ფაილი ვერ მომზადდა — სცადეთ თავიდან.");
   await expect(button).toHaveAttribute("aria-busy", "false");
+  const observedStates = await page.evaluate(() => {
+    const tracked = window as typeof window & {
+      __excelStates?: Array<{ text: string; disabled: boolean; busy: string | null; announcement: string }>;
+      __excelStateObserver?: MutationObserver;
+    };
+    tracked.__excelStateObserver?.disconnect();
+    return tracked.__excelStates ?? [];
+  });
+  expect(observedStates).toContainEqual({
+    text: "Excel მზადდება…",
+    disabled: true,
+    busy: "true",
+    announcement: "Excel მზადდება…",
+  });
 
   const retry = await downloadWorkbook(page);
   expect(retry.download.suggestedFilename()).toMatch(/^fiscal-fields-\d{4}-\d{4}\.xlsx$/);
@@ -695,6 +749,8 @@ test("analysis view renders the fixed single-year section order", async ({ page 
 
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("ბიუჯეტის სურათი");
+  await expect(page.locator("main h1")).toHaveCount(1);
+  await expect(page.locator("main h2")).toHaveCount(5);
 
   await expect(page.getByTestId("analysis-year-selector")).toContainText("2025");
   await expect(page.getByTestId("snapshot-treemap")).toBeVisible();
@@ -706,6 +762,9 @@ test("analysis view renders the fixed single-year section order", async ({ page 
   await expect(page.getByTestId("budget-radar")).toBeVisible();
   await expect(page.getByTestId("budget-field")).toBeVisible();
   await expect(page.getByTestId("single-year-ranking")).toBeVisible();
+  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
+    "ხარჯები სფეროების მიხედვით — სრული რეიტინგი, 2025",
+  );
 
   const sectionOrder = await page.evaluate(() => {
     const ids = ["snapshot-treemap", "every-100-gel", "budget-radar", "budget-field", "single-year-ranking"];
@@ -730,12 +789,23 @@ test("analysis view renders the fixed single-year section order", async ({ page 
   // Revenue side reuses the same layout.
   await page.getByTestId("analysis-side-revenue").click();
   await expect(page.getByTestId("single-year-ranking")).toContainText("დამატებული ღირებულების გადასახადი");
+  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
+    "შემოსავლები კატეგორიების მიხედვით — სრული რეიტინგი, 2025",
+  );
   await expect(page.getByTestId("analysis-grouping-fields")).toHaveCount(0);
+
+  await page.getByTestId("analysis-year-selector").getByRole("button", { name: "2024", exact: true }).click();
+  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
+    "შემოსავლები კატეგორიების მიხედვით — სრული რეიტინგი, 2024",
+  );
 
   // Ministries grouping in analysis (categories only).
   await page.getByTestId("analysis-side-expenditure").click();
   await page.getByTestId("analysis-grouping-ministries").click();
   await expect(page.getByTestId("snapshot-treemap")).toContainText("სტრუქტურა უწყებების მიხედვით");
+  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
+    "ხარჯები უწყებების მიხედვით — სრული რეიტინგი, 2024",
+  );
 
   expect(consoleProblems).toEqual([]);
 });
@@ -1017,23 +1087,29 @@ test("a single-year range states that it has no period instead of reporting 0.0%
   await expect(kpis).not.toContainText("პერიოდის ცვლილება");
 });
 
-test("ships no source-document registry in the explorer payload", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
-  await expectAppReady(page);
+test("ships no server-only provenance fields in explorer payloads", async ({ page }) => {
+  for (const route of ["/explorer/expenditure", "/explorer/revenue", "/explorer/analysis"]) {
+    await page.goto(`http://localhost:3100${route}`);
+    await expectAppReady(page);
 
-  // Every route used to hand its client explorer a narrowed copy of the source
-  // registry so the model builders could stamp a SourceMetadata onto every
-  // row-year and point — fields no component ever read. Measured at 44 records
-  // and ~15 KB on this route alone. lastUpdatedAt is the only source fact the
-  // UI shows, and it is computed server-side.
-  const occurrences = await page.evaluate(() =>
-    [...document.querySelectorAll("script")].reduce(
-      (count, script) => count + ((script.textContent ?? "").split("sourceUrlOrFile").length - 1),
-      0,
-    ),
-  );
+    // lastUpdatedAt and workbook source links are computed from the complete
+    // server rows before projection. Per-row source ids and original institution
+    // labels have no browser consumer and must not be repeated through RSC.
+    const occurrences = await page.evaluate(() => {
+      const payload = [...document.querySelectorAll("script")].map((script) => script.textContent ?? "").join("\n");
+      return {
+        sourceRegistry: payload.split("sourceUrlOrFile").length - 1,
+        sourceIds: payload.split("sourceId").length - 1,
+        officialInstitutionLabels: payload.split("officialInstitutionLabelKa").length - 1,
+      };
+    });
 
-  expect(occurrences).toBe(0);
+    expect(occurrences, route).toEqual({
+      sourceRegistry: 0,
+      sourceIds: 0,
+      officialInstitutionLabels: 0,
+    });
+  }
 });
 
 test("every explorer route family renders the site footer", async ({ page }) => {
@@ -1047,7 +1123,7 @@ test("every explorer route family renders the site footer", async ({ page }) => 
     "/explorer/revenue",
     "/explorer/analysis",
     "/explorer/municipalities",
-    "/explorer/municipalities/71",
+    "/explorer/municipalities/oni",
     "/explorer/municipalities/georgia",
   ]) {
     await page.goto(`http://localhost:3100${route}`);
@@ -1182,6 +1258,10 @@ test("hub lists four cards, all four now live", async ({ page }) => {
   await expectAppReady(page);
 
   await expect(page.getByTestId("hub-card")).toHaveCount(4);
+  await expect(page.getByTestId("hub-card").locator("h2")).toHaveCount(4);
+  for (const card of await page.getByTestId("hub-card").all()) {
+    await expect(card.locator("h2")).toHaveCount(1);
+  }
   // Scoped to the hub: the sidebar carries a ხარჯები link too, and an unscoped
   // role query would trip Playwright's strict mode.
   await expect(page.getByTestId("budget-hub").getByRole("link", { name: /ხარჯები/ })).toHaveAttribute(

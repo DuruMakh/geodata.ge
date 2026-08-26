@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
+import { computedCssColorAlpha } from "./focus-outline";
 
 // Landing page (GeoData Site v2 design): structure, live data blocks, and the
 // paths into the explorer. The hero is WebGL; tests assert the canvas mounts
@@ -24,6 +25,27 @@ async function expectNoPageOverflow(page: Page) {
   expect(width.scroll).toBe(width.client);
 }
 
+async function expectMinimumTarget(locator: Locator, size = 24) {
+  const box = await locator.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.width).toBeGreaterThanOrEqual(size);
+  expect(box!.height).toBeGreaterThanOrEqual(size);
+}
+
+async function expectNonOverlappingTargets(locator: Locator) {
+  const boxes = await Promise.all((await locator.all()).map((target) => target.boundingBox()));
+  expect(boxes.every((box) => box !== null)).toBe(true);
+
+  for (let first = 0; first < boxes.length; first += 1) {
+    for (let second = first + 1; second < boxes.length; second += 1) {
+      const a = boxes[first]!;
+      const b = boxes[second]!;
+      const overlaps = a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+      expect(overlaps, `targets ${first} and ${second} overlap`).toBe(false);
+    }
+  }
+}
+
 async function expectVisibleFocusOutline(locator: Locator) {
   await locator.focus();
   await expect(locator).toBeFocused();
@@ -37,7 +59,42 @@ async function expectVisibleFocusOutline(locator: Locator) {
   });
   expect(outline.style).not.toBe("none");
   expect(outline.width).toBeGreaterThan(0);
-  expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
+  expect(computedCssColorAlpha(outline.color)).toBeGreaterThan(0);
+}
+
+async function expectKeyboardFocusOrder(page: Page, locator: Locator) {
+  const links = await locator.all();
+  expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
+
+  for (let index = 0; index < links.length; index += 1) {
+    const link = links[index]!;
+    let reachedTarget = false;
+
+    for (let tab = 0; tab < 100; tab += 1) {
+      await page.keyboard.press("Tab");
+      const focusedIndex = await locator.evaluateAll((elements) => elements.findIndex((element) => element === document.activeElement));
+      expect(focusedIndex, `target ${index} was skipped in keyboard order`).not.toBeGreaterThan(index);
+      if (focusedIndex !== index) continue;
+
+      await expect(link).toBeFocused();
+      const outline = await link.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          color: style.outlineColor,
+          style: style.outlineStyle,
+          width: Number.parseFloat(style.outlineWidth),
+        };
+      });
+      expect(await link.evaluate((element) => element.matches(":focus-visible"))).toBe(true);
+      expect(outline.style).not.toBe("none");
+      expect(outline.width).toBeGreaterThan(0);
+      expect(computedCssColorAlpha(outline.color)).toBeGreaterThan(0);
+      reachedTarget = true;
+      break;
+    }
+
+    expect(reachedTarget, `target ${index} was not reached by Tab`).toBe(true);
+  }
 }
 
 async function expectDatasetTableFits(page: Page, testId: string) {
@@ -138,6 +195,20 @@ test("landing renders the approved latest-year data composition", async ({ page 
     const latestYear = await section.getByTestId("landing-dataset-total").locator("strong").textContent();
     await expect(section.locator("thead th").nth(1)).toHaveText(latestYear!);
   }
+  await expect(page.getByTestId("landing-dataset-expenditure").locator("table caption")).toHaveText(
+    "როგორ იხარჯება საქართველოს ბიუჯეტი — 2025 წლის მონაცემები",
+  );
+  await expect(
+    page.getByTestId("landing-dataset-expenditure").getByRole("table", {
+      name: "როგორ იხარჯება საქართველოს ბიუჯეტი — 2025 წლის მონაცემები",
+    }),
+  ).toHaveCount(1);
+  await expect(page.getByTestId("landing-dataset-revenue").locator("table caption")).toHaveText(
+    "როგორ ფინანსდება საქართველოს ბიუჯეტი — 2025 წლის მონაცემები",
+  );
+  await expect(page.getByTestId("landing-dataset-municipalities").locator("table caption")).toHaveText(
+    "როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები — 2025 წლის მონაცემები",
+  );
 
   await expect(page.getByTestId("landing-dataset-expenditure").getByRole("link")).toHaveAttribute("href", "/explorer/expenditure");
   await expect(page.getByTestId("landing-dataset-revenue").getByRole("link")).toHaveAttribute("href", "/explorer/revenue");
@@ -254,4 +325,24 @@ test("methodology is in the footer but never the landing header", async ({ page 
   );
   await expect(page.getByTestId("landing-methodology")).toBeVisible();
   await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
+});
+
+test("footer links keep non-overlapping 24px mobile targets and keyboard focus", async ({ page }) => {
+  for (const viewport of [
+    { width: 375, height: 812 },
+    { width: 390, height: 844 },
+    { width: 767, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto(baseUrl);
+
+    const links = page.getByTestId("site-footer").getByRole("link");
+    expect(await links.count()).toBe(5);
+    for (const link of await links.all()) {
+      await expectMinimumTarget(link);
+    }
+    await expectKeyboardFocusOrder(page, links);
+    await expectNonOverlappingTargets(links);
+    await expectNoPageOverflow(page);
+  }
 });
