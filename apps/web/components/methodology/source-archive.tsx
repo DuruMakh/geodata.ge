@@ -43,6 +43,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
     [rows],
   );
   const normalizedQuery = query.trim().toLocaleLowerCase("ka-GE");
+  const captionPeriod = year === null ? `${years.at(-1)}–${years[0]} წლები` : `${year} წელი`;
   const filteredRows = rows.filter((row) => {
     if (year !== null && !row.years.includes(year)) return false;
     const searchable = [
@@ -113,7 +114,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
 
       <div className="mt-7 overflow-x-auto border-t-2 border-[var(--ink)]">
         <table className="w-full min-w-[760px] border-collapse text-left text-[11.5px]">
-          <caption className="sr-only">{`${datasetLabel} — პირველწყაროების არქივი`}</caption>
+          <caption className="sr-only">{`${datasetLabel} — პირველწყაროების არქივი, ${captionPeriod}`}</caption>
           <thead>
             <tr className="border-b border-[var(--ink)] text-[9.5px] uppercase tracking-[0.05em] text-[var(--muted)]">
               <th className="px-2 py-3 font-semibold">წელი</th>
