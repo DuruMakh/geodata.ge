@@ -105,6 +105,28 @@ for (const { route, canonical } of representativeRoutes) {
   });
 }
 
+test("Link navigation keeps exactly one route-correct canonical and Open Graph URL", async ({ page }) => {
+  async function expectUrlMetadata(expected: string) {
+    const canonical = page.locator('link[rel="canonical"]');
+    const openGraphUrl = page.locator('meta[property="og:url"]');
+    await expect(canonical).toHaveCount(1);
+    await expect(openGraphUrl).toHaveCount(1);
+    await expect(canonical).toHaveAttribute("href", expected);
+    await expect(openGraphUrl).toHaveAttribute("content", expected);
+  }
+
+  await page.goto(`${BASE_URL}/explorer/expenditure`);
+  await expectUrlMetadata("https://fiscal.ge/explorer/expenditure");
+
+  await page.locator('[data-testid="data-sidebar"] a[href="/"]').first().click();
+  await expect(page).toHaveURL(`${BASE_URL}/`);
+  await expectUrlMetadata("https://fiscal.ge/");
+
+  await page.getByRole("link", { name: "მონაცემები", exact: true }).click();
+  await expect(page).toHaveURL(`${BASE_URL}/explorer`);
+  await expectUrlMetadata("https://fiscal.ge/explorer");
+});
+
 test("explorer datasets publish stable ids and downloadable CSV distributions", async ({ page, request }) => {
   for (const { route, downloadPath } of [
     { route: "/explorer/expenditure", downloadPath: "/downloads/data/national-expenditure.csv" },

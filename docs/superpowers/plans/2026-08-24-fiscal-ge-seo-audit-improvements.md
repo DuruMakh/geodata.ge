@@ -740,7 +740,7 @@ First set `preload: false` only on `Geist_Mono`; build, measure and compare comp
 ```text
 fewer than five preloads
 fewer than 190,264 preload bytes
-no synthetic 500/600/700 weight
+no newly introduced synthetic weight compared with the all-preload baseline
 identical computed font families and line wrapping after load
 no meaningful screenshot difference
 no worse CLS/fallback flash in the Playwright trace

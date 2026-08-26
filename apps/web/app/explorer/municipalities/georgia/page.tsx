@@ -42,6 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
       firstYear,
       latestYear,
       latestTotalGel: latestTotal.publicTotalGel,
+      budgetUnitCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
     }),
     path: ROUTE,
   });
@@ -76,6 +77,7 @@ export default async function GeorgiaMunicipalitiesPage() {
     firstYear,
     latestYear,
     latestTotalGel: latestTotal.publicTotalGel,
+    budgetUnitCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
   });
 
   return (

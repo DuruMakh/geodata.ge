@@ -15,3 +15,17 @@ it("noindexes only third-party methodology source originals", async () => {
     expect.objectContaining({ source: "/methodology/:path*" }),
   );
 });
+
+it("retains the general security headers on every route", async () => {
+  const headers = await nextConfig.headers?.();
+
+  expect(headers).toContainEqual({
+    source: "/(.*)",
+    headers: [
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+    ],
+  });
+});

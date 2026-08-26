@@ -118,7 +118,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
   const description =
     regionId === ADJARA_REGION_ID
-      ? adjaraDescriptionKa(common)
+      ? adjaraDescriptionKa({
+          ...common,
+          municipalityCount: facts.members.memberCodes.length,
+        })
       : regionDescriptionKa({
           ...common,
           largestCategoryKa: facts.largestFunction.kaLabel,
@@ -195,7 +198,10 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
   };
   const description =
     regionId === ADJARA_REGION_ID
-      ? adjaraDescriptionKa(commonDescriptionInput)
+      ? adjaraDescriptionKa({
+          ...commonDescriptionInput,
+          municipalityCount: members.memberCodes.length,
+        })
       : regionDescriptionKa({
           ...commonDescriptionInput,
           largestCategoryKa: largestFunction.kaLabel,

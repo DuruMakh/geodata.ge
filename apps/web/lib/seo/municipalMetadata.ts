@@ -31,12 +31,14 @@ export function regionDescriptionKa(input: RankedEntitySeoInput): string {
 }
 
 export function adjaraDescriptionKa(
-  input: Omit<RankedEntitySeoInput, "largestCategoryKa" | "largestCategoryShare">,
+  input: Omit<RankedEntitySeoInput, "largestCategoryKa" | "largestCategoryShare"> & {
+    municipalityCount: number;
+  },
 ): string {
   return (
     `აჭარის გაერთიანებული ბიუჯეტი ${input.latestYear}: ${formatAmount(input.latestTotalGel)}; ` +
     `ადგილი: ${georgianOrdinal(input.rank)} ${input.rankOutOf}-დან. ` +
-    `მოიცავს 6 მუნიციპალიტეტსა და აჭარის ა.რ. ბიუჯეტს, შიდა ტრანსფერების გამოკლებით. ` +
+    `მოიცავს ${input.municipalityCount} მუნიციპალიტეტსა და აჭარის ა.რ. ბიუჯეტს, შიდა ტრანსფერების გამოკლებით. ` +
     `${input.firstYear}–${input.latestYear}.`
   );
 }
@@ -45,10 +47,11 @@ export function georgiaDescriptionKa(input: {
   firstYear: number;
   latestYear: number;
   latestTotalGel: number;
+  budgetUnitCount: number;
 }): string {
   return (
     `საქართველოს მუნიციპალური ბიუჯეტები ${input.latestYear}: ${formatAmount(input.latestTotalGel)}. ` +
-    `ჯამი მოიცავს 69 ერთეულს და აჭარის ა.რ. გადასახდელებს შიდა ტრანსფერების გამოკლებით. ` +
+    `ჯამი მოიცავს ${input.budgetUnitCount} ერთეულს და აჭარის ა.რ. გადასახდელებს შიდა ტრანსფერების გამოკლებით. ` +
     `${input.firstYear}–${input.latestYear}.`
   );
 }
