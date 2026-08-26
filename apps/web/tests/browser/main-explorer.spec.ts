@@ -657,29 +657,55 @@ test("Excel button shows working and retryable error states", async ({ page }) =
   const button = page.getByTestId("series-excel");
   const announcement = page.getByRole("status");
   await expect(button).toHaveText("ჩამოტვირთვა");
-  await button.click();
-  // The forced error can settle between separate locator assertions once the
-  // workbook chunk is warm. Read the transient working state atomically so the
-  // test still proves all four signals without racing itself.
-  await expect
-    .poll(
-      () =>
-        button.evaluate((element) => ({
-          text: element.textContent,
-          disabled: (element as HTMLButtonElement).disabled,
-          busy: element.getAttribute("aria-busy"),
-          announcement: element.parentElement?.querySelector("[role='status']")?.textContent,
-        })),
-      { intervals: [1, 2, 5, 10, 20] },
-    )
-    .toEqual({
-      text: "Excel მზადდება…",
-      disabled: true,
-      busy: "true",
-      announcement: "Excel მზადდება…",
+  await page.evaluate(() => {
+    const target = document.querySelector<HTMLButtonElement>("[data-testid='series-excel']");
+    const live = target?.parentElement?.querySelector<HTMLElement>("[role='status']");
+    if (!target || !live) throw new Error("Expected the Excel button and live status");
+
+    type ExcelState = { text: string; disabled: boolean; busy: string | null; announcement: string };
+    const tracked = window as typeof window & {
+      __excelStates?: ExcelState[];
+      __excelStateObserver?: MutationObserver;
+    };
+    tracked.__excelStates = [];
+    const record = () => {
+      const state = {
+        text: target.textContent ?? "",
+        disabled: target.disabled,
+        busy: target.getAttribute("aria-busy"),
+        announcement: live.textContent ?? "",
+      };
+      const previous = tracked.__excelStates?.at(-1);
+      if (JSON.stringify(previous) !== JSON.stringify(state)) tracked.__excelStates?.push(state);
+    };
+    tracked.__excelStateObserver = new MutationObserver(record);
+    tracked.__excelStateObserver.observe(target, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
     });
+    tracked.__excelStateObserver.observe(live, { childList: true, subtree: true, characterData: true });
+    record();
+  });
+
+  await button.click();
   await expect(announcement).toHaveText("ფაილი ვერ მომზადდა — სცადეთ თავიდან.");
   await expect(button).toHaveAttribute("aria-busy", "false");
+  const observedStates = await page.evaluate(() => {
+    const tracked = window as typeof window & {
+      __excelStates?: Array<{ text: string; disabled: boolean; busy: string | null; announcement: string }>;
+      __excelStateObserver?: MutationObserver;
+    };
+    tracked.__excelStateObserver?.disconnect();
+    return tracked.__excelStates ?? [];
+  });
+  expect(observedStates).toContainEqual({
+    text: "Excel მზადდება…",
+    disabled: true,
+    busy: "true",
+    announcement: "Excel მზადდება…",
+  });
 
   const retry = await downloadWorkbook(page);
   expect(retry.download.suggestedFilename()).toMatch(/^fiscal-fields-\d{4}-\d{4}\.xlsx$/);

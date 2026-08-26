@@ -17,7 +17,6 @@ const notoSerifGeorgian = Noto_Serif_Georgian({
   weight: ["400", "500", "600", "700"],
   variable: "--font-noto-serif-georgian",
   display: "swap",
-  preload: false,
 });
 
 const geistMono = Geist_Mono({
