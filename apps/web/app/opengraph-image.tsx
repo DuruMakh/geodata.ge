@@ -52,7 +52,6 @@ export default async function OpenGraphImage() {
           padding: "40px 82px 42px",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse embeds this SVG data URI at build time. */}
         <img
           alt=""
           src={svgDataUri(horizontalLogoSvg)}
@@ -76,7 +75,6 @@ export default async function OpenGraphImage() {
           padding: "24px 82px",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse embeds this SVG data URI at build time. */}
         <img
           alt=""
           src={svgDataUri(reversedMarkSvg)}
