@@ -162,6 +162,7 @@ export function ExplorerView({
                 firstColumnLabel={FIRST_COL_LABEL[scope]}
                 unit={unit}
                 share={share}
+                showChangeColumn={false}
                 shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
               />
             ) : (
