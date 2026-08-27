@@ -3,8 +3,8 @@ import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { formatBn, formatShare } from "../../lib/explorer/format";
 import { SwatchBar } from "../ui/editorial";
 
-// Full ranking per DESIGN.md §9.7: mono rank index, swatch, amount, 120px share bar,
-// colored change; sticky first column on horizontal scroll.
+// Full ranking per DESIGN.md §9.7: mono rank index, swatch, amount, share bar,
+// and colored change. The compact table also fits the narrow mobile layout.
 
 type FullRankingProps = {
   rows: SnapshotItem[];
@@ -17,6 +17,11 @@ function truncate(text: string, length: number): string {
   return text.length > length ? `${text.slice(0, length - 1)}…` : text;
 }
 
+function compactLabel(text: string): string {
+  const words = text.trim().split(/\s+/);
+  return words.length > 2 ? `${words.slice(0, 2).join(" ")}…` : text;
+}
+
 export function FullRanking({ rows, side, grouping, year }: FullRankingProps) {
   const header = side === "revenue" ? "კატეგორია" : grouping === "ministries" ? "უწყება" : "სფერო";
   const caption =
@@ -25,43 +30,55 @@ export function FullRanking({ rows, side, grouping, year }: FullRankingProps) {
       : `ხარჯები ${grouping === "ministries" ? "უწყებების" : "სფეროების"} მიხედვით — სრული რეიტინგი, ${year}`;
   const maxShare = Math.max(...rows.map((row) => row.shareOfTotal), 0.001);
   const headCell =
-    "border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-[9px] text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] whitespace-nowrap";
+    "border-b-2 border-[var(--ink)] px-1.5 pt-1.5 pb-[9px] text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] min-[768px]:whitespace-nowrap min-[768px]:px-3";
 
   return (
     <div data-testid="single-year-ranking" className="mt-9 border-t border-[var(--hairline)] pt-6">
       <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">სრული რეიტინგი</h2>
       <p className="mb-3 text-xs text-[var(--muted)]">დალაგებულია მოცულობით, კლებადობით</p>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[720px] border-collapse">
+      <div>
+        <table className="w-full table-fixed border-collapse">
           <caption className="sr-only">{caption}</caption>
+          <colgroup>
+            <col className="w-[36%] min-[768px]:w-[39%]" />
+            <col className="w-[22%] min-[768px]:w-[18%]" />
+            <col className="w-[21%] min-[768px]:w-[26%]" />
+            <col className="w-[21%] min-[768px]:w-[17%]" />
+          </colgroup>
           <thead>
             <tr>
-              <th className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)]">
+              <th className="border-b-2 border-[var(--ink)] pr-1.5 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] min-[768px]:pr-3">
                 {header}
               </th>
-              <th className={headCell}>მლრდ ₾</th>
+              <th className={`${headCell} whitespace-nowrap text-[10px] min-[768px]:text-[11px]`}>მლრდ ₾</th>
               <th className={`${headCell} w-[220px]`}>წილი</th>
-              <th className={`${headCell} pr-0`}>ცვლილება</th>
+              <th className={`${headCell} pr-0`}>
+                <span className="min-[768px]:hidden">ცვლ.</span>
+                <span className="hidden min-[768px]:inline">ცვლილება</span>
+              </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, index) => (
               <tr key={row.itemId} className="border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]">
-                <td className="sticky left-0 z-[1] bg-[var(--paper)] py-[11px] pr-3 shadow-[1px_0_0_var(--hairline-soft)]">
-                  <span className="inline-flex min-w-0 items-center gap-[9px]">
+                <td className="py-[11px] pr-1.5 min-[768px]:pr-3" title={row.kaLabel}>
+                  <span className="flex min-w-0 items-start gap-1.5 min-[768px]:items-center min-[768px]:gap-[9px]">
                     <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                    <SwatchBar color={row.color} />
-                    <span className="text-[13px] font-medium text-[var(--ink)]">{truncate(row.kaLabel, 52)}</span>
+                    <SwatchBar color={row.color} className="mt-[5px] flex-none min-[768px]:mt-0" />
+                    <span className="min-w-0 text-[11.5px] font-medium leading-[1.25] text-[var(--ink)] min-[768px]:text-[13px] min-[768px]:leading-normal">
+                      <span className="min-[768px]:hidden">{compactLabel(row.kaLabel)}</span>
+                      <span className="hidden min-[768px]:inline">{truncate(row.kaLabel, 52)}</span>
+                    </span>
                   </span>
                 </td>
-                <td className="px-3 py-[11px] text-right font-[family-name:var(--font-numeric)] text-[12.5px] font-semibold whitespace-nowrap text-[var(--ink)]">
+                <td className="px-1.5 py-[11px] text-right font-[family-name:var(--font-numeric)] text-[11.5px] font-semibold whitespace-nowrap text-[var(--ink)] min-[768px]:px-3 min-[768px]:text-[12.5px]">
                   {formatBn(row.amountGel)}
                 </td>
-                <td className="px-3 py-[11px] text-right">
-                  <span className="inline-flex w-full items-center justify-end gap-2.5">
-                    <span className="inline-block h-[3px] w-[120px] overflow-hidden bg-[var(--hairline-soft)]">
+                <td className="px-1.5 py-[11px] text-right min-[768px]:px-3">
+                  <span className="inline-flex w-full items-center justify-end gap-1 min-[768px]:gap-2.5">
+                    <span data-testid="ranking-share-bar" className="hidden h-[3px] w-[120px] overflow-hidden bg-[var(--hairline-soft)] min-[768px]:inline-block">
                       <span
                         className="block h-full"
                         style={{
@@ -71,13 +88,13 @@ export function FullRanking({ rows, side, grouping, year }: FullRankingProps) {
                         }}
                       />
                     </span>
-                    <span className="min-w-[52px] font-[family-name:var(--font-numeric)] text-[12.5px] text-[var(--muted)]">
+                    <span className="min-w-[45px] font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)] min-[768px]:min-w-[52px] min-[768px]:text-[12.5px]">
                       {formatShare(row.shareOfTotal)}
                     </span>
                   </span>
                 </td>
                 <td
-                  className="py-[11px] pl-3 pr-0 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap"
+                  className="py-[11px] pl-1.5 pr-0 text-right font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap min-[768px]:pl-3 min-[768px]:text-[12.5px]"
                   style={{
                     color:
                       row.changeFromPreviousYear === null

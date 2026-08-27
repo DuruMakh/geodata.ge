@@ -234,7 +234,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await chartPanel.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table")).toBeVisible();
   await expect(page.getByTestId("explorer-table")).toContainText("მთლიანი ხარჯი");
-  await expect(page.getByTestId("explorer-table")).toContainText("ცვლილება");
+  await expect(page.getByTestId("explorer-table")).not.toContainText("ცვლილება");
   await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
     "ხარჯვითი მონაცემები — ხარჯები ლარში, 2004–2025",
   );
@@ -252,7 +252,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await page.getByRole("img", { name: "მრავალწლიანი დინამიკა" }).hover({ position: { x: 300, y: 100 } });
   await expect(page.getByTestId("chart-tooltip")).toContainText("წილი მშპ-ში");
   await chartPanel.getByTestId("chart-mode-table").click();
-  await expect(page.getByTestId("explorer-table")).toContainText("წილი მშპ-ში 2025");
+  await expect(page.getByTestId("explorer-table")).not.toContainText("წილი მშპ-ში 2025");
   await expect(page.getByTestId("explorer-table")).not.toContainText("100.0%");
   await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
     "უწყებრივი მონაცემები — წილი მშპ-ში, 2004–2025",
@@ -570,6 +570,8 @@ test("period comparison keeps every revenue category when the selected series ch
   await totalButton.click();
 
   await expect(page.getByTestId("explorer-table")).not.toContainText("მთლიანი შემოსავლები");
+  await expect(page.getByTestId("explorer-table").getByRole("columnheader", { name: "ცვლილება" })).toHaveCount(0);
+  await expect(page.getByTestId("explorer-table").getByRole("columnheader", { name: /წილი მშპ/ })).toHaveCount(0);
   await expect(page.getByTestId("explorer-table").locator("tbody tr").first()).toContainText("%");
   await expect(comparison.locator("tbody tr")).toHaveCount(comparisonRowCount);
   await expect(comparison.locator("tbody tr").first()).toContainText("მთლიანი შემოსავლები");
@@ -765,6 +767,9 @@ test("analysis view renders the fixed single-year section order", async ({ page 
   await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
     "ხარჯები სფეროების მიხედვით — სრული რეიტინგი, 2025",
   );
+  await expect(page.getByTestId("single-year-ranking").locator("thead th")).toHaveCount(4);
+  await expect(page.getByTestId("single-year-ranking").getByTestId("ranking-share-bar").first()).toBeVisible();
+  await expect(page.getByTestId("single-year-ranking").locator('td[title="ინფრასტრუქტურა და რეგიონული განვითარება"]')).toContainText("ინფრასტრუქტურა და რეგიონული განვითარება");
 
   const sectionOrder = await page.evaluate(() => {
     const ids = ["snapshot-treemap", "every-100-gel", "budget-radar", "budget-field", "single-year-ranking"];
@@ -851,7 +856,7 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   await expect(page.getByTestId("every-100-grid").locator("[data-cell='gel']")).toHaveCount(100);
   await expectNoPageOverflow(page);
 
-  for (const width of [320, 375]) {
+  for (const width of [320, 375, 390]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto("http://localhost:3100/explorer/analysis");
     await expectAppReady(page);
@@ -886,6 +891,15 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
     expect(await tabGroups.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
     const snapshot = page.getByTestId("single-year-snapshot");
     expect(await snapshot.evaluate((element) => getComputedStyle(element).overflowX)).not.toBe("clip");
+
+    const ranking = page.getByTestId("single-year-ranking");
+    const rankingTable = ranking.locator("table");
+    expect(await rankingTable.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+    await expect(rankingTable.locator("thead th").nth(1)).toHaveText("მლრდ ₾");
+    expect(await ranking.getByTestId("ranking-share-bar").evaluateAll((elements) => elements.every((element) => getComputedStyle(element).display === "none"))).toBe(true);
+    const longLabel = ranking.locator('tbody td[title="ინფრასტრუქტურა და რეგიონული განვითარება"]');
+    await expect(longLabel).toHaveCount(1);
+    await expect(longLabel).toContainText("ინფრასტრუქტურა და…");
 
     for (const sideTestId of ["analysis-side-expenditure", "analysis-side-revenue"]) {
       await page.getByTestId(sideTestId).click();
