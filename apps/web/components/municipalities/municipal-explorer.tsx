@@ -356,7 +356,6 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
               firstColumnLabel="ფუნქცია"
               unit={unit}
               share={state.share}
-              shareColumnLabel="წილი"
               shareValueForYear={(row, year) => municipalShareValueForYear(model, row, year)}
             />
           )}

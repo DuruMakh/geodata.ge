@@ -611,7 +611,7 @@ Bubble scatter, viewBox 920×380: x = share of total, y = growth vs previous yea
 
 ### 9.7 Full Ranking
 
-Table columns: `<scope header> | მლრდ ₾ | წილი | ცვლილება`, sorted by GEL descending, top-level categories of the active grouping only. Rank as mono `01`-style index + swatch + label; a 120px 3px share bar (category color on `hairline-soft` track) next to the mono share; change colored positive/negative. Same table anatomy as §8.4 including sticky first column on horizontal scroll.
+Table columns: `<scope header> | მლრდ ₾ | წილი | ცვლილება`, sorted by GEL descending, top-level categories of the active grouping only. Rank as mono `01`-style index + swatch + label; a 120px 3px share bar (category color on `hairline-soft` track) next to the mono share; change colored positive/negative. On narrow mobile layouts the table fits without horizontal scrolling: labels show the first two words plus `…` with the full name available on hover, `მლრდ ₾` stays on one line, and the share bar is hidden while its numeric share remains visible. Desktop retains the full label and share bar.
 
 **Completeness rule:** the ranking lists EVERY official row of the year — including zero and negative lines (e.g. `revenue.other_taxes` 2019–2020) — so the rows always reconcile with the `სულ` headline, and the category counts in the headline/deck count all rows. Shares are of the true year total (negative rows get a negative share and no bar). Only the geometry sections (treemap, every-100, radar, field) draw positive rows exclusively.
 

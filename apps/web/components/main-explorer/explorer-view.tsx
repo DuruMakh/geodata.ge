@@ -162,7 +162,6 @@ export function ExplorerView({
                 firstColumnLabel={FIRST_COL_LABEL[scope]}
                 unit={unit}
                 share={share}
-                shareColumnLabel="წილი მშპ-ში"
                 shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
               />
             ) : (

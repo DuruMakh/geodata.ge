@@ -1,11 +1,10 @@
 import type { ExplorerTableRow } from "../../lib/explorer/types";
 import { formatInUnit, formatShare, MISSING, type ValueUnit } from "../../lib/explorer/format";
-import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { SwatchBar } from "../ui/editorial";
 import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 
 // Table mode per DESIGN.md §8.4: newspaper anatomy — 2px ink rules on the header and
-// total row, mono right-aligned numerals, sticky label/change/share columns.
+// total row, mono right-aligned numerals.
 
 type ExplorerTableProps = {
   caption: string;
@@ -16,7 +15,6 @@ type ExplorerTableProps = {
   firstColumnLabel: string;
   unit: ValueUnit;
   share: boolean;
-  shareColumnLabel: string;
   shareValueForYear: (row: ExplorerTableRow, year: number) => number | null;
 };
 
@@ -24,13 +22,7 @@ const headCellClass =
   "border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-[9px] text-right text-[11px] font-semibold text-[var(--muted)] whitespace-nowrap";
 const numericCellClass = "px-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap";
 
-function changeColor(change: number | null): string {
-  if (change === null) return "var(--muted)";
-  return change >= 0 ? POSITIVE : NEGATIVE;
-}
-
-export function ExplorerTable({ caption, rows, totalRow, showTotal, years, firstColumnLabel, unit, share, shareColumnLabel, shareValueForYear }: ExplorerTableProps) {
-  const endYear = years.at(-1);
+export function ExplorerTable({ caption, rows, totalRow, showTotal, years, firstColumnLabel, unit, share, shareValueForYear }: ExplorerTableProps) {
   const lastIndex = years.length - 1;
   const cellValue = (row: ExplorerTableRow, year: number): string => {
     const amount = row.valuesByYear[year];
@@ -40,7 +32,7 @@ export function ExplorerTable({ caption, rows, totalRow, showTotal, years, first
   };
 
   const cellPad = { paddingTop: 11, paddingBottom: 11 };
-  const minWidth = 320 + years.length * 78 + 208;
+  const minWidth = 320 + years.length * 78;
 
   return (
     <div className="mt-[18px]">
@@ -64,12 +56,6 @@ export function ExplorerTable({ caption, rows, totalRow, showTotal, years, first
                 {year}
               </th>
             ))}
-            <th className={`${headCellClass} sticky right-24 z-[2] w-28 min-w-28 bg-[var(--paper)] uppercase tracking-[0.06em] shadow-[-1px_0_0_var(--hairline-soft)]`}>
-              ცვლილება
-            </th>
-            <th className={`${headCellClass} sticky right-0 z-[2] w-24 min-w-24 bg-[var(--paper)] pr-0 uppercase tracking-[0.06em]`}>
-              {shareColumnLabel} {endYear}
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -101,15 +87,6 @@ export function ExplorerTable({ caption, rows, totalRow, showTotal, years, first
                   ) : null}
                 </td>
               ))}
-              <td
-                className={`${numericCellClass} sticky right-24 z-[1] bg-[var(--paper)] shadow-[-1px_0_0_var(--hairline-soft)]`}
-                style={{ ...cellPad, color: changeColor(row.change) }}
-              >
-                {formatShare(row.change, true)}
-              </td>
-              <td className={`${numericCellClass} sticky right-0 z-[1] bg-[var(--paper)] pr-0 text-[var(--muted)]`} style={cellPad}>
-                {endYear === undefined ? MISSING : formatShare(shareValueForYear(row, endYear))}
-              </td>
             </tr>
           ))}
           {showTotal && totalRow ? (
@@ -122,15 +99,6 @@ export function ExplorerTable({ caption, rows, totalRow, showTotal, years, first
                   {cellValue(totalRow, year)}
                 </td>
               ))}
-              <td
-                className={`${numericCellClass} sticky right-24 z-[1] bg-[var(--paper)] font-semibold shadow-[-1px_0_0_var(--hairline-soft)]`}
-                style={{ ...cellPad, color: changeColor(totalRow.change) }}
-              >
-                {formatShare(totalRow.change, true)}
-              </td>
-              <td className={`${numericCellClass} sticky right-0 z-[1] bg-[var(--paper)] pr-0 font-semibold text-[var(--ink)]`} style={cellPad}>
-                {endYear === undefined ? MISSING : formatShare(shareValueForYear(totalRow, endYear))}
-              </td>
             </tr>
           ) : null}
         </tbody>
