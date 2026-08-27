@@ -347,7 +347,7 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
   }
 });
 
-test("shared brand identity uses the full desktop lockup and compact mobile lockup", async ({ page }) => {
+test("shared brand identity uses the full desktop lockup and compact mobile lockup", async ({ page, request }) => {
   for (const viewport of [
     { width: 1440, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
     { width: 900, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
@@ -359,7 +359,12 @@ test("shared brand identity uses the full desktop lockup and compact mobile lock
     await page.goto(baseUrl);
     const logo = page.getByTestId("site-header-logo");
     await expect(logo).toBeVisible();
-    expect(await logo.evaluate((image: HTMLImageElement) => image.currentSrc)).toContain(viewport.asset);
+    const currentSrc = await logo.evaluate((image: HTMLImageElement) => image.currentSrc);
+    expect(currentSrc).toContain(viewport.asset);
+    const assetResponse = await request.get(currentSrc);
+    expect(assetResponse.status()).toBe(200);
+    expect(assetResponse.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
+    await expect.poll(() => logo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
     expect((await logo.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(viewport.minimumWidth);
     await expect(page.getByTestId("landing-header").getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true })).toHaveCount(1);
     await expect(logo).toHaveAttribute("alt", "");
