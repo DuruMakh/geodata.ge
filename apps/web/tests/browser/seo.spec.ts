@@ -164,7 +164,7 @@ test("agent instructions publish a plain-text guide with working public links", 
   expect(response.status()).toBe(200);
   expect(response.headers()["content-type"]?.toLowerCase()).toBe("text/plain; charset=utf-8");
 
-  const targets = [...(await response.text()).matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]+)\)/g)].map((match) => match[1]!);
+  const targets = [...(await response.text()).matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]!);
   expect(targets).not.toHaveLength(0);
 
   for (const target of targets) {
