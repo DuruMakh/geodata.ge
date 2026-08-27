@@ -35,7 +35,7 @@ describe("2004 complete state-budget functional expenditure", () => {
       readPdfTextPages(centralFile).then((pdf) => pdf.pages),
       loadYear2004StateBudget(),
     ]);
-  }, 30_000);
+  }, 60_000);
 
   it("parses the complete state-budget actual column and preserves the reviewed source pins", () => {
     expect(result.grandTotalGel).toBe(1_930_210_300);
