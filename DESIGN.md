@@ -346,7 +346,7 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 
 **Sidebar (expanded, ≥900px).** 232px, `ink` background, radius 0, sticky at `top: 0` with full viewport height so it holds while the long explorer page scrolls. Dividers on ink are `rgba(247,242,233,0.12)`; the active row background is `rgba(247,242,233,0.07)`.
 
-- Brand block → `/`: serif `Fiscal.ge` in `paper`, mono `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`.
+- Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
 - `ბიუჯეტი` — the active dataset: `2px accent` left border, active-row background, sans 12.5/600 in `paper`. Not a link; it is where you already are.
 - Its four sections nest beneath it (below).
@@ -360,7 +360,7 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 
 - The toggle stays in place at the top, glyph flipped to `»`.
 - Below it, the context line runs vertically down the rail: `მონაცემები · ბიუჯეტი`, mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
-- At the foot, an 8×8 `accent` square is the collapsed `← მთავარი` link, with a 26×26 hit area, `aria-label="მთავარი"`, and a `title` tooltip.
+- At the foot, an 8×8 `accent` square is the collapsed `← მთავარი` link, with a 26×26 hit area, `aria-label="მთავარი"`, and a `title` tooltip. The collapsed rail remains logo-free.
 - **Sections are not reachable while collapsed** — the list is unmounted, not hidden. A 52px rail cannot carry Georgian section names, and reducing them to invented initials would trade one extra click for three ambiguous glyphs. Collapse is a reading posture: it hands the width back to the data and keeps only orientation and escape.
 
 Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: reduce`. The choice persists in `localStorage` under `geodata:sidebar-collapsed`, read after mount; a storage denial falls back to expanded rather than breaking the render.
@@ -376,7 +376,7 @@ Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: redu
 
 The crumbs carry `BreadcrumbTrail`'s semantics, not its markup: a `<nav aria-label="Breadcrumb">` landmark, `aria-hidden` separators, and `aria-current="page"` on the final crumb. They deliberately do **not** reuse the component itself — `BreadcrumbTrail` renders its own `BreadcrumbJsonLd`, and these routes already emit one, so reusing it would ship two structured-data blocks per page. Marking the current page by colour alone, in a paragraph of spans, is what this replaced: on the site's largest set of routes the trail was not a landmark and read as a run-on string with the slashes announced.
 
-**Footer.** Every `/explorer` route renders `SiteFooter` (§19) at the foot of the content column — inside it, not beside the sidebar — with the pages' own horizontal padding so its rule lines up with the content above. These routes are the site's main SEO landing targets, and the footer is where the CC BY 4.0 licence, the contact address and the methodology link live (§21); without it ~85 pages ended with no licence, no way to report an error and no route to the methodology. `updatedAt` comes from the landing model, the same site-wide review date the methodology and about pages show.
+**Footer.** Every `/explorer` route renders `SiteFooter` (§19) at the foot of the content column — inside it, not beside the sidebar — with the pages' own horizontal padding so its rule lines up with the content above. The footer uses the compact lockup at approximately 150px; its trust, navigation, source/update, contact, and CC BY 4.0 licence content remains unchanged. These routes are the site's main SEO landing targets, and the footer is where the licence, contact address and methodology link live (§21); without it ~85 pages ended with no licence, no way to report an error and no route to the methodology. `updatedAt` comes from the landing model, the same site-wide review date the methodology and about pages show.
 
 **Budget hub (`/explorer`).** Breadcrumb, serif H1 `საქართველოს ბიუჯეტი`, the two-sentence lead `Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ ფაქტობრივ მონაცემებს. შეადარეთ წლები, სფეროები და მუნიციპალიტეტები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.`, then four cards in a 2×2 grid (one column below 768px, max-width 860px), then the standard source note (§7.10). Card anatomy, in order: mono index in accent with `→` right-aligned, serif 18px title, 11.5px `muted` description, graphic, mono 10px `faint` footer.
 
@@ -399,7 +399,9 @@ Specs below are contracts; visual proof lives in the reference files.
 
 The public-site header appears on the landing page (§19), the methodology hub, and every live dataset methodology route. Surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs. The landing and methodology surfaces use one shared component.
 
-Baseline-aligned row: serif brand left (`Fiscal.ge`), nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
+The brand link uses the reviewed full v2.0 horizontal lockup at 280px from 768px upward and the compact lockup below 768px. The full horizontal lockup must not render below 280px; the standalone mark must not render below 24px. The supplied token JSON's 180px lockup value is not authoritative for production.
+
+Vertically centered logo row: lockup left, nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
 
 ### 7.2a Mode Control
 
@@ -770,7 +772,9 @@ Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implem
 
 Section order is fixed: shared header → living-relief hero → country figures → expenditure → revenue → municipalities → methodology and first sources → retained footer.
 
-**Header and hero.** The header keeps `Fiscal.ge`, `მთავარი` as the active page, and `მონაცემები` → `/explorer`; its right slot shows the mono revenue year range and hides it on mobile. The living-relief map remains the full-bleed primary visual with its existing geometry, camera fitting, city behavior, reduced-motion still frame, accessible description, and WebGL fallback. Visible hero copy is exactly `საქართველოს მონაცემების პორტალი`, H1 `საქართველო ციფრებში`, and CTA `გაეცანი მონაცემებს` → `#data`. The figure is 330px below 768px, 500px from 768px, and `clamp(560px, 78vh, 820px)` from 1100px.
+**Header and hero.** The header uses the responsive lockups of §7.1, keeps `მთავარი` as the active page and `მონაცემები` → `/explorer`, and shows the mono revenue year range in its right slot above mobile. The living-relief map remains the full-bleed primary visual with its existing geometry, camera fitting, city behavior, reduced-motion still frame, accessible description, and WebGL fallback. The hero receives no additional logo. Visible hero copy is exactly `საქართველოს მონაცემების პორტალი`, H1 `საქართველო ციფრებში`, and CTA `გაეცანი მონაცემებს` → `#data`. The figure is 330px below 768px, 500px from 768px, and `clamp(560px, 78vh, 820px)` from 1100px.
+
+**Brand metadata.** Organization structured data uses the reviewed mark at `/fiscal-ge-logo.svg` with its intrinsic 520×650 dimensions. App Router owns `favicon.ico`, `icon.svg`, and `apple-icon.png`. The generated 1200×630 social image combines the horizontal lockup with the reversed mark; it is the site sharing image, not a hero asset.
 
 **Country figures.** Three maintained snapshots remain in one row: `მოსახლეობა` — `3.9 მლნ`, `2026 წლის 1 იანვარი · საქსტატი`; `ფართობი` — `69.7 ათ. კმ²`, `საქართველოს ტერიტორია`; `ეკონომიკის ზომა` — `104.6 მლრდ ₾`, `ნომინალური მშპ · 2025, წინასწარი`. A narrow mobile caption may shorten visually, but assistive technology retains the full caption.
 
@@ -784,7 +788,7 @@ The exact dataset contracts are:
 
 National sections apply actual-over-planned selection before deriving the latest year, applicable total, status, and descending top four; stable category ID breaks ties. Municipal latest year and denominator come from the reviewed `country.georgia` public-total fact, while the descending top four come from all eligible public municipality totals for that year; municipality code breaks ties. The municipal total is never the sum of the four displayed rows. All labels come from the reviewed glossary or municipality registry; amounts use `formatAmount` and shares use the one-decimal `formatShare` contract.
 
-**Methodology and footer.** The single fourth ledger section is index `04`, H2 `მეთოდოლოგია და პირველწყაროები`, the introduction `თითოეული რიცხვი უკავშირდება ოფიციალურ წყაროს, კლასიფიკაციის წესსა და გადამოწმების შედეგს.`, and four steps: official-document preservation; classification and transformation rule; reconciliation and quality check; downloadable data. `მეთოდოლოგიის ნახვა →` links to `/methodology`. The retained footer follows immediately with its contact, navigation, source/update, and CC BY 4.0 trust information.
+**Methodology and footer.** The single fourth ledger section is index `04`, H2 `მეთოდოლოგია და პირველწყაროები`, the introduction `თითოეული რიცხვი უკავშირდება ოფიციალურ წყაროს, კლასიფიკაციის წესსა და გადამოწმების შედეგს.`, and four steps: official-document preservation; classification and transformation rule; reconciliation and quality check; downloadable data. `მეთოდოლოგიის ნახვა →` links to `/methodology`. The retained footer follows immediately with its approximately 150px compact lockup and unchanged contact, navigation, source/update, and CC BY 4.0 trust information.
 
 **Responsive contract.** At ≥850px, each ledger reads index → copy → data in three columns and the three tables align. Below 850px, each ledger and the methodology section stack in DOM order; total and year remain on one row where space permits; the three country figures remain one compact row; tables stay inside their parent without horizontal scrolling. At ≤380px, side padding and type scale tighten, country-stat units become block-level, and a 320px viewport must have `scrollWidth === clientWidth`.
 

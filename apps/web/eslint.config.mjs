@@ -21,6 +21,13 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    files: ["app/opengraph-image.tsx"],
+    rules: {
+      // ImageResponse embeds reviewed SVG data URIs; next/image cannot render inside it.
+      "@next/next/no-img-element": "off",
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

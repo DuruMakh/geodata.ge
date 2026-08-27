@@ -8,7 +8,18 @@ export function SiteFooter({ updatedAt }: { updatedAt: string }) {
       <div data-testid="landing-footer">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-9">
           <div className="flex flex-col gap-2.5">
-            <span className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em]">Fiscal.ge</span>
+            <Link href="/" aria-label="Fiscal.ge — მთავარი" className="block w-[150px]">
+              {/* Local SVG brand asset; native img avoids adding a raster optimization path. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                data-testid="site-footer-logo"
+                src="/brand/fiscal-logo-compact.svg"
+                width="1080"
+                height="340"
+                alt=""
+                className="block h-auto w-full"
+              />
+            </Link>
             <p className="max-w-[260px] text-pretty text-[12.5px] leading-relaxed text-[var(--body)]">
               საქართველოს ბიუჯეტი — ნათლად, გადამოწმებულად, ღიად.
             </p>

@@ -337,7 +337,7 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
     await page.goto(baseUrl);
 
     const links = page.getByTestId("site-footer").getByRole("link");
-    expect(await links.count()).toBe(5);
+    expect(await links.count()).toBe(6);
     for (const link of await links.all()) {
       await expectMinimumTarget(link);
     }
@@ -345,4 +345,62 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
     await expectNonOverlappingTargets(links);
     await expectNoPageOverflow(page);
   }
+});
+
+test("shared brand identity uses the full desktop lockup and compact mobile lockup", async ({ page, request }) => {
+  for (const viewport of [
+    { width: 1440, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
+    { width: 900, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
+    { width: 768, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
+    { width: 767, height: 900, asset: "fiscal-logo-compact.svg", minimumWidth: 118 },
+    { width: 390, height: 844, asset: "fiscal-logo-compact.svg", minimumWidth: 118 },
+  ] as const) {
+    await page.setViewportSize(viewport);
+    await page.goto(baseUrl);
+    const logo = page.getByTestId("site-header-logo");
+    await expect(logo).toBeVisible();
+    const currentSrc = await logo.evaluate((image: HTMLImageElement) => image.currentSrc);
+    expect(currentSrc).toContain(viewport.asset);
+    const assetResponse = await request.get(currentSrc);
+    expect(assetResponse.status()).toBe(200);
+    expect(assetResponse.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
+    await expect.poll(() => logo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+    expect((await logo.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(viewport.minimumWidth);
+    await expect(page.getByTestId("landing-header").getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true })).toHaveCount(1);
+    await expect(logo).toHaveAttribute("alt", "");
+  }
+});
+
+test("active public-header underline touches the header rule across the logo breakpoint", async ({ page }) => {
+  for (const viewport of [
+    { width: 768, height: 900 },
+    { width: 767, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto(baseUrl);
+    const activeLink = page.getByTestId("landing-header").getByRole("link", { name: "მთავარი", exact: true });
+    const geometry = await activeLink.evaluate((link) => {
+      const header = link.closest("header")!;
+      const linkBox = link.getBoundingClientRect();
+      const headerBox = header.getBoundingClientRect();
+      const headerBorderWidth = Number.parseFloat(getComputedStyle(header).borderBottomWidth);
+      return {
+        headerRuleTop: headerBox.bottom - headerBorderWidth,
+        underlineBottom: linkBox.bottom,
+      };
+    });
+    expect(
+      Math.abs(geometry.headerRuleTop - geometry.underlineBottom),
+      `${viewport.width}px underline-to-rule gap`,
+    ).toBeLessThanOrEqual(0.5);
+  }
+});
+
+test("shared footer uses the compact logo without changing its trust content", async ({ page }) => {
+  await page.goto(baseUrl);
+  const footer = page.getByTestId("site-footer");
+  await expect(footer.getByTestId("site-footer-logo")).toHaveAttribute("src", "/brand/fiscal-logo-compact.svg");
+  await expect(footer.getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true })).toHaveCount(1);
+  await expect(footer).toContainText("info@fiscal.ge");
+  await expect(footer).toContainText("CC BY 4.0");
 });

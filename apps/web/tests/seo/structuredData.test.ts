@@ -31,8 +31,8 @@ describe("Fiscal.ge structured data", () => {
       logo: {
         "@type": "ImageObject",
         url: "https://fiscal.ge/fiscal-ge-logo.svg",
-        width: 512,
-        height: 512,
+        width: 520,
+        height: 650,
       },
     });
     expect(serializeJsonLd(graph)).not.toContain("sameAs");

@@ -1152,6 +1152,29 @@ test("exposes the explorer breadcrumb as a navigation landmark", async ({ page }
   await expect(trail.locator("span[aria-hidden='true']").first()).toHaveText("/");
 });
 
+test("Explorer branding uses the reversed mark without changing shell behavior", async ({ page, request }) => {
+  for (const viewport of [
+    { width: 1200, height: 900 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto("http://localhost:3100/explorer/expenditure");
+    const sidebar = page.getByTestId("data-sidebar");
+    const home = sidebar.getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true });
+    const mark = sidebar.getByTestId("sidebar-brand-mark");
+    await expect(home).toHaveCount(1);
+    await expect(mark).toHaveAttribute("src", "/brand/fiscal-logo-mark-reversed.svg");
+    await expect(mark).toHaveAttribute("alt", "");
+    const assetResponse = await request.get(await mark.evaluate((image: HTMLImageElement) => image.currentSrc));
+    expect(assetResponse.status()).toBe(200);
+    expect(assetResponse.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
+    await expect.poll(() => mark.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+    expect((await mark.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(24);
+    await expect(home).toContainText("Fiscal.ge");
+    await expect(home).toContainText("ღია მონაცემები");
+  }
+});
+
 test("sidebar collapses to a rail and remembers the choice", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
@@ -1170,6 +1193,8 @@ test("sidebar collapses to a rail and remembers the choice", async ({ page }) =>
   await expectSidebarWidth(page, 52);
   await expect(sidebar).toHaveAttribute("data-collapsed", "true");
   await expect(page.getByTestId("section-link-revenue")).toHaveCount(0);
+  await expect(page.getByTestId("sidebar-brand-mark")).toHaveCount(0);
+  await expect(sidebar.getByRole("link", { name: "მთავარი", exact: true })).toBeVisible();
   // The rail keeps orientation instead of the section list (spec §4.2).
   await expect(sidebar).toContainText("მონაცემები · ბიუჯეტი");
 

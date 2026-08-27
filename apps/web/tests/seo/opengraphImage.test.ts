@@ -2,10 +2,41 @@ import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import OpenGraphImage from "../../app/opengraph-image";
 
+function countPixelsNear(
+  data: Buffer,
+  channels: number,
+  target: readonly [number, number, number],
+  tolerance = 3,
+) {
+  let count = 0;
+  for (let offset = 0; offset < data.length; offset += channels) {
+    if (
+      Math.abs(data[offset] - target[0]) <= tolerance &&
+      Math.abs(data[offset + 1] - target[1]) <= tolerance &&
+      Math.abs(data[offset + 2] - target[2]) <= tolerance
+    ) count += 1;
+  }
+  return count;
+}
+
 describe("OpenGraphImage", () => {
   it("renders distinct Georgian glyph shapes instead of repeated missing-glyph boxes", async () => {
     const response = await OpenGraphImage();
     const png = Buffer.from(await response.arrayBuffer());
+    const fullImage = await sharp(png)
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const upperLockup = await sharp(png)
+      .extract({ left: 70, top: 35, width: 500, height: 180 })
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const lowerMark = await sharp(png)
+      .extract({ left: 65, top: 480, width: 140, height: 140 })
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
     const { data, info } = await sharp(png)
       .extract({ left: 82, top: 235, width: 940, height: 175 })
       .removeAlpha()
@@ -30,6 +61,17 @@ describe("OpenGraphImage", () => {
     }
 
     expect(response.headers.get("content-type")).toContain("image/png");
+    expect(fullImage.info.width).toBe(1200);
+    expect(fullImage.info.height).toBe(630);
+    expect(countPixelsNear(fullImage.data, fullImage.info.channels, [179, 64, 42])).toBeGreaterThan(500);
+    expect(countPixelsNear(fullImage.data, fullImage.info.channels, [31, 110, 86])).toBeGreaterThan(150);
+    expect(countPixelsNear(fullImage.data, fullImage.info.channels, [144, 104, 69])).toBeGreaterThan(100);
+    expect(countPixelsNear(upperLockup.data, upperLockup.info.channels, [179, 64, 42])).toBeGreaterThan(250);
+    expect(countPixelsNear(upperLockup.data, upperLockup.info.channels, [31, 110, 86])).toBeGreaterThan(150);
+    expect(countPixelsNear(upperLockup.data, upperLockup.info.channels, [144, 104, 69])).toBeGreaterThan(100);
+    expect(countPixelsNear(lowerMark.data, lowerMark.info.channels, [179, 64, 42])).toBeGreaterThan(500);
+    expect(countPixelsNear(lowerMark.data, lowerMark.info.channels, [31, 110, 86])).toBeGreaterThan(250);
+    expect(countPixelsNear(lowerMark.data, lowerMark.info.channels, [144, 104, 69])).toBeGreaterThan(150);
     expect(glyphWidths.length).toBeGreaterThan(10);
     expect(new Set(glyphWidths).size).toBeGreaterThanOrEqual(5);
   }, 20_000);

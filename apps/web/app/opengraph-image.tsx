@@ -9,9 +9,26 @@ export const contentType = "image/png";
 const notoSansGeorgian = readFile(
   join(process.cwd(), "assets/fonts/NotoSansGeorgian-Regular.ttf"),
 );
+const horizontalLogo = readFile(
+  join(process.cwd(), "public/brand/fiscal-logo-horizontal.svg"),
+  "utf8",
+);
+const reversedMark = readFile(
+  join(process.cwd(), "public/brand/fiscal-logo-mark-reversed.svg"),
+  "utf8",
+);
+
+function svgDataUri(svg: string) {
+  const renderableSvg = svg.replaceAll("ns0:", "").replace("xmlns:ns0=", "xmlns=");
+  return `data:image/svg+xml;base64,${Buffer.from(renderableSvg).toString("base64")}`;
+}
 
 export default async function OpenGraphImage() {
-  const fontData = await notoSansGeorgian;
+  const [fontData, horizontalLogoSvg, reversedMarkSvg] = await Promise.all([
+    notoSansGeorgian,
+    horizontalLogo,
+    reversedMark,
+  ]);
   return new ImageResponse(
     <div
       style={{
@@ -19,21 +36,56 @@ export default async function OpenGraphImage() {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
         background: "#F7F2E9",
         color: "#1E1B16",
-        padding: "72px 82px",
         borderTop: "16px solid #1E1B16",
         fontFamily: "Noto Sans Georgian",
       }}
     >
-      <div style={{ display: "flex", fontSize: 34, letterSpacing: "0.04em" }}>FISCAL.GE</div>
-      <div style={{ display: "flex", maxWidth: 940, fontSize: 72, lineHeight: 1.12 }}>
-        საქართველოს ბიუჯეტის მონაცემები
+      <div
+        style={{
+          width: "100%",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "40px 82px 42px",
+        }}
+      >
+        <img
+          alt=""
+          src={svgDataUri(horizontalLogoSvg)}
+          width={400}
+          height={136}
+          style={{ objectFit: "contain", objectPosition: "left center" }}
+        />
+        <div style={{ display: "flex", maxWidth: 940, fontSize: 72, lineHeight: 1.12 }}>
+          საქართველოს ბიუჯეტის მონაცემები
+        </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 28, color: "#55503F" }}>
+      <div
+        style={{
+          width: "100%",
+          height: 155,
+          display: "flex",
+          alignItems: "center",
+          gap: 30,
+          background: "#1E1B16",
+          color: "#F7F2E9",
+          padding: "24px 82px",
+        }}
+      >
+        <img
+          alt=""
+          src={svgDataUri(reversedMarkSvg)}
+          width={80}
+          height={100}
+          style={{ objectFit: "contain" }}
+        />
         <span style={{ width: 72, height: 8, background: "#B3402A" }} />
-        გადამოწმებული · მრავალწლიანი · ღია
+        <div style={{ display: "flex", fontSize: 28 }}>
+          გადამოწმებული · მრავალწლიანი · ღია
+        </div>
       </div>
     </div>,
     {

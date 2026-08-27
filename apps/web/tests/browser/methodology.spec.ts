@@ -21,7 +21,7 @@ test("public header keeps landing active and leaves methodology navigation inact
   await page.setViewportSize({ width: 1640, height: 900 });
   await page.goto("http://localhost:3100/");
   const landingHeader = page.getByTestId("landing-header");
-  await expect(landingHeader.getByRole("link", { name: "მთავარი" })).toHaveAttribute(
+  await expect(landingHeader.getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute(
     "aria-current",
     "page",
   );
@@ -38,7 +38,7 @@ test("public header keeps landing active and leaves methodology navigation inact
     await page.goto(`http://localhost:3100${path}`);
     const header = page.getByTestId(testId);
     await expect(header).toBeVisible();
-    await expect(header.getByRole("link", { name: "მთავარი" })).toHaveAttribute("href", "/");
+    await expect(header.getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute("href", "/");
     await expect(header.getByRole("link", { name: "მონაცემები", exact: true })).toHaveAttribute("href", "/explorer");
     await expect(header.locator("[aria-current]")).toHaveCount(0);
     await expect(header).toContainText("2004–2025");
