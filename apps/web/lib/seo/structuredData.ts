@@ -49,8 +49,8 @@ export function siteJsonLd(origin: string) {
         logo: {
           "@type": "ImageObject",
           url: `${origin}/fiscal-ge-logo.svg`,
-          width: 512,
-          height: 512,
+          width: 520,
+          height: 650,
         },
       },
       {

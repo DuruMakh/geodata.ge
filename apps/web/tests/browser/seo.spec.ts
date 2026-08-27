@@ -202,7 +202,7 @@ test("entity datasets use final URLs and omit unavailable workbook distributions
   await expect(page.getByTestId("explorer-dataset-json-ld")).toHaveCount(0);
 });
 
-test("site Organization schema publishes the square SVG logo without unverified graph claims", async ({ page, request }) => {
+test("site Organization schema publishes the reviewed SVG logo without unverified graph claims", async ({ page, request }) => {
   await page.goto(`${BASE_URL}/`);
   const raw = await page.getByTestId("site-json-ld").textContent() ?? "{}";
   const graph = JSON.parse(raw);
@@ -212,8 +212,8 @@ test("site Organization schema publishes the square SVG logo without unverified 
   expect(organization.logo).toEqual({
     "@type": "ImageObject",
     url: "https://fiscal.ge/fiscal-ge-logo.svg",
-    width: 512,
-    height: 512,
+    width: 520,
+    height: 650,
   });
   expect(raw).not.toContain("sameAs");
   expect(raw).not.toContain("SearchAction");
@@ -221,6 +221,20 @@ test("site Organization schema publishes the square SVG logo without unverified 
   const logo = await request.get(`${BASE_URL}/fiscal-ge-logo.svg`);
   expect(logo.status()).toBe(200);
   expect(logo.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
+});
+
+test("root metadata publishes the reviewed browser and Apple icons", async ({ page, request }) => {
+  await page.goto(`${BASE_URL}/`);
+  const iconHrefs = await page.locator('link[rel="icon"]').evaluateAll((links) =>
+    links.map((link) => (link as HTMLLinkElement).href),
+  );
+  const appleHref = await page.locator('link[rel="apple-touch-icon"]').getAttribute("href");
+  expect(iconHrefs.some((href) => href.includes("/icon.svg"))).toBe(true);
+  expect(appleHref).toContain("/apple-icon.png");
+
+  for (const href of [...iconHrefs, new URL(appleHref!, BASE_URL).href]) {
+    expect((await request.get(href)).ok()).toBe(true);
+  }
 });
 
 test("municipality navigation uses crawlable links", async ({ page }) => {
