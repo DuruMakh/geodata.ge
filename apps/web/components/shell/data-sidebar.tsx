@@ -107,10 +107,28 @@ export function DataSidebar() {
     >
       <div className="flex items-center justify-between gap-2.5">
         {railed ? null : (
-          <Link href="/" className="flex flex-col gap-0.5 no-underline">
-            <span className="font-[family-name:var(--font-display)] text-base font-bold text-[var(--paper)]">Fiscal.ge</span>
-            <span className="font-[family-name:var(--font-numeric)] text-[8.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]">
-              ღია მონაცემები
+          <Link
+            href="/"
+            aria-label="Fiscal.ge — მთავარი"
+            className="flex min-w-0 items-center gap-2.5 no-underline"
+          >
+            {/* Local SVG brand asset; native img avoids adding a raster optimization path. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              data-testid="sidebar-brand-mark"
+              src="/brand/fiscal-logo-mark-reversed.svg"
+              width="520"
+              height="650"
+              alt=""
+              className="h-auto w-[30px] flex-none"
+            />
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="font-[family-name:var(--font-display)] text-base font-bold text-[var(--paper)]">
+                Fiscal.ge
+              </span>
+              <span className="font-[family-name:var(--font-numeric)] text-[8.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]">
+                ღია მონაცემები
+              </span>
             </span>
           </Link>
         )}
