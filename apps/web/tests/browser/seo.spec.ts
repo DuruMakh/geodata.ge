@@ -158,6 +158,21 @@ test("only third-party methodology source originals send a noindex header", asyn
   expect(methodologyPage.headers()["x-robots-tag"]).toBeUndefined();
 });
 
+test("agent instructions publish a plain-text guide with working public links", async ({ request }) => {
+  const response = await request.get(`${BASE_URL}/llms.txt`);
+
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]?.toLowerCase()).toBe("text/plain; charset=utf-8");
+
+  const targets = [...(await response.text()).matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]+)\)/g)].map((match) => match[1]!);
+  expect(targets).not.toHaveLength(0);
+
+  for (const target of targets) {
+    const listedResponse = await request.get(`${BASE_URL}${new URL(target).pathname}`);
+    expect(listedResponse.status(), target).toBe(200);
+  }
+});
+
 test("breadcrumb links keep non-overlapping 24px mobile targets and keyboard focus", async ({ page }) => {
   test.setTimeout(90_000);
 
