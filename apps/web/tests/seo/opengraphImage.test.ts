@@ -27,6 +27,16 @@ describe("OpenGraphImage", () => {
       .removeAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
+    const upperLockup = await sharp(png)
+      .extract({ left: 70, top: 35, width: 500, height: 180 })
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const lowerMark = await sharp(png)
+      .extract({ left: 65, top: 480, width: 140, height: 140 })
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
     const { data, info } = await sharp(png)
       .extract({ left: 82, top: 235, width: 940, height: 175 })
       .removeAlpha()
@@ -56,6 +66,12 @@ describe("OpenGraphImage", () => {
     expect(countPixelsNear(fullImage.data, fullImage.info.channels, [179, 64, 42])).toBeGreaterThan(500);
     expect(countPixelsNear(fullImage.data, fullImage.info.channels, [31, 110, 86])).toBeGreaterThan(150);
     expect(countPixelsNear(fullImage.data, fullImage.info.channels, [144, 104, 69])).toBeGreaterThan(100);
+    expect(countPixelsNear(upperLockup.data, upperLockup.info.channels, [179, 64, 42])).toBeGreaterThan(250);
+    expect(countPixelsNear(upperLockup.data, upperLockup.info.channels, [31, 110, 86])).toBeGreaterThan(150);
+    expect(countPixelsNear(upperLockup.data, upperLockup.info.channels, [144, 104, 69])).toBeGreaterThan(100);
+    expect(countPixelsNear(lowerMark.data, lowerMark.info.channels, [179, 64, 42])).toBeGreaterThan(500);
+    expect(countPixelsNear(lowerMark.data, lowerMark.info.channels, [31, 110, 86])).toBeGreaterThan(250);
+    expect(countPixelsNear(lowerMark.data, lowerMark.info.channels, [144, 104, 69])).toBeGreaterThan(150);
     expect(glyphWidths.length).toBeGreaterThan(10);
     expect(new Set(glyphWidths).size).toBeGreaterThanOrEqual(5);
   }, 20_000);

@@ -223,7 +223,7 @@ test("site Organization schema publishes the reviewed SVG logo without unverifie
   expect(logo.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
 });
 
-test("root metadata publishes the reviewed browser and Apple icons", async ({ page, request }) => {
+test("root metadata publishes the reviewed browser and Apple icons", async ({ page }) => {
   await page.goto(`${BASE_URL}/`);
   const iconHrefs = await page.locator('link[rel="icon"]').evaluateAll((links) =>
     links.map((link) => (link as HTMLLinkElement).href),
@@ -232,8 +232,23 @@ test("root metadata publishes the reviewed browser and Apple icons", async ({ pa
   expect(iconHrefs.some((href) => href.includes("/icon.svg"))).toBe(true);
   expect(appleHref).toContain("/apple-icon.png");
 
-  for (const href of [...iconHrefs, new URL(appleHref!, BASE_URL).href]) {
-    expect((await request.get(href)).ok()).toBe(true);
+  const emittedHrefs = [...iconHrefs, new URL(appleHref!, BASE_URL).href];
+  for (const [pathname, expectedContentType] of [
+    ["/favicon.ico", "image/x-icon"],
+    ["/icon.svg", "image/svg+xml"],
+    ["/apple-icon.png", "image/png"],
+  ] as const) {
+    const href = emittedHrefs.find((candidate) => new URL(candidate).pathname === pathname);
+    expect(href, `${pathname} metadata link`).toBeDefined();
+    const response = await page.evaluate(async (url) => {
+      const result = await fetch(url, { cache: "no-store" });
+      return {
+        contentType: result.headers.get("content-type"),
+        ok: result.ok,
+      };
+    }, href!);
+    expect(response.ok).toBe(true);
+    expect(response.contentType).toBe(expectedContentType);
   }
 });
 

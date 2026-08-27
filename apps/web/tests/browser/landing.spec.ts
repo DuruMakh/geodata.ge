@@ -366,6 +366,31 @@ test("shared brand identity uses the full desktop lockup and compact mobile lock
   }
 });
 
+test("active public-header underline touches the header rule across the logo breakpoint", async ({ page }) => {
+  for (const viewport of [
+    { width: 768, height: 900 },
+    { width: 767, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto(baseUrl);
+    const activeLink = page.getByTestId("landing-header").getByRole("link", { name: "მთავარი", exact: true });
+    const geometry = await activeLink.evaluate((link) => {
+      const header = link.closest("header")!;
+      const linkBox = link.getBoundingClientRect();
+      const headerBox = header.getBoundingClientRect();
+      const headerBorderWidth = Number.parseFloat(getComputedStyle(header).borderBottomWidth);
+      return {
+        headerRuleTop: headerBox.bottom - headerBorderWidth,
+        underlineBottom: linkBox.bottom,
+      };
+    });
+    expect(
+      Math.abs(geometry.headerRuleTop - geometry.underlineBottom),
+      `${viewport.width}px underline-to-rule gap`,
+    ).toBeLessThanOrEqual(0.5);
+  }
+});
+
 test("shared footer uses the compact logo without changing its trust content", async ({ page }) => {
   await page.goto(baseUrl);
   const footer = page.getByTestId("site-footer");
