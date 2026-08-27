@@ -1,9 +1,22 @@
+import localFont from "next/font/local";
 import Link from "next/link";
 import type { LandingModel } from "../../lib/landing/landingData";
 import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
 import { HeroReliefLazy } from "./hero-relief-lazy";
 import { LandingDatasetSection } from "./landing-dataset-section";
+
+// Hero display face, used by the landing H1 alone. Declared here rather than in
+// the root layout so only this route preloads it. The Mkhedruli codepoints carry
+// Mtavruli glyphs, so the heading renders as caps while the DOM text — and with
+// it search indexing and screen readers — stays Mkhedruli.
+const heroDisplay = localFont({
+  src: "../../assets/fonts/EurostileGEOMt-Demi.ttf",
+  weight: "600",
+  style: "normal",
+  display: "swap",
+  fallback: ["Noto Serif Georgian", "serif"],
+});
 
 // Country snapshots are maintained by hand; every budget value below them is
 // derived from the same active facts as the matching explorer.
@@ -61,7 +74,9 @@ export function LandingPage({ model }: { model: LandingModel }) {
             <p className="text-[10px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[11px]">
               საქართველოს მონაცემების პორტალი
             </p>
-            <h1 className="mt-2.5 text-pretty font-[family-name:var(--font-display)] text-[33px] font-semibold leading-[1.12] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-[30px] min-[1100px]:text-[40px]">
+            <h1
+              className={`mt-2.5 text-pretty text-[33px] font-semibold leading-[1.12] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-[30px] min-[1100px]:text-[40px] ${heroDisplay.className}`}
+            >
               საქართველო ციფრებში
             </h1>
             <div className="mt-3.5 min-[768px]:pointer-events-auto min-[768px]:mt-5">
