@@ -51,7 +51,7 @@ Only reviewed delivery assets from Brand Kit v2.0 enter the application. Editabl
 | Apple touch icon | `apple-touch-icon-180.png` | App Router Apple icon |
 | Social image | horizontal SVG plus reversed mark | Embedded into the generated Open Graph image |
 
-The implementation should keep assets under a clearly named public brand directory, except files that use Next.js metadata conventions inside `app/`. The existing stable `/fiscal-ge-logo.svg` URL remains available for Organization JSON-LD and is replaced with the reviewed square v2.0 mark rather than renamed.
+The implementation should keep assets under a clearly named public brand directory, except files that use Next.js metadata conventions inside `app/`. The existing stable `/fiscal-ge-logo.svg` URL remains available for Organization JSON-LD and is replaced with the reviewed standalone v2.0 mark rather than renamed.
 
 ## 5. Surface Design
 
