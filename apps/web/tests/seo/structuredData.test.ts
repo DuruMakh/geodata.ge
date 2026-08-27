@@ -37,12 +37,12 @@ describe("Fiscal.ge structured data", () => {
         width: 520,
         height: 650,
       },
-      contactPoint: {
-        "@type": "ContactPoint",
-        email: "info@fiscal.ge",
-        contactType: "general inquiries",
-        availableLanguage: "ka",
-      },
+    });
+    expect(organization.contactPoint).toEqual({
+      "@type": "ContactPoint",
+      email: "info@fiscal.ge",
+      contactType: "general inquiries",
+      availableLanguage: "ka",
     });
     expect(organization).not.toHaveProperty("address");
     expect(organization).not.toHaveProperty("telephone");

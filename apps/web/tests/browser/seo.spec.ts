@@ -287,18 +287,22 @@ test("raw homepage response retains meaningful content, heading order, and core 
   const response = await request.get(`${BASE_URL}/`);
   expect(response.ok()).toBe(true);
   const html = await response.text();
-  const meaningfulText = html
+  const serverHtml = html
     .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ");
+  const meaningfulText = serverHtml
     .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
   const headingSequence = [...html.matchAll(/<h([1-6])(?:\s[^>]*)?>/gi)].map((match) => `H${match[1]}`);
+  const serverLinkHrefs = [...serverHtml.matchAll(/<a\b[^>]*\bhref=(["'])(.*?)\1[^>]*>/gi)].map(
+    (match) => match[2],
+  );
 
   expect(meaningfulText.length).toBeGreaterThan(500);
   expect(headingSequence).toEqual(["H1", "H2", "H2", "H2", "H2"]);
-  expect(html).toContain('href="/explorer"');
-  expect(html).toContain('href="/methodology"');
+  expect(serverLinkHrefs).toContain("/explorer");
+  expect(serverLinkHrefs).toContain("/methodology");
 });
 
 test("root metadata publishes the reviewed browser and Apple icons", async ({ page }) => {
