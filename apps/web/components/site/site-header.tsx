@@ -8,7 +8,7 @@ type SiteHeaderProps = {
 
 function navLinkClass(isActive: boolean) {
   return isActive
-    ? "flex h-full items-center border-b-2 border-[var(--accent)] pb-3.5 text-[13px] font-semibold text-[var(--ink)]"
+    ? "relative flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-semibold text-[var(--ink)] after:absolute after:bottom-2 after:left-0 after:right-0 after:h-0.5 after:bg-[var(--accent)]"
     : "flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-medium text-[var(--muted)] transition-colors duration-150 hover:text-[var(--ink)]";
 }
 
@@ -21,7 +21,7 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
       <Link
         href="/"
         aria-label="Fiscal.ge — მთავარი"
-        className="mb-3.5 block aspect-[1080/340] w-[118px] flex-none min-[768px]:aspect-[1600/545] min-[768px]:w-[280px]"
+        className="mb-3.5 block aspect-[1080/340] w-[118px] flex-none min-[768px]:mb-1 min-[768px]:aspect-[1600/400] min-[768px]:w-[280px]"
       >
         <picture>
           <source media="(max-width: 767px)" srcSet="/brand/fiscal-logo-compact.svg" />
@@ -31,7 +31,7 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
             width="1600"
             height="545"
             alt=""
-            className="block h-full w-full object-contain"
+            className="block h-full w-full object-contain min-[768px]:object-cover"
           />
         </picture>
       </Link>
