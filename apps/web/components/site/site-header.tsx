@@ -16,11 +16,25 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
   return (
     <header
       data-testid={testId}
-      className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2 border-b-2 border-[var(--ink)] pb-3.5 min-[768px]:gap-5"
+      className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b-2 border-[var(--ink)] pb-3.5 min-[768px]:gap-5"
     >
-      <span className="font-[family-name:var(--font-display)] text-lg font-bold tracking-[-0.01em]">
-        Fiscal.ge
-      </span>
+      <Link
+        href="/"
+        aria-label="Fiscal.ge — მთავარი"
+        className="block aspect-[1080/340] w-[118px] flex-none min-[768px]:aspect-[1600/545] min-[768px]:w-[280px]"
+      >
+        <picture>
+          <source media="(max-width: 767px)" srcSet="/brand/fiscal-logo-compact.svg" />
+          <img
+            data-testid="site-header-logo"
+            src="/brand/fiscal-logo-horizontal.svg"
+            width="1600"
+            height="545"
+            alt=""
+            className="block h-full w-full object-contain"
+          />
+        </picture>
+      </Link>
       <nav aria-label="ნავიგაცია" className="flex gap-4 min-[768px]:gap-[26px]">
         <Link
           href="/"
