@@ -107,7 +107,9 @@ export function DataSidebar() {
     >
       <div className="flex items-center justify-between gap-2.5">
         {railed ? null : (
-          <Link
+          // Reload across the Explorer/public layout boundary so stale route metadata cannot remain in <head>.
+          // eslint-disable-next-line @next/next/no-html-link-for-pages
+          <a
             href="/"
             aria-label="Fiscal.ge — მთავარი"
             className="flex min-w-0 items-center gap-2.5 no-underline"
@@ -130,7 +132,7 @@ export function DataSidebar() {
                 ღია მონაცემები
               </span>
             </span>
-          </Link>
+          </a>
         )}
         <button
           ref={toggleRef}
