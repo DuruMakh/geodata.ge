@@ -173,6 +173,51 @@ test("agent instructions publish a plain-text guide with working public links", 
   }
 });
 
+test("404 recovery keeps a real not-found response with useful, accessible destinations", async ({ page, request }) => {
+  const path = "/this-route-does-not-exist";
+  const response = await request.get(`${BASE_URL}${path}`);
+  const html = await response.text();
+
+  expect(response.status()).toBe(404);
+  expect(response.headers()["content-type"]?.toLowerCase()).toContain("text/html");
+  for (const href of ["/", "/explorer", "/methodology", "/sitemap.xml", "/llms.txt"]) {
+    expect(html).toContain(`href=\"${href}\"`);
+  }
+
+  const consoleIssues: string[] = [];
+  const pageErrors: string[] = [];
+  page.on("console", (message) => {
+    const isExpectedNotFoundStatus = message.text() === "Failed to load resource: the server responded with a status of 404 (Not Found)";
+    if ((message.type() === "warning" || message.type() === "error") && !isExpectedNotFoundStatus) {
+      consoleIssues.push(message.text());
+    }
+  });
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  for (const viewport of [
+    { width: 1366, height: 768 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const navigation = await page.goto(`${BASE_URL}${path}`);
+
+    expect(navigation?.status()).toBe(404);
+    await expect(page.getByRole("heading", { level: 1, name: "გვერდი ვერ მოიძებნა" })).toHaveCount(1);
+    const recovery = page.getByTestId("not-found-recovery");
+    await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
+    const links = recovery.getByRole("link");
+    await expect(links).toHaveCount(5);
+    for (const href of ["/", "/explorer", "/methodology", "/sitemap.xml", "/llms.txt"]) {
+      await expect(recovery.locator(`[href=\"${href}\"]`)).toHaveCount(1);
+    }
+    await expectNoPageOverflow(page);
+    await expectKeyboardFocusOrder(page, links);
+  }
+
+  expect(consoleIssues).toEqual([]);
+  expect(pageErrors).toEqual([]);
+});
+
 test("breadcrumb links keep non-overlapping 24px mobile targets and keyboard focus", async ({ page }) => {
   test.setTimeout(90_000);
 
