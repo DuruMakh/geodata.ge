@@ -44,6 +44,12 @@ export function siteJsonLd(origin: string) {
         name: "Fiscal.ge",
         url: origin,
         email: "info@fiscal.ge",
+        contactPoint: {
+          "@type": "ContactPoint",
+          email: "info@fiscal.ge",
+          contactType: "general inquiries",
+          availableLanguage: "ka",
+        },
         description:
           "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად აქვეყნებს.",
         logo: {

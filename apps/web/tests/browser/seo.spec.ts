@@ -283,6 +283,24 @@ test("site Organization schema publishes the reviewed SVG logo without unverifie
   expect(logo.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
 });
 
+test("raw homepage response retains meaningful content, heading order, and core links", async ({ request }) => {
+  const response = await request.get(`${BASE_URL}/`);
+  expect(response.ok()).toBe(true);
+  const html = await response.text();
+  const meaningfulText = html
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const headingSequence = [...html.matchAll(/<h([1-6])(?:\s[^>]*)?>/gi)].map((match) => `H${match[1]}`);
+
+  expect(meaningfulText.length).toBeGreaterThan(500);
+  expect(headingSequence).toEqual(["H1", "H2", "H2", "H2", "H2"]);
+  expect(html).toContain('href="/explorer"');
+  expect(html).toContain('href="/methodology"');
+});
+
 test("root metadata publishes the reviewed browser and Apple icons", async ({ page }) => {
   await page.goto(`${BASE_URL}/`);
   const iconHrefs = await page.locator('link[rel="icon"]').evaluateAll((links) =>
