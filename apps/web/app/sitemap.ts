@@ -1,13 +1,28 @@
 import type { MetadataRoute } from "next";
 import { loadServedLandingData, loadServedMunicipalData } from "../lib/data/servedData";
+import { ADJARA_REGION_ID } from "../lib/data/municipal/types";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../lib/methodology/catalog";
+import {
+  aggregateFactsForEntity,
+  applyAdjaraBudgetAdjustment,
+  latestReviewedAtForMunicipalFacts,
+  regionFactsFor,
+} from "../lib/explorer/municipalData";
 import { MUNICIPALITY_ROUTES } from "../lib/explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../lib/siteUrl";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
   const { sourceDocuments } = await loadServedLandingData();
-  const { regions } = await loadServedMunicipalData();
+  const {
+    regions,
+    municipalities,
+    functionFacts,
+    totalFacts,
+    countryFunctionFacts,
+    countryTotalFacts,
+    adjaraBudgetAdjustments,
+  } = await loadServedMunicipalData();
   const lastReviewedAt = sourceDocuments
     .map((source) => source.lastReviewedAt)
     .sort()
@@ -19,6 +34,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .sort()
     .at(-1);
 
+  // lastmod is per-URL, and a municipal entity's facts are usually older than the
+  // newest document on the site. Stamping the site-wide maximum on all of them
+  // reports every entity as changed on every import, so each municipal route
+  // derives its own date the same way its page derives the "განახლდა" it renders.
+  const reviewedAt = (
+    entityFunctionFacts: typeof functionFacts,
+    entityTotalFacts: typeof totalFacts,
+  ): Date | undefined => {
+    const reviewed = latestReviewedAtForMunicipalFacts(
+      sourceDocuments,
+      entityFunctionFacts,
+      entityTotalFacts,
+    );
+    return reviewed ? new Date(reviewed) : undefined;
+  };
+
   return [
     { url: `${siteUrl}/`, lastModified },
     { url: `${siteUrl}/about`, lastModified },
@@ -26,8 +57,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
     { url: `${siteUrl}/explorer/revenue`, lastModified },
     { url: `${siteUrl}/explorer/analysis`, lastModified },
-    { url: `${siteUrl}/explorer/municipalities`, lastModified },
-    { url: `${siteUrl}/explorer/municipalities/georgia`, lastModified },
+    {
+      url: `${siteUrl}/explorer/municipalities`,
+      lastModified: reviewedAt(functionFacts, [...totalFacts, ...countryTotalFacts]),
+    },
+    {
+      url: `${siteUrl}/explorer/municipalities/georgia`,
+      lastModified: reviewedAt(countryFunctionFacts, countryTotalFacts),
+    },
     {
       url: `${siteUrl}/methodology`,
       lastModified: methodologyLastModified ? new Date(methodologyLastModified) : undefined,
@@ -39,16 +76,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // The 64 municipality pages and 11 region roll-ups are complete, closed
     // sets. Municipality public identities are stable slugs; numeric codes
     // remain source-data identities only.
-    ...MUNICIPALITY_ROUTES.map(({ slug }) => ({
+    ...MUNICIPALITY_ROUTES.map(({ code, slug }) => ({
       url: `${siteUrl}/explorer/municipalities/${slug}`,
-      lastModified,
+      lastModified: reviewedAt(
+        functionFacts.filter((row) => row.municipalityCode === code),
+        totalFacts.filter((row) => row.municipalityCode === code),
+      ),
     })),
-    ...regions.map((region) => ({
-      // Region ids carry a "region." prefix (e.g. "region.tbilisi"); the route
-      // strips it, the same way .../region/[id]/page.tsx's own
-      // generateStaticParams and prev/next hrefs already do.
-      url: `${siteUrl}/explorer/municipalities/region/${region.id.replace("region.", "")}`,
-      lastModified,
-    })),
+    ...regions.map((region) => {
+      const members = regionFactsFor(region.id, municipalities, functionFacts, totalFacts);
+      const rolled = aggregateFactsForEntity(region.id, members.functionFacts, members.totalFacts);
+      // Adjara's roll-up folds in the republic budget, which is reviewed later than
+      // any member municipality, so the raw member facts alone would date it too early.
+      const ownTotalFacts =
+        region.id === ADJARA_REGION_ID
+          ? applyAdjaraBudgetAdjustment(rolled.totalFacts, adjaraBudgetAdjustments)
+          : rolled.totalFacts;
+      return {
+        // Region ids carry a "region." prefix (e.g. "region.tbilisi"); the route
+        // strips it, the same way .../region/[id]/page.tsx's own
+        // generateStaticParams and prev/next hrefs already do.
+        url: `${siteUrl}/explorer/municipalities/region/${region.id.replace("region.", "")}`,
+        lastModified: reviewedAt(members.functionFacts, ownTotalFacts),
+      };
+    }),
   ];
 }
