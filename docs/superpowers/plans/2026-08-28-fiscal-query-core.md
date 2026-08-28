@@ -198,7 +198,12 @@ export type FactQuerySnapshot = {
   releaseCommit: string;
   generatedAt: string;
   national: { facts: ServedBudgetFact[]; items: BudgetItemMeta[] };
-  ministries: { facts: ServedAdminFact[]; categories: AdminSpendingCategory[] };
+  ministries: {
+    facts: ServedAdminFact[];
+    categories: AdminSpendingCategory[];
+    /** Series with an approved join, from PROGRAM_SUCCESSIONS and LEGACY_PROGRAM_JOINS. */
+    historicalJoinSeriesIds: string[];
+  };
   municipal: {
     functions: MunicipalFunction[];
     regions: MunicipalRegion[];
@@ -428,10 +433,33 @@ Expected: FAIL — cannot resolve `buildSnapshot`.
 // purity.test.ts excludes this file for exactly that reason.
 import { loadServedExplorerData, loadServedMunicipalData } from "../data/servedData";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
+import { PROGRAM_SUCCESSIONS } from "../data/adminSpending/programSuccessions";
+import { LEGACY_PROGRAM_JOINS } from "../data/adminSpending/legacyProgramJoins";
 import { hashDataVersion } from "./canonical";
 import { SCHEMA_VERSION, type BudgetItemMeta, type FactQuerySnapshot } from "./types";
 
 export type BuildSnapshotOptions = { releaseCommit: string; generatedAt: string };
+
+/**
+ * Item ids of the series that carry an approved historical join. Both
+ * PROGRAM_SUCCESSIONS and LEGACY_PROGRAM_JOINS key on `targetCode`, which is a
+ * tavi-VI program CODE, not an item id. Resolve codes to ids through the served
+ * facts' officialCode rather than by string-building an id.
+ */
+function joinedSeriesIds(adminFacts: ServedAdminFact[]): string[] {
+  const joinedCodes = new Set([
+    ...PROGRAM_SUCCESSIONS.map((entry) => entry.targetCode),
+    ...LEGACY_PROGRAM_JOINS.map((entry) => entry.targetCode),
+  ]);
+
+  const ids = new Set<string>();
+  for (const fact of adminFacts) {
+    if (fact.level !== "major_program") continue;
+    const code = officialCodeOf(fact);
+    if (code !== null && joinedCodes.has(code)) ids.add(fact.itemId);
+  }
+  return [...ids].sort();
+}
 
 export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Promise<FactQuerySnapshot> {
   const [explorer, municipal] = await Promise.all([loadServedExplorerData(), loadServedMunicipalData()]);
@@ -450,7 +478,11 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
   const content = {
     schemaVersion: SCHEMA_VERSION,
     national: { facts: explorer.facts, items },
-    ministries: { facts: explorer.adminFacts, categories: explorer.adminCategories },
+    ministries: {
+      facts: explorer.adminFacts,
+      categories: explorer.adminCategories,
+      historicalJoinSeriesIds: joinedSeriesIds(explorer.adminFacts),
+    },
     municipal: {
       functions: municipal.functions,
       regions: municipal.regions,
@@ -476,7 +508,22 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
 }
 ```
 
-If `GlossaryEntry` has no `sortOrder`, drop the `?? 0` and read the field the type actually exposes — run `npm run typecheck` to confirm.
+Two things to resolve while implementing, both by reading the code rather than guessing:
+
+1. If `GlossaryEntry` has no `sortOrder`, drop the `?? 0` and read the field the type actually exposes.
+2. `ServedAdminFact` (`lib/servedRows.ts`) does **not** expose `officialCode` — only `officialLabelKa` and `officialInstitutionLabelKa`. Find how `lib/data/adminSpending/generateAdminSpendingFacts.ts` maps a `targetCode` to an `itemId` and reuse that mapping in `joinedSeriesIds`, replacing the `officialCodeOf(fact)` placeholder. Then assert the result is non-empty and every entry appears in the served facts:
+
+```ts
+it("resolves historical join series to real served item ids", async () => {
+  const snapshot = await buildFactQuerySnapshot(OPTIONS);
+  const served = new Set(snapshot.ministries.facts.map((f) => f.itemId));
+
+  expect(snapshot.ministries.historicalJoinSeriesIds.length).toBeGreaterThan(0);
+  for (const id of snapshot.ministries.historicalJoinSeriesIds) expect(served.has(id)).toBe(true);
+});
+```
+
+If no mapping exists, report BLOCKED rather than inventing one — `program_historical_join` firing on the wrong series is worse than not firing.
 
 - [ ] **Step 4: Run to verify pass**
 
@@ -1106,6 +1153,8 @@ export type CaveatContext = {
   municipalTotalInputs: MunicipalTotalFact[];
   gdpInputs: ServedNationalGdpFact[];
   comparison: { fromYear: number; toYear: number; fromDefinition: string; toDefinition: string } | null;
+  /** Series carrying an approved succession or legacy join. Only these get program_historical_join. */
+  historicalJoinSeriesIds: string[];
 };
 
 export type CaveatRule = {
@@ -1837,8 +1886,8 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
     messageKa: "მწკრივი იყენებს დამტკიცებულ ისტორიულ გაერთიანებას; შენარჩუნებულია მისი მოცულობა და ორიგინალი დასახელება.",
     messageEn: "The series uses an approved historical succession join; its scope and original label are preserved.",
     methodologyRef: "ministries-drilldown-programs-methodology.md",
-    applies: (c) => c.datasetId === "ministries" && c.years.some((year) => year < 2012),
-    affects: (c) => c.seriesIds,
+    applies: (c) => c.seriesIds.some((id) => c.historicalJoinSeriesIds.includes(id)),
+    affects: (c) => c.seriesIds.filter((id) => c.historicalJoinSeriesIds.includes(id)),
   },
   {
     code: "non_positive_comparison_base",
@@ -1955,6 +2004,16 @@ describe("query core agrees with the served facts", () => {
         expect(returned.get(`${fact.itemId}:${fact.year}`)).toBe(fact.amountGel);
       }
     }
+  });
+
+  it("matches the explorer model for every supported calculated total", () => {
+    // Spec 14.2 requires agreement with the EXPLORER MODEL, not only the raw facts.
+    // Build the same model the explorer route builds (buildExplorerModel from
+    // ../../lib/explorer/explorerData) and assert queryNational's revenue.total and
+    // expenditure.total equal that model's totalRow value for every year in coverage.
+    // A mismatch means the AI and the chart would disagree: investigate the core,
+    // never relax the assertion.
+    expect.hasAssertions();
   });
 
   it("computes revenue.total as the sum of its non-overlapping components", () => {
