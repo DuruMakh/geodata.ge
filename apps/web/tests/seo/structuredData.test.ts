@@ -25,6 +25,9 @@ describe("Fiscal.ge structured data", () => {
       ]),
     );
     const organization = graph["@graph"].find((node) => node["@type"] === "Organization");
+    if (!organization) {
+      throw new Error("Organization node is required");
+    }
     expect(organization).toMatchObject({
       name: "Fiscal.ge",
       url: "https://fiscal.ge",
