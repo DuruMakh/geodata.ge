@@ -28,7 +28,7 @@ Every claim below was verified against the working tree at `3a1d86876`.
 | Basis coverage | Every served row is `actual` — 527 budget, 286 expenditure, 852 admin, all `basis=actual` | The planned/actual precedence rule is latent, not live. The envelope must still carry `basis`, because the CSV contract permits `planned` rows. |
 | Aggregate IDs in taxonomy | `revenue.taxes_total` exists in `data/taxonomy/revenue-categories.json` but appears in zero fact rows | A consumer that enumerates taxonomy IDs and sums them would double-count. `describeCoverage` must distinguish served IDs from taxonomy IDs. |
 | Municipal reconciliation flags | 46 rows carry `show_warning`; `warning_type` distribution is `financing_outside_functional` 21, `source_version_difference` 24, `source_actual_missing` 1, `none` 658 | A structured caveat channel already exists in the data and must be surfaced, not dropped. |
-| English label coverage | `enLabel` present in `revenue-categories.json`, `spending-fields.json`, `admin-spending-categories.json`, and `data/glossary/category-glossary.csv`. Absent from `municipal-functions.json`, `municipal-regions.json`, and `municipalities.csv` | Bilingual output is roughly 85 strings away from complete: 10 functions, 11 regions, 64 municipality names. |
+| English label coverage | `enLabel` present in `revenue-categories.json`, `spending-fields.json`, `admin-spending-categories.json`, and `data/glossary/category-glossary.csv`. Absent from `municipal-functions.json`, `municipal-regions.json`, and `municipalities.csv`. The Prisma models `MunicipalFunctionCategory`, `MunicipalRegion`, and `Municipality` carry no English field at all | The 85 strings themselves (10 functions, 11 regions, 64 municipality names) are the small part. Because the database is a mirror of the taxonomy files under a parity check, adding them is a pipeline change: taxonomy files, Prisma schema, a migration, the import mapper, `servedDataParity` canonicalisation, and the file-validation schema. Treat it as a bounded work item, not a text edit. |
 | Served-data contract | `apps/web/lib/servedRows.ts` is the zero-import browser contract; `apps/web/lib/data/servedData.ts` exposes `loadServedLandingData()`, `loadServedExplorerData()`, `loadServedMunicipalData()` over a `csv \| db` source with parity checks | The query core builds directly on these loaders. The AI and the explorer charts therefore read identical rows by construction, not by convention. |
 | Runtime posture | No API routes exist; the site builds and deploys fully static | `/mcp` introduces the first server-side runtime. Static explorer routes are unaffected. |
 | Downloads robots policy | `apps/web/next.config.ts` sets `X-Robots-Tag: noindex, follow` on `/downloads/methodology/:dataset/files/:path*` | Correct for the raw methodology archive; wrong for grounding dumps, which must be discoverable. Dumps need a separate indexable path. |
@@ -220,9 +220,11 @@ No provider SDK is imported anywhere in this spec's surface. `lib/factQuery/` co
 
 Spec 1 is independently shippable and carries no inference cost. Sequence within it:
 
-1. `lib/factQuery/` — envelope, six functions, caveat engine, with tests.
-2. Municipal English labels and the evaluation fixture.
+1. `lib/factQuery/` — envelope, six functions, caveat engine, with tests. Georgian-only labels at this stage; the envelope's `labelEn` falls back to `labelKa` for municipal entities until step 2 lands.
+2. Municipal English labels — the pipeline change described in §2.1, delivered as its own reviewable unit because it touches the Prisma schema and the parity check. Then the evaluation fixture.
 3. `/mcp`, then `/llms.txt` and bulk dumps.
 4. Documentation and scope amendments in the same change as the code they describe.
+
+Step 2 is the only part of this spec that touches the data pipeline, and it is separable: if it proves larger than expected, steps 1, 3, and 4 still ship as a Georgian-first grounding layer with English available for all national and ministries data.
 
 Spec 2 (the on-platform assistant) is brainstormed separately after `/mcp` query logs exist, so that its UI placement and question-handling are designed against observed questions rather than predicted ones.
