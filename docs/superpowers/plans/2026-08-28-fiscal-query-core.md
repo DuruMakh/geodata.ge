@@ -356,6 +356,14 @@ export function hashDataVersion(payload: unknown): string {
 
 `node:crypto` is not in the forbidden list in Task 1 — it is pure computation, not IO.
 
+**Shipped implementation differs from the block above and is authoritative.** Review found two
+collisions in it that broke the digest's core contract: `NaN`/`Infinity`/`-Infinity`/`undefined`
+all canonicalized to `"null"`, and `Map`/`Set`/`Date` all collapsed to `"{}"` because their
+contents live in internal slots that `Object.entries` cannot see. `canonicalize` now **throws**
+on any value it cannot represent faithfully, and a shared `isPlainObject` predicate gates both
+`canonicalize` and `hashDataVersion`'s volatile-key stripping so a top-level `Map` cannot slip
+past. Read `apps/web/lib/factQuery/canonical.ts` for the current code.
+
 - [ ] **Step 4: Run to verify pass**
 
 Run: `npm run test -- tests/factQuery/canonical.test.ts`
