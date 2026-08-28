@@ -59,4 +59,4 @@ Local checks cannot establish Search Console indexing or external brand knowledg
 
 ## Remaining local artifact boundary
 
-`apps/web/.playwright-cli/` remains task-owned untracked output containing eight screenshots/logs from the prior visual inspection. Its absolute path was resolved under this checkout's `apps/web` directory, but the desktop execution safety layer rejected the requested native PowerShell removal command; it is not part of this commit.
+The eight task-owned screenshots/logs from `apps/web/.playwright-cli/` were moved out of this worktree after exact source-path validation. They remain recoverable at `C:\Users\Mylaptop\AppData\Local\Temp\fiscal-agent-readiness-playwright-cli-backup`; the source directory no longer exists and was not part of either documentation commit.
