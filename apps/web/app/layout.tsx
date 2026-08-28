@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Sans_Georgian, Noto_Serif_Georgian } from "next/font/google";
 import { JsonLd } from "../components/seo/json-ld";
+import { SiteAnalytics } from "../components/site/site-analytics";
 import { resolveSiteUrl } from "../lib/siteUrl";
 import { siteJsonLd } from "../lib/seo/structuredData";
 import "./globals.css";
@@ -47,6 +48,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <JsonLd data={siteJsonLd(resolveSiteUrl())} testId="site-json-ld" />
         {children}
+        <SiteAnalytics />
       </body>
     </html>
   );
