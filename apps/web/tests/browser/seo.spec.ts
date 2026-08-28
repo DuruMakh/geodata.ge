@@ -177,6 +177,12 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
   const path = "/this-route-does-not-exist";
   const response = await request.get(`${BASE_URL}${path}`);
   const html = await response.text();
+  const rscPrefetchRequests: string[] = [];
+
+  page.on("request", (pageRequest) => {
+    const url = new URL(pageRequest.url());
+    if (url.searchParams.has("_rsc")) rscPrefetchRequests.push(url.pathname);
+  });
 
   expect(response.status()).toBe(404);
   expect(response.headers()["content-type"]?.toLowerCase()).toContain("text/html");
@@ -202,6 +208,7 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
     const navigation = await page.goto(`${BASE_URL}${path}`);
 
     expect(navigation?.status()).toBe(404);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await expect(page.getByRole("heading", { level: 1, name: "გვერდი ვერ მოიძებნა" })).toHaveCount(1);
     const recovery = page.getByTestId("not-found-recovery");
     await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
@@ -212,8 +219,10 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
     }
     await expectNoPageOverflow(page);
     await expectKeyboardFocusOrder(page, links);
+    await page.waitForTimeout(500);
   }
 
+  expect(rscPrefetchRequests).toEqual([]);
   expect(consoleIssues).toEqual([]);
   expect(pageErrors).toEqual([]);
 });
@@ -294,7 +303,7 @@ test("raw homepage response retains meaningful content, heading order, and core 
     .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  const headingSequence = [...html.matchAll(/<h([1-6])(?:\s[^>]*)?>/gi)].map((match) => `H${match[1]}`);
+  const headingSequence = [...serverHtml.matchAll(/<h([1-6])(?:\s[^>]*)?>/gi)].map((match) => `H${match[1]}`);
   const serverLinkHrefs = [...serverHtml.matchAll(/<a\b[^>]*\bhref=(["'])(.*?)\1[^>]*>/gi)].map(
     (match) => match[2],
   );

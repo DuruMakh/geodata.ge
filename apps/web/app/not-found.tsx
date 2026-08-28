@@ -29,6 +29,7 @@ export default function NotFound() {
                 <li key={href} className="border-b border-[var(--hairline)]">
                   <Link
                     href={href}
+                    prefetch={false}
                     className="flex min-h-11 items-center py-2 text-[14px] font-medium text-[var(--ink)] transition-colors hover:bg-[var(--tint)]"
                   >
                     {label}

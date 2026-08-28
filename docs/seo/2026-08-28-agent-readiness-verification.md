@@ -60,3 +60,9 @@ Local checks cannot establish Search Console indexing or external brand knowledg
 ## Remaining local artifact boundary
 
 The eight task-owned screenshots/logs from `apps/web/.playwright-cli/` were moved out of this worktree after exact source-path validation. They remain recoverable at `C:\Users\Mylaptop\AppData\Local\Temp\fiscal-agent-readiness-playwright-cli-backup`; the source directory no longer exists and was not part of either documentation commit.
+
+## Post-review hardening
+
+The final independent review produced no blocking findings and two bounded hardening recommendations. The raw-homepage heading assertion now reads from the same script/style-stripped HTML as the text and anchor assertions. The five custom-404 recovery links set `prefetch={false}`, preventing unnecessary App Router requests from a page whose purpose is recovery rather than navigation prediction.
+
+Production-mode RED evidence recorded 30 `_rsc` requests across the two 404 viewports before the prefetch change. After the change, the focused 404/raw-homepage run passed 2/2 with zero `_rsc` requests. Fresh final gates passed: `npm.cmd run check` (100 files / 843 tests plus all data validation), canonical-host `npm.cmd run build` (95/95 static pages), and the production landing/SEO suite (44/44).
