@@ -75,17 +75,22 @@ import { describe, expect, it } from "vitest";
 
 const CORE_DIR = path.join(process.cwd(), "lib", "factQuery");
 const FORBIDDEN = [
-  /from\s+["']node:fs/,
-  /from\s+["']node:net/,
-  /from\s+["']node:http/,
+  /(?:from\s+["'](?:node:)?fs|import\s*\(\s*["'](?:node:)?fs)/,
+  /(?:from\s+["'](?:node:)?net|import\s*\(\s*["'](?:node:)?net)/,
+  /(?:from\s+["'](?:node:)?https?|import\s*\(\s*["'](?:node:)?https?)/,
+  /(?:from\s+["'](?:node:)?child_process|import\s*\(\s*["'](?:node:)?child_process)/,
+  /(?:from\s+["'](?:node:)?dns|import\s*\(\s*["'](?:node:)?dns)/,
   /\bfetch\s*\(/,
-  /from\s+["'].*\/db\//,
-  /from\s+["']@prisma\//,
-  /from\s+["']@ai-sdk\//,
-  /from\s+["']ai["']/,
-  /from\s+["']@anthropic-ai\//,
-  /console\.(log|warn|error|info)\s*\(/,
+  /(?:from\s+["'].*\/db\/|import\s*\(\s*["'].*\/db\/)/,
+  /(?:from\s+["']@prisma\/|import\s*\(\s*["']@prisma\/)/,
+  /(?:from\s+["']@ai-sdk\/|import\s*\(\s*["']@ai-sdk\/)/,
+  /(?:from\s+["']ai["']|import\s*\(\s*["']ai["'])/,
+  /(?:from\s+["']@anthropic-ai\/|import\s*\(\s*["']@anthropic-ai\/)/,
+  /console\.\w+\s*\(/,
 ];
+
+// node:crypto is deliberately NOT forbidden: it is pure computation, and
+// Task 2's dataVersion hashing needs createHash.
 
 async function walk(dir: string): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
