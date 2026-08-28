@@ -430,7 +430,10 @@ const PROGRAM_SEMANTIC_ERAS = [
   },
 ] as const;
 
-function makeProgramItemId(code: string, parentItemId: string, eraKey: string): string {
+// Exported so lib/factQuery/buildSnapshot.ts can resolve a PROGRAM_SUCCESSIONS/
+// LEGACY_PROGRAM_JOINS target (code, parentItemId, eraKey) to the same item id this
+// generator assigns, instead of re-deriving the id scheme and risking drift.
+export function makeProgramItemId(code: string, parentItemId: string, eraKey: string): string {
   const identityKey = `${code}|${parentItemId}|${eraKey}`;
   return `admin_program.${code.replaceAll(" ", "_")}.${shortHash(identityKey)}`;
 }
