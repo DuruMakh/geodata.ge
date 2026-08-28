@@ -4,6 +4,7 @@
 // Everything else takes the finished snapshot as an argument. tests/factQuery/
 // purity.test.ts excludes this file for exactly that reason.
 import { loadServedExplorerData, loadServedMunicipalData } from "../data/servedData";
+import { loadTaxonomyFiles } from "../data/taxonomy";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { PROGRAM_SUCCESSIONS, findProgramSuccession } from "../data/adminSpending/programSuccessions";
 import { LEGACY_PROGRAM_JOINS } from "../data/adminSpending/legacyProgramJoins";
@@ -52,22 +53,44 @@ function historicalJoinSeriesIds(): string[] {
 }
 
 export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Promise<FactQuerySnapshot> {
-  const [explorer, municipal] = await Promise.all([loadServedExplorerData(), loadServedMunicipalData()]);
+  const [explorer, municipal, taxonomy] = await Promise.all([
+    loadServedExplorerData(),
+    loadServedMunicipalData(),
+    loadTaxonomyFiles("../../data/taxonomy"),
+  ]);
 
-  // GlossaryEntry (lib/data/glossary.ts) carries no sort/display-order column — unlike
-  // AdminSpendingCategory/MunicipalFunction/MunicipalRegion, category-glossary.csv was
-  // never given one. The glossary Map's iteration order is the CSV's row order (the
-  // order loadGlossary inserted each record in), the only ordering signal genuinely
-  // available for a budget item, so that position becomes sortOrder here. `items`
-  // itself is still sorted by id below, so the snapshot's own array order stays
-  // deterministic regardless of CSV row order.
+  // GlossaryEntry (lib/data/glossary.ts) carries no sort/display-order column, so
+  // sortOrder cannot come from the glossary itself — and it must NOT come from the
+  // glossary Map's iteration order either: the CSV loader (lib/data/glossary.ts)
+  // inserts in category-glossary.csv's row order, while the db loader
+  // (lib/db/mirrorRows.ts's loadGlossaryFromMirror) inserts in `ORDER BY sortOrder,
+  // id` order. Those are two different, independently-authored orderings of the same
+  // ids, so a position-derived sortOrder would hash to a different dataVersion per
+  // mode for identical data. TaxonomyItem.sortOrder (data/taxonomy/revenue-
+  // categories.json + spending-fields.json) is the actual authored source of truth —
+  // BudgetItem.sortOrder in the database is populated from these same files at
+  // import time (scripts/import-budget-facts.ts) — so both modes agree by
+  // construction. A glossary id with no taxonomy entry throws rather than silently
+  // defaulting to 0, which would reintroduce a mode-independent-looking but wrong
+  // value.
+  const taxonomySortOrderById = new Map(taxonomy.map((item) => [item.id, item.sortOrder]));
+
   const items: BudgetItemMeta[] = Array.from(explorer.glossary.entries())
-    .map(([id, entry], sortOrder) => ({
-      id,
-      side: id.startsWith("revenue.") ? ("revenue" as const) : ("expenditure" as const),
-      kaLabel: entry.kaLabel,
-      sortOrder,
-    }))
+    .map(([id, entry]) => {
+      const sortOrder = taxonomySortOrderById.get(id);
+      if (sortOrder === undefined) {
+        throw new Error(
+          `buildFactQuerySnapshot: glossary id "${id}" has no taxonomy entry in data/taxonomy/revenue-categories.json or spending-fields.json`,
+        );
+      }
+
+      return {
+        id,
+        side: id.startsWith("revenue.") ? ("revenue" as const) : ("expenditure" as const),
+        kaLabel: entry.kaLabel,
+        sortOrder,
+      };
+    })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 
   const slugByCode = Object.fromEntries(MUNICIPALITY_ROUTES.map(({ code, slug }) => [code, slug]));

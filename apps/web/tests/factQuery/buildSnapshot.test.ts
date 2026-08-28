@@ -2,6 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "../../lib/factQuery/types";
+import { loadTaxonomyFiles } from "../../lib/data/taxonomy";
 
 const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:00.000Z" };
 
@@ -40,5 +41,23 @@ describe("buildFactQuerySnapshot", () => {
 
     expect(snapshot.ministries.historicalJoinSeriesIds.length).toBeGreaterThan(0);
     for (const id of snapshot.ministries.historicalJoinSeriesIds) expect(served.has(id)).toBe(true);
+  });
+
+  // sortOrder must come from the taxonomy files (data/taxonomy/*.json), not from
+  // glossary Map iteration order: the CSV loader (lib/data/glossary.ts) and the db
+  // loader (lib/db/mirrorRows.ts's loadGlossaryFromMirror, ORDER BY sortOrder, id)
+  // insert into that Map in two different, independently-authored orders, so a
+  // position-derived sortOrder would make dataVersion mode-dependent. Comparing
+  // against a fresh, independent load of the taxonomy files (not the snapshot's own
+  // computation) is mode-invariant by construction and needs no database.
+  it("takes each item's sortOrder from the taxonomy files, not glossary order", async () => {
+    const snapshot = await buildFactQuerySnapshot(OPTIONS);
+    const taxonomy = await loadTaxonomyFiles("../../data/taxonomy");
+    const taxonomySortOrderById = new Map(taxonomy.map((item) => [item.id, item.sortOrder]));
+
+    expect(snapshot.national.items.length).toBe(taxonomySortOrderById.size);
+    for (const item of snapshot.national.items) {
+      expect(item.sortOrder).toBe(taxonomySortOrderById.get(item.id));
+    }
   });
 });
