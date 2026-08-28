@@ -75,6 +75,7 @@ These were settled with the project owner on 2026-08-28 and are not re-opened by
 - Indexable bulk dumps (complete JSON per dataset plus a manifest) generated at build time from the served-data loaders.
 - English labels for the municipal taxonomy: 10 functions, 11 regions, 64 municipality names.
 - A Georgian and English evaluation fixture of approximately 40 questions with hand-verified expected answers, expected sources, and expected caveats.
+- A public connection page explaining, in Georgian, how to add Fiscal.ge to an AI assistant, with the endpoint URL, per-app steps, example questions, and an honest coverage statement.
 - Anonymized MCP query logging.
 - A new `Project_Definition.md` "V2 Scope" section owning this work and recording which V1 exclusions V2 lifts.
 - `docs/deployment.md` update covering the first server-side runtime.
@@ -190,6 +191,14 @@ These are written to `apps/web/public/data/` and served from `/data/`, outside `
 
 No provider SDK is imported anywhere in this spec's surface. `lib/factQuery/` contains no LLM code at all, and the MCP server delegates inference to whichever client connects. Spec 2 will select models through AI SDK v6 configuration so that changing model or provider is a configuration change.
 
+### 6.5 The connection page
+
+The only human-facing surface in this spec, and the reason the rest of it reaches anyone. An MCP endpoint that nobody knows exists is a feature nobody uses; the other four sub-sections of §6 are machine surfaces with no discovery path of their own.
+
+A Georgian-first page carrying: what the feature does in plain language for a non-technical journalist; the `https://fiscal.ge/mcp` endpoint with a copy control; per-application connection steps; example questions to try; and an explicit coverage statement naming both what is served (2004–2025 national, 2015–2025 municipal) and what is not (quarterly, monthly, debt, capital projects). The coverage statement is not decoration — it prevents a user asking for out-of-scope data and concluding the tool is broken.
+
+Follows `DESIGN.md` v4.1 like every other production page. No new visual direction is introduced.
+
 ## 7. Risks and stop conditions
 
 | Risk | Response |
@@ -209,7 +218,7 @@ No provider SDK is imported anywhere in this spec's surface. `lib/factQuery/` co
 4. **Schema derivation tests** asserting the MCP JSON Schema and the AI SDK tool definitions derive from the same Zod source and stay structurally equivalent.
 5. **Parity test** asserting a `factQuery` result and the corresponding explorer view model report the same figures for a sampled set of year/category combinations.
 6. **The evaluation fixture** — approximately 40 Georgian and English questions with hand-verified expected values, sources, and required caveat codes. In this spec it runs against the query functions directly, scoring numeric accuracy and caveat coverage. Spec 2 reuses it end-to-end, which is what makes a model swap measurable rather than a matter of impression.
-7. `npm run check` and `npm run build` pass. No browser tests are required; this spec ships no UI.
+7. `npm run check` and `npm run build` pass. `npm run test:browser` covers the §6.5 connection page — the one UI surface in this spec — asserting the endpoint URL renders, the copy control works, and the coverage statement is present.
 
 ## 9. Documentation updates
 
@@ -220,13 +229,34 @@ No provider SDK is imported anywhere in this spec's surface. `lib/factQuery/` co
 
 ## 10. Delivery
 
-Spec 1 is independently shippable and carries no inference cost. Sequence within it:
+Spec 1 is independently shippable and carries no inference cost. It ships as **three pull requests**, grouped so that each isolates one class of failure and each ends in something the project owner can verify without reading code.
 
-1. `lib/factQuery/` — envelope, six functions, caveat engine, with tests. Georgian-only labels at this stage; the envelope's `labelEn` falls back to `labelKa` for municipal entities until step 2 lands.
-2. Municipal English labels — the pipeline change described in §2.1, delivered as its own reviewable unit because it touches the Prisma schema and the parity check. Then the evaluation fixture.
-3. `/mcp`, then `/llms.txt` and bulk dumps.
-4. Documentation and scope amendments in the same change as the code they describe.
+The grouping rationale: the engine fails as wrong numbers, the surfaces fail as a broken deployment, and the English labels fail as a broken migration. Bundling them would mean a single checkpoint at the end with three unrelated systems to debug, and no way to ship the healthy parts while fixing one.
 
-Step 2 is the only part of this spec that touches the data pipeline, and it is separable: if it proves larger than expected, steps 1, 3, and 4 still ship as a Georgian-first grounding layer with English available for all national and ministries data.
+### PR 1 — the engine
+
+`lib/factQuery/`: envelope, six query functions, caveat engine, unit and caveat-firing tests, the evaluation fixture, and the new `docs/data-methodology/` caveat catalogue.
+
+Pure TypeScript. No routes, no runtime, no schema change, nothing user-visible. Municipal `labelEn` falls back to `labelKa` until PR 3 lands.
+
+*Verification:* `npm run check` passes; the caveat-firing test names are themselves the review surface — each row of §5.4 appears as a named passing assertion.
+
+### PR 2 — the surfaces
+
+`/mcp`, `/llms.txt`, bulk dumps to `/data/`, the connection page (§6.5), `docs/deployment.md`, and the `Project_Definition.md` V2 Scope section.
+
+Depends on PR 1. Concentrates all deployment risk: this is where the first server-side runtime appears.
+
+*Verification:* connect a real MCP client to the deployed `/mcp` and ask a Georgian budget question end to end. `npm run test:browser` passes for the connection page.
+
+### PR 3 — municipal English labels
+
+The pipeline change described in §2.1: taxonomy files, Prisma schema, migration, import mapper, `servedDataParity` canonicalisation, file-validation schema.
+
+Independent of PR 1 and PR 2 — it may run in parallel or afterwards. Sequenced last deliberately: there is no reason to take data-pipeline risk before the grounding layer is proven to work.
+
+*Verification:* `npm run data:validate` and the CSV/DB parity check pass; municipal English labels appear in `describeCoverage` output.
+
+If PR 3 proves larger than expected, PR 1 and PR 2 still ship as a Georgian-first grounding layer with English already complete for all national and ministries data.
 
 Spec 2 (the on-platform assistant) is brainstormed separately after `/mcp` query logs exist, so that its UI placement and question-handling are designed against observed questions rather than predicted ones.
