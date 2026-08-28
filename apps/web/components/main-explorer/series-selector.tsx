@@ -210,7 +210,7 @@ export function SeriesSelectorRow({
             {label}
           </span>
         </span>
-        <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--faint)]">
+        <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--muted)]">
           {value}
         </span>
       </button>

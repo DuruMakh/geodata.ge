@@ -119,3 +119,28 @@ summary:focus-visible {
     transition: none;
   }
 }
+
+/* Reserve the relief's cropped band before its scene loads. These bounds follow
+   the existing camera presets; the shared grid row can grow for enlarged text. */
+.landing-hero-frame {
+  min-height: calc(29vw + 48px);
+}
+
+@media (min-width: 768px) {
+  .landing-hero-frame {
+    min-height: calc(22.7vw + 57px);
+  }
+}
+
+@media (min-width: 1100px) {
+  .landing-hero-frame {
+    --hero-reference-height: clamp(560px, 78vh, 820px);
+    min-height: min(
+      var(--hero-reference-height),
+      calc(22.353vw + var(--hero-reference-height) * 0.0297 + 34px),
+      calc(20.023vw + var(--hero-reference-height) * 0.08155 + 36px),
+      calc(2.2vw + var(--hero-reference-height) * 0.74263 + 44px),
+      calc(var(--hero-reference-height) * 0.83566 + 38px)
+    );
+  }
+}

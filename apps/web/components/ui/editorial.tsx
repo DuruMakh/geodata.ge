@@ -134,9 +134,11 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, aria
 
 // Marks a dataset or section that has no data yet (DESIGN.md §6.7). Rendering a
 // coming-soon surface as if it were live is the failure this guards against.
-export function ComingSoonBadge() {
+export function ComingSoonBadge({ surface = "ink" }: { surface?: "ink" | "paper" }) {
   return (
-    <span className="flex-none rounded-[2px] border border-[#6C6860] px-1.5 py-px font-[family-name:var(--font-numeric)] text-[9px] text-[var(--ink-fg-faint)]">
+    <span
+      className={`flex-none rounded-[2px] border border-[#6C6860] px-1.5 py-px font-[family-name:var(--font-numeric)] text-[9px] ${surface === "paper" ? "text-[var(--muted)]" : "text-[var(--ink-fg-faint)]"}`}
+    >
       მალე
     </span>
   );

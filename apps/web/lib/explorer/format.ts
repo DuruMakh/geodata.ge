@@ -6,11 +6,18 @@ const MILLION = 1_000_000;
 
 export const MISSING = "—";
 
+const numberFormatters = new Map<number, Intl.NumberFormat>();
+
 function fixed(value: number, decimals: number): string {
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(value);
+  let formatter = numberFormatters.get(decimals);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+    numberFormatters.set(decimals, formatter);
+  }
+  return formatter.format(value);
 }
 
 /**
@@ -61,7 +68,7 @@ export function formatSignedAmount(value: number | null | undefined): string {
 /** Budget per resident in whole lari, e.g. "1,335 ₾". */
 export function formatPerResidentGel(value: number | null | undefined): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return MISSING;
-  return `${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value)} ₾`;
+  return `${fixed(value, 0)} ₾`;
 }
 
 /** Percentage from a fraction, `decimals` digits (default 1); "−" minus; optional "+" for positives. */

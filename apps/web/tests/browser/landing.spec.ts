@@ -404,3 +404,91 @@ test("shared footer uses the compact logo without changing its trust content", a
   await expect(footer).toContainText("info@fiscal.ge");
   await expect(footer).toContainText("CC BY 4.0");
 });
+
+for (const width of [768, 1100]) {
+  test(`hero leaves room for enlarged text at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(baseUrl);
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    await expect(page.locator("figure canvas")).toBeVisible({ timeout: 15_000 });
+    const initialCanvasHeight = (await page.locator("figure canvas").boundingBox())!.height;
+
+    // Text-only enlargement keeps the viewport and map scale unchanged.
+    await page.locator("[data-hero-copy] p, [data-hero-copy] h1, [data-hero-copy] a").evaluateAll((elements) => {
+      for (const element of elements) {
+        (element as HTMLElement).style.fontSize = `${Number.parseFloat(getComputedStyle(element).fontSize) * 2}px`;
+      }
+    });
+    await page.setViewportSize({ width: width + 1, height: 900 });
+    await page.setViewportSize({ width, height: 900 });
+    await expect.poll(async () => (await page.locator("figure canvas").boundingBox())!.height).toBeGreaterThan(initialCanvasHeight);
+    const copy = await page.locator("[data-hero-copy]").boundingBox();
+    const stats = await page.getByTestId("key-numbers").boundingBox();
+    expect(copy).not.toBeNull();
+    expect(stats).not.toBeNull();
+    const figure = await page.locator("figure").boundingBox();
+    const canvas = await page.locator("figure canvas").boundingBox();
+    expect(canvas!.height).toBeLessThanOrEqual(figure!.height + 1);
+    expect(stats!.y).toBeGreaterThanOrEqual(copy!.y + copy!.height + 24);
+
+    await page.locator("[data-hero-copy] p, [data-hero-copy] h1, [data-hero-copy] a").evaluateAll((elements) => {
+      for (const element of elements) (element as HTMLElement).style.removeProperty("font-size");
+    });
+    await expect.poll(async () => {
+      const frame = await page.locator("figure").boundingBox();
+      const canvas = await page.locator("figure canvas").boundingBox();
+      return canvas!.height - frame!.height;
+    }).toBeLessThanOrEqual(1);
+  });
+}
+
+for (const viewport of [
+  { width: 320, height: 844 },
+  { width: 390, height: 844 },
+  { width: 767, height: 900 },
+  { width: 768, height: 900 },
+  { width: 1099, height: 900 },
+  { width: 1100, height: 900 },
+  { width: 1440, height: 640 },
+  { width: 1440, height: 900 },
+  { width: 1920, height: 900 },
+  { width: 1920, height: 1200 },
+  { width: 2560, height: 900 },
+  { width: 4000, height: 900 },
+]) {
+  test(`hero initialization preserves reserved space at ${viewport.width}px by ${viewport.height}px`, async ({ browser, page }) => {
+    const initialContext = await browser.newContext({ javaScriptEnabled: false, viewport });
+    try {
+      const initialPage = await initialContext.newPage();
+      await initialPage.goto(baseUrl);
+      await initialPage.evaluate(() => document.fonts.ready.then(() => undefined));
+      const initialFigure = await initialPage.locator("figure").boundingBox();
+      const initialStats = await initialPage.getByTestId("key-numbers").boundingBox();
+      expect(initialFigure).not.toBeNull();
+      expect(initialStats).not.toBeNull();
+
+      await page.setViewportSize(viewport);
+      await page.goto(baseUrl);
+      await page.evaluate(() => document.fonts.ready.then(() => undefined));
+      await expect(page.locator("figure canvas")).toBeVisible({ timeout: 15_000 });
+      await expect.poll(async () => {
+        const figure = await page.locator("figure").boundingBox();
+        const stats = await page.getByTestId("key-numbers").boundingBox();
+        if (!figure || !stats) return Number.POSITIVE_INFINITY;
+        return Math.max(
+          Math.abs(figure.height - initialFigure!.height),
+          Math.abs(stats.y - initialStats!.y),
+        );
+      }).toBeLessThanOrEqual(1);
+      const figure = await page.locator("figure").boundingBox();
+      const canvas = await page.locator("figure canvas").boundingBox();
+      expect(figure).not.toBeNull();
+      expect(canvas).not.toBeNull();
+      expect(canvas!.height).toBeLessThanOrEqual(figure!.height + 1);
+      expect(figure!.height - canvas!.height).toBeLessThanOrEqual(10);
+      await expectNoPageOverflow(page);
+    } finally {
+      await initialContext.close();
+    }
+  });
+}

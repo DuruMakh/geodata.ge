@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
 import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
+import municipalityMapDefinitions from "../../assets/municipality-map-definitions.svg";
 
 type MunicipalityMapProps = Omit<MunicipalityMapModel, "legendMinPerResidentGel" | "legendMaxPerResidentGel"> & {
   legendMin: string;
@@ -206,7 +207,7 @@ export function MunicipalityMap({
             const active = shape.code === activeCode;
 
             return (
-              <path
+              <use
                 key={`decorative:${shape.code}`}
                 data-testid={`municipality-shape-${shape.code}`}
                 data-municipality-shape=""
@@ -216,14 +217,13 @@ export function MunicipalityMap({
                 // deliberately not a map target: no tab stop and no second
                 // accessible name for the same municipality.
                 aria-hidden
-                d={shape.d}
+                href={`${municipalityMapDefinitions.src}#municipality-shape-${shape.code}`}
                 fill={MAP_RAMP[shape.bucket]}
                 fillRule="evenodd"
                 clipRule="evenodd"
                 stroke={active ? "var(--ink)" : "var(--hairline-soft)"}
                 strokeWidth={active ? 2.2 : 0.7}
                 strokeLinejoin="round"
-                vectorEffect="non-scaling-stroke"
                 className="cursor-pointer"
                 onMouseEnter={(event) => {
                   activatePointerTarget({
@@ -247,21 +247,20 @@ export function MunicipalityMap({
               const active = shape.code === activeCode;
 
               return (
-                <path
+                <use
                   key={`shape:${shape.code}`}
                   data-testid={`municipality-shape-${shape.code}`}
                   data-municipality-shape=""
                   data-municipality-map-target=""
                   data-municipality-code={shape.code}
                   data-active={active ? "true" : undefined}
-                  d={shape.d}
+                  href={`${municipalityMapDefinitions.src}#municipality-shape-${shape.code}`}
                   fill={MAP_RAMP[shape.bucket]}
                   fillRule="evenodd"
                   clipRule="evenodd"
                   stroke={active ? "var(--ink)" : "var(--hairline-soft)"}
                   strokeWidth={active ? 2.2 : 0.7}
                   strokeLinejoin="round"
-                  vectorEffect="non-scaling-stroke"
                   tabIndex={targetIndex === rovingIndex ? 0 : -1}
                   role="link"
                   aria-label={accessibleName(shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel)}
@@ -347,11 +346,11 @@ export function MunicipalityMap({
           })}
 
           {occupiedAreas.map((area) => (
-            <path
+            <use
               key={area.key}
               data-testid={`occupied-overlay-${area.key}`}
               data-occupied-overlay=""
-              d={area.d}
+              href={`${municipalityMapDefinitions.src}#occupied-overlay-${area.key}`}
               fill={`url(#${HATCH_ID})`}
               fillRule="evenodd"
               clipRule="evenodd"
@@ -359,7 +358,6 @@ export function MunicipalityMap({
               strokeWidth="1.5"
               strokeDasharray="5 4"
               strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
               pointerEvents="none"
               aria-hidden="true"
             />

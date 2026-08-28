@@ -1,11 +1,19 @@
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import {
   GENERATED_ARTIFACT_PATH,
   GENERATED_MANIFEST_PATH,
+  GENERATED_SVG_ASSET_PATH,
   buildMunicipalityGeometryOutputs,
   checkMunicipalityGeometryOutputs,
 } from "../../../lib/data/municipalGeometry/prepareMunicipalGeometry";
+
+function svgPathDataById(svg: string): Map<string, string> {
+  return new Map(
+    [...svg.matchAll(/<path id="([^"]+)" d="([^"]+)"/g)].map(([, id, d]) => [id!, d!]),
+  );
+}
 
 describe("municipality geometry preparation", () => {
   it("builds the approved counts and duplicate contract", async () => {
@@ -37,6 +45,21 @@ describe("municipality geometry preparation", () => {
     const { artifact } = await buildMunicipalityGeometryOutputs();
     const pathText = [...artifact.municipalityPaths, ...artifact.occupiedAreas].map((item) => item.d).join("");
     expect(Buffer.byteLength(pathText, "utf8")).toBeLessThanOrEqual(350 * 1024);
+  });
+
+  it("emits an exact static SVG definition asset for every reviewed map path", async () => {
+    const { artifact } = await buildMunicipalityGeometryOutputs();
+
+    expect(existsSync(GENERATED_SVG_ASSET_PATH)).toBe(true);
+    if (!existsSync(GENERATED_SVG_ASSET_PATH)) return;
+
+    const asset = await readFile(GENERATED_SVG_ASSET_PATH, "utf8");
+    const pathDataById = svgPathDataById(asset);
+    expect([...pathDataById.entries()]).toEqual([
+      ...artifact.municipalityPaths.map((shape) => [`municipality-shape-${shape.code}`, shape.d]),
+      ...artifact.occupiedAreas.map((area) => [`occupied-overlay-${area.key}`, area.d]),
+    ]);
+    expect(asset).toContain('vector-effect="non-scaling-stroke"');
   });
 
   it("is deterministic and matches both checked-in outputs", async () => {

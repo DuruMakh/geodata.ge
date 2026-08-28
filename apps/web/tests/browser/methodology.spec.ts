@@ -1,7 +1,31 @@
 import { expect, test, type Locator } from "@playwright/test";
 import { createHash } from "node:crypto";
+import { expectReadableText } from "./color-contrast";
 
 const TEST_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+
+for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
+  test(`coming-soon badges are readable on paper and ink at ${viewport.width}px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto(`${TEST_BASE_URL}/methodology`);
+    const badges = page.getByTestId("methodology-future-row").getByText("მალე", { exact: true });
+    await expect(badges).toHaveCount(4);
+    for (const badge of await badges.all()) {
+      await expectReadableText(badge, page.locator("body"));
+    }
+
+    if (viewport.width >= 900) {
+      await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
+      const sidebar = page.getByTestId("data-sidebar");
+      await expect(sidebar).toBeVisible();
+      const inkBadges = sidebar.getByText("მალე", { exact: true });
+      await expect(inkBadges).toHaveCount(4);
+      for (const badge of await inkBadges.all()) {
+        await expectReadableText(badge, sidebar);
+      }
+    }
+  });
+}
 
 async function expectVisibleFocusOutline(locator: Locator) {
   await locator.focus();

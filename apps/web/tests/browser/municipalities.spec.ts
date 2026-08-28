@@ -120,6 +120,23 @@ test("renders 64 globally ordered accessible map targets behind one tab stop", a
   expect(overlaysFollowTargets).toBe(true);
 });
 
+test("draws all reviewed map shapes before JavaScript runs", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  try {
+    const page = await context.newPage();
+    await page.goto("http://localhost:3100/explorer/municipalities");
+    const paths = page.getByTestId("municipality-map").locator("[data-municipality-shape], [data-occupied-overlay]");
+    await expect(paths).toHaveCount(62);
+    await expect.poll(() => paths.evaluateAll((elements) => elements.filter((element) => {
+      const box = (element as SVGGraphicsElement).getBBox();
+      return box.width > 0 && box.height > 0;
+    }).length)).toBe(62);
+    await expect(page.getByTestId("municipality-map").locator("[data-municipality-marker]")).toHaveCount(5);
+  } finally {
+    await context.close();
+  }
+});
+
 test("moves between map targets with arrow keys instead of 65 tab stops", async ({ page }) => {
   await page.goto("http://localhost:3100/explorer/municipalities");
   await expectMunicipalAppReady(page);
