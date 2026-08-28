@@ -52,6 +52,42 @@ function historicalJoinSeriesIds(): string[] {
   return [...ids].sort();
 }
 
+/**
+ * Every array assigned into `content` (below) is hash-significant:
+ * `canonicalize` (./canonical.ts) deliberately preserves array order, on the
+ * documented assumption that "the served-data loaders already order rows and
+ * that order is meaningful." That assumption does not hold across serving
+ * modes: the CSV loaders return files in on-disk row order, the db mirror
+ * (lib/db/mirrorRows.ts) returns Prisma `ORDER BY` order, and
+ * lib/data/servedData.ts only guarantees year-ascending in between
+ * (orderExplorerDataForServing, orderMunicipalDataForServing — that file says
+ * outright "exact cross-path row order is not claimed here"). Left alone, a
+ * CSV regeneration or taxonomy reorder can silently change `dataVersion`
+ * between db-mode production and csv-mode previews/CI for identical data.
+ *
+ * This is the one file permitted to shape data before hashing, so every array
+ * entering `content` is re-sorted here by the same keys the mirror's
+ * `ORDER BY` uses (lib/db/mirrorRows.ts). Each key list corresponds to that
+ * row's database unique constraint (prisma/schema.prisma), so the comparator
+ * is total: two distinct rows in a clean dataset cannot tie on every key.
+ */
+function compareBy<T>(...keys: Array<(row: T) => string | number>): (a: T, b: T) => number {
+  return (a, b) => {
+    for (const key of keys) {
+      const left = key(a);
+      const right = key(b);
+      if (left === right) continue;
+      if (typeof left === "number" && typeof right === "number") return left - right;
+      return String(left) < String(right) ? -1 : 1;
+    }
+    return 0;
+  };
+}
+
+function sortedBy<T>(rows: T[], ...keys: Array<(row: T) => string | number>): T[] {
+  return [...rows].sort(compareBy(...keys));
+}
+
 export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Promise<FactQuerySnapshot> {
   const [explorer, municipal, taxonomy] = await Promise.all([
     loadServedExplorerData(),
@@ -97,25 +133,83 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
 
   const content = {
     schemaVersion: SCHEMA_VERSION,
-    national: { facts: explorer.facts, items },
+    national: {
+      facts: sortedBy(
+        explorer.facts,
+        (f) => f.year,
+        (f) => f.side,
+        (f) => f.itemId,
+        (f) => f.basis,
+      ),
+      items,
+    },
     ministries: {
-      facts: explorer.adminFacts,
-      categories: explorer.adminCategories,
+      facts: sortedBy(
+        explorer.adminFacts,
+        (f) => f.year,
+        (f) => f.itemId,
+      ),
+      categories: sortedBy(
+        explorer.adminCategories,
+        (c) => c.sortOrder,
+        (c) => c.id,
+      ),
       historicalJoinSeriesIds: historicalJoinSeriesIds(),
     },
     municipal: {
-      functions: municipal.functions,
-      regions: municipal.regions,
-      municipalities: municipal.municipalities,
-      functionFacts: municipal.functionFacts,
-      totalFacts: municipal.totalFacts,
-      countryFunctionFacts: municipal.countryFunctionFacts,
-      countryTotalFacts: municipal.countryTotalFacts,
-      adjaraBudgetAdjustments: municipal.adjaraBudgetAdjustments,
-      populationFacts: municipal.populationFacts,
+      functions: sortedBy(
+        municipal.functions,
+        (f) => f.sortOrder,
+        (f) => f.id,
+      ),
+      regions: sortedBy(
+        municipal.regions,
+        (r) => r.sortOrder,
+        (r) => r.id,
+      ),
+      municipalities: sortedBy(
+        municipal.municipalities,
+        (m) => m.sortId,
+        (m) => m.code,
+      ),
+      functionFacts: sortedBy(
+        municipal.functionFacts,
+        (f) => f.year,
+        (f) => f.municipalityCode,
+        (f) => f.categoryId,
+      ),
+      totalFacts: sortedBy(
+        municipal.totalFacts,
+        (f) => f.year,
+        (f) => f.municipalityCode,
+      ),
+      // Served as MunicipalFunctionFact, whose only location field is
+      // municipalityCode — but these rows come from MunicipalCountryFunctionFact,
+      // whose mirror ORDER BY is scopeId (lib/db/mirrorRows.ts,
+      // loadMunicipalCountryFunctionFactsFromMirror). That loader copies
+      // row.scopeId into the served row's municipalityCode field, so
+      // municipalityCode is where the mirror's scopeId ordering lands here.
+      countryFunctionFacts: sortedBy(
+        municipal.countryFunctionFacts,
+        (f) => f.year,
+        (f) => f.municipalityCode,
+        (f) => f.categoryId,
+      ),
+      // Same scopeId -> municipalityCode translation as countryFunctionFacts above.
+      countryTotalFacts: sortedBy(
+        municipal.countryTotalFacts,
+        (f) => f.year,
+        (f) => f.municipalityCode,
+      ),
+      adjaraBudgetAdjustments: sortedBy(municipal.adjaraBudgetAdjustments, (a) => a.year),
+      populationFacts: sortedBy(
+        municipal.populationFacts,
+        (f) => f.year,
+        (f) => f.municipalityCode,
+      ),
       slugByCode,
     },
-    gdpFacts: explorer.gdpFacts,
+    gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
     sources: [],
   };
 
