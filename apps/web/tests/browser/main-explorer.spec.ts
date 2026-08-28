@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { expectReadableText } from "./color-contrast";
 
 function collectConsoleProblems(page: Page) {
   const consoleProblems: string[] = [];
@@ -25,6 +26,32 @@ async function expectNoPageOverflow(page: Page) {
 
 async function expectAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+}
+
+for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
+  for (const section of ["expenditure", "revenue"] as const) {
+    test(`${section} series values stay readable on selected and hover backgrounds at ${viewport.width}px`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await page.goto(`http://localhost:3100/explorer/${section}`);
+      await expectAppReady(page);
+      const row = page.locator(`[data-testid="series-row"][data-series-id="${section}.total"]`);
+      const toggle = row.getByTestId("series-row-toggle");
+      const value = toggle.locator(":scope > span").last();
+      await expect(toggle).toHaveAttribute("aria-pressed", "true");
+      await expect(row).toHaveCSS("background-color", "rgb(241, 234, 220)");
+      await expectReadableText(value, row);
+
+      await toggle.click();
+      await expect(toggle).toHaveAttribute("aria-pressed", "false");
+      await page.mouse.move(0, 0);
+      await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expectReadableText(value, page.locator("body"));
+
+      await row.hover();
+      await expect(row).toHaveCSS("background-color", "rgb(241, 234, 220)");
+      await expectReadableText(value, row);
+    });
+  }
 }
 
 async function downloadWorkbook(page: Page) {
@@ -54,6 +81,28 @@ async function expectLineChartRendered(page: Page) {
   const box = await line.boundingBox();
   expect(box?.width ?? 0).toBeGreaterThan(2);
   expect(box?.height ?? 0).toBeGreaterThan(2);
+}
+
+for (const section of ["expenditure", "revenue", "analysis"] as const) {
+  test(`${section} keeps its initial chart content available without JavaScript`, async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+    try {
+      const page = await context.newPage();
+      await page.goto(`http://localhost:3100/explorer/${section}`);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      if (section === "analysis") {
+        const snapshot = page.getByTestId("single-year-snapshot");
+        await expect(snapshot).toBeVisible();
+        await expect(snapshot.locator("svg").first()).toBeVisible();
+      } else {
+        await expectLineChartRendered(page);
+        await expect(page.locator(`[data-series-id="${section}.total"]`)).toBeVisible();
+      }
+      await expectNoPageOverflow(page);
+    } finally {
+      await context.close();
+    }
+  });
 }
 
 test("explorer hydrates with the editorial shell and default expenditure view", async ({ page }) => {

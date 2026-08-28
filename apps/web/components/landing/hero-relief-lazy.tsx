@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 // anyway — and it must live in a client component (Next forbids it in server
 // components), which is this file's whole job. While the chunk loads, the
 // placeholder paints the hero figure paper-colored; the <figure> in
-// landing-page.tsx owns the height at every breakpoint, so nothing shifts.
+// landing-page.tsx reserves the compact map band in CSS before the scene loads.
 // The no-WebGL fallback message and the breakpoint-crossing scene rebuild
 // both live inside HeroRelief itself and are unaffected by the deferral.
 export const HeroReliefLazy = dynamic(() => import("./hero-relief").then((m) => m.HeroRelief), {

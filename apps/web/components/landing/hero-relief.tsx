@@ -37,8 +37,8 @@ import { GEORGIA_GEO } from "../../lib/landing/georgiaGeo";
 //      HeroOpts); fitCameraDistance() binary-searches the camera distance so
 //      every sampled dot projects inside the margins, then refit() measures
 //      the map's projected vertical band, CROPS the canvas to it with
-//      cam.setViewOffset, and pins the parent <figure> height to the band so
-//      the stats section starts right under the last dots.
+//      cam.setViewOffset, inside a compact CSS-reserved <figure> so the stats
+//      section stays right under the last dots without moving on scene load.
 //   3. Geometry: one dot cloud for terrain (N grid dots), one for city squares
 //      (NC cities, index 0 = Tbilisi), four reusable LineLoop rings for ripple
 //      fronts, and HTML <span>s (labelsRef) for peak labels + hover readout.
@@ -431,7 +431,6 @@ export function HeroRelief() {
       const camBase = new THREE.Vector3();
       const halfFov = Math.tan(((O.fov / 2) * Math.PI) / 180);
       const mSym = (O.marginL + O.marginR) / 2;
-      const heroFigure = el.parentElement;
       const copyEl = el.closest("section")?.querySelector<HTMLElement>("[data-hero-copy]") ?? null;
       const virtualHeightFor = () =>
         window.innerWidth < 768 ? 340 : window.innerWidth < 1100 ? 500 : Math.min(820, Math.max(560, Math.round(window.innerHeight * 0.78)));
@@ -475,13 +474,15 @@ export function HeroRelief() {
         const bandH = Math.max(1, bottom - top);
         cam.setViewOffset(w, virtualH, 0, top, w, bandH);
         renderer.setSize(w, bandH);
-        if (heroFigure && Math.abs(heroFigure.clientHeight - bandH) > 3) {
-          heroFigure.style.height = `${bandH}px`;
-        }
+        el.style.height = `${bandH}px`;
+        labelsEl.style.height = `${bandH}px`;
       };
       refit();
       cam.position.copy(camBase);
-      if (heroFigure) disposers.push(() => { heroFigure.style.height = ""; });
+      disposers.push(() => {
+        el.style.height = "";
+        labelsEl.style.height = "";
+      });
       const cloud = makeDotCloud(N);
       scene.add(cloud.points);
       disposers.push(() => {
@@ -603,13 +604,13 @@ export function HeroRelief() {
         disposers.push(() => io.disconnect());
       }
       const ro = new ResizeObserver(() => {
-        refit(); // recomputes fit, crop, renderer size, and figure height
+        refit(); // recomputes fit, crop, renderer size, and inner scene height
       });
-      ro.observe(el);
+      // Text-only zoom can resize the CSS-owned frame without a window resize.
+      ro.observe(el.parentElement!);
       disposers.push(() => ro.disconnect());
-      // The ResizeObserver goes blind to height-only viewport changes once
-      // refit() pins the figure height inline, and a width change across a
-      // breakpoint needs a scene rebuilt on the matching preset.
+      // A viewport-height change can alter the virtual camera frame even when
+      // the CSS band is capped; crossing a width breakpoint needs a new preset.
       const onWindowResize = () => {
         if (heroBucket(window.innerWidth) !== bucket) setSceneEpoch((n) => n + 1);
         else refit();

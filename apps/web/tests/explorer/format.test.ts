@@ -1,7 +1,29 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatPerResidentGel, formatShare, formatSignedAmount, UNIT_BN, UNIT_MLN } from "../../lib/explorer/format";
 
 describe("editorial formatters", () => {
+  it("reuses number-format rules across subsequent chart and map values", () => {
+    const OriginalNumberFormat = Intl.NumberFormat;
+    const numberFormat = vi.spyOn(Intl, "NumberFormat").mockImplementation(function (locales, options) {
+      return new OriginalNumberFormat(locales, options);
+    });
+    try {
+      formatBn(2_000_000_000);
+      formatAmount(450_000_000);
+      formatAmount(8_000_000);
+      formatPerResidentGel(1_000);
+      numberFormat.mockClear();
+
+      expect(formatBn(2_500_000_000)).toBe("2.5");
+      expect(formatAmount(750_000_000)).toBe("750 მლნ ₾");
+      expect(formatAmount(1_250_000)).toBe("1.25 მლნ ₾");
+      expect(formatPerResidentGel(1_334.6)).toBe("1,335 ₾");
+      expect(numberFormat).not.toHaveBeenCalled();
+    } finally {
+      numberFormat.mockRestore();
+    }
+  });
+
   it("formats billions with one decimal and en-US grouping", () => {
     expect(formatBn(26_500_000_000)).toBe("26.5");
     expect(formatBn(1_234_500_000_000)).toBe("1,234.5");

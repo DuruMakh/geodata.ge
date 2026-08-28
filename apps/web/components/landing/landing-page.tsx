@@ -66,10 +66,10 @@ export function LandingPage({ model }: { model: LandingModel }) {
       <div className="mx-auto max-w-[1240px]">
         <SiteHeader active="home" yearsLabel={model.yearsLabel} testId="landing-header" />
 
-        <section className="relative">
+        <section className="relative min-[768px]:grid min-[768px]:grid-cols-1">
           <div
             data-hero-copy
-            className="pb-[18px] pt-7 min-[768px]:pointer-events-none min-[768px]:absolute min-[768px]:right-0 min-[768px]:top-[42px] min-[768px]:z-10 min-[768px]:flex min-[768px]:w-[340px] min-[768px]:flex-col min-[768px]:items-end min-[768px]:p-0 min-[768px]:text-right min-[1100px]:w-[470px]"
+            className="pb-[18px] pt-7 min-[768px]:pointer-events-none min-[768px]:col-start-1 min-[768px]:row-start-1 min-[768px]:z-10 min-[768px]:mb-6 min-[768px]:mt-[42px] min-[768px]:flex min-[768px]:w-[340px] min-[768px]:flex-col min-[768px]:items-end min-[768px]:self-start min-[768px]:justify-self-end min-[768px]:p-0 min-[768px]:text-right min-[1100px]:w-[470px]"
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[11px]">
               საქართველოს მონაცემების პორტალი
@@ -92,7 +92,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
           <figure
             role="img"
             aria-label={HERO_ARIA_LABEL}
-            className="relative m-0 ml-[calc(50%-50vw)] h-[330px] w-screen min-w-0 overflow-hidden p-0 min-[768px]:h-[500px] min-[1100px]:h-[clamp(560px,78vh,820px)]"
+            className="landing-hero-frame relative m-0 ml-[calc(50%-50vw)] w-screen min-w-0 overflow-hidden p-0 min-[768px]:col-start-1 min-[768px]:row-start-1"
           >
             <HeroReliefLazy />
           </figure>
