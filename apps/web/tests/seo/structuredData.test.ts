@@ -25,7 +25,13 @@ describe("Fiscal.ge structured data", () => {
       ]),
     );
     const organization = graph["@graph"].find((node) => node["@type"] === "Organization");
+    if (!organization) {
+      throw new Error("Organization node is required");
+    }
     expect(organization).toMatchObject({
+      name: "Fiscal.ge",
+      url: "https://fiscal.ge",
+      email: "info@fiscal.ge",
       description:
         "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად აქვეყნებს.",
       logo: {
@@ -35,6 +41,15 @@ describe("Fiscal.ge structured data", () => {
         height: 650,
       },
     });
+    expect(organization.contactPoint).toEqual({
+      "@type": "ContactPoint",
+      email: "info@fiscal.ge",
+      contactType: "general inquiries",
+      availableLanguage: "ka",
+    });
+    expect(organization).not.toHaveProperty("address");
+    expect(organization).not.toHaveProperty("telephone");
+    expect(organization).not.toHaveProperty("sameAs");
     expect(serializeJsonLd(graph)).not.toContain("sameAs");
     expect(serializeJsonLd(graph)).not.toContain("SearchAction");
   });

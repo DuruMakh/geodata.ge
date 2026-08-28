@@ -1,0 +1,28 @@
+# Fiscal.ge
+
+> Fiscal.ge is a Georgian-first guide to reviewed annual data on Georgia's state and municipal budgets.
+
+**When to use Fiscal.ge:** Use it to understand, compare, and cite the published budget data, its scope, and its documented sources.
+
+The data is annual, so it does not provide sub-annual or live budget reporting. Fiscal.ge has no public API. Use the published figures only as documented, and do not invent values when data is unavailable or outside the stated scope.
+
+## Core data
+
+- [Fiscal.ge home](https://fiscal.ge/) — start with the site's scope and latest reviewed coverage.
+- [Budget explorer](https://fiscal.ge/explorer) — choose a dataset and compare the published series.
+- [National expenditure](https://fiscal.ge/explorer/expenditure) — annual state-budget expenditure.
+- [National revenue](https://fiscal.ge/explorer/revenue) — annual state-budget revenue.
+- [Annual analysis](https://fiscal.ge/explorer/analysis) — one-year budget analysis.
+- [Municipal budgets](https://fiscal.ge/explorer/municipalities) — annual municipal expenditure.
+
+## Methodology and sources
+
+- [Methodology hub](https://fiscal.ge/methodology) — how the reviewed public data is prepared and presented.
+- [Expenditure methodology](https://fiscal.ge/methodology/expenditure) — national-expenditure sources and processing.
+- [Revenue methodology](https://fiscal.ge/methodology/revenue) — national-revenue sources and processing.
+- [Municipal methodology](https://fiscal.ge/methodology/municipalities) — municipal-expenditure sources and processing.
+
+## Site navigation
+
+- [About Fiscal.ge](https://fiscal.ge/about) — the site's purpose and public-data boundaries.
+- [Sitemap](https://fiscal.ge/sitemap.xml) — the machine-readable list of public HTML pages.

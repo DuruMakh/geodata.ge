@@ -158,6 +158,75 @@ test("only third-party methodology source originals send a noindex header", asyn
   expect(methodologyPage.headers()["x-robots-tag"]).toBeUndefined();
 });
 
+test("agent instructions publish a plain-text guide with working public links", async ({ request }) => {
+  const response = await request.get(`${BASE_URL}/llms.txt`);
+
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]?.toLowerCase()).toBe("text/plain; charset=utf-8");
+
+  const targets = [...(await response.text()).matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]!);
+  expect(targets).not.toHaveLength(0);
+
+  for (const target of targets) {
+    const listedResponse = await request.get(`${BASE_URL}${new URL(target).pathname}`);
+    expect(listedResponse.status(), target).toBe(200);
+  }
+});
+
+test("404 recovery keeps a real not-found response with useful, accessible destinations", async ({ page, request }) => {
+  const path = "/this-route-does-not-exist";
+  const response = await request.get(`${BASE_URL}${path}`);
+  const html = await response.text();
+  const rscPrefetchRequests: string[] = [];
+
+  page.on("request", (pageRequest) => {
+    const url = new URL(pageRequest.url());
+    if (url.searchParams.has("_rsc")) rscPrefetchRequests.push(url.pathname);
+  });
+
+  expect(response.status()).toBe(404);
+  expect(response.headers()["content-type"]?.toLowerCase()).toContain("text/html");
+  for (const href of ["/", "/explorer", "/methodology", "/sitemap.xml", "/llms.txt"]) {
+    expect(html).toContain(`href=\"${href}\"`);
+  }
+
+  const consoleIssues: string[] = [];
+  const pageErrors: string[] = [];
+  page.on("console", (message) => {
+    const isExpectedNotFoundStatus = message.text() === "Failed to load resource: the server responded with a status of 404 (Not Found)";
+    if ((message.type() === "warning" || message.type() === "error") && !isExpectedNotFoundStatus) {
+      consoleIssues.push(message.text());
+    }
+  });
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  for (const viewport of [
+    { width: 1366, height: 768 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const navigation = await page.goto(`${BASE_URL}${path}`);
+
+    expect(navigation?.status()).toBe(404);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    await expect(page.getByRole("heading", { level: 1, name: "გვერდი ვერ მოიძებნა" })).toHaveCount(1);
+    const recovery = page.getByTestId("not-found-recovery");
+    await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
+    const links = recovery.getByRole("link");
+    await expect(links).toHaveCount(5);
+    for (const href of ["/", "/explorer", "/methodology", "/sitemap.xml", "/llms.txt"]) {
+      await expect(recovery.locator(`[href=\"${href}\"]`)).toHaveCount(1);
+    }
+    await expectNoPageOverflow(page);
+    await expectKeyboardFocusOrder(page, links);
+    await page.waitForTimeout(500);
+  }
+
+  expect(rscPrefetchRequests).toEqual([]);
+  expect(consoleIssues).toEqual([]);
+  expect(pageErrors).toEqual([]);
+});
+
 test("breadcrumb links keep non-overlapping 24px mobile targets and keyboard focus", async ({ page }) => {
   test.setTimeout(90_000);
 
@@ -221,6 +290,28 @@ test("site Organization schema publishes the reviewed SVG logo without unverifie
   const logo = await request.get(`${BASE_URL}/fiscal-ge-logo.svg`);
   expect(logo.status()).toBe(200);
   expect(logo.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
+});
+
+test("raw homepage response retains meaningful content, heading order, and core links", async ({ request }) => {
+  const response = await request.get(`${BASE_URL}/`);
+  expect(response.ok()).toBe(true);
+  const html = await response.text();
+  const serverHtml = html
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ");
+  const meaningfulText = serverHtml
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const headingSequence = [...serverHtml.matchAll(/<h([1-6])(?:\s[^>]*)?>/gi)].map((match) => `H${match[1]}`);
+  const serverLinkHrefs = [...serverHtml.matchAll(/<a\b[^>]*\bhref=(["'])(.*?)\1[^>]*>/gi)].map(
+    (match) => match[2],
+  );
+
+  expect(meaningfulText.length).toBeGreaterThan(500);
+  expect(headingSequence).toEqual(["H1", "H2", "H2", "H2", "H2"]);
+  expect(serverLinkHrefs).toContain("/explorer");
+  expect(serverLinkHrefs).toContain("/methodology");
 });
 
 test("root metadata publishes the reviewed browser and Apple icons", async ({ page }) => {
