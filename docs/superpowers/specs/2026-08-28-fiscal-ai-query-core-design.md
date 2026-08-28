@@ -21,7 +21,7 @@ This release provides:
 - A public **MCP connection**, through which compatible AI applications request information.
 - An updated **`llms.txt` guide** and a **connection page**, so the service can be found and used.
 - Complete, documented **JSON publications**, which software can read without scraping charts.
-- Reviewed Georgian and English names for the entire public catalogue.
+- Stable identifiers and reviewed Georgian names, with existing URL slugs exposed as matching aids.
 
 The central promise:
 
@@ -43,11 +43,10 @@ Publishing a connection does not automatically make any AI application use Fisca
 6. One new application runtime route, `/mcp`.
 7. Updated discovery guidance and JSON publications under the existing `/downloads/data/` family.
 8. A public connection page explaining how to add Fiscal.ge to an AI assistant (§12.3).
-9. Municipal English labels and reviewed English labels for the served major-program series.
-10. Necessary label, provenance, validation, database-mirror, and import-parity changes.
-11. Endpoint abuse protection, operating limits, minimal query logging, and operating documentation.
-12. A bilingual evaluation fixture, real-client compatibility checks, browser verification of citation links, and production verification requirements.
-13. Small link and explanatory-copy updates on existing methodology and discovery surfaces. The production visual system is unchanged.
+9. English text for the caveat and error messages Fiscal.ge itself authors (§10.1). No dataset, entity, category or program is translated.
+10. Endpoint abuse protection, operating limits, minimal query logging, and operating documentation.
+11. A bilingual evaluation fixture, real-client compatibility checks, browser verification of citation links, and production verification requirements.
+12. Small link and explanatory-copy updates on existing methodology and discovery surfaces. The production visual system is unchanged.
 
 `compare` is deliberately added to the original six-function design. Changes and growth rates must be calculated by Fiscal.ge, with comparability checks, rather than left to an AI to improvise.
 
@@ -69,7 +68,7 @@ Static JSON files are public data publications, not a new REST query service. MC
 Settled with the project owner on 2026-08-28.
 
 1. **Truth policy.** Superseded during review — see §2.4 and §13. The owner's original decision permitted unsupported explanations without distinction; the owner reversed this after the audit. §13 is authoritative.
-2. **Languages.** Georgian and English, selected by the language of the question. Bilingual coverage is a public-release requirement, not a later improvement.
+2. **Language.** Georgian-only data and labels. Only Fiscal.ge's own caveat and error text is also authored in English. Reversed on 2026-08-28 after verification showed the bilingual requirement was largely illusory and partly harmful (§10).
 3. **External surfaces.** MCP connection, `llms.txt`, JSON publications, connection page. No public REST API.
 4. **Access posture.** Open, free, unauthenticated, bounded by operating limits. Specification 2 owns inference spending controls.
 5. **Query approach.** Typed bounded functions. No model-authored SQL, and no escape hatch until pilot evidence proves a need.
@@ -95,11 +94,10 @@ Further corrections adopted from the revision 2.0 audit:
 | One numeric row shape fits every function | Share metadata, but use distinct catalogue, observation, comparison, ranking, source, and error results (§7). |
 | Six functions are sufficient | Add `compare`. Growth and change are the most common budget questions and must not be left to model arithmetic (§6.6). |
 | National revenue and expenditure share a budget concept | They do not. Subtracting the two published totals is not a deficit. `budgetScope` and the `budget_scopes_differ` caveat are required (§5.1, §9.2). |
-| 85 municipal labels complete bilingual coverage | Add the 48 served major-program labels as well (§10). |
 | A new `/data/` publication family is necessary | Extend the existing `/downloads/data/` family and retain existing CSV URLs (§12.1). |
 | No browser tests are needed | Verify citation links and any affected website behavior in a real browser (§14.4). |
 | Public MCP logs are a prerequisite for designing Specification 2 | Use a controlled pilot with real users; logs are supplementary evidence (§17). |
-| English labels may ship last behind a Georgian fallback | A public release may not fall back to Georgian in `labelEn`. Bilingual completion therefore precedes the public surfaces (§10.1, §16). |
+| Bilingual catalogue coverage is a public-release requirement | Reversed. The site is Georgian-only and will remain so. Latin municipality names already exist as reviewed URL slugs, region and function IDs are already Latin or English, and translating the 48 program names would manufacture unreviewed English renderings of legally specific Georgian names (§10). |
 
 ## 3. Verified baseline and authoritative sources
 
@@ -122,7 +120,7 @@ Rows marked **✓verified** were independently re-measured against the working t
 | 2004 revenue | Ten served categories summing to exactly 2,283,035,800 GEL; **no `revenue.increase_liabilities` row exists** **✓verified** | The narrower-total limitation is real and must attach to totals, not to individual comparable tax categories. |
 | National totals | Calculated by the explorer; no separate total rows in the budget file | The public catalogue must include valid calculated totals. |
 | Taxonomy-only entries | Includes `revenue.taxes_total`, with no served fact rows | Do not advertise unsupported entries as queryable or sum taxonomy parents with their components. |
-| English labels | Missing for municipal functions, regions, municipality display names, and major-program names. The Prisma models `MunicipalFunctionCategory`, `MunicipalRegion`, `Municipality` carry no English field | Municipal translation alone does not complete English support, and the change is a pipeline change, not a text edit (§10.2). |
+| Latin names already exist | `lib/explorer/municipalityRoutes.ts` carries 64 reviewed Latin slugs (`khulo`, `batumi`, `khelvachauri`) already live in production URLs. The 11 region IDs are Latin (`region.samtskhe_javakheti`); the 10 municipal function IDs are English words (`municipal.social_protection`) **✓verified** | No translation work and no schema change are needed for matching. Expose the existing slugs; invent nothing (§10.2). |
 | Existing agent surfaces (PR #88, 2026-08-28) | `/llms.txt` is already published in llms.txt v2 order and guarded by `apps/web/tests/seo/agentFiles.test.ts`, which asserts **exact** equality of the link list against `requiredTargets`, that every HTML target also appears in the sitemap, and that the text matches `/no public API/i`. A branded 404 recovery page links to it. `/downloads/data/` holds three processed CSVs — `national-revenue.csv`, `national-expenditure.csv`, `municipal-expenditure.csv`; **there is no ministries CSV** **✓verified** | Extend these surfaces; never create a competing description. Publishing `/mcp` requires updating that test's `requiredTargets` **and** its "no public API" assertion in the same change, and any new HTML page linked from `llms.txt` must also enter the sitemap. |
 | Pre-existing runtime decision gate | The merged agent-readiness design (`docs/superpowers/specs/2026-08-28-fiscal-agent-readiness-design.md`) defers Markdown content negotiation because it "would be Fiscal.ge's first request-time application layer", pending explicit owner acceptance of the runtime, latency, caching and cost boundary **✓verified** | `/mcp` crosses the same boundary that gate protects. This specification is where that boundary is accepted, and §11.4 defines the evidence required. Approving this document does not retroactively approve Markdown negotiation, which remains a separate owner decision. |
 | Runtime | Existing application pages are prerendered | `/mcp` introduces the first application request-time function. |
@@ -249,7 +247,7 @@ Observation requests require explicit `years` and a `measure`. Years are a non-e
 
 A year outside the dataset's overall coverage returns `year_out_of_range`; do not silently clamp. A valid series missing a year within coverage returns a missing cell with a reason. Excluded territorial entities return exclusion metadata and no numeric row.
 
-Metadata and labels are bilingual. The core does not interpret natural language or select an answer language; its client does that.
+Labels are Georgian; stable IDs and municipality slugs carry the Latin handles a client needs for matching. Caveat and error text is Georgian and English. The core does not interpret natural language or select an answer language; its client does that.
 
 All seven functions accept optional `expectedDataVersion`.
 
@@ -257,7 +255,7 @@ All seven functions accept optional `expectedDataVersion`.
 
 **Purpose:** explain what can be queried before asking for numbers.
 
-Parameters: optional `datasetId`, `search`, `entityType`, `level`. With no dataset filter, return the four dataset summaries; with one, return its entity and series catalogue. `search` is a maximum 120-character filter over stable IDs and reviewed Georgian/English names; it does not change underlying coverage.
+Parameters: optional `datasetId`, `search`, `entityType`, `level`. With no dataset filter, return the four dataset summaries; with one, return its entity and series catalogue. `search` is a maximum 120-character filter over stable IDs, reviewed Georgian names, and municipality slugs; it does not change underlying coverage.
 
 Return available years, exact years per series, supported measure combinations, entity types, category hierarchy, totals, exclusions, source and methodology links, and whether a result is a reviewed subset.
 
@@ -281,7 +279,7 @@ Parameters: `level` (`admin_category` | `major_program`), `seriesIds`, `years`, 
 
 Use existing approved program identities, semantic-era separation and historical joins. Never join two programs because their names resemble each other.
 
-Return parent identifiers, level, current reviewed bilingual series names, original historical labels where relevant, exact available years, and required history and coverage notes. Program amounts do not add to their parent as additional spending.
+Return parent identifiers, level, current reviewed Georgian series names, original historical labels where relevant, exact available years, and required history and coverage notes. Program amounts do not add to their parent as additional spending.
 
 ### 6.5 `queryMunicipal`
 
@@ -360,8 +358,8 @@ Transport failures before a tool executes follow MCP and HTTP error rules; they 
 | --- | --- |
 | `observationId` | Stable identity within this data version, built from dataset, entity, series, year and measure. |
 | `datasetId`, `budgetScope` | Which budget dataset and accounting boundary the figure belongs to. |
-| `entityId`, `entityType`, `entityLabelKa`, `entityLabelEn` | The geography, kept separate from the category. |
-| `seriesId`, `seriesLabelKa`, `seriesLabelEn`, `level`, `parentSeriesId` | The category, program or total and its hierarchy. |
+| `entityId`, `entityType`, `entityLabelKa`, `entitySlug` | The geography, kept separate from the category. `entitySlug` is present for municipalities only, is the existing URL slug, and is never presented as a translation or official name. |
+| `seriesId`, `seriesLabelKa`, `level`, `parentSeriesId` | The category, program or total and its hierarchy. The stable ID carries the Latin handle; there is no English label field. |
 | `year`, `measure`, `unit` | Observation year and explicit numeric meaning. Units are `GEL`, `percent`, `GEL_per_resident`. |
 | `value` | A finite number when available, otherwise `null`. |
 | `availability`, `missingReason` | `available` or `missing`, with an explanation when missing. Excluded entities have no observation row. |
@@ -470,27 +468,39 @@ The engine preserves relevant limitations through regional and country calculati
 
 Methodology owners: revenue rules in `revenue-methodology.md`; GDP rules in `national-nominal-gdp.md`; municipal totals and consolidation in `municipal-functional-annual-2015-2025.md`; population in `municipal-population-regional-gdp.md`; program history and selection in `ministries-drilldown-programs-methodology.md`.
 
-## 10. Georgian and English coverage
+## 10. Language
 
-### 10.1 Public release requirement
+Fiscal.ge is a Georgian product and this release does not change that. The website stays Georgian-only. **No dataset, entity, category, or program is translated into English.**
 
-Every queryable entity, category and program has reviewed Georgian and English display names. Both languages appear in coverage explanations, caveats and errors. The response format does not disguise Georgian text as an English translation.
+This reverses the bilingual requirement carried by earlier revisions. Verification showed that requirement was largely illusory and partly harmful:
 
-Current work inventory: 10 municipal functions, 11 regions, 64 municipality display names, 48 program series, plus explanatory messages. Counts are checked against the current served catalogue, never permanently hardcoded.
+- The 64 Latin municipality names **already exist** as reviewed URL slugs in `lib/explorer/municipalityRoutes.ts` — `khulo`, `batumi`, `khelvachauri` — live in production URLs and therefore already reviewed and stable.
+- The 11 region IDs are already Latin transliterations: `region.samtskhe_javakheti`, `region.kvemo_kartli`.
+- The 10 municipal function IDs are already English words: `municipal.social_protection`, `municipal.education`.
+- The 48 major-program names are the only genuinely untranslated set, and translating them would manufacture unreviewed English renderings of legally specific Georgian program names — a new class of citable error the platform does not currently have.
 
-The external client normally answers in the language of the question; the later Fiscal.ge assistant must do the same. The website's existing Georgian interface is not made bilingual by this release.
+The consumer of this service is a language model, which translates competently. A response carrying `seriesId: "municipal.education"` with `labelKa` set to the Georgian name gives a client everything it needs to answer in any language. Pre-translating for a translator adds permanent maintenance burden and new risk without adding capability.
 
-**Private implementation checkpoints may have incomplete translations. The public release may not silently fall back to Georgian in `labelEn`.** A Georgian-only public release would require an explicit scope revision and different coverage claims. This is why bilingual completion precedes the public surfaces in §16.
+### 10.1 What is authored in English
 
-### 10.2 Pipeline change
+Only text Fiscal.ge itself writes as a warning or a refusal:
 
-Add English fields to the existing municipal taxonomy and registry and their corresponding TypeScript and Prisma models. `MunicipalFunctionCategory`, `MunicipalRegion` and `Municipality` currently carry no English field at all. One English municipality display name is required; a separate translation of every formal legal name is not.
+- the 22 caveat messages (§9.2);
+- the error messages (§7.4).
 
-Add a bounded `data/taxonomy/admin-program-labels.json` registry containing `id`, `kaLabel`, `enLabel` for served program IDs, with a corresponding `AdminProgramLabel` serving mirror. Preserve historical official labels on fact rows; the registry supplies the current public series name.
+These are the sentences where precise wording matters most and where a model's improvised translation is least acceptable — a mistranslated limitation is worse than a mistranslated label. They live in the caveat catalogue and error definitions as plain source files: no database field, no migration, no parity check.
 
-Update file validation, import mappings, database reads, served-data types and parity canonicalisation together. Program labels must cover exactly the served program ID set and must not change program identity, parentage, history, financial facts, or existing Georgian display meaning.
+### 10.2 Matching aids, not translations
 
-Use reviewed terminology and consistent geographic naming. Automated presence tests do not replace bilingual review of meaning.
+`describeCoverage` exposes each municipality's existing URL slug as `entitySlug`, and `search` matches over stable IDs, Georgian names, and slugs. An English question about "Khulo" therefore resolves to code `11` without inventing an official English name.
+
+`entitySlug` is documented as a URL slug, never as a translation or an official name. No other entity type gains one.
+
+### 10.3 No pipeline change
+
+This release adds no English field to any taxonomy file, TypeScript type, or Prisma model, and creates no program-label registry. `MunicipalFunctionCategory`, `MunicipalRegion` and `Municipality` are untouched. There is no migration, no import-mapper change, and no parity canonicalisation change.
+
+Making Fiscal.ge bilingual would be its own specification, driven by the website, not by this service.
 
 ## 11. MCP endpoint and operations
 
@@ -647,6 +657,8 @@ Rebuild twice from identical reviewed inputs: semantic `dataVersion` and determi
 
 ### 14.3 Bilingual reference fixture
 
+"Bilingual" here refers to the language of the *question*, not to the data. Labels stay Georgian (§10); the client answers in the asking language by translating them, and the fixture checks that it does so without corrupting figures, scope, or caveats.
+
 At least 20 intents, each asked in Georgian and English — at least 40 prompts. Each record contains the prompt, expected structured calls, manually checked expected values and status, allowed rounding, expected budget scope, sources and documents, required caveats, and whether the answer must decline or qualify a comparison.
 
 | # | Intent, in both languages | Required check |
@@ -670,7 +682,7 @@ At least 20 intents, each asked in Georgian and English — at least 40 prompts.
 | 17 | Highest municipal total budget per resident in 2025 | Rank valid peers with the reviewed population denominator. |
 | 18 | Country aggregate or historical per-resident value | Unsupported; no invented denominator. |
 | 19 | Territorial spending for one excluded municipal code | Exclusion with explanation; no numeric territorial row. |
-| 20 | Fastest-growing served major programs over a period | Reviewed subset, comparable endpoints, missing coverage, English names. |
+| 20 | Fastest-growing served major programs over a period | Reviewed subset, comparable endpoints, missing coverage reported, Georgian series names returned intact. |
 
 This inventory defines tests to be authored during implementation; it is not a claim that the fixture exists or has passed. Add automated boundary cases for the other excluded codes, unknown IDs, unsupported 2026 requests at this baseline, negative corrections, zero bases, ties, limit errors, and version changes.
 
@@ -691,7 +703,6 @@ In a real browser, open representative `exact_view` citation links and confirm y
 - `npm run check`, `npm run build`, and relevant `npm run test:browser` coverage pass from `apps/web`, including new verification scripts integrated into the normal checks.
 - All deterministic reference answers, source checks and required severe-caveat checks pass. One critical failure blocks release; do not average it away.
 - No reviewed financial value changes without separate approval; no excluded standalone territorial amounts appear.
-- All queryable catalogue labels have reviewed English equivalents.
 - The public source resolver has no unresolved available figure, broken internal archive reference, or fabricated official URL.
 - Snapshot, public publications and corresponding explorer results agree at the recorded version.
 - Database migration, import, parity, real-client compatibility, operating limits, pause behavior and browser citation tests have current evidence.
@@ -705,7 +716,6 @@ In a real browser, open representative `exact_view` citation links and confirm y
 | `DESIGN.md` | Record the connection page and necessary existing-page download-link and citation behavior; preserve the production visual system. |
 | `docs/deployment.md` | Snapshot generation and bundling, first runtime route, protocol compatibility, limits, costs, logs, health checks, pause, rollback, live-proof procedure. |
 | `docs/data-methodology/ai-grounding-and-caveats.md` | New. Owns query definitions, comparison restrictions, provenance mapping, the bilingual caveat catalogue, and links to upstream methodology. |
-| `docs/data-methodology/database-import.md` | Document label fields and table, and their validation, import and parity path. |
 | Existing dataset methodologies | Add only relevant public-query, source and measure references; resolve any contradiction found during implementation before publication. |
 | `AGENTS.md` | Replace the blanket fully-static statement with static explorer pages plus an isolated snapshot-backed `/mcp` runtime. Preserve the protected Engineering Behavior section. |
 | `CLAUDE.md` | Record actual generation and verification commands and the revised definition of done. |
@@ -720,30 +730,34 @@ Three parts, each isolating one class of failure and ending in a gate the owner 
 | Part | Fails as | Owner-verifiable gate |
 | --- | --- | --- |
 | 1. Query core | Wrong numbers | Named passing tests, one per caveat rule |
-| 2. Bilingual completion | Broken migration | English names present; parity passes |
-| 3. Surfaces and release | Broken deployment | Connect a real AI client and ask a Georgian question |
+| 2. Static publications | Wrong published files | Download a JSON and check it matches the explorer |
+| 3. Runtime and release | Broken deployment | Connect a real AI client and ask a Georgian question |
 
-**Order note.** Revision 1.0 sequenced English labels last behind a Georgian fallback. §10.1 forbids a public release that falls back to Georgian in `labelEn`, so bilingual completion now precedes the public surfaces. The engine remains first.
+Part 1 must precede Part 2, and Part 2 must precede Part 3. There is no data-pipeline change anywhere in this release (§10.3).
 
 ### Part 1 — Query core and verified snapshot
 
-Snapshot builder and contract, `dataVersion` identity, capability catalogue, shared calculation extraction, public source resolver over `workbookSources.ts` and `sourceManifest.ts`, caveat engine with all 22 codes, the seven functions, the shared Zod schema module, deterministic tests, and product-agreement tests.
+Snapshot builder and contract, `dataVersion` identity, capability catalogue, shared calculation extraction, public source resolver over `workbookSources.ts` and `sourceManifest.ts`, caveat engine with all 22 codes in Georgian and English, the seven functions, the shared Zod schema module, deterministic tests, and product-agreement tests.
 
-Pure TypeScript. No route, no runtime, no schema change, nothing user-visible. This is an internal checkpoint, not a partial public launch.
+Pure TypeScript. No route, no runtime, no schema change, nothing user-visible. An internal checkpoint, not a partial public launch.
 
-**Gate:** `npm run check` passes. Agreement tests cover every served base observation and supported calculated total against the explorer model. Double rebuild produces an identical `dataVersion`. Every §9.2 code has both a firing and a non-firing test. The source resolver reports no unresolved available figure.
+**Gate:** `npm run check` passes. Agreement tests cover every served base observation and supported calculated total against the explorer model. A double rebuild produces an identical `dataVersion`. Every §9.2 code has both a firing and a non-firing test. The source resolver reports no unresolved available figure.
 
-### Part 2 — Bilingual completion and serving mirror
+### Part 2 — Static publications
 
-Municipal English fields for 10 functions, 11 regions and 64 municipality display names; `data/taxonomy/admin-program-labels.json` for the 48 served program series with its `AdminProgramLabel` mirror; Prisma schema and migration; import mapper; `servedDataParity` canonicalisation; file-validation schema. Then the bilingual reference fixture of at least 20 intents in both languages.
+The manifest, catalogue, sources and four dataset JSON files under `/downloads/data/`, generated at build time from the Part 1 snapshot. Links added beside the existing processed-data links on the methodology pages, and the JSON files added to `/llms.txt`.
 
-Delivered as its own reviewable unit because it is the only part touching the data pipeline.
+No route, no runtime, no inference, no operating cost. The "no public API" statement in `/llms.txt` **remains true and unchanged** in this part: static files are publications, not an API. Only `requiredTargets` in `apps/web/tests/seo/agentFiles.test.ts` needs updating, for the added links.
 
-**Gate:** `npm run data:validate` and the CSV/DB parity check pass. Every queryable catalogue label has a reviewed English equivalent, confirmed by human terminology review rather than a presence test alone. Program labels cover exactly the served program ID set. No financial value, program identity, parentage or Georgian display meaning changes.
+**Gate:** published JSON figures match the explorer for a sampled set of year and category combinations, checked by downloading the file. Manifest hashes and byte counts match the artifacts. `npm run check` and the `agentFiles` test pass.
 
-### Part 3 — Public surfaces, operations and release
+### Part 3 — Runtime, discovery and release
 
-JSON publications under `/downloads/data/`, the `llms.txt` update, the connection page, the thin MCP adapter, operating limits, security and privacy controls, the pause switch, and all §15 documentation updates. Then integration verification: real-client and browser tests, bilingual answer checks, and performance and cost evidence.
+`/mcp`, the `llms.txt` rewording that replaces the now-false "no public API" claim and links the connection, the connection page and its sitemap entry, operating limits, security and privacy controls, the pause switch, and all §15 documentation updates. Then integration verification: real-client and browser tests, bilingual answer checks, and performance and cost evidence.
+
+This part alone crosses the request-time runtime boundary that the merged agent-readiness design gates (§3). It is isolated here so that boundary is accepted, and reviewed, once.
+
+`agentFiles.test.ts` needs three coordinated updates in this part: the no-public-API assertion, because the claim becomes false; `requiredTargets`, for the connection link; and the sitemap, because the connection page is HTML.
 
 **Gate:** MCP Inspector plus at least two independently implemented real clients. Browser citation-link verification. Deployed queries succeed with no request-time database connectivity. Limits, counter failure, pause and recovery behave as specified. Performance targets met and recorded. Owner authorization on record for hosting configuration and any operating budget.
 
@@ -755,7 +769,7 @@ When publishing is explicitly authorized, follow the repository delivery process
 codex/* branch -> commits -> push -> draft PR -> required CI -> review/resolved conversations -> merge -> delete branch
 ```
 
-Do not bypass required CI or push implementation commits directly to `main`. Use the existing Actions-owned migration, import, build and deploy process. Never use a manual database edit as a shortcut.
+Do not bypass required CI or push implementation commits directly to `main`. Use the existing Actions-owned build and deploy process. Never use a manual database edit as a shortcut.
 
 Production is proven only after Vercel reports `READY` for the intended merge commit **and** direct production checks establish:
 
@@ -789,7 +803,7 @@ Stop the affected implementation or release step if:
 - A shared calculation would change existing reviewed figures or silently alter website behavior.
 - A caveat cannot be traced to methodology, or a severe limitation disappears through aggregation.
 - A comparison mixes incompatible definitions but is presented as meaningful growth or a fiscal balance.
-- An available row lacks required source or version information, or a reviewed bilingual label.
+- An available row lacks required source or version information, or its reviewed Georgian label.
 - The runtime requires the live database, undeployed local files, unrestricted input, or per-process-only abuse protection.
 - Required checks, reviews, migration and parity proof, or deployed-artifact verification fail.
 - Public enablement would require unapproved paid services or unrecorded operating exposure.
