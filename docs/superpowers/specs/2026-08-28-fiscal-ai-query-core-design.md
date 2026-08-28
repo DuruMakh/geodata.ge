@@ -2,6 +2,8 @@
 
 **Status:** Approved 2026-08-28
 
+**Release:** V2. V1 is shipped; this spec does not modify V1 scope.
+
 **Date:** 2026-08-28
 
 **Baseline:** `main` at `3a1d86876` (PR #87 merged)
@@ -34,7 +36,7 @@ Every claim below was verified against the working tree at `3a1d86876`.
 | Downloads robots policy | `apps/web/next.config.ts` sets `X-Robots-Tag: noindex, follow` on `/downloads/methodology/:dataset/files/:path*` | Correct for the raw methodology archive; wrong for grounding dumps, which must be discoverable. Dumps need a separate indexable path. |
 | Source registry | 104 entries in `data/sources/source-documents.csv` | `getSources` resolves against an existing registry; no new provenance model is required. |
 | Data licence | CC BY 4.0, declared in `apps/web/components/site/site-footer.tsx:55` and `apps/web/app/about/page.tsx:34` | Attribution is an existing licence condition, not a new request. The new surfaces must state it machine-readably. |
-| V1 scope text | `Project_Definition.md` §2 lists "Public API" under *Excluded From V1* | This spec requires an explicit, bounded scope amendment. |
+| Scope document structure | `Project_Definition.md` is a V1 document end to end: §2 is "V1 Scope" with an "Excluded From V1" list containing "Public API", and it closes with §9 "Durable V1 Principle". There is no V2 section | This work is V2, not a V1 amendment. The V1 exclusion list is a true record of a shipped release and must not be rewritten. The document gains a new "V2 Scope" section that owns this work and states which V1 exclusions V2 deliberately lifts and which still hold. |
 
 ### 2.2 Semantic traps the caveat engine must encode
 
@@ -74,7 +76,7 @@ These were settled with the project owner on 2026-08-28 and are not re-opened by
 - English labels for the municipal taxonomy: 10 functions, 11 regions, 64 municipality names.
 - A Georgian and English evaluation fixture of approximately 40 questions with hand-verified expected answers, expected sources, and expected caveats.
 - Anonymized MCP query logging.
-- `Project_Definition.md` §2 amendment permitting these two bounded surfaces.
+- A new `Project_Definition.md` "V2 Scope" section owning this work and recording which V1 exclusions V2 lifts.
 - `docs/deployment.md` update covering the first server-side runtime.
 
 ### 4.2 Not included
@@ -211,7 +213,7 @@ No provider SDK is imported anywhere in this spec's surface. `lib/factQuery/` co
 
 ## 9. Documentation updates
 
-- `Project_Definition.md` §2: amend the "Public API" exclusion to permit the MCP endpoint and static grounding artifacts, and record what remains excluded (REST API, authentication, write access).
+- `Project_Definition.md`: add a "V2 Scope" section. V1's §2 and its "Excluded From V1" list stay untouched as the record of a shipped release. The new section states that V2 lifts the "Public API" exclusion only for the MCP endpoint and static grounding artifacts, and that a public REST API, authentication, and write access remain excluded.
 - `docs/deployment.md`: the first server-side runtime, its environment configuration, and its verification procedure.
 - `docs/data-methodology/`: a new document owning the caveat catalogue, cross-referencing the existing methodology documents each caveat restates.
 - `AGENTS.md`: only if an always-relevant operational constraint emerges. Not expected.
