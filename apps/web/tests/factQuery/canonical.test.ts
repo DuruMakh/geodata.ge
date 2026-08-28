@@ -113,4 +113,25 @@ describe("hashDataVersion", () => {
   it("returns a 64-character lowercase hex digest", () => {
     expect(hashDataVersion({ rows: [] })).toMatch(/^[0-9a-f]{64}$/);
   });
+
+  it("rejects a Map passed directly as payload", () => {
+    expect(() => hashDataVersion(new Map([["a", 1]]))).toThrow(/cannot hash a non-plain object \(Map\)/);
+  });
+
+  it("rejects a Set passed directly as payload", () => {
+    expect(() => hashDataVersion(new Set([1]))).toThrow(/cannot hash a non-plain object \(Set\)/);
+  });
+
+  it("rejects a Date passed directly as payload", () => {
+    expect(() => hashDataVersion(new Date(0))).toThrow(/cannot hash a non-plain object \(Date\)/);
+  });
+
+  it("hashes an array payload normally, preserving order", () => {
+    expect(hashDataVersion([1, 2])).not.toBe(hashDataVersion([2, 1]));
+  });
+
+  it("hashes primitive payloads normally", () => {
+    expect(hashDataVersion("x")).toMatch(/^[0-9a-f]{64}$/);
+    expect(hashDataVersion(1)).toMatch(/^[0-9a-f]{64}$/);
+  });
 });
