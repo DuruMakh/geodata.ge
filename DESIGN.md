@@ -1,7 +1,7 @@
 # Fiscal.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-08-07
+Last updated: 2026-08-28
 Status: Production visual system for Fiscal.ge Budget Explorer v1
 Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -827,3 +827,7 @@ The public structure is `/methodology` plus live category pages for expenditure,
 Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only.
 
 The approved public visibility is dataset-specific: expenditure hides its historical-decision group; revenue hides its validation group, technical appendix, and later classification, validation, and limitations sections; municipalities hide the full decision record, appendix, and later classification, validation, and limitations sections. Archive tables visibly show `Year | Original source/file | Format | Size | Download`.
+
+## 22. Not-found Recovery
+
+Unknown HTML routes retain their HTTP 404 status and use a minimal editorial recovery surface. It uses the existing paper, ink, body, muted, tint, and accent-focus tokens: a compact Fiscal.ge identifier, one Georgian H1, a short explanation, and ordinary visible links to the homepage, explorer, methodology, sitemap, and agent guide. It does not load data, reuse the application shell, add an illustration, or introduce a separate visual system.

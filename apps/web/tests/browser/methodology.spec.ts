@@ -1,6 +1,8 @@
 import { expect, test, type Locator } from "@playwright/test";
 import { createHash } from "node:crypto";
 
+const TEST_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+
 async function expectVisibleFocusOutline(locator: Locator) {
   await locator.focus();
   await expect(locator).toBeFocused();
@@ -107,10 +109,10 @@ test("sitemap publishes exactly the four live methodology routes", async ({ page
 
 test("future routes stay on the static 404 surface and out of navigation", async ({ page }) => {
   for (const slug of ["inflation", "gdp", "population", "unemployment"] as const) {
-    const response = await page.goto(`http://localhost:3100/methodology/${slug}`);
+    const response = await page.goto(`${TEST_BASE_URL}/methodology/${slug}`);
     expect(response?.status(), slug).toBe(404);
-    await expect(page.locator("body")).toContainText("404");
-    await expect(page.locator("body")).toContainText("This page could not be found.");
+    await expect(page.getByRole("heading", { level: 1, name: "გვერდი ვერ მოიძებნა" })).toHaveCount(1);
+    await expect(page.getByTestId("not-found-recovery").getByRole("link")).toHaveCount(5);
     await expect(page.locator(`link[rel="canonical"][href*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.locator(`meta[property="og:url"][content*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.getByTestId("site-json-ld")).toHaveCount(1);
@@ -118,7 +120,7 @@ test("future routes stay on the static 404 surface and out of navigation", async
     await expect(page.getByTestId("dataset-json-ld")).toHaveCount(0);
   }
 
-  await page.goto("http://localhost:3100/methodology");
+  await page.goto(`${TEST_BASE_URL}/methodology`);
   const futureRows = page.getByTestId("methodology-future-row");
   await expect(futureRows).toHaveCount(4);
   for (const label of ["ინფლაცია", "მშპ", "მოსახლეობა", "უმუშევრობა"] as const) {
