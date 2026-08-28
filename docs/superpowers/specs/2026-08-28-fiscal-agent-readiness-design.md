@@ -1,7 +1,7 @@
 # Fiscal.ge Agent Readiness Design
 
-**Date:** 2026-08-28  
-**Status:** Reviewed implementation scope  
+**Date:** 2026-08-28
+**Status:** Reviewed implementation scope
 **Source:** Ora Is Agentic audit supplied by the owner, rechecked against current `origin/main` and live `https://fiscal.ge`
 
 ## Goal
@@ -42,4 +42,3 @@ That would be Fiscal.ge's first request-time application layer and conflicts wit
 - Organization JSON-LD exposes the existing verified identity plus email-only `ContactPoint`; no address or phone is invented.
 - If the negotiation gate is approved: canonical HTML requests stay HTML, Markdown-preferred requests return UTF-8 `text/markdown`, unacceptable requests return 406, missing Markdown routes return 404, and every negotiated response includes `Accept` in `Vary` without removing Next.js tokens.
 - `npm.cmd run check`, a canonical-host production build, focused browser tests, and `git diff --check` pass.
-

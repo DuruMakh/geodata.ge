@@ -9,7 +9,7 @@ The complete local gate passed at `dfc046e1c1fba91448f210a2161f14250d930a14` on 
 - This commit adds this verification record only. It changes no data, homepage wording/headings, navigation, dependencies, metadata types, downloads, routes, static-serving behavior, address, telephone, `sameAs`, public API, or production visual.
 - Task 3's approved correction `dfc046e1c` changed only `apps/web/tests/seo/structuredData.test.ts` to narrow the Organization schema assertion.
 - The browser-test configuration normally points to port 3100, which is owned by a separate checkout. Verification instead used a Task 5 `next start` process at port 3205 with a temporary, uncommitted no-web-server configuration; it was removed after testing.
-- `git diff --check` and `git diff --cached --check` completed with no output. The staged diff contains this document only.
+- The earlier `git diff --check` and `git diff --cached --check` completed with no output, but covered only staged and unstaged changes. A fresh whole-branch `git diff --check 125e459f901dd44229673c9c832e3ed685375e83..51b84e0c38d2d8b744b460cdac9635a22dbcb683` found the design-spec whitespace errors corrected by this documentation follow-up; the final whole-branch check is clean.
 
 ## Complete local gate
 
@@ -17,7 +17,7 @@ The complete local gate passed at `dfc046e1c1fba91448f210a2161f14250d930a14` on 
 | --- | --- |
 | `npm.cmd exec vitest run -- --configLoader native tests/seo/agentFiles.test.ts tests/seo/structuredData.test.ts` | PASS — 2 files, 10 tests, 762ms. |
 | `npm.cmd run check` | PASS (exit 0) — lint, typecheck, 100 test files / 843 tests, and all data validation. Vitest duration: 40.76s. |
-| `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm.cmd run build` | PASS (exit 0) — 95/95 static pages generated. Compilation 5.3s, TypeScript 8.5s, page data 945ms, static generation 1840ms. |
+| `$env:NEXT_PUBLIC_SITE_URL='https://fiscal.ge'; npm.cmd run build; Remove-Item Env:NEXT_PUBLIC_SITE_URL` | PASS (exit 0) — 95/95 static pages generated. Compilation 5.3s, TypeScript 8.5s, page data 945ms, static generation 1840ms. |
 | `npm.cmd run test:browser -- --config .task5-playwright.config.ts landing.spec.ts seo.spec.ts` with `SEO_BASE_URL` and `PLAYWRIGHT_BASE_URL` set to `http://localhost:3205` | PASS (exit 0) — 44/44 browser tests in 38.6s. |
 
 Data validation confirmed 7,040 municipal function rows, 704 municipal total rows, 110 Georgia function rows, 11 Georgia total rows, 64 municipalities, 527 fact rows, 852 administrative-spending fact rows, and 30 national-GDP facts. Archive and public-dataset checks passed for all three data packages.
@@ -59,4 +59,4 @@ Local checks cannot establish Search Console indexing or external brand knowledg
 
 ## Remaining local artifact boundary
 
-`apps/web/.playwright-cli/` remains untracked and was not staged or modified in this resumed run. It contains eight screenshots/logs created during the prior visual inspection; deletion was rejected by the desktop command-safety policy after the path was verified. It is not part of this commit.
+`apps/web/.playwright-cli/` remains task-owned untracked output containing eight screenshots/logs from the prior visual inspection. Its absolute path was resolved under this checkout's `apps/web` directory, but the desktop execution safety layer rejected the requested native PowerShell removal command; it is not part of this commit.
