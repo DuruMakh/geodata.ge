@@ -3,16 +3,122 @@
 // The ONE file in lib/factQuery/ permitted to reach the served-data loaders.
 // Everything else takes the finished snapshot as an argument. tests/factQuery/
 // purity.test.ts excludes this file for exactly that reason.
+import path from "node:path";
+import { readFile } from "node:fs/promises";
+import { parse } from "csv-parse/sync";
 import { loadServedExplorerData, loadServedMunicipalData } from "../data/servedData";
 import { loadTaxonomyFiles } from "../data/taxonomy";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
+import { absoluteWorkbookSourceUrl } from "../explorer/workbookModel";
 import { PROGRAM_SUCCESSIONS, findProgramSuccession } from "../data/adminSpending/programSuccessions";
 import { LEGACY_PROGRAM_JOINS } from "../data/adminSpending/legacyProgramJoins";
 import { makeProgramItemId } from "../data/adminSpending/generateAdminSpendingFacts";
+import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { hashDataVersion } from "./canonical";
-import { SCHEMA_VERSION, type BudgetItemMeta, type FactQuerySnapshot } from "./types";
+import { resolvePublicSources, type ManifestDocument } from "./sources";
+import { SCHEMA_VERSION, type BudgetItemMeta, type FactQuerySnapshot, type ResolvedSource } from "./types";
 
 export type BuildSnapshotOptions = { releaseCommit: string; generatedAt: string };
+
+// Fixed, environment-independent production origin for the absolute public
+// URLs that go into `sources` (below). Deliberately NOT lib/siteUrl.ts's
+// resolveSiteUrl(): that falls back to http://localhost:3000 whenever
+// NEXT_PUBLIC_SITE_URL/VERCEL_PROJECT_PRODUCTION_URL are unset, which is true
+// both for a local `npm test` and for CI's `checks` job (only the separate
+// `e2e` job sets NEXT_PUBLIC_SITE_URL — see .github/workflows/ci.yml).
+// `sources` is hash-significant content (§4.3 of the query-core spec: "an
+// unchanged snapshot rebuilt later has the same dataVersion"), so an
+// env-dependent origin would make dataVersion depend on where the build ran
+// rather than what data it serves, and would silently produce a non-https
+// archiveUrl exactly where "every link is https" most needs to hold.
+// docs/deployment.md pins this exact string for NEXT_PUBLIC_SITE_URL in
+// Production, so hardcoding it here matches the real deployed value.
+const PUBLIC_SITE_ORIGIN = "https://fiscal.ge";
+
+const GDP_SOURCE_MANIFEST_RELATIVE_PATH = ["docs", "Raw Data", "GDP", "national-nominal-gdp"] as const;
+
+type GdpManifestRow = {
+  source_id: string;
+  dataset_title: string;
+  retrieved_file_url: string;
+  local_file: string;
+};
+
+/**
+ * Every public document the reviewed methodology manifests
+ * (lib/methodology/sourceManifest.ts) and the GDP source manifest archived,
+ * flattened across datasets and keyed by repository path so
+ * resolvePublicSources (./sources.ts) can join them against
+ * data/sources/source-documents.csv's `source_url_or_file` column. Not
+ * role-filtered and not deduplicated by file hash — unlike
+ * lib/methodology/workbookSources.ts's loadWorkbookSources /
+ * loadGdpWorkbookSources, which do both (for a workbook footer's short
+ * "sources used" list) and, doing so, drop the very source_id this join
+ * needs. Reuses loadReviewedSourceManifest directly instead: same
+ * validation (file exists, byte size, sha256, license), full row set.
+ */
+async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
+  const repositoryRoot = path.resolve(process.cwd(), "../..");
+
+  const perDataset = await Promise.all(
+    (["expenditure", "revenue", "municipalities"] as const).map((datasetId) =>
+      loadReviewedSourceManifest(repositoryRoot, datasetId),
+    ),
+  );
+
+  const documents: ManifestDocument[] = perDataset.flat().map((row) => ({
+    repositoryPath: row.repository_source_path,
+    documentId: row.source_id,
+    title: row.display_title_ka,
+    officialUrl: null,
+    archiveUrl: absoluteWorkbookSourceUrl(PUBLIC_SITE_ORIGIN, row.downloadHref),
+  }));
+
+  // GDP sources live in a separate manifest with its own schema (no
+  // repository_source_path — `local_file` is relative to this manifest's own
+  // directory) and are not one of LIVE_METHODOLOGY_IDS, so
+  // loadReviewedSourceManifest cannot read them. loadGdpWorkbookSources
+  // (workbookSources.ts) reads the same file but, like loadWorkbookSources,
+  // projects source_id away — read it directly here to keep it.
+  const gdpManifestPath = path.join(repositoryRoot, ...GDP_SOURCE_MANIFEST_RELATIVE_PATH, "source-manifest.csv");
+  const gdpCsv = await readFile(gdpManifestPath, "utf8");
+  const gdpRows = parse(gdpCsv, {
+    bom: true,
+    columns: true,
+    skip_empty_lines: true,
+    trim: true,
+  }) as GdpManifestRow[];
+
+  for (const row of gdpRows) {
+    if (!row.retrieved_file_url.startsWith("https://")) {
+      throw new Error(
+        `buildFactQuerySnapshot: GDP source manifest row "${row.source_id}" has a non-https retrieved_file_url`,
+      );
+    }
+    documents.push({
+      repositoryPath: [...GDP_SOURCE_MANIFEST_RELATIVE_PATH, row.local_file].join("/"),
+      documentId: row.source_id,
+      title: row.dataset_title,
+      officialUrl: row.retrieved_file_url,
+      archiveUrl: null,
+    });
+  }
+
+  return documents;
+}
+
+// Memoized like loadServedExplorerData/loadServedMunicipalData below and
+// lib/methodology/workbookSources.ts's own cache: loadReviewedSourceManifest
+// re-reads and re-hashes every archived file with no caching of its own, and
+// buildFactQuerySnapshot is called repeatedly within one test run (every
+// tests/factQuery/*.test.ts case). Not reset-for-tests like servedData.ts's
+// cache: nothing here depends on GEODATA_DATA_SOURCE or needs per-test
+// isolation.
+let manifestDocumentsPromise: Promise<ManifestDocument[]> | null = null;
+function loadManifestDocuments(): Promise<ManifestDocument[]> {
+  manifestDocumentsPromise ??= loadManifestDocumentsUncached();
+  return manifestDocumentsPromise;
+}
 
 /**
  * Item ids of the series that carry an approved historical join, from
@@ -89,11 +195,30 @@ function sortedBy<T>(rows: T[], ...keys: Array<(row: T) => string | number>): T[
 }
 
 export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Promise<FactQuerySnapshot> {
-  const [explorer, municipal, taxonomy] = await Promise.all([
+  const [explorer, municipal, taxonomy, manifestDocuments] = await Promise.all([
     loadServedExplorerData(),
     loadServedMunicipalData(),
     loadTaxonomyFiles("../../data/taxonomy"),
+    loadManifestDocuments(),
   ]);
+
+  // explorer.sourceDocuments' incoming order is not hash-safe either: the CSV
+  // loader (lib/data/sources.ts) returns source-documents.csv's file row
+  // order, while the db mirror (lib/db/mirrorRows.ts's
+  // loadSourceDocumentsFromMirror) returns `ORDER BY id`. resolvePublicSources
+  // (./sources.ts) is deliberately silent on order for exactly this reason —
+  // both the outer array and each entry's nested `documents` are sorted here,
+  // by sourceId and documentId respectively, both of which are unique (source
+  // ids are asserted unique at load time; document ids come from the
+  // manifests' own source_id, unique across all four manifests — verified by
+  // inspection, not just assumed).
+  const sources: ResolvedSource[] = sortedBy(
+    resolvePublicSources({ sourceDocuments: explorer.sourceDocuments, manifestDocuments }),
+    (source) => source.sourceId,
+  ).map((source) => ({
+    ...source,
+    documents: sortedBy(source.documents, (document) => document.documentId),
+  }));
 
   // GlossaryEntry (lib/data/glossary.ts) carries no sort/display-order column, so
   // sortOrder cannot come from the glossary itself — and it must NOT come from the
@@ -210,7 +335,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
       slugByCode,
     },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
-    sources: [],
+    sources,
   };
 
   return {
