@@ -58,8 +58,9 @@ const GDP_SOURCE_MANIFEST_RELATIVE_PATH = ["docs", "Raw Data", "GDP", "national-
  * `retrieved_file_url` values — all 83 pass unchanged, including
  * already-percent-encoded Georgian filenames (mof.ge), a matsne.gov.ge
  * download link, and a web.archive.org URL with a second https:// URL
- * embedded in its path. See .superpowers/sdd/task-4-report.md, Fix pass 2,
- * for the scan output.
+ * embedded in its path. The invariant test in tests/factQuery/sources.test.ts
+ * is the durable enforcement of this property: it re-checks every resolved
+ * document on each run, so a future manifest row carrying prose fails there.
  */
 function isCleanHttpsUrl(value: string): boolean {
   if (!value.startsWith("https://")) return false;
