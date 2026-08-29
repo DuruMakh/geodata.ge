@@ -10,8 +10,13 @@ const uniqueIds = z.array(z.string().min(1)).min(1).transform((ids) => Array.fro
 
 export const expectedDataVersion = z.string().regex(/^[0-9a-f]{64}$/).optional();
 
-const nationalMeasure = z.enum(["amount_gel", "share_of_total_pct", "share_of_gdp_pct"]);
-const municipalMeasure = z.enum(["amount_gel", "share_of_total_pct", "gel_per_resident"]);
+// Exported so describeCoverage.ts can report each dataset's legal `measures`
+// straight from the same enum queryNationalInput/queryMinistriesInput/
+// queryMunicipalInput already validate against, instead of a second
+// hand-maintained copy that could silently drift from what those functions
+// actually accept.
+export const nationalMeasure = z.enum(["amount_gel", "share_of_total_pct", "share_of_gdp_pct"]);
+export const municipalMeasure = z.enum(["amount_gel", "share_of_total_pct", "gel_per_resident"]);
 
 export const describeCoverageInput = z.object({
   datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure"]).optional(),
