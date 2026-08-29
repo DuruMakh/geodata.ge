@@ -1752,7 +1752,7 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "per_resident_coverage_limited",
     severity: "severe",
-    messageKa: "ერთ მcxოვრებზე გაანგარიშება მხოლოდ 2025 წლის მუნიციპალურ/რეგიონულ ჯამებზეა დაშვებული (ერთ მცხოვრებზე).",
+    messageKa: "ერთ მცხოვრებზე გაანგარიშება მხოლოდ 2025 წლის მუნიციპალურ/რეგიონულ ჯამებზეა დაშვებული.",
     messageEn: "Per-resident values are supported only for the approved 2025 municipal and region totals.",
     methodologyRef: "municipal-population-regional-gdp.md",
     applies: (c) =>
