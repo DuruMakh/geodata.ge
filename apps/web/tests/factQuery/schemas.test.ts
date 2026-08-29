@@ -26,7 +26,20 @@ describe("query input schemas", () => {
 });
 
 describe("envelope schema", () => {
-  it("requires an error when status is error", () => {
-    expect(() => envelopeSchema.parse({ kind: "error", status: "error", meta: null })).toThrow();
+  // meta is deliberately VALID here. An earlier version passed `meta: null`, which
+  // fails the meta validator on its own — so that test would have passed even if the
+  // union never enforced the error requirement it claims to test.
+  it("requires an error object when status is error", () => {
+    expect(envelopeSchema.safeParse({ kind: "error", status: "error", meta: {} }).success).toBe(false);
+  });
+
+  it("accepts a well-formed error envelope", () => {
+    const result = envelopeSchema.safeParse({
+      kind: "error",
+      status: "error",
+      meta: {},
+      error: { code: "unknown_series", messageKa: "უცნობი", messageEn: "unknown", retryable: false },
+    });
+    expect(result.success).toBe(true);
   });
 });
