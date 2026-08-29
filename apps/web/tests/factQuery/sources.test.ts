@@ -21,6 +21,39 @@ describe("public source resolution", () => {
     }
   });
 
+  // The test above only checks for the "docs/Raw Data" substring — it would
+  // not catch a URL with prose trailing after it (e.g. a real
+  // "https://mof.ge/5039" followed by " Repository archive: ..."), which is
+  // exactly the shape data/methodology/source-archives/*.csv's
+  // official_url_or_archive_url column holds in 99 of 180 rows today (just
+  // never yet combined with an https:// prefix). This asserts the stronger,
+  // general property over every resolved document in the snapshot: a
+  // non-null officialUrl/archiveUrl round-trips unchanged through the URL
+  // parser (nothing left for it to silently percent-encode away) and never
+  // contains whitespace or either prose fragment. A future manifest row
+  // combining a real URL with trailing notes fails here instead of shipping.
+  it("every resolved officialUrl and archiveUrl is a clean, single https:// URL with no embedded prose", async () => {
+    const snapshot = await buildFactQuerySnapshot(OPTIONS);
+    let checked = 0;
+
+    for (const source of snapshot.sources) {
+      for (const document of source.documents) {
+        for (const url of [document.officialUrl, document.archiveUrl]) {
+          if (url === null) continue;
+          checked += 1;
+
+          expect(url).toMatch(/^https:\/\//);
+          expect(url).not.toMatch(/\s/);
+          expect(url).not.toContain("Raw Data");
+          expect(url).not.toContain("Repository archive");
+          expect(url).toBe(new URL(url).href);
+        }
+      }
+    }
+
+    expect(checked).toBeGreaterThan(0);
+  });
+
   it("never emits a sentinel source id", async () => {
     const snapshot = await buildFactQuerySnapshot(OPTIONS);
     for (const source of snapshot.sources) {

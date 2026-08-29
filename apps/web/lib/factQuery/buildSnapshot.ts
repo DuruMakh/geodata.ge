@@ -38,15 +38,51 @@ const PUBLIC_SITE_ORIGIN = "https://fiscal.ge";
 
 const GDP_SOURCE_MANIFEST_RELATIVE_PATH = ["docs", "Raw Data", "GDP", "national-nominal-gdp"] as const;
 
-// Same fields, same https guard as workbookSources.ts's own
-// gdpWorkbookSourceRowSchema (not reused directly: that schema omits
-// source_id, the field this loader exists to keep — see the note below). Not
+/**
+ * True only when `value` is an https:// URL and nothing else — no leading or
+ * trailing whitespace, no trailing prose, nothing the URL parser would
+ * silently rewrite. `startsWith("https://")` alone is not enough: a manifest
+ * row holding "https://mof.ge/5039 Repository archive: docs/Raw Data/x.pdf"
+ * (a real URL followed by internal-path prose — this project reviews
+ * documents by appending exactly this kind of note) passes that check and
+ * would publish the whole string, prose included, as a public URL. Nor does
+ * zod's `.url()` catch it: `new URL(value)` does not throw on trailing
+ * garbage, it silently percent-encodes it into the parsed URL, so `.url()`
+ * alone accepts the same bad string. Requiring the value to already equal
+ * its own parsed `.href` closes both gaps, because percent-encoding
+ * anything makes that equality fail.
+ *
+ * Verified empirically, not just argued: run against every one of the 81
+ * `official_url_or_archive_url` values across expenditure.csv/revenue.csv/
+ * municipalities.csv that start with "https://", plus both GDP
+ * `retrieved_file_url` values — all 83 pass unchanged, including
+ * already-percent-encoded Georgian filenames (mof.ge), a matsne.gov.ge
+ * download link, and a web.archive.org URL with a second https:// URL
+ * embedded in its path. See .superpowers/sdd/task-4-report.md, Fix pass 2,
+ * for the scan output.
+ */
+function isCleanHttpsUrl(value: string): boolean {
+  if (!value.startsWith("https://")) return false;
+  try {
+    return value === new URL(value).href;
+  } catch {
+    return false;
+  }
+}
+
+// Same field set as workbookSources.ts's own gdpWorkbookSourceRowSchema (not
+// reused directly: that schema omits source_id, the field this loader exists
+// to keep — see the note below), but with the tightened https check above in
+// place of zod's `.url()`, so this path and the officialUrl guard just below
+// cannot drift onto two different definitions of "a real URL". Not
 // `.strict()`: like its sibling, this only names the columns it needs out of
 // source-manifest.csv's wider set (publisher, role, sha256, bytes, ...).
 const gdpManifestRowSchema = z.object({
   source_id: z.string().trim().min(1),
   dataset_title: z.string().trim().min(1),
-  retrieved_file_url: z.string().url().startsWith("https://"),
+  retrieved_file_url: z.string().refine(isCleanHttpsUrl, {
+    message: "retrieved_file_url must be a clean https:// URL with no embedded whitespace or trailing text",
+  }),
   local_file: z.string().trim().min(1),
 });
 
@@ -77,14 +113,15 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
   // rows hold prose like "Repository archive: docs/Raw Data/..." (an internal
   // path, never usable as a public link), but some genuinely hold the
   // original https:// URL (e.g. https://mof.ge/5039, matsne.gov.ge,
-  // web.archive.org). Take it only when it is actually an https URL —
-  // confirmed by inspection to recover 81 of 180 rows across the three
-  // manifests — never when it's descriptive text.
+  // web.archive.org). Take it only when isCleanHttpsUrl confirms it's
+  // exactly a URL and nothing else — confirmed by inspection to recover 81
+  // of 180 rows across the three manifests — never when it's descriptive
+  // text, and never a URL with descriptive text trailing after it.
   const documents: ManifestDocument[] = perDataset.flat().map((row) => ({
     repositoryPath: row.repository_source_path,
     documentId: row.source_id,
     title: row.display_title_ka,
-    officialUrl: row.official_url_or_archive_url.startsWith("https://") ? row.official_url_or_archive_url : null,
+    officialUrl: isCleanHttpsUrl(row.official_url_or_archive_url) ? row.official_url_or_archive_url : null,
     archiveUrl: absoluteWorkbookSourceUrl(PUBLIC_SITE_ORIGIN, row.downloadHref),
   }));
 
