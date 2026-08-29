@@ -9,6 +9,17 @@ const NATIONAL_TOTAL_IDS = new Set(["revenue.total", "expenditure.total"]);
 const REVENUE_TOTAL_ID = "revenue.total";
 const LIABILITIES_ID = "revenue.increase_liabilities";
 const NETTED_REVENUE_IDS = new Set(["revenue.grants", "revenue.other_revenue"]);
+// revenue.grants / revenue.other_revenue are net of internal government flows only from 2008
+// onward. revenue-methodology.md §6.2 (line 398): "Old-code years (2005-2007) have no netting -
+// their classification predates these internal rows". The era table (§2.3, line 103) shows 2008
+// is the first year on GFS codes, the classification that carries the 1.3.3 / 1.4.1.1.3 rows the
+// netting subtracts. Confirmed in code: generateFacts.ts's oldCodeYears (2005-2007, matched by
+// isOldRevenueRow's 12-/8-digit patterns) route through generateOldCodeRevenueFacts, which takes
+// revenue.grants/revenue.other_revenue as a single required row with no subtraction; only
+// modernRows (year not in oldCodeYears, i.e. 2008 on) go through the branch that subtracts 1.3.3
+// and 1.4.1.1.3. 2004 predates this entirely (a separate reviewed annual-report panel,
+// year2004Revenue.ts, with no subtraction either) and is excluded by the same year >= 2008 gate.
+const NETTING_START_YEAR = 2008;
 
 export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
@@ -35,7 +46,16 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
     messageKa: "2004 წლის შემოსავლების ჯამი უფრო ვიწრო მოცულობისაა: ვალდებულებების ზრდა მიუწვდომელია.",
     messageEn: "The 2004 receipts total has narrower coverage: increase in liabilities is unavailable.",
     methodologyRef: "revenue-methodology.md",
-    applies: (c) => c.years.includes(2004) && c.seriesIds.includes(REVENUE_TOTAL_ID),
+    // Fires directly on the 2004 revenue total, AND on any share_of_total_pct query against
+    // national revenue in 2004 - spec 5.2's measure matrix makes "the applicable consolidated
+    // receipts total" the share_of_total_pct denominator for every national revenue category and
+    // the total itself, so a 2004 percentage silently inherits the narrower-total limitation even
+    // when revenue.total is never named in seriesIds. Gated on datasetId === "national-revenue"
+    // so this does not bleed onto a same-shaped national-expenditure query (expenditure's 2004
+    // total has no analogous gap; see the REVENUE_TOTAL_ID comment above).
+    applies: (c) =>
+      c.years.includes(2004) &&
+      (c.seriesIds.includes(REVENUE_TOTAL_ID) || (c.datasetId === "national-revenue" && c.measure === "share_of_total_pct")),
     affects: () => ["2004"],
   },
   {
@@ -71,7 +91,8 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
     messageKa: "შერჩეული მუხლი შიდა ნაკადების დოკუმენტირებულ ნეტირებას იყენებს.",
     messageEn: "The selected item uses the documented netting of internal flows.",
     methodologyRef: "revenue-methodology.md",
-    applies: (c) => c.seriesIds.some((id) => NETTED_REVENUE_IDS.has(id)),
+    applies: (c) =>
+      c.seriesIds.some((id) => NETTED_REVENUE_IDS.has(id)) && c.years.some((y) => y >= NETTING_START_YEAR),
     affects: (c) => c.seriesIds.filter((id) => NETTED_REVENUE_IDS.has(id)),
   },
   {

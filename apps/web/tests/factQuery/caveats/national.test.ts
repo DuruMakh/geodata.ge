@@ -45,6 +45,23 @@ describe("revenue_2004_total_scope", () => {
       codes(context({ datasetId: "national-expenditure", years: [2004], seriesIds: ["expenditure.total"] })),
     ).not.toContain("revenue_2004_total_scope");
   });
+  it("fires for a 2004 revenue category as share_of_total_pct (the total is its denominator)", () => {
+    expect(
+      codes(context({ years: [2004], seriesIds: ["revenue.vat"], measure: "share_of_total_pct" })),
+    ).toContain("revenue_2004_total_scope");
+  });
+  it("does NOT fire for a 2004 expenditure share_of_total_pct (different total, no gap)", () => {
+    expect(
+      codes(
+        context({
+          datasetId: "national-expenditure",
+          years: [2004],
+          seriesIds: ["expenditure.total"],
+          measure: "share_of_total_pct",
+        }),
+      ),
+    ).not.toContain("revenue_2004_total_scope");
+  });
 });
 
 describe("revenue_2004_liabilities_unavailable", () => {
@@ -58,6 +75,11 @@ describe("revenue_2004_liabilities_unavailable", () => {
       "revenue_2004_liabilities_unavailable",
     );
   });
+  it("does not fire for 2004 when liabilities are not the requested series", () => {
+    expect(codes(context({ years: [2004], seriesIds: ["revenue.vat"] }))).not.toContain(
+      "revenue_2004_liabilities_unavailable",
+    );
+  });
 });
 
 describe("budget_scopes_differ", () => {
@@ -67,6 +89,29 @@ describe("budget_scopes_differ", () => {
   });
   it("does not fire for a category", () => {
     expect(codes(context({ seriesIds: ["revenue.vat"] }))).not.toContain("budget_scopes_differ");
+  });
+});
+
+describe("revenue_internal_flows_netted", () => {
+  it("fires for 2008, the first netted year", () => {
+    expect(codes(context({ years: [2008], seriesIds: ["revenue.grants"] }))).toContain(
+      "revenue_internal_flows_netted",
+    );
+  });
+  it("does not fire for 2007, the last un-netted (old-code) year", () => {
+    expect(codes(context({ years: [2007], seriesIds: ["revenue.other_revenue"] }))).not.toContain(
+      "revenue_internal_flows_netted",
+    );
+  });
+  it("does not fire for 2004, the reviewed-panel year (also unnetted, different reason)", () => {
+    expect(codes(context({ years: [2004], seriesIds: ["revenue.grants"] }))).not.toContain(
+      "revenue_internal_flows_netted",
+    );
+  });
+  it("does not fire for a netted year when the series is not grants/other_revenue", () => {
+    expect(codes(context({ years: [2020], seriesIds: ["revenue.vat"] }))).not.toContain(
+      "revenue_internal_flows_netted",
+    );
   });
 });
 
