@@ -1,7 +1,8 @@
 // apps/web/lib/factQuery/caveats/rules.municipal.ts
 import { ADJARA_REGION_ID, MUNICIPAL_COUNTRY_ID } from "../../data/municipal/types";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "../types";
-import type { CaveatRule } from "./engine";
+import type { MunicipalWarningType } from "../../data/municipal/types";
+import type { CaveatContext, CaveatRule } from "./engine";
 
 const EXCLUDED = new Set<string>(AGGREGATE_ONLY_MUNICIPAL_CODES);
 const COUNTRY_ID = MUNICIPAL_COUNTRY_ID;
@@ -13,13 +14,13 @@ const TOTAL_SERIES = "municipal.total";
  * carries warningType "source_actual_missing" with showWarning false: a
  * display-flag rule would serve its fallback figure with no warning at all.
  */
-function hasWarningType(context: { municipalTotalInputs: { warningType: string; municipalityCode: string; year: number }[] }, type: string) {
+function hasWarningType(context: Pick<CaveatContext, "municipalTotalInputs">, type: MunicipalWarningType) {
   return context.municipalTotalInputs.some((row) => row.warningType === type);
 }
 
 function affectedByWarningType(
-  context: { municipalTotalInputs: { warningType: string; municipalityCode: string; year: number }[] },
-  type: string,
+  context: Pick<CaveatContext, "municipalTotalInputs">,
+  type: MunicipalWarningType,
 ) {
   return context.municipalTotalInputs.filter((row) => row.warningType === type).map((row) => `${row.municipalityCode}:${row.year}`);
 }
