@@ -33,6 +33,13 @@ describe("describeCoverage", () => {
     ]);
   });
 
+  it("narrows datasets to the requested one", () => {
+    const result = describeCoverage(snapshot, { datasetId: "national-revenue" });
+    expect(envelopeSchema.parse(result)).toBeTruthy();
+    expect(data(result).datasets.length).toBe(1);
+    expect(data(result).datasets[0]?.datasetId).toBe("national-revenue");
+  });
+
   it("marks revenue.taxes_total taxonomy_only, never served", () => {
     const series = data(describeCoverage(snapshot, { datasetId: "national-revenue" })).series ?? [];
     const entry = series.find((s) => s.seriesId === "revenue.taxes_total");
@@ -87,12 +94,14 @@ describe("describeCoverage", () => {
 
   it("rejects a stale expectedDataVersion", () => {
     const result = describeCoverage(snapshot, { expectedDataVersion: "0".repeat(64) });
+    expect(envelopeSchema.parse(result)).toBeTruthy();
     expect(result.kind).toBe("error");
     expect((result as { error: { code: string } }).error.code).toBe("data_version_changed");
   });
 
   it("rejects an unknown dataset with invalid_parameters and offers valid choices", () => {
     const result = describeCoverage(snapshot, { datasetId: "not-a-dataset" });
+    expect(envelopeSchema.parse(result)).toBeTruthy();
     expect(result.kind).toBe("error");
     expect((result as { error: { code: string; validChoices?: string[] } }).error.code).toBe("invalid_parameters");
     expect((result as { error: { validChoices?: string[] } }).error.validChoices).toContain("national-revenue");

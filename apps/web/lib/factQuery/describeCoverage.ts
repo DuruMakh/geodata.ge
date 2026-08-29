@@ -55,7 +55,6 @@ type DatasetSummary = {
   datasetId: DatasetId;
   budgetScope: string;
   labelKa: string;
-  labelEn: string;
   years: [number, number];
   entityTypes: EntityType[];
   measures: Measure[];
@@ -90,33 +89,29 @@ const MUNICIPAL_MEASURES = municipalMeasure.options as Measure[];
 // their totals are not the same concept.
 const DATASET_META: Record<
   DatasetId,
-  Pick<DatasetSummary, "budgetScope" | "labelKa" | "labelEn" | "entityTypes" | "measures">
+  Pick<DatasetSummary, "budgetScope" | "labelKa" | "entityTypes" | "measures">
 > = {
   "national-revenue": {
     budgetScope: "consolidated_budget_receipts",
     labelKa: "შემოსავლები",
-    labelEn: "National revenue",
     entityTypes: ["country"],
     measures: NATIONAL_MEASURES,
   },
   "national-expenditure": {
     budgetScope: "state_budget_expenditure",
     labelKa: "ხარჯები",
-    labelEn: "National expenditure",
     entityTypes: ["country"],
     measures: NATIONAL_MEASURES,
   },
   ministries: {
     budgetScope: "state_budget_administrative",
     labelKa: "სამინისტროები",
-    labelEn: "Ministries",
     entityTypes: ["country"],
     measures: NATIONAL_MEASURES,
   },
   "municipal-expenditure": {
     budgetScope: "municipal_functional_public_total",
     labelKa: "მუნიციპალიტეტები",
-    labelEn: "Municipal expenditure",
     entityTypes: ["country", "municipality", "region"],
     measures: MUNICIPAL_MEASURES,
   },
@@ -479,6 +474,13 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   const meta = buildResponseMeta(snapshot, { caveats });
 
   const exclusions = buildExclusions();
+  // datasets narrows to the single requested entry once datasetId is given,
+  // rather than always returning all four: the brief only says series/
+  // entities are absent without a datasetId, but spec §6.2 ("with one,
+  // return its entity and series catalogue") reads as the whole response
+  // becoming about that one dataset. This is a real contract decision, not
+  // just an implementation detail — asserted below by the
+  // "narrows datasets to the requested one" test.
   const datasets = DATASET_IDS.filter((id) => input.datasetId === undefined || id === input.datasetId).map((id) =>
     buildDatasetSummary(snapshot, id),
   );
