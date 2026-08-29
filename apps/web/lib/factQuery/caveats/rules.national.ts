@@ -1,0 +1,99 @@
+// apps/web/lib/factQuery/caveats/rules.national.ts
+import type { CaveatRule } from "./engine";
+
+const NATIONAL_TOTAL_IDS = new Set(["revenue.total", "expenditure.total"]);
+// revenue_2004_total_scope is about the revenue-side 2004 panel omitting increase-in-liabilities
+// (revenue-methodology.md §5.6). The 2004 expenditure total has no analogous gap — the treasury
+// methodology's 2004 execution annex is complete and reconciled — so this must stay revenue-only
+// and not reuse NATIONAL_TOTAL_IDS.
+const REVENUE_TOTAL_ID = "revenue.total";
+const LIABILITIES_ID = "revenue.increase_liabilities";
+const NETTED_REVENUE_IDS = new Set(["revenue.grants", "revenue.other_revenue"]);
+
+export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
+  {
+    code: "nominal_gel",
+    severity: "note",
+    messageKa: "თანხები ნომინალურ ლარშია, მიმდინარე ფასებში; ინფლაციაზე კორექტირებული არ არის.",
+    messageEn: "Amounts are nominal GEL at current prices and are not adjusted for inflation.",
+    methodologyRef: "ai-grounding-and-caveats.md#nominal_gel",
+    applies: (c) => c.measure === "amount_gel" && c.years.length > 1,
+    affects: (c) => c.seriesIds,
+  },
+  {
+    code: "planned_values",
+    severity: "severe",
+    messageKa: "შედეგი შეიცავს გეგმურ (და არა ფაქტობრივ) მაჩვენებელს.",
+    messageEn: "The result contains planned rather than actual values.",
+    methodologyRef: "ai-grounding-and-caveats.md#planned_values",
+    applies: (c) => c.observations.some((o) => o.basis === "planned"),
+    affects: (c) => c.observations.filter((o) => o.basis === "planned").map((o) => `${o.seriesId}:${o.year}`),
+  },
+  {
+    code: "revenue_2004_total_scope",
+    severity: "severe",
+    messageKa: "2004 წლის შემოსავლების ჯამი უფრო ვიწრო მოცულობისაა: ვალდებულებების ზრდა მიუწვდომელია.",
+    messageEn: "The 2004 receipts total has narrower coverage: increase in liabilities is unavailable.",
+    methodologyRef: "revenue-methodology.md",
+    applies: (c) => c.years.includes(2004) && c.seriesIds.includes(REVENUE_TOTAL_ID),
+    affects: () => ["2004"],
+  },
+  {
+    code: "revenue_2004_liabilities_unavailable",
+    severity: "severe",
+    messageKa: "2004 წლისთვის ვალდებულებების ზრდა მიუწვდომელია — ის ნული არ არის.",
+    messageEn: "Increase in liabilities is unavailable for 2004. It is not zero.",
+    methodologyRef: "revenue-methodology.md",
+    applies: (c) => c.years.includes(2004) && c.seriesIds.includes(LIABILITIES_ID),
+    affects: () => [`${LIABILITIES_ID}:2004`],
+  },
+  {
+    code: "budget_scopes_differ",
+    severity: "severe",
+    messageKa: "ეროვნული შემოსავლებისა და ხარჯების ჯამები სხვადასხვა საბიუჯეტო მოცულობას ეყრდნობა; მათი გამოკლებით დეფიციტი არ დგინდება.",
+    messageEn: "National revenue and expenditure totals use different budget concepts; subtracting them does not establish a deficit.",
+    methodologyRef: "revenue-methodology.md",
+    applies: (c) => c.seriesIds.some((id) => NATIONAL_TOTAL_IDS.has(id)),
+    affects: (c) => c.seriesIds.filter((id) => NATIONAL_TOTAL_IDS.has(id)),
+  },
+  {
+    code: "negative_revenue_correction",
+    severity: "note",
+    messageKa: "უარყოფითი მნიშვნელობა გადამოწმებული კორექციაა და არა დაკარგული მონაცემი.",
+    messageEn: "A negative value is a reviewed correction, not missing or invalid data.",
+    methodologyRef: "revenue-methodology.md",
+    applies: (c) => c.observations.some((o) => o.value !== null && o.value < 0),
+    affects: (c) => c.observations.filter((o) => o.value !== null && o.value < 0).map((o) => `${o.seriesId}:${o.year}`),
+  },
+  {
+    code: "revenue_internal_flows_netted",
+    severity: "note",
+    messageKa: "შერჩეული მუხლი შიდა ნაკადების დოკუმენტირებულ ნეტირებას იყენებს.",
+    messageEn: "The selected item uses the documented netting of internal flows.",
+    methodologyRef: "revenue-methodology.md",
+    applies: (c) => c.seriesIds.some((id) => NETTED_REVENUE_IDS.has(id)),
+    affects: (c) => c.seriesIds.filter((id) => NETTED_REVENUE_IDS.has(id)),
+  },
+  {
+    code: "gdp_sna_break_2010",
+    severity: "note",
+    messageKa: "მშპ-ის მაჩვენებელი 2010 წელს აღრიცხვის სტანდარტს იცვლის (SNA 1993 → SNA 2008).",
+    messageEn: "The GDP denominator changes accounting standard at 2010 (SNA 1993 to SNA 2008).",
+    methodologyRef: "national-nominal-gdp.md",
+    applies: (c) => {
+      if (c.measure !== "share_of_gdp_pct") return false;
+      const standards = new Set(c.gdpInputs.filter((g) => c.years.includes(g.year)).map((g) => g.accountingStandard));
+      return standards.size > 1;
+    },
+    affects: () => ["gdp"],
+  },
+  {
+    code: "gdp_preliminary",
+    severity: "note",
+    messageKa: "გამოყენებული მშპ-ის მაჩვენებელი წინასწარია.",
+    messageEn: "A GDP denominator used by this result is preliminary.",
+    methodologyRef: "national-nominal-gdp.md",
+    applies: (c) => c.measure === "share_of_gdp_pct" && c.gdpInputs.some((g) => c.years.includes(g.year) && g.status === "preliminary"),
+    affects: (c) => c.gdpInputs.filter((g) => c.years.includes(g.year) && g.status === "preliminary").map((g) => `gdp:${g.year}`),
+  },
+];
