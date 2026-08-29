@@ -11,6 +11,12 @@ import type {
   MunicipalTotalFact,
 } from "../data/municipal/types";
 
+// Re-exported so the caveat engine (and other factQuery modules) can import
+// these from "./types" instead of reaching into ../servedRows or
+// ../data/municipal/types directly.
+export type { MunicipalTotalFact } from "../data/municipal/types";
+export type { ServedNationalGdpFact } from "../servedRows";
+
 export const SCHEMA_VERSION = "1.0.0" as const;
 
 /** Municipal codes whose budgets are not territorially attributable (spec section 5.4). */
