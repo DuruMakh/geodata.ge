@@ -49,4 +49,8 @@ describe("CAVEAT_RULES registry", () => {
       expect(rule.methodologyRef.length).toBeGreaterThan(0);
     }
   });
+
+  it("registers all 22 codes from spec section 9.2", () => {
+    expect(CAVEAT_RULES).toHaveLength(22);
+  });
 });
