@@ -44,4 +44,80 @@ describe("public source resolution", () => {
     const selected = selectSources(snapshot, [target, target, "source.does_not_exist"]);
     expect(selected.map((s) => s.sourceId)).toEqual([target]);
   });
+
+  // Golden mappings: resolvePublicSources' path-join, its " + " multi-file
+  // split, and its directory-prefix fallback are all mechanisms the brief
+  // never specified — nothing above pins what a source's documents actually
+  // are, so every test up to this point would still pass if the join
+  // attached the wrong document, or none at all. These pin exact,
+  // independently-verified documentId sets (and, for the third case, exact
+  // officialUrl/archiveUrl values) against data/sources/source-documents.csv
+  // and the reviewed manifests as they exist today, so a future change that
+  // breaks the join fails here instead of only showing up as a silently
+  // wrong or missing citation.
+  describe("golden document mappings", () => {
+    it("a straightforward single-path source resolves to exactly its one archived document", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const source = snapshot.sources.find((s) => s.sourceId === "source.mof_2017_revenue_form1_pdf");
+
+      expect(source?.documents).toEqual([
+        {
+          documentId: "source.mof.revenue.2017.form_1",
+          title: "2017 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები",
+          officialUrl: null,
+          archiveUrl: "https://fiscal.ge/downloads/methodology/revenue/files/2017/mof-revenue-form-1.pdf",
+        },
+      ]);
+    });
+
+    it("a ' + '-joined multi-file source resolves to both archived documents", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const source = snapshot.sources.find(
+        (s) => s.sourceId === "source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual",
+      );
+
+      expect(source?.documents).toEqual([
+        {
+          documentId: "source.mof.expenditure.2017.mof_excel_fact",
+          title: "2017 წლის სახელმწიფო ბიუჯეტის შესრულების სამუშაო წიგნი",
+          officialUrl: null,
+          archiveUrl: "https://fiscal.ge/downloads/methodology/expenditure/files/2017/mof-excel-fact.xlsx",
+        },
+        {
+          documentId: "source.mof.expenditure.2017.treasury_e11",
+          title: "2017 წლის სახელმწიფო ბიუჯეტის ფუნქციური შესრულება",
+          officialUrl: null,
+          archiveUrl: "https://fiscal.ge/downloads/methodology/expenditure/files/2017/treasury-e11.pdf",
+        },
+      ]);
+    });
+
+    // Also covers the "gains a real officialUrl" case: source_url_or_file
+    // names the adjara-republic-budget-2015-2025 directory (no single file
+    // matches it exactly), so this only resolves via the directory-prefix
+    // fallback — and the 2015 file's manifest row happens to carry a real
+    // matsne.gov.ge URL in official_url_or_archive_url, while the 2016-2025
+    // file's row holds only descriptive text ("user-supplied official
+    // workbook"), so the two documents exercise both branches of the
+    // officialUrl guard side by side.
+    it("a directory-prefix-fallback source resolves to every file under it, with a real officialUrl where the manifest records one", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const source = snapshot.sources.find((s) => s.sourceId === "source.adjara_republic_budget_actual");
+
+      expect(source?.documents).toEqual([
+        {
+          documentId: "source.adjara.republic.2015.actual_payments",
+          title: "აჭარის ა.რ. რესპუბლიკური ბიუჯეტი — 2015 წლის ფაქტობრივი გადასახდელები",
+          officialUrl: "https://matsne.gov.ge/ka/document/download/3515842/2/ge/pdf",
+          archiveUrl: "https://fiscal.ge/downloads/methodology/municipalities/files/2015/adjara-republic-actual-payments.pdf",
+        },
+        {
+          documentId: "source.adjara.republic.2016_2025.actual_payments",
+          title: "აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივი გადასახდელები 2016–2025",
+          officialUrl: null,
+          archiveUrl: "https://fiscal.ge/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx",
+        },
+      ]);
+    });
+  });
 });

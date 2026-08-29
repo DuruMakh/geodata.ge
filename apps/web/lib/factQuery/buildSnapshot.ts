@@ -6,6 +6,7 @@
 import path from "node:path";
 import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
+import { z } from "zod";
 import { loadServedExplorerData, loadServedMunicipalData } from "../data/servedData";
 import { loadTaxonomyFiles } from "../data/taxonomy";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
@@ -37,12 +38,17 @@ const PUBLIC_SITE_ORIGIN = "https://fiscal.ge";
 
 const GDP_SOURCE_MANIFEST_RELATIVE_PATH = ["docs", "Raw Data", "GDP", "national-nominal-gdp"] as const;
 
-type GdpManifestRow = {
-  source_id: string;
-  dataset_title: string;
-  retrieved_file_url: string;
-  local_file: string;
-};
+// Same fields, same https guard as workbookSources.ts's own
+// gdpWorkbookSourceRowSchema (not reused directly: that schema omits
+// source_id, the field this loader exists to keep — see the note below). Not
+// `.strict()`: like its sibling, this only names the columns it needs out of
+// source-manifest.csv's wider set (publisher, role, sha256, bytes, ...).
+const gdpManifestRowSchema = z.object({
+  source_id: z.string().trim().min(1),
+  dataset_title: z.string().trim().min(1),
+  retrieved_file_url: z.string().url().startsWith("https://"),
+  local_file: z.string().trim().min(1),
+});
 
 /**
  * Every public document the reviewed methodology manifests
@@ -66,11 +72,19 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
     ),
   );
 
+  // official_url_or_archive_url is free text, not a validated URL column
+  // (sourceManifest.ts's schema only checks it's a non-empty string): most
+  // rows hold prose like "Repository archive: docs/Raw Data/..." (an internal
+  // path, never usable as a public link), but some genuinely hold the
+  // original https:// URL (e.g. https://mof.ge/5039, matsne.gov.ge,
+  // web.archive.org). Take it only when it is actually an https URL —
+  // confirmed by inspection to recover 81 of 180 rows across the three
+  // manifests — never when it's descriptive text.
   const documents: ManifestDocument[] = perDataset.flat().map((row) => ({
     repositoryPath: row.repository_source_path,
     documentId: row.source_id,
     title: row.display_title_ka,
-    officialUrl: null,
+    officialUrl: row.official_url_or_archive_url.startsWith("https://") ? row.official_url_or_archive_url : null,
     archiveUrl: absoluteWorkbookSourceUrl(PUBLIC_SITE_ORIGIN, row.downloadHref),
   }));
 
@@ -82,19 +96,20 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
   // projects source_id away — read it directly here to keep it.
   const gdpManifestPath = path.join(repositoryRoot, ...GDP_SOURCE_MANIFEST_RELATIVE_PATH, "source-manifest.csv");
   const gdpCsv = await readFile(gdpManifestPath, "utf8");
-  const gdpRows = parse(gdpCsv, {
+  const gdpRawRows = parse(gdpCsv, {
     bom: true,
     columns: true,
     skip_empty_lines: true,
     trim: true,
-  }) as GdpManifestRow[];
+  }) as unknown[];
 
-  for (const row of gdpRows) {
-    if (!row.retrieved_file_url.startsWith("https://")) {
-      throw new Error(
-        `buildFactQuerySnapshot: GDP source manifest row "${row.source_id}" has a non-https retrieved_file_url`,
-      );
+  for (const [index, rawRow] of gdpRawRows.entries()) {
+    const parsed = gdpManifestRowSchema.safeParse(rawRow);
+    if (!parsed.success) {
+      const issues = parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ");
+      throw new Error(`buildFactQuerySnapshot: invalid GDP source manifest row ${index + 1}: ${issues}`);
     }
+    const row = parsed.data;
     documents.push({
       repositoryPath: [...GDP_SOURCE_MANIFEST_RELATIVE_PATH, row.local_file].join("/"),
       documentId: row.source_id,
