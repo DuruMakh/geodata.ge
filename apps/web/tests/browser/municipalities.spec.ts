@@ -2,6 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 
+const TEST_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+
 async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
@@ -22,7 +24,7 @@ function contrastRatio(foreground: string, background: string): number {
 }
 
 test("states where the index figures come from and what the map measures", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
 
   // The page publishes a choropleth, four fiscal KPIs and 64 ranked budgets.
@@ -54,7 +56,7 @@ test("states where the index figures come from and what the map measures", async
 });
 
 test("renders 64 globally ordered accessible map targets behind one tab stop", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   const map = page.getByTestId("municipality-map");
   await expect(map.locator("[data-municipality-shape]")).toHaveCount(60);
@@ -124,7 +126,7 @@ test("draws all reviewed map shapes before JavaScript runs", async ({ browser })
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   try {
     const page = await context.newPage();
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     const paths = page.getByTestId("municipality-map").locator("[data-municipality-shape], [data-occupied-overlay]");
     await expect(paths).toHaveCount(62);
     await expect.poll(() => paths.evaluateAll((elements) => elements.filter((element) => {
@@ -138,7 +140,7 @@ test("draws all reviewed map shapes before JavaScript runs", async ({ browser })
 });
 
 test("moves between map targets with arrow keys instead of 65 tab stops", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
 
   const map = page.getByTestId("municipality-map");
@@ -164,25 +166,25 @@ test("moves between map targets with arrow keys instead of 65 tab stops", async 
 });
 
 test("polygon and marker clicks open municipality pages directly", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   await page.getByTestId("municipality-shape-33").click();
   await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/zugdidi");
 
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   await page.getByTestId("municipality-marker-06").click();
   await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/batumi");
 });
 
 test("Enter activates a polygon and Space activates a marker", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   await page.getByTestId("municipality-shape-33").focus();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/zugdidi");
 
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   const before = await page.evaluate(() => window.scrollY);
   await page.getByTestId("municipality-marker-06").focus();
@@ -192,7 +194,7 @@ test("Enter activates a polygon and Space activates a marker", async ({ page }) 
 });
 
 test("occupied overlays expose no interaction or public explanation", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   const overlays = page.locator("[data-occupied-overlay]");
   await expect(overlays).toHaveCount(2);
@@ -205,14 +207,14 @@ test("occupied overlays expose no interaction or public explanation", async ({ p
 });
 
 test("keeps occupied-area and no-data wording out of the map itself", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
   await expect(page.getByTestId("municipality-map")).not.toContainText(/მონაცემები არ არის|no data/i);
 });
 
 test("map omits the redundant heading while its legend, tooltip, and accessibility retain the measure", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   await expect(page.getByTestId("municipality-map-heading")).toHaveCount(0);
   await expect(page.getByTestId("municipality-map-legend")).toContainText("₾");
@@ -254,7 +256,7 @@ test("map omits the redundant heading while its legend, tooltip, and accessibili
 test("Tbilisi path and marker activate together while only the map-origin target owns the description", async ({
   page,
 }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   const path = page.getByTestId("municipality-shape-04");
   const marker = page.getByTestId("municipality-marker-04");
@@ -276,7 +278,7 @@ test("Tbilisi path and marker activate together while only the map-origin target
 });
 
 test("list focus suppresses a stale tooltip from a different map pointer target", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   const zugdidi = page.getByTestId("municipality-shape-33");
   const tbilisiPath = page.getByTestId("municipality-shape-04");
@@ -297,7 +299,7 @@ test("list focus suppresses a stale tooltip from a different map pointer target"
 });
 
 test("municipality map and list highlight each other by exact code", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   const shape = page.getByTestId("municipality-shape-33");
   const row = page.locator('[data-municipality-row-code="33"]');
@@ -312,7 +314,7 @@ test("municipality map and list highlight each other by exact code", async ({ pa
 });
 
 test("map keyboard focus wins over a simultaneous list pointer target", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   const focusedShape = page.getByTestId("municipality-shape-33");
   const otherRow = page.locator('[data-municipality-row-code="04"]');
@@ -323,7 +325,7 @@ test("map keyboard focus wins over a simultaneous list pointer target", async ({
 });
 
 test("region rows do not activate municipality geometry", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   await page.getByTestId("level-region").click();
   const regionRow = page.getByTestId("municipal-list-row").first();
@@ -335,7 +337,7 @@ test("region rows do not activate municipality geometry", async ({ page }) => {
 });
 
 test("focus uses the polygon or marker instead of a rectangular outline", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   const shape = page.getByTestId("municipality-shape-33");
   await shape.focus();
@@ -372,7 +374,7 @@ test("focus uses the polygon or marker instead of a rectangular outline", async 
 
 test("keeps the tooltip inside the map after a narrow viewport resize", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://localhost:3100/explorer/municipalities");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   const map = page.getByTestId("municipality-map");
   const lowestTestId = await map.locator("[data-municipality-shape]").evaluateAll((elements) => {
@@ -403,14 +405,14 @@ test("keeps the tooltip inside the map after a narrow viewport resize", async ({
 
 test.describe("municipalities index", () => {
   test("shows the review date of the consolidated Adjara source", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
 
     await expect(page.getByTestId("explorer-shell")).toContainText("განახლდა 2026-08-16");
   });
 
   test("lists all municipalities and the country-first region grain", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
     await page.getByTestId("level-region").click();
@@ -419,7 +421,7 @@ test.describe("municipalities index", () => {
   });
 
   test("puts Georgia first in the region list and routes it to the country explorer", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
     await page.getByTestId("level-region").click();
 
@@ -437,7 +439,7 @@ test.describe("municipalities index", () => {
 
   test("keeps total budget primary while showing per-resident support for municipalities and regions", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
 
     const municipality = page.getByTestId("municipal-list-row").first();
@@ -454,7 +456,7 @@ test.describe("municipalities index", () => {
   });
 
   test("filters and clears the search", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-search").fill("თელავი");
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(1);
@@ -463,7 +465,7 @@ test.describe("municipalities index", () => {
   });
 
   test("uses the same simple search label for municipalities and regions", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
 
     const search = page.getByTestId("municipal-search");
@@ -473,7 +475,7 @@ test.describe("municipalities index", () => {
   });
 
   test("keeps row bars normalized to the unfiltered leader while searching", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
 
     const rows = page.getByTestId("municipal-list-row");
@@ -490,14 +492,14 @@ test.describe("municipalities index", () => {
   });
 
   test("opens a municipality from the list", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
     await page.getByTestId("municipal-list-row").first().click();
     await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/tbilisi");
   });
 
   test("shows four KPIs including the 2025 median budget per resident", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
     const kpis = page.getByTestId("index-kpi");
     await expect(kpis).toHaveCount(4);
@@ -508,7 +510,7 @@ test.describe("municipalities index", () => {
   });
 
   test("starts directly with the municipal comparison workspace", async ({ page }) => {
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
     await expect(page.getByTestId("municipal-index-workspace")).toBeVisible();
     await expect(page.getByText("საქართველოს მუნიციპალიტეტების ბიუჯეტები წარმოდგენილია", { exact: false })).toHaveCount(0);
@@ -516,7 +518,7 @@ test.describe("municipalities index", () => {
 
   test("keeps the index workspace stacked until its content container reaches 1100px", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto("http://localhost:3100/explorer/municipalities");
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
     await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "true");
 
@@ -532,7 +534,7 @@ test.describe("municipalities index", () => {
 });
 
 test("keeps municipality share as share of its budget", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/municipalities/tbilisi");
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities/tbilisi`);
   await expectMunicipalAppReady(page);
 
   await page.getByRole("button", { name: "ცხრილი" }).click();
