@@ -28,6 +28,29 @@
   --font-sans: var(--font-ui);
 }
 
+@font-face {
+  font-family: "heroDisplay";
+  src: url("../assets/fonts/EurostileGEOMt-Demi.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "heroDisplay Fallback";
+  src: local(Arial);
+  ascent-override: 54.1%;
+  descent-override: 18.03%;
+  line-gap-override: 14.43%;
+  size-adjust: 138.64%;
+}
+
+.hero-display {
+  font-family: heroDisplay, "heroDisplay Fallback", "Noto Serif Georgian", serif;
+  font-style: normal;
+  font-weight: 600;
+}
+
 * {
   box-sizing: border-box;
   scrollbar-width: thin;

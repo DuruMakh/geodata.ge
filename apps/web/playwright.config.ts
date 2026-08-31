@@ -17,7 +17,7 @@ export default defineConfig({
     // Local runs use the preinstalled Edge; CI installs bundled Chromium.
     ...(process.env.CI ? {} : { channel: "msedge" }),
   },
-  webServer: {
+  webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
     // CI tests the artifact that deploys, not `next dev`. Everything that differs
     // between the two is otherwise ungated: CSS layer ordering and minification
     // (globals.css relies on unlayered rules beating Tailwind's utilities layer),

@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type APIRequestContext, type Locator, type Page } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { computedCssColorAlpha } from "./focus-outline";
@@ -9,6 +9,45 @@ import { computedCssColorAlpha } from "./focus-outline";
 
 const artifactDir = join(process.cwd(), "test-results", "visual-reference");
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const heroRuntimeMarkers = ["WebGLRenderer", "ვიზუალი ვერ ჩაიტვირთა"] as const;
+
+async function heroRuntimeScripts(request: APIRequestContext, urls: Iterable<string>) {
+  const uniqueUrls = [...new Set(urls)];
+  const matches = await Promise.all(
+    uniqueUrls.map(async (url) => {
+      const response = await request.get(url);
+      if (!response.ok()) return null;
+      const body = await response.text();
+      return heroRuntimeMarkers.every((marker) => body.includes(marker)) ? url : null;
+    }),
+  );
+  return matches.filter((url): url is string => url !== null);
+}
+
+function installHeroDrawInstrumentation() {
+  const counts: number[] = [];
+  const testWindow = window as typeof window & {
+    __heroDrawCounts: number[];
+    __heroFirstTerrainDrawAt?: number;
+    __heroTerrainDrawCount: number;
+  };
+  testWindow.__heroDrawCounts = counts;
+  testWindow.__heroTerrainDrawCount = 0;
+  type DrawArraysOwner = { drawArrays: (mode: number, first: number, count: number) => void };
+  const wrap = (prototype: DrawArraysOwner) => {
+    const original = prototype.drawArrays;
+    prototype.drawArrays = function (this: DrawArraysOwner, mode, first, count) {
+      counts.push(count);
+      if (count > 1_000) {
+        testWindow.__heroFirstTerrainDrawAt ??= performance.now();
+        testWindow.__heroTerrainDrawCount = count;
+      }
+      original.call(this, mode, first, count);
+    };
+  };
+  wrap(WebGLRenderingContext.prototype);
+  if (typeof WebGL2RenderingContext !== "undefined") wrap(WebGL2RenderingContext.prototype);
+}
 
 async function capture(page: Page, name: string) {
   await mkdir(artifactDir, { recursive: true });
@@ -241,6 +280,260 @@ test("landing data and methodology links use real destinations", async ({ page }
   await page.getByTestId("landing-dataset-revenue").getByRole("link").click();
   await expect(page).toHaveURL(/\/explorer\/revenue/);
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
+});
+
+test("landing loads the hero font successfully without requesting it on other routes", async ({ browser, page }) => {
+  const fontResponses: Array<{ status: number; url: string }> = [];
+  page.on("response", (response) => {
+    if (response.url().includes("EurostileGEOMt-Demi")) {
+      fontResponses.push({ status: response.status(), url: response.url() });
+    }
+  });
+
+  await page.goto(baseUrl);
+  const heading = page.getByRole("heading", { level: 1, name: "საქართველო ციფრებში" });
+  const fontState = await heading.evaluate(async (element) => {
+    const descriptor = '600 40px "heroDisplay"';
+    const loadedFaces = await document.fonts.load(descriptor, element.textContent ?? "");
+    await document.fonts.ready;
+    return {
+      family: getComputedStyle(element).fontFamily,
+      loadedFaces: loadedFaces.length,
+      ready: document.fonts.check(descriptor, element.textContent ?? ""),
+      stylesheets: document.querySelectorAll('link[rel="stylesheet"]').length,
+    };
+  });
+
+  expect(fontState).toEqual({
+    family: 'heroDisplay, "heroDisplay Fallback", "Noto Serif Georgian", serif',
+    loadedFaces: 1,
+    ready: true,
+    stylesheets: 1,
+  });
+  expect(fontResponses).toHaveLength(1);
+  expect(fontResponses[0]?.status).toBe(200);
+  expect(new URL(fontResponses[0]!.url).pathname).toMatch(/\/EurostileGEOMt-Demi\.[^/]+\.ttf$/);
+
+  const nonHomeContext = await browser.newContext();
+  try {
+    const nonHomePage = await nonHomeContext.newPage();
+    await nonHomePage.goto(`${baseUrl}/explorer/expenditure`);
+    await nonHomePage.evaluate(() => document.fonts.ready.then(() => undefined));
+    const nonHomeFontRequests = await nonHomePage.evaluate(() =>
+      performance
+        .getEntriesByType("resource")
+        .map((entry) => entry.name)
+        .filter((url) => url.includes("EurostileGEOMt-Demi")),
+    );
+    expect(nonHomeFontRequests).toEqual([]);
+  } finally {
+    await nonHomeContext.close();
+  }
+});
+
+test("landing waits for the post-load idle timeout before requesting the WebGL hero", async ({ page, request }) => {
+  const scriptRequests: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.endsWith(".js")) scriptRequests.push(request.url());
+  });
+  await page.addInitScript(() => {
+    const callbacks = new Map<number, IdleRequestCallback>();
+    let nextId = 1;
+    const testWindow = window as typeof window & {
+      __flushHeroIdle: (didTimeout?: boolean) => void;
+      __heroIdlePending: () => number;
+      __heroIdleTimeout: () => number | undefined;
+    };
+    const requestedTimeouts: number[] = [];
+    testWindow.__heroIdlePending = () => callbacks.size;
+    testWindow.__heroIdleTimeout = () => requestedTimeouts.at(-1);
+    testWindow.__flushHeroIdle = (didTimeout = false) => {
+      const pending = [...callbacks.values()];
+      callbacks.clear();
+      pending.forEach((callback) => callback({ didTimeout, timeRemaining: () => (didTimeout ? 0 : 50) }));
+    };
+    window.requestIdleCallback = (callback, options) => {
+      if (options?.timeout !== undefined) requestedTimeouts.push(options.timeout);
+      const id = nextId++;
+      callbacks.set(id, callback);
+      return id;
+    };
+    window.cancelIdleCallback = (id) => callbacks.delete(id);
+  });
+
+  await page.goto(baseUrl, { waitUntil: "load" });
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (window as typeof window & { __heroIdlePending: () => number }).__heroIdlePending(),
+      ),
+    )
+    .toBeGreaterThan(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (window as typeof window & { __heroIdleTimeout: () => number | undefined }).__heroIdleTimeout(),
+      ),
+    )
+    .toBe(1_500);
+  await expect(page.locator("figure canvas")).toHaveCount(0);
+
+  const scriptsBeforeIdle = new Set(scriptRequests);
+  expect(await heroRuntimeScripts(request, scriptsBeforeIdle)).toEqual([]);
+
+  await page.evaluate(() =>
+    (window as typeof window & { __flushHeroIdle: (didTimeout?: boolean) => void }).__flushHeroIdle(true),
+  );
+  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 5_000 });
+
+  const scriptsAfterTimeout = scriptRequests.filter((url) => !scriptsBeforeIdle.has(url));
+  expect(await heroRuntimeScripts(request, scriptsAfterTimeout)).toHaveLength(1);
+});
+
+test("landing keeps timeout-driven hero readiness within five seconds of load", async ({ page }) => {
+  await page.addInitScript(installHeroDrawInstrumentation);
+  await page.addInitScript(() => {
+    const testWindow = window as typeof window & {
+      __heroFallbackAt?: number;
+      __heroLoadAt?: number;
+    };
+    window.requestIdleCallback = (callback, options) =>
+      window.setTimeout(
+        () => callback({ didTimeout: true, timeRemaining: () => 0 }),
+        options?.timeout ?? 0,
+      );
+    window.cancelIdleCallback = (id) => window.clearTimeout(id);
+    window.addEventListener(
+      "load",
+      () => {
+        testWindow.__heroLoadAt = performance.now();
+      },
+      { once: true },
+    );
+    new MutationObserver(() => {
+      if (testWindow.__heroFallbackAt !== undefined) return;
+      if (document.body?.textContent?.includes("ვიზუალი ვერ ჩაიტვირთა")) {
+        testWindow.__heroFallbackAt = performance.now();
+      }
+    }).observe(document, { childList: true, subtree: true });
+  });
+
+  await page.goto(baseUrl, { waitUntil: "load" });
+  await expect(page.locator("figure canvas")).toHaveCount(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const testWindow = window as typeof window & {
+          __heroFallbackAt?: number;
+          __heroFirstTerrainDrawAt?: number;
+          __heroLoadAt?: number;
+        };
+        const readyAt = testWindow.__heroFirstTerrainDrawAt ?? testWindow.__heroFallbackAt;
+        return readyAt === undefined ? Number.POSITIVE_INFINITY : readyAt - (testWindow.__heroLoadAt ?? 0);
+      }),
+    )
+    .toBeLessThanOrEqual(5_000);
+  const readiness = await page.evaluate(() => {
+    const testWindow = window as typeof window & {
+      __heroFallbackAt?: number;
+      __heroFirstTerrainDrawAt?: number;
+      __heroLoadAt?: number;
+    };
+    return (
+      (testWindow.__heroFirstTerrainDrawAt ?? testWindow.__heroFallbackAt ?? Number.POSITIVE_INFINITY) -
+      (testWindow.__heroLoadAt ?? 0)
+    );
+  });
+  expect(readiness).toBeGreaterThanOrEqual(1_500);
+  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible();
+});
+
+test("landing activates the hero after load when requestIdleCallback is unavailable", async ({ page, request }) => {
+  const scriptRequests: Array<{ beforeLoad: boolean; url: string }> = [];
+  let loadFired = false;
+  page.on("request", (browserRequest) => {
+    if (!new URL(browserRequest.url()).pathname.endsWith(".js")) return;
+    scriptRequests.push({ beforeLoad: !loadFired, url: browserRequest.url() });
+  });
+  page.once("load", () => {
+    loadFired = true;
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "requestIdleCallback", { configurable: true, value: undefined });
+  });
+
+  await page.goto(baseUrl, { waitUntil: "load" });
+  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 5_000 });
+
+  const matchingScripts = await heroRuntimeScripts(
+    request,
+    scriptRequests.map(({ url }) => url),
+  );
+  expect(matchingScripts).toHaveLength(1);
+  expect(scriptRequests.find(({ url }) => url === matchingScripts[0])?.beforeLoad).toBe(false);
+});
+
+test("landing reduces mobile WebGL density while retaining desktop detail", async ({ browser }) => {
+  for (const profile of [
+    { name: "mobile", viewport: { width: 390, height: 844 }, expectedDots: 5_885, expectedPixelRatio: 1.25 },
+    { name: "desktop", viewport: { width: 1440, height: 900 }, expectedDots: 10_656, expectedPixelRatio: 2 },
+  ]) {
+    const context = await browser.newContext({ viewport: profile.viewport, deviceScaleFactor: 2 });
+    const page = await context.newPage();
+    await page.addInitScript(installHeroDrawInstrumentation);
+
+    await page.goto(baseUrl);
+    const canvas = page.locator("figure canvas");
+    await expect(canvas.or(page.getByText("ვიზუალი ვერ ჩაიტვირთა")), profile.name).toBeVisible({ timeout: 15_000 });
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() =>
+            Math.max(...(window as typeof window & { __heroDrawCounts: number[] }).__heroDrawCounts),
+          ),
+        { message: `${profile.name} terrain draw count` },
+      )
+      .toBe(profile.expectedDots);
+    const pixelRatio = await canvas.evaluate((element) => {
+      const drawingSurface = element as HTMLCanvasElement;
+      return drawingSurface.width / drawingSurface.getBoundingClientRect().width;
+    });
+    expect(pixelRatio, `${profile.name} canvas pixel ratio`).toBeCloseTo(profile.expectedPixelRatio, 1);
+    await context.close();
+  }
+});
+
+test("landing rebuilds one correctly sized hero across the mobile breakpoint", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+  const page = await context.newPage();
+  await page.addInitScript(installHeroDrawInstrumentation);
+  try {
+    await page.goto(baseUrl);
+
+    for (const profile of [
+      { viewport: { width: 390, height: 844 }, expectedDots: 5_885, expectedPixelRatio: 1.25 },
+      { viewport: { width: 768, height: 900 }, expectedDots: 10_656, expectedPixelRatio: 2 },
+      { viewport: { width: 390, height: 844 }, expectedDots: 5_885, expectedPixelRatio: 1.25 },
+    ]) {
+      await page.setViewportSize(profile.viewport);
+      const canvas = page.locator("figure canvas");
+      await expect(canvas).toHaveCount(1, { timeout: 5_000 });
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            (window as typeof window & { __heroTerrainDrawCount: number }).__heroTerrainDrawCount,
+          ),
+        )
+        .toBe(profile.expectedDots);
+      const pixelRatio = await canvas.evaluate((element) => {
+        const drawingSurface = element as HTMLCanvasElement;
+        return drawingSurface.width / drawingSurface.getBoundingClientRect().width;
+      });
+      expect(pixelRatio).toBeCloseTo(profile.expectedPixelRatio, 1);
+    }
+  } finally {
+    await context.close();
+  }
 });
 
 test("landing hero has no browser runtime warnings or errors", async ({ page }) => {

@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
+const TEST_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+
 async function waitForApp(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
@@ -7,7 +9,7 @@ async function waitForApp(page: Page) {
 test("explorer preserves the editorial v4.1 structure", async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
 
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await waitForApp(page);
 
   // Structural contract of DESIGN.md v4.1.
@@ -33,7 +35,7 @@ test("explorer preserves the editorial v4.1 structure", async ({ page }) => {
 test("analysis preserves the editorial v4.1 single-year structure on mobile", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
 
-  await page.goto("http://localhost:3100/explorer/analysis");
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await waitForApp(page);
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
 
