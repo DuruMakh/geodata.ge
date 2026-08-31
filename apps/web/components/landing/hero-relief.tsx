@@ -1,7 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
+import { BufferAttribute } from "three/src/core/BufferAttribute.js";
+import { BufferGeometry } from "three/src/core/BufferGeometry.js";
+import { PerspectiveCamera } from "three/src/cameras/PerspectiveCamera.js";
+import { LineBasicMaterial } from "three/src/materials/LineBasicMaterial.js";
+import type { Material } from "three/src/materials/Material.js";
+import { ShaderMaterial } from "three/src/materials/ShaderMaterial.js";
+import { Vector3 } from "three/src/math/Vector3.js";
+import { LineLoop } from "three/src/objects/LineLoop.js";
+import { Points } from "three/src/objects/Points.js";
+import { WebGLRenderer } from "three/src/renderers/WebGLRenderer.js";
+import { Scene } from "three/src/scenes/Scene.js";
 import { GEORGIA_GEO } from "../../lib/landing/georgiaGeo";
 
 // Living relief of Georgia (landing hero, GeoData Site v2 design): the exact
@@ -154,14 +164,14 @@ function heroOpts(w: number): HeroOpts {
 // Distance along `dir` from `look` at which every sample point projects inside
 // NDC with the given margins. Binary search; smaller distance = bigger map.
 function fitCameraDistance(
-  cam: THREE.PerspectiveCamera,
-  look: THREE.Vector3,
-  dir: THREE.Vector3,
-  samples: THREE.Vector3[],
+  cam: PerspectiveCamera,
+  look: Vector3,
+  dir: Vector3,
+  samples: Vector3[],
   marginX: number,
   marginY: number,
 ): number {
-  const v = new THREE.Vector3();
+  const v = new Vector3();
   const fits = (t: number) => {
     cam.position.copy(look).addScaledVector(dir, t);
     cam.lookAt(look);
@@ -330,27 +340,27 @@ function geoField(): GeoField {
 }
 
 type DotCloud = {
-  geo: THREE.BufferGeometry;
+  geo: BufferGeometry;
   pos: Float32Array;
   col: Float32Array;
   size: Float32Array;
-  points: THREE.Points;
+  points: Points;
 };
 
 function makeDotCloud(n: number): DotCloud {
-  const geo = new THREE.BufferGeometry();
+  const geo = new BufferGeometry();
   const pos = new Float32Array(n * 3);
   const col = new Float32Array(n * 3);
   const size = new Float32Array(n);
-  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute("col", new THREE.BufferAttribute(col, 3));
-  geo.setAttribute("psize", new THREE.BufferAttribute(size, 1));
-  const mat = new THREE.ShaderMaterial({
+  geo.setAttribute("position", new BufferAttribute(pos, 3));
+  geo.setAttribute("col", new BufferAttribute(col, 3));
+  geo.setAttribute("psize", new BufferAttribute(size, 1));
+  const mat = new ShaderMaterial({
     vertexShader:
       "attribute float psize; attribute vec3 col; varying vec3 vc; void main(){ vc = col; gl_PointSize = psize; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
     fragmentShader: "varying vec3 vc; void main(){ gl_FragColor = vec4(vc, 1.0); }",
   });
-  return { geo, pos, col, size, points: new THREE.Points(geo, mat) };
+  return { geo, pos, col, size, points: new Points(geo, mat) };
 }
 
 export function HeroRelief() {
@@ -373,10 +383,10 @@ export function HeroRelief() {
     const disposers: Array<() => void> = [];
     let raf = 0;
 
-    let renderer: THREE.WebGLRenderer;
+    let renderer: WebGLRenderer;
     let updater: (t: number, dt: number) => void;
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer = new WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(el.clientWidth, el.clientHeight);
       renderer.setClearColor(0x000000, 0);
@@ -387,8 +397,8 @@ export function HeroRelief() {
       });
 
       const pr = renderer.getPixelRatio();
-      const scene = new THREE.Scene();
-      const cam = new THREE.PerspectiveCamera(O.fov, el.clientWidth / Math.max(1, el.clientHeight), 1, 6000);
+      const scene = new Scene();
+      const cam = new PerspectiveCamera(O.fov, el.clientWidth / Math.max(1, el.clientHeight), 1, 6000);
       const F = geoField();
       const N = F.n;
       const G = GEORGIA_GEO;
@@ -396,8 +406,8 @@ export function HeroRelief() {
 
       // Fit the camera along the preset's viewing direction so the country
       // (its real dot bounds plus relief height) fills the canvas.
-      const lookVec = new THREE.Vector3(O.lookX, O.lookY, O.lookZ);
-      const camDir = new THREE.Vector3(O.camX, O.camY, O.camZ).sub(lookVec).normalize();
+      const lookVec = new Vector3(O.lookX, O.lookY, O.lookZ);
+      const camDir = new Vector3(O.camX, O.camY, O.camZ).sub(lookVec).normalize();
       const bounds = { minX: Infinity, maxX: -Infinity, minZ: Infinity, maxZ: -Infinity, maxY: 0 };
       for (let i = 0; i < N; i++) {
         if (!F.inside[i]) continue;
@@ -413,28 +423,28 @@ export function HeroRelief() {
       // Fit against the real dots (every edge dot + a third of the interior at
       // its relief height) — bounding-box corners are phantom points that
       // would leave the frame under-filled.
-      const fitSamples: THREE.Vector3[] = [];
+      const fitSamples: Vector3[] = [];
       for (let i = 0; i < N; i++) {
         if (!F.inside[i]) continue;
         if (F.edge[i] || i % 3 === 0) {
-          fitSamples.push(new THREE.Vector3(F.px[i]! - 620, F.elev[i]! * HREL + 6, F.py[i]! - 320));
+          fitSamples.push(new Vector3(F.px[i]! - 620, F.elev[i]! * HREL + 6, F.py[i]! - 320));
         }
       }
       if (O.peaks) {
         // The peak labels float above the summits; keep them in frame too.
         for (const [lon, lat] of [[43.11, 43.005], [44.521, 42.699]] as const) {
           const [x, y] = geoProj().toPx(lon, lat);
-          fitSamples.push(new THREE.Vector3(x - 620, elevGe(lon, lat) * HREL + 42, y - 320));
+          fitSamples.push(new Vector3(x - 620, elevGe(lon, lat) * HREL + 42, y - 320));
         }
       }
       const countryMidX = lookVec.x;
-      const camBase = new THREE.Vector3();
+      const camBase = new Vector3();
       const halfFov = Math.tan(((O.fov / 2) * Math.PI) / 180);
       const mSym = (O.marginL + O.marginR) / 2;
       const copyEl = el.closest("section")?.querySelector<HTMLElement>("[data-hero-copy]") ?? null;
       const virtualHeightFor = () =>
         window.innerWidth < 768 ? 340 : window.innerWidth < 1100 ? 500 : Math.min(820, Math.max(560, Math.round(window.innerHeight * 0.78)));
-      const vtmp = new THREE.Vector3();
+      const vtmp = new Vector3();
       // Fit the camera in a fixed virtual frame (the framing the design was
       // tuned on), then CROP the canvas to the map's projected vertical band
       // via a camera view offset — the stats section starts right under the
@@ -487,7 +497,7 @@ export function HeroRelief() {
       scene.add(cloud.points);
       disposers.push(() => {
         cloud.geo.dispose();
-        (cloud.points.material as THREE.Material).dispose();
+        (cloud.points.material as Material).dispose();
       });
       for (let i = 0; i < N; i++) {
         cloud.pos[i * 3] = F.px[i]! - 620;
@@ -513,16 +523,16 @@ export function HeroRelief() {
       scene.add(mk.points);
       disposers.push(() => {
         mk.geo.dispose();
-        (mk.points.material as THREE.Material).dispose();
+        (mk.points.material as Material).dispose();
       });
 
       const RSEG = 72;
       const rings = [0, 1, 2, 3].map(() => {
         const p = new Float32Array(RSEG * 3);
-        const g = new THREE.BufferGeometry();
-        g.setAttribute("position", new THREE.BufferAttribute(p, 3));
-        const m = new THREE.LineBasicMaterial({ color: 0x1e1b16, transparent: true, opacity: 0 });
-        const line = new THREE.LineLoop(g, m);
+        const g = new BufferGeometry();
+        g.setAttribute("position", new BufferAttribute(p, 3));
+        const m = new LineBasicMaterial({ color: 0x1e1b16, transparent: true, opacity: 0 });
+        const line = new LineLoop(g, m);
         scene.add(line);
         disposers.push(() => {
           g.dispose();
@@ -544,9 +554,9 @@ export function HeroRelief() {
       const P = geoProj();
       const mkWorld = (lon: number, lat: number, lift: number) => {
         const [x, y] = P.toPx(lon, lat);
-        return new THREE.Vector3(x - 620, elevGe(lon, lat) * HREL + lift, y - 320);
+        return new Vector3(x - 620, elevGe(lon, lat) * HREL + lift, y - 320);
       };
-      const labelDefs: Record<string, THREE.Vector3> = O.peaks
+      const labelDefs: Record<string, Vector3> = O.peaks
         ? {
             shkh: mkWorld(43.11, 43.005, 14),
             mkin: mkWorld(44.521, 42.699, 14),
@@ -624,7 +634,7 @@ export function HeroRelief() {
       const tan = [0.541, 0.482, 0.396] as const;
       const eo = (x: number) => 1 - Math.pow(1 - x, 3);
       const cl = (x: number) => Math.min(1, Math.max(0, x));
-      const vv = new THREE.Vector3();
+      const vv = new Vector3();
       const fmtPop = (p: number) => (p >= 1000 ? (p / 1000).toFixed(2).replace(/0$/, "") + " მლნ" : p + " ათ.");
       const band = (dd: number, R: number, wd: number) =>
         dd > R ? Math.max(0, 1 - (dd - R) / (wd * 0.55)) : Math.max(0, 1 - (R - dd) / (wd * 2.3));
