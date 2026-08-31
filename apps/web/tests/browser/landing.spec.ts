@@ -243,6 +243,92 @@ test("landing data and methodology links use real destinations", async ({ page }
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
 });
 
+test("landing waits for post-load idle time before activating the WebGL hero", async ({ page }) => {
+  const scriptRequests: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.endsWith(".js")) scriptRequests.push(request.url());
+  });
+  await page.addInitScript(() => {
+    const callbacks = new Map<number, IdleRequestCallback>();
+    let nextId = 1;
+    const testWindow = window as typeof window & {
+      __flushHeroIdle: () => void;
+      __heroIdlePending: () => number;
+    };
+    testWindow.__heroIdlePending = () => callbacks.size;
+    testWindow.__flushHeroIdle = () => {
+      const pending = [...callbacks.values()];
+      callbacks.clear();
+      pending.forEach((callback) => callback({ didTimeout: false, timeRemaining: () => 50 }));
+    };
+    window.requestIdleCallback = (callback) => {
+      const id = nextId++;
+      callbacks.set(id, callback);
+      return id;
+    };
+    window.cancelIdleCallback = (id) => callbacks.delete(id);
+  });
+
+  await page.goto(baseUrl, { waitUntil: "load" });
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (window as typeof window & { __heroIdlePending: () => number }).__heroIdlePending(),
+      ),
+    )
+    .toBeGreaterThan(0);
+  await expect(page.locator("figure canvas")).toHaveCount(0);
+
+  const scriptsBeforeIdle = new Set(scriptRequests);
+  await page.evaluate(() => (window as typeof window & { __flushHeroIdle: () => void }).__flushHeroIdle());
+  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
+  expect(scriptRequests.some((request) => !scriptsBeforeIdle.has(request))).toBe(true);
+});
+
+test("landing reduces mobile WebGL density while retaining desktop detail", async ({ browser }) => {
+  for (const profile of [
+    { name: "mobile", viewport: { width: 390, height: 844 }, expectedDots: 5_885, expectedPixelRatio: 1.25 },
+    { name: "desktop", viewport: { width: 1440, height: 900 }, expectedDots: 10_656, expectedPixelRatio: 2 },
+  ]) {
+    const context = await browser.newContext({ viewport: profile.viewport, deviceScaleFactor: 2 });
+    const page = await context.newPage();
+    await page.addInitScript(() => {
+      const counts: number[] = [];
+      const testWindow = window as typeof window & { __heroDrawCounts: number[] };
+      testWindow.__heroDrawCounts = counts;
+      type DrawArraysOwner = { drawArrays: (mode: number, first: number, count: number) => void };
+      const wrap = (prototype: DrawArraysOwner) => {
+        const original = prototype.drawArrays;
+        prototype.drawArrays = function (this: DrawArraysOwner, mode, first, count) {
+          counts.push(count);
+          original.call(this, mode, first, count);
+        };
+      };
+      wrap(WebGLRenderingContext.prototype);
+      if (typeof WebGL2RenderingContext !== "undefined") wrap(WebGL2RenderingContext.prototype);
+    });
+
+    await page.goto(baseUrl);
+    const canvas = page.locator("figure canvas");
+    await expect(canvas.or(page.getByText("ვიზუალი ვერ ჩაიტვირთა")), profile.name).toBeVisible({ timeout: 15_000 });
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() =>
+            Math.max(...(window as typeof window & { __heroDrawCounts: number[] }).__heroDrawCounts),
+          ),
+        { message: `${profile.name} terrain draw count` },
+      )
+      .toBe(profile.expectedDots);
+    const pixelRatio = await canvas.evaluate((element) => {
+      const drawingSurface = element as HTMLCanvasElement;
+      return drawingSurface.width / drawingSurface.getBoundingClientRect().width;
+    });
+    expect(pixelRatio, `${profile.name} canvas pixel ratio`).toBeCloseTo(profile.expectedPixelRatio, 1);
+    await context.close();
+  }
+});
+
 test("landing hero has no browser runtime warnings or errors", async ({ page }) => {
   const consoleIssues: string[] = [];
   const pageErrors: string[] = [];

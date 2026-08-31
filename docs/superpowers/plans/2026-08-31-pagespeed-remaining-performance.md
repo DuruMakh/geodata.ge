@@ -46,8 +46,9 @@ The work is split into independent workstreams so each can be accepted or reject
 - Task 3: accepted. The route-local hero-font stylesheet request was consolidated into global CSS; the generated homepage now has one stylesheet instead of two, and the hero font/layout checks passed. WOFF2 conversion was not used because an approved converter and font redistribution terms were not confirmed.
 - Task 4: accepted. Only Google Analytics moved to `lazyOnload`; Microsoft Clarity remains unchanged. Runtime analytics checks passed, including one post-load request assertion and no duplicate request.
 - Verification harness: corrected four existing Playwright files so `PLAYWRIGHT_BASE_URL` actually controls every navigation. This prevents a stale server on port 3100 from being mistaken for the intended production artifact.
-- Task 7 local verification: complete for lint, TypeScript, 852 unit tests, data validation, the 95-route production build, and all 241 browser tests against the same port-3110 artifact. Production PageSpeed/Lighthouse comparisons remain post-deployment evidence and are not claimed locally.
-- Tasks 5–6: intentionally paused. The hero runtime remains the dominant potential cost; no visual-fidelity, scheduling, or browser-support change has been authorized.
+- Task 7 local verification: complete for lint, TypeScript, 852 unit tests, data validation, the 95-route production build, and all 243 browser tests against the same port-3110 artifact. Production PageSpeed/Lighthouse comparisons remain post-deployment evidence and are not claimed locally.
+- Task 5: approved and implemented as a combined scheduling/mobile-fidelity change. The existing placeholder remains through `load`, then the hero chunk starts during `requestIdleCallback` with a 1.5-second timeout. Mobile terrain spacing is 11.5px (5,885 terrain points) with a 1.25× renderer-density cap; widths from 768px retain 8.6px spacing (10,656 points) and the 2× cap. A 5-second, 4×-CPU profile measured 584 ms in the mobile frame updater versus 976 ms for the unchanged desktop scene, about 40% less updater CPU; the deferred hero script began roughly 350–420 ms after `loadEventEnd`. Production PageSpeed remains post-deployment evidence.
+- Task 6: intentionally retained. No browser-support change has been authorized for the low-priority legacy-JavaScript warning.
 
 ---
 
