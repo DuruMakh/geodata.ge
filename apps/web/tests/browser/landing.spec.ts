@@ -28,6 +28,7 @@ function installHeroDrawInstrumentation() {
   const counts: number[] = [];
   const testWindow = window as typeof window & {
     __heroDrawCounts: number[];
+    __heroFirstTerrainDrawAt?: number;
     __heroTerrainDrawCount: number;
   };
   testWindow.__heroDrawCounts = counts;
@@ -37,7 +38,10 @@ function installHeroDrawInstrumentation() {
     const original = prototype.drawArrays;
     prototype.drawArrays = function (this: DrawArraysOwner, mode, first, count) {
       counts.push(count);
-      if (count > 1_000) testWindow.__heroTerrainDrawCount = count;
+      if (count > 1_000) {
+        testWindow.__heroFirstTerrainDrawAt ??= performance.now();
+        testWindow.__heroTerrainDrawCount = count;
+      }
       original.call(this, mode, first, count);
     };
   };
@@ -387,10 +391,11 @@ test("landing waits for the post-load idle timeout before requesting the WebGL h
 });
 
 test("landing keeps timeout-driven hero readiness within five seconds of load", async ({ page }) => {
+  await page.addInitScript(installHeroDrawInstrumentation);
   await page.addInitScript(() => {
     const testWindow = window as typeof window & {
+      __heroFallbackAt?: number;
       __heroLoadAt?: number;
-      __heroReadyAt?: number;
     };
     window.requestIdleCallback = (callback, options) =>
       window.setTimeout(
@@ -406,22 +411,41 @@ test("landing keeps timeout-driven hero readiness within five seconds of load", 
       { once: true },
     );
     new MutationObserver(() => {
-      if (testWindow.__heroReadyAt !== undefined) return;
-      if (document.querySelector("figure canvas") || document.body?.textContent?.includes("ვიზუალი ვერ ჩაიტვირთა")) {
-        testWindow.__heroReadyAt = performance.now();
+      if (testWindow.__heroFallbackAt !== undefined) return;
+      if (document.body?.textContent?.includes("ვიზუალი ვერ ჩაიტვირთა")) {
+        testWindow.__heroFallbackAt = performance.now();
       }
     }).observe(document, { childList: true, subtree: true });
   });
 
   await page.goto(baseUrl, { waitUntil: "load" });
   await expect(page.locator("figure canvas")).toHaveCount(0);
-  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 5_000 });
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const testWindow = window as typeof window & {
+          __heroFallbackAt?: number;
+          __heroFirstTerrainDrawAt?: number;
+          __heroLoadAt?: number;
+        };
+        const readyAt = testWindow.__heroFirstTerrainDrawAt ?? testWindow.__heroFallbackAt;
+        return readyAt === undefined ? Number.POSITIVE_INFINITY : readyAt - (testWindow.__heroLoadAt ?? 0);
+      }),
+    )
+    .toBeLessThanOrEqual(5_000);
   const readiness = await page.evaluate(() => {
-    const testWindow = window as typeof window & { __heroLoadAt?: number; __heroReadyAt?: number };
-    return (testWindow.__heroReadyAt ?? Number.POSITIVE_INFINITY) - (testWindow.__heroLoadAt ?? 0);
+    const testWindow = window as typeof window & {
+      __heroFallbackAt?: number;
+      __heroFirstTerrainDrawAt?: number;
+      __heroLoadAt?: number;
+    };
+    return (
+      (testWindow.__heroFirstTerrainDrawAt ?? testWindow.__heroFallbackAt ?? Number.POSITIVE_INFINITY) -
+      (testWindow.__heroLoadAt ?? 0)
+    );
   });
   expect(readiness).toBeGreaterThanOrEqual(1_500);
-  expect(readiness).toBeLessThanOrEqual(5_000);
+  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible();
 });
 
 test("landing activates the hero after load when requestIdleCallback is unavailable", async ({ page, request }) => {
