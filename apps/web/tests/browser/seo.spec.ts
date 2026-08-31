@@ -2,7 +2,16 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
 import { computedCssColorAlpha } from "./focus-outline";
 
-const BASE_URL = process.env.SEO_BASE_URL ?? "http://localhost:3100";
+const BASE_URL = process.env.SEO_BASE_URL ?? process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+
+test("uses the shared browser artifact when no SEO-specific URL is configured", async ({ page }) => {
+  test.skip(Boolean(process.env.SEO_BASE_URL), "SEO_BASE_URL intentionally overrides the shared artifact URL");
+
+  await page.goto(BASE_URL);
+
+  const expectedOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100").origin;
+  expect(new URL(page.url()).origin).toBe(expectedOrigin);
+});
 
 async function expectMinimumTarget(locator: Locator, size = 24) {
   const box = await locator.boundingBox();
