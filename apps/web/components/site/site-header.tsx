@@ -8,7 +8,7 @@ type SiteHeaderProps = {
 
 function navLinkClass(isActive: boolean) {
   return isActive
-    ? "relative flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-semibold text-[var(--ink)] after:absolute after:bottom-2 after:left-0 after:right-0 after:h-0.5 after:bg-[var(--accent)]"
+    ? "flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-semibold text-[var(--ink)] underline decoration-2 decoration-[var(--accent)] underline-offset-[5px]"
     : "flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-medium text-[var(--muted)] transition-colors duration-150 hover:text-[var(--ink)]";
 }
 
@@ -16,7 +16,7 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
   return (
     <header
       data-testid={testId}
-      className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b-2 border-[var(--ink)] min-[768px]:gap-5"
+      className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 min-[768px]:gap-5"
     >
       <Link
         href="/"

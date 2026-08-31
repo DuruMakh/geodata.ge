@@ -403,7 +403,7 @@ The public-site header appears on the landing page (§19), the methodology hub, 
 
 The brand link uses the reviewed full v2.0 horizontal lockup at 280px from 768px upward and the compact lockup below 768px. The full horizontal lockup must not render below 280px; the standalone mark must not render below 24px. The supplied token JSON's 180px lockup value is not authoritative for production.
 
-Vertically centered logo row: lockup left, nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
+Vertically centered logo row: lockup left, nav tabs center, mono loaded-coverage context label right; no bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` text underline with a `5px` offset; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
 
 ### 7.2a Mode Control
 
@@ -780,7 +780,7 @@ Section order is fixed: shared header → living-relief hero → country figures
 
 **Country figures.** Three maintained snapshots remain in one row: `მოსახლეობა` — `3.9 მლნ`, `2026 წლის 1 იანვარი · საქსტატი`; `ფართობი` — `69.7 ათ. კმ²`, `საქართველოს ტერიტორია`; `ეკონომიკის ზომა` — `104.6 მლრდ ₾`, `ნომინალური მშპ · 2025, წინასწარი`. A narrow mobile caption may shorten visually, but assistive technology retains the full caption.
 
-**Annual data ledger.** `#data` retains its strong top rule but has no annual masthead, shared-year label, or reserved masthead spacing: section `01` begins immediately below the rule. Each of the three repeated ledger sections contains, in order: decorative index; dataset overline; question-led H2; concise latest-year description; real explorer link; an applicable total between two strong ink rules; latest year and truthful actual/planned/mixed status; and a semantic table of exactly four latest-year rows with amount and share. The first dataset section has no ordinary top border, avoiding a doubled rule; later dataset sections retain their hairline top borders. There is no post-hero graphic, chart, map, canvas, SVG data visualization, prior-year comparison, change callout, old three-path card, About block, Excel preview, or separate methodology promotion.
+**Annual data ledger.** `#data` has no top rule, annual masthead, shared-year label, or reserved masthead spacing. Each of the three repeated ledger sections contains, in order: decorative index; dataset overline; question-led H2; concise latest-year description; real explorer link; an applicable total between two strong ink rules; latest year and truthful actual/planned/mixed status; and a semantic table of exactly four latest-year rows with amount and share. The first dataset section has no ordinary top border, avoiding a doubled rule; later dataset sections retain their hairline top borders. There is no post-hero graphic, chart, map, canvas, SVG data visualization, prior-year comparison, change callout, old three-path card, About block, Excel preview, or separate methodology promotion.
 
 The exact dataset contracts are:
 
