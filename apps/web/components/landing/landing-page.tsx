@@ -127,7 +127,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
           ))}
         </section>
 
-        <div id="data" data-testid="landing-data" className="mt-14 scroll-mt-4 border-t-2 border-[var(--ink)]">
+        <div id="data" data-testid="landing-data" className="mt-14 scroll-mt-4">
           <LandingDatasetSection
             kind="expenditure"
             index="01"

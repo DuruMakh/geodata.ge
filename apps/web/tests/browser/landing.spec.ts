@@ -179,7 +179,7 @@ test("landing renders the approved latest-year data composition", async ({ page 
     "landing-dataset-municipalities",
     "landing-methodology",
   ]);
-  await expect(landingData).toHaveCSS("border-top-width", "2px");
+  await expect(landingData).toHaveCSS("border-top-width", "0px");
   await expect(expenditureSection).toHaveCSS("border-top-width", "0px");
 
   for (const testId of [
@@ -371,7 +371,7 @@ test("shared brand identity uses the full desktop lockup and compact mobile lock
   }
 });
 
-test("active public-header underline touches the header rule across the logo breakpoint", async ({ page }) => {
+test("active public-header underline sits directly beneath its label across the logo breakpoint", async ({ page }) => {
   for (const viewport of [
     { width: 768, height: 900 },
     { width: 767, height: 900 },
@@ -379,20 +379,25 @@ test("active public-header underline touches the header rule across the logo bre
     await page.setViewportSize(viewport);
     await page.goto(baseUrl);
     const activeLink = page.getByTestId("landing-header").getByRole("link", { name: "მთავარი", exact: true });
-    const geometry = await activeLink.evaluate((link) => {
+    const decoration = await activeLink.evaluate((link) => {
+      const style = getComputedStyle(link);
       const header = link.closest("header")!;
-      const linkBox = link.getBoundingClientRect();
-      const headerBox = header.getBoundingClientRect();
-      const headerBorderWidth = Number.parseFloat(getComputedStyle(header).borderBottomWidth);
+      const dataSection = document.querySelector('[data-testid="landing-data"]')!;
       return {
-        headerRuleTop: headerBox.bottom - headerBorderWidth,
-        underlineBottom: linkBox.bottom,
+        line: style.textDecorationLine,
+        color: style.textDecorationColor,
+        thickness: style.textDecorationThickness,
+        offset: style.textUnderlineOffset,
+        headerBorder: getComputedStyle(header).borderBottomWidth,
+        dataBorder: getComputedStyle(dataSection).borderTopWidth,
       };
     });
-    expect(
-      Math.abs(geometry.headerRuleTop - geometry.underlineBottom),
-      `${viewport.width}px underline-to-rule gap`,
-    ).toBeLessThanOrEqual(0.5);
+    expect(decoration.line, `${viewport.width}px active label decoration`).toContain("underline");
+    expect(decoration.color).toBe("rgb(179, 64, 42)");
+    expect(decoration.thickness).toBe("2px");
+    expect(decoration.offset).toBe("5px");
+    expect(decoration.headerBorder).toBe("0px");
+    expect(decoration.dataBorder).toBe("0px");
   }
 });
 
