@@ -153,6 +153,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
               {years.map((year) => (
                 <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={cellPad}>
                   {cellValue(totalRow, year)}
+                  {forecastLabel && forecastYears?.includes(year) ? (
+                    <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{forecastLabel}</sup>
+                  ) : null}
                 </td>
               ))}
               {showChangeColumn ? (

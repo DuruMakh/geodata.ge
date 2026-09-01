@@ -36,4 +36,25 @@ describe("ExplorerTable forecast labels", () => {
 
     expect(markup).toContain("პროგნოზი");
   });
+
+  it("labels optional marked-year cells in the displayed total row", () => {
+    const markup = renderToStaticMarkup(
+      createElement(ExplorerTable, {
+        caption: "ვალის გადახდა",
+        rows: [],
+        totalRow: row,
+        showTotal: true,
+        years: [2025, 2026],
+        firstColumnLabel: "სერია",
+        unit: UNIT_MLN,
+        share: false,
+        showChangeColumn: false,
+        forecastYears: [2026],
+        forecastLabel: "პროგნოზი",
+        shareValueForYear: () => null,
+      }),
+    );
+
+    expect(markup).toContain("პროგნოზი");
+  });
 });
