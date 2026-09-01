@@ -7,10 +7,15 @@ import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 // Table mode per DESIGN.md §8.4: newspaper anatomy — 2px ink rules on the header and
 // total row, mono right-aligned numerals.
 
-type ExplorerTableProps = {
+type ExplorerTableRowLike = Pick<ExplorerTableRow, "itemId" | "kaLabel" | "color" | "valuesByYear"> & {
+  basisByYear?: ExplorerTableRow["basisByYear"];
+  change?: ExplorerTableRow["change"];
+};
+
+type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   caption: string;
-  rows: ExplorerTableRow[];
-  totalRow: ExplorerTableRow | null;
+  rows: Row[];
+  totalRow: Row | null;
   showTotal: boolean;
   years: number[];
   firstColumnLabel: string;
@@ -18,7 +23,9 @@ type ExplorerTableProps = {
   share: boolean;
   showChangeColumn?: boolean;
   shareColumnLabel?: string;
-  shareValueForYear: (row: ExplorerTableRow, year: number) => number | null;
+  forecastYears?: number[];
+  forecastLabel?: string;
+  shareValueForYear: (row: Row, year: number) => number | null;
 };
 
 const headCellClass =
@@ -30,7 +37,7 @@ function changeColor(change: number | null): string {
   return change >= 0 ? POSITIVE : NEGATIVE;
 }
 
-export function ExplorerTable({
+export function ExplorerTable<Row extends ExplorerTableRowLike>({
   caption,
   rows,
   totalRow,
@@ -41,11 +48,13 @@ export function ExplorerTable({
   share,
   showChangeColumn = true,
   shareColumnLabel,
+  forecastYears,
+  forecastLabel,
   shareValueForYear,
-}: ExplorerTableProps) {
+}: ExplorerTableProps<Row>) {
   const endYear = years.at(-1);
   const lastIndex = years.length - 1;
-  const cellValue = (row: ExplorerTableRow, year: number): string => {
+  const cellValue = (row: Row, year: number): string => {
     const amount = row.valuesByYear[year];
     if (amount === null || amount === undefined) return MISSING;
     if (!share) return formatInUnit(amount, unit);
@@ -113,17 +122,20 @@ export function ExplorerTable({
                   }}
                 >
                   {cellValue(row, year)}
-                  {row.basisByYear[year] === "planned" ? (
+                  {row.basisByYear?.[year] === "planned" ? (
                     <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">გეგმა</sup>
+                  ) : null}
+                  {forecastLabel && forecastYears?.includes(year) ? (
+                    <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{forecastLabel}</sup>
                   ) : null}
                 </td>
               ))}
               {showChangeColumn ? (
                 <td
                   className={`${numericCellClass} sticky ${shareColumnLabel ? "right-24" : "right-0"} z-[1] bg-[var(--paper)] shadow-[-1px_0_0_var(--hairline-soft)]`}
-                  style={{ ...cellPad, color: changeColor(row.change) }}
+                  style={{ ...cellPad, color: changeColor(row.change ?? null) }}
                 >
-                  {formatShare(row.change, true)}
+                  {formatShare(row.change ?? null, true)}
                 </td>
               ) : null}
               {shareColumnLabel ? (
@@ -146,9 +158,9 @@ export function ExplorerTable({
               {showChangeColumn ? (
                 <td
                   className={`${numericCellClass} sticky ${shareColumnLabel ? "right-24" : "right-0"} z-[1] bg-[var(--paper)] font-semibold shadow-[-1px_0_0_var(--hairline-soft)]`}
-                  style={{ ...cellPad, color: changeColor(totalRow.change) }}
+                  style={{ ...cellPad, color: changeColor(totalRow.change ?? null) }}
                 >
-                  {formatShare(totalRow.change, true)}
+                  {formatShare(totalRow.change ?? null, true)}
                 </td>
               ) : null}
               {shareColumnLabel ? (

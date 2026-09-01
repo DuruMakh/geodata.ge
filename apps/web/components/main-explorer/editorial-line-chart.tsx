@@ -15,6 +15,7 @@ export type ChartSeries = {
   color: string;
   vals: (number | null)[];
   planned: boolean[];
+  forecastFromYear?: number;
 };
 
 type EditorialLineChartProps = {
@@ -258,17 +259,62 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
           if (run.length > 0) segments.push(run);
           if (segments.length === 0) return null;
 
-          const path = segments
-            .filter((segment) => segment.length > 1)
-            .map((segment) => segment.map(([px, py], index) => `${index === 0 ? "M" : "L"}${px.toFixed(1)} ${py.toFixed(1)}`).join(" "))
-            .join(" ");
+          const pathFor = (pathSegments: Array<Array<[number, number, number]>>) =>
+            pathSegments
+              .filter((segment) => segment.length > 1)
+              .map((segment) => segment.map(([px, py], index) => `${index === 0 ? "M" : "L"}${px.toFixed(1)} ${py.toFixed(1)}`).join(" "))
+              .join(" ");
+          const path = pathFor(segments);
+          const actualSegments: Array<Array<[number, number, number]>> = [];
+          const forecastSegments: Array<Array<[number, number, number]>> = [];
+
+          if (line.forecastFromYear !== undefined) {
+            for (const segment of segments) {
+              const firstForecastIndex = segment.findIndex(([, , index]) => years[index]! >= line.forecastFromYear!);
+              if (firstForecastIndex === -1) {
+                actualSegments.push(segment);
+              } else {
+                if (firstForecastIndex > 0) actualSegments.push(segment.slice(0, firstForecastIndex));
+                forecastSegments.push(
+                  firstForecastIndex > 0
+                    ? [segment[firstForecastIndex - 1]!, ...segment.slice(firstForecastIndex)]
+                    : segment.slice(firstForecastIndex),
+                );
+              }
+            }
+          }
+
+          const actualPath = line.forecastFromYear === undefined ? path : pathFor(actualSegments);
+          const forecastPath = line.forecastFromYear === undefined ? "" : pathFor(forecastSegments);
           const isolated = segments.filter((segment) => segment.length === 1).map((segment) => segment[0]);
           const points = segments.flat();
           const last = points[points.length - 1];
 
           return (
             <g key={line.id}>
-              {path ? <path d={path} fill="none" stroke={line.color} strokeWidth={2.2} strokeLinejoin="round" strokeLinecap="round" /> : null}
+              {actualPath ? (
+                <path
+                  {...(line.forecastFromYear === undefined ? {} : { "data-testid": `chart-series-${line.id}-actual` })}
+                  d={actualPath}
+                  fill="none"
+                  stroke={line.color}
+                  strokeWidth={2.2}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              ) : null}
+              {forecastPath ? (
+                <path
+                  data-testid={`chart-series-${line.id}-forecast`}
+                  d={forecastPath}
+                  fill="none"
+                  stroke={line.color}
+                  strokeWidth={2.2}
+                  strokeDasharray="6 5"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              ) : null}
               {isolated.map(([px, py, index]) => (
                 <circle key={`isolated-${index}`} cx={px} cy={py} r={2.5} fill={line.color} />
               ))}
