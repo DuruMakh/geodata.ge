@@ -56,3 +56,82 @@ export type MethodologyNoteRow = {
   note_en: string;
   source_id: GovernmentDebtSourceId;
 };
+
+export type GovernmentDebtStockRow = {
+  year: number;
+  debt_scope: DebtScope;
+  amount_million_gel: number;
+  amount_gel: number;
+  observation_date: string;
+  status: "actual";
+  source_id: GovernmentDebtSourceId;
+  source_table: string;
+  source_row_label: string;
+  source_unit: "Million GEL";
+  transformation: string;
+  methodology_note_id: string;
+  last_reviewed_at: string;
+};
+
+export type GovernmentDebtActualServiceRow = {
+  year: number;
+  debt_scope: DebtScope;
+  principal_paid_million_gel: number;
+  interest_paid_million_gel: number;
+  principal_paid_gel: number;
+  interest_paid_gel: number;
+  status: "actual";
+  source_id: GovernmentDebtSourceId;
+  source_table: string;
+  source_row_label: string;
+  source_unit: "Million GEL";
+  transformation: string;
+  methodology_note_id: string;
+  last_reviewed_at: string;
+};
+
+export type GovernmentDebtInterestRateRow = {
+  year: number;
+  debt_scope: DebtScope;
+  weighted_average_interest_rate_percent: number | null;
+  observation_date: string;
+  portfolio_scope: string;
+  rate_definition: "Year-end weighted-average annual interest rate";
+  availability_status: AvailabilityStatus;
+  source_id: GovernmentDebtSourceId;
+  source_table: string;
+  source_row_label: string;
+  source_unit: "% p.a.";
+  transformation: string;
+  last_reviewed_at: string;
+};
+
+export type GovernmentDebtForecastRow = {
+  snapshot_date: "2025-12-31";
+  payment_year: number;
+  debt_scope: DebtScope;
+  principal_source_amount: number;
+  interest_source_amount: number;
+  source_currency: "GEL" | "USD";
+  published_exchange_rate: number;
+  published_exchange_rate_definition: string;
+  source_exchange_rate_to_gel: number;
+  principal_million_gel: number;
+  interest_million_gel: number;
+  total_service_million_gel: number;
+  status: "projection_existing_portfolio";
+  coverage_note: string;
+  source_id: GovernmentDebtSourceId;
+  source_table: string;
+  source_row_label: string;
+  transformation: string;
+  last_reviewed_at: string;
+};
+
+export type ControlYearComparison = {
+  year: 2019 | 2022;
+  total_million_gel: number;
+  domestic_million_gel: number;
+  external_million_gel: number;
+  source_cells: string;
+};
