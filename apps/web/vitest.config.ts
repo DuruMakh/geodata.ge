@@ -10,6 +10,7 @@ const EXCLUSIVE_TEST = "tests/data/municipalGeometry/dataValidateGeometry.test.t
 // before the ordinary parallel group starts competing for CPU and memory.
 const HEAVY_TESTS = [
   "tests/data/adminSpending/olderMinistryYears.test.ts",
+  "tests/data/governmentDebt/governmentDebtPackage.test.ts",
   "tests/data/realExpenditurePdf/year2004StateBudget.test.ts",
 ] as const;
 

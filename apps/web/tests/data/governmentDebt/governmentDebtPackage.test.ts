@@ -578,6 +578,55 @@ describe("government debt research package", () => {
     });
   });
 
+  it("documents and wires the deterministic package workflow", () => {
+    const packageJson = JSON.parse(
+      fs.readFileSync(path.join(repoRoot, "apps/web/package.json"), "utf8"),
+    ) as { scripts: Record<string, string> };
+    expect(packageJson.scripts["data:prepare-government-debt"]).toBe(
+      "tsx scripts/prepare-government-debt.ts --write",
+    );
+    expect(packageJson.scripts["data:check-government-debt"]).toBe(
+      "tsx scripts/prepare-government-debt.ts --check",
+    );
+    expect(packageJson.scripts["data:validate"]).toContain(
+      "npm run data:check-government-debt",
+    );
+
+    const readmePath = path.join(packageDir, "README.md");
+    const methodologyPath = path.join(
+      repoRoot,
+      "docs/data-methodology/government-debt-annual.md",
+    );
+    expect(fs.existsSync(readmePath)).toBe(true);
+    expect(fs.existsSync(methodologyPath)).toBe(true);
+    if (!fs.existsSync(readmePath) || !fs.existsSync(methodologyPath)) return;
+
+    const combined = `${fs.readFileSync(readmePath, "utf8")}\n${fs.readFileSync(methodologyPath, "utf8")}`;
+    for (const requiredText of [
+      "Stock: 2013-2025",
+      "Actual service: 2013-2025",
+      "Interest rates: 2015-2025",
+      "Forecast service: 2026-2030",
+      "2025-12-31",
+      "11 documented gaps",
+      "2019",
+      "2022",
+      "existing national GDP dataset",
+      "No estimates were created. The package changes no served Fiscal.ge data.",
+      "No UI, route, database, or public-data import was added.",
+    ]) {
+      expect(combined, requiredText).toContain(requiredText);
+    }
+
+    const vitestConfig = fs.readFileSync(
+      path.join(repoRoot, "apps/web/vitest.config.ts"),
+      "utf8",
+    );
+    expect(vitestConfig).toContain(
+      '"tests/data/governmentDebt/governmentDebtPackage.test.ts"',
+    );
+  });
+
   it("validates committed artifacts in check mode without writing", async () => {
     const artifactPaths = generatedArtifactNames.map((fileName) =>
       path.join(packageDir, fileName),
