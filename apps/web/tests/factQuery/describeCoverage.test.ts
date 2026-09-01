@@ -2,6 +2,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import { queryMinistries } from "../../lib/factQuery/queryMinistries";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
 
@@ -13,7 +14,7 @@ beforeAll(async () => {
 
 type CoverageData = {
   datasets: { datasetId: string; years: [number, number]; measures: string[] }[];
-  series?: { seriesId: string; availability: string; years: number[] }[];
+  series?: { seriesId: string; availability: string; level: string; years: number[] }[];
   entities?: { entityId: string; entitySlug: string | null }[];
   exclusions: { entityId: string; reason: string }[];
 };
@@ -115,5 +116,50 @@ describe("describeCoverage", () => {
     const meta = describeCoverage(snapshot, {}).meta;
     expect(meta.licence).toBe("CC BY 4.0");
     expect(meta.dataVersion).toBe(snapshot.dataVersion);
+  });
+
+  describe("the level filter lists what is queryable at that level, not structural levels", () => {
+    const seriesAt = (level: "admin_category" | "major_program") =>
+      data(describeCoverage(snapshot, { datasetId: "ministries", level })).series ?? [];
+
+    it("surfaces admin_spending.total under admin_category, still labelled a total", () => {
+      const total = seriesAt("admin_category").find((s) => s.seriesId === "admin_spending.total");
+
+      // queryMinistries accepts the total ONLY at admin_category, so a client
+      // narrowing the catalogue by level must find it there - otherwise the
+      // state budget's headline number is undiscoverable through the catalogue.
+      expect(total).toBeDefined();
+      // Its structural level is untouched: the filter widened, the data did not.
+      expect(total?.level).toBe("total");
+      expect(total?.availability).toBe("calculated_total");
+    });
+
+    it("does not surface admin_spending.total under major_program", () => {
+      expect(seriesAt("major_program").map((s) => s.seriesId)).not.toContain("admin_spending.total");
+    });
+
+    it("agrees with what queryMinistries actually accepts at admin_category", () => {
+      const catalogueQueryable = seriesAt("admin_category")
+        .filter((s) => s.availability !== "taxonomy_only")
+        .map((s) => s.seriesId)
+        .sort();
+
+      // An unknown_series error reports the real queryable set as validChoices.
+      const rejected = queryMinistries(snapshot, {
+        level: "admin_category",
+        seriesIds: ["definitely.not.a.series"],
+        years: [2024],
+        measure: "amount_gel",
+      });
+      const accepted = (rejected as { error: { validChoices?: string[] } }).error.validChoices ?? [];
+
+      expect(catalogueQueryable).toEqual([...accepted].sort());
+      expect(catalogueQueryable).toContain("admin_spending.total");
+    });
+
+    it("does not leak a national total into a ministries level filter", () => {
+      const series = data(describeCoverage(snapshot, { datasetId: "national-revenue", level: "admin_category" })).series ?? [];
+      expect(series.map((s) => s.seriesId)).not.toContain("revenue.total");
+    });
   });
 });

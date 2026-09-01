@@ -408,6 +408,29 @@ function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): 
   return datasetId === "municipal-expenditure" ? municipalEntitiesFor(snapshot) : undefined;
 }
 
+/**
+ * `level` narrows the catalogue to what a client can ASK FOR at that request
+ * level, which is not the same as matching each series' structural `level`.
+ *
+ * admin_spending.total is structurally a total, but queryMinistries accepts it
+ * only at admin_category and rejects it at major_program (its
+ * queryableSeriesIds). A plain `entry.level === input.level` comparison
+ * therefore hid the state budget's headline number from BOTH ministries
+ * filters: a client following spec section 6.1 ("use identifiers returned by
+ * the catalogue") and narrowing by level could never discover it, and only an
+ * unknown_series error's validChoices revealed it existed.
+ *
+ * Scoped to the ministries dataset deliberately. The other datasets' totals
+ * (revenue.total, expenditure.total, municipal.total) also carry LEVEL_TOTAL,
+ * and admin_category/major_program are not their request levels — widening for
+ * them would leak a national total into a ministries-shaped filter.
+ */
+function matchesLevel(entry: SeriesEntry, level: string | undefined, datasetId: DatasetId): boolean {
+  if (level === undefined) return true;
+  if (datasetId === "ministries" && entry.level === LEVEL_TOTAL) return level === LEVEL_ADMIN_CATEGORY;
+  return entry.level === level;
+}
+
 /** Case-insensitive substring match. `null` candidates (e.g. a region's entitySlug) are skipped, which is what makes "for municipalities" (the brief's search contract) fall out of the data instead of needing a special case. */
 function matchesSearch(query: string, candidates: (string | null)[]): boolean {
   const needle = query.toLowerCase();
@@ -490,9 +513,10 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     return { kind: "catalogue", status: "ok", data: { datasets, exclusions }, meta };
   }
 
-  const series = seriesForDataset(snapshot, input.datasetId).filter(
+  const datasetId = input.datasetId;
+  const series = seriesForDataset(snapshot, datasetId).filter(
     (entry) =>
-      (input.level === undefined || entry.level === input.level) &&
+      matchesLevel(entry, input.level, datasetId) &&
       (input.search === undefined || matchesSearch(input.search, [entry.seriesId, entry.labelKa])),
   );
 
