@@ -56,7 +56,19 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
     applies: (c) =>
       c.years.includes(2004) &&
       (c.seriesIds.includes(REVENUE_TOTAL_ID) || (c.datasetId === "national-revenue" && c.measure === "share_of_total_pct")),
-    affects: () => ["2004"],
+    // Precise per (seriesId, year), not just "2004": the two applies() branches
+    // affect different sets of observations, and a bare year string would
+    // attach this to every 2004 observation in the request regardless of
+    // which branch actually fired. share_of_total_pct widens to every
+    // requested series in 2004 (each one's denominator is the narrower
+    // total), but amount_gel only widens to revenue.total itself - a VAT
+    // amount requested alongside the 2004 total is not, on its own, narrower.
+    affects: (c) => {
+      const wideningMeasure = c.datasetId === "national-revenue" && c.measure === "share_of_total_pct";
+      return c.observations
+        .filter((o) => o.year === 2004 && (o.seriesId === REVENUE_TOTAL_ID || wideningMeasure))
+        .map((o) => `${o.seriesId}:${o.year}`);
+    },
   },
   {
     code: "revenue_2004_liabilities_unavailable",
@@ -93,7 +105,15 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
     methodologyRef: "revenue-methodology.md",
     applies: (c) =>
       c.seriesIds.some((id) => NETTED_REVENUE_IDS.has(id)) && c.years.some((y) => y >= NETTING_START_YEAR),
-    affects: (c) => c.seriesIds.filter((id) => NETTED_REVENUE_IDS.has(id)),
+    // Precise per (seriesId, year), not a bare seriesId: applies() only needs
+    // ONE requested year to be >= 2008 to put this caveat on meta.caveats at
+    // all, but a bare "revenue.grants" would then attach it to every
+    // requested year for that series - including a pre-2008 year in the same
+    // request, where the comment above documents there is no netting.
+    affects: (c) =>
+      c.observations
+        .filter((o) => NETTED_REVENUE_IDS.has(o.seriesId) && o.year >= NETTING_START_YEAR)
+        .map((o) => `${o.seriesId}:${o.year}`),
   },
   {
     code: "gdp_sna_break_2010",

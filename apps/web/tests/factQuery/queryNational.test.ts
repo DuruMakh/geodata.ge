@@ -242,6 +242,51 @@ describe("queryNational", () => {
     expect(vat.meta.caveats.map((c) => c.code)).not.toContain("revenue_2004_total_scope");
   });
 
+  it("attaches revenue_2004_total_scope only to the total observation, not a VAT observation requested alongside it", () => {
+    const result = queryNational(snapshot, {
+      side: "revenue",
+      seriesIds: ["revenue.total", "revenue.vat"],
+      years: [2004],
+      measure: "amount_gel",
+    });
+
+    const total = data(result).observations.find((o) => o.seriesId === "revenue.total");
+    const vat = data(result).observations.find((o) => o.seriesId === "revenue.vat");
+
+    expect(total?.caveatIds).toContain("revenue_2004_total_scope");
+    expect(vat?.caveatIds).not.toContain("revenue_2004_total_scope");
+  });
+
+  it("attaches revenue_2004_total_scope to every requested series under share_of_total_pct, since all of them divide by the narrower total", () => {
+    const result = queryNational(snapshot, {
+      side: "revenue",
+      seriesIds: ["revenue.vat"],
+      years: [2004],
+      measure: "share_of_total_pct",
+    });
+
+    const vat = data(result).observations.find((o) => o.seriesId === "revenue.vat");
+    expect(vat?.caveatIds).toContain("revenue_2004_total_scope");
+  });
+
+  it("does not attach revenue_internal_flows_netted to a pre-2008 observation of a netted series requested alongside a post-2008 one", () => {
+    const result = queryNational(snapshot, {
+      side: "revenue",
+      seriesIds: ["revenue.grants"],
+      years: [2005, 2020],
+      measure: "amount_gel",
+    });
+
+    const y2005 = data(result).observations.find((o) => o.year === 2005);
+    const y2020 = data(result).observations.find((o) => o.year === 2020);
+
+    expect(y2005?.caveatIds).not.toContain("revenue_internal_flows_netted");
+    expect(y2020?.caveatIds).toContain("revenue_internal_flows_netted");
+    // The caveat is still relevant to the request as a whole - it correctly
+    // affects part of it - so it still belongs in the request-level list.
+    expect(result.meta.caveats.map((c) => c.code)).toContain("revenue_internal_flows_netted");
+  });
+
   it("reports requested, available and returned years plus missing cells", () => {
     const result = queryNational(snapshot, {
       side: "revenue",

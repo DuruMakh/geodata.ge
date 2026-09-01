@@ -44,7 +44,17 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     messageKa: "საქართველოს მუნიციპალური აგრეგატი მოიცავს 69 გადამოწმებულ ბიუჯეტს და აჭარის ნეტო კორექციას; რეგიონული მწკრივები ამ ჯამს არ ქმნიან.",
     messageEn: "The Georgia municipal aggregate covers 69 reviewed budgets plus the net Adjara adjustment; regional rows do not sum to it.",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
-    applies: (c) => c.entityIds.includes(COUNTRY_ID),
+    // Gated on datasetId, matching the precedent already in this catalogue
+    // (rules.national.ts's revenue_2004_total_scope gates on
+    // "national-revenue"; rules.ministries.ts's program_coverage_partial
+    // gates on "ministries", with the same failure mode documented inline
+    // there). COUNTRY_ID ("country.georgia") is the exact entityId spec 7.2
+    // assigns every national observation, and this rule has no other
+    // condition - without the gate, any caller populating entityIds with the
+    // national entity id (as queryNational legitimately could, since that IS
+    // its entity) would spuriously inherit a caveat about the municipal
+    // aggregate.
+    applies: (c) => c.datasetId === "municipal-expenditure" && c.entityIds.includes(COUNTRY_ID),
     affects: () => [COUNTRY_ID],
   },
   {
@@ -71,8 +81,13 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     messageKa: "ფუნქციური კატეგორიები მხოლოდ მუნიციპალურია; რესპუბლიკური ფუნქციური განაწილება არ არსებობს და არ არის გამოგონილი.",
     messageEn: "Functional categories are municipal-only; no republican functional allocation exists and none is invented.",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
+    // Gated on datasetId for the same reason as municipal_country_scope above:
+    // COUNTRY_ID collides with the national entityId, and this rule has no
+    // other condition that would stop it firing on a national-shaped context.
     applies: (c) =>
-      (c.entityIds.includes(ADJARA_ID) || c.entityIds.includes(COUNTRY_ID)) && c.seriesIds.some((id) => id !== TOTAL_SERIES),
+      c.datasetId === "municipal-expenditure" &&
+      (c.entityIds.includes(ADJARA_ID) || c.entityIds.includes(COUNTRY_ID)) &&
+      c.seriesIds.some((id) => id !== TOTAL_SERIES),
     affects: (c) => c.entityIds.filter((id) => id === ADJARA_ID || id === COUNTRY_ID),
   },
   {

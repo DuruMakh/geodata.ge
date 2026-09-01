@@ -124,6 +124,26 @@ describe("scope rules", () => {
   });
 });
 
+describe("national-shaped requests never trigger municipal country-scope rules", () => {
+  // MUNICIPAL_COUNTRY_ID ("country.georgia") is the exact entityId spec 7.2
+  // assigns every national observation (queryNational.ts). municipal_country_scope
+  // and municipal_functions_no_republican_crosswalk key on that literal id with
+  // no other dataset-independent condition, so without the datasetId gate a
+  // national-shaped context populating entityIds with its own entity id would
+  // spuriously inherit a caveat about the municipal Georgia aggregate.
+  it("municipal_country_scope and municipal_functions_no_republican_crosswalk do not fire for datasetId national-revenue, even with entityIds including country.georgia", () => {
+    const ctx = context({
+      datasetId: "national-revenue",
+      seriesIds: ["revenue.vat"],
+      entityIds: ["country.georgia"],
+    });
+    const fired = codes(ctx);
+
+    expect(fired).not.toContain("municipal_country_scope");
+    expect(fired).not.toContain("municipal_functions_no_republican_crosswalk");
+  });
+});
+
 describe("municipal_functional_total_gap", () => {
   it("fires for a share-of-total query when the functional sum leaves a reconciliation gap", () => {
     const ctx = context({

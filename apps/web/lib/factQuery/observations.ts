@@ -7,7 +7,7 @@
 // id, resolving sourceIds into documentIds without re-querying sources per
 // row, and deciding which already-evaluated request-level caveats belong on
 // one specific observation's caveatIds.
-import type { Caveat, DatasetId, Measure, ResolvedSource, Availability } from "./types";
+import type { Availability, Caveat, DatasetId, Measure, ResolvedSource, Unit } from "./types";
 
 /**
  * One value on one line of a query-function response, per spec section 7.2.
@@ -31,7 +31,7 @@ export type Observation = {
   parentSeriesId: string | null;
   year: number;
   measure: Measure;
-  unit: "GEL" | "percent" | "GEL_per_resident";
+  unit: Unit;
   value: number | null;
   availability: Availability;
   missingReason: string | null;
@@ -88,6 +88,44 @@ export function resolveDocumentIds(resolvedSources: readonly ResolvedSource[], s
  * REQUEST's year count; revenue_2004_total_scope reads a single
  * observation's own year) and no one per-observation context satisfies
  * both.
+ *
+ * PRECISION CONTRACT for every CaveatRule this helper is used against
+ * (read this before writing or reviewing a rule in rules.*.ts):
+ *
+ * This function trusts `affects()`'s output completely - it does string
+ * matching, not semantics. That is only safe when `affects()` is precise at
+ * the same grain the rule's underlying truth actually varies at. A shape
+ * that merely "parses" as one of the id / id:year / bare-year forms above is
+ * NOT enough: it also has to be TRUE for every observation it will end up
+ * matching against.
+ *
+ * Two rules in rules.national.ts shipped exactly this bug and were fixed
+ * once this helper exposed it in practice, not by inspection:
+ *   - revenue_internal_flows_netted's `applies()` fires whenever ANY
+ *     requested year is >= 2008, but its old `affects()` returned a bare
+ *     seriesId ("revenue.grants"). A request for years [2005, 2020] then
+ *     attached the caveat to the 2005 observation too, where the rule's own
+ *     comment documents there is no netting - a reader quoting the message
+ *     next to the 2005 figure could not tell it was false there.
+ *   - revenue_2004_total_scope's `applies()` has two independent firing
+ *     paths (the total is named directly; OR the whole request measure is
+ *     share_of_total_pct on national-revenue) that affect DIFFERENT sets of
+ *     observations - the first affects only revenue.total, the second
+ *     affects every requested series. A bare "2004" `affects()` could not
+ *     distinguish them, so requesting revenue.total and revenue.vat together
+ *     for 2004 (amount_gel) attached the caveat to the VAT observation too,
+ *     which has no such gap.
+ *
+ * The fix pattern in both cases (see rules.national.ts): build `affects()`
+ * from `c.observations`, filtered by the SAME predicate `applies()` used to
+ * decide the caveat fires at all, then map to the precise `${seriesId}:${year}`
+ * (or `${entityId}:${year}`) composite - never a bare id or bare year unless
+ * the rule's truth is genuinely uniform across every year/series in the
+ * request (nominal_gel and budget_scopes_differ are the two rules in this
+ * file where that is actually the case - see their own comments).
+ * `planned_values` and `negative_revenue_correction` already followed this
+ * pattern before the fix; treat them as the reference shape for any new
+ * rule.
  */
 export function caveatIdsForObservation(
   caveats: readonly Caveat[],
