@@ -1205,8 +1205,8 @@ test("exposes the explorer breadcrumb as a navigation landmark", async ({ page }
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
-  // BreadcrumbTrail next door already does this correctly on /about and the
-  // methodology pages. PageHeader — used on every explorer route including all
+  // BreadcrumbTrail next door already does this correctly on the methodology
+  // pages. PageHeader — used on every explorer route including all
   // 76 municipal pages — rendered the same information as a paragraph of spans
   // with an unhidden "/" separator and the current page marked by colour alone.
   const header = page.getByTestId("explorer-header");

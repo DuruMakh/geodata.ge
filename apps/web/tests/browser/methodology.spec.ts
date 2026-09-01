@@ -43,7 +43,7 @@ async function expectVisibleFocusOutline(locator: Locator) {
   expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
 }
 
-test("public header keeps landing active and leaves methodology navigation inactive", async ({ page }) => {
+test("public header keeps landing active, exposes mission, and leaves methodology navigation inactive", async ({ page }) => {
   await page.setViewportSize({ width: 1640, height: 900 });
   await page.goto(`${TEST_BASE_URL}/`);
   const landingHeader = page.getByTestId("landing-header");
@@ -51,6 +51,7 @@ test("public header keeps landing active and leaves methodology navigation inact
     "aria-current",
     "page",
   );
+  await expect(landingHeader.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("href", "/about");
   const landingHeaderBox = await landingHeader.boundingBox();
   expect(landingHeaderBox).not.toBeNull();
 
@@ -66,7 +67,13 @@ test("public header keeps landing active and leaves methodology navigation inact
     await expect(header).toBeVisible();
     await expect(header.getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute("href", "/");
     await expect(header.getByRole("link", { name: "მონაცემები", exact: true })).toHaveAttribute("href", "/explorer");
-    await expect(header.locator("[aria-current]")).toHaveCount(0);
+    await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("href", "/about");
+    if (path === "/about") {
+      await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("aria-current", "page");
+      await expect(header.locator("[aria-current]")).toHaveCount(1);
+    } else {
+      await expect(header.locator("[aria-current]")).toHaveCount(0);
+    }
     await expect(header).toContainText("2004–2025");
 
     const headerBox = await header.boundingBox();

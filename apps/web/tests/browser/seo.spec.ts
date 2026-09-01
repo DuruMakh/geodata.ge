@@ -501,7 +501,6 @@ test("methodology exposes a stable processed-data download", async ({ page, requ
 });
 
 for (const [route, expectedLabels] of [
-  ["/about", ["მთავარი", "Fiscal.ge-ის შესახებ"]],
   ["/methodology", ["მთავარი", "მეთოდოლოგია"]],
   ["/methodology/expenditure", ["მთავარი", "მეთოდოლოგია", "ხარჯების მეთოდოლოგია"]],
 ] as const) {
