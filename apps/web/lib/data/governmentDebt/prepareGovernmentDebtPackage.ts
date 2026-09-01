@@ -182,40 +182,69 @@ async function readManifest(filePath: string): Promise<SourceManifestRow[]> {
   return rows as SourceManifestRow[];
 }
 
-async function validateMethodologyNotes(filePath: string): Promise<void> {
-  const rows = parseCsv(await fs.readFile(filePath, "utf8"));
-  const expectedHeaders = [
-    "methodology_note_id",
-    "effective_date",
-    "affected_dataset",
-    "affected_scope",
-    "note_ka",
-    "note_en",
-    "source_id",
-  ];
+const METHODOLOGY_NOTE_HEADERS = [
+  "methodology_note_id",
+  "effective_date",
+  "affected_dataset",
+  "affected_scope",
+  "note_ka",
+  "note_en",
+  "source_id",
+] as const;
+
+const APPROVED_METHODOLOGY_NOTES: CsvRow[] = [
+  {
+    methodology_note_id: "government-domestic-2019-budget-organizations",
+    effective_date: "2019-01-01",
+    affected_dataset: "stock|actual_service",
+    affected_scope: "domestic",
+    note_ka:
+      "2019 წლიდან მთავრობის საშინაო ვალი დამატებით მოიცავს საბიუჯეტო ორგანიზაციების სესხის სახით არსებულ ვალს.",
+    note_en:
+      "From 2019, domestic Government Debt additionally includes loan debt owed by budgetary organizations.",
+    source_id: "mof_public_debt_bulletin_n25",
+  },
+  {
+    methodology_note_id: "government-domestic-2022-general-government-soes",
+    effective_date: "2022-12-31",
+    affected_dataset: "stock|actual_service",
+    affected_scope: "domestic",
+    note_ka:
+      "2022 წლის დეკემბრიდან გათვალისწინებულია სამთავრობო სექტორის სახელმწიფო საწარმოების სესხის სახით არსებული ვალიც.",
+    note_en:
+      "From December 2022, domestic Government Debt also includes loan debt of state-owned enterprises classified in general government.",
+    source_id: "mof_public_debt_bulletin_n25",
+  },
+];
+
+export function validateGovernmentDebtMethodologyNotes(
+  rows: CsvRow[],
+): true {
   if (
-    rows.length !== 2 ||
-    Object.keys(rows[0] ?? {}).join(",") !== expectedHeaders.join(",")
+    rows.length !== APPROVED_METHODOLOGY_NOTES.length ||
+    rows.some(
+      (row) =>
+        Object.keys(row).join(",") !== METHODOLOGY_NOTE_HEADERS.join(","),
+    )
   ) {
     throw new Error("Methodology notes do not match the approved schema");
   }
-  const expectedIds = new Set([
-    "government-domestic-2019-budget-organizations",
-    "government-domestic-2022-general-government-soes",
-  ]);
   if (
-    rows.some(
-      (row) =>
-        !expectedIds.delete(row.methodology_note_id) ||
-        row.affected_scope !== "domestic" ||
-        row.source_id !== "mof_public_debt_bulletin_n25" ||
-        !row.note_ka.trim() ||
-        !row.note_en.trim(),
-    ) ||
-    expectedIds.size !== 0
+    rows.some((row, index) =>
+      METHODOLOGY_NOTE_HEADERS.some(
+        (header) => row[header] !== APPROVED_METHODOLOGY_NOTES[index]![header],
+      ),
+    )
   ) {
     throw new Error("Methodology notes do not match the approved values");
   }
+  return true;
+}
+
+async function validateMethodologyNotes(filePath: string): Promise<void> {
+  validateGovernmentDebtMethodologyNotes(
+    parseCsv(await fs.readFile(filePath, "utf8")),
+  );
 }
 
 type ApprovedSourcePages = {
@@ -437,6 +466,11 @@ function validateForecast(rows: GovernmentDebtForecastRow[]): void {
       total.interest_million_gel,
       domestic.interest_million_gel + external.interest_million_gel,
       `Forecast interest total for ${year}`,
+    );
+    assertClose(
+      total.total_service_million_gel,
+      domestic.total_service_million_gel + external.total_service_million_gel,
+      `Forecast service total for ${year}`,
     );
     if (
       Number(

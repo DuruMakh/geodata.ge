@@ -449,7 +449,7 @@
         "year": 2018,
         "debt_scope": "external",
         "availability_status": "not_found_in_reviewed_sources",
-        "reason": "The reviewed component table excludes the Eurobond, so it is not normalized as the full External Government Debt portfolio rate."
+        "reason": "The reviewed component table reports External Debt and Eurobond separately, so the External Debt row is not normalized as the full External Government Debt portfolio rate."
       },
       {
         "year": 2019,

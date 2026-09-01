@@ -131,6 +131,13 @@ describe("government debt research package", () => {
     );
     const rows = readPackageCsvRows("source-manifest.csv");
     await expect(validateGovernmentDebtSourceManifest(rows)).resolves.toBe(true);
+    expect(
+      rows.find((row) => row.source_id === "mof_public_debt_bulletin_n19"),
+    ).toMatchObject({
+      source_period_min: "2014",
+      used_period_min: "2015",
+      used_period_max: "2022",
+    });
 
     const changedHash = rows.map((row, index) =>
       index === 0 ? { ...row, sha256: "0".repeat(64) } : { ...row },
@@ -138,6 +145,39 @@ describe("government debt research package", () => {
     await expect(
       validateGovernmentDebtSourceManifest(changedHash),
     ).rejects.toThrow("Unexpected source-manifest sha256");
+  });
+
+  it("rejects any drift in the two approved methodology notes", async () => {
+    const packageModule = await import(pathToFileURL(packageModulePath).href);
+    expect(packageModule.validateGovernmentDebtMethodologyNotes).toBeTypeOf(
+      "function",
+    );
+    if (
+      typeof packageModule.validateGovernmentDebtMethodologyNotes !== "function"
+    ) {
+      return;
+    }
+    const rows = readPackageCsvRows("methodology-notes.csv");
+    expect(() =>
+      packageModule.validateGovernmentDebtMethodologyNotes(rows),
+    ).not.toThrow();
+
+    for (const field of [
+      "effective_date",
+      "affected_dataset",
+      "affected_scope",
+      "note_ka",
+      "note_en",
+      "source_id",
+    ]) {
+      const changed = rows.map((row, index) =>
+        index === 0 ? { ...row, [field]: `${row[field]}-changed` } : row,
+      );
+      expect(
+        () => packageModule.validateGovernmentDebtMethodologyNotes(changed),
+        field,
+      ).toThrow("Methodology notes do not match the approved values");
+    }
   });
 
   it("builds the complete normalized package with only documented rate gaps", async () => {

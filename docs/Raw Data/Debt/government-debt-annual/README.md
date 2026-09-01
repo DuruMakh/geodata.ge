@@ -45,7 +45,7 @@ The total Government Debt rate is complete for 2015-2025. Exact comparable compo
 - domestic: 2015, 2016, 2017 and 2025;
 - external: 2015, 2016, 2017, 2018, 2019, 2020 and 2025.
 
-The 2018-2020 external figures found in older strategy tables exclude the Eurobond, so they are not used as full External Government Debt portfolio rates. Missing values remain blank; they are never set to zero or estimated.
+The 2018 strategy table reports External Debt and the Eurobond separately; the 2019-2020 external rows explicitly exclude the Eurobond. Those figures are therefore not used as full External Government Debt portfolio rates. Missing values remain blank; they are never set to zero or estimated.
 
 ## GDP reuse and controls
 
@@ -55,7 +55,7 @@ The separate central-government-liabilities workbook is used only for a one-time
 
 ## Forecast boundary
 
-The forecast is one internally consistent snapshot, not a rolling monthly splice. External rows cover the published External Government Debt schedule. Domestic rows cover the published Treasury-securities schedule. The package excludes future borrowing, refinancing, exchange-rate changes, variable-rate changes and unscheduled domestic loan debt. Replace the whole snapshot when a later complete official year-end schedule becomes available.
+The forecast is one internally consistent snapshot, not a rolling monthly splice. External rows cover the published External Government Debt schedule. Domestic rows cover the published Treasury-securities schedule. Domestic `total_service_million_gel` preserves the published total; derived domestic interest retains the source chart's one-decimal precision. Total-scope service therefore sums the domestic and external `total_service_million_gel` fields directly. The package excludes future borrowing, refinancing, exchange-rate changes, variable-rate changes and unscheduled domestic loan debt. Replace the whole snapshot when a later complete official year-end schedule becomes available.
 
 ## Reproduce and check
 

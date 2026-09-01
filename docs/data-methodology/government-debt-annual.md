@@ -78,7 +78,7 @@ The 11 documented gaps remain blank:
 - domestic 2015-2017 and 2025;
 - external 2015-2020 and 2025.
 
-The 2018-2020 strategy tables explicitly exclude the Eurobond from their external figures, so those values are not comparable with the full External Government Debt portfolio. No exact year-end 2025 component rate was found in the reviewed sources. Nothing is inferred from chart geometry, another rate or cash flows.
+The 2018 strategy table reports External Debt and the Eurobond separately, while the 2019-2020 external rows explicitly exclude the Eurobond. Those values are not comparable with the full External Government Debt portfolio. No exact year-end 2025 component rate was found in the reviewed sources. Nothing is inferred from chart geometry, another rate or cash flows.
 
 ## Forecast normalization
 
@@ -97,7 +97,9 @@ The forecast is an existing-portfolio snapshot as of 2025-12-31:
 | 2029 | 521.3 | 194.4 | 1,413.474 | 536.5 | 1,950.0 |
 | 2030 | 508.9 | 181.5 | 1,516.849 | 342.3 | 1,859.1 |
 
-Total rows sum the GEL-normalized domestic and external components. The schedule excludes future borrowing, refinancing, FX changes, variable-rate changes and unscheduled domestic loan debt. A newer monthly stock report is not spliced into this schedule; replace the complete snapshot when a later full official year-end principal-and-interest schedule is available.
+Domestic `total_service_million_gel` preserves the published chart total. Domestic interest is derived from that total and the more precise principal amount, then rounded to the chart's one-decimal precision; consequently, unrounded principal plus rounded interest can differ from published domestic total service by less than 0.05 million GEL. Total-scope principal and interest each sum their same-named domestic and external components, while total-scope `total_service_million_gel` separately sums the two component total-service fields. This preserves both the published domestic total and exact scope reconciliation.
+
+The schedule excludes future borrowing, refinancing, FX changes, variable-rate changes and unscheduled domestic loan debt. A newer monthly stock report is not spliced into this schedule; replace the complete snapshot when a later full official year-end principal-and-interest schedule is available.
 
 ## Concise methodology changes
 

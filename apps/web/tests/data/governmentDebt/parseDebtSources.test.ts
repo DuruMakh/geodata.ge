@@ -266,9 +266,21 @@ describe("government debt source parsers", () => {
     expect(value(2024, "external")?.weighted_average_interest_rate_percent).toBe(
       3.12,
     );
+    expect(value(2018, "external")).toMatchObject({
+      weighted_average_interest_rate_percent: null,
+      source_id: "mof_debt_strategy_2019_2021",
+      source_row_label: "External Debt / Eurobond",
+    });
     expect(value(2019, "external")).toMatchObject({
       weighted_average_interest_rate_percent: null,
       availability_status: "not_found_in_reviewed_sources",
+      source_id: "mof_debt_strategy_2022_2025",
+      source_row_label: "External Debt (excludes the Eurobond)",
+    });
+    expect(value(2020, "external")).toMatchObject({
+      weighted_average_interest_rate_percent: null,
+      source_id: "mof_debt_strategy_2022_2025",
+      source_row_label: "External Debt (excludes the Eurobond)",
     });
     expect(value(2025, "domestic")?.weighted_average_interest_rate_percent).toBeNull();
     expect(value(2025, "external")?.weighted_average_interest_rate_percent).toBeNull();
@@ -339,6 +351,11 @@ describe("government debt source parsers", () => {
       expect(value(year, "total")?.interest_million_gel).toBeCloseTo(
         value(year, "domestic")!.interest_million_gel +
           value(year, "external")!.interest_million_gel,
+        10,
+      );
+      expect(value(year, "total")?.total_service_million_gel).toBeCloseTo(
+        value(year, "domestic")!.total_service_million_gel +
+          value(year, "external")!.total_service_million_gel,
         10,
       );
     }

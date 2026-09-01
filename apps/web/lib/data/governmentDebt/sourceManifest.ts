@@ -88,7 +88,7 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     bytes: "3256246",
     source_period_min: "2014",
     source_period_max: "2022",
-    used_period_min: "2020",
+    used_period_min: "2015",
     used_period_max: "2022",
   },
   mof_public_debt_bulletin_n25: {

@@ -466,10 +466,11 @@ export type InterestRateSourcePages = {
 };
 
 type RateEvidence = {
-  value: number;
+  value: number | null;
   sourceId: GovernmentDebtSourceId;
   sourceTable: string;
   sourceRowLabel: string;
+  gapReason?: string;
 };
 
 function percentTokens(source: string): number[] {
@@ -481,11 +482,14 @@ function requirePercentSeries(
   prefix: string,
   expectedCount: number,
 ): number[] {
-  const values = percentTokens(requireLine(source, prefix).slice(prefix.length));
-  if (values.length !== expectedCount) {
-    throw new Error(
-      `Expected ${expectedCount} percentage values for ${prefix}; found ${values.length}`,
-    );
+  const values = source
+    .split(/\r?\n/)
+    .map((candidate) => candidate.trim())
+    .filter((candidate) => candidate.startsWith(prefix))
+    .map((candidate) => percentTokens(candidate.slice(prefix.length)))
+    .find((candidate) => candidate.length === expectedCount);
+  if (!values) {
+    throw new Error(`Expected ${expectedCount} percentage values for ${prefix}`);
   }
   return values;
 }
@@ -495,6 +499,7 @@ function rateRow(
   debtScope: DebtScope,
   evidence: RateEvidence | undefined,
 ): GovernmentDebtInterestRateRow {
+  const available = evidence?.value !== null && evidence?.value !== undefined;
   const scopeLabel =
     debtScope === "total"
       ? "Total Government Debt portfolio"
@@ -510,16 +515,16 @@ function rateRow(
     observation_date: `${year}-12-31`,
     portfolio_scope: scopeLabel,
     rate_definition: "Year-end weighted-average annual interest rate",
-    availability_status: evidence
+    availability_status: available
       ? "available"
       : "not_found_in_reviewed_sources",
     source_id: evidence?.sourceId ?? "mof_monthly_debt_report_2026_07",
     source_table: evidence?.sourceTable ?? "Reviewed official source set",
     source_row_label: evidence?.sourceRowLabel ?? "No comparable source row",
     source_unit: "% p.a.",
-    transformation: evidence
+    transformation: available
       ? "Exact published weighted-average portfolio interest rate; no calculation or chart-position digitization."
-      : gapReason,
+      : evidence?.gapReason ?? gapReason,
     last_reviewed_at: "2026-09-01",
   };
 }
@@ -544,6 +549,19 @@ export function parseInterestRateGrid(
     "Domestic Debt",
     2,
   )[0]!;
+  const excludedExternal2018 = requirePercentSeries(
+    sources.strategy2019Page14,
+    "External Debt",
+    2,
+  );
+  const separateEurobond2018 = requirePercentSeries(
+    sources.strategy2019Page14,
+    "Eurobond",
+    1,
+  );
+  if (excludedExternal2018.length !== 2 || separateEurobond2018.length !== 1) {
+    throw new Error("Missing separate 2018 external-debt and Eurobond rows");
+  }
   const domestic2019And2020 = requirePercentSeries(
     sources.strategy2022Page23,
     "Domestic Debt",
@@ -688,12 +706,45 @@ export function parseInterestRateGrid(
       },
     ],
   ]);
+  const excludedExternalEvidence = new Map<number, RateEvidence>([
+    [
+      2018,
+      {
+        value: null,
+        sourceId: "mof_debt_strategy_2019_2021",
+        sourceTable:
+          "Table 2: Weighted Average Interest Rates on General Government Domestic and External Debt",
+        sourceRowLabel: "External Debt / Eurobond",
+        gapReason:
+          "The reviewed component table reports External Debt and Eurobond separately, so the External Debt row is not normalized as the full External Government Debt portfolio rate.",
+      },
+    ],
+    ...[2019, 2020].map(
+      (year) =>
+        [
+          year,
+          {
+            value: null,
+            sourceId: "mof_debt_strategy_2022_2025" as const,
+            sourceTable:
+              "Table 4.1: Weighted Average Interest Rates on the General Government Domestic and External Debt Portfolios",
+            sourceRowLabel: "External Debt (excludes the Eurobond)",
+            gapReason:
+              "The reviewed component table excludes the Eurobond, so it is not normalized as the full External Government Debt portfolio rate.",
+          },
+        ] as const,
+    ),
+  ]);
 
   return Array.from({ length: 11 }, (_, index) => 2015 + index).flatMap(
     (year) => [
       rateRow(year, "total", totalEvidence.get(year)),
       rateRow(year, "domestic", domesticEvidence.get(year)),
-      rateRow(year, "external", externalEvidence.get(year)),
+      rateRow(
+        year,
+        "external",
+        externalEvidence.get(year) ?? excludedExternalEvidence.get(year),
+      ),
     ],
   );
 }
@@ -890,6 +941,12 @@ export function parseDebtServiceForecast(
         "GEL",
         1,
         1,
+        Number(
+          (
+            domesticRow.total_service_million_gel +
+            externalRow.total_service_million_gel
+          ).toFixed(10),
+        ),
       );
       return [totalRow, domesticRow, externalRow];
     },
