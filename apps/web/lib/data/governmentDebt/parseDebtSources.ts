@@ -177,6 +177,76 @@ export function parseGovernmentDebtStock(
   ];
 }
 
+export type StockOverlapSourcePages = StockSourcePages & {
+  n19Page34: string;
+};
+
+export function parseGovernmentDebtStockOverlapSources(
+  sources: StockOverlapSourcePages,
+): {
+  n13: GovernmentDebtStockRow[];
+  n19: GovernmentDebtStockRow[];
+  n25: GovernmentDebtStockRow[];
+} {
+  const n13Years = Array.from({ length: 7 }, (_, index) => 2013 + index);
+  const n19Years = Array.from({ length: 9 }, (_, index) => 2014 + index);
+  const n25Years = Array.from({ length: 11 }, (_, index) => 2015 + index);
+
+  return {
+    n13: stockRowsForYears(
+      n13Years,
+      gelValues(
+        sources.n13Page31,
+        "Domestic Government Debt",
+        n13Years.length,
+        legacyNumberTokens,
+      ),
+      gelValues(
+        sources.n13Page31,
+        "External Government Debt",
+        n13Years.length,
+        legacyNumberTokens,
+      ),
+      "mof_public_debt_bulletin_n13",
+      "16. PUBLIC DEBT STOCK",
+    ),
+    n19: stockRowsForYears(
+      n19Years,
+      gelValues(
+        sources.n19Page34,
+        "Domestic Government Debt *",
+        n19Years.length,
+        englishNumberTokens,
+      ),
+      gelValues(
+        sources.n19Page34,
+        "External Government Debt",
+        n19Years.length,
+        englishNumberTokens,
+      ),
+      "mof_public_debt_bulletin_n19",
+      "17. PUBLIC DEBT STOCK",
+    ),
+    n25: stockRowsForYears(
+      n25Years,
+      gelValues(
+        sources.n25Page26,
+        "Domestic Government Debt",
+        n25Years.length,
+        englishNumberTokens,
+      ),
+      gelValues(
+        sources.n25Page26,
+        "External Government Debt",
+        n25Years.length,
+        englishNumberTokens,
+      ),
+      "mof_public_debt_bulletin_n25",
+      "17. Public Debt Stock",
+    ),
+  };
+}
+
 export type ActualServiceSourcePages = {
   n7Page32: string;
   n13Page32: string;

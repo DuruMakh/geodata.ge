@@ -8,6 +8,7 @@ import {
   parseActualDebtService,
   parseDebtServiceForecast,
   parseGovernmentDebtStock,
+  parseGovernmentDebtStockOverlapSources,
   parseInterestRateGrid,
   parsePublishedGovernmentDebtGdpRatios,
   readControlWorkbookValues,
@@ -24,6 +25,7 @@ import type {
   GovernmentDebtRateGap,
   GovernmentDebtSourceId,
   GovernmentDebtStockRow,
+  GovernmentDebtStockOverlapComparison,
   GovernmentDebtValidationReport,
   SourceManifestRow,
 } from "./types";
@@ -220,6 +222,7 @@ type ApprovedSourcePages = {
   n7Page32: string;
   n13Page31: string;
   n13Page32: string;
+  n19Page34: string;
   n19Page35: string;
   n25Page7: string;
   n25Page17: string;
@@ -243,7 +246,7 @@ async function loadApprovedPages(
     await Promise.all([
       readPdfPages(paths.n7, [32]),
       readPdfPages(paths.n13, [31, 32]),
-      readPdfPages(paths.n19, [35]),
+      readPdfPages(paths.n19, [34, 35]),
       readPdfPages(paths.n25, [7, 17, 20, 22, 24, 26, 27, 28]),
       readPdfPages(paths.monthly, [3]),
       readPdfPages(paths.strategy2019, [14]),
@@ -260,6 +263,7 @@ async function loadApprovedPages(
     ),
     n13Page31: requirePageMarker(n13, 31, "PUBLIC DEBT STOCK"),
     n13Page32: requirePageMarker(n13, 32, "NET FLOWS & NET TRANSFERS"),
+    n19Page34: requirePageMarker(n19, 34, "PUBLIC DEBT STOCK"),
     n19Page35: requirePageMarker(n19, 35, "NET FLOWS & NET TRANSFERS"),
     n25Page7: requirePageMarker(n25, 7, "Exchange Rates"),
     n25Page17: requirePageMarker(n25, 17, "Projected External Public Debt Service"),
@@ -504,6 +508,43 @@ function controlComparisons(
   });
 }
 
+function stockOverlapComparisons(
+  canonicalRows: GovernmentDebtStockRow[],
+  controls: ReturnType<typeof parseGovernmentDebtStockOverlapSources>,
+): GovernmentDebtStockOverlapComparison[] {
+  const canonical = new Map(
+    canonicalRows.map((row) => [
+      key(row.year, row.debt_scope),
+      row.amount_million_gel,
+    ]),
+  );
+  return [
+    ...controls.n13.filter((row) => row.year >= 2015),
+    ...controls.n19.filter((row) => row.year >= 2015),
+  ].map((control) => {
+    const canonicalAmount = canonical.get(key(control.year, control.debt_scope));
+    if (canonicalAmount === undefined) {
+      throw new Error(
+        `Missing canonical stock overlap for ${control.source_id} ${control.year}:${control.debt_scope}`,
+      );
+    }
+    const difference = Number(
+      (control.amount_million_gel - canonicalAmount).toFixed(10),
+    );
+    return {
+      control_source_id: control.source_id as
+        | "mof_public_debt_bulletin_n13"
+        | "mof_public_debt_bulletin_n19",
+      year: control.year,
+      debt_scope: control.debt_scope,
+      canonical_amount_million_gel: canonicalAmount,
+      control_amount_million_gel: control.amount_million_gel,
+      difference_million_gel: difference,
+      comparison_status: difference === 0 ? "exact_match" : "revision",
+    };
+  });
+}
+
 function csvValue(value: unknown, header: string): string | number | boolean | null {
   if (
     value === null ||
@@ -566,6 +607,11 @@ export async function buildGovernmentDebtPackage(options: {
     n13Page31: pages.n13Page31,
     n25Page26: pages.n25Page26,
   });
+  const stockOverlapSources = parseGovernmentDebtStockOverlapSources({
+    n13Page31: pages.n13Page31,
+    n19Page34: pages.n19Page34,
+    n25Page26: pages.n25Page26,
+  });
   const actualServiceRows = parseActualDebtService({
     n7Page32: pages.n7Page32,
     n13Page32: pages.n13Page32,
@@ -600,6 +646,10 @@ export async function buildGovernmentDebtPackage(options: {
     stockRows,
     readControlWorkbookValues(paths.controlWorkbook),
   );
+  const stockOverlaps = stockOverlapComparisons(
+    stockRows,
+    stockOverlapSources,
+  );
 
   const validation: GovernmentDebtValidationReport = {
     status: "complete_with_documented_rate_gaps",
@@ -613,6 +663,7 @@ export async function buildGovernmentDebtPackage(options: {
     stock: {
       rowCount: stockRows.length,
       observedYears: Array.from({ length: 13 }, (_, index) => 2013 + index),
+      overlapComparisons: stockOverlaps,
     },
     actualService: {
       rowCount: actualServiceRows.length,

@@ -98,6 +98,46 @@ describe("government debt source parsers", () => {
     }
   });
 
+  it("extracts every N13/N19/N25 stock overlap control at source precision", async () => {
+    const { readPdfPages } = await import(pathToFileURL(pdfTextModulePath).href);
+    const parserModule = await import(pathToFileURL(parserModulePath).href);
+    expect(parserModule.parseGovernmentDebtStockOverlapSources).toBeTypeOf(
+      "function",
+    );
+    if (
+      typeof parserModule.parseGovernmentDebtStockOverlapSources !== "function"
+    ) {
+      return;
+    }
+
+    const [n13, n19, n25] = await Promise.all([
+      readPdfPages(path.join(sourceDir, "public-debt-bulletin-n13.pdf"), [31]),
+      readPdfPages(path.join(sourceDir, "public-debt-bulletin-n19.pdf"), [34]),
+      readPdfPages(path.join(sourceDir, "public-debt-bulletin-n25.pdf"), [26]),
+    ]);
+    const series = parserModule.parseGovernmentDebtStockOverlapSources({
+      n13Page31: n13.get(31)!,
+      n19Page34: n19.get(34)!,
+      n25Page26: n25.get(26)!,
+    });
+
+    expect(series.n13).toHaveLength(21);
+    expect(series.n19).toHaveLength(27);
+    expect(series.n25).toHaveLength(33);
+    expect(
+      series.n19.find(
+        (row: { year: number; debt_scope: string }) =>
+          row.year === 2022 && row.debt_scope === "domestic",
+      )?.amount_million_gel,
+    ).toBe(7195.3);
+    expect(
+      series.n25.find(
+        (row: { year: number; debt_scope: string }) =>
+          row.year === 2019 && row.debt_scope === "external",
+      )?.amount_million_gel,
+    ).toBe(15749.7);
+  });
+
   it("normalizes actual Government Debt principal and interest without public-debt extras", async () => {
     const { readPdfPages } = await import(pathToFileURL(pdfTextModulePath).href);
     const parserModule = await import(pathToFileURL(parserModulePath).href);

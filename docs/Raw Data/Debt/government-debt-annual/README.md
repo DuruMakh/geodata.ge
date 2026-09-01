@@ -24,7 +24,7 @@ No UI, route, database, or public-data import was added. The existing `spending.
 | `government-debt-interest-rates-annual-2015-2025.csv` | Published weighted-average rates plus explicit blanks. |
 | `government-debt-service-forecast-2026-2030.csv` | Existing-portfolio payment schedule from the 2025-12-31 snapshot. |
 | `government-debt-review.xlsx` | Seven-sheet internal review workbook with CSV parity, GDP review formulas, controls and sources. |
-| `validation-report.json` | Row counts, source/hash status, rate gaps, GDP-ratio checks and 2019/2022 controls. |
+| `validation-report.json` | Row counts, source/hash status, 39 stock overlap comparisons, rate gaps, GDP-ratio checks and 2019/2022 controls. |
 | `source-manifest.csv` | Official URLs, local files, source roles, dates, hashes, sizes and period bounds. |
 | `methodology-notes.csv` | The two short comparability notes used by the normalized rows. |
 | `official/` | Ten immutable source captures: four bulletins, one monthly report, four debt strategies and one control workbook. |

@@ -32,6 +32,359 @@
       2023,
       2024,
       2025
+    ],
+    "overlapComparisons": [
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2015,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 12442.6,
+        "control_amount_million_gel": 12442.6,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2015,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 2155.3,
+        "control_amount_million_gel": 2155.3,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2015,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 10287.3,
+        "control_amount_million_gel": 10287.3,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2016,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 14436,
+        "control_amount_million_gel": 14436,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2016,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 2498.7,
+        "control_amount_million_gel": 2498.7,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2016,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 11937.3,
+        "control_amount_million_gel": 11937.3,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2017,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 16062.5,
+        "control_amount_million_gel": 16062.5,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2017,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 2863.1,
+        "control_amount_million_gel": 2863.1,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2017,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 13199.4,
+        "control_amount_million_gel": 13199.4,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2018,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 17348.7,
+        "control_amount_million_gel": 17348.7,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2018,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 3250.5,
+        "control_amount_million_gel": 3250.5,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2018,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 14098.2,
+        "control_amount_million_gel": 14098.2,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2019,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 19915.7,
+        "control_amount_million_gel": 19915.7,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2019,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 4166,
+        "control_amount_million_gel": 4166,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n13",
+        "year": 2019,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 15749.7,
+        "control_amount_million_gel": 15749.7,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2015,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 12442.6,
+        "control_amount_million_gel": 12442.6,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2015,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 2155.3,
+        "control_amount_million_gel": 2155.3,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2015,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 10287.3,
+        "control_amount_million_gel": 10287.3,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2016,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 14436,
+        "control_amount_million_gel": 14436,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2016,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 2498.7,
+        "control_amount_million_gel": 2498.7,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2016,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 11937.3,
+        "control_amount_million_gel": 11937.3,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2017,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 16062.5,
+        "control_amount_million_gel": 16062.5,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2017,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 2863.1,
+        "control_amount_million_gel": 2863.1,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2017,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 13199.4,
+        "control_amount_million_gel": 13199.4,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2018,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 17348.7,
+        "control_amount_million_gel": 17348.7,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2018,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 3250.5,
+        "control_amount_million_gel": 3250.5,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2018,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 14098.2,
+        "control_amount_million_gel": 14098.2,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2019,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 19915.7,
+        "control_amount_million_gel": 19915.7,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2019,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 4166,
+        "control_amount_million_gel": 4166,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2019,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 15749.7,
+        "control_amount_million_gel": 15749.7,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2020,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 29672,
+        "control_amount_million_gel": 29672,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2020,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 6204.5,
+        "control_amount_million_gel": 6204.5,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2020,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 23467.5,
+        "control_amount_million_gel": 23467.5,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2021,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 29811.9,
+        "control_amount_million_gel": 29811.9,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2021,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 5845.2,
+        "control_amount_million_gel": 5845.2,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2021,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 23966.7,
+        "control_amount_million_gel": 23966.7,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2022,
+        "debt_scope": "total",
+        "canonical_amount_million_gel": 28587.3,
+        "control_amount_million_gel": 28587.3,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2022,
+        "debt_scope": "domestic",
+        "canonical_amount_million_gel": 7195.3,
+        "control_amount_million_gel": 7195.3,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      },
+      {
+        "control_source_id": "mof_public_debt_bulletin_n19",
+        "year": 2022,
+        "debt_scope": "external",
+        "canonical_amount_million_gel": 21392,
+        "control_amount_million_gel": 21392,
+        "difference_million_gel": 0,
+        "comparison_status": "exact_match"
+      }
     ]
   },
   "actualService": {

@@ -29,7 +29,7 @@ The Ministry of Finance of Georgia is the publisher of all ten preserved files. 
 | --- | --- | --- | --- |
 | `mof_public_debt_bulletin_n7` | `official/public-debt-bulletin-n7.pdf` | External actual service, 2013-2016; page 32. | `0FC59178E8910028A7773EE03E55EAE97AF4AC1E425F928544D87B0522CC66DA` |
 | `mof_public_debt_bulletin_n13` | `official/public-debt-bulletin-n13.pdf` | Stock, 2013-2014, page 31; external actual service, 2017-2019, page 32. | `BB27879C4EDD5D24D8246E2EC05F1E1DBE7F8374FE09BC673397184060E19CC2` |
-| `mof_public_debt_bulletin_n19` | `official/public-debt-bulletin-n19.pdf` | External actual service, 2020-2022; page 35. | `07BF09C8B3CFEC8FEBD9FDE89CC8BD40E7F2876B836A2B8459692CABC4A9D8BF` |
+| `mof_public_debt_bulletin_n19` | `official/public-debt-bulletin-n19.pdf` | Stock overlap control, 2015-2022, page 34; external actual service, 2020-2022, page 35. | `07BF09C8B3CFEC8FEBD9FDE89CC8BD40E7F2876B836A2B8459692CABC4A9D8BF` |
 | `mof_public_debt_bulletin_n25` | `official/public-debt-bulletin-n25.pdf` | Stock, domestic actual service, external actual service and forecast; pages 7, 17, 20, 22, 24, 26, 27 and 28. | `F4C3B267C0A351A09D723037CF666C949694FCF1764E0C3366B2EBC393AF35F0` |
 | `mof_monthly_debt_report_2026_07` | `official/monthly-debt-report-2026-07.pdf` | Total weighted-average rate history, 2015-2025; page 3. | `EF71062CE4BF01042AEA5F5B9B86B783E6CF15E8D3A4A619FEE69415947FFF08` |
 | `mof_debt_strategy_2019_2021` | `official/debt-management-strategy-2019-2021.pdf` | Domestic rate for 2018; page 14. | `140D7D9BA29747773603829533060D27E7F729E0AC575319C0385E25EC489399` |
@@ -54,6 +54,8 @@ Representative exact controls are:
 | 2025 | 35,934.4 | 11,703.1 | 24,231.3 |
 
 Published total rows can be rounded to whole millions. The normalized total is instead the exact sum of the published domestic and external components.
+
+The validation report also records 39 stock overlap comparisons: all three scopes for N13 versus N25 in 2015-2019, and all three scopes for N19 versus N25 in 2015-2022. Every observed comparison is an exact source-precision match with a `0` million GEL difference. N25 remains canonical; if a future capture revises an overlap, the exact control value, canonical value and difference are reported as `revision` rather than silently replacing either source.
 
 ## Actual principal and interest paid
 
@@ -135,7 +137,7 @@ Equality is not expected because the control workbook organizes broader central-
 
 Generation fails if an approved source file is missing or its SHA-256/byte size differs, if a required PDF page marker or source row disappears, if a year/scope key is missing or duplicated, if an available value is negative/non-numeric, or if totals do not equal their components. The interest-rate grid must contain exactly 22 available values and the 11 listed blanks. The forecast must contain the exact five-year, three-scope grid and reconcile its component calculations.
 
-The four normalized CSVs use fixed headers, UTF-8 with BOM, source-precision numbers and final newlines. `validation-report.json` records 39 stock rows, 39 actual-service rows, 33 interest-rate rows, 15 forecast rows, 10 verified source IDs, 13 GDP-share checks, both control years, `estimates_created: 0`, `source_hashes_match: true`, and `normalized_values_reconcile: true`. Its status is `complete_with_documented_rate_gaps`.
+The four normalized CSVs use fixed headers, UTF-8 with BOM, source-precision numbers and final newlines. `validation-report.json` records 39 stock rows, 39 stock overlap comparisons, 39 actual-service rows, 33 interest-rate rows, 15 forecast rows, 10 verified source IDs, 13 GDP-share checks, both control years, `estimates_created: 0`, `source_hashes_match: true`, and `normalized_values_reconcile: true`. Its status is `complete_with_documented_rate_gaps`.
 
 The seven-sheet `government-debt-review.xlsx` mirrors every normalized CSV field and type. Its two Stock review columns reuse existing GDP and calculate the ratio with `=IFERROR(Cn/Nn,"")`. The workbook is an internal review aid, not the future public Excel download.
 

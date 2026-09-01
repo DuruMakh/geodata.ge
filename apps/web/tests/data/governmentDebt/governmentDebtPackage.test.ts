@@ -166,6 +166,18 @@ describe("government debt research package", () => {
       },
     });
     expect(result.validation.interestRates.gaps).toHaveLength(11);
+    const overlapComparisons = result.validation.stock.overlapComparisons;
+    expect(overlapComparisons).toHaveLength(39);
+    expect(
+      overlapComparisons.filter(
+        (comparison) => comparison.comparison_status === "revision",
+      ),
+    ).toEqual([]);
+    expect(
+      overlapComparisons.every(
+        (comparison) => comparison.difference_million_gel === 0,
+      ),
+    ).toBe(true);
     expect(result.validation.controlComparisons).toEqual([
       {
         year: 2019,
@@ -609,6 +621,7 @@ describe("government debt research package", () => {
       "Forecast service: 2026-2030",
       "2025-12-31",
       "11 documented gaps",
+      "39 stock overlap comparisons",
       "2019",
       "2022",
       "existing national GDP dataset",

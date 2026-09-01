@@ -164,6 +164,18 @@ export type GovernmentDebtControlComparison = {
   source_cells: string;
 };
 
+export type GovernmentDebtStockOverlapComparison = {
+  control_source_id:
+    | "mof_public_debt_bulletin_n13"
+    | "mof_public_debt_bulletin_n19";
+  year: number;
+  debt_scope: DebtScope;
+  canonical_amount_million_gel: number;
+  control_amount_million_gel: number;
+  difference_million_gel: number;
+  comparison_status: "exact_match" | "revision";
+};
+
 export type GovernmentDebtValidationReport = {
   status: "complete_with_documented_rate_gaps" | "failed";
   review_date: "2026-09-01";
@@ -171,7 +183,11 @@ export type GovernmentDebtValidationReport = {
     rowCount: number;
     sourceIds: GovernmentDebtSourceId[];
   };
-  stock: { rowCount: number; observedYears: number[] };
+  stock: {
+    rowCount: number;
+    observedYears: number[];
+    overlapComparisons: GovernmentDebtStockOverlapComparison[];
+  };
   actualService: { rowCount: number; observedYears: number[] };
   interestRates: {
     rowCount: number;
