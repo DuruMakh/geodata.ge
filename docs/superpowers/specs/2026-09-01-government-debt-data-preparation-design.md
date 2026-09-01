@@ -23,7 +23,7 @@ This phase prepares data for future use. It does not activate a Debt explorer or
 | --- | --- | --- | --- |
 | Government Debt stock | 2013-2025 | Annual, year-end | Total, domestic, external |
 | Actual Government Debt service | 2013-2025 | Annual | Total, domestic, external |
-| Weighted-average interest rate | 2015-2025 target window | Annual, year-end | Total, domestic, external |
+| Weighted-average interest rate | 2015-2025 review grid | Annual, year-end | Total 2015-2025; domestic 2018-2024; external 2021-2024; documented blanks elsewhere |
 | Projected Government Debt service | 2026-2030 | Annual forecast from one snapshot | Total, domestic, external |
 
 The stock and actual-service series deliberately start in 2013 so the first delivery has one clear historical starting point. The rate series starts in 2015 because that is the agreed practical window for comparable official rate data.
@@ -92,18 +92,28 @@ The manifest records the exact official archive page and file URL used for each 
 
 ### 5.2 Actual principal and interest paid
 
-Use the `Net Flows & Net Transfers on Public Debt` tables from consecutive year-end bulletins:
+Use Bulletin N25's `Domestic Debt Service` history for the domestic component. It publishes the 2013-2025 principal and interest series and, from 2019, the separate loans-of-budgetary-organizations service needed to reach the Government Debt boundary. Normalize domestic Government Debt service as:
+
+- the published domestic principal and interest series for 2013-2018; and
+- those same series plus the published budgetary-organization loan principal and interest for 2019-2025.
+
+Use the `Net Flows & Net Transfers on Public Debt` tables from consecutive year-end bulletins for the external Government Debt component:
 
 - N7 for 2013-2016;
 - N13 for 2017-2019;
 - N19 for 2020-2022;
 - N25 for 2023-2025.
 
-The normalized Government Debt total is calculated from the Government external and Government domestic components. It is never copied from the `TOTAL PUBLIC DEBT` row. For years where the official table uses the earlier `Domestic Public Debt` label, it may be mapped to domestic Government Debt only when the bulletin's definition confirms the two scopes are equivalent for that year. The original row label remains in provenance metadata.
+The older bulletins' domestic rows are retained as overlap controls, not as the canonical domestic series. The normalized Government Debt total is calculated from the Government external and Government domestic components and is never copied from the `TOTAL PUBLIC DEBT` row. Every original row label and addition remains in provenance metadata.
 
 ### 5.3 Weighted-average interest rates
 
-Use official year-end Government Debt Management Annual Reports, year-end Government Debt Portfolio files, and statistical bulletins only when the table or figure clearly identifies the same Government Debt portfolio and rate definition.
+Use the official July 2026 Monthly Debt Report's historical Government Debt chart for the consistent one-decimal total series from 2015 through 2025. Use official Government Debt Management Strategy tables for exact component rates only when the table identifies the full matching portfolio:
+
+- domestic Government Debt: 2018-2024;
+- external Government Debt: 2021-2024.
+
+The 2018-2020 external rate tables explicitly exclude the Eurobond, so those values are not normalized as full external Government Debt rates. No exact year-end 2025 domestic/external component rate was found in the reviewed official sources; the available October 2025 figures are not substituted for year-end values.
 
 Rules:
 
@@ -114,7 +124,7 @@ Rules:
 - a `Public Debt` rate is not silently relabeled as a `Government Debt` rate; and
 - if an exact Government Debt value cannot be found for a year/scope after reviewing the official reports, the value remains blank and the gap is documented.
 
-The target review grid is all 33 combinations of 2015-2025 and the three scopes. A package with unresolved source-backed gaps is marked `complete_with_documented_rate_gaps`, never fully complete.
+The review grid contains all 33 combinations of 2015-2025 and the three scopes. It contains 22 available values and 11 documented blanks: domestic 2015-2017 and 2025; external 2015-2020 and 2025. The package is marked `complete_with_documented_rate_gaps`, never fully complete.
 
 ### 5.4 Projected principal and interest
 
@@ -500,7 +510,7 @@ Promotion into `data/imports` and the future line/table, `₾`/`% მშპ-შ�
 - All official files used for values are preserved with exact URLs, dates, hashes, sizes, roles, and table references.
 - Stock contains complete total/domestic/external Government Debt for 2013-2025.
 - Actual service contains complete principal/interest and total/domestic/external Government Debt for 2013-2025.
-- Rates contain every exact official Government Debt value found for the 2015-2025 target grid, with no scope mixing or estimates and with every gap explicit.
+- Rates contain the complete total Government Debt series for 2015-2025, domestic values for 2018-2024, external values for 2021-2024, and the 11 explicit blanks defined in section 5.3, with no scope mixing or estimates.
 - Forecast service contains principal/interest and total/domestic/external rows for 2026-2030 from the 2025-12-31 snapshot, with the external-Government-Debt and domestic-Treasury-securities boundaries explicit.
 - The existing GDP file drives review-only GDP-share checks and is unchanged.
 - The 2019 and 2022 control checks pass and the control Excel is not used as a canonical source.
