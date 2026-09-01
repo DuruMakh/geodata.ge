@@ -78,7 +78,7 @@ export function resolveDocumentIds(resolvedSources: readonly ResolvedSource[], s
  * Which of the request's already-evaluated caveats (meta.caveats) belong on
  * one specific observation's caveatIds.
  *
- * Caveat.affects (caveats/engine.ts) has no single shape across the 22
+ * Caveat.affects (caveats/engine.ts) has no single shape across the 24
  * rules: some list bare series or entity ids, some "id:year", some bare
  * years, and the two GDP rules list "gdp"/"gdp:year" since GDP is a
  * denominator a rule can flag, not a queryable series of its own. This
@@ -115,6 +115,12 @@ export function resolveDocumentIds(resolvedSources: readonly ResolvedSource[], s
  *     distinguish them, so requesting revenue.total and revenue.vat together
  *     for 2004 (amount_gel) attached the caveat to the VAT observation too,
  *     which has no such gap.
+ *   - program_historical_join (rules.ministries.ts) shipped the same shape a
+ *     third time, and it is the clearest case that "precise at the grain the
+ *     truth varies at" is about the DATA, not the rule: the rule could not be
+ *     precise until buildSnapshot.ts started emitting the joined years, because
+ *     a joined series is joined for only some of its years and the snapshot
+ *     carried a bare id list. Fixing affects() alone was not possible.
  *
  * The fix pattern in both cases (see rules.national.ts): build `affects()`
  * from `c.observations`, filtered by the SAME predicate `applies()` used to

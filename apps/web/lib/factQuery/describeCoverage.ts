@@ -449,7 +449,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   // A catalogue request carries no observations, entities, series selection
   // or comparison — describeCoverage never returns a figure, so this context
   // is fixed and empty regardless of which dataset (if any) was requested.
-  // Traced against all 22 rules (caveats/rules.*.ts): every one requires a
+  // Traced against all 24 rules (caveats/rules.*.ts): every one requires a
   // non-empty seriesIds/entityIds/observations/comparison, or a measure other
   // than amount_gel, to fire — so this call is provably inert, asserted by
   // the "fires no data-shaped caveat" test below rather than left as an
@@ -467,7 +467,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       municipalTotalInputs: [],
       gdpInputs: [],
       comparison: null,
-      historicalJoinSeriesIds: snapshot.ministries.historicalJoinSeriesIds,
+      historicalJoinSeriesYears: snapshot.ministries.historicalJoinSeriesYears,
+      adminCategoryYears: [],
     },
     CAVEAT_RULES,
   );

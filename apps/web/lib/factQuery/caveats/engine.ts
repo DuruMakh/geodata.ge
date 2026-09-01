@@ -30,12 +30,39 @@ export type CaveatContext = {
   years: number[];
   seriesIds: string[];
   entityIds: string[];
-  observations: { entityId: string; seriesId: string; year: number; value: number | null; basis: "actual" | "planned" | null }[];
+  /**
+   * `level` and `parentSeriesId` mirror the Observation fields of the same names
+   * (observations.ts), so a rule can tell a program cell from a category cell and from
+   * the calculated total. Without `level`, program_coverage_partial's "the requested
+   * PROGRAM series does not cover every requested year" fired on any null cell in the
+   * ministries dataset, including an admin_category year the category did not exist in.
+   */
+  observations: {
+    entityId: string;
+    seriesId: string;
+    level: string;
+    parentSeriesId: string | null;
+    year: number;
+    value: number | null;
+    basis: "actual" | "planned" | null;
+  }[];
   municipalTotalInputs: MunicipalTotalFact[];
   gdpInputs: ServedNationalGdpFact[];
   comparison: { fromYear: number; toYear: number; fromDefinition: string; toDefinition: string } | null;
-  /** Series carrying an approved succession or legacy join. Only these get program_historical_join. */
-  historicalJoinSeriesIds: string[];
+  /**
+   * `${seriesId}:${year}` cells served through an approved succession or legacy join.
+   * Per cell, not per series: a joined series still serves most of its years from its
+   * own official code, and program_historical_join must not claim a join on those.
+   */
+  historicalJoinSeriesYears: string[];
+  /**
+   * `${categoryId}:${year}` administrative categories actually served in the requested
+   * years, pre-scoped like every other array here. Empty outside the ministries dataset.
+   * Categories are not all coeval — thirteen run 2004-2025 and
+   * admin_spending.regional_development_infrastructure only starts in 2009 — so a
+   * program's modern parent can name a category that had no row in the program's year.
+   */
+  adminCategoryYears: string[];
 };
 
 export type CaveatRule = {

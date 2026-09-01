@@ -53,21 +53,50 @@ const data = (result: ReturnType<typeof queryMinistries>) => (result as { data: 
 const errorOf = (result: ReturnType<typeof queryMinistries>) =>
   (result as { error: { code: string; validChoices?: string[] } }).error;
 
-/** A program series carrying an approved join, plus one that carries none, both served in every one of `years`. */
-function joinedAndUnjoinedProgram(years: number[]): { joined: string; unjoined: string } {
-  const joins = new Set(snapshot.ministries.historicalJoinSeriesIds);
-  const servedIn = (seriesId: string) =>
-    years.every((year) => snapshot.ministries.facts.some((f) => f.itemId === seriesId && f.year === year));
-  const programIds = Array.from(
-    new Set(snapshot.ministries.facts.filter((f) => f.level === "major_program").map((f) => f.itemId)),
+const servedYearsOf = (seriesId: string) =>
+  snapshot.ministries.facts
+    .filter((f) => f.itemId === seriesId)
+    .map((f) => f.year)
+    .sort((a, b) => a - b);
+
+const joinedYearsOf = (seriesId: string) =>
+  snapshot.ministries.historicalJoinSeriesYears
+    .filter((cell) => cell.startsWith(`${seriesId}:`))
+    .map((cell) => Number(cell.slice(cell.lastIndexOf(":") + 1)))
+    .sort((a, b) => a - b);
+
+/**
+ * A joined program series together with one year it serves THROUGH the join and one it
+ * serves natively under its own official code, plus a program carrying no join at all
+ * that is served in that native year. The joined/native split is the whole point: a
+ * joined series is joined for only some of its years.
+ */
+function joinedSeriesWithNativeYear(): { joined: string; unjoined: string; joinedYear: number; nativeYear: number } {
+  const joinedIds = Array.from(
+    new Set(snapshot.ministries.historicalJoinSeriesYears.map((cell) => cell.slice(0, cell.lastIndexOf(":")))),
   ).sort();
 
-  const joined = programIds.find((id) => joins.has(id) && servedIn(id));
-  const unjoined = programIds.find((id) => !joins.has(id) && servedIn(id));
-  expect(joined).toBeDefined();
-  expect(unjoined).toBeDefined();
+  for (const seriesId of joinedIds) {
+    const joinedYears = joinedYearsOf(seriesId);
+    const nativeYears = servedYearsOf(seriesId).filter((year) => !joinedYears.includes(year));
+    if (joinedYears.length === 0 || nativeYears.length === 0) continue;
 
-  return { joined: joined as string, unjoined: unjoined as string };
+    const nativeYear = nativeYears[nativeYears.length - 1] as number;
+    const unjoined = Array.from(
+      new Set(
+        snapshot.ministries.facts
+          .filter((f) => f.level === "major_program" && f.year === nativeYear)
+          .map((f) => f.itemId),
+      ),
+    )
+      .sort()
+      .find((id) => joinedYearsOf(id).length === 0);
+    if (unjoined === undefined) continue;
+
+    return { joined: seriesId, unjoined, joinedYear: joinedYears[0] as number, nativeYear };
+  }
+
+  throw new Error("no joined program series with both a joined and a native served year");
 }
 
 describe("queryMinistries", () => {
@@ -331,9 +360,32 @@ describe("queryMinistries", () => {
     }
   });
 
-  it("attaches program_historical_join to a joined series only, not to an unjoined one in the same request", () => {
-    const years = [2020, 2021];
-    const { joined, unjoined } = joinedAndUnjoinedProgram(years);
+  it("pins program_historical_join to the joined years of a series, not to its native years", () => {
+    const { joined, joinedYear, nativeYear } = joinedSeriesWithNativeYear();
+
+    const result = queryMinistries(snapshot, {
+      level: "major_program",
+      seriesIds: [joined],
+      years: [joinedYear, nativeYear],
+      measure: "amount_gel",
+    });
+
+    // The disclosure still belongs to the request as a whole.
+    expect(result.meta.caveats.map((c) => c.code)).toContain("program_historical_join");
+
+    const observations = data(result).observations;
+    const joinedCell = observations.find((o) => o.year === joinedYear);
+    const nativeCell = observations.find((o) => o.year === nativeYear);
+
+    expect(joinedCell?.caveatIds).toContain("program_historical_join");
+    // The whole point: this year came from the program's own official code, so the
+    // "uses an approved historical succession join" note is not true of it.
+    expect(nativeCell?.caveatIds).not.toContain("program_historical_join");
+  });
+
+  it("does not attach program_historical_join to an unjoined series in the same request", () => {
+    const { joined, unjoined, joinedYear, nativeYear } = joinedSeriesWithNativeYear();
+    const years = [joinedYear, nativeYear].sort((a, b) => a - b);
 
     const result = queryMinistries(snapshot, {
       level: "major_program",
@@ -342,10 +394,10 @@ describe("queryMinistries", () => {
       measure: "amount_gel",
     });
 
-    expect(result.meta.caveats.map((c) => c.code)).toContain("program_historical_join");
     for (const observation of data(result).observations) {
-      if (observation.seriesId === joined) expect(observation.caveatIds).toContain("program_historical_join");
-      else expect(observation.caveatIds).not.toContain("program_historical_join");
+      if (observation.seriesId === unjoined) {
+        expect(observation.caveatIds).not.toContain("program_historical_join");
+      }
     }
 
     const unjoinedOnly = queryMinistries(snapshot, {
@@ -355,6 +407,26 @@ describe("queryMinistries", () => {
       measure: "amount_gel",
     });
     expect(unjoinedOnly.meta.caveats.map((c) => c.code)).not.toContain("program_historical_join");
+  });
+
+  it("never attaches program_historical_join to a missing cell", () => {
+    const { joined } = joinedSeriesWithNativeYear();
+    const served = new Set(servedYearsOf(joined));
+    const missingYear = [2004, 2005].find((year) => !served.has(year));
+    expect(missingYear).toBeDefined();
+
+    const result = queryMinistries(snapshot, {
+      level: "major_program",
+      seriesIds: [joined],
+      years: [missingYear as number],
+      measure: "amount_gel",
+    });
+
+    const observation = data(result).observations.find((o) => o.year === missingYear);
+    expect(observation?.value).toBeNull();
+    expect(observation?.availability).toBe("missing");
+    // A row with no value cannot have "its scope and original label preserved".
+    expect(observation?.caveatIds).not.toContain("program_historical_join");
   });
 
   it("keeps the current reviewed Georgian series name and surfaces the original historical label", () => {

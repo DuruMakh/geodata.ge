@@ -174,13 +174,20 @@ function loadManifestDocuments(): Promise<ManifestDocument[]> {
 }
 
 /**
- * Item ids of the series that carry an approved historical join, from
- * PROGRAM_SUCCESSIONS and LEGACY_PROGRAM_JOINS (lib/data/adminSpending/). Both tables
- * key on `targetCode`, a tavi-VI program CODE — not an item id — and ServedAdminFact
- * (lib/servedRows.ts) exposes no officialCode to join back through. Resolving ids
- * therefore goes through makeProgramItemId, the exact function
+ * `${seriesId}:${year}` cells that a series serves THROUGH an approved historical join,
+ * from PROGRAM_SUCCESSIONS and LEGACY_PROGRAM_JOINS (lib/data/adminSpending/). Both
+ * tables key on `targetCode`, a tavi-VI program CODE — not an item id — and
+ * ServedAdminFact (lib/servedRows.ts) exposes no officialCode to join back through.
+ * Resolving ids therefore goes through makeProgramItemId, the exact function
  * generateAdminSpendingFacts.ts uses to assign these facts' itemId in the first place,
  * rather than string-building an id that could drift from it.
+ *
+ * Emitted per CELL rather than per series because a joined series is joined only for
+ * SOME of its years. `admin_program.09_01.f5bec61a` serves 2006-2011 through the legacy
+ * "09 02" common-courts lines and 2012-2025 natively from its own official code 09 01;
+ * a bare series id made program_historical_join claim a join on all twenty years.
+ * Both tables already carry the year grain this needs — a succession's
+ * `startYear..endYear`, a legacy join's `year` — so nothing is inferred here.
  *
  * PROGRAM_SUCCESSIONS entries resolve directly: single-step resolution (every entry
  * points at the end of a chain, never an intermediate segment) is a documented
@@ -189,26 +196,38 @@ function loadManifestDocuments(): Promise<ManifestDocument[]> {
  * "27 02" for years 2006-2018 — so each join is re-checked against
  * findProgramSuccession for its own year before falling back to its own target,
  * mirroring generateAdminSpendingFacts.ts's programItemId exactly.
+ *
+ * A succession's year range can name a year the source code did not actually carry
+ * (56 01's 2018-2024 range covers years the payments institution ran under a different
+ * code), and a legacy join's year can already be inside its target's succession range,
+ * so the set is deduplicated. Today it yields 190 cells across 25 series — 50 from
+ * LEGACY_PROGRAM_JOINS (9 series), 140 more from PROGRAM_SUCCESSIONS (20 series, four
+ * of them also reached by a legacy join) — and every one of the 190 has a served
+ * major_program fact, asserted in tests/factQuery/buildSnapshot.test.ts.
  */
-function historicalJoinSeriesIds(): string[] {
-  const ids = new Set<string>();
+function historicalJoinSeriesYears(): string[] {
+  const cells = new Set<string>();
 
   for (const succession of PROGRAM_SUCCESSIONS) {
-    ids.add(
-      makeProgramItemId(succession.targetCode, succession.parentItemId, succession.targetEraKey ?? "default"),
+    const seriesId = makeProgramItemId(
+      succession.targetCode,
+      succession.parentItemId,
+      succession.targetEraKey ?? "default",
     );
+    for (let year = succession.startYear; year <= succession.endYear; year += 1) {
+      cells.add(`${seriesId}:${year}`);
+    }
   }
 
   for (const join of LEGACY_PROGRAM_JOINS) {
     const succession = findProgramSuccession(join.targetCode, join.targetParentItemId, join.year);
-    ids.add(
-      succession
-        ? makeProgramItemId(succession.targetCode, join.targetParentItemId, succession.targetEraKey ?? "default")
-        : makeProgramItemId(join.targetCode, join.targetParentItemId, "default"),
-    );
+    const seriesId = succession
+      ? makeProgramItemId(succession.targetCode, join.targetParentItemId, succession.targetEraKey ?? "default")
+      : makeProgramItemId(join.targetCode, join.targetParentItemId, "default");
+    cells.add(`${seriesId}:${join.year}`);
   }
 
-  return [...ids].sort();
+  return [...cells].sort();
 }
 
 /**
@@ -332,7 +351,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
         (c) => c.sortOrder,
         (c) => c.id,
       ),
-      historicalJoinSeriesIds: historicalJoinSeriesIds(),
+      historicalJoinSeriesYears: historicalJoinSeriesYears(),
     },
     municipal: {
       functions: sortedBy(

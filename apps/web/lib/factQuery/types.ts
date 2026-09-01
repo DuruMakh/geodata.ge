@@ -80,8 +80,15 @@ export type FactQuerySnapshot = {
   ministries: {
     facts: ServedAdminFact[];
     categories: AdminSpendingCategory[];
-    /** Series with an approved join, from PROGRAM_SUCCESSIONS and LEGACY_PROGRAM_JOINS. */
-    historicalJoinSeriesIds: string[];
+    /**
+     * `${seriesId}:${year}` cells actually served through an approved join, from
+     * PROGRAM_SUCCESSIONS and LEGACY_PROGRAM_JOINS. Per CELL, not per series: a joined
+     * series serves most of its years from its own official code, and only the years
+     * inside a succession's `startYear..endYear` or a legacy join's `year` came in
+     * through the join. A bare series id cannot express that, and pinned
+     * `program_historical_join` to every year of a joined series.
+     */
+    historicalJoinSeriesYears: string[];
   };
   municipal: {
     functions: MunicipalFunction[];

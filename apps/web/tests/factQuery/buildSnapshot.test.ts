@@ -35,12 +35,50 @@ describe("buildFactQuerySnapshot", () => {
     expect(first.dataVersion).toMatch(/^[0-9a-f]{64}$/);
   });
 
-  it("resolves historical join series to real served item ids", async () => {
+  // Per CELL, not per series. PROGRAM_SUCCESSIONS carries startYear/endYear and
+  // LEGACY_PROGRAM_JOINS carries year, so the joined years are in the tables already —
+  // 50 legacy-join cells across 9 series, 140 further succession cells across 20
+  // series (four of the 20 are also reached by a legacy join), 190 cells and 25
+  // distinct series once deduplicated. Cross-checked against the reviewed CSV's own
+  // mapping_notes and ministries-drilldown-programs-methodology.md §6. Asserting the
+  // exact totals here is what keeps program_historical_join honest: a derivation that
+  // silently widened to whole series would blow past 190.
+  it("resolves historical joins to the exact served cells that came in through a join", async () => {
     const snapshot = await buildFactQuerySnapshot(OPTIONS);
-    const served = new Set(snapshot.ministries.facts.map((f) => f.itemId));
+    const servedProgramCells = new Set(
+      snapshot.ministries.facts.filter((f) => f.level === "major_program").map((f) => `${f.itemId}:${f.year}`),
+    );
+    const cells = snapshot.ministries.historicalJoinSeriesYears;
+    const seriesIds = new Set(cells.map((cell) => cell.slice(0, cell.lastIndexOf(":"))));
 
-    expect(snapshot.ministries.historicalJoinSeriesIds.length).toBeGreaterThan(0);
-    for (const id of snapshot.ministries.historicalJoinSeriesIds) expect(served.has(id)).toBe(true);
+    expect(cells.length).toBe(190);
+    expect(seriesIds.size).toBe(25);
+
+    // Every joined cell is a real served major_program row: the caveat can never pin
+    // to a cell the query would return as missing.
+    for (const cell of cells) expect(servedProgramCells.has(cell)).toBe(true);
+
+    // And every series in the list is joined for at least one of its own years, so no
+    // id in it is a resolution artefact of a table entry with no served row behind it.
+    for (const seriesId of seriesIds) {
+      expect(cells.some((cell) => cell.startsWith(`${seriesId}:`))).toBe(true);
+    }
+  });
+
+  it("leaves a joined series' native years out of the join list", async () => {
+    const snapshot = await buildFactQuerySnapshot(OPTIONS);
+    // Common courts: 2006-2011 arrive through the legacy "09 02" lines, 2012-2025 are
+    // served natively under the series' own code 09 01.
+    const seriesId = "admin_program.09_01.f5bec61a";
+    const joinedYears = snapshot.ministries.historicalJoinSeriesYears
+      .filter((cell) => cell.startsWith(`${seriesId}:`))
+      .map((cell) => Number(cell.slice(cell.lastIndexOf(":") + 1)))
+      .sort((a, b) => a - b);
+    const servedYears = snapshot.ministries.facts.filter((f) => f.itemId === seriesId).map((f) => f.year);
+
+    expect(joinedYears).toEqual([2006, 2007, 2008, 2009, 2010, 2011]);
+    expect(servedYears).toContain(2020);
+    expect(joinedYears).not.toContain(2020);
   });
 
   // sortOrder must come from the taxonomy files (data/taxonomy/*.json), not from

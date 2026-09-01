@@ -150,6 +150,11 @@ export function queryMinistries(snapshot: FactQuerySnapshot, rawInput: unknown):
   // titled by its oldest pre-2012 organizational line. Built from every
   // program fact, not only the requested years, so a series whose requested
   // years are all missing still reports its parent and name.
+  //
+  // The latest name is the right answer for the LABEL and only a fallback for
+  // the PARENT: a year that has a fact reads its parent off that row instead
+  // (below), so a future reclassification cannot silently back-apply to
+  // historical years. No program's parent varies across its years today.
   const programMeta = new Map<string, { labelKa: string; parentSeriesId: string | null }>();
   for (const fact of programFacts) {
     programMeta.set(fact.itemId, { labelKa: fact.officialLabelKa ?? fact.itemId, parentSeriesId: fact.parentItemId });
@@ -224,13 +229,15 @@ export function queryMinistries(snapshot: FactQuerySnapshot, rawInput: unknown):
       : kind === "admin_category"
         ? (categoryById.get(seriesId)?.kaLabel ?? seriesId)
         : (program?.labelKa ?? seriesId);
-    const parentSeriesId = kind === "major_program" ? (program?.parentSeriesId ?? null) : null;
 
     for (const year of input.years) {
       let numeratorAmount: number | null;
       let numeratorSourceIds: string[];
       let missingReason: string | null;
       let originalLabelKa: string | null = null;
+      // The series' latest parent is only the starting point: a year with a
+      // served row overwrites this with that row's own parentItemId below.
+      let parentSeriesId = kind === "major_program" ? (program?.parentSeriesId ?? null) : null;
 
       if (isTotal) {
         const total = totalsByYear.get(year);
@@ -250,6 +257,7 @@ export function queryMinistries(snapshot: FactQuerySnapshot, rawInput: unknown):
           numeratorSourceIds = splitSourceIds(fact.sourceId);
           missingReason = null;
           originalLabelKa = fact.officialLabelKa !== null && fact.officialLabelKa !== seriesLabelKa ? fact.officialLabelKa : null;
+          if (kind === "major_program") parentSeriesId = fact.parentItemId;
         } else {
           // Missing != zero != excluded. Program coverage is genuinely
           // ragged (no major-program rows before 2006, contiguous only from
@@ -348,13 +356,29 @@ export function queryMinistries(snapshot: FactQuerySnapshot, rawInput: unknown):
     // and describeCoverage both pass. See the scoping contract on
     // CaveatContext (caveats/engine.ts).
     entityIds: [],
-    observations: withDocuments.map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, value: o.value, basis: o.basis })),
+    observations: withDocuments.map((o) => ({
+      entityId: o.entityId,
+      seriesId: o.seriesId,
+      level: o.level,
+      parentSeriesId: o.parentSeriesId,
+      year: o.year,
+      value: o.value,
+      basis: o.basis,
+    })),
     municipalTotalInputs: [],
     gdpInputs,
     comparison: null,
     // Caveat context only: the joins themselves are already applied in the
     // served facts, so this list is never a transformation input here.
-    historicalJoinSeriesIds: snapshot.ministries.historicalJoinSeriesIds,
+    historicalJoinSeriesYears: snapshot.ministries.historicalJoinSeriesYears,
+    // Pre-scoped to the requested years, per the CaveatContext scoping
+    // contract: only the category cells a rule could be asked about. Lets
+    // program_parent_category_modern_grouping tell a program's modern parent
+    // grouping from a category that actually held the money that year, without
+    // reaching back into the snapshot from a rule.
+    adminCategoryYears: categoryFacts
+      .filter((f) => input.years.includes(f.year))
+      .map((f) => `${f.itemId}:${f.year}`),
   };
   const caveats = evaluateCaveats(caveatContext, CAVEAT_RULES);
 

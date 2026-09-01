@@ -37,7 +37,8 @@ function context(overrides: Partial<CaveatContext>): CaveatContext {
     municipalTotalInputs: [],
     gdpInputs: [],
     comparison: null,
-    historicalJoinSeriesIds: [],
+    historicalJoinSeriesYears: [],
+    adminCategoryYears: [],
     ...overrides,
   };
 }

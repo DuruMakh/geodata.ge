@@ -291,11 +291,23 @@ export function queryNational(snapshot: FactQuerySnapshot, rawInput: unknown): F
     // neither of which is gated on datasetId and both of which key on that
     // exact literal id (MUNICIPAL_COUNTRY_ID === "country.georgia").
     entityIds: [],
-    observations: withDocuments.map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, value: o.value, basis: o.basis })),
+    observations: withDocuments.map((o) => ({
+      entityId: o.entityId,
+      seriesId: o.seriesId,
+      level: o.level,
+      parentSeriesId: o.parentSeriesId,
+      year: o.year,
+      value: o.value,
+      basis: o.basis,
+    })),
     municipalTotalInputs: [],
     gdpInputs,
     comparison: null,
-    historicalJoinSeriesIds: snapshot.ministries.historicalJoinSeriesIds,
+    historicalJoinSeriesYears: snapshot.ministries.historicalJoinSeriesYears,
+    // Administrative categories are a ministries-dataset concept; an empty list
+    // keeps the ministries rules that read it inert here, the same defence in
+    // depth entityIds gets just above.
+    adminCategoryYears: [],
   };
   const caveats = evaluateCaveats(caveatContext, CAVEAT_RULES);
 
