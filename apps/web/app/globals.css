@@ -30,7 +30,7 @@
 
 @font-face {
   font-family: "heroDisplay";
-  src: url("../assets/fonts/EurostileGEOMt-Demi.ttf") format("truetype");
+  src: url("../assets/fonts/EurostileGEOMt-Demi.woff2") format("woff2");
   font-display: swap;
   font-weight: 600;
   font-style: normal;
