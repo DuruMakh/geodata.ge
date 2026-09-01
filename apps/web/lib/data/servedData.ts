@@ -9,6 +9,7 @@ import { loadSourceDocuments, type SourceDocumentRow } from "./sources";
 import type {
   ServedAdminFact,
   ServedBudgetFact,
+  ServedGovernmentDebtFact,
   ServedNationalGdpFact,
 } from "../servedRows";
 import {
@@ -20,6 +21,7 @@ import {
   municipalTotalFactParityKey,
   municipalPopulationFactParityKey,
   nationalGdpFactParityKey,
+  governmentDebtFactParityKey,
 } from "./servedDataParity";
 import type {
   AdjaraBudgetAdjustment,
@@ -65,7 +67,10 @@ export const SERVED_DATA_FILES = {
   municipalAdjaraBudgetAdjustments:
     "../../data/imports/municipal-adjara-budget-adjustments-2015-2025.csv",
   gdpFacts: "../../data/imports/national-gdp-annual-1996-2025.csv",
+  governmentDebtFacts: "../../data/imports/government-debt-facts-2013-2030.csv",
 } as const;
+
+export { loadServedGovernmentDebtData } from "./governmentDebt/importGovernmentDebtFacts";
 
 // Single switch for where the site reads its data while pages are built.
 // "db" reads the Supabase mirror populated by `npm run data:import` (the
@@ -318,6 +323,11 @@ export const EXPLORER_ROW_PARITY_CHECKS: {
   adminFacts: { label: "admin spending facts", keyOf: adminFactParityKey },
   adminCategories: { label: "admin spending categories", keyOf: (row) => row.id },
   gdpFacts: { label: "national GDP facts", keyOf: nationalGdpFactParityKey },
+};
+
+export const GOVERNMENT_DEBT_PARITY_CHECK: ParityCheck<ServedGovernmentDebtFact> = {
+  label: "Government Debt facts",
+  keyOf: governmentDebtFactParityKey,
 };
 
 // The database is only served after proving it still matches the reviewed

@@ -49,3 +49,28 @@ export type ServedNationalGdpFact = {
   status: "final_as_published" | "preliminary";
   sourceId: string;
 };
+
+export type DebtFamily = "stock" | "service" | "rate";
+
+export type DebtSeriesId =
+  | "debt.stock.total"
+  | "debt.stock.domestic"
+  | "debt.stock.external"
+  | "debt.service.total"
+  | "debt.service.principal"
+  | "debt.service.interest"
+  | "debt.rate.total"
+  | "debt.rate.domestic"
+  | "debt.rate.external";
+
+export type ServedGovernmentDebtFact = {
+  year: number;
+  family: DebtFamily;
+  seriesId: DebtSeriesId;
+  value: number | null;
+  valueKind: "amount_gel" | "percent";
+  status: "actual" | "projection_existing_portfolio" | "not_available";
+  sourceId: string | null;
+  snapshotDate: string | null;
+  lastReviewedAt: string;
+};

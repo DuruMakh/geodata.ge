@@ -1,4 +1,5 @@
 import type { LoadedExplorerData, LoadedLandingData, MunicipalData } from "../data/servedData";
+import type { ServedGovernmentDebtFact } from "../servedRows";
 import {
   loadAdminCategoriesFromMirror,
   loadAdminFactsFromMirror,
@@ -14,6 +15,7 @@ import {
   loadMunicipalTotalFactsFromMirror,
   loadMunicipalPopulationFactsFromMirror,
   loadNationalGdpFactsFromMirror,
+  loadGovernmentDebtFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "./mirrorRows";
 import { prisma } from "./prisma";
@@ -41,6 +43,10 @@ export async function loadExplorerDataFromDb(): Promise<LoadedExplorerData> {
   ]);
 
   return { ...landing, adminFacts, adminCategories, gdpFacts };
+}
+
+export async function loadGovernmentDebtFactsFromDb(): Promise<ServedGovernmentDebtFact[]> {
+  return loadGovernmentDebtFactsFromMirror(prisma);
 }
 
 export async function loadMunicipalDataFromDb(): Promise<MunicipalData> {

@@ -1,4 +1,5 @@
 import { buildGovernmentDebtPackage } from "../lib/data/governmentDebt/prepareGovernmentDebtPackage";
+import { prepareGovernmentDebtFacts } from "../lib/data/governmentDebt/importGovernmentDebtFacts";
 
 async function main() {
   const args = process.argv.slice(2);
@@ -7,6 +8,7 @@ async function main() {
   }
   const write = args[0] === "--write";
   const result = await buildGovernmentDebtPackage({ write });
+  const servedFactCount = await prepareGovernmentDebtFacts({ write });
 
   console.log(
     `${write ? "Prepared" : "Validated"} the government debt research package.`,
@@ -15,6 +17,7 @@ async function main() {
   console.log(`Actual service rows: ${result.actualServiceRows.length}`);
   console.log(`Interest-rate rows: ${result.interestRateRows.length}`);
   console.log(`Forecast rows: ${result.forecastRows.length}`);
+  console.log(`Serving facts: ${servedFactCount}`);
   console.log(`Validation: ${result.validation.status}`);
 }
 

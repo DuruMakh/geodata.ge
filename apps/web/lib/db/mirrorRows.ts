@@ -6,6 +6,7 @@ import type {
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { NationalGdpFact } from "../data/nationalGdp/types";
+import type { ServedGovernmentDebtFact } from "../servedRows";
 import {
   ADJARA_REGION_ID,
   type AdjaraBudgetAdjustment,
@@ -161,6 +162,26 @@ export async function loadNationalGdpFactsFromMirror(
     sourceCell: row.sourceCell,
     sourceUnit: row.sourceUnit as "mil. GEL",
     transformation: row.transformation,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export async function loadGovernmentDebtFactsFromMirror(
+  db: MirrorClient,
+): Promise<ServedGovernmentDebtFact[]> {
+  const rows = await db.governmentDebtFact.findMany({
+    orderBy: [{ year: "asc" }, { seriesId: "asc" }],
+  });
+
+  return rows.map((row) => ({
+    year: row.year,
+    family: row.family as ServedGovernmentDebtFact["family"],
+    seriesId: row.seriesId as ServedGovernmentDebtFact["seriesId"],
+    value: decimalOrNull(row.value),
+    valueKind: row.valueKind as ServedGovernmentDebtFact["valueKind"],
+    status: row.status as ServedGovernmentDebtFact["status"],
+    sourceId: row.sourceId,
+    snapshotDate: row.snapshotDate === null ? null : isoDate(row.snapshotDate),
     lastReviewedAt: isoDate(row.lastReviewedAt),
   }));
 }

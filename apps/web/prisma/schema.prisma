@@ -97,6 +97,7 @@ model ImportRun {
   facts                 BudgetFact[]
   adminFacts            AdminSpendingFact[]
   gdpFacts              NationalGdpFact[]
+  governmentDebtFacts   GovernmentDebtFact[]
   populationFacts       MunicipalPopulationFact[]
 }
 
@@ -175,6 +176,25 @@ model NationalGdpFact {
   lastReviewedAt      DateTime              @db.Date
   importRunId         String?
   importRun           ImportRun?            @relation(fields: [importRunId], references: [id])
+}
+
+// Mirror of data/imports/government-debt-facts-2013-2030.csv. The composite
+// key permits exactly one approved annual value for each public debt series.
+model GovernmentDebtFact {
+  year           Int
+  family         String
+  seriesId       String
+  value          Decimal?   @db.Decimal(24, 6)
+  valueKind      String
+  status         String
+  sourceId       String?
+  snapshotDate   DateTime?  @db.Date
+  lastReviewedAt DateTime   @db.Date
+  importRunId    String?
+  importRun      ImportRun? @relation(fields: [importRunId], references: [id])
+
+  @@id([year, seriesId])
+  @@index([family, year])
 }
 
 enum MunicipalWarningType {
