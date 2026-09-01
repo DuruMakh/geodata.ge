@@ -4,8 +4,8 @@ import { join } from "node:path";
 import { computedCssColorAlpha } from "./focus-outline";
 
 // Landing page (GeoData Site v2 design): structure, live data blocks, and the
-// paths into the explorer. The hero is WebGL; tests assert the canvas mounts
-// (or the fallback message shows) rather than pixel content.
+// paths into the explorer. The hero is a static image below 768px and WebGL at
+// wider sizes; tests assert the matching visual mounts rather than pixel content.
 
 const artifactDir = join(process.cwd(), "test-results", "visual-reference");
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
@@ -312,7 +312,7 @@ test("landing loads the hero font successfully without requesting it on other ro
   });
   expect(fontResponses).toHaveLength(1);
   expect(fontResponses[0]?.status).toBe(200);
-  expect(new URL(fontResponses[0]!.url).pathname).toMatch(/\/EurostileGEOMt-Demi\.[^/]+\.ttf$/);
+  expect(new URL(fontResponses[0]!.url).pathname).toMatch(/\/EurostileGEOMt-Demi\.[^/]+\.woff2$/);
 
   const nonHomeContext = await browser.newContext();
   try {
@@ -329,6 +329,48 @@ test("landing loads the hero font successfully without requesting it on other ro
   } finally {
     await nonHomeContext.close();
   }
+});
+
+test("landing keeps mobile header and statistic geometry stable while fonts load", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route(/\.(?:woff2|ttf)(?:\?|$)/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 2_000));
+    const response = await route.fetch();
+    await route.fulfill({ response });
+  });
+
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  const nav = page.getByRole("navigation");
+  const heading = page.getByRole("heading", { level: 1, name: "საქართველო ციფრებში" });
+  const statisticValues = page.locator("[data-country-stat] > div:nth-child(2)");
+  const before = {
+    nav: await nav.boundingBox(),
+    heading: await heading.boundingBox(),
+    statisticValues: await Promise.all((await statisticValues.all()).map((value) => value.boundingBox())),
+  };
+
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  const after = {
+    nav: await nav.boundingBox(),
+    heading: await heading.boundingBox(),
+    statisticValues: await Promise.all((await statisticValues.all()).map((value) => value.boundingBox())),
+  };
+
+  for (const key of ["x", "y", "width", "height"] as const) {
+    expect(after.nav?.[key], `navigation ${key}`).toBeCloseTo(before.nav?.[key] ?? Number.NaN, 0);
+    expect(after.heading?.[key], `hero heading ${key}`).toBeCloseTo(before.heading?.[key] ?? Number.NaN, 0);
+  }
+  expect(after.statisticValues).toHaveLength(3);
+  for (const [index, box] of after.statisticValues.entries()) {
+    for (const key of ["x", "y", "width", "height"] as const) {
+      expect(box?.[key], `statistic ${index + 1} ${key}`).toBeCloseTo(
+        before.statisticValues[index]?.[key] ?? Number.NaN,
+        0,
+      );
+    }
+  }
+  const statisticHeights = after.statisticValues.map((box) => box?.height ?? Number.NaN);
+  expect(Math.max(...statisticHeights) - Math.min(...statisticHeights)).toBeLessThanOrEqual(1);
 });
 
 test("landing waits for the post-load idle timeout before requesting the WebGL hero", async ({ page, request }) => {
@@ -473,64 +515,85 @@ test("landing activates the hero after load when requestIdleCallback is unavaila
   expect(scriptRequests.find(({ url }) => url === matchingScripts[0])?.beforeLoad).toBe(false);
 });
 
-test("landing reduces mobile WebGL density while retaining desktop detail", async ({ browser }) => {
-  for (const profile of [
-    { name: "mobile", viewport: { width: 390, height: 844 }, expectedDots: 5_885, expectedPixelRatio: 1.25 },
-    { name: "desktop", viewport: { width: 1440, height: 900 }, expectedDots: 10_656, expectedPixelRatio: 2 },
-  ]) {
-    const context = await browser.newContext({ viewport: profile.viewport, deviceScaleFactor: 2 });
-    const page = await context.newPage();
-    await page.addInitScript(installHeroDrawInstrumentation);
+test("landing serves a static mobile hero without loading WebGL and retains desktop detail", async ({ browser, request }) => {
+  const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+  try {
+    const mobilePage = await mobileContext.newPage();
+    const mobileScripts: string[] = [];
+    mobilePage.on("request", (browserRequest) => {
+      if (new URL(browserRequest.url()).pathname.endsWith(".js")) mobileScripts.push(browserRequest.url());
+    });
+    await mobilePage.goto(baseUrl);
+    const mobileStatic = mobilePage.getByTestId("mobile-hero-static");
+    const mobileStaticImage = mobileStatic.locator("img");
+    await expect(mobileStatic).toBeVisible();
+    await expect(mobileStaticImage).toHaveJSProperty("complete", true);
+    expect(await mobileStaticImage.evaluate((image) => (image as HTMLImageElement).currentSrc)).toMatch(
+      /\/landing\/hero-relief-mobile-390\.webp$/,
+    );
+    expect(await mobileStaticImage.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(780);
+    await mobilePage.waitForTimeout(3_500);
+    await expect(mobilePage.locator("figure canvas")).toHaveCount(0);
+    expect(await heroRuntimeScripts(request, mobileScripts)).toEqual([]);
+  } finally {
+    await mobileContext.close();
+  }
 
-    await page.goto(baseUrl);
-    const canvas = page.locator("figure canvas");
-    await expect(canvas.or(page.getByText("ვიზუალი ვერ ჩაიტვირთა")), profile.name).toBeVisible({ timeout: 15_000 });
+  const desktopContext = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
+  try {
+    const desktopPage = await desktopContext.newPage();
+    const desktopImages: string[] = [];
+    desktopPage.on("request", (browserRequest) => {
+      if (new URL(browserRequest.url()).pathname.endsWith(".webp")) desktopImages.push(browserRequest.url());
+    });
+    await desktopPage.addInitScript(installHeroDrawInstrumentation);
+    await desktopPage.goto(baseUrl);
+    await expect(desktopPage.getByTestId("mobile-hero-static")).toBeHidden();
+    expect(desktopImages).toEqual([]);
+    const canvas = desktopPage.locator("figure canvas");
+    await expect(canvas.or(desktopPage.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
     await expect
-      .poll(
-        () =>
-          page.evaluate(() =>
-            Math.max(...(window as typeof window & { __heroDrawCounts: number[] }).__heroDrawCounts),
-          ),
-        { message: `${profile.name} terrain draw count` },
+      .poll(() =>
+        desktopPage.evaluate(() =>
+          Math.max(...(window as typeof window & { __heroDrawCounts: number[] }).__heroDrawCounts),
+        ),
       )
-      .toBe(profile.expectedDots);
+      .toBe(10_656);
     const pixelRatio = await canvas.evaluate((element) => {
       const drawingSurface = element as HTMLCanvasElement;
       return drawingSurface.width / drawingSurface.getBoundingClientRect().width;
     });
-    expect(pixelRatio, `${profile.name} canvas pixel ratio`).toBeCloseTo(profile.expectedPixelRatio, 1);
-    await context.close();
+    expect(pixelRatio).toBeCloseTo(2, 1);
+  } finally {
+    await desktopContext.close();
   }
 });
 
-test("landing rebuilds one correctly sized hero across the mobile breakpoint", async ({ browser }) => {
+test("landing swaps between the static mobile hero and one desktop canvas across the breakpoint", async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
   const page = await context.newPage();
   await page.addInitScript(installHeroDrawInstrumentation);
   try {
     await page.goto(baseUrl);
+    const mobileStatic = page.getByTestId("mobile-hero-static");
+    const canvas = page.locator("figure canvas");
+    await expect(mobileStatic).toBeVisible();
+    await expect(canvas).toHaveCount(0);
 
-    for (const profile of [
-      { viewport: { width: 390, height: 844 }, expectedDots: 5_885, expectedPixelRatio: 1.25 },
-      { viewport: { width: 768, height: 900 }, expectedDots: 10_656, expectedPixelRatio: 2 },
-      { viewport: { width: 390, height: 844 }, expectedDots: 5_885, expectedPixelRatio: 1.25 },
-    ]) {
-      await page.setViewportSize(profile.viewport);
-      const canvas = page.locator("figure canvas");
-      await expect(canvas).toHaveCount(1, { timeout: 5_000 });
-      await expect
-        .poll(() =>
-          page.evaluate(() =>
-            (window as typeof window & { __heroTerrainDrawCount: number }).__heroTerrainDrawCount,
-          ),
-        )
-        .toBe(profile.expectedDots);
-      const pixelRatio = await canvas.evaluate((element) => {
-        const drawingSurface = element as HTMLCanvasElement;
-        return drawingSurface.width / drawingSurface.getBoundingClientRect().width;
-      });
-      expect(pixelRatio).toBeCloseTo(profile.expectedPixelRatio, 1);
-    }
+    await page.setViewportSize({ width: 768, height: 900 });
+    await expect(mobileStatic).toBeHidden();
+    await expect(canvas).toHaveCount(1, { timeout: 5_000 });
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          (window as typeof window & { __heroTerrainDrawCount: number }).__heroTerrainDrawCount,
+        ),
+      )
+      .toBe(10_656);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(mobileStatic).toBeVisible();
+    await expect(canvas).toHaveCount(0);
   } finally {
     await context.close();
   }
@@ -768,7 +831,9 @@ for (const viewport of [
       await page.setViewportSize(viewport);
       await page.goto(baseUrl);
       await page.evaluate(() => document.fonts.ready.then(() => undefined));
-      await expect(page.locator("figure canvas")).toBeVisible({ timeout: 15_000 });
+      const renderedHero =
+        viewport.width < 768 ? page.getByTestId("mobile-hero-static") : page.locator("figure canvas");
+      await expect(renderedHero).toBeVisible({ timeout: 15_000 });
       await expect.poll(async () => {
         const figure = await page.locator("figure").boundingBox();
         const stats = await page.getByTestId("key-numbers").boundingBox();
@@ -779,11 +844,11 @@ for (const viewport of [
         );
       }).toBeLessThanOrEqual(1);
       const figure = await page.locator("figure").boundingBox();
-      const canvas = await page.locator("figure canvas").boundingBox();
+      const renderedHeroBox = await renderedHero.boundingBox();
       expect(figure).not.toBeNull();
-      expect(canvas).not.toBeNull();
-      expect(canvas!.height).toBeLessThanOrEqual(figure!.height + 1);
-      expect(figure!.height - canvas!.height).toBeLessThanOrEqual(10);
+      expect(renderedHeroBox).not.toBeNull();
+      expect(renderedHeroBox!.height).toBeLessThanOrEqual(figure!.height + 1);
+      expect(figure!.height - renderedHeroBox!.height).toBeLessThanOrEqual(10);
       await expectNoPageOverflow(page);
     } finally {
       await initialContext.close();
