@@ -2135,11 +2135,11 @@ git commit -m "docs(factQuery): document the caveat catalogue and gate it in tes
 
 Per spec §16, Part 1 is done when all of these hold:
 
-- [ ] `npm run check` passes from `apps/web`.
-- [ ] Every §9.2 code has both a firing and a non-firing test.
-- [ ] `CAVEAT_RULES` has exactly 22 entries and every code is documented.
-- [ ] The agreement test covers every served base observation and supported calculated total.
-- [ ] A double rebuild produces an identical `dataVersion`.
-- [ ] The source resolver reports no unresolved available figure and emits no internal path as a public URL.
-- [ ] The purity test passes — no IO, database, provider SDK, or logging under `lib/factQuery/` outside `buildSnapshot.ts`.
-- [ ] No reviewed financial value, taxonomy file, or Prisma model was modified.
+- [x] `npm run check` passes from `apps/web`. (lint, typecheck, 1,159 tests / 120 files, all data validations.)
+- [x] Every §9.2 code has both a firing and a non-firing test. (Audited across all 24: zero gaps.)
+- [x] `CAVEAT_RULES` has exactly 24 entries and every code is documented. (22 at spec time; two were split out during implementation to fix Critical mislabels — see the catalogue doc.)
+- [x] The agreement test covers every served base observation and supported calculated total. (All 852 ministries facts, 704 municipal totals, 7,040 function facts, every national fact, plus the explorer totalRow comparison.)
+- [x] A double rebuild produces an identical `dataVersion`. (54fbcbc2… twice.)
+- [x] The source resolver reports no unresolved available figure and emits no internal path as a public URL. (104/104 resolved; 293 emitted URLs, 0 non-https or internal-path.)
+- [x] The purity test passes — no IO, database, provider SDK, or logging under `lib/factQuery/` outside `buildSnapshot.ts`.
+- [x] No reviewed financial value, taxonomy file, or Prisma model was modified. (`git diff main...HEAD -- data/ prisma/` is empty.)

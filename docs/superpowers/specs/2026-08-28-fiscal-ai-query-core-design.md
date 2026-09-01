@@ -461,7 +461,9 @@ Rules and bilingual messages have one versioned owner. The new caveat-catalogue 
 | `municipal_functional_total_gap` | A requested functional share or decomposition does not cover the applicable public total; never normalize to an invented 100%. | note |
 | `per_resident_coverage_limited` | Unsupported per-resident year, category or country request: only approved 2025 municipal and region totals are supported. Returned with the appropriate error, not an invented ratio. | severe |
 | `program_coverage_partial` | Requested program observations have missing years, or the comparison or ranking uses a reviewed subset; distinguish missing from zero and explain the eligible population. | severe |
+| `admin_category_not_yet_established` | An administrative CATEGORY has no row for a requested year because it was established later (regional development and infrastructure starts in 2009). Split out of `program_coverage_partial` during implementation, which had claimed a program gap on category cells in both languages. | severe |
 | `program_historical_join` | A returned observation uses an approved historical organizational line or succession join; preserve its scope and original label. | note |
+| `program_parent_category_modern_grouping` | A program cell whose parent category had no row in that year: the parent is the series' modern grouping, not a containment claim. Three cells (roads, 2006-2008). The amount and share stay correct and unchanged. | severe |
 | `non_positive_comparison_base` | Percentage growth would divide by a zero or negative starting amount; percentage growth is null while a valid GEL difference may remain. | note |
 
 The engine preserves relevant limitations through regional and country calculations even where display-oriented aggregation clears reconciliation flags. A genuinely unresolved material reconciliation error blocks publication; a caveat is not a substitute for required validation.
@@ -485,7 +487,7 @@ The consumer of this service is a language model, which translates competently. 
 
 Only text Fiscal.ge itself writes as a warning or a refusal:
 
-- the 22 caveat messages (§9.2);
+- the caveat messages (§9.2);
 - the error messages (§7.4).
 
 These are the sentences where precise wording matters most and where a model's improvised translation is least acceptable — a mistranslated limitation is worse than a mistranslated label. They live in the caveat catalogue and error definitions as plain source files: no database field, no migration, no parity check.
@@ -737,7 +739,7 @@ Part 1 must precede Part 2, and Part 2 must precede Part 3. There is no data-pip
 
 ### Part 1 — Query core and verified snapshot
 
-Snapshot builder and contract, `dataVersion` identity, capability catalogue, shared calculation extraction, public source resolver over `workbookSources.ts` and `sourceManifest.ts`, caveat engine with all 22 codes in Georgian and English, the seven functions, the shared Zod schema module, deterministic tests, and product-agreement tests.
+Snapshot builder and contract, `dataVersion` identity, capability catalogue, shared calculation extraction, public source resolver over `workbookSources.ts` and `sourceManifest.ts`, caveat engine with all 24 codes in Georgian and English, the seven functions, the shared Zod schema module, deterministic tests, and product-agreement tests.
 
 Pure TypeScript. No route, no runtime, no schema change, nothing user-visible. An internal checkpoint, not a partial public launch.
 
