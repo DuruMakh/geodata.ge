@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 import type {
   ControlYearComparison,
   DebtScope,
+  GovernmentDebtActualServiceControlRow,
   GovernmentDebtActualServiceRow,
   GovernmentDebtForecastRow,
   GovernmentDebtInterestRateRow,
@@ -457,6 +458,85 @@ export function parseActualDebtService(
   );
 }
 
+export type DomesticServiceOverlapSourcePages = Pick<
+  ActualServiceSourcePages,
+  "n7Page32" | "n13Page32" | "n19Page35" | "n25Page27"
+>;
+
+function domesticServiceControlRows(
+  text: string,
+  years: number[],
+  startMarker: string,
+  endMarker: string,
+  sourceId: GovernmentDebtActualServiceControlRow["source_id"],
+  sourceTable: string,
+  toleranceMillionGel: number,
+): GovernmentDebtActualServiceControlRow[] {
+  const values = externalServiceValues(
+    text,
+    years,
+    startMarker,
+    endMarker,
+    sourceId,
+    sourceTable,
+  );
+  return years.map((year) => {
+    const value = values.get(year)!;
+    return {
+      year,
+      principal_paid_million_gel: value.principal,
+      interest_paid_million_gel: value.interest,
+      tolerance_million_gel: toleranceMillionGel,
+      source_id: sourceId,
+      source_table: sourceTable,
+      source_row_label: startMarker,
+    };
+  });
+}
+
+export function parseDomesticServiceOverlapControls(
+  sources: DomesticServiceOverlapSourcePages,
+): GovernmentDebtActualServiceControlRow[] {
+  return [
+    ...domesticServiceControlRows(
+      sources.n7Page32,
+      [2013, 2014, 2015, 2016],
+      "PUBLIC DOMESTIC DEBT",
+      "o/w Debt to NBG",
+      "mof_public_debt_bulletin_n7",
+      "17. NET FLOWS & NET TRANSFERS ON PUBLIC DEBT",
+      0.5,
+    ),
+    ...domesticServiceControlRows(
+      sources.n13Page32,
+      [2017, 2018, 2019],
+      "PUBLIC DOMESTIC DEBT",
+      "o/w Debt to NBG",
+      "mof_public_debt_bulletin_n13",
+      "17. NET FLOWS & NET TRANSFERS ON PUBLIC DEBT",
+      0.5,
+    ),
+    ...domesticServiceControlRows(
+      sources.n19Page35,
+      [2020, 2021, 2022],
+      "Domestic Government Debt **",
+      "*Exchange rate at day of transaction",
+      "mof_public_debt_bulletin_n19",
+      "18. NET FLOWS & NET TRANSFERS ON PUBLIC DEBT",
+      0.1,
+    ),
+    ...domesticServiceControlRows(
+      sources.n25Page27,
+      [2023, 2024, 2025],
+      "Domestic Government Debt **",
+      "*Exchange rate at day of transaction",
+      "mof_public_debt_bulletin_n25",
+      "18. Net Flows & Net Transfers on Public Debt",
+      0.1,
+    ),
+  ];
+}
+
 export type InterestRateSourcePages = {
   monthlyPage3: string;
   strategy2019Page14: string;
@@ -518,9 +598,9 @@ function rateRow(
     availability_status: available
       ? "available"
       : "not_found_in_reviewed_sources",
-    source_id: evidence?.sourceId ?? "mof_monthly_debt_report_2026_07",
-    source_table: evidence?.sourceTable ?? "Reviewed official source set",
-    source_row_label: evidence?.sourceRowLabel ?? "No comparable source row",
+    source_id: evidence?.sourceId ?? "",
+    source_table: evidence?.sourceTable ?? "",
+    source_row_label: evidence?.sourceRowLabel ?? "",
     source_unit: "% p.a.",
     transformation: available
       ? "Exact published weighted-average portfolio interest rate; no calculation or chart-position digitization."

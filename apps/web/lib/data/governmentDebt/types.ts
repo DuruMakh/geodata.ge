@@ -90,6 +90,20 @@ export type GovernmentDebtActualServiceRow = {
   last_reviewed_at: string;
 };
 
+export type GovernmentDebtActualServiceControlRow = {
+  year: number;
+  principal_paid_million_gel: number;
+  interest_paid_million_gel: number;
+  tolerance_million_gel: number;
+  source_id:
+    | "mof_public_debt_bulletin_n7"
+    | "mof_public_debt_bulletin_n13"
+    | "mof_public_debt_bulletin_n19"
+    | "mof_public_debt_bulletin_n25";
+  source_table: string;
+  source_row_label: string;
+};
+
 export type GovernmentDebtInterestRateRow = {
   year: number;
   debt_scope: DebtScope;
@@ -98,7 +112,7 @@ export type GovernmentDebtInterestRateRow = {
   portfolio_scope: string;
   rate_definition: "Year-end weighted-average annual interest rate";
   availability_status: AvailabilityStatus;
-  source_id: GovernmentDebtSourceId;
+  source_id: GovernmentDebtSourceId | "";
   source_table: string;
   source_row_label: string;
   source_unit: "% p.a.";
@@ -140,7 +154,40 @@ export type GovernmentDebtRateGap = {
   year: number;
   debt_scope: DebtScope;
   availability_status: Exclude<AvailabilityStatus, "available">;
+  source_id: GovernmentDebtSourceId | "";
+  reviewed_source_ids: GovernmentDebtSourceId[];
   reason: string;
+};
+
+export type GovernmentDebtInterestRateCheck = {
+  check_id: string;
+  year: number;
+  debt_scope: DebtScope;
+  expected_value: number | null;
+  observed_value: number | null;
+  difference: number | null;
+  tolerance: number;
+  expected_availability_status: AvailabilityStatus;
+  observed_availability_status: AvailabilityStatus;
+  expected_source_id: GovernmentDebtSourceId | "";
+  observed_source_id: GovernmentDebtSourceId | "";
+  source_reference: string;
+  status: "pass" | "fail";
+};
+
+export type GovernmentDebtForecastCheck = {
+  check_id: string;
+  year: number;
+  debt_scope: "domestic" | "external";
+  field: string;
+  expected_value: number;
+  observed_value: number;
+  difference: number;
+  tolerance: number;
+  expected_source_id: "mof_public_debt_bulletin_n25";
+  observed_source_id: GovernmentDebtSourceId;
+  source_reference: string;
+  status: "pass" | "fail";
 };
 
 export type GovernmentDebtGdpShareCheck = {
@@ -176,6 +223,24 @@ export type GovernmentDebtStockOverlapComparison = {
   comparison_status: "exact_match" | "revision";
 };
 
+export type GovernmentDebtActualServiceOverlapComparison = {
+  control_source_id: GovernmentDebtActualServiceControlRow["source_id"];
+  year: number;
+  canonical_principal_million_gel: number;
+  control_principal_million_gel: number;
+  principal_difference_million_gel: number;
+  canonical_interest_million_gel: number;
+  control_interest_million_gel: number;
+  interest_difference_million_gel: number;
+  tolerance_million_gel: number;
+  source_table: string;
+  source_row_label: string;
+  comparison_status:
+    | "exact_match"
+    | "within_source_precision"
+    | "unexplained_difference";
+};
+
 export type GovernmentDebtValidationReport = {
   status: "complete_with_documented_rate_gaps" | "failed";
   review_date: "2026-09-01";
@@ -188,7 +253,11 @@ export type GovernmentDebtValidationReport = {
     observedYears: number[];
     overlapComparisons: GovernmentDebtStockOverlapComparison[];
   };
-  actualService: { rowCount: number; observedYears: number[] };
+  actualService: {
+    rowCount: number;
+    observedYears: number[];
+    overlapComparisons: GovernmentDebtActualServiceOverlapComparison[];
+  };
   interestRates: {
     rowCount: number;
     availableCount: number;
@@ -201,9 +270,13 @@ export type GovernmentDebtValidationReport = {
   };
   gdpShareChecks: GovernmentDebtGdpShareCheck[];
   controlComparisons: GovernmentDebtControlComparison[];
+  checks: {
+    interestRates: GovernmentDebtInterestRateCheck[];
+    forecast: GovernmentDebtForecastCheck[];
+  };
   estimates_created: 0;
   source_hashes_match: true;
-  normalized_values_reconcile: true;
+  normalized_values_reconcile: boolean;
 };
 
 export type GovernmentDebtPackageBuild = {

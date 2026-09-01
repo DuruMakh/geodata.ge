@@ -202,6 +202,58 @@ describe("government debt source parsers", () => {
     });
   });
 
+  it("extracts domestic actual-service overlap controls with source precision", async () => {
+    const { readPdfPages } = await import(pathToFileURL(pdfTextModulePath).href);
+    const parserModule = await import(pathToFileURL(parserModulePath).href);
+    expect(parserModule.parseDomesticServiceOverlapControls).toBeTypeOf(
+      "function",
+    );
+    if (typeof parserModule.parseDomesticServiceOverlapControls !== "function") {
+      return;
+    }
+
+    const [n7, n13, n19, n25] = await Promise.all([
+      readPdfPages(path.join(sourceDir, "public-debt-bulletin-n7.pdf"), [32]),
+      readPdfPages(path.join(sourceDir, "public-debt-bulletin-n13.pdf"), [32]),
+      readPdfPages(path.join(sourceDir, "public-debt-bulletin-n19.pdf"), [35]),
+      readPdfPages(path.join(sourceDir, "public-debt-bulletin-n25.pdf"), [27]),
+    ]);
+    const rows = parserModule.parseDomesticServiceOverlapControls({
+      n7Page32: n7.get(32)!,
+      n13Page32: n13.get(32)!,
+      n19Page35: n19.get(35)!,
+      n25Page27: n25.get(27)!,
+    });
+    const value = (year: number) =>
+      rows.find((row: { year: number }) => row.year === year);
+
+    expect(rows).toHaveLength(13);
+    expect(value(2013)).toMatchObject({
+      principal_paid_million_gel: 262,
+      interest_paid_million_gel: 99,
+      tolerance_million_gel: 0.5,
+      source_id: "mof_public_debt_bulletin_n7",
+    });
+    expect(value(2019)).toMatchObject({
+      principal_paid_million_gel: 1379,
+      interest_paid_million_gel: 281,
+      tolerance_million_gel: 0.5,
+      source_id: "mof_public_debt_bulletin_n13",
+    });
+    expect(value(2020)).toMatchObject({
+      principal_paid_million_gel: 1570.2,
+      interest_paid_million_gel: 428.1,
+      tolerance_million_gel: 0.1,
+      source_id: "mof_public_debt_bulletin_n19",
+    });
+    expect(value(2025)).toMatchObject({
+      principal_paid_million_gel: 1377.4,
+      interest_paid_million_gel: 914.4,
+      tolerance_million_gel: 0.1,
+      source_id: "mof_public_debt_bulletin_n25",
+    });
+  });
+
   it("builds the exact rate grid and leaves non-comparable component rates blank", async () => {
     const { readPdfPages } = await import(pathToFileURL(pdfTextModulePath).href);
     const parserModule = await import(pathToFileURL(parserModulePath).href);
@@ -282,8 +334,20 @@ describe("government debt source parsers", () => {
       source_id: "mof_debt_strategy_2022_2025",
       source_row_label: "External Debt (excludes the Eurobond)",
     });
-    expect(value(2025, "domestic")?.weighted_average_interest_rate_percent).toBeNull();
-    expect(value(2025, "external")?.weighted_average_interest_rate_percent).toBeNull();
+    expect(value(2015, "domestic")).toMatchObject({
+      weighted_average_interest_rate_percent: null,
+      source_id: "",
+      source_table: "",
+      source_row_label: "",
+    });
+    expect(value(2025, "domestic")).toMatchObject({
+      weighted_average_interest_rate_percent: null,
+      source_id: "",
+    });
+    expect(value(2025, "external")).toMatchObject({
+      weighted_average_interest_rate_percent: null,
+      source_id: "",
+    });
   });
 
   it("builds the five-year existing-portfolio schedule and reads control cells", async () => {
@@ -341,6 +405,34 @@ describe("government debt source parsers", () => {
       interest_source_amount: 342.3,
       total_service_million_gel: 1859.1,
     });
+    expect(
+      [2026, 2027, 2028, 2029, 2030].map((year) => {
+        const row = value(year, "external")!;
+        return [row.principal_source_amount, row.interest_source_amount];
+      }),
+    ).toEqual([
+      [1010.9, 237.6],
+      [512.6, 218.3],
+      [526.5, 207],
+      [521.3, 194.4],
+      [508.9, 181.5],
+    ]);
+    expect(
+      [2026, 2027, 2028, 2029, 2030].map((year) => {
+        const row = value(year, "domestic")!;
+        return [
+          row.principal_source_amount,
+          row.interest_source_amount,
+          row.total_service_million_gel,
+        ];
+      }),
+    ).toEqual([
+      [822.211, 973.4, 1795.6],
+      [1539.249, 879.1, 2418.3],
+      [2833.611, 669.4, 3503],
+      [1413.474, 536.5, 1950],
+      [1516.849, 342.3, 1859.1],
+    ]);
 
     for (let year = 2026; year <= 2030; year += 1) {
       expect(value(year, "total")?.principal_million_gel).toBeCloseTo(

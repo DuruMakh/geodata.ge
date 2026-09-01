@@ -145,6 +145,15 @@ describe("government debt research package", () => {
     await expect(
       validateGovernmentDebtSourceManifest(changedHash),
     ).rejects.toThrow("Unexpected source-manifest sha256");
+    for (const field of Object.keys(rows[0]!)) {
+      const changed = rows.map((row, index) =>
+        index === 0 ? { ...row, [field]: `${row[field]}-changed` } : row,
+      );
+      await expect(
+        validateGovernmentDebtSourceManifest(changed),
+        field,
+      ).rejects.toThrow();
+    }
   });
 
   it("rejects any drift in the two approved methodology notes", async () => {
@@ -206,6 +215,49 @@ describe("government debt research package", () => {
       },
     });
     expect(result.validation.interestRates.gaps).toHaveLength(11);
+    expect(
+      result.validation.interestRates.gaps.find(
+        (gap) => gap.year === 2015 && gap.debt_scope === "domestic",
+      ),
+    ).toMatchObject({
+      source_id: "",
+      reviewed_source_ids: [
+        "mof_monthly_debt_report_2026_07",
+        "mof_debt_strategy_2019_2021",
+        "mof_debt_strategy_2022_2025",
+        "mof_debt_strategy_2023_2026",
+        "mof_debt_strategy_2025_2029",
+      ],
+    });
+    const validationChecks = result.validation.checks;
+    expect(validationChecks.interestRates).toHaveLength(33);
+    expect(validationChecks.interestRates.every((check) => check.status === "pass")).toBe(
+      true,
+    );
+    expect(
+      validationChecks.interestRates.find(
+        (check) => check.year === 2019 && check.debt_scope === "external",
+      ),
+    ).toMatchObject({
+      expected_value: null,
+      observed_value: null,
+      expected_source_id: "mof_debt_strategy_2022_2025",
+      observed_source_id: "mof_debt_strategy_2022_2025",
+      status: "pass",
+    });
+    expect(validationChecks.forecast).toHaveLength(30);
+    expect(validationChecks.forecast.every((check) => check.status === "pass")).toBe(
+      true,
+    );
+    expect(
+      validationChecks.forecast.find(
+        (check) => check.check_id === "forecast_2028_external_principal_usd",
+      ),
+    ).toMatchObject({
+      expected_value: 526.5,
+      observed_value: 526.5,
+      status: "pass",
+    });
     const overlapComparisons = result.validation.stock.overlapComparisons;
     expect(overlapComparisons).toHaveLength(39);
     expect(
@@ -218,6 +270,29 @@ describe("government debt research package", () => {
         (comparison) => comparison.difference_million_gel === 0,
       ),
     ).toBe(true);
+    const serviceOverlapComparisons =
+      result.validation.actualService.overlapComparisons;
+    expect(serviceOverlapComparisons).toHaveLength(13);
+    expect(
+      serviceOverlapComparisons.filter(
+        (comparison) =>
+          comparison.comparison_status === "unexplained_difference",
+      ),
+    ).toEqual([]);
+    expect(
+      serviceOverlapComparisons.find((comparison) => comparison.year === 2020),
+    ).toMatchObject({
+      principal_difference_million_gel: -0.03,
+      interest_difference_million_gel: -0.1,
+      comparison_status: "within_source_precision",
+    });
+    expect(
+      serviceOverlapComparisons.find((comparison) => comparison.year === 2025),
+    ).toMatchObject({
+      principal_difference_million_gel: 0,
+      interest_difference_million_gel: 0.1,
+      comparison_status: "within_source_precision",
+    });
     expect(result.validation.controlComparisons).toEqual([
       {
         year: 2019,
@@ -320,6 +395,40 @@ describe("government debt research package", () => {
       published_share_percent: 34.4,
       comparison_status: "rounding_match",
     });
+  });
+
+  it("rejects shifted middle-year rate and forecast source controls", async () => {
+    const packageModule = await import(pathToFileURL(packageModulePath).href);
+    expect(packageModule.validateGovernmentDebtInterestRates).toBeTypeOf(
+      "function",
+    );
+    expect(packageModule.validateGovernmentDebtForecast).toBeTypeOf("function");
+    if (
+      typeof packageModule.validateGovernmentDebtInterestRates !== "function" ||
+      typeof packageModule.validateGovernmentDebtForecast !== "function"
+    ) {
+      return;
+    }
+    const result = (await packageModule.buildGovernmentDebtPackage({
+      write: false,
+    })) as GovernmentDebtPackageBuild;
+    const shiftedRates = result.interestRateRows.map((row) =>
+      row.year === 2020 && row.debt_scope === "total"
+        ? { ...row, weighted_average_interest_rate_percent: 2.9 }
+        : row,
+    );
+    expect(() =>
+      packageModule.validateGovernmentDebtInterestRates(shiftedRates),
+    ).toThrow("interest_rate_2020_total");
+
+    const shiftedForecast = result.forecastRows.map((row) =>
+      row.payment_year === 2028 && row.debt_scope === "external"
+        ? { ...row, principal_source_amount: 526.6 }
+        : row,
+    );
+    expect(() =>
+      packageModule.validateGovernmentDebtForecast(shiftedForecast),
+    ).toThrow("forecast_2028_external_principal_usd");
   });
 
   it("commits fixed-schema UTF-8-BOM CSV artifacts", () => {
@@ -429,6 +538,7 @@ describe("government debt research package", () => {
     const workbook = XLSX.read(fs.readFileSync(reviewWorkbookPath), {
       type: "buffer",
       cellDates: true,
+      cellNF: true,
     });
     expect(workbook.SheetNames).toEqual([
       "Read me",
@@ -540,6 +650,8 @@ describe("government debt research package", () => {
       ]),
     );
     const stockSheet = workbook.Sheets.Stock;
+    expect(stockSheet.A2?.z).toBe("0");
+    expect(workbook.Sheets["Forecast service"].B2?.z).toBe("0");
     for (const [index, stockRow] of stockRows.entries()) {
       const rowNumber = index + 2;
       expect(stockSheet[`N${rowNumber}`]?.v).toBe(

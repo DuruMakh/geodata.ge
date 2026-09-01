@@ -30,7 +30,9 @@ export const SOURCE_MANIFEST_HEADERS = [
 
 type SourceContract = Pick<
   SourceManifestRow,
+  | "dataset_title"
   | "roles"
+  | "document_date"
   | "source_page_url"
   | "retrieved_file_url"
   | "local_file"
@@ -40,6 +42,7 @@ type SourceContract = Pick<
   | "source_period_max"
   | "used_period_min"
   | "used_period_max"
+  | "notes"
 >;
 
 const BULLETIN_PAGE =
@@ -53,7 +56,9 @@ const CONTROL_PAGE =
 
 const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
   mof_public_debt_bulletin_n7: {
+    dataset_title: "Public Debt of Georgia Statistical Bulletin N7",
     roles: "canonical_actual_service",
+    document_date: "2016-12-31",
     source_page_url: BULLETIN_PAGE,
     retrieved_file_url:
       "https://mof.ge/files/download/PublicSectorDebtN7ENGMay2017.pdf/d8812ef3-d563-4447-b35e-8a0a0b812056",
@@ -64,9 +69,13 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     source_period_max: "2016",
     used_period_min: "2013",
     used_period_max: "2016",
+    notes:
+      "External Government Debt service is canonical and Public Domestic Debt service is an overlap control for 2013-2016.",
   },
   mof_public_debt_bulletin_n13: {
+    dataset_title: "Public Debt of Georgia Statistical Bulletin N13",
     roles: "canonical_stock|canonical_actual_service",
+    document_date: "2019-12-31",
     source_page_url: BULLETIN_PAGE,
     retrieved_file_url:
       "https://mof.ge/files/download/N13ENG.pdf/78e85ff9-d592-4359-936a-b4874d3ebd1a",
@@ -77,9 +86,13 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     source_period_max: "2019",
     used_period_min: "2013",
     used_period_max: "2019",
+    notes:
+      "Government Debt stock is canonical for 2013-2014; external service is canonical and domestic service is an overlap control for 2017-2019.",
   },
   mof_public_debt_bulletin_n19: {
+    dataset_title: "Public Debt of Georgia Statistical Bulletin N19",
     roles: "canonical_actual_service",
+    document_date: "2022-12-31",
     source_page_url: BULLETIN_PAGE,
     retrieved_file_url:
       "https://mof.ge/files/download/N19ENG.pdf/87b685f6-5e38-41ec-b777-b9e499ab6eca",
@@ -90,9 +103,13 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     source_period_max: "2022",
     used_period_min: "2015",
     used_period_max: "2022",
+    notes:
+      "External Government Debt service is canonical for 2020-2022; Government Debt stock is an overlap control for 2015-2022 and domestic service is an overlap control for 2020-2022.",
   },
   mof_public_debt_bulletin_n25: {
+    dataset_title: "Public Debt of Georgia Statistical Bulletin N25",
     roles: "canonical_stock|canonical_actual_service|canonical_forecast",
+    document_date: "2025-12-31",
     source_page_url: BULLETIN_PAGE,
     retrieved_file_url:
       "https://mof.ge/files/download/N25ENGUpdate.pdf/a8e288fa-cb9e-4028-9ae1-32f2dde1ace2",
@@ -103,9 +120,13 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     source_period_max: "2053",
     used_period_min: "2013",
     used_period_max: "2030",
+    notes:
+      "Government Debt stock for 2015-2025, domestic service history for 2013-2025, external service for 2023-2025, domestic service overlap controls for 2023-2025, and the 2025-12-31 forecast snapshot.",
   },
   mof_monthly_debt_report_2026_07: {
+    dataset_title: "Monthly Debt Report July 2026",
     roles: "canonical_interest_rate",
+    document_date: "2026-07",
     source_page_url: MONTHLY_PAGE,
     retrieved_file_url:
       "https://mof.ge/files/download/Monthly%20Debt%20Report%20%20July.pdf/91fdb650-1e68-46a5-899f-a752f9811742",
@@ -116,9 +137,13 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     source_period_max: "2026",
     used_period_min: "2015",
     used_period_max: "2025",
+    notes:
+      "Consistent one-decimal weighted-average interest rate history for total Government Debt.",
   },
   mof_debt_strategy_2019_2021: {
+    dataset_title: "General Government Debt Management Strategy 2019-2021",
     roles: "canonical_interest_rate",
+    document_date: "2019-02",
     source_page_url: STRATEGY_PAGE,
     retrieved_file_url:
       "https://mof.ge/files/download/DMSENG19213May2019Web.pdf/924681c3-c2cd-4455-8043-531d6ded8b5e",
@@ -129,9 +154,13 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     source_period_max: "2021",
     used_period_min: "2018",
     used_period_max: "2018",
+    notes:
+      "Domestic Government Debt portfolio rate for 2018; the external figure is excluded because it does not cover the same full portfolio.",
   },
   mof_debt_strategy_2022_2025: {
+    dataset_title: "General Government Debt Management Strategy 2022-2025",
     roles: "canonical_interest_rate",
+    document_date: "2021-12",
     source_page_url: STRATEGY_PAGE,
     retrieved_file_url:
       "https://mof.ge/files/download/General%20Government%20Debt%20Management%20Strategy%20for%2020222025.pdf/7ebce43c-ea3f-42d8-bd79-4538e5290afe",
@@ -142,9 +171,13 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     source_period_max: "2025",
     used_period_min: "2019",
     used_period_max: "2020",
+    notes:
+      "Domestic Government Debt portfolio rates for 2019-2020; external rates explicitly exclude the Eurobond and are not normalized.",
   },
   mof_debt_strategy_2023_2026: {
+    dataset_title: "General Government Debt Management Strategy 2023-2026",
     roles: "canonical_interest_rate",
+    document_date: "2023",
     source_page_url: STRATEGY_PAGE,
     retrieved_file_url:
       "https://mof.ge/files/download/Government%20Debt%20Management%20Strategy%2020232026.pdf/b27d2e53-de14-417e-aa90-6c99794ad573",
@@ -155,9 +188,13 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     source_period_max: "2026",
     used_period_min: "2021",
     used_period_max: "2022",
+    notes:
+      "Full domestic and external Government Debt portfolio rates for 2021-2022.",
   },
   mof_debt_strategy_2025_2029: {
+    dataset_title: "General Government Debt Management Strategy 2025-2029",
     roles: "canonical_interest_rate",
+    document_date: "2025",
     source_page_url: STRATEGY_PAGE,
     retrieved_file_url:
       "https://mof.ge/files/download/DMS%2020252029%20ENG.pdf/43e57bc8-01e2-4b71-bf3f-57f3516115f1",
@@ -168,9 +205,14 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     source_period_max: "2029",
     used_period_min: "2023",
     used_period_max: "2024",
+    notes:
+      "Full domestic and external Government Debt portfolio rates for 2023-2024.",
   },
   mof_central_government_liabilities_control: {
+    dataset_title:
+      "Central Government Debt Liabilities by Maturity, Residency, and Instrument with reference to GFSM 2001",
     roles: "control_only",
+    document_date: "2026-Q2",
     source_page_url: CONTROL_PAGE,
     retrieved_file_url:
       "https://www.mof.ge/files/download/centraluri%20xelisuflebis%20valebi%20da%20valdebulebebi.xls%20%20eng%20IIQ.xlsx/dc8cf5f0-82df-4b13-812e-25b53821df8b",
@@ -181,6 +223,8 @@ const SOURCE_CONTRACTS: Record<GovernmentDebtSourceId, SourceContract> = {
     source_period_max: "2026",
     used_period_min: "2019",
     used_period_max: "2022",
+    notes:
+      "Control only: fourth-quarter 2019 and 2022 GFSM liability totals are compared but never used as normalized Government Debt values.",
   },
 };
 
