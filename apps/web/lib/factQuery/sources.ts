@@ -1,6 +1,6 @@
 // apps/web/lib/factQuery/sources.ts
 import type { SourceDocumentRow } from "../data/sources";
-import type { FactQuerySnapshot, ResolvedSource } from "./types";
+import type { FactQuerySnapshot, PublicDocument, ResolvedSource } from "./types";
 
 /**
  * Pure lookup used by the query path. Unknown ids are dropped, not invented:
@@ -36,7 +36,7 @@ export function splitSourceIds(raw: string): string[] {
  * filesystem); resolvePublicSources below only ever compares `repositoryPath`
  * strings already in memory.
  */
-export type ManifestDocument = {
+export type ManifestDocument = PublicDocument & {
   /**
    * Repo-relative path this document was archived from, e.g.
    * "docs/Raw Data/Expenditure/treasury.ge/2017-....pdf". Matched against
@@ -44,10 +44,54 @@ export type ManifestDocument = {
    * itself emitted as a public URL — see buildSnapshot.ts's purity note.
    */
   repositoryPath: string;
-  documentId: string;
-  title: string;
-  officialUrl: string | null;
-  archiveUrl: string | null;
+};
+
+/**
+ * Fact-data source ids whose `source_url_or_file` names a file EXTRACTED from
+ * an archived original rather than the original itself, mapped to the
+ * repository path that was actually published.
+ *
+ * source.municipal_portal_archive is the live case and backs 3,314 rows. It
+ * cites .../municipalities.mof.ge-archive-2022/functionals/functionals.csv —
+ * the 11.5 MB CSV obtained by unzipping functionals.zip, which sits in the
+ * same directory and IS published, with a working Internet Archive URL.
+ * Publishing the ZIP rather than its extracted contents is deliberate:
+ * lib/methodology/sourceInventory.ts's municipalities rule takes only
+ * top-level .zip files from that root.
+ *
+ * Kept as an explicit two-line map rather than a "strip a path segment and
+ * retry" heuristic on purpose. A heuristic would silently match unrelated
+ * neighbours and defeat the point of the section 8.1 gate, which exists to
+ * make an unresolvable source fail the build rather than quietly publish
+ * nothing. Each entry records a reviewed extracted-from relationship, which is
+ * also why this lives here instead of being edited into the reviewed CSV: a
+ * path rewrite there would erase the fact that the cited file is derived.
+ */
+const EXTRACTED_FILE_ALIASES: Readonly<Record<string, string>> = {
+  "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022/functionals/functionals.csv":
+    "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022/functionals.zip",
+  "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022/functionalbasictypes/functionalbasictypes.csv":
+    "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022/functionalbasictypes.zip",
+};
+
+/**
+ * Sources whose `source_url_or_file` names one of fiscal.ge's own reviewed
+ * calculation files rather than an original document, mapped to the upstream
+ * source ids whose documents DO back them.
+ *
+ * source.adjara_consolidated_budget is the live case. Its 11 rows are the
+ * country.georgia municipal totals 2015-2025, and its file
+ * (data/imports/municipal-adjara-budget-adjustments-2015-2025.csv) is the
+ * arithmetic, not a publication. Repository owner's decision, 2026-09-01: state
+ * how it was derived and point at the originals. The derivation text is taken
+ * from the reviewed `source_name` rather than written here, so the two cannot
+ * drift.
+ */
+const DERIVED_SOURCE_UPSTREAMS: Readonly<Record<string, readonly string[]>> = {
+  "source.adjara_consolidated_budget": [
+    "source.adjara.republic.2015.actual_payments",
+    "source.adjara.republic.2016_2025.actual_payments",
+  ],
 };
 
 export type ResolvePublicSourcesInput = {
@@ -72,10 +116,12 @@ function splitFilePaths(sourceUrlOrFile: string): string[] {
  * equality match would leave those permanently unresolved.
  */
 function matchDocuments(filePath: string, manifestDocuments: readonly ManifestDocument[]): ManifestDocument[] {
-  const exact = manifestDocuments.filter((doc) => doc.repositoryPath === filePath);
+  const resolvedPath = EXTRACTED_FILE_ALIASES[filePath] ?? filePath;
+
+  const exact = manifestDocuments.filter((doc) => doc.repositoryPath === resolvedPath);
   if (exact.length > 0) return exact;
 
-  const directoryPrefix = `${filePath}/`;
+  const directoryPrefix = `${resolvedPath}/`;
   return manifestDocuments.filter((doc) => doc.repositoryPath.startsWith(directoryPrefix));
 }
 
@@ -83,35 +129,47 @@ function matchDocuments(filePath: string, manifestDocuments: readonly ManifestDo
  * Resolves every data/sources/source-documents.csv row to the public
  * documents backing it, joining on repository file path rather than source
  * id: the fact-data source registry (data/sources/source-documents.csv) and
- * the reviewed methodology manifests (data/methodology/source-archives/,
- * docs/Raw Data/GDP/national-nominal-gdp/source-manifest.csv) use unrelated
- * id schemes, but `source_url_or_file` always names the exact repository
- * path(s) the manifests archived (spec section 8.1).
+ * the reviewed methodology manifests (data/methodology/source-archives/, and
+ * the GDP and Geostat package manifests) use unrelated id schemes, but
+ * `source_url_or_file` always names the exact repository path(s) the manifests
+ * archived (spec section 8.1). Two exceptions are handled explicitly above:
+ * a path naming a file extracted from an archived original
+ * (EXTRACTED_FILE_ALIASES) and a source that is a derived calculation rather
+ * than a document (DERIVED_SOURCE_UPSTREAMS).
  *
- * A row whose file(s) match nothing in `manifestDocuments` resolves to an
- * empty `documents` array rather than a fabricated link — this function never
- * invents a URL or an id. It also never sorts: array order is hash-
- * significant (lib/factQuery/canonical.ts), and buildSnapshot.ts is the one
- * file in lib/factQuery/ responsible for imposing that order, with the same
- * sortedBy helper it uses for every other snapshot array.
+ * A row whose file(s) match nothing and which is not a known derived source
+ * resolves to an empty `documents` array with `derivation: null` rather than a
+ * fabricated link — this function never invents a URL or an id. That state is
+ * what scripts/prepare-fact-query-snapshot.ts's --check fails the build on.
+ *
+ * It also never sorts: array order is hash-significant
+ * (lib/factQuery/canonical.ts), and buildSnapshot.ts is the one file in
+ * lib/factQuery/ responsible for imposing that order, with the same sortedBy
+ * helper it uses for every other snapshot array.
  */
 export function resolvePublicSources(input: ResolvePublicSourcesInput): ResolvedSource[] {
   const { sourceDocuments, manifestDocuments } = input;
+  const documentsById = new Map(manifestDocuments.map((doc) => [doc.documentId, doc]));
 
   return sourceDocuments.map((row): ResolvedSource => {
     const seenDocumentIds = new Set<string>();
-    const documents: ResolvedSource["documents"] = [];
+    const documents: PublicDocument[] = [];
 
-    for (const filePath of splitFilePaths(row.sourceUrlOrFile)) {
-      for (const doc of matchDocuments(filePath, manifestDocuments)) {
-        if (seenDocumentIds.has(doc.documentId)) continue;
-        seenDocumentIds.add(doc.documentId);
-        documents.push({
-          documentId: doc.documentId,
-          title: doc.title,
-          officialUrl: doc.officialUrl,
-          archiveUrl: doc.archiveUrl,
-        });
+    const push = (doc: ManifestDocument | undefined) => {
+      if (!doc || seenDocumentIds.has(doc.documentId)) return;
+      seenDocumentIds.add(doc.documentId);
+      // repositoryPath is an internal path and is deliberately dropped here:
+      // ResolvedSource is public output.
+      const { repositoryPath: _internal, ...publicFields } = doc;
+      documents.push(publicFields);
+    };
+
+    const upstreamIds = DERIVED_SOURCE_UPSTREAMS[row.sourceId];
+    if (upstreamIds) {
+      for (const id of upstreamIds) push(documentsById.get(id));
+    } else {
+      for (const filePath of splitFilePaths(row.sourceUrlOrFile)) {
+        for (const doc of matchDocuments(filePath, manifestDocuments)) push(doc);
       }
     }
 
@@ -119,6 +177,11 @@ export function resolvePublicSources(input: ResolvePublicSourcesInput): Resolved
       sourceId: row.sourceId,
       name: row.sourceName,
       lastReviewedAt: row.lastReviewedAt,
+      // The reviewed source_name already states the derivation in prose
+      // ("Reviewed consolidated Adjara calculation - municipalities plus
+      // republican payments minus internal transfers"); reusing it keeps one
+      // wording under review instead of two that can drift.
+      derivation: upstreamIds ? row.sourceName : null,
       documents,
     };
   });

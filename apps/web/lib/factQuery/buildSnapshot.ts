@@ -78,14 +78,50 @@ function isCleanHttpsUrl(value: string): boolean {
 // cannot drift onto two different definitions of "a real URL". Not
 // `.strict()`: like its sibling, this only names the columns it needs out of
 // source-manifest.csv's wider set (publisher, role, sha256, bytes, ...).
-const gdpManifestRowSchema = z.object({
+const packageManifestRowSchema = z.object({
   source_id: z.string().trim().min(1),
   dataset_title: z.string().trim().min(1),
+  publisher: z.string().trim().min(1),
   retrieved_file_url: z.string().refine(isCleanHttpsUrl, {
     message: "retrieved_file_url must be a clean https:// URL with no embedded whitespace or trailing text",
   }),
+  retrieved_at: z.string().trim().min(1),
   local_file: z.string().trim().min(1),
-});
+  sha256: z.string().trim().regex(/^[a-fA-F0-9]{64}$/).transform((value) => value.toLowerCase()),
+  bytes: z.coerce.number().int().nonnegative(),
+  // The two package manifests name their coverage columns differently - GDP
+  // uses selected_year_*, the Geostat package normalized_year_* - so accept
+  // either and require exactly that one of the pairs is present, rather than
+  // silently publishing a document with no coverage years.
+  selected_year_min: z.coerce.number().int().optional(),
+  selected_year_max: z.coerce.number().int().optional(),
+  normalized_year_min: z.coerce.number().int().optional(),
+  normalized_year_max: z.coerce.number().int().optional(),
+}).refine(
+  (row) =>
+    (row.selected_year_min !== undefined && row.selected_year_max !== undefined) ||
+    (row.normalized_year_min !== undefined && row.normalized_year_max !== undefined),
+  { message: "a package manifest row needs selected_year_min/max or normalized_year_min/max" },
+);
+
+/**
+ * Manifests that share the package schema above: a `local_file` relative to
+ * the manifest's own directory, and no repository_source_path. The GDP one was
+ * always read here. The Geostat municipal population/regional-GDP package was
+ * NOT, which is why source.geostat_municipal_population (64 rows) resolved to
+ * no public document at all even though its manifest carries the real Geostat
+ * URL and sha256 — spec section 8.1's gate could not be turned on until this
+ * second directory was read too.
+ */
+const PACKAGE_MANIFEST_DIRECTORIES: readonly (readonly string[])[] = [
+  GDP_SOURCE_MANIFEST_RELATIVE_PATH,
+  ["docs", "Raw Data", "Municipalities", "geostat-population-regional-gdp"],
+];
+
+function yearsBetween(first: number, last: number): number[] {
+  if (last < first) return [];
+  return Array.from({ length: last - first + 1 }, (_value, index) => first + index);
+}
 
 /**
  * Every public document the reviewed methodology manifests
@@ -122,39 +158,64 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
     repositoryPath: row.repository_source_path,
     documentId: row.source_id,
     title: row.display_title_ka,
+    publisher: row.source_organization,
     officialUrl: isCleanHttpsUrl(row.official_url_or_archive_url) ? row.official_url_or_archive_url : null,
     archiveUrl: absoluteWorkbookSourceUrl(PUBLIC_SITE_ORIGIN, row.downloadHref),
+    years: row.years,
+    datasetId: row.dataset_id,
+    sha256: row.sha256,
+    byteSize: row.byte_size,
+    mediaType: row.media_type,
+    retrievedAt: row.retrieved_at,
+    licenceId: row.license_id,
+    attribution: row.attribution_text,
   }));
 
-  // GDP sources live in a separate manifest with its own schema (no
-  // repository_source_path — `local_file` is relative to this manifest's own
-  // directory) and are not one of LIVE_METHODOLOGY_IDS, so
+  // These sources live in package manifests with their own schema (a
+  // `local_file` relative to the manifest's own directory, no
+  // repository_source_path) and are not LIVE_METHODOLOGY_IDS, so
   // loadReviewedSourceManifest cannot read them. loadGdpWorkbookSources
-  // (workbookSources.ts) reads the same file but, like loadWorkbookSources,
-  // projects source_id away — read it directly here to keep it.
-  const gdpManifestPath = path.join(repositoryRoot, ...GDP_SOURCE_MANIFEST_RELATIVE_PATH, "source-manifest.csv");
-  const gdpCsv = await readFile(gdpManifestPath, "utf8");
-  const gdpRawRows = parse(gdpCsv, {
-    bom: true,
-    columns: true,
-    skip_empty_lines: true,
-    trim: true,
-  }) as unknown[];
+  // (workbookSources.ts) reads the GDP one but, like loadWorkbookSources,
+  // projects source_id away — read them directly here to keep it.
+  for (const directory of PACKAGE_MANIFEST_DIRECTORIES) {
+    const manifestPath = path.join(repositoryRoot, ...directory, "source-manifest.csv");
+    const csv = await readFile(manifestPath, "utf8");
+    const rawRows = parse(csv, {
+      bom: true,
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
+    }) as unknown[];
 
-  for (const [index, rawRow] of gdpRawRows.entries()) {
-    const parsed = gdpManifestRowSchema.safeParse(rawRow);
-    if (!parsed.success) {
-      const issues = parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ");
-      throw new Error(`buildFactQuerySnapshot: invalid GDP source manifest row ${index + 1}: ${issues}`);
+    for (const [index, rawRow] of rawRows.entries()) {
+      const parsed = packageManifestRowSchema.safeParse(rawRow);
+      if (!parsed.success) {
+        const issues = parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ");
+        throw new Error(`buildFactQuerySnapshot: invalid source manifest row ${index + 1} in ${directory.join("/")}: ${issues}`);
+      }
+      const row = parsed.data;
+      documents.push({
+        repositoryPath: [...directory, row.local_file].join("/"),
+        documentId: row.source_id,
+        title: row.dataset_title,
+        publisher: row.publisher,
+        officialUrl: row.retrieved_file_url,
+        archiveUrl: null,
+        years: yearsBetween(
+          row.selected_year_min ?? row.normalized_year_min ?? 0,
+          row.selected_year_max ?? row.normalized_year_max ?? -1,
+        ),
+        datasetId: null,
+        sha256: row.sha256,
+        byteSize: row.bytes,
+        mediaType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        retrievedAt: row.retrieved_at,
+        // The package manifests carry no licence or attribution column;
+        // reported as absent rather than filled with a guess.
+        licenceId: null,
+        attribution: null,
+      });
     }
-    const row = parsed.data;
-    documents.push({
-      repositoryPath: [...GDP_SOURCE_MANIFEST_RELATIVE_PATH, row.local_file].join("/"),
-      documentId: row.source_id,
-      title: row.dataset_title,
-      officialUrl: row.retrieved_file_url,
-      archiveUrl: null,
-    });
   }
 
   return documents;

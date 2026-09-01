@@ -59,16 +59,40 @@ export type Coverage = {
   expectedCount: number;
 };
 
+export type PublicDocument = {
+  documentId: string;
+  title: string;
+  publisher: string;
+  officialUrl: string | null;
+  archiveUrl: string | null;
+  /** Years the document covers, so a grouped source can be narrowed (spec section 6.8). */
+  years: number[];
+  datasetId: string | null;
+  sha256: string;
+  byteSize: number;
+  mediaType: string;
+  retrievedAt: string;
+  /**
+   * Null for the two package manifests (GDP, Geostat municipal population),
+   * whose schema carries no licence or attribution column. Reported as absent
+   * rather than filled with a guess.
+   */
+  licenceId: string | null;
+  attribution: string | null;
+};
+
 export type ResolvedSource = {
   sourceId: string;
   name: string;
   lastReviewedAt: string;
-  documents: {
-    documentId: string;
-    title: string;
-    officialUrl: string | null;
-    archiveUrl: string | null;
-  }[];
+  /**
+   * Non-null when the figures behind this source are fiscal.ge's own reviewed
+   * calculation rather than a published document. The text states how they
+   * were derived, and `documents` then carries the UPSTREAM originals rather
+   * than a document of the derived figures themselves — there is none.
+   */
+  derivation: string | null;
+  documents: PublicDocument[];
 };
 
 export type FactQuerySnapshot = {

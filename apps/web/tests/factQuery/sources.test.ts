@@ -93,7 +93,7 @@ describe("public source resolution", () => {
       const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const source = snapshot.sources.find((s) => s.sourceId === "source.mof_2017_revenue_form1_pdf");
 
-      expect(source?.documents).toEqual([
+      expect(source?.documents).toMatchObject([
         {
           documentId: "source.mof.revenue.2017.form_1",
           title: "2017 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები",
@@ -109,7 +109,7 @@ describe("public source resolution", () => {
         (s) => s.sourceId === "source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual",
       );
 
-      expect(source?.documents).toEqual([
+      expect(source?.documents).toMatchObject([
         {
           documentId: "source.mof.expenditure.2017.mof_excel_fact",
           title: "2017 წლის სახელმწიფო ბიუჯეტის შესრულების სამუშაო წიგნი",
@@ -137,7 +137,7 @@ describe("public source resolution", () => {
       const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const source = snapshot.sources.find((s) => s.sourceId === "source.adjara_republic_budget_actual");
 
-      expect(source?.documents).toEqual([
+      expect(source?.documents).toMatchObject([
         {
           documentId: "source.adjara.republic.2015.actual_payments",
           title: "აჭარის ა.რ. რესპუბლიკური ბიუჯეტი — 2015 წლის ფაქტობრივი გადასახდელები",
@@ -151,6 +151,94 @@ describe("public source resolution", () => {
           archiveUrl: "https://fiscal.ge/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx",
         },
       ]);
+    });
+  });
+
+  // Spec section 8.1. These three sources back 3,389 fact rows and resolved to
+  // nothing before this: two because the join missed (an extracted file, and a
+  // manifest that was never read), one because it is a derived calculation
+  // with no document of its own. Each failure mode is distinct, so each gets
+  // its own test rather than one "everything resolves" assertion.
+  describe("every source resolves to a document or a stated derivation", () => {
+    it("leaves no source unresolved", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const unresolved = snapshot.sources
+        .filter((source) => source.documents.length === 0 && source.derivation === null)
+        .map((source) => source.sourceId);
+
+      expect(unresolved).toEqual([]);
+      expect(snapshot.sources.length).toBe(104);
+    });
+
+    it("resolves an extracted file to the archived original it came from", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const source = snapshot.sources.find((s) => s.sourceId === "source.municipal_portal_archive");
+
+      // source_url_or_file names functionals/functionals.csv; the ZIP it was
+      // extracted from is what the manifest publishes.
+      expect(source?.documents.map((d) => d.documentId)).toEqual([
+        "source.mof.municipalities.2015_2019.portal_functionals",
+      ]);
+      expect(source?.documents[0]?.officialUrl).toBe(
+        "https://web.archive.org/web/20220628234046id_/https://municipalities.mof.ge/api/OpenData?fileName=functionals.zip",
+      );
+      expect(source?.derivation).toBeNull();
+    });
+
+    it("resolves the Geostat population package manifest", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const source = snapshot.sources.find((s) => s.sourceId === "source.geostat_municipal_population");
+
+      expect(source?.documents[0]?.officialUrl).toBe(
+        "https://www.geostat.ge/media/78356/01-population-by-self-governed-unit.xlsx",
+      );
+      expect(source?.documents[0]?.sha256).toBe(
+        "8bd7a1b56e756e8d6bc92192095795b204b23fd18274aaff39b78c0b0a487a57",
+      );
+    });
+
+    it("states the derivation of the consolidated Adjara calculation and cites its upstream originals", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const source = snapshot.sources.find((s) => s.sourceId === "source.adjara_consolidated_budget");
+
+      expect(source?.derivation).toBe(source?.name);
+      expect((source?.derivation ?? "").length).toBeGreaterThan(0);
+      // Upstream originals, not a document of the derived figures - there is none.
+      expect(source?.documents.map((d) => d.documentId)).toEqual([
+        "source.adjara.republic.2015.actual_payments",
+        "source.adjara.republic.2016_2025.actual_payments",
+      ]);
+    });
+
+    it("leaves every ordinary source's derivation null", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const derived = snapshot.sources.filter((s) => s.derivation !== null).map((s) => s.sourceId);
+
+      // The field is for genuinely derived sources, not a dumping ground.
+      expect(derived).toEqual(["source.adjara_consolidated_budget"]);
+    });
+
+    it("carries provenance metadata on every document", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+
+      for (const source of snapshot.sources) {
+        for (const document of source.documents) {
+          expect(document.sha256).toMatch(/^[0-9a-f]{64}$/);
+          expect(document.byteSize).toBeGreaterThan(0);
+          expect(document.publisher.length).toBeGreaterThan(0);
+          expect(document.retrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+          expect(document.years.length).toBeGreaterThan(0);
+        }
+      }
+    });
+
+    it("does not alias a path that was never an extracted file", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const source = snapshot.sources.find((s) => s.sourceId === "source.mof_2017_revenue_form1_pdf");
+
+      // The alias map is exact, not a "strip a segment and retry" heuristic:
+      // an ordinary source must still resolve only to its own document.
+      expect(source?.documents.map((d) => d.documentId)).toEqual(["source.mof.revenue.2017.form_1"]);
     });
   });
 });

@@ -40,7 +40,26 @@ async function main() {
   if (!Array.isArray(snapshot.sources) || snapshot.sources.length === 0) {
     throw new Error("Invalid snapshot: sources array is empty");
   }
-  process.stdout.write(`snapshot valid dataVersion=${snapshot.dataVersion}\n`);
+
+  // Spec section 8.1: every logical source must resolve either to at least one
+  // public document or to a stated derivation. A source with neither would let
+  // the query core cite a figure it cannot show anyone the origin of, so it
+  // fails the build rather than shipping. Names every offending id, not just
+  // the count and not just the first — a partial list turns one fix into
+  // several rebuild cycles.
+  const unresolved = snapshot.sources.filter(
+    (source) => source.documents.length === 0 && source.derivation === null,
+  );
+  if (unresolved.length > 0) {
+    throw new Error(
+      `${unresolved.length} source(s) resolve to neither a public document nor a stated derivation:\n` +
+        unresolved.map((source) => `  - ${source.sourceId}`).join("\n"),
+    );
+  }
+
+  process.stdout.write(
+    `snapshot valid dataVersion=${snapshot.dataVersion} sources=${snapshot.sources.length} all resolved\n`,
+  );
 }
 
 main().catch((error) => {
