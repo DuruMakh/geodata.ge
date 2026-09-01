@@ -57,16 +57,16 @@ describe("Government Debt explorer model", () => {
       shareOfGdp: false,
     });
 
-    expect(model.items.map((item) => [item.id, item.parentItemId, item.kaLabel])).toEqual([
-      ["debt.stock.total", null, "მთლიანი ვალი"],
-      ["debt.stock.domestic", "debt.stock.total", "საშინაო ვალი"],
-      ["debt.stock.external", "debt.stock.total", "საგარეო ვალი"],
-      ["debt.service.total", null, "ვალის გადახდა"],
-      ["debt.service.principal", "debt.service.total", "ძირი თანხა"],
-      ["debt.service.interest", "debt.service.total", "პროცენტი"],
-      ["debt.rate.total", null, "საპროცენტო განაკვეთი"],
-      ["debt.rate.domestic", "debt.rate.total", "საშინაო განაკვეთი"],
-      ["debt.rate.external", "debt.rate.total", "საგარეო განაკვეთი"],
+    expect(model.items.map((item) => [item.id, item.parentItemId, item.kaLabel, item.color])).toEqual([
+      ["debt.stock.total", null, "მთლიანი ვალი", "#1E1B16"],
+      ["debt.stock.domestic", "debt.stock.total", "საშინაო ვალი", "#C98632"],
+      ["debt.stock.external", "debt.stock.total", "საგარეო ვალი", "#496F83"],
+      ["debt.service.total", null, "ვალის გადახდა", "#1F6E56"],
+      ["debt.service.principal", "debt.service.total", "ძირი თანხა", "#725B8F"],
+      ["debt.service.interest", "debt.service.total", "პროცენტი", "#B3402A"],
+      ["debt.rate.total", null, "საპროცენტო განაკვეთი", "#1E1B16"],
+      ["debt.rate.domestic", "debt.rate.total", "საშინაო განაკვეთი", "#C98632"],
+      ["debt.rate.external", "debt.rate.total", "საგარეო განაკვეთი", "#496F83"],
     ]);
     expect(model.expandedParentIds).toEqual([
       "debt.stock.total",
