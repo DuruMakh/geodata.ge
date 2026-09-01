@@ -135,3 +135,65 @@ export type ControlYearComparison = {
   external_million_gel: number;
   source_cells: string;
 };
+
+export type GovernmentDebtRateGap = {
+  year: number;
+  debt_scope: DebtScope;
+  availability_status: Exclude<AvailabilityStatus, "available">;
+  reason: string;
+};
+
+export type GovernmentDebtGdpShareCheck = {
+  year: number;
+  debt_total_million_gel: number;
+  gdp_million_gel: number;
+  calculated_share_percent: number;
+  published_share_percent: number;
+  difference_percentage_points: number;
+  comparison_status: "rounding_match" | "possible_gdp_vintage_difference";
+};
+
+export type GovernmentDebtControlComparison = {
+  year: 2019 | 2022;
+  canonical_total_million_gel: number;
+  canonical_domestic_million_gel: number;
+  canonical_external_million_gel: number;
+  control_total_million_gel: number;
+  control_domestic_million_gel: number;
+  control_external_million_gel: number;
+  source_cells: string;
+};
+
+export type GovernmentDebtValidationReport = {
+  status: "complete_with_documented_rate_gaps" | "failed";
+  review_date: "2026-09-01";
+  sources: {
+    rowCount: number;
+    sourceIds: GovernmentDebtSourceId[];
+  };
+  stock: { rowCount: number; observedYears: number[] };
+  actualService: { rowCount: number; observedYears: number[] };
+  interestRates: {
+    rowCount: number;
+    availableCount: number;
+    gaps: GovernmentDebtRateGap[];
+  };
+  forecast: {
+    rowCount: number;
+    paymentYears: number[];
+    snapshotDate: "2025-12-31";
+  };
+  gdpShareChecks: GovernmentDebtGdpShareCheck[];
+  controlComparisons: GovernmentDebtControlComparison[];
+  estimates_created: 0;
+  source_hashes_match: true;
+  normalized_values_reconcile: true;
+};
+
+export type GovernmentDebtPackageBuild = {
+  stockRows: GovernmentDebtStockRow[];
+  actualServiceRows: GovernmentDebtActualServiceRow[];
+  interestRateRows: GovernmentDebtInterestRateRow[];
+  forecastRows: GovernmentDebtForecastRow[];
+  validation: GovernmentDebtValidationReport;
+};

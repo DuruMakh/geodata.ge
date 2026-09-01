@@ -860,3 +860,14 @@ export function readControlWorkbookValues(
     },
   ];
 }
+
+export function parsePublishedGovernmentDebtGdpRatios(
+  n25Page28: string,
+): Map<number, number> {
+  const values = requirePercentSeries(
+    n25Page28,
+    "Government Debt to GDP (SNA-2008)***",
+    13,
+  );
+  return new Map(values.map((value, index) => [2013 + index, value]));
+}

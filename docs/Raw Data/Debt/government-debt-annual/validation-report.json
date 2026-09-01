@@ -1,0 +1,282 @@
+{
+  "status": "complete_with_documented_rate_gaps",
+  "review_date": "2026-09-01",
+  "sources": {
+    "rowCount": 10,
+    "sourceIds": [
+      "mof_public_debt_bulletin_n7",
+      "mof_public_debt_bulletin_n13",
+      "mof_public_debt_bulletin_n19",
+      "mof_public_debt_bulletin_n25",
+      "mof_monthly_debt_report_2026_07",
+      "mof_debt_strategy_2019_2021",
+      "mof_debt_strategy_2022_2025",
+      "mof_debt_strategy_2023_2026",
+      "mof_debt_strategy_2025_2029",
+      "mof_central_government_liabilities_control"
+    ]
+  },
+  "stock": {
+    "rowCount": 39,
+    "observedYears": [
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ]
+  },
+  "actualService": {
+    "rowCount": 39,
+    "observedYears": [
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ]
+  },
+  "interestRates": {
+    "rowCount": 33,
+    "availableCount": 22,
+    "gaps": [
+      {
+        "year": 2015,
+        "debt_scope": "domestic",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "No exact comparable year-end component rate was found in the reviewed official sources; no estimate."
+      },
+      {
+        "year": 2015,
+        "debt_scope": "external",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "No exact comparable year-end component rate was found in the reviewed official sources; no estimate."
+      },
+      {
+        "year": 2016,
+        "debt_scope": "domestic",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "No exact comparable year-end component rate was found in the reviewed official sources; no estimate."
+      },
+      {
+        "year": 2016,
+        "debt_scope": "external",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "No exact comparable year-end component rate was found in the reviewed official sources; no estimate."
+      },
+      {
+        "year": 2017,
+        "debt_scope": "domestic",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "No exact comparable year-end component rate was found in the reviewed official sources; no estimate."
+      },
+      {
+        "year": 2017,
+        "debt_scope": "external",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "No exact comparable year-end component rate was found in the reviewed official sources; no estimate."
+      },
+      {
+        "year": 2018,
+        "debt_scope": "external",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "The reviewed component table excludes the Eurobond, so it is not normalized as the full External Government Debt portfolio rate."
+      },
+      {
+        "year": 2019,
+        "debt_scope": "external",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "The reviewed component table excludes the Eurobond, so it is not normalized as the full External Government Debt portfolio rate."
+      },
+      {
+        "year": 2020,
+        "debt_scope": "external",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "The reviewed component table excludes the Eurobond, so it is not normalized as the full External Government Debt portfolio rate."
+      },
+      {
+        "year": 2025,
+        "debt_scope": "domestic",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "No exact comparable year-end component rate was found in the reviewed official sources; no estimate."
+      },
+      {
+        "year": 2025,
+        "debt_scope": "external",
+        "availability_status": "not_found_in_reviewed_sources",
+        "reason": "No exact comparable year-end component rate was found in the reviewed official sources; no estimate."
+      }
+    ]
+  },
+  "forecast": {
+    "rowCount": 15,
+    "paymentYears": [
+      2026,
+      2027,
+      2028,
+      2029,
+      2030
+    ],
+    "snapshotDate": "2025-12-31"
+  },
+  "gdpShareChecks": [
+    {
+      "year": 2013,
+      "debt_total_million_gel": 8433,
+      "gdp_million_gel": 29137.7,
+      "calculated_share_percent": 28.94188628477882,
+      "published_share_percent": 28.9,
+      "difference_percentage_points": 0.04188628477882261,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2014,
+      "debt_total_million_gel": 9622.9,
+      "gdp_million_gel": 31722.4,
+      "calculated_share_percent": 30.334716162711523,
+      "published_share_percent": 30.3,
+      "difference_percentage_points": 0.034716162711522,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2015,
+      "debt_total_million_gel": 12442.6,
+      "gdp_million_gel": 34548.2,
+      "calculated_share_percent": 36.01519037171257,
+      "published_share_percent": 36,
+      "difference_percentage_points": 0.015190371712570538,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2016,
+      "debt_total_million_gel": 14436,
+      "gdp_million_gel": 36553.3,
+      "calculated_share_percent": 39.49301431060944,
+      "published_share_percent": 39.5,
+      "difference_percentage_points": -0.0069856893905608786,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2017,
+      "debt_total_million_gel": 16062.5,
+      "gdp_million_gel": 41339.8,
+      "calculated_share_percent": 38.85480819936235,
+      "published_share_percent": 38.9,
+      "difference_percentage_points": -0.04519180063764594,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2018,
+      "debt_total_million_gel": 17348.7,
+      "gdp_million_gel": 45374.4,
+      "calculated_share_percent": 38.234555167671644,
+      "published_share_percent": 38.2,
+      "difference_percentage_points": 0.03455516767164113,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2019,
+      "debt_total_million_gel": 19915.7,
+      "gdp_million_gel": 49726.3,
+      "calculated_share_percent": 40.05063718796693,
+      "published_share_percent": 40.1,
+      "difference_percentage_points": -0.04936281203307402,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2020,
+      "debt_total_million_gel": 29672,
+      "gdp_million_gel": 49788.5,
+      "calculated_share_percent": 59.59609146690501,
+      "published_share_percent": 59.6,
+      "difference_percentage_points": -0.003908533094993061,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2021,
+      "debt_total_million_gel": 29811.9,
+      "gdp_million_gel": 60724.1,
+      "calculated_share_percent": 49.0940170377165,
+      "published_share_percent": 49.1,
+      "difference_percentage_points": -0.005982962283503923,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2022,
+      "debt_total_million_gel": 28587.3,
+      "gdp_million_gel": 72860.1,
+      "calculated_share_percent": 39.23587807318408,
+      "published_share_percent": 39.2,
+      "difference_percentage_points": 0.03587807318407954,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2023,
+      "debt_total_million_gel": 31482.2,
+      "gdp_million_gel": 80882.8,
+      "calculated_share_percent": 38.92323213340784,
+      "published_share_percent": 38.9,
+      "difference_percentage_points": 0.023232133407844913,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2024,
+      "debt_total_million_gel": 33169.3,
+      "gdp_million_gel": 93022.3,
+      "calculated_share_percent": 35.657363879413865,
+      "published_share_percent": 35.7,
+      "difference_percentage_points": -0.042636120586138304,
+      "comparison_status": "rounding_match"
+    },
+    {
+      "year": 2025,
+      "debt_total_million_gel": 35934.4,
+      "gdp_million_gel": 104598.1,
+      "calculated_share_percent": 34.354734933043716,
+      "published_share_percent": 34.4,
+      "difference_percentage_points": -0.04526506695628285,
+      "comparison_status": "rounding_match"
+    }
+  ],
+  "controlComparisons": [
+    {
+      "year": 2019,
+      "canonical_total_million_gel": 19915.7,
+      "canonical_domestic_million_gel": 4166,
+      "canonical_external_million_gel": 15749.7,
+      "control_total_million_gel": 20569.7,
+      "control_domestic_million_gel": 4827,
+      "control_external_million_gel": 15742.7,
+      "source_cells": "Sheet2!AX6/AX9/AX15"
+    },
+    {
+      "year": 2022,
+      "canonical_total_million_gel": 28587.3,
+      "canonical_domestic_million_gel": 7195.3,
+      "canonical_external_million_gel": 21392,
+      "control_total_million_gel": 28493.8,
+      "control_domestic_million_gel": 7105.1,
+      "control_external_million_gel": 21388.7,
+      "source_cells": "Sheet2!BJ6/BJ9/BJ15"
+    }
+  ],
+  "estimates_created": 0,
+  "source_hashes_match": true,
+  "normalized_values_reconcile": true
+}
