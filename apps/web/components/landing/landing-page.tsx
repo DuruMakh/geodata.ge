@@ -91,7 +91,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
         >
           {KEY_NUMBERS.map((entry) => (
             <div key={entry.label} data-country-stat className="min-w-0">
-              <div className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] min-[768px]:text-[11px] min-[768px]:tracking-[0.08em]">
+              <div className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] max-[380px]:min-h-[27px] min-[768px]:text-[11px] min-[768px]:tracking-[0.08em]">
                 {entry.label}
               </div>
               <div className="mt-2 min-h-[58px] font-[family-name:var(--font-display)] text-[clamp(22px,7vw,46px)] font-semibold leading-[1.05] tracking-[-0.02em] min-[768px]:min-h-0">

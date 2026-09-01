@@ -37,7 +37,7 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
       </Link>
       <nav
         aria-label="ნავიგაცია"
-        className="flex w-[158px] flex-none justify-end self-stretch gap-4 min-[768px]:w-auto min-[768px]:gap-[26px]"
+        className="flex w-[150px] flex-none justify-end self-stretch gap-4 min-[768px]:w-auto min-[768px]:gap-[26px]"
       >
         <Link
           href="/"

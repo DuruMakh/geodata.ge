@@ -332,7 +332,7 @@ test("landing loads the hero font successfully without requesting it on other ro
 });
 
 test("landing keeps mobile header and statistic geometry stable while fonts load", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize({ width: 320, height: 844 });
   await page.route(/\.(?:woff2|ttf)(?:\?|$)/, async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 2_000));
     const response = await route.fetch();
@@ -341,10 +341,12 @@ test("landing keeps mobile header and statistic geometry stable while fonts load
 
   await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
   const nav = page.getByRole("navigation");
+  const logo = page.getByTestId("site-header-logo").locator("..");
   const heading = page.getByRole("heading", { level: 1, name: "საქართველო ციფრებში" });
   const statisticValues = page.locator("[data-country-stat] > div:nth-child(2)");
   const before = {
     nav: await nav.boundingBox(),
+    logo: await logo.boundingBox(),
     heading: await heading.boundingBox(),
     statisticValues: await Promise.all((await statisticValues.all()).map((value) => value.boundingBox())),
   };
@@ -352,14 +354,18 @@ test("landing keeps mobile header and statistic geometry stable while fonts load
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
   const after = {
     nav: await nav.boundingBox(),
+    logo: await logo.boundingBox(),
     heading: await heading.boundingBox(),
     statisticValues: await Promise.all((await statisticValues.all()).map((value) => value.boundingBox())),
   };
 
   for (const key of ["x", "y", "width", "height"] as const) {
     expect(after.nav?.[key], `navigation ${key}`).toBeCloseTo(before.nav?.[key] ?? Number.NaN, 0);
+    expect(after.logo?.[key], `logo ${key}`).toBeCloseTo(before.logo?.[key] ?? Number.NaN, 0);
     expect(after.heading?.[key], `hero heading ${key}`).toBeCloseTo(before.heading?.[key] ?? Number.NaN, 0);
   }
+  expect(Math.abs((before.nav?.y ?? Number.NaN) - (before.logo?.y ?? Number.NaN))).toBeLessThanOrEqual(1);
+  expect(Math.abs((after.nav?.y ?? Number.NaN) - (after.logo?.y ?? Number.NaN))).toBeLessThanOrEqual(1);
   expect(after.statisticValues).toHaveLength(3);
   for (const [index, box] of after.statisticValues.entries()) {
     for (const key of ["x", "y", "width", "height"] as const) {
