@@ -9,8 +9,14 @@
 // file recalculates a budget number, so a published file and an MCP answer
 // cannot disagree: there is only one implementation of an observation.
 import { createHash } from "node:crypto";
+import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { describeCoverage, type CoverageData } from "./describeCoverage";
-import type { DatasetId, FactQuerySnapshot } from "./types";
+import type { Observation } from "./observations";
+import { queryMinistries } from "./queryMinistries";
+import { queryMunicipal } from "./queryMunicipal";
+import { queryNational } from "./queryNational";
+import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
+import type { Caveat, Coverage, DatasetId, FactQueryResponse, FactQuerySnapshot, ResolvedSource } from "./types";
 
 export type PublicationHeader = {
   schemaVersion: string;
@@ -140,4 +146,174 @@ export function buildManifestFile(
   });
 
   return { fileName: "manifest.json", bytes, rowCount: artifacts.length };
+}
+
+const SUM_WARNING =
+  "ამ ფაილში ერთდროულადაა ჯამები და მათი შემადგენელი ნაწილები. ყველა სტრიქონის შეკრება არასწორ შედეგს იძლევა — გამოიყენეთ level და parentSeriesId.";
+
+type ObservationResult = {
+  data: { observations: Observation[]; coverage: Coverage };
+  meta: { sources: ResolvedSource[]; caveats: Caveat[] };
+};
+
+/**
+ * `status` is deliberately not asserted. A bulk query over every series and
+ * year legitimately reports "partial", because a series that does not exist in
+ * every year produces missing cells - and those cells are published in
+ * `coverage` rather than hidden. Only a non-observations `kind` is a bug.
+ */
+function observationsOf(response: FactQueryResponse, label: string): ObservationResult {
+  if (response.kind !== "observations") {
+    const detail = response.kind === "error" ? response.error.messageEn : response.kind;
+    throw new Error(`${label} returned ${detail}, expected observations`);
+  }
+  return response as unknown as ObservationResult;
+}
+
+function datasetFile(
+  snapshot: FactQuerySnapshot,
+  datasetId: DatasetId,
+  fileName: string,
+  response: FactQueryResponse,
+  supportingValues: Record<string, unknown>,
+): PublicationArtifact {
+  const result = observationsOf(response, fileName);
+  const bytes = serialize({
+    ...publicationHeader(snapshot),
+    datasetId,
+    notice: SUM_WARNING,
+    catalogue: catalogueData(snapshot, datasetId),
+    observations: result.data.observations,
+    coverage: result.data.coverage,
+    supportingValues,
+    // Repeated in full, not by reference: spec 12.1 requires source and caveat
+    // definitions to stay usable when the file is downloaded on its own.
+    sources: result.meta.sources,
+    caveats: result.meta.caveats,
+  });
+
+  return { fileName, bytes, rowCount: result.data.observations.length };
+}
+
+function yearsOf(values: readonly { year: number }[]): number[] {
+  return [...new Set(values.map((value) => value.year))].sort((left, right) => left - right);
+}
+
+/**
+ * Ministries publishes both hierarchy levels in one file (spec 12.1). The two
+ * responses are queried separately because `level` is a request dimension,
+ * then concatenated; every row still carries its own `level`. Sources and
+ * caveats are unioned by id so the file states each one once.
+ */
+function ministriesFile(snapshot: FactQuerySnapshot): PublicationArtifact {
+  const years = yearsOf(snapshot.ministries.facts);
+  const admin = observationsOf(
+    queryMinistries(snapshot, {
+      level: "admin_category",
+      seriesIds: snapshot.ministries.categories.map((category) => category.id),
+      years,
+      measure: "amount_gel",
+    }),
+    "ministries.json (admin_category)",
+  );
+  // Program series are the itemIds of the major_program-level facts.
+  const programSeriesIds = [
+    ...new Set(snapshot.ministries.facts.filter((fact) => fact.level === "major_program").map((fact) => fact.itemId)),
+  ];
+  const programs = observationsOf(
+    queryMinistries(snapshot, { level: "major_program", seriesIds: programSeriesIds, years, measure: "amount_gel" }),
+    "ministries.json (major_program)",
+  );
+
+  const bytes = serialize({
+    ...publicationHeader(snapshot),
+    datasetId: "ministries" satisfies DatasetId,
+    notice: SUM_WARNING,
+    catalogue: catalogueData(snapshot, "ministries"),
+    observations: [...admin.data.observations, ...programs.data.observations],
+    coverage: { admin_category: admin.data.coverage, major_program: programs.data.coverage },
+    supportingValues: { gdpFacts: snapshot.gdpFacts },
+    sources: [
+      ...admin.meta.sources,
+      ...programs.meta.sources.filter(
+        (source) => !admin.meta.sources.some((seen) => seen.sourceId === source.sourceId),
+      ),
+    ],
+    caveats: [
+      ...admin.meta.caveats,
+      ...programs.meta.caveats.filter((caveat) => !admin.meta.caveats.some((seen) => seen.code === caveat.code)),
+    ],
+  });
+
+  return {
+    fileName: "ministries.json",
+    bytes,
+    rowCount: admin.data.observations.length + programs.data.observations.length,
+  };
+}
+
+export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtifact[] {
+  const nationalYears = yearsOf(snapshot.national.facts);
+  const seriesFor = (side: "revenue" | "expenditure") => [
+    ...new Set(snapshot.national.facts.filter((fact) => fact.side === side).map((fact) => fact.itemId)),
+  ];
+  // amount_gel only (spec 12.1): shares and per-resident figures are
+  // reproducible from these denominators, so publishing four measures of every
+  // row would multiply the file to say nothing new.
+  const gdp = { gdpFacts: snapshot.gdpFacts };
+
+  const municipalEntityIds = [
+    ...snapshot.municipal.municipalities
+      .map((municipality) => municipality.code)
+      .filter(
+        (code) => !AGGREGATE_ONLY_MUNICIPAL_CODES.includes(code as (typeof AGGREGATE_ONLY_MUNICIPAL_CODES)[number]),
+      ),
+    ...snapshot.municipal.regions.map((region) => region.id),
+    MUNICIPAL_COUNTRY_ID,
+  ];
+
+  return [
+    datasetFile(
+      snapshot,
+      "national-revenue",
+      "national-revenue.json",
+      queryNational(snapshot, {
+        side: "revenue",
+        seriesIds: seriesFor("revenue"),
+        years: nationalYears,
+        measure: "amount_gel",
+      }),
+      gdp,
+    ),
+    datasetFile(
+      snapshot,
+      "national-expenditure",
+      "national-expenditure.json",
+      queryNational(snapshot, {
+        side: "expenditure",
+        seriesIds: seriesFor("expenditure"),
+        years: nationalYears,
+        measure: "amount_gel",
+      }),
+      gdp,
+    ),
+    ministriesFile(snapshot),
+    datasetFile(
+      snapshot,
+      "municipal-expenditure",
+      "municipal-expenditure.json",
+      queryMunicipal(snapshot, {
+        entityIds: municipalEntityIds,
+        seriesIds: [...snapshot.municipal.functions.map((fn) => fn.id), "municipal.total"],
+        years: yearsOf(snapshot.municipal.functionFacts),
+        measure: "amount_gel",
+      }),
+      { populationFacts: snapshot.municipal.populationFacts },
+    ),
+  ];
+}
+
+export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationArtifact[] {
+  const artifacts = [buildCatalogueFile(snapshot), buildSourcesFile(snapshot), ...buildDatasetFiles(snapshot)];
+  return [...artifacts, buildManifestFile(snapshot, artifacts)];
 }
