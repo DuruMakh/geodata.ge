@@ -395,6 +395,75 @@ Three cells: the roads series for 2006-2008, whose modern parent ministry was cr
 
 Percentage change divides by the earlier value, so a non-positive base makes growth undefined. The absolute difference survives and is still returned. Gated to amounts: percentage measures use a point difference, which subtraction handles fine.
 
+
+## Published bulk files
+
+Seven JSON files are generated at build time from the same verified snapshot the
+query core reads, and served under `/downloads/data/`. They are publications,
+not an API: there is no request-time runtime behind them.
+
+| Public path | Rows | Size | Contents |
+| --- | --- | --- | --- |
+| `/downloads/data/manifest.json` | 6 files | 2 KB | Every published file with its row count, byte size and SHA-256. |
+| `/downloads/data/catalogue.json` | 103 series | 79 KB | The four datasets, their entities, series, hierarchy and exclusions. |
+| `/downloads/data/sources.json` | 104 sources | 264 KB | Every logical source with its public originals or its stated derivation. |
+| `/downloads/data/national-revenue.json` | 242 | 330 KB | Annual state-budget revenue observations. |
+| `/downloads/data/national-expenditure.json` | 286 | 428 KB | Annual state-budget expenditure observations. |
+| `/downloads/data/ministries.json` | 1,364 | 2.25 MB | Administrative categories and major programs, both levels in one file. |
+| `/downloads/data/municipal-expenditure.json` | 9,196 | 12.20 MB | Municipality, region and Georgia rows for the ten functional categories and the total. |
+
+`ministries.json` has no CSV counterpart; it is a new published dataset rather
+than a format conversion. The three existing processed CSVs stay where they
+are, unchanged.
+
+### What the figures are
+
+Every observation is `amount_gel`. Shares and per-resident values are **not**
+precomputed: each file carries the denominators needed to reproduce its allowed
+ratios instead — `supportingValues.gdpFacts` for the national and ministries
+files, `supportingValues.populationFacts` for the municipal one. Publishing four
+measures of every row would multiply the files to say nothing new.
+
+Each file is self-contained. It repeats its own `catalogue`, `coverage`,
+`sources` and `caveats` in full rather than by reference, so a download read on
+its own — without `llms.txt` and without the manifest — still states what the
+figures mean, which cells are missing, where they came from and how they are
+limited. Every file also carries `schemaVersion`, `dataVersion`,
+`releaseCommit`, `generatedAt` and the CC BY 4.0 licence and attribution.
+
+### Rows must not be summed
+
+These files deliberately contain overlapping totals and their components, so
+that both can be inspected. Every row carries `level`, `parentSeriesId` and
+`entityType`, and each file repeats the warning in its `notice` field: adding
+every row together double-counts. A municipality's rows sit inside its region's,
+which sit inside Georgia's; a total sits above its functional categories.
+
+### Excluded municipalities
+
+Codes `05`, `42`, `43`, `46` and `64` never appear as territorial rows, and
+their individual contribution amounts are never exposed. They are named in
+`catalogue.exclusions` with a reason, so a consumer can tell an excluded
+municipality from a missing one.
+
+### Which originals a row cites
+
+`documentIds` names only the originals that support that row. The municipality
+budget-history source archives one workbook per municipality, so a single
+municipality's figure cites its own workbook plus the cross-municipality
+functional-classification workbook for that year — not all 75. A region cites
+its members' workbooks; the Georgia row cites every served municipality's,
+because it really is built from all of them.
+
+### Regeneration and staleness
+
+`npm run data:prepare-fact-query-publications` writes the files; it runs last in
+the `prebuild` chain, after `data:prepare-public-datasets`, which clears the
+output directory before writing its CSVs. `npm run data:check-fact-query-publications`
+(part of `npm run data:validate`) fails the build if a published file drifts
+from what the current snapshot produces, and separately verifies the on-disk
+manifest's hashes and byte sizes against the on-disk files.
+
 ## Keeping this document true
 
 `apps/web/tests/factQuery/caveats/documented.test.ts` fails if a registered code is missing from this file, so the catalogue cannot grow without the documentation growing with it. It deliberately does not check the prose: a test can prove a code is mentioned, not that the sentence beside it is right. That stays a review responsibility.
