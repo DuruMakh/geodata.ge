@@ -101,6 +101,10 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
   const forecastYears = model.forecastStartYear === null
     ? []
     : model.years.filter((year) => year >= model.forecastStartYear!);
+  const forecastBoundaryYear = props.facts
+    .filter((fact) => fact.family === "service" && fact.status === "projection_existing_portfolio")
+    .map((fact) => fact.year)
+    .sort((left, right) => left - right)[0] ?? null;
 
   return (
     <main
@@ -204,8 +208,8 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                 years={familyYears}
                 range={props.range}
                 onChange={props.onRangeChange}
-                marker={props.family === "service" && model.forecastStartYear !== null
-                  ? { year: model.forecastStartYear, label: "პროგნოზი" }
+                marker={props.family === "service" && forecastBoundaryYear !== null
+                  ? { year: forecastBoundaryYear, label: "პროგნოზი" }
                   : undefined}
               />
               {props.family === "service" ? (
@@ -231,7 +235,6 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
           <DebtSeriesPanel
             items={model.items}
             facts={props.facts}
-            activeFamily={props.family}
             selectedIds={props.selectedIds}
             expandedParentIds={model.expandedParentIds}
             onSelectionChange={props.onSelectionChange}

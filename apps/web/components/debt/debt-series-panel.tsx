@@ -3,13 +3,12 @@
 import { useState, type ReactNode } from "react";
 import type { GovernmentDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
-import type { DebtFamily, DebtSeriesId, ServedGovernmentDebtFact } from "../../lib/servedRows";
+import type { DebtSeriesId, ServedGovernmentDebtFact } from "../../lib/servedRows";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 
 type DebtSeriesPanelProps = {
   items: GovernmentDebtExplorerModel["items"];
   facts: ServedGovernmentDebtFact[];
-  activeFamily: DebtFamily;
   selectedIds: DebtSeriesId[];
   expandedParentIds: DebtSeriesId[];
   onSelectionChange: (ids: DebtSeriesId[]) => void;
@@ -21,15 +20,15 @@ function matches(item: GovernmentDebtExplorerModel["items"][number], query: stri
   return `${item.kaLabel} ${item.enLabel} ${item.id}`.toLowerCase().includes(query);
 }
 
-function formatLatest(fact: ServedGovernmentDebtFact | undefined): string {
+function formatSummary(fact: ServedGovernmentDebtFact | undefined, latestYear: number | undefined): string {
   if (!fact || fact.value === null) return MISSING;
-  return fact.family === "rate" ? formatShare(fact.value / 100) : formatAmount(fact.value);
+  const value = fact.family === "rate" ? formatShare(fact.value / 100) : formatAmount(fact.value);
+  return fact.family === "rate" && fact.year !== latestYear ? `${value} · ${fact.year}` : value;
 }
 
 export function DebtSeriesPanel({
   items,
   facts,
-  activeFamily,
   selectedIds,
   expandedParentIds,
   onSelectionChange,
@@ -39,12 +38,14 @@ export function DebtSeriesPanel({
   const [query, setQuery] = useState("");
   const [expandedIds, setExpandedIds] = useState<DebtSeriesId[]>(expandedParentIds);
   const normalizedQuery = query.trim().toLowerCase();
-  const activeIds = items.filter((item) => item.family === activeFamily).map((item) => item.id);
-  const latestBySeries = new Map<DebtSeriesId, ServedGovernmentDebtFact>();
+  const latestYearBySeries = new Map<DebtSeriesId, number>();
+  const summaryBySeries = new Map<DebtSeriesId, ServedGovernmentDebtFact>();
 
   for (const fact of facts) {
-    const current = latestBySeries.get(fact.seriesId);
-    if (!current || fact.year > current.year) latestBySeries.set(fact.seriesId, fact);
+    latestYearBySeries.set(fact.seriesId, Math.max(latestYearBySeries.get(fact.seriesId) ?? fact.year, fact.year));
+    if (fact.value === null || fact.status !== "actual") continue;
+    const current = summaryBySeries.get(fact.seriesId);
+    if (!current || fact.year > current.year) summaryBySeries.set(fact.seriesId, fact);
   }
 
   const visibleRows: Array<{
@@ -74,8 +75,6 @@ export function DebtSeriesPanel({
   }
 
   const hasSelection = selectedIds.length > 0;
-  const allSelected = activeIds.every((id) => selectedIds.includes(id));
-
   return (
     <aside
       aria-label="სერიები"
@@ -86,10 +85,11 @@ export function DebtSeriesPanel({
         onQueryChange={setQuery}
         searchPlaceholder="ძებნა"
         selectedCount={selectedIds.length}
-        totalCount={activeIds.length}
+        totalCount={items.length}
         hasSelection={hasSelection}
-        allSelected={allSelected}
-        onToggleAll={() => onSelectionChange(hasSelection ? [] : activeIds)}
+        allSelected={false}
+        onToggleAll={() => onSelectionChange([])}
+        allowSelectAll={false}
         hasVisibleMatches={normalizedQuery === "" || visibleRows.length > 0}
       >
         {visibleRows.map(({ item, isChild, hasChildren, expanded, expansionLocked }) => (
@@ -98,7 +98,7 @@ export function DebtSeriesPanel({
             id={item.id}
             label={item.kaLabel}
             color={item.color}
-            value={formatLatest(latestBySeries.get(item.id))}
+            value={formatSummary(summaryBySeries.get(item.id), latestYearBySeries.get(item.id))}
             selected={selectedIds.includes(item.id)}
             level={isChild ? "debt_child" : "debt_parent"}
             parentId={item.parentItemId}
@@ -106,6 +106,7 @@ export function DebtSeriesPanel({
             hasChildren={hasChildren}
             expanded={expanded}
             expansionLocked={expansionLocked}
+            expansionLabel={`${item.kaLabel} — ქვესერიების ${expanded ? "ჩაკეცვა" : "გაშლა"}`}
             showRail={isChild || expanded}
             isChild={isChild}
             onToggle={() => onToggle(item.id)}
