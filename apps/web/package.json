@@ -91,6 +91,7 @@
     "prisma:deploy": "prisma migrate deploy"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "csv-parse": "^6.2.1",

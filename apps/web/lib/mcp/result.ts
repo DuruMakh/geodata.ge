@@ -42,7 +42,8 @@ export const LIMITS = {
 } as const;
 
 export type ToolResult = {
-  structuredContent?: unknown;
+  /** MCP types structured content as a record, so match that rather than `unknown`. */
+  structuredContent?: Record<string, unknown>;
   content: { type: "text"; text: string }[];
   isError: boolean;
 };
@@ -201,7 +202,9 @@ export function toolResult(response: FactQueryResponse): ToolResult {
   // schema, so it carries text only.
   return response.kind === "error"
     ? { content, isError: true }
-    : { structuredContent: response, content, isError: false };
+    : // The envelope is a plain JSON object, but a discriminated union is not
+      // implicitly assignable to an index-signature type, so state the fact.
+      { structuredContent: response as unknown as Record<string, unknown>, content, isError: false };
 }
 
 export function tooLargeResponse(
