@@ -546,6 +546,12 @@ Proposed launch settings, not changes already made to the hosting account.
 | Request duration | Maximum 10 seconds; cancel abandoned work where supported. |
 | Pause control | A documented switch that disables `/mcp` without disabling static pages or downloads. |
 
+**Correction, measured during Part 3 implementation.** The observation-cell and serialized-size rows above cannot both hold for municipal data. A compliant 495-cell request (45 municipalities x `municipal.total` x 11 years) serializes to 517.0 KiB, at roughly 936 bytes of JSON per municipal observation; before the `meta.sources` narrowing that same request was 541.9 KiB. A request can therefore satisfy the 500-cell cap and still produce a response the 512 KiB ceiling must refuse.
+
+The **byte ceiling is the binding gate**. The cell cap stays as a cheap pre-check that avoids serializing an obviously oversized result. An over-ceiling result is refused whole with narrowing guidance and a link to the bulk files, never trimmed: sources and warnings are not dropped to make a result fit.
+
+The "equivalent text representation" is a compact table, not a second serialization of the envelope. Equivalent means equivalent in content, not in structure, and both representations are counted against the one ceiling. Measured, the text twin costs about 34% of the JSON it accompanies rather than doubling it.
+
 Enforce shared quotas with platform controls or a minimal approved shared counter, not process-local memory. A counter failure stops expensive MCP processing with a retryable service error. Do not quietly disable limits.
 
 Reject over-limit requests with the appropriate status and retry guidance. Fixed single-POST requests are supported; reject oversized or unsupported protocol batches before processing.
