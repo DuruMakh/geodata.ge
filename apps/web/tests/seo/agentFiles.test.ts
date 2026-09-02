@@ -16,6 +16,9 @@ const requiredTargets = [
   "https://fiscal.ge/methodology/expenditure",
   "https://fiscal.ge/methodology/revenue",
   "https://fiscal.ge/methodology/municipalities",
+  "https://fiscal.ge/downloads/data/manifest.json",
+  "https://fiscal.ge/downloads/data/catalogue.json",
+  "https://fiscal.ge/downloads/data/sources.json",
   "https://fiscal.ge/about",
   "https://fiscal.ge/sitemap.xml",
 ] as const;
@@ -49,7 +52,11 @@ describe("Fiscal.ge agent instructions", () => {
     process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
     const content = await readFile(llmsPath, "utf8");
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]!);
-    const htmlTargets = targets.filter((target) => new URL(target).pathname !== "/sitemap.xml");
+    // Downloads are published files, not pages: they are deliberately absent
+    // from the sitemap, which lists public HTML routes. Spec section 16 said
+    // only requiredTargets needed updating here; it missed this filter, which
+    // treated any non-sitemap link as an HTML page owing a sitemap entry.
+    const htmlTargets = targets.filter((target) => !/\.(xml|json|csv)$/.test(new URL(target).pathname));
     const sitemapTargets = (await sitemap()).map((entry) => entry.url);
 
     expect(htmlTargets.every((target) => sitemapTargets.includes(target))).toBe(true);

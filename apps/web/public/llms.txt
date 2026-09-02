@@ -4,7 +4,7 @@
 
 **When to use Fiscal.ge:** Use it to understand, compare, and cite the published budget data, its scope, and its documented sources.
 
-The data is annual, so it does not provide sub-annual or live budget reporting. Fiscal.ge has no public API. Use the published figures only as documented, and do not invent values when data is unavailable or outside the stated scope.
+The data is annual, so it does not provide sub-annual or live budget reporting. Fiscal.ge has no public API; the bulk files below are static publications, not a query service. Each carries its own sources, caveats and coverage — read them before citing a figure. Use the published figures only as documented, and do not invent values when data is unavailable or outside the stated scope.
 
 ## Core data
 
@@ -21,6 +21,14 @@ The data is annual, so it does not provide sub-annual or live budget reporting. 
 - [Expenditure methodology](https://fiscal.ge/methodology/expenditure) — national-expenditure sources and processing.
 - [Revenue methodology](https://fiscal.ge/methodology/revenue) — national-revenue sources and processing.
 - [Municipal methodology](https://fiscal.ge/methodology/municipalities) — municipal-expenditure sources and processing.
+
+## Bulk data files
+
+- [Data manifest](https://fiscal.ge/downloads/data/manifest.json) — every published file with its row count, byte size and SHA-256.
+- [Capability catalogue](https://fiscal.ge/downloads/data/catalogue.json) — the datasets, entities, series and exclusions that exist.
+- [Source resolution](https://fiscal.ge/downloads/data/sources.json) — every logical source with its public originals or its stated derivation.
+
+The manifest lists the four dataset files, so they are reachable without repeating them here. Figures are published in GEL with the GDP and population denominators alongside; shares and per-resident values are reproducible from those, not precomputed.
 
 ## Site navigation
 

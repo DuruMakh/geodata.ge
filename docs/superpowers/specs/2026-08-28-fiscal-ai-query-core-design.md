@@ -754,7 +754,7 @@ Pure TypeScript. No route, no runtime, no schema change, nothing user-visible. A
 
 The manifest, catalogue, sources and four dataset JSON files under `/downloads/data/`, generated at build time from the Part 1 snapshot. Links added beside the existing processed-data links on the methodology pages, and the JSON files added to `/llms.txt`.
 
-No route, no runtime, no inference, no operating cost. The "no public API" statement in `/llms.txt` **remains true and unchanged** in this part: static files are publications, not an API. Only `requiredTargets` in `apps/web/tests/seo/agentFiles.test.ts` needs updating, for the added links.
+No route, no runtime, no inference, no operating cost. The "no public API" statement in `/llms.txt` **remains true and unchanged** in this part: static files are publications, not an API. Two assertions in `apps/web/tests/seo/agentFiles.test.ts` need updating, not one: `requiredTargets`, for the added links, and the second test's `htmlTargets` filter, which excluded only `/sitemap.xml` and so treated a published `.json` download as an HTML page owing a sitemap entry. Downloads are files, not routes, and are correctly absent from the sitemap.
 
 **Gate:** published JSON figures match the explorer for a sampled set of year and category combinations, checked by downloading the file. Manifest hashes and byte counts match the artifacts. `npm run check` and the `agentFiles` test pass.
 
