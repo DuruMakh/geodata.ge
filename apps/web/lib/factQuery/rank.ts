@@ -400,6 +400,9 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   const status: "ok" | "partial" | "empty" =
     entries.length === 0 ? "empty" : exclusions.length === 0 ? "ok" : "partial";
 
+  // No citedDocumentIds: a RankEntry carries no documentIds to narrow by,
+  // and a ranking genuinely draws on every ranked entity's originals, so the
+  // full document list is the honest evidence here rather than an oversight.
   const meta = buildResponseMeta(snapshot, { sources, caveats });
 
   const data: RankData = {

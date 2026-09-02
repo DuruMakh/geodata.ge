@@ -12,6 +12,20 @@ import type { Caveat, FactQuerySnapshot, ResolvedSource, ResponseMeta } from "./
 export type ResponseMetaExtra = {
   sources?: ResolvedSource[];
   caveats?: Caveat[];
+  /**
+   * Every documentId the returned rows actually cite. When supplied, each
+   * source's `documents` is narrowed to it.
+   *
+   * Without this a one-cell municipal answer carried all 75 municipal
+   * workbooks - 77.9 KiB of an 80.0 KiB response - to support a row citing two
+   * of them. `documentIds` was narrowed per observation in Part 2; `meta` was
+   * not, so the evidence block still answered "which documents exist for this
+   * source" rather than "which documents support this answer".
+   *
+   * Omitted by getSources, whose result IS the document listing, and by
+   * describeCoverage and rank, whose results carry no documentIds to narrow by.
+   */
+  citedDocumentIds?: readonly string[];
 };
 
 /**
@@ -23,6 +37,9 @@ export type ResponseMetaExtra = {
  * both default to `[]` rather than forcing every call site to pass them.
  */
 export function buildResponseMeta(snapshot: FactQuerySnapshot, extra?: ResponseMetaExtra): ResponseMeta {
+  const sources = extra?.sources ?? [];
+  const cited = extra?.citedDocumentIds === undefined ? null : new Set(extra.citedDocumentIds);
+
   return {
     schemaVersion: snapshot.schemaVersion,
     dataVersion: snapshot.dataVersion,
@@ -30,7 +47,17 @@ export function buildResponseMeta(snapshot: FactQuerySnapshot, extra?: ResponseM
     generatedAt: snapshot.generatedAt,
     licence: "CC BY 4.0",
     licenceUrl: "https://creativecommons.org/licenses/by/4.0/",
-    sources: extra?.sources ?? [],
+    sources:
+      cited === null
+        ? sources
+        : sources.map((source) => {
+            const kept = source.documents.filter((document) => cited.has(document.documentId));
+            // Narrowing points at the right original; it never hides
+            // provenance. A source the rows cite must always show something a
+            // reader can open, so an empty filter falls back to everything the
+            // source archives - the same rule resolveDocumentIds applies.
+            return kept.length > 0 ? { ...source, documents: kept } : source;
+          }),
     caveats: extra?.caveats ?? [],
   };
 }

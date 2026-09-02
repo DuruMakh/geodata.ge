@@ -308,7 +308,15 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
         ? "ok"
         : "partial";
 
-  const meta = buildResponseMeta(snapshot, { sources: endpointResult.meta.sources, caveats });
+  const meta = buildResponseMeta(snapshot, {
+    sources: endpointResult.meta.sources,
+    caveats,
+    // A comparison's evidence is whatever supports its two endpoints, not
+    // every document of every source the underlying query touched.
+    citedDocumentIds: [
+      ...new Set(comparisons.flatMap((comparison) => [...comparison.from.documentIds, ...comparison.to.documentIds])),
+    ],
+  });
 
   return {
     kind: "comparisons",

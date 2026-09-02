@@ -537,7 +537,11 @@ export function queryMunicipal(
   };
 
   const status: "ok" | "partial" | "empty" = returnedCount === 0 ? "empty" : returnedCount === expectedCount ? "ok" : "partial";
-  const meta = buildResponseMeta(snapshot, { sources: resolvedSources, caveats });
+  const meta = buildResponseMeta(snapshot, {
+    sources: resolvedSources,
+    caveats,
+    citedDocumentIds: [...new Set(observations.flatMap((observation) => observation.documentIds))],
+  });
 
   return { kind: "observations", status, data: { observations, coverage }, meta };
 }
