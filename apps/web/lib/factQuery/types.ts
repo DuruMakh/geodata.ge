@@ -79,6 +79,22 @@ export type PublicDocument = {
    */
   licenceId: string | null;
   attribution: string | null;
+  /**
+   * What this document IS to the source that cites it.
+   *
+   * "primary" - the publication of these figures.
+   * "derivation_upstream" - an INPUT to a calculation fiscal.ge performed. The
+   *   derived figures themselves have no publication; this document does not
+   *   contain them.
+   *
+   * Without this the two carried an identical field set, and the only
+   * discriminant was the sibling `derivation` field on the source. Any consumer
+   * rendering `documents` without checking that first would present the Adjara
+   * republican-payments PDF as the publication of the consolidated total, which
+   * is exactly the "dressed up as a primary publication" failure the
+   * non-negotiable warns about.
+   */
+  role: "primary" | "derivation_upstream";
 };
 
 export type ResolvedSource = {

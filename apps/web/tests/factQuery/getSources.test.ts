@@ -123,9 +123,9 @@ describe("getSources", () => {
     });
 
     it("does not hide provenance when a filter would leave nothing", () => {
-      // A year no document covers must not turn into "this figure has no
+      // A filter no document matches must not turn into "this figure has no
       // source" - the unnarrowed list comes back instead.
-      const result = getSources(snapshot, { sourceIds: [grouped], years: [1801] });
+      const result = getSources(snapshot, { sourceIds: [grouped], datasetId: "national-revenue" });
       const source = data(result).sources[0]!;
 
       expect(source.documents.length).toBe(source.documentCount);
@@ -139,7 +139,7 @@ describe("getSources", () => {
       // document from another year, byte-identical to a genuine match.
       const notRequested = getSources(snapshot, { sourceIds: [grouped] });
       const applied = getSources(snapshot, { sourceIds: [grouped], years: [2020] });
-      const dropped = getSources(snapshot, { sourceIds: [grouped], years: [1801] });
+      const dropped = getSources(snapshot, { sourceIds: [grouped], datasetId: "national-revenue" });
 
       expect(data(notRequested).sources[0]!.narrowingOutcome).toBe("not_requested");
       expect(data(applied).sources[0]!.narrowingOutcome).toBe("applied");
@@ -149,7 +149,7 @@ describe("getSources", () => {
     it("distinguishes a real single-document match from a dropped filter", () => {
       const single = "source.mof_2017_revenue_form1_pdf";
       const match = getSources(snapshot, { sourceIds: [single], years: [2017] });
-      const miss = getSources(snapshot, { sourceIds: [single], years: [1801] });
+      const miss = getSources(snapshot, { sourceIds: [single], years: [2020] });
 
       // These two returned JSON-identical objects.
       expect(data(match).sources[0]!.narrowingOutcome).toBe("applied");
@@ -192,5 +192,50 @@ describe("getSources", () => {
 
     expect(meta.licence).toBe("CC BY 4.0");
     expect(meta.dataVersion).toBe(snapshot.dataVersion);
+  });
+
+  describe("strict on every id namespace, not just source ids", () => {
+    it("rejects an unknown entity id instead of returning the full list", () => {
+      const result = getSources(snapshot, {
+        sourceIds: ["source.municipal_mof_annual_and_history_workbooks"],
+        entityIds: ["not-a-code"],
+      });
+
+      expect(result.kind).toBe("error");
+      expect(errorOf(result).code).toBe("unknown_entity");
+      expect((errorOf(result).validChoices ?? []).length).toBeGreaterThan(0);
+    });
+
+    it("rejects a year outside coverage", () => {
+      const result = getSources(snapshot, {
+        sourceIds: ["source.municipal_mof_annual_and_history_workbooks"],
+        years: [1801],
+      });
+
+      expect(result.kind).toBe("error");
+      expect(errorOf(result).code).toBe("year_out_of_range");
+    });
+
+    it("accepts a real municipality code and a covered year", () => {
+      const result = getSources(snapshot, {
+        sourceIds: ["source.municipal_mof_annual_and_history_workbooks"],
+        entityIds: ["11"],
+        years: [2020],
+      });
+
+      expect(result.kind).toBe("sources");
+    });
+
+    it("does not narrow a derived source away from its stated inputs", () => {
+      const result = getSources(snapshot, {
+        sourceIds: ["source.adjara_consolidated_budget"],
+        years: [2020],
+      });
+
+      // Both upstreams stay: the derivation sentence describes a calculation
+      // over both, so showing one would leave it unsupported.
+      expect(data(result).sources[0]!.documents.length).toBe(2);
+      expect(data(result).sources[0]!.narrowingOutcome).toBe("not_requested");
+    });
   });
 });

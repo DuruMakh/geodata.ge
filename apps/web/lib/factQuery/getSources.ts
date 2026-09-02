@@ -9,6 +9,7 @@
 // narrowing never hides provenance: a filter that would leave a source with no
 // documents at all is dropped rather than applied, because "here is the source
 // with nothing behind it" is a worse answer than an unfiltered list.
+import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { buildResponseMeta } from "./meta";
 import { getSourcesInput } from "./schemas";
 import { selectSources } from "./sources";
@@ -128,6 +129,43 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     });
   }
 
+  // Strict on every id namespace, not just source ids. An unknown entity or an
+  // impossible year used to return status "ok" with the full unnarrowed list,
+  // so a caller asking about a municipality that does not exist got a
+  // confident-looking answer about a different one.
+  const knownEntityIds = new Set<string>([
+    MUNICIPAL_COUNTRY_ID,
+    ...snapshot.municipal.regions.map((region) => region.id),
+    ...snapshot.municipal.municipalities.map((municipality) => municipality.code),
+  ]);
+  const unknownEntityIds = (input.entityIds ?? []).filter((id) => !knownEntityIds.has(id));
+  if (unknownEntityIds.length > 0) {
+    return errorResponse(snapshot, {
+      code: "unknown_entity",
+      messageKa: `უცნობი ერთეულის იდენტიფიკატორი: ${unknownEntityIds.join(", ")}.`,
+      messageEn: `Unknown entity id(s): ${unknownEntityIds.join(", ")}.`,
+      retryable: false,
+      validChoices: Array.from(knownEntityIds).sort(),
+    });
+  }
+
+  const coveredYears = [
+    ...snapshot.national.facts.map((f) => f.year),
+    ...snapshot.ministries.facts.map((f) => f.year),
+    ...snapshot.municipal.totalFacts.map((f) => f.year),
+  ];
+  const minYear = Math.min(...coveredYears);
+  const maxYear = Math.max(...coveredYears);
+  const outOfRangeYears = (input.years ?? []).filter((year) => year < minYear || year > maxYear);
+  if (outOfRangeYears.length > 0) {
+    return errorResponse(snapshot, {
+      code: "year_out_of_range",
+      messageKa: `მოთხოვნილი წელი (${outOfRangeYears.join(", ")}) სცილდება დაფარვის საზღვრებს (${minYear}–${maxYear}).`,
+      messageEn: `Requested year(s) ${outOfRangeYears.join(", ")} fall outside the covered range (${minYear}-${maxYear}).`,
+      retryable: false,
+    });
+  }
+
   const hasNarrowing =
     input.datasetId !== undefined || (input.years?.length ?? 0) > 0 || (input.entityIds?.length ?? 0) > 0;
 
@@ -136,7 +174,11 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
 
     let narrowingOutcome: ResolvedSourceView["narrowingOutcome"] = "not_requested";
 
-    if (hasNarrowing) {
+    // A derived source is exempt. Its documents are the inputs to the stated
+    // calculation, so showing one of the two Adjara republican-payments
+    // originals beside a derivation reading "members plus republican payments"
+    // would leave the sentence unsupported by what is displayed.
+    if (hasNarrowing && source.derivation === null) {
       const filtered = source.documents.filter((document) => {
         // A document with no datasetId is NOT treated as matching every dataset.
         // Exempting it returned the Geostat municipal-population workbook as a

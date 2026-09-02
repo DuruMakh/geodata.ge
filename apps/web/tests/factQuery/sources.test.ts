@@ -369,4 +369,27 @@ describe("public source resolution", () => {
       expect(snapshot.sources.length).toBeGreaterThan(100);
     });
   });
+
+  describe("an upstream original is not shaped like a publication", () => {
+    it("marks the derived source documents as derivation upstreams", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const derived = snapshot.sources.find((s) => s.sourceId === "source.adjara_consolidated_budget");
+
+      // These two PDFs publish the republican payments, not the consolidated
+      // total. Only the sibling derivation field distinguished them before, so a
+      // consumer rendering documents would present one as the publication.
+      expect(derived?.documents.map((d) => d.role)).toEqual(["derivation_upstream", "derivation_upstream"]);
+    });
+
+    it("marks every ordinary document primary", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const roles = new Set(
+        snapshot.sources
+          .filter((s) => s.derivation === null)
+          .flatMap((s) => s.documents.map((d) => d.role)),
+      );
+
+      expect(Array.from(roles)).toEqual(["primary"]);
+    });
+  });
 });

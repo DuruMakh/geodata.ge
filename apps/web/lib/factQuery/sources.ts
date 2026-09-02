@@ -36,7 +36,7 @@ export function splitSourceIds(raw: string): string[] {
  * filesystem); resolvePublicSources below only ever compares `repositoryPath`
  * strings already in memory.
  */
-export type ManifestDocument = PublicDocument & {
+export type ManifestDocument = Omit<PublicDocument, "role"> & {
   /**
    * Repo-relative path this document was archived from, e.g.
    * "docs/Raw Data/Expenditure/treasury.ge/2017-....pdf". Matched against
@@ -188,13 +188,13 @@ export function resolvePublicSources(input: ResolvePublicSourcesInput): Resolved
     const seenDocumentIds = new Set<string>();
     const documents: PublicDocument[] = [];
 
-    const push = (doc: ManifestDocument | undefined) => {
+    const push = (doc: ManifestDocument | undefined, role: PublicDocument["role"] = "primary") => {
       if (!doc || seenDocumentIds.has(doc.documentId)) return;
       seenDocumentIds.add(doc.documentId);
       // repositoryPath is an internal path and is deliberately dropped here:
       // ResolvedSource is public output.
       const { repositoryPath: _internal, ...publicFields } = doc;
-      documents.push(publicFields);
+      documents.push({ ...publicFields, role });
     };
 
     const upstreamIds = DERIVED_SOURCE_UPSTREAMS[row.sourceId];
@@ -211,7 +211,7 @@ export function resolvePublicSources(input: ResolvePublicSourcesInput): Resolved
             `DERIVED_SOURCE_UPSTREAMS names upstream "${id}" for ${row.sourceId}, but no manifest document has that id.`,
           );
         }
-        push(doc);
+        push(doc, "derivation_upstream");
       }
     } else {
       for (const filePath of splitFilePaths(row.sourceUrlOrFile)) {
