@@ -12,6 +12,8 @@ export type DatasetJsonLdInput = {
   lastYear: number;
   dateModified: string;
   downloadPath: `/downloads/data/${string}.csv`;
+  /** Published JSON companions to the CSV, in the order they should be listed. */
+  jsonDownloadPaths?: readonly `/downloads/data/${string}.json`[];
 };
 
 export type ExplorerDatasetJsonLdInput = {
@@ -126,6 +128,14 @@ export function datasetJsonLd(input: DatasetJsonLdInput) {
         encodingFormat: "text/csv",
         contentUrl: absoluteUrl(input.origin, input.downloadPath),
       },
+      // The JSON publications are a different format of the same dataset, not
+      // a different dataset, so they belong in this distribution list rather
+      // than in a Dataset node of their own.
+      ...(input.jsonDownloadPaths ?? []).map((jsonPath) => ({
+        "@type": "DataDownload" as const,
+        encodingFormat: "application/json",
+        contentUrl: absoluteUrl(input.origin, jsonPath),
+      })),
     ],
   };
 }

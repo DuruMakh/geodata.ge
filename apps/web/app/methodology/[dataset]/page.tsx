@@ -42,6 +42,15 @@ const DATASET_DOWNLOADS = {
   municipalities: "/downloads/data/municipal-expenditure.csv",
 } as const;
 
+// Spec 12.2: the expenditure methodology links both the expenditure and the
+// ministries JSON. ministries.json has no CSV counterpart in this family, so
+// this page is its only published entry point.
+const DATASET_JSON_DOWNLOADS = {
+  expenditure: ["/downloads/data/national-expenditure.json", "/downloads/data/ministries.json"],
+  revenue: ["/downloads/data/national-revenue.json"],
+  municipalities: ["/downloads/data/municipal-expenditure.json"],
+} as const;
+
 export async function generateMetadata({ params }: MethodologyDatasetPageProps): Promise<Metadata> {
   const dataset = validatedDataset((await params).dataset);
   const content = METHODOLOGY_CONTENT[dataset];
@@ -92,6 +101,7 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
           lastYear: coverage.lastYear,
           dateModified: content.reviewedAt,
           downloadPath: DATASET_DOWNLOADS[dataset],
+          jsonDownloadPaths: DATASET_JSON_DOWNLOADS[dataset],
         })}
         testId="dataset-json-ld"
       />
@@ -101,6 +111,7 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
         rows={publicRows}
         archiveSummary={archiveSummaries[dataset]}
         processedDataHref={DATASET_DOWNLOADS[dataset]}
+        processedDataJsonHrefs={DATASET_JSON_DOWNLOADS[dataset]}
         breadcrumbItems={[
           { name: "მთავარი", path: "/" },
           { name: "მეთოდოლოგია", path: "/methodology" },
