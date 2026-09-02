@@ -115,10 +115,18 @@ export function resolveDocumentIds(
   const documentsBySourceId = new Map(resolvedSources.map((source) => [source.sourceId, source.documents]));
   const seen = new Set<string>();
   const documentIds: string[] = [];
+  // Hoisted out of the per-document loop: the matcher is called once per
+  // document per row, and rebuilding the lookup each time made a full
+  // municipal query 5.6x slower.
+  const codeOwners = scope === undefined ? null : new Map<string, string | undefined>();
 
   const supports = (document: PublicDocument): boolean => {
-    if (scope === undefined) return true;
-    const owner = namedMunicipality(document.documentId, scope.allCodes);
+    if (scope === undefined || codeOwners === null) return true;
+    let owner = codeOwners.get(document.documentId);
+    if (!codeOwners.has(document.documentId)) {
+      owner = namedMunicipality(document.documentId, scope.allCodes);
+      codeOwners.set(document.documentId, owner);
+    }
     // Names a municipality: keep it only for the entities this row covers.
     if (owner !== undefined) return scope.entityCodes.includes(owner);
     // Names none: a cross-municipality workbook, narrowed by its reviewed
@@ -128,8 +136,20 @@ export function resolveDocumentIds(
   };
 
   for (const sourceId of sourceIds) {
-    for (const document of documentsBySourceId.get(sourceId) ?? []) {
-      if (seen.has(document.documentId) || !supports(document)) continue;
+    const documents = documentsBySourceId.get(sourceId) ?? [];
+    const supported = documents.filter(supports);
+    // Narrowing points at the right original; it never hides provenance
+    // (the contract getSources states at its own matcher). If the filter
+    // empties a source that HAS documents, this row would cite a source and
+    // then show nothing to look at - worse than showing an imprecise
+    // original. Fall back to everything the source archives.
+    //
+    // This is reachable: source.treasury_consolidated_revenue_actual is cited
+    // on region.adjara for 2016-2025 but archives only a 2015 form. The
+    // fallback keeps that visible rather than silently dropping it, so the
+    // underlying metadata gap stays inspectable instead of disappearing.
+    for (const document of supported.length > 0 ? supported : documents) {
+      if (seen.has(document.documentId)) continue;
       seen.add(document.documentId);
       documentIds.push(document.documentId);
     }

@@ -402,15 +402,26 @@ Seven JSON files are generated at build time from the same verified snapshot the
 query core reads, and served under `/downloads/data/`. They are publications,
 not an API: there is no request-time runtime behind them.
 
-| Public path | Rows | Size | Contents |
-| --- | --- | --- | --- |
-| `/downloads/data/manifest.json` | 6 files | 2 KB | Every published file with its row count, byte size and SHA-256. |
-| `/downloads/data/catalogue.json` | 103 series | 79 KB | The four datasets, their entities, series, hierarchy and exclusions. |
-| `/downloads/data/sources.json` | 104 sources | 264 KB | Every logical source with its public originals or its stated derivation. |
-| `/downloads/data/national-revenue.json` | 242 | 330 KB | Annual state-budget revenue observations. |
-| `/downloads/data/national-expenditure.json` | 286 | 428 KB | Annual state-budget expenditure observations. |
-| `/downloads/data/ministries.json` | 1,364 | 2.25 MB | Administrative categories and major programs, both levels in one file. |
-| `/downloads/data/municipal-expenditure.json` | 9,196 | 12.20 MB | Municipality, region and Georgia rows for the ten functional categories and the total. |
+Row counts, byte sizes and SHA-256 hashes are **not repeated here**: they change
+with the data, and a hardcoded table would rot silently. `manifest.json` carries
+them for every file and is regenerated with them, so read it there.
+
+| Public path | Contents |
+| --- | --- |
+| `/downloads/data/manifest.json` | Every published file with its row count, byte size, SHA-256, and each dataset's covered year range. |
+| `/downloads/data/catalogue.json` | The four datasets, their entities, series, hierarchy and exclusions. |
+| `/downloads/data/sources.json` | Every logical source with its public originals or its stated derivation. |
+| `/downloads/data/national-revenue.json` | Annual state-budget revenue observations, including `revenue.total`. |
+| `/downloads/data/national-expenditure.json` | Annual state-budget expenditure observations, including `expenditure.total`. |
+| `/downloads/data/ministries.json` | Administrative categories and major programs, both levels in one file, including `admin_spending.total`. |
+| `/downloads/data/municipal-expenditure.json` | Municipality, region and Georgia rows for the ten functional categories, including `municipal.total`. |
+
+Each file publishes every total its own embedded catalogue advertises. That is
+enforced by a test rather than by care: the first version derived its series
+list from the served facts, and a *calculated* total has no fact row, so three
+of the four files advertised a total they did not contain — which also
+suppressed the `budget_scopes_differ` caveat that stops a reader subtracting the
+two national totals into a deficit that does not exist.
 
 `ministries.json` has no CSV counterpart; it is a new published dataset rather
 than a format conversion. The three existing processed CSVs stay where they
@@ -459,10 +470,16 @@ because it really is built from all of them.
 
 `npm run data:prepare-fact-query-publications` writes the files; it runs last in
 the `prebuild` chain, after `data:prepare-public-datasets`, which clears the
-output directory before writing its CSVs. `npm run data:check-fact-query-publications`
-(part of `npm run data:validate`) fails the build if a published file drifts
-from what the current snapshot produces, and separately verifies the on-disk
-manifest's hashes and byte sizes against the on-disk files.
+output directory before writing its CSVs.
+
+`npm run data:check-fact-query-publications` verifies them, and runs as
+`postbuild` — after the files exist. It fails the build if a published file
+drifts from what the current snapshot produces, and separately verifies the
+on-disk manifest's hashes and byte sizes against the on-disk files. It is
+deliberately **not** part of `npm run data:validate`: that runs before `npm run
+build` in CI, and `public/downloads/data/` is gitignored, so on a clean runner
+the files do not exist yet and the check failed `missing` on every fresh
+checkout.
 
 ## Keeping this document true
 

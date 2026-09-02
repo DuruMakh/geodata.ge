@@ -671,15 +671,26 @@ describe("an observation cites only the originals that support it", () => {
 
   it("still cites every document behind the country aggregate", () => {
     // The country row really is built from all served municipalities, so
-    // narrowing must not silently drop provenance here.
+    // narrowing must not silently drop provenance here. Asserting a loose
+    // ">50" passed at BOTH revisions (75 before the fix, 65 after) and so
+    // proved nothing: a bug dropping ten served codes would leave 55 and still
+    // pass. Pin the exact membership instead.
     const result = queryMunicipal(snapshot, {
       entityIds: [COUNTRY],
       seriesIds: ["municipal.education"],
       years: [2020],
       measure: "amount_gel",
     });
+    const documentIds = data(result).observations[0]!.documentIds;
+    const served = snapshot.municipal.municipalities.map((municipality) => municipality.code);
 
-    expect(data(result).observations[0]!.documentIds.length).toBeGreaterThan(50);
+    for (const code of served) {
+      expect(
+        documentIds.some((id) => id.endsWith(`_${code}`)),
+        `country row must cite municipality ${code}`,
+      ).toBe(true);
+    }
+    expect(documentIds.filter((id) => /budget_history_\d{2}$/.test(id))).toHaveLength(served.length);
   });
 
   it("never cites an excluded municipality's workbook", () => {

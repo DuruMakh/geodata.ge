@@ -110,7 +110,11 @@ const DATASET_META: Record<
     measures: NATIONAL_MEASURES,
   },
   "municipal-expenditure": {
-    budgetScope: "municipal_functional_public_total",
+    // Must equal queryMunicipal's BUDGET_SCOPE: an observation and the
+    // catalogue entry describing it are the two halves of one join, and these
+    // were the only two occurrences of either string, so nothing caught the
+    // drift until both landed in one published file.
+    budgetScope: "municipal_budget_expenditure",
     labelKa: "მუნიციპალიტეტები",
     entityTypes: ["country", "municipality", "region"],
     measures: MUNICIPAL_MEASURES,

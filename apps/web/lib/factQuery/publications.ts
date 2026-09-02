@@ -135,6 +135,13 @@ export function buildManifestFile(
 ): PublicationArtifact {
   const bytes = serialize({
     ...publicationHeader(snapshot),
+    // Spec 12.1 assigns coverage to the manifest. Without it a client had to
+    // fetch 12 MB to learn which years the municipal file spans.
+    coverage: DATASET_IDS.map((datasetId) => {
+      const summary = catalogueData(snapshot, datasetId).datasets.find((entry) => entry.datasetId === datasetId);
+      if (summary === undefined) throw new Error(`No dataset summary for ${datasetId}`);
+      return { datasetId, firstYear: summary.years[0], lastYear: summary.years[1] };
+    }),
     files: artifacts.map((artifact) => ({
       fileName: artifact.fileName,
       url: `/downloads/data/${artifact.fileName}`,
@@ -200,6 +207,60 @@ function yearsOf(values: readonly { year: number }[]): number[] {
 }
 
 /**
+ * The catalogue is the authority on which totals a dataset has, so the file
+ * can never advertise a total it does not publish. Deriving the list instead
+ * of hardcoding it is the whole point: the first version built seriesIds from
+ * the served facts alone, and a calculated total has no fact row, so
+ * revenue.total, expenditure.total and admin_spending.total silently vanished
+ * from three of four files while their own catalogues still listed them.
+ */
+function totalSeriesIds(snapshot: FactQuerySnapshot, datasetId: DatasetId): string[] {
+  return (catalogueData(snapshot, datasetId).series ?? [])
+    .filter((entry) => entry.level === "total")
+    .map((entry) => entry.seriesId);
+}
+
+/**
+ * Union two responses' caveats by code, merging their `affects` lists.
+ *
+ * A first-wins dedup loses scope: `Caveat.affects` is computed per response,
+ * so a code firing at both ministries levels with disjoint lists kept only the
+ * first. 1,056 of 1,364 ministries rows declared `nominal_gel` while the
+ * published caveat's `affects` named only the 14 admin series. Harmless for a
+ * note; the same path would drop a severe caveat's scope as soon as a planned
+ * ministries fact exists.
+ */
+function mergeCaveats(left: readonly Caveat[], right: readonly Caveat[]): Caveat[] {
+  const byCode = new Map<string, Caveat>();
+  for (const caveat of [...left, ...right]) {
+    const seen = byCode.get(caveat.code);
+    byCode.set(
+      caveat.code,
+      seen === undefined ? caveat : { ...seen, affects: [...new Set([...seen.affects, ...caveat.affects])].sort() },
+    );
+  }
+  return [...byCode.values()];
+}
+
+/** Same hazard as caveats: merge a source's documents rather than keeping the first list. */
+function mergeSources(left: readonly ResolvedSource[], right: readonly ResolvedSource[]): ResolvedSource[] {
+  const bySourceId = new Map<string, ResolvedSource>();
+  for (const source of [...left, ...right]) {
+    const seen = bySourceId.get(source.sourceId);
+    if (seen === undefined) {
+      bySourceId.set(source.sourceId, source);
+      continue;
+    }
+    const documents = [...seen.documents];
+    for (const document of source.documents) {
+      if (!documents.some((existing) => existing.documentId === document.documentId)) documents.push(document);
+    }
+    bySourceId.set(source.sourceId, { ...seen, documents });
+  }
+  return [...bySourceId.values()];
+}
+
+/**
  * Ministries publishes both hierarchy levels in one file (spec 12.1). The two
  * responses are queried separately because `level` is a request dimension,
  * then concatenated; every row still carries its own `level`. Sources and
@@ -210,7 +271,13 @@ function ministriesFile(snapshot: FactQuerySnapshot): PublicationArtifact {
   const admin = observationsOf(
     queryMinistries(snapshot, {
       level: "admin_category",
-      seriesIds: snapshot.ministries.categories.map((category) => category.id),
+      // The applicable total rides with the admin level (spec 12.1). Without
+      // it the file advertised admin_spending.total in its own catalogue and
+      // published no row for it.
+      seriesIds: [
+        ...snapshot.ministries.categories.map((category) => category.id),
+        ...totalSeriesIds(snapshot, "ministries"),
+      ],
       years,
       measure: "amount_gel",
     }),
@@ -233,16 +300,8 @@ function ministriesFile(snapshot: FactQuerySnapshot): PublicationArtifact {
     observations: [...admin.data.observations, ...programs.data.observations],
     coverage: { admin_category: admin.data.coverage, major_program: programs.data.coverage },
     supportingValues: { gdpFacts: snapshot.gdpFacts },
-    sources: [
-      ...admin.meta.sources,
-      ...programs.meta.sources.filter(
-        (source) => !admin.meta.sources.some((seen) => seen.sourceId === source.sourceId),
-      ),
-    ],
-    caveats: [
-      ...admin.meta.caveats,
-      ...programs.meta.caveats.filter((caveat) => !admin.meta.caveats.some((seen) => seen.code === caveat.code)),
-    ],
+    sources: mergeSources(admin.meta.sources, programs.meta.sources),
+    caveats: mergeCaveats(admin.meta.caveats, programs.meta.caveats),
   });
 
   return {
@@ -279,7 +338,7 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
       "national-revenue.json",
       queryNational(snapshot, {
         side: "revenue",
-        seriesIds: seriesFor("revenue"),
+        seriesIds: [...seriesFor("revenue"), ...totalSeriesIds(snapshot, "national-revenue")],
         years: nationalYears,
         measure: "amount_gel",
       }),
@@ -291,7 +350,7 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
       "national-expenditure.json",
       queryNational(snapshot, {
         side: "expenditure",
-        seriesIds: seriesFor("expenditure"),
+        seriesIds: [...seriesFor("expenditure"), ...totalSeriesIds(snapshot, "national-expenditure")],
         years: nationalYears,
         measure: "amount_gel",
       }),
@@ -304,7 +363,10 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
       "municipal-expenditure.json",
       queryMunicipal(snapshot, {
         entityIds: municipalEntityIds,
-        seriesIds: [...snapshot.municipal.functions.map((fn) => fn.id), "municipal.total"],
+        seriesIds: [
+          ...snapshot.municipal.functions.map((fn) => fn.id),
+          ...totalSeriesIds(snapshot, "municipal-expenditure"),
+        ],
         years: yearsOf(snapshot.municipal.functionFacts),
         measure: "amount_gel",
       }),

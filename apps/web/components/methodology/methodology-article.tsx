@@ -11,7 +11,7 @@ type MethodologyArticleProps = {
   rows: readonly PublicSourceManifestRow[];
   archiveSummary: MethodologyArchiveSummary;
   processedDataHref: `/downloads/data/${string}.csv`;
-  processedDataJsonHrefs: readonly `/downloads/data/${string}.json`[];
+  processedDataJsonLinks: readonly { href: `/downloads/data/${string}.json`; labelKa: string }[];
   breadcrumbItems: readonly BreadcrumbItem[];
 };
 
@@ -27,7 +27,7 @@ function sectionAnchorId(section: MethodologyContent["sections"][number]) {
   return section.kind === "archive" ? "source-archive" : section.id;
 }
 
-export function MethodologyArticle({ content, coverage, rows, archiveSummary, processedDataHref, processedDataJsonHrefs, breadcrumbItems }: MethodologyArticleProps) {
+export function MethodologyArticle({ content, coverage, rows, archiveSummary, processedDataHref, processedDataJsonLinks, breadcrumbItems }: MethodologyArticleProps) {
   const journeyDescriptions = [
     firstParagraphByKind(content, "archive", content.summaryKa),
     firstParagraphByKind(content, "sources", content.summaryKa),
@@ -73,24 +73,21 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
         <p className="mt-2 text-[11.5px] leading-relaxed text-[var(--muted)]">
           UTF-8 / Excel თავსებადი · CC BY 4.0 · წყაროსა და ფაქტი/გეგმის მეტამონაცემებით
         </p>
-        {processedDataJsonHrefs.length > 0 ? (
-          <p className="mt-3 text-[11.5px] leading-relaxed text-[var(--muted)]">
-            {processedDataJsonHrefs.map((href, index) => (
-              <span key={href}>
-                {index > 0 ? " · " : null}
-                <a
-                  data-testid="processed-dataset-json"
-                  href={href}
-                  download
-                  className="font-semibold text-[var(--accent)] underline underline-offset-4"
-                >
-                  {href.split("/").pop()}
-                </a>
-              </span>
-            ))}
-            {" — JSON: წყაროებით, დათქმებითა და დაფარვით"}
-          </p>
-        ) : null}
+        <p data-testid="processed-dataset-json" className="mt-3 text-[11.5px] leading-relaxed text-[var(--muted)]">
+          {processedDataJsonLinks.map((link, index) => (
+            <span key={link.href}>
+              {index > 0 ? " · " : null}
+              {/* The visible text is the reviewed Georgian name, not the Latin
+                  file name: a link whose only accessible name is
+                  "ministries.json" tells a screen-reader user nothing about
+                  what they are downloading (DESIGN.md:624). */}
+              <a href={link.href} download className="font-semibold text-[var(--accent)] underline underline-offset-4">
+                {link.labelKa}
+              </a>
+            </span>
+          ))}
+          {" — JSON: წყაროებით, დათქმებითა და დაფარვით"}
+        </p>
       </div>
 
       <aside

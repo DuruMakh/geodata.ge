@@ -46,7 +46,20 @@ const DATASET_DOWNLOADS = {
 // ministries JSON. ministries.json has no CSV counterpart in this family, so
 // this page is its only published entry point.
 const DATASET_JSON_DOWNLOADS = {
-  expenditure: ["/downloads/data/national-expenditure.json", "/downloads/data/ministries.json"],
+  expenditure: [
+    { href: "/downloads/data/national-expenditure.json", labelKa: "სახელმწიფო ხარჯები" },
+    { href: "/downloads/data/ministries.json", labelKa: "უწყებები და პროგრამები" },
+  ],
+  revenue: [{ href: "/downloads/data/national-revenue.json", labelKa: "სახელმწიფო შემოსავლები" }],
+  municipalities: [{ href: "/downloads/data/municipal-expenditure.json", labelKa: "მუნიციპალური ხარჯები" }],
+} as const;
+
+// Only the file that IS this dataset in another format belongs in the Dataset
+// node's distribution. ministries.json is a separate published dataset (spec
+// 12.1), so it stays a human link on this page and is not claimed as a
+// distribution of national expenditure.
+const DATASET_JSON_DISTRIBUTIONS = {
+  expenditure: ["/downloads/data/national-expenditure.json"],
   revenue: ["/downloads/data/national-revenue.json"],
   municipalities: ["/downloads/data/municipal-expenditure.json"],
 } as const;
@@ -101,7 +114,7 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
           lastYear: coverage.lastYear,
           dateModified: content.reviewedAt,
           downloadPath: DATASET_DOWNLOADS[dataset],
-          jsonDownloadPaths: DATASET_JSON_DOWNLOADS[dataset],
+          jsonDownloadPaths: DATASET_JSON_DISTRIBUTIONS[dataset],
         })}
         testId="dataset-json-ld"
       />
@@ -111,7 +124,7 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
         rows={publicRows}
         archiveSummary={archiveSummaries[dataset]}
         processedDataHref={DATASET_DOWNLOADS[dataset]}
-        processedDataJsonHrefs={DATASET_JSON_DOWNLOADS[dataset]}
+        processedDataJsonLinks={DATASET_JSON_DOWNLOADS[dataset]}
         breadcrumbItems={[
           { name: "მთავარი", path: "/" },
           { name: "მეთოდოლოგია", path: "/methodology" },
