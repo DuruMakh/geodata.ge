@@ -16,6 +16,7 @@ import {
 } from "../../lib/factQuery";
 import { buildExplorerModel } from "../../lib/explorer/explorerData";
 import { buildCountryTotalByYear } from "../../lib/explorer/municipalData";
+import { projectAdminFact } from "../../lib/explorer/clientData";
 import type { Observation } from "../../lib/factQuery";
 import type { FactQueryResponse, FactQuerySnapshot } from "../../lib/factQuery";
 import type { GlossaryEntry } from "../../lib/data/glossary";
@@ -252,5 +253,55 @@ describe("municipal", () => {
 
     expect(observationsOf(result).length).toBe(0);
     expect(result.kind).toBe("observations");
+  });
+});
+
+describe("ministries agree with the website model, not only with the snapshot", () => {
+  // Both ministries tests above compare queryMinistries against
+  // snapshot.ministries.facts - the same array the query core reads. That is a
+  // self-consistency check, not an agreement check: it cannot catch the query
+  // core and the ministries explorer aggregating the same facts differently.
+  // buildExplorerModel renders the ministries grouping, so it can be compared.
+  it("matches buildExplorerModel's administrative total for every year", () => {
+    const facts = snapshot.ministries.facts;
+    const years = [...new Set(facts.map((f) => f.year))].sort((a, b) => a - b);
+    expect(years.length).toBeGreaterThan(0);
+
+    const glossary = new Map(
+      snapshot.ministries.categories.map((category) => [
+        category.id,
+        { id: category.id, kaLabel: category.kaLabel, enLabel: category.kaLabel, description: "", notes: "" },
+      ]),
+    );
+
+    const model = buildExplorerModel({
+      facts: [],
+      adminFacts: facts.map(projectAdminFact),
+      adminCategories: new Map(snapshot.ministries.categories.map((c) => [c.id, c])),
+      expenditureGrouping: "ministries",
+      glossary,
+      side: "expenditure",
+      selectedItemIds: ["admin_spending.total"],
+      startYear: years[0]!,
+      endYear: years[years.length - 1]!,
+      measure: "nominal",
+    });
+
+    const result = queryMinistries(snapshot, {
+      level: "admin_category",
+      seriesIds: ["admin_spending.total"],
+      years,
+      measure: "amount_gel",
+    });
+    const returned = valueMap(observationsOf(result), (o) => String(o.year));
+
+    expect(model.totalRow).not.toBeNull();
+    for (const year of years) {
+      // The website chart and the query core must read the same number.
+      expect(returned.get(String(year)), `ministries total ${year}`).toBeCloseTo(
+        model.totalRow!.valuesByYear[year]!,
+        2,
+      );
+    }
   });
 });
