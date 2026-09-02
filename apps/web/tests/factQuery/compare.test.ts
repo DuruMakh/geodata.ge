@@ -2,6 +2,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
 import { compare } from "../../lib/factQuery/compare";
+import { queryMinistries } from "../../lib/factQuery/queryMinistries";
+import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
+import { CAVEAT_RULES } from "../../lib/factQuery/caveats";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
 import type { Comparison } from "../../lib/factQuery/compare";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
@@ -209,7 +212,15 @@ describe("compare", () => {
     });
 
     it("carries non_positive_comparison_base when the earlier amount is not positive", () => {
-      const zero = snapshot.municipal.functionFacts.find((f) => f.amountGel === 0 && f.year < 2025);
+      // Pinned to 2016 or later ON PURPOSE. This fixture used to be
+      // `f.year < 2025`, which resolved to a 2015 municipal function fact, so
+      // the test asserted that a 2015-to-2025 functional comparison IS
+      // comparable — defending the definition break instead of catching it, and
+      // it would have failed against a correct implementation. The behaviour
+      // under test here is the non-positive base, so the fixture must not
+      // straddle a definition break at all. The break itself is covered by
+      // "declines a municipal FUNCTION comparison across the 2015 break" below.
+      const zero = snapshot.municipal.functionFacts.find((f) => f.amountGel === 0 && f.year >= 2016 && f.year < 2025);
       expect(zero).toBeDefined();
 
       const result = compare(snapshot, {
@@ -265,6 +276,245 @@ describe("compare", () => {
 
       expect(only(result).comparability).toBe("comparable");
       expect(only(result).absoluteChange).not.toBeNull();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Regression cover for the review of 2026-09-02. Every test below fails
+  // against the implementation as it shipped; several describe figures that were
+  // actually published.
+  // ---------------------------------------------------------------------------
+
+  describe("definition identity, not display prose", () => {
+    // The break: 2015 is the portal functional fallback for all 64
+    // municipalities, 2016 onward are payment totals. Only municipal.total
+    // embedded that in its display string, so every FUNCTION series compared
+    // equal across it and published growth. Education came out at +572.1%.
+    it("declines a municipal FUNCTION comparison across the 2015 break", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "municipal", entityIds: ["04"], seriesIds: ["municipal.education"] },
+        fromYear: 2015,
+        toYear: 2020,
+        measure: "amount_gel",
+      });
+
+      const row = only(result);
+      expect(row.comparability).toBe("not_comparable");
+      expect(row.absoluteChange).toBeNull();
+      expect(row.percentageChange).toBeNull();
+      // Both reviewed figures survive the decline.
+      expect(row.from.value).not.toBeNull();
+      expect(row.to.value).not.toBeNull();
+    });
+
+    it("declines the share measure across the same break", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "municipal", entityIds: ["04"], seriesIds: ["municipal.education"] },
+        fromYear: 2015,
+        toYear: 2020,
+        measure: "share_of_total_pct",
+      });
+
+      expect(only(result).comparability).toBe("not_comparable");
+      expect(only(result).percentagePointChange).toBeNull();
+    });
+
+    it("still compares two post-break municipal function years", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "municipal", entityIds: ["04"], seriesIds: ["municipal.education"] },
+        fromYear: 2020,
+        toYear: 2024,
+        measure: "amount_gel",
+      });
+
+      expect(only(result).comparability).toBe("comparable");
+      expect(only(result).absoluteChange).not.toBeNull();
+    });
+
+    // The other direction: queryMinistries appends the year's own official label
+    // when it differs, which is presentation. Comparing display strings declined
+    // every program that had ever been renamed - 48 of 48 excluded.
+    it("compares a ministries program across a rename", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "ministries", level: "major_program", seriesIds: ["admin_program.27_02.56e31b26"] },
+        fromYear: 2012,
+        toYear: 2025,
+        measure: "amount_gel",
+      });
+
+      const row = only(result);
+      expect(row.from.valueDefinition).not.toBe(row.to.valueDefinition);
+      expect(row.from.valueDefinitionId).toBe(row.to.valueDefinitionId);
+      expect(row.comparability).not.toBe("not_comparable");
+      expect(row.absoluteChange).not.toBeNull();
+    });
+  });
+
+  describe("coverage changes decline; quality flags do not", () => {
+    // revenue.grants subtracts GFS internal-flow rows from 2008; 2005 does not.
+    // Byte-identical valueDefinition at both ends, so nothing caught it and the
+    // pair shipped as "comparable, +651.19%".
+    it("declines a netted revenue series across the year netting begins", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "national", side: "revenue", seriesIds: ["revenue.grants"] },
+        fromYear: 2005,
+        toYear: 2020,
+        measure: "amount_gel",
+      });
+
+      const row = only(result);
+      expect(row.from.valueDefinition).toBe(row.to.valueDefinition);
+      expect(row.comparability).toBe("not_comparable");
+      expect(row.percentageChange).toBeNull();
+    });
+
+    it("still compares two post-netting years of the same series", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "national", side: "revenue", seriesIds: ["revenue.grants"] },
+        fromYear: 2015,
+        toYear: 2020,
+        measure: "amount_gel",
+      });
+
+      expect(only(result).comparability).toBe("comparable");
+    });
+
+    // A provenance flag in one year and a reconciliation flag in the other are
+    // quality disclosures about figures that both still measure total payments.
+    // Declining these was the over-correction that made the set too broad.
+    it("does not decline an ordinary municipal comparison over asymmetric quality flags", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "municipal", entityIds: ["04"], seriesIds: ["municipal.total"] },
+        fromYear: 2019,
+        toYear: 2023,
+        measure: "amount_gel",
+      });
+
+      expect(only(result).comparability).toBe("comparable");
+      expect(only(result).absoluteChange).not.toBeNull();
+    });
+
+    it("classifies every registered caveat code, so the set cannot silently gain a hole", () => {
+      const unclassified = CAVEAT_RULES.filter(
+        (rule) => !["breaks", "limits", "none"].includes(rule.comparisonEffect),
+      );
+      expect(unclassified.map((r) => r.code)).toEqual([]);
+    });
+  });
+
+  describe("caveats agree with the query that produced the endpoints", () => {
+    // compare() rebuilt a CaveatContext by hand. Three of its fields disagreed
+    // with the sub-query for the identical rows, which both invented a severe
+    // caveat and dropped severe ones. Asking for the CHANGE in a number must
+    // never disclose less than asking for the number.
+    const codesOf = (result: { meta: { caveats: { code: string }[] } }) =>
+      new Set(result.meta.caveats.map((c) => c.code));
+
+    it("never discloses less than queryMunicipal for a region total", () => {
+      const queried = queryMunicipal(snapshot, {
+        entityIds: ["region.adjara"],
+        seriesIds: ["municipal.total"],
+        years: [2020, 2024],
+        measure: "amount_gel",
+      });
+      const compared = compare(snapshot, {
+        target: { dataset: "municipal", entityIds: ["region.adjara"], seriesIds: ["municipal.total"] },
+        fromYear: 2020,
+        toYear: 2024,
+        measure: "amount_gel",
+      });
+
+      for (const code of codesOf(queried)) expect(codesOf(compared)).toContain(code);
+      expect(codesOf(compared)).toContain("municipal_source_actual_missing");
+    });
+
+    it("never discloses more than queryMinistries for the same program cells", () => {
+      const queried = queryMinistries(snapshot, {
+        level: "major_program",
+        seriesIds: ["admin_program.06_04.674b2aee", "admin_program.09_01.f5bec61a"],
+        years: [2020, 2024],
+        measure: "amount_gel",
+      });
+      const compared = compare(snapshot, {
+        target: {
+          dataset: "ministries",
+          level: "major_program",
+          seriesIds: ["admin_program.06_04.674b2aee", "admin_program.09_01.f5bec61a"],
+        },
+        fromYear: 2020,
+        toYear: 2024,
+        measure: "amount_gel",
+      });
+
+      // The parent categories existed in both years; claiming otherwise named
+      // the wrong administering institution for real spending.
+      expect(codesOf(compared)).not.toContain("program_parent_category_modern_grouping");
+      for (const code of codesOf(compared)) {
+        if (code === "non_positive_comparison_base") continue;
+        expect(codesOf(queried)).toContain(code);
+      }
+    });
+
+    it("raises no municipal caveat on a ministries comparison", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "ministries", level: "major_program", seriesIds: ["admin_program.27_02.56e31b26"] },
+        fromYear: 2012,
+        toYear: 2025,
+        measure: "amount_gel",
+      });
+
+      const municipalCodes = result.meta.caveats.filter((c) => c.code.startsWith("municipal"));
+      expect(municipalCodes.map((c) => c.code)).toEqual([]);
+    });
+  });
+
+  describe("status and qualification", () => {
+    it("reports a single declined comparison as partial, keeping both values readable", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "national", side: "revenue", seriesIds: ["revenue.total"] },
+        fromYear: 2004,
+        toYear: 2005,
+        measure: "amount_gel",
+      });
+
+      // "empty" invited a consumer to short-circuit and throw away the two
+      // reviewed numbers the decline deliberately preserved.
+      expect(result.status).toBe("partial");
+      expect(data(result).comparisons.length).toBe(1);
+      expect(only(result).from.value).toBe(2283035800);
+    });
+
+    it("qualifies rather than ignores a comparison spanning an approved program join", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "ministries", level: "major_program", seriesIds: ["admin_program.24_14.6c3a02c8"] },
+        fromYear: 2014,
+        toYear: 2024,
+        measure: "amount_gel",
+      });
+
+      const row = only(result);
+      expect(row.caveatIds).toContain("program_historical_join");
+      // Spec 6.6: a documented join must qualify or decline the comparison. It
+      // used to ride along as a note and change nothing, so +170.07% shipped
+      // marked fully comparable.
+      expect(row.comparability).toBe("limited");
+      expect(row.reasons.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("2004 receipts", () => {
+    it("declines the share branch as well as the amount branch", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "national", side: "revenue", seriesIds: ["revenue.vat"] },
+        fromYear: 2004,
+        toYear: 2005,
+        measure: "share_of_total_pct",
+      });
+
+      // Every 2004 percentage inherits the narrower denominator even when
+      // revenue.total is never named in the request.
+      expect(only(result).comparability).toBe("not_comparable");
+      expect(only(result).percentagePointChange).toBeNull();
     });
   });
 });

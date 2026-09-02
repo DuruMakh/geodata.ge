@@ -58,7 +58,18 @@ function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): Fact
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
 }
 
-export function queryNational(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryResponse {
+export function queryNational(
+  snapshot: FactQuerySnapshot,
+  rawInput: unknown,
+  /**
+   * Set only by compare(). It makes the comparison-only rules reachable while
+   * they read THIS function pre-scoped context rather than one rebuilt from
+   * scratch - the rebuild hardcoded adminCategoryYears to [] and fired a severe,
+   * false "the parent category did not exist that year" caveat on every program
+   * cell of every comparison.
+   */
+  comparison: CaveatContext["comparison"] = null,
+): FactQueryResponse {
   const parsed = queryNationalInput.safeParse(rawInput);
 
   if (!parsed.success) {
@@ -262,6 +273,12 @@ export function queryNational(snapshot: FactQuerySnapshot, rawInput: unknown): F
         missingReason: availability === "missing" ? missingReason : null,
         basis: availability === "missing" ? null : basis,
         valueDefinition: valueDefinitionFor(isTotal, side, input.measure),
+        // Structured identity for machine comparison. National series carry no
+        // year-varying definition today, so the year is deliberately absent: a
+        // coverage change here is expressed by a caveat whose comparisonEffect
+        // is "breaks" (revenue_2004_total_scope, revenue_internal_flows_netted),
+        // not by the identity string.
+        valueDefinitionId: `${datasetId}:${input.measure}:${isTotal ? "total" : "component"}`,
         sourceIds,
       });
     }
@@ -299,10 +316,12 @@ export function queryNational(snapshot: FactQuerySnapshot, rawInput: unknown): F
       year: o.year,
       value: o.value,
       basis: o.basis,
+      valueDefinitionId: o.valueDefinitionId,
     })),
     municipalTotalInputs: [],
+    municipalInputServedBy: {},
     gdpInputs,
-    comparison: null,
+    comparison,
     historicalJoinSeriesYears: snapshot.ministries.historicalJoinSeriesYears,
     // Administrative categories are a ministries-dataset concept; an empty list
     // keeps the ministries rules that read it inert here, the same defence in

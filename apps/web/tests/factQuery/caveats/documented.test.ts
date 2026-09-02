@@ -45,6 +45,18 @@ describe("caveat catalogue documentation", () => {
     expect(doc).toContain("**Severity:** note");
   });
 
+  it("records each code's comparison effect", () => {
+    // The axis that decides whether a growth figure is published at all. It was
+    // previously a hand-kept list of one inside compare.ts, documented nowhere,
+    // and it was incomplete.
+    for (const rule of CAVEAT_RULES) {
+      const section = doc.slice(doc.indexOf(`### \`${rule.code}\``));
+      expect(section.slice(0, 400), `${rule.code} comparison effect`).toContain(
+        `**Comparison effect:** \`${rule.comparisonEffect}\``,
+      );
+    }
+  });
+
   it("states the registered code count so a silent addition is visible", () => {
     expect(doc).toContain(`${CAVEAT_RULES.length} codes are registered.`);
   });

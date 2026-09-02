@@ -26,6 +26,21 @@ export type ResolvedSourceView = {
   documentCount: number;
   /** True when datasetId/years/entityIds actually reduced the list. */
   narrowed: boolean;
+  /**
+   * Whether the requested narrowing was applied, and if not, why.
+   *
+   * "not_requested"      - no filter was given.
+   * "applied"            - the filter matched and the list is narrowed.
+   * "dropped_no_match"   - the filter matched NOTHING, so it was dropped and
+   *                        the full list is returned instead.
+   *
+   * `narrowed` alone could not express the third case: it is computed as "the
+   * list got shorter", which the fallback makes false by construction. A
+   * request for a year no document covers therefore returned a document from
+   * another year, byte-identical to a genuine match. On the one surface whose
+   * whole job is letting a reader check a figure, that is not survivable.
+   */
+  narrowingOutcome: "not_requested" | "applied" | "dropped_no_match";
 };
 
 export type GetSourcesData = {
@@ -119,9 +134,15 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   const sources: ResolvedSourceView[] = resolved.map((source) => {
     let documents = source.documents;
 
+    let narrowingOutcome: ResolvedSourceView["narrowingOutcome"] = "not_requested";
+
     if (hasNarrowing) {
       const filtered = source.documents.filter((document) => {
-        if (input.datasetId !== undefined && document.datasetId !== null && document.datasetId !== input.datasetId) {
+        // A document with no datasetId is NOT treated as matching every dataset.
+        // Exempting it returned the Geostat municipal-population workbook as a
+        // match for national-revenue; the honest outcome is that the filter
+        // matched nothing, which the caller is now told.
+        if (input.datasetId !== undefined && document.datasetId !== input.datasetId) {
           return false;
         }
         if (input.years !== undefined && input.years.length > 0) {
@@ -134,8 +155,14 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
       });
 
       // Narrowing is a convenience, not a filter that may hide where a figure
-      // came from. If it would leave nothing, return the unnarrowed list.
-      if (filtered.length > 0) documents = filtered;
+      // came from. If it would leave nothing, return the unnarrowed list - and
+      // say so, rather than passing it off as a match.
+      if (filtered.length > 0) {
+        documents = filtered;
+        narrowingOutcome = "applied";
+      } else {
+        narrowingOutcome = "dropped_no_match";
+      }
     }
 
     return {
@@ -146,6 +173,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
       documents,
       documentCount: source.documents.length,
       narrowed: documents.length !== source.documents.length,
+      narrowingOutcome,
     };
   });
 

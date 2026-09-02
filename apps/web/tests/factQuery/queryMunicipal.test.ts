@@ -24,6 +24,19 @@ const errorOf = (result: ReturnType<typeof queryMunicipal>) => (result as { erro
 const cell = (result: ReturnType<typeof queryMunicipal>, entityId: string, year: number) =>
   data(result).observations.find((o) => o.entityId === entityId && o.year === year);
 
+/** The ten reviewed functional categories (lib/data/municipal/functionMapping.ts). */
+const FUNCTION_SERIES = [
+  "municipal.general_public_services",
+  "municipal.defence",
+  "municipal.public_order_safety",
+  "municipal.economic_affairs",
+  "municipal.environment",
+  "municipal.housing_communal",
+  "municipal.health",
+  "municipal.recreation_culture",
+  "municipal.education",
+  "municipal.social_protection",
+];
 describe("queryMunicipal", () => {
   it("returns a conforming observations envelope", () => {
     const result = queryMunicipal(snapshot, {
@@ -471,6 +484,127 @@ describe("queryMunicipal", () => {
       expect(caveatIds).not.toContain("municipal_country_scope");
       expect(caveatIds).not.toContain("adjara_consolidation_applied");
       expect(caveatIds).not.toContain("municipal_functions_no_republican_crosswalk");
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Regression cover for the review of 2026-09-02.
+  // ---------------------------------------------------------------------------
+
+  describe("Adjara consolidation is claimed only where it is true", () => {
+    // The two triggering paths affect DIFFERENT cells, and the old test issued
+    // them as two separate requests - the only two shapes where the mislabel is
+    // invisible. One combined request is what exposes it.
+    it("does not stamp an unconsolidated function amount when the total is in the same request", () => {
+      const result = queryMunicipal(snapshot, {
+        entityIds: ["region.adjara"],
+        seriesIds: ["municipal.total", "municipal.education"],
+        years: [2024],
+        measure: "amount_gel",
+      });
+
+      const rows = data(result).observations;
+      const total = rows.find((o) => o.seriesId === "municipal.total")!;
+      const education = rows.find((o) => o.seriesId === "municipal.education")!;
+
+      expect(total.caveatIds).toContain("adjara_consolidation_applied");
+      // Education is the plain municipal-only functional sum of the six members.
+      // No republican payment is inside it.
+      expect(education.caveatIds).not.toContain("adjara_consolidation_applied");
+    });
+
+    it("does claim it on every cell of a share request, where the denominator IS consolidated", () => {
+      const result = queryMunicipal(snapshot, {
+        entityIds: ["region.adjara"],
+        seriesIds: ["municipal.education"],
+        years: [2024],
+        measure: "share_of_total_pct",
+      });
+
+      expect(data(result).observations[0]!.caveatIds).toContain("adjara_consolidation_applied");
+    });
+  });
+
+  describe("every caveat attaches to something", () => {
+    // The general invariant. A caveat whose affects match no returned cell is
+    // simultaneously over-disclosure (it is in meta.caveats) and under-disclosure
+    // (no row carries it), and it is unjoinable to any number. A region query
+    // produced four such caveats, one with 548 affects entries.
+    const shapes = [
+      { entityIds: ["region.adjara"], seriesIds: ["municipal.total"], years: [2020, 2024], measure: "amount_gel" as const },
+      { entityIds: ["region.adjara"], seriesIds: FUNCTION_SERIES, years: [2024], measure: "share_of_total_pct" as const },
+      { entityIds: ["country.georgia"], seriesIds: FUNCTION_SERIES, years: [2024], measure: "share_of_total_pct" as const },
+      { entityIds: ["11"], seriesIds: ["municipal.total", "municipal.education"], years: [2024], measure: "amount_gel" as const },
+      { entityIds: ["04", "11"], seriesIds: ["municipal.total"], years: [2015, 2024], measure: "amount_gel" as const },
+    ];
+
+    for (const [index, request] of shapes.entries()) {
+      it(`shape ${index} raises no caveat that matches zero returned cells`, () => {
+        const result = queryMunicipal(snapshot, request);
+        const rows = data(result).observations;
+        const carried = new Set(rows.flatMap((o) => o.caveatIds));
+
+        for (const caveat of result.meta.caveats) {
+          // municipality_not_territorial is the one legitimate exception: it
+          // explains entities that deliberately produce NO row, so it can never
+          // attach to one.
+          if (caveat.code === "municipality_not_territorial") continue;
+          expect(carried.has(caveat.code), `${caveat.code} attaches to no returned cell`).toBe(true);
+        }
+      });
+    }
+  });
+
+  describe("the shares-never-reach-100% disclosure works at all three grains", () => {
+    for (const entityId of ["04", "region.adjara", "country.georgia"]) {
+      it(`discloses the functional gap for ${entityId}`, () => {
+        const result = queryMunicipal(snapshot, {
+          entityIds: [entityId],
+          seriesIds: FUNCTION_SERIES,
+          years: [2024],
+          measure: "share_of_total_pct",
+        });
+
+        const rows = data(result).observations;
+        const sum = rows.reduce((total, o) => total + (o.value ?? 0), 0);
+        if (sum >= 99.999) return; // no gap to disclose
+
+        // Country shares summed to 91.41% and region to 57.38% with nothing in
+        // meta.caveats saying so - the reporting half of "never normalised to
+        // 100%" simply did not exist above municipality grain.
+        const codes = result.meta.caveats.map((c) => c.code);
+        expect(codes).toContain("municipal_functional_total_gap");
+        expect(rows.some((o) => o.caveatIds.includes("municipal_functional_total_gap"))).toBe(true);
+      });
+    }
+  });
+
+  describe("valueDefinition describes the measure that was asked for", () => {
+    it("does not describe a GEL total on a per-resident value", () => {
+      const result = queryMunicipal(snapshot, {
+        entityIds: ["11"],
+        seriesIds: ["municipal.total"],
+        years: [2025],
+        measure: "gel_per_resident",
+      });
+
+      const row = data(result).observations[0]!;
+      expect(row.value).not.toBeNull();
+      // gel_per_resident is only valid for the total series, so the old
+      // isTotal-before-measure order mislabelled 100% of per-resident output.
+      expect(row.valueDefinition).toContain("მცხოვრებ");
+      expect(row.valueDefinition).not.toContain("გაზომვის საფუძველი");
+    });
+
+    it("does not describe a GEL total on a share value", () => {
+      const result = queryMunicipal(snapshot, {
+        entityIds: ["11"],
+        seriesIds: ["municipal.total"],
+        years: [2024],
+        measure: "share_of_total_pct",
+      });
+
+      expect(data(result).observations[0]!.valueDefinition).not.toContain("გაზომვის საფუძველი");
     });
   });
 });

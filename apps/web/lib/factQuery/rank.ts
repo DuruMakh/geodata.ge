@@ -60,7 +60,8 @@ type Candidate = {
   entityLabelKa: string;
   seriesId: string;
   seriesLabelKa: string;
-  value: number | null;
+  /** Never null: a row with no value is an exclusion, never a candidate. */
+  value: number;
   unit: Unit;
   basis: "actual" | "planned" | null;
   caveatIds: string[];
@@ -262,19 +263,6 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     sources = result.meta.sources;
     caveats = result.meta.caveats;
 
-    // Spec section 6.7: a value ranking needs one consistent actual/planned
-    // basis. One unqualified ordering over mixed bases would present a plan
-    // and an outturn as the same kind of number. Currently unreachable - every
-    // reviewed fact is "actual" - but the rule outlives that.
-    const bases = new Set(observations.filter((o) => o.basis !== null).map((o) => o.basis));
-    if (bases.size > 1) {
-      return errorResponse(snapshot, {
-        code: "unsupported_comparison",
-        messageKa: "რანჟირებადი მწკრივები ფაქტსა და გეგმას ურევს; ერთიანი დალაგება არ ბრუნდება.",
-        messageEn: "The eligible rows mix actual and planned bases; a single unqualified ordering is not returned.",
-        retryable: false,
-      });
-    }
 
     for (const observation of observations) {
       const stableId = isMunicipal ? observation.entityId : observation.seriesId;
@@ -331,7 +319,12 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
             : comparison.percentagePointChange;
 
       if (value === null) {
-        exclusions.push({ id: stableId, reason: REASON_NO_VALUE });
+        // compare() already knows WHY - most often a zero or negative base,
+        // which makes percentage change undefined while both endpoint values
+        // exist. Reporting "the indicator is unavailable" there was a wrong
+        // statement about the data, and exclusions are a ranking honesty
+        // mechanism. Mirrors the not_comparable branch just above.
+        exclusions.push({ id: stableId, reason: comparison.reasons[0] ?? REASON_NO_VALUE });
         continue;
       }
 
@@ -349,6 +342,23 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     }
   }
 
+  // Spec section 6.7: one ordering needs one consistent actual/planned basis,
+  // or a plan and an outturn are presented as the same kind of number. Checked
+  // over the CANDIDATES so it covers change rankings as well as value ones -
+  // compare() rejects a mixed basis within a single pair, but nothing stopped
+  // one candidate being actual->actual and another planned->planned in the same
+  // table. Currently unreachable (every reviewed fact is "actual"), but the
+  // rule outlives that, which is the same reason the value branch had it.
+  const bases = new Set(candidates.filter((c) => c.basis !== null).map((c) => c.basis));
+  if (bases.size > 1) {
+    return errorResponse(snapshot, {
+      code: "unsupported_comparison",
+      messageKa: "რანჟირებადი მწკრივები ფაქტსა და გეგმას ურევს; ერთიანი დალაგება არ ბრუნდება.",
+      messageEn: "The eligible rows mix actual and planned bases; a single unqualified ordering is not returned.",
+      retryable: false,
+    });
+  }
+
   // ---- order, tie-flag, cut -------------------------------------------------
 
   const direction = input.order === "ascending" ? 1 : -1;
@@ -356,14 +366,14 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   // concern and never decides position. Exact ties fall back to the stable id
   // so the same request always returns the same order.
   const ordered = [...candidates].sort((left, right) => {
-    const byValue = ((left.value ?? 0) - (right.value ?? 0)) * direction;
+    const byValue = (left.value - right.value) * direction;
     if (byValue !== 0) return byValue;
     return left.stableId < right.stableId ? -1 : left.stableId > right.stableId ? 1 : 0;
   });
 
-  const tiedValues = new Set(
-    ordered.filter((entry, index) => ordered.some((other, otherIndex) => otherIndex !== index && other.value === entry.value)).map((entry) => entry.value),
-  );
+  const valueCounts = new Map<number, number>();
+  for (const entry of ordered) valueCounts.set(entry.value, (valueCounts.get(entry.value) ?? 0) + 1);
+  const tiedValues = new Set(Array.from(valueCounts).filter(([, count]) => count > 1).map(([value]) => value));
 
   const cut = ordered.slice(0, input.limit);
   const cutoffSplitsTie =

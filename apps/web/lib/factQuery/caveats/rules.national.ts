@@ -25,6 +25,7 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "nominal_gel",
     severity: "note",
+    comparisonEffect: "none",
     messageKa: "თანხები ნომინალურ ლარშია, მიმდინარე ფასებში; ინფლაციაზე კორექტირებული არ არის.",
     messageEn: "Amounts are nominal GEL at current prices and are not adjusted for inflation.",
     methodologyRef: "ai-grounding-and-caveats.md#nominal_gel",
@@ -34,6 +35,7 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "planned_values",
     severity: "severe",
+    comparisonEffect: "none",
     messageKa: "შედეგი შეიცავს გეგმურ (და არა ფაქტობრივ) მაჩვენებელს.",
     messageEn: "The result contains planned rather than actual values.",
     methodologyRef: "ai-grounding-and-caveats.md#planned_values",
@@ -43,6 +45,7 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "revenue_2004_total_scope",
     severity: "severe",
+    comparisonEffect: "breaks",
     messageKa: "2004 წლის შემოსავლების ჯამი უფრო ვიწრო მოცულობისაა: ვალდებულებების ზრდა მიუწვდომელია.",
     messageEn: "The 2004 receipts total has narrower coverage: increase in liabilities is unavailable.",
     methodologyRef: "revenue-methodology.md",
@@ -73,6 +76,7 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "revenue_2004_liabilities_unavailable",
     severity: "severe",
+    comparisonEffect: "breaks",
     messageKa: "2004 წლისთვის ვალდებულებების ზრდა მიუწვდომელია — ის ნული არ არის.",
     messageEn: "Increase in liabilities is unavailable for 2004. It is not zero.",
     methodologyRef: "revenue-methodology.md",
@@ -82,6 +86,7 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "budget_scopes_differ",
     severity: "severe",
+    comparisonEffect: "none",
     messageKa: "ეროვნული შემოსავლებისა და ხარჯების ჯამები სხვადასხვა საბიუჯეტო მოცულობას ეყრდნობა; მათი გამოკლებით დეფიციტი არ დგინდება.",
     messageEn: "National revenue and expenditure totals use different budget concepts; subtracting them does not establish a deficit.",
     methodologyRef: "revenue-methodology.md",
@@ -91,6 +96,7 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "negative_revenue_correction",
     severity: "note",
+    comparisonEffect: "none",
     messageKa: "უარყოფითი მნიშვნელობა გადამოწმებული კორექციაა და არა დაკარგული მონაცემი.",
     messageEn: "A negative value is a reviewed correction, not missing or invalid data.",
     methodologyRef: "revenue-methodology.md",
@@ -100,6 +106,7 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "revenue_internal_flows_netted",
     severity: "note",
+    comparisonEffect: "breaks",
     messageKa: "შერჩეული მუხლი შიდა ნაკადების დოკუმენტირებულ ნეტირებას იყენებს.",
     messageEn: "The selected item uses the documented netting of internal flows.",
     methodologyRef: "revenue-methodology.md",
@@ -118,6 +125,7 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "gdp_sna_break_2010",
     severity: "note",
+    comparisonEffect: "limits",
     messageKa: "მშპ-ის მაჩვენებელი 2010 წელს აღრიცხვის სტანდარტს იცვლის (SNA 1993 → SNA 2008).",
     messageEn: "The GDP denominator changes accounting standard at 2010 (SNA 1993 to SNA 2008).",
     methodologyRef: "national-nominal-gdp.md",
@@ -131,6 +139,7 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "gdp_preliminary",
     severity: "note",
+    comparisonEffect: "none",
     messageKa: "გამოყენებული მშპ-ის მაჩვენებელი წინასწარია.",
     messageEn: "A GDP denominator used by this result is preliminary.",
     methodologyRef: "national-nominal-gdp.md",

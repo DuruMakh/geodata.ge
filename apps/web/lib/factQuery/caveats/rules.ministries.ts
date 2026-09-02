@@ -39,6 +39,7 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "program_coverage_partial",
     severity: "severe",
+    comparisonEffect: "none",
     messageKa:
       "მოთხოვნილი პროგრამული მწკრივი ზოგიერთ წელს არ ფარავს; არარსებული მნიშვნელობა ნული არ არის.",
     messageEn: "The requested program series does not cover every requested year; a missing value is not zero.",
@@ -68,6 +69,7 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "admin_category_not_yet_established",
     severity: "severe",
+    comparisonEffect: "none",
     messageKa:
       "მოთხოვნილი ადმინისტრაციული კატეგორია ამ წლის კლასიფიკაციაში არ არსებობს — ის მოგვიანებით ჩამოყალიბდა; არარსებული მნიშვნელობა ნული არ არის.",
     messageEn:
@@ -90,6 +92,7 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "program_historical_join",
     severity: "note",
+    comparisonEffect: "limits",
     messageKa:
       "მწკრივი იყენებს დამტკიცებულ ისტორიულ გაერთიანებას; შენარჩუნებულია მისი მოცულობა და ორიგინალი დასახელება.",
     messageEn: "The series uses an approved historical succession join; its scope and original label are preserved.",
@@ -123,6 +126,7 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "program_parent_category_modern_grouping",
     severity: "severe",
+    comparisonEffect: "none",
     messageKa:
       "მშობელი ადმინისტრაციული კატეგორია სერიის თანამედროვე მიკუთვნებაა და ამ წელს ჯერ არ არსებობდა; ხარჯი მაშინ სხვა უწყებამ განახორციელა. თანხა და წილი სწორია, მაგრამ მშობელი კატეგორია ამ წლისთვის კუთვნილების მტკიცება არ არის.",
     messageEn:
@@ -143,6 +147,7 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
   {
     code: "non_positive_comparison_base",
     severity: "note",
+    comparisonEffect: "none",
     messageKa:
       "საწყისი მაჩვენებელი ნულოვანი ან უარყოფითია, ამიტომ პროცენტული ზრდა არ გამოითვლება; აბსოლუტური სხვაობა შესაძლოა დარჩეს.",
     messageEn: "The starting value is zero or negative, so percentage growth is unavailable; an absolute difference may remain.",

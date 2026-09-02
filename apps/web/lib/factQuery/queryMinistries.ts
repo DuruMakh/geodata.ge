@@ -90,7 +90,18 @@ function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): Fact
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
 }
 
-export function queryMinistries(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryResponse {
+export function queryMinistries(
+  snapshot: FactQuerySnapshot,
+  rawInput: unknown,
+  /**
+   * Set only by compare(). It makes the comparison-only rules reachable while
+   * they read THIS function pre-scoped context rather than one rebuilt from
+   * scratch - the rebuild hardcoded adminCategoryYears to [] and fired a severe,
+   * false "the parent category did not exist that year" caveat on every program
+   * cell of every comparison.
+   */
+  comparison: CaveatContext["comparison"] = null,
+): FactQueryResponse {
   const parsed = queryMinistriesInput.safeParse(rawInput);
 
   if (!parsed.success) {
@@ -329,6 +340,12 @@ export function queryMinistries(snapshot: FactQuerySnapshot, rawInput: unknown):
         // actual and a missing one has no basis at all.
         basis: availability === "missing" ? null : "actual",
         valueDefinition: valueDefinitionFor(kind, input.measure, originalLabelKa),
+        // originalLabelKa is deliberately NOT in the identity. It is presentation:
+        // the year own official name, surfaced instead of overwriting the series
+        // name. Comparing the display string instead of this declined every
+        // comparison spanning a RENAME - 48 of 48 programs excluded, whole
+        // rankings returned empty - while changing nothing about what was measured.
+        valueDefinitionId: `ministries:${input.measure}:${kind}`,
         sourceIds,
       });
     }
@@ -364,10 +381,12 @@ export function queryMinistries(snapshot: FactQuerySnapshot, rawInput: unknown):
       year: o.year,
       value: o.value,
       basis: o.basis,
+      valueDefinitionId: o.valueDefinitionId,
     })),
     municipalTotalInputs: [],
+    municipalInputServedBy: {},
     gdpInputs,
-    comparison: null,
+    comparison,
     // Caveat context only: the joins themselves are already applied in the
     // served facts, so this list is never a transformation input here.
     historicalJoinSeriesYears: snapshot.ministries.historicalJoinSeriesYears,

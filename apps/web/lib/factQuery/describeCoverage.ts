@@ -488,6 +488,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       entityIds: [],
       observations: [],
       municipalTotalInputs: [],
+    municipalInputServedBy: {},
       gdpInputs: [],
       comparison: null,
       historicalJoinSeriesYears: snapshot.ministries.historicalJoinSeriesYears,

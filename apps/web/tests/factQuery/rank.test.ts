@@ -489,4 +489,174 @@ describe("rank", () => {
       expect(errorOf(result).code).toBe("data_version_changed");
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Regression cover for the review of 2026-09-02. A ranking is the shape a
+  // reader repeats without checking, so a wrong one is the worst output here.
+  // ---------------------------------------------------------------------------
+
+  describe("never ranks across a definition break", () => {
+    it("excludes every municipality rather than publishing 2015-to-2020 function growth", () => {
+      const result = rank(snapshot, {
+        datasetId: "municipal-expenditure",
+        dimension: "entities",
+        entityType: "municipality",
+        seriesId: "municipal.education",
+        fromYear: 2015,
+        toYear: 2020,
+        measure: "amount_gel",
+        metric: "percentage_change",
+        limit: 100,
+      });
+
+      // This returned 64 entries, 0 exclusions, status "ok", topped by +572.1%.
+      expect(data(result).entries).toEqual([]);
+      expect(data(result).exclusions.length).toBeGreaterThan(0);
+      for (const exclusion of data(result).exclusions) {
+        expect(exclusion.reason.length).toBeGreaterThan(0);
+      }
+    });
+
+    it("excludes the same way for the share metric", () => {
+      const result = rank(snapshot, {
+        datasetId: "municipal-expenditure",
+        dimension: "entities",
+        entityType: "municipality",
+        seriesId: "municipal.education",
+        fromYear: 2015,
+        toYear: 2020,
+        measure: "share_of_total_pct",
+        metric: "percentage_point_change",
+        limit: 100,
+      });
+
+      expect(data(result).entries).toEqual([]);
+    });
+
+    it("still ranks two post-break years", () => {
+      const result = rank(snapshot, {
+        datasetId: "municipal-expenditure",
+        dimension: "entities",
+        entityType: "municipality",
+        seriesId: "municipal.education",
+        fromYear: 2020,
+        toYear: 2024,
+        measure: "amount_gel",
+        metric: "percentage_change",
+        limit: 100,
+      });
+
+      expect(data(result).entries.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("does not empty a ranking over cosmetic label changes", () => {
+    it("ranks ministries programs across years where many were renamed", () => {
+      const result = rank(snapshot, {
+        datasetId: "ministries",
+        dimension: "series",
+        level: "major_program",
+        fromYear: 2012,
+        toYear: 2024,
+        measure: "amount_gel",
+        metric: "percentage_change",
+        limit: 20,
+      });
+
+      // This returned 0 entries and 48 exclusions: every program that had ever
+      // been renamed was declined, because the display string carried the
+      // year own official label.
+      expect(data(result).entries.length).toBeGreaterThan(0);
+      expect(result.status).not.toBe("empty");
+    });
+  });
+
+  describe("exclusions state the real reason", () => {
+    it("does not report a non-positive base as an unavailable indicator", () => {
+      const zero = snapshot.municipal.functionFacts.find(
+        (f) => f.amountGel === 0 && f.year >= 2016 && f.year < 2024,
+      );
+      expect(zero).toBeDefined();
+
+      const result = rank(snapshot, {
+        datasetId: "municipal-expenditure",
+        dimension: "entities",
+        entityType: "municipality",
+        seriesId: zero!.categoryId,
+        fromYear: zero!.year,
+        toYear: 2024,
+        measure: "amount_gel",
+        metric: "percentage_change",
+        limit: 100,
+      });
+
+      const excluded = data(result).exclusions.find((e) => e.id === zero!.municipalityCode);
+      expect(excluded).toBeDefined();
+      // Both endpoint values exist; percentage change is undefined because the
+      // base is zero. Saying "the indicator is unavailable" was a wrong
+      // statement about the data.
+      expect(excluded!.reason).toContain("ნულოვანი");
+    });
+  });
+
+  describe("tie reporting, in both directions", () => {
+    it("reports cutoffSplitsTie false when the cut is clean", () => {
+      const result = rank(snapshot, {
+        datasetId: "municipal-expenditure",
+        dimension: "entities",
+        entityType: "municipality",
+        seriesId: "municipal.total",
+        year: 2024,
+        measure: "amount_gel",
+        metric: "value",
+        limit: 5,
+      });
+
+      // Nothing anywhere asserted the false case, so a hardcoded `true` passed
+      // the whole suite.
+      expect(data(result).universe.cutoffSplitsTie).toBe(false);
+    });
+
+    it("marks a distinct-valued entry as untied", () => {
+      const result = rank(snapshot, {
+        datasetId: "municipal-expenditure",
+        dimension: "entities",
+        entityType: "municipality",
+        seriesId: "municipal.total",
+        year: 2024,
+        measure: "amount_gel",
+        metric: "value",
+        limit: 10,
+      });
+
+      // GEL totals to the cent: the top entry is unique.
+      expect(data(result).entries[0]!.tied).toBe(false);
+    });
+  });
+
+  describe("parent filtering returns the right children", () => {
+    it("returns only programs whose parent is the requested category", () => {
+      const parentSeriesId = snapshot.ministries.facts.find((f) => f.level === "major_program")?.parentItemId;
+      expect(parentSeriesId).toBeDefined();
+
+      const result = rank(snapshot, {
+        datasetId: "ministries",
+        dimension: "series",
+        level: "major_program",
+        parentSeriesId: parentSeriesId!,
+        year: 2024,
+        measure: "amount_gel",
+        metric: "value",
+        limit: 50,
+      });
+
+      const childIds = new Set(
+        snapshot.ministries.facts
+          .filter((f) => f.level === "major_program" && f.parentItemId === parentSeriesId)
+          .map((f) => f.itemId),
+      );
+      expect(data(result).entries.length).toBeGreaterThan(0);
+      for (const entry of data(result).entries) expect(childIds.has(entry.seriesId)).toBe(true);
+    });
+  });
 });

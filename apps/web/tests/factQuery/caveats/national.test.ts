@@ -12,6 +12,7 @@ function context(overrides: Partial<CaveatContext>): CaveatContext {
     entityIds: [],
     observations: [],
     municipalTotalInputs: [],
+    municipalInputServedBy: {},
     gdpInputs: [],
     comparison: null,
     historicalJoinSeriesYears: [],
@@ -159,19 +160,19 @@ describe("gdp caveats", () => {
 
 describe("value-driven rules", () => {
   it("negative_revenue_correction fires on a negative observation", () => {
-    const ctx = context({ observations: [{ entityId: "country.georgia", seriesId: "revenue.other_revenue", level: "public_field", parentSeriesId: null, year: 2020, value: -5, basis: "actual" }] });
+    const ctx = context({ observations: [{ entityId: "country.georgia", seriesId: "revenue.other_revenue", level: "public_field", parentSeriesId: null, year: 2020, value: -5, basis: "actual", valueDefinitionId: "national-revenue:amount_gel:component" }] });
     expect(codes(ctx)).toContain("negative_revenue_correction");
   });
   it("does not fire when all values are non-negative", () => {
-    const ctx = context({ observations: [{ entityId: "country.georgia", seriesId: "revenue.vat", level: "public_field", parentSeriesId: null, year: 2020, value: 5, basis: "actual" }] });
+    const ctx = context({ observations: [{ entityId: "country.georgia", seriesId: "revenue.vat", level: "public_field", parentSeriesId: null, year: 2020, value: 5, basis: "actual", valueDefinitionId: "national-revenue:amount_gel:component" }] });
     expect(codes(ctx)).not.toContain("negative_revenue_correction");
   });
   it("planned_values fires when any returned basis is planned", () => {
-    const ctx = context({ observations: [{ entityId: "country.georgia", seriesId: "revenue.vat", level: "public_field", parentSeriesId: null, year: 2026, value: 5, basis: "planned" }] });
+    const ctx = context({ observations: [{ entityId: "country.georgia", seriesId: "revenue.vat", level: "public_field", parentSeriesId: null, year: 2026, value: 5, basis: "planned", valueDefinitionId: "national-revenue:amount_gel:component" }] });
     expect(codes(ctx)).toContain("planned_values");
   });
   it("planned_values does not fire when all returned bases are actual", () => {
-    const ctx = context({ observations: [{ entityId: "country.georgia", seriesId: "revenue.vat", level: "public_field", parentSeriesId: null, year: 2020, value: 5, basis: "actual" }] });
+    const ctx = context({ observations: [{ entityId: "country.georgia", seriesId: "revenue.vat", level: "public_field", parentSeriesId: null, year: 2020, value: 5, basis: "actual", valueDefinitionId: "national-revenue:amount_gel:component" }] });
     expect(codes(ctx)).not.toContain("planned_values");
   });
 });

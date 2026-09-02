@@ -132,6 +132,41 @@ describe("getSources", () => {
       expect(source.narrowed).toBe(false);
     });
 
+    it("says WHICH of the three narrowing outcomes happened", () => {
+      // narrowed alone could not distinguish these: it means "the list got
+      // shorter", which the drop-the-filter fallback makes false by
+      // construction. A caller asking for a year no document covers received a
+      // document from another year, byte-identical to a genuine match.
+      const notRequested = getSources(snapshot, { sourceIds: [grouped] });
+      const applied = getSources(snapshot, { sourceIds: [grouped], years: [2020] });
+      const dropped = getSources(snapshot, { sourceIds: [grouped], years: [1801] });
+
+      expect(data(notRequested).sources[0]!.narrowingOutcome).toBe("not_requested");
+      expect(data(applied).sources[0]!.narrowingOutcome).toBe("applied");
+      expect(data(dropped).sources[0]!.narrowingOutcome).toBe("dropped_no_match");
+    });
+
+    it("distinguishes a real single-document match from a dropped filter", () => {
+      const single = "source.mof_2017_revenue_form1_pdf";
+      const match = getSources(snapshot, { sourceIds: [single], years: [2017] });
+      const miss = getSources(snapshot, { sourceIds: [single], years: [1801] });
+
+      // These two returned JSON-identical objects.
+      expect(data(match).sources[0]!.narrowingOutcome).toBe("applied");
+      expect(data(miss).sources[0]!.narrowingOutcome).toBe("dropped_no_match");
+    });
+
+    it("does not present an unscoped document as a dataset match", () => {
+      // The Geostat municipal-population workbook carries no datasetId. It used
+      // to be exempted from the filter and returned as a match for any dataset.
+      const result = getSources(snapshot, {
+        sourceIds: ["source.geostat_municipal_population"],
+        datasetId: "national-revenue",
+      });
+
+      expect(data(result).sources[0]!.narrowingOutcome).toBe("dropped_no_match");
+    });
+
     it("keeps a single-document source intact under narrowing", () => {
       const result = getSources(snapshot, {
         sourceIds: ["source.mof_2017_revenue_form1_pdf"],

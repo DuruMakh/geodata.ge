@@ -35,6 +35,7 @@ function context(overrides: Partial<CaveatContext>): CaveatContext {
     entityIds: ["11"],
     observations: [],
     municipalTotalInputs: [],
+    municipalInputServedBy: {},
     gdpInputs: [],
     comparison: null,
     historicalJoinSeriesYears: [],
@@ -225,15 +226,46 @@ describe("per_resident_coverage_limited", () => {
 });
 
 describe("municipal_total_definition_changed", () => {
+  const pair = (fromId: string, toId: string, seriesId = "municipal.total") => [
+    { entityId: "11", seriesId, level: "total", parentSeriesId: null, year: 2015, value: 1, basis: "actual" as const, valueDefinitionId: fromId },
+    { entityId: "11", seriesId, level: "total", parentSeriesId: null, year: 2024, value: 2, basis: "actual" as const, valueDefinitionId: toId },
+  ];
+
   it("fires when comparison endpoints use different total definitions", () => {
     const ctx = context({
-      comparison: { fromYear: 2015, toYear: 2024, fromDefinition: "functional_total_fallback", toDefinition: "total_payments_actual" },
+      comparison: { fromYear: 2015, toYear: 2024 },
+      observations: pair("municipal:amount_gel:total:portal_functional_total_fallback", "municipal:amount_gel:total:total_payments"),
     });
     expect(codes(ctx)).toContain("municipal_total_definition_changed");
   });
   it("does not fire when both endpoints share a definition", () => {
     const ctx = context({
-      comparison: { fromYear: 2020, toYear: 2024, fromDefinition: "total_payments_actual", toDefinition: "total_payments_actual" },
+      comparison: { fromYear: 2015, toYear: 2024 },
+      observations: pair("municipal:amount_gel:total:total_payments", "municipal:amount_gel:total:total_payments"),
+    });
+    expect(codes(ctx)).not.toContain("municipal_total_definition_changed");
+  });
+
+  // The break is real for FUNCTION series too, and that is the case that shipped
+  // wrong: their display prose is constant across 2015, so a growth figure was
+  // published for every function of every municipality.
+  it("fires on a function series whose regime changed, not just the total", () => {
+    const ctx = context({
+      comparison: { fromYear: 2015, toYear: 2024 },
+      observations: pair(
+        "municipal:amount_gel:function:portal_functional_total_fallback",
+        "municipal:amount_gel:function:total_payments",
+        "municipal.education",
+      ),
+    });
+    expect(codes(ctx)).toContain("municipal_total_definition_changed");
+  });
+
+  it("does not fire outside the municipal dataset", () => {
+    const ctx = context({
+      datasetId: "ministries",
+      comparison: { fromYear: 2012, toYear: 2025 },
+      observations: pair("ministries:amount_gel:major_program", "ministries:amount_gel:major_program_renamed"),
     });
     expect(codes(ctx)).not.toContain("municipal_total_definition_changed");
   });

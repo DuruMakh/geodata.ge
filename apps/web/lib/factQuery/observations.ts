@@ -37,6 +37,23 @@ export type Observation = {
   missingReason: string | null;
   basis: "actual" | "planned" | null;
   valueDefinition: string;
+  /**
+   * Structured identity of WHAT IS MEASURED, for machine comparison.
+   *
+   * valueDefinition above is display prose and must never be used to decide
+   * whether two years are like-for-like: it is simultaneously too weak and too
+   * strong. Too weak, because a municipal FUNCTION series carries a constant
+   * string across the 2015 portal-fallback break, so `compare` published a
+   * +572.1% education "growth" and `rank` turned it into a 64-row league table.
+   * Too strong, because queryMinistries appends the year's own official label
+   * when it differs, so a program that was merely RENAMED compared unequal and
+   * whole rankings came back empty.
+   *
+   * This field carries only the things that change the measurement, and nothing
+   * cosmetic. Two observations with the same id measure the same quantity the
+   * same way; a difference is a real definition break.
+   */
+  valueDefinitionId: string;
   sourceIds: string[];
   documentIds: string[];
   caveatIds: string[];
@@ -139,6 +156,12 @@ export function caveatIdsForObservation(
 ): string[] {
   const seriesYear = `${observation.seriesId}:${observation.year}`;
   const entityYear = `${observation.entityId}:${observation.year}`;
+  // The finest shape, for a claim true of ONE series of one entity in one year.
+  // adjara_consolidation_applied needs it: entity-year could not separate
+  // Adjara's consolidated TOTAL from its unconsolidated education amount in the
+  // same year, so naming the total in a request stamped the function cell with
+  // a consolidation notice that was false of it.
+  const entitySeriesYear = `${observation.entityId}:${observation.seriesId}:${observation.year}`;
   const year = String(observation.year);
 
   return caveats
@@ -146,6 +169,7 @@ export function caveatIdsForObservation(
       (caveat) =>
         caveat.affects.includes(seriesYear) ||
         caveat.affects.includes(entityYear) ||
+        caveat.affects.includes(entitySeriesYear) ||
         caveat.affects.includes(observation.seriesId) ||
         caveat.affects.includes(observation.entityId) ||
         caveat.affects.includes(year) ||

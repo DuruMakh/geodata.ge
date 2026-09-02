@@ -67,7 +67,20 @@ function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): Fact
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
 }
 
-export function queryMunicipal(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryResponse {
+export function queryMunicipal(
+  snapshot: FactQuerySnapshot,
+  rawInput: unknown,
+  /**
+   * Set only by compare(). It makes the comparison-only rules reachable while
+   * they read THIS function pre-scoped context - the contributing total rows,
+   * the served category years, the real entity ids. compare() used to rebuild
+   * a context from scratch instead, and three of its fields disagreed with
+   * what the query had built for the identical rows: a severe provenance
+   * caveat fired falsely on every program cell, and severe municipal caveats
+   * vanished for regions. Passing the window down makes that class impossible.
+   */
+  comparison: CaveatContext["comparison"] = null,
+): FactQueryResponse {
   const parsed = queryMunicipalInput.safeParse(rawInput);
 
   if (!parsed.success) {
@@ -212,9 +225,15 @@ export function queryMunicipal(snapshot: FactQuerySnapshot, rawInput: unknown): 
       return value === undefined ? null : { value, sourceIds: fact ? splitSourceIds(fact.sourceId) : [] };
     }
     if (entity.entityType === "region") {
+      const codes = membersOf.get(entity.entityId) ?? [];
+      // Every member must be present for the sum to BE the region total.
+      // buildMunicipalListRows treats an absent member as 0 and still emits a
+      // row, so without this a region with one missing member returned a short
+      // figure marked "available" - the "missing is never zero" non-negotiable
+      // broken at the one grain nothing else checks it.
+      if (codes.length === 0 || codes.some((code) => !municipalTotalByKey.has(`${code}:${year}`))) return null;
       const row = listRowsByYear.get(year)?.regions.find((r) => r.id === entity.entityId);
       if (!row) return null;
-      const codes = membersOf.get(entity.entityId) ?? [];
       const memberSourceIds = codes.flatMap((code) => {
         const fact = municipalTotalByKey.get(`${code}:${year}`);
         return fact ? splitSourceIds(fact.sourceId) : [];
@@ -232,6 +251,35 @@ export function queryMunicipal(snapshot: FactQuerySnapshot, rawInput: unknown): 
     }
     const fact = municipalTotalByKey.get(`${entity.entityId}:${year}`);
     return fact ? { value: fact.publicTotalGel, sourceIds: splitSourceIds(fact.sourceId) } : null;
+  };
+
+  /**
+   * The year PANEL regime: 2015 is the portal functional fallback for all 64
+   * municipalities, 2016 onward are payment totals. Used for aggregates, where
+   * one member substituting a functional total does not redefine the whole.
+   */
+  const panelRegimeByYear = new Map<number, string>();
+  for (const year of input.years) {
+    const counts = new Map<string, number>();
+    for (const fact of municipal.totalFacts) {
+      if (fact.year !== year) continue;
+      counts.set(fact.publicTotalMeasure, (counts.get(fact.publicTotalMeasure) ?? 0) + 1);
+    }
+    const ranked = Array.from(counts.entries()).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
+    panelRegimeByYear.set(year, ranked[0]?.[0] ?? "unknown");
+  }
+
+  const definitionRegimeFor = (entity: EntityMeta, year: number): string => {
+    if (entity.entityType === "municipality") {
+      // A single municipality own measure IS its definition: Khulo 2024 serves
+      // a reviewed functional total in place of a payment actual, so growth
+      // from its 2023 payment total is not like-for-like.
+      return municipalTotalByKey.get(`${entity.entityId}:${year}`)?.publicTotalMeasure ?? "unknown";
+    }
+    // Aggregates use the panel regime. Folding one member substitute into a
+    // region identity would decline every ordinary Adjara comparison touching
+    // 2024, and over-declining is what emptied whole rankings elsewhere.
+    return panelRegimeByYear.get(year) ?? "unknown";
   };
 
   const totalValueDefinition = (entity: EntityMeta, year: number): string => {
@@ -256,6 +304,8 @@ export function queryMunicipal(snapshot: FactQuerySnapshot, rawInput: unknown): 
   type ObservationCore = Omit<Observation, "documentIds" | "caveatIds">;
   const cores: ObservationCore[] = [];
   const usedTotalFacts = new Map<string, MunicipalTotalFact>();
+  /** `${municipalityCode}:${year}` -> the returned entities whose figure includes that row. */
+  const servedBy = new Map<string, Set<string>>();
 
   for (const entityId of requestedEntityIds) {
     const entity = entityMeta.get(entityId);
@@ -268,15 +318,22 @@ export function queryMunicipal(snapshot: FactQuerySnapshot, rawInput: unknown): 
         // Record the total rows behind whatever is returned so the five
         // quality-state rules see exactly these and no more (the scoping
         // contract on CaveatContext).
-        const codesBehind =
+        // The country aggregate used to contribute NO input row, so no
+        // warningType or reconciliation rule could fire on it at all - its ten
+        // functional shares summed to 91.41% with nothing saying why. Its own
+        // served total row carries both fields, so it belongs here like any
+        // other contributing row.
+        const inputFacts: MunicipalTotalFact[] =
           entity.entityType === "country"
-            ? []
-            : entity.entityType === "region"
-              ? (membersOf.get(entity.entityId) ?? [])
-              : [entity.entityId];
-        for (const code of codesBehind) {
-          const fact = municipalTotalByKey.get(`${code}:${year}`);
-          if (fact) usedTotalFacts.set(`${code}:${year}`, fact);
+            ? [countryTotalFactByYear.get(year)].filter((f): f is MunicipalTotalFact => f !== undefined)
+            : (entity.entityType === "region" ? (membersOf.get(entity.entityId) ?? []) : [entity.entityId])
+                .map((code) => municipalTotalByKey.get(`${code}:${year}`))
+                .filter((f): f is MunicipalTotalFact => f !== undefined);
+
+        for (const fact of inputFacts) {
+          const key = `${fact.municipalityCode}:${fact.year}`;
+          usedTotalFacts.set(key, fact);
+          servedBy.set(key, (servedBy.get(key) ?? new Set<string>()).add(entity.entityId));
         }
 
         let numeratorAmount: number | null = null;
@@ -377,11 +434,21 @@ export function queryMunicipal(snapshot: FactQuerySnapshot, rawInput: unknown): 
           // Every municipal fact is basis "actual"; the dataset carries no
           // planned rows, so a missing cell has no basis at all.
           basis: availability === "missing" ? null : "actual",
-          valueDefinition: isTotal
-            ? totalValueDefinition(entity, year)
-            : input.measure === "share_of_total_pct"
-              ? "წილი ერთეულის საკუთარ საჯარო ჯამში, 0-დან 100-მდე შკალაზე."
-              : "ფუნქციური კლასიფიკაციის გადამოწმებული მაჩვენებელი ლარში, სრული სიზუსტით.",
+          // measure FIRST, isTotal last, matching queryNational valueDefinitionFor.
+          // The old order tested isTotal first, so every gel_per_resident value -
+          // a measure only the total series supports - shipped a definition
+          // describing a GEL total, in the wrong unit, every single time.
+          valueDefinition:
+            input.measure === "share_of_total_pct"
+              ? isTotal
+                ? "ერთეულის საჯარო ჯამი მისსავე ჯამში, ანუ ყოველთვის 100%."
+                : "წილი ერთეულის საკუთარ საჯარო ჯამში, 0-დან 100-მდე შკალაზე."
+              : input.measure === "gel_per_resident"
+                ? "ერთეულის 2025 წლის საჯარო ჯამი გაყოფილი იმავე წლის მოსახლეობაზე, ლარი ერთ მცხოვრებზე."
+                : isTotal
+                  ? totalValueDefinition(entity, year)
+                  : "ფუნქციური კლასიფიკაციის გადამოწმებული მაჩვენებელი ლარში, სრული სიზუსტით.",
+          valueDefinitionId: `municipal:${input.measure}:${isTotal ? "total" : "function"}:${definitionRegimeFor(entity, year)}`,
           sourceIds,
         });
       }
@@ -414,10 +481,14 @@ export function queryMunicipal(snapshot: FactQuerySnapshot, rawInput: unknown): 
       year: o.year,
       value: o.value,
       basis: o.basis,
+      valueDefinitionId: o.valueDefinitionId,
     })),
     municipalTotalInputs: Array.from(usedTotalFacts.values()),
+    municipalInputServedBy: Object.fromEntries(
+      Array.from(servedBy, ([key, entities]) => [key, Array.from(entities).sort()]),
+    ),
     gdpInputs: [],
-    comparison: null,
+    comparison,
     historicalJoinSeriesYears: [],
     adminCategoryYears: [],
   };

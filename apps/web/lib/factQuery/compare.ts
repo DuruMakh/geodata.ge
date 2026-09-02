@@ -13,13 +13,12 @@
 // or a 2015 municipal portal fallback against a later payment total. Those
 // return both endpoints with null change fields and a reason, never a growth
 // figure that reads as like-for-like.
-import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
+import { CAVEAT_RULES } from "./caveats";
 import { buildResponseMeta } from "./meta";
 import { queryMinistries } from "./queryMinistries";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
-import type { CaveatContext } from "./caveats";
 import type { Observation } from "./observations";
 import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, Unit } from "./types";
 
@@ -30,6 +29,8 @@ export type ComparisonEndpoint = {
   missingReason: string | null;
   basis: "actual" | "planned" | null;
   valueDefinition: string;
+  /** Structured identity of what is measured. This, never valueDefinition, decides like-for-like. */
+  valueDefinitionId: string;
   sourceIds: string[];
   documentIds: string[];
 };
@@ -59,30 +60,17 @@ export type Comparison = {
 const PERCENTAGE_MEASURES = new Set<Measure>(["share_of_total_pct", "share_of_gdp_pct"]);
 
 /**
- * Caveats that say an endpoint's COVERAGE OR DEFINITION differs, as opposed to
- * flagging its provenance or reconciliation quality. Only the former makes two
- * years not like-for-like.
+ * How each caveat code bears on a two-year comparison, taken from the rule that
+ * declares it (caveats/engine.ts ComparisonEffect).
  *
- * The distinction is load-bearing, and getting it wrong in either direction is
- * a product failure. revenue_2004_total_scope says "narrower coverage:
- * increase in liabilities is unavailable" - the 2004 total counts different
- * things than the 2005 one, so growth between them is meaningless.
- * municipal_source_version_difference says the reviewed figure differs between
- * source versions, and municipal_financing_outside_functional says financing
- * sits outside the functional breakdown: both are quality disclosures about a
- * figure that still measures total payments. Treating those as definition
- * breaks declined Tbilisi 2019 -> 2023, a perfectly ordinary payment-total
- * comparison.
- *
- * Most definition changes never reach this set, because they are already
- * visible in valueDefinition - the municipal 2015 portal fallback and Khulo's
- * 2024 fallback both name their measure there, and the inequality check below
- * catches them. This set is the supplement for scope changes that
- * valueDefinition does not encode. Asymmetric quality caveats stay visible on
- * the row's caveatIds and in meta.caveats; they just do not suppress the
- * growth figure.
+ * This replaced a hand-maintained literal set that contained exactly one code.
+ * Nothing could prove that set complete, and it was not: revenue_internal_flows_netted
+ * marks the year from which a revenue series SUBTRACTS internal flows, so
+ * revenue.grants 2005 and 2020 count different things - and the pair was published
+ * as "comparable, +651.19%". Moving the decision onto the rule forces whoever adds
+ * the next rule to make it, and a test can now assert every code is classified.
  */
-const SCOPE_BREAK_CAVEATS = new Set(["revenue_2004_total_scope"]);
+const COMPARISON_EFFECT = new Map(CAVEAT_RULES.map((rule) => [rule.code, rule.comparisonEffect]));
 
 const REASON_SEVERE_ASYMMETRY = "ერთ-ერთ საზღვარზე მოქმედებს მოცულობის შემზღუდველი შენიშვნა, მეორეზე კი არა — წლები ერთსა და იმავეს არ ზომავს.";
 const REASON_DEFINITION_CHANGED = "საზღვრები სხვადასხვა განსაზღვრებით არის გაზომილი, ამიტომ ზრდა პირდაპირ შედარებადი არ არის.";
@@ -90,6 +78,7 @@ const REASON_BASIS_DIFFERS = "საზღვრებს განსხვა�
 const REASON_ENDPOINT_MISSING = "ერთ-ერთი საზღვრის მნიშვნელობა მიუწვდომელია, ამიტომ ცვლილება არ გამოითვლება.";
 const REASON_NON_POSITIVE_BASE = "საწყისი მაჩვენებელი ნულოვანი ან უარყოფითია, ამიტომ პროცენტული ზრდა არ გამოითვლება.";
 const REASON_GDP_STANDARD_BREAK = "მშპ-ის აღრიცხვის სტანდარტი შუალედში იცვლება, ამიტომ შედარება შეზღუდულია.";
+const REASON_HISTORICAL_JOIN = "ერთ-ერთი საზღვარი დამტკიცებული ისტორიული შეერთებით არის მოწოდებული, ამიტომ შედარება შეზღუდულია.";
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
@@ -103,6 +92,7 @@ function endpointOf(observation: Observation): ComparisonEndpoint {
     missingReason: observation.missingReason,
     basis: observation.basis,
     valueDefinition: observation.valueDefinition,
+    valueDefinitionId: observation.valueDefinitionId,
     sourceIds: observation.sourceIds,
     documentIds: observation.documentIds,
   };
@@ -134,6 +124,10 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
 
   const years = [input.fromYear, input.toYear];
   const target = input.target;
+  // Handed to the sub-query so IT evaluates the comparison-only rules against
+  // its own pre-scoped inputs. compare() previously rebuilt a CaveatContext by
+  // hand; three of its fields disagreed with the query for the identical rows.
+  const comparisonWindow = { fromYear: input.fromYear, toYear: input.toYear };
 
   // Endpoints come from the observation queries, so `compare` owns no second
   // copy of the value arithmetic (Global Constraints: never duplicate a
@@ -141,35 +135,43 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
   // because two rules exist only for comparisons.
   let endpointResult: FactQueryResponse;
   let datasetId: DatasetId;
-  let entityIds: string[];
 
   if (target.dataset === "national") {
     datasetId = target.side === "revenue" ? "national-revenue" : "national-expenditure";
-    entityIds = [];
-    endpointResult = queryNational(snapshot, {
+    endpointResult = queryNational(
+      snapshot,
+      {
       side: target.side,
       seriesIds: target.seriesIds,
       years,
       measure: input.measure,
-    });
+      },
+      comparisonWindow,
+    );
   } else if (target.dataset === "ministries") {
     datasetId = "ministries";
-    entityIds = [];
-    endpointResult = queryMinistries(snapshot, {
+    endpointResult = queryMinistries(
+      snapshot,
+      {
       level: target.level,
       seriesIds: target.seriesIds,
       years,
       measure: input.measure,
-    });
+      },
+      comparisonWindow,
+    );
   } else {
     datasetId = "municipal-expenditure";
-    entityIds = target.entityIds;
-    endpointResult = queryMunicipal(snapshot, {
+    endpointResult = queryMunicipal(
+      snapshot,
+      {
       entityIds: target.entityIds,
       seriesIds: target.seriesIds,
       years,
       measure: input.measure,
-    });
+      },
+      comparisonWindow,
+    );
   }
 
   if (endpointResult.kind === "error") {
@@ -206,7 +208,6 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
   const gdpStandardBreak = endpointCaveats.some((c) => c.code === "gdp_sna_break_2010");
 
   const comparisons: Comparison[] = [];
-  let definitionChange: { fromDefinition: string; toDefinition: string } | null = null;
 
   for (const [key, pair] of byPair) {
     const from = pair.from;
@@ -217,17 +218,21 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
 
     if (from.value === null || to.value === null) reasons.push(REASON_ENDPOINT_MISSING);
     if (from.basis !== null && to.basis !== null && from.basis !== to.basis) reasons.push(REASON_BASIS_DIFFERS);
-    if (from.valueDefinition !== to.valueDefinition) {
-      reasons.push(REASON_DEFINITION_CHANGED);
-      definitionChange ??= { fromDefinition: from.valueDefinition, toDefinition: to.valueDefinition };
-    }
+    // The STRUCTURED identity, never the display prose. valueDefinition is written
+    // for a reader: it stays constant across the municipal 2015 portal-fallback
+    // break (so a +572.1% education "growth" was published, and rank turned it
+    // into a 64-row league table) and it VARIES when a ministries program is
+    // merely renamed (so 48 of 48 programs were excluded and rankings came back
+    // empty). It is wrong in both directions and must not decide this.
+    if (from.valueDefinitionId !== to.valueDefinitionId) reasons.push(REASON_DEFINITION_CHANGED);
 
-    // A scope-break caveat naming one endpoint and not the other.
-    const scopeOnFrom = from.caveatIds.filter((id) => SCOPE_BREAK_CAVEATS.has(id));
-    const scopeOnTo = to.caveatIds.filter((id) => SCOPE_BREAK_CAVEATS.has(id));
-    const asymmetric =
-      scopeOnFrom.some((id) => !scopeOnTo.includes(id)) || scopeOnTo.some((id) => !scopeOnFrom.includes(id));
-    if (asymmetric) reasons.push(REASON_SEVERE_ASYMMETRY);
+    // A coverage-changing caveat that describes one endpoint and not the other.
+    const codes = Array.from(new Set([...from.caveatIds, ...to.caveatIds]));
+    const asymmetric = (code: string) => from.caveatIds.includes(code) !== to.caveatIds.includes(code);
+    if (codes.some((code) => COMPARISON_EFFECT.get(code) === "breaks" && asymmetric(code))) {
+      reasons.push(REASON_SEVERE_ASYMMETRY);
+    }
+    const limiting = codes.filter((code) => COMPARISON_EFFECT.get(code) === "limits");
 
     const comparable = reasons.length === 0;
 
@@ -253,9 +258,13 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     let comparability: Comparison["comparability"];
     if (!comparable) {
       comparability = "not_comparable";
-    } else if (gdpStandardBreak) {
+    } else if (gdpStandardBreak || limiting.length > 0) {
+      // Still answerable, but the reader must be told. A GDP accounting change
+      // and an approved program-history join both land here: spec 6.6 requires a
+      // join to qualify a comparison, and it previously changed nothing at all.
       comparability = "limited";
-      reasons.push(REASON_GDP_STANDARD_BREAK);
+      if (gdpStandardBreak) reasons.push(REASON_GDP_STANDARD_BREAK);
+      if (limiting.includes("program_historical_join")) reasons.push(REASON_HISTORICAL_JOIN);
     } else {
       comparability = "comparable";
     }
@@ -266,7 +275,7 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       entityId: from.entityId,
       entityLabelKa: from.entityLabelKa,
       seriesId: from.seriesId,
-      seriesLabelKa: to.seriesLabelKa,
+      seriesLabelKa: from.seriesLabelKa,
       measure: input.measure,
       unit: from.unit,
       from: endpointOf(from),
@@ -280,47 +289,20 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     });
   }
 
-  const caveatContext: CaveatContext = {
-    datasetId,
-    measure: input.measure,
-    years,
-    seriesIds: target.seriesIds,
-    entityIds,
-    observations: observations.map((o) => ({
-      entityId: o.entityId,
-      seriesId: o.seriesId,
-      level: o.level,
-      parentSeriesId: o.parentSeriesId,
-      year: o.year,
-      value: o.value,
-      basis: o.basis,
-    })),
-    municipalTotalInputs:
-      datasetId === "municipal-expenditure"
-        ? snapshot.municipal.totalFacts.filter(
-            (f) => years.includes(f.year) && entityIds.includes(f.municipalityCode),
-          )
-        : [],
-    gdpInputs: input.measure === "share_of_gdp_pct" ? snapshot.gdpFacts.filter((f) => years.includes(f.year)) : [],
-    // Set here and nowhere else: non_positive_comparison_base and
-    // municipal_total_definition_changed exist only for a comparison, and both
-    // read this. The definitions are the endpoints' own valueDefinition
-    // strings, so the municipal rule fires on exactly the 2015-to-payment-total
-    // case the spec names.
-    comparison: {
-      fromYear: input.fromYear,
-      toYear: input.toYear,
-      fromDefinition: definitionChange?.fromDefinition ?? "",
-      toDefinition: definitionChange?.toDefinition ?? "",
-    },
-    historicalJoinSeriesYears: datasetId === "ministries" ? snapshot.ministries.historicalJoinSeriesYears : [],
-    adminCategoryYears: [],
-  };
-  const caveats = evaluateCaveats(caveatContext, CAVEAT_RULES);
+  // The sub-query already evaluated every rule against its own pre-scoped
+  // context, WITH comparisonWindow set, so the comparison-only rules fired there
+  // and their codes are already on the endpoint rows caveatIds. Rebuilding a
+  // context here is what produced a false severe provenance caveat on every
+  // program cell and silently dropped severe municipal caveats for regions.
+  const caveats = endpointResult.meta.caveats;
 
   const comparableCount = comparisons.filter((c) => c.comparability !== "not_comparable").length;
+  // "empty" only when there is genuinely nothing to read. A declined comparison
+  // still returns both reviewed endpoint values, and reporting that as empty
+  // invited a consumer to short-circuit and discard the two numbers the decline
+  // was careful to preserve.
   const status: "ok" | "partial" | "empty" =
-    comparisons.length === 0 || comparableCount === 0
+    comparisons.length === 0
       ? "empty"
       : comparableCount === comparisons.length
         ? "ok"

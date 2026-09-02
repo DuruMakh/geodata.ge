@@ -45,10 +45,30 @@ export type CaveatContext = {
     year: number;
     value: number | null;
     basis: "actual" | "planned" | null;
+    /** Mirrors Observation.valueDefinitionId, so a rule can detect a real definition break between two years without reading display prose. */
+    valueDefinitionId: string;
   }[];
   municipalTotalInputs: MunicipalTotalFact[];
+  /**
+   * `${municipalityCode}:${year}` -> the entityIds in THIS response whose
+   * returned figure includes that contributing row.
+   *
+   * A municipality row reaches the response either as itself or folded inside a
+   * region or the country aggregate. Without this map a rule could only name the
+   * member code, which at aggregate grain names something the response does not
+   * contain: a region query emitted a caveat with 548 affects entries matching
+   * zero observations, so the disclosure was simultaneously over-stated in
+   * meta.caveats and absent from every row.
+   */
+  municipalInputServedBy: Record<string, string[]>;
   gdpInputs: ServedNationalGdpFact[];
-  comparison: { fromYear: number; toYear: number; fromDefinition: string; toDefinition: string } | null;
+  /**
+   * Set only when the request is a comparison. Carries the two years and
+   * nothing else: a rule that needs to know whether the definition changed
+   * reads `observations[].valueDefinitionId`, which is the structured identity,
+   * rather than being handed display strings the caller pre-compared.
+   */
+  comparison: { fromYear: number; toYear: number } | null;
   /**
    * `${seriesId}:${year}` cells served through an approved succession or legacy join.
    * Per cell, not per series: a joined series still serves most of its years from its
@@ -65,9 +85,35 @@ export type CaveatContext = {
   adminCategoryYears: string[];
 };
 
+/**
+ * What this caveat means for a two-year comparison. Required on every rule so
+ * the decision is made once, by whoever knows the data, instead of being
+ * inferred later from severity or from a hand-kept list in compare.ts.
+ *
+ * "breaks"  - the endpoints do not measure the same thing. A comparison whose
+ *             endpoints disagree on this caveat is not_comparable.
+ * "limits"  - still comparable, but the reader must be told (a GDP accounting
+ *             change, an approved program-history join).
+ * "none"    - a quality, provenance or presentation disclosure. It rides along
+ *             on the row and never suppresses a growth figure.
+ *
+ * The distinction is load-bearing in BOTH directions. Marking a quality flag
+ * as "breaks" declined an ordinary Tbilisi 2019->2023 payment comparison;
+ * leaving a coverage change as "none" published revenue.grants 2005->2020 as
+ * "+651.19%, comparable" straight across the documented 2008 netting change.
+ */
+export type ComparisonEffect = "breaks" | "limits" | "none";
+
 export type CaveatRule = {
   code: string;
   severity: Severity;
+  /**
+   * Severity is about how badly a reader is misled; comparisonEffect is about
+   * whether the years are like-for-like. They are independent: gdp_sna_break_2010
+   * is a "note" that still limits a comparison, and municipal_source_actual_missing
+   * is "severe" but does not stop one.
+   */
+  comparisonEffect: ComparisonEffect;
   messageKa: string;
   messageEn: string;
   methodologyRef: string;

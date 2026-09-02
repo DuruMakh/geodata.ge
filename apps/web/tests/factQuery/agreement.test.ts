@@ -157,7 +157,10 @@ describe("ministries", () => {
       measure: "amount_gel",
     });
 
-    for (const observation of observationsOf(result)) {
+    const totals = observationsOf(result);
+    expect(totals.length).toBeGreaterThan(0);
+
+    for (const observation of totals) {
       const expected = categoryFacts
         .filter((f) => f.year === observation.year)
         .reduce((sum, f) => sum + f.amountGel, 0);
@@ -221,6 +224,9 @@ describe("municipal", () => {
   it("matches the served consolidated country total for every year", () => {
     const byYear = buildCountryTotalByYear(snapshot.municipal.countryTotalFacts);
     const years = Object.keys(byYear).map(Number).sort((a, b) => a - b);
+    // Without this the loop below never runs on an empty panel and the test
+    // passes green while proving nothing.
+    expect(years.length).toBeGreaterThan(0);
 
     const result = queryMunicipal(snapshot, {
       entityIds: ["country.georgia"],

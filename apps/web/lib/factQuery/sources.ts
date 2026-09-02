@@ -126,6 +126,39 @@ function matchDocuments(filePath: string, manifestDocuments: readonly ManifestDo
 }
 
 /**
+ * Spec section 8.1, as a pure predicate so it can be tested directly.
+ *
+ * It lived inline in scripts/prepare-fact-query-snapshot.ts, where the only way
+ * to exercise it was to run the whole build. It was verified against an ordinary
+ * source, passed, and was declared proven - while the DERIVED branch, the one
+ * with a real failure mode, went unchecked and did not fail. A gate that is
+ * trusted and cannot fail is worse than no gate.
+ */
+export type SourceProvenanceFailure = {
+  sourceId: string;
+  reason: "no_document_and_no_derivation" | "derived_without_upstreams";
+};
+
+export function findSourceProvenanceFailures(
+  sources: readonly Pick<ResolvedSource, "sourceId" | "derivation" | "documents">[],
+): SourceProvenanceFailure[] {
+  const failures: SourceProvenanceFailure[] = [];
+
+  for (const source of sources) {
+    if (source.documents.length > 0) continue;
+    // Both halves of the non-negotiable: a derived figure must state that it is
+    // derived AND cite its upstream originals.
+    const states = source.derivation !== null && source.derivation.trim() !== "";
+    failures.push({
+      sourceId: source.sourceId,
+      reason: states ? "derived_without_upstreams" : "no_document_and_no_derivation",
+    });
+  }
+
+  return failures;
+}
+
+/**
  * Resolves every data/sources/source-documents.csv row to the public
  * documents backing it, joining on repository file path rather than source
  * id: the fact-data source registry (data/sources/source-documents.csv) and
@@ -166,7 +199,20 @@ export function resolvePublicSources(input: ResolvePublicSourcesInput): Resolved
 
     const upstreamIds = DERIVED_SOURCE_UPSTREAMS[row.sourceId];
     if (upstreamIds) {
-      for (const id of upstreamIds) push(documentsById.get(id));
+      for (const id of upstreamIds) {
+        const doc = documentsById.get(id);
+        // Throws rather than skipping: this map is hand-authored, so an id that
+        // matches nothing is always an authoring error (a typo, or an upstream
+        // renamed in a reviewed manifest), never a data condition. Skipping it
+        // silently would ship a derived figure with a derivation sentence and
+        // no citable original, and the build would stay green.
+        if (!doc) {
+          throw new Error(
+            `DERIVED_SOURCE_UPSTREAMS names upstream "${id}" for ${row.sourceId}, but no manifest document has that id.`,
+          );
+        }
+        push(doc);
+      }
     } else {
       for (const filePath of splitFilePaths(row.sourceUrlOrFile)) {
         for (const doc of matchDocuments(filePath, manifestDocuments)) push(doc);

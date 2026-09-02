@@ -1,3 +1,4 @@
+import { findSourceProvenanceFailures, type SourceProvenanceFailure } from "../lib/factQuery/sources";
 import { execFileSync } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -47,13 +48,15 @@ async function main() {
   // fails the build rather than shipping. Names every offending id, not just
   // the count and not just the first — a partial list turns one fix into
   // several rebuild cycles.
-  const unresolved = snapshot.sources.filter(
-    (source) => source.documents.length === 0 && source.derivation === null,
-  );
-  if (unresolved.length > 0) {
+  const failures = findSourceProvenanceFailures(snapshot.sources);
+  if (failures.length > 0) {
+    const describe = (reason: SourceProvenanceFailure["reason"]) =>
+      reason === "derived_without_upstreams"
+        ? "states a derivation but cites no upstream original"
+        : "resolves to neither a public document nor a stated derivation";
     throw new Error(
-      `${unresolved.length} source(s) resolve to neither a public document nor a stated derivation:\n` +
-        unresolved.map((source) => `  - ${source.sourceId}`).join("\n"),
+      `${failures.length} source(s) fail the section 8.1 provenance gate:\n` +
+        failures.map((f) => `  - ${f.sourceId}: ${describe(f.reason)}`).join("\n"),
     );
   }
 

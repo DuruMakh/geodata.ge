@@ -14,6 +14,7 @@ function context(overrides: Partial<CaveatContext>): CaveatContext {
     entityIds: ["country.georgia"],
     observations: [],
     municipalTotalInputs: [],
+    municipalInputServedBy: {},
     gdpInputs: [],
     comparison: null,
     historicalJoinSeriesYears: [],
@@ -28,6 +29,7 @@ function observation(overrides: Partial<ContextObservation>): ContextObservation
     seriesId: "p1",
     level: "major_program",
     parentSeriesId: null,
+    valueDefinitionId: "ministries:amount_gel:major_program",
     year: 2020,
     value: 10,
     basis: "actual",
@@ -234,7 +236,7 @@ describe("program_parent_category_modern_grouping", () => {
 describe("non_positive_comparison_base", () => {
   it("fires when the earlier endpoint is zero", () => {
     const ctx = context({
-      comparison: { fromYear: 2019, toYear: 2020, fromDefinition: "x", toDefinition: "x" },
+      comparison: { fromYear: 2019, toYear: 2020 },
       observations: [observation({ year: 2019, value: 0 }), observation({ year: 2020 })],
     });
     expect(codes(ctx)).toContain("non_positive_comparison_base");
@@ -242,7 +244,7 @@ describe("non_positive_comparison_base", () => {
 
   it("fires when the earlier endpoint is negative", () => {
     const ctx = context({
-      comparison: { fromYear: 2019, toYear: 2020, fromDefinition: "x", toDefinition: "x" },
+      comparison: { fromYear: 2019, toYear: 2020 },
       observations: [observation({ year: 2019, value: -3 }), observation({ year: 2020 })],
     });
     expect(codes(ctx)).toContain("non_positive_comparison_base");
@@ -250,7 +252,7 @@ describe("non_positive_comparison_base", () => {
 
   it("does not fire for a positive base", () => {
     const ctx = context({
-      comparison: { fromYear: 2019, toYear: 2020, fromDefinition: "x", toDefinition: "x" },
+      comparison: { fromYear: 2019, toYear: 2020 },
       observations: [observation({ year: 2019, value: 5 }), observation({ year: 2020 })],
     });
     expect(codes(ctx)).not.toContain("non_positive_comparison_base");
@@ -259,7 +261,7 @@ describe("non_positive_comparison_base", () => {
   it("does not fire on a percentage measure with a zero base (percentage-point change is a subtraction that never divides by the base; a naive implementation with no measure gate would fire here)", () => {
     const ctx = context({
       measure: "share_of_total_pct",
-      comparison: { fromYear: 2019, toYear: 2020, fromDefinition: "x", toDefinition: "x" },
+      comparison: { fromYear: 2019, toYear: 2020 },
       observations: [observation({ year: 2019, value: 0 }), observation({ year: 2020, value: 5 })],
     });
     expect(codes(ctx)).not.toContain("non_positive_comparison_base");

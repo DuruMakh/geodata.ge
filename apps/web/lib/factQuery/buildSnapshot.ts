@@ -78,7 +78,33 @@ function isCleanHttpsUrl(value: string): boolean {
 // cannot drift onto two different definitions of "a real URL". Not
 // `.strict()`: like its sibling, this only names the columns it needs out of
 // source-manifest.csv's wider set (publisher, role, sha256, bytes, ...).
-const packageManifestRowSchema = z.object({
+/** An absent column and a present-but-blank cell both mean "no year here". */
+const blankableYear = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.coerce.number().int().optional(),
+);
+
+/**
+ * Resolves the coverage pair ATOMICALLY. Reading min and max through separate
+ * `??` chains let a half-filled row take its min from selected_* and its max
+ * from normalized_*, silently reporting a 30-year span across two different
+ * column families.
+ */
+function yearRangeOf(row: {
+  selected_year_min?: number;
+  selected_year_max?: number;
+  normalized_year_min?: number;
+  normalized_year_max?: number;
+}): { min: number; max: number } | null {
+  if (row.selected_year_min !== undefined && row.selected_year_max !== undefined) {
+    return { min: row.selected_year_min, max: row.selected_year_max };
+  }
+  if (row.normalized_year_min !== undefined && row.normalized_year_max !== undefined) {
+    return { min: row.normalized_year_min, max: row.normalized_year_max };
+  }
+  return null;
+}
+export const packageManifestRowSchema = z.object({
   source_id: z.string().trim().min(1),
   dataset_title: z.string().trim().min(1),
   publisher: z.string().trim().min(1),
@@ -93,15 +119,17 @@ const packageManifestRowSchema = z.object({
   // uses selected_year_*, the Geostat package normalized_year_* - so accept
   // either and require exactly that one of the pairs is present, rather than
   // silently publishing a document with no coverage years.
-  selected_year_min: z.coerce.number().int().optional(),
-  selected_year_max: z.coerce.number().int().optional(),
-  normalized_year_min: z.coerce.number().int().optional(),
-  normalized_year_max: z.coerce.number().int().optional(),
+  // csv-parse yields "" for a blank cell whose COLUMN exists, and
+  // z.coerce.number() turns "" into 0 - so a blank coverage year parsed as
+  // year 0, the refine below saw it as present, and a manifest carrying the
+  // real range in the other column pair had that range thrown away.
+  selected_year_min: blankableYear,
+  selected_year_max: blankableYear,
+  normalized_year_min: blankableYear,
+  normalized_year_max: blankableYear,
 }).refine(
-  (row) =>
-    (row.selected_year_min !== undefined && row.selected_year_max !== undefined) ||
-    (row.normalized_year_min !== undefined && row.normalized_year_max !== undefined),
-  { message: "a package manifest row needs selected_year_min/max or normalized_year_min/max" },
+  (row) => yearRangeOf(row) !== null,
+  { message: "a package manifest row needs a complete selected_year_min/max or normalized_year_min/max pair" },
 );
 
 /**
@@ -201,10 +229,8 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
         publisher: row.publisher,
         officialUrl: row.retrieved_file_url,
         archiveUrl: null,
-        years: yearsBetween(
-          row.selected_year_min ?? row.normalized_year_min ?? 0,
-          row.selected_year_max ?? row.normalized_year_max ?? -1,
-        ),
+        // Non-null: the schema refine above rejects a row without a complete pair.
+        years: yearsBetween(yearRangeOf(row)!.min, yearRangeOf(row)!.max),
         datasetId: null,
         sha256: row.sha256,
         byteSize: row.bytes,

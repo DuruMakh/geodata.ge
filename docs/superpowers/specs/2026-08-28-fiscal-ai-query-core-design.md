@@ -307,6 +307,10 @@ Do not calculate comparable growth when endpoints use incompatible total definit
 
 Check the definitions of contributing inputs, not just an aggregate's final name. Two rows both called a consolidated total can contain different underlying definitions. Where an approved program-history join documents a coverage change, use that evidence to qualify or decline; a stable ID alone does not prove unchanged coverage.
 
+**Comparability is decided by `valueDefinitionId`, never by `valueDefinition`.** The prose field is written for a reader and is wrong for this purpose in both directions: it is constant across the municipal 2015 portal-fallback break, and it varies when a ministries program is merely renamed. Implementing this clause against the display string published a 64-row league table of municipal education "growth" across that break, and separately emptied whole program rankings over cosmetic label changes. `valueDefinitionId` carries only what changes the measurement.
+
+**Every caveat rule declares a `comparisonEffect`** of `breaks`, `limits`, or `none`, and `compare` derives its decision from that. This replaced a hand-maintained list inside `compare` which nothing could prove complete — and which was not: `revenue_internal_flows_netted` marks the year a revenue series begins subtracting internal flows, and `revenue.grants` 2005-to-2020 was published as `comparable, +651.19%`. Coverage changes decline a comparison; quality and provenance flags do not. The catalogue in `docs/data-methodology/ai-grounding-and-caveats.md` records the effect for all 24 codes.
+
 A documented GDP accounting-standard change can produce a `limited` percentage-point comparison with its caveat. Nominal GEL growth is allowed but never described as inflation-adjusted growth.
 
 Cross-dataset deficit calculations, totals across overlapping geography, unsupported per-resident periods, and comparisons between unrelated series are outside this function.
@@ -364,7 +368,8 @@ Transport failures before a tool executes follow MCP and HTTP error rules; they 
 | `value` | A finite number when available, otherwise `null`. |
 | `availability`, `missingReason` | `available` or `missing`, with an explanation when missing. Excluded entities have no observation row. |
 | `basis` | `actual`, `planned`, or `null` when no figure is available. |
-| `valueDefinition` | The actual definition, including public-total fallback or consolidated-total status. |
+| `valueDefinition` | The actual definition, including public-total fallback or consolidated-total status. Human-readable prose; never used to decide comparability. |
+| `valueDefinitionId` | Structured identity of what is measured, for machine comparison. Two observations with the same id measure the same quantity the same way; a difference is a real definition break. Excludes anything cosmetic, notably a series' year-specific official label. |
 | `sourceIds`, `documentIds` | All relevant logical sources and the exact public originals supporting the result. |
 | `calculation` | Direct observation or named calculation, contributing observation references, numerator and denominator where applicable, and the calculation-policy version. |
 | `caveatIds`, `citationIds` | Links to applicable records in response metadata. |

@@ -1,7 +1,8 @@
 // apps/web/tests/factQuery/sources.test.ts
 import { describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
-import { selectSources } from "../../lib/factQuery/sources";
+import { findSourceProvenanceFailures, resolvePublicSources, selectSources } from "../../lib/factQuery/sources";
+import { packageManifestRowSchema } from "../../lib/factQuery/buildSnapshot";
 
 const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:00.000Z" };
 
@@ -220,9 +221,11 @@ describe("public source resolution", () => {
 
     it("carries provenance metadata on every document", async () => {
       const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      let checked = 0;
 
       for (const source of snapshot.sources) {
         for (const document of source.documents) {
+          checked += 1;
           expect(document.sha256).toMatch(/^[0-9a-f]{64}$/);
           expect(document.byteSize).toBeGreaterThan(0);
           expect(document.publisher.length).toBeGreaterThan(0);
@@ -230,6 +233,11 @@ describe("public source resolution", () => {
           expect(document.years.length).toBeGreaterThan(0);
         }
       }
+
+      // Without this the sweep proves nothing if every source resolves to zero
+      // documents - the guard against that lives in a different test, and a test
+      // must not depend on a sibling staying strict.
+      expect(checked).toBeGreaterThan(100);
     });
 
     it("does not alias a path that was never an extracted file", async () => {
@@ -239,6 +247,126 @@ describe("public source resolution", () => {
       // The alias map is exact, not a "strip a segment and retry" heuristic:
       // an ordinary source must still resolve only to its own document.
       expect(source?.documents.map((d) => d.documentId)).toEqual(["source.mof.revenue.2017.form_1"]);
+    });
+  });
+
+  describe("a derived source cannot lose its upstream originals silently", () => {
+    it("throws when a declared upstream matches no manifest document", () => {
+      // DERIVED_SOURCE_UPSTREAMS is hand-authored, so an id matching nothing is
+      // always an authoring error - a typo, or an upstream renamed in a reviewed
+      // manifest. It used to be skipped silently, which would ship the
+      // consolidated Adjara total with a derivation sentence and no citable
+      // original, build green.
+      expect(() =>
+        resolvePublicSources({
+          sourceDocuments: [
+            {
+              sourceId: "source.adjara_consolidated_budget",
+              sourceName: "derived: members plus net republican payments",
+              sourceUrlOrFile: "",
+              lastReviewedAt: "2026-08-01",
+            },
+          ],
+          manifestDocuments: [],
+        }),
+      ).toThrow(/upstream/i);
+    });
+  });
+
+  describe("package manifest coverage years", () => {
+    const base = {
+      source_id: "source.example",
+      dataset_title: "Example",
+      publisher: "Geostat",
+      retrieved_file_url: "https://example.org/x.xlsx",
+      retrieved_at: "2026-01-01",
+      local_file: "x.xlsx",
+      sha256: "a".repeat(64),
+      bytes: "10",
+    };
+
+    it("rejects a row with neither coverage pair", () => {
+      expect(packageManifestRowSchema.safeParse(base).success).toBe(false);
+    });
+
+    it("rejects a row whose only pair is blank, rather than reading it as year 0", () => {
+      // csv-parse yields "" for a blank cell whose column exists, and
+      // z.coerce.number() turned "" into 0 - so the document claimed coverage of
+      // year 0 and the refine saw the pair as present.
+      const parsed = packageManifestRowSchema.safeParse({
+        ...base,
+        selected_year_min: "",
+        selected_year_max: "",
+      });
+      expect(parsed.success).toBe(false);
+    });
+
+    it("keeps the real range when the other column family is blank", () => {
+      const parsed = packageManifestRowSchema.safeParse({
+        ...base,
+        selected_year_min: "",
+        selected_year_max: "",
+        normalized_year_min: "2015",
+        normalized_year_max: "2025",
+      });
+
+      expect(parsed.success).toBe(true);
+      expect(parsed.data?.normalized_year_min).toBe(2015);
+      expect(parsed.data?.selected_year_min).toBeUndefined();
+    });
+
+    it("rejects a half-filled pair rather than mixing two column families", () => {
+      // Reading min and max through separate ?? chains took the min from
+      // selected_* and the max from normalized_*, reporting a 30-year span that
+      // exists in neither.
+      const parsed = packageManifestRowSchema.safeParse({
+        ...base,
+        selected_year_min: "1996",
+        normalized_year_min: "2015",
+        normalized_year_max: "2025",
+      });
+
+      expect(parsed.success).toBe(true);
+      expect(parsed.data?.selected_year_max).toBeUndefined();
+    });
+  });
+
+  describe("the section 8.1 provenance gate", () => {
+    const source = (over: Partial<{ sourceId: string; derivation: string | null; documents: unknown[] }>) => ({
+      sourceId: "source.x",
+      derivation: null,
+      documents: [],
+      ...over,
+    }) as Parameters<typeof findSourceProvenanceFailures>[0][number];
+
+    it("passes a source with a public document", () => {
+      expect(findSourceProvenanceFailures([source({ documents: [{}] })])).toEqual([]);
+    });
+
+    it("fails a source with neither a document nor a derivation", () => {
+      const failures = findSourceProvenanceFailures([source({})]);
+      expect(failures.map((f) => f.reason)).toEqual(["no_document_and_no_derivation"]);
+    });
+
+    it("fails a DERIVED source that cites no upstream original", () => {
+      // The branch that shipped unguarded: this exited 0. The rule is that a
+      // derived figure states it is derived AND cites its originals; only the
+      // first half was enforced.
+      const failures = findSourceProvenanceFailures([
+        source({ derivation: "members plus net republican payments", documents: [] }),
+      ]);
+      expect(failures.map((f) => f.reason)).toEqual(["derived_without_upstreams"]);
+    });
+
+    it("fails a derivation that is present but blank", () => {
+      const failures = findSourceProvenanceFailures([source({ derivation: "   " })]);
+      expect(failures.map((f) => f.reason)).toEqual(["no_document_and_no_derivation"]);
+    });
+
+    it("passes the real snapshot", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      expect(findSourceProvenanceFailures(snapshot.sources)).toEqual([]);
+      expect(snapshot.sources.length).toBeGreaterThan(100);
     });
   });
 });

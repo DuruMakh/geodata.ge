@@ -11,6 +11,7 @@ const BASE: CaveatContext = {
   entityIds: [],
   observations: [],
   municipalTotalInputs: [],
+  municipalInputServedBy: {},
   gdpInputs: [],
   comparison: null,
   historicalJoinSeriesYears: [],
@@ -20,22 +21,22 @@ const BASE: CaveatContext = {
 describe("evaluateCaveats", () => {
   it("returns only rules whose predicate holds", () => {
     const rules: CaveatRule[] = [
-      { code: "fires", severity: "note", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => ["a"] },
-      { code: "quiet", severity: "note", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => false, affects: () => [] },
+      { code: "fires", severity: "note", comparisonEffect: "none", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => ["a"] },
+      { code: "quiet", severity: "note", comparisonEffect: "none", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => false, affects: () => [] },
     ];
     expect(evaluateCaveats(BASE, rules).map((c) => c.code)).toEqual(["fires"]);
   });
 
   it("orders severe before note, then by code", () => {
     const rules: CaveatRule[] = [
-      { code: "b_note", severity: "note", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => [] },
-      { code: "a_severe", severity: "severe", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => [] },
+      { code: "b_note", severity: "note", comparisonEffect: "none", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => [] },
+      { code: "a_severe", severity: "severe", comparisonEffect: "none", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => [] },
     ];
     expect(evaluateCaveats(BASE, rules).map((c) => c.code)).toEqual(["a_severe", "b_note"]);
   });
 
   it("emits each code at most once", () => {
-    const rule: CaveatRule = { code: "dup", severity: "note", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => [] };
+    const rule: CaveatRule = { code: "dup", severity: "note", comparisonEffect: "none", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => [] };
     expect(evaluateCaveats(BASE, [rule, rule])).toHaveLength(1);
   });
 });

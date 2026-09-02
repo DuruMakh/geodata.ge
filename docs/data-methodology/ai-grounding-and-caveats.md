@@ -14,40 +14,55 @@ So every response carries machine-readable caveats alongside its figures, each s
 
 A caveat's `affects` array pins it to specific observations, normally as `seriesId:year` or `entityId:year` composites. A rule whose `affects` is coarser than the grain at which its claim is true will label figures it does not describe, and nothing in the type system catches that. Two such defects have shipped and been fixed; the precision contract is documented in `apps/web/lib/factQuery/observations.ts`. A bare id or a bare year is correct only where the claim is genuinely uniform across every cell in the request, which is why `nominal_gel` and `budget_scopes_differ` are allowed to use one.
 
+## Severity and comparison effect are different questions
+
+Severity says how badly a reader is misled if they ignore the caveat. **Comparison effect** says something independent: whether the two endpoints of a two-year comparison still measure the same thing.
+
+- `breaks` - the endpoints do not measure the same thing. A comparison whose endpoints disagree on this caveat is returned as `not_comparable`, with both reviewed values intact and no growth figure.
+- `limits` - still answerable, but the reader must be told; the comparison is returned as `limited`.
+- `none` - a quality, provenance or presentation disclosure. It rides along on the row and never suppresses a growth figure.
+
+The two axes genuinely cross. `gdp_sna_break_2010` is a *note* that still limits a comparison; `municipal_source_actual_missing` is *severe* but does not stop one, because the figure it flags still measures total payments.
+
+This field exists because `compare` previously consulted a hand-maintained list of scope-breaking codes that contained exactly one entry, and nothing could prove that list complete. It was not. Declaring the effect on the rule forces whoever writes the next rule to decide, and a test asserts every registered code is classified.
+
+**A comparison is never decided by `valueDefinition`.** That field is display prose written for a reader. It stays constant across the municipal 2015 portal-fallback break and it varies when a ministries program is merely renamed, so using it to decide like-for-like was wrong in both directions at once. `Observation.valueDefinitionId` carries the structured identity instead.
+
 ## The catalogue
 
 24 codes are registered.
 
-| Code | Severity | Owner document |
-| --- | --- | --- |
-| `nominal_gel` | note | `ai-grounding-and-caveats.md#nominal_gel` |
-| `planned_values` | severe | `ai-grounding-and-caveats.md#planned_values` |
-| `revenue_2004_total_scope` | severe | `revenue-methodology.md` |
-| `revenue_2004_liabilities_unavailable` | severe | `revenue-methodology.md` |
-| `budget_scopes_differ` | severe | `revenue-methodology.md` |
-| `negative_revenue_correction` | note | `revenue-methodology.md` |
-| `revenue_internal_flows_netted` | note | `revenue-methodology.md` |
-| `gdp_sna_break_2010` | note | `national-nominal-gdp.md` |
-| `gdp_preliminary` | note | `national-nominal-gdp.md` |
-| `municipality_not_territorial` | severe | `municipal-functional-annual-2015-2025.md` |
-| `municipal_country_scope` | note | `municipal-functional-annual-2015-2025.md` |
-| `adjara_consolidation_applied` | note | `municipal-functional-annual-2015-2025.md` |
-| `municipal_functions_no_republican_crosswalk` | note | `municipal-functional-annual-2015-2025.md` |
-| `municipal_total_definition_changed` | severe | `municipal-functional-annual-2015-2025.md` |
-| `municipal_source_actual_missing` | severe | `municipal-functional-annual-2015-2025.md` |
-| `municipal_source_version_difference` | severe | `municipal-functional-annual-2015-2025.md` |
-| `municipal_financing_outside_functional` | note | `municipal-functional-annual-2015-2025.md` |
-| `municipal_functional_total_gap` | note | `municipal-functional-annual-2015-2025.md` |
-| `per_resident_coverage_limited` | severe | `municipal-population-regional-gdp.md` |
-| `program_coverage_partial` | severe | `ministries-drilldown-programs-methodology.md` |
-| `admin_category_not_yet_established` | severe | `ministries-expenditure-methodology.md` |
-| `program_historical_join` | note | `ministries-drilldown-programs-methodology.md` |
-| `program_parent_category_modern_grouping` | severe | `ministries-drilldown-programs-methodology.md` |
-| `non_positive_comparison_base` | note | `ai-grounding-and-caveats.md#non_positive_comparison_base` |
+| Code | Severity | Comparison effect | Owner document |
+| --- | --- | --- | --- |
+| `nominal_gel` | note | `none` | `ai-grounding-and-caveats.md#nominal_gel` |
+| `planned_values` | severe | `none` | `ai-grounding-and-caveats.md#planned_values` |
+| `revenue_2004_total_scope` | severe | `breaks` | `revenue-methodology.md` |
+| `revenue_2004_liabilities_unavailable` | severe | `breaks` | `revenue-methodology.md` |
+| `budget_scopes_differ` | severe | `none` | `revenue-methodology.md` |
+| `negative_revenue_correction` | note | `none` | `revenue-methodology.md` |
+| `revenue_internal_flows_netted` | note | `breaks` | `revenue-methodology.md` |
+| `gdp_sna_break_2010` | note | `limits` | `national-nominal-gdp.md` |
+| `gdp_preliminary` | note | `none` | `national-nominal-gdp.md` |
+| `municipality_not_territorial` | severe | `none` | `municipal-functional-annual-2015-2025.md` |
+| `municipal_country_scope` | note | `none` | `municipal-functional-annual-2015-2025.md` |
+| `adjara_consolidation_applied` | note | `none` | `municipal-functional-annual-2015-2025.md` |
+| `municipal_functions_no_republican_crosswalk` | note | `none` | `municipal-functional-annual-2015-2025.md` |
+| `municipal_total_definition_changed` | severe | `breaks` | `municipal-functional-annual-2015-2025.md` |
+| `municipal_source_actual_missing` | severe | `none` | `municipal-functional-annual-2015-2025.md` |
+| `municipal_source_version_difference` | severe | `none` | `municipal-functional-annual-2015-2025.md` |
+| `municipal_financing_outside_functional` | note | `none` | `municipal-functional-annual-2015-2025.md` |
+| `municipal_functional_total_gap` | note | `none` | `municipal-functional-annual-2015-2025.md` |
+| `per_resident_coverage_limited` | severe | `none` | `municipal-population-regional-gdp.md` |
+| `program_coverage_partial` | severe | `none` | `ministries-drilldown-programs-methodology.md` |
+| `admin_category_not_yet_established` | severe | `none` | `ministries-expenditure-methodology.md` |
+| `program_historical_join` | note | `limits` | `ministries-drilldown-programs-methodology.md` |
+| `program_parent_category_modern_grouping` | severe | `none` | `ministries-drilldown-programs-methodology.md` |
+| `non_positive_comparison_base` | note | `none` | `ai-grounding-and-caveats.md#non_positive_comparison_base` |
 
 ### `nominal_gel`
 
 **Severity:** note  
+**Comparison effect:** `none`  
 **Owner document:** `ai-grounding-and-caveats.md#nominal_gel`
 
 **Trigger.** Any `amount_gel` result spanning more than one year.
@@ -61,6 +76,7 @@ Multi-year GEL figures invite a growth story. The figures are current-price nomi
 ### `planned_values`
 
 **Severity:** severe  
+**Comparison effect:** `none`  
 **Owner document:** `ai-grounding-and-caveats.md#planned_values`
 
 **Trigger.** Any returned cell whose `basis` is `planned`.
@@ -74,6 +90,7 @@ Actual wins over planned wherever both exist, but where only a plan exists the f
 ### `revenue_2004_total_scope`
 
 **Severity:** severe  
+**Comparison effect:** `breaks`  
 **Owner document:** `revenue-methodology.md`
 
 **Trigger.** `revenue.total` requested for 2004, or any `share_of_total_pct` request against national revenue in 2004.
@@ -87,6 +104,7 @@ The 2004 receipts total is 2,283,035,800 GEL over ten components, and increase i
 ### `revenue_2004_liabilities_unavailable`
 
 **Severity:** severe  
+**Comparison effect:** `breaks`  
 **Owner document:** `revenue-methodology.md`
 
 **Trigger.** `revenue.increase_liabilities` requested for 2004.
@@ -100,6 +118,7 @@ The category begins in 2005. The 2004 cell is neither estimated nor zeroed; it r
 ### `budget_scopes_differ`
 
 **Severity:** severe  
+**Comparison effect:** `none`  
 **Owner document:** `revenue-methodology.md`
 
 **Trigger.** A request naming both a national revenue total and a national expenditure total.
@@ -113,6 +132,7 @@ National revenue is consolidated budget receipts; national expenditure is state-
 ### `negative_revenue_correction`
 
 **Severity:** note  
+**Comparison effect:** `none`  
 **Owner document:** `revenue-methodology.md`
 
 **Trigger.** A returned revenue cell whose value is negative.
@@ -126,6 +146,7 @@ A negative reviewed figure is a correction that belongs in the series, not a dat
 ### `revenue_internal_flows_netted`
 
 **Severity:** note  
+**Comparison effect:** `breaks`  
 **Owner document:** `revenue-methodology.md`
 
 **Trigger.** A netted revenue series requested at or after the year netting begins.
@@ -134,11 +155,12 @@ A negative reviewed figure is a correction that belongs in the series, not a dat
 
 **English.** The selected item uses the documented netting of internal flows.
 
-Scoped per cell rather than per series: the netting does not apply to the earlier years of the same series, and claiming it there would describe those figures wrongly.
+Scoped per cell rather than per series: the netting does not apply to the earlier years of the same series, and claiming it there would describe those figures wrongly. Its comparison effect is `breaks`, and that was a correction: from 2008 the series subtracts GFS rows 1.3.3 and 1.4.1.1.3 and before 2008 it does not, so the two endpoints count different things. Both endpoints carry a byte-identical `valueDefinition`, so nothing else could catch it, and `revenue.grants` 2005 to 2020 was published as `comparable, +651.19%`.
 
 ### `gdp_sna_break_2010`
 
 **Severity:** note  
+**Comparison effect:** `limits`  
 **Owner document:** `national-nominal-gdp.md`
 
 **Trigger.** A GDP-share request whose years span both GDP accounting standards.
@@ -152,6 +174,7 @@ The GDP denominator switches from SNA 1993 to SNA 2008 at 2010. A percentage-poi
 ### `gdp_preliminary`
 
 **Severity:** note  
+**Comparison effect:** `none`  
 **Owner document:** `national-nominal-gdp.md`
 
 **Trigger.** A GDP-share request using a GDP figure still marked preliminary.
@@ -165,6 +188,7 @@ A preliminary denominator can be revised. The share is still reported; the reade
 ### `municipality_not_territorial`
 
 **Severity:** severe  
+**Comparison effect:** `none`  
 **Owner document:** `municipal-functional-annual-2015-2025.md`
 
 **Trigger.** Any request naming one of the five aggregate-only codes 05, 42, 43, 46, 64.
@@ -178,6 +202,7 @@ These budgets exist but are not territorially attributable spending inside those
 ### `municipal_country_scope`
 
 **Severity:** note  
+**Comparison effect:** `none`  
 **Owner document:** `municipal-functional-annual-2015-2025.md`
 
 **Trigger.** A municipal request naming the Georgia aggregate.
@@ -191,6 +216,7 @@ The Georgia municipal aggregate covers 69 reviewed budgets plus the net Adjara a
 ### `adjara_consolidation_applied`
 
 **Severity:** note  
+**Comparison effect:** `none`  
 **Owner document:** `municipal-functional-annual-2015-2025.md`
 
 **Trigger.** A municipal total or share request naming the Adjara region.
@@ -199,11 +225,12 @@ The Georgia municipal aggregate covers 69 reviewed budgets plus the net Adjara a
 
 **English.** The result applies the net Adjara republican adjustment once.
 
-Adjara's regional total is its six member municipalities plus the net republican payments, added once with integer-cent arithmetic. The caveat states that the adjustment is already included, so a reader does not add it again.
+Adjara's regional total is its six member municipalities plus the net republican payments, added once with integer-cent arithmetic. The caveat states that the adjustment is already included, so a reader does not add it again. Its two firing paths affect DIFFERENT cells, so `affects()` is built per cell: a share request consolidates every denominator, but a plain `amount_gel` request consolidates only the total, and the function amounts beside it are unconsolidated municipal-only sums. A bare entity id matched both, stamping Adjara's 2024 education figure - which contains no republican money - with a consolidation notice.
 
 ### `municipal_functions_no_republican_crosswalk`
 
 **Severity:** note  
+**Comparison effect:** `none`  
 **Owner document:** `municipal-functional-annual-2015-2025.md`
 
 **Trigger.** A functional-category request naming the Adjara region or the country aggregate.
@@ -217,6 +244,7 @@ The republican payments folded into Adjara's total have no functional breakdown.
 ### `municipal_total_definition_changed`
 
 **Severity:** severe  
+**Comparison effect:** `breaks`  
 **Owner document:** `municipal-functional-annual-2015-2025.md`
 
 **Trigger.** A comparison whose two endpoints use different public-total definitions.
@@ -230,6 +258,7 @@ The republican payments folded into Adjara's total have no functional breakdown.
 ### `municipal_source_actual_missing`
 
 **Severity:** severe  
+**Comparison effect:** `none`  
 **Owner document:** `municipal-functional-annual-2015-2025.md`
 
 **Trigger.** A returned municipality-year whose warning type is a missing source actual.
@@ -243,6 +272,7 @@ Khulo 2024 is the only such row: 30,969,077.43 GEL, a reviewed functional total 
 ### `municipal_source_version_difference`
 
 **Severity:** severe  
+**Comparison effect:** `none`  
 **Owner document:** `municipal-functional-annual-2015-2025.md`
 
 **Trigger.** A returned municipality-year whose warning type is a source version difference.
@@ -256,6 +286,7 @@ Functional and total inputs come from documented differing source versions and a
 ### `municipal_financing_outside_functional`
 
 **Severity:** note  
+**Comparison effect:** `none`  
 **Owner document:** `municipal-functional-annual-2015-2025.md`
 
 **Trigger.** A returned municipality-year whose warning type is financing outside the functional breakdown.
@@ -269,19 +300,21 @@ The public total includes financing components that are not distributed across t
 ### `municipal_functional_total_gap`
 
 **Severity:** note  
+**Comparison effect:** `none`  
 **Owner document:** `municipal-functional-annual-2015-2025.md`
 
-**Trigger.** A share request over municipality-years with a non-zero reconciliation difference.
+**Trigger.** A share request whose returned functional shares fall short of the public total, at any grain.
 
 **Georgian.** ფუნქციური წილები საჯარო ჯამს სრულად არ ფარავს; 100%-მდე ნორმალიზება არ ხდება.
 
 **English.** Functional shares do not cover the applicable public total and are never normalised to 100%.
 
-Functional shares are never normalised to 100%. Reporting the gap is the honest alternative to scaling the parts until they fit.
+Functional shares are never normalised to 100%. Reporting the gap is the honest alternative to scaling the parts until they fit. The trigger measures the RETURNED shares as well as reading the contributing rows' reconciliation figures, because those figures are null on every country row: the aggregate whose ten shares sum to 91.41% previously had no rule that could report it, and a region's 57.38% was reported only against member codes absent from the response.
 
 ### `per_resident_coverage_limited`
 
 **Severity:** severe  
+**Comparison effect:** `none`  
 **Owner document:** `municipal-population-regional-gdp.md`
 
 **Trigger.** A per-resident request outside 2025, for a non-total series, or for the country aggregate.
@@ -295,6 +328,7 @@ The reviewed population panel covers 2025 only, for the 64 municipalities. The c
 ### `program_coverage_partial`
 
 **Severity:** severe  
+**Comparison effect:** `none`  
 **Owner document:** `ministries-drilldown-programs-methodology.md`
 
 **Trigger.** A major-program observation with no value for a requested year.
@@ -308,6 +342,7 @@ Program coverage is genuinely ragged: contiguous 2017-2025, partial from 2012, w
 ### `admin_category_not_yet_established`
 
 **Severity:** severe  
+**Comparison effect:** `none`  
 **Owner document:** `ministries-expenditure-methodology.md`
 
 **Trigger.** An administrative-category observation with no value for a requested year.
@@ -321,9 +356,10 @@ Split out of `program_coverage_partial`, which previously claimed a *program* ga
 ### `program_historical_join`
 
 **Severity:** note  
+**Comparison effect:** `limits`  
 **Owner document:** `ministries-drilldown-programs-methodology.md`
 
-**Trigger.** A program cell served through an approved succession or legacy join.
+**Trigger.** A program cell served through an approved succession or legacy join. Its comparison effect is `limits`: spec 6.6 requires a documented join to qualify or decline a comparison, and while it was classified as an ordinary note a join-spanning pair returned `comparable, +170.07%`.
 
 **Georgian.** მწკრივი იყენებს დამტკიცებულ ისტორიულ გაერთიანებას; შენარჩუნებულია მისი მოცულობა და ორიგინალი დასახელება.
 
@@ -334,6 +370,7 @@ Scoped to the 190 genuinely joined cells across 25 series, per cell rather than 
 ### `program_parent_category_modern_grouping`
 
 **Severity:** severe  
+**Comparison effect:** `none`  
 **Owner document:** `ministries-drilldown-programs-methodology.md`
 
 **Trigger.** A program cell whose parent category had no row in that year.
@@ -347,6 +384,7 @@ Three cells: the roads series for 2006-2008, whose modern parent ministry was cr
 ### `non_positive_comparison_base`
 
 **Severity:** note  
+**Comparison effect:** `none`  
 **Owner document:** `ai-grounding-and-caveats.md#non_positive_comparison_base`
 
 **Trigger.** An amount comparison whose earlier endpoint is zero or negative.
