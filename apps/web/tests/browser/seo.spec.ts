@@ -80,6 +80,7 @@ const representativeRoutes = [
   { route: "/explorer/expenditure", canonical: "https://fiscal.ge/explorer/expenditure" },
   { route: "/explorer/revenue", canonical: "https://fiscal.ge/explorer/revenue" },
   { route: "/explorer/analysis", canonical: "https://fiscal.ge/explorer/analysis" },
+  { route: "/explorer/debt", canonical: "https://fiscal.ge/explorer/debt" },
   { route: "/explorer/municipalities", canonical: "https://fiscal.ge/explorer/municipalities" },
   { route: "/explorer/municipalities/tbilisi", canonical: "https://fiscal.ge/explorer/municipalities/tbilisi" },
   { route: "/explorer/municipalities/region/imereti", canonical: "https://fiscal.ge/explorer/municipalities/region/imereti" },

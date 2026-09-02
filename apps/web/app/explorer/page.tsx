@@ -4,25 +4,31 @@ import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect"
 import { PageHeader } from "../../components/shell/page-header";
 import { SourceNote } from "../../components/ui/editorial";
 import { buildHubCards } from "../../lib/explorer/hubCards";
-import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 import { fiscalMetadata } from "../../lib/seo/metadata";
 
 export const metadata = fiscalMetadata({
   title: "საქართველოს ბიუჯეტის მონაცემები | Fiscal.ge",
   description:
-    "საქართველოს ბიუჯეტის გადამოწმებული მონაცემები: შემოსავლები, ხარჯები, მუნიციპალიტეტები და ერთი წლის ანალიზი.",
+    "საქართველოს ბიუჯეტის გადამოწმებული მონაცემები: შემოსავლები, ხარჯები, მუნიციპალიტეტები, ვალი და ერთი წლის ანალიზი.",
   path: "/explorer",
 });
 
 export default async function ExplorerHubPage() {
-  const { facts, sourceDocuments } = await loadServedLandingData();
-  const { countryTotalFacts } = await loadServedMunicipalData();
+  const [{ facts, sourceDocuments }, { countryTotalFacts }, { facts: debtFacts }] = await Promise.all([
+    loadServedLandingData(),
+    loadServedMunicipalData(),
+    loadServedGovernmentDebtData(),
+  ]);
   const municipalTotals = new Map<number, number>();
   for (const row of countryTotalFacts) {
     municipalTotals.set(row.year, row.publicTotalGel);
   }
-  const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
-  const cards = buildHubCards(facts, municipalTotals);
+  const lastUpdatedAt = [
+    ...sourceDocuments.map((source) => source.lastReviewedAt),
+    ...debtFacts.map((fact) => fact.lastReviewedAt),
+  ].sort().at(-1) ?? "";
+  const cards = buildHubCards(facts, municipalTotals, debtFacts);
   const years = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
   const coverage = [
     years.length > 0 ? `${years[0]}–${years.at(-1)}` : "",

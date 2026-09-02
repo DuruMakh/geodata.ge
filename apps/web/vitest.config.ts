@@ -31,7 +31,7 @@ export default defineConfig({
         test: {
           ...shared,
           name: "parallel",
-          include: ["tests/**/*.test.ts"],
+          include: ["tests/**/*.test.{ts,tsx}"],
           exclude: [...defaultExclude, EXCLUSIVE_TEST, ...HEAVY_TESTS],
           sequence: { groupOrder: 1 },
         },

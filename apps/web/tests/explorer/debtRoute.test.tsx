@@ -1,0 +1,195 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it } from "vitest";
+import { selectDebtSeries } from "../../lib/explorer/debtExplorer";
+import type {
+  DebtSeriesId,
+  ServedGovernmentDebtFact,
+  ServedNationalGdpFact,
+} from "../../lib/servedRows";
+
+const reviewedAt = "2026-09-01";
+
+function debtFact(
+  year: number,
+  family: ServedGovernmentDebtFact["family"],
+  seriesId: DebtSeriesId,
+  value: number | null,
+  status: ServedGovernmentDebtFact["status"] = "actual",
+): ServedGovernmentDebtFact {
+  return {
+    year,
+    family,
+    seriesId,
+    value,
+    valueKind: family === "rate" ? "percent" : "amount_gel",
+    status,
+    sourceId: status === "not_available" ? null : "test-debt-source",
+    snapshotDate: status === "projection_existing_portfolio" ? "2025-12-31" : null,
+    lastReviewedAt: reviewedAt,
+  };
+}
+
+const facts: ServedGovernmentDebtFact[] = [
+  debtFact(2013, "stock", "debt.stock.total", 8_000_000_000),
+  debtFact(2025, "stock", "debt.stock.total", 35_000_000_000),
+  debtFact(2013, "stock", "debt.stock.domestic", 2_000_000_000),
+  debtFact(2025, "stock", "debt.stock.domestic", 10_000_000_000),
+  debtFact(2013, "stock", "debt.stock.external", 6_000_000_000),
+  debtFact(2025, "stock", "debt.stock.external", 25_000_000_000),
+  debtFact(2013, "service", "debt.service.total", 900_000_000),
+  debtFact(2025, "service", "debt.service.total", 4_300_000_000),
+  debtFact(2026, "service", "debt.service.total", 5_100_000_000, "projection_existing_portfolio"),
+  debtFact(2013, "service", "debt.service.principal", 650_000_000),
+  debtFact(2025, "service", "debt.service.principal", 2_700_000_000),
+  debtFact(2026, "service", "debt.service.principal", 3_500_000_000, "projection_existing_portfolio"),
+  debtFact(2013, "service", "debt.service.interest", 250_000_000),
+  debtFact(2025, "service", "debt.service.interest", 1_600_000_000),
+  debtFact(2026, "service", "debt.service.interest", 1_600_000_000, "projection_existing_portfolio"),
+  debtFact(2015, "rate", "debt.rate.total", 4.1),
+  debtFact(2025, "rate", "debt.rate.total", 4.7),
+  debtFact(2015, "rate", "debt.rate.domestic", 7.2),
+  debtFact(2025, "rate", "debt.rate.domestic", null, "not_available"),
+  debtFact(2015, "rate", "debt.rate.external", 2.4),
+  debtFact(2025, "rate", "debt.rate.external", null, "not_available"),
+];
+
+const gdpFacts: ServedNationalGdpFact[] = [
+  { year: 2013, gdpCurrentPricesGel: 27_000_000_000, accountingStandard: "sna_2008", status: "final_as_published", sourceId: "gdp" },
+  { year: 2025, gdpCurrentPricesGel: 100_000_000_000, accountingStandard: "sna_2008", status: "preliminary", sourceId: "gdp" },
+];
+
+async function loadDebtComponents() {
+  try {
+    return await import("../../components/debt/debt-explorer");
+  } catch {
+    return null;
+  }
+}
+
+function selectedSeries(markup: string): string[] {
+  return [...markup.matchAll(/data-testid="series-row"(?:(?!data-testid="series-row").)*?data-series-id="([^"]+)"(?:(?!data-testid="series-row").)*?aria-pressed="true"/g)]
+    .map((match) => match[1]!);
+}
+
+describe("Government Debt route composition", () => {
+  it("renders the approved H1, total-only default, nine expanded rows and one chart", async () => {
+    const components = await loadDebtComponents();
+    expect(components).not.toBeNull();
+    if (!components) return;
+
+    const markup = renderToStaticMarkup(createElement(components.DebtExplorer, {
+      facts,
+      gdpFacts,
+      workbookSources: [],
+      lastUpdatedAt: reviewedAt,
+    }));
+
+    expect(markup).toContain("რამდენია მთავრობის ვალი და როგორ ვიხდით მას");
+    expect((markup.match(/data-testid="series-row"/g) ?? [])).toHaveLength(9);
+    expect((markup.match(/aria-expanded="true"/g) ?? [])).toHaveLength(3);
+    expect(selectedSeries(markup)).toEqual(["debt.stock.total"]);
+    expect((markup.match(/data-testid="chart-frame"/g) ?? [])).toHaveLength(1);
+    expect(markup).not.toContain('data-testid="explorer-table"');
+    expect(markup).not.toContain('data-testid="site-footer"');
+    expect(markup).toMatch(/data-testid="debt-excel"[^>]*disabled/);
+    expect(markup).toContain("2019");
+    expect(markup).toContain("2022");
+  });
+
+  it("keeps multiple lines in one family and clears them on a cross-family choice", () => {
+    expect(selectDebtSeries(
+      ["debt.stock.total", "debt.stock.domestic"],
+      "debt.stock.external",
+    )).toEqual(["debt.stock.total", "debt.stock.domestic", "debt.stock.external"]);
+    expect(selectDebtSeries(
+      ["debt.stock.total", "debt.stock.domestic"],
+      "debt.service.interest",
+    )).toEqual(["debt.service.interest"]);
+  });
+
+  it("shows the stock GDP pill but hides it for service and rate measures", async () => {
+    const components = await loadDebtComponents();
+    expect(components).not.toBeNull();
+    if (!components) return;
+
+    const base = { facts, gdpFacts, workbookSources: [], lastUpdatedAt: reviewedAt };
+    const noop = () => {};
+    const stock = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+      ...base,
+      family: "stock",
+      chartMode: "line",
+      shareOfGdp: false,
+      range: { start: 2013, end: 2025, min: 2013, max: 2025 },
+      selectedIds: ["debt.stock.total"],
+      onChartModeChange: noop,
+      onShareChange: noop,
+      onRangeChange: noop,
+      onSelectionChange: noop,
+      onToggleSeries: noop,
+    }));
+    const service = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+      ...base,
+      family: "service",
+      chartMode: "line",
+      shareOfGdp: false,
+      range: { start: 2013, end: 2026, min: 2013, max: 2026 },
+      selectedIds: ["debt.service.total"],
+      onChartModeChange: noop,
+      onShareChange: noop,
+      onRangeChange: noop,
+      onSelectionChange: noop,
+      onToggleSeries: noop,
+    }));
+    const rate = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+      ...base,
+      family: "rate",
+      chartMode: "table",
+      shareOfGdp: false,
+      range: { start: 2015, end: 2025, min: 2015, max: 2025 },
+      selectedIds: ["debt.rate.domestic"],
+      onChartModeChange: noop,
+      onShareChange: noop,
+      onRangeChange: noop,
+      onSelectionChange: noop,
+      onToggleSeries: noop,
+    }));
+
+    expect(stock).toContain('data-testid="measure-share-toggle"');
+    expect(service).not.toContain('data-testid="measure-share-toggle"');
+    expect(service).toContain('data-measure="amount"');
+    expect(rate).not.toContain('data-testid="measure-share-toggle"');
+    expect(rate).toContain('data-measure="percent"');
+    expect(rate).toContain("—");
+  });
+
+  it("marks and explains the existing-portfolio service forecast", async () => {
+    const components = await loadDebtComponents();
+    expect(components).not.toBeNull();
+    if (!components) return;
+
+    const noop = () => {};
+    const markup = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+      facts,
+      gdpFacts,
+      workbookSources: [],
+      lastUpdatedAt: reviewedAt,
+      family: "service",
+      chartMode: "line",
+      shareOfGdp: false,
+      range: { start: 2013, end: 2026, min: 2013, max: 2026 },
+      selectedIds: ["debt.service.total"],
+      onChartModeChange: noop,
+      onShareChange: noop,
+      onRangeChange: noop,
+      onSelectionChange: noop,
+      onToggleSeries: noop,
+    }));
+
+    expect(markup).toContain('data-testid="chart-series-debt.service.total-forecast"');
+    expect(markup).toContain('data-testid="range-marker"');
+    expect(markup).toContain('data-testid="debt-forecast-note"');
+    expect(markup).toContain("2025-12-31");
+    expect(markup).toContain("არ წარმოადგენს მომავალი ბიუჯეტის სრულ პროგნოზს");
+  });
+});
