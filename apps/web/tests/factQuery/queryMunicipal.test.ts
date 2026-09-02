@@ -608,3 +608,93 @@ describe("queryMunicipal", () => {
     });
   });
 });
+
+describe("an observation cites only the originals that support it", () => {
+  // Spec section 7.2 calls documentIds "the exact public originals supporting
+  // the result". The municipality budget-history source archives one workbook
+  // per municipality, so Tbilisi's workbook is not an original supporting
+  // Khulo's education figure. resolveDocumentIds used to attach every document
+  // of every cited source to every row: 75 ids on a single-municipality cell,
+  // and 71% of the municipal publication's bytes.
+  it("cites one municipality's own workbook, not all 64", () => {
+    const result = queryMunicipal(snapshot, {
+      entityIds: [KHULO],
+      seriesIds: ["municipal.education"],
+      years: [2020],
+      measure: "amount_gel",
+    });
+    const documentIds = data(result).observations[0]!.documentIds;
+
+    expect(documentIds).toContain(`source.mof.municipalities.2016_2025.budget_history_${KHULO}`);
+    expect(documentIds).not.toContain("source.mof.municipalities.2016_2025.budget_history_04");
+    expect(documentIds.length).toBeLessThanOrEqual(3);
+  });
+
+  it("keeps a cross-municipality workbook only for the years it covers", () => {
+    const result = queryMunicipal(snapshot, {
+      entityIds: [KHULO],
+      seriesIds: ["municipal.education"],
+      years: [2016, 2020],
+      measure: "amount_gel",
+    });
+
+    // A workbook naming no municipality is narrowed by its own reviewed
+    // `years` field rather than by a filename convention.
+    for (const observation of data(result).observations) {
+      const yearly = observation.documentIds.filter((id) => /\.\d{4}\.functional_classification$/.test(id));
+      for (const id of yearly) {
+        expect(id, `year ${observation.year} cited ${id}`).toContain(`.${observation.year}.`);
+      }
+    }
+  });
+
+  it("gives a region the workbooks of its own municipalities and no others", () => {
+    const members = snapshot.municipal.municipalities
+      .filter((municipality) => municipality.regionId === ADJARA)
+      .map((municipality) => municipality.code);
+    const outsider = snapshot.municipal.municipalities.find(
+      (municipality) => municipality.regionId !== ADJARA,
+    )!.code;
+    expect(members.length).toBeGreaterThan(0);
+
+    const result = queryMunicipal(snapshot, {
+      entityIds: [ADJARA],
+      seriesIds: ["municipal.education"],
+      years: [2020],
+      measure: "amount_gel",
+    });
+    const documentIds = data(result).observations[0]!.documentIds;
+
+    expect(documentIds).not.toContain(`source.mof.municipalities.2016_2025.budget_history_${outsider}`);
+    expect(documentIds.some((id) => members.some((code) => id.endsWith(`_${code}`)))).toBe(true);
+  });
+
+  it("still cites every document behind the country aggregate", () => {
+    // The country row really is built from all served municipalities, so
+    // narrowing must not silently drop provenance here.
+    const result = queryMunicipal(snapshot, {
+      entityIds: [COUNTRY],
+      seriesIds: ["municipal.education"],
+      years: [2020],
+      measure: "amount_gel",
+    });
+
+    expect(data(result).observations[0]!.documentIds.length).toBeGreaterThan(50);
+  });
+
+  it("never cites an excluded municipality's workbook", () => {
+    // Codes 05/42/43/46/64 are not territorially attributable (spec 5.4), so
+    // their workbooks must not surface as an original behind a public figure.
+    const result = queryMunicipal(snapshot, {
+      entityIds: [COUNTRY],
+      seriesIds: ["municipal.education"],
+      years: [2020],
+      measure: "amount_gel",
+    });
+    const documentIds = data(result).observations[0]!.documentIds;
+
+    for (const code of AGGREGATE_ONLY_MUNICIPAL_CODES) {
+      expect(documentIds).not.toContain(`source.mof.municipalities.2016_2025.budget_history_${code}`);
+    }
+  });
+});

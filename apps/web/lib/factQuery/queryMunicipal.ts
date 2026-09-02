@@ -180,6 +180,23 @@ export function queryMunicipal(
     membersOf.set(row.regionId, [...(membersOf.get(row.regionId) ?? []), row.code]);
   }
 
+  // Which municipality workbooks stand behind each returned entity. The
+  // municipality budget-history source archives one workbook per municipality,
+  // so attaching all of them to every row cited 63 other municipalities' books
+  // as originals supporting one municipality's figure (spec section 7.2).
+  // membersOf is reused rather than re-deriving the region membership.
+  const servedCodes = municipal.municipalities.map((row) => row.code);
+  // The five aggregate-only codes are absent from municipal.municipalities, so
+  // they must be added here: allCodes exists to RECOGNISE a workbook as
+  // entity-naming. Without them their workbooks look like cross-municipality
+  // files and would be cited on every row of the matching year.
+  const allMunicipalityCodes = [...servedCodes, ...AGGREGATE_ONLY_MUNICIPAL_CODES];
+  const codesByEntityId = new Map<string, readonly string[]>([
+    [MUNICIPAL_COUNTRY_ID, servedCodes],
+    ...municipal.regions.map((region) => [region.id, membersOf.get(region.id) ?? []] as const),
+    ...servedCodes.map((code) => [code, [code]] as const),
+  ]);
+
   const countryTotalByYear = buildCountryTotalByYear(municipal.countryTotalFacts);
   const countryTotalFactByYear = new Map(municipal.countryTotalFacts.map((f) => [f.year, f]));
   const municipalTotalByKey = new Map(municipal.totalFacts.map((f) => [`${f.municipalityCode}:${f.year}`, f]));
@@ -460,7 +477,11 @@ export function queryMunicipal(
 
   const withDocuments: Omit<Observation, "caveatIds">[] = cores.map((core) => ({
     ...core,
-    documentIds: resolveDocumentIds(resolvedSources, core.sourceIds),
+    documentIds: resolveDocumentIds(resolvedSources, core.sourceIds, {
+      year: core.year,
+      entityCodes: codesByEntityId.get(core.entityId) ?? [],
+      allCodes: allMunicipalityCodes,
+    }),
   }));
 
   const caveatContext: CaveatContext = {

@@ -7,7 +7,7 @@
 // id, resolving sourceIds into documentIds without re-querying sources per
 // row, and deciding which already-evaluated request-level caveats belong on
 // one specific observation's caveatIds.
-import type { Availability, Caveat, DatasetId, Measure, ResolvedSource, Unit } from "./types";
+import type { Availability, Caveat, DatasetId, Measure, PublicDocument, ResolvedSource, Unit } from "./types";
 
 /**
  * One value on one line of a query-function response, per spec section 7.2.
@@ -69,22 +69,69 @@ export function uniqueSorted(values: readonly string[]): string[] {
 }
 
 /**
+ * Which municipality workbooks support ONE observation.
+ *
+ * `entityCodes` is the set whose own published workbook stands behind this
+ * row: one code for a municipality row, its member codes for a region row,
+ * every served code for the country row. A document naming a municipality
+ * outside that set is not an original supporting this figure, and citing it
+ * makes a false provenance claim (spec section 7.2).
+ *
+ * `allCodes` includes the five aggregate-only codes so a workbook naming one
+ * of them is recognised as entity-naming and then correctly excluded, rather
+ * than falling through to the year-narrowed cross-municipality branch and
+ * being cited on every row.
+ */
+export type DocumentScope = {
+  year: number;
+  entityCodes: readonly string[];
+  allCodes: readonly string[];
+};
+
+/** The archive names a municipality in a document id as `_<code>` or `.<code>.`. */
+function namedMunicipality(documentId: string, allCodes: readonly string[]): string | undefined {
+  return allCodes.find((code) => documentId.endsWith(`_${code}`) || documentId.includes(`.${code}.`));
+}
+
+/**
  * documentIds for one observation, given the sources already resolved for
  * the whole response. Takes the resolved list rather than the snapshot so a
  * caller resolves sourceIds once per response (selectSources over the union
  * of every observation's sourceIds) instead of re-walking snapshot.sources
  * once per row.
+ *
+ * With no `scope` every document of every cited source is returned, which is
+ * correct for national and ministries: their sources archive one or two
+ * documents each, none of them entity-specific. queryMunicipal is the only
+ * caller that passes a scope, because the municipality budget-history source
+ * archives one workbook per municipality and attaching all 75 to every row
+ * cited 63 other municipalities' books behind a single municipality's figure.
  */
-export function resolveDocumentIds(resolvedSources: readonly ResolvedSource[], sourceIds: readonly string[]): string[] {
-  const documentIdsBySourceId = new Map(resolvedSources.map((source) => [source.sourceId, source.documents.map((doc) => doc.documentId)]));
+export function resolveDocumentIds(
+  resolvedSources: readonly ResolvedSource[],
+  sourceIds: readonly string[],
+  scope?: DocumentScope,
+): string[] {
+  const documentsBySourceId = new Map(resolvedSources.map((source) => [source.sourceId, source.documents]));
   const seen = new Set<string>();
   const documentIds: string[] = [];
 
+  const supports = (document: PublicDocument): boolean => {
+    if (scope === undefined) return true;
+    const owner = namedMunicipality(document.documentId, scope.allCodes);
+    // Names a municipality: keep it only for the entities this row covers.
+    if (owner !== undefined) return scope.entityCodes.includes(owner);
+    // Names none: a cross-municipality workbook, narrowed by its reviewed
+    // `years` field. An empty `years` means the metadata does not record
+    // coverage, so the document is kept rather than dropped on a guess.
+    return document.years.length === 0 || document.years.includes(scope.year);
+  };
+
   for (const sourceId of sourceIds) {
-    for (const documentId of documentIdsBySourceId.get(sourceId) ?? []) {
-      if (seen.has(documentId)) continue;
-      seen.add(documentId);
-      documentIds.push(documentId);
+    for (const document of documentsBySourceId.get(sourceId) ?? []) {
+      if (seen.has(document.documentId) || !supports(document)) continue;
+      seen.add(document.documentId);
+      documentIds.push(document.documentId);
     }
   }
 
