@@ -21,7 +21,7 @@ import {
   queryNationalInput,
   rankInput,
 } from "../factQuery/schemas";
-import { SERVER_INSTRUCTIONS } from "./instructions";
+import { serverInstructions } from "./instructions";
 import { boundedToolResult } from "./result";
 import { loadPackagedSnapshot } from "./snapshot";
 import type { DatasetId, FactQueryResponse, FactQuerySnapshot } from "../factQuery/types";
@@ -152,7 +152,7 @@ export function createMcpServer(): McpServer {
 
   const server = new McpServer(
     { name: "fiscal-ge", version: "1.0.0" },
-    { instructions: SERVER_INSTRUCTIONS },
+    { instructions: serverInstructions(coverage) },
   );
 
   for (const tool of TOOLS) {

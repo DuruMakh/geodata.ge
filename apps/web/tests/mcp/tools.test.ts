@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { SERVER_INSTRUCTIONS } from "../../lib/mcp/instructions";
+import { serverInstructions } from "../../lib/mcp/instructions";
 import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
 
 async function connected(): Promise<Client> {
@@ -129,12 +129,30 @@ describe("MCP tool surface", () => {
 
   it("tells the client what the service is for and what it must not claim", () => {
     // Spec 13: the truth policy is part of the contract, not decoration.
-    expect(SERVER_INSTRUCTIONS).toContain("CC BY 4.0");
-    expect(SERVER_INSTRUCTIONS).toContain("GEL");
-    expect(SERVER_INSTRUCTIONS.toLowerCase()).toMatch(/caveat|limitation/);
-    expect(SERVER_INSTRUCTIONS.toLowerCase()).toContain("deficit");
-    expect(SERVER_INSTRUCTIONS.toLowerCase()).toMatch(/never estimate|do not estimate/);
+    const instructions = serverInstructions({ "national-revenue": "2004-2025" });
+
+    expect(instructions).toContain("CC BY 4.0");
+    expect(instructions).toContain("GEL");
+    expect(instructions.toLowerCase()).toMatch(/caveat|limitation/);
+    expect(instructions.toLowerCase()).toContain("deficit");
+    expect(instructions.toLowerCase()).toMatch(/never estimate|do not estimate/);
     expect(TOOLS).toHaveLength(7);
+  });
+
+  // The instructions state coverage, so they must read it from the catalogue
+  // rather than carry a written-down range. This one had already drifted before
+  // it shipped: the text said ministries covered 2005-2025 while the catalogue
+  // said 2004-2025.
+  it("states coverage from the catalogue rather than a hardcoded range", async () => {
+    const { tools } = await (await connected()).listTools();
+    const ministries = tools.find((tool) => tool.name === "query_ministries")!;
+
+    const filled = serverInstructions({ ministries: "1999-2001" });
+    expect(filled).toContain("1999-2001");
+    expect(serverInstructions({})).toContain("see describe_coverage");
+    // And the live server agrees with itself: the tool description carries the
+    // real range, not a different one.
+    expect(ministries.description).toMatch(/\d{4}-\d{4}/);
   });
 
   it("keeps every tool name in the advertised set", () => {

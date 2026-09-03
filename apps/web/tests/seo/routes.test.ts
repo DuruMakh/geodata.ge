@@ -14,10 +14,14 @@ describe("indexable Fiscal.ge routes", () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls).toHaveLength(87);
+    // 87 + /connect, the MCP connection page. This count is pinned on purpose:
+    // a new HTML route has to be an explicit decision, and llms.txt asserts
+    // every HTML target it links also appears here.
+    expect(urls).toHaveLength(88);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
+    expect(urls).toContain("https://fiscal.ge/connect");
     expect(urls.some((url) => url.includes("#") || url.includes("?"))).toBe(false);
   });
 

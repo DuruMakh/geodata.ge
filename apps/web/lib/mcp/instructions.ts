@@ -10,13 +10,28 @@
 // data, and nothing here is a substitute for reading the caveats a response
 // actually returns.
 
-export const SERVER_INSTRUCTIONS = `Fiscal.ge serves reviewed annual data on Georgia's state and municipal budgets.
+import type { DatasetId } from "../factQuery/types";
+
+/**
+ * Built from the snapshot's own catalogue rather than written down.
+ *
+ * A hardcoded range rots the first time the data extends, and it rotted here
+ * before it ever shipped: this text said ministries covered "2005-2025" while
+ * the catalogue said 2004-2025, because the ministries dataset carries 2004
+ * administrative rows. Same rule as the UI (DESIGN.md section 2.1) - derive
+ * coverage from loaded facts, never hardcode it.
+ */
+export function serverInstructions(coverage: Partial<Record<DatasetId, string>>): string {
+  const range = (id: DatasetId) => coverage[id] ?? "see describe_coverage";
+
+  return `Fiscal.ge serves reviewed annual data on Georgia's state and municipal budgets.
 
 WHAT IS SERVED
-- National state-budget revenue and expenditure by category, 2004-2025.
-- Ministries: administrative categories and their major programs, 2005-2025.
+- National state-budget revenue, ${range("national-revenue")}, and expenditure,
+  ${range("national-expenditure")}, by category.
+- Ministries: administrative categories and their major programs, ${range("ministries")}.
 - Municipal expenditure by function for 64 municipalities, 11 regions and a
-  Georgia aggregate, 2015-2025.
+  Georgia aggregate, ${range("municipal-expenditure")}.
 Coverage is derived from the loaded data and is reported by describe_coverage.
 Do not assume a year or a series exists; ask.
 
@@ -70,3 +85,4 @@ Errors are structured and carry both Georgian and English messages, a retryable
 flag, and often valid choices. An unknown id returns suggestions drawn only from
 ids that exist. result_too_large means narrow the request - fewer years first,
 then fewer entities, then fewer series - or download the bulk file it names.`;
+}

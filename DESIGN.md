@@ -285,6 +285,8 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
                                                           for expenditure, and year selector)
 ```
 
+Outside `/explorer` and alongside `/about` sit the two editorial pages: `/about` (§2) and `/connect`, the MCP connection page (§23).
+
 Public municipality routes use the explicit lowercase-ASCII `[slug]` registry. Numeric municipality codes remain internal data, geometry, and join identifiers; they are not the public route identity.
 
 The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`.
@@ -831,3 +833,17 @@ The approved public visibility is dataset-specific: expenditure hides its histor
 ## 22. Not-found Recovery
 
 Unknown HTML routes retain their HTTP 404 status and use a minimal editorial recovery surface. It uses the existing paper, ink, body, muted, tint, and accent-focus tokens: a compact Fiscal.ge identifier, one Georgian H1, a short explanation, and ordinary visible links to the homepage, explorer, methodology, sitemap, and agent guide. It does not load data, reuse the application shell, add an illustration, or introduce a separate visual system.
+
+## 23. Connection Page (`/connect`)
+
+The one human-facing surface for the read-only MCP connection. Every other agent-facing surface (`llms.txt`, the JSON publications, the endpoint itself) is machine-facing; this page is the entire discovery funnel, and it is written for a non-technical journalist rather than for a developer.
+
+No new visual direction, chart type, or interaction pattern. It reuses the `/about` composition exactly: `SiteHeader` with the loaded-coverage label, `BreadcrumbTrail` (`მთავარი / AI-კავშირი`), a `2px ink` top rule under the serif H1, then rule-separated sections at the established `border-t border-[var(--ink)] pt-5` rhythm, and `SiteFooter`.
+
+Sections, in fixed order: the endpoint with a copy control; per-application connection steps; example questions in Georgian; the coverage statement; and a pointer to the bulk files for people who do not want an AI connection at all.
+
+**The copy control is the page's only interactive element.** A mono, 1px-`control`-bordered button at the established minimum target size, with an accessible Georgian name that changes to a confirmation on success. The endpoint is *also* rendered as selectable mono text beside it, so the address is obtainable when the clipboard API is unavailable or refused — the button is a convenience, never the only route to it.
+
+**The coverage statement carries both halves.** What is served, with year ranges derived from the same catalogue the endpoint answers from (§2.1 — never hardcoded), and what is *not*: quarterly and monthly data, public debt, individual capital projects and procurement, and the current year's live execution. The second half is not optional politeness. Without it a visitor asks for quarterly data, receives nothing, and concludes the service is broken; the page says plainly that the assistant will report missing data rather than invent it.
+
+Discovery is the site-footer navigation list, which every `/explorer` route and both editorial pages already render (§6.7). `/connect` also enters `sitemap.xml` and `llms.txt`.

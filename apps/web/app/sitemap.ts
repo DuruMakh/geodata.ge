@@ -53,6 +53,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: `${siteUrl}/`, lastModified },
     { url: `${siteUrl}/about`, lastModified },
+    // The connection page is HTML and is linked from llms.txt, so agentFiles'
+    // sitemap assertion requires it here.
+    { url: `${siteUrl}/connect`, lastModified },
     { url: `${siteUrl}/explorer`, lastModified },
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
     { url: `${siteUrl}/explorer/revenue`, lastModified },
