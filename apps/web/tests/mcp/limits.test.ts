@@ -146,3 +146,27 @@ describe("logging", () => {
     });
   });
 });
+
+describe("the limiter a deployment is allowed to use", () => {
+  it("refuses the in-process counter in production, whatever the configuration says", async () => {
+    // The in-process counter enforces nothing across serverless instances, so
+    // a single mistyped variable on the Production scope would otherwise turn a
+    // fail-closed endpoint into an effectively unlimited one - silently.
+    process.env.VERCEL_ENV = "production";
+    process.env.MCP_RATE_LIMITER = "memory";
+
+    expect(await createCounter().hit("any-key", 60, 60)).toBe("unavailable");
+  });
+
+  it("still allows it outside production, where it exists to make the route runnable", async () => {
+    process.env.MCP_RATE_LIMITER = "memory";
+
+    expect(await createCounter().hit("any-key", 60, 60)).toBe("allow");
+  });
+
+  it("fails closed on an unrecognised limiter name rather than serving unlimited", async () => {
+    process.env.MCP_RATE_LIMITER = "some-limiter-nobody-implemented";
+
+    expect(await createCounter().hit("any-key", 60, 60)).toBe("unavailable");
+  });
+});

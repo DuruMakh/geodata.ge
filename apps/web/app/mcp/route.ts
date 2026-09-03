@@ -1,7 +1,14 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import { LIMITS, RATE_MAX_REQUESTS, RATE_WINDOW_SECONDS, createCounter, isPaused } from "../../lib/mcp/limits";
+import {
+  LIMITS,
+  RATE_MAX_REQUESTS,
+  RATE_WINDOW_SECONDS,
+  type CounterVerdict,
+  createCounter,
+  isPaused,
+} from "../../lib/mcp/limits";
 import { checkRequest, clientKey, corsOriginFor } from "../../lib/mcp/security";
-import { createMcpServer } from "../../lib/mcp/tools";
+import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
 import { logToolCall } from "../../lib/mcp/log";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 
@@ -66,17 +73,119 @@ function methodNotAllowed(): Response {
   );
 }
 
-/** What this call was, for the log. Never the arguments, never the body. */
+/** The protocol methods this server implements, so the log can name them. */
+const PROTOCOL_METHODS = new Set(["initialize", "notifications/initialized", "ping", "tools/list", "tools/call"]);
+
+/**
+ * What this call was, for the log. Never the arguments, never the body.
+ *
+ * Every value this returns is one of a fixed set of constants. The caller
+ * controls `method` and `params.name` completely, and section 11.5 allows a
+ * tool name and validated stable IDs while forbidding invalid parameter
+ * strings - so echoing either straight through would write unbounded
+ * caller-supplied text into retained records, sixty times a minute per key.
+ * Matching against the known surface first means an unrecognised name is
+ * counted, not quoted.
+ */
 function toolNameOf(body: unknown): string {
   if (typeof body !== "object" || body === null) return "unparsed";
   const message = body as { method?: unknown; params?: { name?: unknown } };
-  if (message.method === "tools/call" && typeof message.params?.name === "string") return message.params.name;
-  return typeof message.method === "string" ? message.method : "unparsed";
+
+  if (message.method === "tools/call") {
+    const name = message.params?.name;
+    return typeof name === "string" && TOOLS.some((tool) => tool.name === name) ? name : "unknown_tool";
+  }
+  if (typeof message.method !== "string") return "unparsed";
+  return PROTOCOL_METHODS.has(message.method) ? message.method : "unknown_method";
 }
 
+/** The response a counter verdict demands, or null to carry on. */
+function refusalFor(verdict: CounterVerdict): Response | null {
+  if (verdict === "deny") {
+    return rpcError(
+      429,
+      "rate_limited",
+      "მოთხოვნების რაოდენობა ლიმიტს გადააჭარბა. სცადეთ ერთი წუთის შემდეგ, ან ჩამოტვირთეთ ფაილები.",
+      "Rate limit exceeded. Retry in a minute, or download the published files at https://fiscal.ge/downloads/data/.",
+      { "retry-after": String(RATE_WINDOW_SECONDS) },
+    );
+  }
+  if (verdict === "unavailable") {
+    // No configured shared limiter, or the limiter itself failed. Serving
+    // unlimited public traffic is a section 18 stop condition, so this fails
+    // closed rather than open.
+    return rpcError(
+      503,
+      "service_unavailable",
+      "სერვისი დროებით მიუწვდომელია.",
+      "Request limiting is unavailable, so the service is not accepting requests. Try again later.",
+      { "retry-after": "60" },
+    );
+  }
+  return null;
+}
+
+/**
+ * CORS preflight.
+ *
+ * A browser sends this before any POST carrying `content-type:
+ * application/json`, so without it an origin approved in MCP_ALLOWED_ORIGINS
+ * still could not reach the endpoint: Next's generated OPTIONS answers 204
+ * with an `Allow` header and no CORS headers at all, and the browser stops
+ * there. Runs the same pause, host and origin checks as a real request - a
+ * preflight is not a reason to skip them.
+ */
+function preflight(request: Request): Response {
+  if (isPaused()) return new Response(null, { status: 503, headers: { "retry-after": "3600" } });
+
+  const verdict = checkRequest(request);
+  const origin = corsOriginFor(request);
+  if (!verdict.ok || origin === null) return new Response(null, { status: 403 });
+
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "access-control-allow-origin": origin,
+      "access-control-allow-methods": "POST, OPTIONS",
+      "access-control-allow-headers": "content-type, accept, mcp-protocol-version, mcp-session-id",
+      "access-control-max-age": "600",
+      vary: "origin",
+    },
+  });
+}
+
+/**
+ * Nothing thrown here reaches the caller or the log.
+ *
+ * Without this, an unexpected throw - an unreadable snapshot, a transport
+ * fault - returns Next's default 500 instead of the bilingual envelope every
+ * other failure uses, emits no log record at all, and writes a stack
+ * containing absolute bundle paths to the platform log. Sections 11.2 and 11.5
+ * forbid publishing both. The caught value is deliberately never inspected.
+ */
 async function handle(request: Request): Promise<Response> {
   const startedAt = Date.now();
+  try {
+    return await serve(request, startedAt);
+  } catch {
+    logToolCall({
+      tool: "unparsed",
+      dataVersion: "unavailable",
+      resultBytes: 0,
+      durationMs: Date.now() - startedAt,
+      outcome: "error",
+      errorCode: "internal_error",
+    });
+    return rpcError(
+      500,
+      "internal_error",
+      "სერვისში მოხდა შეცდომა. მონაცემები ხელმისაწვდომია საიტზე და ჩამოსატვირთ ფაილებში.",
+      "The service failed to answer this request. The data remains available on the site and in the published files at https://fiscal.ge/downloads/data/.",
+    );
+  }
+}
 
+async function serve(request: Request, startedAt: number): Promise<Response> {
   // 1. Paused? Nothing else runs, and static pages are untouched.
   if (isPaused()) {
     return rpcError(
@@ -99,18 +208,26 @@ async function handle(request: Request): Promise<Response> {
     );
   }
 
-  // 3. Body cap, measured on the actual bytes rather than a Content-Length the
-  // caller controls. Read once and hand the parsed value to the transport so
-  // the body is not consumed twice.
-  const raw = await request.text();
-  if (Buffer.byteLength(raw, "utf8") > LIMITS.bodyBytes) {
-    return rpcError(
+  // 3. Body cap, in two passes. The declared length is a caller's claim, so it
+  // can only ever be grounds to refuse early - never grounds to accept - and a
+  // caller who understates it still meets the real measurement below. Checking
+  // it first is what makes 11.3's "reject before full processing" true: without
+  // it every oversized request is buffered to the platform's own multi-megabyte
+  // ceiling before this route says no. Read once, and hand the parsed value to
+  // the transport so the body is not consumed twice.
+  const tooLarge = (): Response =>
+    rpcError(
       413,
-      "result_too_large",
+      "request_too_large",
       `მოთხოვნა ზედმეტად დიდია (მაქსიმუმი ${LIMITS.bodyBytes / 1024} კბ).`,
       `Request body exceeds the ${LIMITS.bodyBytes / 1024} KiB limit.`,
     );
-  }
+
+  const declared = Number(request.headers.get("content-length"));
+  if (Number.isFinite(declared) && declared > LIMITS.bodyBytes) return tooLarge();
+
+  const raw = await request.text();
+  if (Buffer.byteLength(raw, "utf8") > LIMITS.bodyBytes) return tooLarge();
 
   let parsedBody: unknown;
   try {
@@ -121,33 +238,25 @@ async function handle(request: Request): Promise<Response> {
 
   // 4. Rate limits. A counter failure stops expensive processing with a
   // retryable error rather than quietly disabling the limit (spec 11.3).
+  //
+  // Each limit is checked before the next one is charged. Charging the shared
+  // daily budget for a request the per-key limit has already refused would let
+  // a single caller spend all 10,000 of it on answers it never received, and
+  // take the endpoint down for everybody else until the next UTC day - the
+  // per-key limit offering no protection at all, because the very requests it
+  // denies are the ones doing the spending.
   const key = clientKey(request);
-  const perKey = key === null ? "allow" : await counter().hit(`mcp:rate:${key}`, RATE_WINDOW_SECONDS, RATE_MAX_REQUESTS);
-  const daily = await counter().hit(`mcp:daily:${new Date().toISOString().slice(0, 10)}`, DAY_SECONDS, DAILY_MAX);
+  // No trusted platform header means no way to tell two callers apart, so they
+  // share one bucket rather than skipping the limit. Every request on Vercel is
+  // keyed; anywhere else this fails towards refusing rather than towards
+  // serving, which is the posture the rest of this module takes.
+  const perKey = await counter().hit(`mcp:rate:${key ?? "unkeyed"}`, RATE_WINDOW_SECONDS, RATE_MAX_REQUESTS);
+  const perKeyRefusal = refusalFor(perKey);
+  if (perKeyRefusal !== null) return perKeyRefusal;
 
-  for (const outcome of [perKey, daily]) {
-    if (outcome === "deny") {
-      return rpcError(
-        429,
-        "rate_limited",
-        "მოთხოვნების რაოდენობა ლიმიტს გადააჭარბა. სცადეთ ერთი წუთის შემდეგ, ან ჩამოტვირთეთ ფაილები.",
-        "Rate limit exceeded. Retry in a minute, or download the published files at https://fiscal.ge/downloads/data/.",
-        { "retry-after": String(RATE_WINDOW_SECONDS) },
-      );
-    }
-    if (outcome === "unavailable") {
-      // No configured shared limiter, or the limiter itself failed. Serving
-      // unlimited public traffic is a section 18 stop condition, so this fails
-      // closed rather than open.
-      return rpcError(
-        503,
-        "service_unavailable",
-        "სერვისი დროებით მიუწვდომელია.",
-        "Request limiting is unavailable, so the service is not accepting requests. Try again later.",
-        { "retry-after": "60" },
-      );
-    }
-  }
+  const daily = await counter().hit(`mcp:daily:${new Date().toISOString().slice(0, 10)}`, DAY_SECONDS, DAILY_MAX);
+  const dailyRefusal = refusalFor(daily);
+  if (dailyRefusal !== null) return dailyRefusal;
 
   // 5. Stateless: no sessionIdGenerator, so no session store and no
   // cross-request state to keep consistent across instances (spec 11.1).
@@ -168,19 +277,22 @@ async function handle(request: Request): Promise<Response> {
     await server.close();
   }
 
+  // Appended unconditionally, and appended rather than set: a cache must not
+  // hand one origin's answer - with or without the header - to another.
+  response.headers.append("vary", "origin");
   const cors = corsOriginFor(request);
-  if (cors !== null) {
-    // The one approved origin, echoed exactly. Never `*`, and never with
-    // credentials.
-    response.headers.set("access-control-allow-origin", cors);
-    response.headers.set("vary", "origin");
-  }
+  // The one approved origin, echoed exactly. Never `*`, and never with
+  // credentials.
+  if (cors !== null) response.headers.set("access-control-allow-origin", cors);
 
   logToolCall({
     tool: toolNameOf(parsedBody),
     dataVersion: loadPackagedSnapshot().dataVersion,
-    resultCount: 0,
-    resultBytes: Number(response.headers.get("content-length") ?? 0),
+    // Measured on the bytes actually being returned. The transport builds its
+    // reply with `new Response(string)`, which sets no content-length, so
+    // reading that header here recorded a confident zero on every single
+    // request - a documented operational signal that could never fire.
+    resultBytes: Buffer.byteLength(await response.clone().text(), "utf8"),
     durationMs: Date.now() - startedAt,
     outcome: response.status < 400 ? "ok" : "error",
   });
@@ -189,4 +301,5 @@ async function handle(request: Request): Promise<Response> {
 }
 
 export { handle as POST };
+export { preflight as OPTIONS };
 export { methodNotAllowed as GET, methodNotAllowed as DELETE };

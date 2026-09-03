@@ -20,7 +20,12 @@ export type ToolCallLog = {
   entityCount?: number;
   seriesCount?: number;
   dataVersion: string;
-  resultCount: number;
+  /**
+   * Omitted rather than sent as a placeholder. The route knows the size of the
+   * reply it is returning but not how many observations are inside it, and
+   * logging a hardcoded zero would read as "this answer had no rows".
+   */
+  resultCount?: number;
   resultBytes: number;
   durationMs: number;
   outcome: "ok" | "error";

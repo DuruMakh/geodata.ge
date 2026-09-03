@@ -75,5 +75,12 @@ function unavailableCounter(): Counter {
  * not chosen here: this release adds no paid dependency.
  */
 export function createCounter(): Counter {
+  // The in-process counter is refused in production outright, not merely
+  // documented as unsafe there. A single mistyped environment variable on the
+  // Production scope would otherwise turn a fail-closed endpoint into an
+  // effectively unlimited one - which is the section 18 stop condition this
+  // whole module exists to avoid - and nothing would report it.
+  if (process.env.VERCEL_ENV === "production") return unavailableCounter();
+
   return process.env.MCP_RATE_LIMITER === "memory" ? memoryCounter() : unavailableCounter();
 }

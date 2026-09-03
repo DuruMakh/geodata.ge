@@ -88,18 +88,27 @@ describe("client identification", () => {
   });
 });
 
-describe("rejection responses leak nothing", () => {
-  it("names no environment variable, path or stack frame", () => {
-    process.env.SECRET_TEST_VALUE = "super-secret-value";
-    const result = checkRequest(request({ host: "attacker.example", origin: "https://evil.example" }));
+// The leak assertion that used to live here serialized this verdict object -
+// `{ok:false,status:403,code:"forbidden_host"}` - and asserted a fixed literal
+// contained no secret, which it could never do. It is now made against the
+// actual rejection responses, in tests/mcp/route.test.ts, where a body that
+// could leak something is available to assert on.
 
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    const serialized = JSON.stringify(result);
+describe("a host the deployment has not configured", () => {
+  it("is refused outright in production, where nothing configured is a mistake", () => {
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+    process.env.VERCEL_ENV = "production";
 
-    expect(serialized).not.toContain("super-secret-value");
-    expect(serialized).not.toContain("SECRET_TEST_VALUE");
-    expect(serialized).not.toMatch(/[A-Za-z]:\\|\/home\/|\/var\/task|node_modules/);
-    expect(serialized).not.toContain("at ");
+    expect(checkRequest(request({ host: "anything.example" })).ok).toBe(false);
+  });
+
+  it("is still answered outside production, where a bare dev server has no site URL", () => {
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+
+    expect(checkRequest(request({ host: "localhost:3000" })).ok).toBe(true);
+  });
+
+  it("matches a configured host whatever case the caller sends it in", () => {
+    expect(checkRequest(request({ host: "FISCAL.GE" })).ok).toBe(true);
   });
 });

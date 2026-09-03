@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { POST, GET, DELETE } from "../../app/mcp/route";
+import { POST, OPTIONS, GET, DELETE } from "../../app/mcp/route";
+import { LIMITS } from "../../lib/mcp/limits";
 
 const ENDPOINT = "https://fiscal.ge/mcp";
 const PROTOCOL = "2025-11-25";
@@ -223,6 +224,158 @@ describe("/mcp guards", () => {
       expect(last.headers.get("retry-after")).toBe("60");
     } finally {
       vi.resetModules();
+    }
+  });
+});
+
+describe("what the log is allowed to say", () => {
+  /** Re-spies the silenced writer so a test can read the records back. */
+  function captureLogs(): string[] {
+    const written: string[] = [];
+    vi.spyOn(process.stdout, "write").mockImplementation((chunk: unknown) => {
+      written.push(String(chunk));
+      return true;
+    });
+    return written;
+  }
+
+  it("names a real tool, and counts an unrecognised one without quoting it", async () => {
+    const logs = captureLogs();
+    // A caller controls this string completely, and may send 32 KiB of it
+    // sixty times a minute. Section 11.5 permits a tool name and validated
+    // stable IDs; it forbids invalid parameter strings.
+    const injected = "totally-made-up-".repeat(40);
+    await POST(
+      post(
+        { jsonrpc: "2.0", id: 20, method: "tools/call", params: { name: injected, arguments: {} } },
+        { "mcp-protocol-version": PROTOCOL },
+      ),
+    );
+
+    expect(JSON.parse(logs.at(-1)!).tool).toBe("unknown_tool");
+    expect(logs.join("")).not.toContain(injected);
+  });
+
+  it("names an unrecognised protocol method without quoting it either", async () => {
+    const logs = captureLogs();
+    await POST(post({ jsonrpc: "2.0", id: 21, method: "nonsense/method", params: {} }, { "mcp-protocol-version": PROTOCOL }));
+
+    expect(JSON.parse(logs.at(-1)!).tool).toBe("unknown_method");
+    expect(logs.join("")).not.toContain("nonsense/method");
+  });
+
+  it("records a genuine tool call under its own name", async () => {
+    const logs = captureLogs();
+    await POST(
+      post(
+        { jsonrpc: "2.0", id: 22, method: "tools/call", params: { name: "describe_coverage", arguments: {} } },
+        { "mcp-protocol-version": PROTOCOL },
+      ),
+    );
+
+    expect(JSON.parse(logs.at(-1)!).tool).toBe("describe_coverage");
+  });
+
+  it("measures the reply it actually returned, and omits a count it does not have", async () => {
+    const logs = captureLogs();
+    await POST(post(initialize));
+    const record = JSON.parse(logs.at(-1)!);
+
+    // The transport builds its reply with `new Response(string)`, which sets no
+    // content-length; reading that header recorded a confident zero forever.
+    expect(record.resultBytes).toBeGreaterThan(0);
+    // Absent, rather than a placeholder that reads as "this answer had no rows".
+    expect(record.resultCount).toBeUndefined();
+  });
+});
+
+describe("cross-origin access", () => {
+  const preflightRequest = (origin: string): Request =>
+    new Request(ENDPOINT, { method: "OPTIONS", headers: { host: "fiscal.ge", origin } });
+
+  it("answers the preflight a browser must send before it may POST at all", () => {
+    process.env.MCP_ALLOWED_ORIGINS = "https://studio.example";
+    try {
+      const response = OPTIONS(preflightRequest("https://studio.example"));
+
+      expect(response.status).toBe(204);
+      expect(response.headers.get("access-control-allow-origin")).toBe("https://studio.example");
+      expect(response.headers.get("access-control-allow-methods")).toContain("POST");
+      expect(response.headers.get("access-control-allow-headers")).toContain("content-type");
+    } finally {
+      delete process.env.MCP_ALLOWED_ORIGINS;
+    }
+  });
+
+  it("refuses the preflight from an origin this deployment does not approve", () => {
+    const response = OPTIONS(preflightRequest("https://evil.example"));
+
+    expect(response.status).toBe(403);
+    expect(response.headers.get("access-control-allow-origin")).toBeNull();
+  });
+
+  it("echoes an approved origin exactly, never a wildcard", async () => {
+    process.env.MCP_ALLOWED_ORIGINS = "https://studio.example";
+    try {
+      const response = await POST(post(initialize, { origin: "https://studio.example" }));
+
+      expect(response.headers.get("access-control-allow-origin")).toBe("https://studio.example");
+    } finally {
+      delete process.env.MCP_ALLOWED_ORIGINS;
+    }
+  });
+
+  it("varies on origin even when none was sent, so no cache crosses the answers over", async () => {
+    const response = await POST(post(initialize));
+
+    expect(response.headers.get("vary")).toContain("origin");
+  });
+});
+
+describe("refusing without leaking", () => {
+  it("rejects an oversized request on its declared length, before reading the body", async () => {
+    const response = await POST(
+      new Request(ENDPOINT, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          accept: "application/json, text/event-stream",
+          host: "fiscal.ge",
+          "content-length": String(LIMITS.bodyBytes + 1),
+        },
+        body: JSON.stringify(initialize),
+      }),
+    );
+
+    expect(response.status).toBe(413);
+    // Distinct from `result_too_large`: the remedies are opposite, so a client
+    // branching on the code must be able to tell "your request was too big"
+    // from "the answer was too big".
+    expect(await response.text()).toContain("request_too_large");
+  });
+
+  it("names no environment value, absolute path or stack frame in any rejection", async () => {
+    process.env.SECRET_TEST_VALUE = "super-secret-value";
+    try {
+      const rejections = [
+        await POST(post(initialize, { host: "attacker.example" })),
+        await POST(post(initialize, { origin: "https://evil.example" })),
+        await POST(post("{not json", { "mcp-protocol-version": PROTOCOL })),
+        await POST(post({ padding: "x".repeat(LIMITS.bodyBytes + 1) })),
+        GET(),
+        DELETE(),
+      ];
+
+      for (const response of rejections) {
+        const body = await response.text();
+
+        expect(body).not.toContain("super-secret-value");
+        expect(body).not.toContain("SECRET_TEST_VALUE");
+        expect(body).not.toMatch(/[A-Za-z]:\|\/home\/|\/var\/task|node_modules/);
+        expect(body).not.toMatch(/\n\s+at /);
+      }
+    } finally {
+      delete process.env.SECRET_TEST_VALUE;
     }
   });
 });

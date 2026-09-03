@@ -29,7 +29,7 @@ function approvedHosts(): Set<string> {
     }
   }
   const platform = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  if (platform !== undefined && platform.length > 0) hosts.add(platform);
+  if (platform !== undefined && platform.length > 0) hosts.add(platform.toLowerCase());
   return hosts;
 }
 
@@ -42,8 +42,17 @@ function approvedOrigins(): string[] {
 
 export function checkRequest(request: Request): SecurityVerdict {
   const hosts = approvedHosts();
-  const host = request.headers.get("host");
-  if (hosts.size > 0 && (host === null || !hosts.has(host))) {
+  // Host names are case-insensitive, so `FISCAL.GE` is the same deployment.
+  const host = request.headers.get("host")?.toLowerCase() ?? null;
+
+  if (hosts.size === 0) {
+    // Nothing configured at all. Running locally that is ordinary - a bare
+    // `next start` has no site URL - but in production it is a
+    // misconfiguration, not permission to answer on whatever host a caller
+    // cares to name. The escape hatch stays where it is useful and closes
+    // where it is dangerous.
+    if (process.env.VERCEL_ENV === "production") return { ok: false, status: 403, code: "forbidden_host" };
+  } else if (host === null || !hosts.has(host)) {
     return { ok: false, status: 403, code: "forbidden_host" };
   }
 
@@ -77,6 +86,12 @@ export function corsOriginFor(request: Request): string | null {
  * Never from a client-supplied header: X-Forwarded-For on a direct connection
  * is a claim, and trusting it would let one caller present a thousand
  * identities and defeat the limit entirely.
+ *
+ * "Trusted" here means Vercel specifically, which sets X-Vercel-Forwarded-For
+ * itself and overwrites X-Forwarded-For so a caller cannot forge it. Behind any
+ * other proxy, or on a self-hosted `next start`, these are ordinary
+ * caller-supplied headers and confer no such guarantee - which is why the route
+ * puts unkeyed requests in one shared bucket instead of exempting them.
  *
  * Hashed, because a raw address is personal data. Hashing does not make a
  * persistent record anonymous (11.5), so the value is used only inside its own
