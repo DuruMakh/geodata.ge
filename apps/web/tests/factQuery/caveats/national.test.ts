@@ -23,18 +23,6 @@ function context(overrides: Partial<CaveatContext>): CaveatContext {
 
 const codes = (ctx: CaveatContext) => evaluateCaveats(ctx, NATIONAL_CAVEAT_RULES).map((c) => c.code);
 
-describe("nominal_gel", () => {
-  it("fires for a multi-year GEL request", () => {
-    expect(codes(context({ years: [2018, 2020] }))).toContain("nominal_gel");
-  });
-  it("does not fire for a single year", () => {
-    expect(codes(context({ years: [2020] }))).not.toContain("nominal_gel");
-  });
-  it("does not fire for a percentage measure", () => {
-    expect(codes(context({ years: [2018, 2020], measure: "share_of_gdp_pct" }))).not.toContain("nominal_gel");
-  });
-});
-
 describe("revenue_2004_total_scope", () => {
   it("fires when a 2004 revenue total is requested", () => {
     expect(codes(context({ years: [2004], seriesIds: ["revenue.total"] }))).toContain("revenue_2004_total_scope");

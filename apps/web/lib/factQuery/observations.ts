@@ -168,9 +168,9 @@ export function resolveDocumentIds(
  * denominator a rule can flag, not a queryable series of its own. This
  * matches every shape a rule in the catalogue actually produces, rather
  * than re-deriving each rule's own `applies` per observation - that would
- * need a different context shape per rule (nominal_gel reads the whole
- * REQUEST's year count; revenue_2004_total_scope reads a single
- * observation's own year) and no one per-observation context satisfies
+ * need a different context shape per rule (municipal_total_definition_changed
+ * reads the whole REQUEST's comparison window; revenue_2004_total_scope reads a
+ * single observation's own year) and no one per-observation context satisfies
  * both.
  *
  * PRECISION CONTRACT for every CaveatRule this helper is used against
@@ -211,8 +211,9 @@ export function resolveDocumentIds(
  * decide the caveat fires at all, then map to the precise `${seriesId}:${year}`
  * (or `${entityId}:${year}`) composite - never a bare id or bare year unless
  * the rule's truth is genuinely uniform across every year/series in the
- * request (nominal_gel and budget_scopes_differ are the two rules in this
- * file where that is actually the case - see their own comments).
+ * request (budget_scopes_differ is the rule in this file where that is
+ * actually the case - see its own comment; nominal_gel was the other until it
+ * was retired on 2026-09-04).
  * `planned_values` and `negative_revenue_correction` already followed this
  * pattern before the fix; treat them as the reference shape for any new
  * rule.

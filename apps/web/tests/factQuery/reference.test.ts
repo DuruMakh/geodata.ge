@@ -193,18 +193,18 @@ describe("section 14.3 bilingual reference fixture", () => {
         // An intent flagged as needing a qualification must actually have
         // something to qualify with.
         if (intent.mustDeclineOrQualify) {
-          // Deliberately not "carries any caveat". Three of the twenty
-          // responses carry none and none of those three is flagged, so the
-          // flag does discriminate - but `nominal_gel` rides along on many
-          // answers as boilerplate, and counting it would let a flagged intent
-          // pass on a qualification that was not about it. Requiring a SEVERE
-          // caveat is the opposite mistake: intents 8, 9, 15 and 16 qualify
-          // correctly with a note. What this flag means is that the service
-          // holds something back that is specific to THIS question.
-          const specific = response.meta.caveats.filter((caveat) => caveat.code !== "nominal_gel");
+          // Three of the twenty responses carry no caveat at all, and none of
+          // those three is flagged, so the flag discriminates. Requiring a
+          // SEVERE caveat would be the opposite mistake: intents 8, 9, 15 and
+          // 16 qualify correctly with a note. What this flag means is that the
+          // service holds something back specific to THIS question.
+          //
+          // The `nominal_gel` exclusion that used to sit here went with the rule
+          // itself: it rode along on every multi-year answer as boilerplate,
+          // which is precisely why it had to be discounted.
           const declined =
             response.status !== "ok" ||
-            specific.length > 0 ||
+            response.meta.caveats.length > 0 ||
             (data.comparisons as Comparison[] | undefined)?.some((c) => c.comparability !== "comparable") === true;
           expect(declined, `intent ${intent.id} must decline or qualify`).toBe(true);
         }

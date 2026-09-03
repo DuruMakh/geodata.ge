@@ -221,14 +221,6 @@ describe("queryNational", () => {
     expect(observation?.value as number).toBeLessThan(0);
   });
 
-  it("carries nominal_gel only for a multi-year amount_gel request", () => {
-    const multi = queryNational(snapshot, { side: "revenue", seriesIds: ["revenue.vat"], years: [2019, 2020], measure: "amount_gel" });
-    const single = queryNational(snapshot, { side: "revenue", seriesIds: ["revenue.vat"], years: [2020], measure: "amount_gel" });
-
-    expect(multi.meta.caveats.map((c) => c.code)).toContain("nominal_gel");
-    expect(single.meta.caveats.map((c) => c.code)).not.toContain("nominal_gel");
-  });
-
   it("warns that revenue and expenditure totals do not form a deficit when a total is requested", () => {
     const result = queryNational(snapshot, { side: "revenue", seriesIds: ["revenue.total"], years: [2020], measure: "amount_gel" });
     expect(result.meta.caveats.map((c) => c.code)).toContain("budget_scopes_differ");

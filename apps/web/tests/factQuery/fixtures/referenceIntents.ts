@@ -202,7 +202,7 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     requiredDocumentIds: [],
     // Only the nominal-price note. The 2004 TOTAL's scope limitation must NOT
     // be pinned onto an individual comparable tax category.
-    requiredCaveatCodes: ["nominal_gel"],
+    requiredCaveatCodes: [],
     mustDeclineOrQualify: false,
     note: "Category-specific: comparable, with no blanket total-scope warning borrowed from intent 3.",
   },
@@ -235,7 +235,7 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     expectedBudgetScope: null,
     requiredSourceIds: ["source.mof_2004_revenue_annual_execution_report", "source.mof_2005_revenue_form1_pdf"],
     requiredDocumentIds: [],
-    requiredCaveatCodes: ["revenue_2004_total_scope", "budget_scopes_differ", "nominal_gel"],
+    requiredCaveatCodes: ["revenue_2004_total_scope", "budget_scopes_differ"],
     mustDeclineOrQualify: true,
     note: "No like-for-like growth across changed total coverage. Both reviewed values still returned.",
   },
@@ -271,7 +271,7 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     requiredDocumentIds: [],
     // Fiscal.ge computes the change; the nominal-price caveat must ride with it
     // so nobody reads +250% as a real-terms increase.
-    requiredCaveatCodes: ["nominal_gel"],
+    requiredCaveatCodes: [],
     mustDeclineOrQualify: false,
     note: "Fiscal.ge computes GEL and percentage change itself rather than leaving it to model arithmetic.",
   },
@@ -442,7 +442,7 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     // MoF headline. Measured across all 64 municipalities, that gap is 0.94% at
     // the median in 2016 and 0.20% by 2024, so the pair compares - but it must
     // still SAY so, or the +154% reads as pure like-for-like growth.
-    requiredCaveatCodes: ["municipal_total_definition_changed", "municipal_country_scope", "nominal_gel"],
+    requiredCaveatCodes: ["municipal_total_definition_changed", "municipal_country_scope"],
     mustDeclineOrQualify: true,
     note: "Compares across the 2015 fallback basis, and qualifies the result rather than publishing it bare.",
   },
@@ -665,7 +665,7 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     requiredDocumentIds: [],
     // These are reviewed programs, not every government program, and the
     // ranking says so.
-    requiredCaveatCodes: ["program_coverage_partial", "nominal_gel"],
+    requiredCaveatCodes: ["program_coverage_partial"],
     mustDeclineOrQualify: true,
     note: "Reviewed subset with comparable endpoints; missing coverage reported and Georgian names returned intact.",
   },

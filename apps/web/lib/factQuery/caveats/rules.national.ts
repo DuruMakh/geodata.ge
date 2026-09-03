@@ -22,16 +22,13 @@ const NETTED_REVENUE_IDS = new Set(["revenue.grants", "revenue.other_revenue"]);
 const NETTING_START_YEAR = 2008;
 
 export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
-  {
-    code: "nominal_gel",
-    severity: "note",
-    comparisonEffect: "none",
-    messageKa: "თანხები ნომინალურ ლარშია, მიმდინარე ფასებში; ინფლაციაზე კორექტირებული არ არის.",
-    messageEn: "Amounts are nominal GEL at current prices and are not adjusted for inflation.",
-    methodologyRef: "ai-grounding-and-caveats.md#nominal_gel",
-    applies: (c) => c.measure === "amount_gel" && c.years.length > 1,
-    affects: (c) => c.seriesIds,
-  },
+  // `nominal_gel` was removed on 2026-09-04. Every GEL figure this service has
+  // ever served is nominal, in every year, for every dataset - so as a caveat it
+  // was true of everything and therefore said nothing about any particular
+  // answer, while crowding the ones that are specific to it. Budget figures are
+  // nominal by convention; deflating them is a deliberate separate step. The
+  // fact is now stated once in the server instructions, where dataset-wide
+  // properties belong, rather than attached to every multi-year request.
   {
     code: "planned_values",
     severity: "severe",

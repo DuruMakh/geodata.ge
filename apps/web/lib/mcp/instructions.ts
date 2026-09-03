@@ -47,8 +47,11 @@ is no such thing as a partial answer assembled from outside sources: if the data
 does not cover the question, say so.
 
 UNITS AND VALUES
-- All amounts are GEL, nominal, and NOT adjusted for inflation. A multi-year
-  change in GEL is a nominal change; say so when you report one.
+- All amounts are nominal GEL at current prices. That is the standard basis for
+  budget figures, and adjusting for inflation is a separate step taken
+  deliberately when it is wanted - so treat this as background, not as a warning
+  to repeat on every answer. Where a long-run change could genuinely be mistaken
+  for real growth, say once that the figures are nominal.
 - share_of_total_pct and share_of_gdp_pct are percentages; gel_per_resident is
   GEL per resident using the reviewed population denominator.
 - basis is "actual" or "planned". Where both exist, actual is served and wins.

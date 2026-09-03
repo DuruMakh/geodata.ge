@@ -225,10 +225,10 @@ function totalSeriesIds(snapshot: FactQuerySnapshot, datasetId: DatasetId): stri
  *
  * A first-wins dedup loses scope: `Caveat.affects` is computed per response,
  * so a code firing at both ministries levels with disjoint lists kept only the
- * first. 1,056 of 1,364 ministries rows declared `nominal_gel` while the
- * published caveat's `affects` named only the 14 admin series. Harmless for a
- * note; the same path would drop a severe caveat's scope as soon as a planned
- * ministries fact exists.
+ * first. 1,056 of 1,364 ministries rows declared `nominal_gel` (since retired)
+ * while the published caveat's `affects` named only the 14 admin series.
+ * Harmless for a note; the same path would drop a severe caveat's scope as soon
+ * as a planned ministries fact exists.
  */
 function mergeCaveats(left: readonly Caveat[], right: readonly Caveat[]): Caveat[] {
   const byCode = new Map<string, Caveat>();

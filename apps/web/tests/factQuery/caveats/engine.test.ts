@@ -58,8 +58,12 @@ describe("CAVEAT_RULES registry", () => {
   // keeps the major_program case and admin_category_not_yet_established takes the
   // admin_category one; program_historical_join keeps the join disclosure and
   // program_parent_category_modern_grouping takes the parent-attribution one.
-  it("registers the 22 codes from spec section 9.2 plus the two approved splits", () => {
-    expect(CAVEAT_RULES).toHaveLength(24);
+  //
+  // nominal_gel was retired on 2026-09-04: true of every GEL figure in every
+  // year, so it qualified nothing in particular while crowding the caveats that
+  // did. See rules.national.ts.
+  it("registers spec section 9.2's codes, less nominal_gel, plus the two approved splits", () => {
+    expect(CAVEAT_RULES).toHaveLength(23);
     const codes = CAVEAT_RULES.map((rule) => rule.code);
     expect(codes).toContain("admin_category_not_yet_established");
     expect(codes).toContain("program_parent_category_modern_grouping");

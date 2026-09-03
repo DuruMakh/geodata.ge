@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { compare } from "../../lib/factQuery/compare";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { LIMITS, boundedToolResult, toolResult, tooLargeResponse } from "../../lib/mcp/result";
@@ -133,11 +134,15 @@ describe("MCP tool results", () => {
     expect(result.content[0]!.text).toContain("municipal_source_actual_missing");
   });
 
+  // Khulo 2023->2024 carries a severe caveat (its 2024 total is a functional
+  // fallback, because the workbook publishes a plan) alongside a note (the two
+  // endpoints are measured differently). This previously used a plain two-year
+  // query, whose only note was the retired nominal_gel boilerplate.
   it("puts severe caveats before notes in the text a model reads", () => {
-    const response = queryMunicipal(snapshot, {
-      entityIds: ["11"],
-      seriesIds: ["municipal.total"],
-      years: [2015, 2024],
+    const response = compare(snapshot, {
+      target: { dataset: "municipal", entityIds: ["11"], seriesIds: ["municipal.total"] },
+      fromYear: 2023,
+      toYear: 2024,
       measure: "amount_gel",
     });
     if (response.kind === "error") throw new Error("expected data");

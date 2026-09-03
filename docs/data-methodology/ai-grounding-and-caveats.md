@@ -12,7 +12,7 @@ So every response carries machine-readable caveats alongside its figures, each s
 
 ## Scoping is part of the contract
 
-A caveat's `affects` array pins it to specific observations, normally as `seriesId:year` or `entityId:year` composites. A rule whose `affects` is coarser than the grain at which its claim is true will label figures it does not describe, and nothing in the type system catches that. Two such defects have shipped and been fixed; the precision contract is documented in `apps/web/lib/factQuery/observations.ts`. A bare id or a bare year is correct only where the claim is genuinely uniform across every cell in the request, which is why `nominal_gel` and `budget_scopes_differ` are allowed to use one.
+A caveat's `affects` array pins it to specific observations, normally as `seriesId:year` or `entityId:year` composites. A rule whose `affects` is coarser than the grain at which its claim is true will label figures it does not describe, and nothing in the type system catches that. Two such defects have shipped and been fixed; the precision contract is documented in `apps/web/lib/factQuery/observations.ts`. A bare id or a bare year is correct only where the claim is genuinely uniform across every cell in the request, which is why `budget_scopes_differ` is allowed to use one.
 
 ## Severity and comparison effect are different questions
 
@@ -30,11 +30,10 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-24 codes are registered.
+23 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
-| `nominal_gel` | note | `none` | `ai-grounding-and-caveats.md#nominal_gel` |
 | `planned_values` | severe | `none` | `ai-grounding-and-caveats.md#planned_values` |
 | `revenue_2004_total_scope` | severe | `breaks` | `revenue-methodology.md` |
 | `revenue_2004_liabilities_unavailable` | severe | `breaks` | `revenue-methodology.md` |
@@ -58,20 +57,6 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `program_historical_join` | note | `limits` | `ministries-drilldown-programs-methodology.md` |
 | `program_parent_category_modern_grouping` | severe | `none` | `ministries-drilldown-programs-methodology.md` |
 | `non_positive_comparison_base` | note | `none` | `ai-grounding-and-caveats.md#non_positive_comparison_base` |
-
-### `nominal_gel`
-
-**Severity:** note  
-**Comparison effect:** `none`  
-**Owner document:** `ai-grounding-and-caveats.md#nominal_gel`
-
-**Trigger.** Any `amount_gel` result spanning more than one year.
-
-**Georgian.** თანხები ნომინალურ ლარშია, მიმდინარე ფასებში; ინფლაციაზე კორექტირებული არ არის.
-
-**English.** Amounts are nominal GEL at current prices and are not adjusted for inflation.
-
-Multi-year GEL figures invite a growth story. The figures are current-price nominal GEL with no deflator anywhere in the pipeline, so growth between two years mixes real change with inflation. Single-year requests do not fire it: there is no across-time comparison to mislead.
 
 ### `planned_values`
 
