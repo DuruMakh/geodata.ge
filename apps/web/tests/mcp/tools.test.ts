@@ -11,6 +11,9 @@ async function connected(): Promise<Client> {
   return client;
 }
 
+/** Any counts; these tests are about how the text is built, not about the data. */
+const ENTITY_COUNTS = { municipalities: 64, regions: 11 };
+
 const TOOL_NAMES = [
   "compare",
   "describe_coverage",
@@ -129,7 +132,7 @@ describe("MCP tool surface", () => {
 
   it("tells the client what the service is for and what it must not claim", () => {
     // Spec 13: the truth policy is part of the contract, not decoration.
-    const instructions = serverInstructions({ "national-revenue": "2004-2025" });
+    const instructions = serverInstructions({ "national-revenue": "2004-2025" }, ENTITY_COUNTS);
 
     expect(instructions).toContain("CC BY 4.0");
     expect(instructions).toContain("GEL");
@@ -147,12 +150,29 @@ describe("MCP tool surface", () => {
     const { tools } = await (await connected()).listTools();
     const ministries = tools.find((tool) => tool.name === "query_ministries")!;
 
-    const filled = serverInstructions({ ministries: "1999-2001" });
+    const filled = serverInstructions({ ministries: "1999-2001" }, ENTITY_COUNTS);
     expect(filled).toContain("1999-2001");
-    expect(serverInstructions({})).toContain("see describe_coverage");
+    expect(serverInstructions({}, ENTITY_COUNTS)).toContain("see describe_coverage");
     // And the live server agrees with itself: the tool description carries the
     // real range, not a different one.
     expect(ministries.description).toMatch(/\d{4}-\d{4}/);
+  });
+
+  // Same rule as the year ranges: the entity counts are read from the snapshot,
+  // so "64 municipalities" cannot go stale in the text while the data moves on.
+  it("counts municipalities and regions rather than stating them", () => {
+    expect(serverInstructions({}, { municipalities: 7, regions: 3 })).toContain("7 municipalities");
+    expect(serverInstructions({}, { municipalities: 7, regions: 3 })).toContain("3 regions");
+  });
+
+  // Revenue is consolidated receipts; expenditure is state-budget expenditure.
+  // A client told they are both "state budget" has been handed the premise for
+  // a deficit subtraction the whole caveat exists to prevent.
+  it("names the two national accounting boundaries as different", () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+
+    expect(instructions).toContain("consolidated budget RECEIPTS");
+    expect(instructions).toContain("STATE-BUDGET expenditure");
   });
 
   it("keeps every tool name in the advertised set", () => {

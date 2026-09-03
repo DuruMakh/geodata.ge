@@ -63,10 +63,23 @@ test.describe("connection page", () => {
     await expect(served).toBeVisible();
     await expect(missing).toBeVisible();
 
-    const servedText = await served.innerText();
-    expect(servedText).toContain("2004");
-    expect(servedText).toContain("2015");
-    expect(servedText).toContain("2025");
+    // Per LINE, not per block. Asserting that the block as a whole contains
+    // "2004" cannot tell which dataset supplied it: if ministries silently
+    // drifted to 2005, national still contributes a 2004 and the test stays
+    // green - which is the exact drift this page exists to prevent.
+    const servedLines = (await served.innerText()).split("\n").filter((line) => line.includes("—"));
+    expect(servedLines).toHaveLength(4);
+    for (const line of servedLines) expect(line).toMatch(/\d{4}–\d{4}\s*$/);
+
+    const municipal = servedLines.find((line) => line.includes("მუნიციპალური"))!;
+    expect(municipal).toContain("2015–2025");
+    // The counts are derived too, so they must be present and non-zero.
+    expect(municipal).toMatch(/\d+ მუნიციპალიტეტი და \d+ რეგიონი/);
+
+    // Revenue is consolidated receipts, NOT state-budget revenue. Getting this
+    // wrong on the page that addresses AI clients hands them the premise for a
+    // deficit subtraction that the data does not support.
+    expect(servedLines.some((line) => line.startsWith("ნაერთი ბიუჯეტის შემოსულობები"))).toBe(true);
 
     const missingText = await missing.innerText();
     // Quarterly, monthly, debt, capital projects - named explicitly.

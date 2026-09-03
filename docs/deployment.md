@@ -112,7 +112,7 @@ Production builds from the Supabase mirror; previews and local dev need none.
 | `GEODATA_DATA_SOURCE` | Production only | `db` |
 | `NEXT_PUBLIC_SITE_URL` | Production only | canonical site origin, exactly `https://fiscal.ge` |
 | `MCP_ENABLED` | Production only | `true` to serve `/mcp`; anything else (including unset) keeps it paused |
-| `MCP_RATE_LIMITER` | Production only | which shared limiter `/mcp` uses; unset fails closed |
+| `MCP_RATE_LIMITER` | Non-production only | selects the shared counter. The ONLY implemented value is `memory`, which is development-only and is refused outright in production. There is no production limiter yet, so any value — including a plausible-looking one — fails closed |
 | `MCP_ALLOWED_ORIGINS` | Production only | comma-separated browser origins allowed to call `/mcp`; unset means server clients only |
 
 - The db-mode build renders from the mirror and re-verifies it row-by-row
@@ -254,12 +254,18 @@ An empty array means the deployed function has no data and every call will fail.
 
 | Control | Value | Enforced in |
 | --- | --- | --- |
-| Request body | 32 KiB, measured on the real bytes | `app/mcp/route.ts` |
+| Request body | 32 KiB, refused on the declared length before the body is read, then re-checked on the real bytes | `app/mcp/route.ts` |
 | Returned observation cells | 500 | `lib/mcp/result.ts` |
+| Returned comparison pairs | 250 — a comparison row is two cells | `lib/mcp/result.ts` |
+| Input arrays | 100 entities, 200 series, 100 years, 100 source ids | `lib/factQuery/schemas.ts` |
 | Serialized tool result | 512 KiB, both representations | `lib/mcp/result.ts` |
-| Per-key request rate | 60 per rolling minute | `app/mcp/route.ts` |
-| Global daily accepted requests | 10,000 per UTC day | `app/mcp/route.ts` |
+| Per-key request rate | 60 per rolling minute; an unidentifiable caller shares one bucket rather than skipping the limit | `app/mcp/route.ts` |
+| Global daily accepted requests | 10,000 per UTC day, charged only once a request has passed the per-key limit | `app/mcp/route.ts` |
 | Request duration | 10 s | `maxDuration` in `app/mcp/route.ts` |
+
+The input array bounds are enforced as `.max()` on the schemas themselves, so a
+client reads them as `maxItems` in `tools/list` rather than discovering them by
+being refused.
 
 The byte ceiling, not the cell cap, is the binding gate: a compliant 495-cell
 municipal request serializes to about 517 KiB. Over-ceiling results are refused
@@ -288,6 +294,19 @@ shared counter — requires the owner sign-off described in the release
 verification: hosting plan, limiter availability and cost, measured resource
 use, expected traffic, budget alerts, and an approved operating budget.
 
+### Two public files claim a live endpoint — do not publish them ahead of the switch
+
+`public/llms.txt` and the `/connect` page both describe `https://fiscal.ge/mcp`
+in the present tense, as a service that answers. They are static, so they go
+live with **any** production deploy, whatever `MCP_ENABLED` is set to.
+
+A client that reads them and connects to a paused endpoint gets a `503` with a
+bilingual message pointing at the site and the published files, so nobody is
+left in silence. But the claim is still ahead of the fact. Either enable `/mcp`
+in the same release that publishes them, or accept that the two files advertise
+a service that answers only with `503` until the switch is on. This is the
+owner's call, and it is a sequencing decision rather than a code change.
+
 ### Pause and resume
 
 `/mcp` ships **deployed and dark**. It runs only when `MCP_ENABLED` is exactly
@@ -310,7 +329,16 @@ That must still be `200` while `/mcp` returns `503`.
 
 One JSON line per request, built from an allow-list in `apps/web/lib/mcp/log.ts`
 — tool name, dataset, measure, year range, entity and series counts, data
-version, result count, response size, duration, outcome, error code.
+version, response size in bytes, duration, outcome, error code.
+
+Result count is **omitted**, not sent as zero: the route knows how large its
+reply was but not how many observations are inside it, and a hardcoded `0`
+would read as "this answer had no rows".
+
+The tool name is matched against the seven tools and the protocol methods
+before it is written; an unrecognised one is recorded as `unknown_tool` or
+`unknown_method`. It is never echoed. A caller controls that field completely,
+so echoing it would put unbounded caller-supplied text into retained records.
 
 It never records raw prompts, invalid parameter strings, request bodies,
 authorization headers, full user agents, or IP addresses. The limiter key is a
@@ -341,7 +369,26 @@ Host is validated against `NEXT_PUBLIC_SITE_URL` and
 direct connection. A request with no `Origin` is allowed, because most MCP
 clients are servers; a *present* origin must appear in `MCP_ALLOWED_ORIGINS`,
 including the opaque `null` origin a sandboxed iframe sends. CORS echoes the one
-approved origin, never `*`, and never with credentials.
+approved origin, never `*`, and never with credentials, and `Vary: Origin` is
+always appended so no cache can hand one origin's answer to another.
+
+A browser also sends a CORS **preflight** before any POST carrying
+`content-type: application/json`, so `/mcp` answers `OPTIONS` itself. Without
+that, an origin listed in `MCP_ALLOWED_ORIGINS` still could not reach the
+endpoint: the framework's own generated `OPTIONS` replies `204` with an `Allow`
+header and no CORS headers, and the browser stops there. The preflight runs the
+same pause, host and origin checks as a real request.
+
+Host matching is case-insensitive. If neither host variable is configured, the
+check is skipped outside production — a bare local server has no site URL — but
+in production nothing configured is treated as a misconfiguration and every
+request is refused.
+
+`GET` and `DELETE` return `405` with `Allow: POST`. This is deliberate: passed
+to the transport, a `GET` carrying `Accept: text/event-stream` opens a
+keep-alive stream this server has nothing to push down, which an unauthenticated
+caller could use to pin a function instance for the full 10-second ceiling with
+a one-line request.
 
 Access is public and unauthenticated by design: every tool reads approved public
 data, and no database credentials exist in request-time code. Origin and host

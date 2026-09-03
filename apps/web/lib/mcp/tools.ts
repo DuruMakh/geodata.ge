@@ -152,7 +152,13 @@ export function createMcpServer(): McpServer {
 
   const server = new McpServer(
     { name: "fiscal-ge", version: "1.0.0" },
-    { instructions: serverInstructions(coverage) },
+    {
+      instructions: serverInstructions(coverage, {
+        // Counted, not written down, for the same reason the year ranges are.
+        municipalities: snapshot.municipal.municipalities.length,
+        regions: snapshot.municipal.regions.length,
+      }),
+    },
   );
 
   for (const tool of TOOLS) {

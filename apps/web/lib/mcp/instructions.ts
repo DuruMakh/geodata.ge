@@ -21,17 +21,22 @@ import type { DatasetId } from "../factQuery/types";
  * administrative rows. Same rule as the UI (DESIGN.md section 2.1) - derive
  * coverage from loaded facts, never hardcode it.
  */
-export function serverInstructions(coverage: Partial<Record<DatasetId, string>>): string {
+export function serverInstructions(
+  coverage: Partial<Record<DatasetId, string>>,
+  entities: { municipalities: number; regions: number },
+): string {
   const range = (id: DatasetId) => coverage[id] ?? "see describe_coverage";
 
   return `Fiscal.ge serves reviewed annual data on Georgia's state and municipal budgets.
 
 WHAT IS SERVED
-- National state-budget revenue, ${range("national-revenue")}, and expenditure,
-  ${range("national-expenditure")}, by category.
+- National consolidated budget RECEIPTS, ${range("national-revenue")}, and
+  national STATE-BUDGET expenditure, ${range("national-expenditure")}, by
+  category. Those are two different accounting boundaries; see BUDGET
+  BOUNDARIES below before combining them.
 - Ministries: administrative categories and their major programs, ${range("ministries")}.
-- Municipal expenditure by function for 64 municipalities, 11 regions and a
-  Georgia aggregate, ${range("municipal-expenditure")}.
+- Municipal expenditure by function for ${entities.municipalities} municipalities,
+  ${entities.regions} regions and a Georgia aggregate, ${range("municipal-expenditure")}.
 Coverage is derived from the loaded data and is reported by describe_coverage.
 Do not assume a year or a series exists; ask.
 
@@ -60,9 +65,11 @@ Municipal figures are municipal budgets only; they are not a territorial split
 of national spending, and they must not be added to national totals.
 
 CITATIONS AND LICENCE
-Every response carries meta.sources with the public originals behind it, and
-each observation carries the documentIds that support that specific figure.
-Cite from those. The data is published under CC BY 4.0
+Every response carries meta.sources, narrowed to the public originals this
+particular answer rests on. Cite from those. (Structured observations also
+carry documentIds for the specific figure; the text representation does not, so
+meta.sources is the citation source that is correct in both.) The data is
+published under CC BY 4.0
 (https://creativecommons.org/licenses/by/4.0/); attribute Fiscal.ge.
 
 CAVEATS

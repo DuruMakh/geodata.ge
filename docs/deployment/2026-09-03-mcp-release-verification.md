@@ -72,6 +72,7 @@ guidance rather than trimmed.
 | 8 | Production latency: warm p95 and first cold response, with region, concurrency and payload sizes | Deployment |
 | 9 | Application logs contain no forbidden field, in production | Deployment |
 | 10 | The six production-proof checks of §16 | Merge + deploy |
+| 11 | **`/connect` and `public/llms.txt` describe `/mcp` in the present tense and ship with any production deploy, whatever `MCP_ENABLED` says** | Owner sequencing decision. Either enable `/mcp` in the same release, or accept that both files advertise a service that answers only `503` until the switch is on. A connecting client gets a bilingual `503` pointing at the site and the published files, so nobody is left in silence — but the claim still precedes the fact. See "Two public files claim a live endpoint" in `docs/deployment.md`. |
 
 **Gate 6 deserves emphasis.** Production builds with `GEODATA_DATA_SOURCE=db`,
 and the snapshot is built through the same loaders, so the deployed endpoint and
@@ -89,6 +90,36 @@ GEODATA_DATA_SOURCE=db npm run data:prepare-fact-query-snapshot
 ```
 
 Each prints `dataVersion=<hash>`. They must match.
+
+## Review round, 2026-09-03
+
+Three reviewers covered the runtime and its guards, the query semantics and the
+reference fixture, and the public surfaces and documentation claims. Their
+findings were fixed in three commits on this branch; the notes below record what
+this document previously overstated.
+
+- **The limits table listed controls the code did not enforce.** Four input
+  array bounds were declared as constants and applied nowhere, and comparisons
+  were gated at the 500-cell limit rather than their own 250 — so 500
+  comparison rows, a thousand cells, were accepted. Both are now enforced, and
+  the input bounds are published to clients as `maxItems`.
+- **The log promised two fields it could not fill.** `resultBytes` read a
+  `Content-Length` the transport never sets, so it recorded zero on every
+  request; `resultCount` was hardcoded to zero. Size is now measured on the
+  bytes returned, and the count is omitted rather than faked.
+- **`MCP_RATE_LIMITER` was described as if a production limiter existed.** Only
+  `memory` is implemented, it is development-only, and it is now refused
+  outright in production.
+- **The performance numbers below predate these changes** and were re-measured
+  only at the application level. Nothing in this round changed the query path's
+  cost; the byte measurement added one clone of a response already bounded at
+  512 KiB.
+
+What the reviewers did **not** find is worth recording too: the provenance
+narrowing that took a municipal response from 80.0 KiB to 4.4 KiB was traced
+through every call site and shown to be incapable of dropping a document the
+answer cites, and ten of the reference fixture's expected figures were verified
+independently against the CSVs in `data/imports/`.
 
 ## Open decisions carried into this release
 

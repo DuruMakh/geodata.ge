@@ -3,6 +3,7 @@ import { CopyEndpoint } from "../../components/connect/copy-endpoint";
 import { SiteFooter } from "../../components/site/site-footer";
 import { SiteHeader } from "../../components/site/site-header";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import type { CoverageData } from "../../lib/factQuery/describeCoverage";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { loadServedLandingData } from "../../lib/data/servedData";
 import { buildLandingContext } from "../../lib/landing/landingData";
@@ -18,37 +19,58 @@ export const metadata = fiscalMetadata({
 });
 
 /**
- * Year ranges come from the same catalogue the endpoint serves, so this page
- * cannot advertise coverage MCP does not have. DESIGN.md section 2.1: derive
- * coverage from loaded facts, never hardcode it.
+ * Everything this page claims about coverage comes from the same catalogue the
+ * endpoint serves, so it cannot advertise something MCP does not have.
+ * DESIGN.md section 2.1: derive coverage from loaded facts, never hardcode it.
+ * That applies to the counts as much as to the years - a stale "64
+ * municipalities" is the same class of error as a stale year range.
  */
-function coverageRanges(): Record<DatasetId, string> {
-  const response = describeCoverage(loadPackagedSnapshot(), {});
+function coverage(): {
+  ranges: Record<DatasetId, string>;
+  municipalities: number;
+  regions: number;
+  excludedCodes: string[];
+} {
+  const snapshot = loadPackagedSnapshot();
+  const response = describeCoverage(snapshot, {});
+  // The input is a literal `{}`, so this cannot fail today. Throwing rather
+  // than falling back to blank years means that if it ever can, the build
+  // stops instead of quietly publishing a coverage claim with the numbers
+  // missing from it.
+  if (response.kind === "error") throw new Error(`coverage unavailable: ${response.error.code}`);
+
+  const { datasets, exclusions } = response.data as CoverageData;
   const ranges = {} as Record<DatasetId, string>;
+  for (const dataset of datasets) ranges[dataset.datasetId] = `${dataset.years[0]}–${dataset.years[1]}`;
 
-  if (response.kind !== "error") {
-    const { datasets } = response.data as { datasets: { datasetId: DatasetId; years: [number, number] }[] };
-    for (const dataset of datasets) ranges[dataset.datasetId] = `${dataset.years[0]}–${dataset.years[1]}`;
-  }
-
-  return ranges;
+  return {
+    ranges,
+    municipalities: snapshot.municipal.municipalities.length,
+    regions: snapshot.municipal.regions.length,
+    excludedCodes: exclusions.map((exclusion) => exclusion.entityId),
+  };
 }
 
+// Deliberately not a per-client click-path. Plan Task 9 Step 3: advertise only
+// tested compatibility, and no client has yet been tested against the deployed
+// endpoint. Menu names also differ by client, plan and version, so a confident
+// three-step recipe that turns out to be wrong is worse than an honest one
+// that says where to look.
 const CLIENTS = [
   {
-    name: "Claude (Desktop და Web)",
+    name: "კლიენტები, რომლებსაც MCP-ის მხარდაჭერა აქვთ",
     steps:
-      "გახსენით პარამეტრები → Connectors → Add custom connector. ჩასვით ზემოთ მოცემული მისამართი და შეინახეთ. ავტორიზაცია არ არის საჭირო — სერვისი საჯაროა.",
+      "ასეთი კლიენტები — მაგალითად Claude და ChatGPT — დისტანციურ სერვერებს პარამეტრებში, განყოფილებაში Connectors, ამატებენ. ზუსტი გზა და ხელმისაწვდომობა კლიენტისა და გეგმის მიხედვით განსხვავდება; იხილეთ კლიენტის დოკუმენტაცია.",
   },
   {
-    name: "ChatGPT",
+    name: "რა უნდა დაამატოთ",
     steps:
-      "პარამეტრებში აირჩიეთ Connectors → Add. ჩასვით მისამართი, დაადასტურეთ, და ბიუჯეტის ინსტრუმენტები ხელმისაწვდომი გახდება საუბარში.",
+      "დაამატეთ ზემოთ მოცემული მისამართი როგორც დისტანციური (remote) MCP სერვერი. ავტორიზაცია და API-გასაღები არ გამოიყენება.",
   },
   {
-    name: "სხვა MCP კლიენტები",
+    name: "ტექნიკური დეტალები",
     steps:
-      "სერვისი იყენებს MCP Streamable HTTP პროტოკოლს (რევიზია 2025-11-25). დაამატეთ მისამართი როგორც დისტანციური MCP სერვერი; სესია და ავტორიზაცია არ გამოიყენება.",
+      "პროტოკოლი — MCP Streamable HTTP, რევიზია 2025-11-25. მუშაობს სესიის გარეშე და მხოლოდ POST მოთხოვნებზე. ინსტრუმენტების სიის მისაღებად გამოიძახეთ tools/list.",
   },
 ] as const;
 
@@ -69,7 +91,7 @@ const NOT_SERVED = [
 
 export default async function ConnectPage() {
   const model = buildLandingContext(await loadServedLandingData());
-  const ranges = coverageRanges();
+  const { ranges, municipalities, regions, excludedCodes } = coverage();
   const endpoint = `${resolveSiteUrl()}/mcp`;
 
   return (
@@ -148,10 +170,21 @@ export default async function ConnectPage() {
               <div data-testid="connect-coverage-served">
                 <h3 className="text-[14px] font-semibold">ხელმისაწვდომია</h3>
                 <ul className="mt-2 grid gap-1.5 text-[13px] leading-[1.8] text-[var(--body)]">
-                  <li>სახელმწიფო ბიუჯეტის შემოსავლები — {ranges["national-revenue"]}</li>
+                  {/* "ნაერთი ბიუჯეტის შემოსულობები", not "სახელმწიფო ბიუჯეტის
+                      შემოსავლები": revenue is consolidated budget receipts while
+                      expenditure is state-budget expenditure. Two different accounting
+                      boundaries - which is exactly why subtracting one total from the
+                      other does not give a deficit, the distinction budget_scopes_differ
+                      exists to carry. The page addressing AI clients is the last place
+                      that should blur it. Wording matches
+                      lib/methodology/content/revenue.ts. */}
+                  <li>ნაერთი ბიუჯეტის შემოსულობები — {ranges["national-revenue"]}</li>
                   <li>სახელმწიფო ბიუჯეტის ხარჯები — {ranges["national-expenditure"]}</li>
                   <li>უწყებები და ძირითადი პროგრამები — {ranges.ministries}</li>
-                  <li>მუნიციპალური ხარჯები, 64 მუნიციპალიტეტი და 11 რეგიონი — {ranges["municipal-expenditure"]}</li>
+                  <li>
+                    მუნიციპალური ხარჯები, {municipalities} მუნიციპალიტეტი და {regions} რეგიონი —{" "}
+                    {ranges["municipal-expenditure"]}
+                  </li>
                 </ul>
               </div>
               <div data-testid="connect-coverage-excluded">
@@ -161,6 +194,10 @@ export default async function ConnectPage() {
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
+                <p className="mt-3 text-[12.5px] leading-relaxed text-[var(--muted)]">
+                  ასევე კოდები {excludedCodes.join(", ")} — ამ კოდების ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ
+                  არის, ამიტომ ასეთ კოდზე დასმულ შეკითხვას ციფრის ნაცვლად განმარტება უბრუნდება.
+                </p>
                 <p className="mt-3 text-[12.5px] leading-relaxed text-[var(--muted)]">
                   თუ შეკითხვა ამ ჩამონათვალს ეხება, ასისტენტი პასუხს არ გამოიგონებს — ის გეტყვით, რომ მონაცემი არ
                   არსებობს.

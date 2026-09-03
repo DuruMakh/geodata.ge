@@ -54,7 +54,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/`, lastModified },
     { url: `${siteUrl}/about`, lastModified },
     // The connection page is HTML and is linked from llms.txt, so agentFiles'
-    // sitemap assertion requires it here.
+    // sitemap assertion requires it here. /mcp is deliberately NOT listed: it
+    // is a POST-only protocol endpoint that answers a crawler's GET with 405,
+    // so it is not a page to index. /connect is its human entry point.
     { url: `${siteUrl}/connect`, lastModified },
     { url: `${siteUrl}/explorer`, lastModified },
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
