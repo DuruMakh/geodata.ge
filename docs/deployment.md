@@ -384,6 +384,40 @@ check is skipped outside production — a bare local server has no site URL — 
 in production nothing configured is treated as a misconfiguration and every
 request is refused.
 
+**On a preview**, the allowlist also includes the deployment's own address, from
+`VERCEL_BRANCH_URL` and `VERCEL_URL`. It has to: Vercel sets
+`VERCEL_PROJECT_PRODUCTION_URL` on previews too — to the *production* domain —
+so without them a preview's allowlist is the production identity alone and the
+endpoint refuses its own address with `forbidden_host` on every request. Those
+are platform environment variables rather than headers, so a caller cannot
+present them, and they are added only when `VERCEL_ENV` is set to something
+other than `production`. In production the configured identity stays the entire
+allowlist.
+
+### Testing `/mcp` on a preview
+
+Previews are the only deployed surface where the endpoint can currently answer:
+`createCounter()` refuses the in-process counter in production outright, so a
+production deploy answers `503` to every request until a real shared limiter
+exists (see the owner gate above). To bring a preview up:
+
+1. Push the branch. Every branch except `main` gets a preview automatically
+   (`apps/web/vercel.json` disables auto-deploy for `main` only).
+2. Set `MCP_ENABLED=true` and `MCP_RATE_LIMITER=memory` on the **Preview**
+   scope, then redeploy so the running function reads them.
+3. Decide on Deployment Protection. An MCP client cannot complete Vercel's SSO
+   flow and will receive an HTML login page instead of JSON, so protection must
+   be disabled for the preview or a bypass token supplied.
+
+The `memory` counter is per-instance and enforces nothing across instances.
+That is acceptable for a short-lived test surface and is not a production
+limiter; restore protection when testing ends.
+
+Note that `/connect` on a preview displays `https://fiscal.ge/mcp`, because
+`resolveSiteUrl()` falls back to `VERCEL_PROJECT_PRODUCTION_URL` and previews
+report the production domain there. Use the preview's own origin with `/mcp`
+appended, not the address the page shows.
+
 `GET` and `DELETE` return `405` with `Allow: POST`. This is deliberate: passed
 to the transport, a `GET` carrying `Accept: text/event-stream` opens a
 keep-alive stream this server has nothing to push down, which an unauthenticated

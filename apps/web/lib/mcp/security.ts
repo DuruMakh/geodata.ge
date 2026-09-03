@@ -30,6 +30,20 @@ function approvedHosts(): Set<string> {
   }
   const platform = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   if (platform !== undefined && platform.length > 0) hosts.add(platform.toLowerCase());
+
+  // A preview answers on its own generated host, and Vercel sets
+  // VERCEL_PROJECT_PRODUCTION_URL there too - to the PRODUCTION domain. Without
+  // the two below, a preview's allowlist is the production identity alone and
+  // every request to it is refused as a forbidden host, which is not a
+  // meaningful control: it rejects the deployment's own address rather than an
+  // attacker's. These are platform environment variables, not headers, so a
+  // caller cannot present them; and they are added only outside production,
+  // where the configured identity remains the entire allowlist.
+  if (process.env.VERCEL_ENV !== undefined && process.env.VERCEL_ENV !== "production") {
+    for (const own of [process.env.VERCEL_BRANCH_URL, process.env.VERCEL_URL]) {
+      if (own !== undefined && own.length > 0) hosts.add(own.toLowerCase());
+    }
+  }
   return hosts;
 }
 

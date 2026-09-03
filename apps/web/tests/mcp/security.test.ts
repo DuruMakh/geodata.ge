@@ -112,3 +112,43 @@ describe("a host the deployment has not configured", () => {
     expect(checkRequest(request({ host: "FISCAL.GE" })).ok).toBe(true);
   });
 });
+
+// A preview is neither the configured site nor production. Vercel reports the
+// PRODUCTION domain in VERCEL_PROJECT_PRODUCTION_URL there as well, so without
+// the deployment's own address the allowlist refuses the deployment itself -
+// a check that rejects nobody but us.
+describe("a preview deployment's own host", () => {
+  beforeEach(() => {
+    process.env.VERCEL_ENV = "preview";
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = "fiscal.ge";
+  });
+
+  it("is accepted on the stable branch address", () => {
+    process.env.VERCEL_BRANCH_URL = "geodata-ge-git-branch-team.vercel.app";
+
+    expect(checkRequest(request({ host: "geodata-ge-git-branch-team.vercel.app" }))).toEqual({ ok: true });
+  });
+
+  it("is accepted on the per-deployment address", () => {
+    process.env.VERCEL_URL = "geodata-ge-abc123-team.vercel.app";
+
+    expect(checkRequest(request({ host: "geodata-ge-abc123-team.vercel.app" }))).toEqual({ ok: true });
+  });
+
+  it("does not widen the allowlist to an unrelated host", () => {
+    process.env.VERCEL_BRANCH_URL = "geodata-ge-git-branch-team.vercel.app";
+
+    expect(checkRequest(request({ host: "attacker.example" })).ok).toBe(false);
+  });
+
+  // The whole point of the guard: production keeps the configured identity as
+  // its entire allowlist, so nothing the platform reports about a deployment
+  // widens it there.
+  it("is not honoured in production", () => {
+    process.env.VERCEL_ENV = "production";
+    process.env.VERCEL_BRANCH_URL = "geodata-ge-git-branch-team.vercel.app";
+    process.env.VERCEL_URL = "geodata-ge-abc123-team.vercel.app";
+
+    expect(checkRequest(request({ host: "geodata-ge-abc123-team.vercel.app" })).ok).toBe(false);
+  });
+});
