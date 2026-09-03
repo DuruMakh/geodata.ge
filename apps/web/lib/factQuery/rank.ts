@@ -334,7 +334,20 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         seriesId: comparison.seriesId,
         seriesLabelKa: comparison.seriesLabelKa,
         value,
-        unit: comparison.unit,
+        // The unit must describe THIS entry's `value`, and on a change ranking
+        // that value is a change, not an endpoint. `comparison.unit` is the
+        // MEASURE's unit, so a percentage_change ranking over amount_gel
+        // published `{ value: 464.33, unit: "GEL" }` - read plainly, "464 GEL"
+        // instead of "+464%". compare() escapes this because its unit describes
+        // the two endpoints and its changes sit in separately named fields;
+        // rank collapses both into one value/unit pair, so it has to choose.
+        //
+        // percentage_point_change is reported as "percent" too: the Unit union
+        // has no percentage-point member, and adding one changes the shared
+        // schema. "percent" is imprecise for points but no longer false about
+        // the order of magnitude, and `rankingDefinition` names the exact
+        // metric. Adding a distinct unit is an open contract decision.
+        unit: input.metric === "absolute_change" ? comparison.unit : "percent",
         basis: comparison.to.basis,
         caveatIds: comparison.caveatIds,
         stableId,

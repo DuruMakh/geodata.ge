@@ -659,4 +659,63 @@ describe("rank", () => {
       for (const entry of data(result).entries) expect(childIds.has(entry.seriesId)).toBe(true);
     });
   });
+
+  // Found by the section 14.3 reference fixture, not by these tests: a
+  // percentage_change ranking over amount_gel published { value: 464.33,
+  // unit: "GEL" }, because the entry copied the MEASURE's unit while its value
+  // was a change. Read plainly that says "464 GEL" instead of "+464%" - the
+  // exact class of misreading this service exists to prevent. compare() is
+  // unaffected: its unit describes the two endpoints and its changes sit in
+  // separately named fields.
+  describe("a change ranking's unit describes its own value", () => {
+    it("reports a percentage change in percent, not in the measure's currency", () => {
+      const result = rank(snapshot, {
+        datasetId: "ministries",
+        dimension: "series",
+        level: "admin_category",
+        fromYear: 2017,
+        toYear: 2024,
+        measure: "amount_gel",
+        metric: "percentage_change",
+        order: "descending",
+        limit: 5,
+      });
+
+      expect(data(result).entries.length).toBeGreaterThan(0);
+      for (const entry of data(result).entries) expect(entry.unit).toBe("percent");
+    });
+
+    it("keeps an absolute change in the measure's own unit", () => {
+      const result = rank(snapshot, {
+        datasetId: "ministries",
+        dimension: "series",
+        level: "admin_category",
+        fromYear: 2017,
+        toYear: 2024,
+        measure: "amount_gel",
+        metric: "absolute_change",
+        order: "descending",
+        limit: 5,
+      });
+
+      expect(data(result).entries.length).toBeGreaterThan(0);
+      for (const entry of data(result).entries) expect(entry.unit).toBe("GEL");
+    });
+
+    it("leaves a value ranking's unit alone", () => {
+      const result = rank(snapshot, {
+        datasetId: "municipal-expenditure",
+        dimension: "entities",
+        entityType: "municipality",
+        seriesId: "municipal.total",
+        year: 2025,
+        measure: "gel_per_resident",
+        metric: "value",
+        order: "descending",
+        limit: 3,
+      });
+
+      for (const entry of data(result).entries) expect(entry.unit).toBe("GEL_per_resident");
+    });
+  });
 });
