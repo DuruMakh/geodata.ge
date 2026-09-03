@@ -17,7 +17,7 @@ import { queryMinistries } from "../../lib/factQuery/queryMinistries";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { rank } from "../../lib/factQuery/rank";
-import { REFERENCE_INTENTS } from "./fixtures/referenceIntents";
+import { RANKING_TOLERANCE, REFERENCE_INTENTS } from "./fixtures/referenceIntents";
 import type { Comparison } from "../../lib/factQuery/compare";
 import type { RankData } from "../../lib/factQuery/rank";
 import type { Observation } from "../../lib/factQuery/observations";
@@ -143,9 +143,17 @@ describe("section 14.3 bilingual reference fixture", () => {
           for (const entry of entries) expect(entry.unit, `entry ${entry.position} unit`).toBe(want.unit);
           expect(universe.candidateCount, "candidateCount").toBe(want.candidateCount);
           expect(universe.eligibleCount, "eligibleCount").toBe(want.eligibleCount);
-          // Values must descend; ordering is the whole point of a ranking.
+          // The values themselves, not only their order: a uniform scaling
+          // error keeps every position and every unit intact.
+          want.topValues.forEach((expected, index) => {
+            near(entries[index]!.value, expected, RANKING_TOLERANCE, `ranking value ${index}`);
+          });
+          // Monotonic in the direction the call actually asked for.
+          const ascending = (intent.call.arguments as { order?: string }).order === "ascending";
           for (let i = 1; i < entries.length; i += 1) {
-            expect(entries[i]!.value!, `entry ${i} below its predecessor`).toBeLessThanOrEqual(entries[i - 1]!.value!);
+            const [previous, current] = [entries[i - 1]!.value!, entries[i]!.value!];
+            if (ascending) expect(current, `entry ${i} above its predecessor`).toBeGreaterThanOrEqual(previous);
+            else expect(current, `entry ${i} below its predecessor`).toBeLessThanOrEqual(previous);
           }
         }
 
@@ -185,9 +193,18 @@ describe("section 14.3 bilingual reference fixture", () => {
         // An intent flagged as needing a qualification must actually have
         // something to qualify with.
         if (intent.mustDeclineOrQualify) {
+          // Deliberately not "carries any caveat". Three of the twenty
+          // responses carry none and none of those three is flagged, so the
+          // flag does discriminate - but `nominal_gel` rides along on many
+          // answers as boilerplate, and counting it would let a flagged intent
+          // pass on a qualification that was not about it. Requiring a SEVERE
+          // caveat is the opposite mistake: intents 8, 9, 15 and 16 qualify
+          // correctly with a note. What this flag means is that the service
+          // holds something back that is specific to THIS question.
+          const specific = response.meta.caveats.filter((caveat) => caveat.code !== "nominal_gel");
           const declined =
             response.status !== "ok" ||
-            response.meta.caveats.length > 0 ||
+            specific.length > 0 ||
             (data.comparisons as Comparison[] | undefined)?.some((c) => c.comparability !== "comparable") === true;
           expect(declined, `intent ${intent.id} must decline or qualify`).toBe(true);
         }

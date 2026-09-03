@@ -143,7 +143,11 @@ describe("MCP tool results", () => {
     if (response.kind === "error") throw new Error("expected data");
     const severe = response.meta.caveats.filter((caveat) => caveat.severity === "severe");
     const notes = response.meta.caveats.filter((caveat) => caveat.severity === "note");
-    if (severe.length === 0 || notes.length === 0) return;
+    // Asserted, not skipped: returning early here meant that a change which
+    // dropped severe caveats from this response turned the test green rather
+    // than red - the opposite of what it exists to catch.
+    expect(severe.length, "severe caveats present").toBeGreaterThan(0);
+    expect(notes.length, "note caveats present").toBeGreaterThan(0);
 
     // Scope to the caveat section: every code also appears in the table's own
     // `caveats` column, so a whole-text indexOf would compare row order, not

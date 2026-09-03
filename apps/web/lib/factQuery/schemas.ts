@@ -1,12 +1,29 @@
 // apps/web/lib/factQuery/schemas.ts
 import { z } from "zod";
 
+/**
+ * Spec section 11.3's input array bounds.
+ *
+ * Declared here rather than beside the response limits because this is the one
+ * place they can actually be kept: a `.max()` on the array both refuses an
+ * over-long request and publishes the bound as `maxItems` in the tool's JSON
+ * Schema, so a client can see the limit instead of discovering it by being
+ * refused. Stated-but-unenforced limits were the bug.
+ */
+export const INPUT_LIMITS = { entities: 100, series: 200, years: 100, sourceIds: 100 } as const;
+
 const uniqueSortedYears = z
   .array(z.number().int())
   .min(1, "years must not be empty")
+  .max(INPUT_LIMITS.years)
   .transform((years) => Array.from(new Set(years)).sort((a, b) => a - b));
 
-const uniqueIds = z.array(z.string().min(1)).min(1).transform((ids) => Array.from(new Set(ids)));
+const boundedIds = (max: number) =>
+  z.array(z.string().min(1)).min(1).max(max).transform((ids) => Array.from(new Set(ids)));
+
+const seriesIdList = boundedIds(INPUT_LIMITS.series);
+const entityIdList = boundedIds(INPUT_LIMITS.entities);
+const sourceIdList = boundedIds(INPUT_LIMITS.sourceIds);
 
 export const expectedDataVersion = z.string().regex(/^[0-9a-f]{64}$/).optional();
 
@@ -28,7 +45,7 @@ export const describeCoverageInput = z.object({
 
 export const queryNationalInput = z.object({
   side: z.enum(["revenue", "expenditure"]),
-  seriesIds: uniqueIds,
+  seriesIds: seriesIdList,
   years: uniqueSortedYears,
   measure: nationalMeasure,
   expectedDataVersion,
@@ -36,15 +53,15 @@ export const queryNationalInput = z.object({
 
 export const queryMinistriesInput = z.object({
   level: z.enum(["admin_category", "major_program"]),
-  seriesIds: uniqueIds,
+  seriesIds: seriesIdList,
   years: uniqueSortedYears,
   measure: nationalMeasure,
   expectedDataVersion,
 });
 
 export const queryMunicipalInput = z.object({
-  entityIds: uniqueIds,
-  seriesIds: uniqueIds,
+  entityIds: entityIdList,
+  seriesIds: seriesIdList,
   years: uniqueSortedYears,
   measure: municipalMeasure,
   expectedDataVersion,
@@ -53,9 +70,9 @@ export const queryMunicipalInput = z.object({
 export const compareInput = z
   .object({
     target: z.discriminatedUnion("dataset", [
-      z.object({ dataset: z.literal("national"), side: z.enum(["revenue", "expenditure"]), seriesIds: uniqueIds }),
-      z.object({ dataset: z.literal("ministries"), level: z.enum(["admin_category", "major_program"]), seriesIds: uniqueIds }),
-      z.object({ dataset: z.literal("municipal"), entityIds: uniqueIds, seriesIds: uniqueIds }),
+      z.object({ dataset: z.literal("national"), side: z.enum(["revenue", "expenditure"]), seriesIds: seriesIdList }),
+      z.object({ dataset: z.literal("ministries"), level: z.enum(["admin_category", "major_program"]), seriesIds: seriesIdList }),
+      z.object({ dataset: z.literal("municipal"), entityIds: entityIdList, seriesIds: seriesIdList }),
     ]),
     fromYear: z.number().int(),
     toYear: z.number().int(),
@@ -87,7 +104,7 @@ export const rankInput = z
   });
 
 export const getSourcesInput = z.object({
-  sourceIds: uniqueIds,
+  sourceIds: sourceIdList,
   datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure"]).optional(),
   years: z.array(z.number().int()).optional(),
   entityIds: z.array(z.string()).optional(),

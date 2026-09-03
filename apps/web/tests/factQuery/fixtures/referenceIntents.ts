@@ -42,6 +42,17 @@ export type ExpectedComparison = {
 export type ExpectedRanking = {
   /** The ordered ids that must come back, top first. */
   orderedIds: string[];
+  /**
+   * The value at each of those positions, hand-derived from the reviewed CSVs.
+   *
+   * Order alone does not pin a ranking: a factor-of-100 scaling error in a
+   * percentage change preserves every position and every unit, and would have
+   * passed silently - in the very intent whose unit defect motivated this
+   * fixture. Compared with RANKING_TOLERANCE rather than allowedRounding
+   * because these are quoted from a hand calculation, not reproduced bit for
+   * bit from the engine's own arithmetic.
+   */
+  topValues: number[];
   /** The unit those values carry - a change ranking is not in the measure's currency. */
   unit: "GEL" | "percent" | "GEL_per_resident";
   candidateCount: number;
@@ -72,6 +83,8 @@ export type ReferenceIntent = {
 
 const EXACT = 0;
 const RATIO_TOLERANCE = 1e-9;
+/** Hand-derived from the CSVs, so compared to twelve significant figures. */
+export const RANKING_TOLERANCE = 1e-6;
 
 export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
   {
@@ -536,6 +549,11 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     expectedRanking: {
       // Oni, Mestia, Kazbegi, Lentekhi, Ambrolauri.
       orderedIds: ["71", "36", "68", "70", "69"],
+      // public_total_gel / population_persons, straight from
+      // municipal-total-facts-2015-2025.csv and municipal-population-2025.csv:
+      // 24,927,687.47/5,700 · 43,390,007.09/10,000 · 17,030,309.67/4,900 ·
+      // 16,867,830.42/5,100 · 30,336,411.59/10,600.
+      topValues: [4373.278503508772, 4339.000709, 3475.5734020408167, 3307.417729411765, 2861.925621698113],
       unit: "GEL_per_resident",
       // All 64 served municipalities are eligible; the aggregate-only codes,
       // the regions and the country aggregate never enter the population.
@@ -616,7 +634,9 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
         measure: "amount_gel",
         metric: "percentage_change",
         order: "descending",
-        limit: 5,
+        // Three, not five, so every returned position is under contract rather
+        // than only the ones the fixture happens to name.
+        limit: 3,
       },
     },
     expectedStatus: "partial",
@@ -626,6 +646,11 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
         "admin_program.25_04.eee6b72f",
         "admin_program.29_05.a7ad04fb",
       ],
+      // From admin-spending-facts-2004-2025.csv, official_code 24 07 / 25 04 /
+      // 29 05: 39,348,400 → 222,054,542 · 184,304,800 → 834,060,617 ·
+      // 38,593,300 → 164,483,093. The first is the +464.33% the methodology
+      // quotes, and it is a PERCENTAGE - it was published as GEL.
+      topValues: [464.3292789541634, 352.5441643408094, 326.19597961304163],
       // A percentage change is reported in percent, NOT in the measure's
       // currency. Published as "GEL" until the fixture caught it.
       unit: "percent",

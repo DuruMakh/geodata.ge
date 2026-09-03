@@ -4,6 +4,7 @@
 // structured content, plus an equivalent text representation for clients that
 // consume text (spec section 11.1). Pure - no transport, no filesystem, no
 // logging. The route wires it; this file decides shape and size.
+import { INPUT_LIMITS } from "../factQuery/schemas";
 import { buildResponseMeta } from "../factQuery/meta";
 import type { Comparison } from "../factQuery/compare";
 import type { GetSourcesData, ResolvedSourceView } from "../factQuery/getSources";
@@ -32,12 +33,21 @@ export const LIMITS = {
    * silently trimmed to fit; the whole result is refused with guidance instead.
    */
   resultBytes: 512 * 1024,
-  /** Input array bounds, further restricted by coverage and result limits. */
-  entities: 100,
-  series: 200,
-  years: 100,
-  sourceIds: 100,
-  /** Request duration. */
+  /**
+   * Input array bounds, further restricted by coverage and result limits.
+   *
+   * Taken from the schemas rather than restated here: these are enforced by
+   * `.max()` on the input arrays, which is also what publishes them to clients
+   * as `maxItems`. A second copy in this file is how they came to be declared
+   * in one place and enforced in none.
+   */
+  ...INPUT_LIMITS,
+  /**
+   * Request duration.
+   *
+   * Documents the platform setting - `maxDuration` in app/mcp/route.ts - which
+   * is what actually stops a long request. Nothing in this module enforces it.
+   */
   durationMs: 10_000,
 } as const;
 
@@ -64,6 +74,10 @@ function observationLine(observation: Observation): string {
     value,
     observation.unit,
     observation.basis,
+    // The accounting boundary, without which a text-mode reader cannot tell
+    // consolidated receipts from state-budget expenditure - the one distinction
+    // that makes these figures unsafe to subtract from each other.
+    observation.budgetScope,
     observation.caveatIds.join(","),
   );
 }
@@ -80,6 +94,10 @@ function comparisonLine(comparison: Comparison): string {
     comparison.percentagePointChange,
     comparison.unit,
     comparison.comparability,
+    // Why it is not comparable. Without this a text-mode client sees
+    // `not_comparable`, two populated endpoints and empty change columns, and
+    // no statement of what makes the two years incompatible.
+    comparison.reasons.join(","),
     comparison.caveatIds.join(","),
   );
 }
@@ -94,7 +112,7 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   if (response.kind === "observations") {
     const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number } };
     return [
-      "# entity\tseries\tyear\tvalue\tunit\tbasis\tcaveats",
+      "# entity\tseries\tyear\tvalue\tunit\tbasis\tbudgetScope\tcaveats",
       ...observations.map(observationLine),
       `returned ${coverage.returnedCount} of ${coverage.expectedCount} requested cells`,
     ];
@@ -103,7 +121,7 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   if (response.kind === "comparisons") {
     const { comparisons } = data as { comparisons: Comparison[] };
     return [
-      "# entity\tseries\tyears\tfrom\tto\tchange\tpct\tpp\tunit\tcomparability\tcaveats",
+      "# entity\tseries\tyears\tfrom\tto\tchange\tpct\tpp\tunit\tcomparability\treasons\tcaveats",
       ...comparisons.map(comparisonLine),
     ];
   }
@@ -131,9 +149,13 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
     ];
   }
 
-  // catalogue: a nested capability description with no natural table. Its own
-  // JSON is the clearest text form, and it is small.
-  return [JSON.stringify(data, null, 2)];
+  // catalogue: a nested capability description with no natural table, so its
+  // own JSON is the clearest text form. Not pretty-printed: describe_coverage
+  // is the first call every client is told to make, and the full catalogue is
+  // ~36 KiB minified - indenting it added roughly another 35 KiB of whitespace
+  // to a payload that already ships beside its structured twin, for no gain to
+  // a reader that parses it anyway.
+  return [JSON.stringify(data)];
 }
 
 function evidenceOf(sources: readonly ResolvedSource[], caveats: readonly Caveat[]): string[] {
@@ -251,8 +273,12 @@ function cellCount(response: FactQueryResponse): number {
  */
 export function boundedToolResult(snapshot: FactQuerySnapshot, response: FactQueryResponse): ToolResult {
   const returned = cellCount(response);
+  // A comparison row is two endpoint cells, which is exactly why 11.3 gives it
+  // its own smaller ceiling. Gating comparisons at `cells` allowed 500 rows -
+  // a thousand cells, double the declared limit.
+  const cap = response.kind === "comparisons" ? LIMITS.comparisonPairs : LIMITS.cells;
   // Cheap pre-check, so an obviously oversized result is never serialized.
-  if (returned > LIMITS.cells) return toolResult(tooLargeResponse(snapshot, { returned, bytes: 0 }));
+  if (returned > cap) return toolResult(tooLargeResponse(snapshot, { returned, bytes: 0 }));
 
   const result = toolResult(response);
   const bytes = Buffer.byteLength(JSON.stringify(result), "utf8");
