@@ -1,8 +1,24 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { POST, GET, DELETE } from "../../app/mcp/route";
 
 const ENDPOINT = "https://fiscal.ge/mcp";
 const PROTOCOL = "2025-11-25";
+const original = { ...process.env };
+
+beforeAll(() => {
+  // The endpoint ships paused and with no limiter, so a test has to turn both
+  // on deliberately - which is itself the point of those defaults.
+  process.env.MCP_ENABLED = "true";
+  process.env.MCP_RATE_LIMITER = "memory";
+  process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
+  // The route logs one line per request; keep the suite output readable.
+  vi.spyOn(process.stdout, "write").mockImplementation(() => true);
+});
+
+afterAll(() => {
+  process.env = { ...original };
+  vi.restoreAllMocks();
+});
 
 function post(body: unknown, headers: Record<string, string> = {}): Request {
   return new Request(ENDPOINT, {
@@ -10,6 +26,7 @@ function post(body: unknown, headers: Record<string, string> = {}): Request {
     headers: {
       "content-type": "application/json",
       accept: "application/json, text/event-stream",
+      host: "fiscal.ge",
       ...headers,
     },
     body: typeof body === "string" ? body : JSON.stringify(body),
@@ -130,5 +147,82 @@ describe("/mcp route", () => {
     expect(segment.runtime).toBe("nodejs");
     expect(segment.dynamic).toBe("force-dynamic");
     expect(segment.maxDuration).toBe(10);
+  });
+});
+
+describe("/mcp guards", () => {
+  it("rejects a host this deployment does not answer on", async () => {
+    const response = await POST(post(initialize, { host: "attacker.example" }));
+
+    expect(response.status).toBe(403);
+    expect(await response.text()).toContain("forbidden_host");
+  });
+
+  it("rejects a present but unapproved origin", async () => {
+    const response = await POST(post(initialize, { origin: "https://evil.example" }));
+
+    expect(response.status).toBe(403);
+  });
+
+  // Measured on the real bytes, not on a Content-Length the caller controls.
+  it("rejects an oversized body before parsing it", async () => {
+    const huge = { jsonrpc: "2.0", id: 1, method: "tools/list", params: { padding: "x".repeat(40 * 1024) } };
+    const response = await POST(post(huge));
+
+    expect(response.status).toBe(413);
+  });
+
+  it("answers 503 while paused, and says where the data still is", async () => {
+    process.env.MCP_ENABLED = "false";
+    try {
+      const response = await POST(post(initialize));
+      const body = await response.text();
+
+      expect(response.status).toBe(503);
+      expect(response.headers.get("retry-after")).toBe("3600");
+      // Pausing the endpoint must not imply the data is gone: static pages and
+      // published files are untouched, and the message says so in both languages.
+      expect(body).toContain("/downloads/data/");
+      expect(body).toMatch(/[Ⴀ-ჿ]/);
+    } finally {
+      process.env.MCP_ENABLED = "true";
+    }
+  });
+
+  // Spec 11.3: a counter failure stops expensive processing with a retryable
+  // service error. It must never quietly disable the limit and serve on.
+  it("fails closed when no shared limiter is configured", async () => {
+    // A fresh module instance, so its lazily built counter reads this config.
+    process.env.MCP_RATE_LIMITER = "";
+    vi.resetModules();
+    try {
+      const { POST: freshPost } = await import("../../app/mcp/route");
+      const response = await freshPost(post(initialize));
+
+      expect(response.status).toBe(503);
+      expect(await response.text()).toContain("service_unavailable");
+    } finally {
+      process.env.MCP_RATE_LIMITER = "memory";
+      vi.resetModules();
+    }
+  });
+
+  it("denies once a client's rolling-minute allowance is spent", async () => {
+    process.env.MCP_RATE_LIMITER = "memory";
+    vi.resetModules();
+    try {
+      const { POST: freshPost } = await import("../../app/mcp/route");
+      // A trusted platform header, so the request is keyed and the per-key
+      // limit applies. A client-supplied X-Forwarded-For would not count.
+      const keyed = () => post(initialize, { "x-vercel-forwarded-for": "203.0.113.7" });
+
+      let last = await freshPost(keyed());
+      for (let i = 0; i < 61 && last.status !== 429; i += 1) last = await freshPost(keyed());
+
+      expect(last.status).toBe(429);
+      expect(last.headers.get("retry-after")).toBe("60");
+    } finally {
+      vi.resetModules();
+    }
   });
 });

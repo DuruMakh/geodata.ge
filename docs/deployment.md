@@ -111,6 +111,9 @@ Production builds from the Supabase mirror; previews and local dev need none.
 | `DATABASE_URL` | Production only | Supabase pooled connection (port 6543, `?pgbouncer=true`) |
 | `GEODATA_DATA_SOURCE` | Production only | `db` |
 | `NEXT_PUBLIC_SITE_URL` | Production only | canonical site origin, exactly `https://fiscal.ge` |
+| `MCP_ENABLED` | Production only | `true` to serve `/mcp`; anything else (including unset) keeps it paused |
+| `MCP_RATE_LIMITER` | Production only | which shared limiter `/mcp` uses; unset fails closed |
+| `MCP_ALLOWED_ORIGINS` | Production only | comma-separated browser origins allowed to call `/mcp`; unset means server clients only |
 
 - The db-mode build renders from the mirror and re-verifies it row-by-row
   against the checkout's CSVs; see
@@ -217,6 +220,132 @@ before rerunning.
    owner will configure it separately as a preview surface; do not use it as
    production deployment evidence and do not redirect it as part of Fiscal.ge
    SEO work.
+
+## The `/mcp` runtime
+
+`/mcp` is the **first and only request-time route** in this application.
+Everything else is prerendered at build time and served as static output, and
+that has not changed — the build log shows exactly one dynamic route (`ƒ /mcp`).
+
+### What it serves and where its data comes from
+
+The seven read-only query tools of the fact-query core, over MCP Streamable
+HTTP, protocol revision **`2025-11-25`**, stateless, with no session store.
+`@modelcontextprotocol/sdk` is pinned to an **exact** version (no caret): the
+protocol revision advertised is a compatibility promise, so it must not drift on
+a routine `npm update`.
+
+It answers from `apps/web/lib/factQuery/generated/snapshot.json`, written during
+`prebuild` and bundled into the function. **There is no request-time database
+access, no network access, and no source-document fetching.** If the database
+goes down, `/mcp` keeps answering.
+
+That artifact is gitignored, so Next cannot trace it statically. It is included
+explicitly via `outputFileTracingIncludes` in `apps/web/next.config.ts`. To
+confirm a build actually shipped it:
+
+```bash
+node -e "console.log(require('./.next/server/app/mcp/route.js.nft.json').files.filter(f=>f.includes('snapshot.json')))"
+```
+
+An empty array means the deployed function has no data and every call will fail.
+
+### Operating limits
+
+| Control | Value | Enforced in |
+| --- | --- | --- |
+| Request body | 32 KiB, measured on the real bytes | `app/mcp/route.ts` |
+| Returned observation cells | 500 | `lib/mcp/result.ts` |
+| Serialized tool result | 512 KiB, both representations | `lib/mcp/result.ts` |
+| Per-key request rate | 60 per rolling minute | `app/mcp/route.ts` |
+| Global daily accepted requests | 10,000 per UTC day | `app/mcp/route.ts` |
+| Request duration | 10 s | `maxDuration` in `app/mcp/route.ts` |
+
+The byte ceiling, not the cell cap, is the binding gate: a compliant 495-cell
+municipal request serializes to about 517 KiB. Over-ceiling results are refused
+whole with narrowing guidance and a link to the bulk files — never trimmed,
+because dropping sources or warnings to make a result fit would publish a
+figure without its limitations.
+
+`GET` and `DELETE` return `405`. Handed a `GET` with `Accept:
+text/event-stream`, the transport would open a keep-alive SSE stream this server
+has nothing to push to, letting an unauthenticated caller pin a function
+instance for the full 10 seconds per request.
+
+### The limiter is an owner decision, and the endpoint fails closed without one
+
+`MCP_RATE_LIMITER` selects the shared counter. **Unset, every request is
+refused with a retryable 503.** That is deliberate: serving unlimited public
+traffic from an unauthenticated endpoint is a stop condition, so `/mcp` cannot
+be switched on without a limiter decision having been made.
+
+`memory` selects a process-local counter. It is for **local development only**
+and must never be used in production: serverless instances scale horizontally,
+so a process-local count of 60 becomes 60 × N and enforces nothing.
+
+Choosing the production limiter — a platform control or a minimal approved
+shared counter — requires the owner sign-off described in the release
+verification: hosting plan, limiter availability and cost, measured resource
+use, expected traffic, budget alerts, and an approved operating budget.
+
+### Pause and resume
+
+`/mcp` ships **deployed and dark**. It runs only when `MCP_ENABLED` is exactly
+`true`; any other value, including unset, returns `503` with `Retry-After` and a
+bilingual message pointing at the static site and the published files.
+
+To pause a live endpoint (Vercel → Settings → Environment Variables →
+Production), set `MCP_ENABLED` to `false` and redeploy, or remove the variable.
+**Pausing `/mcp` does not affect anything else**: static pages, CSV downloads,
+the JSON publications and the explorer keep working, because the switch is one
+variable on one route. Confirm after pausing:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" https://fiscal.ge/explorer/municipalities
+```
+
+That must still be `200` while `/mcp` returns `503`.
+
+### Logs and privacy
+
+One JSON line per request, built from an allow-list in `apps/web/lib/mcp/log.ts`
+— tool name, dataset, measure, year range, entity and series counts, data
+version, result count, response size, duration, outcome, error code.
+
+It never records raw prompts, invalid parameter strings, request bodies,
+authorization headers, full user agents, or IP addresses. The limiter key is a
+truncated hash of the platform's trusted address metadata, used only inside its
+enforcement window and never written to these logs. Hashing an address does not
+make a persistent record anonymous, which is why it is not persisted.
+
+Retain detailed application events for 14 days and aggregated service metrics
+for 90 days. Vercel's own access-log retention is separate and is not covered by
+that policy; do not claim no provider ever processes an address.
+
+These records describe tool activity, not people. One key may be an entire
+organisation's traffic, and the original question a user asked never reaches
+this service at all.
+
+### Rollback
+
+`/mcp` needs no separate rollback: it is part of the same deployment as
+everything else, so the standard Vercel rollback restores the previous route and
+its snapshot together. To disable it *without* a rollback, use the pause switch
+above.
+
+### Security
+
+Host is validated against `NEXT_PUBLIC_SITE_URL` and
+`VERCEL_PROJECT_PRODUCTION_URL`, read from the `Host` header only —
+`X-Forwarded-Host` is deliberately ignored, since it is client-supplied on a
+direct connection. A request with no `Origin` is allowed, because most MCP
+clients are servers; a *present* origin must appear in `MCP_ALLOWED_ORIGINS`,
+including the opaque `null` origin a sandboxed iframe sends. CORS echoes the one
+approved origin, never `*`, and never with credentials.
+
+Access is public and unauthenticated by design: every tool reads approved public
+data, and no database credentials exist in request-time code. Origin and host
+checks are protocol security controls, not proof of who is calling.
 
 ## SEO and headers
 
