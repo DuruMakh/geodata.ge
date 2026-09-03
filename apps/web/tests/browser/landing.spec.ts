@@ -337,7 +337,10 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
     await page.goto(baseUrl);
 
     const links = page.getByTestId("site-footer").getByRole("link");
-    expect(await links.count()).toBe(6);
+    // 6 + AI-კავშირი (/connect). Pinned on purpose: the footer is the only
+    // navigation to the connection page, and a link added here has to clear the
+    // mobile target-size and focus-order checks below.
+    expect(await links.count()).toBe(7);
     for (const link of await links.all()) {
       await expectMinimumTarget(link);
     }
