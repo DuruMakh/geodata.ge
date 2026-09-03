@@ -404,7 +404,14 @@ exists (see the owner gate above). To bring a preview up:
 1. Push the branch. Every branch except `main` gets a preview automatically
    (`apps/web/vercel.json` disables auto-deploy for `main` only).
 2. Set `MCP_ENABLED=true` and `MCP_RATE_LIMITER=memory` on the **Preview**
-   scope, then redeploy so the running function reads them.
+   scope, then redeploy so the running function reads them. Scope them to the
+   branch (`vercel env add <name> preview <branch>`) rather than to previews
+   generally, so another branch's preview does not become a live endpoint.
+   Also set `MCP_ALLOWED_ORIGINS` — a client that sends an `Origin` header at
+   all is refused with `forbidden_origin` when nothing is configured, and a
+   `403` with no CORS headers is an opaque failure to debug from the client
+   side. `https://claude.ai,https://chatgpt.com,https://chat.openai.com`
+   covers the hosted assistants.
 3. Decide on Deployment Protection. An MCP client cannot complete Vercel's SSO
    flow and will receive an HTML login page instead of JSON, so protection must
    be disabled for the preview or a bypass token supplied.
