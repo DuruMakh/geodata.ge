@@ -19,6 +19,7 @@ const requiredTargets = [
   "https://fiscal.ge/downloads/data/manifest.json",
   "https://fiscal.ge/downloads/data/catalogue.json",
   "https://fiscal.ge/downloads/data/sources.json",
+  "https://fiscal.ge/connect",
   "https://fiscal.ge/about",
   "https://fiscal.ge/sitemap.xml",
 ] as const;
@@ -40,7 +41,13 @@ describe("Fiscal.ge agent instructions", () => {
     expect(content).toContain("## Site navigation");
     expect(content).toMatch(/\[.+\]\(https:\/\/fiscal\.ge\/.+\)/);
     expect(content).toMatch(/annual/i);
-    expect(content).toMatch(/no public API/i);
+    // The blanket "no public API" claim became FALSE when /mcp shipped: MCP is
+    // a public programmatic interface and spec 2.2 requires it be described
+    // honestly as one. What remains excluded must still be stated, or the
+    // rewording would trade one false claim for a vaguer one.
+    expect(content).not.toMatch(/no public API/i);
+    expect(content).toMatch(/read-only MCP/i);
+    expect(content).toMatch(/no REST query API/i);
     expect(content).toMatch(/do not invent values/i);
 
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]);

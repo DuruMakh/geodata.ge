@@ -452,3 +452,18 @@ Historical changelog 2026-07-13: published facts CSVs were renamed `expenditure-
 ## 14. National GDP denominator
 
 The multi-year explorer's `% მშპ-ში` measure divides each expenditure amount—including fields, ministries, programs, and the derived total—by Geostat's same-year nominal GDP at current prices. It is independent of selected series, and missing GDP is not estimated. The SNA 1993/SNA 2008 handoff, preliminary status, preserved workbooks, hashes, preparation commands, and export columns are documented in `national-nominal-gdp.md`. This denominator does not change the single-year expenditure composition view.
+
+## Querying this dataset
+
+These figures are served publicly two ways, both from the same reviewed
+rows: the bulk JSON files under `/downloads/data/` and the read-only MCP
+connection at `https://fiscal.ge/mcp`.
+
+- Tool: `query_national` with `side: "expenditure"`
+- Legal measures: `amount_gel`, `share_of_total_pct`, `share_of_gdp_pct`
+- `budgetScope` is `state_budget_expenditure`. See the note in the revenue
+  methodology on why the two national totals must not be subtracted.
+
+Call `describe_coverage` for the exact ids and year ranges rather than
+assuming them; coverage is derived from the loaded data, never hardcoded.
+See `ai-grounding-and-caveats.md` for the caveat catalogue.

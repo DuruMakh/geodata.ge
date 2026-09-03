@@ -567,3 +567,18 @@ To add a new (older or newer) year:
 **Detailed per-year config appendices:** `group-c-annual-report-ministries-methodology.md`
 (2006–2012, 2015, 2016 + SHA-256 table), `2005-2014-ministries-expenditure-methodology.md`
 (2005, 2014 + SHA-256 table).
+
+## Querying this dataset
+
+These figures are served publicly two ways, both from the same reviewed
+rows: the bulk JSON files under `/downloads/data/` and the read-only MCP
+connection at `https://fiscal.ge/mcp`.
+
+- Tool: `query_ministries`
+- Legal measures: `amount_gel`, `share_of_total_pct`, `share_of_gdp_pct`
+- `level` selects `admin_category` or `major_program`. The two are separate
+  populations and their rows must never be summed together.
+
+Call `describe_coverage` for the exact ids and year ranges rather than
+assuming them; coverage is derived from the loaded data, never hardcoded.
+See `ai-grounding-and-caveats.md` for the caveat catalogue.

@@ -481,6 +481,38 @@ build` in CI, and `public/downloads/data/` is gitignored, so on a clean runner
 the files do not exist yet and the check failed `missing` on every fresh
 checkout.
 
+## The MCP connection
+
+The same observations, sources and caveats are also served live at
+`https://fiscal.ge/mcp` over MCP Streamable HTTP, protocol revision
+`2025-11-25`, stateless and unauthenticated. `/connect` is the human-facing
+guide to it.
+
+Seven read-only tools: `describe_coverage`, `query_national`,
+`query_ministries`, `query_municipal`, `compare`, `rank`, `get_sources`.
+
+**The connection and the bulk files use the same definitions.** Both are
+produced from one snapshot by the same pure functions in
+`apps/web/lib/factQuery/`, so an observation's fields, its `budgetScope`, its
+`valueDefinitionId`, and every caveat in the catalogue above mean exactly the
+same thing in both places. There is no second implementation to drift.
+
+The difference is shape, not substance: the files are the whole dataset in one
+download, the connection answers a bounded question and returns only the
+evidence behind that answer. A response is capped at 512 KiB including both its
+structured and text representations, and an over-cap request is refused with
+narrowing guidance rather than trimmed — dropping sources or warnings to make a
+result fit would publish a figure without its limitations.
+
+The endpoint reads no database and fetches no document at request time. It
+answers from the snapshot bundled into the deployment, so it keeps working
+if the database is unavailable. Operating limits, the pause switch, and the
+logging and privacy policy are in `docs/deployment.md`.
+
+`ai-reference-intents.md` records the twenty budget questions the service is
+tested against, in Georgian and English, with the answer each must give and the
+limitation it must carry.
+
 ## Keeping this document true
 
 `apps/web/tests/factQuery/caveats/documented.test.ts` fails if a registered code is missing from this file, so the catalogue cannot grow without the documentation growing with it. It deliberately does not check the prose: a test can prove a code is mentioned, not that the sentence beside it is right. That stays a review responsibility.
