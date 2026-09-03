@@ -515,6 +515,14 @@ describe("rank", () => {
       for (const exclusion of data(result).exclusions) {
         expect(exclusion.reason.length).toBeGreaterThan(0);
       }
+
+      // Grouping by reason is a way of saying the same thing once, not of
+      // saying less: every excluded candidate is still named exactly once.
+      const named = data(result).exclusions.flatMap((exclusion) => exclusion.ids);
+      expect(new Set(named).size).toBe(named.length);
+      expect(named.length).toBe(data(result).universe.candidateCount - data(result).universe.eligibleCount);
+      // 64 municipalities refused for one identical reason is one row, not 64.
+      expect(data(result).exclusions.length).toBeLessThan(named.length);
     });
 
     it("excludes the same way for the share metric", () => {
@@ -590,7 +598,7 @@ describe("rank", () => {
         limit: 100,
       });
 
-      const excluded = data(result).exclusions.find((e) => e.id === zero!.municipalityCode);
+      const excluded = data(result).exclusions.find((e) => e.ids.includes(zero!.municipalityCode));
       expect(excluded).toBeDefined();
       // Both endpoint values exist; percentage change is undefined because the
       // base is zero. Saying "the indicator is unavailable" was a wrong

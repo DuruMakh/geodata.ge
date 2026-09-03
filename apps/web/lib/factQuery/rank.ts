@@ -17,10 +17,11 @@ import { queryMinistries } from "./queryMinistries";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { rankInput } from "./schemas";
+import { selectSources } from "./sources";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import type { Comparison } from "./compare";
 import type { Observation } from "./observations";
-import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, Unit } from "./types";
+import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, ResolvedSource, Unit } from "./types";
 
 const EXCLUDED = new Set<string>(AGGREGATE_ONLY_MUNICIPAL_CODES);
 const TOTAL_LEVEL = "total";
@@ -51,7 +52,13 @@ export type RankData = {
     /** True when `limit` splits a group of equal values, so the cutoff is arbitrary. */
     cutoffSplitsTie: boolean;
   };
-  exclusions: { id: string; reason: string }[];
+  /**
+   * Grouped by reason, not one row per entity. A refusal covering 64
+   * municipalities repeated one identical Georgian sentence 64 times - 16.9 KiB
+   * of a 91 KiB response saying the same thing. Reasons keep first-seen order,
+   * and ids keep their order within a reason.
+   */
+  exclusions: { reason: string; ids: string[] }[];
   rankingDefinition: string;
 };
 
@@ -68,6 +75,17 @@ type Candidate = {
   /** Stable sort key, used only to break exact ties reproducibly. */
   stableId: string;
 };
+
+/** Collapse one row per excluded entity into one row per distinct reason. */
+function groupByReason(flat: readonly { id: string; reason: string }[]): { reason: string; ids: string[] }[] {
+  const byReason = new Map<string, string[]>();
+  for (const { id, reason } of flat) {
+    const ids = byReason.get(reason);
+    if (ids === undefined) byReason.set(reason, [id]);
+    else ids.push(id);
+  }
+  return [...byReason].map(([reason, ids]) => ({ reason, ids }));
+}
 
 const REASON_NOT_COMPARABLE = "საზღვრები შედარებადი არ არის, ამიტომ რანჟირებაში არ მონაწილეობს.";
 const REASON_NO_VALUE = "მაჩვენებელი მიუწვდომელია, ამიტომ რანჟირებაში არ მონაწილეობს.";
@@ -237,7 +255,11 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
   const exclusions: { id: string; reason: string }[] = [];
   const candidates: Candidate[] = [];
-  let sources: FactQueryResponse["meta"]["sources"] = [];
+  let sources: ResolvedSource[] = [];
+  // Which documents the ranked observations actually cite. The sub-query
+  // already worked this out; taking the full sources without it made a ranking
+  // cite every document its sources archive rather than the ones it read.
+  let citedDocumentIds: string[] = [];
   let caveats: FactQueryResponse["meta"]["caveats"] = [];
 
   const runObservations = (years: number[]): FactQueryResponse => {
@@ -260,7 +282,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     if (result.kind === "error") return errorResponse(snapshot, result.error);
 
     const observations = (result.data as { observations: Observation[] }).observations;
-    sources = result.meta.sources;
+    sources = selectSources(snapshot, result.meta.sources.map((source) => source.sourceId));
+    citedDocumentIds = result.meta.sources.flatMap((source) => source.documents.map((document) => document.documentId));
     caveats = result.meta.caveats;
 
 
@@ -298,7 +321,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     if (result.kind === "error") return errorResponse(snapshot, result.error);
 
     const comparisons = (result.data as { comparisons: Comparison[] }).comparisons;
-    sources = result.meta.sources;
+    sources = selectSources(snapshot, result.meta.sources.map((source) => source.sourceId));
+    citedDocumentIds = result.meta.sources.flatMap((source) => source.documents.map((document) => document.documentId));
     caveats = result.meta.caveats;
 
     for (const comparison of comparisons) {
@@ -413,10 +437,11 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   const status: "ok" | "partial" | "empty" =
     entries.length === 0 ? "empty" : exclusions.length === 0 ? "ok" : "partial";
 
-  // No citedDocumentIds: a RankEntry carries no documentIds to narrow by,
-  // and a ranking genuinely draws on every ranked entity's originals, so the
-  // full document list is the honest evidence here rather than an oversight.
-  const meta = buildResponseMeta(snapshot, { sources, caveats });
+  // A RankEntry carries no documentIds of its own, so the narrowing comes from
+  // the observations the ranking was computed from: every document those cite,
+  // and no more. A ranking over all 64 municipalities still names 64 workbooks -
+  // it genuinely read them - but not the documents its sources merely archive.
+  const meta = buildResponseMeta(snapshot, { sources, caveats, citedDocumentIds });
 
   const data: RankData = {
     entries,
@@ -428,7 +453,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       returnedCount: entries.length,
       cutoffSplitsTie,
     },
-    exclusions,
+    exclusions: groupByReason(exclusions),
     rankingDefinition,
   };
 

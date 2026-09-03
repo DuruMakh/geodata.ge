@@ -19,6 +19,7 @@ import { queryMinistries } from "./queryMinistries";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
+import { selectSources } from "./sources";
 import type { Observation } from "./observations";
 import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, Unit } from "./types";
 
@@ -309,7 +310,11 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
         : "partial";
 
   const meta = buildResponseMeta(snapshot, {
-    sources: endpointResult.meta.sources,
+    // Re-resolved from the snapshot rather than reused from the sub-query's
+    // meta: that copy is already compacted for a response, and buildResponseMeta
+    // needs the full record to decide what this response states once and what
+    // it states per document.
+    sources: selectSources(snapshot, endpointResult.meta.sources.map((source) => source.sourceId)),
     caveats,
     // A comparison's evidence is whatever supports its two endpoints, not
     // every document of every source the underlying query touched.

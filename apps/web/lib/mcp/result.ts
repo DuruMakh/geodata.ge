@@ -10,7 +10,7 @@ import type { Comparison } from "../factQuery/compare";
 import type { GetSourcesData, ResolvedSourceView } from "../factQuery/getSources";
 import type { RankData } from "../factQuery/rank";
 import type { Observation } from "../factQuery/observations";
-import type { Caveat, FactQueryResponse, FactQuerySnapshot, ResolvedSource } from "../factQuery/types";
+import type { Caveat, FactQueryResponse, FactQuerySnapshot, ResponseSource } from "../factQuery/types";
 
 /** Spec section 11.3's operating limits, one constant per row of that table. */
 export const LIMITS = {
@@ -136,7 +136,9 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
       ),
       `${universe.returnedCount} of ${universe.eligibleCount} eligible from ${universe.candidateCount} candidates` +
         (universe.cutoffSplitsTie ? " — the cutoff splits a tie, so the last place is arbitrary" : ""),
-      ...(exclusions.length > 0 ? [`excluded: ${exclusions.map((e) => `${e.id} (${e.reason})`).join("; ")}`] : []),
+      // One line per reason. Printing the reason once per entity repeated the
+      // same sentence sixty-four times.
+      ...exclusions.map((group) => `excluded (${group.reason}): ${group.ids.join(", ")}`),
     ];
   }
 
@@ -158,7 +160,7 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   return [JSON.stringify(data)];
 }
 
-function evidenceOf(sources: readonly ResolvedSource[], caveats: readonly Caveat[]): string[] {
+function evidenceOf(sources: readonly ResponseSource[], caveats: readonly Caveat[]): string[] {
   const out: string[] = [];
 
   if (sources.length > 0) {

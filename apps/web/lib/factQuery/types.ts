@@ -97,6 +97,53 @@ export type PublicDocument = {
   role: "primary" | "derivation_upstream";
 };
 
+/**
+ * Document fields a source may state once for all of its documents.
+ *
+ * These describe the source rather than the individual file - who published it,
+ * under what licence, when it was retrieved - so a source whose documents agree
+ * on them is repeating itself once per document. Sixty-five municipal workbooks
+ * carried seven identical values each, 25 KiB of a 69 KiB evidence block.
+ *
+ * Fields NOT in this list never hoist: documentId, title, years and the two
+ * URLs identify the specific document, and the point of the block is to name
+ * documents.
+ */
+export const HOISTABLE_DOCUMENT_FIELDS = [
+  "publisher",
+  "attribution",
+  "licenceId",
+  "mediaType",
+  "retrievedAt",
+  "datasetId",
+  "role",
+] as const;
+
+export type HoistableDocumentField = (typeof HOISTABLE_DOCUMENT_FIELDS)[number];
+
+export type DocumentDefaults = Partial<Pick<PublicDocument, HoistableDocumentField>>;
+
+/**
+ * A document as a RESPONSE carries it, which is not how the snapshot stores it.
+ *
+ * `sha256` and `byteSize` are absent: they answer "do these bytes match what
+ * was reviewed", which is get_sources' question, not "what should I cite".
+ * get_sources' own `data` and the published sources.json both keep them.
+ *
+ * A hoistable field is absent when its source states it in `documentDefaults`.
+ */
+export type ResponseDocument = Omit<PublicDocument, "sha256" | "byteSize" | HoistableDocumentField> & DocumentDefaults;
+
+export type ResponseSource = Omit<ResolvedSource, "documents"> & {
+  /**
+   * Values shared by every document below. A field absent from a document takes
+   * its value from here; a field that differs between documents is not here and
+   * appears on each document instead.
+   */
+  documentDefaults?: DocumentDefaults;
+  documents: ResponseDocument[];
+};
+
 export type ResolvedSource = {
   sourceId: string;
   name: string;
@@ -166,6 +213,6 @@ export type ResponseMeta = {
   generatedAt: string;
   licence: "CC BY 4.0";
   licenceUrl: "https://creativecommons.org/licenses/by/4.0/";
-  sources: ResolvedSource[];
+  sources: ResponseSource[];
   caveats: Caveat[];
 };

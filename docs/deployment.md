@@ -267,6 +267,28 @@ The input array bounds are enforced as `.max()` on the schemas themselves, so a
 client reads them as `maxItems` in `tools/list` rather than discovering them by
 being refused.
 
+**What a response cites, and what `get_sources` adds.** `meta.sources` answers
+"what should I cite": document id, title, coverage years, and both the official
+and archived URLs. Fields every document of a source agrees on — publisher,
+attribution, licence, media type, retrieval date, dataset, role — are stated once
+in that source's `documentDefaults` rather than repeated per document; a field
+the documents disagree about stays on each of them. `sha256` and `byteSize`
+answer a different question — "do these bytes match what was reviewed" — and are
+served by `get_sources` and the published `sources.json`, not by every response.
+
+No document is ever omitted to save space. A ranking over all 64 municipalities
+still names all 66 documents it read. Compaction took that response's structured
+envelope from 91.0 KiB to 42.4 KiB, of which grouping the ranking's exclusions by
+reason — rather than repeating one identical sentence per excluded entity — was
+16.3 KiB.
+
+Every tool declares an `outputSchema` (`lib/mcp/outputSchema.ts`). Responses have
+always carried a structured twin alongside the text, but without that declaration
+a client has no way to know it exists, and real clients were observed parsing the
+text table instead. The SDK validates `structuredContent` against the schema and
+fails the call on a mismatch, so `tests/mcp/outputSchema.test.ts` runs every tool
+against it.
+
 The byte ceiling, not the cell cap, is the binding gate: a compliant 495-cell
 municipal request serializes to about 517 KiB. Over-ceiling results are refused
 whole with narrowing guidance and a link to the bulk files — never trimmed,

@@ -3,7 +3,9 @@ import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
 import { compare } from "../../lib/factQuery/compare";
 import { getSources } from "../../lib/factQuery/getSources";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
+import { rank } from "../../lib/factQuery/rank";
 import type { Comparison } from "../../lib/factQuery/compare";
+import type { GetSourcesData } from "../../lib/factQuery/getSources";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let snapshot: FactQuerySnapshot;
@@ -82,5 +84,103 @@ describe("response meta carries only the evidence behind the answer", () => {
     const archived = snapshot.sources.find((s) => s.sourceId === sourceId);
     expect(archived).toBeDefined();
     expect(result.meta.sources[0]!.documents.length).toBe(archived!.documents.length);
+  });
+});
+
+// A ranking over every municipality legitimately cites every municipality's
+// workbook, so narrowing cannot help it. The repetition can: 65 documents
+// carried seven identical values each.
+describe("a source states once what all of its documents agree on", () => {
+  const rankAllMunicipalities = () =>
+    rank(snapshot, {
+      datasetId: "municipal-expenditure",
+      dimension: "entities",
+      entityType: "municipality",
+      seriesId: "municipal.total",
+      year: 2025,
+      measure: "amount_gel",
+      metric: "value",
+      order: "descending",
+      limit: 5,
+    });
+
+  it("hoists a field every document shares and removes it from each of them", () => {
+    const result = rankAllMunicipalities();
+    if (result.kind === "error") throw new Error(result.error.messageEn);
+
+    const source = result.meta.sources.find((s) => s.documents.length > 1);
+    expect(source).toBeDefined();
+    // Every municipal workbook comes from the same ministry under the same licence.
+    expect(source!.documentDefaults?.publisher).toBe("საქართველოს ფინანსთა სამინისტრო");
+    for (const document of source!.documents) {
+      expect(document).not.toHaveProperty("publisher");
+      expect(document).not.toHaveProperty("licenceId");
+    }
+  });
+
+  // The fields that identify WHICH document this is must never move.
+  it("keeps the identifying fields on every document", () => {
+    const result = rankAllMunicipalities();
+    if (result.kind === "error") throw new Error(result.error.messageEn);
+
+    for (const source of result.meta.sources) {
+      for (const document of source.documents) {
+        expect(typeof document.documentId).toBe("string");
+        expect(typeof document.title).toBe("string");
+        expect(Array.isArray(document.years)).toBe(true);
+        expect(document.archiveUrl ?? document.officialUrl).not.toBeNull();
+      }
+    }
+  });
+
+  // Integrity metadata answers "do these bytes match", which is get_sources'
+  // question. It stays there and in the published sources.json.
+  it("drops sha256 and byteSize from the response envelope but not from getSources", () => {
+    const ranked = rankAllMunicipalities();
+    if (ranked.kind === "error") throw new Error(ranked.error.messageEn);
+    for (const source of ranked.meta.sources) {
+      for (const document of source.documents) {
+        expect(document).not.toHaveProperty("sha256");
+        expect(document).not.toHaveProperty("byteSize");
+      }
+    }
+
+    const listed = getSources(snapshot, { sourceIds: ["source.municipal_mof_annual_and_history_workbooks"] });
+    if (listed.kind === "error") throw new Error(listed.error.messageEn);
+    const first = (listed.data as GetSourcesData).sources[0]!.documents[0]!;
+    expect(first.sha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(first.byteSize).toBeGreaterThan(0);
+  });
+
+  // A field the documents disagree about is not shared, so it cannot be stated
+  // once. `years` differs here: 64 history workbooks span 2016-2025, the 2025
+  // functional classification covers one year.
+  it("leaves a field the documents disagree about on each document", () => {
+    const result = rankAllMunicipalities();
+    if (result.kind === "error") throw new Error(result.error.messageEn);
+
+    const source = result.meta.sources.find((s) => s.documents.length > 1)!;
+    const spans = new Set(source.documents.map((d) => JSON.stringify(d.years)));
+    expect(spans.size).toBeGreaterThan(1);
+    expect(source.documentDefaults).not.toHaveProperty("years");
+  });
+
+  it("names every document it read, invents none, and is materially smaller", () => {
+    const result = rankAllMunicipalities();
+    if (result.kind === "error") throw new Error(result.error.messageEn);
+
+    const cited = result.meta.sources.flatMap((s) => s.documents.map((d) => d.documentId));
+    const archived = new Set(
+      result.meta.sources.flatMap((s) => snapshot.sources.find((a) => a.sourceId === s.sourceId)!.documents.map((d) => d.documentId)),
+    );
+
+    // A ranking over every municipality genuinely reads every municipality's
+    // workbook, so it names them - one entry each, none repeated, none invented.
+    expect(cited.length).toBeGreaterThan(60);
+    expect(new Set(cited).size).toBe(cited.length);
+    for (const documentId of cited) expect(archived.has(documentId)).toBe(true);
+
+    // Measured before compaction: 69.0 KiB.
+    expect(bytes(result.meta.sources)).toBeLessThan(45_000);
   });
 });

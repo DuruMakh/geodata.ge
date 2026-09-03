@@ -14,8 +14,8 @@ beforeAll(async () => {
 
 type CoverageData = {
   datasets: { datasetId: string; years: [number, number]; measures: string[] }[];
-  series?: { seriesId: string; availability: string; level: string; years: number[] }[];
-  entities?: { entityId: string; entitySlug: string | null }[];
+  series?: { seriesId: string; labelKa: string; availability: string; level: string; years: number[]; datasetId?: string }[];
+  entities?: { entityId: string; labelKa: string; entitySlug: string | null; datasetId?: string }[];
   exclusions: { entityId: string; reason: string }[];
 };
 
@@ -161,5 +161,78 @@ describe("describeCoverage", () => {
       const series = data(describeCoverage(snapshot, { datasetId: "national-revenue", level: "admin_category" })).series ?? [];
       expect(series.map((s) => s.seriesId)).not.toContain("revenue.total");
     });
+  });
+});
+
+// "Ask this FIRST when you do not already know an id" has to work before the
+// dataset is known too - which is precisely when a caller cannot supply one.
+// Before this, search without a datasetId returned nothing, silently, and read
+// as "no such thing" rather than "wrong call".
+describe("search before you know the dataset", () => {
+  it("finds a municipal entity with no datasetId given", () => {
+    const entities = data(describeCoverage(snapshot, { search: "ბათუმი" })).entities ?? [];
+    expect(entities.map((e) => e.entityId)).toContain("06");
+  });
+
+  it("names the dataset each cross-dataset match belongs to", () => {
+    const found = data(describeCoverage(snapshot, { search: "ბათუმი" }));
+    for (const entity of found.entities ?? []) expect(entity.datasetId).toBe("municipal-expenditure");
+    expect((found.entities ?? []).length).toBeGreaterThan(0);
+  });
+
+  it("finds a national series with no datasetId given", () => {
+    const series = data(describeCoverage(snapshot, { search: "განათლება" })).series ?? [];
+    expect(series.length).toBeGreaterThan(0);
+    for (const entry of series) expect(typeof entry.datasetId).toBe("string");
+  });
+
+  it("reports empty rather than ok when a cross-dataset search matches nothing", () => {
+    const result = describeCoverage(snapshot, { search: "zzzznotathing" });
+    expect(result.status).toBe("empty");
+  });
+
+  // The single-dataset shape is a published contract; searching across datasets
+  // must not start tagging it.
+  it("does not tag matches when a datasetId was given", () => {
+    const entities = data(describeCoverage(snapshot, { datasetId: "municipal-expenditure", search: "ბათუმი" })).entities ?? [];
+    expect(entities.length).toBeGreaterThan(0);
+    for (const entity of entities) expect(entity.datasetId).toBeUndefined();
+  });
+
+  // Without a search the dataset catalogue is still the whole answer.
+  it("still returns no series or entities when neither search nor datasetId is given", () => {
+    const found = data(describeCoverage(snapshot, {}));
+    expect(found.series).toBeUndefined();
+    expect(found.entities).toBeUndefined();
+  });
+});
+
+// Georgian inflects. A question says "ბათუმის ბიუჯეტი", not "ბათუმი", and a
+// model passes the form the question used.
+describe("search understands Georgian case endings", () => {
+  it("finds ბათუმი from the genitive ბათუმის", () => {
+    const entities = data(describeCoverage(snapshot, { datasetId: "municipal-expenditure", search: "ბათუმის" })).entities ?? [];
+    expect(entities.map((e) => e.entityId)).toContain("06");
+  });
+
+  // The harder case: the ending replaces the final vowel rather than appending,
+  // so no prefix of the query is a prefix of the label.
+  it("finds განათლება from the genitive განათლების", () => {
+    const plain = data(describeCoverage(snapshot, { datasetId: "national-expenditure", search: "განათლება" })).series ?? [];
+    const inflected = data(describeCoverage(snapshot, { datasetId: "national-expenditure", search: "განათლების" })).series ?? [];
+    expect(plain.length).toBeGreaterThan(0);
+    expect(inflected.map((s) => s.seriesId).sort()).toEqual(plain.map((s) => s.seriesId).sort());
+  });
+
+  it("finds ონი from the genitive ონის", () => {
+    const entities = data(describeCoverage(snapshot, { datasetId: "municipal-expenditure", search: "ონის" })).entities ?? [];
+    expect(entities.map((e) => e.labelKa)).toContain("ონი");
+  });
+
+  // A two-character stem must begin the label, not merely appear in it, or
+  // "ონის" would drag in every label containing "ონ".
+  it("does not let a short stem match mid-word", () => {
+    const entities = data(describeCoverage(snapshot, { datasetId: "municipal-expenditure", search: "ონის" })).entities ?? [];
+    for (const entity of entities) expect(entity.labelKa.startsWith("ონ")).toBe(true);
   });
 });

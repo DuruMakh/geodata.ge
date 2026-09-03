@@ -7,7 +7,8 @@
 // queryMinistries, queryMunicipal, compare, rank and getSources (Tasks 12-17)
 // reuse it unchanged, supplying whatever sources they resolved and caveats
 // they evaluated for their own request.
-import type { Caveat, FactQuerySnapshot, ResolvedSource, ResponseMeta } from "./types";
+import { HOISTABLE_DOCUMENT_FIELDS } from "./types";
+import type { Caveat, DocumentDefaults, FactQuerySnapshot, ResolvedSource, ResponseMeta, ResponseSource } from "./types";
 
 export type ResponseMetaExtra = {
   sources?: ResolvedSource[];
@@ -29,6 +30,47 @@ export type ResponseMetaExtra = {
 };
 
 /**
+ * State once what every document of a source agrees on, and drop the two fields
+ * that answer a question this block is not asked.
+ *
+ * Nothing is lost and no document is omitted: a hoisted value is stated on the
+ * source instead of repeated on each document, and sha256/byteSize remain in
+ * get_sources' own payload and in the published sources.json. A ranking over 64
+ * municipalities cited 66 documents and spent 69 KiB doing it, most of it the
+ * same seven values written 65 times.
+ */
+function compactSource(source: ResolvedSource): ResponseSource {
+  const documents = source.documents;
+  const defaults: DocumentDefaults = {};
+
+  if (documents.length > 0) {
+    for (const field of HOISTABLE_DOCUMENT_FIELDS) {
+      const first = documents[0]![field];
+      // Identical across every document, or it stays on each of them. A source
+      // whose documents disagree about their publisher must keep saying so.
+      if (documents.every((document) => document[field] === first)) {
+        Object.assign(defaults, { [field]: first });
+      }
+    }
+  }
+
+  const hoisted = new Set<string>(Object.keys(defaults));
+  const trimmed = documents.map((document) => {
+    const entries = Object.entries(document).filter(
+      ([key]) => !hoisted.has(key) && key !== "sha256" && key !== "byteSize",
+    );
+    return Object.fromEntries(entries) as ResponseSource["documents"][number];
+  });
+
+  const { documents: _documents, ...rest } = source;
+  return {
+    ...rest,
+    ...(hoisted.size > 0 ? { documentDefaults: defaults } : {}),
+    documents: trimmed,
+  };
+}
+
+/**
  * Publication facts copied verbatim from the snapshot, plus whatever
  * request-specific sources and caveats the caller already resolved. Neither
  * extra field is required: a catalogue response (describeCoverage) has no
@@ -47,17 +89,19 @@ export function buildResponseMeta(snapshot: FactQuerySnapshot, extra?: ResponseM
     generatedAt: snapshot.generatedAt,
     licence: "CC BY 4.0",
     licenceUrl: "https://creativecommons.org/licenses/by/4.0/",
-    sources:
-      cited === null
-        ? sources
-        : sources.map((source) => {
-            const kept = source.documents.filter((document) => cited.has(document.documentId));
-            // Narrowing points at the right original; it never hides
-            // provenance. A source the rows cite must always show something a
-            // reader can open, so an empty filter falls back to everything the
-            // source archives - the same rule resolveDocumentIds applies.
-            return kept.length > 0 ? { ...source, documents: kept } : source;
-          }),
+    // Narrow first, then compact what survives: which documents belong here is
+    // a different question from how compactly to state them.
+    sources: (cited === null
+      ? sources
+      : sources.map((source) => {
+          const kept = source.documents.filter((document) => cited.has(document.documentId));
+          // Narrowing points at the right original; it never hides
+          // provenance. A source the rows cite must always show something a
+          // reader can open, so an empty filter falls back to everything the
+          // source archives - the same rule resolveDocumentIds applies.
+          return kept.length > 0 ? { ...source, documents: kept } : source;
+        })
+    ).map(compactSource),
     caveats: extra?.caveats ?? [],
   };
 }

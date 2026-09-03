@@ -435,10 +435,38 @@ function matchesLevel(entry: SeriesEntry, level: string | undefined, datasetId: 
   return entry.level === level;
 }
 
+/**
+ * Georgian case endings, longest first.
+ *
+ * A real question says "ბათუმის ბიუჯეტი" while the label is "ბათუმი", and
+ * "განათლების" against "განათლება" changes the final vowel rather than only
+ * appending one - so plain substring matching misses the form a question
+ * actually uses, which is the form a model passes through.
+ */
+const GEORGIAN_CASE_ENDINGS = ["თვის", "ებში", "ში", "ზე", "ის", "ად", "ით", "მა", "ს"] as const;
+
+/** The query with one case ending removed, or null when none applies. Longest ending wins. */
+function georgianStem(query: string): string | null {
+  for (const ending of GEORGIAN_CASE_ENDINGS) {
+    if (query.endsWith(ending) && query.length - ending.length >= 2) return query.slice(0, -ending.length);
+  }
+  return null;
+}
+
 /** Case-insensitive substring match. `null` candidates (e.g. a region's entitySlug) are skipped, which is what makes "for municipalities" (the brief's search contract) fall out of the data instead of needing a special case. */
 function matchesSearch(query: string, candidates: (string | null)[]): boolean {
   const needle = query.toLowerCase();
-  return candidates.some((candidate) => candidate !== null && candidate.toLowerCase().includes(needle));
+  const stem = georgianStem(needle);
+
+  return candidates.some((candidate) => {
+    if (candidate === null) return false;
+    const hay = candidate.toLowerCase();
+    if (hay.includes(needle)) return true;
+    if (stem === null) return false;
+    // A two-character stem is ambiguous - "ონ" sits inside plenty of unrelated
+    // labels - so it has to begin the label rather than merely appear in it.
+    return stem.length >= 3 ? hay.includes(stem) : hay.startsWith(stem);
+  });
 }
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
@@ -515,7 +543,42 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   );
 
   if (input.datasetId === undefined) {
-    return { kind: "catalogue", status: "ok", data: { datasets, exclusions }, meta };
+    // With no search the dataset catalogue IS the answer (spec §6.2). With one,
+    // the instruction this tool gives - "ask this FIRST when you do not already
+    // know an id" - has to hold before the dataset is known too, which is
+    // exactly the moment a caller cannot name one. Searching within nothing and
+    // returning nothing looked like "no such thing" instead of "wrong call".
+    if (input.search === undefined) {
+      return { kind: "catalogue", status: "ok", data: { datasets, exclusions }, meta };
+    }
+
+    const foundSeries: (SeriesEntry & { datasetId: DatasetId })[] = [];
+    const foundEntities: (EntityEntry & { datasetId: DatasetId })[] = [];
+
+    for (const id of DATASET_IDS) {
+      for (const entry of seriesForDataset(snapshot, id)) {
+        if (matchesLevel(entry, input.level, id) && matchesSearch(input.search, [entry.seriesId, entry.labelKa])) {
+          // Tagged, because a match found without a dataset is useless until the
+          // caller knows which dataset to ask.
+          foundSeries.push({ ...entry, datasetId: id });
+        }
+      }
+      for (const entry of entitiesForDataset(snapshot, id) ?? []) {
+        if (
+          (input.entityType === undefined || entry.entityType === input.entityType) &&
+          matchesSearch(input.search, [entry.entityId, entry.labelKa, entry.entitySlug])
+        ) {
+          foundEntities.push({ ...entry, datasetId: id });
+        }
+      }
+    }
+
+    return {
+      kind: "catalogue",
+      status: foundSeries.length === 0 && foundEntities.length === 0 ? "empty" : "ok",
+      data: { datasets, series: foundSeries, entities: foundEntities, exclusions },
+      meta,
+    };
   }
 
   const datasetId = input.datasetId;

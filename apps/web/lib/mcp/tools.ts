@@ -22,6 +22,7 @@ import {
   rankInput,
 } from "../factQuery/schemas";
 import { serverInstructions } from "./instructions";
+import { toolOutput } from "./outputSchema";
 import { boundedToolResult } from "./result";
 import { loadPackagedSnapshot } from "./snapshot";
 import type { DatasetId, FactQueryResponse, FactQuerySnapshot } from "../factQuery/types";
@@ -57,8 +58,10 @@ export const TOOLS: readonly ToolDefinition[] = [
     describe: () =>
       "Ask this FIRST when you do not already know an id. Returns the datasets, entities, series, " +
       "hierarchy, calculated totals, legal measures, year coverage and documented exclusions that " +
-      "actually exist. Optional `search` matches Georgian labels and Latin slugs. Never guess a " +
-      "series or entity id; take it from here.",
+      "actually exist. Optional `search` matches Georgian labels and Latin slugs, and works WITHOUT " +
+      "a datasetId — search alone looks across all four datasets and each match names the dataset " +
+      "it belongs to, so you can find an id before you know where it lives. Georgian case endings " +
+      "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here.",
     schema: describeCoverageInput,
     run: (snapshot, input) => describeCoverage(snapshot, input),
   },
@@ -176,6 +179,10 @@ export function createMcpServer(): McpServer {
         // measure, result too large - still comes back as the core's own
         // bilingual envelope below.
         inputSchema: tool.schema,
+        // Declared so a client KNOWS the structured twin exists. Every response
+        // has always carried one, but without this a client has no way to learn
+        // that and parses the text table instead.
+        outputSchema: toolOutput,
         annotations: ANNOTATIONS,
       },
       (args: unknown) => boundedToolResult(snapshot, tool.run(snapshot, args)),
