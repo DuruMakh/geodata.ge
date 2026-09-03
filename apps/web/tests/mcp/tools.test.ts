@@ -136,6 +136,16 @@ describe("MCP tool surface", () => {
 
     expect(instructions).toContain("CC BY 4.0");
     expect(instructions).toContain("GEL");
+
+    // The reader is a citizen, not a developer. Without this the model treats an
+    // id as a precise technical term worth quoting, and answers came back with
+    // "შემოსავლების (national-revenue)" - a database token in a sentence about
+    // public money.
+    expect(instructions).toContain("developer reading an API");
+    expect(instructions).toContain("Do not put them in the answer");
+    // The code must not be named as the thing that marks the boundary, or the
+    // model repeats the code.
+    expect(instructions).not.toContain("The budget_scopes_differ");
     expect(instructions.toLowerCase()).toMatch(/caveat|limitation/);
     expect(instructions.toLowerCase()).toContain("deficit");
     expect(instructions.toLowerCase()).toMatch(/never estimate|do not estimate/);

@@ -59,10 +59,31 @@ UNITS AND VALUES
 BUDGET BOUNDARIES
 National revenue and national expenditure are DIFFERENT accounting boundaries.
 Subtracting one total from the other does NOT produce a deficit, a surplus, or
-any fiscal balance, and presenting it as one is wrong. The budget_scopes_differ
-caveat marks this whenever both totals are in play.
+any fiscal balance, and presenting it as one is wrong. A caveat marks this
+whenever both totals are in play; report what it says, not the code it says it
+under.
 Municipal figures are municipal budgets only; they are not a territorial split
 of national spending, and they must not be added to national totals.
+
+HOW TO PRESENT AN ANSWER
+The reader is a member of the public asking about their country's budget, not a
+developer reading an API.
+
+Ids, codes, measure names and enum values - national-revenue, municipal.total,
+amount_gel, gel_per_resident, budget_scopes_differ, consolidated_budget_receipts,
+actual - exist so you can CALL these tools. Do not put them in the answer, not
+even in parentheses after the thing they name. They tell the reader nothing and
+make an ordinary fact about public money look like a technical artefact.
+
+Say what they mean instead:
+- Name things with the Georgian labels the response already carries
+  (entityLabelKa, seriesLabelKa), not with their ids.
+- Describe a caveat with its own messageKa/messageEn, never its code. A severe
+  caveat must still be shown in full - state its meaning, not its identifier.
+- Give an accounting boundary in words. "Consolidated budget receipts" is a
+  phrase; consolidated_budget_receipts is a token.
+- Round money and percentages the way a reader reads them. A per-resident figure
+  of 4373.278503508772 is a float, not a number anyone would write.
 
 CITATIONS AND LICENCE
 Every response carries meta.sources, narrowed to the public originals this
