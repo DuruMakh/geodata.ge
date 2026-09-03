@@ -424,25 +424,27 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
         measure: "amount_gel",
       },
     },
-    expectedStatus: "partial",
+    expectedStatus: "ok",
     expectedComparison: {
       id: "municipal-expenditure:country.georgia:municipal.total:2015-2024:amount_gel",
       from: 2186717489.17,
       to: 5553107287.81,
-      absoluteChange: null,
-      percentageChange: null,
+      absoluteChange: 3366389798.6400003,
+      percentageChange: 153.94717494657993,
       percentagePointChange: null,
-      comparability: "not_comparable",
+      comparability: "comparable",
     },
     allowedRounding: EXACT,
     expectedBudgetScope: null,
     requiredSourceIds: [],
     requiredDocumentIds: [],
-    // The 2015 figure and the later one are not the same measurement. Without
-    // this, the pair publishes a +154% "growth" that is a definition change.
+    // The 2015 figure is the sum of the ten functions and the 2024 one is the
+    // MoF headline. Measured across all 64 municipalities, that gap is 0.94% at
+    // the median in 2016 and 0.20% by 2024, so the pair compares - but it must
+    // still SAY so, or the +154% reads as pure like-for-like growth.
     requiredCaveatCodes: ["municipal_total_definition_changed", "municipal_country_scope", "nominal_gel"],
     mustDeclineOrQualify: true,
-    note: "Detects the definition change between the 2015 fallback basis and the later payment total.",
+    note: "Compares across the 2015 fallback basis, and qualifies the result rather than publishing it bare.",
   },
   {
     id: 14,

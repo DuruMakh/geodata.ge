@@ -189,10 +189,20 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
   },
   {
     code: "municipal_total_definition_changed",
-    severity: "severe",
-    comparisonEffect: "breaks",
-    messageKa: "შედარების წერტილები საჯარო ჯამის სხვადასხვა განსაზღვრებას იყენებს; თანაზომადი ზრდა არ გამოითვლება.",
-    messageEn: "The comparison endpoints use different public-total definitions; no like-for-like growth is produced.",
+    // Measured across all 64 municipalities in every year where both totals
+    // exist: the median gap between the functional sum and the official
+    // headline is 0.94% (2016) falling to 0.20% (2024). The tail is real - p90
+    // is 4.2% in 2016 and the worst municipality reaches 13.5% - so the
+    // difference is stated, not hidden. But refusing the comparison outright
+    // withheld a usable ten-year answer from every reader to protect a handful
+    // of cases, which is the wrong trade for a public explorer. Owner decision,
+    // 2026-09-04.
+    severity: "note",
+    comparisonEffect: "none",
+    messageKa:
+      "შედარების ერთ-ერთ წელს ჯამი ფუნქციების შეკრებით არის გაზომილი, და არა ოფიციალური ჯამური გადახდებით. სხვაობა ჩვეულებრივ 1%-ზე ნაკლებია, თუმცა ზოგიერთ მუნიციპალიტეტში მეტია.",
+    messageEn:
+      "In one of the compared years the total is the sum of the ten functions rather than the official total-payments headline. The difference is usually under 1%, and larger for some municipalities.",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
     // Gated on datasetId like its four siblings above. Without the gate it fired
     // on any comparison whose endpoint definitions differed, including a

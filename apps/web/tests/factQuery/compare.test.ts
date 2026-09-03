@@ -108,12 +108,17 @@ describe("compare", () => {
         measure: "amount_gel",
       });
 
+      // The 2015 portal fallback against a later payment total is the one
+      // definition change measured and accepted (compare.ts
+      // ACCEPTED_BASIS_CHANGE): median gap 0.94% in 2016, 0.20% by 2024. It
+      // compares, and says so in a note.
       const row = only(result);
-      expect(row.comparability).toBe("not_comparable");
-      expect(row.absoluteChange).toBeNull();
+      expect(row.comparability).toBe("comparable");
+      expect(row.absoluteChange).not.toBeNull();
       expect(row.from.value).not.toBeNull();
       expect(row.to.value).not.toBeNull();
       expect(result.meta.caveats.map((c) => c.code)).toContain("municipal_total_definition_changed");
+      expect(result.meta.caveats.find((c) => c.code === "municipal_total_definition_changed")?.severity).toBe("note");
     });
 
     it("still compares two like-for-like municipal payment-total years", () => {
@@ -290,7 +295,10 @@ describe("compare", () => {
     // municipalities, 2016 onward are payment totals. Only municipal.total
     // embedded that in its display string, so every FUNCTION series compared
     // equal across it and published growth. Education came out at +572.1%.
-    it("declines a municipal FUNCTION comparison across the 2015 break", () => {
+    // The measured acceptance covers functions as well as the total: both carry
+    // the same basis token. What must survive is the NOTE - the reader has to be
+    // told the base year is measured differently, or the growth reads as pure.
+    it("compares a municipal FUNCTION across the 2015 break, but says it did", () => {
       const result = compare(snapshot, {
         target: { dataset: "municipal", entityIds: ["04"], seriesIds: ["municipal.education"] },
         fromYear: 2015,
@@ -299,15 +307,32 @@ describe("compare", () => {
       });
 
       const row = only(result);
-      expect(row.comparability).toBe("not_comparable");
-      expect(row.absoluteChange).toBeNull();
-      expect(row.percentageChange).toBeNull();
-      // Both reviewed figures survive the decline.
+      expect(row.comparability).toBe("comparable");
+      expect(row.absoluteChange).not.toBeNull();
       expect(row.from.value).not.toBeNull();
       expect(row.to.value).not.toBeNull();
+      expect(result.meta.caveats.map((c) => c.code)).toContain("municipal_total_definition_changed");
     });
 
-    it("declines the share measure across the same break", () => {
+    // Khulo 2024 is a DIFFERENT fallback - its workbook publishes a plan, not an
+    // actual - and is not covered by the measured acceptance.
+    it("still declines Khulo's 2024 fallback against a payment-total year", () => {
+      const result = compare(snapshot, {
+        target: { dataset: "municipal", entityIds: ["11"], seriesIds: ["municipal.total"] },
+        fromYear: 2023,
+        toYear: 2024,
+        measure: "amount_gel",
+      });
+
+      const row = only(result);
+      expect(row.comparability).toBe("not_comparable");
+      expect(row.absoluteChange).toBeNull();
+      expect(row.from.value).not.toBeNull();
+      expect(row.to.value).not.toBeNull();
+      expect(result.meta.caveats.map((c) => c.code)).toContain("municipal_source_actual_missing");
+    });
+
+    it("compares the share measure across the same break", () => {
       const result = compare(snapshot, {
         target: { dataset: "municipal", entityIds: ["04"], seriesIds: ["municipal.education"] },
         fromYear: 2015,
@@ -315,8 +340,8 @@ describe("compare", () => {
         measure: "share_of_total_pct",
       });
 
-      expect(only(result).comparability).toBe("not_comparable");
-      expect(only(result).percentagePointChange).toBeNull();
+      expect(only(result).comparability).toBe("comparable");
+      expect(only(result).percentagePointChange).not.toBeNull();
     });
 
     it("still compares two post-break municipal function years", () => {

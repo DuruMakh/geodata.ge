@@ -47,7 +47,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `municipal_country_scope` | note | `none` | `municipal-functional-annual-2015-2025.md` |
 | `adjara_consolidation_applied` | note | `none` | `municipal-functional-annual-2015-2025.md` |
 | `municipal_functions_no_republican_crosswalk` | note | `none` | `municipal-functional-annual-2015-2025.md` |
-| `municipal_total_definition_changed` | severe | `breaks` | `municipal-functional-annual-2015-2025.md` |
+| `municipal_total_definition_changed` | note | `none` | `municipal-functional-annual-2015-2025.md` |
 | `municipal_source_actual_missing` | severe | `none` | `municipal-functional-annual-2015-2025.md` |
 | `municipal_source_version_difference` | severe | `none` | `municipal-functional-annual-2015-2025.md` |
 | `municipal_financing_outside_functional` | note | `none` | `municipal-functional-annual-2015-2025.md` |
@@ -243,17 +243,21 @@ The republican payments folded into Adjara's total have no functional breakdown.
 
 ### `municipal_total_definition_changed`
 
-**Severity:** severe  
-**Comparison effect:** `breaks`  
+**Severity:** note  
+**Comparison effect:** `none`  
 **Owner document:** `municipal-functional-annual-2015-2025.md`
 
 **Trigger.** A comparison whose two endpoints use different public-total definitions.
 
-**Georgian.** შედარების წერტილები საჯარო ჯამის სხვადასხვა განსაზღვრებას იყენებს; თანაზომადი ზრდა არ გამოითვლება.
+**Georgian.** შედარების ერთ-ერთ წელს ჯამი ფუნქციების შეკრებით არის გაზომილი, და არა ოფიციალური ჯამური გადახდებით. სხვაობა ჩვეულებრივ 1%-ზე ნაკლებია, თუმცა ზოგიერთ მუნიციპალიტეტში მეტია.
 
-**English.** The comparison endpoints use different public-total definitions; no like-for-like growth is produced.
+**English.** In one of the compared years the total is the sum of the ten functions rather than the official total-payments headline. The difference is usually under 1%, and larger for some municipalities.
 
-2015 is the portal functional fallback for all 64 municipalities while 2016 onward are payment totals, so a 2015-to-later growth figure is not like-for-like. The comparison returns both endpoints with null change fields rather than a number that reads as growth.
+2015 is the archived portal's functional figure for all 64 municipalities, total and functions alike, while 2016 onward are MoF payment totals.
+
+**Why this compares rather than refusing.** The gap between the two measures was measured across all 64 municipalities in every year where both exist: median 0.94% in 2016, falling to 0.20% by 2024, with a p90 of 4.2% in 2016 and a worst case of 13.5%. Refusing every 2015-to-later question outright withheld a usable ten-year answer from every reader in order to protect that tail, which is the wrong trade for a public explorer. The comparison is produced and carries this note. Owner decision, 2026-09-04.
+
+The acceptance is specific to this basis pair, listed as `ACCEPTED_BASIS_CHANGE` in `apps/web/lib/factQuery/compare.ts`. Khulo 2024 uses `functional_total_fallback_missing_payment_actual`, because its workbook publishes a plan rather than an actual, and still breaks a comparison — as does any definition change introduced later, and any change of measure or level.
 
 ### `municipal_source_actual_missing`
 

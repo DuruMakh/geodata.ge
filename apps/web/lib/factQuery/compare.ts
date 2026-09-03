@@ -9,10 +9,14 @@
 // between "the number" and "the change in the number".
 //
 // The hard part is not the subtraction. It is refusing to subtract when the
-// endpoints do not mean the same thing - a 2004 receipts total against 2005,
-// or a 2015 municipal portal fallback against a later payment total. Those
-// return both endpoints with null change fields and a reason, never a growth
-// figure that reads as like-for-like.
+// endpoints do not mean the same thing - a 2004 receipts total against 2005, or
+// Khulo's 2024 functional fallback against a payment total. Those return both
+// endpoints with null change fields and a reason, never a growth figure that
+// reads as like-for-like.
+//
+// One definition change is measured and accepted rather than refused: the 2015
+// municipal portal fallback against a later payment total. See
+// ACCEPTED_BASIS_CHANGE below for the measurement behind that.
 import { CAVEAT_RULES } from "./caveats";
 import { buildResponseMeta } from "./meta";
 import { queryMinistries } from "./queryMinistries";
@@ -59,6 +63,46 @@ export type Comparison = {
 };
 
 const PERCENTAGE_MEASURES = new Set<Measure>(["share_of_total_pct", "share_of_gdp_pct"]);
+
+/**
+ * The one definition change measured and accepted as comparable.
+ *
+ * A municipal valueDefinitionId is `municipal:<measure>:<level>:<basis>`. The
+ * 2015 figures - total and functions alike - come from the archived portal and
+ * carry `portal_functional_total_fallback`; 2016 onward carries the MoF
+ * headline `total_payments`.
+ *
+ * Measured across all 64 municipalities in every year where both totals exist:
+ * the median gap is 0.94% in 2016, falling to 0.20% by 2024. The tail is real -
+ * p90 of 4.2% in 2016, worst case 13.5% - so the pair still carries
+ * municipal_total_definition_changed, now as a note. But refusing every
+ * ten-year question outright withheld a usable answer from every reader in
+ * order to protect that tail, which is the wrong trade for a public explorer.
+ * Owner decision, 2026-09-04.
+ *
+ * ONLY this pair. Khulo 2024 carries
+ * `functional_total_fallback_missing_payment_actual` because its workbook
+ * publishes a plan rather than an actual, and still breaks the comparison; so
+ * does any definition change introduced later, and so does a change of measure
+ * or level. Accepting one measured case is not the same as accepting the idea.
+ */
+const ACCEPTED_BASIS_CHANGE = new Set(["portal_functional_total_fallback", "total_payments"]);
+
+/** `municipal:amount_gel:total:total_payments` -> scope `municipal:amount_gel:total`, basis `total_payments`. */
+function splitDefinition(id: string): [scope: string, basis: string] {
+  const cut = id.lastIndexOf(":");
+  return cut === -1 ? [id, ""] : [id.slice(0, cut), id.slice(cut + 1)];
+}
+
+function definitionChangeBreaks(fromId: string, toId: string): boolean {
+  if (fromId === toId) return false;
+  const [fromScope, fromBasis] = splitDefinition(fromId);
+  const [toScope, toBasis] = splitDefinition(toId);
+  // A different measure or level is a different quantity, never merely a
+  // different basis for the same one.
+  if (fromScope !== toScope) return true;
+  return !(ACCEPTED_BASIS_CHANGE.has(fromBasis) && ACCEPTED_BASIS_CHANGE.has(toBasis));
+}
 
 /**
  * How each caveat code bears on a two-year comparison, taken from the rule that
@@ -225,7 +269,7 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     // into a 64-row league table) and it VARIES when a ministries program is
     // merely renamed (so 48 of 48 programs were excluded and rankings came back
     // empty). It is wrong in both directions and must not decide this.
-    if (from.valueDefinitionId !== to.valueDefinitionId) reasons.push(REASON_DEFINITION_CHANGED);
+    if (definitionChangeBreaks(from.valueDefinitionId, to.valueDefinitionId)) reasons.push(REASON_DEFINITION_CHANGED);
 
     // A coverage-changing caveat that describes one endpoint and not the other.
     const codes = Array.from(new Set([...from.caveatIds, ...to.caveatIds]));

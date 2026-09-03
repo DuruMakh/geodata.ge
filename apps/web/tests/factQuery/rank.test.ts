@@ -401,24 +401,28 @@ describe("rank", () => {
     });
 
     it("omits candidates that are not comparable and reports why", () => {
-      // 2015 is the portal fallback for every municipality, so a 2015 -> 2020
-      // change ranking has no comparable candidate at all.
+      // Khulo's 2024 total is a functional fallback because its workbook
+      // publishes a plan, so it alone cannot be compared to 2023 while every
+      // other municipality can. A ranking that quietly dropped it, or quietly
+      // included it, would both be wrong.
       const result = rank(snapshot, {
         datasetId: "municipal-expenditure",
         dimension: "entities",
         entityType: "municipality",
         seriesId: "municipal.total",
-        fromYear: 2015,
-        toYear: 2020,
+        fromYear: 2023,
+        toYear: 2024,
         measure: "amount_gel",
         metric: "percentage_change",
         limit: 100,
       });
 
-      expect(data(result).entries.length).toBe(0);
+      expect(data(result).entries.length).toBeGreaterThan(0);
       expect(data(result).exclusions.length).toBeGreaterThan(0);
       expect(data(result).exclusions[0]?.reason.length).toBeGreaterThan(0);
-      expect(result.status).toBe("empty");
+      expect(data(result).exclusions.flatMap((e) => e.ids)).toContain("11");
+      expect(data(result).entries.map((e) => e.entityId)).not.toContain("11");
+      expect(result.status).toBe("partial");
     });
 
     it("ranks by percentage points on a percentage measure", () => {
@@ -495,8 +499,8 @@ describe("rank", () => {
   // reader repeats without checking, so a wrong one is the worst output here.
   // ---------------------------------------------------------------------------
 
-  describe("never ranks across a definition break", () => {
-    it("excludes every municipality rather than publishing 2015-to-2020 function growth", () => {
+  describe("ranks across the measured 2015 basis change, and refuses the rest", () => {
+    it("ranks 2015-to-2020 function growth and qualifies every row", () => {
       const result = rank(snapshot, {
         datasetId: "municipal-expenditure",
         dimension: "entities",
@@ -509,11 +513,14 @@ describe("rank", () => {
         limit: 100,
       });
 
-      // This returned 64 entries, 0 exclusions, status "ok", topped by +572.1%.
-      expect(data(result).entries).toEqual([]);
-      expect(data(result).exclusions.length).toBeGreaterThan(0);
-      for (const exclusion of data(result).exclusions) {
-        expect(exclusion.reason.length).toBeGreaterThan(0);
+      // Measured: the 2015 functional figure and the later payment total differ
+      // by 0.94% at the median, so this ranking is produced. What it must never
+      // be is bare - every entry carries the note that the base year is
+      // measured differently.
+      expect(data(result).entries.length).toBeGreaterThan(0);
+      expect(result.meta.caveats.map((c) => c.code)).toContain("municipal_total_definition_changed");
+      for (const entry of data(result).entries) {
+        expect(entry.caveatIds).toContain("municipal_total_definition_changed");
       }
 
       // Grouping by reason is a way of saying the same thing once, not of
@@ -521,11 +528,9 @@ describe("rank", () => {
       const named = data(result).exclusions.flatMap((exclusion) => exclusion.ids);
       expect(new Set(named).size).toBe(named.length);
       expect(named.length).toBe(data(result).universe.candidateCount - data(result).universe.eligibleCount);
-      // 64 municipalities refused for one identical reason is one row, not 64.
-      expect(data(result).exclusions.length).toBeLessThan(named.length);
     });
 
-    it("excludes the same way for the share metric", () => {
+    it("ranks the same way for the share metric", () => {
       const result = rank(snapshot, {
         datasetId: "municipal-expenditure",
         dimension: "entities",
@@ -538,7 +543,8 @@ describe("rank", () => {
         limit: 100,
       });
 
-      expect(data(result).entries).toEqual([]);
+      expect(data(result).entries.length).toBeGreaterThan(0);
+      expect(result.meta.caveats.map((c) => c.code)).toContain("municipal_total_definition_changed");
     });
 
     it("still ranks two post-break years", () => {
