@@ -113,7 +113,7 @@ describe("projectWorkbookSources", () => {
 });
 
 describe("loadWorkbookSources", () => {
-  it.each(["expenditure", "revenue", "municipalities"] as const)(
+  it.each(["expenditure", "revenue", "municipalities", "debt"] as const)(
     "loads validated public sources for %s",
     async (datasetId) => {
       resetWorkbookSourceCacheForTests();

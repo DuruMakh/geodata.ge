@@ -9,6 +9,7 @@ import { loadAdminSpendingFacts } from "../lib/data/adminSpending/importAdminSpe
 import { validateFoundationReferences } from "../lib/data/foundationValidation";
 import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
+import { loadGovernmentDebtFacts } from "../lib/data/governmentDebt/importGovernmentDebtFacts";
 import { buildImportReport } from "../lib/data/importReport";
 import { loadNationalGdpFacts } from "../lib/data/nationalGdp/importNationalGdp";
 import { loadMunicipalitiesFile } from "../lib/data/municipal/municipalitiesFile";
@@ -38,6 +39,7 @@ import {
   adminFactParityKey,
   assertSameServedRows,
   budgetFactParityKey,
+  governmentDebtFactParityKey,
   municipalFunctionFactParityKey,
   municipalTotalFactParityKey,
   municipalPopulationFactParityKey,
@@ -60,6 +62,7 @@ import {
   loadMunicipalTotalFactsFromMirror,
   loadMunicipalPopulationFactsFromMirror,
   loadNationalGdpFactsFromMirror,
+  loadGovernmentDebtFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "../lib/db/mirrorRows";
 
@@ -100,6 +103,18 @@ function assertAmountPrecision(label: string, rows: { amountGel: number }[]): vo
   for (const row of rows) {
     if (new Decimal(row.amountGel).decimalPlaces() > 2) {
       throw new Error(`${label} amount has more than 2 decimal places: ${row.amountGel}`);
+    }
+  }
+}
+
+function assertGovernmentDebtPrecision(
+  rows: { value: number | null; seriesId: string; year: number }[],
+): void {
+  for (const row of rows) {
+    if (row.value !== null && new Decimal(row.value).decimalPlaces() > 6) {
+      throw new Error(
+        `Government Debt value has more than 6 decimal places: ${row.year} ${row.seriesId}`,
+      );
     }
   }
 }
@@ -165,6 +180,7 @@ async function main() {
     municipalAdjaraBudgetAdjustments,
     municipalPopulationFacts,
     nationalGdpFacts,
+    governmentDebtFacts,
   ] = await Promise.all([
     loadTaxonomyFiles(TAXONOMY_DIR),
     loadGlossary(SERVED_DATA_FILES.glossary),
@@ -182,6 +198,7 @@ async function main() {
     loadAdjaraBudgetAdjustments(SERVED_DATA_FILES.municipalAdjaraBudgetAdjustments),
     loadMunicipalPopulationFacts(SERVED_DATA_FILES.municipalPopulationFacts),
     loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
+    loadGovernmentDebtFacts(SERVED_DATA_FILES.governmentDebtFacts),
   ]);
 
   // Same reference validation the site's data pipeline uses (allows explicit
@@ -230,6 +247,8 @@ async function main() {
   assertUnique("admin fact natural key", adminFacts.map(adminFactParityKey));
   assertSubset("National GDP fact source IDs", nationalGdpFacts.map((fact) => fact.sourceId), sourceIds);
   assertUnique("national GDP fact natural key", nationalGdpFacts.map(nationalGdpFactParityKey));
+  assertUnique("Government Debt fact natural key", governmentDebtFacts.map(governmentDebtFactParityKey));
+  assertGovernmentDebtPrecision(governmentDebtFacts);
   assertAmountPrecision("Budget fact", budgetFacts);
   assertAmountPrecision("Admin fact", adminFacts);
   assertAmountPrecision(
@@ -324,6 +343,7 @@ async function main() {
         await tx.budgetFact.deleteMany();
         await tx.adminSpendingFact.deleteMany();
         await tx.nationalGdpFact.deleteMany();
+        await tx.governmentDebtFact.deleteMany();
         await tx.budgetItem.deleteMany();
         await tx.adminSpendingCategory.deleteMany();
         await tx.municipalFunctionFact.deleteMany();
@@ -555,6 +575,24 @@ async function main() {
           })),
         });
 
+        await tx.governmentDebtFact.createMany({
+          data: governmentDebtFacts.map((fact) => ({
+            year: fact.year,
+            family: fact.family,
+            seriesId: fact.seriesId,
+            value: fact.value === null ? null : String(fact.value),
+            valueKind: fact.valueKind,
+            status: fact.status,
+            sourceId: fact.sourceId,
+            snapshotDate:
+              fact.snapshotDate === null
+                ? null
+                : new Date(`${fact.snapshotDate}T00:00:00.000Z`),
+            lastReviewedAt: new Date(`${fact.lastReviewedAt}T00:00:00.000Z`),
+            importRunId: run.id,
+          })),
+        });
+
         await tx.municipalPopulationFact.createMany({
           data: municipalPopulationFacts.map((fact) => ({
             id: municipalPopulationFactParityKey(fact),
@@ -584,6 +622,7 @@ async function main() {
           mirrorAdminFacts,
           mirrorAdminCategories,
           mirrorNationalGdpFacts,
+          mirrorGovernmentDebtFacts,
         ] =
           await Promise.all([
             loadBudgetFactsFromMirror(tx),
@@ -592,6 +631,7 @@ async function main() {
             loadAdminFactsFromMirror(tx),
             loadAdminCategoriesFromMirror(tx),
             loadNationalGdpFactsFromMirror(tx),
+            loadGovernmentDebtFactsFromMirror(tx),
           ]);
 
         const [
@@ -630,6 +670,12 @@ async function main() {
           nationalGdpFacts,
           mirrorNationalGdpFacts,
           nationalGdpFactParityKey,
+        );
+        assertSameServedRows(
+          "Government Debt facts",
+          governmentDebtFacts,
+          mirrorGovernmentDebtFacts,
+          governmentDebtFactParityKey,
         );
         assertSameServedRows(
           "admin spending categories",
@@ -708,6 +754,11 @@ async function main() {
               table: "NationalGdpFact",
               csvRows: nationalGdpFacts.length,
               dbRows: mirrorNationalGdpFacts.length,
+            },
+            {
+              table: "GovernmentDebtFact",
+              csvRows: governmentDebtFacts.length,
+              dbRows: mirrorGovernmentDebtFacts.length,
             },
             { table: "BudgetItem", csvRows: taxonomy.length, dbRows: mirrorGlossary.size },
             {

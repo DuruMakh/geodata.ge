@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   EXPLORER_ROW_PARITY_CHECKS,
+  GOVERNMENT_DEBT_PARITY_CHECK,
   MUNICIPAL_PARITY_CHECKS,
   loadServedMunicipalData,
   resetServedDataCacheForTests,
 } from "../../lib/data/servedData";
+import { governmentDebtFactParityKey } from "../../lib/data/servedDataParity";
 
 describe("served data parity coverage", () => {
   it("checks every municipal dataset the site serves", async () => {
@@ -29,5 +31,12 @@ describe("served data parity coverage", () => {
     const labels = Object.values(EXPLORER_ROW_PARITY_CHECKS).map((check) => check.label);
 
     expect(new Set(labels).size).toBe(labels.length);
+  });
+
+  it("names the Government Debt rows that db-mode serving must compare", () => {
+    expect(GOVERNMENT_DEBT_PARITY_CHECK).toEqual({
+      label: "Government Debt facts",
+      keyOf: governmentDebtFactParityKey,
+    });
   });
 });

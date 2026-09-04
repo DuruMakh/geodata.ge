@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { TEST_BASE_URL } from "./test-base-url";
 
 // Municipality entity pages (Task 11). Three things nothing in the repo
 // exercised before this page existed:
@@ -23,7 +24,7 @@ import ExcelJS from "exceljs";
 //
 // Full section e2e coverage is Task 14's; this pins the specific gaps above.
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const BASE_URL = TEST_BASE_URL;
 const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
 const ENTITY_URL = `${BASE_URL}/explorer/municipalities/tbilisi`; // თბილისი
 const ALL_FUNCTIONS = [

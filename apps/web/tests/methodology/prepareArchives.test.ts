@@ -100,6 +100,9 @@ async function createFixtureRepository() {
       await writeReviewedSource(repositoryRoot, "municipalities", "2016-2025", "docs/Raw Data/Municipalities/mof-municipality-budget-history-2016-2025/source-e.xlsx", "downloads/methodology/municipalities/files/2016-2025/source-e.xlsx", "source-e"),
       await writeReviewedSource(repositoryRoot, "municipalities", "2022", "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022/source-f.zip", "downloads/methodology/municipalities/files/2022/source-f.zip", "source-f"),
     ],
+    debt: [
+      await writeReviewedSource(repositoryRoot, "debt", "2013-2030", "docs/Raw Data/Debt/government-debt-annual/official/source-g.pdf", "downloads/methodology/debt/files/2013-2030/source-g.pdf", "source-g"),
+    ],
   };
   for (const datasetId of Object.keys(rows) as MethodologyDatasetId[]) {
     const manifestPath = path.join(repositoryRoot, `data/methodology/source-archives/${datasetId}.csv`);
@@ -156,7 +159,7 @@ describe("methodology archive preparation", () => {
     const reportPath = path.join(repositoryRoot, "data/reports/methodology-archive-validation.json");
     await prepareMethodologyArchives({ repositoryRoot, publicRoot, reportPath, mode: "write" });
 
-    for (const datasetId of ["expenditure", "revenue", "municipalities"] as const) {
+    for (const datasetId of ["expenditure", "revenue", "municipalities", "debt"] as const) {
       const datasetRoot = path.join(publicRoot, `downloads/methodology/${datasetId}`);
       const publishedOriginals = (await listFiles(path.join(datasetRoot, "files"))).map((file) => `files/${file}`);
       const zipEntries = Object.keys(unzipSync(await readFile(path.join(datasetRoot, `${datasetId}-original-sources.zip`))));
@@ -175,7 +178,7 @@ describe("methodology archive preparation", () => {
     const firstRun = await prepareMethodologyArchives({ repositoryRoot, publicRoot: firstPublicRoot, reportPath, mode: "write" });
     const secondRun = await prepareMethodologyArchives({ repositoryRoot, publicRoot: secondPublicRoot, reportPath, mode: "write" });
 
-    for (const datasetId of ["expenditure", "revenue", "municipalities"] as const) {
+    for (const datasetId of ["expenditure", "revenue", "municipalities", "debt"] as const) {
       expect(firstRun[datasetId].outputHashes).toEqual(secondRun[datasetId].outputHashes);
       expect(firstRun[datasetId].outputByteSizes).toEqual(secondRun[datasetId].outputByteSizes);
     }
@@ -228,6 +231,7 @@ describe("methodology archive preparation", () => {
       expenditure: { status: "PASS" },
       revenue: { status: "PASS" },
       municipalities: { status: "PASS" },
+      debt: { status: "PASS" },
     });
     expect(await readFile(sentinelPath, "utf8")).toBe("keep");
     expect(await listFiles(publicRoot)).toEqual(["downloads/methodology/sentinel.txt"]);

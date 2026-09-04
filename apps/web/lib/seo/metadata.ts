@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { resolveSiteUrl } from "../siteUrl";
+import { DEBT_EXPLORER_PATH } from "./internalLinks";
 
 const SOCIAL_IMAGE = {
   url: "/opengraph-image",
@@ -64,4 +65,17 @@ export function municipalityBudgetTitleKa(
     throw new Error(`Official municipality name must end in მუნიციპალიტეტი: ${nameKa}`);
   }
   return `${nameKa}ს ბიუჯეტი ${firstYear}–${lastYear} | Fiscal.ge`;
+}
+
+export function governmentDebtMetadata(
+  facts: readonly { year: number; family: string; status: string }[],
+): Metadata {
+  const { firstYear, lastYear } = coverageFromYears(
+    facts.filter((fact) => fact.family === "stock" && fact.status === "actual"),
+  );
+  return fiscalMetadata({
+    title: `საქართველოს მთავრობის ვალი ${firstYear}–${lastYear} | Fiscal.ge`,
+    description: `საქართველოს მთავრობის ვალის მოცულობა, ვალის მომსახურება და საპროცენტო განაკვეთები, ${firstYear}–${lastYear}.`,
+    path: DEBT_EXPLORER_PATH,
+  });
 }

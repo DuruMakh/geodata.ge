@@ -1,8 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
-
-const TEST_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+import { TEST_BASE_URL } from "./test-base-url";
 
 async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");

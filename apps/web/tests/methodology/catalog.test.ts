@@ -17,6 +17,7 @@ import type {
   MethodologyContent,
 } from "../../lib/methodology/types";
 import type { ServedBudgetFact } from "../../lib/servedRows";
+import type { ServedGovernmentDebtFact } from "../../lib/servedRows";
 
 const budgetFacts: ServedBudgetFact[] = [
   { year: 2005, side: "expenditure", itemId: "spending.health", amountGel: 1, basis: "actual", sourceId: "source.1" },
@@ -45,6 +46,10 @@ const municipalFact = (year: number): MunicipalTotalFact => ({
 });
 
 const municipalFacts = [municipalFact(2015), municipalFact(2025)];
+const debtFacts: ServedGovernmentDebtFact[] = [
+  { year: 2013, family: "stock", seriesId: "debt.stock.total", value: 1, valueKind: "amount_gel", status: "actual", sourceId: "debt.source", snapshotDate: null, lastReviewedAt: "2026-09-01" },
+  { year: 2030, family: "service", seriesId: "debt.service.total", value: 1, valueKind: "amount_gel", status: "projection_existing_portfolio", sourceId: "debt.source", snapshotDate: "2025-12-31", lastReviewedAt: "2026-09-01" },
+];
 const repositoryRoot = path.resolve(process.cwd(), "../..");
 
 const validCanonicalDocument = "docs/data-methodology/revenue-methodology.md";
@@ -62,8 +67,8 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 });
 
 describe("methodology catalog", () => {
-  it("exposes only the three approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities"]);
+  it("exposes the four approved live datasets", () => {
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
     expect(FUTURE_METHODOLOGY_DATASETS).toEqual([
       { titleKa: "ინფლაცია", href: null, state: "future" },
@@ -71,6 +76,27 @@ describe("methodology catalog", () => {
       { titleKa: "მოსახლეობა", href: null, state: "future" },
       { titleKa: "უმუშევრობა", href: null, state: "future" },
     ]);
+  });
+
+  it("keeps the Debt methodology concise and discloses its approved boundaries", () => {
+    const content = METHODOLOGY_CONTENT.debt;
+    const publicText = [
+      content.summaryKa,
+      content.disclosureKa,
+      ...content.sections.flatMap((section) => section.paragraphsKa),
+    ].join(" ");
+
+    expect(content.sections.map((section) => section.kind)).toEqual(["scope", "sources", "limitations", "archive"]);
+    expect(publicText).toContain("მთავრობის ვალი");
+    expect(publicText).toMatch(/საჯარო.*სახელმწიფო ვალს/);
+    expect(publicText).toContain("2019");
+    expect(publicText).toContain("2022");
+    expect(publicText).toContain("2015–2017");
+    expect(publicText).toContain("2015–2020");
+    expect(publicText).toContain("2025");
+    expect(publicText).toContain("2025-12-31");
+    expect(publicText).toContain("არ წარმოადგენს მომავალი ბიუჯეტის სრულ პროგნოზს");
+    expect(publicText.length).toBeLessThan(3_500);
   });
 
   it("keeps the retained article sections in their approved order", () => {
@@ -287,9 +313,10 @@ describe("methodology catalog", () => {
   });
 
   it("derives coverage from the facts for each live dataset", () => {
-    expect(deriveMethodologyCoverage("expenditure", budgetFacts, municipalFacts)).toEqual({ firstYear: 2005, lastYear: 2025 });
-    expect(deriveMethodologyCoverage("revenue", budgetFacts, municipalFacts)).toEqual({ firstYear: 2005, lastYear: 2025 });
-    expect(deriveMethodologyCoverage("municipalities", budgetFacts, municipalFacts)).toEqual({ firstYear: 2015, lastYear: 2025 });
+    expect(deriveMethodologyCoverage("expenditure", budgetFacts, municipalFacts, debtFacts)).toEqual({ firstYear: 2005, lastYear: 2025 });
+    expect(deriveMethodologyCoverage("revenue", budgetFacts, municipalFacts, debtFacts)).toEqual({ firstYear: 2005, lastYear: 2025 });
+    expect(deriveMethodologyCoverage("municipalities", budgetFacts, municipalFacts, debtFacts)).toEqual({ firstYear: 2015, lastYear: 2025 });
+    expect(deriveMethodologyCoverage("debt", budgetFacts, municipalFacts, debtFacts)).toEqual({ firstYear: 2013, lastYear: 2030 });
   });
 
   it("declares where every live dataset's coverage years come from", () => {
@@ -304,6 +331,7 @@ describe("methodology catalog", () => {
     expect(METHODOLOGY_CONTENT.municipalities.coverageSource).toEqual({
       kind: "municipalTotals",
     });
+    expect(METHODOLOGY_CONTENT.debt.coverageSource).toEqual({ kind: "governmentDebt" });
   });
 
   it("will not accept a methodology dataset that omits its coverage source", () => {
@@ -317,7 +345,7 @@ describe("methodology catalog", () => {
   });
 
   it("rejects live datasets without served years", () => {
-    expect(() => deriveMethodologyCoverage("revenue", [], municipalFacts)).toThrow(/no served years/i);
+    expect(() => deriveMethodologyCoverage("revenue", [], municipalFacts, debtFacts)).toThrow(/no served years/i);
   });
 
   it("builds live hub rows from facts, content metadata, and validated archives", () => {
@@ -325,9 +353,10 @@ describe("methodology catalog", () => {
       expenditure: { fileCount: 42, totalBytes: 100, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 21, totalBytes: 200, latestRetrievedAt: "2026-08-09", validated: true },
       municipalities: { fileCount: 80, totalBytes: 300, latestRetrievedAt: "2026-08-08", validated: true },
+      debt: { fileCount: 10, totalBytes: 400, latestRetrievedAt: "2026-09-01", validated: true },
     };
 
-    expect(buildMethodologyHubEntries({ budgetFacts, municipalFacts, archives })).toEqual([
+    expect(buildMethodologyHubEntries({ budgetFacts, municipalFacts, debtFacts, archives })).toEqual([
       {
         id: "expenditure",
         titleKa: METHODOLOGY_CONTENT.expenditure.titleKa,
@@ -355,6 +384,15 @@ describe("methodology catalog", () => {
         originalFileCount: 80,
         reviewedAt: METHODOLOGY_CONTENT.municipalities.reviewedAt,
       },
+      {
+        id: "debt",
+        titleKa: METHODOLOGY_CONTENT.debt.titleKa,
+        summaryKa: METHODOLOGY_CONTENT.debt.summaryKa,
+        href: "/methodology/debt",
+        coverage: { firstYear: 2013, lastYear: 2030 },
+        originalFileCount: 10,
+        reviewedAt: METHODOLOGY_CONTENT.debt.reviewedAt,
+      },
     ]);
   });
 
@@ -363,8 +401,9 @@ describe("methodology catalog", () => {
       expenditure: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: false },
       municipalities: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: true },
+      debt: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-09-01", validated: true },
     } satisfies Record<(typeof LIVE_METHODOLOGY_IDS)[number], MethodologyArchiveSummary>;
 
-    expect(() => buildMethodologyHubEntries({ budgetFacts, municipalFacts, archives })).toThrow(/validated archive/i);
+    expect(() => buildMethodologyHubEntries({ budgetFacts, municipalFacts, debtFacts, archives })).toThrow(/validated archive/i);
   });
 });

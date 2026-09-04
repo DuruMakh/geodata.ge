@@ -6,20 +6,24 @@ import type { ResolvedRange } from "./use-explorer-state";
 // Range strip per DESIGN.md §7.4–7.5: mono quick chips (5წ/10წ/ყველა) and a
 // 24px rail with year ticks and two accessible slider handles.
 
+export type RangeMarker = { year: number; label: string };
+
 type RangeStripProps = {
   years: number[];
   range: ResolvedRange;
   onChange: (patch: { start?: number; end?: number }) => void;
+  marker?: RangeMarker;
 };
 
 type Handle = "start" | "end";
 
-export function RangeStrip({ years, range, onChange }: RangeStripProps) {
+export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) {
   const railRef = useRef<HTMLDivElement | null>(null);
   const draggingRef = useRef<Handle | null>(null);
   const { start, end, min, max } = range;
   const span = Math.max(max - min, 1);
   const pct = (year: number) => `${(((year - min) / span) * 100).toFixed(2)}%`;
+  const visibleMarker = marker && marker.year >= min && marker.year <= max ? marker : undefined;
 
   // No one-year chip: every figure in ძირითადი ინდიკატორები is a start-to-end
   // delta, so a range of one year zeroes the whole section. The rail handles can
@@ -171,6 +175,17 @@ export function RangeStrip({ years, range, onChange }: RangeStripProps) {
           className="absolute top-2.5 h-[3px] bg-[var(--accent)] opacity-40"
           style={{ left: pct(start), right: `${(100 - ((end - min) / span) * 100).toFixed(2)}%` }}
         />
+        {visibleMarker ? (
+          <div
+            data-testid="range-marker"
+            className="pointer-events-none absolute top-0 bottom-0 z-[1] w-px bg-[var(--accent)]"
+            style={{ left: pct(visibleMarker.year) }}
+          >
+            <span className="absolute -top-4 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[9px] font-medium text-[var(--accent)]">
+              {visibleMarker.label}
+            </span>
+          </div>
+        ) : null}
         <button
           type="button"
           data-testid="range-start-handle"

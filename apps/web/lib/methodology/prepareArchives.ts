@@ -192,10 +192,12 @@ async function generateDatasetArchive(
 }
 
 async function generateAll(repositoryRoot: string, publicRoot: string): Promise<GeneratedArchiveSummaries> {
-  const [expenditure, revenue, municipalities] = await Promise.all(
-    LIVE_METHODOLOGY_IDS.map((datasetId) => generateDatasetArchive(repositoryRoot, publicRoot, datasetId)),
+  const results = await Promise.allSettled(
+    LIVE_METHODOLOGY_IDS.map(async (datasetId) => [datasetId, await generateDatasetArchive(repositoryRoot, publicRoot, datasetId)] as const),
   );
-  return { expenditure, revenue, municipalities };
+  const failed = results.find((result) => result.status === "rejected");
+  if (failed?.status === "rejected") throw failed.reason;
+  return Object.fromEntries(results.map((result) => (result as PromiseFulfilledResult<readonly [MethodologyDatasetId, GeneratedArchiveSummary]>).value)) as GeneratedArchiveSummaries;
 }
 
 async function writeReport(reportPath: string, summaries: GeneratedArchiveSummaries) {

@@ -2,7 +2,7 @@ import path from "node:path";
 import { MethodologyHub } from "../../components/methodology/methodology-hub";
 import { JsonLd } from "../../components/seo/json-ld";
 import { SiteFooter } from "../../components/site/site-footer";
-import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 import { buildLandingContext } from "../../lib/landing/landingData";
 import { buildMethodologyHubEntries } from "../../lib/methodology/catalog";
 import { loadGeneratedArchiveSummaries } from "../../lib/methodology/prepareArchives";
@@ -20,14 +20,16 @@ export const metadata = fiscalMetadata({
 
 export default async function MethodologyPage() {
   const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [landingData, municipalData, archives] = await Promise.all([
+  const [landingData, municipalData, debtData, archives] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
+    loadServedGovernmentDebtData(),
     loadGeneratedArchiveSummaries(repositoryRoot),
   ]);
   const liveEntries = buildMethodologyHubEntries({
     budgetFacts: landingData.facts,
     municipalFacts: municipalData.totalFacts,
+    debtFacts: debtData.facts,
     archives,
   });
   const landingModel = buildLandingContext(landingData);
@@ -39,6 +41,7 @@ export default async function MethodologyPage() {
           "/methodology/expenditure",
           "/methodology/revenue",
           "/methodology/municipalities",
+          "/methodology/debt",
         ])}
         testId="catalog-json-ld"
       />

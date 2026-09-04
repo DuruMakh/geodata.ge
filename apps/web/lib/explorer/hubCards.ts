@@ -1,4 +1,4 @@
-import type { ServedBudgetFact } from "../servedRows";
+import type { ServedBudgetFact, ServedGovernmentDebtFact } from "../servedRows";
 import { MUNICIPAL_COUNTRY_BUDGET_COUNT } from "./municipalData";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { isDerivedTotalItemId } from "./explorerData";
@@ -57,6 +57,7 @@ function categoryCount(facts: ServedBudgetFact[], side: "expenditure" | "revenue
 export function buildHubCards(
   facts: ServedBudgetFact[],
   municipalTotals: Map<number, number>,
+  debtFacts: ServedGovernmentDebtFact[],
 ): HubCardModel[] {
   const expenditure = totalsByYear(facts, "expenditure");
   const revenue = totalsByYear(facts, "revenue");
@@ -84,6 +85,13 @@ export function buildHubCards(
   const spend = build(expenditure);
   const revenues = build(revenue);
   const municipal = build(municipalTotals);
+  const debtTotals = new Map<number, number>();
+  for (const fact of debtFacts) {
+    if (fact.seriesId === "debt.stock.total" && fact.status === "actual" && fact.value !== null) {
+      debtTotals.set(fact.year, fact.value);
+    }
+  }
+  const debt = build(debtTotals);
   const analysisYear = spend.latest;
 
   return [
@@ -136,6 +144,16 @@ export function buildHubCards(
         analysisYear === null
           ? null
           : `${analysisYear} · ${categoryCount(facts, "expenditure", analysisYear)} კატეგორია`,
+    },
+    {
+      index: "05",
+      title: BUDGET_SECTIONS.debt.label,
+      description: "მთავრობის ვალის მოცულობა, გადახდა და საპროცენტო განაკვეთები.",
+      href: BUDGET_SECTIONS.debt.href,
+      comingSoon: BUDGET_SECTIONS.debt.href === null,
+      series: debt.series,
+      seriesColor: debt.series === null ? null : INK,
+      footer: debt.footer,
     },
   ];
 }

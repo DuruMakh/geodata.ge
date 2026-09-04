@@ -1,7 +1,7 @@
-export type WorkbookBasis = "actual" | "planned";
+export type WorkbookBasis = "actual" | "planned" | "forecast" | "not_available";
 
 export type WorkbookPoint = {
-  amountGel: number;
+  amountGel: number | null;
   measureValue?: number | null;
   basis: WorkbookBasis;
 };
@@ -34,6 +34,7 @@ export type WorkbookExportInput = {
   measure: WorkbookMeasure;
   totalId: string | null;
   series: WorkbookSeries[];
+  includeTotalsInAnalysis?: boolean;
   sources: WorkbookPublicSource[];
   siteOrigin: string;
 };
@@ -64,7 +65,12 @@ export type WorkbookExportModel = {
   sources: Array<WorkbookPublicSource & { absoluteUrl: string }>;
 };
 
-const statusKa = (basis: WorkbookBasis) => (basis === "planned" ? "გეგმა" : "ფაქტი");
+const statusKa = (basis: WorkbookBasis) => ({
+  actual: "ფაქტი",
+  planned: "გეგმა",
+  forecast: "პროგნოზი",
+  not_available: "არ არის ხელმისაწვდომი",
+})[basis];
 
 export function absoluteWorkbookSourceUrl(
   siteOrigin: string,
@@ -81,12 +87,27 @@ function safeChange(start: number | null, end: number | null): number | null {
 
 function readableValue(measure: WorkbookMeasure, point: WorkbookPoint | null | undefined): number | null {
   if (!point) return null;
-  return measure.kind === "percentage" ? point.measureValue ?? null : point.amountGel / measure.readableScale;
+  return measure.kind === "percentage"
+    ? point.measureValue ?? null
+    : point.amountGel === null
+      ? null
+      : point.amountGel / measure.readableScale;
 }
 
 function subtitleKa(rows: WorkbookReadableRow[], years: number[], unitLabelKa: string): string {
-  const bases = new Set(Object.values(rows.flatMap((row) => Object.values(row.basisByYear))).filter((basis): basis is WorkbookBasis => basis !== null));
-  const basis = bases.size > 1 ? "ფაქტი და გეგმა" : bases.has("planned") ? "გეგმა" : "ფაქტი";
+  const statuses = Object.values(rows.flatMap((row) => Object.values(row.basisByYear))).filter((basis): basis is WorkbookBasis => basis !== null);
+  const bases = new Set(statuses.filter((basis) => basis !== "not_available"));
+  const basis = bases.has("actual") && bases.has("forecast")
+    ? "ფაქტი და პროგნოზი"
+    : bases.has("actual") && bases.has("planned")
+      ? "ფაქტი და გეგმა"
+      : bases.has("forecast")
+        ? "პროგნოზი"
+        : bases.has("planned")
+          ? "გეგმა"
+          : statuses.includes("not_available")
+            ? "არ არის ხელმისაწვდომი"
+          : "ფაქტი";
   const period = years.length > 0 ? `${years[0]}–${years.at(-1)}` : "პერიოდი არ არის";
   return `${period} · ${basis} · ${unitLabelKa}`;
 }
@@ -112,7 +133,9 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
   });
 
   const nonTotalsExist = input.series.some((series) => series.kind !== "total");
-  const analysisSeries = input.series.filter((series) => !nonTotalsExist || series.kind !== "total");
+  const analysisSeries = input.includeTotalsInAnalysis
+    ? input.series
+    : input.series.filter((series) => !nonTotalsExist || series.kind !== "total");
   const headers = ["წელი", "მთავარი ჯგუფი", "კატეგორია", "თანხა (₾)", "სტატუსი", ...(input.measure.kind === "percentage" ? [input.measure.analysisHeaderKa] : [])];
   const analysisRows: Array<Array<string | number | null>> = [];
   for (const year of years) {

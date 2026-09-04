@@ -1,8 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { TEST_BASE_URL } from "./test-base-url";
 
-const COUNTRY_URL = `${process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100"}/explorer/municipalities/georgia`;
+const COUNTRY_URL = `${TEST_BASE_URL}/explorer/municipalities/georgia`;
 const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
 
 async function expectMunicipalAppReady(page: Page) {

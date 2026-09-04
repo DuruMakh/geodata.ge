@@ -1,15 +1,16 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
 import { computedCssColorAlpha } from "./focus-outline";
+import { TEST_BASE_URL } from "./test-base-url";
 
-const BASE_URL = process.env.SEO_BASE_URL ?? process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const BASE_URL = process.env.SEO_BASE_URL ?? TEST_BASE_URL;
 
 test("uses the shared browser artifact when no SEO-specific URL is configured", async ({ page }) => {
   test.skip(Boolean(process.env.SEO_BASE_URL), "SEO_BASE_URL intentionally overrides the shared artifact URL");
 
   await page.goto(BASE_URL);
 
-  const expectedOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100").origin;
+  const expectedOrigin = new URL(TEST_BASE_URL).origin;
   expect(new URL(page.url()).origin).toBe(expectedOrigin);
 });
 
@@ -89,6 +90,7 @@ const representativeRoutes = [
   { route: "/explorer/expenditure", canonical: "https://fiscal.ge/explorer/expenditure" },
   { route: "/explorer/revenue", canonical: "https://fiscal.ge/explorer/revenue" },
   { route: "/explorer/analysis", canonical: "https://fiscal.ge/explorer/analysis" },
+  { route: "/explorer/debt", canonical: "https://fiscal.ge/explorer/debt" },
   { route: "/explorer/municipalities", canonical: "https://fiscal.ge/explorer/municipalities" },
   { route: "/explorer/municipalities/tbilisi", canonical: "https://fiscal.ge/explorer/municipalities/tbilisi" },
   { route: "/explorer/municipalities/region/imereti", canonical: "https://fiscal.ge/explorer/municipalities/region/imereti" },
@@ -153,6 +155,15 @@ test("explorer datasets publish stable ids and downloadable CSV distributions", 
     ]);
     expect((await request.get(`${BASE_URL}${downloadPath}`)).status()).toBe(200);
   }
+});
+
+test("Government Debt Dataset metadata includes the service projection horizon", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer/debt`);
+  const node = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
+
+  expect(node.temporalCoverage).toBe("2013/2030");
+  expect(node.description).toContain("2026–2030");
+  expect(node.description).toContain("პროგნოზი");
 });
 
 test("only third-party methodology source originals send a noindex header", async ({ request }) => {
