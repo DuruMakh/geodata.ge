@@ -4,7 +4,7 @@ import path from "node:path";
 import { MethodologyArticle } from "../../../components/methodology/methodology-article";
 import { JsonLd } from "../../../components/seo/json-ld";
 import { SiteFooter } from "../../../components/site/site-footer";
-import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
+import { loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
 import {
   deriveMethodologyCoverage,
   LIVE_METHODOLOGY_IDS,
@@ -40,6 +40,7 @@ const DATASET_DOWNLOADS = {
   expenditure: "/downloads/data/national-expenditure.csv",
   revenue: "/downloads/data/national-revenue.csv",
   municipalities: "/downloads/data/municipal-expenditure.csv",
+  debt: "/downloads/data/government-debt.csv",
 } as const;
 
 // Spec 12.2: the expenditure methodology links both the expenditure and the
@@ -52,6 +53,10 @@ const DATASET_JSON_DOWNLOADS = {
   ],
   revenue: [{ href: "/downloads/data/national-revenue.json", labelKa: "სახელმწიფო შემოსავლები" }],
   municipalities: [{ href: "/downloads/data/municipal-expenditure.json", labelKa: "მუნიციპალური ხარჯები" }],
+  // Empty on purpose: government debt is published as CSV and as the
+  // methodology workbook, but it is not part of the fact-query core, so it
+  // has no JSON publication to link. Give it one and add it here.
+  debt: [],
 } as const;
 
 // Only the file that IS this dataset in another format belongs in the Dataset
@@ -62,6 +67,7 @@ const DATASET_JSON_DISTRIBUTIONS = {
   expenditure: ["/downloads/data/national-expenditure.json"],
   revenue: ["/downloads/data/national-revenue.json"],
   municipalities: ["/downloads/data/municipal-expenditure.json"],
+  debt: [],
 } as const;
 
 export async function generateMetadata({ params }: MethodologyDatasetPageProps): Promise<Metadata> {
@@ -82,13 +88,14 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
   const dataset = validatedDataset((await params).dataset);
   const content = METHODOLOGY_CONTENT[dataset];
   const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [landingData, municipalData, archiveSummaries, rows] = await Promise.all([
+  const [landingData, municipalData, debtData, archiveSummaries, rows] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
+    loadServedGovernmentDebtData(),
     loadGeneratedArchiveSummaries(repositoryRoot),
     loadReviewedSourceManifest(repositoryRoot, content.archiveManifestId),
   ]);
-  const coverage = deriveMethodologyCoverage(dataset, landingData.facts, municipalData.totalFacts);
+  const coverage = deriveMethodologyCoverage(dataset, landingData.facts, municipalData.totalFacts, debtData.facts);
   const updatedAt = landingData.sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
   const publicRows = rows.map((row) => ({
     source_id: row.source_id,

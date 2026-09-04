@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { buildSeriesPanelRows, SeriesPanel, topLevelIds } from "../../components/main-explorer/series-panel";
-import { SeriesSelector } from "../../components/main-explorer/series-selector";
+import { SeriesSelector, SeriesSelectorRow } from "../../components/main-explorer/series-selector";
 import type { ExplorerItem } from "../../lib/explorer/types";
 
 function item(partial: Partial<ExplorerItem> & Pick<ExplorerItem, "id" | "kaLabel" | "level">): ExplorerItem {
@@ -154,5 +154,51 @@ describe("empty state", () => {
 
   it("says the query matched no categories", () => {
     expect(emptyStateMarkup()).toContain("კატეგორია");
+  });
+});
+
+describe("optional debt selector semantics", () => {
+  it("can suppress select-all while keeping the empty count visible", () => {
+    const props = {
+      query: "",
+      onQueryChange: () => {},
+      searchPlaceholder: "ძებნა",
+      selectedCount: 0,
+      totalCount: 9,
+      hasSelection: false,
+      allSelected: false,
+      onToggleAll: () => {},
+      allowSelectAll: false,
+      hasVisibleMatches: true,
+      children: createElement("div"),
+    };
+    const markup = renderToStaticMarkup(createElement(SeriesSelector, props));
+
+    expect(markup).toContain("0 / 9");
+    expect(markup).not.toContain("ყველას მონიშვნა");
+    expect(markup).not.toContain('data-testid="series-toggle-all"');
+  });
+
+  it("keeps the existing ministry caret name by default and accepts a debt-specific name", () => {
+    const base = {
+      id: "parent",
+      label: "ვალი",
+      color: "#1E1B16",
+      value: "1.0 მლრდ ₾",
+      selected: false,
+      showCaretColumn: true,
+      hasChildren: true,
+      expanded: true,
+      onToggle: () => {},
+      onToggleExpanded: () => {},
+    };
+    const existing = renderToStaticMarkup(createElement(SeriesSelectorRow, base));
+    const debt = renderToStaticMarkup(createElement(SeriesSelectorRow, {
+      ...base,
+      expansionLabel: "ვალი — ქვესერიების ჩაკეცვა",
+    }));
+
+    expect(existing).toContain('aria-label="ქვეპროგრამები"');
+    expect(debt).toContain('aria-label="ვალი — ქვესერიების ჩაკეცვა"');
   });
 });

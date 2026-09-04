@@ -49,6 +49,8 @@ describe("Fiscal.ge agent instructions", () => {
     expect(content).toMatch(/read-only MCP/i);
     expect(content).toMatch(/no REST query API/i);
     expect(content).toMatch(/do not invent values/i);
+    expect(content).toContain("[Mission — Fiscal.ge](https://fiscal.ge/about)");
+    expect(content).not.toContain("[About Fiscal.ge](https://fiscal.ge/about)");
 
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]);
     expect(targets).toEqual(requiredTargets);

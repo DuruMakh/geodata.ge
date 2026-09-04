@@ -23,9 +23,11 @@ describe("original-source inventory", () => {
     expect(inventory.expenditure).toHaveLength(79);
     expect(inventory.revenue).toHaveLength(22);
     expect(inventory.municipalities).toHaveLength(79);
+    expect(inventory.debt).toHaveLength(10);
     expect(inventory.expenditure.reduce(sumBytes, 0)).toBe(58_628_862);
     expect(inventory.revenue.reduce(sumBytes, 0)).toBe(5_465_153);
     expect(inventory.municipalities.reduce(sumBytes, 0)).toBe(3_571_415);
+    expect(inventory.debt.reduce(sumBytes, 0)).toBe(16_250_452);
     expect(inventory.revenue.some((row) => row.path.includes("/text/"))).toBe(false);
     expect(inventory.municipalities.some((row) => row.path.includes("combined-annual"))).toBe(false);
     expect(inventory.municipalities.some((row) => row.path.includes("geostat-population"))).toBe(false);

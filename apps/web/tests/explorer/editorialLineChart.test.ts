@@ -51,6 +51,65 @@ describe("EditorialLineChart amount axes", () => {
   });
 });
 
+describe("EditorialLineChart forecast paths", () => {
+  it("keeps actual values solid and continues from their final point with a dashed forecast", () => {
+    const markup = renderToStaticMarkup(
+      createElement(EditorialLineChart, {
+        years: [2023, 2024, 2025, 2026, 2027],
+        series: [
+          {
+            id: "debt-service",
+            label: "ვალის გადახდა",
+            color: "#1F6E56",
+            vals: [30, 35, 40, 38, 34],
+            planned: [false, false, false, false, false],
+            forecastFromYear: 2026,
+          },
+        ],
+        share: false,
+        unit: UNIT_MLN,
+        shareLabel: "% წილი",
+      }),
+    );
+
+    const actualPath = markup.match(/data-testid="chart-series-debt-service-actual" d="([^"]+)"/)?.[1];
+    const forecastPath = markup.match(/data-testid="chart-series-debt-service-forecast" d="([^"]+)"/)?.[1];
+
+    expect(actualPath).toContain("L482.0");
+    expect(actualPath).not.toContain("L686.0");
+    expect(forecastPath).toContain("M482.0");
+    expect(forecastPath).toContain("L686.0");
+    expect(markup).toContain('stroke-dasharray="6 5"');
+  });
+
+  it("does not bridge a missing value across a forecast boundary", () => {
+    const markup = renderToStaticMarkup(
+      createElement(EditorialLineChart, {
+        years: [2024, 2025, 2026, 2027],
+        series: [
+          {
+            id: "debt-service",
+            label: "ვალის გადახდა",
+            color: "#1F6E56",
+            vals: [30, null, 38, 34],
+            planned: [false, false, false, false],
+            forecastFromYear: 2026,
+          },
+        ],
+        share: false,
+        unit: UNIT_MLN,
+        shareLabel: "% წილი",
+      }),
+    );
+
+    const forecastPath = markup.match(/data-testid="chart-series-debt-service-forecast" d="([^"]+)"/)?.[1];
+
+    expect(forecastPath).toContain("M618.0");
+    expect(forecastPath).not.toContain("M74.0");
+    expect(markup).not.toContain('data-testid="chart-series-debt-service-actual"');
+  });
+});
+
 // The hover readout renders one row per selected series with no cap, and
 // ყველას მონიშვნა is a first-class control: on ministries that measured 1327px
 // of tooltip against a 334px chart, 24 of its rows reading "—", with ~993px of

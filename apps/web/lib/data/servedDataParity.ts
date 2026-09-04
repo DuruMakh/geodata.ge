@@ -21,6 +21,13 @@ export function nationalGdpFactParityKey(row: { year: number }): string {
   return String(row.year);
 }
 
+export function governmentDebtFactParityKey(row: {
+  year: number;
+  seriesId: string;
+}): string {
+  return [row.year, row.seriesId].join(":");
+}
+
 export function municipalFunctionFactParityKey(row: {
   year: number;
   municipalityCode: string;

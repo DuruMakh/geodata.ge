@@ -6,7 +6,6 @@ import type { MunicipalListRow } from "./municipalData";
 export type MunicipalityMapShape = {
   code: string;
   nameKa: string;
-  d: string;
   totalBudgetGel: number;
   budgetPerResidentGel: number;
   bucket: number;
@@ -23,7 +22,6 @@ export type MunicipalityMapMarker = {
 
 export type MunicipalityMapOccupiedArea = {
   key: "abkhazia" | "tskhinvali";
-  d: string;
 };
 
 export type MunicipalityMapModel = {
@@ -40,7 +38,7 @@ type MunicipalityMapArtifact = {
   viewBox: "0 0 1000 540";
   municipalityPaths: Array<{ code: string; relationId: number; d: string }>;
   cityMarkers: Array<{ code: string; x: number; y: number }>;
-  occupiedAreas: MunicipalityMapOccupiedArea[];
+  occupiedAreas: Array<{ key: "abkhazia" | "tskhinvali"; d: string }>;
 };
 
 const rawArtifact = JSON.parse(
@@ -230,7 +228,6 @@ export function buildMunicipalityMapModel({
     shapes: MUNICIPALITY_MAP_ARTIFACT.municipalityPaths.map((shape) => ({
       code: shape.code,
       nameKa: nameFor(shape.code),
-      d: shape.d,
       totalBudgetGel: valueFor(shape.code).totalBudgetGel,
       budgetPerResidentGel: valueFor(shape.code).budgetPerResidentGel,
       bucket: bucketOf(valueFor(shape.code).budgetPerResidentGel),
@@ -243,7 +240,7 @@ export function buildMunicipalityMapModel({
       totalBudgetGel: valueFor(marker.code).totalBudgetGel,
       budgetPerResidentGel: valueFor(marker.code).budgetPerResidentGel,
     })),
-    occupiedAreas: MUNICIPALITY_MAP_ARTIFACT.occupiedAreas.map((area) => ({ key: area.key, d: area.d })),
+    occupiedAreas: MUNICIPALITY_MAP_ARTIFACT.occupiedAreas.map((area) => ({ key: area.key })),
     legendMinPerResidentGel: Math.min(...polygonValues),
     legendMaxPerResidentGel: Math.max(...polygonValues),
   };

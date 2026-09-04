@@ -128,6 +128,29 @@ Production builds from the Supabase mirror; previews and local dev need none.
   (`apps/web/lib/siteUrl.ts`) independently of Vercel alias ordering. The value
   must be a bare HTTPS origin without a path, query, or fragment.
 
+## Website analytics
+
+The shared root layout loads Google Analytics 4 (`G-RRS446MKJW`) and Microsoft
+Clarity (`y9my6v583o`) through `components/site/site-analytics.tsx`. These are
+public tracking IDs, not credentials; no additional environment variables or
+packages are required. The vendor scripts load asynchronously after hydration
+and only when the browser hostname is exactly `fiscal.ge`. Local development,
+Vercel preview URLs, and the `geodata-ge.vercel.app` alias do not send visits.
+
+This installation has no consent banner or consent gate, as explicitly requested
+by the owner. It does not send a fabricated consent-granted signal or change
+provider consent settings. This is not a claim of legal compliance; regional
+provider requirements can limit tracking, including Clarity functionality.
+Search Console is unchanged, and Vercel Speed Insights is not installed.
+
+GA4 client-side page views rely on **Enhanced measurement → Page views → Page
+changes based on browser history events** being enabled for the web stream.
+Do not add a second manual page-view tracker while that setting is enabled.
+This initial installation does not add custom explorer or Excel-download events.
+After deployment, verify the production scripts, GA4 Realtime data, and incoming
+Clarity sessions separately; passing local tests does not prove receipt by either
+provider. Browser tests intercept vendor requests to avoid polluting real reports.
+
 ## GitHub Actions credentials
 
 Three repository secrets (GitHub → Settings → Secrets and variables →

@@ -17,7 +17,8 @@ import { GEORGIA_GEO } from "../../lib/landing/georgiaGeo";
 // rebuilds — none of it depends on viewport or preset):
 //   geoProj()      projection between lon/lat and a fixed 1240×640 px "design
 //                  plane", the canvas the design was tuned on.
-//   geoField()     the terrain: an 8.6px grid over that plane, each cell
+//   geoField()     the terrain: a preset-selected grid over that plane (11.5px
+//                  on mobile, 8.6px otherwise), each cell
 //                  jittered into a dot and classified — inside the outline?
 //                  edge dot? which region? — with precomputed elevation
 //                  (elevGe: analytic Caucasus ridges/lowlands + hash noise),
@@ -37,8 +38,8 @@ import { GEORGIA_GEO } from "../../lib/landing/georgiaGeo";
 //      HeroOpts); fitCameraDistance() binary-searches the camera distance so
 //      every sampled dot projects inside the margins, then refit() measures
 //      the map's projected vertical band, CROPS the canvas to it with
-//      cam.setViewOffset, and pins the parent <figure> height to the band so
-//      the stats section starts right under the last dots.
+//      cam.setViewOffset, inside a compact CSS-reserved <figure> so the stats
+//      section stays right under the last dots without moving on scene load.
 //   3. Geometry: one dot cloud for terrain (N grid dots), one for city squares
 //      (NC cities, index 0 = Tbilisi), four reusable LineLoop rings for ripple
 //      fronts, and HTML <span>s (labelsRef) for peak labels + hover readout.
@@ -106,6 +107,8 @@ type HeroOpts = {
   npShake: number; // camera-shake amplitude while the national pulse sweeps
   wvShake: number; // max camera shake from ripples of cities with amp > 1.2 (only Tbilisi qualifies)
   maxCities: number; // cap on city markers/ripple emitters: 10 on mobile, 99 = all
+  dotStep: number; // terrain grid spacing in design-plane pixels; mobile uses fewer dots
+  maxPixelRatio: number; // renderer density cap; mobile limits high-DPI fragment work
   // NDC margins (fractions of the half-frame) the country must stay inside.
   // marginR reserves the gutter under the right-aligned headline overlay.
   marginL: number;
@@ -131,7 +134,7 @@ function heroOpts(w: number): HeroOpts {
     return {
       fov: 30, camX: 110, camY: 1080, camZ: 1260, lookX: 110, lookY: -60, lookZ: -30,
       hrel: 165, parX: 26, parY: 20, drift: 10, peaks: false, mkMul: 0.72, sizeMul: 0.6,
-      hitScr: 30, npShake: 8, wvShake: 16, maxCities: 10,
+      hitScr: 30, npShake: 8, wvShake: 16, maxCities: 10, dotStep: 11.5, maxPixelRatio: 1.25,
       marginL: 0.06, marginR: 0.06, marginY: 0.08,
     };
   }
@@ -139,14 +142,14 @@ function heroOpts(w: number): HeroOpts {
     return {
       fov: 30, camX: 111, camY: 887, camZ: 1251, lookX: 118, lookY: -40, lookZ: -30,
       hrel: 135, parX: 56, parY: 40, drift: 18, peaks: true, mkMul: 1, sizeMul: 1,
-      hitScr: 28, npShake: 15, wvShake: 32, maxCities: 99,
+      hitScr: 28, npShake: 15, wvShake: 32, maxCities: 99, dotStep: 8.6, maxPixelRatio: 2,
       marginL: 0.05, marginR: 0.3, marginY: 0.07,
     };
   }
   return {
     fov: 30, camX: 111, camY: 613, camZ: 877, lookX: 118, lookY: -38, lookZ: -30,
     hrel: 135, parX: 40, parY: 32, drift: 14, peaks: true, mkMul: 1.05, sizeMul: 1.1,
-    hitScr: 28, npShake: 16, wvShake: 34, maxCities: 99,
+    hitScr: 28, npShake: 16, wvShake: 34, maxCities: 99, dotStep: 8.6, maxPixelRatio: 2,
     marginL: 0.05, marginR: 0.38, marginY: 0.06,
   };
 }
@@ -261,14 +264,15 @@ type GeoField = {
   shade: Float32Array;
 };
 
-let fieldCache: GeoField | null = null;
+const fieldCache = new Map<number, GeoField>();
 
-function geoField(): GeoField {
-  if (fieldCache) return fieldCache;
+function geoField(step: number): GeoField {
+  const cached = fieldCache.get(step);
+  if (cached) return cached;
   const G = GEORGIA_GEO;
   const P = geoProj();
   const B = G.bbox;
-  const STEP = 8.6, W = 1240, H = 640;
+  const STEP = step, W = 1240, H = 640;
   const cols = Math.floor(W / STEP), rows = Math.floor(H / STEP);
   const caps = G.regions.map((r) => P.toPx(r.cap[0], r.cap[1]));
   const tb = caps[11]!;
@@ -325,7 +329,7 @@ function geoField(): GeoField {
     F.dTb[i] = Math.hypot(x - tb[0], y - tb[1]); F.dCap[i] = dc; F.elev[i] = ev; F.shade[i] = sh;
     F.r1[i] = rand01(c * 13.7, r * 7.1); F.r2[i] = rand01(r * 3.3, c * 11.9);
   }
-  fieldCache = F;
+  fieldCache.set(step, F);
   return F;
 }
 
@@ -377,7 +381,7 @@ export function HeroRelief() {
     let updater: (t: number, dt: number) => void;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, O.maxPixelRatio));
       renderer.setSize(el.clientWidth, el.clientHeight);
       renderer.setClearColor(0x000000, 0);
       el.appendChild(renderer.domElement);
@@ -389,7 +393,7 @@ export function HeroRelief() {
       const pr = renderer.getPixelRatio();
       const scene = new THREE.Scene();
       const cam = new THREE.PerspectiveCamera(O.fov, el.clientWidth / Math.max(1, el.clientHeight), 1, 6000);
-      const F = geoField();
+      const F = geoField(O.dotStep);
       const N = F.n;
       const G = GEORGIA_GEO;
       const HREL = O.hrel;
@@ -431,7 +435,6 @@ export function HeroRelief() {
       const camBase = new THREE.Vector3();
       const halfFov = Math.tan(((O.fov / 2) * Math.PI) / 180);
       const mSym = (O.marginL + O.marginR) / 2;
-      const heroFigure = el.parentElement;
       const copyEl = el.closest("section")?.querySelector<HTMLElement>("[data-hero-copy]") ?? null;
       const virtualHeightFor = () =>
         window.innerWidth < 768 ? 340 : window.innerWidth < 1100 ? 500 : Math.min(820, Math.max(560, Math.round(window.innerHeight * 0.78)));
@@ -475,13 +478,15 @@ export function HeroRelief() {
         const bandH = Math.max(1, bottom - top);
         cam.setViewOffset(w, virtualH, 0, top, w, bandH);
         renderer.setSize(w, bandH);
-        if (heroFigure && Math.abs(heroFigure.clientHeight - bandH) > 3) {
-          heroFigure.style.height = `${bandH}px`;
-        }
+        el.style.height = `${bandH}px`;
+        labelsEl.style.height = `${bandH}px`;
       };
       refit();
       cam.position.copy(camBase);
-      if (heroFigure) disposers.push(() => { heroFigure.style.height = ""; });
+      disposers.push(() => {
+        el.style.height = "";
+        labelsEl.style.height = "";
+      });
       const cloud = makeDotCloud(N);
       scene.add(cloud.points);
       disposers.push(() => {
@@ -603,13 +608,13 @@ export function HeroRelief() {
         disposers.push(() => io.disconnect());
       }
       const ro = new ResizeObserver(() => {
-        refit(); // recomputes fit, crop, renderer size, and figure height
+        refit(); // recomputes fit, crop, renderer size, and inner scene height
       });
-      ro.observe(el);
+      // Text-only zoom can resize the CSS-owned frame without a window resize.
+      ro.observe(el.parentElement!);
       disposers.push(() => ro.disconnect());
-      // The ResizeObserver goes blind to height-only viewport changes once
-      // refit() pins the figure height inline, and a width change across a
-      // breakpoint needs a scene rebuilt on the matching preset.
+      // A viewport-height change can alter the virtual camera frame even when
+      // the CSS band is capped; crossing a width breakpoint needs a new preset.
       const onWindowResize = () => {
         if (heroBucket(window.innerWidth) !== bucket) setSceneEpoch((n) => n + 1);
         else refit();

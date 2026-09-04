@@ -15,6 +15,7 @@ type SeriesSelectorProps = {
   hasSelection: boolean;
   allSelected: boolean;
   onToggleAll: () => void;
+  allowSelectAll?: boolean;
   hasVisibleMatches: boolean;
   children: ReactNode;
 };
@@ -31,6 +32,7 @@ export function SeriesSelector({
   hasSelection,
   allSelected,
   onToggleAll,
+  allowSelectAll = true,
   hasVisibleMatches,
   children,
 }: SeriesSelectorProps) {
@@ -57,34 +59,36 @@ export function SeriesSelector({
         data-selector-section="actions"
         className="mt-3.5 flex items-center justify-between gap-4 pb-2.5"
       >
-        <button
-          type="button"
-          role="checkbox"
-          data-testid="series-toggle-all"
-          aria-checked={bulkState}
-          onClick={onToggleAll}
-          className="grid shrink-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 py-1 pr-1 pl-0.5 text-left"
-        >
-          <span
-            aria-hidden
-            data-testid="series-toggle-indicator"
-            className="inline-flex size-3.5 items-center justify-center border-[1.5px] text-[9px] leading-none"
-            style={{
-              borderColor: bulkState === "false" ? "var(--control)" : "var(--ink)",
-              backgroundColor: bulkState === "true" ? "var(--ink)" : "transparent",
-              color: bulkState === "true" ? "var(--paper)" : "var(--ink)",
-            }}
+        {hasSelection || allowSelectAll ? (
+          <button
+            type="button"
+            role="checkbox"
+            data-testid="series-toggle-all"
+            aria-checked={bulkState}
+            onClick={onToggleAll}
+            className="grid shrink-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 py-1 pr-1 pl-0.5 text-left"
           >
-            {bulkMark}
-          </span>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
-            {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}
-          </span>
-        </button>
+            <span
+              aria-hidden
+              data-testid="series-toggle-indicator"
+              className="inline-flex size-3.5 items-center justify-center border-[1.5px] text-[9px] leading-none"
+              style={{
+                borderColor: bulkState === "false" ? "var(--control)" : "var(--ink)",
+                backgroundColor: bulkState === "true" ? "var(--ink)" : "transparent",
+                color: bulkState === "true" ? "var(--paper)" : "var(--ink)",
+              }}
+            >
+              {bulkMark}
+            </span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
+              {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}
+            </span>
+          </button>
+        ) : null}
 
         <span
           data-testid="series-status"
-          className="text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]"
+          className="ml-auto text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]"
         >
           {countLabel}{" "}
           <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
@@ -130,8 +134,10 @@ type SeriesSelectorRowProps = {
   hasChildren?: boolean;
   expanded?: boolean;
   expansionLocked?: boolean;
+  expansionLabel?: string;
   showRail?: boolean;
   isChild?: boolean;
+  childLabelSize?: "compact" | "standard";
   onToggle: () => void;
   onToggleExpanded?: () => void;
 };
@@ -148,8 +154,10 @@ export function SeriesSelectorRow({
   hasChildren = false,
   expanded = false,
   expansionLocked = false,
+  expansionLabel = "ქვეპროგრამები",
   showRail = false,
   isChild = false,
+  childLabelSize = "compact",
   onToggle,
   onToggleExpanded,
 }: SeriesSelectorRowProps) {
@@ -174,7 +182,7 @@ export function SeriesSelectorRow({
             if (!expansionLocked) onToggleExpanded?.();
           }}
           aria-expanded={hasChildren ? expanded : undefined}
-          aria-label="ქვეპროგრამები"
+          aria-label={expansionLabel}
           aria-disabled={expansionLocked || undefined}
           className={`flex w-[22px] flex-none items-center justify-center text-base leading-none ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
           style={{ visibility: hasChildren ? "visible" : "hidden" }}
@@ -205,12 +213,12 @@ export function SeriesSelectorRow({
           </span>
           <span
             data-testid="series-label"
-            className={`line-clamp-2 leading-[1.35] ${isChild ? "text-[11.5px] font-normal text-[var(--body)]" : "text-[12.5px] font-medium text-[var(--ink)]"}`}
+            className={`line-clamp-2 leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[12px]" : "text-[11.5px]"} font-normal text-[var(--body)]` : "text-[12.5px] font-medium text-[var(--ink)]"}`}
           >
             {label}
           </span>
         </span>
-        <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--faint)]">
+        <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--muted)]">
           {value}
         </span>
       </button>

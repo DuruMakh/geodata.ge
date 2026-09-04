@@ -1,7 +1,7 @@
 # Fiscal.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-08-28
+Last updated: 2026-09-01
 Status: Production visual system for Fiscal.ge Budget Explorer v1
 Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -28,9 +28,9 @@ Superseded and must not appear in production:
 
 Fiscal.ge v1 is a Georgian-first national budget explorer for annual data. It is not a broad public-data catalog.
 
-V1 includes: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, Excel workbook export, Georgian-first UI, minimal public source label, internal provenance metadata.
+V1 includes: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, Excel workbook export, Georgian-first UI, minimal public source label, internal provenance metadata.
 
-V1 excludes: data catalog, capital/debt explorers, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown).
+V1 excludes: data catalog, capital and deficit explorers, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
 Municipal budgets are an implemented v1 **section** in this branch at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). Production verification follows merge and deployment; this branch state is not evidence that the current municipal surfaces are live. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) remain markers only, with no data at all. Nothing about a marker may be styled as if it were live.
 
@@ -91,8 +91,10 @@ Rules:
 - `paper` is the only background for the landing page and the explorer content column. Never introduce white panels.
 - **Exception: the explorer sidebar** (`ink` background, §6.7) — a persistent navigation shell beside the content column, not a panel within it. This does not generalize: `paper` remains the only background for every panel, block, or surface inside the content column.
 - Selection/hover emphasis is always `tint`, never shadow or border color change.
+- Series-row values use `muted` so their small text stays above 4.5:1 on both `paper` and selected/hovered `tint` backgrounds; `faint` is not a text color for tinted rows.
 - `tile` is reserved for tooltips, treemap tiles, and budget hub cards (§6.6).
 - The two `ink-fg-*` tokens exist only on the `ink` shell surface (§6.7); never use them on paper. **These lines are the single definition of both hex values** — §16 mirrors the paper tokens only, so a value change is one edit here plus one in `apps/web/app/globals.css`.
+- `ComingSoonBadge` keeps `ink-fg-faint` for its default dark-shell use. On the methodology hub's paper background, use its explicit `paper` surface with `muted` text; its label, size, and border stay unchanged.
 - Both ink tokens clear WCAG AA on `ink`: `ink-fg-faint` measures **4.77:1** for the 8.5–9.5px text it carries (brand sub-line, `მონაცემები /` overline, rail label, `მალე` badge) and `ink-fg-muted` measures **6.34:1** for its 12–12.5px labels. They are a deliberate two-step hierarchy — an ~8.5 CIE L\* gap, so faint still reads dimmer than muted. Any future move has to keep **both** above 4.5:1 **and** that gap; raising one alone collapses the pair. (The pair was raised from `#7A7060` / `#8F8676`, where faint sat at 3.53:1.)
 - The paper pair answers to the same floor: `faint` measures **4.52:1** on `paper` and **4.83:1** on `tile`, and `muted` **5.54:1** / **5.92:1**. `faint` is the dimmest paper tier, not decoration — it carries the page-header coverage line (10.5px), hub card footers (10px) and the `გეგმა` planned tag (9px), all small text, all owed 4.5:1. `tests/explorer/themeTokens.test.ts` asserts both, mirroring the ink-pair guard. (The token was darkened from `#A89C88`, which sat at 2.42:1. The paper two-step is necessarily tighter than the ink pair's — `muted` is itself only 5.54:1, so the L\* gap is ~5.6, not 8.5. Restoring a wider step means moving `muted` down first.)
 - Non-text UI boundaries answer to WCAG 2.1 SC 1.4.11's **3:1**, the same floor §6.7 cites for the `მალე` badge border. `control` measures **3.25:1** on `paper` and **3.03:1** on `tint`; the focus ring, drawn in solid `accent`, measures **5.11:1** on `paper`. Both sat below the floor until this was pinned — `control` at `#C9BEA9` was 1.65:1, the first repair `#97866C` still reached only 2.95:1 on a tinted hover row, and the ring at 0.4 alpha composited to `rgb(220,171,157)`, 1.82:1 — while every 4.5:1 text assertion stayed green. `tests/explorer/themeTokens.test.ts` therefore asserts the actual `paper` and `tint` backgrounds as well as the solid ring.
@@ -267,14 +269,14 @@ page:
 
 No screen card, no outer container. Content sits directly on paper.
 
-**Exception: the explorer shell** (§6.7) — `/explorer` and its three sections use a sidebar + content-column layout instead, with different max-width and padding. This page shell applies to the landing page (§19) only.
+**Exception: the explorer shell** (§6.7) — `/explorer` and its five sections use a sidebar + content-column layout instead, with different max-width and padding. This page shell applies to the landing page (§19) only.
 
 ### 6.2 Information Architecture
 
 The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: a budget hub and its sections, all mounted under `/explorer` inside the shell of §6.7.
 
 ```text
-/explorer                              budget hub — the four sections as cards
+/explorer                              budget hub — the five sections as cards
 /explorer/expenditure                  ხარჯები           multi-year expenditure explorer (fields/ministries grouping)
 /explorer/revenue                      შემოსავლები       multi-year revenue explorer
 /explorer/municipalities               მუნიციპალიტეტები  index — municipality-grain map, ranked list, KPIs (§20)
@@ -283,13 +285,14 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/municipalities/region/[id]                     11 region roll-up pages
 /explorer/analysis                     ანალიზი           single-year analysis view (own side switch, grouping switch
                                                           for expenditure, and year selector)
+/explorer/debt                         ვალი              Government Debt stock, service, and rate explorer (§8.5)
 ```
 
 Outside `/explorer` and alongside `/about` sit the two editorial pages: `/about` (§2) and `/connect`, the MCP connection page (§23).
 
 Public municipality routes use the explicit lowercase-ASCII `[slug]` registry. Numeric municipality codes remain internal data, geometry, and join identifiers; they are not the public route identity.
 
-The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`.
+The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი`.
 
 Every surface under `/explorer` opens with the **breadcrumb row** (§6.7): `მთავარი / მონაცემები / ბიუჯეტი` on the hub, `მთავარი / მონაცემები / ბიუჯეტი / <section>` on a section. Municipality entity pages extend that hierarchy through their real region before the municipality name (`… / მუნიციპალიტეტები / იმერეთი / ჭიათურა`); the visible trail and `BreadcrumbList` JSON-LD use the same region route. Its right slot is a mono **coverage** label — `{minYear}–{maxYear} · განახლდა {YYYY-MM-DD}` for the route's active scope, not the user's selection (the range strip owns that, and the two facts live at different altitudes).
 
@@ -340,7 +343,7 @@ spacing:
 - Border radius: **0–3px everywhere** (buttons 2px, tooltip 3px). Exception: the national `% მშპ-ში` measure pill, the municipal `% წილი` measure pill, and slider handles/ticks use `999px`.
 - Shadows: only the chart tooltip (`0 4px 16px rgba(30,27,22,0.10)`) and slider handles (`0 1px 3px rgba(30,27,22,0.15)`). Nothing else casts a shadow.
 - Swatches are **14×3px bars**, never dots or rounded squares.
-- **Exception: budget hub cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow). Four peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
+- **Exception: budget hub cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow). Five peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
 
 ### 6.7 Shell and Sidebar
 
@@ -351,12 +354,12 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
 - `ბიუჯეტი` — the active dataset: `2px accent` left border, active-row background, sans 12.5/600 in `paper`. Not a link; it is where you already are.
-- Its four sections nest beneath it (below).
+- Its five sections nest beneath it (below).
 - `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, mono glyph `«` (expanded) / `»` (collapsed).
 
-**Section list** (`section-nav.tsx`, nested under `ბიუჯეტი`). Each entry is a route link. Active: accent `▸` marker, `paper` text at weight 600, active-row background, `aria-current="page"`. Inactive: `ink-fg-muted`, marker held in transparent so labels do not shift. All four sections — `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი` — render this way; none is a `მალე` marker. Deleting this one component and its single usage reverts navigation to hub-and-breadcrumb only; nothing else imports it.
+**Section list** (`section-nav.tsx`, nested under `ბიუჯეტი`). Each entry is a route link. Active: accent `▸` marker, `paper` text at weight 600, active-row background, `aria-current="page"`. Inactive: `ink-fg-muted`, marker held in transparent so labels do not shift. All five sections — `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი` — render this way; none is a `მალე` marker. Deleting this one component and its single usage reverts navigation to hub-and-breadcrumb only; nothing else imports it.
 
 **Collapsed rail (≥900px).** 52px, same `ink` surface, radius 0:
 
@@ -380,7 +383,7 @@ The crumbs carry `BreadcrumbTrail`'s semantics, not its markup: a `<nav aria-lab
 
 **Footer.** Every `/explorer` route renders `SiteFooter` (§19) at the foot of the content column — inside it, not beside the sidebar — with the pages' own horizontal padding so its rule lines up with the content above. The footer uses the compact lockup at approximately 150px; its trust, navigation, source/update, contact, and CC BY 4.0 licence content remains unchanged. These routes are the site's main SEO landing targets, and the footer is where the licence, contact address and methodology link live (§21); without it ~85 pages ended with no licence, no way to report an error and no route to the methodology. `updatedAt` comes from the landing model, the same site-wide review date the methodology and about pages show.
 
-**Budget hub (`/explorer`).** Breadcrumb, serif H1 `საქართველოს ბიუჯეტი`, the two-sentence lead `Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ ფაქტობრივ მონაცემებს. შეადარეთ წლები, სფეროები და მუნიციპალიტეტები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.`, then four cards in a 2×2 grid (one column below 768px, max-width 860px), then the standard source note (§7.10). Card anatomy, in order: mono index in accent with `→` right-aligned, serif 18px title, 11.5px `muted` description, graphic, mono 10px `faint` footer.
+**Budget hub (`/explorer`).** Breadcrumb, serif H1 `საქართველოს ბიუჯეტი`, the two-sentence lead `Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ ფაქტობრივ მონაცემებს. შეადარეთ წლები, სფეროები და მუნიციპალიტეტები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.`, then five cards in a two-column grid (one column below 768px, max-width 860px), then the standard source note (§7.10). Card anatomy, in order: mono index in accent with `→` right-aligned, serif 18px title, 11.5px `muted` description, graphic, mono 10px `faint` footer.
 
 | # | Card | Graphic | Footer | Links to |
 |---|------|---------|--------|----------|
@@ -388,8 +391,9 @@ The crumbs carry `BreadcrumbTrail`'s semantics, not its markup: a `<nav aria-lab
 | 02 | `შემოსავლები` | total revenue series, same at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/revenue` |
 | 03 | `მუნიციპალიტეტები` | total municipal series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/municipalities` |
 | 04 | `ანალიზი` | none | `{latestYear} · {n} კატეგორია` | `/explorer/analysis` |
+| 05 | `ვალი` | total Government Debt stock series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/debt` |
 
-All three sparklines are `ink` because each traces a **total** (a side total for cards 01/02, the municipal total for card 03), and §4.2 gives every `*.total` series `ink`. `accent` is not free chrome here: `#B3402A` is the token of `spending.social_protection` and `revenue.vat`, so an accent total would draw one quantity in another category's color.
+All four sparklines are `ink` because each traces a **total** (a side total for cards 01/02, the municipal total for card 03, and Government Debt stock for card 05), and §4.2 gives every `*.total` series `ink`. `accent` is not free chrome here: `#B3402A` is the token of `spending.social_protection` and `revenue.vat`, so an accent total would draw one quantity in another category's color.
 
 Every figure on the hub — series, footers and card 03's description counts alike — is computed at build time from the same served facts the section pages use, so the hub cannot drift from the pages behind it. Nothing on it is hardcoded.
 
@@ -399,11 +403,11 @@ Specs below are contracts; visual proof lives in the reference files.
 
 ### 7.1 Header / Nav
 
-The public-site header appears on the landing page (§19), the methodology hub, and every live dataset methodology route. Surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs. The landing and methodology surfaces use one shared component.
+The public-site header appears on the landing page (§19), `/about` (§23), the methodology hub, and every live dataset methodology route. Surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs. The landing, mission, and methodology surfaces use one shared component.
 
 The brand link uses the reviewed full v2.0 horizontal lockup at 280px from 768px upward and the compact lockup below 768px. The full horizontal lockup must not render below 280px; the standalone mark must not render below 24px. The supplied token JSON's 180px lockup value is not authoritative for production.
 
-Vertically centered logo row: lockup left, nav tabs center, mono loaded-coverage context label right; `2px ink` bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` bottom border touching the header rule; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
+Vertically centered logo row: lockup left, nav tabs center, mono loaded-coverage context label right; no bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` text underline with a `5px` offset; inactive = muted, weight 500. The landing page marks `მთავარი` active. `/about` marks `მიზანი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` nor `მიზანი` active and render no `aria-current`, because methodology remains inactive as a separate destination; no methodology tab is added.
 
 ### 7.2a Mode Control
 
@@ -550,7 +554,13 @@ Data-reality rules (the prototype's snapshot had none of these; production data 
 
 National columns: `<first col> | years… | ცვლილება | წილი მშპ-ში <end-year>`. First column header by scope: `სფერო` (fields), `უწყება` (ministries), `საბიუჯეტო მუხლი` (revenue). Header: overline style, `2px ink` bottom rule. Rows: 1px `hairline-soft` borders, tint hover; swatch bar + sans label left; numerals mono right-aligned; latest-year column weight 600; change colored positive/negative (minus sign `−`). When selected, the national dataset total row uses its exact scope label (`მთლიანი ხარჯი` or `მთლიანი შემოსავლები`) with a `2px ink` top rule, weight 600, and its calculated GDP share rather than `100.0%`; it is absent when deselected. Municipal tables retain `წილი <end-year>` and the selected `მთლიანი ბიუჯეტი` row at `100.0%`. Horizontal scroll with sticky first column and sticky right change/share columns (paper bg, 1px `hairline-soft` edge shadows).
 
-### 8.5 Below-Chart Sections (`ძირითადი ინდიკატორები`, order fixed)
+### 8.5 Government Debt — approved Variant D
+
+`/explorer/debt` reuses the explorer shell with exactly one chart or table and no dashboard cards or separate metric routes. Its right panel is one expanded hierarchy: `მთლიანი ვალი` with `საშინაო ვალი` and `საგარეო ვალი`; `ვალის გადახდა` with `ძირი თანხა` and `პროცენტი`; and `საპროცენტო განაკვეთი` with `საშინაო განაკვეთი` and `საგარეო განაკვეთი`. The three parents are real selectable series. The default is line mode, nominal GEL, full 2013–2025 stock coverage, and only `მთლიანი ვალი` selected. Same-family selections can be combined; choosing another family clears the old selection and resets to that family's full coverage.
+
+Stock can optionally use `% მშპ-ში`; service stays in GEL and rates use percent. Exact rate gaps render as `—` and are never interpolated or replaced with zero. Service may extend past actual 2025 values with a dashed 2026–2030 segment, a visible `პროგნოზი` boundary, and the statement that it covers only the portfolio outstanding on 2025-12-31, not a full future-budget forecast. The Excel action exports the active family, selection, range, and measure through the standard three-sheet workbook. For rates the GEL amount cell is blank and the percentage column carries the value; forecast service rows use status `პროგნოზი`.
+
+### 8.6 Below-Chart Sections (`ძირითადი ინდიკატორები`, order fixed)
 
 When the selected range covers a single year (`start === end`, reachable through
 the rail handles or a `#r=YYYY-YYYY` hash), the **delta-derived blocks stand
@@ -694,7 +704,7 @@ The sidebar's width transition runs at `base` and is gated on `prefers-reduced-m
 
 Every analytical view exposes: active side, view, year/period, unit, measure, source note. Planned years get the `გეგმა` tag near the year context and a subtle marker in charts. When planned and actual both exist, actual wins in UI and the Excel workbook.
 
-Each workbook has exactly three visible sheets, in order: `მარტივი ცხრილი`, `მონაცემები`, and `წყაროები`. `მარტივი ცხრილი` opens first and places its category-by-year table directly on row 3; its top title band is cream with dark text, while the table header remains ink with paper text. Year headings and numeric values are right-aligned, with the first column and header rows frozen. `მონაცემები` is a filterable row-based table with the exact Georgian headers `წელი`, `მთავარი ჯგუფი`, `კატეგორია`, `თანხა (₾)`, and `სტატუსი`; `% მშპ-ში` may add `მშპ-ის წილი (%)`. It contains no internal IDs, repository paths, English labels, review dates, hashes, or source metadata columns. `წყაროები` contains the relevant validated public-archive originals with compressed year ranges, source organization, retrieval date, and a clean `ფაილის ჩამოტვირთვა` hyperlink label; raw URLs do not occupy visible cells. The filename is `fiscal-{scope}-{startYear}-{endYear}.xlsx`. Methodology manifest CSVs remain archive-integrity artifacts and are unchanged.
+Each workbook has exactly three visible sheets, in order: `მარტივი ცხრილი`, `მონაცემები`, and `წყაროები`. `მარტივი ცხრილი` opens first and places its category-by-year table directly on row 3; its top title band is cream with dark text, while the table header remains ink with paper text. Year headings and numeric values are right-aligned, with the first column and header rows frozen. `მონაცემები` is a filterable row-based table with the exact Georgian headers `წელი`, `მთავარი ჯგუფი`, `კატეგორია`, `თანხა (₾)`, and `სტატუსი`; `% მშპ-ში` may add `მშპ-ის წილი (%)`. The Debt-rate exception adds `საპროცენტო განაკვეთი (%)` and leaves `თანხა (₾)` blank because a portfolio rate is not a GEL amount. It contains no internal IDs, repository paths, English labels, review dates, hashes, or source metadata columns. `წყაროები` contains the relevant validated public-archive originals with family-and-year-specific compressed periods, source organization, retrieval date, and a clean `ფაილის ჩამოტვირთვა` hyperlink label; raw URLs do not occupy visible cells. The filename is `fiscal-{scope}-{startYear}-{endYear}.xlsx`. Methodology manifest CSVs remain archive-integrity artifacts and are unchanged.
 
 ## 16. Implementation Tokens
 
@@ -738,7 +748,7 @@ Do:
 
 Do not:
 
-- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only). The single card exception is the budget hub's four cards (§6.6); it does not generalize.
+- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only). The single card exception is the budget hub's five cards (§6.6); it does not generalize.
 - No white surfaces; no gradients anywhere.
 - No blue `#0071e3` or any v3.x Apple token; no night theme or theme toggle.
 - No dots/rounded-square swatches — bars only.
@@ -750,7 +760,7 @@ Do not:
 
 ## 18. Design QA Checklist
 
-1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only; the budget hub's four cards are the one card exception, §6.6).
+1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only; the budget hub's five cards are the one card exception, §6.6).
 2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), not in-page nav tabs.
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
 4. Explorer default: line mode, nominal GEL, full range, total-only selection, and unrestricted line rendering.
@@ -774,13 +784,13 @@ Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implem
 
 Section order is fixed: shared header → living-relief hero → country figures → expenditure → revenue → municipalities → methodology and first sources → retained footer.
 
-**Header and hero.** The header uses the responsive lockups of §7.1, keeps `მთავარი` as the active page and `მონაცემები` → `/explorer`, and shows the mono revenue year range in its right slot above mobile. The living-relief map remains the full-bleed primary visual with its existing geometry, camera fitting, city behavior, reduced-motion still frame, accessible description, and WebGL fallback. The hero receives no additional logo. Visible hero copy is exactly `საქართველოს მონაცემების პორტალი`, H1 `საქართველო ციფრებში`, and CTA `გაეცანი მონაცემებს` → `#data`. The figure is 330px below 768px, 500px from 768px, and `clamp(560px, 78vh, 820px)` from 1100px.
+**Header and hero.** The header uses the responsive lockups of §7.1, keeps `მთავარი` as the active page and `მონაცემები` → `/explorer`, and shows the mono revenue year range in its right slot above mobile. The living-relief map remains the full-bleed primary visual with its existing camera fitting, city behavior, reduced-motion still frame, accessible description, and WebGL fallback. Below 768px it is a static-only, reduced-motion capture selected for narrow, medium, or wide mobile widths; mobile must not request or mount the Three.js runtime. From 768px the existing WebGL relief remains interactive, retains 8.6px terrain spacing and the 2× renderer-density cap, and begins after `load` during browser idle time with a 1.5-second timeout. The hero receives no additional logo. Visible hero copy is exactly `საქართველოს მონაცემების პორტალი`, H1 `საქართველო ციფრებში`, and CTA `გაეცანი მონაცემებს` → `#data`. The figure reserves the compact, settled map band from first paint: `calc(29vw + 48px)` below 768px, `calc(22.7vw + 57px)` from 768px, and the camera-fit bounds in `.landing-hero-frame` from 1100px. The existing virtual camera frames (340px, 500px, and `clamp(560px, 78vh, 820px)`) still determine the map's scale and crop. The static mobile image or desktop canvas receives that exact height; initialization must not resize the outer figure or move the country figures below it. At standard text sizes, keep the reserved band within 10px of the rendered visual at the tested responsive sizes, without clipping the map or adding a large blank area. From 768px, copy and figure share a grid row: the copy stays at its existing top/right alignment, and its intrinsic height plus 24px of clearance can enlarge the row for text-only zoom without overlapping the country figures.
 
 **Brand metadata.** Organization structured data uses the reviewed mark at `/fiscal-ge-logo.svg` with its intrinsic 520×650 dimensions. App Router owns `favicon.ico`, `icon.svg`, and `apple-icon.png`. The generated 1200×630 social image combines the horizontal lockup with the reversed mark; it is the site sharing image, not a hero asset.
 
 **Country figures.** Three maintained snapshots remain in one row: `მოსახლეობა` — `3.9 მლნ`, `2026 წლის 1 იანვარი · საქსტატი`; `ფართობი` — `69.7 ათ. კმ²`, `საქართველოს ტერიტორია`; `ეკონომიკის ზომა` — `104.6 მლრდ ₾`, `ნომინალური მშპ · 2025, წინასწარი`. A narrow mobile caption may shorten visually, but assistive technology retains the full caption.
 
-**Annual data ledger.** `#data` retains its strong top rule but has no annual masthead, shared-year label, or reserved masthead spacing: section `01` begins immediately below the rule. Each of the three repeated ledger sections contains, in order: decorative index; dataset overline; question-led H2; concise latest-year description; real explorer link; an applicable total between two strong ink rules; latest year and truthful actual/planned/mixed status; and a semantic table of exactly four latest-year rows with amount and share. The first dataset section has no ordinary top border, avoiding a doubled rule; later dataset sections retain their hairline top borders. There is no post-hero graphic, chart, map, canvas, SVG data visualization, prior-year comparison, change callout, old three-path card, About block, Excel preview, or separate methodology promotion.
+**Annual data ledger.** `#data` has no top rule, annual masthead, shared-year label, or reserved masthead spacing. Each of the three repeated ledger sections contains, in order: decorative index; dataset overline; question-led H2; concise latest-year description; real explorer link; an applicable total between two strong ink rules; latest year and truthful actual/planned/mixed status; and a semantic table of exactly four latest-year rows with amount and share. The first dataset section has no ordinary top border, avoiding a doubled rule; later dataset sections retain their hairline top borders. There is no post-hero graphic, chart, map, canvas, SVG data visualization, prior-year comparison, change callout, old three-path card, About block, Excel preview, or separate methodology promotion.
 
 The exact dataset contracts are:
 
@@ -792,9 +802,9 @@ National sections apply actual-over-planned selection before deriving the latest
 
 **Methodology and footer.** The single fourth ledger section is index `04`, H2 `მეთოდოლოგია და პირველწყაროები`, the introduction `თითოეული რიცხვი უკავშირდება ოფიციალურ წყაროს, კლასიფიკაციის წესსა და გადამოწმების შედეგს.`, and four steps: official-document preservation; classification and transformation rule; reconciliation and quality check; downloadable data. `მეთოდოლოგიის ნახვა →` links to `/methodology`. The retained footer follows immediately with its approximately 150px compact lockup and unchanged contact, navigation, source/update, and CC BY 4.0 trust information.
 
-**Responsive contract.** At ≥850px, each ledger reads index → copy → data in three columns and the three tables align. Below 850px, each ledger and the methodology section stack in DOM order; total and year remain on one row where space permits; the three country figures remain one compact row; tables stay inside their parent without horizontal scrolling. At ≤380px, side padding and type scale tighten, country-stat units become block-level, and a 320px viewport must have `scrollWidth === clientWidth`.
+**Responsive contract.** At ≥850px, each ledger reads index → copy → data in three columns and the three tables align. Below 850px, each ledger and the methodology section stack in DOM order; total and year remain on one row where space permits; the three country figures remain one compact row; tables stay inside their parent without horizontal scrolling. Below 768px, each country-stat unit occupies the second line of an equal-height value block so font loading cannot move the unit or stagger the captions. At ≤380px, side padding and type scale tighten, country-stat labels reserve two lines, and a 320px viewport must have `scrollWidth === clientWidth`.
 
-Landing QA: verify exact copy, metadata, destination links, ordered H2s, data-derived total/year/status and four rows for each dataset; verify hero canvas or fallback; verify the absence of old paths/About/promo and all post-hero SVG/canvas graphics; at desktop, 390px, and 320px verify one-row figures, strong total rules, consistent ledger rhythm, semantic tables, unit wrap, table containment, and zero document overflow.
+Landing QA: verify exact copy, metadata, destination links, ordered H2s, data-derived total/year/status and four rows for each dataset; verify a static-only hero with no WebGL request below 768px and one canvas or fallback from 768px; verify the absence of old paths/About/promo and all post-hero SVG/canvas graphics; at desktop, 390px, and 320px verify one-row figures, strong total rules, consistent ledger rhythm, semantic tables, unit wrap, table containment, and zero document overflow.
 
 ## 20. Municipal Surfaces
 
@@ -824,26 +834,38 @@ The Georgia page's total and function rows are dedicated `country.georgia` facts
 
 Approved visual and behavioral specification: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`. Approved preview: `design-shotgun/methodology-portal-2026-08-11/variant-d.html` (Editorial Fieldbook).
 
-The public structure is `/methodology` plus live category pages for expenditure, revenue, and municipalities. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
+The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, and Government Debt. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
 
 Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only.
 
-The approved public visibility is dataset-specific: expenditure hides its historical-decision group; revenue hides its validation group, technical appendix, and later classification, validation, and limitations sections; municipalities hide the full decision record, appendix, and later classification, validation, and limitations sections. Archive tables visibly show `Year | Original source/file | Format | Size | Download`.
+The approved public visibility is dataset-specific: expenditure hides its historical-decision group; revenue hides its validation group, technical appendix, and later classification, validation, and limitations sections; municipalities hide the full decision record, appendix, and later classification, validation, and limitations sections; Government Debt uses only concise scope, source, limitation, and archive sections. Archive tables visibly show `Year | Original source/file | Format | Size | Download`.
 
 ## 22. Not-found Recovery
 
 Unknown HTML routes retain their HTTP 404 status and use a minimal editorial recovery surface. It uses the existing paper, ink, body, muted, tint, and accent-focus tokens: a compact Fiscal.ge identifier, one Georgian H1, a short explanation, and ordinary visible links to the homepage, explorer, methodology, sitemap, and agent guide. It does not load data, reuse the application shell, add an illustration, or introduce a separate visual system.
 
-## 23. Connection Page (`/connect`)
+## 23. Mission Surface (მიზანი)
 
-The one human-facing surface for the read-only MCP connection. Every other agent-facing surface (`llms.txt`, the JSON publications, the endpoint itself) is machine-facing; this page is the entire discovery funnel, and it is written for a non-technical journalist rather than for a developer.
+`/about` remains the canonical URL for the mission page. Its shared header links are `მთავარი`, `მონაცემები`, and `მიზანი`; only `მიზანი` is active on `/about`, while methodology remains inactive. The page renders no visible breadcrumb.
 
-No new visual direction, chart type, or interaction pattern. It reuses the `/about` composition exactly: `SiteHeader` with the loaded-coverage label, `BreadcrumbTrail` (`მთავარი / AI-კავშირი`), a `2px ink` top rule under the serif H1, then rule-separated sections at the established `border-t border-[var(--ink)] pt-5` rhythm, and `SiteFooter`.
+The cover is an ink block with a paper title, terracotta `01`, `FISCAL.GE / OPEN DATA`, and a data-derived review year plus `MISSION NOTE`. The copy is one continuous four-paragraph article. The final strong sentence alone carries the terracotta left rule.
 
-Sections, in fixed order: the endpoint with a copy control; per-application connection steps; example questions in Georgian; the coverage statement; and a pointer to the bulk files for people who do not want an AI connection at all.
+The shared footer remains unchanged apart from the visible navigation label, which is `მიზანი` for the `/about` link. The page has no horizontal overflow at the documented mobile breakpoints.
 
-**The copy control is the page's only interactive element.** A mono, 1px-`control`-bordered button at the established minimum target size, with an accessible Georgian name that changes to a confirmation on success. The endpoint is *also* rendered as selectable mono text beside it, so the address is obtainable when the clipboard API is unavailable or refused — the button is a convenience, never the only route to it.
+## 24. Connection Page (`/connect`)
 
-**The coverage statement carries both halves.** What is served, with year ranges derived from the same catalogue the endpoint answers from (§2.1 — never hardcoded), and what is *not*: quarterly and monthly data, public debt, individual capital projects and procurement, and the current year's live execution. The second half is not optional politeness. Without it a visitor asks for quarterly data, receives nothing, and concludes the service is broken; the page says plainly that the assistant will report missing data rather than invent it.
+The one human-facing surface for the read-only MCP connection. Every other agent-facing surface (`llms.txt`, the JSON publications, the endpoint itself) is machine-facing; this page is the entire discovery funnel. It is written for someone who already uses an AI assistant and wants the address in it, not for a developer reading a spec.
+
+No new visual direction, chart type, or interaction pattern. It reuses the established composition: `SiteHeader` with the loaded-coverage label, `BreadcrumbTrail` (`მთავარი / AI-კავშირი`), a `2px ink` top rule under the serif H1 with a single-sentence deck, then rule-separated sections at the `border-t border-[var(--ink)] pt-5` rhythm, and `SiteFooter`.
+
+**The page is ordered by weight, not as equal blocks: anchor, act, check, fine print.**
+
+1. **The address** is the anchor and the only element on a `--tint` panel. Mono, 16px rising to 21px, with the copy control beside it and the conditions of use as short labels beneath (free; no authorization). It is the one thing the page exists to hand over, so nothing above it competes.
+2. **Connection steps** name the applications actually verified and give their real menu paths as numbered lists, with a one-line qualifier under each name. Prose describing a menu path reads worse than the path itself. A closing note covers every other client generically.
+3. **Asking without connecting** gives one copyable Georgian prompt, quoted and bold on a `--tint` block with its own copy control, and states plainly what this route does not provide — per-figure sources and caveats.
+4. **The coverage statement** carries both halves: what is served, with year ranges derived from the same catalogue the endpoint answers from (§2.1 — never hardcoded), and what is not. The second half is not optional politeness. Without it a visitor asks for out-of-scope data, receives nothing, and concludes the service is broken.
+5. **Technical details** are 12px `--muted` fine print above the footer, on a hairline rule rather than an ink one. Read-only status, protocol, revision and transport live here, where they inform without implying the page is for developers.
+
+**Copy controls are conveniences, never the only route.** Both the address and the prompt are rendered as selectable text beside their buttons, so each is obtainable when the clipboard API is unavailable or refused. Each button carries an accessible Georgian name that changes to a confirmation on success, announced through a live region.
 
 Discovery is the site-footer navigation list, which every `/explorer` route and both editorial pages already render (§6.7). `/connect` also enters `sitemap.xml` and `llms.txt`.

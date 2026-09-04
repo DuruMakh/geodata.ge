@@ -346,5 +346,12 @@
     "municipalityPathCount": 60,
     "cityMarkerCount": 5,
     "occupiedOverlayCount": 2
+  },
+  "generatedSvgAsset": {
+    "file": "apps/web/assets/municipality-map-definitions.svg",
+    "bytes": 236747,
+    "sha256": "CBA2090835DE5BE77BCB78DC734C379821923D8584CAC7DDB28C40C691E721CF",
+    "municipalityPathCount": 60,
+    "occupiedOverlayCount": 2
   }
 }

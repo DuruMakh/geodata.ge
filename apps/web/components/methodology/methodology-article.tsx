@@ -71,8 +71,11 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
           სრული დამუშავებული მონაცემები — CSV
         </a>
         <p className="mt-2 text-[11.5px] leading-relaxed text-[var(--muted)]">
-          UTF-8 / Excel თავსებადი · CC BY 4.0 · წყაროსა და ფაქტი/გეგმის მეტამონაცემებით
+          UTF-8 / Excel თავსებადი · CC BY 4.0 · წყაროსა და სტატუსის მეტამონაცემებით
         </p>
+        {/* A dataset with no JSON publication would otherwise render this
+            as a bare " - JSON: ..." trailer with nothing before the dash. */}
+        {processedDataJsonLinks.length > 0 ? (
         <p data-testid="processed-dataset-json" className="mt-3 text-[11.5px] leading-relaxed text-[var(--muted)]">
           {processedDataJsonLinks.map((link, index) => (
             <span key={link.href}>
@@ -88,6 +91,7 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
           ))}
           {" — JSON: წყაროებით, დათქმებითა და დაფარვით"}
         </p>
+        ) : null}
       </div>
 
       <aside

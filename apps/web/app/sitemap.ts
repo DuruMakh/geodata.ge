@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { loadServedLandingData, loadServedMunicipalData } from "../lib/data/servedData";
+import { loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../lib/data/servedData";
 import { ADJARA_REGION_ID } from "../lib/data/municipal/types";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../lib/methodology/catalog";
 import {
@@ -10,11 +10,11 @@ import {
 } from "../lib/explorer/municipalData";
 import { MUNICIPALITY_ROUTES } from "../lib/explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../lib/siteUrl";
+import { DEBT_EXPLORER_PATH } from "../lib/seo/internalLinks";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
-  const { sourceDocuments } = await loadServedLandingData();
-  const {
+  const [{ sourceDocuments }, {
     regions,
     municipalities,
     functionFacts,
@@ -22,7 +22,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  } = await loadServedMunicipalData();
+  }, { facts: debtFacts }] = await Promise.all([
+    loadServedLandingData(),
+    loadServedMunicipalData(),
+    loadServedGovernmentDebtData(),
+  ]);
   const lastReviewedAt = sourceDocuments
     .map((source) => source.lastReviewedAt)
     .sort()
@@ -62,6 +66,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
     { url: `${siteUrl}/explorer/revenue`, lastModified },
     { url: `${siteUrl}/explorer/analysis`, lastModified },
+    {
+      url: `${siteUrl}${DEBT_EXPLORER_PATH}`,
+      lastModified: debtFacts.length > 0
+        ? new Date(debtFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!)
+        : undefined,
+    },
     {
       url: `${siteUrl}/explorer/municipalities`,
       lastModified: reviewedAt(functionFacts, [...totalFacts, ...countryTotalFacts]),

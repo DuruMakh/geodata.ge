@@ -1,22 +1,9 @@
-import localFont from "next/font/local";
 import Link from "next/link";
 import type { LandingModel } from "../../lib/landing/landingData";
 import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
 import { HeroReliefLazy } from "./hero-relief-lazy";
 import { LandingDatasetSection } from "./landing-dataset-section";
-
-// Hero display face, used by the landing H1 alone. Declared here rather than in
-// the root layout so only this route preloads it. The Mkhedruli codepoints carry
-// Mtavruli glyphs, so the heading renders as caps while the DOM text — and with
-// it search indexing and screen readers — stays Mkhedruli.
-const heroDisplay = localFont({
-  src: "../../assets/fonts/EurostileGEOMt-Demi.ttf",
-  weight: "600",
-  style: "normal",
-  display: "swap",
-  fallback: ["Noto Serif Georgian", "serif"],
-});
 
 // Country snapshots are maintained by hand; every budget value below them is
 // derived from the same active facts as the matching explorer.
@@ -66,16 +53,16 @@ export function LandingPage({ model }: { model: LandingModel }) {
       <div className="mx-auto max-w-[1240px]">
         <SiteHeader active="home" yearsLabel={model.yearsLabel} testId="landing-header" />
 
-        <section className="relative">
+        <section className="relative min-[768px]:grid min-[768px]:grid-cols-1">
           <div
             data-hero-copy
-            className="pb-[18px] pt-7 min-[768px]:pointer-events-none min-[768px]:absolute min-[768px]:right-0 min-[768px]:top-[42px] min-[768px]:z-10 min-[768px]:flex min-[768px]:w-[340px] min-[768px]:flex-col min-[768px]:items-end min-[768px]:p-0 min-[768px]:text-right min-[1100px]:w-[470px]"
+            className="pb-[18px] pt-7 min-[768px]:pointer-events-none min-[768px]:col-start-1 min-[768px]:row-start-1 min-[768px]:z-10 min-[768px]:mb-6 min-[768px]:mt-[42px] min-[768px]:flex min-[768px]:w-[340px] min-[768px]:flex-col min-[768px]:items-end min-[768px]:self-start min-[768px]:justify-self-end min-[768px]:p-0 min-[768px]:text-right min-[1100px]:w-[470px]"
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[11px]">
               საქართველოს მონაცემების პორტალი
             </p>
             <h1
-              className={`mt-2.5 text-pretty text-[33px] font-semibold leading-[1.12] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-[30px] min-[1100px]:text-[40px] ${heroDisplay.className}`}
+              className="hero-display mt-2.5 text-pretty text-[33px] font-semibold leading-[1.12] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-[30px] min-[1100px]:text-[40px]"
             >
               საქართველო ციფრებში
             </h1>
@@ -92,7 +79,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
           <figure
             role="img"
             aria-label={HERO_ARIA_LABEL}
-            className="relative m-0 ml-[calc(50%-50vw)] h-[330px] w-screen min-w-0 overflow-hidden p-0 min-[768px]:h-[500px] min-[1100px]:h-[clamp(560px,78vh,820px)]"
+            className="landing-hero-frame relative m-0 ml-[calc(50%-50vw)] w-screen min-w-0 overflow-hidden p-0 min-[768px]:col-start-1 min-[768px]:row-start-1"
           >
             <HeroReliefLazy />
           </figure>
@@ -104,14 +91,14 @@ export function LandingPage({ model }: { model: LandingModel }) {
         >
           {KEY_NUMBERS.map((entry) => (
             <div key={entry.label} data-country-stat className="min-w-0">
-              <div className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] min-[768px]:text-[11px] min-[768px]:tracking-[0.08em]">
+              <div className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] max-[380px]:min-h-[27px] min-[768px]:text-[11px] min-[768px]:tracking-[0.08em]">
                 {entry.label}
               </div>
-              <div className="mt-2 font-[family-name:var(--font-display)] text-[clamp(22px,7vw,46px)] font-semibold leading-[1.05] tracking-[-0.02em]">
+              <div className="mt-2 min-h-[58px] font-[family-name:var(--font-display)] text-[clamp(22px,7vw,46px)] font-semibold leading-[1.05] tracking-[-0.02em] min-[768px]:min-h-0">
                 {entry.value}{" "}
                 <span
                   data-testid={entry.unitTestId}
-                  className="text-[clamp(11px,3vw,25px)] max-[380px]:mt-1 max-[380px]:block"
+                  className="mt-1 block text-[clamp(11px,3vw,25px)] min-[768px]:mt-0 min-[768px]:inline"
                 >
                   {entry.unit}
                 </span>
@@ -127,7 +114,7 @@ export function LandingPage({ model }: { model: LandingModel }) {
           ))}
         </section>
 
-        <div id="data" data-testid="landing-data" className="mt-14 scroll-mt-4 border-t-2 border-[var(--ink)]">
+        <div id="data" data-testid="landing-data" className="mt-14 scroll-mt-4">
           <LandingDatasetSection
             kind="expenditure"
             index="01"

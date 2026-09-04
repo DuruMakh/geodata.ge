@@ -1,0 +1,3 @@
+﻿methodology_note_id,effective_date,affected_dataset,affected_scope,note_ka,note_en,source_id
+government-domestic-2019-budget-organizations,2019-01-01,stock|actual_service,domestic,2019 წლიდან მთავრობის საშინაო ვალი დამატებით მოიცავს საბიუჯეტო ორგანიზაციების სესხის სახით არსებულ ვალს.,"From 2019, domestic Government Debt additionally includes loan debt owed by budgetary organizations.",mof_public_debt_bulletin_n25
+government-domestic-2022-general-government-soes,2022-12-31,stock|actual_service,domestic,2022 წლის დეკემბრიდან გათვალისწინებულია სამთავრობო სექტორის სახელმწიფო საწარმოების სესხის სახით არსებული ვალიც.,"From December 2022, domestic Government Debt also includes loan debt of state-owned enterprises classified in general government.",mof_public_debt_bulletin_n25

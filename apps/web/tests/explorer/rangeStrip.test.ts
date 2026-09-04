@@ -33,3 +33,31 @@ describe("range strip quick chips", () => {
     expect(chipLabels([2023, 2024, 2025])).toEqual(["ყველა"]);
   });
 });
+
+describe("range strip markers", () => {
+  it("renders an optional labelled marker at the supplied year", () => {
+    const markup = renderToStaticMarkup(
+      createElement(RangeStrip, {
+        years: [2023, 2024, 2025, 2026, 2027],
+        range: { start: 2023, end: 2027, min: 2023, max: 2027 },
+        onChange: () => {},
+        marker: { year: 2026, label: "პროგნოზი" },
+      }),
+    );
+
+    expect(markup).toContain('data-testid="range-marker"');
+    expect(markup).toContain("პროგნოზი");
+  });
+
+  it("does not render a marker when none is supplied", () => {
+    const markup = renderToStaticMarkup(
+      createElement(RangeStrip, {
+        years: [2023, 2024, 2025],
+        range: { start: 2023, end: 2025, min: 2023, max: 2025 },
+        onChange: () => {},
+      }),
+    );
+
+    expect(markup).not.toContain('data-testid="range-marker"');
+  });
+});

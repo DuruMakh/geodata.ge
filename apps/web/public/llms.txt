@@ -38,5 +38,5 @@ The endpoint is `https://fiscal.ge/mcp`, MCP Streamable HTTP, protocol revision 
 
 ## Site navigation
 
-- [About Fiscal.ge](https://fiscal.ge/about) — the site's purpose and public-data boundaries.
+- [Mission — Fiscal.ge](https://fiscal.ge/about) — the site's purpose and public-data boundaries.
 - [Sitemap](https://fiscal.ge/sitemap.xml) — the machine-readable list of public HTML pages.

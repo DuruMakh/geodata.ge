@@ -1,14 +1,14 @@
 import Link from "next/link";
 
 type SiteHeaderProps = {
-  active?: "home" | "explorer";
+  active?: "home" | "explorer" | "mission";
   yearsLabel: string;
   testId: string;
 };
 
 function navLinkClass(isActive: boolean) {
   return isActive
-    ? "relative flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-semibold text-[var(--ink)] after:absolute after:bottom-2 after:left-0 after:right-0 after:h-0.5 after:bg-[var(--accent)]"
+    ? "flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-semibold text-[var(--ink)] underline decoration-2 decoration-[var(--accent)] underline-offset-[5px]"
     : "flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-medium text-[var(--muted)] transition-colors duration-150 hover:text-[var(--ink)]";
 }
 
@@ -16,7 +16,7 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
   return (
     <header
       data-testid={testId}
-      className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b-2 border-[var(--ink)] min-[768px]:gap-5"
+      className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 min-[768px]:gap-5"
     >
       <Link
         href="/"
@@ -35,7 +35,10 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
           />
         </picture>
       </Link>
-      <nav aria-label="ნავიგაცია" className="flex self-stretch gap-4 min-[768px]:gap-[26px]">
+      <nav
+        aria-label="ნავიგაცია"
+        className="order-3 flex w-full basis-full justify-end gap-[18px] self-stretch border-t border-[var(--hairline)] pt-2 min-[768px]:order-none min-[768px]:w-auto min-[768px]:basis-auto min-[768px]:gap-[26px] min-[768px]:border-t-0 min-[768px]:pt-0"
+      >
         <Link
           href="/"
           aria-current={active === "home" ? "page" : undefined}
@@ -49,6 +52,13 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
           className={navLinkClass(active === "explorer")}
         >
           მონაცემები
+        </Link>
+        <Link
+          href="/about"
+          aria-current={active === "mission" ? "page" : undefined}
+          className={navLinkClass(active === "mission")}
+        >
+          მიზანი
         </Link>
       </nav>
       <span className="hidden self-stretch items-center pb-3.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)] min-[768px]:flex">

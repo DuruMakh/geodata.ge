@@ -83,7 +83,7 @@ export function MethodologyHub({
               className="flex items-center justify-between gap-4 border-b border-[var(--hairline-soft)] py-4 text-[13.5px] text-[var(--muted)]"
             >
               <span>{entry.titleKa}</span>
-              <ComingSoonBadge />
+              <ComingSoonBadge surface="paper" />
             </div>
           ))}
         </div>

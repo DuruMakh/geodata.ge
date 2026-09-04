@@ -28,6 +28,29 @@
   --font-sans: var(--font-ui);
 }
 
+@font-face {
+  font-family: "heroDisplay";
+  src: url("../assets/fonts/EurostileGEOMt-Demi.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "heroDisplay Fallback";
+  src: local(Arial);
+  ascent-override: 54.1%;
+  descent-override: 18.03%;
+  line-gap-override: 14.43%;
+  size-adjust: 138.64%;
+}
+
+.hero-display {
+  font-family: heroDisplay, "heroDisplay Fallback", "Noto Serif Georgian", serif;
+  font-style: normal;
+  font-weight: 600;
+}
+
 * {
   box-sizing: border-box;
   scrollbar-width: thin;
@@ -117,5 +140,30 @@ summary:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   [data-testid="data-sidebar"] {
     transition: none;
+  }
+}
+
+/* Reserve the relief's cropped band before its scene loads. These bounds follow
+   the existing camera presets; the shared grid row can grow for enlarged text. */
+.landing-hero-frame {
+  min-height: calc(29vw + 48px);
+}
+
+@media (min-width: 768px) {
+  .landing-hero-frame {
+    min-height: calc(22.7vw + 57px);
+  }
+}
+
+@media (min-width: 1100px) {
+  .landing-hero-frame {
+    --hero-reference-height: clamp(560px, 78vh, 820px);
+    min-height: min(
+      var(--hero-reference-height),
+      calc(22.353vw + var(--hero-reference-height) * 0.0297 + 34px),
+      calc(20.023vw + var(--hero-reference-height) * 0.08155 + 36px),
+      calc(2.2vw + var(--hero-reference-height) * 0.74263 + 44px),
+      calc(var(--hero-reference-height) * 0.83566 + 38px)
+    );
   }
 }

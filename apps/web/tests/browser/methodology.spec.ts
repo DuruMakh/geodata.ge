@@ -1,7 +1,30 @@
 import { expect, test, type Locator } from "@playwright/test";
 import { createHash } from "node:crypto";
+import { expectReadableText } from "./color-contrast";
+import { TEST_BASE_URL } from "./test-base-url";
 
-const TEST_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
+  test(`coming-soon badges are readable on paper and ink at ${viewport.width}px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto(`${TEST_BASE_URL}/methodology`);
+    const badges = page.getByTestId("methodology-future-row").getByText("მალე", { exact: true });
+    await expect(badges).toHaveCount(4);
+    for (const badge of await badges.all()) {
+      await expectReadableText(badge, page.locator("body"));
+    }
+
+    if (viewport.width >= 900) {
+      await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
+      const sidebar = page.getByTestId("data-sidebar");
+      await expect(sidebar).toBeVisible();
+      const inkBadges = sidebar.getByText("მალე", { exact: true });
+      await expect(inkBadges).toHaveCount(4);
+      for (const badge of await inkBadges.all()) {
+        await expectReadableText(badge, sidebar);
+      }
+    }
+  });
+}
 
 async function expectVisibleFocusOutline(locator: Locator) {
   await locator.focus();
@@ -19,14 +42,15 @@ async function expectVisibleFocusOutline(locator: Locator) {
   expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
 }
 
-test("public header keeps landing active and leaves methodology navigation inactive", async ({ page }) => {
+test("public header keeps landing active, exposes mission, and leaves methodology navigation inactive", async ({ page }) => {
   await page.setViewportSize({ width: 1640, height: 900 });
-  await page.goto("http://localhost:3100/");
+  await page.goto(`${TEST_BASE_URL}/`);
   const landingHeader = page.getByTestId("landing-header");
   await expect(landingHeader.getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute(
     "aria-current",
     "page",
   );
+  await expect(landingHeader.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("href", "/about");
   const landingHeaderBox = await landingHeader.boundingBox();
   expect(landingHeaderBox).not.toBeNull();
 
@@ -37,12 +61,18 @@ test("public header keeps landing active and leaves methodology navigation inact
     ["/methodology/municipalities", "methodology-header"],
     ["/about", "about-header"],
   ] as const) {
-    await page.goto(`http://localhost:3100${path}`);
+    await page.goto(`${TEST_BASE_URL}${path}`);
     const header = page.getByTestId(testId);
     await expect(header).toBeVisible();
     await expect(header.getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute("href", "/");
     await expect(header.getByRole("link", { name: "მონაცემები", exact: true })).toHaveAttribute("href", "/explorer");
-    await expect(header.locator("[aria-current]")).toHaveCount(0);
+    await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("href", "/about");
+    if (path === "/about") {
+      await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("aria-current", "page");
+      await expect(header.locator("[aria-current]")).toHaveCount(1);
+    } else {
+      await expect(header.locator("[aria-current]")).toHaveCount(0);
+    }
     await expect(header).toContainText("2004–2025");
 
     const headerBox = await header.boundingBox();
@@ -65,7 +95,7 @@ for (const path of [
   "/explorer/municipalities/region/imereti",
 ] as const) {
   test(`${path} keeps the methodology link in the footer rather than inline`, async ({ page }) => {
-    await page.goto(`http://localhost:3100${path}`);
+    await page.goto(`${TEST_BASE_URL}${path}`);
 
     // The owner's design puts the methodology route in the footer and in the
     // lowest section of the main pages, not on every data surface. Until the
@@ -80,9 +110,9 @@ for (const path of [
 }
 
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
-  await page.goto("http://localhost:3100/methodology");
+  await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
-  await expect(page.getByTestId("methodology-live-row")).toHaveCount(3);
+  await expect(page.getByTestId("methodology-live-row")).toHaveCount(4);
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(4);
   await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
@@ -90,7 +120,7 @@ test("methodology hub separates live datasets from future markers", async ({ pag
 });
 
 test("sitemap publishes exactly the four live methodology routes", async ({ page }) => {
-  await page.goto("http://localhost:3100/methodology");
+  await page.goto(`${TEST_BASE_URL}/methodology`);
   const sitemapXml = await page.evaluate(async () => (await fetch("/sitemap.xml")).text());
   const methodologyUrls = await page.evaluate((xml) => {
     const document = new DOMParser().parseFromString(xml, "application/xml");
@@ -104,6 +134,7 @@ test("sitemap publishes exactly the four live methodology routes", async ({ page
     "/methodology/expenditure",
     "/methodology/revenue",
     "/methodology/municipalities",
+    "/methodology/debt",
   ]);
 });
 
@@ -139,7 +170,7 @@ test("future routes stay on the static 404 surface and out of navigation", async
 
 test("methodology live rows snap off motion when reduced motion is requested", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("http://localhost:3100/methodology");
+  await page.goto(`${TEST_BASE_URL}/methodology`);
 
   const row = page.getByTestId("methodology-live-row").first();
   const arrow = row.locator('[aria-hidden="true"]');
@@ -160,7 +191,7 @@ test("methodology live rows snap off motion when reduced motion is requested", a
 });
 
 test("expenditure methodology exposes the complete layered article", async ({ page }) => {
-  await page.goto("http://localhost:3100/methodology/expenditure");
+  await page.goto(`${TEST_BASE_URL}/methodology/expenditure`);
 
   await expect(page.getByRole("heading", { level: 1 })).toContainText("ხარჯები");
   await expect(page.getByTestId("methodology-disclosure")).toContainText("Fiscal.ge");
@@ -179,9 +210,9 @@ test("expenditure methodology exposes the complete layered article", async ({ pa
   await expect(page.locator("#source-archive")).toBeInViewport();
 });
 
-for (const dataset of ["expenditure", "revenue", "municipalities"] as const) {
+for (const dataset of ["expenditure", "revenue", "municipalities", "debt"] as const) {
   test(`${dataset} methodology article is followed by the shared footer`, async ({ page }) => {
-    await page.goto(`http://localhost:3100/methodology/${dataset}`);
+    await page.goto(`${TEST_BASE_URL}/methodology/${dataset}`);
 
     const footer = page.getByTestId("site-footer");
     await expect(footer).toBeVisible();
@@ -214,7 +245,7 @@ test("regular content pages do not repeat the methodology promotion", async ({ p
     "/explorer/municipalities/georgia",
     "/about",
   ]) {
-    await page.goto(`http://localhost:3100${path}`);
+    await page.goto(`${TEST_BASE_URL}${path}`);
     await expect(page.getByTestId("seo-introduction")).toHaveCount(0);
     await expect(page.getByRole("link", { name: "მეთოდოლოგია და პირველწყაროები", exact: true })).toHaveCount(0);
   }
@@ -226,7 +257,7 @@ test("source archives describe the full coverage and selected year without expos
     ["revenue", "შემოსავლების მეთოდოლოგია", "2004–2025"],
     ["municipalities", "მუნიციპალიტეტების მეთოდოლოგია", "2015–2025"],
   ] as const) {
-    await page.goto(`http://localhost:3100/methodology/${dataset}#source-archive`);
+    await page.goto(`${TEST_BASE_URL}/methodology/${dataset}#source-archive`);
     const archive = page.getByTestId("source-archive");
     const caption = archive.locator("table caption");
 
@@ -244,11 +275,11 @@ test("source archives describe the full coverage and selected year without expos
 });
 
 test("dataset articles omit the public methodology blocks requested for simplification", async ({ page }) => {
-  await page.goto("http://localhost:3100/methodology/expenditure");
+  await page.goto(`${TEST_BASE_URL}/methodology/expenditure`);
   await expect(page.getByRole("heading", { name: "ისტორიული გადაწყვეტილებები" })).toHaveCount(0);
   await expect(page.getByTestId("decision-record")).toContainText("2004–2025");
 
-  await page.goto("http://localhost:3100/methodology/revenue");
+  await page.goto(`${TEST_BASE_URL}/methodology/revenue`);
   await expect(page.getByRole("heading", { name: "ვალიდაცია" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "ტექნიკური დანართი" })).toHaveCount(0);
   await expect(page.getByTestId("decision-record")).toContainText("ფაქტი უპირატესია გეგმაზე");
@@ -257,7 +288,7 @@ test("dataset articles omit the public methodology blocks requested for simplifi
   }
   await expect(page.getByRole("heading", { name: "უცვლელი პირველწყაროები" })).toBeVisible();
 
-  await page.goto("http://localhost:3100/methodology/municipalities");
+  await page.goto(`${TEST_BASE_URL}/methodology/municipalities`);
   await expect(page.getByRole("heading", { name: "გადაწყვეტილებების სრული ჩანაწერი" })).toHaveCount(0);
   await expect(page.getByTestId("decision-record")).toHaveCount(0);
   for (const title of ["კლასიფიკაცია და გარდაქმნა", "შემოწმება და შეჯერება", "შეზღუდვები"] as const) {
@@ -267,7 +298,7 @@ test("dataset articles omit the public methodology blocks requested for simplifi
 });
 
 test("municipality archive copy keeps prepared geometry outside the download boundary", async ({ page }) => {
-  await page.goto("http://localhost:3100/methodology/municipalities#source-archive");
+  await page.goto(`${TEST_BASE_URL}/methodology/municipalities#source-archive`);
 
   const archiveSection = page.locator("#source-archive");
   await expect(archiveSection).toContainText("პორტალურ ექსპორტებსა და ფინანსთა სამინისტროს სამუშაო წიგნებს");
@@ -278,7 +309,7 @@ test("municipality archive copy keeps prepared geometry outside the download bou
 
 test("method journey shows its tokenized spine only on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto("http://localhost:3100/methodology/expenditure");
+  await page.goto(`${TEST_BASE_URL}/methodology/expenditure`);
 
   const spine = page.getByTestId("method-journey-spine");
   await expect(spine).toBeVisible();
@@ -295,7 +326,7 @@ test("method journey shows its tokenized spine only on desktop", async ({ page }
 });
 
 test("archive filters by search and year with a visible zero state", async ({ page }) => {
-  await page.goto("http://localhost:3100/methodology/revenue#source-archive");
+  await page.goto(`${TEST_BASE_URL}/methodology/revenue#source-archive`);
 
   const archive = page.getByTestId("source-archive");
   await archive.getByRole("button", { name: "2025", exact: true }).click();
@@ -310,7 +341,7 @@ test("archive filters by search and year with a visible zero state", async ({ pa
 
 test("methodology mobile layout preserves reading order, overflow, and substantial boundaries", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://localhost:3100/methodology");
+  await page.goto(`${TEST_BASE_URL}/methodology`);
 
   const heading = page.getByRole("heading", { level: 1 });
   const jumpLink = page.getByRole("link", { name: "მონაცემთა მეთოდოლოგიები ↓" });
@@ -331,7 +362,7 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
   expect(documentBox!.y).toBeGreaterThanOrEqual(jumpBox!.y + jumpBox!.height);
   await expect(page.getByTestId("site-footer")).toBeVisible();
 
-  await page.goto("http://localhost:3100/methodology/expenditure#source-archive");
+  await page.goto(`${TEST_BASE_URL}/methodology/expenditure#source-archive`);
   const contents = page.getByRole("navigation", { name: "გვერდის სარჩევი" });
   await expect(contents).toHaveCSS("position", "static");
   const archiveScroller = page.getByTestId("source-archive").locator("table").locator("..");
@@ -347,7 +378,7 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
     })),
   ).toEqual({ body: 390, viewport: 390 });
 
-  await page.goto("http://localhost:3100/");
+  await page.goto(`${TEST_BASE_URL}/`);
   const methodology = page.getByTestId("landing-methodology");
   const methodologyTitle = methodology.getByRole("heading", { level: 2 });
   const methodologyList = methodology.locator("ol");
@@ -397,10 +428,10 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
 });
 
 test("methodology keyboard controls expose native behavior and visible focus", async ({ page }) => {
-  await page.goto("http://localhost:3100/methodology");
+  await page.goto(`${TEST_BASE_URL}/methodology`);
   await expectVisibleFocusOutline(page.getByTestId("methodology-live-row").first());
 
-  await page.goto("http://localhost:3100/methodology/expenditure#source-archive");
+  await page.goto(`${TEST_BASE_URL}/methodology/expenditure#source-archive`);
   const summary = page.getByTestId("methodology-decision").first().locator("summary");
   const indicator = summary.getByTestId("decision-disclosure-indicator");
   await expect(indicator.locator('[data-disclosure-state="closed"]')).toBeVisible();
@@ -428,7 +459,7 @@ test("methodology keyboard controls expose native behavior and visible focus", a
 });
 
 test("published download bytes match the manifest integrity record", async ({ page, request }) => {
-  await page.goto("http://localhost:3100/methodology/expenditure#source-archive");
+  await page.goto(`${TEST_BASE_URL}/methodology/expenditure#source-archive`);
 
   const firstRow = page.getByTestId("source-archive-row").first();
   const download = firstRow.getByRole("link", { name: /ჩამოტვირთვა/ });
@@ -436,7 +467,7 @@ test("published download bytes match the manifest integrity record", async ({ pa
   expect(downloadHref).toBeTruthy();
 
   const manifestResponse = await request.get(
-    "http://localhost:3100/downloads/methodology/expenditure/manifest.json",
+    `${TEST_BASE_URL}/downloads/methodology/expenditure/manifest.json`,
   );
   expect(manifestResponse.ok()).toBe(true);
   const manifest = (await manifestResponse.json()) as { downloadHref: string; sha256: string }[];
@@ -444,7 +475,7 @@ test("published download bytes match the manifest integrity record", async ({ pa
   expect(manifestRow).toBeTruthy();
   expect(manifestRow?.sha256).toMatch(/^[a-f0-9]{64}$/);
 
-  const fileResponse = await request.get(`http://localhost:3100${downloadHref}`);
+  const fileResponse = await request.get(`${TEST_BASE_URL}${downloadHref}`);
   expect(fileResponse.ok()).toBe(true);
   const publishedHash = createHash("sha256").update(await fileResponse.body()).digest("hex");
   expect(publishedHash).toBe(manifestRow?.sha256);
@@ -454,7 +485,7 @@ test("published download bytes match the manifest integrity record", async ({ pa
     "/downloads/methodology/expenditure/manifest.csv",
     "/downloads/methodology/expenditure/manifest.json",
   ]) {
-    const response = await request.get(`http://localhost:3100${href}`);
+    const response = await request.get(`${TEST_BASE_URL}${href}`);
     expect(response.status(), href).toBe(200);
   }
 });

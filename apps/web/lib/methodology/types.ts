@@ -1,7 +1,7 @@
 import type { MunicipalTotalFact } from "../data/municipal/types";
-import type { ServedBudgetFact } from "../servedRows";
+import type { ServedBudgetFact, ServedGovernmentDebtFact } from "../servedRows";
 
-export const LIVE_METHODOLOGY_IDS = ["expenditure", "revenue", "municipalities"] as const;
+export const LIVE_METHODOLOGY_IDS = ["expenditure", "revenue", "municipalities", "debt"] as const;
 
 export type MethodologyDatasetId = (typeof LIVE_METHODOLOGY_IDS)[number];
 
@@ -39,7 +39,8 @@ export type MethodologyContent = {
   // უმუშევრობა) are not budget sides.
   coverageSource:
     | { kind: "budgetSide"; side: ServedBudgetFact["side"] }
-    | { kind: "municipalTotals" };
+    | { kind: "municipalTotals" }
+    | { kind: "governmentDebt" };
   canonicalDocuments: readonly string[];
   disclosureKa: string;
   keyFacts: readonly {
@@ -106,5 +107,6 @@ export type MethodologyHubEntry = {
 export type MethodologyHubInput = {
   budgetFacts: readonly ServedBudgetFact[];
   municipalFacts: readonly MunicipalTotalFact[];
+  debtFacts: readonly ServedGovernmentDebtFact[];
   archives: Readonly<Record<MethodologyDatasetId, MethodologyArchiveSummary>>;
 };

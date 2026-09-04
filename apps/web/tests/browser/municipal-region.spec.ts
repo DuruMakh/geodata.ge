@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { TEST_BASE_URL } from "./test-base-url";
 
 async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -33,7 +34,7 @@ async function downloadMunicipalWorkbook(page: Page) {
 
 // იმერეთი: 12 member municipalities (data/imports/municipalities.csv), the
 // same region the brief's own manual verification step names.
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const BASE_URL = TEST_BASE_URL;
 const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
 const REGION_URL = `${BASE_URL}/explorer/municipalities/region/imereti`;
 const ADJARA_URL = `${BASE_URL}/explorer/municipalities/region/adjara`;
