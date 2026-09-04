@@ -1,14 +1,53 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type APIRequestContext, type Locator, type Page } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { computedCssColorAlpha } from "./focus-outline";
 
 // Landing page (GeoData Site v2 design): structure, live data blocks, and the
-// paths into the explorer. The hero is WebGL; tests assert the canvas mounts
-// (or the fallback message shows) rather than pixel content.
+// paths into the explorer. The hero is a static image below 768px and WebGL at
+// wider sizes; tests assert the matching visual mounts rather than pixel content.
 
 const artifactDir = join(process.cwd(), "test-results", "visual-reference");
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+const heroRuntimeMarkers = ["WebGLRenderer", "ვიზუალი ვერ ჩაიტვირთა"] as const;
+
+async function heroRuntimeScripts(request: APIRequestContext, urls: Iterable<string>) {
+  const uniqueUrls = [...new Set(urls)];
+  const matches = await Promise.all(
+    uniqueUrls.map(async (url) => {
+      const response = await request.get(url);
+      if (!response.ok()) return null;
+      const body = await response.text();
+      return heroRuntimeMarkers.every((marker) => body.includes(marker)) ? url : null;
+    }),
+  );
+  return matches.filter((url): url is string => url !== null);
+}
+
+function installHeroDrawInstrumentation() {
+  const counts: number[] = [];
+  const testWindow = window as typeof window & {
+    __heroDrawCounts: number[];
+    __heroFirstTerrainDrawAt?: number;
+    __heroTerrainDrawCount: number;
+  };
+  testWindow.__heroDrawCounts = counts;
+  testWindow.__heroTerrainDrawCount = 0;
+  type DrawArraysOwner = { drawArrays: (mode: number, first: number, count: number) => void };
+  const wrap = (prototype: DrawArraysOwner) => {
+    const original = prototype.drawArrays;
+    prototype.drawArrays = function (this: DrawArraysOwner, mode, first, count) {
+      counts.push(count);
+      if (count > 1_000) {
+        testWindow.__heroFirstTerrainDrawAt ??= performance.now();
+        testWindow.__heroTerrainDrawCount = count;
+      }
+      original.call(this, mode, first, count);
+    };
+  };
+  wrap(WebGLRenderingContext.prototype);
+  if (typeof WebGL2RenderingContext !== "undefined") wrap(WebGL2RenderingContext.prototype);
+}
 
 async function capture(page: Page, name: string) {
   await mkdir(artifactDir, { recursive: true });
@@ -243,6 +282,333 @@ test("landing data and methodology links use real destinations", async ({ page }
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
 });
 
+test("landing loads the hero font successfully without requesting it on other routes", async ({ browser, page }) => {
+  const fontResponses: Array<{ status: number; url: string }> = [];
+  page.on("response", (response) => {
+    if (response.url().includes("EurostileGEOMt-Demi")) {
+      fontResponses.push({ status: response.status(), url: response.url() });
+    }
+  });
+
+  await page.goto(baseUrl);
+  const heading = page.getByRole("heading", { level: 1, name: "საქართველო ციფრებში" });
+  const fontState = await heading.evaluate(async (element) => {
+    const descriptor = '600 40px "heroDisplay"';
+    const loadedFaces = await document.fonts.load(descriptor, element.textContent ?? "");
+    await document.fonts.ready;
+    return {
+      family: getComputedStyle(element).fontFamily,
+      loadedFaces: loadedFaces.length,
+      ready: document.fonts.check(descriptor, element.textContent ?? ""),
+      stylesheets: document.querySelectorAll('link[rel="stylesheet"]').length,
+    };
+  });
+
+  expect(fontState).toEqual({
+    family: 'heroDisplay, "heroDisplay Fallback", "Noto Serif Georgian", serif',
+    loadedFaces: 1,
+    ready: true,
+    stylesheets: 1,
+  });
+  expect(fontResponses).toHaveLength(1);
+  expect(fontResponses[0]?.status).toBe(200);
+  expect(new URL(fontResponses[0]!.url).pathname).toMatch(/\/EurostileGEOMt-Demi\.[^/]+\.woff2$/);
+
+  const nonHomeContext = await browser.newContext();
+  try {
+    const nonHomePage = await nonHomeContext.newPage();
+    await nonHomePage.goto(`${baseUrl}/explorer/expenditure`);
+    await nonHomePage.evaluate(() => document.fonts.ready.then(() => undefined));
+    const nonHomeFontRequests = await nonHomePage.evaluate(() =>
+      performance
+        .getEntriesByType("resource")
+        .map((entry) => entry.name)
+        .filter((url) => url.includes("EurostileGEOMt-Demi")),
+    );
+    expect(nonHomeFontRequests).toEqual([]);
+  } finally {
+    await nonHomeContext.close();
+  }
+});
+
+test("landing keeps mobile header and statistic geometry stable while fonts load", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.route(/\.(?:woff2|ttf)(?:\?|$)/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 2_000));
+    const response = await route.fetch();
+    await route.fulfill({ response });
+  });
+
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  const nav = page.getByRole("navigation");
+  const logo = page.getByTestId("site-header-logo").locator("..");
+  const heading = page.getByRole("heading", { level: 1, name: "საქართველო ციფრებში" });
+  const statisticValues = page.locator("[data-country-stat] > div:nth-child(2)");
+  const before = {
+    nav: await nav.boundingBox(),
+    logo: await logo.boundingBox(),
+    heading: await heading.boundingBox(),
+    statisticValues: await Promise.all((await statisticValues.all()).map((value) => value.boundingBox())),
+  };
+
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  const after = {
+    nav: await nav.boundingBox(),
+    logo: await logo.boundingBox(),
+    heading: await heading.boundingBox(),
+    statisticValues: await Promise.all((await statisticValues.all()).map((value) => value.boundingBox())),
+  };
+
+  for (const key of ["x", "y", "width", "height"] as const) {
+    expect(after.nav?.[key], `navigation ${key}`).toBeCloseTo(before.nav?.[key] ?? Number.NaN, 0);
+    expect(after.logo?.[key], `logo ${key}`).toBeCloseTo(before.logo?.[key] ?? Number.NaN, 0);
+    expect(after.heading?.[key], `hero heading ${key}`).toBeCloseTo(before.heading?.[key] ?? Number.NaN, 0);
+  }
+  expect(before.nav?.y ?? Number.NaN).toBeGreaterThanOrEqual(
+    (before.logo?.y ?? Number.NaN) + (before.logo?.height ?? Number.NaN),
+  );
+  expect(after.nav?.y ?? Number.NaN).toBeGreaterThanOrEqual(
+    (after.logo?.y ?? Number.NaN) + (after.logo?.height ?? Number.NaN),
+  );
+  expect(after.statisticValues).toHaveLength(3);
+  for (const [index, box] of after.statisticValues.entries()) {
+    for (const key of ["x", "y", "width", "height"] as const) {
+      expect(box?.[key], `statistic ${index + 1} ${key}`).toBeCloseTo(
+        before.statisticValues[index]?.[key] ?? Number.NaN,
+        0,
+      );
+    }
+  }
+  const statisticHeights = after.statisticValues.map((box) => box?.height ?? Number.NaN);
+  expect(Math.max(...statisticHeights) - Math.min(...statisticHeights)).toBeLessThanOrEqual(1);
+});
+
+test("landing waits for the post-load idle timeout before requesting the WebGL hero", async ({ page, request }) => {
+  const scriptRequests: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.endsWith(".js")) scriptRequests.push(request.url());
+  });
+  await page.addInitScript(() => {
+    const callbacks = new Map<number, IdleRequestCallback>();
+    let nextId = 1;
+    const testWindow = window as typeof window & {
+      __flushHeroIdle: (didTimeout?: boolean) => void;
+      __heroIdlePending: () => number;
+      __heroIdleTimeout: () => number | undefined;
+    };
+    const requestedTimeouts: number[] = [];
+    testWindow.__heroIdlePending = () => callbacks.size;
+    testWindow.__heroIdleTimeout = () => requestedTimeouts.at(-1);
+    testWindow.__flushHeroIdle = (didTimeout = false) => {
+      const pending = [...callbacks.values()];
+      callbacks.clear();
+      pending.forEach((callback) => callback({ didTimeout, timeRemaining: () => (didTimeout ? 0 : 50) }));
+    };
+    window.requestIdleCallback = (callback, options) => {
+      if (options?.timeout !== undefined) requestedTimeouts.push(options.timeout);
+      const id = nextId++;
+      callbacks.set(id, callback);
+      return id;
+    };
+    window.cancelIdleCallback = (id) => callbacks.delete(id);
+  });
+
+  await page.goto(baseUrl, { waitUntil: "load" });
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (window as typeof window & { __heroIdlePending: () => number }).__heroIdlePending(),
+      ),
+    )
+    .toBeGreaterThan(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (window as typeof window & { __heroIdleTimeout: () => number | undefined }).__heroIdleTimeout(),
+      ),
+    )
+    .toBe(1_500);
+  await expect(page.locator("figure canvas")).toHaveCount(0);
+
+  const scriptsBeforeIdle = new Set(scriptRequests);
+  expect(await heroRuntimeScripts(request, scriptsBeforeIdle)).toEqual([]);
+
+  await page.evaluate(() =>
+    (window as typeof window & { __flushHeroIdle: (didTimeout?: boolean) => void }).__flushHeroIdle(true),
+  );
+  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 5_000 });
+
+  const scriptsAfterTimeout = scriptRequests.filter((url) => !scriptsBeforeIdle.has(url));
+  expect(await heroRuntimeScripts(request, scriptsAfterTimeout)).toHaveLength(1);
+});
+
+test("landing keeps timeout-driven hero readiness within five seconds of load", async ({ page }) => {
+  await page.addInitScript(installHeroDrawInstrumentation);
+  await page.addInitScript(() => {
+    const testWindow = window as typeof window & {
+      __heroFallbackAt?: number;
+      __heroLoadAt?: number;
+    };
+    window.requestIdleCallback = (callback, options) =>
+      window.setTimeout(
+        () => callback({ didTimeout: true, timeRemaining: () => 0 }),
+        options?.timeout ?? 0,
+      );
+    window.cancelIdleCallback = (id) => window.clearTimeout(id);
+    window.addEventListener(
+      "load",
+      () => {
+        testWindow.__heroLoadAt = performance.now();
+      },
+      { once: true },
+    );
+    new MutationObserver(() => {
+      if (testWindow.__heroFallbackAt !== undefined) return;
+      if (document.body?.textContent?.includes("ვიზუალი ვერ ჩაიტვირთა")) {
+        testWindow.__heroFallbackAt = performance.now();
+      }
+    }).observe(document, { childList: true, subtree: true });
+  });
+
+  await page.goto(baseUrl, { waitUntil: "load" });
+  await expect(page.locator("figure canvas")).toHaveCount(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const testWindow = window as typeof window & {
+          __heroFallbackAt?: number;
+          __heroFirstTerrainDrawAt?: number;
+          __heroLoadAt?: number;
+        };
+        const readyAt = testWindow.__heroFirstTerrainDrawAt ?? testWindow.__heroFallbackAt;
+        return readyAt === undefined ? Number.POSITIVE_INFINITY : readyAt - (testWindow.__heroLoadAt ?? 0);
+      }),
+    )
+    .toBeLessThanOrEqual(5_000);
+  const readiness = await page.evaluate(() => {
+    const testWindow = window as typeof window & {
+      __heroFallbackAt?: number;
+      __heroFirstTerrainDrawAt?: number;
+      __heroLoadAt?: number;
+    };
+    return (
+      (testWindow.__heroFirstTerrainDrawAt ?? testWindow.__heroFallbackAt ?? Number.POSITIVE_INFINITY) -
+      (testWindow.__heroLoadAt ?? 0)
+    );
+  });
+  expect(readiness).toBeGreaterThanOrEqual(1_500);
+  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible();
+});
+
+test("landing activates the hero after load when requestIdleCallback is unavailable", async ({ page, request }) => {
+  const scriptRequests: Array<{ beforeLoad: boolean; url: string }> = [];
+  let loadFired = false;
+  page.on("request", (browserRequest) => {
+    if (!new URL(browserRequest.url()).pathname.endsWith(".js")) return;
+    scriptRequests.push({ beforeLoad: !loadFired, url: browserRequest.url() });
+  });
+  page.once("load", () => {
+    loadFired = true;
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "requestIdleCallback", { configurable: true, value: undefined });
+  });
+
+  await page.goto(baseUrl, { waitUntil: "load" });
+  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 5_000 });
+
+  const matchingScripts = await heroRuntimeScripts(
+    request,
+    scriptRequests.map(({ url }) => url),
+  );
+  expect(matchingScripts).toHaveLength(1);
+  expect(scriptRequests.find(({ url }) => url === matchingScripts[0])?.beforeLoad).toBe(false);
+});
+
+test("landing serves a static mobile hero without loading WebGL and retains desktop detail", async ({ browser, request }) => {
+  const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+  try {
+    const mobilePage = await mobileContext.newPage();
+    const mobileScripts: string[] = [];
+    mobilePage.on("request", (browserRequest) => {
+      if (new URL(browserRequest.url()).pathname.endsWith(".js")) mobileScripts.push(browserRequest.url());
+    });
+    await mobilePage.goto(baseUrl);
+    const mobileStatic = mobilePage.getByTestId("mobile-hero-static");
+    const mobileStaticImage = mobileStatic.locator("img");
+    await expect(mobileStatic).toBeVisible();
+    await expect(mobileStaticImage).toHaveJSProperty("complete", true);
+    expect(await mobileStaticImage.evaluate((image) => (image as HTMLImageElement).currentSrc)).toMatch(
+      /\/landing\/hero-relief-mobile-390\.webp$/,
+    );
+    expect(await mobileStaticImage.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(780);
+    await mobilePage.waitForTimeout(3_500);
+    await expect(mobilePage.locator("figure canvas")).toHaveCount(0);
+    expect(await heroRuntimeScripts(request, mobileScripts)).toEqual([]);
+  } finally {
+    await mobileContext.close();
+  }
+
+  const desktopContext = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
+  try {
+    const desktopPage = await desktopContext.newPage();
+    const desktopImages: string[] = [];
+    desktopPage.on("request", (browserRequest) => {
+      if (new URL(browserRequest.url()).pathname.endsWith(".webp")) desktopImages.push(browserRequest.url());
+    });
+    await desktopPage.addInitScript(installHeroDrawInstrumentation);
+    await desktopPage.goto(baseUrl);
+    await expect(desktopPage.getByTestId("mobile-hero-static")).toBeHidden();
+    expect(desktopImages).toEqual([]);
+    const canvas = desktopPage.locator("figure canvas");
+    await expect(canvas.or(desktopPage.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
+    await expect
+      .poll(() =>
+        desktopPage.evaluate(() =>
+          Math.max(...(window as typeof window & { __heroDrawCounts: number[] }).__heroDrawCounts),
+        ),
+      )
+      .toBe(10_656);
+    const pixelRatio = await canvas.evaluate((element) => {
+      const drawingSurface = element as HTMLCanvasElement;
+      return drawingSurface.width / drawingSurface.getBoundingClientRect().width;
+    });
+    expect(pixelRatio).toBeCloseTo(2, 1);
+  } finally {
+    await desktopContext.close();
+  }
+});
+
+test("landing swaps between the static mobile hero and one desktop canvas across the breakpoint", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+  const page = await context.newPage();
+  await page.addInitScript(installHeroDrawInstrumentation);
+  try {
+    await page.goto(baseUrl);
+    const mobileStatic = page.getByTestId("mobile-hero-static");
+    const canvas = page.locator("figure canvas");
+    await expect(mobileStatic).toBeVisible();
+    await expect(canvas).toHaveCount(0);
+
+    await page.setViewportSize({ width: 768, height: 900 });
+    await expect(mobileStatic).toBeHidden();
+    await expect(canvas).toHaveCount(1, { timeout: 5_000 });
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          (window as typeof window & { __heroTerrainDrawCount: number }).__heroTerrainDrawCount,
+        ),
+      )
+      .toBe(10_656);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(mobileStatic).toBeVisible();
+    await expect(canvas).toHaveCount(0);
+  } finally {
+    await context.close();
+  }
+});
+
 test("landing hero has no browser runtime warnings or errors", async ({ page }) => {
   const consoleIssues: string[] = [];
   const pageErrors: string[] = [];
@@ -316,9 +682,17 @@ test("landing keeps stats and dataset tables inside narrow viewports", async ({ 
   }
 });
 
-test("methodology is in the footer but never the landing header", async ({ page }) => {
+test("landing header exposes mission while methodology stays in the footer", async ({ page }) => {
   await page.goto(`${baseUrl}/`);
   await expect(page.getByTestId("landing-header").getByRole("link", { name: "მეთოდოლოგია" })).toHaveCount(0);
+  await expect(page.getByTestId("landing-header").getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute(
+    "href",
+    "/about",
+  );
+  await expect(page.getByTestId("landing-header").getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
   await expect(page.getByTestId("site-footer").getByRole("link", { name: "მეთოდოლოგია" })).toHaveAttribute(
     "href",
     "/methodology",
@@ -475,7 +849,9 @@ for (const viewport of [
       await page.setViewportSize(viewport);
       await page.goto(baseUrl);
       await page.evaluate(() => document.fonts.ready.then(() => undefined));
-      await expect(page.locator("figure canvas")).toBeVisible({ timeout: 15_000 });
+      const renderedHero =
+        viewport.width < 768 ? page.getByTestId("mobile-hero-static") : page.locator("figure canvas");
+      await expect(renderedHero).toBeVisible({ timeout: 15_000 });
       await expect.poll(async () => {
         const figure = await page.locator("figure").boundingBox();
         const stats = await page.getByTestId("key-numbers").boundingBox();
@@ -486,11 +862,11 @@ for (const viewport of [
         );
       }).toBeLessThanOrEqual(1);
       const figure = await page.locator("figure").boundingBox();
-      const canvas = await page.locator("figure canvas").boundingBox();
+      const renderedHeroBox = await renderedHero.boundingBox();
       expect(figure).not.toBeNull();
-      expect(canvas).not.toBeNull();
-      expect(canvas!.height).toBeLessThanOrEqual(figure!.height + 1);
-      expect(figure!.height - canvas!.height).toBeLessThanOrEqual(10);
+      expect(renderedHeroBox).not.toBeNull();
+      expect(renderedHeroBox!.height).toBeLessThanOrEqual(figure!.height + 1);
+      expect(figure!.height - renderedHeroBox!.height).toBeLessThanOrEqual(10);
       await expectNoPageOverflow(page);
     } finally {
       await initialContext.close();

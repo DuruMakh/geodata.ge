@@ -1,4 +1,3 @@
-import { BreadcrumbTrail } from "../../components/seo/breadcrumb-json-ld";
 import { SiteFooter } from "../../components/site/site-footer";
 import { SiteHeader } from "../../components/site/site-header";
 import { loadServedLandingData } from "../../lib/data/servedData";
@@ -6,66 +5,70 @@ import { buildLandingContext } from "../../lib/landing/landingData";
 import { fiscalMetadata } from "../../lib/seo/metadata";
 
 export const metadata = fiscalMetadata({
-  title: "Fiscal.ge-ის შესახებ — მონაცემები, წყაროები და შესწორებები",
+  title: "მიზანი — Fiscal.ge",
   description:
-    "როგორ ამოწმებს და აქვეყნებს Fiscal.ge საქართველოს საბიუჯეტო მონაცემებს, როგორ მიუთითოთ წყარო და როგორ გვაცნობოთ შესაძლო შეცდომა.",
+    "Fiscal.ge-ის მიზანია საქართველოს საჯარო ეკონომიკური და ფინანსური მონაცემები ერთ სივრცეში მოაქციოს და მარტივი, გასაგები ფორმით წარმოადგინოს.",
   path: "/about",
 });
 
-const sections = [
-  {
-    title: "რას ვაქვეყნებთ",
-    body: "Fiscal.ge არის დამოუკიდებელი, ქართულენოვანი საბიუჯეტო მონაცემების ექსპლორერი. პლატფორმა აჩვენებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მრავალწლიან მონაცემებს; ის არ ცვლის ოფიციალურ სამართლებრივ დოკუმენტებს.",
-  },
-  {
-    title: "როგორ ვამოწმებთ მონაცემებს",
-    body: "ოფიციალური დოკუმენტები ინახება პირველწყაროს სახით, მონაცემები გადის კლასიფიკაციის, ჯამების, პერიოდისა და ფაქტი/გეგმის შემოწმებას, ხოლო მიღებული გადაწყვეტილებები საჯარო მეთოდოლოგიაში აისახება.",
-  },
-  {
-    title: "შესწორებების პოლიტიკა",
-    body: "შესაძლო შეცდომის დადასტურებისას ვაახლებთ მონაცემს, შესაბამის მეთოდოლოგიურ ჩანაწერსა და ბოლო განხილვის თარიღს. რიცხვითი შესწორება წყაროსა და განმარტების უხმოდ არ ქვეყნდება.",
-  },
-  {
-    title: "როგორ მიუთითოთ წყარო",
-    body: "ციტირების რეკომენდებული ფორმაა: „Fiscal.ge, საქართველოს საბიუჯეტო მონაცემები, შესაბამისი კრებული და წლები, წვდომის თარიღი“. ბმული მიუთითეთ იმ გვერდზე ან CSV ფაილზე, რომელიც გამოიყენეთ.",
-  },
-  {
-    title: "ლიცენზია და პირველწყაროების უფლებები",
-    body: "Fiscal.ge-ის დამუშავებული მონაცემები ქვეყნდება CC BY 4.0 ლიცენზიით — წყაროს მითითებით მათი გამოყენება თავისუფალია. ოფიციალური პირველწყაროების უფლებრივი სტატუსი ცალკე ინახება თითოეული ფაილის მანიფესტში და Fiscal.ge-ის ლიცენზია მათზე არ ვრცელდება.",
-  },
-] as const;
-
 export default async function AboutPage() {
   const model = buildLandingContext(await loadServedLandingData());
+
   return (
     <div className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]">
       <div className="mx-auto max-w-[1240px]">
-        <SiteHeader yearsLabel={model.yearsLabel} testId="about-header" />
+        <SiteHeader active="mission" yearsLabel={model.yearsLabel} testId="about-header" />
         <main className="pt-10 min-[768px]:pt-16">
-          <BreadcrumbTrail items={[{ name: "მთავარი", path: "/" }, { name: "Fiscal.ge-ის შესახებ", path: "/about" }]} />
-          <header className="border-t-2 border-[var(--ink)] pt-8">
-            <h1 className="max-w-[860px] font-[family-name:var(--font-display)] text-[38px] font-semibold leading-[1.12] min-[768px]:text-[52px]">
-              Fiscal.ge-ის შესახებ
+          <section
+            data-testid="mission-cover"
+            aria-labelledby="mission-title"
+            className="grid min-h-[310px] grid-cols-[170px_minmax(0,1fr)_210px] gap-10 bg-[var(--ink)] px-10 pb-[43px] pt-[38px] text-[var(--paper)] max-[767.99px]:min-h-[350px] max-[767.99px]:grid-cols-1 max-[767.99px]:gap-0 max-[767.99px]:px-5 max-[767.99px]:py-6"
+          >
+            <div aria-hidden="true" className="flex min-w-0 items-start justify-between gap-3">
+              <strong className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--accent)]">01</strong>
+              <span className="text-right font-[family-name:var(--font-numeric)] text-[9px] leading-[1.35] tracking-[0.08em] text-[var(--paper)]">
+                FISCAL.GE
+                <br />
+                OPEN DATA
+              </span>
+            </div>
+            <h1
+              id="mission-title"
+              className="self-center font-[family-name:var(--font-display)] text-[clamp(48px,7vw,84px)] font-semibold leading-none tracking-[-0.035em] text-[var(--paper)] max-[767.99px]:mt-12 max-[767.99px]:self-start max-[767.99px]:text-[clamp(48px,16vw,72px)]"
+            >
+              მიზანი
             </h1>
-            <p className="mt-5 max-w-[760px] text-[15px] leading-[1.8] text-[var(--body)]">
-              საქართველოს ბიუჯეტი — ნათლად, გადამოწმებულად და ღიად.
+            <span className="self-end font-[family-name:var(--font-numeric)] text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-12">
+              {model.updatedAt.slice(0, 4)}
+              <br />
+              MISSION NOTE
+            </span>
+          </section>
+
+          <article
+            data-testid="mission-copy"
+            aria-label="მიზნის ტექსტი"
+            className="mx-auto mt-[72px] max-w-[760px] font-[family-name:var(--font-ui)] text-[16px] leading-[1.96] text-[var(--body)] max-[767.99px]:mt-[48px] max-[767.99px]:px-0 max-[767.99px]:text-[15px] max-[767.99px]:leading-[1.88]"
+          >
+            <p className="first-letter:float-left first-letter:mr-2 first-letter:mt-[5px] first-letter:font-[family-name:var(--font-display)] first-letter:text-[58px] first-letter:font-semibold first-letter:leading-[0.8] first-letter:text-[var(--accent)] max-[767.99px]:first-letter:text-[50px]">
+              საქართველოში ეკონომიკის, სახელმწიფო ფინანსების, რეგიონების, ვაჭრობის, ბიზნესისა და სხვა მნიშვნელოვანი მიმართულებების შესახებ დიდი რაოდენობით საჯარო მონაცემები არსებობს. თუმცა ეს ინფორმაცია სხვადასხვა უწყების ვებგვერდებზე, ექსელის ფაილებში, ანგარიშებსა და რთულ ცხრილებშია გაფანტული. ხშირად ერთი მარტივი პასუხის მისაღებადაც კი საჭიროა რამდენიმე წყაროს მოძიება, მონაცემების ჩამოტვირთვა, დამუშავება და ერთმანეთთან შედარება.
             </p>
-          </header>
-          <div className="mt-12 grid gap-10 min-[900px]:grid-cols-2">
-            {sections.map((section) => (
-              <section key={section.title} className="border-t border-[var(--ink)] pt-5">
-                <h2 className="font-[family-name:var(--font-display)] text-[23px] font-semibold">{section.title}</h2>
-                <p className="mt-3 text-[13.5px] leading-[1.8] text-[var(--body)]">{section.body}</p>
-              </section>
-            ))}
-            <section className="border-t border-[var(--ink)] pt-5">
-              <h2 className="font-[family-name:var(--font-display)] text-[23px] font-semibold">კონტაქტი</h2>
-              <p className="mt-3 text-[13.5px] leading-[1.8] text-[var(--body)]">
-                შესაძლო შეცდომა ან მონაცემთან დაკავშირებული შეკითხვა გამოგვიგზავნეთ მისამართზე{" "}
-                <a href="mailto:info@fiscal.ge" className="text-[var(--accent)] underline underline-offset-4">info@fiscal.ge</a>.
-              </p>
-            </section>
-          </div>
+            <p className="mt-[39px]">
+              პრობლემა მხოლოდ ინფორმაციის მოძიება არ არის. არსებული მონაცემები ხშირად წარმოდგენილია ისეთი ფორმით, რომელიც სპეციალური ცოდნის გარეშე რთულად გასაგებია. ასევე რთულია სხვადასხვა წლის მონაცემების, სხვადასხვა რეგიონისა თუ ეკონომიკური მაჩვენებლების ერთმანეთთან შედარება და საერთო სურათის დანახვა. შედეგად, საჯაროდ ხელმისაწვდომი მონაცემების მნიშვნელოვანი ნაწილი პრაქტიკაში მხოლოდ ადამიანთა მცირე წრისთვის არის მარტივად გამოსაყენებელი.
+            </p>
+            <p className="mt-[39px]">
+              fiscal.ge სწორედ ამ პრობლემის გადასაჭრელად შეიქმნა. ჩვენი მიზანია საქართველოს შესახებ საჯაროდ ხელმისაწვდომი ეკონომიკური და ფინანსური მონაცემების დიდი ნაწილი ერთ სივრცეში მოვაქციოთ, დავალაგოთ, ერთმანეთთან დავაკავშიროთ და მარტივი, ვიზუალურად გასაგები ფორმით წარმოვადგინოთ.
+            </p>
+            <p
+              data-testid="mission-closing"
+              className="mt-[39px] py-[25px] pb-[27px] text-[16px] leading-[1.96] text-[var(--body)] max-[767.99px]:mt-[31px] max-[767.99px]:py-[20px] max-[767.99px]:pb-[23px] max-[767.99px]:text-[15px] max-[767.99px]:leading-[1.88]"
+            >
+              გვინდა, მომხმარებელს რამდენიმე საათის ძიების ნაცვლად, რამდენიმე წამში შეეძლოს საჭირო მონაცემის პოვნა, მისი შედარება და კონტექსტის დანახვა.{" "}
+              <strong className="mt-[21px] block border-l-4 border-[var(--accent)] pl-[25px] font-[family-name:var(--font-display)] text-[clamp(25px,3.2vw,38px)] font-semibold leading-[1.45] tracking-[-0.02em] text-[var(--ink)] max-[767.99px]:mt-[18px] max-[767.99px]:pl-[18px] max-[767.99px]:text-[23px]">
+                ჩვენი მიზანია, საქართველოს მონაცემები იყოს არა მხოლოდ საჯარო, არამედ რეალურად ხელმისაწვდომი, გასაგები და გამოყენებადი.
+              </strong>
+            </p>
+          </article>
         </main>
         <SiteFooter updatedAt={model.updatedAt} />
       </div>

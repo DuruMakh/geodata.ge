@@ -70,6 +70,28 @@ test("loads both analytics projects on Fiscal.ge without a consent step or dupli
   expect(errors).toEqual([]);
 });
 
+test("starts Google Analytics after the initial page load", async ({ page }) => {
+  await serveLocalSite(page, productionOrigin);
+  const beforeLoad: string[] = [];
+  const googleRequests: string[] = [];
+  let loadFired = false;
+  page.on("request", (request) => {
+    if (request.url() !== googleScript) return;
+    googleRequests.push(request.url());
+    if (!loadFired) beforeLoad.push(request.url());
+  });
+  page.once("load", () => {
+    loadFired = true;
+  });
+  await page.route(/https:\/\/(?:www\.googletagmanager\.com|www\.clarity\.ms)\//, async (route) => {
+    await route.fulfill({ contentType: "application/javascript", body: "" });
+  });
+
+  await page.goto(productionOrigin, { waitUntil: "load" });
+  expect(beforeLoad).toEqual([]);
+  await expect.poll(() => googleRequests).toHaveLength(1);
+});
+
 for (const origin of [baseUrl, "https://geodata-preview.vercel.app"]) {
   test(`does not load analytics on ${origin}`, async ({ page }) => {
     if (origin !== baseUrl) await serveLocalSite(page, origin);

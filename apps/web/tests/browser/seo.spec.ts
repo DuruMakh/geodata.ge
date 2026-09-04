@@ -5,6 +5,15 @@ import { TEST_BASE_URL } from "./test-base-url";
 
 const BASE_URL = process.env.SEO_BASE_URL ?? TEST_BASE_URL;
 
+test("uses the shared browser artifact when no SEO-specific URL is configured", async ({ page }) => {
+  test.skip(Boolean(process.env.SEO_BASE_URL), "SEO_BASE_URL intentionally overrides the shared artifact URL");
+
+  await page.goto(BASE_URL);
+
+  const expectedOrigin = new URL(TEST_BASE_URL).origin;
+  expect(new URL(page.url()).origin).toBe(expectedOrigin);
+});
+
 async function expectMinimumTarget(locator: Locator, size = 24) {
   const box = await locator.boundingBox();
   expect(box).not.toBeNull();
@@ -503,7 +512,6 @@ test("methodology exposes a stable processed-data download", async ({ page, requ
 });
 
 for (const [route, expectedLabels] of [
-  ["/about", ["მთავარი", "Fiscal.ge-ის შესახებ"]],
   ["/methodology", ["მთავარი", "მეთოდოლოგია"]],
   ["/methodology/expenditure", ["მთავარი", "მეთოდოლოგია", "ხარჯების მეთოდოლოგია"]],
 ] as const) {

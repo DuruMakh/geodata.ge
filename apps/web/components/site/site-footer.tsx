@@ -42,7 +42,7 @@ export function SiteFooter({ updatedAt }: { updatedAt: string }) {
               მეთოდოლოგია
             </Link>
             <Link href="/about" className="max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center max-[768px]:self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
-              Fiscal.ge-ის შესახებ
+              მიზანი
             </Link>
           </div>
           <div className="flex max-w-[340px] flex-col gap-[9px]">

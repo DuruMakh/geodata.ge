@@ -123,9 +123,13 @@
     "@prisma/config": {
       "deepmerge-ts": "8.0.1"
     },
-    "fast-uri": "3.1.5",
+    "browserslist": "4.28.8",
+    "fast-uri": "3.1.7",
     "minimatch@3.1.5": {
       "brace-expansion": "1.1.18"
+    },
+    "prisma": {
+      "mysql2": "3.24.2"
     },
     "postcss": "8.5.26",
     "sharp": "0.35.3"

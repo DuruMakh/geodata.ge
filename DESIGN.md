@@ -1,7 +1,7 @@
 # Fiscal.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-08-28
+Last updated: 2026-09-01
 Status: Production visual system for Fiscal.ge Budget Explorer v1
 Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -401,11 +401,11 @@ Specs below are contracts; visual proof lives in the reference files.
 
 ### 7.1 Header / Nav
 
-The public-site header appears on the landing page (§19), the methodology hub, and every live dataset methodology route. Surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs. The landing and methodology surfaces use one shared component.
+The public-site header appears on the landing page (§19), `/about` (§23), the methodology hub, and every live dataset methodology route. Surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs. The landing, mission, and methodology surfaces use one shared component.
 
 The brand link uses the reviewed full v2.0 horizontal lockup at 280px from 768px upward and the compact lockup below 768px. The full horizontal lockup must not render below 280px; the standalone mark must not render below 24px. The supplied token JSON's 180px lockup value is not authoritative for production.
 
-Vertically centered logo row: lockup left, nav tabs center, mono loaded-coverage context label right; no bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` text underline with a `5px` offset; inactive = muted, weight 500. The landing page marks `მთავარი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` active and render no `aria-current`, because methodology is a separate destination; no methodology tab is added.
+Vertically centered logo row: lockup left, nav tabs center, mono loaded-coverage context label right; no bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` text underline with a `5px` offset; inactive = muted, weight 500. The landing page marks `მთავარი` active. `/about` marks `მიზანი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` nor `მიზანი` active and render no `aria-current`, because methodology remains inactive as a separate destination; no methodology tab is added.
 
 ### 7.2a Mode Control
 
@@ -782,7 +782,7 @@ Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implem
 
 Section order is fixed: shared header → living-relief hero → country figures → expenditure → revenue → municipalities → methodology and first sources → retained footer.
 
-**Header and hero.** The header uses the responsive lockups of §7.1, keeps `მთავარი` as the active page and `მონაცემები` → `/explorer`, and shows the mono revenue year range in its right slot above mobile. The living-relief map remains the full-bleed primary visual with its existing geometry, camera fitting, city behavior, reduced-motion still frame, accessible description, and WebGL fallback. The hero receives no additional logo. Visible hero copy is exactly `საქართველოს მონაცემების პორტალი`, H1 `საქართველო ციფრებში`, and CTA `გაეცანი მონაცემებს` → `#data`. The figure reserves the compact, settled map band from first paint: `calc(29vw + 48px)` below 768px, `calc(22.7vw + 57px)` from 768px, and the camera-fit bounds in `.landing-hero-frame` from 1100px. The existing virtual camera frames (340px, 500px, and `clamp(560px, 78vh, 820px)`) still determine the map's scale and crop. Only the inner canvas and label layer receive that exact cropped height; initialization must not resize the outer figure or move the country figures below it. At standard text sizes, keep the reserved band within 10px of the canvas at the tested responsive sizes, without clipping the map or adding a large blank area. From 768px, copy and figure share a grid row: the copy stays at its existing top/right alignment, and its intrinsic height plus 24px of clearance can enlarge the row for text-only zoom without overlapping the country figures.
+**Header and hero.** The header uses the responsive lockups of §7.1, keeps `მთავარი` as the active page and `მონაცემები` → `/explorer`, and shows the mono revenue year range in its right slot above mobile. The living-relief map remains the full-bleed primary visual with its existing camera fitting, city behavior, reduced-motion still frame, accessible description, and WebGL fallback. Below 768px it is a static-only, reduced-motion capture selected for narrow, medium, or wide mobile widths; mobile must not request or mount the Three.js runtime. From 768px the existing WebGL relief remains interactive, retains 8.6px terrain spacing and the 2× renderer-density cap, and begins after `load` during browser idle time with a 1.5-second timeout. The hero receives no additional logo. Visible hero copy is exactly `საქართველოს მონაცემების პორტალი`, H1 `საქართველო ციფრებში`, and CTA `გაეცანი მონაცემებს` → `#data`. The figure reserves the compact, settled map band from first paint: `calc(29vw + 48px)` below 768px, `calc(22.7vw + 57px)` from 768px, and the camera-fit bounds in `.landing-hero-frame` from 1100px. The existing virtual camera frames (340px, 500px, and `clamp(560px, 78vh, 820px)`) still determine the map's scale and crop. The static mobile image or desktop canvas receives that exact height; initialization must not resize the outer figure or move the country figures below it. At standard text sizes, keep the reserved band within 10px of the rendered visual at the tested responsive sizes, without clipping the map or adding a large blank area. From 768px, copy and figure share a grid row: the copy stays at its existing top/right alignment, and its intrinsic height plus 24px of clearance can enlarge the row for text-only zoom without overlapping the country figures.
 
 **Brand metadata.** Organization structured data uses the reviewed mark at `/fiscal-ge-logo.svg` with its intrinsic 520×650 dimensions. App Router owns `favicon.ico`, `icon.svg`, and `apple-icon.png`. The generated 1200×630 social image combines the horizontal lockup with the reversed mark; it is the site sharing image, not a hero asset.
 
@@ -800,9 +800,9 @@ National sections apply actual-over-planned selection before deriving the latest
 
 **Methodology and footer.** The single fourth ledger section is index `04`, H2 `მეთოდოლოგია და პირველწყაროები`, the introduction `თითოეული რიცხვი უკავშირდება ოფიციალურ წყაროს, კლასიფიკაციის წესსა და გადამოწმების შედეგს.`, and four steps: official-document preservation; classification and transformation rule; reconciliation and quality check; downloadable data. `მეთოდოლოგიის ნახვა →` links to `/methodology`. The retained footer follows immediately with its approximately 150px compact lockup and unchanged contact, navigation, source/update, and CC BY 4.0 trust information.
 
-**Responsive contract.** At ≥850px, each ledger reads index → copy → data in three columns and the three tables align. Below 850px, each ledger and the methodology section stack in DOM order; total and year remain on one row where space permits; the three country figures remain one compact row; tables stay inside their parent without horizontal scrolling. At ≤380px, side padding and type scale tighten, country-stat units become block-level, and a 320px viewport must have `scrollWidth === clientWidth`.
+**Responsive contract.** At ≥850px, each ledger reads index → copy → data in three columns and the three tables align. Below 850px, each ledger and the methodology section stack in DOM order; total and year remain on one row where space permits; the three country figures remain one compact row; tables stay inside their parent without horizontal scrolling. Below 768px, each country-stat unit occupies the second line of an equal-height value block so font loading cannot move the unit or stagger the captions. At ≤380px, side padding and type scale tighten, country-stat labels reserve two lines, and a 320px viewport must have `scrollWidth === clientWidth`.
 
-Landing QA: verify exact copy, metadata, destination links, ordered H2s, data-derived total/year/status and four rows for each dataset; verify hero canvas or fallback; verify the absence of old paths/About/promo and all post-hero SVG/canvas graphics; at desktop, 390px, and 320px verify one-row figures, strong total rules, consistent ledger rhythm, semantic tables, unit wrap, table containment, and zero document overflow.
+Landing QA: verify exact copy, metadata, destination links, ordered H2s, data-derived total/year/status and four rows for each dataset; verify a static-only hero with no WebGL request below 768px and one canvas or fallback from 768px; verify the absence of old paths/About/promo and all post-hero SVG/canvas graphics; at desktop, 390px, and 320px verify one-row figures, strong total rules, consistent ledger rhythm, semantic tables, unit wrap, table containment, and zero document overflow.
 
 ## 20. Municipal Surfaces
 
@@ -841,3 +841,11 @@ The approved public visibility is dataset-specific: expenditure hides its histor
 ## 22. Not-found Recovery
 
 Unknown HTML routes retain their HTTP 404 status and use a minimal editorial recovery surface. It uses the existing paper, ink, body, muted, tint, and accent-focus tokens: a compact Fiscal.ge identifier, one Georgian H1, a short explanation, and ordinary visible links to the homepage, explorer, methodology, sitemap, and agent guide. It does not load data, reuse the application shell, add an illustration, or introduce a separate visual system.
+
+## 23. Mission Surface (მიზანი)
+
+`/about` remains the canonical URL for the mission page. Its shared header links are `მთავარი`, `მონაცემები`, and `მიზანი`; only `მიზანი` is active on `/about`, while methodology remains inactive. The page renders no visible breadcrumb.
+
+The cover is an ink block with a paper title, terracotta `01`, `FISCAL.GE / OPEN DATA`, and a data-derived review year plus `MISSION NOTE`. The copy is one continuous four-paragraph article. The final strong sentence alone carries the terracotta left rule.
+
+The shared footer remains unchanged apart from the visible navigation label, which is `მიზანი` for the `/about` link. The page has no horizontal overflow at the documented mobile breakpoints.

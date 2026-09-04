@@ -3,7 +3,7 @@ import Script from "next/script";
 export function SiteAnalytics() {
   return (
     <>
-      <Script id="google-analytics" strategy="afterInteractive">
+      <Script id="google-analytics" strategy="lazyOnload">
         {`
           (function () {
             if (window.location.hostname !== "fiscal.ge") return;

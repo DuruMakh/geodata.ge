@@ -12,7 +12,7 @@
 
 ## Landing hero display face
 
-`EurostileGEOMt-Demi.ttf` is loaded by `components/landing/landing-page.tsx` for the landing `<h1>` only. Its Mkhedruli codepoints carry Mtavruli glyphs, so the heading displays as caps while the DOM text stays Mkhedruli.
+`EurostileGEOMt-Demi.woff2` is the browser-delivered face loaded by `components/landing/landing-page.tsx` for the landing `<h1>` only. It is a lossless WOFF2 conversion of the retained `EurostileGEOMt-Demi.ttf` source. Its Mkhedruli codepoints carry Mtavruli glyphs, so the heading displays as caps while the DOM text stays Mkhedruli.
 
 - Source: https://typeface.ge/ka/font/Eurostile+GEOMt (`/ka/font/554/download`)
 - Retrieved: 2026-08-27
