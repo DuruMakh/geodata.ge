@@ -2,6 +2,7 @@
 import type { CaveatRule } from "./engine";
 
 const NATIONAL_TOTAL_IDS = new Set(["revenue.total", "expenditure.total"]);
+const NATIONAL_DATASET_IDS = new Set(["national-revenue", "national-expenditure"]);
 // revenue_2004_total_scope is about the revenue-side 2004 panel omitting increase-in-liabilities
 // (revenue-methodology.md §5.6). The 2004 expenditure total has no analogous gap — the treasury
 // methodology's 2004 execution annex is complete and reconciled — so this must stay revenue-only
@@ -97,7 +98,14 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
     messageKa: "უარყოფითი მნიშვნელობა გადამოწმებული კორექციაა და არა დაკარგული მონაცემი.",
     messageEn: "A negative value is a reviewed correction, not missing or invalid data.",
     methodologyRef: "revenue-methodology.md",
-    applies: (c) => c.observations.some((o) => o.value !== null && o.value < 0),
+    // Gated on the national datasets. A negative number means "a reviewed
+    // correction" only where positive is the norm; in the general government
+    // balance a negative value is the ordinary case - it is a deficit - and
+    // this note fired on every deficit answer, telling readers a correction had
+    // been applied when none had. Caught by live verification against the
+    // deployed preview, not by any unit test, because no test asked a
+    // national rule what it does with another dataset's numbers.
+    applies: (c) => NATIONAL_DATASET_IDS.has(c.datasetId) && c.observations.some((o) => o.value !== null && o.value < 0),
     affects: (c) => c.observations.filter((o) => o.value !== null && o.value < 0).map((o) => `${o.seriesId}:${o.year}`),
   },
   {

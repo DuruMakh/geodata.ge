@@ -64,6 +64,19 @@ describe("deficit_projection", () => {
   });
 });
 
+describe("rules from other datasets", () => {
+  it("does not attach negative_revenue_correction to a deficit", () => {
+    // Every deficit is negative. That rule reads a negative value as "a
+    // reviewed correction", which is true where positive is the norm and false
+    // here - it fired on every balance answer on the deployed preview before
+    // being gated to the national datasets.
+    const codes = evaluateCaveats(context([2020], "actual"), CAVEAT_RULES).map((c) => c.code);
+
+    expect(codes).not.toContain("negative_revenue_correction");
+    expect(codes).toContain("deficit_general_government_scope");
+  });
+});
+
 describe("the registry", () => {
   it("carries every deficit rule", () => {
     const registered = new Set(CAVEAT_RULES.map((rule) => rule.code));
