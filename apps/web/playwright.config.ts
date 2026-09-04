@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const testBaseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+
 export default defineConfig({
   testDir: "./tests/browser",
   // Opt-in only, and deliberately not keyed off CI. Measured 2026-08-27 over 204
@@ -14,6 +16,7 @@ export default defineConfig({
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
     ...devices["Desktop Chrome"],
+    baseURL: testBaseUrl,
     // Local runs use the preinstalled Edge; CI installs bundled Chromium.
     ...(process.env.CI ? {} : { channel: "msedge" }),
   },
@@ -29,6 +32,6 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI && !process.env.GEODATA_DATA_SOURCE,
     // The CI path builds before it serves; the dev path still starts in seconds.
     timeout: process.env.CI ? 300_000 : 120_000,
-    url: "http://localhost:3100",
+    url: testBaseUrl,
   },
 });

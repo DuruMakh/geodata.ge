@@ -1,8 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
-
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+import { TEST_BASE_URL } from "./test-base-url";
 
 async function expectAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -28,7 +27,7 @@ test.describe("Government Debt explorer", () => {
   ] as const) {
     test(`renders the one-chart default with all nine rows expanded on ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize(viewport);
-      await page.goto(`${BASE_URL}/explorer/debt`);
+      await page.goto(`${TEST_BASE_URL}/explorer/debt`);
       await expectAppReady(page);
 
       await expect(page.getByRole("heading", { level: 1 })).toHaveText("რამდენია მთავრობის ვალი და როგორ ვიხდით მას");
@@ -44,6 +43,16 @@ test.describe("Government Debt explorer", () => {
       for (const parentId of ["debt.stock.total", "debt.service.total", "debt.rate.total"]) {
         await expect(seriesRow(page, parentId).locator('button[aria-expanded="true"]')).toHaveCount(1);
       }
+      for (const childId of [
+        "debt.stock.domestic",
+        "debt.stock.external",
+        "debt.service.principal",
+        "debt.service.interest",
+        "debt.rate.domestic",
+        "debt.rate.external",
+      ]) {
+        await expect(seriesRow(page, childId)).toBeVisible();
+      }
 
       await expect(selector.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
       await expect(seriesRow(page, "debt.stock.total").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
@@ -58,11 +67,20 @@ test.describe("Government Debt explorer", () => {
       await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "percent");
       await expect(page.getByTestId("debt-measure-label")).toHaveText("% მშპ-ში");
       await expectNoPageOverflow(page);
+
+      if (viewport.name === "mobile") {
+        await selector.scrollIntoViewIfNeeded();
+        const childToggle = seriesRow(page, "debt.stock.domestic").getByTestId("series-row-toggle");
+        await childToggle.scrollIntoViewIfNeeded();
+        await expect(childToggle).toBeInViewport();
+        await childToggle.click();
+        await expect(childToggle).toHaveAttribute("aria-pressed", "true");
+      }
     });
   }
 
   test("keeps same-family multi-selection and clears incompatible selections and ranges", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explorer/debt`);
+    await page.goto(`${TEST_BASE_URL}/explorer/debt`);
     await expectAppReady(page);
 
     const startHandle = page.getByTestId("range-start-handle");
@@ -93,16 +111,29 @@ test.describe("Government Debt explorer", () => {
   });
 
   test("shows published rate gaps in the table and switches back to the one line chart", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explorer/debt#f=rate&m=table&r=2015-2025&sel=debt.rate.external`);
+    await page.goto(`${TEST_BASE_URL}/explorer/debt#f=rate&m=table&r=2015-2025&sel=debt.rate.external`);
     await expectAppReady(page);
 
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "rate");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
     await expect(page.getByTestId("measure-share-toggle")).toHaveCount(0);
-    const rateRow = page.getByTestId("explorer-table").getByRole("row").filter({ hasText: "საგარეო განაკვეთი" });
-    await expect(rateRow.getByText("—", { exact: true })).toHaveCount(7);
-    await expect(rateRow).toContainText("0.9%");
-    await expect(rateRow).toContainText("3.1%");
+    const table = page.getByTestId("explorer-table");
+    const expectedByYear = [
+      [2015, "—"],
+      [2016, "—"],
+      [2017, "—"],
+      [2018, "—"],
+      [2019, "—"],
+      [2020, "—"],
+      [2021, "0.9%"],
+      [2022, "2.2%"],
+      [2023, "3.4%"],
+      [2024, "3.1%"],
+      [2025, "—"],
+    ] as const;
+    await expect(table.getByRole("columnheader")).toHaveText(["სერია", ...expectedByYear.map(([year]) => String(year))]);
+    const rateRow = table.getByRole("row").filter({ hasText: "საგარეო განაკვეთი" });
+    await expect(rateRow.getByRole("cell")).toHaveText(["საგარეო განაკვეთი", ...expectedByYear.map(([, value]) => value)]);
 
     await page.getByTestId("chart-mode-line").click();
     await expect(page.getByTestId("explorer-table")).toHaveCount(0);
@@ -110,7 +141,7 @@ test.describe("Government Debt explorer", () => {
   });
 
   test("marks the service forecast and downloads its active actual and forecast rows", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explorer/debt#f=service&m=line&r=2024-2026&sel=debt.service.total`);
+    await page.goto(`${TEST_BASE_URL}/explorer/debt#f=service&m=line&r=2024-2026&sel=debt.service.total`);
     await expectAppReady(page);
 
     await expect(page.getByTestId("chart-series-debt.service.total-actual")).toBeVisible();

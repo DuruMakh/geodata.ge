@@ -1,8 +1,9 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
 import { computedCssColorAlpha } from "./focus-outline";
+import { TEST_BASE_URL } from "./test-base-url";
 
-const BASE_URL = process.env.SEO_BASE_URL ?? "http://localhost:3100";
+const BASE_URL = process.env.SEO_BASE_URL ?? TEST_BASE_URL;
 
 async function expectMinimumTarget(locator: Locator, size = 24) {
   const box = await locator.boundingBox();
