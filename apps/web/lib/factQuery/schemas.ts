@@ -34,9 +34,14 @@ export const expectedDataVersion = z.string().regex(/^[0-9a-f]{64}$/).optional()
 // actually accept.
 export const nationalMeasure = z.enum(["amount_gel", "share_of_total_pct", "share_of_gdp_pct"]);
 export const municipalMeasure = z.enum(["amount_gel", "share_of_total_pct", "gel_per_resident"]);
+// Stock and service are GEL amounts; a weighted-average interest rate is a
+// rate per annum, which is why it needs a measure of its own. queryDebt
+// rejects a measure its series family does not carry.
+export const debtMeasure = z.enum(["amount_gel", "share_of_gdp_pct", "rate_percent"]);
+export const deficitMeasure = z.enum(["share_of_gdp_pct", "amount_gel"]);
 
 export const describeCoverageInput = z.object({
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance"]).optional(),
   search: z.string().max(120).optional(),
   entityType: z.enum(["country", "municipality", "region"]).optional(),
   level: z.enum(["admin_category", "major_program"]).optional(),
@@ -48,6 +53,21 @@ export const queryNationalInput = z.object({
   seriesIds: seriesIdList,
   years: uniqueSortedYears,
   measure: nationalMeasure,
+  expectedDataVersion,
+});
+
+export const queryDebtInput = z.object({
+  seriesIds: seriesIdList,
+  years: uniqueSortedYears,
+  measure: debtMeasure,
+  expectedDataVersion,
+});
+
+// No seriesIds: there is exactly one series, and a required parameter with a
+// single legal value is noise for the caller.
+export const queryDeficitInput = z.object({
+  years: uniqueSortedYears,
+  measure: deficitMeasure,
   expectedDataVersion,
 });
 
@@ -83,6 +103,8 @@ export const compareInput = z
 
 export const rankInput = z
   .object({
+    // Deliberately excludes government-debt and general-government-balance:
+    // both are country-level, so there is nothing to rank.
     datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure"]),
     dimension: z.enum(["series", "entities"]),
     level: z.enum(["admin_category", "major_program"]).optional(),
@@ -105,7 +127,7 @@ export const rankInput = z
 
 export const getSourcesInput = z.object({
   sourceIds: sourceIdList,
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance"]).optional(),
   years: z.array(z.number().int()).optional(),
   entityIds: z.array(z.string()).optional(),
   expectedDataVersion,

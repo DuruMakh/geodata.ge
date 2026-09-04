@@ -1,5 +1,11 @@
 // apps/web/lib/factQuery/types.ts
-import type { ServedAdminFact, ServedBudgetFact, ServedNationalGdpFact } from "../servedRows";
+import type {
+  ServedAdminFact,
+  ServedBudgetFact,
+  ServedGeneralGovernmentBalanceFact,
+  ServedGovernmentDebtFact,
+  ServedNationalGdpFact,
+} from "../servedRows";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import type {
   AdjaraBudgetAdjustment,
@@ -26,9 +32,29 @@ export type DatasetId =
   | "national-revenue"
   | "national-expenditure"
   | "ministries"
-  | "municipal-expenditure";
+  | "municipal-expenditure"
+  | "government-debt"
+  | "general-government-balance";
 
-export type Measure = "amount_gel" | "share_of_total_pct" | "share_of_gdp_pct" | "gel_per_resident";
+// rate_percent is a rate per annum, NOT a share of anything. Reusing
+// share_of_gdp_pct or share_of_total_pct for a weighted-average interest rate
+// would mislabel the number.
+export type Measure =
+  | "amount_gel"
+  | "share_of_total_pct"
+  | "share_of_gdp_pct"
+  | "gel_per_resident"
+  | "rate_percent";
+
+/**
+ * `planned` means a budget a government approved. `projection` means neither an
+ * outcome nor a plan: a schedule of what the EXISTING debt portfolio will cost
+ * (debt service after the last actual year), or an IMF forecast of the economy
+ * (the general government balance after the last actual year). Both source
+ * datasets already use the literal string "projection" for their own status, so
+ * this name is taken from the data rather than invented here.
+ */
+export type Basis = "actual" | "planned" | "projection";
 export type Unit = "GEL" | "percent" | "GEL_per_resident";
 export type Severity = "severe" | "note";
 export type Availability = "available" | "missing";
@@ -189,9 +215,14 @@ export type FactQuerySnapshot = {
     populationFacts: MunicipalPopulationFact[];
     slugByCode: Record<string, string>;
   };
+  debt: { facts: ServedGovernmentDebtFact[] };
+  deficit: { facts: ServedGeneralGovernmentBalanceFact[] };
   gdpFacts: ServedNationalGdpFact[];
   sources: ResolvedSource[];
 };
+
+/** The single series of the general government balance dataset. */
+export const DEFICIT_SERIES_ID = "deficit.general_government.balance";
 
 export type FactQueryError = {
   code: string;

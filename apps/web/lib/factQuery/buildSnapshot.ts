@@ -14,6 +14,8 @@ import { absoluteWorkbookSourceUrl } from "../explorer/workbookModel";
 import { PROGRAM_SUCCESSIONS, findProgramSuccession } from "../data/adminSpending/programSuccessions";
 import { LEGACY_PROGRAM_JOINS } from "../data/adminSpending/legacyProgramJoins";
 import { makeProgramItemId } from "../data/adminSpending/generateAdminSpendingFacts";
+import { loadServedGeneralGovernmentBalanceData } from "../data/generalGovernmentBalance/importGeneralGovernmentBalance";
+import { loadServedGovernmentDebtData } from "../data/governmentDebt/importGovernmentDebtFacts";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { hashDataVersion } from "./canonical";
 import { resolvePublicSources, type ManifestDocument } from "./sources";
@@ -375,11 +377,13 @@ function sortedBy<T>(rows: T[], ...keys: Array<(row: T) => string | number>): T[
 }
 
 export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Promise<FactQuerySnapshot> {
-  const [explorer, municipal, taxonomy, manifestDocuments] = await Promise.all([
+  const [explorer, municipal, taxonomy, manifestDocuments, debt, deficit] = await Promise.all([
     loadServedExplorerData(),
     loadServedMunicipalData(),
     loadTaxonomyFiles("../../data/taxonomy"),
     loadManifestDocuments(),
+    loadServedGovernmentDebtData(),
+    loadServedGeneralGovernmentBalanceData(),
   ]);
 
   // explorer.sourceDocuments' incoming order is not hash-safe either: the CSV
@@ -514,6 +518,14 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
       ),
       slugByCode,
     },
+    debt: {
+      facts: sortedBy(
+        debt.facts,
+        (f) => f.year,
+        (f) => f.seriesId,
+      ),
+    },
+    deficit: { facts: sortedBy(deficit.facts, (f) => f.year) },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
     sources,
   };

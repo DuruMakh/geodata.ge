@@ -7,7 +7,7 @@
 // id, resolving sourceIds into documentIds without re-querying sources per
 // row, and deciding which already-evaluated request-level caveats belong on
 // one specific observation's caveatIds.
-import type { Availability, Caveat, DatasetId, Measure, PublicDocument, ResolvedSource, Unit } from "./types";
+import type { Availability, Basis, Caveat, DatasetId, Measure, PublicDocument, ResolvedSource, Unit } from "./types";
 
 /**
  * One value on one line of a query-function response, per spec section 7.2.
@@ -35,7 +35,7 @@ export type Observation = {
   value: number | null;
   availability: Availability;
   missingReason: string | null;
-  basis: "actual" | "planned" | null;
+  basis: Basis | null;
   valueDefinition: string;
   /**
    * Structured identity of WHAT IS MEASURED, for machine comparison.

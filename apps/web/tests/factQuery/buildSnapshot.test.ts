@@ -17,6 +17,37 @@ describe("buildFactQuerySnapshot", () => {
     expect(snapshot.gdpFacts.length).toBe(30);
   });
 
+  it("carries the debt and balance facts", async () => {
+    const snapshot = await buildFactQuerySnapshot(OPTIONS);
+
+    expect(new Set(snapshot.debt.facts.map((f) => f.seriesId))).toEqual(
+      new Set([
+        "debt.stock.total",
+        "debt.stock.domestic",
+        "debt.stock.external",
+        "debt.service.total",
+        "debt.service.principal",
+        "debt.service.interest",
+        "debt.rate.total",
+        "debt.rate.domestic",
+        "debt.rate.external",
+      ]),
+    );
+
+    // Projections begin the year after the last recorded one. If that ever
+    // stops holding, a projection overlaps an actual and "which is this?"
+    // stops being answerable from the year alone.
+    const service = snapshot.debt.facts.filter((f) => f.family === "service");
+    const lastActual = Math.max(...service.filter((f) => f.status === "actual").map((f) => f.year));
+    const firstProjection = Math.min(
+      ...service.filter((f) => f.status === "projection_existing_portfolio").map((f) => f.year),
+    );
+    expect(firstProjection).toBe(lastActual + 1);
+
+    expect(snapshot.deficit.facts).toHaveLength(37);
+    expect(snapshot.deficit.facts.filter((f) => f.status === "projection")).toHaveLength(6);
+  });
+
   it("exposes a url slug for every municipality and none for excluded codes", async () => {
     const snapshot = await buildFactQuerySnapshot(OPTIONS);
 

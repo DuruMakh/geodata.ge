@@ -21,7 +21,7 @@ import { selectSources } from "./sources";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import type { Comparison } from "./compare";
 import type { Observation } from "./observations";
-import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, ResolvedSource, Unit } from "./types";
+import type { Basis, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, ResolvedSource, Unit } from "./types";
 
 const EXCLUDED = new Set<string>(AGGREGATE_ONLY_MUNICIPAL_CODES);
 const TOTAL_LEVEL = "total";
@@ -37,7 +37,7 @@ export type RankEntry = {
   seriesLabelKa: string;
   value: number | null;
   unit: Unit;
-  basis: "actual" | "planned" | null;
+  basis: Basis | null;
   caveatIds: string[];
 };
 
@@ -70,7 +70,7 @@ type Candidate = {
   /** Never null: a row with no value is an exclusion, never a candidate. */
   value: number;
   unit: Unit;
-  basis: "actual" | "planned" | null;
+  basis: Basis | null;
   caveatIds: string[];
   /** Stable sort key, used only to break exact ties reproducibly. */
   stableId: string;

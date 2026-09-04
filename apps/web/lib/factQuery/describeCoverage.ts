@@ -7,8 +7,9 @@
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
 import { buildResponseMeta } from "./meta";
-import { describeCoverageInput, municipalMeasure, nationalMeasure } from "./schemas";
+import { debtMeasure, deficitMeasure, describeCoverageInput, municipalMeasure, nationalMeasure } from "./schemas";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
+import { DEFICIT_SERIES_ID } from "./types";
 import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
 
 const DATASET_IDS: readonly DatasetId[] = [
@@ -77,6 +78,8 @@ const EXCLUDED_MUNICIPALITY_REASON =
 
 const NATIONAL_MEASURES = nationalMeasure.options as Measure[];
 const MUNICIPAL_MEASURES = municipalMeasure.options as Measure[];
+const DEBT_MEASURES = debtMeasure.options as Measure[];
+const DEFICIT_MEASURES = deficitMeasure.options as Measure[];
 
 // Structural facts about each of the four fixed datasets — not "coverage"
 // (years, series, entities) in the sense the standing no-hardcoding rule
@@ -118,6 +121,23 @@ const DATASET_META: Record<
     labelKa: "მუნიციპალიტეტები",
     entityTypes: ["country", "municipality", "region"],
     measures: MUNICIPAL_MEASURES,
+  },
+  "government-debt": {
+    // Deliberately not any budget scope. Debt is a stock of obligations, and
+    // debt_not_budget_scope (caveats/rules.debt.ts) exists because adding it to
+    // expenditure or subtracting it from receipts is the predictable error.
+    budgetScope: "central_government_liabilities",
+    labelKa: "სახელმწიფო ვალი",
+    entityTypes: ["country"],
+    measures: DEBT_MEASURES,
+  },
+  "general-government-balance": {
+    // General government per the IMF: wider than either national series here,
+    // and NOT their difference.
+    budgetScope: "general_government_imf",
+    labelKa: "ზოგადი მთავრობის ბალანსი",
+    entityTypes: ["country"],
+    measures: DEFICIT_MEASURES,
   },
 };
 
@@ -170,6 +190,18 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
           ...snapshot.municipal.countryFunctionFacts.map((f) => f.year),
           ...snapshot.municipal.countryTotalFacts.map((f) => f.year),
         ],
+        datasetId,
+      );
+      break;
+    case "government-debt":
+      years = yearRange(
+        snapshot.debt.facts.map((f) => f.year),
+        datasetId,
+      );
+      break;
+    case "general-government-balance":
+      years = yearRange(
+        snapshot.deficit.facts.map((f) => f.year),
         datasetId,
       );
       break;
@@ -357,6 +389,56 @@ function municipalSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
   return [totalSeries, ...functionSeries];
 }
 
+/**
+ * The nine debt series, each with the exact years it actually carries. Ragged
+ * on purpose: debt.rate.domestic and .external have years no reviewed source
+ * published a rate for, and those years are absent here rather than listed
+ * with a null - the exact-list guarantee is what stops a client assuming a
+ * rate exists for every year the family spans.
+ */
+function debtSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
+  const labels: Record<string, string> = {
+    "debt.stock.total": "მთლიანი ვალი",
+    "debt.stock.domestic": "საშინაო ვალი",
+    "debt.stock.external": "საგარეო ვალი",
+    "debt.service.total": "ვალის მომსახურება — ჯამი",
+    "debt.service.principal": "ძირითადი თანხის გადახდა",
+    "debt.service.interest": "პროცენტის გადახდა",
+    "debt.rate.total": "საშუალო შეწონილი განაკვეთი — ჯამი",
+    "debt.rate.domestic": "საშუალო შეწონილი განაკვეთი — საშინაო",
+    "debt.rate.external": "საშუალო შეწონილი განაკვეთი — საგარეო",
+  };
+
+  const byId = new Map<string, number[]>();
+  for (const fact of snapshot.debt.facts) {
+    if (fact.value === null) continue;
+    byId.set(fact.seriesId, [...(byId.get(fact.seriesId) ?? []), fact.year]);
+  }
+
+  return Object.entries(labels).map(([seriesId, labelKa]) => ({
+    seriesId,
+    labelKa,
+    level: seriesId.split(".")[1],
+    parentSeriesId: null,
+    availability: byId.has(seriesId) ? ("served" as const) : ("taxonomy_only" as const),
+    years: sortedUniqueYears(byId.get(seriesId) ?? []),
+  }));
+}
+
+/** One series. Both measures come from the reviewed row, so neither is derived. */
+function deficitSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
+  return [
+    {
+      seriesId: DEFICIT_SERIES_ID,
+      labelKa: "ზოგადი მთავრობის ბალანსი",
+      level: "total",
+      parentSeriesId: null,
+      availability: "served",
+      years: sortedUniqueYears(snapshot.deficit.facts.map((f) => f.year)),
+    },
+  ];
+}
+
 function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): SeriesEntry[] {
   switch (datasetId) {
     case "national-revenue":
@@ -367,6 +449,10 @@ function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): Se
       return ministriesSeriesFor(snapshot);
     case "municipal-expenditure":
       return municipalSeriesFor(snapshot);
+    case "government-debt":
+      return debtSeriesFor(snapshot);
+    case "general-government-balance":
+      return deficitSeriesFor(snapshot);
   }
 }
 

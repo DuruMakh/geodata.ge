@@ -1,5 +1,5 @@
 // apps/web/lib/factQuery/caveats/engine.ts
-import type { Caveat, DatasetId, Measure, Severity } from "../types";
+import type { Basis, Caveat, DatasetId, Measure, Severity } from "../types";
 import type { MunicipalTotalFact, ServedNationalGdpFact } from "../types";
 
 /**
@@ -44,7 +44,7 @@ export type CaveatContext = {
     parentSeriesId: string | null;
     year: number;
     value: number | null;
-    basis: "actual" | "planned" | null;
+    basis: Basis | null;
     /** Mirrors Observation.valueDefinitionId, so a rule can detect a real definition break between two years without reading display prose. */
     valueDefinitionId: string;
   }[];

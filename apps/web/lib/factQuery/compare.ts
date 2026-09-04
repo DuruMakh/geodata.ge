@@ -25,14 +25,14 @@ import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
 import { selectSources } from "./sources";
 import type { Observation } from "./observations";
-import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, Unit } from "./types";
+import type { Basis, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, Unit } from "./types";
 
 export type ComparisonEndpoint = {
   year: number;
   value: number | null;
   availability: "available" | "missing";
   missingReason: string | null;
-  basis: "actual" | "planned" | null;
+  basis: Basis | null;
   valueDefinition: string;
   /** Structured identity of what is measured. This, never valueDefinition, decides like-for-like. */
   valueDefinitionId: string;
