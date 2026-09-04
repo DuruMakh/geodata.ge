@@ -1,6 +1,6 @@
 # General government deficit data design
 
-**Status:** Draft for user review, 2026-09-04
+**Status:** Approved 2026-09-04
 
 ## 1. Purpose
 
