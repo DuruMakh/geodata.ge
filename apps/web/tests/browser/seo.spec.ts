@@ -340,8 +340,10 @@ test("raw homepage response retains meaningful content, heading order, and core 
   );
 
   expect(meaningfulText.length).toBeGreaterThan(500);
-  expect(headingSequence).toEqual(["H1", "H2", "H2", "H2", "H2"]);
+  expect(headingSequence).toEqual(["H1", "H2", "H2", "H2", "H2", "H2", "H2"]);
   expect(serverLinkHrefs).toContain("/explorer");
+  expect(serverLinkHrefs).toContain("/explorer/debt");
+  expect(serverLinkHrefs).toContain("/explorer/deficit");
   expect(serverLinkHrefs).toContain("/methodology");
 });
 

@@ -5,7 +5,11 @@ import {
   type MunicipalTotalFact,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
-import type { ServedBudgetFact } from "../servedRows";
+import type {
+  ServedBudgetFact,
+  ServedGeneralGovernmentBalanceFact,
+  ServedGovernmentDebtFact,
+} from "../servedRows";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { isDerivedTotalItemId } from "../explorer/explorerData";
 
@@ -28,6 +32,19 @@ export type LandingDatasetSummary = {
   rows: LandingSummaryRow[];
 };
 
+export type LandingDebtSummary = {
+  latestYear: number;
+  totalGel: number;
+  domesticGel: number;
+  externalGel: number;
+};
+
+export type LandingDeficitSummary = {
+  latestActualYear: number;
+  percentGdp: number;
+  recentActual: Array<{ year: number; percentGdp: number }>;
+};
+
 export type LandingContext = {
   yearsLabel: string;
   updatedAt: string;
@@ -37,6 +54,8 @@ export type LandingModel = LandingContext & {
   expenditure: LandingDatasetSummary;
   revenue: LandingDatasetSummary;
   municipalities: LandingDatasetSummary;
+  debt: LandingDebtSummary;
+  deficit: LandingDeficitSummary;
 };
 
 type BuildLandingModelInput = {
@@ -46,6 +65,8 @@ type BuildLandingModelInput = {
   municipalities: Municipality[];
   municipalTotalFacts: MunicipalTotalFact[];
   municipalCountryTotalFacts: MunicipalTotalFact[];
+  debtFacts: ServedGovernmentDebtFact[];
+  balanceFacts: ServedGeneralGovernmentBalanceFact[];
 };
 
 function basisStatus(rows: ServedBudgetFact[]): LandingBasisStatus {
@@ -116,6 +137,45 @@ function buildMunicipalSummary(
   };
 }
 
+function buildDebtSummary(facts: ServedGovernmentDebtFact[]): LandingDebtSummary {
+  const latestYear = facts
+    .filter((fact) => fact.family === "stock" && fact.status === "actual" && fact.valueKind === "amount_gel")
+    .map((fact) => fact.year)
+    .sort((left, right) => left - right)
+    .at(-1)!;
+  const latest = facts.filter((fact) => fact.year === latestYear && fact.family === "stock");
+  const valueFor = (seriesId: ServedGovernmentDebtFact["seriesId"]) => {
+    const value = latest.find((fact) => fact.seriesId === seriesId)?.value;
+    if (value === null || value === undefined) throw new Error(`Missing ${seriesId} for ${latestYear}`);
+    return value;
+  };
+
+  return {
+    latestYear,
+    totalGel: valueFor("debt.stock.total"),
+    domesticGel: valueFor("debt.stock.domestic"),
+    externalGel: valueFor("debt.stock.external"),
+  };
+}
+
+function buildDeficitSummary(facts: ServedGeneralGovernmentBalanceFact[]): LandingDeficitSummary {
+  const recentActual = facts
+    .filter((fact) => fact.status === "actual")
+    .slice()
+    .sort((left, right) => left.year - right.year)
+    .slice(-3);
+  const latestActual = recentActual.at(-1)!;
+
+  return {
+    latestActualYear: latestActual.year,
+    percentGdp: latestActual.generalGovernmentBalancePctGdp,
+    recentActual: recentActual.map((fact) => ({
+      year: fact.year,
+      percentGdp: fact.generalGovernmentBalancePctGdp,
+    })),
+  };
+}
+
 function buildLandingContextFromActive(
   activeFacts: ServedBudgetFact[],
   sourceDocuments: SourceDocumentRow[],
@@ -149,6 +209,8 @@ export function buildLandingModel({
   municipalities,
   municipalTotalFacts,
   municipalCountryTotalFacts,
+  debtFacts,
+  balanceFacts,
 }: BuildLandingModelInput): LandingModel {
   const active = chooseActivePublicFacts(facts);
   const context = buildLandingContextFromActive(
@@ -164,5 +226,7 @@ export function buildLandingModel({
     expenditure,
     revenue,
     municipalities: municipalSummary,
+    debt: buildDebtSummary(debtFacts),
+    deficit: buildDeficitSummary(balanceFacts),
   };
 }

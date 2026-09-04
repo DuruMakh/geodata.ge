@@ -427,6 +427,42 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
   expect(geometry.overflow).toEqual({ body: 390, viewport: 390 });
 });
 
+test("landing methodology keeps its introduction and link with the left heading on desktop", async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto(`${TEST_BASE_URL}/`);
+
+  const methodology = page.getByTestId("landing-methodology");
+  const copy = methodology.getByTestId("landing-methodology-copy");
+  const intro = methodology.getByTestId("landing-methodology-intro");
+  const link = methodology.getByTestId("landing-methodology-link");
+  const list = methodology.locator("ol");
+  await expect(copy).toBeVisible();
+  await expect(intro).toBeVisible();
+  await expect(link).toBeVisible();
+  await expect(list).toBeVisible();
+
+  const positions = await page.evaluate(() => {
+    const section = document.querySelector<HTMLElement>('[data-testid="landing-methodology"]')!;
+    const box = (selector: string) => {
+      const rect = section.querySelector<HTMLElement>(selector)!.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, top: rect.top };
+    };
+    return {
+      copy: box('[data-testid="landing-methodology-copy"]'),
+      intro: box('[data-testid="landing-methodology-intro"]'),
+      link: box('[data-testid="landing-methodology-link"]'),
+      list: box("ol"),
+    };
+  });
+
+  expect(positions.intro.left).toBeGreaterThanOrEqual(positions.copy.left);
+  expect(positions.intro.right).toBeLessThanOrEqual(positions.copy.right);
+  expect(positions.link.left).toBeGreaterThanOrEqual(positions.copy.left);
+  expect(positions.link.right).toBeLessThanOrEqual(positions.copy.right);
+  expect(positions.list.left).toBeGreaterThan(positions.copy.right);
+  expect(positions.list.top).toBeLessThanOrEqual(positions.intro.top);
+});
+
 test("methodology keyboard controls expose native behavior and visible focus", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);
   await expectVisibleFocusOutline(page.getByTestId("methodology-live-row").first());

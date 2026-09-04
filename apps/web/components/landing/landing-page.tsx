@@ -4,6 +4,7 @@ import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
 import { HeroReliefLazy } from "./hero-relief-lazy";
 import { LandingDatasetSection } from "./landing-dataset-section";
+import { LandingFiscalSections } from "./landing-fiscal-sections";
 
 // Country snapshots are maintained by hand; every budget value below them is
 // derived from the same active facts as the matching explorer.
@@ -152,44 +153,47 @@ export function LandingPage({ model }: { model: LandingModel }) {
             summary={model.municipalities}
           />
 
+          <LandingFiscalSections debt={model.debt} deficit={model.deficit} />
+
           <section
             data-testid="landing-methodology"
             aria-labelledby="landing-methodology-title"
             className="grid gap-5 border-t border-[var(--hairline)] py-8 min-[850px]:grid-cols-[52px_minmax(230px,0.82fr)_minmax(0,1.35fr)] min-[850px]:gap-8 min-[850px]:py-11"
           >
             <div aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[12px] text-[var(--accent)]">
-              04
+              06
             </div>
-            <h2
-              id="landing-methodology-title"
-              className="font-[family-name:var(--font-display)] text-[26px] font-semibold leading-[1.16]"
-            >
-              მეთოდოლოგია და პირველწყაროები
-            </h2>
-            <div>
-              <p className="text-[13px] leading-[1.75] text-[var(--body)]">
+            <div data-testid="landing-methodology-copy" className="min-w-0">
+              <h2
+                id="landing-methodology-title"
+                className="font-[family-name:var(--font-display)] text-[26px] font-semibold leading-[1.16]"
+              >
+                მეთოდოლოგია და პირველწყაროები
+              </h2>
+              <p data-testid="landing-methodology-intro" className="mt-4 text-[13px] leading-[1.75] text-[var(--body)]">
                 თითოეული რიცხვი უკავშირდება ოფიციალურ წყაროს, კლასიფიკაციის წესსა და გადამოწმების შედეგს.
               </p>
-              <ol className="mt-5 border-t border-[var(--hairline-soft)]">
-                {METHODOLOGY_STEPS.map((label, index) => (
-                  <li
-                    key={label}
-                    className="grid grid-cols-[28px_1fr] gap-3 border-b border-[var(--hairline-soft)] py-2.5 text-[11.5px] text-[var(--body)]"
-                  >
-                    <span aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[var(--faint)]">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span>{label}</span>
-                  </li>
-                ))}
-              </ol>
               <Link
+                data-testid="landing-methodology-link"
                 href="/methodology"
                 className="mt-4 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
               >
                 მეთოდოლოგიის ნახვა →
               </Link>
             </div>
+            <ol className="border-t border-[var(--hairline-soft)]">
+              {METHODOLOGY_STEPS.map((label, index) => (
+                <li
+                  key={label}
+                  className="grid grid-cols-[28px_1fr] gap-3 border-b border-[var(--hairline-soft)] py-2.5 text-[11.5px] text-[var(--body)]"
+                >
+                  <span aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[var(--faint)]">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span>{label}</span>
+                </li>
+              ))}
+            </ol>
           </section>
         </div>
 
