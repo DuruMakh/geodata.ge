@@ -750,6 +750,11 @@ describe("country-level datasets", () => {
       expect(response.kind).toBe("error");
       if (response.kind !== "error") throw new Error("unreachable");
       expect(response.error.code).toBe("invalid_parameters");
+      // The bare enum error lists the four legal ids without saying why these
+      // two are not among them, so a model may retry with a different
+      // dimension instead of understanding the dataset can never be ranked.
+      expect(response.error.messageEn).toContain("single entity");
+      expect(response.error.messageEn).toContain("query_debt");
     }
   });
 });

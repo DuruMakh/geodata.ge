@@ -477,7 +477,7 @@ A separate code from `debt_service_projection` rather than one shared projection
 
 ## Published bulk files
 
-Seven JSON files are generated at build time from the same verified snapshot the
+Ten JSON files are generated at build time from the same verified snapshot the
 query core reads, and served under `/downloads/data/`. They are publications,
 not an API: there is no request-time runtime behind them.
 
@@ -488,12 +488,15 @@ them for every file and is regenerated with them, so read it there.
 | Public path | Contents |
 | --- | --- |
 | `/downloads/data/manifest.json` | Every published file with its row count, byte size, SHA-256, and each dataset's covered year range. |
-| `/downloads/data/catalogue.json` | The four datasets, their entities, series, hierarchy and exclusions. |
+| `/downloads/data/catalogue.json` | Every dataset, with its entities, series, hierarchy and exclusions. |
 | `/downloads/data/sources.json` | Every logical source with its public originals or its stated derivation. |
 | `/downloads/data/national-revenue.json` | Annual state-budget revenue observations, including `revenue.total`. |
 | `/downloads/data/national-expenditure.json` | Annual state-budget expenditure observations, including `expenditure.total`. |
 | `/downloads/data/ministries.json` | Administrative categories and major programs, both levels in one file, including `admin_spending.total`. |
 | `/downloads/data/municipal-expenditure.json` | Municipality, region and Georgia rows for the ten functional categories, including `municipal.total`. |
+| `/downloads/data/government-debt.json` | Debt stock and debt service in GEL. Years after the last recorded one are projections of the existing portfolio. |
+| `/downloads/data/government-debt-rates.json` | Weighted-average interest rates in percent per annum, with the documented publication gaps left empty. |
+| `/downloads/data/general-government-balance.json` | The IMF's general government balance as a share of GDP, with the published GEL amount alongside. Values are signed: negative is a deficit. |
 
 Each file publishes every total its own embedded catalogue advertises. That is
 enforced by a test rather than by care: the first version derived its series
@@ -508,11 +511,18 @@ are, unchanged.
 
 ### What the figures are
 
-Every observation is `amount_gel`. Shares and per-resident values are **not**
-precomputed: each file carries the denominators needed to reproduce its allowed
-ratios instead — `supportingValues.gdpFacts` for the national and ministries
-files, `supportingValues.populationFacts` for the municipal one. Publishing four
+Every observation is `amount_gel`, with two exceptions that have no amount
+form at all. Shares and per-resident values are **not** precomputed: each file
+carries the denominators needed to reproduce its allowed ratios instead —
+`supportingValues.gdpFacts` for the national, ministries and debt files,
+`supportingValues.populationFacts` for the municipal one. Publishing four
 measures of every row would multiply the files to say nothing new.
+
+The exceptions are `government-debt-rates.json`, whose observations are
+`rate_percent` because an interest rate cannot be expressed as an amount, and
+`general-government-balance.json`, whose observations are `share_of_gdp_pct`
+because that is the form the IMF publishes; its GEL amount travels alongside in
+`supportingValues.balanceGelByYear` rather than being derived.
 
 Each file is self-contained. It repeats its own `catalogue`, `coverage`,
 `sources` and `caveats` in full rather than by reference, so a download read on

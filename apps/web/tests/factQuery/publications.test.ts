@@ -2,6 +2,7 @@
 import { createHash } from "node:crypto";
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import {
   buildAllPublications,
   buildCatalogueFile,
@@ -41,13 +42,15 @@ describe("publication header", () => {
 });
 
 describe("catalogue.json", () => {
-  it("publishes all four datasets with their series and entities", async () => {
+  it("publishes every dataset with its series and entities", async () => {
     const catalogue = parse(buildCatalogueFile(snapshot).bytes) as unknown as {
       datasets: { datasetId: string; series: unknown[]; entities?: unknown[] }[];
       exclusions: unknown[];
     };
 
     expect(catalogue.datasets.map((dataset) => dataset.datasetId).sort()).toEqual([
+      "general-government-balance",
+      "government-debt",
       "ministries",
       "municipal-expenditure",
       "national-expenditure",
@@ -415,3 +418,21 @@ describe("regressions from the Part 2 review", () => {
   });
 });
 
+
+describe("the published catalogue", () => {
+  it("describes every dataset the endpoint serves", () => {
+    // publications.ts kept its own DATASET_IDS list, so catalogue.json and
+    // manifest.json's coverage described four datasets while manifest.json's
+    // files listed all ten. A bulk client told to read the catalogue first was
+    // told debt and the balance do not exist.
+    const catalogue = parse(buildCatalogueFile(snapshot).bytes) as unknown as {
+      datasets: { datasetId: string }[];
+    };
+    const served = describeCoverage(snapshot, {});
+    if (served.kind !== "catalogue") throw new Error("expected a catalogue");
+
+    expect(catalogue.datasets.map((d) => d.datasetId).sort()).toEqual(
+      (served.data as { datasets: { datasetId: string }[] }).datasets.map((d) => d.datasetId).sort(),
+    );
+  });
+});

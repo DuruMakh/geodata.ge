@@ -221,6 +221,27 @@ export type FactQuerySnapshot = {
   sources: ResolvedSource[];
 };
 
+/**
+ * The nine debt series and their Georgian labels, in publication order.
+ *
+ * One map, consumed by queryDebt (an observation's seriesLabelKa),
+ * describeCoverage (the catalogue's labelKa) and publications (which series go
+ * in which file). They were three separate copies, which meant an observation
+ * and the catalogue entry describing it could drift apart with nothing to catch
+ * it - the same hazard the budgetScope constants carry a comment about.
+ */
+export const DEBT_SERIES_LABELS_KA: Readonly<Record<string, string>> = {
+  "debt.stock.total": "მთლიანი ვალი",
+  "debt.stock.domestic": "საშინაო ვალი",
+  "debt.stock.external": "საგარეო ვალი",
+  "debt.service.total": "ვალის მომსახურება — ჯამი",
+  "debt.service.principal": "ძირითადი თანხის გადახდა",
+  "debt.service.interest": "პროცენტის გადახდა",
+  "debt.rate.total": "საშუალო შეწონილი განაკვეთი — ჯამი",
+  "debt.rate.domestic": "საშუალო შეწონილი განაკვეთი — საშინაო",
+  "debt.rate.external": "საშუალო შეწონილი განაკვეთი — საგარეო",
+};
+
 /** The single series of the general government balance dataset. */
 export const DEFICIT_SERIES_ID = "deficit.general_government.balance";
 

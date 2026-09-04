@@ -224,10 +224,10 @@ export default async function ConnectPage() {
                       a year the service does not have. Debt runs past the last
                       recorded year because its service schedule is published
                       ahead; the balance does the same for the IMF forecast. */}
-                  <li>სახელმწიფო ვალი — {ranges["government-debt"]}</li>
+                  <li>სახელმწიფო ვალი — {ranges["government-debt"]} (ბოლო წლები — პროგნოზი)</li>
                   <li>
                     ზოგადი მთავრობის ბალანსი (დეფიციტი/პროფიციტი) —{" "}
-                    {ranges["general-government-balance"]}
+                    {ranges["general-government-balance"]} (ბოლო წლები — პროგნოზი)
                   </li>
                 </ul>
               </div>

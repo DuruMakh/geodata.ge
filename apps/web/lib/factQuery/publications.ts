@@ -37,11 +37,17 @@ export type PublicationArtifact = {
   rowCount: number;
 };
 
+// Drives buildCatalogueFile's datasets array and buildManifestFile's coverage
+// array. Widening DatasetId does not force an entry here, so a dataset served
+// over /mcp can silently be absent from the published catalogue - which is
+// exactly what happened to debt and the balance until this was widened.
 const DATASET_IDS: readonly DatasetId[] = [
   "national-revenue",
   "national-expenditure",
   "ministries",
   "municipal-expenditure",
+  "government-debt",
+  "general-government-balance",
 ];
 
 /**
@@ -313,15 +319,13 @@ function ministriesFile(snapshot: FactQuerySnapshot): PublicationArtifact {
   };
 }
 
-const DEBT_AMOUNT_SERIES_IDS = [
-  "debt.stock.total",
-  "debt.stock.domestic",
-  "debt.stock.external",
-  "debt.service.total",
-  "debt.service.principal",
-  "debt.service.interest",
-];
-const DEBT_RATE_SERIES_IDS = ["debt.rate.total", "debt.rate.domestic", "debt.rate.external"];
+// Derived from the facts rather than listed, so a tenth reviewed debt series is
+// published rather than silently dropped - the same failure totalSeriesIds
+// above exists to prevent.
+function debtSeriesIds(snapshot: FactQuerySnapshot, kind: "amount" | "rate"): string[] {
+  const wanted = kind === "rate" ? ["rate"] : ["stock", "service"];
+  return [...new Set(snapshot.debt.facts.filter((f) => wanted.includes(f.family)).map((f) => f.seriesId))];
+}
 
 export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtifact[] {
   const nationalYears = yearsOf(snapshot.national.facts);
@@ -394,7 +398,7 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
       "government-debt",
       "government-debt.json",
       queryDebt(snapshot, {
-        seriesIds: DEBT_AMOUNT_SERIES_IDS,
+        seriesIds: debtSeriesIds(snapshot, "amount"),
         years: yearsOf(snapshot.debt.facts),
         measure: "amount_gel",
       }),
@@ -405,7 +409,7 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
       "government-debt",
       "government-debt-rates.json",
       queryDebt(snapshot, {
-        seriesIds: DEBT_RATE_SERIES_IDS,
+        seriesIds: debtSeriesIds(snapshot, "rate"),
         years: yearsOf(snapshot.debt.facts.filter((fact) => fact.family === "rate")),
         measure: "rate_percent",
       }),

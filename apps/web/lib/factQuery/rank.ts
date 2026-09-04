@@ -105,6 +105,21 @@ function catalogueSeries(snapshot: FactQuerySnapshot, datasetId: DatasetId): Cat
 }
 
 export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryResponse {
+  // Named before schema validation, because the enum's own message lists the
+  // four legal ids without saying why these two are not among them - a model
+  // reading it may retry with a different dimension rather than understand that
+  // a single-entity dataset can never be ranked.
+  const requestedDataset = (rawInput as { datasetId?: unknown } | null)?.datasetId;
+  if (requestedDataset === "government-debt" || requestedDataset === "general-government-balance") {
+    return errorResponse(snapshot, {
+      code: "invalid_parameters",
+      messageKa: "ამ მონაცემთა ნაკრებს ერთადერთი სუბიექტი აქვს (საქართველო), ამიტომ რანჟირება არ ეხება.",
+      messageEn: `The "${requestedDataset}" dataset has a single entity (Georgia), so there is nothing to rank. Use query_debt or query_deficit for its values, or compare for a change between two years.`,
+      retryable: false,
+      validChoices: ["national-revenue", "national-expenditure", "ministries", "municipal-expenditure"],
+    });
+  }
+
   const parsed = rankInput.safeParse(rawInput);
 
   if (!parsed.success) {

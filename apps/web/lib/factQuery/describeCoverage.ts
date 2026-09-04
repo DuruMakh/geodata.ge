@@ -9,7 +9,7 @@ import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
 import { buildResponseMeta } from "./meta";
 import { debtMeasure, deficitMeasure, describeCoverageInput, municipalMeasure, nationalMeasure } from "./schemas";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
-import { DEFICIT_SERIES_ID } from "./types";
+import { DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_ID } from "./types";
 import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
 
 // Typed as DatasetId[] rather than derived from the union, so widening
@@ -402,27 +402,24 @@ function municipalSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
  * rate exists for every year the family spans.
  */
 function debtSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
-  const labels: Record<string, string> = {
-    "debt.stock.total": "მთლიანი ვალი",
-    "debt.stock.domestic": "საშინაო ვალი",
-    "debt.stock.external": "საგარეო ვალი",
-    "debt.service.total": "ვალის მომსახურება — ჯამი",
-    "debt.service.principal": "ძირითადი თანხის გადახდა",
-    "debt.service.interest": "პროცენტის გადახდა",
-    "debt.rate.total": "საშუალო შეწონილი განაკვეთი — ჯამი",
-    "debt.rate.domestic": "საშუალო შეწონილი განაკვეთი — საშინაო",
-    "debt.rate.external": "საშუალო შეწონილი განაკვეთი — საგარეო",
-  };
-
   const byId = new Map<string, number[]>();
   for (const fact of snapshot.debt.facts) {
     if (fact.value === null) continue;
     byId.set(fact.seriesId, [...(byId.get(fact.seriesId) ?? []), fact.year]);
   }
 
-  return Object.entries(labels).map(([seriesId, labelKa]) => ({
+  // Driven by the facts as well as the label map, so a tenth reviewed series is
+  // visible here rather than only through query_debt, which derives its known
+  // ids from the facts. An id with no label falls back to the id itself, which
+  // is ugly and therefore gets noticed.
+  const seriesIds = [
+    ...Object.keys(DEBT_SERIES_LABELS_KA),
+    ...snapshot.debt.facts.map((fact) => fact.seriesId).filter((id) => !(id in DEBT_SERIES_LABELS_KA)),
+  ];
+
+  return [...new Set(seriesIds)].map((seriesId) => ({
     seriesId,
-    labelKa,
+    labelKa: DEBT_SERIES_LABELS_KA[seriesId] ?? seriesId,
     level: seriesId.split(".")[1],
     parentSeriesId: null,
     availability: byId.has(seriesId) ? ("served" as const) : ("taxonomy_only" as const),

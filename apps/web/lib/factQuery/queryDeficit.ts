@@ -57,6 +57,15 @@ export function queryDeficit(
   }
 
   const input = parsed.data;
+
+  if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
+    return errorResponse(snapshot, {
+      code: "data_version_changed",
+      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
+      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      retryable: false,
+    });
+  }
   const facts = snapshot.deficit.facts;
   const availableYears = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
   const minYear = availableYears[0];

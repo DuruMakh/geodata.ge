@@ -596,3 +596,26 @@ describe("the country-level datasets", () => {
     );
   });
 });
+
+describe("issues found in code review", () => {
+  it("treats a rate change as a POINT difference, not as growth", () => {
+    // PERCENTAGE_MEASURES did not include rate_percent, so the GEL branch ran:
+    // a rate moving 3.3 -> 4.9 came back as "grew 48.5%" with the point-change
+    // column empty. That is the mislabelling rate_percent exists to prevent.
+    const response = compare(snapshot, {
+      target: { dataset: "debt", seriesIds: ["debt.rate.total"] },
+      fromYear: 2016,
+      toYear: 2024,
+      measure: "rate_percent",
+    });
+
+    if (response.kind !== "comparisons") throw new Error(`expected comparisons, got ${response.kind}`);
+    const row = (response.data as {
+      comparisons: { absoluteChange: number | null; percentageChange: number | null; percentagePointChange: number | null }[];
+    }).comparisons[0]!;
+
+    expect(row.percentagePointChange).not.toBeNull();
+    expect(row.absoluteChange).toBeNull();
+    expect(row.percentageChange).toBeNull();
+  });
+});

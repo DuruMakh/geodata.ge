@@ -64,7 +64,12 @@ export type Comparison = {
   caveatIds: string[];
 };
 
-const PERCENTAGE_MEASURES = new Set<Measure>(["share_of_total_pct", "share_of_gdp_pct"]);
+// rate_percent belongs here for the same reason it exists at all: a rate is a
+// percent, so the honest difference between two of them is a POINT difference.
+// Without it the GEL branch ran, and a rate moving 4.6% -> 6.2% was reported as
+// "grew 48.5%" with the point-change column empty - the mislabelling this
+// measure was introduced to prevent, one layer further down.
+const PERCENTAGE_MEASURES = new Set<Measure>(["share_of_total_pct", "share_of_gdp_pct", "rate_percent"]);
 
 /**
  * The one definition change measured and accepted as comparable.

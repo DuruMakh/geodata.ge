@@ -239,3 +239,20 @@ describe("getSources", () => {
     });
   });
 });
+
+describe("years only the newer datasets reach", () => {
+  it("does not report a covered year as out of range", () => {
+    // coveredYears was built from the national, ministries and municipal facts
+    // only, so it stopped at 2025 - and get_sources rejected 1995 and 2028 with
+    // a false out-of-range error, breaking the flow the server instructions
+    // push clients toward: query a year, take its sourceIds, ask about that year.
+    for (const [sourceId, year] of [
+      ["source.imf_weo_april_2026_general_government_balance", 1995],
+      ["source.mof_public_debt_bulletin_n25", 2028],
+    ] as const) {
+      const response = getSources(snapshot, { sourceIds: [sourceId], years: [year] });
+
+      expect(response.kind, `${sourceId} ${year}`).toBe("sources");
+    }
+  });
+});

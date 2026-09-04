@@ -14,6 +14,7 @@ import { buildResponseMeta } from "./meta";
 import { buildObservationId, caveatIdsForObservation, resolveDocumentIds, uniqueSorted } from "./observations";
 import { queryDebtInput } from "./schemas";
 import { selectSources, splitSourceIds } from "./sources";
+import { DEBT_SERIES_LABELS_KA } from "./types";
 import type { CaveatContext } from "./caveats";
 import type { Observation } from "./observations";
 import type { Basis, Coverage, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Unit } from "./types";
@@ -26,18 +27,6 @@ const ENTITY_LABEL_KA = "საქართველო";
 const BUDGET_SCOPE = "central_government_liabilities";
 
 type Family = "stock" | "service" | "rate";
-
-const SERIES_LABELS_KA: Record<string, string> = {
-  "debt.stock.total": "მთლიანი ვალი",
-  "debt.stock.domestic": "საშინაო ვალი",
-  "debt.stock.external": "საგარეო ვალი",
-  "debt.service.total": "ვალის მომსახურება — ჯამი",
-  "debt.service.principal": "ძირითადი თანხის გადახდა",
-  "debt.service.interest": "პროცენტის გადახდა",
-  "debt.rate.total": "საშუალო შეწონილი განაკვეთი — ჯამი",
-  "debt.rate.domestic": "საშუალო შეწონილი განაკვეთი — საშინაო",
-  "debt.rate.external": "საშუალო შეწონილი განაკვეთი — საგარეო",
-};
 
 /**
  * A rate is a percent per annum; a stock is an amount. Asking for one with the
@@ -59,8 +48,15 @@ function missingSeriesReason(year: number): string {
   return `არჩეული სერიისთვის ${year} წელს მონაცემი არ ფიქსირდება — ეს ნულოვან მნიშვნელობას არ ნიშნავს.`;
 }
 
+/**
+ * Only for input validation, before any fact is in hand; everywhere a fact
+ * exists its own typed `family` field is used instead. Falling back rather than
+ * casting keeps a future id with an unexpected shape returning a structured
+ * measure error instead of throwing on an undefined lookup.
+ */
 function familyOf(seriesId: string): Family {
-  return seriesId.split(".")[1] as Family;
+  const segment = seriesId.split(".")[1];
+  return segment === "stock" || segment === "service" || segment === "rate" ? segment : "stock";
 }
 
 /**
@@ -93,7 +89,7 @@ function valueDefinitionFor(family: Family, measure: string): string {
  * `source.mof_...`. Translating here keeps both files in the form their own
  * validator demands, instead of editing reviewed rows to satisfy a registry.
  */
-function registrySourceId(id: string): string {
+export function registrySourceId(id: string): string {
   return id.startsWith("source.") ? id : `source.${id}`;
 }
 
@@ -119,6 +115,15 @@ export function queryDebt(
   }
 
   const input = parsed.data;
+
+  if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
+    return errorResponse(snapshot, {
+      code: "data_version_changed",
+      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
+      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      retryable: false,
+    });
+  }
   const facts = snapshot.debt.facts;
   const knownSeriesIds = new Set<string>(facts.map((fact) => fact.seriesId));
 
@@ -188,7 +193,10 @@ export function queryDebt(
       } else if (fact.value === null) {
         // A published gap, not an absent row: the reviewed data says this
         // year/scope was never published rather than saying nothing at all.
-        missingReason = RATE_NOT_PUBLISHED_REASON;
+        // Branching on the family rather than assuming: every null in the
+        // reviewed file today is a rate, and a future null amount must not
+        // inherit a message about interest rates.
+        missingReason = fact.family === "rate" ? RATE_NOT_PUBLISHED_REASON : missingSeriesReason(year);
       } else {
         basis = basisOf(fact.status);
         const factSourceIds =
@@ -224,7 +232,7 @@ export function queryDebt(
         entityLabelKa: ENTITY_LABEL_KA,
         entitySlug: null,
         seriesId,
-        seriesLabelKa: SERIES_LABELS_KA[seriesId] ?? seriesId,
+        seriesLabelKa: DEBT_SERIES_LABELS_KA[seriesId] ?? seriesId,
         level: family,
         parentSeriesId: null,
         year,

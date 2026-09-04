@@ -152,7 +152,13 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   const coveredYears = [
     ...snapshot.national.facts.map((f) => f.year),
     ...snapshot.ministries.facts.map((f) => f.year),
-    ...snapshot.municipal.totalFacts.map((f) => f.year),
+    ...snapshot.municipal.totalFacts.map((fact) => fact.year),
+    // Without these, a year only the new datasets reach - the balance starts
+    // in 1995, debt service runs to 2030 - came back as a false out-of-range
+    // error, breaking the documented flow: query a year, take its sourceIds,
+    // then ask get_sources about that same year.
+    ...snapshot.debt.facts.map((fact) => fact.year),
+    ...snapshot.deficit.facts.map((f) => f.year),
   ];
   const minYear = Math.min(...coveredYears);
   const maxYear = Math.max(...coveredYears);

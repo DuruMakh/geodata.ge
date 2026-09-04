@@ -1,6 +1,7 @@
 // apps/web/tests/factQuery/queryDebt.test.ts
 import { describe, expect, it } from "vitest";
 import { queryDebt } from "../../lib/factQuery/queryDebt";
+import { queryDeficit } from "../../lib/factQuery/queryDeficit";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 
 const snapshot = loadPackagedSnapshot();
@@ -61,5 +62,41 @@ describe("queryDebt", () => {
 
     expect(response.kind).toBe("observations");
     expect(observations(response)[0]!.value).toBeGreaterThan(0);
+  });
+});
+
+describe("expectedDataVersion", () => {
+  it("refuses a stale version rather than serving data under it", () => {
+    // Both functions accepted the parameter in their schema - so it was
+    // advertised in the published JSON schema - and ignored it, while the other
+    // seven functions error. A client pinning a version got a hard error from
+    // one tool and stale-but-unflagged data from another, then built one answer
+    // from two snapshots.
+    const stale = "0".repeat(64);
+
+    const debt = queryDebt(snapshot, {
+      seriesIds: ["debt.stock.total"],
+      years: [2024],
+      measure: "amount_gel",
+      expectedDataVersion: stale,
+    });
+    const deficit = queryDeficit(snapshot, { years: [2020], measure: "share_of_gdp_pct", expectedDataVersion: stale });
+
+    for (const response of [debt, deficit]) {
+      expect(response.kind).toBe("error");
+      if (response.kind !== "error") throw new Error("unreachable");
+      expect(response.error.code).toBe("data_version_changed");
+    }
+  });
+
+  it("serves normally when the version matches", () => {
+    const response = queryDebt(snapshot, {
+      seriesIds: ["debt.stock.total"],
+      years: [2024],
+      measure: "amount_gel",
+      expectedDataVersion: snapshot.dataVersion,
+    });
+
+    expect(response.kind).toBe("observations");
   });
 });

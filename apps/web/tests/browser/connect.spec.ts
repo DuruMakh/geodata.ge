@@ -69,7 +69,10 @@ test.describe("connection page", () => {
     expect(servedLines.some((line) => line.startsWith("სახელმწიფო ვალი"))).toBe(true);
     const balance = servedLines.find((line) => line.includes("ბალანსი"))!;
     expect(balance).toContain("1995–2031");
-    for (const line of servedLines) expect(line).toMatch(/\d{4}–\d{4}\s*$/);
+    // A range, optionally followed by the projection note the two forward-
+    // looking datasets carry. The range itself must still be the last data on
+    // the line, so a dataset silently losing its years is still caught.
+    for (const line of servedLines) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\s*$/);
 
     const municipal = servedLines.find((line) => line.includes("მუნიციპალური"))!;
     expect(municipal).toContain("2015–2025");
