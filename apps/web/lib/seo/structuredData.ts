@@ -12,6 +12,8 @@ export type DatasetJsonLdInput = {
   lastYear: number;
   dateModified: string;
   downloadPath: `/downloads/data/${string}.csv`;
+  /** Published JSON companions to the CSV, in the order they should be listed. */
+  jsonDownloadPaths?: readonly `/downloads/data/${string}.json`[];
 };
 
 export type ExplorerDatasetJsonLdInput = {
@@ -126,6 +128,15 @@ export function datasetJsonLd(input: DatasetJsonLdInput) {
         encodingFormat: "text/csv",
         contentUrl: absoluteUrl(input.origin, input.downloadPath),
       },
+      // Only a different FORMAT of this same dataset belongs here. A related
+      // but distinct published dataset (ministries.json beside national
+      // expenditure) is linked for humans on the page instead: claiming it as
+      // a distribution would tell a machine the two are the same data.
+      ...(input.jsonDownloadPaths ?? []).map((jsonPath) => ({
+        "@type": "DataDownload" as const,
+        encodingFormat: "application/json",
+        contentUrl: absoluteUrl(input.origin, jsonPath),
+      })),
     ],
   };
 }

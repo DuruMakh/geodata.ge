@@ -290,6 +290,8 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/deficit                      დეფიციტი          General-government balance explorer (§8.6)
 ```
 
+Outside `/explorer` and alongside `/about` sit the two editorial pages: `/about` (§2) and `/connect`, the MCP connection page (§23).
+
 Public municipality routes use the explicit lowercase-ASCII `[slug]` registry. Numeric municipality codes remain internal data, geometry, and join identifiers; they are not the public route identity.
 
 The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი`, `დეფიციტი`.
@@ -858,3 +860,21 @@ Unknown HTML routes retain their HTTP 404 status and use a minimal editorial rec
 The cover is an ink block with a paper title, terracotta `01`, `FISCAL.GE / OPEN DATA`, and a data-derived review year plus `MISSION NOTE`. The copy is one continuous four-paragraph article. The final strong sentence alone carries the terracotta left rule.
 
 The shared footer remains unchanged apart from the visible navigation label, which is `მიზანი` for the `/about` link. The page has no horizontal overflow at the documented mobile breakpoints.
+
+## 24. Connection Page (`/connect`)
+
+The one human-facing surface for the read-only MCP connection. Every other agent-facing surface (`llms.txt`, the JSON publications, the endpoint itself) is machine-facing; this page is the entire discovery funnel. It is written for someone who already uses an AI assistant and wants the address in it, not for a developer reading a spec.
+
+No new visual direction, chart type, or interaction pattern. It reuses the established composition: `SiteHeader` with the loaded-coverage label, `BreadcrumbTrail` (`მთავარი / AI-კავშირი`), a `2px ink` top rule under the serif H1 with a single-sentence deck, then rule-separated sections at the `border-t border-[var(--ink)] pt-5` rhythm, and `SiteFooter`.
+
+**The page is ordered by weight, not as equal blocks: anchor, act, check, fine print.**
+
+1. **The address** is the anchor and the only element on a `--tint` panel. Mono, 16px rising to 21px, with the copy control beside it and the conditions of use as short labels beneath (free; no authorization). It is the one thing the page exists to hand over, so nothing above it competes.
+2. **Connection steps** name the applications actually verified and give their real menu paths as numbered lists, with a one-line qualifier under each name. Prose describing a menu path reads worse than the path itself. A closing note covers every other client generically.
+3. **Asking without connecting** gives one copyable Georgian prompt, quoted and bold on a `--tint` block with its own copy control, and states plainly what this route does not provide — per-figure sources and caveats.
+4. **The coverage statement** carries both halves: what is served, with year ranges derived from the same catalogue the endpoint answers from (§2.1 — never hardcoded), and what is not. The second half is not optional politeness. Without it a visitor asks for out-of-scope data, receives nothing, and concludes the service is broken.
+5. **Technical details** are 12px `--muted` fine print above the footer, on a hairline rule rather than an ink one. Read-only status, protocol, revision and transport live here, where they inform without implying the page is for developers.
+
+**Copy controls are conveniences, never the only route.** Both the address and the prompt are rendered as selectable text beside their buttons, so each is obtainable when the clipboard API is unavailable or refused. Each button carries an accessible Georgian name that changes to a confirmation on success, announced through a live region.
+
+Discovery is the site-footer navigation list, which every `/explorer` route and both editorial pages already render (§6.7). `/connect` also enters `sitemap.xml` and `llms.txt`.

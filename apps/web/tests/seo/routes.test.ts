@@ -46,10 +46,18 @@ describe("indexable Fiscal.ge routes", () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
+    // 87 before either branch, plus /explorer/debt, /methodology/debt and
+    // /explorer/deficit. /connect exists and is tested but is deliberately NOT
+    // listed until /mcp answers in production - see the note in app/sitemap.ts.
+    // This count is pinned on purpose: a new HTML route has to be an explicit
+    // decision, and llms.txt asserts every HTML target it links also appears
+    // here.
     expect(urls).toHaveLength(90);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
+    // Absent on purpose while the endpoint it documents is off in production.
+    expect(urls).not.toContain("https://fiscal.ge/connect");
     expect(urls).toContain("https://fiscal.ge/explorer/debt");
     expect(urls).toContain("https://fiscal.ge/explorer/deficit");
     expect(urls).toContain("https://fiscal.ge/methodology/debt");

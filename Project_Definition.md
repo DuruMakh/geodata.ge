@@ -53,6 +53,44 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Automated production extraction from DOCX/PDF.
 - Clickable drilldown/detail pages into programs, subprograms, or revenue subcategories.
 
+## 2A. V2 Scope
+
+V1's scope above is the record of a shipped release and is not edited. This
+section states what V2 adds, and what stays excluded.
+
+### Included in V2
+
+- A **read-only MCP connection** at `/mcp`, so an outside AI client can ask a
+  budget question and receive the same reviewed figures the site shows, with
+  their sources and limitations attached. Unauthenticated and free, bounded by
+  documented operating limits.
+- **Static data publications** under `/downloads/data/`: a manifest, the
+  capability catalogue, the source resolution, and four dataset files. These are
+  published files, not a query service.
+- A Georgian **connection page** at `/connect` describing the service, its exact
+  coverage, and how to connect — the one human-facing surface for the above.
+
+V2 lifts the V1 "Public API" exclusion **only** for these. Nothing else about
+V1's scope changes.
+
+### Still excluded in V2
+
+- A REST query API of any kind.
+- Write access, user accounts, authentication, and uploads.
+- Any dataset V1 does not already serve, including quarterly and monthly data,
+  public debt, capital projects, and procurement.
+- An on-site AI assistant. The query service contains no model or inference
+  code; an assistant is a later, separately scoped decision.
+
+### Revenue and expenditure are distinct concepts
+
+V2 exposes both nationally, and they are **not** two sides of one budget.
+Revenue is consolidated budget receipts; expenditure is state-budget
+expenditure. They are different accounting boundaries, so subtracting one total
+from the other does not produce a deficit or any other fiscal balance. Every
+published surface must carry that distinction rather than assume the reader
+knows it.
+
 ## 3. Target Users
 
 Primary users:

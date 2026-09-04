@@ -172,3 +172,53 @@ describe("Fiscal.ge structured data", () => {
     expect(json).toContain("\\u003c/script>");
   });
 });
+
+describe("Dataset distributions describe every published format", () => {
+  it("adds a JSON DataDownload beside the CSV", () => {
+    const jsonLd = datasetJsonLd({
+      origin: "https://fiscal.ge",
+      path: "/methodology/expenditure",
+      name: "sakhelmtsifo biujetis kharjebi",
+      description:
+        "Annual national expenditure of the Georgian state budget, prepared from reviewed official sources.",
+      firstYear: 2004,
+      lastYear: 2025,
+      dateModified: "2026-09-02",
+      downloadPath: "/downloads/data/national-expenditure.csv",
+      jsonDownloadPaths: ["/downloads/data/national-expenditure.json", "/downloads/data/ministries.json"],
+    });
+
+    expect((jsonLd as { distribution: unknown[] }).distribution).toEqual([
+      {
+        "@type": "DataDownload",
+        encodingFormat: "text/csv",
+        contentUrl: "https://fiscal.ge/downloads/data/national-expenditure.csv",
+      },
+      {
+        "@type": "DataDownload",
+        encodingFormat: "application/json",
+        contentUrl: "https://fiscal.ge/downloads/data/national-expenditure.json",
+      },
+      {
+        "@type": "DataDownload",
+        encodingFormat: "application/json",
+        contentUrl: "https://fiscal.ge/downloads/data/ministries.json",
+      },
+    ]);
+  });
+
+  it("keeps the CSV-only shape when no JSON is published", () => {
+    const jsonLd = datasetJsonLd({
+      origin: "https://fiscal.ge",
+      path: "/methodology/revenue",
+      name: "sakhelmtsifo biujetis shemosavlebi",
+      description: "Annual national revenue of the Georgian state budget, prepared from reviewed official sources.",
+      firstYear: 2005,
+      lastYear: 2025,
+      dateModified: "2026-09-02",
+      downloadPath: "/downloads/data/national-revenue.csv",
+    });
+
+    expect((jsonLd as { distribution: unknown[] }).distribution).toHaveLength(1);
+  });
+});

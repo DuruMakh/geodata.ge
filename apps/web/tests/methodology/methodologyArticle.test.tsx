@@ -20,6 +20,14 @@ function renderArticle(dataset: "debt" | "expenditure") {
     processedDataHref: dataset === "debt"
       ? "/downloads/data/government-debt.csv"
       : "/downloads/data/national-expenditure.csv",
+    // Debt has no JSON publication; expenditure has two.
+    processedDataJsonLinks:
+      dataset === "debt"
+        ? []
+        : [
+            { href: "/downloads/data/national-expenditure.json", labelKa: "სახელმწიფო ხარჯები" },
+            { href: "/downloads/data/ministries.json", labelKa: "უწყებები და პროგრამები" },
+          ],
     breadcrumbItems: [],
   }));
 }

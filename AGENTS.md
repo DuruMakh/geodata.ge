@@ -96,6 +96,8 @@ GeoData.ge v1 is an implemented Georgian-first Georgia Budget Explorer, not a br
 
 The stack is Next.js 16, strict TypeScript, Tailwind v4, and the custom editorial component layer; do not introduce shadcn. Reviewed CSVs under `data/imports/` are the canonical human-reviewed source of truth. Supabase Postgres via Prisma 7 is the serving mirror, populated only by the transactional, parity-checked `npm run data:import`; never edit the database directly. Builds remain fully static, with CSV mode as the documented fallback. See `docs/data-methodology/database-import.md`.
 
+Explorer pages remain prerendered and are served as static output. The single exception is `/mcp`, the read-only MCP endpoint: it is the application's only request-time route, and it answers from a snapshot bundled at build time, with no database, network, or filesystem access outside the deployed bundle. Its operating limits, pause switch and logging policy live in `docs/deployment.md`.
+
 Production deploys to Vercel through the Actions-owned, CI-gated pipeline. `docs/deployment.md` owns project identifiers, environment configuration, release operations, rollback, and live-verification procedure.
 
 A branch implementation, merged commit, green deploy-trigger workflow, or accepted Vercel hook is not proof that a route is live. Verify the deployed commit and relevant production URLs separately.

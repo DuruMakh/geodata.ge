@@ -4,6 +4,13 @@ import { MUNICIPALITY_ROUTES } from "./lib/explorer/municipalityRoutes";
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   poweredByHeader: false,
+  // The /mcp route reads the build-time snapshot at request time. Next traces
+  // only what it can see statically, and this artifact is written by `prebuild`
+  // rather than imported, so it must be included explicitly or the deployed
+  // function has no data to answer from.
+  outputFileTracingIncludes: {
+    "/mcp": ["./lib/factQuery/generated/snapshot.json"],
+  },
   async redirects() {
     return MUNICIPALITY_ROUTES.map(({ code, slug }) => ({
       source: `/explorer/municipalities/${code}`,

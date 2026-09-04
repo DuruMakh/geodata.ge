@@ -371,3 +371,21 @@ The raw package's generated `validation-report.json` has status `PASS` and recor
 - The 2020 functional-source transition and the 2016-2019 publication-vintage differences should be considered in trend interpretation.
 - MoF may revise or replace published workbooks. Use the manifests and hashes to identify future source changes.
 - Khulo 2024 is not an official total-payment actual because the current municipality history workbook omits that measure. It is explicitly a functional actual fallback.
+
+## Querying this dataset
+
+These figures are served publicly two ways, both from the same reviewed
+rows: the bulk JSON files under `/downloads/data/` and the read-only MCP
+connection at `https://fiscal.ge/mcp`.
+
+- Tool: `query_municipal`
+- Legal measures: `amount_gel`, `share_of_total_pct`, `gel_per_resident`
+- `entityIds` accepts a municipality code, a region id, or the country
+  aggregate. The five aggregate-only codes return an explained exclusion
+  rather than a number, and the country aggregate has no per-resident
+  value because its numerator includes budgets with no territorial
+  population.
+
+Call `describe_coverage` for the exact ids and year ranges rather than
+assuming them; coverage is derived from the loaded data, never hardcoded.
+See `ai-grounding-and-caveats.md` for the caveat catalogue.

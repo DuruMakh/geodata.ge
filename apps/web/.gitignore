@@ -35,6 +35,9 @@ yarn-error.log*
 # generated Prisma client
 lib/generated/prisma/
 
+# generated fact query snapshot
+lib/factQuery/generated/
+
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example

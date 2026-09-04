@@ -43,6 +43,35 @@ const DATASET_DOWNLOADS = {
   debt: "/downloads/data/government-debt.csv",
 } as const;
 
+// Spec 12.2: the expenditure methodology links both the expenditure and the
+// ministries JSON. ministries.json has no CSV counterpart in this family, so
+// this page is its only published entry point.
+const DATASET_JSON_DOWNLOADS = {
+  expenditure: [
+    { href: "/downloads/data/national-expenditure.json", labelKa: "სახელმწიფო ხარჯები" },
+    { href: "/downloads/data/ministries.json", labelKa: "უწყებები და პროგრამები" },
+  ],
+  revenue: [{ href: "/downloads/data/national-revenue.json", labelKa: "სახელმწიფო შემოსავლები" }],
+  municipalities: [{ href: "/downloads/data/municipal-expenditure.json", labelKa: "მუნიციპალური ხარჯები" }],
+  debt: [
+    { href: "/downloads/data/government-debt.json", labelKa: "სახელმწიფო ვალი" },
+    { href: "/downloads/data/government-debt-rates.json", labelKa: "საპროცენტო განაკვეთები" },
+  ],
+} as const;
+
+// Only the file that IS this dataset in another format belongs in the Dataset
+// node's distribution. ministries.json is a separate published dataset (spec
+// 12.1), so it stays a human link on this page and is not claimed as a
+// distribution of national expenditure.
+const DATASET_JSON_DISTRIBUTIONS = {
+  expenditure: ["/downloads/data/national-expenditure.json"],
+  revenue: ["/downloads/data/national-revenue.json"],
+  municipalities: ["/downloads/data/municipal-expenditure.json"],
+  // Only the amounts file is a distribution OF this dataset; the rates
+  // file is a different measure of it and stays a human link above.
+  debt: ["/downloads/data/government-debt.json"],
+} as const;
+
 export async function generateMetadata({ params }: MethodologyDatasetPageProps): Promise<Metadata> {
   const dataset = validatedDataset((await params).dataset);
   const content = METHODOLOGY_CONTENT[dataset];
@@ -94,6 +123,7 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
           lastYear: coverage.lastYear,
           dateModified: content.reviewedAt,
           downloadPath: DATASET_DOWNLOADS[dataset],
+          jsonDownloadPaths: DATASET_JSON_DISTRIBUTIONS[dataset],
         })}
         testId="dataset-json-ld"
       />
@@ -103,6 +133,7 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
         rows={publicRows}
         archiveSummary={archiveSummaries[dataset]}
         processedDataHref={DATASET_DOWNLOADS[dataset]}
+        processedDataJsonLinks={DATASET_JSON_DOWNLOADS[dataset]}
         breadcrumbItems={[
           { name: "მთავარი", path: "/" },
           { name: "მეთოდოლოგია", path: "/methodology" },
