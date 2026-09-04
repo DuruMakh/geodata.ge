@@ -1,7 +1,7 @@
 # Government Debt Explorer Design
 
-**Date:** 2026-09-02  
-**Status:** Approved  
+**Date:** 2026-09-02
+**Status:** Approved
 **Reference:** `design-shotgun/debt-explorer-2026-09-01/variant-d.html`
 
 ## Goal
