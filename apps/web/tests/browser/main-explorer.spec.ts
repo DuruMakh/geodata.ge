@@ -4,8 +4,6 @@ import ExcelJS from "exceljs";
 import { expectReadableText } from "./color-contrast";
 import { TEST_BASE_URL } from "./test-base-url";
 
-const TEST_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
-
 function collectConsoleProblems(page: Page) {
   const consoleProblems: string[] = [];
 
