@@ -32,7 +32,7 @@ describe("general-government deficit route composition", () => {
     const text = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
     expect(markup).toContain('data-testid="deficit-explorer"');
-    expect(markup).toContain("რამდენია ზოგადი მთავრობის დეფიციტი");
+    expect(markup).toContain("რამდენია საქართველოს ბიუჯეტის დეფიციტი");
     expect(text).toContain("2025: ზოგადი მთავრობის ბალანსი · −1.5%");
     expect(markup).toContain('data-measure="percent"');
     expect(markup).toContain('data-testid="chart-frame"');

@@ -13,7 +13,7 @@ test.describe("General-government deficit explorer", () => {
       await page.goto(`${TEST_BASE_URL}/explorer/deficit`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("რამდენია ზოგადი მთავრობის დეფიციტი");
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText("რამდენია საქართველოს ბიუჯეტის დეფიციტი");
       await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "percent");
       await expect(page.getByTestId("deficit-deck")).toContainText("2025: ზოგადი მთავრობის ბალანსი · −1.5%");
       await expect(page.getByTestId("series-row")).toHaveCount(1);

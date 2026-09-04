@@ -135,7 +135,7 @@ export function DeficitExplorer({ facts, workbookSources, siteOrigin, lastUpdate
           coverage={coverage}
         />
         <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-          რამდენია ზოგადი მთავრობის დეფიციტი
+          რამდენია საქართველოს ბიუჯეტის დეფიციტი
         </h1>
         <p data-testid="deficit-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
           <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
