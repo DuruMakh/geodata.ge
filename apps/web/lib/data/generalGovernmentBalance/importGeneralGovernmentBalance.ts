@@ -7,22 +7,28 @@ import type { GeneralGovernmentBalanceFact } from "./types";
 
 const EXPECTED_YEARS = Array.from({ length: 37 }, (_, index) => 1995 + index);
 
-const rowSchema = z.object({
-  year: z.coerce.number().int().min(1995).max(2031),
-  general_government_balance_pct_gdp: z.string().min(1),
-  general_government_balance_gel: z.string().min(1),
-  status: z.enum(["actual", "projection"]),
-  source_id: stableIdSchema,
-  source_dataset: z.literal("IMF.RES:WEO(9.0.0)"),
-  source_vintage: z.literal("2026-04"),
-  source_sheet: z.literal("Countries"),
-  source_country_id: z.literal("GEO"),
-  source_percent_series_code: z.literal("GEO.GGXCNL_NGDP.A"),
-  source_nominal_series_code: z.literal("GEO.GGXCNL.A"),
-  source_unit: z.literal("billion GEL"),
-  transformation: z.string().min(1),
-  last_reviewed_at: z.literal("2026-09-04"),
-});
+const rowSchema = z
+  .object({
+    year: z.coerce.number().int().min(1995).max(2031),
+    general_government_balance_pct_gdp: z.string().min(1),
+    general_government_balance_gel: z.string().min(1),
+    status: z.enum(["actual", "projection"]),
+    source_id: stableIdSchema.and(
+      z.literal("source.imf_weo_april_2026_general_government_balance"),
+    ),
+    source_dataset: z.literal("IMF.RES:WEO(9.0.0)"),
+    source_vintage: z.literal("2026-04"),
+    source_sheet: z.literal("Countries"),
+    source_country_id: z.literal("GEO"),
+    source_percent_series_code: z.literal("GEO.GGXCNL_NGDP.A"),
+    source_nominal_series_code: z.literal("GEO.GGXCNL.A"),
+    source_unit: z.literal("billion GEL"),
+    transformation: z.literal(
+      "IMF billion GEL multiplied by 1,000,000,000; signed value preserved.",
+    ),
+    last_reviewed_at: z.literal("2026-09-04"),
+  })
+  .strict();
 
 export async function loadGeneralGovernmentBalanceFacts(
   relativePath: string,

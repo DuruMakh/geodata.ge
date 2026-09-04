@@ -4,6 +4,7 @@ import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
 import * as XLSX from "xlsx";
+import { z } from "zod";
 
 import { csvEscape } from "../csvEscape";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
@@ -16,22 +17,6 @@ import type {
   GeneralGovernmentBalanceValidationReport,
   GeneralGovernmentBalanceValidationSummary,
 } from "./types";
-
-type ManifestRow = {
-  source_id: string;
-  dataset_version: string;
-  local_file: string;
-  sha256: string;
-  bytes: string;
-  country_id: string;
-  source_sheet: string;
-  percent_series_code: string;
-  nominal_series_code: string;
-  validation_gdp_series_code: string;
-  year_min: string;
-  year_max: string;
-  latest_actual_year: string;
-};
 
 const EXPECTED_DATASET = "IMF.RES:WEO(9.0.0)" as const;
 const EXPECTED_COUNTRY_ID = "GEO" as const;
@@ -64,6 +49,43 @@ const TARGETS = {
     scale: "Billions",
   },
 } as const;
+
+const manifestSchema = z
+  .object({
+    source_id: z.literal(SOURCE_ID),
+    publisher: z.literal("International Monetary Fund"),
+    dataset: z.literal("World Economic Outlook"),
+    dataset_version: z.literal(EXPECTED_DATASET),
+    publication_date: z.literal("2026-04-14"),
+    source_page_url: z.literal("https://data.imf.org/Datasets/WEO"),
+    retrieved_file_url: z.literal(
+      "https://data.imf.org/-/media/iData/External-Storage/Documents/2F78EE59F79143A7921E5E203D3AAA80/en/WEOApr2026all.xlsx",
+    ),
+    retrieved_at: z.literal(REVIEWED_AT),
+    local_file: z.literal("official/WEOApr2026all.xlsx"),
+    sha256: z.literal(EXPECTED_SOURCE_SHA256),
+    bytes: z.literal(String(EXPECTED_SOURCE_BYTES)),
+    country_id: z.literal(EXPECTED_COUNTRY_ID),
+    source_sheet: z.literal(EXPECTED_SHEET),
+    percent_series_code: z.literal(TARGETS.GGXCNL_NGDP.seriesCode),
+    nominal_series_code: z.literal(TARGETS.GGXCNL.seriesCode),
+    validation_gdp_series_code: z.literal(TARGETS.NGDP_FY.seriesCode),
+    year_min: z.literal("1995"),
+    year_max: z.literal("2031"),
+    latest_actual_year: z.literal("2025"),
+    methodology: z.literal("GFSM 2001"),
+    valuation: z.literal("Cash"),
+    general_government_composition: z.literal("Central Government; Local Government"),
+  })
+  .strict();
+
+type ManifestRow = z.infer<typeof manifestSchema>;
+
+export function validateGeneralGovernmentBalanceManifest(
+  record: Record<string, string>,
+): ManifestRow {
+  return manifestSchema.parse(record);
+}
 
 const REPO_ROOT = path.resolve(process.cwd(), "../..");
 const PACKAGE_DIR = path.join(
@@ -168,6 +190,7 @@ function extractSourceFacts(workbookBytes: Buffer): GeneralGovernmentBalanceSour
     expectMetadata(sheet, sourceRow, columns, "SCALE", target.scale);
     expectMetadata(sheet, sourceRow, columns, "UNIT", target.unit);
     expectMetadata(sheet, sourceRow, columns, "LATEST_ACTUAL_ANNUAL_DATA", "2025");
+    expectMetadata(sheet, sourceRow, columns, "PRIMARY_DOMESTIC_CURRENCY", "Georgian lari");
 
     if (indicatorId !== "NGDP_FY") {
       expectMetadata(
@@ -185,7 +208,6 @@ function extractSourceFacts(workbookBytes: Buffer): GeneralGovernmentBalanceSour
         "FISCAL_SECTOR_GENERAL_GOVERNMENT_COMPOSITION",
         "Central Government; Local Government",
       );
-      expectMetadata(sheet, sourceRow, columns, "PRIMARY_DOMESTIC_CURRENCY", "Georgian lari");
     }
 
     for (const year of EXPECTED_YEARS) {
@@ -273,6 +295,19 @@ export function validateGeneralGovernmentBalanceSeries(
     if (row.status !== expectedStatus(row.year)) {
       throw new Error(`General-government balance status is invalid for ${row.year}`);
     }
+    const sourcePercent = sourceValue(sourceFacts, row.year, "GGXCNL_NGDP");
+    if (!new Decimal(row.generalGovernmentBalancePctGdp).equals(sourcePercent)) {
+      throw new Error(
+        `Canonical general-government balance percentage does not match IMF source for ${row.year}`,
+      );
+    }
+    const sourceNominalBillions = sourceValue(sourceFacts, row.year, "GGXCNL");
+    const sourceGel = new Decimal(sourceNominalBillions).times(1_000_000_000);
+    if (!sourceGel.equals(row.generalGovernmentBalanceGel)) {
+      throw new Error(
+        `Canonical general-government balance GEL does not match IMF source for ${row.year}`,
+      );
+    }
     const percentIsNegative = row.generalGovernmentBalancePctGdp < 0;
     const gelIsNegative = row.generalGovernmentBalanceGel < 0;
     if (
@@ -320,6 +355,11 @@ export function validateGeneralGovernmentBalanceSeries(
     maximumDifference = Math.max(maximumDifference, difference);
     if (difference > RECONCILIATION_TOLERANCE_PP) reconciliationFailureYears.push(row.year);
   }
+  if (reconciliationFailureYears.length > 0) {
+    throw new Error(
+      `General-government balance reconciliation exceeds ${RECONCILIATION_TOLERANCE_PP} percentage points for ${reconciliationFailureYears.join(", ")}`,
+    );
+  }
 
   return {
     maximumReconciliationDifferencePercentagePoints: maximumDifference,
@@ -340,23 +380,9 @@ export async function prepareGeneralGovernmentBalance({
     columns: true,
     skip_empty_lines: true,
     trim: true,
-  }) as ManifestRow[];
+  }) as Record<string, string>[];
   if (manifestRows.length !== 1) throw new Error("Expected exactly one IMF balance source");
-  const manifest = manifestRows[0];
-  if (
-    manifest.source_id !== SOURCE_ID ||
-    manifest.dataset_version !== EXPECTED_DATASET ||
-    manifest.country_id !== EXPECTED_COUNTRY_ID ||
-    manifest.source_sheet !== EXPECTED_SHEET ||
-    manifest.percent_series_code !== TARGETS.GGXCNL_NGDP.seriesCode ||
-    manifest.nominal_series_code !== TARGETS.GGXCNL.seriesCode ||
-    manifest.validation_gdp_series_code !== TARGETS.NGDP_FY.seriesCode ||
-    manifest.year_min !== "1995" ||
-    manifest.year_max !== "2031" ||
-    manifest.latest_actual_year !== "2025"
-  ) {
-    throw new Error("IMF balance source manifest does not match the reviewed source contract");
-  }
+  const manifest = validateGeneralGovernmentBalanceManifest(manifestRows[0]);
 
   const workbookBytes = await fs.readFile(path.join(PACKAGE_DIR, manifest.local_file));
   const sourceSha256 = createHash("sha256").update(workbookBytes).digest("hex").toUpperCase();
