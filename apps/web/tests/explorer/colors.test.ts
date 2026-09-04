@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { loadServedExplorerData } from "../../lib/data/servedData";
 import { colorForProgram, SERIES_COLORS } from "../../lib/explorer/colors";
+import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { buildExplorerModel } from "../../lib/explorer/explorerData";
 
 // The 14 admin categories resolve to fixed hexes, but the 48 major programs used
@@ -44,6 +45,27 @@ describe("fixed series colours", () => {
       for (const [surface, background] of [["paper", PAPER], ["tint", TINT]] as const) {
         const ratio = contrastRatio(color, background);
         if (ratio < 3) failures.push(`${color} on ${surface}: ${ratio.toFixed(2)}:1`);
+      }
+    }
+
+    expect(failures).toEqual([]);
+  });
+
+  it("keeps every Government Debt series above the 3:1 graphical-object floor", () => {
+    const model = buildDebtExplorerModel({
+      facts: [],
+      gdpFacts: [],
+      family: "stock",
+      selectedIds: [],
+      range: { start: 2013, end: 2025 },
+      shareOfGdp: false,
+    });
+    const failures: string[] = [];
+
+    for (const item of model.items) {
+      for (const [surface, background] of [["paper", PAPER], ["tint", TINT]] as const) {
+        const ratio = contrastRatio(item.color, background);
+        if (ratio < 3) failures.push(`${item.id} ${item.color} on ${surface}: ${ratio.toFixed(2)}:1`);
       }
     }
 

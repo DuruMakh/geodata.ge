@@ -34,6 +34,7 @@ export type WorkbookExportInput = {
   measure: WorkbookMeasure;
   totalId: string | null;
   series: WorkbookSeries[];
+  includeTotalsInAnalysis?: boolean;
   sources: WorkbookPublicSource[];
   siteOrigin: string;
 };
@@ -132,7 +133,9 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
   });
 
   const nonTotalsExist = input.series.some((series) => series.kind !== "total");
-  const analysisSeries = input.series.filter((series) => !nonTotalsExist || series.kind !== "total");
+  const analysisSeries = input.includeTotalsInAnalysis
+    ? input.series
+    : input.series.filter((series) => !nonTotalsExist || series.kind !== "total");
   const headers = ["წელი", "მთავარი ჯგუფი", "კატეგორია", "თანხა (₾)", "სტატუსი", ...(input.measure.kind === "percentage" ? [input.measure.analysisHeaderKa] : [])];
   const analysisRows: Array<Array<string | number | null>> = [];
   for (const year of years) {

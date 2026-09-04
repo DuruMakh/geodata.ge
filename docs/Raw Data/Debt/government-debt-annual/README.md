@@ -2,7 +2,7 @@
 
 ## What this package contains
 
-This is a source-backed preparation package for a future Fiscal.ge Government Debt section. It uses the Ministry of Finance of Georgia's Government Debt rows, not the broader Public/State Debt total.
+This is the source-backed preparation package for Fiscal.ge's Government Debt section. It uses the Ministry of Finance of Georgia's Government Debt rows, not the broader Public/State Debt total.
 
 - Stock: 2013-2025 — year-end total, domestic and external Government Debt (39 rows).
 - Actual service: 2013-2025 — principal and interest paid for total, domestic and external Government Debt (39 rows).
@@ -11,9 +11,9 @@ This is a source-backed preparation package for a future Fiscal.ge Government De
 
 Government Debt total is always the exact sum of its domestic and external components. Broader Public Debt rows, National Bank debt, guaranteed-debt subtotals, on-lending service, PPP commitments and the control-only central-government-liabilities workbook are not substituted for Government Debt values.
 
-No estimates were created. The package changes no served Fiscal.ge data.
+No estimates were created. The serving projection changes no pre-existing Fiscal.ge budget, GDP, or `spending.debt_service` data.
 
-No UI, route, database, or public-data import was added. The existing `spending.debt_service` expenditure series remains unchanged.
+The package is consumed by the Government Debt explorer and mirrored `GovernmentDebtFact` import. The existing `spending.debt_service` expenditure series remains unchanged.
 
 ## Files
 

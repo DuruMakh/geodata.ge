@@ -15,6 +15,7 @@ import {
   readControlWorkbookValues,
 } from "./parseDebtSources";
 import { validateGovernmentDebtSourceManifest } from "./sourceManifest";
+import { GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS } from "./types";
 import type {
   DebtScope,
   GovernmentDebtActualServiceRow,
@@ -39,13 +40,6 @@ type CsvRow = Record<string, string>;
 const ARTIFACT_LABEL = "government debt";
 const REVIEW_DATE = "2026-09-01" as const;
 const SCOPES: DebtScope[] = ["total", "domestic", "external"];
-const REVIEWED_RATE_SOURCE_IDS: GovernmentDebtSourceId[] = [
-  "mof_monthly_debt_report_2026_07",
-  "mof_debt_strategy_2019_2021",
-  "mof_debt_strategy_2022_2025",
-  "mof_debt_strategy_2023_2026",
-  "mof_debt_strategy_2025_2029",
-];
 
 type ExpectedRateControl = {
   value: number | null;
@@ -550,7 +544,7 @@ function validateInterestRates(
       observed_source_id: row.source_id,
       source_reference: row.source_id
         ? `${row.source_id} | ${row.source_table} | ${row.source_row_label}`
-        : `Reviewed sources: ${REVIEWED_RATE_SOURCE_IDS.join("|")}`,
+        : `Reviewed sources: ${GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS.join("|")}`,
       status,
     };
   });
@@ -567,7 +561,7 @@ function validateInterestRates(
       source_id: row.source_id,
       reviewed_source_ids: row.source_id
         ? [row.source_id]
-        : [...REVIEWED_RATE_SOURCE_IDS],
+        : [...GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS],
       reason: row.transformation,
     }));
   const failedCheck = checks.find((check) => check.status === "fail");

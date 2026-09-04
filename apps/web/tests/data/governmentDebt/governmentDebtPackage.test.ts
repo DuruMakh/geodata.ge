@@ -777,8 +777,8 @@ describe("government debt research package", () => {
       "2019",
       "2022",
       "existing national GDP dataset",
-      "No estimates were created. The package changes no served Fiscal.ge data.",
-      "No UI, route, database, or public-data import was added.",
+      "No estimates were created.",
+      "The existing `spending.debt_service` expenditure series remains unchanged.",
     ]) {
       expect(combined, requiredText).toContain(requiredText);
     }

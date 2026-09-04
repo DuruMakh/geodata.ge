@@ -4,6 +4,7 @@ import type {
   ServedGovernmentDebtFact,
   ServedNationalGdpFact,
 } from "../servedRows";
+import { GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS } from "../data/governmentDebt/types";
 import { buildDebtExplorerModel } from "./debtExplorer";
 import {
   buildWorkbookExportModel,
@@ -68,6 +69,9 @@ function debtSourcesFor(input: DebtWorkbookInput): WorkbookPublicSource[] {
       fact.year > input.range.end
     ) continue;
     add(fact.sourceId, fact.year);
+    if (fact.family === "rate" && fact.status === "not_available" && !fact.sourceId) {
+      for (const sourceId of GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS) add(sourceId, fact.year);
+    }
     if (fact.family === "service" && fact.status === "actual") {
       add(externalServiceSourceId(fact.year), fact.year);
     }
@@ -142,6 +146,7 @@ export function buildDebtWorkbookExportModel(input: DebtWorkbookInput): Workbook
       : { kind: "amount", unitLabelKa: "მლრდ ₾", readableScale: 1_000_000_000 },
     totalId: model.items.find((item) => item.family === input.family && item.parentItemId === null)?.id ?? null,
     series,
+    includeTotalsInAnalysis: true,
     sources: [
       ...debtSourcesFor(input),
       ...(input.family === "stock" && input.shareOfGdp ? input.gdpSources : []),

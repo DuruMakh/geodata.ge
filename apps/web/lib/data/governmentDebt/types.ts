@@ -14,6 +14,14 @@ export const GOVERNMENT_DEBT_SOURCE_IDS = [
 export type GovernmentDebtSourceId =
   (typeof GOVERNMENT_DEBT_SOURCE_IDS)[number];
 
+export const GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS = [
+  "mof_monthly_debt_report_2026_07",
+  "mof_debt_strategy_2019_2021",
+  "mof_debt_strategy_2022_2025",
+  "mof_debt_strategy_2023_2026",
+  "mof_debt_strategy_2025_2029",
+] as const satisfies readonly GovernmentDebtSourceId[];
+
 export type DebtScope = "total" | "domestic" | "external";
 
 export type AvailabilityStatus =

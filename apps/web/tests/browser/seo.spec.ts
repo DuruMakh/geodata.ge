@@ -148,6 +148,15 @@ test("explorer datasets publish stable ids and downloadable CSV distributions", 
   }
 });
 
+test("Government Debt Dataset metadata includes the service projection horizon", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer/debt`);
+  const node = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
+
+  expect(node.temporalCoverage).toBe("2013/2030");
+  expect(node.description).toContain("2026–2030");
+  expect(node.description).toContain("პროგნოზი");
+});
+
 test("only third-party methodology source originals send a noindex header", async ({ request }) => {
   const original = await request.get(
     `${BASE_URL}/downloads/methodology/expenditure/files/2004/mof-annual-execution-annex.pdf`,

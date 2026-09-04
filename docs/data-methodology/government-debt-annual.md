@@ -6,7 +6,7 @@ This methodology governs the research package at `docs/Raw Data/Debt/government-
 
 The normalized concept is Government Debt: domestic Government Debt plus external Government Debt. The broader Public/State Debt total can also contain National Bank obligations and is not used as a replacement. Guaranteed-debt subtotals, on-lending service, PPP commitments and the separate central-government-liabilities workbook are also outside the normalized boundary.
 
-No estimates were created. The package changes no served Fiscal.ge data.
+No estimates were created. The package changes no pre-existing Fiscal.ge budget, GDP, or `spending.debt_service` data.
 
 The projection serves exactly nine annual series: stock total/domestic/external (2013–2025), service total/principal/interest (actual 2013–2025 plus the 2026–2030 existing-portfolio snapshot), and rate total/domestic/external (2015–2025). It is mirrored by the transactional `GovernmentDebtFact` database import and checked row-for-row against the CSV before that import commits. The existing GDP file and the existing `spending.debt_service` expenditure data are unchanged.
 

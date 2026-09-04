@@ -23,8 +23,10 @@ export default async function DebtPage() {
   ]);
   const stockFacts = facts.filter((fact) => fact.family === "stock" && fact.status === "actual");
   const { firstYear, lastYear } = coverageFromYears(stockFacts);
+  const { firstYear: datasetFirstYear, lastYear: datasetLastYear } = coverageFromYears(facts);
   const lastUpdatedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";
   const description = `საქართველოს მთავრობის ვალის მოცულობა, ვალის მომსახურება და საპროცენტო განაკვეთები, ${firstYear}–${lastYear}.`;
+  const datasetDescription = `${description} 2026–2030 წლების ვალის გადახდა არის 2025-12-31 მდგომარეობით არსებული პორტფელის პროგნოზი.`;
 
   return (
     <>
@@ -33,9 +35,9 @@ export default async function DebtPage() {
           origin: resolveSiteUrl(),
           path: DEBT_EXPLORER_PATH,
           name: "საქართველოს მთავრობის ვალი",
-          description,
-          firstYear,
-          lastYear,
+          description: datasetDescription,
+          firstYear: datasetFirstYear,
+          lastYear: datasetLastYear,
           dateModified: lastUpdatedAt,
           spatialCoverageName: "საქართველო",
           downloadPath: "/downloads/data/government-debt.csv",

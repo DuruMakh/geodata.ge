@@ -139,6 +139,66 @@ describe("Debt workbook adapter", () => {
     expect(workbook.getWorksheet("მონაცემები")!.getCell("E2").value).toBe("არ არის ხელმისაწვდომი");
   });
 
+  it.each([
+    {
+      name: "external 2015–2017",
+      selectedId: "debt.rate.external" as const,
+      start: 2015,
+      end: 2017,
+    },
+    {
+      name: "domestic 2025",
+      selectedId: "debt.rate.domestic" as const,
+      start: 2025,
+      end: 2025,
+    },
+  ])("keeps the reviewed rate-source set in a gap-only $name workbook", async ({ selectedId, start, end }) => {
+    resetWorkbookSourceCacheForTests();
+    const [realFacts, realSources] = await Promise.all([
+      loadGovernmentDebtFacts(),
+      loadWorkbookSources("debt"),
+    ]);
+    const model = buildDebtWorkbookExportModel({
+      facts: realFacts,
+      gdpFacts: [],
+      family: "rate",
+      selectedIds: [selectedId],
+      range: { start, end },
+      shareOfGdp: false,
+      sources: realSources,
+      gdpSources: [],
+      siteOrigin: "https://fiscal.ge",
+    });
+
+    expect(model.sources.map((source) => source.downloadHref.split("/").at(-1))).toEqual([
+      "monthly-debt-report-2026-07.pdf",
+      "debt-management-strategy-2019-2021.pdf",
+      "debt-management-strategy-2022-2025.pdf",
+      "debt-management-strategy-2023-2026.pdf",
+      "debt-management-strategy-2025-2029.pdf",
+    ]);
+    expect(model.sources.every((source) => source.years[0] === start && source.years.at(-1) === end)).toBe(true);
+  });
+
+  it("keeps a selected total rate in the machine-friendly sheet beside a component rate", () => {
+    const model = buildDebtWorkbookExportModel({
+      facts,
+      gdpFacts: [],
+      family: "rate",
+      selectedIds: ["debt.rate.total", "debt.rate.external"],
+      range: { start: 2019, end: 2019 },
+      shareOfGdp: false,
+      sources: debtSources,
+      gdpSources: [],
+      siteOrigin: "https://fiscal.ge",
+    });
+
+    expect(model.analysis.rows).toEqual([
+      [2019, "საპროცენტო განაკვეთი", "საპროცენტო განაკვეთი", null, "ფაქტი", 0.032],
+      [2019, "საპროცენტო განაკვეთი", "საგარეო განაკვეთი", null, "არ არის ხელმისაწვდომი", null],
+    ]);
+  });
+
   it("maps the active stock selection, range, GDP measure and existing three-sheet contract", () => {
     const model = buildDebtWorkbookExportModel({
       facts,

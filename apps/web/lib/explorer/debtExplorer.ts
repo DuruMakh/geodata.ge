@@ -51,13 +51,13 @@ export type GovernmentDebtExplorerModel = {
 
 const DEBT_ITEMS: DebtExplorerItem[] = [
   { id: "debt.stock.total", family: "stock", parentItemId: null, kaLabel: "მთლიანი ვალი", enLabel: "Total Government Debt", color: INK, sortOrder: 1 },
-  { id: "debt.stock.domestic", family: "stock", parentItemId: "debt.stock.total", kaLabel: "საშინაო ვალი", enLabel: "Domestic debt", color: "#C98632", sortOrder: 2 },
+  { id: "debt.stock.domestic", family: "stock", parentItemId: "debt.stock.total", kaLabel: "საშინაო ვალი", enLabel: "Domestic debt", color: "#A5822B", sortOrder: 2 },
   { id: "debt.stock.external", family: "stock", parentItemId: "debt.stock.total", kaLabel: "საგარეო ვალი", enLabel: "External debt", color: "#496F83", sortOrder: 3 },
   { id: "debt.service.total", family: "service", parentItemId: null, kaLabel: "ვალის გადახდა", enLabel: "Debt service", color: "#1F6E56", sortOrder: 4 },
   { id: "debt.service.principal", family: "service", parentItemId: "debt.service.total", kaLabel: "ძირი თანხა", enLabel: "Principal", color: "#725B8F", sortOrder: 5 },
   { id: "debt.service.interest", family: "service", parentItemId: "debt.service.total", kaLabel: "პროცენტი", enLabel: "Interest", color: "#B3402A", sortOrder: 6 },
   { id: "debt.rate.total", family: "rate", parentItemId: null, kaLabel: "საპროცენტო განაკვეთი", enLabel: "Weighted-average interest rate", color: INK, sortOrder: 7 },
-  { id: "debt.rate.domestic", family: "rate", parentItemId: "debt.rate.total", kaLabel: "საშინაო განაკვეთი", enLabel: "Domestic rate", color: "#C98632", sortOrder: 8 },
+  { id: "debt.rate.domestic", family: "rate", parentItemId: "debt.rate.total", kaLabel: "საშინაო განაკვეთი", enLabel: "Domestic rate", color: "#A5822B", sortOrder: 8 },
   { id: "debt.rate.external", family: "rate", parentItemId: "debt.rate.total", kaLabel: "საგარეო განაკვეთი", enLabel: "External rate", color: "#496F83", sortOrder: 9 },
 ];
 
