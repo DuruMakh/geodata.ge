@@ -122,10 +122,7 @@ function expectedStatus(year: number): GeneralGovernmentBalanceStatus {
   return year <= EXPECTED_LATEST_ACTUAL_YEAR ? "actual" : "projection";
 }
 
-function extractSourceFacts(
-  workbookBytes: Buffer,
-  manifest: ManifestRow,
-): GeneralGovernmentBalanceSourceFact[] {
+function extractSourceFacts(workbookBytes: Buffer): GeneralGovernmentBalanceSourceFact[] {
   const workbook = XLSX.read(workbookBytes, { type: "buffer", cellNF: true });
   const sheet = workbook.Sheets[EXPECTED_SHEET];
   if (!sheet) throw new Error(`IMF workbook is missing the ${EXPECTED_SHEET} sheet`);
@@ -161,6 +158,13 @@ function extractSourceFacts(
     expectMetadata(sheet, sourceRow, columns, "COUNTRY.ID", EXPECTED_COUNTRY_ID);
     expectMetadata(sheet, sourceRow, columns, "INDICATOR.ID", indicatorId);
     expectMetadata(sheet, sourceRow, columns, "FREQUENCY", "Annual");
+    expectMetadata(
+      sheet,
+      sourceRow,
+      columns,
+      "START_END_MONTHS_OF_REPORTING_YEAR",
+      "January/December",
+    );
     expectMetadata(sheet, sourceRow, columns, "SCALE", target.scale);
     expectMetadata(sheet, sourceRow, columns, "UNIT", target.unit);
     expectMetadata(sheet, sourceRow, columns, "LATEST_ACTUAL_ANNUAL_DATA", "2025");
@@ -365,7 +369,7 @@ export async function prepareGeneralGovernmentBalance({
     throw new Error(`Reviewed source mismatch for ${SOURCE_ID}`);
   }
 
-  const sourceFacts = extractSourceFacts(workbookBytes, manifest);
+  const sourceFacts = extractSourceFacts(workbookBytes);
   const canonicalFacts = buildCanonicalFacts(sourceFacts);
   const validationSummary = validateGeneralGovernmentBalanceSeries(sourceFacts, canonicalFacts);
   const validation: GeneralGovernmentBalanceValidationReport = {
