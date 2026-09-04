@@ -109,7 +109,7 @@ export function queryDebt(
 
   const input = parsed.data;
   const facts = snapshot.debt.facts;
-  const knownSeriesIds = new Set(facts.map((fact) => fact.seriesId));
+  const knownSeriesIds = new Set<string>(facts.map((fact) => fact.seriesId));
 
   const unknownSeriesIds = input.seriesIds.filter((id) => !knownSeriesIds.has(id));
   if (unknownSeriesIds.length > 0) {

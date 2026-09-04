@@ -30,7 +30,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-23 codes are registered.
+29 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -57,6 +57,12 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `program_historical_join` | note | `limits` | `ministries-drilldown-programs-methodology.md` |
 | `program_parent_category_modern_grouping` | severe | `none` | `ministries-drilldown-programs-methodology.md` |
 | `non_positive_comparison_base` | note | `none` | `ai-grounding-and-caveats.md#non_positive_comparison_base` |
+| `debt_not_budget_scope` | severe | `none` | `ai-grounding-and-caveats.md#debt_not_budget_scope` |
+| `debt_service_projection` | severe | `breaks` | `ai-grounding-and-caveats.md#debt_service_projection` |
+| `debt_rate_not_published` | note | `limits` | `ai-grounding-and-caveats.md#debt_rate_not_published` |
+| `debt_gdp_share_vintage` | note | `none` | `ai-grounding-and-caveats.md#debt_gdp_share_vintage` |
+| `deficit_general_government_scope` | severe | `none` | `ai-grounding-and-caveats.md#deficit_general_government_scope` |
+| `deficit_projection` | severe | `breaks` | `ai-grounding-and-caveats.md#deficit_projection` |
 
 ### `planned_values`
 
@@ -383,6 +389,90 @@ Three cells: the roads series for 2006-2008, whose modern parent ministry was cr
 **English.** The starting value is zero or negative, so percentage growth is unavailable; an absolute difference may remain.
 
 Percentage change divides by the earlier value, so a non-positive base makes growth undefined. The absolute difference survives and is still returned. Gated to amounts: percentage measures use a point difference, which subtraction handles fine.
+
+### `debt_not_budget_scope`
+
+**Severity:** severe  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#debt_not_budget_scope`
+
+**Trigger.** Any government-debt response.
+
+**Georgian.** სახელმწიფო ვალი ცენტრალური მთავრობის ვალდებულებაა და ბიუჯეტის მაჩვენებელი არ არის: მას ხარჯებს ვერ დაუმატებთ და შემოსავლებს ვერ გამოაკლებთ.
+
+**English.** Government debt is a central-government liability, not a budget figure: it cannot be added to expenditure or subtracted from receipts.
+
+Unconditional within the dataset, like `deficit_general_government_scope` and unlike every rule above it. The error it prevents does not depend on which series or year was asked for: it becomes available the moment a debt figure sits beside budget figures the client already holds. Debt is a stock of obligations, not spending, and no arithmetic combines the two.
+
+### `debt_service_projection`
+
+**Severity:** severe  
+**Comparison effect:** `breaks`  
+**Owner document:** `ai-grounding-and-caveats.md#debt_service_projection`
+
+**Trigger.** Any returned cell whose `basis` is `projection`, in the debt dataset.
+
+**Georgian.** მომავალი წლების მომსახურება პროგნოზია — უკვე არსებული პორტფელის გადახდის გრაფიკი, და არა დაფიქსირებული შედეგი.
+
+**English.** Future-year debt service is a projection - the payment schedule of the already-outstanding portfolio, not a recorded outcome.
+
+Debt service after the last actual year is a schedule of what the debt already outstanding is contracted to cost. It is not a budget anyone approved, which is why `basis` is `projection` rather than `planned`. `breaks` rather than `limits`: comparing a recorded year to a projected one compares two different kinds of quantity.
+
+### `debt_rate_not_published`
+
+**Severity:** note  
+**Comparison effect:** `limits`  
+**Owner document:** `ai-grounding-and-caveats.md#debt_rate_not_published`
+
+**Trigger.** A `rate_percent` request in which at least one returned cell has no value.
+
+**Georgian.** ამ წლებისთვის საპროცენტო განაკვეთი გადამოწმებულ წყაროებში გამოქვეყნებული არ არის — მონაცემი აკლია და ნულოვანი არ არის.
+
+**English.** No reviewed source published an interest rate for these years - the value is missing, not zero.
+
+Rate coverage is uneven because publication was uneven: `debt.rate.total` runs continuously, while the domestic and external splits appear only in the years a reviewed source carried them. The missing cell already blocks invention; this names the reason, so a reader can tell an unpublished figure from an unasked question.
+
+### `debt_gdp_share_vintage`
+
+**Severity:** note  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#debt_gdp_share_vintage`
+
+**Trigger.** Any debt request whose measure is `share_of_gdp_pct`.
+
+**Georgian.** მშპ-ში წილი გამოთვლილია ამ სერვისის მშპ-ის მაჩვენებლით; ფინანსთა სამინისტროს გამოქვეყნებულმა წილმა შესაძლოა სხვა ვინტაჟის მშპ გამოიყენოს და ოდნავ განსხვავდებოდეს.
+
+**English.** The GDP share is computed with this service's GDP figures; the Ministry's published share may use a different GDP vintage and differ slightly.
+
+The debt package's own validation report records `possible_gdp_vintage_difference` against the Ministry's published debt-to-GDP share. A note rather than a severe: the number is correct for the denominator used. What the caveat supplies is the denominator, so a reader comparing this share to a published one knows why two right answers differ.
+
+### `deficit_general_government_scope`
+
+**Severity:** severe  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#deficit_general_government_scope`
+
+**Trigger.** Any general-government-balance response.
+
+**Georgian.** ეს არის ზოგადი მთავრობის ბალანსი საერთაშორისო სავალუტო ფონდის გაზომვით — და არა აქ მოწოდებული შემოსულობებისა და ხარჯების სხვაობა. ეს ორი ერთმანეთს არ უტოლდება.
+
+**English.** This is the general government balance as measured by the IMF - not the difference between the receipts and expenditure served here. The two are not the same quantity.
+
+The sibling of `budget_scopes_differ`, one boundary further out. General government is wider than either national series this service carries, so subtracting national expenditure from national receipts does not reproduce this number, and the difference between the two is not an error to be explained. Unconditional within the dataset, for the same reason as `debt_not_budget_scope`.
+
+### `deficit_projection`
+
+**Severity:** severe  
+**Comparison effect:** `breaks`  
+**Owner document:** `ai-grounding-and-caveats.md#deficit_projection`
+
+**Trigger.** Any returned cell whose `basis` is `projection`, in the balance dataset.
+
+**Georgian.** მომავალი წლების მაჩვენებელი საერთაშორისო სავალუტო ფონდის პროგნოზია და არა დაფიქსირებული შედეგი.
+
+**English.** Future-year values are an IMF forecast, not a recorded outcome.
+
+A separate code from `debt_service_projection` rather than one shared projection rule, because the reason differs and the reason is what a reader needs. A debt-service projection is a schedule of obligations already incurred; this is a forecast of an economy, and the next WEO vintage can revise it. One message cannot say both truthfully.
 
 
 ## Published bulk files
