@@ -73,6 +73,7 @@ test.describe("Government Debt explorer", () => {
         const childToggle = seriesRow(page, "debt.stock.domestic").getByTestId("series-row-toggle");
         await childToggle.scrollIntoViewIfNeeded();
         await expect(childToggle).toBeInViewport();
+        await expect(seriesRow(page, "debt.stock.domestic").getByTestId("series-label")).toHaveCSS("font-size", "12px");
         await childToggle.click();
         await expect(childToggle).toHaveAttribute("aria-pressed", "true");
       }
@@ -138,6 +139,52 @@ test.describe("Government Debt explorer", () => {
     await page.getByTestId("chart-mode-line").click();
     await expect(page.getByTestId("explorer-table")).toHaveCount(0);
     await expect(page.getByRole("img", { name: "მრავალწლიანი დინამიკა" })).toHaveCount(1);
+  });
+
+  test("restores the family total for unknown-only selections but preserves explicit empty selection", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt#f=rate&m=line&r=2015-2025&sel=obsolete.rate.series`);
+    await expectAppReady(page);
+
+    await expect(seriesRow(page, "debt.rate.total").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 9");
+    await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+
+    // Change the document URL as well as the hash: the explorer intentionally
+    // parses shared-link state once per mount, so a hash-only navigation would
+    // keep the first case's live state instead of exercising a fresh restore.
+    await page.goto(`${TEST_BASE_URL}/explorer/debt?case=empty#f=rate&m=line&r=2015-2025&sel=`);
+    await expectAppReady(page);
+    await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(0);
+    await expect(page.getByTestId("series-status")).toContainText("0 / 9");
+    await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  });
+
+  test("shows the no-range-data callout for an all-gap rate interval in line and table modes", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt#f=rate&m=line&r=2015-2017&sel=debt.rate.external`);
+    await expectAppReady(page);
+
+    const callout = page.getByTestId("no-range-data-callout");
+    await expect(callout).toContainText("არჩეული სერიებისთვის ამ დიაპაზონში მონაცემები არ არის");
+    await expect(page.getByRole("img", { name: "მრავალწლიანი დინამიკა" })).toHaveCount(0);
+
+    await page.getByTestId("chart-mode-table").click();
+    await expect(callout).toBeVisible();
+    await expect(page.getByTestId("explorer-table")).toHaveCount(0);
+  });
+
+  test("keeps the deck on latest coverage and identifies projected service totals", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt#f=stock&m=line&r=2013-2024&sel=debt.stock.total`);
+    await expectAppReady(page);
+
+    await expect(page.getByTestId("debt-deck")).toContainText("2025: მთავრობის ვალი");
+    await expect(page.getByTestId("debt-deck")).toContainText("+8.3%");
+    await expect(page.getByTestId("debt-deck")).toContainText("წინა წელთან");
+
+    await page.goto(`${TEST_BASE_URL}/explorer/debt?case=service-deck#f=service&m=line&r=2013-2025&sel=debt.service.total`);
+    await expectAppReady(page);
+    await expect(page.getByTestId("debt-deck")).toContainText("2030: ვალის გადახდა");
+    await expect(page.getByTestId("debt-deck")).toContainText("პროგნოზი");
+    await expect(page.getByTestId("debt-deck")).toContainText("წინა წელთან");
   });
 
   test("marks the service forecast and downloads its active actual and forecast rows", async ({ page }) => {

@@ -38,8 +38,12 @@ describe("Government Debt URL state", () => {
     expect(parseDebtHash("#f=rate&sel=")).toEqual({ family: "rate", selection: [] });
   });
 
-  it("falls back safely when the hash is malformed or names an unknown family", () => {
-    expect(parseDebtHash("#f=unknown&sel=nope")).toEqual({ family: "stock", selection: [] });
+  it("treats a non-empty unknown-only selection as absent so the family default can be restored", () => {
+    expect(parseDebtHash("#f=rate&sel=obsolete.rate.series")).toEqual({ family: "rate" });
+    expect(parseDebtHash("#f=unknown&sel=nope")).toEqual({ family: "stock" });
+  });
+
+  it("falls back safely when the hash is malformed", () => {
     expect(parseDebtHash("#%%%")).toEqual({ family: "stock" });
   });
 });

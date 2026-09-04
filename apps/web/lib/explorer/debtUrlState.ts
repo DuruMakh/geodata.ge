@@ -45,7 +45,14 @@ export function parseDebtHash(hash: string): DebtUrlState {
       const [start = 0, end = 0] = range.split("-").map(Number);
       state.range = { start, end };
     }
-    if (rawSelection !== undefined) state.selection = normalizeDebtSelection(rawSelection, family);
+    if (rawSelection !== undefined) {
+      const normalizedSelection = normalizeDebtSelection(rawSelection, family);
+      // Preserve a deliberate `sel=` clear, but let a stale non-empty list whose
+      // ids all disappeared fall through to the family's safe default.
+      if (normalizedSelection.length > 0 || params.get("sel") === "") {
+        state.selection = normalizedSelection;
+      }
+    }
 
     return state;
   } catch {

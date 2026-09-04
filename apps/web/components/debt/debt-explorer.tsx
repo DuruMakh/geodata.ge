@@ -5,6 +5,7 @@ import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
+import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { formatAmount, formatShare, unitFor, UNIT_BN } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
 import type {
@@ -73,6 +74,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
   ), [props.facts, props.family]);
   const isPercent = props.family === "rate" || (props.family === "stock" && props.shareOfGdp);
   const noSelection = props.selectedIds.length === 0;
+  const noRangeData = !noSelection && !model.points.some((point) => point.value !== null);
   const pointsBySeriesYear = new Map(model.points.map((point) => [`${point.itemId}:${point.year}`, point]));
   const chartSeries: ChartSeries[] = model.selectedItems.map((item) => ({
     id: item.id,
@@ -88,16 +90,27 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
       : {}),
   }));
   const totalItemId = model.items.find((item) => item.family === props.family && item.parentItemId === null)?.id;
-  const totalValue = totalItemId
-    ? props.facts.find((fact) => fact.seriesId === totalItemId && fact.year === props.range.end)?.value ?? null
+  const totalFacts = totalItemId
+    ? props.facts
+      .filter((fact) => fact.seriesId === totalItemId && fact.value !== null)
+      .sort((left, right) => left.year - right.year)
+    : [];
+  const latestTotalFact = totalFacts.at(-1) ?? null;
+  const previousTotalFact = latestTotalFact
+    ? totalFacts.find((fact) => fact.year === latestTotalFact.year - 1) ?? null
     : null;
-  const deckValue = totalValue === null
+  const deckValue = latestTotalFact?.value === null || latestTotalFact?.value === undefined
     ? "—"
     : props.family === "rate"
-      ? formatShare(totalValue / 100)
-      : props.family === "stock" && props.shareOfGdp
-        ? formatShare(model.totalRow?.shareByYear?.[props.range.end] ?? null)
-        : formatAmount(totalValue);
+      ? formatShare(latestTotalFact.value / 100)
+      : formatAmount(latestTotalFact.value);
+  const deckYoy = latestTotalFact?.value !== null
+    && latestTotalFact?.value !== undefined
+    && previousTotalFact?.value !== null
+    && previousTotalFact?.value !== undefined
+    && previousTotalFact.value !== 0
+    ? (latestTotalFact.value - previousTotalFact.value) / previousTotalFact.value
+    : null;
   const coverage = [
     familyYears.length > 0 ? `${familyYears[0]}–${familyYears.at(-1)}` : "",
     props.lastUpdatedAt ? `განახლდა ${props.lastUpdatedAt}` : "",
@@ -128,10 +141,24 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
         <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
           რამდენია მთავრობის ვალი და როგორ ვიხდით მას
         </h1>
-        <p className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
+        <p data-testid="debt-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
           <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
-            {props.range.end}: {FAMILY_LABEL[props.family]} · {deckValue}
+            {latestTotalFact?.year}: {FAMILY_LABEL[props.family]} · {deckValue}
           </span>
+          {latestTotalFact?.status === "projection_existing_portfolio" ? (
+            <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">პროგნოზი</span>
+          ) : null}
+          {deckYoy !== null ? (
+            <>
+              <span
+                className="font-[family-name:var(--font-numeric)] text-[13px]"
+                style={{ color: deckYoy < 0 ? NEGATIVE : POSITIVE }}
+              >
+                {formatShare(deckYoy, true)}
+              </span>
+              <span>წინა წელთან</span>
+            </>
+          ) : null}
         </p>
 
         <div data-testid="explorer-workspace" className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">
@@ -176,6 +203,12 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
               {noSelection ? (
                 <div className="mt-5">
                   <Callout testId="no-selection-callout">არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.</Callout>
+                </div>
+              ) : noRangeData ? (
+                <div className="mt-5">
+                  <Callout testId="no-range-data-callout">
+                    არჩეული სერიებისთვის ამ დიაპაზონში მონაცემები არ არის. გააფართოვე დიაპაზონი ან შეცვალე სერიები.
+                  </Callout>
                 </div>
               ) : props.chartMode === "table" ? (
                 <ExplorerTable

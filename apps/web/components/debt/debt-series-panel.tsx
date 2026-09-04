@@ -109,6 +109,7 @@ export function DebtSeriesPanel({
             expansionLabel={`${item.kaLabel} — ქვესერიების ${expanded ? "ჩაკეცვა" : "გაშლა"}`}
             showRail={isChild || expanded}
             isChild={isChild}
+            childLabelSize="standard"
             onToggle={() => onToggle(item.id)}
             onToggleExpanded={() => {
               setExpandedIds((current) => current.includes(item.id)

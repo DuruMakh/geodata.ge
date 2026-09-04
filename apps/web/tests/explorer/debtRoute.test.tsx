@@ -33,6 +33,7 @@ function debtFact(
 
 const facts: ServedGovernmentDebtFact[] = [
   debtFact(2013, "stock", "debt.stock.total", 8_000_000_000),
+  debtFact(2024, "stock", "debt.stock.total", 30_000_000_000),
   debtFact(2025, "stock", "debt.stock.total", 35_000_000_000),
   debtFact(2013, "stock", "debt.stock.domestic", 2_000_000_000),
   debtFact(2025, "stock", "debt.stock.domestic", 10_000_000_000),
@@ -48,6 +49,7 @@ const facts: ServedGovernmentDebtFact[] = [
   debtFact(2025, "service", "debt.service.interest", 1_600_000_000),
   debtFact(2026, "service", "debt.service.interest", 1_600_000_000, "projection_existing_portfolio"),
   debtFact(2015, "rate", "debt.rate.total", 4.1),
+  debtFact(2024, "rate", "debt.rate.total", 5),
   debtFact(2025, "rate", "debt.rate.total", 4.7),
   debtFact(2015, "rate", "debt.rate.domestic", 7.2),
   debtFact(2025, "rate", "debt.rate.domestic", null, "not_available"),
@@ -102,6 +104,8 @@ describe("Government Debt route composition", () => {
     expect(markup).toContain('aria-label="ვალის გადახდა — ქვესერიების ჩაკეცვა"');
     expect(markup).toContain('aria-label="საპროცენტო განაკვეთი — ქვესერიების ჩაკეცვა"');
     expect(markup).not.toContain('aria-label="ქვეპროგრამები"');
+    expect(seriesRow(markup, "debt.stock.domestic")).toContain("text-[12px]");
+    expect(seriesRow(markup, "debt.stock.domestic")).not.toContain("text-[11.5px]");
     expect((markup.match(/data-testid="chart-frame"/g) ?? [])).toHaveLength(1);
     expect(markup).not.toContain('data-testid="explorer-table"');
     expect(markup).not.toContain('data-testid="site-footer"');
@@ -110,6 +114,64 @@ describe("Government Debt route composition", () => {
     expect(excelButton).not.toContain(' disabled=""');
     expect(markup).toContain("2019");
     expect(markup).toContain("2022");
+    expect(markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain(
+      "2025: მთავრობის ვალი · 35.0 მლრდ ₾ +16.7% წინა წელთან",
+    );
+  });
+
+  it("keeps the deck on latest family coverage when the selected range ends earlier", async () => {
+    const components = await loadDebtComponents();
+    expect(components).not.toBeNull();
+    if (!components) return;
+
+    const noop = () => {};
+    const markup = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+      facts,
+      gdpFacts,
+      workbookSources: [],
+      lastUpdatedAt: reviewedAt,
+      family: "stock",
+      chartMode: "line",
+      shareOfGdp: false,
+      range: { start: 2013, end: 2013, min: 2013, max: 2025 },
+      selectedIds: ["debt.stock.total"],
+      onChartModeChange: noop,
+      onShareChange: noop,
+      onRangeChange: noop,
+      onSelectionChange: noop,
+      onToggleSeries: noop,
+    }));
+    const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+
+    expect(visibleText).toContain("2025: მთავრობის ვალი · 35.0 მლრდ ₾ +16.7% წინა წელთან");
+    expect(visibleText).not.toContain("2013: მთავრობის ვალი · 8.0 მლრდ ₾");
+  });
+
+  it("labels a latest projected family total in the deck", async () => {
+    const components = await loadDebtComponents();
+    expect(components).not.toBeNull();
+    if (!components) return;
+
+    const noop = () => {};
+    const markup = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+      facts,
+      gdpFacts,
+      workbookSources: [],
+      lastUpdatedAt: reviewedAt,
+      family: "service",
+      chartMode: "line",
+      shareOfGdp: false,
+      range: { start: 2013, end: 2025, min: 2013, max: 2026 },
+      selectedIds: ["debt.service.total"],
+      onChartModeChange: noop,
+      onShareChange: noop,
+      onRangeChange: noop,
+      onSelectionChange: noop,
+      onToggleSeries: noop,
+    }));
+    const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+
+    expect(visibleText).toContain("2026: ვალის გადახდა · 5.1 მლრდ ₾ პროგნოზი +18.6% წინა წელთან");
   });
 
   it("uses actual service and latest published rate facts in real-data selector summaries", async () => {
@@ -256,6 +318,44 @@ describe("Government Debt route composition", () => {
     expect(markup).toContain('data-testid="range-marker"');
     expect(markup).toContain("პროგნოზი");
     expect(markup).not.toContain('data-testid="chart-series-debt.service.total-forecast"');
+  });
+
+  it("shows the canonical no-range-data callout when every selected rate value is unavailable", async () => {
+    const components = await loadDebtComponents();
+    expect(components).not.toBeNull();
+    if (!components) return;
+
+    const noop = () => {};
+    const base = {
+      facts,
+      gdpFacts,
+      workbookSources: [],
+      lastUpdatedAt: reviewedAt,
+      family: "rate" as const,
+      shareOfGdp: false,
+      range: { start: 2025, end: 2025, min: 2015, max: 2025 },
+      selectedIds: ["debt.rate.domestic"] as DebtSeriesId[],
+      onChartModeChange: noop,
+      onShareChange: noop,
+      onRangeChange: noop,
+      onSelectionChange: noop,
+      onToggleSeries: noop,
+    };
+    const line = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+      ...base,
+      chartMode: "line",
+    }));
+    const table = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+      ...base,
+      chartMode: "table",
+    }));
+
+    for (const markup of [line, table]) {
+      expect(markup).toContain('data-testid="no-range-data-callout"');
+      expect(markup).toContain("არჩეული სერიებისთვის ამ დიაპაზონში მონაცემები არ არის");
+      expect(markup).not.toContain('data-testid="chart-frame"');
+      expect(markup).not.toContain('data-testid="explorer-table"');
+    }
   });
 
   it("shows an empty nine-row count without offering an impossible select-all action", async () => {

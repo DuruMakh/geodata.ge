@@ -2,8 +2,7 @@ import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { expectReadableText } from "./color-contrast";
-
-const TEST_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+import { TEST_BASE_URL } from "./test-base-url";
 
 function collectConsoleProblems(page: Page) {
   const consoleProblems: string[] = [];
@@ -30,11 +29,12 @@ async function expectAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
 
+test.describe("main explorer", () => {
 for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
   for (const section of ["expenditure", "revenue"] as const) {
     test(`${section} series values stay readable on selected and hover backgrounds at ${viewport.width}px`, async ({ page }) => {
       await page.setViewportSize(viewport);
-      await page.goto(`http://localhost:3100/explorer/${section}`);
+      await page.goto(`${TEST_BASE_URL}/explorer/${section}`);
       await expectAppReady(page);
       const row = page.locator(`[data-testid="series-row"][data-series-id="${section}.total"]`);
       const toggle = row.getByTestId("series-row-toggle");
@@ -90,7 +90,7 @@ for (const section of ["expenditure", "revenue", "analysis"] as const) {
     const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
     try {
       const page = await context.newPage();
-      await page.goto(`http://localhost:3100/explorer/${section}`);
+      await page.goto(`${TEST_BASE_URL}/explorer/${section}`);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       if (section === "analysis") {
         const snapshot = page.getByTestId("single-year-snapshot");
@@ -110,7 +110,7 @@ for (const section of ["expenditure", "revenue", "analysis"] as const) {
 test("explorer hydrates with the editorial shell and default expenditure view", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
@@ -146,7 +146,7 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
 });
 
 test("national selector uses the standardized search, action, status, and row anatomy", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const panel = page.getByTestId("series-selector");
@@ -176,7 +176,7 @@ test("national selector uses the standardized search, action, status, and row an
 });
 
 test("national selector treats a pinned total search as a match and reports genuine misses", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const panel = page.getByTestId("series-selector");
@@ -195,7 +195,7 @@ test("national selector treats a pinned total search as a match and reports genu
 
 test("standardized selector keeps its order when stacked below the chart", async ({ page }) => {
   await page.setViewportSize({ width: 820, height: 900 });
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const chartBox = await page.getByTestId("chart-panel").boundingBox();
@@ -212,7 +212,7 @@ test("standardized selector keeps its order when stacked below the chart", async
 });
 
 test("series header clears and selects every series independently of search", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const panel = page.getByTestId("series-selector");
@@ -236,7 +236,7 @@ test("series header clears and selects every series independently of search", as
 });
 
 test("bulk selector exposes mixed, empty, and checked states", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const panel = page.getByTestId("series-selector");
@@ -267,7 +267,7 @@ test("bulk selector exposes mixed, empty, and checked states", async ({ page }) 
 test("explorer controls expose line, table, grouping, and the share pill", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const chartPanel = page.getByTestId("chart-panel");
@@ -315,7 +315,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
 test("revenue nav reuses the identical system without a grouping switch", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer/revenue");
+  await page.goto(`${TEST_BASE_URL}/explorer/revenue`);
   await expectAppReady(page);
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ფინანსდება საქართველოს ბიუჯეტი");
@@ -332,7 +332,7 @@ test("revenue nav reuses the identical system without a grouping switch", async 
 test("sidebar section links move between sections in-app", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const sidebar = page.getByTestId("data-sidebar");
@@ -372,7 +372,7 @@ test("sidebar section links move between sections in-app", async ({ page }) => {
 test("ministries grouping expands nested programs by name only", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   await page.getByTestId("grouping-ministries").click();
@@ -425,7 +425,7 @@ test("ministries grouping expands nested programs by name only", async ({ page }
 test("2004 expenditure is complete across functions, ministries, GDP share, and Excel exports", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const fields = page.getByTestId("series-selector");
@@ -468,7 +468,7 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
   expect(ministry2004Rows.length).toBeGreaterThan(0);
   expect(ministry2004Rows.some((row) => row.getCell(4).value === 172_009_000)).toBe(true);
 
-  await page.goto("http://localhost:3100/explorer/revenue");
+  await page.goto(`${TEST_BASE_URL}/explorer/revenue`);
   await expectAppReady(page);
   await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
 
@@ -478,7 +478,7 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
 test("2004 revenue total excludes an unavailable liability value in tables and Excel", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer/revenue#m=table&r=2004-2005&sel=revenue.total,revenue.increase_liabilities");
+  await page.goto(`${TEST_BASE_URL}/explorer/revenue#m=table&r=2004-2005&sel=revenue.total,revenue.increase_liabilities`);
   await expectAppReady(page);
 
   const table = page.getByTestId("explorer-table");
@@ -535,7 +535,7 @@ test("Debt Excel exports the active family, forecast status, rate gaps and valid
 
 test("range strip supports chips and dragging handles", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const strip = page.getByTestId("year-range-strip");
@@ -568,7 +568,7 @@ test("range strip supports chips and dragging handles", async ({ page }) => {
 });
 
 test("URL hash round-trips explorer state", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   await page.getByTestId("chart-mode-table").click();
@@ -576,7 +576,7 @@ test("URL hash round-trips explorer state", async ({ page }) => {
   await expect(page).toHaveURL(/#.*m=table/);
   await expect(page).toHaveURL(/sh=1/);
 
-  await page.goto("http://localhost:3100/explorer/revenue#m=table&sh=1&r=2010-2020&sel=revenue.total,revenue.vat");
+  await page.goto(`${TEST_BASE_URL}/explorer/revenue#m=table&sh=1&r=2010-2020&sel=revenue.total,revenue.vat`);
   await page.reload();
   await expectAppReady(page);
 
@@ -593,7 +593,7 @@ test("URL hash round-trips explorer state", async ({ page }) => {
 });
 
 test("national URL restores an explicitly empty selection as empty", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure#m=line&sel=");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#m=line&sel=`);
   await expectAppReady(page);
   await page.reload();
   await expectAppReady(page);
@@ -604,7 +604,7 @@ test("national URL restores an explicitly empty selection as empty", async ({ pa
 });
 
 test("national URL falls back to the applicable total when every selected id is unknown", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/revenue#m=line&sel=revenue.made_up");
+  await page.goto(`${TEST_BASE_URL}/explorer/revenue#m=line&sel=revenue.made_up`);
   await expectAppReady(page);
   await page.reload();
   await expectAppReady(page);
@@ -627,7 +627,7 @@ test("line mode renders every series from a large shared selection", async ({ pa
     "spending.sport",
   ];
 
-  await page.goto(`http://localhost:3100/explorer/expenditure#m=line&sel=${ids.join(",")}`);
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#m=line&sel=${ids.join(",")}`);
   await page.reload();
   await expectAppReady(page);
 
@@ -636,7 +636,7 @@ test("line mode renders every series from a large shared selection", async ({ pa
 });
 
 test("period comparison keeps every revenue category when the selected series change", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/revenue");
+  await page.goto(`${TEST_BASE_URL}/explorer/revenue`);
   await expectAppReady(page);
 
   const vatButton = page.getByTestId("series-selector").getByTitle("დამატებული ღირებულების გადასახადი");
@@ -662,7 +662,7 @@ test("period comparison keeps every revenue category when the selected series ch
 });
 
 test("ministries period comparison keeps every top-level ministry and excludes major programs", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   await page.getByTestId("grouping-ministries").click();
@@ -684,7 +684,7 @@ test("ministries period comparison keeps every top-level ministry and excludes m
 });
 
 test("shared ministries program links restore with the parent expanded", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   await page.getByTestId("grouping-ministries").click();
@@ -704,7 +704,7 @@ test("shared ministries program links restore with the parent expanded", async (
 });
 
 test("Excel download uses only the selected range and series", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure#r=2020-2021&sel=spending.social_protection");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#r=2020-2021&sel=spending.social_protection`);
   await expectAppReady(page);
 
   const socialProtectionButton = page.getByTestId("series-selector").getByTitle("სოციალური დაცვა");
@@ -729,7 +729,7 @@ test("Excel download uses only the selected range and series", async ({ page }) 
 });
 
 test("Excel button shows working and retryable error states", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   await page.evaluate(() => {
@@ -803,7 +803,7 @@ test("Excel button shows working and retryable error states", async ({ page }) =
 });
 
 test("GDP share Excel download adds the analysis column and official sources", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure#r=2020-2021&sel=expenditure.total");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#r=2020-2021&sel=expenditure.total`);
   await expectAppReady(page);
   await page.getByTestId("measure-share-toggle").click();
 
@@ -830,7 +830,7 @@ test("GDP share Excel download adds the analysis column and official sources", a
 test("analysis view renders the fixed single-year section order", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer/analysis");
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await expectAppReady(page);
 
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
@@ -900,7 +900,7 @@ test("analysis view renders the fixed single-year section order", async ({ page 
 });
 
 test("budget field identifies a circle with its category and amount on hover and focus", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/analysis");
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await expectAppReady(page);
 
   const field = page.getByTestId("budget-field");
@@ -925,7 +925,7 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   const consoleProblems = collectConsoleProblems(page);
   await page.setViewportSize({ width: 390, height: 844 });
 
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   await expect(page.getByTestId("explorer-header")).toBeVisible();
@@ -933,7 +933,7 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   await expect(page.getByTestId("series-selector")).toBeVisible();
   await expectNoPageOverflow(page);
 
-  await page.goto("http://localhost:3100/explorer/analysis");
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await expectAppReady(page);
 
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
@@ -942,7 +942,7 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
 
   for (const width of [320, 375, 390]) {
     await page.setViewportSize({ width, height: 844 });
-    await page.goto("http://localhost:3100/explorer/analysis");
+    await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
     await expectAppReady(page);
 
     const selector = page.getByTestId("analysis-year-selector");
@@ -1038,7 +1038,7 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
 
 test("mobile chart and table explain their contained horizontal scroll", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const chart = page.getByTestId("chart-frame");
@@ -1059,7 +1059,7 @@ test("mobile chart and table explain their contained horizontal scroll", async (
 
 test("mobile chart accepts a horizontal touch drag", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const chart = page.getByTestId("chart-frame");
@@ -1079,24 +1079,24 @@ test("mobile chart accepts a horizontal touch drag", async ({ page }) => {
 });
 
 test("captures editorial desktop and mobile screenshots", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
   await expectLineChartRendered(page);
   await page.screenshot({ path: "test-results/geodata-editorial-desktop.png", fullPage: true, caret: "initial" });
 
-  await page.goto("http://localhost:3100/explorer/analysis");
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await expectAppReady(page);
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await page.screenshot({ path: "test-results/geodata-editorial-analysis.png", fullPage: true, caret: "initial" });
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
   await page.screenshot({ path: "test-results/geodata-editorial-mobile.png", fullPage: true, caret: "initial" });
 });
 
 test("every side KPI carries a sparkline", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const kpis = page.getByTestId("side-kpi");
@@ -1110,7 +1110,7 @@ test("every side KPI carries a sparkline", async ({ page }) => {
 });
 
 test("chart draws a dot lattice instead of horizontal gridlines", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const chart = page.getByTestId("chart-frame");
@@ -1161,7 +1161,7 @@ test("chart draws a dot lattice instead of horizontal gridlines", async ({ page 
 });
 
 test("a single-year range states that it has no period instead of reporting 0.0% everywhere", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   await expect(page.getByTestId("period-kpi-cards")).toBeVisible();
@@ -1187,7 +1187,7 @@ test("a single-year range states that it has no period instead of reporting 0.0%
 
 test("ships no server-only provenance fields in explorer payloads", async ({ page }) => {
   for (const route of ["/explorer/expenditure", "/explorer/revenue", "/explorer/analysis"]) {
-    await page.goto(`http://localhost:3100${route}`);
+    await page.goto(`${TEST_BASE_URL}${route}`);
     await expectAppReady(page);
 
     // lastUpdatedAt and workbook source links are computed from the complete
@@ -1225,7 +1225,7 @@ test("every explorer route family renders the site footer", async ({ page }) => 
     "/explorer/municipalities/oni",
     "/explorer/municipalities/georgia",
   ]) {
-    await page.goto(`http://localhost:3100${route}`);
+    await page.goto(`${TEST_BASE_URL}${route}`);
 
     const footer = page.getByTestId("site-footer");
     await expect(footer, route).toBeVisible();
@@ -1236,7 +1236,7 @@ test("every explorer route family renders the site footer", async ({ page }) => 
 });
 
 test("exposes the explorer breadcrumb as a navigation landmark", async ({ page }) => {
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   // BreadcrumbTrail next door already does this correctly on /about and the
@@ -1257,7 +1257,7 @@ test("Explorer branding uses the reversed mark without changing shell behavior",
     { width: 390, height: 844 },
   ]) {
     await page.setViewportSize(viewport);
-    await page.goto("http://localhost:3100/explorer/expenditure");
+    await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
     const sidebar = page.getByTestId("data-sidebar");
     const home = sidebar.getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true });
     const mark = sidebar.getByTestId("sidebar-brand-mark");
@@ -1277,7 +1277,7 @@ test("Explorer branding uses the reversed mark without changing shell behavior",
 test("sidebar collapses to a rail and remembers the choice", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const sidebar = page.getByTestId("data-sidebar");
@@ -1322,7 +1322,7 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
   // here rather than applied as an unexplained 52px rail on a phone.
   await page.addInitScript(() => window.localStorage.setItem("geodata:sidebar-collapsed", "1"));
 
-  await page.goto("http://localhost:3100/explorer/expenditure");
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const toggle = page.getByTestId("sidebar-toggle");
@@ -1378,7 +1378,7 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
 test("hub lists five cards, all five live", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer");
+  await page.goto(`${TEST_BASE_URL}/explorer`);
   await expectAppReady(page);
 
   await expect(page.getByTestId("hub-card")).toHaveCount(5);
@@ -1430,14 +1430,15 @@ test("hub lists five cards, all five live", async ({ page }) => {
 test("legacy nav hashes redirect to their route", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto("http://localhost:3100/explorer#nav=analysis&ay=2024");
+  await page.goto(`${TEST_BASE_URL}/explorer#nav=analysis&ay=2024`);
   await expect(page).toHaveURL(/\/explorer\/analysis/);
   await expect(page).toHaveURL(/ay=2024/);
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
 
-  await page.goto("http://localhost:3100/explorer#nav=revenue&m=table");
+  await page.goto(`${TEST_BASE_URL}/explorer#nav=revenue&m=table`);
   await expect(page).toHaveURL(/\/explorer\/revenue/);
   await expect(page.getByTestId("explorer-table")).toBeVisible();
 
   expect(consoleProblems).toEqual([]);
+});
 });

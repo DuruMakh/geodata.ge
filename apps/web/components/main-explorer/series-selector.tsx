@@ -137,6 +137,7 @@ type SeriesSelectorRowProps = {
   expansionLabel?: string;
   showRail?: boolean;
   isChild?: boolean;
+  childLabelSize?: "compact" | "standard";
   onToggle: () => void;
   onToggleExpanded?: () => void;
 };
@@ -156,6 +157,7 @@ export function SeriesSelectorRow({
   expansionLabel = "ქვეპროგრამები",
   showRail = false,
   isChild = false,
+  childLabelSize = "compact",
   onToggle,
   onToggleExpanded,
 }: SeriesSelectorRowProps) {
@@ -211,7 +213,7 @@ export function SeriesSelectorRow({
           </span>
           <span
             data-testid="series-label"
-            className={`line-clamp-2 leading-[1.35] ${isChild ? "text-[11.5px] font-normal text-[var(--body)]" : "text-[12.5px] font-medium text-[var(--ink)]"}`}
+            className={`line-clamp-2 leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[12px]" : "text-[11.5px]"} font-normal text-[var(--body)]` : "text-[12.5px] font-medium text-[var(--ink)]"}`}
           >
             {label}
           </span>
