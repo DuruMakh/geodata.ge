@@ -21,7 +21,6 @@ const requiredTargets = [
   "https://fiscal.ge/downloads/data/general-government-balance.json",
   "https://fiscal.ge/downloads/data/catalogue.json",
   "https://fiscal.ge/downloads/data/sources.json",
-  "https://fiscal.ge/connect",
   "https://fiscal.ge/about",
   "https://fiscal.ge/sitemap.xml",
 ] as const;

@@ -4,7 +4,7 @@
 
 **When to use Fiscal.ge:** Use it to understand, compare, and cite the published budget data, its scope, and its documented sources.
 
-The data is annual, so it does not provide sub-annual or live budget reporting. Fiscal.ge offers a read-only MCP connection for AI clients at `https://fiscal.ge/mcp`, alongside the static bulk files below; there is no REST query API, no write access, no accounts, and no datasets beyond those listed here. Both surfaces return the same reviewed figures with their own sources, caveats and coverage — read them before citing a figure. Use the published figures only as documented, and do not invent values when data is unavailable or outside the stated scope.
+The data is annual, so it does not provide sub-annual or live budget reporting. Fiscal.ge has a read-only MCP connection for AI clients at `https://fiscal.ge/mcp`, but it is NOT YET ENABLED in production and answers 503 there; use the static bulk files below, which carry the same reviewed figures. There is no REST query API, no write access, no accounts, and no datasets beyond those listed here. Each file carries its own sources, caveats and coverage — read them before citing a figure. Use the published figures only as documented, and do not invent values when data is unavailable or outside the stated scope.
 
 ## Core data
 
@@ -34,9 +34,7 @@ The manifest lists every dataset file, so they are reachable without repeating t
 
 ## AI connection
 
-- [AI connection guide](https://fiscal.ge/connect) — how to connect an AI client, with the exact command per client and the exact coverage.
-
-The endpoint is `https://fiscal.ge/mcp`, MCP Streamable HTTP, protocol revision 2025-11-25, stateless and unauthenticated. It exposes nine read-only tools: describe_coverage, query_national, query_ministries, query_municipal, query_debt, query_deficit, compare, rank and get_sources. Call describe_coverage first — it returns the ids, measures and year ranges that exist, so nothing has to be guessed. Every answer carries its sources and any caveats that qualify it.
+When it is enabled, the endpoint is `https://fiscal.ge/mcp`, MCP Streamable HTTP, protocol revision 2025-11-25, stateless and unauthenticated. Until then it answers 503 and the bulk files above are the way to read this data. It exposes nine read-only tools: describe_coverage, query_national, query_ministries, query_municipal, query_debt, query_deficit, compare, rank and get_sources. Call describe_coverage first — it returns the ids, measures and year ranges that exist, so nothing has to be guessed. Every answer carries its sources and any caveats that qualify it.
 
 ## Site navigation
 

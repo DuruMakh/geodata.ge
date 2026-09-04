@@ -92,13 +92,14 @@ test.describe("connection page", () => {
     await expect(missing).toHaveText(/[Ⴀ-ჿ]/);
   });
 
-  test("is reachable from the site footer", async ({ page }) => {
+  // The footer link is held back until /mcp answers in production (see the note
+  // in app/sitemap.ts). Asserting its ABSENCE rather than deleting the test, so
+  // that restoring the link is a deliberate change to this line and not
+  // something that can drift back in unnoticed.
+  test("is not advertised in the footer while the endpoint is off", async ({ page }) => {
     await page.goto(`${BASE_URL}/about`);
-    const link = page.locator('footer a[href="/connect"]');
 
-    await expect(link).toHaveCount(1);
-    await link.click();
-    await expect(page).toHaveURL(new RegExp("/connect$"));
+    await expect(page.locator('footer a[href="/connect"]')).toHaveCount(0);
   });
 
   test("stays readable on a narrow viewport", async ({ page }) => {
