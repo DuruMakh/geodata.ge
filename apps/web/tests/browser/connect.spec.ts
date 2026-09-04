@@ -47,13 +47,6 @@ test.describe("connection page", () => {
     }
   });
 
-  test("offers example questions in Georgian", async ({ page }) => {
-    const examples = page.getByTestId("connect-example");
-
-    expect(await examples.count()).toBeGreaterThanOrEqual(3);
-    for (const example of await examples.all()) await expect(example).toHaveText(/[Ⴀ-ჿ]/);
-  });
-
   // Spec 12.3: the coverage statement is what stops a user asking for
   // out-of-scope data and concluding the tool is broken.
   test("states both what is served and what is not", async ({ page }) => {

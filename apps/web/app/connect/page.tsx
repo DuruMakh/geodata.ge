@@ -74,14 +74,6 @@ const CLIENTS = [
   },
 ] as const;
 
-const EXAMPLES = [
-  "რამდენი დაიხარჯა ჯანდაცვაზე 2025 წელს და საიდან მოდის ეს ციფრი?",
-  "შეადარე განათლების ხარჯი 2015 და 2024 წლებში.",
-  "რომელ მუნიციპალიტეტს აქვს ყველაზე მაღალი ბიუჯეტი ერთ მცხოვრებზე?",
-  "რამდენი იყო ხულოს ბიუჯეტი 2024 წელს?",
-  "როგორია ჯანდაცვის ხარჯის წილი მშპ-ში?",
-] as const;
-
 const NOT_SERVED = [
   "კვარტალური და თვიური მონაცემები — მხოლოდ წლიური ინფორმაციაა გადამოწმებული",
   "სახელმწიფო ვალი",
@@ -144,23 +136,6 @@ export default async function ConnectPage() {
             </div>
           </section>
 
-          <section className="mt-10 border-t border-[var(--ink)] pt-5">
-            <h2 className="font-[family-name:var(--font-display)] text-[23px] font-semibold">
-              შეკითხვების მაგალითები
-            </h2>
-            <ul className="mt-4 grid max-w-[900px] gap-2">
-              {EXAMPLES.map((example) => (
-                <li
-                  key={example}
-                  data-testid="connect-example"
-                  className="text-[13.5px] leading-[1.8] text-[var(--body)]"
-                >
-                  „{example}“
-                </li>
-              ))}
-            </ul>
-          </section>
-
           {/* Spec 12.3: naming what is NOT served is what stops someone asking
               for quarterly data, getting nothing, and concluding the tool is
               broken. It belongs beside the coverage, not in a FAQ. */}
@@ -204,22 +179,6 @@ export default async function ConnectPage() {
                 </p>
               </div>
             </div>
-          </section>
-
-          <section className="mt-10 border-t border-[var(--ink)] pt-5">
-            <h2 className="font-[family-name:var(--font-display)] text-[23px] font-semibold">
-              მონაცემები ფაილების სახით
-            </h2>
-            <p className="mt-3 max-w-[760px] text-[13.5px] leading-[1.8] text-[var(--body)]">
-              თუ AI-კავშირი არ გჭირდებათ, იგივე მონაცემები ხელმისაწვდომია ჩამოსატვირთად —{" "}
-              <a
-                href="/downloads/data/manifest.json"
-                className="font-semibold text-[var(--accent)] underline underline-offset-4"
-              >
-                მონაცემთა მანიფესტი
-              </a>{" "}
-              ჩამოთვლის ყველა გამოქვეყნებულ ფაილს წყაროებით, დათქმებითა და დაფარვით. ლიცენზია — CC BY 4.0.
-            </p>
           </section>
         </main>
         <SiteFooter updatedAt={model.updatedAt} />
