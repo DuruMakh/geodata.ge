@@ -25,6 +25,8 @@ The data is annual, so it does not provide sub-annual or live budget reporting. 
 ## Bulk data files
 
 - [Data manifest](https://fiscal.ge/downloads/data/manifest.json) — every published file with its row count, byte size and SHA-256.
+- [Government debt](https://fiscal.ge/downloads/data/government-debt.json) — debt stock and debt service in GEL, with the interest rates in a file of their own.
+- [General government balance](https://fiscal.ge/downloads/data/general-government-balance.json) — the IMF's deficit or surplus measure; values are signed.
 - [Capability catalogue](https://fiscal.ge/downloads/data/catalogue.json) — the datasets, entities, series and exclusions that exist.
 - [Source resolution](https://fiscal.ge/downloads/data/sources.json) — every logical source with its public originals or its stated derivation.
 
@@ -34,7 +36,7 @@ The manifest lists the four dataset files, so they are reachable without repeati
 
 - [AI connection guide](https://fiscal.ge/connect) — how to connect an AI client, with the exact command per client and the exact coverage.
 
-The endpoint is `https://fiscal.ge/mcp`, MCP Streamable HTTP, protocol revision 2025-11-25, stateless and unauthenticated. It exposes seven read-only tools: describe_coverage, query_national, query_ministries, query_municipal, compare, rank and get_sources. Call describe_coverage first — it returns the ids, measures and year ranges that exist, so nothing has to be guessed. Every answer carries its sources and any caveats that qualify it.
+The endpoint is `https://fiscal.ge/mcp`, MCP Streamable HTTP, protocol revision 2025-11-25, stateless and unauthenticated. It exposes nine read-only tools: describe_coverage, query_national, query_ministries, query_municipal, query_debt, query_deficit, compare, rank and get_sources. Call describe_coverage first — it returns the ids, measures and year ranges that exist, so nothing has to be guessed. Every answer carries its sources and any caveats that qualify it.
 
 ## Site navigation
 

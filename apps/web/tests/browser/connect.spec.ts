@@ -61,7 +61,14 @@ test.describe("connection page", () => {
     // drifted to 2005, national still contributes a 2004 and the test stays
     // green - which is the exact drift this page exists to prevent.
     const servedLines = (await served.innerText()).split("\n").filter((line) => line.includes("—"));
-    expect(servedLines).toHaveLength(4);
+    expect(servedLines).toHaveLength(6);
+
+    // Debt and the balance are served now, so the page must not still deny
+    // them, and their ranges must be real rather than borrowed from a
+    // neighbour: the balance reaches back further than anything else here.
+    expect(servedLines.some((line) => line.startsWith("სახელმწიფო ვალი"))).toBe(true);
+    const balance = servedLines.find((line) => line.includes("ბალანსი"))!;
+    expect(balance).toContain("1995–2031");
     for (const line of servedLines) expect(line).toMatch(/\d{4}–\d{4}\s*$/);
 
     const municipal = servedLines.find((line) => line.includes("მუნიციპალური"))!;
@@ -75,7 +82,9 @@ test.describe("connection page", () => {
     expect(servedLines.some((line) => line.startsWith("ნაერთი ბიუჯეტის შემოსულობები"))).toBe(true);
 
     const missingText = await missing.innerText();
-    // Quarterly, monthly, debt, capital projects - named explicitly.
+    // Quarterly, monthly, capital projects - named explicitly. Debt was on
+    // this list until the endpoint began serving it.
+    expect(missingText).not.toContain("სახელმწიფო ვალი");
     expect(missingText.length).toBeGreaterThan(40);
     await expect(missing).toHaveText(/[Ⴀ-ჿ]/);
   });

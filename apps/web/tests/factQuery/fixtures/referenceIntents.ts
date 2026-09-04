@@ -669,4 +669,99 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     mustDeclineOrQualify: true,
     note: "Reviewed subset with comparable endpoints; missing coverage reported and Georgian names returned intact.",
   },
+  {
+    id: 21,
+    promptKa: "რამდენი იყო საქართველოს სახელმწიფო ვალი 2024 წელს?",
+    promptEn: "How large was Georgia's government debt in 2024?",
+    call: {
+      tool: "query_debt",
+      arguments: { seriesIds: ["debt.stock.total"], years: [2024], measure: "amount_gel" },
+    },
+    expectedStatus: "ok",
+    expectedCells: [
+      { id: "government-debt:country.georgia:debt.stock.total:2024:amount_gel", value: 33169300000, unit: "GEL" },
+    ],
+    allowedRounding: EXACT,
+    expectedBudgetScope: "central_government_liabilities",
+    requiredSourceIds: ["source.mof_public_debt_bulletin_n25"],
+    requiredDocumentIds: [],
+    // The boundary caveat is unconditional: this figure must never be handed
+    // over without saying it is not a budget number.
+    requiredCaveatCodes: ["debt_not_budget_scope"],
+    mustDeclineOrQualify: false,
+    note: "Read from data/imports/government-debt-facts-2013-2030.csv, not from the engine: 33,169,300,000 GEL, status actual.",
+  },
+  {
+    id: 22,
+    promptKa: "რამდენი დაიხარჯება ვალის მომსახურებაზე 2027 წელს?",
+    promptEn: "How much will be spent servicing the debt in 2027?",
+    call: {
+      tool: "query_debt",
+      arguments: { seriesIds: ["debt.service.total"], years: [2027], measure: "amount_gel" },
+    },
+    expectedStatus: "ok",
+    expectedCells: [
+      {
+        id: "government-debt:country.georgia:debt.service.total:2027:amount_gel",
+        value: 4388380862.5336,
+        unit: "GEL",
+      },
+    ],
+    allowedRounding: EXACT,
+    expectedBudgetScope: "central_government_liabilities",
+    requiredSourceIds: ["source.mof_public_debt_bulletin_n25"],
+    requiredDocumentIds: [],
+    requiredCaveatCodes: ["debt_not_budget_scope", "debt_service_projection"],
+    // The number exists and is served, but presenting it as a recorded figure
+    // would be wrong - so the correct behaviour is to answer WITH the
+    // qualification, which is what this flag means.
+    mustDeclineOrQualify: true,
+    note: "A future year: served, but a schedule of the existing portfolio rather than an outcome.",
+  },
+  {
+    id: 23,
+    promptKa: "როგორი იყო საგარეო ვალის საშუალო საპროცენტო განაკვეთი 2016 წელს?",
+    promptEn: "What was the average interest rate on external debt in 2016?",
+    call: {
+      tool: "query_debt",
+      arguments: { seriesIds: ["debt.rate.external"], years: [2016], measure: "rate_percent" },
+    },
+    expectedStatus: "empty",
+    // null, not 0: no reviewed source published this cell.
+    expectedCells: [
+      { id: "government-debt:country.georgia:debt.rate.external:2016:rate_percent", value: null, unit: "percent" },
+    ],
+    allowedRounding: EXACT,
+    expectedBudgetScope: "central_government_liabilities",
+    requiredSourceIds: [],
+    requiredDocumentIds: [],
+    requiredCaveatCodes: ["debt_not_budget_scope", "debt_rate_not_published"],
+    mustDeclineOrQualify: true,
+    note: "A documented publication gap. Inventing or interpolating a rate here is the failure this intent exists to catch.",
+  },
+  {
+    id: 24,
+    promptKa: "როგორი იყო ბიუჯეტის დეფიციტი 2020 წელს მშპ-თან მიმართებაში?",
+    promptEn: "What was the budget deficit as a share of GDP in 2020?",
+    call: {
+      tool: "query_deficit",
+      arguments: { years: [2020], measure: "share_of_gdp_pct" },
+    },
+    expectedStatus: "ok",
+    // NEGATIVE. A deficit reported as +9.158 would be a surplus.
+    expectedCells: [
+      {
+        id: "general-government-balance:country.georgia:deficit.general_government.balance:2020:share_of_gdp_pct",
+        value: -9.158,
+        unit: "percent",
+      },
+    ],
+    allowedRounding: EXACT,
+    expectedBudgetScope: "general_government_imf",
+    requiredSourceIds: ["source.imf_weo_april_2026_general_government_balance"],
+    requiredDocumentIds: [],
+    requiredCaveatCodes: ["deficit_general_government_scope"],
+    mustDeclineOrQualify: true,
+    note: "Read from data/imports/general-government-balance-annual-1995-2031.csv: -9.158 % of GDP, status actual. The sign is the point.",
+  },
 ] as const;

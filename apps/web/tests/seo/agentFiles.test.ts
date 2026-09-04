@@ -17,6 +17,8 @@ const requiredTargets = [
   "https://fiscal.ge/methodology/revenue",
   "https://fiscal.ge/methodology/municipalities",
   "https://fiscal.ge/downloads/data/manifest.json",
+  "https://fiscal.ge/downloads/data/government-debt.json",
+  "https://fiscal.ge/downloads/data/general-government-balance.json",
   "https://fiscal.ge/downloads/data/catalogue.json",
   "https://fiscal.ge/downloads/data/sources.json",
   "https://fiscal.ge/connect",

@@ -85,7 +85,6 @@ const CHAT_PROMPT = "fiscal.ge-ის გამოქვეყნებულ �
 
 const NOT_SERVED = [
   "კვარტალური და თვიური მონაცემები — მხოლოდ წლიური ინფორმაციაა გადამოწმებული",
-  "სახელმწიფო ვალი",
   "ცალკეული კაპიტალური პროექტები და შესყიდვები",
   "მიმდინარე წლის მიმდინარე შესრულება",
 ] as const;
@@ -219,6 +218,16 @@ export default async function ConnectPage() {
                   <li>
                     მუნიციპალური ხარჯები, {municipalities} მუნიციპალიტეტი და {regions} რეგიონი —{" "}
                     {ranges["municipal-expenditure"]}
+                  </li>
+                  {/* Both ranges come from the same catalogue the endpoint
+                      answers from (DESIGN.md 2.1), so the page cannot advertise
+                      a year the service does not have. Debt runs past the last
+                      recorded year because its service schedule is published
+                      ahead; the balance does the same for the IMF forecast. */}
+                  <li>სახელმწიფო ვალი — {ranges["government-debt"]}</li>
+                  <li>
+                    ზოგადი მთავრობის ბალანსი (დეფიციტი/პროფიციტი) —{" "}
+                    {ranges["general-government-balance"]}
                   </li>
                 </ul>
               </div>
