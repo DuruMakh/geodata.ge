@@ -30,11 +30,57 @@ const FAMILY_LABEL: Record<DebtFamily, string> = {
   rate: "საპროცენტო განაკვეთი",
 };
 
-const SOURCE_FILENAME_TOKENS: Record<DebtFamily, readonly string[]> = {
-  stock: ["public-debt-bulletin-n13", "public-debt-bulletin-n25"],
-  service: ["public-debt-bulletin-n7", "public-debt-bulletin-n13", "public-debt-bulletin-n19", "public-debt-bulletin-n25"],
-  rate: ["monthly-debt-report", "debt-management-strategy"],
+const SOURCE_FILENAME_BY_ID: Readonly<Record<string, string>> = {
+  mof_public_debt_bulletin_n7: "public-debt-bulletin-n7",
+  mof_public_debt_bulletin_n13: "public-debt-bulletin-n13",
+  mof_public_debt_bulletin_n19: "public-debt-bulletin-n19",
+  mof_public_debt_bulletin_n25: "public-debt-bulletin-n25",
+  mof_monthly_debt_report_2026_07: "monthly-debt-report-2026-07",
+  mof_debt_strategy_2019_2021: "debt-management-strategy-2019-2021",
+  mof_debt_strategy_2022_2025: "debt-management-strategy-2022-2025",
+  mof_debt_strategy_2023_2026: "debt-management-strategy-2023-2026",
+  mof_debt_strategy_2025_2029: "debt-management-strategy-2025-2029",
 };
+
+function externalServiceSourceId(year: number): string | null {
+  if (year >= 2013 && year <= 2016) return "mof_public_debt_bulletin_n7";
+  if (year <= 2019) return "mof_public_debt_bulletin_n13";
+  if (year <= 2022) return "mof_public_debt_bulletin_n19";
+  if (year <= 2025) return "mof_public_debt_bulletin_n25";
+  return null;
+}
+
+function debtSourcesFor(input: DebtWorkbookInput): WorkbookPublicSource[] {
+  const selected = new Set(input.selectedIds);
+  const yearsBySourceId = new Map<string, Set<number>>();
+  const add = (sourceId: string | null, year: number) => {
+    if (!sourceId) return;
+    const years = yearsBySourceId.get(sourceId) ?? new Set<number>();
+    years.add(year);
+    yearsBySourceId.set(sourceId, years);
+  };
+
+  for (const fact of input.facts) {
+    if (
+      fact.family !== input.family ||
+      !selected.has(fact.seriesId) ||
+      fact.year < input.range.start ||
+      fact.year > input.range.end
+    ) continue;
+    add(fact.sourceId, fact.year);
+    if (fact.family === "service" && fact.status === "actual") {
+      add(externalServiceSourceId(fact.year), fact.year);
+    }
+  }
+
+  return [...yearsBySourceId].flatMap(([sourceId, years]) => {
+    const filename = SOURCE_FILENAME_BY_ID[sourceId];
+    const source = filename
+      ? input.sources.find((candidate) => candidate.downloadHref.includes(filename))
+      : undefined;
+    return source ? [{ ...source, years: [...years].sort((left, right) => left - right) }] : [];
+  });
+}
 
 function workbookStatus(status: ServedGovernmentDebtFact["status"]) {
   if (status === "projection_existing_portfolio") return "forecast" as const;
@@ -97,7 +143,7 @@ export function buildDebtWorkbookExportModel(input: DebtWorkbookInput): Workbook
     totalId: model.items.find((item) => item.family === input.family && item.parentItemId === null)?.id ?? null,
     series,
     sources: [
-      ...input.sources.filter((source) => SOURCE_FILENAME_TOKENS[input.family].some((token) => source.downloadHref.includes(token))),
+      ...debtSourcesFor(input),
       ...(input.family === "stock" && input.shareOfGdp ? input.gdpSources : []),
     ],
     siteOrigin: input.siteOrigin,

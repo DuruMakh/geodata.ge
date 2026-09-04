@@ -70,7 +70,7 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
           სრული დამუშავებული მონაცემები — CSV
         </a>
         <p className="mt-2 text-[11.5px] leading-relaxed text-[var(--muted)]">
-          UTF-8 / Excel თავსებადი · CC BY 4.0 · წყაროსა და ფაქტი/გეგმის მეტამონაცემებით
+          UTF-8 / Excel თავსებადი · CC BY 4.0 · წყაროსა და სტატუსის მეტამონაცემებით
         </p>
       </div>
 

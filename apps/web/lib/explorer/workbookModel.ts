@@ -94,7 +94,8 @@ function readableValue(measure: WorkbookMeasure, point: WorkbookPoint | null | u
 }
 
 function subtitleKa(rows: WorkbookReadableRow[], years: number[], unitLabelKa: string): string {
-  const bases = new Set(Object.values(rows.flatMap((row) => Object.values(row.basisByYear))).filter((basis): basis is WorkbookBasis => basis !== null && basis !== "not_available"));
+  const statuses = Object.values(rows.flatMap((row) => Object.values(row.basisByYear))).filter((basis): basis is WorkbookBasis => basis !== null);
+  const bases = new Set(statuses.filter((basis) => basis !== "not_available"));
   const basis = bases.has("actual") && bases.has("forecast")
     ? "ფაქტი და პროგნოზი"
     : bases.has("actual") && bases.has("planned")
@@ -103,6 +104,8 @@ function subtitleKa(rows: WorkbookReadableRow[], years: number[], unitLabelKa: s
         ? "პროგნოზი"
         : bases.has("planned")
           ? "გეგმა"
+          : statuses.includes("not_available")
+            ? "არ არის ხელმისაწვდომი"
           : "ფაქტი";
   const period = years.length > 0 ? `${years[0]}–${years.at(-1)}` : "პერიოდი არ არის";
   return `${period} · ${basis} · ${unitLabelKa}`;

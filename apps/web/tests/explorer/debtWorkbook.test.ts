@@ -1,6 +1,10 @@
+import ExcelJS from "exceljs";
 import { describe, expect, it } from "vitest";
 import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { loadGovernmentDebtFacts } from "../../lib/data/governmentDebt/importGovernmentDebtFacts";
+import { loadWorkbookSources, resetWorkbookSourceCacheForTests } from "../../lib/methodology/workbookSources";
 import type { ServedGovernmentDebtFact, ServedNationalGdpFact } from "../../lib/servedRows";
 
 const facts: ServedGovernmentDebtFact[] = [
@@ -22,7 +26,14 @@ const gdpFacts: ServedNationalGdpFact[] = [
 
 const debtSources: WorkbookPublicSource[] = [
   {
-    years: [2013, 2014, 2025, 2026],
+    years: [2013, 2014],
+    titleKa: "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
+    organizationKa: "საქართველოს ფინანსთა სამინისტრო",
+    downloadHref: "/downloads/methodology/debt/files/2013-2019/public-debt-bulletin-n13.pdf",
+    retrievedAt: "2026-09-01",
+  },
+  {
+    years: [2015, 2025, 2026],
     titleKa: "სახელმწიფო ვალის სტატისტიკური ბიულეტენი",
     organizationKa: "საქართველოს ფინანსთა სამინისტრო",
     downloadHref: "/downloads/methodology/debt/files/2013-2030/public-debt-bulletin-n25.pdf",
@@ -46,6 +57,88 @@ const gdpSources: WorkbookPublicSource[] = [{
 }];
 
 describe("Debt workbook adapter", () => {
+  it("uses exact real-manifest stock and service lineage at source-era boundaries", async () => {
+    resetWorkbookSourceCacheForTests();
+    const [realFacts, realSources] = await Promise.all([
+      loadGovernmentDebtFacts(),
+      loadWorkbookSources("debt"),
+    ]);
+    const build = (family: "stock" | "service", start: number, end: number) => buildDebtWorkbookExportModel({
+      facts: realFacts,
+      gdpFacts: [],
+      family,
+      selectedIds: [family === "stock" ? "debt.stock.total" : "debt.service.total"],
+      range: { start, end },
+      shareOfGdp: false,
+      sources: realSources,
+      gdpSources: [],
+      siteOrigin: "https://fiscal.ge",
+    }).sources.map((source) => ({ href: source.downloadHref, years: source.years }));
+
+    const stock2013 = build("stock", 2013, 2014);
+    expect(stock2013).toEqual([
+      { href: "/downloads/methodology/debt/files/2013-2019/public-debt-bulletin-n13.pdf", years: [2013, 2014] },
+    ]);
+    expect(JSON.stringify(stock2013)).not.toContain("bulletin-n25");
+
+    const service2015 = build("service", 2015, 2016);
+    expect(service2015).toEqual([
+      { href: "/downloads/methodology/debt/files/2013-2030/public-debt-bulletin-n25.pdf", years: [2015, 2016] },
+      { href: "/downloads/methodology/debt/files/2013-2016/public-debt-bulletin-n7.pdf", years: [2015, 2016] },
+    ]);
+    expect(JSON.stringify(service2015)).not.toMatch(/bulletin-n13|bulletin-n19/);
+
+    expect(build("service", 2026, 2030)).toEqual([
+      { href: "/downloads/methodology/debt/files/2013-2030/public-debt-bulletin-n25.pdf", years: [2026, 2027, 2028, 2029, 2030] },
+    ]);
+  });
+
+  it.each([
+    {
+      name: "external 2015–2017",
+      selectedId: "debt.rate.external" as const,
+      years: [2015, 2016, 2017],
+    },
+    {
+      name: "domestic 2025",
+      selectedId: "debt.rate.domestic" as const,
+      years: [2025],
+    },
+  ])("labels the gap-only $name range as unavailable in the model and generated workbook", async ({ selectedId, years }) => {
+    const gapFacts: ServedGovernmentDebtFact[] = years.map((year) => ({
+      year,
+      family: "rate",
+      seriesId: selectedId,
+      value: null,
+      valueKind: "percent",
+      status: "not_available",
+      sourceId: null,
+      snapshotDate: null,
+      lastReviewedAt: "2026-09-01",
+    }));
+    const model = buildDebtWorkbookExportModel({
+      facts: gapFacts,
+      gdpFacts: [],
+      family: "rate",
+      selectedIds: [selectedId],
+      range: { start: years[0]!, end: years.at(-1)! },
+      shareOfGdp: false,
+      sources: [],
+      gdpSources: [],
+      siteOrigin: "https://fiscal.ge",
+    });
+
+    expect(model.readable.subtitleKa).toBe(`${years[0]}–${years.at(-1)} · არ არის ხელმისაწვდომი · %`);
+    expect(model.readable.subtitleKa).not.toContain("ფაქტი");
+    expect(model.analysis.rows.every((row) => row[4] === "არ არის ხელმისაწვდომი")).toBe(true);
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(await createWorkbookBuffer(model));
+    expect(workbook.getWorksheet("მარტივი ცხრილი")!.getCell("A2").value).toBe(model.readable.subtitleKa);
+    expect(workbook.getWorksheet("მარტივი ცხრილი")!.getCell("B4").value).toBeNull();
+    expect(workbook.getWorksheet("მონაცემები")!.getCell("E2").value).toBe("არ არის ხელმისაწვდომი");
+  });
+
   it("maps the active stock selection, range, GDP measure and existing three-sheet contract", () => {
     const model = buildDebtWorkbookExportModel({
       facts,
@@ -63,13 +156,14 @@ describe("Debt workbook adapter", () => {
     expect(model.sheetNames).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
     expect(model.readable.years).toEqual([2013, 2014]);
     expect(model.readable.unitLabelKa).toBe("% მშპ-ში");
+    expect(model.readable.subtitleKa).toBe("2013–2014 · ფაქტი · % მშპ-ში");
     expect(model.readable.rows.map((row) => [row.labelKa, row.valuesByYear])).toEqual([
       ["მთლიანი ვალი", { 2013: 0.5, 2014: 0.5 }],
       ["საშინაო ვალი", { 2013: 0.125, 2014: 0.125 }],
     ]);
     expect(model.analysis.headers).toEqual(["წელი", "მთავარი ჯგუფი", "კატეგორია", "თანხა (₾)", "სტატუსი", "მშპ-ის წილი (%)"]);
     expect(model.sources.map((source) => source.titleKa)).toEqual([
-      "სახელმწიფო ვალის სტატისტიკური ბიულეტენი",
+      "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
       "მშპ მიმდინარე ფასებში — SNA 2008",
     ]);
   });
