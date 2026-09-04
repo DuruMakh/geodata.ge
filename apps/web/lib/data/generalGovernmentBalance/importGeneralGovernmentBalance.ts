@@ -2,7 +2,12 @@ import Decimal from "decimal.js";
 import { z } from "zod";
 
 import { readCsvRecords } from "../csv";
+import {
+  assertSameServedRows,
+  generalGovernmentBalanceFactParityKey,
+} from "../servedDataParity";
 import { stableIdSchema } from "../validation";
+import type { ServedGeneralGovernmentBalanceFact } from "../../servedRows";
 import type { GeneralGovernmentBalanceFact } from "./types";
 
 const EXPECTED_YEARS = Array.from({ length: 37 }, (_, index) => 1995 + index);
@@ -83,4 +88,48 @@ export async function loadGeneralGovernmentBalanceFacts(
   }
 
   return facts;
+}
+
+const SERVING_PATH = "../../data/imports/general-government-balance-annual-1995-2031.csv";
+
+export function toServedGeneralGovernmentBalanceFact(
+  fact: GeneralGovernmentBalanceFact,
+): ServedGeneralGovernmentBalanceFact {
+  return {
+    year: fact.year,
+    generalGovernmentBalancePctGdp: fact.generalGovernmentBalancePctGdp,
+    generalGovernmentBalanceGel: fact.generalGovernmentBalanceGel,
+    status: fact.status,
+    sourceId: fact.sourceId,
+    lastReviewedAt: fact.lastReviewedAt,
+  };
+}
+
+export async function loadServedGeneralGovernmentBalanceData(): Promise<{
+  facts: ServedGeneralGovernmentBalanceFact[];
+}> {
+  const raw = (process.env.GEODATA_DATA_SOURCE ?? "").trim().toLowerCase();
+  const csvFacts = async () =>
+    (await loadGeneralGovernmentBalanceFacts(SERVING_PATH)).map(
+      toServedGeneralGovernmentBalanceFact,
+    );
+  if (raw !== "db") {
+    if (raw !== "" && raw !== "csv") {
+      throw new Error(`GEODATA_DATA_SOURCE must be "db" or "csv", got "${raw}"`);
+    }
+    return { facts: await csvFacts() };
+  }
+
+  const { loadGeneralGovernmentBalanceFactsFromDb } = await import("../../db/servedDataDb");
+  const [dbFacts, reviewedCsvFacts] = await Promise.all([
+    loadGeneralGovernmentBalanceFactsFromDb(),
+    csvFacts(),
+  ]);
+  assertSameServedRows(
+    "general-government balance facts",
+    reviewedCsvFacts,
+    dbFacts,
+    generalGovernmentBalanceFactParityKey,
+  );
+  return { facts: dbFacts };
 }

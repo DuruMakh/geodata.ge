@@ -15,7 +15,9 @@ describe("indexable Fiscal.ge routes", () => {
     const internalLinks = await import("../../lib/seo/internalLinks") as Record<string, unknown>;
 
     expect(internalLinks.DEBT_EXPLORER_PATH).toBe("/explorer/debt");
+    expect(internalLinks.DEFICIT_EXPLORER_PATH).toBe("/explorer/deficit");
     expect(typeof metadataModule.governmentDebtMetadata).toBe("function");
+    expect(typeof metadataModule.generalGovernmentDeficitMetadata).toBe("function");
     if (typeof metadataModule.governmentDebtMetadata !== "function") return;
 
     const metadata = metadataModule.governmentDebtMetadata([
@@ -27,6 +29,16 @@ describe("indexable Fiscal.ge routes", () => {
     expect(metadata.title).toContain("2013–2025");
     expect(metadata.title).not.toContain("2030");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/debt");
+
+    if (typeof metadataModule.generalGovernmentDeficitMetadata !== "function") return;
+    const deficitMetadata = metadataModule.generalGovernmentDeficitMetadata([
+      { year: 1995, status: "actual" },
+      { year: 2025, status: "actual" },
+      { year: 2031, status: "projection" },
+    ]) as { title?: string; alternates?: { canonical?: string } };
+    expect(deficitMetadata.title).toContain("1995–2025");
+    expect(deficitMetadata.title).not.toContain("2031");
+    expect(deficitMetadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/deficit");
   });
 
   it("publishes the exact unique Fiscal.ge HTML inventory", async () => {
@@ -34,11 +46,12 @@ describe("indexable Fiscal.ge routes", () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls).toHaveLength(89);
+    expect(urls).toHaveLength(90);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
     expect(urls).toContain("https://fiscal.ge/explorer/debt");
+    expect(urls).toContain("https://fiscal.ge/explorer/deficit");
     expect(urls).toContain("https://fiscal.ge/methodology/debt");
     expect(urls.some((url) => url.includes("#") || url.includes("?"))).toBe(false);
   });

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { resolveSiteUrl } from "../siteUrl";
-import { DEBT_EXPLORER_PATH } from "./internalLinks";
+import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "./internalLinks";
 
 const SOCIAL_IMAGE = {
   url: "/opengraph-image",
@@ -77,5 +77,18 @@ export function governmentDebtMetadata(
     title: `საქართველოს მთავრობის ვალი ${firstYear}–${lastYear} | Fiscal.ge`,
     description: `საქართველოს მთავრობის ვალის მოცულობა, ვალის მომსახურება და საპროცენტო განაკვეთები, ${firstYear}–${lastYear}.`,
     path: DEBT_EXPLORER_PATH,
+  });
+}
+
+export function generalGovernmentDeficitMetadata(
+  facts: readonly { year: number; status: string }[],
+): Metadata {
+  const { firstYear, lastYear } = coverageFromYears(
+    facts.filter((fact) => fact.status === "actual"),
+  );
+  return fiscalMetadata({
+    title: `საქართველოს ზოგადი მთავრობის დეფიციტი ${firstYear}–${lastYear} | Fiscal.ge`,
+    description: `საქართველოს ზოგადი მთავრობის დეფიციტი ან პროფიციტი, მშპ-ის პროცენტად და ნომინალურ ლარში, ${firstYear}–${lastYear}.`,
+    path: DEFICIT_EXPLORER_PATH,
   });
 }

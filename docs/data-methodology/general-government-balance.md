@@ -1,6 +1,6 @@
 # General government balance, 1995–2031
 
-Status: reviewed annual IMF data package. It does not itself create a public route or page.
+Status: reviewed annual IMF data package, published at `/explorer/deficit`.
 
 ## Public meaning
 

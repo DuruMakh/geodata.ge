@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import { buildHubCards } from "../../lib/explorer/hubCards";
 import { ACCENT, INK } from "../../lib/explorer/colors";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
-import type { ServedGovernmentDebtFact } from "../../lib/servedRows";
+import type {
+  ServedGeneralGovernmentBalanceFact,
+  ServedGovernmentDebtFact,
+} from "../../lib/servedRows";
 
 function fact(
   side: "expenditure" | "revenue",
@@ -56,17 +59,23 @@ const DEBT_FACTS: ServedGovernmentDebtFact[] = [
   { year: 2025, family: "stock", seriesId: "debt.stock.domestic", value: 10_000_000_000, valueKind: "amount_gel", status: "actual", sourceId: "debt-source", snapshotDate: null, lastReviewedAt: "2026-09-01" },
 ];
 
+const BALANCE_FACTS: ServedGeneralGovernmentBalanceFact[] = [
+  { year: 2024, generalGovernmentBalancePctGdp: -2.267, generalGovernmentBalanceGel: -2_109_000_000, status: "actual", sourceId: "source.imf", lastReviewedAt: "2026-09-04" },
+  { year: 2025, generalGovernmentBalancePctGdp: -1.455, generalGovernmentBalanceGel: -1_526_000_000, status: "actual", sourceId: "source.imf", lastReviewedAt: "2026-09-04" },
+  { year: 2026, generalGovernmentBalancePctGdp: -2.327, generalGovernmentBalanceGel: -2_672_000_000, status: "projection", sourceId: "source.imf", lastReviewedAt: "2026-09-04" },
+];
+
 // The real registry currently holds 64 municipalities and 11 data-bearing
 // regions, but tests below deliberately use a different pair (see the
 // "does not hardcode" test) so a description that quietly ignores this input
 // and falls back to a literal cannot pass unnoticed.
 
 describe("buildHubCards", () => {
-  it("orders expenditure, revenue, municipalities, analysis, debt", () => {
+  it("orders expenditure, revenue, municipalities, analysis, debt, deficit", () => {
     const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS);
 
-    expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "შემოსავლები", "მუნიციპალიტეტები", "ანალიზი", "ვალი"]);
-    expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04", "05"]);
+    expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "შემოსავლები", "მუნიციპალიტეტები", "ანალიზი", "ვალი", "დეფიციტი"]);
+    expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04", "05", "06"]);
   });
 
   it("derives each live card's footer from the latest year", () => {
@@ -165,6 +174,16 @@ describe("buildHubCards", () => {
     expect(card.comingSoon).toBe(false);
     expect(card.series).toEqual([32_000_000_000, 35_000_000_000]);
     expect(card.footer).toBe("2025 · 35.0 მლრდ ₾");
+    expect(card.seriesColor).toBe(INK);
+  });
+
+  it("builds card 06 from actual IMF deficit percentages, excluding projections", () => {
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS, BALANCE_FACTS)[5]!;
+
+    expect(card.href).toBe("/explorer/deficit");
+    expect(card.comingSoon).toBe(false);
+    expect(card.series).toEqual([-2.267, -1.455]);
+    expect(card.footer).toBe("2025 · −1.5% მშპ-ის");
     expect(card.seriesColor).toBe(INK);
   });
 });

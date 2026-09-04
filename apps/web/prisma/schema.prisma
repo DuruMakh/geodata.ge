@@ -77,6 +77,7 @@ model SourceDocument {
   facts           BudgetFact[]
   gdpFacts        NationalGdpFact[]
   populationFacts MunicipalPopulationFact[]
+  generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
 }
 
 model ImportRun {
@@ -98,6 +99,7 @@ model ImportRun {
   adminFacts            AdminSpendingFact[]
   gdpFacts              NationalGdpFact[]
   governmentDebtFacts   GovernmentDebtFact[]
+  generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
   populationFacts       MunicipalPopulationFact[]
 }
 
@@ -195,6 +197,19 @@ model GovernmentDebtFact {
 
   @@id([year, seriesId])
   @@index([family, year])
+}
+
+// Mirror of data/imports/general-government-balance-annual-1995-2031.csv.
+model GeneralGovernmentBalanceFact {
+  year                               Int            @id
+  generalGovernmentBalancePctGdp     Decimal        @db.Decimal(9, 3)
+  generalGovernmentBalanceGel        Decimal        @db.Decimal(24, 0)
+  status                             String
+  sourceDocumentId                   String
+  sourceDocument                     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt                     DateTime       @db.Date
+  importRunId                        String?
+  importRun                          ImportRun?     @relation(fields: [importRunId], references: [id])
 }
 
 enum MunicipalWarningType {

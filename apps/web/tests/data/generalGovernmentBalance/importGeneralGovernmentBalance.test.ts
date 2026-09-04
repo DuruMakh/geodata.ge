@@ -4,6 +4,7 @@ import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { loadGeneralGovernmentBalanceFacts } from "../../../lib/data/generalGovernmentBalance/importGeneralGovernmentBalance";
+import { loadServedGeneralGovernmentBalanceData } from "../../../lib/data/generalGovernmentBalance/importGeneralGovernmentBalance";
 
 const temporaryDirectories: string[] = [];
 
@@ -86,5 +87,28 @@ describe("loadGeneralGovernmentBalanceFacts", () => {
     );
 
     await expect(loadGeneralGovernmentBalanceFacts(fixturePath)).rejects.toThrow();
+  });
+});
+
+describe("loadServedGeneralGovernmentBalanceData", () => {
+  it("serves only the annual balance fields needed by the public page", async () => {
+    delete process.env.GEODATA_DATA_SOURCE;
+    const { facts } = await loadServedGeneralGovernmentBalanceData();
+
+    expect(facts).toHaveLength(37);
+    expect(Object.keys(facts[0]!).sort()).toEqual([
+      "generalGovernmentBalanceGel",
+      "generalGovernmentBalancePctGdp",
+      "lastReviewedAt",
+      "sourceId",
+      "status",
+      "year",
+    ]);
+    expect(facts.find((row) => row.year === 2025)).toMatchObject({
+      generalGovernmentBalancePctGdp: -1.455,
+      generalGovernmentBalanceGel: -1_526_000_000,
+      status: "actual",
+    });
+    expect(facts.find((row) => row.year === 2026)?.status).toBe("projection");
   });
 });
