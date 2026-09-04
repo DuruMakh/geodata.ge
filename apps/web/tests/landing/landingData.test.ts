@@ -3,7 +3,11 @@ import type { GlossaryEntry } from "../../lib/data/glossary";
 import type { Municipality, MunicipalTotalFact } from "../../lib/data/municipal/types";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import { buildLandingContext, buildLandingModel } from "../../lib/landing/landingData";
-import type { ServedBudgetFact } from "../../lib/servedRows";
+import type {
+  ServedBudgetFact,
+  ServedGeneralGovernmentBalanceFact,
+  ServedGovernmentDebtFact,
+} from "../../lib/servedRows";
 
 function glossaryEntry(id: string, kaLabel: string): [string, GlossaryEntry] {
   return [id, { id, kaLabel, enLabel: id, description: "", notes: "" }];
@@ -86,6 +90,88 @@ const municipalTotalFacts = [
 
 const municipalCountryTotalFacts = [municipalTotal(2025, "country.georgia", 900), municipalTotal(2026, "country.georgia", 1_000)];
 
+const debtFacts: ServedGovernmentDebtFact[] = [
+  {
+    year: 2024,
+    family: "stock",
+    seriesId: "debt.stock.total",
+    value: 900,
+    valueKind: "amount_gel",
+    status: "actual",
+    sourceId: "source.debt",
+    snapshotDate: "2024-12-31",
+    lastReviewedAt: "2026-07-01",
+  },
+  {
+    year: 2025,
+    family: "stock",
+    seriesId: "debt.stock.domestic",
+    value: 300,
+    valueKind: "amount_gel",
+    status: "actual",
+    sourceId: "source.debt",
+    snapshotDate: "2025-12-31",
+    lastReviewedAt: "2026-07-01",
+  },
+  {
+    year: 2025,
+    family: "stock",
+    seriesId: "debt.stock.external",
+    value: 700,
+    valueKind: "amount_gel",
+    status: "actual",
+    sourceId: "source.debt",
+    snapshotDate: "2025-12-31",
+    lastReviewedAt: "2026-07-01",
+  },
+  {
+    year: 2025,
+    family: "stock",
+    seriesId: "debt.stock.total",
+    value: 1_000,
+    valueKind: "amount_gel",
+    status: "actual",
+    sourceId: "source.debt",
+    snapshotDate: "2025-12-31",
+    lastReviewedAt: "2026-07-01",
+  },
+];
+
+const balanceFacts: ServedGeneralGovernmentBalanceFact[] = [
+  {
+    year: 2023,
+    generalGovernmentBalancePctGdp: -2.329,
+    generalGovernmentBalanceGel: -1_883,
+    status: "actual",
+    sourceId: "source.balance",
+    lastReviewedAt: "2026-09-04",
+  },
+  {
+    year: 2024,
+    generalGovernmentBalancePctGdp: -2.267,
+    generalGovernmentBalanceGel: -2_109,
+    status: "actual",
+    sourceId: "source.balance",
+    lastReviewedAt: "2026-09-04",
+  },
+  {
+    year: 2025,
+    generalGovernmentBalancePctGdp: -1.455,
+    generalGovernmentBalanceGel: -1_526,
+    status: "actual",
+    sourceId: "source.balance",
+    lastReviewedAt: "2026-09-04",
+  },
+  {
+    year: 2026,
+    generalGovernmentBalancePctGdp: -2.327,
+    generalGovernmentBalanceGel: -2_672,
+    status: "projection",
+    sourceId: "source.balance",
+    lastReviewedAt: "2026-09-04",
+  },
+];
+
 describe("landing model", () => {
   const model = buildLandingModel({
     facts,
@@ -94,6 +180,8 @@ describe("landing model", () => {
     municipalities,
     municipalTotalFacts,
     municipalCountryTotalFacts,
+    debtFacts,
+    balanceFacts,
   });
 
   it("uses the active explicit total for the latest detail year", () => {
@@ -128,6 +216,42 @@ describe("landing model", () => {
       share: 0.25,
     });
     expect(model.municipalities.rows.some((row) => row.id === "15")).toBe(false);
+  });
+
+  it("uses the latest actual debt stock and preserves its domestic and external split", () => {
+    expect(model.debt).toEqual({
+      latestYear: 2025,
+      totalGel: 1_000,
+      domesticGel: 300,
+      externalGel: 700,
+    });
+  });
+
+  it("keeps deficit projections off the homepage summary", () => {
+    expect(model.deficit).toEqual({
+      latestActualYear: 2025,
+      percentGdp: -1.455,
+      recentActual: [
+        { year: 2023, percentGdp: -2.329 },
+        { year: 2024, percentGdp: -2.267 },
+        { year: 2025, percentGdp: -1.455 },
+      ],
+    });
+  });
+
+  it("fails instead of presenting a missing debt stock component as zero", () => {
+    expect(() =>
+      buildLandingModel({
+        facts,
+        glossary,
+        sourceDocuments,
+        municipalities,
+        municipalTotalFacts,
+        municipalCountryTotalFacts,
+        debtFacts: debtFacts.filter((fact) => fact.seriesId !== "debt.stock.external"),
+        balanceFacts,
+      }),
+    ).toThrow("Missing debt.stock.external for 2025");
   });
 });
 
