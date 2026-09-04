@@ -254,7 +254,10 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     return errorResponse(snapshot, { ...endpointResult.error, code });
   }
 
-  const observations = (endpointResult.data as { observations: Observation[] }).observations;
+  const { observations, coverage } = endpointResult.data as {
+    observations: Observation[];
+    coverage: { expectedCount: number; excludedEntities: { entityId: string; reason: string }[] };
+  };
   const isPercentage = PERCENTAGE_MEASURES.has(input.measure);
 
   // The endpoint caveats, keyed per observation, decide whether the two years
@@ -371,7 +374,7 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
   const status: "ok" | "partial" | "empty" =
     comparisons.length === 0
       ? "empty"
-      : comparableCount === comparisons.length
+      : comparableCount === coverage.expectedCount / 2
         ? "ok"
         : "partial";
 
@@ -397,6 +400,8 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       coverage: {
         requestedYears: years,
         comparedPairs: comparisons.length,
+        requestedPairs: coverage.expectedCount / 2,
+        excludedEntities: coverage.excludedEntities,
         comparableCount,
         notComparableCount: comparisons.length - comparableCount,
       },

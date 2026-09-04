@@ -753,11 +753,9 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
     await page.goto(baseUrl);
 
     const links = page.getByTestId("site-footer").getByRole("link");
-    // 6. The AI-კავშირი link to /connect is held back until /mcp answers in
-    // production (see app/sitemap.ts), which takes this to 7 again. Pinned on
-    // purpose: a link added here has to clear the mobile target-size and
-    // focus-order checks below.
-    expect(await links.count()).toBe(6);
+    // The production connection is discoverable from every site footer.
+    await expect(links).toHaveCount(7);
+    await expect(page.getByTestId("site-footer").getByRole("link", { name: "AI-კავშირი", exact: true })).toHaveAttribute("href", "/connect");
     for (const link of await links.all()) {
       await expectMinimumTarget(link);
     }

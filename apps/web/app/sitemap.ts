@@ -58,13 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: `${siteUrl}/`, lastModified },
     { url: `${siteUrl}/about`, lastModified },
-    // /connect is deliberately ABSENT until the endpoint it documents answers
-    // in production. The page ships and is tested; it is simply not advertised,
-    // because /mcp returns 503 there - MCP_ENABLED is set on Preview only, and
-    // createCounter refuses in production regardless while no shared rate
-    // limiter exists (lib/mcp/limits.ts). Sending a reader to instructions for
-    // an endpoint that cannot answer is worse than not mentioning it.
-    // Re-add here, in site-footer.tsx and in llms.txt together when it is on.
+    { url: `${siteUrl}/connect`, lastModified },
     // /mcp itself is never listed: a POST-only protocol endpoint answers a
     // crawler's GET with 405, so it is not a page to index.
     { url: `${siteUrl}/explorer`, lastModified },

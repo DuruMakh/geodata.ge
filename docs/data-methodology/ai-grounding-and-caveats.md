@@ -30,11 +30,12 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-29 codes are registered.
+30 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
 | `planned_values` | severe | `none` | `ai-grounding-and-caveats.md#planned_values` |
+| `revenue_2004_component_scope` | severe | `breaks` | `revenue-methodology.md#56-2004--annual-report-partial-panel` |
 | `revenue_2004_total_scope` | severe | `breaks` | `revenue-methodology.md` |
 | `revenue_2004_liabilities_unavailable` | severe | `breaks` | `revenue-methodology.md` |
 | `budget_scopes_differ` | severe | `none` | `revenue-methodology.md` |
@@ -605,3 +606,20 @@ limitation it must carry.
 ## Keeping this document true
 
 `apps/web/tests/factQuery/caveats/documented.test.ts` fails if a registered code is missing from this file, so the catalogue cannot grow without the documentation growing with it. It deliberately does not check the prose: a test can prove a code is mentioned, not that the sentence beside it is right. That stays a review responsibility.
+
+
+### `revenue_2004_component_scope`
+
+**Severity:** severe. **Comparison effect:** `breaks`.
+
+**Trigger:** An available 2004 observation for `revenue.asset_decrease` or
+`revenue.other_taxes`. The 2004 capital-revenue row and residual other-taxes
+calculation do not establish equivalence to the later components. This rule
+suppresses growth across the boundary for those two series and their growth
+rankings. It does not change reviewed amounts or the validated VAT comparison.
+
+**Owner:** `revenue-methodology.md#56-2004--annual-report-partial-panel`.
+
+**Georgian:** 2004 წლის კაპიტალური შემოსავლები და სხვა გადასახადები შემდგომი წლებისგან განსხვავებული განსაზღვრებითაა მოცემული; ამ საზღვარზე ზრდა არ გამოითვლება.
+
+**English:** The 2004 capital receipts and other taxes use different definitions from later years. Growth is not calculated across this boundary.

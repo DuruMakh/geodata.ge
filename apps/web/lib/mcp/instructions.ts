@@ -59,7 +59,8 @@ UNITS AND VALUES
   for real growth, say once that the figures are nominal.
 - share_of_total_pct and share_of_gdp_pct are percentages; gel_per_resident is
   GEL per resident using the reviewed population denominator.
-- basis is "actual" or "planned". Where both exist, actual is served and wins.
+- basis is "actual", "planned", or "projection". For budget facts where both
+  actual and planned exist, actual is served and wins.
 - availability "missing" means the reviewed data does not contain that cell.
   Never estimate it, interpolate it, infer it from neighbouring years, or report
   it as zero. Missing is not zero, and zero is a real reviewed value.

@@ -21,8 +21,19 @@ const NETTED_REVENUE_IDS = new Set(["revenue.grants", "revenue.other_revenue"]);
 // and 1.4.1.1.3. 2004 predates this entirely (a separate reviewed annual-report panel,
 // year2004Revenue.ts, with no subtraction either) and is excluded by the same year >= 2008 gate.
 const NETTING_START_YEAR = 2008;
+const CHANGED_2004_COMPONENTS = new Set(["revenue.asset_decrease", "revenue.other_taxes"]);
 
 export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
+  {
+    code: "revenue_2004_component_scope",
+    severity: "severe",
+    comparisonEffect: "breaks",
+    messageKa: "2004 წლის კაპიტალური შემოსავლები და სხვა გადასახადები შემდგომი წლებისგან განსხვავებული განსაზღვრებითაა მოცემული; ამ საზღვარზე ზრდა არ გამოითვლება.",
+    messageEn: "The 2004 capital receipts and other taxes use different definitions from later years. Growth is not calculated across this boundary.",
+    methodologyRef: "revenue-methodology.md#56-2004--annual-report-partial-panel",
+    applies: (c) => c.datasetId === "national-revenue" && c.observations.some((o) => o.year === 2004 && o.value !== null && CHANGED_2004_COMPONENTS.has(o.seriesId)),
+    affects: (c) => c.observations.filter((o) => o.year === 2004 && o.value !== null && CHANGED_2004_COMPONENTS.has(o.seriesId)).map((o) => `${o.seriesId}:${o.year}`),
+  },
   // `nominal_gel` was removed on 2026-09-04. Every GEL figure this service has
   // ever served is nominal, in every year, for every dataset - so as a caveat it
   // was true of everything and therefore said nothing about any particular

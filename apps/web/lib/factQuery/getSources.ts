@@ -175,6 +175,26 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   const hasNarrowing =
     input.datasetId !== undefined || (input.years?.length ?? 0) > 0 || (input.entityIds?.length ?? 0) > 0;
 
+  const documentDataset = input.datasetId === undefined ? undefined : {
+    "national-revenue": "revenue",
+    "national-expenditure": "expenditure",
+    ministries: "expenditure",
+    "municipal-expenditure": "municipalities",
+    "government-debt": "debt",
+    "general-government-balance": "deficit",
+  }[input.datasetId];
+  const entityCodes = (input.entityIds ?? []).flatMap((id) => {
+    if (id.startsWith("region.")) return snapshot.municipal.municipalities.filter((m) => m.regionId === id).map((m) => m.code);
+    return [id];
+  });
+  const packageSourceIds = new Set(
+    input.datasetId === "government-debt"
+      ? snapshot.debt.facts.flatMap((f) => f.sourceId ? [f.sourceId.startsWith("source.") ? f.sourceId : `source.${f.sourceId}`] : [])
+      : input.datasetId === "general-government-balance"
+        ? snapshot.deficit.facts.map((f) => f.sourceId)
+        : [],
+  );
+
   const sources: ResolvedSourceView[] = resolved.map((source) => {
     let documents = source.documents;
 
@@ -190,14 +210,16 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
         // Exempting it returned the Geostat municipal-population workbook as a
         // match for national-revenue; the honest outcome is that the filter
         // matched nothing, which the caller is now told.
-        if (input.datasetId !== undefined && document.datasetId !== input.datasetId) {
+        if (documentDataset !== undefined && document.datasetId !== documentDataset && !(document.datasetId === null && packageSourceIds.has(source.sourceId))) {
           return false;
         }
         if (input.years !== undefined && input.years.length > 0) {
           if (!input.years.some((year) => document.years.includes(year))) return false;
         }
         if (input.entityIds !== undefined && input.entityIds.length > 0) {
-          if (!matchesEntity(document, input.entityIds)) return false;
+          // Every source in this catalogue concerns Georgia. A country filter
+          // includes both national originals and the complete municipal panel.
+          if (!input.entityIds.includes(MUNICIPAL_COUNTRY_ID) && !matchesEntity(document, entityCodes)) return false;
         }
         return true;
       });
@@ -233,5 +255,5 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
       : null,
   };
 
-  return { kind: "sources", status, data, meta: buildResponseMeta(snapshot, { sources: resolved, caveats: [] }) };
+  return { kind: "sources", status, data, meta: buildResponseMeta(snapshot, { sources: sources.map(({ sourceId, name, lastReviewedAt, derivation, documents }) => ({ sourceId, name, lastReviewedAt, derivation, documents })), caveats: [] }) };
 }
