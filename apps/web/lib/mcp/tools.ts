@@ -9,6 +9,8 @@ import { compare } from "../factQuery/compare";
 import { describeCoverage } from "../factQuery/describeCoverage";
 import { getSources } from "../factQuery/getSources";
 import { queryMinistries } from "../factQuery/queryMinistries";
+import { queryDebt } from "../factQuery/queryDebt";
+import { queryDeficit } from "../factQuery/queryDeficit";
 import { queryMunicipal } from "../factQuery/queryMunicipal";
 import { queryNational } from "../factQuery/queryNational";
 import { rank } from "../factQuery/rank";
@@ -17,6 +19,8 @@ import {
   describeCoverageInput,
   getSourcesInput,
   queryMinistriesInput,
+  queryDebtInput,
+  queryDeficitInput,
   queryMunicipalInput,
   queryNationalInput,
   rankInput,
@@ -99,6 +103,33 @@ export const TOOLS: readonly ToolDefinition[] = [
       "territorial split of national spending.",
     schema: queryMunicipalInput,
     run: (snapshot, input) => queryMunicipal(snapshot, input),
+  },
+  {
+    name: "query_debt",
+    title: "სახელმწიფო ვალი",
+    describe: (coverage) =>
+      `Annual Georgian government debt, ${coverage["government-debt"]}. Three families: stock (how ` +
+      "much debt exists), service (principal and interest paid) and rate (year-end weighted-average " +
+      "interest rate). Measures: amount_gel and share_of_gdp_pct for stock and service, rate_percent " +
+      "for rates; a measure its family does not carry is rejected, not answered empty. This is " +
+      "CENTRAL GOVERNMENT LIABILITIES, not a budget figure - never add it to expenditure or subtract " +
+      "it from receipts. Service years after the last actual year are projections of the " +
+      "already-outstanding portfolio, not recorded outcomes. Rate coverage is uneven: where no " +
+      "reviewed source published a rate the cell is missing, which is not zero.",
+    schema: queryDebtInput,
+    run: (snapshot, input) => queryDebt(snapshot, input),
+  },
+  {
+    name: "query_deficit",
+    title: "ზოგადი მთავრობის ბალანსი",
+    describe: (coverage) =>
+      `The general government balance as measured by the IMF, ${coverage["general-government-balance"]}. ` +
+      "Measures: share_of_gdp_pct and amount_gel, both published by the source rather than derived " +
+      "here. VALUES ARE SIGNED - a negative value is a deficit and a positive one a surplus, so " +
+      "report the sign. This is a different accounting boundary from the receipts and expenditure " +
+      "served here and is NOT their difference. Years after the last actual year are IMF forecasts.",
+    schema: queryDeficitInput,
+    run: (snapshot, input) => queryDeficit(snapshot, input),
   },
   {
     name: "compare",

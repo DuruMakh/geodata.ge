@@ -37,12 +37,17 @@ WHAT IS SERVED
 - Ministries: administrative categories and their major programs, ${range("ministries")}.
 - Municipal expenditure by function for ${entities.municipalities} municipalities,
   ${entities.regions} regions and a Georgia aggregate, ${range("municipal-expenditure")}.
+- Government debt: how much is owed, what was paid on it, and at what rate,
+  ${range("government-debt")}.
+- The general government balance (the deficit or surplus) as measured by the
+  IMF, ${range("general-government-balance")}.
 Coverage is derived from the loaded data and is reported by describe_coverage.
 Do not assume a year or a series exists; ask.
 
 WHAT IS NOT SERVED
-Quarterly or monthly data, live budget execution, public debt, individual
-capital projects, procurement, and anything after the last reviewed year. There
+Quarterly or monthly data, live budget execution, individual capital
+projects, procurement, and anything after the last reviewed year that is not
+explicitly served as a projection. There
 is no such thing as a partial answer assembled from outside sources: if the data
 does not cover the question, say so.
 
@@ -67,6 +72,25 @@ whenever both totals are in play; report what it says, not the code it says it
 under.
 Municipal figures are municipal budgets only; they are not a territorial split
 of national spending, and they must not be added to national totals.
+
+DEBT AND FISCAL BALANCE
+Two datasets sit outside the budget boundaries above, and neither may be
+combined with them.
+- Government debt is CENTRAL GOVERNMENT LIABILITIES, published by the Ministry
+  of Finance. It is a stock of obligations, not spending. Do not add it to
+  expenditure, subtract it from receipts, or present it as part of a budget.
+- The general government balance is published by the IMF for GENERAL
+  government, a wider boundary than either national series here. It is NOT the
+  difference between the receipts and the expenditure this service serves;
+  subtracting one from the other does not reproduce it, and the gap between the
+  two is not something to explain away.
+- Balance values are SIGNED. A negative value is a deficit; a positive one is a
+  surplus. Report the sign. Dropping it turns a deficit into a surplus, which is
+  the worst error available in this data.
+- Years whose basis is "projection" are not recorded outcomes. A debt-service
+  projection is the payment schedule of debt already outstanding; a balance
+  projection is an IMF forecast that a later vintage can revise. Say which, and
+  say that it is a projection, whenever one appears in an answer.
 
 HOW TO PRESENT AN ANSWER
 The reader is a member of the public asking about their country's budget, not a

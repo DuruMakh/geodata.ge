@@ -74,13 +74,13 @@ describe("/mcp route", () => {
     expect(result.instructions).toContain("CC BY 4.0");
   });
 
-  it("lists the seven tools", async () => {
+  it("lists every tool", async () => {
     const body = await jsonOf(
       await POST(post({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }, { "mcp-protocol-version": PROTOCOL })),
     );
     const tools = (body as unknown as { result: { tools: { name: string }[] } }).result.tools;
 
-    expect(tools).toHaveLength(7);
+    expect(tools).toHaveLength(9);
     expect(tools.map((tool) => tool.name)).toContain("query_national");
   });
 

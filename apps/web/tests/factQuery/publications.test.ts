@@ -150,7 +150,7 @@ type PublishedFile = {
 };
 
 describe("dataset publications", () => {
-  it("publishes the four files with observations, catalogue, sources and caveats", async () => {
+  it("publishes every dataset file with observations, catalogue, sources and caveats", async () => {
     const files = buildDatasetFiles(snapshot);
 
     expect(files.map((file) => file.fileName)).toEqual([
@@ -158,6 +158,9 @@ describe("dataset publications", () => {
       "national-expenditure.json",
       "ministries.json",
       "municipal-expenditure.json",
+      "government-debt.json",
+      "government-debt-rates.json",
+      "general-government-balance.json",
     ]);
 
     for (const file of files) {
@@ -230,6 +233,9 @@ describe("dataset publications", () => {
       "national-expenditure.json",
       "ministries.json",
       "municipal-expenditure.json",
+      "government-debt.json",
+      "government-debt-rates.json",
+      "general-government-balance.json",
       "manifest.json",
     ]);
   });
@@ -283,7 +289,15 @@ describe("regressions from the Part 2 review", () => {
         .map((entry) => entry.seriesId);
       const returned = new Set(published.observations.map((observation) => observation.seriesId));
 
-      expect(advertised.length, `${file.fileName} advertises no total`).toBeGreaterThan(0);
+      // The two debt files are exempt from "must advertise a total". A debt
+      // total (debt.stock.total) is a served row published by the Ministry,
+      // not a figure this service calculates - so there is no derived total
+      // that could silently vanish, which is the regression above. Their
+      // series level is the family (stock/service/rate). The balance file is
+      // not exempt: its single series IS a total.
+      if (!file.fileName.startsWith("government-debt")) {
+        expect(advertised.length, `${file.fileName} advertises no total`).toBeGreaterThan(0);
+      }
       for (const total of advertised) {
         expect(returned.has(total), `${file.fileName} advertises ${total} but publishes no row for it`).toBe(true);
       }

@@ -53,10 +53,10 @@ const DATASET_JSON_DOWNLOADS = {
   ],
   revenue: [{ href: "/downloads/data/national-revenue.json", labelKa: "სახელმწიფო შემოსავლები" }],
   municipalities: [{ href: "/downloads/data/municipal-expenditure.json", labelKa: "მუნიციპალური ხარჯები" }],
-  // Empty on purpose: government debt is published as CSV and as the
-  // methodology workbook, but it is not part of the fact-query core, so it
-  // has no JSON publication to link. Give it one and add it here.
-  debt: [],
+  debt: [
+    { href: "/downloads/data/government-debt.json", labelKa: "სახელმწიფო ვალი" },
+    { href: "/downloads/data/government-debt-rates.json", labelKa: "საპროცენტო განაკვეთები" },
+  ],
 } as const;
 
 // Only the file that IS this dataset in another format belongs in the Dataset
@@ -67,7 +67,9 @@ const DATASET_JSON_DISTRIBUTIONS = {
   expenditure: ["/downloads/data/national-expenditure.json"],
   revenue: ["/downloads/data/national-revenue.json"],
   municipalities: ["/downloads/data/municipal-expenditure.json"],
-  debt: [],
+  // Only the amounts file is a distribution OF this dataset; the rates
+  // file is a different measure of it and stays a human link above.
+  debt: ["/downloads/data/government-debt.json"],
 } as const;
 
 export async function generateMetadata({ params }: MethodologyDatasetPageProps): Promise<Metadata> {

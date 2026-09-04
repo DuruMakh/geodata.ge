@@ -45,6 +45,8 @@ const CALLS: Record<string, unknown> = {
     limit: 5,
   },
   get_sources: { sourceIds: ["source.municipal_mof_annual_and_history_workbooks"] },
+  query_debt: { seriesIds: ["debt.stock.total"], years: [2024], measure: "amount_gel" },
+  query_deficit: { years: [2020], measure: "share_of_gdp_pct" },
 };
 
 describe("every tool's structured output matches its declared schema", () => {
@@ -68,7 +70,7 @@ describe("every tool's structured output matches its declared schema", () => {
 
   // Every probe above must exist, or a tool could be added without ever being
   // validated against the schema it now advertises.
-  it("covers all seven tools", () => {
+  it("covers every tool", () => {
     expect(Object.keys(CALLS).sort()).toEqual(TOOLS.map((tool) => tool.name).sort());
   });
 

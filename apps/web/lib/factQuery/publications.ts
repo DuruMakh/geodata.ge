@@ -13,6 +13,8 @@ import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { describeCoverage, type CoverageData } from "./describeCoverage";
 import type { Observation } from "./observations";
 import { queryMinistries } from "./queryMinistries";
+import { queryDebt } from "./queryDebt";
+import { queryDeficit } from "./queryDeficit";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
@@ -311,6 +313,16 @@ function ministriesFile(snapshot: FactQuerySnapshot): PublicationArtifact {
   };
 }
 
+const DEBT_AMOUNT_SERIES_IDS = [
+  "debt.stock.total",
+  "debt.stock.domestic",
+  "debt.stock.external",
+  "debt.service.total",
+  "debt.service.principal",
+  "debt.service.interest",
+];
+const DEBT_RATE_SERIES_IDS = ["debt.rate.total", "debt.rate.domestic", "debt.rate.external"];
+
 export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtifact[] {
   const nationalYears = yearsOf(snapshot.national.facts);
   const seriesFor = (side: "revenue" | "expenditure") => [
@@ -371,6 +383,45 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
         measure: "amount_gel",
       }),
       { populationFacts: snapshot.municipal.populationFacts },
+    ),
+    // amount_gel only, like every dataset file above: the GDP share is
+    // reproducible from the denominators shipped alongside. Rates are the
+    // exception - a rate has no amount form, so its own measure is the only way
+    // to publish it at all, and it goes in a second file rather than being
+    // mixed into one whose every other row is money.
+    datasetFile(
+      snapshot,
+      "government-debt",
+      "government-debt.json",
+      queryDebt(snapshot, {
+        seriesIds: DEBT_AMOUNT_SERIES_IDS,
+        years: yearsOf(snapshot.debt.facts),
+        measure: "amount_gel",
+      }),
+      gdp,
+    ),
+    datasetFile(
+      snapshot,
+      "government-debt",
+      "government-debt-rates.json",
+      queryDebt(snapshot, {
+        seriesIds: DEBT_RATE_SERIES_IDS,
+        years: yearsOf(snapshot.debt.facts.filter((fact) => fact.family === "rate")),
+        measure: "rate_percent",
+      }),
+      {},
+    ),
+    datasetFile(
+      snapshot,
+      "general-government-balance",
+      "general-government-balance.json",
+      queryDeficit(snapshot, {
+        years: yearsOf(snapshot.deficit.facts),
+        measure: "share_of_gdp_pct",
+      }),
+      // The published GEL amount travels with the share so the file carries
+      // both measures the source publishes, without a second request.
+      { balanceGelByYear: Object.fromEntries(snapshot.deficit.facts.map((f) => [f.year, f.generalGovernmentBalanceGel])) },
     ),
   ];
 }

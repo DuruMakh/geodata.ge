@@ -18,6 +18,8 @@ const TOOL_NAMES = [
   "compare",
   "describe_coverage",
   "get_sources",
+  "query_debt",
+  "query_deficit",
   "query_ministries",
   "query_municipal",
   "query_national",
@@ -25,7 +27,7 @@ const TOOL_NAMES = [
 ];
 
 describe("MCP tool surface", () => {
-  it("advertises exactly the seven read-only query functions", async () => {
+  it("advertises exactly the read-only query functions", async () => {
     const { tools } = await (await connected()).listTools();
 
     expect(tools.map((tool) => tool.name).sort()).toEqual(TOOL_NAMES);
@@ -149,7 +151,7 @@ describe("MCP tool surface", () => {
     expect(instructions.toLowerCase()).toMatch(/caveat|limitation/);
     expect(instructions.toLowerCase()).toContain("deficit");
     expect(instructions.toLowerCase()).toMatch(/never estimate|do not estimate/);
-    expect(TOOLS).toHaveLength(7);
+    expect(TOOLS).toHaveLength(9);
   });
 
   // The instructions state coverage, so they must read it from the catalogue
