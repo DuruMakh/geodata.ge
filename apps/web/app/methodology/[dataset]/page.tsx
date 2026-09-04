@@ -4,7 +4,7 @@ import path from "node:path";
 import { MethodologyArticle } from "../../../components/methodology/methodology-article";
 import { JsonLd } from "../../../components/seo/json-ld";
 import { SiteFooter } from "../../../components/site/site-footer";
-import { loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
+import { loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../../lib/data/servedData";
 import {
   deriveMethodologyCoverage,
   LIVE_METHODOLOGY_IDS,
@@ -40,6 +40,7 @@ const DATASET_DOWNLOADS = {
   expenditure: "/downloads/data/national-expenditure.csv",
   revenue: "/downloads/data/national-revenue.csv",
   municipalities: "/downloads/data/municipal-expenditure.csv",
+  debt: "/downloads/data/government-debt.csv",
 } as const;
 
 export async function generateMetadata({ params }: MethodologyDatasetPageProps): Promise<Metadata> {
@@ -60,13 +61,14 @@ export default async function MethodologyDatasetPage({ params }: MethodologyData
   const dataset = validatedDataset((await params).dataset);
   const content = METHODOLOGY_CONTENT[dataset];
   const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [landingData, municipalData, archiveSummaries, rows] = await Promise.all([
+  const [landingData, municipalData, debtData, archiveSummaries, rows] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
+    loadServedGovernmentDebtData(),
     loadGeneratedArchiveSummaries(repositoryRoot),
     loadReviewedSourceManifest(repositoryRoot, content.archiveManifestId),
   ]);
-  const coverage = deriveMethodologyCoverage(dataset, landingData.facts, municipalData.totalFacts);
+  const coverage = deriveMethodologyCoverage(dataset, landingData.facts, municipalData.totalFacts, debtData.facts);
   const updatedAt = landingData.sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
   const publicRows = rows.map((row) => ({
     source_id: row.source_id,

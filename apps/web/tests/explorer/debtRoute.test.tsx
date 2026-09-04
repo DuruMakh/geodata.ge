@@ -105,7 +105,9 @@ describe("Government Debt route composition", () => {
     expect((markup.match(/data-testid="chart-frame"/g) ?? [])).toHaveLength(1);
     expect(markup).not.toContain('data-testid="explorer-table"');
     expect(markup).not.toContain('data-testid="site-footer"');
-    expect(markup).toMatch(/data-testid="debt-excel"[^>]*disabled/);
+    const excelButton = markup.match(/<button[^>]*data-testid="debt-excel"[^>]*>/)?.[0];
+    expect(excelButton).toBeDefined();
+    expect(excelButton).not.toContain(' disabled=""');
     expect(markup).toContain("2019");
     expect(markup).toContain("2022");
   });

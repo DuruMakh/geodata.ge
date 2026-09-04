@@ -112,6 +112,10 @@ The schedule excludes future borrowing, refinancing, FX changes, variable-rate c
 - `government-domestic-2019-budget-organizations`: from 2019, domestic Government Debt additionally includes loan debt owed by budgetary organizations.
 - `government-domestic-2022-general-government-soes`: from December 2022, domestic Government Debt also includes loan debt of state-owned enterprises classified in general government.
 
+## Public methodology surface
+
+The live public methodology stays deliberately concise. It identifies the series as Government Debt rather than the broader Public/State Debt total; discloses only the 2019 budgetary-organization and December 2022 general-government SOE boundary changes; and leaves the exact unpublished rate gaps empty (domestic 2015–2017 and 2025, external 2015–2020 and 2025). The 2026–2030 service values are labelled as the portfolio outstanding on 2025-12-31 and not as a full future-budget forecast. Its source archive publishes the ten reviewed official originals individually and in the standard validated archive; normalized CSVs, working notes and review outputs are not presented as originals.
+
 The Ministry note that stock accounting moves to nominal value including accrued interest from 2026 is preserved in source metadata. It does not change this 2013-2025 stock output. A future 2026 stock row must carry an explicit comparability note.
 
 ## Existing GDP reuse

@@ -3,6 +3,8 @@ import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { expectReadableText } from "./color-contrast";
 
+const TEST_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
+
 function collectConsoleProblems(page: Page) {
   const consoleProblems: string[] = [];
 
@@ -54,9 +56,9 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 
   }
 }
 
-async function downloadWorkbook(page: Page) {
+async function downloadWorkbook(page: Page, testId = "series-excel") {
   const downloadPromise = page.waitForEvent("download");
-  await page.getByTestId("series-excel").click();
+  await page.getByTestId(testId).click();
   const download = await downloadPromise;
   const path = await download.path();
   if (!path) throw new Error("Expected a local XLSX download path");
@@ -496,6 +498,39 @@ test("2004 revenue total excludes an unavailable liability value in tables and E
   expect(exportedRows.some((row) => row.getCell(1).value === 2005 && row.getCell(3).value === "ვალდებულებების ზრდა")).toBe(true);
 
   expect(consoleProblems).toEqual([]);
+});
+
+test("Debt Excel exports the active family, forecast status, rate gaps and validated sources", async ({ page }) => {
+  await page.goto(`${TEST_BASE_URL}/explorer/debt#f=service&m=table&r=2025-2026&sel=debt.service.total`);
+  await expectAppReady(page);
+
+  const serviceExport = await downloadWorkbook(page, "debt-excel");
+  expect(serviceExport.download.suggestedFilename()).toBe("fiscal-government-debt-service-2025-2026.xlsx");
+  expect(serviceExport.workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
+  const serviceRows = serviceExport.workbook.getWorksheet("მონაცემები")!.getRows(2, 10) ?? [];
+  expect(serviceRows.map((row) => row.getCell(5).value).filter((value) => value !== null)).toEqual(["ფაქტი", "პროგნოზი"]);
+  expect(serviceExport.workbook.getWorksheet("წყაროები")!.getCell("D4").value).toEqual(expect.objectContaining({
+    text: "ფაილის ჩამოტვირთვა",
+    hyperlink: expect.stringContaining("/downloads/methodology/debt/files/"),
+  }));
+
+  await page.goto(`${TEST_BASE_URL}/explorer/debt?view=rate#f=rate&m=table&r=2019-2021&sel=debt.rate.external`);
+  await expectAppReady(page);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "rate");
+  const rateExport = await downloadWorkbook(page, "debt-excel");
+  const rateSheet = rateExport.workbook.getWorksheet("მონაცემები")!;
+  expect(rateSheet.getRow(1).values).toEqual([
+    undefined,
+    "წელი",
+    "მთავარი ჯგუფი",
+    "კატეგორია",
+    "თანხა (₾)",
+    "სტატუსი",
+    "საპროცენტო განაკვეთი (%)",
+  ]);
+  const rateRows = rateSheet.getRows(2, 10) ?? [];
+  expect(rateRows.some((row) => row.getCell(1).value === 2019 && row.getCell(4).value === null && row.getCell(5).value === "არ არის ხელმისაწვდომი")).toBe(true);
+  expect(rateRows.some((row) => row.getCell(1).value === 2021 && row.getCell(6).value === 0.0095)).toBe(true);
 });
 
 test("range strip supports chips and dragging handles", async ({ page }) => {

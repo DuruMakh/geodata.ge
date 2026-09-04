@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
+import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
+import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { formatAmount, formatShare, unitFor, UNIT_BN } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
@@ -26,6 +28,8 @@ type DebtExplorerProps = {
   facts: ServedGovernmentDebtFact[];
   gdpFacts: ServedNationalGdpFact[];
   workbookSources: WorkbookPublicSource[];
+  gdpWorkbookSources?: WorkbookPublicSource[];
+  siteOrigin?: string;
   lastUpdatedAt: string;
 };
 
@@ -242,10 +246,18 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
             downloadAction={(
               <ExcelDownloadButton
                 testId="debt-excel"
-                disabled
-                onDownload={async () => {
-                  throw new Error("Debt workbook export is wired in Task 5");
-                }}
+                disabled={noSelection}
+                onDownload={() => downloadWorkbook(buildDebtWorkbookExportModel({
+                  facts: props.facts,
+                  gdpFacts: props.gdpFacts,
+                  family: props.family,
+                  selectedIds: props.selectedIds,
+                  range: props.range,
+                  shareOfGdp: props.shareOfGdp,
+                  sources: props.workbookSources,
+                  gdpSources: props.gdpWorkbookSources ?? [],
+                  siteOrigin: props.siteOrigin ?? window.location.origin,
+                }))}
               />
             )}
           />

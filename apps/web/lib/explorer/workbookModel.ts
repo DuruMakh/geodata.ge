@@ -1,7 +1,7 @@
-export type WorkbookBasis = "actual" | "planned";
+export type WorkbookBasis = "actual" | "planned" | "forecast" | "not_available";
 
 export type WorkbookPoint = {
-  amountGel: number;
+  amountGel: number | null;
   measureValue?: number | null;
   basis: WorkbookBasis;
 };
@@ -64,7 +64,12 @@ export type WorkbookExportModel = {
   sources: Array<WorkbookPublicSource & { absoluteUrl: string }>;
 };
 
-const statusKa = (basis: WorkbookBasis) => (basis === "planned" ? "გეგმა" : "ფაქტი");
+const statusKa = (basis: WorkbookBasis) => ({
+  actual: "ფაქტი",
+  planned: "გეგმა",
+  forecast: "პროგნოზი",
+  not_available: "არ არის ხელმისაწვდომი",
+})[basis];
 
 export function absoluteWorkbookSourceUrl(
   siteOrigin: string,
@@ -81,12 +86,24 @@ function safeChange(start: number | null, end: number | null): number | null {
 
 function readableValue(measure: WorkbookMeasure, point: WorkbookPoint | null | undefined): number | null {
   if (!point) return null;
-  return measure.kind === "percentage" ? point.measureValue ?? null : point.amountGel / measure.readableScale;
+  return measure.kind === "percentage"
+    ? point.measureValue ?? null
+    : point.amountGel === null
+      ? null
+      : point.amountGel / measure.readableScale;
 }
 
 function subtitleKa(rows: WorkbookReadableRow[], years: number[], unitLabelKa: string): string {
-  const bases = new Set(Object.values(rows.flatMap((row) => Object.values(row.basisByYear))).filter((basis): basis is WorkbookBasis => basis !== null));
-  const basis = bases.size > 1 ? "ფაქტი და გეგმა" : bases.has("planned") ? "გეგმა" : "ფაქტი";
+  const bases = new Set(Object.values(rows.flatMap((row) => Object.values(row.basisByYear))).filter((basis): basis is WorkbookBasis => basis !== null && basis !== "not_available"));
+  const basis = bases.has("actual") && bases.has("forecast")
+    ? "ფაქტი და პროგნოზი"
+    : bases.has("actual") && bases.has("planned")
+      ? "ფაქტი და გეგმა"
+      : bases.has("forecast")
+        ? "პროგნოზი"
+        : bases.has("planned")
+          ? "გეგმა"
+          : "ფაქტი";
   const period = years.length > 0 ? `${years[0]}–${years.at(-1)}` : "პერიოდი არ არის";
   return `${period} · ${basis} · ${unitLabelKa}`;
 }

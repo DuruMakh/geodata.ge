@@ -104,9 +104,9 @@ for (const path of [
 }
 
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
-  await page.goto("http://localhost:3100/methodology");
+  await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
-  await expect(page.getByTestId("methodology-live-row")).toHaveCount(3);
+  await expect(page.getByTestId("methodology-live-row")).toHaveCount(4);
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(4);
   await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
@@ -114,7 +114,7 @@ test("methodology hub separates live datasets from future markers", async ({ pag
 });
 
 test("sitemap publishes exactly the four live methodology routes", async ({ page }) => {
-  await page.goto("http://localhost:3100/methodology");
+  await page.goto(`${TEST_BASE_URL}/methodology`);
   const sitemapXml = await page.evaluate(async () => (await fetch("/sitemap.xml")).text());
   const methodologyUrls = await page.evaluate((xml) => {
     const document = new DOMParser().parseFromString(xml, "application/xml");
@@ -128,6 +128,7 @@ test("sitemap publishes exactly the four live methodology routes", async ({ page
     "/methodology/expenditure",
     "/methodology/revenue",
     "/methodology/municipalities",
+    "/methodology/debt",
   ]);
 });
 
@@ -203,9 +204,9 @@ test("expenditure methodology exposes the complete layered article", async ({ pa
   await expect(page.locator("#source-archive")).toBeInViewport();
 });
 
-for (const dataset of ["expenditure", "revenue", "municipalities"] as const) {
+for (const dataset of ["expenditure", "revenue", "municipalities", "debt"] as const) {
   test(`${dataset} methodology article is followed by the shared footer`, async ({ page }) => {
-    await page.goto(`http://localhost:3100/methodology/${dataset}`);
+    await page.goto(`${TEST_BASE_URL}/methodology/${dataset}`);
 
     const footer = page.getByTestId("site-footer");
     await expect(footer).toBeVisible();

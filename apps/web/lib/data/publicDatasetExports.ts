@@ -8,7 +8,8 @@ import { budgetFactHeaders } from "./factCsv";
 export type PublicDatasetId =
   | "national-expenditure"
   | "national-revenue"
-  | "municipal-expenditure";
+  | "municipal-expenditure"
+  | "government-debt";
 
 export type PublicDatasetValidation = {
   status: "PASS";
@@ -111,6 +112,7 @@ export async function preparePublicDatasets(options: {
 }): Promise<readonly PublicDatasetValidation[]> {
   const imports = path.join(options.repositoryRoot, "data", "imports");
   const budgetRows = await readCsv(path.join(imports, "budget-facts-2004-2025.csv"));
+  const debtRows = await readCsv(path.join(imports, "government-debt-facts-2013-2030.csv"));
   const expenditureRows = budgetRows.filter((row) => row.side === "expenditure").toSorted(byYearAndId);
   const revenueRows = budgetRows.filter((row) => row.side === "revenue").toSorted(byYearAndId);
 
@@ -145,6 +147,22 @@ export async function preparePublicDatasets(options: {
       fileName: "municipal-expenditure.csv",
       rows: municipalRows,
       bytes: serialize(MUNICIPAL_HEADERS, municipalRows),
+    },
+    {
+      datasetId: "government-debt" as const,
+      fileName: "government-debt.csv",
+      rows: debtRows,
+      bytes: serialize([
+        "year",
+        "family",
+        "series_id",
+        "value",
+        "value_kind",
+        "status",
+        "source_id",
+        "snapshot_date",
+        "last_reviewed_at",
+      ], debtRows),
     },
   ];
 

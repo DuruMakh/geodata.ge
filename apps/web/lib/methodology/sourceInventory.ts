@@ -35,6 +35,9 @@ const inventoryRules = {
     { root: "docs/Raw Data/Municipalities/mof-municipality-budget-history-2016-2025", include: extension(".xlsx") },
     { root: "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022", include: topLevelExtension(".zip") },
   ],
+  debt: [
+    { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
+  ],
 } satisfies Record<MethodologyDatasetId, readonly InventoryRule[]>;
 
 function dirname(candidatePath: string) {
@@ -110,10 +113,7 @@ export async function expectedOriginalSourcePaths(
   }
 
   if (datasetId) return inventoryFor(datasetId);
-  const [expenditure, revenue, municipalities] = await Promise.all([
-    inventoryFor("expenditure"),
-    inventoryFor("revenue"),
-    inventoryFor("municipalities"),
-  ]);
-  return { expenditure, revenue, municipalities };
+  return Object.fromEntries(await Promise.all(
+    (Object.keys(inventoryRules) as MethodologyDatasetId[]).map(async (id) => [id, await inventoryFor(id)]),
+  )) as Record<MethodologyDatasetId, OriginalSourceInventoryRow[]>;
 }

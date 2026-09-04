@@ -7,6 +7,7 @@ import { coverageFromYears, governmentDebtMetadata } from "../../../lib/seo/meta
 import { DEBT_EXPLORER_PATH } from "../../../lib/seo/internalLinks";
 import { explorerDatasetJsonLd } from "../../../lib/seo/structuredData";
 import { resolveSiteUrl } from "../../../lib/siteUrl";
+import { loadGdpWorkbookSources, loadWorkbookSources } from "../../../lib/methodology/workbookSources";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { facts } = await loadServedGovernmentDebtData();
@@ -14,9 +15,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DebtPage() {
-  const [{ facts }, { gdpFacts }] = await Promise.all([
+  const [{ facts }, { gdpFacts }, workbookSources, gdpWorkbookSources] = await Promise.all([
     loadServedGovernmentDebtData(),
     loadServedExplorerData(),
+    loadWorkbookSources("debt"),
+    loadGdpWorkbookSources(),
   ]);
   const stockFacts = facts.filter((fact) => fact.family === "stock" && fact.status === "actual");
   const { firstYear, lastYear } = coverageFromYears(stockFacts);
@@ -35,6 +38,7 @@ export default async function DebtPage() {
           lastYear,
           dateModified: lastUpdatedAt,
           spatialCoverageName: "საქართველო",
+          downloadPath: "/downloads/data/government-debt.csv",
         })}
         testId="explorer-dataset-json-ld"
       />
@@ -46,9 +50,9 @@ export default async function DebtPage() {
       <DebtExplorer
         facts={facts}
         gdpFacts={gdpFacts}
-        // Task 5 replaces this empty source set with the reviewed workbook
-        // adapter and enables the already-rendered Excel action.
-        workbookSources={[]}
+        workbookSources={workbookSources}
+        gdpWorkbookSources={gdpWorkbookSources}
+        siteOrigin={resolveSiteUrl()}
         lastUpdatedAt={lastUpdatedAt}
       />
     </>
