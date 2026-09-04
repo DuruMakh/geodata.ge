@@ -370,6 +370,14 @@ Form #1 perimeter. The report also does not contain the comparable consolidated 
 in-liabilities amount. That series therefore has no 2004 point; the missing amount is neither zero
 nor an estimate, and it is excluded from the derived 2004 total.
 
+The MCP comparison layer preserves the reviewed 2004 amounts but does not
+calculate growth across 2004 for `revenue.asset_decrease` or
+`revenue.other_taxes`: the first represents capital revenue, while the second
+includes the documented residual and special-state-fund receipts. These two
+components receive `revenue_2004_component_scope` and are excluded from growth
+rankings across the boundary. This does not change the validated VAT comparison.
+
+
 ---
 
 ## 6. Mapping decisions & rationale

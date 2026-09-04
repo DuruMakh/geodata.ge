@@ -97,7 +97,7 @@ export default async function ConnectPage() {
   return (
     <div className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]">
       <div className="mx-auto max-w-[1240px]">
-        <SiteHeader yearsLabel={model.yearsLabel} testId="connect-header" />
+        <SiteHeader active="connect" yearsLabel={model.yearsLabel} testId="connect-header" />
         <main className="pt-10 min-[768px]:pt-16">
           <BreadcrumbTrail items={[{ name: "მთავარი", path: "/" }, { name: "AI-კავშირი", path: "/connect" }]} />
 

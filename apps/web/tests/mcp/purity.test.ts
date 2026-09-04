@@ -38,7 +38,7 @@ async function walk(dir: string): Promise<string[]> {
 }
 
 describe("MCP runtime purity", () => {
-  it("reaches no model provider, no database and nothing over the network", async () => {
+  it("reaches no model provider or dataset database and uses the network only for the limiter", async () => {
     const files = (await Promise.all(RUNTIME_DIRS.map(walk))).flat();
     expect(files.length).toBeGreaterThan(0);
 
@@ -46,6 +46,9 @@ describe("MCP runtime purity", () => {
     for (const file of files) {
       const source = await readFile(file, "utf8");
       for (const [pattern, what] of FORBIDDEN) {
+        // The production limiter is the sole network exception: only fixed
+        // Redis commands over configured credentials, never dataset fetching.
+        if (what === "outbound fetch" && path.basename(file) === "upstashCounter.ts") continue;
         if (pattern.test(source)) offences.push(`${path.basename(file)}: ${what}`);
       }
     }

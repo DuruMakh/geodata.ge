@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 type SiteHeaderProps = {
-  active?: "home" | "explorer" | "mission";
+  active?: "home" | "explorer" | "mission" | "connect";
   yearsLabel: string;
   testId: string;
 };
@@ -52,6 +52,13 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
           className={navLinkClass(active === "explorer")}
         >
           მონაცემები
+        </Link>
+        <Link
+          href="/connect"
+          aria-current={active === "connect" ? "page" : undefined}
+          className={navLinkClass(active === "connect")}
+        >
+          AI
         </Link>
         <Link
           href="/about"

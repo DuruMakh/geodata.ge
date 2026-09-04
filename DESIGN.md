@@ -855,7 +855,7 @@ Unknown HTML routes retain their HTTP 404 status and use a minimal editorial rec
 
 ## 23. Mission Surface (მიზანი)
 
-`/about` remains the canonical URL for the mission page. Its shared header links are `მთავარი`, `მონაცემები`, and `მიზანი`; only `მიზანი` is active on `/about`, while methodology remains inactive. The page renders no visible breadcrumb.
+`/about` remains the canonical URL for the mission page. Its shared header links are `მთავარი`, `მონაცემები`, `AI`, and `მიზანი`; only `მიზანი` is active on `/about`, while methodology remains inactive. The page renders no visible breadcrumb.
 
 The cover is an ink block with a paper title, terracotta `01`, `FISCAL.GE / OPEN DATA`, and a data-derived review year plus `MISSION NOTE`. The copy is one continuous four-paragraph article. The final strong sentence alone carries the terracotta left rule.
 
@@ -877,4 +877,4 @@ No new visual direction, chart type, or interaction pattern. It reuses the estab
 
 **Copy controls are conveniences, never the only route.** Both the address and the prompt are rendered as selectable text beside their buttons, so each is obtainable when the clipboard API is unavailable or refused. Each button carries an accessible Georgian name that changes to a confirmation on success, announced through a live region.
 
-Discovery is the site-footer navigation list, which every `/explorer` route and both editorial pages already render (§6.7). `/connect` also enters `sitemap.xml` and `llms.txt`.
+Discovery includes the shared public header item `AI` linking to `/connect`, active only on that page, and the site-footer navigation list, which every `/explorer` route and both editorial pages render (§6.7). `/connect` also appears in `sitemap.xml` and `llms.txt`. The AI item uses the existing link styling and keyboard/focus behavior.

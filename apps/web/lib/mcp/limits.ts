@@ -4,6 +4,7 @@
 // size limits themselves live with the code that applies them, in result.ts;
 // they are re-exported here so callers have one import.
 export { LIMITS } from "./result";
+import { upstashCounter } from "./upstashCounter";
 
 /** Requests per rolling window, per key. Spec 11.3: 60 in a rolling minute. */
 export const RATE_WINDOW_SECONDS = 60;
@@ -70,11 +71,11 @@ function unavailableCounter(): Counter {
  *
  * With nothing configured it fails closed rather than serving unlimited public
  * traffic, so /mcp cannot be enabled without a limiter decision having been
- * made. Which shared limiter that is - a platform control or a minimal approved
- * shared counter - is the owner gate in section 11.4, and it is deliberately
- * not chosen here: this release adds no paid dependency.
+ * made. The approved shared counter is Upstash Redis on its free plan, with automatic
+ * upgrades disabled. See docs/deployment.md for quotas and failure behavior.
  */
 export function createCounter(): Counter {
+  if (process.env.MCP_RATE_LIMITER === "upstash") return upstashCounter();
   // The in-process counter is refused in production outright, not merely
   // documented as unsafe there. A single mistyped environment variable on the
   // Production scope would otherwise turn a fail-closed endpoint into an

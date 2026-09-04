@@ -64,6 +64,7 @@ type DatasetSummary = {
   years: [number, number];
   entityTypes: EntityType[];
   measures: Measure[];
+  measureNotes?: Record<string, string>;
 };
 
 export type CoverageData = {
@@ -218,7 +219,11 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
   // long-lived snapshot (§4.2 "reuse calculations without rebuilding the
   // website"), so handing back the module-level array itself would let one
   // caller's in-place mutation of a response corrupt every later call.
-  return { datasetId, ...meta, entityTypes: [...meta.entityTypes], measures: [...meta.measures], years };
+  return {
+    datasetId, ...meta, entityTypes: [...meta.entityTypes], measures: [...meta.measures], years,
+    ...(datasetId === "municipal-expenditure" ? { measureNotes: { gel_per_resident: "Available only for 2025 municipality and region totals (municipal.total); not for the country aggregate or individual functions." } } : {}),
+    ...(datasetId === "government-debt" ? { measureNotes: { amount_gel: "Stock and service only.", share_of_gdp_pct: "Stock and service, where reviewed GDP is available.", rate_percent: "Interest-rate series only; unpublished rates are missing, not zero." } } : {}),
+  };
 }
 
 /**
@@ -543,7 +548,9 @@ function georgianStem(query: string): string | null {
 
 /** Case-insensitive substring match. `null` candidates (e.g. a region's entitySlug) are skipped, which is what makes "for municipalities" (the brief's search contract) fall out of the data instead of needing a special case. */
 function matchesSearch(query: string, candidates: (string | null)[]): boolean {
-  const needle = query.toLowerCase();
+  const aliases: Record<string, string> = { "დღგ": "revenue.vat", pension: "საპენსიო" };
+  const normalized = query.trim().toLowerCase();
+  const needle = aliases[normalized] ?? normalized;
   const stem = georgianStem(needle);
 
   return candidates.some((candidate) => {

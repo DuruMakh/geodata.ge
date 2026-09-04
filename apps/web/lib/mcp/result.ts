@@ -58,7 +58,7 @@ export type ToolResult = {
   isError: boolean;
 };
 
-const BULK_DATA_URL = "https://fiscal.ge/downloads/data/";
+export const BULK_DATA_URL = "https://fiscal.ge/downloads/data/manifest.json";
 
 function line(...cells: (string | number | null)[]): string {
   return cells.map((cell) => (cell === null ? "" : String(cell))).join("\t");
@@ -71,6 +71,7 @@ function observationLine(observation: Observation): string {
     observation.entityLabelKa,
     observation.seriesLabelKa,
     observation.year,
+    observation.measure,
     value,
     observation.unit,
     observation.basis,
@@ -78,6 +79,7 @@ function observationLine(observation: Observation): string {
     // consolidated receipts from state-budget expenditure - the one distinction
     // that makes these figures unsafe to subtract from each other.
     observation.budgetScope,
+    observation.valueDefinition,
     observation.caveatIds.join(","),
   );
 }
@@ -87,8 +89,11 @@ function comparisonLine(comparison: Comparison): string {
     comparison.entityLabelKa,
     comparison.seriesLabelKa,
     `${comparison.from.year}→${comparison.to.year}`,
+    comparison.measure,
     comparison.from.value,
     comparison.to.value,
+    comparison.from.basis,
+    comparison.to.basis,
     comparison.absoluteChange,
     comparison.percentageChange,
     comparison.percentagePointChange,
@@ -103,26 +108,32 @@ function comparisonLine(comparison: Comparison): string {
 }
 
 function sourceView(source: ResolvedSourceView): string {
-  return line(source.sourceId, source.name, source.documentCount, source.narrowed ? "narrowed" : "full");
+  return line(source.sourceId, source.name, source.documents.length, source.narrowingOutcome);
+}
+
+function excludedLines(coverage: { excludedEntities: { entityId: string; reason: string }[] }): string[] {
+  return coverage.excludedEntities.map((entity) => `excluded ${entity.entityId}: ${entity.reason}`);
 }
 
 function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryResponse["kind"], "error"> }>): string[] {
   const data = response.data as Record<string, unknown>;
 
   if (response.kind === "observations") {
-    const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number } };
+    const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number; excludedEntities: { entityId: string; reason: string }[] } };
     return [
-      "# entity\tseries\tyear\tvalue\tunit\tbasis\tbudgetScope\tcaveats",
+      "# entity\tseries\tyear\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinition\tcaveats",
       ...observations.map(observationLine),
       `returned ${coverage.returnedCount} of ${coverage.expectedCount} requested cells`,
+      ...excludedLines(coverage),
     ];
   }
 
   if (response.kind === "comparisons") {
-    const { comparisons } = data as { comparisons: Comparison[] };
+    const { comparisons, coverage } = data as { comparisons: Comparison[]; coverage: { excludedEntities: { entityId: string; reason: string }[] } };
     return [
-      "# entity\tseries\tyears\tfrom\tto\tchange\tpct\tpp\tunit\tcomparability\treasons\tcaveats",
+      "# entity\tseries\tyears\tmeasure\tfrom\tto\tfromBasis\ttoBasis\tchange\tpct\tpp\tunit\tcomparability\treasons\tcaveats",
       ...comparisons.map(comparisonLine),
+      ...excludedLines(coverage),
     ];
   }
 
@@ -146,8 +157,12 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
     const { sources, narrowedBy } = data as GetSourcesData;
     return [
       "# sourceId\tname\tdocuments\tscope",
-      ...sources.map(sourceView),
-      ...(narrowedBy === null ? [] : [`narrowed by ${JSON.stringify(narrowedBy)}`]),
+      ...sources.flatMap((source) => [
+        sourceView(source),
+        ...(source.narrowingOutcome === "dropped_no_match" ? ["No document matched the requested filters; showing the full source instead."] : []),
+        ...source.documents.map((document) => line(document.documentId, document.title, document.publisher, document.years.join(","), document.officialUrl, document.archiveUrl, document.sha256, document.byteSize)),
+      ]),
+      ...(narrowedBy === null ? [] : [`requested filters: ${JSON.stringify(narrowedBy)}`]),
     ];
   }
 

@@ -26,8 +26,8 @@ import {
   rankInput,
 } from "../factQuery/schemas";
 import { serverInstructions } from "./instructions";
-import { toolOutput } from "./outputSchema";
-import { boundedToolResult } from "./result";
+import { outputSchemaFor } from "./outputSchema";
+import { boundedToolResult, LIMITS, tooLargeResponse, toolResult } from "./result";
 import { loadPackagedSnapshot } from "./snapshot";
 import type { DatasetId, FactQueryResponse, FactQuerySnapshot } from "../factQuery/types";
 
@@ -63,7 +63,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       "Ask this FIRST when you do not already know an id. Returns the datasets, entities, series, " +
       "hierarchy, calculated totals, legal measures, year coverage and documented exclusions that " +
       "actually exist. Optional `search` matches Georgian labels and Latin slugs, and works WITHOUT " +
-      "a datasetId — search alone looks across all four datasets and each match names the dataset " +
+      "a datasetId — search alone looks across all six datasets and each match names the dataset " +
       "it belongs to, so you can find an id before you know where it lives. Georgian case endings " +
       "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here.",
     schema: describeCoverageInput,
@@ -73,7 +73,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     name: "query_national",
     title: "სახელმწიფო ბიუჯეტი",
     describe: (coverage) =>
-      `Annual Georgian state-budget revenue or expenditure by category, ${coverage["national-revenue"]} for ` +
+      `Annual Georgian consolidated-budget receipts or state-budget expenditure by category, ${coverage["national-revenue"]} for ` +
       `revenue and ${coverage["national-expenditure"]} for expenditure, in nominal GEL. Measures: ` +
       "amount_gel, share_of_total_pct, share_of_gdp_pct. Revenue and expenditure are DIFFERENT " +
       "accounting boundaries: subtracting their totals does not give a deficit.",
@@ -98,7 +98,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       `Municipal expenditure by function, ${coverage["municipal-expenditure"]}, for 64 municipalities, 11 ` +
       "regions and the Georgia aggregate. `entityIds` takes a municipality code, a region id " +
       "(region.adjara) or the country id. Measures: amount_gel, share_of_total_pct, " +
-      "gel_per_resident. Five municipal codes are excluded as not territorially attributable and " +
+      "gel_per_resident (2025 municipality/region totals only). Five municipal codes are excluded as not territorially attributable and " +
       "return an explained exclusion rather than a number. These are municipal budgets, not a " +
       "territorial split of national spending.",
     schema: queryMunicipalInput,
@@ -213,10 +213,22 @@ export function createMcpServer(): McpServer {
         // Declared so a client KNOWS the structured twin exists. Every response
         // has always carried one, but without this a client has no way to learn
         // that and parses the text table instead.
-        outputSchema: toolOutput,
+        outputSchema: outputSchemaFor(tool.name),
         annotations: ANNOTATIONS,
       },
-      (args: unknown) => boundedToolResult(snapshot, tool.run(snapshot, args)),
+      (args: unknown) => {
+        // The SDK has validated and deduplicated these arrays. Reject the
+        // requested product before calculating cells or resolving their sources.
+        const input = args as { years?: number[]; seriesIds?: string[]; entityIds?: string[]; target?: { seriesIds?: string[]; entityIds?: string[] } };
+        const count = tool.name === "compare"
+          ? (input.target?.entityIds?.length ?? 1) * (input.target?.seriesIds?.length ?? 1)
+          : tool.name.startsWith("query_")
+            ? (input.entityIds?.length ?? 1) * (input.seriesIds?.length ?? 1) * (input.years?.length ?? 1)
+            : 0;
+        const limit = tool.name === "compare" ? LIMITS.comparisonPairs : LIMITS.cells;
+        if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0 }));
+        return boundedToolResult(snapshot, tool.run(snapshot, args));
+      },
     );
   }
 

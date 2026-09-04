@@ -524,7 +524,7 @@ export function queryMunicipal(
     (a, b) => a - b,
   );
   const returnedCount = observations.filter((o) => o.availability === "available").length;
-  const expectedCount = observations.length;
+  const expectedCount = input.entityIds.length * input.seriesIds.length * input.years.length;
 
   const coverage: Coverage = {
     requestedYears: input.years,

@@ -10,6 +10,7 @@ import {
 import { checkRequest, clientKey, corsOriginFor } from "../../lib/mcp/security";
 import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
 import { logToolCall } from "../../lib/mcp/log";
+import { errorCodeSchema } from "../../lib/factQuery/schemas";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 
 // The only request-time code in the repository. Every other route is
@@ -34,11 +35,11 @@ function counter(): ReturnType<typeof createCounter> {
 const DAILY_MAX = 10_000;
 const DAY_SECONDS = 24 * 60 * 60;
 
-function rpcError(status: number, code: string, messageKa: string, messageEn: string, headers: HeadersInit = {}): Response {
+function rpcError(status: number, code: string, messageKa: string, messageEn: string, headers: HeadersInit = {}, rpcCode = -32000): Response {
   return new Response(
     JSON.stringify({
       jsonrpc: "2.0",
-      error: { code: -32000, message: `${code}: ${messageEn}`, data: { code, messageKa, messageEn } },
+      error: { code: rpcCode, message: `${code}: ${messageEn}`, data: { code, messageKa, messageEn } },
       id: null,
     }),
     { status, headers: { "content-type": "application/json", ...headers } },
@@ -106,7 +107,7 @@ function refusalFor(verdict: CounterVerdict): Response | null {
       429,
       "rate_limited",
       "მოთხოვნების რაოდენობა ლიმიტს გადააჭარბა. სცადეთ ერთი წუთის შემდეგ, ან ჩამოტვირთეთ ფაილები.",
-      "Rate limit exceeded. Retry in a minute, or download the published files at https://fiscal.ge/downloads/data/.",
+      "Rate limit exceeded. Retry in a minute, or download the published files at https://fiscal.ge/downloads/data/manifest.json.",
       { "retry-after": String(RATE_WINDOW_SECONDS) },
     );
   }
@@ -163,36 +164,58 @@ function preflight(request: Request): Response {
  * containing absolute bundle paths to the platform log. Sections 11.2 and 11.5
  * forbid publishing both. The caught value is deliberately never inspected.
  */
-async function handle(request: Request): Promise<Response> {
-  const startedAt = Date.now();
-  try {
-    return await serve(request, startedAt);
-  } catch {
-    logToolCall({
-      tool: "unparsed",
-      dataVersion: "unavailable",
-      resultBytes: 0,
-      durationMs: Date.now() - startedAt,
-      outcome: "error",
-      errorCode: "internal_error",
-    });
-    return rpcError(
-      500,
-      "internal_error",
-      "სერვისში მოხდა შეცდომა. მონაცემები ხელმისაწვდომია საიტზე და ჩამოსატვირთ ფაილებში.",
-      "The service failed to answer this request. The data remains available on the site and in the published files at https://fiscal.ge/downloads/data/.",
-    );
+function withResponseHeaders(request: Request, response: Response): Response {
+  response.headers.append("vary", "origin");
+  response.headers.set("cache-control", "no-store");
+  const origin = corsOriginFor(request);
+  if (origin !== null) {
+    response.headers.set("access-control-allow-origin", origin);
+    response.headers.set("access-control-expose-headers", "retry-after");
   }
+  return response;
 }
 
-async function serve(request: Request, startedAt: number): Promise<Response> {
+const LOG_ERROR_CODES = new Set<string>([...errorCodeSchema.options, "request_too_large", "forbidden_host", "forbidden_origin", "internal_error"]);
+
+type RequestContext = { tool: string; dataVersion: string };
+
+async function handle(request: Request): Promise<Response> {
+  const startedAt = Date.now();
+  const context: RequestContext = { tool: "unparsed", dataVersion: "unavailable" };
+  let response: Response;
+  try {
+    response = await serve(request, context);
+  } catch {
+    response = rpcError(
+      500, "internal_error",
+      "სერვისში მოხდა შეცდომა. მონაცემები ხელმისაწვდომია საიტზე და ჩამოსატვირთ ფაილებში.",
+      "The service failed to answer this request. The data remains available at https://fiscal.ge/downloads/data/manifest.json.",
+    );
+  }
+  withResponseHeaders(request, response);
+  const text = await response.clone().text();
+  const body = text.length === 0 ? null : JSON.parse(text);
+  const failed = response.status >= 400 || body?.error !== undefined || body?.result?.isError === true;
+  const toolText = body?.result?.content?.find((item: { type: string }) => item.type === "text")?.text ?? "";
+  const code = body?.error?.data?.code ?? /^error ([a-z_]+)/m.exec(toolText)?.[1];
+  logToolCall({
+    ...context,
+    resultBytes: Buffer.byteLength(text, "utf8"),
+    durationMs: Date.now() - startedAt,
+    outcome: failed ? "error" : "ok",
+    ...(failed ? { errorCode: LOG_ERROR_CODES.has(code) ? code : "protocol_error" } : {}),
+  });
+  return response;
+}
+
+async function serve(request: Request, context: RequestContext): Promise<Response> {
   // 1. Paused? Nothing else runs, and static pages are untouched.
   if (isPaused()) {
     return rpcError(
       503,
       "service_unavailable",
       "სერვისი დროებით მიუწვდომელია. მონაცემები კვლავ ხელმისაწვდომია საიტზე და ჩამოსატვირთ ფაილებში.",
-      "The MCP service is currently unavailable. The data remains available on the site and in the published files at https://fiscal.ge/downloads/data/.",
+      "The MCP service is currently unavailable. The data remains available on the site and in the published files at https://fiscal.ge/downloads/data/manifest.json.",
       { "retry-after": "3600" },
     );
   }
@@ -226,15 +249,34 @@ async function serve(request: Request, startedAt: number): Promise<Response> {
   const declared = Number(request.headers.get("content-length"));
   if (Number.isFinite(declared) && declared > LIMITS.bodyBytes) return tooLarge();
 
-  const raw = await request.text();
-  if (Buffer.byteLength(raw, "utf8") > LIMITS.bodyBytes) return tooLarge();
+  const chunks: Uint8Array[] = [];
+  let bodyBytes = 0;
+  const reader = request.body?.getReader();
+  if (reader !== undefined) {
+    while (true) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      bodyBytes += chunk.value.byteLength;
+      if (bodyBytes > LIMITS.bodyBytes) {
+        await reader.cancel();
+        return tooLarge();
+      }
+      chunks.push(chunk.value);
+    }
+  }
+  const raw = new TextDecoder().decode(Buffer.concat(chunks));
 
   let parsedBody: unknown;
   try {
     parsedBody = JSON.parse(raw);
   } catch {
-    return rpcError(400, "invalid_parameters", "მოთხოვნა არასწორი JSON-ია.", "Request body is not valid JSON.");
+    return rpcError(400, "invalid_parameters", "მოთხოვნა არასწორი JSON-ია.", "Request body is not valid JSON.", {}, -32700);
   }
+
+  if (Array.isArray(parsedBody)) {
+    return rpcError(400, "invalid_parameters", "თითოეული მოთხოვნა ცალკე გაგზავნეთ.", "Send one JSON-RPC message per HTTP request; batches are not supported.", {}, -32600);
+  }
+  context.tool = toolNameOf(parsedBody);
 
   // 4. Rate limits. A counter failure stops expensive processing with a
   // retryable error rather than quietly disabling the limit (spec 11.3).
@@ -255,6 +297,10 @@ async function serve(request: Request, startedAt: number): Promise<Response> {
   if (perKeyRefusal !== null) return perKeyRefusal;
 
   const daily = await counter().hit(`mcp:daily:${new Date().toISOString().slice(0, 10)}`, DAY_SECONDS, DAILY_MAX);
+  if (daily === "deny") {
+    const retryAfter = DAY_SECONDS - Math.floor(Date.now() / 1000) % DAY_SECONDS;
+    return rpcError(429, "rate_limited", "დღიური ლიმიტი ამოიწურა. გამოიყენეთ ჩამოსატვირთი ფაილები ან სცადეთ შემდეგ UTC დღეს.", "The daily request allowance is exhausted. Retry after the next UTC midnight or use https://fiscal.ge/downloads/data/manifest.json.", { "retry-after": String(retryAfter) });
+  }
   const dailyRefusal = refusalFor(daily);
   if (dailyRefusal !== null) return dailyRefusal;
 
@@ -266,6 +312,7 @@ async function serve(request: Request, startedAt: number): Promise<Response> {
     enableJsonResponse: true,
   });
   const server = createMcpServer();
+  context.dataVersion = loadPackagedSnapshot().dataVersion;
 
   await server.connect(transport);
   let response: Response;
@@ -277,29 +324,14 @@ async function serve(request: Request, startedAt: number): Promise<Response> {
     await server.close();
   }
 
-  // Appended unconditionally, and appended rather than set: a cache must not
-  // hand one origin's answer - with or without the header - to another.
-  response.headers.append("vary", "origin");
-  const cors = corsOriginFor(request);
-  // The one approved origin, echoed exactly. Never `*`, and never with
-  // credentials.
-  if (cors !== null) response.headers.set("access-control-allow-origin", cors);
-
-  logToolCall({
-    tool: toolNameOf(parsedBody),
-    dataVersion: loadPackagedSnapshot().dataVersion,
-    // Measured on the bytes actually being returned. The transport builds its
-    // reply with `new Response(string)`, which sets no content-length, so
-    // reading that header here recorded a confident zero on every single
-    // request - a documented operational signal that could never fire.
-    resultBytes: Buffer.byteLength(await response.clone().text(), "utf8"),
-    durationMs: Date.now() - startedAt,
-    outcome: response.status < 400 ? "ok" : "error",
-  });
-
   return response;
 }
 
 export { handle as POST };
-export { preflight as OPTIONS };
-export { methodNotAllowed as GET, methodNotAllowed as DELETE };
+export function OPTIONS(request: Request): Response {
+  return withResponseHeaders(request, preflight(request));
+}
+function unsupportedMethod(request: Request): Response {
+  return withResponseHeaders(request, methodNotAllowed());
+}
+export { unsupportedMethod as GET, unsupportedMethod as DELETE };

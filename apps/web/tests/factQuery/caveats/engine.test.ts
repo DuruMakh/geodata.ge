@@ -64,8 +64,8 @@ describe("CAVEAT_RULES registry", () => {
   // did. See rules.national.ts.
   // Plus four government-debt codes and two general-government-balance codes,
   // added on 2026-09-04 when those datasets began being served.
-  it("registers spec section 9.2's codes, less nominal_gel, plus the two approved splits and the two new datasets", () => {
-    expect(CAVEAT_RULES).toHaveLength(29);
+  it("registers spec section 9.2's codes, less nominal_gel, plus the approved splits, new datasets and 2004 component guard", () => {
+    expect(CAVEAT_RULES).toHaveLength(30);
     const codes = CAVEAT_RULES.map((rule) => rule.code);
     expect(codes).toContain("admin_category_not_yet_established");
     expect(codes).toContain("program_parent_category_modern_grouping");

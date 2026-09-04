@@ -146,6 +146,16 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   const isMunicipal = input.datasetId === "municipal-expenditure";
   const isValueMetric = input.metric === "value";
 
+  if (input.withinRegionId !== undefined && !snapshot.municipal.regions.some((r) => r.id === input.withinRegionId)) {
+    return errorResponse(snapshot, {
+      code: "unknown_entity",
+      messageKa: "მითითებული რეგიონი არ არსებობს.",
+      messageEn: "Unknown withinRegionId. Use a region id from describe_coverage.",
+      retryable: false,
+      validChoices: snapshot.municipal.regions.map((r) => r.id),
+    });
+  }
+
   // rankInput's refine already pairs `value` with one year and change metrics
   // with two; this rejects the other direction (a value ranking handed a
   // range, or a change ranking handed a single year), which the schema allows

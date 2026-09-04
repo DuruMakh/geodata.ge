@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const BASE_URL = process.env.SEO_BASE_URL ?? "http://localhost:3100";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? process.env.SEO_BASE_URL ?? "http://localhost:3100";
 const ENDPOINT = "https://fiscal.ge/mcp";
 
 test.describe("connection page", () => {
@@ -92,14 +92,11 @@ test.describe("connection page", () => {
     await expect(missing).toHaveText(/[Ⴀ-ჿ]/);
   });
 
-  // The footer link is held back until /mcp answers in production (see the note
-  // in app/sitemap.ts). Asserting its ABSENCE rather than deleting the test, so
-  // that restoring the link is a deliberate change to this line and not
-  // something that can drift back in unnoticed.
-  test("is not advertised in the footer while the endpoint is off", async ({ page }) => {
+  // Production discovery includes the connection page.
+  test("is discoverable from the shared footer", async ({ page }) => {
     await page.goto(`${BASE_URL}/about`);
 
-    await expect(page.locator('footer a[href="/connect"]')).toHaveCount(0);
+    await expect(page.locator('footer a[href="/connect"]')).toHaveCount(1);
   });
 
   test("stays readable on a narrow viewport", async ({ page }) => {
@@ -120,4 +117,18 @@ test.describe("connection page", () => {
     const description = await page.locator('meta[name="description"]').getAttribute("content");
     expect((description ?? "").length).toBeGreaterThan(40);
   });
+});
+
+
+test("AI header navigation opens the active connection page on desktop and mobile", async ({ page }) => {
+  for (const width of [1440, 375]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(BASE_URL);
+    const link = page.getByRole("navigation", { name: "ნავიგაცია", exact: true }).getByRole("link", { name: "AI", exact: true });
+    await expect(link).toBeVisible();
+    await link.click();
+    await expect(page).toHaveURL(/\/connect$/);
+    await expect(page.getByTestId("connect-header").getByRole("link", { name: "AI", exact: true })).toHaveAttribute("aria-current", "page");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  }
 });

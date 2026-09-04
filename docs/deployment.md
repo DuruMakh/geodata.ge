@@ -112,8 +112,9 @@ Production builds from the Supabase mirror; previews and local dev need none.
 | `GEODATA_DATA_SOURCE` | Production only | `db` |
 | `NEXT_PUBLIC_SITE_URL` | Production only | canonical site origin, exactly `https://fiscal.ge` |
 | `MCP_ENABLED` | Production only | `true` to serve `/mcp`; anything else (including unset) keeps it paused |
-| `MCP_RATE_LIMITER` | Non-production only | selects the shared counter. The ONLY implemented value is `memory`, which is development-only and is refused outright in production. There is no production limiter yet, so any value — including a plausible-looking one — fails closed |
-| `MCP_ALLOWED_ORIGINS` | Production only | comma-separated browser origins allowed to call `/mcp`; unset means server clients only |
+| `MCP_RATE_LIMITER` | Production: `upstash` | Shared Redis counter; missing/unknown configuration fails closed. `memory` remains local-only. |
+| `MCP_ALLOWED_ORIGINS` | Production only | Comma-separated approved browser origins; server clients without Origin are permitted. |
+| `KV_REST_API_URL`, `KV_REST_API_TOKEN` | Production | Encrypted credentials injected by the Upstash integration. Never expose through NEXT_PUBLIC variables. |
 
 - The db-mode build renders from the mirror and re-verifies it row-by-row
   against the checkout's CSVs; see
@@ -246,239 +247,135 @@ before rerunning.
 
 ## The `/mcp` runtime
 
-`/mcp` is the **first and only request-time route** in this application.
-Everything else is prerendered at build time and served as static output, and
-that has not changed — the build log shows exactly one dynamic route (`ƒ /mcp`).
+`/mcp` is the only request-time route. Explorer pages, `/connect`, methodology,
+and publications remain static. The endpoint exposes nine read-only tools
+through the pinned MCP SDK, stateless Streamable HTTP revision `2025-11-25`.
+There is no session store, model invocation, authentication, or write tool.
 
-### What it serves and where its data comes from
+### Snapshot and network boundary
 
-The seven read-only query tools of the fact-query core, over MCP Streamable
-HTTP, protocol revision **`2025-11-25`**, stateless, with no session store.
-`@modelcontextprotocol/sdk` is pinned to an **exact** version (no caret): the
-protocol revision advertised is a compatibility promise, so it must not drift on
-a routine `npm update`.
+All budget answers use `apps/web/lib/factQuery/generated/snapshot.json`, prepared
+at build time and cached once per function instance. The sole runtime network
+exception is `lib/mcp/upstashCounter.ts`, which sends fixed Redis rate-limit
+commands to the configured Upstash endpoint. It never sends query arguments,
+figures, source documents, prompts, or raw client addresses. There is no runtime
+dataset-database access or external data fallback.
 
-It answers from `apps/web/lib/factQuery/generated/snapshot.json`, written during
-`prebuild` and bundled into the function. **There is no request-time database
-access, no network access, and no source-document fetching.** If the database
-goes down, `/mcp` keeps answering.
+The snapshot is included by `outputFileTracingIncludes`. Check the production
+build trace at `apps/web/.next/server/app/mcp/route.js.nft.json` for the snapshot
+path before release. An unreadable snapshot returns a service error, not data
+from a different release.
 
-That artifact is gitignored, so Next cannot trace it statically. It is included
-explicitly via `outputFileTracingIncludes` in `apps/web/next.config.ts`. To
-confirm a build actually shipped it:
+### Shared production rate limiter
 
-```bash
-node -e "console.log(require('./.next/server/app/mcp/route.js.nft.json').files.filter(f=>f.includes('snapshot.json')))"
-```
+The `fiscal-mcp-limits` Upstash Redis resource is linked to `geodata-ge` Production
+through the Vercel Marketplace. It uses the **free** plan, primary region `iad1`,
+with `autoUpgrade=false`, `eviction=false`, and `prodPack=false`. The user accepted
+the Marketplace terms and authorized production rate limiting. No paid SDK,
+subscription, or automatic plan upgrade is required.
 
-An empty array means the deployed function has no data and every call will fail.
+Set `MCP_RATE_LIMITER=upstash`. The integration provides `KV_REST_API_URL` and
+`KV_REST_API_TOKEN`. The adapter uses native HTTPS with a 1.5-second timeout and
+no automatic retry; an unavailable service, invalid response, or missing
+credentials fails closed with 503. Memory-only counters are refused in Vercel
+Production.
 
-### Operating limits
+Two limits are checked in order:
 
-| Control | Value | Enforced in |
-| --- | --- | --- |
-| Request body | 32 KiB, refused on the declared length before the body is read, then re-checked on the real bytes | `app/mcp/route.ts` |
-| Returned observation cells | 500 | `lib/mcp/result.ts` |
-| Returned comparison pairs | 250 — a comparison row is two cells | `lib/mcp/result.ts` |
-| Input arrays | 100 entities, 200 series, 100 years, 100 source ids | `lib/factQuery/schemas.ts` |
-| Serialized tool result | 512 KiB, both representations | `lib/mcp/result.ts` |
-| Per-key request rate | 60 per rolling minute; an unidentifiable caller shares one bucket rather than skipping the limit | `app/mcp/route.ts` |
-| Global daily accepted requests | 10,000 per UTC day, charged only once a request has passed the per-key limit | `app/mcp/route.ts` |
-| Request duration | 10 s | `maxDuration` in `app/mcp/route.ts` |
+1. **60 requests in a rolling minute per client key.** A Redis sorted set uses
+   Redis server time and expires 60 seconds after the most recent accepted hit.
+   The key is a hash of the trusted platform address header, not a stored raw IP.
+   An unidentifiable caller shares one bucket.
+2. **10,000 accepted requests per UTC day globally.** The date-keyed integer is
+   checked only after the client limit allows the request, so per-client denials
+   cannot drain the global quota. The daily key expires automatically.
 
-The input array bounds are enforced as `.max()` on the schemas themselves, so a
-client reads them as `maxItems` in `tools/list` rather than discovering them by
-being refused.
+Each hit is an atomic Lua operation. Counters are shared across function
+instances. Production and preview counter namespaces are separate. A limit
+reached returns 429 and Retry-After; the daily refusal points to the next UTC day.
+These are request allowances, so initialization and discovery also count.
 
-**What a response cites, and what `get_sources` adds.** `meta.sources` answers
-"what should I cite": document id, title, coverage years, and both the official
-and archived URLs. Fields every document of a source agrees on — publisher,
-attribution, licence, media type, retrieval date, dataset, role — are stated once
-in that source's `documentDefaults` rather than repeated per document; a field
-the documents disagree about stays on each of them. `sha256` and `byteSize`
-answer a different question — "do these bytes match what was reviewed" — and are
-served by `get_sources` and the published `sources.json`, not by every response.
+The free service has its own monthly quota (500,000 commands at setup). It does
+not guarantee continuous availability under an attack or sustained maximum
+traffic. Provider quota exhaustion pauses MCP through the same fail-closed 503;
+static pages and bulk files continue working. Review usage before changing the
+free plan. Upgrading or enabling automatic upgrades needs explicit approval.
 
-No document is ever omitted to save space. A ranking over all 64 municipalities
-still names all 66 documents it read. Compaction took that response's structured
-envelope from 91.0 KiB to 42.4 KiB, of which grouping the ranking's exclusions by
-reason — rather than repeating one identical sentence per excluded entity — was
-16.3 KiB.
+### Other operating limits
 
-Every tool declares an `outputSchema` (`lib/mcp/outputSchema.ts`). Responses have
-always carried a structured twin alongside the text, but without that declaration
-a client has no way to know it exists, and real clients were observed parsing the
-text table instead. The SDK validates `structuredContent` against the schema and
-fails the call on a mismatch, so `tests/mcp/outputSchema.test.ts` runs every tool
-against it.
+| Control | Value |
+| --- | --- |
+| Request body | 32 KiB, declared-length check plus incremental byte cap |
+| Query result | 500 requested cells, checked before query calculation |
+| Comparison result | 250 requested pairs, checked before calculation |
+| Input arrays | 100 entities, 200 series, 100 years, 100 source IDs |
+| Serialized tool result | 512 KiB across text and structured content |
+| Function duration | 10 seconds |
 
-The byte ceiling, not the cell cap, is the binding gate: a compliant 495-cell
-municipal request serializes to about 517 KiB. Over-ceiling results are refused
-whole with narrowing guidance and a link to the bulk files — never trimmed,
-because dropping sources or warnings to make a result fit would publish a
-figure without its limitations.
+An oversized request is rejected in full with guidance to narrow it. Source
+references and caveats are never silently trimmed. Every tool publishes its own
+output shape. Structured and text answers preserve missingness, relevant
+sources, definitions, and exclusions; only `get_sources` includes document
+checksums and byte sizes.
 
-`GET` and `DELETE` return `405`. Handed a `GET` with `Accept:
-text/event-stream`, the transport would open a keep-alive SSE stream this server
-has nothing to push to, letting an unauthenticated caller pin a function
-instance for the full 10 seconds per request.
+### Security and browser access
 
-### The limiter is an owner decision, and the endpoint fails closed without one
+The Host header is validated against the configured production identity.
+X-Forwarded-Host is ignored. Outside production, configured Vercel preview hosts
+are also allowed. A present Origin must match `MCP_ALLOWED_ORIGINS`; no Origin
+is normal for server-side clients. Suggested production origins for the current
+connection page: `https://fiscal.ge,https://claude.ai,https://chatgpt.com,https://chat.openai.com`.
 
-`MCP_RATE_LIMITER` selects the shared counter. **Unset, every request is
-refused with a retryable 503.** That is deliberate: serving unlimited public
-traffic from an unauthenticated endpoint is a stop condition, so `/mcp` cannot
-be switched on without a limiter decision having been made.
+OPTIONS preflight and all POST responses, including errors, use the approved
+origin, never a wildcard or credentialed grant. Responses vary by Origin and
+are not cached. Retry-After is exposed to approved browser clients. GET and
+DELETE return 405: no standalone stream or session termination is provided.
 
-`memory` selects a process-local counter. It is for **local development only**
-and must never be used in production: serverless instances scale horizontally,
-so a process-local count of 60 becomes 60 × N and enforces nothing.
+The endpoint is public because the underlying figures and sources are public.
+Origin checks are protocol/browser controls, not caller authentication.
 
-Choosing the production limiter — a platform control or a minimal approved
-shared counter — requires the owner sign-off described in the release
-verification: hosting plan, limiter availability and cost, measured resource
-use, expected traffic, budget alerts, and an approved operating budget.
+### Pause, activation, and release verification
 
-### Two public files claim a live endpoint — do not publish them ahead of the switch
+`MCP_ENABLED=true` enables serving only when the limiter is also configured.
+Any other value returns 503 with a one-hour Retry-After and the working fallback
+`https://fiscal.ge/downloads/data/manifest.json`. Change the Production variable
+and redeploy to pause or resume. This does not affect the static site.
 
-`public/llms.txt` and the `/connect` page both describe `https://fiscal.ge/mcp`
-in the present tense, as a service that answers. They are static, so they go
-live with **any** production deploy, whatever `MCP_ENABLED` is set to.
+The public header's `AI` item and shared footer lead to `/connect`; the page is
+in the sitemap and llms.txt. Ship this discovery with a verified, enabled MCP
+release. For emergency pauses, the static setup page remains accessible while
+the endpoint gives an explicit temporary-service error and bulk fallback.
 
-A client that reads them and connects to a paused endpoint gets a `503` with a
-bilingual message pointing at the site and the published files, so nobody is
-left in silence. But the claim is still ahead of the fact. Either enable `/mcp`
-in the same release that publishes them, or accept that the two files advertise
-a service that answers only with `503` until the switch is on. This is the
-owner's call, and it is a sequencing decision rather than a code change.
+Release through the Actions-owned pipeline described above. Configure the
+production limiter and switch before the final deployment; do not bypass CI.
+After Vercel reports READY for the merge commit:
 
-### Pause and resume
-
-`/mcp` ships **deployed and dark**. It runs only when `MCP_ENABLED` is exactly
-`true`; any other value, including unset, returns `503` with `Retry-After` and a
-bilingual message pointing at the static site and the published files.
-
-To pause a live endpoint (Vercel → Settings → Environment Variables →
-Production), set `MCP_ENABLED` to `false` and redeploy, or remove the variable.
-**Pausing `/mcp` does not affect anything else**: static pages, CSV downloads,
-the JSON publications and the explorer keep working, because the switch is one
-variable on one route. Confirm after pausing:
-
-```bash
-curl -s -o /dev/null -w "%{http_code}\n" https://fiscal.ge/explorer/municipalities
-```
-
-That must still be `200` while `/mcp` returns `503`.
+- Check the published catalogue's releaseCommit and dataVersion.
+- Connect an SDK client, list all nine tools, discover an entity, and query
+  reviewed expenditure, municipal totals, debt, and a signed deficit.
+- Check missing values, invalid inputs, source narrowing, and a stale version.
+- Verify rate enforcement with bounded test counters or a preview deployment;
+  do not consume the global production quota for a load test.
+- Open `/connect`, click `AI` from the homepage, verify mobile layout and copy
+  controls, and check that the bulk fallback resolves.
+- Inspect the post-release runtime error window. A successful build or hook
+  alone is not proof the endpoint is live.
 
 ### Logs and privacy
 
-One JSON line per request, built from an allow-list in `apps/web/lib/mcp/log.ts`
-— tool name, dataset, measure, year range, entity and series counts, data
-version, response size in bytes, duration, outcome, error code.
+Application logs use the allowlist in `lib/mcp/log.ts`: tool, data version,
+response bytes, duration, outcome, and bounded error code. HTTP 200 tool errors
+are logged as failures. Early refusals are counted too. Unknown caller-provided
+tool and method names are recorded as fixed unknown labels, never echoed.
 
-Result count is **omitted**, not sent as zero: the route knows how large its
-reply was but not how many observations are inside it, and a hardcoded `0`
-would read as "this answer had no rows".
+Do not log raw prompts, request bodies, invalid parameter strings, credentials,
+addresses, or provider error text. The temporary hashed counter key is not an
+application log field. Retain detailed application events for 14 days and
+aggregated metrics for 90 days. Vercel/Upstash infrastructure logs are separate;
+do not claim providers never process request addresses.
 
-The tool name is matched against the seven tools and the protocol methods
-before it is written; an unrecognised one is recorded as `unknown_tool` or
-`unknown_method`. It is never echoed. A caller controls that field completely,
-so echoing it would put unbounded caller-supplied text into retained records.
-
-It never records raw prompts, invalid parameter strings, request bodies,
-authorization headers, full user agents, or IP addresses. The limiter key is a
-truncated hash of the platform's trusted address metadata, used only inside its
-enforcement window and never written to these logs. Hashing an address does not
-make a persistent record anonymous, which is why it is not persisted.
-
-Retain detailed application events for 14 days and aggregated service metrics
-for 90 days. Vercel's own access-log retention is separate and is not covered by
-that policy; do not claim no provider ever processes an address.
-
-These records describe tool activity, not people. One key may be an entire
-organisation's traffic, and the original question a user asked never reaches
-this service at all.
-
-### Rollback
-
-`/mcp` needs no separate rollback: it is part of the same deployment as
-everything else, so the standard Vercel rollback restores the previous route and
-its snapshot together. To disable it *without* a rollback, use the pause switch
-above.
-
-### Security
-
-Host is validated against `NEXT_PUBLIC_SITE_URL` and
-`VERCEL_PROJECT_PRODUCTION_URL`, read from the `Host` header only —
-`X-Forwarded-Host` is deliberately ignored, since it is client-supplied on a
-direct connection. A request with no `Origin` is allowed, because most MCP
-clients are servers; a *present* origin must appear in `MCP_ALLOWED_ORIGINS`,
-including the opaque `null` origin a sandboxed iframe sends. CORS echoes the one
-approved origin, never `*`, and never with credentials, and `Vary: Origin` is
-always appended so no cache can hand one origin's answer to another.
-
-A browser also sends a CORS **preflight** before any POST carrying
-`content-type: application/json`, so `/mcp` answers `OPTIONS` itself. Without
-that, an origin listed in `MCP_ALLOWED_ORIGINS` still could not reach the
-endpoint: the framework's own generated `OPTIONS` replies `204` with an `Allow`
-header and no CORS headers, and the browser stops there. The preflight runs the
-same pause, host and origin checks as a real request.
-
-Host matching is case-insensitive. If neither host variable is configured, the
-check is skipped outside production — a bare local server has no site URL — but
-in production nothing configured is treated as a misconfiguration and every
-request is refused.
-
-**On a preview**, the allowlist also includes the deployment's own address, from
-`VERCEL_BRANCH_URL` and `VERCEL_URL`. It has to: Vercel sets
-`VERCEL_PROJECT_PRODUCTION_URL` on previews too — to the *production* domain —
-so without them a preview's allowlist is the production identity alone and the
-endpoint refuses its own address with `forbidden_host` on every request. Those
-are platform environment variables rather than headers, so a caller cannot
-present them, and they are added only when `VERCEL_ENV` is set to something
-other than `production`. In production the configured identity stays the entire
-allowlist.
-
-### Testing `/mcp` on a preview
-
-Previews are the only deployed surface where the endpoint can currently answer:
-`createCounter()` refuses the in-process counter in production outright, so a
-production deploy answers `503` to every request until a real shared limiter
-exists (see the owner gate above). To bring a preview up:
-
-1. Push the branch. Every branch except `main` gets a preview automatically
-   (`apps/web/vercel.json` disables auto-deploy for `main` only).
-2. Set `MCP_ENABLED=true` and `MCP_RATE_LIMITER=memory` on the **Preview**
-   scope, then redeploy so the running function reads them. Scope them to the
-   branch (`vercel env add <name> preview <branch>`) rather than to previews
-   generally, so another branch's preview does not become a live endpoint.
-   Also set `MCP_ALLOWED_ORIGINS` — a client that sends an `Origin` header at
-   all is refused with `forbidden_origin` when nothing is configured, and a
-   `403` with no CORS headers is an opaque failure to debug from the client
-   side. `https://claude.ai,https://chatgpt.com,https://chat.openai.com`
-   covers the hosted assistants.
-3. Decide on Deployment Protection. An MCP client cannot complete Vercel's SSO
-   flow and will receive an HTML login page instead of JSON, so protection must
-   be disabled for the preview or a bypass token supplied.
-
-The `memory` counter is per-instance and enforces nothing across instances.
-That is acceptable for a short-lived test surface and is not a production
-limiter; restore protection when testing ends.
-
-Note that `/connect` on a preview displays `https://fiscal.ge/mcp`, because
-`resolveSiteUrl()` falls back to `VERCEL_PROJECT_PRODUCTION_URL` and previews
-report the production domain there. Use the preview's own origin with `/mcp`
-appended, not the address the page shows.
-
-`GET` and `DELETE` return `405` with `Allow: POST`. This is deliberate: passed
-to the transport, a `GET` carrying `Accept: text/event-stream` opens a
-keep-alive stream this server has nothing to push down, which an unauthenticated
-caller could use to pin a function instance for the full 10-second ceiling with
-a one-line request.
-
-Access is public and unauthenticated by design: every tool reads approved public
-data, and no database credentials exist in request-time code. Origin and host
-checks are protocol security controls, not proof of who is calling.
+Rollback restores the route and snapshot together. The Redis counters contain
+no budget data and require no migration when a code release is rolled back.
 
 ## SEO and headers
 

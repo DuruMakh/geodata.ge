@@ -9,12 +9,11 @@
 // client was observed doing: parsing a tab-separated table by hand while the
 // parsed object sat beside it.
 //
-// The SDK validates `structuredContent` against this and fails the call on a
-// mismatch, so the envelope is described exactly and `data` - whose shape is
-// what differs between a ranking, a catalogue and a set of observations - is
-// left open. Narrowing `data` per tool is a later job; declaring that it exists
-// is this one.
+// The SDK validates both the envelope and each tool's data shape. The shared
+// union below supports validation of any response; registration narrows it to
+// the one kind of answer the selected tool returns.
 import { z } from "zod";
+import { observationSchema } from "../factQuery/schemas";
 
 const caveat = z
   .object({
@@ -82,13 +81,59 @@ const responseMeta = z
  * attaches no structured payload to one - so this schema describes successful
  * answers and does not advertise an error shape that can never arrive.
  */
+const excludedEntity = z.object({ entityId: z.string(), reason: z.string() });
+const coverage = z.object({
+  requestedYears: z.array(z.number().int()), availableYears: z.array(z.number().int()), returnedYears: z.array(z.number().int()),
+  missingCells: z.array(z.object({ entityId: z.string(), seriesId: z.string(), year: z.number().int(), reason: z.string() })),
+  excludedEntities: z.array(excludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
+});
+const endpoint = observationSchema.pick({ year: true, value: true, availability: true, missingReason: true, basis: true, valueDefinition: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
+const dataShapes = {
+  observations: z.object({ observations: z.array(observationSchema), coverage }),
+  comparisons: z.object({
+    comparisons: z.array(z.object({
+      comparisonId: z.string(), datasetId: z.string(), entityId: z.string(), entityLabelKa: z.string(), seriesId: z.string(), seriesLabelKa: z.string(),
+      measure: z.string(), unit: observationSchema.shape.unit, from: endpoint, to: endpoint,
+      absoluteChange: z.number().nullable(), percentageChange: z.number().nullable(), percentagePointChange: z.number().nullable(),
+      comparability: z.enum(["comparable", "limited", "not_comparable"]), reasons: z.array(z.string()), caveatIds: z.array(z.string()),
+    })),
+    coverage: z.object({ requestedYears: z.array(z.number()), requestedPairs: z.number(), comparedPairs: z.number(), comparableCount: z.number(), notComparableCount: z.number(), excludedEntities: z.array(excludedEntity) }),
+  }),
+  ranking: z.object({
+    entries: z.array(z.object({
+      position: z.number(), tied: z.boolean(), entityId: z.string(), entityLabelKa: z.string(), seriesId: z.string(), seriesLabelKa: z.string(),
+      value: z.number().nullable(), unit: observationSchema.shape.unit, basis: observationSchema.shape.basis, caveatIds: z.array(z.string()),
+    })),
+    universe: z.object({ dimension: z.enum(["series", "entities"]), description: z.string(), candidateCount: z.number(), eligibleCount: z.number(), returnedCount: z.number(), cutoffSplitsTie: z.boolean() }),
+    exclusions: z.array(z.object({ reason: z.string(), ids: z.array(z.string()) })), rankingDefinition: z.string(),
+  }),
+  catalogue: z.object({
+    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), years: z.tuple([z.number(), z.number()]), entityTypes: z.array(z.string()), measures: z.array(z.string()), measureNotes: z.record(z.string(), z.string()).optional() })),
+    series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), datasetId: z.string().optional() })).optional(),
+    entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), entitySlug: z.string().nullable(), datasetId: z.string().optional() })).optional(),
+    exclusions: z.array(excludedEntity),
+  }),
+  sources: z.object({
+    sources: z.array(z.object({
+      sourceId: z.string(), name: z.string(), lastReviewedAt: z.string(), derivation: z.string().nullable(), documentCount: z.number(), narrowed: z.boolean(), narrowingOutcome: z.enum(["not_requested", "applied", "dropped_no_match"]),
+      documents: z.array(responseDocument.extend({ sha256: z.string(), byteSize: z.number() })),
+    })),
+    narrowedBy: z.object({ datasetId: z.string().optional(), years: z.array(z.number()).optional(), entityIds: z.array(z.string()).optional() }).nullable(),
+  }),
+};
+
 export const toolOutput = z
   .object({
     kind: z.enum(["observations", "comparisons", "ranking", "catalogue", "sources"]),
     /** How complete the answer is, not whether the call worked. */
     status: z.enum(["ok", "partial", "empty"]),
     /** Present on every successful answer. Its shape is what differs between tools. */
-    data: z.record(z.string(), z.unknown()),
+    data: z.union([dataShapes.observations, dataShapes.comparisons, dataShapes.ranking, dataShapes.catalogue, dataShapes.sources]),
     meta: responseMeta,
   })
   .loose();
+
+export function outputSchemaFor(tool: string) {
+  const kind = tool === "describe_coverage" ? "catalogue" : tool === "get_sources" ? "sources" : tool === "compare" ? "comparisons" : tool === "rank" ? "ranking" : "observations";
+  return toolOutput.extend({ kind: z.literal(kind), data: dataShapes[kind] });
+}

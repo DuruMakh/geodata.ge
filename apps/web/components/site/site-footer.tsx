@@ -41,9 +41,9 @@ export function SiteFooter({ updatedAt }: { updatedAt: string }) {
             <Link href="/methodology" className="max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center max-[768px]:self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
               მეთოდოლოგია
             </Link>
-            {/* The AI-კავშირი link is held back until /mcp answers in production;
-                see the note in app/sitemap.ts. The page itself is live and
-                tested at /connect. */}
+            <Link href="/connect" className="max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center max-[768px]:self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
+              AI-კავშირი
+            </Link>
             <Link href="/about" className="max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center max-[768px]:self-start text-[12.5px] text-[var(--body)] hover:text-[var(--ink)]">
               მიზანი
             </Link>
