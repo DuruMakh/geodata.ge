@@ -74,3 +74,12 @@ export type ServedGovernmentDebtFact = {
   snapshotDate: string | null;
   lastReviewedAt: string;
 };
+
+export type ServedGeneralGovernmentBalanceFact = {
+  year: number;
+  generalGovernmentBalancePctGdp: number;
+  generalGovernmentBalanceGel: number;
+  status: "actual" | "projection";
+  sourceId: string;
+  lastReviewedAt: string;
+};

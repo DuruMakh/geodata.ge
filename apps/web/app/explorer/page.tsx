@@ -4,21 +4,22 @@ import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect"
 import { PageHeader } from "../../components/shell/page-header";
 import { SourceNote } from "../../components/ui/editorial";
 import { buildHubCards } from "../../lib/explorer/hubCards";
-import { loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 import { fiscalMetadata } from "../../lib/seo/metadata";
 
 export const metadata = fiscalMetadata({
   title: "საქართველოს ბიუჯეტის მონაცემები | Fiscal.ge",
   description:
-    "საქართველოს ბიუჯეტის გადამოწმებული მონაცემები: შემოსავლები, ხარჯები, მუნიციპალიტეტები, ვალი და ერთი წლის ანალიზი.",
+    "საქართველოს ბიუჯეტის გადამოწმებული მონაცემები: შემოსავლები, ხარჯები, მუნიციპალიტეტები, ვალი, დეფიციტი და ერთი წლის ანალიზი.",
   path: "/explorer",
 });
 
 export default async function ExplorerHubPage() {
-  const [{ facts, sourceDocuments }, { countryTotalFacts }, { facts: debtFacts }] = await Promise.all([
+  const [{ facts, sourceDocuments }, { countryTotalFacts }, { facts: debtFacts }, { facts: balanceFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
+    loadServedGeneralGovernmentBalanceData(),
   ]);
   const municipalTotals = new Map<number, number>();
   for (const row of countryTotalFacts) {
@@ -27,8 +28,9 @@ export default async function ExplorerHubPage() {
   const lastUpdatedAt = [
     ...sourceDocuments.map((source) => source.lastReviewedAt),
     ...debtFacts.map((fact) => fact.lastReviewedAt),
+    ...balanceFacts.map((fact) => fact.lastReviewedAt),
   ].sort().at(-1) ?? "";
-  const cards = buildHubCards(facts, municipalTotals, debtFacts);
+  const cards = buildHubCards(facts, municipalTotals, debtFacts, balanceFacts);
   const years = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
   const coverage = [
     years.length > 0 ? `${years[0]}–${years.at(-1)}` : "",
@@ -56,13 +58,13 @@ export default async function ExplorerHubPage() {
           data-testid="explorer-hub-introduction"
           className="mb-[26px] max-w-[640px] text-[13.5px] leading-relaxed text-[var(--body)]"
         >
-          Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ ფაქტობრივ მონაცემებს.
-          {" "}შეადარეთ წლები, სფეროები და მუნიციპალიტეტები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.
+          Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების, მთავრობის ვალისა და ზოგადი მთავრობის დეფიციტის გადამოწმებულ მონაცემებს.
+          {" "}შეადარეთ წლები და მაჩვენებლები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.
         </p>
         <BudgetHub cards={cards} />
         <div className="mt-[26px] max-w-[860px]">
           <SourceNote>
-            მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო).
+            მონაცემები: საქართველოს ფინანსთა სამინისტროს ოფიციალური დოკუმენტები და IMF-ის World Economic Outlook.
             {lastUpdatedAt ? (
               <>
                 {" "}ბოლო განახლება: <span className="font-[family-name:var(--font-numeric)]">{lastUpdatedAt}</span>.

@@ -103,3 +103,4 @@ source.adjara_republic_budget_actual,Adjara Autonomous Republic republican budge
 source.treasury_consolidated_revenue_actual,Treasury annual consolidated-revenue reports — transfers from autonomous republic,docs/Raw Data/Revenue/2015-jan-dec-consolidated-revenue.pdf + annual 2016-2025 files,2026-08-16
 source.adjara_consolidated_budget,Reviewed consolidated Adjara calculation — municipalities plus republican payments minus internal transfers,data/imports/municipal-adjara-budget-adjustments-2015-2025.csv,2026-08-16
 source.geostat_municipal_population,Geostat population as of 1 January by self-governed units,docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx,2026-08-03
+source.imf_weo_april_2026_general_government_balance,IMF WEO April 2026 general government net lending or borrowing for Georgia,docs/Raw Data/Deficit/imf-weo-general-government-balance/official/WEOApr2026all.xlsx,2026-09-04

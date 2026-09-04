@@ -91,6 +91,7 @@ const representativeRoutes = [
   { route: "/explorer/revenue", canonical: "https://fiscal.ge/explorer/revenue" },
   { route: "/explorer/analysis", canonical: "https://fiscal.ge/explorer/analysis" },
   { route: "/explorer/debt", canonical: "https://fiscal.ge/explorer/debt" },
+  { route: "/explorer/deficit", canonical: "https://fiscal.ge/explorer/deficit" },
   { route: "/explorer/municipalities", canonical: "https://fiscal.ge/explorer/municipalities" },
   { route: "/explorer/municipalities/tbilisi", canonical: "https://fiscal.ge/explorer/municipalities/tbilisi" },
   { route: "/explorer/municipalities/region/imereti", canonical: "https://fiscal.ge/explorer/municipalities/region/imereti" },
@@ -143,6 +144,7 @@ test("explorer datasets publish stable ids and downloadable CSV distributions", 
     { route: "/explorer/expenditure", downloadPath: "/downloads/data/national-expenditure.csv" },
     { route: "/explorer/revenue", downloadPath: "/downloads/data/national-revenue.csv" },
     { route: "/explorer/municipalities", downloadPath: "/downloads/data/municipal-expenditure.csv" },
+    { route: "/explorer/deficit", downloadPath: "/downloads/data/general-government-balance.csv" },
   ] as const) {
     await page.goto(`${BASE_URL}${route}`);
     const node = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
@@ -164,6 +166,15 @@ test("Government Debt Dataset metadata includes the service projection horizon",
   expect(node.temporalCoverage).toBe("2013/2030");
   expect(node.description).toContain("2026–2030");
   expect(node.description).toContain("პროგნოზი");
+});
+
+test("general-government deficit metadata includes the IMF projection horizon", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer/deficit`);
+  const node = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
+
+  expect(node.temporalCoverage).toBe("1995/2031");
+  expect(node.description).toContain("2026–2031");
+  expect(node.description).toContain("პროგნოზია");
 });
 
 test("only third-party methodology source originals send a noindex header", async ({ request }) => {
@@ -496,7 +507,7 @@ test("explorer hub explains the reviewed data scope and available actions", asyn
 
   const introduction = page.getByTestId("explorer-hub-introduction");
   await expect(introduction).toHaveText(
-    "Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ ფაქტობრივ მონაცემებს. შეადარეთ წლები, სფეროები და მუნიციპალიტეტები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.",
+    "Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების, მთავრობის ვალისა და ზოგადი მთავრობის დეფიციტის გადამოწმებულ მონაცემებს. შეადარეთ წლები და მაჩვენებლები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.",
   );
 });
 

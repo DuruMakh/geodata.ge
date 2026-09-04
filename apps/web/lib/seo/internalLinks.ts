@@ -1,6 +1,7 @@
 import { municipalityHrefForCode } from "../explorer/municipalityRoutes";
 
 export const DEBT_EXPLORER_PATH = "/explorer/debt" as const;
+export const DEFICIT_EXPLORER_PATH = "/explorer/deficit" as const;
 
 export type MunicipalEntityKind = "country" | "region" | "municipality";
 

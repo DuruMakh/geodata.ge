@@ -24,6 +24,7 @@ the import is re-run.
 | `AdminSpendingFact` | `data/imports/admin-spending-facts-2004-2025.csv` (admin categories + major-program drill-down rows) |
 | `NationalGdpFact` | `data/imports/national-gdp-annual-1996-2025.csv` (one reviewed nominal-GDP denominator per year) |
 | `GovernmentDebtFact` | `data/imports/government-debt-facts-2013-2030.csv` (nine public Government Debt series; generated from the approved normalized debt package) |
+| `GeneralGovernmentBalanceFact` | `data/imports/general-government-balance-annual-1995-2031.csv` (IMF general-government balance as percent of GDP and nominal GEL, with actual/projection status) |
 | `MunicipalFunctionCategory` | `data/taxonomy/municipal-functions.json` |
 | `MunicipalRegion` | `data/taxonomy/municipal-regions.json` |
 | `Municipality` | `data/imports/municipalities.csv` |
@@ -70,7 +71,7 @@ Every run prints and stores (in `ImportRun.reportJson` and
 - budget-fact GEL totals per year/side, database vs CSV;
 - admin-spending GEL totals per year/level, database vs CSV.
 
-Beyond counts and totals, including the `NationalGdpFact`, `GovernmentDebtFact`, and `MunicipalPopulationFact` row counts, the import re-reads every inserted row **through the
+Beyond counts and totals, including the `NationalGdpFact`, `GovernmentDebtFact`, `GeneralGovernmentBalanceFact`, and `MunicipalPopulationFact` row counts, the import re-reads every inserted row **through the
 same code path db-mode builds use** and compares it field by field against the
 CSV loader output — a mapping bug in any column (labels, notes, dates) fails
 the import, not a later build.
@@ -184,6 +185,7 @@ From `apps/web`, with `.env` configured:
     at import *and* on every db-mode build. This is the tier the sentence
     above describes.
   - **`NationalGdpFact`** — read by `loadServedExplorerData` and verified field by field at import and whenever the national explorer routes build in db mode.
+  - **`GovernmentDebtFact` and `GeneralGovernmentBalanceFact`** — read by their public explorer routes and verified field by field at import and whenever those routes build in db mode.
   - **The municipal tables, including `MunicipalPopulationFact`** — verified field by field at import. The
     earlier data-only deployment had no route that called
     `loadServedMunicipalData`, so its db-mode build did not run

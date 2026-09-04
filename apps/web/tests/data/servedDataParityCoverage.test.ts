@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
   EXPLORER_ROW_PARITY_CHECKS,
+  GENERAL_GOVERNMENT_BALANCE_PARITY_CHECK,
   GOVERNMENT_DEBT_PARITY_CHECK,
   MUNICIPAL_PARITY_CHECKS,
   loadServedMunicipalData,
   resetServedDataCacheForTests,
 } from "../../lib/data/servedData";
-import { governmentDebtFactParityKey } from "../../lib/data/servedDataParity";
+import {
+  generalGovernmentBalanceFactParityKey,
+  governmentDebtFactParityKey,
+} from "../../lib/data/servedDataParity";
 
 describe("served data parity coverage", () => {
   it("checks every municipal dataset the site serves", async () => {
@@ -37,6 +41,13 @@ describe("served data parity coverage", () => {
     expect(GOVERNMENT_DEBT_PARITY_CHECK).toEqual({
       label: "Government Debt facts",
       keyOf: governmentDebtFactParityKey,
+    });
+  });
+
+  it("names the general-government balance rows that db-mode serving must compare", () => {
+    expect(GENERAL_GOVERNMENT_BALANCE_PARITY_CHECK).toEqual({
+      label: "general-government balance facts",
+      keyOf: generalGovernmentBalanceFactParityKey,
     });
   });
 });

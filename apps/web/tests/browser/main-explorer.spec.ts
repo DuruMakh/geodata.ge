@@ -1221,6 +1221,7 @@ test("every explorer route family renders the site footer", async ({ page }) => 
     "/explorer/revenue",
     "/explorer/analysis",
     "/explorer/debt",
+    "/explorer/deficit",
     "/explorer/municipalities",
     "/explorer/municipalities/oni",
     "/explorer/municipalities/georgia",
@@ -1375,14 +1376,14 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
   expect(consoleProblems).toEqual([]);
 });
 
-test("hub lists five cards, all five live", async ({ page }) => {
+test("hub lists six cards, all six live", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
   await page.goto(`${TEST_BASE_URL}/explorer`);
   await expectAppReady(page);
 
-  await expect(page.getByTestId("hub-card")).toHaveCount(5);
-  await expect(page.getByTestId("hub-card").locator("h2")).toHaveCount(5);
+  await expect(page.getByTestId("hub-card")).toHaveCount(6);
+  await expect(page.getByTestId("hub-card").locator("h2")).toHaveCount(6);
   for (const card of await page.getByTestId("hub-card").all()) {
     await expect(card.locator("h2")).toHaveCount(1);
   }
@@ -1417,6 +1418,11 @@ test("hub lists five cards, all five live", async ({ page }) => {
   await expect(debt).toContainText("ვალი");
   await expect(debt).toHaveAttribute("href", "/explorer/debt");
   await expect(debt).toContainText(/2025 · [\d,]+\.\d მლრდ ₾/);
+
+  const deficit = page.getByTestId("hub-card").nth(5);
+  await expect(deficit).toContainText("დეფიციტი");
+  await expect(deficit).toHaveAttribute("href", "/explorer/deficit");
+  await expect(deficit).toContainText("2025 · −1.5% მშპ-ის");
 
   // The card is not just styled as a link — clicking it actually lands on the
   // municipalities index.

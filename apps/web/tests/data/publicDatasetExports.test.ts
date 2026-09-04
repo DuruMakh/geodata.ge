@@ -24,6 +24,7 @@ describe("public SEO dataset exports", () => {
       ["national-revenue", 241],
       ["municipal-expenditure", 7865],
       ["government-debt", 126],
+      ["general-government-balance", 37],
     ]);
     expect(validations.every((row) => row.status === "PASS")).toBe(true);
 
@@ -31,8 +32,9 @@ describe("public SEO dataset exports", () => {
     const revenue = await readFile(path.join(publicRoot, "downloads/data/national-revenue.csv"));
     const municipal = await readFile(path.join(publicRoot, "downloads/data/municipal-expenditure.csv"));
     const debt = await readFile(path.join(publicRoot, "downloads/data/government-debt.csv"));
+    const deficit = await readFile(path.join(publicRoot, "downloads/data/general-government-balance.csv"));
 
-    for (const bytes of [expenditure, revenue, municipal, debt]) {
+    for (const bytes of [expenditure, revenue, municipal, debt, deficit]) {
       expect(bytes.subarray(0, 3)).toEqual(Buffer.from([0xef, 0xbb, 0xbf]));
     }
     expect(expenditure.toString("utf8")).toContain("year,side,item_id,amount_gel,basis,source_id");
@@ -42,6 +44,16 @@ describe("public SEO dataset exports", () => {
     expect(municipal.toString("utf8")).toContain("country.georgia,total,municipal.total");
     expect(debt.toString("utf8")).toContain("year,family,series_id,value,value_kind,status,source_id,snapshot_date,last_reviewed_at");
     expect(debt.toString("utf8")).toContain("projection_existing_portfolio");
+    const deficitText = deficit.toString("utf8");
+    expect(deficitText).toContain(
+      "year,general_government_balance_pct_gdp,general_government_balance_gel,status,source_id,last_reviewed_at",
+    );
+    expect(deficitText).toContain(
+      "2025,-1.455,-1526000000,actual,source.imf_weo_april_2026_general_government_balance,2026-09-04",
+    );
+    expect(deficitText).toContain(
+      "2026,-2.327,-2672000000,projection,source.imf_weo_april_2026_general_government_balance,2026-09-04",
+    );
   });
 
   it("check mode returns the same hashes without writing public files", async () => {
@@ -49,8 +61,8 @@ describe("public SEO dataset exports", () => {
     tempRoots.push(root);
     const validations = await preparePublicDatasets({ repositoryRoot, publicRoot: root, mode: "check" });
 
-    expect(validations).toHaveLength(4);
-    expect(new Set(validations.map((row) => row.sha256)).size).toBe(4);
+    expect(validations).toHaveLength(5);
+    expect(new Set(validations.map((row) => row.sha256)).size).toBe(5);
     await expect(readFile(path.join(root, "downloads/data/national-expenditure.csv"))).rejects.toThrow();
   });
 });

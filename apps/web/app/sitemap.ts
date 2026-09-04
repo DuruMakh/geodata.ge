@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../lib/data/servedData";
+import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../lib/data/servedData";
 import { ADJARA_REGION_ID } from "../lib/data/municipal/types";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../lib/methodology/catalog";
 import {
@@ -10,7 +10,7 @@ import {
 } from "../lib/explorer/municipalData";
 import { MUNICIPALITY_ROUTES } from "../lib/explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../lib/siteUrl";
-import { DEBT_EXPLORER_PATH } from "../lib/seo/internalLinks";
+import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "../lib/seo/internalLinks";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
@@ -22,10 +22,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
+    loadServedGeneralGovernmentBalanceData(),
   ]);
   const lastReviewedAt = sourceDocuments
     .map((source) => source.lastReviewedAt)
@@ -65,6 +66,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}${DEBT_EXPLORER_PATH}`,
       lastModified: debtFacts.length > 0
         ? new Date(debtFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!)
+        : undefined,
+    },
+    {
+      url: `${siteUrl}${DEFICIT_EXPLORER_PATH}`,
+      lastModified: balanceFacts.length > 0
+        ? new Date(balanceFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!)
         : undefined,
     },
     {
