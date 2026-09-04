@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "dataset": "IMF.RES:WEO(9.0.0)",
+  "sourceBytes": 5585205,
+  "sourceSha256": "B29239CB48F8B895D1E526070C4FDE01147BC8F6BD3B86F636363BB6BD87FE7A",
+  "sourceFactCount": 111,
+  "canonicalFactCount": 37,
+  "canonicalYearMin": 1995,
+  "canonicalYearMax": 2031,
+  "latestActualYear": 2025,
+  "firstProjectionYear": 2026,
+  "reconciliationTolerancePercentagePoints": 0.02,
+  "maximumReconciliationDifferencePercentagePoints": 0.014782884310618067,
+  "reconciliationFailureYears": []
+}

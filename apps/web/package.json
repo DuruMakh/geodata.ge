@@ -24,6 +24,8 @@
     "data:check-government-debt": "tsx scripts/prepare-government-debt.ts --check",
     "data:prepare-national-gdp": "tsx scripts/prepare-national-gdp.ts --write",
     "data:check-national-gdp": "tsx scripts/prepare-national-gdp.ts --check",
+    "data:prepare-general-government-balance": "tsx scripts/prepare-general-government-balance.ts --write",
+    "data:check-general-government-balance": "tsx scripts/prepare-general-government-balance.ts --check",
     "data:extract-expenditure": "tsx scripts/extract-real-expenditure.ts",
     "data:extract-expenditure-pdf-pilot": "tsx scripts/extract-expenditure-pdf-pilot.ts",
     "data:extract-expenditure-pdf-2007": "tsx scripts/extract-expenditure-pdf-pilot.ts --year 2007",
