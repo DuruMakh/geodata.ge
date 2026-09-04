@@ -104,3 +104,13 @@ source.treasury_consolidated_revenue_actual,Treasury annual consolidated-revenue
 source.adjara_consolidated_budget,Reviewed consolidated Adjara calculation — municipalities plus republican payments minus internal transfers,data/imports/municipal-adjara-budget-adjustments-2015-2025.csv,2026-08-16
 source.geostat_municipal_population,Geostat population as of 1 January by self-governed units,docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx,2026-08-03
 source.imf_weo_april_2026_general_government_balance,IMF WEO April 2026 general government net lending or borrowing for Georgia,docs/Raw Data/Deficit/imf-weo-general-government-balance/official/WEOApr2026all.xlsx,2026-09-04
+source.mof_public_debt_bulletin_n7,Public Debt of Georgia Statistical Bulletin N7,docs/Raw Data/Debt/government-debt-annual/official/public-debt-bulletin-n7.pdf,2026-09-01
+source.mof_public_debt_bulletin_n13,Public Debt of Georgia Statistical Bulletin N13,docs/Raw Data/Debt/government-debt-annual/official/public-debt-bulletin-n13.pdf,2026-09-01
+source.mof_public_debt_bulletin_n19,Public Debt of Georgia Statistical Bulletin N19,docs/Raw Data/Debt/government-debt-annual/official/public-debt-bulletin-n19.pdf,2026-09-01
+source.mof_public_debt_bulletin_n25,Public Debt of Georgia Statistical Bulletin N25,docs/Raw Data/Debt/government-debt-annual/official/public-debt-bulletin-n25.pdf,2026-09-01
+source.mof_monthly_debt_report_2026_07,Monthly Debt Report July 2026,docs/Raw Data/Debt/government-debt-annual/official/monthly-debt-report-2026-07.pdf,2026-09-01
+source.mof_debt_strategy_2019_2021,General Government Debt Management Strategy 2019-2021,docs/Raw Data/Debt/government-debt-annual/official/debt-management-strategy-2019-2021.pdf,2026-09-01
+source.mof_debt_strategy_2022_2025,General Government Debt Management Strategy 2022-2025,docs/Raw Data/Debt/government-debt-annual/official/debt-management-strategy-2022-2025.pdf,2026-09-01
+source.mof_debt_strategy_2023_2026,General Government Debt Management Strategy 2023-2026,docs/Raw Data/Debt/government-debt-annual/official/debt-management-strategy-2023-2026.pdf,2026-09-01
+source.mof_debt_strategy_2025_2029,General Government Debt Management Strategy 2025-2029,docs/Raw Data/Debt/government-debt-annual/official/debt-management-strategy-2025-2029.pdf,2026-09-01
+source.mof_central_government_liabilities_control,Central Government Debt Liabilities by Maturity; Residency; and Instrument with reference to GFSM 2001,docs/Raw Data/Debt/government-debt-annual/official/central-government-debt-liabilities-control.xlsx,2026-09-01

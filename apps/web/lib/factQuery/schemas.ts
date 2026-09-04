@@ -93,10 +93,13 @@ export const compareInput = z
       z.object({ dataset: z.literal("national"), side: z.enum(["revenue", "expenditure"]), seriesIds: seriesIdList }),
       z.object({ dataset: z.literal("ministries"), level: z.enum(["admin_category", "major_program"]), seriesIds: seriesIdList }),
       z.object({ dataset: z.literal("municipal"), entityIds: entityIdList, seriesIds: seriesIdList }),
+      z.object({ dataset: z.literal("debt"), seriesIds: seriesIdList }),
+      // No seriesIds: the balance dataset has exactly one series.
+      z.object({ dataset: z.literal("deficit") }),
     ]),
     fromYear: z.number().int(),
     toYear: z.number().int(),
-    measure: z.enum(["amount_gel", "share_of_total_pct", "share_of_gdp_pct", "gel_per_resident"]),
+    measure: z.enum(["amount_gel", "share_of_total_pct", "share_of_gdp_pct", "gel_per_resident", "rate_percent"]),
     expectedDataVersion,
   })
   .refine((input) => input.fromYear < input.toYear, { message: "fromYear must be earlier than toYear" });

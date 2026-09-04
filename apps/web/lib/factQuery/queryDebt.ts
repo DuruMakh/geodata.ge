@@ -86,6 +86,17 @@ function valueDefinitionFor(family: Family, measure: string): string {
     : "წლის განმავლობაში გადახდილი თანხა ლარში.";
 }
 
+/**
+ * The reviewed debt facts cite a document by its bare manifest id
+ * (`mof_public_debt_bulletin_n25`), while data/sources/source-documents.csv
+ * requires dot-namespaced ids and registers the same documents as
+ * `source.mof_...`. Translating here keeps both files in the form their own
+ * validator demands, instead of editing reviewed rows to satisfy a registry.
+ */
+function registrySourceId(id: string): string {
+  return id.startsWith("source.") ? id : `source.${id}`;
+}
+
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
 }
@@ -180,7 +191,10 @@ export function queryDebt(
         missingReason = RATE_NOT_PUBLISHED_REASON;
       } else {
         basis = basisOf(fact.status);
-        const factSourceIds = fact.sourceId === null ? [] : splitSourceIds(fact.sourceId);
+        const factSourceIds =
+          fact.sourceId === null || fact.sourceId === ""
+            ? []
+            : splitSourceIds(fact.sourceId).map(registrySourceId);
 
         if (input.measure === "share_of_gdp_pct") {
           usedGdpYears.add(year);

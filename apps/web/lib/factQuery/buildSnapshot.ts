@@ -99,6 +99,8 @@ function yearRangeOf(row: {
   normalized_year_max?: number;
   year_min?: number;
   year_max?: number;
+  used_period_min?: number;
+  used_period_max?: number;
 }): { min: number; max: number } | null {
   if (row.selected_year_min !== undefined && row.selected_year_max !== undefined) {
     return { min: row.selected_year_min, max: row.selected_year_max };
@@ -108,6 +110,13 @@ function yearRangeOf(row: {
   }
   if (row.year_min !== undefined && row.year_max !== undefined) {
     return { min: row.year_min, max: row.year_max };
+  }
+  // used_period_*, not source_period_*: the debt manifest records both, and the
+  // years this repository actually took from a document are the ones a citation
+  // should claim. A bulletin covering 2013-2030 that we read 2013-2016 from
+  // must not advertise coverage it did not supply here.
+  if (row.used_period_min !== undefined && row.used_period_max !== undefined) {
+    return { min: row.used_period_min, max: row.used_period_max };
   }
   return null;
 }
@@ -139,11 +148,13 @@ export const packageManifestRowSchema = z.object({
   normalized_year_max: blankableYear,
   year_min: blankableYear,
   year_max: blankableYear,
+  used_period_min: blankableYear,
+  used_period_max: blankableYear,
 }).refine(
   (row) => yearRangeOf(row) !== null,
   {
     message:
-      "a package manifest row needs a complete selected_year_min/max, normalized_year_min/max or year_min/max pair",
+      "a package manifest row needs a complete selected_year_min/max, normalized_year_min/max, year_min/max or used_period_min/max pair",
   },
 ).refine((row) => (row.dataset_title ?? row.dataset) !== undefined, {
   message: "a package manifest row needs a dataset_title or a dataset",
@@ -166,6 +177,10 @@ const PACKAGE_MANIFEST_DIRECTORIES: readonly (readonly string[])[] = [
   // provenance gate sees the source; without this directory it resolved to no
   // public document at all - the same failure the Geostat package had.
   ["docs", "Raw Data", "Deficit", "imf-weo-general-government-balance"],
+  // The Ministry of Finance bulletins, strategies and reports behind the debt
+  // dataset. Without this, every debt figure would ship with an empty
+  // meta.sources - a number no reader could trace.
+  ["docs", "Raw Data", "Debt", "government-debt-annual"],
 ];
 
 function yearsBetween(first: number, last: number): number[] {
@@ -257,7 +272,12 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
         datasetId: null,
         sha256: row.sha256,
         byteSize: row.bytes,
-        mediaType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        // The GDP and Geostat packages are workbooks; the debt package is mostly
+        // PDF bulletins. Derived from the file rather than assumed, so a
+        // citation does not describe a PDF as a spreadsheet.
+        mediaType: row.local_file.toLowerCase().endsWith(".pdf")
+          ? "application/pdf"
+          : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         retrievedAt: row.retrieved_at,
         // The package manifests carry no licence or attribution column;
         // reported as absent rather than filled with a guess.

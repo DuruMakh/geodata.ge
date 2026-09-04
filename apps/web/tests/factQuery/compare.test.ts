@@ -543,3 +543,56 @@ describe("compare", () => {
     });
   });
 });
+
+describe("the country-level datasets", () => {
+  it("compares two debt stock years", () => {
+    const response = compare(snapshot, {
+      target: { dataset: "debt", seriesIds: ["debt.stock.total"] },
+      fromYear: 2015,
+      toYear: 2024,
+      measure: "amount_gel",
+    });
+
+    if (response.kind !== "comparisons") throw new Error(`expected comparisons, got ${response.kind}`);
+    const rows = (response.data as { comparisons: { absoluteChange: number | null; comparability: string }[] }).comparisons;
+    expect(rows[0]!.absoluteChange).not.toBeNull();
+    expect(rows[0]!.comparability).toBe("comparable");
+  });
+
+  it("refuses to compare a recorded service year with a projected one", () => {
+    // debt_service_projection carries comparisonEffect "breaks", so this needs
+    // no arithmetic of its own - the existing machinery downgrades it.
+    const response = compare(snapshot, {
+      target: { dataset: "debt", seriesIds: ["debt.service.total"] },
+      fromYear: 2024,
+      toYear: 2027,
+      measure: "amount_gel",
+    });
+
+    if (response.kind !== "comparisons") throw new Error(`expected comparisons, got ${response.kind}`);
+    const rows = (response.data as { comparisons: { comparability: string }[] }).comparisons;
+    expect(rows[0]!.comparability).toBe("not_comparable");
+  });
+
+  it("compares two recorded balance years and refuses a forecast endpoint", () => {
+    const recorded = compare(snapshot, {
+      target: { dataset: "deficit" },
+      fromYear: 2015,
+      toYear: 2024,
+      measure: "share_of_gdp_pct",
+    });
+    if (recorded.kind !== "comparisons") throw new Error("expected comparisons");
+    expect((recorded.data as { comparisons: { comparability: string }[] }).comparisons[0]!.comparability).toBe("comparable");
+
+    const forecast = compare(snapshot, {
+      target: { dataset: "deficit" },
+      fromYear: 2024,
+      toYear: 2030,
+      measure: "share_of_gdp_pct",
+    });
+    if (forecast.kind !== "comparisons") throw new Error("expected comparisons");
+    expect((forecast.data as { comparisons: { comparability: string }[] }).comparisons[0]!.comparability).toBe(
+      "not_comparable",
+    );
+  });
+});

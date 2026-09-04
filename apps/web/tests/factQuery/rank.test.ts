@@ -733,3 +733,23 @@ describe("rank", () => {
     });
   });
 });
+
+describe("country-level datasets", () => {
+  it("refuses to rank debt or the balance", () => {
+    // Both have exactly one entity and no entity dimension, so a ranking would
+    // be a list of one. rankInput's enum is what refuses them.
+    for (const datasetId of ["government-debt", "general-government-balance"]) {
+      const response = rank(snapshot, {
+        datasetId,
+        dimension: "entities",
+        year: 2024,
+        measure: "amount_gel",
+        metric: "value",
+      });
+
+      expect(response.kind).toBe("error");
+      if (response.kind !== "error") throw new Error("unreachable");
+      expect(response.error.code).toBe("invalid_parameters");
+    }
+  });
+});

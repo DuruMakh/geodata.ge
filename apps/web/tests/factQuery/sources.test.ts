@@ -168,9 +168,10 @@ describe("public source resolution", () => {
         .map((source) => source.sourceId);
 
       expect(unresolved).toEqual([]);
-      // 105 since the deficit merge added the IMF WEO workbook behind the
-      // general government balance.
-      expect(snapshot.sources.length).toBe(105);
+      // 105 after the deficit merge added the IMF WEO workbook, then 115 once
+      // the ten Ministry of Finance debt documents were registered so debt
+      // figures could cite them.
+      expect(snapshot.sources.length).toBe(115);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {
@@ -393,5 +394,35 @@ describe("public source resolution", () => {
 
       expect(Array.from(roles)).toEqual(["primary"]);
     });
+  });
+});
+
+describe("the debt and balance sources", () => {
+  it("resolves every source id those facts cite", async () => {
+    // Every response carries meta.sources, so a fact whose source id has no
+    // manifest row would ship a number with no citation. This is exactly the
+    // failure the deficit merge produced: the IMF source was registered in
+    // source-documents.csv while its manifest directory was read by nothing.
+    const snapshot = await buildFactQuerySnapshot(OPTIONS);
+    // The debt facts cite bare manifest ids; queryDebt namespaces them to the
+    // registry's form, so this joins the same way the query does.
+    const cited = new Set<string>([
+      ...snapshot.debt.facts
+        .map((fact) => fact.sourceId)
+        .filter((id): id is string => id !== null && id !== "")
+        .map((id) => (id.startsWith("source.") ? id : `source.${id}`)),
+      ...snapshot.deficit.facts.map((fact) => fact.sourceId),
+    ]);
+    const resolved = new Map(snapshot.sources.map((source) => [source.sourceId, source]));
+
+    expect(cited.size).toBeGreaterThan(0);
+    for (const id of cited) {
+      const source = resolved.get(id);
+      expect(source, `${id} is cited by a fact but absent from snapshot.sources`).toBeDefined();
+      expect(
+        source!.documents.length > 0 || source!.derivation !== null,
+        `${id} resolves to neither a public document nor a stated derivation`,
+      ).toBe(true);
+    }
   });
 });

@@ -12,11 +12,16 @@ import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import { DEFICIT_SERIES_ID } from "./types";
 import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
 
+// Typed as DatasetId[] rather than derived from the union, so widening
+// DatasetId does NOT force an entry here - unlike DATASET_META below, which is
+// a Record and does. Adding a dataset means adding it in both places.
 const DATASET_IDS: readonly DatasetId[] = [
   "national-revenue",
   "national-expenditure",
   "ministries",
   "municipal-expenditure",
+  "government-debt",
+  "general-government-balance",
 ];
 
 type EntityType = "country" | "municipality" | "region";

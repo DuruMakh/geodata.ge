@@ -20,6 +20,8 @@
 import { CAVEAT_RULES } from "./caveats";
 import { buildResponseMeta } from "./meta";
 import { queryMinistries } from "./queryMinistries";
+import { queryDebt } from "./queryDebt";
+import { queryDeficit } from "./queryDeficit";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
@@ -205,6 +207,21 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       },
       comparisonWindow,
     );
+  } else if (target.dataset === "debt") {
+    datasetId = "government-debt";
+    endpointResult = queryDebt(
+      snapshot,
+      {
+      seriesIds: target.seriesIds,
+      years,
+      measure: input.measure,
+      },
+      comparisonWindow,
+    );
+  } else if (target.dataset === "deficit") {
+    datasetId = "general-government-balance";
+    // No seriesIds: the dataset has exactly one series.
+    endpointResult = queryDeficit(snapshot, { years, measure: input.measure }, comparisonWindow);
   } else {
     datasetId = "municipal-expenditure";
     endpointResult = queryMunicipal(

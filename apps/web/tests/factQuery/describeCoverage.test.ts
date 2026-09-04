@@ -22,11 +22,45 @@ type CoverageData = {
 const data = (result: ReturnType<typeof describeCoverage>) => (result as { data: CoverageData }).data;
 
 describe("describeCoverage", () => {
-  it("returns a conforming catalogue envelope with all four datasets", () => {
+  it("lists debt and the balance with the ranges their own facts carry", () => {
+    const response = describeCoverage(snapshot, {});
+    if (response.kind !== "catalogue") throw new Error("expected a catalogue");
+    const byId = new Map(
+      (response.data as { datasets: { datasetId: string; years: [number, number]; budgetScope: string }[] }).datasets.map(
+        (dataset) => [dataset.datasetId, dataset],
+      ),
+    );
+
+    expect(byId.get("government-debt")!.years).toEqual([2013, 2030]);
+    expect(byId.get("general-government-balance")!.years).toEqual([1995, 2031]);
+
+    // The boundary slug is half of a join: an observation carries the same
+    // string, and budget_scopes_differ exists because boundaries that share a
+    // shape are not the same concept.
+    expect(byId.get("government-debt")!.budgetScope).toBe("central_government_liabilities");
+    expect(byId.get("general-government-balance")!.budgetScope).toBe("general_government_imf");
+  });
+
+  it("gives the debt rate series only the years a reviewed source published", () => {
+    const response = describeCoverage(snapshot, { datasetId: "government-debt" });
+    if (response.kind !== "catalogue") throw new Error("expected a catalogue");
+    const series = new Map(
+      (response.data as { series: { seriesId: string; years: number[] }[] }).series.map((s) => [s.seriesId, s.years]),
+    );
+
+    // Ragged on purpose. Listing a year here that carries no rate would tell a
+    // client one exists.
+    expect(series.get("debt.rate.external")).not.toContain(2016);
+    expect(series.get("debt.rate.total")).toContain(2016);
+  });
+
+  it("returns a conforming catalogue envelope with every dataset", () => {
     const result = describeCoverage(snapshot, {});
     expect(envelopeSchema.parse(result)).toBeTruthy();
     expect(result.kind).toBe("catalogue");
     expect(data(result).datasets.map((d) => d.datasetId).sort()).toEqual([
+      "general-government-balance",
+      "government-debt",
       "ministries",
       "municipal-expenditure",
       "national-expenditure",
