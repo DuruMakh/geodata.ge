@@ -32,7 +32,7 @@ The manifest lists the four dataset files, so they are reachable without repeati
 
 ## AI connection
 
-- [AI connection guide](https://fiscal.ge/connect) — how to connect an AI client, with example questions and the exact coverage.
+- [AI connection guide](https://fiscal.ge/connect) — how to connect an AI client, with the exact command per client and the exact coverage.
 
 The endpoint is `https://fiscal.ge/mcp`, MCP Streamable HTTP, protocol revision 2025-11-25, stateless and unauthenticated. It exposes seven read-only tools: describe_coverage, query_national, query_ministries, query_municipal, compare, rank and get_sources. Call describe_coverage first — it returns the ids, measures and year ranges that exist, so nothing has to be guessed. Every answer carries its sources and any caveats that qualify it.
 
