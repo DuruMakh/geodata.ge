@@ -18,6 +18,7 @@ async function expectNoPageOverflow(page: Page) {
 }
 
 for (const viewport of [
+  { width: 320, height: 844 },
   { width: 390, height: 844 },
   { width: 767, height: 900 },
   { width: 768, height: 900 },
@@ -81,7 +82,7 @@ for (const viewport of [
       expect(gridColumns).toHaveLength(viewport.width === 767 ? 1 : 3);
     }
 
-    if (viewport.width === 390) {
+    if (viewport.width === 320 || viewport.width === 390) {
       await expectNoPageOverflow(page);
 
       const cover = page.getByTestId("mission-cover");
