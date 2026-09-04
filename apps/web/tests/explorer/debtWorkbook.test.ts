@@ -222,10 +222,34 @@ describe("Debt workbook adapter", () => {
       ["საშინაო ვალი", { 2013: 0.125, 2014: 0.125 }],
     ]);
     expect(model.analysis.headers).toEqual(["წელი", "მთავარი ჯგუფი", "კატეგორია", "თანხა (₾)", "სტატუსი", "მშპ-ის წილი (%)"]);
+    expect(model.analysis.rows.map((row) => row[2])).toEqual([
+      "საშინაო ვალი",
+      "საშინაო ვალი",
+    ]);
     expect(model.sources.map((source) => source.titleKa)).toEqual([
       "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
       "მშპ მიმდინარე ფასებში — SNA 2008",
     ]);
+  });
+
+  it("keeps derived service totals out of the machine-friendly sheet when a component is selected", () => {
+    const serviceFacts: ServedGovernmentDebtFact[] = [
+      { year: 2025, family: "service", seriesId: "debt.service.total", value: 4_000_000_000, valueKind: "amount_gel", status: "actual", sourceId: "mof_public_debt_bulletin_n25", snapshotDate: null, lastReviewedAt: "2026-09-01" },
+      { year: 2025, family: "service", seriesId: "debt.service.principal", value: 2_500_000_000, valueKind: "amount_gel", status: "actual", sourceId: "mof_public_debt_bulletin_n25", snapshotDate: null, lastReviewedAt: "2026-09-01" },
+    ];
+    const model = buildDebtWorkbookExportModel({
+      facts: serviceFacts,
+      gdpFacts: [],
+      family: "service",
+      selectedIds: ["debt.service.total", "debt.service.principal"],
+      range: { start: 2025, end: 2025 },
+      shareOfGdp: false,
+      sources: debtSources,
+      gdpSources: [],
+      siteOrigin: "https://fiscal.ge",
+    });
+
+    expect(model.analysis.rows.map((row) => row[2])).toEqual(["ძირი თანხა"]);
   });
 
   it("exports rates as percentages with exact gaps and no invented GEL amount", () => {
