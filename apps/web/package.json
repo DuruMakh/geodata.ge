@@ -15,6 +15,8 @@
     "start": "next start",
     "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
+    "//pretest": "The MCP tests read the generated snapshot, which is gitignored and built by predev/prebuild. CI runs npm test BEFORE npm run build, so on a fresh checkout every loadPackagedSnapshot test threw snapshot_unavailable. npm runs pretest automatically, which keeps a clean clone working too.",
+    "pretest": "npm run data:prepare-fact-query-snapshot",
     "test": "vitest run --configLoader native --maxWorkers=4",
     "test:browser": "playwright test",
     "test:watch": "vitest",
