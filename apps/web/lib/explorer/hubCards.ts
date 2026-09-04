@@ -1,8 +1,12 @@
-import type { ServedBudgetFact, ServedGovernmentDebtFact } from "../servedRows";
+import type {
+  ServedBudgetFact,
+  ServedGeneralGovernmentBalanceFact,
+  ServedGovernmentDebtFact,
+} from "../servedRows";
 import { MUNICIPAL_COUNTRY_BUDGET_COUNT } from "./municipalData";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { isDerivedTotalItemId } from "./explorerData";
-import { formatAmount } from "./format";
+import { formatAmount, formatShare } from "./format";
 import { INK } from "./colors";
 import { BUDGET_SECTIONS } from "./sections";
 
@@ -58,6 +62,7 @@ export function buildHubCards(
   facts: ServedBudgetFact[],
   municipalTotals: Map<number, number>,
   debtFacts: ServedGovernmentDebtFact[],
+  balanceFacts: ServedGeneralGovernmentBalanceFact[] = [],
 ): HubCardModel[] {
   const expenditure = totalsByYear(facts, "expenditure");
   const revenue = totalsByYear(facts, "revenue");
@@ -92,6 +97,9 @@ export function buildHubCards(
     }
   }
   const debt = build(debtTotals);
+  const actualBalanceFacts = balanceFacts.filter((fact) => fact.status === "actual");
+  const balanceYears = actualBalanceFacts.map((fact) => fact.year).sort((a, b) => a - b);
+  const latestBalance = actualBalanceFacts.find((fact) => fact.year === balanceYears.at(-1)) ?? null;
   const analysisYear = spend.latest;
 
   return [
@@ -154,6 +162,20 @@ export function buildHubCards(
       series: debt.series,
       seriesColor: debt.series === null ? null : INK,
       footer: debt.footer,
+    },
+    {
+      index: "06",
+      title: BUDGET_SECTIONS.deficit.label,
+      description: "ზოგადი მთავრობის დეფიციტი ან პროფიციტი — მშპ-ის წილი და თანხა ლარში.",
+      href: BUDGET_SECTIONS.deficit.href,
+      comingSoon: BUDGET_SECTIONS.deficit.href === null,
+      series: actualBalanceFacts.length > 0
+        ? balanceYears.map((year) => actualBalanceFacts.find((fact) => fact.year === year)?.generalGovernmentBalancePctGdp ?? null)
+        : null,
+      seriesColor: actualBalanceFacts.length > 0 ? INK : null,
+      footer: latestBalance === null
+        ? null
+        : `${latestBalance.year} · ${formatShare(latestBalance.generalGovernmentBalancePctGdp / 100)} მშპ-ის`,
     },
   ];
 }

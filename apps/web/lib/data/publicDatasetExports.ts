@@ -9,7 +9,8 @@ export type PublicDatasetId =
   | "national-expenditure"
   | "national-revenue"
   | "municipal-expenditure"
-  | "government-debt";
+  | "government-debt"
+  | "general-government-balance";
 
 export type PublicDatasetValidation = {
   status: "PASS";
@@ -113,6 +114,9 @@ export async function preparePublicDatasets(options: {
   const imports = path.join(options.repositoryRoot, "data", "imports");
   const budgetRows = await readCsv(path.join(imports, "budget-facts-2004-2025.csv"));
   const debtRows = await readCsv(path.join(imports, "government-debt-facts-2013-2030.csv"));
+  const balanceRows = await readCsv(
+    path.join(imports, "general-government-balance-annual-1995-2031.csv"),
+  );
   const expenditureRows = budgetRows.filter((row) => row.side === "expenditure").toSorted(byYearAndId);
   const revenueRows = budgetRows.filter((row) => row.side === "revenue").toSorted(byYearAndId);
 
@@ -163,6 +167,19 @@ export async function preparePublicDatasets(options: {
         "snapshot_date",
         "last_reviewed_at",
       ], debtRows),
+    },
+    {
+      datasetId: "general-government-balance" as const,
+      fileName: "general-government-balance.csv",
+      rows: balanceRows,
+      bytes: serialize([
+        "year",
+        "general_government_balance_pct_gdp",
+        "general_government_balance_gel",
+        "status",
+        "source_id",
+        "last_reviewed_at",
+      ], balanceRows),
     },
   ];
 

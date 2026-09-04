@@ -28,6 +28,10 @@ export function governmentDebtFactParityKey(row: {
   return [row.year, row.seriesId].join(":");
 }
 
+export function generalGovernmentBalanceFactParityKey(row: { year: number }): string {
+  return String(row.year);
+}
+
 export function municipalFunctionFactParityKey(row: {
   year: number;
   municipalityCode: string;

@@ -1,0 +1,112 @@
+﻿year,indicator_id,series_code,value,unit,scale,status,source_id,source_sheet,source_cell
+1995,GGXCNL,GEO.GGXCNL.A,-0.123,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AS5621
+1995,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-4.888,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,AS5622
+1995,NGDP_FY,GEO.NGDP_FY.A,2.524,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AS5631
+1996,GGXCNL,GEO.GGXCNL.A,-0.235,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AT5621
+1996,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-5.910,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,AT5622
+1996,NGDP_FY,GEO.NGDP_FY.A,3.974,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AT5631
+1997,GGXCNL,GEO.GGXCNL.A,-0.318,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AU5621
+1997,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-6.632,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,AU5622
+1997,NGDP_FY,GEO.NGDP_FY.A,4.792,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AU5631
+1998,GGXCNL,GEO.GGXCNL.A,-0.206,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AV5621
+1998,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-3.963,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,AV5622
+1998,NGDP_FY,GEO.NGDP_FY.A,5.208,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AV5631
+1999,GGXCNL,GEO.GGXCNL.A,-0.275,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AW5621
+1999,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-4.703,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,AW5622
+1999,NGDP_FY,GEO.NGDP_FY.A,5.853,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AW5631
+2000,GGXCNL,GEO.GGXCNL.A,-0.119,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AX5621
+2000,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-1.921,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,AX5622
+2000,NGDP_FY,GEO.NGDP_FY.A,6.213,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AX5631
+2001,GGXCNL,GEO.GGXCNL.A,-0.049,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AY5621
+2001,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-0.707,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,AY5622
+2001,NGDP_FY,GEO.NGDP_FY.A,6.861,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AY5631
+2002,GGXCNL,GEO.GGXCNL.A,-0.014,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AZ5621
+2002,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-0.186,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,AZ5622
+2002,NGDP_FY,GEO.NGDP_FY.A,7.665,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,AZ5631
+2003,GGXCNL,GEO.GGXCNL.A,-0.048,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BA5621
+2003,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-0.548,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BA5622
+2003,NGDP_FY,GEO.NGDP_FY.A,8.805,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BA5631
+2004,GGXCNL,GEO.GGXCNL.A,0.363,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BB5621
+2004,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,3.592,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BB5622
+2004,NGDP_FY,GEO.NGDP_FY.A,10.100,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BB5631
+2005,GGXCNL,GEO.GGXCNL.A,0.256,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BC5621
+2005,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,2.145,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BC5622
+2005,NGDP_FY,GEO.NGDP_FY.A,11.947,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BC5631
+2006,GGXCNL,GEO.GGXCNL.A,0.466,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BD5621
+2006,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,3.284,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BD5622
+2006,NGDP_FY,GEO.NGDP_FY.A,14.177,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BD5631
+2007,GGXCNL,GEO.GGXCNL.A,0.141,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BE5621
+2007,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,0.809,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BE5622
+2007,NGDP_FY,GEO.NGDP_FY.A,17.471,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BE5631
+2008,GGXCNL,GEO.GGXCNL.A,-0.377,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BF5621
+2008,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-1.922,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BF5622
+2008,NGDP_FY,GEO.NGDP_FY.A,19.611,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BF5631
+2009,GGXCNL,GEO.GGXCNL.A,-1.177,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BG5621
+2009,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-6.365,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BG5622
+2009,NGDP_FY,GEO.NGDP_FY.A,18.491,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BG5631
+2010,GGXCNL,GEO.GGXCNL.A,-0.992,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BH5621
+2010,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-4.477,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BH5622
+2010,NGDP_FY,GEO.NGDP_FY.A,22.149,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BH5631
+2011,GGXCNL,GEO.GGXCNL.A,-0.211,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BI5621
+2011,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-0.808,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BI5622
+2011,NGDP_FY,GEO.NGDP_FY.A,26.099,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BI5631
+2012,GGXCNL,GEO.GGXCNL.A,-0.198,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BJ5621
+2012,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-0.710,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BJ5622
+2012,NGDP_FY,GEO.NGDP_FY.A,27.897,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BJ5631
+2013,GGXCNL,GEO.GGXCNL.A,-0.364,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BK5621
+2013,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-1.248,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BK5622
+2013,NGDP_FY,GEO.NGDP_FY.A,29.138,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BK5631
+2014,GGXCNL,GEO.GGXCNL.A,-0.564,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BL5621
+2014,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-1.779,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BL5622
+2014,NGDP_FY,GEO.NGDP_FY.A,31.722,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BL5631
+2015,GGXCNL,GEO.GGXCNL.A,-0.402,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BM5621
+2015,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-1.163,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BM5622
+2015,NGDP_FY,GEO.NGDP_FY.A,34.548,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BM5631
+2016,GGXCNL,GEO.GGXCNL.A,-0.545,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BN5621
+2016,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-1.490,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BN5622
+2016,NGDP_FY,GEO.NGDP_FY.A,36.553,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BN5631
+2017,GGXCNL,GEO.GGXCNL.A,-0.187,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BO5621
+2017,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-0.452,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BO5622
+2017,NGDP_FY,GEO.NGDP_FY.A,41.340,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BO5631
+2018,GGXCNL,GEO.GGXCNL.A,-0.364,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BP5621
+2018,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-0.803,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BP5622
+2018,NGDP_FY,GEO.NGDP_FY.A,45.374,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BP5631
+2019,GGXCNL,GEO.GGXCNL.A,-0.907,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BQ5621
+2019,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-1.825,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BQ5622
+2019,NGDP_FY,GEO.NGDP_FY.A,49.726,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BQ5631
+2020,GGXCNL,GEO.GGXCNL.A,-4.559,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BR5621
+2020,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-9.158,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BR5622
+2020,NGDP_FY,GEO.NGDP_FY.A,49.789,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BR5631
+2021,GGXCNL,GEO.GGXCNL.A,-3.627,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BS5621
+2021,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-5.972,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BS5622
+2021,NGDP_FY,GEO.NGDP_FY.A,60.724,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BS5631
+2022,GGXCNL,GEO.GGXCNL.A,-1.602,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BT5621
+2022,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-2.198,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BT5622
+2022,NGDP_FY,GEO.NGDP_FY.A,72.860,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BT5631
+2023,GGXCNL,GEO.GGXCNL.A,-1.883,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BU5621
+2023,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-2.329,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BU5622
+2023,NGDP_FY,GEO.NGDP_FY.A,80.883,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BU5631
+2024,GGXCNL,GEO.GGXCNL.A,-2.109,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BV5621
+2024,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-2.267,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BV5622
+2024,NGDP_FY,GEO.NGDP_FY.A,93.022,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BV5631
+2025,GGXCNL,GEO.GGXCNL.A,-1.526,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BW5621
+2025,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-1.455,Percent,Units,actual,source.imf_weo_april_2026_general_government_balance,Countries,BW5622
+2025,NGDP_FY,GEO.NGDP_FY.A,104.818,Domestic currency,Billions,actual,source.imf_weo_april_2026_general_government_balance,Countries,BW5631
+2026,GGXCNL,GEO.GGXCNL.A,-2.672,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,BX5621
+2026,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-2.327,Percent,Units,projection,source.imf_weo_april_2026_general_government_balance,Countries,BX5622
+2026,NGDP_FY,GEO.NGDP_FY.A,114.825,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,BX5631
+2027,GGXCNL,GEO.GGXCNL.A,-2.898,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,BY5621
+2027,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-2.321,Percent,Units,projection,source.imf_weo_april_2026_general_government_balance,Countries,BY5622
+2027,NGDP_FY,GEO.NGDP_FY.A,124.887,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,BY5631
+2028,GGXCNL,GEO.GGXCNL.A,-3.150,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,BZ5621
+2028,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-2.319,Percent,Units,projection,source.imf_weo_april_2026_general_government_balance,Countries,BZ5622
+2028,NGDP_FY,GEO.NGDP_FY.A,135.831,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,BZ5631
+2029,GGXCNL,GEO.GGXCNL.A,-3.276,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,CA5621
+2029,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-2.218,Percent,Units,projection,source.imf_weo_april_2026_general_government_balance,Countries,CA5622
+2029,NGDP_FY,GEO.NGDP_FY.A,147.723,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,CA5631
+2030,GGXCNL,GEO.GGXCNL.A,-3.556,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,CB5621
+2030,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-2.213,Percent,Units,projection,source.imf_weo_april_2026_general_government_balance,Countries,CB5622
+2030,NGDP_FY,GEO.NGDP_FY.A,160.670,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,CB5631
+2031,GGXCNL,GEO.GGXCNL.A,-3.865,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,CC5621
+2031,GGXCNL_NGDP,GEO.GGXCNL_NGDP.A,-2.212,Percent,Units,projection,source.imf_weo_april_2026_general_government_balance,Countries,CC5622
+2031,NGDP_FY,GEO.NGDP_FY.A,174.738,Domestic currency,Billions,projection,source.imf_weo_april_2026_general_government_balance,Countries,CC5631

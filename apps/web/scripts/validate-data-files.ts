@@ -6,6 +6,7 @@ import { validateFoundationReferences } from "../lib/data/foundationValidation";
 import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
 import { buildImportReport } from "../lib/data/importReport";
+import { loadGeneralGovernmentBalanceFacts } from "../lib/data/generalGovernmentBalance/importGeneralGovernmentBalance";
 import { loadNationalGdpFacts } from "../lib/data/nationalGdp/importNationalGdp";
 import { checkMunicipalityGeometryOutputs } from "../lib/data/municipalGeometry/prepareMunicipalGeometry";
 import {
@@ -30,7 +31,7 @@ import {
   assertMunicipalCountryPanel,
 } from "../lib/data/municipal/sourceValidation";
 import { SERVED_DATA_FILES } from "../lib/data/servedData";
-import { loadSourceDocuments } from "../lib/data/sources";
+import { loadSourceDocuments, referencedSourceIds } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
 import { budgetRowsToCsvRows } from "./compose-budget-facts";
 
@@ -66,6 +67,9 @@ async function main() {
   const facts = await loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts);
   const adminSpendingFacts = await loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts);
   const nationalGdpFacts = await loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts);
+  const generalGovernmentBalanceFacts = await loadGeneralGovernmentBalanceFacts(
+    "../../data/imports/general-government-balance-annual-1995-2031.csv",
+  );
   const municipalFunctions = await loadMunicipalFunctionsFile(SERVED_DATA_FILES.municipalFunctions);
   const municipalRegions = await loadMunicipalRegionsFile(SERVED_DATA_FILES.municipalRegions);
   const municipalities = await loadMunicipalitiesFile(SERVED_DATA_FILES.municipalities);
@@ -86,6 +90,11 @@ async function main() {
   const report = buildImportReport("real-budget-2004-2025", facts);
   const missingGlossary = taxonomy.filter((item) => !glossary.has(item.id));
   const registeredSourceIds = new Set(sources.map((source) => source.sourceId));
+  for (const sourceId of referencedSourceIds(generalGovernmentBalanceFacts)) {
+    if (!registeredSourceIds.has(sourceId)) {
+      throw new Error(`General-government balance source is not registered: ${sourceId}`);
+    }
+  }
   const unresolvedAdminSpendingSourceIds = Array.from(
     new Set(
       adminSpendingFacts
@@ -274,6 +283,9 @@ async function main() {
   console.log(`Validated fact rows: ${facts.length}`);
   console.log(`Validated admin spending fact rows: ${adminSpendingFacts.length}`);
   console.log(`Validated national GDP fact rows: ${nationalGdpFacts.length}`);
+  console.log(
+    `Validated general-government balance fact rows: ${generalGovernmentBalanceFacts.length}`,
+  );
   console.log(`Report written: ${reportPath}`);
 }
 

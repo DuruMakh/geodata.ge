@@ -6,7 +6,10 @@ import type {
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { NationalGdpFact } from "../data/nationalGdp/types";
-import type { ServedGovernmentDebtFact } from "../servedRows";
+import type {
+  ServedGeneralGovernmentBalanceFact,
+  ServedGovernmentDebtFact,
+} from "../servedRows";
 import {
   ADJARA_REGION_ID,
   type AdjaraBudgetAdjustment,
@@ -182,6 +185,21 @@ export async function loadGovernmentDebtFactsFromMirror(
     status: row.status as ServedGovernmentDebtFact["status"],
     sourceId: row.sourceId,
     snapshotDate: row.snapshotDate === null ? null : isoDate(row.snapshotDate),
+    lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export async function loadGeneralGovernmentBalanceFactsFromMirror(
+  db: MirrorClient,
+): Promise<ServedGeneralGovernmentBalanceFact[]> {
+  const rows = await db.generalGovernmentBalanceFact.findMany({ orderBy: { year: "asc" } });
+
+  return rows.map((row) => ({
+    year: row.year,
+    generalGovernmentBalancePctGdp: Number(row.generalGovernmentBalancePctGdp),
+    generalGovernmentBalanceGel: Number(row.generalGovernmentBalanceGel),
+    status: row.status as ServedGeneralGovernmentBalanceFact["status"],
+    sourceId: row.sourceDocumentId,
     lastReviewedAt: isoDate(row.lastReviewedAt),
   }));
 }

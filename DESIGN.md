@@ -28,9 +28,9 @@ Superseded and must not appear in production:
 
 Fiscal.ge v1 is a Georgian-first national budget explorer for annual data. It is not a broad public-data catalog.
 
-V1 includes: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, Excel workbook export, Georgian-first UI, minimal public source label, internal provenance metadata.
+V1 includes: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, Excel workbook export, Georgian-first UI, minimal public source label, internal provenance metadata.
 
-V1 excludes: data catalog, capital and deficit explorers, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
+V1 excludes: data catalog, capital explorer, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
 Municipal budgets are an implemented v1 **section** in this branch at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). Production verification follows merge and deployment; this branch state is not evidence that the current municipal surfaces are live. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) remain markers only, with no data at all. Nothing about a marker may be styled as if it were live.
 
@@ -44,7 +44,8 @@ Year ranges in the UI always derive from loaded facts. Current reviewed coverage
 - Expenditure by ministries (administrative view): **2004–2025** categories; major-program drill-down rows exist from 2012 (partial) and are contiguous 2017–2025.
 - Revenue: **2005–2025** (11 top-level categories).
 - Municipal expenditure by functional category: **2015–2025** (10 main functions plus the public total headline). The public entity set is 64 municipalities across 11 data-bearing regions. Adjara's total combines its six municipalities with Adjara republican actual payments net of transfers to territorial budgets. The separate Georgia scope aggregates all 69 reviewed municipal-budget series and adds the same net Adjara amount once; the 110 function rows remain municipal-only. Five occupied-territory-associated bodies appear only inside that country aggregate. Implemented in this branch at `/explorer/municipalities` (§20); production deployment remains unverified as described above.
-- All current facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned facts ever load.
+- General-government balance: **1995–2031** (1995–2025 actual; 2026–2031 IMF projection), published directly as percent of GDP and nominal GEL.
+- All current budget facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned budget facts ever load; debt and deficit projections use the separate `პროგნოზი` treatment.
 
 ## 3. Design Direction
 
@@ -269,14 +270,14 @@ page:
 
 No screen card, no outer container. Content sits directly on paper.
 
-**Exception: the explorer shell** (§6.7) — `/explorer` and its five sections use a sidebar + content-column layout instead, with different max-width and padding. This page shell applies to the landing page (§19) only.
+**Exception: the explorer shell** (§6.7) — `/explorer` and its six sections use a sidebar + content-column layout instead, with different max-width and padding. This page shell applies to the landing page (§19) only.
 
 ### 6.2 Information Architecture
 
 The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: a budget hub and its sections, all mounted under `/explorer` inside the shell of §6.7.
 
 ```text
-/explorer                              budget hub — the five sections as cards
+/explorer                              budget hub — the six sections as cards
 /explorer/expenditure                  ხარჯები           multi-year expenditure explorer (fields/ministries grouping)
 /explorer/revenue                      შემოსავლები       multi-year revenue explorer
 /explorer/municipalities               მუნიციპალიტეტები  index — municipality-grain map, ranked list, KPIs (§20)
@@ -286,13 +287,14 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/analysis                     ანალიზი           single-year analysis view (own side switch, grouping switch
                                                           for expenditure, and year selector)
 /explorer/debt                         ვალი              Government Debt stock, service, and rate explorer (§8.5)
+/explorer/deficit                      დეფიციტი          General-government balance explorer (§8.6)
 ```
 
 Outside `/explorer` and alongside `/about` sit the two editorial pages: `/about` (§2) and `/connect`, the MCP connection page (§23).
 
 Public municipality routes use the explicit lowercase-ASCII `[slug]` registry. Numeric municipality codes remain internal data, geometry, and join identifiers; they are not the public route identity.
 
-The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი`.
+The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი`, `დეფიციტი`.
 
 Every surface under `/explorer` opens with the **breadcrumb row** (§6.7): `მთავარი / მონაცემები / ბიუჯეტი` on the hub, `მთავარი / მონაცემები / ბიუჯეტი / <section>` on a section. Municipality entity pages extend that hierarchy through their real region before the municipality name (`… / მუნიციპალიტეტები / იმერეთი / ჭიათურა`); the visible trail and `BreadcrumbList` JSON-LD use the same region route. Its right slot is a mono **coverage** label — `{minYear}–{maxYear} · განახლდა {YYYY-MM-DD}` for the route's active scope, not the user's selection (the range strip owns that, and the two facts live at different altitudes).
 
@@ -343,7 +345,7 @@ spacing:
 - Border radius: **0–3px everywhere** (buttons 2px, tooltip 3px). Exception: the national `% მშპ-ში` measure pill, the municipal `% წილი` measure pill, and slider handles/ticks use `999px`.
 - Shadows: only the chart tooltip (`0 4px 16px rgba(30,27,22,0.10)`) and slider handles (`0 1px 3px rgba(30,27,22,0.15)`). Nothing else casts a shadow.
 - Swatches are **14×3px bars**, never dots or rounded squares.
-- **Exception: budget hub cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow). Five peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
+- **Exception: budget hub cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow). Six peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
 
 ### 6.7 Shell and Sidebar
 
@@ -354,12 +356,12 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
 - `ბიუჯეტი` — the active dataset: `2px accent` left border, active-row background, sans 12.5/600 in `paper`. Not a link; it is where you already are.
-- Its five sections nest beneath it (below).
+- Its six sections nest beneath it (below).
 - `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, mono glyph `«` (expanded) / `»` (collapsed).
 
-**Section list** (`section-nav.tsx`, nested under `ბიუჯეტი`). Each entry is a route link. Active: accent `▸` marker, `paper` text at weight 600, active-row background, `aria-current="page"`. Inactive: `ink-fg-muted`, marker held in transparent so labels do not shift. All five sections — `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი` — render this way; none is a `მალე` marker. Deleting this one component and its single usage reverts navigation to hub-and-breadcrumb only; nothing else imports it.
+**Section list** (`section-nav.tsx`, nested under `ბიუჯეტი`). Each entry is a route link. Active: accent `▸` marker, `paper` text at weight 600, active-row background, `aria-current="page"`. Inactive: `ink-fg-muted`, marker held in transparent so labels do not shift. All six sections — `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი`, `დეფიციტი` — render this way; none is a `მალე` marker. Deleting this one component and its single usage reverts navigation to hub-and-breadcrumb only; nothing else imports it.
 
 **Collapsed rail (≥900px).** 52px, same `ink` surface, radius 0:
 
@@ -383,7 +385,7 @@ The crumbs carry `BreadcrumbTrail`'s semantics, not its markup: a `<nav aria-lab
 
 **Footer.** Every `/explorer` route renders `SiteFooter` (§19) at the foot of the content column — inside it, not beside the sidebar — with the pages' own horizontal padding so its rule lines up with the content above. The footer uses the compact lockup at approximately 150px; its trust, navigation, source/update, contact, and CC BY 4.0 licence content remains unchanged. These routes are the site's main SEO landing targets, and the footer is where the licence, contact address and methodology link live (§21); without it ~85 pages ended with no licence, no way to report an error and no route to the methodology. `updatedAt` comes from the landing model, the same site-wide review date the methodology and about pages show.
 
-**Budget hub (`/explorer`).** Breadcrumb, serif H1 `საქართველოს ბიუჯეტი`, the two-sentence lead `Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ ფაქტობრივ მონაცემებს. შეადარეთ წლები, სფეროები და მუნიციპალიტეტები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.`, then five cards in a two-column grid (one column below 768px, max-width 860px), then the standard source note (§7.10). Card anatomy, in order: mono index in accent with `→` right-aligned, serif 18px title, 11.5px `muted` description, graphic, mono 10px `faint` footer.
+**Budget hub (`/explorer`).** Breadcrumb, serif H1 `საქართველოს ბიუჯეტი`, a concise lead covering budgets, debt and deficit, then six cards in a two-column grid (one column below 768px, max-width 860px), then the standard source note (§7.10). Card anatomy, in order: mono index in accent with `→` right-aligned, serif 18px title, 11.5px `muted` description, graphic, mono 10px `faint` footer.
 
 | # | Card | Graphic | Footer | Links to |
 |---|------|---------|--------|----------|
@@ -392,8 +394,9 @@ The crumbs carry `BreadcrumbTrail`'s semantics, not its markup: a `<nav aria-lab
 | 03 | `მუნიციპალიტეტები` | total municipal series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/municipalities` |
 | 04 | `ანალიზი` | none | `{latestYear} · {n} კატეგორია` | `/explorer/analysis` |
 | 05 | `ვალი` | total Government Debt stock series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/debt` |
+| 06 | `დეფიციტი` | actual general-government balance as `% მშპ-ში`, `Sparkline` at 200×34 in `ink` | `{latestActualYear} · {balance}% მშპ-ის` | `/explorer/deficit` |
 
-All four sparklines are `ink` because each traces a **total** (a side total for cards 01/02, the municipal total for card 03, and Government Debt stock for card 05), and §4.2 gives every `*.total` series `ink`. `accent` is not free chrome here: `#B3402A` is the token of `spending.social_protection` and `revenue.vat`, so an accent total would draw one quantity in another category's color.
+All five sparklines are `ink` because each traces a **total or balance** (a side total for cards 01/02, the municipal total for card 03, Government Debt stock for card 05, and the general-government balance for card 06). `accent` is not free chrome here: `#B3402A` is the token of `spending.social_protection` and `revenue.vat`, so an accent aggregate would draw one quantity in another category's color.
 
 Every figure on the hub — series, footers and card 03's description counts alike — is computed at build time from the same served facts the section pages use, so the hub cannot drift from the pages behind it. Nothing on it is hardcoded.
 
@@ -560,7 +563,11 @@ National columns: `<first col> | years… | ცვლილება | წილ
 
 Stock can optionally use `% მშპ-ში`; service stays in GEL and rates use percent. Exact rate gaps render as `—` and are never interpolated or replaced with zero. Service may extend past actual 2025 values with a dashed 2026–2030 segment, a visible `პროგნოზი` boundary, and the statement that it covers only the portfolio outstanding on 2025-12-31, not a full future-budget forecast. The Excel action exports the active family, selection, range, and measure through the standard three-sheet workbook. For rates the GEL amount cell is blank and the percentage column carries the value; forecast service rows use status `პროგნოზი`.
 
-### 8.6 Below-Chart Sections (`ძირითადი ინდიკატორები`, order fixed)
+### 8.6 General-government deficit
+
+`/explorer/deficit` reuses the Government Debt explorer primitives with exactly one selectable series, `ზოგადი მთავრობის ბალანსი`. It defaults to `% მშპ-ში`, line mode and full 1995–2031 coverage; nominal GEL is the only alternative measure. The deck line always reports the latest actual observation (2025), while 2026–2031 render as a dashed continuation with a visible `პროგნოზი` marker and table labels. Negative values mean deficit/net borrowing and positive values mean surplus/net lending. The source note names IMF WEO and explicitly prevents deriving this differently scoped general-government measure from the site's state-budget expenditure and consolidated-budget revenue datasets.
+
+### 8.7 Below-Chart Sections (`ძირითადი ინდიკატორები`, order fixed)
 
 When the selected range covers a single year (`start === end`, reachable through
 the rail handles or a `#r=YYYY-YYYY` hash), the **delta-derived blocks stand
@@ -748,7 +755,7 @@ Do:
 
 Do not:
 
-- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only). The single card exception is the budget hub's five cards (§6.6); it does not generalize.
+- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only). The single card exception is the budget hub's six cards (§6.6); it does not generalize.
 - No white surfaces; no gradients anywhere.
 - No blue `#0071e3` or any v3.x Apple token; no night theme or theme toggle.
 - No dots/rounded-square swatches — bars only.
@@ -760,7 +767,7 @@ Do not:
 
 ## 18. Design QA Checklist
 
-1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only; the budget hub's five cards are the one card exception, §6.6).
+1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only; the budget hub's six cards are the one card exception, §6.6).
 2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), not in-page nav tabs.
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
 4. Explorer default: line mode, nominal GEL, full range, total-only selection, and unrestricted line rendering.

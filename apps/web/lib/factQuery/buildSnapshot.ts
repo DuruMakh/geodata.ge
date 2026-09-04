@@ -95,6 +95,8 @@ function yearRangeOf(row: {
   selected_year_max?: number;
   normalized_year_min?: number;
   normalized_year_max?: number;
+  year_min?: number;
+  year_max?: number;
 }): { min: number; max: number } | null {
   if (row.selected_year_min !== undefined && row.selected_year_max !== undefined) {
     return { min: row.selected_year_min, max: row.selected_year_max };
@@ -102,11 +104,17 @@ function yearRangeOf(row: {
   if (row.normalized_year_min !== undefined && row.normalized_year_max !== undefined) {
     return { min: row.normalized_year_min, max: row.normalized_year_max };
   }
+  if (row.year_min !== undefined && row.year_max !== undefined) {
+    return { min: row.year_min, max: row.year_max };
+  }
   return null;
 }
 export const packageManifestRowSchema = z.object({
   source_id: z.string().trim().min(1),
-  dataset_title: z.string().trim().min(1),
+  // Named `dataset_title` by the GDP and Geostat packages and `dataset` by the
+  // IMF WEO one. Accept either; the refine below requires exactly one.
+  dataset_title: z.string().trim().min(1).optional(),
+  dataset: z.string().trim().min(1).optional(),
   publisher: z.string().trim().min(1),
   retrieved_file_url: z.string().refine(isCleanHttpsUrl, {
     message: "retrieved_file_url must be a clean https:// URL with no embedded whitespace or trailing text",
@@ -127,10 +135,17 @@ export const packageManifestRowSchema = z.object({
   selected_year_max: blankableYear,
   normalized_year_min: blankableYear,
   normalized_year_max: blankableYear,
+  year_min: blankableYear,
+  year_max: blankableYear,
 }).refine(
   (row) => yearRangeOf(row) !== null,
-  { message: "a package manifest row needs a complete selected_year_min/max or normalized_year_min/max pair" },
-);
+  {
+    message:
+      "a package manifest row needs a complete selected_year_min/max, normalized_year_min/max or year_min/max pair",
+  },
+).refine((row) => (row.dataset_title ?? row.dataset) !== undefined, {
+  message: "a package manifest row needs a dataset_title or a dataset",
+});
 
 /**
  * Manifests that share the package schema above: a `local_file` relative to
@@ -144,6 +159,11 @@ export const packageManifestRowSchema = z.object({
 const PACKAGE_MANIFEST_DIRECTORIES: readonly (readonly string[])[] = [
   GDP_SOURCE_MANIFEST_RELATIVE_PATH,
   ["docs", "Raw Data", "Municipalities", "geostat-population-regional-gdp"],
+  // The IMF WEO workbook behind the general government balance. Registered in
+  // data/sources/source-documents.csv by the deficit merge, so section 8.1's
+  // provenance gate sees the source; without this directory it resolved to no
+  // public document at all - the same failure the Geostat package had.
+  ["docs", "Raw Data", "Deficit", "imf-weo-general-government-balance"],
 ];
 
 function yearsBetween(first: number, last: number): number[] {
@@ -225,7 +245,8 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
       documents.push({
         repositoryPath: [...directory, row.local_file].join("/"),
         documentId: row.source_id,
-        title: row.dataset_title,
+        // Non-null: the second refine above rejects a row carrying neither.
+        title: (row.dataset_title ?? row.dataset)!,
         publisher: row.publisher,
         officialUrl: row.retrieved_file_url,
         archiveUrl: null,

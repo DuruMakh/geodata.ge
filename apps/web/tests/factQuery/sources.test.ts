@@ -168,7 +168,9 @@ describe("public source resolution", () => {
         .map((source) => source.sourceId);
 
       expect(unresolved).toEqual([]);
-      expect(snapshot.sources.length).toBe(104);
+      // 105 since the deficit merge added the IMF WEO workbook behind the
+      // general government balance.
+      expect(snapshot.sources.length).toBe(105);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {
