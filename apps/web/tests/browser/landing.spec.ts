@@ -364,8 +364,12 @@ test("landing keeps mobile header and statistic geometry stable while fonts load
     expect(after.logo?.[key], `logo ${key}`).toBeCloseTo(before.logo?.[key] ?? Number.NaN, 0);
     expect(after.heading?.[key], `hero heading ${key}`).toBeCloseTo(before.heading?.[key] ?? Number.NaN, 0);
   }
-  expect(Math.abs((before.nav?.y ?? Number.NaN) - (before.logo?.y ?? Number.NaN))).toBeLessThanOrEqual(1);
-  expect(Math.abs((after.nav?.y ?? Number.NaN) - (after.logo?.y ?? Number.NaN))).toBeLessThanOrEqual(1);
+  expect(before.nav?.y ?? Number.NaN).toBeGreaterThanOrEqual(
+    (before.logo?.y ?? Number.NaN) + (before.logo?.height ?? Number.NaN),
+  );
+  expect(after.nav?.y ?? Number.NaN).toBeGreaterThanOrEqual(
+    (after.logo?.y ?? Number.NaN) + (after.logo?.height ?? Number.NaN),
+  );
   expect(after.statisticValues).toHaveLength(3);
   for (const [index, box] of after.statisticValues.entries()) {
     for (const key of ["x", "y", "width", "height"] as const) {
@@ -678,9 +682,17 @@ test("landing keeps stats and dataset tables inside narrow viewports", async ({ 
   }
 });
 
-test("methodology is in the footer but never the landing header", async ({ page }) => {
+test("landing header exposes mission while methodology stays in the footer", async ({ page }) => {
   await page.goto(`${baseUrl}/`);
   await expect(page.getByTestId("landing-header").getByRole("link", { name: "მეთოდოლოგია" })).toHaveCount(0);
+  await expect(page.getByTestId("landing-header").getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute(
+    "href",
+    "/about",
+  );
+  await expect(page.getByTestId("landing-header").getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
   await expect(page.getByTestId("site-footer").getByRole("link", { name: "მეთოდოლოგია" })).toHaveAttribute(
     "href",
     "/methodology",
