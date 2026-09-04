@@ -44,6 +44,16 @@ describe("public SEO dataset exports", () => {
     expect(municipal.toString("utf8")).toContain("country.georgia,total,municipal.total");
     expect(debt.toString("utf8")).toContain("year,family,series_id,value,value_kind,status,source_id,snapshot_date,last_reviewed_at");
     expect(debt.toString("utf8")).toContain("projection_existing_portfolio");
+    const deficitText = deficit.toString("utf8");
+    expect(deficitText).toContain(
+      "year,general_government_balance_pct_gdp,general_government_balance_gel,status,source_id,last_reviewed_at",
+    );
+    expect(deficitText).toContain(
+      "2025,-1.455,-1526000000,actual,source.imf_weo_april_2026_general_government_balance,2026-09-04",
+    );
+    expect(deficitText).toContain(
+      "2026,-2.327,-2672000000,projection,source.imf_weo_april_2026_general_government_balance,2026-09-04",
+    );
   });
 
   it("check mode returns the same hashes without writing public files", async () => {

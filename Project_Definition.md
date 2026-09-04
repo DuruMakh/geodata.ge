@@ -46,7 +46,6 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - The six selected-detail municipal categories. Only the ten main functions are served.
 - Any data behind the four sidebar indicator markers (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`).
 - Capital projects explorer.
-- Deficit explorer.
 - Admin UI.
 - Public API.
 - User uploads.

@@ -343,7 +343,7 @@ spacing:
 - Border radius: **0–3px everywhere** (buttons 2px, tooltip 3px). Exception: the national `% მშპ-ში` measure pill, the municipal `% წილი` measure pill, and slider handles/ticks use `999px`.
 - Shadows: only the chart tooltip (`0 4px 16px rgba(30,27,22,0.10)`) and slider handles (`0 1px 3px rgba(30,27,22,0.15)`). Nothing else casts a shadow.
 - Swatches are **14×3px bars**, never dots or rounded squares.
-- **Exception: budget hub cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow). Five peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
+- **Exception: budget hub cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow). Six peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
 
 ### 6.7 Shell and Sidebar
 
@@ -753,7 +753,7 @@ Do:
 
 Do not:
 
-- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only). The single card exception is the budget hub's five cards (§6.6); it does not generalize.
+- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only). The single card exception is the budget hub's six cards (§6.6); it does not generalize.
 - No white surfaces; no gradients anywhere.
 - No blue `#0071e3` or any v3.x Apple token; no night theme or theme toggle.
 - No dots/rounded-square swatches — bars only.
@@ -765,7 +765,7 @@ Do not:
 
 ## 18. Design QA Checklist
 
-1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only; the budget hub's five cards are the one card exception, §6.6).
+1. Page is paper-backed with no cards or shadows (tooltip/slider-handle exceptions only; the budget hub's six cards are the one card exception, §6.6).
 2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), not in-page nav tabs.
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
 4. Explorer default: line mode, nominal GEL, full range, total-only selection, and unrestricted line rendering.
