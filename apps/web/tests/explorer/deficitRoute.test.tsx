@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
 
 import type { ServedGeneralGovernmentBalanceFact } from "../../lib/servedRows";
@@ -24,7 +24,7 @@ describe("general-government deficit route composition", () => {
     expect(components).not.toBeNull();
     if (!components) return;
 
-    const markup = renderToStaticMarkup(createElement(components.DeficitExplorer, {
+    const markup = renderGeorgianMarkup(createElement(components.DeficitExplorer, {
       facts,
       workbookSources: [],
       lastUpdatedAt: "2026-09-04",

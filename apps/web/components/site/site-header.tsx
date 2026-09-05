@@ -1,6 +1,12 @@
 import Link from "next/link";
+import { LanguageSwitch } from "./language-switch";
+import { getCommonMessages } from "../../lib/i18n/common.server";
+import { message } from "../../lib/i18n/messages";
+import { pageHref } from "../../lib/i18n/routes";
+import type { Locale } from "../../lib/i18n/types";
 
 type SiteHeaderProps = {
+  locale?: Locale;
   active?: "home" | "explorer" | "mission" | "connect";
   yearsLabel: string;
   testId: string;
@@ -12,15 +18,16 @@ function navLinkClass(isActive: boolean) {
     : "flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-medium text-[var(--muted)] transition-colors duration-150 hover:text-[var(--ink)]";
 }
 
-export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
+export function SiteHeader({ active, yearsLabel, testId, locale = "ka" }: SiteHeaderProps) {
+  const messages = getCommonMessages(locale);
   return (
     <header
       data-testid={testId}
       className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 min-[768px]:gap-5"
     >
       <Link
-        href="/"
-        aria-label="Fiscal.ge — მთავარი"
+        href={pageHref("/", locale)}
+        aria-label={message(messages, "common.brandHome")}
         className="mb-3.5 block aspect-[1080/340] w-[118px] flex-none min-[768px]:mb-1 min-[768px]:aspect-[1600/400] min-[768px]:w-[280px]"
       >
         <picture>
@@ -36,41 +43,42 @@ export function SiteHeader({ active, yearsLabel, testId }: SiteHeaderProps) {
         </picture>
       </Link>
       <nav
-        aria-label="ნავიგაცია"
+        aria-label={message(messages, "common.navigation")}
         className="order-3 flex w-full basis-full justify-end gap-[18px] self-stretch border-t border-[var(--hairline)] pt-2 min-[768px]:order-none min-[768px]:w-auto min-[768px]:basis-auto min-[768px]:gap-[26px] min-[768px]:border-t-0 min-[768px]:pt-0"
       >
         <Link
-          href="/"
+          href={pageHref("/", locale)}
           aria-current={active === "home" ? "page" : undefined}
           className={navLinkClass(active === "home")}
         >
-          მთავარი
+          {message(messages, "common.home")}
         </Link>
         <Link
-          href="/explorer"
+          href={pageHref("/explorer", locale)}
           aria-current={active === "explorer" ? "page" : undefined}
           className={navLinkClass(active === "explorer")}
         >
-          მონაცემები
+          {message(messages, "common.data")}
         </Link>
         <Link
-          href="/connect"
+          href={pageHref("/connect", locale)}
           aria-current={active === "connect" ? "page" : undefined}
           className={navLinkClass(active === "connect")}
         >
-          AI
+          {message(messages, "common.ai")}
         </Link>
         <Link
-          href="/about"
+          href={pageHref("/about", locale)}
           aria-current={active === "mission" ? "page" : undefined}
           className={navLinkClass(active === "mission")}
         >
-          მიზანი
+          {message(messages, "common.about")}
         </Link>
       </nav>
       <span className="hidden self-stretch items-center pb-3.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)] min-[768px]:flex">
         {yearsLabel}
       </span>
+      <LanguageSwitch />
     </header>
   );
 }

@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
 import { selectDebtSeries } from "../../lib/explorer/debtExplorer";
 import { loadGovernmentDebtFacts } from "../../lib/data/governmentDebt/importGovernmentDebtFacts";
@@ -88,7 +88,7 @@ describe("Government Debt route composition", () => {
     expect(components).not.toBeNull();
     if (!components) return;
 
-    const markup = renderToStaticMarkup(createElement(components.DebtExplorer, {
+    const markup = renderGeorgianMarkup(createElement(components.DebtExplorer, {
       facts,
       gdpFacts,
       workbookSources: [],
@@ -125,7 +125,7 @@ describe("Government Debt route composition", () => {
     if (!components) return;
 
     const noop = () => {};
-    const markup = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+    const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       facts,
       gdpFacts,
       workbookSources: [],
@@ -153,7 +153,7 @@ describe("Government Debt route composition", () => {
     if (!components) return;
 
     const noop = () => {};
-    const markup = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+    const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       facts,
       gdpFacts,
       workbookSources: [],
@@ -179,7 +179,7 @@ describe("Government Debt route composition", () => {
     expect(components).not.toBeNull();
     if (!components) return;
     const realFacts = await loadGovernmentDebtFacts();
-    const markup = renderToStaticMarkup(createElement(components.DebtExplorer, {
+    const markup = renderGeorgianMarkup(createElement(components.DebtExplorer, {
       facts: realFacts,
       gdpFacts: [],
       workbookSources: [],
@@ -214,7 +214,7 @@ describe("Government Debt route composition", () => {
 
     const base = { facts, gdpFacts, workbookSources: [], lastUpdatedAt: reviewedAt };
     const noop = () => {};
-    const stock = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+    const stock = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       ...base,
       family: "stock",
       chartMode: "line",
@@ -227,7 +227,7 @@ describe("Government Debt route composition", () => {
       onSelectionChange: noop,
       onToggleSeries: noop,
     }));
-    const service = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+    const service = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       ...base,
       family: "service",
       chartMode: "line",
@@ -240,7 +240,7 @@ describe("Government Debt route composition", () => {
       onSelectionChange: noop,
       onToggleSeries: noop,
     }));
-    const rate = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+    const rate = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       ...base,
       family: "rate",
       chartMode: "table",
@@ -268,7 +268,7 @@ describe("Government Debt route composition", () => {
     if (!components) return;
 
     const noop = () => {};
-    const markup = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+    const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       facts,
       gdpFacts,
       workbookSources: [],
@@ -298,7 +298,7 @@ describe("Government Debt route composition", () => {
     if (!components) return;
 
     const noop = () => {};
-    const markup = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+    const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       facts,
       gdpFacts,
       workbookSources: [],
@@ -341,11 +341,11 @@ describe("Government Debt route composition", () => {
       onSelectionChange: noop,
       onToggleSeries: noop,
     };
-    const line = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+    const line = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       ...base,
       chartMode: "line",
     }));
-    const table = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+    const table = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       ...base,
       chartMode: "table",
     }));
@@ -364,7 +364,7 @@ describe("Government Debt route composition", () => {
     if (!components) return;
 
     const noop = () => {};
-    const markup = renderToStaticMarkup(createElement(components.DebtExplorerSurface, {
+    const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       facts,
       gdpFacts,
       workbookSources: [],

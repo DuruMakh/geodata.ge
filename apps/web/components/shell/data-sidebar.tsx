@@ -5,17 +5,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ComingSoonBadge } from "../ui/editorial";
 import { SectionNav } from "./section-nav";
+import { LanguageSwitch } from "../site/language-switch";
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
+import { pageHref } from "../../lib/i18n/routes";
 
 // Platform sidebar (DESIGN.md §6.7). Two desktop states — 232px expanded and a
 // 52px reading rail — plus a top bar with a sheet below 900px. Fiscal.ge is a data
 // platform whose first dataset is the budget; teaser rows are markers only.
 
-const TEASERS = ["უმუშევრობა", "ინფლაცია", "ეკონომიკური ზრდა", "დემოგრაფია"];
+const TEASERS = ["unemployment", "inflation", "economicGrowth", "demography"];
 const STORAGE_KEY = "geodata:sidebar-collapsed";
 const DESKTOP_MIN_WIDTH = 900;
 const MOBILE_NAV_ID = "data-sidebar-navigation";
 
 export function DataSidebar() {
+  const { locale, messages } = useI18n();
   const [collapsed, setCollapsed] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(true);
@@ -98,7 +103,7 @@ export function DataSidebar() {
 
   return (
     <aside
-      aria-label="მონაცემთა პანელი"
+      aria-label={message(messages, "common.dataPanel")}
       data-testid="data-sidebar"
       data-collapsed={railed ? "true" : "false"}
       className={`flex w-full flex-none flex-col bg-[var(--ink)] px-4 pt-[18px] pb-4 min-[900px]:sticky min-[900px]:top-0 min-[900px]:h-screen ${
@@ -108,10 +113,9 @@ export function DataSidebar() {
       <div className="flex items-center justify-between gap-2.5">
         {railed ? null : (
           // Reload across the Explorer/public layout boundary so stale route metadata cannot remain in <head>.
-          // eslint-disable-next-line @next/next/no-html-link-for-pages
           <a
-            href="/"
-            aria-label="Fiscal.ge — მთავარი"
+            href={pageHref("/", locale)}
+            aria-label={message(messages, "common.brandHome")}
             className="flex min-w-0 items-center gap-2.5 no-underline"
           >
             {/* Local SVG brand asset; native img avoids adding a raster optimization path. */}
@@ -129,7 +133,7 @@ export function DataSidebar() {
                 Fiscal.ge
               </span>
               <span className="font-[family-name:var(--font-numeric)] text-[8.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]">
-                ღია მონაცემები
+                {message(messages, "common.openData")}
               </span>
             </span>
           </a>
@@ -140,7 +144,7 @@ export function DataSidebar() {
           data-testid="sidebar-toggle"
           aria-expanded={navVisible}
           aria-controls={!isDesktop ? MOBILE_NAV_ID : undefined}
-          aria-label={navVisible ? "პანელის ჩაკეცვა" : "პანელის გაშლა"}
+          aria-label={message(messages, navVisible ? "common.collapsePanel" : "common.expandPanel")}
           onClick={handleToggle}
           className="size-9 flex-none cursor-pointer rounded-[3px] border border-[rgba(247,242,233,0.18)] font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink-fg-muted)] hover:text-[var(--paper)] min-[900px]:size-[26px]"
         >
@@ -154,12 +158,13 @@ export function DataSidebar() {
             className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
             style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
           >
-            მონაცემები · ბიუჯეტი
+            {message(messages, "common.dataBudget")}
           </p>
+          <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
           <Link
-            href="/"
-            aria-label="მთავარი"
-            title="მთავარი"
+            href={pageHref("/", locale)}
+            aria-label={message(messages, "common.home")}
+            title={message(messages, "common.home")}
             className="mt-auto flex size-[26px] items-center justify-center self-center no-underline"
           >
             <span aria-hidden className="size-2 bg-[var(--accent)]" />
@@ -169,11 +174,11 @@ export function DataSidebar() {
         <div id={MOBILE_NAV_ID} className={sheetOpen ? "flex flex-1 flex-col" : "hidden flex-1 min-[900px]:flex min-[900px]:flex-col"}>
           <div aria-hidden className="mt-4 mb-3.5 h-px bg-[rgba(247,242,233,0.12)]" />
           <p className="mb-3 font-[family-name:var(--font-numeric)] text-[9.5px] tracking-[0.12em] text-[var(--ink-fg-faint)]">
-            მონაცემები /
+            {message(messages, "common.dataSection")}
           </p>
-          <nav aria-label="მონაცემთა ნაკრებები" className="flex flex-col gap-0.5">
+          <nav aria-label={message(messages, "common.datasets")} className="flex flex-col gap-0.5">
             <p className="flex items-baseline gap-2 border-l-2 border-[var(--accent)] bg-[rgba(247,242,233,0.07)] px-2.5 py-2 text-[12.5px] font-semibold text-[var(--paper)]">
-              ბიუჯეტი
+              {message(messages, "common.budget")}
             </p>
             <SectionNav />
 
@@ -185,15 +190,16 @@ export function DataSidebar() {
                   key={label}
                   className="flex items-baseline gap-2 border-l-2 border-transparent px-2.5 py-2 text-[12.5px] font-medium text-[var(--ink-fg-muted)]"
                 >
-                  <span className="min-w-0 flex-1 truncate">{label}</span>
+                  <span className="min-w-0 flex-1 truncate">{message(messages, `common.${label}`)}</span>
                   <ComingSoonBadge />
                 </li>
               ))}
             </ul>
           </nav>
           <div className="mt-auto border-t border-[rgba(247,242,233,0.12)] pt-3">
-            <Link href="/" className="text-[11.5px] font-medium text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)]">
-              ← მთავარი
+            <div className="mb-2 text-[var(--ink-fg-muted)]"><LanguageSwitch /></div>
+            <Link href={pageHref("/", locale)} className="text-[11.5px] font-medium text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)]">
+              {message(messages, "common.backHome")}
             </Link>
           </div>
         </div>
