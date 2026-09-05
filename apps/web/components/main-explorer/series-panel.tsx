@@ -2,6 +2,8 @@
 
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
+import { publicLabel } from "../../lib/i18n/labels";
+import { matchesLabelQuery } from "../../lib/i18n/search";
 import { useState, type ReactNode } from "react";
 import type { ExplorerItem, ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { formatAmount } from "../../lib/explorer/format";
@@ -22,7 +24,7 @@ export type SeriesPanelRow = {
 };
 
 function matches(item: ExplorerItem, query: string): boolean {
-  return `${item.kaLabel} ${item.enLabel} ${item.id}`.toLowerCase().includes(query);
+  return matchesLabelQuery(query, [item.kaLabel, item.enLabel, item.id]);
 }
 
 export function buildSeriesPanelRows(items: ExplorerItem[], query: string, expandedIds: string[]): SeriesPanelRow[] {
@@ -109,7 +111,7 @@ export function SeriesPanel({
   onToggleExpanded,
   downloadAction,
 }: SeriesPanelProps) {
-  const { locale, messages } = useI18n();
+  const { locale, messages, englishLabels } = useI18n();
   // The query is panel-local so keystrokes re-render only this aside — the parent
   // keys this component by scope, which also resets the search on nav/grouping
   // switches consistently.
@@ -165,7 +167,7 @@ export function SeriesPanel({
             <SeriesSelectorRow
               key={item.id}
               id={item.id}
-              label={item.kaLabel}
+              label={publicLabel(locale, item.id, item.kaLabel, englishLabels)}
               color={item.color}
               value={formatAmount(latest, locale)}
               selected={selected}

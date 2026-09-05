@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getPresentation } from "../../../../lib/i18n/presentation.server";
 import { MainExplorer } from "../../../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../../../components/seo/breadcrumb-json-ld";
 import { loadServedExplorerData } from "../../../../lib/data/servedData";
@@ -33,10 +34,12 @@ export default async function AnalysisPage() {
     .sort()
     .at(-1) ?? "";
 
+  const presentation = await getPresentation("ka", ["common", "controls", "format", "main"], []);
   return (
     <>
       <BreadcrumbJsonLd items={[{ name: "მთავარი", path: "/" }, { name: "ბიუჯეტი", path: "/explorer" }, { name: "ანალიზი", path: "/explorer/analysis" }]} />
       <MainExplorer
+        presentation={presentation}
         nav="analysis"
         facts={facts.map(projectBudgetFact)}
         adminFacts={ownAdminFacts.map(projectAdminFact)}

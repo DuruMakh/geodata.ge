@@ -3,6 +3,9 @@
 import type { ReactNode } from "react";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
+import { Message } from "../../lib/i18n/message";
+import { publicLabel } from "../../lib/i18n/labels";
+import { formatDisplayDate } from "../../lib/explorer/format";
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ValueUnit } from "../../lib/explorer/format";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
@@ -42,24 +45,24 @@ type ExplorerViewProps = {
 };
 
 const COVERAGE_NOTE: Record<ExplorerScope, string> = {
-  fields: "ხარჯვითი მონაცემები",
-  ministries: "უწყებრივი მონაცემები",
-  revenue: "შემოსავლების მონაცემები",
+  fields: "main.expenditureCoverage",
+  ministries: "main.ministryCoverage",
+  revenue: "main.revenueCoverage",
 };
 
 // Moved out of ExplorerTable so the table takes a label rather than a scope.
 const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
-  fields: "სფერო",
-  ministries: "უწყება",
-  revenue: "საბიუჯეტო მუხლი",
+  fields: "main.field",
+  ministries: "main.institution",
+  revenue: "main.budgetItem",
 };
 
 // Classification-authorship disclosure (DESIGN.md §7.10): year totals are official;
 // the category split is Fiscal.ge's own mapping and must say so. Revenue categories
 // are the official budget-classification lines, so no disclosure is needed there.
 const CLASSIFICATION_NOTE: Record<ExplorerScope, string | null> = {
-  fields: "კატეგორიებად დაყოფა Fiscal.ge-ის კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით.",
-  ministries: "უწყებრივი დაჯგუფება Fiscal.ge-ისაა ბიუჯეტის შესრულების ანგარიშების პროგრამული კლასიფიკაციის მიხედვით.",
+  fields: "main.fieldsClassification",
+  ministries: "main.ministriesClassification",
   revenue: null,
 };
 
@@ -85,14 +88,15 @@ export function ExplorerView({
   onToggleExpanded,
   downloadAction,
 }: ExplorerViewProps) {
-  const { messages } = useI18n();
+  const { locale, messages, englishLabels } = useI18n();
   const noSelection = selectedIds.length === 0;
   const series: ChartSeries[] = model.selectedItems.map((item) => {
+    const label = publicLabel(locale, item.id, item.kaLabel, englishLabels);
     const pointsByYear = new Map(model.points.filter((point) => point.itemId === item.id).map((point) => [point.year, point]));
 
     return {
       id: item.id,
-      label: item.kaLabel.length > 30 ? `${item.kaLabel.slice(0, 29)}…` : item.kaLabel,
+      label: label.length > 30 ? `${label.slice(0, 29)}…` : label,
       color: item.color,
       vals: model.years.map((year) => {
         const value = pointsByYear.get(year)?.value ?? null;
@@ -102,8 +106,9 @@ export function ExplorerView({
     };
   });
 
-  const coverage =
-    scopeYears.length > 0 ? `${COVERAGE_NOTE[scope]}: ${scopeYears[0]}–${scopeYears.at(-1)}` : COVERAGE_NOTE[scope];
+  const coverageLabel = message(messages, COVERAGE_NOTE[scope]);
+  const coverage = scopeYears.length > 0 ? `${coverageLabel}: ${scopeYears[0]}–${scopeYears.at(-1)}` : coverageLabel;
+  const preliminaryYears = model.years.filter(year => model.gdpByYear[year]?.status === "preliminary");
 
   // A non-empty selection can still have zero coverage in the active range
   // (e.g. a program series with a pre-2016 range) — say so instead of drawing
@@ -127,7 +132,7 @@ export function ExplorerView({
               />
               <div className="flex items-center gap-3.5">
                 <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                  {share ? "% მშპ-ში" : "მლრდ ₾"}
+                  {message(messages, share ? "main.percentGdp" : "format.bnGel")}
                 </span>
                 <button
                   type="button"
@@ -140,29 +145,29 @@ export function ExplorerView({
                       : "border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]"
                   }`}
                 >
-                  % მშპ-ში
+                  {message(messages, "main.percentGdp")}
                 </button>
               </div>
             </div>
 
             {noSelection ? (
               <div className="mt-5">
-                <Callout testId="no-selection-callout">არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.</Callout>
+                <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
               </div>
             ) : noRangeData ? (
               <div className="mt-5">
                 <Callout testId="no-range-data-callout">
-                  არჩეული სერიებისთვის ამ დიაპაზონში მონაცემები არ არის. გააფართოვე დიაპაზონი ან შეცვალე სერიები.
+                  {message(messages, "main.noRangeData")}
                 </Callout>
               </div>
             ) : chartMode === "table" ? (
               <ExplorerTable
-                caption={`${COVERAGE_NOTE[scope]} — ${share ? "წილი მშპ-ში" : scope === "revenue" ? "შემოსავლები ლარში" : "ხარჯები ლარში"}, ${range.start}–${range.end}`}
+                caption={message(messages, "main.tableCaption", { coverage: coverageLabel, measure: message(messages, share ? "main.shareGdp" : scope === "revenue" ? "main.revenueGel" : "main.expenditureGel"), startYear: range.start, endYear: range.end })}
                 rows={model.tableRows.filter((row) => row.level !== "total")}
                 totalRow={model.totalRow}
                 showTotal={Boolean(model.totalRow && selectedIds.includes(model.totalRow.itemId))}
                 years={model.years}
-                firstColumnLabel={FIRST_COL_LABEL[scope]}
+                firstColumnLabel={message(messages, FIRST_COL_LABEL[scope])}
                 unit={unit}
                 share={share}
                 showChangeColumn={false}
@@ -170,7 +175,7 @@ export function ExplorerView({
               />
             ) : (
               <div className="mt-5">
-                <EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel="წილი მშპ-ში" />
+                <EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel={message(messages, "main.shareGdp")} />
               </div>
             )}
 
@@ -179,18 +184,14 @@ export function ExplorerView({
 
           <div className="mt-[18px]">
             <SourceNote testId="source-label">
-              მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო).{" "}
-              <span className="font-[family-name:var(--font-numeric)]">{coverage}</span> · 12-თვიანი ფაქტობრივი შესრულება.
-              {CLASSIFICATION_NOTE[scope] ? ` ${CLASSIFICATION_NOTE[scope]}` : null}
-              {scope === "revenue" ? " 2004 წლის ვალდებულებების ზრდა არ არის ხელმისაწვდომი და 2004 წლის ჯამში არ შედის." : null}
-              {Object.keys(model.gdpByYear).length > 0 ? " მშპ: საქსტატი, მიმდინარე ფასებში." : null}
-              {model.years.some((year) => model.gdpByYear[year]?.status === "preliminary") ? " 2025 წლის მშპ წინასწარია." : null}
-              {lastUpdatedAt ? (
-                <>
-                  {" "}ბოლო განახლება: <span className="font-[family-name:var(--font-numeric)]">{lastUpdatedAt}</span>.
-                </>
-              ) : null}
-              {model.hasPlannedValues ? " აქტიურ მნიშვნელობებში არის გეგმური ბიუჯეტის მონაცემები." : null}
+              {message(messages, "main.sourceData")}{" "}
+              <span className="font-[family-name:var(--font-numeric)]">{coverage}</span>{" "}{message(messages, "main.annualExecution")}
+              {CLASSIFICATION_NOTE[scope] ? " " + message(messages, CLASSIFICATION_NOTE[scope]) : null}
+              {scope === "revenue" ? " " + message(messages, "main.missing2004Liabilities") : null}
+              {Object.keys(model.gdpByYear).length > 0 ? " " + message(messages, "main.gdpSource") : null}
+              {preliminaryYears.length > 0 ? " " + message(messages, "main.preliminaryGdp", { years: preliminaryYears.join(", ") }) : null}
+              {lastUpdatedAt ? <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} /></> : null}
+              {model.hasPlannedValues ? " " + message(messages, "main.activePlanned") : null}
             </SourceNote>
           </div>
         </div>

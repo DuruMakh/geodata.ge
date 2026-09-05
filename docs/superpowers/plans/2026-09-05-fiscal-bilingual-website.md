@@ -83,7 +83,7 @@ export function formatDisplayDate(isoDate: string, locale: Locale): string {
 
 **Interfaces:** `renderRevenuePage(locale: Locale): Promise<React.ReactElement>` and `revenuePageMetadata(locale: Locale): Promise<Metadata>`. Extend `MainExplorerProps` with required `presentation: Presentation`. Existing `buildExplorerModel(input: ExplorerModelInput, presentation?: Presentation): ExplorerModel` preserves IDs/points/order and resolves the `enLabel` fields from `presentation.englishLabels` when supplied. Keep Georgian `kaLabel` values intact. All public consumers choose a displayed label through `publicLabel`.
 
-- [ ] Build a small model test fixture with one actual and one planned value for the same category/year, two selected categories, and a missing year. Feed the identical fixture to each language. Compare points, years, selected IDs, totals, status, and colour identities exactly; compare text separately.
+- [x] Build a small model test fixture with one actual and one planned value for the same category/year, two selected categories, and a missing year. Feed the identical fixture to each language. Compare points, years, selected IDs, totals, status, and colour identities exactly; compare text separately.
 
 ```ts
 const glossary = new Map([
@@ -111,8 +111,8 @@ it('keeps every numerical point identical between languages', () => {
 ```
 
 Import `ExplorerModelInput` from `explorerData.ts` and load `kaMessages`/`enMessages` with `await getMessages(locale, ['common', 'main'])` in `beforeAll`. Additionally assert that the active 2020 education value is 100, not 120 or their sum, and 2021 is not reported as zero. Do not compare a field carrying translated text as if it were numerical.
-- [ ] Run the new model/browser regressions, then resolve category, ministry, programme, and total labels using the reviewed catalogue. The latest reviewed programme name and historical explanations follow existing year/identity rules. Do not infer English programme names from official codes or reintroduce the Georgian-to-English fallback in `adminFactForModel`.
-- [ ] Pass the correct locale, units, and scoped sentences through the main explorer, table, chart, selectors, legend/tooltips, empty states, warnings, growth summaries, source dates, and accessible chart descriptions. Search both reviewed languages using `matchesLabelQuery` on the same candidates as today; selection remains unlimited and existing bulk behaviour remains global to its scope.
+- [x] Run the new model/browser regressions, then resolve category, ministry, programme, and total labels using the reviewed catalogue. The latest reviewed programme name and historical explanations follow existing year/identity rules. Do not infer English programme names from official codes or reintroduce the Georgian-to-English fallback in `adminFactForModel`.
+- [x] Pass the correct locale, units, and scoped sentences through the main explorer, table, chart, selectors, legend/tooltips, empty states, warnings, growth summaries, source dates, and accessible chart descriptions. Search both reviewed languages using `matchesLabelQuery` on the same candidates as today; selection remains unlimited and existing bulk behaviour remains global to its scope.
 
 ```tsx
 const { locale, englishLabels, messages } = presentation;
@@ -120,11 +120,13 @@ const displayedName = publicLabel(locale, item.id, item.kaLabel, englishLabels);
 return <span>{displayedName}</span>;
 ```
 
-- [ ] Review the English receipts heading/total against the source boundary. Use `Budget receipts` for the full receipts concept and retain specific tax/revenue component names. Do not change the underlying route `/explorer/revenue`, IDs, or Georgian wording. Review `% of GDP`, planned status, the unavailable 2004 liabilities item, and all historical caveats.
-- [ ] Add tests switching in both directions with fields/ministries, table/line, selected programmes, non-default ranges, and GDP-share mode. Query English and Georgian names on the English page. Verify the same selected rows and plotted values after reload and back navigation.
-- [ ] Run the focused tests, `tests/factQuery/agreement.test.ts`, `npm run typecheck`, and `npm run i18n:check`. Commit with `feat: complete English expenditure and receipts explorers`.
+- [x] Review the English receipts heading/total against the source boundary. Use `Budget receipts` for the full receipts concept and retain specific tax/revenue component names. Do not change the underlying route `/explorer/revenue`, IDs, or Georgian wording. Review `% of GDP`, planned status, the unavailable 2004 liabilities item, and all historical caveats.
+- [x] Add tests switching in both directions with fields/ministries, table/line, selected programmes, non-default ranges, and GDP-share mode. Query English and Georgian names on the English page. Verify the same selected rows and plotted values after reload and back navigation.
+- [x] Run the focused tests, `tests/factQuery/agreement.test.ts`, `npm run typecheck`, and `npm run i18n:check`. Commit with `feat: complete English expenditure and receipts explorers`.
 
 **Done:** an English reader can perform every existing national multi-year interaction using reviewed English names and descriptions.
+
+> W2 verified on 2026-09-05: 475 focused tests passed across 46 files, including numerical/label parity, actual-over-planned precedence, zero versus missing values, existing explorer cases, AI agreement and the reference fixture. All 54 national/bilingual browser tests passed, including initial English HTML without JavaScript, both-language search, table/GDP-share parity, selected-programme plot parity across switching/back/reload, and existing Georgian workbook behavior. Lint, typecheck, translation checks and a production build passed; 101 static-generation entries, only /mcp dynamic, unchanged publication hashes/dataVersion. Desktop/mobile screenshots reviewed under .tmp/bilingual/w2-*. Rich translated sentences preserve styled numbers through a small escaped React message component; labels cross the client boundary only for the active page. English Excel content is W3; final language-paired SEO is W9.
 
 ## Task W3: Localize the existing Excel pipeline and source descriptions
 
