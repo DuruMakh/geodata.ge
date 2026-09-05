@@ -1,6 +1,6 @@
 # Fiscal.ge Bilingual Foundation Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Follow active-session delegation instructions before dispatching workers.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking. Follow active-session delegation instructions before dispatching workers.
 
 **Goal:** Establish reviewed language data and static language-aware routing without changing reviewed figures or Georgian behaviour.
 
@@ -26,11 +26,11 @@
 
 **Interfaces:** Produce `baseline.md` containing checked commit, data source, test counts, route list, build duration, known failures, sample URLs, and saved artifact locations; `baseline-manifest.json` containing existing public download hashes/sizes. Later measurements use these exact files.
 
-- [ ] Recheck the checkout, branch, worktrees, existing changes, and available local port with the master-plan inspection commands. Keep the existing linked worktree; do not create a second worktree or reset it. If dependencies are absent, run `npm ci` in `apps/web` once.
-- [ ] Read the installed `node_modules/next/dist/docs/` guides for root layouts, route groups, and `global-not-found`; if that package lacks the docs, use current official documentation through Context7. Confirm the planned experimental flag against the installed version before route edits.
-- [ ] Run `npm run check` and `npm run build` sequentially, then the existing reference fixture. Record actual counts, exits, build duration, and the prerendered/request-time route list. Diagnose pre-existing failures separately; never claim them caused by localization or erase their expectations.
-- [ ] Start this checkout's production server using the master-plan isolated-port procedure. Run the existing browser suite against it and save representative screens at 390 and 1440 pixels. Include homepage, expenditure ministries, municipal index/detail/region/country, analysis, debt, deficit, methodology, About, and connection.
-- [ ] Save the existing publication manifest and sample Georgian workbooks, using the actual download events. Record the raw machine CSV hashes and a representative original archive hash from each archive family. These are parity baselines, not new canonical data.
+- [x] Recheck the checkout, branch, worktrees, existing changes, and available local port with the master-plan inspection commands. Keep the existing linked worktree; do not create a second worktree or reset it. If dependencies are absent, run `npm ci` in `apps/web` once.
+- [x] Read the installed `node_modules/next/dist/docs/` guides for root layouts, route groups, and `global-not-found`; if that package lacks the docs, use current official documentation through Context7. Confirm the planned experimental flag against the installed version before route edits.
+- [x] Run `npm run check` and `npm run build` sequentially, then the existing reference fixture. Record actual counts, exits, build duration, and the prerendered/request-time route list. Diagnose pre-existing failures separately; never claim them caused by localization or erase their expectations.
+- [x] Start this checkout's production server using the master-plan isolated-port procedure. Run the existing browser suite against it and save representative screens at 390 and 1440 pixels. Include homepage, expenditure ministries, municipal index/detail/region/country, analysis, debt, deficit, methodology, About, and connection.
+- [x] Save the existing publication manifest and sample Georgian workbooks, using the actual download events. Record the raw machine CSV hashes and a representative original archive hash from each archive family. These are parity baselines, not new canonical data.
 
 ```powershell
 # Repository root: evidence directory, not a tracked source directory
@@ -42,13 +42,13 @@ Copy-Item -LiteralPath 'public/downloads/data/manifest.json' -Destination '../..
 Get-FileHash -Algorithm SHA256 -LiteralPath 'public/downloads/data/national-expenditure.csv'
 ```
 
-- [ ] List current pages with `rg --files app -g 'page.tsx'`, and public Georgian text owners with `rg -l '[\p{Georgian}]' app components lib`. Inspect strings in SVG/brand assets and `public/llms.txt` too. Classify visible strings, accessibility strings, generated prose, source descriptions, technical codes, and explicitly retained original text. Do not translate an entire source file just because it contains Georgian characters.
+- [x] List current pages with `rg --files app -g 'page.tsx'`, and public Georgian text owners with `rg -l '[\p{Georgian}]' app components lib`. Inspect strings in SVG/brand assets and `public/llms.txt` too. Classify visible strings, accessibility strings, generated prose, source descriptions, technical codes, and explicitly retained original text. Do not translate an entire source file just because it contains Georgian characters.
 
 **Done:** baseline is tied to a commit and a server from this checkout. This task produces evidence and therefore needs no artificial code change or commit.
 
 ## Task F2: Define language, message, link, and search primitives
 
-**Files:** Create `apps/web/lib/i18n/{types,routes,messages,search}.ts`, `apps/web/lib/i18n/provider.tsx`, `apps/web/lib/i18n/messages/{ka,en}/common.json`; create `apps/web/tests/i18n/{routes,messages,search}.test.ts`. Do not move routes yet.
+**Files:** Create `apps/web/lib/i18n/{types,routes,messages,messages.server,search}.ts`, `apps/web/lib/i18n/provider.tsx`, `apps/web/lib/i18n/messages/{ka,en}/common.json`; create `apps/web/tests/i18n/{routes,messages,search}.test.ts`. Do not move routes yet.
 
 **Interfaces:**
 
@@ -68,9 +68,9 @@ export function I18nProvider(props: { locale: Locale; messages: Messages; childr
 export function useI18n(): { locale: Locale; messages: Messages };
 ```
 
-Declarations above belong in their named responsibility files, not one combined utility. `getMessages` is server/build-side loading; `message`, route helpers, label matching, and context are browser-safe. Scoped dictionaries use flat, section-prefixed keys. `common` owns all chrome and shared control labels. Literal wording is checked against existing Georgian copy before extraction.
+Declarations above belong in their named responsibility files, not one combined utility. `getMessages` lives in `messages.server.ts` for server/build-side loading; `message`, route helpers, label matching, and context are browser-safe. Scoped dictionaries use flat, section-prefixed keys. `common` owns all chrome and shared control labels. Literal wording is checked against existing Georgian copy before extraction.
 
-- [ ] Add the following tests, with imports from the corresponding new helper file. Include root `/en`, English-to-Georgian, a shared hash, code routes, repeated prefix prevention, and an external URL.
+- [x] Add the following tests, with imports from the corresponding new helper file. Include root `/en`, English-to-Georgian, a shared hash, code routes, repeated prefix prevention, and an external URL.
 
 ```ts
 it('changes only the page language', () => {
@@ -99,8 +99,8 @@ it('finds either reviewed language without broadening matching', () => {
 });
 ```
 
-- [ ] Run `npx vitest run tests/i18n/routes.test.ts tests/i18n/messages.test.ts tests/i18n/search.test.ts`; confirm the new behaviour is absent.
-- [ ] Implement prefix removal only for the exact `/en` segment, then add a prefix only for public page families: `/`, `/about`, `/connect`, `/explorer` and descendants, `/methodology` and descendants. Leave other resources and external links unchanged. Preserve suffixes by separating pathname, query, and hash before normalization. Never turn `/english` into `/glish` or `/en/en/...` into a normal route silently.
+- [x] Run `npx vitest run tests/i18n/routes.test.ts tests/i18n/messages.test.ts tests/i18n/search.test.ts`; confirm the new behaviour is absent.
+- [x] Implement prefix removal only for the exact `/en` segment, then add a prefix only for public page families: `/`, `/about`, `/connect`, `/explorer` and descendants, `/methodology` and descendants. Leave other resources and external links unchanged. Preserve suffixes by separating pathname, query, and hash before normalization. Never turn `/english` into `/glish` or `/en/en/...` into a normal route silently.
 
 ```ts
 export function splitLanguagePath(pathname: string): { locale: Locale; pathname: string } {
@@ -119,11 +119,13 @@ export function matchesLabelQuery(query: string, values: readonly string[]): boo
 }
 ```
 
-- [ ] Implement `message` using `{name}` interpolation. Missing messages or required parameters fail clearly during tests/build; they never fall back to a Georgian key or ID. Add compile-time types for messages and build-time key/parameter parity in F3. `getMessages` imports only requested scope files and merges distinct prefixed keys; duplicate keys fail validation. Keep original-language fragments as separate marked elements, not HTML injected into a dictionary.
-- [ ] Implement the provider as a small client context using React's `createContext`, `useContext`, and a required explicit value. Shared chrome receives `common`; page client roots receive `common` plus only that page's implemented scopes. Child providers get a complete scoped value rather than implicitly pulling all languages into the root bundle.
-- [ ] Run the focused tests and `npm run typecheck`. Inspect preservation tests for resources and fragments, then commit the named new files with `feat: add bilingual locale and message primitives`.
+- [x] Implement `message` using `{name}` interpolation. Missing messages or required parameters fail clearly during tests/build; they never fall back to a Georgian key or ID. Add compile-time types for messages and build-time key/parameter parity in F3. `getMessages` imports only requested scope files and merges distinct prefixed keys; duplicate keys fail validation. Keep original-language fragments as separate marked elements, not HTML injected into a dictionary.
+- [x] Implement the provider as a small client context using React's `createContext`, `useContext`, and a required explicit value. Shared chrome receives `common`; page client roots receive `common` plus only that page's implemented scopes. Child providers get a complete scoped value rather than implicitly pulling all languages into the root bundle.
+- [x] Run the focused tests and `npm run typecheck`. Inspect preservation tests for resources and fragments, then commit the named new files with `feat: add bilingual locale and message primitives`.
 
 **Done:** a locale is explicit, page links are deterministic, resources are untouched, and both-language search uses reviewed strings without introducing fuzzy matches.
+
+> F1/F2 verified on 2026-09-05: baseline 1,574 unit tests and 281 browser tests; 44 new helper/context tests; full updated check 1,618 tests; production build and publication parity passed. Evidence is under `.tmp/bilingual/`. The browser-safe formatter and server dictionary loader are split into separate modules.
 
 ## Task F3: Build and review the translation catalogue and coverage validator
 
