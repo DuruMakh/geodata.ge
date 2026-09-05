@@ -1,6 +1,6 @@
 # Fiscal.ge: complete Georgian and English experience
 
-**Status:** design draft for owner review. The overall direction, Georgian default with `/en`, and inclusion of the AI connection and its public data are approved in conversation. The detailed design below is proposed for review; implementation has not started.
+**Status:** approved for implementation planning on 2026-09-05. The owner reviewed the design and requested the implementation plan. Application implementation has not started.
 
 **Date:** 2026-09-05
 
