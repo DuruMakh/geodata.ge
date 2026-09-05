@@ -1,5 +1,5 @@
 export type Locale = "ka" | "en";
-export const MESSAGE_SCOPES = ["common"] as const;
+export const MESSAGE_SCOPES = ["common", "format", "controls"] as const;
 export type MessageScope = (typeof MESSAGE_SCOPES)[number];
 export type Messages = Readonly<Record<string, string>>;
 export type TemplateValues = Readonly<Record<string, string | number>>;
@@ -25,4 +25,10 @@ export type TranslationInventory = {
   derivedSourceIds: string[];
   attributedDocumentIds: string[];
   programmeHistory: Array<{ seriesId: string; year: number; originalKa: string }>;
+};
+
+export type Presentation = {
+  locale: Locale;
+  englishLabels: Readonly<Record<string, string>>;
+  messages: Messages;
 };

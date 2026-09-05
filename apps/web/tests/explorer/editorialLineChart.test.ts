@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
 import {
   buildTooltipRows,
@@ -19,7 +19,7 @@ function axisLabels(unit: ValueUnit, values: number[]): string[] {
       planned: values.map(() => false),
     },
   ];
-  const markup = renderToStaticMarkup(
+  const markup = renderGeorgianMarkup(
     createElement(EditorialLineChart, {
       years: values.map((_, index) => 2024 + index),
       series,
@@ -53,7 +53,7 @@ describe("EditorialLineChart amount axes", () => {
 
 describe("EditorialLineChart forecast paths", () => {
   it("keeps actual values solid and continues from their final point with a dashed forecast", () => {
-    const markup = renderToStaticMarkup(
+    const markup = renderGeorgianMarkup(
       createElement(EditorialLineChart, {
         years: [2023, 2024, 2025, 2026, 2027],
         series: [
@@ -83,7 +83,7 @@ describe("EditorialLineChart forecast paths", () => {
   });
 
   it("does not bridge a missing value across a forecast boundary", () => {
-    const markup = renderToStaticMarkup(
+    const markup = renderGeorgianMarkup(
       createElement(EditorialLineChart, {
         years: [2024, 2025, 2026, 2027],
         series: [

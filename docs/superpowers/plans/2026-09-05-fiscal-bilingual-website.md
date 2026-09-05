@@ -44,7 +44,7 @@ For all new scope names below, create both JSON dictionaries under `apps/web/lib
 
 **Interfaces:** Preserve existing numerical helper behaviour. Add final `locale: Locale = 'ka'` to `formatAmount(value, locale)`, `formatSignedAmount(value, locale)`, `formatPerResidentGel(value, locale)`, and `formatAmountParts(value, signed = false, locale = 'ka')`. Add `unitsFor(locale: Locale): { bn: ValueUnit; mln: ValueUnit }` and `formatDisplayDate(isoDate: string, locale: Locale): string`. The tiny format dictionaries can be statically imported by the pure formatter; do not make it depend on filesystem or the full message loader.
 
-- [ ] Add numeric parity regressions for null, zero, a negative amount, the billion threshold, and the small nonzero-value floor. Preserve existing precision; only unit text changes.
+- [x] Add numeric parity regressions for null, zero, a negative amount, the billion threshold, and the small nonzero-value floor. Preserve existing precision; only unit text changes.
 
 ```ts
 it('changes units without changing numerical precision or missingness', () => {
@@ -57,7 +57,7 @@ it('changes units without changing numerical precision or missingness', () => {
 });
 ```
 
-- [ ] Run `npx vitest run tests/i18n/format.test.ts tests/explorer/format.test.ts`, confirm the new language assertions fail, then localize only unit strings and formatted display dates. Keep `fixed`, threshold logic, minus handling, `MISSING`, and division arithmetic unchanged. Use UTC when formatting a date-only ISO value so a browser timezone cannot move it to the previous day.
+- [x] Run `npx vitest run tests/i18n/format.test.ts tests/explorer/format.test.ts`, confirm the new language assertions fail, then localize only unit strings and formatted display dates. Keep `fixed`, threshold logic, minus handling, `MISSING`, and division arithmetic unchanged. Use UTC when formatting a date-only ISO value so a browser timezone cannot move it to the previous day.
 
 ```ts
 export function formatDisplayDate(isoDate: string, locale: Locale): string {
@@ -67,11 +67,13 @@ export function formatDisplayDate(isoDate: string, locale: Locale): string {
 }
 ```
 
-- [ ] Replace hardcoded shared-control labels with `message(messages, key)`, using `useI18n()` or explicit props for non-context consumers. Cover search accessible names, select/clear text, totals and programme counts, chart/table controls, download progress/failure, coming-soon badges, and horizontal-scroll instructions. A count must retain its current denominator and supplemental programme count.
-- [ ] Add a browser assertion that filtering results does not change the bulk-action denominator, and that English screen-reader names correspond to the visible buttons. Run the focused browser file against the isolated build, plus `npm run typecheck` and `npm run i18n:check`.
-- [ ] Commit the named files with `feat: localize shared controls and number units`.
+- [x] Replace hardcoded shared-control labels with `message(messages, key)`, using `useI18n()` or explicit props for non-context consumers. Cover search accessible names, select/clear text, totals and programme counts, chart/table controls, download progress/failure, coming-soon badges, and horizontal-scroll instructions. A count must retain its current denominator and supplemental programme count.
+- [x] Add a browser assertion that filtering results does not change the bulk-action denominator, and that English screen-reader names correspond to the visible buttons. Run the focused browser file against the isolated build, plus `npm run typecheck` and `npm run i18n:check`.
+- [x] Commit the named files with `feat: localize shared controls and number units`.
 
 **Done:** shared controls and number displays work in English; numerical and selection semantics stay unchanged.
+
+> W1 verified on 2026-09-05: 11 new numerical/date regressions; full check passed 166 files / 1,651 tests. Focused shared-component tests passed; isolated rendering fixtures retain their existing Georgian expectations inside the real language provider. Production build and unchanged publication hashes passed. Bilingual controls/navigation passed 13 browser tests, followed by seven final English-control and Georgian-selector/range checks. Desktop/mobile screenshots confirmed label-and-count groups stay together. Evidence: .tmp/bilingual/w1-*. Page-specific copy and chart/model labels remain in W2 and the later family tasks.
 
 ## Task W2: Complete expenditure and receipts explorers
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
 import { useRef } from "react";
 import type { ResolvedRange } from "./use-explorer-state";
 
@@ -18,6 +20,7 @@ type RangeStripProps = {
 type Handle = "start" | "end";
 
 export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) {
+  const { messages } = useI18n();
   const railRef = useRef<HTMLDivElement | null>(null);
   const draggingRef = useRef<Handle | null>(null);
   const { start, end, min, max } = range;
@@ -29,9 +32,9 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
   // delta, so a range of one year zeroes the whole section. The rail handles can
   // still reach that range, which is what the Indicators guard covers.
   const chips = [
-    { label: "5წ", start: years[Math.max(years.length - 5, 0)] ?? min, show: years.length > 5 },
-    { label: "10წ", start: years[Math.max(years.length - 10, 0)] ?? min, show: years.length > 10 },
-    { label: "ყველა", start: min, show: true },
+    { label: message(messages, "controls.fiveYears"), start: years[Math.max(years.length - 5, 0)] ?? min, show: years.length > 5 },
+    { label: message(messages, "controls.tenYears"), start: years[Math.max(years.length - 10, 0)] ?? min, show: years.length > 10 },
+    { label: message(messages, "controls.allYears"), start: min, show: true },
   ].filter((chip) => chip.show);
 
   function yearFromClientX(clientX: number): number {
@@ -133,7 +136,7 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
     <div data-testid="year-range-strip" className="mt-[22px] border-t border-[var(--hairline)] pt-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="text-xs text-[var(--muted)]">
-          დიაპაზონი{" "}
+          {message(messages, "controls.range")}{" "}
           <span className="font-[family-name:var(--font-numeric)] text-xs font-medium text-[var(--ink)]">
             {start}–{end}
           </span>
@@ -167,7 +170,7 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         role="group"
-        aria-label="წლების დიაპაზონი"
+        aria-label={message(messages, "controls.yearRange")}
         className="relative mt-3 h-6 cursor-pointer touch-none"
       >
         <div className="absolute inset-x-0 top-2.5 h-[3px] bg-[var(--hairline-soft)]" />
@@ -192,7 +195,7 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
           onPointerDown={(event) => handleHandleDown("start", event)}
           onKeyDown={(event) => handleKey("start", event)}
           role="slider"
-          aria-label="საწყისი წელი"
+          aria-label={message(messages, "controls.startYear")}
           aria-valuemin={min}
           aria-valuemax={max}
           aria-valuenow={start}
@@ -206,7 +209,7 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
           onPointerDown={(event) => handleHandleDown("end", event)}
           onKeyDown={(event) => handleKey("end", event)}
           role="slider"
-          aria-label="საბოლოო წელი"
+          aria-label={message(messages, "controls.endYear")}
           aria-valuemin={min}
           aria-valuemax={max}
           aria-valuenow={end}

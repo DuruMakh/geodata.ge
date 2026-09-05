@@ -1,8 +1,16 @@
 import type { Locale, Messages, MessageScope } from "./types";
 
 const dictionaries = {
-  ka: { common: () => import("./messages/ka/common.json") },
-  en: { common: () => import("./messages/en/common.json") },
+  ka: {
+    common: () => import("./messages/ka/common.json"),
+    format: () => import("./messages/ka/format.json"),
+    controls: () => import("./messages/ka/controls.json"),
+  },
+  en: {
+    common: () => import("./messages/en/common.json"),
+    format: () => import("./messages/en/format.json"),
+    controls: () => import("./messages/en/controls.json"),
+  },
 } satisfies Record<Locale, Record<MessageScope, () => Promise<{ default: Messages }>>>;
 
 export async function getMessages(locale: Locale, scopes: readonly MessageScope[]): Promise<Messages> {

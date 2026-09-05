@@ -3,7 +3,7 @@ import { FUTURE_METHODOLOGY_DATASETS } from "../../lib/methodology/catalog";
 import type { MethodologyHubEntry } from "../../lib/methodology/types";
 import type { BreadcrumbItem } from "../../lib/seo/structuredData";
 import { BreadcrumbTrail } from "../seo/breadcrumb-json-ld";
-import { ComingSoonBadge } from "../ui/editorial";
+import { ComingSoonBadge } from "../ui/coming-soon-badge";
 import { OpenDocumentVisual } from "./document-visuals";
 
 export function MethodologyHub({

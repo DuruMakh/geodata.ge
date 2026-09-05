@@ -1,6 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ValueUnit } from "../../lib/explorer/format";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
@@ -83,6 +85,7 @@ export function ExplorerView({
   onToggleExpanded,
   downloadAction,
 }: ExplorerViewProps) {
+  const { messages } = useI18n();
   const noSelection = selectedIds.length === 0;
   const series: ChartSeries[] = model.selectedItems.map((item) => {
     const pointsByYear = new Map(model.points.filter((point) => point.itemId === item.id).map((point) => [point.year, point]));
@@ -114,12 +117,12 @@ export function ExplorerView({
           <section data-testid="chart-panel" data-mode={chartMode} data-measure={share ? "share_of_gdp" : "nominal"} className="border-t border-[var(--ink)] pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <SegmentedTabs<ChartMode>
-                ariaLabel="ხედის რეჟიმი"
+                ariaLabel={message(messages, "controls.viewMode")}
                 value={chartMode}
                 onChange={onChartModeChange}
                 options={[
-                  { value: "line", label: "ხაზი", testId: "chart-mode-line" },
-                  { value: "table", label: "ცხრილი", testId: "chart-mode-table" },
+                  { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
+                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
                 ]}
               />
               <div className="flex items-center gap-3.5">

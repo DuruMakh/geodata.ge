@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
-import { ComingSoonBadge } from "../ui/editorial";
+import { ComingSoonBadge } from "../ui/coming-soon-badge";
 import { BUDGET_SECTIONS, BUDGET_SECTION_ORDER } from "../../lib/explorer/sections";
 
 // Budget sections, nested under ბიუჯეტი in the sidebar (DESIGN.md §6.7).

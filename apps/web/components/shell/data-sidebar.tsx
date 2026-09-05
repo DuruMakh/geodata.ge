@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ComingSoonBadge } from "../ui/editorial";
+import { ComingSoonBadge } from "../ui/coming-soon-badge";
 import { SectionNav } from "./section-nav";
 import { LanguageSwitch } from "../site/language-switch";
 import { useI18n } from "../../lib/i18n/provider";

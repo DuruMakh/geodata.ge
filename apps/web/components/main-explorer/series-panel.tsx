@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
 import { useState, type ReactNode } from "react";
 import type { ExplorerItem, ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { formatAmount } from "../../lib/explorer/format";
@@ -107,6 +109,7 @@ export function SeriesPanel({
   onToggleExpanded,
   downloadAction,
 }: SeriesPanelProps) {
+  const { locale, messages } = useI18n();
   // The query is panel-local so keystrokes re-render only this aside — the parent
   // keys this component by scope, which also resets the search on nav/grouping
   // switches consistently.
@@ -130,25 +133,25 @@ export function SeriesPanel({
 
   return (
     <aside
-      aria-label="სერიები"
+      aria-label={message(messages, "controls.series")}
       className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
     >
       <SeriesSelector
         controls={
           showGrouping ? (
             <div className="flex gap-[18px] border-b border-[var(--row-border)] pb-3">
-              <TextTab label="სფეროები" active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
-              <TextTab label="სამინისტროები" active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
+              <TextTab label={message(messages, "controls.fields")} active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
+              <TextTab label={message(messages, "controls.ministries")} active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
             </div>
           ) : undefined
         }
         query={query}
         onQueryChange={setQuery}
-        searchPlaceholder="ძებნა"
-        countLabel={isMinistries ? "ძირითადი" : "სერიები"}
+        searchPlaceholder={message(messages, "controls.search")}
+        countLabel={message(messages, isMinistries ? "controls.primary" : "controls.series")}
         selectedCount={selectedTopLevelCount}
         totalCount={bulkIds.length}
-        supplementalSelected={isMinistries ? { label: "პროგრამები", count: selectedProgramCount } : undefined}
+        supplementalSelected={isMinistries ? { label: message(messages, "controls.programmes"), count: selectedProgramCount } : undefined}
         hasSelection={hasSelection}
         allSelected={allSelected}
         onToggleAll={() => onSelectionChange(hasSelection ? [] : bulkIds)}
@@ -164,7 +167,7 @@ export function SeriesPanel({
               id={item.id}
               label={item.kaLabel}
               color={item.color}
-              value={formatAmount(latest)}
+              value={formatAmount(latest, locale)}
               selected={selected}
               level={item.level}
               parentId={item.parentItemId}

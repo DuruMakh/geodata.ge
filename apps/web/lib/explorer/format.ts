@@ -1,3 +1,9 @@
+import type { Locale } from "../i18n/types";
+import kaFormat from "../i18n/messages/ka/format.json";
+import enFormat from "../i18n/messages/en/format.json";
+
+const formatMessages = { ka: kaFormat, en: enFormat };
+
 // Editorial number formatting (DESIGN.md §11): en-US grouping, fixed decimals
 // (bn: 1, mln: 0, %: 1), minus sign is "−" (U+2212), em dash "—" for missing values.
 
@@ -33,12 +39,12 @@ export function formatBn(value: number | null | undefined): string {
 
 export type AmountParts = { num: string; unit: string };
 
-/** Split amount into number + Georgian unit, choosing მლრდ/მლნ by magnitude. */
-export function formatAmountParts(value: number | null | undefined, signed = false): AmountParts {
+/** Split amount into number and localized unit, choosing magnitude from the value. */
+export function formatAmountParts(value: number | null | undefined, signed = false, locale: Locale = "ka"): AmountParts {
   if (value === null || value === undefined) return { num: MISSING, unit: "" };
   const sign = signed ? (value >= 0 ? "+" : "−") : value < 0 ? "−" : "";
   const abs = Math.abs(value);
-  if (abs >= 0.9995 * BILLION) return { num: sign + fixed(abs / BILLION, 1), unit: "მლრდ ₾" };
+  if (abs >= 0.9995 * BILLION) return { num: sign + fixed(abs / BILLION, 1), unit: formatMessages[locale]["format.bnGel"] };
 
   // Three significant digits. A standalone amount carries its own unit label,
   // so precision can follow the value here — unlike a column, which shares one
@@ -46,29 +52,29 @@ export function formatAmountParts(value: number | null | undefined, signed = fal
   const millions = abs / MILLION;
   const decimals = millions >= 100 ? 0 : millions >= 10 ? 1 : 2;
   if (abs > 0 && Number(millions.toFixed(decimals)) === 0) {
-    return { num: value < 0 ? ">−0.01" : signed ? "+<0.01" : "<0.01", unit: "მლნ ₾" };
+    return { num: value < 0 ? ">−0.01" : signed ? "+<0.01" : "<0.01", unit: formatMessages[locale]["format.mlnGel"] };
   }
-  return { num: sign + fixed(millions, decimals), unit: "მლნ ₾" };
+  return { num: sign + fixed(millions, decimals), unit: formatMessages[locale]["format.mlnGel"] };
 }
 
 /** Full amount string with unit, e.g. "26.5 მლრდ ₾". */
-export function formatAmount(value: number | null | undefined): string {
+export function formatAmount(value: number | null | undefined, locale: Locale = "ka"): string {
   if (value === null || value === undefined) return MISSING;
-  const parts = formatAmountParts(value);
+  const parts = formatAmountParts(value, false, locale);
   return `${parts.num} ${parts.unit}`;
 }
 
 /** Signed full amount string, e.g. "+2.2 მლრდ ₾". */
-export function formatSignedAmount(value: number | null | undefined): string {
+export function formatSignedAmount(value: number | null | undefined, locale: Locale = "ka"): string {
   if (value === null || value === undefined) return MISSING;
-  const parts = formatAmountParts(value, true);
+  const parts = formatAmountParts(value, true, locale);
   return `${parts.num} ${parts.unit}`;
 }
 
 /** Budget per resident in whole lari, e.g. "1,335 ₾". */
-export function formatPerResidentGel(value: number | null | undefined): string {
+export function formatPerResidentGel(value: number | null | undefined, locale: Locale = "ka"): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return MISSING;
-  return `${fixed(value, 0)} ₾`;
+  return `${fixed(value, 0)} ${formatMessages[locale]["format.gel"]}`;
 }
 
 /** Percentage from a fraction, `decimals` digits (default 1); "−" minus; optional "+" for positives. */
@@ -133,4 +139,17 @@ export function formatInUnit(value: number | null | undefined, unit: ValueUnit):
   }
 
   return fixed(scaled, unit.decimals).replace("-", "−");
+}
+
+export function unitsFor(locale: Locale): { bn: ValueUnit; mln: ValueUnit } {
+  return {
+    bn: { ...UNIT_BN, label: formatMessages[locale]["format.bn"] },
+    mln: { ...UNIT_MLN, label: formatMessages[locale]["format.mln"] },
+  };
+}
+
+export function formatDisplayDate(isoDate: string, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "ka-GE", {
+    day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+  }).format(new Date(isoDate + "T00:00:00Z"));
 }
