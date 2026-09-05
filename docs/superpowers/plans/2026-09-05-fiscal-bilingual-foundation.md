@@ -146,6 +146,7 @@ export type EnglishCatalogue = {
 };
 export type TranslationInventory = {
   pagePaths: string[]; labelIds: string[]; sourceIds: string[]; documentIds: string[];
+  derivedSourceIds: string[]; attributedDocumentIds: string[];
   programmeHistory: Array<{ seriesId: string; year: number; originalKa: string }>;
 };
 export async function loadEnglishCatalogue(repositoryRoot: string): Promise<EnglishCatalogue>;
@@ -160,7 +161,7 @@ export async function checkLocalization(): Promise<{ errors: string[]; routeCoun
 
 Store these types in `types.ts`; pure label and validation functions must not import the `.server` loaders. The inventory loader uses existing served-data loaders and `loadManifestDocuments`, not `buildFactQuerySnapshot`: the future snapshot depends on the catalogue, so calling it from catalogue validation would create a cycle.
 
-- [ ] Add tests using a minimal in-memory catalogue/inventory: a missing label, blank label, missing document, invalid review date, missing programme year, changed `originalKa`, mismatched message parameters, and a complete valid pair. Do not access production data to test a missing-key branch.
+- [x] Add tests using a minimal in-memory catalogue/inventory: a missing label, blank label, missing document, invalid review date, missing programme year, changed `originalKa`, mismatched message parameters, and a complete valid pair. Do not access production data to test a missing-key branch.
 
 ```ts
 it('requires an English display name without changing the Georgian name', () => {
@@ -176,10 +177,10 @@ it('detects a lost interpolation variable', () => {
 });
 ```
 
-- [ ] Run `npx vitest run tests/i18n/catalogue.test.ts tests/i18n/coverage.test.ts tests/i18n/labels.test.ts`, confirm the expected failures, then implement strict catalogue loading with the existing Zod dependency. Require nonblank reviewed text and valid ISO review dates. Report failures with catalogue path and stable identity.
-- [ ] Implement inventory construction from the same closed public route lists, served series/derived totals, current and historical programme names, six dataset identities, municipal and regional names, source registry, and full public archive documents. Include source-only aggregate entities where actually exposed. `documentId` for ordinary methodology archive rows is their `source_id`; package-manifest document IDs must come from the existing manifest loader. Do not join a source name to a document by translating the name.
-- [ ] Define `listPublicPagePaths()` as the inventory's page portion using shared route lists and loaded regions, not a second hardcoded municipality list. It returns unprefixed public paths including all live methodology pages and excludes protocol/resources. It must be usable before the English catalogue exists.
-- [ ] Seed and review the catalogue in four batches: national/ministry categories; all served programmes and historical variants; municipal/region/debt/deficit labels; source and document descriptions. Existing English values are seeds, not automatically approved terminology. Retain the official Georgian names verbatim in historical guard records.
+- [x] Run `npx vitest run tests/i18n/catalogue.test.ts tests/i18n/coverage.test.ts tests/i18n/labels.test.ts`, confirm the expected failures, then implement strict catalogue loading with the existing Zod dependency. Require nonblank reviewed text and valid ISO review dates. Report failures with catalogue path and stable identity.
+- [x] Implement inventory construction from the same closed public route lists, served series/derived totals, current and historical programme names, six dataset identities, municipal and regional names, source registry, and full public archive documents. Include source-only aggregate entities where actually exposed. `documentId` for ordinary methodology archive rows is their `source_id`; package-manifest document IDs must come from the existing manifest loader. Do not join a source name to a document by translating the name.
+- [x] Define `listPublicPagePaths()` as the inventory's page portion using shared route lists and loaded regions, not a second hardcoded municipality list. It returns unprefixed public paths including all live methodology pages and excludes protocol/resources. It must be usable before the English catalogue exists.
+- [x] Seed and review the catalogue in four batches: national/ministry categories; all served programmes and historical variants; municipal/region/debt/deficit labels; source and document descriptions. Existing English values are seeds, not automatically approved terminology. Retain the official Georgian names verbatim in historical guard records.
 
 ```json
 {
@@ -189,7 +190,7 @@ it('detects a lost interpolation variable', () => {
 ```
 
 Use the actual review date when authoring; the sample does not authorize marking unseen translations reviewed. Each batch must reconcile to the loaded inventory. Check established English institutional names against official sources when unclear. Identify documentary language only from evidence; retain `null` when unknown. Review long-source explanations and fiscal terminology with the relevant methodology, not a word-for-word substitution.
-- [ ] Add `publicLabel` and `pickEnglishLabels`; return plain strings to client components and omit review metadata. Both languages use identical selected IDs; Georgian labels stay current. Include whole-word or exact allowances for source quotations in a maintained exception list inside `validation.ts`, with reasons and contexts; do not globally suppress Georgian-script detection.
+- [x] Add `publicLabel` and `pickEnglishLabels`; return plain strings to client components and omit review metadata. Both languages use identical selected IDs; Georgian labels stay current. Include whole-word or exact allowances for source quotations in a maintained exception list inside `validation.ts`, with reasons and contexts; do not globally suppress Georgian-script detection.
 
 ```ts
 export function publicLabel(locale: Locale, id: string, labelKa: string, englishLabels: Readonly<Record<string, string>>): string {
@@ -200,10 +201,12 @@ export function publicLabel(locale: Locale, id: string, labelKa: string, english
 }
 ```
 
-- [ ] Wire `checkLocalization()` to validate the loaded catalogue and every currently implemented message-scope pair. The CLI supports `--check` (nonzero exit on errors) and `--inventory` (print IDs/counts without requiring translated files). As W/A tasks add scopes and methodology/service templates, they register their validators here. Retain a final full-coverage gate in V1; early checks must not describe untranslated page components as complete.
-- [ ] Run `npm run i18n:check`, focused tests, and `npm run typecheck`. Confirm the same original data objects fed through CSV-shaped and mirror-shaped fixtures produce the same English map, without requiring live credentials. Commit the named files with `feat: validate reviewed English presentation catalogue`.
+- [x] Wire `checkLocalization()` to validate the loaded catalogue and every currently implemented message-scope pair. The CLI supports `--check` (nonzero exit on errors) and `--inventory` (print IDs/counts without requiring translated files). As W/A tasks add scopes and methodology/service templates, they register their validators here. Retain a final full-coverage gate in V1; early checks must not describe untranslated page components as complete.
+- [x] Run `npm run i18n:check`, focused tests, and `npm run typecheck`. Confirm the same original data objects fed through CSV-shaped and mirror-shaped fixtures produce the same English map, without requiring live credentials. Commit the named files with `feat: validate reviewed English presentation catalogue`.
 
 **Done:** catalogue records cover every exposed identity and historical variant. All consumers have one English display authority; numerical imports, archive bytes, and the mirror are unchanged.
+
+> F3 verified on 2026-09-05: complete catalogue coverage (264 labels, 549 historical records, 115 sources, 195 documents), 1,640 passing full-suite tests, production build and unchanged dataVersion/publication hashes. Build-only orchestration lives in `check.server.ts` to keep validation and client label projection pure. Source derivation and document attribution coverage are checked explicitly.
 
 ## Task F4: Migrate the route roots and install the language switch
 

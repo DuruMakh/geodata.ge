@@ -298,7 +298,7 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
 // cache: nothing here depends on GEODATA_DATA_SOURCE or needs per-test
 // isolation.
 let manifestDocumentsPromise: Promise<ManifestDocument[]> | null = null;
-function loadManifestDocuments(): Promise<ManifestDocument[]> {
+export function loadManifestDocuments(): Promise<ManifestDocument[]> {
   manifestDocumentsPromise ??= loadManifestDocumentsUncached();
   return manifestDocumentsPromise;
 }
