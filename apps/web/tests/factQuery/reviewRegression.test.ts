@@ -108,4 +108,12 @@ describe("MCP review regressions", () => {
     if (result.kind === "error") throw new Error(result.error.messageEn);
     expect((result.data as { series: unknown[] }).series.length).toBeGreaterThan(0);
   });
+
+  it.each(["constructor", "__proto__"])("treats %s as ordinary search text", (search) => {
+    const result = describeCoverage(snapshot, { search });
+    expect(result.status).toBe("empty");
+    if (result.kind === "error") throw new Error(result.error.messageEn);
+    expect((result.data as { series: unknown[]; entities: unknown[] }).series).toEqual([]);
+    expect((result.data as { entities: unknown[] }).entities).toEqual([]);
+  });
 });
