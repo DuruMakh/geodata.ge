@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useI18n } from "../../lib/i18n/provider";
+import { publicLabel } from "../../lib/i18n/labels";
+import { workbookMessage } from "../../lib/i18n/workbook";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
 import {
@@ -77,6 +80,7 @@ export type MunicipalExplorerProps = MunicipalExplorerBaseProps &
   );
 
 export function MunicipalExplorer(props: MunicipalExplorerProps) {
+  const { locale, englishLabels } = useI18n();
   const { functions, functionFacts, totalFacts } = props;
   const { metrics, navigation } = props;
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -204,8 +208,8 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
       return {
         id: row.itemId,
         kind: row.itemId === model.totalRow.itemId ? "total" : "item",
-        parentLabelKa: null,
-        labelKa: row.kaLabel,
+        parentLabel: null,
+        label: publicLabel(locale, row.itemId, row.kaLabel, englishLabels),
         pointsByYear,
       };
     });
@@ -213,17 +217,18 @@ export function MunicipalExplorer(props: MunicipalExplorerProps) {
     const hasTotalSeries = selectedRows.some((row) => row.itemId === model.totalRow.itemId);
     const useTotalSources = hasTotalSeries || (state.share && hasFunctionSeries);
     return {
+      locale,
       filenameBase: props.workbookBasename,
-      titleKa: metrics.kind === "country" ? props.pickerCountry.nameKa : props.triggerLabel,
-      groupLabelKa: "მუნიციპალური ხარჯები",
+      title: publicLabel(locale, props.entityId, metrics.kind === "country" ? props.pickerCountry.nameKa : props.triggerLabel, englishLabels),
+      groupLabel: workbookMessage(locale, "workbook.municipalExpenditure"),
       years,
       measure: state.share
         ? {
             kind: "percentage",
-            unitLabelKa: "% წილი",
-            analysisHeaderKa: "წილი მთლიან ბიუჯეტში (%)",
+            unitLabel: workbookMessage(locale, "workbook.percentShare"),
+            analysisHeader: workbookMessage(locale, "workbook.budgetShareHeader"),
           }
-        : { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
+        : { kind: "amount", unitLabel: workbookMessage(locale, "workbook.millionGel"), readableScale: 1_000_000 },
       totalId: model.totalRow.itemId,
       series: workbookSeries,
       sources: [

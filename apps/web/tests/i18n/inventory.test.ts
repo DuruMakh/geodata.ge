@@ -4,6 +4,7 @@ import sitemap from "../../app/sitemap";
 import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
 import { listPublicPagePaths, loadTranslationInventory } from "../../lib/i18n/inventory.server";
 import { validateCatalogue } from "../../lib/i18n/validation";
+import { DEFICIT_ITEM } from "../../lib/explorer/deficitExplorer";
 
 describe("served translation inventory", () => {
   it("covers the same public page identities as the existing sitemap without protocol routes", async () => {
@@ -24,6 +25,8 @@ describe("served translation inventory", () => {
     expect(catalogue.labels["spending.education"].text).toBe("Education");
     expect(catalogue.labels["revenue.total"].text).toBe("Total receipts");
     expect(catalogue.labels["06"].text).toBe("Batumi");
+    expect(inventory.labelIds).toContain(DEFICIT_ITEM.id);
+    expect(catalogue.labels[DEFICIT_ITEM.id].text).toBe("General government balance");
     expect(inventory.derivedSourceIds).toContain("source.adjara_consolidated_budget");
   });
 });

@@ -11,8 +11,8 @@ import { resolveSiteUrl } from "../../../../lib/siteUrl";
 
 const workbookSources: WorkbookPublicSource[] = [{
   years: Array.from({ length: 37 }, (_, index) => 1995 + index),
-  titleKa: "IMF World Economic Outlook — 2026 წლის აპრილი",
-  organizationKa: "საერთაშორისო სავალუტო ფონდი (IMF)",
+  title: "IMF World Economic Outlook — 2026 წლის აპრილი",
+  organization: "საერთაშორისო სავალუტო ფონდი (IMF)",
   downloadHref: "https://data.imf.org/-/media/iData/External-Storage/Documents/2F78EE59F79143A7921E5E203D3AAA80/en/WEOApr2026all.xlsx",
   retrievedAt: "2026-09-04",
 }];

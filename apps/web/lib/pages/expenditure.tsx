@@ -27,9 +27,9 @@ export async function renderExpenditurePage(locale: Locale) {
   const [{ facts, glossary, sourceDocuments, adminFacts, adminCategories, gdpFacts }, workbookSources, adminWorkbookSources, gdpWorkbookSources] =
     await Promise.all([
       loadServedExplorerData(),
-      loadWorkbookSources("expenditure", "expenditure-fields"),
-      loadWorkbookSources("expenditure", "expenditure-ministries"),
-      loadGdpWorkbookSources(),
+      loadWorkbookSources("expenditure", "expenditure-fields", locale),
+      loadWorkbookSources("expenditure", "expenditure-ministries", locale),
+      loadGdpWorkbookSources(locale),
     ]);
   // Same reasoning the revenue route already applies to the admin corpus: this
   // route's explorerSide is fixed to "expenditure" by `nav`, so the 241 revenue

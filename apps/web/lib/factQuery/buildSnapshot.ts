@@ -73,9 +73,8 @@ function isCleanHttpsUrl(value: string): boolean {
   }
 }
 
-// Same field set as workbookSources.ts's own gdpWorkbookSourceRowSchema (not
-// reused directly: that schema omits source_id, the field this loader exists
-// to keep — see the note below), but with the tightened https check above in
+// Kept separate from workbookSources.ts's gdpWorkbookSourceRowSchema to use
+// the tightened https check above in
 // place of zod's `.url()`, so this path and the officialUrl guard just below
 // cannot drift onto two different definitions of "a real URL". Not
 // `.strict()`: like its sibling, this only names the columns it needs out of

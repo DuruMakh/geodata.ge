@@ -827,6 +827,10 @@
     "text": "General government balance",
     "reviewedAt": "2026-09-05"
   },
+  "deficit.general_government_balance": {
+    "text": "General government balance",
+    "reviewedAt": "2026-09-05"
+  },
   "expenditure.total": {
     "text": "Total expenditure",
     "reviewedAt": "2026-09-05"

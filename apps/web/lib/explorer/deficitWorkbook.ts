@@ -1,5 +1,8 @@
 import type { ServedGeneralGovernmentBalanceFact } from "../servedRows";
 import { DEFICIT_ITEM } from "./deficitExplorer";
+import type { Presentation } from "../i18n/types";
+import { workbookMessage } from "../i18n/workbook";
+import { publicLabel } from "../i18n/labels";
 import {
   buildWorkbookExportModel,
   type WorkbookExportModel,
@@ -12,31 +15,33 @@ export function buildDeficitWorkbookExportModel(input: {
   percentage: boolean;
   sources: readonly WorkbookPublicSource[];
   siteOrigin: string;
-}): WorkbookExportModel {
+}, presentation?: Presentation): WorkbookExportModel {
+  const locale = presentation?.locale ?? "ka";
   const activeFacts = input.facts.filter(
     (fact) => fact.year >= input.range.start && fact.year <= input.range.end,
   );
   const years = activeFacts.map((fact) => fact.year);
 
   return buildWorkbookExportModel({
+    locale,
     filenameBase: "general-government-deficit",
-    titleKa: "ზოგადი მთავრობის ბალანსი",
-    groupLabelKa: "ზოგადი მთავრობის ბალანსი",
+    title: workbookMessage(locale, "workbook.balance"),
+    groupLabel: workbookMessage(locale, "workbook.balance"),
     years,
     measure: input.percentage
       ? {
           kind: "percentage",
-          unitLabelKa: "% მშპ-ში",
-          analysisHeaderKa: "მშპ-ის წილი (%)",
+          unitLabel: workbookMessage(locale, "workbook.percentGdp"),
+          analysisHeader: workbookMessage(locale, "workbook.gdpHeader"),
         }
-      : { kind: "amount", unitLabelKa: "მლრდ ₾", readableScale: 1_000_000_000 },
+      : { kind: "amount", unitLabel: workbookMessage(locale, "workbook.billionGel"), readableScale: 1_000_000_000 },
     totalId: DEFICIT_ITEM.id,
     includeTotalsInAnalysis: true,
     series: [{
       id: DEFICIT_ITEM.id,
       kind: "total",
-      parentLabelKa: null,
-      labelKa: DEFICIT_ITEM.kaLabel,
+      parentLabel: null,
+      label: publicLabel(locale, DEFICIT_ITEM.id, DEFICIT_ITEM.kaLabel, presentation?.englishLabels ?? {}),
       pointsByYear: Object.fromEntries(activeFacts.map((fact) => [
         fact.year,
         {

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
+import { useI18n } from "../../lib/i18n/provider";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
@@ -54,6 +55,7 @@ const FAMILY_LABEL: Record<DebtFamily, string> = {
 };
 
 export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
+  const exportPresentation = useI18n();
   const model = useMemo(() => buildDebtExplorerModel({
     facts: props.facts,
     gdpFacts: props.gdpFacts,
@@ -290,7 +292,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                   sources: props.workbookSources,
                   gdpSources: props.gdpWorkbookSources ?? [],
                   siteOrigin: props.siteOrigin ?? window.location.origin,
-                }))}
+                }, exportPresentation))}
               />
             )}
           />

@@ -4,6 +4,8 @@ import { useEffect, useMemo } from "react";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import type { Presentation } from "../../lib/i18n/types";
+import { publicLabel } from "../../lib/i18n/labels";
+import { workbookMessage } from "../../lib/i18n/workbook";
 import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type {
@@ -234,7 +236,7 @@ function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminC
     .filter(Boolean)
     .join(" · ");
   function buildWorkbookInput(model: ExplorerModel): WorkbookExportInput {
-    const labelById = new Map(model.items.map((item) => [item.id, item.kaLabel]));
+    const labelById = new Map(model.items.map((item) => [item.id, publicLabel(locale, item.id, item.kaLabel, presentation.englishLabels)]));
     const series = model.tableRows.map<WorkbookSeries>((row) => {
       const pointsByYear: WorkbookSeries["pointsByYear"] = {};
       for (const year of model.years) {
@@ -252,21 +254,22 @@ function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminC
       return {
         id: row.itemId,
         kind: row.itemId === model.totalRow?.itemId ? "total" : row.level === "admin_category" ? "group" : "item",
-        parentLabelKa: row.parentItemId ? labelById.get(row.parentItemId) ?? null : null,
-        labelKa: row.kaLabel,
+        parentLabel: row.parentItemId ? labelById.get(row.parentItemId) ?? null : null,
+        label: publicLabel(locale, row.itemId, row.kaLabel, presentation.englishLabels),
         pointsByYear,
       };
     });
 
-    const groupLabelKa = scope === "revenue" ? "შემოსავლები" : scope === "ministries" ? "უწყებები" : "ხარჯები";
+    const groupLabel = workbookMessage(locale, scope === "revenue" ? "workbook.receipts" : scope === "ministries" ? "workbook.institutions" : "workbook.expenditure");
     return {
+      locale,
       filenameBase: scope,
-      titleKa: screenTitle,
-      groupLabelKa,
+      title: screenTitle,
+      groupLabel,
       years: model.years,
       measure: share
-        ? { kind: "percentage", unitLabelKa: "% მშპ-ში", analysisHeaderKa: "მშპ-ის წილი (%)" }
-        : { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
+        ? { kind: "percentage", unitLabel: workbookMessage(locale, "workbook.percentGdp"), analysisHeader: workbookMessage(locale, "workbook.gdpHeader") }
+        : { kind: "amount", unitLabel: workbookMessage(locale, "workbook.millionGel"), readableScale: 1_000_000 },
       totalId: model.totalRow?.itemId ?? null,
       series,
       sources: share

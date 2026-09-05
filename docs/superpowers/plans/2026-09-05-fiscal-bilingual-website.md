@@ -136,7 +136,7 @@ return <span>{displayedName}</span>;
 
 **Interfaces:** Make internal workbook display-property names neutral: `titleKa→title`, `groupLabelKa→groupLabel`, `labelKa→label`, `parentLabelKa→parentLabel`, `organizationKa→organization`, `unitLabelKa→unitLabel`, `analysisHeaderKa→analysisHeader`, and `subtitleKa→subtitle`. Add required `locale: Locale` to `WorkbookExportInput` and `WorkbookExportModel`. `buildWorkbookExportModel` retains its one-input signature. Public source loader signatures gain an optional last locale argument defaulting to Georgian; their caches must include locale, or cache language-neutral source records and project after lookup. Export the two approved sheet-name tuples rather than unrestricted names.
 
-- [ ] Extend the existing workbook fixtures to include explicit `locale`, neutral presentation names, actual/planned/forecast/missing status, zero, negative values, and English text. Add a test that checks exact sheet names, filename suffix, English annotations, numerical cells, and selected-source URLs.
+- [x] Extend the existing workbook fixtures to include explicit `locale`, neutral presentation names, actual/planned/forecast/missing status, zero, negative values, and English text. Add a test that checks exact sheet names, filename suffix, English annotations, numerical cells, and selected-source URLs.
 
 ```ts
 const georgianModel = buildWorkbookExportModel(input);
@@ -158,7 +158,7 @@ it('exports the English table without converting amounts', () => {
 ```
 
 Construct `englishInput` from the existing workbook fixture with only its new locale/display fields translated; `georgianModel` uses the same numerical fixture. Update existing test property names mechanically while retaining every numeric expectation.
-- [ ] Confirm failure, then adapt the model/writer and all existing exporter call sites together so intermediate commits do not leave a broken signature. Keep English labels selected before model construction. Preserve original source IDs for lookup before the loader strips them; map ordinary manifest `source_id` to F3 document records and use the existing package-document IDs for GDP/debt sources. The writer must not perform filesystem translation lookups.
+- [x] Confirm failure, then adapt the model/writer and all existing exporter call sites together so intermediate commits do not leave a broken signature. Keep English labels selected before model construction. Preserve original source IDs for lookup before the loader strips them; map ordinary manifest `source_id` to F3 document records and use the existing package-document IDs for GDP/debt sources. The writer must not perform filesystem translation lookups.
 
 ```ts
 export const SHEET_NAMES = {
@@ -168,8 +168,8 @@ export const SHEET_NAMES = {
 const filename = `fiscal-${input.filenameBase}-${years[0]}-${years.at(-1)}${input.locale === 'en' ? '-en' : ''}.xlsx`;
 ```
 
-- [ ] Localize status lookup, title/subtitle, headings, source labels, download hyperlink text, and the quoted planned marker in Excel number formats. Preserve workbook numeric formatting, hierarchy, filters, frozen rows/columns, source-role selection, archive URLs, GDP-source conditions, and the debt-rate blank GEL column. Public workbooks keep three sheets and no internal provenance columns.
-- [ ] Capture an actual browser download and load the bytes with the existing ExcelJS test pattern. Check sheet names and cell types rather than only the export model. Assert the English and Georgian source links resolve to the same originals and source selection matches the active measure/range.
+- [x] Localize status lookup, title/subtitle, headings, source labels, download hyperlink text, and the quoted planned marker in Excel number formats. Preserve workbook numeric formatting, hierarchy, filters, frozen rows/columns, source-role selection, archive URLs, GDP-source conditions, and the debt-rate blank GEL column. Public workbooks keep three sheets and no internal provenance columns.
+- [x] Capture an actual browser download and load the bytes with the existing ExcelJS test pattern. Check sheet names and cell types rather than only the export model. Assert the English and Georgian source links resolve to the same originals and source selection matches the active measure/range.
 
 ```ts
 const downloadPromise = page.waitForEvent('download');
@@ -183,9 +183,11 @@ await workbook.xlsx.readFile(filePath);
 expect(workbook.worksheets.map(sheet => sheet.name)).toEqual(['Summary', 'Data', 'Sources']);
 ```
 
-- [ ] Run focused workbook/lineage tests, `npm run typecheck`, and `npm run i18n:check`. Commit with `feat: generate English Excel workbooks with source parity`.
+- [x] Run focused workbook/lineage tests, `npm run typecheck`, and `npm run i18n:check`. Commit with `feat: generate English Excel workbooks with source parity`.
 
 **Done:** the exporter can generate either language for every existing export family. W5–W7 will expose English exporter inputs as their pages are localized. Do not add a new export action to a page that currently has none.
+
+> W3 verified on 2026-09-06: full check passed 168 files / 1,669 tests; focused export/catalogue/source cases passed. Ten browser tests passed, including four paired real English/Georgian downloads with equal numeric cells, formulas, blank-versus-text structure, source URLs, source periods and retrieval dates. Files are retained under .tmp/bilingual/w3-workbooks. English debt/rate and signed deficit workbooks were also opened with ExcelJS; rates retain blank GEL cells. Source caches now distinguish locale and join reviewed translations before removing document IDs. The existing deficit UI ID differs from the service ID; both are now explicitly covered in the 265-label inventory, with no identifier changes. Production build passed; publication hashes/dataVersion remained unchanged. Neutral workbook field names were applied to all consumers; English municipal/debt/deficit page inputs will become public with W6/W7.
 
 ## Task W4: Translate complete methodology and source archives
 

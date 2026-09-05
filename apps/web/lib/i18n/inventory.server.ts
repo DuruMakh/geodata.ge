@@ -2,6 +2,7 @@ import path from "node:path";
 import { loadServedExplorerData, loadServedMunicipalData } from "../data/servedData";
 import { BUDGET_SECTIONS, BUDGET_SECTION_ORDER } from "../explorer/sections";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
+import { DEFICIT_ITEM } from "../explorer/deficitExplorer";
 import { loadManifestDocuments } from "../factQuery/buildSnapshot";
 import { resolvePublicSources } from "../factQuery/sources";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_ID } from "../factQuery/types";
@@ -41,7 +42,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia",
       ...municipal.functions.map((row) => row.id), ...municipal.regions.map((row) => row.id),
       ...municipal.municipalities.flatMap((row) => [row.code, `${row.code}.official-name`]),
-      ...AGGREGATE_ONLY_MUNICIPAL_CODES, ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID,
+      ...AGGREGATE_ONLY_MUNICIPAL_CODES, ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID, DEFICIT_ITEM.id,
       "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
     ]),
     sourceIds: sortedUnique(sources.map((row) => row.sourceId)),

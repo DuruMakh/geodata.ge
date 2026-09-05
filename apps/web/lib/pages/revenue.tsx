@@ -26,8 +26,8 @@ export async function revenuePageMetadata(locale: Locale): Promise<Metadata> {
 export async function renderRevenuePage(locale: Locale) {
   const [{ facts, glossary, sourceDocuments, gdpFacts }, workbookSources, gdpWorkbookSources] = await Promise.all([
     loadServedExplorerData(),
-    loadWorkbookSources("revenue", "revenue"),
-    loadGdpWorkbookSources(),
+    loadWorkbookSources("revenue", "revenue", locale),
+    loadGdpWorkbookSources(locale),
   ]);
   // `nav` fixes explorerSide to "revenue" here, so the 286 expenditure rows can
   // never be rendered on this route — 53 KB of dead payload, the same reasoning

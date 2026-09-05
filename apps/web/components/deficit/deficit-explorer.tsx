@@ -5,6 +5,7 @@ import type { ServedGeneralGovernmentBalanceFact } from "../../lib/servedRows";
 import { buildDeficitExplorerModel, DEFICIT_ITEM } from "../../lib/explorer/deficitExplorer";
 import { parseDeficitHash, serializeDeficitHash } from "../../lib/explorer/deficitUrlState";
 import { buildDeficitWorkbookExportModel } from "../../lib/explorer/deficitWorkbook";
+import { useI18n } from "../../lib/i18n/provider";
 import { formatAmount, formatShare, unitFor, UNIT_BN } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
@@ -25,6 +26,7 @@ type DeficitExplorerProps = {
 };
 
 export function DeficitExplorer({ facts, workbookSources, siteOrigin, lastUpdatedAt }: DeficitExplorerProps) {
+  const exportPresentation = useI18n();
   const years = useMemo(
     () => [...new Set(facts.map((fact) => fact.year))].sort((left, right) => left - right),
     [facts],
@@ -276,7 +278,7 @@ export function DeficitExplorer({ facts, workbookSources, siteOrigin, lastUpdate
                 percentage,
                 sources: workbookSources,
                 siteOrigin: siteOrigin ?? window.location.origin,
-              }))}
+              }, exportPresentation))}
             />
           </aside>
         </div>

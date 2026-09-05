@@ -6,12 +6,14 @@ const dictionaries = {
     format: () => import("./messages/ka/format.json"),
     controls: () => import("./messages/ka/controls.json"),
     main: () => import("./messages/ka/main.json"),
+    workbook: () => import("./messages/ka/workbook.json"),
   },
   en: {
     common: () => import("./messages/en/common.json"),
     format: () => import("./messages/en/format.json"),
     controls: () => import("./messages/en/controls.json"),
     main: () => import("./messages/en/main.json"),
+    workbook: () => import("./messages/en/workbook.json"),
   },
 } satisfies Record<Locale, Record<MessageScope, () => Promise<{ default: Messages }>>>;
 
