@@ -1,6 +1,6 @@
 // apps/web/lib/mcp/tools.ts
 //
-// The seven read-only tools, wired to the pure query core. This file owns names,
+// The nine read-only tools, wired to the pure query core. This file owns names,
 // descriptions, schemas and annotations; it owns no arithmetic. Every figure
 // still comes from lib/factQuery/, and every error envelope is the core's own.
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";

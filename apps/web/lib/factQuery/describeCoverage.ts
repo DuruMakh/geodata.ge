@@ -550,7 +550,7 @@ function georgianStem(query: string): string | null {
 function matchesSearch(query: string, candidates: (string | null)[]): boolean {
   const aliases: Record<string, string> = { "დღგ": "revenue.vat", pension: "საპენსიო" };
   const normalized = query.trim().toLowerCase();
-  const needle = aliases[normalized] ?? normalized;
+  const needle = Object.hasOwn(aliases, normalized) ? aliases[normalized] : normalized;
   const stem = georgianStem(needle);
 
   return candidates.some((candidate) => {

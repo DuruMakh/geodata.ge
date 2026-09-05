@@ -295,7 +295,12 @@ instances. Production and preview counter namespaces are separate. A limit
 reached returns 429 and Retry-After; the daily refusal points to the next UTC day.
 These are request allowances, so initialization and discovery also count.
 
-The free service has its own monthly quota (500,000 commands at setup). It does
+The free service has its own monthly quota (500,000 commands at setup).
+[Upstash counts EVAL and its nested Redis commands](https://upstash.com/docs/redis/sdks/ratelimit-ts/costs):
+the current successful request uses six for the minute bucket and four for the
+daily bucket. That allows roughly 50,000 accepted requests per month before
+other usage; refused requests also consume commands. The 10,000/day application
+ceiling is not guaranteed sustainable daily capacity on the free plan. It does
 not guarantee continuous availability under an attack or sustained maximum
 traffic. Provider quota exhaustion pauses MCP through the same fail-closed 503;
 static pages and bulk files continue working. Review usage before changing the

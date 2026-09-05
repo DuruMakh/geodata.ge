@@ -578,8 +578,9 @@ The same observations, sources and caveats are also served live at
 `2025-11-25`, stateless and unauthenticated. `/connect` is the human-facing
 guide to it.
 
-Seven read-only tools: `describe_coverage`, `query_national`,
-`query_ministries`, `query_municipal`, `compare`, `rank`, `get_sources`.
+Nine read-only tools: `describe_coverage`, `query_national`,
+`query_ministries`, `query_municipal`, `query_debt`, `query_deficit`,
+`compare`, `rank`, `get_sources`.
 
 **The connection and the bulk files use the same definitions.** Both are
 produced from one snapshot by the same pure functions in
