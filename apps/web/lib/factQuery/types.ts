@@ -23,7 +23,7 @@ import type {
 export type { MunicipalTotalFact } from "../data/municipal/types";
 export type { ServedNationalGdpFact } from "../servedRows";
 
-export const SCHEMA_VERSION = "1.0.0" as const;
+export const SCHEMA_VERSION = "1.1.0" as const;
 
 /** Municipal codes whose budgets are not territorially attributable (spec section 5.4). */
 export const AGGREGATE_ONLY_MUNICIPAL_CODES = ["05", "42", "43", "46", "64"] as const;

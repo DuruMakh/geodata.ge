@@ -10,7 +10,7 @@ describe("served translation inventory", () => {
   it("covers the same public page identities as the existing sitemap without protocol routes", async () => {
     const paths = await listPublicPagePaths();
     const published = (await sitemap()).map((entry) => new URL(entry.url).pathname);
-    expect([...paths].sort()).toEqual(published.sort());
+    expect(paths.flatMap(path => [path, path === "/" ? "/en" : `/en${path}`]).sort()).toEqual(published.sort());
     expect(new Set(paths).size).toBe(paths.length);
     expect(paths).not.toContain("/mcp");
     expect(paths).toContain("/explorer/municipalities/region/adjara");

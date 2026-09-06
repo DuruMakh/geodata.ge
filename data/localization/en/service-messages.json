@@ -255,5 +255,7 @@
   "sources.source.mof_public_debt_bulletin_n7.name": "Public Debt of Georgia Statistical Bulletin N7",
   "sources.source.municipal_mof_annual_and_history_workbooks.name": "MoF annual functional-classification workbooks (2020-2025) and municipality budget-history workbooks (2016-2025 total payments)",
   "sources.source.municipal_portal_archive.name": "Archived Municipalities Analytical Portal open-data exports (2015-2019 functional actuals)",
-  "sources.source.treasury_consolidated_revenue_actual.name": "Treasury annual consolidated-revenue reports — transfers from autonomous republic"
+  "sources.source.treasury_consolidated_revenue_actual.name": "Treasury annual consolidated-revenue reports — transfers from autonomous republic",
+  "supporting.populationTransformation": "Source sheet “{sheet}”, cell {cell}, year {year}; retained published thousands; persons = thousands × 1000; no estimates.",
+  "supporting.populationUnit": "thousands"
 }

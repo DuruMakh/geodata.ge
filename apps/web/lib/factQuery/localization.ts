@@ -114,13 +114,16 @@ export const SERVICE_MESSAGE_KEYS = [
   "ranking.publicFields",
   "ranking.regions",
   "ranking.valueDefinition",
-  "ranking.withinRegion"
+  "ranking.withinRegion",
+  "supporting.populationTransformation",
+  "supporting.populationUnit"
 ] as const;
 export type ServiceMessageKey = (typeof SERVICE_MESSAGE_KEYS)[number];
 
 // Existing Georgian errors intentionally omit the SDK's English validation
 // detail. Keep each language's established parameters explicit.
 export const SERVICE_MESSAGE_PARAMETERS: Partial<Record<ServiceMessageKey, { ka: readonly string[]; en: readonly string[] }>> = {
+  "supporting.populationTransformation": { ka: ["cell", "sheet", "year"], en: ["cell", "sheet", "year"] },
   "definitions.historicalName": {
     "ka": [
       "base",

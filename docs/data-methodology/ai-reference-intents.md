@@ -1,6 +1,6 @@
 # AI reference intents
 
-Twenty budget questions, each asked in Georgian and in English, with the answer
+Twenty-four budget questions, each asked in Georgian and in English, with the answer
 Fiscal.ge must give and the limitation that answer must carry. This is the
 acceptance list for the query service: if one of these regresses, the service is
 wrong, not merely different.
@@ -9,13 +9,15 @@ The list comes from the query-core specification (§14.3). It is executed as a
 test — `apps/web/tests/factQuery/reference.test.ts`, over the fixture in
 `apps/web/tests/factQuery/fixtures/referenceIntents.ts` — so it cannot rot
 quietly. Running the calls tests arithmetic and evidence. Whether a real AI
-client then *says* the right thing in Georgian is checked separately, against
-real clients; the service itself makes no AI calls.
+client then *says* the right thing in either language needs a separate real-client
+check; the service itself makes no AI calls. SDK transport tests do not establish
+an external assistant's language understanding.
 
-**"Bilingual" is the language of the question, not of the data.** Labels stay
-Georgian. A client answers in the language it was asked in by translating the
-label, and these intents pin that it can do so without corrupting the figure,
-its scope, or its caveats.
+**Questions and responses are bilingual in schema 1.1.0.** Reviewed Georgian and
+English labels, definitions, missingness, comparisons, ranking explanations and
+source descriptions travel with the same figures. Clients use the appropriate
+`*Ka`/`*En` fields. The 24 existing numerical, source and comparability expectations
+remain unchanged; language assertions verify the additional response fields.
 
 ## How the expected values were established
 

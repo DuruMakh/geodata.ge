@@ -7,13 +7,15 @@ import { loadEnglishCatalogue } from "./catalogue.server";
 import { loadTranslationInventory } from "./inventory.server";
 import { getMessages } from "./messages.server";
 import { MESSAGE_SCOPES } from "./types";
-import { serviceMessagesSchema, validateCatalogue, validateMessages, validateServiceMessages } from "./validation";
+import { serviceMessagesSchema, validateCatalogue, validateMessages, validateServiceMessages, validatePageRevisions } from "./validation";
+import { loadPageRevisions } from "./page-revisions.server";
 
 export async function checkLocalization(): Promise<{ errors: string[]; routeCount: number; labelCount: number }> {
   const [catalogue, inventory] = await Promise.all([
     loadEnglishCatalogue(path.resolve(process.cwd(), "../..")), loadTranslationInventory(),
   ]);
   const errors = validateCatalogue(catalogue, inventory);
+  errors.push(...validatePageRevisions(await loadPageRevisions(), inventory.pagePaths));
   const [serviceKa, serviceEn] = await Promise.all(["ka", "en"].map(async locale =>
     serviceMessagesSchema.parse(JSON.parse(await readFile(path.resolve(process.cwd(), `../../data/localization/${locale}/service-messages.json`), "utf8"))),
   ));

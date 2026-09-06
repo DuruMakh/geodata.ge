@@ -166,14 +166,7 @@ export async function renderConnectPage(locale: Locale) {
             </p>
           </section>
 
-          {/* Asked for directly, and worth stating carefully. Without the
-              connection an assistant can still read this site over the web -
-              the pages, the methodology and the published files are all
-              public. What it does not get that way is per-figure source
-              resolution and the caveats, so it can quote a correct number with
-              the wrong meaning attached. The prompt carries its own "say so if
-              the figure is not there" clause, because that instruction is what
-              makes the difference between a sourced answer and a guess. */}
+          {/* Public files retain evidence too; the connection adds direct queries. */}
           <section className="mt-10 border-t border-[var(--ink)] pt-5" data-testid="connect-without">
             <h2 className="font-[family-name:var(--font-display)] text-[23px] font-semibold">
               {message(messages, "connect.withoutConnection")}
@@ -200,6 +193,15 @@ export async function renderConnectPage(locale: Locale) {
             <p className="mt-4 max-w-[820px] text-[13px] leading-[1.8] text-[var(--muted)]">
               {message(messages, "connect.webSearchNote")}
             </p>
+          </section>
+
+          <section className="mt-10 border-t border-[var(--ink)] pt-5" data-testid="connect-bilingual">
+            <h2 className="font-[family-name:var(--font-display)] text-[23px] font-semibold">{message(messages, "connect.bilingualHeading")}</h2>
+            <p className="mt-4 max-w-[820px] text-[13.5px] leading-[1.8] text-[var(--body)]">{message(messages, "connect.bilingualText")}</p>
+            <h3 className="mt-5 text-[14px] font-semibold">{message(messages, "connect.examplesHeading")}</h3>
+            <ul className="mt-3 grid max-w-[820px] list-disc gap-2 pl-5 text-[13.5px] leading-[1.8] text-[var(--body)]">
+              {["connect.exampleNational", "connect.exampleMunicipal", "connect.exampleDebt", "connect.exampleDeficit"].map(key => <li key={key}>{message(messages, key)}</li>)}
+            </ul>
           </section>
 
           {/* Spec 12.3: naming what is NOT served is what stops someone asking
@@ -262,6 +264,7 @@ export async function renderConnectPage(locale: Locale) {
             <p className="max-w-[900px] text-[12px] leading-[1.9] text-[var(--muted)]">
               {message(messages, "connect.technical")}
             </p>
+            <p className="mt-3 max-w-[900px] text-[12px] leading-[1.9] text-[var(--muted)]">{message(messages, "connect.languageContract")}</p>
           </section>
         </main>
         <SiteFooter locale={locale} updatedAt={model.updatedAt} />

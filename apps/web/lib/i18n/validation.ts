@@ -13,6 +13,18 @@ const reviewedText = z.strictObject({
 });
 const id = z.string().min(1);
 
+export const pageRevisionsSchema = z.record(z.string().startsWith("/"), reviewedAt);
+
+export function validatePageRevisions(revisions: unknown, paths: readonly string[]): string[] {
+  const parsed = pageRevisionsSchema.safeParse(revisions);
+  if (!parsed.success) return parsed.error.issues.map(issue => `Page revision ${issue.path.join(".")}: ${issue.message}`);
+  const expected = new Set(paths);
+  return [
+    ...paths.filter(path => !Object.hasOwn(parsed.data, path)).map(path => `Missing page revision: ${path}`),
+    ...Object.keys(parsed.data).filter(path => !expected.has(path)).map(path => `Unknown page revision: ${path}`),
+  ];
+}
+
 export const englishCatalogueSchema = z.strictObject({
   labels: z.record(id, reviewedText),
   programmeHistory: z.record(id, z.record(z.string().regex(/^\d{4}$/), reviewedText.extend({ originalKa: z.string().min(1) }))),

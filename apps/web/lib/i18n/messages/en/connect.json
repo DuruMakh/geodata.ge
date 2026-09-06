@@ -25,7 +25,7 @@
   "connect.webSearchPrompt": "If your assistant can search the web, start with:",
   "connect.copyPrompt": "Copy text",
   "connect.copiedPrompt": "Text copied",
-  "connect.webSearchNote": "This lets the assistant read the site’s pages, methodology and published files to find real figures. It does not provide the connection’s direct link from each figure to its sources and caveats, such as a warning that two years are not comparable. Use the connection for precise citations.",
+  "connect.webSearchNote": "An assistant with web access can read the pages and published files, including their sources and caveats. The connection adds direct queries, comparisons and rankings using the same reviewed data. In either case, ask it to cite the source and explain any limits on the figure.",
   "connect.coverage": "Data coverage",
   "connect.available": "Available",
   "connect.receipts": "Consolidated budget receipts —",
@@ -44,5 +44,13 @@
   "connect.copiedEndpoint": "Address copied",
   "connect.copy": "Copy",
   "connect.copied": "Copied",
-  "connect.quotedPrompt": "“{prompt}”"
+  "connect.quotedPrompt": "“{prompt}”",
+  "connect.bilingualHeading": "Ask in Georgian or English",
+  "connect.bilingualText": "Both languages use the same figures and original sources. The connection returns reviewed names, definitions and explanations in Georgian and English; catalogue search accepts either language. Original source documents keep their published language.",
+  "connect.examplesHeading": "Example questions",
+  "connect.exampleNational": "How much did the state budget spend on education in 2025?",
+  "connect.exampleMunicipal": "How did Khulo’s municipal expenditure change from 2024 to 2025, and are the totals comparable?",
+  "connect.exampleDebt": "What was the government debt portfolio’s weighted-average interest rate in 2024?",
+  "connect.exampleDeficit": "Which general government balance years are forecasts, and what does a negative value mean?",
+  "connect.languageContract": "Data format 1.1.0 adds *Ka and *En fields for reviewed Georgian and English descriptions. Generic fields retain the original wording; documentLanguage is null when unverified. A translation correction changes dataVersion. Existing requests, tool names and shared /mcp and /downloads/data/ URLs are unchanged. Clients must accept additive fields and version 1.1.0."
 }

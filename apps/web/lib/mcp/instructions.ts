@@ -1,8 +1,8 @@
 // apps/web/lib/mcp/instructions.ts
 //
 // What every connecting client is told before it calls anything. Authored in
-// English because it is read by models, not by site visitors; the DATA it
-// describes stays Georgian (spec section 10).
+// English because it is read by models. Reviewed response descriptions are
+// supplied in both Georgian and English by the pinned snapshot.
 //
 // These instructions explain scope, units, missingness, required caveats,
 // citation behaviour and the prohibition on unsupported causal or
@@ -43,6 +43,23 @@ WHAT IS SERVED
   IMF, ${range("general-government-balance")}.
 Coverage is derived from the loaded data and is reported by describe_coverage.
 Do not assume a year or a series exists; ask.
+
+LANGUAGES AND COMPATIBILITY
+Schema 1.1.0 adds reviewed Georgian (*Ka) and English (*En) names, definitions,
+missing-value explanations, comparison reasons, rankings and source descriptions.
+Answer in the user's language using those fields. Catalogue search matches both
+languages. The same nine tools and input schemas work without a language argument.
+Generic source/document fields preserve original wording and mandatory attribution;
+translated companions describe it without replacing it. documentLanguage is null
+when unverified; a translated title does not mean the source document was translated.
+Translation corrections change dataVersion because the text is part of the pinned
+data identity. Reuse a dataVersion only with responses from that same snapshot.
+Clients must accept additive fields and schema 1.1.0; exact-version or unknown-field
+validators need updating. Byte-for-byte response compatibility is not promised.
+Both /connect and /en/connect describe the shared /mcp endpoint and /downloads/data/
+publications. Static publications carry the same bilingual evidence and remain
+available without an MCP connection. Text rows include both languages; values and
+stable identifiers are not translated.
 
 WHAT IS NOT SERVED
 Quarterly or monthly data, live budget execution, individual capital
@@ -104,8 +121,8 @@ even in parentheses after the thing they name. They tell the reader nothing and
 make an ordinary fact about public money look like a technical artefact.
 
 Say what they mean instead:
-- Name things with the Georgian labels the response already carries
-  (entityLabelKa, seriesLabelKa), not with their ids.
+- Name things with the reviewed labels in the user's language
+  (entityLabelKa/En, seriesLabelKa/En), not with their ids.
 - Describe a caveat with its own messageKa/messageEn, never its code. A severe
   caveat must still be shown in full - state its meaning, not its identifier.
 - Give an accounting boundary in words. "Consolidated budget receipts" is a

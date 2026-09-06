@@ -1,6 +1,6 @@
 # Fiscal.ge
 
-> Fiscal.ge is a Georgian-first guide to reviewed annual data on Georgia's state and municipal budgets.
+> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets.
 
 **When to use Fiscal.ge:** Use it to understand, compare, and cite the published budget data, its scope, and its documented sources.
 
@@ -35,10 +35,23 @@ The manifest lists every dataset file, so they are reachable without repeating t
 ## AI connection
 
 - [Connect an AI assistant](https://fiscal.ge/connect) — connection address, setup and coverage.
+- [Connect an AI assistant in English](https://fiscal.ge/en/connect) — the same endpoint, with English instructions and examples.
+
+Schema 1.1.0 supplies reviewed Georgian (*Ka) and English (*En) labels, definitions, missing-value explanations, comparison reasons, ranking descriptions and source evidence. Generic fields retain original wording and mandatory attributions. documentLanguage is null unless verified; an English title does not imply an English source document. Catalogue search accepts either language. Translation corrections change dataVersion. Existing requests and nine tool names are unchanged, with no language argument; clients must accept additive fields and schema 1.1.0 rather than require byte-identical output. Human pages use /en for English; /mcp, /downloads/data/, /robots.txt, /sitemap.xml and /llms.txt remain shared.
+
+Paired example questions:
+- „რამდენი დაიხარჯა სახელმწიფო ბიუჯეტიდან განათლებაზე 2025 წელს?“ / “How much did the state budget spend on education in 2025?”
+- „როგორ შეიცვალა ხულოს მუნიციპალური ხარჯები 2024 წლიდან 2025 წლამდე და შედარებადია თუ არა ჯამები?“ / “How did Khulo’s municipal expenditure change from 2024 to 2025, and are the totals comparable?”
+- „რამდენი იყო სახელმწიფო ვალის პორტფელის შეწონილი საშუალო საპროცენტო განაკვეთი 2024 წელს?“ / “What was the government debt portfolio’s weighted-average interest rate in 2024?”
+- „სახელმწიფო მმართველობის სექტორის ბალანსის რომელი წლებია პროგნოზი და რას ნიშნავს უარყოფითი მნიშვნელობა?“ / “Which general government balance years are forecasts, and what does a negative value mean?”
 
 The endpoint is `https://fiscal.ge/mcp`, MCP Streamable HTTP, protocol revision 2025-11-25, stateless and unauthenticated. If it returns 429, respect Retry-After; if temporarily unavailable, use https://fiscal.ge/downloads/data/manifest.json. It exposes nine read-only tools: describe_coverage, query_national, query_ministries, query_municipal, query_debt, query_deficit, compare, rank and get_sources. Call describe_coverage first — it returns the ids, measures and year ranges that exist, so nothing has to be guessed. Every answer carries its sources and any caveats that qualify it.
 
 ## Site navigation
+
+- [English home](https://fiscal.ge/en) — scope and latest reviewed coverage.
+- [English budget explorer](https://fiscal.ge/en/explorer) — all current data families.
+- [English methodology](https://fiscal.ge/en/methodology/expenditure) — reviewed definitions and original source documents.
 
 - [Mission — Fiscal.ge](https://fiscal.ge/about) — the site's purpose and public-data boundaries.
 - [Sitemap](https://fiscal.ge/sitemap.xml) — the machine-readable list of public HTML pages.

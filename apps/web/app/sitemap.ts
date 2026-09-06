@@ -11,6 +11,8 @@ import {
 import { MUNICIPALITY_ROUTES } from "../lib/explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../lib/siteUrl";
 import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "../lib/seo/internalLinks";
+import { loadPageRevisions } from "../lib/i18n/page-revisions.server";
+import { pageHref } from "../lib/i18n/routes";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
@@ -55,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return reviewed ? new Date(reviewed) : undefined;
   };
 
-  return [
+  const georgian: MetadataRoute.Sitemap = [
     { url: `${siteUrl}/`, lastModified },
     { url: `${siteUrl}/about`, lastModified },
     { url: `${siteUrl}/connect`, lastModified },
@@ -121,4 +123,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     }),
   ];
+  const revisions = await loadPageRevisions();
+  return georgian.flatMap(entry => {
+    const path = new URL(entry.url).pathname;
+    const reviewedAt = revisions[path];
+    if (!reviewedAt) throw new Error(`Missing English page revision: ${path}`);
+    const en = new URL(pageHref(path, "en"), siteUrl).href;
+    const languages = { ka: entry.url, en, "x-default": entry.url };
+    const originalDate = entry.lastModified ? new Date(entry.lastModified).toISOString().slice(0, 10) : "";
+    return [
+      { ...entry, alternates: { languages } },
+      { url: en, lastModified: new Date([originalDate, reviewedAt].sort().at(-1)!), alternates: { languages } },
+    ];
+  });
 }
