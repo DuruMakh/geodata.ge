@@ -21,9 +21,13 @@ const parse = (bytes: Buffer): Record<string, never> => JSON.parse(bytes.toStrin
 // Rebuilding per `it` cost 47.6s here against 10.2s for a complete
 // build-and-write run.
 let snapshot: FactQuerySnapshot;
-// The four builders below are pure over the snapshot, and 22 tests read them.
-// Calling them per `it` rebuilt and re-serialised every published file 23
-// times: 32.7s for this file alone against 5.9s when they are built once.
+// The published files are pure over the snapshot, and 22 tests read them.
+// Rebuilding per `it` re-serialised all of them 23 times: 32.7s for this file
+// against 5.9s built once. `buildAllPublications` already composes the other
+// three builders, and `buildDatasetFiles` is the only expensive one (1.8s of
+// its 2.1s), so everything is taken from that single call rather than built
+// again alongside it. Selected by name, not position, so a reordering fails in
+// the test that pins the order rather than silently here.
 let datasetFiles: ReturnType<typeof buildDatasetFiles>;
 let allPublications: ReturnType<typeof buildAllPublications>;
 let catalogueFile: ReturnType<typeof buildCatalogueFile>;
@@ -31,10 +35,12 @@ let sourcesFile: ReturnType<typeof buildSourcesFile>;
 
 beforeAll(async () => {
   snapshot = await buildFactQuerySnapshot(OPTIONS);
-  datasetFiles = buildDatasetFiles(snapshot);
   allPublications = buildAllPublications(snapshot);
-  catalogueFile = buildCatalogueFile(snapshot);
-  sourcesFile = buildSourcesFile(snapshot);
+  catalogueFile = allPublications.find((file) => file.fileName === "catalogue.json")!;
+  sourcesFile = allPublications.find((file) => file.fileName === "sources.json")!;
+  datasetFiles = allPublications.filter(
+    (file) => !["catalogue.json", "sources.json", "manifest.json"].includes(file.fileName),
+  );
 });
 
 describe("publication header", () => {
