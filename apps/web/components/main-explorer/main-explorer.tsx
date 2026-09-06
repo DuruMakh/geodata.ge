@@ -190,9 +190,9 @@ function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminC
             glossary,
             side: analysisSide,
             year: analysisYear ?? analysisYears.at(-1) ?? 0,
-          })
+          }, presentation)
         : null,
-    [isAnalysis, facts, adminFacts, adminCategoryMap, analysisGrouping, glossary, analysisSide, analysisYear, analysisYears],
+    [isAnalysis, facts, adminFacts, adminCategoryMap, analysisGrouping, glossary, analysisSide, analysisYear, analysisYears, presentation],
   );
 
   const deck = useMemo(() => {
@@ -203,7 +203,7 @@ function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminC
       const yoy = previousTotal ? (analysisModel.totalGel - previousTotal) / previousTotal : null;
 
       return {
-        lead: `${year} · ${analysisModel.items.length} კატეგორია · სულ ${formatAmount(analysisModel.totalGel, locale)}`,
+        lead: message(messages, "analysis.deck", { year, count: analysisModel.items.length, amount: formatAmount(analysisModel.totalGel, locale) }),
         yoy,
       };
     }
@@ -220,10 +220,10 @@ function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminC
       lead: latestTotal === null ? "" : `${latestYear}: ${formatAmount(latestTotal, locale)}`,
       yoy,
     };
-  }, [totalsByScope, scope, scopeYears, analysisSide, analysisGrouping, analysisModel, locale]);
+  }, [totalsByScope, scope, scopeYears, analysisSide, analysisGrouping, analysisModel, locale, messages]);
 
   const screenTitle = analysisModel
-    ? `${analysisModel.year} წლის ბიუჯეტის სურათი — ${analysisSide === "expenditure" ? "სად მიდის საჯარო ფული" : "საიდან მოდის საჯარო ფული"}`
+    ? message(messages, analysisSide === "expenditure" ? "analysis.expenditureHeading" : "analysis.revenueHeading", { year: analysisModel.year })
     : nav === "expenditure"
       ? message(messages, "main.expenditureHeading")
       : message(messages, "main.revenueHeading");

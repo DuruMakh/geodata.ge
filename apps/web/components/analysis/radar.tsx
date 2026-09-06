@@ -1,3 +1,6 @@
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
+import { publicLabel } from "../../lib/i18n/labels";
 import type { SnapshotItem } from "../../lib/explorer/types";
 import { formatShare } from "../../lib/explorer/format";
 import { SwatchBar } from "../ui/editorial";
@@ -14,6 +17,8 @@ const CY = 158;
 const RADIUS = 104;
 
 export function BudgetRadar({ items }: BudgetRadarProps) {
+  const { locale, messages, englishLabels } = useI18n();
+  const labelFor = (item: Pick<SnapshotItem, "itemId" | "kaLabel">) => publicLabel(locale, item.itemId, item.kaLabel, englishLabels);
   if (items.length === 0) return null;
 
   const numbered = items.map((item, index) => ({ ...item, num: String(index + 1).padStart(2, "0") }));
@@ -41,10 +46,10 @@ export function BudgetRadar({ items }: BudgetRadarProps) {
 
   return (
     <div data-testid="budget-radar" className="mt-9 border-t border-[var(--hairline)] pt-6">
-      <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის რადარი</h2>
-      <p className="mb-4 text-xs text-[var(--muted)]">წილები · ზედა კატეგორიები · მხოლოდ ვიზუალური</p>
+      <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">{message(messages, "analysis.radar")}</h2>
+      <p className="mb-4 text-xs text-[var(--muted)]">{message(messages, "analysis.radarNote")}</p>
       <div className="grid items-center gap-6 @min-[1100px]:grid-cols-[minmax(0,1fr)_300px] @min-[1100px]:gap-12">
-        <svg viewBox="0 0 420 316" role="img" aria-label="ბიუჯეტის რადარი" className="block h-auto w-full max-w-[460px]">
+        <svg viewBox="0 0 420 316" role="img" aria-label={message(messages, "analysis.radar")} className="block h-auto w-full max-w-[460px]">
           {[0.25, 0.5, 0.75, 1].map((fraction) => (
             <path key={fraction} d={ringPath(fraction)} fill="none" stroke="#E7DECF" strokeWidth={1} />
           ))}
@@ -67,7 +72,7 @@ export function BudgetRadar({ items }: BudgetRadarProps) {
 
             return (
               <circle key={item.itemId} cx={x} cy={y} r={3} fill={item.color}>
-                <title>{`${item.kaLabel} — ${formatShare(item.shareOfTotal)}`}</title>
+                <title>{`${labelFor(item)} — ${formatShare(item.shareOfTotal)}`}</title>
               </circle>
             );
           })}
@@ -78,7 +83,7 @@ export function BudgetRadar({ items }: BudgetRadarProps) {
               <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{item.num}</span>
               <SwatchBar color={item.color} />
               <span className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-medium text-[var(--ink)]">
-                {item.kaLabel}
+                {labelFor(item)}
               </span>
               <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
                 {formatShare(item.shareOfTotal)}

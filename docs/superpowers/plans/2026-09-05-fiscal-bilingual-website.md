@@ -250,7 +250,7 @@ The seven supporting values above come from the existing methodology page's data
 
 **Interfaces:** `renderAnalysisPage(locale: Locale): Promise<React.ReactElement>` and `analysisPageMetadata(locale: Locale): Promise<Metadata>`. Existing `buildSingleYearSnapshotModel(input, presentation?: Presentation)` preserves its numerical output and resolves display names through F3.
 
-- [ ] Add a year/grouping parity test and browser tests for all six current visualizations. The test must verify that the language switch retains `as`, `ag`, and `ay` hash values, and that English labels appear in focus/hover details.
+- [x] Add a year/grouping parity test and browser tests for all six current visualizations. The test must verify that the language switch retains `as`, `ag`, and `ay` hash values, and that English labels appear in focus/hover details.
 
 ```ts
 test('keeps analysis year and grouping across languages', async ({ page }) => {
@@ -264,7 +264,7 @@ test('keeps analysis year and grouping across languages', async ({ page }) => {
 });
 ```
 
-- [ ] Confirm failure, then pass `Presentation` to the existing snapshot presentation and visualization components. Replace full headline sentences, tooltips, chart summaries, category names, ranks/ordinals, unit descriptions, and accessible labels. Retain every numerical position/size/rank and its selected side/group/year.
+- [x] Confirm failure, then pass `Presentation` to the existing snapshot presentation and visualization components. Replace full headline sentences, tooltips, chart summaries, category names, ranks/ordinals, unit descriptions, and accessible labels. Retain every numerical position/size/rank and its selected side/group/year.
 
 ```ts
 const title = message(presentation.messages, 'analysis.every100.title');
@@ -272,9 +272,13 @@ const amount = formatAmountParts(value, false, presentation.locale);
 ```
 
 Define `analysis.every100.title` as the unchanged Georgian title and `Every 100 GEL` in English. Keep decimal handling and share calculations in the current functions.
-- [ ] Run the model tests, relevant existing single-year tests, focused browser coverage at desktop/mobile, `npm run typecheck`, and `npm run i18n:check`. Commit with `feat: localize single-year budget analysis`.
+- [x] Run the model tests, relevant existing single-year tests, focused browser coverage at desktop/mobile, `npm run typecheck`, and `npm run i18n:check`. Commit with `feat: localize single-year budget analysis`.
 
 **Done:** the six visualizations and all accessible descriptions are English-complete without new chart behaviour.
+
+> W5 verified on 2026-09-06: full check passed 173 files / 1,697 tests; 118 focused translation/model/agreement tests and all 53 main-explorer/English-analysis browser tests passed. Every served year in expenditure fields, administrative categories and receipts has identical model rows, ranks, numerical headlines, radar inputs and 100-cell allocations in both languages. English initial HTML, source notes, hover/focus details, the first-year growth limitation, mobile controls, and state across switching/back/reload are verified. Treemap geometry, radar paths, bubble coordinates, cell colours and displayed ranking numbers stay identical. The existing synthetic snapshot.other display ID is now reviewed in the 266-label catalogue; no data ID or calculation changed.
+
+> Final production build passed with 107 static-generation entries, only /mcp dynamic, unchanged dataVersion a6c927f06f86396992ed7afd5fc0aae3accfc83700f3213fc28ddcbc7c1ceeff, and all ten publication hashes verified. Desktop/mobile screenshots reviewed under .tmp/bilingual/w5-*. Preview: http://127.0.0.1:3217/en/explorer/analysis. There is no new analysis download action. Shared English metadata completion remains W9.
 
 ## Task W6: Complete municipal index, municipality, region, and country pages
 

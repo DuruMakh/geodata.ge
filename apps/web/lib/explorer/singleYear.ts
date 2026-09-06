@@ -1,4 +1,8 @@
 import { chooseActivePublicFacts } from "../data/activeFacts";
+import { message } from "../i18n/messages";
+import { publicLabel } from "../i18n/labels";
+import type { Presentation } from "../i18n/types";
+import kaAnalysis from "../i18n/messages/ka/analysis.json";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import type { GlossaryEntry } from "../data/glossary";
 import type { ClientAdminFact, ClientBudgetFact } from "./clientData";
@@ -42,10 +46,8 @@ function totalIdFor(side: ExplorerSide): string {
   return side === "revenue" ? "revenue.total" : "expenditure.total";
 }
 
-function emptyReasonFor(side: ExplorerSide): string {
-  return side === "revenue"
-    ? "ამ წლისთვის შემოსავლების მონაცემები ჯერ არ არის ჩატვირთული."
-    : "ამ წლისთვის ხარჯების მონაცემები ჯერ არ არის ჩატვირთული.";
+function emptyReasonFor(side: ExplorerSide, presentation?: Presentation): string {
+  return message(presentation?.messages ?? kaAnalysis, side === "revenue" ? "analysis.emptyRevenue" : "analysis.emptyExpenditure");
 }
 
 // Growth from a non-positive base (e.g. revenue.other_taxes 2019-2020) is not
@@ -105,7 +107,7 @@ function wholeGelFrom100(items: SnapshotItem[]): Every100Item[] {
   }));
 }
 
-function buildRadarItems(items: SnapshotItem[]): SnapshotItem[] {
+function buildRadarItems(items: SnapshotItem[], presentation?: Presentation): SnapshotItem[] {
   if (items.length <= 8) return items;
 
   const visible = items.slice(0, 7);
@@ -121,7 +123,7 @@ function buildRadarItems(items: SnapshotItem[]): SnapshotItem[] {
     {
       itemId: "snapshot.other",
       kaLabel: "სხვა",
-      enLabel: "Other",
+      enLabel: presentation ? publicLabel("en", "snapshot.other", "სხვა", presentation.englishLabels) : "Other",
       color: OTHER_COLOR,
       amountGel,
       shareOfTotal: omitted.reduce((sum, item) => sum + item.shareOfTotal, 0),
@@ -133,9 +135,10 @@ function buildRadarItems(items: SnapshotItem[]): SnapshotItem[] {
   ];
 }
 
-const NO_PREVIOUS_YEAR_NOTE = "წინა წლის მონაცემები არ არის";
-
-function headlineCards(totalGel: number, year: number, items: SnapshotItem[]): SnapshotHeadline[] {
+function headlineCards(totalGel: number, year: number, items: SnapshotItem[], presentation?: Presentation): SnapshotHeadline[] {
+  const locale = presentation?.locale ?? "ka";
+  const messages = presentation?.messages ?? kaAnalysis;
+  const labelFor = (item: SnapshotItem) => publicLabel(locale, item.itemId, item.kaLabel, presentation?.englishLabels ?? {});
   const largest = items[0] ?? null;
   const fastestGrowth = [...items]
     .filter((item) => item.changeFromPreviousYear !== null)
@@ -146,47 +149,47 @@ function headlineCards(totalGel: number, year: number, items: SnapshotItem[]): S
   const largestIncrease = [...items]
     .filter((item) => item.amountChangeFromPreviousYear !== null && item.changeFromPreviousYear !== null)
     .sort((a, b) => (b.amountChangeFromPreviousYear ?? -Infinity) - (a.amountChangeFromPreviousYear ?? -Infinity))[0] ?? null;
-  const totalParts = formatAmountParts(items.length > 0 ? totalGel : null);
-  const largestParts = largest ? formatAmountParts(largest.amountGel) : { num: MISSING, unit: "" };
-  const increaseParts = largestIncrease ? formatAmountParts(largestIncrease.amountChangeFromPreviousYear, true) : { num: MISSING, unit: "" };
+  const totalParts = formatAmountParts(items.length > 0 ? totalGel : null, false, locale);
+  const largestParts = largest ? formatAmountParts(largest.amountGel, false, locale) : { num: MISSING, unit: "" };
+  const increaseParts = largestIncrease ? formatAmountParts(largestIncrease.amountChangeFromPreviousYear, true, locale) : { num: MISSING, unit: "" };
 
   return [
     {
       id: "total",
-      label: "სულ",
+      label: message(messages, "analysis.total"),
       value: totalParts.num,
       unit: totalParts.unit,
-      detail: `${items.length} კატეგორია · ${year}`,
+      detail: message(messages, "analysis.headlinePeriod", { count: items.length, year }),
       negative: false,
     },
     {
       id: "largest",
-      label: "ყველაზე დიდი",
+      label: message(messages, "analysis.largest"),
       value: largestParts.num,
       unit: largestParts.unit,
-      detail: largest ? `${largest.kaLabel} · ${formatShare(largest.shareOfTotal)}` : MISSING,
+      detail: largest ? `${labelFor(largest)} · ${formatShare(largest.shareOfTotal)}` : MISSING,
       negative: false,
     },
     {
       id: "fastest_growth",
-      label: "ყველაზე სწრაფი ზრდა",
+      label: message(messages, "analysis.fastestGrowth"),
       value: fastestGrowth ? formatShare(fastestGrowth.changeFromPreviousYear, true) : MISSING,
       unit: "",
-      detail: fastestGrowth?.kaLabel ?? NO_PREVIOUS_YEAR_NOTE,
+      detail: fastestGrowth ? labelFor(fastestGrowth) : message(messages, "analysis.noPreviousYear"),
       negative: (fastestGrowth?.changeFromPreviousYear ?? 0) < 0,
     },
     {
       id: "largest_increase",
-      label: "ყველაზე დიდი მატება",
+      label: message(messages, "analysis.largestIncrease"),
       value: increaseParts.num,
       unit: increaseParts.unit,
-      detail: largestIncrease?.kaLabel ?? NO_PREVIOUS_YEAR_NOTE,
+      detail: largestIncrease ? labelFor(largestIncrease) : message(messages, "analysis.noPreviousYear"),
       negative: false,
     },
   ];
 }
 
-export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): SingleYearSnapshotModel {
+export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput, presentation?: Presentation): SingleYearSnapshotModel {
   const grouping: ExpenditureGrouping = input.side === "expenditure" ? input.grouping ?? "fields" : "fields";
   const isMinistryGrouping = input.side === "expenditure" && grouping === "ministries";
 
@@ -199,11 +202,11 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
         .map((fact) => ({ year: fact.year, itemId: fact.itemId, amountGel: fact.amountGel, basis: fact.basis }));
 
   const labelFor = (itemId: string) => {
-    if (!isMinistryGrouping) return labelsFor(itemId, input.glossary);
     const category = input.adminCategories?.get(itemId);
-    return category
+    const labels = !isMinistryGrouping ? labelsFor(itemId, input.glossary) : category
       ? { kaLabel: category.kaLabel, enLabel: category.enLabel }
       : { kaLabel: itemId, enLabel: itemId };
+    return presentation ? { ...labels, enLabel: publicLabel("en", itemId, labels.kaLabel, presentation.englishLabels) } : labels;
   };
 
   const yearFacts = active.filter((fact) => fact.year === input.year);
@@ -219,13 +222,13 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
       totalGel: 0,
       basis: "actual",
       hasPlannedValues: false,
-      headlineCards: headlineCards(0, input.year, []),
+      headlineCards: headlineCards(0, input.year, [], presentation),
       items: [],
       every100: [],
       radarItems: [],
       rankingRows: [],
       hasGrowthData: false,
-      emptyReason: emptyReasonFor(input.side),
+      emptyReason: emptyReasonFor(input.side, presentation),
     };
   }
 
@@ -266,10 +269,10 @@ export function buildSingleYearSnapshotModel(input: SingleYearSnapshotInput): Si
     totalGel,
     basis: yearFacts.some((fact) => fact.basis === "planned") ? "planned" : "actual",
     hasPlannedValues: yearFacts.some((fact) => fact.basis === "planned"),
-    headlineCards: headlineCards(totalGel, input.year, items),
+    headlineCards: headlineCards(totalGel, input.year, items, presentation),
     items,
     every100: wholeGelFrom100(drawnItems),
-    radarItems: buildRadarItems(drawnItems),
+    radarItems: buildRadarItems(drawnItems, presentation),
     rankingRows: items,
     hasGrowthData: items.some((item) => item.changeFromPreviousYear !== null),
     emptyReason: null,

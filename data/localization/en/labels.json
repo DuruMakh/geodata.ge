@@ -823,11 +823,11 @@
     "text": "Total debt",
     "reviewedAt": "2026-09-05"
   },
-  "deficit.general_government.balance": {
+  "deficit.general_government_balance": {
     "text": "General government balance",
     "reviewedAt": "2026-09-05"
   },
-  "deficit.general_government_balance": {
+  "deficit.general_government.balance": {
     "text": "General government balance",
     "reviewedAt": "2026-09-05"
   },
@@ -1006,6 +1006,10 @@
   "revenue.vat": {
     "text": "VAT",
     "reviewedAt": "2026-09-05"
+  },
+  "snapshot.other": {
+    "text": "Other",
+    "reviewedAt": "2026-09-06"
   },
   "spending.agriculture_environment": {
     "text": "Agriculture and environment",

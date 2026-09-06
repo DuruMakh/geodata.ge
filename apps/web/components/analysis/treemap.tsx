@@ -1,3 +1,6 @@
+import { Message } from "../../lib/i18n/message";
+import { useI18n } from "../../lib/i18n/provider";
+import { publicLabel } from "../../lib/i18n/labels";
 import type { SnapshotItem } from "../../lib/explorer/types";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { SwatchBar } from "../ui/editorial";
@@ -78,6 +81,8 @@ type StructureTreemapProps = {
 };
 
 export function StructureTreemap({ items, title, yearLabel }: StructureTreemapProps) {
+  const { locale, messages, englishLabels } = useI18n();
+  const labelFor = (item: Pick<SnapshotItem, "itemId" | "kaLabel">) => publicLabel(locale, item.itemId, item.kaLabel, englishLabels);
   // Only positive rows have tile geometry; negative rows (real data: e.g.
   // revenue.other_taxes 2019-2020) stay visible in the ranking table instead.
   // Lay out over the drawn items' own sum so the tiles exactly fill the area.
@@ -89,7 +94,7 @@ export function StructureTreemap({ items, title, yearLabel }: StructureTreemapPr
     <div data-testid="snapshot-treemap" className="mt-9 border-t border-[var(--hairline)] pt-6">
       <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">{title}</h2>
       <p className="mb-4 text-xs text-[var(--muted)]">
-        <span className="font-[family-name:var(--font-numeric)]">{yearLabel}</span> · წილი მთლიანიდან
+        <Message messages={messages} id="analysis.treemapNote" values={{ year: <span className="font-[family-name:var(--font-numeric)]">{yearLabel}</span> }} />
       </p>
       <div data-testid="snapshot-structure-grid" className="relative w-full" style={{ aspectRatio: `${AREA_W} / ${AREA_H}` }}>
         {rects.map(({ item, x, y, w, h }) => {
@@ -101,7 +106,7 @@ export function StructureTreemap({ items, title, yearLabel }: StructureTreemapPr
             <div
               key={item.itemId}
               data-testid="snapshot-structure-card"
-              title={`${item.kaLabel} — ${formatShare(item.shareOfTotal)} · ${formatAmount(item.amountGel)}`}
+              title={`${labelFor(item)} — ${formatShare(item.shareOfTotal)} · ${formatAmount(item.amountGel, locale)}`}
               className="absolute flex min-w-0 flex-col justify-between overflow-hidden border border-[var(--hairline)] bg-[var(--tile)] px-[11px] py-[9px] transition-colors duration-100 hover:bg-[var(--tint)]"
               style={{
                 left: `${(x / AREA_W) * 100}%`,
@@ -122,12 +127,12 @@ export function StructureTreemap({ items, title, yearLabel }: StructureTreemapPr
               <span className="min-w-0">
                 {mid ? (
                   <span className="block overflow-hidden text-ellipsis whitespace-nowrap text-xs font-medium text-[var(--ink)]">
-                    {item.kaLabel}
+                    {labelFor(item)}
                   </span>
                 ) : null}
                 {big ? (
                   <span className="mt-[3px] block font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                    {formatAmount(item.amountGel)}
+                    {formatAmount(item.amountGel, locale)}
                   </span>
                 ) : null}
               </span>
@@ -140,7 +145,7 @@ export function StructureTreemap({ items, title, yearLabel }: StructureTreemapPr
           {tinyLegend.map((item) => (
             <span key={item.itemId} className="inline-flex items-center gap-[7px] text-[11.5px] text-[var(--body)]">
               <SwatchBar color={item.color} className="!w-3" />
-              {item.kaLabel}
+              {labelFor(item)}
               <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">
                 {formatShare(item.shareOfTotal)}
               </span>
