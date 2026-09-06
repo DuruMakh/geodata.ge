@@ -51,6 +51,7 @@ test("homepage and hub figures stay identical when switching languages", async (
   await page.goto("/en#data");
   const figures = () => page.locator('[data-testid="landing-data"] table td, [data-testid="landing-dataset-total"] p, [data-testid="landing-debt"] dd, [data-testid="landing-deficit-history"] strong').evaluateAll(elements => elements.map(element => element.textContent?.match(/[−+]?\d[\d,.]*%?/g) ?? []));
   const before = await figures();
+  await page.getByTestId("landing-header").getByRole("button", { name: "Menu", exact: true }).click();
   await page.getByTestId("landing-header").getByTestId("language-switch").getByRole("link", { name: "ქართული", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ka");
   expect(new URL(page.url()).hash).toBe("#data");

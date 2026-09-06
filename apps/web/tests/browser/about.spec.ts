@@ -42,11 +42,13 @@ for (const viewport of [
     await expect(page.getByText("გამოყენებადი", { exact: false })).toHaveCount(1);
 
     const header = page.getByTestId("about-header");
+    if (viewport.width < 900) await header.getByRole("button", { name: "მენიუ" }).click();
     await expect(header.getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute("href", "/");
     await expect(header.getByRole("link", { name: "მონაცემები", exact: true })).toHaveAttribute("href", "/explorer");
     await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("href", "/about");
     await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("aria-current", "page");
 
+    if (viewport.width < 900) await header.getByRole("button", { name: "მენიუ" }).click();
     const footer = page.getByTestId("site-footer");
     await expect(footer.getByRole("link", { name: "მიზანი", exact: true })).toHaveCount(1);
     await expect(footer.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("href", "/about");

@@ -139,10 +139,12 @@ test("AI header navigation opens the active connection page on desktop and mobil
   for (const width of [1440, 375]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(BASE_URL);
+    if (width < 900) await page.getByTestId("landing-header").getByRole("button", { name: "მენიუ" }).click();
     const link = page.getByRole("navigation", { name: "ნავიგაცია", exact: true }).getByRole("link", { name: "AI", exact: true });
     await expect(link).toBeVisible();
     await link.click();
     await expect(page).toHaveURL(/\/connect$/);
+    if (width < 900) await page.getByTestId("connect-header").getByRole("button", { name: "მენიუ" }).click();
     await expect(page.getByTestId("connect-header").getByRole("link", { name: "AI", exact: true })).toHaveAttribute("aria-current", "page");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
