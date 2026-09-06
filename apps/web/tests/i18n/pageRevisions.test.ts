@@ -3,7 +3,7 @@ import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
 import { loadPageRevisions } from "../../lib/i18n/page-revisions.server";
 import { validatePageRevisions } from "../../lib/i18n/validation";
 import { pageHref } from "../../lib/i18n/routes";
-import sitemap from "../../app/sitemap";
+import sitemap from "../../lib/seo/sitemap";
 
 describe("reviewed English page dates", () => {
   it("requires real dates for exactly the public route inventory", async () => {

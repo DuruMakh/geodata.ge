@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import sitemap from "../../app/sitemap";
+import sitemap from "../../lib/seo/sitemap";
 
 const llmsPath = fileURLToPath(new URL("../../public/llms.txt", import.meta.url));
 const originalEnv = { ...process.env };

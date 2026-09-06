@@ -1,6 +1,6 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import sitemap from "../../app/sitemap";
+import sitemap from "../../lib/seo/sitemap";
 import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
 import { listPublicPagePaths, loadTranslationInventory } from "../../lib/i18n/inventory.server";
 import { validateCatalogue } from "../../lib/i18n/validation";

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import sitemap from "../../app/sitemap";
+import sitemap from "../../lib/seo/sitemap";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 import {
   aggregateFactsForEntity,

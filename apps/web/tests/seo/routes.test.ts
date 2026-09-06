@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import sitemap from "../../app/sitemap";
+import sitemap from "../../lib/seo/sitemap";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
 
 const originalEnv = { ...process.env };
