@@ -69,11 +69,11 @@ test("public header keeps landing active, exposes mission, and leaves methodolog
     await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("href", "/about");
     if (path === "/about") {
       await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("aria-current", "page");
-      await expect(header.locator("[aria-current]")).toHaveCount(1);
+      await expect(header.getByRole("navigation").locator("[aria-current]")).toHaveCount(1);
     } else {
-      await expect(header.locator("[aria-current]")).toHaveCount(0);
+      await expect(header.getByRole("navigation").locator("[aria-current]")).toHaveCount(0);
     }
-    await expect(header).toContainText("2004–2025");
+    await expect(header).not.toContainText(/\d{4}[–-]\d{4}/);
 
     const headerBox = await header.boundingBox();
     const headingBox = await page.getByRole("heading", { level: 1 }).boundingBox();

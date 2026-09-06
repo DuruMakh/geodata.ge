@@ -71,19 +71,19 @@ describe("methodology catalog", () => {
     expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
     expect(FUTURE_METHODOLOGY_DATASETS).toEqual([
-      { titleKa: "ინფლაცია", href: null, state: "future" },
-      { titleKa: "მშპ", href: null, state: "future" },
-      { titleKa: "მოსახლეობა", href: null, state: "future" },
-      { titleKa: "უმუშევრობა", href: null, state: "future" },
+      { title: "ინფლაცია", href: null, state: "future" },
+      { title: "მშპ", href: null, state: "future" },
+      { title: "მოსახლეობა", href: null, state: "future" },
+      { title: "უმუშევრობა", href: null, state: "future" },
     ]);
   });
 
   it("keeps the Debt methodology concise and discloses its approved boundaries", () => {
     const content = METHODOLOGY_CONTENT.debt;
     const publicText = [
-      content.summaryKa,
-      content.disclosureKa,
-      ...content.sections.flatMap((section) => section.paragraphsKa),
+      content.summary,
+      content.disclosure,
+      ...content.sections.flatMap((section) => section.paragraphs),
     ].join(" ");
 
     expect(content.sections.map((section) => section.kind)).toEqual(["scope", "sources", "limitations", "archive"]);
@@ -130,9 +130,9 @@ describe("methodology catalog", () => {
   it("publishes the complete 64-page and 69-series municipal boundary without changing anchors", () => {
     const content = METHODOLOGY_CONTENT.municipalities;
     const publicText = [
-      content.summaryKa,
-      content.disclosureKa,
-      ...content.sections.flatMap((section) => section.paragraphsKa),
+      content.summary,
+      content.disclosure,
+      ...content.sections.flatMap((section) => section.paragraphs),
     ].join(" ");
 
     expect(content.sections.map((section) => section.id)).toEqual(["scope", "sources", "journey", "archive"]);
@@ -147,16 +147,16 @@ describe("methodology catalog", () => {
 
   it("discloses the nominal-GDP denominator without opening a GDP methodology route", () => {
     for (const dataset of ["expenditure", "revenue"] as const) {
-      expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("მშპ");
-      expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("მიმდინარე ფასებში");
-      expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("2010 წლიდან — SNA 2008");
-      expect(METHODOLOGY_CONTENT[dataset].disclosureKa).toContain("2025 წლის მშპ წინასწარია");
+      expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("მშპ");
+      expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("მიმდინარე ფასებში");
+      expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("2010 წლიდან — SNA 2008");
+      expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("2025 წლის მშპ წინასწარია");
     }
     expect(METHODOLOGY_CONTENT.expenditure.reviewedAt).toBe("2026-08-20");
     expect(METHODOLOGY_CONTENT.revenue.reviewedAt).toBe("2026-08-20");
 
-    expect(FUTURE_METHODOLOGY_DATASETS.find((entry) => entry.titleKa === "მშპ")).toEqual({
-      titleKa: "მშპ",
+    expect(FUTURE_METHODOLOGY_DATASETS.find((entry) => entry.title === "მშპ")).toEqual({
+      title: "მშპ",
       href: null,
       state: "future",
     });
@@ -165,7 +165,7 @@ describe("methodology catalog", () => {
   it("publishes the year-specific functional expenditure source boundary", () => {
     const sourceText = METHODOLOGY_CONTENT.expenditure.sections
       .find((section) => section.id === "sources")
-      ?.paragraphsKa.join(" ") ?? "";
+      ?.paragraphs.join(" ") ?? "";
 
     expect(sourceText).toContain("2004 წლის სრული სახელმწიფო ბიუჯეტის შესრულების დანართიდან");
     expect(sourceText).toContain("2005–2025 წლებში — ხაზინის E11 ფორმებიდან");
@@ -180,7 +180,7 @@ describe("methodology catalog", () => {
     ].find(
       (decision) => decision.id === "revenue.limitation.legacy_hash_gap",
     );
-    const publicText = [disclosure?.titleKa, disclosure?.summaryKa, ...(disclosure?.detailKa ?? [])].join(" ");
+    const publicText = [disclosure?.title, disclosure?.summary, ...(disclosure?.detail ?? [])].join(" ");
 
     expect(manifest).toHaveLength(22);
     expect(publicText).toContain(`ყველა ${manifest.length} გამოქვეყნებულ PDF-ს SHA-256 აქვს`);
@@ -191,8 +191,8 @@ describe("methodology catalog", () => {
 
   it("discloses the partial 2004 revenue panel without inventing liabilities", () => {
     const publicText = [
-      METHODOLOGY_CONTENT.revenue.disclosureKa,
-      ...METHODOLOGY_CONTENT.revenue.decisions.flatMap((entry) => [entry.titleKa, entry.summaryKa, ...entry.detailKa]),
+      METHODOLOGY_CONTENT.revenue.disclosure,
+      ...METHODOLOGY_CONTENT.revenue.decisions.flatMap((entry) => [entry.title, entry.summary, ...entry.detail]),
     ].join(" ");
 
     expect(publicText).toContain("2004");
@@ -251,7 +251,7 @@ describe("methodology catalog", () => {
     expect(functional).toContain("Old 14-group → public category (2004–2006)");
     expect(functional).toContain("year2004StateBudget.ts");
     expect(functional).toContain("revenue from 2004–2025");
-    expect(METHODOLOGY_CONTENT.expenditure.sections.find((section) => section.id === "scope")?.paragraphsKa.join(" ")).toContain("შემოსავლების ცალკე სერია 2004–2025");
+    expect(METHODOLOGY_CONTENT.expenditure.sections.find((section) => section.id === "scope")?.paragraphs.join(" ")).toContain("შემოსავლების ცალკე სერია 2004–2025");
     expect(register).toContain("6b. Old 14-group → public category (2004–2006)");
   });
 
@@ -359,8 +359,8 @@ describe("methodology catalog", () => {
     expect(buildMethodologyHubEntries({ budgetFacts, municipalFacts, debtFacts, archives })).toEqual([
       {
         id: "expenditure",
-        titleKa: METHODOLOGY_CONTENT.expenditure.titleKa,
-        summaryKa: METHODOLOGY_CONTENT.expenditure.summaryKa,
+        title: METHODOLOGY_CONTENT.expenditure.title,
+        summary: METHODOLOGY_CONTENT.expenditure.summary,
         href: "/methodology/expenditure",
         coverage: { firstYear: 2005, lastYear: 2025 },
         originalFileCount: 42,
@@ -368,8 +368,8 @@ describe("methodology catalog", () => {
       },
       {
         id: "revenue",
-        titleKa: METHODOLOGY_CONTENT.revenue.titleKa,
-        summaryKa: METHODOLOGY_CONTENT.revenue.summaryKa,
+        title: METHODOLOGY_CONTENT.revenue.title,
+        summary: METHODOLOGY_CONTENT.revenue.summary,
         href: "/methodology/revenue",
         coverage: { firstYear: 2005, lastYear: 2025 },
         originalFileCount: 21,
@@ -377,8 +377,8 @@ describe("methodology catalog", () => {
       },
       {
         id: "municipalities",
-        titleKa: METHODOLOGY_CONTENT.municipalities.titleKa,
-        summaryKa: METHODOLOGY_CONTENT.municipalities.summaryKa,
+        title: METHODOLOGY_CONTENT.municipalities.title,
+        summary: METHODOLOGY_CONTENT.municipalities.summary,
         href: "/methodology/municipalities",
         coverage: { firstYear: 2015, lastYear: 2025 },
         originalFileCount: 80,
@@ -386,8 +386,8 @@ describe("methodology catalog", () => {
       },
       {
         id: "debt",
-        titleKa: METHODOLOGY_CONTENT.debt.titleKa,
-        summaryKa: METHODOLOGY_CONTENT.debt.summaryKa,
+        title: METHODOLOGY_CONTENT.debt.title,
+        summary: METHODOLOGY_CONTENT.debt.summary,
         href: "/methodology/debt",
         coverage: { firstYear: 2013, lastYear: 2030 },
         originalFileCount: 10,

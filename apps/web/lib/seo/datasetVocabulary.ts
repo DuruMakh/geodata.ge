@@ -5,20 +5,26 @@
 // shared by every page that renders that dataset — a municipality subset
 // measures exactly what the municipal dataset measures.
 //
+// Every string here reaches the page, so it is localized: an English page
+// carries no Georgian, which `tests/browser/bilingual-seo.spec.ts` enforces
+// inside JSON-LD as well as in visible text.
+//
 // The measure ids are NOT retyped here: `Measure` and `DatasetId` are imported
 // from the query layer, which validates every served request against the same
 // enums. `schemas.ts` already carries the warning that a second hand-maintained
-// copy silently drifts, so this module owns only the SEO-facing prose — the
-// Georgian labels, descriptions, keywords and provenance sentence — and takes
+// copy silently drifts, so this module owns only the SEO-facing prose and takes
 // the identifiers from the one place that defines them.
 //
 // Which measures each dataset carries still mirrors `catalogue.json`, and
 // `datasetVocabulary.enums.test.ts` asserts that against the query enums.
 
 import type { DatasetId, Measure } from "../factQuery/types";
+import type { Locale } from "../i18n/types";
 
 /** Every published dataset except `ministries`, which has no page of its own. */
 export type FiscalDatasetId = Exclude<DatasetId, "ministries">;
+
+type Localized = Record<Locale, string>;
 
 export type MeasureJsonLd = {
   "@type": "PropertyValue";
@@ -29,113 +35,111 @@ export type MeasureJsonLd = {
   unitText: string;
 };
 
-const MEASURES: Record<Measure, Omit<MeasureJsonLd, "@type" | "propertyID">> = {
+const MEASURES: Record<Measure, { name: Localized; description: Localized; unitText: string }> = {
   amount_gel: {
-    name: "თანხა (ლარი)",
-    description: "თანხა ნომინალურ ლარში, მიმდინარე ფასებში.",
+    name: { ka: "თანხა (ლარი)", en: "Amount (GEL)" },
+    description: {
+      ka: "თანხა ნომინალურ ლარში, მიმდინარე ფასებში.",
+      en: "Amount in nominal GEL, at current prices.",
+    },
     unitText: "GEL",
   },
   share_of_total_pct: {
-    name: "წილი ჯამში (%)",
-    description: "წილი შესაბამის ჯამში, პროცენტებში.",
+    name: { ka: "წილი ჯამში (%)", en: "Share of total (%)" },
+    description: {
+      ka: "წილი შესაბამის ჯამში, პროცენტებში.",
+      en: "Share of the relevant total, in percent.",
+    },
     unitText: "%",
   },
   share_of_gdp_pct: {
-    name: "წილი მშპ-ში (%)",
-    description: "წილი მთლიან შიდა პროდუქტში, პროცენტებში.",
+    name: { ka: "წილი მშპ-ში (%)", en: "Share of GDP (%)" },
+    description: {
+      ka: "წილი მთლიან შიდა პროდუქტში, პროცენტებში.",
+      en: "Share of gross domestic product, in percent.",
+    },
     unitText: "%",
   },
   gel_per_resident: {
-    name: "თანხა ერთ მოსახლეზე (ლარი)",
-    description: "თანხა ერთ მოსახლეზე, ნომინალურ ლარში.",
+    name: { ka: "თანხა ერთ მოსახლეზე (ლარი)", en: "Amount per resident (GEL)" },
+    description: {
+      ka: "თანხა ერთ მოსახლეზე, ნომინალურ ლარში.",
+      en: "Amount per resident, in nominal GEL.",
+    },
     unitText: "GEL",
   },
   rate_percent: {
-    name: "საპროცენტო განაკვეთი (%)",
-    description: "საპროცენტო განაკვეთი წლიურად, პროცენტებში.",
+    name: { ka: "საპროცენტო განაკვეთი (%)", en: "Interest rate (%)" },
+    description: {
+      ka: "საპროცენტო განაკვეთი წლიურად, პროცენტებში.",
+      en: "Interest rate per annum, in percent.",
+    },
     unitText: "%",
   },
 };
 
-// Georgian terms carry the site's own audience; the English terms are how the
-// same data is searched for internationally. Keywords are metadata, so both
-// belong on a Georgian page.
 export const DATASETS: Record<
   FiscalDatasetId,
-  { measures: readonly Measure[]; keywords: readonly string[]; measurementTechnique: string }
+  {
+    measures: readonly Measure[];
+    keywords: Record<Locale, readonly string[]>;
+    measurementTechnique: Localized;
+  }
 > = {
   "national-expenditure": {
     measures: ["amount_gel", "share_of_total_pct", "share_of_gdp_pct"],
-    keywords: [
-      "ბიუჯეტი",
-      "სახელმწიფო ბიუჯეტი",
-      "ხარჯები",
-      "საქართველო",
-      "Georgia",
-      "state budget",
-      "government expenditure",
-      "public finance",
-    ],
-    measurementTechnique:
-      "გადამოწმებული ამოღება ბიუჯეტის შესრულების ოფიციალური გამოქვეყნებული ანგარიშებიდან.",
+    keywords: {
+      ka: ["ბიუჯეტი", "სახელმწიფო ბიუჯეტი", "ხარჯები", "საქართველო"],
+      en: ["Georgia", "state budget", "government expenditure", "public finance"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება ბიუჯეტის შესრულების ოფიციალური გამოქვეყნებული ანგარიშებიდან.",
+      en: "Reviewed extraction from the official published budget execution reports.",
+    },
   },
   "national-revenue": {
     measures: ["amount_gel", "share_of_total_pct", "share_of_gdp_pct"],
-    keywords: [
-      "ბიუჯეტი",
-      "შემოსავლები",
-      "გადასახადები",
-      "საქართველო",
-      "Georgia",
-      "budget revenue",
-      "tax revenue",
-      "public finance",
-    ],
-    measurementTechnique:
-      "გადამოწმებული ამოღება ბიუჯეტის შესრულების ოფიციალური გამოქვეყნებული ანგარიშებიდან.",
+    keywords: {
+      ka: ["ბიუჯეტი", "შემოსავლები", "გადასახადები", "საქართველო"],
+      en: ["Georgia", "budget revenue", "tax revenue", "public finance"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება ბიუჯეტის შესრულების ოფიციალური გამოქვეყნებული ანგარიშებიდან.",
+      en: "Reviewed extraction from the official published budget execution reports.",
+    },
   },
   "municipal-expenditure": {
     measures: ["amount_gel", "share_of_total_pct", "gel_per_resident"],
-    keywords: [
-      "ბიუჯეტი",
-      "მუნიციპალიტეტი",
-      "ადგილობრივი ბიუჯეტი",
-      "ხარჯები",
-      "საქართველო",
-      "Georgia",
-      "municipal budget",
-      "local government finance",
-    ],
-    measurementTechnique:
-      "გადამოწმებული ამოღება მუნიციპალური ბიუჯეტების შესრულების ოფიციალური გამოქვეყნებული ანგარიშებიდან.",
+    keywords: {
+      ka: ["ბიუჯეტი", "მუნიციპალიტეტი", "ადგილობრივი ბიუჯეტი", "ხარჯები", "საქართველო"],
+      en: ["Georgia", "municipal budget", "local government finance", "municipality"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება მუნიციპალური ბიუჯეტების შესრულების ოფიციალური გამოქვეყნებული ანგარიშებიდან.",
+      en: "Reviewed extraction from the official published municipal budget execution reports.",
+    },
   },
   "government-debt": {
     measures: ["amount_gel", "share_of_gdp_pct", "rate_percent"],
-    keywords: [
-      "სახელმწიფო ვალი",
-      "ვალის მომსახურება",
-      "საქართველო",
-      "Georgia",
-      "government debt",
-      "public debt",
-      "debt service",
-    ],
-    measurementTechnique:
-      "გადამოწმებული ამოღება ფინანსთა სამინისტროს ოფიციალური სავალო პუბლიკაციებიდან.",
+    keywords: {
+      ka: ["სახელმწიფო ვალი", "ვალის მომსახურება", "საქართველო"],
+      en: ["Georgia", "government debt", "public debt", "debt service"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება ფინანსთა სამინისტროს ოფიციალური სავალო პუბლიკაციებიდან.",
+      en: "Reviewed extraction from the Ministry of Finance's official debt publications.",
+    },
   },
   "general-government-balance": {
     measures: ["share_of_gdp_pct", "amount_gel"],
-    keywords: [
-      "დეფიციტი",
-      "პროფიციტი",
-      "ფისკალური ბალანსი",
-      "საქართველო",
-      "Georgia",
-      "fiscal deficit",
-      "general government balance",
-    ],
-    measurementTechnique:
-      "გადამოწმებული ამოღება საერთაშორისო სავალუტო ფონდის გამოქვეყნებული მაჩვენებლებიდან.",
+    keywords: {
+      ka: ["დეფიციტი", "პროფიციტი", "ფისკალური ბალანსი", "საქართველო"],
+      en: ["Georgia", "fiscal deficit", "general government balance", "budget balance"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საერთაშორისო სავალუტო ფონდის გამოქვეყნებული მაჩვენებლებიდან.",
+      en: "Reviewed extraction from the International Monetary Fund's published indicators.",
+    },
   },
 };
 
@@ -146,6 +150,7 @@ export const DATASETS: Record<
  */
 export function variableMeasuredFor(
   datasetId: FiscalDatasetId,
+  locale: Locale,
   omit: readonly Measure[] = [],
 ): readonly MeasureJsonLd[] {
   return DATASETS[datasetId].measures
@@ -153,14 +158,16 @@ export function variableMeasuredFor(
     .map((propertyID) => ({
       "@type": "PropertyValue",
       propertyID,
-      ...MEASURES[propertyID],
+      name: MEASURES[propertyID].name[locale],
+      description: MEASURES[propertyID].description[locale],
+      unitText: MEASURES[propertyID].unitText,
     }));
 }
 
-export function keywordsFor(datasetId: FiscalDatasetId): readonly string[] {
-  return DATASETS[datasetId].keywords;
+export function keywordsFor(datasetId: FiscalDatasetId, locale: Locale): readonly string[] {
+  return DATASETS[datasetId].keywords[locale];
 }
 
-export function measurementTechniqueFor(datasetId: FiscalDatasetId): string {
-  return DATASETS[datasetId].measurementTechnique;
+export function measurementTechniqueFor(datasetId: FiscalDatasetId, locale: Locale): string {
+  return DATASETS[datasetId].measurementTechnique[locale];
 }

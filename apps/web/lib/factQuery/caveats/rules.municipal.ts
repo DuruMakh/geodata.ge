@@ -112,9 +112,9 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "municipality_not_territorial",
     severity: "severe",
     comparisonEffect: "none",
-    messageKa: "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
-    messageEn: "The named code's budget is not territorially attributable spending and is excluded.",
+    messageKey: "caveats.municipality_not_territorial",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
+    methodologyRefEn: "/en/methodology/municipalities",
     // The five codes are already absent from every served registry and fact file
     // (methodology "Public exclusion decision"), so this rule is never about
     // filtering output — it only fires when a query explicitly names one.
@@ -125,9 +125,9 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "municipal_country_scope",
     severity: "note",
     comparisonEffect: "none",
-    messageKa: "საქართველოს მუნიციპალური აგრეგატი მოიცავს 69 გადამოწმებულ ბიუჯეტს და აჭარის ნეტო კორექციას; რეგიონული მწკრივები ამ ჯამს არ ქმნიან.",
-    messageEn: "The Georgia municipal aggregate covers 69 reviewed budgets plus the net Adjara adjustment; regional rows do not sum to it.",
+    messageKey: "caveats.municipal_country_scope",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
+    methodologyRefEn: "/en/methodology/municipalities",
     // Gated on datasetId, matching the precedent already in this catalogue
     // (rules.national.ts's revenue_2004_total_scope gates on
     // "national-revenue"; rules.ministries.ts's program_coverage_partial
@@ -145,9 +145,9 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "adjara_consolidation_applied",
     severity: "note",
     comparisonEffect: "none",
-    messageKa: "შედეგი იყენებს აჭარის რესპუბლიკური გადახდების ნეტო კორექციას, ერთხელ.",
-    messageEn: "The result applies the net Adjara republican adjustment once.",
+    messageKey: "caveats.adjara_consolidation_applied",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
+    methodologyRefEn: "/en/methodology/municipalities",
     // Fires when the total series is explicitly requested, AND for
     // share_of_total_pct on any series for Adjara: percentages always divide by
     // public_total_gel, and for Adjara that denominator is always the
@@ -175,9 +175,9 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "municipal_functions_no_republican_crosswalk",
     severity: "note",
     comparisonEffect: "none",
-    messageKa: "ფუნქციური კატეგორიები მხოლოდ მუნიციპალურია; რესპუბლიკური ფუნქციური განაწილება არ არსებობს და არ არის გამოგონილი.",
-    messageEn: "Functional categories are municipal-only; no republican functional allocation exists and none is invented.",
+    messageKey: "caveats.municipal_functions_no_republican_crosswalk",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
+    methodologyRefEn: "/en/methodology/municipalities",
     // Gated on datasetId for the same reason as municipal_country_scope above:
     // COUNTRY_ID collides with the national entityId, and this rule has no
     // other condition that would stop it firing on a national-shaped context.
@@ -199,11 +199,9 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     // 2026-09-04.
     severity: "note",
     comparisonEffect: "none",
-    messageKa:
-      "შედარების ერთ-ერთ წელს ჯამი ფუნქციების შეკრებით არის გაზომილი, და არა ოფიციალური ჯამური გადახდებით. სხვაობა ჩვეულებრივ 1%-ზე ნაკლებია, თუმცა ზოგიერთ მუნიციპალიტეტში მეტია.",
-    messageEn:
-      "In one of the compared years the total is the sum of the ten functions rather than the official total-payments headline. The difference is usually under 1%, and larger for some municipalities.",
+    messageKey: "caveats.municipal_total_definition_changed",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
+    methodologyRefEn: "/en/methodology/municipalities",
     // Gated on datasetId like its four siblings above. Without the gate it fired
     // on any comparison whose endpoint definitions differed, including a
     // MINISTRIES program comparison - pointing a reader at a municipal
@@ -219,9 +217,9 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "municipal_source_actual_missing",
     severity: "severe",
     comparisonEffect: "none",
-    messageKa: "საჭირო ფაქტობრივი გადახდების მაჩვენებელი მიუწვდომელია; გამოყენებულია გადამოწმებული ფუნქციური ჯამი.",
-    messageEn: "The required payment actual is unavailable; the reviewed functional total is used instead.",
+    messageKey: "caveats.municipal_source_actual_missing",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
+    methodologyRefEn: "/en/methodology/municipalities",
     // Reads warningType, never showWarning: Khulo 2024 has showWarning false
     // (it never trips the GEL 1M review-difference rule, since there is no
     // official total to compare its fallback against) but still needs this
@@ -236,9 +234,9 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "municipal_source_version_difference",
     severity: "severe",
     comparisonEffect: "none",
-    messageKa: "ფუნქციური და ჯამური მონაცემები წყაროს სხვადასხვა ვერსიიდანაა; შეჯერება იძულებით არ ხდება.",
-    messageEn: "Functional and total inputs come from documented differing source versions; they are not forcibly reconciled.",
+    messageKey: "caveats.municipal_source_version_difference",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
+    methodologyRefEn: "/en/methodology/municipalities",
     applies: (c) => hasWarningType(c, "source_version_difference"),
     // Entity-year, deliberately: this one names BOTH the functional and the
     // total inputs, so it is true of every series of that municipality-year.
@@ -248,9 +246,9 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "municipal_financing_outside_functional",
     severity: "note",
     comparisonEffect: "none",
-    messageKa: "საჯარო ჯამი მოიცავს ფინანსურ კომპონენტებს, რომლებიც ათ ფუნქციაზე არ არის განაწილებული.",
-    messageEn: "The public total includes financing components not distributed across the ten functions.",
+    messageKey: "caveats.municipal_financing_outside_functional",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
+    methodologyRefEn: "/en/methodology/municipalities",
     applies: (c) => hasWarningType(c, "financing_outside_functional"),
     // Entity-year, deliberately: the claim is about the relationship between
     // the total and the ten functions, so it describes the function cells just
@@ -261,9 +259,9 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "municipal_functional_total_gap",
     severity: "note",
     comparisonEffect: "none",
-    messageKa: "ფუნქციური წილები საჯარო ჯამს სრულად არ ფარავს; 100%-მდე ნორმალიზება არ ხდება.",
-    messageEn: "Functional shares do not cover the applicable public total and are never normalised to 100%.",
+    messageKey: "caveats.municipal_functional_total_gap",
     methodologyRef: "municipal-functional-annual-2015-2025.md",
+    methodologyRefEn: "/en/methodology/municipalities",
     applies: (c) =>
       c.measure === "share_of_total_pct" &&
       (c.municipalTotalInputs.some((row) => row.reconciliationDifferenceGel !== null && row.reconciliationDifferenceGel !== 0) ||
@@ -287,9 +285,9 @@ export const MUNICIPAL_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "per_resident_coverage_limited",
     severity: "severe",
     comparisonEffect: "none",
-    messageKa: "ერთ მცხოვრებზე გაანგარიშება მხოლოდ 2025 წლის მუნიციპალურ/რეგიონულ ჯამებზეა დაშვებული.",
-    messageEn: "Per-resident values are supported only for the approved 2025 municipal and region totals.",
+    messageKey: "caveats.per_resident_coverage_limited",
     methodologyRef: "municipal-population-regional-gdp.md",
+    methodologyRefEn: "/en/methodology/municipalities",
     // Approved coverage is 2025, municipality/region entities, and the public
     // total series only (municipal-population-regional-gdp.md: "budget_per_resident_gel
     // = 2025 public_total_gel / 2025 population_persons"). The Georgia

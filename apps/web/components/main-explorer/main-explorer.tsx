@@ -1,6 +1,11 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
+import { I18nProvider } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
+import type { Presentation } from "../../lib/i18n/types";
+import { publicLabel } from "../../lib/i18n/labels";
+import { workbookMessage } from "../../lib/i18n/workbook";
 import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
 import type { GlossaryEntry } from "../../lib/data/glossary";
 import type {
@@ -11,7 +16,7 @@ import type {
 import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
 import { buildExplorerModel, isDerivedTotalItemId, type ExplorerModel } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
-import { formatAmount, formatShare, unitFor, UNIT_BN } from "../../lib/explorer/format";
+import { formatAmount, formatDisplayDate, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import type { ExplorerNav, ExplorerScope } from "../../lib/explorer/types";
 import {
@@ -28,6 +33,7 @@ import { ExplorerView } from "./explorer-view";
 import { useExplorerState } from "./use-explorer-state";
 
 type MainExplorerProps = {
+  presentation: Presentation;
   nav: ExplorerNav;
   facts: ClientBudgetFact[];
   // Optional because the ministries scope is unreachable on the revenue route:
@@ -45,7 +51,12 @@ type MainExplorerProps = {
   lastUpdatedAt: string;
 };
 
-export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
+export function MainExplorer(props: MainExplorerProps) {
+  return <I18nProvider {...props.presentation}><MainExplorerContent {...props} /></I18nProvider>;
+}
+
+function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
+  const { locale, messages } = presentation;
   useEffect(() => {
     document.body.dataset.appReady = "true";
 
@@ -120,13 +131,13 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
   const unit = useMemo(
     () =>
       scope === "ministries"
-        ? unitFor(adminFacts.map((fact) => fact.amountGel), UNIT_BN, 2)
+        ? unitFor(adminFacts.map((fact) => fact.amountGel), unitsFor(locale).bn, 2)
         : unitFor(
             facts.filter((fact) => fact.side === explorerSide).map((fact) => fact.amountGel),
-            UNIT_BN,
+            unitsFor(locale).bn,
             1,
           ),
-    [facts, adminFacts, scope, explorerSide],
+    [facts, adminFacts, scope, explorerSide, locale],
   );
 
   // Mirror of the analysisModel optimisation below: nav is fixed by the route, so
@@ -150,8 +161,8 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
       startYear: range.start,
       endYear: range.end,
       measure: share ? "share_of_gdp" : "nominal",
-    });
-  }, [isAnalysis, facts, gdpFacts, adminFacts, adminCategoryMap, grouping, glossary, explorerSide, selectedIds, range.start, range.end, share]);
+    }, presentation);
+  }, [isAnalysis, facts, gdpFacts, adminFacts, adminCategoryMap, grouping, glossary, explorerSide, selectedIds, range.start, range.end, share, presentation]);
 
   // Years whose ACTIVE values are planned (actual wins over planned), for the
   // analysis year selector's გეგმა tags. Admin facts are actual-only by contract,
@@ -179,9 +190,9 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
             glossary,
             side: analysisSide,
             year: analysisYear ?? analysisYears.at(-1) ?? 0,
-          })
+          }, presentation)
         : null,
-    [isAnalysis, facts, adminFacts, adminCategoryMap, analysisGrouping, glossary, analysisSide, analysisYear, analysisYears],
+    [isAnalysis, facts, adminFacts, adminCategoryMap, analysisGrouping, glossary, analysisSide, analysisYear, analysisYears, presentation],
   );
 
   const deck = useMemo(() => {
@@ -192,7 +203,7 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
       const yoy = previousTotal ? (analysisModel.totalGel - previousTotal) / previousTotal : null;
 
       return {
-        lead: `${year} · ${analysisModel.items.length} კატეგორია · სულ ${formatAmount(analysisModel.totalGel)}`,
+        lead: message(messages, "analysis.deck", { year, count: analysisModel.items.length, amount: formatAmount(analysisModel.totalGel, locale) }),
         yoy,
       };
     }
@@ -206,26 +217,26 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
     const yoy = latestTotal !== null && previousTotal ? (latestTotal - previousTotal) / previousTotal : null;
 
     return {
-      lead: latestTotal === null ? "" : `${latestYear}: ${formatAmount(latestTotal)}`,
+      lead: latestTotal === null ? "" : `${latestYear}: ${formatAmount(latestTotal, locale)}`,
       yoy,
     };
-  }, [totalsByScope, scope, scopeYears, analysisSide, analysisGrouping, analysisModel]);
+  }, [totalsByScope, scope, scopeYears, analysisSide, analysisGrouping, analysisModel, locale, messages]);
 
   const screenTitle = analysisModel
-    ? `${analysisModel.year} წლის ბიუჯეტის სურათი — ${analysisSide === "expenditure" ? "სად მიდის საჯარო ფული" : "საიდან მოდის საჯარო ფული"}`
+    ? message(messages, analysisSide === "expenditure" ? "analysis.expenditureHeading" : "analysis.revenueHeading", { year: analysisModel.year })
     : nav === "expenditure"
-      ? "როგორ იხარჯება საქართველოს ბიუჯეტი"
-      : "როგორ ფინანსდება საქართველოს ბიუჯეტი";
-  const sectionLabel = isAnalysis ? "ანალიზი" : nav === "revenue" ? "შემოსავლები" : "ხარჯები";
+      ? message(messages, "main.expenditureHeading")
+      : message(messages, "main.revenueHeading");
+  const sectionLabel = message(messages, isAnalysis ? "common.analysis" : nav === "revenue" ? "common.revenue" : "common.expenditure");
   const coverageYears = isAnalysis ? analysisYears : scopeYears;
   const coverage = [
     coverageYears.length > 0 ? `${coverageYears[0]}–${coverageYears.at(-1)}` : "",
-    lastUpdatedAt ? `განახლდა ${lastUpdatedAt}` : "",
+    lastUpdatedAt ? message(messages, "main.updated", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "",
   ]
     .filter(Boolean)
     .join(" · ");
   function buildWorkbookInput(model: ExplorerModel): WorkbookExportInput {
-    const labelById = new Map(model.items.map((item) => [item.id, item.kaLabel]));
+    const labelById = new Map(model.items.map((item) => [item.id, publicLabel(locale, item.id, item.kaLabel, presentation.englishLabels)]));
     const series = model.tableRows.map<WorkbookSeries>((row) => {
       const pointsByYear: WorkbookSeries["pointsByYear"] = {};
       for (const year of model.years) {
@@ -243,21 +254,22 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
       return {
         id: row.itemId,
         kind: row.itemId === model.totalRow?.itemId ? "total" : row.level === "admin_category" ? "group" : "item",
-        parentLabelKa: row.parentItemId ? labelById.get(row.parentItemId) ?? null : null,
-        labelKa: row.kaLabel,
+        parentLabel: row.parentItemId ? labelById.get(row.parentItemId) ?? null : null,
+        label: publicLabel(locale, row.itemId, row.kaLabel, presentation.englishLabels),
         pointsByYear,
       };
     });
 
-    const groupLabelKa = scope === "revenue" ? "შემოსავლები" : scope === "ministries" ? "უწყებები" : "ხარჯები";
+    const groupLabel = workbookMessage(locale, scope === "revenue" ? "workbook.receipts" : scope === "ministries" ? "workbook.institutions" : "workbook.expenditure");
     return {
+      locale,
       filenameBase: scope,
-      titleKa: screenTitle,
-      groupLabelKa,
+      title: screenTitle,
+      groupLabel,
       years: model.years,
       measure: share
-        ? { kind: "percentage", unitLabelKa: "% მშპ-ში", analysisHeaderKa: "მშპ-ის წილი (%)" }
-        : { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
+        ? { kind: "percentage", unitLabel: workbookMessage(locale, "workbook.percentGdp"), analysisHeader: workbookMessage(locale, "workbook.gdpHeader") }
+        : { kind: "amount", unitLabel: workbookMessage(locale, "workbook.millionGel"), readableScale: 1_000_000 },
       totalId: model.totalRow?.itemId ?? null,
       series,
       sources: share
@@ -278,9 +290,9 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[
-            { label: "მთავარი", href: "/" },
-            { label: "მონაცემები" },
-            { label: "ბიუჯეტი", href: "/explorer" },
+            { label: message(messages, "common.home"), href: "/" },
+            { label: message(messages, "common.data") },
+            { label: message(messages, "common.budget"), href: "/explorer" },
             { label: sectionLabel },
           ]}
           coverage={coverage}
@@ -300,7 +312,7 @@ export function MainExplorer({ nav, facts, adminFacts = [], adminCategories = []
               >
                 {formatShare(deck.yoy, true)}
               </span>
-              <span>წინა წელთან</span>
+              <span>{message(messages, "main.previousYear")}</span>
             </>
           ) : null}
         </p>

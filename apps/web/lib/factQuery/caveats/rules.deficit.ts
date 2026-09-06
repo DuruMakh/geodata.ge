@@ -16,11 +16,9 @@ export const DEFICIT_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "deficit_general_government_scope",
     severity: "severe",
     comparisonEffect: "none",
-    messageKa:
-      "ეს არის ზოგადი მთავრობის ბალანსი საერთაშორისო სავალუტო ფონდის გაზომვით — და არა აქ მოწოდებული შემოსულობებისა და ხარჯების სხვაობა. ეს ორი ერთმანეთს არ უტოლდება.",
-    messageEn:
-      "This is the general government balance as measured by the IMF - not the difference between the receipts and expenditure served here. The two are not the same quantity.",
+    messageKey: "caveats.deficit_general_government_scope",
     methodologyRef: "ai-grounding-and-caveats.md#deficit_general_government_scope",
+    methodologyRefEn: "/en/explorer/deficit",
     // Unconditional within the dataset, and for the same reason as
     // debt_not_budget_scope: the error is available the moment this number sits
     // beside budget figures, whatever year was asked for.
@@ -31,10 +29,9 @@ export const DEFICIT_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "deficit_projection",
     severity: "severe",
     comparisonEffect: "breaks",
-    messageKa:
-      "მომავალი წლების მაჩვენებელი საერთაშორისო სავალუტო ფონდის პროგნოზია და არა დაფიქსირებული შედეგი.",
-    messageEn: "Future-year values are an IMF forecast, not a recorded outcome.",
+    messageKey: "caveats.deficit_projection",
     methodologyRef: "ai-grounding-and-caveats.md#deficit_projection",
+    methodologyRefEn: "/en/explorer/deficit",
     applies: (c) => c.datasetId === DATASET_ID && c.observations.some((o) => o.basis === "projection"),
     affects: (c) => c.observations.filter((o) => o.basis === "projection").map((o) => `${o.seriesId}:${o.year}`),
   },

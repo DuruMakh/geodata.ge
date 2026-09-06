@@ -1,8 +1,15 @@
-import { createElement } from "react";
+import React, { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { I18nProvider } from "../../lib/i18n/provider";
+import { getPresentation } from "../../lib/i18n/presentation.server";
+import type { Presentation } from "../../lib/i18n/types";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import type { ServedGeneralGovernmentBalanceFact } from "../../lib/servedRows";
+
+let presentation: Presentation;
+beforeAll(async () => { presentation = await getPresentation("ka", ["common", "controls", "format", "main", "deficit"], ["deficit.general_government_balance"]); });
+function renderGeorgianMarkup(children: ReactNode) { return renderToStaticMarkup(<I18nProvider {...presentation}>{children}</I18nProvider>); }
 
 const facts: ServedGeneralGovernmentBalanceFact[] = [
   { year: 2024, generalGovernmentBalancePctGdp: -2.267, generalGovernmentBalanceGel: -2_109_000_000, status: "actual", sourceId: "source.imf", lastReviewedAt: "2026-09-04" },
@@ -24,7 +31,7 @@ describe("general-government deficit route composition", () => {
     expect(components).not.toBeNull();
     if (!components) return;
 
-    const markup = renderToStaticMarkup(createElement(components.DeficitExplorer, {
+    const markup = renderGeorgianMarkup(createElement(components.DeficitExplorer, {
       facts,
       workbookSources: [],
       lastUpdatedAt: "2026-09-04",

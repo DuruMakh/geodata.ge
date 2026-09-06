@@ -4,6 +4,8 @@ import type {
   ClientBudgetFact,
   ClientNationalGdpFact,
 } from "./clientData";
+import type { Presentation } from "../i18n/types";
+import { publicLabel } from "../i18n/labels";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { colorForItem, colorForProgram, OTHER_COLOR } from "./colors";
@@ -241,7 +243,7 @@ function ministryItemIds(active: ModelFact[], baselineAmounts: Map<string, numbe
   ];
 }
 
-export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
+export function buildExplorerModel(input: ExplorerModelInput, presentation?: Presentation): ExplorerModel {
   const isMinistryGrouping = input.side === "expenditure" && input.expenditureGrouping === "ministries";
   const active = isMinistryGrouping
     ? (input.adminFacts ?? []).map(adminFactForModel)
@@ -302,13 +304,15 @@ export function buildExplorerModel(input: ExplorerModelInput): ExplorerModel {
     const fact = factsByItem.get(id);
     const parentItemId = id === totalId ? null : fact?.parentItemId ?? null;
     const programOrdinal = programOrdinals.get(id);
+    const labels = isMinistryGrouping ? adminLabelsFor(id, fact, input.adminCategories ?? new Map()) : labelsFor(id, input.side, input.glossary);
+    if (presentation) labels.enLabel = publicLabel("en", id, labels.kaLabel, presentation.englishLabels);
 
     return {
       id,
       side: sideForItemId(id),
       parentItemId,
       level: id === totalId ? "total" : fact?.level ?? "public_field",
-      ...(isMinistryGrouping ? adminLabelsFor(id, fact, input.adminCategories ?? new Map()) : labelsFor(id, input.side, input.glossary)),
+      ...labels,
       color:
         parentItemId !== null && programOrdinal !== undefined
           ? colorForProgram(baseColorsByItemId.get(parentItemId) ?? OTHER_COLOR, programOrdinal)

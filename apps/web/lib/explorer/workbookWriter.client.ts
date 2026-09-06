@@ -1,3 +1,6 @@
+import type { Locale } from "../i18n/types";
+import { workbookMessage } from "../i18n/workbook";
+
 import type { WorkbookView, Worksheet } from "exceljs";
 import type { WorkbookExportModel, WorkbookReadableRow } from "./workbookModel";
 
@@ -22,13 +25,16 @@ function columnLetter(column: number): string {
   return result;
 }
 
-function readableNumberFormat(isPercentage: boolean, isPlanned: boolean): string {
-  if (isPlanned) return isPercentage ? '0.0% "გეგმა";[Red](0.0%) "გეგმა";0.0% "გეგმა"' : '#,##0.0 "გეგმა";[Red](#,##0.0) "გეგმა";0.0 "გეგმა"';
+function readableNumberFormat(isPercentage: boolean, isPlanned: boolean, locale: Locale): string {
+  if (isPlanned) {
+    const marker = workbookMessage(locale, "workbook.planned");
+    return isPercentage ? `0.0% "${marker}";[Red](0.0%) "${marker}";0.0% "${marker}"` : `#,##0.0 "${marker}";[Red](#,##0.0) "${marker}";0.0 "${marker}"`;
+  }
   return isPercentage ? PERCENTAGE_NUMBER_FORMAT : AMOUNT_NUMBER_FORMAT;
 }
 
-function sourceRowHeight(titleKa: string, organizationKa: string): number {
-  const lines = Math.max(Math.ceil(titleKa.length / 36), Math.ceil(organizationKa.length / 24));
+function sourceRowHeight(title: string, organization: string): number {
+  const lines = Math.max(Math.ceil(title.length / 36), Math.ceil(organization.length / 24));
   return Math.max(24, lines * 15);
 }
 
@@ -48,10 +54,10 @@ function formatYearRanges(years: number[]): string {
   return ranges.join(", ");
 }
 
-function sourceFileFormat(absoluteUrl: string): string {
+function sourceFileFormat(absoluteUrl: string, locale: Locale): string {
   const filename = new URL(absoluteUrl).pathname.split("/").at(-1) ?? "";
   const extension = filename.includes(".") ? filename.split(".").at(-1) : undefined;
-  return extension ? extension.toUpperCase() : "ფაილი";
+  return extension ? extension.toUpperCase() : workbookMessage(locale, "workbook.file");
 }
 
 function writeReadableRow(
@@ -60,10 +66,11 @@ function writeReadableRow(
   row: WorkbookReadableRow,
   years: number[],
   isPercentage: boolean,
+  locale: Locale,
 ): void {
   const label = worksheet.getCell(rowNumber, 1);
-  label.value = row.kind === "item" && row.parentLabelKa ? `${row.parentLabelKa} — ${row.labelKa}` : row.labelKa;
-  label.alignment = { vertical: "middle", wrapText: true, indent: row.kind === "item" && row.parentLabelKa ? 1 : 0 };
+  label.value = row.kind === "item" && row.parentLabel ? `${row.parentLabel} — ${row.label}` : row.label;
+  label.alignment = { vertical: "middle", wrapText: true, indent: row.kind === "item" && row.parentLabel ? 1 : 0 };
 
   for (const [index, year] of years.entries()) {
     const cell = worksheet.getCell(rowNumber, index + 2);
@@ -72,7 +79,7 @@ function writeReadableRow(
     cell.alignment = { horizontal: "right", vertical: "middle" };
     if (value !== null) {
       const isPlanned = row.basisByYear[year] === "planned";
-      cell.numFmt = readableNumberFormat(isPercentage, isPlanned);
+      cell.numFmt = readableNumberFormat(isPercentage, isPlanned, locale);
       if (isPlanned) cell.fill = PLANNED_FILL;
     }
   }
@@ -97,15 +104,15 @@ function writeReadableRow(
   if (row.kind === "total") worksheet.getRow(rowNumber).border = { bottom: { style: "medium", color: { argb: "FF1E1B16" } } };
 }
 
-function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel["readable"]): void {
+function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel["readable"], locale: Locale): void {
   const lastColumn = Math.max(readable.years.length + 2, 4);
   const lastColumnLetter = columnLetter(lastColumn);
-  const isPercentage = readable.unitLabelKa.includes("%");
+  const isPercentage = readable.unitLabel.includes("%");
 
   worksheet.mergeCells(`A1:${lastColumnLetter}1`);
   worksheet.mergeCells(`A2:${lastColumnLetter}2`);
-  worksheet.getCell("A1").value = readable.titleKa;
-  worksheet.getCell("A2").value = readable.subtitleKa;
+  worksheet.getCell("A1").value = readable.title;
+  worksheet.getCell("A2").value = readable.subtitle;
   for (let column = 1; column <= lastColumn; column += 1) {
     const titleCell = worksheet.getCell(1, column);
     titleCell.fill = TITLE_FILL;
@@ -113,7 +120,10 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
   }
   worksheet.getCell("A2").alignment = { vertical: "middle", wrapText: true };
 
-  const headers = ["კატეგორია", ...readable.years, `ცვლილება ${readable.years[0]}–${readable.years.at(-1)}`];
+  const changeHeader = readable.years.length > 0
+    ? workbookMessage(locale, "workbook.changeRange", { startYear: readable.years[0], endYear: readable.years.at(-1)! })
+    : workbookMessage(locale, "workbook.change");
+  const headers = [workbookMessage(locale, "workbook.category"), ...readable.years, changeHeader];
   headers.forEach((header, index) => {
     const cell = worksheet.getCell(3, index + 1);
     cell.value = header;
@@ -122,10 +132,10 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
     cell.alignment = { horizontal: index === 0 ? "left" : "right", vertical: "middle" };
   });
 
-  readable.rows.forEach((row, index) => writeReadableRow(worksheet, index + 4, row, readable.years, isPercentage));
+  readable.rows.forEach((row, index) => writeReadableRow(worksheet, index + 4, row, readable.years, isPercentage, locale));
 
   const noteRow = readable.rows.length + 4;
-  worksheet.getCell(noteRow, 1).value = `ერთეული: ${readable.unitLabelKa}`;
+  worksheet.getCell(noteRow, 1).value = workbookMessage(locale, "workbook.unit", { unit: readable.unitLabel });
 
   worksheet.getColumn(1).width = 46;
   for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = 18;
@@ -135,11 +145,12 @@ function writeSourcesSheet(
   worksheet: Worksheet,
   sources: WorkbookExportModel["sources"],
   years: number[],
+  locale: Locale,
 ): void {
   worksheet.mergeCells("A1:E1");
   worksheet.mergeCells("A2:E2");
-  worksheet.getCell("A1").value = "წყაროები";
-  worksheet.getCell("A2").value = `${formatYearRanges(years)} · ოფიციალური პირველწყაროები`;
+  worksheet.getCell("A1").value = workbookMessage(locale, "workbook.sources");
+  worksheet.getCell("A2").value = workbookMessage(locale, "workbook.originalSources", { years: formatYearRanges(years) });
   for (let column = 1; column <= 5; column += 1) {
     const titleCell = worksheet.getCell(1, column);
     titleCell.fill = TITLE_FILL;
@@ -147,7 +158,8 @@ function writeSourcesSheet(
   }
   worksheet.getCell("A2").alignment = { vertical: "middle", wrapText: true };
 
-  ["პერიოდი", "ოფიციალური წყარო", "ორგანიზაცია", "ფაილი", "მოპოვებულია"].forEach((header, index) => {
+  (["workbook.period", "workbook.source", "workbook.organization", "workbook.file", "workbook.retrieved"] as const).forEach((key, index) => {
+    const header = workbookMessage(locale, key);
     const cell = worksheet.getCell(3, index + 1);
     cell.value = header;
     cell.fill = INK_FILL;
@@ -158,19 +170,19 @@ function writeSourcesSheet(
   sources.forEach((source, index) => {
     const rowNumber = index + 4;
     worksheet.getCell(rowNumber, 1).value = formatYearRanges(source.years);
-    worksheet.getCell(rowNumber, 2).value = source.titleKa;
-    worksheet.getCell(rowNumber, 3).value = source.organizationKa;
+    worksheet.getCell(rowNumber, 2).value = source.title;
+    worksheet.getCell(rowNumber, 3).value = source.organization;
     worksheet.getCell(rowNumber, 4).value = {
-      text: "ფაილის ჩამოტვირთვა",
+      text: workbookMessage(locale, "workbook.downloadFile"),
       hyperlink: source.absoluteUrl,
-      tooltip: `${source.titleKa} · ${sourceFileFormat(source.absoluteUrl)}`,
+      tooltip: `${source.title} · ${sourceFileFormat(source.absoluteUrl, locale)}`,
     };
     worksheet.getCell(rowNumber, 4).font = { color: { argb: "FF0563C1" }, underline: true };
     worksheet.getCell(rowNumber, 5).value = source.retrievedAt;
     for (let column = 1; column <= 5; column += 1) {
       worksheet.getCell(rowNumber, column).alignment = { vertical: "top", wrapText: true };
     }
-    worksheet.getRow(rowNumber).height = sourceRowHeight(source.titleKa, source.organizationKa);
+    worksheet.getRow(rowNumber).height = sourceRowHeight(source.title, source.organization);
   });
 
   [18, 42, 30, 22, 14].forEach((width, index) => {
@@ -223,9 +235,9 @@ export async function createWorkbookBuffer(model: WorkbookExportModel): Promise<
     views: [{ state: "frozen", ySplit: 3, topLeftCell: "A4" }],
   });
 
-  writeReadableSheet(readable, model.readable);
+  writeReadableSheet(readable, model.readable, model.locale);
   writeAnalysisSheet(analysis, model.analysis);
-  writeSourcesSheet(sources, model.sources, model.readable.years);
+  writeSourcesSheet(sources, model.sources, model.readable.years, model.locale);
 
   const bytes = await workbook.xlsx.writeBuffer();
   return new Uint8Array(bytes).buffer;

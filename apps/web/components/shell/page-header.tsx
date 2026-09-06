@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useI18n } from "../../lib/i18n/provider";
+import { pageHref } from "../../lib/i18n/routes";
 
 // Breadcrumb row above every explorer surface (DESIGN.md §6.7). The right-hand
 // label is dataset COVERAGE, not the user's selection — the range strip owns that.
@@ -15,6 +19,7 @@ type PageHeaderProps = {
 };
 
 export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
+  const { locale } = useI18n();
   return (
     <header
       data-testid="explorer-header"
@@ -31,7 +36,7 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
             <span key={crumb.label}>
               {index > 0 ? <span aria-hidden="true" className="mx-1.5 text-[var(--accent)]">/</span> : null}
               {crumb.href ? (
-                <Link href={crumb.href} className="max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center text-[var(--muted)] no-underline hover:text-[var(--ink)] hover:underline">
+                <Link href={pageHref(crumb.href, locale)} className="max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center text-[var(--muted)] no-underline hover:text-[var(--ink)] hover:underline">
                   {crumb.label}
                 </Link>
               ) : (

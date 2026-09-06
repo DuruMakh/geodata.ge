@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import type { HeroReliefProps } from "./hero-relief";
 
 function HeroPlaceholder() {
   return <div aria-hidden className="absolute inset-0 bg-[var(--paper)]" />;
@@ -52,7 +53,7 @@ const DeferredHeroRelief = dynamic(() => import("./hero-relief").then((m) => m.H
   loading: HeroPlaceholder,
 });
 
-export function HeroReliefLazy() {
+export function HeroReliefLazy(props: HeroReliefProps) {
   const [active, setActive] = useState(false);
 
   useEffect(() => {
@@ -105,7 +106,7 @@ export function HeroReliefLazy() {
   return (
     <>
       <MobileHeroStatic />
-      {active ? <DeferredHeroRelief /> : <DesktopHeroPlaceholder />}
+      {active ? <DeferredHeroRelief {...props} /> : <DesktopHeroPlaceholder />}
     </>
   );
 }

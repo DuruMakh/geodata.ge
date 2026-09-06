@@ -1,7 +1,12 @@
+import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 // apps/web/tests/factQuery/caveats/ministries.test.ts
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { evaluateCaveats, type CaveatContext } from "../../../lib/factQuery/caveats/engine";
 import { MINISTRIES_CAVEAT_RULES } from "../../../lib/factQuery/caveats/rules.ministries";
+
+let snapshot: FactQuerySnapshot;
+beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 
 type ContextObservation = CaveatContext["observations"][number];
 
@@ -37,9 +42,9 @@ function observation(overrides: Partial<ContextObservation>): ContextObservation
   };
 }
 
-const codes = (ctx: CaveatContext) => evaluateCaveats(ctx, MINISTRIES_CAVEAT_RULES).map((c) => c.code);
+const codes = (ctx: CaveatContext) => evaluateCaveats(snapshot, ctx, MINISTRIES_CAVEAT_RULES).map((c) => c.code);
 const affectsOf = (ctx: CaveatContext, code: string) =>
-  evaluateCaveats(ctx, MINISTRIES_CAVEAT_RULES).find((c) => c.code === code)?.affects;
+  evaluateCaveats(snapshot, ctx, MINISTRIES_CAVEAT_RULES).find((c) => c.code === code)?.affects;
 
 describe("program_coverage_partial", () => {
   it("fires when a requested program year is missing", () => {

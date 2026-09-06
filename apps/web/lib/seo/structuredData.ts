@@ -1,13 +1,13 @@
 import type { Measure } from "../factQuery/types";
+import type { Locale } from "../i18n/types";
+import { pageHref, splitLanguagePath } from "../i18n/routes";
 import {
   type FiscalDatasetId,
   keywordsFor,
   measurementTechniqueFor,
   variableMeasuredFor,
 } from "./datasetVocabulary";
-
-const CATALOG_NAME = "Fiscal.ge — ბიუჯეტის მონაცემები";
-const MUNICIPAL_PARENT_NAME = "საქართველოს მუნიციპალიტეტების ბიუჯეტები";
+import { seoMessage } from "./strings";
 
 export type BreadcrumbItem = {
   name: string;
@@ -15,8 +15,9 @@ export type BreadcrumbItem = {
 };
 
 export type DatasetJsonLdInput = {
+  locale: Locale;
   origin: string;
-  path: `/methodology/${string}`;
+  path: `/methodology/${string}` | `/en/methodology/${string}`;
   datasetId: FiscalDatasetId;
   name: string;
   description: string;
@@ -31,6 +32,7 @@ export type DatasetJsonLdInput = {
 };
 
 export type ExplorerDatasetJsonLdInput = {
+  locale: Locale;
   origin: string;
   path: `/${string}`;
   datasetId: FiscalDatasetId;
@@ -55,9 +57,8 @@ export type ExplorerDatasetJsonLdInput = {
   omitMeasures?: readonly Measure[];
   /**
    * The methodology page describing this same dataset, where one exists. The
-   * two pages carry a Dataset node each for one dataset, so naming the
-   * canonical description page here keeps a consumer from having to guess
-   * which of the pair is the dataset's identity.
+   * pair carries a Dataset node each for one dataset, so naming the canonical
+   * description page keeps a consumer from having to guess which is which.
    */
   sameAsPath?: `/methodology/${string}`;
 };
@@ -66,22 +67,25 @@ function absoluteUrl(origin: string, path: string): string {
   return new URL(path, origin).href;
 }
 
-/** Explorer datasets are identified by a `#dataset` fragment on their page URL. */
+/**
+ * Dataset `@id`s are locale-independent: one dataset has one identity, and the
+ * Georgian path is its canonical form. Only `url` follows the reader's locale.
+ */
 function explorerDatasetId(origin: string, path: string): string {
-  return `${absoluteUrl(origin, path)}#dataset`;
+  return `${absoluteUrl(origin, splitLanguagePath(path).pathname)}#dataset`;
 }
 
 /**
- * The catalog node lives on /methodology, so a reference to it from any other
- * page has to describe itself: a bare `@id` resolves to a node with no `@type`
- * for a validator reading one page in isolation.
+ * The catalog node is rendered on /methodology only, so a reference to it from
+ * any other page has to describe itself: a bare `@id` resolves to a node with
+ * no `@type` for a validator reading a single page in isolation.
  */
-function catalogReference(origin: string) {
+function catalogReference(origin: string, locale: Locale) {
   return {
     "@type": "DataCatalog",
     "@id": `${origin}/methodology#catalog`,
-    name: CATALOG_NAME,
-    url: `${origin}/methodology`,
+    name: seoMessage(locale, "seo.catalogName"),
+    url: absoluteUrl(origin, pageHref("/methodology", locale)),
   };
 }
 
@@ -90,11 +94,15 @@ function catalogReference(origin: string) {
  * the page: what it measures, what it is found by, how it was obtained, and
  * that reading it costs nothing.
  */
-function datasetVocabulary(datasetId: FiscalDatasetId, omitMeasures?: readonly Measure[]) {
+function datasetVocabulary(
+  datasetId: FiscalDatasetId,
+  locale: Locale,
+  omitMeasures?: readonly Measure[],
+) {
   return {
-    keywords: keywordsFor(datasetId),
-    variableMeasured: variableMeasuredFor(datasetId, omitMeasures),
-    measurementTechnique: measurementTechniqueFor(datasetId),
+    keywords: keywordsFor(datasetId, locale),
+    variableMeasured: variableMeasuredFor(datasetId, locale, omitMeasures),
+    measurementTechnique: measurementTechniqueFor(datasetId, locale),
     isAccessibleForFree: true,
   };
 }
@@ -103,7 +111,7 @@ export function serializeJsonLd(data: object): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }
 
-export function siteJsonLd(origin: string) {
+export function siteJsonLd(origin: string, locale: Locale = "ka") {
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -117,10 +125,9 @@ export function siteJsonLd(origin: string) {
           "@type": "ContactPoint",
           email: "info@fiscal.ge",
           contactType: "general inquiries",
-          availableLanguage: "ka",
+          availableLanguage: ["ka", "en"],
         },
-        description:
-          "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად აქვეყნებს.",
+        description: seoMessage(locale, "seo.organizationDescription"),
         logo: {
           "@type": "ImageObject",
           url: `${origin}/fiscal-ge-logo.svg`,
@@ -133,7 +140,7 @@ export function siteJsonLd(origin: string) {
         "@id": `${origin}/#website`,
         name: "Fiscal.ge",
         url: origin,
-        inLanguage: "ka",
+        inLanguage: ["ka", "en"],
         publisher: { "@id": `${origin}/#organization` },
       },
     ],
@@ -160,23 +167,25 @@ export function breadcrumbJsonLd(origin: string, items: readonly BreadcrumbItem[
  */
 export function dataCatalogJsonLd(
   origin: string,
-  datasetPaths: readonly `/methodology/${string}`[],
+  datasetPaths: readonly (`/methodology/${string}` | `/en/methodology/${string}`)[],
+  locale: Locale = "ka",
   explorerDatasetPaths: readonly `/${string}`[] = [],
 ) {
   return {
     "@context": "https://schema.org",
     "@type": "DataCatalog",
     "@id": `${origin}/methodology#catalog`,
-    name: CATALOG_NAME,
-    description:
-      "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებული მონაცემების კატალოგი.",
-    url: `${origin}/methodology`,
-    inLanguage: "ka",
+    name: seoMessage(locale, "seo.catalogName"),
+    description: seoMessage(locale, "seo.catalogDescription"),
+    url: absoluteUrl(origin, pageHref("/methodology", locale)),
+    inLanguage: ["ka", "en"],
     publisher: { "@id": `${origin}/#organization` },
     dataset: [
       // A methodology dataset is identified by its page URL; an explorer
       // dataset shares its page with other content and carries a fragment.
-      ...datasetPaths.map((path) => ({ "@id": absoluteUrl(origin, path) })),
+      ...datasetPaths.map((path) => ({
+        "@id": absoluteUrl(origin, splitLanguagePath(path).pathname),
+      })),
       ...explorerDatasetPaths.map((path) => ({ "@id": explorerDatasetId(origin, path) })),
     ],
   };
@@ -189,19 +198,19 @@ export function datasetJsonLd(input: DatasetJsonLdInput) {
   return {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "@id": absoluteUrl(input.origin, input.path),
+    "@id": absoluteUrl(input.origin, splitLanguagePath(input.path).pathname),
     name: input.name,
     description: input.description,
-    url: absoluteUrl(input.origin, input.path),
-    inLanguage: "ka",
+    url: absoluteUrl(input.origin, pageHref(input.path, input.locale)),
+    inLanguage: ["ka", "en"],
     temporalCoverage: `${input.firstYear}/${input.lastYear}`,
-    spatialCoverage: { "@type": "Place", name: "საქართველო" },
+    spatialCoverage: { "@type": "Place", name: seoMessage(input.locale, "seo.country") },
     dateModified: input.dateModified,
     creator: { "@id": `${input.origin}/#organization` },
     publisher: { "@id": `${input.origin}/#organization` },
-    includedInDataCatalog: catalogReference(input.origin),
+    includedInDataCatalog: catalogReference(input.origin, input.locale),
     license: "https://creativecommons.org/licenses/by/4.0/",
-    ...datasetVocabulary(input.datasetId, input.omitMeasures),
+    ...datasetVocabulary(input.datasetId, input.locale, input.omitMeasures),
     distribution: [
       {
         "@type": "DataDownload",
@@ -215,6 +224,7 @@ export function datasetJsonLd(input: DatasetJsonLdInput) {
       ...(input.jsonDownloadPaths ?? []).map((jsonPath) => ({
         "@type": "DataDownload" as const,
         encodingFormat: "application/json",
+        inLanguage: ["ka", "en"],
         contentUrl: absoluteUrl(input.origin, jsonPath),
       })),
     ],
@@ -225,15 +235,15 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
   if (input.description.length < 50) {
     throw new Error("Dataset description must contain at least 50 characters");
   }
-  const url = absoluteUrl(input.origin, input.path);
+  const url = absoluteUrl(input.origin, pageHref(input.path, input.locale));
   return {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "@id": `${url}#dataset`,
+    "@id": explorerDatasetId(input.origin, input.path),
     name: input.name,
     description: input.description,
     url,
-    inLanguage: "ka",
+    inLanguage: ["ka", "en"],
     temporalCoverage: `${input.firstYear}/${input.lastYear}`,
     spatialCoverage: {
       "@type": "Place",
@@ -246,7 +256,7 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
         ? {
             containedInPlace: {
               "@type": "Country",
-              name: "საქართველო",
+              name: seoMessage(input.locale, "seo.country"),
               identifier: {
                 "@type": "PropertyValue",
                 propertyID: "ISO 3166-1 alpha-2",
@@ -260,8 +270,10 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
     creator: { "@id": `${input.origin}/#organization` },
     publisher: { "@id": `${input.origin}/#organization` },
     license: "https://creativecommons.org/licenses/by/4.0/",
-    ...datasetVocabulary(input.datasetId, input.omitMeasures),
-    ...(input.sameAsPath ? { sameAs: absoluteUrl(input.origin, input.sameAsPath) } : {}),
+    ...datasetVocabulary(input.datasetId, input.locale, input.omitMeasures),
+    ...(input.sameAsPath
+      ? { sameAs: absoluteUrl(input.origin, pageHref(input.sameAsPath, input.locale)) }
+      : {}),
     // A subset is reachable from the catalog through its parent, so it claims
     // one relationship or the other and never both.
     ...(input.partOfPath
@@ -269,11 +281,10 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
           isPartOf: {
             "@type": "Dataset",
             "@id": explorerDatasetId(input.origin, input.partOfPath),
-            name: MUNICIPAL_PARENT_NAME,
-            url: absoluteUrl(input.origin, input.partOfPath),
+            url: absoluteUrl(input.origin, pageHref(input.partOfPath, input.locale)),
           },
         }
-      : { includedInDataCatalog: catalogReference(input.origin) }),
+      : { includedInDataCatalog: catalogReference(input.origin, input.locale) }),
     ...(input.hasPartPaths
       ? {
           hasPart: input.hasPartPaths.map((path) => ({

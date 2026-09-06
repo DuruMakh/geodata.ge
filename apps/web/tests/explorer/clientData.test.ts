@@ -106,8 +106,8 @@ function workbookFor(model: ExplorerModel, measure: "nominal" | "share_of_gdp") 
   const series = model.tableRows.map<WorkbookSeries>((row) => ({
     id: row.itemId,
     kind: row.itemId === model.totalRow?.itemId ? "total" : row.level === "admin_category" ? "group" : "item",
-    parentLabelKa: row.parentItemId ? labelById.get(row.parentItemId) ?? null : null,
-    labelKa: row.kaLabel,
+    parentLabel: row.parentItemId ? labelById.get(row.parentItemId) ?? null : null,
+    label: row.kaLabel,
     pointsByYear: Object.fromEntries(
       model.years.map((year) => {
         const amountGel = row.valuesByYear[year];
@@ -126,14 +126,15 @@ function workbookFor(model: ExplorerModel, measure: "nominal" | "share_of_gdp") 
     ),
   }));
   const input: WorkbookExportInput = {
+    locale: "ka",
     filenameBase: "parity",
-    titleKa: "პარიტეტის ტესტი",
-    groupLabelKa: "ხარჯები",
+    title: "პარიტეტის ტესტი",
+    groupLabel: "ხარჯები",
     years: model.years,
     measure:
       measure === "share_of_gdp"
-        ? { kind: "percentage", unitLabelKa: "% მშპ-ში", analysisHeaderKa: "მშპ-ის წილი (%)" }
-        : { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
+        ? { kind: "percentage", unitLabel: "% მშპ-ში", analysisHeader: "მშპ-ის წილი (%)" }
+        : { kind: "amount", unitLabel: "მილიონი ₾", readableScale: 1_000_000 },
     totalId: model.totalRow?.itemId ?? null,
     series,
     sources: [],

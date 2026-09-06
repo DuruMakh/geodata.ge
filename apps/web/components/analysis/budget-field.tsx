@@ -1,5 +1,8 @@
 "use client";
 
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
+import { publicLabel } from "../../lib/i18n/labels";
 import { useState } from "react";
 import type { SnapshotItem } from "../../lib/explorer/types";
 import { formatAmount } from "../../lib/explorer/format";
@@ -20,6 +23,8 @@ const PAD_T = 18;
 const PAD_B = 36;
 
 export function BudgetField({ items }: BudgetFieldProps) {
+  const { locale, messages, englishLabels } = useI18n();
+  const labelFor = (item: Pick<SnapshotItem, "itemId" | "kaLabel">) => publicLabel(locale, item.itemId, item.kaLabel, englishLabels);
   const [activeId, setActiveId] = useState<string | null>(null);
   // Negative rows have no meaningful share/size geometry; growth from a
   // non-positive base is already null upstream, but guard the amount too.
@@ -31,10 +36,10 @@ export function BudgetField({ items }: BudgetFieldProps) {
   if (withGrowth.length === 0) {
     return (
       <div data-testid="budget-field" className="mt-9 border-t border-[var(--hairline)] pt-6">
-        <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის ველი</h2>
-        <p className="mb-4 text-xs text-[var(--muted)]">x — წილი მთლიანიდან · y — ზრდა წინა წელთან · ზომა — მოცულობა</p>
+        <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">{message(messages, "analysis.budgetField")}</h2>
+        <p className="mb-4 text-xs text-[var(--muted)]">{message(messages, "analysis.budgetFieldNote")}</p>
         <Callout>
-          წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.
+          {message(messages, "analysis.budgetFieldEmpty")}
         </Callout>
       </div>
     );
@@ -71,11 +76,11 @@ export function BudgetField({ items }: BudgetFieldProps) {
 
   return (
     <div data-testid="budget-field" className="mt-9 border-t border-[var(--hairline)] pt-6">
-      <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">ბიუჯეტის ველი</h2>
-      <p className="mb-4 text-xs text-[var(--muted)]">x — წილი მთლიანიდან · y — ზრდა წინა წელთან · ზომა — მოცულობა</p>
+      <h2 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">{message(messages, "analysis.budgetField")}</h2>
+      <p className="mb-4 text-xs text-[var(--muted)]">{message(messages, "analysis.budgetFieldNote")}</p>
       <div className="overflow-x-auto">
       <div className="relative min-w-[720px]">
-      <svg viewBox={`0 0 ${W} ${H}`} role="group" aria-label="ბიუჯეტის ველი" className="block h-auto w-full">
+      <svg viewBox={`0 0 ${W} ${H}`} role="group" aria-label={message(messages, "analysis.budgetField")} className="block h-auto w-full">
         {yTicks.map((tick) => (
           <g key={`y-${tick}`}>
             <line x1={PAD_L} x2={W - PAD_R} y1={y(tick)} y2={y(tick)} stroke={tick === 0 ? "#1E1B16" : "#E7DECF"} strokeWidth={1} />
@@ -106,13 +111,13 @@ export function BudgetField({ items }: BudgetFieldProps) {
                 strokeWidth={2}
                 role="img"
                 tabIndex={0}
-                aria-label={`${item.kaLabel} · ${formatAmount(item.amountGel)}`}
+                aria-label={`${labelFor(item)} · ${formatAmount(item.amountGel, locale)}`}
                 onPointerEnter={() => setActiveId(item.itemId)}
                 onPointerLeave={() => setActiveId(null)}
                 onFocus={() => setActiveId(item.itemId)}
                 onBlur={() => setActiveId(null)}
               >
-                <title>{`${item.kaLabel} · ${formatAmount(item.amountGel)}`}</title>
+                <title>{`${labelFor(item)} · ${formatAmount(item.amountGel, locale)}`}</title>
               </circle>
             </g>
           );
@@ -128,9 +133,9 @@ export function BudgetField({ items }: BudgetFieldProps) {
             transform: `${activeX > 60 ? "translateX(calc(-100% - 10px))" : "translateX(10px)"} ${activeY > 50 ? "translateY(calc(-100% - 10px))" : "translateY(10px)"}`,
           }}
         >
-          <div className="text-[11px] font-medium text-[var(--body)]">{activeItem.kaLabel}</div>
+          <div className="text-[11px] font-medium text-[var(--body)]">{labelFor(activeItem)}</div>
           <div className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
-            {formatAmount(activeItem.amountGel)}
+            {formatAmount(activeItem.amountGel, locale)}
           </div>
         </div>
       ) : null}

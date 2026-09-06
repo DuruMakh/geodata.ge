@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
+import type { EnglishCatalogue, Locale } from "../i18n/types";
+import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import {
   loadReviewedSourceManifest,
   type ValidatedSourceManifestRow,
@@ -16,7 +18,14 @@ export type WorkbookSourceRole =
   | "municipal-functional"
   | "municipal-total";
 
-type WorkbookSourceCacheKey = `${MethodologyDatasetId}:${WorkbookSourceRole}`;
+type WorkbookSourceCacheKey = `${Locale}:${MethodologyDatasetId}:${WorkbookSourceRole}`;
+
+function documentText(documentId: string, title: string, organization: string, locale: Locale, englishDocuments?: EnglishCatalogue["documents"]) {
+  if (locale === "ka") return { title, organization };
+  const document = englishDocuments && Object.hasOwn(englishDocuments, documentId) ? englishDocuments[documentId] : undefined;
+  if (!document) throw new Error(`Missing English document: ${documentId}`);
+  return { title: document.title.text, organization: document.publisher.text };
+}
 
 const expenditureSourceId = (year: number, kind: string) => `source.mof.expenditure.${year}.${kind}`;
 
@@ -69,6 +78,8 @@ const MINISTRY_LINEAGE: Readonly<Record<number, readonly string[]>> = {
 
 export function projectWorkbookSources(
   rows: readonly ValidatedSourceManifestRow[],
+  locale: Locale = "ka",
+  englishDocuments?: EnglishCatalogue["documents"],
 ): WorkbookPublicSource[] {
   const preferred = new Map<string, { row: ValidatedSourceManifestRow; years: Set<number> }>();
   for (const row of rows) {
@@ -85,8 +96,7 @@ export function projectWorkbookSources(
   }
   return [...preferred.values()].map(({ row, years }) => ({
     years: [...years].sort((left, right) => left - right),
-    titleKa: row.display_title_ka,
-    organizationKa: row.source_organization,
+    ...documentText(row.source_id, row.display_title_ka, row.source_organization, locale, englishDocuments),
     downloadHref: row.downloadHref,
     retrievedAt: row.retrieved_at,
   }));
@@ -156,6 +166,7 @@ export function scopeMunicipalWorkbookSources(
 }
 
 const gdpWorkbookSourceRowSchema = z.object({
+  source_id: z.string().trim().min(1),
   accounting_standard: z.enum(["sna_1993", "sna_2008"]),
   retrieved_file_url: z.string().url().startsWith("https://"),
   retrieved_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -168,7 +179,7 @@ const titleByStandard = {
   sna_2008: "მშპ მიმდინარე ფასებში — SNA 2008",
 } as const;
 
-export function projectGdpWorkbookSources(rows: readonly unknown[]): WorkbookPublicSource[] {
+export function projectGdpWorkbookSources(rows: readonly unknown[], locale: Locale = "ka", englishDocuments?: EnglishCatalogue["documents"]): WorkbookPublicSource[] {
   return rows.map((row, index) => {
     const parsed = gdpWorkbookSourceRowSchema.parse(row);
     if (parsed.selected_year_max < parsed.selected_year_min) {
@@ -180,8 +191,7 @@ export function projectGdpWorkbookSources(rows: readonly unknown[]): WorkbookPub
     );
     return {
       years,
-      titleKa: titleByStandard[parsed.accounting_standard],
-      organizationKa: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
+      ...documentText(parsed.source_id, titleByStandard[parsed.accounting_standard], "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)", locale, englishDocuments),
       downloadHref: parsed.retrieved_file_url as `https://${string}`,
       retrievedAt: parsed.retrieved_at,
     };
@@ -189,25 +199,29 @@ export function projectGdpWorkbookSources(rows: readonly unknown[]): WorkbookPub
 }
 
 const cache = new Map<WorkbookSourceCacheKey, Promise<WorkbookPublicSource[]>>();
-let gdpWorkbookSourcesPromise: Promise<WorkbookPublicSource[]> | undefined;
+const gdpCache = new Map<Locale, Promise<WorkbookPublicSource[]>>();
 
 export function loadWorkbookSources(
   datasetId: MethodologyDatasetId,
   role: WorkbookSourceRole = datasetId === "revenue" ? "revenue" : datasetId === "municipalities" ? "municipal-functional" : "expenditure-fields",
+  locale: Locale = "ka",
 ): Promise<WorkbookPublicSource[]> {
-  const cacheKey: WorkbookSourceCacheKey = `${datasetId}:${role}`;
+  const cacheKey: WorkbookSourceCacheKey = `${locale}:${datasetId}:${role}`;
   const existing = cache.get(cacheKey);
   if (existing) return existing;
 
   const repositoryRoot = path.resolve(process.cwd(), "../..");
-  const pending = loadReviewedSourceManifest(repositoryRoot, datasetId)
-    .then((rows) => projectWorkbookSources(roleRows(datasetId, rows, role)));
+  const pending = Promise.all([
+    loadReviewedSourceManifest(repositoryRoot, datasetId),
+    locale === "en" ? loadEnglishCatalogue(repositoryRoot) : undefined,
+  ]).then(([rows, catalogue]) => projectWorkbookSources(roleRows(datasetId, rows, role), locale, catalogue?.documents));
   cache.set(cacheKey, pending);
   return pending;
 }
 
-export function loadGdpWorkbookSources(): Promise<WorkbookPublicSource[]> {
-  if (gdpWorkbookSourcesPromise) return gdpWorkbookSourcesPromise;
+export function loadGdpWorkbookSources(locale: Locale = "ka"): Promise<WorkbookPublicSource[]> {
+  const existing = gdpCache.get(locale);
+  if (existing) return existing;
 
   const repositoryRoot = path.resolve(process.cwd(), "../..");
   const manifestPath = path.join(
@@ -218,16 +232,19 @@ export function loadGdpWorkbookSources(): Promise<WorkbookPublicSource[]> {
     "national-nominal-gdp",
     "source-manifest.csv",
   );
-  gdpWorkbookSourcesPromise = readFile(manifestPath, "utf8").then((csv) => projectGdpWorkbookSources(parse(csv, {
+  const pending = Promise.all([
+    readFile(manifestPath, "utf8"), locale === "en" ? loadEnglishCatalogue(repositoryRoot) : undefined,
+  ]).then(([csv, catalogue]) => projectGdpWorkbookSources(parse(csv, {
     bom: true,
     columns: true,
     skip_empty_lines: true,
     trim: true,
-  }) as unknown[]));
-  return gdpWorkbookSourcesPromise;
+  }) as unknown[], locale, catalogue?.documents));
+  gdpCache.set(locale, pending);
+  return pending;
 }
 
 export function resetWorkbookSourceCacheForTests(): void {
   cache.clear();
-  gdpWorkbookSourcesPromise = undefined;
+  gdpCache.clear();
 }

@@ -20,7 +20,7 @@ describe("Fiscal.ge structured data", () => {
         expect.objectContaining({
           "@type": "WebSite",
           "@id": "https://fiscal.ge/#website",
-          inLanguage: "ka",
+          inLanguage: ["ka", "en"],
         }),
       ]),
     );
@@ -33,7 +33,7 @@ describe("Fiscal.ge structured data", () => {
       url: "https://fiscal.ge",
       email: "info@fiscal.ge",
       description:
-        "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად აქვეყნებს.",
+        "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად და ინგლისურად აქვეყნებს.",
       logo: {
         "@type": "ImageObject",
         url: "https://fiscal.ge/fiscal-ge-logo.svg",
@@ -45,7 +45,7 @@ describe("Fiscal.ge structured data", () => {
       "@type": "ContactPoint",
       email: "info@fiscal.ge",
       contactType: "general inquiries",
-      availableLanguage: "ka",
+      availableLanguage: ["ka", "en"],
     });
     expect(organization).not.toHaveProperty("address");
     expect(organization).not.toHaveProperty("telephone");
@@ -55,7 +55,7 @@ describe("Fiscal.ge structured data", () => {
   });
 
   it("describes stable explorer downloads with stable dataset ids", () => {
-    const data = explorerDatasetJsonLd({
+    const data = explorerDatasetJsonLd({ locale: "ka",
       origin: "https://fiscal.ge",
       path: "/explorer/expenditure",
       datasetId: "national-expenditure",
@@ -85,7 +85,7 @@ describe("Fiscal.ge structured data", () => {
   });
 
   it("omits distribution from client-generated entity datasets", () => {
-    const data = explorerDatasetJsonLd({
+    const data = explorerDatasetJsonLd({ locale: "ka",
       origin: "https://fiscal.ge",
       path: "/explorer/municipalities/tbilisi",
       datasetId: "municipal-expenditure",
@@ -116,7 +116,7 @@ describe("Fiscal.ge structured data", () => {
   });
 
   it("describes a downloadable CC BY 4.0 dataset", () => {
-    const data = datasetJsonLd({
+    const data = datasetJsonLd({ locale: "ka",
       origin: "https://fiscal.ge",
       path: "/methodology/expenditure",
       datasetId: "national-expenditure",
@@ -158,6 +158,7 @@ describe("Fiscal.ge structured data", () => {
   it("rejects dataset descriptions too short for Google's dataset contract", () => {
     expect(() =>
       datasetJsonLd({
+        locale: "ka",
         origin: "https://fiscal.ge",
         path: "/methodology/revenue",
         datasetId: "national-revenue",
@@ -180,7 +181,7 @@ describe("Fiscal.ge structured data", () => {
 
 describe("Dataset distributions describe every published format", () => {
   it("adds a JSON DataDownload beside the CSV", () => {
-    const jsonLd = datasetJsonLd({
+    const jsonLd = datasetJsonLd({ locale: "ka",
       origin: "https://fiscal.ge",
       path: "/methodology/expenditure",
       datasetId: "national-expenditure",
@@ -203,18 +204,20 @@ describe("Dataset distributions describe every published format", () => {
       {
         "@type": "DataDownload",
         encodingFormat: "application/json",
+        inLanguage: ["ka", "en"],
         contentUrl: "https://fiscal.ge/downloads/data/national-expenditure.json",
       },
       {
         "@type": "DataDownload",
         encodingFormat: "application/json",
+        inLanguage: ["ka", "en"],
         contentUrl: "https://fiscal.ge/downloads/data/ministries.json",
       },
     ]);
   });
 
   it("keeps the CSV-only shape when no JSON is published", () => {
-    const jsonLd = datasetJsonLd({
+    const jsonLd = datasetJsonLd({ locale: "ka",
       origin: "https://fiscal.ge",
       path: "/methodology/revenue",
       datasetId: "national-revenue",
@@ -232,6 +235,7 @@ describe("Dataset distributions describe every published format", () => {
 
 describe("Dataset records carry the full Google Dataset property set", () => {
   const municipalParent = {
+    locale: "ka" as const,
     origin: "https://fiscal.ge",
     path: "/explorer/municipalities" as const,
     datasetId: "municipal-expenditure" as const,
@@ -246,6 +250,7 @@ describe("Dataset records carry the full Google Dataset property set", () => {
   };
 
   const tbilisiSubset = {
+    locale: "ka" as const,
     origin: "https://fiscal.ge",
     path: "/explorer/municipalities/tbilisi" as const,
     datasetId: "municipal-expenditure" as const,
@@ -295,7 +300,8 @@ describe("Dataset records carry the full Google Dataset property set", () => {
     expect(explorerDatasetJsonLd(tbilisiSubset)).toMatchObject({ isAccessibleForFree: true });
     expect(
       datasetJsonLd({
-        origin: "https://fiscal.ge",
+        locale: "ka" as const,
+    origin: "https://fiscal.ge",
         path: "/methodology/expenditure",
         datasetId: "national-expenditure",
         name: "საქართველოს სახელმწიფო ბიუჯეტის ხარჯები",
@@ -336,12 +342,26 @@ describe("Dataset records carry the full Google Dataset property set", () => {
     expect(subset.variableMeasured).toEqual(parent.variableMeasured);
   });
 
-  it("publishes Georgian and English keywords so both search languages resolve", () => {
-    const keywords = (explorerDatasetJsonLd(municipalParent) as unknown as { keywords: string[] })
-      .keywords;
-    expect(keywords).toContain("მუნიციპალიტეტი");
-    expect(keywords).toContain("municipal budget");
-    expect(keywords).toContain("Georgia");
+  it("keeps every published string in the page's own language", () => {
+    // bilingual-seo.spec.ts forbids Georgian anywhere on an English page,
+    // JSON-LD included, so the vocabulary is localized rather than shared.
+    const georgian = /[Ⴀ-ჿ]/;
+    const ka = explorerDatasetJsonLd(municipalParent) as unknown as {
+      keywords: string[];
+      measurementTechnique: string;
+      variableMeasured: { name: string }[];
+    };
+    expect(ka.keywords).toContain("მუნიციპალიტეტი");
+
+    const en = explorerDatasetJsonLd({ ...municipalParent, locale: "en" }) as unknown as {
+      keywords: string[];
+      measurementTechnique: string;
+      variableMeasured: { name: string }[];
+    };
+    expect(en.keywords).toContain("municipal budget");
+    expect(en.keywords.some((keyword) => georgian.test(keyword))).toBe(false);
+    expect(georgian.test(en.measurementTechnique)).toBe(false);
+    expect(en.variableMeasured.some((measure) => georgian.test(measure.name))).toBe(false);
   });
 
   it("records how the figures were obtained", () => {
@@ -378,7 +398,7 @@ describe("Dataset records carry the full Google Dataset property set", () => {
       "/methodology/revenue",
       "/methodology/municipalities",
       "/methodology/debt",
-    ], [
+    ], "ka", [
       "/explorer/expenditure",
       "/explorer/revenue",
       "/explorer/debt",
@@ -406,7 +426,8 @@ describe("Dataset records carry the full Google Dataset property set", () => {
     expect(
       homes(
         datasetJsonLd({
-          origin: "https://fiscal.ge",
+          locale: "ka" as const,
+    origin: "https://fiscal.ge",
           path: "/methodology/debt",
           datasetId: "government-debt",
           name: "სახელმწიფო ვალი",
@@ -453,9 +474,11 @@ describe("Dataset records carry the full Google Dataset property set", () => {
   it("types the nodes it points at, so one page is readable on its own", () => {
     expect(explorerDatasetJsonLd(tbilisiSubset)).toMatchObject({
       isPartOf: {
+        // @type and url make the reference self-describing; the parent's name is
+        // locale-dependent and carries no message key, so it is left out rather
+        // than hardcoded in one language.
         "@type": "Dataset",
         "@id": "https://fiscal.ge/explorer/municipalities#dataset",
-        name: expect.any(String),
         url: "https://fiscal.ge/explorer/municipalities",
       },
     });
@@ -506,7 +529,8 @@ describe("Dataset records carry the full Google Dataset property set", () => {
   it("names Fiscal.ge as publisher of the methodology datasets too", () => {
     expect(
       datasetJsonLd({
-        origin: "https://fiscal.ge",
+        locale: "ka" as const,
+    origin: "https://fiscal.ge",
         path: "/methodology/municipalities",
         datasetId: "municipal-expenditure",
         name: "მუნიციპალიტეტების ბიუჯეტები",

@@ -17,19 +17,19 @@ export type MethodologySectionKind =
 
 export type MethodologyDecision = {
   id: string;
-  groupKa: string;
-  titleKa: string;
-  statusKa: "ოფიციალური ფაქტი" | "Fiscal.ge-ის გადაწყვეტილება" | "შეზღუდვა";
-  summaryKa: string;
-  detailKa: readonly string[];
+  group: string;
+  title: string;
+  statusLabel: "ოფიციალური ფაქტი" | "Fiscal.ge-ის გადაწყვეტილება" | "შეზღუდვა" | "Official fact" | "Fiscal.ge decision" | "Limitation";
+  summary: string;
+  detail: readonly string[];
   canonicalDecisionIds: readonly string[];
 };
 
 export type MethodologyContent = {
   id: MethodologyDatasetId;
   slug: MethodologyDatasetId;
-  titleKa: string;
-  summaryKa: string;
+  title: string;
+  summary: string;
   reviewedAt: string;
   archiveManifestId: MethodologyDatasetId;
   // Where this dataset's coverage years come from. Declared rather than inferred:
@@ -42,17 +42,17 @@ export type MethodologyContent = {
     | { kind: "municipalTotals" }
     | { kind: "governmentDebt" };
   canonicalDocuments: readonly string[];
-  disclosureKa: string;
+  disclosure: string;
   keyFacts: readonly {
-    labelKa: string;
+    label: string;
     valueKind: "coverage" | "frequency" | "basis" | "unit";
-    valueKa?: string;
+    value?: string;
   }[];
   sections: readonly {
     id: string;
     kind: MethodologySectionKind;
-    titleKa: string;
-    paragraphsKa: readonly string[];
+    title: string;
+    paragraphs: readonly string[];
   }[];
   decisions: readonly MethodologyDecision[];
   technicalAppendix: readonly MethodologyDecision[];
@@ -96,9 +96,9 @@ export type MethodologyArchiveSummary = {
 
 export type MethodologyHubEntry = {
   id: MethodologyDatasetId;
-  titleKa: string;
-  summaryKa: string;
-  href: `/methodology/${MethodologyDatasetId}`;
+  title: string;
+  summary: string;
+  href: `/methodology/${MethodologyDatasetId}` | `/en/methodology/${MethodologyDatasetId}`;
   coverage: { firstYear: number; lastYear: number };
   originalFileCount: number;
   reviewedAt: string;

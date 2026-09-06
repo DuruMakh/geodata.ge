@@ -12,6 +12,7 @@ import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest
 
 const gdpRows = [
   {
+    source_id: "source.geostat_national_gdp_sna_1993",
     accounting_standard: "sna_1993",
     retrieved_file_url: "https://www.geostat.ge/media/27798/GDP-at-current-prices.xlsx",
     retrieved_at: "2026-08-13",
@@ -19,6 +20,7 @@ const gdpRows = [
     selected_year_max: "2009",
   },
   {
+    source_id: "source.geostat_national_gdp_sna_2008",
     accounting_standard: "sna_2008",
     retrieved_file_url: "https://www.geostat.ge/media/81052/03_GDP-at-Current-Prices.xlsx",
     retrieved_at: "2026-08-13",
@@ -26,6 +28,29 @@ const gdpRows = [
     selected_year_max: "2025",
   },
 ];
+
+describe("language-specific workbook source descriptions", () => {
+  it.each(["expenditure", "revenue", "municipalities", "debt"] as const)("keeps %s source selection and separates both cached languages", async dataset => {
+    resetWorkbookSourceCacheForTests();
+    const ka = await loadWorkbookSources(dataset);
+    const en = await loadWorkbookSources(dataset, undefined, "en");
+    expect(en.map(source => [source.downloadHref, source.years, source.retrievedAt])).toEqual(ka.map(source => [source.downloadHref, source.years, source.retrievedAt]));
+    expect(en.length).toBeGreaterThan(0);
+    expect(en.every(source => !/\p{Script=Georgian}/u.test(source.title + source.organization))).toBe(true);
+    expect(await loadWorkbookSources(dataset)).toEqual(ka);
+    expect(await loadWorkbookSources(dataset, undefined, "en")).toEqual(en);
+  });
+
+  it("keeps both GDP source links and reviewed accounting-standard titles in English", async () => {
+    resetWorkbookSourceCacheForTests();
+    const ka = await loadGdpWorkbookSources();
+    const en = await loadGdpWorkbookSources("en");
+    expect(en.map(source => [source.downloadHref, source.years, source.retrievedAt])).toEqual(ka.map(source => [source.downloadHref, source.years, source.retrievedAt]));
+    expect(en.map(source => source.title)).toEqual(["GDP at current prices, SNA 1993", "GDP at current prices, SNA 2008"]);
+    expect(en.every(source => !/\p{Script=Georgian}/u.test(source.organization))).toBe(true);
+    expect(await loadGdpWorkbookSources()).toEqual(ka);
+  });
+});
 
 describe("projectWorkbookSources", () => {
   it("keeps only client-safe public fields", () => {
@@ -57,8 +82,8 @@ describe("projectWorkbookSources", () => {
     expect(projected).toEqual([
       {
         years: [2025],
-        titleKa: "2025 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები",
-        organizationKa: "საქართველოს ფინანსთა სამინისტრო",
+        title: "2025 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები",
+        organization: "საქართველოს ფინანსთა სამინისტრო",
         downloadHref: "/downloads/methodology/revenue/files/2025/mof-revenue-form-1.pdf",
         retrievedAt: "2026-05-14",
       },
@@ -102,13 +127,13 @@ describe("projectWorkbookSources", () => {
     };
 
     expect(projectWorkbookSources([finalFact, excelFact])).toEqual([
-      expect.objectContaining({ downloadHref: excelFact.downloadHref, titleKa: "Excel fact" }),
+      expect.objectContaining({ downloadHref: excelFact.downloadHref, title: "Excel fact" }),
     ]);
 
     expect(projectWorkbookSources([
       { ...finalFact, source_id: "source.z" },
       { ...finalFact, source_id: "source.a", display_title_ka: "Lexically first" },
-    ])).toEqual([expect.objectContaining({ titleKa: "Lexically first" })]);
+    ])).toEqual([expect.objectContaining({ title: "Lexically first" })]);
   });
 });
 
@@ -178,19 +203,19 @@ describe("scopeMunicipalWorkbookSources", () => {
   it("keeps shared sources and only histories for the requested municipality codes", () => {
     const shared = {
       years: [2020],
-      titleKa: "2020 წლის მუნიციპალური ბიუჯეტების ფუნქციური კლასიფიკაცია",
-      organizationKa: "საქართველოს ფინანსთა სამინისტრო",
+      title: "2020 წლის მუნიციპალური ბიუჯეტების ფუნქციური კლასიფიკაცია",
+      organization: "საქართველოს ფინანსთა სამინისტრო",
       downloadHref: "/downloads/methodology/municipalities/files/2020/mof-functional-classification.xlsx" as const,
       retrievedAt: "2026-07-26",
     };
     const history = (code: string) => ({
       ...shared,
-      titleKa: `${code} მუნიციპალიტეტის ისტორია`,
+      title: `${code} მუნიციპალიტეტის ისტორია`,
       downloadHref: `/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-${code}.xlsx` as const,
     });
     const adjaraRepublic = {
       ...shared,
-      titleKa: "აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივი გადასახდელები",
+      title: "აჭარის ა.რ. რესპუბლიკური ბიუჯეტის ფაქტობრივი გადასახდელები",
       downloadHref: "/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx" as const,
     };
 
@@ -231,15 +256,15 @@ describe("projectGdpWorkbookSources", () => {
     expect(projected).toEqual([
       {
         years: [1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009],
-        titleKa: "მშპ მიმდინარე ფასებში — SNA 1993",
-        organizationKa: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
+        title: "მშპ მიმდინარე ფასებში — SNA 1993",
+        organization: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
         downloadHref: "https://www.geostat.ge/media/27798/GDP-at-current-prices.xlsx",
         retrievedAt: "2026-08-13",
       },
       {
         years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
-        titleKa: "მშპ მიმდინარე ფასებში — SNA 2008",
-        organizationKa: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
+        title: "მშპ მიმდინარე ფასებში — SNA 2008",
+        organization: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
         downloadHref: "https://www.geostat.ge/media/81052/03_GDP-at-Current-Prices.xlsx",
         retrievedAt: "2026-08-13",
       },

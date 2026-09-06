@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
 import { buildSeriesPanelRows, SeriesPanel, topLevelIds } from "../../components/main-explorer/series-panel";
 import { SeriesSelector, SeriesSelectorRow } from "../../components/main-explorer/series-selector";
@@ -99,7 +99,7 @@ describe("bulk selection domain", () => {
   });
 
   it("reports selected top-level rows and programs as separate counts", () => {
-    const markup = renderToStaticMarkup(
+    const markup = renderGeorgianMarkup(
       createElement(SeriesPanel, {
         items,
         rows: [],
@@ -142,7 +142,7 @@ describe("empty state", () => {
       children: createElement("div", null, "მთლიანი ხარჯი"),
     };
 
-    return renderToStaticMarkup(createElement(SeriesSelector, props));
+    return renderGeorgianMarkup(createElement(SeriesSelector, props));
   }
 
   it("does not claim zero results while the pinned total is still listed", () => {
@@ -172,7 +172,7 @@ describe("optional debt selector semantics", () => {
       hasVisibleMatches: true,
       children: createElement("div"),
     };
-    const markup = renderToStaticMarkup(createElement(SeriesSelector, props));
+    const markup = renderGeorgianMarkup(createElement(SeriesSelector, props));
 
     expect(markup).toContain("0 / 9");
     expect(markup).not.toContain("ყველას მონიშვნა");
@@ -192,8 +192,8 @@ describe("optional debt selector semantics", () => {
       onToggle: () => {},
       onToggleExpanded: () => {},
     };
-    const existing = renderToStaticMarkup(createElement(SeriesSelectorRow, base));
-    const debt = renderToStaticMarkup(createElement(SeriesSelectorRow, {
+    const existing = renderGeorgianMarkup(createElement(SeriesSelectorRow, base));
+    const debt = renderGeorgianMarkup(createElement(SeriesSelectorRow, {
       ...base,
       expansionLabel: "ვალი — ქვესერიების ჩაკეცვა",
     }));

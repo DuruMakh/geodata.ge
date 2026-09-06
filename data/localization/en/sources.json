@@ -1,0 +1,810 @@
+{
+  "source.adjara_consolidated_budget": {
+    "name": {
+      "text": "Reviewed consolidated Adjara calculation — municipalities plus republican payments minus internal transfers",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": {
+      "text": "Reviewed consolidated Adjara calculation — municipalities plus republican payments minus internal transfers",
+      "reviewedAt": "2026-09-05"
+    }
+  },
+  "source.adjara_republic_budget_actual": {
+    "name": {
+      "text": "Adjara Autonomous Republic republican budget actual payments (2015-2025)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.geostat_municipal_population": {
+    "name": {
+      "text": "Geostat population as of 1 January by self-governed units",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.geostat_national_gdp_sna_1993": {
+    "name": {
+      "text": "Geostat GDP at current prices, SNA 1993",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.geostat_national_gdp_sna_2008": {
+    "name": {
+      "text": "Geostat GDP at current prices, SNA 2008",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.imf_weo_april_2026_general_government_balance": {
+    "name": {
+      "text": "IMF WEO April 2026 general government net lending or borrowing for Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2004_expenditure_full_state_functional_actual": {
+    "name": {
+      "text": "Reviewed official 2004 complete state-budget execution annex (full-state functional actuals)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2004_expenditure_pdf_form_e11_actual": {
+    "name": {
+      "text": "Reviewed official 2004 expenditure E11 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2004_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2004 complete state-budget execution annex (organizational actuals)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2004_revenue_annual_execution_report": {
+    "name": {
+      "text": "Reviewed official 2004 consolidated-budget revenue and grants annual execution report",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2005_expenditure_functional_old_classification_actual": {
+    "name": {
+      "text": "Reviewed official 2005 expenditure E11 PDF (pre-COFOG 14-group classification) verified against the execution report total",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2005_expenditure_pdf_form_e11_actual": {
+    "name": {
+      "text": "Reviewed official 2005 expenditure E11 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2005_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2005 ministry-total expenditure workbook (AcadNusx transliteration)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2005_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2005 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2006_expenditure_functional_old_classification_actual": {
+    "name": {
+      "text": "Reviewed official 2006 expenditure E11 PDF (pre-COFOG 14-group classification) verified against the execution report total",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2006_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2006 annual budget-execution report (organizational; AcadNusx)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2006_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2006 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2007_execution_report_total_actual": {
+    "name": {
+      "text": "Reviewed official 2007 annual execution report whole-budget payments total (mof.ge doc 8903)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2007_expenditure_functional_actual": {
+    "name": {
+      "text": "Reviewed official 2007 expenditure E11 PDF verified against the execution report total",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2007_expenditure_pdf_form_e11_actual": {
+    "name": {
+      "text": "Reviewed official 2007 expenditure E11 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2007_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2007 annual budget-execution report (tavi V organizational; AcadNusx)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2007_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2007 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2008_execution_report_aggregate_actual": {
+    "name": {
+      "text": "Reviewed official 2008 annual execution report whole-budget financial-assets and liabilities aggregates (mof.ge doc 8898 Tavi I and pages 109-110)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2008_expenditure_functional_plus_execution_report_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2008 expenditure E11 PDF plus execution-report supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2008_expenditure_pdf_form_e11_actual": {
+    "name": {
+      "text": "Reviewed official 2008 expenditure E11 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2008_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2008 annual budget-execution report (tavi V organizational; AcadNusx)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2008_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2008 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2009_expenditure_functional_plus_execution_report_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2009 expenditure E11 PDF plus execution-report supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2009_expenditure_pdf_form_e11_actual": {
+    "name": {
+      "text": "Reviewed official 2009 expenditure E11 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2009_organizational_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2009 annual execution report payments-by-organization chapter Tavi V (mof.ge doc 8894 pages 53-114)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2009_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2009 annual budget-execution report (tavi V organizational; AcadNusx)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2009_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2009 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2010_expenditure_functional_plus_execution_report_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2010 expenditure E11 PDF plus execution-report supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2010_expenditure_pdf_form_e11_actual": {
+    "name": {
+      "text": "Reviewed official 2010 expenditure E11 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2010_organizational_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2010 annual execution report payments-by-organization chapter Tavi V (mof.ge doc 8881 pages 47-100)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2010_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2010 annual budget-execution report (tavi V organizational; AcadNusx)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2010_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2010 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2011_expenditure_functional_plus_execution_report_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2011 expenditure E11 PDF plus execution-report supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2011_expenditure_pdf_form_e11_actual": {
+    "name": {
+      "text": "Reviewed official 2011 expenditure E11 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2011_organizational_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2011 annual execution report payments-by-organization chapter Tavi V (mof.ge doc 8944 pages 69-151)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2011_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2011 annual budget-execution report (tavi VI organizational; AcadNusx)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2011_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2011 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2012_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2012 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2012_expenditure_pdf_form_e11_actual": {
+    "name": {
+      "text": "Reviewed official 2012 expenditure E11 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2012_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2012 annual budget-execution report (tavi VI organizational)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2012_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2012 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2013_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2013 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2013_expenditure_pdf_form_e11_actual": {
+    "name": {
+      "text": "Reviewed official 2013 expenditure E11 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2013_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2013 organizational (tavi 6) expenditure workbook",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2013_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2013 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2014_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2014 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2014_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2014 ministry expenditure actuals (2015 workbook col_4)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2014_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2014 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2015_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2015 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2015_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2015 annual budget-execution report (tavi VI organizational)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2015_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2015 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2016_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2016 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2016_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2016 annual budget-execution report (tavi VI organizational)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2016_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2016 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2017_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2017 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2017 expenditure E11 PDF plus tavi 6 workbook supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2017_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2017 programmatic expenditure workbook",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2017_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2017 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2018_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2018 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2018_expenditure_pdf_e11_plus_tavi6_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2018 expenditure E11 PDF plus tavi 6 workbook supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2018_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2018 programmatic expenditure workbook",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2018_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2018 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2019_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2019 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2019_expenditure_pdf_e11_plus_tavi6_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2019 expenditure E11 PDF plus tavi 6 workbook supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2019_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2019 programmatic expenditure workbook",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2019_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2019 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2020_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2020 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2020_expenditure_pdf_e11_plus_tavi6_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2020 expenditure E11 PDF plus tavi 6 workbook supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2020_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2020 programmatic expenditure workbook",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2020_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2020 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2021_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2021 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2021_expenditure_pdf_e11_plus_tavi6_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2021 expenditure E11 PDF plus tavi 6 workbook supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2021_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2021 programmatic expenditure workbook",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2021_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2021 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2022_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2022 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2022_expenditure_pdf_e11_plus_tavi6_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2022 expenditure E11 PDF plus tavi 6 workbook supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2022_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2022 programmatic expenditure workbook",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2022_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2022 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2023_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2023 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2023_expenditure_pdf_e11_plus_tavi6_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2023 expenditure E11 PDF plus tavi 6 workbook supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2023_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2023 programmatic expenditure workbook",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2023_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2023 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2023_tavi1_actual": {
+    "name": {
+      "text": "Reviewed official 2023 state budget execution tavi 1",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2023_tavi6_actual": {
+    "name": {
+      "text": "Reviewed official 2023 state budget execution tavi 6",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2024_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2024 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2024_expenditure_pdf_e11_plus_tavi6_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2024 expenditure E11 PDF plus tavi 6 workbook supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2024_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2024 programmatic expenditure workbook",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2024_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2024 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2024_tavi1_actual": {
+    "name": {
+      "text": "Reviewed official 2024 state budget execution tavi 1",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2024_tavi6_actual": {
+    "name": {
+      "text": "Reviewed official 2024 state budget execution tavi 6",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2025_execution": {
+    "name": {
+      "text": "Reviewed official 2025 budget execution documents",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2025_expenditure_functional_plus_programmatic_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2025 expenditure E11 PDF plus programmatic supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2025_expenditure_pdf_e11_plus_tavi6_supplement_actual": {
+    "name": {
+      "text": "Reviewed official 2025 expenditure E11 PDF plus tavi 6 workbook supplement",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2025_programmatic_fact_actual": {
+    "name": {
+      "text": "Reviewed official 2025 programmatic expenditure workbook",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2025_revenue_form1_pdf": {
+    "name": {
+      "text": "Reviewed official 2025 revenue classification form 1 PDF",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2025_tavi1_actual": {
+    "name": {
+      "text": "Reviewed official 2025 state budget execution tavi 1",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_2025_tavi6_actual": {
+    "name": {
+      "text": "Reviewed official 2025 state budget execution tavi 6",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_central_government_liabilities_control": {
+    "name": {
+      "text": "Central Government Debt Liabilities by Maturity; Residency; and Instrument with reference to GFSM 2001",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_debt_strategy_2019_2021": {
+    "name": {
+      "text": "General Government Debt Management Strategy 2019-2021",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_debt_strategy_2022_2025": {
+    "name": {
+      "text": "General Government Debt Management Strategy 2022-2025",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_debt_strategy_2023_2026": {
+    "name": {
+      "text": "General Government Debt Management Strategy 2023-2026",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_debt_strategy_2025_2029": {
+    "name": {
+      "text": "General Government Debt Management Strategy 2025-2029",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_monthly_debt_report_2026_07": {
+    "name": {
+      "text": "Monthly Debt Report July 2026",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_public_debt_bulletin_n13": {
+    "name": {
+      "text": "Public Debt of Georgia Statistical Bulletin N13",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_public_debt_bulletin_n19": {
+    "name": {
+      "text": "Public Debt of Georgia Statistical Bulletin N19",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_public_debt_bulletin_n25": {
+    "name": {
+      "text": "Public Debt of Georgia Statistical Bulletin N25",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.mof_public_debt_bulletin_n7": {
+    "name": {
+      "text": "Public Debt of Georgia Statistical Bulletin N7",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.municipal_mof_annual_and_history_workbooks": {
+    "name": {
+      "text": "MoF annual functional-classification workbooks (2020-2025) and municipality budget-history workbooks (2016-2025 total payments)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.municipal_portal_archive": {
+    "name": {
+      "text": "Archived Municipalities Analytical Portal open-data exports (2015-2019 functional actuals)",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  },
+  "source.treasury_consolidated_revenue_actual": {
+    "name": {
+      "text": "Treasury annual consolidated-revenue reports — transfers from autonomous republic",
+      "reviewedAt": "2026-09-05"
+    },
+    "derivation": null
+  }
+}

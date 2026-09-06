@@ -9,24 +9,24 @@ const sourceUrl = "https://fiscal.ge/downloads/methodology/revenue/files/2020/mo
 const readableRows: WorkbookReadableRow[] = [
   {
     kind: "total",
-    parentLabelKa: null,
-    labelKa: "გადასახადები სულ",
+    parentLabel: null,
+    label: "გადასახადები სულ",
     valuesByYear: { 2020: 1_000, 2021: 1_250, 2022: 1_500 },
     basisByYear: { 2020: "actual", 2021: "actual", 2022: "actual" },
     change: 0.5,
   },
   {
     kind: "item",
-    parentLabelKa: "გადასახადები",
-    labelKa: "დამატებული ღირებულების გადასახადი",
+    parentLabel: "გადასახადები",
+    label: "დამატებული ღირებულების გადასახადი",
     valuesByYear: { 2020: 100, 2021: -120, 2022: 150 },
     basisByYear: { 2020: "actual", 2021: "planned", 2022: "actual" },
     change: 0.5,
   },
   ...Array.from({ length: 10 }, (_, index) => ({
     kind: "group" as const,
-    parentLabelKa: null,
-    labelKa: `სატესტო ჯგუფი ${index + 1}`,
+    parentLabel: null,
+    label: `სატესტო ჯგუფი ${index + 1}`,
     valuesByYear: { 2020: index + 1, 2021: index + 2, 2022: index + 3 },
     basisByYear: { 2020: "actual" as const, 2021: "actual" as const, 2022: "actual" as const },
     change: 2 / (index + 1),
@@ -34,12 +34,13 @@ const readableRows: WorkbookReadableRow[] = [
 ];
 
 const approvedModelFixture: WorkbookExportModel = {
+  locale: "ka",
   filename: "fiscal-revenue-2020-2022.xlsx",
   sheetNames: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"],
   readable: {
-    titleKa: "საქართველოს საგადასახადო შემოსავლები",
-    subtitleKa: "2020–2022 · ფაქტი და გეგმა · მილიონი ₾",
-    unitLabelKa: "მილიონი ₾",
+    title: "საქართველოს საგადასახადო შემოსავლები",
+    subtitle: "2020–2022 · ფაქტი და გეგმა · მილიონი ₾",
+    unitLabel: "მილიონი ₾",
     years: [2020, 2021, 2022],
     rows: readableRows,
   },
@@ -49,8 +50,8 @@ const approvedModelFixture: WorkbookExportModel = {
   },
   sources: [{
     years: [2020],
-    titleKa: "2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები",
-    organizationKa: "საქართველოს ფინანსთა სამინისტრო",
+    title: "2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები",
+    organization: "საქართველოს ფინანსთა სამინისტრო",
     downloadHref: "/downloads/methodology/revenue/files/2020/mof-revenue-form-1.pdf",
     retrievedAt: "2026-06-09",
     absoluteUrl: sourceUrl,
@@ -82,6 +83,39 @@ function expectSourceMetadata(sources: ExcelJS.Worksheet) {
 }
 
 describe("createWorkbookBuffer", () => {
+  it("writes English cells, planned formats and source links as a real three-sheet workbook", async () => {
+    const englishModel: WorkbookExportModel = {
+      ...approvedModelFixture,
+      locale: "en",
+      filename: "fiscal-revenue-2020-2022-en.xlsx",
+      sheetNames: ["Summary", "Data", "Sources"],
+      readable: {
+        ...approvedModelFixture.readable,
+        title: "Georgia tax revenue", subtitle: "2020–2022 · Actual and planned · million GEL", unitLabel: "million GEL",
+        rows: readableRows.map((row, index) => ({ ...row, label: index === 0 ? "Total taxes" : index === 1 ? "VAT" : `Test group ${index - 1}`, parentLabel: row.parentLabel ? "Taxes" : null })),
+      },
+      analysis: { headers: ["Year", "Group", "Category", "Amount (GEL)", "Status"], rows: [[2020, "Taxes", "VAT", 1_212_500_000, "Actual"]] },
+      sources: approvedModelFixture.sources.map(source => ({ ...source, title: "Consolidated budget receipts, 2020", organization: "Ministry of Finance of Georgia" })),
+    };
+    const workbook = await loadWorkbook(englishModel);
+    expect(workbook.worksheets.map(sheet => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
+    const summary = workbook.getWorksheet("Summary")!;
+    expect(summary.getCell("A3").value).toBe("Category");
+    expect(summary.getCell("E3").value).toBe("Change 2020–2022");
+    expect(summary.getCell("C5").type).toBe(ExcelJS.ValueType.Number);
+    expect(summary.getCell("C5").value).toBe(-120);
+    expect(summary.getCell("C5").numFmt).toContain('"Planned"');
+    expect(summary.getCell("E5").value).toEqual({ formula: "D5/B5-1", result: 0.5 });
+    expect(summary.views[0]).toMatchObject({ state: "frozen", xSplit: 1, ySplit: 3 });
+    expect(workbook.getWorksheet("Data")!.getCell("D2").value).toBe(1_212_500_000);
+    expect(workbook.getWorksheet("Data")!.getCell("D2").type).toBe(ExcelJS.ValueType.Number);
+    expect(workbook.getWorksheet("Sources")!.getCell("D4").value).toMatchObject({ text: "Download file", hyperlink: sourceUrl });
+    workbook.eachSheet(sheet => sheet.eachRow(row => row.eachCell(cell => {
+      expect(JSON.stringify(cell.value)).not.toMatch(/\p{Script=Georgian}/u);
+      expect(cell.numFmt ?? "").not.toMatch(/\p{Script=Georgian}/u);
+    })));
+  });
+
   it("writes the approved three-sheet workbook with a cream title and separate sources", async () => {
     const workbook = await loadWorkbook(approvedModelFixture);
 
@@ -167,7 +201,7 @@ describe("createWorkbookBuffer", () => {
   it("adds the GDP-share header only to percentage analysis data", async () => {
     const workbook = await loadWorkbook({
       ...approvedModelFixture,
-      readable: { ...approvedModelFixture.readable, unitLabelKa: "% მშპ-ში" },
+      readable: { ...approvedModelFixture.readable, unitLabel: "% მშპ-ში" },
       analysis: {
         headers: [...approvedModelFixture.analysis.headers, "მშპ-ის წილი (%)"],
         rows: [[2020, "გადასახადები", "დამატებული ღირებულების გადასახადი", 1_212_500_000, "ფაქტი", 0.025]],
@@ -215,7 +249,7 @@ describe("createWorkbookBuffer", () => {
       },
       sources: [{
           ...approvedModelFixture.sources[0]!,
-          titleKa: "მოკლე წყარო",
+          title: "მოკლე წყარო",
           absoluteUrl: "https://fiscal.ge/a.pdf",
       }],
     });
@@ -223,7 +257,7 @@ describe("createWorkbookBuffer", () => {
       ...approvedModelFixture,
       sources: [{
         ...approvedModelFixture.sources[0]!,
-        titleKa: "2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლების ოფიციალური და სრულად გადამოწმებული პირველწყარო",
+        title: "2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლების ოფიციალური და სრულად გადამოწმებული პირველწყარო",
       }],
     });
 
@@ -255,7 +289,7 @@ describe("createWorkbookBuffer", () => {
       ...approvedModelFixture,
       readable: {
         ...approvedModelFixture.readable,
-        unitLabelKa: "% მშპ-ში",
+        unitLabel: "% მშპ-ში",
         rows: [{ ...readableRows[1]!, valuesByYear: { 2020: 0, 2021: 0, 2022: 0 }, basisByYear: { 2020: "planned", 2021: "planned", 2022: "planned" } }],
       },
     });

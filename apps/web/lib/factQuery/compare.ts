@@ -18,6 +18,7 @@
 // municipal portal fallback against a later payment total. See
 // ACCEPTED_BASIS_CHANGE below for the measurement behind that.
 import { CAVEAT_RULES } from "./caveats";
+import { serviceMessage, type ServiceMessageKey } from "./localization";
 import { buildResponseMeta } from "./meta";
 import { queryMinistries } from "./queryMinistries";
 import { queryDebt } from "./queryDebt";
@@ -34,8 +35,10 @@ export type ComparisonEndpoint = {
   value: number | null;
   availability: "available" | "missing";
   missingReason: string | null;
+  missingReasonEn: string | null;
   basis: Basis | null;
   valueDefinition: string;
+  valueDefinitionEn: string;
   /** Structured identity of what is measured. This, never valueDefinition, decides like-for-like. */
   valueDefinitionId: string;
   sourceIds: string[];
@@ -47,8 +50,10 @@ export type Comparison = {
   datasetId: DatasetId;
   entityId: string;
   entityLabelKa: string;
+  entityLabelEn: string;
   seriesId: string;
   seriesLabelKa: string;
+  seriesLabelEn: string;
   measure: Measure;
   unit: Unit;
   from: ComparisonEndpoint;
@@ -61,6 +66,7 @@ export type Comparison = {
   percentagePointChange: number | null;
   comparability: "comparable" | "limited" | "not_comparable";
   reasons: string[];
+  reasonsEn: string[];
   caveatIds: string[];
 };
 
@@ -124,13 +130,13 @@ function definitionChangeBreaks(fromId: string, toId: string): boolean {
  */
 const COMPARISON_EFFECT = new Map(CAVEAT_RULES.map((rule) => [rule.code, rule.comparisonEffect]));
 
-const REASON_SEVERE_ASYMMETRY = "ერთ-ერთ საზღვარზე მოქმედებს მოცულობის შემზღუდველი შენიშვნა, მეორეზე კი არა — წლები ერთსა და იმავეს არ ზომავს.";
-const REASON_DEFINITION_CHANGED = "საზღვრები სხვადასხვა განსაზღვრებით არის გაზომილი, ამიტომ ზრდა პირდაპირ შედარებადი არ არის.";
-const REASON_BASIS_DIFFERS = "საზღვრებს განსხვავებული საფუძველი აქვს (ფაქტი / გეგმა), ამიტომ ზრდა შედარებადი არ არის.";
-const REASON_ENDPOINT_MISSING = "ერთ-ერთი საზღვრის მნიშვნელობა მიუწვდომელია, ამიტომ ცვლილება არ გამოითვლება.";
-const REASON_NON_POSITIVE_BASE = "საწყისი მაჩვენებელი ნულოვანი ან უარყოფითია, ამიტომ პროცენტული ზრდა არ გამოითვლება.";
-const REASON_GDP_STANDARD_BREAK = "მშპ-ის აღრიცხვის სტანდარტი შუალედში იცვლება, ამიტომ შედარება შეზღუდულია.";
-const REASON_HISTORICAL_JOIN = "ერთ-ერთი საზღვარი დამტკიცებული ისტორიული შეერთებით არის მოწოდებული, ამიტომ შედარება შეზღუდულია.";
+const REASON_SEVERE_ASYMMETRY = "comparison.severeAsymmetry";
+const REASON_DEFINITION_CHANGED = "comparison.definitionChanged";
+const REASON_BASIS_DIFFERS = "comparison.basisDiffers";
+const REASON_ENDPOINT_MISSING = "comparison.endpointMissing";
+const REASON_NON_POSITIVE_BASE = "comparison.nonPositiveBase";
+const REASON_GDP_STANDARD_BREAK = "comparison.gdpStandardBreak";
+const REASON_HISTORICAL_JOIN = "comparison.historicalJoin";
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
@@ -142,8 +148,10 @@ function endpointOf(observation: Observation): ComparisonEndpoint {
     value: observation.value,
     availability: observation.availability,
     missingReason: observation.missingReason,
+    missingReasonEn: observation.missingReasonEn,
     basis: observation.basis,
     valueDefinition: observation.valueDefinition,
+    valueDefinitionEn: observation.valueDefinitionEn,
     valueDefinitionId: observation.valueDefinitionId,
     sourceIds: observation.sourceIds,
     documentIds: observation.documentIds,
@@ -157,8 +165,8 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     const issues = parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ");
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მოთხოვნის პარამეტრები არასწორია.",
-      messageEn: `Invalid parameters: ${issues}`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues }),
       retryable: false,
     });
   }
@@ -168,8 +176,8 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
       code: "data_version_changed",
-      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
-      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.dataVersionChanged"),
+      messageEn: serviceMessage(snapshot, "en", "errors.dataVersionChanged"),
       retryable: false,
     });
   }
@@ -256,7 +264,7 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
 
   const { observations, coverage } = endpointResult.data as {
     observations: Observation[];
-    coverage: { expectedCount: number; excludedEntities: { entityId: string; reason: string }[] };
+    coverage: { expectedCount: number; excludedEntities: { entityId: string; reason: string; reasonEn: string }[] };
   };
   const isPercentage = PERCENTAGE_MEASURES.has(input.measure);
 
@@ -284,7 +292,7 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     const to = pair.to;
     if (!from || !to) continue;
 
-    const reasons: string[] = [];
+    const reasons: ServiceMessageKey[] = [];
 
     if (from.value === null || to.value === null) reasons.push(REASON_ENDPOINT_MISSING);
     if (from.basis !== null && to.basis !== null && from.basis !== to.basis) reasons.push(REASON_BASIS_DIFFERS);
@@ -344,8 +352,10 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       datasetId,
       entityId: from.entityId,
       entityLabelKa: from.entityLabelKa,
+      entityLabelEn: from.entityLabelEn,
       seriesId: from.seriesId,
       seriesLabelKa: from.seriesLabelKa,
+      seriesLabelEn: from.seriesLabelEn,
       measure: input.measure,
       unit: from.unit,
       from: endpointOf(from),
@@ -354,7 +364,8 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       percentageChange,
       percentagePointChange,
       comparability,
-      reasons,
+      reasons: reasons.map(key => serviceMessage(snapshot, "ka", key)),
+      reasonsEn: reasons.map(key => serviceMessage(snapshot, "en", key)),
       caveatIds: Array.from(new Set([...from.caveatIds, ...to.caveatIds])).sort(),
     });
   }

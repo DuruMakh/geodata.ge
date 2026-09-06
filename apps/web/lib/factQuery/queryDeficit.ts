@@ -12,6 +12,7 @@
 // 2. GENERAL government is a wider boundary than either national series this
 //    service serves. It is NOT their difference, which is why
 //    deficit_general_government_scope fires on every response.
+import { serviceLabelEn, serviceMessage } from "./localization";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
 import { buildResponseMeta } from "./meta";
 import { buildObservationId, caveatIdsForObservation, resolveDocumentIds, uniqueSorted } from "./observations";
@@ -29,11 +30,7 @@ const SERIES_LABEL_KA = "ზოგადი მთავრობის ბა�
 // Must equal describeCoverage.ts's DATASET_META entry for this dataset.
 const BUDGET_SCOPE = "general_government_imf";
 
-const SIGN_NOTE = "უარყოფითი მნიშვნელობა დეფიციტია, დადებითი — პროფიციტი.";
 
-function missingYearReason(year: number): string {
-  return `${year} წლისთვის მონაცემი არ ფიქსირდება — ეს ნულოვან მნიშვნელობას არ ნიშნავს.`;
-}
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
@@ -50,8 +47,8 @@ export function queryDeficit(
     const issues = parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ");
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მოთხოვნის პარამეტრები არასწორია.",
-      messageEn: `Invalid parameters: ${issues}`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues: issues }),
       retryable: false,
     });
   }
@@ -61,8 +58,8 @@ export function queryDeficit(
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
       code: "data_version_changed",
-      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
-      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.dataVersionChanged"),
+      messageEn: serviceMessage(snapshot, "en", "errors.dataVersionChanged"),
       retryable: false,
     });
   }
@@ -79,8 +76,8 @@ export function queryDeficit(
   if (outOfRangeYears.length > 0) {
     return errorResponse(snapshot, {
       code: "year_out_of_range",
-      messageKa: `მოთხოვნილი წელი (${outOfRangeYears.join(", ")}) სცილდება მონაცემთა დაფარვის საზღვრებს (${minYear}–${maxYear}); წელი არ იკვეცება.`,
-      messageEn: `Requested year(s) ${outOfRangeYears.join(", ")} fall outside this dataset's coverage (${minYear}-${maxYear}).`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.yearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear: minYear, maxYear: maxYear }),
+      messageEn: serviceMessage(snapshot, "en", "errors.yearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear: minYear, maxYear: maxYear }),
       retryable: false,
     });
   }
@@ -110,9 +107,11 @@ export function queryDeficit(
       entityId: ENTITY_ID,
       entityType: "country",
       entityLabelKa: ENTITY_LABEL_KA,
+        entityLabelEn: serviceLabelEn(snapshot, ENTITY_ID),
       entitySlug: null,
       seriesId: DEFICIT_SERIES_ID,
       seriesLabelKa: SERIES_LABEL_KA,
+      seriesLabelEn: serviceLabelEn(snapshot, DEFICIT_SERIES_ID),
       level: "total",
       parentSeriesId: null,
       year,
@@ -120,12 +119,11 @@ export function queryDeficit(
       unit,
       value,
       availability,
-      missingReason: availability === "missing" ? missingYearReason(year) : null,
+      missingReason: availability === "missing" ? serviceMessage(snapshot, "ka", "missing.balanceYear", { year }) : null,
+      missingReasonEn: availability === "missing" ? serviceMessage(snapshot, "en", "missing.balanceYear", { year }) : null,
       basis: availability === "missing" ? null : basis,
-      valueDefinition:
-        input.measure === "amount_gel"
-          ? `ზოგადი მთავრობის ბალანსი ლარში, მიმდინარე ფასებში. ${SIGN_NOTE}`
-          : `ზოგადი მთავრობის ბალანსი მშპ-ის პროცენტში. ${SIGN_NOTE}`,
+      valueDefinition: serviceMessage(snapshot, "ka", input.measure === "amount_gel" ? "definitions.balanceAmount" : "definitions.balanceShare"),
+      valueDefinitionEn: serviceMessage(snapshot, "en", input.measure === "amount_gel" ? "definitions.balanceAmount" : "definitions.balanceShare"),
       valueDefinitionId: `${DATASET_ID}:${input.measure}`,
       sourceIds: fact === undefined ? [] : splitSourceIds(fact.sourceId),
     });
@@ -165,7 +163,7 @@ export function queryDeficit(
     historicalJoinSeriesYears: snapshot.ministries.historicalJoinSeriesYears,
     adminCategoryYears: [],
   };
-  const caveats = evaluateCaveats(caveatContext, CAVEAT_RULES);
+  const caveats = evaluateCaveats(snapshot, caveatContext, CAVEAT_RULES);
 
   const observations: Observation[] = withDocuments.map((o) => ({ ...o, caveatIds: caveatIdsForObservation(caveats, o) }));
   const returnedCount = observations.filter((o) => o.availability === "available").length;
@@ -178,7 +176,7 @@ export function queryDeficit(
     ).sort((a, b) => a - b),
     missingCells: observations
       .filter((o) => o.availability === "missing")
-      .map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, reason: o.missingReason ?? "" })),
+      .map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, reason: o.missingReason ?? "", reasonEn: o.missingReasonEn ?? "" })),
     excludedEntities: [],
     returnedCount,
     expectedCount: observations.length,

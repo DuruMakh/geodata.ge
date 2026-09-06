@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
 import { ExplorerTable } from "../../components/main-explorer/explorer-table";
 import type { DebtExplorerTableRow } from "../../lib/explorer/debtExplorer";
@@ -17,7 +17,7 @@ const row: DebtExplorerTableRow = {
 
 describe("ExplorerTable forecast labels", () => {
   it("labels optional marked-year cells with caller supplied text", () => {
-    const markup = renderToStaticMarkup(
+    const markup = renderGeorgianMarkup(
       createElement(ExplorerTable, {
         caption: "ვალის გადახდა",
         rows: [row],
@@ -38,7 +38,7 @@ describe("ExplorerTable forecast labels", () => {
   });
 
   it("labels optional marked-year cells in the displayed total row", () => {
-    const markup = renderToStaticMarkup(
+    const markup = renderGeorgianMarkup(
       createElement(ExplorerTable, {
         caption: "ვალის გადახდა",
         rows: [],

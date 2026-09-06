@@ -3,6 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { GEORGIA_GEO } from "../../lib/landing/georgiaGeo";
+import type { Locale } from "../../lib/i18n/types";
+
+export type HeroReliefProps = {
+  locale: Locale;
+  copy: { million: string; thousand: string; peakShkhara: string; peakKazbek: string; unavailable: string };
+};
 
 // Living relief of Georgia (landing hero, GeoData Site v2 design): the exact
 // country outline as a dotted elevation field, city squares scaled by population
@@ -357,7 +363,7 @@ function makeDotCloud(n: number): DotCloud {
   return { geo, pos, col, size, points: new THREE.Points(geo, mat) };
 }
 
-export function HeroRelief() {
+export function HeroRelief({ locale, copy }: HeroReliefProps) {
   const heroRef = useRef<HTMLDivElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
@@ -502,7 +508,7 @@ export function HeroRelief() {
 
       const cities = G.cityMarkers.slice(0, O.maxCities || G.cityMarkers.length).map((c) => {
         const p = geoProj().toPx(c.lon, c.lat);
-        return { x: p[0], y: p[1], pop: c.pop, ka: c.ka, ev: elevGe(c.lon, c.lat) };
+        return { x: p[0], y: p[1], pop: c.pop, label: locale === "en" ? c.en : c.ka, ev: elevGe(c.lon, c.lat) };
       });
       const NC = cities.length; // Tbilisi is index 0
       const cityAmp = (pop: number) => 0.42 + 0.98 * Math.sqrt(pop / 1258);
@@ -629,7 +635,7 @@ export function HeroRelief() {
       const eo = (x: number) => 1 - Math.pow(1 - x, 3);
       const cl = (x: number) => Math.min(1, Math.max(0, x));
       const vv = new THREE.Vector3();
-      const fmtPop = (p: number) => (p >= 1000 ? (p / 1000).toFixed(2).replace(/0$/, "") + " მლნ" : p + " ათ.");
+      const fmtPop = (p: number) => (p >= 1000 ? (p / 1000).toFixed(2).replace(/0$/, "") + " " + copy.million : p + " " + copy.thousand);
       const band = (dd: number, R: number, wd: number) =>
         dd > R ? Math.max(0, 1 - (dd - R) / (wd * 0.55)) : Math.max(0, 1 - (R - dd) / (wd * 2.3));
       const ndcToGround = () => {
@@ -814,7 +820,7 @@ export function HeroRelief() {
         if (capLbl) {
           if (hci >= 0) {
             const c = cities[hci]!;
-            capLbl.textContent = c.ka + " · " + fmtPop(c.pop);
+            capLbl.textContent = c.label + " · " + fmtPop(c.pop);
             capLbl.style.transform = "translate3d(" + (cityScr[hci * 2]! + 12).toFixed(1) + "px," + (cityScr[hci * 2 + 1]! - 34).toFixed(1) + "px,0)";
             capLbl.style.opacity = "1";
             el.style.cursor = "pointer";
@@ -870,7 +876,7 @@ export function HeroRelief() {
       cancelAnimationFrame(raf);
       disposers.forEach((dispose) => dispose());
     };
-  }, [sceneEpoch]);
+  }, [sceneEpoch, locale, copy]);
 
   return (
     <>
@@ -881,11 +887,11 @@ export function HeroRelief() {
         className="pointer-events-none absolute inset-0 font-[family-name:var(--font-numeric)] tracking-[0.05em]"
       >
         <span data-gid="shkh" className="absolute left-0 top-0 text-[10px] text-[var(--muted)] opacity-0 will-change-transform">
-          შხარა · 5193 მ
+          {copy.peakShkhara}
           <span className="absolute -left-2 top-[3px] h-2 w-px bg-[var(--muted)] opacity-70" />
         </span>
         <span data-gid="mkin" className="absolute left-0 top-0 text-[10px] text-[var(--muted)] opacity-0 will-change-transform">
-          მყინვარწვერი · 5054 მ
+          {copy.peakKazbek}
           <span className="absolute -left-2 top-[3px] h-2 w-px bg-[var(--muted)] opacity-70" />
         </span>
         <span
@@ -896,7 +902,7 @@ export function HeroRelief() {
       {failed ? (
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">
-            ვიზუალი ვერ ჩაიტვირთა — მონაცემები ხელმისაწვდომია ექსპლორერში
+            {copy.unavailable}
           </span>
         </div>
       ) : null}

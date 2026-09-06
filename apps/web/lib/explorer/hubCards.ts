@@ -1,3 +1,5 @@
+import type { Presentation, TemplateValues } from "../i18n/types";
+import { message } from "../i18n/messages";
 import type {
   ServedBudgetFact,
   ServedGeneralGovernmentBalanceFact,
@@ -63,7 +65,10 @@ export function buildHubCards(
   municipalTotals: Map<number, number>,
   debtFacts: ServedGovernmentDebtFact[],
   balanceFacts: ServedGeneralGovernmentBalanceFact[] = [],
+  presentation?: Presentation,
 ): HubCardModel[] {
+  const locale = presentation?.locale ?? "ka";
+  const translated = (key: string, originalKa: string, values?: TemplateValues) => presentation ? message(presentation.messages, key, values) : originalKa;
   const expenditure = totalsByYear(facts, "expenditure");
   const revenue = totalsByYear(facts, "revenue");
 
@@ -82,7 +87,7 @@ export function buildHubCards(
 
     return {
       series: span.length > 0 ? span.map((year) => totals.get(year) ?? null) : null,
-      footer: latest === null ? null : `${latest} · ${formatAmount(totals.get(latest) ?? 0)}`,
+      footer: latest === null ? null : `${latest} · ${formatAmount(totals.get(latest) ?? 0, locale)}`,
       latest,
     };
   };
@@ -105,8 +110,8 @@ export function buildHubCards(
   return [
     {
       index: "01",
-      title: BUDGET_SECTIONS.expenditure.label,
-      description: "ფუნქციონალური და უწყებრივი ჭრილი — რაში იხარჯება ბიუჯეტი.",
+      title: translated("common.expenditure", BUDGET_SECTIONS.expenditure.label),
+      description: translated("hub.expenditureDescription", "ფუნქციონალური და უწყებრივი ჭრილი — რაში იხარჯება ბიუჯეტი."),
       href: BUDGET_SECTIONS.expenditure.href,
       comingSoon: BUDGET_SECTIONS.expenditure.href === null,
       series: spend.series,
@@ -115,8 +120,8 @@ export function buildHubCards(
     },
     {
       index: "02",
-      title: BUDGET_SECTIONS.revenue.label,
-      description: "გადასახადები, გრანტები და სხვა შემოსულობები წლების მიხედვით.",
+      title: translated("common.revenue", BUDGET_SECTIONS.revenue.label),
+      description: translated("hub.revenueDescription", "გადასახადები, გრანტები და სხვა შემოსულობები წლების მიხედვით."),
       href: BUDGET_SECTIONS.revenue.href,
       comingSoon: BUDGET_SECTIONS.revenue.href === null,
       series: revenues.series,
@@ -125,13 +130,13 @@ export function buildHubCards(
     },
     {
       index: "03",
-      title: BUDGET_SECTIONS.municipalities.label,
+      title: translated("common.municipalities", BUDGET_SECTIONS.municipalities.label),
       // The figure beside this is countryTotalFacts — the national roll-up,
       // which carries five excluded budget units and the Adjara A.R. republican
       // payments on top of the 64 served municipalities. Naming those 64 here
       // overstated what they sum to by 8.6%; this is the wording the
       // destination page and buildIndexKpis already use.
-      description: `${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური საბიუჯეტო ერთეული — რაში იხარჯება ადგილობრივი ბიუჯეტები.`,
+      description: translated("hub.municipalDescription", `${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური საბიუჯეტო ერთეული — რაში იხარჯება ადგილობრივი ბიუჯეტები.`, { count: MUNICIPAL_COUNTRY_BUDGET_COUNT }),
       href: BUDGET_SECTIONS.municipalities.href,
       comingSoon: BUDGET_SECTIONS.municipalities.href === null,
       series: municipal.series,
@@ -142,8 +147,8 @@ export function buildHubCards(
     },
     {
       index: "04",
-      title: BUDGET_SECTIONS.analysis.label,
-      description: "ერთი წლის სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾.",
+      title: translated("common.analysis", BUDGET_SECTIONS.analysis.label),
+      description: translated("hub.analysisDescription", "ერთი წლის სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾."),
       href: BUDGET_SECTIONS.analysis.href,
       comingSoon: BUDGET_SECTIONS.analysis.href === null,
       series: null,
@@ -151,12 +156,12 @@ export function buildHubCards(
       footer:
         analysisYear === null
           ? null
-          : `${analysisYear} · ${categoryCount(facts, "expenditure", analysisYear)} კატეგორია`,
+          : translated("hub.analysisFooter", `${analysisYear} · ${categoryCount(facts, "expenditure", analysisYear)} კატეგორია`, { year: analysisYear, count: categoryCount(facts, "expenditure", analysisYear) }),
     },
     {
       index: "05",
-      title: BUDGET_SECTIONS.debt.label,
-      description: "მთავრობის ვალის მოცულობა, გადახდა და საპროცენტო განაკვეთები.",
+      title: translated("common.debt", BUDGET_SECTIONS.debt.label),
+      description: translated("hub.debtDescription", "მთავრობის ვალის მოცულობა, გადახდა და საპროცენტო განაკვეთები."),
       href: BUDGET_SECTIONS.debt.href,
       comingSoon: BUDGET_SECTIONS.debt.href === null,
       series: debt.series,
@@ -165,8 +170,8 @@ export function buildHubCards(
     },
     {
       index: "06",
-      title: BUDGET_SECTIONS.deficit.label,
-      description: "ზოგადი მთავრობის დეფიციტი ან პროფიციტი — მშპ-ის წილი და თანხა ლარში.",
+      title: translated("common.deficit", BUDGET_SECTIONS.deficit.label),
+      description: translated("hub.deficitDescription", "ზოგადი მთავრობის დეფიციტი ან პროფიციტი — მშპ-ის წილი და თანხა ლარში."),
       href: BUDGET_SECTIONS.deficit.href,
       comingSoon: BUDGET_SECTIONS.deficit.href === null,
       series: actualBalanceFacts.length > 0
@@ -175,7 +180,7 @@ export function buildHubCards(
       seriesColor: actualBalanceFacts.length > 0 ? INK : null,
       footer: latestBalance === null
         ? null
-        : `${latestBalance.year} · ${formatShare(latestBalance.generalGovernmentBalancePctGdp / 100)} მშპ-ის`,
+        : translated("hub.deficitFooter", `${latestBalance.year} · ${formatShare(latestBalance.generalGovernmentBalancePctGdp / 100)} მშპ-ის`, { year: latestBalance.year, share: formatShare(latestBalance.generalGovernmentBalancePctGdp / 100) }),
     },
   ];
 }

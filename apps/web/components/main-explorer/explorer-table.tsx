@@ -1,4 +1,9 @@
+"use client";
+
 import type { ExplorerTableRow } from "../../lib/explorer/types";
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
+import { publicLabel } from "../../lib/i18n/labels";
 import { formatInUnit, formatShare, MISSING, type ValueUnit } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { SwatchBar } from "../ui/editorial";
@@ -52,6 +57,8 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   forecastLabel,
   shareValueForYear,
 }: ExplorerTableProps<Row>) {
+  const { locale, messages, englishLabels } = useI18n();
+  const rowLabel = (row: Row) => publicLabel(locale, row.itemId, row.kaLabel, englishLabels);
   const endYear = years.at(-1);
   const lastIndex = years.length - 1;
   const cellValue = (row: Row, year: number): string => {
@@ -71,7 +78,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
         data-testid="explorer-table"
         role="region"
         tabIndex={0}
-        aria-label="მრავალწლიანი ცხრილი — ჰორიზონტალურად გადაადგილებადი"
+        aria-label={message(messages, "controls.tableScrollable")}
         className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
         <table className="w-full border-collapse" style={{ minWidth }}>
@@ -88,7 +95,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
             ))}
             {showChangeColumn ? (
               <th className={`${headCellClass} sticky ${shareColumnLabel ? "right-24" : "right-0"} z-[2] w-28 min-w-28 bg-[var(--paper)] uppercase tracking-[0.06em] shadow-[-1px_0_0_var(--hairline-soft)]`}>
-                ცვლილება
+                {message(messages, "controls.change")}
               </th>
             ) : null}
             {shareColumnLabel ? (
@@ -104,11 +111,11 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
               <td
                 className="sticky left-0 z-[1] bg-[var(--paper)] pr-3 whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]"
                 style={cellPad}
-                title={row.kaLabel}
+                title={rowLabel(row)}
               >
                 <span className="inline-flex items-center gap-[9px]">
                   <SwatchBar color={row.color} />
-                  <span className="text-[13px] font-medium text-[var(--ink)]">{row.kaLabel}</span>
+                  <span className="text-[13px] font-medium text-[var(--ink)]">{rowLabel(row)}</span>
                 </span>
               </td>
               {years.map((year, index) => (
@@ -123,7 +130,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                 >
                   {cellValue(row, year)}
                   {row.basisByYear?.[year] === "planned" ? (
-                    <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">გეგმა</sup>
+                    <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{message(messages, "controls.planned")}</sup>
                   ) : null}
                   {forecastLabel && forecastYears?.includes(year) ? (
                     <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{forecastLabel}</sup>
@@ -148,7 +155,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
           {showTotal && totalRow ? (
             <tr className="border-t-2 border-[var(--ink)]">
               <td className="sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-[13px] font-semibold whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]" style={cellPad}>
-                {totalRow.kaLabel}
+                {rowLabel(totalRow)}
               </td>
               {years.map((year) => (
                 <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={cellPad}>

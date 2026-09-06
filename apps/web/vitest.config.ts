@@ -22,6 +22,14 @@ const shared = {
   // a dozen forks compete for CPU. 30s matches the budget the heavy tests already declare
   // inline, so a real hang still fails the run rather than stalling it.
   testTimeout: 30_000,
+  // `hookTimeout` is a separate budget and still defaults to 10s, so raising
+  // testTimeout alone does not cover setup. Several files deliberately hoist
+  // expensive shared work into `beforeAll` — that is what makes them fast — and
+  // on a CI runner with a fraction of the cores this repo is developed on, that
+  // work legitimately exceeds 10s: tests/factQuery/publications.test.ts passed
+  // locally and timed out its hook in CI. Keep the two budgets equal so a slow
+  // setup fails for being genuinely stuck, not for being on a smaller machine.
+  hookTimeout: 30_000,
 } as const;
 
 export default defineConfig({

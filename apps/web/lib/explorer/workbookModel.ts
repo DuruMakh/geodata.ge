@@ -1,3 +1,6 @@
+import type { Locale } from "../i18n/types";
+import { workbookMessage } from "../i18n/workbook";
+
 export type WorkbookBasis = "actual" | "planned" | "forecast" | "not_available";
 
 export type WorkbookPoint = {
@@ -9,27 +12,28 @@ export type WorkbookPoint = {
 export type WorkbookSeries = {
   id: string;
   kind: "total" | "group" | "item";
-  parentLabelKa: string | null;
-  labelKa: string;
+  parentLabel: string | null;
+  label: string;
   pointsByYear: Record<number, WorkbookPoint | null | undefined>;
 };
 
 export type WorkbookPublicSource = {
   years: number[];
-  titleKa: string;
-  organizationKa: string;
+  title: string;
+  organization: string;
   downloadHref: `/downloads/methodology/${string}` | `https://${string}`;
   retrievedAt: string;
 };
 
 export type WorkbookMeasure =
-  | { kind: "amount"; unitLabelKa: string; readableScale: number }
-  | { kind: "percentage"; unitLabelKa: string; analysisHeaderKa: string };
+  | { kind: "amount"; unitLabel: string; readableScale: number }
+  | { kind: "percentage"; unitLabel: string; analysisHeader: string };
 
 export type WorkbookExportInput = {
+  locale: Locale;
   filenameBase: string;
-  titleKa: string;
-  groupLabelKa: string;
+  title: string;
+  groupLabel: string;
   years: number[];
   measure: WorkbookMeasure;
   totalId: string | null;
@@ -41,20 +45,26 @@ export type WorkbookExportInput = {
 
 export type WorkbookReadableRow = {
   kind: WorkbookSeries["kind"];
-  parentLabelKa: string | null;
-  labelKa: string;
+  parentLabel: string | null;
+  label: string;
   valuesByYear: Record<number, number | null>;
   basisByYear: Record<number, WorkbookBasis | null>;
   change: number | null;
 };
 
+export const SHEET_NAMES = {
+  ka: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"],
+  en: ["Summary", "Data", "Sources"],
+} as const;
+
 export type WorkbookExportModel = {
+  locale: Locale;
   filename: string;
-  sheetNames: readonly ["მარტივი ცხრილი", "მონაცემები", "წყაროები"];
+  sheetNames: (typeof SHEET_NAMES)[Locale];
   readable: {
-    titleKa: string;
-    subtitleKa: string;
-    unitLabelKa: string;
+    title: string;
+    subtitle: string;
+    unitLabel: string;
     years: number[];
     rows: WorkbookReadableRow[];
   };
@@ -65,12 +75,9 @@ export type WorkbookExportModel = {
   sources: Array<WorkbookPublicSource & { absoluteUrl: string }>;
 };
 
-const statusKa = (basis: WorkbookBasis) => ({
-  actual: "ფაქტი",
-  planned: "გეგმა",
-  forecast: "პროგნოზი",
-  not_available: "არ არის ხელმისაწვდომი",
-})[basis];
+const statusLabel = (basis: WorkbookBasis, locale: Locale) => workbookMessage(locale, ({
+  actual: "workbook.actual", planned: "workbook.planned", forecast: "workbook.forecast", not_available: "workbook.unavailable",
+} as const)[basis]);
 
 export function absoluteWorkbookSourceUrl(
   siteOrigin: string,
@@ -94,22 +101,22 @@ function readableValue(measure: WorkbookMeasure, point: WorkbookPoint | null | u
       : point.amountGel / measure.readableScale;
 }
 
-function subtitleKa(rows: WorkbookReadableRow[], years: number[], unitLabelKa: string): string {
+function subtitle(rows: WorkbookReadableRow[], years: number[], unitLabel: string, locale: Locale): string {
   const statuses = Object.values(rows.flatMap((row) => Object.values(row.basisByYear))).filter((basis): basis is WorkbookBasis => basis !== null);
   const bases = new Set(statuses.filter((basis) => basis !== "not_available"));
   const basis = bases.has("actual") && bases.has("forecast")
-    ? "ფაქტი და პროგნოზი"
+    ? workbookMessage(locale, "workbook.actualForecast")
     : bases.has("actual") && bases.has("planned")
-      ? "ფაქტი და გეგმა"
+      ? workbookMessage(locale, "workbook.actualPlanned")
       : bases.has("forecast")
-        ? "პროგნოზი"
+        ? workbookMessage(locale, "workbook.forecast")
         : bases.has("planned")
-          ? "გეგმა"
+          ? workbookMessage(locale, "workbook.planned")
           : statuses.includes("not_available")
-            ? "არ არის ხელმისაწვდომი"
-          : "ფაქტი";
-  const period = years.length > 0 ? `${years[0]}–${years.at(-1)}` : "პერიოდი არ არის";
-  return `${period} · ${basis} · ${unitLabelKa}`;
+            ? workbookMessage(locale, "workbook.unavailable")
+          : workbookMessage(locale, "workbook.actual");
+  const period = years.length > 0 ? `${years[0]}–${years.at(-1)}` : workbookMessage(locale, "workbook.noPeriod");
+  return `${period} · ${basis} · ${unitLabel}`;
 }
 
 export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookExportModel {
@@ -124,8 +131,8 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
     }
     return {
       kind: series.kind,
-      parentLabelKa: series.parentLabelKa,
-      labelKa: series.labelKa,
+      parentLabel: series.parentLabel,
+      label: series.label,
       valuesByYear,
       basisByYear,
       change: safeChange(valuesByYear[years[0] ?? 0] ?? null, valuesByYear[years.at(-1) ?? 0] ?? null),
@@ -136,14 +143,15 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
   const analysisSeries = input.includeTotalsInAnalysis
     ? input.series
     : input.series.filter((series) => !nonTotalsExist || series.kind !== "total");
-  const headers = ["წელი", "მთავარი ჯგუფი", "კატეგორია", "თანხა (₾)", "სტატუსი", ...(input.measure.kind === "percentage" ? [input.measure.analysisHeaderKa] : [])];
+  const headers = (["workbook.year", "workbook.group", "workbook.category", "workbook.amountGel", "workbook.status"] as const).map(key => workbookMessage(input.locale, key));
+  if (input.measure.kind === "percentage") headers.push(input.measure.analysisHeader);
   const analysisRows: Array<Array<string | number | null>> = [];
   for (const year of years) {
     for (const series of analysisSeries) {
       const point = series.pointsByYear[year];
       if (!point) continue;
-      const row: Array<string | number | null> = [year, series.parentLabelKa ?? input.groupLabelKa, series.labelKa, point.amountGel];
-      row.push(statusKa(point.basis));
+      const row: Array<string | number | null> = [year, series.parentLabel ?? input.groupLabel, series.label, point.amountGel];
+      row.push(statusLabel(point.basis, input.locale));
       if (input.measure.kind === "percentage") row.push(point.measureValue ?? null);
       analysisRows.push(row);
     }
@@ -165,12 +173,13 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
 
   const range = years.length > 0 ? `-${years[0]}-${years.at(-1)}` : "";
   return {
-    filename: `fiscal-${input.filenameBase}${range}.xlsx`,
-    sheetNames: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"],
+    locale: input.locale,
+    filename: `fiscal-${input.filenameBase}${range}${input.locale === "en" ? "-en" : ""}.xlsx`,
+    sheetNames: SHEET_NAMES[input.locale],
     readable: {
-      titleKa: input.titleKa,
-      subtitleKa: subtitleKa(rows, years, input.measure.unitLabelKa),
-      unitLabelKa: input.measure.unitLabelKa,
+      title: input.title,
+      subtitle: subtitle(rows, years, input.measure.unitLabel, input.locale),
+      unitLabel: input.measure.unitLabel,
       years,
       rows,
     },

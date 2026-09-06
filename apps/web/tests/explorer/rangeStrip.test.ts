@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
 import { RangeStrip } from "../../components/main-explorer/range-strip";
 
@@ -9,7 +9,7 @@ import { RangeStrip } from "../../components/main-explorer/range-strip";
 // growing category. The chip is gone; the rail handles still reach that range,
 // which is what the Indicators guard is for.
 function chipLabels(years: number[]): string[] {
-  const markup = renderToStaticMarkup(
+  const markup = renderGeorgianMarkup(
     createElement(RangeStrip, {
       years,
       range: { start: years[0]!, end: years[years.length - 1]!, min: years[0]!, max: years[years.length - 1]! },
@@ -36,7 +36,7 @@ describe("range strip quick chips", () => {
 
 describe("range strip markers", () => {
   it("renders an optional labelled marker at the supplied year", () => {
-    const markup = renderToStaticMarkup(
+    const markup = renderGeorgianMarkup(
       createElement(RangeStrip, {
         years: [2023, 2024, 2025, 2026, 2027],
         range: { start: 2023, end: 2027, min: 2023, max: 2027 },
@@ -50,7 +50,7 @@ describe("range strip markers", () => {
   });
 
   it("does not render a marker when none is supplied", () => {
-    const markup = renderToStaticMarkup(
+    const markup = renderGeorgianMarkup(
       createElement(RangeStrip, {
         years: [2023, 2024, 2025],
         range: { start: 2023, end: 2025, min: 2023, max: 2025 },

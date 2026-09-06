@@ -553,9 +553,11 @@ test("the municipal parent dataset lists exactly the entity pages that exist", a
   // The sitemap is the site's own statement of which entity pages exist, so the
   // two cannot drift apart without this failing.
   const sitemap = await (await request.get(`${BASE_URL}/sitemap.xml`)).text();
+  // Dataset @ids are locale-independent, so only the canonical Georgian URLs
+  // take part: the /en twins resolve to the same identity.
   const entityUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
     .map((match) => match[1])
-    .filter((url) => /\/explorer\/municipalities\/./.test(url));
+    .filter((url) => /\/explorer\/municipalities\/./.test(url) && !url.includes("/en/"));
 
   expect(parts.toSorted()).toEqual(entityUrls.map((url) => `${url}#dataset`).toSorted());
   expect(new Set(parts).size).toBe(parts.length);
