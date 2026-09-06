@@ -4,7 +4,7 @@
   "landing.populationCaption": "1 January 2026 · Geostat",
   "landing.populationMobile": "2026 · Geostat",
   "landing.area": "Area",
-  "landing.areaUnit": "thousand km²",
+  "landing.areaUnit": "k km²",
   "landing.areaCaption": "Georgia’s territory",
   "landing.areaMobile": "Territory",
   "landing.economy": "Economic size",
@@ -66,7 +66,7 @@
   "landing.peakKazbek": "Mount Kazbek · 5054 m",
   "landing.heroUnavailable": "The visual could not load — data is available in the explorer",
   "landing.heroMillion": "mln",
-  "landing.heroThousand": "thousand",
+  "landing.heroThousand": "k",
   "landing.metaTitle": "Georgia’s budget, debt and deficit | Fiscal.ge",
   "landing.metaDescription": "Verified data on Georgia’s state and municipal budgets, government debt and deficit, with methodology and downloadable Excel files."
 }

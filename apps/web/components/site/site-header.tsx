@@ -13,8 +13,8 @@ type SiteHeaderProps = {
 
 function navLinkClass(isActive: boolean) {
   return isActive
-    ? "flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-semibold text-[var(--ink)] underline decoration-2 decoration-[var(--accent)] underline-offset-[5px] min-[768px]:min-h-8 min-[768px]:border-b-0 min-[768px]:pb-0"
-    : "flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-medium text-[var(--muted)] transition-colors duration-150 hover:text-[var(--ink)] min-[768px]:min-h-8 min-[768px]:border-b-0 min-[768px]:pb-0";
+    ? "flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-semibold text-[var(--ink)] underline decoration-2 decoration-[var(--accent)] underline-offset-[5px] min-[900px]:min-h-8 min-[900px]:border-b-0 min-[900px]:pb-0"
+    : "flex h-full items-center border-b-2 border-transparent pb-3.5 text-[13px] font-medium text-[var(--muted)] transition-colors duration-150 hover:text-[var(--ink)] min-[900px]:min-h-8 min-[900px]:border-b-0 min-[900px]:pb-0";
 }
 
 export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
@@ -22,7 +22,7 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
   return (
     <header
       data-testid={testId}
-      className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 min-[768px]:gap-5"
+      className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 min-[768px]:gap-5 min-[900px]:grid min-[900px]:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] min-[900px]:gap-x-2.5 min-[1100px]:gap-x-5"
     >
       <Link
         href={pageHref("/", locale)}
@@ -41,40 +41,40 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
           />
         </picture>
       </Link>
-      <div className="contents min-[768px]:flex min-[768px]:items-baseline min-[768px]:gap-5 min-[1100px]:gap-8">
-        <nav
-          aria-label={message(messages, "common.navigation")}
-          className="order-3 flex w-full basis-full justify-end gap-[18px] self-stretch border-t border-[var(--hairline)] pt-2 min-[768px]:order-none min-[768px]:w-auto min-[768px]:basis-auto min-[768px]:self-auto min-[768px]:border-t-0 min-[768px]:pt-0 min-[1100px]:gap-[26px]"
+      <nav
+        aria-label={message(messages, "common.navigation")}
+        className="order-3 flex w-full basis-full justify-center gap-[18px] self-stretch border-t border-[var(--hairline)] pt-2 min-[900px]:order-none min-[900px]:w-auto min-[900px]:basis-auto min-[900px]:self-auto min-[900px]:border-t-0 min-[900px]:pt-0 min-[1100px]:gap-[26px]"
+      >
+        <Link
+          href={pageHref("/", locale)}
+          aria-current={active === "home" ? "page" : undefined}
+          className={navLinkClass(active === "home")}
         >
-          <Link
-            href={pageHref("/", locale)}
-            aria-current={active === "home" ? "page" : undefined}
-            className={navLinkClass(active === "home")}
-          >
-            {message(messages, "common.home")}
-          </Link>
-          <Link
-            href={pageHref("/explorer", locale)}
-            aria-current={active === "explorer" ? "page" : undefined}
-            className={navLinkClass(active === "explorer")}
-          >
-            {message(messages, "common.data")}
-          </Link>
-          <Link
-            href={pageHref("/connect", locale)}
-            aria-current={active === "connect" ? "page" : undefined}
-            className={navLinkClass(active === "connect")}
-          >
-            {message(messages, "common.ai")}
-          </Link>
-          <Link
-            href={pageHref("/about", locale)}
-            aria-current={active === "mission" ? "page" : undefined}
-            className={navLinkClass(active === "mission")}
-          >
-            {message(messages, "common.about")}
-          </Link>
-        </nav>
+          {message(messages, "common.home")}
+        </Link>
+        <Link
+          href={pageHref("/explorer", locale)}
+          aria-current={active === "explorer" ? "page" : undefined}
+          className={navLinkClass(active === "explorer")}
+        >
+          {message(messages, "common.data")}
+        </Link>
+        <Link
+          href={pageHref("/connect", locale)}
+          aria-current={active === "connect" ? "page" : undefined}
+          className={navLinkClass(active === "connect")}
+        >
+          {message(messages, "common.ai")}
+        </Link>
+        <Link
+          href={pageHref("/about", locale)}
+          aria-current={active === "mission" ? "page" : undefined}
+          className={navLinkClass(active === "mission")}
+        >
+          {message(messages, "common.about")}
+        </Link>
+      </nav>
+      <div className="flex items-center min-[900px]:justify-self-end">
         <LanguageSwitch />
       </div>
     </header>
