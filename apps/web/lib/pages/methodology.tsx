@@ -11,6 +11,7 @@ import { buildLandingContext } from "../landing/landingData";
 import { buildMethodologyHubEntries } from "../methodology/catalog";
 import { loadGeneratedArchiveSummaries } from "../methodology/prepareArchives";
 import { fiscalMetadata } from "../seo/metadata";
+import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "../seo/internalLinks";
 import { dataCatalogJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 
@@ -39,7 +40,13 @@ export async function renderMethodologyPage(locale: Locale) {
   return (
     <>
       <JsonLd
-        data={dataCatalogJsonLd(resolveSiteUrl(), liveEntries.map(entry => entry.href), locale)}
+        data={dataCatalogJsonLd(resolveSiteUrl(), liveEntries.map(entry => entry.href), locale, [
+          "/explorer/expenditure",
+          "/explorer/revenue",
+          DEBT_EXPLORER_PATH,
+          DEFICIT_EXPLORER_PATH,
+          "/explorer/municipalities",
+        ])}
         testId="catalog-json-ld"
       />
       <MethodologyHub

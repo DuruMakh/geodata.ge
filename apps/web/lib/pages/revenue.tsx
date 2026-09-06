@@ -50,6 +50,8 @@ export async function renderRevenuePage(locale: Locale) {
     <>
       <JsonLd
         data={explorerDatasetJsonLd({ locale,
+          datasetId: "national-revenue",
+          sameAsPath: "/methodology/revenue",
           origin: resolveSiteUrl(),
           path: "/explorer/revenue",
           name: message(messages, "main.datasetRevenueName"),

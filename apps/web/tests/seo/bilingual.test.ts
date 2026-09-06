@@ -24,15 +24,18 @@ describe("paired page metadata", () => {
 
   it("keeps one dataset identity and shared distribution URLs across translated descriptions", () => {
     const input = { origin: "https://fiscal.ge", name: "Budget data", description: "Reviewed annual state budget expenditure with original public source evidence.", firstYear: 2004, lastYear: 2025, dateModified: "2026-09-06", downloadPath: "/downloads/data/national-expenditure.csv" as const };
-    const ka = datasetJsonLd({ ...input, locale: "ka", path: "/methodology/expenditure", jsonDownloadPaths: ["/downloads/data/national-expenditure.json"] });
-    const en = datasetJsonLd({ ...input, locale: "en", path: "/en/methodology/expenditure", jsonDownloadPaths: ["/downloads/data/national-expenditure.json"] });
+    const ka = datasetJsonLd({ ...input, locale: "ka", path: "/methodology/expenditure",
+      datasetId: "national-expenditure", jsonDownloadPaths: ["/downloads/data/national-expenditure.json"] });
+    const en = datasetJsonLd({ ...input, locale: "en", path: "/en/methodology/expenditure",
+      datasetId: "national-expenditure", jsonDownloadPaths: ["/downloads/data/national-expenditure.json"] });
     expect(en["@id"]).toBe(ka["@id"]);
     expect(en.url).toBe("https://fiscal.ge/en/methodology/expenditure");
     expect(en.inLanguage).toEqual(["ka", "en"]);
     expect(en.distribution).toEqual(ka.distribution);
     expect(en.distribution.find(item => item.encodingFormat === "application/json")).toMatchObject({ inLanguage: ["ka", "en"] });
     expect(en.spatialCoverage.name).toBe("Georgia");
-    const explorer = explorerDatasetJsonLd({ ...input, locale: "en", path: "/en/explorer/expenditure", spatialCoverageName: "Georgia" });
+    const explorer = explorerDatasetJsonLd({ ...input, locale: "en", path: "/en/explorer/expenditure",
+      datasetId: "national-expenditure", spatialCoverageName: "Georgia" });
     expect(explorer["@id"]).toBe("https://fiscal.ge/explorer/expenditure#dataset");
   });
 

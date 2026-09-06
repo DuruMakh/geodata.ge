@@ -43,6 +43,7 @@ export async function renderDeficitPage(locale: Locale) {
     <>
       <JsonLd
         data={explorerDatasetJsonLd({ locale,
+          datasetId: "general-government-balance",
           origin: resolveSiteUrl(),
           path: DEFICIT_EXPLORER_PATH,
           name: message(messages, "deficit.datasetName"),

@@ -582,3 +582,42 @@ for (const [route, expectedLabels] of [
     expect(structuredLabels).toEqual([...expectedLabels]);
   });
 }
+
+test("the municipal parent dataset lists exactly the entity pages that exist", async ({ page, request }) => {
+  await page.goto(`${BASE_URL}/explorer/municipalities`);
+  const parent = JSON.parse(
+    (await page.getByTestId("explorer-dataset-json-ld").textContent()) ?? "{}",
+  );
+  const parts: string[] = parent.hasPart.map((part: { "@id": string }) => part["@id"]);
+
+  // The sitemap is the site's own statement of which entity pages exist, so the
+  // two cannot drift apart without this failing.
+  const sitemap = await (await request.get(`${BASE_URL}/sitemap.xml`)).text();
+  // Dataset @ids are locale-independent, so only the canonical Georgian URLs
+  // take part: the /en twins resolve to the same identity.
+  const entityUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map((match) => match[1])
+    .filter((url) => /\/explorer\/municipalities\/./.test(url) && !url.includes("/en/"));
+
+  expect(parts.toSorted()).toEqual(entityUrls.map((url) => `${url}#dataset`).toSorted());
+  expect(new Set(parts).size).toBe(parts.length);
+
+  // ...and the relationship closes in the other direction.
+  for (const route of ["/explorer/municipalities/tbilisi", "/explorer/municipalities/georgia"]) {
+    await page.goto(`${BASE_URL}${route}`);
+    const child = JSON.parse(
+      (await page.getByTestId("explorer-dataset-json-ld").textContent()) ?? "{}",
+    );
+    expect(child.isPartOf["@id"]).toBe("https://fiscal.ge/explorer/municipalities#dataset");
+    expect(parts).toContain(child["@id"]);
+  }
+});
+
+test("the country aggregate does not claim the per-resident measure", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer/municipalities/georgia`);
+  const node = JSON.parse(
+    (await page.getByTestId("explorer-dataset-json-ld").textContent()) ?? "{}",
+  );
+  const measures = node.variableMeasured.map((measure: { propertyID: string }) => measure.propertyID);
+  expect(measures).toEqual(["amount_gel", "share_of_total_pct"]);
+});

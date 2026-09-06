@@ -92,6 +92,12 @@ export async function renderMunicipalCountry(locale: Locale) {
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
       <JsonLd
         data={explorerDatasetJsonLd({ locale,
+          datasetId: "municipal-expenditure",
+          partOfPath: "/explorer/municipalities",
+          // catalogue.json qualifies gel_per_resident: it exists for municipality
+          // and region totals, "not for the country aggregate". This page is that
+          // aggregate, so claiming the measure here would be a false claim.
+          omitMeasures: ["gel_per_resident"],
           origin: resolveSiteUrl(),
           path: ROUTE,
           name: message(messages, "municipal.countryDatasetName"),

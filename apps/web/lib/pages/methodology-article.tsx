@@ -40,6 +40,15 @@ function validatedDataset(value: string): MethodologyDatasetId {
   return value;
 }
 
+// Methodology route ids are the public URL vocabulary; the schema.org Dataset
+// vocabulary is keyed by published dataset id, so the two are mapped here.
+const DATASET_SCHEMA_IDS = {
+  expenditure: "national-expenditure",
+  revenue: "national-revenue",
+  municipalities: "municipal-expenditure",
+  debt: "government-debt",
+} as const;
+
 const DATASET_DOWNLOADS = {
   expenditure: "/downloads/data/national-expenditure.csv",
   revenue: "/downloads/data/national-revenue.csv",
@@ -114,6 +123,7 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
         data={datasetJsonLd({ locale,
           origin: resolveSiteUrl(),
           path: locale === "en" ? `/en/methodology/${dataset}` : `/methodology/${dataset}`,
+          datasetId: DATASET_SCHEMA_IDS[dataset],
           name: content.title,
           description: content.summary,
           firstYear: coverage.firstYear,

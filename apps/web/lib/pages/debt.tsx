@@ -43,6 +43,8 @@ export async function renderDebtPage(locale: Locale) {
     <>
       <JsonLd
         data={explorerDatasetJsonLd({ locale,
+          datasetId: "government-debt",
+          sameAsPath: "/methodology/debt",
           origin: resolveSiteUrl(),
           path: DEBT_EXPLORER_PATH,
           name: message(messages, "debt.datasetName"),

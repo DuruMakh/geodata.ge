@@ -20,6 +20,7 @@ import {
 import { formatPerResidentGel, formatDisplayDate } from "../explorer/format";
 import { buildMunicipalityMapModel } from "../explorer/municipalityMapData";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
+import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 
@@ -68,6 +69,18 @@ export async function renderMunicipalIndex(locale: Locale) {
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
       <JsonLd
         data={explorerDatasetJsonLd({ locale,
+          datasetId: "municipal-expenditure",
+          sameAsPath: "/methodology/municipalities",
+          // This page is the parent of every municipal entity dataset: the
+          // closed set of 64 municipalities, 11 region roll-ups and the one
+          // Georgia aggregate, each of which points back with isPartOf.
+          hasPartPaths: [
+            "/explorer/municipalities/georgia",
+            ...MUNICIPALITY_ROUTES.map(({ slug }) => `/explorer/municipalities/${slug}` as const),
+            ...regions.map(
+              (region) => `/explorer/municipalities/region/${region.id.replace("region.", "")}` as const,
+            ),
+          ],
           origin: resolveSiteUrl(),
           path: "/explorer/municipalities",
           name: message(messages, "municipal.indexDatasetName"),

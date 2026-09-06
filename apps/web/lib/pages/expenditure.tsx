@@ -50,6 +50,8 @@ export async function renderExpenditurePage(locale: Locale) {
     <>
       <JsonLd
         data={explorerDatasetJsonLd({ locale,
+          datasetId: "national-expenditure",
+          sameAsPath: "/methodology/expenditure",
           origin: resolveSiteUrl(),
           path: "/explorer/expenditure",
           name: message(messages, "main.datasetExpenditureName"),
