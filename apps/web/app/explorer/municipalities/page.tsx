@@ -14,6 +14,7 @@ import {
 } from "../../../lib/explorer/municipalData";
 import { formatPerResidentGel } from "../../../lib/explorer/format";
 import { buildMunicipalityMapModel } from "../../../lib/explorer/municipalityMapData";
+import { MUNICIPALITY_ROUTES } from "../../../lib/explorer/municipalityRoutes";
 import { coverageFromYears, fiscalMetadata } from "../../../lib/seo/metadata";
 import { explorerDatasetJsonLd } from "../../../lib/seo/structuredData";
 import { resolveSiteUrl } from "../../../lib/siteUrl";
@@ -59,6 +60,18 @@ export default async function MunicipalitiesIndexPage() {
         data={explorerDatasetJsonLd({
           origin: resolveSiteUrl(),
           path: "/explorer/municipalities",
+          datasetId: "municipal-expenditure",
+          sameAsPath: "/methodology/municipalities",
+          // This page is the parent of every municipal entity dataset: the
+          // closed set of 64 municipalities, 11 region roll-ups and the one
+          // Georgia aggregate, each of which points back with isPartOf.
+          hasPartPaths: [
+            "/explorer/municipalities/georgia",
+            ...MUNICIPALITY_ROUTES.map(({ slug }) => `/explorer/municipalities/${slug}` as const),
+            ...regions.map(
+              (region) => `/explorer/municipalities/region/${region.id.replace("region.", "")}` as const,
+            ),
+          ],
           name: "საქართველოს მუნიციპალიტეტების ბიუჯეტები",
           description: `საქართველოს მუნიციპალიტეტების ფაქტობრივი ბიუჯეტები ფუნქციების მიხედვით, ${firstYear}–${latestYear}.`,
           firstYear,

@@ -43,6 +43,8 @@ export default async function ExpenditurePage() {
         data={explorerDatasetJsonLd({
           origin: resolveSiteUrl(),
           path: "/explorer/expenditure",
+          datasetId: "national-expenditure",
+          sameAsPath: "/methodology/expenditure",
           name: "საქართველოს სახელმწიფო ბიუჯეტის ხარჯები",
           description: `საქართველოს სახელმწიფო ბიუჯეტის ფაქტობრივი ხარჯები სფეროებისა და უწყებების მიხედვით, ${firstYear}–${lastYear}.`,
           firstYear,

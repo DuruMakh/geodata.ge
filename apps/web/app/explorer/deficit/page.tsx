@@ -34,6 +34,7 @@ export default async function DeficitPage() {
         data={explorerDatasetJsonLd({
           origin: resolveSiteUrl(),
           path: DEFICIT_EXPLORER_PATH,
+          datasetId: "general-government-balance",
           name: "საქართველოს ზოგადი მთავრობის დეფიციტი",
           description,
           firstYear,

@@ -43,6 +43,8 @@ export default async function RevenuePage() {
         data={explorerDatasetJsonLd({
           origin: resolveSiteUrl(),
           path: "/explorer/revenue",
+          datasetId: "national-revenue",
+          sameAsPath: "/methodology/revenue",
           name: "საქართველოს სახელმწიფო ბიუჯეტის შემოსავლები",
           description: `საქართველოს ბიუჯეტის ფაქტობრივი შემოსავლები — გადასახადები, გრანტები და სხვა შემოსულობები, ${firstYear}–${lastYear}.`,
           firstYear,

@@ -34,6 +34,8 @@ export default async function DebtPage() {
         data={explorerDatasetJsonLd({
           origin: resolveSiteUrl(),
           path: DEBT_EXPLORER_PATH,
+          datasetId: "government-debt",
+          sameAsPath: "/methodology/debt",
           name: "საქართველოს მთავრობის ვალი",
           description: datasetDescription,
           firstYear: datasetFirstYear,

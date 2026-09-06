@@ -86,6 +86,12 @@ export default async function GeorgiaMunicipalitiesPage() {
         data={explorerDatasetJsonLd({
           origin: resolveSiteUrl(),
           path: ROUTE,
+          datasetId: "municipal-expenditure",
+          partOfPath: "/explorer/municipalities",
+          // catalogue.json qualifies gel_per_resident: it exists for municipality
+          // and region totals, "not for the country aggregate". This page is that
+          // aggregate, so claiming the measure here would be a false claim.
+          omitMeasures: ["gel_per_resident"],
           name: "საქართველოს მუნიციპალური ბიუჯეტების ჯამი",
           description,
           firstYear,

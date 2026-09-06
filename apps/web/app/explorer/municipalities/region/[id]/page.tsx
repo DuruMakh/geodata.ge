@@ -214,6 +214,9 @@ export default async function RegionPage({ params }: { params: Promise<{ id: str
         data={explorerDatasetJsonLd({
           origin: resolveSiteUrl(),
           path: `/explorer/municipalities/region/${id}`,
+          datasetId: "municipal-expenditure",
+          partOfPath: "/explorer/municipalities",
+          withinGeorgia: true,
           name: `${regionName} ბიუჯეტი`,
           description,
           firstYear,

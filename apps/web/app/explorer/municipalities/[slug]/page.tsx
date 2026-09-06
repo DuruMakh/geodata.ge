@@ -174,6 +174,9 @@ export default async function MunicipalityPage({ params }: { params: Promise<{ s
         data={explorerDatasetJsonLd({
           origin: resolveSiteUrl(),
           path: municipalityHrefForCode(code),
+          datasetId: "municipal-expenditure",
+          partOfPath: "/explorer/municipalities",
+          withinGeorgia: true,
           name: `${municipality.nameKa}ს ბიუჯეტი`,
           description,
           firstYear,

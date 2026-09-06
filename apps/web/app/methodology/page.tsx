@@ -6,6 +6,7 @@ import { loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipa
 import { buildLandingContext } from "../../lib/landing/landingData";
 import { buildMethodologyHubEntries } from "../../lib/methodology/catalog";
 import { loadGeneratedArchiveSummaries } from "../../lib/methodology/prepareArchives";
+import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "../../lib/seo/internalLinks";
 import { fiscalMetadata } from "../../lib/seo/metadata";
 import { dataCatalogJsonLd } from "../../lib/seo/structuredData";
 import { resolveSiteUrl } from "../../lib/siteUrl";
@@ -37,12 +38,22 @@ export default async function MethodologyPage() {
   return (
     <>
       <JsonLd
-        data={dataCatalogJsonLd(resolveSiteUrl(), [
-          "/methodology/expenditure",
-          "/methodology/revenue",
-          "/methodology/municipalities",
-          "/methodology/debt",
-        ])}
+        data={dataCatalogJsonLd(
+          resolveSiteUrl(),
+          [
+            "/methodology/expenditure",
+            "/methodology/revenue",
+            "/methodology/municipalities",
+            "/methodology/debt",
+          ],
+          [
+            "/explorer/expenditure",
+            "/explorer/revenue",
+            DEBT_EXPLORER_PATH,
+            DEFICIT_EXPLORER_PATH,
+            "/explorer/municipalities",
+          ],
+        )}
         testId="catalog-json-ld"
       />
       <MethodologyHub
