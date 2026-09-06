@@ -9,7 +9,7 @@ import { computedCssColorAlpha } from "./focus-outline";
 
 const artifactDir = join(process.cwd(), "test-results", "visual-reference");
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
-const heroRuntimeMarkers = ["WebGLRenderer", "ვიზუალი ვერ ჩაიტვირთა"] as const;
+const heroRuntimeMarkers = ["WebGLRenderer", "hero scene init failed"] as const;
 
 async function heroRuntimeScripts(request: APIRequestContext, urls: Iterable<string>) {
   const uniqueUrls = [...new Set(urls)];
@@ -490,7 +490,9 @@ test("landing keeps timeout-driven hero readiness within five seconds of load", 
     );
     new MutationObserver(() => {
       if (testWindow.__heroFallbackAt !== undefined) return;
-      if (document.body?.textContent?.includes("ვიზუალი ვერ ჩაიტვირთა")) {
+      // The translated fallback also travels in hidden page data; readiness
+      // must observe the rendered figure rather than serialized script text.
+      if (document.querySelector<HTMLElement>(".landing-hero-frame")?.innerText.includes("ვიზუალი ვერ ჩაიტვირთა")) {
         testWindow.__heroFallbackAt = performance.now();
       }
     }).observe(document, { childList: true, subtree: true });

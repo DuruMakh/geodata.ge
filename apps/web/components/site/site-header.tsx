@@ -31,10 +31,10 @@ export function SiteHeader({ active, yearsLabel, testId, locale = "ka" }: SiteHe
         className="mb-3.5 block aspect-[1080/340] w-[118px] flex-none min-[768px]:mb-1 min-[768px]:aspect-[1600/400] min-[768px]:w-[280px]"
       >
         <picture>
-          <source media="(max-width: 767px)" srcSet="/brand/fiscal-logo-compact.svg" />
+          <source media="(max-width: 767px)" srcSet={locale === "en" ? "/brand/fiscal-logo-compact-en.svg" : "/brand/fiscal-logo-compact.svg"} />
           <img
             data-testid="site-header-logo"
-            src="/brand/fiscal-logo-horizontal.svg"
+            src={locale === "en" ? "/brand/fiscal-logo-horizontal-en.svg" : "/brand/fiscal-logo-horizontal.svg"}
             width="1600"
             height="545"
             alt=""

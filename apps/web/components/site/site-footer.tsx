@@ -19,7 +19,7 @@ export function SiteFooter({ updatedAt, locale = "ka" }: { updatedAt: string; lo
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 data-testid="site-footer-logo"
-                src="/brand/fiscal-logo-compact.svg"
+                src={locale === "en" ? "/brand/fiscal-logo-compact-en.svg" : "/brand/fiscal-logo-compact.svg"}
                 width="1080"
                 height="340"
                 alt=""

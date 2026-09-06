@@ -12,6 +12,10 @@ const dictionaries = {
     municipal: () => import("./messages/ka/municipal.json"),
     debt: () => import("./messages/ka/debt.json"),
     deficit: () => import("./messages/ka/deficit.json"),
+    landing: () => import("./messages/ka/landing.json"),
+    hub: () => import("./messages/ka/hub.json"),
+    about: () => import("./messages/ka/about.json"),
+    connect: () => import("./messages/ka/connect.json"),
   },
   en: {
     common: () => import("./messages/en/common.json"),
@@ -24,6 +28,10 @@ const dictionaries = {
     municipal: () => import("./messages/en/municipal.json"),
     debt: () => import("./messages/en/debt.json"),
     deficit: () => import("./messages/en/deficit.json"),
+    landing: () => import("./messages/en/landing.json"),
+    hub: () => import("./messages/en/hub.json"),
+    about: () => import("./messages/en/about.json"),
+    connect: () => import("./messages/en/connect.json"),
   },
 } satisfies Record<Locale, Record<MessageScope, () => Promise<{ default: Messages }>>>;
 

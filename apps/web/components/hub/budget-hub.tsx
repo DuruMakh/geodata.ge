@@ -1,18 +1,22 @@
 import Link from "next/link";
 import type { HubCardModel } from "../../lib/explorer/hubCards";
 import { Sparkline } from "../ui/sparkline";
+import type { Locale } from "../../lib/i18n/types";
+import { getCommonMessages } from "../../lib/i18n/common.server";
+import { message } from "../../lib/i18n/messages";
+import { pageHref } from "../../lib/i18n/routes";
 
 // Hub cards are the one card-framed block in the system (DESIGN.md §6.6):
 // four peer destinations with no natural reading order need containment.
 
-function CardBody({ card }: { card: HubCardModel }) {
+function CardBody({ card, locale }: { card: HubCardModel; locale: Locale }) {
   return (
     <>
       <div className="flex items-baseline justify-between">
         <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--accent)]">{card.index}</span>
         {card.comingSoon ? (
           <span className="rounded-[2px] border border-[var(--control)] px-1.5 py-px font-[family-name:var(--font-numeric)] text-[9px] text-[var(--muted)]">
-            მალე
+            {message(getCommonMessages(locale), "common.comingSoon")}
           </span>
         ) : (
           <span aria-hidden className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">
@@ -38,7 +42,7 @@ function CardBody({ card }: { card: HubCardModel }) {
   );
 }
 
-export function BudgetHub({ cards }: { cards: HubCardModel[] }) {
+export function BudgetHub({ cards, locale = "ka" }: { cards: HubCardModel[]; locale?: Locale }) {
   return (
     <div data-testid="budget-hub" className="grid max-w-[860px] gap-4 min-[768px]:grid-cols-2">
       {cards.map((card) =>
@@ -49,16 +53,16 @@ export function BudgetHub({ cards }: { cards: HubCardModel[] }) {
             aria-disabled="true"
             className="flex flex-col gap-2 border border-[var(--hairline)] bg-[var(--tile)] px-[18px] pt-[18px] pb-[15px]"
           >
-            <CardBody card={card} />
+            <CardBody card={card} locale={locale} />
           </div>
         ) : (
           <Link
             key={card.index}
-            href={card.href}
+            href={pageHref(card.href, locale)}
             data-testid="hub-card"
             className="flex flex-col gap-2 border border-[var(--hairline)] bg-[var(--tile)] px-[18px] pt-[18px] pb-[15px] no-underline transition-colors duration-150 hover:bg-[var(--tint)]"
           >
-            <CardBody card={card} />
+            <CardBody card={card} locale={locale} />
           </Link>
         ),
       )}

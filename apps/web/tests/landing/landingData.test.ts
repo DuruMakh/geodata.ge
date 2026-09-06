@@ -192,7 +192,7 @@ describe("landing model", () => {
       "spending.gamma",
       "spending.delta",
     ]);
-    expect(model.expenditure.rows[0]).toMatchObject({ labelKa: "ალფა", amountGel: 40 });
+    expect(model.expenditure.rows[0]).toMatchObject({ label: "ალფა", amountGel: 40 });
     expect(model.expenditure.rows[0]!.share).toBeCloseTo(40 / 999);
   });
 
@@ -211,7 +211,7 @@ describe("landing model", () => {
     expect(model.municipalities.rows.map((row) => row.id)).toEqual(["10", "11", "12", "13"]);
     expect(model.municipalities.rows[0]).toEqual({
       id: "10",
-      labelKa: "არაქალაქი",
+      label: "არაქალაქი",
       amountGel: 250,
       share: 0.25,
     });

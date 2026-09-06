@@ -369,7 +369,7 @@ const note = message(presentation.messages, 'debt.portfolioProjection', { date: 
 
 **Interfaces:** each page module exports `renderHomePage`, `renderHubPage`, `renderAboutPage`, or `renderConnectPage` with `(locale: Locale): Promise<React.ReactElement>`, plus its matching `{home,hub,about,connect}PageMetadata(locale): Promise<Metadata>`. Existing landing/hub data builders accept optional presentation only for display text; their facts, coverage dates, ordering, and numerical headline logic stay unchanged.
 
-- [ ] Add a browser journey from English home → data hub → a dataset → methodology → connection, verifying every human page stays under `/en` and the copied endpoint remains shared.
+- [x] Add a browser journey from English home → data hub → a dataset → methodology → connection, verifying every human page stays under `/en` and the copied endpoint remains shared.
 
 ```ts
 test('English connection still points to the shared endpoint', async ({ page }) => {
@@ -380,7 +380,7 @@ test('English connection still points to the shared endpoint', async ({ page }) 
 });
 ```
 
-- [ ] Confirm failure, then translate home headings/descriptions, data-derived narrative templates, coverage/status labels, trust/process sections, hub cards, About copy, licensing text, footer content, and the connection instructions. Preserve the approved hero, data-derived actual headlines, coming-soon markers, and route exclusions.
+- [x] Confirm failure, then translate home headings/descriptions, data-derived narrative templates, coverage/status labels, trust/process sections, hub cards, About copy, licensing text, footer content, and the connection instructions. Preserve the approved hero, data-derived actual headlines, coming-soon markers, and route exclusions.
 
 ```tsx
 <Link href={pageHref('/explorer/expenditure', locale)}>
@@ -388,10 +388,16 @@ test('English connection still points to the shared endpoint', async ({ page }) 
 </Link>
 ```
 
-- [ ] Keep Fiscal.ge brand and its contact address unchanged. English future indicators remain non-clickable labels. Translate alt text and embedded descriptive text only where present; do not regenerate decorative images just because the page language changes. The final connection page must describe A5's actual schema/examples and all current tool coverage.
-- [ ] Run the focused content and existing landing/about/connect tests, `npm run typecheck`, `npm run i18n:check`, and inspect desktop/mobile composition. Commit with `feat: complete English public information pages`.
+- [x] Keep Fiscal.ge brand and its contact address unchanged. English future indicators remain non-clickable labels. Translate alt text and embedded descriptive text only where present; do not regenerate decorative images just because the page language changes. The final connection page must describe A5's actual schema/examples and all current tool coverage.
+- [x] Run the focused content and existing landing/about/connect tests, `npm run typecheck`, `npm run i18n:check`, and inspect desktop/mobile composition. Commit with `feat: complete English public information pages`.
 
 **Done:** an English reader can enter through any public content page and continue through the complete site in English.
+
+> W8 verified on 2026-09-06: full check passed 176 files / 1,710 tests. All 56 public-content/landing/About/connection browser tests passed, including the English home-to-hub-to-explorer-to-methodology-to-connection journey, English initial HTML for all four page types, keyboard copy confirmation and exact shared endpoint/prompt values, language-switch number parity, hub sparkline parity, and widths 320/390/768/1440. Existing Georgian mission copy, navigation, hero loading/idle timing, reduced-motion behaviour, mobile static rendering and responsive contracts remain covered. Desktop/mobile screenshots were reviewed under .tmp/bilingual/w8-*.
+
+> Landing summary rows now use a neutral label field; amounts, shares, year selection and actual-only debt/deficit headlines are unchanged. The existing 64/11 homepage sentence now derives both counts from served municipality records. Hero geometry, populations and every original geographic field were compared exactly against the pre-change object; only 21 English city display names were added. The desktop hero receives five small translated strings and locale, while all mobile image bytes remain unchanged. English logo assets preserve the mark and wordmark and translate the caption/accessible title; Georgian assets remain untouched.
+
+> A timing test initially counted the hidden serialized fallback translation as a displayed error. It now observes rendered figure text; the original 1.5-second lower bound and five-second upper bound both pass. The runtime-chunk test uses language-neutral identifiers because fallback copy is now a prop. Final build passed with 190 static-generation entries, every public human page paired, only /mcp dynamic, unchanged dataVersion a6c927f06f86396992ed7afd5fc0aae3accfc83700f3213fc28ddcbc7c1ceeff, and all ten publication hashes verified. Preview: http://127.0.0.1:3217/en. Connection examples/version wording are completed with A5; paired SEO/social metadata remains W9.
 
 ## Task W9: Finish language-specific SEO, social previews, and exhaustive route coverage
 

@@ -1,3 +1,6 @@
+import type { Presentation } from "../../lib/i18n/types";
+import { message } from "../../lib/i18n/messages";
+import { pageHref } from "../../lib/i18n/routes";
 import Link from "next/link";
 import type { LandingModel } from "../../lib/landing/landingData";
 import { SiteFooter } from "../site/site-footer";
@@ -10,49 +13,50 @@ import { LandingFiscalSections } from "./landing-fiscal-sections";
 // derived from the same active facts as the matching explorer.
 const KEY_NUMBERS = [
   {
-    label: "მოსახლეობა",
+    label: "landing.population",
     value: "3.9",
-    unit: "მლნ",
-    caption: "2026 წლის 1 იანვარი · საქსტატი",
-    mobileCaption: "2026 · საქსტატი",
+    unit: "landing.million",
+    caption: "landing.populationCaption",
+    mobileCaption: "landing.populationMobile",
     unitTestId: "population-unit",
   },
   {
-    label: "ფართობი",
+    label: "landing.area",
     value: "69.7",
-    unit: "ათ. კმ²",
-    caption: "საქართველოს ტერიტორია",
-    mobileCaption: "ტერიტორია",
+    unit: "landing.areaUnit",
+    caption: "landing.areaCaption",
+    mobileCaption: "landing.areaMobile",
     unitTestId: "area-unit",
   },
   {
-    label: "ეკონომიკის ზომა",
+    label: "landing.economy",
     value: "104.6",
-    unit: "მლრდ ₾",
-    caption: "ნომინალური მშპ · 2025, წინასწარი",
-    mobileCaption: "მშპ · 2025",
+    unit: "landing.bnGel",
+    caption: "landing.economyCaption",
+    mobileCaption: "landing.economyMobile",
     unitTestId: "gdp-unit",
   },
 ] as const;
 
 const HERO_ARIA_LABEL =
-  "საქართველოს ზუსტი რუკა ცოცხალ რელიეფად: მთავარი ქალაქები მოსახლეობის ზომის კვადრატებით უშვებენ ტალღებს; კავკასიონი მუქდება სიმაღლესთან ერთად";
+  "landing.heroAria";
 
 const METHODOLOGY_STEPS = [
-  "ოფიციალური დოკუმენტის შენარჩუნება",
-  "კლასიფიკაცია და გარდაქმნის წესი",
-  "შეჯერება და ხარისხის შემოწმება",
-  "ჩამოსატვირთი მონაცემები",
+  "landing.methodStep1",
+  "landing.methodStep2",
+  "landing.methodStep3",
+  "landing.methodStep4",
 ] as const;
 
-export function LandingPage({ model }: { model: LandingModel }) {
+export function LandingPage({ model, presentation }: { model: LandingModel; presentation: Presentation }) {
+  const { locale, messages } = presentation;
   return (
     <main
       data-testid="landing-shell"
       className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]"
     >
       <div className="mx-auto max-w-[1240px]">
-        <SiteHeader active="home" yearsLabel={model.yearsLabel} testId="landing-header" />
+        <SiteHeader locale={locale} active="home" yearsLabel={model.yearsLabel} testId="landing-header" />
 
         <section className="relative min-[768px]:grid min-[768px]:grid-cols-1">
           <div
@@ -60,12 +64,12 @@ export function LandingPage({ model }: { model: LandingModel }) {
             className="pb-[18px] pt-7 min-[768px]:pointer-events-none min-[768px]:col-start-1 min-[768px]:row-start-1 min-[768px]:z-10 min-[768px]:mb-6 min-[768px]:mt-[42px] min-[768px]:flex min-[768px]:w-[340px] min-[768px]:flex-col min-[768px]:items-end min-[768px]:self-start min-[768px]:justify-self-end min-[768px]:p-0 min-[768px]:text-right min-[1100px]:w-[470px]"
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[11px]">
-              საქართველოს მონაცემების პორტალი
+              {message(messages, "landing.portal")}
             </p>
             <h1
               className="hero-display mt-2.5 text-pretty text-[33px] font-semibold leading-[1.12] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-[30px] min-[1100px]:text-[40px]"
             >
-              საქართველო ციფრებში
+              {message(messages, "landing.heading")}
             </h1>
             <div className="mt-3.5 min-[768px]:pointer-events-auto min-[768px]:mt-5">
               <Link
@@ -73,16 +77,16 @@ export function LandingPage({ model }: { model: LandingModel }) {
                 data-testid="hero-cta"
                 className="text-[12px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222] min-[768px]:text-[12.5px]"
               >
-                გაეცანი მონაცემებს
+                {message(messages, "landing.explore")}
               </Link>
             </div>
           </div>
           <figure
             role="img"
-            aria-label={HERO_ARIA_LABEL}
+            aria-label={message(messages, HERO_ARIA_LABEL)}
             className="landing-hero-frame relative m-0 ml-[calc(50%-50vw)] w-screen min-w-0 overflow-hidden p-0 min-[768px]:col-start-1 min-[768px]:row-start-1"
           >
-            <HeroReliefLazy />
+            <HeroReliefLazy locale={locale} copy={{ million: message(messages, "landing.heroMillion"), thousand: message(messages, "landing.heroThousand"), peakShkhara: message(messages, "landing.peakShkhara"), peakKazbek: message(messages, "landing.peakKazbek"), unavailable: message(messages, "landing.heroUnavailable") }} />
           </figure>
         </section>
 
@@ -91,9 +95,9 @@ export function LandingPage({ model }: { model: LandingModel }) {
           className="grid grid-cols-3 gap-3 border-t border-[var(--hairline-soft)] pt-[18px] min-[768px]:gap-8"
         >
           {KEY_NUMBERS.map((entry) => (
-            <div key={entry.label} data-country-stat className="min-w-0">
+            <div key={message(messages, entry.label)} data-country-stat className="min-w-0">
               <div className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] max-[380px]:min-h-[27px] min-[768px]:text-[11px] min-[768px]:tracking-[0.08em]">
-                {entry.label}
+                {message(messages, entry.label)}
               </div>
               <div className="mt-2 min-h-[58px] font-[family-name:var(--font-display)] text-[clamp(22px,7vw,46px)] font-semibold leading-[1.05] tracking-[-0.02em] min-[768px]:min-h-0">
                 {entry.value}{" "}
@@ -101,15 +105,15 @@ export function LandingPage({ model }: { model: LandingModel }) {
                   data-testid={entry.unitTestId}
                   className="mt-1 block text-[clamp(11px,3vw,25px)] min-[768px]:mt-0 min-[768px]:inline"
                 >
-                  {entry.unit}
+                  {message(messages, entry.unit)}
                 </span>
               </div>
               <div className="mt-2 text-[9px] leading-snug text-[var(--muted)] min-[768px]:text-[12px]">
-                <span className="hidden min-[381px]:inline">{entry.caption}</span>
+                <span className="hidden min-[381px]:inline">{message(messages, entry.caption)}</span>
                 <span aria-hidden="true" className="min-[381px]:hidden">
-                  {entry.mobileCaption}
+                  {message(messages, entry.mobileCaption)}
                 </span>
-                <span className="sr-only min-[381px]:hidden">{entry.caption}</span>
+                <span className="sr-only min-[381px]:hidden">{message(messages, entry.caption)}</span>
               </div>
             </div>
           ))}
@@ -117,43 +121,46 @@ export function LandingPage({ model }: { model: LandingModel }) {
 
         <div id="data" data-testid="landing-data" className="mt-14 scroll-mt-4">
           <LandingDatasetSection
+            presentation={presentation}
             kind="expenditure"
             index="01"
-            overline="სახელმწიფო ხარჯები"
-            heading="როგორ იხარჯება საქართველოს ბიუჯეტი"
-            description={`ნახე ${model.expenditure.latestYear} წლის ხარჯები სფეროების, სამინისტროებისა და ძირითადი პროგრამების მიხედვით.`}
+            overline={message(messages, "landing.expenditureOverline")}
+            heading={message(messages, "landing.expenditureHeading")}
+            description={message(messages, "landing.expenditureDescription", { year: model.expenditure.latestYear })}
             href="/explorer/expenditure"
-            linkLabel="ხარჯების მონაცემები →"
-            totalLabel="მთლიანი ხარჯი"
-            firstColumnLabel="სფერო"
+            linkLabel={message(messages, "landing.expenditureLink")}
+            totalLabel={message(messages, "landing.expenditureTotal")}
+            firstColumnLabel={message(messages, "landing.expenditureColumn")}
             summary={model.expenditure}
           />
           <LandingDatasetSection
+            presentation={presentation}
             kind="revenue"
             index="02"
-            overline="სახელმწიფო შემოსავლები"
-            heading="როგორ ფინანსდება საქართველოს ბიუჯეტი"
-            description={`ნახე ${model.revenue.latestYear} წლის გადასახადები, გრანტები, სხვა შემოსავლები და ვალდებულებები.`}
+            overline={message(messages, "landing.revenueOverline")}
+            heading={message(messages, "landing.revenueHeading")}
+            description={message(messages, "landing.revenueDescription", { year: model.revenue.latestYear })}
             href="/explorer/revenue"
-            linkLabel="შემოსავლების მონაცემები →"
-            totalLabel="მთლიანი შემოსავლები"
-            firstColumnLabel="მუხლი"
+            linkLabel={message(messages, "landing.revenueLink")}
+            totalLabel={message(messages, "landing.revenueTotal")}
+            firstColumnLabel={message(messages, "landing.revenueColumn")}
             summary={model.revenue}
           />
           <LandingDatasetSection
+            presentation={presentation}
             kind="municipalities"
             index="03"
-            overline="მუნიციპალური ბიუჯეტები"
-            heading="როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები"
-            description={`64 მუნიციპალიტეტისა და 11 რეგიონის ${model.municipalities.latestYear} წლის ბიუჯეტები.`}
+            overline={message(messages, "landing.municipalOverline")}
+            heading={message(messages, "landing.municipalHeading")}
+            description={message(messages, "landing.municipalDescription", { year: model.municipalities.latestYear, ...model.municipalCoverage })}
             href="/explorer/municipalities"
-            linkLabel="მუნიციპალური მონაცემები →"
-            totalLabel="საქართველოს მუნიციპალური ჯამი"
-            firstColumnLabel="უდიდესი მუნიციპალური ბიუჯეტები"
+            linkLabel={message(messages, "landing.municipalLink")}
+            totalLabel={message(messages, "landing.municipalTotal")}
+            firstColumnLabel={message(messages, "landing.municipalColumn")}
             summary={model.municipalities}
           />
 
-          <LandingFiscalSections debt={model.debt} deficit={model.deficit} />
+          <LandingFiscalSections presentation={presentation} debt={model.debt} deficit={model.deficit} />
 
           <section
             data-testid="landing-methodology"
@@ -168,17 +175,17 @@ export function LandingPage({ model }: { model: LandingModel }) {
                 id="landing-methodology-title"
                 className="font-[family-name:var(--font-display)] text-[26px] font-semibold leading-[1.16]"
               >
-                მეთოდოლოგია და პირველწყაროები
+                {message(messages, "landing.methodologyHeading")}
               </h2>
               <p data-testid="landing-methodology-intro" className="mt-4 text-[13px] leading-[1.75] text-[var(--body)]">
-                თითოეული რიცხვი უკავშირდება ოფიციალურ წყაროს, კლასიფიკაციის წესსა და გადამოწმების შედეგს.
+                {message(messages, "landing.methodologyDescription")}
               </p>
               <Link
                 data-testid="landing-methodology-link"
-                href="/methodology"
+                href={pageHref("/methodology", locale)}
                 className="mt-4 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
               >
-                მეთოდოლოგიის ნახვა →
+                {message(messages, "landing.methodologyLink")}
               </Link>
             </div>
             <ol className="border-t border-[var(--hairline-soft)]">
@@ -190,14 +197,14 @@ export function LandingPage({ model }: { model: LandingModel }) {
                   <span aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[var(--faint)]">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span>{label}</span>
+                  <span>{message(messages, label)}</span>
                 </li>
               ))}
             </ol>
           </section>
         </div>
 
-        <SiteFooter updatedAt={model.updatedAt} />
+        <SiteFooter locale={locale} updatedAt={model.updatedAt} />
       </div>
     </main>
   );

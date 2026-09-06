@@ -1,14 +1,18 @@
+import type { Presentation } from "../../lib/i18n/types";
+import { message } from "../../lib/i18n/messages";
+import { pageHref } from "../../lib/i18n/routes";
 import Link from "next/link";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
 import type { LandingBasisStatus, LandingDatasetSummary } from "../../lib/landing/landingData";
 
 const STATUS_LABEL: Record<LandingBasisStatus, string> = {
-  actual: "ფაქტობრივი შესრულება",
-  planned: "გეგმა",
-  mixed: "ფაქტი და გეგმა",
+  actual: "landing.actual",
+  planned: "landing.planned",
+  mixed: "landing.mixed",
 };
 
 type LandingDatasetSectionProps = {
+  presentation: Presentation;
   kind: "expenditure" | "revenue" | "municipalities";
   index: "01" | "02" | "03";
   overline: string;
@@ -22,6 +26,7 @@ type LandingDatasetSectionProps = {
 };
 
 export function LandingDatasetSection({
+  presentation,
   kind,
   index,
   overline,
@@ -33,6 +38,7 @@ export function LandingDatasetSection({
   firstColumnLabel,
   summary,
 }: LandingDatasetSectionProps) {
+  const { locale, messages } = presentation;
   const headingId = `landing-${kind}-title`;
 
   return (
@@ -60,7 +66,7 @@ export function LandingDatasetSection({
         </h2>
         <p className="mt-4 max-w-[470px] text-[13px] leading-[1.75] text-[var(--body)]">{description}</p>
         <Link
-          href={href}
+          href={pageHref(href, locale)}
           className="mt-4 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]"
         >
           {linkLabel}
@@ -74,20 +80,20 @@ export function LandingDatasetSection({
           <div className="min-w-0">
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{totalLabel}</p>
             <p className="mt-2 font-[family-name:var(--font-display)] text-[clamp(24px,5vw,42px)] font-semibold leading-none tracking-[-0.02em]">
-              {formatAmount(summary.totalGel)}
+              {formatAmount(summary.totalGel, locale)}
             </p>
           </div>
           <div className="text-right">
-            <span className="block text-[9px] uppercase tracking-[0.06em] text-[var(--faint)]">ბოლო ხელმისაწვდომი წელი</span>
+            <span className="block text-[9px] uppercase tracking-[0.06em] text-[var(--faint)]">{message(messages, "landing.latestYear")}</span>
             <strong className="mt-1 block font-[family-name:var(--font-numeric)] text-[18px]">{summary.latestYear}</strong>
-            <span className="mt-1 block text-[10px] text-[var(--muted)]">{STATUS_LABEL[summary.basis]}</span>
+            <span className="mt-1 block text-[10px] text-[var(--muted)]">{message(messages, STATUS_LABEL[summary.basis])}</span>
           </div>
         </div>
         <div className="min-w-0 overflow-hidden">
           <table
             className="mt-3 w-full table-fixed text-[11px] max-[380px]:text-[10px]"
           >
-            <caption className="sr-only">{`${heading} — ${summary.latestYear} წლის მონაცემები`}</caption>
+            <caption className="sr-only">{message(messages, "landing.tableCaption", { heading, year: summary.latestYear })}</caption>
             <colgroup>
               <col className="w-[52%]" />
               <col className="w-[30%]" />
@@ -102,7 +108,7 @@ export function LandingDatasetSection({
                   {summary.latestYear}
                 </th>
                 <th scope="col" className="py-2 pl-1 text-right font-medium">
-                  წილი
+                  {message(messages, "landing.share")}
                 </th>
               </tr>
             </thead>
@@ -110,10 +116,10 @@ export function LandingDatasetSection({
               {summary.rows.map((row) => (
                 <tr key={row.id} className="border-b border-[var(--hairline-soft)] last:border-b-0">
                   <th scope="row" className="break-words py-2.5 pr-2 text-left font-medium leading-snug">
-                    {row.labelKa}
+                    {row.label}
                   </th>
                   <td className="whitespace-nowrap px-1 py-2.5 text-right font-[family-name:var(--font-numeric)]">
-                    {formatAmount(row.amountGel)}
+                    {formatAmount(row.amountGel, locale)}
                   </td>
                   <td className="whitespace-nowrap py-2.5 pl-1 text-right font-[family-name:var(--font-numeric)]">
                     {formatShare(row.share)}

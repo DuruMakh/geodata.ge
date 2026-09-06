@@ -12,6 +12,8 @@ import type {
 } from "../servedRows";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { isDerivedTotalItemId } from "../explorer/explorerData";
+import type { Presentation } from "../i18n/types";
+import { publicLabel } from "../i18n/labels";
 
 // Compact server-side model: budget-derived landing values come from the same
 // active facts as the explorer, while shared page context stays lightweight.
@@ -20,7 +22,7 @@ export type LandingBasisStatus = "actual" | "planned" | "mixed";
 
 export type LandingSummaryRow = {
   id: string;
-  labelKa: string;
+  label: string;
   amountGel: number;
   share: number;
 };
@@ -54,6 +56,7 @@ export type LandingModel = LandingContext & {
   expenditure: LandingDatasetSummary;
   revenue: LandingDatasetSummary;
   municipalities: LandingDatasetSummary;
+  municipalCoverage: { municipalities: number; regions: number };
   debt: LandingDebtSummary;
   deficit: LandingDeficitSummary;
 };
@@ -79,6 +82,7 @@ function buildNationalSummary(
   activeFacts: ServedBudgetFact[],
   glossary: Map<string, GlossaryEntry>,
   side: ServedBudgetFact["side"],
+  presentation?: Presentation,
 ): LandingDatasetSummary {
   const detailFacts = activeFacts.filter((fact) => fact.side === side && !isDerivedTotalItemId(fact.itemId));
   const latestYear = detailFacts.map((fact) => fact.year).sort((left, right) => left - right).at(-1) ?? 0;
@@ -97,7 +101,7 @@ function buildNationalSummary(
       .slice(0, 4)
       .map((fact) => ({
         id: fact.itemId,
-        labelKa: glossary.get(fact.itemId)?.kaLabel ?? fact.itemId,
+        label: presentation ? publicLabel(presentation.locale, fact.itemId, glossary.get(fact.itemId)?.kaLabel ?? fact.itemId, presentation.englishLabels) : glossary.get(fact.itemId)?.kaLabel ?? fact.itemId,
         amountGel: fact.amountGel,
         share: fact.amountGel / totalGel,
       })),
@@ -108,6 +112,7 @@ function buildMunicipalSummary(
   municipalities: Municipality[],
   municipalTotalFacts: MunicipalTotalFact[],
   municipalCountryTotalFacts: MunicipalTotalFact[],
+  presentation?: Presentation,
 ): LandingDatasetSummary {
   const countryTotal = municipalCountryTotalFacts
     .filter((fact) => fact.municipalityCode === MUNICIPAL_COUNTRY_ID)
@@ -130,7 +135,7 @@ function buildMunicipalSummary(
       .slice(0, 4)
       .map((fact) => ({
         id: fact.municipalityCode,
-        labelKa: labels.get(fact.municipalityCode)!,
+        label: presentation ? publicLabel(presentation.locale, fact.municipalityCode, labels.get(fact.municipalityCode)!, presentation.englishLabels) : labels.get(fact.municipalityCode)!,
         amountGel: fact.publicTotalGel,
         share: fact.publicTotalGel / countryTotal.publicTotalGel,
       })),
@@ -211,21 +216,22 @@ export function buildLandingModel({
   municipalCountryTotalFacts,
   debtFacts,
   balanceFacts,
-}: BuildLandingModelInput): LandingModel {
+}: BuildLandingModelInput, presentation?: Presentation): LandingModel {
   const active = chooseActivePublicFacts(facts);
   const context = buildLandingContextFromActive(
     active.filter((fact) => !isDerivedTotalItemId(fact.itemId)),
     sourceDocuments,
   );
-  const expenditure = buildNationalSummary(active, glossary, "expenditure");
-  const revenue = buildNationalSummary(active, glossary, "revenue");
-  const municipalSummary = buildMunicipalSummary(municipalities, municipalTotalFacts, municipalCountryTotalFacts);
+  const expenditure = buildNationalSummary(active, glossary, "expenditure", presentation);
+  const revenue = buildNationalSummary(active, glossary, "revenue", presentation);
+  const municipalSummary = buildMunicipalSummary(municipalities, municipalTotalFacts, municipalCountryTotalFacts, presentation);
 
   return {
     ...context,
     expenditure,
     revenue,
     municipalities: municipalSummary,
+    municipalCoverage: { municipalities: municipalities.length, regions: new Set(municipalities.map(entity => entity.regionId)).size },
     debt: buildDebtSummary(debtFacts),
     deficit: buildDeficitSummary(balanceFacts),
   };
