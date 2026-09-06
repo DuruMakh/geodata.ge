@@ -47,6 +47,28 @@ Year ranges in the UI always derive from loaded facts. Current reviewed coverage
 - General-government balance: **1995–2031** (1995–2025 actual; 2026–2031 IMF projection), published directly as percent of GDP and nominal GEL.
 - All current budget facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned budget facts ever load; debt and deficit projections use the separate `პროგნოზი` treatment.
 
+### 2.2 Bilingual presentation
+
+Georgian keeps its existing addresses; English human pages use `/en`. Both use
+this same v4.1 visual system, component hierarchy, colours, chart geometry and
+financial rules. The language switch is an accessible link and preserves the
+current page, query and explorer settings. Human navigation stays in the selected
+language; downloads and the MCP endpoint retain shared resource addresses.
+
+English names and full sentences come from reviewed catalogues and scoped
+messages. Missing English text is a validation error. Search may match either
+language while results use the selected language. Long English debt-rate labels
+wrap so domestic and external series remain distinguishable. Dates and units
+use the selected locale; numerical precision, missing/zero distinctions, basis
+markers and forecasts retain their existing meaning. English workbooks have
+Summary, Data and Sources sheets and an `-en.xlsx` suffix, with identical numbers
+and original-source selection. Original filenames remain unchanged, explicitly
+marked with their language and accompanied by translated descriptions.
+
+Review both languages at 390, 768 and 1440 pixels, including keyboard navigation,
+the compact sidebar, mobile controls, search and exports. Update the affected
+English page review dates when a translation or shared public text changes.
+
 ## 3. Design Direction
 
 The confirmed direction is a **warm editorial statistical annual**: the product should read like a precisely typeset printed reference publication, not a SaaS dashboard.

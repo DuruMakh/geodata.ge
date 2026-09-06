@@ -39,12 +39,14 @@ test("national table numbers and GDP-share settings survive a language switch", 
   await page.goto("/explorer/expenditure#g=fields&m=table&sh=1&r=2020-2025&sel=expenditure.total,spending.education");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const hash = new URL(page.url()).hash;
+  // Hydration may serialize the comma as %2C; all selected settings must agree.
+  const settings = (hash: string) => Object.fromEntries(new URLSearchParams(hash.slice(1)));
   const numbers = () => page.getByTestId("explorer-table").locator("tbody tr").evaluateAll(rows => rows.map(row => Array.from(row.querySelectorAll("td")).slice(1).map(cell => cell.textContent?.trim())));
   const before = await numbers();
   await page.getByTestId("language-switch").getByRole("link", { name: "English", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  expect(new URL(page.url()).hash).toBe(hash);
+  expect(settings(new URL(page.url()).hash)).toEqual(settings(hash));
   expect(await numbers()).toEqual(before);
   await expect(page.getByTestId("measure-share-toggle")).toHaveAccessibleName("% of GDP");
   await expectEnglishPresentation(page);
