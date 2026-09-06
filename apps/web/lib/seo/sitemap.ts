@@ -1,18 +1,18 @@
 import type { MetadataRoute } from "next";
-import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../lib/data/servedData";
-import { ADJARA_REGION_ID } from "../lib/data/municipal/types";
-import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../lib/methodology/catalog";
+import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
+import { ADJARA_REGION_ID } from "../data/municipal/types";
+import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../methodology/catalog";
 import {
   aggregateFactsForEntity,
   applyAdjaraBudgetAdjustment,
   latestReviewedAtForMunicipalFacts,
   regionFactsFor,
-} from "../lib/explorer/municipalData";
-import { MUNICIPALITY_ROUTES } from "../lib/explorer/municipalityRoutes";
-import { resolveSiteUrl } from "../lib/siteUrl";
-import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "../lib/seo/internalLinks";
-import { loadPageRevisions } from "../lib/i18n/page-revisions.server";
-import { pageHref } from "../lib/i18n/routes";
+} from "../explorer/municipalData";
+import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
+import { resolveSiteUrl } from "../siteUrl";
+import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "./internalLinks";
+import { loadPageRevisions } from "../i18n/page-revisions.server";
+import { pageHref } from "../i18n/routes";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
@@ -136,4 +136,51 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: en, lastModified: new Date([originalDate, reviewedAt].sort().at(-1)!), alternates: { languages } },
     ];
   });
+}
+
+const SITEMAP_NS = "http://www.sitemaps.org/schemas/sitemap/0.9";
+const XHTML_NS = "http://www.w3.org/1999/xhtml";
+
+const escapeXml = (value: string): string =>
+  value.replace(/[<>&'"]/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&apos;",
+  })[character]!);
+
+const serializeLastModified = (value: string | Date): string =>
+  value instanceof Date ? value.toISOString() : value;
+
+export function serializeSitemapXml(entries: MetadataRoute.Sitemap): string {
+  const urls = entries
+    .map((entry) => {
+      const alternateLinks = Object.entries(entry.alternates?.languages ?? {}).flatMap(
+        ([language, href]) => (Array.isArray(href) ? href : [href]).map((value) =>
+          `    <xhtml:link rel="alternate" hreflang="${escapeXml(language)}" href="${escapeXml(value)}" />`,
+        ),
+      );
+      const lastModified = entry.lastModified
+        ? `    <lastmod>${escapeXml(serializeLastModified(entry.lastModified))}</lastmod>`
+        : "";
+
+      return [
+        "  <url>",
+        `    <loc>${escapeXml(entry.url)}</loc>`,
+        lastModified,
+        ...alternateLinks,
+        "  </url>",
+      ].filter(Boolean).join("\n");
+    })
+    .join("\n");
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>',
+    `<urlset xmlns="${SITEMAP_NS}" xmlns:xhtml="${XHTML_NS}">`,
+    urls,
+    "</urlset>",
+    "",
+  ].join("\n");
 }

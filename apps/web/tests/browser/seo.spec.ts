@@ -414,6 +414,46 @@ test("sitemap publishes every municipality slug and no numeric municipality page
   expect(municipalityPaths.some((path) => /\/\d{2}$/.test(path))).toBe(false);
 });
 
+test("sitemap keeps its XML contract and offers a readable browser view", async ({ page, request }) => {
+  const response = await request.get(`${BASE_URL}/sitemap.xml`);
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]?.toLowerCase()).toContain("application/xml");
+
+  const xml = await response.text();
+  expect(xml).toContain('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>');
+  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(182);
+
+  const consoleIssues: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleIssues.push(message.text());
+  });
+  page.on("pageerror", (error) => consoleIssues.push(error.message));
+
+  for (const viewport of [
+    { width: 1366, height: 900 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const navigation = await page.goto(`${BASE_URL}/sitemap.xml`);
+    expect(navigation?.status()).toBe(200);
+    await expect(page).toHaveTitle("Fiscal.ge / XML sitemap");
+    await expect(page.getByRole("heading", { name: "Public pages" })).toHaveCount(1);
+    await expect(page.locator(".sitemap-row")).toHaveCount(182);
+    await expectNoPageOverflow(page);
+
+    if (viewport.width < 720) {
+      const firstRowGeometry = await page.locator(".sitemap-row").first().evaluate((row) => {
+        const url = row.querySelector<HTMLElement>(".url")!.getBoundingClientRect();
+        const lastModified = row.querySelector<HTMLElement>(".last-modified")!.getBoundingClientRect();
+        return { urlBottom: url.bottom, lastModifiedTop: lastModified.top };
+      });
+      expect(firstRowGeometry.lastModifiedTop).toBeGreaterThanOrEqual(firstRowGeometry.urlBottom);
+    }
+  }
+
+  expect(consoleIssues).toEqual([]);
+});
+
 test("municipality index server-renders the existing country and region tab links", async ({ page, request }) => {
   const response = await request.get(`${BASE_URL}/explorer/municipalities`);
   expect(response.ok()).toBe(true);

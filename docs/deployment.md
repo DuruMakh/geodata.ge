@@ -430,9 +430,10 @@ no budget data and require no migration when a code release is rolled back.
 
 ## SEO and headers
 
-- `apps/web/app/robots.ts` and `apps/web/app/sitemap.ts` generate
-  `/robots.txt` and `/sitemap.xml` at build time (sitemap `lastModified` comes
-  from the newest `lastReviewedAt` in `data/sources/source-documents.csv`).
+- `apps/web/app/robots.ts` and `apps/web/app/sitemap.xml/route.ts` generate
+  `/robots.txt` and `/sitemap.xml` at build time; the sitemap data and XML
+  serializer live in `apps/web/lib/seo/sitemap.ts` (sitemap `lastModified`
+  comes from the newest `lastReviewedAt` in `data/sources/source-documents.csv`).
 - Both pages set Georgian titles/descriptions, Open Graph tags, and canonical
   URLs; `metadataBase` comes from `resolveSiteUrl()`.
 - Security headers (nosniff, `X-Frame-Options: DENY`, referrer policy,
