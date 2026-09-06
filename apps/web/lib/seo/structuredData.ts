@@ -1,11 +1,16 @@
+import type { Locale } from "../i18n/types";
+import { pageHref, splitLanguagePath } from "../i18n/routes";
+import { seoMessage } from "./strings";
+
 export type BreadcrumbItem = {
   name: string;
   path: `/${string}` | "/";
 };
 
 export type DatasetJsonLdInput = {
+  locale: Locale;
   origin: string;
-  path: `/methodology/${string}`;
+  path: `/methodology/${string}` | `/en/methodology/${string}`;
   name: string;
   description: string;
   firstYear: number;
@@ -17,6 +22,7 @@ export type DatasetJsonLdInput = {
 };
 
 export type ExplorerDatasetJsonLdInput = {
+  locale: Locale;
   origin: string;
   path: `/${string}`;
   name: string;
@@ -36,7 +42,7 @@ export function serializeJsonLd(data: object): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }
 
-export function siteJsonLd(origin: string) {
+export function siteJsonLd(origin: string, locale: Locale = "ka") {
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -50,10 +56,9 @@ export function siteJsonLd(origin: string) {
           "@type": "ContactPoint",
           email: "info@fiscal.ge",
           contactType: "general inquiries",
-          availableLanguage: "ka",
+          availableLanguage: ["ka", "en"],
         },
-        description:
-          "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად აქვეყნებს.",
+        description: seoMessage(locale, "seo.organizationDescription"),
         logo: {
           "@type": "ImageObject",
           url: `${origin}/fiscal-ge-logo.svg`,
@@ -66,7 +71,7 @@ export function siteJsonLd(origin: string) {
         "@id": `${origin}/#website`,
         name: "Fiscal.ge",
         url: origin,
-        inLanguage: "ka",
+        inLanguage: ["ka", "en"],
         publisher: { "@id": `${origin}/#organization` },
       },
     ],
@@ -88,19 +93,19 @@ export function breadcrumbJsonLd(origin: string, items: readonly BreadcrumbItem[
 
 export function dataCatalogJsonLd(
   origin: string,
-  datasetPaths: readonly `/methodology/${string}`[],
+  datasetPaths: readonly (`/methodology/${string}` | `/en/methodology/${string}`)[],
+  locale: Locale = "ka",
 ) {
   return {
     "@context": "https://schema.org",
     "@type": "DataCatalog",
     "@id": `${origin}/methodology#catalog`,
-    name: "Fiscal.ge — ბიუჯეტის მონაცემები",
-    description:
-      "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებული მონაცემების კატალოგი.",
-    url: `${origin}/methodology`,
-    inLanguage: "ka",
+    name: seoMessage(locale, "seo.catalogName"),
+    description: seoMessage(locale, "seo.catalogDescription"),
+    url: absoluteUrl(origin, pageHref("/methodology", locale)),
+    inLanguage: ["ka", "en"],
     publisher: { "@id": `${origin}/#organization` },
-    dataset: datasetPaths.map((path) => ({ "@id": absoluteUrl(origin, path) })),
+    dataset: datasetPaths.map((path) => ({ "@id": absoluteUrl(origin, splitLanguagePath(path).pathname) })),
   };
 }
 
@@ -111,13 +116,13 @@ export function datasetJsonLd(input: DatasetJsonLdInput) {
   return {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "@id": absoluteUrl(input.origin, input.path),
+    "@id": absoluteUrl(input.origin, splitLanguagePath(input.path).pathname),
     name: input.name,
     description: input.description,
-    url: absoluteUrl(input.origin, input.path),
-    inLanguage: "ka",
+    url: absoluteUrl(input.origin, pageHref(input.path, input.locale)),
+    inLanguage: ["ka", "en"],
     temporalCoverage: `${input.firstYear}/${input.lastYear}`,
-    spatialCoverage: { "@type": "Place", name: "საქართველო" },
+    spatialCoverage: { "@type": "Place", name: seoMessage(input.locale, "seo.country") },
     dateModified: input.dateModified,
     creator: { "@id": `${input.origin}/#organization` },
     includedInDataCatalog: { "@id": `${input.origin}/methodology#catalog` },
@@ -135,6 +140,7 @@ export function datasetJsonLd(input: DatasetJsonLdInput) {
       ...(input.jsonDownloadPaths ?? []).map((jsonPath) => ({
         "@type": "DataDownload" as const,
         encodingFormat: "application/json",
+        inLanguage: ["ka", "en"],
         contentUrl: absoluteUrl(input.origin, jsonPath),
       })),
     ],
@@ -145,15 +151,15 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
   if (input.description.length < 50) {
     throw new Error("Dataset description must contain at least 50 characters");
   }
-  const url = absoluteUrl(input.origin, input.path);
+  const url = absoluteUrl(input.origin, pageHref(input.path, input.locale));
   return {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "@id": `${url}#dataset`,
+    "@id": `${absoluteUrl(input.origin, splitLanguagePath(input.path).pathname)}#dataset`,
     name: input.name,
     description: input.description,
     url,
-    inLanguage: "ka",
+    inLanguage: ["ka", "en"],
     temporalCoverage: `${input.firstYear}/${input.lastYear}`,
     spatialCoverage: { "@type": "Place", name: input.spatialCoverageName },
     dateModified: input.dateModified,

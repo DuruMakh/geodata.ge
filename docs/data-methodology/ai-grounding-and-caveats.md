@@ -4,6 +4,38 @@ This document is the single owner of the caveat catalogue used by the fact-query
 
 **A code appearing in this document is not evidence that its trigger is correct.** The firing and non-firing tests under `apps/web/tests/factQuery/caveats/` are what establish that, and they have twice caught a rule attaching a warning to figures it did not describe. Read this document to learn what a code means; read the tests to learn when it fires.
 
+## Bilingual response contract, schema 1.1.0
+
+The shared `/mcp` endpoint and all ten `/downloads/data/` publications use one
+reviewed snapshot. Descriptions, labels, definitions, missingness, comparison
+reasons and ranking explanations include Georgian and English. Caveat text is
+resolved from stable snapshot message keys; its severity, comparison effect and
+affected IDs are independent of the wording. `methodologyRef` retains the
+original owner document. `methodologyRefEn` points to the existing public English
+topic explanation: expenditure, revenue, municipalities or debt methodology, or
+the deficit explorer's source and forecast explanation. These are topic links,
+not invented English copies of internal documents.
+
+Generic source/document fields preserve the original metadata and required
+attribution. `*Ka` and `*En` companions are reviewed descriptions, not replacements
+for original legal wording. `documentLanguage` is `null` when unverified; English
+metadata does not establish that a source document is English. Narrowed source
+evidence and shared document defaults retain both languages. Full source records
+retain the archived byte sizes and hashes.
+
+No language input is needed. The same nine tools and valid requests continue to
+work; catalogue search accepts either language. Schema 1.1.0 is additive, so
+clients rejecting unknown properties or requiring exactly 1.0.0 must update.
+Translation corrections change `dataVersion`, just as other snapshot changes do.
+Responses are not byte-identical to 1.0.0. The unchanged 512 KiB complete-result
+limit counts both structured and text output; a source-heavy request can now
+require fewer sources. `result_too_large` preserves narrower-query and shared
+bulk-manifest guidance. No evidence is silently removed to make an answer fit.
+
+Both `/connect` and `/en/connect` include paired national, municipal, debt-rate
+and deficit-forecast examples. The SDK tests prove serialization and response
+contracts; they do not prove an external AI client's interpretation.
+
 ## Why caveats exist at all
 
 The query core exists so that a language model answering a question about the Georgian budget quotes reviewed figures instead of inventing them. That is only half the problem. A correct number presented without its limitation is still a wrong answer: 2004 receipts really are 2,283,035,800 GEL, and growth from that figure to 2005 is still meaningless, because the two totals count different things.

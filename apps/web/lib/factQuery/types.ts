@@ -23,7 +23,7 @@ import type {
 export type { MunicipalTotalFact } from "../data/municipal/types";
 export type { ServedNationalGdpFact } from "../servedRows";
 
-export const SCHEMA_VERSION = "1.0.0" as const;
+export const SCHEMA_VERSION = "1.1.0" as const;
 
 /** Municipal codes whose budgets are not territorially attributable (spec section 5.4). */
 export const AGGREGATE_ONLY_MUNICIPAL_CODES = ["05", "42", "43", "46", "64"] as const;
@@ -72,6 +72,7 @@ export type Caveat = {
   messageKa: string;
   messageEn: string;
   methodologyRef: string;
+  methodologyRefEn: string;
   affects: string[];
 };
 
@@ -79,8 +80,8 @@ export type Coverage = {
   requestedYears: number[];
   availableYears: number[];
   returnedYears: number[];
-  missingCells: { entityId: string; seriesId: string; year: number; reason: string }[];
-  excludedEntities: { entityId: string; reason: string }[];
+  missingCells: { entityId: string; seriesId: string; year: number; reason: string; reasonEn: string }[];
+  excludedEntities: { entityId: string; reason: string; reasonEn: string }[];
   returnedCount: number;
   expectedCount: number;
 };
@@ -89,6 +90,13 @@ export type PublicDocument = {
   documentId: string;
   title: string;
   publisher: string;
+  titleKa: string;
+  titleEn: string;
+  publisherKa: string;
+  publisherEn: string;
+  attributionKa: string | null;
+  attributionEn: string | null;
+  documentLanguage: "ka" | "en" | "mul" | null;
   officialUrl: string | null;
   archiveUrl: string | null;
   /** Years the document covers, so a grouped source can be narrowed (spec section 6.8). */
@@ -137,7 +145,11 @@ export type PublicDocument = {
  */
 export const HOISTABLE_DOCUMENT_FIELDS = [
   "publisher",
+  "publisherKa",
+  "publisherEn",
   "attribution",
+  "attributionKa",
+  "attributionEn",
   "licenceId",
   "mediaType",
   "retrievedAt",
@@ -173,6 +185,10 @@ export type ResponseSource = Omit<ResolvedSource, "documents"> & {
 export type ResolvedSource = {
   sourceId: string;
   name: string;
+  nameKa: string;
+  nameEn: string;
+  derivationKa: string | null;
+  derivationEn: string | null;
   lastReviewedAt: string;
   /**
    * Non-null when the figures behind this source are fiscal.ge's own reviewed
@@ -184,7 +200,17 @@ export type ResolvedSource = {
   documents: PublicDocument[];
 };
 
+export type RawPublicDocument = Omit<PublicDocument, "titleKa" | "titleEn" | "publisherKa" | "publisherEn" | "attributionKa" | "attributionEn" | "documentLanguage">;
+export type RawResolvedSource = Omit<ResolvedSource, "nameKa" | "nameEn" | "derivationKa" | "derivationEn" | "documents"> & { documents: RawPublicDocument[] };
+
+export type ServiceLocalization = {
+  labelsEn: Record<string, string>;
+  programmeHistoryEn: Record<string, Record<string, string>>;
+  messages: { ka: Record<string, string>; en: Record<string, string> };
+};
+
 export type FactQuerySnapshot = {
+  localization: ServiceLocalization;
   schemaVersion: typeof SCHEMA_VERSION;
   dataVersion: string;
   releaseCommit: string;

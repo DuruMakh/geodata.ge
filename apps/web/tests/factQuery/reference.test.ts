@@ -80,6 +80,23 @@ describe("section 14.3 bilingual reference fixture", () => {
       it("returns the reviewed answer with its scope, sources and caveats", () => {
         const response = run(intent.call.tool, intent.call.arguments);
 
+        function verifyLanguageCompanions(value: unknown): void {
+          if (value === null || typeof value !== "object") return;
+          const record = value as Record<string, unknown>;
+          for (const [key, item] of Object.entries(record)) {
+            if (key.endsWith("Ka")) {
+              const translated = record[`${key.slice(0, -2)}En`];
+              if (item === null) expect(translated).toBeNull();
+              else {
+                expect(typeof translated, key).toBe("string");
+                expect((translated as string).trim().length, key).toBeGreaterThan(0);
+              }
+            }
+            verifyLanguageCompanions(item);
+          }
+        }
+        verifyLanguageCompanions(response);
+
         expect(response.status, "status").toBe(intent.expectedStatus);
 
         if (intent.expectedStatus === "error") {

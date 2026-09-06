@@ -7,6 +7,10 @@ import path from "node:path";
 import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
+import { loadEnglishCatalogue } from "../i18n/catalogue.server";
+import { serviceMessagesSchema, validateServiceMessages } from "../i18n/validation";
+import type { EnglishCatalogue } from "../i18n/types";
+import { SERVICE_MESSAGE_KEYS } from "./localization";
 import { loadServedExplorerData, loadServedMunicipalData } from "../data/servedData";
 import { loadTaxonomyFiles } from "../data/taxonomy";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
@@ -19,7 +23,7 @@ import { loadServedGovernmentDebtData } from "../data/governmentDebt/importGover
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { hashDataVersion } from "./canonical";
 import { resolvePublicSources, type ManifestDocument } from "./sources";
-import { SCHEMA_VERSION, type BudgetItemMeta, type FactQuerySnapshot, type ResolvedSource } from "./types";
+import { AGGREGATE_ONLY_MUNICIPAL_CODES, DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_ID, SCHEMA_VERSION, type BudgetItemMeta, type FactQuerySnapshot, type RawResolvedSource, type ResolvedSource, type ServiceLocalization } from "./types";
 
 export type BuildSnapshotOptions = { releaseCommit: string; generatedAt: string };
 
@@ -73,9 +77,8 @@ function isCleanHttpsUrl(value: string): boolean {
   }
 }
 
-// Same field set as workbookSources.ts's own gdpWorkbookSourceRowSchema (not
-// reused directly: that schema omits source_id, the field this loader exists
-// to keep — see the note below), but with the tightened https check above in
+// Kept separate from workbookSources.ts's gdpWorkbookSourceRowSchema to use
+// the tightened https check above in
 // place of zod's `.url()`, so this path and the officialUrl guard just below
 // cannot drift onto two different definitions of "a real URL". Not
 // `.strict()`: like its sibling, this only names the columns it needs out of
@@ -298,7 +301,7 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
 // cache: nothing here depends on GEODATA_DATA_SOURCE or needs per-test
 // isolation.
 let manifestDocumentsPromise: Promise<ManifestDocument[]> | null = null;
-function loadManifestDocuments(): Promise<ManifestDocument[]> {
+export function loadManifestDocuments(): Promise<ManifestDocument[]> {
   manifestDocumentsPromise ??= loadManifestDocumentsUncached();
   return manifestDocumentsPromise;
 }
@@ -396,15 +399,79 @@ function sortedBy<T>(rows: T[], ...keys: Array<(row: T) => string | number>): T[
   return [...rows].sort(compareBy(...keys));
 }
 
+export function enrichSourceTranslations(sources: readonly RawResolvedSource[], catalogue: EnglishCatalogue, kaMessages: Readonly<Record<string, string>>): ResolvedSource[] {
+  function kaText(original: string, key: string): string {
+    if (Object.hasOwn(kaMessages, key) && kaMessages[key].trim()) return kaMessages[key];
+    // Build-time validation only: an English original needs an explicitly authored
+    // Georgian companion. Queries never inspect or infer a field's language.
+    if (/\p{Script=Georgian}/u.test(original)) return original;
+    throw new Error(`Missing reviewed Georgian source companion: ${key}`);
+  }
+  return sources.map(source => {
+    const translation = catalogue.sources[source.sourceId];
+    if (!translation || (source.derivation !== null && !translation.derivation)) throw new Error(`Missing reviewed source translation: ${source.sourceId}`);
+    return {
+      ...source,
+      nameKa: kaText(source.name, `sources.${source.sourceId}.name`),
+      nameEn: translation.name.text,
+      derivationKa: source.derivation === null ? null : kaText(source.derivation, `sources.${source.sourceId}.derivation`),
+      derivationEn: source.derivation === null ? null : translation.derivation!.text,
+      documents: source.documents.map(document => {
+        const translated = catalogue.documents[document.documentId];
+        if (!translated || (document.attribution !== null && !translated.attribution)) throw new Error(`Missing reviewed document translation: ${document.documentId}`);
+        return {
+          ...document,
+          titleKa: kaText(document.title, `documents.${document.documentId}.title`), titleEn: translated.title.text,
+          publisherKa: kaText(document.publisher, `documents.${document.documentId}.publisher`), publisherEn: translated.publisher.text,
+          attributionKa: document.attribution === null ? null : kaText(document.attribution, `documents.${document.documentId}.attribution`),
+          attributionEn: document.attribution === null ? null : translated.attribution!.text,
+          documentLanguage: translated.documentLanguage,
+        };
+      }),
+    };
+  });
+}
+
 export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Promise<FactQuerySnapshot> {
-  const [explorer, municipal, taxonomy, manifestDocuments, debt, deficit] = await Promise.all([
+  const repositoryRoot = path.resolve(process.cwd(), "../..");
+  const [explorer, municipal, taxonomy, manifestDocuments, debt, deficit, catalogue, serviceKa, serviceEn] = await Promise.all([
     loadServedExplorerData(),
     loadServedMunicipalData(),
     loadTaxonomyFiles("../../data/taxonomy"),
     loadManifestDocuments(),
     loadServedGovernmentDebtData(),
     loadServedGeneralGovernmentBalanceData(),
+    loadEnglishCatalogue(repositoryRoot),
+    readFile(path.join(repositoryRoot, "data/localization/ka/service-messages.json"), "utf8").then(text => serviceMessagesSchema.parse(JSON.parse(text))),
+    readFile(path.join(repositoryRoot, "data/localization/en/service-messages.json"), "utf8").then(text => serviceMessagesSchema.parse(JSON.parse(text))),
   ]);
+  const messageErrors = validateServiceMessages(serviceKa, serviceEn);
+  if (messageErrors.length) throw new Error(messageErrors.join("\n"));
+  const labelIds = [...new Set([
+    ...explorer.glossary.keys(), ...explorer.adminCategories.map(category => category.id),
+    ...explorer.adminFacts.map(fact => fact.itemId),
+    "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia",
+    ...municipal.functions.map(item => item.id), ...municipal.regions.map(region => region.id),
+    ...municipal.municipalities.map(entity => entity.code), ...AGGREGATE_ONLY_MUNICIPAL_CODES,
+    ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID,
+    "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
+  ])].sort();
+  const localization: ServiceLocalization = {
+    labelsEn: Object.fromEntries(labelIds.map(id => {
+      if (!catalogue.labels[id]) throw new Error(`Missing reviewed service label: ${id}`);
+      return [id, catalogue.labels[id].text];
+    })),
+    programmeHistoryEn: {},
+    messages: {
+      ka: Object.fromEntries(SERVICE_MESSAGE_KEYS.map(key => [key, serviceKa[key]])),
+      en: Object.fromEntries(SERVICE_MESSAGE_KEYS.map(key => [key, serviceEn[key]])),
+    },
+  };
+  for (const fact of explorer.adminFacts.filter(fact => fact.level === "major_program")) {
+    const translated = catalogue.programmeHistory[fact.itemId]?.[fact.year];
+    if (!translated || translated.originalKa !== fact.officialLabelKa) throw new Error(`Missing or stale reviewed programme history: ${fact.itemId}:${fact.year}`);
+    (localization.programmeHistoryEn[fact.itemId] ??= {})[fact.year] = translated.text;
+  }
 
   // explorer.sourceDocuments' incoming order is not hash-safe either: the CSV
   // loader (lib/data/sources.ts) returns source-documents.csv's file row
@@ -417,7 +484,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
   // manifests' own source_id, unique across all four manifests — verified by
   // inspection, not just assumed).
   const sources: ResolvedSource[] = sortedBy(
-    resolvePublicSources({ sourceDocuments: explorer.sourceDocuments, manifestDocuments }),
+    enrichSourceTranslations(resolvePublicSources({ sourceDocuments: explorer.sourceDocuments, manifestDocuments }), catalogue, serviceKa),
     (source) => source.sourceId,
   ).map((source) => ({
     ...source,
@@ -462,6 +529,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
 
   const content = {
     schemaVersion: SCHEMA_VERSION,
+    localization,
     national: {
       facts: sortedBy(
         explorer.facts,

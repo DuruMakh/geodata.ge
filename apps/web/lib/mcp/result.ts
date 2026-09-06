@@ -6,11 +6,12 @@
 // logging. The route wires it; this file decides shape and size.
 import { INPUT_LIMITS } from "../factQuery/schemas";
 import { buildResponseMeta } from "../factQuery/meta";
+import { serviceMessage } from "../factQuery/localization";
 import type { Comparison } from "../factQuery/compare";
 import type { GetSourcesData, ResolvedSourceView } from "../factQuery/getSources";
 import type { RankData } from "../factQuery/rank";
 import type { Observation } from "../factQuery/observations";
-import type { Caveat, FactQueryResponse, FactQuerySnapshot, ResponseSource } from "../factQuery/types";
+import type { Caveat, FactQueryResponse, FactQuerySnapshot, ResponseSource, ResolvedSource } from "../factQuery/types";
 
 /** Spec section 11.3's operating limits, one constant per row of that table. */
 export const LIMITS = {
@@ -26,9 +27,8 @@ export const LIMITS = {
   /**
    * Serialized tool result, including evidence and BOTH representations.
    *
-   * This is the binding gate, not `cells`. Measured on real municipal data, a
-   * compliant 495-cell request serializes to 517.0 KiB at roughly 936 bytes of
-   * JSON per observation - so a request can satisfy the cell cap and still
+   * This is the binding gate, not `cells`. A real 495-cell municipal request
+   * exceeds this ceiling even though it satisfies the cell cap, and can still
    * produce a response this ceiling must refuse. Sources and warnings are never
    * silently trimmed to fit; the whole result is refused with guidance instead.
    */
@@ -69,7 +69,9 @@ function observationLine(observation: Observation): string {
     observation.value === null ? `missing${observation.missingReason ? ` (${observation.missingReason})` : ""}` : observation.value;
   return line(
     observation.entityLabelKa,
+    observation.entityLabelEn,
     observation.seriesLabelKa,
+    observation.seriesLabelEn,
     observation.year,
     observation.measure,
     value,
@@ -80,14 +82,22 @@ function observationLine(observation: Observation): string {
     // that makes these figures unsafe to subtract from each other.
     observation.budgetScope,
     observation.valueDefinition,
+    observation.valueDefinitionEn,
+    observation.missingReasonEn,
     observation.caveatIds.join(","),
+    observation.entityId,
+    observation.seriesId,
+    observation.sourceIds.join(","),
+    observation.documentIds.join(","),
   );
 }
 
 function comparisonLine(comparison: Comparison): string {
   return line(
     comparison.entityLabelKa,
+    comparison.entityLabelEn,
     comparison.seriesLabelKa,
+    comparison.seriesLabelEn,
     `${comparison.from.year}→${comparison.to.year}`,
     comparison.measure,
     comparison.from.value,
@@ -103,7 +113,22 @@ function comparisonLine(comparison: Comparison): string {
     // `not_comparable`, two populated endpoints and empty change columns, and
     // no statement of what makes the two years incompatible.
     comparison.reasons.join(","),
+    comparison.reasonsEn.join(","),
+    comparison.from.valueDefinition,
+    comparison.from.valueDefinitionEn,
+    comparison.to.valueDefinition,
+    comparison.to.valueDefinitionEn,
+    comparison.from.missingReason,
+    comparison.from.missingReasonEn,
+    comparison.to.missingReason,
+    comparison.to.missingReasonEn,
     comparison.caveatIds.join(","),
+    comparison.entityId,
+    comparison.seriesId,
+    comparison.from.sourceIds.join(","),
+    comparison.from.documentIds.join(","),
+    comparison.to.sourceIds.join(","),
+    comparison.to.documentIds.join(","),
   );
 }
 
@@ -111,17 +136,17 @@ function sourceView(source: ResolvedSourceView): string {
   return line(source.sourceId, source.name, source.documents.length, source.narrowingOutcome);
 }
 
-function excludedLines(coverage: { excludedEntities: { entityId: string; reason: string }[] }): string[] {
-  return coverage.excludedEntities.map((entity) => `excluded ${entity.entityId}: ${entity.reason}`);
+function excludedLines(coverage: { excludedEntities: { entityId: string; reason: string; reasonEn: string }[] }): string[] {
+  return coverage.excludedEntities.map((entity) => `excluded ${entity.entityId}: ${entity.reason} | ${entity.reasonEn}`);
 }
 
 function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryResponse["kind"], "error"> }>): string[] {
   const data = response.data as Record<string, unknown>;
 
   if (response.kind === "observations") {
-    const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number; excludedEntities: { entityId: string; reason: string }[] } };
+    const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number; excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
     return [
-      "# entity\tseries\tyear\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinition\tcaveats",
+      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyear\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinitionKa\tdefinitionEn\tmissingReasonEn\tcaveats\tentityId\tseriesId\tsourceIds\tdocumentIds",
       ...observations.map(observationLine),
       `returned ${coverage.returnedCount} of ${coverage.expectedCount} requested cells`,
       ...excludedLines(coverage),
@@ -129,27 +154,29 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   }
 
   if (response.kind === "comparisons") {
-    const { comparisons, coverage } = data as { comparisons: Comparison[]; coverage: { excludedEntities: { entityId: string; reason: string }[] } };
+    const { comparisons, coverage } = data as { comparisons: Comparison[]; coverage: { excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
     return [
-      "# entity\tseries\tyears\tmeasure\tfrom\tto\tfromBasis\ttoBasis\tchange\tpct\tpp\tunit\tcomparability\treasons\tcaveats",
+      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyears\tmeasure\tfrom\tto\tfromBasis\ttoBasis\tchange\tpct\tpp\tunit\tcomparability\treasonsKa\treasonsEn\tfromDefinitionKa\tfromDefinitionEn\ttoDefinitionKa\ttoDefinitionEn\tfromMissingKa\tfromMissingEn\ttoMissingKa\ttoMissingEn\tcaveats\tentityId\tseriesId\tfromSources\tfromDocuments\ttoSources\ttoDocuments",
       ...comparisons.map(comparisonLine),
       ...excludedLines(coverage),
     ];
   }
 
   if (response.kind === "ranking") {
-    const { entries, universe, exclusions, rankingDefinition } = data as RankData;
+    const { entries, universe, exclusions, rankingDefinition, rankingDefinitionEn } = data as RankData;
     return [
       rankingDefinition,
-      "# position\tentity\tseries\tvalue\tunit\ttied\tcaveats",
+      rankingDefinitionEn,
+      `${universe.description} | ${universe.descriptionEn}`,
+      "# position\tentityKa\tentityEn\tseriesKa\tseriesEn\tvalue\tunit\tbasis\ttied\tcaveats\tentityId\tseriesId",
       ...entries.map((entry) =>
-        line(entry.position, entry.entityLabelKa, entry.seriesLabelKa, entry.value, entry.unit, entry.tied ? "tied" : "", entry.caveatIds.join(",")),
+        line(entry.position, entry.entityLabelKa, entry.entityLabelEn, entry.seriesLabelKa, entry.seriesLabelEn, entry.value, entry.unit, entry.basis, entry.tied ? "tied" : "", entry.caveatIds.join(","), entry.entityId, entry.seriesId),
       ),
       `${universe.returnedCount} of ${universe.eligibleCount} eligible from ${universe.candidateCount} candidates` +
         (universe.cutoffSplitsTie ? " — the cutoff splits a tie, so the last place is arbitrary" : ""),
       // One line per reason. Printing the reason once per entity repeated the
       // same sentence sixty-four times.
-      ...exclusions.map((group) => `excluded (${group.reason}): ${group.ids.join(", ")}`),
+      ...exclusions.map((group) => `excluded (${group.reason} | ${group.reasonEn}): ${group.ids.join(", ")}`),
     ];
   }
 
@@ -160,7 +187,7 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
       ...sources.flatMap((source) => [
         sourceView(source),
         ...(source.narrowingOutcome === "dropped_no_match" ? ["No document matched the requested filters; showing the full source instead."] : []),
-        ...source.documents.map((document) => line(document.documentId, document.title, document.publisher, document.years.join(","), document.officialUrl, document.archiveUrl, document.sha256, document.byteSize)),
+        ...sourceLines(source),
       ]),
       ...(narrowedBy === null ? [] : [`requested filters: ${JSON.stringify(narrowedBy)}`]),
     ];
@@ -175,16 +202,26 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   return [JSON.stringify(data)];
 }
 
+function sourceLines(source: ResponseSource | ResolvedSource): string[] {
+  const defaults = "documentDefaults" in source ? source.documentDefaults : undefined;
+  return [
+    line(source.sourceId, source.nameKa, source.nameEn, source.name, source.derivationKa, source.derivationEn, source.derivation, source.lastReviewedAt),
+    ...(defaults ? [`document defaults: ${JSON.stringify(defaults)}`] : []),
+    "# documentId\ttitleKa\ttitleEn\toriginalTitle\tyears\tofficialUrl\tarchiveUrl\tdocumentLanguage\tmetadata",
+    ...source.documents.map(document => {
+      const { documentId, titleKa, titleEn, title, years, officialUrl, archiveUrl, documentLanguage, ...metadata } = document;
+      return line(documentId, titleKa, titleEn, title, years.join(","), officialUrl, archiveUrl, documentLanguage, JSON.stringify(metadata));
+    }),
+  ];
+}
+
 function evidenceOf(sources: readonly ResponseSource[], caveats: readonly Caveat[]): string[] {
   const out: string[] = [];
 
   if (sources.length > 0) {
     out.push("", "## წყაროები / sources");
     for (const source of sources) {
-      out.push(`${source.sourceId} — ${source.name}${source.derivation === null ? "" : ` [derived: ${source.derivation}]`}`);
-      for (const document of source.documents) {
-        out.push(`  · ${document.title} — ${document.archiveUrl ?? document.officialUrl ?? "(no public link)"}`);
-      }
+      out.push(...sourceLines(source));
     }
   }
 
@@ -197,6 +234,7 @@ function evidenceOf(sources: readonly ResponseSource[], caveats: readonly Caveat
     out.push("", "## შენიშვნები / caveats");
     for (const caveat of ordered) {
       out.push(`${caveat.code} (${caveat.severity}): ${caveat.messageKa} | ${caveat.messageEn}`);
+      out.push(`methodology: ${caveat.methodologyRef} | ${caveat.methodologyRefEn}; affects: ${caveat.affects.join(",")}`);
     }
   }
 
@@ -230,7 +268,7 @@ export function renderText(response: FactQueryResponse): string {
     ].join("\n");
   }
 
-  return [...header, "", ...bodyOf(response), ...evidenceOf(response.meta.sources, response.meta.caveats)].join("\n");
+  return [...header, "", ...bodyOf(response), ...evidenceOf(response.kind === "sources" ? [] : response.meta.sources, response.meta.caveats)].join("\n");
 }
 
 /** Shapes one envelope. Applies no limit - see boundedToolResult. */
@@ -250,24 +288,16 @@ export function tooLargeResponse(
   snapshot: FactQuerySnapshot,
   detail: { returned: number; bytes: number },
 ): FactQueryResponse {
-  const howToNarrow =
-    "Narrow the request and ask again: fewer years first, then fewer entities, then fewer series. " +
-    `For a whole dataset, download the published file instead: ${BULK_DATA_URL}`;
+  const key = detail.bytes > 0 ? "errors.resultTooLargeBytes" : "errors.resultTooLargeCells";
+  const values = { cells: detail.returned, ...(detail.bytes > 0 ? { kib: Math.round(detail.bytes / 1024) } : {}), bulkUrl: BULK_DATA_URL };
 
   return {
     kind: "error",
     status: "error",
     error: {
       code: "result_too_large",
-      messageKa:
-        `შედეგი ზედმეტად დიდია: ${detail.returned} უჯრა` +
-        (detail.bytes > 0 ? `, ${Math.round(detail.bytes / 1024)} კბ` : "") +
-        `. დააზუსტეთ მოთხოვნა — ჯერ ნაკლები წელი, შემდეგ ნაკლები ერთეული, ბოლოს ნაკლები სერია. ` +
-        `მთლიანი მონაცემთა ნაკრებისთვის ჩამოტვირთეთ გამოქვეყნებული ფაილი: ${BULK_DATA_URL}`,
-      messageEn:
-        `Result too large: ${detail.returned} cells` +
-        (detail.bytes > 0 ? `, ${Math.round(detail.bytes / 1024)} KiB` : "") +
-        `. ${howToNarrow}`,
+      messageKa: serviceMessage(snapshot, "ka", key, values),
+      messageEn: serviceMessage(snapshot, "en", key, values),
       retryable: true,
     },
     meta: buildResponseMeta(snapshot),

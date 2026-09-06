@@ -412,7 +412,7 @@ describe("queryMunicipal", () => {
       expect(coverage.returnedYears).toEqual([2015, 2024]);
     });
 
-    it("carries the entity slug as a url handle and Georgian labels only", () => {
+    it("carries the entity slug as a url handle and reviewed bilingual labels", () => {
       const result = queryMunicipal(snapshot, {
         entityIds: [KHULO],
         seriesIds: [TOTAL],
@@ -423,7 +423,8 @@ describe("queryMunicipal", () => {
       const observation = cell(result, KHULO, 2024);
       expect(observation?.entitySlug).toBe(snapshot.municipal.slugByCode[KHULO]);
       expect(observation?.entityLabelKa).toBe("ხულო");
-      expect(Object.keys(observation ?? {}).some((key) => key.endsWith("En"))).toBe(false);
+      expect(observation?.entityLabelEn).toBe("Khulo");
+      expect(observation?.seriesLabelEn).toBe("Total budget");
     });
 
     it("rejects a stale expectedDataVersion", () => {

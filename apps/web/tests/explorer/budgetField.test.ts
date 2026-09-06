@@ -1,7 +1,8 @@
 import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
 import { BudgetField } from "../../components/analysis/budget-field";
+import analysis from "../../lib/i18n/messages/ka/analysis.json";
 import type { SnapshotItem } from "../../lib/explorer/types";
 
 const items: SnapshotItem[] = [
@@ -44,7 +45,7 @@ const items: SnapshotItem[] = [
 ];
 
 function renderedChart(chartItems: SnapshotItem[] = items): string {
-  return renderToStaticMarkup(createElement(BudgetField, { items: chartItems }));
+  return renderGeorgianMarkup(createElement(BudgetField, { items: chartItems }), analysis);
 }
 
 function attribute(markup: string, name: string): string {

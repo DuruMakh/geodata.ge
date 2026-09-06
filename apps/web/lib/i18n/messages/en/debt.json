@@ -1,0 +1,19 @@
+{
+  "debt.heading": "How much the government owes and how it is repaid",
+  "debt.stock": "Government debt",
+  "debt.service": "Debt service",
+  "debt.rate": "Interest rate",
+  "debt.forecast": "Forecast",
+  "debt.caption": "{family}, {start}–{end}",
+  "debt.expand": "{name} — expand subseries",
+  "debt.collapse": "{name} — collapse subseries",
+  "debt.portfolioForecast": "The 2026–2030 forecast covers the debt portfolio outstanding on 31 December 2025. It is a repayment schedule for that portfolio, rather than a complete forecast of future government budgets.",
+  "debt.source": "Data: Ministry of Finance of Georgia. The figures cover government debt, which has a narrower scope than public or state debt.",
+  "debt.comparability": "When comparing years, consider the 2019 change in the accounting of budgetary organisations and the 2022 change in which state-owned enterprises fall within general government.",
+  "debt.missingRates": " Unpublished rates remain missing; they have not been replaced with zero.",
+  "debt.metaTitle": "Georgia government debt {first}–{last} | Fiscal.ge",
+  "debt.description": "Georgia’s government debt stock, debt service and interest rates, {first}–{last}.",
+  "debt.datasetForecast": "Debt service for 2026–2030 is a forecast for the portfolio outstanding on 31 December 2025.",
+  "debt.datasetName": "Georgia government debt",
+  "debt.georgia": "Georgia"
+}

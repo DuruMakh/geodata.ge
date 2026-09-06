@@ -8,13 +8,18 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 import { CAVEAT_RULES } from "../../../lib/factQuery/caveats";
+import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import { serviceMessage } from "../../../lib/factQuery/localization";
+import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 
 const DOC_PATH = path.join(process.cwd(), "..", "..", "docs", "data-methodology", "ai-grounding-and-caveats.md");
 
 let doc: string;
+let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
   doc = await readFile(DOC_PATH, "utf8");
+  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" });
 });
 
 describe("caveat catalogue documentation", () => {
@@ -32,8 +37,8 @@ describe("caveat catalogue documentation", () => {
     // A paraphrase here would let the documented meaning drift away from what
     // a consumer actually receives.
     for (const rule of CAVEAT_RULES) {
-      expect(doc, `${rule.code} messageKa`).toContain(rule.messageKa);
-      expect(doc, `${rule.code} messageEn`).toContain(rule.messageEn);
+      expect(doc, `${rule.code} messageKa`).toContain(serviceMessage(snapshot, "ka", rule.messageKey));
+      expect(doc, `${rule.code} messageEn`).toContain(serviceMessage(snapshot, "en", rule.messageKey));
     }
   });
 

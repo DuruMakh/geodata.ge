@@ -1,6 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
+import { publicLabel } from "../../lib/i18n/labels";
+import { matchesLabelQuery } from "../../lib/i18n/search";
+import { pageHref } from "../../lib/i18n/routes";
+import { MUNICIPAL_COUNTRY_BUDGET_COUNT } from "../../lib/explorer/municipalData";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { MunicipalKpi, MunicipalListRow } from "../../lib/explorer/municipalData";
@@ -23,6 +29,16 @@ type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResident
 };
 
 export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
+  const { locale, messages, englishLabels } = useI18n();
+  function subtitleFor(row: MunicipalListRow): string {
+    if (locale === "ka") return row.subtitleKa;
+    if (row.kind === "municipality" && row.regionId) return publicLabel(locale, row.regionId, row.subtitleKa, englishLabels);
+    if (row.kind === "region") {
+      const count = props.municipalities.filter(member => member.regionId === row.id).length;
+      return message(messages, count === 1 ? "municipal.memberOne" : "municipal.members", { count });
+    }
+    return message(messages, "municipal.budgets", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT });
+  }
   const router = useRouter();
   const [level, setLevel] = useState<"muni" | "region">("muni");
   const [query, setQuery] = useState("");
@@ -43,9 +59,10 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
   useEffect(() => {
     try {
       // Clearing the hash must restore the path (and any query string), not
-      // write a literal space or silently drop `?...`.
+      // write a literal space or silently drop `?...`. Preserve the router's
+      // history entry: this mount effect can run before its history wrapper.
       history.replaceState(
-        null,
+        history.state,
         "",
         level === "region" ? "#lvl=region" : `${window.location.pathname}${window.location.search}`,
       );
@@ -70,13 +87,13 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
     const needle = query.trim();
     if (needle === "") return sources;
     const filter = (rows: MunicipalListRow[]) =>
-      rows.filter((row) => row.nameKa.includes(needle) || row.subtitleKa.includes(needle));
+      rows.filter((row) => matchesLabelQuery(needle, [row.nameKa, row.subtitleKa, publicLabel("en", row.id, row.nameKa, englishLabels), ...(row.regionId ? [publicLabel("en", row.regionId, row.subtitleKa, englishLabels)] : [])]));
     return { muni: filter(sources.muni), region: filter(sources.region) };
-  }, [sources, query]);
+  }, [sources, query, englishLabels]);
   const source = sources[level];
   const rows = rowsByLevel[level];
 
-  const openMunicipality = (code: string) => router.push(municipalityHrefForCode(code));
+  const openMunicipality = (code: string) => router.push(pageHref(municipalityHrefForCode(code), locale));
 
   function renderRowsFor(panelLevel: "muni" | "region") {
     const panelRows = rowsByLevel[panelLevel];
@@ -92,7 +109,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
         {panelRows.map((row) => (
           <Link
             key={row.id}
-            href={municipalEntityHref(row.kind, row.id)}
+            href={pageHref(municipalEntityHref(row.kind, row.id), locale)}
             data-testid={activePanel ? "municipal-list-row" : undefined}
             data-municipality-row-code={row.kind === "municipality" ? row.id : undefined}
             data-active={row.kind === "municipality" && row.id === activeMunicipalityCode ? "true" : undefined}
@@ -117,9 +134,9 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
             </span>
             <span className="min-w-0">
               <span data-testid="municipal-row-name" className="block truncate text-[12.5px] font-medium">
-                {row.nameKa}
+                {publicLabel(locale, row.id, row.nameKa, englishLabels)}
               </span>
-              <span className="block truncate text-[10.5px] text-[var(--faint)]">{row.subtitleKa}</span>
+              <span className="block truncate text-[10.5px] text-[var(--faint)]">{subtitleFor(row)}</span>
               <span className="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
                 <span
                   data-testid="municipal-row-bar"
@@ -130,11 +147,11 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
             </span>
             <span className="min-w-0 text-right font-[family-name:var(--font-numeric)]">
               <span data-testid="municipal-row-primary-amount" className="block text-[11.5px]">
-                {formatAmount(row.valueGel)}
+                {formatAmount(row.valueGel, locale)}
               </span>
               {row.budgetPerResidentGel !== null ? (
                 <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[10px] leading-[1.25] text-[var(--muted)]">
-                  {formatPerResidentGel(row.budgetPerResidentGel).replace(" ₾", "")} ერთ სულზე
+                  {message(messages, "municipal.perResidentShort", { amount: formatPerResidentGel(row.budgetPerResidentGel, locale).replace(locale === "ka" ? " ₾" : " GEL", "") })}
                 </span>
               ) : null}
             </span>
@@ -167,7 +184,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
 
           <div className="mt-8 border-t-2 border-[var(--ink)] pt-5">
             <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">
-              ძირითადი ინდიკატორები
+              {message(messages, "municipal.indicators")}
             </h2>
             <div data-testid="index-kpi-grid" className="grid grid-cols-2 gap-8 @min-[1100px]:grid-cols-4">
               {props.kpis.map((kpi) => (
@@ -189,11 +206,11 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
         <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
           <div className="flex items-baseline justify-between gap-2.5 border-b-2 border-[var(--ink)] pb-2">
             <span className="flex items-baseline gap-3.5">
-              <TextTab label="მუნიციპალიტეტები" active={level === "muni"} onClick={() => setLevel("muni")} testId="level-muni" />
+              <TextTab label={message(messages, "municipal.municipalities")} active={level === "muni"} onClick={() => setLevel("muni")} testId="level-muni" />
               <TabDivider />
-              <TextTab label="რეგიონები" active={level === "region"} onClick={() => setLevel("region")} testId="level-region" />
+              <TextTab label={message(messages, "municipal.regions")} active={level === "region"} onClick={() => setLevel("region")} testId="level-region" />
             </span>
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">₾</span>
+            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{message(messages, "municipal.gel")}</span>
           </div>
 
           <div className="flex items-center gap-2 pt-3 pb-1">
@@ -201,8 +218,8 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               data-testid="municipal-search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="ძებნა"
-              aria-label="ძებნა"
+              placeholder={message(messages, "municipal.search")}
+              aria-label={message(messages, "municipal.search")}
               className="h-[38px] min-w-0 flex-1 rounded-[3px] border border-[var(--control)] bg-[var(--tile)] px-[11px] text-[13px] text-[var(--ink)] outline-none focus:border-[var(--ink)]"
             />
             <span data-testid="row-count" className="font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--faint)]">
@@ -212,13 +229,13 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
 
           {rows.length === 0 ? (
             <div data-testid="municipal-empty" className="px-1 py-[26px] text-center">
-              <div className="text-[13px] text-[var(--body)]">ვერაფერი მოიძებნა</div>
+              <div className="text-[13px] text-[var(--body)]">{message(messages, "municipal.empty")}</div>
               <button
                 type="button"
                 onClick={() => setQuery("")}
                 className="mt-3 inline-flex h-[30px] cursor-pointer items-center rounded-[3px] border border-[var(--control)] px-3 text-[12px] text-[var(--accent)]"
               >
-                ძებნის გასუფთავება
+                {message(messages, "municipal.clearSearch")}
               </button>
             </div>
           ) : (
@@ -235,7 +252,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
           {/* The choropleth is a vendored OSM derivative, so ODbL §4.3 attribution
               belongs wherever it is publicly used. Fixed text, so it lives here
               rather than being threaded through the page as data. */}
-          საზღვრები:{" "}
+          {message(messages, "municipal.boundaries")}{" "}
           <a
             href="https://www.openstreetmap.org/copyright"
             target="_blank"

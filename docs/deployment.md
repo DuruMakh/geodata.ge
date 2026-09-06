@@ -5,6 +5,52 @@ project configuration and the operational workflows: the production deploy pipel
 variables, GitHub Actions credentials, the runbook, the scheduled health
 check, and connecting the custom domain.
 
+## Bilingual release contract
+
+The current human route inventory contains 91 page identities, each with Georgian
+and English HTML (182 sitemap URLs). Georgian addresses remain unchanged; English
+uses `/en`, self canonicals and reciprocal `ka`/`en`/`x-default` links. Sitemap
+Georgian dates retain existing data/content freshness; English dates use the later
+of that date and the reviewed translation date. Do not infer indexing from a
+successful build or deployment.
+
+`/mcp`, `/downloads/`, `/robots.txt`, `/sitemap.xml` and `/llms.txt` remain shared.
+The two social images at `/opengraph-image` and `/en/opengraph-image` use explicit
+`force-static` GET routes, avoiding Next.js route-group filename suffixes. Both
+are generated at build time. All human pages remain prerendered and `/mcp` remains
+the sole request-time route; the older all-static description below predates MCP.
+
+Schema 1.1.0 adds reviewed language companions to the same nine MCP tools and ten
+JSON publications. Requests do not gain a language argument. Clients must accept
+new fields and version 1.1.0; byte-identical response compatibility is not promised.
+Translation changes alter `dataVersion`. Retain the existing body, cell, pair,
+ranking, byte, duration, rate and pause limits. Large bilingual evidence responses
+can require narrower queries; never trim evidence or increase limits to fit.
+
+The existing `npm run check` includes translation validation; `prebuild` prepares
+the snapshot/publications, and `postbuild` verifies publication hashes. Before
+release, run the full browser suite against the new build and inspect both image
+URLs, language-switch state, original archives and English workbook sheets.
+`scripts/measure-bilingual-output.ts` records decoded HTML/asset bytes separately
+from supplied encoded-length headers, build inventory, publication hashes and
+baseline comparison; `scripts/measure-bilingual-mcp.ts` retains complete-result
+measurements. Reports are local evidence under `.tmp/bilingual/`, not deployment
+proof. A local CSV build with credential-free database-loader fixtures does not
+replace the production pipeline's database-mode parity check. Verify the deployed
+commit and both language URL families separately after an authorized release.
+
+The 2026-09-06 local comparison measured 99 to 191 static-generation entries,
+37.59 to 46.13 seconds of build time, and 2,404,505 to 2,553,522 decoded bytes of
+emitted client JavaScript (6.2% growth); emitted fonts stayed at 335,992 bytes.
+These are observed build/file measurements, not network timing or a performance
+guarantee. Snapshot size grew from 3,485,225 to 3,760,913 bytes. Original snapshot
+fields and source records were checked against the F1 baseline; only added
+translations and version/release metadata differ. The 100-source MCP batch newly
+exceeds the unchanged 512 KiB cap; ordinary measured requests retain their prior
+acceptance. Reproducing the asset comparison requires the exact baseline build
+at `.tmp/bilingual/baseline-checkout` (detached `ac9f53fc0`, CSV mode, same lockfile)
+alongside the current build. The full local report is `.tmp/bilingual/final/comparison.md`.
+
 ## Vercel project
 
 | Setting | Value |

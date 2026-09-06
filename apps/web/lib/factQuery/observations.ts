@@ -11,10 +11,8 @@ import type { Availability, Basis, Caveat, DatasetId, Measure, PublicDocument, R
 
 /**
  * One value on one line of a query-function response, per spec section 7.2.
- * Georgian labels only: there is no seriesLabelEn/entityLabelEn/labelEn
- * field anywhere in this shape. The stable id (seriesId, entityId) carries
- * the Latin handle a caller needs for matching; only Caveat and
- * FactQueryError carry English text.
+ * Reviewed labels and definitions are bilingual; stable IDs carry identity
+ * independently of the displayed language.
  */
 export type Observation = {
   observationId: string;
@@ -23,10 +21,12 @@ export type Observation = {
   entityId: string;
   entityType: "country" | "municipality" | "region";
   entityLabelKa: string;
+  entityLabelEn: string;
   /** The existing URL slug. Present for municipalities only; null otherwise. */
   entitySlug: string | null;
   seriesId: string;
   seriesLabelKa: string;
+  seriesLabelEn: string;
   level: string;
   parentSeriesId: string | null;
   year: number;
@@ -35,8 +35,10 @@ export type Observation = {
   value: number | null;
   availability: Availability;
   missingReason: string | null;
+  missingReasonEn: string | null;
   basis: Basis | null;
   valueDefinition: string;
+  valueDefinitionEn: string;
   /**
    * Structured identity of WHAT IS MEASURED, for machine comparison.
    *

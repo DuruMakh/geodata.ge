@@ -295,7 +295,7 @@ describe("queryNational", () => {
     expect(coverage.expectedCount).toBe(2);
     expect(coverage.returnedCount).toBe(1);
     expect(coverage.missingCells).toEqual([
-      { entityId: "country.georgia", seriesId: "revenue.increase_liabilities", year: 2004, reason: expect.any(String) },
+      { entityId: "country.georgia", seriesId: "revenue.increase_liabilities", year: 2004, reason: expect.any(String), reasonEn: "No value is recorded for the selected series in 2004; this does not mean zero." },
     ]);
     expect(result.status).toBe("partial");
   });

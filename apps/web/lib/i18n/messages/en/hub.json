@@ -1,0 +1,16 @@
+{
+  "hub.expenditureDescription": "Expenditure by function and institution — where the budget is spent.",
+  "hub.revenueDescription": "Taxes, grants and other receipts across years.",
+  "hub.analysisDescription": "One year at a glance — composition, rankings and every GEL 100.",
+  "hub.debtDescription": "Government debt stock, repayments and interest rates.",
+  "hub.deficitDescription": "General government deficit or surplus — share of GDP and nominal GEL.",
+  "hub.municipalDescription": "{count} municipal budget units — where local budgets are spent.",
+  "hub.analysisFooter": "{year} · {count} categories",
+  "hub.deficitFooter": "{year} · {share} of GDP",
+  "hub.metaTitle": "Georgia budget data | Fiscal.ge",
+  "hub.metaDescription": "Verified data on Georgia’s budget: receipts, expenditure, municipalities, debt, deficit and single-year analysis.",
+  "hub.heading": "Georgia’s budget",
+  "hub.introduction": "Fiscal.ge brings together verified data on Georgia’s state and municipal budgets, government debt and general government deficit.",
+  "hub.explore": "Compare years and indicators, or download the data in Excel format.",
+  "hub.source": "Data: official documents from the Ministry of Finance of Georgia and the IMF’s World Economic Outlook."
+}

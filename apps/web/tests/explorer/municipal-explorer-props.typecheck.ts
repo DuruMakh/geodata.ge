@@ -1,6 +1,7 @@
 import type { MunicipalExplorerProps } from "../../components/municipalities/municipal-explorer";
 
 const common = {
+  presentation: { locale: "ka" as const, messages: {}, englishLabels: {} },
   title: "title",
   triggerLabel: "trigger",
   metaLine: "meta",

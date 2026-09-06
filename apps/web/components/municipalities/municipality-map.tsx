@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
+import { publicLabel } from "../../lib/i18n/labels";
+import { MUNICIPAL_PER_RESIDENT_YEAR } from "../../lib/explorer/municipalData";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
 import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
@@ -18,9 +22,6 @@ function isActivationKey(key: string): boolean {
   return key === "Enter" || key === " ";
 }
 
-function accessibleName(nameKa: string, budgetPerResidentGel: number, totalBudgetGel: number): string {
-  return `${nameKa} · ${formatPerResidentGel(budgetPerResidentGel)} ერთ მოსახლეზე · ${formatAmount(totalBudgetGel)} მთლიანი ბიუჯეტი · მუნიციპალიტეტის გახსნა`;
-}
 
 type InteractionTarget = {
   key: `shape:${string}` | `marker:${string}`;
@@ -75,6 +76,8 @@ export function MunicipalityMap({
   onActiveCodeChange,
   onOpenMunicipality,
 }: MunicipalityMapProps) {
+  const { locale, messages, englishLabels } = useI18n();
+  const accessibleName = (code: string, nameKa: string, budgetPerResidentGel: number, totalBudgetGel: number) => message(messages, "municipal.mapEntityAria", { name: publicLabel(locale, code, nameKa, englishLabels), perResident: formatPerResidentGel(budgetPerResidentGel, locale), total: formatAmount(totalBudgetGel, locale) });
   const svgRef = useRef<SVGSVGElement>(null);
   const [pointerTarget, setPointerTarget] = useState<InteractionTarget | null>(null);
   const [focusTarget, setFocusTarget] = useState<InteractionTarget | null>(null);
@@ -193,7 +196,7 @@ export function MunicipalityMap({
           ref={svgRef}
           viewBox={viewBox}
           role="group"
-          aria-label="საქართველოს მუნიციპალიტეტების 2025 წლის ბიუჯეტი ერთ მოსახლეზე"
+          aria-label={message(messages, "municipal.mapAria", { year: MUNICIPAL_PER_RESIDENT_YEAR })}
           className="block h-auto w-full"
         >
           <defs>
@@ -263,7 +266,7 @@ export function MunicipalityMap({
                   strokeLinejoin="round"
                   tabIndex={targetIndex === rovingIndex ? 0 : -1}
                   role="link"
-                  aria-label={accessibleName(shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel)}
+                  aria-label={accessibleName(shape.code, shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel)}
                   aria-describedby={describedTarget?.key === `shape:${shape.code}` ? TOOLTIP_ID : undefined}
                   className="cursor-pointer"
                   onMouseEnter={(event) => {
@@ -314,7 +317,7 @@ export function MunicipalityMap({
                 vectorEffect="non-scaling-stroke"
                 tabIndex={targetIndex === rovingIndex ? 0 : -1}
                 role="link"
-                aria-label={accessibleName(marker.nameKa, marker.budgetPerResidentGel, marker.totalBudgetGel)}
+                aria-label={accessibleName(marker.code, marker.nameKa, marker.budgetPerResidentGel, marker.totalBudgetGel)}
                 aria-describedby={describedTarget?.key === `marker:${marker.code}` ? TOOLTIP_ID : undefined}
                 className="cursor-pointer"
                 onMouseEnter={(event) => {
@@ -373,13 +376,13 @@ export function MunicipalityMap({
             style={{ left: tooltipPosition.left, top: tooltipPosition.top }}
           >
             <div className="truncate text-[12px] font-medium text-[var(--ink)]">
-              {describedTarget.nameKa}
+              {publicLabel(locale, describedTarget.code, describedTarget.nameKa, englishLabels)}
             </div>
             <div data-testid="municipality-map-tooltip-per-resident" className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
-              {formatPerResidentGel(describedTarget.budgetPerResidentGel)} ერთ მოსახლეზე
+              {formatPerResidentGel(describedTarget.budgetPerResidentGel, locale)} {message(messages, "municipal.perResident")}
             </div>
             <div data-testid="municipality-map-tooltip-total" className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-              {formatAmount(describedTarget.totalBudgetGel)} მთლიანი ბიუჯეტი
+              {message(messages, "municipal.mapTotal", { amount: formatAmount(describedTarget.totalBudgetGel, locale) })}
             </div>
             <span aria-hidden className="absolute top-2 right-2.5 text-[12px] text-[var(--muted)]">→</span>
           </div>
@@ -394,10 +397,10 @@ export function MunicipalityMap({
           ))}
         </span>
         <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{legendMax}</span>
-        <span className="text-[10px] text-[var(--faint)]">ერთ მოსახლეზე</span>
+        <span className="text-[10px] text-[var(--faint)]">{message(messages, "municipal.perResident")}</span>
         <span className="inline-flex items-center gap-1.5">
           <span aria-hidden className="h-2.5 w-2.5 rounded-full border border-[var(--tile)] bg-[var(--positive)]" />
-          <span className="text-[11px] text-[var(--faint)]">თვითმმართველი ქალაქები</span>
+          <span className="text-[11px] text-[var(--faint)]">{message(messages, "municipal.cities")}</span>
         </span>
       </div>
     </div>

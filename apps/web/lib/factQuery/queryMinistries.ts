@@ -16,6 +16,7 @@
 //      here re-derives, re-maps or re-joins anything;
 //      snapshot.ministries.historicalJoinSeriesIds only tells the caveat
 //      engine which series carry one.
+import { serviceLabelEn, serviceMessage, historicalProgrammeLabelEn, type ServiceMessageKey } from "./localization";
 import { isDerivedTotalItemId } from "../explorer/explorerData";
 import { shareOfTotal } from "../explorer/share";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
@@ -43,47 +44,44 @@ const LEVEL_TOTAL = "total";
 // should see one phrasing. Kept local rather than exported from
 // observations.ts, which owns shared structure (id building, document
 // resolution, caveat attachment), not display strings.
-function missingSeriesReason(year: number): string {
-  return `არჩეული სერიისთვის ${year} წელს მონაცემი არ ფიქსირდება — ეს ნულოვან მნიშვნელობას არ ნიშნავს.`;
-}
 
-const GDP_DENOMINATOR_MISSING_REASON =
-  "ამ წლისთვის მშპ-ის მაჩვენებელი მიუწვდომელია ან დადებითი არ არის, ამიტომ წილის გამოთვლა შეუძლებელია.";
-const TOTAL_DENOMINATOR_MISSING_REASON =
-  "ამ წლისთვის შესაბამისი ჯამი მიუწვდომელია ან დადებითი არ არის, ამიტომ წილის გამოთვლა შეუძლებელია.";
+const GDP_DENOMINATOR_MISSING_KEY = "missing.gdpDenominator" as const;
+const TOTAL_DENOMINATOR_MISSING_KEY = "missing.totalDenominator" as const;
 
 type SeriesKind = "total" | "admin_category" | "major_program";
 
 function valueDefinitionFor(
+  snapshot: FactQuerySnapshot,
+  locale: "ka" | "en",
   kind: SeriesKind,
   measure: "amount_gel" | "share_of_total_pct" | "share_of_gdp_pct",
-  originalLabelKa: string | null,
+  originalName: string | null,
 ): string {
   const base = (() => {
     if (measure === "share_of_gdp_pct") {
-      return "წილი იმავე წლის მშპ-ში მიმდინარე ფასებში, 0-დან 100-მდე შკალაზე.";
+      return serviceMessage(snapshot, locale, "definitions.shareOfGdp");
     }
     if (measure === "share_of_total_pct") {
       // Names the denominator explicitly, because the one mistake this
       // measure invites on this dataset is reading a program's share as a
       // share of its own ministry (spec section 5.2: "full administrative
       // expenditure total, not selected rows or parent ministry").
-      return "წილი წლის მთლიან ადმინისტრაციულ ხარჯში (და არა მშობელ კატეგორიაში), 0-დან 100-მდე შკალაზე.";
+      return serviceMessage(snapshot, locale, "definitions.administrativeShare");
     }
     if (kind === "total") {
-      return "გამოთვლილია წლის ადმინისტრაციული კატეგორიების ჯამად; პროგრამები კატეგორიების შვილობილია და ჯამს ცალკე არ ემატება.";
+      return serviceMessage(snapshot, locale, "definitions.administrativeTotal");
     }
     if (kind === "major_program") {
-      return "საწყისი გადამოწმებული მაჩვენებელი ლარში, სრული სიზუსტით; პროგრამა კატეგორიის შვილობილია და მას ცალკე არ ემატება.";
+      return serviceMessage(snapshot, locale, "definitions.programmeAmount");
     }
-    return "საწყისი გადამოწმებული მაჩვენებელი ლარში, სრული სიზუსტით.";
+    return serviceMessage(snapshot, locale, "definitions.reviewedAmount");
   })();
 
   // The series keeps its current reviewed Georgian name (a joined series is
   // titled by its most recent official label); this year's own official
   // label is surfaced here instead of overwriting that name, per spec
   // section 6.4's "original historical labels where relevant".
-  return originalLabelKa === null ? base : `${base} ამ წლის ორიგინალი ოფიციალური დასახელება: „${originalLabelKa}“.`;
+  return originalName === null ? base : serviceMessage(snapshot, locale, "definitions.historicalName", { base, name: originalName });
 }
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
@@ -108,8 +106,8 @@ export function queryMinistries(
     const issues = parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ");
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მოთხოვნის პარამეტრები არასწორია.",
-      messageEn: `Invalid parameters: ${issues}`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues: issues }),
       retryable: false,
     });
   }
@@ -119,8 +117,8 @@ export function queryMinistries(
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
       code: "data_version_changed",
-      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
-      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.dataVersionChanged"),
+      messageEn: serviceMessage(snapshot, "en", "errors.dataVersionChanged"),
       retryable: false,
     });
   }
@@ -189,8 +187,8 @@ export function queryMinistries(
   if (unknownSeriesIds.length > 0) {
     return errorResponse(snapshot, {
       code: "unknown_series",
-      messageKa: `უცნობი სერიის იდენტიფიკატორი მოთხოვნილ დონეზე (${input.level}): ${unknownSeriesIds.join(", ")}.`,
-      messageEn: `Unknown series id(s) at level "${input.level}": ${unknownSeriesIds.join(", ")}.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownSeriesAtLevel", { level: input.level, unknownSeriesIds: unknownSeriesIds.join(", ") }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownSeriesAtLevel", { level: input.level, unknownSeriesIds: unknownSeriesIds.join(", ") }),
       retryable: false,
       validChoices: Array.from(queryableSeriesIds).sort(),
     });
@@ -200,8 +198,8 @@ export function queryMinistries(
   if (outOfRangeYears.length > 0) {
     return errorResponse(snapshot, {
       code: "year_out_of_range",
-      messageKa: `მოთხოვნილი წელი (${outOfRangeYears.join(", ")}) სცილდება მონაცემთა დაფარვის საზღვრებს (${minYear}–${maxYear}); წელი არ იკვეცება.`,
-      messageEn: `Requested year(s) ${outOfRangeYears.join(", ")} fall outside this dataset's coverage (${minYear}-${maxYear}).`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.yearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear: minYear, maxYear: maxYear }),
+      messageEn: serviceMessage(snapshot, "en", "errors.yearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear: minYear, maxYear: maxYear }),
       retryable: false,
     });
   }
@@ -244,7 +242,7 @@ export function queryMinistries(
     for (const year of input.years) {
       let numeratorAmount: number | null;
       let numeratorSourceIds: string[];
-      let missingReason: string | null;
+      let missingReasonKey: ServiceMessageKey | null;
       let originalLabelKa: string | null = null;
       // The series' latest parent is only the starting point: a year with a
       // served row overwrites this with that row's own parentItemId below.
@@ -255,18 +253,18 @@ export function queryMinistries(
         if (total) {
           numeratorAmount = total.value;
           numeratorSourceIds = total.sourceIds;
-          missingReason = null;
+          missingReasonKey = null;
         } else {
           numeratorAmount = null;
           numeratorSourceIds = [];
-          missingReason = missingSeriesReason(year);
+          missingReasonKey = "missing.seriesYear";
         }
       } else {
         const fact = factByKey.get(`${seriesId}:${year}`);
         if (fact) {
           numeratorAmount = fact.amountGel;
           numeratorSourceIds = splitSourceIds(fact.sourceId);
-          missingReason = null;
+          missingReasonKey = null;
           originalLabelKa = fact.officialLabelKa !== null && fact.officialLabelKa !== seriesLabelKa ? fact.officialLabelKa : null;
           if (kind === "major_program") parentSeriesId = fact.parentItemId;
         } else {
@@ -277,7 +275,7 @@ export function queryMinistries(
           // silently dropped row.
           numeratorAmount = null;
           numeratorSourceIds = [];
-          missingReason = missingSeriesReason(year);
+          missingReasonKey = "missing.seriesYear";
         }
       }
 
@@ -297,7 +295,7 @@ export function queryMinistries(
           const total = totalsByYear.get(year);
           const share = total ? shareOfTotal(numeratorAmount, total.value) : null;
           if (share === null) {
-            missingReason = TOTAL_DENOMINATOR_MISSING_REASON;
+            missingReasonKey = TOTAL_DENOMINATOR_MISSING_KEY;
           } else {
             value = share * 100;
             sourceIds = uniqueSorted([...numeratorSourceIds, ...(total?.sourceIds ?? [])]);
@@ -307,7 +305,7 @@ export function queryMinistries(
           usedGdpYears.add(year);
           const gdp = gdpByYear.get(year);
           if (!gdp || gdp.gdpCurrentPricesGel <= 0) {
-            missingReason = GDP_DENOMINATOR_MISSING_REASON;
+            missingReasonKey = GDP_DENOMINATOR_MISSING_KEY;
           } else {
             value = (numeratorAmount / gdp.gdpCurrentPricesGel) * 100;
             sourceIds = uniqueSorted([...numeratorSourceIds, ...splitSourceIds(gdp.sourceId)]);
@@ -324,9 +322,11 @@ export function queryMinistries(
         entityId: ENTITY_ID,
         entityType: "country",
         entityLabelKa: ENTITY_LABEL_KA,
+        entityLabelEn: serviceLabelEn(snapshot, ENTITY_ID),
         entitySlug: null,
         seriesId,
         seriesLabelKa,
+        seriesLabelEn: serviceLabelEn(snapshot, seriesId),
         level: isTotal ? LEVEL_TOTAL : input.level,
         parentSeriesId,
         year,
@@ -334,12 +334,14 @@ export function queryMinistries(
         unit: input.measure === "amount_gel" ? "GEL" : "percent",
         value,
         availability,
-        missingReason: availability === "missing" ? missingReason : null,
+        missingReason: availability === "missing" && missingReasonKey !== null ? serviceMessage(snapshot, "ka", missingReasonKey, { year: year }) : null,
+        missingReasonEn: availability === "missing" && missingReasonKey !== null ? serviceMessage(snapshot, "en", missingReasonKey, { year: year }) : null,
         // ServedAdminFact.basis is the literal "actual": the administrative
         // dataset carries no planned rows, so an available cell is always
         // actual and a missing one has no basis at all.
         basis: availability === "missing" ? null : "actual",
-        valueDefinition: valueDefinitionFor(kind, input.measure, originalLabelKa),
+        valueDefinition: valueDefinitionFor(snapshot, "ka", kind, input.measure, originalLabelKa),
+        valueDefinitionEn: valueDefinitionFor(snapshot, "en", kind, input.measure, originalLabelKa === null ? null : historicalProgrammeLabelEn(snapshot, seriesId, year)),
         // originalLabelKa is deliberately NOT in the identity. It is presentation:
         // the year own official name, surfaced instead of overwriting the series
         // name. Comparing the display string instead of this declined every
@@ -399,13 +401,13 @@ export function queryMinistries(
       .filter((f) => input.years.includes(f.year))
       .map((f) => `${f.itemId}:${f.year}`),
   };
-  const caveats = evaluateCaveats(caveatContext, CAVEAT_RULES);
+  const caveats = evaluateCaveats(snapshot, caveatContext, CAVEAT_RULES);
 
   const observations: Observation[] = withDocuments.map((o) => ({ ...o, caveatIds: caveatIdsForObservation(caveats, o) }));
 
   const missingCells = observations
     .filter((o) => o.availability === "missing")
-    .map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, reason: o.missingReason ?? "" }));
+    .map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, reason: o.missingReason ?? "", reasonEn: o.missingReasonEn ?? "" }));
   const returnedYears = Array.from(new Set(observations.filter((o) => o.availability === "available").map((o) => o.year))).sort(
     (a, b) => a - b,
   );

@@ -1,4 +1,9 @@
 import type { MunicipalTotalFact } from "../data/municipal/types";
+import type { Locale } from "../i18n/types";
+import { DEBT_METHODOLOGY_CONTENT as EN_DEBT } from "./content/en/debt";
+import { EXPENDITURE_METHODOLOGY_CONTENT as EN_EXPENDITURE } from "./content/en/expenditure";
+import { MUNICIPALITIES_METHODOLOGY_CONTENT as EN_MUNICIPALITIES } from "./content/en/municipalities";
+import { REVENUE_METHODOLOGY_CONTENT as EN_REVENUE } from "./content/en/revenue";
 import type { ServedBudgetFact, ServedGovernmentDebtFact } from "../servedRows";
 import { DEBT_METHODOLOGY_CONTENT } from "./content/debt";
 import { EXPENDITURE_METHODOLOGY_CONTENT } from "./content/expenditure";
@@ -23,11 +28,19 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
 };
 
 export const FUTURE_METHODOLOGY_DATASETS = [
-  { titleKa: "ინფლაცია", href: null, state: "future" },
-  { titleKa: "მშპ", href: null, state: "future" },
-  { titleKa: "მოსახლეობა", href: null, state: "future" },
-  { titleKa: "უმუშევრობა", href: null, state: "future" },
+  { title: "ინფლაცია", href: null, state: "future" },
+  { title: "მშპ", href: null, state: "future" },
+  { title: "მოსახლეობა", href: null, state: "future" },
+  { title: "უმუშევრობა", href: null, state: "future" },
 ] as const;
+
+const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, MethodologyContent>> = {
+  expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT,
+};
+
+export function getMethodologyContent(id: MethodologyDatasetId, locale: Locale): MethodologyContent {
+  return (locale === "en" ? ENGLISH_METHODOLOGY_CONTENT : METHODOLOGY_CONTENT)[id];
+}
 
 function assertNever(value: never): never {
   throw new Error(`Unhandled methodology coverage source: ${JSON.stringify(value)}`);
@@ -56,19 +69,19 @@ export function deriveMethodologyCoverage(
   return { firstYear: Math.min(...years), lastYear: Math.max(...years) };
 }
 
-export function buildMethodologyHubEntries(input: MethodologyHubInput): MethodologyHubEntry[] {
+export function buildMethodologyHubEntries(input: MethodologyHubInput, locale: Locale = "ka"): MethodologyHubEntry[] {
   return LIVE_METHODOLOGY_IDS.map((id) => {
     const archive = input.archives[id];
     if (!archive || !archive.validated || archive.fileCount < 1) {
       throw new Error(`Live methodology dataset has no validated archive: ${id}`);
     }
 
-    const content = METHODOLOGY_CONTENT[id];
+    const content = getMethodologyContent(id, locale);
     return {
       id,
-      titleKa: content.titleKa,
-      summaryKa: content.summaryKa,
-      href: `/methodology/${id}`,
+      title: content.title,
+      summary: content.summary,
+      href: locale === "en" ? `/en/methodology/${id}` : `/methodology/${id}`,
       coverage: deriveMethodologyCoverage(id, input.budgetFacts, input.municipalFacts, input.debtFacts),
       originalFileCount: archive.fileCount,
       reviewedAt: content.reviewedAt,

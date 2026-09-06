@@ -7,25 +7,26 @@ import {
 
 const source = {
   years: [2020],
-  titleKa: "2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები",
-  organizationKa: "საქართველოს ფინანსთა სამინისტრო",
+  title: "2020 წლის კონსოლიდირებული ბიუჯეტის შემოსავლები",
+  organization: "საქართველოს ფინანსთა სამინისტრო",
   downloadHref: "/downloads/methodology/revenue/files/2020/mof-revenue-form-1.pdf" as const,
   retrievedAt: "2026-06-09",
 };
 
 const input: WorkbookExportInput = {
+  locale: "ka",
   filenameBase: "revenue",
-  titleKa: "საქართველოს საგადასახადო შემოსავლები",
-  groupLabelKa: "გადასახადები",
+  title: "საქართველოს საგადასახადო შემოსავლები",
+  groupLabel: "გადასახადები",
   years: [2020, 2021],
-  measure: { kind: "amount", unitLabelKa: "მილიონი ₾", readableScale: 1_000_000 },
+  measure: { kind: "amount", unitLabel: "მილიონი ₾", readableScale: 1_000_000 },
   totalId: "revenue.total",
   series: [
     {
       id: "revenue.total",
       kind: "total",
-      parentLabelKa: null,
-      labelKa: "გადასახადები სულ",
+      parentLabel: null,
+      label: "გადასახადები სულ",
       pointsByYear: {
         2020: { amountGel: 90, basis: "actual" },
         2021: { amountGel: 130, basis: "actual" },
@@ -34,8 +35,8 @@ const input: WorkbookExportInput = {
     {
       id: "revenue.vat",
       kind: "item",
-      parentLabelKa: null,
-      labelKa: "დამატებული ღირებულების გადასახადი",
+      parentLabel: null,
+      label: "დამატებული ღირებულების გადასახადი",
       pointsByYear: {
         2020: { amountGel: -10, basis: "actual" },
         2021: { amountGel: 30, basis: "planned" },
@@ -47,14 +48,34 @@ const input: WorkbookExportInput = {
 };
 
 describe("buildWorkbookExportModel", () => {
+  it("exports English headings and status without changing amounts, missingness or source selection", () => {
+    const ka = buildWorkbookExportModel(input);
+    const englishInput = {
+      ...input, locale: "en" as const, title: "Georgia tax revenue", groupLabel: "Taxes",
+      measure: { kind: "amount" as const, unitLabel: "million GEL", readableScale: 1_000_000 },
+      series: input.series.map(series => ({ ...series, label: series.id === "revenue.total" ? "Total taxes" : "VAT" })),
+      sources: input.sources.map(source => ({ ...source, title: "Consolidated budget receipts, 2020", organization: "Ministry of Finance of Georgia" })),
+    };
+    const en = buildWorkbookExportModel(englishInput);
+    expect(en.sheetNames).toEqual(["Summary", "Data", "Sources"]);
+    expect(en.filename).toBe("fiscal-revenue-2020-2021-en.xlsx");
+    expect(en.analysis.headers).toEqual(["Year", "Group", "Category", "Amount (GEL)", "Status"]);
+    expect(en.analysis.rows.map(row => row[3])).toEqual(ka.analysis.rows.map(row => row[3]));
+    expect(en.readable.rows.map(row => [row.valuesByYear, row.basisByYear, row.change])).toEqual(ka.readable.rows.map(row => [row.valuesByYear, row.basisByYear, row.change]));
+    expect(en.sources.map(source => [source.absoluteUrl, source.years])).toEqual(ka.sources.map(source => [source.absoluteUrl, source.years]));
+    expect(en.readable.subtitle).toBe("2020–2021 · Actual and planned · million GEL");
+    expect(en.analysis.rows).toContainEqual([2021, "Taxes", "VAT", 30, "Planned"]);
+    expect(JSON.stringify(en)).not.toMatch(/\p{Script=Georgian}/u);
+  });
+
   it("builds three-sheet content without public IDs or duplicate sources", () => {
     const model = buildWorkbookExportModel(input);
 
     expect(model.filename).toBe("fiscal-revenue-2020-2021.xlsx");
     expect(model.sheetNames).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
-    expect(model.readable.subtitleKa).toBe("2020–2021 · ფაქტი და გეგმა · მილიონი ₾");
+    expect(model.readable.subtitle).toBe("2020–2021 · ფაქტი და გეგმა · მილიონი ₾");
     expect(model.readable.years).toEqual([2020, 2021]);
-    expect(model.readable.rows.map((row) => row.labelKa)).toEqual([
+    expect(model.readable.rows.map((row) => row.label)).toEqual([
       "გადასახადები სულ",
       "დამატებული ღირებულების გადასახადი",
     ]);
@@ -111,7 +132,7 @@ describe("buildWorkbookExportModel", () => {
   it("uses percentage measure values while retaining full GEL analysis amounts", () => {
     const model = buildWorkbookExportModel({
       ...input,
-      measure: { kind: "percentage", unitLabelKa: "% მშპ-ში", analysisHeaderKa: "მშპ-ის წილი (%)" },
+      measure: { kind: "percentage", unitLabel: "% მშპ-ში", analysisHeader: "მშპ-ის წილი (%)" },
       series: [{ ...input.series[1], pointsByYear: { 2020: { amountGel: 500, measureValue: 2.5, basis: "actual" } } }],
       totalId: null,
     });

@@ -1,4 +1,6 @@
 import type { DebtFamily, DebtSeriesId, ServedGovernmentDebtFact, ServedNationalGdpFact } from "../servedRows";
+import type { Presentation } from "../i18n/types";
+import { publicLabel } from "../i18n/labels";
 import { INK } from "./colors";
 
 export const DEBT_FAMILIES = ["stock", "service", "rate"] as const satisfies readonly DebtFamily[];
@@ -158,7 +160,8 @@ export function buildDebtExplorerModel(input: {
   selectedIds: DebtSeriesId[];
   range: { start: number; end: number };
   shareOfGdp: boolean;
-}): GovernmentDebtExplorerModel {
+}, presentation?: Presentation): GovernmentDebtExplorerModel {
+  const items = presentation ? DEBT_ITEMS.map(item => ({ ...item, enLabel: publicLabel("en", item.id, item.kaLabel, presentation.englishLabels) })) : DEBT_ITEMS;
   const activeFacts = input.facts.filter(
     (fact) => fact.family === input.family && fact.year >= input.range.start && fact.year <= input.range.end,
   );
@@ -166,7 +169,7 @@ export function buildDebtExplorerModel(input: {
   const factsBySeriesYear = new Map(activeFacts.map((fact) => [`${fact.seriesId}:${fact.year}`, fact]));
   const gdpByYear = new Map(input.gdpFacts.map((fact) => [fact.year, fact]));
   const selectedIds = normalizeDebtSelection(input.selectedIds, input.family);
-  const selectedItems = DEBT_ITEMS.filter((item) => selectedIds.includes(item.id));
+  const selectedItems = items.filter((item) => selectedIds.includes(item.id));
   const points = selectedItems.flatMap((item) =>
     years.flatMap((year) => {
       const fact = factsBySeriesYear.get(`${item.id}:${year}`);
@@ -182,7 +185,7 @@ export function buildDebtExplorerModel(input: {
   const tableRows = selectedItems
     .map((item) => tableRowFor(item, factsBySeriesYear, years, gdpByYear))
     .filter((row): row is DebtExplorerTableRow => row !== null);
-  const totalItem = DEBT_ITEMS.find(
+  const totalItem = items.find(
     (item) => item.family === input.family && item.parentItemId === null,
   )!;
   const totalRow = tableRowFor(totalItem, factsBySeriesYear, years, gdpByYear);
@@ -194,7 +197,7 @@ export function buildDebtExplorerModel(input: {
   return {
     family: input.family,
     years,
-    items: DEBT_ITEMS,
+    items,
     expandedParentIds: DEBT_EXPANDED_PARENT_IDS,
     selectedItems,
     points,

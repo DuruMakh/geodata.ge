@@ -3,6 +3,21 @@ import { expect, test } from "@playwright/test";
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? process.env.SEO_BASE_URL ?? "http://localhost:3100";
 const ENDPOINT = "https://fiscal.ge/mcp";
 
+for (const prefix of ["", "/en"]) {
+  test(`bilingual examples and shared contract on ${prefix}/connect`, async ({ page }) => {
+    await page.goto(`${BASE_URL}${prefix}/connect`);
+    await expect(page.getByTestId("connect-endpoint")).toHaveText(ENDPOINT);
+    const bilingual = page.getByTestId("connect-bilingual");
+    await expect(bilingual.locator("li")).toHaveCount(4);
+    await expect(bilingual).toContainText("2025");
+    await expect(bilingual).toContainText("2024");
+    await expect(page.getByTestId("connect-technical")).toContainText("1.1.0");
+    await expect(page.getByTestId("connect-technical")).toContainText("dataVersion");
+    if (prefix) expect(await bilingual.innerText()).not.toMatch(/\p{Script=Georgian}/u);
+    else await expect(bilingual).toContainText("ხულოს");
+  });
+}
+
 test.describe("connection page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(`${BASE_URL}/connect`);
@@ -124,10 +139,12 @@ test("AI header navigation opens the active connection page on desktop and mobil
   for (const width of [1440, 375]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(BASE_URL);
+    if (width < 900) await page.getByTestId("landing-header").getByRole("button", { name: "მენიუ" }).click();
     const link = page.getByRole("navigation", { name: "ნავიგაცია", exact: true }).getByRole("link", { name: "AI", exact: true });
     await expect(link).toBeVisible();
     await link.click();
     await expect(page).toHaveURL(/\/connect$/);
+    if (width < 900) await page.getByTestId("connect-header").getByRole("button", { name: "მენიუ" }).click();
     await expect(page.getByTestId("connect-header").getByRole("link", { name: "AI", exact: true })).toHaveAttribute("aria-current", "page");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }

@@ -91,6 +91,25 @@ from the other does not produce a deficit or any other fiscal balance. Every
 published surface must carry that distinction rather than assume the reader
 knows it.
 
+## 2B. Approved bilingual extension
+
+The existing Fiscal.ge website is available in Georgian at its established URLs
+and in English under `/en`. This is a presentation extension to the currently
+approved expenditure, receipts, ministries, analysis, municipal, government-debt
+and general-government-balance surfaces; it adds no dataset or query API. The
+shipped V1 record above remains intact.
+
+Both languages share reviewed facts, stable ASCII identities, calculations,
+source documents and the editorial design. Human pages, controls, methodology,
+Excel workbooks, metadata and social previews are translated. The shared `/mcp`
+endpoint and ten existing JSON publications expose the additive bilingual schema
+1.1.0. Original document bytes, URLs and mandatory attribution are preserved.
+Translations are reviewed build inputs; no request-time translation service,
+automatic language detection, language cookie or language redirect is introduced.
+Future additions must provide reviewed language companions and page review dates
+before passing `npm run i18n:check`. The bounded decisions are in
+`docs/superpowers/specs/2026-09-05-fiscal-bilingual-design.md`.
+
 ## 3. Target Users
 
 Primary users:

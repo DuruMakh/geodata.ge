@@ -1,11 +1,13 @@
+import { message } from "../../lib/i18n/messages";
+import type { Messages } from "../../lib/i18n/types";
 import type { MethodologyDecision } from "../../lib/methodology/types";
 
 function grouped(decisions: readonly MethodologyDecision[]) {
   const groups = new Map<string, MethodologyDecision[]>();
   for (const decision of decisions) {
-    const entries = groups.get(decision.groupKa) ?? [];
+    const entries = groups.get(decision.group) ?? [];
     entries.push(decision);
-    groups.set(decision.groupKa, entries);
+    groups.set(decision.group, entries);
   }
   return [...groups.entries()];
 }
@@ -16,7 +18,7 @@ function DecisionDetails({ decision }: { decision: MethodologyDecision }) {
       <summary className="grid cursor-pointer list-none gap-2 py-4 pr-1 marker:content-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(179,64,42,0.4)] min-[640px]:grid-cols-[minmax(0,1fr)_auto] min-[640px]:items-start min-[640px]:gap-6 [&::-webkit-details-marker]:hidden">
         <span className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
           <span className="font-[family-name:var(--font-display)] text-[15px] font-semibold leading-relaxed group-open:text-[var(--accent)]">
-            {decision.titleKa}
+            {decision.title}
           </span>
           <span
             aria-hidden="true"
@@ -28,12 +30,12 @@ function DecisionDetails({ decision }: { decision: MethodologyDecision }) {
           </span>
         </span>
         <span className="font-[family-name:var(--font-numeric)] text-[9.5px] leading-6 text-[var(--muted)]">
-          {decision.statusKa}
+          {decision.statusLabel}
         </span>
       </summary>
       <div className="max-w-[760px] space-y-3 pb-5 text-[13px] leading-[1.75] text-[var(--body)]">
-        <p>{decision.summaryKa}</p>
-        {decision.detailKa.map((paragraph) => (
+        <p>{decision.summary}</p>
+        {decision.detail.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
       </div>
@@ -66,12 +68,14 @@ function DecisionGroups({
 }
 
 export function DecisionRecord({
+  messages,
   decisions,
   technicalAppendix,
   hiddenGroups,
   showTechnicalAppendix = true,
 }: {
   decisions: readonly MethodologyDecision[];
+  messages: Messages;
   technicalAppendix: readonly MethodologyDecision[];
   hiddenGroups?: readonly string[];
   showTechnicalAppendix?: boolean;
@@ -85,10 +89,10 @@ export function DecisionRecord({
             id="technical-appendix-title"
             className="font-[family-name:var(--font-display)] text-[22px] font-semibold"
           >
-            ტექნიკური დანართი
+            {message(messages, "methodology.appendixTitle")}
           </h3>
           <p className="mt-3 max-w-[760px] text-[13px] leading-[1.75] text-[var(--body)]">
-            ქვემოთ სრულად არის დატოვებული ისტორიული, ტექნიკური და შეზღუდვის ჩანაწერები, რომლებიც საჯარო შედეგის განმარტებისთვის საჭიროა.
+            {message(messages, "methodology.appendixSummary")}
           </p>
           <DecisionGroups decisions={technicalAppendix} hiddenGroups={hiddenGroups} />
         </section>

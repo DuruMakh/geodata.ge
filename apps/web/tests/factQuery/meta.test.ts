@@ -127,6 +127,8 @@ describe("a source states once what all of its documents agree on", () => {
       for (const document of source.documents) {
         expect(typeof document.documentId).toBe("string");
         expect(typeof document.title).toBe("string");
+        expect(typeof document.titleKa).toBe("string");
+        expect(typeof document.titleEn).toBe("string");
         expect(Array.isArray(document.years)).toBe(true);
         expect(document.archiveUrl ?? document.officialUrl).not.toBeNull();
       }
@@ -180,7 +182,18 @@ describe("a source states once what all of its documents agree on", () => {
     expect(new Set(cited).size).toBe(cited.length);
     for (const documentId of cited) expect(archived.has(documentId)).toBe(true);
 
-    // Measured before compaction: 69.0 KiB.
-    expect(bytes(result.meta.sources)).toBeLessThan(45_000);
+    // The original 45 KB ceiling covered Georgian-only titles. Bilingual
+    // evidence necessarily adds per-document titles; verify at least 40%
+    // saving against the same evidence without shared fields instead.
+    const expanded = result.meta.sources.map(source => {
+      const original = snapshot.sources.find(row => row.sourceId === source.sourceId)!;
+      return { ...original, documents: source.documents.map(document => {
+        const { sha256: _hash, byteSize: _size, ...full } = original.documents.find(row => row.documentId === document.documentId)!;
+        expect({ ...source.documentDefaults, ...document }).toEqual(full);
+        return full;
+      }) };
+    });
+    expect(bytes(result.meta.sources)).toBeLessThan(bytes(expanded) * 0.6);
+    expect(bytes(result.meta.sources)).toBeLessThan(64 * 1024);
   });
 });

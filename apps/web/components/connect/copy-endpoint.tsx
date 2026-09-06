@@ -15,11 +15,15 @@ export function CopyEndpoint({
   testId = "connect-copy",
   copyLabel = "მისამართის კოპირება",
   copiedLabel = "მისამართი დაკოპირდა",
+  copyText = "კოპირება",
+  copiedText = "დაკოპირდა",
 }: {
   endpoint: string;
   testId?: string;
   copyLabel?: string;
   copiedLabel?: string;
+  copyText?: string;
+  copiedText?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -47,7 +51,7 @@ export function CopyEndpoint({
         }}
         className="inline-flex min-h-9 shrink-0 items-center gap-2 border border-[var(--control)] px-3 py-1.5 font-[family-name:var(--font-numeric)] text-[11px] uppercase tracking-[0.04em] text-[var(--muted)] transition-colors hover:bg-[var(--tint)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
-        {copied ? "დაკოპირდა" : "კოპირება"}
+        {copied ? copiedText : copyText}
       </button>
     </>
   );

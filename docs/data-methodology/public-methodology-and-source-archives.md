@@ -18,6 +18,29 @@ The originals under `docs/Raw Data/` are immutable. Never normalize, re-encode, 
 
 Prepared GeoData CSV, text, validation, and geometry artifacts are not upstream originals and must never be described or published as such. Explorer Excel workbooks remain on their explorer surfaces; methodology manifest CSVs remain archive artifacts with their existing contract.
 
+## Bilingual descriptions and original documents
+
+The methodology hub and all four current topic pages have Georgian and English
+versions. Both expose the same reviewed manifest entries and byte-identical
+archives under the existing shared download URLs. English titles, publishers
+and explanatory attribution come from `data/localization/en/`; generic original
+metadata and required legal attribution remain intact. A translated description
+does not mean the source document has been translated. `documentLanguage` is
+`null` unless verified.
+
+Original filenames are the deliberate original-language exception on English
+pages: each is marked with language/source identity, explained beside the archive,
+and checked against the exact manifest filename. Do not exempt an entire archive,
+source description or SVG from translation checks. Search accepts reviewed names
+in either language and original filenames. Source selection and hyperlinks in
+English Excel exports are identical to their Georgian counterparts.
+
+Review new names and full explanatory sentences in both languages, validate
+message parameters with `npm run i18n:check`, and update affected dates in
+`data/localization/en/page-revisions.json`. Service wording is pinned into the
+build snapshot and participates in `dataVersion`; no runtime file lookup or
+translation network call belongs in a fact query.
+
 ## Reviewed manifest contract
 
 Each category manifest is a human-reviewed CSV with one row per approved original. Every row records a stable source ID, dataset and year scope, source organization, Georgian display title, official filename and URL/archive location, immutable repository path, stable lowercase-ASCII public path, media type, byte size, SHA-256, retrieval metadata, licence, attribution, redistribution status, and notes.

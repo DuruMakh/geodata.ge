@@ -1,0 +1,2912 @@
+{
+  "geostat_population_self_governed_units": {
+    "title": {
+      "text": "Population as of 1 January by regions and self-governed units",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": null,
+    "documentLanguage": null
+  },
+  "geostat_regional_gdp_current_prices": {
+    "title": {
+      "text": "Distribution of gross domestic product by regions at current prices",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": null,
+    "documentLanguage": null
+  },
+  "mof_central_government_liabilities_control": {
+    "title": {
+      "text": "Central government debt and liabilities — cross-check file",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "mof_debt_strategy_2019_2021": {
+    "title": {
+      "text": "Government Debt Management Strategy 2019–2021",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "mof_debt_strategy_2022_2025": {
+    "title": {
+      "text": "Government Debt Management Strategy 2022–2025",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "mof_debt_strategy_2023_2026": {
+    "title": {
+      "text": "Government Debt Management Strategy 2023–2026",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "mof_debt_strategy_2025_2029": {
+    "title": {
+      "text": "Government Debt Management Strategy 2025–2029",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "mof_monthly_debt_report_2026_07": {
+    "title": {
+      "text": "Monthly Government Debt Report — July 2026",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "mof_public_debt_bulletin_n13": {
+    "title": {
+      "text": "Public Debt Statistical Bulletin No. 13",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "mof_public_debt_bulletin_n19": {
+    "title": {
+      "text": "Public Debt Statistical Bulletin No. 19",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "mof_public_debt_bulletin_n25": {
+    "title": {
+      "text": "Public Debt Statistical Bulletin No. 25",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "mof_public_debt_bulletin_n7": {
+    "title": {
+      "text": "Public Debt Statistical Bulletin No. 7",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.adjara.republic.2015.actual_payments": {
+    "title": {
+      "text": "Adjara Autonomous Republic republican budget: actual payments, 2015",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Legislative Herald of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Legislative Herald of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.adjara.republic.2016_2025.actual_payments": {
+    "title": {
+      "text": "Adjara Autonomous Republic republican budget: actual payments, 2016–2025",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Autonomous Republic of Adjara",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Autonomous Republic of Adjara",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.geostat_national_gdp_sna_1993": {
+    "title": {
+      "text": "GDP at current prices, SNA 1993",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": null,
+    "documentLanguage": null
+  },
+  "source.geostat_national_gdp_sna_2008": {
+    "title": {
+      "text": "GDP at current prices, SNA 2008",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": null,
+    "documentLanguage": null
+  },
+  "source.imf_weo_april_2026_general_government_balance": {
+    "title": {
+      "text": "World Economic Outlook",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "International Monetary Fund",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": null,
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2004.mof_annual_execution_annex": {
+    "title": {
+      "text": "Annex to the state budget execution report, 2004",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2004.mof_annual_execution_overview": {
+    "title": {
+      "text": "State budget execution overview, 2004",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2004.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2004",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2004.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2004",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2004.treasury_e11": {
+    "title": {
+      "text": "Central-budget functional execution (Form E11), 2004",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2005.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2005",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2005.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2005",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2005.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2005",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2005.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2005",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2006.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2006",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2006.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2006",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2006.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2006",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2006.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2006",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2007.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2007",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2007.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2007",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2007.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2007",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2007.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2007",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2008.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2008",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2008.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2008",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2008.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2008",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2008.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2008",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2009.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2009",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2009.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2009",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2009.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2009",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2009.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2009",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2010.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2010",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2010.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2010",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2010.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2010",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2010.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2010",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2011.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2011",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2011.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2011",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2011.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2011",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2011.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2011",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2012.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2012",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2012.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2012",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2012.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2012",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2012.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2012",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2013.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2013",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2013.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2013",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2013.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2013",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2014.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2014",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2014.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2014",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2014.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2014",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2014.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2014",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2015.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2015",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2015.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2015",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2015.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2015",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2015.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2015",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2016.mof_annual_execution": {
+    "title": {
+      "text": "State budget execution report, 2016",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2016.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2016",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2016.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2016",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2016.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2016",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2017.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2017",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2017.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2017",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2017.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2017",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2018.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2018",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2018.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2018",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2018.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2018",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2019.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2019",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2019.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2019",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2019.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2019",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2020.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2020",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2020.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2020",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2020.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2020",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2021.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2021",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2021.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2021",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2021.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2021",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2022.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2022",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2022.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2022",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2022.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2022",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2023.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2023",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2023.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2023",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2023.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2023",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2024.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2024",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2024.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2024",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2024.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2024",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2025.mof_excel_fact": {
+    "title": {
+      "text": "State budget execution workbook, 2025",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2025.mof_final_fact": {
+    "title": {
+      "text": "State budget execution: original source, 2025",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.expenditure.2025.treasury_e11": {
+    "title": {
+      "text": "State budget execution by function, 2025",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2015_2019.portal_functional_basic_types": {
+    "title": {
+      "text": "Municipalities Analytical Portal: functional classification details",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2015_2019.portal_functionals": {
+    "title": {
+      "text": "Municipalities Analytical Portal: functional expenditure data",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_04": {
+    "title": {
+      "text": "Tbilisi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_05": {
+    "title": {
+      "text": "Azhara Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_06": {
+    "title": {
+      "text": "Batumi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_07": {
+    "title": {
+      "text": "Kobuleti Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_08": {
+    "title": {
+      "text": "Khelvachauri Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_09": {
+    "title": {
+      "text": "Keda Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_10": {
+    "title": {
+      "text": "Shuakhevi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_11": {
+    "title": {
+      "text": "Khulo Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_12": {
+    "title": {
+      "text": "Akhmeta Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_13": {
+    "title": {
+      "text": "Gurjaani Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_14": {
+    "title": {
+      "text": "Dedoplistskaro Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_15": {
+    "title": {
+      "text": "Telavi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_16": {
+    "title": {
+      "text": "Lagodekhi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_17": {
+    "title": {
+      "text": "Sagarejo Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_18": {
+    "title": {
+      "text": "Sighnaghi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_19": {
+    "title": {
+      "text": "Kvareli Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_20": {
+    "title": {
+      "text": "Kutaisi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_21": {
+    "title": {
+      "text": "Chiatura Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_22": {
+    "title": {
+      "text": "Tkibuli Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_23": {
+    "title": {
+      "text": "Tskaltubo Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_24": {
+    "title": {
+      "text": "Baghdati Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_25": {
+    "title": {
+      "text": "Vani Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_26": {
+    "title": {
+      "text": "Zestafoni Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_27": {
+    "title": {
+      "text": "Terjola Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_28": {
+    "title": {
+      "text": "Samtredia Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_29": {
+    "title": {
+      "text": "Sachkhere Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_30": {
+    "title": {
+      "text": "Kharagauli Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_31": {
+    "title": {
+      "text": "Khoni Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_32": {
+    "title": {
+      "text": "Poti Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_33": {
+    "title": {
+      "text": "Zugdidi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_34": {
+    "title": {
+      "text": "Abasha Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_35": {
+    "title": {
+      "text": "Martvili Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_36": {
+    "title": {
+      "text": "Mestia Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_37": {
+    "title": {
+      "text": "Senaki Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_38": {
+    "title": {
+      "text": "Chkhorotsku Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_39": {
+    "title": {
+      "text": "Tsalenjikha Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_40": {
+    "title": {
+      "text": "Khobi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_41": {
+    "title": {
+      "text": "Gori Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_42": {
+    "title": {
+      "text": "Eredvi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_43": {
+    "title": {
+      "text": "Kurta Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_44": {
+    "title": {
+      "text": "Kareli Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_45": {
+    "title": {
+      "text": "Kaspi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_46": {
+    "title": {
+      "text": "Tighva Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_47": {
+    "title": {
+      "text": "Khashuri Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_48": {
+    "title": {
+      "text": "Rustavi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_49": {
+    "title": {
+      "text": "Bolnisi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_50": {
+    "title": {
+      "text": "Gardabani Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_51": {
+    "title": {
+      "text": "Dmanisi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_52": {
+    "title": {
+      "text": "Tetritskaro Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_53": {
+    "title": {
+      "text": "Marneuli Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_54": {
+    "title": {
+      "text": "Tsalka Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_55": {
+    "title": {
+      "text": "Lanchkhuti Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_56": {
+    "title": {
+      "text": "Ozurgeti Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_57": {
+    "title": {
+      "text": "Chokhatauri Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_58": {
+    "title": {
+      "text": "Borjomi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_59": {
+    "title": {
+      "text": "Adigeni Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_60": {
+    "title": {
+      "text": "Aspindza Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_61": {
+    "title": {
+      "text": "Akhalkalaki Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_62": {
+    "title": {
+      "text": "Akhaltsikhe Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_63": {
+    "title": {
+      "text": "Ninotsminda Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_64": {
+    "title": {
+      "text": "Akhalgori Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_65": {
+    "title": {
+      "text": "Dusheti Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_66": {
+    "title": {
+      "text": "Tianeti Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_67": {
+    "title": {
+      "text": "Mtskheta Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_68": {
+    "title": {
+      "text": "Kazbegi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_69": {
+    "title": {
+      "text": "Ambrolauri Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_70": {
+    "title": {
+      "text": "Lentekhi Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_71": {
+    "title": {
+      "text": "Oni Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2016_2025.budget_history_72": {
+    "title": {
+      "text": "Tsageri Municipality — budget history",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2020.functional_classification": {
+    "title": {
+      "text": "Functional classification of municipal budgets, 2020",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2021.functional_classification": {
+    "title": {
+      "text": "Functional classification of municipal budgets, 2021",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2022.functional_classification": {
+    "title": {
+      "text": "Functional classification of municipal budgets, 2022",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2023.functional_classification": {
+    "title": {
+      "text": "Functional classification of municipal budgets, 2023",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2024.functional_classification": {
+    "title": {
+      "text": "Functional classification of municipal budgets, 2024",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.municipalities.2025.functional_classification": {
+    "title": {
+      "text": "Functional classification of municipal budgets, 2025",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2004.annual_execution_report": {
+    "title": {
+      "text": "Consolidated budget revenue and grants, 2004",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2005.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2005",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2006.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2006",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2007.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2007",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2008.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2008",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2009.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2009",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2010.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2010",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2011.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2011",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2012.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2012",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2013.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2013",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2014.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2014",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2015.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2015",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2016.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2016",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2017.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2017",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2018.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2018",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2019.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2019",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2020.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2020",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2021.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2021",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2022.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2022",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2023.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2023",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2024.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2024",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  },
+  "source.mof.revenue.2025.form_1": {
+    "title": {
+      "text": "Consolidated budget receipts, 2025",
+      "reviewedAt": "2026-09-05"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-09-05"
+    },
+    "documentLanguage": null
+  }
+}

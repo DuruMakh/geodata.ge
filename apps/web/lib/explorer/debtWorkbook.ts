@@ -5,6 +5,9 @@ import type {
   ServedNationalGdpFact,
 } from "../servedRows";
 import { GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS } from "../data/governmentDebt/types";
+import type { Presentation } from "../i18n/types";
+import { workbookMessage } from "../i18n/workbook";
+import { publicLabel } from "../i18n/labels";
 import { buildDebtExplorerModel } from "./debtExplorer";
 import {
   buildWorkbookExportModel,
@@ -25,11 +28,7 @@ export type DebtWorkbookInput = {
   siteOrigin: string;
 };
 
-const FAMILY_LABEL: Record<DebtFamily, string> = {
-  stock: "მთავრობის ვალი",
-  service: "ვალის გადახდა",
-  rate: "საპროცენტო განაკვეთი",
-};
+const FAMILY_LABEL = { stock: "workbook.debtStock", service: "workbook.debtService", rate: "workbook.debtRate" } as const;
 
 const SOURCE_FILENAME_BY_ID: Readonly<Record<string, string>> = {
   mof_public_debt_bulletin_n7: "public-debt-bulletin-n7",
@@ -92,7 +91,9 @@ function workbookStatus(status: ServedGovernmentDebtFact["status"]) {
   return "actual" as const;
 }
 
-export function buildDebtWorkbookExportModel(input: DebtWorkbookInput): WorkbookExportModel {
+export function buildDebtWorkbookExportModel(input: DebtWorkbookInput, presentation?: Presentation): WorkbookExportModel {
+  const locale = presentation?.locale ?? "ka";
+  const englishLabels = presentation?.englishLabels ?? {};
   const model = buildDebtExplorerModel({
     facts: [...input.facts],
     gdpFacts: [...input.gdpFacts],
@@ -122,28 +123,30 @@ export function buildDebtWorkbookExportModel(input: DebtWorkbookInput): Workbook
         basis: workbookStatus(fact.status),
       };
     }
+    const parent = item.parentItemId === null ? undefined : itemsById.get(item.parentItemId);
     return {
       id: item.id,
       kind: item.parentItemId === null ? "total" : "item",
-      parentLabelKa: item.parentItemId === null ? null : itemsById.get(item.parentItemId)?.kaLabel ?? null,
-      labelKa: item.kaLabel,
+      parentLabel: parent ? publicLabel(locale, parent.id, parent.kaLabel, englishLabels) : null,
+      label: publicLabel(locale, item.id, item.kaLabel, englishLabels),
       pointsByYear,
     };
   });
   const percentage = input.family === "rate" || (input.family === "stock" && input.shareOfGdp);
 
   return buildWorkbookExportModel({
+    locale,
     filenameBase: `government-debt-${input.family}`,
-    titleKa: FAMILY_LABEL[input.family],
-    groupLabelKa: FAMILY_LABEL[input.family],
+    title: workbookMessage(locale, FAMILY_LABEL[input.family]),
+    groupLabel: workbookMessage(locale, FAMILY_LABEL[input.family]),
     years: model.years,
     measure: percentage
       ? {
           kind: "percentage",
-          unitLabelKa: input.family === "rate" ? "%" : "% მშპ-ში",
-          analysisHeaderKa: input.family === "rate" ? "საპროცენტო განაკვეთი (%)" : "მშპ-ის წილი (%)",
+          unitLabel: input.family === "rate" ? "%" : workbookMessage(locale, "workbook.percentGdp"),
+          analysisHeader: workbookMessage(locale, input.family === "rate" ? "workbook.rateHeader" : "workbook.gdpHeader"),
         }
-      : { kind: "amount", unitLabelKa: "მლრდ ₾", readableScale: 1_000_000_000 },
+      : { kind: "amount", unitLabel: workbookMessage(locale, "workbook.billionGel"), readableScale: 1_000_000_000 },
     totalId: model.items.find((item) => item.family === input.family && item.parentItemId === null)?.id ?? null,
     series,
     includeTotalsInAnalysis: input.family === "rate",

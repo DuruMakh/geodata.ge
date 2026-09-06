@@ -1,5 +1,9 @@
 "use client";
 
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
+import { Message } from "../../lib/i18n/message";
+import { formatDisplayDate } from "../../lib/explorer/format";
 import type { SingleYearSnapshotModel } from "../../lib/explorer/types";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
 import { NEGATIVE } from "../../lib/explorer/colors";
@@ -38,12 +42,8 @@ export function AnalysisView({
   onGroupingChange,
   onYearChange,
 }: AnalysisViewProps) {
-  const structureTitle =
-    side === "revenue"
-      ? "სტრუქტურა კატეგორიების მიხედვით"
-      : grouping === "ministries"
-        ? "სტრუქტურა უწყებების მიხედვით"
-        : "სტრუქტურა სფეროების მიხედვით";
+  const { locale, messages } = useI18n();
+  const structureTitle = message(messages, side === "revenue" ? "analysis.structureRevenue" : grouping === "ministries" ? "analysis.structureMinistries" : "analysis.structureFields");
 
   return (
     <div data-testid="single-year-snapshot" className="min-w-0">
@@ -51,19 +51,19 @@ export function AnalysisView({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div data-testid="analysis-tab-groups" className="flex min-w-0 flex-wrap items-center gap-x-[18px] gap-y-3">
             <span className="flex items-center gap-[18px]">
-              <TextTab label="ხარჯები" active={side === "expenditure"} onClick={() => onSideChange("expenditure")} testId="analysis-side-expenditure" />
-              <TextTab label="შემოსავლები" active={side === "revenue"} onClick={() => onSideChange("revenue")} testId="analysis-side-revenue" />
+              <TextTab label={message(messages, "analysis.expenditure")} active={side === "expenditure"} onClick={() => onSideChange("expenditure")} testId="analysis-side-expenditure" />
+              <TextTab label={message(messages, "analysis.revenue")} active={side === "revenue"} onClick={() => onSideChange("revenue")} testId="analysis-side-revenue" />
             </span>
             {side === "expenditure" ? (
               <span className="flex items-center gap-[18px]">
                 <span className="hidden min-[480px]:inline"><TabDivider /></span>
-                <TextTab label="სფეროები" active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="analysis-grouping-fields" />
-                <TextTab label="უწყებები" active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="analysis-grouping-ministries" />
+                <TextTab label={message(messages, "analysis.fields")} active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="analysis-grouping-fields" />
+                <TextTab label={message(messages, "analysis.ministries")} active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="analysis-grouping-ministries" />
               </span>
             ) : null}
           </div>
           <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-            {model.hasPlannedValues ? "გეგმური ბიუჯეტის მონაცემები" : "12-თვიანი ფაქტობრივი შესრულება"}
+            {message(messages, model.hasPlannedValues ? "analysis.plannedBudget" : "analysis.actualBudget")}
           </span>
         </div>
 
@@ -83,7 +83,7 @@ export function AnalysisView({
               >
                 {candidate}
                 {plannedYears.has(candidate) ? (
-                  <span className="ml-1 align-super text-[9px] text-[var(--faint)]">გეგმა</span>
+                  <span className="ml-1 align-super text-[9px] text-[var(--faint)]">{message(messages, "analysis.planned")}</span>
                 ) : null}
               </button>
             );
@@ -125,17 +125,18 @@ export function AnalysisView({
 
           <div className="mt-[26px]">
             <SourceNote testId="source-label">
-              მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო) ·{" "}
-              <span className="font-[family-name:var(--font-numeric)]">{model.year}</span> ·{" "}
-              {model.hasPlannedValues ? "გეგმური ბიუჯეტის მონაცემები" : "12-თვიანი ფაქტობრივი შესრულება"}.
+              <Message messages={messages} id="analysis.source" values={{
+                year: <span className="font-[family-name:var(--font-numeric)]">{model.year}</span>,
+                basis: message(messages, model.hasPlannedValues ? "analysis.plannedBudget" : "analysis.actualBudget"),
+              }} />
               {side === "expenditure"
                 ? grouping === "ministries"
-                  ? " უწყებრივი დაჯგუფება Fiscal.ge-ისაა ბიუჯეტის შესრულების ანგარიშების პროგრამული კლასიფიკაციის მიხედვით."
-                  : " კატეგორიებად დაყოფა Fiscal.ge-ის კლასიფიკაციაა ოფიციალური ფუნქციური (COFOG) კოდების მიხედვით."
+                  ? message(messages, "analysis.ministryClassification")
+                  : message(messages, "analysis.fieldClassification")
                 : null}
               {lastUpdatedAt ? (
                 <>
-                  {" "}ბოლო განახლება: <span className="font-[family-name:var(--font-numeric)]">{lastUpdatedAt}</span>.
+                  <Message messages={messages} id="analysis.updated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} />
                 </>
               ) : null}
             </SourceNote>

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { getPresentation } from "../../lib/i18n/presentation.server";
 import { loadGovernmentDebtFacts } from "../../lib/data/governmentDebt/importGovernmentDebtFacts";
 import { loadWorkbookSources, resetWorkbookSourceCacheForTests } from "../../lib/methodology/workbookSources";
 import type { ServedGovernmentDebtFact, ServedNationalGdpFact } from "../../lib/servedRows";
@@ -27,22 +28,22 @@ const gdpFacts: ServedNationalGdpFact[] = [
 const debtSources: WorkbookPublicSource[] = [
   {
     years: [2013, 2014],
-    titleKa: "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
-    organizationKa: "საქართველოს ფინანსთა სამინისტრო",
+    title: "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
+    organization: "საქართველოს ფინანსთა სამინისტრო",
     downloadHref: "/downloads/methodology/debt/files/2013-2019/public-debt-bulletin-n13.pdf",
     retrievedAt: "2026-09-01",
   },
   {
     years: [2015, 2025, 2026],
-    titleKa: "სახელმწიფო ვალის სტატისტიკური ბიულეტენი",
-    organizationKa: "საქართველოს ფინანსთა სამინისტრო",
+    title: "სახელმწიფო ვალის სტატისტიკური ბიულეტენი",
+    organization: "საქართველოს ფინანსთა სამინისტრო",
     downloadHref: "/downloads/methodology/debt/files/2013-2030/public-debt-bulletin-n25.pdf",
     retrievedAt: "2026-09-01",
   },
   {
     years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
-    titleKa: "მთავრობის ვალის ყოველთვიური ანგარიში",
-    organizationKa: "საქართველოს ფინანსთა სამინისტრო",
+    title: "მთავრობის ვალის ყოველთვიური ანგარიში",
+    organization: "საქართველოს ფინანსთა სამინისტრო",
     downloadHref: "/downloads/methodology/debt/files/2015-2025/monthly-debt-report-2026-07.pdf",
     retrievedAt: "2026-09-01",
   },
@@ -50,13 +51,42 @@ const debtSources: WorkbookPublicSource[] = [
 
 const gdpSources: WorkbookPublicSource[] = [{
   years: [2013, 2014],
-  titleKa: "მშპ მიმდინარე ფასებში — SNA 2008",
-  organizationKa: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
+  title: "მშპ მიმდინარე ფასებში — SNA 2008",
+  organization: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
   downloadHref: "https://www.geostat.ge/gdp.xlsx",
   retrievedAt: "2026-08-13",
 }];
 
 describe("Debt workbook adapter", () => {
+  it.each(["stock", "service", "rate"] as const)("exports English %s without changing numbers, status flags or source links", async family => {
+    const presentation = await getPresentation("en", ["workbook"], facts.map(fact => fact.seriesId));
+    const input = {
+      facts, gdpFacts, family,
+      selectedIds: [...new Set(facts.filter(fact => fact.family === family).map(fact => fact.seriesId))],
+      range: { start: family === "stock" ? 2013 : family === "service" ? 2025 : 2019, end: family === "stock" ? 2014 : family === "service" ? 2026 : 2021 },
+      shareOfGdp: false, sources: debtSources, gdpSources, siteOrigin: "https://fiscal.ge",
+    };
+    const ka = buildDebtWorkbookExportModel(input);
+    const en = buildDebtWorkbookExportModel({ ...input, sources: debtSources.map((source, index) => ({ ...source, title: `Official debt source ${index + 1}`, organization: "Ministry of Finance of Georgia" })) }, presentation);
+    expect(en.sheetNames).toEqual(["Summary", "Data", "Sources"]);
+    expect(en.analysis.rows.map(row => [row[0], row[3], row[5]])).toEqual(ka.analysis.rows.map(row => [row[0], row[3], row[5]]));
+    expect(en.readable.rows.map(row => [row.valuesByYear, row.basisByYear])).toEqual(ka.readable.rows.map(row => [row.valuesByYear, row.basisByYear]));
+    expect(en.sources.map(source => [source.absoluteUrl, source.years])).toEqual(ka.sources.map(source => [source.absoluteUrl, source.years]));
+    expect(JSON.stringify(en)).not.toMatch(/\p{Script=Georgian}/u);
+    if (family === "service") expect(en.analysis.rows.some(row => row[4] === "Forecast")).toBe(true);
+    if (family === "rate") {
+      expect(en.analysis.rows.every(row => row[3] === null)).toBe(true);
+      expect(en.analysis.rows.some(row => row[4] === "Not available")).toBe(true);
+    }
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(await createWorkbookBuffer(en));
+    expect(workbook.worksheets.map(sheet => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
+    if (family === "rate") {
+      const sheet = workbook.getWorksheet("Data")!;
+      for (let row = 2; row <= sheet.rowCount; row += 1) expect(sheet.getCell(row, 4).value).toBeNull();
+    }
+  });
+
   it("uses exact real-manifest stock and service lineage at source-era boundaries", async () => {
     resetWorkbookSourceCacheForTests();
     const [realFacts, realSources] = await Promise.all([
@@ -128,13 +158,13 @@ describe("Debt workbook adapter", () => {
       siteOrigin: "https://fiscal.ge",
     });
 
-    expect(model.readable.subtitleKa).toBe(`${years[0]}–${years.at(-1)} · არ არის ხელმისაწვდომი · %`);
-    expect(model.readable.subtitleKa).not.toContain("ფაქტი");
+    expect(model.readable.subtitle).toBe(`${years[0]}–${years.at(-1)} · არ არის ხელმისაწვდომი · %`);
+    expect(model.readable.subtitle).not.toContain("ფაქტი");
     expect(model.analysis.rows.every((row) => row[4] === "არ არის ხელმისაწვდომი")).toBe(true);
 
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(await createWorkbookBuffer(model));
-    expect(workbook.getWorksheet("მარტივი ცხრილი")!.getCell("A2").value).toBe(model.readable.subtitleKa);
+    expect(workbook.getWorksheet("მარტივი ცხრილი")!.getCell("A2").value).toBe(model.readable.subtitle);
     expect(workbook.getWorksheet("მარტივი ცხრილი")!.getCell("B4").value).toBeNull();
     expect(workbook.getWorksheet("მონაცემები")!.getCell("E2").value).toBe("არ არის ხელმისაწვდომი");
   });
@@ -215,9 +245,9 @@ describe("Debt workbook adapter", () => {
     expect(model.filename).toBe("fiscal-government-debt-stock-2013-2014.xlsx");
     expect(model.sheetNames).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
     expect(model.readable.years).toEqual([2013, 2014]);
-    expect(model.readable.unitLabelKa).toBe("% მშპ-ში");
-    expect(model.readable.subtitleKa).toBe("2013–2014 · ფაქტი · % მშპ-ში");
-    expect(model.readable.rows.map((row) => [row.labelKa, row.valuesByYear])).toEqual([
+    expect(model.readable.unitLabel).toBe("% მშპ-ში");
+    expect(model.readable.subtitle).toBe("2013–2014 · ფაქტი · % მშპ-ში");
+    expect(model.readable.rows.map((row) => [row.label, row.valuesByYear])).toEqual([
       ["მთლიანი ვალი", { 2013: 0.5, 2014: 0.5 }],
       ["საშინაო ვალი", { 2013: 0.125, 2014: 0.125 }],
     ]);
@@ -226,7 +256,7 @@ describe("Debt workbook adapter", () => {
       "საშინაო ვალი",
       "საშინაო ვალი",
     ]);
-    expect(model.sources.map((source) => source.titleKa)).toEqual([
+    expect(model.sources.map((source) => source.title)).toEqual([
       "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
       "მშპ მიმდინარე ფასებში — SNA 2008",
     ]);
@@ -265,7 +295,7 @@ describe("Debt workbook adapter", () => {
       siteOrigin: "https://fiscal.ge",
     });
 
-    expect(model.readable.unitLabelKa).toBe("%");
+    expect(model.readable.unitLabel).toBe("%");
     expect(model.readable.years).toEqual([2019, 2021]);
     expect(model.readable.rows[0]?.valuesByYear).toEqual({ 2019: null, 2021: 0.0095 });
     expect(model.analysis.headers).toEqual(["წელი", "მთავარი ჯგუფი", "კატეგორია", "თანხა (₾)", "სტატუსი", "საპროცენტო განაკვეთი (%)"]);
@@ -288,7 +318,7 @@ describe("Debt workbook adapter", () => {
       siteOrigin: "https://fiscal.ge",
     });
 
-    expect(model.readable.subtitleKa).toBe("2025–2026 · ფაქტი და პროგნოზი · მლრდ ₾");
+    expect(model.readable.subtitle).toBe("2025–2026 · ფაქტი და პროგნოზი · მლრდ ₾");
     expect(model.analysis.rows.map((row) => row[4])).toEqual(["ფაქტი", "პროგნოზი"]);
     expect(model.sources).toEqual([
       expect.objectContaining({

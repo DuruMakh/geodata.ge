@@ -47,6 +47,28 @@ Year ranges in the UI always derive from loaded facts. Current reviewed coverage
 - General-government balance: **1995–2031** (1995–2025 actual; 2026–2031 IMF projection), published directly as percent of GDP and nominal GEL.
 - All current budget facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned budget facts ever load; debt and deficit projections use the separate `პროგნოზი` treatment.
 
+### 2.2 Bilingual presentation
+
+Georgian keeps its existing addresses; English human pages use `/en`. Both use
+this same v4.1 visual system, component hierarchy, colours, chart geometry and
+financial rules. The language switch is an accessible link and preserves the
+current page, query and explorer settings. Human navigation stays in the selected
+language; downloads and the MCP endpoint retain shared resource addresses.
+
+English names and full sentences come from reviewed catalogues and scoped
+messages. Missing English text is a validation error. Search may match either
+language while results use the selected language. Long English debt-rate labels
+wrap so domestic and external series remain distinguishable. Dates and units
+use the selected locale; numerical precision, missing/zero distinctions, basis
+markers and forecasts retain their existing meaning. English workbooks have
+Summary, Data and Sources sheets and an `-en.xlsx` suffix, with identical numbers
+and original-source selection. Original filenames remain unchanged, explicitly
+marked with their language and accompanied by translated descriptions.
+
+Review both languages at 390, 768 and 1440 pixels, including keyboard navigation,
+the compact sidebar, mobile controls, search and exports. Update the affected
+English page review dates when a translation or shared public text changes.
+
 ## 3. Design Direction
 
 The confirmed direction is a **warm editorial statistical annual**: the product should read like a precisely typeset printed reference publication, not a SaaS dashboard.
@@ -408,9 +430,11 @@ Specs below are contracts; visual proof lives in the reference files.
 
 The public-site header appears on the landing page (§19), `/about` (§23), the methodology hub, and every live dataset methodology route. Surfaces under `/explorer` use the sidebar of §6.7 and its breadcrumb page header instead, and have no nav tabs. The landing, mission, and methodology surfaces use one shared component.
 
-The brand link uses the reviewed full v2.0 horizontal lockup at 280px from 768px upward and the compact lockup below 768px. The full horizontal lockup must not render below 280px; the standalone mark must not render below 24px. The supplied token JSON's 180px lockup value is not authoritative for production.
+The brand link uses the reviewed full v2.0 horizontal lockup at 280px from 900px upward and the standalone symbol below 900px. The full horizontal lockup must not render below 280px; the standalone mark must not render below 24px. The supplied token JSON's 180px lockup value is not authoritative for production.
 
-Vertically centered logo row: lockup left, nav tabs center, mono loaded-coverage context label right; no bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` text underline with a `5px` offset; inactive = muted, weight 500. The landing page marks `მთავარი` active. `/about` marks `მიზანი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` nor `მიზანი` active and render no `aria-current`, because methodology remains inactive as a separate destination; no methodology tab is added.
+Vertically centered logo row: lockup left, navigation centered independently of the side content, language switch right; no coverage-year label or bottom rule. From 900px, equal outer grid columns keep navigation at the header's true midpoint. Below 900px, a single compact row contains the standalone logo symbol on the left, a centered bold Fiscal.ge wordmark without a tagline, and an icon-only Menu button on the right. The button retains a localized accessible name. The button expands navigation links and the KA / EN language switch beneath it; the language switch stays inside this panel. Escape closes the panel and returns focus to the button; following a link or crossing the desktop breakpoint closes it. Nav tab: sans 13px; active = ink, weight 600, `2px accent` text underline with a `5px` offset; inactive = muted, weight 500. The landing page marks `მთავარი` active. `/about` marks `მიზანი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` nor `მიზანი` active and render no `aria-current`, because methodology remains inactive as a separate destination; no methodology tab is added.
+
+The English hero heading uses two explicit lines: `Georgia` followed by `in numbers`. English hero statistics and city population labels abbreviate thousand as `k` (for example, `69.7 k km²`).
 
 ### 7.2a Mode Control
 
@@ -791,7 +815,7 @@ Lives at `/`; reuses the editorial shell (§6.1), tokens, and type scale. Implem
 
 Section order is fixed: shared header → living-relief hero → country figures → expenditure → revenue → municipalities → Government Debt → general-government deficit → methodology and first sources → retained footer.
 
-**Header and hero.** The header uses the responsive lockups of §7.1, keeps `მთავარი` as the active page and `მონაცემები` → `/explorer`, and shows the mono revenue year range in its right slot above mobile. The living-relief map remains the full-bleed primary visual with its existing camera fitting, city behavior, reduced-motion still frame, accessible description, and WebGL fallback. Below 768px it is a static-only, reduced-motion capture selected for narrow, medium, or wide mobile widths; mobile must not request or mount the Three.js runtime. From 768px the existing WebGL relief remains interactive, retains 8.6px terrain spacing and the 2× renderer-density cap, and begins after `load` during browser idle time with a 1.5-second timeout. The hero receives no additional logo. Visible hero copy is exactly `საქართველოს მონაცემების პორტალი`, H1 `საქართველო ციფრებში`, and CTA `გაეცანი მონაცემებს` → `#data`. The figure reserves the compact, settled map band from first paint: `calc(29vw + 48px)` below 768px, `calc(22.7vw + 57px)` from 768px, and the camera-fit bounds in `.landing-hero-frame` from 1100px. The existing virtual camera frames (340px, 500px, and `clamp(560px, 78vh, 820px)`) still determine the map's scale and crop. The static mobile image or desktop canvas receives that exact height; initialization must not resize the outer figure or move the country figures below it. At standard text sizes, keep the reserved band within 10px of the rendered visual at the tested responsive sizes, without clipping the map or adding a large blank area. From 768px, copy and figure share a grid row: the copy stays at its existing top/right alignment, and its intrinsic height plus 24px of clearance can enlarge the row for text-only zoom without overlapping the country figures.
+**Header and hero.** The header uses the responsive lockups of §7.1, keeps `მთავარი` as the active page and `მონაცემები` → `/explorer`. The living-relief map remains the full-bleed primary visual with its existing camera fitting, city behavior, reduced-motion still frame, accessible description, and WebGL fallback. Below 768px it is a static-only, reduced-motion capture selected for narrow, medium, or wide mobile widths; mobile must not request or mount the Three.js runtime. From 768px the existing WebGL relief remains interactive, retains 8.6px terrain spacing and the 2× renderer-density cap, and begins after `load` during browser idle time with a 1.5-second timeout. The hero receives no additional logo. Visible hero copy is exactly `საქართველოს მონაცემების პორტალი`, H1 `საქართველო ციფრებში`, and CTA `გაეცანი მონაცემებს` → `#data`. The figure reserves the compact, settled map band from first paint: `calc(29vw + 48px)` below 768px, `calc(22.7vw + 57px)` from 768px, and the camera-fit bounds in `.landing-hero-frame` from 1100px. The existing virtual camera frames (340px, 500px, and `clamp(560px, 78vh, 820px)`) still determine the map's scale and crop. The static mobile image or desktop canvas receives that exact height; initialization must not resize the outer figure or move the country figures below it. At standard text sizes, keep the reserved band within 10px of the rendered visual at the tested responsive sizes, without clipping the map or adding a large blank area. From 768px, copy and figure share a grid row: the copy stays at its existing top/right alignment, and its intrinsic height plus 24px of clearance can enlarge the row for text-only zoom without overlapping the country figures.
 
 **Brand metadata.** Organization structured data uses the reviewed mark at `/fiscal-ge-logo.svg` with its intrinsic 520×650 dimensions. App Router owns `favicon.ico`, `icon.svg`, and `apple-icon.png`. The generated 1200×630 social image combines the horizontal lockup with the reversed mark; it is the site sharing image, not a hero asset.
 
@@ -865,7 +889,7 @@ The shared footer remains unchanged apart from the visible navigation label, whi
 
 The one human-facing surface for the read-only MCP connection. Every other agent-facing surface (`llms.txt`, the JSON publications, the endpoint itself) is machine-facing; this page is the entire discovery funnel. It is written for someone who already uses an AI assistant and wants the address in it, not for a developer reading a spec.
 
-No new visual direction, chart type, or interaction pattern. It reuses the established composition: `SiteHeader` with the loaded-coverage label, `BreadcrumbTrail` (`მთავარი / AI-კავშირი`), a `2px ink` top rule under the serif H1 with a single-sentence deck, then rule-separated sections at the `border-t border-[var(--ink)] pt-5` rhythm, and `SiteFooter`.
+No new visual direction, chart type, or interaction pattern. It reuses the established composition: `SiteHeader` following the responsive navigation rules of §7.1, `BreadcrumbTrail` (`მთავარი / AI-კავშირი`), a `2px ink` top rule under the serif H1 with a single-sentence deck, then rule-separated sections at the `border-t border-[var(--ink)] pt-5` rhythm, and `SiteFooter`.
 
 **The page is ordered by weight, not as equal blocks: anchor, act, check, fine print.**
 

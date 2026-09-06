@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 const CORE_DIR = path.join(process.cwd(), "lib", "factQuery");
 const FORBIDDEN = [
+  /(?:from\s+["'][^"']*\/i18n\/(?:messages|catalogue\.server)|import\s*\(\s*["'][^"']*\/i18n\/(?:messages|catalogue\.server))/,
   /(?:from\s+["'](?:node:)?fs|import\s*\(\s*["'](?:node:)?fs)/,
   /(?:from\s+["'](?:node:)?net|import\s*\(\s*["'](?:node:)?net)/,
   /(?:from\s+["'](?:node:)?https?|import\s*\(\s*["'](?:node:)?https?)/,

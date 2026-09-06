@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
 import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
@@ -80,6 +82,7 @@ function decimalsFor(step: number, max: number): number {
 }
 
 export function EditorialLineChart({ years, series, share, unit, shareLabel }: EditorialLineChartProps) {
+  const { messages } = useI18n();
   const [hoverRaw, setHover] = useState<number | null>(null);
   const n = years.length;
   // The hover index survives range shrinks (no pointer event fires), so clamp it
@@ -163,14 +166,14 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
         data-testid="chart-frame"
         role="region"
         tabIndex={0}
-        aria-label="მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი"
+        aria-label={message(messages, "controls.chartScrollable")}
         className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
       <div className="relative min-w-[720px] min-[900px]:max-[1020px]:min-w-0">
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label="მრავალწლიანი დინამიკა"
+        aria-label={message(messages, "controls.chartTrend")}
         className="block h-auto w-full"
         onPointerMove={handlePointerMove}
         onPointerLeave={() => setHover(null)}
@@ -356,7 +359,7 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
             </div>
           ))}
           {tooltip.hidden > 0 ? (
-            <div className="pt-0.5 text-[10.5px] text-[var(--muted)]">+{tooltip.hidden} სხვა</div>
+            <div className="pt-0.5 text-[10.5px] text-[var(--muted)]">+{tooltip.hidden} {message(messages, "controls.other")}</div>
           ) : null}
         </div>
       ) : null}

@@ -22,6 +22,7 @@ const caveat = z
     messageKa: z.string(),
     messageEn: z.string(),
     methodologyRef: z.string(),
+    methodologyRefEn: z.string().min(1),
     affects: z.array(z.string()),
   })
   .loose();
@@ -38,11 +39,18 @@ const responseDocument = z
   .object({
     documentId: z.string(),
     title: z.string(),
+    titleKa: z.string().min(1),
+    titleEn: z.string().min(1),
+    documentLanguage: z.enum(["ka", "en", "mul"]).nullable(),
     officialUrl: z.string().nullable(),
     archiveUrl: z.string().nullable(),
     years: z.array(z.number()),
     publisher: z.string().optional(),
+    publisherKa: z.string().min(1).optional(),
+    publisherEn: z.string().min(1).optional(),
     attribution: z.string().nullable().optional(),
+    attributionKa: z.string().nullable().optional(),
+    attributionEn: z.string().nullable().optional(),
     licenceId: z.string().nullable().optional(),
     mediaType: z.string().optional(),
     retrievedAt: z.string().optional(),
@@ -55,10 +63,14 @@ const responseSource = z
   .object({
     sourceId: z.string(),
     name: z.string(),
+    nameKa: z.string().min(1),
+    nameEn: z.string().min(1),
+    derivationKa: z.string().nullable(),
+    derivationEn: z.string().nullable(),
     lastReviewedAt: z.string(),
     derivation: z.string().nullable(),
     /** Values shared by every document below; a field absent from a document is given here. */
-    documentDefaults: z.record(z.string(), z.unknown()).optional(),
+    documentDefaults: responseDocument.pick({ publisher: true, publisherKa: true, publisherEn: true, attribution: true, attributionKa: true, attributionEn: true, licenceId: true, mediaType: true, retrievedAt: true, datasetId: true, role: true }).optional(),
     documents: z.array(responseDocument),
   })
   .loose();
@@ -82,40 +94,42 @@ const responseMeta = z
  * answers and does not advertise an error shape that can never arrive.
  */
 const excludedEntity = z.object({ entityId: z.string(), reason: z.string() });
+const bilingualExcludedEntity = excludedEntity.extend({ reasonEn: z.string().min(1) });
 const coverage = z.object({
   requestedYears: z.array(z.number().int()), availableYears: z.array(z.number().int()), returnedYears: z.array(z.number().int()),
-  missingCells: z.array(z.object({ entityId: z.string(), seriesId: z.string(), year: z.number().int(), reason: z.string() })),
-  excludedEntities: z.array(excludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
+  missingCells: z.array(z.object({ entityId: z.string(), seriesId: z.string(), year: z.number().int(), reason: z.string(), reasonEn: z.string().min(1) })),
+  excludedEntities: z.array(bilingualExcludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
 });
-const endpoint = observationSchema.pick({ year: true, value: true, availability: true, missingReason: true, basis: true, valueDefinition: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
+const endpoint = observationSchema.pick({ year: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
 const dataShapes = {
   observations: z.object({ observations: z.array(observationSchema), coverage }),
   comparisons: z.object({
     comparisons: z.array(z.object({
-      comparisonId: z.string(), datasetId: z.string(), entityId: z.string(), entityLabelKa: z.string(), seriesId: z.string(), seriesLabelKa: z.string(),
+      comparisonId: z.string(), datasetId: z.string(), entityId: z.string(), entityLabelKa: z.string(), entityLabelEn: z.string().min(1), seriesId: z.string(), seriesLabelKa: z.string(), seriesLabelEn: z.string().min(1),
       measure: z.string(), unit: observationSchema.shape.unit, from: endpoint, to: endpoint,
       absoluteChange: z.number().nullable(), percentageChange: z.number().nullable(), percentagePointChange: z.number().nullable(),
-      comparability: z.enum(["comparable", "limited", "not_comparable"]), reasons: z.array(z.string()), caveatIds: z.array(z.string()),
+      comparability: z.enum(["comparable", "limited", "not_comparable"]), reasons: z.array(z.string()), reasonsEn: z.array(z.string()), caveatIds: z.array(z.string()),
     })),
-    coverage: z.object({ requestedYears: z.array(z.number()), requestedPairs: z.number(), comparedPairs: z.number(), comparableCount: z.number(), notComparableCount: z.number(), excludedEntities: z.array(excludedEntity) }),
+    coverage: z.object({ requestedYears: z.array(z.number()), requestedPairs: z.number(), comparedPairs: z.number(), comparableCount: z.number(), notComparableCount: z.number(), excludedEntities: z.array(bilingualExcludedEntity) }),
   }),
   ranking: z.object({
     entries: z.array(z.object({
-      position: z.number(), tied: z.boolean(), entityId: z.string(), entityLabelKa: z.string(), seriesId: z.string(), seriesLabelKa: z.string(),
+      position: z.number(), tied: z.boolean(), entityId: z.string(), entityLabelKa: z.string(), entityLabelEn: z.string().min(1), seriesId: z.string(), seriesLabelKa: z.string(), seriesLabelEn: z.string().min(1),
       value: z.number().nullable(), unit: observationSchema.shape.unit, basis: observationSchema.shape.basis, caveatIds: z.array(z.string()),
     })),
-    universe: z.object({ dimension: z.enum(["series", "entities"]), description: z.string(), candidateCount: z.number(), eligibleCount: z.number(), returnedCount: z.number(), cutoffSplitsTie: z.boolean() }),
-    exclusions: z.array(z.object({ reason: z.string(), ids: z.array(z.string()) })), rankingDefinition: z.string(),
+    universe: z.object({ dimension: z.enum(["series", "entities"]), description: z.string(), descriptionEn: z.string().min(1), candidateCount: z.number(), eligibleCount: z.number(), returnedCount: z.number(), cutoffSplitsTie: z.boolean() }),
+    exclusions: z.array(z.object({ reason: z.string(), reasonEn: z.string().min(1), ids: z.array(z.string()) })), rankingDefinition: z.string(), rankingDefinitionEn: z.string().min(1),
   }),
   catalogue: z.object({
-    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), years: z.tuple([z.number(), z.number()]), entityTypes: z.array(z.string()), measures: z.array(z.string()), measureNotes: z.record(z.string(), z.string()).optional() })),
-    series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), datasetId: z.string().optional() })).optional(),
-    entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), entitySlug: z.string().nullable(), datasetId: z.string().optional() })).optional(),
-    exclusions: z.array(excludedEntity),
+    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), labelEn: z.string().min(1), years: z.tuple([z.number(), z.number()]), entityTypes: z.array(z.string()), measures: z.array(z.string()), measureNotes: z.record(z.string(), z.string()).optional(), measureNotesEn: z.record(z.string(), z.string()).optional(), measureNotesKa: z.record(z.string(), z.string()).optional() })),
+    series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), datasetId: z.string().optional() })).optional(),
+    entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), labelEn: z.string().min(1), entitySlug: z.string().nullable(), datasetId: z.string().optional() })).optional(),
+    exclusions: z.array(bilingualExcludedEntity),
   }),
   sources: z.object({
     sources: z.array(z.object({
       sourceId: z.string(), name: z.string(), lastReviewedAt: z.string(), derivation: z.string().nullable(), documentCount: z.number(), narrowed: z.boolean(), narrowingOutcome: z.enum(["not_requested", "applied", "dropped_no_match"]),
+      nameKa: z.string().min(1), nameEn: z.string().min(1), derivationKa: z.string().nullable(), derivationEn: z.string().nullable(),
       documents: z.array(responseDocument.extend({ sha256: z.string(), byteSize: z.number() })),
     })),
     narrowedBy: z.object({ datasetId: z.string().optional(), years: z.array(z.number()).optional(), entityIds: z.array(z.string()).optional() }).nullable(),

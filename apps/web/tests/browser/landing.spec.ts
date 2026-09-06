@@ -9,7 +9,7 @@ import { computedCssColorAlpha } from "./focus-outline";
 
 const artifactDir = join(process.cwd(), "test-results", "visual-reference");
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
-const heroRuntimeMarkers = ["WebGLRenderer", "ვიზუალი ვერ ჩაიტვირთა"] as const;
+const heroRuntimeMarkers = ["WebGLRenderer", "hero scene init failed"] as const;
 
 async function heroRuntimeScripts(request: APIRequestContext, urls: Iterable<string>) {
   const uniqueUrls = [...new Set(urls)];
@@ -366,7 +366,7 @@ test("landing keeps mobile header and statistic geometry stable while fonts load
   });
 
   await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
-  const nav = page.getByRole("navigation");
+  const nav = page.getByTestId("landing-header").getByRole("button", { name: "მენიუ" });
   const logo = page.getByTestId("site-header-logo").locator("..");
   const heading = page.getByRole("heading", { level: 1, name: "საქართველო ციფრებში" });
   const statisticValues = page.locator("[data-country-stat] > div:nth-child(2)");
@@ -386,16 +386,17 @@ test("landing keeps mobile header and statistic geometry stable while fonts load
   };
 
   for (const key of ["x", "y", "width", "height"] as const) {
-    expect(after.nav?.[key], `navigation ${key}`).toBeCloseTo(before.nav?.[key] ?? Number.NaN, 0);
+    expect(after.nav?.[key], `menu button ${key}`).toBeCloseTo(before.nav?.[key] ?? Number.NaN, 0);
     expect(after.logo?.[key], `logo ${key}`).toBeCloseTo(before.logo?.[key] ?? Number.NaN, 0);
     expect(after.heading?.[key], `hero heading ${key}`).toBeCloseTo(before.heading?.[key] ?? Number.NaN, 0);
   }
-  expect(before.nav?.y ?? Number.NaN).toBeGreaterThanOrEqual(
-    (before.logo?.y ?? Number.NaN) + (before.logo?.height ?? Number.NaN),
-  );
-  expect(after.nav?.y ?? Number.NaN).toBeGreaterThanOrEqual(
-    (after.logo?.y ?? Number.NaN) + (after.logo?.height ?? Number.NaN),
-  );
+  for (const geometry of [before, after]) {
+    expect(geometry.nav!.y + geometry.nav!.height / 2).toBeCloseTo(
+      geometry.logo!.y + geometry.logo!.height / 2,
+      0,
+    );
+    expect(geometry.nav!.x).toBeGreaterThan(geometry.logo!.x + geometry.logo!.width);
+  }
   expect(after.statisticValues).toHaveLength(3);
   for (const [index, box] of after.statisticValues.entries()) {
     for (const key of ["x", "y", "width", "height"] as const) {
@@ -490,7 +491,9 @@ test("landing keeps timeout-driven hero readiness within five seconds of load", 
     );
     new MutationObserver(() => {
       if (testWindow.__heroFallbackAt !== undefined) return;
-      if (document.body?.textContent?.includes("ვიზუალი ვერ ჩაიტვირთა")) {
+      // The translated fallback also travels in hidden page data; readiness
+      // must observe the rendered figure rather than serialized script text.
+      if (document.querySelector<HTMLElement>(".landing-hero-frame")?.innerText.includes("ვიზუალი ვერ ჩაიტვირთა")) {
         testWindow.__heroFallbackAt = performance.now();
       }
     }).observe(document, { childList: true, subtree: true });
@@ -765,13 +768,13 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
   }
 });
 
-test("shared brand identity uses the full desktop lockup and compact mobile lockup", async ({ page, request }) => {
+test("shared brand identity uses the full desktop lockup and standalone mobile symbol", async ({ page, request }) => {
   for (const viewport of [
     { width: 1440, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
     { width: 900, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
-    { width: 768, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
-    { width: 767, height: 900, asset: "fiscal-logo-compact.svg", minimumWidth: 118 },
-    { width: 390, height: 844, asset: "fiscal-logo-compact.svg", minimumWidth: 118 },
+    { width: 768, height: 900, asset: "icon.svg", minimumWidth: 44 },
+    { width: 767, height: 900, asset: "icon.svg", minimumWidth: 44 },
+    { width: 390, height: 844, asset: "icon.svg", minimumWidth: 44 },
   ] as const) {
     await page.setViewportSize(viewport);
     await page.goto(baseUrl);
@@ -796,6 +799,7 @@ test("active public-header underline sits directly beneath its label across the 
   ]) {
     await page.setViewportSize(viewport);
     await page.goto(baseUrl);
+    await page.getByTestId("landing-header").getByRole("button", { name: "მენიუ" }).click();
     const activeLink = page.getByTestId("landing-header").getByRole("link", { name: "მთავარი", exact: true });
     const decoration = await activeLink.evaluate((link) => {
       const style = getComputedStyle(link);

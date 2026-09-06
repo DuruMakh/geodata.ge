@@ -1,5 +1,10 @@
 "use client";
 
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
+import { publicLabel } from "../../lib/i18n/labels";
+import { matchesLabelQuery } from "../../lib/i18n/search";
+import type { Locale } from "../../lib/i18n/types";
 import { useState, type ReactNode } from "react";
 import type { GovernmentDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
@@ -17,12 +22,12 @@ type DebtSeriesPanelProps = {
 };
 
 function matches(item: GovernmentDebtExplorerModel["items"][number], query: string): boolean {
-  return `${item.kaLabel} ${item.enLabel} ${item.id}`.toLowerCase().includes(query);
+  return matchesLabelQuery(query, [item.kaLabel, item.enLabel, item.id]);
 }
 
-function formatSummary(fact: ServedGovernmentDebtFact | undefined, latestYear: number | undefined): string {
+function formatSummary(fact: ServedGovernmentDebtFact | undefined, latestYear: number | undefined, locale: Locale): string {
   if (!fact || fact.value === null) return MISSING;
-  const value = fact.family === "rate" ? formatShare(fact.value / 100) : formatAmount(fact.value);
+  const value = fact.family === "rate" ? formatShare(fact.value / 100) : formatAmount(fact.value, locale);
   return fact.family === "rate" && fact.year !== latestYear ? `${value} · ${fact.year}` : value;
 }
 
@@ -35,6 +40,7 @@ export function DebtSeriesPanel({
   onToggle,
   downloadAction,
 }: DebtSeriesPanelProps) {
+  const { locale, messages, englishLabels } = useI18n();
   const [query, setQuery] = useState("");
   const [expandedIds, setExpandedIds] = useState<DebtSeriesId[]>(expandedParentIds);
   const normalizedQuery = query.trim().toLowerCase();
@@ -77,13 +83,13 @@ export function DebtSeriesPanel({
   const hasSelection = selectedIds.length > 0;
   return (
     <aside
-      aria-label="სერიები"
+      aria-label={message(messages, "controls.series")}
       className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
     >
       <SeriesSelector
         query={query}
         onQueryChange={setQuery}
-        searchPlaceholder="ძებნა"
+        searchPlaceholder={message(messages, "controls.search")}
         selectedCount={selectedIds.length}
         totalCount={items.length}
         hasSelection={hasSelection}
@@ -96,9 +102,9 @@ export function DebtSeriesPanel({
           <SeriesSelectorRow
             key={item.id}
             id={item.id}
-            label={item.kaLabel}
+            label={publicLabel(locale, item.id, item.kaLabel, englishLabels)}
             color={item.color}
-            value={formatSummary(summaryBySeries.get(item.id), latestYearBySeries.get(item.id))}
+            value={formatSummary(summaryBySeries.get(item.id), latestYearBySeries.get(item.id), locale)}
             selected={selectedIds.includes(item.id)}
             level={isChild ? "debt_child" : "debt_parent"}
             parentId={item.parentItemId}
@@ -106,10 +112,11 @@ export function DebtSeriesPanel({
             hasChildren={hasChildren}
             expanded={expanded}
             expansionLocked={expansionLocked}
-            expansionLabel={`${item.kaLabel} — ქვესერიების ${expanded ? "ჩაკეცვა" : "გაშლა"}`}
+            expansionLabel={message(messages, expanded ? "debt.collapse" : "debt.expand", { name: publicLabel(locale, item.id, item.kaLabel, englishLabels) })}
             showRail={isChild || expanded}
             isChild={isChild}
             childLabelSize="standard"
+            wrapLabel={locale === "en"}
             onToggle={() => onToggle(item.id)}
             onToggleExpanded={() => {
               setExpandedIds((current) => current.includes(item.id)

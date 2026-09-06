@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
 import { useState } from "react";
 
 type ExcelDownloadButtonProps = {
@@ -9,6 +11,7 @@ type ExcelDownloadButtonProps = {
 };
 
 export function ExcelDownloadButton({ testId, disabled, onDownload }: ExcelDownloadButtonProps) {
+  const { messages } = useI18n();
   const [status, setStatus] = useState<"idle" | "working" | "error">("idle");
 
   async function start() {
@@ -32,13 +35,13 @@ export function ExcelDownloadButton({ testId, disabled, onDownload }: ExcelDownl
         onClick={start}
         className="h-[38px] w-full cursor-pointer rounded-[2px] bg-[var(--ink)] text-[12.5px] font-semibold text-[var(--paper)] transition-opacity duration-150 hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-55"
       >
-        {status === "working" ? "Excel მზადდება…" : "ჩამოტვირთვა"}
+        {message(messages, status === "working" ? "controls.excelWorking" : "controls.download")}
       </button>
       <p role="status" aria-live="polite" aria-atomic="true" className="mt-2 min-h-4 text-[11px] text-[var(--negative)]">
         {status === "working" ? (
-          <span className="sr-only">Excel მზადდება…</span>
+          <span className="sr-only">{message(messages, "controls.excelWorking")}</span>
         ) : status === "error" ? (
-          "ფაილი ვერ მომზადდა — სცადეთ თავიდან."
+          message(messages, "controls.excelError")
         ) : (
           ""
         )}

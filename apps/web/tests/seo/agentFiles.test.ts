@@ -22,6 +22,10 @@ const requiredTargets = [
   "https://fiscal.ge/downloads/data/catalogue.json",
   "https://fiscal.ge/downloads/data/sources.json",
   "https://fiscal.ge/connect",
+  "https://fiscal.ge/en/connect",
+  "https://fiscal.ge/en",
+  "https://fiscal.ge/en/explorer",
+  "https://fiscal.ge/en/methodology/expenditure",
   "https://fiscal.ge/about",
   "https://fiscal.ge/sitemap.xml",
 ] as const;

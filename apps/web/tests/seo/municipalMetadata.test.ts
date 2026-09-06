@@ -11,11 +11,11 @@ import {
 } from "../../lib/explorer/municipalData";
 import { REGION_GENITIVE_KA } from "../../lib/explorer/municipalLabels";
 import {
-  adjaraDescriptionKa,
-  georgiaDescriptionKa,
-  municipalityDescriptionKa,
-  regionBudgetTitleKa,
-  regionDescriptionKa,
+  adjaraDescription,
+  georgiaDescription,
+  municipalityDescription,
+  regionBudgetTitle,
+  regionDescription,
   type RankedEntitySeoInput,
 } from "../../lib/seo/municipalMetadata";
 
@@ -46,7 +46,7 @@ function largestFunctionInput(
     .sort((left, right) => right.amountGel - left.amountGel)[0]!;
   return {
     latestTotalGel,
-    largestCategoryKa: data.functions.find((row) => row.id === largest.categoryId)!.kaLabel,
+    largestCategory: data.functions.find((row) => row.id === largest.categoryId)!.kaLabel,
     largestCategoryShare: largest.amountGel / latestTotalGel,
   };
 }
@@ -68,7 +68,7 @@ function municipalityInputs(): RankedEntitySeoInput[] {
     );
     const totalFacts = data.totalFacts.filter((row) => row.municipalityCode === municipality.code);
     return {
-      nameKa: municipality.nameKa,
+      name: municipality.nameKa,
       firstYear,
       latestYear,
       rank: requiredRank(list.municipalities.find((row) => row.id === municipality.code)!.rank),
@@ -82,7 +82,7 @@ function regionInputs(): Array<
   | { kind: "ranked"; input: RankedEntitySeoInput }
   | {
       kind: "adjara";
-      input: Omit<RankedEntitySeoInput, "largestCategoryKa" | "largestCategoryShare"> & {
+      input: Omit<RankedEntitySeoInput, "largestCategory" | "largestCategoryShare"> & {
         municipalityCount: number;
       };
     }
@@ -113,7 +113,7 @@ function regionInputs(): Array<
           }
         : rolled;
     const common = {
-      nameKa: REGION_GENITIVE_KA[region.id]!,
+      name: REGION_GENITIVE_KA[region.id]!,
       firstYear,
       latestYear,
       rank: requiredRank(list.regions.find((row) => row.id === region.id)!.rank),
@@ -134,7 +134,7 @@ function regionInputs(): Array<
 
 describe("municipal entity SEO copy", () => {
   it("keeps all 64 municipality descriptions unique and within the search-snippet range", () => {
-    const descriptions = municipalityInputs().map(municipalityDescriptionKa);
+    const descriptions = municipalityInputs().map(input => municipalityDescription(input));
     expect(descriptions).toHaveLength(MUNICIPAL_PUBLIC_PAGE_COUNT);
     expect(new Set(descriptions).size).toBe(MUNICIPAL_PUBLIC_PAGE_COUNT);
     expect(descriptions.every((text) => text.length >= 120 && text.length <= 160)).toBe(true);
@@ -142,7 +142,7 @@ describe("municipal entity SEO copy", () => {
 
   it("keeps all 11 region descriptions unique and within the search-snippet range", () => {
     const descriptions = regionInputs().map(({ kind, input }) =>
-      kind === "adjara" ? adjaraDescriptionKa(input) : regionDescriptionKa(input),
+      kind === "adjara" ? adjaraDescription(input) : regionDescription(input),
     );
     expect(descriptions).toHaveLength(11);
     expect(new Set(descriptions).size).toBe(11);
@@ -151,7 +151,7 @@ describe("municipal entity SEO copy", () => {
 
   it("describes Adjara's reviewed municipality total without inventing a functional share", () => {
     const adjara = regionInputs().find((row) => row.kind === "adjara")!;
-    const description = adjaraDescriptionKa(adjara.input);
+    const description = adjaraDescription(adjara.input);
     expect(description).toContain(`${adjara.input.municipalityCount} მუნიციპალიტეტ`);
     expect(description).toContain("შიდა ტრანსფერ");
     expect(description).not.toContain("ყველაზე დიდი ფუნქციური");
@@ -159,7 +159,7 @@ describe("municipal entity SEO copy", () => {
 
   it("states the reviewed Georgia unit count and Adjara adjustment within the snippet range", () => {
     const { firstYear, latestYear } = coverage();
-    const description = georgiaDescriptionKa({
+    const description = georgiaDescription({
       firstYear,
       latestYear,
       latestTotalGel: data.countryTotalFacts.find((row) => row.year === latestYear)!.publicTotalGel,
@@ -179,13 +179,13 @@ describe("municipal entity SEO copy", () => {
     const { firstYear, latestYear } = coverage();
 
     expect(
-      adjaraDescriptionKa({
+      adjaraDescription({
         ...adjara.input,
         municipalityCount: alternateMunicipalityCount,
       }),
     ).toContain(`${alternateMunicipalityCount} მუნიციპალიტეტ`);
     expect(
-      georgiaDescriptionKa({
+      georgiaDescription({
         firstYear,
         latestYear,
         latestTotalGel: data.countryTotalFacts.find((row) => row.year === latestYear)!.publicTotalGel,
@@ -195,7 +195,7 @@ describe("municipal entity SEO copy", () => {
   });
 
   it("uses a shorter unique region title", () => {
-    expect(regionBudgetTitleKa("იმერეთის", 2015, 2025)).toBe(
+    expect(regionBudgetTitle("იმერეთის", 2015, 2025)).toBe(
       "იმერეთის ბიუჯეტი 2015–2025 | Fiscal.ge",
     );
   });

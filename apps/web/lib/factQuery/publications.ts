@@ -11,6 +11,7 @@
 import { createHash } from "node:crypto";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { describeCoverage, type CoverageData } from "./describeCoverage";
+import { serviceMessage } from "./localization";
 import type { Observation } from "./observations";
 import { queryMinistries } from "./queryMinistries";
 import { queryDebt } from "./queryDebt";
@@ -107,8 +108,8 @@ export function buildCatalogueFile(snapshot: FactQuerySnapshot): PublicationArti
 
   const bytes = serialize({
     ...publicationHeader(snapshot),
-    notice:
-      "ეს გადამოწმებული კატალოგია: რომელი მონაცემთა ნაკრები, ერთეული და სერია არსებობს. ციფრები ცალკეულ ფაილებშია.",
+    notice: serviceMessage(snapshot, "ka", "publication.catalogueNotice"),
+    noticeEn: serviceMessage(snapshot, "en", "publication.catalogueNotice"),
     datasets,
     exclusions: overview.exclusions,
   });
@@ -123,8 +124,8 @@ export function buildCatalogueFile(snapshot: FactQuerySnapshot): PublicationArti
 export function buildSourcesFile(snapshot: FactQuerySnapshot): PublicationArtifact {
   const bytes = serialize({
     ...publicationHeader(snapshot),
-    notice:
-      'დოკუმენტი role="derivation_upstream" აღნიშნავს, რომ ის გაანგარიშების საწყისი მონაცემია და არა საბოლოო ციფრის პუბლიკაცია.',
+    notice: serviceMessage(snapshot, "ka", "publication.sourcesNotice"),
+    noticeEn: serviceMessage(snapshot, "en", "publication.sourcesNotice"),
     sources: snapshot.sources,
   });
 
@@ -163,9 +164,6 @@ export function buildManifestFile(
   return { fileName: "manifest.json", bytes, rowCount: artifacts.length };
 }
 
-const SUM_WARNING =
-  "ამ ფაილში ერთდროულადაა ჯამები და მათი შემადგენელი ნაწილები. ყველა სტრიქონის შეკრება არასწორ შედეგს იძლევა — გამოიყენეთ level და parentSeriesId.";
-
 type ObservationResult = {
   data: { observations: Observation[]; coverage: Coverage };
   meta: { sources: ResolvedSource[]; caveats: Caveat[] };
@@ -196,7 +194,8 @@ function datasetFile(
   const bytes = serialize({
     ...publicationHeader(snapshot),
     datasetId,
-    notice: SUM_WARNING,
+    notice: serviceMessage(snapshot, "ka", "publication.sumWarning"),
+    noticeEn: serviceMessage(snapshot, "en", "publication.sumWarning"),
     catalogue: catalogueData(snapshot, datasetId),
     observations: result.data.observations,
     coverage: result.data.coverage,
@@ -303,7 +302,8 @@ function ministriesFile(snapshot: FactQuerySnapshot): PublicationArtifact {
   const bytes = serialize({
     ...publicationHeader(snapshot),
     datasetId: "ministries" satisfies DatasetId,
-    notice: SUM_WARNING,
+    notice: serviceMessage(snapshot, "ka", "publication.sumWarning"),
+    noticeEn: serviceMessage(snapshot, "en", "publication.sumWarning"),
     catalogue: catalogueData(snapshot, "ministries"),
     observations: [...admin.data.observations, ...programs.data.observations],
     coverage: { admin_category: admin.data.coverage, major_program: programs.data.coverage },
@@ -386,7 +386,13 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
         years: yearsOf(snapshot.municipal.functionFacts),
         measure: "amount_gel",
       }),
-      { populationFacts: snapshot.municipal.populationFacts },
+      { populationFacts: snapshot.municipal.populationFacts.map(fact => ({
+        ...fact,
+        transformationKa: serviceMessage(snapshot, "ka", "supporting.populationTransformation", { sheet: fact.sourceSheet, cell: fact.sourceCell, year: fact.year }),
+        transformationEn: serviceMessage(snapshot, "en", "supporting.populationTransformation", { sheet: fact.sourceSheet, cell: fact.sourceCell, year: fact.year }),
+        sourceUnitKa: serviceMessage(snapshot, "ka", "supporting.populationUnit"),
+        sourceUnitEn: serviceMessage(snapshot, "en", "supporting.populationUnit"),
+      })) },
     ),
     // amount_gel only, like every dataset file above: the GDP share is
     // reproducible from the denominators shipped alongside. Rates are the

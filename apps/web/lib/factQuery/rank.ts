@@ -1,3 +1,4 @@
+import { serviceMessage, type ServiceMessageKey } from "./localization";
 // apps/web/lib/factQuery/rank.ts
 //
 // Ordering among PEERS (spec section 6.7). The constraint that shapes this
@@ -33,8 +34,10 @@ export type RankEntry = {
   tied: boolean;
   entityId: string;
   entityLabelKa: string;
+  entityLabelEn: string;
   seriesId: string;
   seriesLabelKa: string;
+  seriesLabelEn: string;
   value: number | null;
   unit: Unit;
   basis: Basis | null;
@@ -46,6 +49,7 @@ export type RankData = {
   universe: {
     dimension: "series" | "entities";
     description: string;
+    descriptionEn: string;
     candidateCount: number;
     eligibleCount: number;
     returnedCount: number;
@@ -58,15 +62,18 @@ export type RankData = {
    * of a 91 KiB response saying the same thing. Reasons keep first-seen order,
    * and ids keep their order within a reason.
    */
-  exclusions: { reason: string; ids: string[] }[];
+  exclusions: { reason: string; reasonEn: string; ids: string[] }[];
   rankingDefinition: string;
+  rankingDefinitionEn: string;
 };
 
 type Candidate = {
   entityId: string;
   entityLabelKa: string;
+  entityLabelEn: string;
   seriesId: string;
   seriesLabelKa: string;
+  seriesLabelEn: string;
   /** Never null: a row with no value is an exclusion, never a candidate. */
   value: number;
   unit: Unit;
@@ -77,18 +84,18 @@ type Candidate = {
 };
 
 /** Collapse one row per excluded entity into one row per distinct reason. */
-function groupByReason(flat: readonly { id: string; reason: string }[]): { reason: string; ids: string[] }[] {
-  const byReason = new Map<string, string[]>();
-  for (const { id, reason } of flat) {
-    const ids = byReason.get(reason);
-    if (ids === undefined) byReason.set(reason, [id]);
-    else ids.push(id);
+function groupByReason(flat: readonly { id: string; reason: string; reasonEn: string }[]): RankData["exclusions"] {
+  const byReason = new Map<string, RankData["exclusions"][number]>();
+  for (const { id, reason, reasonEn } of flat) {
+    const group = byReason.get(reason);
+    if (group === undefined) byReason.set(reason, { reason, reasonEn, ids: [id] });
+    else group.ids.push(id);
   }
-  return [...byReason].map(([reason, ids]) => ({ reason, ids }));
+  return [...byReason.values()];
 }
 
-const REASON_NOT_COMPARABLE = "საზღვრები შედარებადი არ არის, ამიტომ რანჟირებაში არ მონაწილეობს.";
-const REASON_NO_VALUE = "მაჩვენებელი მიუწვდომელია, ამიტომ რანჟირებაში არ მონაწილეობს.";
+const REASON_NOT_COMPARABLE = "ranking.notComparable";
+const REASON_NO_VALUE = "ranking.noValue";
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
@@ -113,8 +120,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   if (requestedDataset === "government-debt" || requestedDataset === "general-government-balance") {
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "ამ მონაცემთა ნაკრებს ერთადერთი სუბიექტი აქვს (საქართველო), ამიტომ რანჟირება არ ეხება.",
-      messageEn: `The "${requestedDataset}" dataset has a single entity (Georgia), so there is nothing to rank. Use query_debt or query_deficit for its values, or compare for a change between two years.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.rankSingleEntity"),
+      messageEn: serviceMessage(snapshot, "en", "errors.rankSingleEntity", { requestedDataset }),
       retryable: false,
       validChoices: ["national-revenue", "national-expenditure", "ministries", "municipal-expenditure"],
     });
@@ -126,8 +133,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     const issues = parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ");
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მოთხოვნის პარამეტრები არასწორია.",
-      messageEn: `Invalid parameters: ${issues}`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues }),
       retryable: false,
     });
   }
@@ -137,8 +144,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
       code: "data_version_changed",
-      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
-      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.dataVersionChanged"),
+      messageEn: serviceMessage(snapshot, "en", "errors.dataVersionChanged"),
       retryable: false,
     });
   }
@@ -149,8 +156,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   if (input.withinRegionId !== undefined && !snapshot.municipal.regions.some((r) => r.id === input.withinRegionId)) {
     return errorResponse(snapshot, {
       code: "unknown_entity",
-      messageKa: "მითითებული რეგიონი არ არსებობს.",
-      messageEn: "Unknown withinRegionId. Use a region id from describe_coverage.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.rankUnknownRegion"),
+      messageEn: serviceMessage(snapshot, "en", "errors.rankUnknownRegion"),
       retryable: false,
       validChoices: snapshot.municipal.regions.map((r) => r.id),
     });
@@ -163,16 +170,16 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   if (isValueMetric && (input.fromYear !== undefined || input.toYear !== undefined)) {
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მნიშვნელობით რანჟირება ერთ წელს მოითხოვს, დიაპაზონს არა.",
-      messageEn: "A value ranking takes a single year, not a year range.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.rankValueYearOnly"),
+      messageEn: serviceMessage(snapshot, "en", "errors.rankValueYearOnly"),
       retryable: false,
     });
   }
   if (!isValueMetric && input.year !== undefined) {
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "ცვლილებით რანჟირება ორ წელს მოითხოვს (fromYear და toYear).",
-      messageEn: "A change ranking takes fromYear and toYear, not a single year.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.rankChangeYears"),
+      messageEn: serviceMessage(snapshot, "en", "errors.rankChangeYears"),
       retryable: false,
     });
   }
@@ -183,16 +190,16 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     if (wantsPercentagePoints && !measureIsPercentage) {
       return errorResponse(snapshot, {
         code: "unsupported_measure",
-        messageKa: "პროცენტული პუნქტის ცვლილება მხოლოდ პროცენტულ მაჩვენებელზეა განსაზღვრული.",
-        messageEn: "percentage_point_change applies only to a percentage measure.",
+        messageKa: serviceMessage(snapshot, "ka", "errors.rankPercentagePoints"),
+        messageEn: serviceMessage(snapshot, "en", "errors.rankPercentagePoints"),
         retryable: false,
       });
     }
     if (GEL_METRICS.has(input.metric) && measureIsPercentage) {
       return errorResponse(snapshot, {
         code: "unsupported_measure",
-        messageKa: "აბსოლუტური და პროცენტული ცვლილება მხოლოდ ლარის მაჩვენებელზეა განსაზღვრული; პროცენტისთვის გამოიყენეთ percentage_point_change.",
-        messageEn: "absolute_change and percentage_change apply to GEL amounts; use percentage_point_change for a percentage measure.",
+        messageKa: serviceMessage(snapshot, "ka", "errors.rankAmountChanges"),
+        messageEn: serviceMessage(snapshot, "en", "errors.rankAmountChanges"),
         retryable: false,
       });
     }
@@ -201,8 +208,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   if (isMunicipal !== (input.dimension === "entities")) {
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მუნიციპალური მონაცემები ერთეულებით რანჟირდება, დანარჩენი — სერიებით.",
-      messageEn: 'Municipal data ranks by "entities"; every other dataset ranks by "series".',
+      messageKa: serviceMessage(snapshot, "ka", "errors.rankDimension"),
+      messageEn: serviceMessage(snapshot, "en", "errors.rankDimension"),
       retryable: false,
     });
   }
@@ -211,14 +218,15 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
   let entityIds: string[] = [];
   let seriesIds: string[] = [];
-  let universeDescription: string;
+  let universeKey: ServiceMessageKey;
+  let universeValues: Record<string, string> = {};
 
   if (isMunicipal) {
     if (input.seriesId === undefined || input.entityType === undefined) {
       return errorResponse(snapshot, {
         code: "invalid_parameters",
-        messageKa: "მუნიციპალური რანჟირება მოითხოვს entityType-ს და ერთ seriesId-ს.",
-        messageEn: "A municipal ranking requires entityType and exactly one seriesId.",
+        messageKa: serviceMessage(snapshot, "ka", "errors.rankMunicipalInput"),
+        messageEn: serviceMessage(snapshot, "en", "errors.rankMunicipalInput"),
         retryable: false,
       });
     }
@@ -226,7 +234,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
     if (input.entityType === "region") {
       entityIds = snapshot.municipal.regions.map((region) => region.id).sort();
-      universeDescription = "საქართველოს 11 რეგიონი; ქვეყნის აგრეგატი და ცალკეული მუნიციპალიტეტები არ მონაწილეობს.";
+      universeKey = "ranking.regions";
     } else {
       entityIds = snapshot.municipal.municipalities
         .filter((row) => input.withinRegionId === undefined || row.regionId === input.withinRegionId)
@@ -235,9 +243,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         .filter((row) => !EXCLUDED.has(row.code))
         .map((row) => row.code)
         .sort();
-      universeDescription = input.withinRegionId
-        ? `რეგიონის (${input.withinRegionId}) წევრი მუნიციპალიტეტები; აგრეგირებული კოდები არ მონაწილეობს.`
-        : "64 გადამოწმებული მუნიციპალიტეტი; ქვეყნის აგრეგატი, რეგიონები და აგრეგირებული კოდები არ მონაწილეობს.";
+      universeKey = input.withinRegionId ? "ranking.withinRegion" : "ranking.municipalities";
+      if (input.withinRegionId) universeValues = { regionId: input.withinRegionId };
     }
   } else {
     const series = catalogueSeries(snapshot, input.datasetId);
@@ -251,16 +258,16 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         .filter((entry) => input.parentSeriesId === undefined || entry.parentSeriesId === input.parentSeriesId)
         .map((entry) => entry.seriesId)
         .sort();
-      universeDescription =
-        level === "major_program"
-          ? `გადამოწმებული ძირითადი პროგრამების სერიები${input.parentSeriesId ? ` კატეგორიაში ${input.parentSeriesId}` : ""}; ეს მთავრობის ყველა პროგრამა არ არის, არამედ მხოლოდ გადამოწმებული და მოწოდებული სერიები. ადმინისტრაციული ჯამი არ მონაწილეობს.`
-          : "ადმინისტრაციული კატეგორიები; ადმინისტრაციული ჯამი არ მონაწილეობს.";
+      universeKey = level === "major_program"
+        ? input.parentSeriesId ? "ranking.programmesWithinParent" : "ranking.programmes"
+        : "ranking.categories";
+      if (input.parentSeriesId) universeValues = { parentId: input.parentSeriesId };
     } else {
       seriesIds = series
         .filter((entry) => entry.level !== TOTAL_LEVEL)
         .map((entry) => entry.seriesId)
         .sort();
-      universeDescription = "საჯარო ხარჯვის/შემოსავლის კატეგორიები; შესაბამისი ჯამი არ მონაწილეობს.";
+      universeKey = "ranking.publicFields";
     }
     entityIds = ["country.georgia"];
   }
@@ -270,15 +277,15 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   if (candidateCount === 0) {
     return errorResponse(snapshot, {
       code: "unknown_series",
-      messageKa: "მოთხოვნილ პარამეტრებზე რანჟირებადი სერია ან ერთეული არ მოიძებნა.",
-      messageEn: "No rankable series or entity matches these parameters.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.rankNoCandidates"),
+      messageEn: serviceMessage(snapshot, "en", "errors.rankNoCandidates"),
       retryable: false,
     });
   }
 
   // ---- gather candidate values ---------------------------------------------
 
-  const exclusions: { id: string; reason: string }[] = [];
+  const exclusions: { id: string; reason: string; reasonEn: string }[] = [];
   const candidates: Candidate[] = [];
   let sources: ResolvedSource[] = [];
   // Which documents the ranked observations actually cite. The sub-query
@@ -315,14 +322,16 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     for (const observation of observations) {
       const stableId = isMunicipal ? observation.entityId : observation.seriesId;
       if (observation.value === null) {
-        exclusions.push({ id: stableId, reason: observation.missingReason ?? REASON_NO_VALUE });
+        exclusions.push({ id: stableId, reason: observation.missingReason ?? serviceMessage(snapshot, "ka", REASON_NO_VALUE), reasonEn: observation.missingReasonEn ?? serviceMessage(snapshot, "en", REASON_NO_VALUE) });
         continue;
       }
       candidates.push({
         entityId: observation.entityId,
         entityLabelKa: observation.entityLabelKa,
+        entityLabelEn: observation.entityLabelEn,
         seriesId: observation.seriesId,
         seriesLabelKa: observation.seriesLabelKa,
+        seriesLabelEn: observation.seriesLabelEn,
         value: observation.value,
         unit: observation.unit,
         basis: observation.basis,
@@ -356,7 +365,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       // Spec section 6.7: omit what is not comparable and report it. A
       // `limited` comparison may remain, carrying its caveat.
       if (comparison.comparability === "not_comparable") {
-        exclusions.push({ id: stableId, reason: comparison.reasons[0] ?? REASON_NOT_COMPARABLE });
+        exclusions.push({ id: stableId, reason: comparison.reasons[0] ?? serviceMessage(snapshot, "ka", REASON_NOT_COMPARABLE), reasonEn: comparison.reasonsEn[0] ?? serviceMessage(snapshot, "en", REASON_NOT_COMPARABLE) });
         continue;
       }
 
@@ -373,15 +382,17 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         // exist. Reporting "the indicator is unavailable" there was a wrong
         // statement about the data, and exclusions are a ranking honesty
         // mechanism. Mirrors the not_comparable branch just above.
-        exclusions.push({ id: stableId, reason: comparison.reasons[0] ?? REASON_NO_VALUE });
+        exclusions.push({ id: stableId, reason: comparison.reasons[0] ?? serviceMessage(snapshot, "ka", REASON_NO_VALUE), reasonEn: comparison.reasonsEn[0] ?? serviceMessage(snapshot, "en", REASON_NO_VALUE) });
         continue;
       }
 
       candidates.push({
         entityId: comparison.entityId,
         entityLabelKa: comparison.entityLabelKa,
+        entityLabelEn: comparison.entityLabelEn,
         seriesId: comparison.seriesId,
         seriesLabelKa: comparison.seriesLabelKa,
+        seriesLabelEn: comparison.seriesLabelEn,
         value,
         // The unit must describe THIS entry's `value`, and on a change ranking
         // that value is a change, not an endpoint. `comparison.unit` is the
@@ -415,8 +426,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   if (bases.size > 1) {
     return errorResponse(snapshot, {
       code: "unsupported_comparison",
-      messageKa: "რანჟირებადი მწკრივები ფაქტსა და გეგმას ურევს; ერთიანი დალაგება არ ბრუნდება.",
-      messageEn: "The eligible rows mix actual and planned bases; a single unqualified ordering is not returned.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.rankMixedBasis"),
+      messageEn: serviceMessage(snapshot, "en", "errors.rankMixedBasis"),
       retryable: false,
     });
   }
@@ -447,17 +458,22 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     tied: tiedValues.has(entry.value),
     entityId: entry.entityId,
     entityLabelKa: entry.entityLabelKa,
+    entityLabelEn: entry.entityLabelEn,
     seriesId: entry.seriesId,
     seriesLabelKa: entry.seriesLabelKa,
+    seriesLabelEn: entry.seriesLabelEn,
     value: entry.value,
     unit: entry.unit,
     basis: entry.basis,
     caveatIds: entry.caveatIds,
   }));
 
-  const rankingDefinition = isValueMetric
-    ? `დალაგება მაჩვენებლით ${input.measure}, ${input.year} წელი, ${input.order === "ascending" ? "ზრდადობით" : "კლებადობით"}.`
-    : `დალაგება ცვლილებით ${input.metric} (${input.measure}), ${input.fromYear}→${input.toYear}, ${input.order === "ascending" ? "ზრდადობით" : "კლებადობით"}.`;
+  const rankingDefinitionFor = (locale: "ka" | "en") => {
+    const order = serviceMessage(snapshot, locale, input.order === "ascending" ? "ranking.ascending" : "ranking.descending");
+    return isValueMetric
+      ? serviceMessage(snapshot, locale, "ranking.valueDefinition", { measure: input.measure, year: input.year as number, order })
+      : serviceMessage(snapshot, locale, "ranking.changeDefinition", { metric: input.metric, measure: input.measure, fromYear: input.fromYear as number, toYear: input.toYear as number, order });
+  };
 
   const status: "ok" | "partial" | "empty" =
     entries.length === 0 ? "empty" : exclusions.length === 0 ? "ok" : "partial";
@@ -472,14 +488,16 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     entries,
     universe: {
       dimension: input.dimension,
-      description: universeDescription,
+      description: serviceMessage(snapshot, "ka", universeKey, universeValues),
+      descriptionEn: serviceMessage(snapshot, "en", universeKey, universeValues),
       candidateCount,
       eligibleCount: candidates.length,
       returnedCount: entries.length,
       cutoffSplitsTie,
     },
     exclusions: groupByReason(exclusions),
-    rankingDefinition,
+    rankingDefinition: rankingDefinitionFor("ka"),
+    rankingDefinitionEn: rankingDefinitionFor("en"),
   };
 
   return { kind: "ranking", status, data, meta };

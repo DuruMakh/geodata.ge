@@ -1,3 +1,4 @@
+import { serviceMessage } from "./localization";
 // apps/web/lib/factQuery/getSources.ts
 //
 // Where a figure came from (spec section 6.8). Every other function cites
@@ -13,16 +14,11 @@ import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { buildResponseMeta } from "./meta";
 import { getSourcesInput } from "./schemas";
 import { selectSources } from "./sources";
-import type { FactQueryError, FactQueryResponse, FactQuerySnapshot, PublicDocument } from "./types";
+import type { FactQueryError, FactQueryResponse, FactQuerySnapshot, PublicDocument, ResolvedSource } from "./types";
 
 const MAX_SUGGESTIONS = 10;
 
-export type ResolvedSourceView = {
-  sourceId: string;
-  name: string;
-  lastReviewedAt: string;
-  derivation: string | null;
-  documents: PublicDocument[];
+export type ResolvedSourceView = ResolvedSource & {
   /** How many documents the source has before any narrowing. */
   documentCount: number;
   /** True when datasetId/years/entityIds actually reduced the list. */
@@ -95,8 +91,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     const issues = parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ");
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მოთხოვნის პარამეტრები არასწორია.",
-      messageEn: `Invalid parameters: ${issues}`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues }),
       retryable: false,
     });
   }
@@ -106,8 +102,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
       code: "data_version_changed",
-      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
-      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.dataVersionChanged"),
+      messageEn: serviceMessage(snapshot, "en", "errors.dataVersionChanged"),
       retryable: false,
     });
   }
@@ -119,8 +115,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   if (unknownIds.length > 0) {
     return errorResponse(snapshot, {
       code: "unknown_source",
-      messageKa: `უცნობი წყაროს იდენტიფიკატორი: ${unknownIds.join(", ")}.`,
-      messageEn: `Unknown source id(s): ${unknownIds.join(", ")}.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownSource", { unknownIds: unknownIds.join(", ") }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownSource", { unknownIds: unknownIds.join(", ") }),
       retryable: false,
       validChoices: suggestionsFor(
         unknownIds,
@@ -142,8 +138,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   if (unknownEntityIds.length > 0) {
     return errorResponse(snapshot, {
       code: "unknown_entity",
-      messageKa: `უცნობი ერთეულის იდენტიფიკატორი: ${unknownEntityIds.join(", ")}.`,
-      messageEn: `Unknown entity id(s): ${unknownEntityIds.join(", ")}.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownEntity", { unknownEntityIds: unknownEntityIds.join(", ") }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownEntity", { unknownEntityIds: unknownEntityIds.join(", ") }),
       retryable: false,
       validChoices: Array.from(knownEntityIds).sort(),
     });
@@ -166,8 +162,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   if (outOfRangeYears.length > 0) {
     return errorResponse(snapshot, {
       code: "year_out_of_range",
-      messageKa: `მოთხოვნილი წელი (${outOfRangeYears.join(", ")}) სცილდება დაფარვის საზღვრებს (${minYear}–${maxYear}).`,
-      messageEn: `Requested year(s) ${outOfRangeYears.join(", ")} fall outside the covered range (${minYear}-${maxYear}).`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.sourceYearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear, maxYear }),
+      messageEn: serviceMessage(snapshot, "en", "errors.sourceYearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear, maxYear }),
       retryable: false,
     });
   }
@@ -236,10 +232,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     }
 
     return {
-      sourceId: source.sourceId,
-      name: source.name,
-      lastReviewedAt: source.lastReviewedAt,
-      derivation: source.derivation,
+      ...source,
       documents,
       documentCount: source.documents.length,
       narrowed: documents.length !== source.documents.length,
@@ -255,5 +248,5 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
       : null,
   };
 
-  return { kind: "sources", status, data, meta: buildResponseMeta(snapshot, { sources: sources.map(({ sourceId, name, lastReviewedAt, derivation, documents }) => ({ sourceId, name, lastReviewedAt, derivation, documents })), caveats: [] }) };
+  return { kind: "sources", status, data, meta: buildResponseMeta(snapshot, { sources: sources.map(({ documentCount: _count, narrowed: _narrowed, narrowingOutcome: _outcome, ...source }) => source), caveats: [] }) };
 }

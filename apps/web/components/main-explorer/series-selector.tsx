@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
 import type { ReactNode } from "react";
 import { SwatchBar } from "../ui/editorial";
 
@@ -25,7 +27,7 @@ export function SeriesSelector({
   query,
   onQueryChange,
   searchPlaceholder,
-  countLabel = "სერიები",
+  countLabel,
   selectedCount,
   totalCount,
   supplementalSelected,
@@ -36,6 +38,7 @@ export function SeriesSelector({
   hasVisibleMatches,
   children,
 }: SeriesSelectorProps) {
+  const { messages } = useI18n();
   const bulkState: "false" | "mixed" | "true" =
     hasSelection && allSelected ? "true" : hasSelection ? "mixed" : "false";
   const bulkMark = bulkState === "true" ? "✓" : bulkState === "mixed" ? "—" : "";
@@ -50,7 +53,7 @@ export function SeriesSelector({
         value={query}
         onChange={(event) => onQueryChange(event.target.value)}
         placeholder={searchPlaceholder}
-        aria-label="ძებნა სერიებში"
+        aria-label={message(messages, "controls.searchSeries")}
         className={`${controls ? "mt-3.5" : ""} h-[34px] w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
       />
 
@@ -81,7 +84,7 @@ export function SeriesSelector({
               {bulkMark}
             </span>
             <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
-              {hasSelection ? "გასუფთავება" : "ყველას მონიშვნა"}
+              {message(messages, hasSelection ? "controls.clear" : "controls.selectAll")}
             </span>
           </button>
         ) : null}
@@ -90,15 +93,19 @@ export function SeriesSelector({
           data-testid="series-status"
           className="ml-auto text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]"
         >
-          {countLabel}{" "}
-          <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
-            {selectedCount} / {totalCount}
+          <span className="inline-block whitespace-nowrap">
+            {countLabel ?? message(messages, "controls.series")}{" "}
+            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
+              {selectedCount} / {totalCount}
+            </span>
           </span>
           {supplementalSelected ? (
             <>
-              {" · "}{supplementalSelected.label}{" "}
-              <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
-                {supplementalSelected.count}
+              {" · "}<span className="inline-block whitespace-nowrap">
+                {supplementalSelected.label}{" "}
+                <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
+                  {supplementalSelected.count}
+                </span>
               </span>
             </>
           ) : null}
@@ -107,7 +114,7 @@ export function SeriesSelector({
 
       {!hasVisibleMatches ? (
         <p className="border-b border-[var(--row-border)] px-1 py-3 text-xs text-[var(--muted)]">
-          კატეგორია ვერ მოიძებნა — შეცვალე საძიებო ტექსტი.
+          {message(messages, "controls.noMatches")}
         </p>
       ) : null}
 
@@ -138,6 +145,7 @@ type SeriesSelectorRowProps = {
   showRail?: boolean;
   isChild?: boolean;
   childLabelSize?: "compact" | "standard";
+  wrapLabel?: boolean;
   onToggle: () => void;
   onToggleExpanded?: () => void;
 };
@@ -154,13 +162,15 @@ export function SeriesSelectorRow({
   hasChildren = false,
   expanded = false,
   expansionLocked = false,
-  expansionLabel = "ქვეპროგრამები",
+  expansionLabel,
   showRail = false,
   isChild = false,
   childLabelSize = "compact",
+  wrapLabel = false,
   onToggle,
   onToggleExpanded,
 }: SeriesSelectorRowProps) {
+  const { messages } = useI18n();
   return (
     <div
       data-testid="series-row"
@@ -182,7 +192,7 @@ export function SeriesSelectorRow({
             if (!expansionLocked) onToggleExpanded?.();
           }}
           aria-expanded={hasChildren ? expanded : undefined}
-          aria-label={expansionLabel}
+          aria-label={expansionLabel ?? message(messages, "controls.subprogrammes")}
           aria-disabled={expansionLocked || undefined}
           className={`flex w-[22px] flex-none items-center justify-center text-base leading-none ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
           style={{ visibility: hasChildren ? "visible" : "hidden" }}
@@ -213,7 +223,7 @@ export function SeriesSelectorRow({
           </span>
           <span
             data-testid="series-label"
-            className={`line-clamp-2 leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[12px]" : "text-[11.5px]"} font-normal text-[var(--body)]` : "text-[12.5px] font-medium text-[var(--ink)]"}`}
+            className={`${wrapLabel ? "" : "line-clamp-2"} leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[12px]" : "text-[11.5px]"} font-normal text-[var(--body)]` : "text-[12.5px] font-medium text-[var(--ink)]"}`}
           >
             {label}
           </span>

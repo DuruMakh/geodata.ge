@@ -1,7 +1,13 @@
+import { serviceMessage } from "../../../lib/factQuery/localization";
+import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 // apps/web/tests/factQuery/caveats/engine.test.ts
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { evaluateCaveats, type CaveatContext, type CaveatRule } from "../../../lib/factQuery/caveats/engine";
 import { CAVEAT_RULES } from "../../../lib/factQuery/caveats";
+
+let snapshot: FactQuerySnapshot;
+beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 
 const BASE: CaveatContext = {
   datasetId: "national-revenue",
@@ -21,23 +27,23 @@ const BASE: CaveatContext = {
 describe("evaluateCaveats", () => {
   it("returns only rules whose predicate holds", () => {
     const rules: CaveatRule[] = [
-      { code: "fires", severity: "note", comparisonEffect: "none", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => ["a"] },
-      { code: "quiet", severity: "note", comparisonEffect: "none", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => false, affects: () => [] },
+      { code: "fires", severity: "note", comparisonEffect: "none", messageKey: "caveats.planned_values", methodologyRef: "x", methodologyRefEn: "/en/methodology/expenditure", applies: () => true, affects: () => ["a"] },
+      { code: "quiet", severity: "note", comparisonEffect: "none", messageKey: "caveats.planned_values", methodologyRef: "x", methodologyRefEn: "/en/methodology/expenditure", applies: () => false, affects: () => [] },
     ];
-    expect(evaluateCaveats(BASE, rules).map((c) => c.code)).toEqual(["fires"]);
+    expect(evaluateCaveats(snapshot, BASE, rules).map((c) => c.code)).toEqual(["fires"]);
   });
 
   it("orders severe before note, then by code", () => {
     const rules: CaveatRule[] = [
-      { code: "b_note", severity: "note", comparisonEffect: "none", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => [] },
-      { code: "a_severe", severity: "severe", comparisonEffect: "none", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => [] },
+      { code: "b_note", severity: "note", comparisonEffect: "none", messageKey: "caveats.planned_values", methodologyRef: "x", methodologyRefEn: "/en/methodology/expenditure", applies: () => true, affects: () => [] },
+      { code: "a_severe", severity: "severe", comparisonEffect: "none", messageKey: "caveats.planned_values", methodologyRef: "x", methodologyRefEn: "/en/methodology/expenditure", applies: () => true, affects: () => [] },
     ];
-    expect(evaluateCaveats(BASE, rules).map((c) => c.code)).toEqual(["a_severe", "b_note"]);
+    expect(evaluateCaveats(snapshot, BASE, rules).map((c) => c.code)).toEqual(["a_severe", "b_note"]);
   });
 
   it("emits each code at most once", () => {
-    const rule: CaveatRule = { code: "dup", severity: "note", comparisonEffect: "none", messageKa: "კ", messageEn: "e", methodologyRef: "x", applies: () => true, affects: () => [] };
-    expect(evaluateCaveats(BASE, [rule, rule])).toHaveLength(1);
+    const rule: CaveatRule = { code: "dup", severity: "note", comparisonEffect: "none", messageKey: "caveats.planned_values", methodologyRef: "x", methodologyRefEn: "/en/methodology/expenditure", applies: () => true, affects: () => [] };
+    expect(evaluateCaveats(snapshot, BASE, [rule, rule])).toHaveLength(1);
   });
 });
 
@@ -46,8 +52,8 @@ describe("CAVEAT_RULES registry", () => {
     const codes = CAVEAT_RULES.map((rule) => rule.code);
     expect(new Set(codes).size).toBe(codes.length);
     for (const rule of CAVEAT_RULES) {
-      expect(rule.messageKa.length).toBeGreaterThan(0);
-      expect(rule.messageEn.length).toBeGreaterThan(0);
+      expect(serviceMessage(snapshot, "ka", rule.messageKey).length).toBeGreaterThan(0);
+      expect(serviceMessage(snapshot, "en", rule.messageKey).length).toBeGreaterThan(0);
       expect(rule.methodologyRef.length).toBeGreaterThan(0);
     }
   });

@@ -267,7 +267,7 @@ describe("compare", () => {
       expect(data(result).comparisons.length).toBe(2);
       for (const row of data(result).comparisons) {
         expect(row.entityLabelKa.length).toBeGreaterThan(0);
-        expect(Object.keys(row).some((key) => key.endsWith("En"))).toBe(false);
+        expect(row.entityLabelEn.length).toBeGreaterThan(0);
       }
     });
 

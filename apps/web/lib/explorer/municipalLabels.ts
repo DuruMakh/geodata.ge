@@ -1,3 +1,5 @@
+import type { Locale } from "../i18n/types";
+
 // Georgian display copy for the municipalities section.
 //
 // These live in the UI, not in data/taxonomy/municipal-regions.json, on purpose:
@@ -28,4 +30,8 @@ export const REGION_GENITIVE_KA: Record<string, string> = {
 /** Georgian ordinal for a rank. First place is პირველი, never მე-1. */
 export function georgianOrdinal(rank: number): string {
   return rank === 1 ? "პირველი" : `მე-${rank}`;
+}
+
+export function municipalRankLabel(rank: number, locale: Locale): string {
+  return locale === "en" ? String(rank) : georgianOrdinal(rank);
 }
