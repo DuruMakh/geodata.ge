@@ -23,7 +23,7 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
   return (
     <header
       data-testid={testId}
-      className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 min-[900px]:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] min-[900px]:gap-x-2.5 min-[1100px]:gap-x-5"
+      className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 min-[900px]:gap-x-2.5 min-[1100px]:gap-x-5"
     >
       <Link
         href={pageHref("/", locale)}
@@ -42,6 +42,9 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
           />
         </picture>
       </Link>
+      <span className="text-[20px] font-bold tracking-tight text-[var(--ink)] min-[900px]:hidden">
+        Fiscal.ge
+      </span>
       <SiteNavigation label={message(messages, "common.menu")}>
         <nav
           aria-label={message(messages, "common.navigation")}

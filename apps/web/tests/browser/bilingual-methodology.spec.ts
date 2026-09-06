@@ -56,10 +56,12 @@ for (const width of [390, 1440]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.getByRole("navigation", { name: "Page contents" }).getByRole("link").last().click();
     expect(new URL(page.url()).hash).toBe("#source-archive");
+    if (width < 900) await page.getByTestId("methodology-header").getByRole("button", { name: "Menu", exact: true }).click();
     await page.getByTestId("language-switch").getByRole("link", { name: "ქართული", exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute("lang", "ka");
     expect(new URL(page.url()).pathname).toBe("/methodology/expenditure");
     expect(new URL(page.url()).hash).toBe("#source-archive");
+    if (width < 900) await page.getByTestId("methodology-header").getByRole("button", { name: "მენიუ", exact: true }).click();
     await page.getByTestId("language-switch").getByRole("link", { name: "English", exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Methodology", exact: true })).toHaveAttribute("href", "/en/methodology");

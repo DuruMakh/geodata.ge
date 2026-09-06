@@ -72,6 +72,7 @@ type DatasetSummary = {
   labelEn: string;
   measureNotes?: Record<string, string>;
   measureNotesEn?: Record<string, string>;
+  measureNotesKa?: Record<string, string>;
 };
 
 export type CoverageData = {
@@ -226,8 +227,8 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
   // caller's in-place mutation of a response corrupt every later call.
   return {
     datasetId, ...meta, labelEn: serviceLabelEn(snapshot, datasetId), entityTypes: [...meta.entityTypes], measures: [...meta.measures], years,
-    ...(datasetId === "municipal-expenditure" ? { measureNotesEn: { gel_per_resident: serviceMessage(snapshot, "en", "coverage.perResident") }, measureNotes: { gel_per_resident: "Available only for 2025 municipality and region totals (municipal.total); not for the country aggregate or individual functions." } } : {}),
-    ...(datasetId === "government-debt" ? { measureNotesEn: { amount_gel: serviceMessage(snapshot, "en", "coverage.debtAmount"), share_of_gdp_pct: serviceMessage(snapshot, "en", "coverage.debtGdp"), rate_percent: serviceMessage(snapshot, "en", "coverage.debtRate") }, measureNotes: { amount_gel: "Stock and service only.", share_of_gdp_pct: "Stock and service, where reviewed GDP is available.", rate_percent: "Interest-rate series only; unpublished rates are missing, not zero." } } : {}),
+    ...(datasetId === "municipal-expenditure" ? { measureNotesKa: { gel_per_resident: serviceMessage(snapshot, "ka", "coverage.perResident") }, measureNotesEn: { gel_per_resident: serviceMessage(snapshot, "en", "coverage.perResident") }, measureNotes: { gel_per_resident: "Available only for 2025 municipality and region totals (municipal.total); not for the country aggregate or individual functions." } } : {}),
+    ...(datasetId === "government-debt" ? { measureNotesKa: { amount_gel: serviceMessage(snapshot, "ka", "coverage.debtAmount"), share_of_gdp_pct: serviceMessage(snapshot, "ka", "coverage.debtGdp"), rate_percent: serviceMessage(snapshot, "ka", "coverage.debtRate") }, measureNotesEn: { amount_gel: serviceMessage(snapshot, "en", "coverage.debtAmount"), share_of_gdp_pct: serviceMessage(snapshot, "en", "coverage.debtGdp"), rate_percent: serviceMessage(snapshot, "en", "coverage.debtRate") }, measureNotes: { amount_gel: "Stock and service only.", share_of_gdp_pct: "Stock and service, where reviewed GDP is available.", rate_percent: "Interest-rate series only; unpublished rates are missing, not zero." } } : {}),
   };
 }
 

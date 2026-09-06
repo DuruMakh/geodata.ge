@@ -77,7 +77,7 @@ test("switching the regional index keeps its view and accounting scope", async (
   await page.getByTestId("language-switch").getByRole("link", { name: "ქართული", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ka");
   await expect(page.getByTestId("municipal-list-row")).toHaveCount(12);
-  expect(new URL(page.url()).hash).toBe("#lvl=region");
+  await expect(page).toHaveURL(/\/explorer\/municipalities#lvl=region$/);
   expect(await bars()).toEqual(before);
 });
 
