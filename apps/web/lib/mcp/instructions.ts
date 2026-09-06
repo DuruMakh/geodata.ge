@@ -115,9 +115,9 @@ Say what they mean instead:
 
 CITATIONS AND LICENCE
 Every response carries meta.sources, narrowed to the public originals this
-particular answer rests on. Cite from those. (Structured observations also
-carry documentIds for the specific figure; the text representation does not, so
-meta.sources is the citation source that is correct in both.) The data is
+particular answer rests on. Cite from those. Both structured observations and
+text rows carry documentIds for the specific figure, resolved by the source
+evidence in the same response. The data is
 published under CC BY 4.0
 (https://creativecommons.org/licenses/by/4.0/); attribute Fiscal.ge.
 
@@ -137,8 +137,8 @@ citation to a budget figure does not support such an explanation. When the
 available data cannot answer a question, say that it cannot.
 
 ERRORS
-Errors are structured and carry both Georgian and English messages, a retryable
-flag, and often valid choices. An unknown id returns suggestions drawn only from
+Failed tool calls carry isError and bilingual text, including the error code,
+retryable flag, and often valid choices; they have no structuredContent. An unknown id returns suggestions drawn only from
 ids that exist. result_too_large means narrow the request - fewer years first,
 then fewer entities, then fewer series - or download the bulk file it names.`;
 }

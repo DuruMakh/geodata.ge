@@ -202,7 +202,7 @@ This mapping occurs in A1's build enrichment; A3 verifies downstream code preser
 
 **Interfaces:** Retain `toolResult`, `boundedToolResult`, and all current transport signatures. Every successful tool still returns structured content and its compact text twin. Text observation rows include both entity labels, both series labels, and both definitions; source/caveat text includes both descriptions. Numeric values appear once per row. Bilingual schema properties are explicitly declared; permissive parsing alone is not acceptance evidence.
 
-- [ ] Add tests for text-only clients using every response kind: observations, catalogue, comparisons, ranking, sources, and errors. Assert English definitions/sources exist alongside Georgian text and that sensitive caveats still precede lower-priority notes. Pin source/document IDs and numerical values in both representations.
+- [x] Add tests for text-only clients using every response kind: observations, catalogue, comparisons, ranking, sources, and errors. Assert English definitions/sources exist alongside Georgian text and that sensitive caveats still precede lower-priority notes. Pin source/document IDs and numerical values in both representations.
 
 ```ts
 it('makes the English observation understandable to a text-only client', () => {
@@ -217,7 +217,7 @@ it('makes the English observation understandable to a text-only client', () => {
 ```
 
 Build `educationResponse` with the same valid query used in A2. Include a separate test where a severe budget-scope caveat is present; do not assume the education-only response should contain it.
-- [ ] Confirm failure, then extend the compact table headers/rows and source rendering. Preserve numeric types and metadata, show both definitions, and include all qualifications without duplicating whole JSON. Add source-default translation fields to the explicit output schema and inspect the SDK's serialized schema in tests.
+- [x] Confirm failure, then extend the compact table headers/rows and source rendering. Preserve numeric types and metadata, show both definitions, and include all qualifications without duplicating whole JSON. Add source-default translation fields to the explicit output schema and inspect the SDK's serialized schema in tests.
 
 ```ts
 return line(
@@ -231,11 +231,15 @@ return line(
 ```
 
 Retain the existing missing-value rendering branch rather than printing a blank numeric value for missing observations; include `missingReasonEn` beside its existing explanation. English text must not lose coverage `reasonEn`, excluded entities, comparability `reasonsEn`, ranking `rankingDefinitionEn`, or `universe.descriptionEn`.
-- [ ] Rerun the A1 measurement harness with the exact saved requests. Compare complete serialized bytes and accepted/rejected status. Test 500 versus 501 cells, byte-boundary refusal, ranking bounds, and source-heavy responses; add a regression demonstrating that a below-cell-limit answer may still exceed the byte limit. No numeric limit may be raised to make tests pass.
-- [ ] Keep source/default reuse and grouped exclusions where meaningful; do not drop translated definitions or evidence to fit. When a request newly exceeds 512 KiB, preserve the existing explicit rejection and manifest/narrower-query guidance, and list the request in the final report. The approved design allows this measured byte-boundary consequence rather than promising every old large request will still fit.
-- [ ] Run `npx vitest run tests/mcp tests/factQuery/reference.test.ts`, typecheck, and translation checks. Confirm rate-limiter, pause, origin/security, and purity tests remain unchanged in meaning. Commit with `feat: expose bilingual MCP text with bounded payloads`.
+- [x] Rerun the A1 measurement harness with the exact saved requests. Compare complete serialized bytes and accepted/rejected status. Test 500 versus 501 cells, byte-boundary refusal, ranking bounds, and source-heavy responses; add a regression demonstrating that a below-cell-limit answer may still exceed the byte limit. No numeric limit may be raised to make tests pass.
+- [x] Keep source/default reuse and grouped exclusions where meaningful; do not drop translated definitions or evidence to fit. When a request newly exceeds 512 KiB, preserve the existing explicit rejection and manifest/narrower-query guidance, and list the request in the final report. The approved design allows this measured byte-boundary consequence rather than promising every old large request will still fit.
+- [x] Run `npx vitest run tests/mcp tests/factQuery/reference.test.ts`, typecheck, and translation checks. Confirm rate-limiter, pause, origin/security, and purity tests remain unchanged in meaning. Commit with `feat: expose bilingual MCP text with bounded payloads`.
 
 **Done:** structured and text-only clients receive equivalent bilingual meaning within the existing enforced limits.
+
+> A4 verified on 2026-09-06: all 158 MCP/reference checks passed, followed by all 11 transport cases after adding the explicit severe national budget-boundary case. Typecheck, lint and translation validation passed. The actual SDK advertises all bilingual fields, including document-default publisher/attribution fields; its unchanged nine-tool surface and request schemas remain covered. Text rows retain English and Georgian definitions, missingness, comparisons, rankings, exclusions and exact source/document IDs. Sources are rendered once per response; defaults remain shared, mandatory original attributions are preserved, and numeric observation values appear once per text row. No security, pause, rate, duration, cell, ranking or byte limit was relaxed.
+
+> The final measurement report has the same 33 inputs and identical limits as the baseline. The first 100-source batch is the only newly oversized request: 362,638 to 696,073 complete serialized bytes; it is explicitly refused with narrower-query and bulk-manifest guidance. The 495-cell and 500-cell municipal cases were already refused by the byte limit (652,923 / 661,780 bytes before; 915,169 / 927,425 after). The exact 501-cell result fixture and real 506-cell request retain their distinct gate evidence. The catalogue remains accepted at 9,390 bytes and all-years national expenditure total at 168,381 bytes. Evidence: .tmp/bilingual/final/mcp.json and a4-* logs. These are SDK/local results, not an external AI-client understanding test.
 
 ## Task A5: Publish bilingual JSON, advertise schema 1.1.0, and document clients
 

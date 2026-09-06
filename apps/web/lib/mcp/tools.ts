@@ -62,7 +62,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     describe: () =>
       "Ask this FIRST when you do not already know an id. Returns the datasets, entities, series, " +
       "hierarchy, calculated totals, legal measures, year coverage and documented exclusions that " +
-      "actually exist. Optional `search` matches Georgian labels and Latin slugs, and works WITHOUT " +
+      "actually exist. Optional `search` matches reviewed Georgian and English labels and Latin slugs, and works WITHOUT " +
       "a datasetId — search alone looks across all six datasets and each match names the dataset " +
       "it belongs to, so you can find an id before you know where it lives. Georgian case endings " +
       "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here.",

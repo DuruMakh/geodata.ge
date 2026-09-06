@@ -70,7 +70,7 @@ const responseSource = z
     lastReviewedAt: z.string(),
     derivation: z.string().nullable(),
     /** Values shared by every document below; a field absent from a document is given here. */
-    documentDefaults: z.record(z.string(), z.unknown()).optional(),
+    documentDefaults: responseDocument.pick({ publisher: true, publisherKa: true, publisherEn: true, attribution: true, attributionKa: true, attributionEn: true, licenceId: true, mediaType: true, retrievedAt: true, datasetId: true, role: true }).optional(),
     documents: z.array(responseDocument),
   })
   .loose();
