@@ -13,16 +13,11 @@ import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { buildResponseMeta } from "./meta";
 import { getSourcesInput } from "./schemas";
 import { selectSources } from "./sources";
-import type { FactQueryError, FactQueryResponse, FactQuerySnapshot, PublicDocument } from "./types";
+import type { FactQueryError, FactQueryResponse, FactQuerySnapshot, PublicDocument, ResolvedSource } from "./types";
 
 const MAX_SUGGESTIONS = 10;
 
-export type ResolvedSourceView = {
-  sourceId: string;
-  name: string;
-  lastReviewedAt: string;
-  derivation: string | null;
-  documents: PublicDocument[];
+export type ResolvedSourceView = ResolvedSource & {
   /** How many documents the source has before any narrowing. */
   documentCount: number;
   /** True when datasetId/years/entityIds actually reduced the list. */
@@ -236,10 +231,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     }
 
     return {
-      sourceId: source.sourceId,
-      name: source.name,
-      lastReviewedAt: source.lastReviewedAt,
-      derivation: source.derivation,
+      ...source,
       documents,
       documentCount: source.documents.length,
       narrowed: documents.length !== source.documents.length,
@@ -255,5 +247,5 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
       : null,
   };
 
-  return { kind: "sources", status, data, meta: buildResponseMeta(snapshot, { sources: sources.map(({ sourceId, name, lastReviewedAt, derivation, documents }) => ({ sourceId, name, lastReviewedAt, derivation, documents })), caveats: [] }) };
+  return { kind: "sources", status, data, meta: buildResponseMeta(snapshot, { sources: sources.map(({ documentCount: _count, narrowed: _narrowed, narrowingOutcome: _outcome, ...source }) => source), caveats: [] }) };
 }

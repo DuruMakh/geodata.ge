@@ -1,6 +1,6 @@
 // apps/web/lib/factQuery/sources.ts
 import type { SourceDocumentRow } from "../data/sources";
-import type { FactQuerySnapshot, PublicDocument, ResolvedSource } from "./types";
+import type { FactQuerySnapshot, RawPublicDocument, RawResolvedSource, ResolvedSource } from "./types";
 
 /**
  * Pure lookup used by the query path. Unknown ids are dropped, not invented:
@@ -36,7 +36,7 @@ export function splitSourceIds(raw: string): string[] {
  * filesystem); resolvePublicSources below only ever compares `repositoryPath`
  * strings already in memory.
  */
-export type ManifestDocument = Omit<PublicDocument, "role"> & {
+export type ManifestDocument = Omit<RawPublicDocument, "role"> & {
   /**
    * Repo-relative path this document was archived from, e.g.
    * "docs/Raw Data/Expenditure/treasury.ge/2017-....pdf". Matched against
@@ -140,7 +140,7 @@ export type SourceProvenanceFailure = {
 };
 
 export function findSourceProvenanceFailures(
-  sources: readonly Pick<ResolvedSource, "sourceId" | "derivation" | "documents">[],
+  sources: readonly Pick<RawResolvedSource, "sourceId" | "derivation" | "documents">[],
 ): SourceProvenanceFailure[] {
   const failures: SourceProvenanceFailure[] = [];
 
@@ -180,15 +180,15 @@ export function findSourceProvenanceFailures(
  * lib/factQuery/ responsible for imposing that order, with the same sortedBy
  * helper it uses for every other snapshot array.
  */
-export function resolvePublicSources(input: ResolvePublicSourcesInput): ResolvedSource[] {
+export function resolvePublicSources(input: ResolvePublicSourcesInput): RawResolvedSource[] {
   const { sourceDocuments, manifestDocuments } = input;
   const documentsById = new Map(manifestDocuments.map((doc) => [doc.documentId, doc]));
 
-  return sourceDocuments.map((row): ResolvedSource => {
+  return sourceDocuments.map((row): RawResolvedSource => {
     const seenDocumentIds = new Set<string>();
-    const documents: PublicDocument[] = [];
+    const documents: RawPublicDocument[] = [];
 
-    const push = (doc: ManifestDocument | undefined, role: PublicDocument["role"] = "primary") => {
+    const push = (doc: ManifestDocument | undefined, role: RawPublicDocument["role"] = "primary") => {
       if (!doc || seenDocumentIds.has(doc.documentId)) return;
       seenDocumentIds.add(doc.documentId);
       // repositoryPath is an internal path and is deliberately dropped here:

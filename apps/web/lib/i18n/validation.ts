@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SERVICE_MESSAGE_KEYS, SERVICE_MESSAGE_PARAMETERS } from "../factQuery/localization";
 import type { EnglishCatalogue, Messages, TranslationInventory } from "./types";
 
 const georgianText = /\p{Script=Georgian}/u;
@@ -62,6 +63,29 @@ export function validateMessages(ka: Messages, en: Messages): string[] {
     if (!enValue?.trim()) errors.push(`Missing or blank English message: ${key}`);
     if (kaValue && enValue && parameters(kaValue) !== parameters(enValue)) errors.push(`Mismatched translation parameters: ${key}`);
     if (enValue && georgianText.test(enValue)) errors.push(`Untranslated Georgian in English message: ${key}`);
+  }
+  return errors;
+}
+
+export const serviceMessagesSchema = z.record(z.string().min(1), z.string().trim().min(1));
+
+export function validateServiceMessages(ka: Messages, en: Messages): string[] {
+  const errors: string[] = [];
+  for (const key of SERVICE_MESSAGE_KEYS) {
+    for (const [locale, messages] of [["ka", ka], ["en", en]] as const) {
+      if (!Object.hasOwn(messages, key) || !messages[key]?.trim()) errors.push(`Missing service message: ${locale}:${key}`);
+      else {
+        const expected = [...(SERVICE_MESSAGE_PARAMETERS[key]?.[locale] ?? [])].sort().join(",");
+        if (parameters(messages[key]) !== expected) errors.push(`Changed service parameters: ${locale}:${key}`);
+        if (locale === "en" && georgianText.test(messages[key])) errors.push(`Untranslated service message: ${key}`);
+      }
+    }
+  }
+  for (const key of new Set([...Object.keys(ka), ...Object.keys(en)])) {
+    if ((SERVICE_MESSAGE_KEYS as readonly string[]).includes(key)) continue;
+    if (!/^(sources\..+\.(name|derivation)|documents\..+\.(title|publisher|attribution))$/.test(key)) errors.push(`Unknown service message key: ${key}`);
+    if (!ka[key]?.trim() || !en[key]?.trim()) errors.push(`Missing service source companion: ${key}`);
+    if (en[key] && georgianText.test(en[key])) errors.push(`Untranslated service source companion: ${key}`);
   }
   return errors;
 }
