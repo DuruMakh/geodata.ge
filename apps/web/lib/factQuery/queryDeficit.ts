@@ -163,7 +163,7 @@ export function queryDeficit(
     historicalJoinSeriesYears: snapshot.ministries.historicalJoinSeriesYears,
     adminCategoryYears: [],
   };
-  const caveats = evaluateCaveats(caveatContext, CAVEAT_RULES);
+  const caveats = evaluateCaveats(snapshot, caveatContext, CAVEAT_RULES);
 
   const observations: Observation[] = withDocuments.map((o) => ({ ...o, caveatIds: caveatIdsForObservation(caveats, o) }));
   const returnedCount = observations.filter((o) => o.availability === "available").length;

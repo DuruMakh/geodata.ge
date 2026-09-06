@@ -150,7 +150,7 @@ Choose the message key from the existing measure/series kind branch; the excerpt
 
 **Interfaces:** Comparisons/rank entries and tie-boundary entries gain `entityLabelEn`/`seriesLabelEn`; comparison endpoints gain `valueDefinitionEn` and nullable `missingReasonEn`. Keep current reasons and add aligned `reasonsEn` arrays of English explanations, without changing original machine reason codes. Rankings gain `rankingDefinitionEn`, `universe.descriptionEn`, and `reasonEn` on grouped prose exclusions. Add `methodologyRefEn` to every caveat. The source/document companion fields from A1 must survive `getSources`, response metadata, hoisting, narrowing, and deduplication. Extend `HOISTABLE_DOCUMENT_FIELDS` only for genuinely shared new publisher/attribution fields; document titles and identity remain per-document.
 
-- [ ] Add cases for comparable and non-comparable periods, programme historical renames, rate percentage-point changes, municipal definition breaks, Adjara derivation/upstream sources, and a tie at a ranking cutoff. Assert unchanged numerical outputs and complete English explanations.
+- [x] Add cases for comparable and non-comparable periods, programme historical renames, rate percentage-point changes, municipal definition breaks, Adjara derivation/upstream sources, and a tie at a ranking cutoff. Assert unchanged numerical outputs and complete English explanations.
 
 ```ts
 it('does not let translated display text affect comparability', () => {
@@ -173,8 +173,8 @@ it('does not let translated display text affect comparability', () => {
 ```
 
 Use `beforeAll` to build the real snapshot with `buildFactQuerySnapshot({ releaseCommit: 'test', generatedAt: '2026-09-05T00:00:00Z' })`, and import `Comparison` from `compare.ts`. The explicit request shape above matches the current strict comparison schema.
-- [ ] Confirm failure on missing bilingual fields; propagate the new labels and definitions from observations into the existing comparison/ranking builders. Keep `valueDefinitionId` as the comparability key and existing numeric tie-break ordering. Never compare translated strings to decide whether two measurements are compatible.
-- [ ] Preserve English fields through source narrowing, document defaults, merged evidence, and `get_sources`. Add a round-trip test expanding hoisted fields: source identity, role, archive URL, hashes where present, and both languages must match the unhoisted source. Preserve A1's raw/enriched type distinction; do not reintroduce translation requirements on raw archive rows.
+- [x] Confirm failure on missing bilingual fields; propagate the new labels and definitions from observations into the existing comparison/ranking builders. Keep `valueDefinitionId` as the comparability key and existing numeric tie-break ordering. Never compare translated strings to decide whether two measurements are compatible.
+- [x] Preserve English fields through source narrowing, document defaults, merged evidence, and `get_sources`. Add a round-trip test expanding hoisted fields: source identity, role, archive URL, hashes where present, and both languages must match the unhoisted source. Preserve A1's raw/enriched type distinction; do not reintroduce translation requirements on raw archive rows.
 
 ```ts
 const translatedDocument = {
@@ -187,10 +187,12 @@ const translatedDocument = {
 ```
 
 This mapping occurs in A1's build enrichment; A3 verifies downstream code preserves it. It must not be copied into a request-time source resolver with a filesystem catalogue lookup.
-- [ ] Resolve caveat/error/limitation messages from A1's snapshot keys where the existing code authored them inline. Preserve severity, affects IDs, retryability, valid choices, and exclusion rules. `methodologyRefEn` is the English counterpart for a real human methodology page; for shared machine resources preserve the same URL. Keep original references untouched. If a reference points to an internal methodology document, add its actual public English equivalent from the current methodology mapping, not a guessed `/en/docs/...` address.
-- [ ] Run comparison, ranking, source, meta, caveat, review-regression, and new evidence tests; run the reference fixture and typecheck. Commit with `feat: carry bilingual evidence through comparisons and rankings`.
+- [x] Resolve caveat/error/limitation messages from A1's snapshot keys where the existing code authored them inline. Preserve severity, affects IDs, retryability, valid choices, and exclusion rules. `methodologyRefEn` is the English counterpart for a real human methodology page; for shared machine resources preserve the same URL. Keep original references untouched. If a reference points to an internal methodology document, add its actual public English equivalent from the current methodology mapping, not a guessed `/en/docs/...` address.
+- [x] Run comparison, ranking, source, meta, caveat, review-regression, and new evidence tests; run the reference fixture and typecheck. Commit with `feat: carry bilingual evidence through comparisons and rankings`.
 
 **Done:** complex answers and their qualifications remain usable in either language; translation cannot affect eligibility, ranking, or fiscal comparability.
+
+> A3 verified on 2026-09-06: the full check passed 177 files / 1,722 tests, including the unchanged numerical/reference expectations, comparison/ranking/source/meta/caveat tests and 12 new bilingual evidence cases. Translation mutations leave every non-English response field unchanged, including eligibility, historical joins, missing endpoints, values and tie ordering. Caveat and error text now resolves from the pinned snapshot; English references point to existing public topic pages, including the deficit explorer explanation. Narrowed and hoisted evidence retains original and translated descriptions, attributions, document identities and language declarations. The explicit MCP schema declares the added comparison/ranking fields. All source archives and raw CSV validations passed; snapshot identity remains a6c927f06f86396992ed7afd5fc0aae3accfc83700f3213fc28ddcbc7c1ceeff. Schema version remains 1.0.0 until A5 completes the public contract.
 
 ## Task A4: Render complete bilingual MCP text within existing limits
 

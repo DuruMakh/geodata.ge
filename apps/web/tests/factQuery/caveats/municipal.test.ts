@@ -1,8 +1,13 @@
+import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 // apps/web/tests/factQuery/caveats/municipal.test.ts
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { evaluateCaveats, type CaveatContext } from "../../../lib/factQuery/caveats/engine";
 import { MUNICIPAL_CAVEAT_RULES } from "../../../lib/factQuery/caveats/rules.municipal";
 import type { MunicipalTotalFact } from "../../../lib/data/municipal/types";
+
+let snapshot: FactQuerySnapshot;
+beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 
 function total(overrides: Partial<MunicipalTotalFact>): MunicipalTotalFact {
   return {
@@ -44,7 +49,7 @@ function context(overrides: Partial<CaveatContext>): CaveatContext {
   };
 }
 
-const codes = (ctx: CaveatContext) => evaluateCaveats(ctx, MUNICIPAL_CAVEAT_RULES).map((c) => c.code);
+const codes = (ctx: CaveatContext) => evaluateCaveats(snapshot, ctx, MUNICIPAL_CAVEAT_RULES).map((c) => c.code);
 
 describe("municipal_source_actual_missing — the Khulo 2024 regression", () => {
   it("fires even though showWarning is false", () => {

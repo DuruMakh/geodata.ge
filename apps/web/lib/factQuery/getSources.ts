@@ -1,3 +1,4 @@
+import { serviceMessage } from "./localization";
 // apps/web/lib/factQuery/getSources.ts
 //
 // Where a figure came from (spec section 6.8). Every other function cites
@@ -90,8 +91,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     const issues = parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ");
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მოთხოვნის პარამეტრები არასწორია.",
-      messageEn: `Invalid parameters: ${issues}`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues }),
       retryable: false,
     });
   }
@@ -101,8 +102,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
       code: "data_version_changed",
-      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
-      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.dataVersionChanged"),
+      messageEn: serviceMessage(snapshot, "en", "errors.dataVersionChanged"),
       retryable: false,
     });
   }
@@ -114,8 +115,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   if (unknownIds.length > 0) {
     return errorResponse(snapshot, {
       code: "unknown_source",
-      messageKa: `უცნობი წყაროს იდენტიფიკატორი: ${unknownIds.join(", ")}.`,
-      messageEn: `Unknown source id(s): ${unknownIds.join(", ")}.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownSource", { unknownIds: unknownIds.join(", ") }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownSource", { unknownIds: unknownIds.join(", ") }),
       retryable: false,
       validChoices: suggestionsFor(
         unknownIds,
@@ -137,8 +138,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   if (unknownEntityIds.length > 0) {
     return errorResponse(snapshot, {
       code: "unknown_entity",
-      messageKa: `უცნობი ერთეულის იდენტიფიკატორი: ${unknownEntityIds.join(", ")}.`,
-      messageEn: `Unknown entity id(s): ${unknownEntityIds.join(", ")}.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownEntity", { unknownEntityIds: unknownEntityIds.join(", ") }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownEntity", { unknownEntityIds: unknownEntityIds.join(", ") }),
       retryable: false,
       validChoices: Array.from(knownEntityIds).sort(),
     });
@@ -161,8 +162,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   if (outOfRangeYears.length > 0) {
     return errorResponse(snapshot, {
       code: "year_out_of_range",
-      messageKa: `მოთხოვნილი წელი (${outOfRangeYears.join(", ")}) სცილდება დაფარვის საზღვრებს (${minYear}–${maxYear}).`,
-      messageEn: `Requested year(s) ${outOfRangeYears.join(", ")} fall outside the covered range (${minYear}-${maxYear}).`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.sourceYearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear, maxYear }),
+      messageEn: serviceMessage(snapshot, "en", "errors.sourceYearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear, maxYear }),
       retryable: false,
     });
   }

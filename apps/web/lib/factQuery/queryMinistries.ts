@@ -401,7 +401,7 @@ export function queryMinistries(
       .filter((f) => input.years.includes(f.year))
       .map((f) => `${f.itemId}:${f.year}`),
   };
-  const caveats = evaluateCaveats(caveatContext, CAVEAT_RULES);
+  const caveats = evaluateCaveats(snapshot, caveatContext, CAVEAT_RULES);
 
   const observations: Observation[] = withDocuments.map((o) => ({ ...o, caveatIds: caveatIdsForObservation(caveats, o) }));
 

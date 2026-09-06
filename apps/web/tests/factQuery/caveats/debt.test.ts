@@ -1,8 +1,13 @@
+import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 // apps/web/tests/factQuery/caveats/debt.test.ts
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { CAVEAT_RULES } from "../../../lib/factQuery/caveats";
 import { evaluateCaveats, type CaveatContext } from "../../../lib/factQuery/caveats/engine";
 import { DEBT_CAVEAT_RULES } from "../../../lib/factQuery/caveats/rules.debt";
+
+let snapshot: FactQuerySnapshot;
+beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 
 function context(overrides: Partial<CaveatContext>): CaveatContext {
   return {
@@ -36,7 +41,7 @@ function observation(overrides: Partial<CaveatContext["observations"][number]>) 
   };
 }
 
-const codes = (ctx: CaveatContext) => evaluateCaveats(ctx, DEBT_CAVEAT_RULES).map((c) => c.code);
+const codes = (ctx: CaveatContext) => evaluateCaveats(snapshot, ctx, DEBT_CAVEAT_RULES).map((c) => c.code);
 
 describe("debt_not_budget_scope", () => {
   it("states the boundary on every debt answer", () => {
@@ -52,7 +57,7 @@ describe("debt_not_budget_scope", () => {
 
 describe("debt_service_projection", () => {
   it("is severe and names the projected cells", () => {
-    const result = evaluateCaveats(
+    const result = evaluateCaveats(snapshot,
       context({
         seriesIds: ["debt.service.total"],
         years: [2027],

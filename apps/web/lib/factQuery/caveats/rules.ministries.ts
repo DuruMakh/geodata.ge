@@ -40,10 +40,9 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "program_coverage_partial",
     severity: "severe",
     comparisonEffect: "none",
-    messageKa:
-      "მოთხოვნილი პროგრამული მწკრივი ზოგიერთ წელს არ ფარავს; არარსებული მნიშვნელობა ნული არ არის.",
-    messageEn: "The requested program series does not cover every requested year; a missing value is not zero.",
+    messageKey: "caveats.program_coverage_partial",
     methodologyRef: "ministries-drilldown-programs-methodology.md",
+    methodologyRefEn: "/en/methodology/expenditure",
     // A missing cell surfaces in `observations` as value: null (never a genuine
     // zero - ministries-drilldown-programs-methodology.md §7 documents real
     // within-range gaps, e.g. "30 06 Civil security 2015-2025 (gap 2018)", and §1
@@ -70,11 +69,9 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "admin_category_not_yet_established",
     severity: "severe",
     comparisonEffect: "none",
-    messageKa:
-      "მოთხოვნილი ადმინისტრაციული კატეგორია ამ წლის კლასიფიკაციაში არ არსებობს — ის მოგვიანებით ჩამოყალიბდა; არარსებული მნიშვნელობა ნული არ არის.",
-    messageEn:
-      "The requested administrative category does not exist in that year's classification — it was established later; a missing value is not zero.",
+    messageKey: "caveats.admin_category_not_yet_established",
     methodologyRef: "ministries-expenditure-methodology.md",
+    methodologyRefEn: "/en/methodology/expenditure",
     // The admin_category counterpart of program_coverage_partial, split off from it
     // because the two situations have different causes, different remedies and
     // different methodology documents. Category coverage is contiguous WITHIN each
@@ -93,10 +90,9 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "program_historical_join",
     severity: "note",
     comparisonEffect: "limits",
-    messageKa:
-      "მწკრივი იყენებს დამტკიცებულ ისტორიულ გაერთიანებას; შენარჩუნებულია მისი მოცულობა და ორიგინალი დასახელება.",
-    messageEn: "The series uses an approved historical succession join; its scope and original label are preserved.",
+    messageKey: "caveats.program_historical_join",
     methodologyRef: "ministries-drilldown-programs-methodology.md",
+    methodologyRefEn: "/en/methodology/expenditure",
     // Must key on historicalJoinSeriesYears - Task 3's resolved list of the exact
     // program CELLS carrying an approved PROGRAM_SUCCESSIONS or LEGACY_PROGRAM_JOINS
     // entry (buildSnapshot.ts historicalJoinSeriesYears()). An earlier draft keyed on
@@ -127,11 +123,9 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "program_parent_category_modern_grouping",
     severity: "severe",
     comparisonEffect: "none",
-    messageKa:
-      "მშობელი ადმინისტრაციული კატეგორია სერიის თანამედროვე მიკუთვნებაა და ამ წელს ჯერ არ არსებობდა; ხარჯი მაშინ სხვა უწყებამ განახორციელა. თანხა და წილი სწორია, მაგრამ მშობელი კატეგორია ამ წლისთვის კუთვნილების მტკიცება არ არის.",
-    messageEn:
-      "The parent administrative category is this series' modern grouping and did not exist in that year; the spending was administered by a different institution. The amount and share are correct, but the parent is not a containment claim for that year.",
+    messageKey: "caveats.program_parent_category_modern_grouping",
     methodologyRef: "ministries-drilldown-programs-methodology.md",
+    methodologyRefEn: "/en/methodology/expenditure",
     // A joined series keeps ONE parent - its modern owner - across every year it
     // serves, which is the approved grouping decision, not a statement about the
     // year's institutions. Where the modern parent postdates the year, following
@@ -148,10 +142,9 @@ export const MINISTRIES_CAVEAT_RULES: readonly CaveatRule[] = [
     code: "non_positive_comparison_base",
     severity: "note",
     comparisonEffect: "none",
-    messageKa:
-      "საწყისი მაჩვენებელი ნულოვანი ან უარყოფითია, ამიტომ პროცენტული ზრდა არ გამოითვლება; აბსოლუტური სხვაობა შესაძლოა დარჩეს.",
-    messageEn: "The starting value is zero or negative, so percentage growth is unavailable; an absolute difference may remain.",
+    messageKey: "caveats.non_positive_comparison_base",
     methodologyRef: "ai-grounding-and-caveats.md#non_positive_comparison_base",
+    methodologyRefEn: "/en/methodology/expenditure",
     // Concerns the comparison's EARLIER endpoint specifically (spec §6.6: percentage
     // change is (later - earlier) / earlier * 100), not any value anywhere in the
     // result - a non-positive LATER value is not a division problem.

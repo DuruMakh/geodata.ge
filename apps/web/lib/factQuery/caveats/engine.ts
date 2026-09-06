@@ -1,5 +1,6 @@
 // apps/web/lib/factQuery/caveats/engine.ts
-import type { Basis, Caveat, DatasetId, Measure, Severity } from "../types";
+import type { Basis, Caveat, DatasetId, FactQuerySnapshot, Measure, Severity } from "../types";
+import { serviceMessage, type ServiceMessageKey } from "../localization";
 import type { MunicipalTotalFact, ServedNationalGdpFact } from "../types";
 
 /**
@@ -114,16 +115,16 @@ export type CaveatRule = {
    * is "severe" but does not stop one.
    */
   comparisonEffect: ComparisonEffect;
-  messageKa: string;
-  messageEn: string;
+  messageKey: ServiceMessageKey;
   methodologyRef: string;
+  methodologyRefEn: string;
   applies: (context: CaveatContext) => boolean;
   affects: (context: CaveatContext) => string[];
 };
 
 const SEVERITY_ORDER: Record<Severity, number> = { severe: 0, note: 1 };
 
-export function evaluateCaveats(context: CaveatContext, rules: readonly CaveatRule[]): Caveat[] {
+export function evaluateCaveats(snapshot: FactQuerySnapshot, context: CaveatContext, rules: readonly CaveatRule[]): Caveat[] {
   const emitted = new Map<string, Caveat>();
 
   for (const rule of rules) {
@@ -132,9 +133,10 @@ export function evaluateCaveats(context: CaveatContext, rules: readonly CaveatRu
     emitted.set(rule.code, {
       code: rule.code,
       severity: rule.severity,
-      messageKa: rule.messageKa,
-      messageEn: rule.messageEn,
+      messageKa: serviceMessage(snapshot, "ka", rule.messageKey),
+      messageEn: serviceMessage(snapshot, "en", rule.messageKey),
       methodologyRef: rule.methodologyRef,
+      methodologyRefEn: rule.methodologyRefEn,
       affects: rule.affects(context),
     });
   }

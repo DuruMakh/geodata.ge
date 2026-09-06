@@ -615,7 +615,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   // unverified claim. datasetId itself is required by CaveatContext but, for
   // the same reason, cannot affect the outcome here: it falls back to an
   // arbitrary fixed member of DatasetId when the request did not name one.
-  const caveats = evaluateCaveats(
+  const caveats = evaluateCaveats(snapshot,
     {
       datasetId: input.datasetId ?? "national-revenue",
       measure: "amount_gel",

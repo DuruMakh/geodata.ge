@@ -1,7 +1,12 @@
+import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 // apps/web/tests/factQuery/caveats/national.test.ts
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { evaluateCaveats, type CaveatContext } from "../../../lib/factQuery/caveats/engine";
 import { NATIONAL_CAVEAT_RULES } from "../../../lib/factQuery/caveats/rules.national";
+
+let snapshot: FactQuerySnapshot;
+beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 
 function context(overrides: Partial<CaveatContext>): CaveatContext {
   return {
@@ -21,7 +26,7 @@ function context(overrides: Partial<CaveatContext>): CaveatContext {
   };
 }
 
-const codes = (ctx: CaveatContext) => evaluateCaveats(ctx, NATIONAL_CAVEAT_RULES).map((c) => c.code);
+const codes = (ctx: CaveatContext) => evaluateCaveats(snapshot, ctx, NATIONAL_CAVEAT_RULES).map((c) => c.code);
 
 describe("revenue_2004_total_scope", () => {
   it("fires when a 2004 revenue total is requested", () => {

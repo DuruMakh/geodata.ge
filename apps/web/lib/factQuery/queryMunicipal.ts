@@ -505,7 +505,7 @@ export function queryMunicipal(
     historicalJoinSeriesYears: [],
     adminCategoryYears: [],
   };
-  const caveats = evaluateCaveats(caveatContext, CAVEAT_RULES);
+  const caveats = evaluateCaveats(snapshot, caveatContext, CAVEAT_RULES);
 
   const observations: Observation[] = withDocuments.map((o) => ({ ...o, caveatIds: caveatIdsForObservation(caveats, o) }));
 

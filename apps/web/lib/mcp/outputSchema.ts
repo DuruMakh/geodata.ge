@@ -22,6 +22,7 @@ const caveat = z
     messageKa: z.string(),
     messageEn: z.string(),
     methodologyRef: z.string(),
+    methodologyRefEn: z.string().min(1),
     affects: z.array(z.string()),
   })
   .loose();
@@ -99,25 +100,25 @@ const coverage = z.object({
   missingCells: z.array(z.object({ entityId: z.string(), seriesId: z.string(), year: z.number().int(), reason: z.string(), reasonEn: z.string().min(1) })),
   excludedEntities: z.array(bilingualExcludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
 });
-const endpoint = observationSchema.pick({ year: true, value: true, availability: true, missingReason: true, basis: true, valueDefinition: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
+const endpoint = observationSchema.pick({ year: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
 const dataShapes = {
   observations: z.object({ observations: z.array(observationSchema), coverage }),
   comparisons: z.object({
     comparisons: z.array(z.object({
-      comparisonId: z.string(), datasetId: z.string(), entityId: z.string(), entityLabelKa: z.string(), seriesId: z.string(), seriesLabelKa: z.string(),
+      comparisonId: z.string(), datasetId: z.string(), entityId: z.string(), entityLabelKa: z.string(), entityLabelEn: z.string().min(1), seriesId: z.string(), seriesLabelKa: z.string(), seriesLabelEn: z.string().min(1),
       measure: z.string(), unit: observationSchema.shape.unit, from: endpoint, to: endpoint,
       absoluteChange: z.number().nullable(), percentageChange: z.number().nullable(), percentagePointChange: z.number().nullable(),
-      comparability: z.enum(["comparable", "limited", "not_comparable"]), reasons: z.array(z.string()), caveatIds: z.array(z.string()),
+      comparability: z.enum(["comparable", "limited", "not_comparable"]), reasons: z.array(z.string()), reasonsEn: z.array(z.string()), caveatIds: z.array(z.string()),
     })),
-    coverage: z.object({ requestedYears: z.array(z.number()), requestedPairs: z.number(), comparedPairs: z.number(), comparableCount: z.number(), notComparableCount: z.number(), excludedEntities: z.array(excludedEntity) }),
+    coverage: z.object({ requestedYears: z.array(z.number()), requestedPairs: z.number(), comparedPairs: z.number(), comparableCount: z.number(), notComparableCount: z.number(), excludedEntities: z.array(bilingualExcludedEntity) }),
   }),
   ranking: z.object({
     entries: z.array(z.object({
-      position: z.number(), tied: z.boolean(), entityId: z.string(), entityLabelKa: z.string(), seriesId: z.string(), seriesLabelKa: z.string(),
+      position: z.number(), tied: z.boolean(), entityId: z.string(), entityLabelKa: z.string(), entityLabelEn: z.string().min(1), seriesId: z.string(), seriesLabelKa: z.string(), seriesLabelEn: z.string().min(1),
       value: z.number().nullable(), unit: observationSchema.shape.unit, basis: observationSchema.shape.basis, caveatIds: z.array(z.string()),
     })),
-    universe: z.object({ dimension: z.enum(["series", "entities"]), description: z.string(), candidateCount: z.number(), eligibleCount: z.number(), returnedCount: z.number(), cutoffSplitsTie: z.boolean() }),
-    exclusions: z.array(z.object({ reason: z.string(), ids: z.array(z.string()) })), rankingDefinition: z.string(),
+    universe: z.object({ dimension: z.enum(["series", "entities"]), description: z.string(), descriptionEn: z.string().min(1), candidateCount: z.number(), eligibleCount: z.number(), returnedCount: z.number(), cutoffSplitsTie: z.boolean() }),
+    exclusions: z.array(z.object({ reason: z.string(), reasonEn: z.string().min(1), ids: z.array(z.string()) })), rankingDefinition: z.string(), rankingDefinitionEn: z.string().min(1),
   }),
   catalogue: z.object({
     datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), labelEn: z.string().min(1), years: z.tuple([z.number(), z.number()]), entityTypes: z.array(z.string()), measures: z.array(z.string()), measureNotes: z.record(z.string(), z.string()).optional(), measureNotesEn: z.record(z.string(), z.string()).optional() })),

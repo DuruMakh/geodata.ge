@@ -72,6 +72,7 @@ export type Caveat = {
   messageKa: string;
   messageEn: string;
   methodologyRef: string;
+  methodologyRefEn: string;
   affects: string[];
 };
 
