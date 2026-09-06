@@ -21,9 +21,26 @@ const parse = (bytes: Buffer): Record<string, never> => JSON.parse(bytes.toStrin
 // Rebuilding per `it` cost 47.6s here against 10.2s for a complete
 // build-and-write run.
 let snapshot: FactQuerySnapshot;
+// The published files are pure over the snapshot, and 22 tests read them.
+// Rebuilding per `it` re-serialised all of them 23 times: 32.7s for this file
+// against 5.9s built once. `buildAllPublications` already composes the other
+// three builders, and `buildDatasetFiles` is the only expensive one (1.8s of
+// its 2.1s), so everything is taken from that single call rather than built
+// again alongside it. Selected by name, not position, so a reordering fails in
+// the test that pins the order rather than silently here.
+let datasetFiles: ReturnType<typeof buildDatasetFiles>;
+let allPublications: ReturnType<typeof buildAllPublications>;
+let catalogueFile: ReturnType<typeof buildCatalogueFile>;
+let sourcesFile: ReturnType<typeof buildSourcesFile>;
 
 beforeAll(async () => {
   snapshot = await buildFactQuerySnapshot(OPTIONS);
+  allPublications = buildAllPublications(snapshot);
+  catalogueFile = allPublications.find((file) => file.fileName === "catalogue.json")!;
+  sourcesFile = allPublications.find((file) => file.fileName === "sources.json")!;
+  datasetFiles = allPublications.filter(
+    (file) => !["catalogue.json", "sources.json", "manifest.json"].includes(file.fileName),
+  );
 });
 
 describe("publication header", () => {
@@ -43,7 +60,7 @@ describe("publication header", () => {
 
 describe("catalogue.json", () => {
   it("publishes every dataset with its series and entities", async () => {
-    const catalogue = parse(buildCatalogueFile(snapshot).bytes) as unknown as {
+    const catalogue = parse(catalogueFile.bytes) as unknown as {
       datasets: { datasetId: string; series: unknown[]; entities?: unknown[] }[];
       exclusions: unknown[];
     };
@@ -65,7 +82,7 @@ describe("catalogue.json", () => {
   });
 
   it("never lists an excluded municipality as a queryable entity", async () => {
-    const catalogue = parse(buildCatalogueFile(snapshot).bytes) as unknown as {
+    const catalogue = parse(catalogueFile.bytes) as unknown as {
       datasets: { datasetId: string; entities?: { entityId: string }[] }[];
     };
     const municipal = catalogue.datasets.find((dataset) => dataset.datasetId === "municipal-expenditure");
@@ -79,7 +96,7 @@ describe("catalogue.json", () => {
 
 describe("sources.json", () => {
   it("publishes every source with its documents and derivation", async () => {
-    const published = parse(buildSourcesFile(snapshot).bytes) as unknown as {
+    const published = parse(sourcesFile.bytes) as unknown as {
       sources: { sourceId: string; derivation: string | null; documents: { role: string }[] }[];
     };
 
@@ -91,7 +108,7 @@ describe("sources.json", () => {
   });
 
   it("keeps the derivation-upstream role on published documents", async () => {
-    const published = parse(buildSourcesFile(snapshot).bytes) as unknown as {
+    const published = parse(sourcesFile.bytes) as unknown as {
       sources: { sourceId: string; documents: { role: string }[] }[];
     };
     const derived = published.sources.find((source) => source.sourceId === "source.adjara_consolidated_budget");
@@ -107,8 +124,8 @@ describe("sources.json", () => {
 
 describe("manifest.json", () => {
   it("records the exact bytes and hash of every artifact it describes", async () => {
-    const catalogue = buildCatalogueFile(snapshot);
-    const sources = buildSourcesFile(snapshot);
+    const catalogue = catalogueFile;
+    const sources = sourcesFile;
     const manifest = parse(buildManifestFile(snapshot, [catalogue, sources]).bytes) as unknown as {
       files: { fileName: string; byteSize: number; sha256: string; url: string }[];
     };
@@ -123,7 +140,7 @@ describe("manifest.json", () => {
   });
 
   it("does not describe itself", async () => {
-    const catalogue = buildCatalogueFile(snapshot);
+    const catalogue = catalogueFile;
     const manifest = parse(buildManifestFile(snapshot, [catalogue]).bytes) as unknown as {
       files: { fileName: string }[];
     };
@@ -154,7 +171,7 @@ type PublishedFile = {
 
 describe("dataset publications", () => {
   it("publishes every dataset file with observations, catalogue, sources and caveats", async () => {
-    const files = buildDatasetFiles(snapshot);
+    const files = datasetFiles;
 
     expect(files.map((file) => file.fileName)).toEqual([
       "national-revenue.json",
@@ -180,7 +197,7 @@ describe("dataset publications", () => {
   });
 
   it("gives every observation an explicit role, parentage and level", async () => {
-    for (const file of buildDatasetFiles(snapshot)) {
+    for (const file of datasetFiles) {
       for (const observation of (parse(file.bytes) as unknown as PublishedFile).observations) {
         expect(observation.level, `${file.fileName} ${observation.observationId}`).toBeTruthy();
         expect(observation).toHaveProperty("parentSeriesId");
@@ -190,7 +207,7 @@ describe("dataset publications", () => {
   });
 
   it("excludes the five aggregate-only municipalities from the municipal file", async () => {
-    const municipal = parse(buildDatasetFiles(snapshot)[3]!.bytes) as unknown as PublishedFile;
+    const municipal = parse(datasetFiles[3]!.bytes) as unknown as PublishedFile;
     const entityIds = new Set(municipal.observations.map((observation) => observation.entityId));
 
     for (const code of ["05", "42", "43", "46", "64"]) {
@@ -201,7 +218,7 @@ describe("dataset publications", () => {
   });
 
   it("separates ministries by hierarchy level", async () => {
-    const ministries = parse(buildDatasetFiles(snapshot)[2]!.bytes) as unknown as PublishedFile;
+    const ministries = parse(datasetFiles[2]!.bytes) as unknown as PublishedFile;
     const levels = new Set(ministries.observations.map((observation) => observation.level));
 
     expect(levels.has("admin_category")).toBe(true);
@@ -209,7 +226,7 @@ describe("dataset publications", () => {
   });
 
   it("carries the supporting denominators, not precomputed ratios", async () => {
-    const files = buildDatasetFiles(snapshot);
+    const files = datasetFiles;
     const revenue = parse(files[0]!.bytes) as unknown as PublishedFile;
     const municipal = parse(files[3]!.bytes) as unknown as PublishedFile;
 
@@ -222,14 +239,14 @@ describe("dataset publications", () => {
   it("keeps every published file within the size budget", async () => {
     // A guard against a silent regression republishing per-row duplication:
     // before the citation fix the municipal response alone was 30 MB.
-    for (const file of buildAllPublications(snapshot)) {
+    for (const file of allPublications) {
       expect(file.bytes.byteLength / 1024 / 1024, `${file.fileName} MB`).toBeLessThan(20);
     }
   });
 
   it("puts the manifest last so it can hash the others", async () => {
 
-    expect(buildAllPublications(snapshot).map((file) => file.fileName)).toEqual([
+    expect(allPublications.map((file) => file.fileName)).toEqual([
       "catalogue.json",
       "sources.json",
       "national-revenue.json",
@@ -246,7 +263,7 @@ describe("dataset publications", () => {
 
 describe("the published bytes carry the same figures the query core returns", () => {
   it("matches queryNational for every published revenue observation", async () => {
-    const published = parse(buildDatasetFiles(snapshot)[0]!.bytes) as unknown as PublishedFile;
+    const published = parse(datasetFiles[0]!.bytes) as unknown as PublishedFile;
 
     const years = [...new Set(snapshot.national.facts.map((fact) => fact.year))].sort((left, right) => left - right);
     // Includes the calculated total, which the published file carries and
@@ -282,7 +299,7 @@ describe("regressions from the Part 2 review", () => {
   // nothing warning that subtracting their totals is not a deficit - a spec 5.1
   // non-negotiable. revenue_2004_total_scope was suppressed the same way.
   it("publishes an observation for every total its own catalogue advertises", () => {
-    for (const file of buildDatasetFiles(snapshot)) {
+    for (const file of datasetFiles) {
       const published = parse(file.bytes) as unknown as {
         catalogue: { series: { seriesId: string; level: string }[] };
         observations: { seriesId: string }[];
@@ -308,7 +325,7 @@ describe("regressions from the Part 2 review", () => {
   });
 
   it("warns that the two national totals are different accounting boundaries", () => {
-    const files = buildDatasetFiles(snapshot);
+    const files = datasetFiles;
     for (const index of [0, 1]) {
       const published = parse(files[index]!.bytes) as unknown as { caveats: { code: string }[] };
 
@@ -325,7 +342,7 @@ describe("regressions from the Part 2 review", () => {
   // discarded: 1,056 of 1,364 rows declared a caveat whose published scope
   // excluded them. Harmless for a note, silently wrong for a severe one.
   it("keeps every declared caveat resolvable back to the row that declares it", () => {
-    for (const file of buildDatasetFiles(snapshot)) {
+    for (const file of datasetFiles) {
       const published = parse(file.bytes) as unknown as {
         caveats: { code: string; affects: string[] }[];
         observations: { observationId: string; entityId: string; seriesId: string; year: number; caveatIds: string[] }[];
@@ -360,7 +377,7 @@ describe("regressions from the Part 2 review", () => {
   // 10 published rows cited source.treasury_consolidated_revenue_actual and
   // showed none of its documents - a figure whose origin nobody can open.
   it("never cites a source while showing none of its documents", () => {
-    for (const file of buildDatasetFiles(snapshot)) {
+    for (const file of datasetFiles) {
       const published = parse(file.bytes) as unknown as {
         sources: { sourceId: string; documents: { documentId: string }[] }[];
         observations: { observationId: string; sourceIds: string[]; documentIds: string[] }[];
@@ -387,7 +404,7 @@ describe("regressions from the Part 2 review", () => {
   // is given, so it could not have failed. This pins the real invariant in
   // buildAllPublications instead.
   it("hashes every published file except the manifest itself", () => {
-    const all = buildAllPublications(snapshot);
+    const all = allPublications;
     const manifest = all[all.length - 1]!;
     const described = (parse(manifest.bytes) as unknown as { files: { fileName: string }[] }).files.map(
       (file) => file.fileName,
@@ -403,7 +420,7 @@ describe("regressions from the Part 2 review", () => {
   // either string in the repo, so no test compared them until both shipped in
   // one file and the obvious consumer join returned nothing.
   it("agrees with itself about each dataset's accounting boundary", () => {
-    for (const file of buildDatasetFiles(snapshot)) {
+    for (const file of datasetFiles) {
       const published = parse(file.bytes) as unknown as {
         datasetId: string;
         catalogue: { datasets: { datasetId: string; budgetScope: string }[] };
@@ -425,7 +442,7 @@ describe("the published catalogue", () => {
     // manifest.json's coverage described four datasets while manifest.json's
     // files listed all ten. A bulk client told to read the catalogue first was
     // told debt and the balance do not exist.
-    const catalogue = parse(buildCatalogueFile(snapshot).bytes) as unknown as {
+    const catalogue = parse(catalogueFile.bytes) as unknown as {
       datasets: { datasetId: string }[];
     };
     const served = describeCoverage(snapshot, {});
