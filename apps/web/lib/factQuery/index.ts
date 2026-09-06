@@ -39,6 +39,7 @@ export type {
   PublicDocument,
   ResolvedSource,
   ResponseMeta,
+  ServiceLocalization,
   Severity,
   Unit,
 } from "./types";

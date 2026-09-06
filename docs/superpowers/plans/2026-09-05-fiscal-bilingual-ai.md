@@ -106,7 +106,7 @@ These are concrete starting English keys; derive additional keys by the existing
 
 **Interfaces:** Add required `labelEn` beside `labelKa` in catalogue dataset/entity/series entries; `measureNotesEn` beside existing `measureNotes`; `reasonEn` beside Georgian prose in catalogue exclusions. Observations add required `entityLabelEn`, `seriesLabelEn`, `valueDefinitionEn`, and nullable `missingReasonEn`. Coverage missing cells and excluded entities gain `reasonEn` for their human explanations. Preserve machine reason codes verbatim wherever they already identify a condition; their English explanation is separate. Retain `valueDefinitionId`, existing Georgian fields, values, units, basis, source/document/caveat IDs, and field ordering meaning. Input schemas remain unchanged.
 
-- [ ] Add tests for all five observation-producing query functions and six dataset families using the real snapshot. Assert exact known labels plus all English field presence. Use the existing reference fixture for financial expectations; compare language additions separately.
+- [x] Add tests for all five observation-producing query functions and six dataset families using the real snapshot. Assert exact known labels plus all English field presence. Use the existing reference fixture for financial expectations; compare language additions separately.
 
 ```ts
 it('returns the same education observation with reviewed English labels', async () => {
@@ -121,7 +121,7 @@ it('returns the same education observation with reviewed English labels', async 
 });
 ```
 
-- [ ] Confirm failure, then add labels to each construction path, including total, missing observation, requested entity, programme, and public-source-only entity cases. Use the same stable IDs in `serviceLabelEn`; do not infer translated names from slugs.
+- [x] Confirm failure, then add labels to each construction path, including total, missing observation, requested entity, programme, and public-source-only entity cases. Use the same stable IDs in `serviceLabelEn`; do not infer translated names from slugs.
 
 ```ts
 const englishFields = {
@@ -132,11 +132,15 @@ const englishFields = {
 ```
 
 Choose the message key from the existing measure/series kind branch; the excerpt is for the raw reviewed amount case only. Shares must identify the applicable denominator. Programme definitions use `historicalProgrammeLabelEn` when the original-year name is shown; never append untranslated `officialLabelKa` inside English definitions.
-- [ ] Complete catalogue translation of measure notes and exclusions. Extend English-name discovery by adding reviewed `labelEn` to the existing search fields. Preserve current stable IDs, slug matching, and alias boundary checks from PR #101; do not replace them with broad substring matching that reintroduces ambiguous administrative-name bugs.
-- [ ] Extend declared observation and tool-output schemas to include all added fields; ensure SDK output validation sees them. Keep `z.strictObject` input contracts unchanged. Tests must prove an old request without any language parameter still works and invalid parameters remain rejected.
-- [ ] Run `npx vitest run tests/factQuery/bilingualObservations.test.ts tests/factQuery/describeCoverage.test.ts tests/factQuery/queryNational.test.ts tests/factQuery/queryMinistries.test.ts tests/factQuery/queryMunicipal.test.ts tests/factQuery/queryDebt.test.ts tests/factQuery/queryDeficit.test.ts tests/factQuery/schemas.test.ts tests/mcp/outputSchema.test.ts`, then the reference fixture and typecheck. Commit with `feat: return bilingual catalogue and budget observations`.
+- [x] Complete catalogue translation of measure notes and exclusions. Extend English-name discovery by adding reviewed `labelEn` to the existing search fields. Preserve current stable IDs, slug matching, and alias boundary checks from PR #101; do not replace them with broad substring matching that reintroduces ambiguous administrative-name bugs.
+- [x] Extend declared observation and tool-output schemas to include all added fields; ensure SDK output validation sees them. Keep `z.strictObject` input contracts unchanged. Tests must prove an old request without any language parameter still works and invalid parameters remain rejected.
+- [x] Run `npx vitest run tests/factQuery/bilingualObservations.test.ts tests/factQuery/describeCoverage.test.ts tests/factQuery/queryNational.test.ts tests/factQuery/queryMinistries.test.ts tests/factQuery/queryMunicipal.test.ts tests/factQuery/queryDebt.test.ts tests/factQuery/queryDeficit.test.ts tests/factQuery/schemas.test.ts tests/mcp/outputSchema.test.ts`, then the reference fixture and typecheck. Commit with `feat: return bilingual catalogue and budget observations`.
 
 **Done:** every served dataset has reviewed bilingual names/definitions without changing what any observation measures.
+
+> A2 verified on 2026-09-06: full check passed 172 files / 1,693 tests, including all six observation families, unchanged reference expectations, catalogue/alias cases and SDK output validation. Catalogue names, measure notes, exclusions, observation definitions and missing reasons now expose reviewed English companions. Existing Georgian values and all non-language observation fields are unchanged when English snapshot text is edited. English historical programme definitions use the reviewed original-year translation. Request schemas remain strict and accept no language parameter. Shared source/document English fields from A1 are now explicitly declared in the MCP output schema. Comparison/ranking English additions and compact bilingual text remain A3/A4.
+
+> Expenditure example: the SDK in-memory transport returned Education / განათლება for 2025, exactly GEL 3,045,941,254, citing the same two original documents. This equals the actual English workbook downloaded in W3. Evidence: .tmp/bilingual/a2-expenditure-example.json and a2-workbook-sdk-parity.json. This verifies the declared SDK response, not a production /mcp request. Build passed with 106 static-generation entries and only /mcp dynamic; all ten publication hashes passed. Snapshot dataVersion remains a6c927f06f86396992ed7afd5fc0aae3accfc83700f3213fc28ddcbc7c1ceeff; public schema version remains 1.0.0 until A5. Two old assertions explicitly requiring Georgian-only output were updated to assert the new English fields; financial reference expectations were not changed.
 
 ## Task A3: Preserve bilingual evidence through comparisons, rankings, and metadata
 

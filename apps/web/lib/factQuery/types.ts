@@ -79,8 +79,8 @@ export type Coverage = {
   requestedYears: number[];
   availableYears: number[];
   returnedYears: number[];
-  missingCells: { entityId: string; seriesId: string; year: number; reason: string }[];
-  excludedEntities: { entityId: string; reason: string }[];
+  missingCells: { entityId: string; seriesId: string; year: number; reason: string; reasonEn: string }[];
+  excludedEntities: { entityId: string; reason: string; reasonEn: string }[];
   returnedCount: number;
   expectedCount: number;
 };

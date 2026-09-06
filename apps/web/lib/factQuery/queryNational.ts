@@ -9,6 +9,7 @@
 // state-budget expenditure. Every observation's budgetScope names which, so
 // geography alone (both are "country.georgia") can never be read as the two
 // sides measuring the same thing.
+import { serviceLabelEn, serviceMessage, type ServiceMessageKey } from "./localization";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { isDerivedTotalItemId } from "../explorer/explorerData";
 import { shareOfTotal } from "../explorer/share";
@@ -28,30 +29,25 @@ const LEVEL_PUBLIC_FIELD = "public_field";
 
 type Side = "revenue" | "expenditure";
 
-function missingSeriesReason(year: number): string {
-  return `არჩეული სერიისთვის ${year} წელს მონაცემი არ ფიქსირდება — ეს ნულოვან მნიშვნელობას არ ნიშნავს.`;
-}
 
-const GDP_DENOMINATOR_MISSING_REASON =
-  "ამ წლისთვის მშპ-ის მაჩვენებელი მიუწვდომელია ან დადებითი არ არის, ამიტომ წილის გამოთვლა შეუძლებელია.";
-const TOTAL_DENOMINATOR_MISSING_REASON =
-  "ამ წლისთვის შესაბამისი ჯამი მიუწვდომელია ან დადებითი არ არის, ამიტომ წილის გამოთვლა შეუძლებელია.";
+const GDP_DENOMINATOR_MISSING_KEY = "missing.gdpDenominator" as const;
+const TOTAL_DENOMINATOR_MISSING_KEY = "missing.totalDenominator" as const;
 
-function valueDefinitionFor(isTotal: boolean, side: Side, measure: "amount_gel" | "share_of_total_pct" | "share_of_gdp_pct"): string {
+function valueDefinitionFor(snapshot: FactQuerySnapshot, locale: "ka" | "en", isTotal: boolean, side: Side, measure: "amount_gel" | "share_of_total_pct" | "share_of_gdp_pct"): string {
   if (measure === "share_of_gdp_pct") {
-    return "წილი იმავე წლის მშპ-ში მიმდინარე ფასებში, 0-დან 100-მდე შკალაზე.";
+    return serviceMessage(snapshot, locale, "definitions.shareOfGdp");
   }
   if (measure === "share_of_total_pct") {
     return side === "revenue"
-      ? "წილი წლის მთლიან შემოსავლებში, 0-დან 100-მდე შკალაზე."
-      : "წილი წლის მთლიან ხარჯში, 0-დან 100-მდე შკალაზე.";
+      ? serviceMessage(snapshot, locale, "definitions.receiptsShare")
+      : serviceMessage(snapshot, locale, "definitions.expenditureShare");
   }
   if (isTotal) {
     return side === "revenue"
-      ? "გამოთვლილია შემოსავლების ყველა კომპონენტის ჯამად შესაბამისი წლისთვის."
-      : "გამოთვლილია ხარჯების ყველა კომპონენტის ჯამად შესაბამისი წლისთვის.";
+      ? serviceMessage(snapshot, locale, "definitions.receiptsTotal")
+      : serviceMessage(snapshot, locale, "definitions.expenditureTotal");
   }
-  return "საწყისი გადამოწმებული მაჩვენებელი ლარში, სრული სიზუსტით.";
+  return serviceMessage(snapshot, locale, "definitions.reviewedAmount");
 }
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
@@ -76,8 +72,8 @@ export function queryNational(
     const issues = parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ");
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მოთხოვნის პარამეტრები არასწორია.",
-      messageEn: `Invalid parameters: ${issues}`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues: issues }),
       retryable: false,
     });
   }
@@ -87,8 +83,8 @@ export function queryNational(
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
       code: "data_version_changed",
-      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
-      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.dataVersionChanged"),
+      messageEn: serviceMessage(snapshot, "en", "errors.dataVersionChanged"),
       retryable: false,
     });
   }
@@ -134,8 +130,8 @@ export function queryNational(
   if (unknownSeriesIds.length > 0) {
     return errorResponse(snapshot, {
       code: "unknown_series",
-      messageKa: `უცნობი სერიის იდენტიფიკატორი: ${unknownSeriesIds.join(", ")}.`,
-      messageEn: `Unknown series id(s): ${unknownSeriesIds.join(", ")}.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownSeries", { unknownSeriesIds: unknownSeriesIds.join(", ") }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownSeries", { unknownSeriesIds: unknownSeriesIds.join(", ") }),
       retryable: false,
       validChoices: Array.from(queryableSeriesIds).sort(),
     });
@@ -145,8 +141,8 @@ export function queryNational(
   if (outOfRangeYears.length > 0) {
     return errorResponse(snapshot, {
       code: "year_out_of_range",
-      messageKa: `მოთხოვნილი წელი (${outOfRangeYears.join(", ")}) სცილდება მონაცემთა დაფარვის საზღვრებს (${minYear}–${maxYear}); წელი არ იკვეცება.`,
-      messageEn: `Requested year(s) ${outOfRangeYears.join(", ")} fall outside this dataset's coverage (${minYear}-${maxYear}).`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.yearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear: minYear, maxYear: maxYear }),
+      messageEn: serviceMessage(snapshot, "en", "errors.yearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear: minYear, maxYear: maxYear }),
       retryable: false,
     });
   }
@@ -183,7 +179,7 @@ export function queryNational(
       let numeratorAmount: number | null;
       let basis: "actual" | "planned" | null;
       let numeratorSourceIds: string[];
-      let missingReason: string | null;
+      let missingReasonKey: ServiceMessageKey | null;
 
       if (isTotal) {
         const total = totalsByYear.get(year);
@@ -191,12 +187,12 @@ export function queryNational(
           numeratorAmount = total.value;
           basis = total.basis;
           numeratorSourceIds = total.sourceIds;
-          missingReason = null;
+          missingReasonKey = null;
         } else {
           numeratorAmount = null;
           basis = null;
           numeratorSourceIds = [];
-          missingReason = missingSeriesReason(year);
+          missingReasonKey = "missing.seriesYear";
         }
       } else {
         const fact = factByKey.get(`${seriesId}:${year}`);
@@ -204,7 +200,7 @@ export function queryNational(
           numeratorAmount = fact.amountGel;
           basis = fact.basis;
           numeratorSourceIds = splitSourceIds(fact.sourceId);
-          missingReason = null;
+          missingReasonKey = null;
         } else {
           // Missing != zero != excluded (brief). revenue.increase_liabilities
           // has no 2004 row because the category begins in 2005 - it is
@@ -213,7 +209,7 @@ export function queryNational(
           numeratorAmount = null;
           basis = null;
           numeratorSourceIds = [];
-          missingReason = missingSeriesReason(year);
+          missingReasonKey = "missing.seriesYear";
         }
       }
 
@@ -233,7 +229,7 @@ export function queryNational(
           const total = totalsByYear.get(year);
           const share = total ? shareOfTotal(numeratorAmount, total.value) : null;
           if (share === null) {
-            missingReason = TOTAL_DENOMINATOR_MISSING_REASON;
+            missingReasonKey = TOTAL_DENOMINATOR_MISSING_KEY;
           } else {
             value = share * 100;
             sourceIds = uniqueSorted([...numeratorSourceIds, ...(total?.sourceIds ?? [])]);
@@ -243,7 +239,7 @@ export function queryNational(
           usedGdpYears.add(year);
           const gdp = gdpByYear.get(year);
           if (!gdp || gdp.gdpCurrentPricesGel <= 0) {
-            missingReason = GDP_DENOMINATOR_MISSING_REASON;
+            missingReasonKey = GDP_DENOMINATOR_MISSING_KEY;
           } else {
             value = (numeratorAmount / gdp.gdpCurrentPricesGel) * 100;
             sourceIds = uniqueSorted([...numeratorSourceIds, ...splitSourceIds(gdp.sourceId)]);
@@ -260,9 +256,11 @@ export function queryNational(
         entityId: ENTITY_ID,
         entityType: "country",
         entityLabelKa: ENTITY_LABEL_KA,
+        entityLabelEn: serviceLabelEn(snapshot, ENTITY_ID),
         entitySlug: null,
         seriesId,
         seriesLabelKa: isTotal ? totalLabelKa : (item?.kaLabel ?? seriesId),
+        seriesLabelEn: serviceLabelEn(snapshot, seriesId),
         level: isTotal ? LEVEL_TOTAL : LEVEL_PUBLIC_FIELD,
         parentSeriesId: null,
         year,
@@ -270,9 +268,11 @@ export function queryNational(
         unit: input.measure === "amount_gel" ? "GEL" : "percent",
         value,
         availability,
-        missingReason: availability === "missing" ? missingReason : null,
+        missingReason: availability === "missing" && missingReasonKey !== null ? serviceMessage(snapshot, "ka", missingReasonKey, { year: year }) : null,
+        missingReasonEn: availability === "missing" && missingReasonKey !== null ? serviceMessage(snapshot, "en", missingReasonKey, { year: year }) : null,
         basis: availability === "missing" ? null : basis,
-        valueDefinition: valueDefinitionFor(isTotal, side, input.measure),
+        valueDefinition: valueDefinitionFor(snapshot, "ka", isTotal, side, input.measure),
+        valueDefinitionEn: valueDefinitionFor(snapshot, "en", isTotal, side, input.measure),
         // Structured identity for machine comparison. National series carry no
         // year-varying definition today, so the year is deliberately absent: a
         // coverage change here is expressed by a caveat whose comparisonEffect
@@ -334,7 +334,7 @@ export function queryNational(
 
   const missingCells = observations
     .filter((o) => o.availability === "missing")
-    .map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, reason: o.missingReason ?? "" }));
+    .map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, reason: o.missingReason ?? "", reasonEn: o.missingReasonEn ?? "" }));
   const returnedYears = Array.from(new Set(observations.filter((o) => o.availability === "available").map((o) => o.year))).sort(
     (a, b) => a - b,
   );

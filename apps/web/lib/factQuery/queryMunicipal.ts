@@ -14,6 +14,7 @@
 // "unknown": they exist, and are excluded because their budgets are not
 // territorially attributable spending. Reporting them as unknown would tell a
 // consumer the municipality is not real.
+import { serviceLabelEn, serviceMessage, type ServiceMessageKey } from "./localization";
 import {
   MUNICIPAL_PER_RESIDENT_YEAR,
   MUNICIPAL_TOTAL_ITEM_ID,
@@ -42,23 +43,13 @@ const LEVEL_TOTAL = "total";
 const LEVEL_FUNCTION = "municipal_function";
 const EXCLUDED = new Set<string>(AGGREGATE_ONLY_MUNICIPAL_CODES);
 
-const EXCLUSION_REASON_KA =
-  "აგრეგირებული კოდი: ამ ბიუჯეტის ხარჯი ტერიტორიულად ამ ერთეულში მიკუთვნებადი არ არის, ამიტომ ცალკე მწკრივად არ ბრუნდება.";
 
-function missingSeriesReason(year: number): string {
-  return `არჩეული სერიისთვის ${year} წელს მონაცემი არ ფიქსირდება — ეს ნულოვან მნიშვნელობას არ ნიშნავს.`;
-}
 
-const TOTAL_DENOMINATOR_MISSING_REASON =
-  "ამ წლისთვის შესაბამისი ჯამი მიუწვდომელია ან დადებითი არ არის, ამიტომ წილის გამოთვლა შეუძლებელია.";
-const PER_RESIDENT_YEAR_REASON =
-  `ერთ მცხოვრებზე გაანგარიშება მხოლოდ ${MUNICIPAL_PER_RESIDENT_YEAR} წლისთვისაა დამტკიცებული — მოსახლეობის გადამოწმებული პანელი სხვა წელს არ ფარავს.`;
-const PER_RESIDENT_COUNTRY_REASON =
-  "საქართველოს აგრეგატს ერთ მცხოვრებზე მაჩვენებელი არ ენიჭება: მისი მრიცხველი მოიცავს ხუთ აგრეგირებულ ბიუჯეტს, რომელთაც ტერიტორიული მოსახლეობა არ აქვს მიკუთვნებული.";
-const PER_RESIDENT_SERIES_REASON =
-  "ერთ მცხოვრებზე გაანგარიშება მხოლოდ საჯარო ჯამის სერიისთვისაა დამტკიცებული, ცალკეული ფუნქციისთვის არა.";
-const PER_RESIDENT_POPULATION_REASON =
-  "ამ ერთეულისთვის დადებითი მოსახლეობის მაჩვენებელი მიუწვდომელია, ამიტომ ერთ მცხოვრებზე გაანგარიშება შეუძლებელია.";
+const TOTAL_DENOMINATOR_MISSING_KEY = "missing.totalDenominator" as const;
+const PER_RESIDENT_YEAR_KEY = "missing.perResidentYear" as const;
+const PER_RESIDENT_COUNTRY_KEY = "missing.perResidentCountry" as const;
+const PER_RESIDENT_SERIES_KEY = "missing.perResidentFunction" as const;
+const PER_RESIDENT_POPULATION_KEY = "missing.population" as const;
 
 type EntityKind = "country" | "region" | "municipality";
 type EntityMeta = { entityId: string; entityType: EntityKind; labelKa: string; slug: string | null };
@@ -87,8 +78,8 @@ export function queryMunicipal(
     const issues = parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ");
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მოთხოვნის პარამეტრები არასწორია.",
-      messageEn: `Invalid parameters: ${issues}`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues: issues }),
       retryable: false,
     });
   }
@@ -98,8 +89,8 @@ export function queryMunicipal(
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
       code: "data_version_changed",
-      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
-      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.dataVersionChanged"),
+      messageEn: serviceMessage(snapshot, "en", "errors.dataVersionChanged"),
       retryable: false,
     });
   }
@@ -134,8 +125,8 @@ export function queryMunicipal(
   if (unknownEntityIds.length > 0) {
     return errorResponse(snapshot, {
       code: "unknown_entity",
-      messageKa: `უცნობი ერთეულის იდენტიფიკატორი: ${unknownEntityIds.join(", ")}.`,
-      messageEn: `Unknown entity id(s): ${unknownEntityIds.join(", ")}.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownEntity", { unknownEntityIds: unknownEntityIds.join(", ") }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownEntity", { unknownEntityIds: unknownEntityIds.join(", ") }),
       retryable: false,
       // Excluded codes are deliberately absent: offering one as a valid choice
       // would invite a request that can never return a row.
@@ -150,8 +141,8 @@ export function queryMunicipal(
   if (unknownSeriesIds.length > 0) {
     return errorResponse(snapshot, {
       code: "unknown_series",
-      messageKa: `უცნობი სერიის იდენტიფიკატორი: ${unknownSeriesIds.join(", ")}.`,
-      messageEn: `Unknown series id(s): ${unknownSeriesIds.join(", ")}.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownSeries", { unknownSeriesIds: unknownSeriesIds.join(", ") }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownSeries", { unknownSeriesIds: unknownSeriesIds.join(", ") }),
       retryable: false,
       validChoices: Array.from(queryableSeriesIds).sort(),
     });
@@ -169,8 +160,8 @@ export function queryMunicipal(
   if (outOfRangeYears.length > 0) {
     return errorResponse(snapshot, {
       code: "year_out_of_range",
-      messageKa: `მოთხოვნილი წელი (${outOfRangeYears.join(", ")}) სცილდება მონაცემთა დაფარვის საზღვრებს (${minYear}–${maxYear}); წელი არ იკვეცება.`,
-      messageEn: `Requested year(s) ${outOfRangeYears.join(", ")} fall outside this dataset's coverage (${minYear}-${maxYear}).`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.yearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear: minYear, maxYear: maxYear }),
+      messageEn: serviceMessage(snapshot, "en", "errors.yearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear: minYear, maxYear: maxYear }),
       retryable: false,
     });
   }
@@ -299,14 +290,14 @@ export function queryMunicipal(
     return panelRegimeByYear.get(year) ?? "unknown";
   };
 
-  const totalValueDefinition = (entity: EntityMeta, year: number): string => {
+  const totalValueDefinition = (entity: EntityMeta, year: number, locale: "ka" | "en"): string => {
     if (entity.entityType === "country") {
-      return "საქართველოს კონსოლიდირებული მუნიციპალური ჯამი, რომელშიც აჭარის კონსოლიდაცია უკვე შესულია; ის ცალკე არ ემატება.";
+      return serviceMessage(snapshot, locale, "definitions.municipalCountry");
     }
     if (entity.entityType === "region") {
       return entity.entityId === "region.adjara"
-        ? "რეგიონის წევრი მუნიციპალიტეტების ჯამს დამატებული აჭარის რესპუბლიკური ბიუჯეტის წმინდა გადახდები."
-        : "რეგიონის წევრი მუნიციპალიტეტების ჯამი.";
+        ? serviceMessage(snapshot, locale, "definitions.adjaraTotal")
+        : serviceMessage(snapshot, locale, "definitions.regionTotal");
     }
     const measure = municipalTotalByKey.get(`${entity.entityId}:${year}`)?.publicTotalMeasure;
     // The measure is part of the figure's meaning, not decoration: 2015 is
@@ -314,8 +305,14 @@ export function queryMunicipal(
     // years are total_payments, so two years of "the same" series are not the
     // same concept.
     return measure
-      ? `მუნიციპალიტეტის საჯარო ჯამი, გაზომვის საფუძველი: ${measure}.`
-      : "მუნიციპალიტეტის საჯარო ჯამი.";
+      ? serviceMessage(snapshot, locale, "definitions.municipalityTotalBasis", { measure })
+      : serviceMessage(snapshot, locale, "definitions.municipalityTotal");
+  };
+
+  const valueDefinitionFor = (entity: EntityMeta, year: number, isTotal: boolean, locale: "ka" | "en"): string => {
+    if (input.measure === "share_of_total_pct") return serviceMessage(snapshot, locale, isTotal ? "definitions.municipalTotalShare" : "definitions.municipalFunctionShare");
+    if (input.measure === "gel_per_resident") return serviceMessage(snapshot, locale, "definitions.perResident");
+    return isTotal ? totalValueDefinition(entity, year, locale) : serviceMessage(snapshot, locale, "definitions.municipalFunction");
   };
 
   type ObservationCore = Omit<Observation, "documentIds" | "caveatIds">;
@@ -355,7 +352,7 @@ export function queryMunicipal(
 
         let numeratorAmount: number | null = null;
         let numeratorSourceIds: string[] = [];
-        let missingReason: string | null = null;
+        let missingReasonKey: ServiceMessageKey | null = null;
 
         if (isTotal) {
           const total = totalFor(entity, year);
@@ -363,7 +360,7 @@ export function queryMunicipal(
             numeratorAmount = total.value;
             numeratorSourceIds = total.sourceIds;
           } else {
-            missingReason = missingSeriesReason(year);
+            missingReasonKey = "missing.seriesYear";
           }
         } else {
           const facts = functionFactsFor(entity, seriesId, year);
@@ -373,7 +370,7 @@ export function queryMunicipal(
             numeratorAmount = facts.reduce((sum, f) => sum + f.amountGel, 0);
             numeratorSourceIds = uniqueSorted(facts.flatMap((f) => splitSourceIds(f.sourceId)));
           } else {
-            missingReason = missingSeriesReason(year);
+            missingReasonKey = "missing.seriesYear";
           }
         }
 
@@ -388,7 +385,7 @@ export function queryMunicipal(
             const total = totalFor(entity, year);
             const share = total ? shareOfTotal(numeratorAmount, total.value) : null;
             if (share === null) {
-              missingReason = TOTAL_DENOMINATOR_MISSING_REASON;
+              missingReasonKey = TOTAL_DENOMINATOR_MISSING_KEY;
             } else {
               value = share * 100;
               sourceIds = uniqueSorted([...numeratorSourceIds, ...(total?.sourceIds ?? [])]);
@@ -401,11 +398,11 @@ export function queryMunicipal(
             // not year_out_of_range: the year is inside coverage and the
             // amount exists - it is the measure that is unavailable.
             if (!isTotal) {
-              missingReason = PER_RESIDENT_SERIES_REASON;
+              missingReasonKey = PER_RESIDENT_SERIES_KEY;
             } else if (entity.entityType === "country") {
-              missingReason = PER_RESIDENT_COUNTRY_REASON;
+              missingReasonKey = PER_RESIDENT_COUNTRY_KEY;
             } else if (year !== MUNICIPAL_PER_RESIDENT_YEAR) {
-              missingReason = PER_RESIDENT_YEAR_REASON;
+              missingReasonKey = PER_RESIDENT_YEAR_KEY;
             } else {
               const codes =
                 entity.entityType === "region" ? (membersOf.get(entity.entityId) ?? []) : [entity.entityId];
@@ -415,7 +412,7 @@ export function queryMunicipal(
               // so an Infinity here would take down the whole envelope instead
               // of degrading one cell.
               if (!Number.isFinite(population) || population <= 0) {
-                missingReason = PER_RESIDENT_POPULATION_REASON;
+                missingReasonKey = PER_RESIDENT_POPULATION_KEY;
               } else {
                 value = numeratorAmount / population;
                 sourceIds = uniqueSorted([
@@ -436,9 +433,11 @@ export function queryMunicipal(
           entityId: entity.entityId,
           entityType: entity.entityType,
           entityLabelKa: entity.labelKa,
+          entityLabelEn: serviceLabelEn(snapshot, entity.entityId),
           entitySlug: entity.slug,
           seriesId,
           seriesLabelKa: isTotal ? "საჯარო ჯამი" : (functionById.get(seriesId)?.kaLabel ?? seriesId),
+        seriesLabelEn: serviceLabelEn(snapshot, seriesId),
           level: isTotal ? LEVEL_TOTAL : LEVEL_FUNCTION,
           parentSeriesId: isTotal ? null : MUNICIPAL_TOTAL_ITEM_ID,
           year,
@@ -447,7 +446,8 @@ export function queryMunicipal(
             input.measure === "amount_gel" ? "GEL" : input.measure === "gel_per_resident" ? "GEL_per_resident" : "percent",
           value,
           availability,
-          missingReason: availability === "missing" ? missingReason : null,
+          missingReason: availability === "missing" && missingReasonKey !== null ? serviceMessage(snapshot, "ka", missingReasonKey, { year: missingReasonKey === "missing.perResidentYear" ? MUNICIPAL_PER_RESIDENT_YEAR : year }) : null,
+        missingReasonEn: availability === "missing" && missingReasonKey !== null ? serviceMessage(snapshot, "en", missingReasonKey, { year: missingReasonKey === "missing.perResidentYear" ? MUNICIPAL_PER_RESIDENT_YEAR : year }) : null,
           // Every municipal fact is basis "actual"; the dataset carries no
           // planned rows, so a missing cell has no basis at all.
           basis: availability === "missing" ? null : "actual",
@@ -455,16 +455,8 @@ export function queryMunicipal(
           // The old order tested isTotal first, so every gel_per_resident value -
           // a measure only the total series supports - shipped a definition
           // describing a GEL total, in the wrong unit, every single time.
-          valueDefinition:
-            input.measure === "share_of_total_pct"
-              ? isTotal
-                ? "ერთეულის საჯარო ჯამი მისსავე ჯამში, ანუ ყოველთვის 100%."
-                : "წილი ერთეულის საკუთარ საჯარო ჯამში, 0-დან 100-მდე შკალაზე."
-              : input.measure === "gel_per_resident"
-                ? "ერთეულის 2025 წლის საჯარო ჯამი გაყოფილი იმავე წლის მოსახლეობაზე, ლარი ერთ მცხოვრებზე."
-                : isTotal
-                  ? totalValueDefinition(entity, year)
-                  : "ფუნქციური კლასიფიკაციის გადამოწმებული მაჩვენებელი ლარში, სრული სიზუსტით.",
+          valueDefinition: valueDefinitionFor(entity, year, isTotal, "ka"),
+          valueDefinitionEn: valueDefinitionFor(entity, year, isTotal, "en"),
           valueDefinitionId: `municipal:${input.measure}:${isTotal ? "total" : "function"}:${definitionRegimeFor(entity, year)}`,
           sourceIds,
         });
@@ -519,7 +511,7 @@ export function queryMunicipal(
 
   const missingCells = observations
     .filter((o) => o.availability === "missing")
-    .map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, reason: o.missingReason ?? "" }));
+    .map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, reason: o.missingReason ?? "", reasonEn: o.missingReasonEn ?? "" }));
   const returnedYears = Array.from(new Set(observations.filter((o) => o.availability === "available").map((o) => o.year))).sort(
     (a, b) => a - b,
   );
@@ -531,7 +523,7 @@ export function queryMunicipal(
     availableYears: datasetYears,
     returnedYears,
     missingCells,
-    excludedEntities: excludedRequested.map((entityId) => ({ entityId, reason: EXCLUSION_REASON_KA })),
+    excludedEntities: excludedRequested.map((entityId) => ({ entityId, reason: serviceMessage(snapshot, "ka", "exclusions.municipalObservation"), reasonEn: serviceMessage(snapshot, "en", "exclusions.municipalObservation") })),
     returnedCount,
     expectedCount,
   };

@@ -9,6 +9,7 @@
 // (caveats/rules.debt.ts) fires on every response, because adding debt to
 // expenditure or subtracting it from receipts is the error a reader is most
 // likely to make with these numbers in front of them.
+import { serviceLabelEn, serviceMessage, type ServiceMessageKey } from "./localization";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
 import { buildResponseMeta } from "./meta";
 import { buildObservationId, caveatIdsForObservation, resolveDocumentIds, uniqueSorted } from "./observations";
@@ -39,14 +40,9 @@ const MEASURES_BY_FAMILY: Record<Family, ReadonlySet<string>> = {
   rate: new Set(["rate_percent"]),
 };
 
-const RATE_NOT_PUBLISHED_REASON =
-  "ამ წლისთვის საპროცენტო განაკვეთი გადამოწმებულ წყაროებში გამოქვეყნებული არ არის — ეს ნულოვან მნიშვნელობას არ ნიშნავს.";
-const GDP_DENOMINATOR_MISSING_REASON =
-  "ამ წლისთვის მშპ-ის მაჩვენებელი მიუწვდომელია ან დადებითი არ არის, ამიტომ წილის გამოთვლა შეუძლებელია.";
+const RATE_NOT_PUBLISHED_KEY = "missing.rateNotPublished" as const;
+const GDP_DENOMINATOR_MISSING_KEY = "missing.gdpDenominator" as const;
 
-function missingSeriesReason(year: number): string {
-  return `არჩეული სერიისთვის ${year} წელს მონაცემი არ ფიქსირდება — ეს ნულოვან მნიშვნელობას არ ნიშნავს.`;
-}
 
 /**
  * Only for input validation, before any fact is in hand; everywhere a fact
@@ -70,16 +66,16 @@ function basisOf(status: string): Basis | null {
   return null;
 }
 
-function valueDefinitionFor(family: Family, measure: string): string {
+function valueDefinitionFor(snapshot: FactQuerySnapshot, locale: "ka" | "en", family: Family, measure: string): string {
   if (measure === "rate_percent") {
-    return "წლის ბოლოს არსებული პორტფელის საშუალო შეწონილი წლიური საპროცენტო განაკვეთი, პროცენტებში.";
+    return serviceMessage(snapshot, locale, "definitions.debtRate");
   }
   if (measure === "share_of_gdp_pct") {
-    return "წილი იმავე წლის მშპ-ში მიმდინარე ფასებში, 0-დან 100-მდე შკალაზე.";
+    return serviceMessage(snapshot, locale, "definitions.shareOfGdp");
   }
   return family === "stock"
-    ? "წლის ბოლოს დაფიქსირებული ვალის ნაშთი ლარში."
-    : "წლის განმავლობაში გადახდილი თანხა ლარში.";
+    ? serviceMessage(snapshot, locale, "definitions.debtStock")
+    : serviceMessage(snapshot, locale, "definitions.debtService");
 }
 
 /**
@@ -108,8 +104,8 @@ export function queryDebt(
     const issues = parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ");
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მოთხოვნის პარამეტრები არასწორია.",
-      messageEn: `Invalid parameters: ${issues}`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues: issues }),
       retryable: false,
     });
   }
@@ -119,8 +115,8 @@ export function queryDebt(
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
       code: "data_version_changed",
-      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
-      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.dataVersionChanged"),
+      messageEn: serviceMessage(snapshot, "en", "errors.dataVersionChanged"),
       retryable: false,
     });
   }
@@ -131,8 +127,8 @@ export function queryDebt(
   if (unknownSeriesIds.length > 0) {
     return errorResponse(snapshot, {
       code: "unknown_series",
-      messageKa: `უცნობი სერიის იდენტიფიკატორი: ${unknownSeriesIds.join(", ")}.`,
-      messageEn: `Unknown series id(s): ${unknownSeriesIds.join(", ")}.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownSeries", { unknownSeriesIds: unknownSeriesIds.join(", ") }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownSeries", { unknownSeriesIds: unknownSeriesIds.join(", ") }),
       retryable: false,
       validChoices: Array.from(knownSeriesIds).sort(),
     });
@@ -142,8 +138,8 @@ export function queryDebt(
   if (mismatched.length > 0) {
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: `ზომა "${input.measure}" არ ეხება სერიას: ${mismatched.join(", ")}.`,
-      messageEn: `Measure "${input.measure}" does not apply to series: ${mismatched.join(", ")}.`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.measureSeriesMismatch", { measure: input.measure, mismatched: mismatched.join(", ") }),
+      messageEn: serviceMessage(snapshot, "en", "errors.measureSeriesMismatch", { measure: input.measure, mismatched: mismatched.join(", ") }),
       retryable: false,
       validChoices: Array.from(MEASURES_BY_FAMILY[familyOf(mismatched[0]!)]).sort(),
     });
@@ -166,8 +162,8 @@ export function queryDebt(
   if (outOfRangeYears.length > 0) {
     return errorResponse(snapshot, {
       code: "year_out_of_range",
-      messageKa: `მოთხოვნილი წელი (${outOfRangeYears.join(", ")}) სცილდება მონაცემთა დაფარვის საზღვრებს (${minYear}–${maxYear}); წელი არ იკვეცება.`,
-      messageEn: `Requested year(s) ${outOfRangeYears.join(", ")} fall outside this dataset's coverage (${minYear}-${maxYear}).`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.yearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear: minYear, maxYear: maxYear }),
+      messageEn: serviceMessage(snapshot, "en", "errors.yearsOutOfRange", { outOfRangeYears: outOfRangeYears.join(", "), minYear: minYear, maxYear: maxYear }),
       retryable: false,
     });
   }
@@ -186,17 +182,17 @@ export function queryDebt(
       let value: number | null = null;
       let basis: Basis | null = null;
       let sourceIds: string[] = [];
-      let missingReason: string | null = null;
+      let missingReasonKey: ServiceMessageKey | null = null;
 
       if (fact === undefined) {
-        missingReason = missingSeriesReason(year);
+        missingReasonKey = "missing.seriesYear";
       } else if (fact.value === null) {
         // A published gap, not an absent row: the reviewed data says this
         // year/scope was never published rather than saying nothing at all.
         // Branching on the family rather than assuming: every null in the
         // reviewed file today is a rate, and a future null amount must not
         // inherit a message about interest rates.
-        missingReason = fact.family === "rate" ? RATE_NOT_PUBLISHED_REASON : missingSeriesReason(year);
+        missingReasonKey = fact.family === "rate" ? RATE_NOT_PUBLISHED_KEY : "missing.seriesYear";
       } else {
         basis = basisOf(fact.status);
         const factSourceIds =
@@ -208,7 +204,7 @@ export function queryDebt(
           usedGdpYears.add(year);
           const gdp = gdpByYear.get(year);
           if (!gdp || gdp.gdpCurrentPricesGel <= 0) {
-            missingReason = GDP_DENOMINATOR_MISSING_REASON;
+            missingReasonKey = GDP_DENOMINATOR_MISSING_KEY;
             basis = null;
           } else {
             value = (fact.value / gdp.gdpCurrentPricesGel) * 100;
@@ -230,9 +226,11 @@ export function queryDebt(
         entityId: ENTITY_ID,
         entityType: "country",
         entityLabelKa: ENTITY_LABEL_KA,
+        entityLabelEn: serviceLabelEn(snapshot, ENTITY_ID),
         entitySlug: null,
         seriesId,
         seriesLabelKa: DEBT_SERIES_LABELS_KA[seriesId] ?? seriesId,
+        seriesLabelEn: serviceLabelEn(snapshot, seriesId),
         level: family,
         parentSeriesId: null,
         year,
@@ -240,9 +238,11 @@ export function queryDebt(
         unit,
         value,
         availability,
-        missingReason: availability === "missing" ? missingReason : null,
+        missingReason: availability === "missing" && missingReasonKey !== null ? serviceMessage(snapshot, "ka", missingReasonKey, { year: year }) : null,
+        missingReasonEn: availability === "missing" && missingReasonKey !== null ? serviceMessage(snapshot, "en", missingReasonKey, { year: year }) : null,
         basis: availability === "missing" ? null : basis,
-        valueDefinition: valueDefinitionFor(family, input.measure),
+        valueDefinition: valueDefinitionFor(snapshot, "ka", family, input.measure),
+        valueDefinitionEn: valueDefinitionFor(snapshot, "en", family, input.measure),
         // Carries the family and the measure, so compare() can tell a stock
         // from a service figure even when both are amount_gel.
         valueDefinitionId: `${DATASET_ID}:${family}:${input.measure}`,
@@ -296,7 +296,7 @@ export function queryDebt(
     ).sort((a, b) => a - b),
     missingCells: observations
       .filter((o) => o.availability === "missing")
-      .map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, reason: o.missingReason ?? "" })),
+      .map((o) => ({ entityId: o.entityId, seriesId: o.seriesId, year: o.year, reason: o.missingReason ?? "", reasonEn: o.missingReasonEn ?? "" })),
     excludedEntities: [],
     returnedCount,
     expectedCount: observations.length,

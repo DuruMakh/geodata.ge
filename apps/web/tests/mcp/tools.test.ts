@@ -65,6 +65,18 @@ describe("MCP tool surface", () => {
     expect((result.content as { type: string; text: string }[])[0]!.text).toContain("2024");
   });
 
+  it("returns the bilingual expenditure example through the SDK's declared output schema", async () => {
+    const client = await connected();
+    try {
+      const result = await client.callTool({ name: "query_national", arguments: { side: "expenditure", seriesIds: ["spending.education"], years: [2025], measure: "amount_gel" } });
+      expect(result.isError).toBeFalsy();
+      expect(result.structuredContent).toMatchObject({ data: { observations: [{
+        entityLabelKa: "საქართველო", entityLabelEn: "Georgia", seriesLabelKa: "განათლება", seriesLabelEn: "Education",
+        valueDefinitionEn: "Reviewed value in GEL at full precision.", missingReasonEn: null,
+      }] } });
+    } finally { await client.close(); }
+  });
+
   it("returns a tool error, not a transport failure, for an unknown series", async () => {
     const result = await (await connected()).callTool({
       name: "query_national",

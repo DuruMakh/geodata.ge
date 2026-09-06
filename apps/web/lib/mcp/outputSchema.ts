@@ -38,11 +38,18 @@ const responseDocument = z
   .object({
     documentId: z.string(),
     title: z.string(),
+    titleKa: z.string().min(1),
+    titleEn: z.string().min(1),
+    documentLanguage: z.enum(["ka", "en", "mul"]).nullable(),
     officialUrl: z.string().nullable(),
     archiveUrl: z.string().nullable(),
     years: z.array(z.number()),
     publisher: z.string().optional(),
+    publisherKa: z.string().min(1).optional(),
+    publisherEn: z.string().min(1).optional(),
     attribution: z.string().nullable().optional(),
+    attributionKa: z.string().nullable().optional(),
+    attributionEn: z.string().nullable().optional(),
     licenceId: z.string().nullable().optional(),
     mediaType: z.string().optional(),
     retrievedAt: z.string().optional(),
@@ -55,6 +62,10 @@ const responseSource = z
   .object({
     sourceId: z.string(),
     name: z.string(),
+    nameKa: z.string().min(1),
+    nameEn: z.string().min(1),
+    derivationKa: z.string().nullable(),
+    derivationEn: z.string().nullable(),
     lastReviewedAt: z.string(),
     derivation: z.string().nullable(),
     /** Values shared by every document below; a field absent from a document is given here. */
@@ -82,10 +93,11 @@ const responseMeta = z
  * answers and does not advertise an error shape that can never arrive.
  */
 const excludedEntity = z.object({ entityId: z.string(), reason: z.string() });
+const bilingualExcludedEntity = excludedEntity.extend({ reasonEn: z.string().min(1) });
 const coverage = z.object({
   requestedYears: z.array(z.number().int()), availableYears: z.array(z.number().int()), returnedYears: z.array(z.number().int()),
-  missingCells: z.array(z.object({ entityId: z.string(), seriesId: z.string(), year: z.number().int(), reason: z.string() })),
-  excludedEntities: z.array(excludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
+  missingCells: z.array(z.object({ entityId: z.string(), seriesId: z.string(), year: z.number().int(), reason: z.string(), reasonEn: z.string().min(1) })),
+  excludedEntities: z.array(bilingualExcludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
 });
 const endpoint = observationSchema.pick({ year: true, value: true, availability: true, missingReason: true, basis: true, valueDefinition: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
 const dataShapes = {
@@ -108,14 +120,15 @@ const dataShapes = {
     exclusions: z.array(z.object({ reason: z.string(), ids: z.array(z.string()) })), rankingDefinition: z.string(),
   }),
   catalogue: z.object({
-    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), years: z.tuple([z.number(), z.number()]), entityTypes: z.array(z.string()), measures: z.array(z.string()), measureNotes: z.record(z.string(), z.string()).optional() })),
-    series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), datasetId: z.string().optional() })).optional(),
-    entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), entitySlug: z.string().nullable(), datasetId: z.string().optional() })).optional(),
-    exclusions: z.array(excludedEntity),
+    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), labelEn: z.string().min(1), years: z.tuple([z.number(), z.number()]), entityTypes: z.array(z.string()), measures: z.array(z.string()), measureNotes: z.record(z.string(), z.string()).optional(), measureNotesEn: z.record(z.string(), z.string()).optional() })),
+    series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), datasetId: z.string().optional() })).optional(),
+    entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), labelEn: z.string().min(1), entitySlug: z.string().nullable(), datasetId: z.string().optional() })).optional(),
+    exclusions: z.array(bilingualExcludedEntity),
   }),
   sources: z.object({
     sources: z.array(z.object({
       sourceId: z.string(), name: z.string(), lastReviewedAt: z.string(), derivation: z.string().nullable(), documentCount: z.number(), narrowed: z.boolean(), narrowingOutcome: z.enum(["not_requested", "applied", "dropped_no_match"]),
+      nameKa: z.string().min(1), nameEn: z.string().min(1), derivationKa: z.string().nullable(), derivationEn: z.string().nullable(),
       documents: z.array(responseDocument.extend({ sha256: z.string(), byteSize: z.number() })),
     })),
     narrowedBy: z.object({ datasetId: z.string().optional(), years: z.array(z.number()).optional(), entityIds: z.array(z.string()).optional() }).nullable(),

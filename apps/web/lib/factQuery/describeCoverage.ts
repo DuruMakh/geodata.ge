@@ -4,6 +4,7 @@
 // first to learn which datasets, series and entities exist before asking for
 // any number. It returns no amounts, only capability: this is what makes it
 // safe to call with zero prior knowledge of the catalogue.
+import { serviceLabelEn, serviceMessage } from "./localization";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
 import { buildResponseMeta } from "./meta";
@@ -41,7 +42,7 @@ const LEVEL_ADMIN_CATEGORY = "admin_category";
 const LEVEL_MAJOR_PROGRAM = "major_program";
 const LEVEL_MUNICIPAL_FUNCTION = "municipal_function";
 
-type SeriesEntry = {
+type BaseSeriesEntry = {
   seriesId: string;
   labelKa: string;
   level: string;
@@ -50,12 +51,16 @@ type SeriesEntry = {
   years: number[];
 };
 
-type EntityEntry = {
+type SeriesEntry = BaseSeriesEntry & { labelEn: string };
+
+type BaseEntityEntry = {
   entityId: string;
   entityType: EntityType;
   labelKa: string;
   entitySlug: string | null;
 };
+
+type EntityEntry = BaseEntityEntry & { labelEn: string };
 
 type DatasetSummary = {
   datasetId: DatasetId;
@@ -64,14 +69,16 @@ type DatasetSummary = {
   years: [number, number];
   entityTypes: EntityType[];
   measures: Measure[];
+  labelEn: string;
   measureNotes?: Record<string, string>;
+  measureNotesEn?: Record<string, string>;
 };
 
 export type CoverageData = {
   datasets: DatasetSummary[];
   series?: SeriesEntry[];
   entities?: EntityEntry[];
-  exclusions: { entityId: string; reason: string }[];
+  exclusions: { entityId: string; reason: string; reasonEn: string }[];
 };
 
 // Same wording as the municipality_not_territorial caveat rule
@@ -79,8 +86,6 @@ export type CoverageData = {
 // codes' permanent, dataset-independent exclusion metadata, so the catalogue
 // and the caveat that fires if a client names one of these codes anyway
 // describe the same fact in the same words.
-const EXCLUDED_MUNICIPALITY_REASON =
-  "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.";
 
 const NATIONAL_MEASURES = nationalMeasure.options as Measure[];
 const MUNICIPAL_MEASURES = municipalMeasure.options as Measure[];
@@ -162,8 +167,8 @@ function yearRange(years: Iterable<number>, datasetId: DatasetId): [number, numb
   return [first, last];
 }
 
-function buildExclusions(): CoverageData["exclusions"] {
-  return AGGREGATE_ONLY_MUNICIPAL_CODES.map((entityId) => ({ entityId, reason: EXCLUDED_MUNICIPALITY_REASON }));
+function buildExclusions(snapshot: FactQuerySnapshot): CoverageData["exclusions"] {
+  return AGGREGATE_ONLY_MUNICIPAL_CODES.map((entityId) => ({ entityId, reason: serviceMessage(snapshot, "ka", "exclusions.catalogueMunicipality"), reasonEn: serviceMessage(snapshot, "en", "exclusions.catalogueMunicipality") }));
 }
 
 function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId): DatasetSummary {
@@ -220,9 +225,9 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
   // website"), so handing back the module-level array itself would let one
   // caller's in-place mutation of a response corrupt every later call.
   return {
-    datasetId, ...meta, entityTypes: [...meta.entityTypes], measures: [...meta.measures], years,
-    ...(datasetId === "municipal-expenditure" ? { measureNotes: { gel_per_resident: "Available only for 2025 municipality and region totals (municipal.total); not for the country aggregate or individual functions." } } : {}),
-    ...(datasetId === "government-debt" ? { measureNotes: { amount_gel: "Stock and service only.", share_of_gdp_pct: "Stock and service, where reviewed GDP is available.", rate_percent: "Interest-rate series only; unpublished rates are missing, not zero." } } : {}),
+    datasetId, ...meta, labelEn: serviceLabelEn(snapshot, datasetId), entityTypes: [...meta.entityTypes], measures: [...meta.measures], years,
+    ...(datasetId === "municipal-expenditure" ? { measureNotesEn: { gel_per_resident: serviceMessage(snapshot, "en", "coverage.perResident") }, measureNotes: { gel_per_resident: "Available only for 2025 municipality and region totals (municipal.total); not for the country aggregate or individual functions." } } : {}),
+    ...(datasetId === "government-debt" ? { measureNotesEn: { amount_gel: serviceMessage(snapshot, "en", "coverage.debtAmount"), share_of_gdp_pct: serviceMessage(snapshot, "en", "coverage.debtGdp"), rate_percent: serviceMessage(snapshot, "en", "coverage.debtRate") }, measureNotes: { amount_gel: "Stock and service only.", share_of_gdp_pct: "Stock and service, where reviewed GDP is available.", rate_percent: "Interest-rate series only; unpublished rates are missing, not zero." } } : {}),
   };
 }
 
@@ -234,7 +239,7 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
  * "revenue.total" nor "expenditure.total" appears as an item_id in
  * data/imports/revenue-facts-2004-2025.csv or expenditure-facts-2004-2025.csv).
  */
-function nationalSeriesFor(snapshot: FactQuerySnapshot, side: "revenue" | "expenditure"): SeriesEntry[] {
+function nationalSeriesFor(snapshot: FactQuerySnapshot, side: "revenue" | "expenditure"): BaseSeriesEntry[] {
   const yearsByItem = new Map<string, Set<number>>();
   const sideYears = new Set<number>();
 
@@ -250,7 +255,7 @@ function nationalSeriesFor(snapshot: FactQuerySnapshot, side: "revenue" | "expen
     .filter((item) => item.side === side)
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
-  const itemSeries: SeriesEntry[] = items.map((item) => {
+  const itemSeries: BaseSeriesEntry[] = items.map((item) => {
     const years = sortedUniqueYears(yearsByItem.get(item.id) ?? []);
     return {
       seriesId: item.id,
@@ -262,7 +267,7 @@ function nationalSeriesFor(snapshot: FactQuerySnapshot, side: "revenue" | "expen
     };
   });
 
-  const totalSeries: SeriesEntry = {
+  const totalSeries: BaseSeriesEntry = {
     seriesId: side === "revenue" ? "revenue.total" : "expenditure.total",
     labelKa: side === "revenue" ? "მთლიანი შემოსავლები" : "მთლიანი ხარჯი",
     level: LEVEL_TOTAL,
@@ -288,7 +293,7 @@ function nationalSeriesFor(snapshot: FactQuerySnapshot, side: "revenue" | "expen
  * level === "admin_category" precisely to avoid double-counting programs
  * under their parent category).
  */
-function ministriesSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
+function ministriesSeriesFor(snapshot: FactQuerySnapshot): BaseSeriesEntry[] {
   const categoryYears = new Map<string, Set<number>>();
   const programYears = new Map<string, Set<number>>();
   const programLabel = new Map<string, string>();
@@ -315,7 +320,7 @@ function ministriesSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
     }
   }
 
-  const categorySeries: SeriesEntry[] = snapshot.ministries.categories.map((category) => {
+  const categorySeries: BaseSeriesEntry[] = snapshot.ministries.categories.map((category) => {
     const years = sortedUniqueYears(categoryYears.get(category.id) ?? []);
     return {
       seriesId: category.id,
@@ -327,7 +332,7 @@ function ministriesSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
     };
   });
 
-  const programSeries: SeriesEntry[] = Array.from(programYears.keys())
+  const programSeries: BaseSeriesEntry[] = Array.from(programYears.keys())
     .sort()
     .map((itemId) => ({
       seriesId: itemId,
@@ -338,7 +343,7 @@ function ministriesSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
       years: sortedUniqueYears(programYears.get(itemId) ?? []),
     }));
 
-  const totalSeries: SeriesEntry = {
+  const totalSeries: BaseSeriesEntry = {
     seriesId: "admin_spending.total",
     labelKa: "მთლიანი ხარჯი",
     level: LEVEL_TOTAL,
@@ -361,7 +366,7 @@ function ministriesSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
  * import) — its figure comes from the separate MunicipalTotalFact rows
  * (totalFacts/countryTotalFacts), not from summing the ten functions.
  */
-function municipalSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
+function municipalSeriesFor(snapshot: FactQuerySnapshot): BaseSeriesEntry[] {
   const yearsByFunction = new Map<string, Set<number>>();
 
   for (const fact of [...snapshot.municipal.functionFacts, ...snapshot.municipal.countryFunctionFacts]) {
@@ -370,7 +375,7 @@ function municipalSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
     yearsByFunction.set(fact.categoryId, years);
   }
 
-  const functionSeries: SeriesEntry[] = snapshot.municipal.functions.map((fn) => {
+  const functionSeries: BaseSeriesEntry[] = snapshot.municipal.functions.map((fn) => {
     const years = sortedUniqueYears(yearsByFunction.get(fn.id) ?? []);
     return {
       seriesId: fn.id,
@@ -387,7 +392,7 @@ function municipalSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
     ...snapshot.municipal.countryTotalFacts.map((f) => f.year),
   ]);
 
-  const totalSeries: SeriesEntry = {
+  const totalSeries: BaseSeriesEntry = {
     seriesId: "municipal.total",
     labelKa: "მთლიანი ბიუჯეტი",
     level: LEVEL_TOTAL,
@@ -406,7 +411,7 @@ function municipalSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
  * with a null - the exact-list guarantee is what stops a client assuming a
  * rate exists for every year the family spans.
  */
-function debtSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
+function debtSeriesFor(snapshot: FactQuerySnapshot): BaseSeriesEntry[] {
   const byId = new Map<string, number[]>();
   for (const fact of snapshot.debt.facts) {
     if (fact.value === null) continue;
@@ -433,7 +438,7 @@ function debtSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
 }
 
 /** One series. Both measures come from the reviewed row, so neither is derived. */
-function deficitSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
+function deficitSeriesFor(snapshot: FactQuerySnapshot): BaseSeriesEntry[] {
   return [
     {
       seriesId: DEFICIT_SERIES_ID,
@@ -446,7 +451,7 @@ function deficitSeriesFor(snapshot: FactQuerySnapshot): SeriesEntry[] {
   ];
 }
 
-function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): SeriesEntry[] {
+function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): BaseSeriesEntry[] {
   switch (datasetId) {
     case "national-revenue":
       return nationalSeriesFor(snapshot, "revenue");
@@ -472,22 +477,22 @@ function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): Se
  * from every served registry — caveats/rules.municipal.ts); they surface only
  * through buildExclusions.
  */
-function municipalEntitiesFor(snapshot: FactQuerySnapshot): EntityEntry[] {
-  const country: EntityEntry = {
+function municipalEntitiesFor(snapshot: FactQuerySnapshot): BaseEntityEntry[] {
+  const country: BaseEntityEntry = {
     entityId: MUNICIPAL_COUNTRY_ID,
     entityType: "country",
     labelKa: "საქართველო",
     entitySlug: null,
   };
 
-  const regions: EntityEntry[] = snapshot.municipal.regions.map((region) => ({
+  const regions: BaseEntityEntry[] = snapshot.municipal.regions.map((region) => ({
     entityId: region.id,
     entityType: "region",
     labelKa: region.kaLabel,
     entitySlug: null,
   }));
 
-  const municipalities: EntityEntry[] = snapshot.municipal.municipalities.map((municipality) => ({
+  const municipalities: BaseEntityEntry[] = snapshot.municipal.municipalities.map((municipality) => ({
     entityId: municipality.code,
     entityType: "municipality",
     // The short display form ("ხულო"), matching the label the rest of the
@@ -501,8 +506,12 @@ function municipalEntitiesFor(snapshot: FactQuerySnapshot): EntityEntry[] {
   return [country, ...regions, ...municipalities];
 }
 
+function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): SeriesEntry[] {
+  return baseSeriesForDataset(snapshot, datasetId).map(series => ({ ...series, labelEn: serviceLabelEn(snapshot, series.seriesId) }));
+}
+
 function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): EntityEntry[] | undefined {
-  return datasetId === "municipal-expenditure" ? municipalEntitiesFor(snapshot) : undefined;
+  return datasetId === "municipal-expenditure" ? municipalEntitiesFor(snapshot).map(entity => ({ ...entity, labelEn: serviceLabelEn(snapshot, entity.entityId) })) : undefined;
 }
 
 /**
@@ -522,7 +531,7 @@ function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): 
  * and admin_category/major_program are not their request levels — widening for
  * them would leak a national total into a ministries-shaped filter.
  */
-function matchesLevel(entry: SeriesEntry, level: string | undefined, datasetId: DatasetId): boolean {
+function matchesLevel(entry: BaseSeriesEntry, level: string | undefined, datasetId: DatasetId): boolean {
   if (level === undefined) return true;
   if (datasetId === "ministries" && entry.level === LEVEL_TOTAL) return level === LEVEL_ADMIN_CATEGORY;
   return entry.level === level;
@@ -575,8 +584,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     const issues = parsed.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ");
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: "მოთხოვნის პარამეტრები არასწორია.",
-      messageEn: `Invalid parameters: ${issues}`,
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues: issues }),
       // Retrying the identical request will fail identically; the client
       // must change the request first, so this is not "retryable" in the
       // transient sense rate_limited/service_unavailable use.
@@ -590,8 +599,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
       code: "data_version_changed",
-      messageKa: "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
-      messageEn: "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+      messageKa: serviceMessage(snapshot, "ka", "errors.dataVersionChanged"),
+      messageEn: serviceMessage(snapshot, "en", "errors.dataVersionChanged"),
       retryable: false,
     });
   }
@@ -625,7 +634,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   );
   const meta = buildResponseMeta(snapshot, { caveats });
 
-  const exclusions = buildExclusions();
+  const exclusions = buildExclusions(snapshot);
   // datasets narrows to the single requested entry once datasetId is given,
   // rather than always returning all four: the brief only says series/
   // entities are absent without a datasetId, but spec §6.2 ("with one,
@@ -652,7 +661,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
 
     for (const id of DATASET_IDS) {
       for (const entry of seriesForDataset(snapshot, id)) {
-        if (matchesLevel(entry, input.level, id) && matchesSearch(input.search, [entry.seriesId, entry.labelKa])) {
+        if (matchesLevel(entry, input.level, id) && matchesSearch(input.search, [entry.seriesId, entry.labelKa, entry.labelEn])) {
           // Tagged, because a match found without a dataset is useless until the
           // caller knows which dataset to ask.
           foundSeries.push({ ...entry, datasetId: id });
@@ -661,7 +670,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       for (const entry of entitiesForDataset(snapshot, id) ?? []) {
         if (
           (input.entityType === undefined || entry.entityType === input.entityType) &&
-          matchesSearch(input.search, [entry.entityId, entry.labelKa, entry.entitySlug])
+          matchesSearch(input.search, [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug])
         ) {
           foundEntities.push({ ...entry, datasetId: id });
         }
@@ -680,13 +689,13 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   const series = seriesForDataset(snapshot, datasetId).filter(
     (entry) =>
       matchesLevel(entry, input.level, datasetId) &&
-      (input.search === undefined || matchesSearch(input.search, [entry.seriesId, entry.labelKa])),
+      (input.search === undefined || matchesSearch(input.search, [entry.seriesId, entry.labelKa, entry.labelEn])),
   );
 
   const entities = entitiesForDataset(snapshot, input.datasetId)?.filter(
     (entry) =>
       (input.entityType === undefined || entry.entityType === input.entityType) &&
-      (input.search === undefined || matchesSearch(input.search, [entry.entityId, entry.labelKa, entry.entitySlug])),
+      (input.search === undefined || matchesSearch(input.search, [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug])),
   );
 
   const isEmpty = series.length === 0 && (entities === undefined || entities.length === 0);
