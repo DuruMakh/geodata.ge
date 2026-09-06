@@ -29,10 +29,10 @@ export async function municipalIndexMetadata(locale: Locale): Promise<Metadata> 
   const presentation = await getMunicipalPresentation(data, locale);
   const { messages } = presentation;
   const { firstYear, lastYear } = coverageFromYears(totalFacts);
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
     title: message(messages, "municipal.metaIndexTitle", { first: firstYear, last: lastYear }),
     description: message(messages, "municipal.metaIndexDescription", { first: firstYear, last: lastYear }),
-    path: pageHref("/explorer/municipalities", locale),
+    path: "/explorer/municipalities",
   });
 }
 
@@ -67,9 +67,9 @@ export async function renderMunicipalIndex(locale: Locale) {
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
       <JsonLd
-        data={explorerDatasetJsonLd({
+        data={explorerDatasetJsonLd({ locale,
           origin: resolveSiteUrl(),
-          path: pageHref("/explorer/municipalities", locale),
+          path: "/explorer/municipalities",
           name: message(messages, "municipal.indexDatasetName"),
           description: message(messages, "municipal.metaIndexDescription", { first: firstYear, last: latestYear }),
           firstYear,

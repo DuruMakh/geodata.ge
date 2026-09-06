@@ -17,11 +17,11 @@ import type { DatasetId } from "../factQuery/types";
 
 export async function connectPageMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["connect"]);
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
   title: message(messages, "connect.metaTitle"),
   description:
     message(messages, "connect.metaDescription"),
-  path: pageHref("/connect", locale),
+  path: "/connect",
   });
 }
 

@@ -81,9 +81,9 @@ export async function methodologyArticleMetadata(locale: Locale, { params }: Met
   const content = getMethodologyContent(dataset, locale);
   const messages = await getMessages(locale, ["common", "methodology"]);
   const title = message(messages, "methodology.articleMetaTitle", { title: content.title });
-  const canonical = pageHref(`/methodology/${dataset}`, locale);
+  const canonical = `/methodology/${dataset}` as const;
 
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
     title,
     description: content.summary,
     path: canonical,
@@ -111,7 +111,7 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
   return (
     <>
       <JsonLd
-        data={datasetJsonLd({
+        data={datasetJsonLd({ locale,
           origin: resolveSiteUrl(),
           path: locale === "en" ? `/en/methodology/${dataset}` : `/methodology/${dataset}`,
           name: content.title,

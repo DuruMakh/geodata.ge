@@ -28,7 +28,7 @@ export async function deficitPageMetadata(locale: Locale): Promise<Metadata> {
   if (locale === "ka") return generalGovernmentDeficitMetadata(facts);
   const { firstYear, lastYear } = coverageFromYears(facts.filter(fact => fact.status === "actual"));
   const messages = await getMessages(locale, ["deficit"]);
-  return fiscalMetadata({ title: message(messages, "deficit.metaTitle", { first: firstYear, last: lastYear }), description: message(messages, "deficit.description", { first: firstYear, last: lastYear }), path: pageHref(DEFICIT_EXPLORER_PATH, locale) });
+  return fiscalMetadata({ locale, title: message(messages, "deficit.metaTitle", { first: firstYear, last: lastYear }), description: message(messages, "deficit.description", { first: firstYear, last: lastYear }), path: DEFICIT_EXPLORER_PATH });
 }
 
 export async function renderDeficitPage(locale: Locale) {
@@ -42,9 +42,9 @@ export async function renderDeficitPage(locale: Locale) {
   return (
     <>
       <JsonLd
-        data={explorerDatasetJsonLd({
+        data={explorerDatasetJsonLd({ locale,
           origin: resolveSiteUrl(),
-          path: pageHref(DEFICIT_EXPLORER_PATH, locale),
+          path: DEFICIT_EXPLORER_PATH,
           name: message(messages, "deficit.datasetName"),
           description,
           firstYear,

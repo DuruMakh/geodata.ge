@@ -9,6 +9,7 @@ import { JsonLd } from "../../components/seo/json-ld";
 import { loadServedExplorerData, loadServedLandingData } from "../data/servedData";
 import { loadGdpWorkbookSources, loadWorkbookSources } from "../methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
+import { pageHref } from "../i18n/routes";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { projectAdminFact, projectBudgetFact, projectGdpFact } from "../explorer/clientData";
@@ -16,10 +17,10 @@ import { projectAdminFact, projectBudgetFact, projectGdpFact } from "../explorer
 export async function expenditurePageMetadata(locale: Locale): Promise<Metadata> {
   const [{ facts }, messages] = await Promise.all([loadServedLandingData(), getMessages(locale, ["main"])]);
   const { firstYear, lastYear } = coverageFromYears(facts.filter(fact => fact.side === "expenditure"));
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
     title: message(messages, "main.metadataExpenditureTitle", { firstYear, lastYear }),
     description: message(messages, "main.metadataExpenditureDescription", { firstYear, lastYear }),
-    path: locale === "ka" ? "/explorer/expenditure" : "/en/explorer/expenditure",
+    path: "/explorer/expenditure",
   });
 }
 
@@ -48,7 +49,7 @@ export async function renderExpenditurePage(locale: Locale) {
   return (
     <>
       <JsonLd
-        data={explorerDatasetJsonLd({
+        data={explorerDatasetJsonLd({ locale,
           origin: resolveSiteUrl(),
           path: "/explorer/expenditure",
           name: message(messages, "main.datasetExpenditureName"),
@@ -61,7 +62,7 @@ export async function renderExpenditurePage(locale: Locale) {
         })}
         testId="explorer-dataset-json-ld"
       />
-      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: "/" }, { name: message(messages, "common.budget"), path: "/explorer" }, { name: message(messages, "common.expenditure"), path: "/explorer/expenditure" }]} />
+      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.expenditure"), path: pageHref("/explorer/expenditure", locale) }]} />
       <MainExplorer
         presentation={presentation}
         nav="expenditure"

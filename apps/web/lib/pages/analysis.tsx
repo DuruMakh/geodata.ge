@@ -14,10 +14,10 @@ import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
 export async function analysisPageMetadata(locale: Locale): Promise<Metadata> {
   const [{ facts }, messages] = await Promise.all([loadServedExplorerData(), getMessages(locale, ["analysis"])]);
   const { lastYear } = coverageFromYears(facts);
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
     title: message(messages, "analysis.metadataTitle", { year: lastYear }),
     description: message(messages, "analysis.metadataDescription", { year: lastYear }),
-    path: pageHref("/explorer/analysis", locale),
+    path: "/explorer/analysis",
   });
 }
 

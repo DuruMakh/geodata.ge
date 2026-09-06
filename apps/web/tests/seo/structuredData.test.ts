@@ -20,7 +20,7 @@ describe("Fiscal.ge structured data", () => {
         expect.objectContaining({
           "@type": "WebSite",
           "@id": "https://fiscal.ge/#website",
-          inLanguage: "ka",
+          inLanguage: ["ka", "en"],
         }),
       ]),
     );
@@ -33,7 +33,7 @@ describe("Fiscal.ge structured data", () => {
       url: "https://fiscal.ge",
       email: "info@fiscal.ge",
       description:
-        "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად აქვეყნებს.",
+        "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად და ინგლისურად აქვეყნებს.",
       logo: {
         "@type": "ImageObject",
         url: "https://fiscal.ge/fiscal-ge-logo.svg",
@@ -45,7 +45,7 @@ describe("Fiscal.ge structured data", () => {
       "@type": "ContactPoint",
       email: "info@fiscal.ge",
       contactType: "general inquiries",
-      availableLanguage: "ka",
+      availableLanguage: ["ka", "en"],
     });
     expect(organization).not.toHaveProperty("address");
     expect(organization).not.toHaveProperty("telephone");
@@ -55,7 +55,7 @@ describe("Fiscal.ge structured data", () => {
   });
 
   it("describes stable explorer downloads with stable dataset ids", () => {
-    const data = explorerDatasetJsonLd({
+    const data = explorerDatasetJsonLd({ locale: "ka",
       origin: "https://fiscal.ge",
       path: "/explorer/expenditure",
       name: "საქართველოს სახელმწიფო ბიუჯეტის ხარჯები",
@@ -84,7 +84,7 @@ describe("Fiscal.ge structured data", () => {
   });
 
   it("omits distribution from client-generated entity datasets", () => {
-    const data = explorerDatasetJsonLd({
+    const data = explorerDatasetJsonLd({ locale: "ka",
       origin: "https://fiscal.ge",
       path: "/explorer/municipalities/tbilisi",
       name: "ქალაქ თბილისის მუნიციპალიტეტის ბიუჯეტი",
@@ -113,7 +113,7 @@ describe("Fiscal.ge structured data", () => {
   });
 
   it("describes a downloadable CC BY 4.0 dataset", () => {
-    const data = datasetJsonLd({
+    const data = datasetJsonLd({ locale: "ka",
       origin: "https://fiscal.ge",
       path: "/methodology/expenditure",
       name: "საქართველოს სახელმწიფო ბიუჯეტის ხარჯები",
@@ -153,7 +153,7 @@ describe("Fiscal.ge structured data", () => {
 
   it("rejects dataset descriptions too short for Google's dataset contract", () => {
     expect(() =>
-      datasetJsonLd({
+      datasetJsonLd({ locale: "ka",
         origin: "https://fiscal.ge",
         path: "/methodology/revenue",
         name: "შემოსავლები",
@@ -175,7 +175,7 @@ describe("Fiscal.ge structured data", () => {
 
 describe("Dataset distributions describe every published format", () => {
   it("adds a JSON DataDownload beside the CSV", () => {
-    const jsonLd = datasetJsonLd({
+    const jsonLd = datasetJsonLd({ locale: "ka",
       origin: "https://fiscal.ge",
       path: "/methodology/expenditure",
       name: "sakhelmtsifo biujetis kharjebi",
@@ -197,18 +197,20 @@ describe("Dataset distributions describe every published format", () => {
       {
         "@type": "DataDownload",
         encodingFormat: "application/json",
+        inLanguage: ["ka", "en"],
         contentUrl: "https://fiscal.ge/downloads/data/national-expenditure.json",
       },
       {
         "@type": "DataDownload",
         encodingFormat: "application/json",
+        inLanguage: ["ka", "en"],
         contentUrl: "https://fiscal.ge/downloads/data/ministries.json",
       },
     ]);
   });
 
   it("keeps the CSV-only shape when no JSON is published", () => {
-    const jsonLd = datasetJsonLd({
+    const jsonLd = datasetJsonLd({ locale: "ka",
       origin: "https://fiscal.ge",
       path: "/methodology/revenue",
       name: "sakhelmtsifo biujetis shemosavlebi",

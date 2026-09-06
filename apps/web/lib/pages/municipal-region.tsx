@@ -128,10 +128,10 @@ export async function municipalRegionMetadata(id: string, locale: Locale): Promi
             facts.largestFunctionFact.amountGel / facts.latestTotal.publicTotalGel,
         }, presentation);
 
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
     title: regionBudgetTitle(name, facts.firstYear, facts.latestYear, presentation),
     description,
-    path: pageHref(`/explorer/municipalities/region/${id}`, locale),
+    path: `/explorer/municipalities/region/${id}`,
   });
 }
 
@@ -212,9 +212,9 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
       <JsonLd
-        data={explorerDatasetJsonLd({
+        data={explorerDatasetJsonLd({ locale,
           origin: resolveSiteUrl(),
-          path: pageHref(`/explorer/municipalities/region/${id}`, locale),
+          path: `/explorer/municipalities/region/${id}`,
           name: message(messages, "municipal.regionDatasetName", { name: grammaticalName }),
           description,
           firstYear,

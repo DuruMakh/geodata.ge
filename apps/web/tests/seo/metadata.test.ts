@@ -21,7 +21,7 @@ describe("Fiscal.ge SEO metadata", () => {
   });
 
   it("builds canonical, Open Graph, and large Twitter metadata", () => {
-    const metadata = fiscalMetadata({
+    const metadata = fiscalMetadata({ locale: "ka",
       title: "საქართველოს ბიუჯეტის ხარჯები 2004–2025 | Fiscal.ge",
       description:
         "საქართველოს სახელმწიფო ბიუჯეტის ფაქტობრივი ხარჯები სფეროებისა და უწყებების მიხედვით, 2004–2025.",
@@ -39,7 +39,7 @@ describe("Fiscal.ge SEO metadata", () => {
   });
 
   it("keeps the canonical root slash in absolute root metadata", () => {
-    const metadata = fiscalMetadata({
+    const metadata = fiscalMetadata({ locale: "ka",
       title: "Fiscal.ge",
       description: "საქართველოს ბიუჯეტის გადამოწმებული მონაცემები.",
       path: "/",

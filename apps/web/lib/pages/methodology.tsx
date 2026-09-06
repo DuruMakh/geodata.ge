@@ -16,7 +16,7 @@ import { resolveSiteUrl } from "../siteUrl";
 
 export async function methodologyPageMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["methodology"]);
-  return fiscalMetadata({ title: message(messages, "methodology.metaTitle"), description: message(messages, "methodology.metaDescription"), path: pageHref("/methodology", locale) });
+  return fiscalMetadata({ locale, title: message(messages, "methodology.metaTitle"), description: message(messages, "methodology.metaDescription"), path: "/methodology" });
 }
 
 export async function renderMethodologyPage(locale: Locale) {
@@ -39,7 +39,7 @@ export async function renderMethodologyPage(locale: Locale) {
   return (
     <>
       <JsonLd
-        data={dataCatalogJsonLd(resolveSiteUrl(), liveEntries.map(entry => entry.href))}
+        data={dataCatalogJsonLd(resolveSiteUrl(), liveEntries.map(entry => entry.href), locale)}
         testId="catalog-json-ld"
       />
       <MethodologyHub

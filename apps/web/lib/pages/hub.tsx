@@ -16,11 +16,11 @@ import { fiscalMetadata } from "../seo/metadata";
 
 export async function hubPageMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["hub"]);
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
   title: message(messages, "hub.metaTitle"),
   description:
     message(messages, "hub.metaDescription"),
-  path: pageHref("/explorer", locale),
+  path: "/explorer",
   });
 }
 

@@ -41,7 +41,7 @@ export function RootDocument({ locale, children }: { locale: Locale; children: R
   return (
     <html lang={locale} className={`h-full antialiased ${notoSansGeorgian.variable} ${notoSerifGeorgian.variable} ${geistMono.variable}`}>
       <body className="min-h-full flex flex-col">
-        <JsonLd data={siteJsonLd(resolveSiteUrl())} testId="site-json-ld" />
+        <JsonLd data={siteJsonLd(resolveSiteUrl(), locale)} testId="site-json-ld" />
         {children}
         <SiteAnalytics />
       </body>

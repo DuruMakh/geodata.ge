@@ -42,7 +42,7 @@ export async function municipalCountryMetadata(locale: Locale): Promise<Metadata
   const { firstYear, latestYear, latestTotal } = buildGeorgiaPageFacts(data);
   const presentation = await getMunicipalPresentation(data, locale);
   const { messages } = presentation;
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
     title: message(messages, "municipal.metaCountryTitle", { first: firstYear, last: latestYear }),
     description: georgiaDescription({
       firstYear,
@@ -50,7 +50,7 @@ export async function municipalCountryMetadata(locale: Locale): Promise<Metadata
       latestTotalGel: latestTotal.publicTotalGel,
       budgetUnitCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
     }, presentation),
-    path: pageHref(ROUTE, locale),
+    path: ROUTE,
   });
 }
 
@@ -91,9 +91,9 @@ export async function renderMunicipalCountry(locale: Locale) {
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
       <JsonLd
-        data={explorerDatasetJsonLd({
+        data={explorerDatasetJsonLd({ locale,
           origin: resolveSiteUrl(),
-          path: pageHref(ROUTE, locale),
+          path: ROUTE,
           name: message(messages, "municipal.countryDatasetName"),
           description,
           firstYear,

@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
-import OpenGraphImage from "../../app/opengraph-image";
+import { GET as OpenGraphImage, dynamic as kaDynamic } from "../../app/opengraph-image/route";
+import { GET as EnglishOpenGraphImage, dynamic as enDynamic } from "../../app/(en)/en/opengraph-image/route";
 
 function countPixelsNear(
   data: Buffer,
@@ -20,6 +21,13 @@ function countPixelsNear(
 }
 
 describe("OpenGraphImage", () => {
+  it("prerenders both language resources and produces different images at the same dimensions", async () => {
+    expect([kaDynamic, enDynamic]).toEqual(["force-static", "force-static"]);
+    const ka = Buffer.from(await (await OpenGraphImage()).arrayBuffer());
+    const en = Buffer.from(await (await EnglishOpenGraphImage()).arrayBuffer());
+    expect(en.equals(ka)).toBe(false);
+    expect(await sharp(en).metadata()).toMatchObject({ width: 1200, height: 630, format: "png" });
+  });
   it("renders distinct Georgian glyph shapes instead of repeated missing-glyph boxes", async () => {
     const response = await OpenGraphImage();
     const png = Buffer.from(await response.arrayBuffer());

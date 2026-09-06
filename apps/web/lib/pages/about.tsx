@@ -1,7 +1,6 @@
 import type { Locale } from "../i18n/types";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
-import { pageHref } from "../i18n/routes";
 import { SiteFooter } from "../../components/site/site-footer";
 import { SiteHeader } from "../../components/site/site-header";
 import { loadServedLandingData } from "../data/servedData";
@@ -10,11 +9,11 @@ import { fiscalMetadata } from "../seo/metadata";
 
 export async function aboutPageMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["about"]);
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
   title: message(messages, "about.metaTitle"),
   description:
     message(messages, "about.metaDescription"),
-  path: pageHref("/about", locale),
+  path: "/about",
   });
 }
 

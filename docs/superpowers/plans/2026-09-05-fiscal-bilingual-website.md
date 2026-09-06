@@ -407,7 +407,7 @@ test('English connection still points to the shared endpoint', async ({ page }) 
 
 **Interfaces:** `fiscalMetadata` gains explicit `locale: Locale` in its input. Page `path` remains unprefixed; the helper uses `pageHref`. Shared structured-data builders gain locale or explicit language lists as appropriate. `page-revisions.json` maps every unprefixed public page path to the actual reviewed English revision date. The sitemap uses `max(existingDataOrContentDate, translationRevisionDate)` for English only; dates remain validated ISO values.
 
-- [ ] Add self-canonical and reciprocal-language tests for a normal page, root, municipality, and methodology. Verify the known homepage trailing-slash contract in rendered HTML, including the existing manual root tags; do not remove them without demonstrating equivalent output and exactly one canonical.
+- [x] Add self-canonical and reciprocal-language tests for a normal page, root, municipality, and methodology. Verify the known homepage trailing-slash contract in rendered HTML, including the existing manual root tags; do not remove them without demonstrating equivalent output and exactly one canonical.
 
 ```ts
 it('gives English its own canonical and pairs both real pages', () => {
@@ -421,7 +421,7 @@ it('gives English its own canonical and pairs both real pages', () => {
 });
 ```
 
-- [ ] Confirm failure, then implement locale-aware titles, descriptions, Open Graph locale/image/alt text, Twitter fields, breadcrumb names, site/page language markers, and methodology links. Use shared numerical dataset IDs/distribution URLs for one dataset; describe bilingual labelled publications with both language codes where appropriate. Machine CSVs and original archives keep their URLs.
+- [x] Confirm failure, then implement locale-aware titles, descriptions, Open Graph locale/image/alt text, Twitter fields, breadcrumb names, site/page language markers, and methodology links. Use shared numerical dataset IDs/distribution URLs for one dataset; describe bilingual labelled publications with both language codes where appropriate. Machine CSVs and original archives keep their URLs.
 
 ```ts
 const ka = new URL(pageHref(path, 'ka'), origin).href;
@@ -430,8 +430,14 @@ const alternates = { canonical: locale === 'en' ? en : ka, languages: { ka, en, 
 ```
 
 - [x] Generate paired sitemap entries from F3's route inventory and current per-page data freshness. Include all real English routes; exclude `/mcp`, 404s, resources, and filter-specific page inventions. Add genuine page translation revision dates, not build dates. Translation corrections update only affected page dates, including shared chrome consumers when their actual public content changes.
-- [ ] Extract the existing social-image composition for both languages. Preserve dimensions, brand, contrast, and static generation; change only language-specific text and necessary line wrapping. Verify the English image actually contains English readable text and its metadata points to the correct static route.
-- [ ] Crawl the final paired route inventory in initial HTML and a real browser. Check visible/accessible strings, alternates, canonicals, sitemap entries, social assets, scoped links, and zero unintended Georgian fallbacks. Use a targeted original-language exception registry with marked fragments; never skip all chart SVG text or all source descriptions.
-- [ ] Run `npx vitest run tests/seo tests/i18n`, all relevant bilingual browser tests, `npm run i18n:check`, typecheck, and a production build. Confirm static social images and content routes. Commit with `feat: publish complete bilingual metadata and discovery`.
+- [x] Extract the existing social-image composition for both languages. Preserve dimensions, brand, contrast, and static generation; change only language-specific text and necessary line wrapping. Verify the English image actually contains English readable text and its metadata points to the correct static route.
+- [x] Crawl the final paired route inventory in initial HTML and a real browser. Check visible/accessible strings, alternates, canonicals, sitemap entries, social assets, scoped links, and zero unintended Georgian fallbacks. Use a targeted original-language exception registry with marked fragments; never skip all chart SVG text or all source descriptions.
+- [x] Run `npx vitest run tests/seo tests/i18n`, all relevant bilingual browser tests, `npm run i18n:check`, typecheck, and a production build. Confirm static social images and content routes. Commit with `feat: publish complete bilingual metadata and discovery`.
 
 **Done:** complete English pages can be discovered and shared correctly. This does not claim search-engine indexing has occurred; V1 and authorized V2 remain the release gate.
+
+> W9 verified on 2026-09-06: full check passed 181 files / 1,749 tests. Every page family now emits a self canonical, reciprocal ka/en/x-default links, translated metadata and language-specific social assets. Both homepage variants retain explicit root tags to preserve the exact Georgian trailing slash and exactly one canonical. Dataset IDs and distribution URLs stay shared, JSON distributions declare both languages, and English breadcrumb URLs remain in English. The existing neutral brand mark at /fiscal-ge-logo.svg was inspected and retained.
+
+> The exhaustive crawl covered initial HTML and hydrated content for all 182 pages, including visible/accessibility text, canonical/alternate/social metadata, breadcrumbs and human/resource links. Ninety of 92 tests initially passed; one browser context setup timed out and one exposed a real missing English social URL. Both were corrected or rerun successfully, with all four focused final checks passing. Original Georgian filenames are exempted only when marked with their language/source ID and matched exactly to a reviewed manifest; no broad SVG or source exemption is used. Final full-browser repetition remains V1.
+
+> Routing refinement: Next.js 16 adds a suffix to file-convention social routes inside route groups. The two images therefore use explicit force-static GET routes at /opengraph-image and /en/opengraph-image, sharing the original ImageResponse composition. Both resources are prerendered, /mcp remains the only dynamic route, and the final build has 191 static entries with no metadataBase warnings. English and Georgian PNGs are 1200×630; the English image was visually reviewed and original Georgian glyph/brand tests pass. All ten publication hashes remain verified with unchanged A5 dataVersion. This is local discovery/sharing evidence, not search indexing or production deployment proof.

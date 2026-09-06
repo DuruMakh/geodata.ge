@@ -16,6 +16,7 @@ const dictionaries = {
     hub: () => import("./messages/ka/hub.json"),
     about: () => import("./messages/ka/about.json"),
     connect: () => import("./messages/ka/connect.json"),
+    seo: () => import("./messages/ka/seo.json"),
   },
   en: {
     common: () => import("./messages/en/common.json"),
@@ -32,6 +33,7 @@ const dictionaries = {
     hub: () => import("./messages/en/hub.json"),
     about: () => import("./messages/en/about.json"),
     connect: () => import("./messages/en/connect.json"),
+    seo: () => import("./messages/en/seo.json"),
   },
 } satisfies Record<Locale, Record<MessageScope, () => Promise<{ default: Messages }>>>;
 

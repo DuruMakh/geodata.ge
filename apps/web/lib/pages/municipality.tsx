@@ -98,7 +98,7 @@ export async function municipalityMetadata(slug: string, locale: Locale): Promis
   const facts = buildMunicipalityPageFacts(data, code);
   const presentation = await getMunicipalPresentation(data, locale, code);
   const { messages, englishLabels } = presentation;
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
     title: locale === "ka" ? municipalityBudgetTitleKa(facts.municipality.nameKa, facts.firstYear, facts.latestYear) : message(messages, "municipal.metaMunicipalityTitle", { name: publicLabel(locale, `${code}.official-name`, facts.municipality.nameKa, englishLabels), first: facts.firstYear, last: facts.latestYear }),
     description: municipalityDescription({
       name: publicLabel(locale, `${code}.official-name`, facts.municipality.nameKa, englishLabels),
@@ -110,7 +110,7 @@ export async function municipalityMetadata(slug: string, locale: Locale): Promis
       largestCategory: publicLabel(locale, facts.largestFunction.id, facts.largestFunction.kaLabel, englishLabels),
       largestCategoryShare: facts.largestFunctionFact.amountGel / facts.latestTotal.publicTotalGel,
     }, presentation),
-    path: pageHref(municipalityHrefForCode(code), locale),
+    path: municipalityHrefForCode(code),
   });
 }
 
@@ -177,9 +177,9 @@ export async function renderMunicipality(slug: string, locale: Locale) {
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
       <JsonLd
-        data={explorerDatasetJsonLd({
+        data={explorerDatasetJsonLd({ locale,
           origin: resolveSiteUrl(),
-          path: pageHref(municipalityHrefForCode(code), locale),
+          path: municipalityHrefForCode(code),
           name: message(messages, "municipal.municipalityDatasetName", { name: officialName }),
           description,
           firstYear,

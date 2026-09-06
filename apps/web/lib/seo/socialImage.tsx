@@ -1,17 +1,14 @@
+/* eslint-disable @next/next/no-img-element -- ImageResponse renders embedded SVGs, not browser images. */
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import type { Locale } from "../i18n/types";
+import { seoMessage } from "./strings";
 
-export const alt = "Fiscal.ge — საქართველოს ბიუჯეტის მონაცემები";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+const size = { width: 1200, height: 630 };
 
 const notoSansGeorgian = readFile(
   join(process.cwd(), "assets/fonts/NotoSansGeorgian-Regular.ttf"),
-);
-const horizontalLogo = readFile(
-  join(process.cwd(), "public/brand/fiscal-logo-horizontal.svg"),
-  "utf8",
 );
 const reversedMark = readFile(
   join(process.cwd(), "public/brand/fiscal-logo-mark-reversed.svg"),
@@ -23,10 +20,10 @@ function svgDataUri(svg: string) {
   return `data:image/svg+xml;base64,${Buffer.from(renderableSvg).toString("base64")}`;
 }
 
-export default async function OpenGraphImage() {
+export async function renderSocialImage(locale: Locale) {
   const [fontData, horizontalLogoSvg, reversedMarkSvg] = await Promise.all([
     notoSansGeorgian,
-    horizontalLogo,
+    readFile(join(process.cwd(), `public/brand/fiscal-logo-horizontal${locale === "en" ? "-en" : ""}.svg`), "utf8"),
     reversedMark,
   ]);
   return new ImageResponse(
@@ -60,7 +57,7 @@ export default async function OpenGraphImage() {
           style={{ objectFit: "contain", objectPosition: "left center" }}
         />
         <div style={{ display: "flex", maxWidth: 940, fontSize: 72, lineHeight: 1.12 }}>
-          საქართველოს ბიუჯეტის მონაცემები
+          {seoMessage(locale, "seo.socialHeadline")}
         </div>
       </div>
       <div
@@ -84,7 +81,7 @@ export default async function OpenGraphImage() {
         />
         <span style={{ width: 72, height: 8, background: "#B3402A" }} />
         <div style={{ display: "flex", fontSize: 28 }}>
-          გადამოწმებული · მრავალწლიანი · ღია
+          {seoMessage(locale, "seo.socialTagline")}
         </div>
       </div>
     </div>,

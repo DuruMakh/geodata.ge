@@ -20,7 +20,7 @@ export async function debtPageMetadata(locale: Locale): Promise<Metadata> {
   if (locale === "ka") return governmentDebtMetadata(facts);
   const { firstYear, lastYear } = coverageFromYears(facts.filter(fact => fact.status === "actual" && fact.family === "stock"));
   const messages = await getMessages(locale, ["debt"]);
-  return fiscalMetadata({ title: message(messages, "debt.metaTitle", { first: firstYear, last: lastYear }), description: message(messages, "debt.description", { first: firstYear, last: lastYear }), path: pageHref(DEBT_EXPLORER_PATH, locale) });
+  return fiscalMetadata({ locale, title: message(messages, "debt.metaTitle", { first: firstYear, last: lastYear }), description: message(messages, "debt.description", { first: firstYear, last: lastYear }), path: DEBT_EXPLORER_PATH });
 }
 
 export async function renderDebtPage(locale: Locale) {
@@ -42,9 +42,9 @@ export async function renderDebtPage(locale: Locale) {
   return (
     <>
       <JsonLd
-        data={explorerDatasetJsonLd({
+        data={explorerDatasetJsonLd({ locale,
           origin: resolveSiteUrl(),
-          path: pageHref(DEBT_EXPLORER_PATH, locale),
+          path: DEBT_EXPLORER_PATH,
           name: message(messages, "debt.datasetName"),
           description: datasetDescription,
           firstYear: datasetFirstYear,

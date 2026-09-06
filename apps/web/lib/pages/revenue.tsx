@@ -9,6 +9,7 @@ import { JsonLd } from "../../components/seo/json-ld";
 import { loadServedExplorerData, loadServedLandingData } from "../data/servedData";
 import { loadGdpWorkbookSources, loadWorkbookSources } from "../methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
+import { pageHref } from "../i18n/routes";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { projectBudgetFact, projectGdpFact } from "../explorer/clientData";
@@ -16,10 +17,10 @@ import { projectBudgetFact, projectGdpFact } from "../explorer/clientData";
 export async function revenuePageMetadata(locale: Locale): Promise<Metadata> {
   const [{ facts }, messages] = await Promise.all([loadServedLandingData(), getMessages(locale, ["main"])]);
   const { firstYear, lastYear } = coverageFromYears(facts.filter(fact => fact.side === "revenue"));
-  return fiscalMetadata({
+  return fiscalMetadata({ locale,
     title: message(messages, "main.metadataRevenueTitle", { firstYear, lastYear }),
     description: message(messages, "main.metadataRevenueDescription", { firstYear, lastYear }),
-    path: locale === "ka" ? "/explorer/revenue" : "/en/explorer/revenue",
+    path: "/explorer/revenue",
   });
 }
 
@@ -48,7 +49,7 @@ export async function renderRevenuePage(locale: Locale) {
   return (
     <>
       <JsonLd
-        data={explorerDatasetJsonLd({
+        data={explorerDatasetJsonLd({ locale,
           origin: resolveSiteUrl(),
           path: "/explorer/revenue",
           name: message(messages, "main.datasetRevenueName"),
@@ -61,7 +62,7 @@ export async function renderRevenuePage(locale: Locale) {
         })}
         testId="explorer-dataset-json-ld"
       />
-      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: "/" }, { name: message(messages, "common.budget"), path: "/explorer" }, { name: message(messages, "common.revenue"), path: "/explorer/revenue" }]} />
+      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.revenue"), path: pageHref("/explorer/revenue", locale) }]} />
       <MainExplorer
         presentation={presentation}
         nav="revenue"
