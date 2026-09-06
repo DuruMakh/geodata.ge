@@ -145,6 +145,7 @@ type SeriesSelectorRowProps = {
   showRail?: boolean;
   isChild?: boolean;
   childLabelSize?: "compact" | "standard";
+  wrapLabel?: boolean;
   onToggle: () => void;
   onToggleExpanded?: () => void;
 };
@@ -165,6 +166,7 @@ export function SeriesSelectorRow({
   showRail = false,
   isChild = false,
   childLabelSize = "compact",
+  wrapLabel = false,
   onToggle,
   onToggleExpanded,
 }: SeriesSelectorRowProps) {
@@ -221,7 +223,7 @@ export function SeriesSelectorRow({
           </span>
           <span
             data-testid="series-label"
-            className={`line-clamp-2 leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[12px]" : "text-[11.5px]"} font-normal text-[var(--body)]` : "text-[12.5px] font-medium text-[var(--ink)]"}`}
+            className={`${wrapLabel ? "" : "line-clamp-2"} leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[12px]" : "text-[11.5px]"} font-normal text-[var(--body)]` : "text-[12.5px] font-medium text-[var(--ink)]"}`}
           >
             {label}
           </span>

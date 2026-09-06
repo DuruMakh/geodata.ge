@@ -2,12 +2,16 @@
 
 import { useEffect, useMemo } from "react";
 import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
+import { message } from "../../lib/i18n/messages";
+import { Message } from "../../lib/i18n/message";
+import { pageHref } from "../../lib/i18n/routes";
+import { publicLabel } from "../../lib/i18n/labels";
 import { useI18n } from "../../lib/i18n/provider";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
-import { formatAmount, formatShare, unitFor, UNIT_BN } from "../../lib/explorer/format";
+import { formatAmount, formatShare, unitFor, unitsFor, formatDisplayDate } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
 import type {
   DebtFamily,
@@ -49,13 +53,14 @@ type DebtExplorerSurfaceProps = DebtExplorerProps & {
 };
 
 const FAMILY_LABEL: Record<DebtFamily, string> = {
-  stock: "მთავრობის ვალი",
-  service: "ვალის გადახდა",
-  rate: "საპროცენტო განაკვეთი",
+  stock: "debt.stock",
+  service: "debt.service",
+  rate: "debt.rate",
 };
 
 export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
-  const exportPresentation = useI18n();
+  const presentation = useI18n();
+  const { locale, messages, englishLabels } = presentation;
   const model = useMemo(() => buildDebtExplorerModel({
     facts: props.facts,
     gdpFacts: props.gdpFacts,
@@ -63,7 +68,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
     selectedIds: props.selectedIds,
     range: props.range,
     shareOfGdp: props.shareOfGdp,
-  }), [props.facts, props.gdpFacts, props.family, props.selectedIds, props.range, props.shareOfGdp]);
+  }, presentation), [props.facts, props.gdpFacts, props.family, props.selectedIds, props.range, props.shareOfGdp, presentation]);
   const familyYears = useMemo(() => Array.from(new Set(
     props.facts.filter((fact) => fact.family === props.family).map((fact) => fact.year),
   )).sort((left, right) => left - right), [props.facts, props.family]);
@@ -71,16 +76,16 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
     props.facts
       .filter((fact) => fact.family === props.family && fact.valueKind === "amount_gel" && fact.value !== null)
       .map((fact) => fact.value as number),
-    UNIT_BN,
+    unitsFor(locale).bn,
     1,
-  ), [props.facts, props.family]);
+  ), [props.facts, props.family, locale]);
   const isPercent = props.family === "rate" || (props.family === "stock" && props.shareOfGdp);
   const noSelection = props.selectedIds.length === 0;
   const noRangeData = !noSelection && !model.points.some((point) => point.value !== null);
   const pointsBySeriesYear = new Map(model.points.map((point) => [`${point.itemId}:${point.year}`, point]));
   const chartSeries: ChartSeries[] = model.selectedItems.map((item) => ({
     id: item.id,
-    label: item.kaLabel,
+    label: publicLabel(locale, item.id, item.kaLabel, englishLabels),
     color: item.color,
     vals: model.years.map((year) => {
       const value = pointsBySeriesYear.get(`${item.id}:${year}`)?.value ?? null;
@@ -105,7 +110,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
     ? "—"
     : props.family === "rate"
       ? formatShare(latestTotalFact.value / 100)
-      : formatAmount(latestTotalFact.value);
+      : formatAmount(latestTotalFact.value, locale);
   const deckYoy = latestTotalFact?.value !== null
     && latestTotalFact?.value !== undefined
     && previousTotalFact?.value !== null
@@ -115,7 +120,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
     : null;
   const coverage = [
     familyYears.length > 0 ? `${familyYears[0]}–${familyYears.at(-1)}` : "",
-    props.lastUpdatedAt ? `განახლდა ${props.lastUpdatedAt}` : "",
+    props.lastUpdatedAt ? message(messages, "main.updated", { date: locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt }) : "",
   ].filter(Boolean).join(" · ");
   const forecastYears = model.forecastStartYear === null
     ? []
@@ -133,22 +138,22 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
       <div className="@container mx-auto max-w-[1180px]">
         <PageHeader
           crumbs={[
-            { label: "მთავარი", href: "/" },
-            { label: "მონაცემები" },
-            { label: "ბიუჯეტი", href: "/explorer" },
-            { label: "ვალი" },
+            { label: message(messages, "common.home"), href: pageHref("/", locale) },
+            { label: message(messages, "common.data") },
+            { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+            { label: message(messages, "common.debt") },
           ]}
           coverage={coverage}
         />
         <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-          რამდენია მთავრობის ვალი და როგორ ვიხდით მას
+          {message(messages, "debt.heading")}
         </h1>
         <p data-testid="debt-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
           <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
-            {latestTotalFact?.year}: {FAMILY_LABEL[props.family]} · {deckValue}
+            {latestTotalFact?.year}: {message(messages, FAMILY_LABEL[props.family])} · {deckValue}
           </span>
           {latestTotalFact?.status === "projection_existing_portfolio" ? (
-            <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">პროგნოზი</span>
+            <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{message(messages, "debt.forecast")}</span>
           ) : null}
           {deckYoy !== null ? (
             <>
@@ -158,7 +163,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
               >
                 {formatShare(deckYoy, true)}
               </span>
-              <span>წინა წელთან</span>
+              <span>{message(messages, "main.previousYear")}</span>
             </>
           ) : null}
         </p>
@@ -174,17 +179,17 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <SegmentedTabs<ChartMode>
-                  ariaLabel="ხედის რეჟიმი"
+                  ariaLabel={message(messages, "controls.viewMode")}
                   value={props.chartMode}
                   onChange={props.onChartModeChange}
                   options={[
-                    { value: "line", label: "ხაზი", testId: "chart-mode-line" },
-                    { value: "table", label: "ცხრილი", testId: "chart-mode-table" },
+                    { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
+                    { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
                   ]}
                 />
                 <div className="flex items-center gap-3.5">
                   <span data-testid="debt-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                    {props.family === "rate" ? "%" : props.shareOfGdp ? "% მშპ-ში" : "მლრდ ₾"}
+                    {props.family === "rate" ? "%" : props.shareOfGdp ? message(messages, "main.percentGdp") : message(messages, "format.bnGel")}
                   </span>
                   {props.family === "stock" ? (
                     <button
@@ -196,7 +201,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                         ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]"
                         : "border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]"}`}
                     >
-                      % მშპ-ში
+                      {message(messages, "main.percentGdp")}
                     </button>
                   ) : null}
                 </div>
@@ -204,27 +209,27 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
 
               {noSelection ? (
                 <div className="mt-5">
-                  <Callout testId="no-selection-callout">არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.</Callout>
+                  <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
                 </div>
               ) : noRangeData ? (
                 <div className="mt-5">
                   <Callout testId="no-range-data-callout">
-                    არჩეული სერიებისთვის ამ დიაპაზონში მონაცემები არ არის. გააფართოვე დიაპაზონი ან შეცვალე სერიები.
+                    {message(messages, "main.noRangeData")}
                   </Callout>
                 </div>
               ) : props.chartMode === "table" ? (
                 <ExplorerTable
-                  caption={`${FAMILY_LABEL[props.family]}, ${props.range.start}–${props.range.end}`}
+                  caption={message(messages, "debt.caption", { family: message(messages, FAMILY_LABEL[props.family]), start: props.range.start, end: props.range.end })}
                   rows={model.tableRows.filter((row) => row.itemId !== totalItemId)}
                   totalRow={model.totalRow}
                   showTotal={Boolean(totalItemId && props.selectedIds.includes(totalItemId))}
                   years={model.years}
-                  firstColumnLabel="სერია"
+                  firstColumnLabel={message(messages, "controls.seriesColumn")}
                   unit={unit}
                   share={isPercent}
                   showChangeColumn={false}
                   forecastYears={forecastYears}
-                  forecastLabel="პროგნოზი"
+                  forecastLabel={message(messages, "debt.forecast")}
                   shareValueForYear={(row, year) => props.family === "rate"
                     ? row.valuesByYear[year] === null || row.valuesByYear[year] === undefined
                       ? null
@@ -238,7 +243,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                     series={chartSeries}
                     share={isPercent}
                     unit={unit}
-                    shareLabel={props.family === "rate" ? "საპროცენტო განაკვეთი" : "წილი მშპ-ში"}
+                    shareLabel={message(messages, props.family === "rate" ? "debt.rate" : "main.shareGdp")}
                   />
                 </div>
               )}
@@ -248,24 +253,24 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                 range={props.range}
                 onChange={props.onRangeChange}
                 marker={props.family === "service" && forecastBoundaryYear !== null
-                  ? { year: forecastBoundaryYear, label: "პროგნოზი" }
+                  ? { year: forecastBoundaryYear, label: message(messages, "debt.forecast") }
                   : undefined}
               />
               {props.family === "service" ? (
                 <p data-testid="debt-forecast-note" className="mt-3 max-w-[680px] text-xs leading-relaxed text-[var(--muted)]">
-                  2026–2030 წლების პროგნოზი ეფუძნება 2025-12-31 მდგომარეობით არსებულ პორტფელს და არ წარმოადგენს მომავალი ბიუჯეტის სრულ პროგნოზს.
+                  {message(messages, "debt.portfolioForecast")}
                 </p>
               ) : null}
             </section>
 
             <div className="mt-[18px]">
               <SourceNote testId="source-label">
-                მონაცემები: საქართველოს ფინანსთა სამინისტრო. ნაჩვენებია მთავრობის ვალი და არა უფრო ფართო საჯარო ან სახელმწიფო ვალი.
-                {" "}შედარებისას გაითვალისწინეთ 2019 წლის საბიუჯეტო ორგანიზაციების აღრიცხვის ცვლილება და 2022 წლის საერთო მთავრობის სახელმწიფო საწარმოების საზღვრის ცვლილება.
-                {props.family === "stock" ? " მშპ: საქსტატი, მიმდინარე ფასებში." : null}
-                {props.family === "rate" ? " გამოუქვეყნებელი განაკვეთები დატოვებულია გამოტოვებად და არ არის ჩანაცვლებული ნულით." : null}
+                {message(messages, "debt.source")}
+                {" "}{message(messages, "debt.comparability")}
+                {props.family === "stock" ? " " + message(messages, "main.gdpSource") : null}
+                {props.family === "rate" ? message(messages, "debt.missingRates") : null}
                 {props.lastUpdatedAt ? (
-                  <> ბოლო განახლება: <span className="font-[family-name:var(--font-numeric)]">{props.lastUpdatedAt}</span>.</>
+                  <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt}</span> }} /></>
                 ) : null}
               </SourceNote>
             </div>
@@ -292,7 +297,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                   sources: props.workbookSources,
                   gdpSources: props.gdpWorkbookSources ?? [],
                   siteOrigin: props.siteOrigin ?? window.location.origin,
-                }, exportPresentation))}
+                }, presentation))}
               />
             )}
           />

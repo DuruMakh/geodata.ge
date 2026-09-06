@@ -10,6 +10,8 @@ const dictionaries = {
     methodology: () => import("./messages/ka/methodology.json"),
     analysis: () => import("./messages/ka/analysis.json"),
     municipal: () => import("./messages/ka/municipal.json"),
+    debt: () => import("./messages/ka/debt.json"),
+    deficit: () => import("./messages/ka/deficit.json"),
   },
   en: {
     common: () => import("./messages/en/common.json"),
@@ -20,6 +22,8 @@ const dictionaries = {
     methodology: () => import("./messages/en/methodology.json"),
     analysis: () => import("./messages/en/analysis.json"),
     municipal: () => import("./messages/en/municipal.json"),
+    debt: () => import("./messages/en/debt.json"),
+    deficit: () => import("./messages/en/deficit.json"),
   },
 } satisfies Record<Locale, Record<MessageScope, () => Promise<{ default: Messages }>>>;
 

@@ -1,6 +1,9 @@
-import { createElement } from "react";
-import { renderGeorgianMarkup } from "../helpers/render-localized";
-import { describe, expect, it } from "vitest";
+import React, { createElement, type ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { I18nProvider } from "../../lib/i18n/provider";
+import { getPresentation } from "../../lib/i18n/presentation.server";
+import type { Presentation } from "../../lib/i18n/types";
+import { beforeAll, describe, expect, it } from "vitest";
 import { selectDebtSeries } from "../../lib/explorer/debtExplorer";
 import { loadGovernmentDebtFacts } from "../../lib/data/governmentDebt/importGovernmentDebtFacts";
 import type {
@@ -10,6 +13,10 @@ import type {
 } from "../../lib/servedRows";
 
 const reviewedAt = "2026-09-01";
+
+let presentation: Presentation;
+beforeAll(async () => { presentation = await getPresentation("ka", ["common", "controls", "format", "main", "debt"], [...new Set(facts.map(fact => fact.seriesId))]); });
+function renderGeorgianMarkup(children: ReactNode) { return renderToStaticMarkup(<I18nProvider {...presentation}>{children}</I18nProvider>); }
 
 function debtFact(
   year: number,

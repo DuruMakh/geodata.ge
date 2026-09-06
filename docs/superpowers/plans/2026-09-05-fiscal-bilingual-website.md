@@ -332,7 +332,7 @@ const summary = message(presentation.messages, 'municipal.latestSummary', {
 
 **Interfaces:** `renderDebtPage(locale)`/`renderDeficitPage(locale)` return `Promise<React.ReactElement>`; `debtPageMetadata(locale)`/`deficitPageMetadata(locale)` return `Promise<Metadata>`. Keep existing model inputs and numerical output. Extend presentation-only descriptions and exporter inputs with locale; existing URL-state serializers retain their signatures and key vocabulary.
 
-- [ ] Add tests for debt stock, actual service, optional existing-portfolio forecast, weighted rates, missing rates, signed deficit, and actual/projection distinction. Compare existing model values across languages and assert English units/status descriptions independently.
+- [x] Add tests for debt stock, actual service, optional existing-portfolio forecast, weighted rates, missing rates, signed deficit, and actual/projection distinction. Compare existing model values across languages and assert English units/status descriptions independently.
 
 ```ts
 test('explains English debt rates without describing them as GEL', async ({ page }) => {
@@ -343,17 +343,23 @@ test('explains English debt rates without describing them as GEL', async ({ page
 ```
 
 The existing debt serializer recognizes `f=rate` and the selected rate-series ID. Also test selecting the rate through its existing series row; do not add a new family button solely for this test.
-- [ ] Confirm failure, then localize all nine debt series, deficit/balance naming, family/measure controls, legends/tooltips, yearly summaries, rate gaps, limitations, projection notices, source links, and W3 export text. English prose must distinguish a debt stock from spending and an existing-portfolio schedule from a government budget plan.
+- [x] Confirm failure, then localize all nine debt series, deficit/balance naming, family/measure controls, legends/tooltips, yearly summaries, rate gaps, limitations, projection notices, source links, and W3 export text. English prose must distinguish a debt stock from spending and an existing-portfolio schedule from a government budget plan.
 
 ```ts
 const shownLabel = publicLabel(presentation.locale, seriesId, labelKa, presentation.englishLabels);
 const note = message(presentation.messages, 'debt.portfolioProjection', { date: snapshotDate });
 ```
 
-- [ ] Verify switching preserves the existing debt and deficit hashes, future-year ranges, selection, and chart/table mode, with the corresponding forecast notices still visible. Verify rate exports retain blank GEL amounts and deficit exports retain signed nominal values. Keep `spending.debt_service` separate from government-debt service.
-- [ ] Run existing debt/deficit model and browser tests plus the new tests, typecheck, and translation checks. Commit with `feat: localize debt and deficit exploration`.
+- [x] Verify switching preserves the existing debt and deficit hashes, future-year ranges, selection, and chart/table mode, with the corresponding forecast notices still visible. Verify rate exports retain blank GEL amounts and deficit exports retain signed nominal values. Keep `spending.debt_service` separate from government-debt service.
+- [x] Run existing debt/deficit model and browser tests plus the new tests, typecheck, and translation checks. Commit with `feat: localize debt and deficit exploration`.
 
 **Done:** both pages explain and export the correct fiscal measures in English, including their limitations.
+
+> W7 verified on 2026-09-06: full check passed 175 files / 1,707 tests; 42 focused model, route and workbook tests passed, followed by 28 focused selector/route/model checks after the visual adjustment. All 23 debt/deficit browser tests passed on the final build. English initial HTML, both-language rate search, existing series controls, actual/forecast boundaries, gap-only rates, selection/range/measure across switching/back/reload, and mobile layouts are verified. Twelve real Excel files cover debt stock in GEL and GDP share, debt service, all rates, and deficit in GEL and GDP share. Numeric/formula cells, missing structure and source evidence match Georgian; rate GEL cells remain blank and deficit nominal values remain signed. Files are retained under .tmp/bilingual/w7-workbooks.
+
+> All nine debt labels and the deficit label resolve through the reviewed catalogue. Source text distinguishes government debt from wider public/state measures, existing-portfolio schedules from future budgets, unavailable rates from zero, and general-government balance from a state-budget subtraction. The original Georgian singular table heading is retained with a dedicated shared column-label message. Desktop inspection caught two clipped rate labels that hid domestic/external; only English debt rows opt into full label wrapping. A failing desktop visibility check now passes. Forecast annotations are compared separately from numeric cell text so translated status labels cannot produce a false data mismatch.
+
+> Final production build passed with 186 static-generation entries and only /mcp dynamic, all ten publication hashes verified, and unchanged dataVersion a6c927f06f86396992ed7afd5fc0aae3accfc83700f3213fc28ddcbc7c1ceeff. Desktop/mobile captures reviewed under .tmp/bilingual/w7-*. Both /en/explorer/debt and /en/explorer/deficit are available at http://127.0.0.1:3217. Shared paired metadata completion remains W9.
 
 ## Task W8: Complete home, data hub, About, and connection pages
 
