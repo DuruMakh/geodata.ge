@@ -73,7 +73,7 @@ test("public header keeps landing active, exposes mission, and leaves methodolog
     } else {
       await expect(header.getByRole("navigation").locator("[aria-current]")).toHaveCount(0);
     }
-    await expect(header).toContainText("2004–2025");
+    await expect(header).not.toContainText(/\d{4}[–-]\d{4}/);
 
     const headerBox = await header.boundingBox();
     const headingBox = await page.getByRole("heading", { level: 1 }).boundingBox();

@@ -56,7 +56,7 @@ export function LandingPage({ model, presentation }: { model: LandingModel; pres
       className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]"
     >
       <div className="mx-auto max-w-[1240px]">
-        <SiteHeader locale={locale} active="home" yearsLabel={model.yearsLabel} testId="landing-header" />
+        <SiteHeader locale={locale} active="home" testId="landing-header" />
 
         <section className="relative min-[768px]:grid min-[768px]:grid-cols-1">
           <div
@@ -67,7 +67,7 @@ export function LandingPage({ model, presentation }: { model: LandingModel; pres
               {message(messages, "landing.portal")}
             </p>
             <h1
-              className="hero-display mt-2.5 text-pretty text-[33px] font-semibold leading-[1.12] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-[30px] min-[1100px]:text-[40px]"
+              className="hero-display mt-2.5 whitespace-pre-line text-pretty text-[33px] font-semibold leading-[1.12] tracking-[-0.015em] min-[768px]:mt-3 min-[768px]:text-[30px] min-[1100px]:text-[40px]"
             >
               {message(messages, "landing.heading")}
             </h1>

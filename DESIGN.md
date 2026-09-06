@@ -432,7 +432,9 @@ The public-site header appears on the landing page (§19), `/about` (§23), the 
 
 The brand link uses the reviewed full v2.0 horizontal lockup at 280px from 768px upward and the compact lockup below 768px. The full horizontal lockup must not render below 280px; the standalone mark must not render below 24px. The supplied token JSON's 180px lockup value is not authoritative for production.
 
-Vertically centered logo row: lockup left, nav tabs center, mono loaded-coverage context label right; no bottom rule. Nav tab: sans 13px; active = ink, weight 600, `2px accent` text underline with a `5px` offset; inactive = muted, weight 500. The landing page marks `მთავარი` active. `/about` marks `მიზანი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` nor `მიზანი` active and render no `aria-current`, because methodology remains inactive as a separate destination; no methodology tab is added.
+Vertically centered logo row: lockup left, navigation and language switch grouped on a shared text baseline at the right; no coverage-year label or bottom rule. Mobile retains the compact logo/language row and separate navigation row. Nav tab: sans 13px; active = ink, weight 600, `2px accent` text underline with a `5px` offset; inactive = muted, weight 500. The landing page marks `მთავარი` active. `/about` marks `მიზანი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` nor `მიზანი` active and render no `aria-current`, because methodology remains inactive as a separate destination; no methodology tab is added.
+
+The English hero heading uses two explicit lines: `Georgia` followed by `in numbers`.
 
 ### 7.2a Mode Control
 

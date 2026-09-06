@@ -24,7 +24,7 @@ export async function renderAboutPage(locale: Locale) {
   return (
     <div className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]">
       <div className="mx-auto max-w-[1240px]">
-        <SiteHeader locale={locale} active="mission" yearsLabel={model.yearsLabel} testId="about-header" />
+        <SiteHeader locale={locale} active="mission" testId="about-header" />
         <main className="pt-10 min-[768px]:pt-16">
           <section
             data-testid="mission-cover"
