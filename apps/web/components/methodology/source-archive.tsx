@@ -1,21 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { ValidatedSourceManifestRow } from "../../lib/methodology/sourceManifest";
+import { message } from "../../lib/i18n/messages";
+import { useI18n } from "../../lib/i18n/provider";
+import { matchesLabelQuery } from "../../lib/i18n/search";
+import type { PublicSourceManifestRow } from "../../lib/methodology/publicSources";
 import type { MethodologyArchiveSummary, MethodologyDatasetId } from "../../lib/methodology/types";
 
-export type PublicSourceManifestRow = Pick<
-  ValidatedSourceManifestRow,
-  | "source_id"
-  | "year"
-  | "years"
-  | "source_organization"
-  | "display_title_ka"
-  | "official_filename"
-  | "media_type"
-  | "byte_size"
-  | "downloadHref"
->;
+export type { PublicSourceManifestRow } from "../../lib/methodology/publicSources";
 
 type SourceArchiveProps = {
   datasetId: MethodologyDatasetId;
@@ -36,34 +28,28 @@ function formatBytes(bytes: number) {
 }
 
 export function SourceArchive({ datasetId, datasetLabel, rows, summary }: SourceArchiveProps) {
+  const { locale, messages } = useI18n();
   const [query, setQuery] = useState("");
   const [year, setYear] = useState<number | null>(null);
   const years = useMemo(
     () => [...new Set(rows.flatMap((row) => row.years))].toSorted((left, right) => right - left),
     [rows],
   );
-  const normalizedQuery = query.trim().toLocaleLowerCase("ka-GE");
-  const captionPeriod = year === null ? `${years.at(-1)}–${years[0]} წლები` : `${year} წელი`;
-  const filteredRows = rows.filter((row) => {
-    if (year !== null && !row.years.includes(year)) return false;
-    const searchable = [
-      row.display_title_ka,
-      row.official_filename,
-      row.source_organization,
-      formatLabel(row),
-      row.year,
-    ]
-      .join(" ")
-      .toLocaleLowerCase("ka-GE");
-    return searchable.includes(normalizedQuery);
-  });
+  const captionPeriod = year === null
+    ? message(messages, "methodology.yearRange", { first: years.at(-1) ?? "", last: years[0] ?? "" })
+    : message(messages, "methodology.yearValue", { year });
+  const filteredRows = rows.filter(row =>
+    (year === null || row.years.includes(year)) && matchesLabelQuery(query, [
+      ...row.searchLabels, row.official_filename, formatLabel(row), row.year,
+    ]),
+  );
 
   return (
     <div data-testid="source-archive" className="mt-7">
       <div className="flex flex-wrap items-start justify-between gap-5 border-y border-[var(--ink)] py-5">
         <div>
           <p className="font-[family-name:var(--font-display)] text-[18px] font-semibold">
-            {summary.fileCount} უცვლელი პირველწყარო
+            {message(messages, "methodology.archiveCount", { count: summary.fileCount })}
           </p>
           <p className="mt-1 font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
             {formatBytes(summary.totalBytes)}
@@ -73,13 +59,15 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
           href={`/downloads/methodology/${datasetId}/${datasetId}-original-sources.zip`}
           className="border border-[var(--ink)] px-4 py-2.5 text-[11px] font-semibold hover:bg-[var(--ink)] hover:text-[var(--paper)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(179,64,42,0.4)]"
         >
-          სრული არქივი · ZIP ↓
+          {message(messages, "methodology.archiveDownload")}
         </a>
       </div>
 
+      {locale === "en" ? <p className="mt-4 max-w-[800px] text-[11.5px] leading-relaxed text-[var(--muted)]">{message(messages, "methodology.originalLanguageNote")}</p> : null}
+
       <div className="mt-8 grid gap-6 min-[760px]:grid-cols-[minmax(240px,0.8fr)_minmax(0,1.2fr)] min-[760px]:items-end">
         <label className="block">
-          <span className="text-[11px] font-semibold text-[var(--muted)]">პირველწყაროს ძებნა</span>
+          <span className="text-[11px] font-semibold text-[var(--muted)]">{message(messages, "methodology.archiveSearch")}</span>
           <input
             type="search"
             value={query}
@@ -87,7 +75,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
             className="mt-2 block w-full border-0 border-b border-[var(--control)] bg-transparent px-0 py-2 text-[13px] outline-none focus:border-[var(--accent)]"
           />
         </label>
-        <div className="overflow-x-auto pb-1" aria-label="წლის ფილტრი">
+        <div className="overflow-x-auto pb-1" aria-label={message(messages, "methodology.yearFilter")}>
           <div className="flex min-w-max gap-2">
             <button
               type="button"
@@ -95,7 +83,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
               onClick={() => setYear(null)}
               className="min-h-9 border-b px-2 text-[11px] font-semibold aria-pressed:border-[var(--accent)] aria-pressed:text-[var(--accent)]"
             >
-              ყველა
+              {message(messages, "methodology.allYears")}
             </button>
             {years.map((candidate) => (
               <button
@@ -114,14 +102,14 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
 
       <div className="mt-7 overflow-x-auto border-t-2 border-[var(--ink)]">
         <table className="w-full min-w-[760px] border-collapse text-left text-[11.5px]">
-          <caption className="sr-only">{`${datasetLabel} — პირველწყაროების არქივი, ${captionPeriod}`}</caption>
+          <caption className="sr-only">{message(messages, "methodology.archiveCaption", { dataset: datasetLabel, period: captionPeriod })}</caption>
           <thead>
             <tr className="border-b border-[var(--ink)] text-[9.5px] uppercase tracking-[0.05em] text-[var(--muted)]">
-              <th className="px-2 py-3 font-semibold">წელი</th>
-              <th className="px-2 py-3 font-semibold">პირველწყარო / ფაილი</th>
-              <th className="px-2 py-3 font-semibold">ფორმატი</th>
-              <th className="px-2 py-3 font-semibold">ზომა</th>
-              <th className="px-2 py-3 font-semibold">ჩამოტვირთვა</th>
+              <th className="px-2 py-3 font-semibold">{message(messages, "methodology.year")}</th>
+              <th className="px-2 py-3 font-semibold">{message(messages, "methodology.file")}</th>
+              <th className="px-2 py-3 font-semibold">{message(messages, "methodology.format")}</th>
+              <th className="px-2 py-3 font-semibold">{message(messages, "methodology.size")}</th>
+              <th className="px-2 py-3 font-semibold">{message(messages, "methodology.download")}</th>
             </tr>
           </thead>
           <tbody>
@@ -131,21 +119,22 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
                 <tr key={row.source_id} data-testid="source-archive-row" className="border-b border-[var(--hairline-soft)] align-top">
                   <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{row.year}</td>
                   <td className="max-w-[320px] px-2 py-4">
-                    <span className="block font-semibold text-[var(--ink)]">{row.display_title_ka}</span>
-                    <span className="mt-1 block break-all font-[family-name:var(--font-numeric)] text-[9.5px] text-[var(--muted)]">
+                    <span className="block font-semibold text-[var(--ink)]">{row.title}</span>
+                    <span lang={/\p{Script=Georgian}/u.test(row.official_filename) ? "ka" : undefined} data-original-language="filename" data-source-id={row.source_id} className="mt-1 block break-all font-[family-name:var(--font-numeric)] text-[9.5px] text-[var(--muted)]">
                       {row.official_filename}
                     </span>
-                    <span className="mt-1 block text-[10px] text-[var(--faint)]">{row.source_organization}</span>
+                    <span className="mt-1 block text-[10px] text-[var(--faint)]">{row.publisher}</span>
+                    {row.documentLanguage ? <span className="mt-1 block text-[10px] text-[var(--faint)]">{message(messages, "methodology.documentLanguage", { language: message(messages, `methodology.language${row.documentLanguage === "ka" ? "Ka" : row.documentLanguage === "en" ? "En" : "Mul"}`) })}</span> : null}
                   </td>
                   <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{format}</td>
                   <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{formatBytes(row.byte_size)}</td>
                   <td className="px-2 py-4">
                     <a
                       href={row.downloadHref}
-                      aria-label={`${row.display_title_ka} — ${format} ჩამოტვირთვა`}
+                      aria-label={message(messages, "methodology.downloadFile", { title: row.title, format })}
                       className="font-semibold text-[var(--accent)] underline underline-offset-4 hover:text-[var(--ink)]"
                     >
-                      ჩამოტვირთვა ↓
+                      {message(messages, "methodology.downloadArrow")}
                     </a>
                   </td>
                 </tr>
@@ -154,7 +143,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
             {filteredRows.length === 0 ? (
               <tr>
                 <td colSpan={5} data-testid="source-archive-empty" className="py-12 text-center text-[13px] text-[var(--muted)]">
-                  ვერაფერი მოიძებნა
+                  {message(messages, "methodology.empty")}
                 </td>
               </tr>
             ) : null}
@@ -163,17 +152,17 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
       </div>
 
       <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-[11px]">
-        <span className="text-[var(--muted)]">მანიფესტი:</span>
+        <span className="text-[var(--muted)]">{message(messages, "methodology.manifest")}</span>
         <a
           href={`/downloads/methodology/${datasetId}/manifest.csv`}
-          aria-label="პირველწყაროების მანიფესტი — CSV ჩამოტვირთვა"
+          aria-label={message(messages, "methodology.manifestDownload", { format: "CSV" })}
           className="text-[var(--accent)] underline underline-offset-4"
         >
           CSV ↓
         </a>
         <a
           href={`/downloads/methodology/${datasetId}/manifest.json`}
-          aria-label="პირველწყაროების მანიფესტი — JSON ჩამოტვირთვა"
+          aria-label={message(messages, "methodology.manifestDownload", { format: "JSON" })}
           className="text-[var(--accent)] underline underline-offset-4"
         >
           JSON ↓

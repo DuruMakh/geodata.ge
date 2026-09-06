@@ -3,6 +3,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { MethodologyArticle } from "../../components/methodology/methodology-article";
 import { METHODOLOGY_CONTENT } from "../../lib/methodology/catalog";
+import common from "../../lib/i18n/messages/ka/common.json";
+import methodology from "../../lib/i18n/messages/ka/methodology.json";
 
 const archiveSummary = {
   fileCount: 1,
@@ -13,6 +15,8 @@ const archiveSummary = {
 
 function renderArticle(dataset: "debt" | "expenditure") {
   return renderToStaticMarkup(createElement(MethodologyArticle, {
+    locale: "ka",
+    messages: { ...common, ...methodology },
     content: METHODOLOGY_CONTENT[dataset],
     coverage: dataset === "debt" ? { firstYear: 2013, lastYear: 2030 } : { firstYear: 2004, lastYear: 2025 },
     rows: [],
@@ -25,8 +29,8 @@ function renderArticle(dataset: "debt" | "expenditure") {
       dataset === "debt"
         ? []
         : [
-            { href: "/downloads/data/national-expenditure.json", labelKa: "სახელმწიფო ხარჯები" },
-            { href: "/downloads/data/ministries.json", labelKa: "უწყებები და პროგრამები" },
+            { href: "/downloads/data/national-expenditure.json", label: "სახელმწიფო ხარჯები" },
+            { href: "/downloads/data/ministries.json", label: "უწყებები და პროგრამები" },
           ],
     breadcrumbItems: [],
   }));

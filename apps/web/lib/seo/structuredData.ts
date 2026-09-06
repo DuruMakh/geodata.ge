@@ -5,7 +5,7 @@ export type BreadcrumbItem = {
 
 export type DatasetJsonLdInput = {
   origin: string;
-  path: `/methodology/${string}`;
+  path: `/methodology/${string}` | `/en/methodology/${string}`;
   name: string;
   description: string;
   firstYear: number;
@@ -88,7 +88,7 @@ export function breadcrumbJsonLd(origin: string, items: readonly BreadcrumbItem[
 
 export function dataCatalogJsonLd(
   origin: string,
-  datasetPaths: readonly `/methodology/${string}`[],
+  datasetPaths: readonly (`/methodology/${string}` | `/en/methodology/${string}`)[],
 ) {
   return {
     "@context": "https://schema.org",

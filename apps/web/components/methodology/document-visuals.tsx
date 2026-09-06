@@ -1,10 +1,12 @@
+import { message } from "../../lib/i18n/messages";
+import type { Messages } from "../../lib/i18n/types";
 const LINEAGE = "SOURCE → METHOD → CHECK → DATA";
 
-export function OpenDocumentVisual() {
+export function OpenDocumentVisual({ messages }: { messages: Messages }) {
   return (
     <figure
       role="img"
-      aria-label="ღია დოკუმენტი, რომელიც პირველწყაროდან შემოწმებულ მონაცემებამდე გზას აჩვენებს"
+      aria-label={message(messages, "methodology.openDocument")}
       className="m-0 text-[var(--ink)]"
     >
       <svg aria-hidden="true" viewBox="0 0 560 350" className="block h-auto w-full">
@@ -28,11 +30,11 @@ export function OpenDocumentVisual() {
   );
 }
 
-export function SourceDocumentStack() {
+export function SourceDocumentStack({ messages }: { messages: Messages }) {
   return (
     <figure
       role="img"
-      aria-label="სამი გადაფარული პირველწყაროს დოკუმენტი"
+      aria-label={message(messages, "methodology.documentStack")}
       className="m-0 text-[var(--ink)]"
     >
       <svg aria-hidden="true" viewBox="0 0 430 270" className="block h-auto w-full">

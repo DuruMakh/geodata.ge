@@ -1,4 +1,7 @@
 import path from "node:path";
+import { getMethodologyContent, LIVE_METHODOLOGY_IDS } from "../methodology/catalog";
+import { METHODOLOGY_TRANSLATION_REVIEWED_AT } from "../methodology/content/en/revisions";
+import { validateMethodologyTranslation } from "./methodology";
 import { loadEnglishCatalogue } from "./catalogue.server";
 import { loadTranslationInventory } from "./inventory.server";
 import { getMessages } from "./messages.server";
@@ -10,6 +13,9 @@ export async function checkLocalization(): Promise<{ errors: string[]; routeCoun
     loadEnglishCatalogue(path.resolve(process.cwd(), "../..")), loadTranslationInventory(),
   ]);
   const errors = validateCatalogue(catalogue, inventory);
+  for (const id of LIVE_METHODOLOGY_IDS) {
+    errors.push(...validateMethodologyTranslation(getMethodologyContent(id, "ka"), getMethodologyContent(id, "en"), METHODOLOGY_TRANSLATION_REVIEWED_AT[id]));
+  }
   for (const scope of MESSAGE_SCOPES) {
     const [ka, en] = await Promise.all([getMessages("ka", [scope]), getMessages("en", [scope])]);
     errors.push(...validateMessages(ka, en).map((error) => `${scope}: ${error}`));

@@ -197,7 +197,7 @@ expect(workbook.worksheets.map(sheet => sheet.name)).toEqual(['Summary', 'Data',
 
 **Interfaces:** Make `MethodologyContent`/`MethodologyDecision` presentation property names language-neutral in both languages: `title`, `summary`, `disclosure`, `label`, `value`, `paragraphs`, `group`, `detail`, and `statusLabel` replace corresponding `*Ka` names. Status display labels can be either language; stable decision IDs/classification mapping retain meaning. Keep all current structural/data fields. Export `getMethodologyContent(dataset: MethodologyDatasetId, locale: Locale): MethodologyContent`, `renderMethodologyHub(locale)`, and `renderMethodologyArticle(dataset, locale)` from their owners; page renderers return `Promise<React.ReactElement>`. `methodologyPageMetadata(dataset: MethodologyDatasetId | null, locale: Locale): Promise<Metadata>` serves both hub and detail wrappers.
 
-- [ ] Add a structural coverage test across the four current subjects, including hidden groups and technical appendices. Compare decision IDs, canonical references, section IDs/kinds, coverage source, archive identity, and key-fact value kinds; compare English prose separately.
+- [x] Add a structural coverage test across the four current subjects, including hidden groups and technical appendices. Compare decision IDs, canonical references, section IDs/kinds, coverage source, archive identity, and key-fact value kinds; compare English prose separately.
 
 ```ts
 for (const dataset of LIVE_METHODOLOGY_IDS) {
@@ -218,8 +218,8 @@ for (const dataset of LIVE_METHODOLOGY_IDS) {
 }
 ```
 
-- [ ] Confirm failure, then rename Georgian presentation fields without changing their values, author the full English parallel content, and implement language selection in `catalog.ts`. Preserve every limitation and source distinction. Translate `hiddenDecisionGroups` consistently with each English decision's `group` label, and assert the same visible/hidden decision IDs and group memberships in both languages so translated labels cannot merge or expose groups accidentally. Register each dataset's translation review date; do not update it merely because code rebuilds.
-- [ ] Localize archive search, filters, counts, download affordances, original-file descriptions, source-organization names, archive labels, document-visual captions, disclosure labels, and accessibility text. Search both reviewed names while displaying the selected language. Join translations by manifest/document IDs, never by display strings. Retain original manifest files byte-for-byte.
+- [x] Confirm failure, then rename Georgian presentation fields without changing their values, author the full English parallel content, and implement language selection in `catalog.ts`. Preserve every limitation and source distinction. Translate `hiddenDecisionGroups` consistently with each English decision's `group` label, and assert the same visible/hidden decision IDs and group memberships in both languages so translated labels cannot merge or expose groups accidentally. Register each dataset's translation review date; do not update it merely because code rebuilds.
+- [x] Localize archive search, filters, counts, download affordances, original-file descriptions, source-organization names, archive labels, document-visual captions, disclosure labels, and accessibility text. Search both reviewed names while displaying the selected language. Join translations by manifest/document IDs, never by display strings. Retain original manifest files byte-for-byte.
 
 ```tsx
 const content = getMethodologyContent(dataset, locale);
@@ -235,10 +235,12 @@ return <MethodologyArticle
 ```
 
 The seven supporting values above come from the existing methodology page's data assembly, moved into the shared renderer. Keep its source/archive inputs. Rename `processedDataJsonLinks[].labelKa` to neutral `label` at the component boundary and resolve it in the page's language.
-- [ ] Mark retained original-language fragments with `lang="ka"` and a specific `data-original-language` attribute; accompany them with English explanation. Verify document language from originals or retain an unknown label. Do not imply the original file is an official English translation. Keep download paths, hashes, role distinctions, and licensing obligations.
-- [ ] Run `npx vitest run tests/i18n/methodologyCoverage.test.ts tests/methodology`, focused browser coverage, `npm run i18n:check`, and `npm run typecheck`. Commit with `feat: translate methodology and original-source descriptions`.
+- [x] Mark retained original-language fragments with `lang="ka"` and a specific `data-original-language` attribute; accompany them with English explanation. Verify document language from originals or retain an unknown label. Do not imply the original file is an official English translation. Keep download paths, hashes, role distinctions, and licensing obligations.
+- [x] Run `npx vitest run tests/i18n/methodologyCoverage.test.ts tests/methodology`, focused browser coverage, `npm run i18n:check`, and `npm run typecheck`. Commit with `feat: translate methodology and original-source descriptions`.
 
 **Done:** the expenditure vertical slice includes English explanations, originals, and a working workbook. Complete an A2 expenditure example before extending all remaining families, as specified in the master sequence.
+
+> W4 verified on 2026-09-06: full check passed 170 files / 1,676 tests; 172 focused translation/methodology tests and all 33 methodology browser tests passed. Four complete English articles retain the same section/decision IDs, canonical references, figures, status meanings, hidden groups and original review dates; separate English translation reviews are dated 2026-09-06. Build-time validation rejects missing text and changed figures/codes/classifications. All five English methodology pages render without JavaScript. Archive descriptions join by document ID and search both languages; original filenames, downloads and manifest bytes remain intact. Browser tests cover mobile/desktop, keyboard disclosure, anchors, filters, empty results and actual source bytes. Production build passed with 106 static-generation entries, only /mcp dynamic, and unchanged publication hashes/dataVersion. Screenshots reviewed under .tmp/bilingual/w4-*. Shared logo embedded Georgian copy remains the explicitly scheduled W8 asset task; final language-paired structured metadata remains W9.
 
 ## Task W5: Complete the single-year analysis views
 

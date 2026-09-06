@@ -1,3 +1,8 @@
+import { I18nProvider } from "../../lib/i18n/provider";
+import type { Locale } from "../../lib/i18n/types";
+import { METHODOLOGY_TRANSLATION_REVIEWED_AT } from "../../lib/methodology/content/en/revisions";
+import { message } from "../../lib/i18n/messages";
+import type { Messages } from "../../lib/i18n/types";
 import type { MethodologyArchiveSummary, MethodologyContent } from "../../lib/methodology/types";
 import type { BreadcrumbItem } from "../../lib/seo/structuredData";
 import { BreadcrumbTrail } from "../seo/breadcrumb-json-ld";
@@ -6,12 +11,14 @@ import { MethodJourney } from "./method-journey";
 import { SourceArchive, type PublicSourceManifestRow } from "./source-archive";
 
 type MethodologyArticleProps = {
+  locale: Locale;
+  messages: Messages;
   content: MethodologyContent;
   coverage: { firstYear: number; lastYear: number };
   rows: readonly PublicSourceManifestRow[];
   archiveSummary: MethodologyArchiveSummary;
   processedDataHref: `/downloads/data/${string}.csv`;
-  processedDataJsonLinks: readonly { href: `/downloads/data/${string}.json`; labelKa: string }[];
+  processedDataJsonLinks: readonly { href: `/downloads/data/${string}.json`; label: string }[];
   breadcrumbItems: readonly BreadcrumbItem[];
 };
 
@@ -20,19 +27,19 @@ function firstParagraphByKind(
   kind: MethodologyContent["sections"][number]["kind"],
   fallback: string,
 ) {
-  return content.sections.find((candidate) => candidate.kind === kind)?.paragraphsKa[0] ?? fallback;
+  return content.sections.find((candidate) => candidate.kind === kind)?.paragraphs[0] ?? fallback;
 }
 
 function sectionAnchorId(section: MethodologyContent["sections"][number]) {
   return section.kind === "archive" ? "source-archive" : section.id;
 }
 
-export function MethodologyArticle({ content, coverage, rows, archiveSummary, processedDataHref, processedDataJsonLinks, breadcrumbItems }: MethodologyArticleProps) {
+export function MethodologyArticle({ locale, messages, content, coverage, rows, archiveSummary, processedDataHref, processedDataJsonLinks, breadcrumbItems }: MethodologyArticleProps) {
   const journeyDescriptions = [
-    firstParagraphByKind(content, "archive", content.summaryKa),
-    firstParagraphByKind(content, "sources", content.summaryKa),
-    firstParagraphByKind(content, "classification", content.disclosureKa),
-    firstParagraphByKind(content, "validation", content.summaryKa),
+    firstParagraphByKind(content, "archive", content.summary),
+    firstParagraphByKind(content, "sources", content.summary),
+    firstParagraphByKind(content, "classification", content.disclosure),
+    firstParagraphByKind(content, "validation", content.summary),
   ];
 
   return (
@@ -40,22 +47,23 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
       <BreadcrumbTrail items={breadcrumbItems} />
 
       <header className="border-b-2 border-[var(--ink)] pb-10 pt-9 min-[768px]:pb-14 min-[768px]:pt-12">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">მონაცემთა ტექნიკური საველე წიგნი</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "methodology.articleOverline")}</p>
         <h1 className="mt-4 max-w-[900px] text-balance font-[family-name:var(--font-display)] text-[38px] font-semibold leading-[1.12] tracking-[-0.02em] min-[768px]:text-[52px]">
-          {content.titleKa}
+          {content.title}
         </h1>
-        <p className="mt-6 max-w-[790px] text-pretty text-[15px] leading-[1.8] text-[var(--body)]">{content.summaryKa}</p>
+        <p className="mt-6 max-w-[790px] text-pretty text-[15px] leading-[1.8] text-[var(--body)]">{content.summary}</p>
         <p className="mt-5 font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">
-          ბოლო მეთოდოლოგიური განხილვა · {content.reviewedAt}
+          {message(messages, "methodology.methodologyReviewed", { date: content.reviewedAt })}
         </p>
+        {locale === "en" ? <p className="mt-2 font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{message(messages, "methodology.translationReviewed", { date: METHODOLOGY_TRANSLATION_REVIEWED_AT[content.id] })}</p> : null}
       </header>
 
       <dl className="grid border-b border-[var(--ink)] min-[620px]:grid-cols-2 min-[1040px]:grid-cols-4">
         {content.keyFacts.map((fact) => (
-          <div key={fact.labelKa} className="border-b border-[var(--hairline)] py-5 last:border-b-0 min-[620px]:px-4 min-[1040px]:border-b-0 min-[1040px]:border-r min-[1040px]:border-[var(--hairline)] min-[1040px]:first:pl-0 min-[1040px]:last:border-r-0">
-            <dt className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{fact.labelKa}</dt>
+          <div key={fact.label} className="border-b border-[var(--hairline)] py-5 last:border-b-0 min-[620px]:px-4 min-[1040px]:border-b-0 min-[1040px]:border-r min-[1040px]:border-[var(--hairline)] min-[1040px]:first:pl-0 min-[1040px]:last:border-r-0">
+            <dt className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{fact.label}</dt>
             <dd className="mt-2 font-[family-name:var(--font-numeric)] text-[12px] leading-relaxed">
-              {fact.valueKind === "coverage" ? `${coverage.firstYear}–${coverage.lastYear}` : fact.valueKa}
+              {fact.valueKind === "coverage" ? `${coverage.firstYear}–${coverage.lastYear}` : fact.value}
             </dd>
           </div>
         ))}
@@ -68,10 +76,10 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
           download
           className="inline-flex items-center gap-2 text-[13px] font-semibold text-[var(--accent)] underline underline-offset-4"
         >
-          სრული დამუშავებული მონაცემები — CSV
+          {message(messages, "methodology.processedDownload")}
         </a>
         <p className="mt-2 text-[11.5px] leading-relaxed text-[var(--muted)]">
-          UTF-8 / Excel თავსებადი · CC BY 4.0 · წყაროსა და სტატუსის მეტამონაცემებით
+          {message(messages, "methodology.processedNote")}
         </p>
         {/* A dataset with no JSON publication would otherwise render this
             as a bare " - JSON: ..." trailer with nothing before the dash. */}
@@ -80,16 +88,16 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
           {processedDataJsonLinks.map((link, index) => (
             <span key={link.href}>
               {index > 0 ? " · " : null}
-              {/* The visible text is the reviewed Georgian name, not the Latin
+              {/* The visible text is the reviewed dataset name, not the Latin
                   file name: a link whose only accessible name is
                   "ministries.json" tells a screen-reader user nothing about
                   what they are downloading (DESIGN.md:624). */}
               <a href={link.href} download className="font-semibold text-[var(--accent)] underline underline-offset-4">
-                {link.labelKa}
+                {link.label}
               </a>
             </span>
           ))}
-          {" — JSON: წყაროებით, დათქმებითა და დაფარვით"}
+          {message(messages, "methodology.jsonNote")}
         </p>
         ) : null}
       </div>
@@ -98,13 +106,13 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
         data-testid="methodology-disclosure"
         className="my-10 border-l-2 border-[var(--accent)] bg-[var(--tint)] px-5 py-5 min-[768px]:my-14 min-[768px]:px-7"
       >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--accent)]">ოფიციალური ფაქტი და Fiscal.ge-ის მეთოდი</p>
-        <p className="mt-3 max-w-[920px] text-[13.5px] leading-[1.75] text-[var(--body)]">{content.disclosureKa}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--accent)]">{message(messages, "methodology.disclosureTitle")}</p>
+        <p className="mt-3 max-w-[920px] text-[13.5px] leading-[1.75] text-[var(--body)]">{content.disclosure}</p>
       </aside>
 
       <div className="grid gap-12 @min-[1100px]:grid-cols-[220px_minmax(0,1fr)] @min-[1100px]:gap-16">
-        <nav aria-label="გვერდის სარჩევი" className="border-t border-[var(--ink)] pt-4 @min-[1100px]:sticky @min-[1100px]:top-6 @min-[1100px]:self-start">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">სარჩევი</p>
+        <nav aria-label={message(messages, "methodology.contentsAria")} className="border-t border-[var(--ink)] pt-4 @min-[1100px]:sticky @min-[1100px]:top-6 @min-[1100px]:self-start">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{message(messages, "methodology.contents")}</p>
           <ol className="mt-3">
             {content.sections.map((section, index) => (
               <li key={section.id} className="border-b border-[var(--hairline-soft)]">
@@ -112,7 +120,7 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
                   <span className="font-[family-name:var(--font-numeric)] text-[9.5px] text-[var(--faint)]">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span>{section.titleKa}</span>
+                  <span>{section.title}</span>
                 </a>
               </li>
             ))}
@@ -131,17 +139,18 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
                 id={`${section.id}-title`}
                 className="scroll-mt-6 font-[family-name:var(--font-display)] text-[27px] font-semibold tracking-[-0.01em]"
               >
-                {section.titleKa}
+                {section.title}
               </h2>
               <div className="mt-5 max-w-[800px] space-y-4 text-[13.5px] leading-[1.8] text-[var(--body)]">
-                {section.paragraphsKa.map((paragraph) => (
+                {section.paragraphs.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
               </div>
 
-              {section.kind === "journey" ? <MethodJourney descriptionsKa={journeyDescriptions} /> : null}
+              {section.kind === "journey" ? <MethodJourney descriptions={journeyDescriptions} messages={messages} /> : null}
               {section.kind === "decisions" ? (
                 <DecisionRecord
+                  messages={messages}
                   decisions={content.decisions}
                   technicalAppendix={content.technicalAppendix}
                   hiddenGroups={content.hiddenDecisionGroups}
@@ -149,7 +158,9 @@ export function MethodologyArticle({ content, coverage, rows, archiveSummary, pr
                 />
               ) : null}
               {section.kind === "archive" ? (
-                <SourceArchive datasetId={content.archiveManifestId} datasetLabel={content.titleKa} rows={rows} summary={archiveSummary} />
+                <I18nProvider locale={locale} messages={messages}>
+                  <SourceArchive datasetId={content.archiveManifestId} datasetLabel={content.title} rows={rows} summary={archiveSummary} />
+                </I18nProvider>
               ) : null}
             </section>
           ))}

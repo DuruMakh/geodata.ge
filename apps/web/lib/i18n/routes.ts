@@ -12,6 +12,8 @@ function isPublicPage(pathname: string): boolean {
     pathname === "/methodology" || pathname.startsWith("/methodology/");
 }
 
+export function pageHref(href: `/${string}`, locale: Locale): `/${string}`;
+export function pageHref(href: string, locale: Locale): string;
 export function pageHref(href: string, locale: Locale): string {
   if (!href.startsWith("/") || href.startsWith("//")) return href;
   const suffixIndex = href.search(/[?#]/);
