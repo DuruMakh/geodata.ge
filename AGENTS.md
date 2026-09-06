@@ -90,6 +90,13 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria like "make it work" require clarification.
 
+Match the verification to the change. The narrowest command that can observe the thing you
+just edited is the feedback loop; the full gate is the done-check you run once, when you are
+about to claim the work is finished. Re-running a whole gate after every edit is not extra
+rigor — it buys no additional signal over the targeted run, and in this repository it has
+been measured as the single largest consumer of session wall clock. Never re-run a gate
+whose inputs have not changed since it last passed. `CLAUDE.md` owns which command is which.
+
 ## Project Snapshot
 
 GeoData.ge v1 is an implemented Georgian-first Georgia Budget Explorer, not a broad public-data catalog. Current route families are expenditure, revenue, municipalities, and single-year analysis under `/explorer`.
