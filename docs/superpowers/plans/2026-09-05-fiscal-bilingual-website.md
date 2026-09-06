@@ -288,7 +288,7 @@ Define `analysis.every100.title` as the unchanged Georgian title and `Every 100 
 
 **Interfaces:** `renderMunicipalIndex(locale)`, `renderMunicipalCountry(locale)`, `renderMunicipality(slug: string, locale)`, and `renderMunicipalRegion(id: string, locale)` return `Promise<React.ReactElement>`. `municipalPageMetadata(kind: 'index' | 'country' | 'municipality' | 'region', id: string | null, locale: Locale): Promise<Metadata>`. Localize the existing presentation-producing municipal functions using the optional final `Presentation` argument; aggregation and geometry functions remain unchanged.
 
-- [ ] Add model parity for a municipality, ordinary region, Adjara, and the Georgia aggregate. Cover municipality total, functions, rank, per-resident index values, null country per-resident value, and generated summaries. Add browser cases for both-language search and link continuity from the English map/index.
+- [x] Add model parity for a municipality, ordinary region, Adjara, and the Georgia aggregate. Cover municipality total, functions, rank, per-resident index values, null country per-resident value, and generated summaries. Add browser cases for both-language search and link continuity from the English map/index.
 
 ```ts
 test('finds Batumi using Georgian on the English index', async ({ page }) => {
@@ -302,8 +302,8 @@ test('finds Batumi using Georgian on the English index', async ({ page }) => {
 ```
 
 Add the stable `municipal-entity-search` test ID to the existing index search input; do not create a new search control. Keep tests for the unchanged 64-page territorial set separate from source-only aggregate identities.
-- [ ] Confirm failure, then use reviewed short/full English entity names according to context, consistent region spellings, and translated municipal functions. Where a full English name is needed, use a reviewed catalogue entry under the stable entity ID's `.official-name` display key and register that derived display key in the inventory; do not alter public entity IDs.
-- [ ] Translate complete municipality/region summary templates and existing Georgian grammatical helpers through separate English sentences. Keep fixed latest-year summaries tied to their current data year rather than the active chart range. English Adjara text must explain its six municipalities plus net republican amount and its municipal-only function rows.
+- [x] Confirm failure, then use reviewed short/full English entity names according to context, consistent region spellings, and translated municipal functions. Where a full English name is needed, use a reviewed catalogue entry under the stable entity ID's `.official-name` display key and register that derived display key in the inventory; do not alter public entity IDs.
+- [x] Translate complete municipality/region summary templates and existing Georgian grammatical helpers through separate English sentences. Keep fixed latest-year summaries tied to their current data year rather than the active chart range. English Adjara text must explain its six municipalities plus net republican amount and its municipal-only function rows.
 
 ```ts
 const summary = message(presentation.messages, 'municipal.latestSummary', {
@@ -313,10 +313,16 @@ const summary = message(presentation.messages, 'municipal.latestSummary', {
 });
 ```
 
-- [ ] Localize map legend and hover/focus descriptions, index KPIs, ranking suffixes, entity pickers, function selectors, compare/mover text, source dates, and the W3 workbook input. Preserve territory overlays as currently non-interactive/unlabelled, geometry, fills, rankings, default totals, and per-resident scope.
-- [ ] Run municipal model/metadata tests, all four existing municipal browser families plus the new bilingual test, `npm run typecheck`, and `npm run i18n:check`. Commit with `feat: complete English municipal and regional explorers`.
+- [x] Localize map legend and hover/focus descriptions, index KPIs, ranking suffixes, entity pickers, function selectors, compare/mover text, source dates, and the W3 workbook input. Preserve territory overlays as currently non-interactive/unlabelled, geometry, fills, rankings, default totals, and per-resident scope.
+- [x] Run municipal model/metadata tests, all four existing municipal browser families plus the new bilingual test, `npm run typecheck`, and `npm run i18n:check`. Commit with `feat: complete English municipal and regional explorers`.
 
 **Done:** every public municipal route has a complete English counterpart and unchanged accounting/territorial behaviour.
+
+> W6 verified on 2026-09-06: full check passed 174 files / 1,702 tests, including unchanged AI financial references and all municipal model/metadata tests. All 112 municipal browser tests passed on the final production build, including the four original families, initial English HTML, both-language search, map and keyboard picker navigation, regional view continuity, fixed latest-year summaries, selected-range values and eight real Excel downloads. Municipality, ordinary-region, Adjara and country workbooks preserve numeric cells, missing/text structure and source URLs/periods/dates. Copies are retained under .tmp/bilingual/w6-workbooks. The 64-place territorial set, 11 regions, 69-budget country total, net Adjara consolidation, per-resident scope and original data/archive hashes are unchanged.
+
+> The navigation check exposed an existing initial-load history problem: the index wrote a null history entry before the router installed its history wrapper. The index now preserves that entry; real Back/Forward checks pass in Georgian and English. The existing municipal-search test ID was retained instead of replacing it with the illustrative plan name. Map calculations/geometry remain untouched; display labels are resolved in the map component. Shared renderers are split by page family behind the planned municipal entry point.
+
+> Final build uses NEXT_PUBLIC_SITE_URL=https://fiscal.ge and passed with 184 static-generation entries, including all 77 English municipal routes; only /mcp is dynamic. All ten publication hashes passed and dataVersion remains a6c927f06f86396992ed7afd5fc0aae3accfc83700f3213fc28ddcbc7c1ceeff. The first browser run exposed a local build-origin mismatch in six old workbook assertions; the correctly configured rebuild passed all of them. Desktop/mobile captures were reviewed under .tmp/bilingual/w6-*. Preview: http://127.0.0.1:3217/en/explorer/municipalities. Final paired search/social metadata remains W9.
 
 ## Task W7: Complete debt and deficit pages
 

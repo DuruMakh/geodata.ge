@@ -1,6 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
+import { publicLabel } from "../../lib/i18n/labels";
+import { matchesLabelQuery } from "../../lib/i18n/search";
+import { pageHref } from "../../lib/i18n/routes";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { MUNICIPAL_COUNTRY_ID } from "../../lib/data/municipal/types";
@@ -69,6 +75,7 @@ function focusTrigger() {
 }
 
 export function EntityPicker({ open, onClose, country, groups, activeId }: EntityPickerProps) {
+  const { locale, messages, englishLabels } = useI18n();
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [activeOptionId, setActiveOptionId] = useState<string | null>(null);
@@ -129,11 +136,11 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
     if (needle === "") return groups;
 
     return groups
-      .map((group) => ({ ...group, members: group.members.filter((member) => member.nameKa.includes(needle)) }))
-      .filter((group) => group.members.length > 0 || group.nameKa.includes(needle));
-  }, [groups, query]);
+      .map((group) => ({ ...group, members: group.members.filter((member) => matchesLabelQuery(needle, [member.nameKa, publicLabel("en", member.code, member.nameKa, englishLabels)])) }))
+      .filter((group) => group.members.length > 0 || matchesLabelQuery(needle, [group.nameKa, publicLabel("en", group.regionId, group.nameKa, englishLabels)]));
+  }, [groups, query, englishLabels]);
 
-  const filteredCountry = useMemo(() => (country.nameKa.includes(query.trim()) ? country : null), [country, query]);
+  const filteredCountry = useMemo(() => (matchesLabelQuery(query, [country.nameKa, publicLabel("en", country.id, country.nameKa, englishLabels)]) ? country : null), [country, query, englishLabels]);
 
   const flatOptions = useMemo<PickerOption[]>(() => {
     const list: PickerOption[] = [];
@@ -157,9 +164,9 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
 
   function selectOption(option: PickerOption) {
     onClose();
-    if (option.kind === "country") router.push(municipalEntityHref("country", country.id));
-    else if (option.kind === "region") router.push(municipalEntityHref("region", option.regionId));
-    else router.push(municipalEntityHref("municipality", option.code));
+    if (option.kind === "country") router.push(pageHref(municipalEntityHref("country", country.id), locale));
+    else if (option.kind === "region") router.push(pageHref(municipalEntityHref("region", option.regionId), locale));
+    else router.push(pageHref(municipalEntityHref("municipality", option.code), locale));
   }
 
   function moveActive(delta: 1 | -1) {
@@ -189,7 +196,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
       />
       <div
         role="dialog"
-        aria-label="აირჩიე საქართველო, მუნიციპალიტეტი ან რეგიონი"
+        aria-label={message(messages, "municipal.pickerTitle")}
         data-testid="entity-picker"
         className="absolute top-1 left-0 z-40 w-[430px] max-w-[92vw] border border-[var(--control)] bg-[var(--tile)]"
       >
@@ -220,15 +227,15 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                 onClose();
               }
             }}
-            placeholder="ძებნა — საქართველო, მუნიციპალიტეტი ან რეგიონი"
-            aria-label="ძებნა საქართველოში, მუნიციპალიტეტებში ან რეგიონებში"
+            placeholder={message(messages, "municipal.pickerPlaceholder")}
+            aria-label={message(messages, "municipal.pickerSearch")}
             className="h-[34px] w-full rounded-[3px] border border-[var(--control)] bg-[var(--paper)] px-2.5 text-[13px] text-[var(--ink)] outline-none"
           />
         </div>
-        <div id={listboxId} role="listbox" aria-label="საქართველოს, მუნიციპალიტეტებისა და რეგიონების შედეგები" className="max-h-[340px] overflow-y-auto">
+        <div id={listboxId} role="listbox" aria-label={message(messages, "municipal.pickerResults")} className="max-h-[340px] overflow-y-auto">
           {filteredCountry ? (
             <Link
-              href={municipalEntityHref("country", country.id)}
+              href={pageHref(municipalEntityHref("country", country.id), locale)}
               id={countryOptionId(baseId)}
               role="option"
               aria-selected={countryOptionId(baseId) === activeOptionId}
@@ -240,9 +247,9 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                 countryOptionId(baseId) === activeOptionId ? "border-l-[var(--ink)]" : "border-l-transparent"
               } ${country.id === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
             >
-              <span className="truncate text-[12px] font-semibold">{country.nameKa}</span>
+              <span className="truncate text-[12px] font-semibold">{publicLabel(locale, country.id, country.nameKa, englishLabels)}</span>
               <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-                {formatAmount(country.valueGel)} · {country.budgetCount} მუნიციპალური ბიუჯეტი
+                {message(messages, "municipal.pickerCountry", { amount: formatAmount(country.valueGel, locale), count: country.budgetCount })}
               </span>
             </Link>
           ) : null}
@@ -253,7 +260,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
             return (
               <div key={group.regionId}>
                 <Link
-                  href={municipalEntityHref("region", group.regionId)}
+                  href={pageHref(municipalEntityHref("region", group.regionId), locale)}
                   id={regionId}
                   role="option"
                   aria-selected={regionActive}
@@ -265,9 +272,9 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                     regionActive ? "border-l-[var(--ink)]" : "border-l-transparent"
                   } ${group.regionId === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
                 >
-                  <span className="truncate text-[12px] font-semibold">{group.nameKa}</span>
+                  <span className="truncate text-[12px] font-semibold">{publicLabel(locale, group.regionId, group.nameKa, englishLabels)}</span>
                   <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-                    {formatAmount(group.valueGel)} · {group.members.length}
+                    {formatAmount(group.valueGel, locale)} · {group.members.length}
                   </span>
                 </Link>
                 {group.members.map((member) => {
@@ -277,7 +284,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                   return (
                     <Link
                       key={member.code}
-                      href={municipalEntityHref("municipality", member.code)}
+                      href={pageHref(municipalEntityHref("municipality", member.code), locale)}
                       id={memberId}
                       role="option"
                       aria-selected={memberActive}
@@ -289,9 +296,9 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                         memberActive ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"
                       } ${member.code === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
                     >
-                      <span className="truncate text-[13px]">{member.nameKa}</span>
+                      <span className="truncate text-[13px]">{publicLabel(locale, member.code, member.nameKa, englishLabels)}</span>
                       <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                        {formatAmount(member.valueGel)}
+                        {formatAmount(member.valueGel, locale)}
                       </span>
                     </Link>
                   );
@@ -305,7 +312,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
             forward Tab from the combobox reaches this sibling action. */}
         {flatOptions.length === 0 ? (
           <div data-testid="picker-empty" className="px-3 py-[26px] text-center">
-            <div role="status" className="text-[13px] text-[var(--body)]">ვერაფერი მოიძებნა</div>
+            <div role="status" className="text-[13px] text-[var(--body)]">{message(messages, "municipal.empty")}</div>
             <button
               type="button"
               onKeyDown={(event) => {
@@ -319,12 +326,12 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
               }}
               className="mt-3 inline-flex h-[30px] cursor-pointer items-center rounded-[3px] border border-[var(--control)] px-3 text-[12px] text-[var(--accent)]"
             >
-              ძებნის გასუფთავება
+              {message(messages, "municipal.clearSearch")}
             </button>
           </div>
         ) : null}
         <div className="border-t border-[var(--hairline-soft)] px-3 py-2 text-[11px] text-[var(--faint)]">
-          საქართველოს ან რეგიონის დაჭერა აჩვენებს მის ჯამურ მონაცემებს
+          {message(messages, "municipal.pickerHint")}
         </div>
       </div>
     </div>

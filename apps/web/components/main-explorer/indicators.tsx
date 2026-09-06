@@ -21,7 +21,6 @@ type IndicatorsProps = {
   scope: ExplorerScope;
 };
 
-export const NO_PERIOD_NOTE = "ერთწლიან პერიოდში ცვლილება არ იზომება — აირჩიე ერთ წელზე მეტი დიაპაზონი.";
 
 const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
   fields: "main.field",

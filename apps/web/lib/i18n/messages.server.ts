@@ -9,6 +9,7 @@ const dictionaries = {
     workbook: () => import("./messages/ka/workbook.json"),
     methodology: () => import("./messages/ka/methodology.json"),
     analysis: () => import("./messages/ka/analysis.json"),
+    municipal: () => import("./messages/ka/municipal.json"),
   },
   en: {
     common: () => import("./messages/en/common.json"),
@@ -18,6 +19,7 @@ const dictionaries = {
     workbook: () => import("./messages/en/workbook.json"),
     methodology: () => import("./messages/en/methodology.json"),
     analysis: () => import("./messages/en/analysis.json"),
+    municipal: () => import("./messages/en/municipal.json"),
   },
 } satisfies Record<Locale, Record<MessageScope, () => Promise<{ default: Messages }>>>;
 

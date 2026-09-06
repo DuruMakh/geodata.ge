@@ -1197,12 +1197,12 @@ describe("buildMunicipalIndicatorPresentation", () => {
 
 describe("buildMovers", () => {
   it("ranks the fastest growers first", () => {
-    expect(buildMovers(build()).up[0]!.kaLabel).toBe("ეკონომიკური საქმიანობა");
+    expect(buildMovers(build()).up[0]!.label).toBe("ეკონომიკური საქმიანობა");
   });
 
   it("keeps a shrinking series in the slow-growth column, never called a loss", () => {
     const down = buildMovers(build()).down;
-    expect(down[0]!.kaLabel).toBe("ჯანმრთელობის დაცვა");
+    expect(down[0]!.label).toBe("ჯანმრთელობის დაცვა");
     expect(down[0]!.growth).toBeLessThan(0);
   });
 
@@ -1223,8 +1223,8 @@ describe("buildMovers", () => {
     });
     const movers = buildMovers(model);
 
-    expect(movers.down[0]!.kaLabel).toBe("ჯანმრთელობის დაცვა");
-    expect([...movers.up, ...movers.down].some((row) => row.kaLabel === "განათლება")).toBe(false);
+    expect(movers.down[0]!.label).toBe("ჯანმრთელობის დაცვა");
+    expect([...movers.up, ...movers.down].some((row) => row.label === "განათლება")).toBe(false);
   });
 });
 
@@ -1232,7 +1232,7 @@ describe("buildComparisonRows", () => {
   it("puts the total first, then functions by end-year size", () => {
     const rows = buildComparisonRows(build());
     expect(rows[0]!.isTotal).toBe(true);
-    expect(rows.slice(1).map((row) => row.kaLabel)).toEqual([
+    expect(rows.slice(1).map((row) => row.label)).toEqual([
       "ეკონომიკური საქმიანობა",
       "განათლება",
       "ჯანმრთელობის დაცვა",
@@ -1240,7 +1240,7 @@ describe("buildComparisonRows", () => {
   });
 
   it("reports both the absolute and relative change", () => {
-    const economic = buildComparisonRows(build()).find((row) => row.kaLabel === "ეკონომიკური საქმიანობა")!;
+    const economic = buildComparisonRows(build()).find((row) => row.label === "ეკონომიკური საქმიანობა")!;
     expect(economic.fromGel).toBe(100);
     expect(economic.toGel).toBe(300);
     expect(economic.changeGel).toBe(200);

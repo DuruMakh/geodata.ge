@@ -9,6 +9,9 @@ import {
   type MunicipalTotalFact,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
+import { message } from "../i18n/messages";
+import { publicLabel } from "../i18n/labels";
+import type { Presentation, TemplateValues } from "../i18n/types";
 import type { ExplorerTableRow } from "./types";
 import { colorForItem, INK } from "./colors";
 import { formatAmount, formatAmountParts, formatPerResidentGel, formatShare, MISSING } from "./format";
@@ -77,7 +80,7 @@ function changeBetween(start: number | null, end: number | null): number | null 
   return (end - start) / start;
 }
 
-export function buildMunicipalEntityModel(input: MunicipalEntityInput): MunicipalEntityModel {
+export function buildMunicipalEntityModel(input: MunicipalEntityInput, presentation?: Presentation): MunicipalEntityModel {
   const { functions, functionFacts, totalFacts, startYear, endYear } = input;
 
   const years = Array.from(new Set(totalFacts.map((row) => row.year)))
@@ -121,7 +124,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
       parentItemId: null,
       level: "municipal_function",
       kaLabel: fn.kaLabel,
-      enLabel: "",
+      enLabel: presentation ? publicLabel("en", fn.id, fn.kaLabel, presentation.englishLabels) : "",
       color: colorForItem(fn.id, index),
       basisByYear,
       valuesByYear,
@@ -144,7 +147,7 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput): Municipa
     parentItemId: null,
     level: "total",
     kaLabel: "მთლიანი ბიუჯეტი",
-    enLabel: "Total",
+    enLabel: presentation ? publicLabel("en", MUNICIPAL_TOTAL_ITEM_ID, "მთლიანი ბიუჯეტი", presentation.englishLabels) : "Total",
     color: INK,
     basisByYear: totalBasisByYear,
     valuesByYear: totalValuesByYear,
@@ -376,7 +379,18 @@ export function buildCountryTotalByYear(totalFacts: MunicipalTotalFact[]): Recor
 /**
  * The four index KPIs. The third uses the reviewed 2025 population panel.
  */
-export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
+// Legacy callers keep their original Georgian copy. Public page callers supply
+// scoped messages; the shared numerical helpers load no UI dictionaries.
+function textFor(presentation: Presentation | undefined, key: string, originalKa: string, values?: TemplateValues): string {
+  return presentation ? message(presentation.messages, key, values) : originalKa;
+}
+
+function displayedLabel(presentation: Presentation | undefined, id: string, originalKa: string): string {
+  return presentation ? publicLabel(presentation.locale, id, originalKa, presentation.englishLabels) : originalKa;
+}
+
+export function buildIndexKpis(input: MunicipalIndexKpiInput, presentation?: Presentation): MunicipalKpi[] {
+  const locale = presentation?.locale ?? "ka";
   const { municipalities, totalFacts, populationFacts, countryTotalFacts, countryFunctionFacts, functions, firstYear, comparisonYear, latestYear } = input;
   const countryTotalByYear = buildCountryTotalByYear(countryTotalFacts);
 
@@ -399,36 +413,36 @@ export function buildIndexKpis(input: MunicipalIndexKpiInput): MunicipalKpi[] {
     byFunction.set(row.categoryId, (byFunction.get(row.categoryId) ?? 0) + row.amountGel);
   }
   const topFunction = Array.from(byFunction.entries()).sort((left, right) => right[1] - left[1])[0];
-  const topFunctionLabel = functions.find((fn) => fn.id === topFunction?.[0])?.kaLabel ?? "";
+  const topFunctionLabel = topFunction ? displayedLabel(presentation, topFunction[0], functions.find((fn) => fn.id === topFunction[0])?.kaLabel ?? "") : "";
 
   return [
     {
-      label: "მუნიციპალური ხარჯი",
-      value: formatAmount(latestTotal),
-      detail: `${latestYear} · ${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური საბიუჯეტო ერთეული`,
+      label: textFor(presentation, "municipal.expenditure", "მუნიციპალური ხარჯი"),
+      value: formatAmount(latestTotal, locale),
+      detail: textFor(presentation, "municipal.budgetUnits", `${latestYear} · ${MUNICIPAL_COUNTRY_BUDGET_COUNT} მუნიციპალური საბიუჯეტო ერთეული`, { year: latestYear, count: MUNICIPAL_COUNTRY_BUDGET_COUNT }),
     },
     {
-      label: `ზრდა ${firstYear}-დან`,
+      label: textFor(presentation, "municipal.growthSince", `ზრდა ${firstYear}-დან`, { year: firstYear }),
       value: growth === null ? MISSING : formatShare(growth, true, 0),
-      detail: `${formatAmount(firstTotal)} → ${formatAmount(latestTotal)}`,
+      detail: `${formatAmount(firstTotal, locale)} → ${formatAmount(latestTotal, locale)}`,
     },
     {
-      label: "მედიანური ბიუჯეტი ერთ მოსახლეზე",
-      value: formatPerResidentGel(medianPerResident),
-      detail: `${comparisonYear} · ${municipalities.length} მუნიციპალიტეტი`,
+      label: textFor(presentation, "municipal.medianPerResident", "მედიანური ბიუჯეტი ერთ მოსახლეზე"),
+      value: formatPerResidentGel(medianPerResident, locale),
+      detail: textFor(presentation, "municipal.municipalityYearCount", `${comparisonYear} · ${municipalities.length} მუნიციპალიტეტი`, { year: comparisonYear, count: municipalities.length }),
     },
     {
-      label: "უმსხვილესი სფერო",
+      label: textFor(presentation, "municipal.largestField", "უმსხვილესი სფერო"),
       value: latestTotal > 0 && topFunction ? formatShare(topFunction[1] / latestTotal) : MISSING,
       detail: topFunctionLabel,
     },
   ];
 }
 
-export type MunicipalMover = { rank: number; kaLabel: string; growth: number | null; color: string };
+export type MunicipalMover = { rank: number; label: string; growth: number | null; color: string };
 
 export type MunicipalComparisonRow = {
-  kaLabel: string;
+  label: string;
   color: string;
   isTotal: boolean;
   fromGel: number | null;
@@ -516,42 +530,43 @@ export type MunicipalKpiSet = {
  * The three cards every municipal view shares. Only the fourth — standing —
  * differs: entity pages show rank, the country page shows the budget count.
  */
-function buildSharedMunicipalKpis(model: MunicipalEntityModel): Omit<MunicipalKpiSet, "standing"> {
+function buildSharedMunicipalKpis(model: MunicipalEntityModel, presentation?: Presentation): Omit<MunicipalKpiSet, "standing"> {
+  const locale = presentation?.locale ?? "ka";
   const startYear = model.years[0];
   const endYear = model.years.at(-1);
   const officialStart = startYear === undefined ? null : model.totalRow.valuesByYear[startYear] ?? null;
   const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
-  const officialEndParts = formatAmountParts(officialEnd);
+  const officialEndParts = formatAmountParts(officialEnd, false, locale);
   const growth = changeBetween(officialStart, officialEnd);
   const largest = sortedByEndYear(model.rows, endYear)[0];
   const largestValue = largest && endYear !== undefined ? largest.valuesByYear[endYear] ?? 0 : 0;
 
   return {
     official: {
-      label: "ოფიციალური ბიუჯეტი",
+      label: textFor(presentation, "municipal.officialBudget", "ოფიციალური ბიუჯეტი"),
       value: officialEndParts.num,
       unit: officialEndParts.unit,
-      detail: `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`,
+      detail: textFor(presentation, "municipal.officialBudgetYear", `${endYear ?? ""} · ფინანსთა სამინისტროს ჯამი`, { year: endYear ?? "" }),
     },
     growth: {
-      label: `ზრდა ${startYear ?? ""}-დან`,
+      label: textFor(presentation, "municipal.growthSince", `ზრდა ${startYear ?? ""}-დან`, { year: startYear ?? "" }),
       // MISSING and the U+2212 minus come from format.ts — never hand-write
       // either (Global Constraints). formatShare's third argument is the
       // decimal count, so a 0-decimal signed percent does not have to build its
       // own sign. Zero growth renders "0%", not "+0%".
       value: growth === null ? MISSING : formatShare(growth, true, 0),
-      detail: `${formatAmount(officialStart)} → ${formatAmount(officialEnd)}`,
+      detail: `${formatAmount(officialStart, locale)} → ${formatAmount(officialEnd, locale)}`,
     },
     largestField: {
-      label: "უმსხვილესი სფერო",
+      label: textFor(presentation, "municipal.largestField", "უმსხვილესი სფერო"),
       value: officialEnd ? formatShare(largestValue / officialEnd) : MISSING,
-      detail: largest?.kaLabel ?? "",
+      detail: largest ? displayedLabel(presentation, largest.itemId, largest.kaLabel) : "",
     },
   };
 }
 
 /** The four entity KPIs, for both municipality and region pages. */
-export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpiSet {
+export function buildEntityKpis(input: MunicipalEntityKpiInput, presentation?: Presentation): MunicipalKpiSet {
   const { model, nationalTotalByYear } = input;
   const endYear = model.years.at(-1);
   const officialEnd = endYear === undefined ? null : model.totalRow.valuesByYear[endYear] ?? null;
@@ -559,27 +574,27 @@ export function buildEntityKpis(input: MunicipalEntityKpiInput): MunicipalKpiSet
   const rank = endYear === undefined ? 0 : input.rankByYear[endYear] ?? 0;
 
   return {
-    ...buildSharedMunicipalKpis(model),
+    ...buildSharedMunicipalKpis(model, presentation),
     standing: {
-      label: "წილი მუნიციპალურ ხარჯებში",
+      label: textFor(presentation, "municipal.municipalShare", "წილი მუნიციპალურ ხარჯებში"),
       value: nationalEnd > 0 && officialEnd !== null ? formatShare(officialEnd / nationalEnd) : MISSING,
       // `detail` is this municipality's ordinal rank for the selected period.
       // The index has a separate fixed-2025 per-resident comparison, so this
       // selected-range KPI remains rank rather than implying population
       // coverage across every year in the range.
-      detail: `${georgianOrdinal(rank)} ადგილი ${input.rankOutOf}-დან`,
+      detail: textFor(presentation, "municipal.standing", `${georgianOrdinal(rank)} ადგილი ${input.rankOutOf}-დან`, { rank: presentation?.locale === "en" ? rank : georgianOrdinal(rank), count: input.rankOutOf }),
     },
   };
 }
 
 /** The country view has no rank because it is the aggregate denominator itself. */
-export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: number): MunicipalKpiSet {
+export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: number, presentation?: Presentation): MunicipalKpiSet {
   return {
-    ...buildSharedMunicipalKpis(model),
+    ...buildSharedMunicipalKpis(model, presentation),
     standing: {
-      label: "მუნიციპალური ბიუჯეტები",
+      label: textFor(presentation, "municipal.countryBudgetLabel", "მუნიციპალური ბიუჯეტები"),
       value: String(budgetCount),
-      detail: `${MUNICIPAL_PUBLIC_PAGE_COUNT} საჯარო გვერდი · ${MUNICIPAL_AGGREGATE_ONLY_COUNT} მხოლოდ საქართველოს ჯამში`,
+      detail: textFor(presentation, "municipal.countryStanding", `${MUNICIPAL_PUBLIC_PAGE_COUNT} საჯარო გვერდი · ${MUNICIPAL_AGGREGATE_ONLY_COUNT} მხოლოდ საქართველოს ჯამში`, { publicCount: MUNICIPAL_PUBLIC_PAGE_COUNT, aggregateCount: MUNICIPAL_AGGREGATE_ONLY_COUNT }),
     },
   };
 }
@@ -588,13 +603,13 @@ export function buildCountryKpis(model: MunicipalEntityModel, budgetCount: numbe
  * Growth board (DESIGN.md §7.13). The bottom column is ყველაზე ნელი ზრდა even
  * when a row is shrinking — never call growth a loss.
  */
-export function buildMovers(model: MunicipalEntityModel): { up: MunicipalMover[]; down: MunicipalMover[] } {
+export function buildMovers(model: MunicipalEntityModel, presentation?: Presentation): { up: MunicipalMover[]; down: MunicipalMover[] } {
   const startYear = model.years[0];
   const endYear = model.years.at(-1);
 
   const growth = model.rows
     .map((row) => ({
-      kaLabel: row.kaLabel,
+      label: displayedLabel(presentation, row.itemId, row.kaLabel),
       color: row.color,
       growth: changeBetween(
         startYear === undefined ? null : row.valuesByYear[startYear] ?? null,
@@ -610,7 +625,7 @@ export function buildMovers(model: MunicipalEntityModel): { up: MunicipalMover[]
 }
 
 /** პერიოდის შედარება: the total, then every function by end-year size. */
-export function buildComparisonRows(model: MunicipalEntityModel): MunicipalComparisonRow[] {
+export function buildComparisonRows(model: MunicipalEntityModel, presentation?: Presentation): MunicipalComparisonRow[] {
   const startYear = model.years[0];
   const endYear = model.years.at(-1);
 
@@ -619,7 +634,7 @@ export function buildComparisonRows(model: MunicipalEntityModel): MunicipalCompa
     const toGel = endYear === undefined ? null : source.valuesByYear[endYear] ?? null;
 
     return {
-      kaLabel: source.kaLabel,
+      label: displayedLabel(presentation, source.itemId, source.kaLabel),
       color: source.color,
       isTotal,
       fromGel,
