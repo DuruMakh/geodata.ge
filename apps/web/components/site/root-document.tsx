@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Sans_Georgian, Noto_Serif_Georgian } from "next/font/google";
 import type { ReactNode } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { JsonLd } from "../seo/json-ld";
 import { SiteAnalytics } from "./site-analytics";
 import { resolveSiteUrl } from "../../lib/siteUrl";
@@ -44,6 +45,7 @@ export function RootDocument({ locale, children }: { locale: Locale; children: R
         <JsonLd data={siteJsonLd(resolveSiteUrl(), locale)} testId="site-json-ld" />
         {children}
         <SiteAnalytics />
+        <SpeedInsights />
       </body>
     </html>
   );
