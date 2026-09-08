@@ -101,6 +101,8 @@
     "@modelcontextprotocol/sdk": "1.30.0",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "csv-parse": "^6.2.1",
     "decimal.js": "^10.6.0",
     "exceljs": "4.4.0",

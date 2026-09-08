@@ -1,4 +1,5 @@
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 
 export function SiteAnalytics() {
   return (
@@ -34,6 +35,7 @@ export function SiteAnalytics() {
           })(window, document, "clarity", "script", "y9my6v583o");
         `}
       </Script>
+      {process.env.VERCEL === "1" && <Analytics />}
     </>
   );
 }
