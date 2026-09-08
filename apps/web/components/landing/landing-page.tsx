@@ -73,7 +73,7 @@ export function LandingPage({ model, presentation }: { model: LandingModel; pres
             </h1>
             <div className="mt-3.5 min-[768px]:pointer-events-auto min-[768px]:mt-5">
               <Link
-                href="#data"
+                href={pageHref("/explorer", locale)}
                 data-testid="hero-cta"
                 className="text-[12px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222] min-[768px]:text-[12.5px]"
               >

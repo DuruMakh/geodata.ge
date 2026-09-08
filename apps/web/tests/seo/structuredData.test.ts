@@ -282,15 +282,15 @@ describe("Dataset records carry the full Google Dataset property set", () => {
     expect(data).not.toHaveProperty("distribution");
   });
 
-  it("lists the subsets a parent dataset is made of", () => {
+  it("lists parent dataset subsets as Google-supported plain URLs", () => {
     const data = explorerDatasetJsonLd({
       ...municipalParent,
       hasPartPaths: ["/explorer/municipalities/tbilisi", "/explorer/municipalities/region/adjara"],
     });
     expect(data).toMatchObject({
       hasPart: [
-        { "@id": "https://fiscal.ge/explorer/municipalities/tbilisi#dataset" },
-        { "@id": "https://fiscal.ge/explorer/municipalities/region/adjara#dataset" },
+        "https://fiscal.ge/explorer/municipalities/tbilisi#dataset",
+        "https://fiscal.ge/explorer/municipalities/region/adjara#dataset",
       ],
     });
   });

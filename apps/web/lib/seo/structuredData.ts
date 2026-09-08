@@ -287,9 +287,7 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
       : { includedInDataCatalog: catalogReference(input.origin, input.locale) }),
     ...(input.hasPartPaths
       ? {
-          hasPart: input.hasPartPaths.map((path) => ({
-            "@id": explorerDatasetId(input.origin, path),
-          })),
+          hasPart: input.hasPartPaths.map((path) => explorerDatasetId(input.origin, path)),
         }
       : {}),
     ...(input.downloadPath
