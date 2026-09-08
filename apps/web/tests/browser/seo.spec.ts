@@ -588,7 +588,7 @@ test("the municipal parent dataset lists exactly the entity pages that exist", a
   const parent = JSON.parse(
     (await page.getByTestId("explorer-dataset-json-ld").textContent()) ?? "{}",
   );
-  const parts: string[] = parent.hasPart.map((part: { "@id": string }) => part["@id"]);
+  const parts: string[] = parent.hasPart;
 
   // The sitemap is the site's own statement of which entity pages exist, so the
   // two cannot drift apart without this failing.

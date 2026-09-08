@@ -11,6 +11,14 @@ const artifactDir = join(process.cwd(), "test-results", "visual-reference");
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
 const heroRuntimeMarkers = ["WebGLRenderer", "hero scene init failed"] as const;
 
+for (const prefix of ["", "/en"]) {
+  test(`landing hero opens the ${prefix ? "English" : "Georgian"} explorer`, async ({ page }) => {
+    await page.goto(`${baseUrl}${prefix}/`);
+    await page.getByTestId("hero-cta").click();
+    await expect(page).toHaveURL(`${baseUrl}${prefix}/explorer`);
+  });
+}
+
 async function heroRuntimeScripts(request: APIRequestContext, urls: Iterable<string>) {
   const uniqueUrls = [...new Set(urls)];
   const matches = await Promise.all(
@@ -187,7 +195,7 @@ test("landing renders the approved latest-year data composition", async ({ page 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("საქართველო ციფრებში");
   await expect(page.getByText("საქართველოს მონაცემების პორტალი", { exact: true })).toBeVisible();
   await expect(page.getByTestId("hero-cta")).toHaveText("გაეცანი მონაცემებს");
-  await expect(page.getByTestId("hero-cta")).toHaveAttribute("href", "#data");
+  await expect(page.getByTestId("hero-cta")).toHaveAttribute("href", "/explorer");
   await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
 
   const figures = page.getByTestId("key-numbers");
@@ -300,9 +308,10 @@ test("landing data and methodology links use real destinations", async ({ page }
   await expect(dataNav).toHaveAttribute("href", "/explorer");
   await expect(page.getByTestId("landing-header").getByRole("link", { name: "ექსპლორერი", exact: true })).toHaveCount(0);
   await page.getByTestId("hero-cta").click();
-  await expect(page).toHaveURL(/\/#data$/);
-  await expect(page.getByTestId("landing-data")).toBeInViewport();
+  await expect(page).toHaveURL(/\/explorer$/);
+  await expect(page.getByTestId("explorer-shell")).toBeVisible();
 
+  await page.goto(baseUrl);
   await page.getByTestId("landing-dataset-revenue").getByRole("link").click();
   await expect(page).toHaveURL(/\/explorer\/revenue/);
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
@@ -663,7 +672,7 @@ test("landing hero remains usable with reduced motion", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: "საქართველო ციფრებში" })).toBeVisible();
   const cta = page.getByTestId("hero-cta");
   await expect(cta).toBeVisible();
-  await expect(cta).toHaveAttribute("href", "#data");
+  await expect(cta).toHaveAttribute("href", "/explorer");
 });
 
 test("landing calls to action have visible keyboard focus", async ({ page }) => {
