@@ -35,7 +35,7 @@ export function SiteAnalytics() {
           })(window, document, "clarity", "script", "y9my6v583o");
         `}
       </Script>
-      <Analytics />
+      {process.env.VERCEL === "1" && <Analytics />}
     </>
   );
 }

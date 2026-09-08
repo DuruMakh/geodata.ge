@@ -5,6 +5,19 @@ const productionOrigin = "https://fiscal.ge";
 const googleScript = "https://www.googletagmanager.com/gtag/js?id=G-RRS446MKJW";
 const clarityScript = "https://www.clarity.ms/tag/y9my6v583o";
 
+test("local builds do not request Vercel-only monitoring scripts in either language", async ({ page }) => {
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (/\/_vercel\/(insights|speed-insights)\//.test(request.url())) requests.push(request.url());
+  });
+  for (const path of ["/explorer/expenditure", "/en/explorer/expenditure"]) {
+    await page.goto(path);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await page.getByRole("button", { name: path.startsWith("/en") ? "Table" : "ცხრილი", exact: true }).click();
+  }
+  expect(requests).toEqual([]);
+});
+
 test.afterEach(async ({ page }) => {
   // Keep prefetches off production; ignore only route callbacks cancelled during teardown.
   await page.context().setOffline(true);

@@ -188,7 +188,18 @@ This installation has no consent banner or consent gate, as explicitly requested
 by the owner. It does not send a fabricated consent-granted signal or change
 provider consent settings. This is not a claim of legal compliance; regional
 provider requirements can limit tracking, including Clarity functionality.
-Search Console is unchanged, and Vercel Speed Insights is not installed.
+Search Console is unchanged.
+
+Vercel Web Analytics and Speed Insights are also mounted in the shared root
+document for both languages. They render only when Vercel's build-time `VERCEL`
+system variable is `1`: local and GitHub CI builds do not request Vercel-only
+script endpoints. Vercel preview and production builds include both integrations.
+Enable both products in the Vercel project dashboard before deploying; preserve
+automatic system environment variables. Web Analytics measures visits and Speed
+Insights collects real-user performance metrics; neither adds custom events.
+After deployment, verify their scripts and collection requests in the browser,
+then check dashboard receipt separately. Local browser checks do not prove
+Vercel has received measurements.
 
 GA4 client-side page views rely on **Enhanced measurement → Page views → Page
 changes based on browser history events** being enabled for the web stream.
