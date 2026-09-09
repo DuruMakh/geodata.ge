@@ -588,7 +588,15 @@ test("the municipal parent dataset lists exactly the entity pages that exist", a
   const parent = JSON.parse(
     (await page.getByTestId("explorer-dataset-json-ld").textContent()) ?? "{}",
   );
-  const parts: string[] = parent.hasPart;
+  const parts: string[] = parent.hasPart.map((part: { "@id": string }) => part["@id"]);
+  for (const part of parent.hasPart) {
+    expect(part["@type"]).toBe("Dataset");
+    expect(part.name.length).toBeGreaterThan(0);
+    expect(part.description.length).toBeGreaterThanOrEqual(50);
+    expect(part.creator).toMatchObject({ "@type": "Organization", name: "Fiscal.ge" });
+    expect(part.license).toBe("https://creativecommons.org/licenses/by/4.0/");
+    expect(part).not.toHaveProperty("distribution");
+  }
 
   // The sitemap is the site's own statement of which entity pages exist, so the
   // two cannot drift apart without this failing.

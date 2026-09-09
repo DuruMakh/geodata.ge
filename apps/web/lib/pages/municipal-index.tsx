@@ -2,6 +2,7 @@ import { I18nProvider } from "../i18n/provider";
 import type { Locale } from "../i18n/types";
 import { getMunicipalPresentation } from "./municipal-presentation.server";
 import { message } from "../i18n/messages";
+import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
 import { MunicipalitiesIndex } from "../../components/municipalities/municipalities-index";
@@ -21,6 +22,7 @@ import { formatPerResidentGel, formatDisplayDate } from "../explorer/format";
 import { buildMunicipalityMapModel } from "../explorer/municipalityMapData";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
+import { REGION_GENITIVE_KA } from "../explorer/municipalLabels";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 
@@ -64,6 +66,22 @@ export async function renderMunicipalIndex(locale: Locale) {
     functionFacts,
     [...totalFacts, ...countryTotalFacts],
   );
+  const subsetDescription = message(messages, "municipal.metaIndexDescription", { first: firstYear, last: latestYear });
+  const subsets = [
+    { path: "/explorer/municipalities/georgia" as const, name: message(messages, "municipal.countryDatasetName") },
+    ...MUNICIPALITY_ROUTES.map(({ code, slug }) => ({
+      path: `/explorer/municipalities/${slug}` as const,
+      name: message(messages, "municipal.municipalityDatasetName", {
+        name: publicLabel(locale, code, municipalities.find((row) => row.code === code)!.nameKa, presentation.englishLabels),
+      }),
+    })),
+    ...regions.map((region) => ({
+      path: `/explorer/municipalities/region/${region.id.replace("region.", "")}` as const,
+      name: message(messages, "municipal.regionDatasetName", {
+        name: publicLabel(locale, region.id, REGION_GENITIVE_KA[region.id] ?? region.kaLabel, presentation.englishLabels),
+      }),
+    })),
+  ];
 
   return (
     <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
@@ -74,13 +92,7 @@ export async function renderMunicipalIndex(locale: Locale) {
           // This page is the parent of every municipal entity dataset: the
           // closed set of 64 municipalities, 11 region roll-ups and the one
           // Georgia aggregate, each of which points back with isPartOf.
-          hasPartPaths: [
-            "/explorer/municipalities/georgia",
-            ...MUNICIPALITY_ROUTES.map(({ slug }) => `/explorer/municipalities/${slug}` as const),
-            ...regions.map(
-              (region) => `/explorer/municipalities/region/${region.id.replace("region.", "")}` as const,
-            ),
-          ],
+          hasParts: subsets.map((subset) => ({ ...subset, description: `${subset.name}. ${subsetDescription}` })),
           origin: resolveSiteUrl(),
           path: "/explorer/municipalities",
           name: message(messages, "municipal.indexDatasetName"),
