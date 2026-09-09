@@ -282,17 +282,24 @@ describe("Dataset records carry the full Google Dataset property set", () => {
     expect(data).not.toHaveProperty("distribution");
   });
 
-  it("lists parent dataset subsets as Google-supported plain URLs", () => {
+  it.each(["ka", "en"] as const)("describes parent subsets as complete Dataset objects in %s", (locale) => {
     const data = explorerDatasetJsonLd({
       ...municipalParent,
-      hasPartPaths: ["/explorer/municipalities/tbilisi", "/explorer/municipalities/region/adjara"],
+      locale,
+      hasParts: [{ path: "/explorer/municipalities/tbilisi", name: "Tbilisi budget", description: tbilisiSubset.description }],
     });
     expect(data).toMatchObject({
-      hasPart: [
-        "https://fiscal.ge/explorer/municipalities/tbilisi#dataset",
-        "https://fiscal.ge/explorer/municipalities/region/adjara#dataset",
-      ],
+      hasPart: [{
+        "@type": "Dataset",
+        "@id": "https://fiscal.ge/explorer/municipalities/tbilisi#dataset",
+        url: `https://fiscal.ge${locale === "en" ? "/en" : ""}/explorer/municipalities/tbilisi`,
+        name: "Tbilisi budget",
+        description: tbilisiSubset.description,
+        license: "https://creativecommons.org/licenses/by/4.0/",
+        creator: { "@type": "Organization", name: "Fiscal.ge" },
+      }],
     });
+    expect(data.hasPart?.[0]).not.toHaveProperty("distribution");
   });
 
   it("states that every published dataset is free to access", () => {

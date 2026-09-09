@@ -50,7 +50,7 @@ export type ExplorerDatasetJsonLdInput = {
    */
   partOfPath?: `/${string}`;
   /** Set on the parent dataset to name the subsets it is made of. */
-  hasPartPaths?: readonly `/${string}`[];
+  hasParts?: readonly { path: `/${string}`; name: string; description: string }[];
   /** True when spatialCoverageName is a place inside Georgia, not the country. */
   withinGeorgia?: boolean;
   /** Measures the published catalogue says this entity does not carry. */
@@ -285,9 +285,17 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
           },
         }
       : { includedInDataCatalog: catalogReference(input.origin, input.locale) }),
-    ...(input.hasPartPaths
+    ...(input.hasParts
       ? {
-          hasPart: input.hasPartPaths.map((path) => explorerDatasetId(input.origin, path)),
+          hasPart: input.hasParts.map((part) => ({
+            "@type": "Dataset",
+            "@id": explorerDatasetId(input.origin, part.path),
+            url: absoluteUrl(input.origin, pageHref(part.path, input.locale)),
+            name: part.name,
+            description: part.description,
+            license: "https://creativecommons.org/licenses/by/4.0/",
+            creator: { "@type": "Organization", "@id": `${input.origin}/#organization`, name: "Fiscal.ge" },
+          })),
         }
       : {}),
     ...(input.downloadPath
