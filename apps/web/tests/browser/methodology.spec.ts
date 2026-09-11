@@ -8,7 +8,7 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 
     await page.setViewportSize(viewport);
     await page.goto(`${TEST_BASE_URL}/methodology`);
     const badges = page.getByTestId("methodology-future-row").getByText("მალე", { exact: true });
-    await expect(badges).toHaveCount(3);
+    await expect(badges).toHaveCount(2);
     for (const badge of await badges.all()) {
       await expectReadableText(badge, page.locator("body"));
     }
@@ -18,7 +18,7 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 
       const sidebar = page.getByTestId("data-sidebar");
       await expect(sidebar).toBeVisible();
       const inkBadges = sidebar.getByText("მალე", { exact: true });
-      await expect(inkBadges).toHaveCount(3);
+      await expect(inkBadges).toHaveCount(2);
       for (const badge of await inkBadges.all()) {
         await expectReadableText(badge, sidebar);
       }
@@ -112,8 +112,8 @@ for (const path of [
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
-  await expect(page.getByTestId("methodology-live-row")).toHaveCount(5);
-  await expect(page.getByTestId("methodology-future-row")).toHaveCount(3);
+  await expect(page.getByTestId("methodology-live-row")).toHaveCount(6);
+  await expect(page.getByTestId("methodology-future-row")).toHaveCount(2);
   await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/79/);
@@ -136,11 +136,12 @@ test("sitemap publishes exactly the four live methodology routes", async ({ page
     "/methodology/municipalities",
     "/methodology/debt",
     "/methodology/gdp",
+    "/methodology/inflation",
   ]);
 });
 
 test("future routes stay on the static 404 surface and out of navigation", async ({ page }) => {
-  for (const slug of ["inflation", "population", "unemployment"] as const) {
+  for (const slug of ["population", "unemployment"] as const) {
     const response = await page.goto(`${TEST_BASE_URL}/methodology/${slug}`);
     expect(response?.status(), slug).toBe(404);
     await expect(page.getByRole("heading", { level: 1, name: "გვერდი ვერ მოიძებნა" })).toHaveCount(1);
@@ -154,8 +155,8 @@ test("future routes stay on the static 404 surface and out of navigation", async
 
   await page.goto(`${TEST_BASE_URL}/methodology`);
   const futureRows = page.getByTestId("methodology-future-row");
-  await expect(futureRows).toHaveCount(3);
-  for (const label of ["ინფლაცია", "მოსახლეობა", "უმუშევრობა"] as const) {
+  await expect(futureRows).toHaveCount(2);
+  for (const label of ["მოსახლეობა", "უმუშევრობა"] as const) {
     await expect(futureRows.getByText(label, { exact: true })).toBeVisible();
   }
   expect(
