@@ -31,7 +31,7 @@
 3. A vintage folder is named after the **last month it covers** (`geostat-cpi/2026-08/`).
 4. The methodology article requires a processed-data link, so the canonical CSV is copied to `/downloads/data/inflation-cpi-national.csv` at build time. No JSON, no MCP.
 5. No explorer `Dataset` JSON-LD on the inflation pages (it would need the fact-query vocabulary, which is out of scope). The pages carry `BreadcrumbList`; the methodology page carries its own `Dataset` node, as GDP's does.
-6. Keeping every monthly vintage adds about 3.4 MB of XLSX per month to the repository and the methodology archive. This milestone has one vintage; the retention policy is a user decision before the first refresh.
+6. Keeping every monthly vintage adds about 3.4 MB of XLSX per month to the repository and the methodology archive. This milestone has one vintage; the retention policy is a user decision before the first refresh. **Resolved 2026-09-11: keep only the latest vintage** (recorded in `docs/data-methodology/inflation-cpi-national.md`).
 
 ## File Map
 

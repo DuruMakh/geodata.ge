@@ -39,7 +39,9 @@ Pre-2015 status: not verified. Searched on 2026-09-11: `nbg.gov.ge/en/page/infla
 
 ## Monthly refresh
 
-Geostat publishes on the 2nd–5th. 1) Download the twelve files into a new vintage folder and write its manifest. 2) Update the seven `source-documents.csv` paths and the methodology archive CSV (`data/methodology/source-archives/inflation.csv`). 3) `npm run data:prepare-inflation`. 4) Review the diff: exactly one new month per series; a revision error is a stop-and-review event. 5) Commit; the standard pipeline imports and deploys. No automated fetching. Retention of old vintages (about 3.4 MB each) is an open decision.
+Geostat publishes on the 2nd–5th. 1) Download the twelve files into a new vintage folder and write its manifest. 2) Delete the previous vintage folder (retention below). 3) Update the seven `source-documents.csv` paths and the methodology archive CSV (`data/methodology/source-archives/inflation.csv`). 4) `npm run data:prepare-inflation`. 5) Review the diff: exactly one new month per series; a revision error is a stop-and-review event. 6) Commit; the standard pipeline imports and deploys. No automated fetching.
+
+Retention (user decision, 2026-09-11): only the latest vintage stays in the working tree. Each Geostat upload repeats the full history, so older folders would add about 3.5 MB a month of duplicates, and the methodology archive would have to list every one of them (its inventory check covers every file under `docs/Raw Data/Inflation`). Earlier vintages remain byte for byte in git history. The revision guard compares against the committed canonical CSV, not the old files, so it is unaffected; when it fires, recover the previous vintage from git to compare.
 
 ## Known limitations
 
