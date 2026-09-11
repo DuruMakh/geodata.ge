@@ -36,6 +36,7 @@ const inventoryRules = {
     { root: "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022", include: topLevelExtension(".zip") },
   ],
   gdp: [{ root: "docs/Raw Data/Economy/gdp-overview/sources", include: () => true }],
+  inflation: [{ root: "docs/Raw Data/Inflation", include: (candidatePath: string) => [".xlsx", ".pdf"].includes(path.posix.extname(candidatePath).toLowerCase()) }],
   debt: [
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
   ],

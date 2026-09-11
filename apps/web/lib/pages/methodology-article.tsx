@@ -56,6 +56,7 @@ const DATASET_DOWNLOADS = {
   municipalities: "/downloads/data/municipal-expenditure.csv",
   debt: "/downloads/data/government-debt.csv",
   gdp: "/downloads/data/gdp-overview.csv",
+  inflation: "/downloads/data/inflation-cpi-national.csv",
 } as const;
 
 // Spec 12.2: the expenditure methodology links both the expenditure and the
@@ -69,6 +70,7 @@ const DATASET_JSON_DOWNLOADS = {
   revenue: [{ href: "/downloads/data/national-revenue.json", labelKey: "methodology.jsonRevenue" }],
   municipalities: [{ href: "/downloads/data/municipal-expenditure.json", labelKey: "methodology.jsonMunicipalities" }],
   gdp: [],
+  inflation: [],
   debt: [
     { href: "/downloads/data/government-debt.json", labelKey: "methodology.jsonDebt" },
     { href: "/downloads/data/government-debt-rates.json", labelKey: "methodology.jsonRates" },
@@ -87,6 +89,7 @@ const DATASET_JSON_DISTRIBUTIONS = {
   // file is a different measure of it and stays a human link above.
   debt: ["/downloads/data/government-debt.json"],
   gdp: [],
+  inflation: [],
 } as const;
 
 export async function methodologyArticleMetadata(locale: Locale, { params }: MethodologyDatasetPageProps): Promise<Metadata> {
@@ -124,11 +127,11 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
   return (
     <>
       <JsonLd
-        data={dataset === "gdp" ? {
+        data={dataset === "gdp" || dataset === "inflation" ? {
           "@context":"https://schema.org", "@type":"Dataset", name:content.title, description:content.summary,
-          url:`${resolveSiteUrl()}${pageHref('/methodology/gdp',locale)}`, temporalCoverage:`${coverage.firstYear}/${coverage.lastYear}`,
+          url:`${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`,locale)}`, temporalCoverage:`${coverage.firstYear}/${coverage.lastYear}`,
           inLanguage:locale, dateModified:content.reviewedAt, spatialCoverage:{"@type":"Place",name:"Georgia"},
-          distribution:{"@type":"DataDownload",encodingFormat:"text/csv",contentUrl:`${resolveSiteUrl()}/downloads/data/gdp-overview.csv`}
+          distribution:{"@type":"DataDownload",encodingFormat:"text/csv",contentUrl:`${resolveSiteUrl()}${DATASET_DOWNLOADS[dataset]}`}
         } : datasetJsonLd({ locale,
           origin: resolveSiteUrl(),
           path: locale === "en" ? `/en/methodology/${dataset}` : `/methodology/${dataset}`,

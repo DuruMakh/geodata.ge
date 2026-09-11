@@ -94,5 +94,6 @@
   "/explorer/economy/gdp": "2026-09-11",
   "/methodology/gdp": "2026-09-11",
   "/explorer/inflation": "2026-09-11",
-  "/explorer/inflation/overview": "2026-09-11"
+  "/explorer/inflation/overview": "2026-09-11",
+  "/methodology/inflation": "2026-09-11"
 }

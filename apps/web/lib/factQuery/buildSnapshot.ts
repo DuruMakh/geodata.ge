@@ -218,6 +218,9 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
   // Geostat documents retain their existing package identities; World Bank originals are new.
   const gdpManifest = await loadReviewedSourceManifest(repositoryRoot, "gdp");
   perDataset.push(gdpManifest.filter(row => row.source_id.startsWith("source.wb_gdp_") && !row.source_id.endsWith("metadata")));
+  // Inflation's registered sources are the English originals; the Georgian
+  // twins (`_ka`) only prove identical values and are not registered sources.
+  perDataset.push((await loadReviewedSourceManifest(repositoryRoot, "inflation")).filter(row => !row.source_id.endsWith("_ka")));
 
   // official_url_or_archive_url is free text, not a validated URL column
   // (sourceManifest.ts's schema only checks it's a non-empty string): most
