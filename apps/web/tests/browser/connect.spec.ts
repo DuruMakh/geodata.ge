@@ -76,7 +76,8 @@ test.describe("connection page", () => {
     // drifted to 2005, national still contributes a 2004 and the test stays
     // green - which is the exact drift this page exists to prevent.
     const servedLines = (await served.innerText()).split("\n").filter((line) => line.includes("—"));
-    expect(servedLines).toHaveLength(6);
+    expect(servedLines).toHaveLength(7);
+    expect(servedLines.find(line => line.startsWith("მშპ,"))).toContain("1960–2025");
 
     // Debt and the balance are served now, so the page must not still deny
     // them, and their ranges must be real rather than borrowed from a
@@ -87,7 +88,7 @@ test.describe("connection page", () => {
     // A range, optionally followed by the projection note the two forward-
     // looking datasets carry. The range itself must still be the last data on
     // the line, so a dataset silently losing its years is still caught.
-    for (const line of servedLines) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\s*$/);
+    for (const line of servedLines) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\.?\s*$/);
 
     const municipal = servedLines.find((line) => line.includes("მუნიციპალური"))!;
     expect(municipal).toContain("2015–2025");

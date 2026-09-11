@@ -18,3 +18,12 @@ Nominal total cells in millions are multiplied by one million, using Decimal ari
 
 ## Presentation and downloads
 One active indicator at a time, in both Georgian and English. GDP/nominal per-person currency controls use published GEL/USD. Real GDP remains constant2015 USD; growth is real annual percent. Preliminary is never treated as planned. Excel uses the established three-sheet style, the active range/measure and original-source hyperlinks, with no cumulative change column. The methodology's static CSV uses explicit units and source provenance; the explorer has one native XLSX action.
+
+
+## MCP and bulk publication
+
+`query_gdp` accepts one or more of the six canonical series IDs and a bounded year list. There is no implicit currency conversion: the series ID fixes the currency and price basis. Its `value` measure is the published number, with `unit` equal to GEL, USD, USD_2015, percent, GEL_per_person or USD_per_person. Growth 7.5 means 7.5%; only the human table and Excel percentage cells use fractions. Published and preliminary are distinct from actual/planned budget status.
+
+The seventh dataset is `gdp-overview`. Discovery returns each series' exact observed years and bilingual names. Responses carry bilingual definitions, historical methodology/reconstruction caveats, preliminary status and original-source references. Requested gaps remain missing, never zero; years outside the overall dataset range are rejected. There is no GDP ranking or cumulative comparison operation. Long histories should be queried one series at a time to respect the existing MCP response-size cap.
+
+The versioned snapshot retains canonical decimal strings plus the bilingual series definitions so either data or definition changes update dataVersion. `gdp-overview.json` publishes all six series over the full union of years (251 available observations and explicit missing cells). `gdp-overview.csv` preserves the exact reviewed decimals, units, status and source IDs with a UTF-8 BOM. Both are in the central manifest with byte hashes; the existing CSV preparation check verifies the CSV independently against canonical inputs.

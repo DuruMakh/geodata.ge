@@ -1,3 +1,5 @@
+import { JsonLd } from "../../components/seo/json-ld";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import path from "node:path";
 import { GdpOverview } from "../../components/gdp/gdp-overview";
 import { I18nProvider } from "../i18n/provider";
@@ -59,6 +61,8 @@ export async function renderGdpPage(locale: Locale) {
   });
   return (
     <I18nProvider {...presentation}>
+      <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({locale,datasetId:"gdp-overview",origin:resolveSiteUrl(),path:"/explorer/economy/gdp",name:message(presentation.messages,"gdp.heading"),description:message(presentation.messages,"gdp.description"),firstYear:Math.min(...facts.map(f=>f.year)),lastYear:Math.max(...facts.map(f=>f.year)),dateModified:facts.map(f=>f.lastReviewedAt).sort().at(-1)!,spatialCoverageName:locale==="ka"?"საქართველო":"Georgia",downloadPath:"/downloads/data/gdp-overview.csv"})}/>
+
       <BreadcrumbJsonLd
         items={[
           {

@@ -204,6 +204,7 @@ export function GdpOverview({
           <div className="mt-5">
             {state.mode === "line" ? (
               <EditorialLineChart
+                axisLeftPadding={90}
                 years={m.years}
                 series={chartSeries}
                 share={d.growth}

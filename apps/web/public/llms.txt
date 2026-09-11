@@ -1,6 +1,6 @@
 # Fiscal.ge
 
-> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets.
+> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets and GDP.
 
 **When to use Fiscal.ge:** Use it to understand, compare, and cite the published budget data, its scope, and its documented sources.
 
@@ -15,6 +15,8 @@ The data is annual, so it does not provide sub-annual or live budget reporting. 
 - [Annual analysis](https://fiscal.ge/explorer/analysis) — one-year budget analysis.
 - [Municipal budgets](https://fiscal.ge/explorer/municipalities) — annual municipal expenditure.
 
+- [Economy overview](https://fiscal.ge/explorer/economy/gdp) — real GDP, annual real growth, nominal GDP and nominal GDP per person.
+
 ## Methodology and sources
 
 - [Methodology hub](https://fiscal.ge/methodology) — how the reviewed public data is prepared and presented.
@@ -22,15 +24,18 @@ The data is annual, so it does not provide sub-annual or live budget reporting. 
 - [Revenue methodology](https://fiscal.ge/methodology/revenue) — national-revenue sources and processing.
 - [Municipal methodology](https://fiscal.ge/methodology/municipalities) — municipal-expenditure sources and processing.
 
+- [GDP methodology](https://fiscal.ge/methodology/gdp) — price bases, series coverage, preliminary status and original sources.
+
 ## Bulk data files
 
+- [GDP overview](https://fiscal.ge/downloads/data/gdp-overview.json) — six series with explicit units, bilingual definitions, missing years, statuses and sources. The [GDP CSV](https://fiscal.ge/downloads/data/gdp-overview.csv) retains reviewed decimal values. Use `query_gdp` for selected series and years; growth values are percentages (7.5 means 7.5%), not fractions. Nominal GDP per person is not average income.
 - [Data manifest](https://fiscal.ge/downloads/data/manifest.json) — every published file with its row count, byte size and SHA-256.
 - [Government debt](https://fiscal.ge/downloads/data/government-debt.json) — debt stock and debt service in GEL, with the interest rates in a file of their own.
 - [General government balance](https://fiscal.ge/downloads/data/general-government-balance.json) — the IMF's deficit or surplus measure; values are signed.
 - [Capability catalogue](https://fiscal.ge/downloads/data/catalogue.json) — the datasets, entities, series and exclusions that exist.
 - [Source resolution](https://fiscal.ge/downloads/data/sources.json) — every logical source with its public originals or its stated derivation.
 
-The manifest lists every dataset file, so they are reachable without repeating them here. Figures are published in GEL with the GDP and population denominators alongside; shares and per-resident values are reproducible from those, not precomputed. Two files are the exception, because their figures have no GEL form: debt interest rates are percent per annum, and the general government balance is a share of GDP whose published GEL amount travels beside it. Balance values are signed - a negative value is a deficit.
+The manifest lists every dataset file, so they are reachable without repeating them here. Budget figures are published in GEL with the GDP and population denominators alongside; shares and per-resident values are reproducible from those, not precomputed. Two files are the exception, because their figures have no GEL form: debt interest rates are percent per annum, and the general government balance is a share of GDP whose published GEL amount travels beside it. Balance values are signed - a negative value is a deficit.
 
 ## AI connection
 

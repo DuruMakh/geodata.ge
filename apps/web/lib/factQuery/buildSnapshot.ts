@@ -18,6 +18,8 @@ import { absoluteWorkbookSourceUrl } from "../explorer/workbookModel";
 import { PROGRAM_SUCCESSIONS, findProgramSuccession } from "../data/adminSpending/programSuccessions";
 import { LEGACY_PROGRAM_JOINS } from "../data/adminSpending/legacyProgramJoins";
 import { makeProgramItemId } from "../data/adminSpending/generateAdminSpendingFacts";
+import { loadGdpOverviewFacts, loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
+import { GDP_QUERY_SERIES } from "./gdpSeries";
 import { loadServedGeneralGovernmentBalanceData } from "../data/generalGovernmentBalance/importGeneralGovernmentBalance";
 import { loadServedGovernmentDebtData } from "../data/governmentDebt/importGovernmentDebtFacts";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
@@ -447,6 +449,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     loadEnglishCatalogue(repositoryRoot),
     readFile(path.join(repositoryRoot, "data/localization/ka/service-messages.json"), "utf8").then(text => serviceMessagesSchema.parse(JSON.parse(text))),
     readFile(path.join(repositoryRoot, "data/localization/en/service-messages.json"), "utf8").then(text => serviceMessagesSchema.parse(JSON.parse(text))),
+    loadServedGdpOverviewData(),
   ]);
   const messageErrors = validateServiceMessages(serviceKa, serviceEn);
   if (messageErrors.length) throw new Error(messageErrors.join("\n"));
@@ -456,7 +459,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia",
     ...municipal.functions.map(item => item.id), ...municipal.regions.map(region => region.id),
     ...municipal.municipalities.map(entity => entity.code), ...AGGREGATE_ONLY_MUNICIPAL_CODES,
-    ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID,
+    ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID, ...Object.keys(GDP_QUERY_SERIES), "gdp-overview",
     "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
   ])].sort();
   const localization: ServiceLocalization = {
@@ -617,6 +620,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
       ),
     },
     deficit: { facts: sortedBy(deficit.facts, (f) => f.year) },
+    gdpOverview: { facts: sortedBy(await loadGdpOverviewFacts(), f=>f.seriesId, f=>f.year), series: GDP_QUERY_SERIES },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
     sources,
   };

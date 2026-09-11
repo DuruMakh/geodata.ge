@@ -202,3 +202,8 @@ Use the joined **₾ | $** currency selector approved in the preview, reusing `S
 ### Heading metadata refinement - 2026-09-11
 
 Place price-basis and measure details beneath the heading summary, before the indicator tabs. Remove the standalone chart-toolbar unit line. Nominal GDP displays only current-price context there; per-capita adds per-person context, without repeating the selected currency. Real GDP retains its fixed constant-2015-USD basis; growth retains its annual percentage context. Currency controls, values and exports retain their existing meaning.
+
+
+### Publication-readiness scope approval - 2026-09-11
+
+The user approved completing the readiness review's gaps. This expands the prior local-UI-only milestone to GDP MCP queries, bilingual AI discovery, central JSON/CSV publication and manifest entries, overview Dataset metadata, and disposable-database migration/import/rollback validation. Preserve the six reviewed series and existing budget denominators; no new economic indicators, ranking or cumulative comparison features are authorized. Implementation steps are in `../plans/2026-09-11-gdp-publication-readiness.md`.

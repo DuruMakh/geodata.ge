@@ -451,3 +451,8 @@ no budget data and require no migration when a code release is rolled back.
   permissions policy) are set in `apps/web/next.config.ts` `headers()`;
   Vercel adds HSTS itself. There is deliberately no Content-Security-Policy
   yet — adding one needs testing against the chart/canvas code first.
+
+
+## GDP dataset release checks
+
+The Economy/GDP addition has 94 bilingual page identities (188 sitemap URLs), ten MCP tools including `query_gdp`, and seven datasets. It adds `gdp-overview.json` and `gdp-overview.csv` to the central publication manifest. Before release, validate all six GDP series against their source data, confirm exact CSV/database parity and source-status semantics, and check both language overview/methodology pages. Apply the GDP migration through the existing pipeline only; verify the deployed commit and a real `query_gdp` response after deployment. Growth MCP values are percent, not fractions; preliminary values are not forecasts or planned budgets.

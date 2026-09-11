@@ -98,3 +98,15 @@ for (const locale of ['ka', 'en']) {
     }
   });
 }
+
+for(const locale of ['ka','en']) test(`GDP real axis and dataset metadata are complete in ${locale}`,async({page})=>{
+ await page.goto(`${locale==='en'?'/en':''}/explorer/economy/gdp`);
+ await expect(page.getByTestId('gdp-tab-real')).toHaveAttribute('aria-pressed','true');
+ await page.evaluate(()=>document.fonts.ready);
+ const labels=page.getByTestId('chart-panel').locator('svg text');
+ for(const label of await labels.all()) expect(await label.evaluate(e=>(e as SVGGraphicsElement).getBBox().x)).toBeGreaterThanOrEqual(0);
+ const dataset=JSON.parse(await page.getByTestId('explorer-dataset-json-ld').textContent()??'{}');
+ expect(dataset['@id']).toBe('https://fiscal.ge/explorer/economy/gdp#dataset');
+ expect(dataset.variableMeasured).toHaveLength(6);
+ expect(dataset.variableMeasured.map((v:{unitText:string})=>v.unitText)).toContain('USD_2015');
+});

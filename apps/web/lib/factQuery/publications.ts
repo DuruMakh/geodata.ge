@@ -8,6 +8,9 @@
 // Every figure here comes from the Part 1 query functions. Nothing in this
 // file recalculates a budget number, so a published file and an MCP answer
 // cannot disagree: there is only one implementation of an observation.
+import { queryGdp } from "./queryGdp";
+import { GDP_QUERY_SERIES } from "./gdpSeries";
+import { csvEscape } from "../data/csvEscape";
 import { createHash } from "node:crypto";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { describeCoverage, type CoverageData } from "./describeCoverage";
@@ -49,6 +52,7 @@ const DATASET_IDS: readonly DatasetId[] = [
   "municipal-expenditure",
   "government-debt",
   "general-government-balance",
+  "gdp-overview",
 ];
 
 /**
@@ -157,7 +161,7 @@ export function buildManifestFile(
       rowCount: artifact.rowCount,
       byteSize: artifact.bytes.byteLength,
       sha256: sha256(artifact.bytes),
-      mediaType: "application/json",
+      mediaType: artifact.fileName.endsWith(".csv") ? "text/csv" : "application/json",
     })),
   });
 
@@ -436,7 +440,15 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
   ];
 }
 
+export function buildGdpCsv(snapshot: FactQuerySnapshot): PublicationArtifact {
+ const rows=snapshot.gdpOverview.facts;
+ const text="\uFEFFseries_id,year,value,unit,status,source_id\n"+rows.map(f=>[f.seriesId,f.year,f.value,f.unit,f.status,f.sourceId].map(csvEscape).join(",")).join("\n")+"\n";
+ return {fileName:"gdp-overview.csv",bytes:Buffer.from(text,"utf8"),rowCount:rows.length};
+}
+
 export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationArtifact[] {
-  const artifacts = [buildCatalogueFile(snapshot), buildSourcesFile(snapshot), ...buildDatasetFiles(snapshot)];
+  const artifacts = [buildCatalogueFile(snapshot), buildSourcesFile(snapshot), ...buildDatasetFiles(snapshot),
+ datasetFile(snapshot,"gdp-overview","gdp-overview.json",queryGdp(snapshot,{seriesIds:Object.keys(GDP_QUERY_SERIES),years:yearsOf(snapshot.gdpOverview.facts)}),{}),
+ buildGdpCsv(snapshot)];
   return [...artifacts, buildManifestFile(snapshot, artifacts)];
 }

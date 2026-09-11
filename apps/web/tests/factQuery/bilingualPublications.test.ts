@@ -14,9 +14,9 @@ beforeAll(async () => {
 const read = (name: string) => JSON.parse(artifacts.find(file => file.fileName === name)!.bytes.toString("utf8"));
 
 describe("bilingual bulk publications", () => {
-  it("publishes all ten existing files under the same version and verifies their exact bytes", () => {
-    expect(artifacts.map(file => file.fileName).sort()).toEqual(["manifest.json", "catalogue.json", "sources.json", "national-revenue.json", "national-expenditure.json", "ministries.json", "municipal-expenditure.json", "government-debt.json", "government-debt-rates.json", "general-government-balance.json"].sort());
-    for (const artifact of artifacts) {
+  it("publishes all JSON and GDP CSV files under the same version and verifies their exact bytes", () => {
+    expect(artifacts.map(file => file.fileName).sort()).toEqual(["manifest.json", "catalogue.json", "sources.json", "national-revenue.json", "national-expenditure.json", "ministries.json", "municipal-expenditure.json", "government-debt.json", "government-debt-rates.json", "general-government-balance.json", "gdp-overview.json", "gdp-overview.csv"].sort());
+    for (const artifact of artifacts.filter(file=>file.fileName.endsWith(".json"))) {
       const published = read(artifact.fileName);
       expect(published.schemaVersion).toBe("1.1.0");
       expect(published.dataVersion).toBe(snapshot.dataVersion);
@@ -30,7 +30,7 @@ describe("bilingual bulk publications", () => {
     }
   });
   it("makes every dataset interpretable in English without changing its fiscal fields", () => {
-    for (const artifact of artifacts.filter(file => !["manifest.json", "catalogue.json", "sources.json"].includes(file.fileName))) {
+    for (const artifact of artifacts.filter(file => file.fileName.endsWith(".json") && !["manifest.json", "catalogue.json", "sources.json"].includes(file.fileName))) {
       const published = read(artifact.fileName);
       expect(published.noticeEn).toContain("totals");
       expect(published.notice).toMatch(/\p{Script=Georgian}/u);

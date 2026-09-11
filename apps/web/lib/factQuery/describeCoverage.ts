@@ -4,6 +4,7 @@
 // first to learn which datasets, series and entities exist before asking for
 // any number. It returns no amounts, only capability: this is what makes it
 // safe to call with zero prior knowledge of the catalogue.
+import { GDP_QUERY_SERIES } from "./gdpSeries";
 import { serviceLabelEn, serviceMessage } from "./localization";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
@@ -23,6 +24,7 @@ const DATASET_IDS: readonly DatasetId[] = [
   "municipal-expenditure",
   "government-debt",
   "general-government-balance",
+  "gdp-overview",
 ];
 
 type EntityType = "country" | "municipality" | "region";
@@ -143,6 +145,7 @@ const DATASET_META: Record<
     entityTypes: ["country"],
     measures: DEBT_MEASURES,
   },
+  "gdp-overview": { budgetScope: "national_accounts", labelKa: "მშპ-ის მიმოხილვა", entityTypes: ["country"], measures: ["value"] },
   "general-government-balance": {
     // General government per the IMF: wider than either national series here,
     // and NOT their difference.
@@ -210,6 +213,9 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
         snapshot.debt.facts.map((f) => f.year),
         datasetId,
       );
+      break;
+    case "gdp-overview":
+      years = yearRange(snapshot.gdpOverview.facts.map(f=>f.year), datasetId);
       break;
     case "general-government-balance":
       years = yearRange(
@@ -466,6 +472,8 @@ function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId)
       return debtSeriesFor(snapshot);
     case "general-government-balance":
       return deficitSeriesFor(snapshot);
+    case "gdp-overview":
+      return Object.entries(GDP_QUERY_SERIES).map(([seriesId,s])=>({seriesId,labelKa:s.labelKa,level:LEVEL_TOTAL,parentSeriesId:null,availability:"served",years:sortedUniqueYears(snapshot.gdpOverview.facts.filter(f=>f.seriesId===seriesId).map(f=>f.year))}));
   }
 }
 

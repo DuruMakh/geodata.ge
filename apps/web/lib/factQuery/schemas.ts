@@ -41,7 +41,7 @@ export const debtMeasure = z.enum(["amount_gel", "share_of_gdp_pct", "rate_perce
 export const deficitMeasure = z.enum(["share_of_gdp_pct", "amount_gel"]);
 
 export const describeCoverageInput = z.strictObject({
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview"]).optional(),
   search: z.string().max(120).optional(),
   entityType: z.enum(["country", "municipality", "region"]).optional(),
   level: z.enum(["admin_category", "major_program"]).optional(),
@@ -65,6 +65,12 @@ export const queryDebtInput = z.strictObject({
 
 // No seriesIds: there is exactly one series, and a required parameter with a
 // single legal value is noise for the caller.
+export const queryGdpInput = z.strictObject({
+ seriesIds: z.array(z.enum(["real_usd_2015","real_growth_percent","nominal_gel","nominal_usd","per_capita_gel","per_capita_usd"])).min(1).max(6).transform(ids=>[...new Set(ids)]),
+ years: uniqueSortedYears,
+ expectedDataVersion,
+});
+
 export const queryDeficitInput = z.strictObject({
   years: uniqueSortedYears,
   measure: deficitMeasure,
@@ -144,7 +150,7 @@ export const rankInput = z
 
 export const getSourcesInput = z.strictObject({
   sourceIds: sourceIdList,
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview"]).optional(),
   years: uniqueSortedYears.optional(),
   entityIds: entityIdList.optional(),
   expectedDataVersion,
@@ -190,12 +196,12 @@ export const observationSchema = z.object({
   parentSeriesId: z.string().nullable(),
   year: z.number().int(),
   measure: z.string(),
-  unit: z.enum(["GEL", "percent", "GEL_per_resident"]),
+  unit: z.enum(["GEL", "percent", "GEL_per_resident", "USD", "USD_2015", "GEL_per_person", "USD_per_person"]),
   value: z.number().finite().nullable(),
   availability: z.enum(["available", "missing"]),
   missingReason: z.string().nullable(),
   missingReasonEn: z.string().min(1).nullable(),
-  basis: z.enum(["actual", "planned", "projection"]).nullable(),
+  basis: z.enum(["actual", "planned", "projection", "published", "preliminary"]).nullable(),
   valueDefinition: z.string(),
   valueDefinitionEn: z.string().min(1),
   valueDefinitionId: z.string(),
