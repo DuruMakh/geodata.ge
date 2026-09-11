@@ -6,7 +6,8 @@ import { useRef } from "react";
 import type { ResolvedRange } from "./use-explorer-state";
 
 // Range strip per DESIGN.md §7.4–7.5: mono quick chips (5წ/10წ/ყველა) and a
-// 24px rail with year ticks and two accessible slider handles.
+// 24px rail with year ticks and two accessible slider handles. A monthly strip
+// (periodsPerYear 12) counts the same chips in months and prints formatted periods.
 
 export type RangeMarker = { year: number; label: string };
 
@@ -15,12 +16,50 @@ type RangeStripProps = {
   range: ResolvedRange;
   onChange: (patch: { start?: number; end?: number }) => void;
   marker?: RangeMarker;
+  /** Periods per calendar year on the rail. Omit for years. */
+  periodsPerYear?: number;
+  /** Readout, end and slider text for a period value. Omit to print the value. */
+  formatPeriod?: (period: number) => string;
 };
 
 type Handle = "start" | "end";
 
-export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) {
+export type RangeChip = { key: "fiveYears" | "tenYears" | "allYears"; start: number };
+
+// No one-year chip: every figure in ძირითადი ინდიკატორები is a start-to-end
+// delta, so a range of one year zeroes the whole section. The rail handles can
+// still reach that range, which is what the Indicators guard covers. A monthly
+// strip counts 5წ/10წ in months.
+export function rangeChips(years: number[], min: number, periodsPerYear = 1): RangeChip[] {
+  const back = (count: number) => years[Math.max(years.length - count, 0)] ?? min;
+  const spans: Array<[RangeChip["key"], number]> = [["fiveYears", 5 * periodsPerYear], ["tenYears", 10 * periodsPerYear]];
+  return [
+    ...spans.filter(([, count]) => years.length > count).map(([key, count]) => ({ key, start: back(count) })),
+    { key: "allYears", start: min },
+  ];
+}
+
+// Arrows step one period; on a monthly strip Page Up/Down step a year.
+export function stepRangeHandle(key: string, handle: Handle, range: ResolvedRange, periodsPerYear = 1): number | null {
+  let delta: number | "home" | "end";
+  if (key === "ArrowLeft" || key === "ArrowDown") delta = -1;
+  else if (key === "ArrowRight" || key === "ArrowUp") delta = 1;
+  else if (key === "PageDown" && periodsPerYear > 1) delta = -periodsPerYear;
+  else if (key === "PageUp" && periodsPerYear > 1) delta = periodsPerYear;
+  else if (key === "Home") delta = "home";
+  else if (key === "End") delta = "end";
+  else return null;
+
+  const { start, end, min, max } = range;
+  const clamp = (value: number, lo: number, hi: number) => Math.min(Math.max(value, lo), hi);
+  if (handle === "start") return delta === "home" ? min : delta === "end" ? end : clamp(start + delta, min, end);
+  return delta === "home" ? start : delta === "end" ? max : clamp(end + delta, start, max);
+}
+
+export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1, formatPeriod }: RangeStripProps) {
   const { messages } = useI18n();
+  const format = formatPeriod ?? String;
+  const monthly = periodsPerYear > 1;
   const railRef = useRef<HTMLDivElement | null>(null);
   const draggingRef = useRef<Handle | null>(null);
   const { start, end, min, max } = range;
@@ -28,14 +67,7 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
   const pct = (year: number) => `${(((year - min) / span) * 100).toFixed(2)}%`;
   const visibleMarker = marker && marker.year >= min && marker.year <= max ? marker : undefined;
 
-  // No one-year chip: every figure in ძირითადი ინდიკატორები is a start-to-end
-  // delta, so a range of one year zeroes the whole section. The rail handles can
-  // still reach that range, which is what the Indicators guard covers.
-  const chips = [
-    { label: message(messages, "controls.fiveYears"), start: years[Math.max(years.length - 5, 0)] ?? min, show: years.length > 5 },
-    { label: message(messages, "controls.tenYears"), start: years[Math.max(years.length - 10, 0)] ?? min, show: years.length > 10 },
-    { label: message(messages, "controls.allYears"), start: min, show: true },
-  ].filter((chip) => chip.show);
+  const chips = rangeChips(years, min, periodsPerYear).map((chip) => ({ label: message(messages, `controls.${chip.key}`), start: chip.start }));
 
   function yearFromClientX(clientX: number): number {
     const rail = railRef.current;
@@ -111,22 +143,10 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
   }
 
   function handleKey(handle: Handle, event: React.KeyboardEvent<HTMLButtonElement>) {
-    let delta: number | "home" | "end" | null = null;
-    if (event.key === "ArrowLeft" || event.key === "ArrowDown") delta = -1;
-    else if (event.key === "ArrowRight" || event.key === "ArrowUp") delta = 1;
-    else if (event.key === "Home") delta = "home";
-    else if (event.key === "End") delta = "end";
-    else return;
+    const next = stepRangeHandle(event.key, handle, range, periodsPerYear);
+    if (next === null) return;
     event.preventDefault();
-
-    const clamp = (value: number, lo: number, hi: number) => Math.min(Math.max(value, lo), hi);
-    if (handle === "start") {
-      const next = delta === "home" ? min : delta === "end" ? end : clamp(start + delta, min, end);
-      onChange({ start: next });
-    } else {
-      const next = delta === "home" ? start : delta === "end" ? max : clamp(end + delta, start, max);
-      onChange({ end: next });
-    }
+    onChange(handle === "start" ? { start: next } : { end: next });
   }
 
   const handleClass =
@@ -138,7 +158,7 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
         <span className="text-xs text-[var(--muted)]">
           {message(messages, "controls.range")}{" "}
           <span className="font-[family-name:var(--font-numeric)] text-xs font-medium text-[var(--ink)]">
-            {start}–{end}
+            {format(start)}–{format(end)}
           </span>
         </span>
         <div className="flex gap-3.5">
@@ -170,7 +190,7 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         role="group"
-        aria-label={message(messages, "controls.yearRange")}
+        aria-label={message(messages, monthly ? "controls.monthRange" : "controls.yearRange")}
         className="relative mt-3 h-6 cursor-pointer touch-none"
       >
         <div className="absolute inset-x-0 top-2.5 h-[3px] bg-[var(--hairline-soft)]" />
@@ -195,11 +215,11 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
           onPointerDown={(event) => handleHandleDown("start", event)}
           onKeyDown={(event) => handleKey("start", event)}
           role="slider"
-          aria-label={message(messages, "controls.startYear")}
+          aria-label={message(messages, monthly ? "controls.startMonth" : "controls.startYear")}
           aria-valuemin={min}
           aria-valuemax={max}
           aria-valuenow={start}
-          aria-valuetext={String(start)}
+          aria-valuetext={format(start)}
           className={handleClass}
           style={{ left: pct(start) }}
         />
@@ -209,18 +229,18 @@ export function RangeStrip({ years, range, onChange, marker }: RangeStripProps) 
           onPointerDown={(event) => handleHandleDown("end", event)}
           onKeyDown={(event) => handleKey("end", event)}
           role="slider"
-          aria-label={message(messages, "controls.endYear")}
+          aria-label={message(messages, monthly ? "controls.endMonth" : "controls.endYear")}
           aria-valuemin={min}
           aria-valuemax={max}
           aria-valuenow={end}
-          aria-valuetext={String(end)}
+          aria-valuetext={format(end)}
           className={handleClass}
           style={{ left: pct(end) }}
         />
       </div>
       <div className="mt-1.5 flex justify-between">
-        <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">{min}</span>
-        <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">{max}</span>
+        <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">{format(min)}</span>
+        <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">{format(max)}</span>
       </div>
     </div>
   );
