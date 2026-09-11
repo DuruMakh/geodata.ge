@@ -1881,9 +1881,10 @@ git commit -m "feat(explorer): monthly period axis and dashed reference lines in
 
 **Interfaces:**
 - Produces: `RangeStrip` props `periodsPerYear?: number`, `formatPeriod?: (period: number) => string`.
-- Produces: `rangeChips(years: number[], min: number, periodsPerYear?: number): RangeChip[]` with `RangeChip = { key: "oneYear" | "fiveYears" | "tenYears" | "allYears"; start: number }`.
+- Produces: `rangeChips(years: number[], min: number, periodsPerYear?: number): RangeChip[]` with `RangeChip = { key: "fiveYears" | "tenYears" | "allYears"; start: number }`.
 - Produces: `stepRangeHandle(key: string, handle: "start" | "end", range: ResolvedRange, periodsPerYear?: number): number | null`.
-- Messages: `controls.oneYear`, `controls.monthRange`, `controls.startMonth`, `controls.endMonth`.
+- Messages: `controls.monthRange`, `controls.startMonth`, `controls.endMonth`.
+- No one-year chip on any strip (user decision, 2026-09-11): monthly strips offer `5წ / 10წ / ყველა`, counted in months.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1903,9 +1904,8 @@ describe("range strip monthly periods", () => {
     ]);
   });
 
-  it("counts the monthly chips in months, including a one-year chip", () => {
+  it("counts the monthly chips in months, with no one-year chip", () => {
     expect(rangeChips(months, months[0]!, 12).map((chip) => [chip.key, label(chip.start)])).toEqual([
-      ["oneYear", "2025-09"],
       ["fiveYears", "2021-09"],
       ["tenYears", "2016-09"],
       ["allYears", "2004-01"],
@@ -1932,12 +1932,12 @@ describe("range strip monthly periods", () => {
         periodsPerYear: 12,
         formatPeriod: label,
       }),
-      { "controls.oneYear": "1წ", "controls.startMonth": "საწყისი თვე", "controls.endMonth": "საბოლოო თვე", "controls.monthRange": "თვეების დიაპაზონი" },
+      { "controls.startMonth": "საწყისი თვე", "controls.endMonth": "საბოლოო თვე", "controls.monthRange": "თვეების დიაპაზონი" },
     );
     expect(markup).toContain("2004-01–2026-08");
     expect(markup).toContain('aria-valuetext="2026-08"');
     expect(markup).toContain('aria-label="საწყისი თვე"');
-    expect(markup).toContain(">1წ<");
+    expect(markup).not.toContain(">1წ<");
   });
 });
 ```
@@ -1954,15 +1954,13 @@ Expected: FAIL — `rangeChips` is not exported.
 Add, above the component:
 
 ```ts
-export type RangeChip = { key: "oneYear" | "fiveYears" | "tenYears" | "allYears"; start: number };
+export type RangeChip = { key: "fiveYears" | "tenYears" | "allYears"; start: number };
 
-// Year strips keep 5წ/10წ/ყველა: every budget indicator is a start-to-end delta,
-// so a one-year range zeroes them. Monthly strips add 1წ — twelve months is the
-// natural inflation window and nothing on that page is a range delta.
+// 5წ/10წ/ყველა on every strip; a monthly strip counts them in months. No
+// one-year chip: the handles still reach a short range.
 export function rangeChips(years: number[], min: number, periodsPerYear = 1): RangeChip[] {
   const back = (count: number) => years[Math.max(years.length - count, 0)] ?? min;
-  const spans: Array<[RangeChip["key"], number]> =
-    periodsPerYear === 1 ? [["fiveYears", 5], ["tenYears", 10]] : [["oneYear", 12], ["fiveYears", 60], ["tenYears", 120]];
+  const spans: Array<[RangeChip["key"], number]> = [["fiveYears", 5 * periodsPerYear], ["tenYears", 10 * periodsPerYear]];
   return [
     ...spans.filter(([, count]) => years.length > count).map(([key, count]) => ({ key, start: back(count) })),
     { key: "allYears", start: min },
@@ -2011,8 +2009,8 @@ Update the component's header comment to mention the monthly chips.
 
 - [ ] **Step 4: Add the messages**
 
-`lib/i18n/messages/ka/controls.json`: `"controls.oneYear": "1წ"`, `"controls.monthRange": "თვეების დიაპაზონი"`, `"controls.startMonth": "საწყისი თვე"`, `"controls.endMonth": "საბოლოო თვე"`.
-`lib/i18n/messages/en/controls.json`: `"controls.oneYear": "1y"`, `"controls.monthRange": "Month range"`, `"controls.startMonth": "Start month"`, `"controls.endMonth": "End month"`.
+`lib/i18n/messages/ka/controls.json`: `"controls.monthRange": "თვეების დიაპაზონი"`, `"controls.startMonth": "საწყისი თვე"`, `"controls.endMonth": "საბოლოო თვე"`.
+`lib/i18n/messages/en/controls.json`: `"controls.monthRange": "Month range"`, `"controls.startMonth": "Start month"`, `"controls.endMonth": "End month"`.
 
 - [ ] **Step 5: Run the tests to verify they pass**
 
@@ -2023,7 +2021,7 @@ Expected: PASS, including the existing chip and marker tests. Then `npm run i18n
 
 ```bash
 git add apps/web/components/main-explorer/range-strip.tsx apps/web/lib/i18n/messages apps/web/tests/explorer/rangeStrip.test.ts
-git commit -m "feat(explorer): monthly range strip with 1y chip and year steps" -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+git commit -m "feat(explorer): monthly range strip with month and year steps" -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -4476,7 +4474,7 @@ Inflation is the third dataset in the explorer sidebar (Budget, Economy, Inflati
 
 The overview follows the GDP overview's header — headline line and unit line under the H1, `TextTab` indicator tabs centred above the workspace (`წლიური ინფლაცია`, `თვიური ინფლაცია`, `ფასების ინდექსი`) — over the Budget explorers' workspace: `ხაზი / ცხრილი`, chart or table, range strip, series panel with the download at its foot, source note. The series panel adds a reference row (the NBG target) with a dashed swatch; its chart line is dashed accent. Inflation values are never coloured good/bad; rate changes are in percentage points.
 
-Monthly axes: the line chart and range strip take a periods-per-year hint. Axis labels fall on calendar years (thinned to twelve); lattice columns group months at calendar boundaries under the 12px floor (§8.3); range chips are `1წ / 5წ / 10წ / ყველა`; arrows step a month, PageUp/PageDown a year.
+Monthly axes: the line chart and range strip take a periods-per-year hint. Axis labels fall on calendar years (thinned to twelve); lattice columns group months at calendar boundaries under the 12px floor (§8.3); range chips are `5წ / 10წ / ყველა` counted in months (no one-year chip); arrows step a month, PageUp/PageDown a year.
 
 `ცხრილი` for monthly data is a years (newest first) × months grid with ExplorerTable's anatomy (§8.4), one series at a time (a `TextTab` picker when several are selected). Percentage tabs tint cells on a five-step scale — deflation blue `#DCE4F2`, then `#F1EADC`, `#EBCDBB`, `#D9967C`, and accent `#B3402A` with paper text — every pair ≥ 4.5:1; values are always printed and a legend names the bins. The index tab is untinted. Annual inflation adds a `წლის საშუალო` column (December 12-month average).
 
@@ -4546,7 +4544,8 @@ test("tabs switch units, series and the target together", async ({ page }) => {
 test("range chips, keyboard steps and tab switches keep a consistent period", async ({ page }) => {
   await page.goto("/en/explorer/inflation/overview");
   await ready(page);
-  await page.getByRole("button", { name: "1y", exact: true }).click();
+  await expect(page.getByRole("button", { name: "1y", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "5y", exact: true }).click();
   await expect(page).toHaveURL(/r=\d{4}-\d{2}-\d{4}-\d{2}/);
   const start = page.getByRole("slider", { name: "Start month" });
   const before = await start.getAttribute("aria-valuenow");

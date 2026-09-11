@@ -134,7 +134,7 @@ Reuse unchanged: `DataSidebar` and `SectionNav` patterns (after the Economy merg
 Narrow, backward-compatible extensions (existing Budget, Debt, Deficit and GDP behaviour must not change; their tests stay green unmodified):
 
 - `EditorialLineChart`: accept a monthly period axis — an optional period formatter for axis labels and the tooltip header, and a periods-per-year hint so labels thin to years and the dot lattice places columns at half-year or year boundaries under the existing 12px minimum-pitch rule (`lib/explorer/dotLattice.ts`). Add `ChartSeries.dashed?: boolean` for the target reference line. Periods are encoded as integers (`year × 12 + month − 1`) so existing arithmetic holds.
-- `RangeStrip`: the same period formatter and periods-per-year hint; quick chips `1წ / 5წ / 10წ / ყველა` computed in periods; handles step one month with arrow keys and one year with PageUp/PageDown. Year-based callers see no change.
+- `RangeStrip`: the same period formatter and periods-per-year hint; quick chips `5წ / 10წ / ყველა` computed in periods, with no one-year chip (user decision, 2026-09-11); handles step one month with arrow keys and one year with PageUp/PageDown. Year-based callers see no change.
 - `SeriesSelectorRow`: an optional dashed swatch for reference rows.
 - `Indicators`: extract the hero block and side-KPI row into presentational components that the budget `Indicators` keeps using unchanged; the inflation page composes them with its own figures.
 - Workbook model and writer: optional readable-sheet column labels (month names instead of numeric column keys), and source-sheet coverage taken from calendar years rather than readable columns.
