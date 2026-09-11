@@ -122,13 +122,23 @@ export function GdpOverview({
         </h1>
         <p
           data-testid="gdp-headline"
-          className="mb-[30px] text-[13px] text-[var(--body)]"
+          className="mb-2 text-[13px] text-[var(--body)]"
         >
           {m.headline?.year}: {d.label} ·{" "}
           <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">
             {headlineAmount}
           </span>
           {m.headline?.status === "preliminary" ? ` · ${t("preliminary")}` : ""}
+        </p>
+        <p
+          data-testid="gdp-unit"
+          className="mb-[30px] text-[13px] text-[var(--muted)]"
+        >
+          {state.indicator === "real" || d.growth
+            ? d.fullUnitLabel
+            : state.indicator === "per_capita"
+              ? `${t("perPerson")} · ${t("current")}`
+              : t("current")}
         </p>
         <div
           data-testid="gdp-indicators"
@@ -191,12 +201,6 @@ export function GdpOverview({
               </div>
             ) : null}
           </div>
-          <p
-            data-testid="gdp-unit"
-            className="mt-4 text-right font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]"
-          >
-            {d.fullUnitLabel}
-          </p>
           <div className="mt-5">
             {state.mode === "line" ? (
               <EditorialLineChart

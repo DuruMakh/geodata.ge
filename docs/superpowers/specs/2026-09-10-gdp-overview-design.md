@@ -197,3 +197,8 @@ Display the page and its navigation/card label as **Economy overview / ეკო
 ### Confirmed currency control - 2026-09-11
 
 Use the joined **₾ | $** currency selector approved in the preview, reusing `SegmentedTabs` and its Chart/Table styling, with 40px minimum button widths. Keep GEL/USD accessible names, existing selection persistence, and full units above the chart. This supersedes the earlier separate currency-pill styling.
+
+
+### Heading metadata refinement - 2026-09-11
+
+Place price-basis and measure details beneath the heading summary, before the indicator tabs. Remove the standalone chart-toolbar unit line. Nominal GDP displays only current-price context there; per-capita adds per-person context, without repeating the selected currency. Real GDP retains its fixed constant-2015-USD basis; growth retains its annual percentage context. Currency controls, values and exports retain their existing meaning.

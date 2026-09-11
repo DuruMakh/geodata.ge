@@ -29,7 +29,8 @@ test("GDP reuses chart/table/range and preserves indicator state", async ({
   await expect(page.getByTestId("gdp-currency")).toHaveCount(0);
   await page.getByTestId("gdp-tab-nominal").click();
   await page.getByRole("button", { name: "USD", exact: true }).click();
-  await expect(page.getByTestId("gdp-unit")).toContainText("USD");
+  await expect(page.getByTestId("gdp-unit")).toHaveText("Current prices");
+  await expect(page.getByTestId("chart-panel").getByTestId("gdp-unit")).toHaveCount(0);
   await page.getByTestId("gdp-tab-growth").click();
   await expect(page.getByTestId("gdp-currency")).toHaveCount(0);
   await expect(page.getByTestId("gdp-unit")).toContainText("%");
