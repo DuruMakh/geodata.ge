@@ -215,8 +215,9 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
     ),
   );
 
-  // Register the new original documents without adding a GDP query dataset or intent.
-  perDataset.push((await loadReviewedSourceManifest(repositoryRoot, "gdp")).filter(row => row.source_id.startsWith("source.wb_gdp_") && !row.source_id.endsWith("metadata")));
+  // Geostat documents retain their existing package identities; World Bank originals are new.
+  const gdpManifest = await loadReviewedSourceManifest(repositoryRoot, "gdp");
+  perDataset.push(gdpManifest.filter(row => row.source_id.startsWith("source.wb_gdp_") && !row.source_id.endsWith("metadata")));
 
   // official_url_or_archive_url is free text, not a validated URL column
   // (sourceManifest.ts's schema only checks it's a non-empty string): most
@@ -267,6 +268,9 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
         throw new Error(`buildFactQuerySnapshot: invalid source manifest row ${index + 1} in ${directory.join("/")}: ${issues}`);
       }
       const row = parsed.data;
+      const archivedOriginal = gdpManifest.find((original) =>
+        original.source_id === row.source_id && original.sha256 === row.sha256 && original.byte_size === row.bytes,
+      );
       documents.push({
         repositoryPath: [...directory, row.local_file].join("/"),
         documentId: row.source_id,
@@ -274,7 +278,7 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
         title: (row.dataset_title ?? row.dataset)!,
         publisher: row.publisher,
         officialUrl: row.retrieved_file_url,
-        archiveUrl: null,
+        archiveUrl: archivedOriginal ? absoluteWorkbookSourceUrl(PUBLIC_SITE_ORIGIN, archivedOriginal.downloadHref) : null,
         // Non-null: the schema refine above rejects a row without a complete pair.
         years: yearsBetween(yearRangeOf(row)!.min, yearRangeOf(row)!.max),
         datasetId: null,

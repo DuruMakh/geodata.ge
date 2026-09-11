@@ -7,8 +7,8 @@ check, and connecting the custom domain.
 
 ## Bilingual release contract
 
-The current human route inventory contains 91 page identities, each with Georgian
-and English HTML (182 sitemap URLs). Georgian addresses remain unchanged; English
+The current human route inventory contains 94 page identities, each with Georgian
+and English HTML (188 sitemap URLs). Georgian addresses remain unchanged; English
 uses `/en`, self canonicals and reciprocal `ka`/`en`/`x-default` links. Sitemap
 Georgian dates retain existing data/content freshness; English dates use the later
 of that date and the reviewed translation date. Do not infer indexing from a
@@ -20,8 +20,9 @@ The two social images at `/opengraph-image` and `/en/opengraph-image` use explic
 are generated at build time. All human pages remain prerendered and `/mcp` remains
 the sole request-time route; the older all-static description below predates MCP.
 
-Schema 1.1.0 adds reviewed language companions to the same nine MCP tools and ten
-JSON publications. Requests do not gain a language argument. Clients must accept
+Schema 1.1.0 includes reviewed language companions for ten MCP tools and twelve
+publication artifacts (eleven JSON files including the manifest, and one GDP CSV).
+Requests do not gain a language argument. Clients must accept
 new fields and version 1.1.0; byte-identical response compatibility is not promised.
 Translation changes alter `dataVersion`. Retain the existing body, cell, pair,
 ranking, byte, duration, rate and pause limits. Large bilingual evidence responses
@@ -456,3 +457,5 @@ no budget data and require no migration when a code release is rolled back.
 ## GDP dataset release checks
 
 The Economy/GDP addition has 94 bilingual page identities (188 sitemap URLs), ten MCP tools including `query_gdp`, and seven datasets. It adds `gdp-overview.json` and `gdp-overview.csv` to the central publication manifest. Before release, validate all six GDP series against their source data, confirm exact CSV/database parity and source-status semantics, and check both language overview/methodology pages. Apply the GDP migration through the existing pipeline only; verify the deployed commit and a real `query_gdp` response after deployment. Growth MCP values are percent, not fractions; preliminary values are not forecasts or planned budgets.
+
+For an authorized GDP release, require the pipeline to apply `20260911000000_gdp_overview`, import 251 GDP observations with field parity, and pass the database-mode build before triggering Vercel. After the deployment is READY at the merged SHA, verify the Georgian and English Economy hub, GDP overview and GDP methodology URLs; all four tabs and summaries; nominal GEL/USD controls; and a native Excel download in each language. Check the overview Dataset metadata and all six route URLs in the sitemap. Query all six GDP series for 2025 and one early real-GDP year through the live MCP endpoint, verify original-source links, and compare the public GDP JSON/CSV bytes with their central manifest hashes. These live checks are separate from local disposable-database evidence and do not establish search indexing.

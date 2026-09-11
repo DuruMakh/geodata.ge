@@ -27,6 +27,7 @@ import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
+import { GdpSummary } from "./gdp-summary";
 
 export type GdpWorkbookSource = WorkbookPublicSource & { sourceId: string };
 export function GdpOverview({
@@ -285,6 +286,7 @@ export function GdpOverview({
             {t("methodology")}
           </Link>
         </div>
+        <GdpSummary indicator={state.indicator} />
       </div>
     </main>
   );
