@@ -906,3 +906,15 @@ Discovery includes the shared public header item `AI` linking to `/connect`, act
 ## GDP overview extension
 
 Economy is a peer below Budget in the explorer sidebar. Its hub reuses the budget cards; only GDP overview is active initially. GDP overview reuses the existing chart, table, range strip, text tabs and Excel button. The four indicator tabs are centered across the workspace (Real GDP, Nominal GDP, GDP growth, GDP per capita). Nominal measures have GEL/USD pills in the chart toolbar at the share-control position. There is no right-side display/series panel, new chart renderer or additional KPI system. See `docs/superpowers/specs/2026-09-10-gdp-overview-design.md`. Existing Budget components remain authoritative over previews.
+
+## 25. Inflation Surfaces
+
+Inflation is the third dataset in the explorer sidebar (Budget, Economy, Inflation), with the same active-row, nested-section, collapse, keyboard and mobile behaviour. Its hub reuses the budget hub cards: only `ინფლაციის მიმოხილვა` is live; categories, basket, cities and products are non-clickable coming-soon cards. The collapsed rail reads `მონაცემები / ინფლაცია`.
+
+The overview follows the GDP overview's header — headline line and unit line under the H1, `TextTab` indicator tabs centred above the workspace (`წლიური ინფლაცია`, `თვიური ინფლაცია`, `ფასების ინდექსი`) — over the Budget explorers' workspace: `ხაზი / ცხრილი`, chart or table, range strip, series panel with the download at its foot, source note. The series panel adds a reference row (the NBG target) with a dashed swatch; its chart line is dashed accent with no end dot, and it appears only on annual inflation. Inflation values are never coloured good/bad; rate changes are in percentage points.
+
+Monthly axes: the line chart and range strip take a periods-per-year hint. Axis labels fall on calendar years (thinned to twelve); lattice columns group months at calendar boundaries under the 12px floor (§8.3); range chips are `5წ / 10წ / ყველა` counted in months (no one-year chip); arrows step a month, PageUp/PageDown a year. Year charts and strips render unchanged.
+
+`ცხრილი` for monthly data is a years (newest first) × months grid with ExplorerTable's anatomy (§8.4), one series at a time (a `TextTab` picker when several are selected). Percentage tabs tint cells on a five-step scale — deflation blue `#DCE4F2`, then `#F1EADC`, `#EBCDBB`, `#D9967C`, and accent `#B3402A` with paper text — every pair ≥ 4.5:1; values are always printed and a legend names the bins. The index tab is untinted. Annual inflation adds a `წლის საშუალო` column (December 12-month average).
+
+`ძირითადი ინდიკატორები` on this page shows the latest published month: the §8.5 hero (value, 3px gauge on a 0–15% scale against the target in force, dashed target mark, one sentence) and three side KPIs with sparklines (core inflation, monthly inflation, 12-month average). No movers board and no period comparison. See `docs/superpowers/specs/2026-09-11-inflation-overview-design.md`.

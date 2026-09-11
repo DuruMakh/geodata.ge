@@ -46,12 +46,12 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Broad public data catalog.
 - Historical municipal per-capita series, detail-page per-capita measures, and per-capita exports. V1 includes only the bounded 2025 index map, supporting list values, and median KPI described above.
 - The six selected-detail municipal categories. Only the ten main functions are served.
-- Any data behind the four sidebar indicator markers (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`).
+- Any data behind the four sidebar indicator markers (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) (inflation: see 2C).
 - Capital projects explorer.
 - Admin UI.
 - Public API.
 - User uploads.
-- Quarterly or monthly data.
+- Quarterly or monthly data (inflation: see 2C).
 - Automated production extraction from DOCX/PDF.
 - Clickable drilldown/detail pages into programs, subprograms, or revenue subcategories.
 
@@ -111,6 +111,15 @@ automatic language detection, language cookie or language redirect is introduced
 Future additions must provide reviewed language companions and page review dates
 before passing `npm run i18n:check`. The bounded decisions are in
 `docs/superpowers/specs/2026-09-05-fiscal-bilingual-design.md`.
+
+## 2C. Approved inflation extension
+
+Approved 2026-09-11 (`docs/superpowers/specs/2026-09-11-inflation-overview-design.md`). For this dataset only, the "data behind the sidebar indicator markers" and "quarterly or monthly data" exclusions are lifted:
+
+- Inflation hub at `/explorer/inflation` and Inflation overview at `/explorer/inflation/overview`: monthly national CPI from Geostat — headline index (2010 = 100), annual and monthly inflation, the 12-month average, core inflation and core excluding tobacco — with the National Bank of Georgia inflation target as a reference line; year × month table; Excel download; Georgian and English.
+- Methodology page `/methodology/inflation` with the archived Geostat and NBG source files.
+
+Still excluded: inflation categories, basket weights, city indices, product-level indices, the price calculator, every other price index (producer, import, construction, property, agricultural), HICP, MCP intents and JSON publications for inflation, and monthly or quarterly data for any other dataset. Each needs its own approved spec.
 
 ## 3. Target Users
 
