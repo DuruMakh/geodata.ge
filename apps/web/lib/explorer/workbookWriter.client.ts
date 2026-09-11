@@ -130,7 +130,10 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
   const changeHeader = readable.years.length > 0
     ? workbookMessage(locale, "workbook.changeRange", { startYear: readable.years[0], endYear: readable.years.at(-1)! })
     : workbookMessage(locale, "workbook.change");
-  const headers = [workbookMessage(locale, "workbook.category"), ...readable.years, ...(readable.showChangeColumn === false ? [] : [changeHeader])];
+  const leading = readable.headerLabels
+    ? [readable.headerLabels.category, ...readable.headerLabels.columns]
+    : [workbookMessage(locale, "workbook.category"), ...readable.years];
+  const headers = [...leading, ...(readable.showChangeColumn === false ? [] : [changeHeader])];
   headers.forEach((header, index) => {
     const cell = worksheet.getCell(3, index + 1);
     cell.value = header;
@@ -247,7 +250,7 @@ export async function createWorkbookBuffer(model: WorkbookExportModel): Promise<
   for (const [column, format] of Object.entries(model.analysis.numericFormats ?? {})) {
     for (let row=2; row<=model.analysis.rows.length+1; row++) analysis.getCell(row,Number(column)).numFmt=format;
   }
-  writeSourcesSheet(sources, model.sources, model.readable.years, model.locale);
+  writeSourcesSheet(sources, model.sources, model.sourceYears ?? model.readable.years, model.locale);
 
   const bytes = await workbook.xlsx.writeBuffer();
   return new Uint8Array(bytes).buffer;

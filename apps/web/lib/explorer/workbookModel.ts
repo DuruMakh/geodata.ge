@@ -68,6 +68,8 @@ export type WorkbookExportModel = {
     showChangeColumn?: boolean;
     years: number[];
     rows: WorkbookReadableRow[];
+    /** Header text when the readable columns are not calendar years (e.g. months). */
+    headerLabels?: { category: string; columns: string[] };
   };
   analysis: {
     numericFormats?: Record<number,string>;
@@ -75,6 +77,8 @@ export type WorkbookExportModel = {
     rows: Array<Array<string | number | null>>;
   };
   sources: Array<WorkbookPublicSource & { absoluteUrl: string }>;
+  /** Calendar years the sources sheet describes when the readable columns are not years. */
+  sourceYears?: number[];
 };
 
 const statusLabel = (basis: WorkbookBasis, locale: Locale) => workbookMessage(locale, ({
