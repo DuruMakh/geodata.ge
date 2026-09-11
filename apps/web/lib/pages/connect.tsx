@@ -237,6 +237,7 @@ export async function renderConnectPage(locale: Locale) {
                     {message(messages, "connect.balance")}{" "}
                     {ranges["general-government-balance"]} {message(messages, "connect.forecastSuffix")}
                   </li>
+                  <li>{message(messages,"connect.gdpCoverage",{range:ranges["gdp-overview"]})}</li>
                 </ul>
               </div>
               <div data-testid="connect-coverage-excluded">

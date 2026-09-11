@@ -1062,5 +1062,33 @@
   "spending.sport": {
     "text": "Sport",
     "reviewedAt": "2026-09-05"
+  },
+  "gdp-overview": {
+    "text": "GDP overview",
+    "reviewedAt": "2026-09-11"
+  },
+  "real_usd_2015": {
+    "text": "Real GDP, constant 2015 USD",
+    "reviewedAt": "2026-09-11"
+  },
+  "real_growth_percent": {
+    "text": "Annual real GDP growth",
+    "reviewedAt": "2026-09-11"
+  },
+  "nominal_gel": {
+    "text": "Nominal GDP, GEL",
+    "reviewedAt": "2026-09-11"
+  },
+  "nominal_usd": {
+    "text": "Nominal GDP, USD",
+    "reviewedAt": "2026-09-11"
+  },
+  "per_capita_gel": {
+    "text": "Nominal GDP per capita, GEL",
+    "reviewedAt": "2026-09-11"
+  },
+  "per_capita_usd": {
+    "text": "Nominal GDP per capita, USD",
+    "reviewedAt": "2026-09-11"
   }
 }

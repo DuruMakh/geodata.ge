@@ -257,5 +257,16 @@
   "sources.source.municipal_portal_archive.name": "Archived Municipalities Analytical Portal open-data exports (2015-2019 functional actuals)",
   "sources.source.treasury_consolidated_revenue_actual.name": "Treasury annual consolidated-revenue reports — transfers from autonomous republic",
   "supporting.populationTransformation": "Source sheet “{sheet}”, cell {cell}, year {year}; retained published thousands; persons = thousands × 1000; no estimates.",
-  "supporting.populationUnit": "thousands"
+  "supporting.populationUnit": "thousands",
+  "sources.source.wb_gdp_real_usd_2015.name": "World Bank GDP Georgia",
+  "sources.source.wb_gdp_real_growth_percent.name": "World Bank GDP Georgia",
+  "documents.source.wb_gdp_real_usd_2015.title": "NY.GDP.MKTP.KD.json",
+  "documents.source.wb_gdp_real_usd_2015.publisher": "World Bank",
+  "documents.source.wb_gdp_real_usd_2015.attribution": "World Bank",
+  "documents.source.wb_gdp_real_growth_percent.title": "NY.GDP.MKTP.KD.ZG.json",
+  "documents.source.wb_gdp_real_growth_percent.publisher": "World Bank",
+  "documents.source.wb_gdp_real_growth_percent.attribution": "World Bank",
+  "documents.source.wb_gdp_metadata.title": "wb_indicator_metadata.json",
+  "documents.source.wb_gdp_metadata.publisher": "World Bank",
+  "documents.source.wb_gdp_metadata.attribution": "World Bank"
 }

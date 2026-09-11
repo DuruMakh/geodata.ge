@@ -68,11 +68,10 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the four approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
     expect(FUTURE_METHODOLOGY_DATASETS).toEqual([
       { title: "ინფლაცია", href: null, state: "future" },
-      { title: "მშპ", href: null, state: "future" },
       { title: "მოსახლეობა", href: null, state: "future" },
       { title: "უმუშევრობა", href: null, state: "future" },
     ]);
@@ -155,11 +154,7 @@ describe("methodology catalog", () => {
     expect(METHODOLOGY_CONTENT.expenditure.reviewedAt).toBe("2026-08-20");
     expect(METHODOLOGY_CONTENT.revenue.reviewedAt).toBe("2026-08-20");
 
-    expect(FUTURE_METHODOLOGY_DATASETS.find((entry) => entry.title === "მშპ")).toEqual({
-      title: "მშპ",
-      href: null,
-      state: "future",
-    });
+    expect(METHODOLOGY_CONTENT.gdp.slug).toBe("gdp");
   });
 
   it("publishes the year-specific functional expenditure source boundary", () => {
@@ -353,6 +348,7 @@ describe("methodology catalog", () => {
       expenditure: { fileCount: 42, totalBytes: 100, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 21, totalBytes: 200, latestRetrievedAt: "2026-08-09", validated: true },
       municipalities: { fileCount: 80, totalBytes: 300, latestRetrievedAt: "2026-08-08", validated: true },
+      gdp: { fileCount:5, totalBytes:100, latestRetrievedAt:"2026-09-10", validated:true, minYear:1960, maxYear:2025 },
       debt: { fileCount: 10, totalBytes: 400, latestRetrievedAt: "2026-09-01", validated: true },
     };
 
@@ -393,6 +389,7 @@ describe("methodology catalog", () => {
         originalFileCount: 10,
         reviewedAt: METHODOLOGY_CONTENT.debt.reviewedAt,
       },
+      {id:"gdp",title:METHODOLOGY_CONTENT.gdp.title,summary:METHODOLOGY_CONTENT.gdp.summary,href:"/methodology/gdp",coverage:{firstYear:1960,lastYear:2025},originalFileCount:5,reviewedAt:METHODOLOGY_CONTENT.gdp.reviewedAt},
     ]);
   });
 
@@ -401,6 +398,7 @@ describe("methodology catalog", () => {
       expenditure: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: false },
       municipalities: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: true },
+      gdp: { fileCount:5, totalBytes:100, latestRetrievedAt:"2026-09-10", validated:true, minYear:1960, maxYear:2025 },
       debt: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-09-01", validated: true },
     } satisfies Record<(typeof LIVE_METHODOLOGY_IDS)[number], MethodologyArchiveSummary>;
 

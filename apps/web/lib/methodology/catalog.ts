@@ -1,3 +1,5 @@
+import { GDP_METHODOLOGY_CONTENT } from "./content/gdp";
+import { GDP_METHODOLOGY_CONTENT as EN_GDP } from "./content/en/gdp";
 import type { MunicipalTotalFact } from "../data/municipal/types";
 import type { Locale } from "../i18n/types";
 import { DEBT_METHODOLOGY_CONTENT as EN_DEBT } from "./content/en/debt";
@@ -25,17 +27,17 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   revenue: REVENUE_METHODOLOGY_CONTENT,
   municipalities: MUNICIPALITIES_METHODOLOGY_CONTENT,
   debt: DEBT_METHODOLOGY_CONTENT,
+  gdp: GDP_METHODOLOGY_CONTENT,
 };
 
 export const FUTURE_METHODOLOGY_DATASETS = [
   { title: "ინფლაცია", href: null, state: "future" },
-  { title: "მშპ", href: null, state: "future" },
   { title: "მოსახლეობა", href: null, state: "future" },
   { title: "უმუშევრობა", href: null, state: "future" },
 ] as const;
 
 const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, MethodologyContent>> = {
-  expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT,
+  expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT, gdp: EN_GDP,
 };
 
 export function getMethodologyContent(id: MethodologyDatasetId, locale: Locale): MethodologyContent {
@@ -51,8 +53,10 @@ export function deriveMethodologyCoverage(
   budgetFacts: readonly ServedBudgetFact[],
   municipalFacts: readonly MunicipalTotalFact[],
   debtFacts: readonly ServedGovernmentDebtFact[],
+  archive?: {minYear?:number;maxYear?:number},
 ): { firstYear: number; lastYear: number } {
   const source = METHODOLOGY_CONTENT[id].coverageSource;
+  if(source.kind === "archive") { if(archive?.minYear === undefined || archive.maxYear === undefined) throw new Error("Missing GDP archive coverage"); return {firstYear:archive.minYear,lastYear:archive.maxYear}; }
   const years =
     source.kind === "municipalTotals"
       ? municipalFacts.map((fact) => fact.year)
@@ -82,7 +86,7 @@ export function buildMethodologyHubEntries(input: MethodologyHubInput, locale: L
       title: content.title,
       summary: content.summary,
       href: locale === "en" ? `/en/methodology/${id}` : `/methodology/${id}`,
-      coverage: deriveMethodologyCoverage(id, input.budgetFacts, input.municipalFacts, input.debtFacts),
+      coverage: deriveMethodologyCoverage(id, input.budgetFacts, input.municipalFacts, input.debtFacts, archive),
       originalFileCount: archive.fileCount,
       reviewedAt: content.reviewedAt,
     };

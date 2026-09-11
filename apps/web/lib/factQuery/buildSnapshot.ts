@@ -18,6 +18,8 @@ import { absoluteWorkbookSourceUrl } from "../explorer/workbookModel";
 import { PROGRAM_SUCCESSIONS, findProgramSuccession } from "../data/adminSpending/programSuccessions";
 import { LEGACY_PROGRAM_JOINS } from "../data/adminSpending/legacyProgramJoins";
 import { makeProgramItemId } from "../data/adminSpending/generateAdminSpendingFacts";
+import { loadGdpOverviewFacts, loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
+import { GDP_QUERY_SERIES } from "./gdpSeries";
 import { loadServedGeneralGovernmentBalanceData } from "../data/generalGovernmentBalance/importGeneralGovernmentBalance";
 import { loadServedGovernmentDebtData } from "../data/governmentDebt/importGovernmentDebtFacts";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
@@ -213,6 +215,10 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
     ),
   );
 
+  // Geostat documents retain their existing package identities; World Bank originals are new.
+  const gdpManifest = await loadReviewedSourceManifest(repositoryRoot, "gdp");
+  perDataset.push(gdpManifest.filter(row => row.source_id.startsWith("source.wb_gdp_") && !row.source_id.endsWith("metadata")));
+
   // official_url_or_archive_url is free text, not a validated URL column
   // (sourceManifest.ts's schema only checks it's a non-empty string): most
   // rows hold prose like "Repository archive: docs/Raw Data/..." (an internal
@@ -262,6 +268,9 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
         throw new Error(`buildFactQuerySnapshot: invalid source manifest row ${index + 1} in ${directory.join("/")}: ${issues}`);
       }
       const row = parsed.data;
+      const archivedOriginal = gdpManifest.find((original) =>
+        original.source_id === row.source_id && original.sha256 === row.sha256 && original.byte_size === row.bytes,
+      );
       documents.push({
         repositoryPath: [...directory, row.local_file].join("/"),
         documentId: row.source_id,
@@ -269,7 +278,7 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
         title: (row.dataset_title ?? row.dataset)!,
         publisher: row.publisher,
         officialUrl: row.retrieved_file_url,
-        archiveUrl: null,
+        archiveUrl: archivedOriginal ? absoluteWorkbookSourceUrl(PUBLIC_SITE_ORIGIN, archivedOriginal.downloadHref) : null,
         // Non-null: the schema refine above rejects a row without a complete pair.
         years: yearsBetween(yearRangeOf(row)!.min, yearRangeOf(row)!.max),
         datasetId: null,
@@ -444,6 +453,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     loadEnglishCatalogue(repositoryRoot),
     readFile(path.join(repositoryRoot, "data/localization/ka/service-messages.json"), "utf8").then(text => serviceMessagesSchema.parse(JSON.parse(text))),
     readFile(path.join(repositoryRoot, "data/localization/en/service-messages.json"), "utf8").then(text => serviceMessagesSchema.parse(JSON.parse(text))),
+    loadServedGdpOverviewData(),
   ]);
   const messageErrors = validateServiceMessages(serviceKa, serviceEn);
   if (messageErrors.length) throw new Error(messageErrors.join("\n"));
@@ -453,7 +463,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia",
     ...municipal.functions.map(item => item.id), ...municipal.regions.map(region => region.id),
     ...municipal.municipalities.map(entity => entity.code), ...AGGREGATE_ONLY_MUNICIPAL_CODES,
-    ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID,
+    ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID, ...Object.keys(GDP_QUERY_SERIES), "gdp-overview",
     "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
   ])].sort();
   const localization: ServiceLocalization = {
@@ -614,6 +624,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
       ),
     },
     deficit: { facts: sortedBy(deficit.facts, (f) => f.year) },
+    gdpOverview: { facts: sortedBy(await loadGdpOverviewFacts(), f=>f.seriesId, f=>f.year), series: GDP_QUERY_SERIES },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
     sources,
   };

@@ -22,6 +22,7 @@ the import is re-run.
 | `SourceDocument` | `data/sources/source-documents.csv` |
 | `BudgetFact` | `data/imports/budget-facts-2004-2025.csv` (expenditure and revenue 2004–2025; 2004 revenue omits unavailable liabilities) |
 | `AdminSpendingFact` | `data/imports/admin-spending-facts-2004-2025.csv` (admin categories + major-program drill-down rows) |
+| `GdpOverviewFact` | `data/imports/gdp-overview-annual.csv` (251 reviewed GDP observations; decimal values and complete provenance) |
 | `NationalGdpFact` | `data/imports/national-gdp-annual-1996-2025.csv` (one reviewed nominal-GDP denominator per year) |
 | `GovernmentDebtFact` | `data/imports/government-debt-facts-2013-2030.csv` (nine public Government Debt series; generated from the approved normalized debt package) |
 | `GeneralGovernmentBalanceFact` | `data/imports/general-government-balance-annual-1995-2031.csv` (IMF general-government balance as percent of GDP and nominal GEL, with actual/projection status) |

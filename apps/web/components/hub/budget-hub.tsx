@@ -42,9 +42,9 @@ function CardBody({ card, locale }: { card: HubCardModel; locale: Locale }) {
   );
 }
 
-export function BudgetHub({ cards, locale = "ka" }: { cards: HubCardModel[]; locale?: Locale }) {
+export function BudgetHub({ cards, locale = "ka", testId = "budget-hub" }: { cards: HubCardModel[]; locale?: Locale; testId?: string }) {
   return (
-    <div data-testid="budget-hub" className="grid max-w-[860px] gap-4 min-[768px]:grid-cols-2">
+    <div data-testid={testId} className="grid max-w-[860px] gap-4 min-[768px]:grid-cols-2">
       {cards.map((card) =>
         card.href === null ? (
           <div

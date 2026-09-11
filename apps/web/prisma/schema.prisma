@@ -78,6 +78,7 @@ model SourceDocument {
   gdpFacts        NationalGdpFact[]
   populationFacts MunicipalPopulationFact[]
   generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
+  gdpOverviewFacts GdpOverviewFact[]
 }
 
 model ImportRun {
@@ -100,6 +101,7 @@ model ImportRun {
   gdpFacts              NationalGdpFact[]
   governmentDebtFacts   GovernmentDebtFact[]
   generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
+  gdpOverviewFacts GdpOverviewFact[]
   populationFacts       MunicipalPopulationFact[]
 }
 
@@ -385,4 +387,20 @@ model MunicipalAdjaraBudgetAdjustment {
   transferSourceId       String
 
   @@index([scopeId])
+}
+
+model GdpOverviewFact {
+  seriesId String
+  year Int
+  value Decimal @db.Decimal(40,20)
+  unit String
+  status String
+  accountingStandard String?
+  sourceLocator String
+  sourceDocumentId String
+  sourceDocument SourceDocument @relation(fields:[sourceDocumentId], references:[id])
+  lastReviewedAt DateTime @db.Date
+  importRunId String?
+  importRun ImportRun? @relation(fields:[importRunId], references:[id])
+  @@id([seriesId, year])
 }

@@ -78,6 +78,10 @@ async function main() {
       stale.push(`${artifact.fileName}: missing`);
       continue;
     }
+    if(artifact.fileName.endsWith(".csv")) {
+      if(!onDisk.equals(artifact.bytes)) stale.push(`${artifact.fileName}: content differs`);
+      continue;
+    }
     const before = comparable(onDisk);
     if (before === null) {
       stale.push(`${artifact.fileName}: not readable as JSON`);

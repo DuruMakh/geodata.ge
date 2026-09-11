@@ -18,6 +18,7 @@ beforeAll(async () => {
  * merely mis-describe one.
  */
 const CALLS: Record<string, unknown> = {
+  query_gdp: {seriesIds:["real_usd_2015","nominal_usd","real_growth_percent"],years:[2025]},
   describe_coverage: { datasetId: "municipal-expenditure" },
   query_national: { side: "revenue", seriesIds: ["revenue.total"], years: [2024], measure: "amount_gel" },
   query_ministries: {

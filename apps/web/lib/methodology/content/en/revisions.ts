@@ -6,4 +6,5 @@ export const METHODOLOGY_TRANSLATION_REVIEWED_AT: Readonly<Record<MethodologyDat
   revenue: "2026-09-06",
   municipalities: "2026-09-06",
   debt: "2026-09-06",
+  gdp: "2026-09-11",
 };

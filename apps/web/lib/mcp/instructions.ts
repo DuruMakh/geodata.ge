@@ -27,9 +27,17 @@ export function serverInstructions(
 ): string {
   const range = (id: DatasetId) => coverage[id] ?? "see describe_coverage";
 
-  return `Fiscal.ge serves reviewed annual data on Georgia's state and municipal budgets.
+  return `Fiscal.ge serves reviewed annual data on Georgia's state and municipal budgets and GDP.
 
 WHAT IS SERVED
+- GDP overview, ${range("gdp-overview")}, through query_gdp. Choose one or more of
+  six discovered series IDs; each fixes its units and price basis. Real GDP is
+  constant-2015 USD; nominal GDP and nominal GDP per capita are current GEL/USD.
+  Annual real growth is percentage points (7.5 means 7.5%), not a fraction.
+  Values are published or preliminary, never budget planned values. Per-capita
+  GDP is output per person, not income. Preserve historical and revision caveats.
+  Individual series have shorter year coverage. GDP ranking and cumulative
+  comparisons are not supported; do not mix currencies or nominal/real changes.
 - National consolidated budget RECEIPTS, ${range("national-revenue")}, and
   national STATE-BUDGET expenditure, ${range("national-expenditure")}, by
   category. Those are two different accounting boundaries; see BUDGET

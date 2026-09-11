@@ -10,6 +10,8 @@ import { describeCoverage } from "../factQuery/describeCoverage";
 import { getSources } from "../factQuery/getSources";
 import { queryMinistries } from "../factQuery/queryMinistries";
 import { queryDebt } from "../factQuery/queryDebt";
+import { queryGdp } from "../factQuery/queryGdp";
+import { queryGdpInput } from "../factQuery/schemas";
 import { queryDeficit } from "../factQuery/queryDeficit";
 import { queryMunicipal } from "../factQuery/queryMunicipal";
 import { queryNational } from "../factQuery/queryNational";
@@ -56,6 +58,7 @@ const ANNOTATIONS = {
 } as const;
 
 export const TOOLS: readonly ToolDefinition[] = [
+ { name: "query_gdp", title: "მშპ / GDP", describe: coverage=>`Annual GDP overview, ${coverage["gdp-overview"]}. Use describe_coverage for the six series IDs and their exact years. Series encode current GEL/USD, constant-2015 USD, annual real growth percent, or nominal GDP per capita GEL/USD. No currency conversion, index rebasing, population calculation, forecasts, ranking or cumulative comparison. Growth 7.5 means 7.5%. For long histories request one series at a time to stay within the response-size limit. Published/preliminary status and source caveats travel with every result.`, schema: queryGdpInput, run: (snapshot,input)=>queryGdp(snapshot,input) },
   {
     name: "describe_coverage",
     title: "დაფარვა და შესაძლებლობები",
@@ -63,7 +66,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       "Ask this FIRST when you do not already know an id. Returns the datasets, entities, series, " +
       "hierarchy, calculated totals, legal measures, year coverage and documented exclusions that " +
       "actually exist. Optional `search` matches reviewed Georgian and English labels and Latin slugs, and works WITHOUT " +
-      "a datasetId — search alone looks across all six datasets and each match names the dataset " +
+      "a datasetId — search alone looks across all seven datasets and each match names the dataset " +
       "it belongs to, so you can find an id before you know where it lives. Georgian case endings " +
       "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here.",
     schema: describeCoverageInput,

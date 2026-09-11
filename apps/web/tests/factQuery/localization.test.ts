@@ -76,7 +76,7 @@ describe("snapshot-pinned translations", () => {
         expect(document.publisherEn).not.toMatch(/\p{Script=Georgian}/u);
         expect(document.attribution === null).toBe(document.attributionKa === null);
         expect(document.attribution === null).toBe(document.attributionEn === null);
-        expect(document.documentLanguage).toBeNull();
+        expect(document.documentLanguage).toBe(document.documentId.startsWith('source.wb_gdp_') ? 'en' : null);
       }
     }
     expect(Object.keys(snapshot.localization.messages.en).some(key => /^(sources|documents)\./.test(key))).toBe(false);

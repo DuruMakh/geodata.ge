@@ -36,5 +36,7 @@
   "workbook.billionGel": "bn GEL",
   "workbook.receipts": "Receipts",
   "workbook.institutions": "Institutions",
-  "workbook.expenditure": "Expenditure"
+  "workbook.expenditure": "Expenditure",
+  "workbook.published": "Published",
+  "workbook.preliminary": "Preliminary"
 }

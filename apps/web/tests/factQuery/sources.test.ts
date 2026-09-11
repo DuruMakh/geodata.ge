@@ -55,6 +55,19 @@ describe("public source resolution", () => {
     expect(checked).toBeGreaterThan(0);
   });
 
+  it("links Geostat GDP originals without changing their historical metadata or scope", async () => {
+    const snapshot = await buildFactQuerySnapshot(OPTIONS);
+    for (const [id, file] of [
+      ["source.geostat_national_gdp_sna_1993", "geostat_nominal_legacy.xlsx"],
+      ["source.geostat_national_gdp_sna_2008", "geostat_nominal_current.xlsx"],
+    ]) {
+      const document = snapshot.sources.find((source) => source.sourceId === id)?.documents[0];
+      expect(document?.archiveUrl).toBe(`https://fiscal.ge/downloads/methodology/gdp/files/${file}`);
+      expect(document?.datasetId).toBeNull();
+      expect(document?.retrievedAt).toBe("2026-08-13");
+    }
+  });
+
   it("never emits a sentinel source id", async () => {
     const snapshot = await buildFactQuerySnapshot(OPTIONS);
     for (const source of snapshot.sources) {
@@ -171,7 +184,7 @@ describe("public source resolution", () => {
       // 105 after the deficit merge added the IMF WEO workbook, then 115 once
       // the ten Ministry of Finance debt documents were registered so debt
       // figures could cite them.
-      expect(snapshot.sources.length).toBe(115);
+      expect(snapshot.sources.length).toBe(117);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {

@@ -20,6 +20,7 @@ import {
   loadNationalGdpFactsFromMirror,
   loadGovernmentDebtFactsFromMirror,
   loadGeneralGovernmentBalanceFactsFromMirror,
+  loadGdpOverviewFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "./mirrorRows";
 import { prisma } from "./prisma";
@@ -94,3 +95,5 @@ export async function loadMunicipalDataFromDb(): Promise<MunicipalData> {
     populationFacts,
   };
 }
+
+export async function loadGdpOverviewFactsFromDb(){return loadGdpOverviewFactsFromMirror(prisma);}

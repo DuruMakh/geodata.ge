@@ -30,6 +30,8 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   shareColumnLabel?: string;
   forecastYears?: number[];
   forecastLabel?: string;
+  preliminaryYears?: number[];
+  preliminaryLabel?: string;
   shareValueForYear: (row: Row, year: number) => number | null;
 };
 
@@ -55,6 +57,8 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   shareColumnLabel,
   forecastYears,
   forecastLabel,
+  preliminaryYears,
+  preliminaryLabel,
   shareValueForYear,
 }: ExplorerTableProps<Row>) {
   const { locale, messages, englishLabels } = useI18n();
@@ -129,6 +133,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                   }}
                 >
                   {cellValue(row, year)}
+                  {preliminaryYears?.includes(year) ? <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{preliminaryLabel}</sup> : null}
                   {row.basisByYear?.[year] === "planned" ? (
                     <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{message(messages, "controls.planned")}</sup>
                   ) : null}

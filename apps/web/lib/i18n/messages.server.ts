@@ -2,6 +2,7 @@ import type { Locale, Messages, MessageScope } from "./types";
 
 const dictionaries = {
   ka: {
+    gdp: () => import("./messages/ka/gdp.json"),
     common: () => import("./messages/ka/common.json"),
     format: () => import("./messages/ka/format.json"),
     controls: () => import("./messages/ka/controls.json"),
@@ -19,6 +20,7 @@ const dictionaries = {
     seo: () => import("./messages/ka/seo.json"),
   },
   en: {
+    gdp: () => import("./messages/en/gdp.json"),
     common: () => import("./messages/en/common.json"),
     format: () => import("./messages/en/format.json"),
     controls: () => import("./messages/en/controls.json"),

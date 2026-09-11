@@ -67,6 +67,7 @@ function writeReadableRow(
   years: number[],
   isPercentage: boolean,
   locale: Locale,
+  showChangeColumn = true,
 ): void {
   const label = worksheet.getCell(rowNumber, 1);
   label.value = row.kind === "item" && row.parentLabel ? `${row.parentLabel} — ${row.label}` : row.label;
@@ -80,10 +81,15 @@ function writeReadableRow(
     if (value !== null) {
       const isPlanned = row.basisByYear[year] === "planned";
       cell.numFmt = readableNumberFormat(isPercentage, isPlanned, locale);
+      if (row.basisByYear[year] === "preliminary") {
+        const marker = workbookMessage(locale, "workbook.preliminary");
+        cell.numFmt = isPercentage ? `0.0% "${marker}"` : `#,##0.0 "${marker}"`;
+      }
       if (isPlanned) cell.fill = PLANNED_FILL;
     }
   }
 
+  if (showChangeColumn) {
   const changeCell = worksheet.getCell(rowNumber, years.length + 2);
   changeCell.alignment = { horizontal: "right", vertical: "middle" };
   changeCell.numFmt = PERCENTAGE_NUMBER_FORMAT;
@@ -93,8 +99,9 @@ function writeReadableRow(
     changeCell.value = { formula: `${lastValueCell}/${firstValueCell}-1`, result: row.change };
   }
 
+  }
   if (row.kind === "total" || row.kind === "group") {
-    for (let column = 1; column <= years.length + 2; column += 1) {
+    for (let column = 1; column <= years.length + (showChangeColumn ? 2 : 1); column += 1) {
       const cell = worksheet.getCell(rowNumber, column);
       cell.font = { bold: true };
       if (row.kind === "total") cell.fill = PLANNED_FILL;
@@ -105,7 +112,7 @@ function writeReadableRow(
 }
 
 function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel["readable"], locale: Locale): void {
-  const lastColumn = Math.max(readable.years.length + 2, 4);
+  const lastColumn = Math.max(readable.years.length + (readable.showChangeColumn === false ? 1 : 2), 4);
   const lastColumnLetter = columnLetter(lastColumn);
   const isPercentage = readable.unitLabel.includes("%");
 
@@ -123,7 +130,7 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
   const changeHeader = readable.years.length > 0
     ? workbookMessage(locale, "workbook.changeRange", { startYear: readable.years[0], endYear: readable.years.at(-1)! })
     : workbookMessage(locale, "workbook.change");
-  const headers = [workbookMessage(locale, "workbook.category"), ...readable.years, changeHeader];
+  const headers = [workbookMessage(locale, "workbook.category"), ...readable.years, ...(readable.showChangeColumn === false ? [] : [changeHeader])];
   headers.forEach((header, index) => {
     const cell = worksheet.getCell(3, index + 1);
     cell.value = header;
@@ -132,7 +139,7 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
     cell.alignment = { horizontal: index === 0 ? "left" : "right", vertical: "middle" };
   });
 
-  readable.rows.forEach((row, index) => writeReadableRow(worksheet, index + 4, row, readable.years, isPercentage, locale));
+  readable.rows.forEach((row, index) => writeReadableRow(worksheet, index + 4, row, readable.years, isPercentage, locale, readable.showChangeColumn !== false));
 
   const noteRow = readable.rows.length + 4;
   worksheet.getCell(noteRow, 1).value = workbookMessage(locale, "workbook.unit", { unit: readable.unitLabel });
@@ -237,6 +244,9 @@ export async function createWorkbookBuffer(model: WorkbookExportModel): Promise<
 
   writeReadableSheet(readable, model.readable, model.locale);
   writeAnalysisSheet(analysis, model.analysis);
+  for (const [column, format] of Object.entries(model.analysis.numericFormats ?? {})) {
+    for (let row=2; row<=model.analysis.rows.length+1; row++) analysis.getCell(row,Number(column)).numFmt=format;
+  }
   writeSourcesSheet(sources, model.sources, model.readable.years, model.locale);
 
   const bytes = await workbook.xlsx.writeBuffer();

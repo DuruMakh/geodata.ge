@@ -39,7 +39,7 @@ beforeAll(async () => {
   catalogueFile = allPublications.find((file) => file.fileName === "catalogue.json")!;
   sourcesFile = allPublications.find((file) => file.fileName === "sources.json")!;
   datasetFiles = allPublications.filter(
-    (file) => !["catalogue.json", "sources.json", "manifest.json"].includes(file.fileName),
+    (file) => file.fileName.endsWith(".json") && !["catalogue.json", "sources.json", "manifest.json"].includes(file.fileName),
   );
 });
 
@@ -66,6 +66,7 @@ describe("catalogue.json", () => {
     };
 
     expect(catalogue.datasets.map((dataset) => dataset.datasetId).sort()).toEqual([
+      "gdp-overview",
       "general-government-balance",
       "government-debt",
       "ministries",
@@ -181,6 +182,7 @@ describe("dataset publications", () => {
       "government-debt.json",
       "government-debt-rates.json",
       "general-government-balance.json",
+      "gdp-overview.json",
     ]);
 
     for (const file of files) {
@@ -256,6 +258,8 @@ describe("dataset publications", () => {
       "government-debt.json",
       "government-debt-rates.json",
       "general-government-balance.json",
+      "gdp-overview.json",
+      "gdp-overview.csv",
       "manifest.json",
     ]);
   });

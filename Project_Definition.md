@@ -39,6 +39,8 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Internal source/provenance metadata.
 - Public methodology and original-source centre: a `/methodology` hub plus live pages for expenditure, revenue, municipalities, and Government Debt; complete public decision records for the budget and municipal datasets; a concise Debt page limited to scope, sources, known limitations, and archive; and untouched upstream files available individually and as category archives. Future dataset names remain non-clickable `მალე` markers until their data, methodology, validation, and sources are ready together. Approved design: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`.
 
+- Economy hub at `/explorer/economy` and annual GDP overview at `/explorer/economy/gdp`: four centered Real GDP, Nominal GDP, GDP growth and nominal GDP-per-capita tabs, existing chart/table/range/download components, GEL/USD for nominal measures only. Scope and source boundaries: `docs/superpowers/specs/2026-09-10-gdp-overview-design.md`. GDP methodology is live with the feature; the six GDP series are also exposed through read-only MCP and central bulk downloads. Sector/regional explorers and population integration remain deferred.
+
 ### Excluded From V1
 
 - Broad public data catalog.

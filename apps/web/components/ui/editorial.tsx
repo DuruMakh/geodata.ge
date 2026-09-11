@@ -93,7 +93,7 @@ export function SourceNote({ children, testId }: SourceNoteProps) {
 }
 
 type SegmentedTabsProps<T extends string> = {
-  options: Array<{ value: T; label: string; testId?: string }>;
+  options: Array<{ value: T; label: string; testId?: string; ariaLabel?: string }>;
   value: T;
   onChange: (next: T) => void;
   ariaLabel: string;
@@ -112,6 +112,7 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, aria
             key={option.value}
             type="button"
             data-testid={option.testId}
+            aria-label={option.ariaLabel}
             data-focus-inset=""
             aria-pressed={active}
             onClick={() => onChange(option.value)}

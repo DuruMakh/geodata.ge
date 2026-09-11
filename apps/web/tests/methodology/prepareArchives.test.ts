@@ -100,6 +100,7 @@ async function createFixtureRepository() {
       await writeReviewedSource(repositoryRoot, "municipalities", "2016-2025", "docs/Raw Data/Municipalities/mof-municipality-budget-history-2016-2025/source-e.xlsx", "downloads/methodology/municipalities/files/2016-2025/source-e.xlsx", "source-e"),
       await writeReviewedSource(repositoryRoot, "municipalities", "2022", "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022/source-f.zip", "downloads/methodology/municipalities/files/2022/source-f.zip", "source-f"),
     ],
+    gdp: [await writeReviewedSource(repositoryRoot,"gdp","1960-2025","docs/Raw Data/Economy/gdp-overview/sources/real.json","downloads/methodology/gdp/files/real.json","gdp-real")],
     debt: [
       await writeReviewedSource(repositoryRoot, "debt", "2013-2030", "docs/Raw Data/Debt/government-debt-annual/official/source-g.pdf", "downloads/methodology/debt/files/2013-2030/source-g.pdf", "source-g"),
     ],

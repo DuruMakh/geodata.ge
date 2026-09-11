@@ -26,6 +26,7 @@ type EditorialLineChartProps = {
   share: boolean;
   unit: ValueUnit;
   shareLabel: string;
+  axisLeftPadding?: number;
 };
 
 const W = 920;
@@ -81,7 +82,7 @@ function decimalsFor(step: number, max: number): number {
   return max;
 }
 
-export function EditorialLineChart({ years, series, share, unit, shareLabel }: EditorialLineChartProps) {
+export function EditorialLineChart({ years, series, share, unit, shareLabel, axisLeftPadding = PAD_L }: EditorialLineChartProps) {
   const { messages } = useI18n();
   const [hoverRaw, setHover] = useState<number | null>(null);
   const n = years.length;
@@ -112,7 +113,7 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
   const bottom = negSpan > 0 ? -Math.ceil(negSpan / step - 1e-9) * step : 0;
   const span = top - bottom;
 
-  const x = (index: number) => PAD_L + (n <= 1 ? (W - PAD_L - PAD_R) / 2 : (index * (W - PAD_L - PAD_R)) / (n - 1));
+  const x = (index: number) => axisLeftPadding + (n <= 1 ? (W - axisLeftPadding - PAD_R) / 2 : (index * (W - axisLeftPadding - PAD_R)) / (n - 1));
   const y = (value: number) => PAD_T + ((top - value) / span) * (H - PAD_T - PAD_B);
   // Axis precision follows the gridline STEP, not the unit's data-derived
   // decimals. The unit carries enough precision for the smallest value in the
@@ -134,7 +135,7 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
   const labelStep = Math.max(1, Math.ceil(n / 12));
 
   const lattice = buildDotLattice({
-    plotWidth: W - PAD_L - PAD_R,
+    plotWidth: W - axisLeftPadding - PAD_R,
     plotHeight: H - PAD_T - PAD_B,
     yearCount: n,
     gridStepCount: Math.round(span / step),
@@ -143,8 +144,8 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
   function handlePointerMove(event: React.PointerEvent<SVGSVGElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
     const px = ((event.clientX - rect.left) / rect.width) * W;
-    const pointerStep = n <= 1 ? 1 : (W - PAD_L - PAD_R) / (n - 1);
-    const index = Math.min(n - 1, Math.max(0, Math.round((px - PAD_L) / pointerStep)));
+    const pointerStep = n <= 1 ? 1 : (W - axisLeftPadding - PAD_R) / (n - 1);
+    const index = Math.min(n - 1, Math.max(0, Math.round((px - axisLeftPadding) / pointerStep)));
     if (index !== hoverRaw) setHover(index);
   }
 
@@ -184,7 +185,7 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
               <pattern
                 id="chart-dot-lattice"
                 patternUnits="userSpaceOnUse"
-                x={PAD_L - lattice.colPitch / 2}
+                x={axisLeftPadding - lattice.colPitch / 2}
                 y={PAD_T - lattice.rowPitch / 2}
                 width={lattice.colPitch}
                 height={lattice.rowPitch}
@@ -198,9 +199,9 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
                 rows draw as half dots (quarters at the corners). */}
             <rect
               data-testid="chart-dot-lattice"
-              x={PAD_L - DOT_R}
+              x={axisLeftPadding - DOT_R}
               y={PAD_T - DOT_R}
-              width={W - PAD_L - PAD_R + DOT_R * 2}
+              width={W - axisLeftPadding - PAD_R + DOT_R * 2}
               height={H - PAD_T - PAD_B + DOT_R * 2}
               fill="url(#chart-dot-lattice)"
               opacity={0.6}
@@ -215,7 +216,7 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
                 or the axis labels would have nothing to sit against. */}
             {value === 0 || lattice === null ? (
               <line
-                x1={PAD_L}
+                x1={axisLeftPadding}
                 x2={W - PAD_R}
                 y1={y(value)}
                 y2={y(value)}
@@ -223,12 +224,12 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel }: E
                 strokeWidth={1}
               />
             ) : null}
-            <text x={PAD_L - 10} y={y(value) + 3} fontSize={11} fill="#6A6050" textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
+            <text x={axisLeftPadding - 10} y={y(value) + 3} fontSize={11} fill="#6A6050" textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
               {formatAxis(value)}
             </text>
           </g>
         ))}
-        <line x1={PAD_L} x2={PAD_L} y1={PAD_T} y2={H - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
+        <line x1={axisLeftPadding} x2={axisLeftPadding} y1={PAD_T} y2={H - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
         {years.map((year, index) => {
           const isLast = index === n - 1;
           const show = isLast || (index % labelStep === 0 && n - 1 - index >= labelStep);

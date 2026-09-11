@@ -37,7 +37,7 @@ describe("original-source inventory", () => {
   it("returns forward-slash paths in lexical order", async () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
     for (const rows of Object.values(inventory)) {
-      expect(rows.map((row) => row.path)).toEqual(rows.map((row) => row.path).toSorted());
+      expect(rows.map((row) => row.path)).toEqual(rows.map((row) => row.path).toSorted((a,b)=>a.localeCompare(b)));
       expect(rows.every((row) => !row.path.includes("\\"))).toBe(true);
     }
   });
@@ -60,7 +60,7 @@ describe("original-source inventory", () => {
     for (const datasetId of LIVE_METHODOLOGY_IDS) {
       const expected = await expectedOriginalSourcePaths(REPOSITORY_ROOT, datasetId);
       const manifest = await loadReviewedSourceManifest(REPOSITORY_ROOT, datasetId);
-      expect(manifest.map((row) => row.repository_source_path).toSorted()).toEqual(expected.map((row) => row.path));
+      expect(manifest.map((row) => row.repository_source_path).toSorted((a,b)=>a.localeCompare(b))).toEqual(expected.map((row) => row.path));
     }
   });
 

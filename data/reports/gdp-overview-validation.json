@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "counts": {
+    "real_usd_2015": 66,
+    "real_growth_percent": 65,
+    "nominal_gel": 30,
+    "nominal_usd": 30,
+    "per_capita_gel": 30,
+    "per_capita_usd": 30
+  },
+  "sourceHashes": {
+    "sources/geostat_nominal_current.xlsx": "21a576c9c20434a87bcb32047cd143eef2b8d3f3ff360442b420c76b0da27d34",
+    "sources/geostat_nominal_legacy.xlsx": "1f9befdca89f3a635f66abb14892386a9947bf7294045e4442832aa53e63dc8e",
+    "sources/NY.GDP.MKTP.KD.json": "a29136443c2aa7abb57299a95d712f9f74b9b39df9e247333a4a95e903050fc0",
+    "sources/NY.GDP.MKTP.KD.ZG.json": "98fbea3447eb4c0c8836ff741a1d3fb147ba027ea0ab50652415f9e2f9dd7b38",
+    "sources/wb_indicator_metadata.json": "bc4bc0ffec1755410f52b1091c6b1f46917c7417977102350d3d1102b4659216"
+  },
+  "budgetDenominatorUnchanged": true,
+  "maxGrowthErrorPercentagePoints": 5.782041512247815e-13
+}

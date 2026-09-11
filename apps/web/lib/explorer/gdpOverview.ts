@@ -1,0 +1,130 @@
+import type { ServedGdpObservation } from "../data/gdpOverview/types";
+export type GdpIndicator = "real" | "nominal" | "growth" | "per_capita";
+export type GdpState = {
+  indicator: GdpIndicator;
+  currency: "gel" | "usd";
+  mode: "line" | "table";
+  range: { kind: "all" } | { kind: "manual"; start: number; end: number };
+};
+export const DEFAULT_GDP_STATE: GdpState = {
+  indicator: "real",
+  currency: "gel",
+  mode: "line",
+  range: { kind: "all" },
+};
+export function seriesFor(state: GdpState) {
+  return state.indicator === "real"
+    ? "real_usd_2015"
+    : state.indicator === "growth"
+      ? "real_growth_percent"
+      : `${state.indicator}_${state.currency}`;
+}
+export function resolveGdpRange(
+  state: GdpState,
+  facts: ServedGdpObservation[],
+) {
+  const years = facts
+    .filter((f) => f.seriesId === seriesFor(state))
+    .map((f) => f.year)
+    .sort((a, b) => a - b);
+  const min = years[0],
+    max = years.at(-1)!;
+  if (
+    state.range.kind === "all" ||
+    state.range.end < min ||
+    state.range.start > max
+  )
+    return { min, max, start: min, end: max };
+  return {
+    min,
+    max,
+    start: Math.max(min, state.range.start),
+    end: Math.min(max, state.range.end),
+  };
+}
+export function changeGdpIndicator(
+  state: GdpState,
+  indicator: GdpIndicator,
+  facts: ServedGdpObservation[],
+): GdpState {
+  const next = { ...state, indicator },
+    r = resolveGdpRange(next, facts);
+  return {
+    ...next,
+    range:
+      state.range.kind === "all" || (r.start === r.min && r.end === r.max)
+        ? { kind: "all" }
+        : { kind: "manual", start: r.start, end: r.end },
+  };
+}
+export function buildGdpOverviewModel(
+  facts: ServedGdpObservation[],
+  state: GdpState,
+) {
+  const available = facts
+    .filter((f) => f.seriesId === seriesFor(state))
+    .sort((a, b) => a.year - b.year);
+  const range = resolveGdpRange(state, facts);
+  const selected = available.filter(
+    (f) => f.year >= range.start && f.year <= range.end,
+  );
+  const points = selected.map((f) => ({
+    ...f,
+    value: state.indicator === "growth" ? f.value / 100 : f.value,
+  }));
+  return {
+    range,
+    points,
+    years: points.map((p) => p.year),
+    availableYears: available.map((p) => p.year),
+    preliminaryYears: selected
+      .filter((f) => f.status === "preliminary")
+      .map((f) => f.year),
+    sourceIds: [...new Set(selected.map((f) => f.sourceId))],
+    headline: points.at(-1) ?? null,
+  };
+}
+export function parseGdpHash(hash: string): GdpState {
+  const p = new URLSearchParams(hash.replace(/^#/, ""));
+  const indicator = p.get("indicator"),
+    view = p.get("view"),
+    currency = p.get("currency");
+  const start = Number(p.get("start")),
+    end = Number(p.get("end"));
+  return {
+    indicator: (["real", "nominal", "growth", "per_capita"].includes(
+      indicator ?? "",
+    )
+      ? indicator
+      : "real") as GdpIndicator,
+    mode: view === "table" ? "table" : "line",
+    currency: currency === "usd" ? "usd" : "gel",
+    range:
+      p.get("range") !== "all" &&
+      p.has("start") &&
+      p.has("end") &&
+      Number.isInteger(start) &&
+      Number.isInteger(end) &&
+      start > 0 &&
+      end > 0
+        ? {
+            kind: "manual",
+            start: Math.min(start, end),
+            end: Math.max(start, end),
+          }
+        : { kind: "all" },
+  };
+}
+export function serializeGdpHash(state: GdpState) {
+  const p = new URLSearchParams({
+    indicator: state.indicator,
+    view: state.mode,
+    currency: state.currency,
+  });
+  if (state.range.kind === "all") p.set("range", "all");
+  else {
+    p.set("start", String(state.range.start));
+    p.set("end", String(state.range.end));
+  }
+  return p.toString();
+}

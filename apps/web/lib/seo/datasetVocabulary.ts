@@ -18,6 +18,7 @@
 // Which measures each dataset carries still mirrors `catalogue.json`, and
 // `datasetVocabulary.enums.test.ts` asserts that against the query enums.
 
+import { GDP_QUERY_SERIES } from "../factQuery/gdpSeries";
 import type { DatasetId, Measure } from "../factQuery/types";
 import type { Locale } from "../i18n/types";
 
@@ -29,13 +30,14 @@ type Localized = Record<Locale, string>;
 export type MeasureJsonLd = {
   "@type": "PropertyValue";
   /** The machine id; `name` carries the label a person reads. */
-  propertyID: Measure;
+  propertyID: string;
   name: string;
   description: string;
   unitText: string;
 };
 
 const MEASURES: Record<Measure, { name: Localized; description: Localized; unitText: string }> = {
+  value: {name:{ka:"გამოქვეყნებული მაჩვენებელი",en:"Published value"},description:{ka:"ერთეული განსაზღვრულია სერიით.",en:"Unit and price basis are defined by each series."},unitText:"series-specific"},
   amount_gel: {
     name: { ka: "თანხა (ლარი)", en: "Amount (GEL)" },
     description: {
@@ -86,6 +88,7 @@ export const DATASETS: Record<
     measurementTechnique: Localized;
   }
 > = {
+  "gdp-overview": {measures:["value"],keywords:{ka:["მშპ","ეკონომიკა","საქართველო"],en:["Georgia","GDP","real GDP growth","GDP per capita"]},measurementTechnique:{ka:"გადამოწმებული ამოღება საქსტატისა და მსოფლიო ბანკის წლიური ეროვნული ანგარიშებიდან.",en:"Reviewed extraction of published annual national accounts from Geostat and the World Bank, with explicit units and source status."}},
   "national-expenditure": {
     measures: ["amount_gel", "share_of_total_pct", "share_of_gdp_pct"],
     keywords: {
@@ -153,6 +156,7 @@ export function variableMeasuredFor(
   locale: Locale,
   omit: readonly Measure[] = [],
 ): readonly MeasureJsonLd[] {
+  if(datasetId === "gdp-overview") return Object.entries(GDP_QUERY_SERIES).map(([propertyID,s])=>({"@type":"PropertyValue",propertyID,name:locale==="ka"?s.labelKa:s.labelEn,description:locale==="ka"?s.definitionKa:s.definitionEn,unitText:s.unit}));
   return DATASETS[datasetId].measures
     .filter((measure) => !omit.includes(measure))
     .map((propertyID) => ({

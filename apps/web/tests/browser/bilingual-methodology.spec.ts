@@ -42,10 +42,10 @@ for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/en/methodology");
     const rows = page.getByTestId("methodology-live-row");
-    await expect(rows).toHaveCount(4);
-    expect(await rows.evaluateAll(elements => elements.map(element => element.getAttribute("href")))).toEqual(["expenditure", "revenue", "municipalities", "debt"].map(id => `/en/methodology/${id}`));
+    await expect(rows).toHaveCount(5);
+    expect(await rows.evaluateAll(elements => elements.map(element => element.getAttribute("href")))).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp"].map(id => `/en/methodology/${id}`));
     await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
-    await expect(page.getByTestId("methodology-future-row").getByText("Coming soon", { exact: true })).toHaveCount(4);
+    await expect(page.getByTestId("methodology-future-row").getByText("Coming soon", { exact: true })).toHaveCount(3);
     await rows.first().click();
     const decision = page.getByTestId("methodology-decision").first();
     await decision.locator("summary").focus();

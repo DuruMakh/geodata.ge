@@ -35,6 +35,7 @@ const inventoryRules = {
     { root: "docs/Raw Data/Municipalities/mof-municipality-budget-history-2016-2025", include: extension(".xlsx") },
     { root: "docs/Raw Data/Municipalities/municipalities.mof.ge-archive-2022", include: topLevelExtension(".zip") },
   ],
+  gdp: [{ root: "docs/Raw Data/Economy/gdp-overview/sources", include: () => true }],
   debt: [
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
   ],
