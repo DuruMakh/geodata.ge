@@ -1,7 +1,15 @@
 import Decimal from "decimal.js";
 import { readCsvRecords } from "../csv";
-import { CPI_MEASURES, CPI_SERIES_IDS, type CpiFact, type InflationTargetRow } from "./types";
-import { validateCpiFacts, validateTargetRows } from "./validateInflation";
+import { assertSameServedRows } from "../servedDataParity";
+import {
+  CPI_MEASURES,
+  CPI_SERIES_IDS,
+  type CpiFact,
+  type InflationTargetRow,
+  type ServedCpiFact,
+  type ServedInflationTargetRow,
+} from "./types";
+import { factKey, validateCpiFacts, validateTargetRows } from "./validateInflation";
 
 // Relative to apps/web, like every served CSV path (lib/data/servedData.ts).
 export const CPI_FACTS_CSV = "../../data/imports/cpi-national-monthly.csv";
@@ -38,4 +46,38 @@ export async function loadInflationTargets(relativePath = INFLATION_TARGETS_CSV)
   }));
   validateTargetRows(targets);
   return targets;
+}
+
+const SOURCE_DOCUMENTS_CSV = "../../data/sources/source-documents.csv";
+
+export function assertInflationParity(
+  csv: { facts: CpiFact[]; targets: InflationTargetRow[] },
+  db: { facts: CpiFact[]; targets: InflationTargetRow[] },
+): void {
+  validateCpiFacts(db.facts);
+  validateTargetRows(db.targets);
+  assertSameServedRows("Inflation CPI", csv.facts, db.facts, factKey);
+  assertSameServedRows("NBG inflation target", csv.targets, db.targets, (row) => row.effectiveFrom);
+}
+
+export async function loadServedInflationData(): Promise<{ facts: ServedCpiFact[]; targets: ServedInflationTargetRow[] }> {
+  const mode = (process.env.GEODATA_DATA_SOURCE ?? "csv").trim().toLowerCase();
+  if (mode !== "csv" && mode !== "" && mode !== "db") throw new Error("Invalid GEODATA_DATA_SOURCE");
+  let facts = await loadCpiFacts();
+  let targets = await loadInflationTargets();
+  const registered = new Set((await readCsvRecords(SOURCE_DOCUMENTS_CSV)).map((row) => row.source_id));
+  for (const id of new Set([...facts, ...targets].map((row) => row.sourceId))) {
+    if (!registered.has(id)) throw new Error(`Inflation source ${id} is not registered in data/sources/source-documents.csv`);
+  }
+  if (mode === "db") {
+    const { loadInflationDataFromDb } = await import("../../db/servedDataDb");
+    const db = await loadInflationDataFromDb();
+    assertInflationParity({ facts, targets }, db);
+    facts = db.facts;
+    targets = db.targets;
+  }
+  return {
+    facts: facts.map((fact) => ({ ...fact, value: Number(fact.value) })),
+    targets: targets.map((row) => ({ ...row, targetPct: Number(row.targetPct) })),
+  };
 }

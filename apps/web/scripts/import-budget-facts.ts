@@ -1,5 +1,7 @@
 import { loadGdpOverviewFacts, assertGdpParity } from "../lib/data/gdpOverview/importGdpOverview";
 import { loadGdpOverviewFactsFromMirror } from "../lib/db/mirrorRows";
+import { assertInflationParity, loadCpiFacts, loadInflationTargets } from "../lib/data/inflation/importInflation";
+import { loadInflationCpiFactsFromMirror, loadInflationTargetsFromMirror } from "../lib/db/mirrorRows";
 import { config as loadEnv } from "dotenv";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -224,6 +226,9 @@ async function main() {
   const sourceIds = new Set(sourceDocuments.map((source) => source.sourceId));
   const gdpOverviewFacts = await loadGdpOverviewFacts(SERVED_DATA_FILES.gdpOverviewFacts);
   assertSubset("GDP overview source IDs",gdpOverviewFacts.map(f=>f.sourceId),sourceIds);
+  const inflationCpiFacts = await loadCpiFacts(SERVED_DATA_FILES.inflationCpiFacts);
+  const inflationTargets = await loadInflationTargets(SERVED_DATA_FILES.inflationTargets);
+  assertSubset("Inflation source IDs", [...inflationCpiFacts, ...inflationTargets].map((row) => row.sourceId), sourceIds);
 
   assertSubset("Glossary IDs", glossaryIds, taxonomyIds);
   assertSubset("Taxonomy IDs missing glossary entries", taxonomyIds, glossaryIds);
@@ -368,6 +373,8 @@ async function main() {
         await tx.nationalGdpFact.deleteMany();
         await tx.governmentDebtFact.deleteMany();
         await tx.gdpOverviewFact.deleteMany();
+        await tx.inflationCpiFact.deleteMany();
+        await tx.inflationTarget.deleteMany();
         await tx.generalGovernmentBalanceFact.deleteMany();
         await tx.budgetItem.deleteMany();
         await tx.adminSpendingCategory.deleteMany();
@@ -621,6 +628,27 @@ async function main() {
         await tx.gdpOverviewFact.createMany({data:gdpOverviewFacts.map(({sourceId,lastReviewedAt,...fact})=>({...fact,sourceDocumentId:sourceId,lastReviewedAt:new Date(`${lastReviewedAt}T00:00:00.000Z`),importRunId:run.id}))});
         const mirrorGdpOverviewFacts=await loadGdpOverviewFactsFromMirror(tx);
         assertGdpParity(gdpOverviewFacts,mirrorGdpOverviewFacts);
+        await tx.inflationCpiFact.createMany({
+          data: inflationCpiFacts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
+            ...fact,
+            sourceDocumentId: sourceId,
+            lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`),
+            importRunId: run.id,
+          })),
+        });
+        await tx.inflationTarget.createMany({
+          data: inflationTargets.map(({ sourceId, lastReviewedAt, ...row }) => ({
+            ...row,
+            sourceDocumentId: sourceId,
+            lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`),
+            importRunId: run.id,
+          })),
+        });
+        const mirrorInflation = {
+          facts: await loadInflationCpiFactsFromMirror(tx),
+          targets: await loadInflationTargetsFromMirror(tx),
+        };
+        assertInflationParity({ facts: inflationCpiFacts, targets: inflationTargets }, mirrorInflation);
         await tx.generalGovernmentBalanceFact.createMany({
           data: generalGovernmentBalanceFacts.map((fact) => ({
             year: fact.year,
@@ -812,6 +840,8 @@ async function main() {
               table: "GdpOverviewFact",
               csvRows: gdpOverviewFacts.length, dbRows: mirrorGdpOverviewFacts.length,
             },
+            { table: "InflationCpiFact", csvRows: inflationCpiFacts.length, dbRows: mirrorInflation.facts.length },
+            { table: "InflationTarget", csvRows: inflationTargets.length, dbRows: mirrorInflation.targets.length },
             {
               table: "GeneralGovernmentBalanceFact",
               csvRows: generalGovernmentBalanceFacts.length,
