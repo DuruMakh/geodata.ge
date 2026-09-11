@@ -14,6 +14,8 @@ for (const locale of ["ka", "en"] as const) {
       await page.getByTestId("chart-mode-table").click();
       await expect(page.getByTestId("month-grid")).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      // Desktop shows every month and the annual average without a hidden scroll.
+      if (width === 1440) expect(await page.getByTestId("month-grid").evaluate((grid) => grid.scrollWidth <= grid.clientWidth)).toBe(true);
       await page.screenshot({ path: testInfo.outputPath(`inflation-table-${locale}-${width}.png`), fullPage: true });
     });
   }
@@ -48,9 +50,9 @@ test("range chips, keyboard steps and tab switches keep a consistent period", as
   const before = await start.getAttribute("aria-valuenow");
   await start.focus();
   await page.keyboard.press("PageDown");
-  expect(Number(await start.getAttribute("aria-valuenow"))).toBe(Number(before) - 12);
+  await expect(start).toHaveAttribute("aria-valuenow", String(Number(before) - 12));
   await page.keyboard.press("ArrowRight");
-  expect(Number(await start.getAttribute("aria-valuenow"))).toBe(Number(before) - 11);
+  await expect(start).toHaveAttribute("aria-valuenow", String(Number(before) - 11));
 
   await page.getByTestId("inflation-tab-index").click();
   await expect(page).toHaveURL(/r=/);
@@ -102,10 +104,26 @@ test("the sidebar lists three datasets and the hub links only the overview", asy
   await expect(page.getByTestId("inflation-link")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("inflation-hub").getByTestId("hub-card")).toHaveCount(5);
   await expect(page.getByTestId("inflation-hub").locator("a")).toHaveCount(1);
+  // Budget and Economy stay inactive; the footer names both publishers.
+  await expect(page.getByTestId("section-link-expenditure")).toHaveCount(0);
+  await expect(page.getByTestId("economy-link")).not.toHaveAttribute("aria-current", "page");
+  await expect(page.getByText("მონაცემები: საქსტატი და საქართველოს ეროვნული ბანკი", { exact: false })).toBeVisible();
   await page.getByTestId("inflation-hub").getByRole("link").click();
   await ready(page);
   await expect(page.getByTestId("inflation-overview-link")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("data-sidebar").getByText("მალე", { exact: true })).toHaveCount(2);
+});
+
+test("the methodology Dataset is the node the catalog references", async ({ page }) => {
+  await page.goto("/methodology");
+  const catalog = JSON.parse((await page.getByTestId("catalog-json-ld").textContent()) ?? "{}");
+  const id = "https://fiscal.ge/methodology/inflation";
+  expect(catalog.dataset.map((entry: { "@id": string }) => entry["@id"])).toContain(id);
+  await page.goto("/en/methodology/inflation");
+  const dataset = JSON.parse((await page.getByTestId("dataset-json-ld").textContent()) ?? "{}");
+  expect(dataset["@id"]).toBe(id);
+  expect(dataset.includedInDataCatalog["@id"]).toBe("https://fiscal.ge/methodology#catalog");
+  expect(dataset.distribution.contentUrl).toBe("https://fiscal.ge/downloads/data/inflation-cpi-national.csv");
 });
 
 for (const locale of ["ka", "en"] as const) {

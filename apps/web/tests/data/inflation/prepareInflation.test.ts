@@ -13,18 +13,19 @@ import { assertNoRevisions, findRevisions, recomputeHeadline, validateCpiFacts, 
 
 let facts: CpiFact[];
 let lastPeriod: string;
+let validation: Awaited<ReturnType<typeof prepareInflation>>["validation"];
 
 beforeAll(async () => {
   const result = await prepareInflation({ previousFacts: null });
   facts = result.facts;
-  lastPeriod = result.validation.lastPeriod;
+  validation = result.validation;
+  lastPeriod = validation.lastPeriod;
 });
 
 const months = (from: string, to: string) => periodFromKey(to) - periodFromKey(from) + 1;
 
 describe("prepareInflation", () => {
-  it("delivers every published series over its full contiguous coverage", async () => {
-    const { validation } = await prepareInflation({ previousFacts: null });
+  it("delivers every published series over its full contiguous coverage", () => {
     expect(validation.firstPeriods).toEqual({
       "cpi.headline:index_2010": "2000-01",
       "cpi.headline:yoy_pct": "2004-01",
@@ -65,6 +66,14 @@ describe("validation rules", () => {
     expect(() => validateCpiFacts(lastCore)).toThrow(/end in different months/);
   });
 
+  it("rejects values the database would round and rates that are really an index", () => {
+    const set = (value: string) => facts.map((fact, index) => (index === 0 ? { ...fact, value } : fact));
+    expect(facts[0]!.measure).toBe("mom_pct");
+    expect(() => validateCpiFacts(set("0.1234567"))).toThrow(/more than 6 decimals/);
+    expect(() => validateCpiFacts(set("100.4282"))).toThrow(/plausible/);
+    expect(() => validateCpiFacts(set("-3.1234"))).not.toThrow();
+  });
+
   it("rejects a headline rate that disagrees with the index", () => {
     const bent = facts.map((fact) =>
       fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct" && fact.period === "2020-03" ? { ...fact, value: "9.9" } : fact,
@@ -95,6 +104,18 @@ describe("validation rules", () => {
     expect(() => validateTargetRows([{ ...targets[0]!, targetPct: "0" }])).toThrow(/target/);
   });
 
+  it("refuses a vintage folder not named after the last month it covers", async () => {
+    const temp = await fs.mkdtemp(path.join(os.tmpdir(), "cpi-raw-"));
+    try {
+      await fs.cp(INFLATION_RAW_ROOT, temp, { recursive: true });
+      const vintage = (await fs.readdir(path.join(temp, "geostat-cpi"))).sort().at(-1)!;
+      await fs.rename(path.join(temp, "geostat-cpi", vintage), path.join(temp, "geostat-cpi", "2099-01"));
+      await expect(prepareInflation({ rawRoot: temp, previousFacts: null })).rejects.toThrow(/Vintage folder 2099-01/);
+    } finally {
+      await fs.rm(temp, { recursive: true, force: true });
+    }
+  });
+
   it("refuses a vintage whose Georgian file carries different values", async () => {
     const temp = await fs.mkdtemp(path.join(os.tmpdir(), "cpi-raw-"));
     try {
@@ -114,6 +135,23 @@ describe("validation rules", () => {
       await expect(prepareInflation({ rawRoot: temp, previousFacts: null })).rejects.toThrow(/English and Georgian yoy files differ/);
     } finally {
       await fs.rm(temp, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("encoding", () => {
+  it("keeps the UTF-8 BOM on every inflation CSV that Excel opens", async () => {
+    const vintage = (await fs.readdir(path.join(INFLATION_RAW_ROOT, "geostat-cpi"))).sort().at(-1)!;
+    const root = path.resolve(process.cwd(), "../..");
+    for (const file of [
+      "data/imports/cpi-national-monthly.csv",
+      "data/imports/nbg-inflation-target.csv",
+      "data/methodology/source-archives/inflation.csv",
+      `docs/Raw Data/Inflation/geostat-cpi/${vintage}/source-manifest.csv`,
+      "docs/Raw Data/Inflation/nbg-inflation-target/source-manifest.csv",
+    ]) {
+      const bytes = await fs.readFile(path.join(root, file));
+      expect([...bytes.subarray(0, 3)], `${file} must start with the UTF-8 BOM bytes EF BB BF`).toEqual([0xef, 0xbb, 0xbf]);
     }
   });
 });

@@ -58,7 +58,7 @@ export function deriveMethodologyCoverage(
   archive?: {minYear?:number;maxYear?:number},
 ): { firstYear: number; lastYear: number } {
   const source = METHODOLOGY_CONTENT[id].coverageSource;
-  if(source.kind === "archive") { if(archive?.minYear === undefined || archive.maxYear === undefined) throw new Error("Missing GDP archive coverage"); return {firstYear:archive.minYear,lastYear:archive.maxYear}; }
+  if(source.kind === "archive") { if(archive?.minYear === undefined || archive.maxYear === undefined) throw new Error(`Missing ${id} archive coverage`); return {firstYear:archive.minYear,lastYear:archive.maxYear}; }
   const years =
     source.kind === "municipalTotals"
       ? municipalFacts.map((fact) => fact.year)

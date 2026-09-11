@@ -19,6 +19,11 @@ export const GRID_TINTS = [
   { background: "#B3402A", text: "#F7F2E9" },
 ] as const;
 
+/** The one-decimal value a reader sees; −0.0 reads as 0.0, so it prints and bins as zero. */
+export function displayedValue(value: number): number {
+  return Number(value.toFixed(1)) + 0;
+}
+
 export function binFor(value: number, edges: readonly number[]): number {
   const index = edges.findIndex((edge) => value < edge);
   return index === -1 ? edges.length : index;
@@ -60,7 +65,7 @@ export function buildMonthGrid(input: {
   const last = Math.max(...periods);
   const topYear = Math.min(periodYear(range.end), periodYear(last));
   const bottomYear = Math.max(periodYear(range.start), periodYear(first));
-  const valueCell = (value: number, tinted: boolean): GridCell => ({ kind: "value", value, bin: tinted && edges ? binFor(value, edges) : null });
+  const valueCell = (value: number, tinted: boolean): GridCell => ({ kind: "value", value, bin: tinted && edges ? binFor(displayedValue(value), edges) : null });
 
   const rows: GridRow[] = [];
   for (let year = topYear; year >= bottomYear; year -= 1) {

@@ -11,7 +11,7 @@
   "connect.codexStep3": "Set Type to Streamable HTTP.",
   "connect.codexStep4": "Paste the address above into the URL field. Leave Bearer token and Headers empty.",
   "connect.chatPrompt": "Answer my question using Fiscal.ge’s published data:",
-  "connect.notServed1": "Quarterly and monthly data — only annual data has been verified",
+  "connect.notServed1": "Quarterly and monthly data — the monthly inflation figures on the site are not available through this connection",
   "connect.notServed2": "Individual capital projects and procurement",
   "connect.notServed3": "Current in-year execution",
   "connect.heading": "Connect your AI assistant",

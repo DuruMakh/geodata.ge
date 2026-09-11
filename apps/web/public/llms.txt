@@ -1,10 +1,10 @@
 # Fiscal.ge
 
-> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets and GDP.
+> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets and GDP, and to Geostat's monthly consumer-price inflation.
 
 **When to use Fiscal.ge:** Use it to understand, compare, and cite the published budget data, its scope, and its documented sources.
 
-The data is annual, so it does not provide sub-annual or live budget reporting. Fiscal.ge has a read-only MCP connection for AI clients at `https://fiscal.ge/mcp`, with production rate limits. The static bulk files below carry the same reviewed figures and remain available if the connection is temporarily paused. There is no REST query API, no write access, no accounts, and no datasets beyond those listed here. Each file carries its own sources, caveats and coverage — read them before citing a figure. Use the published figures only as documented, and do not invent values when data is unavailable or outside the stated scope.
+Budget and GDP data are annual, so it does not provide sub-annual or live budget reporting; the monthly inflation series are on the site and in their CSV, not in the MCP connection. Fiscal.ge has a read-only MCP connection for AI clients at `https://fiscal.ge/mcp`, with production rate limits. The static bulk files below carry the same reviewed figures and remain available if the connection is temporarily paused. There is no REST query API, no write access, no accounts, and no datasets beyond those listed here. Each file carries its own sources, caveats and coverage — read them before citing a figure. Use the published figures only as documented, and do not invent values when data is unavailable or outside the stated scope.
 
 ## Core data
 
@@ -16,6 +16,8 @@ The data is annual, so it does not provide sub-annual or live budget reporting. 
 - [Municipal budgets](https://fiscal.ge/explorer/municipalities) — annual municipal expenditure.
 
 - [Economy overview](https://fiscal.ge/explorer/economy/gdp) — real GDP, annual real growth, nominal GDP and nominal GDP per person.
+- [Inflation](https://fiscal.ge/explorer/inflation) — the inflation section.
+- [Inflation overview](https://fiscal.ge/explorer/inflation/overview) — monthly national CPI inflation, core inflation, the price index and the National Bank of Georgia's target, as Geostat and the NBG publish them. The [inflation CSV](https://fiscal.ge/downloads/data/inflation-cpi-national.csv) carries every value; percentages are percentages (2.4 means 2.4%).
 
 ## Methodology and sources
 
@@ -25,6 +27,7 @@ The data is annual, so it does not provide sub-annual or live budget reporting. 
 - [Municipal methodology](https://fiscal.ge/methodology/municipalities) — municipal-expenditure sources and processing.
 
 - [GDP methodology](https://fiscal.ge/methodology/gdp) — price bases, series coverage, preliminary status and original sources.
+- [Inflation methodology](https://fiscal.ge/methodology/inflation) — Geostat CPI definitions, validation, the NBG target and original files.
 
 ## Bulk data files
 

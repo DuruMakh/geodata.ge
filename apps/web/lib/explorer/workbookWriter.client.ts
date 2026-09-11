@@ -68,6 +68,7 @@ function writeReadableRow(
   isPercentage: boolean,
   locale: Locale,
   showChangeColumn = true,
+  numberFormat?: string,
 ): void {
   const label = worksheet.getCell(rowNumber, 1);
   label.value = row.kind === "item" && row.parentLabel ? `${row.parentLabel} — ${row.label}` : row.label;
@@ -80,7 +81,7 @@ function writeReadableRow(
     cell.alignment = { horizontal: "right", vertical: "middle" };
     if (value !== null) {
       const isPlanned = row.basisByYear[year] === "planned";
-      cell.numFmt = readableNumberFormat(isPercentage, isPlanned, locale);
+      cell.numFmt = numberFormat ?? readableNumberFormat(isPercentage, isPlanned, locale);
       if (row.basisByYear[year] === "preliminary") {
         const marker = workbookMessage(locale, "workbook.preliminary");
         cell.numFmt = isPercentage ? `0.0% "${marker}"` : `#,##0.0 "${marker}"`;
@@ -142,7 +143,7 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
     cell.alignment = { horizontal: index === 0 ? "left" : "right", vertical: "middle" };
   });
 
-  readable.rows.forEach((row, index) => writeReadableRow(worksheet, index + 4, row, readable.years, isPercentage, locale, readable.showChangeColumn !== false));
+  readable.rows.forEach((row, index) => writeReadableRow(worksheet, index + 4, row, readable.years, isPercentage, locale, readable.showChangeColumn !== false, readable.numberFormat));
 
   const noteRow = readable.rows.length + 4;
   worksheet.getCell(noteRow, 1).value = workbookMessage(locale, "workbook.unit", { unit: readable.unitLabel });

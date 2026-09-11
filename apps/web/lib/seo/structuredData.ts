@@ -80,7 +80,7 @@ function explorerDatasetId(origin: string, path: string): string {
  * any other page has to describe itself: a bare `@id` resolves to a node with
  * no `@type` for a validator reading a single page in isolation.
  */
-function catalogReference(origin: string, locale: Locale) {
+export function catalogReference(origin: string, locale: Locale) {
   return {
     "@type": "DataCatalog",
     "@id": `${origin}/methodology#catalog`,

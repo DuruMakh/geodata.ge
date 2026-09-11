@@ -3,6 +3,7 @@ import { loadServedInflationData } from "../../lib/data/inflation/importInflatio
 import { periodFromKey } from "../../lib/data/inflation/periods";
 import { buildInflationHubCards } from "../../lib/explorer/inflationHubCards";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
+import { formatShare } from "../../lib/explorer/format";
 import { getMessages } from "../../lib/i18n/messages.server";
 
 describe("inflation hub", () => {
@@ -15,7 +16,7 @@ describe("inflation hub", () => {
     expect(cards.slice(1).every((card) => card.comingSoon && card.series === null && card.footer === null)).toBe(true);
     const yoy = facts.filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct");
     const last = yoy.reduce((latest, fact) => (fact.period > latest.period ? fact : latest));
-    expect(cards[0]!.footer).toBe(`${periodLabel(messages, periodFromKey(last.period), "long")} · ${(last.value).toFixed(1)}%`);
+    expect(cards[0]!.footer).toBe(`${periodLabel(messages, periodFromKey(last.period), "long")} · ${formatShare(Number(last.value) / 100)}`);
     expect(cards[0]!.series).toHaveLength(yoy.length);
   });
 });

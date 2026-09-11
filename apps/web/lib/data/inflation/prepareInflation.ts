@@ -77,6 +77,9 @@ export async function prepareInflation(options: { rawRoot?: string; previousFact
   facts.sort((a, b) => a.seriesId.localeCompare(b.seriesId) || a.measure.localeCompare(b.measure) || a.period.localeCompare(b.period));
 
   const coverage = validateCpiFacts(facts);
+  if (coverage.lastPeriod !== vintage) {
+    throw new Error(`Vintage folder ${vintage} must be named after the last month its files cover, ${coverage.lastPeriod}`);
+  }
   const errors = recomputeHeadline(facts);
   const previous = options.previousFacts === undefined ? await loadPreviousFacts() : options.previousFacts;
   if (previous) assertNoRevisions(previous, facts);

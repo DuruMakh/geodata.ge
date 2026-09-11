@@ -3,6 +3,7 @@
 import type { ServedInflationTargetRow } from "../../lib/data/inflation/types";
 import { periodMonth } from "../../lib/data/inflation/periods";
 import { formatShare } from "../../lib/explorer/format";
+import { displayedValue } from "../../lib/explorer/inflationGrid";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { INFLATION_COLORS, latestIndicators, type InflationIndex } from "../../lib/explorer/inflationOverview";
 import { Message } from "../../lib/i18n/message";
@@ -16,7 +17,7 @@ import { SectionTitle } from "../ui/editorial";
 // no good/bad colour — the gauge measures against the target in force.
 
 const GAUGE_MAX = 15;
-const pct = (value: number | null, signed = false) => formatShare(value === null ? null : value / 100, signed);
+const pct = (value: number | null, signed = false) => formatShare(value === null ? null : displayedValue(value) / 100, signed);
 const mono = (text: string) => <span className="font-[family-name:var(--font-numeric)] text-xs">{text}</span>;
 
 function TargetGauge({ value, target }: { value: number; target: number | null }) {
@@ -53,7 +54,9 @@ export function InflationIndicators({ index, targets }: { index: InflationIndex;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
   const month = periodMonth(latest.period);
   const previousMonth = periodMonth(latest.period - 1);
-  const delta = latest.target === null ? null : latest.yoy - latest.target;
+  // The sentence argues from the printed figures, so its gap never disagrees with them.
+  const shownYoy = displayedValue(latest.yoy);
+  const delta = latest.target === null ? null : displayedValue(shownYoy - latest.target);
 
   const sideKpis: SideKpi[] = [
     { label: t("kpiCore"), value: pct(latest.coreYoy), unit: "", color: "var(--ink)", detail: t("kpiCoreDetail"), spark: { values: latest.sparks.coreYoy, color: INFLATION_COLORS.core } },
@@ -77,7 +80,7 @@ export function InflationIndicators({ index, targets }: { index: InflationIndex;
           <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
             <Message
               messages={messages}
-              id={latest.yoy >= 0 ? "inflation.heroRise" : "inflation.heroFall"}
+              id={shownYoy >= 0 ? "inflation.heroRise" : "inflation.heroFall"}
               values={{ monthIn: message(messages, `inflation.monthIn.${month}`), monthWith: message(messages, `inflation.monthWith.${month}`), value: mono(pct(Math.abs(latest.yoy))) }}
             />
             {delta !== null ? (

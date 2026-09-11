@@ -9,7 +9,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
   archiveManifestId: "inflation",
   coverageSource: { kind: "archive" },
   canonicalDocuments: ["docs/data-methodology/inflation-cpi-national.md"],
-  disclosure: "მონაცემები საქსტატის გამოქვეყნებული მნიშვნელობებია; Fiscal.ge არ ითვლის და არ ასწორებს ინფლაციის მაჩვენებლებს.",
+  disclosure: "მონაცემები საქსტატისა და საქართველოს ეროვნული ბანკის გამოქვეყნებული მნიშვნელობებია; Fiscal.ge მხოლოდ საქსტატის გამოქვეყნებულ ინდექსებს გარდაქმნის პროცენტულ ცვლილებად და სხვაგვარად არ ითვლის და არ ასწორებს ინფლაციის მაჩვენებლებს.",
   keyFacts: [
     { label: "მოცვა", valueKind: "coverage" },
     { label: "სიხშირე", valueKind: "frequency", value: "თვიური" },

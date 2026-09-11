@@ -9,7 +9,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
   archiveManifestId: "inflation",
   coverageSource: { kind: "archive" },
   canonicalDocuments: ["docs/data-methodology/inflation-cpi-national.md"],
-  disclosure: "Figures are Geostat's published values; Fiscal.ge does not compute or adjust inflation.",
+  disclosure: "Figures are the values Geostat and the National Bank of Georgia publish; Fiscal.ge only converts Geostat's published indices to percentage change and does not otherwise compute or adjust inflation.",
   keyFacts: [
     { label: "Coverage", valueKind: "coverage" },
     { label: "Frequency", valueKind: "frequency", value: "Monthly" },
@@ -42,7 +42,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
       title: "Validation and updates",
       paragraphs: [
         "Each file's size and SHA-256 are checked; the series are contiguous and monthly; every file ends in the same month; annual, monthly and 12-month average change are recomputed from the price index and agree within 0.2 percentage points.",
-        "Geostat's policy is not to revise published figures. On a refresh, any change to an already published month stops the update for review. Updates are monthly and checked by hand.",
+        "Geostat does not plan revisions to published figures. On a refresh, any change to an already published month stops the update for review. Updates are monthly and checked by hand.",
       ],
     },
     {

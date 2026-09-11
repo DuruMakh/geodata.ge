@@ -6,9 +6,12 @@ import { CPI_SERIES_IDS, CPI_SERIES_MEASURES, type CpiFact, type InflationTarget
 const PERIOD = /^\d{4}-(0[1-9]|1[0-2])$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-// The 2026-09-10 files agree with their own index within 0.15 pp across every
-// month — rounding only. 0.2 leaves room for rounding, never for a wrong row.
+// The spec's bound, set from the one-decimal values Geostat displays. The cells
+// store four decimals, and the 2026-08 vintage agrees with its own index within
+// 0.0002 pp (data/reports/inflation-cpi-validation.json); a month shifted by one
+// row misses by whole points.
 export const RECOMPUTE_TOLERANCE_PP = 0.2;
+const PLAUSIBLE_RATE_PCT = 50;
 
 export function factKey(fact: Pick<CpiFact, "seriesId" | "measure" | "period">): string {
   return `${fact.seriesId}:${fact.measure}:${fact.period}`;
@@ -27,6 +30,10 @@ export function validateCpiFacts(facts: CpiFact[]): { lastPeriod: string; counts
     const value = new Decimal(fact.value);
     if (!value.isFinite()) throw new Error(`Non-finite CPI observation ${key}`);
     if (fact.measure === "index_2010" && value.lte(0)) throw new Error(`Non-positive CPI index ${key}`);
+    // The mirror stores DECIMAL(20,6); a longer value would only fail parity at import.
+    if (value.decimalPlaces() > 6) throw new Error(`CPI observation ${key} has more than 6 decimals: ${fact.value}`);
+    // Core is checked by nothing else: a file switched to "=100" form would read as ~100%.
+    if (fact.measure !== "index_2010" && value.abs().gte(PLAUSIBLE_RATE_PCT)) throw new Error(`CPI rate ${key} is outside a plausible range: ${fact.value}`);
     if (fact.status !== "published") throw new Error(`Invalid CPI status ${key}`);
     if (!fact.sourceId || !fact.sourceLocator || !DATE.test(fact.lastReviewedAt)) throw new Error(`CPI provenance missing ${key}`);
     const group = `${fact.seriesId}:${fact.measure}`;

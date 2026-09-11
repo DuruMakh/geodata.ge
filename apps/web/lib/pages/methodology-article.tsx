@@ -20,7 +20,8 @@ import { loadGeneratedArchiveSummaries } from "../methodology/prepareArchives";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import type { MethodologyDatasetId } from "../methodology/types";
 import { fiscalMetadata } from "../seo/metadata";
-import { datasetJsonLd } from "../seo/structuredData";
+import { catalogReference, datasetJsonLd } from "../seo/structuredData";
+import { seoMessage } from "../seo/strings";
 import { resolveSiteUrl } from "../siteUrl";
 
 export type MethodologyDatasetPageProps = {
@@ -128,9 +129,11 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
     <>
       <JsonLd
         data={dataset === "gdp" || dataset === "inflation" ? {
-          "@context":"https://schema.org", "@type":"Dataset", name:content.title, description:content.summary,
+          "@context":"https://schema.org", "@type":"Dataset", "@id":`${resolveSiteUrl()}/methodology/${dataset}`, name:content.title, description:content.summary,
           url:`${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`,locale)}`, temporalCoverage:`${coverage.firstYear}/${coverage.lastYear}`,
-          inLanguage:locale, dateModified:content.reviewedAt, spatialCoverage:{"@type":"Place",name:"Georgia"},
+          inLanguage:["ka","en"], dateModified:content.reviewedAt, spatialCoverage:{"@type":"Place",name:seoMessage(locale,"seo.country")},
+          creator:{"@id":`${resolveSiteUrl()}/#organization`}, publisher:{"@id":`${resolveSiteUrl()}/#organization`},
+          includedInDataCatalog:catalogReference(resolveSiteUrl(),locale), license:"https://creativecommons.org/licenses/by/4.0/",
           distribution:{"@type":"DataDownload",encodingFormat:"text/csv",contentUrl:`${resolveSiteUrl()}${DATASET_DOWNLOADS[dataset]}`}
         } : datasetJsonLd({ locale,
           origin: resolveSiteUrl(),

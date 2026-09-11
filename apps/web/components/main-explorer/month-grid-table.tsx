@@ -24,7 +24,7 @@ type MonthGridTableProps = {
   picker?: ReactNode;
 };
 
-const headCell = "border-b-2 border-[var(--ink)] px-2 pt-1.5 pb-[9px] text-right text-[11px] font-semibold text-[var(--muted)] whitespace-nowrap";
+const headCell = "border-b-2 border-[var(--ink)] px-2 pt-1.5 pb-[9px] text-right align-bottom text-[11px] font-semibold text-[var(--muted)]";
 const numericCell = "px-2 py-[9px] text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap";
 
 export function MonthGridTable({ caption, yearLabel, monthLabels, monthNames, summaryLabel, rows, formatValue, legend, legendLabel, picker }: MonthGridTableProps) {
@@ -61,7 +61,8 @@ export function MonthGridTable({ caption, yearLabel, monthLabels, monthNames, su
         aria-label={message(messages, "controls.tableScrollable")}
         className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
-        <table className="w-full border-collapse" style={{ minWidth: 88 + 12 * 64 + (hasSummary ? 96 : 0) }}>
+        {/* Sized to fit the 1440px workspace (~808px) with the summary column; narrower screens scroll. */}
+        <table className="w-full border-collapse" style={{ minWidth: 64 + 12 * 54 + (hasSummary ? 76 : 0) }}>
           <caption className="sr-only">{caption}</caption>
           <thead>
             <tr>
@@ -69,7 +70,7 @@ export function MonthGridTable({ caption, yearLabel, monthLabels, monthNames, su
                 {yearLabel}
               </th>
               {monthLabels.map((label) => (
-                <th key={label} scope="col" className={headCell}>{label}</th>
+                <th key={label} scope="col" className={`${headCell} whitespace-nowrap`}>{label}</th>
               ))}
               {hasSummary ? <th scope="col" className={`${headCell} uppercase tracking-[0.06em]`}>{summaryLabel}</th> : null}
             </tr>

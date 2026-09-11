@@ -74,4 +74,19 @@ describe("inflation workbook", () => {
     expect(String(sheetSources!.getCell("A2").value)).toContain("2025");
     expect(String(sheetSources!.getCell("A2").value)).not.toContain("1–13");
   });
+
+  it("never colours deflation or hides a zero in the readable sheet", async () => {
+    const year2012: InflationState["range"] = { kind: "manual", start: makePeriod(2012, 1), end: makePeriod(2012, 12) };
+    for (const [tab, format] of [["yoy", "0.0%"], ["mom", "0.0%"], ["index", "#,##0.0"]] as const) {
+      const model = await build("en", { ...DEFAULT_INFLATION_STATE, tab, range: year2012, selected: ["cpi"] });
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(await createWorkbookBuffer(model));
+      const readable = workbook.worksheets[0]!;
+      const values = readable.getRow(4).values as unknown[];
+      if (tab === "yoy") expect(values.some((value) => typeof value === "number" && value < 0)).toBe(true);
+      for (let column = 2; column <= model.readable.years.length + 1; column += 1) {
+        expect(readable.getCell(4, column).numFmt).toBe(format);
+      }
+    }
+  });
 });
