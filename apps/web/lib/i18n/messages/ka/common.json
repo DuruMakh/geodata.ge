@@ -37,5 +37,8 @@
   "common.economy": "ეკონომიკა",
   "common.gdpOverview": "ეკონომიკის მიმოხილვა",
   "common.economySourceNote": "მონაცემები: მსოფლიო ბანკი და საქსტატი. ბოლო განახლება: {updatedAt}.",
-  "common.dataEconomy": "მონაცემები / ეკონომიკა"
+  "common.dataEconomy": "მონაცემები / ეკონომიკა",
+  "common.inflationOverview": "ინფლაციის მიმოხილვა",
+  "common.dataInflation": "მონაცემები / ინფლაცია",
+  "common.inflationSourceNote": "მონაცემები: საქსტატი და საქართველოს ეროვნული ბანკი. ბოლო განახლება: {updatedAt}."
 }
