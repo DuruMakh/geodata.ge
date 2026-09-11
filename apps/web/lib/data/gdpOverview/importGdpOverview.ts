@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
 import { readCsvRecords } from "../csv";
 import { assertSameServedRows } from "../servedDataParity";
-import { validateGdpObservations } from "./prepareGdpOverview";
+import { validateGdpObservations } from "./validation";
 import {
   GDP_SERIES,
   type GdpObservation,

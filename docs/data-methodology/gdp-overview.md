@@ -13,6 +13,8 @@ Nominal total cells in millions are multiplied by one million, using Decimal ari
 ## Validation and refresh
 `npm run data:prepare-gdp-overview` writes the canonical BOM CSV and validation report; `npm run data:check-gdp-overview` checks byte parity without writing. Both read archived originals offline. Source hashes, country/indicator, year uniqueness/coverage, units, status, finite values, FX and level/growth consistency are checked. Source updates require a reviewed replacement manifest; builds never fetch fresh upstream files.
 
+Serving imports the pure observation validator without loading workbook preparation. The public GDP CSV is generated during prebuild and independently checked during postbuild, after it exists; canonical source validation remains available on a clean checkout before any build.
+
 ## Serving
 `loadServedGdpOverviewData` supports reviewed CSV and db mirror modes. `GdpOverviewFact` stores exact decimals; the import checks every field inside its existing transaction. Browser data are numbers. RLS is enabled and no anonymous Data API access is granted. Migration/application to a live database is a delivery operation, not a local source-edit side effect.
 
