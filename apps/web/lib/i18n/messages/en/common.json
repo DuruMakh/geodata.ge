@@ -35,7 +35,7 @@
   "common.footerLicence": "Data is published under CC BY 4.0 — credit the source and reuse it freely.",
   "common.comingSoon": "Coming soon",
   "common.economy": "Economy",
-  "common.gdpOverview": "GDP overview",
+  "common.gdpOverview": "Economy overview",
   "common.economySourceNote": "Data: World Bank and Geostat. Last updated: {updatedAt}.",
   "common.dataEconomy": "Data / Economy"
 }

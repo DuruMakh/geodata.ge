@@ -74,7 +74,8 @@ export function GdpOverview({
       id: row.itemId,
       label: d.label,
       color: "#1E1B16",
-      vals: m.points.map((p) => p.value),
+      // Shared chart percentages use points; table and workbook use fractions.
+      vals: m.points.map((p) => d.growth ? p.value * 100 : p.value),
       planned: m.years.map(() => false),
     },
   ];
@@ -209,7 +210,9 @@ export function GdpOverview({
                 years={m.years}
                 series={chartSeries}
                 share={d.growth}
-                unit={d.unit}
+                unit={state.indicator === "per_capita"
+                  ? { ...d.unit, label: state.currency === "gel" ? "₾" : "$" }
+                  : d.unit}
                 shareLabel={d.fullUnitLabel}
               />
             ) : (

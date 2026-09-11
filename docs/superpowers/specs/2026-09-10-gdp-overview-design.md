@@ -187,3 +187,8 @@ Run the relevant targeted checks during work and the required final gates from C
 Approval of this document authorizes the bounded Economy/GDP feature described here, not broader economic indicators. During implementation update Project_Definition.md section 2 and the relevant DESIGN.md sections to record this explicit scope extension; retain other exclusions.
 
 After user review, produce the implementation plan with concrete file boundaries, data preparation, component integration and verification steps. Do not start production implementation from the previews or from the spec-writing request alone.
+
+
+### User refinement - 2026-09-11
+
+Display the page and its navigation/card label as **Economy overview / ეკონომიკის მიმოხილვა**. Keep the GDP route and four indicator names. GDP growth chart inputs use percentage points (10 means 10%), matching the existing chart contract; table and workbook values remain fractions. Per-capita chart axes use compact currency symbols (₾ / $), with full localized units above the chart.

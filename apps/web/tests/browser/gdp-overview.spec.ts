@@ -74,3 +74,25 @@ test("Economy links only the delivered overview", async ({ page }) => {
   await page.getByTestId("economy-hub").getByRole("link").click();
   await expect(page.getByTestId("gdp-overview")).toBeVisible();
 });
+
+for (const locale of ['ka', 'en']) {
+  test(`GDP axes use readable currencies and percentage points in ${locale}`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto(`${locale === 'en' ? '/en' : ''}/explorer/economy/gdp#indicator=growth&start=2015&end=2025`);
+    await expect(page.locator('body')).toHaveAttribute('data-app-ready', 'true');
+    const axis = page.getByTestId('chart-panel').locator('svg text');
+    await expect(axis.filter({ hasText: /^15%$/ })).toHaveCount(1);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(locale === 'en' ? 'Economy overview' : 'ეკონომიკის მიმოხილვა');
+    await page.screenshot({ path: testInfo.outputPath(`growth-${locale}.png`), fullPage: true });
+    await page.getByTestId('gdp-tab-per_capita').click();
+    for (const currency of ['GEL', 'USD']) {
+      await page.getByRole('button', { name: currency, exact: true }).click();
+      const ticks = axis.filter({ hasText: currency === 'GEL' ? /₾$/ : /\$$/ });
+      expect(await ticks.count()).toBeGreaterThan(2);
+      for (const tick of await ticks.all()) {
+        expect(await tick.evaluate(el => (el as SVGGraphicsElement).getBBox().x)).toBeGreaterThanOrEqual(0);
+      }
+      await page.screenshot({ path: testInfo.outputPath(`per-capita-${locale}-${currency}.png`), fullPage: true });
+    }
+  });
+}
