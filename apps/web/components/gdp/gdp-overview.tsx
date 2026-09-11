@@ -178,23 +178,16 @@ export function GdpOverview({
             />
             {state.indicator === "nominal" ||
             state.indicator === "per_capita" ? (
-              <div
-                data-testid="gdp-currency"
-                role="group"
-                aria-label={t("currency")}
-                className="flex gap-2"
-              >
-                {(["gel", "usd"] as const).map((currency) => (
-                  <button
-                    type="button"
-                    key={currency}
-                    aria-pressed={state.currency === currency}
-                    onClick={() => setState((s) => ({ ...s, currency }))}
-                    className={`h-[27px] cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 ${state.currency === currency ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]" : "border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]"}`}
-                  >
-                    {currency.toUpperCase()}
-                  </button>
-                ))}
+              <div data-testid="gdp-currency" className="[&_button]:min-w-[40px]">
+                <SegmentedTabs
+                  ariaLabel={t("currency")}
+                  value={state.currency}
+                  onChange={(currency) => setState((s) => ({ ...s, currency }))}
+                  options={[
+                    { value: "gel", label: "₾", ariaLabel: "GEL" },
+                    { value: "usd", label: "$", ariaLabel: "USD" },
+                  ]}
+                />
               </div>
             ) : null}
           </div>

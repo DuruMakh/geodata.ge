@@ -87,6 +87,7 @@ for (const locale of ['ka', 'en']) {
     await page.getByTestId('gdp-tab-per_capita').click();
     for (const currency of ['GEL', 'USD']) {
       await page.getByRole('button', { name: currency, exact: true }).click();
+      await expect(page.getByRole('button', { name: currency, exact: true })).toHaveText(currency === 'GEL' ? '₾' : '$');
       const ticks = axis.filter({ hasText: currency === 'GEL' ? /₾$/ : /\$$/ });
       expect(await ticks.count()).toBeGreaterThan(2);
       for (const tick of await ticks.all()) {

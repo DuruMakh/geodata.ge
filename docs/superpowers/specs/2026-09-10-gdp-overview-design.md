@@ -192,3 +192,8 @@ After user review, produce the implementation plan with concrete file boundaries
 ### User refinement - 2026-09-11
 
 Display the page and its navigation/card label as **Economy overview / ეკონომიკის მიმოხილვა**. Keep the GDP route and four indicator names. GDP growth chart inputs use percentage points (10 means 10%), matching the existing chart contract; table and workbook values remain fractions. Per-capita chart axes use compact currency symbols (₾ / $), with full localized units above the chart.
+
+
+### Confirmed currency control - 2026-09-11
+
+Use the joined **₾ | $** currency selector approved in the preview, reusing `SegmentedTabs` and its Chart/Table styling, with 40px minimum button widths. Keep GEL/USD accessible names, existing selection persistence, and full units above the chart. This supersedes the earlier separate currency-pill styling.
