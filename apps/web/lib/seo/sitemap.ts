@@ -64,6 +64,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // /mcp itself is never listed: a POST-only protocol endpoint answers a
     // crawler's GET with 405, so it is not a page to index.
     { url: `${siteUrl}/explorer`, lastModified },
+    { url: `${siteUrl}/explorer/economy`, lastModified },
+    { url: `${siteUrl}/explorer/economy/gdp`, lastModified },
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
     { url: `${siteUrl}/explorer/revenue`, lastModified },
     { url: `${siteUrl}/explorer/analysis`, lastModified },

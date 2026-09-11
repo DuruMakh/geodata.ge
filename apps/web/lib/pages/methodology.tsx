@@ -41,6 +41,7 @@ export async function renderMethodologyPage(locale: Locale) {
     <>
       <JsonLd
         data={dataCatalogJsonLd(resolveSiteUrl(), liveEntries.map(entry => entry.href), locale, [
+          "/explorer/economy/gdp",
           "/explorer/expenditure",
           "/explorer/revenue",
           DEBT_EXPLORER_PATH,

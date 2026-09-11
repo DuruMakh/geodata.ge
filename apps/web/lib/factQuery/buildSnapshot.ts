@@ -213,6 +213,9 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
     ),
   );
 
+  // Register the new original documents without adding a GDP query dataset or intent.
+  perDataset.push((await loadReviewedSourceManifest(repositoryRoot, "gdp")).filter(row => row.source_id.startsWith("source.wb_gdp_") && !row.source_id.endsWith("metadata")));
+
   // official_url_or_archive_url is free text, not a validated URL column
   // (sourceManifest.ts's schema only checks it's a non-empty string): most
   // rows hold prose like "Repository archive: docs/Raw Data/..." (an internal

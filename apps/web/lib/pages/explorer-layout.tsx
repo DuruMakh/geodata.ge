@@ -2,7 +2,7 @@ import { getMessages } from "../i18n/messages.server";
 import { I18nProvider } from "../i18n/provider";
 import type { ReactNode } from "react";
 import { DataSidebar } from "../../components/shell/data-sidebar";
-import { SiteFooter } from "../../components/site/site-footer";
+import { ExplorerFooter } from "../../components/shell/explorer-footer";
 import { loadServedLandingData } from "../data/servedData";
 import { buildLandingContext } from "../landing/landingData";
 import type { Locale } from "../i18n/types";
@@ -19,7 +19,7 @@ export async function renderExplorerLayout(locale: Locale, children: ReactNode) 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex-1">{children}</div>
           <div className="px-5 min-[768px]:px-[34px]">
-            <div className="mx-auto max-w-[1180px]"><SiteFooter updatedAt={updatedAt} locale={locale} /></div>
+            <div className="mx-auto max-w-[1180px]"><ExplorerFooter updatedAt={updatedAt} locale={locale} /></div>
           </div>
         </div>
       </div>

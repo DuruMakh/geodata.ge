@@ -36,5 +36,7 @@
   "workbook.billionGel": "მლრდ ₾",
   "workbook.receipts": "შემოსავლები",
   "workbook.institutions": "უწყებები",
-  "workbook.expenditure": "ხარჯები"
+  "workbook.expenditure": "ხარჯები",
+  "workbook.published": "გამოქვეყნებული",
+  "workbook.preliminary": "წინასწარი"
 }

@@ -2908,5 +2908,50 @@
       "reviewedAt": "2026-09-05"
     },
     "documentLanguage": null
+  },
+  "source.wb_gdp_real_usd_2015": {
+    "title": {
+      "text": "NY.GDP.MKTP.KD.json",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "World Bank",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "World Bank",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.wb_gdp_real_growth_percent": {
+    "title": {
+      "text": "NY.GDP.MKTP.KD.ZG.json",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "World Bank",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "World Bank",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.wb_gdp_metadata": {
+    "title": {
+      "text": "wb_indicator_metadata.json",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "World Bank",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "World Bank",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
   }
 }

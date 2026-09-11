@@ -1,7 +1,7 @@
 import type { Locale } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
 
-export type WorkbookBasis = "actual" | "planned" | "forecast" | "not_available";
+export type WorkbookBasis = "actual" | "planned" | "forecast" | "not_available" | "published" | "preliminary";
 
 export type WorkbookPoint = {
   amountGel: number | null;
@@ -65,10 +65,12 @@ export type WorkbookExportModel = {
     title: string;
     subtitle: string;
     unitLabel: string;
+    showChangeColumn?: boolean;
     years: number[];
     rows: WorkbookReadableRow[];
   };
   analysis: {
+    numericFormats?: Record<number,string>;
     headers: string[];
     rows: Array<Array<string | number | null>>;
   };
@@ -76,7 +78,7 @@ export type WorkbookExportModel = {
 };
 
 const statusLabel = (basis: WorkbookBasis, locale: Locale) => workbookMessage(locale, ({
-  actual: "workbook.actual", planned: "workbook.planned", forecast: "workbook.forecast", not_available: "workbook.unavailable",
+  published: "workbook.published", preliminary: "workbook.preliminary", actual: "workbook.actual", planned: "workbook.planned", forecast: "workbook.forecast", not_available: "workbook.unavailable",
 } as const)[basis]);
 
 export function absoluteWorkbookSourceUrl(

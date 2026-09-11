@@ -902,3 +902,7 @@ No new visual direction, chart type, or interaction pattern. It reuses the estab
 **Copy controls are conveniences, never the only route.** Both the address and the prompt are rendered as selectable text beside their buttons, so each is obtainable when the clipboard API is unavailable or refused. Each button carries an accessible Georgian name that changes to a confirmation on success, announced through a live region.
 
 Discovery includes the shared public header item `AI` linking to `/connect`, active only on that page, and the site-footer navigation list, which every `/explorer` route and both editorial pages render (§6.7). `/connect` also appears in `sitemap.xml` and `llms.txt`. The AI item uses the existing link styling and keyboard/focus behavior.
+
+## GDP overview extension
+
+Economy is a peer below Budget in the explorer sidebar. Its hub reuses the budget cards; only GDP overview is active initially. GDP overview reuses the existing chart, table, range strip, text tabs and Excel button. The four indicator tabs are centered across the workspace (Real GDP, Nominal GDP, GDP growth, GDP per capita). Nominal measures have GEL/USD pills in the chart toolbar at the share-control position. There is no right-side display/series panel, new chart renderer or additional KPI system. See `docs/superpowers/specs/2026-09-10-gdp-overview-design.md`. Existing Budget components remain authoritative over previews.

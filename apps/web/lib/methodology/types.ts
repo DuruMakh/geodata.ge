@@ -1,7 +1,7 @@
 import type { MunicipalTotalFact } from "../data/municipal/types";
 import type { ServedBudgetFact, ServedGovernmentDebtFact } from "../servedRows";
 
-export const LIVE_METHODOLOGY_IDS = ["expenditure", "revenue", "municipalities", "debt"] as const;
+export const LIVE_METHODOLOGY_IDS = ["expenditure", "revenue", "municipalities", "debt", "gdp"] as const;
 
 export type MethodologyDatasetId = (typeof LIVE_METHODOLOGY_IDS)[number];
 
@@ -40,7 +40,8 @@ export type MethodologyContent = {
   coverageSource:
     | { kind: "budgetSide"; side: ServedBudgetFact["side"] }
     | { kind: "municipalTotals" }
-    | { kind: "governmentDebt" };
+    | { kind: "governmentDebt" }
+    | { kind: "archive" };
   canonicalDocuments: readonly string[];
   disclosure: string;
   keyFacts: readonly {

@@ -7,9 +7,9 @@
   },
   "scripts": {
     "postinstall": "prisma generate --schema prisma/schema.prisma",
-    "predev": "npm run data:prepare-methodology-archives && npm run i18n:check && npm run data:prepare-public-datasets && npm run data:prepare-fact-query-snapshot && npm run data:prepare-fact-query-publications",
+    "predev": "npm run data:prepare-methodology-archives && npm run i18n:check && npm run data:prepare-public-datasets && npm run data:prepare-fact-query-snapshot && npm run data:prepare-fact-query-publications && npm run data:prepare-gdp-public",
     "dev": "next dev",
-    "prebuild": "npm run data:prepare-methodology-archives && npm run i18n:check && npm run data:prepare-public-datasets && npm run data:prepare-fact-query-snapshot && npm run data:prepare-fact-query-publications",
+    "prebuild": "npm run data:prepare-methodology-archives && npm run i18n:check && npm run data:prepare-public-datasets && npm run data:prepare-fact-query-snapshot && npm run data:prepare-fact-query-publications && npm run data:prepare-gdp-public",
     "build": "next build",
     "postbuild": "npm run data:check-fact-query-publications",
     "start": "next start",
@@ -23,7 +23,7 @@
     "seo:measure": "tsx scripts/measure-seo-output.ts",
     "check": "npm run lint && npm run typecheck && npm run test && npm run data:validate && npm run i18n:check",
     "i18n:check": "tsx scripts/check-localization.ts --check",
-    "data:validate": "tsx scripts/validate-data-files.ts && npm run data:check-national-gdp && npm run data:check-general-government-balance && npm run data:check-municipal-indicators && npm run data:check-municipal-population && npm run data:check-methodology-archives && npm run data:check-public-datasets && npm run data:check-government-debt && npm run data:check-fact-query-snapshot",
+    "data:validate": "tsx scripts/validate-data-files.ts && npm run data:check-national-gdp && npm run data:check-general-government-balance && npm run data:check-municipal-indicators && npm run data:check-municipal-population && npm run data:check-methodology-archives && npm run data:check-public-datasets && npm run data:check-government-debt && npm run data:check-fact-query-snapshot && npm run data:check-gdp-overview && npm run data:check-gdp-public",
     "data:prepare-government-debt": "tsx scripts/prepare-government-debt.ts --write",
     "data:check-government-debt": "tsx scripts/prepare-government-debt.ts --check",
     "data:prepare-national-gdp": "tsx scripts/prepare-national-gdp.ts --write",
@@ -95,7 +95,11 @@
     "data:import": "tsx scripts/import-budget-facts.ts",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:deploy": "prisma migrate deploy"
+    "prisma:deploy": "prisma migrate deploy",
+    "data:prepare-gdp-overview": "tsx scripts/prepare-gdp-overview.ts --write",
+    "data:check-gdp-overview": "tsx scripts/prepare-gdp-overview.ts --check",
+    "data:prepare-gdp-public": "tsx scripts/prepare-gdp-public.ts",
+    "data:check-gdp-public": "tsx scripts/prepare-gdp-public.ts --check"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",

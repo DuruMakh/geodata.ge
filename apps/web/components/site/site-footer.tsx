@@ -6,9 +6,9 @@ import type { Locale } from "../../lib/i18n/types";
 
 const ANALYSIS_HREF = "/explorer/analysis";
 
-export function SiteFooter({ updatedAt, locale = "ka" }: { updatedAt: string; locale?: Locale }) {
+export function SiteFooter({ updatedAt, locale = "ka", sourceNote }: { updatedAt: string; locale?: Locale; sourceNote?: string }) {
   const messages = getCommonMessages(locale);
-  const [sourcePrefix, sourceSuffix] = messages["common.sourceNote"].split("{updatedAt}");
+  const [sourcePrefix, sourceSuffix] = (sourceNote ?? messages["common.sourceNote"]).split("{updatedAt}");
   return (
     <footer data-testid="site-footer" className="mt-[72px] border-t-2 border-[var(--ink)] pb-10 pt-[26px]">
       <div data-testid="landing-footer">

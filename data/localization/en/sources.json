@@ -806,5 +806,19 @@
       "reviewedAt": "2026-09-05"
     },
     "derivation": null
+  },
+  "source.wb_gdp_real_usd_2015": {
+    "name": {
+      "text": "World Bank GDP Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
+  },
+  "source.wb_gdp_real_growth_percent": {
+    "name": {
+      "text": "World Bank GDP Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
   }
 }

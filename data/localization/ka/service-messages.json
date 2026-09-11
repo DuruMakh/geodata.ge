@@ -257,5 +257,16 @@
   "sources.source.municipal_portal_archive.name": "მუნიციპალიტეტების ანალიტიკური პორტალის ღია მონაცემების დაარქივებული ექსპორტები (2015-2019 წლების ფუნქციური ფაქტობრივი მაჩვენებლები)",
   "sources.source.treasury_consolidated_revenue_actual.name": "სახაზინო სამსახურის წლიური კონსოლიდირებული შემოსავლების ანგარიშები — ტრანსფერები ავტონომიური რესპუბლიკიდან",
   "supporting.populationTransformation": "წყაროს ფურცელი „{sheet}“, უჯრა {cell}, წელი {year}; შენარჩუნებულია გამოქვეყნებული ათასები; მოსახლეობა ადამიანებში = ათასები × 1000; შეფასებები არ გამოიყენება.",
-  "supporting.populationUnit": "ათასი"
+  "supporting.populationUnit": "ათასი",
+  "sources.source.wb_gdp_real_usd_2015.name": "მსოფლიო ბანკი · რეალური მშპ",
+  "sources.source.wb_gdp_real_growth_percent.name": "მსოფლიო ბანკი · მშპ-ის რეალური ზრდა",
+  "documents.source.wb_gdp_real_usd_2015.title": "მსოფლიო ბანკი · რეალური მშპ",
+  "documents.source.wb_gdp_real_usd_2015.publisher": "World Bank",
+  "documents.source.wb_gdp_real_usd_2015.attribution": "World Bank",
+  "documents.source.wb_gdp_real_growth_percent.title": "მსოფლიო ბანკი · მშპ-ის წლიური ზრდა",
+  "documents.source.wb_gdp_real_growth_percent.publisher": "World Bank",
+  "documents.source.wb_gdp_real_growth_percent.attribution": "World Bank",
+  "documents.source.wb_gdp_metadata.title": "მსოფლიო ბანკი · მშპ-ის მეტამონაცემები",
+  "documents.source.wb_gdp_metadata.publisher": "World Bank",
+  "documents.source.wb_gdp_metadata.attribution": "World Bank"
 }

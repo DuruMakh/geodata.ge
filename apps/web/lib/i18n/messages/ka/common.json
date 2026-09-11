@@ -33,5 +33,9 @@
   "common.footerDescription": "საქართველოს ბიუჯეტი — ნათლად, გადამოწმებულად, ღიად.",
   "common.sourceNote": "მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო). ბოლო განახლება: {updatedAt}.",
   "common.footerLicence": "მონაცემები ქვეყნდება CC BY 4.0 ლიცენზიით — მიუთითე წყარო და გამოიყენე თავისუფლად.",
-  "common.comingSoon": "მალე"
+  "common.comingSoon": "მალე",
+  "common.economy": "ეკონომიკა",
+  "common.gdpOverview": "მშპ-ის მიმოხილვა",
+  "common.economySourceNote": "მონაცემები: მსოფლიო ბანკი და საქსტატი. ბოლო განახლება: {updatedAt}.",
+  "common.dataEconomy": "მონაცემები / ეკონომიკა"
 }

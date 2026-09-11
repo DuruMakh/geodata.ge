@@ -1,0 +1,35 @@
+{
+  "captured_utc": "2026-09-10T11:30:37.833033+00:00",
+  "files": [
+    {
+      "file": "sources/geostat_nominal_current.xlsx",
+      "url": "https://geostat.ge/media/81052/03_GDP-at-Current-Prices.xlsx",
+      "sha256": "21a576c9c20434a87bcb32047cd143eef2b8d3f3ff360442b420c76b0da27d34",
+      "bytes": 50098
+    },
+    {
+      "file": "sources/geostat_nominal_legacy.xlsx",
+      "url": "https://geostat.ge/media/27798/GDP-at-current-prices.xlsx",
+      "sha256": "1f9befdca89f3a635f66abb14892386a9947bf7294045e4442832aa53e63dc8e",
+      "bytes": 94214
+    },
+    {
+      "file": "sources/NY.GDP.MKTP.KD.json",
+      "url": "https://api.worldbank.org/v2/country/GEO/indicator/NY.GDP.MKTP.KD?format=json&per_page=1000",
+      "sha256": "a29136443c2aa7abb57299a95d712f9f74b9b39df9e247333a4a95e903050fc0",
+      "bytes": 14143
+    },
+    {
+      "file": "sources/NY.GDP.MKTP.KD.ZG.json",
+      "url": "https://api.worldbank.org/v2/country/GEO/indicator/NY.GDP.MKTP.KD.ZG?format=json&per_page=1000",
+      "sha256": "98fbea3447eb4c0c8836ff741a1d3fb147ba027ea0ab50652415f9e2f9dd7b38",
+      "bytes": 14205
+    },
+    {
+      "file": "sources/wb_indicator_metadata.json",
+      "url": "https://api.worldbank.org/v2/indicator/NY.GDP.MKTP.KD?format=json",
+      "sha256": "bc4bc0ffec1755410f52b1091c6b1f46917c7417977102350d3d1102b4659216",
+      "bytes": 994
+    }
+  ]
+}

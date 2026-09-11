@@ -1,0 +1,252 @@
+﻿series_id,year,value,unit,status,accounting_standard,source_id,source_locator,last_reviewed_at
+nominal_gel,1996,3868475406.8725238,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!G25,2026-09-11
+nominal_gel,1997,4554926744.549016,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!L25,2026-09-11
+nominal_gel,1998,5022102721.948613,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!Q25,2026-09-11
+nominal_gel,1999,5668695947.724524,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!V25,2026-09-11
+nominal_gel,2000,6043056870.338865,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AA25,2026-09-11
+nominal_gel,2001,6673998109.803526,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AF25,2026-09-11
+nominal_gel,2002,7456025960.032186,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AK25,2026-09-11
+nominal_gel,2003,8564092781.365967,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AP25,2026-09-11
+nominal_gel,2004,9824295478.900656,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AU25,2026-09-11
+nominal_gel,2005,11620942438.490814,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AZ25,2026-09-11
+nominal_gel,2006,13789913218.215346,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BE25,2026-09-11
+nominal_gel,2007,16993778789.722528,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BJ25,2026-09-11
+nominal_gel,2008,19074852303.629596,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BO25,2026-09-11
+nominal_gel,2009,17985954595.150855,gel,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BT25,2026-09-11
+nominal_gel,2010,22148652202.05562,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!G26,2026-09-11
+nominal_gel,2011,26099375332.42154,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!L26,2026-09-11
+nominal_gel,2012,27896854555.001788,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!Q26,2026-09-11
+nominal_gel,2013,29137727778.991604,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!V26,2026-09-11
+nominal_gel,2014,31722398994.712326,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AA26,2026-09-11
+nominal_gel,2015,34548162434.34734,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AF26,2026-09-11
+nominal_gel,2016,36553296752.505135,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AK26,2026-09-11
+nominal_gel,2017,41339766809.526416,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AP26,2026-09-11
+nominal_gel,2018,45374358771.43686,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AU26,2026-09-11
+nominal_gel,2019,49726284068.63045,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ26,2026-09-11
+nominal_gel,2020,49788538400.564656,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BE26,2026-09-11
+nominal_gel,2021,60724140108.70711,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ26,2026-09-11
+nominal_gel,2022,72860059026.36678,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BO26,2026-09-11
+nominal_gel,2023,80882761660.03566,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BT26,2026-09-11
+nominal_gel,2024,93022275315.70538,gel,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BY26,2026-09-11
+nominal_gel,2025,104598139883.332,gel,preliminary,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!CD26,2026-09-11
+nominal_usd,1996,3064559400.483133,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!G28,2026-09-11
+nominal_usd,1997,3510738557.2112303,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!L28,2026-09-11
+nominal_usd,1998,3606876529.5003363,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!Q28,2026-09-11
+nominal_usd,1999,2814063170.4033276,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!V28,2026-09-11
+nominal_usd,2000,3059054553.1890907,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AA28,2026-09-11
+nominal_usd,2001,3221033319.963478,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AF28,2026-09-11
+nominal_usd,2002,3397808727.8060884,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AK28,2026-09-11
+nominal_usd,2003,3990820330.198637,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AP28,2026-09-11
+nominal_usd,2004,5124717542.480579,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AU28,2026-09-11
+nominal_usd,2005,6410979635.200569,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AZ28,2026-09-11
+nominal_usd,2006,7761721336.106261,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BE28,2026-09-11
+nominal_usd,2007,10171917936.387841,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BJ28,2026-09-11
+nominal_usd,2008,12800541177.325193,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BO28,2026-09-11
+nominal_usd,2009,10767054578.19759,usd,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BT28,2026-09-11
+nominal_usd,2010,12424847447.370594,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!G29,2026-09-11
+nominal_usd,2011,15479661622.136198,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!L29,2026-09-11
+nominal_usd,2012,16894265599.067734,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!Q29,2026-09-11
+nominal_usd,2013,17516779510.175016,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!V29,2026-09-11
+nominal_usd,2014,17964308118.267072,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AA29,2026-09-11
+nominal_usd,2015,15218255429.91636,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AF29,2026-09-11
+nominal_usd,2016,15444732234.776526,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AK29,2026-09-11
+nominal_usd,2017,16478986048.603336,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AP29,2026-09-11
+nominal_usd,2018,17902386479.821227,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AU29,2026-09-11
+nominal_usd,2019,17638701857.574193,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ29,2026-09-11
+nominal_usd,2020,16010734844.435725,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BE29,2026-09-11
+nominal_usd,2021,18852987497.931405,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ29,2026-09-11
+nominal_usd,2022,24989472465.00803,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BO29,2026-09-11
+nominal_usd,2023,30779055341.245115,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BT29,2026-09-11
+nominal_usd,2024,34189423544.91312,usd,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BY29,2026-09-11
+nominal_usd,2025,38143610371.977644,usd,preliminary,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!CD29,2026-09-11
+per_capita_gel,1996,861.2500164186275,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!G26,2026-09-11
+per_capita_gel,1997,1047.1306594210837,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!L26,2026-09-11
+per_capita_gel,1998,1183.4515575250937,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!Q26,2026-09-11
+per_capita_gel,1999,1363.5878808384273,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!V26,2026-09-11
+per_capita_gel,2000,1482.1836409815783,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AA26,2026-09-11
+per_capita_gel,2001,1662.5258642050596,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AF26,2026-09-11
+per_capita_gel,2002,1874.0728379982495,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AK26,2026-09-11
+per_capita_gel,2003,2167.172296268265,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AP26,2026-09-11
+per_capita_gel,2004,2501.514187632787,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AU26,2026-09-11
+per_capita_gel,2005,2977.844007835249,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AZ26,2026-09-11
+per_capita_gel,2006,3553.783977336907,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BE26,2026-09-11
+per_capita_gel,2007,4402.353735494608,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BJ26,2026-09-11
+per_capita_gel,2008,4956.504498794669,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BO26,2026-09-11
+per_capita_gel,2009,4715.254038728009,gel_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BT26,2026-09-11
+per_capita_gel,2010,5849.072133365803,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!G27,2026-09-11
+per_capita_gel,2011,6947.900634236464,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!L27,2026-09-11
+per_capita_gel,2012,7481.308914073322,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!Q27,2026-09-11
+per_capita_gel,2013,7837.636845950209,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!V27,2026-09-11
+per_capita_gel,2014,8528.87128433349,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AA27,2026-09-11
+per_capita_gel,2015,9273.987332575447,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AF27,2026-09-11
+per_capita_gel,2016,9806.370951214054,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AK27,2026-09-11
+per_capita_gel,2017,11088.98283210475,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AP27,2026-09-11
+per_capita_gel,2018,12175.974302075196,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AU27,2026-09-11
+per_capita_gel,2019,13366.702158490036,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ27,2026-09-11
+per_capita_gel,2020,13374.252854016015,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BE27,2026-09-11
+per_capita_gel,2021,16373.827420167425,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ27,2026-09-11
+per_capita_gel,2022,19625.594552236413,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BO27,2026-09-11
+per_capita_gel,2023,21769.11387956629,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BT27,2026-09-11
+per_capita_gel,2024,25144.165994930037,gel_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BY27,2026-09-11
+per_capita_gel,2025,28235.381420176403,gel_per_person,preliminary,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!CD27,2026-09-11
+per_capita_usd,1996,682.2718400362654,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!G27,2026-09-11
+per_capita_usd,1997,807.0825694105869,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!L27,2026-09-11
+per_capita_usd,1998,849.9554634720103,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!Q27,2026-09-11
+per_capita_usd,1999,676.9144915271108,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!V27,2026-09-11
+per_capita_usd,2000,750.2958705984894,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AA27,2026-09-11
+per_capita_usd,2001,802.3752952580952,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AF27,2026-09-11
+per_capita_usd,2002,854.0395486320557,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AK27,2026-09-11
+per_capita_usd,2003,1009.8904203617442,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AP27,2026-09-11
+per_capita_usd,2004,1304.8827437710895,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AU27,2026-09-11
+per_capita_usd,2005,1642.8011232379117,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!AZ27,2026-09-11
+per_capita_usd,2006,2000.2650114123214,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BE27,2026-09-11
+per_capita_usd,2007,2635.1043801678666,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BJ27,2026-09-11
+per_capita_usd,2008,3326.156288001566,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BO27,2026-09-11
+per_capita_usd,2009,2822.7246608717055,usd_per_person,published,sna_1993,source.geostat_national_gdp_sna_1993,GDP at curr pr!BT27,2026-09-11
+per_capita_usd,2010,3281.185162092694,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!G28,2026-09-11
+per_capita_usd,2011,4120.832373662301,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!L28,2026-09-11
+per_capita_usd,2012,4530.662034812319,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!Q28,2026-09-11
+per_capita_usd,2013,4711.766049592927,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!V28,2026-09-11
+per_capita_usd,2014,4829.876570127809,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AA28,2026-09-11
+per_capita_usd,2015,4085.1350154770703,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AF28,2026-09-11
+per_capita_usd,2016,4143.450440650389,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AK28,2026-09-11
+per_capita_usd,2017,4420.3247257153425,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AP28,2026-09-11
+per_capita_usd,2018,4804.012742574322,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AU28,2026-09-11
+per_capita_usd,2019,4741.381315909229,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ28,2026-09-11
+per_capita_usd,2020,4300.8214956087095,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BE28,2026-09-11
+per_capita_usd,2021,5083.572416061922,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ28,2026-09-11
+per_capita_usd,2022,6731.167408127466,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BO28,2026-09-11
+per_capita_usd,2023,8283.999545481674,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BT28,2026-09-11
+per_capita_usd,2024,9241.491223114856,usd_per_person,published,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!BY28,2026-09-11
+per_capita_usd,2025,10296.544362994053,usd_per_person,preliminary,sna_2008,source.geostat_national_gdp_sna_2008,GDP at current prices!CD28,2026-09-11
+real_growth_percent,1961,4.86594070054342,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1961,2026-09-11
+real_growth_percent,1962,5.11301649671694,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1962,2026-09-11
+real_growth_percent,1963,4.20187909672116,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1963,2026-09-11
+real_growth_percent,1964,5.42958764979345,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1964,2026-09-11
+real_growth_percent,1965,10.5586366152245,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1965,2026-09-11
+real_growth_percent,1966,7.53566314896325,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1966,2026-09-11
+real_growth_percent,1967,6.25308215800375,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1967,2026-09-11
+real_growth_percent,1968,4.45558340295182,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1968,2026-09-11
+real_growth_percent,1969,4.7765040433662,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1969,2026-09-11
+real_growth_percent,1970,12.0520758237564,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1970,2026-09-11
+real_growth_percent,1971,2.47133179427014,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1971,2026-09-11
+real_growth_percent,1972,2.83646033387501,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1972,2026-09-11
+real_growth_percent,1973,6.48254561126276,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1973,2026-09-11
+real_growth_percent,1974,8.80974063206179,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1974,2026-09-11
+real_growth_percent,1975,7.38042838101734,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1975,2026-09-11
+real_growth_percent,1976,6.09953235956353,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1976,2026-09-11
+real_growth_percent,1977,6.89430009522513,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1977,2026-09-11
+real_growth_percent,1978,7.42956043676347,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1978,2026-09-11
+real_growth_percent,1979,7.37064063684609,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1979,2026-09-11
+real_growth_percent,1980,4.57644696484918,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1980,2026-09-11
+real_growth_percent,1981,5.26660055282426,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1981,2026-09-11
+real_growth_percent,1982,2.00244542885206,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1982,2026-09-11
+real_growth_percent,1983,4.3016035214589,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1983,2026-09-11
+real_growth_percent,1984,5.4279631478795,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1984,2026-09-11
+real_growth_percent,1985,4.94120590442833,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1985,2026-09-11
+real_growth_percent,1986,-8.17567222383052,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1986,2026-09-11
+real_growth_percent,1987,1.28148065724565,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1987,2026-09-11
+real_growth_percent,1988,5.55545382967426,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1988,2026-09-11
+real_growth_percent,1989,-7.19378285079883,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1989,2026-09-11
+real_growth_percent,1990,-14.788785046729,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1990,2026-09-11
+real_growth_percent,1991,-21.0998508379398,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1991,2026-09-11
+real_growth_percent,1992,-44.899774806083,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1992,2026-09-11
+real_growth_percent,1993,-29.3001665068873,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1993,2026-09-11
+real_growth_percent,1994,-10.3982300884956,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1994,2026-09-11
+real_growth_percent,1995,2.59657506969336,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1995,2026-09-11
+real_growth_percent,1996,11.2025463861501,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1996,2026-09-11
+real_growth_percent,1997,10.5208042446244,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1997,2026-09-11
+real_growth_percent,1998,3.10150969616576,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1998,2026-09-11
+real_growth_percent,1999,2.86729567454968,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/1999,2026-09-11
+real_growth_percent,2000,1.84038117927339,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2000,2026-09-11
+real_growth_percent,2001,4.80729867243699,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2001,2026-09-11
+real_growth_percent,2002,5.47402488700408,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2002,2026-09-11
+real_growth_percent,2003,11.0570310020104,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2003,2026-09-11
+real_growth_percent,2004,5.79268292682926,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2004,2026-09-11
+real_growth_percent,2005,9.59113832853026,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2005,2026-09-11
+real_growth_percent,2006,9.42148081189909,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2006,2026-09-11
+real_growth_percent,2007,12.5755698246405,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2007,2026-09-11
+real_growth_percent,2008,2.42161440960641,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2008,2026-09-11
+real_growth_percent,2009,-3.65075229596822,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2009,2026-09-11
+real_growth_percent,2010,6.24640865303363,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2010,2026-09-11
+real_growth_percent,2011,7.9343365253078,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2011,2026-09-11
+real_growth_percent,2012,6.57883101954195,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2012,2026-09-11
+real_growth_percent,2013,5.13288531209382,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2013,2026-09-11
+real_growth_percent,2014,4.09049059581743,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2014,2026-09-11
+real_growth_percent,2015,3.35102350265353,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2015,2026-09-11
+real_growth_percent,2016,3.45021517996871,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2016,2026-09-11
+real_growth_percent,2017,5.15990261658827,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2017,2026-09-11
+real_growth_percent,2018,6.062036412677,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2018,2026-09-11
+real_growth_percent,2019,5.38071926589951,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2019,2026-09-11
+real_growth_percent,2020,-6.2904717853839,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2020,2026-09-11
+real_growth_percent,2021,10.6442336580969,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2021,2026-09-11
+real_growth_percent,2022,10.9585321385624,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2022,2026-09-11
+real_growth_percent,2023,7.83220126555726,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2023,2026-09-11
+real_growth_percent,2024,9.67979379712661,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2024,2026-09-11
+real_growth_percent,2025,7.46161504152039,percent,published,,source.wb_gdp_real_growth_percent,GEO/NY.GDP.MKTP.KD.ZG/2025,2026-09-11
+real_usd_2015,1960,5243159135.67355,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1960,2026-09-11
+real_usd_2015,1961,5498288150.05056,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1961,2026-09-11
+real_usd_2015,1962,5779416530.19967,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1962,2026-09-11
+real_usd_2015,1963,6022260625.29458,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1963,2026-09-11
+real_usd_2015,1964,6349244544.44395,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1964,2026-09-11
+real_usd_2015,1965,7019638203.70375,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1965,2026-09-11
+real_usd_2015,1966,7548614493.0108,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1966,2026-09-11
+real_usd_2015,1967,8020635559.04975,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1967,2026-09-11
+real_usd_2015,1968,8378001665.83002,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1968,2026-09-11
+real_usd_2015,1969,8778177254.15168,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1969,2026-09-11
+real_usd_2015,1970,9836129832.76578,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1970,2026-09-11
+real_usd_2015,1971,10079213236.6486,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1971,2026-09-11
+real_usd_2015,1972,10365106122.0728,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1972,2026-09-11
+real_usd_2015,1973,11037028854.092,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1973,2026-09-11
+real_usd_2015,1974,12009362469.6233,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1974,2026-09-11
+real_usd_2015,1975,12895704865.7106,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1975,2026-09-11
+real_usd_2015,1976,13682282556.9885,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1976,2026-09-11
+real_usd_2015,1977,14625580176.3439,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1977,2026-09-11
+real_usd_2015,1978,15712196494.7727,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1978,2026-09-11
+real_usd_2015,1979,16870286034.5575,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1979,2026-09-11
+real_usd_2015,1980,17642345727.7474,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1980,2026-09-11
+real_usd_2015,1981,18571497605.3761,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1981,2026-09-11
+real_usd_2015,1982,18943381710.2443,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1982,2026-09-11
+real_usd_2015,1983,19758250884.9756,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1983,2026-09-11
+real_usd_2015,1984,20830721461.6776,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1984,2026-09-11
+real_usd_2015,1985,21860010300.477,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1985,2026-09-11
+real_usd_2015,1986,20072807510.2145,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1986,2026-09-11
+real_usd_2015,1987,20330036655.824,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1987,2026-09-11
+real_usd_2015,1988,21459462455.7942,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1988,2026-09-11
+real_usd_2015,1989,19915715325.7756,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1989,2026-09-11
+real_usd_2015,1990,16970422995.7282,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1990,2026-09-11
+real_usd_2015,1991,13389689057.0621,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1991,2026-09-11
+real_usd_2015,1992,7377748823.20649,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1992,2026-09-11
+real_usd_2015,1993,5216056133.54707,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1993,2026-09-11
+real_usd_2015,1994,4673678615.23576,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1994,2026-09-11
+real_usd_2015,1995,4795034188.99656,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1995,2026-09-11
+real_usd_2015,1996,5332200118.25066,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1996,2026-09-11
+real_usd_2015,1997,5893190454.62344,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1997,2026-09-11
+real_usd_2015,1998,6075968327.9871,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1998,2026-09-11
+real_usd_2015,1999,6250184305.04248,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/1999,2026-09-11
+real_usd_2015,2000,6365211520.66238,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2000,2026-09-11
+real_usd_2015,2001,6671206249.59299,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2001,2026-09-11
+real_usd_2015,2002,7036389739.95908,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2002,2026-09-11
+real_usd_2015,2003,7814405534.92863,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2003,2026-09-11
+real_usd_2015,2004,8267069270.18365,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2004,2026-09-11
+real_usd_2015,2005,9059975319.60238,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2005,2026-09-11
+real_usd_2015,2006,9913559155.90151,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2006,2026-09-11
+real_usd_2015,2007,11160245709.6589,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2007,2026-09-11
+real_usd_2015,2008,11430503827.9115,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2008,2026-09-11
+real_usd_2015,2009,11013204446.9733,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2009,2026-09-11
+real_usd_2015,2010,11701134202.5253,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2010,2026-09-11
+real_usd_2015,2011,12629541567.4316,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2011,2026-09-11
+real_usd_2015,2012,13460417765.6957,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2012,2026-09-11
+real_usd_2015,2013,14151325572.1376,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2013,2026-09-11
+real_usd_2015,2014,14730184213.8494,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2014,2026-09-11
+real_usd_2015,2015,15223796148.8396,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2015,2026-09-11
+real_usd_2015,2016,15749049874.5344,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2016,2026-09-11
+real_usd_2015,2017,16561685511.0983,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2017,2026-09-11
+real_usd_2015,2018,17565660917.3341,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2018,2026-09-11
+real_usd_2015,2019,18510819818.4957,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2019,2026-09-11
+real_usd_2015,2020,17346401920.57,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2020,2026-09-11
+real_usd_2015,2021,19192793472.268,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2021,2026-09-11
+real_usd_2015,2022,21296041913.2144,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2022,2026-09-11
+real_usd_2015,2023,22963990777.4548,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2023,2026-09-11
+real_usd_2015,2024,25186857732.3036,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2024,2026-09-11
+real_usd_2015,2025,27066204097.3435,usd_2015,published,,source.wb_gdp_real_usd_2015,GEO/NY.GDP.MKTP.KD/2025,2026-09-11

@@ -89,5 +89,8 @@
   "/methodology/debt": "2026-09-06",
   "/methodology/expenditure": "2026-09-06",
   "/methodology/municipalities": "2026-09-06",
-  "/methodology/revenue": "2026-09-06"
+  "/methodology/revenue": "2026-09-06",
+  "/explorer/economy": "2026-09-11",
+  "/explorer/economy/gdp": "2026-09-11",
+  "/methodology/gdp": "2026-09-11"
 }
