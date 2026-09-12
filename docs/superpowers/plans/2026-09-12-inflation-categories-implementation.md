@@ -2008,9 +2008,15 @@ describe("InflationCategories", () => {
     expect(screen.getByTestId("inflation-category-tab-contrib").getAttribute("aria-selected")).toBe("true");
   });
 
-  it("names the largest contributor in the headline line", () => {
+  it("carries the unit line alone under the H1, with no headline value line", () => {
     renderWithMessages(<InflationCategories {...props} />);
-    expect(screen.getByTestId("inflation-category-headline").textContent).toContain("ტრანსპორტი");
+    expect(screen.getByTestId("inflation-category-unit").textContent).toContain("პროცენტული პუნქტი");
+    expect(screen.queryByTestId("inflation-category-headline")).toBeNull();
+  });
+
+  it("names the largest contributor in the indicators hero", () => {
+    renderWithMessages(<InflationCategories {...props} />);
+    expect(screen.getByTestId("inflation-category-hero").textContent).toContain("ტრანსპორტი");
   });
 
   it("selects all twelve divisions by default", () => {
@@ -2062,7 +2068,7 @@ Add one message per COICOP division and subgroup under `inflation.category.<id>`
 
 - [ ] **Step 4: Implement the page**
 
-`inflation-categories.tsx` follows `inflation-overview.tsx` line for line in structure: `useState` on the state module's default, hash read after hydration behind `ready`, `history.replaceState` on change, `document.body.dataset.appReady`. It renders `PageHeader`, the h1, the headline and unit lines, the three `TextTab`s (`data-testid="inflation-category-tab-<tab>"`), the `SegmentedTabs` mode toggle, then either `StackedColumnChart` (contrib), `EditorialLineChart` (rates) or `InflationCategoryTable`, the legend, `RangeStrip`, the source note with `derivedNote` on the contribution tab, `InflationCategoryPanel` and `InflationCategoryIndicators`.
+`inflation-categories.tsx` follows `inflation-overview.tsx` line for line in structure: `useState` on the state module's default, hash read after hydration behind `ready`, `history.replaceState` on change, `document.body.dataset.appReady`. It renders `PageHeader`, the h1, then **the unit line alone** — no headline value line, per `DESIGN.md` §25 as amended by `f8dd5e05c`; copy the header markup and its 16px/12px spacing from `inflation-overview.tsx:100-103` rather than reinventing it — the three `TextTab`s (`data-testid="inflation-category-tab-<tab>"`), the `SegmentedTabs` mode toggle, then either `StackedColumnChart` (contrib), `EditorialLineChart` (rates) or `InflationCategoryTable`, the legend, `RangeStrip`, the source note with `derivedNote` on the contribution tab, `InflationCategoryPanel` and `InflationCategoryIndicators`.
 
 `inflation-category-indicators.tsx` renders the hero (largest contributor, 62px mono value, its rate and basket share, one sentence) and three KPI cells with `Sparkline` over the last 36 months, from `latestContributors(index, 4)`.
 

@@ -165,7 +165,6 @@ Validation fails the build if any month's absolute reconstruction error over all
 Home / Data / Inflation / Categories        Jan 2004 – Aug 2026 · updated YYYY-MM-DD
 
 კატეგორიები
-აგვისტო 2026: ტრანსპორტი · +1.74 პპ
 პროცენტული პუნქტი · წვლილი წლიურ ინფლაციაში (5.65%)
 
      წლიური ინფლაცია   თვიური ინფლაცია   წვლილი ინფლაციაში
@@ -180,7 +179,9 @@ source note + methodology link                   │
 hero: largest contributor   │  next three, with sparklines
 ```
 
-- **Headline line.** On the contribution tab, the largest contributor in the last month of the active range and its percentage points. On the rate tabs, the published headline for that month, as on the overview. **Unit line:** contribution `პროცენტული პუნქტი · წვლილი წლიურ ინფლაციაში ({headline}%)`; y/y `პროცენტი · წინა წლის შესაბამის თვესთან შედარებით`; m/m `პროცენტი · წინა თვესთან შედარებით`.
+- **No headline value line.** `DESIGN.md` §25 and the GDP extension, as amended on 2026-09-12 (`f8dd5e05c`), carry **the unit line alone** under the H1 on both overviews, with 16px beneath it and 12px under the tabs. This page follows that rule: the "largest contributor" figure lives in the indicators hero, which is where the page already answers that question. **Unit line:** contribution `პროცენტული პუნქტი · წვლილი წლიურ ინფლაციაში ({headline}%)`; y/y `პროცენტი · წინა წლის შესაბამის თვესთან შედარებით`; m/m `პროცენტი · წინა თვესთან შედარებით`.
+
+  (The 2026-09-12 mockup predates this check and drew a headline line. It is wrong on that point and the spec governs.)
 - **Tabs** are production `TextTab` in a centred, scrollable row, as on the overview and GDP. A tab switches chart, table, panel, headline line, available range, download and default selection together. They are ordered `წლიური ინფლაცია`, `თვიური ინფლაცია`, `წვლილი ინფლაციაში` so the two rate tabs keep the order a reader already knows from the overview, but the **landing tab is `წვლილი ინფლაციაში`**, not the first one: the section exists for the decomposition, and the rate tabs are the supporting detail. The three tabs have three different coverages — 2005-01, 2004-01 and 2013-01 — and the overview's existing range-transition rule (keep the intersection, keep "all" as "all", fall back to the destination's full range, announce the change) handles them unchanged.
 - **Toolbar.** `SegmentedTabs`, labelled `სვეტები | ცხრილი` on the contribution tab and `ხაზი | ცხრილი` on the rate tabs. The mode persists across tabs.
 - **Series panel.** The ministries two-level pattern: 12 division rows, each expanding to its subgroups, search above, and the count line `ჯგუფები {selected} / 12 · ქვეჯგუფები {selectedSubgroups}` so a selected subgroup is never hidden by the division count. Search never scopes the bulk action or the denominator. Every row carries its basket weight for the latest year, right-aligned in mono; a row with no weight shows `—`. A category with no value on the active tab — the two subgroups that ended in 2011, on the contribution tab — shows `—` and is left out of the chart, exactly as the overview treats core inflation on the index tab.
