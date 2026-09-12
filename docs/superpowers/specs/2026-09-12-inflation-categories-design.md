@@ -48,7 +48,7 @@ Two observations from the mockup were not settled in conversation. Both are reco
 | 2 — divisions | 12 | 2005-01 – 2026-08 | 2004-01 – 2026-08 |
 | 3 — subgroups | 43 | 2005-01 – 2026-08 (six exceptions, §3.4) | 2004-01 – 2026-08 |
 
-**One new source:** Geostat *Consumer Basket Weights* (`https://geostat.ge/media/76662/Consumer-basket-weights.xlsx`, English, retrieved 2026-09-12, 25,626 bytes), a single `Weights` sheet: `N`, `Level`, `COICOP code`, `Groups/subgroups`, then one column per year 2012–2026. Values are fractions; divisions sum to 1.0 for every year and so do subgroups.
+**One new source:** Geostat *Consumer Basket Weights* (`https://geostat.ge/media/76662/Consumer-basket-weights.xlsx`, English, retrieved 2026-09-12, 25,626 bytes), a single `Weights` sheet: `N`, `Level`, `COICOP code`, `Groups/subgroups`, then one column per year 2012–2026. Values are fractions of one; divisions sum to exactly 1.0 for every year and so do subgroups. The file holds 12 divisions and 41 subgroups — two fewer than the CPI workbooks, exactly the two that ended in 2011 (§3.4).
 
 **Collection task:** locate the Georgian twin on `https://www.geostat.ge/ka/modules/categories/26/cpi-inflation`. The URL obtained from an automated read of the page (media id 76653) returns 404 and must not be trusted. If no Georgian weights file is published, record that in the methodology and treat the English file as canonical — Georgian category labels do not depend on it (§3.3).
 
@@ -89,7 +89,9 @@ Two new files; the overview's `cpi-national-monthly.csv` and `nbg-inflation-targ
 
 `data/imports/cpi-basket-weights.csv` — one row per category and year, about 780 rows:
 
-`category_id`, `year`, `weight`, `source_id`, `last_reviewed_at`.
+`category_id`, `year`, `weight_pct`, `source_id`, `last_reviewed_at`.
+
+Geostat publishes weights as fractions of one. They are stored as **percentages with six decimals** (`30.320378`), matching how every other percentage in this dataset is stored and giving the mirror a `DECIMAL(12,6)` column. At that precision a level's yearly sum can drift from 100 by rounding, so the sum check below is stated as a tolerance rather than an equality.
 
 Values are published precision. Percentages hold percentage points, as the overview does. `parent_id` is empty for divisions. **No contribution column**: contributions are derived at serving time (§4.6), following the `% of GDP` precedent at `lib/explorer/debtExplorer.ts`.
 
@@ -112,7 +114,7 @@ Categories refresh with the monthly CPI vintage and need no extra step — the s
 Added to `npm run data:validate` through the existing `data:check-inflation`:
 
 - exactly 12 level-2 rows; every level-3 row's `parent_id` resolves;
-- weights sum to 1.0 at each level for every year (tolerance 1e-9; measured exact today);
+- weights sum to 100% at each level for every year, within 0.001 pp of the stored six-decimal values (the source fractions sum to exactly 1.0 today, at every level and in every year);
 - every category carrying a weight has price data, and every category without one is absent from the weights file for a reason recorded in the report;
 - English and Georgian category values identical, and the COICOP code↔label pairing stable against the previous vintage;
 - gaps enumerated in `data/reports/inflation-cpi-validation.json`;
@@ -129,10 +131,10 @@ At roughly 28,000 rows this is the largest dataset in the repository — four ti
 For category *i* in month *m* of year *y*:
 
 ```
-contribution_i(m) = weight_i(y) × published_change_i(m)
+contribution_i(m) = weight_pct_i(y) / 100 × published_change_i(m)
 ```
 
-with the weight taken from the calendar year of the month being measured, and the change in percentage points. The measure is derived in `lib/explorer/inflationCategories.ts` at build time from stored published values, never written to a CSV and never presented as a Geostat figure.
+with the weight taken from the calendar year of the month being measured, and the change in percentage points. Both operands and the result are percentage points; the division by 100 converts the stored percentage back to the fraction the arithmetic needs. The measure is derived in `lib/explorer/inflationCategories.ts` at build time from stored published values, never written to a CSV and never presented as a Geostat figure.
 
 **The residual.** The chart, table and export show `დანარჩენი` = `published headline − Σ(selected contributions)`. One definition does three jobs: the stack always closes exactly on the published headline; selecting three subgroups rather than the whole basket is a meaningful view rather than a broken one; and the approximation inherent in the method is absorbed visibly rather than hidden.
 
