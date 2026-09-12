@@ -134,6 +134,8 @@ type SeriesSelectorRowProps = {
   label: string;
   color: string;
   value: string;
+  /** A second, quieter metric before the value (the category panel's basket share). */
+  meta?: string;
   selected: boolean;
   level?: string;
   parentId?: string | null;
@@ -156,6 +158,7 @@ export function SeriesSelectorRow({
   label,
   color,
   value,
+  meta,
   selected,
   level,
   parentId,
@@ -230,6 +233,11 @@ export function SeriesSelectorRow({
             {label}
           </span>
         </span>
+        {meta === undefined ? null : (
+          <span className="mt-0.5 flex-none font-[family-name:var(--font-mono)] text-[10px] whitespace-nowrap text-[var(--muted)] opacity-70">
+            {meta}
+          </span>
+        )}
         <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--muted)]">
           {value}
         </span>
