@@ -21,6 +21,8 @@ import {
   loadGovernmentDebtFactsFromMirror,
   loadGeneralGovernmentBalanceFactsFromMirror,
   loadGdpOverviewFactsFromMirror,
+  loadInflationBasketWeightsFromMirror,
+  loadInflationCategoryFactsFromMirror,
   loadInflationCpiFactsFromMirror,
   loadInflationTargetsFromMirror,
   loadSourceDocumentsFromMirror,
@@ -101,6 +103,11 @@ export async function loadMunicipalDataFromDb(): Promise<MunicipalData> {
 export async function loadGdpOverviewFactsFromDb(){return loadGdpOverviewFactsFromMirror(prisma);}
 
 export async function loadInflationDataFromDb() {
-  const [facts, targets] = await Promise.all([loadInflationCpiFactsFromMirror(prisma), loadInflationTargetsFromMirror(prisma)]);
-  return { facts, targets };
+  const [facts, targets, categories, weights] = await Promise.all([
+    loadInflationCpiFactsFromMirror(prisma),
+    loadInflationTargetsFromMirror(prisma),
+    loadInflationCategoryFactsFromMirror(prisma),
+    loadInflationBasketWeightsFromMirror(prisma),
+  ]);
+  return { facts, targets, categories, weights };
 }
