@@ -51,7 +51,7 @@ export function MonthGridTable({ caption, yearLabel, monthLabels, monthNames, su
   };
 
   return (
-    <div className="mt-[18px]">
+    <div className="mt-4">
       {picker ? <div className="mb-4">{picker}</div> : null}
       <HorizontalScrollHint testId="table-scroll-hint" />
       <div

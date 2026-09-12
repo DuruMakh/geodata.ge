@@ -28,5 +28,6 @@ it("renders centered four indicator controls and the existing chart", async () =
   expect(html).toContain("GDP per capita");
   expect(html).not.toContain('data-testid="gdp-currency"');
   expect(html).not.toContain(">Display<");
-  expect(html).toContain("27.1 bn USD");
+  expect(html).not.toContain('data-testid="gdp-headline"');
+  expect(html).toContain("bn · Constant 2015 USD");
 });

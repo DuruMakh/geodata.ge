@@ -27,7 +27,7 @@ test("tabs switch units, series and the target together", async ({ page }) => {
   await expect(page.getByTestId("inflation-tab-yoy")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("inflation-unit")).toHaveText("Percent · change on the same month of the previous year");
   await expect(page.getByTestId("chart-series-target-dashed")).toHaveCount(1);
-  await expect(page.getByTestId("inflation-headline")).toContainText("Annual inflation ·");
+  await expect(page.getByTestId("inflation-headline")).toHaveCount(0);
 
   await page.getByTestId("inflation-tab-index").click();
   await expect(page.getByTestId("inflation-unit")).toHaveText("Index · 2010 average = 100");
@@ -37,7 +37,7 @@ test("tabs switch units, series and the target together", async ({ page }) => {
   await expect(page.getByRole("slider", { name: "Start month" })).toHaveAttribute("aria-valuetext", "Jan 2000");
 
   await page.getByTestId("inflation-tab-mom").click();
-  await expect(page.getByTestId("inflation-headline")).toContainText(/Monthly inflation · [+−]?\d/);
+  await expect(page.getByTestId("inflation-unit")).toHaveText("Percent · change on the previous month");
 });
 
 test("range chips, keyboard steps and tab switches keep a consistent period", async ({ page }) => {

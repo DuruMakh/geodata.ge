@@ -2,19 +2,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeAll, describe, expect, it } from "vitest";
 import { InflationOverview } from "../../components/inflation/inflation-overview";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
-import { periodFromKey } from "../../lib/data/inflation/periods";
-import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { I18nProvider } from "../../lib/i18n/provider";
 
 let html: string;
-let heading: string;
 
 beforeAll(async () => {
   const { facts, targets } = await loadServedInflationData();
   const messages = await getMessages("en", ["inflation", "common", "controls", "format", "main"]);
-  const last = Math.max(...facts.map((fact) => periodFromKey(fact.period)));
-  heading = `${periodLabel(messages, last, "long")}: Annual inflation · `;
   html = renderToStaticMarkup(
     <I18nProvider locale="en" messages={messages}>
       <InflationOverview facts={facts} targets={targets} sources={[]} siteOrigin="https://fiscal.ge" />
@@ -30,8 +25,8 @@ describe("inflation overview (server render = default state)", () => {
     expect(html).toContain(">Price index<");
   });
 
-  it("states the latest month, the value and the unit under the heading", () => {
-    expect(html).toContain(heading);
+  it("states the unit under the heading", () => {
+    expect(html).not.toContain('data-testid="inflation-headline"');
     expect(html).toContain("Percent · change on the same month of the previous year");
   });
 

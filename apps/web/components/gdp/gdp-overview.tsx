@@ -18,7 +18,6 @@ import {
   buildGdpWorkbookExportModel,
   gdpDisplay,
 } from "../../lib/explorer/gdpWorkbook";
-import { formatInUnit, formatShare } from "../../lib/explorer/format";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { PageHeader } from "../shell/page-header";
@@ -61,9 +60,6 @@ export function GdpOverview({
   }, [state, ready]);
   const m = useMemo(() => buildGdpOverviewModel(facts, state), [facts, state]);
   const d = gdpDisplay(state, presentation);
-  const headlineAmount = d.growth
-    ? formatShare(m.headline?.value)
-    : `${formatInUnit(m.headline?.value, d.unit)} ${d.unit.label}${state.indicator === "per_capita" ? "" : ` ${t(state.indicator === "real" ? "usd" : state.currency)}`}`;
   const row = {
     itemId: "gdp.overview",
     kaLabel: d.label,
@@ -122,18 +118,8 @@ export function GdpOverview({
           {t("heading")}
         </h1>
         <p
-          data-testid="gdp-headline"
-          className="mb-2 text-[13px] text-[var(--body)]"
-        >
-          {m.headline?.year}: {d.label} ·{" "}
-          <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">
-            {headlineAmount}
-          </span>
-          {m.headline?.status === "preliminary" ? ` · ${t("preliminary")}` : ""}
-        </p>
-        <p
           data-testid="gdp-unit"
-          className="mb-[30px] text-[13px] text-[var(--muted)]"
+          className="mb-4 text-[13px] text-[var(--muted)]"
         >
           {state.indicator === "real" || d.growth
             ? d.fullUnitLabel
@@ -143,7 +129,7 @@ export function GdpOverview({
         </p>
         <div
           data-testid="gdp-indicators"
-          className="mb-7 overflow-x-auto py-2"
+          className="mb-3 overflow-x-auto py-2"
           onFocusCapture={(event) =>
             event.target.scrollIntoView({ block: "nearest", inline: "nearest" })
           }
@@ -167,7 +153,7 @@ export function GdpOverview({
         </p>
         <section
           data-testid="chart-panel"
-          className="border-t border-[var(--ink)] pt-4"
+          className="border-t border-[var(--ink)] pt-3"
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SegmentedTabs

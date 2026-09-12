@@ -5,9 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ServedCpiFact, ServedInflationTargetRow } from "../../lib/data/inflation/types";
 import { formatDisplayDate } from "../../lib/explorer/format";
-import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
+import { periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
 import {
-  DEFAULT_INFLATION_STATE, INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, headlinePoint, indexInflationFacts,
+  DEFAULT_INFLATION_STATE, INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
   overallCoverage, parseInflationHash, rangeFromPatch, resolveInflationRange, serializeInflationHash, toggleSelection,
   type InflationState, type InflationTab,
 } from "../../lib/explorer/inflationOverview";
@@ -65,7 +65,6 @@ export function InflationOverview({ facts, targets, sources, siteOrigin }: Infla
   const range = resolveInflationRange(state, index);
   const { periods, lines } = buildInflationLines(index, targets, state, range);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
-  const headline = headlinePoint(index, state, range);
   const coverage = overallCoverage(index);
   const lastReviewedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
@@ -101,21 +100,13 @@ export function InflationOverview({ facts, targets, sources, siteOrigin }: Infla
         <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
           {t("heading")}
         </h1>
-        <p data-testid="inflation-headline" className="mb-2 min-h-[18px] text-[13px] text-[var(--body)]">
-          {headline ? (
-            <>
-              {periodLabel(messages, headline.period, "long")}: {t(`tab.${state.tab}`)} ·{" "}
-              <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{formatInflationValue(headline.value, state.tab)}</span>
-            </>
-          ) : null}
-        </p>
-        <p data-testid="inflation-unit" className="mb-[30px] text-[13px] text-[var(--muted)]">{t(`unit.${state.tab}`)}</p>
+        <p data-testid="inflation-unit" className="mb-4 text-[13px] text-[var(--muted)]">{t(`unit.${state.tab}`)}</p>
 
         <div
           data-testid="inflation-tabs"
           role="group"
           aria-label={t("tabs")}
-          className="mb-7 overflow-x-auto py-2"
+          className="mb-3 overflow-x-auto py-2"
           onFocusCapture={(event) => event.target.scrollIntoView({ block: "nearest", inline: "nearest" })}
         >
           <div className="mx-auto flex w-max gap-7 px-1">
@@ -128,7 +119,7 @@ export function InflationOverview({ facts, targets, sources, siteOrigin }: Infla
 
         <div data-testid="explorer-workspace" className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">
           <div className="flex min-w-0 flex-col">
-            <section data-testid="chart-panel" data-mode={state.mode} data-tab={state.tab} className="border-t border-[var(--ink)] pt-4">
+            <section data-testid="chart-panel" data-mode={state.mode} data-tab={state.tab} className="border-t border-[var(--ink)] pt-3">
               <SegmentedTabs<InflationState["mode"]>
                 ariaLabel={message(messages, "controls.viewMode")}
                 value={state.mode}

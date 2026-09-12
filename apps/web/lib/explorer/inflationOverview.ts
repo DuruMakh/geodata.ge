@@ -129,11 +129,6 @@ function lastInRange(values: Map<number, number> | undefined, range: ResolvedPer
   return null;
 }
 
-/** The headline line: headline series, active tab, last month in the active range. */
-export function headlinePoint(index: InflationIndex, state: InflationState, range: ResolvedPeriodRange) {
-  return lastInRange(seriesValues(index, "cpi", state.tab), range);
-}
-
 export function panelValue(index: InflationIndex, targets: ServedInflationTargetRow[], key: InflationSelectionKey, state: InflationState, range: ResolvedPeriodRange): number | null {
   if (key === "target") return state.tab === "yoy" ? targetForPeriod(targets, range.end) : null;
   return lastInRange(seriesValues(index, key, state.tab), range)?.value ?? null;

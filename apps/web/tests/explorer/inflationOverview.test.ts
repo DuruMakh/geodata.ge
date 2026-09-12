@@ -3,7 +3,7 @@ import { loadServedInflationData } from "../../lib/data/inflation/importInflatio
 import { makePeriod, periodFromKey } from "../../lib/data/inflation/periods";
 import type { ServedCpiFact, ServedInflationTargetRow } from "../../lib/data/inflation/types";
 import {
-  DEFAULT_INFLATION_STATE, buildInflationLines, changeInflationTab, effectiveTableSeries, headlinePoint, indexInflationFacts,
+  DEFAULT_INFLATION_STATE, buildInflationLines, changeInflationTab, effectiveTableSeries, indexInflationFacts,
   latestIndicators, panelValue, parseInflationHash, resolveInflationRange, serializeInflationHash, targetForPeriod, toggleSelection,
   type InflationIndex, type InflationState,
 } from "../../lib/explorer/inflationOverview";
@@ -49,14 +49,6 @@ describe("inflation overview state", () => {
     const indexState = { ...DEFAULT_INFLATION_STATE, tab: "index" as const, selected: ["cpi", "core", "target"] as InflationState["selected"] };
     expect(buildInflationLines(index, targets, indexState, resolveInflationRange(indexState, index)).lines.map((line) => line.key)).toEqual(["cpi"]);
     expect(panelValue(index, targets, "core", indexState, resolveInflationRange(indexState, index))).toBeNull();
-  });
-
-  it("reads the headline line at the last month of the active range", () => {
-    const all = resolveInflationRange(DEFAULT_INFLATION_STATE, index);
-    const yoyLast = facts.find((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct" && periodFromKey(fact.period) === last)!;
-    expect(headlinePoint(index, DEFAULT_INFLATION_STATE, all)).toEqual({ period: last, value: yoyLast.value });
-    const to2025 = { ...DEFAULT_INFLATION_STATE, range: manual("2020-01", "2025-12") };
-    expect(headlinePoint(index, to2025, resolveInflationRange(to2025, index))?.period).toBe(makePeriod(2025, 12));
   });
 
   it("toggles selection, keeps the table series among selected series, and round-trips the hash", () => {
