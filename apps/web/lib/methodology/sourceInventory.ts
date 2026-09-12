@@ -40,6 +40,7 @@ const inventoryRules = {
     { root: "docs/Raw Data/Economy/economic-sectors/sources", include: extension(".xlsx") },
     { root: "docs/Raw Data/Economy/gdp-overview/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "geostat_nominal_current.xlsx" },
   ],
+  inflation: [{ root: "docs/Raw Data/Inflation", include: (candidatePath: string) => [".xlsx", ".pdf"].includes(path.posix.extname(candidatePath).toLowerCase()) }],
   debt: [
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
   ],

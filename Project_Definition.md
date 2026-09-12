@@ -32,12 +32,12 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Single-year snapshot with headline cards, treemap, Every 100 GEL, Budget Radar, Budget Field, and full ranking.
 - Municipal annual expenditure data for 2015-2025: ten main functional categories plus the public total headline. The public entity set remains 64 municipality pages and 11 region roll-up pages under `/explorer/municipalities`. The 2025 index map uses the reviewed 1 January 2025 Geostat population denominator to color municipalities by budget per resident; municipality and region lists remain ranked by total budget and show per-resident values only as supporting context, and one KPI reports the 64-municipality median. Adjara's regional total consolidates its six municipalities with Adjara Autonomous Republic actual payments and removes transfers from the republic to territorial budgets. The explicit `/explorer/municipalities/georgia` page starts from all 69 reviewed municipal-budget series and adds the same net Adjara republican amount once. Codes `05`, `42`, `43`, `46`, and `64` remain country-aggregate-only because their budgets are not territorially attributable spending inside the named municipalities. The Georgia row has no per-resident value. The ten functional series remain municipal-only because no reviewed comparable Adjara republican function crosswalk exists; no residual or proportional allocation is invented. Municipality and region ranks remain out of 64 and 11 respectively. Methodology: `docs/data-methodology/municipal-functional-annual-2015-2025.md` and `docs/data-methodology/municipal-population-regional-gdp.md`.
 - Annual Government Debt explorer at `/explorer/debt`: stock for 2013–2025, actual debt service for 2013–2025 with the optional 2026–2030 existing-portfolio snapshot, and weighted-average rates for 2015–2025. Stock can be shown in GEL or as a share of same-year GDP; exact unpublished rate gaps remain empty. This does not change the existing `spending.debt_service` expenditure series. Methodology: `docs/data-methodology/government-debt-annual.md`.
-- `მალე` markers for named future datasets (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` in the sidebar). Labels only: no routes, not clickable, no data.
+- `მალე` markers for named future datasets (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` in the sidebar). Labels only: no routes, not clickable, no data (inflation: see 2C).
 - Excel workbook export. Each explorer has one `ჩამოტვირთვა` action for the active range, selected series, grouping, and measure; it downloads a Fiscal.ge `.xlsx` file with `მარტივი ცხრილი`, `მონაცემები`, and `წყაროები` sheets. The readable table starts on row 3 with right-aligned years, while the analysis sheet uses the Georgian headers `წელი`, `მთავარი ჯგუფი`, `კატეგორია`, `თანხა (₾)`, and `სტატუსი`. Relevant validated public-archive originals live only on `წყაროები`, with compressed year ranges and clean clickable file labels rather than raw URLs. There is no public explorer CSV action. National multi-year workbooks always retain the full GEL amount, add `მშპ-ის წილი (%)` and link the validated GDP source workbook only for the active `% მშპ-ში` measure; the Debt-rate exception leaves the GEL amount blank and adds `საპროცენტო განაკვეთი (%)`. Workbooks do not expose denominator, accounting-standard, publication-status, or source-metadata columns. Methodology manifest CSVs remain unchanged.
 - Georgian-first UI.
 - Minimal public source label.
 - Internal source/provenance metadata.
-- Public methodology and original-source centre: a `/methodology` hub plus live pages for expenditure, revenue, municipalities, and Government Debt; complete public decision records for the budget and municipal datasets; a concise Debt page limited to scope, sources, known limitations, and archive; and untouched upstream files available individually and as category archives. Future dataset names remain non-clickable `მალე` markers until their data, methodology, validation, and sources are ready together. Approved design: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`.
+- Public methodology and original-source centre: a `/methodology` hub plus live pages for expenditure, revenue, municipalities, and Government Debt (GDP and inflation pages: see the Economy item below and 2C); complete public decision records for the budget and municipal datasets; a concise Debt page limited to scope, sources, known limitations, and archive; and untouched upstream files available individually and as category archives. Future dataset names remain non-clickable `მალე` markers until their data, methodology, validation, and sources are ready together. Approved design: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`.
 
 - Economy hub at `/explorer/economy` and annual GDP overview at `/explorer/economy/gdp`: four centered Real GDP, Nominal GDP, GDP growth and nominal GDP-per-capita tabs, existing chart/table/range/download components, GEL/USD for nominal measures only. Scope and source boundaries: `docs/superpowers/specs/2026-09-10-gdp-overview-design.md`. GDP methodology is live with the feature; the six GDP series are also exposed through read-only MCP and central bulk downloads. Regional explorers and population integration remain deferred.
 - National economic sectors at `/explorer/economy/sectors`: 20 NACE activities and a separately published total GDP reference, with nominal GEL and GDP share for 2010–2025 and real growth for 2011–2025. One workspace reuses the existing chart, table, unlimited selector, year range and Excel components, with a joined three-way measure switch and no top indicator tabs. Sector values are GVA at basic prices; GDP-share denominators are national GDP at market prices. Source-supported growth is never replaced by nominal growth. Both languages, source originals, methodology, read-only MCP and central bulk downloads are included. Regional sectors remain separate and deferred. See `docs/data-methodology/economic-sectors.md`.
@@ -49,12 +49,12 @@ The approved national-sector page also includes four point-in-time highlights: l
 - Broad public data catalog.
 - Historical municipal per-capita series, detail-page per-capita measures, and per-capita exports. V1 includes only the bounded 2025 index map, supporting list values, and median KPI described above.
 - The six selected-detail municipal categories. Only the ten main functions are served.
-- Any data behind the four sidebar indicator markers (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`).
+- Any data behind the four sidebar indicator markers (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) (inflation: see 2C).
 - Capital projects explorer.
 - Admin UI.
 - Public API.
 - User uploads.
-- Quarterly or monthly data.
+- Quarterly or monthly data (inflation: see 2C).
 - Automated production extraction from DOCX/PDF.
 - Clickable drilldown/detail pages into programs, subprograms, or revenue subcategories.
 
@@ -114,6 +114,15 @@ automatic language detection, language cookie or language redirect is introduced
 Future additions must provide reviewed language companions and page review dates
 before passing `npm run i18n:check`. The bounded decisions are in
 `docs/superpowers/specs/2026-09-05-fiscal-bilingual-design.md`.
+
+## 2C. Approved inflation extension
+
+Approved 2026-09-11 (`docs/superpowers/specs/2026-09-11-inflation-overview-design.md`). For this dataset only, the "data behind the sidebar indicator markers" and "quarterly or monthly data" exclusions are lifted:
+
+- Inflation hub at `/explorer/inflation` and Inflation overview at `/explorer/inflation/overview`: monthly national CPI from Geostat — headline index (2010 = 100), annual and monthly inflation, the 12-month average, core inflation and core excluding tobacco — with the National Bank of Georgia inflation target as a reference line; year × month table; Excel download; Georgian and English.
+- Methodology page `/methodology/inflation` with the archived Geostat and NBG source files.
+
+Still excluded: inflation categories, basket weights, city indices, product-level indices, the price calculator, every other price index (producer, import, construction, property, agricultural), HICP, MCP intents and JSON publications for inflation, and monthly or quarterly data for any other dataset. Each needs its own approved spec.
 
 ## 3. Target Users
 

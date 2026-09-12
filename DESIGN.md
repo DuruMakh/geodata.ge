@@ -32,7 +32,7 @@ V1 includes: the budget hub, multi-year explorer (line + table) with fields/mini
 
 V1 excludes: data catalog, capital explorer, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
-Municipal budgets are an implemented v1 **section** in this branch at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). Production verification follows merge and deployment; this branch state is not evidence that the current municipal surfaces are live. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) remain markers only, with no data at all. Nothing about a marker may be styled as if it were live.
+Municipal budgets are an implemented v1 **section** in this branch at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). Production verification follows merge and deployment; this branch state is not evidence that the current municipal surfaces are live. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) remain markers only, with no data at all (inflation: see §25). Nothing about a marker may be styled as if it were live.
 
 Every visual decision should support a focused budget product, not a generic dashboard.
 
@@ -379,7 +379,7 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
 - `ბიუჯეტი` — the active dataset: `2px accent` left border, active-row background, sans 12.5/600 in `paper`. Not a link; it is where you already are.
 - Its six sections nest beneath it (below).
-- `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
+- `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data (inflation: see §25).
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, mono glyph `«` (expanded) / `»` (collapsed).
 
@@ -875,7 +875,7 @@ The Georgia page's total and function rows are dedicated `country.georgia` facts
 
 Approved visual and behavioral specification: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`. Approved preview: `design-shotgun/methodology-portal-2026-08-11/variant-d.html` (Editorial Fieldbook).
 
-The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, and Government Debt. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
+The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, and Government Debt (GDP and inflation pages: see GDP overview extension and §25). Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
 
 Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only.
 
@@ -913,7 +913,19 @@ Discovery includes the shared public header item `AI` linking to `/connect`, act
 
 ## GDP overview extension
 
-Economy is a peer below Budget in the explorer sidebar. Its hub reuses the budget cards; only GDP overview is active initially. GDP overview reuses the existing chart, table, range strip, text tabs and Excel button. The four indicator tabs are centered across the workspace (Real GDP, Nominal GDP, GDP growth, GDP per capita). Nominal measures have GEL/USD pills in the chart toolbar at the share-control position. There is no right-side display/series panel, new chart renderer or additional KPI system. See `docs/superpowers/specs/2026-09-10-gdp-overview-design.md`. Existing Budget components remain authoritative over previews.
+Economy is a peer below Budget in the explorer sidebar. Its hub reuses the budget cards; only GDP overview is active initially. GDP overview reuses the existing chart, table, range strip, text tabs and Excel button. The four indicator tabs are centered across the workspace (Real GDP, Nominal GDP, GDP growth, GDP per capita). Nominal measures have GEL/USD pills in the chart toolbar at the share-control position. There is no right-side display/series panel, new chart renderer or additional KPI system. Under the H1 both overviews carry the unit line alone — no headline value line — and heading, tabs and chart panel sit on compact spacing (16px under the unit line, 12px under the tabs) so the chart or table reads without scrolling. See `docs/superpowers/specs/2026-09-10-gdp-overview-design.md`. Existing Budget components remain authoritative over previews.
+
+## 25. Inflation Surfaces
+
+Inflation is the third dataset in the explorer sidebar (Budget, Economy, Inflation), with the same active-row, nested-section, collapse, keyboard and mobile behaviour. Its hub reuses the budget hub cards: only `ინფლაციის მიმოხილვა` is live; categories, basket, cities and products are non-clickable coming-soon cards. The collapsed rail reads `მონაცემები / ინფლაცია`.
+
+The overview follows the GDP overview's header — a single unit line under the H1, `TextTab` indicator tabs centred directly above the workspace (`წლიური ინფლაცია`, `თვიური ინფლაცია`, `ფასების ინდექსი`) — over the Budget explorers' workspace: `ხაზი / ცხრილი`, chart or table, range strip, series panel with the download at its foot, source note. The series panel adds a reference row (the NBG target) with a dashed swatch; its chart line is dashed accent with no end dot, and it appears only on annual inflation. Inflation values are never coloured good/bad; rate changes are in percentage points.
+
+Monthly axes: the line chart and range strip take a periods-per-year hint. Axis labels fall on calendar years (thinned to twelve); lattice columns group months at calendar boundaries under the 12px floor (§8.3); range chips are `5წ / 10წ / ყველა` counted in months (no one-year chip); arrows step a month, PageUp/PageDown a year. Year charts and strips render unchanged.
+
+`ცხრილი` for monthly data is a years (newest first) × months grid with ExplorerTable's anatomy (§8.4), one series at a time (a `TextTab` picker when several are selected). Percentage tabs tint cells on a five-step scale — deflation blue `#DCE4F2`, then `#F1EADC`, `#EBCDBB`, `#D9967C`, and accent `#B3402A` with paper text — every pair ≥ 4.5:1; values are always printed and a legend names the bins. The index tab is untinted. Annual inflation adds a `წლის საშუალო` column (December 12-month average).
+
+`ძირითადი ინდიკატორები` on this page shows the latest published month: the §8.5 hero (value, 3px gauge on a 0–15% scale against the target in force, dashed target mark, one sentence) and three side KPIs with sparklines (core inflation, monthly inflation, 12-month average). No movers board and no period comparison. See `docs/superpowers/specs/2026-09-11-inflation-overview-design.md`.
 
 ## National economic sectors extension
 

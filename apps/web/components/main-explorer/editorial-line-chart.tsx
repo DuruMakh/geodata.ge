@@ -5,6 +5,7 @@ import { message } from "../../lib/i18n/messages";
 import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
+import { periodLabelIndices } from "../../lib/explorer/periodAxis";
 import { SwatchBar } from "../ui/editorial";
 import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 
@@ -19,6 +20,8 @@ export type ChartSeries = {
   planned: boolean[];
   preliminary?: boolean[];
   forecastFromYear?: number;
+  /** Reference lines (the NBG target) draw dashed and without an end dot. */
+  dashed?: boolean;
 };
 
 type EditorialLineChartProps = {
@@ -30,6 +33,10 @@ type EditorialLineChartProps = {
   preliminaryLabel?: string;
   axisLeftPadding?: number;
   formatTooltipValue?: (value: number) => string;
+  /** Periods per calendar year on the x axis. Omit for years. */
+  periodsPerYear?: number;
+  /** Axis label or tooltip header for a period value. Omit to print the value. */
+  formatPeriod?: (period: number, kind: "axis" | "tooltip") => string;
 };
 
 const W = 920;
@@ -85,7 +92,18 @@ function decimalsFor(step: number, max: number): number {
   return max;
 }
 
-export function EditorialLineChart({ years, series, share, unit, shareLabel, preliminaryLabel, axisLeftPadding = PAD_L, formatTooltipValue }: EditorialLineChartProps) {
+export function EditorialLineChart({
+  years,
+  series,
+  share,
+  unit,
+  shareLabel,
+  axisLeftPadding = PAD_L,
+  periodsPerYear = 1,
+  formatPeriod,
+  preliminaryLabel,
+  formatTooltipValue,
+}: EditorialLineChartProps) {
   const { messages } = useI18n();
   const [hoverRaw, setHover] = useState<number | null>(null);
   const n = years.length;
@@ -135,13 +153,15 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel, pre
     formatTooltipValue && value !== null ? formatTooltipValue(value) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
-  const labelStep = Math.max(1, Math.ceil(n / 12));
+  const labelIndices = new Set(periodLabelIndices(years, periodsPerYear));
 
   const lattice = buildDotLattice({
     plotWidth: W - axisLeftPadding - PAD_R,
     plotHeight: H - PAD_T - PAD_B,
     yearCount: n,
     gridStepCount: Math.round(span / step),
+    periodsPerYear,
+    firstPeriod: years[0],
   });
 
   function handlePointerMove(event: React.PointerEvent<SVGSVGElement>) {
@@ -188,7 +208,7 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel, pre
               <pattern
                 id="chart-dot-lattice"
                 patternUnits="userSpaceOnUse"
-                x={axisLeftPadding - lattice.colPitch / 2}
+                x={axisLeftPadding + lattice.colOffset - lattice.colPitch / 2}
                 y={PAD_T - lattice.rowPitch / 2}
                 width={lattice.colPitch}
                 height={lattice.rowPitch}
@@ -234,15 +254,14 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel, pre
         ))}
         <line x1={axisLeftPadding} x2={axisLeftPadding} y1={PAD_T} y2={H - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
         {years.map((year, index) => {
+          if (!labelIndices.has(index)) return null;
           const isLast = index === n - 1;
-          const show = isLast || (index % labelStep === 0 && n - 1 - index >= labelStep);
-          if (!show) return null;
           const anchor = index === 0 ? "start" : isLast ? "end" : "middle";
           const tx = index === 0 ? x(index) - 4 : isLast ? x(index) + 4 : x(index);
 
           return (
             <text key={`year-${year}`} x={tx} y={H - 8} fontSize={11} fill="#6A6050" textAnchor={anchor} style={{ fontFamily: "var(--font-numeric)" }}>
-              {year}
+              {formatPeriod ? formatPeriod(year, "axis") : year}
             </text>
           );
         })}
@@ -301,11 +320,16 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel, pre
             <g key={line.id}>
               {actualPath ? (
                 <path
-                  {...(line.forecastFromYear === undefined ? {} : { "data-testid": `chart-series-${line.id}-actual` })}
+                  {...(line.forecastFromYear !== undefined
+                    ? { "data-testid": `chart-series-${line.id}-actual` }
+                    : line.dashed
+                      ? { "data-testid": `chart-series-${line.id}-dashed` }
+                      : {})}
                   d={actualPath}
                   fill="none"
                   stroke={line.color}
                   strokeWidth={2.2}
+                  strokeDasharray={line.dashed ? "6 5" : undefined}
                   strokeLinejoin="round"
                   strokeLinecap="round"
                 />
@@ -325,7 +349,7 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel, pre
               {isolated.map(([px, py, index]) => (
                 <circle key={`isolated-${index}`} cx={px} cy={py} r={2.5} fill={line.color} />
               ))}
-              <circle cx={last[0]} cy={last[1]} r={3.5} fill={line.color} />
+              {line.dashed ? null : <circle cx={last[0]} cy={last[1]} r={3.5} fill={line.color} />}
               {points
                 .filter(([, , index]) => line.planned[index])
                 .map(([px, py, index]) => (
@@ -348,7 +372,7 @@ export function EditorialLineChart({ years, series, share, unit, shareLabel, pre
           }}
         >
           <div className="mb-0.5 flex justify-between gap-3 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">
-            <span>{years[hover]}</span>
+            <span>{formatPeriod ? formatPeriod(years[hover]!, "tooltip") : years[hover]}</span>
             {share ? <span>{shareLabel}</span> : null}
           </div>
           {tooltip.rows.map((row) => (

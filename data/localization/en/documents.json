@@ -2983,5 +2983,215 @@
       "reviewedAt": "2026-09-11"
     },
     "documentLanguage": "en"
+  },
+  "source.geostat_cpi_index_2010": {
+    "title": {
+      "text": "Consumer price indices in Georgia, 2010 average = 100",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_cpi_yoy": {
+    "title": {
+      "text": "Consumer price indices in Georgia, same month of the previous year = 100",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_cpi_mom": {
+    "title": {
+      "text": "Consumer price indices in Georgia, previous month = 100",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_cpi_avg12": {
+    "title": {
+      "text": "Consumer price indices in Georgia, 12-month average over the previous 12-month average",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_core_yoy": {
+    "title": {
+      "text": "Core inflation in Georgia, change on the same month of the previous year",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_core_mom": {
+    "title": {
+      "text": "Core inflation in Georgia, change on the previous month",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_cpi_index_2010_ka": {
+    "title": {
+      "text": "Consumer price indices in Georgia, 2010 average = 100 (Georgian)",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "ka"
+  },
+  "source.geostat_cpi_yoy_ka": {
+    "title": {
+      "text": "Consumer price indices in Georgia, same month of the previous year = 100 (Georgian)",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "ka"
+  },
+  "source.geostat_cpi_mom_ka": {
+    "title": {
+      "text": "Consumer price indices in Georgia, previous month = 100 (Georgian)",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "ka"
+  },
+  "source.geostat_cpi_avg12_ka": {
+    "title": {
+      "text": "Consumer price indices in Georgia, 12-month average over the previous 12-month average (Georgian)",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "ka"
+  },
+  "source.geostat_core_yoy_ka": {
+    "title": {
+      "text": "Core inflation in Georgia, change on the same month of the previous year (Georgian)",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "ka"
+  },
+  "source.geostat_core_mom_ka": {
+    "title": {
+      "text": "Core inflation in Georgia, change on the previous month (Georgian)",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "ka"
+  },
+  "source.nbg_inflation_target": {
+    "title": {
+      "text": "Monetary Policy Strategy of the National Bank of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Bank of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "National Bank of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.nbg_inflation_target_ka": {
+    "title": {
+      "text": "Monetary Policy Strategy of the National Bank of Georgia (Georgian)",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "National Bank of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "National Bank of Georgia",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "ka"
   }
 }

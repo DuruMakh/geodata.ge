@@ -202,3 +202,16 @@ describe("optional debt selector semantics", () => {
     expect(debt).toContain('aria-label="ვალი — ქვესერიების ჩაკეცვა"');
   });
 });
+
+describe("series selector reference rows", () => {
+  const render = (swatch?: "solid" | "dashed") =>
+    renderGeorgianMarkup(createElement(SeriesSelectorRow, { id: "target", label: "მიზნობრივი მაჩვენებელი", color: "#B3402A", value: "3.0%", selected: true, swatch, onToggle: () => {} }));
+
+  it("draws a dashed swatch for a reference row", () => {
+    expect(render("dashed")).toMatch(/data-testid="series-swatch"[^]*stroke-dasharray="4 2"/);
+  });
+
+  it("keeps the solid swatch by default", () => {
+    expect(render()).not.toContain("stroke-dasharray");
+  });
+});

@@ -2,6 +2,8 @@ import { GDP_METHODOLOGY_CONTENT } from "./content/gdp";
 import { ECONOMIC_SECTORS_METHODOLOGY } from "./content/economic-sectors";
 import { ECONOMIC_SECTORS_METHODOLOGY as EN_SECTORS } from "./content/en/economic-sectors";
 import { GDP_METHODOLOGY_CONTENT as EN_GDP } from "./content/en/gdp";
+import { INFLATION_METHODOLOGY_CONTENT } from "./content/inflation";
+import { INFLATION_METHODOLOGY_CONTENT as EN_INFLATION } from "./content/en/inflation";
 import type { MunicipalTotalFact } from "../data/municipal/types";
 import type { Locale } from "../i18n/types";
 import { DEBT_METHODOLOGY_CONTENT as EN_DEBT } from "./content/en/debt";
@@ -31,17 +33,17 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   debt: DEBT_METHODOLOGY_CONTENT,
   gdp: GDP_METHODOLOGY_CONTENT,
   "economic-sectors": ECONOMIC_SECTORS_METHODOLOGY,
+  inflation: INFLATION_METHODOLOGY_CONTENT,
 };
 
 export const FUTURE_METHODOLOGY_DATASETS = [
-  { title: "ინფლაცია", href: null, state: "future" },
   { title: "მოსახლეობა", href: null, state: "future" },
   { title: "უმუშევრობა", href: null, state: "future" },
 ] as const;
 
 const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, MethodologyContent>> = {
   "economic-sectors": EN_SECTORS,
-  expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT, gdp: EN_GDP,
+  expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT, gdp: EN_GDP, inflation: EN_INFLATION,
 };
 
 export function getMethodologyContent(id: MethodologyDatasetId, locale: Locale): MethodologyContent {
@@ -60,7 +62,7 @@ export function deriveMethodologyCoverage(
   archive?: {minYear?:number;maxYear?:number},
 ): { firstYear: number; lastYear: number } {
   const source = METHODOLOGY_CONTENT[id].coverageSource;
-  if(source.kind === "archive") { if(archive?.minYear === undefined || archive.maxYear === undefined) throw new Error("Missing GDP archive coverage"); return {firstYear:archive.minYear,lastYear:archive.maxYear}; }
+  if(source.kind === "archive") { if(archive?.minYear === undefined || archive.maxYear === undefined) throw new Error(`Missing ${id} archive coverage`); return {firstYear:archive.minYear,lastYear:archive.maxYear}; }
   const years =
     source.kind === "municipalTotals"
       ? municipalFacts.map((fact) => fact.year)

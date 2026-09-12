@@ -13,7 +13,7 @@ describe("buildFactQuerySnapshot", () => {
       buildFactQuerySnapshot(OPTIONS),
       loadSourceDocuments("../../data/sources/source-documents.csv"),
     ]);
-    expect(sources).toHaveLength(119);
+    expect(sources).toHaveLength(126);
     expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.map(source => source.sourceId).sort());
     expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([
       "source.geostat_sector_growth", "source.geostat_sector_volume",

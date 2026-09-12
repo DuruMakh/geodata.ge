@@ -146,6 +146,7 @@ type SeriesSelectorRowProps = {
   isChild?: boolean;
   childLabelSize?: "compact" | "standard";
   wrapLabel?: boolean;
+  swatch?: "solid" | "dashed";
   onToggle: () => void;
   onToggleExpanded?: () => void;
 };
@@ -167,6 +168,7 @@ export function SeriesSelectorRow({
   isChild = false,
   childLabelSize = "compact",
   wrapLabel = false,
+  swatch = "solid",
   onToggle,
   onToggleExpanded,
 }: SeriesSelectorRowProps) {
@@ -219,7 +221,7 @@ export function SeriesSelectorRow({
         </span>
         <span className="flex min-w-0 flex-1 items-start gap-2">
           <span data-testid="series-swatch" className="mt-[7px] flex-none">
-            <SwatchBar color={color} />
+            {swatch === "dashed" ? <DashedSwatch color={color} /> : <SwatchBar color={color} />}
           </span>
           <span
             data-testid="series-label"
@@ -233,5 +235,14 @@ export function SeriesSelectorRow({
         </span>
       </button>
     </div>
+  );
+}
+
+// Reference rows (a target, not a series) match their dashed chart line.
+function DashedSwatch({ color }: { color: string }) {
+  return (
+    <svg aria-hidden width={14} height={3} className="block flex-none">
+      <line x1={0} y1={1.5} x2={14} y2={1.5} stroke={color} strokeWidth={3} strokeDasharray="4 2" />
+    </svg>
   );
 }

@@ -1,0 +1,45 @@
+{
+  "status": "PASS",
+  "vintage": "2026-08",
+  "lastPeriod": "2026-08",
+  "counts": {
+    "cpi.headline:index_2010": 320,
+    "cpi.headline:yoy_pct": 272,
+    "cpi.headline:mom_pct": 272,
+    "cpi.headline:avg12_pct": 296,
+    "cpi.core:yoy_pct": 200,
+    "cpi.core:mom_pct": 200,
+    "cpi.core_ex_tobacco:yoy_pct": 200,
+    "cpi.core_ex_tobacco:mom_pct": 200
+  },
+  "firstPeriods": {
+    "cpi.headline:index_2010": "2000-01",
+    "cpi.headline:yoy_pct": "2004-01",
+    "cpi.headline:mom_pct": "2004-01",
+    "cpi.headline:avg12_pct": "2002-01",
+    "cpi.core:yoy_pct": "2010-01",
+    "cpi.core:mom_pct": "2010-01",
+    "cpi.core_ex_tobacco:yoy_pct": "2010-01",
+    "cpi.core_ex_tobacco:mom_pct": "2010-01"
+  },
+  "maxRecomputeErrorPp": {
+    "yoy": 0.0002,
+    "mom": 0.0001,
+    "avg12": 0.0001
+  },
+  "languageParity": "PASS",
+  "sourceHashes": {
+    "en/cpi-index-2010.xlsx": "4aa2a8b2d923f915855fa70c3aac54dff8080bcbe24dfcf784816edb915d5492",
+    "en/cpi-yoy.xlsx": "fbd93bf2891e3691975eea5e92f754e03e8e93c2c86a71b3e582ceaaf79863e9",
+    "en/cpi-mom.xlsx": "26f32d7a37a262c084afd935b01632e6dc02c4b21ef13608c27c2e50a0cc403c",
+    "en/cpi-avg12.xlsx": "32a8891f69d1786ab4fee21e285f465370159d097e0acf7a7875f45f7b7d5b80",
+    "en/core-yoy.xlsx": "19c93828962e0ec28a7b3d784e7bc473697924fa74f43e9f9f96dc525cc4bfb3",
+    "en/core-mom.xlsx": "14f2fffc80674fd8a3fef1820776af36bbfdeeb4799195b93a565d2b5a9676aa",
+    "ka/cpi-index-2010.xlsx": "e5a1c33a64a589c1c91f09524e79035d8b29565bbb254aeffd4fb1c42a11d5db",
+    "ka/cpi-yoy.xlsx": "77da6b090f6e727d5919c81ff0de36851fc2d7e1c09346da47fbfd32b2b22a17",
+    "ka/cpi-mom.xlsx": "5dc52f3ff44449641fe702a32639b72e95509fbd01c591712bc0bd8992fb427d",
+    "ka/cpi-avg12.xlsx": "004c85f71de48a99063561b3be1b0337169bb77d6ba03ef085574e0e8cda1237",
+    "ka/core-yoy.xlsx": "55b5274a90d05744b4529da3a2a0d0ec68bc4de28553dc6eeb54fa695f602c9a",
+    "ka/core-mom.xlsx": "592bb00db5bd953da88fb0101dd1ccd992652b47ec1a22a43a47523f3f033cf2"
+  }
+}

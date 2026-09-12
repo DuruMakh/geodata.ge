@@ -6,6 +6,7 @@ import type {
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { NationalGdpFact } from "../data/nationalGdp/types";
+import type { CpiFact, InflationTargetRow } from "../data/inflation/types";
 import type {
   ServedGeneralGovernmentBalanceFact,
   ServedGovernmentDebtFact,
@@ -468,5 +469,30 @@ export async function loadEconomicSectorFactsFromMirror(db: MirrorClient): Promi
     valuation: row.valuation as SectorObservation["valuation"], priceBasis: row.priceBasis as SectorObservation["priceBasis"],
     calculation: row.calculation as SectorObservation["calculation"], status: row.status as SectorObservation["status"],
     sourceId: row.sourceDocumentId, sourceLocator: row.sourceLocator, lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export async function loadInflationCpiFactsFromMirror(db: MirrorClient): Promise<CpiFact[]> {
+  const rows = await db.inflationCpiFact.findMany({ orderBy: [{ seriesId: "asc" }, { measure: "asc" }, { period: "asc" }] });
+  return rows.map((row) => ({
+    seriesId: row.seriesId as CpiFact["seriesId"],
+    measure: row.measure as CpiFact["measure"],
+    period: row.period,
+    value: row.value.toFixed(),
+    status: row.status as CpiFact["status"],
+    sourceId: row.sourceDocumentId,
+    sourceLocator: row.sourceLocator,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export async function loadInflationTargetsFromMirror(db: MirrorClient): Promise<InflationTargetRow[]> {
+  const rows = await db.inflationTarget.findMany({ orderBy: { effectiveFrom: "asc" } });
+  return rows.map((row) => ({
+    effectiveFrom: row.effectiveFrom,
+    effectiveTo: row.effectiveTo,
+    targetPct: row.targetPct.toFixed(),
+    sourceId: row.sourceDocumentId,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
   }));
 }

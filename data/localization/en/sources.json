@@ -834,5 +834,54 @@
       "reviewedAt": "2026-09-11"
     },
     "derivation": null
+  },
+  "source.geostat_cpi_index_2010": {
+    "name": {
+      "text": "Geostat consumer price index, 2010 average = 100",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
+  },
+  "source.geostat_cpi_yoy": {
+    "name": {
+      "text": "Geostat consumer price index, same month of the previous year = 100",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
+  },
+  "source.geostat_cpi_mom": {
+    "name": {
+      "text": "Geostat consumer price index, previous month = 100",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
+  },
+  "source.geostat_cpi_avg12": {
+    "name": {
+      "text": "Geostat consumer price index, 12-month average over the previous 12-month average",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
+  },
+  "source.geostat_core_yoy": {
+    "name": {
+      "text": "Geostat core inflation, change on the same month of the previous year",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
+  },
+  "source.geostat_core_mom": {
+    "name": {
+      "text": "Geostat core inflation, change on the previous month",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
+  },
+  "source.nbg_inflation_target": {
+    "name": {
+      "text": "National Bank of Georgia inflation target",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
   }
 }

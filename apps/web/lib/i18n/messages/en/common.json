@@ -39,5 +39,8 @@
   "common.economy": "Economy",
   "common.gdpOverview": "Economy overview",
   "common.economySourceNote": "Data: World Bank and Geostat. Last updated: {updatedAt}.",
-  "common.dataEconomy": "Data / Economy"
+  "common.dataEconomy": "Data / Economy",
+  "common.inflationOverview": "Inflation overview",
+  "common.dataInflation": "Data / Inflation",
+  "common.inflationSourceNote": "Data: Geostat and the National Bank of Georgia. Last updated: {updatedAt}."
 }

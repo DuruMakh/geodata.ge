@@ -118,3 +118,10 @@ source.wb_gdp_real_usd_2015,World Bank GDP Georgia NY.GDP.MKTP.KD,docs/Raw Data/
 source.wb_gdp_real_growth_percent,World Bank GDP Georgia NY.GDP.MKTP.KD.ZG,docs/Raw Data/Economy/gdp-overview/sources/NY.GDP.MKTP.KD.ZG.json,2026-09-11
 source.geostat_sector_growth,Geostat real GDP growth by economic activity,docs/Raw Data/Economy/economic-sectors/sources/06_Real-GDP-Growth.xlsx,2026-09-11
 source.geostat_sector_volume,Geostat chain-linked GDP by economic activity at constant 2019 prices,docs/Raw Data/Economy/economic-sectors/sources/04_GDP-at-constant-prices.xlsx,2026-09-11
+source.geostat_cpi_index_2010,"Geostat consumer price index, 2010 average=100",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-index-2010.xlsx,2026-09-11
+source.geostat_cpi_yoy,"Geostat consumer price index, same month of the previous year=100",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-yoy.xlsx,2026-09-11
+source.geostat_cpi_mom,"Geostat consumer price index, previous month=100",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-mom.xlsx,2026-09-11
+source.geostat_cpi_avg12,"Geostat consumer price index, 12-month average over the previous 12-month average",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-avg12.xlsx,2026-09-11
+source.geostat_core_yoy,"Geostat core inflation, change on the same month of the previous year",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/core-yoy.xlsx,2026-09-11
+source.geostat_core_mom,"Geostat core inflation, change on the previous month",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/core-mom.xlsx,2026-09-11
+source.nbg_inflation_target,National Bank of Georgia inflation target,docs/Raw Data/Inflation/nbg-inflation-target/official/monetary-policy-strategy-en.pdf,2026-09-11

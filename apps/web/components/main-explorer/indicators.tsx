@@ -9,9 +9,9 @@ import type { ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { ACCENT, NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { compoundAnnualGrowth, rankPeriodDeltas } from "../../lib/explorer/indicators";
 import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
-import { Sparkline } from "../ui/sparkline";
 import { formatAmount, formatAmountParts, formatBn, formatShare, MISSING } from "../../lib/explorer/format";
-import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
+import { SectionTitle, SwatchBar } from "../ui/editorial";
+import { HeroKpi, SideKpiList } from "./kpi-blocks";
 
 // "ძირითადი ინდიკატორები" per DESIGN.md §8.5: hero KPI with a two-segment gauge and
 // an editorial sentence, three side KPIs, the movers board, and the period comparison.
@@ -167,15 +167,11 @@ export function Indicators({ model, scope }: IndicatorsProps) {
             </p>
           </div>
         ) : (
-        <div className="min-w-0 @min-[1100px]:pr-11">
-          <Overline>{message(messages, "main.periodChange")}</Overline>
-          <p
-            className="mt-3.5 whitespace-nowrap font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]"
-            style={{ color: totalChange !== null && totalChange < 0 ? NEGATIVE : "var(--ink)" }}
-          >
-            {formatShare(totalChange, true)}
-          </p>
-          <div className="mt-7 max-w-[480px]">
+        <HeroKpi
+          label={message(messages, "main.periodChange")}
+          value={formatShare(totalChange, true)}
+          valueColor={totalChange !== null && totalChange < 0 ? NEGATIVE : "var(--ink)"}
+        >
             <div className="flex h-[3px] bg-[var(--hairline-soft)]">
               <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${(gaugeBase * 100).toFixed(1)}%` }} />
               <div className="h-[3px] bg-[var(--accent)]" style={{ width: `${((1 - gaugeBase) * 100).toFixed(1)}%` }} />
@@ -197,37 +193,9 @@ export function Indicators({ model, scope }: IndicatorsProps) {
                 {cagr !== null ? <Message messages={messages} id={cagr >= 0 ? "main.annualGrowth" : "main.annualChange"} values={{ rate: <span className="font-[family-name:var(--font-numeric)] text-xs">{formatShare(cagr, true)}</span> }} /> : null}.
               </p>
             ) : null}
-          </div>
-        </div>
+        </HeroKpi>
         )}
-        <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
-          {sideKpis.map((kpi, index) => (
-            <div
-              key={kpi.label}
-              data-testid="side-kpi"
-              className={index === 0 ? "pt-0.5 pb-3.5" : index === sideKpis.length - 1 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}
-            >
-              <Overline>{kpi.label}</Overline>
-              <div className="mt-[7px] flex items-baseline justify-between gap-4">
-                <p
-                  className="whitespace-nowrap font-[family-name:var(--font-display)] text-2xl font-semibold leading-[1.1] tracking-[-0.02em]"
-                  style={{ color: kpi.color }}
-                >
-                  {kpi.value}
-                  {kpi.unit ? (
-                    <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-xs font-medium tracking-normal text-[var(--body)]">
-                      {kpi.unit}
-                    </span>
-                  ) : null}
-                </p>
-                <p title={kpi.detail} className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right text-xs text-[var(--muted)]">
-                  {kpi.detail}
-                </p>
-              </div>
-              {kpi.spark ? <Sparkline values={kpi.spark.values} color={kpi.spark.color} /> : null}
-            </div>
-          ))}
-        </div>
+        <SideKpiList kpis={sideKpis} />
       </div>
 
       {singleYear ? null : (
