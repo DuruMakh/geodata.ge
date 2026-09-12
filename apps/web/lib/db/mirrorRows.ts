@@ -21,6 +21,7 @@ import {
   MunicipalTotalFact,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
+import type { SectorObservation } from "../data/economicSectors/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
 // same shapes as the CSV loaders. Used with the pooled singleton by the
@@ -457,4 +458,15 @@ export async function loadMunicipalAdjaraBudgetAdjustmentsFromMirror(
 export async function loadGdpOverviewFactsFromMirror(db:MirrorClient):Promise<import('../data/gdpOverview/types').GdpObservation[]> {
   const rows=await db.gdpOverviewFact.findMany({orderBy:[{seriesId:'asc'},{year:'asc'}]});
   return rows.map(row=>({seriesId:row.seriesId as import('../data/gdpOverview/types').GdpSeriesId,year:row.year,value:row.value.toFixed(),unit:row.unit as import('../data/gdpOverview/types').GdpObservation['unit'],status:row.status as import('../data/gdpOverview/types').GdpObservation['status'],accountingStandard:row.accountingStandard as import('../data/gdpOverview/types').GdpObservation['accountingStandard'],sourceId:row.sourceDocumentId,sourceLocator:row.sourceLocator,lastReviewedAt:row.lastReviewedAt.toISOString().slice(0,10)}));
+}
+
+export async function loadEconomicSectorFactsFromMirror(db: MirrorClient): Promise<SectorObservation[]> {
+  const rows = await db.economicSectorFact.findMany({ orderBy: [{ seriesId: "asc" }, { measure: "asc" }, { year: "asc" }] });
+  return rows.map(row => ({
+    seriesId: row.seriesId, measure: row.measure as SectorObservation["measure"], year: row.year,
+    value: row.value.toFixed(), unit: row.unit as SectorObservation["unit"],
+    valuation: row.valuation as SectorObservation["valuation"], priceBasis: row.priceBasis as SectorObservation["priceBasis"],
+    calculation: row.calculation as SectorObservation["calculation"], status: row.status as SectorObservation["status"],
+    sourceId: row.sourceDocumentId, sourceLocator: row.sourceLocator, lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
 }

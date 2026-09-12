@@ -14,6 +14,7 @@ import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 
 type ExplorerTableRowLike = Pick<ExplorerTableRow, "itemId" | "kaLabel" | "color" | "valuesByYear"> & {
   basisByYear?: ExplorerTableRow["basisByYear"];
+  preliminaryByYear?: Record<number, boolean>;
   change?: ExplorerTableRow["change"];
 };
 
@@ -22,6 +23,8 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   rows: Row[];
   totalRow: Row | null;
   showTotal: boolean;
+  totalFirst?: boolean;
+  wrapRowLabels?: boolean;
   years: number[];
   firstColumnLabel: string;
   unit: ValueUnit;
@@ -49,6 +52,8 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   rows,
   totalRow,
   showTotal,
+  totalFirst = false,
+  wrapRowLabels = false,
   years,
   firstColumnLabel,
   unit,
@@ -73,7 +78,38 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   };
 
   const cellPad = { paddingTop: 11, paddingBottom: 11 };
-  const minWidth = 320 + years.length * 78 + (showChangeColumn ? 128 : 0) + (shareColumnLabel ? 96 : 0);
+  const minWidth = (wrapRowLabels ? 180 : 320) + years.length * 78 + (showChangeColumn ? 128 : 0) + (shareColumnLabel ? 96 : 0);
+  const labelStyle = wrapRowLabels ? { width: 180, minWidth: 180, maxWidth: 180, whiteSpace: "normal" as const, overflowWrap: "anywhere" as const } : undefined;
+
+  const total = showTotal && totalRow ? (
+    <tr className="border-t-2 border-[var(--ink)]">
+      <td className="sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-[13px] font-semibold whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]" style={{ ...cellPad, ...labelStyle }}>
+        {rowLabel(totalRow)}
+      </td>
+      {years.map((year) => (
+        <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={cellPad}>
+          {cellValue(totalRow, year)}
+          {totalRow.preliminaryByYear?.[year] ? <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{preliminaryLabel}</sup> : null}
+          {forecastLabel && forecastYears?.includes(year) ? (
+            <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{forecastLabel}</sup>
+          ) : null}
+        </td>
+      ))}
+      {showChangeColumn ? (
+        <td
+          className={`${numericCellClass} sticky ${shareColumnLabel ? "right-24" : "right-0"} z-[1] bg-[var(--paper)] font-semibold shadow-[-1px_0_0_var(--hairline-soft)]`}
+          style={{ ...cellPad, color: changeColor(totalRow.change ?? null) }}
+        >
+          {formatShare(totalRow.change ?? null, true)}
+        </td>
+      ) : null}
+      {shareColumnLabel ? (
+        <td className={`${numericCellClass} sticky right-0 z-[1] bg-[var(--paper)] pr-0 font-semibold text-[var(--ink)]`} style={cellPad}>
+          {endYear === undefined ? MISSING : formatShare(shareValueForYear(totalRow, endYear))}
+        </td>
+      ) : null}
+    </tr>
+  ) : null;
 
   return (
     <div className="mt-[18px]">
@@ -89,7 +125,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
-            <th className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]">
+            <th style={labelStyle} className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]">
               {firstColumnLabel}
             </th>
             {years.map((year) => (
@@ -110,11 +146,12 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
           </tr>
         </thead>
         <tbody>
+          {totalFirst ? total : null}
           {rows.map((row) => (
             <tr key={row.itemId} className="border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]">
               <td
                 className="sticky left-0 z-[1] bg-[var(--paper)] pr-3 whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]"
-                style={cellPad}
+                style={{ ...cellPad, ...labelStyle }}
                 title={rowLabel(row)}
               >
                 <span className="inline-flex items-center gap-[9px]">
@@ -133,7 +170,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                   }}
                 >
                   {cellValue(row, year)}
-                  {preliminaryYears?.includes(year) ? <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{preliminaryLabel}</sup> : null}
+                  {(row.preliminaryByYear?.[year] ?? preliminaryYears?.includes(year)) ? <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{preliminaryLabel}</sup> : null}
                   {row.basisByYear?.[year] === "planned" ? (
                     <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{message(messages, "controls.planned")}</sup>
                   ) : null}
@@ -157,34 +194,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
               ) : null}
             </tr>
           ))}
-          {showTotal && totalRow ? (
-            <tr className="border-t-2 border-[var(--ink)]">
-              <td className="sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-[13px] font-semibold whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]" style={cellPad}>
-                {rowLabel(totalRow)}
-              </td>
-              {years.map((year) => (
-                <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={cellPad}>
-                  {cellValue(totalRow, year)}
-                  {forecastLabel && forecastYears?.includes(year) ? (
-                    <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{forecastLabel}</sup>
-                  ) : null}
-                </td>
-              ))}
-              {showChangeColumn ? (
-                <td
-                  className={`${numericCellClass} sticky ${shareColumnLabel ? "right-24" : "right-0"} z-[1] bg-[var(--paper)] font-semibold shadow-[-1px_0_0_var(--hairline-soft)]`}
-                  style={{ ...cellPad, color: changeColor(totalRow.change ?? null) }}
-                >
-                  {formatShare(totalRow.change ?? null, true)}
-                </td>
-              ) : null}
-              {shareColumnLabel ? (
-                <td className={`${numericCellClass} sticky right-0 z-[1] bg-[var(--paper)] pr-0 font-semibold text-[var(--ink)]`} style={cellPad}>
-                  {endYear === undefined ? MISSING : formatShare(shareValueForYear(totalRow, endYear))}
-                </td>
-              ) : null}
-            </tr>
-          ) : null}
+          {totalFirst ? null : total}
         </tbody>
         </table>
       </div>

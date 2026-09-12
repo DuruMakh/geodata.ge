@@ -268,5 +268,13 @@
   "documents.source.wb_gdp_real_growth_percent.attribution": "World Bank",
   "documents.source.wb_gdp_metadata.title": "wb_indicator_metadata.json",
   "documents.source.wb_gdp_metadata.publisher": "World Bank",
-  "documents.source.wb_gdp_metadata.attribution": "World Bank"
+  "documents.source.wb_gdp_metadata.attribution": "World Bank",
+  "sources.source.geostat_sector_growth.name": "Geostat real GDP growth by economic activity",
+  "sources.source.geostat_sector_volume.name": "Geostat chain-linked GDP by economic activity",
+  "documents.source.geostat_sector_growth.title": "Real GDP growth by economic activity",
+  "documents.source.geostat_sector_growth.publisher": "Geostat",
+  "documents.source.geostat_sector_growth.attribution": "Geostat",
+  "documents.source.geostat_sector_volume.title": "GDP by economic activity at constant 2019 prices",
+  "documents.source.geostat_sector_volume.publisher": "Geostat",
+  "documents.source.geostat_sector_volume.attribution": "Geostat"
 }

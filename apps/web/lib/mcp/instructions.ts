@@ -30,6 +30,12 @@ export function serverInstructions(
   return `Fiscal.ge serves reviewed annual data on Georgia's state and municipal budgets and GDP.
 
 WHAT IS SERVED
+- National economic sectors, ${range("economic-sectors")}, through query_economic_sectors.
+  Twenty NACE Rev.2 activities and a separately published Total GDP reference.
+  Nominal GEL and GDP shares cover2010–2025; annual real growth covers2011–2025.
+  Inspect yearsByMeasure in describe_coverage. Sectors are GVA at basic prices;
+  shares divide by market-price GDP and need not sum to100%. Growth7.5 means7.5%.
+  No regional sectors, rankings, contributions or cumulative sector comparisons.
 - GDP overview, ${range("gdp-overview")}, through query_gdp. Choose one or more of
   six discovered series IDs; each fixes its units and price basis. Real GDP is
   constant-2015 USD; nominal GDP and nominal GDP per capita are current GEL/USD.
@@ -56,7 +62,7 @@ LANGUAGES AND COMPATIBILITY
 Schema 1.1.0 adds reviewed Georgian (*Ka) and English (*En) names, definitions,
 missing-value explanations, comparison reasons, rankings and source descriptions.
 Answer in the user's language using those fields. Catalogue search matches both
-languages. The same nine tools and input schemas work without a language argument.
+languages. The discovered tools and input schemas work without a language argument.
 Generic source/document fields preserve original wording and mandatory attribution;
 translated companions describe it without replacing it. documentLanguage is null
 when unverified; a translated title does not mean the source document was translated.

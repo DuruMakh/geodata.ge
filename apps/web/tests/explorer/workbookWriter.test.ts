@@ -65,6 +65,16 @@ async function loadWorkbook(model: WorkbookExportModel) {
   return workbook;
 }
 
+it("honors optional readable precision for small nominal and preliminary amounts", async () => {
+  const model = structuredClone(approvedModelFixture);
+  Object.assign(model.readable, { amountDecimals: 2 });
+  model.readable.rows[0].valuesByYear[2020] = 0.021963618299791698;
+  model.readable.rows[0].basisByYear[2020] = "preliminary";
+  const workbook = await loadWorkbook(model);
+  expect(workbook.worksheets[0].getCell("B4").value).toBe(0.021963618299791698);
+  expect(workbook.worksheets[0].getCell("B4").numFmt).toContain("#,##0.00");
+});
+
 function modelWithYears(years: number[]): WorkbookExportModel {
   return {
     ...approvedModelFixture,

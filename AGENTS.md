@@ -124,6 +124,7 @@ A branch implementation, merged commit, green deploy-trigger workflow, or accept
 ## UI Contract
 
 - Production follows the warm editorial system in `DESIGN.md` v4.1. Do not revive the superseded Apple Light/Night, dark, neon, or terminal directions without explicit approval.
+- Functional UI icons use Lucide (`lucide-react`), with sizing, accessibility and exceptions owned by `DESIGN.md` §7.2a. Do not introduce a second icon family or replace brand assets/data visualizations with UI icons.
 - Derive year ranges and defaults from loaded facts; do not hardcode coverage.
 - Preserve readable Georgian text, accessible chart labels, distinguishable stable category colors, and data comprehension.
 - Only the applicable total is selected by default; it remains first, selectable, and removable.

@@ -1090,5 +1090,93 @@
   "per_capita_usd": {
     "text": "Nominal GDP per capita, USD",
     "reviewedAt": "2026-09-11"
+  },
+  "sector.a": {
+    "text": "Agriculture, forestry and fishing",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.b": {
+    "text": "Mining and quarrying",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.c": {
+    "text": "Manufacturing",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.d": {
+    "text": "Electricity, gas, steam and air conditioning supply",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.e": {
+    "text": "Water supply; sewerage, waste management and remediation activities",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.f": {
+    "text": "Construction",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.g": {
+    "text": "Wholesale and retail trade; repair of motor vehicles and motorcycles",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.h": {
+    "text": "Transportation and storage",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.i": {
+    "text": "Accommodation and food service activities",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.j": {
+    "text": "Information and communication",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.k": {
+    "text": "Financial and insurance activities",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.l": {
+    "text": "Real estate activities",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.m": {
+    "text": "Professional, scientific and technical activities",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.n": {
+    "text": "Administrative and support service activities",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.o": {
+    "text": "Public administration and defence; compulsory social security",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.p": {
+    "text": "Education",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.q": {
+    "text": "Human health and social work activities",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.r": {
+    "text": "Arts, entertainment and recreation",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.s": {
+    "text": "Other service activities",
+    "reviewedAt": "2026-09-11"
+  },
+  "sector.t": {
+    "text": "Activities of households as employers; undifferentiated goods- and services-producing activities of households for own use",
+    "reviewedAt": "2026-09-11"
+  },
+  "economy.gdp_total": {
+    "text": "Total GDP",
+    "reviewedAt": "2026-09-11"
+  },
+  "economic-sectors": {
+    "text": "Economic sectors",
+    "reviewedAt": "2026-09-11"
   }
 }

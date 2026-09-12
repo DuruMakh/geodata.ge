@@ -20,6 +20,8 @@ import { LEGACY_PROGRAM_JOINS } from "../data/adminSpending/legacyProgramJoins";
 import { makeProgramItemId } from "../data/adminSpending/generateAdminSpendingFacts";
 import { loadGdpOverviewFacts, loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { GDP_QUERY_SERIES } from "./gdpSeries";
+import { loadEconomicSectorFacts, ECONOMIC_SECTORS } from "../data/economicSectors/importEconomicSectors";
+import { SECTOR_DEFINITIONS } from "./economicSectorsSeries";
 import { loadServedGeneralGovernmentBalanceData } from "../data/generalGovernmentBalance/importGeneralGovernmentBalance";
 import { loadServedGovernmentDebtData } from "../data/governmentDebt/importGovernmentDebtFacts";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
@@ -218,6 +220,8 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
   // Geostat documents retain their existing package identities; World Bank originals are new.
   const gdpManifest = await loadReviewedSourceManifest(repositoryRoot, "gdp");
   perDataset.push(gdpManifest.filter(row => row.source_id.startsWith("source.wb_gdp_") && !row.source_id.endsWith("metadata")));
+  const sectorManifest = await loadReviewedSourceManifest(repositoryRoot, "economic-sectors");
+  perDataset.push(sectorManifest.filter(row => row.source_id.startsWith("source.geostat_sector_")));
 
   // official_url_or_archive_url is free text, not a validated URL column
   // (sourceManifest.ts's schema only checks it's a non-empty string): most
@@ -464,6 +468,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     ...municipal.functions.map(item => item.id), ...municipal.regions.map(region => region.id),
     ...municipal.municipalities.map(entity => entity.code), ...AGGREGATE_ONLY_MUNICIPAL_CODES,
     ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID, ...Object.keys(GDP_QUERY_SERIES), "gdp-overview",
+    ...ECONOMIC_SECTORS.map(r=>r.id), "economic-sectors",
     "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
   ])].sort();
   const localization: ServiceLocalization = {
@@ -625,6 +630,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     },
     deficit: { facts: sortedBy(deficit.facts, (f) => f.year) },
     gdpOverview: { facts: sortedBy(await loadGdpOverviewFacts(), f=>f.seriesId, f=>f.year), series: GDP_QUERY_SERIES },
+    economicSectors: { facts: sortedBy(await loadEconomicSectorFacts(), f=>f.seriesId,f=>f.measure,f=>f.year), registry: ECONOMIC_SECTORS, definitions: SECTOR_DEFINITIONS },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
     sources,
   };

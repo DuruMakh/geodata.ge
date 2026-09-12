@@ -184,7 +184,7 @@ describe("public source resolution", () => {
       // 105 after the deficit merge added the IMF WEO workbook, then 115 once
       // the ten Ministry of Finance debt documents were registered so debt
       // figures could cite them.
-      expect(snapshot.sources.length).toBe(117);
+      expect(snapshot.sources.length).toBe(119);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {

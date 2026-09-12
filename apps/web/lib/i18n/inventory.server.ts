@@ -9,6 +9,7 @@ import { AGGREGATE_ONLY_MUNICIPAL_CODES, DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_I
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { LIVE_METHODOLOGY_IDS } from "../methodology/types";
 import type { TranslationInventory } from "./types";
+import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -16,6 +17,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
   const { regions } = await loadServedMunicipalData();
   return [
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
+    "/explorer/economy/sectors",
     ...BUDGET_SECTION_ORDER.map((id) => BUDGET_SECTIONS[id].href).filter((href): href is string => href !== null),
     "/explorer/municipalities/georgia",
     ...MUNICIPALITY_ROUTES.map(({ slug }) => `/explorer/municipalities/${slug}`),
@@ -37,6 +39,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
   return {
     pagePaths,
     labelIds: sortedUnique([
+      ...sectorRegistry.map(row => row.id), "economic-sectors",
       ...explorer.glossary.keys(), ...explorer.adminCategories.map((row) => row.id),
       ...programmeHistory.map((row) => row.seriesId),
       "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia", "snapshot.other",

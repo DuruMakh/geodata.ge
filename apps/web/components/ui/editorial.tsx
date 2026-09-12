@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ControlTooltip } from "./control-tooltip";
 
 // Small shared pieces of the editorial system (DESIGN.md §7): text tabs with an
 // accent underline, the tint callout, and the 14×3px swatch bar.
@@ -93,7 +94,7 @@ export function SourceNote({ children, testId }: SourceNoteProps) {
 }
 
 type SegmentedTabsProps<T extends string> = {
-  options: Array<{ value: T; label: string; testId?: string; ariaLabel?: string }>;
+  options: Array<{ value: T; label: string; icon?: ReactNode; testId?: string; ariaLabel?: string }>;
   value: T;
   onChange: (next: T) => void;
   ariaLabel: string;
@@ -103,16 +104,16 @@ type SegmentedTabsProps<T extends string> = {
 // TextTab — boxing every tab group turns the page into a control panel.
 export function SegmentedTabs<T extends string>({ options, value, onChange, ariaLabel }: SegmentedTabsProps<T>) {
   return (
-    <span role="group" aria-label={ariaLabel} className="inline-flex items-stretch overflow-hidden rounded-[2px] border border-[var(--control)]">
+    <span role="group" aria-label={ariaLabel} className={`inline-flex items-stretch ${options.some(option => option.icon) ? "overflow-visible" : "overflow-hidden"} rounded-[2px] border border-[var(--control)]`}>
       {options.map((option, index) => {
         const active = option.value === value;
 
-        return (
+        const button = (
           <button
             key={option.value}
             type="button"
             data-testid={option.testId}
-            aria-label={option.ariaLabel}
+            aria-label={option.ariaLabel ?? (option.icon ? option.label : undefined)}
             data-focus-inset=""
             aria-pressed={active}
             onClick={() => onChange(option.value)}
@@ -121,13 +122,14 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, aria
             // on three sides and the survivor lands over the neighbouring tab.
             // Transition only the two properties that change — `transition-colors`
             // also animates outline-color, hiding the ring for its first 150ms.
-            className={`cursor-pointer px-[13px] py-1.5 font-[family-name:var(--font-numeric)] text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
+            className={`cursor-pointer ${option.icon ? "flex size-9 items-center justify-center" : "px-[13px] py-1.5"} font-[family-name:var(--font-numeric)] text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
               index > 0 ? "border-l border-[var(--control)]" : ""
             } ${active ? "bg-[var(--ink)] text-[var(--paper)]" : "bg-transparent text-[var(--muted)] hover:bg-[var(--tint)] hover:text-[var(--ink)]"}`}
           >
-            {option.label}
+            {option.icon ?? option.label}
           </button>
         );
+        return option.icon ? <ControlTooltip key={option.value} label={option.ariaLabel ?? option.label}>{button}</ControlTooltip> : button;
       })}
     </span>
   );

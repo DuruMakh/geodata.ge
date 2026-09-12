@@ -1,4 +1,6 @@
 {
+  "common.economicSectors": "Sectors",
+  "common.sectorsSourceNote": "Data: Geostat. Last updated: {updatedAt}.",
   "common.brandHome": "Fiscal.ge — Home",
   "common.home": "Home",
   "common.data": "Data",

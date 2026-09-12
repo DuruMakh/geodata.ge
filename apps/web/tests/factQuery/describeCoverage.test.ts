@@ -59,6 +59,7 @@ describe("describeCoverage", () => {
     expect(envelopeSchema.parse(result)).toBeTruthy();
     expect(result.kind).toBe("catalogue");
     expect(data(result).datasets.map((d) => d.datasetId).sort()).toEqual([
+      "economic-sectors",
       "gdp-overview",
       "general-government-balance",
       "government-debt",

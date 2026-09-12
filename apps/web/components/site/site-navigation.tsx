@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { Menu, X } from "lucide-react";
 
 export function SiteNavigation({ label, children }: { label: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -35,9 +36,7 @@ export function SiteNavigation({ label, children }: { label: string; children: R
         style={{ minWidth: 44 }}
         className="flex min-h-11 items-center justify-center justify-self-end px-2 text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-offset-2 min-[900px]:hidden"
       >
-        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d={open ? "M6 6l12 12M6 18L18 6" : "M3 6h18M3 12h18M3 18h18"} />
-        </svg>
+        {open ? <X aria-hidden="true" size={18} strokeWidth={1.5} /> : <Menu aria-hidden="true" size={18} strokeWidth={1.5} />}
       </button>
       <div
         id={panelId}

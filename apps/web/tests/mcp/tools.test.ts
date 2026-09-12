@@ -20,6 +20,7 @@ const TOOL_NAMES = [
   "get_sources",
   "query_debt",
   "query_deficit",
+  "query_economic_sectors",
   "query_gdp",
   "query_ministries",
   "query_municipal",
@@ -164,7 +165,7 @@ describe("MCP tool surface", () => {
     expect(instructions.toLowerCase()).toMatch(/caveat|limitation/);
     expect(instructions.toLowerCase()).toContain("deficit");
     expect(instructions.toLowerCase()).toMatch(/never estimate|do not estimate/);
-    expect(TOOLS).toHaveLength(10);
+    expect(TOOLS).toHaveLength(TOOL_NAMES.length);
   });
 
   // The instructions state coverage, so they must read it from the catalogue
