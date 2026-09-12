@@ -181,5 +181,14 @@
   "inflation.category.cpi.cat.12_3": "პირადი ნივთები, სხვა კატეგორიებში ჩაურთველი",
   "inflation.category.cpi.cat.12_5": "დაზღვევა",
   "inflation.category.cpi.cat.12_6": "საფინანსო მომსახურება",
-  "inflation.category.cpi.cat.12_7": "სხვა სახის მომსახურება"
+  "inflation.category.cpi.cat.12_7": "სხვა სახის მომსახურება",
+  "inflation.categoryHeroRise": "{monthIn} ყველაზე დიდი წვლილი შეიტანა ჯგუფმა «{category}»: ფასები {change}-ით შეიცვალა, კალათის {share}-იანი წილით, რაც საერთო ინფლაციის {value} შეადგენს.",
+  "inflation.categoryHeroFall": "{monthIn} ჯგუფი «{category}» გაიაფდა {change}-ით; კალათის {share}-იანი წილით ამან საერთო ინფლაცია {value}-ით შეამცირა.",
+  "inflation.categorySource": "მონაცემები: საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი), სამომხმარებლო ფასების ინდექსი COICOP ჯგუფებად და სამომხმარებლო კალათის წონები.",
+  "inflation.chartMode.columns": "სვეტები",
+  "inflation.categoryTableSeries": "ცხრილის კატეგორია",
+  "inflation.categoryColumn": "კატეგორია",
+  "inflation.coicopColumn": "COICOP კოდი",
+  "inflation.levelColumn": "დონე",
+  "inflation.weightColumn": "წონა (%)"
 }

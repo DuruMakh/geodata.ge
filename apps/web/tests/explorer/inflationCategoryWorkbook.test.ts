@@ -68,8 +68,9 @@ describe("buildInflationCategoryWorkbookExportModel", () => {
       ...contribInput,
       state: { ...contribInput.state, tab: "yoy" },
     });
-    expect(contrib.sources.some((row) => row.sourceId === "source.geostat_basket_weights")).toBe(true);
-    expect(rates.sources.some((row) => row.sourceId === "source.geostat_basket_weights")).toBe(false);
+    // The fixture titles its sources "<sourceId> <language>".
+    expect(contrib.sources.some((row) => row.title.startsWith("source.geostat_basket_weights"))).toBe(true);
+    expect(rates.sources.some((row) => row.title.startsWith("source.geostat_basket_weights"))).toBe(false);
   });
 
   it("says on the sheet that contributions are a Fiscal.ge calculation", () => {

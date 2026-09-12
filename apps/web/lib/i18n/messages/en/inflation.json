@@ -181,5 +181,14 @@
   "inflation.category.cpi.cat.12_3": "Personal effects n.e.c.",
   "inflation.category.cpi.cat.12_5": "Insurance",
   "inflation.category.cpi.cat.12_6": "Financial services n.e.c.",
-  "inflation.category.cpi.cat.12_7": "Other services n.e.c."
+  "inflation.category.cpi.cat.12_7": "Other services n.e.c.",
+  "inflation.categoryHeroRise": "In {monthIn} the largest contribution came from {category}: prices changed by {change}, and at {share} of the basket that is {value} of headline inflation.",
+  "inflation.categoryHeroFall": "In {monthIn} {category} fell by {change}; at {share} of the basket that took {value} off headline inflation.",
+  "inflation.categorySource": "Data: National Statistics Office of Georgia (Geostat), consumer price index by COICOP group and consumer basket weights.",
+  "inflation.chartMode.columns": "Columns",
+  "inflation.categoryTableSeries": "Table category",
+  "inflation.categoryColumn": "Category",
+  "inflation.coicopColumn": "COICOP code",
+  "inflation.levelColumn": "Level",
+  "inflation.weightColumn": "Weight (%)"
 }

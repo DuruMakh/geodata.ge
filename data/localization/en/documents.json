@@ -3163,5 +3163,35 @@
       "reviewedAt": "2026-09-11"
     },
     "documentLanguage": "ka"
+  },
+  "source.geostat_basket_weights": {
+    "title": {
+      "text": "Consumer basket weights, %",
+      "reviewedAt": "2026-09-13"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-13"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-13"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_basket_weights_ka": {
+    "title": {
+      "text": "Consumer basket weights, % (Georgian)",
+      "reviewedAt": "2026-09-13"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-13"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-13"
+    },
+    "documentLanguage": "ka"
   }
 }

@@ -115,7 +115,32 @@ export function assertInflationParity(
   assertSameServedRows("CPI basket weights", csv.weights, db.weights, (row) => `${row.categoryId}:${row.year}`);
 }
 
-export async function loadServedInflationData(): Promise<{
+/**
+ * Build-time memo, the same pattern and for the same reason as
+ * lib/data/servedData.ts: the hub, both metadata functions and both page
+ * renders each call this, and with the category table it is 28,000 rows —
+ * the largest dataset in the repository. Caching the promise collapses them
+ * onto one parse, one validation and, in db mode, one parity pass.
+ */
+let servedInflationPromise: Promise<ServedInflationData> | null = null;
+
+export function resetInflationCacheForTests(): void {
+  servedInflationPromise = null;
+}
+
+export type ServedInflationData = {
+  facts: ServedCpiFact[];
+  targets: ServedInflationTargetRow[];
+  categories: ServedCpiCategoryFact[];
+  weights: ServedBasketWeightRow[];
+};
+
+export function loadServedInflationData(): Promise<ServedInflationData> {
+  servedInflationPromise ??= loadServedInflationDataUncached();
+  return servedInflationPromise;
+}
+
+async function loadServedInflationDataUncached(): Promise<{
   facts: ServedCpiFact[];
   targets: ServedInflationTargetRow[];
   categories: ServedCpiCategoryFact[];
