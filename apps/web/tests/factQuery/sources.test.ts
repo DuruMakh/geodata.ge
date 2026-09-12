@@ -183,8 +183,9 @@ describe("public source resolution", () => {
       expect(unresolved).toEqual([]);
       // 105 after the deficit merge added the IMF WEO workbook, then 115 once
       // the ten Ministry of Finance debt documents were registered so debt
-      // figures could cite them.
-      expect(snapshot.sources.length).toBe(117);
+      // figures could cite them. 124 once the seven inflation sources (six
+      // Geostat CPI workbooks and the NBG strategy) were registered.
+      expect(snapshot.sources.length).toBe(124);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {

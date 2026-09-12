@@ -18,6 +18,7 @@ const dictionaries = {
     about: () => import("./messages/ka/about.json"),
     connect: () => import("./messages/ka/connect.json"),
     seo: () => import("./messages/ka/seo.json"),
+    inflation: () => import("./messages/ka/inflation.json"),
   },
   en: {
     gdp: () => import("./messages/en/gdp.json"),
@@ -36,6 +37,7 @@ const dictionaries = {
     about: () => import("./messages/en/about.json"),
     connect: () => import("./messages/en/connect.json"),
     seo: () => import("./messages/en/seo.json"),
+    inflation: () => import("./messages/en/inflation.json"),
   },
 } satisfies Record<Locale, Record<MessageScope, () => Promise<{ default: Messages }>>>;
 

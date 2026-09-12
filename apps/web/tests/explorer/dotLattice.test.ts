@@ -32,3 +32,28 @@ describe("buildDotLattice", () => {
     expect(buildDotLattice({ plotWidth: 0, plotHeight: 278, yearCount: 21, gridStepCount: 4 })).toBeNull();
   });
 });
+
+describe("buildDotLattice for monthly axes", () => {
+  it("keeps year axes unchanged, with no column offset", () => {
+    expect(buildDotLattice({ plotWidth: 816, plotHeight: 278, yearCount: 21, gridStepCount: 4 })?.colOffset).toBe(0);
+  });
+
+  it("groups months into half-year columns when single months are too dense", () => {
+    const lattice = buildDotLattice({ plotWidth: 816, plotHeight: 278, yearCount: 272, gridStepCount: 4, periodsPerYear: 12, firstPeriod: 2004 * 12 });
+    const monthPitch = 816 / 271;
+    // 1 and 3 months fall under the 12px floor; 6 months (≈18px) clears it.
+    expect(lattice?.colPitch).toBeCloseTo(monthPitch * 6, 5);
+    expect(lattice?.colOffset).toBe(0);
+  });
+
+  it("aligns columns to calendar boundaries when the range starts mid-year", () => {
+    const lattice = buildDotLattice({ plotWidth: 816, plotHeight: 278, yearCount: 272, gridStepCount: 4, periodsPerYear: 12, firstPeriod: 2004 * 12 + 2 });
+    // March start: the first half-year boundary (July) is four months in.
+    expect(lattice?.colOffset).toBeCloseTo((816 / 271) * 4, 5);
+  });
+
+  it("uses single-month columns on a short range", () => {
+    const lattice = buildDotLattice({ plotWidth: 816, plotHeight: 278, yearCount: 13, gridStepCount: 4, periodsPerYear: 12, firstPeriod: 2025 * 12 });
+    expect(lattice?.colPitch).toBeCloseTo(816 / 12, 5);
+  });
+});

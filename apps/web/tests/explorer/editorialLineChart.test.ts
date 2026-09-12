@@ -155,3 +155,37 @@ describe("chart tooltip rows", () => {
     expect(hidden).toBe(0);
   });
 });
+
+describe("EditorialLineChart monthly periods", () => {
+  const months = Array.from({ length: 272 }, (_, index) => 2004 * 12 + index);
+  const series: ChartSeries[] = [
+    { id: "cpi", label: "CPI", color: "#1E1B16", vals: months.map((_, index) => (index % 24) - 3), planned: months.map(() => false) },
+    { id: "target", label: "Target", color: "#B3402A", vals: months.map(() => 3), planned: months.map(() => false), dashed: true },
+  ];
+  const markup = renderGeorgianMarkup(
+    createElement(EditorialLineChart, {
+      years: months,
+      series,
+      share: true,
+      unit: UNIT_BN,
+      shareLabel: "%",
+      periodsPerYear: 12,
+      formatPeriod: (period: number, kind: "axis" | "tooltip") => (kind === "axis" ? String(Math.floor(period / 12)) : `m${period}`),
+    }),
+  );
+
+  it("prints formatted calendar-year labels", () => {
+    const labels = [...markup.matchAll(/<text\b[^>]*>(\d{4})<\/text>/g)].map((match) => match[1]);
+    expect(labels).toEqual(["2004", "2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022", "2024", "2026"]);
+  });
+
+  it("dashes a reference series and leaves ordinary series solid", () => {
+    expect(markup).toMatch(/data-testid="chart-series-target-dashed"[^>]*stroke-dasharray="6 5"/);
+    expect(markup).not.toContain("chart-series-cpi-dashed");
+  });
+
+  it("spaces lattice columns by half-years", () => {
+    const width = Number(/<pattern[^>]*\swidth="([\d.]+)"/.exec(markup)?.[1]);
+    expect(width).toBeCloseTo((816 / 271) * 6, 3);
+  });
+});

@@ -1,0 +1,1961 @@
+﻿series_id,measure,period,value,status,source_id,source_locator,last_reviewed_at
+cpi.core,mom_pct,2010-01,0.4282,published,source.geostat_core_mom,Core Inflation!B5,2026-09-11
+cpi.core,mom_pct,2010-02,-0.0654,published,source.geostat_core_mom,Core Inflation!C5,2026-09-11
+cpi.core,mom_pct,2010-03,-0.051,published,source.geostat_core_mom,Core Inflation!D5,2026-09-11
+cpi.core,mom_pct,2010-04,-0.0117,published,source.geostat_core_mom,Core Inflation!E5,2026-09-11
+cpi.core,mom_pct,2010-05,-0.1651,published,source.geostat_core_mom,Core Inflation!F5,2026-09-11
+cpi.core,mom_pct,2010-06,1.528,published,source.geostat_core_mom,Core Inflation!G5,2026-09-11
+cpi.core,mom_pct,2010-07,-0.0366,published,source.geostat_core_mom,Core Inflation!H5,2026-09-11
+cpi.core,mom_pct,2010-08,0.3983,published,source.geostat_core_mom,Core Inflation!I5,2026-09-11
+cpi.core,mom_pct,2010-09,-0.1262,published,source.geostat_core_mom,Core Inflation!J5,2026-09-11
+cpi.core,mom_pct,2010-10,0.5442,published,source.geostat_core_mom,Core Inflation!K5,2026-09-11
+cpi.core,mom_pct,2010-11,-0.019,published,source.geostat_core_mom,Core Inflation!L5,2026-09-11
+cpi.core,mom_pct,2010-12,0.1636,published,source.geostat_core_mom,Core Inflation!M5,2026-09-11
+cpi.core,mom_pct,2011-01,0.2915,published,source.geostat_core_mom,Core Inflation!N5,2026-09-11
+cpi.core,mom_pct,2011-02,-0.1799,published,source.geostat_core_mom,Core Inflation!O5,2026-09-11
+cpi.core,mom_pct,2011-03,-0.2982,published,source.geostat_core_mom,Core Inflation!P5,2026-09-11
+cpi.core,mom_pct,2011-04,-0.6452,published,source.geostat_core_mom,Core Inflation!Q5,2026-09-11
+cpi.core,mom_pct,2011-05,-0.1772,published,source.geostat_core_mom,Core Inflation!R5,2026-09-11
+cpi.core,mom_pct,2011-06,0.3,published,source.geostat_core_mom,Core Inflation!S5,2026-09-11
+cpi.core,mom_pct,2011-07,1.6259,published,source.geostat_core_mom,Core Inflation!T5,2026-09-11
+cpi.core,mom_pct,2011-08,0.6919,published,source.geostat_core_mom,Core Inflation!U5,2026-09-11
+cpi.core,mom_pct,2011-09,0.495,published,source.geostat_core_mom,Core Inflation!V5,2026-09-11
+cpi.core,mom_pct,2011-10,-0.0904,published,source.geostat_core_mom,Core Inflation!W5,2026-09-11
+cpi.core,mom_pct,2011-11,0.3493,published,source.geostat_core_mom,Core Inflation!X5,2026-09-11
+cpi.core,mom_pct,2011-12,0.0535,published,source.geostat_core_mom,Core Inflation!Y5,2026-09-11
+cpi.core,mom_pct,2012-01,0.0287,published,source.geostat_core_mom,Core Inflation!Z5,2026-09-11
+cpi.core,mom_pct,2012-02,0.1234,published,source.geostat_core_mom,Core Inflation!AA5,2026-09-11
+cpi.core,mom_pct,2012-03,-0.2079,published,source.geostat_core_mom,Core Inflation!AB5,2026-09-11
+cpi.core,mom_pct,2012-04,-0.1403,published,source.geostat_core_mom,Core Inflation!AC5,2026-09-11
+cpi.core,mom_pct,2012-05,-0.276,published,source.geostat_core_mom,Core Inflation!AD5,2026-09-11
+cpi.core,mom_pct,2012-06,-0.1949,published,source.geostat_core_mom,Core Inflation!AE5,2026-09-11
+cpi.core,mom_pct,2012-07,-0.2144,published,source.geostat_core_mom,Core Inflation!AF5,2026-09-11
+cpi.core,mom_pct,2012-08,-0.0514,published,source.geostat_core_mom,Core Inflation!AG5,2026-09-11
+cpi.core,mom_pct,2012-09,0.3349,published,source.geostat_core_mom,Core Inflation!AH5,2026-09-11
+cpi.core,mom_pct,2012-10,0.2235,published,source.geostat_core_mom,Core Inflation!AI5,2026-09-11
+cpi.core,mom_pct,2012-11,0.2416,published,source.geostat_core_mom,Core Inflation!AJ5,2026-09-11
+cpi.core,mom_pct,2012-12,-0.0457,published,source.geostat_core_mom,Core Inflation!AK5,2026-09-11
+cpi.core,mom_pct,2013-01,-0.2272,published,source.geostat_core_mom,Core Inflation!AL5,2026-09-11
+cpi.core,mom_pct,2013-02,-0.1982,published,source.geostat_core_mom,Core Inflation!AM5,2026-09-11
+cpi.core,mom_pct,2013-03,0.2354,published,source.geostat_core_mom,Core Inflation!AN5,2026-09-11
+cpi.core,mom_pct,2013-04,0.1792,published,source.geostat_core_mom,Core Inflation!AO5,2026-09-11
+cpi.core,mom_pct,2013-05,-0.0593,published,source.geostat_core_mom,Core Inflation!AP5,2026-09-11
+cpi.core,mom_pct,2013-06,0.0683,published,source.geostat_core_mom,Core Inflation!AQ5,2026-09-11
+cpi.core,mom_pct,2013-07,0.1401,published,source.geostat_core_mom,Core Inflation!AR5,2026-09-11
+cpi.core,mom_pct,2013-08,-0.0903,published,source.geostat_core_mom,Core Inflation!AS5,2026-09-11
+cpi.core,mom_pct,2013-09,-0.9202,published,source.geostat_core_mom,Core Inflation!AT5,2026-09-11
+cpi.core,mom_pct,2013-10,1.8185,published,source.geostat_core_mom,Core Inflation!AU5,2026-09-11
+cpi.core,mom_pct,2013-11,0.1051,published,source.geostat_core_mom,Core Inflation!AV5,2026-09-11
+cpi.core,mom_pct,2013-12,-0.2684,published,source.geostat_core_mom,Core Inflation!AW5,2026-09-11
+cpi.core,mom_pct,2014-01,0.2048,published,source.geostat_core_mom,Core Inflation!AX5,2026-09-11
+cpi.core,mom_pct,2014-02,0.5345,published,source.geostat_core_mom,Core Inflation!AY5,2026-09-11
+cpi.core,mom_pct,2014-03,0.1712,published,source.geostat_core_mom,Core Inflation!AZ5,2026-09-11
+cpi.core,mom_pct,2014-04,0.1077,published,source.geostat_core_mom,Core Inflation!BA5,2026-09-11
+cpi.core,mom_pct,2014-05,0.4306,published,source.geostat_core_mom,Core Inflation!BB5,2026-09-11
+cpi.core,mom_pct,2014-06,0.0818,published,source.geostat_core_mom,Core Inflation!BC5,2026-09-11
+cpi.core,mom_pct,2014-07,-0.0832,published,source.geostat_core_mom,Core Inflation!BD5,2026-09-11
+cpi.core,mom_pct,2014-08,-0.5358,published,source.geostat_core_mom,Core Inflation!BE5,2026-09-11
+cpi.core,mom_pct,2014-09,0.6453,published,source.geostat_core_mom,Core Inflation!BF5,2026-09-11
+cpi.core,mom_pct,2014-10,0.2999,published,source.geostat_core_mom,Core Inflation!BG5,2026-09-11
+cpi.core,mom_pct,2014-11,-0.0356,published,source.geostat_core_mom,Core Inflation!BH5,2026-09-11
+cpi.core,mom_pct,2014-12,0.8843,published,source.geostat_core_mom,Core Inflation!BI5,2026-09-11
+cpi.core,mom_pct,2015-01,0.5277,published,source.geostat_core_mom,Core Inflation!BJ5,2026-09-11
+cpi.core,mom_pct,2015-02,0.7334,published,source.geostat_core_mom,Core Inflation!BK5,2026-09-11
+cpi.core,mom_pct,2015-03,1.2976,published,source.geostat_core_mom,Core Inflation!BL5,2026-09-11
+cpi.core,mom_pct,2015-04,0.2524,published,source.geostat_core_mom,Core Inflation!BM5,2026-09-11
+cpi.core,mom_pct,2015-05,0.9615,published,source.geostat_core_mom,Core Inflation!BN5,2026-09-11
+cpi.core,mom_pct,2015-06,0.4151,published,source.geostat_core_mom,Core Inflation!BO5,2026-09-11
+cpi.core,mom_pct,2015-07,0.0411,published,source.geostat_core_mom,Core Inflation!BP5,2026-09-11
+cpi.core,mom_pct,2015-08,0.3012,published,source.geostat_core_mom,Core Inflation!BQ5,2026-09-11
+cpi.core,mom_pct,2015-09,1.1974,published,source.geostat_core_mom,Core Inflation!BR5,2026-09-11
+cpi.core,mom_pct,2015-10,1.0625,published,source.geostat_core_mom,Core Inflation!BS5,2026-09-11
+cpi.core,mom_pct,2015-11,0.2557,published,source.geostat_core_mom,Core Inflation!BT5,2026-09-11
+cpi.core,mom_pct,2015-12,-0.3089,published,source.geostat_core_mom,Core Inflation!BU5,2026-09-11
+cpi.core,mom_pct,2016-01,0.4577,published,source.geostat_core_mom,Core Inflation!BV5,2026-09-11
+cpi.core,mom_pct,2016-02,1.1058,published,source.geostat_core_mom,Core Inflation!BW5,2026-09-11
+cpi.core,mom_pct,2016-03,0.0918,published,source.geostat_core_mom,Core Inflation!BX5,2026-09-11
+cpi.core,mom_pct,2016-04,-0.5511,published,source.geostat_core_mom,Core Inflation!BY5,2026-09-11
+cpi.core,mom_pct,2016-05,-0.2845,published,source.geostat_core_mom,Core Inflation!BZ5,2026-09-11
+cpi.core,mom_pct,2016-06,-0.5283,published,source.geostat_core_mom,Core Inflation!CA5,2026-09-11
+cpi.core,mom_pct,2016-07,0.2739,published,source.geostat_core_mom,Core Inflation!CB5,2026-09-11
+cpi.core,mom_pct,2016-08,-0.1329,published,source.geostat_core_mom,Core Inflation!CC5,2026-09-11
+cpi.core,mom_pct,2016-09,0.0492,published,source.geostat_core_mom,Core Inflation!CD5,2026-09-11
+cpi.core,mom_pct,2016-10,0.4841,published,source.geostat_core_mom,Core Inflation!CE5,2026-09-11
+cpi.core,mom_pct,2016-11,0.2816,published,source.geostat_core_mom,Core Inflation!CF5,2026-09-11
+cpi.core,mom_pct,2016-12,0.5987,published,source.geostat_core_mom,Core Inflation!CG5,2026-09-11
+cpi.core,mom_pct,2017-01,1.4347,published,source.geostat_core_mom,Core Inflation!CH5,2026-09-11
+cpi.core,mom_pct,2017-02,1.3903,published,source.geostat_core_mom,Core Inflation!CI5,2026-09-11
+cpi.core,mom_pct,2017-03,-0.1415,published,source.geostat_core_mom,Core Inflation!CJ5,2026-09-11
+cpi.core,mom_pct,2017-04,-0.1326,published,source.geostat_core_mom,Core Inflation!CK5,2026-09-11
+cpi.core,mom_pct,2017-05,0.1248,published,source.geostat_core_mom,Core Inflation!CL5,2026-09-11
+cpi.core,mom_pct,2017-06,0.2271,published,source.geostat_core_mom,Core Inflation!CM5,2026-09-11
+cpi.core,mom_pct,2017-07,0.0334,published,source.geostat_core_mom,Core Inflation!CN5,2026-09-11
+cpi.core,mom_pct,2017-08,-0.1051,published,source.geostat_core_mom,Core Inflation!CO5,2026-09-11
+cpi.core,mom_pct,2017-09,0.1914,published,source.geostat_core_mom,Core Inflation!CP5,2026-09-11
+cpi.core,mom_pct,2017-10,0.4525,published,source.geostat_core_mom,Core Inflation!CQ5,2026-09-11
+cpi.core,mom_pct,2017-11,0.9373,published,source.geostat_core_mom,Core Inflation!CR5,2026-09-11
+cpi.core,mom_pct,2017-12,0.1636,published,source.geostat_core_mom,Core Inflation!CS5,2026-09-11
+cpi.core,mom_pct,2018-01,-0.1313,published,source.geostat_core_mom,Core Inflation!CT5,2026-09-11
+cpi.core,mom_pct,2018-02,0.1164,published,source.geostat_core_mom,Core Inflation!CU5,2026-09-11
+cpi.core,mom_pct,2018-03,-0.0768,published,source.geostat_core_mom,Core Inflation!CV5,2026-09-11
+cpi.core,mom_pct,2018-04,-0.121,published,source.geostat_core_mom,Core Inflation!CW5,2026-09-11
+cpi.core,mom_pct,2018-05,0.1009,published,source.geostat_core_mom,Core Inflation!CX5,2026-09-11
+cpi.core,mom_pct,2018-06,0.0549,published,source.geostat_core_mom,Core Inflation!CY5,2026-09-11
+cpi.core,mom_pct,2018-07,-0.2219,published,source.geostat_core_mom,Core Inflation!CZ5,2026-09-11
+cpi.core,mom_pct,2018-08,0.0508,published,source.geostat_core_mom,Core Inflation!DA5,2026-09-11
+cpi.core,mom_pct,2018-09,0.4049,published,source.geostat_core_mom,Core Inflation!DB5,2026-09-11
+cpi.core,mom_pct,2018-10,0.4335,published,source.geostat_core_mom,Core Inflation!DC5,2026-09-11
+cpi.core,mom_pct,2018-11,0.5012,published,source.geostat_core_mom,Core Inflation!DD5,2026-09-11
+cpi.core,mom_pct,2018-12,-0.2382,published,source.geostat_core_mom,Core Inflation!DE5,2026-09-11
+cpi.core,mom_pct,2019-01,0.674,published,source.geostat_core_mom,Core Inflation!DF5,2026-09-11
+cpi.core,mom_pct,2019-02,-0.2557,published,source.geostat_core_mom,Core Inflation!DG5,2026-09-11
+cpi.core,mom_pct,2019-03,2.0554,published,source.geostat_core_mom,Core Inflation!DH5,2026-09-11
+cpi.core,mom_pct,2019-04,0.0309,published,source.geostat_core_mom,Core Inflation!DI5,2026-09-11
+cpi.core,mom_pct,2019-05,-0.1381,published,source.geostat_core_mom,Core Inflation!DJ5,2026-09-11
+cpi.core,mom_pct,2019-06,0.2855,published,source.geostat_core_mom,Core Inflation!DK5,2026-09-11
+cpi.core,mom_pct,2019-07,-0.4178,published,source.geostat_core_mom,Core Inflation!DL5,2026-09-11
+cpi.core,mom_pct,2019-08,0.4692,published,source.geostat_core_mom,Core Inflation!DM5,2026-09-11
+cpi.core,mom_pct,2019-09,1.1403,published,source.geostat_core_mom,Core Inflation!DN5,2026-09-11
+cpi.core,mom_pct,2019-10,0.5113,published,source.geostat_core_mom,Core Inflation!DO5,2026-09-11
+cpi.core,mom_pct,2019-11,0.7398,published,source.geostat_core_mom,Core Inflation!DP5,2026-09-11
+cpi.core,mom_pct,2019-12,-0.0078,published,source.geostat_core_mom,Core Inflation!DQ5,2026-09-11
+cpi.core,mom_pct,2020-01,-0.0822,published,source.geostat_core_mom,Core Inflation!DR5,2026-09-11
+cpi.core,mom_pct,2020-02,-0.0092,published,source.geostat_core_mom,Core Inflation!DS5,2026-09-11
+cpi.core,mom_pct,2020-03,1.0932,published,source.geostat_core_mom,Core Inflation!DT5,2026-09-11
+cpi.core,mom_pct,2020-04,0.9023,published,source.geostat_core_mom,Core Inflation!DU5,2026-09-11
+cpi.core,mom_pct,2020-05,1.1128,published,source.geostat_core_mom,Core Inflation!DV5,2026-09-11
+cpi.core,mom_pct,2020-06,0.9866,published,source.geostat_core_mom,Core Inflation!DW5,2026-09-11
+cpi.core,mom_pct,2020-07,-0.8674,published,source.geostat_core_mom,Core Inflation!DX5,2026-09-11
+cpi.core,mom_pct,2020-08,0.0126,published,source.geostat_core_mom,Core Inflation!DY5,2026-09-11
+cpi.core,mom_pct,2020-09,0.705,published,source.geostat_core_mom,Core Inflation!DZ5,2026-09-11
+cpi.core,mom_pct,2020-10,0.7383,published,source.geostat_core_mom,Core Inflation!EA5,2026-09-11
+cpi.core,mom_pct,2020-11,0.4022,published,source.geostat_core_mom,Core Inflation!EB5,2026-09-11
+cpi.core,mom_pct,2020-12,0.2106,published,source.geostat_core_mom,Core Inflation!EC5,2026-09-11
+cpi.core,mom_pct,2021-01,0.4262,published,source.geostat_core_mom,Core Inflation!ED5,2026-09-11
+cpi.core,mom_pct,2021-02,0.6893,published,source.geostat_core_mom,Core Inflation!EE5,2026-09-11
+cpi.core,mom_pct,2021-03,1.3994,published,source.geostat_core_mom,Core Inflation!EF5,2026-09-11
+cpi.core,mom_pct,2021-04,0.9264,published,source.geostat_core_mom,Core Inflation!EG5,2026-09-11
+cpi.core,mom_pct,2021-05,0.6559,published,source.geostat_core_mom,Core Inflation!EH5,2026-09-11
+cpi.core,mom_pct,2021-06,0.469,published,source.geostat_core_mom,Core Inflation!EI5,2026-09-11
+cpi.core,mom_pct,2021-07,-0.4352,published,source.geostat_core_mom,Core Inflation!EJ5,2026-09-11
+cpi.core,mom_pct,2021-08,0.3544,published,source.geostat_core_mom,Core Inflation!EK5,2026-09-11
+cpi.core,mom_pct,2021-09,0.3091,published,source.geostat_core_mom,Core Inflation!EL5,2026-09-11
+cpi.core,mom_pct,2021-10,0.6896,published,source.geostat_core_mom,Core Inflation!EM5,2026-09-11
+cpi.core,mom_pct,2021-11,0.2911,published,source.geostat_core_mom,Core Inflation!EN5,2026-09-11
+cpi.core,mom_pct,2021-12,0.0207,published,source.geostat_core_mom,Core Inflation!EO5,2026-09-11
+cpi.core,mom_pct,2022-01,0.1193,published,source.geostat_core_mom,Core Inflation!EP5,2026-09-11
+cpi.core,mom_pct,2022-02,0.2336,published,source.geostat_core_mom,Core Inflation!EQ5,2026-09-11
+cpi.core,mom_pct,2022-03,1.5183,published,source.geostat_core_mom,Core Inflation!ER5,2026-09-11
+cpi.core,mom_pct,2022-04,0.6399,published,source.geostat_core_mom,Core Inflation!ES5,2026-09-11
+cpi.core,mom_pct,2022-05,1.5892,published,source.geostat_core_mom,Core Inflation!ET5,2026-09-11
+cpi.core,mom_pct,2022-06,0.3603,published,source.geostat_core_mom,Core Inflation!EU5,2026-09-11
+cpi.core,mom_pct,2022-07,0.7483,published,source.geostat_core_mom,Core Inflation!EV5,2026-09-11
+cpi.core,mom_pct,2022-08,0.3025,published,source.geostat_core_mom,Core Inflation!EW5,2026-09-11
+cpi.core,mom_pct,2022-09,0.7528,published,source.geostat_core_mom,Core Inflation!EX5,2026-09-11
+cpi.core,mom_pct,2022-10,0.4921,published,source.geostat_core_mom,Core Inflation!EY5,2026-09-11
+cpi.core,mom_pct,2022-11,0.1116,published,source.geostat_core_mom,Core Inflation!EZ5,2026-09-11
+cpi.core,mom_pct,2022-12,-0.1948,published,source.geostat_core_mom,Core Inflation!FA5,2026-09-11
+cpi.core,mom_pct,2023-01,0.8572,published,source.geostat_core_mom,Core Inflation!FB5,2026-09-11
+cpi.core,mom_pct,2023-02,-0.8256,published,source.geostat_core_mom,Core Inflation!FC5,2026-09-11
+cpi.core,mom_pct,2023-03,0.1156,published,source.geostat_core_mom,Core Inflation!FD5,2026-09-11
+cpi.core,mom_pct,2023-04,0.3519,published,source.geostat_core_mom,Core Inflation!FE5,2026-09-11
+cpi.core,mom_pct,2023-05,0.9081,published,source.geostat_core_mom,Core Inflation!FF5,2026-09-11
+cpi.core,mom_pct,2023-06,0.4372,published,source.geostat_core_mom,Core Inflation!FG5,2026-09-11
+cpi.core,mom_pct,2023-07,-0.1134,published,source.geostat_core_mom,Core Inflation!FH5,2026-09-11
+cpi.core,mom_pct,2023-08,-0.2274,published,source.geostat_core_mom,Core Inflation!FI5,2026-09-11
+cpi.core,mom_pct,2023-09,0.7137,published,source.geostat_core_mom,Core Inflation!FJ5,2026-09-11
+cpi.core,mom_pct,2023-10,0.2948,published,source.geostat_core_mom,Core Inflation!FK5,2026-09-11
+cpi.core,mom_pct,2023-11,-0.1901,published,source.geostat_core_mom,Core Inflation!FL5,2026-09-11
+cpi.core,mom_pct,2023-12,-0.323,published,source.geostat_core_mom,Core Inflation!FM5,2026-09-11
+cpi.core,mom_pct,2024-01,0.2982,published,source.geostat_core_mom,Core Inflation!FN5,2026-09-11
+cpi.core,mom_pct,2024-02,0.3104,published,source.geostat_core_mom,Core Inflation!FO5,2026-09-11
+cpi.core,mom_pct,2024-03,-0.0979,published,source.geostat_core_mom,Core Inflation!FP5,2026-09-11
+cpi.core,mom_pct,2024-04,0.3088,published,source.geostat_core_mom,Core Inflation!FQ5,2026-09-11
+cpi.core,mom_pct,2024-05,0.2964,published,source.geostat_core_mom,Core Inflation!FR5,2026-09-11
+cpi.core,mom_pct,2024-06,0.1704,published,source.geostat_core_mom,Core Inflation!FS5,2026-09-11
+cpi.core,mom_pct,2024-07,-0.3823,published,source.geostat_core_mom,Core Inflation!FT5,2026-09-11
+cpi.core,mom_pct,2024-08,-0.448,published,source.geostat_core_mom,Core Inflation!FU5,2026-09-11
+cpi.core,mom_pct,2024-09,0.6844,published,source.geostat_core_mom,Core Inflation!FV5,2026-09-11
+cpi.core,mom_pct,2024-10,0.5592,published,source.geostat_core_mom,Core Inflation!FW5,2026-09-11
+cpi.core,mom_pct,2024-11,0.242,published,source.geostat_core_mom,Core Inflation!FX5,2026-09-11
+cpi.core,mom_pct,2024-12,0.3154,published,source.geostat_core_mom,Core Inflation!FY5,2026-09-11
+cpi.core,mom_pct,2025-01,0.1674,published,source.geostat_core_mom,Core Inflation!FZ5,2026-09-11
+cpi.core,mom_pct,2025-02,0.2414,published,source.geostat_core_mom,Core Inflation!GA5,2026-09-11
+cpi.core,mom_pct,2025-03,0.2599,published,source.geostat_core_mom,Core Inflation!GB5,2026-09-11
+cpi.core,mom_pct,2025-04,0.2026,published,source.geostat_core_mom,Core Inflation!GC5,2026-09-11
+cpi.core,mom_pct,2025-05,0.0877,published,source.geostat_core_mom,Core Inflation!GD5,2026-09-11
+cpi.core,mom_pct,2025-06,0.4087,published,source.geostat_core_mom,Core Inflation!GE5,2026-09-11
+cpi.core,mom_pct,2025-07,-0.3798,published,source.geostat_core_mom,Core Inflation!GF5,2026-09-11
+cpi.core,mom_pct,2025-08,0.1632,published,source.geostat_core_mom,Core Inflation!GG5,2026-09-11
+cpi.core,mom_pct,2025-09,0.0721,published,source.geostat_core_mom,Core Inflation!GH5,2026-09-11
+cpi.core,mom_pct,2025-10,0.8449,published,source.geostat_core_mom,Core Inflation!GI5,2026-09-11
+cpi.core,mom_pct,2025-11,0.1538,published,source.geostat_core_mom,Core Inflation!GJ5,2026-09-11
+cpi.core,mom_pct,2025-12,-0.2795,published,source.geostat_core_mom,Core Inflation!GK5,2026-09-11
+cpi.core,mom_pct,2026-01,0.6153,published,source.geostat_core_mom,Core Inflation!GL5,2026-09-11
+cpi.core,mom_pct,2026-02,0.5201,published,source.geostat_core_mom,Core Inflation!GM5,2026-09-11
+cpi.core,mom_pct,2026-03,0.3348,published,source.geostat_core_mom,Core Inflation!GN5,2026-09-11
+cpi.core,mom_pct,2026-04,0.9417,published,source.geostat_core_mom,Core Inflation!GO5,2026-09-11
+cpi.core,mom_pct,2026-05,0.3034,published,source.geostat_core_mom,Core Inflation!GP5,2026-09-11
+cpi.core,mom_pct,2026-06,0.1432,published,source.geostat_core_mom,Core Inflation!GQ5,2026-09-11
+cpi.core,mom_pct,2026-07,-0.1132,published,source.geostat_core_mom,Core Inflation!GR5,2026-09-11
+cpi.core,mom_pct,2026-08,0.205,published,source.geostat_core_mom,Core Inflation!GS5,2026-09-11
+cpi.core,yoy_pct,2010-01,1.9499,published,source.geostat_core_yoy,Core Inflation!B5,2026-09-11
+cpi.core,yoy_pct,2010-02,2.2369,published,source.geostat_core_yoy,Core Inflation!C5,2026-09-11
+cpi.core,yoy_pct,2010-03,1.9954,published,source.geostat_core_yoy,Core Inflation!D5,2026-09-11
+cpi.core,yoy_pct,2010-04,2.3619,published,source.geostat_core_yoy,Core Inflation!E5,2026-09-11
+cpi.core,yoy_pct,2010-05,3.4492,published,source.geostat_core_yoy,Core Inflation!F5,2026-09-11
+cpi.core,yoy_pct,2010-06,5.317,published,source.geostat_core_yoy,Core Inflation!G5,2026-09-11
+cpi.core,yoy_pct,2010-07,5.6352,published,source.geostat_core_yoy,Core Inflation!H5,2026-09-11
+cpi.core,yoy_pct,2010-08,6.1314,published,source.geostat_core_yoy,Core Inflation!I5,2026-09-11
+cpi.core,yoy_pct,2010-09,2.4241,published,source.geostat_core_yoy,Core Inflation!J5,2026-09-11
+cpi.core,yoy_pct,2010-10,2.5906,published,source.geostat_core_yoy,Core Inflation!K5,2026-09-11
+cpi.core,yoy_pct,2010-11,2.3245,published,source.geostat_core_yoy,Core Inflation!L5,2026-09-11
+cpi.core,yoy_pct,2010-12,2.6056,published,source.geostat_core_yoy,Core Inflation!M5,2026-09-11
+cpi.core,yoy_pct,2011-01,2.4659,published,source.geostat_core_yoy,Core Inflation!N5,2026-09-11
+cpi.core,yoy_pct,2011-02,2.3485,published,source.geostat_core_yoy,Core Inflation!O5,2026-09-11
+cpi.core,yoy_pct,2011-03,2.0953,published,source.geostat_core_yoy,Core Inflation!P5,2026-09-11
+cpi.core,yoy_pct,2011-04,1.4484,published,source.geostat_core_yoy,Core Inflation!Q5,2026-09-11
+cpi.core,yoy_pct,2011-05,1.4361,published,source.geostat_core_yoy,Core Inflation!R5,2026-09-11
+cpi.core,yoy_pct,2011-06,0.2092,published,source.geostat_core_yoy,Core Inflation!S5,2026-09-11
+cpi.core,yoy_pct,2011-07,1.8758,published,source.geostat_core_yoy,Core Inflation!T5,2026-09-11
+cpi.core,yoy_pct,2011-08,2.1738,published,source.geostat_core_yoy,Core Inflation!U5,2026-09-11
+cpi.core,yoy_pct,2011-09,2.8093,published,source.geostat_core_yoy,Core Inflation!V5,2026-09-11
+cpi.core,yoy_pct,2011-10,2.1605,published,source.geostat_core_yoy,Core Inflation!W5,2026-09-11
+cpi.core,yoy_pct,2011-11,2.5367,published,source.geostat_core_yoy,Core Inflation!X5,2026-09-11
+cpi.core,yoy_pct,2011-12,2.424,published,source.geostat_core_yoy,Core Inflation!Y5,2026-09-11
+cpi.core,yoy_pct,2012-01,2.1556,published,source.geostat_core_yoy,Core Inflation!Z5,2026-09-11
+cpi.core,yoy_pct,2012-02,2.466,published,source.geostat_core_yoy,Core Inflation!AA5,2026-09-11
+cpi.core,yoy_pct,2012-03,2.5588,published,source.geostat_core_yoy,Core Inflation!AB5,2026-09-11
+cpi.core,yoy_pct,2012-04,3.08,published,source.geostat_core_yoy,Core Inflation!AC5,2026-09-11
+cpi.core,yoy_pct,2012-05,2.978,published,source.geostat_core_yoy,Core Inflation!AD5,2026-09-11
+cpi.core,yoy_pct,2012-06,2.47,published,source.geostat_core_yoy,Core Inflation!AE5,2026-09-11
+cpi.core,yoy_pct,2012-07,0.6144,published,source.geostat_core_yoy,Core Inflation!AF5,2026-09-11
+cpi.core,yoy_pct,2012-08,-0.1284,published,source.geostat_core_yoy,Core Inflation!AG5,2026-09-11
+cpi.core,yoy_pct,2012-09,-0.2875,published,source.geostat_core_yoy,Core Inflation!AH5,2026-09-11
+cpi.core,yoy_pct,2012-10,0.0257,published,source.geostat_core_yoy,Core Inflation!AI5,2026-09-11
+cpi.core,yoy_pct,2012-11,-0.0816,published,source.geostat_core_yoy,Core Inflation!AJ5,2026-09-11
+cpi.core,yoy_pct,2012-12,-0.1807,published,source.geostat_core_yoy,Core Inflation!AK5,2026-09-11
+cpi.core,yoy_pct,2013-01,-0.436,published,source.geostat_core_yoy,Core Inflation!AL5,2026-09-11
+cpi.core,yoy_pct,2013-02,-0.7557,published,source.geostat_core_yoy,Core Inflation!AM5,2026-09-11
+cpi.core,yoy_pct,2013-03,-0.3149,published,source.geostat_core_yoy,Core Inflation!AN5,2026-09-11
+cpi.core,yoy_pct,2013-04,0.0041,published,source.geostat_core_yoy,Core Inflation!AO5,2026-09-11
+cpi.core,yoy_pct,2013-05,0.2213,published,source.geostat_core_yoy,Core Inflation!AP5,2026-09-11
+cpi.core,yoy_pct,2013-06,0.4856,published,source.geostat_core_yoy,Core Inflation!AQ5,2026-09-11
+cpi.core,yoy_pct,2013-07,0.8426,published,source.geostat_core_yoy,Core Inflation!AR5,2026-09-11
+cpi.core,yoy_pct,2013-08,0.8034,published,source.geostat_core_yoy,Core Inflation!AS5,2026-09-11
+cpi.core,yoy_pct,2013-09,-0.4576,published,source.geostat_core_yoy,Core Inflation!AT5,2026-09-11
+cpi.core,yoy_pct,2013-10,1.1266,published,source.geostat_core_yoy,Core Inflation!AU5,2026-09-11
+cpi.core,yoy_pct,2013-11,0.9888,published,source.geostat_core_yoy,Core Inflation!AV5,2026-09-11
+cpi.core,yoy_pct,2013-12,0.7638,published,source.geostat_core_yoy,Core Inflation!AW5,2026-09-11
+cpi.core,yoy_pct,2014-01,1.2002,published,source.geostat_core_yoy,Core Inflation!AX5,2026-09-11
+cpi.core,yoy_pct,2014-02,1.9431,published,source.geostat_core_yoy,Core Inflation!AY5,2026-09-11
+cpi.core,yoy_pct,2014-03,1.8779,published,source.geostat_core_yoy,Core Inflation!AZ5,2026-09-11
+cpi.core,yoy_pct,2014-04,1.8051,published,source.geostat_core_yoy,Core Inflation!BA5,2026-09-11
+cpi.core,yoy_pct,2014-05,2.3042,published,source.geostat_core_yoy,Core Inflation!BB5,2026-09-11
+cpi.core,yoy_pct,2014-06,2.318,published,source.geostat_core_yoy,Core Inflation!BC5,2026-09-11
+cpi.core,yoy_pct,2014-07,2.0899,published,source.geostat_core_yoy,Core Inflation!BD5,2026-09-11
+cpi.core,yoy_pct,2014-08,1.6347,published,source.geostat_core_yoy,Core Inflation!BE5,2026-09-11
+cpi.core,yoy_pct,2014-09,3.2406,published,source.geostat_core_yoy,Core Inflation!BF5,2026-09-11
+cpi.core,yoy_pct,2014-10,1.7009,published,source.geostat_core_yoy,Core Inflation!BG5,2026-09-11
+cpi.core,yoy_pct,2014-11,1.558,published,source.geostat_core_yoy,Core Inflation!BH5,2026-09-11
+cpi.core,yoy_pct,2014-12,2.7317,published,source.geostat_core_yoy,Core Inflation!BI5,2026-09-11
+cpi.core,yoy_pct,2015-01,3.0627,published,source.geostat_core_yoy,Core Inflation!BJ5,2026-09-11
+cpi.core,yoy_pct,2015-02,3.2667,published,source.geostat_core_yoy,Core Inflation!BK5,2026-09-11
+cpi.core,yoy_pct,2015-03,4.4279,published,source.geostat_core_yoy,Core Inflation!BL5,2026-09-11
+cpi.core,yoy_pct,2015-04,4.5788,published,source.geostat_core_yoy,Core Inflation!BM5,2026-09-11
+cpi.core,yoy_pct,2015-05,5.1316,published,source.geostat_core_yoy,Core Inflation!BN5,2026-09-11
+cpi.core,yoy_pct,2015-06,5.4817,published,source.geostat_core_yoy,Core Inflation!BO5,2026-09-11
+cpi.core,yoy_pct,2015-07,5.6129,published,source.geostat_core_yoy,Core Inflation!BP5,2026-09-11
+cpi.core,yoy_pct,2015-08,6.5017,published,source.geostat_core_yoy,Core Inflation!BQ5,2026-09-11
+cpi.core,yoy_pct,2015-09,7.0859,published,source.geostat_core_yoy,Core Inflation!BR5,2026-09-11
+cpi.core,yoy_pct,2015-10,7.9,published,source.geostat_core_yoy,Core Inflation!BS5,2026-09-11
+cpi.core,yoy_pct,2015-11,8.2144,published,source.geostat_core_yoy,Core Inflation!BT5,2026-09-11
+cpi.core,yoy_pct,2015-12,6.9345,published,source.geostat_core_yoy,Core Inflation!BU5,2026-09-11
+cpi.core,yoy_pct,2016-01,6.86,published,source.geostat_core_yoy,Core Inflation!BV5,2026-09-11
+cpi.core,yoy_pct,2016-02,7.255,published,source.geostat_core_yoy,Core Inflation!BW5,2026-09-11
+cpi.core,yoy_pct,2016-03,5.9782,published,source.geostat_core_yoy,Core Inflation!BX5,2026-09-11
+cpi.core,yoy_pct,2016-04,5.1288,published,source.geostat_core_yoy,Core Inflation!BY5,2026-09-11
+cpi.core,yoy_pct,2016-05,3.8314,published,source.geostat_core_yoy,Core Inflation!BZ5,2026-09-11
+cpi.core,yoy_pct,2016-06,2.856,published,source.geostat_core_yoy,Core Inflation!CA5,2026-09-11
+cpi.core,yoy_pct,2016-07,3.0953,published,source.geostat_core_yoy,Core Inflation!CB5,2026-09-11
+cpi.core,yoy_pct,2016-08,2.649,published,source.geostat_core_yoy,Core Inflation!CC5,2026-09-11
+cpi.core,yoy_pct,2016-09,1.4844,published,source.geostat_core_yoy,Core Inflation!CD5,2026-09-11
+cpi.core,yoy_pct,2016-10,0.9036,published,source.geostat_core_yoy,Core Inflation!CE5,2026-09-11
+cpi.core,yoy_pct,2016-11,0.9297,published,source.geostat_core_yoy,Core Inflation!CF5,2026-09-11
+cpi.core,yoy_pct,2016-12,1.8486,published,source.geostat_core_yoy,Core Inflation!CG5,2026-09-11
+cpi.core,yoy_pct,2017-01,2.8391,published,source.geostat_core_yoy,Core Inflation!CH5,2026-09-11
+cpi.core,yoy_pct,2017-02,3.1285,published,source.geostat_core_yoy,Core Inflation!CI5,2026-09-11
+cpi.core,yoy_pct,2017-03,2.8882,published,source.geostat_core_yoy,Core Inflation!CJ5,2026-09-11
+cpi.core,yoy_pct,2017-04,3.3211,published,source.geostat_core_yoy,Core Inflation!CK5,2026-09-11
+cpi.core,yoy_pct,2017-05,3.7452,published,source.geostat_core_yoy,Core Inflation!CL5,2026-09-11
+cpi.core,yoy_pct,2017-06,4.533,published,source.geostat_core_yoy,Core Inflation!CM5,2026-09-11
+cpi.core,yoy_pct,2017-07,4.2822,published,source.geostat_core_yoy,Core Inflation!CN5,2026-09-11
+cpi.core,yoy_pct,2017-08,4.3113,published,source.geostat_core_yoy,Core Inflation!CO5,2026-09-11
+cpi.core,yoy_pct,2017-09,4.4595,published,source.geostat_core_yoy,Core Inflation!CP5,2026-09-11
+cpi.core,yoy_pct,2017-10,4.4266,published,source.geostat_core_yoy,Core Inflation!CQ5,2026-09-11
+cpi.core,yoy_pct,2017-11,5.1094,published,source.geostat_core_yoy,Core Inflation!CR5,2026-09-11
+cpi.core,yoy_pct,2017-12,4.6548,published,source.geostat_core_yoy,Core Inflation!CS5,2026-09-11
+cpi.core,yoy_pct,2018-01,3.0391,published,source.geostat_core_yoy,Core Inflation!CT5,2026-09-11
+cpi.core,yoy_pct,2018-02,1.7444,published,source.geostat_core_yoy,Core Inflation!CU5,2026-09-11
+cpi.core,yoy_pct,2018-03,1.8104,published,source.geostat_core_yoy,Core Inflation!CV5,2026-09-11
+cpi.core,yoy_pct,2018-04,1.8222,published,source.geostat_core_yoy,Core Inflation!CW5,2026-09-11
+cpi.core,yoy_pct,2018-05,1.798,published,source.geostat_core_yoy,Core Inflation!CX5,2026-09-11
+cpi.core,yoy_pct,2018-06,1.6231,published,source.geostat_core_yoy,Core Inflation!CY5,2026-09-11
+cpi.core,yoy_pct,2018-07,1.3638,published,source.geostat_core_yoy,Core Inflation!CZ5,2026-09-11
+cpi.core,yoy_pct,2018-08,1.522,published,source.geostat_core_yoy,Core Inflation!DA5,2026-09-11
+cpi.core,yoy_pct,2018-09,1.7384,published,source.geostat_core_yoy,Core Inflation!DB5,2026-09-11
+cpi.core,yoy_pct,2018-10,1.7191,published,source.geostat_core_yoy,Core Inflation!DC5,2026-09-11
+cpi.core,yoy_pct,2018-11,1.2797,published,source.geostat_core_yoy,Core Inflation!DD5,2026-09-11
+cpi.core,yoy_pct,2018-12,0.8734,published,source.geostat_core_yoy,Core Inflation!DE5,2026-09-11
+cpi.core,yoy_pct,2019-01,1.6868,published,source.geostat_core_yoy,Core Inflation!DF5,2026-09-11
+cpi.core,yoy_pct,2019-02,1.3089,published,source.geostat_core_yoy,Core Inflation!DG5,2026-09-11
+cpi.core,yoy_pct,2019-03,3.4706,published,source.geostat_core_yoy,Core Inflation!DH5,2026-09-11
+cpi.core,yoy_pct,2019-04,3.628,published,source.geostat_core_yoy,Core Inflation!DI5,2026-09-11
+cpi.core,yoy_pct,2019-05,3.3806,published,source.geostat_core_yoy,Core Inflation!DJ5,2026-09-11
+cpi.core,yoy_pct,2019-06,3.6189,published,source.geostat_core_yoy,Core Inflation!DK5,2026-09-11
+cpi.core,yoy_pct,2019-07,3.4154,published,source.geostat_core_yoy,Core Inflation!DL5,2026-09-11
+cpi.core,yoy_pct,2019-08,3.8478,published,source.geostat_core_yoy,Core Inflation!DM5,2026-09-11
+cpi.core,yoy_pct,2019-09,4.6085,published,source.geostat_core_yoy,Core Inflation!DN5,2026-09-11
+cpi.core,yoy_pct,2019-10,4.6895,published,source.geostat_core_yoy,Core Inflation!DO5,2026-09-11
+cpi.core,yoy_pct,2019-11,4.938,published,source.geostat_core_yoy,Core Inflation!DP5,2026-09-11
+cpi.core,yoy_pct,2019-12,5.1804,published,source.geostat_core_yoy,Core Inflation!DQ5,2026-09-11
+cpi.core,yoy_pct,2020-01,4.3903,published,source.geostat_core_yoy,Core Inflation!DR5,2026-09-11
+cpi.core,yoy_pct,2020-02,4.6483,published,source.geostat_core_yoy,Core Inflation!DS5,2026-09-11
+cpi.core,yoy_pct,2020-03,3.6617,published,source.geostat_core_yoy,Core Inflation!DT5,2026-09-11
+cpi.core,yoy_pct,2020-04,4.5647,published,source.geostat_core_yoy,Core Inflation!DU5,2026-09-11
+cpi.core,yoy_pct,2020-05,5.8745,published,source.geostat_core_yoy,Core Inflation!DV5,2026-09-11
+cpi.core,yoy_pct,2020-06,6.6147,published,source.geostat_core_yoy,Core Inflation!DW5,2026-09-11
+cpi.core,yoy_pct,2020-07,6.1334,published,source.geostat_core_yoy,Core Inflation!DX5,2026-09-11
+cpi.core,yoy_pct,2020-08,5.6511,published,source.geostat_core_yoy,Core Inflation!DY5,2026-09-11
+cpi.core,yoy_pct,2020-09,5.1964,published,source.geostat_core_yoy,Core Inflation!DZ5,2026-09-11
+cpi.core,yoy_pct,2020-10,5.434,published,source.geostat_core_yoy,Core Inflation!EA5,2026-09-11
+cpi.core,yoy_pct,2020-11,5.0806,published,source.geostat_core_yoy,Core Inflation!EB5,2026-09-11
+cpi.core,yoy_pct,2020-12,5.31,published,source.geostat_core_yoy,Core Inflation!EC5,2026-09-11
+cpi.core,yoy_pct,2021-01,5.8459,published,source.geostat_core_yoy,Core Inflation!ED5,2026-09-11
+cpi.core,yoy_pct,2021-02,6.5853,published,source.geostat_core_yoy,Core Inflation!EE5,2026-09-11
+cpi.core,yoy_pct,2021-03,6.9081,published,source.geostat_core_yoy,Core Inflation!EF5,2026-09-11
+cpi.core,yoy_pct,2021-04,6.9337,published,source.geostat_core_yoy,Core Inflation!EG5,2026-09-11
+cpi.core,yoy_pct,2021-05,6.4504,published,source.geostat_core_yoy,Core Inflation!EH5,2026-09-11
+cpi.core,yoy_pct,2021-06,5.9048,published,source.geostat_core_yoy,Core Inflation!EI5,2026-09-11
+cpi.core,yoy_pct,2021-07,6.3664,published,source.geostat_core_yoy,Core Inflation!EJ5,2026-09-11
+cpi.core,yoy_pct,2021-08,6.7299,published,source.geostat_core_yoy,Core Inflation!EK5,2026-09-11
+cpi.core,yoy_pct,2021-09,6.3103,published,source.geostat_core_yoy,Core Inflation!EL5,2026-09-11
+cpi.core,yoy_pct,2021-10,6.259,published,source.geostat_core_yoy,Core Inflation!EM5,2026-09-11
+cpi.core,yoy_pct,2021-11,6.1414,published,source.geostat_core_yoy,Core Inflation!EN5,2026-09-11
+cpi.core,yoy_pct,2021-12,5.9403,published,source.geostat_core_yoy,Core Inflation!EO5,2026-09-11
+cpi.core,yoy_pct,2022-01,5.6165,published,source.geostat_core_yoy,Core Inflation!EP5,2026-09-11
+cpi.core,yoy_pct,2022-02,5.1385,published,source.geostat_core_yoy,Core Inflation!EQ5,2026-09-11
+cpi.core,yoy_pct,2022-03,5.2619,published,source.geostat_core_yoy,Core Inflation!ER5,2026-09-11
+cpi.core,yoy_pct,2022-04,4.9631,published,source.geostat_core_yoy,Core Inflation!ES5,2026-09-11
+cpi.core,yoy_pct,2022-05,5.9363,published,source.geostat_core_yoy,Core Inflation!ET5,2026-09-11
+cpi.core,yoy_pct,2022-06,5.8217,published,source.geostat_core_yoy,Core Inflation!EU5,2026-09-11
+cpi.core,yoy_pct,2022-07,7.0797,published,source.geostat_core_yoy,Core Inflation!EV5,2026-09-11
+cpi.core,yoy_pct,2022-08,7.0243,published,source.geostat_core_yoy,Core Inflation!EW5,2026-09-11
+cpi.core,yoy_pct,2022-09,7.4977,published,source.geostat_core_yoy,Core Inflation!EX5,2026-09-11
+cpi.core,yoy_pct,2022-10,7.2868,published,source.geostat_core_yoy,Core Inflation!EY5,2026-09-11
+cpi.core,yoy_pct,2022-11,7.0949,published,source.geostat_core_yoy,Core Inflation!EZ5,2026-09-11
+cpi.core,yoy_pct,2022-12,6.8641,published,source.geostat_core_yoy,Core Inflation!FA5,2026-09-11
+cpi.core,yoy_pct,2023-01,7.6517,published,source.geostat_core_yoy,Core Inflation!FB5,2026-09-11
+cpi.core,yoy_pct,2023-02,6.5141,published,source.geostat_core_yoy,Core Inflation!FC5,2026-09-11
+cpi.core,yoy_pct,2023-03,5.0424,published,source.geostat_core_yoy,Core Inflation!FD5,2026-09-11
+cpi.core,yoy_pct,2023-04,4.7418,published,source.geostat_core_yoy,Core Inflation!FE5,2026-09-11
+cpi.core,yoy_pct,2023-05,4.0395,published,source.geostat_core_yoy,Core Inflation!FF5,2026-09-11
+cpi.core,yoy_pct,2023-06,4.1193,published,source.geostat_core_yoy,Core Inflation!FG5,2026-09-11
+cpi.core,yoy_pct,2023-07,3.2288,published,source.geostat_core_yoy,Core Inflation!FH5,2026-09-11
+cpi.core,yoy_pct,2023-08,2.6833,published,source.geostat_core_yoy,Core Inflation!FI5,2026-09-11
+cpi.core,yoy_pct,2023-09,2.6434,published,source.geostat_core_yoy,Core Inflation!FJ5,2026-09-11
+cpi.core,yoy_pct,2023-10,2.4419,published,source.geostat_core_yoy,Core Inflation!FK5,2026-09-11
+cpi.core,yoy_pct,2023-11,2.1332,published,source.geostat_core_yoy,Core Inflation!FL5,2026-09-11
+cpi.core,yoy_pct,2023-12,2.0019,published,source.geostat_core_yoy,Core Inflation!FM5,2026-09-11
+cpi.core,yoy_pct,2024-01,1.4366,published,source.geostat_core_yoy,Core Inflation!FN5,2026-09-11
+cpi.core,yoy_pct,2024-02,2.5985,published,source.geostat_core_yoy,Core Inflation!FO5,2026-09-11
+cpi.core,yoy_pct,2024-03,2.3797,published,source.geostat_core_yoy,Core Inflation!FP5,2026-09-11
+cpi.core,yoy_pct,2024-04,2.3358,published,source.geostat_core_yoy,Core Inflation!FQ5,2026-09-11
+cpi.core,yoy_pct,2024-05,1.7154,published,source.geostat_core_yoy,Core Inflation!FR5,2026-09-11
+cpi.core,yoy_pct,2024-06,1.4452,published,source.geostat_core_yoy,Core Inflation!FS5,2026-09-11
+cpi.core,yoy_pct,2024-07,1.1722,published,source.geostat_core_yoy,Core Inflation!FT5,2026-09-11
+cpi.core,yoy_pct,2024-08,0.9485,published,source.geostat_core_yoy,Core Inflation!FU5,2026-09-11
+cpi.core,yoy_pct,2024-09,0.9192,published,source.geostat_core_yoy,Core Inflation!FV5,2026-09-11
+cpi.core,yoy_pct,2024-10,1.1852,published,source.geostat_core_yoy,Core Inflation!FW5,2026-09-11
+cpi.core,yoy_pct,2024-11,1.6233,published,source.geostat_core_yoy,Core Inflation!FX5,2026-09-11
+cpi.core,yoy_pct,2024-12,2.2742,published,source.geostat_core_yoy,Core Inflation!FY5,2026-09-11
+cpi.core,yoy_pct,2025-01,2.1408,published,source.geostat_core_yoy,Core Inflation!FZ5,2026-09-11
+cpi.core,yoy_pct,2025-02,2.0705,published,source.geostat_core_yoy,Core Inflation!GA5,2026-09-11
+cpi.core,yoy_pct,2025-03,2.436,published,source.geostat_core_yoy,Core Inflation!GB5,2026-09-11
+cpi.core,yoy_pct,2025-04,2.3276,published,source.geostat_core_yoy,Core Inflation!GC5,2026-09-11
+cpi.core,yoy_pct,2025-05,2.1146,published,source.geostat_core_yoy,Core Inflation!GD5,2026-09-11
+cpi.core,yoy_pct,2025-06,2.3575,published,source.geostat_core_yoy,Core Inflation!GE5,2026-09-11
+cpi.core,yoy_pct,2025-07,2.3601,published,source.geostat_core_yoy,Core Inflation!GF5,2026-09-11
+cpi.core,yoy_pct,2025-08,2.9886,published,source.geostat_core_yoy,Core Inflation!GG5,2026-09-11
+cpi.core,yoy_pct,2025-09,2.3622,published,source.geostat_core_yoy,Core Inflation!GH5,2026-09-11
+cpi.core,yoy_pct,2025-10,2.653,published,source.geostat_core_yoy,Core Inflation!GI5,2026-09-11
+cpi.core,yoy_pct,2025-11,2.5627,published,source.geostat_core_yoy,Core Inflation!GJ5,2026-09-11
+cpi.core,yoy_pct,2025-12,1.9545,published,source.geostat_core_yoy,Core Inflation!GK5,2026-09-11
+cpi.core,yoy_pct,2026-01,2.4104,published,source.geostat_core_yoy,Core Inflation!GL5,2026-09-11
+cpi.core,yoy_pct,2026-02,2.6952,published,source.geostat_core_yoy,Core Inflation!GM5,2026-09-11
+cpi.core,yoy_pct,2026-03,2.7719,published,source.geostat_core_yoy,Core Inflation!GN5,2026-09-11
+cpi.core,yoy_pct,2026-04,3.5299,published,source.geostat_core_yoy,Core Inflation!GO5,2026-09-11
+cpi.core,yoy_pct,2026-05,3.7531,published,source.geostat_core_yoy,Core Inflation!GP5,2026-09-11
+cpi.core,yoy_pct,2026-06,3.4788,published,source.geostat_core_yoy,Core Inflation!GQ5,2026-09-11
+cpi.core,yoy_pct,2026-07,3.7557,published,source.geostat_core_yoy,Core Inflation!GR5,2026-09-11
+cpi.core,yoy_pct,2026-08,3.799,published,source.geostat_core_yoy,Core Inflation!GS5,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-01,0.2273,published,source.geostat_core_mom,Core Inflation!B6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-02,-0.1306,published,source.geostat_core_mom,Core Inflation!C6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-03,-0.0668,published,source.geostat_core_mom,Core Inflation!D6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-04,-0.0023,published,source.geostat_core_mom,Core Inflation!E6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-05,-0.187,published,source.geostat_core_mom,Core Inflation!F6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-06,1.6234,published,source.geostat_core_mom,Core Inflation!G6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-07,-0.0525,published,source.geostat_core_mom,Core Inflation!H6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-08,0.4046,published,source.geostat_core_mom,Core Inflation!I6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-09,-0.329,published,source.geostat_core_mom,Core Inflation!J6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-10,0.505,published,source.geostat_core_mom,Core Inflation!K6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-11,-0.1176,published,source.geostat_core_mom,Core Inflation!L6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2010-12,0.1491,published,source.geostat_core_mom,Core Inflation!M6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-01,0.2516,published,source.geostat_core_mom,Core Inflation!N6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-02,-0.2167,published,source.geostat_core_mom,Core Inflation!O6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-03,-0.3509,published,source.geostat_core_mom,Core Inflation!P6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-04,-0.6684,published,source.geostat_core_mom,Core Inflation!Q6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-05,-0.1824,published,source.geostat_core_mom,Core Inflation!R6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-06,0.3187,published,source.geostat_core_mom,Core Inflation!S6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-07,1.7523,published,source.geostat_core_mom,Core Inflation!T6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-08,0.7471,published,source.geostat_core_mom,Core Inflation!U6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-09,0.5248,published,source.geostat_core_mom,Core Inflation!V6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-10,-0.0896,published,source.geostat_core_mom,Core Inflation!W6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-11,0.3663,published,source.geostat_core_mom,Core Inflation!X6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2011-12,0.0576,published,source.geostat_core_mom,Core Inflation!Y6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-01,0.0289,published,source.geostat_core_mom,Core Inflation!Z6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-02,0.1182,published,source.geostat_core_mom,Core Inflation!AA6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-03,-0.2203,published,source.geostat_core_mom,Core Inflation!AB6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-04,-0.1564,published,source.geostat_core_mom,Core Inflation!AC6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-05,-0.3001,published,source.geostat_core_mom,Core Inflation!AD6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-06,-0.213,published,source.geostat_core_mom,Core Inflation!AE6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-07,-0.2286,published,source.geostat_core_mom,Core Inflation!AF6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-08,-0.0516,published,source.geostat_core_mom,Core Inflation!AG6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-09,0.3578,published,source.geostat_core_mom,Core Inflation!AH6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-10,0.2365,published,source.geostat_core_mom,Core Inflation!AI6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-11,0.2568,published,source.geostat_core_mom,Core Inflation!AJ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2012-12,-0.0492,published,source.geostat_core_mom,Core Inflation!AK6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-01,-0.2347,published,source.geostat_core_mom,Core Inflation!AL6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-02,-0.2108,published,source.geostat_core_mom,Core Inflation!AM6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-03,0.16,published,source.geostat_core_mom,Core Inflation!AN6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-04,0.1837,published,source.geostat_core_mom,Core Inflation!AO6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-05,-0.0654,published,source.geostat_core_mom,Core Inflation!AP6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-06,0.059,published,source.geostat_core_mom,Core Inflation!AQ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-07,0.1423,published,source.geostat_core_mom,Core Inflation!AR6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-08,-0.175,published,source.geostat_core_mom,Core Inflation!AS6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-09,-1.3493,published,source.geostat_core_mom,Core Inflation!AT6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-10,1.7392,published,source.geostat_core_mom,Core Inflation!AU6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-11,0.1095,published,source.geostat_core_mom,Core Inflation!AV6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2013-12,-0.2746,published,source.geostat_core_mom,Core Inflation!AW6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-01,0.1965,published,source.geostat_core_mom,Core Inflation!AX6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-02,0.5573,published,source.geostat_core_mom,Core Inflation!AY6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-03,0.1836,published,source.geostat_core_mom,Core Inflation!AZ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-04,0.1237,published,source.geostat_core_mom,Core Inflation!BA6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-05,0.4479,published,source.geostat_core_mom,Core Inflation!BB6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-06,-0.0034,published,source.geostat_core_mom,Core Inflation!BC6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-07,-0.0488,published,source.geostat_core_mom,Core Inflation!BD6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-08,-0.5043,published,source.geostat_core_mom,Core Inflation!BE6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-09,0.6926,published,source.geostat_core_mom,Core Inflation!BF6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-10,0.3153,published,source.geostat_core_mom,Core Inflation!BG6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-11,-0.0417,published,source.geostat_core_mom,Core Inflation!BH6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2014-12,0.8457,published,source.geostat_core_mom,Core Inflation!BI6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-01,0.1328,published,source.geostat_core_mom,Core Inflation!BJ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-02,0.6954,published,source.geostat_core_mom,Core Inflation!BK6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-03,1.4165,published,source.geostat_core_mom,Core Inflation!BL6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-04,0.2534,published,source.geostat_core_mom,Core Inflation!BM6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-05,1.0005,published,source.geostat_core_mom,Core Inflation!BN6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-06,0.4303,published,source.geostat_core_mom,Core Inflation!BO6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-07,0.0211,published,source.geostat_core_mom,Core Inflation!BP6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-08,0.2775,published,source.geostat_core_mom,Core Inflation!BQ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-09,1.1994,published,source.geostat_core_mom,Core Inflation!BR6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-10,1.0986,published,source.geostat_core_mom,Core Inflation!BS6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-11,0.2568,published,source.geostat_core_mom,Core Inflation!BT6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2015-12,-0.2196,published,source.geostat_core_mom,Core Inflation!BU6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-01,0.3924,published,source.geostat_core_mom,Core Inflation!BV6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-02,0.4563,published,source.geostat_core_mom,Core Inflation!BW6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-03,-0.0476,published,source.geostat_core_mom,Core Inflation!BX6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-04,-0.7477,published,source.geostat_core_mom,Core Inflation!BY6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-05,-0.2377,published,source.geostat_core_mom,Core Inflation!BZ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-06,-0.5443,published,source.geostat_core_mom,Core Inflation!CA6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-07,0.2548,published,source.geostat_core_mom,Core Inflation!CB6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-08,-0.1464,published,source.geostat_core_mom,Core Inflation!CC6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-09,0.0466,published,source.geostat_core_mom,Core Inflation!CD6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-10,0.5214,published,source.geostat_core_mom,Core Inflation!CE6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-11,0.2997,published,source.geostat_core_mom,Core Inflation!CF6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2016-12,0.4515,published,source.geostat_core_mom,Core Inflation!CG6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-01,0.6598,published,source.geostat_core_mom,Core Inflation!CH6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-02,0.8887,published,source.geostat_core_mom,Core Inflation!CI6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-03,-0.201,published,source.geostat_core_mom,Core Inflation!CJ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-04,-0.1471,published,source.geostat_core_mom,Core Inflation!CK6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-05,0.1277,published,source.geostat_core_mom,Core Inflation!CL6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-06,0.0022,published,source.geostat_core_mom,Core Inflation!CM6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-07,-0.0183,published,source.geostat_core_mom,Core Inflation!CN6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-08,-0.1301,published,source.geostat_core_mom,Core Inflation!CO6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-09,0.1897,published,source.geostat_core_mom,Core Inflation!CP6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-10,0.4768,published,source.geostat_core_mom,Core Inflation!CQ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-11,0.8743,published,source.geostat_core_mom,Core Inflation!CR6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2017-12,0.1666,published,source.geostat_core_mom,Core Inflation!CS6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-01,-0.2232,published,source.geostat_core_mom,Core Inflation!CT6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-02,-0.0135,published,source.geostat_core_mom,Core Inflation!CU6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-03,-0.0961,published,source.geostat_core_mom,Core Inflation!CV6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-04,-0.1238,published,source.geostat_core_mom,Core Inflation!CW6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-05,0.1063,published,source.geostat_core_mom,Core Inflation!CX6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-06,-0.0458,published,source.geostat_core_mom,Core Inflation!CY6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-07,-0.2461,published,source.geostat_core_mom,Core Inflation!CZ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-08,0.0531,published,source.geostat_core_mom,Core Inflation!DA6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-09,0.4179,published,source.geostat_core_mom,Core Inflation!DB6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-10,0.358,published,source.geostat_core_mom,Core Inflation!DC6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-11,0.476,published,source.geostat_core_mom,Core Inflation!DD6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2018-12,-0.2439,published,source.geostat_core_mom,Core Inflation!DE6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-01,-0.015,published,source.geostat_core_mom,Core Inflation!DF6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-02,-0.4284,published,source.geostat_core_mom,Core Inflation!DG6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-03,0.9242,published,source.geostat_core_mom,Core Inflation!DH6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-04,0.0009,published,source.geostat_core_mom,Core Inflation!DI6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-05,-0.1584,published,source.geostat_core_mom,Core Inflation!DJ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-06,0.2829,published,source.geostat_core_mom,Core Inflation!DK6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-07,0.2629,published,source.geostat_core_mom,Core Inflation!DL6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-08,0.4979,published,source.geostat_core_mom,Core Inflation!DM6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-09,1.2118,published,source.geostat_core_mom,Core Inflation!DN6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-10,0.5552,published,source.geostat_core_mom,Core Inflation!DO6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-11,0.5549,published,source.geostat_core_mom,Core Inflation!DP6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2019-12,-0.0426,published,source.geostat_core_mom,Core Inflation!DQ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-01,-0.2716,published,source.geostat_core_mom,Core Inflation!DR6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-02,-0.0361,published,source.geostat_core_mom,Core Inflation!DS6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-03,0.3812,published,source.geostat_core_mom,Core Inflation!DT6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-04,0.7598,published,source.geostat_core_mom,Core Inflation!DU6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-05,1.1446,published,source.geostat_core_mom,Core Inflation!DV6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-06,1.0563,published,source.geostat_core_mom,Core Inflation!DW6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-07,-0.1858,published,source.geostat_core_mom,Core Inflation!DX6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-08,-0.0203,published,source.geostat_core_mom,Core Inflation!DY6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-09,0.7395,published,source.geostat_core_mom,Core Inflation!DZ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-10,0.7828,published,source.geostat_core_mom,Core Inflation!EA6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-11,0.4179,published,source.geostat_core_mom,Core Inflation!EB6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2020-12,0.0438,published,source.geostat_core_mom,Core Inflation!EC6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-01,0.4463,published,source.geostat_core_mom,Core Inflation!ED6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-02,0.6008,published,source.geostat_core_mom,Core Inflation!EE6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-03,0.6563,published,source.geostat_core_mom,Core Inflation!EF6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-04,0.9866,published,source.geostat_core_mom,Core Inflation!EG6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-05,0.687,published,source.geostat_core_mom,Core Inflation!EH6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-06,0.5001,published,source.geostat_core_mom,Core Inflation!EI6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-07,0.3344,published,source.geostat_core_mom,Core Inflation!EJ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-08,0.3716,published,source.geostat_core_mom,Core Inflation!EK6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-09,0.3301,published,source.geostat_core_mom,Core Inflation!EL6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-10,0.6653,published,source.geostat_core_mom,Core Inflation!EM6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-11,0.2799,published,source.geostat_core_mom,Core Inflation!EN6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2021-12,0.0138,published,source.geostat_core_mom,Core Inflation!EO6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-01,0.0036,published,source.geostat_core_mom,Core Inflation!EP6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-02,0.2056,published,source.geostat_core_mom,Core Inflation!EQ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-03,1.4866,published,source.geostat_core_mom,Core Inflation!ER6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-04,0.6641,published,source.geostat_core_mom,Core Inflation!ES6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-05,1.6474,published,source.geostat_core_mom,Core Inflation!ET6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-06,0.3793,published,source.geostat_core_mom,Core Inflation!EU6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-07,0.7825,published,source.geostat_core_mom,Core Inflation!EV6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-08,0.3122,published,source.geostat_core_mom,Core Inflation!EW6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-09,0.8253,published,source.geostat_core_mom,Core Inflation!EX6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-10,0.5247,published,source.geostat_core_mom,Core Inflation!EY6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-11,0.1039,published,source.geostat_core_mom,Core Inflation!EZ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2022-12,-0.3404,published,source.geostat_core_mom,Core Inflation!FA6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-01,0.909,published,source.geostat_core_mom,Core Inflation!FB6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-02,-0.8891,published,source.geostat_core_mom,Core Inflation!FC6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-03,-0.0023,published,source.geostat_core_mom,Core Inflation!FD6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-04,0.3825,published,source.geostat_core_mom,Core Inflation!FE6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-05,0.9044,published,source.geostat_core_mom,Core Inflation!FF6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-06,0.4451,published,source.geostat_core_mom,Core Inflation!FG6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-07,-0.1152,published,source.geostat_core_mom,Core Inflation!FH6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-08,-0.2436,published,source.geostat_core_mom,Core Inflation!FI6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-09,0.7742,published,source.geostat_core_mom,Core Inflation!FJ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-10,0.2128,published,source.geostat_core_mom,Core Inflation!FK6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-11,-0.1872,published,source.geostat_core_mom,Core Inflation!FL6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2023-12,-0.3386,published,source.geostat_core_mom,Core Inflation!FM6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-01,0.2975,published,source.geostat_core_mom,Core Inflation!FN6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-02,0.3011,published,source.geostat_core_mom,Core Inflation!FO6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-03,-0.1199,published,source.geostat_core_mom,Core Inflation!FP6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-04,0.3078,published,source.geostat_core_mom,Core Inflation!FQ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-05,0.3177,published,source.geostat_core_mom,Core Inflation!FR6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-06,0.1606,published,source.geostat_core_mom,Core Inflation!FS6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-07,-0.4116,published,source.geostat_core_mom,Core Inflation!FT6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-08,-0.4549,published,source.geostat_core_mom,Core Inflation!FU6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-09,0.7396,published,source.geostat_core_mom,Core Inflation!FV6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-10,0.564,published,source.geostat_core_mom,Core Inflation!FW6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-11,0.209,published,source.geostat_core_mom,Core Inflation!FX6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2024-12,0.3404,published,source.geostat_core_mom,Core Inflation!FY6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-01,0.0649,published,source.geostat_core_mom,Core Inflation!FZ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-02,0.2477,published,source.geostat_core_mom,Core Inflation!GA6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-03,0.2948,published,source.geostat_core_mom,Core Inflation!GB6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-04,0.1917,published,source.geostat_core_mom,Core Inflation!GC6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-05,0.0864,published,source.geostat_core_mom,Core Inflation!GD6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-06,0.3365,published,source.geostat_core_mom,Core Inflation!GE6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-07,-0.4421,published,source.geostat_core_mom,Core Inflation!GF6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-08,0.1755,published,source.geostat_core_mom,Core Inflation!GG6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-09,0.0574,published,source.geostat_core_mom,Core Inflation!GH6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-10,0.7786,published,source.geostat_core_mom,Core Inflation!GI6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-11,0.1189,published,source.geostat_core_mom,Core Inflation!GJ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2025-12,-0.31,published,source.geostat_core_mom,Core Inflation!GK6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2026-01,0.5769,published,source.geostat_core_mom,Core Inflation!GL6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2026-02,0.5096,published,source.geostat_core_mom,Core Inflation!GM6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2026-03,0.3138,published,source.geostat_core_mom,Core Inflation!GN6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2026-04,0.9917,published,source.geostat_core_mom,Core Inflation!GO6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2026-05,0.3033,published,source.geostat_core_mom,Core Inflation!GP6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2026-06,0.1114,published,source.geostat_core_mom,Core Inflation!GQ6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2026-07,-0.1317,published,source.geostat_core_mom,Core Inflation!GR6,2026-09-11
+cpi.core_ex_tobacco,mom_pct,2026-08,0.2063,published,source.geostat_core_mom,Core Inflation!GS6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-01,1.8143,published,source.geostat_core_yoy,Core Inflation!B6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-02,2.044,published,source.geostat_core_yoy,Core Inflation!C6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-03,1.7686,published,source.geostat_core_yoy,Core Inflation!D6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-04,2.1528,published,source.geostat_core_yoy,Core Inflation!E6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-05,3.3031,published,source.geostat_core_yoy,Core Inflation!F6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-06,5.3136,published,source.geostat_core_yoy,Core Inflation!G6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-07,5.6065,published,source.geostat_core_yoy,Core Inflation!H6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-08,6.175,published,source.geostat_core_yoy,Core Inflation!I6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-09,1.985,published,source.geostat_core_yoy,Core Inflation!J6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-10,2.0753,published,source.geostat_core_yoy,Core Inflation!K6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-11,1.6865,published,source.geostat_core_yoy,Core Inflation!L6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2010-12,2.0274,published,source.geostat_core_yoy,Core Inflation!M6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-01,2.0521,published,source.geostat_core_yoy,Core Inflation!N6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-02,1.9641,published,source.geostat_core_yoy,Core Inflation!O6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-03,1.6742,published,source.geostat_core_yoy,Core Inflation!P6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-04,0.9969,published,source.geostat_core_yoy,Core Inflation!Q6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-05,1.0016,published,source.geostat_core_yoy,Core Inflation!R6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-06,-0.2951,published,source.geostat_core_yoy,Core Inflation!S6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-07,1.5053,published,source.geostat_core_yoy,Core Inflation!T6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-08,1.8515,published,source.geostat_core_yoy,Core Inflation!U6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-09,2.7239,published,source.geostat_core_yoy,Core Inflation!V6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-10,2.1163,published,source.geostat_core_yoy,Core Inflation!W6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-11,2.611,published,source.geostat_core_yoy,Core Inflation!X6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2011-12,2.5173,published,source.geostat_core_yoy,Core Inflation!Y6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-01,2.2896,published,source.geostat_core_yoy,Core Inflation!Z6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-02,2.6329,published,source.geostat_core_yoy,Core Inflation!AA6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-03,2.7674,published,source.geostat_core_yoy,Core Inflation!AB6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-04,3.2971,published,source.geostat_core_yoy,Core Inflation!AC6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-05,3.1753,published,source.geostat_core_yoy,Core Inflation!AD6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-06,2.6285,published,source.geostat_core_yoy,Core Inflation!AE6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-07,0.6305,published,source.geostat_core_yoy,Core Inflation!AF6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-08,-0.1672,published,source.geostat_core_yoy,Core Inflation!AG6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-09,-0.3331,published,source.geostat_core_yoy,Core Inflation!AH6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-10,-0.0078,published,source.geostat_core_yoy,Core Inflation!AI6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-11,-0.1169,published,source.geostat_core_yoy,Core Inflation!AJ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2012-12,-0.2236,published,source.geostat_core_yoy,Core Inflation!AK6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-01,-0.4866,published,source.geostat_core_yoy,Core Inflation!AL6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-02,-0.8136,published,source.geostat_core_yoy,Core Inflation!AM6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-03,-0.4355,published,source.geostat_core_yoy,Core Inflation!AN6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-04,-0.0963,published,source.geostat_core_yoy,Core Inflation!AO6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-05,0.1388,published,source.geostat_core_yoy,Core Inflation!AP6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-06,0.4118,published,source.geostat_core_yoy,Core Inflation!AQ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-07,0.785,published,source.geostat_core_yoy,Core Inflation!AR6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-08,0.6606,published,source.geostat_core_yoy,Core Inflation!AS6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-09,-1.0516,published,source.geostat_core_yoy,Core Inflation!AT6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-10,0.4317,published,source.geostat_core_yoy,Core Inflation!AU6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-11,0.2843,published,source.geostat_core_yoy,Core Inflation!AV6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2013-12,0.0582,published,source.geostat_core_yoy,Core Inflation!AW6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-01,0.4907,published,source.geostat_core_yoy,Core Inflation!AX6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-02,1.2643,published,source.geostat_core_yoy,Core Inflation!AY6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-03,1.2881,published,source.geostat_core_yoy,Core Inflation!AZ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-04,1.2274,published,source.geostat_core_yoy,Core Inflation!BA6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-05,1.7474,published,source.geostat_core_yoy,Core Inflation!BB6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-06,1.6839,published,source.geostat_core_yoy,Core Inflation!BC6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-07,1.4899,published,source.geostat_core_yoy,Core Inflation!BD6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-08,1.1552,published,source.geostat_core_yoy,Core Inflation!BE6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-09,3.2488,published,source.geostat_core_yoy,Core Inflation!BF6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-10,1.8038,published,source.geostat_core_yoy,Core Inflation!BG6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-11,1.65,published,source.geostat_core_yoy,Core Inflation!BH6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2014-12,2.7919,published,source.geostat_core_yoy,Core Inflation!BI6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-01,2.7265,published,source.geostat_core_yoy,Core Inflation!BJ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-02,2.8675,published,source.geostat_core_yoy,Core Inflation!BK6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-03,4.1335,published,source.geostat_core_yoy,Core Inflation!BL6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-04,4.2684,published,source.geostat_core_yoy,Core Inflation!BM6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-05,4.842,published,source.geostat_core_yoy,Core Inflation!BN6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-06,5.2967,published,source.geostat_core_yoy,Core Inflation!BO6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-07,5.3703,published,source.geostat_core_yoy,Core Inflation!BP6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-08,6.1983,published,source.geostat_core_yoy,Core Inflation!BQ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-09,6.7329,published,source.geostat_core_yoy,Core Inflation!BR6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-10,7.5663,published,source.geostat_core_yoy,Core Inflation!BS6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-11,7.8875,published,source.geostat_core_yoy,Core Inflation!BT6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2015-12,6.7478,published,source.geostat_core_yoy,Core Inflation!BU6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-01,7.0246,published,source.geostat_core_yoy,Core Inflation!BV6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-02,6.7705,published,source.geostat_core_yoy,Core Inflation!BW6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-03,5.2291,published,source.geostat_core_yoy,Core Inflation!BX6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-04,4.1783,published,source.geostat_core_yoy,Core Inflation!BY6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-05,2.9011,published,source.geostat_core_yoy,Core Inflation!BZ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-06,1.9025,published,source.geostat_core_yoy,Core Inflation!CA6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-07,2.1406,published,source.geostat_core_yoy,Core Inflation!CB6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-08,1.7089,published,source.geostat_core_yoy,Core Inflation!CC6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-09,0.5503,published,source.geostat_core_yoy,Core Inflation!CD6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-10,-0.0237,published,source.geostat_core_yoy,Core Inflation!CE6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-11,0.0191,published,source.geostat_core_yoy,Core Inflation!CF6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2016-12,0.6918,published,source.geostat_core_yoy,Core Inflation!CG6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-01,0.9599,published,source.geostat_core_yoy,Core Inflation!CH6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-02,1.3945,published,source.geostat_core_yoy,Core Inflation!CI6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-03,1.2389,published,source.geostat_core_yoy,Core Inflation!CJ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-04,1.8515,published,source.geostat_core_yoy,Core Inflation!CK6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-05,2.2246,published,source.geostat_core_yoy,Core Inflation!CL6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-06,2.7863,published,source.geostat_core_yoy,Core Inflation!CM6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-07,2.5062,published,source.geostat_core_yoy,Core Inflation!CN6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-08,2.523,published,source.geostat_core_yoy,Core Inflation!CO6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-09,2.6697,published,source.geostat_core_yoy,Core Inflation!CP6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-10,2.6241,published,source.geostat_core_yoy,Core Inflation!CQ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-11,3.2119,published,source.geostat_core_yoy,Core Inflation!CR6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2017-12,2.9192,published,source.geostat_core_yoy,Core Inflation!CS6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-01,2.0164,published,source.geostat_core_yoy,Core Inflation!CT6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-02,1.1041,published,source.geostat_core_yoy,Core Inflation!CU6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-03,1.2104,published,source.geostat_core_yoy,Core Inflation!CV6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-04,1.234,published,source.geostat_core_yoy,Core Inflation!CW6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-05,1.2123,published,source.geostat_core_yoy,Core Inflation!CX6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-06,1.1637,published,source.geostat_core_yoy,Core Inflation!CY6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-07,0.9332,published,source.geostat_core_yoy,Core Inflation!CZ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-08,1.1183,published,source.geostat_core_yoy,Core Inflation!DA6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-09,1.3486,published,source.geostat_core_yoy,Core Inflation!DB6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-10,1.2288,published,source.geostat_core_yoy,Core Inflation!DC6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-11,0.8292,published,source.geostat_core_yoy,Core Inflation!DD6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2018-12,0.416,published,source.geostat_core_yoy,Core Inflation!DE6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-01,0.6255,published,source.geostat_core_yoy,Core Inflation!DF6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-02,0.208,published,source.geostat_core_yoy,Core Inflation!DG6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-03,1.2314,published,source.geostat_core_yoy,Core Inflation!DH6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-04,1.3578,published,source.geostat_core_yoy,Core Inflation!DI6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-05,1.0898,published,source.geostat_core_yoy,Core Inflation!DJ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-06,1.4223,published,source.geostat_core_yoy,Core Inflation!DK6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-07,1.9398,published,source.geostat_core_yoy,Core Inflation!DL6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-08,2.393,published,source.geostat_core_yoy,Core Inflation!DM6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-09,3.2025,published,source.geostat_core_yoy,Core Inflation!DN6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-10,3.4053,published,source.geostat_core_yoy,Core Inflation!DO6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-11,3.4865,published,source.geostat_core_yoy,Core Inflation!DP6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2019-12,3.6953,published,source.geostat_core_yoy,Core Inflation!DQ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-01,3.4291,published,source.geostat_core_yoy,Core Inflation!DR6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-02,3.8366,published,source.geostat_core_yoy,Core Inflation!DS6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-03,3.278,published,source.geostat_core_yoy,Core Inflation!DT6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-04,4.0618,published,source.geostat_core_yoy,Core Inflation!DU6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-05,5.4198,published,source.geostat_core_yoy,Core Inflation!DV6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-06,6.2328,published,source.geostat_core_yoy,Core Inflation!DW6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-07,5.7574,published,source.geostat_core_yoy,Core Inflation!DX6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-08,5.2121,published,source.geostat_core_yoy,Core Inflation!DY6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-09,4.7212,published,source.geostat_core_yoy,Core Inflation!DZ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-10,4.9581,published,source.geostat_core_yoy,Core Inflation!EA6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-11,4.8151,published,source.geostat_core_yoy,Core Inflation!EB6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2020-12,4.9056,published,source.geostat_core_yoy,Core Inflation!EC6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-01,5.6608,published,source.geostat_core_yoy,Core Inflation!ED6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-02,6.334,published,source.geostat_core_yoy,Core Inflation!EE6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-03,6.6255,published,source.geostat_core_yoy,Core Inflation!EF6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-04,6.8655,published,source.geostat_core_yoy,Core Inflation!EG6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-05,6.382,published,source.geostat_core_yoy,Core Inflation!EH6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-06,5.7965,published,source.geostat_core_yoy,Core Inflation!EI6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-07,6.3479,published,source.geostat_core_yoy,Core Inflation!EJ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-08,6.7648,published,source.geostat_core_yoy,Core Inflation!EK6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-09,6.3309,published,source.geostat_core_yoy,Core Inflation!EL6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-10,6.2069,published,source.geostat_core_yoy,Core Inflation!EM6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-11,6.0611,published,source.geostat_core_yoy,Core Inflation!EN6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2021-12,6.0293,published,source.geostat_core_yoy,Core Inflation!EO6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-01,5.562,published,source.geostat_core_yoy,Core Inflation!EP6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-02,5.1473,published,source.geostat_core_yoy,Core Inflation!EQ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-03,6.0146,published,source.geostat_core_yoy,Core Inflation!ER6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-04,5.6761,published,source.geostat_core_yoy,Core Inflation!ES6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-05,6.684,published,source.geostat_core_yoy,Core Inflation!ET6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-06,6.5557,published,source.geostat_core_yoy,Core Inflation!EU6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-07,7.0317,published,source.geostat_core_yoy,Core Inflation!EV6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-08,6.9683,published,source.geostat_core_yoy,Core Inflation!EW6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-09,7.4963,published,source.geostat_core_yoy,Core Inflation!EX6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-10,7.3462,published,source.geostat_core_yoy,Core Inflation!EY6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-11,7.1578,published,source.geostat_core_yoy,Core Inflation!EZ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2022-12,6.7782,published,source.geostat_core_yoy,Core Inflation!FA6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-01,7.7449,published,source.geostat_core_yoy,Core Inflation!FB6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-02,6.5678,published,source.geostat_core_yoy,Core Inflation!FC6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-03,5.0044,published,source.geostat_core_yoy,Core Inflation!FD6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-04,4.7107,published,source.geostat_core_yoy,Core Inflation!FE6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-05,3.9453,published,source.geostat_core_yoy,Core Inflation!FF6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-06,4.0135,published,source.geostat_core_yoy,Core Inflation!FG6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-07,3.087,published,source.geostat_core_yoy,Core Inflation!FH6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-08,2.5158,published,source.geostat_core_yoy,Core Inflation!FI6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-09,2.4638,published,source.geostat_core_yoy,Core Inflation!FJ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-10,2.1459,published,source.geostat_core_yoy,Core Inflation!FK6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-11,1.8488,published,source.geostat_core_yoy,Core Inflation!FL6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2023-12,1.8506,published,source.geostat_core_yoy,Core Inflation!FM6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-01,1.2334,published,source.geostat_core_yoy,Core Inflation!FN6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-02,2.4491,published,source.geostat_core_yoy,Core Inflation!FO6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-03,2.3286,published,source.geostat_core_yoy,Core Inflation!FP6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-04,2.2524,published,source.geostat_core_yoy,Core Inflation!FQ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-05,1.6579,published,source.geostat_core_yoy,Core Inflation!FR6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-06,1.37,published,source.geostat_core_yoy,Core Inflation!FS6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-07,1.0692,published,source.geostat_core_yoy,Core Inflation!FT6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-08,0.8551,published,source.geostat_core_yoy,Core Inflation!FU6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-09,0.8206,published,source.geostat_core_yoy,Core Inflation!FV6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-10,1.1739,published,source.geostat_core_yoy,Core Inflation!FW6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-11,1.5755,published,source.geostat_core_yoy,Core Inflation!FX6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2024-12,2.2675,published,source.geostat_core_yoy,Core Inflation!FY6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-01,2.0304,published,source.geostat_core_yoy,Core Inflation!FZ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-02,1.9761,published,source.geostat_core_yoy,Core Inflation!GA6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-03,2.3995,published,source.geostat_core_yoy,Core Inflation!GB6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-04,2.281,published,source.geostat_core_yoy,Core Inflation!GC6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-05,2.0451,published,source.geostat_core_yoy,Core Inflation!GD6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-06,2.2243,published,source.geostat_core_yoy,Core Inflation!GE6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-07,2.193,published,source.geostat_core_yoy,Core Inflation!GF6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-08,2.8402,published,source.geostat_core_yoy,Core Inflation!GG6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-09,2.1437,published,source.geostat_core_yoy,Core Inflation!GH6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-10,2.3617,published,source.geostat_core_yoy,Core Inflation!GI6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-11,2.2697,published,source.geostat_core_yoy,Core Inflation!GJ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2025-12,1.6068,published,source.geostat_core_yoy,Core Inflation!GK6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2026-01,2.1267,published,source.geostat_core_yoy,Core Inflation!GL6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2026-02,2.3936,published,source.geostat_core_yoy,Core Inflation!GM6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2026-03,2.4129,published,source.geostat_core_yoy,Core Inflation!GN6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2026-04,3.2306,published,source.geostat_core_yoy,Core Inflation!GO6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2026-05,3.4544,published,source.geostat_core_yoy,Core Inflation!GP6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2026-06,3.2223,published,source.geostat_core_yoy,Core Inflation!GQ6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2026-07,3.5442,published,source.geostat_core_yoy,Core Inflation!GR6,2026-09-11
+cpi.core_ex_tobacco,yoy_pct,2026-08,3.576,published,source.geostat_core_yoy,Core Inflation!GS6,2026-09-11
+cpi.headline,avg12_pct,2002-01,4.6715,published,source.geostat_cpi_avg12,Georgia!B4,2026-09-11
+cpi.headline,avg12_pct,2002-02,4.6376,published,source.geostat_cpi_avg12,Georgia!C4,2026-09-11
+cpi.headline,avg12_pct,2002-03,4.625,published,source.geostat_cpi_avg12,Georgia!D4,2026-09-11
+cpi.headline,avg12_pct,2002-04,4.5812,published,source.geostat_cpi_avg12,Georgia!E4,2026-09-11
+cpi.headline,avg12_pct,2002-05,4.7079,published,source.geostat_cpi_avg12,Georgia!F4,2026-09-11
+cpi.headline,avg12_pct,2002-06,4.6607,published,source.geostat_cpi_avg12,Georgia!G4,2026-09-11
+cpi.headline,avg12_pct,2002-07,4.6154,published,source.geostat_cpi_avg12,Georgia!H4,2026-09-11
+cpi.headline,avg12_pct,2002-08,4.6164,published,source.geostat_cpi_avg12,Georgia!I4,2026-09-11
+cpi.headline,avg12_pct,2002-09,4.8961,published,source.geostat_cpi_avg12,Georgia!J4,2026-09-11
+cpi.headline,avg12_pct,2002-10,5.2012,published,source.geostat_cpi_avg12,Georgia!K4,2026-09-11
+cpi.headline,avg12_pct,2002-11,5.413,published,source.geostat_cpi_avg12,Georgia!L4,2026-09-11
+cpi.headline,avg12_pct,2002-12,5.5794,published,source.geostat_cpi_avg12,Georgia!M4,2026-09-11
+cpi.headline,avg12_pct,2003-01,5.6432,published,source.geostat_cpi_avg12,Georgia!B5,2026-09-11
+cpi.headline,avg12_pct,2003-02,5.5032,published,source.geostat_cpi_avg12,Georgia!C5,2026-09-11
+cpi.headline,avg12_pct,2003-03,5.3031,published,source.geostat_cpi_avg12,Georgia!D5,2026-09-11
+cpi.headline,avg12_pct,2003-04,4.9192,published,source.geostat_cpi_avg12,Georgia!E5,2026-09-11
+cpi.headline,avg12_pct,2003-05,4.4682,published,source.geostat_cpi_avg12,Georgia!F5,2026-09-11
+cpi.headline,avg12_pct,2003-06,4.4122,published,source.geostat_cpi_avg12,Georgia!G5,2026-09-11
+cpi.headline,avg12_pct,2003-07,4.409,published,source.geostat_cpi_avg12,Georgia!H5,2026-09-11
+cpi.headline,avg12_pct,2003-08,4.4405,published,source.geostat_cpi_avg12,Georgia!I5,2026-09-11
+cpi.headline,avg12_pct,2003-09,4.4065,published,source.geostat_cpi_avg12,Georgia!J5,2026-09-11
+cpi.headline,avg12_pct,2003-10,4.3529,published,source.geostat_cpi_avg12,Georgia!K5,2026-09-11
+cpi.headline,avg12_pct,2003-11,4.6518,published,source.geostat_cpi_avg12,Georgia!L5,2026-09-11
+cpi.headline,avg12_pct,2003-12,4.7852,published,source.geostat_cpi_avg12,Georgia!M5,2026-09-11
+cpi.headline,avg12_pct,2004-01,4.7618,published,source.geostat_cpi_avg12,Georgia!B6,2026-09-11
+cpi.headline,avg12_pct,2004-02,4.9695,published,source.geostat_cpi_avg12,Georgia!C6,2026-09-11
+cpi.headline,avg12_pct,2004-03,5.2103,published,source.geostat_cpi_avg12,Georgia!D6,2026-09-11
+cpi.headline,avg12_pct,2004-04,5.5,published,source.geostat_cpi_avg12,Georgia!E6,2026-09-11
+cpi.headline,avg12_pct,2004-05,5.7562,published,source.geostat_cpi_avg12,Georgia!F6,2026-09-11
+cpi.headline,avg12_pct,2004-06,5.652,published,source.geostat_cpi_avg12,Georgia!G6,2026-09-11
+cpi.headline,avg12_pct,2004-07,5.6851,published,source.geostat_cpi_avg12,Georgia!H6,2026-09-11
+cpi.headline,avg12_pct,2004-08,5.6777,published,source.geostat_cpi_avg12,Georgia!I6,2026-09-11
+cpi.headline,avg12_pct,2004-09,5.7432,published,source.geostat_cpi_avg12,Georgia!J6,2026-09-11
+cpi.headline,avg12_pct,2004-10,5.9888,published,source.geostat_cpi_avg12,Georgia!K6,2026-09-11
+cpi.headline,avg12_pct,2004-11,5.6027,published,source.geostat_cpi_avg12,Georgia!L6,2026-09-11
+cpi.headline,avg12_pct,2004-12,5.6564,published,source.geostat_cpi_avg12,Georgia!M6,2026-09-11
+cpi.headline,avg12_pct,2005-01,6.0083,published,source.geostat_cpi_avg12,Georgia!B7,2026-09-11
+cpi.headline,avg12_pct,2005-02,6.2642,published,source.geostat_cpi_avg12,Georgia!C7,2026-09-11
+cpi.headline,avg12_pct,2005-03,6.5584,published,source.geostat_cpi_avg12,Georgia!D7,2026-09-11
+cpi.headline,avg12_pct,2005-04,6.9644,published,source.geostat_cpi_avg12,Georgia!E7,2026-09-11
+cpi.headline,avg12_pct,2005-05,7.2571,published,source.geostat_cpi_avg12,Georgia!F7,2026-09-11
+cpi.headline,avg12_pct,2005-06,7.6987,published,source.geostat_cpi_avg12,Georgia!G7,2026-09-11
+cpi.headline,avg12_pct,2005-07,7.7361,published,source.geostat_cpi_avg12,Georgia!H7,2026-09-11
+cpi.headline,avg12_pct,2005-08,7.9094,published,source.geostat_cpi_avg12,Georgia!I7,2026-09-11
+cpi.headline,avg12_pct,2005-09,8.0404,published,source.geostat_cpi_avg12,Georgia!J7,2026-09-11
+cpi.headline,avg12_pct,2005-10,8.0414,published,source.geostat_cpi_avg12,Georgia!K7,2026-09-11
+cpi.headline,avg12_pct,2005-11,8.3676,published,source.geostat_cpi_avg12,Georgia!L7,2026-09-11
+cpi.headline,avg12_pct,2005-12,8.2471,published,source.geostat_cpi_avg12,Georgia!M7,2026-09-11
+cpi.headline,avg12_pct,2006-01,7.8945,published,source.geostat_cpi_avg12,Georgia!B8,2026-09-11
+cpi.headline,avg12_pct,2006-02,7.5431,published,source.geostat_cpi_avg12,Georgia!C8,2026-09-11
+cpi.headline,avg12_pct,2006-03,7.1065,published,source.geostat_cpi_avg12,Georgia!D8,2026-09-11
+cpi.headline,avg12_pct,2006-04,6.7502,published,source.geostat_cpi_avg12,Georgia!E8,2026-09-11
+cpi.headline,avg12_pct,2006-05,6.8631,published,source.geostat_cpi_avg12,Georgia!F8,2026-09-11
+cpi.headline,avg12_pct,2006-06,7.081,published,source.geostat_cpi_avg12,Georgia!G8,2026-09-11
+cpi.headline,avg12_pct,2006-07,7.7808,published,source.geostat_cpi_avg12,Georgia!H8,2026-09-11
+cpi.headline,avg12_pct,2006-08,8.2918,published,source.geostat_cpi_avg12,Georgia!I8,2026-09-11
+cpi.headline,avg12_pct,2006-09,8.5879,published,source.geostat_cpi_avg12,Georgia!J8,2026-09-11
+cpi.headline,avg12_pct,2006-10,8.7929,published,source.geostat_cpi_avg12,Georgia!K8,2026-09-11
+cpi.headline,avg12_pct,2006-11,8.9499,published,source.geostat_cpi_avg12,Georgia!L8,2026-09-11
+cpi.headline,avg12_pct,2006-12,9.161,published,source.geostat_cpi_avg12,Georgia!M8,2026-09-11
+cpi.headline,avg12_pct,2007-01,9.5968,published,source.geostat_cpi_avg12,Georgia!B9,2026-09-11
+cpi.headline,avg12_pct,2007-02,10.0946,published,source.geostat_cpi_avg12,Georgia!C9,2026-09-11
+cpi.headline,avg12_pct,2007-03,10.5221,published,source.geostat_cpi_avg12,Georgia!D9,2026-09-11
+cpi.headline,avg12_pct,2007-04,10.6851,published,source.geostat_cpi_avg12,Georgia!E9,2026-09-11
+cpi.headline,avg12_pct,2007-05,10.4368,published,source.geostat_cpi_avg12,Georgia!F9,2026-09-11
+cpi.headline,avg12_pct,2007-06,10.0787,published,source.geostat_cpi_avg12,Georgia!G9,2026-09-11
+cpi.headline,avg12_pct,2007-07,9.4286,published,source.geostat_cpi_avg12,Georgia!H9,2026-09-11
+cpi.headline,avg12_pct,2007-08,8.9741,published,source.geostat_cpi_avg12,Georgia!I9,2026-09-11
+cpi.headline,avg12_pct,2007-09,8.7985,published,source.geostat_cpi_avg12,Georgia!J9,2026-09-11
+cpi.headline,avg12_pct,2007-10,8.8949,published,source.geostat_cpi_avg12,Georgia!K9,2026-09-11
+cpi.headline,avg12_pct,2007-11,9.0573,published,source.geostat_cpi_avg12,Georgia!L9,2026-09-11
+cpi.headline,avg12_pct,2007-12,9.2449,published,source.geostat_cpi_avg12,Georgia!M9,2026-09-11
+cpi.headline,avg12_pct,2008-01,9.2785,published,source.geostat_cpi_avg12,Georgia!B10,2026-09-11
+cpi.headline,avg12_pct,2008-02,9.2835,published,source.geostat_cpi_avg12,Georgia!C10,2026-09-11
+cpi.headline,avg12_pct,2008-03,9.5027,published,source.geostat_cpi_avg12,Georgia!D10,2026-09-11
+cpi.headline,avg12_pct,2008-04,9.8461,published,source.geostat_cpi_avg12,Georgia!E10,2026-09-11
+cpi.headline,avg12_pct,2008-05,10.174,published,source.geostat_cpi_avg12,Georgia!F10,2026-09-11
+cpi.headline,avg12_pct,2008-06,10.5076,published,source.geostat_cpi_avg12,Georgia!G10,2026-09-11
+cpi.headline,avg12_pct,2008-07,10.7638,published,source.geostat_cpi_avg12,Georgia!H10,2026-09-11
+cpi.headline,avg12_pct,2008-08,11.1824,published,source.geostat_cpi_avg12,Georgia!I10,2026-09-11
+cpi.headline,avg12_pct,2008-09,11.3076,published,source.geostat_cpi_avg12,Georgia!J10,2026-09-11
+cpi.headline,avg12_pct,2008-10,10.9383,published,source.geostat_cpi_avg12,Georgia!K10,2026-09-11
+cpi.headline,avg12_pct,2008-11,10.4708,published,source.geostat_cpi_avg12,Georgia!L10,2026-09-11
+cpi.headline,avg12_pct,2008-12,9.9995,published,source.geostat_cpi_avg12,Georgia!M10,2026-09-11
+cpi.headline,avg12_pct,2009-01,9.4475,published,source.geostat_cpi_avg12,Georgia!B11,2026-09-11
+cpi.headline,avg12_pct,2009-02,8.6741,published,source.geostat_cpi_avg12,Georgia!C11,2026-09-11
+cpi.headline,avg12_pct,2009-03,7.7653,published,source.geostat_cpi_avg12,Georgia!D11,2026-09-11
+cpi.headline,avg12_pct,2009-04,6.8921,published,source.geostat_cpi_avg12,Georgia!E11,2026-09-11
+cpi.headline,avg12_pct,2009-05,6.1429,published,source.geostat_cpi_avg12,Georgia!F11,2026-09-11
+cpi.headline,avg12_pct,2009-06,5.4091,published,source.geostat_cpi_avg12,Georgia!G11,2026-09-11
+cpi.headline,avg12_pct,2009-07,4.6212,published,source.geostat_cpi_avg12,Georgia!H11,2026-09-11
+cpi.headline,avg12_pct,2009-08,3.3181,published,source.geostat_cpi_avg12,Georgia!I11,2026-09-11
+cpi.headline,avg12_pct,2009-09,2.5077,published,source.geostat_cpi_avg12,Georgia!J11,2026-09-11
+cpi.headline,avg12_pct,2009-10,2.2095,published,source.geostat_cpi_avg12,Georgia!K11,2026-09-11
+cpi.headline,avg12_pct,2009-11,1.927,published,source.geostat_cpi_avg12,Georgia!L11,2026-09-11
+cpi.headline,avg12_pct,2009-12,1.7275,published,source.geostat_cpi_avg12,Georgia!M11,2026-09-11
+cpi.headline,avg12_pct,2010-01,1.5888,published,source.geostat_cpi_avg12,Georgia!B12,2026-09-11
+cpi.headline,avg12_pct,2010-02,1.8859,published,source.geostat_cpi_avg12,Georgia!C12,2026-09-11
+cpi.headline,avg12_pct,2010-03,2.2423,published,source.geostat_cpi_avg12,Georgia!D12,2026-09-11
+cpi.headline,avg12_pct,2010-04,2.5612,published,source.geostat_cpi_avg12,Georgia!E12,2026-09-11
+cpi.headline,avg12_pct,2010-05,2.7093,published,source.geostat_cpi_avg12,Georgia!F12,2026-09-11
+cpi.headline,avg12_pct,2010-06,2.8216,published,source.geostat_cpi_avg12,Georgia!G12,2026-09-11
+cpi.headline,avg12_pct,2010-07,3.3831,published,source.geostat_cpi_avg12,Georgia!H12,2026-09-11
+cpi.headline,avg12_pct,2010-08,4.4296,published,source.geostat_cpi_avg12,Georgia!I12,2026-09-11
+cpi.headline,avg12_pct,2010-09,5.2126,published,source.geostat_cpi_avg12,Georgia!J12,2026-09-11
+cpi.headline,avg12_pct,2010-10,5.7522,published,source.geostat_cpi_avg12,Georgia!K12,2026-09-11
+cpi.headline,avg12_pct,2010-11,6.4158,published,source.geostat_cpi_avg12,Georgia!L12,2026-09-11
+cpi.headline,avg12_pct,2010-12,7.1102,published,source.geostat_cpi_avg12,Georgia!M12,2026-09-11
+cpi.headline,avg12_pct,2011-01,7.922,published,source.geostat_cpi_avg12,Georgia!B13,2026-09-11
+cpi.headline,avg12_pct,2011-02,8.6154,published,source.geostat_cpi_avg12,Georgia!C13,2026-09-11
+cpi.headline,avg12_pct,2011-03,9.2985,published,source.geostat_cpi_avg12,Georgia!D13,2026-09-11
+cpi.headline,avg12_pct,2011-04,9.9602,published,source.geostat_cpi_avg12,Georgia!E13,2026-09-11
+cpi.headline,avg12_pct,2011-05,10.8228,published,source.geostat_cpi_avg12,Georgia!F13,2026-09-11
+cpi.headline,avg12_pct,2011-06,11.3401,published,source.geostat_cpi_avg12,Georgia!G13,2026-09-11
+cpi.headline,avg12_pct,2011-07,11.4386,published,source.geostat_cpi_avg12,Georgia!H13,2026-09-11
+cpi.headline,avg12_pct,2011-08,11.2227,published,source.geostat_cpi_avg12,Georgia!I13,2026-09-11
+cpi.headline,avg12_pct,2011-09,10.7537,published,source.geostat_cpi_avg12,Georgia!J13,2026-09-11
+cpi.headline,avg12_pct,2011-10,10.1015,published,source.geostat_cpi_avg12,Georgia!K13,2026-09-11
+cpi.headline,avg12_pct,2011-11,9.3394,published,source.geostat_cpi_avg12,Georgia!L13,2026-09-11
+cpi.headline,avg12_pct,2011-12,8.5429,published,source.geostat_cpi_avg12,Georgia!M13,2026-09-11
+cpi.headline,avg12_pct,2012-01,7.5264,published,source.geostat_cpi_avg12,Georgia!B14,2026-09-11
+cpi.headline,avg12_pct,2012-02,6.1588,published,source.geostat_cpi_avg12,Georgia!C14,2026-09-11
+cpi.headline,avg12_pct,2012-03,4.7934,published,source.geostat_cpi_avg12,Georgia!D14,2026-09-11
+cpi.headline,avg12_pct,2012-04,3.4999,published,source.geostat_cpi_avg12,Georgia!E14,2026-09-11
+cpi.headline,avg12_pct,2012-05,2.0656,published,source.geostat_cpi_avg12,Georgia!F14,2026-09-11
+cpi.headline,avg12_pct,2012-06,1.2694,published,source.geostat_cpi_avg12,Georgia!G14,2026-09-11
+cpi.headline,avg12_pct,2012-07,0.6651,published,source.geostat_cpi_avg12,Georgia!H14,2026-09-11
+cpi.headline,avg12_pct,2012-08,0.0814,published,source.geostat_cpi_avg12,Georgia!I14,2026-09-11
+cpi.headline,avg12_pct,2012-09,-0.2894,published,source.geostat_cpi_avg12,Georgia!J14,2026-09-11
+cpi.headline,avg12_pct,2012-10,-0.469,published,source.geostat_cpi_avg12,Georgia!K14,2026-09-11
+cpi.headline,avg12_pct,2012-11,-0.6643,published,source.geostat_cpi_avg12,Georgia!L14,2026-09-11
+cpi.headline,avg12_pct,2012-12,-0.9437,published,source.geostat_cpi_avg12,Georgia!M14,2026-09-11
+cpi.headline,avg12_pct,2013-01,-1.1167,published,source.geostat_cpi_avg12,Georgia!B15,2026-09-11
+cpi.headline,avg12_pct,2013-02,-1.1203,published,source.geostat_cpi_avg12,Georgia!C15,2026-09-11
+cpi.headline,avg12_pct,2013-03,-1.1063,published,source.geostat_cpi_avg12,Georgia!D15,2026-09-11
+cpi.headline,avg12_pct,2013-04,-1.0687,published,source.geostat_cpi_avg12,Georgia!E15,2026-09-11
+cpi.headline,avg12_pct,2013-05,-0.7961,published,source.geostat_cpi_avg12,Georgia!F15,2026-09-11
+cpi.headline,avg12_pct,2013-06,-0.7613,published,source.geostat_cpi_avg12,Georgia!G15,2026-09-11
+cpi.headline,avg12_pct,2013-07,-0.8244,published,source.geostat_cpi_avg12,Georgia!H15,2026-09-11
+cpi.headline,avg12_pct,2013-08,-0.824,published,source.geostat_cpi_avg12,Georgia!I15,2026-09-11
+cpi.headline,avg12_pct,2013-09,-0.9212,published,source.geostat_cpi_avg12,Georgia!J15,2026-09-11
+cpi.headline,avg12_pct,2013-10,-0.9133,published,source.geostat_cpi_avg12,Georgia!K15,2026-09-11
+cpi.headline,avg12_pct,2013-11,-0.8227,published,source.geostat_cpi_avg12,Georgia!L15,2026-09-11
+cpi.headline,avg12_pct,2013-12,-0.512,published,source.geostat_cpi_avg12,Georgia!M15,2026-09-11
+cpi.headline,avg12_pct,2014-01,-0.135,published,source.geostat_cpi_avg12,Georgia!B16,2026-09-11
+cpi.headline,avg12_pct,2014-02,0.3316,published,source.geostat_cpi_avg12,Georgia!C16,2026-09-11
+cpi.headline,avg12_pct,2014-03,0.7976,published,source.geostat_cpi_avg12,Georgia!D16,2026-09-11
+cpi.headline,avg12_pct,2014-04,1.2273,published,source.geostat_cpi_avg12,Georgia!E16,2026-09-11
+cpi.headline,avg12_pct,2014-05,1.4391,published,source.geostat_cpi_avg12,Georgia!F16,2026-09-11
+cpi.headline,avg12_pct,2014-06,1.5893,published,source.geostat_cpi_avg12,Georgia!G16,2026-09-11
+cpi.headline,avg12_pct,2014-07,1.8421,published,source.geostat_cpi_avg12,Georgia!H16,2026-09-11
+cpi.headline,avg12_pct,2014-08,2.1502,published,source.geostat_cpi_avg12,Georgia!I16,2026-09-11
+cpi.headline,avg12_pct,2014-09,2.6525,published,source.geostat_cpi_avg12,Georgia!J16,2026-09-11
+cpi.headline,avg12_pct,2014-10,2.9258,published,source.geostat_cpi_avg12,Georgia!K16,2026-09-11
+cpi.headline,avg12_pct,2014-11,3.1061,published,source.geostat_cpi_avg12,Georgia!L16,2026-09-11
+cpi.headline,avg12_pct,2014-12,3.0688,published,source.geostat_cpi_avg12,Georgia!M16,2026-09-11
+cpi.headline,avg12_pct,2015-01,2.9377,published,source.geostat_cpi_avg12,Georgia!B17,2026-09-11
+cpi.headline,avg12_pct,2015-02,2.752,published,source.geostat_cpi_avg12,Georgia!C17,2026-09-11
+cpi.headline,avg12_pct,2015-03,2.6747,published,source.geostat_cpi_avg12,Georgia!D17,2026-09-11
+cpi.headline,avg12_pct,2015-04,2.599,published,source.geostat_cpi_avg12,Georgia!E17,2026-09-11
+cpi.headline,avg12_pct,2015-05,2.6882,published,source.geostat_cpi_avg12,Georgia!F17,2026-09-11
+cpi.headline,avg12_pct,2015-06,2.8912,published,source.geostat_cpi_avg12,Georgia!G17,2026-09-11
+cpi.headline,avg12_pct,2015-07,3.058,published,source.geostat_cpi_avg12,Georgia!H17,2026-09-11
+cpi.headline,avg12_pct,2015-08,3.2254,published,source.geostat_cpi_avg12,Georgia!I17,2026-09-11
+cpi.headline,avg12_pct,2015-09,3.2704,published,source.geostat_cpi_avg12,Georgia!J17,2026-09-11
+cpi.headline,avg12_pct,2015-10,3.4689,published,source.geostat_cpi_avg12,Georgia!K17,2026-09-11
+cpi.headline,avg12_pct,2015-11,3.7598,published,source.geostat_cpi_avg12,Georgia!L17,2026-09-11
+cpi.headline,avg12_pct,2015-12,4.0036,published,source.geostat_cpi_avg12,Georgia!M17,2026-09-11
+cpi.headline,avg12_pct,2016-01,4.3529,published,source.geostat_cpi_avg12,Georgia!B18,2026-09-11
+cpi.headline,avg12_pct,2016-02,4.7126,published,source.geostat_cpi_avg12,Georgia!C18,2026-09-11
+cpi.headline,avg12_pct,2016-03,4.8358,published,source.geostat_cpi_avg12,Georgia!D18,2026-09-11
+cpi.headline,avg12_pct,2016-04,4.8856,published,source.geostat_cpi_avg12,Georgia!E18,2026-09-11
+cpi.headline,avg12_pct,2016-05,4.763,published,source.geostat_cpi_avg12,Georgia!F18,2026-09-11
+cpi.headline,avg12_pct,2016-06,4.478,published,source.geostat_cpi_avg12,Georgia!G18,2026-09-11
+cpi.headline,avg12_pct,2016-07,4.1963,published,source.geostat_cpi_avg12,Georgia!H18,2026-09-11
+cpi.headline,avg12_pct,2016-08,3.8223,published,source.geostat_cpi_avg12,Georgia!I18,2026-09-11
+cpi.headline,avg12_pct,2016-09,3.3909,published,source.geostat_cpi_avg12,Georgia!J18,2026-09-11
+cpi.headline,avg12_pct,2016-10,2.8906,published,source.geostat_cpi_avg12,Georgia!K18,2026-09-11
+cpi.headline,avg12_pct,2016-11,2.384,published,source.geostat_cpi_avg12,Georgia!L18,2026-09-11
+cpi.headline,avg12_pct,2016-12,2.1349,published,source.geostat_cpi_avg12,Georgia!M18,2026-09-11
+cpi.headline,avg12_pct,2017-01,2.0058,published,source.geostat_cpi_avg12,Georgia!B19,2026-09-11
+cpi.headline,avg12_pct,2017-02,2.0186,published,source.geostat_cpi_avg12,Georgia!C19,2026-09-11
+cpi.headline,avg12_pct,2017-03,2.1344,published,source.geostat_cpi_avg12,Georgia!D19,2026-09-11
+cpi.headline,avg12_pct,2017-04,2.3848,published,source.geostat_cpi_avg12,Georgia!E19,2026-09-11
+cpi.headline,avg12_pct,2017-05,2.7578,published,source.geostat_cpi_avg12,Georgia!F19,2026-09-11
+cpi.headline,avg12_pct,2017-06,3.2473,published,source.geostat_cpi_avg12,Georgia!G19,2026-09-11
+cpi.headline,avg12_pct,2017-07,3.6118,published,source.geostat_cpi_avg12,Georgia!H19,2026-09-11
+cpi.headline,avg12_pct,2017-08,4.0082,published,source.geostat_cpi_avg12,Georgia!I19,2026-09-11
+cpi.headline,avg12_pct,2017-09,4.5103,published,source.geostat_cpi_avg12,Georgia!J19,2026-09-11
+cpi.headline,avg12_pct,2017-10,5.0589,published,source.geostat_cpi_avg12,Georgia!K19,2026-09-11
+cpi.headline,avg12_pct,2017-11,5.6273,published,source.geostat_cpi_avg12,Georgia!L19,2026-09-11
+cpi.headline,avg12_pct,2017-12,6.0353,published,source.geostat_cpi_avg12,Georgia!M19,2026-09-11
+cpi.headline,avg12_pct,2018-01,6.067,published,source.geostat_cpi_avg12,Georgia!B20,2026-09-11
+cpi.headline,avg12_pct,2018-02,5.8187,published,source.geostat_cpi_avg12,Georgia!C20,2026-09-11
+cpi.headline,avg12_pct,2018-03,5.5964,published,source.geostat_cpi_avg12,Georgia!D20,2026-09-11
+cpi.headline,avg12_pct,2018-04,5.2846,published,source.geostat_cpi_avg12,Georgia!E20,2026-09-11
+cpi.headline,avg12_pct,2018-05,4.9375,published,source.geostat_cpi_avg12,Georgia!F20,2026-09-11
+cpi.headline,avg12_pct,2018-06,4.5309,published,source.geostat_cpi_avg12,Georgia!G20,2026-09-11
+cpi.headline,avg12_pct,2018-07,4.2747,published,source.geostat_cpi_avg12,Georgia!H20,2026-09-11
+cpi.headline,avg12_pct,2018-08,4.0633,published,source.geostat_cpi_avg12,Georgia!I20,2026-09-11
+cpi.headline,avg12_pct,2018-09,3.7849,published,source.geostat_cpi_avg12,Georgia!J20,2026-09-11
+cpi.headline,avg12_pct,2018-10,3.4485,published,source.geostat_cpi_avg12,Georgia!K20,2026-09-11
+cpi.headline,avg12_pct,2018-11,3.0389,published,source.geostat_cpi_avg12,Georgia!L20,2026-09-11
+cpi.headline,avg12_pct,2018-12,2.6152,published,source.geostat_cpi_avg12,Georgia!M20,2026-09-11
+cpi.headline,avg12_pct,2019-01,2.439,published,source.geostat_cpi_avg12,Georgia!B21,2026-09-11
+cpi.headline,avg12_pct,2019-02,2.4015,published,source.geostat_cpi_avg12,Georgia!C21,2026-09-11
+cpi.headline,avg12_pct,2019-03,2.477,published,source.geostat_cpi_avg12,Georgia!D21,2026-09-11
+cpi.headline,avg12_pct,2019-04,2.616,published,source.geostat_cpi_avg12,Georgia!E21,2026-09-11
+cpi.headline,avg12_pct,2019-05,2.8048,published,source.geostat_cpi_avg12,Georgia!F21,2026-09-11
+cpi.headline,avg12_pct,2019-06,2.9834,published,source.geostat_cpi_avg12,Georgia!G21,2026-09-11
+cpi.headline,avg12_pct,2019-07,3.1311,published,source.geostat_cpi_avg12,Georgia!H21,2026-09-11
+cpi.headline,avg12_pct,2019-08,3.2791,published,source.geostat_cpi_avg12,Georgia!I21,2026-09-11
+cpi.headline,avg12_pct,2019-09,3.5827,published,source.geostat_cpi_avg12,Georgia!J21,2026-09-11
+cpi.headline,avg12_pct,2019-10,3.9643,published,source.geostat_cpi_avg12,Georgia!K21,2026-09-11
+cpi.headline,avg12_pct,2019-11,4.3942,published,source.geostat_cpi_avg12,Georgia!L21,2026-09-11
+cpi.headline,avg12_pct,2019-12,4.8529,published,source.geostat_cpi_avg12,Georgia!M21,2026-09-11
+cpi.headline,avg12_pct,2020-01,5.2057,published,source.geostat_cpi_avg12,Georgia!B22,2026-09-11
+cpi.headline,avg12_pct,2020-02,5.5542,published,source.geostat_cpi_avg12,Georgia!C22,2026-09-11
+cpi.headline,avg12_pct,2020-03,5.7527,published,source.geostat_cpi_avg12,Georgia!D22,2026-09-11
+cpi.headline,avg12_pct,2020-04,5.981,published,source.geostat_cpi_avg12,Georgia!E22,2026-09-11
+cpi.headline,avg12_pct,2020-05,6.1337,published,source.geostat_cpi_avg12,Georgia!F22,2026-09-11
+cpi.headline,avg12_pct,2020-06,6.2785,published,source.geostat_cpi_avg12,Georgia!G22,2026-09-11
+cpi.headline,avg12_pct,2020-07,6.3598,published,source.geostat_cpi_avg12,Georgia!H22,2026-09-11
+cpi.headline,avg12_pct,2020-08,6.3439,published,source.geostat_cpi_avg12,Georgia!I22,2026-09-11
+cpi.headline,avg12_pct,2020-09,6.1191,published,source.geostat_cpi_avg12,Georgia!J22,2026-09-11
+cpi.headline,avg12_pct,2020-10,5.86,published,source.geostat_cpi_avg12,Georgia!K22,2026-09-11
+cpi.headline,avg12_pct,2020-11,5.5898,published,source.geostat_cpi_avg12,Georgia!L22,2026-09-11
+cpi.headline,avg12_pct,2020-12,5.2025,published,source.geostat_cpi_avg12,Georgia!M22,2026-09-11
+cpi.headline,avg12_pct,2021-01,4.9023,published,source.geostat_cpi_avg12,Georgia!B23,2026-09-11
+cpi.headline,avg12_pct,2021-02,4.6636,published,source.geostat_cpi_avg12,Georgia!C23,2026-09-11
+cpi.headline,avg12_pct,2021-03,4.7685,published,source.geostat_cpi_avg12,Georgia!D23,2026-09-11
+cpi.headline,avg12_pct,2021-04,4.8098,published,source.geostat_cpi_avg12,Georgia!E23,2026-09-11
+cpi.headline,avg12_pct,2021-05,4.9182,published,source.geostat_cpi_avg12,Georgia!F23,2026-09-11
+cpi.headline,avg12_pct,2021-06,5.2428,published,source.geostat_cpi_avg12,Georgia!G23,2026-09-11
+cpi.headline,avg12_pct,2021-07,5.7694,published,source.geostat_cpi_avg12,Georgia!H23,2026-09-11
+cpi.headline,avg12_pct,2021-08,6.4315,published,source.geostat_cpi_avg12,Georgia!I23,2026-09-11
+cpi.headline,avg12_pct,2021-09,7.1356,published,source.geostat_cpi_avg12,Georgia!J23,2026-09-11
+cpi.headline,avg12_pct,2021-10,7.887,published,source.geostat_cpi_avg12,Georgia!K23,2026-09-11
+cpi.headline,avg12_pct,2021-11,8.6128,published,source.geostat_cpi_avg12,Georgia!L23,2026-09-11
+cpi.headline,avg12_pct,2021-12,9.5669,published,source.geostat_cpi_avg12,Georgia!M23,2026-09-11
+cpi.headline,avg12_pct,2022-01,10.4905,published,source.geostat_cpi_avg12,Georgia!B24,2026-09-11
+cpi.headline,avg12_pct,2022-02,11.335,published,source.geostat_cpi_avg12,Georgia!C24,2026-09-11
+cpi.headline,avg12_pct,2022-03,11.7186,published,source.geostat_cpi_avg12,Georgia!D24,2026-09-11
+cpi.headline,avg12_pct,2022-04,12.1908,published,source.geostat_cpi_avg12,Georgia!E24,2026-09-11
+cpi.headline,avg12_pct,2022-05,12.6585,published,source.geostat_cpi_avg12,Georgia!F24,2026-09-11
+cpi.headline,avg12_pct,2022-06,12.8925,published,source.geostat_cpi_avg12,Georgia!G24,2026-09-11
+cpi.headline,avg12_pct,2022-07,12.8513,published,source.geostat_cpi_avg12,Georgia!H24,2026-09-11
+cpi.headline,avg12_pct,2022-08,12.6831,published,source.geostat_cpi_avg12,Georgia!I24,2026-09-11
+cpi.headline,avg12_pct,2022-09,12.6146,published,source.geostat_cpi_avg12,Georgia!J24,2026-09-11
+cpi.headline,avg12_pct,2022-10,12.4195,published,source.geostat_cpi_avg12,Georgia!K24,2026-09-11
+cpi.headline,avg12_pct,2022-11,12.2365,published,source.geostat_cpi_avg12,Georgia!L24,2026-09-11
+cpi.headline,avg12_pct,2022-12,11.8982,published,source.geostat_cpi_avg12,Georgia!M24,2026-09-11
+cpi.headline,avg12_pct,2023-01,11.5277,published,source.geostat_cpi_avg12,Georgia!B25,2026-09-11
+cpi.headline,avg12_pct,2023-02,11.0651,published,source.geostat_cpi_avg12,Georgia!C25,2026-09-11
+cpi.headline,avg12_pct,2023-03,10.4966,published,source.geostat_cpi_avg12,Georgia!D25,2026-09-11
+cpi.headline,avg12_pct,2023-04,9.6155,published,source.geostat_cpi_avg12,Georgia!E25,2026-09-11
+cpi.headline,avg12_pct,2023-05,8.6018,published,source.geostat_cpi_avg12,Georgia!F25,2026-09-11
+cpi.headline,avg12_pct,2023-06,7.5655,published,source.geostat_cpi_avg12,Georgia!G25,2026-09-11
+cpi.headline,avg12_pct,2023-07,6.6152,published,source.geostat_cpi_avg12,Georgia!H25,2026-09-11
+cpi.headline,avg12_pct,2023-08,5.7821,published,source.geostat_cpi_avg12,Georgia!I25,2026-09-11
+cpi.headline,avg12_pct,2023-09,4.8892,published,source.geostat_cpi_avg12,Georgia!J25,2026-09-11
+cpi.headline,avg12_pct,2023-10,4.0854,published,source.geostat_cpi_avg12,Georgia!K25,2026-09-11
+cpi.headline,avg12_pct,2023-11,3.2419,published,source.geostat_cpi_avg12,Georgia!L25,2026-09-11
+cpi.headline,avg12_pct,2023-12,2.4878,published,source.geostat_cpi_avg12,Georgia!M25,2026-09-11
+cpi.headline,avg12_pct,2024-01,1.7317,published,source.geostat_cpi_avg12,Georgia!B26,2026-09-11
+cpi.headline,avg12_pct,2024-02,1.1064,published,source.geostat_cpi_avg12,Georgia!C26,2026-09-11
+cpi.headline,avg12_pct,2024-03,0.7201,published,source.geostat_cpi_avg12,Georgia!D26,2026-09-11
+cpi.headline,avg12_pct,2024-04,0.6274,published,source.geostat_cpi_avg12,Georgia!E26,2026-09-11
+cpi.headline,avg12_pct,2024-05,0.675,published,source.geostat_cpi_avg12,Georgia!F26,2026-09-11
+cpi.headline,avg12_pct,2024-06,0.8067,published,source.geostat_cpi_avg12,Georgia!G26,2026-09-11
+cpi.headline,avg12_pct,2024-07,0.9291,published,source.geostat_cpi_avg12,Georgia!H26,2026-09-11
+cpi.headline,avg12_pct,2024-08,0.935,published,source.geostat_cpi_avg12,Georgia!I26,2026-09-11
+cpi.headline,avg12_pct,2024-09,0.9314,published,source.geostat_cpi_avg12,Georgia!J26,2026-09-11
+cpi.headline,avg12_pct,2024-10,0.891,published,source.geostat_cpi_avg12,Georgia!K26,2026-09-11
+cpi.headline,avg12_pct,2024-11,0.9902,published,source.geostat_cpi_avg12,Georgia!L26,2026-09-11
+cpi.headline,avg12_pct,2024-12,1.1097,published,source.geostat_cpi_avg12,Georgia!M26,2026-09-11
+cpi.headline,avg12_pct,2025-01,1.2742,published,source.geostat_cpi_avg12,Georgia!B27,2026-09-11
+cpi.headline,avg12_pct,2025-02,1.4525,published,source.geostat_cpi_avg12,Georgia!C27,2026-09-11
+cpi.headline,avg12_pct,2025-03,1.702,published,source.geostat_cpi_avg12,Georgia!D27,2026-09-11
+cpi.headline,avg12_pct,2025-04,1.8597,published,source.geostat_cpi_avg12,Georgia!E27,2026-09-11
+cpi.headline,avg12_pct,2025-05,1.9795,published,source.geostat_cpi_avg12,Georgia!F27,2026-09-11
+cpi.headline,avg12_pct,2025-06,2.132,published,source.geostat_cpi_avg12,Georgia!G27,2026-09-11
+cpi.headline,avg12_pct,2025-07,2.3375,published,source.geostat_cpi_avg12,Georgia!H27,2026-09-11
+cpi.headline,avg12_pct,2025-08,2.6426,published,source.geostat_cpi_avg12,Georgia!I27,2026-09-11
+cpi.headline,avg12_pct,2025-09,2.9903,published,source.geostat_cpi_avg12,Georgia!J27,2026-09-11
+cpi.headline,avg12_pct,2025-10,3.3955,published,source.geostat_cpi_avg12,Georgia!K27,2026-09-11
+cpi.headline,avg12_pct,2025-11,3.694,published,source.geostat_cpi_avg12,Georgia!L27,2026-09-11
+cpi.headline,avg12_pct,2025-12,3.8692,published,source.geostat_cpi_avg12,Georgia!M27,2026-09-11
+cpi.headline,avg12_pct,2026-01,4.1072,published,source.geostat_cpi_avg12,Georgia!B28,2026-09-11
+cpi.headline,avg12_pct,2026-02,4.2873,published,source.geostat_cpi_avg12,Georgia!C28,2026-09-11
+cpi.headline,avg12_pct,2026-03,4.3543,published,source.geostat_cpi_avg12,Georgia!D28,2026-09-11
+cpi.headline,avg12_pct,2026-04,4.5679,published,source.geostat_cpi_avg12,Georgia!E28,2026-09-11
+cpi.headline,avg12_pct,2026-05,4.7607,published,source.geostat_cpi_avg12,Georgia!F28,2026-09-11
+cpi.headline,avg12_pct,2026-06,4.9139,published,source.geostat_cpi_avg12,Georgia!G28,2026-09-11
+cpi.headline,avg12_pct,2026-07,5.0183,published,source.geostat_cpi_avg12,Georgia!H28,2026-09-11
+cpi.headline,avg12_pct,2026-08,5.1014,published,source.geostat_cpi_avg12,Georgia!I28,2026-09-11
+cpi.headline,index_2010,2000-01,52.4448,published,source.geostat_cpi_index_2010,Georgia!B4,2026-09-11
+cpi.headline,index_2010,2000-02,52.3174,published,source.geostat_cpi_index_2010,Georgia!C4,2026-09-11
+cpi.headline,index_2010,2000-03,52.2566,published,source.geostat_cpi_index_2010,Georgia!D4,2026-09-11
+cpi.headline,index_2010,2000-04,52.1297,published,source.geostat_cpi_index_2010,Georgia!E4,2026-09-11
+cpi.headline,index_2010,2000-05,52.0824,published,source.geostat_cpi_index_2010,Georgia!F4,2026-09-11
+cpi.headline,index_2010,2000-06,51.9398,published,source.geostat_cpi_index_2010,Georgia!G4,2026-09-11
+cpi.headline,index_2010,2000-07,51.8027,published,source.geostat_cpi_index_2010,Georgia!H4,2026-09-11
+cpi.headline,index_2010,2000-08,52.4443,published,source.geostat_cpi_index_2010,Georgia!I4,2026-09-11
+cpi.headline,index_2010,2000-09,53.3903,published,source.geostat_cpi_index_2010,Georgia!J4,2026-09-11
+cpi.headline,index_2010,2000-10,54.0256,published,source.geostat_cpi_index_2010,Georgia!K4,2026-09-11
+cpi.headline,index_2010,2000-11,54.3467,published,source.geostat_cpi_index_2010,Georgia!L4,2026-09-11
+cpi.headline,index_2010,2000-12,54.6401,published,source.geostat_cpi_index_2010,Georgia!M4,2026-09-11
+cpi.headline,index_2010,2001-01,55.0301,published,source.geostat_cpi_index_2010,Georgia!B5,2026-09-11
+cpi.headline,index_2010,2001-02,55.3489,published,source.geostat_cpi_index_2010,Georgia!C5,2026-09-11
+cpi.headline,index_2010,2001-03,55.3585,published,source.geostat_cpi_index_2010,Georgia!D5,2026-09-11
+cpi.headline,index_2010,2001-04,55.8985,published,source.geostat_cpi_index_2010,Georgia!E5,2026-09-11
+cpi.headline,index_2010,2001-05,55.3437,published,source.geostat_cpi_index_2010,Georgia!F5,2026-09-11
+cpi.headline,index_2010,2001-06,55.1431,published,source.geostat_cpi_index_2010,Georgia!G5,2026-09-11
+cpi.headline,index_2010,2001-07,54.7569,published,source.geostat_cpi_index_2010,Georgia!H5,2026-09-11
+cpi.headline,index_2010,2001-08,54.8971,published,source.geostat_cpi_index_2010,Georgia!I5,2026-09-11
+cpi.headline,index_2010,2001-09,54.5901,published,source.geostat_cpi_index_2010,Georgia!J5,2026-09-11
+cpi.headline,index_2010,2001-10,54.9518,published,source.geostat_cpi_index_2010,Georgia!K5,2026-09-11
+cpi.headline,index_2010,2001-11,55.7138,published,source.geostat_cpi_index_2010,Georgia!L5,2026-09-11
+cpi.headline,index_2010,2001-12,56.4994,published,source.geostat_cpi_index_2010,Georgia!M5,2026-09-11
+cpi.headline,index_2010,2002-01,57.6338,published,source.geostat_cpi_index_2010,Georgia!B6,2026-09-11
+cpi.headline,index_2010,2002-02,58.3052,published,source.geostat_cpi_index_2010,Georgia!C6,2026-09-11
+cpi.headline,index_2010,2002-03,58.5229,published,source.geostat_cpi_index_2010,Georgia!D6,2026-09-11
+cpi.headline,index_2010,2002-04,59.5585,published,source.geostat_cpi_index_2010,Georgia!E6,2026-09-11
+cpi.headline,index_2010,2002-05,59.5775,published,source.geostat_cpi_index_2010,Georgia!F6,2026-09-11
+cpi.headline,index_2010,2002-06,58.1895,published,source.geostat_cpi_index_2010,Georgia!G6,2026-09-11
+cpi.headline,index_2010,2002-07,57.5515,published,source.geostat_cpi_index_2010,Georgia!H6,2026-09-11
+cpi.headline,index_2010,2002-08,57.47,published,source.geostat_cpi_index_2010,Georgia!I6,2026-09-11
+cpi.headline,index_2010,2002-09,57.6891,published,source.geostat_cpi_index_2010,Georgia!J6,2026-09-11
+cpi.headline,index_2010,2002-10,57.9381,published,source.geostat_cpi_index_2010,Georgia!K6,2026-09-11
+cpi.headline,index_2010,2002-11,58.5536,published,source.geostat_cpi_index_2010,Georgia!L6,2026-09-11
+cpi.headline,index_2010,2002-12,59.5632,published,source.geostat_cpi_index_2010,Georgia!M6,2026-09-11
+cpi.headline,index_2010,2003-01,60.8079,published,source.geostat_cpi_index_2010,Georgia!B7,2026-09-11
+cpi.headline,index_2010,2003-02,60.4916,published,source.geostat_cpi_index_2010,Georgia!C7,2026-09-11
+cpi.headline,index_2010,2003-03,60.5162,published,source.geostat_cpi_index_2010,Georgia!D7,2026-09-11
+cpi.headline,index_2010,2003-04,60.8174,published,source.geostat_cpi_index_2010,Georgia!E7,2026-09-11
+cpi.headline,index_2010,2003-05,60.9521,published,source.geostat_cpi_index_2010,Georgia!F7,2026-09-11
+cpi.headline,index_2010,2003-06,60.9896,published,source.geostat_cpi_index_2010,Georgia!G7,2026-09-11
+cpi.headline,index_2010,2003-07,60.4475,published,source.geostat_cpi_index_2010,Georgia!H7,2026-09-11
+cpi.headline,index_2010,2003-08,60.3728,published,source.geostat_cpi_index_2010,Georgia!I7,2026-09-11
+cpi.headline,index_2010,2003-09,60.6909,published,source.geostat_cpi_index_2010,Georgia!J7,2026-09-11
+cpi.headline,index_2010,2003-10,60.6834,published,source.geostat_cpi_index_2010,Georgia!K7,2026-09-11
+cpi.headline,index_2010,2003-11,63.602,published,source.geostat_cpi_index_2010,Georgia!L7,2026-09-11
+cpi.headline,index_2010,2003-12,63.7045,published,source.geostat_cpi_index_2010,Georgia!M7,2026-09-11
+cpi.headline,index_2010,2004-01,63.9688,published,source.geostat_cpi_index_2010,Georgia!B8,2026-09-11
+cpi.headline,index_2010,2004-02,64.2487,published,source.geostat_cpi_index_2010,Georgia!C8,2026-09-11
+cpi.headline,index_2010,2004-03,64.3127,published,source.geostat_cpi_index_2010,Georgia!D8,2026-09-11
+cpi.headline,index_2010,2004-04,64.1967,published,source.geostat_cpi_index_2010,Georgia!E8,2026-09-11
+cpi.headline,index_2010,2004-05,64.2226,published,source.geostat_cpi_index_2010,Georgia!F8,2026-09-11
+cpi.headline,index_2010,2004-06,63.2079,published,source.geostat_cpi_index_2010,Georgia!G8,2026-09-11
+cpi.headline,index_2010,2004-07,63.7438,published,source.geostat_cpi_index_2010,Georgia!H8,2026-09-11
+cpi.headline,index_2010,2004-08,63.3875,published,source.geostat_cpi_index_2010,Georgia!I8,2026-09-11
+cpi.headline,index_2010,2004-09,64.3362,published,source.geostat_cpi_index_2010,Georgia!J8,2026-09-11
+cpi.headline,index_2010,2004-10,65.3669,published,source.geostat_cpi_index_2010,Georgia!K8,2026-09-11
+cpi.headline,index_2010,2004-11,66.1348,published,source.geostat_cpi_index_2010,Georgia!L8,2026-09-11
+cpi.headline,index_2010,2004-12,68.4716,published,source.geostat_cpi_index_2010,Georgia!M8,2026-09-11
+cpi.headline,index_2010,2005-01,69.9027,published,source.geostat_cpi_index_2010,Georgia!B9,2026-09-11
+cpi.headline,index_2010,2005-02,70.1278,published,source.geostat_cpi_index_2010,Georgia!C9,2026-09-11
+cpi.headline,index_2010,2005-03,70.5387,published,source.geostat_cpi_index_2010,Georgia!D9,2026-09-11
+cpi.headline,index_2010,2005-04,70.835,published,source.geostat_cpi_index_2010,Georgia!E9,2026-09-11
+cpi.headline,index_2010,2005-05,69.9202,published,source.geostat_cpi_index_2010,Georgia!F9,2026-09-11
+cpi.headline,index_2010,2005-06,68.9154,published,source.geostat_cpi_index_2010,Georgia!G9,2026-09-11
+cpi.headline,index_2010,2005-07,67.5772,published,source.geostat_cpi_index_2010,Georgia!H9,2026-09-11
+cpi.headline,index_2010,2005-08,67.9525,published,source.geostat_cpi_index_2010,Georgia!I9,2026-09-11
+cpi.headline,index_2010,2005-09,69.2698,published,source.geostat_cpi_index_2010,Georgia!J9,2026-09-11
+cpi.headline,index_2010,2005-10,70.4347,published,source.geostat_cpi_index_2010,Georgia!K9,2026-09-11
+cpi.headline,index_2010,2005-11,71.3858,published,source.geostat_cpi_index_2010,Georgia!L9,2026-09-11
+cpi.headline,index_2010,2005-12,72.7024,published,source.geostat_cpi_index_2010,Georgia!M9,2026-09-11
+cpi.headline,index_2010,2006-01,73.5707,published,source.geostat_cpi_index_2010,Georgia!B10,2026-09-11
+cpi.headline,index_2010,2006-02,73.704,published,source.geostat_cpi_index_2010,Georgia!C10,2026-09-11
+cpi.headline,index_2010,2006-03,73.7693,published,source.geostat_cpi_index_2010,Georgia!D10,2026-09-11
+cpi.headline,index_2010,2006-04,75.0938,published,source.geostat_cpi_index_2010,Georgia!E10,2026-09-11
+cpi.headline,index_2010,2006-05,76.9121,published,source.geostat_cpi_index_2010,Georgia!F10,2026-09-11
+cpi.headline,index_2010,2006-06,76.7837,published,source.geostat_cpi_index_2010,Georgia!G10,2026-09-11
+cpi.headline,index_2010,2006-07,77.3889,published,source.geostat_cpi_index_2010,Georgia!H10,2026-09-11
+cpi.headline,index_2010,2006-08,77.0631,published,source.geostat_cpi_index_2010,Georgia!I10,2026-09-11
+cpi.headline,index_2010,2006-09,77.0555,published,source.geostat_cpi_index_2010,Georgia!J10,2026-09-11
+cpi.headline,index_2010,2006-10,77.6393,published,source.geostat_cpi_index_2010,Georgia!K10,2026-09-11
+cpi.headline,index_2010,2006-11,78.4096,published,source.geostat_cpi_index_2010,Georgia!L10,2026-09-11
+cpi.headline,index_2010,2006-12,79.0842,published,source.geostat_cpi_index_2010,Georgia!M10,2026-09-11
+cpi.headline,index_2010,2007-01,81.2499,published,source.geostat_cpi_index_2010,Georgia!B11,2026-09-11
+cpi.headline,index_2010,2007-02,81.8389,published,source.geostat_cpi_index_2010,Georgia!C11,2026-09-11
+cpi.headline,index_2010,2007-03,80.9598,published,source.geostat_cpi_index_2010,Georgia!D11,2026-09-11
+cpi.headline,index_2010,2007-04,81.1928,published,source.geostat_cpi_index_2010,Georgia!E11,2026-09-11
+cpi.headline,index_2010,2007-05,82.5124,published,source.geostat_cpi_index_2010,Georgia!F11,2026-09-11
+cpi.headline,index_2010,2007-06,82.3607,published,source.geostat_cpi_index_2010,Georgia!G11,2026-09-11
+cpi.headline,index_2010,2007-07,82.4761,published,source.geostat_cpi_index_2010,Georgia!H11,2026-09-11
+cpi.headline,index_2010,2007-08,82.9959,published,source.geostat_cpi_index_2010,Georgia!I11,2026-09-11
+cpi.headline,index_2010,2007-09,83.9665,published,source.geostat_cpi_index_2010,Georgia!J11,2026-09-11
+cpi.headline,index_2010,2007-10,86.3486,published,source.geostat_cpi_index_2010,Georgia!K11,2026-09-11
+cpi.headline,index_2010,2007-11,87.5362,published,source.geostat_cpi_index_2010,Georgia!L11,2026-09-11
+cpi.headline,index_2010,2007-12,87.7635,published,source.geostat_cpi_index_2010,Georgia!M11,2026-09-11
+cpi.headline,index_2010,2008-01,89.9495,published,source.geostat_cpi_index_2010,Georgia!B12,2026-09-11
+cpi.headline,index_2010,2008-02,90.7748,published,source.geostat_cpi_index_2010,Georgia!C12,2026-09-11
+cpi.headline,index_2010,2008-03,90.8777,published,source.geostat_cpi_index_2010,Georgia!D12,2026-09-11
+cpi.headline,index_2010,2008-04,91.1181,published,source.geostat_cpi_index_2010,Georgia!E12,2026-09-11
+cpi.headline,index_2010,2008-05,91.7829,published,source.geostat_cpi_index_2010,Georgia!F12,2026-09-11
+cpi.headline,index_2010,2008-06,91.6976,published,source.geostat_cpi_index_2010,Georgia!G12,2026-09-11
+cpi.headline,index_2010,2008-07,90.5616,published,source.geostat_cpi_index_2010,Georgia!H12,2026-09-11
+cpi.headline,index_2010,2008-08,93.6182,published,source.geostat_cpi_index_2010,Georgia!I12,2026-09-11
+cpi.headline,index_2010,2008-09,92.8713,published,source.geostat_cpi_index_2010,Georgia!J12,2026-09-11
+cpi.headline,index_2010,2008-10,92.4105,published,source.geostat_cpi_index_2010,Georgia!K12,2026-09-11
+cpi.headline,index_2010,2008-11,93.0217,published,source.geostat_cpi_index_2010,Georgia!L12,2026-09-11
+cpi.headline,index_2010,2008-12,92.6324,published,source.geostat_cpi_index_2010,Georgia!M12,2026-09-11
+cpi.headline,index_2010,2009-01,93.944,published,source.geostat_cpi_index_2010,Georgia!B13,2026-09-11
+cpi.headline,index_2010,2009-02,92.676,published,source.geostat_cpi_index_2010,Georgia!C13,2026-09-11
+cpi.headline,index_2010,2009-03,92.3063,published,source.geostat_cpi_index_2010,Georgia!D13,2026-09-11
+cpi.headline,index_2010,2009-04,92.7446,published,source.geostat_cpi_index_2010,Georgia!E13,2026-09-11
+cpi.headline,index_2010,2009-05,93.8412,published,source.geostat_cpi_index_2010,Georgia!F13,2026-09-11
+cpi.headline,index_2010,2009-06,93.8497,published,source.geostat_cpi_index_2010,Georgia!G13,2026-09-11
+cpi.headline,index_2010,2009-07,90.6895,published,source.geostat_cpi_index_2010,Georgia!H13,2026-09-11
+cpi.headline,index_2010,2009-08,90.7104,published,source.geostat_cpi_index_2010,Georgia!I13,2026-09-11
+cpi.headline,index_2010,2009-09,93.2801,published,source.geostat_cpi_index_2010,Georgia!J13,2026-09-11
+cpi.headline,index_2010,2009-10,95.3706,published,source.geostat_cpi_index_2010,Georgia!K13,2026-09-11
+cpi.headline,index_2010,2009-11,95.5307,published,source.geostat_cpi_index_2010,Georgia!L13,2026-09-11
+cpi.headline,index_2010,2009-12,95.3986,published,source.geostat_cpi_index_2010,Georgia!M13,2026-09-11
+cpi.headline,index_2010,2010-01,96.4744,published,source.geostat_cpi_index_2010,Georgia!B14,2026-09-11
+cpi.headline,index_2010,2010-02,97.8969,published,source.geostat_cpi_index_2010,Georgia!C14,2026-09-11
+cpi.headline,index_2010,2010-03,97.7135,published,source.geostat_cpi_index_2010,Georgia!D14,2026-09-11
+cpi.headline,index_2010,2010-04,97.9481,published,source.geostat_cpi_index_2010,Georgia!E14,2026-09-11
+cpi.headline,index_2010,2010-05,97.5996,published,source.geostat_cpi_index_2010,Georgia!F14,2026-09-11
+cpi.headline,index_2010,2010-06,97.3108,published,source.geostat_cpi_index_2010,Georgia!G14,2026-09-11
+cpi.headline,index_2010,2010-07,97.0801,published,source.geostat_cpi_index_2010,Georgia!H14,2026-09-11
+cpi.headline,index_2010,2010-08,99.3375,published,source.geostat_cpi_index_2010,Georgia!I14,2026-09-11
+cpi.headline,index_2010,2010-09,102.415,published,source.geostat_cpi_index_2010,Georgia!J14,2026-09-11
+cpi.headline,index_2010,2010-10,104.5021,published,source.geostat_cpi_index_2010,Georgia!K14,2026-09-11
+cpi.headline,index_2010,2010-11,105.6006,published,source.geostat_cpi_index_2010,Georgia!L14,2026-09-11
+cpi.headline,index_2010,2010-12,106.1214,published,source.geostat_cpi_index_2010,Georgia!M14,2026-09-11
+cpi.headline,index_2010,2011-01,108.3008,published,source.geostat_cpi_index_2010,Georgia!B15,2026-09-11
+cpi.headline,index_2010,2011-02,111.3533,published,source.geostat_cpi_index_2010,Georgia!C15,2026-09-11
+cpi.headline,index_2010,2011-03,111.3291,published,source.geostat_cpi_index_2010,Georgia!D15,2026-09-11
+cpi.headline,index_2010,2011-04,111.1703,published,source.geostat_cpi_index_2010,Georgia!E15,2026-09-11
+cpi.headline,index_2010,2011-05,111.5872,published,source.geostat_cpi_index_2010,Georgia!F15,2026-09-11
+cpi.headline,index_2010,2011-06,107.0748,published,source.geostat_cpi_index_2010,Georgia!G15,2026-09-11
+cpi.headline,index_2010,2011-07,105.3309,published,source.geostat_cpi_index_2010,Georgia!H15,2026-09-11
+cpi.headline,index_2010,2011-08,106.4445,published,source.geostat_cpi_index_2010,Georgia!I15,2026-09-11
+cpi.headline,index_2010,2011-09,107.087,published,source.geostat_cpi_index_2010,Georgia!J15,2026-09-11
+cpi.headline,index_2010,2011-10,106.9247,published,source.geostat_cpi_index_2010,Georgia!K15,2026-09-11
+cpi.headline,index_2010,2011-11,107.6251,published,source.geostat_cpi_index_2010,Georgia!L15,2026-09-11
+cpi.headline,index_2010,2011-12,108.2875,published,source.geostat_cpi_index_2010,Georgia!M15,2026-09-11
+cpi.headline,index_2010,2012-01,108.819,published,source.geostat_cpi_index_2010,Georgia!B16,2026-09-11
+cpi.headline,index_2010,2012-02,109.0656,published,source.geostat_cpi_index_2010,Georgia!C16,2026-09-11
+cpi.headline,index_2010,2012-03,108.8677,published,source.geostat_cpi_index_2010,Georgia!D16,2026-09-11
+cpi.headline,index_2010,2012-04,108.8302,published,source.geostat_cpi_index_2010,Georgia!E16,2026-09-11
+cpi.headline,index_2010,2012-05,107.9044,published,source.geostat_cpi_index_2010,Georgia!F16,2026-09-11
+cpi.headline,index_2010,2012-06,106.882,published,source.geostat_cpi_index_2010,Georgia!G16,2026-09-11
+cpi.headline,index_2010,2012-07,105.9259,published,source.geostat_cpi_index_2010,Georgia!H16,2026-09-11
+cpi.headline,index_2010,2012-08,106.0622,published,source.geostat_cpi_index_2010,Georgia!I16,2026-09-11
+cpi.headline,index_2010,2012-09,106.9575,published,source.geostat_cpi_index_2010,Georgia!J16,2026-09-11
+cpi.headline,index_2010,2012-10,107.0084,published,source.geostat_cpi_index_2010,Georgia!K16,2026-09-11
+cpi.headline,index_2010,2012-11,107.1007,published,source.geostat_cpi_index_2010,Georgia!L16,2026-09-11
+cpi.headline,index_2010,2012-12,106.8003,published,source.geostat_cpi_index_2010,Georgia!M16,2026-09-11
+cpi.headline,index_2010,2013-01,107.0779,published,source.geostat_cpi_index_2010,Georgia!B17,2026-09-11
+cpi.headline,index_2010,2013-02,106.7566,published,source.geostat_cpi_index_2010,Georgia!C17,2026-09-11
+cpi.headline,index_2010,2013-03,106.6148,published,source.geostat_cpi_index_2010,Georgia!D17,2026-09-11
+cpi.headline,index_2010,2013-04,107.004,published,source.geostat_cpi_index_2010,Georgia!E17,2026-09-11
+cpi.headline,index_2010,2013-05,107.7835,published,source.geostat_cpi_index_2010,Georgia!F17,2026-09-11
+cpi.headline,index_2010,2013-06,107.1401,published,source.geostat_cpi_index_2010,Georgia!G17,2026-09-11
+cpi.headline,index_2010,2013-07,105.7009,published,source.geostat_cpi_index_2010,Georgia!H17,2026-09-11
+cpi.headline,index_2010,2013-08,105.688,published,source.geostat_cpi_index_2010,Georgia!I17,2026-09-11
+cpi.headline,index_2010,2013-09,105.5733,published,source.geostat_cpi_index_2010,Georgia!J17,2026-09-11
+cpi.headline,index_2010,2013-10,107.1933,published,source.geostat_cpi_index_2010,Georgia!K17,2026-09-11
+cpi.headline,index_2010,2013-11,107.751,published,source.geostat_cpi_index_2010,Georgia!L17,2026-09-11
+cpi.headline,index_2010,2013-12,109.3338,published,source.geostat_cpi_index_2010,Georgia!M17,2026-09-11
+cpi.headline,index_2010,2014-01,110.2043,published,source.geostat_cpi_index_2010,Georgia!B18,2026-09-11
+cpi.headline,index_2010,2014-02,110.4513,published,source.geostat_cpi_index_2010,Georgia!C18,2026-09-11
+cpi.headline,index_2010,2014-03,110.3376,published,source.geostat_cpi_index_2010,Georgia!D18,2026-09-11
+cpi.headline,index_2010,2014-04,110.6733,published,source.geostat_cpi_index_2010,Georgia!E18,2026-09-11
+cpi.headline,index_2010,2014-05,110.3755,published,source.geostat_cpi_index_2010,Georgia!F18,2026-09-11
+cpi.headline,index_2010,2014-06,109.3276,published,source.geostat_cpi_index_2010,Georgia!G18,2026-09-11
+cpi.headline,index_2010,2014-07,108.7133,published,source.geostat_cpi_index_2010,Georgia!H18,2026-09-11
+cpi.headline,index_2010,2014-08,109.2566,published,source.geostat_cpi_index_2010,Georgia!I18,2026-09-11
+cpi.headline,index_2010,2014-09,110.59,published,source.geostat_cpi_index_2010,Georgia!J18,2026-09-11
+cpi.headline,index_2010,2014-10,110.8822,published,source.geostat_cpi_index_2010,Georgia!K18,2026-09-11
+cpi.headline,index_2010,2014-11,110.7297,published,source.geostat_cpi_index_2010,Georgia!L18,2026-09-11
+cpi.headline,index_2010,2014-12,111.4676,published,source.geostat_cpi_index_2010,Georgia!M18,2026-09-11
+cpi.headline,index_2010,2015-01,111.7403,published,source.geostat_cpi_index_2010,Georgia!B19,2026-09-11
+cpi.headline,index_2010,2015-02,111.8569,published,source.geostat_cpi_index_2010,Georgia!C19,2026-09-11
+cpi.headline,index_2010,2015-03,113.1635,published,source.geostat_cpi_index_2010,Georgia!D19,2026-09-11
+cpi.headline,index_2010,2015-04,113.4584,published,source.geostat_cpi_index_2010,Georgia!E19,2026-09-11
+cpi.headline,index_2010,2015-05,114.1939,published,source.geostat_cpi_index_2010,Georgia!F19,2026-09-11
+cpi.headline,index_2010,2015-06,114.2188,published,source.geostat_cpi_index_2010,Georgia!G19,2026-09-11
+cpi.headline,index_2010,2015-07,113.9908,published,source.geostat_cpi_index_2010,Georgia!H19,2026-09-11
+cpi.headline,index_2010,2015-08,115.1259,published,source.geostat_cpi_index_2010,Georgia!I19,2026-09-11
+cpi.headline,index_2010,2015-09,116.3593,published,source.geostat_cpi_index_2010,Georgia!J19,2026-09-11
+cpi.headline,index_2010,2015-10,117.3078,published,source.geostat_cpi_index_2010,Georgia!K19,2026-09-11
+cpi.headline,index_2010,2015-11,117.6545,published,source.geostat_cpi_index_2010,Georgia!L19,2026-09-11
+cpi.headline,index_2010,2015-12,116.9066,published,source.geostat_cpi_index_2010,Georgia!M19,2026-09-11
+cpi.headline,index_2010,2016-01,117.965,published,source.geostat_cpi_index_2010,Georgia!B20,2026-09-11
+cpi.headline,index_2010,2016-02,118.0924,published,source.geostat_cpi_index_2010,Georgia!C20,2026-09-11
+cpi.headline,index_2010,2016-03,117.7596,published,source.geostat_cpi_index_2010,Georgia!D20,2026-09-11
+cpi.headline,index_2010,2016-04,117.0422,published,source.geostat_cpi_index_2010,Georgia!E20,2026-09-11
+cpi.headline,index_2010,2016-05,116.5609,published,source.geostat_cpi_index_2010,Georgia!F20,2026-09-11
+cpi.headline,index_2010,2016-06,115.5229,published,source.geostat_cpi_index_2010,Georgia!G20,2026-09-11
+cpi.headline,index_2010,2016-07,115.7151,published,source.geostat_cpi_index_2010,Georgia!H20,2026-09-11
+cpi.headline,index_2010,2016-08,116.187,published,source.geostat_cpi_index_2010,Georgia!I20,2026-09-11
+cpi.headline,index_2010,2016-09,116.4941,published,source.geostat_cpi_index_2010,Georgia!J20,2026-09-11
+cpi.headline,index_2010,2016-10,117.1298,published,source.geostat_cpi_index_2010,Georgia!K20,2026-09-11
+cpi.headline,index_2010,2016-11,117.8355,published,source.geostat_cpi_index_2010,Georgia!L20,2026-09-11
+cpi.headline,index_2010,2016-12,119.0483,published,source.geostat_cpi_index_2010,Georgia!M20,2026-09-11
+cpi.headline,index_2010,2017-01,122.5371,published,source.geostat_cpi_index_2010,Georgia!B21,2026-09-11
+cpi.headline,index_2010,2017-02,124.6311,published,source.geostat_cpi_index_2010,Georgia!C21,2026-09-11
+cpi.headline,index_2010,2017-03,124.0624,published,source.geostat_cpi_index_2010,Georgia!D21,2026-09-11
+cpi.headline,index_2010,2017-04,124.1989,published,source.geostat_cpi_index_2010,Georgia!E21,2026-09-11
+cpi.headline,index_2010,2017-05,124.2024,published,source.geostat_cpi_index_2010,Georgia!F21,2026-09-11
+cpi.headline,index_2010,2017-06,123.7183,published,source.geostat_cpi_index_2010,Georgia!G21,2026-09-11
+cpi.headline,index_2010,2017-07,122.6044,published,source.geostat_cpi_index_2010,Georgia!H21,2026-09-11
+cpi.headline,index_2010,2017-08,122.8492,published,source.geostat_cpi_index_2010,Georgia!I21,2026-09-11
+cpi.headline,index_2010,2017-09,123.679,published,source.geostat_cpi_index_2010,Georgia!J21,2026-09-11
+cpi.headline,index_2010,2017-10,124.6414,published,source.geostat_cpi_index_2010,Georgia!K21,2026-09-11
+cpi.headline,index_2010,2017-11,126.0021,published,source.geostat_cpi_index_2010,Georgia!L21,2026-09-11
+cpi.headline,index_2010,2017-12,127.044,published,source.geostat_cpi_index_2010,Georgia!M21,2026-09-11
+cpi.headline,index_2010,2018-01,127.8324,published,source.geostat_cpi_index_2010,Georgia!B22,2026-09-11
+cpi.headline,index_2010,2018-02,128.0487,published,source.geostat_cpi_index_2010,Georgia!C22,2026-09-11
+cpi.headline,index_2010,2018-03,127.5694,published,source.geostat_cpi_index_2010,Georgia!D22,2026-09-11
+cpi.headline,index_2010,2018-04,127.298,published,source.geostat_cpi_index_2010,Georgia!E22,2026-09-11
+cpi.headline,index_2010,2018-05,127.2579,published,source.geostat_cpi_index_2010,Georgia!F22,2026-09-11
+cpi.headline,index_2010,2018-06,126.4389,published,source.geostat_cpi_index_2010,Georgia!G22,2026-09-11
+cpi.headline,index_2010,2018-07,126.0841,published,source.geostat_cpi_index_2010,Georgia!H22,2026-09-11
+cpi.headline,index_2010,2018-08,126.7121,published,source.geostat_cpi_index_2010,Georgia!I22,2026-09-11
+cpi.headline,index_2010,2018-09,127.0728,published,source.geostat_cpi_index_2010,Georgia!J22,2026-09-11
+cpi.headline,index_2010,2018-10,127.4793,published,source.geostat_cpi_index_2010,Georgia!K22,2026-09-11
+cpi.headline,index_2010,2018-11,128.3795,published,source.geostat_cpi_index_2010,Georgia!L22,2026-09-11
+cpi.headline,index_2010,2018-12,128.9688,published,source.geostat_cpi_index_2010,Georgia!M22,2026-09-11
+cpi.headline,index_2010,2019-01,130.6302,published,source.geostat_cpi_index_2010,Georgia!B23,2026-09-11
+cpi.headline,index_2010,2019-02,130.9881,published,source.geostat_cpi_index_2010,Georgia!C23,2026-09-11
+cpi.headline,index_2010,2019-03,132.2952,published,source.geostat_cpi_index_2010,Georgia!D23,2026-09-11
+cpi.headline,index_2010,2019-04,132.5658,published,source.geostat_cpi_index_2010,Georgia!E23,2026-09-11
+cpi.headline,index_2010,2019-05,133.242,published,source.geostat_cpi_index_2010,Georgia!F23,2026-09-11
+cpi.headline,index_2010,2019-06,131.9349,published,source.geostat_cpi_index_2010,Georgia!G23,2026-09-11
+cpi.headline,index_2010,2019-07,131.9038,published,source.geostat_cpi_index_2010,Georgia!H23,2026-09-11
+cpi.headline,index_2010,2019-08,132.9447,published,source.geostat_cpi_index_2010,Georgia!I23,2026-09-11
+cpi.headline,index_2010,2019-09,135.1977,published,source.geostat_cpi_index_2010,Georgia!J23,2026-09-11
+cpi.headline,index_2010,2019-10,136.2376,published,source.geostat_cpi_index_2010,Georgia!K23,2026-09-11
+cpi.headline,index_2010,2019-11,137.4172,published,source.geostat_cpi_index_2010,Georgia!L23,2026-09-11
+cpi.headline,index_2010,2019-12,137.9924,published,source.geostat_cpi_index_2010,Georgia!M23,2026-09-11
+cpi.headline,index_2010,2020-01,138.9685,published,source.geostat_cpi_index_2010,Georgia!B24,2026-09-11
+cpi.headline,index_2010,2020-02,139.43,published,source.geostat_cpi_index_2010,Georgia!C24,2026-09-11
+cpi.headline,index_2010,2020-03,140.339,published,source.geostat_cpi_index_2010,Georgia!D24,2026-09-11
+cpi.headline,index_2010,2020-04,141.6638,published,source.geostat_cpi_index_2010,Georgia!E24,2026-09-11
+cpi.headline,index_2010,2020-05,141.9516,published,source.geostat_cpi_index_2010,Georgia!F24,2026-09-11
+cpi.headline,index_2010,2020-06,140.0229,published,source.geostat_cpi_index_2010,Georgia!G24,2026-09-11
+cpi.headline,index_2010,2020-07,139.3583,published,source.geostat_cpi_index_2010,Georgia!H24,2026-09-11
+cpi.headline,index_2010,2020-08,139.3248,published,source.geostat_cpi_index_2010,Georgia!I24,2026-09-11
+cpi.headline,index_2010,2020-09,140.2941,published,source.geostat_cpi_index_2010,Georgia!J24,2026-09-11
+cpi.headline,index_2010,2020-10,141.4229,published,source.geostat_cpi_index_2010,Georgia!K24,2026-09-11
+cpi.headline,index_2010,2020-11,142.6767,published,source.geostat_cpi_index_2010,Georgia!L24,2026-09-11
+cpi.headline,index_2010,2020-12,141.3107,published,source.geostat_cpi_index_2010,Georgia!M24,2026-09-11
+cpi.headline,index_2010,2021-01,142.903,published,source.geostat_cpi_index_2010,Georgia!B25,2026-09-11
+cpi.headline,index_2010,2021-02,144.4187,published,source.geostat_cpi_index_2010,Georgia!C25,2026-09-11
+cpi.headline,index_2010,2021-03,150.4663,published,source.geostat_cpi_index_2010,Georgia!D25,2026-09-11
+cpi.headline,index_2010,2021-04,151.871,published,source.geostat_cpi_index_2010,Georgia!E25,2026-09-11
+cpi.headline,index_2010,2021-05,152.8648,published,source.geostat_cpi_index_2010,Georgia!F25,2026-09-11
+cpi.headline,index_2010,2021-06,153.8774,published,source.geostat_cpi_index_2010,Georgia!G25,2026-09-11
+cpi.headline,index_2010,2021-07,155.9535,published,source.geostat_cpi_index_2010,Georgia!H25,2026-09-11
+cpi.headline,index_2010,2021-08,157.1157,published,source.geostat_cpi_index_2010,Georgia!I25,2026-09-11
+cpi.headline,index_2010,2021-09,157.4984,published,source.geostat_cpi_index_2010,Georgia!J25,2026-09-11
+cpi.headline,index_2010,2021-10,159.5886,published,source.geostat_cpi_index_2010,Georgia!K25,2026-09-11
+cpi.headline,index_2010,2021-11,160.5684,published,source.geostat_cpi_index_2010,Georgia!L25,2026-09-11
+cpi.headline,index_2010,2021-12,161.0087,published,source.geostat_cpi_index_2010,Georgia!M25,2026-09-11
+cpi.headline,index_2010,2022-01,162.828,published,source.geostat_cpi_index_2010,Georgia!B26,2026-09-11
+cpi.headline,index_2010,2022-02,164.2517,published,source.geostat_cpi_index_2010,Georgia!C26,2026-09-11
+cpi.headline,index_2010,2022-03,168.2852,published,source.geostat_cpi_index_2010,Georgia!D26,2026-09-11
+cpi.headline,index_2010,2022-04,171.3781,published,source.geostat_cpi_index_2010,Georgia!E26,2026-09-11
+cpi.headline,index_2010,2022-05,173.1846,published,source.geostat_cpi_index_2010,Georgia!F26,2026-09-11
+cpi.headline,index_2010,2022-06,173.5588,published,source.geostat_cpi_index_2010,Georgia!G26,2026-09-11
+cpi.headline,index_2010,2022-07,173.9642,published,source.geostat_cpi_index_2010,Georgia!H26,2026-09-11
+cpi.headline,index_2010,2022-08,174.2068,published,source.geostat_cpi_index_2010,Georgia!I26,2026-09-11
+cpi.headline,index_2010,2022-09,175.6575,published,source.geostat_cpi_index_2010,Georgia!J26,2026-09-11
+cpi.headline,index_2010,2022-10,176.5142,published,source.geostat_cpi_index_2010,Georgia!K26,2026-09-11
+cpi.headline,index_2010,2022-11,177.336,published,source.geostat_cpi_index_2010,Georgia!L26,2026-09-11
+cpi.headline,index_2010,2022-12,176.8635,published,source.geostat_cpi_index_2010,Georgia!M26,2026-09-11
+cpi.headline,index_2010,2023-01,178.2038,published,source.geostat_cpi_index_2010,Georgia!B27,2026-09-11
+cpi.headline,index_2010,2023-02,177.6371,published,source.geostat_cpi_index_2010,Georgia!C27,2026-09-11
+cpi.headline,index_2010,2023-03,177.2421,published,source.geostat_cpi_index_2010,Georgia!D27,2026-09-11
+cpi.headline,index_2010,2023-04,175.9699,published,source.geostat_cpi_index_2010,Georgia!E27,2026-09-11
+cpi.headline,index_2010,2023-05,175.7366,published,source.geostat_cpi_index_2010,Georgia!F27,2026-09-11
+cpi.headline,index_2010,2023-06,174.5664,published,source.geostat_cpi_index_2010,Georgia!G27,2026-09-11
+cpi.headline,index_2010,2023-07,174.4917,published,source.geostat_cpi_index_2010,Georgia!H27,2026-09-11
+cpi.headline,index_2010,2023-08,175.7629,published,source.geostat_cpi_index_2010,Georgia!I27,2026-09-11
+cpi.headline,index_2010,2023-09,176.8438,published,source.geostat_cpi_index_2010,Georgia!J27,2026-09-11
+cpi.headline,index_2010,2023-10,177.9076,published,source.geostat_cpi_index_2010,Georgia!K27,2026-09-11
+cpi.headline,index_2010,2023-11,177.4775,published,source.geostat_cpi_index_2010,Georgia!L27,2026-09-11
+cpi.headline,index_2010,2023-12,177.6368,published,source.geostat_cpi_index_2010,Georgia!M27,2026-09-11
+cpi.headline,index_2010,2024-01,178.2104,published,source.geostat_cpi_index_2010,Georgia!B28,2026-09-11
+cpi.headline,index_2010,2024-02,178.1435,published,source.geostat_cpi_index_2010,Georgia!C28,2026-09-11
+cpi.headline,index_2010,2024-03,178.1641,published,source.geostat_cpi_index_2010,Georgia!D28,2026-09-11
+cpi.headline,index_2010,2024-04,178.6374,published,source.geostat_cpi_index_2010,Georgia!E28,2026-09-11
+cpi.headline,index_2010,2024-05,179.3101,published,source.geostat_cpi_index_2010,Georgia!F28,2026-09-11
+cpi.headline,index_2010,2024-06,178.3659,published,source.geostat_cpi_index_2010,Georgia!G28,2026-09-11
+cpi.headline,index_2010,2024-07,177.6112,published,source.geostat_cpi_index_2010,Georgia!H28,2026-09-11
+cpi.headline,index_2010,2024-08,177.4573,published,source.geostat_cpi_index_2010,Georgia!I28,2026-09-11
+cpi.headline,index_2010,2024-09,177.9662,published,source.geostat_cpi_index_2010,Georgia!J28,2026-09-11
+cpi.headline,index_2010,2024-10,178.4583,published,source.geostat_cpi_index_2010,Georgia!K28,2026-09-11
+cpi.headline,index_2010,2024-11,179.7221,published,source.geostat_cpi_index_2010,Georgia!L28,2026-09-11
+cpi.headline,index_2010,2024-12,180.9499,published,source.geostat_cpi_index_2010,Georgia!M28,2026-09-11
+cpi.headline,index_2010,2025-01,181.7024,published,source.geostat_cpi_index_2010,Georgia!B29,2026-09-11
+cpi.headline,index_2010,2025-02,182.4369,published,source.geostat_cpi_index_2010,Georgia!C29,2026-09-11
+cpi.headline,index_2010,2025-03,184.3922,published,source.geostat_cpi_index_2010,Georgia!D29,2026-09-11
+cpi.headline,index_2010,2025-04,184.6979,published,source.geostat_cpi_index_2010,Georgia!E29,2026-09-11
+cpi.headline,index_2010,2025-05,185.4994,published,source.geostat_cpi_index_2010,Georgia!F29,2026-09-11
+cpi.headline,index_2010,2025-06,185.4892,published,source.geostat_cpi_index_2010,Georgia!G29,2026-09-11
+cpi.headline,index_2010,2025-07,185.183,published,source.geostat_cpi_index_2010,Georgia!H29,2026-09-11
+cpi.headline,index_2010,2025-08,185.7083,published,source.geostat_cpi_index_2010,Georgia!I29,2026-09-11
+cpi.headline,index_2010,2025-09,186.5466,published,source.geostat_cpi_index_2010,Georgia!J29,2026-09-11
+cpi.headline,index_2010,2025-10,187.6865,published,source.geostat_cpi_index_2010,Georgia!K29,2026-09-11
+cpi.headline,index_2010,2025-11,188.4301,published,source.geostat_cpi_index_2010,Georgia!L29,2026-09-11
+cpi.headline,index_2010,2025-12,188.141,published,source.geostat_cpi_index_2010,Georgia!M29,2026-09-11
+cpi.headline,index_2010,2026-01,190.4385,published,source.geostat_cpi_index_2010,Georgia!B30,2026-09-11
+cpi.headline,index_2010,2026-02,190.7789,published,source.geostat_cpi_index_2010,Georgia!C30,2026-09-11
+cpi.headline,index_2010,2026-03,192.3328,published,source.geostat_cpi_index_2010,Georgia!D30,2026-09-11
+cpi.headline,index_2010,2026-04,195.6433,published,source.geostat_cpi_index_2010,Georgia!E30,2026-09-11
+cpi.headline,index_2010,2026-05,196.1539,published,source.geostat_cpi_index_2010,Georgia!F30,2026-09-11
+cpi.headline,index_2010,2026-06,196.286,published,source.geostat_cpi_index_2010,Georgia!G30,2026-09-11
+cpi.headline,index_2010,2026-07,195.4056,published,source.geostat_cpi_index_2010,Georgia!H30,2026-09-11
+cpi.headline,index_2010,2026-08,196.1968,published,source.geostat_cpi_index_2010,Georgia!I30,2026-09-11
+cpi.headline,mom_pct,2004-01,0.4149,published,source.geostat_cpi_mom,Georgia!D5,2026-09-11
+cpi.headline,mom_pct,2004-02,0.4375,published,source.geostat_cpi_mom,Georgia!E5,2026-09-11
+cpi.headline,mom_pct,2004-03,0.0997,published,source.geostat_cpi_mom,Georgia!F5,2026-09-11
+cpi.headline,mom_pct,2004-04,-0.1804,published,source.geostat_cpi_mom,Georgia!G5,2026-09-11
+cpi.headline,mom_pct,2004-05,0.0403,published,source.geostat_cpi_mom,Georgia!H5,2026-09-11
+cpi.headline,mom_pct,2004-06,-1.5799,published,source.geostat_cpi_mom,Georgia!I5,2026-09-11
+cpi.headline,mom_pct,2004-07,0.8479,published,source.geostat_cpi_mom,Georgia!J5,2026-09-11
+cpi.headline,mom_pct,2004-08,-0.5589,published,source.geostat_cpi_mom,Georgia!K5,2026-09-11
+cpi.headline,mom_pct,2004-09,1.4966,published,source.geostat_cpi_mom,Georgia!L5,2026-09-11
+cpi.headline,mom_pct,2004-10,1.602,published,source.geostat_cpi_mom,Georgia!M5,2026-09-11
+cpi.headline,mom_pct,2004-11,1.1748,published,source.geostat_cpi_mom,Georgia!N5,2026-09-11
+cpi.headline,mom_pct,2004-12,3.5333,published,source.geostat_cpi_mom,Georgia!O5,2026-09-11
+cpi.headline,mom_pct,2005-01,2.0901,published,source.geostat_cpi_mom,Georgia!P5,2026-09-11
+cpi.headline,mom_pct,2005-02,0.3221,published,source.geostat_cpi_mom,Georgia!Q5,2026-09-11
+cpi.headline,mom_pct,2005-03,0.5858,published,source.geostat_cpi_mom,Georgia!R5,2026-09-11
+cpi.headline,mom_pct,2005-04,0.4201,published,source.geostat_cpi_mom,Georgia!S5,2026-09-11
+cpi.headline,mom_pct,2005-05,-1.2914,published,source.geostat_cpi_mom,Georgia!T5,2026-09-11
+cpi.headline,mom_pct,2005-06,-1.437,published,source.geostat_cpi_mom,Georgia!U5,2026-09-11
+cpi.headline,mom_pct,2005-07,-1.9419,published,source.geostat_cpi_mom,Georgia!V5,2026-09-11
+cpi.headline,mom_pct,2005-08,0.5554,published,source.geostat_cpi_mom,Georgia!W5,2026-09-11
+cpi.headline,mom_pct,2005-09,1.9386,published,source.geostat_cpi_mom,Georgia!X5,2026-09-11
+cpi.headline,mom_pct,2005-10,1.6816,published,source.geostat_cpi_mom,Georgia!Y5,2026-09-11
+cpi.headline,mom_pct,2005-11,1.3504,published,source.geostat_cpi_mom,Georgia!Z5,2026-09-11
+cpi.headline,mom_pct,2005-12,1.8443,published,source.geostat_cpi_mom,Georgia!AA5,2026-09-11
+cpi.headline,mom_pct,2006-01,1.1943,published,source.geostat_cpi_mom,Georgia!AB5,2026-09-11
+cpi.headline,mom_pct,2006-02,0.1813,published,source.geostat_cpi_mom,Georgia!AC5,2026-09-11
+cpi.headline,mom_pct,2006-03,0.0885,published,source.geostat_cpi_mom,Georgia!AD5,2026-09-11
+cpi.headline,mom_pct,2006-04,1.7955,published,source.geostat_cpi_mom,Georgia!AE5,2026-09-11
+cpi.headline,mom_pct,2006-05,2.4214,published,source.geostat_cpi_mom,Georgia!AF5,2026-09-11
+cpi.headline,mom_pct,2006-06,-0.1669,published,source.geostat_cpi_mom,Georgia!AG5,2026-09-11
+cpi.headline,mom_pct,2006-07,0.7882,published,source.geostat_cpi_mom,Georgia!AH5,2026-09-11
+cpi.headline,mom_pct,2006-08,-0.421,published,source.geostat_cpi_mom,Georgia!AI5,2026-09-11
+cpi.headline,mom_pct,2006-09,-0.0098,published,source.geostat_cpi_mom,Georgia!AJ5,2026-09-11
+cpi.headline,mom_pct,2006-10,0.7575,published,source.geostat_cpi_mom,Georgia!AK5,2026-09-11
+cpi.headline,mom_pct,2006-11,0.9923,published,source.geostat_cpi_mom,Georgia!AL5,2026-09-11
+cpi.headline,mom_pct,2006-12,0.8604,published,source.geostat_cpi_mom,Georgia!AM5,2026-09-11
+cpi.headline,mom_pct,2007-01,2.7384,published,source.geostat_cpi_mom,Georgia!AN5,2026-09-11
+cpi.headline,mom_pct,2007-02,0.725,published,source.geostat_cpi_mom,Georgia!AO5,2026-09-11
+cpi.headline,mom_pct,2007-03,-1.0742,published,source.geostat_cpi_mom,Georgia!AP5,2026-09-11
+cpi.headline,mom_pct,2007-04,0.2878,published,source.geostat_cpi_mom,Georgia!AQ5,2026-09-11
+cpi.headline,mom_pct,2007-05,1.6252,published,source.geostat_cpi_mom,Georgia!AR5,2026-09-11
+cpi.headline,mom_pct,2007-06,-0.1839,published,source.geostat_cpi_mom,Georgia!AS5,2026-09-11
+cpi.headline,mom_pct,2007-07,0.1401,published,source.geostat_cpi_mom,Georgia!AT5,2026-09-11
+cpi.headline,mom_pct,2007-08,0.6303,published,source.geostat_cpi_mom,Georgia!AU5,2026-09-11
+cpi.headline,mom_pct,2007-09,1.1695,published,source.geostat_cpi_mom,Georgia!AV5,2026-09-11
+cpi.headline,mom_pct,2007-10,2.8369,published,source.geostat_cpi_mom,Georgia!AW5,2026-09-11
+cpi.headline,mom_pct,2007-11,1.3753,published,source.geostat_cpi_mom,Georgia!AX5,2026-09-11
+cpi.headline,mom_pct,2007-12,0.2597,published,source.geostat_cpi_mom,Georgia!AY5,2026-09-11
+cpi.headline,mom_pct,2008-01,2.4907,published,source.geostat_cpi_mom,Georgia!AZ5,2026-09-11
+cpi.headline,mom_pct,2008-02,0.9175,published,source.geostat_cpi_mom,Georgia!BA5,2026-09-11
+cpi.headline,mom_pct,2008-03,0.1134,published,source.geostat_cpi_mom,Georgia!BB5,2026-09-11
+cpi.headline,mom_pct,2008-04,0.2645,published,source.geostat_cpi_mom,Georgia!BC5,2026-09-11
+cpi.headline,mom_pct,2008-05,0.7297,published,source.geostat_cpi_mom,Georgia!BD5,2026-09-11
+cpi.headline,mom_pct,2008-06,-0.093,published,source.geostat_cpi_mom,Georgia!BE5,2026-09-11
+cpi.headline,mom_pct,2008-07,-1.2388,published,source.geostat_cpi_mom,Georgia!BF5,2026-09-11
+cpi.headline,mom_pct,2008-08,3.3752,published,source.geostat_cpi_mom,Georgia!BG5,2026-09-11
+cpi.headline,mom_pct,2008-09,-0.7979,published,source.geostat_cpi_mom,Georgia!BH5,2026-09-11
+cpi.headline,mom_pct,2008-10,-0.4961,published,source.geostat_cpi_mom,Georgia!BI5,2026-09-11
+cpi.headline,mom_pct,2008-11,0.6614,published,source.geostat_cpi_mom,Georgia!BJ5,2026-09-11
+cpi.headline,mom_pct,2008-12,-0.4185,published,source.geostat_cpi_mom,Georgia!BK5,2026-09-11
+cpi.headline,mom_pct,2009-01,1.4159,published,source.geostat_cpi_mom,Georgia!BL5,2026-09-11
+cpi.headline,mom_pct,2009-02,-1.3498,published,source.geostat_cpi_mom,Georgia!BM5,2026-09-11
+cpi.headline,mom_pct,2009-03,-0.3989,published,source.geostat_cpi_mom,Georgia!BN5,2026-09-11
+cpi.headline,mom_pct,2009-04,0.4748,published,source.geostat_cpi_mom,Georgia!BO5,2026-09-11
+cpi.headline,mom_pct,2009-05,1.1824,published,source.geostat_cpi_mom,Georgia!BP5,2026-09-11
+cpi.headline,mom_pct,2009-06,0.0091,published,source.geostat_cpi_mom,Georgia!BQ5,2026-09-11
+cpi.headline,mom_pct,2009-07,-3.3673,published,source.geostat_cpi_mom,Georgia!BR5,2026-09-11
+cpi.headline,mom_pct,2009-08,0.023,published,source.geostat_cpi_mom,Georgia!BS5,2026-09-11
+cpi.headline,mom_pct,2009-09,2.833,published,source.geostat_cpi_mom,Georgia!BT5,2026-09-11
+cpi.headline,mom_pct,2009-10,2.2411,published,source.geostat_cpi_mom,Georgia!BU5,2026-09-11
+cpi.headline,mom_pct,2009-11,0.1678,published,source.geostat_cpi_mom,Georgia!BV5,2026-09-11
+cpi.headline,mom_pct,2009-12,-0.1382,published,source.geostat_cpi_mom,Georgia!BW5,2026-09-11
+cpi.headline,mom_pct,2010-01,1.1276,published,source.geostat_cpi_mom,Georgia!BX5,2026-09-11
+cpi.headline,mom_pct,2010-02,1.4746,published,source.geostat_cpi_mom,Georgia!BY5,2026-09-11
+cpi.headline,mom_pct,2010-03,-0.1874,published,source.geostat_cpi_mom,Georgia!BZ5,2026-09-11
+cpi.headline,mom_pct,2010-04,0.2401,published,source.geostat_cpi_mom,Georgia!CA5,2026-09-11
+cpi.headline,mom_pct,2010-05,-0.3559,published,source.geostat_cpi_mom,Georgia!CB5,2026-09-11
+cpi.headline,mom_pct,2010-06,-0.2959,published,source.geostat_cpi_mom,Georgia!CC5,2026-09-11
+cpi.headline,mom_pct,2010-07,-0.2371,published,source.geostat_cpi_mom,Georgia!CD5,2026-09-11
+cpi.headline,mom_pct,2010-08,2.3253,published,source.geostat_cpi_mom,Georgia!CE5,2026-09-11
+cpi.headline,mom_pct,2010-09,3.098,published,source.geostat_cpi_mom,Georgia!CF5,2026-09-11
+cpi.headline,mom_pct,2010-10,2.0379,published,source.geostat_cpi_mom,Georgia!CG5,2026-09-11
+cpi.headline,mom_pct,2010-11,1.0512,published,source.geostat_cpi_mom,Georgia!CH5,2026-09-11
+cpi.headline,mom_pct,2010-12,0.4931,published,source.geostat_cpi_mom,Georgia!CI5,2026-09-11
+cpi.headline,mom_pct,2011-01,2.0537,published,source.geostat_cpi_mom,Georgia!CJ5,2026-09-11
+cpi.headline,mom_pct,2011-02,2.8186,published,source.geostat_cpi_mom,Georgia!CK5,2026-09-11
+cpi.headline,mom_pct,2011-03,-0.0218,published,source.geostat_cpi_mom,Georgia!CL5,2026-09-11
+cpi.headline,mom_pct,2011-04,-0.1427,published,source.geostat_cpi_mom,Georgia!CM5,2026-09-11
+cpi.headline,mom_pct,2011-05,0.375,published,source.geostat_cpi_mom,Georgia!CN5,2026-09-11
+cpi.headline,mom_pct,2011-06,-4.0438,published,source.geostat_cpi_mom,Georgia!CO5,2026-09-11
+cpi.headline,mom_pct,2011-07,-1.6286,published,source.geostat_cpi_mom,Georgia!CP5,2026-09-11
+cpi.headline,mom_pct,2011-08,1.0572,published,source.geostat_cpi_mom,Georgia!CQ5,2026-09-11
+cpi.headline,mom_pct,2011-09,0.6036,published,source.geostat_cpi_mom,Georgia!CR5,2026-09-11
+cpi.headline,mom_pct,2011-10,-0.1516,published,source.geostat_cpi_mom,Georgia!CS5,2026-09-11
+cpi.headline,mom_pct,2011-11,0.6551,published,source.geostat_cpi_mom,Georgia!CT5,2026-09-11
+cpi.headline,mom_pct,2011-12,0.6154,published,source.geostat_cpi_mom,Georgia!CU5,2026-09-11
+cpi.headline,mom_pct,2012-01,0.4908,published,source.geostat_cpi_mom,Georgia!CV5,2026-09-11
+cpi.headline,mom_pct,2012-02,0.2266,published,source.geostat_cpi_mom,Georgia!CW5,2026-09-11
+cpi.headline,mom_pct,2012-03,-0.1814,published,source.geostat_cpi_mom,Georgia!CX5,2026-09-11
+cpi.headline,mom_pct,2012-04,-0.0345,published,source.geostat_cpi_mom,Georgia!CY5,2026-09-11
+cpi.headline,mom_pct,2012-05,-0.8506,published,source.geostat_cpi_mom,Georgia!CZ5,2026-09-11
+cpi.headline,mom_pct,2012-06,-0.9475,published,source.geostat_cpi_mom,Georgia!DA5,2026-09-11
+cpi.headline,mom_pct,2012-07,-0.8946,published,source.geostat_cpi_mom,Georgia!DB5,2026-09-11
+cpi.headline,mom_pct,2012-08,0.1287,published,source.geostat_cpi_mom,Georgia!DC5,2026-09-11
+cpi.headline,mom_pct,2012-09,0.8441,published,source.geostat_cpi_mom,Georgia!DD5,2026-09-11
+cpi.headline,mom_pct,2012-10,0.0476,published,source.geostat_cpi_mom,Georgia!DE5,2026-09-11
+cpi.headline,mom_pct,2012-11,0.0863,published,source.geostat_cpi_mom,Georgia!DF5,2026-09-11
+cpi.headline,mom_pct,2012-12,-0.2806,published,source.geostat_cpi_mom,Georgia!DG5,2026-09-11
+cpi.headline,mom_pct,2013-01,0.26,published,source.geostat_cpi_mom,Georgia!DH5,2026-09-11
+cpi.headline,mom_pct,2013-02,-0.3001,published,source.geostat_cpi_mom,Georgia!DI5,2026-09-11
+cpi.headline,mom_pct,2013-03,-0.1328,published,source.geostat_cpi_mom,Georgia!DJ5,2026-09-11
+cpi.headline,mom_pct,2013-04,0.3651,published,source.geostat_cpi_mom,Georgia!DK5,2026-09-11
+cpi.headline,mom_pct,2013-05,0.7285,published,source.geostat_cpi_mom,Georgia!DL5,2026-09-11
+cpi.headline,mom_pct,2013-06,-0.597,published,source.geostat_cpi_mom,Georgia!DM5,2026-09-11
+cpi.headline,mom_pct,2013-07,-1.3432,published,source.geostat_cpi_mom,Georgia!DN5,2026-09-11
+cpi.headline,mom_pct,2013-08,-0.0123,published,source.geostat_cpi_mom,Georgia!DO5,2026-09-11
+cpi.headline,mom_pct,2013-09,-0.1085,published,source.geostat_cpi_mom,Georgia!DP5,2026-09-11
+cpi.headline,mom_pct,2013-10,1.5344,published,source.geostat_cpi_mom,Georgia!DQ5,2026-09-11
+cpi.headline,mom_pct,2013-11,0.5203,published,source.geostat_cpi_mom,Georgia!DR5,2026-09-11
+cpi.headline,mom_pct,2013-12,1.469,published,source.geostat_cpi_mom,Georgia!DS5,2026-09-11
+cpi.headline,mom_pct,2014-01,0.7962,published,source.geostat_cpi_mom,Georgia!DT5,2026-09-11
+cpi.headline,mom_pct,2014-02,0.2241,published,source.geostat_cpi_mom,Georgia!DU5,2026-09-11
+cpi.headline,mom_pct,2014-03,-0.1029,published,source.geostat_cpi_mom,Georgia!DV5,2026-09-11
+cpi.headline,mom_pct,2014-04,0.3042,published,source.geostat_cpi_mom,Georgia!DW5,2026-09-11
+cpi.headline,mom_pct,2014-05,-0.269,published,source.geostat_cpi_mom,Georgia!DX5,2026-09-11
+cpi.headline,mom_pct,2014-06,-0.9494,published,source.geostat_cpi_mom,Georgia!DY5,2026-09-11
+cpi.headline,mom_pct,2014-07,-0.5619,published,source.geostat_cpi_mom,Georgia!DZ5,2026-09-11
+cpi.headline,mom_pct,2014-08,0.4998,published,source.geostat_cpi_mom,Georgia!EA5,2026-09-11
+cpi.headline,mom_pct,2014-09,1.2204,published,source.geostat_cpi_mom,Georgia!EB5,2026-09-11
+cpi.headline,mom_pct,2014-10,0.2642,published,source.geostat_cpi_mom,Georgia!EC5,2026-09-11
+cpi.headline,mom_pct,2014-11,-0.1375,published,source.geostat_cpi_mom,Georgia!ED5,2026-09-11
+cpi.headline,mom_pct,2014-12,0.6664,published,source.geostat_cpi_mom,Georgia!EE5,2026-09-11
+cpi.headline,mom_pct,2015-01,0.2447,published,source.geostat_cpi_mom,Georgia!EF5,2026-09-11
+cpi.headline,mom_pct,2015-02,0.1044,published,source.geostat_cpi_mom,Georgia!EG5,2026-09-11
+cpi.headline,mom_pct,2015-03,1.1681,published,source.geostat_cpi_mom,Georgia!EH5,2026-09-11
+cpi.headline,mom_pct,2015-04,0.2606,published,source.geostat_cpi_mom,Georgia!EI5,2026-09-11
+cpi.headline,mom_pct,2015-05,0.6483,published,source.geostat_cpi_mom,Georgia!EJ5,2026-09-11
+cpi.headline,mom_pct,2015-06,0.0218,published,source.geostat_cpi_mom,Georgia!EK5,2026-09-11
+cpi.headline,mom_pct,2015-07,-0.1996,published,source.geostat_cpi_mom,Georgia!EL5,2026-09-11
+cpi.headline,mom_pct,2015-08,0.9958,published,source.geostat_cpi_mom,Georgia!EM5,2026-09-11
+cpi.headline,mom_pct,2015-09,1.0713,published,source.geostat_cpi_mom,Georgia!EN5,2026-09-11
+cpi.headline,mom_pct,2015-10,0.8151,published,source.geostat_cpi_mom,Georgia!EO5,2026-09-11
+cpi.headline,mom_pct,2015-11,0.2956,published,source.geostat_cpi_mom,Georgia!EP5,2026-09-11
+cpi.headline,mom_pct,2015-12,-0.6357,published,source.geostat_cpi_mom,Georgia!EQ5,2026-09-11
+cpi.headline,mom_pct,2016-01,0.9054,published,source.geostat_cpi_mom,Georgia!ER5,2026-09-11
+cpi.headline,mom_pct,2016-02,0.108,published,source.geostat_cpi_mom,Georgia!ES5,2026-09-11
+cpi.headline,mom_pct,2016-03,-0.2818,published,source.geostat_cpi_mom,Georgia!ET5,2026-09-11
+cpi.headline,mom_pct,2016-04,-0.6093,published,source.geostat_cpi_mom,Georgia!EU5,2026-09-11
+cpi.headline,mom_pct,2016-05,-0.4112,published,source.geostat_cpi_mom,Georgia!EV5,2026-09-11
+cpi.headline,mom_pct,2016-06,-0.8905,published,source.geostat_cpi_mom,Georgia!EW5,2026-09-11
+cpi.headline,mom_pct,2016-07,0.1664,published,source.geostat_cpi_mom,Georgia!EX5,2026-09-11
+cpi.headline,mom_pct,2016-08,0.4078,published,source.geostat_cpi_mom,Georgia!EY5,2026-09-11
+cpi.headline,mom_pct,2016-09,0.2643,published,source.geostat_cpi_mom,Georgia!EZ5,2026-09-11
+cpi.headline,mom_pct,2016-10,0.5458,published,source.geostat_cpi_mom,Georgia!FA5,2026-09-11
+cpi.headline,mom_pct,2016-11,0.6025,published,source.geostat_cpi_mom,Georgia!FB5,2026-09-11
+cpi.headline,mom_pct,2016-12,1.0292,published,source.geostat_cpi_mom,Georgia!FC5,2026-09-11
+cpi.headline,mom_pct,2017-01,2.9306,published,source.geostat_cpi_mom,Georgia!FD5,2026-09-11
+cpi.headline,mom_pct,2017-02,1.7088,published,source.geostat_cpi_mom,Georgia!FE5,2026-09-11
+cpi.headline,mom_pct,2017-03,-0.4563,published,source.geostat_cpi_mom,Georgia!FF5,2026-09-11
+cpi.headline,mom_pct,2017-04,0.11,published,source.geostat_cpi_mom,Georgia!FG5,2026-09-11
+cpi.headline,mom_pct,2017-05,0.0028,published,source.geostat_cpi_mom,Georgia!FH5,2026-09-11
+cpi.headline,mom_pct,2017-06,-0.3898,published,source.geostat_cpi_mom,Georgia!FI5,2026-09-11
+cpi.headline,mom_pct,2017-07,-0.9003,published,source.geostat_cpi_mom,Georgia!FJ5,2026-09-11
+cpi.headline,mom_pct,2017-08,0.1996,published,source.geostat_cpi_mom,Georgia!FK5,2026-09-11
+cpi.headline,mom_pct,2017-09,0.6755,published,source.geostat_cpi_mom,Georgia!FL5,2026-09-11
+cpi.headline,mom_pct,2017-10,0.7781,published,source.geostat_cpi_mom,Georgia!FM5,2026-09-11
+cpi.headline,mom_pct,2017-11,1.0917,published,source.geostat_cpi_mom,Georgia!FN5,2026-09-11
+cpi.headline,mom_pct,2017-12,0.8269,published,source.geostat_cpi_mom,Georgia!FO5,2026-09-11
+cpi.headline,mom_pct,2018-01,0.6205,published,source.geostat_cpi_mom,Georgia!FP5,2026-09-11
+cpi.headline,mom_pct,2018-02,0.1692,published,source.geostat_cpi_mom,Georgia!FQ5,2026-09-11
+cpi.headline,mom_pct,2018-03,-0.3743,published,source.geostat_cpi_mom,Georgia!FR5,2026-09-11
+cpi.headline,mom_pct,2018-04,-0.2128,published,source.geostat_cpi_mom,Georgia!FS5,2026-09-11
+cpi.headline,mom_pct,2018-05,-0.0315,published,source.geostat_cpi_mom,Georgia!FT5,2026-09-11
+cpi.headline,mom_pct,2018-06,-0.6435,published,source.geostat_cpi_mom,Georgia!FU5,2026-09-11
+cpi.headline,mom_pct,2018-07,-0.2806,published,source.geostat_cpi_mom,Georgia!FV5,2026-09-11
+cpi.headline,mom_pct,2018-08,0.4981,published,source.geostat_cpi_mom,Georgia!FW5,2026-09-11
+cpi.headline,mom_pct,2018-09,0.2847,published,source.geostat_cpi_mom,Georgia!FX5,2026-09-11
+cpi.headline,mom_pct,2018-10,0.3198,published,source.geostat_cpi_mom,Georgia!FY5,2026-09-11
+cpi.headline,mom_pct,2018-11,0.7062,published,source.geostat_cpi_mom,Georgia!FZ5,2026-09-11
+cpi.headline,mom_pct,2018-12,0.4591,published,source.geostat_cpi_mom,Georgia!GA5,2026-09-11
+cpi.headline,mom_pct,2019-01,1.2881,published,source.geostat_cpi_mom,Georgia!GB5,2026-09-11
+cpi.headline,mom_pct,2019-02,0.274,published,source.geostat_cpi_mom,Georgia!GC5,2026-09-11
+cpi.headline,mom_pct,2019-03,0.9978,published,source.geostat_cpi_mom,Georgia!GD5,2026-09-11
+cpi.headline,mom_pct,2019-04,0.2046,published,source.geostat_cpi_mom,Georgia!GE5,2026-09-11
+cpi.headline,mom_pct,2019-05,0.51,published,source.geostat_cpi_mom,Georgia!GF5,2026-09-11
+cpi.headline,mom_pct,2019-06,-0.981,published,source.geostat_cpi_mom,Georgia!GG5,2026-09-11
+cpi.headline,mom_pct,2019-07,-0.0236,published,source.geostat_cpi_mom,Georgia!GH5,2026-09-11
+cpi.headline,mom_pct,2019-08,0.7891,published,source.geostat_cpi_mom,Georgia!GI5,2026-09-11
+cpi.headline,mom_pct,2019-09,1.6947,published,source.geostat_cpi_mom,Georgia!GJ5,2026-09-11
+cpi.headline,mom_pct,2019-10,0.7691,published,source.geostat_cpi_mom,Georgia!GK5,2026-09-11
+cpi.headline,mom_pct,2019-11,0.8659,published,source.geostat_cpi_mom,Georgia!GL5,2026-09-11
+cpi.headline,mom_pct,2019-12,0.4186,published,source.geostat_cpi_mom,Georgia!GM5,2026-09-11
+cpi.headline,mom_pct,2020-01,0.7074,published,source.geostat_cpi_mom,Georgia!GN5,2026-09-11
+cpi.headline,mom_pct,2020-02,0.332,published,source.geostat_cpi_mom,Georgia!GO5,2026-09-11
+cpi.headline,mom_pct,2020-03,0.6519,published,source.geostat_cpi_mom,Georgia!GP5,2026-09-11
+cpi.headline,mom_pct,2020-04,0.944,published,source.geostat_cpi_mom,Georgia!GQ5,2026-09-11
+cpi.headline,mom_pct,2020-05,0.2032,published,source.geostat_cpi_mom,Georgia!GR5,2026-09-11
+cpi.headline,mom_pct,2020-06,-1.3587,published,source.geostat_cpi_mom,Georgia!GS5,2026-09-11
+cpi.headline,mom_pct,2020-07,-0.4747,published,source.geostat_cpi_mom,Georgia!GT5,2026-09-11
+cpi.headline,mom_pct,2020-08,-0.024,published,source.geostat_cpi_mom,Georgia!GU5,2026-09-11
+cpi.headline,mom_pct,2020-09,0.6957,published,source.geostat_cpi_mom,Georgia!GV5,2026-09-11
+cpi.headline,mom_pct,2020-10,0.8046,published,source.geostat_cpi_mom,Georgia!GW5,2026-09-11
+cpi.headline,mom_pct,2020-11,0.8865,published,source.geostat_cpi_mom,Georgia!GX5,2026-09-11
+cpi.headline,mom_pct,2020-12,-0.9574,published,source.geostat_cpi_mom,Georgia!GY5,2026-09-11
+cpi.headline,mom_pct,2021-01,1.1268,published,source.geostat_cpi_mom,Georgia!GZ5,2026-09-11
+cpi.headline,mom_pct,2021-02,1.0607,published,source.geostat_cpi_mom,Georgia!HA5,2026-09-11
+cpi.headline,mom_pct,2021-03,4.1875,published,source.geostat_cpi_mom,Georgia!HB5,2026-09-11
+cpi.headline,mom_pct,2021-04,0.9336,published,source.geostat_cpi_mom,Georgia!HC5,2026-09-11
+cpi.headline,mom_pct,2021-05,0.6544,published,source.geostat_cpi_mom,Georgia!HD5,2026-09-11
+cpi.headline,mom_pct,2021-06,0.6624,published,source.geostat_cpi_mom,Georgia!HE5,2026-09-11
+cpi.headline,mom_pct,2021-07,1.3492,published,source.geostat_cpi_mom,Georgia!HF5,2026-09-11
+cpi.headline,mom_pct,2021-08,0.7452,published,source.geostat_cpi_mom,Georgia!HG5,2026-09-11
+cpi.headline,mom_pct,2021-09,0.2436,published,source.geostat_cpi_mom,Georgia!HH5,2026-09-11
+cpi.headline,mom_pct,2021-10,1.3271,published,source.geostat_cpi_mom,Georgia!HI5,2026-09-11
+cpi.headline,mom_pct,2021-11,0.614,published,source.geostat_cpi_mom,Georgia!HJ5,2026-09-11
+cpi.headline,mom_pct,2021-12,0.2743,published,source.geostat_cpi_mom,Georgia!HK5,2026-09-11
+cpi.headline,mom_pct,2022-01,1.1299,published,source.geostat_cpi_mom,Georgia!HL5,2026-09-11
+cpi.headline,mom_pct,2022-02,0.8743,published,source.geostat_cpi_mom,Georgia!HM5,2026-09-11
+cpi.headline,mom_pct,2022-03,2.4557,published,source.geostat_cpi_mom,Georgia!HN5,2026-09-11
+cpi.headline,mom_pct,2022-04,1.8379,published,source.geostat_cpi_mom,Georgia!HO5,2026-09-11
+cpi.headline,mom_pct,2022-05,1.0542,published,source.geostat_cpi_mom,Georgia!HP5,2026-09-11
+cpi.headline,mom_pct,2022-06,0.2161,published,source.geostat_cpi_mom,Georgia!HQ5,2026-09-11
+cpi.headline,mom_pct,2022-07,0.2336,published,source.geostat_cpi_mom,Georgia!HR5,2026-09-11
+cpi.headline,mom_pct,2022-08,0.1395,published,source.geostat_cpi_mom,Georgia!HS5,2026-09-11
+cpi.headline,mom_pct,2022-09,0.8327,published,source.geostat_cpi_mom,Georgia!HT5,2026-09-11
+cpi.headline,mom_pct,2022-10,0.4877,published,source.geostat_cpi_mom,Georgia!HU5,2026-09-11
+cpi.headline,mom_pct,2022-11,0.4656,published,source.geostat_cpi_mom,Georgia!HV5,2026-09-11
+cpi.headline,mom_pct,2022-12,-0.2664,published,source.geostat_cpi_mom,Georgia!HW5,2026-09-11
+cpi.headline,mom_pct,2023-01,0.7578,published,source.geostat_cpi_mom,Georgia!HX5,2026-09-11
+cpi.headline,mom_pct,2023-02,-0.318,published,source.geostat_cpi_mom,Georgia!HY5,2026-09-11
+cpi.headline,mom_pct,2023-03,-0.2224,published,source.geostat_cpi_mom,Georgia!HZ5,2026-09-11
+cpi.headline,mom_pct,2023-04,-0.7178,published,source.geostat_cpi_mom,Georgia!IA5,2026-09-11
+cpi.headline,mom_pct,2023-05,-0.1326,published,source.geostat_cpi_mom,Georgia!IB5,2026-09-11
+cpi.headline,mom_pct,2023-06,-0.6658,published,source.geostat_cpi_mom,Georgia!IC5,2026-09-11
+cpi.headline,mom_pct,2023-07,-0.0428,published,source.geostat_cpi_mom,Georgia!ID5,2026-09-11
+cpi.headline,mom_pct,2023-08,0.7285,published,source.geostat_cpi_mom,Georgia!IE5,2026-09-11
+cpi.headline,mom_pct,2023-09,0.615,published,source.geostat_cpi_mom,Georgia!IF5,2026-09-11
+cpi.headline,mom_pct,2023-10,0.6016,published,source.geostat_cpi_mom,Georgia!IG5,2026-09-11
+cpi.headline,mom_pct,2023-11,-0.2418,published,source.geostat_cpi_mom,Georgia!IH5,2026-09-11
+cpi.headline,mom_pct,2023-12,0.0897,published,source.geostat_cpi_mom,Georgia!II5,2026-09-11
+cpi.headline,mom_pct,2024-01,0.3229,published,source.geostat_cpi_mom,Georgia!IJ5,2026-09-11
+cpi.headline,mom_pct,2024-02,-0.0376,published,source.geostat_cpi_mom,Georgia!IK5,2026-09-11
+cpi.headline,mom_pct,2024-03,0.0116,published,source.geostat_cpi_mom,Georgia!IL5,2026-09-11
+cpi.headline,mom_pct,2024-04,0.2657,published,source.geostat_cpi_mom,Georgia!IM5,2026-09-11
+cpi.headline,mom_pct,2024-05,0.3765,published,source.geostat_cpi_mom,Georgia!IN5,2026-09-11
+cpi.headline,mom_pct,2024-06,-0.5266,published,source.geostat_cpi_mom,Georgia!IO5,2026-09-11
+cpi.headline,mom_pct,2024-07,-0.4231,published,source.geostat_cpi_mom,Georgia!IP5,2026-09-11
+cpi.headline,mom_pct,2024-08,-0.0866,published,source.geostat_cpi_mom,Georgia!IQ5,2026-09-11
+cpi.headline,mom_pct,2024-09,0.2868,published,source.geostat_cpi_mom,Georgia!IR5,2026-09-11
+cpi.headline,mom_pct,2024-10,0.2765,published,source.geostat_cpi_mom,Georgia!IS5,2026-09-11
+cpi.headline,mom_pct,2024-11,0.7082,published,source.geostat_cpi_mom,Georgia!IT5,2026-09-11
+cpi.headline,mom_pct,2024-12,0.6831,published,source.geostat_cpi_mom,Georgia!IU5,2026-09-11
+cpi.headline,mom_pct,2025-01,0.4159,published,source.geostat_cpi_mom,Georgia!IV5,2026-09-11
+cpi.headline,mom_pct,2025-02,0.4042,published,source.geostat_cpi_mom,Georgia!IW5,2026-09-11
+cpi.headline,mom_pct,2025-03,1.0717,published,source.geostat_cpi_mom,Georgia!IX5,2026-09-11
+cpi.headline,mom_pct,2025-04,0.1658,published,source.geostat_cpi_mom,Georgia!IY5,2026-09-11
+cpi.headline,mom_pct,2025-05,0.434,published,source.geostat_cpi_mom,Georgia!IZ5,2026-09-11
+cpi.headline,mom_pct,2025-06,-0.0055,published,source.geostat_cpi_mom,Georgia!JA5,2026-09-11
+cpi.headline,mom_pct,2025-07,-0.1651,published,source.geostat_cpi_mom,Georgia!JB5,2026-09-11
+cpi.headline,mom_pct,2025-08,0.2836,published,source.geostat_cpi_mom,Georgia!JC5,2026-09-11
+cpi.headline,mom_pct,2025-09,0.4514,published,source.geostat_cpi_mom,Georgia!JD5,2026-09-11
+cpi.headline,mom_pct,2025-10,0.6111,published,source.geostat_cpi_mom,Georgia!JE5,2026-09-11
+cpi.headline,mom_pct,2025-11,0.3961,published,source.geostat_cpi_mom,Georgia!JF5,2026-09-11
+cpi.headline,mom_pct,2025-12,-0.1534,published,source.geostat_cpi_mom,Georgia!JG5,2026-09-11
+cpi.headline,mom_pct,2026-01,1.2212,published,source.geostat_cpi_mom,Georgia!JH5,2026-09-11
+cpi.headline,mom_pct,2026-02,0.1787,published,source.geostat_cpi_mom,Georgia!JI5,2026-09-11
+cpi.headline,mom_pct,2026-03,0.8145,published,source.geostat_cpi_mom,Georgia!JJ5,2026-09-11
+cpi.headline,mom_pct,2026-04,1.7212,published,source.geostat_cpi_mom,Georgia!JK5,2026-09-11
+cpi.headline,mom_pct,2026-05,0.261,published,source.geostat_cpi_mom,Georgia!JL5,2026-09-11
+cpi.headline,mom_pct,2026-06,0.0674,published,source.geostat_cpi_mom,Georgia!JM5,2026-09-11
+cpi.headline,mom_pct,2026-07,-0.4486,published,source.geostat_cpi_mom,Georgia!JN5,2026-09-11
+cpi.headline,mom_pct,2026-08,0.4049,published,source.geostat_cpi_mom,Georgia!JO5,2026-09-11
+cpi.headline,yoy_pct,2004-01,5.1981,published,source.geostat_cpi_yoy,Georgia!D5,2026-09-11
+cpi.headline,yoy_pct,2004-02,6.2108,published,source.geostat_cpi_yoy,Georgia!E5,2026-09-11
+cpi.headline,yoy_pct,2004-03,6.2736,published,source.geostat_cpi_yoy,Georgia!F5,2026-09-11
+cpi.headline,yoy_pct,2004-04,5.5564,published,source.geostat_cpi_yoy,Georgia!G5,2026-09-11
+cpi.headline,yoy_pct,2004-05,5.3657,published,source.geostat_cpi_yoy,Georgia!H5,2026-09-11
+cpi.headline,yoy_pct,2004-06,3.6372,published,source.geostat_cpi_yoy,Georgia!I5,2026-09-11
+cpi.headline,yoy_pct,2004-07,5.4531,published,source.geostat_cpi_yoy,Georgia!J5,2026-09-11
+cpi.headline,yoy_pct,2004-08,4.9934,published,source.geostat_cpi_yoy,Georgia!K5,2026-09-11
+cpi.headline,yoy_pct,2004-09,6.0063,published,source.geostat_cpi_yoy,Georgia!L5,2026-09-11
+cpi.headline,yoy_pct,2004-10,7.7178,published,source.geostat_cpi_yoy,Georgia!M5,2026-09-11
+cpi.headline,yoy_pct,2004-11,3.9822,published,source.geostat_cpi_yoy,Georgia!N5,2026-09-11
+cpi.headline,yoy_pct,2004-12,7.4831,published,source.geostat_cpi_yoy,Georgia!O5,2026-09-11
+cpi.headline,yoy_pct,2005-01,9.2763,published,source.geostat_cpi_yoy,Georgia!P5,2026-09-11
+cpi.headline,yoy_pct,2005-02,9.1507,published,source.geostat_cpi_yoy,Georgia!Q5,2026-09-11
+cpi.headline,yoy_pct,2005-03,9.6807,published,source.geostat_cpi_yoy,Georgia!R5,2026-09-11
+cpi.headline,yoy_pct,2005-04,10.3405,published,source.geostat_cpi_yoy,Georgia!S5,2026-09-11
+cpi.headline,yoy_pct,2005-05,8.8717,published,source.geostat_cpi_yoy,Georgia!T5,2026-09-11
+cpi.headline,yoy_pct,2005-06,9.0298,published,source.geostat_cpi_yoy,Georgia!U5,2026-09-11
+cpi.headline,yoy_pct,2005-07,6.0137,published,source.geostat_cpi_yoy,Georgia!V5,2026-09-11
+cpi.headline,yoy_pct,2005-08,7.2016,published,source.geostat_cpi_yoy,Georgia!W5,2026-09-11
+cpi.headline,yoy_pct,2005-09,7.6685,published,source.geostat_cpi_yoy,Georgia!X5,2026-09-11
+cpi.headline,yoy_pct,2005-10,7.7529,published,source.geostat_cpi_yoy,Georgia!Y5,2026-09-11
+cpi.headline,yoy_pct,2005-11,7.9399,published,source.geostat_cpi_yoy,Georgia!Z5,2026-09-11
+cpi.headline,yoy_pct,2005-12,6.179,published,source.geostat_cpi_yoy,Georgia!AA5,2026-09-11
+cpi.headline,yoy_pct,2006-01,5.2472,published,source.geostat_cpi_yoy,Georgia!AB5,2026-09-11
+cpi.headline,yoy_pct,2006-02,5.0995,published,source.geostat_cpi_yoy,Georgia!AC5,2026-09-11
+cpi.headline,yoy_pct,2006-03,4.5799,published,source.geostat_cpi_yoy,Georgia!AD5,2026-09-11
+cpi.headline,yoy_pct,2006-04,6.0123,published,source.geostat_cpi_yoy,Georgia!AE5,2026-09-11
+cpi.headline,yoy_pct,2006-05,9.9998,published,source.geostat_cpi_yoy,Georgia!AF5,2026-09-11
+cpi.headline,yoy_pct,2006-06,11.4173,published,source.geostat_cpi_yoy,Georgia!AG5,2026-09-11
+cpi.headline,yoy_pct,2006-07,14.5193,published,source.geostat_cpi_yoy,Georgia!AH5,2026-09-11
+cpi.headline,yoy_pct,2006-08,13.4073,published,source.geostat_cpi_yoy,Georgia!AI5,2026-09-11
+cpi.headline,yoy_pct,2006-09,11.2397,published,source.geostat_cpi_yoy,Georgia!AJ5,2026-09-11
+cpi.headline,yoy_pct,2006-10,10.2287,published,source.geostat_cpi_yoy,Georgia!AK5,2026-09-11
+cpi.headline,yoy_pct,2006-11,9.8392,published,source.geostat_cpi_yoy,Georgia!AL5,2026-09-11
+cpi.headline,yoy_pct,2006-12,8.778,published,source.geostat_cpi_yoy,Georgia!AM5,2026-09-11
+cpi.headline,yoy_pct,2007-01,10.4379,published,source.geostat_cpi_yoy,Georgia!AN5,2026-09-11
+cpi.headline,yoy_pct,2007-02,11.0372,published,source.geostat_cpi_yoy,Georgia!AO5,2026-09-11
+cpi.headline,yoy_pct,2007-03,9.7474,published,source.geostat_cpi_yoy,Georgia!AP5,2026-09-11
+cpi.headline,yoy_pct,2007-04,8.1219,published,source.geostat_cpi_yoy,Georgia!AQ5,2026-09-11
+cpi.headline,yoy_pct,2007-05,7.2815,published,source.geostat_cpi_yoy,Georgia!AR5,2026-09-11
+cpi.headline,yoy_pct,2007-06,7.2633,published,source.geostat_cpi_yoy,Georgia!AS5,2026-09-11
+cpi.headline,yoy_pct,2007-07,6.5735,published,source.geostat_cpi_yoy,Georgia!AT5,2026-09-11
+cpi.headline,yoy_pct,2007-08,7.6987,published,source.geostat_cpi_yoy,Georgia!AU5,2026-09-11
+cpi.headline,yoy_pct,2007-09,8.9689,published,source.geostat_cpi_yoy,Georgia!AV5,2026-09-11
+cpi.headline,yoy_pct,2007-10,11.2177,published,source.geostat_cpi_yoy,Georgia!AW5,2026-09-11
+cpi.headline,yoy_pct,2007-11,11.6396,published,source.geostat_cpi_yoy,Georgia!AX5,2026-09-11
+cpi.headline,yoy_pct,2007-12,10.9747,published,source.geostat_cpi_yoy,Georgia!AY5,2026-09-11
+cpi.headline,yoy_pct,2008-01,10.7073,published,source.geostat_cpi_yoy,Georgia!AZ5,2026-09-11
+cpi.headline,yoy_pct,2008-02,10.9188,published,source.geostat_cpi_yoy,Georgia!BA5,2026-09-11
+cpi.headline,yoy_pct,2008-03,12.2504,published,source.geostat_cpi_yoy,Georgia!BB5,2026-09-11
+cpi.headline,yoy_pct,2008-04,12.2243,published,source.geostat_cpi_yoy,Georgia!BC5,2026-09-11
+cpi.headline,yoy_pct,2008-05,11.2353,published,source.geostat_cpi_yoy,Georgia!BD5,2026-09-11
+cpi.headline,yoy_pct,2008-06,11.3366,published,source.geostat_cpi_yoy,Georgia!BE5,2026-09-11
+cpi.headline,yoy_pct,2008-07,9.8035,published,source.geostat_cpi_yoy,Georgia!BF5,2026-09-11
+cpi.headline,yoy_pct,2008-08,12.7986,published,source.geostat_cpi_yoy,Georgia!BG5,2026-09-11
+cpi.headline,yoy_pct,2008-09,10.6051,published,source.geostat_cpi_yoy,Georgia!BH5,2026-09-11
+cpi.headline,yoy_pct,2008-10,7.0203,published,source.geostat_cpi_yoy,Georgia!BI5,2026-09-11
+cpi.headline,yoy_pct,2008-11,6.2666,published,source.geostat_cpi_yoy,Georgia!BJ5,2026-09-11
+cpi.headline,yoy_pct,2008-12,5.5477,published,source.geostat_cpi_yoy,Georgia!BK5,2026-09-11
+cpi.headline,yoy_pct,2009-01,4.4409,published,source.geostat_cpi_yoy,Georgia!BL5,2026-09-11
+cpi.headline,yoy_pct,2009-02,2.0945,published,source.geostat_cpi_yoy,Georgia!BM5,2026-09-11
+cpi.headline,yoy_pct,2009-03,1.572,published,source.geostat_cpi_yoy,Georgia!BN5,2026-09-11
+cpi.headline,yoy_pct,2009-04,1.785,published,source.geostat_cpi_yoy,Georgia!BO5,2026-09-11
+cpi.headline,yoy_pct,2009-05,2.2425,published,source.geostat_cpi_yoy,Georgia!BP5,2026-09-11
+cpi.headline,yoy_pct,2009-06,2.347,published,source.geostat_cpi_yoy,Georgia!BQ5,2026-09-11
+cpi.headline,yoy_pct,2009-07,0.1413,published,source.geostat_cpi_yoy,Georgia!BR5,2026-09-11
+cpi.headline,yoy_pct,2009-08,-3.1061,published,source.geostat_cpi_yoy,Georgia!BS5,2026-09-11
+cpi.headline,yoy_pct,2009-09,0.4402,published,source.geostat_cpi_yoy,Georgia!BT5,2026-09-11
+cpi.headline,yoy_pct,2009-10,3.2032,published,source.geostat_cpi_yoy,Georgia!BU5,2026-09-11
+cpi.headline,yoy_pct,2009-11,2.6972,published,source.geostat_cpi_yoy,Georgia!BV5,2026-09-11
+cpi.headline,yoy_pct,2009-12,2.9862,published,source.geostat_cpi_yoy,Georgia!BW5,2026-09-11
+cpi.headline,yoy_pct,2010-01,2.6934,published,source.geostat_cpi_yoy,Georgia!BX5,2026-09-11
+cpi.headline,yoy_pct,2010-02,5.6335,published,source.geostat_cpi_yoy,Georgia!BY5,2026-09-11
+cpi.headline,yoy_pct,2010-03,5.8579,published,source.geostat_cpi_yoy,Georgia!BZ5,2026-09-11
+cpi.headline,yoy_pct,2010-04,5.6106,published,source.geostat_cpi_yoy,Georgia!CA5,2026-09-11
+cpi.headline,yoy_pct,2010-05,4.0051,published,source.geostat_cpi_yoy,Georgia!CB5,2026-09-11
+cpi.headline,yoy_pct,2010-06,3.6879,published,source.geostat_cpi_yoy,Georgia!CC5,2026-09-11
+cpi.headline,yoy_pct,2010-07,7.0466,published,source.geostat_cpi_yoy,Georgia!CD5,2026-09-11
+cpi.headline,yoy_pct,2010-08,9.5107,published,source.geostat_cpi_yoy,Georgia!CE5,2026-09-11
+cpi.headline,yoy_pct,2010-09,9.7929,published,source.geostat_cpi_yoy,Georgia!CF5,2026-09-11
+cpi.headline,yoy_pct,2010-10,9.5747,published,source.geostat_cpi_yoy,Georgia!CG5,2026-09-11
+cpi.headline,yoy_pct,2010-11,10.541,published,source.geostat_cpi_yoy,Georgia!CH5,2026-09-11
+cpi.headline,yoy_pct,2010-12,11.2399,published,source.geostat_cpi_yoy,Georgia!CI5,2026-09-11
+cpi.headline,yoy_pct,2011-01,12.2586,published,source.geostat_cpi_yoy,Georgia!CJ5,2026-09-11
+cpi.headline,yoy_pct,2011-02,13.7455,published,source.geostat_cpi_yoy,Georgia!CK5,2026-09-11
+cpi.headline,yoy_pct,2011-03,13.9342,published,source.geostat_cpi_yoy,Georgia!CL5,2026-09-11
+cpi.headline,yoy_pct,2011-04,13.4991,published,source.geostat_cpi_yoy,Georgia!CM5,2026-09-11
+cpi.headline,yoy_pct,2011-05,14.3316,published,source.geostat_cpi_yoy,Georgia!CN5,2026-09-11
+cpi.headline,yoy_pct,2011-06,10.0338,published,source.geostat_cpi_yoy,Georgia!CO5,2026-09-11
+cpi.headline,yoy_pct,2011-07,8.499,published,source.geostat_cpi_yoy,Georgia!CP5,2026-09-11
+cpi.headline,yoy_pct,2011-08,7.1544,published,source.geostat_cpi_yoy,Georgia!CQ5,2026-09-11
+cpi.headline,yoy_pct,2011-09,4.5618,published,source.geostat_cpi_yoy,Georgia!CR5,2026-09-11
+cpi.headline,yoy_pct,2011-10,2.3182,published,source.geostat_cpi_yoy,Georgia!CS5,2026-09-11
+cpi.headline,yoy_pct,2011-11,1.9171,published,source.geostat_cpi_yoy,Georgia!CT5,2026-09-11
+cpi.headline,yoy_pct,2011-12,2.0411,published,source.geostat_cpi_yoy,Georgia!CU5,2026-09-11
+cpi.headline,yoy_pct,2012-01,0.4785,published,source.geostat_cpi_yoy,Georgia!CV5,2026-09-11
+cpi.headline,yoy_pct,2012-02,-2.0545,published,source.geostat_cpi_yoy,Georgia!CW5,2026-09-11
+cpi.headline,yoy_pct,2012-03,-2.2109,published,source.geostat_cpi_yoy,Georgia!CX5,2026-09-11
+cpi.headline,yoy_pct,2012-04,-2.1049,published,source.geostat_cpi_yoy,Georgia!CY5,2026-09-11
+cpi.headline,yoy_pct,2012-05,-3.3003,published,source.geostat_cpi_yoy,Georgia!CZ5,2026-09-11
+cpi.headline,yoy_pct,2012-06,-0.18,published,source.geostat_cpi_yoy,Georgia!DA5,2026-09-11
+cpi.headline,yoy_pct,2012-07,0.5648,published,source.geostat_cpi_yoy,Georgia!DB5,2026-09-11
+cpi.headline,yoy_pct,2012-08,-0.3592,published,source.geostat_cpi_yoy,Georgia!DC5,2026-09-11
+cpi.headline,yoy_pct,2012-09,-0.1209,published,source.geostat_cpi_yoy,Georgia!DD5,2026-09-11
+cpi.headline,yoy_pct,2012-10,0.0783,published,source.geostat_cpi_yoy,Georgia!DE5,2026-09-11
+cpi.headline,yoy_pct,2012-11,-0.4872,published,source.geostat_cpi_yoy,Georgia!DF5,2026-09-11
+cpi.headline,yoy_pct,2012-12,-1.3734,published,source.geostat_cpi_yoy,Georgia!DG5,2026-09-11
+cpi.headline,yoy_pct,2013-01,-1.6,published,source.geostat_cpi_yoy,Georgia!DH5,2026-09-11
+cpi.headline,yoy_pct,2013-02,-2.117,published,source.geostat_cpi_yoy,Georgia!DI5,2026-09-11
+cpi.headline,yoy_pct,2013-03,-2.0694,published,source.geostat_cpi_yoy,Georgia!DJ5,2026-09-11
+cpi.headline,yoy_pct,2013-04,-1.678,published,source.geostat_cpi_yoy,Georgia!DK5,2026-09-11
+cpi.headline,yoy_pct,2013-05,-0.112,published,source.geostat_cpi_yoy,Georgia!DL5,2026-09-11
+cpi.headline,yoy_pct,2013-06,0.2414,published,source.geostat_cpi_yoy,Georgia!DM5,2026-09-11
+cpi.headline,yoy_pct,2013-07,-0.2123,published,source.geostat_cpi_yoy,Georgia!DN5,2026-09-11
+cpi.headline,yoy_pct,2013-08,-0.3528,published,source.geostat_cpi_yoy,Georgia!DO5,2026-09-11
+cpi.headline,yoy_pct,2013-09,-1.2941,published,source.geostat_cpi_yoy,Georgia!DP5,2026-09-11
+cpi.headline,yoy_pct,2013-10,0.1728,published,source.geostat_cpi_yoy,Georgia!DQ5,2026-09-11
+cpi.headline,yoy_pct,2013-11,0.6071,published,source.geostat_cpi_yoy,Georgia!DR5,2026-09-11
+cpi.headline,yoy_pct,2013-12,2.3723,published,source.geostat_cpi_yoy,Georgia!DS5,2026-09-11
+cpi.headline,yoy_pct,2014-01,2.9197,published,source.geostat_cpi_yoy,Georgia!DT5,2026-09-11
+cpi.headline,yoy_pct,2014-02,3.4608,published,source.geostat_cpi_yoy,Georgia!DU5,2026-09-11
+cpi.headline,yoy_pct,2014-03,3.4918,published,source.geostat_cpi_yoy,Georgia!DV5,2026-09-11
+cpi.headline,yoy_pct,2014-04,3.4291,published,source.geostat_cpi_yoy,Georgia!DW5,2026-09-11
+cpi.headline,yoy_pct,2014-05,2.4048,published,source.geostat_cpi_yoy,Georgia!DX5,2026-09-11
+cpi.headline,yoy_pct,2014-06,2.0417,published,source.geostat_cpi_yoy,Georgia!DY5,2026-09-11
+cpi.headline,yoy_pct,2014-07,2.8499,published,source.geostat_cpi_yoy,Georgia!DZ5,2026-09-11
+cpi.headline,yoy_pct,2014-08,3.3766,published,source.geostat_cpi_yoy,Georgia!EA5,2026-09-11
+cpi.headline,yoy_pct,2014-09,4.7518,published,source.geostat_cpi_yoy,Georgia!EB5,2026-09-11
+cpi.headline,yoy_pct,2014-10,3.4414,published,source.geostat_cpi_yoy,Georgia!EC5,2026-09-11
+cpi.headline,yoy_pct,2014-11,2.7644,published,source.geostat_cpi_yoy,Georgia!ED5,2026-09-11
+cpi.headline,yoy_pct,2014-12,1.9516,published,source.geostat_cpi_yoy,Georgia!EE5,2026-09-11
+cpi.headline,yoy_pct,2015-01,1.3938,published,source.geostat_cpi_yoy,Georgia!EF5,2026-09-11
+cpi.headline,yoy_pct,2015-02,1.2726,published,source.geostat_cpi_yoy,Georgia!EG5,2026-09-11
+cpi.headline,yoy_pct,2015-03,2.5611,published,source.geostat_cpi_yoy,Georgia!EH5,2026-09-11
+cpi.headline,yoy_pct,2015-04,2.5165,published,source.geostat_cpi_yoy,Georgia!EI5,2026-09-11
+cpi.headline,yoy_pct,2015-05,3.4594,published,source.geostat_cpi_yoy,Georgia!EJ5,2026-09-11
+cpi.headline,yoy_pct,2015-06,4.474,published,source.geostat_cpi_yoy,Georgia!EK5,2026-09-11
+cpi.headline,yoy_pct,2015-07,4.8545,published,source.geostat_cpi_yoy,Georgia!EL5,2026-09-11
+cpi.headline,yoy_pct,2015-08,5.372,published,source.geostat_cpi_yoy,Georgia!EM5,2026-09-11
+cpi.headline,yoy_pct,2015-09,5.2168,published,source.geostat_cpi_yoy,Georgia!EN5,2026-09-11
+cpi.headline,yoy_pct,2015-10,5.7949,published,source.geostat_cpi_yoy,Georgia!EO5,2026-09-11
+cpi.headline,yoy_pct,2015-11,6.2538,published,source.geostat_cpi_yoy,Georgia!EP5,2026-09-11
+cpi.headline,yoy_pct,2015-12,4.8795,published,source.geostat_cpi_yoy,Georgia!EQ5,2026-09-11
+cpi.headline,yoy_pct,2016-01,5.5707,published,source.geostat_cpi_yoy,Georgia!ER5,2026-09-11
+cpi.headline,yoy_pct,2016-02,5.5745,published,source.geostat_cpi_yoy,Georgia!ES5,2026-09-11
+cpi.headline,yoy_pct,2016-03,4.0615,published,source.geostat_cpi_yoy,Georgia!ET5,2026-09-11
+cpi.headline,yoy_pct,2016-04,3.1587,published,source.geostat_cpi_yoy,Georgia!EU5,2026-09-11
+cpi.headline,yoy_pct,2016-05,2.0728,published,source.geostat_cpi_yoy,Georgia!EV5,2026-09-11
+cpi.headline,yoy_pct,2016-06,1.1417,published,source.geostat_cpi_yoy,Georgia!EW5,2026-09-11
+cpi.headline,yoy_pct,2016-07,1.5126,published,source.geostat_cpi_yoy,Georgia!EX5,2026-09-11
+cpi.headline,yoy_pct,2016-08,0.9217,published,source.geostat_cpi_yoy,Georgia!EY5,2026-09-11
+cpi.headline,yoy_pct,2016-09,0.1158,published,source.geostat_cpi_yoy,Georgia!EZ5,2026-09-11
+cpi.headline,yoy_pct,2016-10,-0.1517,published,source.geostat_cpi_yoy,Georgia!FA5,2026-09-11
+cpi.headline,yoy_pct,2016-11,0.1539,published,source.geostat_cpi_yoy,Georgia!FB5,2026-09-11
+cpi.headline,yoy_pct,2016-12,1.832,published,source.geostat_cpi_yoy,Georgia!FC5,2026-09-11
+cpi.headline,yoy_pct,2017-01,3.8758,published,source.geostat_cpi_yoy,Georgia!FD5,2026-09-11
+cpi.headline,yoy_pct,2017-02,5.5369,published,source.geostat_cpi_yoy,Georgia!FE5,2026-09-11
+cpi.headline,yoy_pct,2017-03,5.3522,published,source.geostat_cpi_yoy,Georgia!FF5,2026-09-11
+cpi.headline,yoy_pct,2017-04,6.1147,published,source.geostat_cpi_yoy,Georgia!FG5,2026-09-11
+cpi.headline,yoy_pct,2017-05,6.5558,published,source.geostat_cpi_yoy,Georgia!FH5,2026-09-11
+cpi.headline,yoy_pct,2017-06,7.0942,published,source.geostat_cpi_yoy,Georgia!FI5,2026-09-11
+cpi.headline,yoy_pct,2017-07,5.9537,published,source.geostat_cpi_yoy,Georgia!FJ5,2026-09-11
+cpi.headline,yoy_pct,2017-08,5.734,published,source.geostat_cpi_yoy,Georgia!FK5,2026-09-11
+cpi.headline,yoy_pct,2017-09,6.1676,published,source.geostat_cpi_yoy,Georgia!FL5,2026-09-11
+cpi.headline,yoy_pct,2017-10,6.413,published,source.geostat_cpi_yoy,Georgia!FM5,2026-09-11
+cpi.headline,yoy_pct,2017-11,6.9305,published,source.geostat_cpi_yoy,Georgia!FN5,2026-09-11
+cpi.headline,yoy_pct,2017-12,6.7164,published,source.geostat_cpi_yoy,Georgia!FO5,2026-09-11
+cpi.headline,yoy_pct,2018-01,4.3214,published,source.geostat_cpi_yoy,Georgia!FP5,2026-09-11
+cpi.headline,yoy_pct,2018-02,2.7422,published,source.geostat_cpi_yoy,Georgia!FQ5,2026-09-11
+cpi.headline,yoy_pct,2018-03,2.8268,published,source.geostat_cpi_yoy,Georgia!FR5,2026-09-11
+cpi.headline,yoy_pct,2018-04,2.4952,published,source.geostat_cpi_yoy,Georgia!FS5,2026-09-11
+cpi.headline,yoy_pct,2018-05,2.4601,published,source.geostat_cpi_yoy,Georgia!FT5,2026-09-11
+cpi.headline,yoy_pct,2018-06,2.199,published,source.geostat_cpi_yoy,Georgia!FU5,2026-09-11
+cpi.headline,yoy_pct,2018-07,2.8381,published,source.geostat_cpi_yoy,Georgia!FV5,2026-09-11
+cpi.headline,yoy_pct,2018-08,3.1445,published,source.geostat_cpi_yoy,Georgia!FW5,2026-09-11
+cpi.headline,yoy_pct,2018-09,2.7441,published,source.geostat_cpi_yoy,Georgia!FX5,2026-09-11
+cpi.headline,yoy_pct,2018-10,2.2768,published,source.geostat_cpi_yoy,Georgia!FY5,2026-09-11
+cpi.headline,yoy_pct,2018-11,1.8868,published,source.geostat_cpi_yoy,Georgia!FZ5,2026-09-11
+cpi.headline,yoy_pct,2018-12,1.5151,published,source.geostat_cpi_yoy,Georgia!GA5,2026-09-11
+cpi.headline,yoy_pct,2019-01,2.1886,published,source.geostat_cpi_yoy,Georgia!GB5,2026-09-11
+cpi.headline,yoy_pct,2019-02,2.2955,published,source.geostat_cpi_yoy,Georgia!GC5,2026-09-11
+cpi.headline,yoy_pct,2019-03,3.7044,published,source.geostat_cpi_yoy,Georgia!GD5,2026-09-11
+cpi.headline,yoy_pct,2019-04,4.1382,published,source.geostat_cpi_yoy,Georgia!GE5,2026-09-11
+cpi.headline,yoy_pct,2019-05,4.7024,published,source.geostat_cpi_yoy,Georgia!GF5,2026-09-11
+cpi.headline,yoy_pct,2019-06,4.3468,published,source.geostat_cpi_yoy,Georgia!GG5,2026-09-11
+cpi.headline,yoy_pct,2019-07,4.6157,published,source.geostat_cpi_yoy,Georgia!GH5,2026-09-11
+cpi.headline,yoy_pct,2019-08,4.9187,published,source.geostat_cpi_yoy,Georgia!GI5,2026-09-11
+cpi.headline,yoy_pct,2019-09,6.3939,published,source.geostat_cpi_yoy,Georgia!GJ5,2026-09-11
+cpi.headline,yoy_pct,2019-10,6.8704,published,source.geostat_cpi_yoy,Georgia!GK5,2026-09-11
+cpi.headline,yoy_pct,2019-11,7.0398,published,source.geostat_cpi_yoy,Georgia!GL5,2026-09-11
+cpi.headline,yoy_pct,2019-12,6.9967,published,source.geostat_cpi_yoy,Georgia!GM5,2026-09-11
+cpi.headline,yoy_pct,2020-01,6.3832,published,source.geostat_cpi_yoy,Georgia!GN5,2026-09-11
+cpi.headline,yoy_pct,2020-02,6.4447,published,source.geostat_cpi_yoy,Georgia!GO5,2026-09-11
+cpi.headline,yoy_pct,2020-03,6.0802,published,source.geostat_cpi_yoy,Georgia!GP5,2026-09-11
+cpi.headline,yoy_pct,2020-04,6.8629,published,source.geostat_cpi_yoy,Georgia!GQ5,2026-09-11
+cpi.headline,yoy_pct,2020-05,6.5367,published,source.geostat_cpi_yoy,Georgia!GR5,2026-09-11
+cpi.headline,yoy_pct,2020-06,6.1303,published,source.geostat_cpi_yoy,Georgia!GS5,2026-09-11
+cpi.headline,yoy_pct,2020-07,5.6515,published,source.geostat_cpi_yoy,Georgia!GT5,2026-09-11
+cpi.headline,yoy_pct,2020-08,4.7991,published,source.geostat_cpi_yoy,Georgia!GU5,2026-09-11
+cpi.headline,yoy_pct,2020-09,3.7696,published,source.geostat_cpi_yoy,Georgia!GV5,2026-09-11
+cpi.headline,yoy_pct,2020-10,3.8061,published,source.geostat_cpi_yoy,Georgia!GW5,2026-09-11
+cpi.headline,yoy_pct,2020-11,3.8274,published,source.geostat_cpi_yoy,Georgia!GX5,2026-09-11
+cpi.headline,yoy_pct,2020-12,2.4047,published,source.geostat_cpi_yoy,Georgia!GY5,2026-09-11
+cpi.headline,yoy_pct,2021-01,2.8312,published,source.geostat_cpi_yoy,Georgia!GZ5,2026-09-11
+cpi.headline,yoy_pct,2021-02,3.578,published,source.geostat_cpi_yoy,Georgia!HA5,2026-09-11
+cpi.headline,yoy_pct,2021-03,7.2163,published,source.geostat_cpi_yoy,Georgia!HB5,2026-09-11
+cpi.headline,yoy_pct,2021-04,7.2053,published,source.geostat_cpi_yoy,Georgia!HC5,2026-09-11
+cpi.headline,yoy_pct,2021-05,7.688,published,source.geostat_cpi_yoy,Georgia!HD5,2026-09-11
+cpi.headline,yoy_pct,2021-06,9.8944,published,source.geostat_cpi_yoy,Georgia!HE5,2026-09-11
+cpi.headline,yoy_pct,2021-07,11.9083,published,source.geostat_cpi_yoy,Georgia!HF5,2026-09-11
+cpi.headline,yoy_pct,2021-08,12.7693,published,source.geostat_cpi_yoy,Georgia!HG5,2026-09-11
+cpi.headline,yoy_pct,2021-09,12.263,published,source.geostat_cpi_yoy,Georgia!HH5,2026-09-11
+cpi.headline,yoy_pct,2021-10,12.8449,published,source.geostat_cpi_yoy,Georgia!HI5,2026-09-11
+cpi.headline,yoy_pct,2021-11,12.54,published,source.geostat_cpi_yoy,Georgia!HJ5,2026-09-11
+cpi.headline,yoy_pct,2021-12,13.9396,published,source.geostat_cpi_yoy,Georgia!HK5,2026-09-11
+cpi.headline,yoy_pct,2022-01,13.943,published,source.geostat_cpi_yoy,Georgia!HL5,2026-09-11
+cpi.headline,yoy_pct,2022-02,13.733,published,source.geostat_cpi_yoy,Georgia!HM5,2026-09-11
+cpi.headline,yoy_pct,2022-03,11.8425,published,source.geostat_cpi_yoy,Georgia!HN5,2026-09-11
+cpi.headline,yoy_pct,2022-04,12.8445,published,source.geostat_cpi_yoy,Georgia!HO5,2026-09-11
+cpi.headline,yoy_pct,2022-05,13.2927,published,source.geostat_cpi_yoy,Georgia!HP5,2026-09-11
+cpi.headline,yoy_pct,2022-06,12.7903,published,source.geostat_cpi_yoy,Georgia!HQ5,2026-09-11
+cpi.headline,yoy_pct,2022-07,11.5488,published,source.geostat_cpi_yoy,Georgia!HR5,2026-09-11
+cpi.headline,yoy_pct,2022-08,10.8781,published,source.geostat_cpi_yoy,Georgia!HS5,2026-09-11
+cpi.headline,yoy_pct,2022-09,11.5297,published,source.geostat_cpi_yoy,Georgia!HT5,2026-09-11
+cpi.headline,yoy_pct,2022-10,10.6058,published,source.geostat_cpi_yoy,Georgia!HU5,2026-09-11
+cpi.headline,yoy_pct,2022-11,10.4427,published,source.geostat_cpi_yoy,Georgia!HV5,2026-09-11
+cpi.headline,yoy_pct,2022-12,9.8471,published,source.geostat_cpi_yoy,Georgia!HW5,2026-09-11
+cpi.headline,yoy_pct,2023-01,9.4429,published,source.geostat_cpi_yoy,Georgia!HX5,2026-09-11
+cpi.headline,yoy_pct,2023-02,8.1494,published,source.geostat_cpi_yoy,Georgia!HY5,2026-09-11
+cpi.headline,yoy_pct,2023-03,5.3224,published,source.geostat_cpi_yoy,Georgia!HZ5,2026-09-11
+cpi.headline,yoy_pct,2023-04,2.6794,published,source.geostat_cpi_yoy,Georgia!IA5,2026-09-11
+cpi.headline,yoy_pct,2023-05,1.4735,published,source.geostat_cpi_yoy,Georgia!IB5,2026-09-11
+cpi.headline,yoy_pct,2023-06,0.5805,published,source.geostat_cpi_yoy,Georgia!IC5,2026-09-11
+cpi.headline,yoy_pct,2023-07,0.3032,published,source.geostat_cpi_yoy,Georgia!ID5,2026-09-11
+cpi.headline,yoy_pct,2023-08,0.8933,published,source.geostat_cpi_yoy,Georgia!IE5,2026-09-11
+cpi.headline,yoy_pct,2023-09,0.6754,published,source.geostat_cpi_yoy,Georgia!IF5,2026-09-11
+cpi.headline,yoy_pct,2023-10,0.7894,published,source.geostat_cpi_yoy,Georgia!IG5,2026-09-11
+cpi.headline,yoy_pct,2023-11,0.0798,published,source.geostat_cpi_yoy,Georgia!IH5,2026-09-11
+cpi.headline,yoy_pct,2023-12,0.4372,published,source.geostat_cpi_yoy,Georgia!II5,2026-09-11
+cpi.headline,yoy_pct,2024-01,0.0037,published,source.geostat_cpi_yoy,Georgia!IJ5,2026-09-11
+cpi.headline,yoy_pct,2024-02,0.285,published,source.geostat_cpi_yoy,Georgia!IK5,2026-09-11
+cpi.headline,yoy_pct,2024-03,0.5202,published,source.geostat_cpi_yoy,Georgia!IL5,2026-09-11
+cpi.headline,yoy_pct,2024-04,1.5159,published,source.geostat_cpi_yoy,Georgia!IM5,2026-09-11
+cpi.headline,yoy_pct,2024-05,2.0335,published,source.geostat_cpi_yoy,Georgia!IN5,2026-09-11
+cpi.headline,yoy_pct,2024-06,2.1765,published,source.geostat_cpi_yoy,Georgia!IO5,2026-09-11
+cpi.headline,yoy_pct,2024-07,1.7878,published,source.geostat_cpi_yoy,Georgia!IP5,2026-09-11
+cpi.headline,yoy_pct,2024-08,0.964,published,source.geostat_cpi_yoy,Georgia!IQ5,2026-09-11
+cpi.headline,yoy_pct,2024-09,0.6347,published,source.geostat_cpi_yoy,Georgia!IR5,2026-09-11
+cpi.headline,yoy_pct,2024-10,0.3095,published,source.geostat_cpi_yoy,Georgia!IS5,2026-09-11
+cpi.headline,yoy_pct,2024-11,1.2647,published,source.geostat_cpi_yoy,Georgia!IT5,2026-09-11
+cpi.headline,yoy_pct,2024-12,1.8651,published,source.geostat_cpi_yoy,Georgia!IU5,2026-09-11
+cpi.headline,yoy_pct,2025-01,1.9595,published,source.geostat_cpi_yoy,Georgia!IV5,2026-09-11
+cpi.headline,yoy_pct,2025-02,2.4101,published,source.geostat_cpi_yoy,Georgia!IW5,2026-09-11
+cpi.headline,yoy_pct,2025-03,3.4957,published,source.geostat_cpi_yoy,Georgia!IX5,2026-09-11
+cpi.headline,yoy_pct,2025-04,3.3926,published,source.geostat_cpi_yoy,Georgia!IY5,2026-09-11
+cpi.headline,yoy_pct,2025-05,3.4517,published,source.geostat_cpi_yoy,Georgia!IZ5,2026-09-11
+cpi.headline,yoy_pct,2025-06,3.9937,published,source.geostat_cpi_yoy,Georgia!JA5,2026-09-11
+cpi.headline,yoy_pct,2025-07,4.2632,published,source.geostat_cpi_yoy,Georgia!JB5,2026-09-11
+cpi.headline,yoy_pct,2025-08,4.6496,published,source.geostat_cpi_yoy,Georgia!JC5,2026-09-11
+cpi.headline,yoy_pct,2025-09,4.8214,published,source.geostat_cpi_yoy,Georgia!JD5,2026-09-11
+cpi.headline,yoy_pct,2025-10,5.1711,published,source.geostat_cpi_yoy,Georgia!JE5,2026-09-11
+cpi.headline,yoy_pct,2025-11,4.8452,published,source.geostat_cpi_yoy,Georgia!JF5,2026-09-11
+cpi.headline,yoy_pct,2025-12,3.9741,published,source.geostat_cpi_yoy,Georgia!JG5,2026-09-11
+cpi.headline,yoy_pct,2026-01,4.8079,published,source.geostat_cpi_yoy,Georgia!JH5,2026-09-11
+cpi.headline,yoy_pct,2026-02,4.5725,published,source.geostat_cpi_yoy,Georgia!JI5,2026-09-11
+cpi.headline,yoy_pct,2026-03,4.3064,published,source.geostat_cpi_yoy,Georgia!JJ5,2026-09-11
+cpi.headline,yoy_pct,2026-04,5.9261,published,source.geostat_cpi_yoy,Georgia!JK5,2026-09-11
+cpi.headline,yoy_pct,2026-05,5.7437,published,source.geostat_cpi_yoy,Georgia!JL5,2026-09-11
+cpi.headline,yoy_pct,2026-06,5.8207,published,source.geostat_cpi_yoy,Georgia!JM5,2026-09-11
+cpi.headline,yoy_pct,2026-07,5.5202,published,source.geostat_cpi_yoy,Georgia!JN5,2026-09-11
+cpi.headline,yoy_pct,2026-08,5.6479,published,source.geostat_cpi_yoy,Georgia!JO5,2026-09-11

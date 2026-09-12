@@ -6,6 +6,7 @@ import type {
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { NationalGdpFact } from "../data/nationalGdp/types";
+import type { CpiFact, InflationTargetRow } from "../data/inflation/types";
 import type {
   ServedGeneralGovernmentBalanceFact,
   ServedGovernmentDebtFact,
@@ -457,4 +458,29 @@ export async function loadMunicipalAdjaraBudgetAdjustmentsFromMirror(
 export async function loadGdpOverviewFactsFromMirror(db:MirrorClient):Promise<import('../data/gdpOverview/types').GdpObservation[]> {
   const rows=await db.gdpOverviewFact.findMany({orderBy:[{seriesId:'asc'},{year:'asc'}]});
   return rows.map(row=>({seriesId:row.seriesId as import('../data/gdpOverview/types').GdpSeriesId,year:row.year,value:row.value.toFixed(),unit:row.unit as import('../data/gdpOverview/types').GdpObservation['unit'],status:row.status as import('../data/gdpOverview/types').GdpObservation['status'],accountingStandard:row.accountingStandard as import('../data/gdpOverview/types').GdpObservation['accountingStandard'],sourceId:row.sourceDocumentId,sourceLocator:row.sourceLocator,lastReviewedAt:row.lastReviewedAt.toISOString().slice(0,10)}));
+}
+
+export async function loadInflationCpiFactsFromMirror(db: MirrorClient): Promise<CpiFact[]> {
+  const rows = await db.inflationCpiFact.findMany({ orderBy: [{ seriesId: "asc" }, { measure: "asc" }, { period: "asc" }] });
+  return rows.map((row) => ({
+    seriesId: row.seriesId as CpiFact["seriesId"],
+    measure: row.measure as CpiFact["measure"],
+    period: row.period,
+    value: row.value.toFixed(),
+    status: row.status as CpiFact["status"],
+    sourceId: row.sourceDocumentId,
+    sourceLocator: row.sourceLocator,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export async function loadInflationTargetsFromMirror(db: MirrorClient): Promise<InflationTargetRow[]> {
+  const rows = await db.inflationTarget.findMany({ orderBy: { effectiveFrom: "asc" } });
+  return rows.map((row) => ({
+    effectiveFrom: row.effectiveFrom,
+    effectiveTo: row.effectiveTo,
+    targetPct: row.targetPct.toFixed(),
+    sourceId: row.sourceDocumentId,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
 }
