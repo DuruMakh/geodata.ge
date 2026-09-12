@@ -2,14 +2,18 @@ import Decimal from "decimal.js";
 import { readCsvRecords } from "../csv";
 import { assertSameServedRows } from "../servedDataParity";
 import {
+  CPI_CATEGORY_MEASURES,
   CPI_MEASURES,
   CPI_SERIES_IDS,
+  type BasketWeightRow,
+  type CpiCategoryFact,
+  type CpiCategoryMeasure,
   type CpiFact,
   type InflationTargetRow,
   type ServedCpiFact,
   type ServedInflationTargetRow,
 } from "./types";
-import { factKey, validateCpiFacts, validateTargetRows } from "./validateInflation";
+import { factKey, validateCategoryFacts, validateCpiFacts, validateTargetRows } from "./validateInflation";
 
 // Relative to apps/web, like every served CSV path (lib/data/servedData.ts).
 export const CPI_FACTS_CSV = "../../data/imports/cpi-national-monthly.csv";
@@ -46,6 +50,44 @@ export async function loadInflationTargets(relativePath = INFLATION_TARGETS_CSV)
   }));
   validateTargetRows(targets);
   return targets;
+}
+
+export const CPI_CATEGORY_FACTS_CSV = "../../data/imports/cpi-categories-monthly.csv";
+export const BASKET_WEIGHTS_CSV = "../../data/imports/cpi-basket-weights.csv";
+
+export async function loadCpiCategoryFacts(relativePath = CPI_CATEGORY_FACTS_CSV): Promise<CpiCategoryFact[]> {
+  const rows = await readCsvRecords(relativePath);
+  const facts = rows.map((row): CpiCategoryFact => {
+    const level = Number(row.level);
+    if (level !== 2 && level !== 3) throw new Error(`Unknown category level ${row.level}`);
+    if (!(CPI_CATEGORY_MEASURES as readonly string[]).includes(row.measure)) throw new Error(`Unknown category measure ${row.measure}`);
+    return {
+      categoryId: row.category_id,
+      coicopCode: row.coicop_code,
+      level,
+      parentId: row.parent_id === "" ? null : row.parent_id,
+      measure: row.measure as CpiCategoryMeasure,
+      period: row.period,
+      value: new Decimal(row.value).toFixed(),
+      status: row.status as CpiCategoryFact["status"],
+      sourceId: row.source_id,
+      sourceLocator: row.source_locator,
+      lastReviewedAt: row.last_reviewed_at,
+    };
+  });
+  validateCategoryFacts(facts);
+  return facts;
+}
+
+export async function loadBasketWeights(relativePath = BASKET_WEIGHTS_CSV): Promise<BasketWeightRow[]> {
+  const rows = await readCsvRecords(relativePath);
+  return rows.map((row) => ({
+    categoryId: row.category_id,
+    year: Number(row.year),
+    weightPct: new Decimal(row.weight_pct).toFixed(),
+    sourceId: row.source_id,
+    lastReviewedAt: row.last_reviewed_at,
+  }));
 }
 
 const SOURCE_DOCUMENTS_CSV = "../../data/sources/source-documents.csv";
