@@ -35,3 +35,38 @@ export type InflationTargetRow = {
 };
 
 export type ServedInflationTargetRow = Omit<InflationTargetRow, "targetPct"> & { targetPct: number };
+
+export const CPI_CATEGORY_MEASURES = ["yoy_pct", "mom_pct"] as const;
+export type CpiCategoryMeasure = (typeof CPI_CATEGORY_MEASURES)[number];
+
+export type CpiCategoryFact = {
+  categoryId: string;
+  coicopCode: string;
+  level: 2 | 3;
+  parentId: string | null;
+  measure: CpiCategoryMeasure;
+  period: string;
+  value: string;
+  status: "published";
+  sourceId: string;
+  sourceLocator: string;
+  lastReviewedAt: string;
+};
+
+export type ServedCpiCategoryFact = Omit<CpiCategoryFact, "value"> & { value: number };
+
+/** Weights are stored as percentages with six decimals; the arithmetic divides by 100. */
+export type BasketWeightRow = { categoryId: string; year: number; weightPct: string; sourceId: string; lastReviewedAt: string };
+export type ServedBasketWeightRow = Omit<BasketWeightRow, "weightPct"> & { weightPct: number };
+
+// Geostat writes COICOP codes bare: division 11 and subgroup 11 (Food, under
+// division 1) are both "11". Only the level tells them apart, so the ID carries
+// the division padded to two digits and the subgroup after an underscore.
+export function categoryIdFromCoicop(code: string, level: 2 | 3): { categoryId: string; parentId: string | null } {
+  if (!/^\d{1,3}$/.test(code)) throw new Error(`Unexpected COICOP code ${code}`);
+  const divisionDigits = level === 2 ? code : code.slice(0, -1);
+  const division = Number(divisionDigits);
+  if (!Number.isInteger(division) || division < 1 || division > 12) throw new Error(`COICOP division out of range: ${code}`);
+  const parentId = `cpi.cat.${String(division).padStart(2, "0")}`;
+  return level === 2 ? { categoryId: parentId, parentId: null } : { categoryId: `${parentId}_${code.slice(-1)}`, parentId };
+}
