@@ -114,12 +114,13 @@ before passing `npm run i18n:check`. The bounded decisions are in
 
 ## 2C. Approved inflation extension
 
-Approved 2026-09-11 (`docs/superpowers/specs/2026-09-11-inflation-overview-design.md`). For this dataset only, the "data behind the sidebar indicator markers" and "quarterly or monthly data" exclusions are lifted:
+Approved 2026-09-11 (`docs/superpowers/specs/2026-09-11-inflation-overview-design.md`) and extended 2026-09-12 (`docs/superpowers/specs/2026-09-12-inflation-categories-design.md`). For this dataset only, the "data behind the sidebar indicator markers" and "quarterly or monthly data" exclusions are lifted:
 
 - Inflation hub at `/explorer/inflation` and Inflation overview at `/explorer/inflation/overview`: monthly national CPI from Geostat — headline index (2010 = 100), annual and monthly inflation, the 12-month average, core inflation and core excluding tobacco — with the National Bank of Georgia inflation target as a reference line; year × month table; Excel download; Georgian and English.
+- Inflation categories at `/explorer/inflation/categories`: the national CPI decomposed into its 12 COICOP divisions and 43 subgroups — annual and monthly price change per group, the annual consumer-basket weights, and a contribution-to-inflation measure derived by Fiscal.ge from those two published series with a visible residual that closes the stack on the published headline; stacked column chart, year × month table, Excel download; Georgian and English.
 - Methodology page `/methodology/inflation` with the archived Geostat and NBG source files.
 
-Still excluded: inflation categories, basket weights, city indices, product-level indices, the price calculator, every other price index (producer, import, construction, property, agricultural), HICP, MCP intents and JSON publications for inflation, and monthly or quarterly data for any other dataset. Each needs its own approved spec.
+Still excluded: city indices, product-level indices, the price calculator, a standalone basket-composition section, every other price index (producer, import, construction, property, agricultural), HICP, MCP intents and JSON publications for inflation, and monthly or quarterly data for any other dataset. Each needs its own approved spec.
 
 ## 3. Target Users
 
