@@ -2,7 +2,7 @@ import { expect, test, vi } from "vitest";
 import { loadRegionalEconomyFactsFromMirror } from "../../../lib/db/mirrorRows";
 
 test("regional mirror rows use canonical ordering and preserve every field", async () => {
-  const findMany = vi.fn().mockResolvedValue([{ 
+  const findMany = vi.fn().mockResolvedValue([{
     regionId: "region.imereti",
     seriesId: "sector.a",
     measure: "nominal",
