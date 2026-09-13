@@ -11,6 +11,7 @@ import {
   REGIONAL_ECONOMY_REGIONS,
   REGIONAL_ECONOMY_SECTORS,
 } from "../data/regionalEconomies/importRegionalEconomies";
+import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { message } from "../i18n/messages";
 import { getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
@@ -43,7 +44,7 @@ async function regionalPresentation(locale: Locale) {
   return getPresentation(
     locale,
     ["regionalEconomies", "common", "controls", "format", "main", "workbook"],
-    [...REGIONAL_ECONOMY_REGIONS.map((region) => region.id), ...REGIONAL_ECONOMY_SECTORS.map((sector) => sector.id)],
+    [REGIONAL_GDP_TOTAL, ...REGIONAL_ECONOMY_REGIONS.map((region) => region.id), ...REGIONAL_ECONOMY_SECTORS.map((sector) => sector.id)],
   );
 }
 

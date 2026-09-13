@@ -113,7 +113,7 @@ for (const path of [
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
-  await expect(page.getByTestId("methodology-live-row")).toHaveCount(7);
+  await expect(page.getByTestId("methodology-live-row")).toHaveCount(8);
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(2);
   await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
@@ -261,7 +261,7 @@ test("source archives describe the full coverage and selected year without expos
     ["expenditure", "ხარჯების მეთოდოლოგია", "2004–2025", "2025"],
     ["revenue", "შემოსავლების მეთოდოლოგია", "2004–2025", "2025"],
     ["municipalities", "მუნიციპალიტეტების მეთოდოლოგია", "2015–2025", "2025"],
-    ["regional-economies", "რეგიონული ეკონომიკები", "2010–2024", "2024"],
+    ["regional-economies", "რეგიონების ეკონომიკა", "2010–2024", "2024"],
   ] as const) {
     await page.goto(`${TEST_BASE_URL}/methodology/${dataset}#source-archive`);
     const archive = page.getByTestId("source-archive");

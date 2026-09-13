@@ -8,7 +8,7 @@ for (const prefix of ["", "/en"]) {
     await page.goto(`${BASE_URL}${prefix}/connect`);
     await expect(page.getByTestId("connect-endpoint")).toHaveText(ENDPOINT);
     const bilingual = page.getByTestId("connect-bilingual");
-    await expect(bilingual.locator("li")).toHaveCount(4);
+    await expect(bilingual.locator("li")).toHaveCount(5);
     await expect(bilingual).toContainText("2025");
     await expect(bilingual).toContainText("2024");
     await expect(page.getByTestId("connect-technical")).toContainText("1.2.0");

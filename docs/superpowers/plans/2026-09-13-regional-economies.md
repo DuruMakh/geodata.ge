@@ -1033,3 +1033,14 @@ Do not treat a commit, pushed branch, merged PR, accepted deploy hook or green w
 - No task authorizes excluded national-share, real-growth, per-capita, 2025, USD, multi-region or homepage work.
 - Every produced interface is defined before a later task consumes it.
 - Final execution records must contain observed results, not assumed counts or checked boxes used as evidence.
+
+## Execution evidence — 2026-09-13
+
+- Preserved the two public regional workbooks byte-for-byte: regional totals `dd2042dff5e2c44b98b4bb140163b5736cf5a71f4683b9e6a359373907d59c35` (13,871 bytes) and activities `88e337bd82a5232ea5260f011b11cb2d82c2cec5115fddbe92d14d1ff3945337` (99,089 bytes).
+- Generated and fixed-point checked 6,930 canonical observations: 11 regions × 21 series × 15 years × 2 measures. All 165 regional totals, 3,300 activity amounts and 495 reconciliation records passed the 0.01 GEL controls; the seven documented national/regional publication differences remain explicit.
+- Added database mirror schema/import/parity code. No disposable database verification was possible because this checkout has no `.env` or `.env.local`; no production database was contacted.
+- Added Georgian and English index/detail routes, the two-measure explorer, Excel export, methodology/original archives, Dataset JSON-LD, central JSON/CSV files and `query_regional_economies`. MCP schema version is 1.2.0 and the registered read-only tool count is 12.
+- Focused unit/integration verification passed: Task 10 suite 137/137; unchanged reference-intent suite 35/35; methodology suite 71/71; typecheck, lint, localization and archive/publication fixed-point checks passed.
+- Production build passed and prerendered 233 static pages, including both regional indexes, 22 localized detail pages and eight localized methodology pages. Postbuild verified 16 publications, 6,930 regional CSV rows and matching manifest hashes.
+- Real-browser verification found and fixed two feature defects: a client import reached `node:fs`, and the English table/workbook path omitted the Total regional GDP label. The production-build browser run passed 64/66; the two remaining checks were rerun serially and passed 2/2, covering the full 66-test set. Regional screenshots were inspected at 1440px and 390px; the mobile document width equalled the viewport width (390px), with no error overlay.
+- Work remains on the feature branch only. No push, pull request, merge, database import, deployment or production verification was authorized or performed.

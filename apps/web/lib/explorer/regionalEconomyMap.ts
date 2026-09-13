@@ -2,6 +2,7 @@ import type { Municipality, MunicipalRegion } from "../data/municipal/types";
 import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { MUNICIPALITY_MAP_ARTIFACT } from "./municipalityMapData";
+export { regionalEconomyHref } from "./regionalEconomyRoutes";
 
 export type RegionalEconomyMapRegion = {
   regionId: string;
@@ -32,11 +33,6 @@ function quantileBucket(values: number[]) {
     while (bucket < breaks.length && value >= breaks[bucket]!) bucket += 1;
     return bucket;
   };
-}
-
-export function regionalEconomyHref(regionId: string) {
-  if (!regionId.startsWith("region.")) throw new Error(`Invalid regional economy route ID ${regionId}`);
-  return `/explorer/economy/regions/${regionId.slice("region.".length)}`;
 }
 
 export function buildRegionalEconomyMapModel({

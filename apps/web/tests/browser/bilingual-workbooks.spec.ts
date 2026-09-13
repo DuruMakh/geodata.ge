@@ -1,11 +1,11 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import ExcelJS from "exceljs";
 
-async function download(page: Page, path: string, testInfo: TestInfo, name: string) {
+async function download(page: Page, path: string, testInfo: TestInfo, name: string, testId = "series-excel") {
   await page.goto(path);
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const pending = page.waitForEvent("download");
-  await page.getByTestId("series-excel").click();
+  await page.getByTestId(testId).click();
   const result = await pending;
   const output = testInfo.outputPath(`${name}.xlsx`);
   await result.saveAs(output);
@@ -33,15 +33,16 @@ function sourceRecords(workbook: ExcelJS.Workbook) {
   }));
 }
 
-for (const [name, route] of [
+for (const [name, route, testId] of [
   ["fields", "/explorer/expenditure#g=fields&m=table&r=2020-2025&sel=expenditure.total,spending.education"],
   ["gdp-share", "/explorer/expenditure#g=fields&m=table&sh=1&r=2020-2025&sel=expenditure.total,spending.education"],
   ["ministries", "/explorer/expenditure#g=ministries&m=table&r=2014-2025&sel=admin_spending.total,admin_spending.defence"],
   ["receipts", "/explorer/revenue#m=table&r=2004-2025&sel=revenue.total,revenue.vat"],
+  ["regional-share", "/explorer/economy/regions/imereti#measure=share_of_region_gdp&view=table&sel=economy.regional_gdp_total,sector.a&range=all", "regional-excel-download"],
 ] as const) {
   test(`${name} downloads an English workbook with identical numbers and originals`, async ({ page, request }, testInfo) => {
-    const ka = await download(page, route, testInfo, `${name}-ka`);
-    const en = await download(page, `/en${route}`, testInfo, `${name}-en`);
+    const ka = await download(page, route, testInfo, `${name}-ka`, testId);
+    const en = await download(page, `/en${route}`, testInfo, `${name}-en`, testId);
     expect(en.filename).toBe(ka.filename.replace(/\.xlsx$/, "-en.xlsx"));
     expect(en.workbook.worksheets.map(sheet => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
     expect(structureAndValues(en.workbook)).toEqual(structureAndValues(ka.workbook));

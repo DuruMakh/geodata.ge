@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import municipalityMapDefinitions from "../../assets/municipality-map-definitions.svg";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
 import type { RegionalEconomyMapModel } from "../../lib/explorer/regionalEconomyMap";
-import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyMap";
+import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
 import { formatAmount } from "../../lib/explorer/format";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";

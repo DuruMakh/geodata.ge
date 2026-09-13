@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
-import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyMap";
+import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
 import { publicLabel } from "../../lib/i18n/labels";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import { message } from "../../lib/i18n/messages";
