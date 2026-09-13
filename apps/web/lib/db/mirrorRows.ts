@@ -23,6 +23,7 @@ import {
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
 import type { SectorObservation } from "../data/economicSectors/types";
+import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
 // same shapes as the CSV loaders. Used with the pooled singleton by the
@@ -469,6 +470,29 @@ export async function loadEconomicSectorFactsFromMirror(db: MirrorClient): Promi
     valuation: row.valuation as SectorObservation["valuation"], priceBasis: row.priceBasis as SectorObservation["priceBasis"],
     calculation: row.calculation as SectorObservation["calculation"], status: row.status as SectorObservation["status"],
     sourceId: row.sourceDocumentId, sourceLocator: row.sourceLocator, lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export async function loadRegionalEconomyFactsFromMirror(
+  db: MirrorClient,
+): Promise<RegionalEconomyObservation[]> {
+  const rows = await db.regionalEconomyFact.findMany({
+    orderBy: [{ regionId: "asc" }, { seriesId: "asc" }, { measure: "asc" }, { year: "asc" }],
+  });
+  return rows.map((row) => ({
+    regionId: row.regionId,
+    seriesId: row.seriesId,
+    measure: row.measure as RegionalEconomyObservation["measure"],
+    year: row.year,
+    value: row.value.toFixed(),
+    unit: row.unit as RegionalEconomyObservation["unit"],
+    valuation: row.valuation as RegionalEconomyObservation["valuation"],
+    priceBasis: row.priceBasis as RegionalEconomyObservation["priceBasis"],
+    calculation: row.calculation as RegionalEconomyObservation["calculation"],
+    status: row.status as RegionalEconomyObservation["status"],
+    sourceId: row.sourceDocumentId,
+    sourceLocator: row.sourceLocator,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
   }));
 }
 

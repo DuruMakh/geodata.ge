@@ -8,6 +8,7 @@ import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
 import { buildImportReport } from "../lib/data/importReport";
 import { loadGeneralGovernmentBalanceFacts } from "../lib/data/generalGovernmentBalance/importGeneralGovernmentBalance";
 import { loadNationalGdpFacts } from "../lib/data/nationalGdp/importNationalGdp";
+import { loadRegionalEconomyFacts } from "../lib/data/regionalEconomies/importRegionalEconomies";
 import { checkMunicipalityGeometryOutputs } from "../lib/data/municipalGeometry/prepareMunicipalGeometry";
 import {
   loadMunicipalityGeometrySources,
@@ -67,6 +68,7 @@ async function main() {
   const facts = await loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts);
   const adminSpendingFacts = await loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts);
   const nationalGdpFacts = await loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts);
+  const regionalEconomyFacts = await loadRegionalEconomyFacts(SERVED_DATA_FILES.regionalEconomyFacts);
   const generalGovernmentBalanceFacts = await loadGeneralGovernmentBalanceFacts(
     "../../data/imports/general-government-balance-annual-1995-2031.csv",
   );
@@ -105,6 +107,13 @@ async function main() {
   const unresolvedGdpSourceIds = Array.from(
     new Set(
       nationalGdpFacts
+        .map((fact) => fact.sourceId)
+        .filter((sourceId) => !registeredSourceIds.has(sourceId)),
+    ),
+  ).sort();
+  const unresolvedRegionalEconomySourceIds = Array.from(
+    new Set(
+      regionalEconomyFacts
         .map((fact) => fact.sourceId)
         .filter((sourceId) => !registeredSourceIds.has(sourceId)),
     ),
@@ -254,6 +263,11 @@ async function main() {
   if (unresolvedGdpSourceIds.length > 0) {
     throw new Error(`GDP facts reference unknown source documents: ${unresolvedGdpSourceIds.join(", ")}`);
   }
+  if (unresolvedRegionalEconomySourceIds.length > 0) {
+    throw new Error(
+      `Regional economy facts reference unknown source documents: ${unresolvedRegionalEconomySourceIds.join(", ")}`,
+    );
+  }
   if (missingGdpYears.length > 0) {
     throw new Error(`National budget years missing a GDP denominator: ${missingGdpYears.join(", ")}`);
   }
@@ -283,6 +297,7 @@ async function main() {
   console.log(`Validated fact rows: ${facts.length}`);
   console.log(`Validated admin spending fact rows: ${adminSpendingFacts.length}`);
   console.log(`Validated national GDP fact rows: ${nationalGdpFacts.length}`);
+  console.log(`Validated regional economy fact rows: ${regionalEconomyFacts.length}`);
   console.log(
     `Validated general-government balance fact rows: ${generalGovernmentBalanceFacts.length}`,
   );

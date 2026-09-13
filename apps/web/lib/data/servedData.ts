@@ -54,6 +54,7 @@ import {
 export const SERVED_DATA_FILES = {
   gdpOverviewFacts: "../../data/imports/gdp-overview-annual.csv",
   economicSectorFacts: "../../data/imports/economic-sectors-annual.csv",
+  regionalEconomyFacts: "../../data/imports/regional-economies-annual.csv",
   inflationCpiFacts: "../../data/imports/cpi-national-monthly.csv",
   inflationTargets: "../../data/imports/nbg-inflation-target.csv",
   budgetFacts: "../../data/imports/budget-facts-2004-2025.csv",
@@ -80,6 +81,7 @@ export const SERVED_DATA_FILES = {
 
 export { loadServedGovernmentDebtData } from "./governmentDebt/importGovernmentDebtFacts";
 export { loadServedGeneralGovernmentBalanceData } from "./generalGovernmentBalance/importGeneralGovernmentBalance";
+export { loadServedRegionalEconomyData } from "./regionalEconomies/importRegionalEconomies";
 
 // Single switch for where the site reads its data while pages are built.
 // "db" reads the Supabase mirror populated by `npm run data:import` (the
