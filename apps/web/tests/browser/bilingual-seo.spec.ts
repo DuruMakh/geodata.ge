@@ -2,13 +2,17 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
 import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
+import { LIVE_METHODOLOGY_IDS } from "../../lib/methodology/types";
 
 const paths = Object.keys(JSON.parse(readFileSync(path.resolve(process.cwd(), "../../data/localization/en/page-revisions.json"), "utf8")));
 const origin = "https://fiscal.ge";
 const englishPath = (path: string) => path === "/" ? "/en" : `/en${path}`;
 let originalFilenames: Record<string, string>;
 test.beforeAll(async () => {
-  const rows = await Promise.all((["expenditure", "revenue", "municipalities", "debt"] as const).map(id => loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), id)));
+  // Every live dataset, not a hand-listed subset: Geostat names the Georgian
+  // basket-weights file in Georgian script, and an omitted manifest would read
+  // as untranslated Georgian on the English page.
+  const rows = await Promise.all(LIVE_METHODOLOGY_IDS.map(id => loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), id)));
   originalFilenames = Object.fromEntries(rows.flat().map(row => [row.source_id, row.official_filename]));
 });
 

@@ -185,7 +185,7 @@ describe("public source resolution", () => {
       // the ten Ministry of Finance debt documents were registered so debt
       // figures could cite them. 124 once the seven inflation sources (six
       // Geostat CPI workbooks and the NBG strategy) were registered.
-      expect(snapshot.sources.length).toBe(124);
+      expect(snapshot.sources.length).toBe(125);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {

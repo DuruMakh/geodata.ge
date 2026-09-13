@@ -47,7 +47,7 @@ describe("indexable Fiscal.ge routes", () => {
     const urls = entries.map((entry) => entry.url);
 
     // Public connection discovery is enabled with the production MCP release.
-    expect(urls).toHaveLength(194);
+    expect(urls).toHaveLength(196);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
