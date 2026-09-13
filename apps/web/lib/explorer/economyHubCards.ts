@@ -1,10 +1,12 @@
 import type { ServedGdpObservation } from "../data/gdpOverview/types";
+import type { ServedSectorObservation } from "../data/economicSectors/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import type { HubCardModel } from "./hubCards";
 export function buildEconomyHubCards(
   facts: ServedGdpObservation[],
   p: Presentation,
+  sectorFacts: ServedSectorObservation[] = [],
 ): HubCardModel[] {
   const t = (k: string) => message(p.messages, `gdp.${k}`);
   const real = facts
@@ -28,11 +30,11 @@ export function buildEconomyHubCards(
       index: `0${i + 2}`,
       title: t(id),
       description: t(id + "Description"),
-      href: null,
-      comingSoon: true,
+      href: id === "sectors" && sectorFacts.length ? "/explorer/economy/sectors" : null,
+      comingSoon: id !== "sectors" || !sectorFacts.length,
       series: null,
       seriesColor: null,
-      footer: null,
+      footer: id === "sectors" && sectorFacts.length ? `${Math.min(...sectorFacts.map(f=>f.year))}–${Math.max(...sectorFacts.map(f=>f.year))}` : null,
     })),
   ];
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ChevronsLeft, ChevronsRight, House } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ComingSoonBadge } from "../ui/coming-soon-badge";
@@ -151,7 +152,7 @@ export function DataSidebar() {
           onClick={handleToggle}
           className="size-9 flex-none cursor-pointer rounded-[3px] border border-[rgba(247,242,233,0.18)] font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink-fg-muted)] hover:text-[var(--paper)] min-[900px]:size-[26px]"
         >
-          {navVisible ? "«" : "»"}
+          {navVisible ? <ChevronsLeft aria-hidden="true" size={18} strokeWidth={1.5} className="mx-auto" /> : <ChevronsRight aria-hidden="true" size={18} strokeWidth={1.5} className="mx-auto" />}
         </button>
       </div>
 
@@ -168,9 +169,9 @@ export function DataSidebar() {
             href={pageHref("/", locale)}
             aria-label={message(messages, "common.home")}
             title={message(messages, "common.home")}
-            className="mt-auto flex size-[26px] items-center justify-center self-center no-underline"
+            className="mt-auto flex size-[26px] items-center justify-center self-center text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)]"
           >
-            <span aria-hidden className="size-2 bg-[var(--accent)]" />
+            <House aria-hidden="true" size={18} strokeWidth={1.5} />
           </Link>
         </>
       ) : (
@@ -188,6 +189,7 @@ export function DataSidebar() {
               {message(messages,"common.economy")}
             </Link>
             {economyActive ? <Link href={pageHref("/explorer/economy/gdp",locale)} aria-current={pathname.endsWith('/gdp')?'page':undefined} className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline">{message(messages,"common.gdpOverview")}</Link> : null}
+            {economyActive ? <Link href={pageHref("/explorer/economy/sectors",locale)} aria-current={pathname.endsWith('/sectors')?'page':undefined} className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline">{message(messages,"common.economicSectors")}</Link> : null}
             <Link
               href={pageHref("/explorer/inflation", locale)}
               data-testid="inflation-link"

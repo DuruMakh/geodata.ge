@@ -79,6 +79,7 @@ model SourceDocument {
   populationFacts MunicipalPopulationFact[]
   generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
   gdpOverviewFacts GdpOverviewFact[]
+  economicSectorFacts EconomicSectorFact[]
   inflationCpiFacts InflationCpiFact[]
   inflationTargets  InflationTarget[]
 }
@@ -104,6 +105,7 @@ model ImportRun {
   governmentDebtFacts   GovernmentDebtFact[]
   generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
   gdpOverviewFacts GdpOverviewFact[]
+  economicSectorFacts EconomicSectorFact[]
   inflationCpiFacts InflationCpiFact[]
   inflationTargets  InflationTarget[]
   populationFacts       MunicipalPopulationFact[]
@@ -407,6 +409,25 @@ model GdpOverviewFact {
   importRunId String?
   importRun ImportRun? @relation(fields:[importRunId], references:[id])
   @@id([seriesId, year])
+}
+
+model EconomicSectorFact {
+  seriesId String
+  measure String
+  year Int
+  value Decimal @db.Decimal(40,20)
+  unit String
+  valuation String
+  priceBasis String
+  calculation String
+  status String
+  sourceLocator String
+  sourceDocumentId String
+  sourceDocument SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt DateTime @db.Date
+  importRunId String?
+  importRun ImportRun? @relation(fields: [importRunId], references: [id])
+  @@id([seriesId, measure, year])
 }
 
 model InflationCpiFact {

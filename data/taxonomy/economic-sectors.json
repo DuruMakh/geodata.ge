@@ -1,0 +1,170 @@
+[
+  {
+    "id": "sector.a",
+    "classificationCode": "A",
+    "sortOrder": 1,
+    "officialName": "Agriculture, forestry and fishing",
+    "labelKa": "სოფლის, სატყეო და თევზის მეურნეობა",
+    "labelEn": "Agriculture, forestry and fishing"
+  },
+  {
+    "id": "sector.b",
+    "classificationCode": "B",
+    "sortOrder": 2,
+    "officialName": "Mining and quarrying",
+    "labelKa": "სამთომოპოვებითი მრეწველობა",
+    "labelEn": "Mining and quarrying"
+  },
+  {
+    "id": "sector.c",
+    "classificationCode": "C",
+    "sortOrder": 3,
+    "officialName": "Manufacturing",
+    "labelKa": "დამამუშავებელი მრეწველობა",
+    "labelEn": "Manufacturing"
+  },
+  {
+    "id": "sector.d",
+    "classificationCode": "D",
+    "sortOrder": 4,
+    "officialName": "Electricity, gas, steam and air conditioning supply",
+    "labelKa": "ელექტროენერგიის, აირის, ორთქლის და კონდიცირებული ჰაერის მიწოდება",
+    "labelEn": "Electricity, gas, steam and air conditioning supply"
+  },
+  {
+    "id": "sector.e",
+    "classificationCode": "E",
+    "sortOrder": 5,
+    "officialName": "Water supply; sewerage, waste management and remediation activities",
+    "labelKa": "წყალმომარაგება; კანალიზაცია, ნარჩენების მართვა და დაბინძურებისაგან გასუფთავების საქმიანობები",
+    "labelEn": "Water supply; sewerage, waste management and remediation activities"
+  },
+  {
+    "id": "sector.f",
+    "classificationCode": "F",
+    "sortOrder": 6,
+    "officialName": "Construction",
+    "labelKa": "მშენებლობა",
+    "labelEn": "Construction"
+  },
+  {
+    "id": "sector.g",
+    "classificationCode": "G",
+    "sortOrder": 7,
+    "officialName": "Wholesale and retail trade; repair of motor vehicles and motorcycles",
+    "labelKa": "საბითუმო და საცალო ვაჭრობა; ავტომობილების და მოტოციკლების რემონტი",
+    "labelEn": "Wholesale and retail trade; repair of motor vehicles and motorcycles"
+  },
+  {
+    "id": "sector.h",
+    "classificationCode": "H",
+    "sortOrder": 8,
+    "officialName": "Transportation and storage",
+    "labelKa": "ტრანსპორტი და დასაწყობება",
+    "labelEn": "Transportation and storage"
+  },
+  {
+    "id": "sector.i",
+    "classificationCode": "I",
+    "sortOrder": 9,
+    "officialName": "Accommodation and food service activities",
+    "labelKa": "განთავსების საშუალებებით უზრუნველყოფის და საკვების მიწოდების საქმიანობები",
+    "labelEn": "Accommodation and food service activities"
+  },
+  {
+    "id": "sector.j",
+    "classificationCode": "J",
+    "sortOrder": 10,
+    "officialName": "Information and communication",
+    "labelKa": "ინფორმაცია და კომუნიკაცია",
+    "labelEn": "Information and communication"
+  },
+  {
+    "id": "sector.k",
+    "classificationCode": "K",
+    "sortOrder": 11,
+    "officialName": "Financial and insurance activities",
+    "labelKa": "საფინანსო და სადაზღვევო საქმიანობები",
+    "labelEn": "Financial and insurance activities"
+  },
+  {
+    "id": "sector.l",
+    "classificationCode": "L",
+    "sortOrder": 12,
+    "officialName": "Real estate activities",
+    "labelKa": "უძრავ ქონებასთან დაკავშირებული საქმიანობები",
+    "labelEn": "Real estate activities"
+  },
+  {
+    "id": "sector.m",
+    "classificationCode": "M",
+    "sortOrder": 13,
+    "officialName": "Professional, scientific and technical activities",
+    "labelKa": "პროფესიული, სამეცნიერო და ტექნიკური საქმიანობები",
+    "labelEn": "Professional, scientific and technical activities"
+  },
+  {
+    "id": "sector.n",
+    "classificationCode": "N",
+    "sortOrder": 14,
+    "officialName": "Administrative and support service activities",
+    "labelKa": "ადმინისტრაციული და დამხმარე მომსახურების საქმიანობები",
+    "labelEn": "Administrative and support service activities"
+  },
+  {
+    "id": "sector.o",
+    "classificationCode": "O",
+    "sortOrder": 15,
+    "officialName": "Public administration and defence; compulsory social security",
+    "labelKa": "სახელმწიფო მმართველობა და თავდაცვა; სავალდებულო სოციალური უსაფრთხოება",
+    "labelEn": "Public administration and defence; compulsory social security"
+  },
+  {
+    "id": "sector.p",
+    "classificationCode": "P",
+    "sortOrder": 16,
+    "officialName": "Education",
+    "labelKa": "განათლება",
+    "labelEn": "Education"
+  },
+  {
+    "id": "sector.q",
+    "classificationCode": "Q",
+    "sortOrder": 17,
+    "officialName": "Human health and social work activities",
+    "labelKa": "ჯანდაცვა და სოციალური მომსახურების საქმიანობები",
+    "labelEn": "Human health and social work activities"
+  },
+  {
+    "id": "sector.r",
+    "classificationCode": "R",
+    "sortOrder": 18,
+    "officialName": "Arts, entertainment and recreation",
+    "labelKa": "ხელოვნება, გართობა და დასვენება",
+    "labelEn": "Arts, entertainment and recreation"
+  },
+  {
+    "id": "sector.s",
+    "classificationCode": "S",
+    "sortOrder": 19,
+    "officialName": "Other service activities",
+    "labelKa": "სხვა სახის მომსახურება",
+    "labelEn": "Other service activities"
+  },
+  {
+    "id": "sector.t",
+    "classificationCode": "T",
+    "sortOrder": 20,
+    "officialName": "Activities of households as employers; undifferentiated goods and servicies producing activities of household for own use",
+    "labelKa": "შინამეურნეობების, როგორც დამქირავებლის, საქმიანობები; არადიფერენცირებული საქონლის და მომსახურების წარმოება შინამეურნეობების მიერ საკუთარი მოხმარებისათვის",
+    "labelEn": "Activities of households as employers; undifferentiated goods- and services-producing activities of households for own use"
+  },
+  {
+    "id": "economy.gdp_total",
+    "classificationCode": null,
+    "sortOrder": 0,
+    "officialName": "(=) GDP at market prices",
+    "labelKa": "მთლიანი მშპ",
+    "labelEn": "Total GDP"
+  }
+]

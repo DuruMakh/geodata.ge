@@ -5,7 +5,6 @@ import type { WorkbookView, Worksheet } from "exceljs";
 import type { WorkbookExportModel, WorkbookReadableRow } from "./workbookModel";
 
 const XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-const AMOUNT_NUMBER_FORMAT = "#,##0.0;[Red](#,##0.0);–";
 const PERCENTAGE_NUMBER_FORMAT = "0.0%;[Red](0.0%);–";
 const PLANNED_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFF1EADC" } };
 const GROUP_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFFDF7EA" } };
@@ -25,12 +24,13 @@ function columnLetter(column: number): string {
   return result;
 }
 
-function readableNumberFormat(isPercentage: boolean, isPlanned: boolean, locale: Locale): string {
+function readableNumberFormat(isPercentage: boolean, isPlanned: boolean, locale: Locale, amountDecimals: number): string {
+  const amount = `#,##0${amountDecimals ? `.${"0".repeat(amountDecimals)}` : ""}`;
   if (isPlanned) {
     const marker = workbookMessage(locale, "workbook.planned");
-    return isPercentage ? `0.0% "${marker}";[Red](0.0%) "${marker}";0.0% "${marker}"` : `#,##0.0 "${marker}";[Red](#,##0.0) "${marker}";0.0 "${marker}"`;
+    return isPercentage ? `0.0% "${marker}";[Red](0.0%) "${marker}";0.0% "${marker}"` : `${amount} "${marker}";[Red](${amount}) "${marker}";${amount.replace("#,##", "")} "${marker}"`;
   }
-  return isPercentage ? PERCENTAGE_NUMBER_FORMAT : AMOUNT_NUMBER_FORMAT;
+  return isPercentage ? PERCENTAGE_NUMBER_FORMAT : `${amount};[Red](${amount});–`;
 }
 
 function sourceRowHeight(title: string, organization: string): number {
@@ -68,6 +68,7 @@ function writeReadableRow(
   isPercentage: boolean,
   locale: Locale,
   showChangeColumn = true,
+  amountDecimals = 1,
   numberFormat?: string,
 ): void {
   const label = worksheet.getCell(rowNumber, 1);
@@ -81,10 +82,10 @@ function writeReadableRow(
     cell.alignment = { horizontal: "right", vertical: "middle" };
     if (value !== null) {
       const isPlanned = row.basisByYear[year] === "planned";
-      cell.numFmt = numberFormat ?? readableNumberFormat(isPercentage, isPlanned, locale);
+      cell.numFmt = numberFormat ?? readableNumberFormat(isPercentage, isPlanned, locale, amountDecimals);
       if (row.basisByYear[year] === "preliminary") {
         const marker = workbookMessage(locale, "workbook.preliminary");
-        cell.numFmt = isPercentage ? `0.0% "${marker}"` : `#,##0.0 "${marker}"`;
+        cell.numFmt = isPercentage ? `0.0% "${marker}"` : `#,##0${amountDecimals ? `.${"0".repeat(amountDecimals)}` : ""} "${marker}"`;
       }
       if (isPlanned) cell.fill = PLANNED_FILL;
     }
@@ -143,7 +144,7 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
     cell.alignment = { horizontal: index === 0 ? "left" : "right", vertical: "middle" };
   });
 
-  readable.rows.forEach((row, index) => writeReadableRow(worksheet, index + 4, row, readable.years, isPercentage, locale, readable.showChangeColumn !== false, readable.numberFormat));
+  readable.rows.forEach((row, index) => writeReadableRow(worksheet, index + 4, row, readable.years, isPercentage, locale, readable.showChangeColumn !== false, readable.amountDecimals, readable.numberFormat));
 
   const noteRow = readable.rows.length + 4;
   worksheet.getCell(noteRow, 1).value = workbookMessage(locale, "workbook.unit", { unit: readable.unitLabel });

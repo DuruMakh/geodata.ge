@@ -1,4 +1,7 @@
 {
+  "connect.sectorCoverage": "Economic sectors, {count} national activities plus Total GDP — nominal GEL {nominalRange}; GDP shares {shareRange}; annual real growth {growthRange}.",
+  "connect.sectorQuery": "Use query_economic_sectors for selected activities, years and one measure: amount_gel, share_of_gdp_pct or real_growth_pct. Regional economies, sector rankings and cumulative comparisons are not supported. 2025 is preliminary; 2010 growth is missing. Percent values use 7.5 for 7.5%; growth rates must not be summed.",
+  "connect.sectorMethodology": "Sector methodology",
   "connect.metaTitle": "AI connection — Georgia’s budget data in your assistant",
   "connect.metaDescription": "Connect your AI assistant to Fiscal.ge’s verified budget data, with sources, caveats and precise coverage for every figure.",
   "connect.claudeNote": "Desktop app and website",

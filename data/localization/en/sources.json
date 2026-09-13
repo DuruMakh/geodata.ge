@@ -821,6 +821,20 @@
     },
     "derivation": null
   },
+  "source.geostat_sector_growth": {
+    "name": {
+      "text": "Geostat real GDP growth by economic activity",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
+  },
+  "source.geostat_sector_volume": {
+    "name": {
+      "text": "Geostat chain-linked GDP by economic activity at constant 2019 prices",
+      "reviewedAt": "2026-09-11"
+    },
+    "derivation": null
+  },
   "source.geostat_cpi_index_2010": {
     "name": {
       "text": "Geostat consumer price index, 2010 average = 100",

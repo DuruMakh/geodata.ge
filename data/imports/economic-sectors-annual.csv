@@ -1,0 +1,988 @@
+﻿series_id,year,measure,value,unit,valuation,price_basis,calculation,status,source_id,source_locator,last_reviewed_at
+economy.gdp_total,2010,nominal,22148652202.055619,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G26 [2010],2026-09-11
+economy.gdp_total,2011,nominal,26099375332.421539,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L26 [2011],2026-09-11
+economy.gdp_total,2012,nominal,27896854555.001788,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q26 [2012],2026-09-11
+economy.gdp_total,2013,nominal,29137727778.991604,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V26 [2013],2026-09-11
+economy.gdp_total,2014,nominal,31722398994.712326,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA26 [2014],2026-09-11
+economy.gdp_total,2015,nominal,34548162434.347338,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF26 [2015],2026-09-11
+economy.gdp_total,2016,nominal,36553296752.505135,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK26 [2016],2026-09-11
+economy.gdp_total,2017,nominal,41339766809.526416,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP26 [2017],2026-09-11
+economy.gdp_total,2018,nominal,45374358771.436862,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU26 [2018],2026-09-11
+economy.gdp_total,2019,nominal,49726284068.630448,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ26 [2019],2026-09-11
+economy.gdp_total,2020,nominal,49788538400.564656,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE26 [2020],2026-09-11
+economy.gdp_total,2021,nominal,60724140108.707114,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ26 [2021],2026-09-11
+economy.gdp_total,2022,nominal,72860059026.366784,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO26 [2022],2026-09-11
+economy.gdp_total,2023,nominal,80882761660.035656,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT26 [2023],2026-09-11
+economy.gdp_total,2024,nominal,93022275315.705381,gel,market_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY26 [2024],2026-09-11
+economy.gdp_total,2025,nominal,104598139883.332,gel,market_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD26 [2025*],2026-09-11
+economy.gdp_total,2010,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G26 [2010]; GDP at current prices!G26 [2010],2026-09-11
+economy.gdp_total,2011,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L26 [2011]; GDP at current prices!L26 [2011],2026-09-11
+economy.gdp_total,2012,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q26 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+economy.gdp_total,2013,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V26 [2013]; GDP at current prices!V26 [2013],2026-09-11
+economy.gdp_total,2014,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA26 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+economy.gdp_total,2015,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF26 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+economy.gdp_total,2016,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK26 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+economy.gdp_total,2017,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP26 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+economy.gdp_total,2018,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU26 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+economy.gdp_total,2019,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ26 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+economy.gdp_total,2020,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE26 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+economy.gdp_total,2021,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ26 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+economy.gdp_total,2022,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO26 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+economy.gdp_total,2023,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT26 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+economy.gdp_total,2024,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY26 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+economy.gdp_total,2025,share_of_gdp,100,percent,market_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD26 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+economy.gdp_total,2011,real_growth,7.94915853127959,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G26 [2011],2026-09-11
+economy.gdp_total,2012,real_growth,6.57903969286873,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L26 [2012],2026-09-11
+economy.gdp_total,2013,real_growth,5.13355465853915,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q26 [2013],2026-09-11
+economy.gdp_total,2014,real_growth,4.09060703814241,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V26 [2014],2026-09-11
+economy.gdp_total,2015,real_growth,3.35080619669405,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA26 [2015],2026-09-11
+economy.gdp_total,2016,real_growth,3.44992893977833,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF26 [2016],2026-09-11
+economy.gdp_total,2017,real_growth,5.16109792776773,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK26 [2017],2026-09-11
+economy.gdp_total,2018,real_growth,6.0621901064486,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP26 [2018],2026-09-11
+economy.gdp_total,2019,real_growth,5.38027718564543,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU26 [2019],2026-09-11
+economy.gdp_total,2020,real_growth,-6.291253972305881,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ26 [2020],2026-09-11
+economy.gdp_total,2021,real_growth,10.64401290352339,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE26 [2021],2026-09-11
+economy.gdp_total,2022,real_growth,10.95953828397201,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ26 [2022],2026-09-11
+economy.gdp_total,2023,real_growth,7.83172263123228,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO26 [2023],2026-09-11
+economy.gdp_total,2024,real_growth,9.67979392614724,percent,market_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT26 [2024],2026-09-11
+economy.gdp_total,2025,real_growth,7.46161492416432,percent,market_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY26 [2025*],2026-09-11
+sector.a,2010,nominal,1963727396.7742849,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G3 [2010],2026-09-11
+sector.a,2011,nominal,2541748063.6588643,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L3 [2011],2026-09-11
+sector.a,2012,nominal,2389561953.6582544,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q3 [2012],2026-09-11
+sector.a,2013,nominal,2685004601.8521889,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V3 [2013],2026-09-11
+sector.a,2014,nominal,2919768010.8231039,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA3 [2014],2026-09-11
+sector.a,2015,nominal,2951110952.5634902,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF3 [2015],2026-09-11
+sector.a,2016,nominal,2925436475.5502543,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK3 [2016],2026-09-11
+sector.a,2017,nominal,2860153081.6176573,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP3 [2017],2026-09-11
+sector.a,2018,nominal,3430996007.8028198,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU3 [2018],2026-09-11
+sector.a,2019,nominal,3647643919.3594852,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ3 [2019],2026-09-11
+sector.a,2020,nominal,4140726285.6413563,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE3 [2020],2026-09-11
+sector.a,2021,nominal,4388716151.2401835,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ3 [2021],2026-09-11
+sector.a,2022,nominal,4832333977.6585872,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO3 [2022],2026-09-11
+sector.a,2023,nominal,4865741221.3467323,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT3 [2023],2026-09-11
+sector.a,2024,nominal,5102683630.4131193,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY3 [2024],2026-09-11
+sector.a,2025,nominal,5419971597.4820028,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD3 [2025*],2026-09-11
+sector.a,2010,share_of_gdp,8.8661259333515162189,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G3 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.a,2011,share_of_gdp,9.73873141132775579257,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L3 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.a,2012,share_of_gdp,8.56570388230316113219,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q3 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.a,2013,share_of_gdp,9.21487297231215779605,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V3 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.a,2014,share_of_gdp,9.20412107328259699691,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA3 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.a,2015,share_of_gdp,8.54202002254549350743,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF3 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.a,2016,share_of_gdp,8.00320828886593690905,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK3 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.a,2017,share_of_gdp,6.91864831941567236784,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP3 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.a,2018,share_of_gdp,7.56153056638373964326,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU3 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.a,2019,share_of_gdp,7.33544439863058507736,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ3 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.a,2020,share_of_gdp,8.31662550992739319912,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE3 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.a,2021,share_of_gdp,7.22730061452264878819,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ3 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.a,2022,share_of_gdp,6.63234979800091824608,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO3 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.a,2023,share_of_gdp,6.01579511070392314804,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT3 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.a,2024,share_of_gdp,5.48544272121411936813,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY3 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.a,2025,share_of_gdp,5.18170935307970052627,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD3 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.a,2011,real_growth,10.68205993351516,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G3 [2011],2026-09-11
+sector.a,2012,real_growth,-3.511093694411443,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L3 [2012],2026-09-11
+sector.a,2013,real_growth,15.66360933054843,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q3 [2013],2026-09-11
+sector.a,2014,real_growth,-1.33702909159399,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V3 [2014],2026-09-11
+sector.a,2015,real_growth,0.27349433721251,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA3 [2015],2026-09-11
+sector.a,2016,real_growth,-8.766607450727477,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF3 [2016],2026-09-11
+sector.a,2017,real_growth,-2.202685826030276,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK3 [2017],2026-09-11
+sector.a,2018,real_growth,13.0975081687223,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP3 [2018],2026-09-11
+sector.a,2019,real_growth,1.44004915891043,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU3 [2019],2026-09-11
+sector.a,2020,real_growth,6.74133749318639,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ3 [2020],2026-09-11
+sector.a,2021,real_growth,2.34182603134907,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE3 [2021],2026-09-11
+sector.a,2022,real_growth,-1.754824196435038,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ3 [2022],2026-09-11
+sector.a,2023,real_growth,-3.424256962342028,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO3 [2023],2026-09-11
+sector.a,2024,real_growth,13.4717478981941,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT3 [2024],2026-09-11
+sector.a,2025,real_growth,-5.67461791842112,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY3 [2025*],2026-09-11
+sector.b,2010,nominal,145527999.57485672,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G4 [2010],2026-09-11
+sector.b,2011,nominal,173418559.65546819,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L4 [2011],2026-09-11
+sector.b,2012,nominal,186647449.92428709,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q4 [2012],2026-09-11
+sector.b,2013,nominal,142331694.35466345,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V4 [2013],2026-09-11
+sector.b,2014,nominal,174874911.24525206,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA4 [2014],2026-09-11
+sector.b,2015,nominal,299525135.23875234,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF4 [2015],2026-09-11
+sector.b,2016,nominal,337472215.30962952,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK4 [2016],2026-09-11
+sector.b,2017,nominal,376936922.46915049,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP4 [2017],2026-09-11
+sector.b,2018,nominal,362593130.11915538,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU4 [2018],2026-09-11
+sector.b,2019,nominal,506257444.31241014,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ4 [2019],2026-09-11
+sector.b,2020,nominal,705788280.95613335,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE4 [2020],2026-09-11
+sector.b,2021,nominal,701084251.35204322,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ4 [2021],2026-09-11
+sector.b,2022,nominal,802813086.90603464,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO4 [2022],2026-09-11
+sector.b,2023,nominal,599295857.98361893,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT4 [2023],2026-09-11
+sector.b,2024,nominal,795378852.66481089,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY4 [2024],2026-09-11
+sector.b,2025,nominal,994837870.62718307,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD4 [2025*],2026-09-11
+sector.b,2010,share_of_gdp,0.65705126545510633531,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G4 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.b,2011,share_of_gdp,0.6644548286948527407,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L4 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.b,2012,share_of_gdp,0.66906270581972114081,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q4 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.b,2013,share_of_gdp,0.48847904488038035047,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V4 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.b,2014,share_of_gdp,0.55126635055060377839,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA4 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.b,2015,share_of_gdp,0.866978484913479246,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF4 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.b,2016,share_of_gdp,0.92323332036118268583,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK4 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.b,2017,share_of_gdp,0.91180224650490388083,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP4 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.b,2018,share_of_gdp,0.79911460996206427676,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU4 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.b,2019,share_of_gdp,1.01808822797555439314,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ4 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.b,2020,share_of_gdp,1.41757180192324935927,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE4 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.b,2021,share_of_gdp,1.15453961158935561418,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ4 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.b,2022,share_of_gdp,1.10185621262742951172,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO4 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.b,2023,share_of_gdp,0.74094386205872132563,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT4 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.b,2024,share_of_gdp,0.8550412790542905581,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY4 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.b,2025,share_of_gdp,0.95110474405837231216,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD4 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.b,2011,real_growth,1.8611639894096,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G4 [2011],2026-09-11
+sector.b,2012,real_growth,3.24709848897164,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L4 [2012],2026-09-11
+sector.b,2013,real_growth,-30.029232207552766,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q4 [2013],2026-09-11
+sector.b,2014,real_growth,35.1262596576409,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V4 [2014],2026-09-11
+sector.b,2015,real_growth,60.5993226673298,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA4 [2015],2026-09-11
+sector.b,2016,real_growth,24.83469630537734,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF4 [2016],2026-09-11
+sector.b,2017,real_growth,-4.696365022373016,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK4 [2017],2026-09-11
+sector.b,2018,real_growth,-7.431761754972072,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP4 [2018],2026-09-11
+sector.b,2019,real_growth,-30.242911479906681,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU4 [2019],2026-09-11
+sector.b,2020,real_growth,27.76195242039083,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ4 [2020],2026-09-11
+sector.b,2021,real_growth,0.19054426209078,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE4 [2021],2026-09-11
+sector.b,2022,real_growth,-1.105032725589496,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ4 [2022],2026-09-11
+sector.b,2023,real_growth,-19.575876564800879,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO4 [2023],2026-09-11
+sector.b,2024,real_growth,1.5411839181515,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT4 [2024],2026-09-11
+sector.b,2025,real_growth,-3.025665818556917,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY4 [2025*],2026-09-11
+sector.c,2010,nominal,2009231015.7671618,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G5 [2010],2026-09-11
+sector.c,2011,nominal,2466757725.1185021,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L5 [2011],2026-09-11
+sector.c,2012,nominal,2662742900.032189,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q5 [2012],2026-09-11
+sector.c,2013,nominal,2687284319.7639259,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V5 [2013],2026-09-11
+sector.c,2014,nominal,2921771658.2991434,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA5 [2014],2026-09-11
+sector.c,2015,nominal,3191781878.9212033,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF5 [2015],2026-09-11
+sector.c,2016,nominal,2845170362.4929123,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK5 [2016],2026-09-11
+sector.c,2017,nominal,3625829535.8588875,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP5 [2017],2026-09-11
+sector.c,2018,nominal,4109577997.9069212,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU5 [2018],2026-09-11
+sector.c,2019,nominal,4388635232.9325418,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ5 [2019],2026-09-11
+sector.c,2020,nominal,4694196973.3192564,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE5 [2020],2026-09-11
+sector.c,2021,nominal,6021419598.5870829,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ5 [2021],2026-09-11
+sector.c,2022,nominal,7084364108.5354902,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO5 [2022],2026-09-11
+sector.c,2023,nominal,6758041835.449395,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT5 [2023],2026-09-11
+sector.c,2024,nominal,7848018253.9015086,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY5 [2024],2026-09-11
+sector.c,2025,nominal,8353740547.5511478,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD5 [2025*],2026-09-11
+sector.c,2010,share_of_gdp,9.07157238028544614806,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G5 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.c,2011,share_of_gdp,9.4514052298187040031,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L5 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.c,2012,share_of_gdp,9.54495746028388875529,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q5 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.c,2013,share_of_gdp,9.22269691084651627815,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V5 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.c,2014,share_of_gdp,9.21043726480510284401,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA5 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.c,2015,share_of_gdp,9.23864441411788337682,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF5 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.c,2016,share_of_gdp,7.78362176675055189613,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK5 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.c,2017,share_of_gdp,8.77080306854402553899,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP5 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.c,2018,share_of_gdp,9.05704919954460857658,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU5 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.c,2019,share_of_gdp,8.82558452764237038115,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ5 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.c,2020,share_of_gdp,9.42826828044829513906,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE5 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.c,2021,share_of_gdp,9.91602283343602833106,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ5 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.c,2022,share_of_gdp,9.72324783043585299151,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO5 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.c,2023,share_of_gdp,8.35535495666508355303,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT5 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.c,2024,share_of_gdp,8.43670854885710517397,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY5 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.c,2025,share_of_gdp,7.98650966151869325009,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD5 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.c,2011,real_growth,13.95289196849541,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G5 [2011],2026-09-11
+sector.c,2012,real_growth,5.57360435635292,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L5 [2012],2026-09-11
+sector.c,2013,real_growth,4.60572263520586,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q5 [2013],2026-09-11
+sector.c,2014,real_growth,0.05705239224216,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V5 [2014],2026-09-11
+sector.c,2015,real_growth,-9.765249051281472,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA5 [2015],2026-09-11
+sector.c,2016,real_growth,-1.525811024567219,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF5 [2016],2026-09-11
+sector.c,2017,real_growth,13.28426741959663,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK5 [2017],2026-09-11
+sector.c,2018,real_growth,3.72091937517401,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP5 [2018],2026-09-11
+sector.c,2019,real_growth,2.06246413128939,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU5 [2019],2026-09-11
+sector.c,2020,real_growth,-5.914176210903406,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ5 [2020],2026-09-11
+sector.c,2021,real_growth,7.14100427530089,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE5 [2021],2026-09-11
+sector.c,2022,real_growth,13.39805862742874,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ5 [2022],2026-09-11
+sector.c,2023,real_growth,3.02439384062301,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO5 [2023],2026-09-11
+sector.c,2024,real_growth,3.88393212509128,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT5 [2024],2026-09-11
+sector.c,2025,real_growth,3.93575232180426,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY5 [2025*],2026-09-11
+sector.d,2010,nominal,514161591.11732077,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G6 [2010],2026-09-11
+sector.d,2011,nominal,536988701.42861347,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L6 [2011],2026-09-11
+sector.d,2012,nominal,509958877.12206945,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q6 [2012],2026-09-11
+sector.d,2013,nominal,563545149.76478276,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V6 [2013],2026-09-11
+sector.d,2014,nominal,596172680.96114287,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA6 [2014],2026-09-11
+sector.d,2015,nominal,594501700.88971731,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF6 [2015],2026-09-11
+sector.d,2016,nominal,690201861.79936991,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK6 [2016],2026-09-11
+sector.d,2017,nominal,800917991.04181996,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP6 [2017],2026-09-11
+sector.d,2018,nominal,1008181744.7729397,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU6 [2018],2026-09-11
+sector.d,2019,nominal,990741936.50595998,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ6 [2019],2026-09-11
+sector.d,2020,nominal,1036546215.0327257,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE6 [2020],2026-09-11
+sector.d,2021,nominal,1745382547.8464705,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ6 [2021],2026-09-11
+sector.d,2022,nominal,2097471643.7006209,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO6 [2022],2026-09-11
+sector.d,2023,nominal,2047242247.535529,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT6 [2023],2026-09-11
+sector.d,2024,nominal,1927511341.2074877,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY6 [2024],2026-09-11
+sector.d,2025,nominal,1995851155.9450355,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD6 [2025*],2026-09-11
+sector.d,2010,share_of_gdp,2.32141254658196029023,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G6 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.d,2011,share_of_gdp,2.05747721770776517952,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L6 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.d,2012,share_of_gdp,1.82801568584238820856,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q6 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.d,2013,share_of_gdp,1.93407376868659139666,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V6 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.d,2014,share_of_gdp,1.87934298745979583864,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA6 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.d,2015,share_of_gdp,1.72079108988636506491,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF6 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.d,2016,share_of_gdp,1.88820687357582262053,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK6 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.d,2017,share_of_gdp,1.93740326289710677705,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP6 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.d,2018,share_of_gdp,2.22191954238169784372,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU6 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.d,2019,share_of_gdp,1.99239085538459541847,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ6 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.d,2020,share_of_gdp,2.08189725654001151041,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE6 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.d,2021,share_of_gdp,2.87428120797087015241,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ6 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.d,2022,share_of_gdp,2.87876742309745111748,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO6 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.d,2023,share_of_gdp,2.53112307927917319676,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT6 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.d,2024,share_of_gdp,2.07209653243351385202,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY6 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.d,2025,share_of_gdp,1.90811343124379962967,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD6 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.d,2011,real_growth,1.89877054447774,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G6 [2011],2026-09-11
+sector.d,2012,real_growth,-2.437287840278714,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L6 [2012],2026-09-11
+sector.d,2013,real_growth,10.6861466648668,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q6 [2013],2026-09-11
+sector.d,2014,real_growth,7.41843905491089,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V6 [2014],2026-09-11
+sector.d,2015,real_growth,10.56205770377512,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA6 [2015],2026-09-11
+sector.d,2016,real_growth,11.08358464214918,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF6 [2016],2026-09-11
+sector.d,2017,real_growth,-1.695629331117914,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK6 [2017],2026-09-11
+sector.d,2018,real_growth,5.96813040997306,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP6 [2018],2026-09-11
+sector.d,2019,real_growth,1.01011516958896,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU6 [2019],2026-09-11
+sector.d,2020,real_growth,-0.619469222057916,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ6 [2020],2026-09-11
+sector.d,2021,real_growth,44.60625040559066,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE6 [2021],2026-09-11
+sector.d,2022,real_growth,34.27472745582799,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ6 [2022],2026-09-11
+sector.d,2023,real_growth,-2.527268074499631,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO6 [2023],2026-09-11
+sector.d,2024,real_growth,-10.498717941442621,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT6 [2024],2026-09-11
+sector.d,2025,real_growth,-4.473542434570632,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY6 [2025*],2026-09-11
+sector.e,2010,nominal,212488297.04046915,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G7 [2010],2026-09-11
+sector.e,2011,nominal,178551755.62429551,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L7 [2011],2026-09-11
+sector.e,2012,nominal,210310714.49485395,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q7 [2012],2026-09-11
+sector.e,2013,nominal,169531178.92886914,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V7 [2013],2026-09-11
+sector.e,2014,nominal,144917575.57154358,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA7 [2014],2026-09-11
+sector.e,2015,nominal,252064828.10724208,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF7 [2015],2026-09-11
+sector.e,2016,nominal,284875274.70509207,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK7 [2016],2026-09-11
+sector.e,2017,nominal,332233216.10474966,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP7 [2017],2026-09-11
+sector.e,2018,nominal,299803370.91643713,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU7 [2018],2026-09-11
+sector.e,2019,nominal,345639150.8070775,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ7 [2019],2026-09-11
+sector.e,2020,nominal,273995807.6809769,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE7 [2020],2026-09-11
+sector.e,2021,nominal,485963460.69429921,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ7 [2021],2026-09-11
+sector.e,2022,nominal,455663140.42063266,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO7 [2022],2026-09-11
+sector.e,2023,nominal,503270221.15596651,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT7 [2023],2026-09-11
+sector.e,2024,nominal,752114897.4341321,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY7 [2024],2026-09-11
+sector.e,2025,nominal,791182807.05145469,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD7 [2025*],2026-09-11
+sector.e,2010,share_of_gdp,0.95937348738876348563,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G7 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.e,2011,share_of_gdp,0.68412271692377402046,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L7 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.e,2012,share_of_gdp,0.75388683724253825828,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q7 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.e,2013,share_of_gdp,0.58182703955076987336,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V7 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.e,2014,share_of_gdp,0.45683044209770920702,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA7 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.e,2015,share_of_gdp,0.72960415358196439214,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF7 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.e,2016,share_of_gdp,0.77934222085062271505,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK7 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.e,2017,share_of_gdp,0.8036649496247017863,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP7 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.e,2018,share_of_gdp,0.66073301978024472767,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU7 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.e,2019,share_of_gdp,0.69508340967130912491,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ7 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.e,2020,share_of_gdp,0.5503190422594720927,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE7 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.e,2021,share_of_gdp,0.80028051418157154491,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ7 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.e,2022,share_of_gdp,0.62539496468941388109,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO7 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.e,2023,share_of_gdp,0.62222185645848612654,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT7 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.e,2024,share_of_gdp,0.80853203695733409252,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY7 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.e,2025,share_of_gdp,0.75640236808602352279,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD7 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.e,2011,real_growth,-17.584777525302826,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G7 [2011],2026-09-11
+sector.e,2012,real_growth,19.29871933849074,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L7 [2012],2026-09-11
+sector.e,2013,real_growth,-21.110167941969777,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q7 [2013],2026-09-11
+sector.e,2014,real_growth,-17.092988582145381,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V7 [2014],2026-09-11
+sector.e,2015,real_growth,69.22445764679776,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA7 [2015],2026-09-11
+sector.e,2016,real_growth,8.92865418514582,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF7 [2016],2026-09-11
+sector.e,2017,real_growth,18.60829944213532,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK7 [2017],2026-09-11
+sector.e,2018,real_growth,-12.705959398312942,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP7 [2018],2026-09-11
+sector.e,2019,real_growth,19.7355918546088,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU7 [2019],2026-09-11
+sector.e,2020,real_growth,-18.867509017277399,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ7 [2020],2026-09-11
+sector.e,2021,real_growth,75.41377873699247,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE7 [2021],2026-09-11
+sector.e,2022,real_growth,-8.214546530825402,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ7 [2022],2026-09-11
+sector.e,2023,real_growth,6.05425892858078,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO7 [2023],2026-09-11
+sector.e,2024,real_growth,37.45933132187326,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT7 [2024],2026-09-11
+sector.e,2025,real_growth,4.25875943772425,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY7 [2025*],2026-09-11
+sector.f,2010,nominal,856879498.86753404,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G8 [2010],2026-09-11
+sector.f,2011,nominal,1258596022.4962023,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L8 [2011],2026-09-11
+sector.f,2012,nominal,1688016344.7418263,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q8 [2012],2026-09-11
+sector.f,2013,nominal,1691973299.7751344,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V8 [2013],2026-09-11
+sector.f,2014,nominal,1926559411.3989705,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA8 [2014],2026-09-11
+sector.f,2015,nominal,2492229021.0149285,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF8 [2015],2026-09-11
+sector.f,2016,nominal,2832003454.5225753,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK8 [2016],2026-09-11
+sector.f,2017,nominal,3656062442.667162,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP8 [2017],2026-09-11
+sector.f,2018,nominal,3704950142.6324096,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU8 [2018],2026-09-11
+sector.f,2019,nominal,3717591699.0847518,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ8 [2019],2026-09-11
+sector.f,2020,nominal,3780490647.0315036,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE8 [2020],2026-09-11
+sector.f,2021,nominal,3839216033.2104331,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ8 [2021],2026-09-11
+sector.f,2022,nominal,5100565519.2504673,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO8 [2022],2026-09-11
+sector.f,2023,nominal,5362778740.0647394,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT8 [2023],2026-09-11
+sector.f,2024,nominal,6894243279.4248398,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY8 [2024],2026-09-11
+sector.f,2025,nominal,7323650339.9737094,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD8 [2025*],2026-09-11
+sector.f,2010,share_of_gdp,3.86876587816935855602,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G8 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.f,2011,share_of_gdp,4.82232239839369321188,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L8 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.f,2012,share_of_gdp,6.05091997527431676267,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q8 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.f,2013,share_of_gdp,5.80681277760804884483,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V8 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.f,2014,share_of_gdp,6.07318321580943682688,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA8 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.f,2015,share_of_gdp,7.21378170474614451647,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF8 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.f,2016,share_of_gdp,7.74760064378731432648,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK8 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.f,2017,share_of_gdp,8.84393581490801221331,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP8 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.f,2018,share_of_gdp,8.16529476767983333486,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU8 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.f,2019,share_of_gdp,7.47611000643817263644,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ8 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.f,2020,share_of_gdp,7.59309425116329331275,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE8 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.f,2021,share_of_gdp,6.32238847077545611605,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ8 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.f,2022,share_of_gdp,7.00049600207524075736,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO8 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.f,2023,share_of_gdp,6.63031111945142662463,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT8 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.f,2024,share_of_gdp,7.41138964406824482287,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY8 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.f,2025,share_of_gdp,7.0017022751479666946,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD8 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.f,2011,real_growth,18.76917573005537,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G8 [2011],2026-09-11
+sector.f,2012,real_growth,16.39167121558103,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L8 [2012],2026-09-11
+sector.f,2013,real_growth,3.03570567653328,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q8 [2013],2026-09-11
+sector.f,2014,real_growth,16.67762796057491,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V8 [2014],2026-09-11
+sector.f,2015,real_growth,25.13647137431863,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA8 [2015],2026-09-11
+sector.f,2016,real_growth,20.01256881513891,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF8 [2016],2026-09-11
+sector.f,2017,real_growth,9.40389998106848,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK8 [2017],2026-09-11
+sector.f,2018,real_growth,-3.233250649054256,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP8 [2018],2026-09-11
+sector.f,2019,real_growth,1.10843697509691,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU8 [2019],2026-09-11
+sector.f,2020,real_growth,-4.074796342144978,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ8 [2020],2026-09-11
+sector.f,2021,real_growth,-23.903303589718448,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE8 [2021],2026-09-11
+sector.f,2022,real_growth,15.85129133356169,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ8 [2022],2026-09-11
+sector.f,2023,real_growth,15.00074399351563,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO8 [2023],2026-09-11
+sector.f,2024,real_growth,12.17621833897475,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT8 [2024],2026-09-11
+sector.f,2025,real_growth,0.84447081752361,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY8 [2025*],2026-09-11
+sector.g,2010,nominal,3303318133.3486154,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G9 [2010],2026-09-11
+sector.g,2011,nominal,4025815364.1981389,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L9 [2011],2026-09-11
+sector.g,2012,nominal,3852598108.8530484,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q9 [2012],2026-09-11
+sector.g,2013,nominal,3839879472.4613526,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V9 [2013],2026-09-11
+sector.g,2014,nominal,4009079196.4298296,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA9 [2014],2026-09-11
+sector.g,2015,nominal,4149845885.3517905,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF9 [2015],2026-09-11
+sector.g,2016,nominal,4347036179.3585898,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK9 [2016],2026-09-11
+sector.g,2017,nominal,4856788389.87568,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP9 [2017],2026-09-11
+sector.g,2018,nominal,5414141414.9392294,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU9 [2018],2026-09-11
+sector.g,2019,nominal,6186298344.5477767,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ9 [2019],2026-09-11
+sector.g,2020,nominal,6399838149.0555239,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE9 [2020],2026-09-11
+sector.g,2021,nominal,8116128107.3505752,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ9 [2021],2026-09-11
+sector.g,2022,nominal,9595524883.9465912,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO9 [2022],2026-09-11
+sector.g,2023,nominal,11243785911.166757,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT9 [2023],2026-09-11
+sector.g,2024,nominal,12433770463.411138,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY9 [2024],2026-09-11
+sector.g,2025,nominal,13539752762.857315,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD9 [2025*],2026-09-11
+sector.g,2010,share_of_gdp,14.91430766627882692516,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G9 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.g,2011,share_of_gdp,15.42494911438410178021,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L9 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.g,2012,share_of_gdp,13.81015232831076956689,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q9 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.g,2013,share_of_gdp,13.17837650755292635783,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V9 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.g,2014,share_of_gdp,12.63800760181500220737,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA9 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.g,2015,share_of_gdp,12.0117702156745308811,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF9 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.g,2016,share_of_gdp,11.89232317071556904081,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK9 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.g,2017,share_of_gdp,11.74846585916510847042,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP9 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.g,2018,share_of_gdp,11.9321607214588979123,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU9 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.g,2019,share_of_gdp,12.44070105059462684691,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ9 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.g,2020,share_of_gdp,12.85403901108079685561,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE9 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.g,2021,share_of_gdp,13.36557107736931080815,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ9 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.g,2022,share_of_gdp,13.16980113957104835765,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO9 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.g,2023,share_of_gdp,13.90133778867040769512,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT9 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.g,2024,share_of_gdp,13.36644413524884724294,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY9 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.g,2025,share_of_gdp,12.94454449950970081943,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD9 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.g,2011,real_growth,3.90558965702617,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G9 [2011],2026-09-11
+sector.g,2012,real_growth,0.27406993983119,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L9 [2012],2026-09-11
+sector.g,2013,real_growth,1.34792640314711,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q9 [2013],2026-09-11
+sector.g,2014,real_growth,0.73537006162177,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V9 [2014],2026-09-11
+sector.g,2015,real_growth,-2.582011998856544,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA9 [2015],2026-09-11
+sector.g,2016,real_growth,3.27284530112304,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF9 [2016],2026-09-11
+sector.g,2017,real_growth,1.41867530051512,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK9 [2017],2026-09-11
+sector.g,2018,real_growth,8.66172442299728,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP9 [2018],2026-09-11
+sector.g,2019,real_growth,7.50302903299063,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU9 [2019],2026-09-11
+sector.g,2020,real_growth,-5.140257924220464,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ9 [2020],2026-09-11
+sector.g,2021,real_growth,12.75411051764029,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE9 [2021],2026-09-11
+sector.g,2022,real_growth,4.9985432139745,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ9 [2022],2026-09-11
+sector.g,2023,real_growth,17.83244513810997,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO9 [2023],2026-09-11
+sector.g,2024,real_growth,9.32556429445061,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT9 [2024],2026-09-11
+sector.g,2025,real_growth,3.8000719060725,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY9 [2025*],2026-09-11
+sector.h,2010,nominal,1415847421.6748004,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G10 [2010],2026-09-11
+sector.h,2011,nominal,1691941498.5814542,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L10 [2011],2026-09-11
+sector.h,2012,nominal,1765625418.8556748,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q10 [2012],2026-09-11
+sector.h,2013,nominal,1632903573.1732322,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V10 [2013],2026-09-11
+sector.h,2014,nominal,1727282956.8832517,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA10 [2014],2026-09-11
+sector.h,2015,nominal,1881881364.1169538,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF10 [2015],2026-09-11
+sector.h,2016,nominal,1797191344.033783,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK10 [2016],2026-09-11
+sector.h,2017,nominal,1949672917.7869584,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP10 [2017],2026-09-11
+sector.h,2018,nominal,2240010983.6733291,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU10 [2018],2026-09-11
+sector.h,2019,nominal,2890045527.1291444,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ10 [2019],2026-09-11
+sector.h,2020,nominal,2609184201.9112532,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE10 [2020],2026-09-11
+sector.h,2021,nominal,3206098788.9865291,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ10 [2021],2026-09-11
+sector.h,2022,nominal,4109030508.9878993,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO10 [2022],2026-09-11
+sector.h,2023,nominal,4307806099.3180898,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT10 [2023],2026-09-11
+sector.h,2024,nominal,5071711822.0357588,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY10 [2024],2026-09-11
+sector.h,2025,nominal,5554579572.1593558,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD10 [2025*],2026-09-11
+sector.h,2010,share_of_gdp,6.3924766561795368988,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G10 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.h,2011,share_of_gdp,6.48268963157775831075,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L10 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.h,2012,share_of_gdp,6.32912006396472261829,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q10 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.h,2013,share_of_gdp,5.60408685796893524177,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V10 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.h,2014,share_of_gdp,5.44499474069147567057,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA10 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.h,2015,share_of_gdp,5.44712433749012246313,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF10 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.h,2016,share_of_gdp,4.91663270813080550171,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK10 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.h,2017,share_of_gdp,4.71621653496524318424,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP10 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.h,2018,share_of_gdp,4.93673308962200692317,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU10 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.h,2019,share_of_gdp,5.81190728657787175868,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ10 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.h,2020,share_of_gdp,5.24053182867015478124,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE10 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.h,2021,share_of_gdp,5.27977635129461957444,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ10 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.h,2022,share_of_gdp,5.63962006605143273184,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO10 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.h,2023,share_of_gdp,5.32598790014681944993,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT10 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.h,2024,share_of_gdp,5.45214767626682448474,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY10 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.h,2025,share_of_gdp,5.31039995391399236949,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD10 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.h,2011,real_growth,14.45534186728035,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G10 [2011],2026-09-11
+sector.h,2012,real_growth,10.03758911912804,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L10 [2012],2026-09-11
+sector.h,2013,real_growth,-10.96952254184626,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q10 [2013],2026-09-11
+sector.h,2014,real_growth,2.38864513212935,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V10 [2014],2026-09-11
+sector.h,2015,real_growth,5.74465786511486,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA10 [2015],2026-09-11
+sector.h,2016,real_growth,0.65153301308052,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF10 [2016],2026-09-11
+sector.h,2017,real_growth,20.97432348823449,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK10 [2017],2026-09-11
+sector.h,2018,real_growth,16.80983339701126,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP10 [2018],2026-09-11
+sector.h,2019,real_growth,14.12556574448548,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU10 [2019],2026-09-11
+sector.h,2020,real_growth,-4.361936836843256,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ10 [2020],2026-09-11
+sector.h,2021,real_growth,32.8724429683175,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE10 [2021],2026-09-11
+sector.h,2022,real_growth,36.42677890994815,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ10 [2022],2026-09-11
+sector.h,2023,real_growth,12.28393987770009,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO10 [2023],2026-09-11
+sector.h,2024,real_growth,11.20002836478045,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT10 [2024],2026-09-11
+sector.h,2025,real_growth,8.85221777510054,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY10 [2025*],2026-09-11
+sector.i,2010,nominal,339522715.91569058,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G11 [2010],2026-09-11
+sector.i,2011,nominal,437520251.78214842,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L11 [2011],2026-09-11
+sector.i,2012,nominal,588484141.52095506,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q11 [2012],2026-09-11
+sector.i,2013,nominal,684539154.3929361,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V11 [2013],2026-09-11
+sector.i,2014,nominal,793650669.87953446,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA11 [2014],2026-09-11
+sector.i,2015,nominal,961883950.25916657,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF11 [2015],2026-09-11
+sector.i,2016,nominal,1158179475.3792697,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK11 [2016],2026-09-11
+sector.i,2017,nominal,1464111088.8215064,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP11 [2017],2026-09-11
+sector.i,2018,nominal,1748626258.8488344,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU11 [2018],2026-09-11
+sector.i,2019,nominal,2300207252.3729644,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ11 [2019],2026-09-11
+sector.i,2020,nominal,1168100393.6672469,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE11 [2020],2026-09-11
+sector.i,2021,nominal,1732244862.1650083,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ11 [2021],2026-09-11
+sector.i,2022,nominal,2397911103.1050952,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO11 [2022],2026-09-11
+sector.i,2023,nominal,2691148461.2994745,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT11 [2023],2026-09-11
+sector.i,2024,nominal,3228075681.0484399,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY11 [2024],2026-09-11
+sector.i,2025,nominal,3701892468.8727848,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD11 [2025*],2026-09-11
+sector.i,2010,share_of_gdp,1.53292720847447068155,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G11 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.i,2011,share_of_gdp,1.67636292520245019207,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L11 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.i,2012,share_of_gdp,2.10949998094119303889,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q11 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.i,2013,share_of_gdp,2.34932236166504048766,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V11 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.i,2014,share_of_gdp,2.50186207547488691029,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA11 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.i,2015,share_of_gdp,2.78418266698570902524,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF11 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.i,2016,share_of_gdp,3.16846790378735209863,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK11 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.i,2017,share_of_gdp,3.54165299375639874809,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP11 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.i,2018,share_of_gdp,3.85377624322394573775,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU11 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.i,2019,share_of_gdp,4.62573726441794885,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ11 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.i,2020,share_of_gdp,2.34612308613984011876,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE11 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.i,2021,share_of_gdp,2.852646178379766213,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ11 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.i,2022,share_of_gdp,3.29111880383919674538,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO11 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.i,2023,share_of_gdp,3.3272212843211765106,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT11 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.i,2024,share_of_gdp,3.47021793446007974808,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY11 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.i,2025,share_of_gdp,3.53915707583504694943,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD11 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.i,2011,real_growth,13.25136157985646,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G11 [2011],2026-09-11
+sector.i,2012,real_growth,13.04550295324938,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L11 [2012],2026-09-11
+sector.i,2013,real_growth,0.67061772720496,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q11 [2013],2026-09-11
+sector.i,2014,real_growth,12.3272397616667,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V11 [2014],2026-09-11
+sector.i,2015,real_growth,11.91896315874889,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA11 [2015],2026-09-11
+sector.i,2016,real_growth,13.9440804364225,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF11 [2016],2026-09-11
+sector.i,2017,real_growth,31.82794022396502,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK11 [2017],2026-09-11
+sector.i,2018,real_growth,17.75538533328999,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP11 [2018],2026-09-11
+sector.i,2019,real_growth,22.44226026759956,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU11 [2019],2026-09-11
+sector.i,2020,real_growth,-46.607254582445776,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ11 [2020],2026-09-11
+sector.i,2021,real_growth,34.72001184569589,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE11 [2021],2026-09-11
+sector.i,2022,real_growth,18.3482135839018,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ11 [2022],2026-09-11
+sector.i,2023,real_growth,1.53882113908179,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO11 [2023],2026-09-11
+sector.i,2024,real_growth,4.89086762673243,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT11 [2024],2026-09-11
+sector.i,2025,real_growth,5.61580913298098,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY11 [2025*],2026-09-11
+sector.j,2010,nominal,959804036.52350924,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G12 [2010],2026-09-11
+sector.j,2011,nominal,847447722.6253382,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L12 [2011],2026-09-11
+sector.j,2012,nominal,911538372.20023456,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q12 [2012],2026-09-11
+sector.j,2013,nominal,834239987.06629595,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V12 [2013],2026-09-11
+sector.j,2014,nominal,841024252.81798617,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA12 [2014],2026-09-11
+sector.j,2015,nominal,933704411.53624381,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF12 [2015],2026-09-11
+sector.j,2016,nominal,963902101.51113934,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK12 [2016],2026-09-11
+sector.j,2017,nominal,994694811.76776242,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP12 [2017],2026-09-11
+sector.j,2018,nominal,1118264117.8346341,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU12 [2018],2026-09-11
+sector.j,2019,nominal,1324742970.3589617,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ12 [2019],2026-09-11
+sector.j,2020,nominal,1384787109.2577263,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE12 [2020],2026-09-11
+sector.j,2021,nominal,1874760412.5074695,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ12 [2021],2026-09-11
+sector.j,2022,nominal,3183269870.9280021,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO12 [2022],2026-09-11
+sector.j,2023,nominal,4208134827.4707079,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT12 [2023],2026-09-11
+sector.j,2024,nominal,5160443673.3085313,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY12 [2024],2026-09-11
+sector.j,2025,nominal,7369807851.7010354,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD12 [2025*],2026-09-11
+sector.j,2010,share_of_gdp,4.33346475337415662327,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G12 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.j,2011,share_of_gdp,3.24700385289532036999,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L12 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.j,2012,share_of_gdp,3.26753100570185819125,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q12 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.j,2013,share_of_gdp,2.86309211683893100185,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V12 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.j,2014,share_of_gdp,2.65120003363608466329,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA12 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.j,2015,share_of_gdp,2.7026167117009005179,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF12 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.j,2016,share_of_gdp,2.63697720081863614997,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK12 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.j,2017,share_of_gdp,2.40614519271681769472,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP12 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.j,2018,share_of_gdp,2.46452875172878663005,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU12 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.j,2019,share_of_gdp,2.66406990824128058099,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ12 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.j,2020,share_of_gdp,2.78133713851303036638,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE12 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.j,2021,share_of_gdp,3.08733958052153845676,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ12 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.j,2022,share_of_gdp,4.36901906677845577883,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO12 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.j,2023,share_of_gdp,5.20275858675329608472,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT12 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.j,2024,share_of_gdp,5.54753542180586688562,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY12 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.j,2025,share_of_gdp,7.04583070016471149608,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD12 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.j,2011,real_growth,-1.985653767104907,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G12 [2011],2026-09-11
+sector.j,2012,real_growth,9.20623967525449,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L12 [2012],2026-09-11
+sector.j,2013,real_growth,-8.920444484073272,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q12 [2013],2026-09-11
+sector.j,2014,real_growth,-0.03356551920686,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V12 [2014],2026-09-11
+sector.j,2015,real_growth,9.25506943200594,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA12 [2015],2026-09-11
+sector.j,2016,real_growth,0.57400500940415,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF12 [2016],2026-09-11
+sector.j,2017,real_growth,2.78118491136708,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK12 [2017],2026-09-11
+sector.j,2018,real_growth,11.89692406099583,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP12 [2018],2026-09-11
+sector.j,2019,real_growth,18.25613346836388,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU12 [2019],2026-09-11
+sector.j,2020,real_growth,3.91477393231965,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ12 [2020],2026-09-11
+sector.j,2021,real_growth,32.59368773539489,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE12 [2021],2026-09-11
+sector.j,2022,real_growth,58.4500978588527,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ12 [2022],2026-09-11
+sector.j,2023,real_growth,27.49416280853787,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO12 [2023],2026-09-11
+sector.j,2024,real_growth,24.63342493810681,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT12 [2024],2026-09-11
+sector.j,2025,real_growth,28.74975642183657,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY12 [2025*],2026-09-11
+sector.k,2010,nominal,1011759217.9024284,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G13 [2010],2026-09-11
+sector.k,2011,nominal,1081548881.4739479,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L13 [2011],2026-09-11
+sector.k,2012,nominal,1295435236.0600817,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q13 [2012],2026-09-11
+sector.k,2013,nominal,1418314519.7244432,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V13 [2013],2026-09-11
+sector.k,2014,nominal,1514017069.8241268,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA13 [2014],2026-09-11
+sector.k,2015,nominal,1632097860.802884,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF13 [2015],2026-09-11
+sector.k,2016,nominal,1621785328.2651577,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK13 [2016],2026-09-11
+sector.k,2017,nominal,1915455828.248781,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP13 [2017],2026-09-11
+sector.k,2018,nominal,2160385010.5293077,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU13 [2018],2026-09-11
+sector.k,2019,nominal,2062615266.7963288,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ13 [2019],2026-09-11
+sector.k,2020,nominal,2089404906.5690278,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE13 [2020],2026-09-11
+sector.k,2021,nominal,2619200172.7005772,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ13 [2021],2026-09-11
+sector.k,2022,nominal,3151007662.8384572,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO13 [2022],2026-09-11
+sector.k,2023,nominal,3502990917.2084385,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT13 [2023],2026-09-11
+sector.k,2024,nominal,3959020528.7136941,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY13 [2024],2026-09-11
+sector.k,2025,nominal,4687247812.335434,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD13 [2025*],2026-09-11
+sector.k,2010,share_of_gdp,4.56803966522408487102,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G13 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.k,2011,share_of_gdp,4.14396462635031265488,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L13 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.k,2012,share_of_gdp,4.64366057293658450358,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q13 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.k,2013,share_of_gdp,4.86762224728811063124,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V13 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.k,2014,share_of_gdp,4.77270672396653220502,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA13 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.k,2015,share_of_gdp,4.72412350122643088391,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF13 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.k,2016,share_of_gdp,4.43676897119822891935,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK13 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.k,2017,share_of_gdp,4.63344613692252285724,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP13 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.k,2018,share_of_gdp,4.76124637135207092242,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU13 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.k,2019,share_of_gdp,4.14793766602302435679,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ13 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.k,2020,share_of_gdp,4.19655803060354887479,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE13 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.k,2021,share_of_gdp,4.31327667713653681295,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ13 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.k,2022,share_of_gdp,4.32473937702707941795,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO13 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.k,2023,share_of_gdp,4.33094870317623407535,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT13 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.k,2024,share_of_gdp,4.25599192803798721141,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY13 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.k,2025,share_of_gdp,4.48119614513561705649,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD13 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.k,2011,real_growth,5.39703737169819,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G13 [2011],2026-09-11
+sector.k,2012,real_growth,19.33910458603808,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L13 [2012],2026-09-11
+sector.k,2013,real_growth,8.68580384773665,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q13 [2013],2026-09-11
+sector.k,2014,real_growth,7.37141730344628,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V13 [2014],2026-09-11
+sector.k,2015,real_growth,3.55676041140534,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA13 [2015],2026-09-11
+sector.k,2016,real_growth,-3.445110444831016,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF13 [2016],2026-09-11
+sector.k,2017,real_growth,12.0543788853428,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK13 [2017],2026-09-11
+sector.k,2018,real_growth,10.16609886187653,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP13 [2018],2026-09-11
+sector.k,2019,real_growth,-4.589823579361934,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU13 [2019],2026-09-11
+sector.k,2020,real_growth,-1.225062855664092,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ13 [2020],2026-09-11
+sector.k,2021,real_growth,23.56554764799994,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE13 [2021],2026-09-11
+sector.k,2022,real_growth,11.7283742981372,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ13 [2022],2026-09-11
+sector.k,2023,real_growth,2.86226576244368,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO13 [2023],2026-09-11
+sector.k,2024,real_growth,8.82164401357169,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT13 [2024],2026-09-11
+sector.k,2025,real_growth,12.94451464582332,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY13 [2025*],2026-09-11
+sector.l,2010,nominal,2702305781.466192,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G14 [2010],2026-09-11
+sector.l,2011,nominal,2810587396.2496598,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L14 [2011],2026-09-11
+sector.l,2012,nominal,2892395509.594367,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q14 [2012],2026-09-11
+sector.l,2013,nominal,3106400105.8401955,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V14 [2013],2026-09-11
+sector.l,2014,nominal,3415033955.759081,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA14 [2014],2026-09-11
+sector.l,2015,nominal,3715964049.7257847,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF14 [2015],2026-09-11
+sector.l,2016,nominal,3933580470.7253346,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK14 [2016],2026-09-11
+sector.l,2017,nominal,4216823932.5895556,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP14 [2017],2026-09-11
+sector.l,2018,nominal,4385431277.0193937,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU14 [2018],2026-09-11
+sector.l,2019,nominal,4877729236.4835894,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ14 [2019],2026-09-11
+sector.l,2020,nominal,4943069821.9871374,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE14 [2020],2026-09-11
+sector.l,2021,nominal,5188721065.3662096,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ14 [2021],2026-09-11
+sector.l,2022,nominal,6158947015.7086271,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO14 [2022],2026-09-11
+sector.l,2023,nominal,7436537206.097586,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT14 [2023],2026-09-11
+sector.l,2024,nominal,7911368293.0868708,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY14 [2024],2026-09-11
+sector.l,2025,nominal,8556137451.1846407,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD14 [2025*],2026-09-11
+sector.l,2010,share_of_gdp,12.20076850191087782998,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G14 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.l,2011,share_of_gdp,10.76879182145885215796,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L14 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.l,2012,share_of_gdp,10.36817790296638558425,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q14 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.l,2013,share_of_gdp,10.66109248257827443452,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V14 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.l,2014,share_of_gdp,10.76537104374835814178,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA14 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.l,2015,share_of_gdp,10.75589492433155030965,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF14 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.l,2016,share_of_gdp,10.76121942531969165202,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK14 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.l,2017,share_of_gdp,10.20040570625043419145,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP14 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.l,2018,share_of_gdp,9.66499890193494188629,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU14 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.l,2019,share_of_gdp,9.80915692343212506775,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ14 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.l,2020,share_of_gdp,9.92812800050197422457,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE14 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.l,2021,share_of_gdp,8.54474193636578013658,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ14 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.l,2022,share_of_gdp,8.45311834496292631978,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO14 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.l,2023,share_of_gdp,9.19421772139117598687,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT14 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.l,2024,share_of_gdp,8.5048105588008100447,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY14 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.l,2025,share_of_gdp,8.18000918632787716637,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD14 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.l,2011,real_growth,8.31600334973326,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G14 [2011],2026-09-11
+sector.l,2012,real_growth,0.10104320239361,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L14 [2012],2026-09-11
+sector.l,2013,real_growth,3.88295335835933,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q14 [2013],2026-09-11
+sector.l,2014,real_growth,3.51220341575198,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V14 [2014],2026-09-11
+sector.l,2015,real_growth,1.44417290521316,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA14 [2015],2026-09-11
+sector.l,2016,real_growth,3.26775215261637,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF14 [2016],2026-09-11
+sector.l,2017,real_growth,4.62016462372723,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK14 [2017],2026-09-11
+sector.l,2018,real_growth,2.78616953082309,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP14 [2018],2026-09-11
+sector.l,2019,real_growth,9.6402643901059,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU14 [2019],2026-09-11
+sector.l,2020,real_growth,-0.64657124251562,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ14 [2020],2026-09-11
+sector.l,2021,real_growth,7.27824906562439,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE14 [2021],2026-09-11
+sector.l,2022,real_growth,-4.525163057230813,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ14 [2022],2026-09-11
+sector.l,2023,real_growth,-1.995974491954982,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO14 [2023],2026-09-11
+sector.l,2024,real_growth,1.63959856245457,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT14 [2024],2026-09-11
+sector.l,2025,real_growth,4.98785961360646,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY14 [2025*],2026-09-11
+sector.m,2010,nominal,230306924.8072897,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G15 [2010],2026-09-11
+sector.m,2011,nominal,388762705.42391978,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L15 [2011],2026-09-11
+sector.m,2012,nominal,585545780.74596657,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q15 [2012],2026-09-11
+sector.m,2013,nominal,593861223.88754063,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V15 [2013],2026-09-11
+sector.m,2014,nominal,678395007.95483741,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA15 [2014],2026-09-11
+sector.m,2015,nominal,748627702.31184891,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF15 [2015],2026-09-11
+sector.m,2016,nominal,824351877.73415612,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK15 [2016],2026-09-11
+sector.m,2017,nominal,928132289.02365677,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP15 [2017],2026-09-11
+sector.m,2018,nominal,1014713779.6502786,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU15 [2018],2026-09-11
+sector.m,2019,nominal,1100924311.9654511,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ15 [2019],2026-09-11
+sector.m,2020,nominal,1026325046.693903,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE15 [2020],2026-09-11
+sector.m,2021,nominal,1126791754.0283152,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ15 [2021],2026-09-11
+sector.m,2022,nominal,1218923899.2321923,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO15 [2022],2026-09-11
+sector.m,2023,nominal,1608977110.3414614,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT15 [2023],2026-09-11
+sector.m,2024,nominal,1968052664.5598313,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY15 [2024],2026-09-11
+sector.m,2025,nominal,2191023541.0178548,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD15 [2025*],2026-09-11
+sector.m,2010,share_of_gdp,1.03982365475906875898,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G15 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.m,2011,share_of_gdp,1.48954793159737205064,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L15 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.m,2012,share_of_gdp,2.09896703440704102158,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q15 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.m,2013,share_of_gdp,2.03811782576854360546,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V15 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.m,2014,share_of_gdp,2.13853626917660368715,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA15 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.m,2015,share_of_gdp,2.16691033491139573059,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF15 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.m,2016,share_of_gdp,2.25520527824254369957,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK15 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.m,2017,share_of_gdp,2.24513189273669576227,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP15 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.m,2018,share_of_gdp,2.23631541497185952101,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU15 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.m,2019,share_of_gdp,2.21396859344244290553,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ15 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.m,2020,share_of_gdp,2.06136809728534501699,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE15 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.m,2021,share_of_gdp,1.85559112407545935007,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ15 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.m,2022,share_of_gdp,1.67296584098440684808,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO15 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.m,2023,share_of_gdp,1.98927073868257938218,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT15 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.m,2024,share_of_gdp,2.11567891441111187887,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY15 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.m,2025,share_of_gdp,2.09470602771875907967,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD15 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.m,2011,real_growth,37.52441967065852,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G15 [2011],2026-09-11
+sector.m,2012,real_growth,52.55658746971707,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L15 [2012],2026-09-11
+sector.m,2013,real_growth,2.06100142978636,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q15 [2013],2026-09-11
+sector.m,2014,real_growth,10.93812121420208,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V15 [2014],2026-09-11
+sector.m,2015,real_growth,3.17768447303126,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA15 [2015],2026-09-11
+sector.m,2016,real_growth,3.84551179836991,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF15 [2016],2026-09-11
+sector.m,2017,real_growth,7.19865185354276,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK15 [2017],2026-09-11
+sector.m,2018,real_growth,7.23761430217633,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP15 [2018],2026-09-11
+sector.m,2019,real_growth,7.04499704151249,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU15 [2019],2026-09-11
+sector.m,2020,real_growth,-10.864963159241043,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ15 [2020],2026-09-11
+sector.m,2021,real_growth,2.01671198636986,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE15 [2021],2026-09-11
+sector.m,2022,real_growth,-6.242359975355811,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ15 [2022],2026-09-11
+sector.m,2023,real_growth,23.58411446206306,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO15 [2023],2026-09-11
+sector.m,2024,real_growth,19.81799046416846,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT15 [2024],2026-09-11
+sector.m,2025,real_growth,8.28097449600929,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY15 [2025*],2026-09-11
+sector.n,2010,nominal,100807408.65439169,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G16 [2010],2026-09-11
+sector.n,2011,nominal,169722832.56197954,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L16 [2011],2026-09-11
+sector.n,2012,nominal,202881479.81749842,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q16 [2012],2026-09-11
+sector.n,2013,nominal,234593472.30537611,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V16 [2013],2026-09-11
+sector.n,2014,nominal,298818176.20696518,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA16 [2014],2026-09-11
+sector.n,2015,nominal,304308134.90864432,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF16 [2015],2026-09-11
+sector.n,2016,nominal,406360393.42490182,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK16 [2016],2026-09-11
+sector.n,2017,nominal,443784167.27815892,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP16 [2017],2026-09-11
+sector.n,2018,nominal,524505014.67565368,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU16 [2018],2026-09-11
+sector.n,2019,nominal,608126230.77177909,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ16 [2019],2026-09-11
+sector.n,2020,nominal,354629314.87141378,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE16 [2020],2026-09-11
+sector.n,2021,nominal,505018632.56781803,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ16 [2021],2026-09-11
+sector.n,2022,nominal,646978311.50983575,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO16 [2022],2026-09-11
+sector.n,2023,nominal,764869853.28837147,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT16 [2023],2026-09-11
+sector.n,2024,nominal,924862284.96905028,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY16 [2024],2026-09-11
+sector.n,2025,nominal,1077505958.3186248,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD16 [2025*],2026-09-11
+sector.n,2010,share_of_gdp,0.45514014909239372416,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G16 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.n,2011,share_of_gdp,0.65029461586823504355,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L16 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.n,2012,share_of_gdp,0.72725575357427753083,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q16 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.n,2013,share_of_gdp,0.80511930815181396035,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V16 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.n,2014,share_of_gdp,0.9419784936718497611,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA16 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.n,2015,share_of_gdp,0.88082292505984368288,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF16 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.n,2016,share_of_gdp,1.1116928691173455178,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK16 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.n,2017,share_of_gdp,1.0735042829895509624,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP16 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.n,2018,share_of_gdp,1.15595025225090199128,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU16 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.n,2019,share_of_gdp,1.22294726453411419914,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ16 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.n,2020,share_of_gdp,0.71227098899410933325,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE16 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.n,2021,share_of_gdp,0.8316604099518642834,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ16 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.n,2022,share_of_gdp,0.88797390525816838609,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO16 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.n,2023,share_of_gdp,0.94565249453678741778,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT16 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.n,2024,share_of_gdp,0.99423743595841877095,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY16 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.n,2025,share_of_gdp,1.03013873814626824437,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD16 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.n,2011,real_growth,45.51957138251964,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G16 [2011],2026-09-11
+sector.n,2012,real_growth,17.89198429777494,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L16 [2012],2026-09-11
+sector.n,2013,real_growth,13.78529074821482,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q16 [2013],2026-09-11
+sector.n,2014,real_growth,23.11051631941754,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V16 [2014],2026-09-11
+sector.n,2015,real_growth,-2.862150522460766,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA16 [2015],2026-09-11
+sector.n,2016,real_growth,28.18587677915161,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF16 [2016],2026-09-11
+sector.n,2017,real_growth,1.2301175508852,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK16 [2017],2026-09-11
+sector.n,2018,real_growth,13.88227491674571,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP16 [2018],2026-09-11
+sector.n,2019,real_growth,7.22798375377749,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU16 [2019],2026-09-11
+sector.n,2020,real_growth,-46.650822103938069,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ16 [2020],2026-09-11
+sector.n,2021,real_growth,34.42175505921449,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE16 [2021],2026-09-11
+sector.n,2022,real_growth,12.90803428306208,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ16 [2022],2026-09-11
+sector.n,2023,real_growth,8.47183920532213,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO16 [2023],2026-09-11
+sector.n,2024,real_growth,18.88358364782256,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT16 [2024],2026-09-11
+sector.n,2025,real_growth,12.42543317965301,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY16 [2025*],2026-09-11
+sector.o,2010,nominal,1867100917.0430755,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G17 [2010],2026-09-11
+sector.o,2011,nominal,1946830169.1504835,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L17 [2011],2026-09-11
+sector.o,2012,nominal,2034965111.9324528,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q17 [2012],2026-09-11
+sector.o,2013,nominal,2431664844.5442534,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V17 [2013],2026-09-11
+sector.o,2014,nominal,2637601532.3445345,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA17 [2014],2026-09-11
+sector.o,2015,nominal,2562040853.479999,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF17 [2015],2026-09-11
+sector.o,2016,nominal,2697859253.6699998,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK17 [2016],2026-09-11
+sector.o,2017,nominal,2638099644.76,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP17 [2017],2026-09-11
+sector.o,2018,nominal,2770427365.1599992,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU17 [2018],2026-09-11
+sector.o,2019,nominal,2992201655.3999997,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ17 [2019],2026-09-11
+sector.o,2020,nominal,3224397961.6393544,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE17 [2020],2026-09-11
+sector.o,2021,nominal,3548136501.0802756,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ17 [2021],2026-09-11
+sector.o,2022,nominal,4031916073.4135899,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO17 [2022],2026-09-11
+sector.o,2023,nominal,4677136764.3617486,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT17 [2023],2026-09-11
+sector.o,2024,nominal,5546878165.3629667,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY17 [2024],2026-09-11
+sector.o,2025,nominal,6119852717.6799698,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD17 [2025*],2026-09-11
+sector.o,2010,share_of_gdp,8.42986245849212281021,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G17 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.o,2011,share_of_gdp,7.45929795006267566103,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L17 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.o,2012,share_of_gdp,7.29460415660944887655,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q17 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.o,2013,share_of_gdp,8.34541685263972992518,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V17 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.o,2014,share_of_gdp,8.31463450410602699647,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA17 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.o,2015,share_of_gdp,7.41585274860480275748,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF17 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.o,2016,share_of_gdp,7.38061814762332032765,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK17 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.o,2017,share_of_gdp,6.38150586798199162544,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP17 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.o,2018,share_of_gdp,6.10571133162543324697,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU17 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.o,2019,share_of_gdp,6.01734417007767851379,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ17 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.o,2020,share_of_gdp,6.47618521294609088509,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE17 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.o,2021,share_of_gdp,5.84304116077802696635,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ17 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.o,2022,share_of_gdp,5.53378095940673041097,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO17 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.o,2023,share_of_gdp,5.78261259676143302406,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT17 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.o,2024,share_of_gdp,5.96295687945450803569,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY17 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.o,2025,share_of_gdp,5.85082366140163558289,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD17 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.o,2011,real_growth,-6.119604161521963,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G17 [2011],2026-09-11
+sector.o,2012,real_growth,3.93016676554893,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L17 [2012],2026-09-11
+sector.o,2013,real_growth,20.42884960967245,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q17 [2013],2026-09-11
+sector.o,2014,real_growth,5.59055465871829,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V17 [2014],2026-09-11
+sector.o,2015,real_growth,-7.019922792461458,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA17 [2015],2026-09-11
+sector.o,2016,real_growth,3.03821080886333,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF17 [2016],2026-09-11
+sector.o,2017,real_growth,-7.748825975715093,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK17 [2017],2026-09-11
+sector.o,2018,real_growth,2.72299515880346,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP17 [2018],2026-09-11
+sector.o,2019,real_growth,2.99532855266509,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU17 [2019],2026-09-11
+sector.o,2020,real_growth,2.32472667335486,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ17 [2020],2026-09-11
+sector.o,2021,real_growth,-0.907206859218405,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE17 [2021],2026-09-11
+sector.o,2022,real_growth,1.83658979382531,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ17 [2022],2026-09-11
+sector.o,2023,real_growth,15.64910824281614,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO17 [2023],2026-09-11
+sector.o,2024,real_growth,15.46451899445537,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT17 [2024],2026-09-11
+sector.o,2025,real_growth,9.26981232007384,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY17 [2025*],2026-09-11
+sector.p,2010,nominal,858441788.01692738,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G18 [2010],2026-09-11
+sector.p,2011,nominal,984028165.34942872,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L18 [2011],2026-09-11
+sector.p,2012,nominal,1138642034.5879339,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q18 [2012],2026-09-11
+sector.p,2013,nominal,1250398085.302349,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V18 [2013],2026-09-11
+sector.p,2014,nominal,1367652722.2531286,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA18 [2014],2026-09-11
+sector.p,2015,nominal,1470348106.0473732,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF18 [2015],2026-09-11
+sector.p,2016,nominal,1690311375.8173099,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK18 [2016],2026-09-11
+sector.p,2017,nominal,1743605189.6273789,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP18 [2017],2026-09-11
+sector.p,2018,nominal,1823675114.7667633,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU18 [2018],2026-09-11
+sector.p,2019,nominal,1951321745.1503306,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ18 [2019],2026-09-11
+sector.p,2020,nominal,2149171808.0325063,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE18 [2020],2026-09-11
+sector.p,2021,nominal,2490522953.8600493,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ18 [2021],2026-09-11
+sector.p,2022,nominal,2834584904.9006947,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO18 [2022],2026-09-11
+sector.p,2023,nominal,3465138345.6699891,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT18 [2023],2026-09-11
+sector.p,2024,nominal,4551148261.8270638,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY18 [2024],2026-09-11
+sector.p,2025,nominal,5862418377.3818113,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD18 [2025*],2026-09-11
+sector.p,2010,share_of_gdp,3.87581953152551331003,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G18 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.p,2011,share_of_gdp,3.77031309299972091719,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L18 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.p,2012,share_of_gdp,4.08161440689656605171,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q18 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.p,2013,share_of_gdp,4.29133697310429972856,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V18 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.p,2014,share_of_gdp,4.31131555492097842807,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA18 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.p,2015,share_of_gdp,4.25593722630403073425,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF18 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.p,2016,share_of_gdp,4.62423782801879969879,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK18 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.p,2017,share_of_gdp,4.21774316643116414521,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP18 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.p,2018,share_of_gdp,4.01917550824931094538,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU18 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.p,2019,share_of_gdp,3.92412540309102074826,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ18 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.p,2020,share_of_gdp,4.31659951682400132845,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE18 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.p,2021,share_of_gdp,4.1013721221931937308,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ18 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.p,2022,share_of_gdp,3.89045101359979393459,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO18 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.p,2023,share_of_gdp,4.28414939667190085865,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT18 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.p,2024,share_of_gdp,4.89253595053557283651,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY18 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.p,2025,share_of_gdp,5.60470614861861775885,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD18 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.p,2011,real_growth,14.17166765399625,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G18 [2011],2026-09-11
+sector.p,2012,real_growth,8.75631230498442,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L18 [2012],2026-09-11
+sector.p,2013,real_growth,5.82914681268288,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q18 [2013],2026-09-11
+sector.p,2014,real_growth,1.95999687896766,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V18 [2014],2026-09-11
+sector.p,2015,real_growth,4.82078470679561,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA18 [2015],2026-09-11
+sector.p,2016,real_growth,12.64225816191755,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF18 [2016],2026-09-11
+sector.p,2017,real_growth,-0.516964800798078,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK18 [2017],2026-09-11
+sector.p,2018,real_growth,2.63793229802225,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP18 [2018],2026-09-11
+sector.p,2019,real_growth,4.64112783135519,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU18 [2019],2026-09-11
+sector.p,2020,real_growth,6.34525587851995,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ18 [2020],2026-09-11
+sector.p,2021,real_growth,8.83283620061475,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE18 [2021],2026-09-11
+sector.p,2022,real_growth,5.42073187591865,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ18 [2022],2026-09-11
+sector.p,2023,real_growth,18.03155125063944,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO18 [2023],2026-09-11
+sector.p,2024,real_growth,28.17119943745513,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT18 [2024],2026-09-11
+sector.p,2025,real_growth,24.48592830066465,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY18 [2025*],2026-09-11
+sector.q,2010,nominal,575792301.75129555,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G19 [2010],2026-09-11
+sector.q,2011,nominal,688642702.95027166,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L19 [2011],2026-09-11
+sector.q,2012,nominal,774995650.24635103,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q19 [2012],2026-09-11
+sector.q,2013,nominal,929570346.07228661,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V19 [2013],2026-09-11
+sector.q,2014,nominal,1030876230.1893032,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA19 [2014],2026-09-11
+sector.q,2015,nominal,1261203040.2496107,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF19 [2015],2026-09-11
+sector.q,2016,nominal,1406791717.6269484,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK19 [2016],2026-09-11
+sector.q,2017,nominal,1534948680.3786394,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP19 [2017],2026-09-11
+sector.q,2018,nominal,1653419285.6716752,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU19 [2018],2026-09-11
+sector.q,2019,nominal,1830614076.5724313,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ19 [2019],2026-09-11
+sector.q,2020,nominal,1781352530.1057543,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE19 [2020],2026-09-11
+sector.q,2021,nominal,2594225291.6671273,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ19 [2021],2026-09-11
+sector.q,2022,nominal,2446653272.8456718,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO19 [2022],2026-09-11
+sector.q,2023,nominal,2690899185.0789457,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT19 [2023],2026-09-11
+sector.q,2024,nominal,2948209811.2506665,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY19 [2024],2026-09-11
+sector.q,2025,nominal,3572193227.7665601,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD19 [2025*],2026-09-11
+sector.q,2010,share_of_gdp,2.599671964228397605,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G19 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.q,2011,share_of_gdp,2.63854093892743892784,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L19 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.q,2012,share_of_gdp,2.77807538738232977109,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q19 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.q,2013,share_of_gdp,3.19026367849626845997,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V19 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.q,2014,share_of_gdp,3.24967928926540406626,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA19 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.q,2015,share_of_gdp,3.65056475187733540862,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF19 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.q,2016,share_of_gdp,3.84860420977086196454,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK19 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.q,2017,share_of_gdp,3.7130075925462715736,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP19 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.q,2018,share_of_gdp,3.6439507476026347301,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU19 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.q,2019,share_of_gdp,3.68138120686010417578,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ19 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.q,2020,share_of_gdp,3.57783656104584871925,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE19 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.q,2021,share_of_gdp,4.27214825442237341989,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ19 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.q,2022,share_of_gdp,3.35801714346713701275,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO19 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.q,2023,share_of_gdp,3.32691308982408879814,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT19 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.q,2024,share_of_gdp,3.16935895326665547723,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY19 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.q,2025,share_of_gdp,3.41515942037875462467,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD19 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.q,2011,real_growth,5.20512946312839,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G19 [2011],2026-09-11
+sector.q,2012,real_growth,1.57638073453505,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L19 [2012],2026-09-11
+sector.q,2013,real_growth,12.07608124984756,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q19 [2013],2026-09-11
+sector.q,2014,real_growth,4.72672254771321,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V19 [2014],2026-09-11
+sector.q,2015,real_growth,20.17538696040459,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA19 [2015],2026-09-11
+sector.q,2016,real_growth,3.48578780207511,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF19 [2016],2026-09-11
+sector.q,2017,real_growth,8.41375356716958,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK19 [2017],2026-09-11
+sector.q,2018,real_growth,5.99094571544676,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP19 [2018],2026-09-11
+sector.q,2019,real_growth,12.17690028116722,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU19 [2019],2026-09-11
+sector.q,2020,real_growth,-5.943256629794121,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ19 [2020],2026-09-11
+sector.q,2021,real_growth,40.97010269852092,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE19 [2021],2026-09-11
+sector.q,2022,real_growth,-13.705335397594226,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ19 [2022],2026-09-11
+sector.q,2023,real_growth,-4.630537720137468,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO19 [2023],2026-09-11
+sector.q,2024,real_growth,5.1903098621622,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT19 [2024],2026-09-11
+sector.q,2025,real_growth,11.94513476748604,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY19 [2025*],2026-09-11
+sector.r,2010,nominal,304972387.3547905,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G20 [2010],2026-09-11
+sector.r,2011,nominal,678841405.14570936,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L20 [2011],2026-09-11
+sector.r,2012,nominal,823420817.85200344,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q20 [2012],2026-09-11
+sector.r,2013,nominal,837771618.04325624,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V20 [2013],2026-09-11
+sector.r,2014,nominal,760643771.12846341,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA20 [2014],2026-09-11
+sector.r,2015,nominal,925320595.62853294,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF20 [2015],2026-09-11
+sector.r,2016,nominal,1030495745.9905922,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK20 [2016],2026-09-11
+sector.r,2017,nominal,1055606289.079682,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP20 [2017],2026-09-11
+sector.r,2018,nominal,1242661657.0204085,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU20 [2018],2026-09-11
+sector.r,2019,nominal,1402015413.1671679,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ20 [2019],2026-09-11
+sector.r,2020,nominal,1328908432.0876623,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE20 [2020],2026-09-11
+sector.r,2021,nominal,2146458738.0473031,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ20 [2021],2026-09-11
+sector.r,2022,nominal,2574964373.4824685,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO20 [2022],2026-09-11
+sector.r,2023,nominal,2771917421.9989914,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT20 [2023],2026-09-11
+sector.r,2024,nominal,3059449483.9956269,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY20 [2024],2026-09-11
+sector.r,2025,nominal,3722116316.7577415,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD20 [2025*],2026-09-11
+sector.r,2010,share_of_gdp,1.37693429185946572893,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G20 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.r,2011,share_of_gdp,2.60098717497820451158,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L20 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.r,2012,share_of_gdp,2.95166186649658526094,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q20 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.r,2013,share_of_gdp,2.87521259172203635972,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V20 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.r,2014,share_of_gdp,2.39781288689815653157,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA20 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.r,2015,share_of_gdp,2.67834967311775495461,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF20 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.r,2016,share_of_gdp,2.81915952196560341198,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK20 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.r,2017,share_of_gdp,2.55348873626550317277,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP20 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.r,2018,share_of_gdp,2.73868698239910652395,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU20 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.r,2019,share_of_gdp,2.81946547872379949153,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ20 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.r,2020,share_of_gdp,2.66910512896797757321,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE20 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.r,2021,share_of_gdp,3.53477008353639352596,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ20 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.r,2022,share_of_gdp,3.53412337004919777065,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO20 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.r,2023,share_of_gdp,3.42708058566279355223,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT20 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.r,2024,share_of_gdp,3.28894286192447702111,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY20 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.r,2025,share_of_gdp,3.55849188227377925574,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD20 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.r,2011,real_growth,48.75337124108589,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G20 [2011],2026-09-11
+sector.r,2012,real_growth,25.40656041388503,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L20 [2012],2026-09-11
+sector.r,2013,real_growth,1.18132967380598,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q20 [2013],2026-09-11
+sector.r,2014,real_growth,-11.323140090038535,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V20 [2014],2026-09-11
+sector.r,2015,real_growth,15.98638472899867,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA20 [2015],2026-09-11
+sector.r,2016,real_growth,7.24534015454168,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF20 [2016],2026-09-11
+sector.r,2017,real_growth,-2.431578759670657,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK20 [2017],2026-09-11
+sector.r,2018,real_growth,14.17935748200019,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP20 [2018],2026-09-11
+sector.r,2019,real_growth,12.93243606681374,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU20 [2019],2026-09-11
+sector.r,2020,real_growth,-11.049594903257258,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ20 [2020],2026-09-11
+sector.r,2021,real_growth,43.98767918051257,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE20 [2021],2026-09-11
+sector.r,2022,real_growth,10.00603883431094,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ20 [2022],2026-09-11
+sector.r,2023,real_growth,4.86798573591179,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO20 [2023],2026-09-11
+sector.r,2024,real_growth,8.02872671563131,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT20 [2024],2026-09-11
+sector.r,2025,real_growth,12.27600612252311,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY20 [2025*],2026-09-11
+sector.s,2010,nominal,138907526.86150714,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G21 [2010],2026-09-11
+sector.s,2011,nominal,198098935.20986731,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L21 [2011],2026-09-11
+sector.s,2012,nominal,249137657.44243022,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q21 [2012],2026-09-11
+sector.s,2013,nominal,169139856.55749286,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V21 [2013],2026-09-11
+sector.s,2014,nominal,292967942.81540002,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA21 [2014],2026-09-11
+sector.s,2015,nominal,286175707.38946114,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF21 [2015],2026-09-11
+sector.s,2016,nominal,280549633.21855666,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK21 [2016],2026-09-11
+sector.s,2017,nominal,335188841.84760293,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP21 [2017],2026-09-11
+sector.s,2018,nominal,342721090.26369776,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU21 [2018],2026-09-11
+sector.s,2019,nominal,313809248.9018469,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ21 [2019],2026-09-11
+sector.s,2020,nominal,304871984.82734698,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE21 [2020],2026-09-11
+sector.s,2021,nominal,447179433.22773567,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ21 [2021],2026-09-11
+sector.s,2022,nominal,602267943.71269739,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO21 [2022],2026-09-11
+sector.s,2023,nominal,739996033.59082516,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT21 [2023],2026-09-11
+sector.s,2024,nominal,801303038.60385834,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY21 [2024],2026-09-11
+sector.s,2025,nominal,836414971.86081472,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD21 [2025*],2026-09-11
+sector.s,2010,share_of_gdp,0.62716017929350624863,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G21 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.s,2011,share_of_gdp,0.75901791781116699663,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L21 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.s,2012,share_of_gdp,0.89306719849446572117,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q21 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.s,2013,share_of_gdp,0.58048403032800396951,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V21 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.s,2014,share_of_gdp,0.92353652970645007322,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA21 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.s,2015,share_of_gdp,0.82833843314615465216,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF21 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.s,2016,share_of_gdp,0.76750842781186224399,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK21 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.s,2017,share_of_gdp,0.81081454424257023996,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP21 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.s,2018,share_of_gdp,0.75531886189307545402,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU21 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.s,2019,share_of_gdp,0.63107319354234983669,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ21 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.s,2020,share_of_gdp,0.61233367080301638497,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE21 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.s,2021,share_of_gdp,0.73641130599330709679,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ21 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.s,2022,share_of_gdp,0.82660918994691883294,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO21 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.s,2023,share_of_gdp,0.91489956376756454017,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT21 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.s,2024,share_of_gdp,0.86140984606573114182,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY21 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.s,2025,share_of_gdp,0.79964612448533583916,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD21 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.s,2011,real_growth,30.86748740598924,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G21 [2011],2026-09-11
+sector.s,2012,real_growth,6.66933787227264,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L21 [2012],2026-09-11
+sector.s,2013,real_growth,-33.101696002543761,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q21 [2013],2026-09-11
+sector.s,2014,real_growth,74.72513685103237,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V21 [2014],2026-09-11
+sector.s,2015,real_growth,-2.363521566544264,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA21 [2015],2026-09-11
+sector.s,2016,real_growth,-5.412482273429859,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF21 [2016],2026-09-11
+sector.s,2017,real_growth,13.30847421777601,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK21 [2017],2026-09-11
+sector.s,2018,real_growth,-6.848761019903932,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP21 [2018],2026-09-11
+sector.s,2019,real_growth,-11.062364963705491,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU21 [2019],2026-09-11
+sector.s,2020,real_growth,-16.082806535194365,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ21 [2020],2026-09-11
+sector.s,2021,real_growth,33.24843059685222,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE21 [2021],2026-09-11
+sector.s,2022,real_growth,29.23518111080213,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ21 [2022],2026-09-11
+sector.s,2023,real_growth,12.14306541637697,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO21 [2023],2026-09-11
+sector.s,2024,real_growth,4.2961811695376,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT21 [2024],2026-09-11
+sector.s,2025,real_growth,-1.462150170712803,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY21 [2025*],2026-09-11
+sector.t,2010,nominal,21963618.299791698,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G22 [2010],2026-09-11
+sector.t,2011,nominal,27489186.265077088,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L22 [2011],2026-09-11
+sector.t,2012,nominal,32011006.001515931,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q22 [2012],2026-09-11
+sector.t,2013,nominal,32261334.80235638,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V22 [2013],2026-09-11
+sector.t,2014,nominal,30991497.301356773,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA22 [2014],2026-09-11
+sector.t,2015,nominal,30991497.30135678,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF22 [2015],2026-09-11
+sector.t,2016,nominal,34213079.712607012,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK22 [2016],2026-09-11
+sector.t,2017,nominal,35022492.752447874,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP22 [2017],2026-09-11
+sector.t,2018,nominal,36928495.404820474,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU22 [2018],2026-09-11
+sector.t,2019,nominal,44823022.010165609,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ22 [2019],2026-09-11
+sector.t,2020,nominal,57660838.044108303,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE22 [2020],2026-09-11
+sector.t,2021,nominal,48785734.728593575,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ22 [2021],2026-09-11
+sector.t,2022,nominal,71360067.043184898,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO22 [2022],2026-09-11
+sector.t,2023,nominal,83199883.432788099,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT22 [2023],2026-09-11
+sector.t,2024,nominal,95180799.881987809,gel,basic_prices,current_prices,published,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY22 [2024],2026-09-11
+sector.t,2025,nominal,86354085.573384111,gel,basic_prices,current_prices,published,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD22 [2025*],2026-09-11
+sector.t,2010,share_of_gdp,0.09916458166133130222,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!G22 [2010]; GDP at current prices!G26 [2010],2026-09-11
+sector.t,2011,share_of_gdp,0.10532507355043504893,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!L22 [2011]; GDP at current prices!L26 [2011],2026-09-11
+sector.t,2012,share_of_gdp,0.11474772519031717521,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!Q22 [2012]; GDP at current prices!Q26 [2012],2026-09-11
+sector.t,2013,share_of_gdp,0.11072014622093115569,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!V22 [2013]; GDP at current prices!V26 [2013],2026-09-11
+sector.t,2014,share_of_gdp,0.09769594445402006341,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AA22 [2014]; GDP at current prices!AA26 [2014],2026-09-11
+sector.t,2015,share_of_gdp,0.08970519737554965486,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AF22 [2015]; GDP at current prices!AF26 [2015],2026-09-11
+sector.t,2016,share_of_gdp,0.0935977948699312898,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AK22 [2016]; GDP at current prices!AK26 [2016],2026-09-11
+sector.t,2017,share_of_gdp,0.08471865096340413531,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AP22 [2017]; GDP at current prices!AP26 [2017],2026-09-11
+sector.t,2018,share_of_gdp,0.08138626397089041596,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AU22 [2018]; GDP at current prices!AU26 [2018],2026-09-11
+sector.t,2019,share_of_gdp,0.09013949634423209431,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!AZ22 [2019]; GDP at current prices!AZ26 [2019],2026-09-11
+sector.t,2020,share_of_gdp,0.11581146966036337108,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BE22 [2020]; GDP at current prices!BE26 [2020],2026-09-11
+sector.t,2021,share_of_gdp,0.08033993505920108578,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BJ22 [2021]; GDP at current prices!BJ26 [2021],2026-09-11
+sector.t,2022,share_of_gdp,0.09794126987649150123,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BO22 [2022]; GDP at current prices!BO26 [2022],2026-09-11
+sector.t,2023,share_of_gdp,0.10286479062435047613,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BT22 [2023]; GDP at current prices!BT26 [2023],2026-09-11
+sector.t,2024,share_of_gdp,0.10232043836700046221,percent,basic_prices,current_prices,ratio_to_gdp,published,source.geostat_national_gdp_sna_2008,GDP at current prices!BY22 [2024]; GDP at current prices!BY26 [2024],2026-09-11
+sector.t,2025,share_of_gdp,0.08255795530370121906,percent,basic_prices,current_prices,ratio_to_gdp,preliminary,source.geostat_national_gdp_sna_2008,GDP at current prices!CD22 [2025*]; GDP at current prices!CD26 [2025*],2026-09-11
+sector.t,2011,real_growth,13.16445015680108,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!G22 [2011],2026-09-11
+sector.t,2012,real_growth,11.50696496717758,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!L22 [2012],2026-09-11
+sector.t,2013,real_growth,0.23233019988453,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!Q22 [2013],2026-09-11
+sector.t,2014,real_growth,-7.370653647639614,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!V22 [2014],2026-09-11
+sector.t,2015,real_growth,-4.077881457777679,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AA22 [2015],2026-09-11
+sector.t,2016,real_growth,5.03729820680074,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AF22 [2016],2026-09-11
+sector.t,2017,real_growth,-0.911255426991147,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AK22 [2017],2026-09-11
+sector.t,2018,real_growth,3.28048275769572,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AP22 [2018],2026-09-11
+sector.t,2019,real_growth,17.1937825776461,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AU22 [2019],2026-09-11
+sector.t,2020,real_growth,19.34711966112717,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!AZ22 [2020],2026-09-11
+sector.t,2021,real_growth,-17.968502756873363,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BE22 [2021],2026-09-11
+sector.t,2022,real_growth,35.76039961858407,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BJ22 [2022],2026-09-11
+sector.t,2023,real_growth,5.17209728728186,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BO22 [2023],2026-09-11
+sector.t,2024,real_growth,4.06910246706522,percent,basic_prices,volume_change,index_to_growth,published,source.geostat_sector_growth,Real GDP Growth!BT22 [2024],2026-09-11
+sector.t,2025,real_growth,-13.017548174793561,percent,basic_prices,volume_change,index_to_growth,preliminary,source.geostat_sector_growth,Real GDP Growth!BY22 [2025*],2026-09-11

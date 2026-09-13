@@ -112,14 +112,14 @@ for (const path of [
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
-  await expect(page.getByTestId("methodology-live-row")).toHaveCount(6);
+  await expect(page.getByTestId("methodology-live-row")).toHaveCount(7);
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(2);
   await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/79/);
 });
 
-test("sitemap publishes exactly the four live methodology routes", async ({ page }) => {
+test("sitemap publishes exactly the live methodology routes", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);
   const sitemapXml = await page.evaluate(async () => (await fetch("/sitemap.xml")).text());
   const methodologyUrls = await page.evaluate((xml) => {
@@ -136,6 +136,7 @@ test("sitemap publishes exactly the four live methodology routes", async ({ page
     "/methodology/municipalities",
     "/methodology/debt",
     "/methodology/gdp",
+    "/methodology/economic-sectors",
     "/methodology/inflation",
   ]);
 });

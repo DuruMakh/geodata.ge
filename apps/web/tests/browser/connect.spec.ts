@@ -15,6 +15,14 @@ for (const prefix of ["", "/en"]) {
     await expect(page.getByTestId("connect-technical")).toContainText("dataVersion");
     if (prefix) expect(await bilingual.innerText()).not.toMatch(/\p{Script=Georgian}/u);
     else await expect(bilingual).toContainText("ხულოს");
+    const sectors = page.getByTestId("connect-sector-coverage");
+    await expect(sectors).toContainText("20");
+    await expect(sectors).toContainText("2010–2025");
+    await expect(sectors).toContainText("2011–2025");
+    const discovery = page.getByTestId("connect-sector-discovery");
+    await expect(discovery).toContainText("query_economic_sectors");
+    await expect(discovery.locator('a[href="/downloads/data/economic-sectors.csv"]')).toHaveCount(1);
+    await expect(discovery.locator(`a[href="${prefix}/methodology/economic-sectors"]`)).toHaveCount(1);
   });
 }
 
@@ -76,7 +84,8 @@ test.describe("connection page", () => {
     // drifted to 2005, national still contributes a 2004 and the test stays
     // green - which is the exact drift this page exists to prevent.
     const servedLines = (await served.innerText()).split("\n").filter((line) => line.includes("—"));
-    expect(servedLines).toHaveLength(7);
+    const catalogue = await (await page.request.get(`${BASE_URL}/downloads/data/catalogue.json`)).json();
+    expect(servedLines).toHaveLength(catalogue.datasets.length);
     expect(servedLines.find(line => line.startsWith("მშპ,"))).toContain("1960–2025");
 
     // Debt and the balance are served now, so the page must not still deny
@@ -88,7 +97,7 @@ test.describe("connection page", () => {
     // A range, optionally followed by the projection note the two forward-
     // looking datasets carry. The range itself must still be the last data on
     // the line, so a dataset silently losing its years is still caught.
-    for (const line of servedLines) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\.?\s*$/);
+    for (const line of servedLines.filter(line => !line.startsWith("ეკონომიკური სექტორები"))) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\.?\s*$/);
 
     const municipal = servedLines.find((line) => line.includes("მუნიციპალური"))!;
     expect(municipal).toContain("2015–2025");

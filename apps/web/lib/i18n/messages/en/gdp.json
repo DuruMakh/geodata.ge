@@ -25,7 +25,7 @@
   "gdp.methodology": "Methodology and sources",
   "gdp.rangeChanged": "Period: {start}–{end}",
   "gdp.description": "Georgia’s annual GDP, real growth and nominal GDP per person.",
-  "gdp.sectors": "Economic sectors",
+  "gdp.sectors": "Sectors",
   "gdp.regions": "Regional economies",
   "gdp.sectorsDescription": "Sector size, share and real growth.",
   "gdp.regionsDescription": "Regional GDP and sector composition.",

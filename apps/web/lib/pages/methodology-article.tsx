@@ -49,6 +49,7 @@ const DATASET_SCHEMA_IDS = {
   municipalities: "municipal-expenditure",
   debt: "government-debt",
   gdp: "gdp-overview",
+  "economic-sectors": "economic-sectors",
 } as const;
 
 const DATASET_DOWNLOADS = {
@@ -57,6 +58,7 @@ const DATASET_DOWNLOADS = {
   municipalities: "/downloads/data/municipal-expenditure.csv",
   debt: "/downloads/data/government-debt.csv",
   gdp: "/downloads/data/gdp-overview.csv",
+  "economic-sectors": "/downloads/data/economic-sectors.csv",
   inflation: "/downloads/data/inflation-cpi-national.csv",
 } as const;
 
@@ -64,6 +66,7 @@ const DATASET_DOWNLOADS = {
 // ministries JSON. ministries.json has no CSV counterpart in this family, so
 // this page is its only published entry point.
 const DATASET_JSON_DOWNLOADS = {
+  "economic-sectors": [{ href: "/downloads/data/economic-sectors.json", labelKey: "methodology.jsonSectors" }],
   expenditure: [
     { href: "/downloads/data/national-expenditure.json", labelKey: "methodology.jsonExpenditure" },
     { href: "/downloads/data/ministries.json", labelKey: "methodology.jsonMinistries" },
@@ -83,6 +86,7 @@ const DATASET_JSON_DOWNLOADS = {
 // 12.1), so it stays a human link on this page and is not claimed as a
 // distribution of national expenditure.
 const DATASET_JSON_DISTRIBUTIONS = {
+  "economic-sectors": ["/downloads/data/economic-sectors.json"],
   expenditure: ["/downloads/data/national-expenditure.json"],
   revenue: ["/downloads/data/national-revenue.json"],
   municipalities: ["/downloads/data/municipal-expenditure.json"],

@@ -438,7 +438,15 @@ The English hero heading uses two explicit lines: `Georgia` followed by `in numb
 
 ### 7.2a Mode Control
 
-A segmented control, used **only** for `ხაზი / ცხრილი` in the chart controls row: inline-flex, 1px `control` border, 2px radius, overflow hidden. Segments are mono 10.5px with 0.04em tracking and `6px 13px` padding; the divider between them is the shared 1px `control` border. Active segment: `ink` background, `paper` text. Inactive: `muted` on transparent, hover `tint` + `ink`. The group has `role="group"` with a Georgian label; each segment keeps `aria-pressed`.
+A segmented control for `ხაზი / ცხრილი` in the chart controls row, and the bounded national-sector measure switch: inline-flex, 1px `control` border, 2px radius. Text segments are mono 10.5px with 0.04em tracking and `6px 13px` padding; the divider between them is the shared 1px `control` border. Active segment: `ink` background, `paper` text. Inactive: `muted` on transparent, hover `tint` + `ink`. The group has `role="group"` with a localized label; each segment keeps `aria-pressed`. Icon segments use 36×36px targets and allow tooltips outside the border; text-only groups retain overflow clipping.
+
+### Functional icon standard — Lucide
+
+Lucide (`lucide-react`) is the project's chosen functional icon family. Use named imports of only the required icons, not a dynamic all-icons registry or another icon library. Default: 18×18px, 1.5px stroke, `currentColor`, no decorative fill, gradients or animation. Keep button sizes, focus rings and existing ink/paper/tint states from their owning controls; do not restyle the application to match an icon library. The dependency version is pinned in the package manifest/lockfile. Lucide's ISC licence permits commercial use; retain its packaged licence notices.
+
+Icon-only controls must keep a localized accessible name on the button/link; the SVG itself is decorative (`aria-hidden`). Measure controls show the full label on hover and keyboard-visible focus, with Escape dismissal and hoverable tooltip content. Mouse/touch clicks must not latch the tooltip open after the pointer leaves. Touch users can read the selected measure's explanation beneath the heading. Reuse `SegmentedTabs` and `ControlTooltip` for this pattern.
+
+National-sector mapping: literal `₾` for nominal GEL, Lucide `ChartPie` for share of GDP, `ChartNoAxesCombined` for real growth. The chart icon denotes a measure, not a promise of positive growth. Existing functional menu/close, sidebar collapse/expand and compact home controls use Lucide `Menu`, `X`, `ChevronsLeft`, `ChevronsRight`, and `House`. Logos, brand assets, maps and actual data visualizations are not UI icons and remain unchanged. Conventional checkbox marks, textual carets and arrows embedded in prose remain typographic; do not add decorative icons or indiscriminately replace text with symbols.
 
 A boxed either/or switch is the honest affordance for choosing which view of the same data you are looking at. A filter is not that — do not box the tab groups of §7.2b.
 
@@ -786,7 +794,7 @@ Do not:
 - No bar/stacked chart modes; only `ხაზი` and `ცხრილი`.
 - National `% მშპ-ში` is share of same-year nominal GDP; municipal `% წილი` and single-year composition remain shares of their applicable budget total.
 - No official program codes in the series panel (names only).
-- No emoji, no decorative icons; the system is typographic (caret `▸/▾` and checkmark `✓` glyphs are part of the control language).
+- No emoji or decorative icons; functional icons use Lucide under §7.2a. Caret `▸/▾` and checkmark `✓` glyphs remain part of the typographic control language.
 - No drilldown anywhere.
 
 ## 18. Design QA Checklist
@@ -918,3 +926,13 @@ Monthly axes: the line chart and range strip take a periods-per-year hint. Axis 
 `ცხრილი` for monthly data is a years (newest first) × months grid with ExplorerTable's anatomy (§8.4), one series at a time (a `TextTab` picker when several are selected). Percentage tabs tint cells on a five-step scale — deflation blue `#DCE4F2`, then `#F1EADC`, `#EBCDBB`, `#D9967C`, and accent `#B3402A` with paper text — every pair ≥ 4.5:1; values are always printed and a legend names the bins. The index tab is untinted. Annual inflation adds a `წლის საშუალო` column (December 12-month average).
 
 `ძირითადი ინდიკატორები` on this page shows the latest published month: the §8.5 hero (value, 3px gauge on a 0–15% scale against the target in force, dashed target mark, one sentence) and three side KPIs with sparklines (core inflation, monthly inflation, 12-month average). No movers board and no period comparison. See `docs/superpowers/specs/2026-09-11-inflation-overview-design.md`.
+
+## National economic sectors extension
+
+Sector table labels wrap within a bounded sticky column, preserving full names and space for values on narrow screens. This behavior is opt-in; existing Budget tables retain their layout.
+
+Below the complete sector workspace, show four end-year highlights in the **same hero-plus-three-side-KPIs composition as Budget and municipality detail indicators** (§7.11–7.12): `1.35fr | 1fr` above the 1100px content breakpoint, stacked below it, not four equal columns or boxed cards. Largest nominal sector is the left hero (62px/44px numeral with a smaller GEL unit), with its GDP-share gauge and full sector name. The right column has a hairline divider, three stacked 24px figures, right-aligned details and existing 64×16 Sparklines: highest real annual growth, largest decline (slowest growth if none decline), and top-three combined GDP share. The sparklines trace the selected year's winning sectors from the first available year through that year; the top-three trace retains those same three members historically. Missing years break lines; a single point draws no fake trend. Exclude GDP from rankings; use all activities, never checked rows. Expose selected year, annual real-growth scope, source, unavailable growth and preliminary status. Full names remain in accessible text; missing-data explanations wrap instead of hiding the first available year. No movers board or period-comparison section is added.
+
+Display name: `სექტორები` / `Sectors` on the page, Economy card, sidebar and workbook title. Use concise explanations under the heading, with shared intrinsic height across the three measures so switching never shifts the chart; narrow screens may wrap without clipping text. Do not repeat `% მშპ-ში`, growth or GEL unit labels in a separate row under the line/table buttons. Preserve chart-axis units, table caption units and standalone row values. Rank the selector, table and workbook rows by the active measure's value in the selected final year, descending; keep GDP first, missing values last and stable classification order for ties. Detailed accounting caveats remain in methodology, source notes and machine-readable definitions.
+
+The Economy hub also links to national economic sectors. Reuse the existing editorial workspace, line chart, table, year strip, paper series panel and Excel action. Do not reproduce prototype styling or add top indicator tabs. A compact joined toolbar control switches nominal GEL, share of GDP and real growth. Only Total GDP is selected initially; it stays first and removable. All 20 sectors are selectable without a selection limit. Search does not restrict bulk actions or counts. Nominal values display their unit explicitly; percentage measures retain signed values, and preliminary observations are marked in charts, tables and workbooks. Coverage and range bounds come from the active measure's facts. Regional sectors are not part of this page. Bounded decisions: `docs/superpowers/specs/2026-09-11-economic-sectors-design.md`.

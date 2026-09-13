@@ -65,6 +65,7 @@ export type WorkbookExportModel = {
     title: string;
     subtitle: string;
     unitLabel: string;
+    amountDecimals?: number;
     showChangeColumn?: boolean;
     years: number[];
     rows: WorkbookReadableRow[];
