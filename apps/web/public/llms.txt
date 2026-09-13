@@ -1,6 +1,6 @@
 # Fiscal.ge
 
-> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets and GDP, and to Geostat's monthly consumer-price inflation.
+> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets, GDP and economic sectors, and to Geostat's monthly consumer-price inflation.
 
 **When to use Fiscal.ge:** Use it to understand, compare, and cite the published budget data, its scope, and its documented sources.
 
@@ -16,6 +16,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Municipal budgets](https://fiscal.ge/explorer/municipalities) — annual municipal expenditure.
 
 - [Economy overview](https://fiscal.ge/explorer/economy/gdp) — real GDP, annual real growth, nominal GDP and nominal GDP per person.
+- [Economic sectors](https://fiscal.ge/explorer/economy/sectors) — 20 national economic activities plus a Total GDP reference; no regional economies.
 - [Inflation](https://fiscal.ge/explorer/inflation) — the inflation section.
 - [Inflation overview](https://fiscal.ge/explorer/inflation/overview) — monthly national CPI inflation, core inflation, the price index and the National Bank of Georgia's target, as Geostat and the NBG publish them. The [inflation CSV](https://fiscal.ge/downloads/data/inflation-cpi-national.csv) carries every value; percentages are percentages (2.4 means 2.4%).
 
@@ -27,11 +28,13 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Municipal methodology](https://fiscal.ge/methodology/municipalities) — municipal-expenditure sources and processing.
 
 - [GDP methodology](https://fiscal.ge/methodology/gdp) — price bases, series coverage, preliminary status and original sources.
+- [Economic sectors methodology](https://fiscal.ge/methodology/economic-sectors) — sector GVA versus GDP, GDP shares, annual real growth and preliminary status.
 - [Inflation methodology](https://fiscal.ge/methodology/inflation) — Geostat CPI definitions, validation, the NBG target and original files.
 
 ## Bulk data files
 
 - [GDP overview](https://fiscal.ge/downloads/data/gdp-overview.json) — six series with explicit units, bilingual definitions, missing years, statuses and sources. The [GDP CSV](https://fiscal.ge/downloads/data/gdp-overview.csv) retains reviewed decimal values. Use `query_gdp` for selected series and years; growth values are percentages (7.5 means 7.5%), not fractions. Nominal GDP per person is not average income.
+- [Economic sectors JSON](https://fiscal.ge/downloads/data/economic-sectors.json) and [economic sectors CSV](https://fiscal.ge/downloads/data/economic-sectors.csv) — use `query_economic_sectors` for national activity/reference selection, annual years and one measure: `amount_gel`, `share_of_gdp_pct` or `real_growth_pct`. Nominal GEL and GDP shares cover 2010–2025; real growth covers 2011–2025, with 2010 explicitly missing. Sector amounts are GVA at basic prices; Total GDP uses market prices. Shares use all national GDP and need not sum to 100%. Percent values use 7.5 for 7.5%; growth rates are not contributions and must not be summed. 2025 is preliminary. Regional queries, sector rankings and cumulative comparisons are unsupported.
 - [Data manifest](https://fiscal.ge/downloads/data/manifest.json) — every published file with its row count, byte size and SHA-256.
 - [Government debt](https://fiscal.ge/downloads/data/government-debt.json) — debt stock and debt service in GEL, with the interest rates in a file of their own.
 - [General government balance](https://fiscal.ge/downloads/data/general-government-balance.json) — the IMF's deficit or surplus measure; values are signed.
@@ -45,7 +48,7 @@ The manifest lists every dataset file, so they are reachable without repeating t
 - [Connect an AI assistant](https://fiscal.ge/connect) — connection address, setup and coverage.
 - [Connect an AI assistant in English](https://fiscal.ge/en/connect) — the same endpoint, with English instructions and examples.
 
-Schema 1.1.0 supplies reviewed Georgian (*Ka) and English (*En) labels, definitions, missing-value explanations, comparison reasons, ranking descriptions and source evidence. Generic fields retain original wording and mandatory attributions. documentLanguage is null unless verified; an English title does not imply an English source document. Catalogue search accepts either language. Translation corrections change dataVersion. Existing requests and nine tool names are unchanged, with no language argument; clients must accept additive fields and schema 1.1.0 rather than require byte-identical output. Human pages use /en for English; /mcp, /downloads/data/, /robots.txt, /sitemap.xml and /llms.txt remain shared.
+Schema 1.1.0 supplies reviewed Georgian (*Ka) and English (*En) labels, definitions, missing-value explanations, comparison reasons, ranking descriptions and source evidence. Generic fields retain original wording and mandatory attributions. documentLanguage is null unless verified; an English title does not imply an English source document. Catalogue search accepts either language. Translation corrections change dataVersion. Existing requests remain compatible, with no language argument; clients must accept additive fields and schema 1.1.0 rather than require byte-identical output. Human pages use /en for English; /mcp, /downloads/data/, /robots.txt, /sitemap.xml and /llms.txt remain shared.
 
 Paired example questions:
 - „რამდენი დაიხარჯა სახელმწიფო ბიუჯეტიდან განათლებაზე 2025 წელს?“ / “How much did the state budget spend on education in 2025?”
@@ -53,7 +56,7 @@ Paired example questions:
 - „რამდენი იყო სახელმწიფო ვალის პორტფელის შეწონილი საშუალო საპროცენტო განაკვეთი 2024 წელს?“ / “What was the government debt portfolio’s weighted-average interest rate in 2024?”
 - „სახელმწიფო მმართველობის სექტორის ბალანსის რომელი წლებია პროგნოზი და რას ნიშნავს უარყოფითი მნიშვნელობა?“ / “Which general government balance years are forecasts, and what does a negative value mean?”
 
-The endpoint is `https://fiscal.ge/mcp`, MCP Streamable HTTP, protocol revision 2025-11-25, stateless and unauthenticated. If it returns 429, respect Retry-After; if temporarily unavailable, use https://fiscal.ge/downloads/data/manifest.json. It exposes nine read-only tools: describe_coverage, query_national, query_ministries, query_municipal, query_debt, query_deficit, compare, rank and get_sources. Call describe_coverage first — it returns the ids, measures and year ranges that exist, so nothing has to be guessed. Every answer carries its sources and any caveats that qualify it.
+The endpoint is `https://fiscal.ge/mcp`, MCP Streamable HTTP, protocol revision 2025-11-25, stateless and unauthenticated. If it returns 429, respect Retry-After; if temporarily unavailable, use https://fiscal.ge/downloads/data/manifest.json. It exposes these read-only tools: describe_coverage, query_national, query_ministries, query_municipal, query_debt, query_deficit, query_gdp, query_economic_sectors, compare, rank, get_sources. Call describe_coverage first — it returns the ids, measures and year ranges that exist, so nothing has to be guessed. Every answer carries its sources and any caveats that qualify it.
 
 ## Site navigation
 

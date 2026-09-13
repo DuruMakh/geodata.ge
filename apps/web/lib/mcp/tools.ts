@@ -12,6 +12,8 @@ import { queryMinistries } from "../factQuery/queryMinistries";
 import { queryDebt } from "../factQuery/queryDebt";
 import { queryGdp } from "../factQuery/queryGdp";
 import { queryGdpInput } from "../factQuery/schemas";
+import { queryEconomicSectors } from "../factQuery/queryEconomicSectors";
+import { queryEconomicSectorsInput } from "../factQuery/schemas";
 import { queryDeficit } from "../factQuery/queryDeficit";
 import { queryMunicipal } from "../factQuery/queryMunicipal";
 import { queryNational } from "../factQuery/queryNational";
@@ -58,6 +60,7 @@ const ANNOTATIONS = {
 } as const;
 
 export const TOOLS: readonly ToolDefinition[] = [
+  { name:"query_economic_sectors",title:"ეკონომიკის სექტორები / Economic sectors",describe:coverage=>`National economic activities A–T and Total GDP, ${coverage["economic-sectors"]}. Nominal GEL and GDP shares cover2010–2025; annual real growth covers2011–2025. Use describe_coverage for IDs and measure-specific years. Measures: amount_gel,share_of_gdp_pct,real_growth_pct. Sectors are GVA at basic prices; shares divide by market-price GDP, not selected sectors. Percent7.5 means7.5%. No regions,ranking,contributions or cumulative comparisons.`,schema:queryEconomicSectorsInput,run:queryEconomicSectors },
  { name: "query_gdp", title: "მშპ / GDP", describe: coverage=>`Annual GDP overview, ${coverage["gdp-overview"]}. Use describe_coverage for the six series IDs and their exact years. Series encode current GEL/USD, constant-2015 USD, annual real growth percent, or nominal GDP per capita GEL/USD. No currency conversion, index rebasing, population calculation, forecasts, ranking or cumulative comparison. Growth 7.5 means 7.5%. For long histories request one series at a time to stay within the response-size limit. Published/preliminary status and source caveats travel with every result.`, schema: queryGdpInput, run: (snapshot,input)=>queryGdp(snapshot,input) },
   {
     name: "describe_coverage",

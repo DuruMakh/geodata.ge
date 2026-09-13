@@ -80,7 +80,7 @@ describe("/mcp route", () => {
     );
     const tools = (body as unknown as { result: { tools: { name: string }[] } }).result.tools;
 
-    expect(tools).toHaveLength(10);
+    expect(tools).toHaveLength(11);
     expect(tools.map((tool) => tool.name)).toContain("query_national");
   });
 

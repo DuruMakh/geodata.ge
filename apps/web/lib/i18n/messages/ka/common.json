@@ -1,4 +1,6 @@
 {
+  "common.economicSectors": "სექტორები",
+  "common.sectorsSourceNote": "მონაცემები: საქსტატი. ბოლო განახლება: {updatedAt}.",
   "common.brandHome": "Fiscal.ge — მთავარი",
   "common.home": "მთავარი",
   "common.data": "მონაცემები",

@@ -10,6 +10,6 @@ export function ExplorerFooter({updatedAt,locale}:{updatedAt:string;locale:Local
   const {pathname}=splitLanguagePath(usePathname());
   const economy=pathname==='/explorer/economy'||pathname.startsWith('/explorer/economy/');
   const inflation=pathname==='/explorer/inflation'||pathname.startsWith('/explorer/inflation/');
-  const noteKey=inflation?'common.inflationSourceNote':economy?'common.economySourceNote':null;
+  const noteKey=inflation?'common.inflationSourceNote':economy?(pathname==='/explorer/economy/sectors'?'common.sectorsSourceNote':'common.economySourceNote'):null;
   return <SiteFooter updatedAt={updatedAt} locale={locale} sourceNote={noteKey?message(getCommonMessages(locale),noteKey,{updatedAt:'{updatedAt}'}):undefined}/>;
 }

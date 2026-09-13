@@ -2,6 +2,9 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import sitemap from "../../lib/seo/sitemap";
+import { TOOLS } from "../../lib/mcp/tools";
+import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
+import { catalogueData } from "../../lib/factQuery/publications";
 
 const llmsPath = fileURLToPath(new URL("../../public/llms.txt", import.meta.url));
 const originalEnv = { ...process.env };
@@ -13,6 +16,7 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/analysis",
   "https://fiscal.ge/explorer/municipalities",
   "https://fiscal.ge/explorer/economy/gdp",
+  "https://fiscal.ge/explorer/economy/sectors",
   "https://fiscal.ge/explorer/inflation",
   "https://fiscal.ge/explorer/inflation/overview",
   "https://fiscal.ge/downloads/data/inflation-cpi-national.csv",
@@ -21,9 +25,12 @@ const requiredTargets = [
   "https://fiscal.ge/methodology/revenue",
   "https://fiscal.ge/methodology/municipalities",
   "https://fiscal.ge/methodology/gdp",
+  "https://fiscal.ge/methodology/economic-sectors",
   "https://fiscal.ge/methodology/inflation",
   "https://fiscal.ge/downloads/data/gdp-overview.json",
   "https://fiscal.ge/downloads/data/gdp-overview.csv",
+  "https://fiscal.ge/downloads/data/economic-sectors.json",
+  "https://fiscal.ge/downloads/data/economic-sectors.csv",
   "https://fiscal.ge/downloads/data/manifest.json",
   "https://fiscal.ge/downloads/data/government-debt.json",
   "https://fiscal.ge/downloads/data/general-government-balance.json",
@@ -43,6 +50,35 @@ afterEach(() => {
 });
 
 describe("Fiscal.ge agent instructions", () => {
+  it("keeps authored sector counts and measure years consistent with the generated catalogue", async () => {
+    const content = await readFile(llmsPath, "utf8");
+    const snapshot = loadPackagedSnapshot();
+    const catalogue = catalogueData(snapshot, "economic-sectors");
+    const count = content.match(/— (\d+) national economic activities plus a Total GDP reference; no regional economies\./);
+    expect(count, "sector activity count and national-only scope must be stated").not.toBeNull();
+    expect(Number(count![1])).toBe(snapshot.economicSectors.registry.filter(series => series.classificationCode !== null).length);
+    expect(catalogue.series?.filter(series => series.level === "total").map(series => series.seriesId)).toEqual(["economy.gdp_total"]);
+    expect(catalogue.series).toHaveLength(Number(count![1]) + 1);
+    expect(catalogue.datasets[0].entityTypes).toEqual(["country"]);
+
+    const ranges = content.match(/Nominal GEL and GDP shares cover (\d{4})–(\d{4}); real growth covers (\d{4})–(\d{4}), with (\d{4}) explicitly missing\./);
+    expect(ranges, "each measure's annual coverage and missing growth year must be stated").not.toBeNull();
+    const years = (first: string, last: string) => Array.from({ length: Number(last) - Number(first) + 1 }, (_, i) => Number(first) + i);
+    const nominalYears = years(ranges![1], ranges![2]);
+    const growthYears = years(ranges![3], ranges![4]);
+    const missingGrowthYear = Number(ranges![5]);
+    for (const series of catalogue.series!) {
+      expect(series.yearsByMeasure?.amount_gel, series.seriesId).toEqual(nominalYears);
+      expect(series.yearsByMeasure?.share_of_gdp_pct, series.seriesId).toEqual(nominalYears);
+      expect(series.yearsByMeasure?.real_growth_pct, series.seriesId).toEqual(growthYears);
+    }
+    expect(nominalYears.filter(year => !growthYears.includes(year))).toEqual([missingGrowthYear]);
+  });
+  it("advertises every registered read-only tool", async () => {
+    const content = await readFile(llmsPath, "utf8");
+    const advertised = content.match(/It exposes these read-only tools: ([^.]+)\./)?.[1].match(/[a-z]+(?:_[a-z]+)*/g);
+    expect(advertised?.sort()).toEqual(TOOLS.map(tool => tool.name).sort());
+  });
   it("publishes a concise guide with clear scope and unique public links", async () => {
     const content = await readFile(llmsPath, "utf8");
 

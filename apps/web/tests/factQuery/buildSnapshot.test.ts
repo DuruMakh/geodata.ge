@@ -3,10 +3,24 @@ import { describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "../../lib/factQuery/types";
 import { loadTaxonomyFiles } from "../../lib/data/taxonomy";
+import { loadSourceDocuments } from "../../lib/data/sources";
 
 const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:00.000Z" };
 
 describe("buildFactQuerySnapshot", () => {
+  it("preserves every registered source, including the sector growth and volume originals", async () => {
+    const [snapshot, sources] = await Promise.all([
+      buildFactQuerySnapshot(OPTIONS),
+      loadSourceDocuments("../../data/sources/source-documents.csv"),
+    ]);
+    // 127 with the Geostat basket-weights workbook the categories page cites.
+    expect(sources).toHaveLength(127);
+    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.map(source => source.sourceId).sort());
+    expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([
+      "source.geostat_sector_growth", "source.geostat_sector_volume",
+    ]));
+  });
+
   it("carries the national, ministries, municipal and gdp facts", async () => {
     const snapshot = await buildFactQuerySnapshot(OPTIONS);
 

@@ -1,4 +1,6 @@
 import { GDP_METHODOLOGY_CONTENT } from "./content/gdp";
+import { ECONOMIC_SECTORS_METHODOLOGY } from "./content/economic-sectors";
+import { ECONOMIC_SECTORS_METHODOLOGY as EN_SECTORS } from "./content/en/economic-sectors";
 import { GDP_METHODOLOGY_CONTENT as EN_GDP } from "./content/en/gdp";
 import { INFLATION_METHODOLOGY_CONTENT } from "./content/inflation";
 import { INFLATION_METHODOLOGY_CONTENT as EN_INFLATION } from "./content/en/inflation";
@@ -30,6 +32,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   municipalities: MUNICIPALITIES_METHODOLOGY_CONTENT,
   debt: DEBT_METHODOLOGY_CONTENT,
   gdp: GDP_METHODOLOGY_CONTENT,
+  "economic-sectors": ECONOMIC_SECTORS_METHODOLOGY,
   inflation: INFLATION_METHODOLOGY_CONTENT,
 };
 
@@ -39,6 +42,7 @@ export const FUTURE_METHODOLOGY_DATASETS = [
 ] as const;
 
 const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, MethodologyContent>> = {
+  "economic-sectors": EN_SECTORS,
   expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT, gdp: EN_GDP, inflation: EN_INFLATION,
 };
 

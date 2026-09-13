@@ -76,9 +76,9 @@ describe("snapshot-pinned translations", () => {
         expect(document.publisherEn).not.toMatch(/\p{Script=Georgian}/u);
         expect(document.attribution === null).toBe(document.attributionKa === null);
         expect(document.attribution === null).toBe(document.attributionEn === null);
-        // World Bank JSON and the English inflation originals (whose Georgian
+        // World Bank JSON, sector originals and English inflation originals (whose Georgian
         // twins sit beside them in the archive) declare their language.
-        expect(document.documentLanguage).toBe(/^source\.(wb_gdp_|geostat_cpi_|geostat_core_|geostat_basket_weights|nbg_inflation_target)/.test(document.documentId) ? 'en' : null);
+        expect(document.documentLanguage).toBe(/^source\.(wb_gdp_|geostat_sector_|geostat_cpi_|geostat_core_|geostat_basket_weights|nbg_inflation_target)/.test(document.documentId) ? 'en' : null);
       }
     }
     expect(Object.keys(snapshot.localization.messages.en).some(key => /^(sources|documents)\./.test(key))).toBe(false);

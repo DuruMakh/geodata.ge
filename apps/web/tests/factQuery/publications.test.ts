@@ -66,6 +66,7 @@ describe("catalogue.json", () => {
     };
 
     expect(catalogue.datasets.map((dataset) => dataset.datasetId).sort()).toEqual([
+      "economic-sectors",
       "gdp-overview",
       "general-government-balance",
       "government-debt",
@@ -183,6 +184,7 @@ describe("dataset publications", () => {
       "government-debt-rates.json",
       "general-government-balance.json",
       "gdp-overview.json",
+      "economic-sectors.json",
     ]);
 
     for (const file of files) {
@@ -260,6 +262,8 @@ describe("dataset publications", () => {
       "general-government-balance.json",
       "gdp-overview.json",
       "gdp-overview.csv",
+      "economic-sectors.json",
+      "economic-sectors.csv",
       "manifest.json",
     ]);
   });

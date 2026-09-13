@@ -37,6 +37,8 @@ function coverage(): {
   municipalities: number;
   regions: number;
   excludedCodes: string[];
+  sectorCount: number;
+  sectorRanges: Record<string, string>;
 } {
   const snapshot = loadPackagedSnapshot();
   const response = describeCoverage(snapshot, {});
@@ -52,6 +54,11 @@ function coverage(): {
 
   return {
     ranges,
+    sectorCount: snapshot.economicSectors.registry.filter(series => series.classificationCode !== null).length,
+    sectorRanges: Object.fromEntries(["nominal", "share_of_gdp", "real_growth"].map(measure => {
+      const years = snapshot.economicSectors.facts.filter(fact => fact.measure === measure).map(fact => fact.year);
+      return [measure, `${Math.min(...years)}–${Math.max(...years)}`];
+    })),
     municipalities: snapshot.municipal.municipalities.length,
     regions: snapshot.municipal.regions.length,
     excludedCodes: exclusions.map((exclusion) => exclusion.entityId),
@@ -99,7 +106,7 @@ const NOT_SERVED = [
 export async function renderConnectPage(locale: Locale) {
   const messages = await getMessages(locale, ["common", "connect"]);
   const model = buildLandingContext(await loadServedLandingData());
-  const { ranges, municipalities, regions, excludedCodes } = coverage();
+  const { ranges, municipalities, regions, excludedCodes, sectorCount, sectorRanges } = coverage();
   const endpoint = `${resolveSiteUrl()}/mcp`;
 
   return (
@@ -238,7 +245,14 @@ export async function renderConnectPage(locale: Locale) {
                     {ranges["general-government-balance"]} {message(messages, "connect.forecastSuffix")}
                   </li>
                   <li>{message(messages,"connect.gdpCoverage",{range:ranges["gdp-overview"]})}</li>
+                  <li data-testid="connect-sector-coverage">{message(messages, "connect.sectorCoverage", { count: sectorCount, nominalRange: sectorRanges.nominal, shareRange: sectorRanges.share_of_gdp, growthRange: sectorRanges.real_growth })}</li>
                 </ul>
+                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-sector-discovery">
+                  {message(messages, "connect.sectorQuery")} {" "}
+                  <a className="underline" href="/downloads/data/economic-sectors.json">JSON</a>{" · "}
+                  <a className="underline" href="/downloads/data/economic-sectors.csv">CSV</a>{" · "}
+                  <a className="underline" href={pageHref("/methodology/economic-sectors", locale)}>{message(messages, "connect.sectorMethodology")}</a>
+                </p>
               </div>
               <div data-testid="connect-coverage-excluded">
                 <h3 className="text-[14px] font-semibold">{message(messages, "connect.notIncluded")}</h3>

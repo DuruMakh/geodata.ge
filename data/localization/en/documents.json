@@ -2954,6 +2954,36 @@
     },
     "documentLanguage": "en"
   },
+  "source.geostat_sector_growth": {
+    "title": {
+      "text": "Geostat real GDP growth by economic activity",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_sector_volume": {
+    "title": {
+      "text": "Geostat chain-linked GDP by economic activity at constant 2019 prices",
+      "reviewedAt": "2026-09-11"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
   "source.geostat_cpi_index_2010": {
     "title": {
       "text": "Consumer price indices in Georgia, 2010 average = 100",

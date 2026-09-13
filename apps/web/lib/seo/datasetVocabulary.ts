@@ -37,6 +37,7 @@ export type MeasureJsonLd = {
 };
 
 const MEASURES: Record<Measure, { name: Localized; description: Localized; unitText: string }> = {
+  real_growth_pct: {name:{ka:"წლიური რეალური ზრდა (%)",en:"Annual real growth (%)"},description:{ka:"წლიური მოცულობის ცვლილება, ფასების ეფექტის გარეშე.",en:"Annual change in volume, excluding price effects."},unitText:"%"},
   value: {name:{ka:"გამოქვეყნებული მაჩვენებელი",en:"Published value"},description:{ka:"ერთეული განსაზღვრულია სერიით.",en:"Unit and price basis are defined by each series."},unitText:"series-specific"},
   amount_gel: {
     name: { ka: "თანხა (ლარი)", en: "Amount (GEL)" },
@@ -88,6 +89,7 @@ export const DATASETS: Record<
     measurementTechnique: Localized;
   }
 > = {
+  "economic-sectors": {measures:["amount_gel","share_of_gdp_pct","real_growth_pct"],keywords:{ka:["ეკონომიკის სექტორები","დამატებული ღირებულება","მშპ"],en:["Georgia","economic sectors","gross value added","real growth"]},measurementTechnique:{ka:"საქსტატის წლიური ეროვნული ანგარიშები; სექტორული დამატებული ღირებულება და მთლიანი მშპ.",en:"Reviewed Geostat annual national accounts: activity GVA at basic prices, market-price GDP shares and real volume growth."}},
   "gdp-overview": {measures:["value"],keywords:{ka:["მშპ","ეკონომიკა","საქართველო"],en:["Georgia","GDP","real GDP growth","GDP per capita"]},measurementTechnique:{ka:"გადამოწმებული ამოღება საქსტატისა და მსოფლიო ბანკის წლიური ეროვნული ანგარიშებიდან.",en:"Reviewed extraction of published annual national accounts from Geostat and the World Bank, with explicit units and source status."}},
   "national-expenditure": {
     measures: ["amount_gel", "share_of_total_pct", "share_of_gdp_pct"],

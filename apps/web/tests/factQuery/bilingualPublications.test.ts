@@ -14,8 +14,8 @@ beforeAll(async () => {
 const read = (name: string) => JSON.parse(artifacts.find(file => file.fileName === name)!.bytes.toString("utf8"));
 
 describe("bilingual bulk publications", () => {
-  it("publishes all JSON and GDP CSV files under the same version and verifies their exact bytes", () => {
-    expect(artifacts.map(file => file.fileName).sort()).toEqual(["manifest.json", "catalogue.json", "sources.json", "national-revenue.json", "national-expenditure.json", "ministries.json", "municipal-expenditure.json", "government-debt.json", "government-debt-rates.json", "general-government-balance.json", "gdp-overview.json", "gdp-overview.csv"].sort());
+  it("publishes all JSON and CSV files under the same version and verifies their exact bytes", () => {
+    expect(artifacts.map(file => file.fileName).sort()).toEqual(["manifest.json", "catalogue.json", "sources.json", "national-revenue.json", "national-expenditure.json", "ministries.json", "municipal-expenditure.json", "government-debt.json", "government-debt-rates.json", "general-government-balance.json", "gdp-overview.json", "gdp-overview.csv", "economic-sectors.json", "economic-sectors.csv"].sort());
     for (const artifact of artifacts.filter(file=>file.fileName.endsWith(".json"))) {
       const published = read(artifact.fileName);
       expect(published.schemaVersion).toBe("1.1.0");

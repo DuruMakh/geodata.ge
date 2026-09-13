@@ -62,7 +62,11 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
       expect(result.lang).toBe(locale);
       expect(result.canonicals).toEqual([expected.canonical]);
       expect(result.alternates).toEqual({ ka: expected.ka, en: expected.en, "x-default": expected.ka });
-      expect(result.title.length).toBeGreaterThan(8);
+      if (route === "/explorer/economy/sectors") {
+        expect(result.title).toBe(locale === "en" ? "Sectors" : "სექტორები");
+      } else {
+        expect(result.title.length).toBeGreaterThan(8);
+      }
       expect(result.description?.length).toBeGreaterThan(30);
       expect(result.ogLocale).toBe(locale === "en" ? "en_GB" : "ka_GE");
       expect(new URL(result.ogImage!).pathname).toBe(`${locale === "en" ? "/en" : ""}/opengraph-image`);

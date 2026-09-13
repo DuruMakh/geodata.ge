@@ -86,6 +86,7 @@ async function createFixtureRepository() {
   const repositoryRoot = await mkdtemp(path.join(tmpdir(), "methodology-archives-repository-"));
   tempDirectories.push(repositoryRoot);
   const rows: Record<MethodologyDatasetId, ReviewedSourceManifestRow[]> = {
+    "economic-sectors": [await writeReviewedSource(repositoryRoot,"economic-sectors","2011-2025","docs/Raw Data/Economy/economic-sectors/sources/growth.xlsx","downloads/methodology/economic-sectors/files/growth.xlsx","sector-growth")],
     expenditure: [
       await writeReviewedSource(repositoryRoot, "expenditure", "2005", "docs/Raw Data/Expenditure/2005/source-a.pdf", "downloads/methodology/expenditure/files/2005/source-a.pdf", "source-a"),
       await writeReviewedSource(repositoryRoot, "expenditure", "2006", "docs/Raw Data/Expenditure/2006/source-b.xlsx", "downloads/methodology/expenditure/files/2006/source-b.xlsx", "source-b"),

@@ -18,6 +18,7 @@ export type ChartSeries = {
   color: string;
   vals: (number | null)[];
   planned: boolean[];
+  preliminary?: boolean[];
   forecastFromYear?: number;
   /** Reference lines (the NBG target) draw dashed and without an end dot. */
   dashed?: boolean;
@@ -29,7 +30,9 @@ type EditorialLineChartProps = {
   share: boolean;
   unit: ValueUnit;
   shareLabel: string;
+  preliminaryLabel?: string;
   axisLeftPadding?: number;
+  formatTooltipValue?: (value: number) => string;
   /** Periods per calendar year on the x axis. Omit for years. */
   periodsPerYear?: number;
   /** Axis label or tooltip header for a period value. Omit to print the value. */
@@ -46,7 +49,7 @@ const PAD_T = 16;
 const PAD_B = 26;
 const DOT_R = 0.7;
 
-export type TooltipRow = { id: string; label: string; color: string; value: number };
+export type TooltipRow = { id: string; label: string; color: string; value: number; preliminary?: boolean };
 
 // Series selection is unlimited (AGENTS.md UI contract), so the hover readout
 // cannot be one row per series: at 63 it measured 1327px against a 334px chart,
@@ -64,7 +67,7 @@ export function buildTooltipRows(
   for (const line of series) {
     const value = line.vals[hover];
     if (value === null || value === undefined) continue;
-    present.push({ id: line.id, label: line.label, color: line.color, value });
+    present.push({ id: line.id, label: line.label, color: line.color, value, ...(line.preliminary?.[hover] ? { preliminary: true } : {}) });
   }
   present.sort((a, b) => b.value - a.value);
 
@@ -98,6 +101,8 @@ export function EditorialLineChart({
   axisLeftPadding = PAD_L,
   periodsPerYear = 1,
   formatPeriod,
+  preliminaryLabel,
+  formatTooltipValue,
 }: EditorialLineChartProps) {
   const { messages } = useI18n();
   const [hoverRaw, setHover] = useState<number | null>(null);
@@ -145,7 +150,7 @@ export function EditorialLineChart({
     ).replace("-", "−");
 
   const formatValue = (value: number | null) =>
-    share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
+    formatTooltipValue && value !== null ? formatTooltipValue(value) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
   const labelIndices = new Set(periodLabelIndices(years, periodsPerYear));
@@ -378,6 +383,7 @@ export function EditorialLineChart({
               </span>
               <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
                 {formatValue(row.value)}
+                {row.preliminary && preliminaryLabel ? <sup className="ml-1 text-[9px]">{preliminaryLabel}</sup> : null}
               </span>
             </div>
           ))}

@@ -116,6 +116,8 @@ source.mof_debt_strategy_2025_2029,General Government Debt Management Strategy 2
 source.mof_central_government_liabilities_control,Central Government Debt Liabilities by Maturity; Residency; and Instrument with reference to GFSM 2001,docs/Raw Data/Debt/government-debt-annual/official/central-government-debt-liabilities-control.xlsx,2026-09-01
 source.wb_gdp_real_usd_2015,World Bank GDP Georgia NY.GDP.MKTP.KD,docs/Raw Data/Economy/gdp-overview/sources/NY.GDP.MKTP.KD.json,2026-09-11
 source.wb_gdp_real_growth_percent,World Bank GDP Georgia NY.GDP.MKTP.KD.ZG,docs/Raw Data/Economy/gdp-overview/sources/NY.GDP.MKTP.KD.ZG.json,2026-09-11
+source.geostat_sector_growth,Geostat real GDP growth by economic activity,docs/Raw Data/Economy/economic-sectors/sources/06_Real-GDP-Growth.xlsx,2026-09-11
+source.geostat_sector_volume,Geostat chain-linked GDP by economic activity at constant 2019 prices,docs/Raw Data/Economy/economic-sectors/sources/04_GDP-at-constant-prices.xlsx,2026-09-11
 source.geostat_cpi_index_2010,"Geostat consumer price index, 2010 average=100",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-index-2010.xlsx,2026-09-11
 source.geostat_cpi_yoy,"Geostat consumer price index, same month of the previous year=100",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-yoy.xlsx,2026-09-11
 source.geostat_cpi_mom,"Geostat consumer price index, previous month=100",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-mom.xlsx,2026-09-11

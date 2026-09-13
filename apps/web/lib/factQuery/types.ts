@@ -35,7 +35,8 @@ export type DatasetId =
   | "municipal-expenditure"
   | "government-debt"
   | "general-government-balance"
-  | "gdp-overview";
+  | "gdp-overview"
+  | "economic-sectors";
 
 // rate_percent is a rate per annum, NOT a share of anything. Reusing
 // share_of_gdp_pct or share_of_total_pct for a weighted-average interest rate
@@ -46,7 +47,8 @@ export type Measure =
   | "share_of_gdp_pct"
   | "gel_per_resident"
   | "rate_percent"
-  | "value";
+  | "value"
+  | "real_growth_pct";
 
 /**
  * `planned` means a budget a government approved. `projection` means neither an
@@ -246,6 +248,7 @@ export type FactQuerySnapshot = {
   debt: { facts: ServedGovernmentDebtFact[] };
   deficit: { facts: ServedGeneralGovernmentBalanceFact[] };
   gdpOverview: { facts: import("../data/gdpOverview/types").GdpObservation[]; series: typeof import("./gdpSeries").GDP_QUERY_SERIES };
+  economicSectors: { facts: import("../data/economicSectors/types").SectorObservation[]; registry: import("../data/economicSectors/types").SectorDefinition[]; definitions: typeof import("./economicSectorsSeries").SECTOR_DEFINITIONS };
   gdpFacts: ServedNationalGdpFact[];
   sources: ResolvedSource[];
 };
