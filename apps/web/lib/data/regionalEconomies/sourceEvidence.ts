@@ -219,7 +219,9 @@ export async function loadRegionalSourceEvidence(repositoryRoot: string) {
     throw new Error("Regional total metadata mismatch");
   }
   const totalValues = numericXmlByAddress(totalBytes, 1, totalSheet);
-  const totalRowByRegion = new Map(REGIONAL_TOTAL_ROWS.map(([, regionId], index) => [regionId, index + 3]));
+  const totalRowByRegion = new Map<string, number>(
+    REGIONAL_TOTAL_ROWS.map(([, regionId], index) => [regionId, index + 3]),
+  );
   const totalSheetEvidence = {
     sheetName: totalSheetName,
     years: [...totalAnnual.keys()],
