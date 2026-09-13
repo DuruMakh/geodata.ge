@@ -1,0 +1,54 @@
+{
+  "capturedOn": "2026-09-10",
+  "reviewedAt": "2026-09-13",
+  "sourcePage": "https://www.geostat.ge/index.php/en/modules/categories/23/gross-domestic-product-gdp",
+  "classification": "NACE Rev. 2 / GNC 006-2016",
+  "accountingStandard": "sna_2008",
+  "unit": "million_gel_current_prices",
+  "metadataUrl": "https://www.geostat.ge/media/68649/0403_060225_EN.PDF",
+  "regionalAccountingToleranceGel": "0.01",
+  "sources": [
+    {
+      "role": "regional_totals",
+      "sourceId": "source.geostat_regional_gdp",
+      "file": "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/regional-GDP-ENG.xlsx",
+      "originalFilename": "regional-GDP-ENG.xlsx",
+      "url": "https://geostat.ge/media/79752/regional-GDP-ENG.xlsx",
+      "sha256": "dd2042dff5e2c44b98b4bb140163b5736cf5a71f4683b9e6a359373907d59c35",
+      "bytes": 13871,
+      "sheetNames": ["regional GDP"]
+    },
+    {
+      "role": "regional_activities",
+      "sourceId": "source.geostat_regional_gdp_by_activity",
+      "file": "docs/Raw Data/Economy/regional-economies/sources/regional-GDP-by-activities-ENG.xlsx",
+      "originalFilename": "regional-GDP-by-activities-ENG.xlsx",
+      "url": "https://geostat.ge/media/79753/regional-GDP-by-activities-ENG.xlsx",
+      "sha256": "88e337bd82a5232ea5260f011b11cb2d82c2cec5115fddbe92d14d1ff3945337",
+      "bytes": 99089,
+      "sheetNames": [
+        "Tbilisi",
+        "Adjara A.R.",
+        "Guria",
+        "Imereti",
+        "Kakheti",
+        "Mtskheta-Mtianeti",
+        "Racha",
+        "Samegrelo",
+        "Samtskhe",
+        "Kvemo Kartli",
+        "Shida Kartli"
+      ]
+    },
+    {
+      "role": "national_validation",
+      "sourceId": "source.geostat_national_gdp_sna_2008",
+      "file": "docs/Raw Data/Economy/gdp-overview/sources/geostat_nominal_current.xlsx",
+      "originalFilename": "03_GDP-at-Current-Prices.xlsx",
+      "url": "https://geostat.ge/media/81052/03_GDP-at-Current-Prices.xlsx",
+      "sha256": "21a576c9c20434a87bcb32047cd143eef2b8d3f3ff360442b420c76b0da27d34",
+      "bytes": 50098,
+      "sheetNames": ["GDP at current prices"]
+    }
+  ]
+}
