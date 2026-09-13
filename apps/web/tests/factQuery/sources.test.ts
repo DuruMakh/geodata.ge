@@ -181,9 +181,9 @@ describe("public source resolution", () => {
         .map((source) => source.sourceId);
 
       expect(unresolved).toEqual([]);
-      // 117 shared sources plus two economic-sector sources and seven inflation
-      // sources (six Geostat CPI workbooks and the NBG strategy).
-      expect(snapshot.sources.length).toBe(126);
+      // 117 shared sources plus two national-sector, seven inflation and three
+      // regional-economy sources.
+      expect(snapshot.sources.length).toBe(129);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {
@@ -231,7 +231,7 @@ describe("public source resolution", () => {
       const derived = snapshot.sources.filter((s) => s.derivation !== null).map((s) => s.sourceId);
 
       // The field is for genuinely derived sources, not a dumping ground.
-      expect(derived).toEqual(["source.adjara_consolidated_budget"]);
+      expect(derived).toEqual(["source.adjara_consolidated_budget", "source.fiscal_regional_economy_share"]);
     });
 
     it("carries provenance metadata on every document", async () => {

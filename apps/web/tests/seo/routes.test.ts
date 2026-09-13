@@ -46,8 +46,9 @@ describe("indexable Fiscal.ge routes", () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    // Regional economies add a bilingual index plus eleven bilingual detail pages.
-    expect(urls).toHaveLength(222);
+    // Regional economies add a bilingual index, eleven bilingual detail pages
+    // and one bilingual methodology page.
+    expect(urls).toHaveLength(224);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
