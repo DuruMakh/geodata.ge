@@ -3193,5 +3193,35 @@
       "reviewedAt": "2026-09-11"
     },
     "documentLanguage": "ka"
+  },
+  "source.geostat_regional_gdp": {
+    "title": {
+      "text": "Regional gross domestic product at current market prices",
+      "reviewedAt": "2026-09-13"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-13"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-13"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_regional_gdp_by_activity": {
+    "title": {
+      "text": "Regional gross domestic product by economic activity at current basic prices",
+      "reviewedAt": "2026-09-13"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-09-13"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-09-13"
+    },
+    "documentLanguage": "en"
   }
 }

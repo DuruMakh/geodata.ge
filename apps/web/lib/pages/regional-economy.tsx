@@ -18,6 +18,10 @@ import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
+import path from "node:path";
+import { loadEnglishCatalogue } from "../i18n/catalogue.server";
+import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
+import { projectPublicSources } from "../methodology/publicSources";
 export {
   regionalEconomiesPageMetadata,
   renderRegionalEconomiesPage,
@@ -55,9 +59,12 @@ export async function regionalEconomyPageMetadata(slug: string, locale: Locale) 
 
 export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
   const region = regionForSlug(slug);
-  const [{ facts }, presentation] = await Promise.all([
+  const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+  const [{ facts }, presentation, manifest, catalogue] = await Promise.all([
     loadServedRegionalEconomyData(),
     regionalPresentation(locale),
+    loadReviewedSourceManifest(repositoryRoot, "regional-economies"),
+    loadEnglishCatalogue(repositoryRoot),
   ]);
   const regionName = publicLabel(locale, region.id, region.kaLabel, presentation.englishLabels);
   const identity: RegionalEconomyIdentity = {
@@ -72,6 +79,18 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
   const lastYear = Math.max(...regionalFacts.map((fact) => fact.year));
   const reviewedAt = regionalFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!;
   const title = message(presentation.messages, "regionalEconomies.heading");
+  const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
+  const sources = manifest.map((source) => {
+    const translated = publicSources.find((candidate) => candidate.source_id === source.source_id)!;
+    return {
+      sourceId: source.source_id,
+      years: source.years,
+      title: translated.title,
+      organization: translated.publisher,
+      downloadHref: source.downloadHref,
+      retrievedAt: source.retrieved_at,
+    };
+  });
   const crumbs = [
     { label: message(presentation.messages, "common.home"), href: pageHref("/", locale) },
     { label: message(presentation.messages, "common.data") },
@@ -95,7 +114,7 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
             registry={REGIONAL_ECONOMY_SECTORS}
             region={identity}
             regions={REGIONAL_ECONOMY_REGIONS}
-            sources={[]}
+            sources={sources}
             siteOrigin={resolveSiteUrl()}
           />
         </div>

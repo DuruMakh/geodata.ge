@@ -86,6 +86,16 @@ afterEach(async () => {
 });
 
 describe("reviewed source manifest", () => {
+  it("loads the two reviewed Regional GDP originals from their existing repository locations", async () => {
+    const repositoryRoot = path.resolve(process.cwd(), "../..");
+    const rows = await loadReviewedSourceManifest(repositoryRoot, "regional-economies" as never);
+    expect(rows.map((row) => [row.source_id, row.byte_size, row.sha256])).toEqual([
+      ["source.geostat_regional_gdp", 13_871, "dd2042dff5e2c44b98b4bb140163b5736cf5a71f4683b9e6a359373907d59c35"],
+      ["source.geostat_regional_gdp_by_activity", 99_089, "88e337bd82a5232ea5260f011b11cb2d82c2cec5115fddbe92d14d1ff3945337"],
+    ]);
+    expect(rows.every((row) => row.years[0] === 2010 && row.years.at(-1) === 2024)).toBe(true);
+  });
+
   it("parses, normalizes, expands years, derives download hrefs, and sorts newest first", async () => {
     const repositoryRoot = await createRepository();
     const secondSourcePath = path.join(repositoryRoot, "docs/Raw Data/Expenditure/2020/source-b.xlsx");

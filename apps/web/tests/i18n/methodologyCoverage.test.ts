@@ -23,6 +23,23 @@ function groups(content: MethodologyContent) {
 }
 
 describe("complete methodology translations", () => {
+  it("publishes the bilingual Regional economies methodology with its accounting boundaries", () => {
+    expect(LIVE_METHODOLOGY_IDS).toContain("regional-economies");
+    expect(LIVE_METHODOLOGY_IDS).toHaveLength(8);
+    for (const locale of ["ka", "en"] as const) {
+      const content = getMethodologyContent("regional-economies" as never, locale);
+      const prose = [content.summary, content.disclosure, ...content.sections.flatMap((section) => section.paragraphs)].join(" ");
+      expect(prose).toContain("2010–2024");
+      expect(prose).toMatch(locale === "en" ? /11 regions/i : /11 რეგიონ/i);
+      expect(prose).toMatch(locale === "en" ? /basic prices/i : /საბაზისო ფას/i);
+      expect(prose).toMatch(locale === "en" ? /market-price GDP/i : /საბაზრო ფასებში.*მშპ/i);
+      expect(prose).toMatch(locale === "en" ? /taxes.*subsidies/i : /გადასახად.*სუბსიდი/i);
+      expect(prose).toMatch(locale === "en" ? /seven/i : /შვიდ/i);
+      expect(prose).toMatch(locale === "en" ? /no 2025|does not include 2025/i : /2025.*არ მოიცავს/i);
+      expect(prose).toMatch(locale === "en" ? /real growth.*per-capita/i : /რეალურ ზრდას.*ერთ მოსახლეზე/i);
+    }
+  });
+
   it("blocks changes to figures, classifications, groups and missing English text", () => {
     const ka = getMethodologyContent("expenditure", "ka");
     const valid = getMethodologyContent("expenditure", "en");

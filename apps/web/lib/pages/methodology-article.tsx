@@ -59,6 +59,7 @@ const DATASET_DOWNLOADS = {
   debt: "/downloads/data/government-debt.csv",
   gdp: "/downloads/data/gdp-overview.csv",
   "economic-sectors": "/downloads/data/economic-sectors.csv",
+  "regional-economies": "/downloads/data/regional-economies.csv",
   inflation: "/downloads/data/inflation-cpi-national.csv",
 } as const;
 
@@ -67,6 +68,7 @@ const DATASET_DOWNLOADS = {
 // this page is its only published entry point.
 const DATASET_JSON_DOWNLOADS = {
   "economic-sectors": [{ href: "/downloads/data/economic-sectors.json", labelKey: "methodology.jsonSectors" }],
+  "regional-economies": [{ href: "/downloads/data/regional-economies.json", labelKey: "methodology.jsonRegionalEconomies" }],
   expenditure: [
     { href: "/downloads/data/national-expenditure.json", labelKey: "methodology.jsonExpenditure" },
     { href: "/downloads/data/ministries.json", labelKey: "methodology.jsonMinistries" },
@@ -87,6 +89,7 @@ const DATASET_JSON_DOWNLOADS = {
 // distribution of national expenditure.
 const DATASET_JSON_DISTRIBUTIONS = {
   "economic-sectors": ["/downloads/data/economic-sectors.json"],
+  "regional-economies": ["/downloads/data/regional-economies.json"],
   expenditure: ["/downloads/data/national-expenditure.json"],
   revenue: ["/downloads/data/national-revenue.json"],
   municipalities: ["/downloads/data/municipal-expenditure.json"],
@@ -132,7 +135,7 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
   return (
     <>
       <JsonLd
-        data={dataset === "gdp" || dataset === "inflation" ? {
+        data={dataset === "gdp" || dataset === "inflation" || dataset === "regional-economies" ? {
           "@context":"https://schema.org", "@type":"Dataset", "@id":`${resolveSiteUrl()}/methodology/${dataset}`, name:content.title, description:content.summary,
           url:`${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`,locale)}`, temporalCoverage:`${coverage.firstYear}/${coverage.lastYear}`,
           inLanguage:["ka","en"], dateModified:content.reviewedAt, spatialCoverage:{"@type":"Place",name:seoMessage(locale,"seo.country")},
