@@ -247,6 +247,91 @@ export function latestContributors(index: CategoryIndex, count = 4) {
   return ranked.length === 0 ? null : { period, contributors: ranked };
 }
 
+export type CategoryIndicatorEntry = {
+  categoryId: string;
+  changePct: number;
+  contribution: number | null;
+  weightPct: number | null;
+  spark: Array<number | null>;
+};
+
+export type CategoryIndicators = {
+  period: number;
+  hero: { categoryId: string; value: number; changePct: number | null; weightPct: number | null; spark: Array<number | null> };
+  fastestRise: CategoryIndicatorEntry | null;
+  /** The weakest division. `fell` says whether it actually got cheaper or merely rose least. */
+  weakest: (CategoryIndicatorEntry & { fell: boolean }) | null;
+  /** How widespread inflation is: divisions with rising prices, out of those with data. */
+  breadth: { rose: number; total: number; spark: Array<number | null> };
+};
+
+const SPARK_MONTHS = 36;
+
+/**
+ * Spec §6: the indicators always describe the latest published month, whatever the
+ * range. Four different questions rather than one ranked four ways — which group
+ * drives the headline, what rose fastest, what is weakest, and how many groups are
+ * rising at all. Divisions only; a subgroup is part of its division, not a peer.
+ */
+export function latestCategoryIndicators(index: CategoryIndex): CategoryIndicators | null {
+  const divisions = index.tree.map((node) => node.categoryId);
+  const annual = divisions.flatMap((categoryId) => {
+    const values = index.values.get(`${categoryId}:yoy_pct`);
+    return values ? [{ categoryId, values }] : [];
+  });
+  if (annual.length === 0) return null;
+  const period = bounds(annual.map((entry) => entry.values)).max;
+  const window = Array.from({ length: SPARK_MONTHS }, (_, offset) => period - SPARK_MONTHS + 1 + offset);
+
+  const present = annual.flatMap((entry) => {
+    const changePct = entry.values.get(period);
+    return changePct === undefined ? [] : [{ ...entry, changePct }];
+  });
+  if (present.length === 0) return null;
+
+  const entryFor = (row: (typeof present)[number]): CategoryIndicatorEntry => ({
+    categoryId: row.categoryId,
+    changePct: row.changePct,
+    contribution: index.contributions.get(row.categoryId)?.get(period) ?? null,
+    weightPct: latestWeight(index, row.categoryId),
+    spark: window.map((month) => row.values.get(month) ?? null),
+  });
+
+  const ranked = [...present].sort((a, b) => b.changePct - a.changePct);
+  const fastest = ranked[0]!;
+  const weakest = ranked.at(-1)!;
+
+  const heroRanked = divisions
+    .flatMap((categoryId) => {
+      const value = index.contributions.get(categoryId)?.get(period);
+      return value === undefined ? [] : [{ categoryId, value }];
+    })
+    .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+  const top = heroRanked[0];
+  if (!top) return null;
+
+  return {
+    period,
+    hero: {
+      categoryId: top.categoryId,
+      value: top.value,
+      changePct: index.values.get(`${top.categoryId}:yoy_pct`)?.get(period) ?? null,
+      weightPct: latestWeight(index, top.categoryId),
+      spark: window.map((month) => index.contributions.get(top.categoryId)?.get(month) ?? null),
+    },
+    fastestRise: entryFor(fastest),
+    weakest: { ...entryFor(weakest), fell: weakest.changePct < 0 },
+    breadth: {
+      rose: present.filter((row) => row.changePct > 0).length,
+      total: present.length,
+      spark: window.map((month) => {
+        const withData = annual.filter((entry) => entry.values.get(month) !== undefined);
+        return withData.length === 0 ? null : withData.filter((entry) => entry.values.get(month)! > 0).length;
+      }),
+    },
+  };
+}
+
 const RANGE_PARAM = /^(\d{4}-\d{2})-(\d{4}-\d{2})$/;
 const CATEGORY_ID = /^cpi\.cat\.(0[1-9]|1[0-2])(_[1-9])?$/;
 

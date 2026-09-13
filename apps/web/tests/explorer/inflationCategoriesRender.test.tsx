@@ -38,6 +38,19 @@ describe("InflationCategories", () => {
     expect(block(markup, "inflation-category-hero")).toContain("ტრანსპორტი");
   });
 
+  it("gives the indicators four different measures, not one ranked four ways", () => {
+    const indicators = markup.slice(markup.indexOf('data-testid="inflation-category-indicators"'));
+    expect(indicators).toContain("უდიდესი წვლილი");
+    expect(indicators).toContain("ყველაზე გაძვირებული");
+    // Nothing fell in the fixture, so the weakest slot must not claim it got cheaper.
+    expect(indicators).toContain("ყველაზე ნაკლებად გაძვირებული");
+    expect(indicators).not.toContain("ყველაზე გაიაფებული");
+    expect(indicators).toContain("ინფლაციის სიგანე");
+    expect(indicators).toContain("ჯგუფი გაძვირდა");
+    // Three of three fixture divisions rose.
+    expect(indicators).toContain("3 / 3");
+  });
+
   it("selects every division by default and counts subgroups separately", () => {
     expect(markup).toContain("ჯგუფები");
     expect(markup).toContain("ქვეჯგუფები");

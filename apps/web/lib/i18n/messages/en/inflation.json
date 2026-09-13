@@ -190,5 +190,12 @@
   "inflation.categoryColumn": "Category",
   "inflation.coicopColumn": "COICOP code",
   "inflation.levelColumn": "Level",
-  "inflation.weightColumn": "Weight (%)"
+  "inflation.weightColumn": "Weight (%)",
+  "inflation.fastestRise": "Fastest rise",
+  "inflation.biggestFall": "Biggest fall",
+  "inflation.smallestRise": "Smallest rise",
+  "inflation.inflationBreadth": "Breadth of inflation",
+  "inflation.breadthDetail": "groups rose",
+  "inflation.breadthValue": "{rose} / {total}",
+  "inflation.contributionDetail": "{category} · contributes {value}"
 }

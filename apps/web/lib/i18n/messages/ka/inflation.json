@@ -190,5 +190,12 @@
   "inflation.categoryColumn": "კატეგორია",
   "inflation.coicopColumn": "COICOP კოდი",
   "inflation.levelColumn": "დონე",
-  "inflation.weightColumn": "წონა (%)"
+  "inflation.weightColumn": "წონა (%)",
+  "inflation.fastestRise": "ყველაზე გაძვირებული",
+  "inflation.biggestFall": "ყველაზე გაიაფებული",
+  "inflation.smallestRise": "ყველაზე ნაკლებად გაძვირებული",
+  "inflation.inflationBreadth": "ინფლაციის სიგანე",
+  "inflation.breadthDetail": "ჯგუფი გაძვირდა",
+  "inflation.breadthValue": "{rose} / {total}",
+  "inflation.contributionDetail": "{category} · წვლილი {value}"
 }

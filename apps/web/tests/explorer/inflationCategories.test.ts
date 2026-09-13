@@ -8,9 +8,11 @@ import {
   parseCategoryHash,
   resolveCategoryRange,
   serializeCategoryHash,
+  latestCategoryIndicators,
   toggleCategory,
 } from "../../lib/explorer/inflationCategories";
-import { makePeriod } from "../../lib/data/inflation/periods";
+import { fixtureFacts, fixtureWeights } from "./fixtures/inflationCategories";
+import { makePeriod, periodKey } from "../../lib/data/inflation/periods";
 import type { ServedBasketWeightRow, ServedCpiCategoryFact } from "../../lib/data/inflation/types";
 
 const fact = (
@@ -118,5 +120,59 @@ describe("selection and hash", () => {
 
   it("drops an unknown category from the hash", () => {
     expect(parseCategoryHash("i=contrib&sel=cpi.cat.01,nonsense").selected).toEqual(["cpi.cat.01"]);
+  });
+});
+
+describe("latestCategoryIndicators", () => {
+  const index = () => buildCategoryIndex(fixtureFacts, fixtureWeights);
+
+  it("leads with the largest contributor", () => {
+    const latest = latestCategoryIndicators(index())!;
+    expect(periodKey(latest.period)).toBe("2026-08");
+    // 15.2% at an 11.4% basket share beats 5.02% at 33.6%.
+    expect(latest.hero.categoryId).toBe("cpi.cat.07");
+    expect(latest.hero.value).toBeCloseTo(1.7328, 4);
+  });
+
+  it("reports the fastest price rise as a rate, not a contribution", () => {
+    const latest = latestCategoryIndicators(index())!;
+    expect(latest.fastestRise!.categoryId).toBe("cpi.cat.07");
+    expect(latest.fastestRise!.changePct).toBeCloseTo(15.2, 4);
+    expect(latest.fastestRise!.contribution).toBeCloseTo(1.7328, 4);
+  });
+
+  it("marks the weakest division as a rise when nothing fell", () => {
+    const latest = latestCategoryIndicators(index())!;
+    // Every fixture division rose, so the slot must not claim anything got cheaper.
+    expect(latest.weakest!.categoryId).toBe("cpi.cat.01");
+    expect(latest.weakest!.fell).toBe(false);
+  });
+
+  it("reports a real fall as a fall", () => {
+    const withFall = buildCategoryIndex(
+      [...fixtureFacts, fact("cpi.cat.03", "2026-08", -2.1)],
+      [...fixtureWeights, weight("cpi.cat.03", 2026, 4.3)],
+    );
+    const latest = latestCategoryIndicators(withFall)!;
+    expect(latest.weakest!.categoryId).toBe("cpi.cat.03");
+    expect(latest.weakest!.fell).toBe(true);
+    expect(latest.weakest!.changePct).toBeCloseTo(-2.1, 4);
+  });
+
+  it("counts how many divisions rose, and tracks that count over time", () => {
+    const withFall = buildCategoryIndex(
+      [...fixtureFacts, fact("cpi.cat.03", "2026-08", -2.1)],
+      [...fixtureWeights, weight("cpi.cat.03", 2026, 4.3)],
+    );
+    const latest = latestCategoryIndicators(withFall)!;
+    expect(latest.breadth).toMatchObject({ rose: 3, total: 4 });
+    expect(latest.breadth.spark).toHaveLength(36);
+    expect(latest.breadth.spark.at(-1)).toBe(3);
+  });
+
+  it("counts divisions only, never subgroups", () => {
+    const latest = latestCategoryIndicators(index())!;
+    // The fixture carries cpi.cat.01_1 and cpi.cat.04_2 as subgroups.
+    expect(latest.breadth.total).toBe(3);
   });
 });
