@@ -77,4 +77,23 @@ describe("buildInflationCategoryWorkbookExportModel", () => {
     const model = buildInflationCategoryWorkbookExportModel(contribInput);
     expect(model.readable.subtitle).toContain("Fiscal.ge");
   });
+
+  it("exports contributions as percentage points and rates as percent", () => {
+    // A contribution is percentage points: it must never leave as a fraction
+    // under a % format, which would print 1.7 pp as "1.7%".
+    const contrib = buildInflationCategoryWorkbookExportModel(contribInput);
+    expect(contrib.readable.numberFormat).not.toContain("%");
+    expect(contrib.analysis.numericFormats?.[7]).toBe("0.00");
+    const transport = contrib.readable.rows.find((row) => row.parentLabel === "ტრანსპორტი")!;
+    // 15.2% change at an 11.4% basket share is 1.7328 pp, stored unscaled.
+    expect(transport.valuesByYear[8]).toBeCloseTo(1.7328, 4);
+
+    const rates = buildInflationCategoryWorkbookExportModel({
+      ...contribInput,
+      state: { ...contribInput.state, tab: "yoy" },
+    });
+    expect(rates.readable.numberFormat).toBe("0.0%");
+    const rateRow = rates.readable.rows.find((row) => row.parentLabel === "ტრანსპორტი")!;
+    expect(rateRow.valuesByYear[8]).toBeCloseTo(0.152, 6);
+  });
 });

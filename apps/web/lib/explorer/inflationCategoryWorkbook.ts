@@ -24,8 +24,9 @@ import {
 const WEIGHTS_SOURCE_ID = "source.geostat_basket_weights";
 
 // Spec §9: the readable sheet mirrors ცხრილი — one row per selected category and
-// year, months across — and percentages leave as fractions under Excel's % format.
-// The contribution tab adds the residual row, so the exported parts re-add to the
+// year, months across. Rate tabs leave as fractions under Excel's % format;
+// contributions are percentage points and leave as plain signed numbers. The
+// contribution tab adds the residual row, so the exported parts re-add to the
 // published headline exactly as they do on screen.
 export function buildInflationCategoryWorkbookExportModel(input: {
   index: CategoryIndex;
@@ -40,7 +41,9 @@ export function buildInflationCategoryWorkbookExportModel(input: {
   const { messages, locale } = presentation;
   const t = (key: string) => message(messages, `inflation.${key}`);
   const contribution = state.tab === "contrib";
-  const scale = (value: number) => value / 100;
+  // A rate leaves as a fraction under Excel percent format; a contribution is
+  // percentage points and stays a plain number, as it does on screen.
+  const scale = (value: number) => (contribution ? value : value / 100);
 
   // Both tabs produce the same shape: an ordered list of labelled series. Only the
   // contribution tab appends the residual.
@@ -134,7 +137,7 @@ export function buildInflationCategoryWorkbookExportModel(input: {
       // A derived measure says so on the sheet, not only on the page.
       subtitle: contribution ? `${subtitle} · ${t("categoryContributionNote")}` : subtitle,
       unitLabel: t(`categoryWorkbookUnit.${state.tab}`),
-      numberFormat: "0.0%",
+      numberFormat: contribution ? "+0.0;−0.0;0.0" : "0.0%",
       showChangeColumn: false,
       years: [...MONTH_NUMBERS],
       headerLabels: {
@@ -156,7 +159,7 @@ export function buildInflationCategoryWorkbookExportModel(input: {
         t("status"),
       ],
       rows: analysisRows,
-      numericFormats: { 6: '0.0"%"', 7: "0.00%" },
+      numericFormats: { 6: '0.0"%"', 7: contribution ? "0.00" : "0.00%" },
     },
     sources: chosen
       .map((row) => ({

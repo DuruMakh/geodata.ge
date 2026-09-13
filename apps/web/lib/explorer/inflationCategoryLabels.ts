@@ -18,13 +18,19 @@ export function categoryLabel(messages: Messages, categoryId: string): string {
   return message(messages, `inflation.category.${categoryId}`);
 }
 
-/** Percentage points, always signed, one decimal — the unit of a contribution. */
+/**
+ * A contribution is percentage points, not percent, so it never carries a `%`.
+ * Always signed, one decimal; the caller appends the `პპ` unit.
+ */
 export function formatContribution(value: number): string {
-  return formatShare(displayedValue(value) / 100, true);
+  const shown = displayedValue(value);
+  const prefix = shown > 0 ? "+" : "";
+  return (prefix + shown.toFixed(1)).replace("-", "−");
 }
 
 export function formatCategoryValue(value: number, tab: CategoryTab): string {
-  return formatShare(displayedValue(value) / 100, tab !== "yoy");
+  if (tab === "contrib") return formatContribution(value);
+  return formatShare(displayedValue(value) / 100, tab === "mom");
 }
 
 /** A basket share, right-aligned in mono on selector rows; absent weights show an em dash. */
