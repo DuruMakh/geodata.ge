@@ -10,6 +10,7 @@ import { periodLabel } from "../../lib/explorer/inflationLabels";
 import {
   CATEGORY_TABS,
   DEFAULT_CATEGORY_STATE,
+  DIVISION_IDS,
   RESIDUAL_ID,
   buildCategoryIndex,
   buildCategoryLines,
@@ -280,7 +281,14 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
             range={range}
             onToggle={(categoryId) => setState((current) => toggleCategory(current, categoryId, index))}
             onToggleExpanded={(categoryId) => setState((current) => toggleExpanded(current, categoryId))}
-            onClear={() => setState((current) => ({ ...current, selected: [] }))}
+            onToggleAll={() =>
+              // Clearing 55 rows was a one-way door: the selector hides the bulk
+              // button when nothing is selected, and the hash keeps it empty.
+              setState((current) => ({
+                ...current,
+                selected: current.selected.length > 0 ? [] : DIVISION_IDS.filter((id) => index.order.includes(id)),
+              }))
+            }
             downloadAction={
               <ExcelDownloadButton
                 testId="inflation-category-download"

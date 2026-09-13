@@ -28,7 +28,7 @@ type InflationCategoryPanelProps = {
   range: ResolvedPeriodRange;
   onToggle: (categoryId: string) => void;
   onToggleExpanded: (categoryId: string) => void;
-  onClear: () => void;
+  onToggleAll: () => void;
   downloadAction: ReactNode;
 };
 
@@ -38,7 +38,7 @@ export function InflationCategoryPanel({
   range,
   onToggle,
   onToggleExpanded,
-  onClear,
+  onToggleAll,
   downloadAction,
 }: InflationCategoryPanelProps) {
   const { messages } = useI18n();
@@ -76,9 +76,11 @@ export function InflationCategoryPanel({
         // A selected subgroup is never hidden by the division count (spec §6).
         supplementalSelected={{ label: message(messages, "inflation.subgroupCounts"), count: selectedSubgroups }}
         hasSelection={state.selected.length > 0}
-        allSelected={false}
-        onToggleAll={onClear}
-        allowSelectAll={false}
+        // "All" is the 12 divisions, never all 55 rows: a division and its own
+        // subgroups overlap, so selecting both levels is the double count the
+        // selection rule forbids. That makes select-all exactly the default.
+        allSelected={selectedDivisions === divisionCount && selectedSubgroups === 0}
+        onToggleAll={onToggleAll}
         hasVisibleMatches={visible.length > 0}
       >
         {visible.map((row) => (

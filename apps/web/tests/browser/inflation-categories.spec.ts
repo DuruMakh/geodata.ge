@@ -45,6 +45,25 @@ test("lands on the contribution tab and swaps the stack for lines on a rate tab"
   await expect(page.locator('rect[data-segment="cpi.cat.residual"]').first()).toBeAttached();
 });
 
+// Clearing used to be a one-way door: with 55 rows and the bulk button hidden
+// while nothing is selected, the only way back was ticking twelve boxes.
+test("clearing the selection can be undone from the same control", async ({ page }) => {
+  await page.goto(`/en${CATEGORIES}`);
+  await ready(page);
+  const bulk = page.getByTestId("series-toggle-all");
+  await expect(bulk).toHaveAttribute("aria-checked", "true");
+
+  await bulk.click();
+  await expect(page.locator("rect[data-segment]")).toHaveCount(0);
+  await expect(bulk).toBeVisible();
+  await expect(bulk).toHaveAttribute("aria-checked", "false");
+
+  await bulk.click();
+  // Back to the documented default: the 12 divisions, no subgroups.
+  await expect(bulk).toHaveAttribute("aria-checked", "true");
+  await expect(page.locator('rect[data-segment="cpi.cat.residual"]').first()).toBeAttached();
+});
+
 test("the residual grows when a division is deselected", async ({ page }) => {
   await page.goto(`/en${CATEGORIES}`);
   await ready(page);

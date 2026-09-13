@@ -13,7 +13,7 @@ const baseProps = {
   range: { min: period, max: period, start: period, end: period },
   onToggle: () => {},
   onToggleExpanded: () => {},
-  onClear: () => {},
+  onToggleAll: () => {},
   downloadAction: null,
 };
 
