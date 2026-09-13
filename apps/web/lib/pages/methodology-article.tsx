@@ -50,6 +50,7 @@ const DATASET_SCHEMA_IDS = {
   debt: "government-debt",
   gdp: "gdp-overview",
   "economic-sectors": "economic-sectors",
+  "regional-economies": "regional-economies",
 } as const;
 
 const DATASET_DOWNLOADS = {
@@ -135,7 +136,7 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
   return (
     <>
       <JsonLd
-        data={dataset === "gdp" || dataset === "inflation" || dataset === "regional-economies" ? {
+        data={dataset === "gdp" || dataset === "inflation" ? {
           "@context":"https://schema.org", "@type":"Dataset", "@id":`${resolveSiteUrl()}/methodology/${dataset}`, name:content.title, description:content.summary,
           url:`${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`,locale)}`, temporalCoverage:`${coverage.firstYear}/${coverage.lastYear}`,
           inLanguage:["ka","en"], dateModified:content.reviewedAt, spatialCoverage:{"@type":"Place",name:seoMessage(locale,"seo.country")},

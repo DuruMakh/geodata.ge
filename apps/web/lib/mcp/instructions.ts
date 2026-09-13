@@ -30,6 +30,11 @@ export function serverInstructions(
   return `Fiscal.ge serves reviewed annual data on Georgia's state and municipal budgets and GDP.
 
 WHAT IS SERVED
+- Regional economies, ${range("regional-economies")}, through query_regional_economies.
+  Eleven regions, Total regional GDP and twenty NACE Rev.2 activities. Values
+  are current-price GEL; activity shares divide basic-price GVA by the same
+  region's complete market-price GDP. No 2025, real growth, per-capita value or
+  region share of Georgia's GDP is served. Do not imply a multi-region chart.
 - National economic sectors, ${range("economic-sectors")}, through query_economic_sectors.
   Twenty NACE Rev.2 activities and a separately published Total GDP reference.
   Nominal GEL and GDP shares cover2010–2025; annual real growth covers2011–2025.
@@ -59,7 +64,7 @@ Coverage is derived from the loaded data and is reported by describe_coverage.
 Do not assume a year or a series exists; ask.
 
 LANGUAGES AND COMPATIBILITY
-Schema 1.1.0 adds reviewed Georgian (*Ka) and English (*En) names, definitions,
+Schema 1.2.0 adds regional economies while retaining reviewed Georgian (*Ka) and English (*En) names, definitions,
 missing-value explanations, comparison reasons, rankings and source descriptions.
 Answer in the user's language using those fields. Catalogue search matches both
 languages. The discovered tools and input schemas work without a language argument.
@@ -68,7 +73,7 @@ translated companions describe it without replacing it. documentLanguage is null
 when unverified; a translated title does not mean the source document was translated.
 Translation corrections change dataVersion because the text is part of the pinned
 data identity. Reuse a dataVersion only with responses from that same snapshot.
-Clients must accept additive fields and schema 1.1.0; exact-version or unknown-field
+Clients must accept additive fields and schema 1.2.0; exact-version or unknown-field
 validators need updating. Byte-for-byte response compatibility is not promised.
 Both /connect and /en/connect describe the shared /mcp endpoint and /downloads/data/
 publications. Static publications carry the same bilingual evidence and remain
@@ -88,7 +93,7 @@ UNITS AND VALUES
   deliberately when it is wanted - so treat this as background, not as a warning
   to repeat on every answer. Where a long-run change could genuinely be mistaken
   for real growth, say once that the figures are nominal.
-- share_of_total_pct and share_of_gdp_pct are percentages; gel_per_resident is
+- share_of_total_pct, share_of_gdp_pct and share_of_region_gdp_pct are percentages; gel_per_resident is
   GEL per resident using the reviewed population denominator.
 - basis is "actual", "planned", or "projection". For budget facts where both
   actual and planned exist, actual is served and wins.

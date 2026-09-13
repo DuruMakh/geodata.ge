@@ -25,6 +25,7 @@ const TOOL_NAMES = [
   "query_ministries",
   "query_municipal",
   "query_national",
+  "query_regional_economies",
   "rank",
 ];
 
@@ -139,6 +140,17 @@ describe("MCP tool surface", () => {
         years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
         measure: "amount_gel",
       },
+    });
+
+    expect(result.isError).toBe(true);
+    expect((result.content as { text: string }[])[0]!.text).toContain("result_too_large");
+    expect((result.content as { text: string }[])[0]!.text).toContain("/downloads/data/");
+  });
+
+  it("requires an all-regions regional request to be narrowed instead of truncating it", async () => {
+    const result = await (await connected()).callTool({
+      name: "query_regional_economies",
+      arguments: { measure: "amount_gel" },
     });
 
     expect(result.isError).toBe(true);

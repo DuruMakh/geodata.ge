@@ -63,6 +63,14 @@ const MEASURES: Record<Measure, { name: Localized; description: Localized; unitT
     },
     unitText: "%",
   },
+  share_of_region_gdp_pct: {
+    name: { ka: "რეგიონის მშპ-ში წილი (%)", en: "Share of regional GDP (%)" },
+    description: {
+      ka: "ეკონომიკური საქმიანობის დამატებული ღირებულების წილი იმავე რეგიონის სრულ მშპ-ში, პროცენტებში.",
+      en: "Economic-activity GVA as a percentage of the same region's complete market-price GDP.",
+    },
+    unitText: "%",
+  },
   gel_per_resident: {
     name: { ka: "თანხა ერთ მოსახლეზე (ლარი)", en: "Amount per resident (GEL)" },
     description: {
@@ -90,6 +98,7 @@ export const DATASETS: Record<
   }
 > = {
   "economic-sectors": {measures:["amount_gel","share_of_gdp_pct","real_growth_pct"],keywords:{ka:["ეკონომიკის სექტორები","დამატებული ღირებულება","მშპ"],en:["Georgia","economic sectors","gross value added","real growth"]},measurementTechnique:{ka:"საქსტატის წლიური ეროვნული ანგარიშები; სექტორული დამატებული ღირებულება და მთლიანი მშპ.",en:"Reviewed Geostat annual national accounts: activity GVA at basic prices, market-price GDP shares and real volume growth."}},
+  "regional-economies": {measures:["amount_gel","share_of_region_gdp_pct"],keywords:{ka:["რეგიონული ეკონომიკა","რეგიონული მშპ","დამატებული ღირებულება"],en:["Georgia","regional economies","regional GDP","gross value added"]},measurementTechnique:{ka:"საქსტატის წლიური რეგიონული ანგარიშები; საქმიანობების დამატებული ღირებულება საბაზისო ფასებში და რეგიონული მშპ საბაზრო ფასებში.",en:"Reviewed Geostat annual regional accounts: activity GVA at basic prices and regional GDP at market prices."}},
   "gdp-overview": {measures:["value"],keywords:{ka:["მშპ","ეკონომიკა","საქართველო"],en:["Georgia","GDP","real GDP growth","GDP per capita"]},measurementTechnique:{ka:"გადამოწმებული ამოღება საქსტატისა და მსოფლიო ბანკის წლიური ეროვნული ანგარიშებიდან.",en:"Reviewed extraction of published annual national accounts from Geostat and the World Bank, with explicit units and source status."}},
   "national-expenditure": {
     measures: ["amount_gel", "share_of_total_pct", "share_of_gdp_pct"],

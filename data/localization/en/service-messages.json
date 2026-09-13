@@ -324,6 +324,16 @@
   "documents.source.geostat_cpi_avg12_ka.attribution": "Geostat",
   "documents.source.geostat_core_yoy_ka.attribution": "Geostat",
   "documents.source.geostat_core_mom_ka.attribution": "Geostat",
+  "sources.source.geostat_regional_gdp.name": "Geostat regional GDP at current market prices",
+  "sources.source.geostat_regional_gdp_by_activity.name": "Geostat regional GDP by economic activity at current basic prices",
+  "sources.source.fiscal_regional_economy_share.name": "Fiscal.ge regional activity share",
+  "sources.source.fiscal_regional_economy_share.derivation": "Sector gross value added divided by the same region and year's complete market-price GDP",
+  "documents.source.geostat_regional_gdp.title": "Regional gross domestic product at current market prices",
+  "documents.source.geostat_regional_gdp.publisher": "National Statistics Office of Georgia",
+  "documents.source.geostat_regional_gdp.attribution": "Geostat",
+  "documents.source.geostat_regional_gdp_by_activity.title": "Regional gross domestic product by economic activity at current basic prices",
+  "documents.source.geostat_regional_gdp_by_activity.publisher": "National Statistics Office of Georgia",
+  "documents.source.geostat_regional_gdp_by_activity.attribution": "Geostat",
   "documents.source.nbg_inflation_target.attribution": "National Bank of Georgia",
   "documents.source.nbg_inflation_target_ka.attribution": "National Bank of Georgia"
 }

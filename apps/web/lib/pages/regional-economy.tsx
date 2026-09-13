@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import {
   RegionalEconomyExplorer,
@@ -17,6 +18,7 @@ import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import path from "node:path";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
@@ -106,6 +108,21 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
         { name: title, path: pageHref("/explorer/economy/regions", locale) },
         { name: regionName, path: pageHref(`/explorer/economy/regions/${slug}`, locale) },
       ]} />
+      <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+        locale,
+        datasetId: "regional-economies",
+        origin: resolveSiteUrl(),
+        path: `/explorer/economy/regions/${slug}`,
+        name: message(presentation.messages, "regionalEconomies.detailMetaTitle", { region: regionName }),
+        description: message(presentation.messages, "regionalEconomies.detailMetaDescription", { region: regionName }),
+        firstYear,
+        lastYear,
+        dateModified: reviewedAt,
+        spatialCoverageName: regionName,
+        withinGeorgia: true,
+        partOfPath: "/explorer/economy/regions",
+        sameAsPath: "/methodology/regional-economies",
+      })} />
       <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
         <div className="@container mx-auto max-w-[1180px]">
           <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${reviewedAt}`} />

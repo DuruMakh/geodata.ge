@@ -17,6 +17,7 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/municipalities",
   "https://fiscal.ge/explorer/economy/gdp",
   "https://fiscal.ge/explorer/economy/sectors",
+  "https://fiscal.ge/explorer/economy/regions",
   "https://fiscal.ge/explorer/inflation",
   "https://fiscal.ge/explorer/inflation/overview",
   "https://fiscal.ge/downloads/data/inflation-cpi-national.csv",
@@ -26,11 +27,14 @@ const requiredTargets = [
   "https://fiscal.ge/methodology/municipalities",
   "https://fiscal.ge/methodology/gdp",
   "https://fiscal.ge/methodology/economic-sectors",
+  "https://fiscal.ge/methodology/regional-economies",
   "https://fiscal.ge/methodology/inflation",
   "https://fiscal.ge/downloads/data/gdp-overview.json",
   "https://fiscal.ge/downloads/data/gdp-overview.csv",
   "https://fiscal.ge/downloads/data/economic-sectors.json",
   "https://fiscal.ge/downloads/data/economic-sectors.csv",
+  "https://fiscal.ge/downloads/data/regional-economies.json",
+  "https://fiscal.ge/downloads/data/regional-economies.csv",
   "https://fiscal.ge/downloads/data/manifest.json",
   "https://fiscal.ge/downloads/data/government-debt.json",
   "https://fiscal.ge/downloads/data/general-government-balance.json",
@@ -54,7 +58,7 @@ describe("Fiscal.ge agent instructions", () => {
     const content = await readFile(llmsPath, "utf8");
     const snapshot = loadPackagedSnapshot();
     const catalogue = catalogueData(snapshot, "economic-sectors");
-    const count = content.match(/— (\d+) national economic activities plus a Total GDP reference; no regional economies\./);
+    const count = content.match(/— (\d+) national economic activities plus a Total GDP reference\./);
     expect(count, "sector activity count and national-only scope must be stated").not.toBeNull();
     expect(Number(count![1])).toBe(snapshot.economicSectors.registry.filter(series => series.classificationCode !== null).length);
     expect(catalogue.series?.filter(series => series.level === "total").map(series => series.seriesId)).toEqual(["economy.gdp_total"]);

@@ -22,6 +22,9 @@ import { loadGdpOverviewFacts, loadServedGdpOverviewData } from "../data/gdpOver
 import { GDP_QUERY_SERIES } from "./gdpSeries";
 import { loadEconomicSectorFacts, ECONOMIC_SECTORS } from "../data/economicSectors/importEconomicSectors";
 import { SECTOR_DEFINITIONS } from "./economicSectorsSeries";
+import { loadRegionalEconomyFacts, REGIONAL_ECONOMY_REGIONS, REGIONAL_ECONOMY_SECTORS } from "../data/regionalEconomies/importRegionalEconomies";
+import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
+import { REGIONAL_ECONOMY_DEFINITIONS } from "./regionalEconomySeries";
 import { loadServedGeneralGovernmentBalanceData } from "../data/generalGovernmentBalance/importGeneralGovernmentBalance";
 import { loadServedGovernmentDebtData } from "../data/governmentDebt/importGovernmentDebtFacts";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
@@ -222,6 +225,7 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
   perDataset.push(gdpManifest.filter(row => row.source_id.startsWith("source.wb_gdp_") && !row.source_id.endsWith("metadata")));
   const sectorManifest = await loadReviewedSourceManifest(repositoryRoot, "economic-sectors");
   perDataset.push(sectorManifest.filter(row => row.source_id.startsWith("source.geostat_sector_")));
+  perDataset.push(await loadReviewedSourceManifest(repositoryRoot, "regional-economies"));
   // Inflation's registered sources are the English originals; the Georgian
   // twins (`_ka`) only prove identical values and are not registered sources.
   perDataset.push((await loadReviewedSourceManifest(repositoryRoot, "inflation")).filter(row => !row.source_id.endsWith("_ka")));
@@ -275,6 +279,16 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
         throw new Error(`buildFactQuerySnapshot: invalid source manifest row ${index + 1} in ${directory.join("/")}: ${issues}`);
       }
       const row = parsed.data;
+      if (
+        directory.join("/") === "docs/Raw Data/Municipalities/geostat-population-regional-gdp" &&
+        row.source_id === "geostat_regional_gdp_current_prices"
+      ) {
+        // The regional-economies methodology manifest publishes these exact
+        // bytes under the registered source id used by the regional facts.
+        // Keep the package row for validation, but do not emit a duplicate
+        // public document identity for the same workbook.
+        continue;
+      }
       const archivedOriginal = gdpManifest.find((original) =>
         original.source_id === row.source_id && original.sha256 === row.sha256 && original.byte_size === row.bytes,
       );
@@ -472,6 +486,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     ...municipal.municipalities.map(entity => entity.code), ...AGGREGATE_ONLY_MUNICIPAL_CODES,
     ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID, ...Object.keys(GDP_QUERY_SERIES), "gdp-overview",
     ...ECONOMIC_SECTORS.map(r=>r.id), "economic-sectors",
+    ...REGIONAL_ECONOMY_REGIONS.map(region => region.id), REGIONAL_GDP_TOTAL, "regional-economies",
     "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
   ])].sort();
   const localization: ServiceLocalization = {
@@ -634,6 +649,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     deficit: { facts: sortedBy(deficit.facts, (f) => f.year) },
     gdpOverview: { facts: sortedBy(await loadGdpOverviewFacts(), f=>f.seriesId, f=>f.year), series: GDP_QUERY_SERIES },
     economicSectors: { facts: sortedBy(await loadEconomicSectorFacts(), f=>f.seriesId,f=>f.measure,f=>f.year), registry: ECONOMIC_SECTORS, definitions: SECTOR_DEFINITIONS },
+    regionalEconomies: { facts: sortedBy(await loadRegionalEconomyFacts(), f=>f.regionId,f=>f.seriesId,f=>f.measure,f=>f.year), regions: REGIONAL_ECONOMY_REGIONS, registry: [{ id: REGIONAL_GDP_TOTAL, classificationCode: null, sortOrder: 0, officialName: "Total regional GDP", labelKa: "რეგიონის მთლიანი მშპ", labelEn: "Total regional GDP" }, ...REGIONAL_ECONOMY_SECTORS], definitions: REGIONAL_ECONOMY_DEFINITIONS },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
     sources,
   };

@@ -74,6 +74,7 @@ describe("catalogue.json", () => {
       "municipal-expenditure",
       "national-expenditure",
       "national-revenue",
+      "regional-economies",
     ]);
     for (const dataset of catalogue.datasets) {
       expect(dataset.series.length, `${dataset.datasetId} series`).toBeGreaterThan(0);
@@ -185,6 +186,7 @@ describe("dataset publications", () => {
       "general-government-balance.json",
       "gdp-overview.json",
       "economic-sectors.json",
+      "regional-economies.json",
     ]);
 
     for (const file of files) {
@@ -264,6 +266,8 @@ describe("dataset publications", () => {
       "gdp-overview.csv",
       "economic-sectors.json",
       "economic-sectors.csv",
+      "regional-economies.json",
+      "regional-economies.csv",
       "manifest.json",
     ]);
   });

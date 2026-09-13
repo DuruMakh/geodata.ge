@@ -43,7 +43,7 @@ export const economicSectorMeasure = z.enum(["amount_gel", "share_of_gdp_pct", "
 export const queryEconomicSectorsInput = z.strictObject({ seriesIds: seriesIdList, years: uniqueSortedYears, measure: economicSectorMeasure, expectedDataVersion });
 
 export const describeCoverageInput = z.strictObject({
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies"]).optional(),
   search: z.string().max(120).optional(),
   entityType: z.enum(["country", "municipality", "region"]).optional(),
   level: z.enum(["admin_category", "major_program"]).optional(),
@@ -152,7 +152,7 @@ export const rankInput = z
 
 export const getSourcesInput = z.strictObject({
   sourceIds: sourceIdList,
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies"]).optional(),
   years: uniqueSortedYears.optional(),
   entityIds: entityIdList.optional(),
   expectedDataVersion,
