@@ -18,6 +18,10 @@ for (const locale of ["ka", "en"] as const) {
 
       await page.getByTestId("chart-mode-table").click();
       await expect(page.getByTestId("month-grid")).toBeVisible();
+      // The grid legend is the one string no other gate sees: it exists only after
+      // this click, so a hardcoded Georgian unit would ship on the English page.
+      const legend = (await page.getByTestId("month-grid").innerText()).normalize();
+      expect(/[Ⴀ-ჿ]/.test(legend)).toBe(locale === "ka");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.screenshot({ path: testInfo.outputPath(`categories-table-${locale}-${width}.png`), fullPage: true });
     });

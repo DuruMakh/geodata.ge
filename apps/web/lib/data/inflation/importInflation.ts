@@ -124,10 +124,6 @@ export function assertInflationParity(
  */
 let servedInflationPromise: Promise<ServedInflationData> | null = null;
 
-export function resetInflationCacheForTests(): void {
-  servedInflationPromise = null;
-}
-
 export type ServedInflationData = {
   facts: ServedCpiFact[];
   targets: ServedInflationTargetRow[];

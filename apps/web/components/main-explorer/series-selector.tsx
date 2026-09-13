@@ -136,6 +136,8 @@ type SeriesSelectorRowProps = {
   value: string;
   /** A second, quieter metric before the value (the category panel's basket share). */
   meta?: string;
+  /** Names `meta` for a screen reader, so the row is not two unlabelled percentages. */
+  metaLabel?: string;
   selected: boolean;
   level?: string;
   parentId?: string | null;
@@ -159,6 +161,7 @@ export function SeriesSelectorRow({
   color,
   value,
   meta,
+  metaLabel,
   selected,
   level,
   parentId,
@@ -235,6 +238,7 @@ export function SeriesSelectorRow({
         </span>
         {meta === undefined ? null : (
           <span className="mt-0.5 flex-none font-[family-name:var(--font-mono)] text-[10px] whitespace-nowrap text-[var(--muted)] opacity-70">
+            {metaLabel === undefined ? null : <span className="sr-only">{metaLabel} </span>}
             {meta}
           </span>
         )}

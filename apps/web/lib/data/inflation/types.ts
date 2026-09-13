@@ -55,6 +55,17 @@ export type CpiCategoryFact = {
 
 export type ServedCpiCategoryFact = Omit<CpiCategoryFact, "value"> & { value: number };
 
+/**
+ * What the page actually needs from a category fact. 27,668 rows cross the
+ * client boundary, so the provenance columns stay on the server and `level` and
+ * `parentId` are re-derived from the ID rather than repeated on every row.
+ */
+export type CategoryFactInput = Pick<ServedCpiCategoryFact, "categoryId" | "measure" | "period" | "value">;
+
+export function categoryFactInput(fact: ServedCpiCategoryFact): CategoryFactInput {
+  return { categoryId: fact.categoryId, measure: fact.measure, period: fact.period, value: fact.value };
+}
+
 /** Weights are stored as percentages with six decimals; the arithmetic divides by 100. */
 export type BasketWeightRow = { categoryId: string; year: number; weightPct: string; sourceId: string; lastReviewedAt: string };
 export type ServedBasketWeightRow = Omit<BasketWeightRow, "weightPct"> & { weightPct: number };

@@ -1,6 +1,6 @@
 import { buildContributionIndex } from "../data/inflation/contributions";
 import { periodFromKey, periodKey } from "../data/inflation/periods";
-import type { ServedBasketWeightRow, ServedCpiCategoryFact } from "../data/inflation/types";
+import type { CategoryFactInput, ServedBasketWeightRow } from "../data/inflation/types";
 
 // Pure state and data selection for the inflation categories section, mirroring
 // lib/explorer/inflationOverview.ts. Components compose these; nothing here
@@ -61,7 +61,41 @@ function byCoicop(a: string, b: string): number {
   return divisionA - divisionB || subA - subB;
 }
 
-export function buildCategoryIndex(facts: ServedCpiCategoryFact[], weights: ServedBasketWeightRow[]): CategoryIndex {
+/**
+ * The wire form of the category facts. 27,668 rows repeat 110 category/measure
+ * pairs and a month string each, which prerendered to a 9 MB page; packed as one
+ * dense run per series it is a fraction of that. Short keys because every byte
+ * here is multiplied by 27,668 and then by two locales.
+ */
+export type PackedCategorySeries = { k: string; s: string; v: Array<number | null> };
+
+export function packCategoryFacts(facts: CategoryFactInput[]): PackedCategorySeries[] {
+  const byKey = new Map<string, Map<number, number>>();
+  for (const fact of facts) {
+    const key = `${fact.categoryId}:${fact.measure}`;
+    if (!byKey.has(key)) byKey.set(key, new Map());
+    byKey.get(key)!.set(periodFromKey(fact.period), fact.value);
+  }
+  return [...byKey].map(([k, values]) => {
+    const periods = [...values.keys()].sort((a, b) => a - b);
+    const start = periods[0]!;
+    const end = periods.at(-1)!;
+    // Dense with nulls: a gap costs four bytes, a repeated month string costs ten.
+    return { k, s: periodKey(start), v: Array.from({ length: end - start + 1 }, (_, offset) => values.get(start + offset) ?? null) };
+  });
+}
+
+export function unpackCategoryFacts(series: PackedCategorySeries[]): CategoryFactInput[] {
+  return series.flatMap(({ k, s, v }) => {
+    const [categoryId, measure] = k.split(":") as [string, CategoryFactInput["measure"]];
+    const start = periodFromKey(s);
+    return v.flatMap((value, offset) =>
+      value === null ? [] : [{ categoryId, measure, period: periodKey(start + offset), value }],
+    );
+  });
+}
+
+export function buildCategoryIndex(facts: CategoryFactInput[], weights: ServedBasketWeightRow[]): CategoryIndex {
   const values = new Map<string, Map<number, number>>();
   const levels = new Map<string, 2 | 3>();
   const children = new Map<string, string[]>();
@@ -69,10 +103,13 @@ export function buildCategoryIndex(facts: ServedCpiCategoryFact[], weights: Serv
     const group = `${fact.categoryId}:${fact.measure}`;
     if (!values.has(group)) values.set(group, new Map());
     values.get(group)!.set(periodFromKey(fact.period), fact.value);
-    levels.set(fact.categoryId, fact.level);
-    if (fact.level === 3 && fact.parentId !== null) {
-      const siblings = children.get(fact.parentId) ?? [];
-      if (!siblings.includes(fact.categoryId)) children.set(fact.parentId, [...siblings, fact.categoryId]);
+    // The ID encodes the tree, so the level and parent columns never cross the wire.
+    const subgroup = fact.categoryId.includes("_");
+    levels.set(fact.categoryId, subgroup ? 3 : 2);
+    if (subgroup) {
+      const parentId = divisionOf(fact.categoryId);
+      const siblings = children.get(parentId) ?? [];
+      if (!siblings.includes(fact.categoryId)) children.set(parentId, [...siblings, fact.categoryId]);
     }
   }
 
@@ -143,12 +180,64 @@ export function rangeFromPatch(range: ResolvedPeriodRange, patch: { start?: numb
   return start === range.min && end === range.max ? { kind: "all" } : { kind: "manual", start, end };
 }
 
+/** `cpi.cat.01_1` → `cpi.cat.01`; a division is its own. */
+function divisionOf(categoryId: string): string {
+  const underscore = categoryId.indexOf("_");
+  return underscore === -1 ? categoryId : categoryId.slice(0, underscore);
+}
+
+/**
+ * A division and one of its own subgroups overlap: summing both would show part
+ * of the basket twice and shrink the residual to hide it, so the stack would
+ * still close on the published headline while misstating what it is made of.
+ * Ticking either level therefore clears the other (2026-09-13 decision).
+ */
+function withoutOverlap(selected: string[], categoryId: string): string[] {
+  return categoryId.includes("_")
+    ? selected.filter((entry) => entry !== divisionOf(categoryId))
+    : selected.filter((entry) => entry === categoryId || divisionOf(entry) !== categoryId);
+}
+
+/** The same rule applied to a whole list: the more specific level wins. */
+function pruneOverlaps(selected: string[]): string[] {
+  const covered = new Set(selected.filter((entry) => entry.includes("_")).map(divisionOf));
+  return selected.filter((entry) => !covered.has(entry));
+}
+
 export function toggleCategory(state: CategoryState, categoryId: string, index: CategoryIndex): CategoryState {
   const next = state.selected.includes(categoryId)
     ? state.selected.filter((entry) => entry !== categoryId)
-    : [...state.selected, categoryId];
+    : withoutOverlap([...state.selected, categoryId], categoryId);
   const known = new Set(index.order);
   return { ...state, selected: next.filter((entry) => known.has(entry)).sort(byCoicop) };
+}
+
+export type CategoryPanelRow = { categoryId: string; level: 2 | 3; hasChildren: boolean; expanded: boolean; expansionLocked: boolean };
+
+/**
+ * The rows the panel lists. 43 subgroups sit behind carets, so search has to
+ * reach them: a division whose subgroup matches opens to the matches with its
+ * caret locked, as buildSeriesPanelRows does on ministries. Pass `matches: null`
+ * when the query is empty — then the manual caret alone decides.
+ */
+export function categoryPanelRows(
+  index: CategoryIndex,
+  expandedIds: string[],
+  matches: ((categoryId: string) => boolean) | null,
+): CategoryPanelRow[] {
+  return index.tree.flatMap((node) => {
+    const children = node.children;
+    const divisionMatches = matches === null || matches(node.categoryId);
+    const matched = matches === null ? children : children.filter(matches);
+    if (!divisionMatches && matched.length === 0) return [];
+    const expansionLocked = !divisionMatches;
+    const expanded = expansionLocked || expandedIds.includes(node.categoryId);
+    const shown = expanded ? (expansionLocked ? matched : children) : [];
+    return [
+      { categoryId: node.categoryId, level: 2 as const, hasChildren: children.length > 0, expanded, expansionLocked },
+      ...shown.map((categoryId) => ({ categoryId, level: 3 as const, hasChildren: false, expanded: false, expansionLocked: false })),
+    ];
+  });
 }
 
 export function toggleExpanded(state: CategoryState, categoryId: string): CategoryState {
@@ -257,7 +346,12 @@ export type CategoryIndicatorEntry = {
 
 export type CategoryIndicators = {
   period: number;
-  hero: { categoryId: string; value: number; changePct: number | null; weightPct: number | null; spark: Array<number | null> };
+  /**
+   * Null when the newest published month has no contribution yet. Weights refresh
+   * annually and CPI monthly, so a January vintage can carry rates before weights;
+   * the three rate measures below need no weights and still stand.
+   */
+  hero: { categoryId: string; value: number; changePct: number | null; weightPct: number | null; spark: Array<number | null> } | null;
   fastestRise: CategoryIndicatorEntry | null;
   /** The weakest division. `fell` says whether it actually got cheaper or merely rose least. */
   weakest: (CategoryIndicatorEntry & { fell: boolean }) | null;
@@ -308,17 +402,18 @@ export function latestCategoryIndicators(index: CategoryIndex): CategoryIndicato
     })
     .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
   const top = heroRanked[0];
-  if (!top) return null;
 
   return {
     period,
-    hero: {
-      categoryId: top.categoryId,
-      value: top.value,
-      changePct: index.values.get(`${top.categoryId}:yoy_pct`)?.get(period) ?? null,
-      weightPct: latestWeight(index, top.categoryId),
-      spark: window.map((month) => index.contributions.get(top.categoryId)?.get(month) ?? null),
-    },
+    hero: top
+      ? {
+          categoryId: top.categoryId,
+          value: top.value,
+          changePct: index.values.get(`${top.categoryId}:yoy_pct`)?.get(period) ?? null,
+          weightPct: latestWeight(index, top.categoryId),
+          spark: window.map((month) => index.contributions.get(top.categoryId)?.get(month) ?? null),
+        }
+      : null,
     fastestRise: entryFor(fastest),
     weakest: { ...entryFor(weakest), fell: weakest.changePct < 0 },
     breadth: {
@@ -351,10 +446,12 @@ export function parseCategoryHash(hash: string): CategoryState {
   }
   // Unknown categories are dropped rather than failing the page (spec §8).
   const selected = params.has("sel")
-    ? (params.get("sel") ?? "")
-        .split(",")
-        .filter((entry) => CATEGORY_ID.test(entry))
-        .sort(byCoicop)
+    ? pruneOverlaps(
+        (params.get("sel") ?? "")
+          .split(",")
+          .filter((entry) => CATEGORY_ID.test(entry))
+          .sort(byCoicop),
+      )
     : DEFAULT_CATEGORY_STATE.selected;
   const expanded = (params.get("x") ?? "").split(",").filter((entry) => CATEGORY_ID.test(entry));
   const tableSeries = CATEGORY_ID.test(params.get("t") ?? "") ? params.get("t") : null;

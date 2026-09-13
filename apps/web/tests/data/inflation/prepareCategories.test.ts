@@ -8,6 +8,7 @@ import {
   MAX_MEAN_RECONSTRUCTION_ERROR_PP,
   MAX_RECONSTRUCTION_ERROR_PP,
 } from "../../../lib/data/inflation/contributions";
+import { loadCpiFacts } from "../../../lib/data/inflation/importInflation";
 
 // One extraction of two 800 KB workbooks serves every assertion below.
 const prepared = prepareInflationCategories({ previousFacts: null });
@@ -36,6 +37,25 @@ describe("prepareInflationCategories", () => {
     const { weights, validation } = await prepared;
     expect(validation.weightYears[0]).toBe(2012);
     expect(weights.some((row) => row.categoryId === "cpi.cat.01" && row.year === 2026)).toBe(true);
+  });
+
+  // The write path computes every artifact before writing any of them, so on a
+  // monthly refresh the committed headline CSV is still a month behind. If the
+  // reconstruction silently read that CSV instead of the vintage being written,
+  // the figure in the byte-compared report would disagree with the next check.
+  it("measures the reconstruction against the headline it is given", async () => {
+    const { validation } = await prepared;
+    const facts = await loadCpiFacts();
+    const newest = facts
+      .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")
+      .map((fact) => fact.period)
+      .sort()
+      .at(-1)!;
+    const trimmed = await prepareInflationCategories({
+      previousFacts: null,
+      headlineFacts: facts.filter((fact) => fact.period !== newest),
+    });
+    expect(trimmed.validation.reconstruction.months).toBe(validation.reconstruction.months - 1);
   });
 
   it("serializes a stable, sorted CSV", async () => {

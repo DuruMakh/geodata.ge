@@ -44,10 +44,12 @@ describe("inflation hub", () => {
     expect(card.footer).toMatch(/ pp$/);
   });
 
-  it("stays a plain link when no category data is supplied", async () => {
-    const { facts } = await loadServedInflationData();
+  // Weights refresh annually and CPI monthly, so a January vintage can carry
+  // categories with no contribution yet. The card then stays a plain link.
+  it("stays a plain link when no contribution can be derived", async () => {
+    const { facts, categories } = await loadServedInflationData();
     const messages = await getMessages("en", ["inflation"]);
-    const cards = buildInflationHubCards(facts, { locale: "en", messages, englishLabels: {} });
+    const cards = buildInflationHubCards(facts, { locale: "en", messages, englishLabels: {} }, categories, []);
     expect(cards[1]!.href).toBe("/explorer/inflation/categories");
     expect(cards[1]!.series).toBeNull();
     expect(cards[1]!.footer).toBeNull();

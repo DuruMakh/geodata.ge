@@ -106,11 +106,14 @@ export function StackedColumnChart({
   });
   const labelIndices = new Set(periodLabelIndices(periods, 12));
 
+  // The move-to goes on the first point that exists, not on index 0: an overlay
+  // starting later than the columns would otherwise open the path with "L".
+  const overlayFirst = overlay === null ? -1 : overlay.values.findIndex((value) => value !== null);
   const overlayPath =
     overlay === null
       ? null
       : overlay.values
-          .map((value, index) => (value === null ? null : `${index === 0 ? "M" : "L"}${x(index)},${y(value)}`))
+          .map((value, index) => (value === null ? null : `${index === overlayFirst ? "M" : "L"}${x(index)},${y(value)}`))
           .filter((entry): entry is string => entry !== null)
           .join(" ");
 
@@ -122,8 +125,10 @@ export function StackedColumnChart({
           .filter((entry): entry is { segment: StackSegment; value: number } => entry.value !== null && entry.value !== undefined);
 
   return (
-    <figure className="m-0" role="img" aria-label={ariaLabel}>
-      <svg viewBox={`0 0 ${W} ${H}`} className="block w-full" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    // role="img" belongs on the svg, not the figure: it is children-presentational,
+    // so on the figure it would hide the sr-only figcaption that carries the numbers.
+    <figure className="m-0">
+      <svg viewBox={`0 0 ${W} ${H}`} className="block w-full" preserveAspectRatio="xMidYMid meet" role="img" aria-label={ariaLabel}>
         {lattice !== null && (
           <g fill="var(--rule)">
             {Array.from({ length: Math.floor(plotWidth / lattice.colPitch) + 1 }, (_, column) =>

@@ -3,9 +3,11 @@
 import { useState, type ReactNode } from "react";
 import { MISSING } from "../../lib/explorer/format";
 import {
+  categoryPanelRows,
   categoryValues,
   latestWeight,
   panelValue,
+  type CategoryPanelRow,
   type CategoryIndex,
   type CategoryState,
   type ResolvedPeriodRange,
@@ -42,22 +44,19 @@ export function InflationCategoryPanel({
   const { messages } = useI18n();
   const [query, setQuery] = useState("");
 
-  const rowFor = (categoryId: string, level: 2 | 3, hasChildren: boolean) => ({
-    categoryId,
-    level,
-    hasChildren,
-    label: categoryLabel(messages, categoryId),
+  const rowFor = (row: CategoryPanelRow) => ({
+    ...row,
+    label: categoryLabel(messages, row.categoryId),
     // A category with no value on the active tab shows an em dash and stays out
     // of the chart, exactly as core inflation does on the overview's index tab.
-    value: categoryValues(index, categoryId, state.tab) === undefined ? null : panelValue(index, categoryId, state, range),
-    weight: latestWeight(index, categoryId),
+    value:
+      categoryValues(index, row.categoryId, state.tab) === undefined ? null : panelValue(index, row.categoryId, state, range),
+    weight: latestWeight(index, row.categoryId),
   });
 
-  const rows = index.tree.flatMap((node) => [
-    rowFor(node.categoryId, 2, node.children.length > 0),
-    ...(state.expanded.includes(node.categoryId) ? node.children.map((child) => rowFor(child, 3, false)) : []),
-  ]);
-  const visible = rows.filter((row) => matchesLabelQuery(query, [row.label, row.categoryId]));
+  const matches = query.trim().length === 0 ? null : (categoryId: string) =>
+    matchesLabelQuery(query, [categoryLabel(messages, categoryId), categoryId]);
+  const visible = categoryPanelRows(index, state.expanded, matches).map(rowFor);
   const divisionCount = index.tree.length;
   const selectedDivisions = state.selected.filter((categoryId) => !categoryId.includes("_")).length;
   const selectedSubgroups = state.selected.filter((categoryId) => categoryId.includes("_")).length;
@@ -90,12 +89,14 @@ export function InflationCategoryPanel({
             color={categoryColor(row.categoryId)}
             value={row.value === null ? MISSING : formatCategoryValue(row.value, state.tab)}
             meta={formatWeight(row.weight)}
+            metaLabel={message(messages, "inflation.basketShare")}
             selected={state.selected.includes(row.categoryId)}
             level={String(row.level)}
             parentId={row.level === 3 ? row.categoryId.split("_")[0] : null}
             showCaretColumn
             hasChildren={row.hasChildren}
-            expanded={state.expanded.includes(row.categoryId)}
+            expanded={row.expanded}
+            expansionLocked={row.expansionLocked}
             expansionLabel={message(messages, "inflation.categorySubgroups")}
             isChild={row.level === 3}
             showRail={row.level === 3 && state.selected.includes(row.categoryId)}

@@ -55,6 +55,11 @@ describe("buildInflationCategoryWorkbookExportModel", () => {
     const model = buildInflationCategoryWorkbookExportModel(contribInput);
     expect(model.analysis.headers).toContain("COICOP კოდი");
     expect(model.analysis.rows[0]).toHaveLength(model.analysis.headers.length);
+    // The basket share is a fraction under Excel's own percent format, so the
+    // two have to agree: an 11.4% share is 0.114, never 0.00114 and never 11.4.
+    const transport = model.analysis.rows.find((row) => row[3] === "07")!;
+    expect(transport[5]).toBeCloseTo(0.114, 6);
+    expect(model.analysis.numericFormats?.[6]).toBe("0.0%");
   });
 
   it("names the file after the tab and range", () => {

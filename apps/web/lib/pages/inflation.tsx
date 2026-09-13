@@ -6,6 +6,8 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
+import { categoryFactInput } from "../data/inflation/types";
+import { packCategoryFacts } from "../explorer/inflationCategories";
 import { buildInflationHubCards } from "../explorer/inflationHubCards";
 import type { InflationWorkbookSource } from "../explorer/inflationWorkbook";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
@@ -144,7 +146,14 @@ export async function renderInflationCategories(locale: Locale) {
           { name: t("inflation.categoriesHeading"), path: pageHref(CATEGORIES_PATH, locale) },
         ]}
       />
-      <InflationCategories facts={categories} weights={weights} headline={headline} sources={sources} siteOrigin={resolveSiteUrl()} />
+      <InflationCategories
+        facts={packCategoryFacts(categories.map(categoryFactInput))}
+        weights={weights}
+        headline={headline}
+        lastReviewedAt={categories.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
+        sources={sources}
+        siteOrigin={resolveSiteUrl()}
+      />
     </I18nProvider>
   );
 }

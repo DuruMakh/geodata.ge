@@ -36,8 +36,9 @@ export function legendLabels(edges: readonly number[]): string[] {
   return [`< ${edges[0]}%`, ...edges.slice(0, -1).map((edge, index) => `${edge}–${edges[index + 1]}%`), `≥ ${edges.at(-1)}%`];
 }
 
-export function legendLabelsPp(edges: readonly number[]): string[] {
-  return [`< ${edges[0]} პპ`, ...edges.slice(0, -1).map((edge, index) => `${edge}–${edges[index + 1]} პპ`), `≥ ${edges.at(-1)} პპ`];
+/** The unit is passed in: `%` is language-neutral, `პპ` / `pp` is not. */
+export function legendLabelsPp(edges: readonly number[], unit: string): string[] {
+  return [`< ${edges[0]} ${unit}`, ...edges.slice(0, -1).map((edge, index) => `${edge}–${edges[index + 1]} ${unit}`), `≥ ${edges.at(-1)} ${unit}`];
 }
 
 function luminance(hex: string): number {

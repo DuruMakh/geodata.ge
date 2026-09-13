@@ -44,7 +44,7 @@ export function InflationCategoryTable({
   const options = tableSeriesOptions(index, state);
   const edges = state.tab === "yoy" ? YOY_BINS : state.tab === "mom" ? MOM_BINS : CONTRIBUTION_BINS;
   const rows = buildMonthGrid({ values: categoryValues(index, active, state.tab)!, range, edges });
-  const legend = state.tab === "contrib" ? legendLabelsPp(edges) : legendLabels(edges);
+  const legend = state.tab === "contrib" ? legendLabelsPp(edges, t("pp")) : legendLabels(edges);
 
   return (
     <MonthGridTable

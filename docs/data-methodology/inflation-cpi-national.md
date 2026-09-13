@@ -56,7 +56,7 @@ separates them. Georgian and English labels are Geostat wording, taken from the
 
 **Gaps are permitted for categories and never for the national series.** A
 category may start late, end early, or skip interior months;
-`validateCategoryFacts` records each discontinuity in
+`validateCategoryFacts` records each interior gap in
 `data/reports/inflation-cpi-validation.json` rather than failing. In the 2026-08
 vintage: 04.2 (imputed rentals) and 08.1 (postal services) end 2011-12; 08.2
 starts 2011-01, 09.2 starts 2015-01, 09.6 starts 2020-01; 12.5 and 12.6 have one
@@ -149,4 +149,4 @@ The national index is a weighted mean of city indices. Core has no published ind
 
 `InflationCpiFact`, `InflationTarget`, `InflationCategoryFact` and `InflationBasketWeight` mirror the four CSVs with exact parity in `npm run data:import` (`docs/data-methodology/database-import.md`). Serving code (`importInflation.ts`) never loads the workbook reader or `prepareInflation.ts` (`tests/data/inflation/servingBoundary.test.ts`). The processed-data download `/downloads/data/inflation-cpi-national.csv` is a copy of the canonical CSV made before the build and checked after it (`data:check-inflation-public` in `postbuild`).
 
-The seven registered sources also appear in `sources.json` and MCP `get_sources`, although MCP serves no inflation figures. Because each refresh edits `source-documents.csv`, it changes the fact-query snapshot's `dataVersion` (MCP clients passing `expectedDataVersion` see `data_version_changed` monthly) and the site-wide last-modified date used by the sitemap and the footer's "Last updated", including the inflation footer note.
+The eight registered sources also appear in `sources.json` and MCP `get_sources`, although MCP serves no inflation figures. Because each refresh edits `source-documents.csv`, it changes the fact-query snapshot's `dataVersion` (MCP clients passing `expectedDataVersion` see `data_version_changed` monthly) and the site-wide last-modified date used by the sitemap and the footer's "Last updated", including the inflation footer note.

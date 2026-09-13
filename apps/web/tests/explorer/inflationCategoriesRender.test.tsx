@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { InflationCategories } from "../../components/inflation/inflation-categories";
+import { packCategoryFacts } from "../../lib/explorer/inflationCategories";
 import common from "../../lib/i18n/messages/ka/common.json";
 import inflation from "../../lib/i18n/messages/ka/inflation.json";
 import main from "../../lib/i18n/messages/ka/main.json";
@@ -7,9 +8,10 @@ import { fixtureFacts, fixtureHeadline, fixtureWeights } from "./fixtures/inflat
 import { renderGeorgianMarkup } from "../helpers/render-localized";
 
 const props = {
-  facts: fixtureFacts,
+  facts: packCategoryFacts(fixtureFacts),
   weights: fixtureWeights,
   headline: [...fixtureHeadline].map(([period, value]) => ({ period, value })),
+  lastReviewedAt: "2026-09-11",
   sources: [],
   siteOrigin: "https://fiscal.ge",
 };

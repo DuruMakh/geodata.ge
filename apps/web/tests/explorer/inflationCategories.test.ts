@@ -9,6 +9,9 @@ import {
   resolveCategoryRange,
   serializeCategoryHash,
   latestCategoryIndicators,
+  categoryPanelRows,
+  packCategoryFacts,
+  unpackCategoryFacts,
   toggleCategory,
 } from "../../lib/explorer/inflationCategories";
 import { fixtureFacts, fixtureWeights } from "./fixtures/inflationCategories";
@@ -121,6 +124,91 @@ describe("selection and hash", () => {
   it("drops an unknown category from the hash", () => {
     expect(parseCategoryHash("i=contrib&sel=cpi.cat.01,nonsense").selected).toEqual(["cpi.cat.01"]);
   });
+
+  // A division already contains its subgroups. Selecting both would show part of
+  // the basket twice and let the residual absorb the duplicate, so the stack
+  // would still close on the headline while misstating its composition.
+  it("clears the parent division when one of its subgroups is picked", () => {
+    const index = buildCategoryIndex(fixtureFacts, fixtureWeights);
+    const state = toggleCategory({ ...DEFAULT_CATEGORY_STATE, selected: ["cpi.cat.01", "cpi.cat.07"] }, "cpi.cat.01_1", index);
+    expect(state.selected).toEqual(["cpi.cat.01_1", "cpi.cat.07"]);
+  });
+
+  it("clears the selected subgroups when their division is picked", () => {
+    const index = buildCategoryIndex(fixtureFacts, fixtureWeights);
+    const state = toggleCategory({ ...DEFAULT_CATEGORY_STATE, selected: ["cpi.cat.01_1", "cpi.cat.07"] }, "cpi.cat.01", index);
+    expect(state.selected).toEqual(["cpi.cat.01", "cpi.cat.07"]);
+  });
+
+  it("prunes an overlapping pair arriving through the hash", () => {
+    expect(parseCategoryHash("i=contrib&sel=cpi.cat.01,cpi.cat.01_1,cpi.cat.07").selected).toEqual([
+      "cpi.cat.01_1",
+      "cpi.cat.07",
+    ]);
+  });
+});
+
+describe("packCategoryFacts", () => {
+  it("round-trips every fact, gaps included", () => {
+    const packed = packCategoryFacts(fixtureFacts);
+    const restored = unpackCategoryFacts(packed);
+    const key = (fact: { categoryId: string; measure: string; period: string; value: number }) =>
+      `${fact.categoryId}:${fact.measure}:${fact.period}=${fact.value}`;
+    expect(restored.map(key).sort()).toEqual(fixtureFacts.map(key).sort());
+  });
+
+  // The point of the format: a month costs one number, not a repeated id and date.
+  it("collapses a multi-month series into one dense run", () => {
+    const packed = packCategoryFacts([
+      fact("cpi.cat.01", "2026-06", 1),
+      fact("cpi.cat.01", "2026-07", 2),
+      fact("cpi.cat.01", "2026-08", 3),
+    ]);
+    expect(packed).toEqual([{ k: "cpi.cat.01:yoy_pct", s: "2026-06", v: [1, 2, 3] }]);
+  });
+
+  it("marks a gap with a null rather than repeating the month", () => {
+    const packed = packCategoryFacts([fact("cpi.cat.01", "2026-06", 1), fact("cpi.cat.01", "2026-08", 3)]);
+    expect(packed[0]!.v).toEqual([1, null, 3]);
+  });
+
+  it("builds the same index packed or not", () => {
+    const direct = buildCategoryIndex(fixtureFacts, fixtureWeights);
+    const viaWire = buildCategoryIndex(unpackCategoryFacts(packCategoryFacts(fixtureFacts)), fixtureWeights);
+    expect(viaWire.order).toEqual(direct.order);
+    expect(viaWire.tree).toEqual(direct.tree);
+    expect([...viaWire.contributions]).toEqual([...direct.contributions]);
+  });
+});
+
+describe("categoryPanelRows", () => {
+  const index = () => buildCategoryIndex(fixtureFacts, fixtureWeights);
+
+  it("lists divisions only until a caret is opened", () => {
+    const rows = categoryPanelRows(index(), [], null);
+    expect(rows.map((row) => row.categoryId)).toEqual(["cpi.cat.01", "cpi.cat.04", "cpi.cat.07"]);
+    expect(rows[0]!.hasChildren).toBe(true);
+  });
+
+  it("shows a division's subgroups once its caret is open", () => {
+    const rows = categoryPanelRows(index(), ["cpi.cat.01"], null);
+    expect(rows.map((row) => row.categoryId)).toContain("cpi.cat.01_1");
+  });
+
+  // The whole point of search here: 43 subgroups are invisible until a caret is
+  // opened, so filtering already-built rows would make them unreachable.
+  it("opens a collapsed division whose subgroup matches, and locks its caret", () => {
+    const rows = categoryPanelRows(index(), [], (categoryId) => categoryId === "cpi.cat.01_1");
+    expect(rows.map((row) => row.categoryId)).toEqual(["cpi.cat.01", "cpi.cat.01_1"]);
+    expect(rows[0]!.expanded).toBe(true);
+    expect(rows[0]!.expansionLocked).toBe(true);
+  });
+
+  it("leaves a name-matched division on its manual caret", () => {
+    const rows = categoryPanelRows(index(), [], (categoryId) => categoryId === "cpi.cat.01");
+    expect(rows.map((row) => row.categoryId)).toEqual(["cpi.cat.01"]);
+    expect(rows[0]!.expansionLocked).toBe(false);
+  });
 });
 
 describe("latestCategoryIndicators", () => {
@@ -130,8 +218,18 @@ describe("latestCategoryIndicators", () => {
     const latest = latestCategoryIndicators(index())!;
     expect(periodKey(latest.period)).toBe("2026-08");
     // 15.2% at an 11.4% basket share beats 5.02% at 33.6%.
-    expect(latest.hero.categoryId).toBe("cpi.cat.07");
-    expect(latest.hero.value).toBeCloseTo(1.7328, 4);
+    expect(latest.hero!.categoryId).toBe("cpi.cat.07");
+    expect(latest.hero!.value).toBeCloseTo(1.7328, 4);
+  });
+
+  // Weights refresh annually, CPI monthly, so a January vintage can carry rates
+  // with no weights yet. The three rate measures need no weights and must survive.
+  it("keeps the rate indicators when the newest month has no contribution", () => {
+    const noWeights = buildCategoryIndex(fixtureFacts, []);
+    const latest = latestCategoryIndicators(noWeights)!;
+    expect(latest.hero).toBeNull();
+    expect(latest.fastestRise!.categoryId).toBe("cpi.cat.07");
+    expect(latest.breadth.total).toBe(3);
   });
 
   it("reports the fastest price rise as a rate, not a contribution", () => {

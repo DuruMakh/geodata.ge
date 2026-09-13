@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
-import type { ServedBasketWeightRow, ServedCpiCategoryFact } from "../../lib/data/inflation/types";
+import type { ServedBasketWeightRow } from "../../lib/data/inflation/types";
 import { formatDisplayDate } from "../../lib/explorer/format";
-import { displayedValue } from "../../lib/explorer/inflationGrid";
+
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import {
   CATEGORY_TABS,
@@ -17,12 +17,14 @@ import {
   categoryCoverage,
   changeCategoryTab,
   parseCategoryHash,
+  unpackCategoryFacts,
   rangeFromPatch,
   resolveCategoryRange,
   serializeCategoryHash,
   toggleCategory,
   toggleExpanded,
   type CategoryState,
+  type PackedCategorySeries,
   type CategoryTab,
 } from "../../lib/explorer/inflationCategories";
 import { categoryColor, categoryLabel, formatContribution } from "../../lib/explorer/inflationCategoryLabels";
@@ -50,18 +52,20 @@ import { InflationCategoryTable } from "./inflation-category-table";
 const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
 export type InflationCategoriesProps = {
-  facts: ServedCpiCategoryFact[];
+  /** Packed on the server: 27,668 rows cross the wire, so they travel as dense runs. */
+  facts: PackedCategorySeries[];
   weights: ServedBasketWeightRow[];
   headline: Array<{ period: number; value: number }>;
+  lastReviewedAt: string;
   sources: InflationWorkbookSource[];
   siteOrigin: string;
 };
 
-export function InflationCategories({ facts, weights, headline, sources, siteOrigin }: InflationCategoriesProps) {
+export function InflationCategories({ facts, weights, headline, lastReviewedAt, sources, siteOrigin }: InflationCategoriesProps) {
   const presentation = useI18n();
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
-  const index = useMemo(() => buildCategoryIndex(facts, weights), [facts, weights]);
+  const index = useMemo(() => buildCategoryIndex(unpackCategoryFacts(facts), weights), [facts, weights]);
   const headlineByPeriod = useMemo(() => new Map(headline.map((row) => [row.period, row.value])), [headline]);
   const [state, setState] = useState<CategoryState>(DEFAULT_CATEGORY_STATE);
   const [ready, setReady] = useState(false);
@@ -86,7 +90,7 @@ export function InflationCategories({ facts, weights, headline, sources, siteOri
   const range = resolveCategoryRange(state, index);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   const coverage = categoryCoverage(index, "mom");
-  const lastReviewedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";
+
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
 
   const stack = buildStackModel(index, state, range, headlineByPeriod);
@@ -97,7 +101,8 @@ export function InflationCategories({ facts, weights, headline, sources, siteOri
   const latestHeadline = [...stack.headline].reverse().find((value) => value !== null) ?? null;
   const unitLine =
     state.tab === "contrib"
-      ? t("categoryUnit.contrib", { headline: latestHeadline === null ? "—" : displayedValue(latestHeadline).toFixed(2) })
+      ? // Two decimals, unrounded: displayedValue() would turn a published 5.65 into 5.70.
+        t("categoryUnit.contrib", { headline: latestHeadline === null ? "—" : latestHeadline.toFixed(2) })
       : t(`categoryUnit.${state.tab}`);
 
   function selectTab(tab: CategoryTab) {

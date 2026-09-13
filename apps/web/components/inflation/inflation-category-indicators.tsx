@@ -62,25 +62,30 @@ export function InflationCategoryIndicators({ index }: { index: CategoryIndex })
   return (
     <section data-testid="inflation-category-indicators" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
       <SectionTitle>{message(messages, "main.indicators")}</SectionTitle>
-      <div data-testid="period-kpi-cards" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-        <HeroKpi
-          label={`${t("largestContributor")} · ${periodLabel(messages, latest.period, "long")}`}
-          value={`${formatContribution(hero.value)} ${t("pp")}`}
-        >
-          <p data-testid="inflation-category-hero" className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
-            <Message
-              messages={messages}
-              id={hero.value >= 0 ? "inflation.categoryHeroRise" : "inflation.categoryHeroFall"}
-              values={{
-                monthIn: message(messages, `inflation.monthIn.${month}`),
-                category: categoryLabel(messages, hero.categoryId),
-                change: mono(hero.changePct === null ? "—" : pct(hero.changePct)),
-                share: mono(hero.weightPct === null ? "—" : `${hero.weightPct.toFixed(1)}%`),
-                value: mono(`${formatContribution(Math.abs(hero.value))} ${t("pp")}`),
-              }}
-            />
-          </p>
-        </HeroKpi>
+      <div
+        data-testid="period-kpi-cards"
+        className={`mt-[26px] grid ${hero === null ? "" : "@min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]"}`}
+      >
+        {hero !== null && (
+          <HeroKpi
+            label={`${t("largestContributor")} · ${periodLabel(messages, latest.period, "long")}`}
+            value={`${formatContribution(hero.value)} ${t("pp")}`}
+          >
+            <p data-testid="inflation-category-hero" className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
+              <Message
+                messages={messages}
+                id={hero.value >= 0 ? "inflation.categoryHeroRise" : "inflation.categoryHeroFall"}
+                values={{
+                  monthIn: message(messages, `inflation.monthIn.${month}`),
+                  category: categoryLabel(messages, hero.categoryId),
+                  change: mono(hero.changePct === null ? "—" : pct(Math.abs(hero.changePct))),
+                  share: mono(hero.weightPct === null ? "—" : `${hero.weightPct.toFixed(1)}%`),
+                  value: mono(`${formatContribution(Math.abs(hero.value))} ${t("pp")}`),
+                }}
+              />
+            </p>
+          </HeroKpi>
+        )}
         <SideKpiList kpis={sideKpis} />
       </div>
     </section>

@@ -159,7 +159,9 @@ export function buildInflationCategoryWorkbookExportModel(input: {
         t("status"),
       ],
       rows: analysisRows,
-      numericFormats: { 6: '0.0"%"', 7: contribution ? "0.00" : "0.00%" },
+      // The weight is written as a fraction, so it needs Excel's own percent
+      // format — a literal "%" suffix would render a 33.6% share as 0.3%.
+      numericFormats: { 6: "0.0%", 7: contribution ? "0.00" : "0.00%" },
     },
     sources: chosen
       .map((row) => ({

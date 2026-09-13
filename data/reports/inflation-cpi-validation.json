@@ -69,6 +69,10 @@
       2026
     ],
     "maxWeightSumErrorPct": 0.000003,
+    "weightSourceHashes": {
+      "en/basket-weights.xlsx": "7cf6f6d95099f5d4369f6ed59b2e0623cd80c782b273918d55ca79e9680ad1db",
+      "ka/basket-weights.xlsx": "e3e53072e6eadf43725ace7dd83b698a188fc5c2343530ab901b551df2b3ed3a"
+    },
     "reconstruction": {
       "months": 164,
       "maxPp": 0.5848,

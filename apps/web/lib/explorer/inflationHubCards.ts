@@ -1,5 +1,5 @@
 import { periodFromKey } from "../data/inflation/periods";
-import type { ServedBasketWeightRow, ServedCpiCategoryFact, ServedCpiFact } from "../data/inflation/types";
+import type { CategoryFactInput, ServedBasketWeightRow, ServedCpiFact } from "../data/inflation/types";
 import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import { INK } from "./colors";
@@ -19,8 +19,8 @@ const COMING_SOON = ["Basket", "Cities", "Products"] as const;
 export function buildInflationHubCards(
   facts: ServedCpiFact[],
   presentation: Presentation,
-  categories: ServedCpiCategoryFact[] = [],
-  weights: ServedBasketWeightRow[] = [],
+  categories: CategoryFactInput[],
+  weights: ServedBasketWeightRow[],
 ): HubCardModel[] {
   const t = (key: string) => message(presentation.messages, `inflation.${key}`);
   const yoy = facts

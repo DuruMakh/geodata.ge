@@ -12,8 +12,10 @@ describe("contribution bins", () => {
   });
 
   it("labels the legend in percentage points", () => {
-    expect(legendLabelsPp(CONTRIBUTION_BINS)[0]).toBe("< 0 პპ");
-    expect(legendLabelsPp(CONTRIBUTION_BINS).at(-1)).toBe("≥ 1.5 პპ");
+    expect(legendLabelsPp(CONTRIBUTION_BINS, "პპ")[0]).toBe("< 0 პპ");
+    // The unit comes from the catalogue, so the English grid never shows Georgian.
+    expect(legendLabelsPp(CONTRIBUTION_BINS, "pp")[0]).toBe("< 0 pp");
+    expect(legendLabelsPp(CONTRIBUTION_BINS, "პპ").at(-1)).toBe("≥ 1.5 პპ");
   });
 
   it("keeps every tint readable", () => {

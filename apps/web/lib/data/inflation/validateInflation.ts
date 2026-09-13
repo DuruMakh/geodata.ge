@@ -204,6 +204,9 @@ export function validateCategoryFacts(facts: CpiCategoryFact[]): { lastPeriod: s
       throw new Error(`Category ${fact.categoryId} has no parent division in the data`);
     }
   }
+  // COICOP has exactly 12 divisions (spec §4.4). Only the workbook reader enforced
+  // this, so a CSV or mirror missing one would have passed the serving-path check.
+  if (divisions.size !== 12) throw new Error(`Expected 12 COICOP divisions, found ${divisions.size}`);
 
   const gaps: string[] = [];
   let last = -Infinity;

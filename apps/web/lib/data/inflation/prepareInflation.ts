@@ -147,6 +147,8 @@ export type InflationCategoryReport = {
   weightYears: number[];
   maxWeightSumErrorPct: number;
   reconstruction: ReconstructionErrors;
+  /** Spec §12: the weights archive is evidenced here too, not only at read time. */
+  weightSourceHashes: Record<string, string>;
 };
 
 /**
@@ -155,7 +157,9 @@ export type InflationCategoryReport = {
  * derived here only to check that the parts still reconstruct the published
  * headline — they are never written to a CSV (spec §4.6).
  */
-export async function prepareInflationCategories(options: { rawRoot?: string; previousFacts?: CpiCategoryFact[] | null } = {}) {
+export async function prepareInflationCategories(
+  options: { rawRoot?: string; previousFacts?: CpiCategoryFact[] | null; headlineFacts?: CpiFact[] } = {},
+) {
   const rawRoot = options.rawRoot ?? INFLATION_RAW_ROOT;
   const vintage = await latestCpiVintage(rawRoot);
   const files = await readVerifiedCpiFiles(path.join(rawRoot, "geostat-cpi", vintage));
@@ -200,7 +204,22 @@ export async function prepareInflationCategories(options: { rawRoot?: string; pr
   const weightVintage = await latestBasketWeightVintage();
   const weightFiles = await readVerifiedBasketWeightFiles(path.join(BASKET_WEIGHTS_ROOT, weightVintage));
   const weightSource = weightFiles.find((file) => file.language === "en")!;
-  const weights: BasketWeightRow[] = readGeostatBasketWeights(weightSource.content)
+  const georgianWeights = weightFiles.find((file) => file.language === "ka")!;
+  const englishRows = readGeostatBasketWeights(weightSource.content);
+  // The Georgian twin is archived to prove identical values, so it is read and
+  // compared rather than merely hashed — the same discipline the CPI files get.
+  const georgianRows = readGeostatBasketWeights(georgianWeights.content, "ka");
+  if (englishRows.length !== georgianRows.length) throw new Error("English and Georgian weights list different categories");
+  englishRows.forEach((row, position) => {
+    const other = georgianRows[position]!;
+    if (other.coicopCode !== row.coicopCode || other.level !== row.level) {
+      throw new Error(`English and Georgian weights differ in order at ${row.coicopCode}`);
+    }
+    const left = [...row.byYear].map(([year, value]) => `${year}=${value}`).join("|");
+    const right = [...other.byYear].map(([year, value]) => `${year}=${value}`).join("|");
+    if (left !== right) throw new Error(`English and Georgian weights differ for category ${row.coicopCode}`);
+  });
+  const weights: BasketWeightRow[] = englishRows
     .flatMap((row) => {
       const { categoryId } = categoryIdFromCoicop(row.coicopCode, row.level);
       return [...row.byYear].map(([year, weightPct]) => ({
@@ -220,8 +239,11 @@ export async function prepareInflationCategories(options: { rawRoot?: string; pr
 
   const served = facts.map((fact) => ({ ...fact, value: Number(fact.value) }));
   const servedWeights = weights.map((row) => ({ ...row, weightPct: Number(row.weightPct) }));
+  // The headline must be the vintage being written, not the committed CSV: on a
+  // monthly refresh the CSV is still a month behind when this runs, and the
+  // reconstruction figures land in a byte-compared report.
   const headline = new Map(
-    (await loadCpiFacts())
+    (options.headlineFacts ?? (await loadCpiFacts()))
       .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")
       .map((fact) => [periodFromKey(fact.period), Number(fact.value)]),
   );
@@ -240,6 +262,7 @@ export async function prepareInflationCategories(options: { rawRoot?: string; pr
     gaps: coverage.gaps,
     weightYears: weightCheck.years,
     maxWeightSumErrorPct: Number(weightCheck.maxSumErrorPct.toFixed(6)),
+    weightSourceHashes: Object.fromEntries(weightFiles.map((file) => [file.local_file, file.sha256])),
     reconstruction: {
       ...reconstruction,
       maxPp: Number(reconstruction.maxPp.toFixed(4)),
@@ -307,7 +330,7 @@ export async function writeInflationArtifacts(mode: InflationArtifactMode) {
     return null;
   }
   const { facts, validation } = await prepareInflation();
-  const categories = await prepareInflationCategories();
+  const categories = await prepareInflationCategories({ headlineFacts: facts });
   const outputs: Array<[string, string]> = [
     [CPI_FACTS_FILE, serializeCpiFacts(facts)],
     [CATEGORY_FACTS_FILE, serializeCategoryFacts(categories.facts)],

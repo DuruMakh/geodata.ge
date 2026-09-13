@@ -872,7 +872,7 @@
   },
   "source.geostat_basket_weights": {
     "name": {
-      "text": "Geostat consumer basket weights",
+      "text": "Geostat consumer basket weights, %",
       "reviewedAt": "2026-09-13"
     },
     "derivation": null
