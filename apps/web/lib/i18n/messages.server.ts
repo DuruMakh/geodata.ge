@@ -3,6 +3,7 @@ import type { Locale, Messages, MessageScope } from "./types";
 const dictionaries = {
   ka: {
     sectors: () => import("./messages/ka/sectors.json"),
+    regionalEconomies: () => import("./messages/ka/regional-economies.json"),
     gdp: () => import("./messages/ka/gdp.json"),
     common: () => import("./messages/ka/common.json"),
     format: () => import("./messages/ka/format.json"),
@@ -23,6 +24,7 @@ const dictionaries = {
   },
   en: {
     sectors: () => import("./messages/en/sectors.json"),
+    regionalEconomies: () => import("./messages/en/regional-economies.json"),
     gdp: () => import("./messages/en/gdp.json"),
     common: () => import("./messages/en/common.json"),
     format: () => import("./messages/en/format.json"),

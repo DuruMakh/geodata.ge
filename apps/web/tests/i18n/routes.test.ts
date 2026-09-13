@@ -11,6 +11,7 @@ describe("language page addresses", () => {
     ["/en/explorer/debt", "en", "/en/explorer/debt"],
     ["/explorer/municipalities/06", "en", "/en/explorer/municipalities/06"],
     ["/en/explorer/municipalities/batumi", "ka", "/explorer/municipalities/batumi"],
+    ["/explorer/economy/regions/imereti", "en", "/en/explorer/economy/regions/imereti"],
     ["/methodology/expenditure?from=chart#sources", "en", "/en/methodology/expenditure?from=chart#sources"],
     ["/about", "en", "/en/about"],
     ["/connect", "en", "/en/connect"],

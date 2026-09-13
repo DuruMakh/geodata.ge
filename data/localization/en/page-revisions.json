@@ -97,5 +97,17 @@
   "/methodology/economic-sectors": "2026-09-11",
   "/explorer/inflation": "2026-09-11",
   "/explorer/inflation/overview": "2026-09-11",
-  "/methodology/inflation": "2026-09-11"
+  "/methodology/inflation": "2026-09-11",
+  "/explorer/economy/regions": "2026-09-13",
+  "/explorer/economy/regions/tbilisi": "2026-09-13",
+  "/explorer/economy/regions/adjara": "2026-09-13",
+  "/explorer/economy/regions/guria": "2026-09-13",
+  "/explorer/economy/regions/imereti": "2026-09-13",
+  "/explorer/economy/regions/kakheti": "2026-09-13",
+  "/explorer/economy/regions/mtskheta_mtianeti": "2026-09-13",
+  "/explorer/economy/regions/racha_lechkhumi_kvemo_svaneti": "2026-09-13",
+  "/explorer/economy/regions/samegrelo_zemo_svaneti": "2026-09-13",
+  "/explorer/economy/regions/samtskhe_javakheti": "2026-09-13",
+  "/explorer/economy/regions/kvemo_kartli": "2026-09-13",
+  "/explorer/economy/regions/shida_kartli": "2026-09-13"
 }

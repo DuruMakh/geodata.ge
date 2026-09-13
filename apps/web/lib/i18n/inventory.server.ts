@@ -18,6 +18,8 @@ export async function listPublicPagePaths(): Promise<string[]> {
   return [
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
     "/explorer/economy/sectors",
+    "/explorer/economy/regions",
+    ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),
     "/explorer/inflation", "/explorer/inflation/overview",
     ...BUDGET_SECTION_ORDER.map((id) => BUDGET_SECTIONS[id].href).filter((href): href is string => href !== null),
     "/explorer/municipalities/georgia",

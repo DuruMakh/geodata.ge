@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
 import { ADJARA_REGION_ID } from "../data/municipal/types";
 import { loadServedInflationData } from "../data/inflation/importInflation";
+import { loadServedRegionalEconomyData } from "../data/regionalEconomies/importRegionalEconomies";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../methodology/catalog";
 import {
   aggregateFactsForEntity,
@@ -25,14 +26,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: regionalEconomyFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
     loadServedGeneralGovernmentBalanceData(),
     loadServedInflationData(),
+    loadServedRegionalEconomyData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
+  const regionalModified = new Date(regionalEconomyFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const lastReviewedAt = sourceDocuments
     .map((source) => source.lastReviewedAt)
     .sort()
@@ -70,6 +73,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/economy`, lastModified },
     { url: `${siteUrl}/explorer/economy/gdp`, lastModified },
     { url: `${siteUrl}/explorer/economy/sectors`, lastModified },
+    { url: `${siteUrl}/explorer/economy/regions`, lastModified: regionalModified },
+    ...regions.map((region) => ({
+      url: `${siteUrl}/explorer/economy/regions/${region.id.replace("region.", "")}`,
+      lastModified: regionalModified,
+    })),
     { url: `${siteUrl}/explorer/inflation`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/inflation/overview`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
