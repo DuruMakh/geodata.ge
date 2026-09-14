@@ -80,6 +80,7 @@ export function countryLevelCaveatContext(
   years: number[],
   seriesIds: string[],
   observations: readonly Observation[],
+  comparison: CaveatContext["comparison"] = null,
 ): CaveatContext {
   return {
     datasetId,
@@ -91,7 +92,7 @@ export function countryLevelCaveatContext(
     municipalTotalInputs: [],
     municipalInputServedBy: {},
     gdpInputs: [],
-    comparison: null,
+    comparison,
     historicalJoinSeriesYears: [],
     adminCategoryYears: [],
   };
@@ -253,7 +254,7 @@ export function resolveDocumentIds(
  */
 export function caveatIdsForObservation(
   caveats: readonly Caveat[],
-  observation: { entityId: string; seriesId: string; year: number; measure: Measure },
+  observation: { entityId: string; seriesId: string; year: number; period?: string; measure: Measure },
 ): string[] {
   const seriesYear = `${observation.seriesId}:${observation.year}`;
   const entityYear = `${observation.entityId}:${observation.year}`;
@@ -268,6 +269,7 @@ export function caveatIdsForObservation(
   return caveats
     .filter(
       (caveat) =>
+        (observation.period !== undefined && caveat.affects.includes(`${observation.seriesId}:${observation.period}`)) ||
         caveat.affects.includes(seriesYear) ||
         caveat.affects.includes(entityYear) ||
         caveat.affects.includes(entitySeriesYear) ||
