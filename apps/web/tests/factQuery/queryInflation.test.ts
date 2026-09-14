@@ -90,6 +90,21 @@ describe("queryInflation", () => {
     expect(response.meta.caveats[0]!.severity).toBe("severe");
   });
 
+  // Spec §8: closure holds for ANY selection, including a partial one and subgroups,
+  // and a requested group with no contribution that month is absorbed by the residual.
+  it("closes any contribution selection on the published headline", () => {
+    const subgroups = snapshot.inflation.groups.filter((g) => g.level === "subgroup").map((g) => g.id);
+    for (const seriesIds of [["cpi.cat.01", "cpi.cat.07"], subgroups]) {
+      const cells = rows(queryInflation(snapshot, { seriesIds, measure: "contribution_pp", fromPeriod: "2024-01", toPeriod: "2026-08" }));
+      for (const period of new Set(cells.map((cell) => cell.period!))) {
+        const month = cells.filter((cell) => cell.period === period);
+        expect(month.at(-1)!.seriesId).toBe("cpi.contribution_residual");
+        const sum = month.reduce((total, row) => total + (row.value ?? 0), 0);
+        expect(Math.abs(sum - headlineYoy(period)), `${seriesIds.length} groups, ${period}`).toBeLessThan(1e-9);
+      }
+    }
+  });
+
   it("serves exactly the site's contribution arithmetic", () => {
     const divisions = snapshot.inflation.groups.filter((g) => g.level === "division").map((g) => g.id);
     const cells = rows(queryInflation(snapshot, { seriesIds: divisions, measure: "contribution_pp", fromPeriod: "2013-01", toPeriod: "2013-12" }));

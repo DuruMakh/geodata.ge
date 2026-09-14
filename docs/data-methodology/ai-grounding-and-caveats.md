@@ -280,9 +280,9 @@ Severe because the failure is provenance: a contribution quoted as a Geostat sta
 
 **Trigger.** The residual series is returned, which happens on every contribution request.
 
-**Georgian.** დანარჩენი = გამოქვეყნებული საერთო ინფლაცია გამოკლებული მოთხოვნილი ჯგუფების წვლილი: ყველაფერი, რაც არ მოითხოვეთ, და მიახლოების ცდომილება; ეს საქონლის კატეგორია არ არის.
+**Georgian.** დანარჩენი = გამოქვეყნებული საერთო ინფლაცია გამოკლებული დაბრუნებული წვლილები: ყველაფერი, რაც არ მოითხოვეთ, მოთხოვნილი ჯგუფი, რომლის წვლილიც ამ თვეში არ არის, და მიახლოების ცდომილება; ეს საქონლის კატეგორია არ არის.
 
-**English.** The residual is the published headline minus the requested groups' contributions: everything not requested plus approximation error, not a category of goods.
+**English.** The residual is the published headline minus the contributions returned: everything not requested, any requested group without a contribution that month, and approximation error; it is not a category of goods.
 
 The residual changes with the selection, so it is never a candidate in a ranking or a target of a comparison.
 

@@ -62,6 +62,11 @@ describe("inflation publications", () => {
     expect(metadata.data.url).toBe("/downloads/data/inflation-categories.csv");
     expect(metadata.catalogue.datasets[0].datasetId).toBe("inflation");
     expect(metadata.caveats.map((c: { code: string }) => c.code)).toContain("inflation_contribution_derived");
+    // The generic totals warning names parentSeriesId, a column the CSV does not have; the
+    // rule that matters here is that contributions close only within one selection.
+    expect(metadata.noticeEn).toContain("selection");
+    expect(metadata.noticeEn).toContain("cpi.contribution_residual");
+    expect(metadata.notice).toMatch(/\p{Script=Georgian}/u);
   });
 
   it("adds inflation to the published catalogue", () => {

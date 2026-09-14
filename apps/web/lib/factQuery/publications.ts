@@ -594,8 +594,8 @@ function buildInflationCategoriesJson(snapshot: FactQuerySnapshot, parts: Inflat
   const bytes = serialize({
     ...publicationHeader(snapshot),
     datasetId: "inflation",
-    notice: serviceMessage(snapshot, "ka", "publication.sumWarning"),
-    noticeEn: serviceMessage(snapshot, "en", "publication.sumWarning"),
+    notice: serviceMessage(snapshot, "ka", "publication.inflationCategoriesNotice"),
+    noticeEn: serviceMessage(snapshot, "en", "publication.inflationCategoriesNotice"),
     catalogue: catalogueData(snapshot, "inflation"),
     data: {
       url: "/downloads/data/inflation-categories.csv",

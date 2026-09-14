@@ -1,6 +1,6 @@
 {
   "caveats.inflation_contribution_derived": "Contributions are Fiscal.ge's approximation from Geostat's published price changes and basket weights, not a figure Geostat publishes.",
-  "caveats.inflation_contribution_residual": "The residual is the published headline minus the requested groups' contributions: everything not requested plus approximation error, not a category of goods.",
+  "caveats.inflation_contribution_residual": "The residual is the published headline minus the contributions returned: everything not requested, any requested group without a contribution that month, and approximation error; it is not a category of goods.",
   "caveats.inflation_contribution_weights_differ": "The consumer basket is re-weighted every January, so contributions in different years rest on different weights.",
   "caveats.inflation_target_unverified_before_2015": "No earlier numeric inflation target is verified in the reviewed sources; this does not mean none existed.",
   "comparison.basketReweighted": "The consumer basket is re-weighted between these months, so the two contributions rest on different weights.",
@@ -147,6 +147,7 @@
   "missing.seriesYear": "No value is recorded for the selected series in {year}; this does not mean zero.",
   "missing.totalDenominator": "The applicable total for this year is unavailable or not positive, so the share cannot be calculated.",
   "publication.catalogueNotice": "This reviewed catalogue identifies the available datasets, entities and series. Numerical values are in the individual files.",
+  "publication.inflationCategoriesNotice": "Rates never sum. The CSV holds year-on-year and month-on-month rates for every group, then contributions (contribution_pp) for the divisions and for the subgroups, each selection with its own residual. Contributions add up to the published headline only within one selection plus its cpi.contribution_residual row; summing across selections double-counts.",
   "publication.sourcesNotice": "A document with role=\"derivation_upstream\" is an input to a calculation, not a publication of the final figure.",
   "publication.sumWarning": "This file contains totals and their component rows. Summing all rows double-counts amounts; use level and parentSeriesId.",
   "ranking.ascending": "ascending",

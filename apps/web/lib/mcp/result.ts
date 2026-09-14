@@ -147,7 +147,7 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   if (response.kind === "observations") {
     const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number; excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
     return [
-      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyear\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinitionKa\tdefinitionEn\tmissingReasonEn\tcaveats\tentityId\tseriesId\tsourceIds\tdocumentIds",
+      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearOrPeriod\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinitionKa\tdefinitionEn\tmissingReasonEn\tcaveats\tentityId\tseriesId\tsourceIds\tdocumentIds",
       ...observations.map(observationLine),
       `returned ${coverage.returnedCount} of ${coverage.expectedCount} requested cells`,
       ...excludedLines(coverage),
@@ -157,7 +157,7 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   if (response.kind === "comparisons") {
     const { comparisons, coverage } = data as { comparisons: Comparison[]; coverage: { excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
     return [
-      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyears\tmeasure\tfrom\tto\tfromBasis\ttoBasis\tchange\tpct\tpp\tunit\tcomparability\treasonsKa\treasonsEn\tfromDefinitionKa\tfromDefinitionEn\ttoDefinitionKa\ttoDefinitionEn\tfromMissingKa\tfromMissingEn\ttoMissingKa\ttoMissingEn\tcaveats\tentityId\tseriesId\tfromSources\tfromDocuments\ttoSources\ttoDocuments",
+      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearsOrPeriods\tmeasure\tfrom\tto\tfromBasis\ttoBasis\tchange\tpct\tpp\tunit\tcomparability\treasonsKa\treasonsEn\tfromDefinitionKa\tfromDefinitionEn\ttoDefinitionKa\ttoDefinitionEn\tfromMissingKa\tfromMissingEn\ttoMissingKa\ttoMissingEn\tcaveats\tentityId\tseriesId\tfromSources\tfromDocuments\ttoSources\ttoDocuments",
       ...comparisons.map(comparisonLine),
       ...excludedLines(coverage),
     ];

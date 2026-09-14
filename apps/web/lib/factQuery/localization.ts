@@ -117,6 +117,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "missing.seriesYear",
   "missing.totalDenominator",
   "publication.catalogueNotice",
+  "publication.inflationCategoriesNotice",
   "publication.sourcesNotice",
   "publication.sumWarning",
   "ranking.ascending",
