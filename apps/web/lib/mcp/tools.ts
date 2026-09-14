@@ -185,7 +185,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "Order series or entities by value or by change. `metric: value` requires `year`; the change " +
       "metrics require `fromYear` and `toYear` (cross-field rules the JSON Schema cannot express). " +
       "Ranking municipalities requires `entityType` and exactly one `seriesId`. Reports ties and " +
-      "says when the cutoff splits one, and names every excluded candidate with its reason.",
+      "says when the cutoff splits one, and names every excluded candidate with its reason. For inflation: dimension series, " +
+      "level division or subgroup (optionally parentSeriesId), and period with metric value or fromPeriod and toPeriod with percentage_point_change.",
     schema: rankInput,
     run: (snapshot, input) => rank(snapshot, input),
   },

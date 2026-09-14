@@ -146,34 +146,52 @@ export const rankInput = z
   .strictObject({
     // Deliberately excludes government-debt and general-government-balance:
     // both are country-level, so there is nothing to rank.
-    datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure"]),
+    datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "inflation"]),
     dimension: z.enum(["series", "entities"]),
-    level: z.enum(["admin_category", "major_program"]).optional(),
-    parentSeriesId: z.string().optional().describe("Only for ministries with level major_program; filters programs to their administrative parent."),
+    level: z.enum(["admin_category", "major_program", "division", "subgroup"]).optional(),
+    parentSeriesId: z.string().optional().describe("For ministries with level major_program, or inflation with level subgroup: filters to that parent."),
     entityType: z.enum(["municipality", "region"]).optional(),
     seriesId: z.string().optional(),
     withinRegionId: z.string().optional().describe("Only for municipal rankings with entityType municipality; obtain the region id from describe_coverage."),
     year: z.number().int().optional(),
     fromYear: z.number().int().optional(),
     toYear: z.number().int().optional(),
-    measure: z.enum(["amount_gel", "share_of_total_pct", "share_of_gdp_pct", "gel_per_resident"]),
+    period: periodKeySchema.optional().describe("Inflation only, with metric value: the month to rank, YYYY-MM."),
+    fromPeriod: periodKeySchema.optional().describe("Inflation only, with percentage_point_change: the earlier month."),
+    toPeriod: periodKeySchema.optional().describe("Inflation only, with percentage_point_change: the later month."),
+    measure: z.enum(["amount_gel", "share_of_total_pct", "share_of_gdp_pct", "gel_per_resident", "yoy_pct", "mom_pct", "contribution_pp"]),
     metric: z.enum(["value", "absolute_change", "percentage_change", "percentage_point_change"]),
     order: z.enum(["descending", "ascending"]).default("descending"),
     limit: z.number().int().min(1).max(100).default(10),
     expectedDataVersion,
   })
-  .refine((input) => (input.metric === "value" ? input.year !== undefined : input.fromYear !== undefined && input.toYear !== undefined), {
+  .refine((input) => input.datasetId === "inflation" || (input.metric === "value" ? input.year !== undefined : input.fromYear !== undefined && input.toYear !== undefined), {
     message: "value ranking needs one year; change rankings need fromYear and toYear",
+  })
+  .refine((input) => input.datasetId !== "inflation" || (input.metric === "value" ? input.period !== undefined : input.fromPeriod !== undefined && input.toPeriod !== undefined), {
+    message: "inflation value ranking needs one period; change rankings need fromPeriod and toPeriod",
   })
   .superRefine((input, context) => {
     const municipal = input.datasetId === "municipal-expenditure";
     const ministries = input.datasetId === "ministries";
+    const inflation = input.datasetId === "inflation";
+    const ministriesLevel = input.level === "admin_category" || input.level === "major_program";
+    const inflationLevel = input.level === "division" || input.level === "subgroup";
+    if (inflation && input.level === undefined) {
+      context.addIssue({ code: "custom", path: ["level"], message: "inflation rankings need level division or subgroup." });
+    }
     const invalid = [
       !municipal && input.entityType !== undefined ? "entityType" : null,
       !municipal && input.seriesId !== undefined ? "seriesId" : null,
       (!municipal || input.entityType !== "municipality") && input.withinRegionId !== undefined ? "withinRegionId" : null,
-      !ministries && input.level !== undefined ? "level" : null,
-      (!ministries || input.level !== "major_program") && input.parentSeriesId !== undefined ? "parentSeriesId" : null,
+      input.level !== undefined && !(ministries && ministriesLevel) && !(inflation && inflationLevel) ? "level" : null,
+      input.parentSeriesId !== undefined && !(ministries && input.level === "major_program") && !(inflation && input.level === "subgroup") ? "parentSeriesId" : null,
+      inflation && (input.year !== undefined || input.fromYear !== undefined || input.toYear !== undefined) ? "year" : null,
+      !inflation && (input.period !== undefined || input.fromPeriod !== undefined || input.toPeriod !== undefined) ? "period" : null,
+      // Mirrors errors.rankValueYearOnly / errors.rankChangeYears for months: a
+      // stray field must be refused, never silently ignored.
+      inflation && input.metric === "value" && (input.fromPeriod !== undefined || input.toPeriod !== undefined) ? "fromPeriod" : null,
+      inflation && input.metric !== "value" && input.period !== undefined ? "period" : null,
     ];
     for (const field of invalid) {
       if (field !== null) context.addIssue({ code: "custom", path: [field], message: `${field} does not apply to this ranking mode; omit it or choose its supported mode.` });
