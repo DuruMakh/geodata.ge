@@ -95,7 +95,7 @@ Input: `{ seriesIds, measure, fromPeriod, toPeriod, expectedDataVersion? }`, per
 
 - Monthly measures return one cell per series per month in the range.
 - `basket_weight_pct` returns one cell per series per calendar year the range touches.
-- The request is sized before calculation against the existing 500-cell limit as series × months (or × years for weights); oversized requests return `result_too_large` naming the inflation CSVs.
+- The request is sized before calculation against the existing 500-cell limit as series × months (or × years for weights); oversized requests return the existing `result_too_large` error, which points to the bulk data manifest that lists the inflation files.
 - Errors, all from the published enum: `unknown_series` with `validChoices`; `unsupported_measure` with the series' valid measures; `year_out_of_range` naming the available period range; `invalid_parameters` for a malformed or reversed range or a mixed-level contribution request; `data_version_changed`.
 
 The description is built from the snapshot like every other tool: period ranges are read from the facts, not written in.
