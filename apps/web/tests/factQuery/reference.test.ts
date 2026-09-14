@@ -16,6 +16,8 @@ import { getSources } from "../../lib/factQuery/getSources";
 import { queryMinistries } from "../../lib/factQuery/queryMinistries";
 import { queryDebt } from "../../lib/factQuery/queryDebt";
 import { queryDeficit } from "../../lib/factQuery/queryDeficit";
+import { queryEconomicSectors } from "../../lib/factQuery/queryEconomicSectors";
+import { queryGdp } from "../../lib/factQuery/queryGdp";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { rank } from "../../lib/factQuery/rank";
@@ -39,6 +41,8 @@ function run(tool: string, args: unknown): FactQueryResponse {
     query_municipal: (input) => queryMunicipal(snapshot, input),
     query_debt: (input) => queryDebt(snapshot, input),
     query_deficit: (input) => queryDeficit(snapshot, input),
+    query_gdp: (input) => queryGdp(snapshot, input),
+    query_economic_sectors: (input) => queryEconomicSectors(snapshot, input),
     compare: (input) => compare(snapshot, input),
     rank: (input) => rank(snapshot, input),
     get_sources: (input) => getSources(snapshot, input),
@@ -61,10 +65,11 @@ describe("section 14.3 bilingual reference fixture", () => {
   // Spec section 14.3 fixed 20; four more were added on 2026-09-04 when debt
   // and the general government balance began being served, covering a recorded
   // debt year, a projected service year, a documented rate gap, and a signed
-  // deficit.
-  it("covers 24 intents, each asked in both languages", () => {
-    expect(REFERENCE_INTENTS).toHaveLength(24);
-    expect(REFERENCE_INTENTS.map((intent) => intent.id)).toEqual(Array.from({ length: 24 }, (_, i) => i + 1));
+  // deficit. Four more on 2026-09-14 for GDP and economic sectors: a published
+  // GDP year, a preliminary one, a sector share of GDP, and a missing growth year.
+  it("covers 28 intents, each asked in both languages", () => {
+    expect(REFERENCE_INTENTS).toHaveLength(28);
+    expect(REFERENCE_INTENTS.map((intent) => intent.id)).toEqual(Array.from({ length: 28 }, (_, i) => i + 1));
 
     for (const intent of REFERENCE_INTENTS) {
       expect(intent.promptKa.length, `intent ${intent.id} promptKa`).toBeGreaterThan(10);

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { serverInstructions } from "../../lib/mcp/instructions";
+import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
 
 async function connected(): Promise<Client> {
@@ -199,6 +201,54 @@ describe("MCP tool surface", () => {
 
     expect(instructions).toContain("consolidated budget RECEIPTS");
     expect(instructions).toContain("STATE-BUDGET expenditure");
+  });
+
+  // The sector bullet carried its measure years as text ("cover2010–2025"), so
+  // they would have gone stale on the next data refresh - and lost their spaces
+  // on the way in.
+  it("states economic-sector measure years from the data", async () => {
+    const snapshot = loadPackagedSnapshot();
+    const range = (measure: string) => {
+      const years = snapshot.economicSectors.facts.filter((fact) => fact.measure === measure).map((fact) => fact.year);
+      return `${Math.min(...years)}-${Math.max(...years)}`;
+    };
+    const { tools } = await (await connected()).listTools();
+    const sectors = tools.find((tool) => tool.name === "query_economic_sectors")!;
+
+    expect(sectors.description).toContain(`shares cover ${range("nominal")}`);
+    expect(sectors.description).toContain(`real growth covers ${range("real_growth")}`);
+    const filled = serverInstructions({}, ENTITY_COUNTS, { amount_gel: "1999-2001", real_growth_pct: "2000-2001" });
+    expect(filled).toContain("shares cover 1999-2001");
+    expect(filled).toContain("real growth covers 2000-2001");
+    expect(serverInstructions({}, ENTITY_COUNTS)).toContain("shares cover see describe_coverage");
+  });
+
+  it("counts the datasets describe_coverage searches rather than naming a number", async () => {
+    const snapshot = loadPackagedSnapshot();
+    const catalogue = describeCoverage(snapshot, {});
+    if (catalogue.kind !== "catalogue") throw new Error("Expected catalogue");
+    const count = (catalogue.data as { datasets: unknown[] }).datasets.length;
+    const { tools } = await (await connected()).listTools();
+
+    expect(tools.find((tool) => tool.name === "describe_coverage")!.description).toContain(`all ${count} datasets`);
+  });
+
+  it("never glues a number to the word before it", async () => {
+    const { tools } = await (await connected()).listTools();
+    const texts = [...tools.map((tool) => tool.description ?? ""), serverInstructions({}, ENTITY_COUNTS)];
+    for (const text of texts) expect(text).not.toMatch(/[a-z]\d/i);
+  });
+
+  // GDP is served in USD, constant-2015 USD and percent, and carries published
+  // and preliminary statuses. Telling a client that every amount is nominal GEL
+  // with an actual/planned/projection basis is false of two datasets.
+  it("does not describe every value as nominal GEL with a budget basis", () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+
+    expect(instructions).not.toContain("All amounts are nominal GEL");
+    expect(instructions).toContain('"published"');
+    expect(instructions).toContain('"preliminary"');
+    expect(instructions).toContain("real_growth_pct");
   });
 
   it("keeps every tool name in the advertised set", () => {

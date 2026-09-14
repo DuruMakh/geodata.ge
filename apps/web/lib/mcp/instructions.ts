@@ -10,7 +10,11 @@
 // data, and nothing here is a substitute for reading the caveats a response
 // actually returns.
 
+import type { SECTOR_QUERY_MEASURES } from "../factQuery/economicSectorsSeries";
 import type { DatasetId } from "../factQuery/types";
+
+/** `2010-2025` per sector query measure; the measures do not share a first year. */
+export type SectorMeasureYears = Partial<Record<keyof typeof SECTOR_QUERY_MEASURES, string>>;
 
 /**
  * Built from the snapshot's own catalogue rather than written down.
@@ -24,17 +28,20 @@ import type { DatasetId } from "../factQuery/types";
 export function serverInstructions(
   coverage: Partial<Record<DatasetId, string>>,
   entities: { municipalities: number; regions: number },
+  sectorMeasureYears: SectorMeasureYears = {},
 ): string {
   const range = (id: DatasetId) => coverage[id] ?? "see describe_coverage";
+  const sectorRange = (measure: keyof SectorMeasureYears) => sectorMeasureYears[measure] ?? "see describe_coverage";
 
-  return `Fiscal.ge serves reviewed annual data on Georgia's state and municipal budgets and GDP.
+  return `Fiscal.ge serves reviewed annual data on Georgia's state and municipal budgets,
+government debt and fiscal balance, GDP and national economic sectors.
 
 WHAT IS SERVED
 - National economic sectors, ${range("economic-sectors")}, through query_economic_sectors.
   Twenty NACE Rev.2 activities and a separately published Total GDP reference.
-  Nominal GEL and GDP shares cover2010–2025; annual real growth covers2011–2025.
+  Nominal GEL and GDP shares cover ${sectorRange("amount_gel")}; annual real growth covers ${sectorRange("real_growth_pct")}.
   Inspect yearsByMeasure in describe_coverage. Sectors are GVA at basic prices;
-  shares divide by market-price GDP and need not sum to100%. Growth7.5 means7.5%.
+  shares divide by market-price GDP and need not sum to 100%. Growth 7.5 means 7.5%.
   No regional sectors, rankings, contributions or cumulative sector comparisons.
 - GDP overview, ${range("gdp-overview")}, through query_gdp. Choose one or more of
   six discovered series IDs; each fixes its units and price basis. Real GDP is
@@ -83,15 +90,21 @@ is no such thing as a partial answer assembled from outside sources: if the data
 does not cover the question, say so.
 
 UNITS AND VALUES
-- All amounts are nominal GEL at current prices. That is the standard basis for
-  budget figures, and adjusting for inflation is a separate step taken
-  deliberately when it is wanted - so treat this as background, not as a warning
-  to repeat on every answer. Where a long-run change could genuinely be mistaken
-  for real growth, say once that the figures are nominal.
-- share_of_total_pct and share_of_gdp_pct are percentages; gel_per_resident is
+- Budget, municipal and debt amounts are nominal GEL at current prices. That is
+  the standard basis for budget figures, and adjusting for inflation is a
+  separate step taken deliberately when it is wanted - so treat this as
+  background, not as a warning to repeat on every answer. Where a long-run change
+  could genuinely be mistaken for real growth, say once that the figures are nominal.
+- GDP and sector figures are NOT all GEL. Every observation states its unit:
+  current GEL or USD, constant-2015 USD, GEL or USD per person, or percent. Read
+  the unit, and never convert between currencies or price bases yourself.
+- share_of_total_pct, share_of_gdp_pct, rate_percent, real_growth_pct and GDP
+  growth are percentages: 7.5 means 7.5%, not a fraction. gel_per_resident is
   GEL per resident using the reviewed population denominator.
-- basis is "actual", "planned", or "projection". For budget facts where both
-  actual and planned exist, actual is served and wins.
+- basis is "actual", "planned" or "projection" for budget, debt and balance
+  figures, and "published" or "preliminary" for GDP and sector figures. For
+  budget facts where both actual and planned exist, actual is served and wins.
+  A preliminary figure can still be revised; say so when one is in the answer.
 - availability "missing" means the reviewed data does not contain that cell.
   Never estimate it, interpolate it, infer it from neighbouring years, or report
   it as zero. Missing is not zero, and zero is a real reviewed value.

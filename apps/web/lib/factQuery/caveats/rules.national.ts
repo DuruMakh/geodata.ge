@@ -1,5 +1,5 @@
 // apps/web/lib/factQuery/caveats/rules.national.ts
-import type { CaveatRule } from "./engine";
+import type { CaveatContext, CaveatRule } from "./engine";
 
 const NATIONAL_TOTAL_IDS = new Set(["revenue.total", "expenditure.total"]);
 const NATIONAL_DATASET_IDS = new Set(["national-revenue", "national-expenditure"]);
@@ -159,7 +159,23 @@ export const NATIONAL_CAVEAT_RULES: readonly CaveatRule[] = [
     messageKey: "caveats.gdp_preliminary",
     methodologyRef: "national-nominal-gdp.md",
     methodologyRefEn: "/en/methodology/expenditure",
-    applies: (c) => c.measure === "share_of_gdp_pct" && c.gdpInputs.some((g) => c.years.includes(g.year) && g.status === "preliminary"),
-    affects: (c) => c.gdpInputs.filter((g) => c.years.includes(g.year) && g.status === "preliminary").map((g) => `gdp:${g.year}`),
+    applies: (c) => preliminaryGdpCells(c).length > 0,
+    affects: preliminaryGdpCells,
   },
 ];
+
+/**
+ * One code for one fact - a GDP figure still marked preliminary - whether that
+ * figure is the denominator of a budget share or the GDP overview's own value.
+ * The GDP overview used to emit the same code inline with a different message,
+ * so the catalogue described one meaning while clients received another.
+ */
+function preliminaryGdpCells(c: CaveatContext): string[] {
+  if (c.measure === "share_of_gdp_pct") {
+    return c.gdpInputs.filter((g) => c.years.includes(g.year) && g.status === "preliminary").map((g) => `gdp:${g.year}`);
+  }
+  if (c.datasetId === "gdp-overview") {
+    return c.observations.filter((o) => o.basis === "preliminary").map((o) => `${o.seriesId}:${o.year}`);
+  }
+  return [];
+}

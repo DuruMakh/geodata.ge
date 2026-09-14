@@ -89,7 +89,7 @@ describe("bilingual comparisons and evidence", () => {
     expect(response.error.messageEn).toBe("Unrecognised source: unknown-source.");
     for (const rule of CAVEAT_RULES) {
       expect(serviceMessage(snapshot, "en", rule.messageKey).trim()).not.toBe("");
-      expect(rule.methodologyRefEn).toMatch(/^\/en\/(methodology\/(expenditure|revenue|municipalities|debt)|explorer\/deficit)$/);
+      expect(rule.methodologyRefEn).toMatch(/^\/en\/(methodology\/(expenditure|revenue|municipalities|debt|gdp|economic-sectors)|explorer\/deficit)$/);
     }
   });
 });

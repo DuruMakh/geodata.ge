@@ -62,7 +62,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-30 codes are registered.
+33 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -75,6 +75,9 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `revenue_internal_flows_netted` | note | `breaks` | `revenue-methodology.md` |
 | `gdp_sna_break_2010` | note | `limits` | `national-nominal-gdp.md` |
 | `gdp_preliminary` | note | `none` | `national-nominal-gdp.md` |
+| `gdp_historical_method` | note | `limits` | `gdp-overview.md` |
+| `gdp_world_bank_history` | note | `none` | `gdp-overview.md` |
+| `sectors_preliminary` | note | `none` | `economic-sectors.md` |
 | `municipality_not_territorial` | severe | `none` | `municipal-functional-annual-2015-2025.md` |
 | `municipal_country_scope` | note | `none` | `municipal-functional-annual-2015-2025.md` |
 | `adjara_consolidation_applied` | note | `none` | `municipal-functional-annual-2015-2025.md` |
@@ -201,13 +204,55 @@ The GDP denominator switches from SNA 1993 to SNA 2008 at 2010. A percentage-poi
 **Comparison effect:** `none`  
 **Owner document:** `national-nominal-gdp.md`
 
-**Trigger.** A GDP-share request using a GDP figure still marked preliminary.
+**Trigger.** A GDP-share request using a GDP figure still marked preliminary, or a GDP overview cell whose status is `preliminary`.
 
-**Georgian.** გამოყენებული მშპ-ის მაჩვენებელი წინასწარია.
+**Georgian.** ამ შედეგში გამოყენებული მშპ-ის მაჩვენებელი წინასწარია და შეიძლება გადაიხედოს.
 
-**English.** A GDP denominator used by this result is preliminary.
+**English.** A GDP figure used by this result is preliminary and may be revised.
 
-A preliminary denominator can be revised. The share is still reported; the reader is told the ground may move.
+A preliminary figure can be revised. The share, or the GDP value itself, is still reported; the reader is told the ground may move. One code covers both cases because the fact is the same: until 2026-09-14 the GDP overview emitted this code inline with its own wording, so the catalogue described one message while clients received another.
+
+### `gdp_historical_method`
+
+**Severity:** note  
+**Comparison effect:** `limits`  
+**Owner document:** `gdp-overview.md`
+
+**Trigger.** A GDP overview request whose returned nominal cells (current GEL, USD or per person) span both accounting standards.
+
+**Georgian.** 2009 წლის ჩათვლით გამოიყენება SNA 1993, 2010 წლიდან — SNA 2008; ისტორიული სერია ერთიანად გადახედილი არ არის.
+
+**English.** Geostat nominal series use SNA 1993 through 2009 and SNA 2008 from 2010; the historical series is not uniformly revised.
+
+Every nominal cell already names its standard in `valueDefinitionId`; the caveat is about mixing them in one answer. It used to ride on every nominal cell, including a 2024-only answer with nothing to mix, which taught clients to ignore it.
+
+### `gdp_world_bank_history`
+
+**Severity:** note  
+**Comparison effect:** `none`  
+**Owner document:** `gdp-overview.md`
+
+**Trigger.** Any available cell of a World Bank real GDP series (constant-2015 USD or annual real growth).
+
+**Georgian.** ადრეული ისტორიული მონაცემების აღდგენის დეტალები წყაროს მეტამონაცემებში მითითებული არ არის.
+
+**English.** The World Bank metadata does not specify how the earliest historical observations were reconstructed. Published values are preserved without custom rebasing or splicing.
+
+The source does not say which years were reconstructed, so there is no narrower scope to give it than the World Bank cells themselves.
+
+### `sectors_preliminary`
+
+**Severity:** note  
+**Comparison effect:** `none`  
+**Owner document:** `economic-sectors.md`
+
+**Trigger.** Any economic-sector cell whose status is `preliminary`.
+
+**Georgian.** ეს სექტორული მონაცემები წინასწარია და შეიძლება გადაიხედოს.
+
+**English.** These sector observations are preliminary and subject to revision.
+
+Scoped by status, never by year. The inline message it replaced named 2025, which would have become false the day Geostat finalised that year.
 
 ### `municipality_not_territorial`
 
