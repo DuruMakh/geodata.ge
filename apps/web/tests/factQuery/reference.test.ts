@@ -18,6 +18,7 @@ import { queryDebt } from "../../lib/factQuery/queryDebt";
 import { queryDeficit } from "../../lib/factQuery/queryDeficit";
 import { queryEconomicSectors } from "../../lib/factQuery/queryEconomicSectors";
 import { queryGdp } from "../../lib/factQuery/queryGdp";
+import { queryInflation } from "../../lib/factQuery/queryInflation";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { rank } from "../../lib/factQuery/rank";
@@ -43,6 +44,7 @@ function run(tool: string, args: unknown): FactQueryResponse {
     query_deficit: (input) => queryDeficit(snapshot, input),
     query_gdp: (input) => queryGdp(snapshot, input),
     query_economic_sectors: (input) => queryEconomicSectors(snapshot, input),
+    query_inflation: (input) => queryInflation(snapshot, input),
     compare: (input) => compare(snapshot, input),
     rank: (input) => rank(snapshot, input),
     get_sources: (input) => getSources(snapshot, input),
@@ -67,9 +69,12 @@ describe("section 14.3 bilingual reference fixture", () => {
   // debt year, a projected service year, a documented rate gap, and a signed
   // deficit. Four more on 2026-09-14 for GDP and economic sectors: a published
   // GDP year, a preliminary one, a sector share of GDP, and a missing growth year.
-  it("covers 28 intents, each asked in both languages", () => {
-    expect(REFERENCE_INTENTS).toHaveLength(28);
-    expect(REFERENCE_INTENTS.map((intent) => intent.id)).toEqual(Array.from({ length: 28 }, (_, i) => i + 1));
+  // Six more on 2026-09-14 for inflation: a published month, a refused core index,
+  // an unverified early target, contributions with their residual, a two-month
+  // point change, and a division ranking.
+  it("covers 34 intents, each asked in both languages", () => {
+    expect(REFERENCE_INTENTS).toHaveLength(34);
+    expect(REFERENCE_INTENTS.map((intent) => intent.id)).toEqual(Array.from({ length: 34 }, (_, i) => i + 1));
 
     for (const intent of REFERENCE_INTENTS) {
       expect(intent.promptKa.length, `intent ${intent.id} promptKa`).toBeGreaterThan(10);

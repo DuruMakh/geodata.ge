@@ -1,6 +1,6 @@
 # AI reference intents
 
-Twenty-four budget questions, each asked in Georgian and in English, with the answer
+Thirty-four questions, each asked in Georgian and in English, with the answer
 Fiscal.ge must give and the limitation that answer must carry. This is the
 acceptance list for the query service: if one of these regresses, the service is
 wrong, not merely different.
@@ -16,7 +16,7 @@ an external assistant's language understanding.
 **Questions and responses are bilingual in schema 1.1.0.** Reviewed Georgian and
 English labels, definitions, missingness, comparisons, ranking explanations and
 source descriptions travel with the same figures. Clients use the appropriate
-`*Ka`/`*En` fields. The 24 existing numerical, source and comparability expectations
+`*Ka`/`*En` fields. The existing numerical, source and comparability expectations
 remain unchanged; language assertions verify the additional response fields.
 
 ## How the expected values were established
@@ -35,7 +35,7 @@ Money is compared exactly. Ratios carry a tolerance of 1e-9 — tight enough tha
 a scaling error or a wrong denominator fails immediately, and far too tight to
 hide one.
 
-## The twenty intents
+## The intents
 
 | # | Question | Expected answer | Must carry |
 | --- | --- | --- | --- |
@@ -59,6 +59,20 @@ hide one.
 | 18 | Georgia's budget per resident | **Missing** | The aggregate includes five budgets with no territorial population, so no denominator exists (severe) |
 | 19 | Spending in municipal code 05 | **No row at all** | The code is excluded as not territorially attributable, with the reason given |
 | 20 | Fastest-growing major programs, 2017→2024 | Entrepreneurship development +464.33% | These are reviewed programs, not every government program (severe); 17 of 48 excluded for a missing endpoint |
+| 21 | Government debt, 2024 | 33,169,300,000 GEL | Debt is a central-government liability, not a budget figure (severe) |
+| 22 | Debt service, 2027 | 4,388,380,862.53 GEL | Not a budget figure; a schedule of the existing portfolio, not an outcome (severe) |
+| 23 | Average interest rate on external debt, 2016 | **Missing** — never estimated | Not a budget figure; no reviewed source published the rate |
+| 24 | Budget deficit as a share of GDP, 2020 | −9.158% of GDP | The IMF general government balance, not receipts minus expenditure (severe); the sign is the answer |
+| 25 | Nominal GDP, 2024 | 93,022,275,315.71 GEL | Nothing further: one published SNA 2008 year |
+| 26 | Nominal GDP, 2025, and whether it is final | 104,598,139,883.33 GEL | The figure is preliminary |
+| 27 | Construction's share of GDP, 2024 | 7.4114% | A percentage of all national GDP, not a fraction |
+| 28 | Construction's real growth, 2010 | **Missing** — never 0 | Real growth starts a year after the nominal series |
+| 29 | Annual inflation, August 2026 | 5.6479% | Nothing further: one published Geostat month |
+| 30 | Core inflation index level, August 2026 | **Declined** — core has no published index | The valid measures are named instead |
+| 31 | National Bank target, June 2014 | **Missing** — never assumed | No earlier target is verified; that does not mean none existed |
+| 32 | Groups making up annual inflation, August 2026 | Twelve division contributions and a 0.1396 pp residual, summing to 5.6479% | Contributions are Fiscal.ge's approximation, not Geostat figures (severe); the residual is not a category |
+| 33 | Change in annual inflation, August 2025 → August 2026 | +0.9983 percentage **points** | A point change between two published months |
+| 34 | Highest annual price growth by division, August 2026 | Division 07 (transport) 15.1989%, then 04 (housing and utilities) 8.4682%, 12 (miscellaneous) 7.1272% | Twelve eligible divisions; the headline, target and residual are excluded |
 
 ## What the list is designed to catch
 
