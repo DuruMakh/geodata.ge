@@ -42,5 +42,6 @@
   "common.dataEconomy": "Data / Economy",
   "common.inflationOverview": "Inflation overview",
   "common.dataInflation": "Data / Inflation",
-  "common.inflationSourceNote": "Data: Geostat and the National Bank of Georgia. Last updated: {updatedAt}."
+  "common.inflationSourceNote": "Data: Geostat and the National Bank of Georgia. Last updated: {updatedAt}.",
+  "common.inflationCategories": "Categories"
 }

@@ -883,5 +883,12 @@
       "reviewedAt": "2026-09-11"
     },
     "derivation": null
+  },
+  "source.geostat_basket_weights": {
+    "name": {
+      "text": "Geostat consumer basket weights, %",
+      "reviewedAt": "2026-09-13"
+    },
+    "derivation": null
   }
 }

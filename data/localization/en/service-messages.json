@@ -325,5 +325,12 @@
   "documents.source.geostat_core_yoy_ka.attribution": "Geostat",
   "documents.source.geostat_core_mom_ka.attribution": "Geostat",
   "documents.source.nbg_inflation_target.attribution": "National Bank of Georgia",
-  "documents.source.nbg_inflation_target_ka.attribution": "National Bank of Georgia"
+  "documents.source.nbg_inflation_target_ka.attribution": "National Bank of Georgia",
+  "sources.source.geostat_basket_weights.name": "Geostat consumer basket weights, %",
+  "documents.source.geostat_basket_weights.title": "Consumer basket weights, %",
+  "documents.source.geostat_basket_weights.publisher": "National Statistics Office of Georgia",
+  "documents.source.geostat_basket_weights.attribution": "Geostat",
+  "documents.source.geostat_basket_weights_ka.title": "Consumer basket weights, % (Georgian)",
+  "documents.source.geostat_basket_weights_ka.publisher": "National Statistics Office of Georgia",
+  "documents.source.geostat_basket_weights_ka.attribution": "Geostat"
 }

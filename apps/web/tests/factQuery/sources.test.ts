@@ -181,9 +181,9 @@ describe("public source resolution", () => {
         .map((source) => source.sourceId);
 
       expect(unresolved).toEqual([]);
-      // 117 shared sources plus two economic-sector sources and seven inflation
-      // sources (six Geostat CPI workbooks and the NBG strategy).
-      expect(snapshot.sources.length).toBe(126);
+      // 117 shared sources plus two economic-sector sources and eight inflation
+      // sources (six Geostat CPI workbooks, the NBG strategy and the basket weights).
+      expect(snapshot.sources.length).toBe(127);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {

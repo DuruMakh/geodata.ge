@@ -125,3 +125,4 @@ source.geostat_cpi_avg12,"Geostat consumer price index, 12-month average over th
 source.geostat_core_yoy,"Geostat core inflation, change on the same month of the previous year",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/core-yoy.xlsx,2026-09-11
 source.geostat_core_mom,"Geostat core inflation, change on the previous month",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/core-mom.xlsx,2026-09-11
 source.nbg_inflation_target,National Bank of Georgia inflation target,docs/Raw Data/Inflation/nbg-inflation-target/official/monetary-policy-strategy-en.pdf,2026-09-11
+source.geostat_basket_weights,"Geostat consumer basket weights, %",docs/Raw Data/Inflation/geostat-basket-weights/2026/en/basket-weights.xlsx,2026-09-12

@@ -42,5 +42,6 @@
   "common.dataEconomy": "მონაცემები / ეკონომიკა",
   "common.inflationOverview": "ინფლაციის მიმოხილვა",
   "common.dataInflation": "მონაცემები / ინფლაცია",
-  "common.inflationSourceNote": "მონაცემები: საქსტატი და საქართველოს ეროვნული ბანკი. ბოლო განახლება: {updatedAt}."
+  "common.inflationSourceNote": "მონაცემები: საქსტატი და საქართველოს ეროვნული ბანკი. ბოლო განახლება: {updatedAt}.",
+  "common.inflationCategories": "კატეგორიები"
 }

@@ -325,5 +325,12 @@
   "documents.source.geostat_core_yoy_ka.attribution": "საქსტატი",
   "documents.source.geostat_core_mom_ka.attribution": "საქსტატი",
   "documents.source.nbg_inflation_target.attribution": "საქართველოს ეროვნული ბანკი",
-  "documents.source.nbg_inflation_target_ka.attribution": "საქართველოს ეროვნული ბანკი"
+  "documents.source.nbg_inflation_target_ka.attribution": "საქართველოს ეროვნული ბანკი",
+  "sources.source.geostat_basket_weights.name": "საქსტატი · სამომხმარებლო კალათის წონები, %",
+  "documents.source.geostat_basket_weights.title": "სამომხმარებლო კალათის წონები, % (ინგლისური)",
+  "documents.source.geostat_basket_weights.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური",
+  "documents.source.geostat_basket_weights.attribution": "საქსტატი",
+  "documents.source.geostat_basket_weights_ka.title": "სამომხმარებლო კალათის წონები, % (ქართული)",
+  "documents.source.geostat_basket_weights_ka.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური",
+  "documents.source.geostat_basket_weights_ka.attribution": "საქსტატი"
 }

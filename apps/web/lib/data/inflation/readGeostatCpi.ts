@@ -169,3 +169,61 @@ export function readGeostatCpiFile(content: Buffer, role: CpiFileRole, language:
     cells: readYearColumns(rows, sheet, header, dataRows[index]!, spec.rebase),
   }));
 }
+
+export type ParsedCategoryCell = { period: number; value: string; locator: string };
+export type ParsedCategorySeries = { coicopCode: string; level: 2 | 3; label: string; cells: ParsedCategoryCell[] };
+
+// The national sheet of the yoy and mom workbooks carries the whole COICOP tree
+// under the Total row: column A the level, B the code, C the label. Category rows
+// may start late, end early or skip months, so unlike the Total row they are read
+// gap-tolerantly — but the months are still located by the shared header.
+export function readGeostatCpiCategories(content: Buffer, role: "yoy" | "mom", language: CpiLanguage): ParsedCategorySeries[] {
+  const book = XLSX.read(content, { type: "buffer" });
+  const found = book.SheetNames.find((name) => name.trim() === NATIONAL_SHEET[language]);
+  if (!found) throw new Error(`CPI layout: national sheet "${NATIONAL_SHEET[language]}" not found in ${role}`);
+  const rows = XLSX.utils.sheet_to_json<unknown[]>(book.Sheets[found]!, { header: 1, raw: true, defval: null });
+  if (language === "en" && !text(rows[0]?.[0]).toLowerCase().includes(EN_TITLES[role].toLowerCase())) {
+    throw new Error(`CPI layout: ${role} title does not contain "${EN_TITLES[role]}"`);
+  }
+  const sheet = found.trim();
+  const header = findMonthHeader(rows);
+  const years = rows[header.row - 1] ?? [];
+  const months = rows[header.row] ?? [];
+  if (language === "en" && text(rows[header.row - 1]?.[0]) !== "Level") {
+    throw new Error(`CPI layout: ${role} has no Level column where the category tree is expected`);
+  }
+
+  const series: ParsedCategorySeries[] = [];
+  for (let row = header.row + 1; row < rows.length; row += 1) {
+    const values = rows[row] ?? [];
+    const level = numeric(values[0]);
+    if (level === null) continue;
+    if (level !== 2 && level !== 3) throw new Error(`CPI layout: unexpected category level ${level} at row ${row + 1}`);
+    const code = text(values[1]);
+    if (!/^\d{1,3}$/.test(code)) throw new Error(`CPI layout: category row ${row + 1} has no COICOP code`);
+    const label = text(values[2]);
+    if (label === "") throw new Error(`CPI layout: category ${code} has no label at row ${row + 1}`);
+
+    const cells: ParsedCategoryCell[] = [];
+    for (let col = header.col; col < months.length; col += 1) {
+      const monthLabel = text(months[col]);
+      if (monthLabel === "") break;
+      const offset = col - header.col;
+      if (monthLabel !== MONTHS[offset % 12]) throw new Error(`CPI layout: unexpected month header "${monthLabel}" at ${locator(sheet, header.row, col)}`);
+      const year = numeric(years[col - (offset % 12)]);
+      if (year === null || !Number.isInteger(year)) throw new Error(`CPI layout: no year above ${locator(sheet, header.row, col)}`);
+      const raw = numeric(values[col]);
+      // A gap is data about the category, not a layout fault: 04.2 and 08.1 end in
+      // 2011, 09.6 starts in 2020, 12.5 and 12.6 skip interior months.
+      if (raw === null) continue;
+      cells.push({ period: makePeriod(year, (offset % 12) + 1), value: toValue(raw, true), locator: locator(sheet, row, col) });
+    }
+    if (cells.length === 0) throw new Error(`CPI layout: category ${code} has no values`);
+    series.push({ coicopCode: code, level, label, cells });
+  }
+
+  if (series.filter((row) => row.level === 2).length !== 12) {
+    throw new Error(`CPI layout: expected 12 COICOP divisions in ${role}, found ${series.filter((row) => row.level === 2).length}`);
+  }
+  return series;
+}

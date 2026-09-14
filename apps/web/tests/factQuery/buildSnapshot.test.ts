@@ -13,7 +13,8 @@ describe("buildFactQuerySnapshot", () => {
       buildFactQuerySnapshot(OPTIONS),
       loadSourceDocuments("../../data/sources/source-documents.csv"),
     ]);
-    expect(sources).toHaveLength(126);
+    // 127 with the Geostat basket-weights workbook the categories page cites.
+    expect(sources).toHaveLength(127);
     expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.map(source => source.sourceId).sort());
     expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([
       "source.geostat_sector_growth", "source.geostat_sector_volume",
