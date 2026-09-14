@@ -168,8 +168,10 @@ export const TOOLS: readonly ToolDefinition[] = [
     name: "compare",
     title: "შედარება ორ წელს შორის",
     describe: () =>
-      "Change between two years for one target, with the comparability judgement attached. Requires " +
-      "fromYear < toYear (a cross-field rule the JSON Schema cannot express). Returns absolute, " +
+      "Change between two years, or for inflation two months, for one target, with the comparability judgement attached. " +
+      "Budget, debt and balance targets require fromYear < toYear. Inflation targets { dataset: \"inflation\", seriesIds } " +
+      "require fromPeriod < toPeriod (YYYY-MM), except basket_weight_pct, which takes fromYear < toYear. These are " +
+      "cross-field rules the JSON Schema cannot express. Returns absolute, " +
       "percentage and percentage-point change as the measure allows, plus a comparability of " +
       "comparable, limited or not_comparable. Use this rather than subtracting two query results " +
       "yourself: it is what detects a definition change between the two years.",

@@ -116,13 +116,31 @@ export const compareInput = z
       z.strictObject({ dataset: z.literal("debt"), seriesIds: seriesIdList }),
       // No seriesIds: the balance dataset has exactly one series.
       z.strictObject({ dataset: z.literal("deficit") }),
+      z.strictObject({ dataset: z.literal("inflation"), seriesIds: seriesIdList }),
     ]),
-    fromYear: z.number().int(),
-    toYear: z.number().int(),
-    measure: z.enum(["amount_gel", "share_of_total_pct", "share_of_gdp_pct", "gel_per_resident", "rate_percent"]),
+    fromYear: z.number().int().optional(),
+    toYear: z.number().int().optional(),
+    fromPeriod: periodKeySchema.optional().describe("Inflation monthly measures only: the earlier month, YYYY-MM."),
+    toPeriod: periodKeySchema.optional().describe("Inflation monthly measures only: the later month, YYYY-MM."),
+    measure: z.enum([
+      "amount_gel", "share_of_total_pct", "share_of_gdp_pct", "gel_per_resident", "rate_percent",
+      "yoy_pct", "mom_pct", "avg12_pct", "index_2010", "target_pct", "basket_weight_pct", "contribution_pp",
+    ]),
     expectedDataVersion,
   })
-  .refine((input) => input.fromYear < input.toYear, { message: "fromYear must be earlier than toYear" });
+  .superRefine((input, context) => {
+    const issue = (path: string, message: string) => context.addIssue({ code: "custom", path: [path], message });
+    const monthly = input.target.dataset === "inflation" && input.measure !== "basket_weight_pct";
+    if (monthly) {
+      if (input.fromYear !== undefined || input.toYear !== undefined) issue("fromYear", "inflation monthly measures take fromPeriod and toPeriod, not years");
+      if (input.fromPeriod === undefined || input.toPeriod === undefined) issue("fromPeriod", "inflation monthly measures need fromPeriod and toPeriod");
+      else if (!(input.fromPeriod < input.toPeriod)) issue("fromPeriod", "fromPeriod must be earlier than toPeriod");
+      return;
+    }
+    if (input.fromPeriod !== undefined || input.toPeriod !== undefined) issue("fromPeriod", "fromPeriod and toPeriod apply only to inflation monthly measures");
+    if (input.fromYear === undefined || input.toYear === undefined) issue("fromYear", "fromYear and toYear are required");
+    else if (!(input.fromYear < input.toYear)) issue("fromYear", "fromYear must be earlier than toYear");
+  });
 
 export const rankInput = z
   .strictObject({

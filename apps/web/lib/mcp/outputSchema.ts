@@ -101,7 +101,7 @@ const coverage = z.object({
   excludedEntities: z.array(bilingualExcludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
   requestedPeriods: z.array(z.string()).optional(), availablePeriods: z.tuple([z.string(), z.string()]).optional(),
 });
-const endpoint = observationSchema.pick({ year: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
+const endpoint = observationSchema.pick({ year: true, period: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
 const dataShapes = {
   observations: z.object({ observations: z.array(observationSchema), coverage }),
   comparisons: z.object({
@@ -111,7 +111,7 @@ const dataShapes = {
       absoluteChange: z.number().nullable(), percentageChange: z.number().nullable(), percentagePointChange: z.number().nullable(),
       comparability: z.enum(["comparable", "limited", "not_comparable"]), reasons: z.array(z.string()), reasonsEn: z.array(z.string()), caveatIds: z.array(z.string()),
     })),
-    coverage: z.object({ requestedYears: z.array(z.number()), requestedPairs: z.number(), comparedPairs: z.number(), comparableCount: z.number(), notComparableCount: z.number(), excludedEntities: z.array(bilingualExcludedEntity) }),
+    coverage: z.object({ requestedYears: z.array(z.number()), requestedPeriods: z.tuple([z.string(), z.string()]).optional(), requestedPairs: z.number(), comparedPairs: z.number(), comparableCount: z.number(), notComparableCount: z.number(), excludedEntities: z.array(bilingualExcludedEntity) }),
   }),
   ranking: z.object({
     entries: z.array(z.object({
