@@ -13,6 +13,10 @@ import { queryEconomicSectors } from "./queryEconomicSectors";
 import { SECTOR_QUERY_MEASURES } from "./economicSectorsSeries";
 import { GDP_QUERY_SERIES } from "./gdpSeries";
 import { csvEscape } from "../data/csvEscape";
+import { CONTRIBUTION_FIRST_YEAR } from "../data/inflation/contributions";
+import { inflationSeriesCoverage, measurePeriodRange, periodsBetween, weightYearRange } from "./inflationData";
+import { INFLATION_DEFINITIONS, NATIONAL_SERIES, TARGET_SERIES_ID, type InflationMeasure } from "./inflationSeries";
+import { inflationObservations } from "./queryInflation";
 import { createHash } from "node:crypto";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { describeCoverage, type CoverageData } from "./describeCoverage";
@@ -56,6 +60,7 @@ const DATASET_IDS: readonly DatasetId[] = [
   "general-government-balance",
   "gdp-overview",
   "economic-sectors",
+  "inflation",
 ];
 
 /**
@@ -450,9 +455,12 @@ export function buildGdpCsv(snapshot: FactQuerySnapshot): PublicationArtifact {
 }
 
 export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationArtifact[] {
+  const inflationCategories = inflationCategoryParts(snapshot);
+  const inflationCategoriesCsv = buildInflationCategoriesCsv(inflationCategories);
   const artifacts = [buildCatalogueFile(snapshot), buildSourcesFile(snapshot), ...buildDatasetFiles(snapshot),
  datasetFile(snapshot,"gdp-overview","gdp-overview.json",queryGdp(snapshot,{seriesIds:Object.keys(GDP_QUERY_SERIES),years:yearsOf(snapshot.gdpOverview.facts)}),{}),
- buildGdpCsv(snapshot), buildEconomicSectorsJson(snapshot), buildEconomicSectorsCsv(snapshot)];
+ buildGdpCsv(snapshot), buildEconomicSectorsJson(snapshot), buildEconomicSectorsCsv(snapshot),
+    buildInflationNationalJson(snapshot), inflationCategoriesCsv, buildInflationCategoriesJson(snapshot, inflationCategories, inflationCategoriesCsv)];
   return [...artifacts, buildManifestFile(snapshot, artifacts)];
 }
 
@@ -487,4 +495,119 @@ function buildEconomicSectorsJson(snapshot: FactQuerySnapshot): PublicationArtif
     caveats:parts.reduce<Caveat[]>((all, part) => mergeCaveats(all, part.meta.caveats), []),
   }};
   return datasetFile(snapshot,"economic-sectors","economic-sectors.json",response,{});
+}
+
+/**
+ * Several observation responses of one dataset as one file body. Coverage stays
+ * per part, keyed by measure, the way ministries.json keys it by level: the parts
+ * span different months and years, so one merged block would describe only the
+ * first part. Sources and caveats are unioned.
+ */
+function mergeObservationResponses(label: string, parts: Record<string, FactQueryResponse>): FactQueryResponse {
+  const responses = Object.values(parts);
+  const results = responses.map((response) => observationsOf(response, label));
+  const first = responses[0]!;
+  if (first.kind !== "observations") throw new Error(`${label}: expected observations`);
+  const observations = results.flatMap((result) => result.data.observations);
+  const returnedCount = observations.filter((o) => o.availability === "available").length;
+  return {
+    ...first,
+    status: returnedCount === observations.length ? "ok" : returnedCount > 0 ? "partial" : "empty",
+    data: {
+      observations,
+      coverage: Object.fromEntries(Object.keys(parts).map((key, index) => [key, results[index]!.data.coverage])),
+    },
+    meta: {
+      ...first.meta,
+      sources: results.reduce<ResolvedSource[]>((all, result) => mergeSources(all, result.meta.sources), []),
+      caveats: results.reduce<Caveat[]>((all, result) => mergeCaveats(all, result.meta.caveats), []),
+    },
+  };
+}
+
+/** Every month any of these series publishes the measure. */
+function inflationMonths(snapshot: FactQuerySnapshot, seriesIds: string[], measure: InflationMeasure): string[] {
+  const coverage = inflationSeriesCoverage(snapshot);
+  const ranges = seriesIds.flatMap((id) => coverage.get(id)?.periodsByMeasure[measure] ?? []);
+  const firsts = ranges.filter((_, index) => index % 2 === 0).sort();
+  const lasts = ranges.filter((_, index) => index % 2 === 1).sort();
+  return periodsBetween(firsts[0]!, lasts.at(-1)!);
+}
+
+function buildInflationNationalJson(snapshot: FactQuerySnapshot): PublicationArtifact {
+  const parts: Record<string, FactQueryResponse> = Object.fromEntries(
+    (["index_2010", "yoy_pct", "mom_pct", "avg12_pct"] as const).map((measure) => {
+      const seriesIds = Object.entries(NATIONAL_SERIES).filter(([, series]) => series.measures.includes(measure)).map(([id]) => id);
+      return [measure, inflationObservations(snapshot, { seriesIds, measure, periods: inflationMonths(snapshot, seriesIds, measure) }, { includeResidual: false })];
+    }),
+  );
+  const headline = measurePeriodRange(snapshot, "yoy_pct")!;
+  parts.target_pct = inflationObservations(snapshot, { seriesIds: [TARGET_SERIES_ID], measure: "target_pct", periods: periodsBetween(headline[0], headline[1]) }, { includeResidual: false });
+  const [minYear, maxYear] = weightYearRange(snapshot);
+  parts.basket_weight_pct = inflationObservations(
+    snapshot,
+    { seriesIds: snapshot.inflation.groups.map((group) => group.id), measure: "basket_weight_pct", years: Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i) },
+    { includeResidual: false },
+  );
+  return datasetFile(snapshot, "inflation", "inflation-national.json", mergeObservationResponses("inflation-national.json", parts), {});
+}
+
+type InflationCategoryPart = { selection: "" | "divisions" | "subgroups"; response: FactQueryResponse };
+
+/** Group rates for every group, then contributions per full level with that level's residual. */
+function inflationCategoryParts(snapshot: FactQuerySnapshot): InflationCategoryPart[] {
+  const ids = (level?: "division" | "subgroup") => snapshot.inflation.groups.filter((g) => level === undefined || g.level === level).map((g) => g.id);
+  const rates = (measure: "yoy_pct" | "mom_pct"): InflationCategoryPart => ({
+    selection: "",
+    response: inflationObservations(snapshot, { seriesIds: ids(), measure, periods: inflationMonths(snapshot, ids(), measure) }, { includeResidual: false }),
+  });
+  const contributionMonths = periodsBetween(`${CONTRIBUTION_FIRST_YEAR}-01`, measurePeriodRange(snapshot, "yoy_pct")![1]);
+  const contributions = (level: "division" | "subgroup"): InflationCategoryPart => ({
+    selection: level === "division" ? "divisions" : "subgroups",
+    response: inflationObservations(snapshot, { seriesIds: ids(level), measure: "contribution_pp", periods: contributionMonths }, { includeResidual: true }),
+  });
+  return [rates("yoy_pct"), rates("mom_pct"), contributions("division"), contributions("subgroup")];
+}
+
+export const INFLATION_CATEGORIES_CSV_COLUMNS = ["series_id", "level", "parent_id", "selection", "measure", "period", "value", "unit", "status", "calculation", "source_ids"] as const;
+
+/** Available cells only; labels, definitions and caveats live in inflation-categories.json. */
+function buildInflationCategoriesCsv(parts: InflationCategoryPart[]): PublicationArtifact {
+  const lines: string[] = [];
+  for (const part of parts) {
+    for (const o of observationsOf(part.response, "inflation-categories.csv").data.observations) {
+      if (o.value === null) continue;
+      lines.push(
+        [o.seriesId, o.level, o.parentSeriesId ?? "", part.selection, o.measure, o.period ?? "", String(o.value), o.unit, o.basis ?? "",
+          o.measure === "contribution_pp" ? "fiscal_ge_derived" : "published", o.sourceIds.join(";")]
+          .map(csvEscape)
+          .join(","),
+      );
+    }
+  }
+  const text = `\uFEFF${INFLATION_CATEGORIES_CSV_COLUMNS.join(",")}\n${lines.join("\n")}\n`;
+  return { fileName: "inflation-categories.csv", bytes: Buffer.from(text, "utf8"), rowCount: lines.length };
+}
+
+function buildInflationCategoriesJson(snapshot: FactQuerySnapshot, parts: InflationCategoryPart[], csv: PublicationArtifact): PublicationArtifact {
+  const results = parts.map((part) => observationsOf(part.response, "inflation-categories.json"));
+  const bytes = serialize({
+    ...publicationHeader(snapshot),
+    datasetId: "inflation",
+    notice: serviceMessage(snapshot, "ka", "publication.sumWarning"),
+    noticeEn: serviceMessage(snapshot, "en", "publication.sumWarning"),
+    catalogue: catalogueData(snapshot, "inflation"),
+    data: {
+      url: "/downloads/data/inflation-categories.csv",
+      mediaType: "text/csv",
+      columns: [...INFLATION_CATEGORIES_CSV_COLUMNS],
+      rowCount: csv.rowCount,
+      byteSize: csv.bytes.byteLength,
+      sha256: sha256(csv.bytes),
+    },
+    definitions: INFLATION_DEFINITIONS,
+    sources: results.reduce<ResolvedSource[]>((all, result) => mergeSources(all, result.meta.sources), []),
+    caveats: results.reduce<Caveat[]>((all, result) => mergeCaveats(all, result.meta.caveats), []),
+  });
+  return { fileName: "inflation-categories.json", bytes, rowCount: csv.rowCount };
 }
