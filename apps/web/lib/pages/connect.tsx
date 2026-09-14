@@ -8,6 +8,7 @@ import { SiteFooter } from "../../components/site/site-footer";
 import { SiteHeader } from "../../components/site/site-header";
 import { describeCoverage } from "../factQuery/describeCoverage";
 import type { CoverageData } from "../factQuery/describeCoverage";
+import { inflationCatalogueSeries, inflationDatasetPeriods } from "../factQuery/inflationData";
 import { loadPackagedSnapshot } from "../mcp/snapshot";
 import { loadServedLandingData } from "../data/servedData";
 import { buildLandingContext } from "../landing/landingData";
@@ -39,6 +40,7 @@ function coverage(): {
   excludedCodes: string[];
   sectorCount: number;
   sectorRanges: Record<string, string>;
+  inflation: { nationalRange: string; groupCount: number; weightRange: string; contributionStart: string; targetStart: string };
 } {
   const snapshot = loadPackagedSnapshot();
   const response = describeCoverage(snapshot, {});
@@ -59,6 +61,20 @@ function coverage(): {
       const years = snapshot.economicSectors.facts.filter(fact => fact.measure === measure).map(fact => fact.year);
       return [measure, `${Math.min(...years)}–${Math.max(...years)}`];
     })),
+    inflation: (() => {
+      const series = inflationCatalogueSeries(snapshot);
+      const firstOf = (measure: string) =>
+        series.map((entry) => entry.periodsByMeasure[measure]?.[0]).filter((period): period is string => period !== undefined).sort()[0]!;
+      const [firstPeriod, lastPeriod] = inflationDatasetPeriods(snapshot);
+      const years = snapshot.inflation.weights.map((row) => row.year);
+      return {
+        nationalRange: `${firstPeriod}–${lastPeriod}`,
+        groupCount: snapshot.inflation.groups.length,
+        weightRange: `${Math.min(...years)}–${Math.max(...years)}`,
+        contributionStart: firstOf("contribution_pp"),
+        targetStart: firstOf("target_pct"),
+      };
+    })(),
     municipalities: snapshot.municipal.municipalities.length,
     regions: snapshot.municipal.regions.length,
     excludedCodes: exclusions.map((exclusion) => exclusion.entityId),
@@ -106,7 +122,7 @@ const NOT_SERVED = [
 export async function renderConnectPage(locale: Locale) {
   const messages = await getMessages(locale, ["common", "connect"]);
   const model = buildLandingContext(await loadServedLandingData());
-  const { ranges, municipalities, regions, excludedCodes, sectorCount, sectorRanges } = coverage();
+  const { ranges, municipalities, regions, excludedCodes, sectorCount, sectorRanges, inflation } = coverage();
   const endpoint = `${resolveSiteUrl()}/mcp`;
 
   return (
@@ -246,12 +262,20 @@ export async function renderConnectPage(locale: Locale) {
                   </li>
                   <li>{message(messages,"connect.gdpCoverage",{range:ranges["gdp-overview"]})}</li>
                   <li data-testid="connect-sector-coverage">{message(messages, "connect.sectorCoverage", { count: sectorCount, nominalRange: sectorRanges.nominal, shareRange: sectorRanges.share_of_gdp, growthRange: sectorRanges.real_growth })}</li>
+                  <li data-testid="connect-inflation-coverage">{message(messages, "connect.inflationCoverage", { nationalRange: inflation.nationalRange, groupCount: inflation.groupCount, weightRange: inflation.weightRange, contributionStart: inflation.contributionStart, targetStart: inflation.targetStart })}</li>
                 </ul>
                 <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-sector-discovery">
                   {message(messages, "connect.sectorQuery")} {" "}
                   <a className="underline" href="/downloads/data/economic-sectors.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/economic-sectors.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/economic-sectors", locale)}>{message(messages, "connect.sectorMethodology")}</a>
+                </p>
+                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-inflation-discovery">
+                  {message(messages, "connect.inflationQuery")}{" "}
+                  <a className="underline" href="/downloads/data/inflation-national.json">JSON</a>{" · "}
+                  <a className="underline" href="/downloads/data/inflation-categories.csv">CSV</a>{" · "}
+                  <a className="underline" href="/downloads/data/inflation-categories.json">{message(messages, "connect.inflationCategoriesMetadata")}</a>{" · "}
+                  <a className="underline" href={pageHref("/methodology/inflation", locale)}>{message(messages, "connect.inflationMethodology")}</a>
                 </p>
               </div>
               <div data-testid="connect-coverage-excluded">
