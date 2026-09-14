@@ -23,7 +23,7 @@ import type {
 export type { MunicipalTotalFact } from "../data/municipal/types";
 export type { ServedNationalGdpFact } from "../servedRows";
 
-export const SCHEMA_VERSION = "1.1.0" as const;
+export const SCHEMA_VERSION = "1.2.0" as const;
 
 /** Municipal codes whose budgets are not territorially attributable (spec section 5.4). */
 export const AGGREGATE_ONLY_MUNICIPAL_CODES = ["05", "42", "43", "46", "64"] as const;
@@ -36,7 +36,8 @@ export type DatasetId =
   | "government-debt"
   | "general-government-balance"
   | "gdp-overview"
-  | "economic-sectors";
+  | "economic-sectors"
+  | "inflation";
 
 // rate_percent is a rate per annum, NOT a share of anything. Reusing
 // share_of_gdp_pct or share_of_total_pct for a weighted-average interest rate
@@ -48,7 +49,14 @@ export type Measure =
   | "gel_per_resident"
   | "rate_percent"
   | "value"
-  | "real_growth_pct";
+  | "real_growth_pct"
+  | "yoy_pct"
+  | "mom_pct"
+  | "avg12_pct"
+  | "index_2010"
+  | "target_pct"
+  | "basket_weight_pct"
+  | "contribution_pp";
 
 /**
  * `planned` means a budget a government approved. `projection` means neither an
@@ -59,7 +67,7 @@ export type Measure =
  * this name is taken from the data rather than invented here.
  */
 export type Basis = "actual" | "planned" | "projection" | "published" | "preliminary";
-export type Unit = "GEL" | "percent" | "GEL_per_resident" | "USD" | "USD_2015" | "GEL_per_person" | "USD_per_person";
+export type Unit = "GEL" | "percent" | "GEL_per_resident" | "USD" | "USD_2015" | "GEL_per_person" | "USD_per_person" | "index_2010_100" | "percentage_points";
 export type Severity = "severe" | "note";
 export type Availability = "available" | "missing";
 
@@ -249,6 +257,13 @@ export type FactQuerySnapshot = {
   deficit: { facts: ServedGeneralGovernmentBalanceFact[] };
   gdpOverview: { facts: import("../data/gdpOverview/types").GdpObservation[]; series: typeof import("./gdpSeries").GDP_QUERY_SERIES };
   economicSectors: { facts: import("../data/economicSectors/types").SectorObservation[]; registry: import("../data/economicSectors/types").SectorDefinition[]; definitions: typeof import("./economicSectorsSeries").SECTOR_DEFINITIONS };
+  inflation: {
+    facts: import("../data/inflation/types").ServedCpiFact[];
+    targets: import("../data/inflation/types").ServedInflationTargetRow[];
+    categories: import("../data/inflation/types").ServedCpiCategoryFact[];
+    weights: import("../data/inflation/types").ServedBasketWeightRow[];
+    groups: import("./inflationSeries").InflationGroup[];
+  };
   gdpFacts: ServedNationalGdpFact[];
   sources: ResolvedSource[];
 };

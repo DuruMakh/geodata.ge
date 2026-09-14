@@ -31,6 +31,8 @@ export type Observation = {
   level: string;
   parentSeriesId: string | null;
   year: number;
+  /** Monthly observations only (inflation): YYYY-MM. `year` stays the calendar year of that month. */
+  period?: string;
   measure: Measure;
   unit: Unit;
   value: number | null;
@@ -62,9 +64,9 @@ export type Observation = {
   caveatIds: string[];
 };
 
-/** observationId's one fixed template (spec section 7.2), so every query function builds it identically. */
-export function buildObservationId(datasetId: DatasetId, entityId: string, seriesId: string, year: number, measure: Measure): string {
-  return `${datasetId}:${entityId}:${seriesId}:${year}:${measure}`;
+/** observationId's one fixed template (spec section 7.2). A monthly observation puts its period where the year goes. */
+export function buildObservationId(datasetId: DatasetId, entityId: string, seriesId: string, yearOrPeriod: number | string, measure: Measure): string {
+  return `${datasetId}:${entityId}:${seriesId}:${yearOrPeriod}:${measure}`;
 }
 
 /**

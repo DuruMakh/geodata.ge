@@ -1178,5 +1178,9 @@
   "economic-sectors": {
     "text": "Economic sectors",
     "reviewedAt": "2026-09-11"
+  },
+  "inflation": {
+    "text": "Consumer price inflation",
+    "reviewedAt": "2026-09-14"
   }
 }

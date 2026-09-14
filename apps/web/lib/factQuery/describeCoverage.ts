@@ -6,6 +6,8 @@
 // safe to call with zero prior knowledge of the catalogue.
 import { GDP_QUERY_SERIES } from "./gdpSeries";
 import { SECTOR_QUERY_MEASURES } from "./economicSectorsSeries";
+import { inflationCatalogueSeries, inflationDatasetPeriods } from "./inflationData";
+import { INFLATION_MEASURES } from "./inflationSeries";
 import { serviceLabelEn, serviceMessage } from "./localization";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
@@ -27,6 +29,7 @@ const DATASET_IDS: readonly DatasetId[] = [
   "general-government-balance",
   "gdp-overview",
   "economic-sectors",
+  "inflation",
 ];
 
 type EntityType = "country" | "municipality" | "region";
@@ -54,6 +57,8 @@ type BaseSeriesEntry = {
   availability: Availability;
   years: number[];
   yearsByMeasure?: Record<string, number[]>;
+  periods?: [string, string];
+  periodsByMeasure?: Record<string, [string, string]>;
 };
 
 type SeriesEntry = BaseSeriesEntry & { labelEn: string };
@@ -74,6 +79,7 @@ type DatasetSummary = {
   years: [number, number];
   entityTypes: EntityType[];
   measures: Measure[];
+  periods?: [string, string];
   labelEn: string;
   measureNotes?: Record<string, string>;
   measureNotesEn?: Record<string, string>;
@@ -150,6 +156,7 @@ const DATASET_META: Record<
   },
   "gdp-overview": { budgetScope: "national_accounts", labelKa: "მშპ-ის მიმოხილვა", entityTypes: ["country"], measures: ["value"] },
   "economic-sectors": { budgetScope: "national_accounts", labelKa: "ეკონომიკის სექტორები", entityTypes: ["country"], measures: ["amount_gel", "share_of_gdp_pct", "real_growth_pct"] },
+  inflation: { budgetScope: "consumer_prices", labelKa: "ინფლაცია", entityTypes: ["country"], measures: [...INFLATION_MEASURES] },
   "general-government-balance": {
     // General government per the IMF: wider than either national series here,
     // and NOT their difference.
@@ -224,6 +231,9 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
     case "economic-sectors":
       years = yearRange(snapshot.economicSectors.facts.map(f=>f.year), datasetId);
       break;
+    case "inflation":
+      years = yearRange(inflationCatalogueSeries(snapshot).flatMap((series) => series.years), datasetId);
+      break;
     case "general-government-balance":
       years = yearRange(
         snapshot.deficit.facts.map((f) => f.year),
@@ -244,6 +254,7 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
       measureNotesKa: Object.fromEntries(Object.entries(SECTOR_QUERY_MEASURES).map(([query,measure])=>[query,`${snapshot.economicSectors.definitions[measure].ka} ${snapshot.economicSectors.definitions.reference[measure].ka}`])),
       measureNotesEn: Object.fromEntries(Object.entries(SECTOR_QUERY_MEASURES).map(([query,measure])=>[query,`${snapshot.economicSectors.definitions[measure].en} ${snapshot.economicSectors.definitions.reference[measure].en}`])),
     } : {}),
+    ...(datasetId === "inflation" ? { periods: inflationDatasetPeriods(snapshot) } : {}),
     ...(datasetId === "municipal-expenditure" ? { measureNotesKa: { gel_per_resident: serviceMessage(snapshot, "ka", "coverage.perResident") }, measureNotesEn: { gel_per_resident: serviceMessage(snapshot, "en", "coverage.perResident") }, measureNotes: { gel_per_resident: "Available only for 2025 municipality and region totals (municipal.total); not for the country aggregate or individual functions." } } : {}),
     ...(datasetId === "government-debt" ? { measureNotesKa: { amount_gel: serviceMessage(snapshot, "ka", "coverage.debtAmount"), share_of_gdp_pct: serviceMessage(snapshot, "ka", "coverage.debtGdp"), rate_percent: serviceMessage(snapshot, "ka", "coverage.debtRate") }, measureNotesEn: { amount_gel: serviceMessage(snapshot, "en", "coverage.debtAmount"), share_of_gdp_pct: serviceMessage(snapshot, "en", "coverage.debtGdp"), rate_percent: serviceMessage(snapshot, "en", "coverage.debtRate") }, measureNotes: { amount_gel: "Stock and service only.", share_of_gdp_pct: "Stock and service, where reviewed GDP is available.", rate_percent: "Interest-rate series only; unpublished rates are missing, not zero." } } : {}),
   };
@@ -487,6 +498,8 @@ function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId)
       return Object.entries(GDP_QUERY_SERIES).map(([seriesId,s])=>({seriesId,labelKa:s.labelKa,level:LEVEL_TOTAL,parentSeriesId:null,availability:"served",years:sortedUniqueYears(snapshot.gdpOverview.facts.filter(f=>f.seriesId===seriesId).map(f=>f.year))}));
     case "economic-sectors":
       return snapshot.economicSectors.registry.map(r=>({seriesId:r.id,labelKa:r.labelKa,level:r.id==="economy.gdp_total"?LEVEL_TOTAL:"economic_activity",parentSeriesId:null,availability:"served",years:sortedUniqueYears(snapshot.economicSectors.facts.filter(f=>f.seriesId===r.id).map(f=>f.year)),yearsByMeasure:Object.fromEntries(Object.entries(SECTOR_QUERY_MEASURES).map(([query,measure])=>[query,sortedUniqueYears(snapshot.economicSectors.facts.filter(f=>f.seriesId===r.id&&f.measure===measure).map(f=>f.year))]))}));
+    case "inflation":
+      return inflationCatalogueSeries(snapshot);
   }
 }
 

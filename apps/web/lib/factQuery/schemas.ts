@@ -27,6 +27,9 @@ const sourceIdList = boundedIds(INPUT_LIMITS.sourceIds);
 
 export const expectedDataVersion = z.string().regex(/^[0-9a-f]{64}$/).optional().describe("Use the dataVersion from a previous response to keep related calls on the same snapshot; a changed version returns data_version_changed.");
 
+export const PERIOD_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
+export const periodKeySchema = z.string().regex(PERIOD_PATTERN, "use YYYY-MM");
+
 // Exported so describeCoverage.ts can report each dataset's legal `measures`
 // straight from the same enum queryNationalInput/queryMinistriesInput/
 // queryMunicipalInput already validate against, instead of a second
@@ -43,10 +46,10 @@ export const economicSectorMeasure = z.enum(["amount_gel", "share_of_gdp_pct", "
 export const queryEconomicSectorsInput = z.strictObject({ seriesIds: seriesIdList, years: uniqueSortedYears, measure: economicSectorMeasure, expectedDataVersion });
 
 export const describeCoverageInput = z.strictObject({
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "inflation"]).optional(),
   search: z.string().max(120).optional(),
   entityType: z.enum(["country", "municipality", "region"]).optional(),
-  level: z.enum(["admin_category", "major_program"]).optional(),
+  level: z.enum(["admin_category", "major_program", "division", "subgroup"]).optional(),
   expectedDataVersion,
 });
 
@@ -152,7 +155,7 @@ export const rankInput = z
 
 export const getSourcesInput = z.strictObject({
   sourceIds: sourceIdList,
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "inflation"]).optional(),
   years: uniqueSortedYears.optional(),
   entityIds: entityIdList.optional(),
   expectedDataVersion,
@@ -197,8 +200,9 @@ export const observationSchema = z.object({
   level: z.string(),
   parentSeriesId: z.string().nullable(),
   year: z.number().int(),
+  period: periodKeySchema.optional(),
   measure: z.string(),
-  unit: z.enum(["GEL", "percent", "GEL_per_resident", "USD", "USD_2015", "GEL_per_person", "USD_per_person"]),
+  unit: z.enum(["GEL", "percent", "GEL_per_resident", "USD", "USD_2015", "GEL_per_person", "USD_per_person", "index_2010_100", "percentage_points"]),
   value: z.number().finite().nullable(),
   availability: z.enum(["available", "missing"]),
   missingReason: z.string().nullable(),
