@@ -375,6 +375,11 @@ free plan. Upgrading or enabling automatic upgrades needs explicit approval.
 | Serialized tool result | 512 KiB across text and structured content |
 | Function duration | 10 seconds |
 
+The byte ceiling, not the cell count, is what binds. The text representation
+prints each value definition once, in a legend keyed by `definitionId`, not on
+every row. Even so, an inflation answer fits about 250 cells, and the
+`query_inflation` description and server instructions say so.
+
 An oversized request is rejected in full with guidance to narrow it. Source
 references and caveats are never silently trimmed. Every tool publishes its own
 output shape. Structured and text answers preserve missingness, relevant

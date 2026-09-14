@@ -160,6 +160,8 @@ INFLATION
 - This service does not adjust budget figures for inflation. If you do, present
   it as your own calculation, not as a Fiscal.ge figure.
 - Do not state causes of price changes or the success or failure of monetary policy.
+- One inflation answer fits about 250 cells (series × months), below the general
+  500-cell limit. For more, split the request by period or use the bulk files.
 
 HOW TO PRESENT AN ANSWER
 The reader is a member of the public asking about their country's budget, not a

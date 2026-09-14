@@ -730,7 +730,10 @@ download, the connection answers a bounded question and returns only the
 evidence behind that answer. A response is capped at 512 KiB including both its
 structured and text representations, and an over-cap request is refused with
 narrowing guidance rather than trimmed — dropping sources or warnings to make a
-result fit would publish a figure without its limitations.
+result fit would publish a figure without its limitations. The text
+representation carries every definition, but prints each one once in a legend
+keyed by the `definitionId` its rows name, so a long monthly series does not
+spend the cap on repeated sentences.
 
 The endpoint reads no database and fetches no document at request time. It
 answers from the snapshot bundled into the deployment, so it keeps working

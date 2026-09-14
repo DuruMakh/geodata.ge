@@ -301,6 +301,28 @@ describe("MCP tool surface", () => {
     expect(result.isError).toBeFalsy();
   });
 
+  // The headline grows by a row every month. Before definitions moved to a legend the
+  // full history was 505 KiB of 512 and would have been refused within a few releases.
+  it("fits the full published headline history and prints its definition once", async () => {
+    const client = await connected();
+    const periods = loadPackagedSnapshot()
+      .inflation.facts.filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")
+      .map((fact) => fact.period)
+      .sort();
+    const result = await client.callTool({
+      name: "query_inflation",
+      arguments: { seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: periods[0], toPeriod: periods.at(-1) },
+    });
+    expect(result.isError).toBeFalsy();
+    const observations = (result.structuredContent as { data: { observations: { valueDefinitionEn: string }[] } }).data.observations;
+    expect(observations.length).toBe(periods.length);
+    const text = (result.content as { text: string }[])[0]!.text;
+    expect(text.split(observations[0]!.valueDefinitionEn)).toHaveLength(2);
+    expect(text).toContain("\tinflation:yoy_pct\t");
+    // Headroom, so the test fails years before production would refuse the call.
+    expect(Buffer.byteLength(JSON.stringify(result), "utf8")).toBeLessThan(0.85 * 512 * 1024);
+  });
+
   it("tells clients inflation is the one monthly dataset", () => {
     const instructions = serverInstructions({}, ENTITY_COUNTS);
     expect(instructions).toContain("INFLATION");

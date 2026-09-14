@@ -82,8 +82,8 @@ function observationLine(observation: Observation): string {
     // consolidated receipts from state-budget expenditure - the one distinction
     // that makes these figures unsafe to subtract from each other.
     observation.budgetScope,
-    observation.valueDefinition,
-    observation.valueDefinitionEn,
+    // The definition's text is printed once in the legend below the table.
+    observation.valueDefinitionId,
     observation.missingReasonEn,
     observation.caveatIds.join(","),
     observation.entityId,
@@ -115,10 +115,8 @@ function comparisonLine(comparison: Comparison): string {
     // no statement of what makes the two years incompatible.
     comparison.reasons.join(","),
     comparison.reasonsEn.join(","),
-    comparison.from.valueDefinition,
-    comparison.from.valueDefinitionEn,
-    comparison.to.valueDefinition,
-    comparison.to.valueDefinitionEn,
+    comparison.from.valueDefinitionId,
+    comparison.to.valueDefinitionId,
     comparison.from.missingReason,
     comparison.from.missingReasonEn,
     comparison.to.missingReason,
@@ -137,6 +135,26 @@ function sourceView(source: ResolvedSourceView): string {
   return line(source.sourceId, source.name, source.documents.length, source.narrowingOutcome);
 }
 
+type Defined = { valueDefinitionId: string; valueDefinition: string; valueDefinitionEn: string };
+
+/**
+ * Each distinct definition once, keyed by the id the rows carry. Repeating both
+ * languages on every row spent about 40% of a long monthly series' 512 KiB on
+ * the same two sentences. Keyed by the full text as well as the id, so two texts
+ * sharing an id would both be printed rather than one silently lost.
+ */
+function definitionLines(items: readonly Defined[]): string[] {
+  const seen = new Map<string, Defined>();
+  for (const item of items) seen.set(JSON.stringify([item.valueDefinitionId, item.valueDefinition, item.valueDefinitionEn]), item);
+  if (seen.size === 0) return [];
+  return [
+    "",
+    "## განმარტებები / definitions",
+    "# definitionId\tdefinitionKa\tdefinitionEn",
+    ...[...seen.values()].map((item) => line(item.valueDefinitionId, item.valueDefinition, item.valueDefinitionEn)),
+  ];
+}
+
 function excludedLines(coverage: { excludedEntities: { entityId: string; reason: string; reasonEn: string }[] }): string[] {
   return coverage.excludedEntities.map((entity) => `excluded ${entity.entityId}: ${entity.reason} | ${entity.reasonEn}`);
 }
@@ -147,19 +165,21 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   if (response.kind === "observations") {
     const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number; excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
     return [
-      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearOrPeriod\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinitionKa\tdefinitionEn\tmissingReasonEn\tcaveats\tentityId\tseriesId\tsourceIds\tdocumentIds",
+      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearOrPeriod\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinitionId\tmissingReasonEn\tcaveats\tentityId\tseriesId\tsourceIds\tdocumentIds",
       ...observations.map(observationLine),
       `returned ${coverage.returnedCount} of ${coverage.expectedCount} requested cells`,
       ...excludedLines(coverage),
+      ...definitionLines(observations),
     ];
   }
 
   if (response.kind === "comparisons") {
     const { comparisons, coverage } = data as { comparisons: Comparison[]; coverage: { excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
     return [
-      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearsOrPeriods\tmeasure\tfrom\tto\tfromBasis\ttoBasis\tchange\tpct\tpp\tunit\tcomparability\treasonsKa\treasonsEn\tfromDefinitionKa\tfromDefinitionEn\ttoDefinitionKa\ttoDefinitionEn\tfromMissingKa\tfromMissingEn\ttoMissingKa\ttoMissingEn\tcaveats\tentityId\tseriesId\tfromSources\tfromDocuments\ttoSources\ttoDocuments",
+      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearsOrPeriods\tmeasure\tfrom\tto\tfromBasis\ttoBasis\tchange\tpct\tpp\tunit\tcomparability\treasonsKa\treasonsEn\tfromDefinitionId\ttoDefinitionId\tfromMissingKa\tfromMissingEn\ttoMissingKa\ttoMissingEn\tcaveats\tentityId\tseriesId\tfromSources\tfromDocuments\ttoSources\ttoDocuments",
       ...comparisons.map(comparisonLine),
       ...excludedLines(coverage),
+      ...definitionLines(comparisons.flatMap((comparison) => [comparison.from, comparison.to])),
     ];
   }
 
