@@ -262,6 +262,18 @@ describe("MCP tool surface", () => {
     });
     expect(result.isError).toBeFalsy();
     expect(result.structuredContent).toMatchObject({ data: { observations: [{ period: "2026-08", unit: "percent" }] } });
+    // The text twin must name the month, or a year of months reads as twelve identical "2026" rows.
+    expect((result.content as { text: string }[])[0]!.text).toContain("\t2026-08\tyoy_pct\t5.6479\t");
+  });
+
+  it("names both months of an inflation comparison in the text twin", async () => {
+    const client = await connected();
+    const result = await client.callTool({
+      name: "compare",
+      arguments: { target: { dataset: "inflation", seriesIds: ["cpi.headline"] }, fromPeriod: "2025-08", toPeriod: "2026-08", measure: "yoy_pct" },
+    });
+    expect(result.isError).toBeFalsy();
+    expect((result.content as { text: string }[])[0]!.text).toContain("\t2025-08→2026-08\t");
   });
 
   it("refuses an oversized inflation request before calculating it", async () => {

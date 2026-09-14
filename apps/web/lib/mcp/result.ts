@@ -72,7 +72,8 @@ function observationLine(observation: Observation): string {
     observation.entityLabelEn,
     observation.seriesLabelKa,
     observation.seriesLabelEn,
-    observation.year,
+    // A monthly observation's month, or twelve months of one year read as twelve identical rows.
+    observation.period ?? observation.year,
     observation.measure,
     value,
     observation.unit,
@@ -98,7 +99,7 @@ function comparisonLine(comparison: Comparison): string {
     comparison.entityLabelEn,
     comparison.seriesLabelKa,
     comparison.seriesLabelEn,
-    `${comparison.from.year}→${comparison.to.year}`,
+    `${comparison.from.period ?? comparison.from.year}→${comparison.to.period ?? comparison.to.year}`,
     comparison.measure,
     comparison.from.value,
     comparison.to.value,
