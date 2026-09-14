@@ -43,6 +43,7 @@ Makes inflation discoverable: `describe_coverage` lists the dataset, its series 
 - Modify: `apps/web/lib/factQuery/getSources.ts`
 - Modify: `apps/web/lib/mcp/outputSchema.ts` (catalogue periods)
 - Modify: `data/localization/en/labels.json` (dataset label)
+- Modify: `apps/web/tests/factQuery/describeCoverage.test.ts` (pinned dataset list)
 - Test: `apps/web/tests/factQuery/inflationCatalogue.test.ts`
 
 **Interfaces:**
@@ -202,7 +203,7 @@ export const INFLATION_DEFINITIONS: Record<InflationMeasure | "residual", { ka: 
     en: "Change in consumer prices against the same month a year earlier, in percent as Geostat publishes it: 2.4 means 2.4%.",
   },
   mom_pct: {
-    ka: "ფასების ცვლილება წინა თვესთან, პროცენტებში, როგორც საქსტატი აქვეყნებს. თვიური ცვლილებები წლიურ ცვლილებას არ ჯამდება.",
+    ka: "ფასების ცვლილება წინა თვესთან, პროცენტებში, როგორც საქსტატი აქვეყნებს. თვიური ცვლილებების ჯამი წლიური ცვლილების ტოლი არ არის.",
     en: "Change against the previous month, in percent as Geostat publishes it. Monthly changes do not add up to the annual change.",
   },
   avg12_pct: {
@@ -210,15 +211,15 @@ export const INFLATION_DEFINITIONS: Record<InflationMeasure | "residual", { ka: 
     en: "Twelve-month average inflation as Geostat publishes it; not the annual (year-on-year) rate.",
   },
   index_2010: {
-    ka: "სამომხმარებლო ფასების ინდექსის დონე, 2010 = 100, როგორც საქსტატი აქვეყნებს; ეს დონეა, არა პროცენტი.",
+    ka: "სამომხმარებლო ფასების ინდექსის დონე, 2010 = 100, როგორც საქსტატი აქვეყნებს; ეს არის ინდექსის დონე, არა პროცენტი.",
     en: "Consumer price index level, 2010 = 100, as Geostat publishes it; a level, not a percentage.",
   },
   target_pct: {
-    ka: "საქართველოს ეროვნული ბანკის ამ თვეში მოქმედი ინფლაციის მიზნობრივი მაჩვენებელი, პროცენტებში; ეს ორიენტირია, არა პროგნოზი ან შედეგი.",
+    ka: "საქართველოს ეროვნული ბანკის ამ თვეში მოქმედი ინფლაციის მიზნობრივი მაჩვენებელი, პროცენტებში; ეს არის ორიენტირი, არა პროგნოზი ან შედეგი.",
     en: "The National Bank of Georgia's inflation target in force that month, in percent; a reference, not a forecast or an outcome.",
   },
   basket_weight_pct: {
-    ka: "ჯგუფის წილი სამომხმარებლო კალათაში ამ წელს, პროცენტებში, როგორც საქსტატი აქვეყნებს; განყოფილებების ჯამი 100-ია.",
+    ka: "ჯგუფის წილი სამომხმარებლო კალათაში ამ წელს, პროცენტებში, როგორც საქსტატი აქვეყნებს; განყოფილებების წილების ჯამი 100-ის ტოლია.",
     en: "The group's share of the consumer basket in that year, in percent, as Geostat publishes it; divisions sum to 100.",
   },
   contribution_pp: {
@@ -519,13 +520,14 @@ async function loadInflationGroups(
     },
 ```
 
-6. In `data/localization/en/labels.json`, after the `"economic-sectors"` entry, add:
+6. In `data/localization/en/labels.json`, `"economic-sectors"` is the last entry, so the new entry needs the comma on the entry before it. Replace the `  }` that closes `"economic-sectors"` (directly above the file's final `}`) with:
 
 ```json
+  },
   "inflation": {
     "text": "Consumer price inflation",
     "reviewedAt": "2026-09-14"
-  },
+  }
 ```
 
 - [ ] **Step 8: Add inflation to the catalogue**
@@ -595,13 +597,17 @@ In `apps/web/lib/mcp/outputSchema.ts`, in `dataShapes.catalogue`:
 - in the `datasets` object, after `measures: z.array(z.string()),` add `periods: z.tuple([z.string(), z.string()]).optional(),`
 - in the `series` object, after `yearsByMeasure: z.record(z.string(), z.array(z.number())).optional(),` add `periods: z.tuple([z.string(), z.string()]).optional(), periodsByMeasure: z.record(z.string(), z.tuple([z.string(), z.string()])).optional(),`
 
-- [ ] **Step 11: Run tests to verify they pass**
+- [ ] **Step 11: Update the pinned dataset list**
+
+In `apps/web/tests/factQuery/describeCoverage.test.ts`, in `"returns a conforming catalogue envelope with every dataset"`, the sorted list gains `"inflation",` between `"government-debt",` and `"ministries",`. Change nothing else in that file.
+
+- [ ] **Step 12: Run tests to verify they pass**
 
 Run: `npx vitest run tests/factQuery/inflationCatalogue.test.ts tests/factQuery/describeCoverage.test.ts tests/factQuery/getSources.test.ts tests/factQuery/purity.test.ts tests/factQuery/buildSnapshot.test.ts`
 Then: `npm run typecheck`
-Expected: PASS. If `describeCoverage.test.ts` or `buildSnapshot.test.ts` pin the dataset list or a label count, add `"inflation"` after `"economic-sectors"` in that one expectation and change nothing else.
+Expected: PASS.
 
-- [ ] **Step 12: Commit**
+- [ ] **Step 13: Commit**
 
 ```bash
 git add apps/web/lib/factQuery/inflationSeries.ts apps/web/lib/factQuery/inflationData.ts apps/web/lib/factQuery/types.ts apps/web/lib/factQuery/observations.ts apps/web/lib/factQuery/schemas.ts apps/web/lib/factQuery/buildSnapshot.ts apps/web/lib/factQuery/describeCoverage.ts apps/web/lib/factQuery/getSources.ts apps/web/lib/mcp/outputSchema.ts data/localization/en/labels.json apps/web/tests/factQuery
@@ -749,21 +755,21 @@ Add these entries to `data/localization/en/service-messages.json` (key order in 
 Add these entries to `data/localization/ka/service-messages.json`:
 
 ```json
-  "caveats.inflation_contribution_derived": "წვლილები Fiscal.ge-ის მიახლოებითი გაანგარიშებაა საქსტატის გამოქვეყნებული ფასების ცვლილებებიდან და კალათის წილებიდან; საქსტატი ამ მაჩვენებელს არ აქვეყნებს.",
+  "caveats.inflation_contribution_derived": "წვლილები Fiscal.ge-ის მიერ მიახლოებით გამოთვლილია საქსტატის გამოქვეყნებული ფასების ცვლილებებიდან და კალათის წილებიდან; საქსტატი ამ მაჩვენებელს არ აქვეყნებს.",
   "caveats.inflation_contribution_residual": "დანარჩენი = გამოქვეყნებული საერთო ინფლაცია გამოკლებული მოთხოვნილი ჯგუფების წვლილი: ყველაფერი, რაც არ მოითხოვეთ, და მიახლოების ცდომილება; ეს საქონლის კატეგორია არ არის.",
-  "caveats.inflation_contribution_weights_differ": "სამომხმარებლო კალათის წილები ყოველ იანვარში განახლდება, ასე რომ სხვადასხვა წლის წვლილები სხვადასხვა წილებს ეყრდნობა.",
+  "caveats.inflation_contribution_weights_differ": "სამომხმარებლო კალათის წილები ყოველ იანვარს ახლდება, ასე რომ სხვადასხვა წლის წვლილები სხვადასხვა წილებს ეყრდნობა.",
   "caveats.inflation_target_unverified_before_2015": "გადამოწმებულ წყაროებში ადრეული ინფლაციის მიზნობრივი მაჩვენებელი დადასტურებული არ არის; ეს არ ნიშნავს, რომ ის არ არსებობდა.",
-  "comparison.basketReweighted": "ამ თვეებს შორის სამომხმარებლო კალათის წილები განახლდა, ასე რომ ორი წვლილი სხვადასხვა წილებს ეყრდნობა.",
-  "errors.contributionMixedLevels": "წვლილებში განყოფილებები და ქვეჯგუფები არ ერთიანდება: ქვეჯგუფები განყოფილებების ნაწილია, და ჯამი მათ ორჯერ დაითვლის.",
-  "errors.periodRangeReversed": "fromPeriod არ უნდა იყოს toPeriod-ზე გვიან.",
+  "comparison.basketReweighted": "ამ თვეებს შორის სამომხმარებლო კალათის წილები ახლდა, ასე რომ ორი წვლილი სხვადასხვა წილებს ეყრდნობა.",
+  "errors.contributionMixedLevels": "წვლილების მოთხოვნაში განყოფილებებისა და ქვეჯგუფების ერთად მითითება დაუშვებელია: ქვეჯგუფები განყოფილებების ნაწილია და ჯამში ორჯერ ჩაითვლება.",
+  "errors.periodRangeReversed": "fromPeriod არ უნდა იყოს toPeriod-ის შემდეგ.",
   "errors.periodsOutOfRange": "მოთხოვნილი პერიოდ(ებ)ი {outOfRangePeriods} სცილდება ამ მაჩვენებლის დაფარვას ({first}–{last}).",
-  "missing.inflationContribution": "ამ თვისთვის წვლილი არ გაანგარიშდება: ჯგუფის წლიური ცვლილება ან კალათის წილი გამოქვეყნებული არ არის.",
-  "missing.inflationContributionStart": "წვლილები გაანგარიშებულია მხოლოდ {firstYear} წლიდან; ადრეული წილები საერთო ინფლაციას ზედმეტად უზუსტოდ აღადგენს.",
+  "missing.inflationContribution": "ამ თვის წვლილის გამოთვლა შეუძლებელია: ჯგუფის წლიური ცვლილება ან კალათის წილი გამოქვეყნებული არ არის.",
+  "missing.inflationContributionStart": "წვლილები გამოთვლილია მხოლოდ {firstYear} წლიდან; ადრეული წლების წილებით საერთო ინფლაცია ზედმეტად არაზუსტად აღდგება.",
   "missing.inflationMonth": "ამ სერიისთვის ამ თვეში მნიშვნელობა გამოქვეყნებული არ არის — ეს ნულს არ ნიშნავს.",
-  "missing.inflationResidualHeadline": "ამ თვისთვის გამოქვეყნებული საერთო ინფლაცია არ არის, ასე რომ დანარჩენი არ გაანგარიშდება.",
+  "missing.inflationResidualHeadline": "ამ თვისთვის გამოქვეყნებული საერთო ინფლაცია არ არის, ასე რომ დანარჩენის გამოთვლა შეუძლებელია.",
   "missing.inflationTargetUnverified": "გადამოწმებულ წყაროებში ამ თვის ინფლაციის რიცხობრივი მიზნობრივი მაჩვენებელი დადასტურებული არ არის; ეს არ ნიშნავს, რომ ის არ არსებობდა.",
   "missing.inflationWeight": "ამ ჯგუფისთვის ამ წელს კალათის წილი გამოქვეყნებული არ არის.",
-  "ranking.changeDefinitionPeriod": "დალაგება ცვლილებით {metric} ({measure}), {fromPeriod}→{toPeriod}, {order}.",
+  "ranking.changeDefinitionPeriod": "დალაგება ცვლილების მაჩვენებლით {metric} ({measure}), {fromPeriod}→{toPeriod}, {order}.",
   "ranking.inflationDivisions": "ეროვნული სამომხმარებლო ფასების ინდექსის COICOP განყოფილებები; საერთო ინფლაცია, მიზნობრივი მაჩვენებელი და დანარჩენი არ მონაწილეობს.",
   "ranking.inflationSubgroups": "ეროვნული სამომხმარებლო ფასების ინდექსის COICOP ქვეჯგუფები.",
   "ranking.inflationSubgroupsWithinParent": "COICOP ქვეჯგუფები განყოფილებაში {parentId}.",
@@ -947,7 +953,7 @@ In `docs/data-methodology/ai-grounding-and-caveats.md`:
 
 **Trigger.** Any returned `contribution_pp` cell of a COICOP group.
 
-**Georgian.** წვლილები Fiscal.ge-ის მიახლოებითი გაანგარიშებაა საქსტატის გამოქვეყნებული ფასების ცვლილებებიდან და კალათის წილებიდან; საქსტატი ამ მაჩვენებელს არ აქვეყნებს.
+**Georgian.** წვლილები Fiscal.ge-ის მიერ მიახლოებით გამოთვლილია საქსტატის გამოქვეყნებული ფასების ცვლილებებიდან და კალათის წილებიდან; საქსტატი ამ მაჩვენებელს არ აქვეყნებს.
 
 **English.** Contributions are Fiscal.ge's approximation from Geostat's published price changes and basket weights, not a figure Geostat publishes.
 
@@ -975,7 +981,7 @@ The residual changes with the selection, so it is never a candidate in a ranking
 
 **Trigger.** A contribution comparison whose two months fall in different calendar years.
 
-**Georgian.** სამომხმარებლო კალათის წილები ყოველ იანვარში განახლდება, ასე რომ სხვადასხვა წლის წვლილები სხვადასხვა წილებს ეყრდნობა.
+**Georgian.** სამომხმარებლო კალათის წილები ყოველ იანვარს ახლდება, ასე რომ სხვადასხვა წლის წვლილები სხვადასხვა წილებს ეყრდნობა.
 
 **English.** The consumer basket is re-weighted every January, so contributions in different years rest on different weights.
 
@@ -1018,7 +1024,7 @@ Adds the one implementation of an inflation cell (`inflationObservations`), the 
 - Create: `apps/web/lib/factQuery/queryInflation.ts`
 - Modify: `apps/web/lib/factQuery/index.ts`
 - Modify: `apps/web/lib/mcp/tools.ts`, `apps/web/lib/mcp/instructions.ts`, `apps/web/lib/mcp/outputSchema.ts`
-- Modify: `apps/web/tests/factQuery/caveats/registered.test.ts`, `apps/web/tests/mcp/tools.test.ts`, `apps/web/tests/mcp/route.test.ts`, `apps/web/tests/mcp/bilingualTransport.test.ts`
+- Modify: `apps/web/tests/factQuery/caveats/registered.test.ts`, `apps/web/tests/mcp/tools.test.ts`, `apps/web/tests/mcp/route.test.ts`, `apps/web/tests/mcp/bilingualTransport.test.ts`, `apps/web/tests/mcp/outputSchema.test.ts`
 - Test: `apps/web/tests/factQuery/queryInflation.test.ts`
 
 **Interfaces:**
@@ -1551,9 +1557,49 @@ In `apps/web/tests/mcp/route.test.ts` and `apps/web/tests/mcp/bilingualTransport
     ["query_inflation", { seriesIds: ["cpi.cat.07"], measure: "contribution_pp", fromPeriod: "2026-08", toPeriod: "2026-08" }],
 ```
 
+Also in `apps/web/tests/mcp/tools.test.ts`, directly after the `"refuses an oversized inflation request before calculating it"` test added above, add:
+
+```ts
+  // The binding MCP gate is LIMITS.resultBytes (512 KiB, both representations), not
+  // the 500-cell cap, and inflation rows carry long bilingual definitions. A year of
+  // division contributions is the everyday contributions question, so it must fit.
+  it("fits a year of division contributions within the response-size limit", async () => {
+    const client = await connected();
+    const snapshot = loadPackagedSnapshot();
+    const divisions = snapshot.inflation.groups.filter((group) => group.level === "division").map((group) => group.id);
+    const result = await client.callTool({
+      name: "query_inflation",
+      arguments: { seriesIds: divisions, measure: "contribution_pp", fromPeriod: "2025-01", toPeriod: "2025-12" },
+    });
+    expect(result.isError).toBeFalsy();
+  });
+```
+
+If this test still fails after Step 9 because the result is refused as `result_too_large`, STOP and report the measured size. Do not shorten definitions, drop evidence or raise the limit to make it pass: which of those to do is the owner's decision.
+
+In the same file, the `"never glues a number to the word before it"` test rejects any letter followed by a digit, which the measure id `avg12_pct` (named as in the reviewed CSV) now puts in a description and the instructions. The regression it guards was a glued year ("cover2010"). Replace:
+
+```ts
+    for (const text of texts) expect(text).not.toMatch(/[a-z]\d/i);
+```
+
+with:
+
+```ts
+    // A glued year ("cover2010") is the regression. Measure ids such as avg12_pct
+    // legitimately put a digit after a letter.
+    for (const text of texts) expect(text).not.toMatch(/[a-z]\d{4}/i);
+```
+
+In `apps/web/tests/mcp/outputSchema.test.ts`, `"covers every tool"` requires a probe call per tool. In `CALLS`, directly after the `query_gdp` entry, add:
+
+```ts
+  query_inflation: { seriesIds: ["cpi.cat.07"], measure: "contribution_pp", fromPeriod: "2026-08", toPeriod: "2026-08" },
+```
+
 - [ ] **Step 8: Run the MCP tests to verify they fail**
 
-Run: `npm run data:prepare-fact-query-snapshot && npx vitest run tests/mcp/tools.test.ts tests/mcp/route.test.ts tests/mcp/bilingualTransport.test.ts`
+Run: `npm run data:prepare-fact-query-snapshot && npx vitest run tests/mcp/tools.test.ts tests/mcp/route.test.ts tests/mcp/bilingualTransport.test.ts tests/mcp/outputSchema.test.ts`
 Expected: FAIL — `query_inflation` is not a registered tool and the instructions have no INFLATION section.
 
 - [ ] **Step 9: Register the tool and its cell gate**
@@ -1594,7 +1640,8 @@ type ServiceFacts = {
       "yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct (one cell per calendar year) or contribution_pp. " +
       "A measure a series does not publish is rejected with the valid measures. Percent values use 2.4 for 2.4%. " +
       "Contributions are percentage points, never mix divisions and subgroups, and arrive with a residual series that closes them on the published headline. " +
-      "Take the latest month from describe_coverage. Monthly changes do not add up to annual inflation, and the 12-month average is not annual inflation.",
+      "Take the latest month from describe_coverage. Monthly changes do not add up to annual inflation, and the 12-month average is not annual inflation. " +
+      "For long ranges or many groups, ask for fewer months or groups: a result over the response-size limit is refused and points to the bulk files.",
     schema: queryInflationInput,
     run: (snapshot, input) => queryInflation(snapshot, input),
   },
@@ -1733,7 +1780,7 @@ INFLATION
 
 Run: `npm run data:prepare-fact-query-snapshot && npx vitest run tests/mcp tests/factQuery/queryInflation.test.ts tests/factQuery/caveats/registered.test.ts`
 Then: `npm run typecheck`
-Expected: PASS. If `tests/mcp/outputSchema.test.ts` enumerates tools, add `query_inflation` with kind `observations` to that list.
+Expected: PASS.
 
 - [ ] **Step 13: Commit**
 
@@ -1974,12 +2021,23 @@ with:
 
 - [ ] **Step 5: Describe and declare**
 
-In `apps/web/lib/mcp/tools.ts`, in the `compare` description, replace `"yourself: it is what detects a definition change between the two years.",` with:
+In `apps/web/lib/mcp/tools.ts`, `fromYear` and `toYear` are now optional in the published schema, so the `compare` description must state both forms. Replace:
 
 ```ts
-      "yourself: it is what detects a definition change between the two years. For inflation use target " +
-      "{ dataset: \"inflation\", seriesIds } with fromPeriod and toPeriod (YYYY-MM); basket_weight_pct takes fromYear and toYear.",
+      "Change between two years for one target, with the comparability judgement attached. Requires " +
+      "fromYear < toYear (a cross-field rule the JSON Schema cannot express). Returns absolute, " +
 ```
+
+with:
+
+```ts
+      "Change between two years, or for inflation two months, for one target, with the comparability judgement attached. " +
+      "Budget, debt and balance targets require fromYear < toYear. Inflation targets { dataset: \"inflation\", seriesIds } " +
+      "require fromPeriod < toPeriod (YYYY-MM), except basket_weight_pct, which takes fromYear < toYear. These are " +
+      "cross-field rules the JSON Schema cannot express. Returns absolute, " +
+```
+
+and leave the rest of that description unchanged.
 
 In `apps/web/lib/mcp/outputSchema.ts`, in `dataShapes.comparisons.coverage`, after `requestedYears: z.array(z.number()),` add `requestedPeriods: z.tuple([z.string(), z.string()]).optional(),`. The `endpoint` schema picks from `observationSchema`; add `period: true` to its `pick({...})` list.
 
@@ -2064,6 +2122,9 @@ describe("rank on inflation", () => {
     expect(rank(snapshot, { ...base, level: "admin_category" }).kind).toBe("error");
     expect(rank(snapshot, { ...base, level: "division", year: 2026 }).kind).toBe("error");
     expect(rank(snapshot, { ...base, level: "division", period: undefined, fromPeriod: "2025-08", toPeriod: "2026-08", metric: "absolute_change" }).kind).toBe("error");
+    // Stray month fields are refused, not ignored.
+    expect(rank(snapshot, { ...base, level: "division", fromPeriod: "2025-08" }).kind).toBe("error");
+    expect(rank(snapshot, { ...base, level: "division", fromPeriod: "2025-08", toPeriod: "2026-08", metric: "percentage_point_change" }).kind).toBe("error");
     expect(rank(snapshot, { datasetId: "national-expenditure", dimension: "series", period: "2026-08", measure: "amount_gel", metric: "value" }).kind).toBe("error");
   });
 });
@@ -2125,6 +2186,10 @@ export const rankInput = z
       input.parentSeriesId !== undefined && !(ministries && input.level === "major_program") && !(inflation && input.level === "subgroup") ? "parentSeriesId" : null,
       inflation && (input.year !== undefined || input.fromYear !== undefined || input.toYear !== undefined) ? "year" : null,
       !inflation && (input.period !== undefined || input.fromPeriod !== undefined || input.toPeriod !== undefined) ? "period" : null,
+      // Mirrors errors.rankValueYearOnly / errors.rankChangeYears for months: a
+      // stray field must be refused, never silently ignored.
+      inflation && input.metric === "value" && (input.fromPeriod !== undefined || input.toPeriod !== undefined) ? "fromPeriod" : null,
+      inflation && input.metric !== "value" && input.period !== undefined ? "period" : null,
     ];
     for (const field of invalid) {
       if (field !== null) context.addIssue({ code: "custom", path: [field], message: `${field} does not apply to this ranking mode; omit it or choose its supported mode.` });
@@ -2171,7 +2236,7 @@ export type RankData = {
 ```
 
 5. In the single-entity error, replace `validChoices: ["national-revenue", "national-expenditure", "ministries", "municipal-expenditure"],` with `validChoices: ["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "inflation"],`.
-6. After `const isMunicipal = input.datasetId === "municipal-expenditure";` add `const isInflation = input.datasetId === "inflation";`. Add `type MinistriesLevel = "admin_category" | "major_program";` above `export function rank`, and replace both occurrences of `level: input.level ?? "admin_category"` with `level: (input.level ?? "admin_category") as MinistriesLevel`.
+6. After `const isMunicipal = input.datasetId === "municipal-expenditure";` add `const isInflation = input.datasetId === "inflation";`. The widened `level` type needs no casts: `queryMinistries` and `compare` both take `rawInput: unknown` and validate it themselves.
 7. Replace:
 
 ```ts
@@ -2221,7 +2286,7 @@ with:
       : isMunicipal
         ? ({ dataset: "municipal", entityIds, seriesIds } as const)
         : input.datasetId === "ministries"
-          ? ({ dataset: "ministries", level: (input.level ?? "admin_category") as MinistriesLevel, seriesIds } as const)
+          ? ({ dataset: "ministries", level: input.level ?? "admin_category", seriesIds } as const)
           : ({ dataset: "national", side: input.datasetId === "national-revenue" ? "revenue" : "expenditure", seriesIds } as const);
 
     const result = compare(
@@ -2286,7 +2351,7 @@ Publishes `inflation-national.json` (observation envelope), `inflation-categorie
 
 **Files:**
 - Modify: `apps/web/lib/factQuery/publications.ts`
-- Modify: `apps/web/tests/factQuery/bilingualPublications.test.ts`
+- Modify: `apps/web/tests/factQuery/bilingualPublications.test.ts`, `apps/web/tests/factQuery/publications.test.ts`
 - Test: `apps/web/tests/factQuery/inflationPublications.test.ts`
 
 **Interfaces:**
@@ -2336,6 +2401,8 @@ describe("inflation publications", () => {
     const weight = national.observations.find((o: { measure: string }) => o.measure === "basket_weight_pct");
     expect(weight.period).toBeUndefined();
     expect(national.observations.some((o: { measure: string }) => o.measure === "contribution_pp")).toBe(false);
+    // One coverage block per part: the parts span different months and years.
+    expect(Object.keys(national.coverage).sort()).toEqual(["avg12_pct", "basket_weight_pct", "index_2010", "mom_pct", "target_pct", "yoy_pct"]);
   });
 
   it("publishes group rates and contributions that close on the headline", () => {
@@ -2413,24 +2480,30 @@ and replace `buildGdpCsv(snapshot), buildEconomicSectorsJson(snapshot), buildEco
 4. Append at the end of the file:
 
 ```ts
-/** Several observation responses of one dataset as one, with coverage, sources and caveats merged. */
-function mergeObservationResponses(label: string, responses: FactQueryResponse[]): FactQueryResponse {
-  const parts = responses.map((response) => observationsOf(response, label));
+/**
+ * Several observation responses of one dataset as one file body. Coverage stays
+ * per part, keyed by measure, the way ministries.json keys it by level: the parts
+ * span different months and years, so one merged block would describe only the
+ * first part. Sources and caveats are unioned.
+ */
+function mergeObservationResponses(label: string, parts: Record<string, FactQueryResponse>): FactQueryResponse {
+  const responses = Object.values(parts);
+  const results = responses.map((response) => observationsOf(response, label));
   const first = responses[0]!;
   if (first.kind !== "observations") throw new Error(`${label}: expected observations`);
-  const observations = parts.flatMap((part) => part.data.observations);
+  const observations = results.flatMap((result) => result.data.observations);
   const returnedCount = observations.filter((o) => o.availability === "available").length;
   return {
     ...first,
     status: returnedCount === observations.length ? "ok" : returnedCount > 0 ? "partial" : "empty",
     data: {
       observations,
-      coverage: { ...parts[0]!.data.coverage, missingCells: parts.flatMap((part) => part.data.coverage.missingCells), expectedCount: observations.length, returnedCount },
+      coverage: Object.fromEntries(Object.keys(parts).map((key, index) => [key, results[index]!.data.coverage])),
     },
     meta: {
       ...first.meta,
-      sources: parts.reduce<ResolvedSource[]>((all, part) => mergeSources(all, part.meta.sources), []),
-      caveats: parts.reduce<Caveat[]>((all, part) => mergeCaveats(all, part.meta.caveats), []),
+      sources: results.reduce<ResolvedSource[]>((all, result) => mergeSources(all, result.meta.sources), []),
+      caveats: results.reduce<Caveat[]>((all, result) => mergeCaveats(all, result.meta.caveats), []),
     },
   };
 }
@@ -2445,19 +2518,21 @@ function inflationMonths(snapshot: FactQuerySnapshot, seriesIds: string[], measu
 }
 
 function buildInflationNationalJson(snapshot: FactQuerySnapshot): PublicationArtifact {
-  const national = (["index_2010", "yoy_pct", "mom_pct", "avg12_pct"] as const).map((measure) => {
-    const seriesIds = Object.entries(NATIONAL_SERIES).filter(([, series]) => series.measures.includes(measure)).map(([id]) => id);
-    return inflationObservations(snapshot, { seriesIds, measure, periods: inflationMonths(snapshot, seriesIds, measure) }, { includeResidual: false });
-  });
+  const parts: Record<string, FactQueryResponse> = Object.fromEntries(
+    (["index_2010", "yoy_pct", "mom_pct", "avg12_pct"] as const).map((measure) => {
+      const seriesIds = Object.entries(NATIONAL_SERIES).filter(([, series]) => series.measures.includes(measure)).map(([id]) => id);
+      return [measure, inflationObservations(snapshot, { seriesIds, measure, periods: inflationMonths(snapshot, seriesIds, measure) }, { includeResidual: false })];
+    }),
+  );
   const headline = measurePeriodRange(snapshot, "yoy_pct")!;
-  const target = inflationObservations(snapshot, { seriesIds: [TARGET_SERIES_ID], measure: "target_pct", periods: periodsBetween(headline[0], headline[1]) }, { includeResidual: false });
+  parts.target_pct = inflationObservations(snapshot, { seriesIds: [TARGET_SERIES_ID], measure: "target_pct", periods: periodsBetween(headline[0], headline[1]) }, { includeResidual: false });
   const [minYear, maxYear] = weightYearRange(snapshot);
-  const weights = inflationObservations(
+  parts.basket_weight_pct = inflationObservations(
     snapshot,
     { seriesIds: snapshot.inflation.groups.map((group) => group.id), measure: "basket_weight_pct", years: Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i) },
     { includeResidual: false },
   );
-  return datasetFile(snapshot, "inflation", "inflation-national.json", mergeObservationResponses("inflation-national.json", [...national, target, weights]), {});
+  return datasetFile(snapshot, "inflation", "inflation-national.json", mergeObservationResponses("inflation-national.json", parts), {});
 }
 
 type InflationCategoryPart = { selection: "" | "divisions" | "subgroups"; response: FactQueryResponse };
@@ -2521,9 +2596,25 @@ function buildInflationCategoriesJson(snapshot: FactQuerySnapshot, parts: Inflat
 }
 ```
 
-- [ ] **Step 4: Update the pinned publication list**
+- [ ] **Step 4: Update the pinned publication tests**
 
-In `apps/web/tests/factQuery/bilingualPublications.test.ts`, add `"inflation-national.json", "inflation-categories.csv", "inflation-categories.json"` to the expected file-name array and change `toBe("1.1.0")` to `toBe("1.2.0")`. If `tests/factQuery/publications.test.ts` pins the published dataset list or file names, add `"inflation"` (or the three file names) to that expectation and change nothing else.
+Both files treat every JSON artifact other than the manifest, catalogue and sources as a dataset file with `observations`. `inflation-categories.json` is the CSV's metadata and has none; its shape is tested in `inflationPublications.test.ts`.
+
+In `apps/web/tests/factQuery/bilingualPublications.test.ts`:
+1. Add `"inflation-national.json", "inflation-categories.csv", "inflation-categories.json"` to the expected file-name array and change `toBe("1.1.0")` to `toBe("1.2.0")`.
+2. In `"makes every dataset interpretable in English without changing its fiscal fields"`, change the excluded names to `["manifest.json", "catalogue.json", "sources.json", "inflation-categories.json"]`.
+
+In `apps/web/tests/factQuery/publications.test.ts`:
+1. In `beforeAll`, change the names `datasetFiles` excludes to `["catalogue.json", "sources.json", "manifest.json", "inflation-categories.json"]`.
+2. In `"publishes every dataset with its series and entities"`, add `"inflation",` between `"government-debt",` and `"ministries",`.
+3. In `"publishes every dataset file with observations, catalogue, sources and caveats"`, add `"inflation-national.json",` after `"economic-sectors.json",`. The positional reads (`datasetFiles[0]`, `[2]`, `[3]`) are unaffected: the new file is last.
+4. In `"puts the manifest last so it can hash the others"`, add `"inflation-national.json",`, `"inflation-categories.csv",` and `"inflation-categories.json",` between `"economic-sectors.csv",` and `"manifest.json",`.
+5. In `"publishes an observation for every total its own catalogue advertises"`, replace `if (!file.fileName.startsWith("government-debt")) {` with `if (!file.fileName.startsWith("government-debt") && file.fileName !== "inflation-national.json") {`, and end the comment above it with: `Inflation is exempt for the same reason: its headline is Geostat's published series, not a total this service calculates.`
+6. In `"keeps every declared caveat resolvable back to the row that declares it"`, inflation caveats name one month (`caveatIdsForObservation`, Task 2). Add `period?: string;` to the observation element type, and after the `` `${observation.entityId}:${observation.seriesId}:${observation.year}`, `` entry of `shapes` add:
+
+```ts
+            ...(observation.period !== undefined ? [`${observation.seriesId}:${observation.period}`] : []),
+```
 
 - [ ] **Step 5: Run tests to verify they pass**
 
@@ -2776,7 +2867,7 @@ In `apps/web/lib/i18n/messages/ka/connect.json`, add:
 
 ```json
   "connect.inflationCoverage": "სამომხმარებლო ფასების ინფლაცია, თვიური — {nationalRange}; {groupCount} COICOP ჯგუფი; კალათის წილები {weightRange}; წვლილები {contributionStart}-დან; ეროვნული ბანკის მიზნობრივი მაჩვენებელი {targetStart}-დან.",
-  "connect.inflationQuery": "query_inflation აბრუნებს fromPeriod-დან toPeriod-მდე (YYYY-MM) ერთ მაჩვენებელს: yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct ან contribution_pp. compare ადარებს ორ თვეს; rank ალაგებს განყოფილებებს ან ქვეჯგუფებს ერთ თვეში. წვლილები Fiscal.ge-ის მიახლოებითი გაანგარიშებაა და საქსტატის მაჩვენებელი არ არის.",
+  "connect.inflationQuery": "query_inflation აბრუნებს fromPeriod-დან toPeriod-მდე (YYYY-MM) ერთ მაჩვენებელს: yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct ან contribution_pp. compare ადარებს ორ თვეს; rank ალაგებს განყოფილებებს ან ქვეჯგუფებს ერთ თვეში. წვლილები Fiscal.ge-ის მიერ მიახლოებით გამოთვლილია და საქსტატის მაჩვენებელი არ არის.",
   "connect.inflationCategoriesMetadata": "კატეგორიების მეტამონაცემები",
   "connect.inflationMethodology": "ინფლაციის მეთოდოლოგია",
 ```
