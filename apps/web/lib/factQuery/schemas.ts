@@ -1,5 +1,6 @@
 // apps/web/lib/factQuery/schemas.ts
 import { z } from "zod";
+import { INFLATION_MEASURES } from "./inflationSeries";
 
 /**
  * Spec section 11.3's input array bounds.
@@ -44,6 +45,14 @@ export const debtMeasure = z.enum(["amount_gel", "share_of_gdp_pct", "rate_perce
 export const deficitMeasure = z.enum(["share_of_gdp_pct", "amount_gel"]);
 export const economicSectorMeasure = z.enum(["amount_gel", "share_of_gdp_pct", "real_growth_pct"]);
 export const queryEconomicSectorsInput = z.strictObject({ seriesIds: seriesIdList, years: uniqueSortedYears, measure: economicSectorMeasure, expectedDataVersion });
+export const inflationMeasure = z.enum(INFLATION_MEASURES);
+export const queryInflationInput = z.strictObject({
+  seriesIds: seriesIdList,
+  measure: inflationMeasure,
+  fromPeriod: periodKeySchema.describe("First month, YYYY-MM, inclusive."),
+  toPeriod: periodKeySchema.describe("Last month, YYYY-MM, inclusive. basket_weight_pct returns one cell per calendar year the range touches."),
+  expectedDataVersion,
+});
 
 export const describeCoverageInput = z.strictObject({
   datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "inflation"]).optional(),

@@ -17,6 +17,7 @@ import { GDP_QUERY_SERIES } from "../../../lib/factQuery/gdpSeries";
 import { serviceMessage } from "../../../lib/factQuery/localization";
 import { queryEconomicSectors } from "../../../lib/factQuery/queryEconomicSectors";
 import { queryGdp } from "../../../lib/factQuery/queryGdp";
+import { queryInflation } from "../../../lib/factQuery/queryInflation";
 import type { Caveat, FactQueryResponse, FactQuerySnapshot } from "../../../lib/factQuery/types";
 
 const FACT_QUERY_DIR = path.join(process.cwd(), "lib", "factQuery");
@@ -59,6 +60,18 @@ describe("caveats come only from the registered catalogue", () => {
       // read as a revenue correction, say) would show up here.
       expect(caveats.map((caveat) => caveat.code), measure).toEqual(["sectors_preliminary"]);
     }
+  });
+
+  it("registers every caveat inflation emits", () => {
+    const divisions = snapshot.inflation.groups.filter((group) => group.level === "division").map((group) => group.id);
+    const codes = new Set(
+      [
+        ...expectRegistered(queryInflation(snapshot, { seriesIds: divisions, measure: "contribution_pp", fromPeriod: "2025-01", toPeriod: "2025-12" }), "contributions"),
+        ...expectRegistered(queryInflation(snapshot, { seriesIds: ["cpi.target"], measure: "target_pct", fromPeriod: "2014-01", toPeriod: "2015-06" }), "target"),
+        ...expectRegistered(queryInflation(snapshot, { seriesIds: ["cpi.headline", "cpi.core"], measure: "yoy_pct", fromPeriod: "2024-01", toPeriod: "2024-12" }), "rates"),
+      ].map((caveat) => caveat.code),
+    );
+    expect([...codes].sort()).toEqual(["inflation_contribution_derived", "inflation_contribution_residual", "inflation_target_unverified_before_2015"]);
   });
 
   it("builds no caveat inline in a query module", () => {

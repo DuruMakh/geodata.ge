@@ -24,6 +24,7 @@ const TOOL_NAMES = [
   "query_deficit",
   "query_economic_sectors",
   "query_gdp",
+  "query_inflation",
   "query_ministries",
   "query_municipal",
   "query_national",
@@ -236,7 +237,9 @@ describe("MCP tool surface", () => {
   it("never glues a number to the word before it", async () => {
     const { tools } = await (await connected()).listTools();
     const texts = [...tools.map((tool) => tool.description ?? ""), serverInstructions({}, ENTITY_COUNTS)];
-    for (const text of texts) expect(text).not.toMatch(/[a-z]\d/i);
+    // A glued year ("cover2010") is the regression. Measure ids such as avg12_pct
+    // legitimately put a digit after a letter.
+    for (const text of texts) expect(text).not.toMatch(/[a-z]\d{4}/i);
   });
 
   // GDP is served in USD, constant-2015 USD and percent, and carries published
@@ -249,6 +252,49 @@ describe("MCP tool surface", () => {
     expect(instructions).toContain('"published"');
     expect(instructions).toContain('"preliminary"');
     expect(instructions).toContain("real_growth_pct");
+  });
+
+  it("answers query_inflation with a monthly period in structured content", async () => {
+    const client = await connected();
+    const result = await client.callTool({
+      name: "query_inflation",
+      arguments: { seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" },
+    });
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent).toMatchObject({ data: { observations: [{ period: "2026-08", unit: "percent" }] } });
+  });
+
+  it("refuses an oversized inflation request before calculating it", async () => {
+    const client = await connected();
+    const snapshot = loadPackagedSnapshot();
+    const result = await client.callTool({
+      name: "query_inflation",
+      arguments: { seriesIds: snapshot.inflation.groups.map((group) => group.id), measure: "yoy_pct", fromPeriod: "2025-01", toPeriod: "2025-12" },
+    });
+    expect(result.isError).toBe(true);
+    expect((result.content as { text: string }[])[0]!.text).toContain("result_too_large");
+  });
+
+  // The binding MCP gate is LIMITS.resultBytes (512 KiB, both representations), not
+  // the 500-cell cap, and inflation rows carry long bilingual definitions. A year of
+  // division contributions is the everyday contributions question, so it must fit.
+  it("fits a year of division contributions within the response-size limit", async () => {
+    const client = await connected();
+    const snapshot = loadPackagedSnapshot();
+    const divisions = snapshot.inflation.groups.filter((group) => group.level === "division").map((group) => group.id);
+    const result = await client.callTool({
+      name: "query_inflation",
+      arguments: { seriesIds: divisions, measure: "contribution_pp", fromPeriod: "2025-01", toPeriod: "2025-12" },
+    });
+    expect(result.isError).toBeFalsy();
+  });
+
+  it("tells clients inflation is the one monthly dataset", () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    expect(instructions).toContain("INFLATION");
+    expect(instructions).toContain("only monthly dataset");
+    expect(instructions).toContain("schema 1.2.0");
+    expect(instructions).not.toContain("Quarterly or monthly data, live budget execution");
   });
 
   it("keeps every tool name in the advertised set", () => {

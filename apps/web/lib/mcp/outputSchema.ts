@@ -97,8 +97,9 @@ const excludedEntity = z.object({ entityId: z.string(), reason: z.string() });
 const bilingualExcludedEntity = excludedEntity.extend({ reasonEn: z.string().min(1) });
 const coverage = z.object({
   requestedYears: z.array(z.number().int()), availableYears: z.array(z.number().int()), returnedYears: z.array(z.number().int()),
-  missingCells: z.array(z.object({ entityId: z.string(), seriesId: z.string(), year: z.number().int(), reason: z.string(), reasonEn: z.string().min(1) })),
+  missingCells: z.array(z.object({ entityId: z.string(), seriesId: z.string(), year: z.number().int(), period: z.string().optional(), reason: z.string(), reasonEn: z.string().min(1) })),
   excludedEntities: z.array(bilingualExcludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
+  requestedPeriods: z.array(z.string()).optional(), availablePeriods: z.tuple([z.string(), z.string()]).optional(),
 });
 const endpoint = observationSchema.pick({ year: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
 const dataShapes = {
