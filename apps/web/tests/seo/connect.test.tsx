@@ -20,3 +20,17 @@ test.each(["ka", "en"] as const)("Connect advertises national sector coverage an
   expect(coverage).not.toContain("{count}");
   if (locale === "en") expect(coverage).not.toMatch(/\p{Script=Georgian}/u);
 });
+
+test.each(["ka", "en"] as const)("Connect advertises monthly inflation coverage and files in %s", async locale => {
+  const messages = await getMessages(locale, ["common", "connect"]);
+  const html = renderToStaticMarkup(<I18nProvider locale={locale} messages={messages}>{await renderConnectPage(locale)}</I18nProvider>);
+  const coverage = html.match(/data-testid="connect-inflation-coverage">(.*?)<\/li>/)?.[1];
+  expect(coverage).toContain("2013-01");
+  expect(coverage).not.toContain("{");
+  expect(html).toContain("query_inflation");
+  for (const name of ["inflation-national.json", "inflation-categories.csv", "inflation-categories.json"]) {
+    expect(html).toContain(`href="/downloads/data/${name}"`);
+  }
+  expect(html).toContain(`href="${locale === "en" ? "/en" : ""}/methodology/inflation"`);
+  if (locale === "en") expect(coverage).not.toMatch(/\p{Script=Georgian}/u);
+});

@@ -11,7 +11,7 @@ for (const prefix of ["", "/en"]) {
     await expect(bilingual.locator("li")).toHaveCount(4);
     await expect(bilingual).toContainText("2025");
     await expect(bilingual).toContainText("2024");
-    await expect(page.getByTestId("connect-technical")).toContainText("1.1.0");
+    await expect(page.getByTestId("connect-technical")).toContainText("1.2.0");
     await expect(page.getByTestId("connect-technical")).toContainText("dataVersion");
     if (prefix) expect(await bilingual.innerText()).not.toMatch(/\p{Script=Georgian}/u);
     else await expect(bilingual).toContainText("ხულოს");
@@ -97,7 +97,12 @@ test.describe("connection page", () => {
     // A range, optionally followed by the projection note the two forward-
     // looking datasets carry. The range itself must still be the last data on
     // the line, so a dataset silently losing its years is still caught.
-    for (const line of servedLines.filter(line => !line.startsWith("ეკონომიკური სექტორები"))) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\.?\s*$/);
+    for (const line of servedLines.filter(line => !line.startsWith("ეკონომიკური სექტორები") && !line.startsWith("სამომხმარებლო ფასების ინფლაცია"))) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\.?\s*$/);
+    // Inflation is monthly, so like the sector line it carries several ranges; its
+    // month span and the contribution start must still be real data.
+    const inflation = servedLines.find((line) => line.startsWith("სამომხმარებლო ფასების ინფლაცია"))!;
+    expect(inflation).toMatch(/\d{4}-\d{2}–\d{4}-\d{2}/);
+    expect(inflation).toContain("2013-01");
 
     const municipal = servedLines.find((line) => line.includes("მუნიციპალური"))!;
     expect(municipal).toContain("2015–2025");

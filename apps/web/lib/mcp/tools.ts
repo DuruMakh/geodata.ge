@@ -1,6 +1,6 @@
 // apps/web/lib/mcp/tools.ts
 //
-// The eleven read-only tools, wired to the pure query core. This file owns names,
+// The twelve read-only tools, wired to the pure query core. This file owns names,
 // descriptions, schemas and annotations; it owns no arithmetic. Every figure
 // still comes from lib/factQuery/, and every error envelope is the core's own.
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -14,6 +14,9 @@ import { queryGdp } from "../factQuery/queryGdp";
 import { queryGdpInput } from "../factQuery/schemas";
 import { queryEconomicSectors } from "../factQuery/queryEconomicSectors";
 import { queryEconomicSectorsInput } from "../factQuery/schemas";
+import { inflationDatasetPeriods } from "../factQuery/inflationData";
+import { inflationCellCount, queryInflation } from "../factQuery/queryInflation";
+import { queryInflationInput } from "../factQuery/schemas";
 import { queryDeficit } from "../factQuery/queryDeficit";
 import { queryMunicipal } from "../factQuery/queryMunicipal";
 import { queryNational } from "../factQuery/queryNational";
@@ -48,7 +51,12 @@ export type ToolDefinition = {
 type DatasetCoverage = Record<DatasetId, string>;
 
 /** Other counts and ranges the text states, read from the same snapshot. */
-type ServiceFacts = { datasetCount: number; sectorMeasureYears: SectorMeasureYears };
+type ServiceFacts = {
+  datasetCount: number;
+  sectorMeasureYears: SectorMeasureYears;
+  inflationPeriods: string;
+  inflationGroupCount: number;
+};
 
 /**
  * Read-only, non-destructive, closed world: every answer comes from the
@@ -66,6 +74,22 @@ const ANNOTATIONS = {
 export const TOOLS: readonly ToolDefinition[] = [
   { name:"query_economic_sectors",title:"ეკონომიკის სექტორები / Economic sectors",describe:(coverage,facts)=>`National economic activities A–T and Total GDP, ${coverage["economic-sectors"]}. Nominal GEL and GDP shares cover ${facts.sectorMeasureYears.amount_gel}; annual real growth covers ${facts.sectorMeasureYears.real_growth_pct}. Use describe_coverage for IDs and measure-specific years. Measures: amount_gel, share_of_gdp_pct, real_growth_pct. Sectors are GVA at basic prices; shares divide by market-price GDP, not selected sectors. Percent 7.5 means 7.5%. No regions, ranking, contributions or cumulative comparisons.`,schema:queryEconomicSectorsInput,run:queryEconomicSectors },
  { name: "query_gdp", title: "მშპ / GDP", describe: coverage=>`Annual GDP overview, ${coverage["gdp-overview"]}. Use describe_coverage for the six series IDs and their exact years. Series encode current GEL/USD, constant-2015 USD, annual real growth percent, or nominal GDP per capita GEL/USD. No currency conversion, index rebasing, population calculation, forecasts, ranking or cumulative comparison. Growth 7.5 means 7.5%. For long histories request one series at a time to stay within the response-size limit. Published/preliminary status and source caveats travel with every result.`, schema: queryGdpInput, run: (snapshot,input)=>queryGdp(snapshot,input) },
+  {
+    name: "query_inflation",
+    title: "ინფლაცია / Inflation",
+    describe: (_coverage, facts) =>
+      `Monthly consumer-price inflation for Georgia, ${facts.inflationPeriods}: national CPI (cpi.headline, cpi.core, cpi.core_ex_tobacco), ` +
+      `the National Bank of Georgia target (cpi.target), ${facts.inflationGroupCount} COICOP divisions and subgroups, their annual basket weights, ` +
+      "and Fiscal.ge-derived contributions to annual inflation. Pass fromPeriod and toPeriod as YYYY-MM (inclusive) and one measure: " +
+      "yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct (one cell per calendar year) or contribution_pp. " +
+      "A measure a series does not publish is rejected with the valid measures. Percent values use 2.4 for 2.4%. " +
+      "Contributions are percentage points, never mix divisions and subgroups, and arrive with a residual series that closes them on the published headline. " +
+      "Take the latest month from describe_coverage. Monthly changes do not add up to annual inflation, and the 12-month average is not annual inflation. " +
+      "One answer fits about 250 cells (series × months): a single series' full history, or a year of every division's contributions. " +
+      "Beyond that ask for fewer months or groups; a result over the response-size limit is refused and points to the bulk files.",
+    schema: queryInflationInput,
+    run: (snapshot, input) => queryInflation(snapshot, input),
+  },
   {
     name: "describe_coverage",
     title: "დაფარვა და შესაძლებლობები",
@@ -145,8 +169,10 @@ export const TOOLS: readonly ToolDefinition[] = [
     name: "compare",
     title: "შედარება ორ წელს შორის",
     describe: () =>
-      "Change between two years for one target, with the comparability judgement attached. Requires " +
-      "fromYear < toYear (a cross-field rule the JSON Schema cannot express). Returns absolute, " +
+      "Change between two years, or for inflation two months, for one target, with the comparability judgement attached. " +
+      "Budget, debt and balance targets require fromYear < toYear. Inflation targets { dataset: \"inflation\", seriesIds } " +
+      "require fromPeriod < toPeriod (YYYY-MM), except basket_weight_pct, which takes fromYear < toYear. These are " +
+      "cross-field rules the JSON Schema cannot express. Returns absolute, " +
       "percentage and percentage-point change as the measure allows, plus a comparability of " +
       "comparable, limited or not_comparable. Use this rather than subtracting two query results " +
       "yourself: it is what detects a definition change between the two years.",
@@ -160,7 +186,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "Order series or entities by value or by change. `metric: value` requires `year`; the change " +
       "metrics require `fromYear` and `toYear` (cross-field rules the JSON Schema cannot express). " +
       "Ranking municipalities requires `entityType` and exactly one `seriesId`. Reports ties and " +
-      "says when the cutoff splits one, and names every excluded candidate with its reason.",
+      "says when the cutoff splits one, and names every excluded candidate with its reason. For inflation: dimension series, " +
+      "level division or subgroup (optionally parentSeriesId), and period with metric value or fromPeriod and toPeriod with percentage_point_change.",
     schema: rankInput,
     run: (snapshot, input) => rank(snapshot, input),
   },
@@ -203,7 +230,12 @@ function sectorMeasureYears(snapshot: FactQuerySnapshot): SectorMeasureYears {
 export function createMcpServer(): McpServer {
   const snapshot = loadPackagedSnapshot();
   const coverage = datasetCoverage(snapshot);
-  const facts: ServiceFacts = { datasetCount: Object.keys(coverage).length, sectorMeasureYears: sectorMeasureYears(snapshot) };
+  const facts: ServiceFacts = {
+    datasetCount: Object.keys(coverage).length,
+    sectorMeasureYears: sectorMeasureYears(snapshot),
+    inflationPeriods: inflationDatasetPeriods(snapshot).join(" to "),
+    inflationGroupCount: snapshot.inflation.groups.length,
+  };
 
   const server = new McpServer(
     { name: "fiscal-ge", version: "1.0.0" },
@@ -247,9 +279,11 @@ export function createMcpServer(): McpServer {
         const input = args as { years?: number[]; seriesIds?: string[]; entityIds?: string[]; target?: { seriesIds?: string[]; entityIds?: string[] } };
         const count = tool.name === "compare"
           ? (input.target?.entityIds?.length ?? 1) * (input.target?.seriesIds?.length ?? 1)
-          : tool.name.startsWith("query_")
-            ? (input.entityIds?.length ?? 1) * (input.seriesIds?.length ?? 1) * (input.years?.length ?? 1)
-            : 0;
+          : tool.name === "query_inflation"
+            ? inflationCellCount(args as Parameters<typeof inflationCellCount>[0])
+            : tool.name.startsWith("query_")
+              ? (input.entityIds?.length ?? 1) * (input.seriesIds?.length ?? 1) * (input.years?.length ?? 1)
+              : 0;
         const limit = tool.name === "compare" ? LIMITS.comparisonPairs : LIMITS.cells;
         if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0 }));
         return boundedToolResult(snapshot, tool.run(snapshot, args));

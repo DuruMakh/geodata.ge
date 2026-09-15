@@ -3,6 +3,7 @@ import type { CaveatRule } from "./engine";
 import { DEBT_CAVEAT_RULES } from "./rules.debt";
 import { DEFICIT_CAVEAT_RULES } from "./rules.deficit";
 import { GDP_CAVEAT_RULES } from "./rules.gdp";
+import { INFLATION_CAVEAT_RULES } from "./rules.inflation";
 import { MINISTRIES_CAVEAT_RULES } from "./rules.ministries";
 import { MUNICIPAL_CAVEAT_RULES } from "./rules.municipal";
 import { NATIONAL_CAVEAT_RULES } from "./rules.national";
@@ -17,8 +18,8 @@ import { SECTORS_CAVEAT_RULES } from "./rules.sectors";
  * of program_historical_join's. nominal_gel was retired on 2026-09-04 (see
  * rules.national.ts), and the debt and general-government-balance datasets add
  * four and two codes of their own. The GDP overview and economic sectors add
- * two and one, registered on 2026-09-14 after shipping inline; the GDP
- * overview's preliminary cells share gdp_preliminary. The count is asserted
+ * two and one, registered on 2026-09-14 after shipping inline, and inflation
+ * adds four; the GDP overview's preliminary cells share gdp_preliminary. The count is asserted
  * against ai-grounding-and-caveats.md rather than written here.
  */
 export const CAVEAT_RULES: readonly CaveatRule[] = [
@@ -29,6 +30,7 @@ export const CAVEAT_RULES: readonly CaveatRule[] = [
   ...DEFICIT_CAVEAT_RULES,
   ...GDP_CAVEAT_RULES,
   ...SECTORS_CAVEAT_RULES,
+  ...INFLATION_CAVEAT_RULES,
 ];
 
 export { evaluateCaveats } from "./engine";

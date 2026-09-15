@@ -14,6 +14,7 @@ import { serviceMessage, type ServiceMessageKey } from "./localization";
 import { compare } from "./compare";
 import { describeCoverage } from "./describeCoverage";
 import { buildResponseMeta } from "./meta";
+import { inflationObservations } from "./queryInflation";
 import { queryMinistries } from "./queryMinistries";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
@@ -27,7 +28,7 @@ import type { Basis, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnap
 const EXCLUDED = new Set<string>(AGGREGATE_ONLY_MUNICIPAL_CODES);
 const TOTAL_LEVEL = "total";
 const GEL_METRICS = new Set(["absolute_change", "percentage_change"]);
-const PERCENTAGE_MEASURES = new Set<Measure>(["share_of_total_pct", "share_of_gdp_pct"]);
+const PERCENTAGE_MEASURES = new Set<Measure>(["share_of_total_pct", "share_of_gdp_pct", "yoy_pct", "mom_pct", "contribution_pp"]);
 
 export type RankEntry = {
   position: number;
@@ -42,6 +43,8 @@ export type RankEntry = {
   unit: Unit;
   basis: Basis | null;
   caveatIds: string[];
+  /** Inflation value rankings only: the month ranked. */
+  period?: string;
 };
 
 export type RankData = {
@@ -79,6 +82,7 @@ type Candidate = {
   unit: Unit;
   basis: Basis | null;
   caveatIds: string[];
+  period?: string;
   /** Stable sort key, used only to break exact ties reproducibly. */
   stableId: string;
 };
@@ -123,7 +127,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       messageKa: serviceMessage(snapshot, "ka", "errors.rankSingleEntity"),
       messageEn: serviceMessage(snapshot, "en", "errors.rankSingleEntity", { requestedDataset }),
       retryable: false,
-      validChoices: ["national-revenue", "national-expenditure", "ministries", "municipal-expenditure"],
+      validChoices: ["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "inflation"],
     });
   }
 
@@ -151,6 +155,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   }
 
   const isMunicipal = input.datasetId === "municipal-expenditure";
+  const isInflation = input.datasetId === "inflation";
   const isValueMetric = input.metric === "value";
 
   if (input.withinRegionId !== undefined && !snapshot.municipal.regions.some((r) => r.id === input.withinRegionId)) {
@@ -248,7 +253,18 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     }
   } else {
     const series = catalogueSeries(snapshot, input.datasetId);
-    if (input.datasetId === "ministries") {
+    if (isInflation) {
+      // Peers only: one COICOP level, never the headline, the target or the residual.
+      seriesIds = snapshot.inflation.groups
+        .filter((group) => group.level === input.level)
+        .filter((group) => input.parentSeriesId === undefined || group.parentId === input.parentSeriesId)
+        .map((group) => group.id)
+        .sort();
+      universeKey = input.level === "subgroup"
+        ? input.parentSeriesId ? "ranking.inflationSubgroupsWithinParent" : "ranking.inflationSubgroups"
+        : "ranking.inflationDivisions";
+      if (input.parentSeriesId) universeValues = { parentId: input.parentSeriesId };
+    } else if (input.datasetId === "ministries") {
       const level = input.level ?? "admin_category";
       seriesIds = series
         // admin_spending.total needs no separate exclusion: its catalogue
@@ -310,7 +326,9 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   };
 
   if (isValueMetric) {
-    const result = runObservations([input.year as number]);
+    const result = isInflation
+      ? inflationObservations(snapshot, { seriesIds, measure: input.measure, periods: [input.period as string] }, { includeResidual: false })
+      : runObservations([input.year as number]);
     if (result.kind === "error") return errorResponse(snapshot, result.error);
 
     const observations = (result.data as { observations: Observation[] }).observations;
@@ -336,22 +354,25 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         unit: observation.unit,
         basis: observation.basis,
         caveatIds: observation.caveatIds,
+        ...(observation.period !== undefined ? { period: observation.period } : {}),
         stableId,
       });
     }
   } else {
-    const target = isMunicipal
-      ? ({ dataset: "municipal", entityIds, seriesIds } as const)
-      : input.datasetId === "ministries"
-        ? ({ dataset: "ministries", level: input.level ?? "admin_category", seriesIds } as const)
-        : ({ dataset: "national", side: input.datasetId === "national-revenue" ? "revenue" : "expenditure", seriesIds } as const);
+    const target = isInflation
+      ? ({ dataset: "inflation", seriesIds } as const)
+      : isMunicipal
+        ? ({ dataset: "municipal", entityIds, seriesIds } as const)
+        : input.datasetId === "ministries"
+          ? ({ dataset: "ministries", level: input.level ?? "admin_category", seriesIds } as const)
+          : ({ dataset: "national", side: input.datasetId === "national-revenue" ? "revenue" : "expenditure", seriesIds } as const);
 
-    const result = compare(snapshot, {
-      target,
-      fromYear: input.fromYear as number,
-      toYear: input.toYear as number,
-      measure: input.measure,
-    });
+    const result = compare(
+      snapshot,
+      isInflation
+        ? { target, fromPeriod: input.fromPeriod, toPeriod: input.toPeriod, measure: input.measure }
+        : { target, fromYear: input.fromYear as number, toYear: input.toYear as number, measure: input.measure },
+    );
     if (result.kind === "error") return errorResponse(snapshot, result.error);
 
     const comparisons = (result.data as { comparisons: Comparison[] }).comparisons;
@@ -407,7 +428,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         // schema. "percent" is imprecise for points but no longer false about
         // the order of magnitude, and `rankingDefinition` names the exact
         // metric. Adding a distinct unit is an open contract decision.
-        unit: input.metric === "absolute_change" ? comparison.unit : "percent",
+        unit: input.metric === "absolute_change" ? comparison.unit : isInflation ? "percentage_points" : "percent",
         basis: comparison.to.basis,
         caveatIds: comparison.caveatIds,
         stableId,
@@ -466,10 +487,16 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     unit: entry.unit,
     basis: entry.basis,
     caveatIds: entry.caveatIds,
+    ...(entry.period !== undefined ? { period: entry.period } : {}),
   }));
 
   const rankingDefinitionFor = (locale: "ka" | "en") => {
     const order = serviceMessage(snapshot, locale, input.order === "ascending" ? "ranking.ascending" : "ranking.descending");
+    if (isInflation) {
+      return isValueMetric
+        ? serviceMessage(snapshot, locale, "ranking.valueDefinitionPeriod", { measure: input.measure, period: input.period as string, order })
+        : serviceMessage(snapshot, locale, "ranking.changeDefinitionPeriod", { metric: input.metric, measure: input.measure, fromPeriod: input.fromPeriod as string, toPeriod: input.toPeriod as string, order });
+    }
     return isValueMetric
       ? serviceMessage(snapshot, locale, "ranking.valueDefinition", { measure: input.measure, year: input.year as number, order })
       : serviceMessage(snapshot, locale, "ranking.changeDefinition", { metric: input.metric, measure: input.measure, fromYear: input.fromYear as number, toYear: input.toYear as number, order });

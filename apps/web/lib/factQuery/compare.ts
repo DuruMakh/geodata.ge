@@ -23,6 +23,7 @@ import { buildResponseMeta } from "./meta";
 import { queryMinistries } from "./queryMinistries";
 import { queryDebt } from "./queryDebt";
 import { queryDeficit } from "./queryDeficit";
+import { inflationObservations } from "./queryInflation";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
@@ -32,6 +33,8 @@ import type { Basis, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnap
 
 export type ComparisonEndpoint = {
   year: number;
+  /** Monthly endpoints only (inflation): YYYY-MM. */
+  period?: string;
   value: number | null;
   availability: "available" | "missing";
   missingReason: string | null;
@@ -75,7 +78,12 @@ export type Comparison = {
 // Without it the GEL branch ran, and a rate moving 4.6% -> 6.2% was reported as
 // "grew 48.5%" with the point-change column empty - the mislabelling this
 // measure was introduced to prevent, one layer further down.
-const PERCENTAGE_MEASURES = new Set<Measure>(["share_of_total_pct", "share_of_gdp_pct", "rate_percent"]);
+// The index level is the only inflation measure that is not a percent or
+// percentage points, so it alone gets absolute and percentage change.
+const PERCENTAGE_MEASURES = new Set<Measure>([
+  "share_of_total_pct", "share_of_gdp_pct", "rate_percent",
+  "yoy_pct", "mom_pct", "avg12_pct", "target_pct", "basket_weight_pct", "contribution_pp",
+]);
 
 /**
  * The one definition change measured and accepted as comparable.
@@ -137,6 +145,7 @@ const REASON_ENDPOINT_MISSING = "comparison.endpointMissing";
 const REASON_NON_POSITIVE_BASE = "comparison.nonPositiveBase";
 const REASON_GDP_STANDARD_BREAK = "comparison.gdpStandardBreak";
 const REASON_HISTORICAL_JOIN = "comparison.historicalJoin";
+const REASON_BASKET_REWEIGHTED = "comparison.basketReweighted";
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
@@ -145,6 +154,7 @@ function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): Fact
 function endpointOf(observation: Observation): ComparisonEndpoint {
   return {
     year: observation.year,
+    ...(observation.period !== undefined ? { period: observation.period } : {}),
     value: observation.value,
     availability: observation.availability,
     missingReason: observation.missingReason,
@@ -182,12 +192,20 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     });
   }
 
-  const years = [input.fromYear, input.toYear];
   const target = input.target;
+  // Inflation's monthly measures pair endpoints on their period; everything
+  // else, basket weights included, pairs on the year. The schema guarantees
+  // whichever pair applies is present.
+  const monthly = target.dataset === "inflation" && input.measure !== "basket_weight_pct";
+  const fromKey = monthly ? input.fromPeriod! : String(input.fromYear!);
+  const toKey = monthly ? input.toPeriod! : String(input.toYear!);
+  const fromYear = monthly ? Number(fromKey.slice(0, 4)) : input.fromYear!;
+  const toYear = monthly ? Number(toKey.slice(0, 4)) : input.toYear!;
+  const years = [fromYear, toYear];
   // Handed to the sub-query so IT evaluates the comparison-only rules against
   // its own pre-scoped inputs. compare() previously rebuilt a CaveatContext by
   // hand; three of its fields disagreed with the query for the identical rows.
-  const comparisonWindow = { fromYear: input.fromYear, toYear: input.toYear };
+  const comparisonWindow = { fromYear, toYear };
 
   // Endpoints come from the observation queries, so `compare` owns no second
   // copy of the value arithmetic (Global Constraints: never duplicate a
@@ -230,6 +248,17 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       measure: input.measure,
       },
       comparisonWindow,
+    );
+  } else if (target.dataset === "inflation") {
+    datasetId = "inflation";
+    // No residual: its value depends on the rest of the selection, so a change
+    // in it is not a change in anything.
+    endpointResult = inflationObservations(
+      snapshot,
+      monthly
+        ? { seriesIds: target.seriesIds, measure: input.measure, periods: [fromKey, toKey] }
+        : { seriesIds: target.seriesIds, measure: input.measure, years },
+      { includeResidual: false, comparison: comparisonWindow },
     );
   } else if (target.dataset === "deficit") {
     datasetId = "general-government-balance";
@@ -278,8 +307,9 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
   for (const observation of observations) {
     const key = `${observation.entityId}::${observation.seriesId}`;
     const pair = byPair.get(key) ?? {};
-    if (observation.year === input.fromYear) pair.from = observation;
-    if (observation.year === input.toYear) pair.to = observation;
+    const endpointKey = observation.period ?? String(observation.year);
+    if (endpointKey === fromKey) pair.from = observation;
+    if (endpointKey === toKey) pair.to = observation;
     byPair.set(key, pair);
   }
 
@@ -343,12 +373,13 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       comparability = "limited";
       if (gdpStandardBreak) reasons.push(REASON_GDP_STANDARD_BREAK);
       if (limiting.includes("program_historical_join")) reasons.push(REASON_HISTORICAL_JOIN);
+      if (limiting.includes("inflation_contribution_weights_differ")) reasons.push(REASON_BASKET_REWEIGHTED);
     } else {
       comparability = "comparable";
     }
 
     comparisons.push({
-      comparisonId: `${datasetId}:${key.replace("::", ":")}:${input.fromYear}-${input.toYear}:${input.measure}`,
+      comparisonId: `${datasetId}:${key.replace("::", ":")}:${fromKey}-${toKey}:${input.measure}`,
       datasetId,
       entityId: from.entityId,
       entityLabelKa: from.entityLabelKa,
@@ -410,6 +441,7 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       comparisons,
       coverage: {
         requestedYears: years,
+        ...(monthly ? { requestedPeriods: [fromKey, toKey] } : {}),
         comparedPairs: comparisons.length,
         requestedPairs: coverage.expectedCount / 2,
         excludedEntities: coverage.excludedEntities,

@@ -33,8 +33,9 @@ export function serverInstructions(
   const range = (id: DatasetId) => coverage[id] ?? "see describe_coverage";
   const sectorRange = (measure: keyof SectorMeasureYears) => sectorMeasureYears[measure] ?? "see describe_coverage";
 
-  return `Fiscal.ge serves reviewed annual data on Georgia's state and municipal budgets,
-government debt and fiscal balance, GDP and national economic sectors.
+  return `Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government
+debt and fiscal balance, GDP and national economic sectors (all annual), and monthly
+consumer-price inflation.
 
 WHAT IS SERVED
 - National economic sectors, ${range("economic-sectors")}, through query_economic_sectors.
@@ -62,6 +63,8 @@ WHAT IS SERVED
   ${range("government-debt")}.
 - The general government balance (the deficit or surplus) as measured by the
   IMF, ${range("general-government-balance")}.
+- Consumer-price inflation, ${range("inflation")}, through query_inflation. It is
+  monthly; read INFLATION below before answering.
 Coverage is derived from the loaded data and is reported by describe_coverage.
 Do not assume a year or a series exists; ask.
 
@@ -75,7 +78,9 @@ translated companions describe it without replacing it. documentLanguage is null
 when unverified; a translated title does not mean the source document was translated.
 Translation corrections change dataVersion because the text is part of the pinned
 data identity. Reuse a dataVersion only with responses from that same snapshot.
-Clients must accept additive fields and schema 1.1.0; exact-version or unknown-field
+Clients must accept additive fields and schema 1.2.0, which adds an optional period
+(YYYY-MM) on inflation observations, comparison endpoints and ranking entries;
+exact-version or unknown-field
 validators need updating. Byte-for-byte response compatibility is not promised.
 Both /connect and /en/connect describe the shared /mcp endpoint and /downloads/data/
 publications. Static publications carry the same bilingual evidence and remain
@@ -83,8 +88,9 @@ available without an MCP connection. Text rows include both languages; values an
 stable identifiers are not translated.
 
 WHAT IS NOT SERVED
-Quarterly or monthly data, live budget execution, individual capital
-projects, procurement, and anything after the last reviewed year that is not
+Quarterly or monthly data for any dataset other than inflation; city or product
+price indices, HICP and other price indices; live budget execution, individual
+capital projects, procurement, and anything after the last reviewed year that is not
 explicitly served as a projection. There
 is no such thing as a partial answer assembled from outside sources: if the data
 does not cover the question, say so.
@@ -102,7 +108,7 @@ UNITS AND VALUES
   growth are percentages: 7.5 means 7.5%, not a fraction. gel_per_resident is
   GEL per resident using the reviewed population denominator.
 - basis is "actual", "planned" or "projection" for budget, debt and balance
-  figures, and "published" or "preliminary" for GDP and sector figures. For
+  figures, and "published" or "preliminary" for GDP, sector and inflation figures. For
   budget facts where both actual and planned exist, actual is served and wins.
   A preliminary figure can still be revised; say so when one is in the answer.
 - availability "missing" means the reviewed data does not contain that cell.
@@ -136,6 +142,26 @@ combined with them.
   projection is the payment schedule of debt already outstanding; a balance
   projection is an IMF forecast that a later vintage can revise. Say which, and
   say that it is a projection, whenever one appears in an answer.
+
+INFLATION
+- Inflation is the only monthly dataset. Periods are YYYY-MM. Take the latest
+  month from describe_coverage; never assume the current month is published.
+- Annual (yoy_pct), monthly (mom_pct) and 12-month average (avg12_pct) are
+  different measures. Monthly changes do not add up to the annual change, and
+  the 12-month average is not annual inflation.
+- 2.4 means 2.4%. Contributions (contribution_pp) are percentage points; with
+  the residual that comes with them they sum to the published headline annual
+  rate. They are Fiscal.ge's approximation, not a Geostat figure - say so.
+- The National Bank of Georgia target is a reference. "Above target" compares
+  two published numbers; it is not a verdict on the central bank. No target
+  before the first reviewed month is verified; do not say none existed.
+- The national CPI is a weighted mean of city indices. It is not a region's
+  inflation, a household's cost of living, or wage growth.
+- This service does not adjust budget figures for inflation. If you do, present
+  it as your own calculation, not as a Fiscal.ge figure.
+- Do not state causes of price changes or the success or failure of monetary policy.
+- One inflation answer fits about 250 cells (series × months), below the general
+  500-cell limit. For more, split the request by period or use the bulk files.
 
 HOW TO PRESENT AN ANSWER
 The reader is a member of the public asking about their country's budget, not a

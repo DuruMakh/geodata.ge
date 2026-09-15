@@ -62,7 +62,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-33 codes are registered.
+37 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -78,6 +78,10 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `gdp_historical_method` | note | `limits` | `gdp-overview.md` |
 | `gdp_world_bank_history` | note | `none` | `gdp-overview.md` |
 | `sectors_preliminary` | note | `none` | `economic-sectors.md` |
+| `inflation_contribution_derived` | severe | `none` | `inflation-cpi-national.md` |
+| `inflation_contribution_residual` | note | `none` | `inflation-cpi-national.md` |
+| `inflation_contribution_weights_differ` | note | `limits` | `inflation-cpi-national.md` |
+| `inflation_target_unverified_before_2015` | note | `none` | `inflation-cpi-national.md` |
 | `municipality_not_territorial` | severe | `none` | `municipal-functional-annual-2015-2025.md` |
 | `municipal_country_scope` | note | `none` | `municipal-functional-annual-2015-2025.md` |
 | `adjara_consolidation_applied` | note | `none` | `municipal-functional-annual-2015-2025.md` |
@@ -253,6 +257,62 @@ The source does not say which years were reconstructed, so there is no narrower 
 **English.** These sector observations are preliminary and subject to revision.
 
 Scoped by status, never by year. The inline message it replaced named 2025, which would have become false the day Geostat finalised that year.
+
+### `inflation_contribution_derived`
+
+**Severity:** severe  
+**Comparison effect:** `none`  
+**Owner document:** `inflation-cpi-national.md`
+
+**Trigger.** Any returned `contribution_pp` cell of a COICOP group.
+
+**Georgian.** წვლილები Fiscal.ge-ის მიერ მიახლოებით გამოთვლილია საქსტატის გამოქვეყნებული ფასების ცვლილებებიდან და კალათის წილებიდან; საქსტატი ამ მაჩვენებელს არ აქვეყნებს.
+
+**English.** Contributions are Fiscal.ge's approximation from Geostat's published price changes and basket weights, not a figure Geostat publishes.
+
+Severe because the failure is provenance: a contribution quoted as a Geostat statistic claims a publication that does not exist. The arithmetic is the site's own `buildContributionIndex`, and the approximation it carries is measured in `inflation-cpi-national.md`.
+
+### `inflation_contribution_residual`
+
+**Severity:** note  
+**Comparison effect:** `none`  
+**Owner document:** `inflation-cpi-national.md`
+
+**Trigger.** The residual series is returned, which happens on every contribution request.
+
+**Georgian.** დანარჩენი = გამოქვეყნებული საერთო ინფლაცია გამოკლებული დაბრუნებული წვლილები: ყველაფერი, რაც არ მოითხოვეთ, მოთხოვნილი ჯგუფი, რომლის წვლილიც ამ თვეში არ არის, და მიახლოების ცდომილება; ეს საქონლის კატეგორია არ არის.
+
+**English.** The residual is the published headline minus the contributions returned: everything not requested, any requested group without a contribution that month, and approximation error; it is not a category of goods.
+
+The residual changes with the selection, so it is never a candidate in a ranking or a target of a comparison.
+
+### `inflation_contribution_weights_differ`
+
+**Severity:** note  
+**Comparison effect:** `limits`  
+**Owner document:** `inflation-cpi-national.md`
+
+**Trigger.** A contribution comparison whose two months fall in different calendar years.
+
+**Georgian.** სამომხმარებლო კალათის წილები ყოველ იანვარს ახლდება, ასე რომ სხვადასხვა წლის წვლილები სხვადასხვა წილებს ეყრდნობა.
+
+**English.** The consumer basket is re-weighted every January, so contributions in different years rest on different weights.
+
+Within one calendar year the weights are identical and the comparison is comparable; across a January it is reported as limited rather than declined.
+
+### `inflation_target_unverified_before_2015`
+
+**Severity:** note  
+**Comparison effect:** `none`  
+**Owner document:** `inflation-cpi-national.md`
+
+**Trigger.** A target cell before the first reviewed target month is returned missing.
+
+**Georgian.** გადამოწმებულ წყაროებში ადრეული ინფლაციის მიზნობრივი მაჩვენებელი დადასტურებული არ არის; ეს არ ნიშნავს, რომ ის არ არსებობდა.
+
+**English.** No earlier numeric inflation target is verified in the reviewed sources; this does not mean none existed.
+
+A secondary lead shows 6% for 2010–2014, but no primary National Bank document was archived for those years, so the months stay missing. Reporting "Georgia had no target" would state something the sources do not.
 
 ### `municipality_not_territorial`
 
@@ -670,7 +730,10 @@ download, the connection answers a bounded question and returns only the
 evidence behind that answer. A response is capped at 512 KiB including both its
 structured and text representations, and an over-cap request is refused with
 narrowing guidance rather than trimmed — dropping sources or warnings to make a
-result fit would publish a figure without its limitations.
+result fit would publish a figure without its limitations. The text
+representation carries every definition, but prints each one once in a legend
+keyed by the `definitionId` its rows name, so a long monthly series does not
+spend the cap on repeated sentences.
 
 The endpoint reads no database and fetches no document at request time. It
 answers from the snapshot bundled into the deployment, so it keeps working

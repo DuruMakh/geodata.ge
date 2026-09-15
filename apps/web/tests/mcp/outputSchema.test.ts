@@ -20,6 +20,7 @@ beforeAll(async () => {
 const CALLS: Record<string, unknown> = {
   query_economic_sectors: { seriesIds: ["sector.a", "economy.gdp_total"], years: [2011, 2025], measure: "real_growth_pct" },
   query_gdp: {seriesIds:["real_usd_2015","nominal_usd","real_growth_percent"],years:[2025]},
+  query_inflation: { seriesIds: ["cpi.cat.07"], measure: "contribution_pp", fromPeriod: "2026-08", toPeriod: "2026-08" },
   describe_coverage: { datasetId: "municipal-expenditure" },
   query_national: { side: "revenue", seriesIds: ["revenue.total"], years: [2024], measure: "amount_gel" },
   query_ministries: {
