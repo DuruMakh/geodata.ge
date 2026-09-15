@@ -4,6 +4,7 @@ import { queryEconomicSectors } from "../../lib/factQuery/queryEconomicSectors";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import type { Observation } from "../../lib/factQuery/observations";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import { errorCodeSchema } from "../../lib/factQuery/schemas";
 let snapshot: FactQuerySnapshot;
 beforeAll(async()=>{ snapshot=await buildFactQuerySnapshot({releaseCommit:"test",generatedAt:"2026-09-11T00:00:00Z"}); });
 
@@ -46,4 +47,23 @@ test.each([
   {seriesIds:["sector.a"],years:[2009],measure:"amount_gel"},
   {seriesIds:["sector.a"],years:[2025],measure:"share_of_total_pct"},
   {seriesIds:["sector.a"],years:[2025],measure:"amount_gel",expectedDataVersion:"0".repeat(64)},
-])("rejects unsupported requests %j",input=>expect(queryEconomicSectors(snapshot,input).status).toBe("error"));
+])("rejects unsupported requests %j",input=>{
+  const result=queryEconomicSectors(snapshot,input);
+  if(result.kind!=="error") throw new Error("Expected error");
+  // Only codes the envelope schema publishes; a client cannot branch on an undeclared one.
+  expect(errorCodeSchema.options).toContain(result.error.code);
+});
+test("an unknown sector names the valid series, as every other query tool does",()=>{
+  const result=queryEconomicSectors(snapshot,{seriesIds:["sector.zz"],years:[2025],measure:"amount_gel"});
+  if(result.kind!=="error") throw new Error("Expected error");
+  expect(result.error.code).toBe("unknown_series");
+  expect(result.error.messageEn).toContain("sector.zz");
+  expect(result.error.validChoices).toEqual(snapshot.economicSectors.registry.map(r=>r.id).sort());
+});
+test("the preliminary caveat does not write a year into its message",()=>{
+  const result=queryEconomicSectors(snapshot,{seriesIds:["sector.a"],years:[2025],measure:"amount_gel"});
+  const caveat=result.meta.caveats.find(c=>c.code==="sectors_preliminary");
+  expect(caveat?.affects).toEqual(["sector.a:2025"]);
+  expect(caveat!.messageEn).not.toMatch(/\b(19|20)\d{2}\b/);
+  expect(caveat!.messageKa).not.toMatch(/\b(19|20)\d{2}\b/);
+});

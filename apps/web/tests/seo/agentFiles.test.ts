@@ -20,6 +20,7 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/inflation",
   "https://fiscal.ge/explorer/inflation/overview",
   "https://fiscal.ge/downloads/data/inflation-cpi-national.csv",
+  "https://fiscal.ge/explorer/inflation/categories",
   "https://fiscal.ge/methodology",
   "https://fiscal.ge/methodology/expenditure",
   "https://fiscal.ge/methodology/revenue",

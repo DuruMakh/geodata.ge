@@ -65,8 +65,8 @@ export const queryDebtInput = z.strictObject({
   expectedDataVersion,
 });
 
-// No seriesIds: there is exactly one series, and a required parameter with a
-// single legal value is noise for the caller.
+// The six GDP series are a closed set, so they are published as an enum the
+// client can read from the schema rather than ids to discover first.
 export const queryGdpInput = z.strictObject({
  seriesIds: z.array(z.enum(["real_usd_2015","real_growth_percent","nominal_gel","nominal_usd","per_capita_gel","per_capita_usd"])).min(1).max(6).transform(ids=>[...new Set(ids)]),
  years: uniqueSortedYears,

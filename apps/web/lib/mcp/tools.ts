@@ -1,6 +1,6 @@
 // apps/web/lib/mcp/tools.ts
 //
-// The nine read-only tools, wired to the pure query core. This file owns names,
+// The eleven read-only tools, wired to the pure query core. This file owns names,
 // descriptions, schemas and annotations; it owns no arithmetic. Every figure
 // still comes from lib/factQuery/, and every error envelope is the core's own.
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -29,7 +29,8 @@ import {
   queryNationalInput,
   rankInput,
 } from "../factQuery/schemas";
-import { serverInstructions } from "./instructions";
+import { SECTOR_QUERY_MEASURES } from "../factQuery/economicSectorsSeries";
+import { serverInstructions, type SectorMeasureYears } from "./instructions";
 import { outputSchemaFor } from "./outputSchema";
 import { boundedToolResult, LIMITS, tooLargeResponse, toolResult } from "./result";
 import { loadPackagedSnapshot } from "./snapshot";
@@ -39,12 +40,15 @@ export type ToolDefinition = {
   name: string;
   title: string;
   /** Built from the snapshot so coverage is never hardcoded (DESIGN.md section 2.1). */
-  describe: (coverage: DatasetCoverage) => string;
+  describe: (coverage: DatasetCoverage, facts: ServiceFacts) => string;
   schema: ZodTypeAny;
   run: (snapshot: FactQuerySnapshot, input: unknown) => FactQueryResponse;
 };
 
 type DatasetCoverage = Record<DatasetId, string>;
+
+/** Other counts and ranges the text states, read from the same snapshot. */
+type ServiceFacts = { datasetCount: number; sectorMeasureYears: SectorMeasureYears };
 
 /**
  * Read-only, non-destructive, closed world: every answer comes from the
@@ -60,16 +64,16 @@ const ANNOTATIONS = {
 } as const;
 
 export const TOOLS: readonly ToolDefinition[] = [
-  { name:"query_economic_sectors",title:"ეკონომიკის სექტორები / Economic sectors",describe:coverage=>`National economic activities A–T and Total GDP, ${coverage["economic-sectors"]}. Nominal GEL and GDP shares cover2010–2025; annual real growth covers2011–2025. Use describe_coverage for IDs and measure-specific years. Measures: amount_gel,share_of_gdp_pct,real_growth_pct. Sectors are GVA at basic prices; shares divide by market-price GDP, not selected sectors. Percent7.5 means7.5%. No regions,ranking,contributions or cumulative comparisons.`,schema:queryEconomicSectorsInput,run:queryEconomicSectors },
+  { name:"query_economic_sectors",title:"ეკონომიკის სექტორები / Economic sectors",describe:(coverage,facts)=>`National economic activities A–T and Total GDP, ${coverage["economic-sectors"]}. Nominal GEL and GDP shares cover ${facts.sectorMeasureYears.amount_gel}; annual real growth covers ${facts.sectorMeasureYears.real_growth_pct}. Use describe_coverage for IDs and measure-specific years. Measures: amount_gel, share_of_gdp_pct, real_growth_pct. Sectors are GVA at basic prices; shares divide by market-price GDP, not selected sectors. Percent 7.5 means 7.5%. No regions, ranking, contributions or cumulative comparisons.`,schema:queryEconomicSectorsInput,run:queryEconomicSectors },
  { name: "query_gdp", title: "მშპ / GDP", describe: coverage=>`Annual GDP overview, ${coverage["gdp-overview"]}. Use describe_coverage for the six series IDs and their exact years. Series encode current GEL/USD, constant-2015 USD, annual real growth percent, or nominal GDP per capita GEL/USD. No currency conversion, index rebasing, population calculation, forecasts, ranking or cumulative comparison. Growth 7.5 means 7.5%. For long histories request one series at a time to stay within the response-size limit. Published/preliminary status and source caveats travel with every result.`, schema: queryGdpInput, run: (snapshot,input)=>queryGdp(snapshot,input) },
   {
     name: "describe_coverage",
     title: "დაფარვა და შესაძლებლობები",
-    describe: () =>
+    describe: (_coverage, facts) =>
       "Ask this FIRST when you do not already know an id. Returns the datasets, entities, series, " +
       "hierarchy, calculated totals, legal measures, year coverage and documented exclusions that " +
       "actually exist. Optional `search` matches reviewed Georgian and English labels and Latin slugs, and works WITHOUT " +
-      "a datasetId — search alone looks across all seven datasets and each match names the dataset " +
+      `a datasetId — search alone looks across all ${facts.datasetCount} datasets and each match names the dataset ` +
       "it belongs to, so you can find an id before you know where it lives. Georgian case endings " +
       "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here.",
     schema: describeCoverageInput,
@@ -186,18 +190,33 @@ function datasetCoverage(snapshot: FactQuerySnapshot): DatasetCoverage {
   return coverage;
 }
 
+/** Sector measures start in different years: real growth needs a prior year to grow from. */
+function sectorMeasureYears(snapshot: FactQuerySnapshot): SectorMeasureYears {
+  return Object.fromEntries(
+    Object.entries(SECTOR_QUERY_MEASURES).map(([queryMeasure, measure]) => {
+      const years = snapshot.economicSectors.facts.filter((fact) => fact.measure === measure).map((fact) => fact.year);
+      return [queryMeasure, `${Math.min(...years)}-${Math.max(...years)}`];
+    }),
+  );
+}
+
 export function createMcpServer(): McpServer {
   const snapshot = loadPackagedSnapshot();
   const coverage = datasetCoverage(snapshot);
+  const facts: ServiceFacts = { datasetCount: Object.keys(coverage).length, sectorMeasureYears: sectorMeasureYears(snapshot) };
 
   const server = new McpServer(
     { name: "fiscal-ge", version: "1.0.0" },
     {
-      instructions: serverInstructions(coverage, {
-        // Counted, not written down, for the same reason the year ranges are.
-        municipalities: snapshot.municipal.municipalities.length,
-        regions: snapshot.municipal.regions.length,
-      }),
+      instructions: serverInstructions(
+        coverage,
+        {
+          // Counted, not written down, for the same reason the year ranges are.
+          municipalities: snapshot.municipal.municipalities.length,
+          regions: snapshot.municipal.regions.length,
+        },
+        facts.sectorMeasureYears,
+      ),
     },
   );
 
@@ -206,7 +225,7 @@ export function createMcpServer(): McpServer {
       tool.name,
       {
         title: tool.title,
-        description: tool.describe(coverage),
+        description: tool.describe(coverage, facts),
         // The schema is registered so clients can SEE it and build valid calls;
         // that is what prevents most errors in the first place. The SDK also
         // validates against it and rejects a shape failure with its own English
