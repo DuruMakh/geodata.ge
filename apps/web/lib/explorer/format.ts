@@ -85,6 +85,13 @@ export function formatShare(fraction: number | null | undefined, signed = false,
   return (prefix + value.toFixed(decimals) + "%").replace("-", "−");
 }
 
+/** Percentage-point difference, `decimals` digits (default 1); "−" minus; optional "+" for positives. */
+export function formatPoints(points: number | null | undefined, signed = false, decimals = 1): string {
+  if (points === null || points === undefined || !Number.isFinite(points)) return MISSING;
+  const prefix = signed && points > 0 ? "+" : "";
+  return (prefix + points.toFixed(decimals)).replace("-", "−");
+}
+
 /**
  * The scale a chart or table renders values in. Budget surfaces work in
  * billions; municipal budgets are two to three orders of magnitude smaller, so
