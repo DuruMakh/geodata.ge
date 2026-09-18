@@ -29,7 +29,7 @@
   - Every pair of the 21 series is at least CIEDE2000 10 apart.
   - Every sector colour has at least 3:1 contrast against paper `#F7F2E9` and tint `#F1EADC` (the `app/globals.css` tokens that `tests/explorer/colors.test.ts:42` checks).
   - The owner approves a screenshot before merge.
-- **Test loop:** targeted tests while editing; the full gates run once, in Task 6. Browser specs need `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`.
+- **Test loop:** targeted tests while editing; the full gates run once, in Task 6. Browser specs need `NEXT_PUBLIC_SITE_URL=https://fiscal.ge` and `CI=1`: with `CI=1`, `playwright.config.ts` builds and serves production on port 3100; without it the config starts `next dev`, where hydration-dependent interactions are unreliable.
 
 ---
 
@@ -493,7 +493,7 @@ Expected: PASS.
 Run: `npm run typecheck && npm run lint`
 Expected: exit 0. An unused `HorizontalScrollHint` or `SwatchBar` import would fail lint; remove it.
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/main-explorer.spec.ts tests/browser/bilingual-controls.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/main-explorer.spec.ts tests/browser/bilingual-controls.spec.ts --reporter=list`
 Expected: PASS. These specs assert `chart-frame`, `chart-scroll-hint` and hover behaviour on the budget explorer.
 
 - [ ] **Step 8: Commit**
@@ -913,7 +913,7 @@ test("the contribution chart scrolls on phones, hovers without moving the page a
 
 - [ ] **Step 7: Run the browser spec**
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/inflation-categories.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/inflation-categories.spec.ts --reporter=list`
 Expected: PASS for every test, including the existing 390px and 1440px layout tests, which require `rect[data-segment="cpi.cat.residual"]` and one `path[data-overlay]`.
 
 - [ ] **Step 8: Commit**
@@ -932,6 +932,7 @@ git commit -m "fix(inflation): put the contribution chart on the shared chart co
 - Modify: `apps/web/lib/explorer/economicSectors.ts` (import at line 1; `sectorColor` at lines 26–30)
 - Modify: `DESIGN.md` (append to the section `## National economic sectors extension`, which starts at line 945)
 - Test: `apps/web/tests/explorer/economicSectors.test.ts` (replace the test at lines 51–55)
+- Test: `apps/web/tests/explorer/economicSectorsPresentation.test.tsx:260,263`: it locates sector A's point and path by the old palette colour `#B3402A` (the accent). Change both to its registry colour `#2F4B3A`.
 
 **Interfaces:**
 - Consumes: `SERIES_COLORS`, `INK`, `ACCENT`, `OTHER_COLOR` (`lib/explorer/colors.ts`); `contrastRatio(foreground: string, background: string): number` (`lib/explorer/inflationGrid.ts:51`).
@@ -1163,7 +1164,7 @@ Append at the end of the `## National economic sectors extension` section of `DE
 - [ ] **Step 8: Commit**
 
 ```bash
-git add lib/explorer/colors.ts lib/explorer/economicSectors.ts tests/explorer/economicSectors.test.ts ../../DESIGN.md
+git add lib/explorer/colors.ts lib/explorer/economicSectors.ts tests/explorer/economicSectors.test.ts tests/explorer/economicSectorsPresentation.test.tsx ../../DESIGN.md
 git commit -m "fix(economy): give the 20 sectors explicit, distinguishable, concept-safe colours"
 ```
 
@@ -1183,6 +1184,8 @@ Merge gate: the owner approves the screenshot on the PR before merge. If the own
 
 Run: `ls "$LOCALAPPDATA/ms-playwright"`
 Expected on this machine: `chromium-*` folders only.
+
+Result when executed (2026-09-18): the folder also holds `firefox-1522` and `webkit-2287` (an earlier `ls | head` hid them), so all three engines were probed without a download. All three resolve `var()`, so Case A's full wording applies.
 
 WebKit and Firefox need `npx playwright install webkit firefox`, a download of several hundred megabytes. Ask the user before running it. If they decline, continue with Chromium only.
 
