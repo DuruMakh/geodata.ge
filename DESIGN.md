@@ -951,3 +951,29 @@ Below the complete sector workspace, show four end-year highlights in the **same
 Display name: `სექტორები` / `Sectors` on the page, Economy card, sidebar and workbook title. Use concise explanations under the heading, with shared intrinsic height across the three measures so switching never shifts the chart; narrow screens may wrap without clipping text. Do not repeat `% მშპ-ში`, growth or GEL unit labels in a separate row under the line/table buttons. Preserve chart-axis units, table caption units and standalone row values. Rank the selector, table and workbook rows by the active measure's value in the selected final year, descending; keep GDP first, missing values last and stable classification order for ties. Detailed accounting caveats remain in methodology, source notes and machine-readable definitions.
 
 The Economy hub also links to national economic sectors. Reuse the existing editorial workspace, line chart, table, year strip, paper series panel and Excel action. Do not reproduce prototype styling or add top indicator tabs. A compact joined toolbar control switches nominal GEL, share of GDP and real growth. Only Total GDP is selected initially; it stays first and removable. All 20 sectors are selectable without a selection limit. Search does not restrict bulk actions or counts. Nominal values display their unit explicitly; percentage measures retain signed values, and preliminary observations are marked in charts, tables and workbooks. Coverage and range bounds come from the active measure's facts. Regional sectors are not part of this page. Bounded decisions: `docs/superpowers/specs/2026-09-11-economic-sectors-design.md`.
+
+**Sector colours.** Each of the 21 series has an explicit `SERIES_COLORS` entry. A sector wears a site concept colour only when it is that concept; every other sector has its own hex. All 21 are at least CIEDE2000 10 apart and at least 3:1 against paper and tint, enforced by `tests/explorer/economicSectors.test.ts`.
+
+| ID | Sector | Colour | Shared with |
+|---|---|---|---|
+| `economy.gdp_total` | Total GDP | `#1E1B16` | ink reference |
+| `sector.a` | Agriculture, forestry and fishing | `#2F4B3A` | agriculture and environment |
+| `sector.b` | Mining and quarrying | `#663E08` | — |
+| `sector.c` | Manufacturing | `#76819F` | — |
+| `sector.d` | Electricity, gas, steam and air conditioning supply | `#9F7B3E` | — |
+| `sector.e` | Water supply; sewerage, waste management and remediation | `#41757E` | — |
+| `sector.f` | Construction | `#816150` | — |
+| `sector.g` | Wholesale and retail trade; repair of motor vehicles | `#792F26` | — |
+| `sector.h` | Transportation and storage | `#C26E4C` | transport |
+| `sector.i` | Accommodation and food service activities | `#C16671` | — |
+| `sector.j` | Information and communication | `#0D89C2` | — |
+| `sector.k` | Financial and insurance activities | `#084D61` | — |
+| `sector.l` | Real estate activities | `#987793` | — |
+| `sector.m` | Professional, scientific and technical activities | `#6D6F50` | — |
+| `sector.n` | Administrative and support service activities | `#474A02` | — |
+| `sector.o` | Public administration and defence; compulsory social security | `#7A4E8C` | defence |
+| `sector.p` | Education | `#3D5A98` | education |
+| `sector.q` | Human health and social work activities | `#1F6E56` | health |
+| `sector.r` | Arts, entertainment and recreation | `#9C3D5E` | culture |
+| `sector.s` | Other service activities | `#588E54` | — |
+| `sector.t` | Activities of households as employers | `#26958A` | — |

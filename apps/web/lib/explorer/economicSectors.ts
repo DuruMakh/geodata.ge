@@ -1,4 +1,4 @@
-import { EDITORIAL_PALETTE, INK, colorForProgram } from "./colors";
+import { SERIES_COLORS } from "./colors";
 import type { SectorDefinition, SectorMeasure, ServedSectorObservation } from "../data/economicSectors/types";
 
 export const SECTOR_GDP = "economy.gdp_total";
@@ -24,9 +24,9 @@ export function rankSectorDefinitions(registry: readonly SectorDefinition[], end
 }
 
 export function sectorColor(id: string): string {
-  if (id === SECTOR_GDP) return INK;
-  const index = id.charCodeAt(id.length - 1) - 97;
-  return index < EDITORIAL_PALETTE.length ? EDITORIAL_PALETTE[index] : colorForProgram(EDITORIAL_PALETTE[index - EDITORIAL_PALETTE.length], 1);
+  const color = SERIES_COLORS[id];
+  if (!color) throw new Error(`No colour for economic sector ${id}`);
+  return color;
 }
 
 export function parseSectorHash(hash: string, validIds: readonly string[]): SectorState {

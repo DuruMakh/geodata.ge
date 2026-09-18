@@ -79,6 +79,33 @@ export const SERIES_COLORS: Record<string, string> = {
   "municipal.environment": "#2F4B3A",
   "municipal.recreation_culture": "#9C3D5E",
   "municipal.general_public_services": "#5B5347",
+
+  // National economic sectors (NACE Rev.2 sections). A sector wears a site concept
+  // colour only when it is that concept (DESIGN.md §4.2): agriculture, transport,
+  // defence, education, health and culture. Every other sector has its own hex;
+  // tests/explorer/economicSectors.test.ts holds all 21 series at CIEDE2000 ≥ 10
+  // apart and ≥ 3:1 against paper and tint. Total GDP is the ink reference line.
+  "economy.gdp_total": INK,
+  "sector.a": "#2F4B3A",
+  "sector.b": "#663E08",
+  "sector.c": "#76819F",
+  "sector.d": "#9F7B3E",
+  "sector.e": "#41757E",
+  "sector.f": "#816150",
+  "sector.g": "#792F26",
+  "sector.h": "#C26E4C",
+  "sector.i": "#C16671",
+  "sector.j": "#0D89C2",
+  "sector.k": "#084D61",
+  "sector.l": "#987793",
+  "sector.m": "#6D6F50",
+  "sector.n": "#474A02",
+  "sector.o": "#7A4E8C",
+  "sector.p": "#3D5A98",
+  "sector.q": "#1F6E56",
+  "sector.r": "#9C3D5E",
+  "sector.s": "#588E54",
+  "sector.t": "#26958A",
 };
 
 // Open-ended top-level sets cycle through the editorial palette by position so
