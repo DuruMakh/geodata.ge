@@ -278,6 +278,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
 
           <DebtSeriesPanel
             items={model.items}
+            family={props.family}
             facts={props.facts}
             selectedIds={props.selectedIds}
             expandedParentIds={model.expandedParentIds}

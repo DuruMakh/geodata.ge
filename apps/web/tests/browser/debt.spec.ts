@@ -224,4 +224,21 @@ test.describe("Government Debt explorer", () => {
       [2026, "პროგნოზი"],
     ]);
   });
+
+  test("clearing the debt selection can be undone from the same control", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt`);
+    await expectAppReady(page);
+    const bulk = page.getByTestId("series-toggle-all");
+    const total = seriesRow(page, "debt.stock.total").getByTestId("series-row-toggle");
+    await expect(bulk).toHaveAttribute("aria-checked", "true");
+
+    await bulk.click();
+    await expect(total).toHaveAttribute("aria-pressed", "false");
+    await expect(bulk).toBeVisible();
+    await expect(bulk).toHaveAttribute("aria-checked", "false");
+
+    await bulk.click();
+    await expect(total).toHaveAttribute("aria-pressed", "true");
+    await expect(bulk).toHaveAttribute("aria-checked", "true");
+  });
 });

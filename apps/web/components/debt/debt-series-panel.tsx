@@ -6,13 +6,14 @@ import { publicLabel } from "../../lib/i18n/labels";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import type { Locale } from "../../lib/i18n/types";
 import { useState, type ReactNode } from "react";
-import type { GovernmentDebtExplorerModel } from "../../lib/explorer/debtExplorer";
+import { getDefaultDebtSelection, type GovernmentDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
-import type { DebtSeriesId, ServedGovernmentDebtFact } from "../../lib/servedRows";
+import type { DebtFamily, DebtSeriesId, ServedGovernmentDebtFact } from "../../lib/servedRows";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 
 type DebtSeriesPanelProps = {
   items: GovernmentDebtExplorerModel["items"];
+  family: DebtFamily;
   facts: ServedGovernmentDebtFact[];
   selectedIds: DebtSeriesId[];
   expandedParentIds: DebtSeriesId[];
@@ -33,6 +34,7 @@ function formatSummary(fact: ServedGovernmentDebtFact | undefined, latestYear: n
 
 export function DebtSeriesPanel({
   items,
+  family,
   facts,
   selectedIds,
   expandedParentIds,
@@ -81,6 +83,12 @@ export function DebtSeriesPanel({
   }
 
   const hasSelection = selectedIds.length > 0;
+  // The bulk control clears, then restores the family's default total. Families
+  // are exclusive, so all nine rows can never be selected at once; restoring the
+  // default is the reversible state (the inflation categories rule, d7c2612ef).
+  const defaultSelection = getDefaultDebtSelection(family);
+  const isDefaultSelection =
+    selectedIds.length === defaultSelection.length && defaultSelection.every((id) => selectedIds.includes(id));
   return (
     <aside
       aria-label={message(messages, "controls.series")}
@@ -93,9 +101,8 @@ export function DebtSeriesPanel({
         selectedCount={selectedIds.length}
         totalCount={items.length}
         hasSelection={hasSelection}
-        allSelected={false}
-        onToggleAll={() => onSelectionChange([])}
-        allowSelectAll={false}
+        allSelected={isDefaultSelection}
+        onToggleAll={() => onSelectionChange(hasSelection ? [] : getDefaultDebtSelection(family))}
         hasVisibleMatches={normalizedQuery === "" || visibleRows.length > 0}
       >
         {visibleRows.map(({ item, isChild, hasChildren, expanded, expansionLocked }) => (

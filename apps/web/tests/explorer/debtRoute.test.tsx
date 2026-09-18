@@ -365,7 +365,7 @@ describe("Government Debt route composition", () => {
     }
   });
 
-  it("shows an empty nine-row count without offering an impossible select-all action", async () => {
+  it("offers the bulk control on an empty selection so clearing can be undone", async () => {
     const components = await loadDebtComponents();
     expect(components).not.toBeNull();
     if (!components) return;
@@ -390,7 +390,7 @@ describe("Government Debt route composition", () => {
     const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
     expect(visibleText).toContain("სერიები 0 / 9");
-    expect(visibleText).not.toContain("ყველას მონიშვნა");
-    expect(markup).not.toContain('data-testid="series-toggle-all"');
+    expect(visibleText).toContain("ყველას მონიშვნა");
+    expect(markup).toMatch(/<button[^>]*data-testid="series-toggle-all"[^>]*aria-checked="false"/);
   });
 });
