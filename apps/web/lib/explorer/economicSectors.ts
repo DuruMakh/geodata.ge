@@ -1,5 +1,6 @@
 import { EDITORIAL_PALETTE, INK, colorForProgram } from "./colors";
 import type { SectorDefinition, SectorMeasure, ServedSectorObservation } from "../data/economicSectors/types";
+import { matchesLabelQuery } from "../i18n/search";
 
 export const SECTOR_GDP = "economy.gdp_total";
 export type SectorState = {
@@ -21,6 +22,11 @@ export function rankSectorDefinitions(registry: readonly SectorDefinition[], end
     if (bv == null && av != null) return -1;
     return (av != null && bv != null ? bv - av : 0) || a.sortOrder - b.sortOrder;
   });
+}
+
+/** Search across both labels and the NACE code with the site's shared matcher. */
+export function sectorMatchesQuery(definition: SectorDefinition, query: string): boolean {
+  return matchesLabelQuery(query, [definition.labelKa, definition.labelEn, definition.classificationCode ?? ""]);
 }
 
 export function sectorColor(id: string): string {
