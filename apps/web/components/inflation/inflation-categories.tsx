@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ServedBasketWeightRow } from "../../lib/data/inflation/types";
 import { formatDisplayDate } from "../../lib/explorer/format";
@@ -84,9 +84,22 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
     };
   }, [index]);
 
+  const serializedHash = serializeCategoryHash(state);
+  const hashApplied = useRef(false);
   useEffect(() => {
-    if (ready) history.replaceState(null, "", `#${serializeCategoryHash(state)}`);
-  }, [ready, state]);
+    if (!ready) return;
+    // Skip the run that applies the incoming hash: writing it back would stamp a
+    // pristine URL with the default state (use-explorer-state.ts has the same rule).
+    if (!hashApplied.current) {
+      hashApplied.current = true;
+      return;
+    }
+    try {
+      history.replaceState(null, "", `#${serializedHash}`);
+    } catch {
+      // History can be unavailable in some embedded contexts; the UI still works.
+    }
+  }, [serializedHash, ready]);
 
   const range = resolveCategoryRange(state, index);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);

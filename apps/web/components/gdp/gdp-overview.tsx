@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { ServedGdpObservation } from "../../lib/data/gdpOverview/types";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
@@ -55,9 +55,22 @@ export function GdpOverview({
       delete document.body.dataset.appReady;
     };
   }, [facts]);
+  const serializedHash = serializeGdpHash(state);
+  const hashApplied = useRef(false);
   useEffect(() => {
-    if (ready) history.replaceState(null, "", `#${serializeGdpHash(state)}`);
-  }, [state, ready]);
+    if (!ready) return;
+    // Skip the run that applies the incoming hash: writing it back would stamp a
+    // pristine URL with the default state (use-explorer-state.ts has the same rule).
+    if (!hashApplied.current) {
+      hashApplied.current = true;
+      return;
+    }
+    try {
+      history.replaceState(null, "", `#${serializedHash}`);
+    } catch {
+      // History can be unavailable in some embedded contexts; the UI still works.
+    }
+  }, [serializedHash, ready]);
   const m = useMemo(() => buildGdpOverviewModel(facts, state), [facts, state]);
   const d = gdpDisplay(state, presentation);
   const row = {
