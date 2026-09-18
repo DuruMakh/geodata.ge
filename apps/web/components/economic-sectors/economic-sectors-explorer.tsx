@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ChartPie, ChartNoAxesCombined } from "lucide-react";
 import type {
   SectorDefinition,
@@ -46,6 +46,7 @@ export function EconomicSectorsExplorer({
   const { locale, messages } = presentation;
   const t = (key: string) => message(messages, `sectors.${key}`);
   const { state, update } = useEconomicSectorsState(facts, registry);
+  const [announcement, setAnnouncement] = useState("");
   const model = useMemo(
     () => buildEconomicSectorsModel(facts, registry, state),
     [facts, registry, state],
@@ -115,10 +116,7 @@ export function EconomicSectorsExplorer({
         ))}
       </div>
       <p role="status" className="sr-only">
-        {message(messages, "sectors.rangeChanged", {
-          start: model.range.start,
-          end: model.range.end,
-        })}
+        {announcement}
       </p>
       <div
         data-testid="explorer-workspace"
@@ -152,9 +150,16 @@ export function EconomicSectorsExplorer({
               <SegmentedTabs
                 ariaLabel={t("measure")}
                 value={state.measure}
-                onChange={(measure) =>
-                  update((s) => changeSectorMeasure(s, measure, facts), "push")
-                }
+                onChange={(measure) => {
+                  const next = changeSectorMeasure(state, measure, facts);
+                  update(() => next, "push");
+                  // Announce the period the new measure lands on, as GDP does on a tab change.
+                  const nextModel = buildEconomicSectorsModel(facts, registry, next);
+                  setAnnouncement(message(messages, "sectors.rangeChanged", {
+                    start: nextModel.range.start,
+                    end: nextModel.range.end,
+                  }));
+                }}
                 options={[
                   { value: "nominal", label: t("nominal"), icon: <span aria-hidden="true" className="text-base">₾</span> },
                   { value: "share_of_gdp", label: t("shareOfGdp"), icon: <ChartPie aria-hidden="true" size={18} strokeWidth={1.5} /> },

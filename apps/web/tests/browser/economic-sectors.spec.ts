@@ -249,3 +249,19 @@ test("range drags and arrow keys replace history; only measure and view add entr
   await page.goBack();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "nominal");
 });
+
+test("announces the period when the measure changes, not on every range change", async ({ page }) => {
+  await page.goto("/en/explorer/economy/sectors");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  // The explorer's own announcer; the Excel button keeps a separate status line.
+  const status = page.getByTestId("economic-sectors-explorer").locator('p.sr-only[role="status"]');
+  await expect(status).toHaveText("");
+
+  const startHandle = page.getByRole("slider", { name: "Start year" });
+  await startHandle.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(status).toHaveText("");
+
+  await page.getByRole("button", { name: "Real growth %", exact: true }).click();
+  await expect(status).toHaveText(/^Period: \d{4}–\d{4}$/);
+});
