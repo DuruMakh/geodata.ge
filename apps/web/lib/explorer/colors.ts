@@ -106,6 +106,11 @@ export const POSITIVE = "#1F6E56";
 export const NEGATIVE = "#B3402A";
 export const ACCENT = "#B3402A";
 
+// Chart-local literals shared by the SVG charts (DESIGN.md §8.3). The lattice
+// hex doubles as the hover guide; axis labels are muted mono.
+export const CHART_LATTICE = "#C9BEA9";
+export const CHART_AXIS_LABEL = "#6A6050";
+
 // Municipality choropleth (spec §5.2). Six-step terracotta ramp, quantile-classed by
 // the caller; the last step is ACCENT. Occupied-territory shapes carry no value,
 // so they get a flat fill and a dashed stroke instead of a ramp step.

@@ -6,6 +6,8 @@ import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
+import { decimalsFor, niceMax } from "../../lib/explorer/chartScale";
+import { CHART_AXIS_LABEL, CHART_LATTICE } from "../../lib/explorer/colors";
 import { SwatchBar } from "../ui/editorial";
 import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 
@@ -72,24 +74,6 @@ export function buildTooltipRows(
   present.sort((a, b) => b.value - a.value);
 
   return { rows: present.slice(0, cap), hidden: Math.max(0, present.length - cap) };
-}
-
-function niceMax(rawMax: number): number {
-  const raw = rawMax * 1.12;
-  const magnitude = 10 ** Math.floor(Math.log10(raw));
-  const normalized = raw / magnitude;
-  const step = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 2.5 ? 2.5 : normalized <= 5 ? 5 : 10;
-  return step * magnitude;
-}
-
-// Smallest decimal count (up to max) that renders the gridline step exactly,
-// so axis labels are never rounded into duplicates ("0.3" for a 0.25 step).
-function decimalsFor(step: number, max: number): number {
-  for (let digits = 0; digits <= max; digits += 1) {
-    const scaled = step * 10 ** digits;
-    if (Math.abs(Math.round(scaled) - scaled) < 1e-6) return digits;
-  }
-  return max;
 }
 
 export function EditorialLineChart({
@@ -213,7 +197,7 @@ export function EditorialLineChart({
                 width={lattice.colPitch}
                 height={lattice.rowPitch}
               >
-                <circle cx={lattice.colPitch / 2} cy={lattice.rowPitch / 2} r={DOT_R} fill="#C9BEA9" />
+                <circle cx={lattice.colPitch / 2} cy={lattice.rowPitch / 2} r={DOT_R} fill={CHART_LATTICE} />
               </pattern>
             </defs>
             {/* Grown by one dot radius on every side: the pitch divides the plot
@@ -247,7 +231,7 @@ export function EditorialLineChart({
                 strokeWidth={1}
               />
             ) : null}
-            <text x={axisLeftPadding - 10} y={y(value) + 3} fontSize={11} fill="#6A6050" textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
+            <text x={axisLeftPadding - 10} y={y(value) + 3} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
               {formatAxis(value)}
             </text>
           </g>
@@ -260,13 +244,13 @@ export function EditorialLineChart({
           const tx = index === 0 ? x(index) - 4 : isLast ? x(index) + 4 : x(index);
 
           return (
-            <text key={`year-${year}`} x={tx} y={H - 8} fontSize={11} fill="#6A6050" textAnchor={anchor} style={{ fontFamily: "var(--font-numeric)" }}>
+            <text key={`year-${year}`} x={tx} y={H - 8} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor={anchor} style={{ fontFamily: "var(--font-numeric)" }}>
               {formatPeriod ? formatPeriod(year, "axis") : year}
             </text>
           );
         })}
         {hover !== null ? (
-          <line x1={x(hover)} x2={x(hover)} y1={PAD_T - 6} y2={H - PAD_B} stroke="#C9BEA9" strokeWidth={1} />
+          <line x1={x(hover)} x2={x(hover)} y1={PAD_T - 6} y2={H - PAD_B} stroke={CHART_LATTICE} strokeWidth={1} />
         ) : null}
         {series.map((line) => {
           // Interior data gaps (e.g. programs with no 2015 facts) split the path

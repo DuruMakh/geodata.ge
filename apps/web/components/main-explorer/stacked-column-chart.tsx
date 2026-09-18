@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
+import { decimalsFor, niceMax } from "../../lib/explorer/chartScale";
 
 // Bespoke SVG stacked column chart per DESIGN.md §8.3, the only form in which
 // "the parts add up to the published whole" is visible. Positive segments stack
@@ -36,22 +37,6 @@ const LATTICE_ID = "stack-dot-lattice";
  */
 const px = (value: number) => Number(value.toFixed(2));
 const MAX_BAR_WIDTH = 28;
-
-function niceMax(rawMax: number): number {
-  const raw = rawMax * 1.12;
-  const magnitude = 10 ** Math.floor(Math.log10(raw));
-  const normalized = raw / magnitude;
-  const step = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 2.5 ? 2.5 : normalized <= 5 ? 5 : 10;
-  return step * magnitude;
-}
-
-function decimalsFor(step: number, max: number): number {
-  for (let digits = 0; digits <= max; digits += 1) {
-    const scaled = step * 10 ** digits;
-    if (Math.abs(Math.round(scaled) - scaled) < 1e-6) return digits;
-  }
-  return max;
-}
 
 export function StackedColumnChart({
   periods,
