@@ -18,6 +18,7 @@ import {
   buildGdpWorkbookExportModel,
   gdpDisplay,
 } from "../../lib/explorer/gdpWorkbook";
+import { formatDisplayDate } from "../../lib/explorer/format";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { PageHeader } from "../shell/page-header";
@@ -103,6 +104,7 @@ export function GdpOverview({
       }),
     );
   }
+  const lastReviewedAt = facts.map((f) => f.lastReviewedAt).sort().at(-1) ?? "";
   return (
     <main
       data-testid="gdp-overview"
@@ -122,10 +124,9 @@ export function GdpOverview({
             },
             { label: t("heading") },
           ]}
-          coverage={`${m.range.min}–${m.range.max} · ${facts
-            .map((f) => f.lastReviewedAt)
-            .sort()
-            .at(-1)}`}
+          coverage={`${m.range.min}–${m.range.max} · ${message(messages, "main.updated", {
+            date: locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt,
+          })}`}
         />
         <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
           {t("heading")}

@@ -15,6 +15,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
+import { formatDisplayDate } from "../explorer/format";
 import { resolveSiteUrl } from "../siteUrl";
 
 export async function economicSectorsPageMetadata(locale: Locale) {
@@ -39,7 +40,7 @@ export async function renderEconomicSectorsPage(locale: Locale) {
     <BreadcrumbJsonLd items={[{name:crumbs[0].label,path:pageHref("/",locale)},{name:crumbs[2].label,path:pageHref("/explorer/economy",locale)},{name:title,path:pageHref("/explorer/economy/sectors",locale)}]}/>
     <main className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
       <div className="mx-auto max-w-[1180px]">
-        <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${dateModified}`}/>
+        <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${message(presentation.messages, "main.updated", { date: locale === "en" ? formatDisplayDate(dateModified, locale) : dateModified })}`}/>
         <EconomicSectorsExplorer facts={facts} registry={ECONOMIC_SECTORS} sources={sources} siteOrigin={resolveSiteUrl()}/>
       </div>
     </main>
