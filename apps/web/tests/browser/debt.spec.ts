@@ -228,5 +228,9 @@ test.describe("Government Debt explorer", () => {
       [2025, "ფაქტი"],
       [2026, "პროგნოზი"],
     ]);
+    // Range 2024–2026: column B = 2024, C = 2025, D = 2026.
+    const summary = workbook.getWorksheet("მარტივი ცხრილი")!;
+    expect(summary.getCell("C4").numFmt).not.toContain("პროგნოზი");
+    expect(summary.getCell("D4").numFmt).toContain("პროგნოზი");
   });
 });
