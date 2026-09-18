@@ -39,6 +39,8 @@ export type WorkbookExportInput = {
   totalId: string | null;
   series: WorkbookSeries[];
   includeTotalsInAnalysis?: boolean;
+  /** false drops the readable sheet's relative change column (percentage measures). */
+  showChangeColumn?: boolean;
   sources: WorkbookPublicSource[];
   siteOrigin: string;
 };
@@ -189,6 +191,7 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
       title: input.title,
       subtitle: subtitle(rows, years, input.measure.unitLabel, input.locale),
       unitLabel: input.measure.unitLabel,
+      ...(input.showChangeColumn === undefined ? {} : { showChangeColumn: input.showChangeColumn }),
       years,
       rows,
     },

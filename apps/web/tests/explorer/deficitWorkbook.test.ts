@@ -52,4 +52,10 @@ describe("general-government deficit workbook", () => {
     ]);
     expect(model.sources).toHaveLength(1);
   });
+
+  it("drops the relative change column from the percentage export only", () => {
+    const input = { facts, range: { start: 2025, end: 2026 }, sources: [], siteOrigin: "https://fiscal.ge" };
+    expect(buildDeficitWorkbookExportModel({ ...input, percentage: true }).readable.showChangeColumn).toBe(false);
+    expect(buildDeficitWorkbookExportModel({ ...input, percentage: false }).readable.showChangeColumn).toBeUndefined();
+  });
 });

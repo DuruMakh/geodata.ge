@@ -37,6 +37,7 @@ export function buildDeficitWorkbookExportModel(input: {
       : { kind: "amount", unitLabel: workbookMessage(locale, "workbook.billionGel"), readableScale: 1_000_000_000 },
     totalId: DEFICIT_ITEM.id,
     includeTotalsInAnalysis: true,
+    ...(input.percentage ? { showChangeColumn: false } : {}),
     series: [{
       id: DEFICIT_ITEM.id,
       kind: "total",

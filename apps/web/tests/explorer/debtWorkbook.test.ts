@@ -327,4 +327,15 @@ describe("Debt workbook adapter", () => {
       }),
     ]);
   });
+
+  it("drops the relative change column from percentage exports only", () => {
+    const base = { facts, gdpFacts, sources: debtSources, gdpSources, siteOrigin: "https://fiscal.ge" };
+    const rate = buildDebtWorkbookExportModel({ ...base, family: "rate", selectedIds: ["debt.rate.total"], range: { start: 2019, end: 2021 }, shareOfGdp: false });
+    const stockShare = buildDebtWorkbookExportModel({ ...base, family: "stock", selectedIds: ["debt.stock.total"], range: { start: 2013, end: 2014 }, shareOfGdp: true });
+    const stockGel = buildDebtWorkbookExportModel({ ...base, family: "stock", selectedIds: ["debt.stock.total"], range: { start: 2013, end: 2014 }, shareOfGdp: false });
+
+    expect(rate.readable.showChangeColumn).toBe(false);
+    expect(stockShare.readable.showChangeColumn).toBe(false);
+    expect(stockGel.readable.showChangeColumn).toBeUndefined();
+  });
 });

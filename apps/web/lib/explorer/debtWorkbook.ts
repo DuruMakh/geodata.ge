@@ -150,6 +150,7 @@ export function buildDebtWorkbookExportModel(input: DebtWorkbookInput, presentat
     totalId: model.items.find((item) => item.family === input.family && item.parentItemId === null)?.id ?? null,
     series,
     includeTotalsInAnalysis: input.family === "rate",
+    ...(percentage ? { showChangeColumn: false } : {}),
     sources: [
       ...debtSourcesFor(input),
       ...(input.family === "stock" && input.shareOfGdp ? input.gdpSources : []),
