@@ -135,7 +135,7 @@ export function EconomicSectorsExplorer({
               <SegmentedTabs
                 ariaLabel={message(messages, "controls.viewMode")}
                 value={state.mode}
-                onChange={(mode) => update((s) => ({ ...s, mode }))}
+                onChange={(mode) => update((s) => ({ ...s, mode }), "push")}
                 options={[
                   {
                     value: "line",
@@ -153,7 +153,7 @@ export function EconomicSectorsExplorer({
                 ariaLabel={t("measure")}
                 value={state.measure}
                 onChange={(measure) =>
-                  update((s) => changeSectorMeasure(s, measure, facts))
+                  update((s) => changeSectorMeasure(s, measure, facts), "push")
                 }
                 options={[
                   { value: "nominal", label: t("nominal"), icon: <span aria-hidden="true" className="text-base">₾</span> },
