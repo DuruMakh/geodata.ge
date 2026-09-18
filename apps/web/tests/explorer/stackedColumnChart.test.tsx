@@ -51,4 +51,28 @@ describe("StackedColumnChart", () => {
     expect(empty).not.toContain("data-segment=");
     expect(empty).toContain('role="img"');
   });
+
+  it("uses the chart tokens, not undefined custom properties", () => {
+    expect(markup).not.toContain("var(--rule)");
+    expect(markup).not.toContain("ink-soft");
+    expect(markup).not.toContain("font-mono");
+    expect(markup).toContain('fill="#6A6050"');
+    expect(markup).toContain("var(--font-numeric)");
+  });
+
+  it("sits in the shared scroll frame and is keyboard focusable", () => {
+    expect(markup).toContain('data-testid="stack-chart-frame"');
+    expect(markup).toContain('data-testid="stack-chart-scroll-hint"');
+    expect(markup).toMatch(/<svg[^>]*tabindex="0"/);
+    expect(markup).toMatch(/<svg[^>]*aria-describedby="[^"]+"/);
+  });
+
+  it("ends the headline overlay in a dot", () => {
+    expect(markup).toContain("data-overlay-end");
+  });
+
+  it("has no per-bar hover rectangles and no in-flow readout", () => {
+    expect(markup).not.toContain('fill="transparent"');
+    expect(markup).not.toContain("mt-2 font-mono");
+  });
 });
