@@ -426,4 +426,32 @@ describe("Government Debt route composition", () => {
     expect(visibleText).not.toContain("ყველას მონიშვნა");
     expect(markup).not.toContain('data-testid="series-toggle-all"');
   });
+
+  it("names preliminary GDP years in the stock source note only when they are in range", async () => {
+    const components = await loadDebtComponents();
+    expect(components).not.toBeNull();
+    if (!components) return;
+
+    const noop = () => {};
+    const render = (end: number) => renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
+      facts,
+      gdpFacts,
+      workbookSources: [],
+      lastUpdatedAt: reviewedAt,
+      family: "stock",
+      chartMode: "line",
+      shareOfGdp: false,
+      range: { start: 2013, end, min: 2013, max: 2025 },
+      selectedIds: ["debt.stock.total"],
+      onChartModeChange: noop,
+      onShareChange: noop,
+      onRangeChange: noop,
+      onSelectionChange: noop,
+      onToggleSeries: noop,
+    }));
+
+    // Fixture: GDP 2025 is preliminary, 2013 is final; stock facts exist for 2013, 2024, 2025.
+    expect(render(2025)).toContain("2025 წლის მშპ წინასწარია.");
+    expect(render(2024)).not.toContain("მშპ წინასწარია");
+  });
 });

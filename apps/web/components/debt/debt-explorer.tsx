@@ -104,6 +104,9 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
       ? formatShare(deck.value / 100)
       : formatAmount(deck.value, locale);
   const deckChange = deck?.change ?? null;
+  const preliminaryGdpYears = props.family === "stock"
+    ? model.years.filter((year) => props.gdpFacts.some((fact) => fact.year === year && fact.status === "preliminary"))
+    : [];
   const coverage = [
     familyYears.length > 0 ? `${familyYears[0]}–${familyYears.at(-1)}` : "",
     props.lastUpdatedAt ? message(messages, "main.updated", { date: locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt }) : "",
@@ -253,6 +256,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                 {message(messages, "debt.source")}
                 {" "}{message(messages, "debt.comparability")}
                 {props.family === "stock" ? " " + message(messages, "main.gdpSource") : null}
+                {preliminaryGdpYears.length > 0 ? " " + message(messages, "main.preliminaryGdp", { years: preliminaryGdpYears.join(", ") }) : null}
                 {props.family === "rate" ? message(messages, "debt.missingRates") : null}
                 {props.lastUpdatedAt ? (
                   <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt}</span> }} /></>
