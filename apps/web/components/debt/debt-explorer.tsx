@@ -9,9 +9,9 @@ import { publicLabel } from "../../lib/i18n/labels";
 import { useI18n } from "../../lib/i18n/provider";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
-import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
+import { buildDebtDeck, buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
-import { formatAmount, formatShare, unitFor, unitsFor, formatDisplayDate } from "../../lib/explorer/format";
+import { formatAmount, formatPoints, formatShare, unitFor, unitsFor, formatDisplayDate } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
 import type {
   DebtFamily,
@@ -97,27 +97,13 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
       : {}),
   }));
   const totalItemId = model.items.find((item) => item.family === props.family && item.parentItemId === null)?.id;
-  const totalFacts = totalItemId
-    ? props.facts
-      .filter((fact) => fact.seriesId === totalItemId && fact.value !== null)
-      .sort((left, right) => left.year - right.year)
-    : [];
-  const latestTotalFact = totalFacts.at(-1) ?? null;
-  const previousTotalFact = latestTotalFact
-    ? totalFacts.find((fact) => fact.year === latestTotalFact.year - 1) ?? null
-    : null;
-  const deckValue = latestTotalFact?.value === null || latestTotalFact?.value === undefined
+  const deck = buildDebtDeck(props.facts, props.family);
+  const deckValue = deck === null
     ? "—"
     : props.family === "rate"
-      ? formatShare(latestTotalFact.value / 100)
-      : formatAmount(latestTotalFact.value, locale);
-  const deckYoy = latestTotalFact?.value !== null
-    && latestTotalFact?.value !== undefined
-    && previousTotalFact?.value !== null
-    && previousTotalFact?.value !== undefined
-    && previousTotalFact.value !== 0
-    ? (latestTotalFact.value - previousTotalFact.value) / previousTotalFact.value
-    : null;
+      ? formatShare(deck.value / 100)
+      : formatAmount(deck.value, locale);
+  const deckChange = deck?.change ?? null;
   const coverage = [
     familyYears.length > 0 ? `${familyYears[0]}–${familyYears.at(-1)}` : "",
     props.lastUpdatedAt ? message(messages, "main.updated", { date: locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt }) : "",
@@ -150,18 +136,17 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
         </h1>
         <p data-testid="debt-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
           <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
-            {latestTotalFact?.year}: {message(messages, FAMILY_LABEL[props.family])} · {deckValue}
+            {deck?.year}: {message(messages, FAMILY_LABEL[props.family])} · {deckValue}
           </span>
-          {latestTotalFact?.status === "projection_existing_portfolio" ? (
-            <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{message(messages, "debt.forecast")}</span>
-          ) : null}
-          {deckYoy !== null ? (
+          {deckChange !== null ? (
             <>
               <span
                 className="font-[family-name:var(--font-numeric)] text-[13px]"
-                style={{ color: deckYoy < 0 ? NEGATIVE : POSITIVE }}
+                style={{ color: deckChange.value < 0 ? NEGATIVE : POSITIVE }}
               >
-                {formatShare(deckYoy, true)}
+                {deckChange.kind === "points"
+                  ? `${formatPoints(deckChange.value, true)} ${message(messages, "debt.pp")}`
+                  : formatShare(deckChange.value, true)}
               </span>
               <span>{message(messages, "main.previousYear")}</span>
             </>

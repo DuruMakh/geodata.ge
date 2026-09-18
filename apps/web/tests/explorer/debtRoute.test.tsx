@@ -82,6 +82,11 @@ function selectedSeries(markup: string): string[] {
     .map((match) => match[1]!);
 }
 
+function deckText(markup: string): string {
+  const match = markup.match(/<p data-testid="debt-deck"[^>]*>([\s\S]*?)<\/p>/);
+  return (match?.[1] ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
 function seriesRow(markup: string, id: DebtSeriesId): string {
   const start = markup.indexOf(`data-series-id="${id}"`);
   expect(start, `${id} row must exist`).toBeGreaterThan(-1);
@@ -154,7 +159,7 @@ describe("Government Debt route composition", () => {
     expect(visibleText).not.toContain("2013: მთავრობის ვალი · 8.0 მლრდ ₾");
   });
 
-  it("labels a latest projected family total in the deck", async () => {
+  it("leads the service deck with the latest actual total, never a projection", async () => {
     const components = await loadDebtComponents();
     expect(components).not.toBeNull();
     if (!components) return;
@@ -176,9 +181,37 @@ describe("Government Debt route composition", () => {
       onSelectionChange: noop,
       onToggleSeries: noop,
     }));
-    const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    const deck = deckText(markup);
 
-    expect(visibleText).toContain("2026: ვალის გადახდა · 5.1 მლრდ ₾ პროგნოზი +18.6% წინა წელთან");
+    // The fixture has no 2024 service total, so no change is shown.
+    expect(deck).toBe("2025: ვალის გადახდა · 4.3 მლრდ ₾");
+  });
+
+  it("reports the interest-rate deck change in percentage points", async () => {
+    const components = await loadDebtComponents();
+    expect(components).not.toBeNull();
+    if (!components) return;
+
+    const noop = () => {};
+    const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
+      facts,
+      gdpFacts,
+      workbookSources: [],
+      lastUpdatedAt: reviewedAt,
+      family: "rate",
+      chartMode: "line",
+      shareOfGdp: false,
+      range: { start: 2015, end: 2025, min: 2015, max: 2025 },
+      selectedIds: ["debt.rate.total"],
+      onChartModeChange: noop,
+      onShareChange: noop,
+      onRangeChange: noop,
+      onSelectionChange: noop,
+      onToggleSeries: noop,
+    }));
+
+    // Fixture: 2024 = 5.0%, 2025 = 4.7%.
+    expect(deckText(markup)).toBe("2025: საპროცენტო განაკვეთი · 4.7% −0.3 პპ წინა წელთან");
   });
 
   it("uses actual service and latest published rate facts in real-data selector summaries", async () => {

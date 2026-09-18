@@ -595,6 +595,8 @@ National columns: `<first col> | years… | ცვლილება | წილ
 
 Stock can optionally use `% მშპ-ში`; service stays in GEL and rates use percent. Exact rate gaps render as `—` and are never interpolated or replaced with zero. Service may extend past actual 2025 values with a dashed 2026–2030 segment, a visible `პროგნოზი` boundary, and the statement that it covers only the portfolio outstanding on 2025-12-31, not a full future-budget forecast. The Excel action exports the active family, selection, range, and measure through the standard three-sheet workbook. For rates the GEL amount cell is blank and the percentage column carries the value; forecast service rows use status `პროგნოზი`.
 
+The deck line reports the latest **actual** observation of the active family's total — never a projection — and its change against the previous actual year: a relative change for stock and service, and a change in percentage points (`პპ`) for rates.
+
 ### 8.6 General-government deficit
 
 `/explorer/deficit` reuses the Government Debt explorer primitives with H1 `რამდენია საქართველოს ბიუჯეტის დეფიციტი` and exactly one selectable series, `ზოგადი მთავრობის ბალანსი`. It defaults to `% მშპ-ში`, line mode and full 1995–2031 coverage; nominal GEL is the only alternative measure. The deck line always reports the latest actual observation (2025), while 2026–2031 render as a dashed continuation with a visible `პროგნოზი` marker and table labels. Negative values mean deficit/net borrowing and positive values mean surplus/net lending. The source note names IMF WEO and explicitly prevents deriving this differently scoped general-government measure from the site's state-budget expenditure and consolidated-budget revenue datasets.
