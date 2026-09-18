@@ -18,6 +18,7 @@ it("only links the delivered GDP overview", async () => {
     null,
   ]);
   expect(cards[0].footer).toContain("27.1");
+  expect(cards[0].footer).toContain("2025: 27.1 bn (Constant 2015 USD)");
   expect(cards.slice(1).every((c) => c.comingSoon && c.series === null)).toBe(
     true,
   );
