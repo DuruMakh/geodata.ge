@@ -29,7 +29,7 @@ No data file, pipeline, MCP response or publication changes.
 - **Locales:** Georgian strings are copied exactly as written in this plan. English message values must not contain Georgian script (`npm run i18n:check` enforces this).
 - **Colours:** the deck delta keeps the site-wide colouring: a rise uses `POSITIVE`, a fall uses `NEGATIVE` (DESIGN.md:323).
 - **Test loop:** while editing, run only the targeted command given in each task. The full gates (`npm run check`, `npm run build`, `npm run test:browser`) run once, in Task 9.
-- **Browser tests:** a single spec runs with `npx playwright test tests/browser/<name>.spec.ts`. If `playwright.config.ts` does not start a server for you, follow the CLAUDE.md recipe (build, start on port 3100, set `PLAYWRIGHT_BASE_URL`). Always set `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`.
+- **Browser tests:** a single spec runs with `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/<name>.spec.ts --reporter=list`. `CI=1` makes `playwright.config.ts` build and serve production on port 3100 (about a minute per run). Without it the config starts `next dev`, where hydration-dependent clicks are unreliable. Always set `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`.
 
 ---
 
@@ -355,7 +355,7 @@ Line 14 becomes:
 import { formatAmount, formatPoints, formatShare, unitFor, unitsFor, formatDisplayDate } from "../../lib/explorer/format";
 ```
 
-Replace lines 99–120, from `const totalItemId = …` through the end of the `deckYoy` expression, with:
+Keep line 99 (`const totalItemId = …`): the table still uses it for its rows and `showTotal`. Replace lines 100–120, from `const totalFacts = …` through the end of the `deckYoy` expression, with:
 
 ```tsx
   const deck = buildDebtDeck(props.facts, props.family);
@@ -400,7 +400,7 @@ Run: `npx vitest run tests/explorer/debtRoute.test.tsx`
 Expected: PASS.
 
 Run: `npm run typecheck`
-Expected: exit 0. A leftover reference to `latestTotalFact`, `previousTotalFact`, `deckYoy` or `totalItemId` would fail here; delete any such reference.
+Expected: exit 0. A leftover reference to `latestTotalFact`, `previousTotalFact` or `deckYoy` would fail here; delete any such reference. `totalItemId` stays.
 
 - [ ] **Step 7: Update the browser test**
 
@@ -430,7 +430,7 @@ In `apps/web/tests/browser/debt.spec.ts`, replace the test `"keeps the deck on l
 
 - [ ] **Step 8: Run the browser spec**
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/debt.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/debt.spec.ts --reporter=list`
 Expected: PASS for every test in the file.
 
 - [ ] **Step 9: Record the rule in DESIGN.md and amend the debt spec**
@@ -659,7 +659,7 @@ In `apps/web/tests/browser/deficit.spec.ts`, replace the test `"switches between
 
 - [ ] **Step 2: Run it to verify it fails**
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/deficit.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/deficit.spec.ts --reporter=list`
 Expected: this test FAILS at `toContainText("−1.5 მლრდ ₾")`, because the panel still shows `−1.5%`.
 
 - [ ] **Step 3: Implement**
@@ -678,7 +678,7 @@ with:
 
 - [ ] **Step 4: Run it to verify it passes**
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/deficit.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/deficit.spec.ts --reporter=list`
 Expected: PASS for every test in the file.
 
 - [ ] **Step 5: Commit**
@@ -787,12 +787,12 @@ In `apps/web/tests/browser/debt.spec.ts`, inside `"marks the service forecast an
     expect(summary.getCell("D4").numFmt).toContain("პროგნოზი");
 ```
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/debt.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/debt.spec.ts --reporter=list`
 Expected: PASS.
 
 - [ ] **Step 6: Record the rule in DESIGN.md**
 
-In `DESIGN.md` §8.5, append this sentence to the end of the deck paragraph added in Task 2:
+In `DESIGN.md` §8.5, append this sentence to the end of the Excel paragraph, which ends `forecast service rows use status \`პროგნოზი\`.` and sits just before the deck paragraph added in Task 2:
 
 ```markdown
  In the readable workbook sheet, cells in forecast years carry the `პროგნოზი` marker.
@@ -1006,6 +1006,8 @@ In `apps/web/lib/explorer/economyHubCards.ts`, replace line 27 with:
 Run: `grep -rn "gdp.usd\|t(\"usd\")\|gdp\.\${" components lib --include=*.ts --include=*.tsx`
 - If nothing can still resolve to `gdp.usd` (no literal `gdp.usd`, no `t("usd")`, and no template such as `` `gdp.${currency}` ``), delete the `"gdp.usd"` line from both `lib/i18n/messages/en/gdp.json` and `lib/i18n/messages/ka/gdp.json`.
 - Otherwise leave both files unchanged.
+
+Result when executed (2026-09-18): the key stays. `lib/explorer/gdpWorkbook.ts` calls `t(currency)` through its `gdp.${key}` helper, and `currency` is `"usd"` for real GDP.
 
 - [ ] **Step 5: Run it to verify it passes**
 
