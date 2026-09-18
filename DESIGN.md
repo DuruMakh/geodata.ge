@@ -331,7 +331,20 @@ The section lives in the route (§6.2). Everything else about a screen serialize
 /explorer/analysis#as=expenditure&ag=ministries&ay=2024              (analysis)
 ```
 
-Keys: `g` grouping (expenditure only), `m` mode, `sh` share measure, `r` range, `sel` selection; `as` analysis side, `ag` analysis grouping, `ay` analysis year. The hash never carries `nav`.
+Keys by section. The hash never carries `nav`, and no key is renamed once shipped — shared links depend on them.
+
+| Section | Keys | Notes |
+|---|---|---|
+| Expenditure, revenue, analysis | `g` grouping (expenditure only), `m` mode, `sh` share measure, `r` range, `sel` selection; `as` analysis side, `ag` analysis grouping, `ay` analysis year | — |
+| Municipalities | `m`, `sh`, `r`, `sel` on the country, region and municipality pages; `lvl=region` on the index | `lvl` switches the index list to regions. |
+| Government debt | `f` family, `m`, `sh`, `r`, `sel` | An empty `sel=` is a deliberate clear and survives a reload. |
+| General-government deficit | `m`, `sh`, `r`, `sel` | A missing `sh` means percent of GDP, the section's default measure. |
+| GDP overview | `indicator`, `view`, `currency`, `range=all` or `start`/`end` | — |
+| Economic sectors | `measure`, `view`, `sel`, `range=all` or `start`/`end` | — |
+| Inflation overview | `i` indicator, `m` mode, `r=YYYY-MM-YYYY-MM`, `sel`, `t` table series | — |
+| Inflation categories | `i`, `m`, `r`, `sel`, `t`, `x` expanded divisions | — |
+
+Write rules: applying an incoming URL never writes the hash, so a pristine URL stays clean; continuous changes (range, selection) replace the history entry; only discrete switches a section's spec asks Back to step through push one — today the economic sectors measure and view.
 
 Restore on load with validation (unknown values fall back to defaults; ranges clamp to loaded years; repeated selection IDs collapse to their first occurrence).
 
