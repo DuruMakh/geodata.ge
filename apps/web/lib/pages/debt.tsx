@@ -13,7 +13,7 @@ import { coverageFromYears, fiscalMetadata, governmentDebtMetadata } from "../se
 import { DEBT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { loadGdpWorkbookSources, loadWorkbookSources } from "../methodology/workbookSources";
+import { loadDebtWorkbookSources, loadGdpWorkbookSources } from "../methodology/workbookSources";
 
 export async function debtPageMetadata(locale: Locale): Promise<Metadata> {
   const { facts } = await loadServedGovernmentDebtData();

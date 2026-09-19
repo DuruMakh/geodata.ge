@@ -47,6 +47,7 @@ const debtSources: SourcedWorkbookPublicSource[] = [
     years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
     title: "მთავრობის ვალის ყოველთვიური ანგარიში",
     organization: "საქართველოს ფინანსთა სამინისტრო",
+    sourceId: "source.mof_monthly_debt_report_2026_07",
     downloadHref: "/downloads/methodology/debt/files/2015-2025/monthly-debt-report-2026-07.pdf",
     retrievedAt: "2026-09-01",
   },

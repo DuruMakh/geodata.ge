@@ -34,9 +34,9 @@ describe("debt workbook sources (golden)", () => {
 });
 
 it("loads each debt archive document with its exact registry id", async () => {
-  const module = await import("../../lib/methodology/workbookSources");
-  expect(module.loadDebtWorkbookSources).toBeTypeOf("function");
-  const sources = await module.loadDebtWorkbookSources();
+  const sourceModule = await import("../../lib/methodology/workbookSources");
+  expect(sourceModule.loadDebtWorkbookSources).toBeTypeOf("function");
+  const sources = await sourceModule.loadDebtWorkbookSources();
   expect(sources.length).toBeGreaterThan(0);
   expect(sources.every(source => source.sourceId.startsWith("source.mof_"))).toBe(true);
 });
