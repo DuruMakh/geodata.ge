@@ -78,6 +78,7 @@ model SourceDocument {
   gdpFacts        NationalGdpFact[]
   populationFacts MunicipalPopulationFact[]
   generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
+  governmentDebtFacts GovernmentDebtFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
   inflationCpiFacts InflationCpiFact[]
@@ -202,6 +203,7 @@ model GovernmentDebtFact {
   valueKind      String
   status         String
   sourceId       String?
+  sourceDocument SourceDocument? @relation(fields: [sourceId], references: [id], onDelete: Restrict)
   snapshotDate   DateTime?  @db.Date
   lastReviewedAt DateTime   @db.Date
   importRunId    String?
@@ -209,6 +211,7 @@ model GovernmentDebtFact {
 
   @@id([year, seriesId])
   @@index([family, year])
+  @@index([sourceId])
 }
 
 // Mirror of data/imports/general-government-balance-annual-1995-2031.csv.
