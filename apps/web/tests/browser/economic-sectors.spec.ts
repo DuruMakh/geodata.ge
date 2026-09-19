@@ -244,6 +244,8 @@ test("range drags and arrow keys replace history; only measure and view add entr
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2 + 160, box.y + box.height / 2, { steps: 16 });
   await page.mouse.up();
+  // The drag must actually move the handle, or the history check below proves nothing.
+  await expect(startHandle).not.toHaveAttribute("aria-valuenow", "2016");
   expect(await page.evaluate(() => history.length)).toBe(initial + 1);
 
   await page.goBack();
@@ -260,6 +262,7 @@ test("announces the period when the measure changes, not on every range change",
   const startHandle = page.getByRole("slider", { name: "Start year" });
   await startHandle.focus();
   await page.keyboard.press("ArrowRight");
+  await expect(startHandle).toHaveAttribute("aria-valuenow", "2011");
   await expect(status).toHaveText("");
 
   await page.getByRole("button", { name: "Real growth %", exact: true }).click();
