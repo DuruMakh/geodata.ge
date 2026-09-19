@@ -179,7 +179,7 @@ test("restored selections show empty and no-data states, keeping the national re
   for (const selectedIds of [[], ["sector.a"]]) {
     vi.spyOn(sectorState, "useEconomicSectorsState").mockReturnValue({
       state: { ...DEFAULT_SECTOR_STATE, selectedIds },
-      update: () => {},
+      update: () => DEFAULT_SECTOR_STATE,
     });
     const html = renderToStaticMarkup(
       <I18nProvider locale="en" messages={messages}>
@@ -209,7 +209,7 @@ test("growth renders negative domains, isolated points and gaps through the shar
       measure: "real_growth",
       selectedIds: ["sector.a"],
     },
-    update: () => {},
+    update: () => DEFAULT_SECTOR_STATE,
   });
   const facts: ServedSectorObservation[] = [
     2021, 2022, 2023, 2024, 2025,

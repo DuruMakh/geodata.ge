@@ -54,6 +54,7 @@ export function useEconomicSectorsState(
         }
       }
       setState(next);
+      return next;
     },
     [],
   );

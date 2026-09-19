@@ -151,8 +151,9 @@ export function EconomicSectorsExplorer({
                 ariaLabel={t("measure")}
                 value={state.measure}
                 onChange={(measure) => {
-                  const next = changeSectorMeasure(state, measure, facts);
-                  update(() => next, "push");
+                  // Build on the hook's current state, not this render's: a click can
+                  // land after a deep link is applied but before it re-renders.
+                  const next = update((s) => changeSectorMeasure(s, measure, facts), "push");
                   // Announce the period the new measure lands on, as GDP does on a tab change.
                   const nextModel = buildEconomicSectorsModel(facts, registry, next);
                   setAnnouncement(message(messages, "sectors.rangeChanged", {
