@@ -1,3 +1,4 @@
+import { registryDebtSourceId } from "../data/governmentDebt/sourceLineage";
 import path from "node:path";
 import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
@@ -217,6 +218,25 @@ export function loadWorkbookSources(
   ]).then(([rows, catalogue]) => projectWorkbookSources(roleRows(datasetId, rows, role), locale, catalogue?.documents));
   cache.set(cacheKey, pending);
   return pending;
+}
+
+export type SourcedWorkbookPublicSource = WorkbookPublicSource & { sourceId: string };
+
+/**
+ * Debt workbook sources keyed by registry source id, so the explorer matches a
+ * fact's documents exactly instead of by filename substring. The join key is the
+ * archive row's download path, which is unique per archived document.
+ */
+export async function loadDebtWorkbookSources(locale: Locale = "ka"): Promise<SourcedWorkbookPublicSource[]> {
+  const repositoryRoot = path.resolve(process.cwd(), "../..");
+  const [rows, projected] = await Promise.all([
+    loadReviewedSourceManifest(repositoryRoot, "debt"),
+    loadWorkbookSources("debt", undefined, locale),
+  ]);
+  return projected.flatMap((source) => {
+    const row = rows.find((candidate) => candidate.downloadHref === source.downloadHref);
+    return row ? [{ ...source, sourceId: registryDebtSourceId(row.source_id) }] : [];
+  });
 }
 
 export function loadGdpWorkbookSources(locale: Locale = "ka"): Promise<WorkbookPublicSource[]> {

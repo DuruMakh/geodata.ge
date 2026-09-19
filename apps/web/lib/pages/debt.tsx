@@ -27,7 +27,7 @@ export async function renderDebtPage(locale: Locale) {
   const [{ facts }, { gdpFacts }, workbookSources, gdpWorkbookSources] = await Promise.all([
     loadServedGovernmentDebtData(),
     loadServedExplorerData(),
-    loadWorkbookSources("debt", undefined, locale),
+    loadDebtWorkbookSources(locale),
     loadGdpWorkbookSources(locale),
   ]);
   const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "debt"], [...new Set(facts.map(fact => fact.seriesId))]);

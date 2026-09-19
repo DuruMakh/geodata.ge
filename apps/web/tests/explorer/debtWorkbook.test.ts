@@ -1,11 +1,12 @@
 import ExcelJS from "exceljs";
 import { describe, expect, it } from "vitest";
 import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
+import type { SourcedWorkbookPublicSource } from "../../lib/methodology/workbookSources";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import { loadGovernmentDebtFacts } from "../../lib/data/governmentDebt/importGovernmentDebtFacts";
-import { loadWorkbookSources, resetWorkbookSourceCacheForTests } from "../../lib/methodology/workbookSources";
+import { loadDebtWorkbookSources, resetWorkbookSourceCacheForTests } from "../../lib/methodology/workbookSources";
 import type { ServedGovernmentDebtFact, ServedNationalGdpFact } from "../../lib/servedRows";
 
 const facts: ServedGovernmentDebtFact[] = [
@@ -25,8 +26,9 @@ const gdpFacts: ServedNationalGdpFact[] = [
   { year: 2014, gdpCurrentPricesGel: 20_000_000_000, accountingStandard: "sna_2008", status: "final_as_published", sourceId: "gdp" },
 ];
 
-const debtSources: WorkbookPublicSource[] = [
+const debtSources: SourcedWorkbookPublicSource[] = [
   {
+    sourceId: "source.mof_public_debt_bulletin_n13",
     years: [2013, 2014],
     title: "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
     organization: "საქართველოს ფინანსთა სამინისტრო",
@@ -34,6 +36,7 @@ const debtSources: WorkbookPublicSource[] = [
     retrievedAt: "2026-09-01",
   },
   {
+    sourceId: "source.mof_public_debt_bulletin_n25",
     years: [2015, 2025, 2026],
     title: "სახელმწიფო ვალის სტატისტიკური ბიულეტენი",
     organization: "საქართველოს ფინანსთა სამინისტრო",
@@ -91,7 +94,7 @@ describe("Debt workbook adapter", () => {
     resetWorkbookSourceCacheForTests();
     const [realFacts, realSources] = await Promise.all([
       loadGovernmentDebtFacts(),
-      loadWorkbookSources("debt"),
+      loadDebtWorkbookSources(),
     ]);
     const build = (family: "stock" | "service", start: number, end: number) => buildDebtWorkbookExportModel({
       facts: realFacts,
@@ -186,7 +189,7 @@ describe("Debt workbook adapter", () => {
     resetWorkbookSourceCacheForTests();
     const [realFacts, realSources] = await Promise.all([
       loadGovernmentDebtFacts(),
-      loadWorkbookSources("debt"),
+      loadDebtWorkbookSources(),
     ]);
     const model = buildDebtWorkbookExportModel({
       facts: realFacts,

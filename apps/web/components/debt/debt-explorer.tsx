@@ -7,6 +7,7 @@ import { Message } from "../../lib/i18n/message";
 import { pageHref } from "../../lib/i18n/routes";
 import { publicLabel } from "../../lib/i18n/labels";
 import { useI18n } from "../../lib/i18n/provider";
+import type { SourcedWorkbookPublicSource } from "../../lib/methodology/workbookSources";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
@@ -33,7 +34,7 @@ type DebtRange = { start: number; end: number; min: number; max: number };
 type DebtExplorerProps = {
   facts: ServedGovernmentDebtFact[];
   gdpFacts: ServedNationalGdpFact[];
-  workbookSources: WorkbookPublicSource[];
+  workbookSources: SourcedWorkbookPublicSource[];
   gdpWorkbookSources?: WorkbookPublicSource[];
   siteOrigin?: string;
   lastUpdatedAt: string;
