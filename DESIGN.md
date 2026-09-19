@@ -344,7 +344,7 @@ Keys by section. The hash never carries `nav`, and no key is renamed once shippe
 | Inflation overview | `i` indicator, `m` mode, `r=YYYY-MM-YYYY-MM`, `sel`, `t` table series | — |
 | Inflation categories | `i`, `m`, `r`, `sel`, `t`, `x` expanded divisions | — |
 
-Write rules: applying an incoming URL never writes the hash, so a pristine URL stays clean; continuous changes (range, selection) replace the history entry; only discrete switches a section's spec asks Back to step through push one — today the economic sectors measure and view.
+Write rules: loading a page never adds state to its URL, so a pristine URL stays clean. After that, every change replaces the current history entry, except the discrete switches a section's spec asks Back to step through, which push one — today only the economic sectors measure and view.
 
 Restore on load with validation (unknown values fall back to defaults; ranges clamp to loaded years; repeated selection IDs collapse to their first occurrence).
 
