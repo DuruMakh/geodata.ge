@@ -163,7 +163,7 @@ In `../../data/localization/en/labels.json`, delete the four lines of the `"defi
 
 Leave `deficit.spec.ts:44` and `tests/browser/bilingual-debt-deficit.spec.ts:41-42` and `:129` unchanged. They open links with the old id, which now exercises the alias.
 
-- [ ] **Step 7: Run the tests**
+- [x] **Step 7: Run the tests**
 
 Run: `npx vitest run tests/explorer/deficitExplorer.test.ts tests/explorer/deficitUrlState.test.ts tests/explorer/deficitRoute.test.tsx tests/explorer/deficitWorkbook.test.ts tests/factQuery/reference.test.ts`
 Expected: PASS, with the reference fixture unchanged.
@@ -1040,22 +1040,22 @@ git commit -m "docs(methodology): record registry source ids, the stock total co
 
 **Files:** none (verification only).
 
-- [ ] **Step 1: Full check**
+- [x] **Step 1: Full check**
 
 Run: `npm run check`
 Expected: exit 0, including `data:validate` and `data:check-government-debt`.
 
-- [ ] **Step 2: Reference fixture**
+- [x] **Step 2: Reference fixture**
 
 Run: `npx vitest run tests/factQuery/reference.test.ts`
 Expected: PASS with no expectation edits.
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `npm run build`
 Expected: exit 0.
 
-- [ ] **Step 4: Browser suite on the production build**
+- [x] **Step 4: Browser suite on the production build**
 
 Run, in two terminals:
 
@@ -1069,7 +1069,7 @@ CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge PLAYWRIGHT_BASE_URL=http://localhost
 
 Expected: all tests pass.
 
-- [ ] **Step 5: Rehearse the migrations and import on a disposable database**
+- [x] **Step 5: Rehearse the migrations and import on a disposable database**
 
 Use a throwaway PostgreSQL database, never production:
 
@@ -1085,7 +1085,7 @@ Expected: the import succeeds, and a deliberately broken copy of the CSV (one `s
 
 If no disposable database is available, report that the rehearsal was not run. Do not skip it silently.
 
-- [ ] **Step 6: Acceptance walk**
+- [x] **Step 6: Acceptance walk**
 
 1. `/explorer/deficit#sel=deficit.general_government_balance` selects the series, and after any change the URL carries `sel=deficit.general_government.balance`.
 2. `data/localization/en/labels.json` has one deficit entry.
@@ -1095,6 +1095,17 @@ If no disposable database is available, report that the rehearsal was not run. D
 6. `npm run data:prepare-government-debt` fails if a stock component is altered by more than 0.5 million GEL.
 7. Both older mirror tables have their public grants revoked.
 
-- [ ] **Step 7: Hand off**
+- [x] **Step 7: Hand off**
 
 Push `codex/identifiers-and-source-lineage` and open a draft PR. List the two migrations, the public CSV `source_id` change and the rehearsal result. Merge only after CI is green. Production applies the migrations through the pipeline in `docs/deployment.md` before the next import.
+
+## Verification result (2026-09-19)
+
+- Implementation and local acceptance complete. Delivery: [draft PR #122](https://github.com/DuruMakh/geodata.ge/pull/122); GitHub records subsequent CI and merge state.
+- Lint, typecheck, data validation and translation checks passed. All 2,184 unit tests passed across the full run and the unchanged seven-test 2004 PDF retry after a setup timeout.
+- All 540 browser cases passed across the full run (530 passed) and isolated unchanged retries (10 passed in 32.1 seconds). Initial failures were connection resets and timing limits. Desktop and 390px mobile screenshots were inspected; old deficit links restore and serialize the canonical ID after interaction.
+- A production build against disposable PostgreSQL 17.10 passed, including all 17 publication integrity checks. Main migrations and the old bare-ID CSV were loaded before applying both new migrations. The subsequent branch import reported exact CSV/database parity.
+- Six real-database integrity/privacy tests passed after demonstrating the relevant failures beforehand. The importer rejects a deliberately unknown source before connecting; the temporary CSV change was restored. The disposable database was stopped after verification.
+- All 126 canonical debt rows retain their other fields and order; exactly 118 non-empty source IDs gain the registry prefix. Four workbook-source snapshots and the query-reference fixture are unchanged. The report contains 13 published-total controls; it accepts the 0.5-million-GEL boundary and rejects altered totals/components.
+- Independent whole-branch review found no Critical, Important or Minor issues. Additional MCP citation membership remains excluded by the spec and needs separate scope.
+- Production was not changed by this implementation. The two migrations must run through the established release pipeline after an authorized merge.
