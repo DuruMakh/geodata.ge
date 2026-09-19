@@ -6,7 +6,7 @@ import { publicLabel } from "../../lib/i18n/labels";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import type { Locale } from "../../lib/i18n/types";
 import { useState, type ReactNode } from "react";
-import { getDefaultDebtSelection, type GovernmentDebtExplorerModel } from "../../lib/explorer/debtExplorer";
+import type { GovernmentDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
 import type { DebtFamily, DebtSeriesId, ServedGovernmentDebtFact } from "../../lib/servedRows";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
@@ -83,12 +83,10 @@ export function DebtSeriesPanel({
   }
 
   const hasSelection = selectedIds.length > 0;
-  // The bulk control clears, then restores the family's default total. Families
-  // are exclusive, so all nine rows can never be selected at once; restoring the
-  // default is the reversible state (the inflation categories rule, d7c2612ef).
-  const defaultSelection = getDefaultDebtSelection(family);
-  const isDefaultSelection =
-    selectedIds.length === defaultSelection.length && defaultSelection.every((id) => selectedIds.includes(id));
+  // Families never combine, so the bulk control's "all" (DESIGN.md §7.7) is the
+  // active family's three rows: empty selects them, anything else clears.
+  const familyIds = items.filter((item) => item.family === family).map((item) => item.id);
+  const allFamilySelected = familyIds.every((id) => selectedIds.includes(id));
   return (
     <aside
       aria-label={message(messages, "controls.series")}
@@ -101,8 +99,8 @@ export function DebtSeriesPanel({
         selectedCount={selectedIds.length}
         totalCount={items.length}
         hasSelection={hasSelection}
-        allSelected={isDefaultSelection}
-        onToggleAll={() => onSelectionChange(hasSelection ? [] : getDefaultDebtSelection(family))}
+        allSelected={allFamilySelected}
+        onToggleAll={() => onSelectionChange(hasSelection ? [] : familyIds)}
         hasVisibleMatches={normalizedQuery === "" || visibleRows.length > 0}
       >
         {visibleRows.map(({ item, isChild, hasChildren, expanded, expansionLocked }) => (

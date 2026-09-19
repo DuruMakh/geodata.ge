@@ -225,20 +225,24 @@ test.describe("Government Debt explorer", () => {
     ]);
   });
 
-  test("clearing the debt selection can be undone from the same control", async ({ page }) => {
+  test("the bulk control clears, then selects every row of the active family", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/debt`);
     await expectAppReady(page);
     const bulk = page.getByTestId("series-toggle-all");
-    const total = seriesRow(page, "debt.stock.total").getByTestId("series-row-toggle");
-    await expect(bulk).toHaveAttribute("aria-checked", "true");
+    const toggle = (id: string) => seriesRow(page, id).getByTestId("series-row-toggle");
+    // The default total alone is a partial selection.
+    await expect(bulk).toHaveAttribute("aria-checked", "mixed");
 
     await bulk.click();
-    await expect(total).toHaveAttribute("aria-pressed", "false");
+    await expect(toggle("debt.stock.total")).toHaveAttribute("aria-pressed", "false");
     await expect(bulk).toBeVisible();
     await expect(bulk).toHaveAttribute("aria-checked", "false");
 
     await bulk.click();
-    await expect(total).toHaveAttribute("aria-pressed", "true");
+    for (const id of ["debt.stock.total", "debt.stock.domestic", "debt.stock.external"]) {
+      await expect(toggle(id)).toHaveAttribute("aria-pressed", "true");
+    }
     await expect(bulk).toHaveAttribute("aria-checked", "true");
+    await expect(page.getByTestId("series-status")).toContainText("3 / 9");
   });
 });

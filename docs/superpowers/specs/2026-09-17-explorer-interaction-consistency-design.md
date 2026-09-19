@@ -23,7 +23,7 @@ The newer explorers behave like the established ones when a reader changes state
 
 - **Keys keep their names.** GDP and sectors keep their hash keys (`indicator`, `view`, `currency`, `measure`, `range`/`start`/`end`), and DESIGN.md documents them. Migrating them to `m`/`r` would break shared links and change pinned tests (`tests/browser/gdp-overview.spec.ts:61`, `:64`), for no reader benefit.
 - **Write rule.** `replaceState` for every change, except discrete top-level switches that a spec asks Back/Forward to step through: the sectors measure and view, as today (`tests/browser/economic-sectors.spec.ts:164-182`).
-- **"Select all" restores the default on debt.** On the debt panel it restores the active family's default selection, following the inflation categories precedent (commit `d7c2612ef`).
+- **"Select all" selects the active family on debt.** Amended 2026-09-19 after code review, by user decision. The debt panel follows DESIGN.md §7.7 ("Empty selects all"), with "all" meaning the active family's three rows because families never combine. The draft restored the family default instead, citing the inflation categories precedent (commit `d7c2612ef`). That put a full checkmark on every page load next to `1 / 9`, and the precedent does not transfer: there the default is all 12 divisions.
 - **Deficit `sh` default stays documented.** Deficit keeps treating a missing `sh` as percent, because its default measure is % of GDP. DESIGN.md records this rather than changing link behaviour.
 
 ## 2. URL hash writes
@@ -73,14 +73,14 @@ Evidence:
 Change:
 
 - Remove `allowSelectAll={false}`.
-- `onToggleAll` clears when anything is selected, and otherwise restores `getDefaultDebtSelection(activeFamily)` (`lib/explorer/debtExplorer.ts:83`).
-- `allSelected` is true when the selection equals that default.
+- `onToggleAll` clears when anything is selected, and otherwise selects all three rows of the active family.
+- `allSelected` is true when every row of the active family is selected. The default total alone stays a partial (dash) selection, as in every other explorer.
 - The count text is unchanged (`სერიები {selected} / 9`).
 
 Tests:
 
-- Rewrite `debtRoute.test.tsx:368` as "offers the bulk control on an empty selection and restores the family default".
-- Add a browser test in `tests/browser/debt.spec.ts`: click `series-toggle-all` down to an empty selection, then back up to the stock total.
+- Rewrite `debtRoute.test.tsx:368` as "offers the bulk control on an empty selection so clearing can be undone", and add a static-markup case for the partial and full states in two families.
+- Add a browser test in `tests/browser/debt.spec.ts`: click `series-toggle-all` down to an empty selection, then back up to all three stock rows.
 
 ## 4. Sector search and announcements
 
