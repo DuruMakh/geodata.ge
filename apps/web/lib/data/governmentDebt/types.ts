@@ -249,6 +249,21 @@ export type GovernmentDebtActualServiceOverlapComparison = {
     | "unexplained_difference";
 };
 
+export type GovernmentDebtStockTotalControl = {
+  year: number;
+  source_id: "mof_public_debt_bulletin_n13" | "mof_public_debt_bulletin_n25";
+  published_total_million_gel: number;
+};
+
+export type GovernmentDebtStockTotalComparison = {
+  year: number;
+  source_id: GovernmentDebtStockTotalControl["source_id"];
+  canonical_total_million_gel: number;
+  published_total_million_gel: number;
+  difference_million_gel: number;
+  tolerance_million_gel: 0.5;
+};
+
 export type GovernmentDebtValidationReport = {
   status: "complete_with_documented_rate_gaps" | "failed";
   review_date: "2026-09-01";
@@ -260,11 +275,13 @@ export type GovernmentDebtValidationReport = {
     rowCount: number;
     observedYears: number[];
     overlapComparisons: GovernmentDebtStockOverlapComparison[];
+    totalControls: GovernmentDebtStockTotalComparison[];
   };
   actualService: {
     rowCount: number;
     observedYears: number[];
     overlapComparisons: GovernmentDebtActualServiceOverlapComparison[];
+    externalTotalControl: "not_published";
   };
   interestRates: {
     rowCount: number;

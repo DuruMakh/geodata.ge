@@ -474,3 +474,22 @@ describe("government debt source parsers", () => {
     ]);
   });
 });
+
+  it("reads the published Total Government Debt row as the stock total control", async () => {
+    const { readPdfPages } = await import(pathToFileURL(pdfTextModulePath).href);
+    const parserModule = await import(pathToFileURL(parserModulePath).href);
+    expect(parserModule.parseGovernmentDebtStockTotalControls).toBeTypeOf("function");
+
+    const n13Pages = await readPdfPages(path.join(sourceDir, "public-debt-bulletin-n13.pdf"), [31]);
+    const n25Pages = await readPdfPages(path.join(sourceDir, "public-debt-bulletin-n25.pdf"), [26]);
+    const controls = parserModule.parseGovernmentDebtStockTotalControls({
+      n13Page31: n13Pages.get(31)!,
+      n25Page26: n25Pages.get(26)!,
+    });
+    const control = (year: number) => controls.find((row: { year: number }) => row.year === year);
+
+    expect(controls).toHaveLength(13);
+    expect(control(2013)).toEqual({ year: 2013, source_id: "mof_public_debt_bulletin_n13", published_total_million_gel: 8433 });
+    expect(control(2015)).toEqual({ year: 2015, source_id: "mof_public_debt_bulletin_n25", published_total_million_gel: 12443 });
+    expect(control(2019)?.published_total_million_gel).toBe(19916);
+  });
