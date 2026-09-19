@@ -29,7 +29,7 @@ Hash keys are not renamed. Code unification is spec 8.
   - Only the sectors measure and view switches use `history.pushState`.
   - Every history call sits in `try { … } catch { /* History can be unavailable in some embedded contexts; the UI still works. */ }`, as in `components/main-explorer/use-explorer-state.ts:188-192`.
 - **Reference implementation:** the budget explorer (`use-explorer-state.ts:181-193`). Effects depend on the serialized hash string, not the state object, so React StrictMode's double effects in `next dev` cannot stamp a URL.
-- **Test loop:** targeted tests while editing; the full gates run once, in Task 8. Browser specs need `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`.
+- **Test loop:** targeted tests while editing; the full gates run once, in Task 8. Browser specs need `NEXT_PUBLIC_SITE_URL=https://fiscal.ge` and `CI=1`: with `CI=1`, `playwright.config.ts` builds and serves production on port 3100 (which must be free); without it the config starts `next dev`, where hydration-dependent interactions are unreliable. Each `CI=1` run pays a build, so red and green runs of neighbouring tasks can share one.
 
 ---
 
@@ -72,7 +72,7 @@ for (const path of [
 
 - [ ] **Step 2: Run it to verify it fails**
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/pristine-urls.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/pristine-urls.spec.ts --reporter=list`
 Expected: the GDP and both inflation tests FAIL, with a hash such as `#indicator=real&view=line&currency=gel&range=all`. The sectors test passes: its hook never writes on mount.
 
 - [ ] **Step 3: Implement for GDP**
@@ -170,7 +170,7 @@ with:
 
 - [ ] **Step 6: Run the pristine test and the pages' own specs**
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/pristine-urls.spec.ts tests/browser/gdp-overview.spec.ts tests/browser/inflation-overview.spec.ts tests/browser/inflation-categories.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/pristine-urls.spec.ts tests/browser/gdp-overview.spec.ts tests/browser/inflation-overview.spec.ts tests/browser/inflation-categories.spec.ts --reporter=list`
 Expected: PASS. The existing hash assertions still pass because they follow an interaction:
 - `gdp-overview.spec.ts:61` expects `start=1996&end=2000` after a tab click.
 - `gdp-overview.spec.ts:64` expects `range=all` after a tab click.
@@ -228,7 +228,7 @@ test("range drags and arrow keys replace history; only measure and view add entr
 
 - [ ] **Step 2: Run it to verify it fails**
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/economic-sectors.spec.ts -g "range drags"`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/economic-sectors.spec.ts -g "range drags" --reporter=list`
 Expected: FAIL; `history.length` grows past `initial + 1` after the arrow presses.
 
 - [ ] **Step 3: Implement the history mode in the hook**
@@ -291,7 +291,7 @@ The range (lines 211–223) and selection (lines 244–246) calls keep the defau
 
 - [ ] **Step 5: Run the sectors spec**
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/economic-sectors.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/economic-sectors.spec.ts --reporter=list`
 Expected: PASS, including the new test and the existing test `"sector selections, measures and manual period survive history and language changes"` (lines 164–183), which goes back across two measure clicks.
 
 - [ ] **Step 6: Commit**
@@ -442,7 +442,7 @@ Expected: PASS.
 Run: `npm run typecheck`
 Expected: exit 0.
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/debt.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/debt.spec.ts --reporter=list`
 Expected: PASS.
 
 - [ ] **Step 6: Commit**
@@ -546,7 +546,7 @@ Expected: PASS.
 Run: `npm run lint && npm run typecheck`
 Expected: exit 0. If `SectorDefinition` is now an unused import in the panel, remove it.
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/economic-sectors.spec.ts -g "search never restricts"`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/economic-sectors.spec.ts -g "search never restricts" --reporter=list`
 Expected: PASS. With a non-matching query, one row (Total GDP) stays visible.
 
 - [ ] **Step 6: Commit**
@@ -586,7 +586,8 @@ Append to `apps/web/tests/browser/economic-sectors.spec.ts`:
 test("announces the period when the measure changes, not on every range change", async ({ page }) => {
   await page.goto("/en/explorer/economy/sectors");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  const status = page.getByTestId("economic-sectors-explorer").getByRole("status");
+  // The explorer's own announcer; the Excel button keeps a separate status line.
+  const status = page.getByTestId("economic-sectors-explorer").locator('p.sr-only[role="status"]');
   await expect(status).toHaveText("");
 
   const startHandle = page.getByRole("slider", { name: "Start year" });
@@ -667,7 +668,7 @@ with:
 Run: `npx vitest run tests/explorer/economicSectorsPage.test.tsx`
 Expected: PASS.
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/economic-sectors.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/economic-sectors.spec.ts --reporter=list`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -782,7 +783,7 @@ with:
 Run: `npx vitest run tests/explorer/explorerCoverage.test.tsx tests/explorer/economicSectorsPage.test.tsx tests/explorer/gdpRoute.test.tsx`
 Expected: PASS.
 
-Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/gdp-overview.spec.ts`
+Run: `CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/gdp-overview.spec.ts --reporter=list`
 Expected: PASS.
 
 - [ ] **Step 6: Commit**
@@ -817,7 +818,7 @@ Keys by section. The hash never carries `nav`, and no key is renamed once shippe
 | Section | Keys | Notes |
 |---|---|---|
 | Expenditure, revenue, analysis | `g` grouping (expenditure only), `m` mode, `sh` share measure, `r` range, `sel` selection; `as` analysis side, `ag` analysis grouping, `ay` analysis year | — |
-| Municipalities | `m`, `sh`, `r`, `sel` | — |
+| Municipalities | `m`, `sh`, `r`, `sel` on the country, region and municipality pages; `lvl=region` on the index | `lvl` switches the index list to regions. |
 | Government debt | `f` family, `m`, `sh`, `r`, `sel` | An empty `sel=` is a deliberate clear and survives a reload. |
 | General-government deficit | `m`, `sh`, `r`, `sel` | A missing `sh` means percent of GDP, the section's default measure. |
 | GDP overview | `indicator`, `view`, `currency`, `range=all` or `start`/`end` | — |
@@ -832,6 +833,8 @@ Write rules: applying an incoming URL never writes the hash, so a pristine URL s
 
 Run: `grep -n "params.get(\"\|params.set(\"" components/municipalities/*.ts* lib/explorer/*unicipal*.ts`
 Expected: the municipal parser reads `m`, `sh`, `r` and `sel`. If it reads a different set, correct the "Municipalities" row to the keys the code actually uses before committing.
+
+Result when executed (2026-09-18): that grep finds nothing, because the municipal codec lives in `lib/explorer/urlState.ts`. `parseMunicipalHash` and `serializeMunicipalHash` use the shared `m`, `sh`, `r`, `sel` keys (the explorer on the country, region and municipality pages), and `parseMunicipalLevel` reads `lvl=region`, which the index writes. The row in Step 1 already names both.
 
 - [ ] **Step 3: Commit**
 
@@ -853,8 +856,8 @@ Expected: exit 0.
 
 - [ ] **Step 2: Build**
 
-Run: `npm run build`
-Expected: exit 0.
+Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build`
+Expected: exit 0. The build bakes the site origin into static pages, the sitemap and workbook links; built without it, the Step 3 suite fails about 139 URL assertions (`http://localhost:3000` instead of `https://fiscal.ge`).
 
 - [ ] **Step 3: Browser suite on the production build**
 
