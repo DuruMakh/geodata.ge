@@ -1,7 +1,7 @@
 # Identifiers and source lineage for debt and deficit: specification
 
 Date: 2026-09-17
-Status: Draft for user review. Scope and packaging were approved in conversation on 2026-09-17, after a reviewed audit of the work merged 2026-09-02..09-14.
+Status: Implementation authorized for inline execution on 2026-09-19. Scope and packaging were approved in conversation on 2026-09-17, after a reviewed audit of the work merged 2026-09-02..09-14.
 Baseline: `main` at `c7451ceaf`. Line numbers refer to that commit. Paths are under `apps/web/` unless they start with `data/`, `docs/` or name a root document.
 Series: audit remediation, spec 4 of 8. No dependency on the other specs. This is a data change, so the methodology documents change with it (CLAUDE.md definition of done, item 3).
 
@@ -73,7 +73,7 @@ The reference fixture must pass unchanged.
    The bulletin year ranges stay exactly as they are today.
 3. **Workbook matching.** `debtWorkbook.ts` uses `sourcesForDebtFact` and matches archive rows by registry `sourceId`, not filename substrings. If the workbook source rows passed by `lib/pages/debt.tsx` do not carry `sourceId`, add it in that projection from the reviewed manifest.
 4. **Query service.** Delete `registrySourceId` and the inline translation in `getSources.ts:192`; both read the fact's `sourceId` directly.
-5. **Mirror.** Add nullable `sourceDocumentId` plus a relation to `GovernmentDebtFact`, following `GeneralGovernmentBalanceFact`. The migration is `prisma/migrations/20260917000000_government_debt_source_document/migration.sql`: column, foreign key and index. The debt mirror reader and parity key keep comparing the full served row.
+5. **Mirror.** Add a source-document relation on the existing nullable `GovernmentDebtFact.sourceId`, following the source-registry relationship used by `GeneralGovernmentBalanceFact`. The migration is `prisma/migrations/20260917000000_government_debt_source_document/migration.sql`: existing-ID normalization, foreign key and index. The debt mirror reader and parity key keep comparing the full served row.
 6. **Import check.** `scripts/import-budget-facts.ts` adds `assertSubset("Government Debt fact source IDs", nonEmptyDebtSourceIds, sourceIds)`.
 
 ### 3.3 Acceptance

@@ -23,6 +23,14 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-17-identifiers-and-source-lineage-design.md`
 
+## Execution amendments (2026-09-19)
+
+- Task 1 follows the spec's removal of the fallback English label: the model requires the presentation already passed by every production caller. Its test checks the rendered model label against the reviewed catalogue. Old links are retained as parser-only aliases.
+- Task 1's browser acceptance is grouped with Task 8 on the final production build. Its unit, reference, translation and type checks passed before the implementation commit.
+- Task 4 attaches the foreign key to the existing nullable `sourceId`, avoiding a duplicate source column. The migration normalizes existing rows first. Opt-in tests in `tests/data/governmentDebt/mirrorIntegration.test.ts` exercise a disposable local PostgreSQL database through `GEODATA_TEST_DATABASE_URL`.
+- Task 5 adds real rejection tests: raised and lowered published totals, and an altered external component, must stop preparation with the affected year in the error. A passing unmodified package alone does not verify this failure path.
+- The two migrations have been applied to a populated disposable PostgreSQL 17.10 database. Source constraints and both API-role revocations passed their failure-then-success checks. Production has not been modified.
+
 ## Global Constraints
 
 - **Branch and paths:** work on `codex/identifiers-and-source-lineage`, created from `main`. Never commit to `main`. Commands run from `apps/web`; repository-root paths are written `../../…`.
@@ -53,7 +61,7 @@
 - Consumes: `DEFICIT_SERIES_ID = "deficit.general_government.balance"` from `lib/factQuery/types.ts:293` (that module has type-only imports, so it is safe for client bundles).
 - Produces: `lib/explorer/deficitExplorer.ts` re-exports that constant and defines none of its own. `DEFICIT_ITEM.id === DEFICIT_SERIES_ID`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 In `apps/web/tests/explorer/deficitExplorer.test.ts`, line 24 becomes:
 
@@ -88,12 +96,12 @@ Append inside the `describe` block:
   });
 ```
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npx vitest run tests/explorer/deficitExplorer.test.ts tests/explorer/deficitUrlState.test.ts`
 Expected: FAIL. The constant is still `deficit.general_government_balance`, the serialized hash uses it, and `labels.json` still has the old key.
 
-- [ ] **Step 3: Adopt the query-service constant**
+- [x] **Step 3: Adopt the query-service constant**
 
 In `apps/web/lib/explorer/deficitExplorer.ts`, replace lines 1–14 with:
 
@@ -117,7 +125,7 @@ export const DEFICIT_ITEM = {
 } as const;
 ```
 
-- [ ] **Step 4: Accept the old id in links**
+- [x] **Step 4: Accept the old id in links**
 
 In `apps/web/lib/explorer/deficitUrlState.ts`, replace line 1 with:
 
@@ -138,7 +146,7 @@ Replace lines 26–30 with:
     }
 ```
 
-- [ ] **Step 5: Use the constant on the page and in the inventory; delete the duplicate label**
+- [x] **Step 5: Use the constant on the page and in the inventory; delete the duplicate label**
 
 In `apps/web/lib/pages/deficit.tsx`, add `import { DEFICIT_SERIES_ID } from "../factQuery/types";` beside the other imports. In line 36, replace `["deficit.general_government_balance"]` with `[DEFICIT_SERIES_ID]`.
 
@@ -146,7 +154,7 @@ In `apps/web/lib/i18n/inventory.server.ts`, delete line 5 (`import { DEFICIT_ITE
 
 In `../../data/localization/en/labels.json`, delete the four lines of the `"deficit.general_government_balance"` entry (lines 826–829).
 
-- [ ] **Step 6: Update the remaining tests to the surviving id**
+- [x] **Step 6: Update the remaining tests to the surviving id**
 
 - `apps/web/tests/explorer/deficitRoute.test.tsx:11`: `["deficit.general_government_balance"]` becomes `["deficit.general_government.balance"]`.
 - `apps/web/tests/explorer/deficitRoute.test.tsx:47`: `'data-series-id="deficit.general_government_balance"'` becomes `'data-series-id="deficit.general_government.balance"'`.
@@ -166,7 +174,7 @@ Expected: exit 0.
 Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/deficit.spec.ts tests/browser/bilingual-debt-deficit.spec.ts`
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add lib/explorer/deficitExplorer.ts lib/explorer/deficitUrlState.ts lib/pages/deficit.tsx lib/i18n/inventory.server.ts ../../data/localization/en/labels.json tests/explorer/deficitExplorer.test.ts tests/explorer/deficitUrlState.test.ts tests/explorer/deficitRoute.test.tsx tests/explorer/deficitWorkbook.test.ts tests/browser/deficit.spec.ts
@@ -195,7 +203,7 @@ git commit -m "fix(deficit): use the published series id in the explorer and acc
   - `loadDebtWorkbookSources(locale?: Locale): Promise<SourcedWorkbookPublicSource[]>`.
   - `DebtWorkbookInput.sources: readonly SourcedWorkbookPublicSource[]`.
 
-- [ ] **Step 1: Record today's source sheet as a golden snapshot**
+- [x] **Step 1: Record today's source sheet as a golden snapshot**
 
 Create `apps/web/tests/explorer/debtWorkbookSources.test.ts`:
 
@@ -246,7 +254,7 @@ git add tests/explorer/debtWorkbookSources.test.ts tests/explorer/__snapshots__/
 git commit -m "test(debt): pin the workbook source sheet before moving lineage"
 ```
 
-- [ ] **Step 2: Write the failing lineage test**
+- [x] **Step 2: Write the failing lineage test**
 
 Create `apps/web/tests/data/governmentDebt/sourceLineage.test.ts`:
 
@@ -296,7 +304,7 @@ describe("debt source lineage", () => {
 Run: `npx vitest run tests/data/governmentDebt/sourceLineage.test.ts`
 Expected: FAIL, because the module cannot be resolved.
 
-- [ ] **Step 3: Create the lineage module**
+- [x] **Step 3: Create the lineage module**
 
 Create `apps/web/lib/data/governmentDebt/sourceLineage.ts`:
 
@@ -341,7 +349,7 @@ export function sourcesForDebtFact(fact: ServedGovernmentDebtFact): string[] {
 Run: `npx vitest run tests/data/governmentDebt/sourceLineage.test.ts`
 Expected: PASS.
 
-- [ ] **Step 4: Load debt workbook sources with their registry ids**
+- [x] **Step 4: Load debt workbook sources with their registry ids**
 
 In `apps/web/lib/methodology/workbookSources.ts`, add after `loadWorkbookSources` (after line 220):
 
@@ -372,7 +380,7 @@ Add the import at the top of the file:
 import { registryDebtSourceId } from "../data/governmentDebt/sourceLineage";
 ```
 
-- [ ] **Step 5: Match workbook sources by registry id**
+- [x] **Step 5: Match workbook sources by registry id**
 
 In `apps/web/lib/explorer/debtWorkbook.ts`:
 
@@ -420,7 +428,7 @@ In `apps/web/lib/explorer/debtWorkbook.ts`:
 
 Keep the `WorkbookPublicSource` type import from `./workbookModel` for the return type and `gdpSources`.
 
-- [ ] **Step 6: Pass sourced rows from the page and type the explorer prop**
+- [x] **Step 6: Pass sourced rows from the page and type the explorer prop**
 
 In `apps/web/lib/pages/debt.tsx`, change line 16 to:
 
@@ -438,7 +446,7 @@ import type { SourcedWorkbookPublicSource } from "../../lib/methodology/workbook
 
 and in `DebtExplorerProps` (line 36) change `workbookSources: WorkbookPublicSource[];` to `workbookSources: SourcedWorkbookPublicSource[];`. Leave the `WorkbookPublicSource` import, which `gdpWorkbookSources` still uses.
 
-- [ ] **Step 7: Update the existing debt workbook test fixtures**
+- [x] **Step 7: Update the existing debt workbook test fixtures**
 
 In `apps/web/tests/explorer/debtWorkbook.test.ts`:
 1. Add `import type { SourcedWorkbookPublicSource } from "../../lib/methodology/workbookSources";`.
@@ -470,7 +478,7 @@ Append this test to the same `describe`:
   });
 ```
 
-- [ ] **Step 8: Run the tests; the golden snapshot must not change**
+- [x] **Step 8: Run the tests; the golden snapshot must not change**
 
 Run: `npx vitest run tests/explorer/debtWorkbookSources.test.ts tests/explorer/debtWorkbook.test.ts tests/data/governmentDebt/sourceLineage.test.ts tests/explorer/debtRoute.test.tsx`
 Expected: PASS, with the snapshot unchanged. Never pass `-u`. A snapshot failure means lineage changed; fix the code, not the snapshot.
@@ -478,7 +486,7 @@ Expected: PASS, with the snapshot unchanged. Never pass `-u`. A snapshot failure
 Run: `npm run typecheck && npm run lint`
 Expected: exit 0.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add lib/data/governmentDebt/sourceLineage.ts lib/methodology/workbookSources.ts lib/explorer/debtWorkbook.ts lib/pages/debt.tsx components/debt/debt-explorer.tsx tests/data/governmentDebt/sourceLineage.test.ts tests/explorer/debtWorkbook.test.ts tests/explorer/debtWorkbookSources.test.ts
@@ -500,7 +508,7 @@ git commit -m "refactor(debt): own source lineage in the data layer and match wo
 - Consumes: `registryDebtSourceId` (Task 2).
 - Produces: `ServedGovernmentDebtFact.sourceId` is `"source.mof_…"` or `null`. `registrySourceId` is removed from `lib/factQuery/queryDebt.ts`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `apps/web/tests/data/governmentDebt/servedGovernmentDebt.test.ts`, inside its top-level `describe` or at the end of the file with the file's existing `vitest` imports:
 
@@ -517,7 +525,7 @@ it("cites source-registry ids on every sourced debt fact", async () => {
 Run: `npx vitest run tests/data/governmentDebt/servedGovernmentDebt.test.ts`
 Expected: FAIL; the CSV holds bare `mof_…` ids.
 
-- [ ] **Step 2: Emit registry ids when building facts from the package**
+- [x] **Step 2: Emit registry ids when building facts from the package**
 
 In `apps/web/lib/data/governmentDebt/importGovernmentDebtFacts.ts`, add the import
 
@@ -538,7 +546,7 @@ to
     sourceId: row.source_id ? registryDebtSourceId(row.source_id) : null,
 ```
 
-- [ ] **Step 3: Regenerate the canonical CSV and prove only `source_id` changed**
+- [x] **Step 3: Regenerate the canonical CSV and prove only `source_id` changed**
 
 Run: `npm run data:prepare-government-debt`
 Expected: `Prepared the government debt research package.`, then `Serving facts: 126`.
@@ -551,7 +559,7 @@ node -e 'const {execSync}=require("child_process");const fs=require("fs");const 
 
 Expected: `only source_id changed`.
 
-- [ ] **Step 4: Remove the query-service translations**
+- [x] **Step 4: Remove the query-service translations**
 
 In `apps/web/lib/factQuery/queryDebt.ts`, delete the comment and the `registrySourceId` function (lines 81–90). Line 201 changes from
 
@@ -577,7 +585,7 @@ to
       ? snapshot.debt.facts.flatMap((f) => (f.sourceId ? [f.sourceId] : []))
 ```
 
-- [ ] **Step 5: Run the tests, including the reference fixture unchanged**
+- [x] **Step 5: Run the tests, including the reference fixture unchanged**
 
 Run: `npx vitest run tests/data/governmentDebt tests/factQuery/queryDebt.test.ts tests/factQuery/getSources.test.ts tests/factQuery/reference.test.ts tests/explorer/debtWorkbookSources.test.ts tests/explorer/debtWorkbook.test.ts`
 Expected: PASS. The golden snapshot and the reference fixture pass with no edits.
@@ -585,7 +593,7 @@ Expected: PASS. The golden snapshot and the reference fixture pass with no edits
 Run: `npm run data:check-government-debt && npm run typecheck`
 Expected: exit 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add lib/data/governmentDebt/importGovernmentDebtFacts.ts ../../data/imports/government-debt-facts-2013-2030.csv lib/factQuery/queryDebt.ts lib/factQuery/getSources.ts tests/data/governmentDebt/servedGovernmentDebt.test.ts
@@ -605,7 +613,7 @@ git commit -m "fix(debt): cite source-registry ids in debt facts and drop the qu
 - Consumes: registry ids in debt facts (Task 3); the `sourceIds` set built at `scripts/import-budget-facts.ts:239`.
 - Produces: the relation `GovernmentDebtFact.sourceId → SourceDocument.id` (nullable, `onDelete: Restrict`).
 
-- [ ] **Step 1: Declare the relation in the schema**
+- [x] **Step 1: Declare the relation in the schema**
 
 In `apps/web/prisma/schema.prisma`, add this line to `model SourceDocument` after `generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]` (line 80):
 
@@ -625,7 +633,7 @@ and add `  @@index([sourceId])` after `  @@index([family, year])` (line 211).
 Run: `npx prisma validate && npx prisma generate`
 Expected: `The schema at prisma/schema.prisma is valid`, then a generated client.
 
-- [ ] **Step 2: Write the migration**
+- [x] **Step 2: Write the migration**
 
 Create `apps/web/prisma/migrations/20260917000000_government_debt_source_document/migration.sql`:
 
@@ -643,7 +651,7 @@ CREATE INDEX "GovernmentDebtFact_sourceId_idx" ON "GovernmentDebtFact"("sourceId
 ALTER TABLE "GovernmentDebtFact" ADD CONSTRAINT "GovernmentDebtFact_sourceId_fkey" FOREIGN KEY ("sourceId") REFERENCES "SourceDocument"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ```
 
-- [ ] **Step 3: Check debt source ids at import**
+- [x] **Step 3: Check debt source ids at import**
 
 In `apps/web/scripts/import-budget-facts.ts`, add directly after line 290 (`assertUnique("Government Debt fact natural key", …);`):
 
@@ -655,7 +663,7 @@ In `apps/web/scripts/import-budget-facts.ts`, add directly after line 290 (`asse
   );
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `npm run typecheck && npm run lint`
 Expected: exit 0.
@@ -665,7 +673,7 @@ Expected: PASS.
 
 The migration and the import are exercised against a disposable database in Task 8.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add prisma/schema.prisma prisma/migrations/20260917000000_government_debt_source_document/migration.sql scripts/import-budget-facts.ts
@@ -694,7 +702,7 @@ git commit -m "fix(db): enforce debt fact sources with a foreign key and an impo
 
 The bulletin tables publish "Total Government Debt" in whole million GEL beside components with one decimal. For example, N25 page 26 shows 2015 as 12,443, while the component sum is 12,442.6. The allowed difference is therefore half a published unit, 0.5 million GEL. The external-service tables publish only combined public-debt totals (they include NBG and on-lending), so external service has no matching control. The report records that explicitly.
 
-- [ ] **Step 1: Write the failing parser test**
+- [x] **Step 1: Write the failing parser test**
 
 Append inside `describe("government debt source parsers", …)` in `apps/web/tests/data/governmentDebt/parseDebtSources.test.ts`:
 
@@ -722,7 +730,7 @@ Append inside `describe("government debt source parsers", …)` in `apps/web/tes
 Run: `npx vitest run tests/data/governmentDebt/parseDebtSources.test.ts`
 Expected: FAIL; `parseGovernmentDebtStockTotalControls` is not a function.
 
-- [ ] **Step 2: Add the types**
+- [x] **Step 2: Add the types**
 
 In `apps/web/lib/data/governmentDebt/types.ts`, add before `export type GovernmentDebtValidationReport`:
 
@@ -766,7 +774,7 @@ and the `actualService` member to:
   };
 ```
 
-- [ ] **Step 3: Implement the parser**
+- [x] **Step 3: Implement the parser**
 
 In `apps/web/lib/data/governmentDebt/parseDebtSources.ts`, add `GovernmentDebtStockTotalControl` to the existing type import from `./types`. Insert after `parseGovernmentDebtStock` (after line 179):
 
@@ -802,7 +810,7 @@ export function parseGovernmentDebtStockTotalControls(sources: {
 Run: `npx vitest run tests/data/governmentDebt/parseDebtSources.test.ts`
 Expected: PASS.
 
-- [ ] **Step 4: Write the failing package test**
+- [x] **Step 4: Write the failing package test**
 
 In `apps/web/tests/data/governmentDebt/governmentDebtPackage.test.ts`, inside `it("builds the complete normalized package with only documented rate gaps", …)`, add after the `overlapComparisons` assertions (after line 272):
 
@@ -821,7 +829,7 @@ In `apps/web/tests/data/governmentDebt/governmentDebtPackage.test.ts`, inside `i
 Run: `npx vitest run tests/data/governmentDebt/governmentDebtPackage.test.ts`
 Expected: FAIL, because `totalControls` is undefined.
 
-- [ ] **Step 5: Compare and fail loudly in prepare**
+- [x] **Step 5: Compare and fail loudly in prepare**
 
 In `apps/web/lib/data/governmentDebt/prepareGovernmentDebtPackage.ts`:
 
@@ -887,7 +895,7 @@ In `apps/web/lib/data/governmentDebt/prepareGovernmentDebtPackage.ts`:
        },
    ```
 
-- [ ] **Step 6: Add a synthetic parser test**
+- [x] **Step 6: Add a synthetic parser test**
 
 Append inside the same `describe` in `governmentDebtPackage.test.ts`:
 
@@ -906,9 +914,9 @@ Append inside the same `describe` in `governmentDebtPackage.test.ts`:
   });
 ```
 
-This checks the parser against synthetic text. The throw path is exercised end to end in Step 7, where the real package passes; any real mismatch above 0.5 aborts `buildGovernmentDebtPackage` with the message from Step 5.
+This checks the parser against synthetic text. The execution also tests raised and lowered published totals and an altered component by changing the extracted PDF text in memory. Each must abort `buildGovernmentDebtPackage` with the affected year in the error; the unmodified real package must still pass.
 
-- [ ] **Step 7: Regenerate the package report and run the debt tests**
+- [x] **Step 7: Regenerate the package report and run the debt tests**
 
 Run: `npm run data:prepare-government-debt`
 Expected: `Prepared the government debt research package.`, with no `Stock total control failed` error.
@@ -922,7 +930,7 @@ Expected: exit 0.
 Run: `git diff --stat -- "../../docs/Raw Data/Debt/government-debt-annual"`
 Expected: only `validation-report.json` changed. If the review workbook test reports a mismatch, regenerate it with the same command and include it; do not edit it by hand.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add lib/data/governmentDebt/types.ts lib/data/governmentDebt/parseDebtSources.ts lib/data/governmentDebt/prepareGovernmentDebtPackage.ts tests/data/governmentDebt/parseDebtSources.test.ts tests/data/governmentDebt/governmentDebtPackage.test.ts "../../docs/Raw Data/Debt/government-debt-annual/validation-report.json"
@@ -939,7 +947,7 @@ git commit -m "fix(debt): check stock totals against the published total"
 
 **Interfaces:** none.
 
-- [ ] **Step 1: Write the migration**
+- [x] **Step 1: Write the migration**
 
 Create `apps/web/prisma/migrations/20260917000100_revoke_debt_deficit_mirror_access/migration.sql`:
 
@@ -950,7 +958,7 @@ REVOKE ALL ON TABLE "GovernmentDebtFact" FROM anon, authenticated;
 REVOKE ALL ON TABLE "GeneralGovernmentBalanceFact" FROM anon, authenticated;
 ```
 
-- [ ] **Step 2: Make the runbook state the rule**
+- [x] **Step 2: Make the runbook state the rule**
 
 In `../../docs/data-methodology/database-import.md`, replace lines 244–247:
 
@@ -974,7 +982,7 @@ unique timestamp: `20260912000000_economic_sectors` and
 applied migration breaks `_prisma_migrations`.
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add prisma/migrations/20260917000100_revoke_debt_deficit_mirror_access/migration.sql ../../docs/data-methodology/database-import.md
@@ -991,7 +999,7 @@ git commit -m "fix(db): revoke public grants on the debt and deficit mirror tabl
 
 **Interfaces:** none. Documentation only.
 
-- [ ] **Step 1: Debt methodology**
+- [x] **Step 1: Debt methodology**
 
 Append at the end of `## Preserved official sources`:
 
@@ -1011,7 +1019,7 @@ Append at the end of `## Validation and outputs`:
 External government service has no published total of its own — the bulletins' TOTAL rows combine public-debt service including NBG and on-lending — so `actualService.externalTotalControl` records `not_published` rather than implying a check.
 ```
 
-- [ ] **Step 2: Deficit methodology**
+- [x] **Step 2: Deficit methodology**
 
 Append at the end of `## Public meaning`:
 
@@ -1019,7 +1027,7 @@ Append at the end of `## Public meaning`:
 The series id is `deficit.general_government.balance` everywhere: the explorer, `/mcp`, the JSON publications and the English label catalogue. Explorer links created before 2026-09-17 with `deficit.general_government_balance` still select the series.
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add ../../docs/data-methodology/government-debt-annual.md ../../docs/data-methodology/general-government-balance.md
