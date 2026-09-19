@@ -12,7 +12,7 @@ const facts: ServedGeneralGovernmentBalanceFact[] = [
 
 describe("general-government deficit workbook", () => {
   it("retains signed GEL values, percentage values and projections in English", async () => {
-    const presentation = await getPresentation("en", ["workbook"], ["deficit.general_government_balance"]);
+    const presentation = await getPresentation("en", ["workbook"], ["deficit.general_government.balance"]);
     const input = { facts, range: { start: 2025, end: 2026 }, percentage: true, sources: [], siteOrigin: "https://fiscal.ge" };
     const ka = buildDeficitWorkbookExportModel(input);
     const en = buildDeficitWorkbookExportModel(input, presentation);

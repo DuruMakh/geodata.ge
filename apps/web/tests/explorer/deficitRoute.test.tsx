@@ -8,7 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { ServedGeneralGovernmentBalanceFact } from "../../lib/servedRows";
 
 let presentation: Presentation;
-beforeAll(async () => { presentation = await getPresentation("ka", ["common", "controls", "format", "main", "deficit"], ["deficit.general_government_balance"]); });
+beforeAll(async () => { presentation = await getPresentation("ka", ["common", "controls", "format", "main", "deficit"], ["deficit.general_government.balance"]); });
 function renderGeorgianMarkup(children: ReactNode) { return renderToStaticMarkup(<I18nProvider {...presentation}>{children}</I18nProvider>); }
 
 const facts: ServedGeneralGovernmentBalanceFact[] = [
@@ -44,7 +44,7 @@ describe("general-government deficit route composition", () => {
     expect(markup).toContain('data-measure="percent"');
     expect(markup).toContain('data-testid="chart-frame"');
     expect((markup.match(/data-testid="series-row"/g) ?? [])).toHaveLength(1);
-    expect(markup).toContain('data-series-id="deficit.general_government_balance"');
+    expect(markup).toContain('data-series-id="deficit.general_government.balance"');
     expect(markup).toContain('data-testid="range-marker"');
     expect(text).toContain("2026–2031 წლები IMF-ის პროგნოზია");
     expect(text).toContain("უარყოფითი მნიშვნელობა დეფიციტია");
