@@ -20,8 +20,8 @@ The two social images at `/opengraph-image` and `/en/opengraph-image` use explic
 are generated at build time. All human pages remain prerendered and `/mcp` remains
 the sole request-time route; the older all-static description below predates MCP.
 
-Schema 1.1.0 includes reviewed language companions for ten MCP tools and twelve
-publication artifacts (eleven JSON files including the manifest, and one GDP CSV).
+Schema 1.3.0 includes reviewed language companions for thirteen MCP tools and nineteen
+publication artifacts (fifteen JSON files including the manifest, and four CSV files).
 Requests do not gain a language argument. Clients must accept
 new fields and version 1.1.0; byte-identical response compatibility is not promised.
 Translation changes alter `dataVersion`. Retain the existing body, cell, pair,
@@ -375,6 +375,11 @@ free plan. Upgrading or enabling automatic upgrades needs explicit approval.
 | Serialized tool result | 512 KiB across text and structured content |
 | Function duration | 10 seconds |
 
+The byte ceiling, not the cell count, is what binds. The text representation
+prints each value definition once, in a legend keyed by `definitionId`, not on
+every row. Even so, an inflation answer fits about 250 cells, and the
+`query_inflation` description and server instructions say so.
+
 An oversized request is rejected in full with guidance to narrow it. Source
 references and caveats are never silently trimmed. Every tool publishes its own
 output shape. Structured and text answers preserve missingness, relevant
@@ -461,5 +466,9 @@ no budget data and require no migration when a code release is rolled back.
 For the sectors release, require the Actions-owned pipeline to apply `20260912000000_economic_sectors`, import all 987 exact-decimal observations with parity, and pass the database-mode build before triggering Vercel. Preserve the already deployed inflation migration and import in the combined release. After Vercel is READY at the merge commit, verify both language sector pages, methodology/originals, all three measures and native Excel downloads. Check the central sector CSV/JSON against their manifest hashes and exercise `query_economic_sectors`, including missing 2010 growth and the bilingual stale-version error. Source-exact sector GDP may differ in the final decimal digits from the unchanged GDP overview representation; the sector validation report documents the difference. Local preview checks do not establish production delivery.
 
 The Economy/GDP addition has 94 bilingual page identities (188 sitemap URLs), ten MCP tools including `query_gdp`, and seven datasets. It adds `gdp-overview.json` and `gdp-overview.csv` to the central publication manifest. Before release, validate all six GDP series against their source data, confirm exact CSV/database parity and source-status semantics, and check both language overview/methodology pages. Apply the GDP migration through the existing pipeline only; verify the deployed commit and a real `query_gdp` response after deployment. Growth MCP values are percent, not fractions; preliminary values are not forecasts or planned budgets.
+
+The inflation MCP addition (`docs/superpowers/specs/2026-09-14-inflation-mcp-design.md`) brings the endpoint to twelve tools with `query_inflation`, moves the schema to 1.2.0 (an additive `period` on monthly observations, comparison endpoints and ranking entries), and adds `inflation-national.json`, `inflation-categories.csv` and `inflation-categories.json` to the manifest. The packaged snapshot grows from about 4.4 MB to about 15.5 MB, measured on 2026-09-14, most of it the monthly category table. After deployment, verify the deployed commit; that `tools/list` on `https://fiscal.ge/mcp` includes `query_inflation`; one real call each of `query_inflation`, `compare` with an inflation target and `rank` with `datasetId: "inflation"`; and that the three files are served with the manifest's hashes.
+
+The regional-economies addition (`docs/superpowers/specs/2026-09-13-regional-economies-design.md`) brings the endpoint to thirteen tools with `query_regional_economies`, moves the schema to 1.3.0, and adds `regional-economies.json` and `regional-economies.csv` to the manifest. After deployment, verify the deployed commit; both language route families; one real `query_regional_economies` call for Imereti nominal GDP and one sector share; and both files against the manifest hashes.
 
 For an authorized GDP release, require the pipeline to apply `20260911000000_gdp_overview`, import 251 GDP observations with field parity, and pass the database-mode build before triggering Vercel. After the deployment is READY at the merged SHA, verify the Georgian and English Economy hub, GDP overview and GDP methodology URLs; all four tabs and summaries; nominal GEL/USD controls; and a native Excel download in each language. Check the overview Dataset metadata and all six route URLs in the sitemap. Query all six GDP series for 2025 and one early real-GDP year through the live MCP endpoint, verify original-source links, and compare the public GDP JSON/CSV bytes with their central manifest hashes. These live checks are separate from local disposable-database evidence and do not establish search indexing.

@@ -8,6 +8,9 @@ export type GridRow = { year: number; cells: GridCell[]; summary: GridCell | nul
 
 export const YOY_BINS = [0, 3, 6, 10] as const;
 export const MOM_BINS = [0, 0.5, 1, 2] as const;
+// Contributions are percentage points, so they need their own bins: a 1.7 pp
+// contribution is large where a 1.7% price change is not.
+export const CONTRIBUTION_BINS = [0, 0.25, 0.75, 1.5] as const;
 
 // Deflation, then four warm steps to the accent. Each pair is checked ≥ 4.5:1
 // in tests; the accent step carries paper text.
@@ -31,6 +34,11 @@ export function binFor(value: number, edges: readonly number[]): number {
 
 export function legendLabels(edges: readonly number[]): string[] {
   return [`< ${edges[0]}%`, ...edges.slice(0, -1).map((edge, index) => `${edge}–${edges[index + 1]}%`), `≥ ${edges.at(-1)}%`];
+}
+
+/** The unit is passed in: `%` is language-neutral, `პპ` / `pp` is not. */
+export function legendLabelsPp(edges: readonly number[], unit: string): string[] {
+  return [`< ${edges[0]} ${unit}`, ...edges.slice(0, -1).map((edge, index) => `${edge}–${edges[index + 1]} ${unit}`), `≥ ${edges.at(-1)} ${unit}`];
 }
 
 function luminance(hex: string): number {

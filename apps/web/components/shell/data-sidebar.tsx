@@ -209,6 +209,16 @@ export function DataSidebar() {
                 {message(messages, "common.inflationOverview")}
               </Link>
             ) : null}
+            {inflationActive ? (
+              <Link
+                href={pageHref("/explorer/inflation/categories", locale)}
+                data-testid="inflation-categories-link"
+                aria-current={pathname.endsWith("/explorer/inflation/categories") ? "page" : undefined}
+                className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline"
+              >
+                {message(messages, "common.inflationCategories")}
+              </Link>
+            ) : null}
 
             {/* No aria-disabled on the rows: the listitem role ignores it (jsx-a11y
                 flags it), and the ComingSoonBadge text already reads out. */}

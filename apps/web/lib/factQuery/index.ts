@@ -13,6 +13,8 @@ export { buildFactQuerySnapshot } from "./buildSnapshot";
 
 export { describeCoverage } from "./describeCoverage";
 export { queryEconomicSectors } from "./queryEconomicSectors";
+export { queryGdp } from "./queryGdp";
+export { queryInflation } from "./queryInflation";
 export { queryNational } from "./queryNational";
 export { queryMinistries } from "./queryMinistries";
 export { queryMunicipal } from "./queryMunicipal";

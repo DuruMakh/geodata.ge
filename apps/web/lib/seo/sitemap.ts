@@ -80,6 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     { url: `${siteUrl}/explorer/inflation`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/inflation/overview`, lastModified: inflationModified },
+    { url: `${siteUrl}/explorer/inflation/categories`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
     { url: `${siteUrl}/explorer/revenue`, lastModified },
     { url: `${siteUrl}/explorer/analysis`, lastModified },

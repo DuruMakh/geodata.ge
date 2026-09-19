@@ -7,6 +7,7 @@
 // id, resolving sourceIds into documentIds without re-querying sources per
 // row, and deciding which already-evaluated request-level caveats belong on
 // one specific observation's caveatIds.
+import type { CaveatContext } from "./caveats";
 import type { Availability, Basis, Caveat, DatasetId, Measure, PublicDocument, ResolvedSource, Unit } from "./types";
 
 /**
@@ -30,6 +31,8 @@ export type Observation = {
   level: string;
   parentSeriesId: string | null;
   year: number;
+  /** Monthly observations only (inflation): YYYY-MM. `year` stays the calendar year of that month. */
+  period?: string;
   measure: Measure;
   unit: Unit;
   value: number | null;
@@ -61,9 +64,38 @@ export type Observation = {
   caveatIds: string[];
 };
 
-/** observationId's one fixed template (spec section 7.2), so every query function builds it identically. */
-export function buildObservationId(datasetId: DatasetId, entityId: string, seriesId: string, year: number, measure: Measure): string {
-  return `${datasetId}:${entityId}:${seriesId}:${year}:${measure}`;
+/** observationId's one fixed template (spec section 7.2). A monthly observation puts its period where the year goes. */
+export function buildObservationId(datasetId: DatasetId, entityId: string, seriesId: string, yearOrPeriod: number | string, measure: Measure): string {
+  return `${datasetId}:${entityId}:${seriesId}:${yearOrPeriod}:${measure}`;
+}
+
+/**
+ * The caveat context for a dataset with one country-level entity and no budget
+ * inputs - the GDP overview and economic sectors. Every array the budget rules
+ * read is empty, so only rules gated on these datasets can fire.
+ */
+export function countryLevelCaveatContext(
+  datasetId: DatasetId,
+  measure: Measure,
+  years: number[],
+  seriesIds: string[],
+  observations: readonly Observation[],
+  comparison: CaveatContext["comparison"] = null,
+): CaveatContext {
+  return {
+    datasetId,
+    measure,
+    years,
+    seriesIds,
+    entityIds: ["country.georgia"],
+    observations: [...observations],
+    municipalTotalInputs: [],
+    municipalInputServedBy: {},
+    gdpInputs: [],
+    comparison,
+    historicalJoinSeriesYears: [],
+    adminCategoryYears: [],
+  };
 }
 
 export function uniqueSorted(values: readonly string[]): string[] {
@@ -222,7 +254,7 @@ export function resolveDocumentIds(
  */
 export function caveatIdsForObservation(
   caveats: readonly Caveat[],
-  observation: { entityId: string; seriesId: string; year: number; measure: Measure },
+  observation: { entityId: string; seriesId: string; year: number; period?: string; measure: Measure },
 ): string[] {
   const seriesYear = `${observation.seriesId}:${observation.year}`;
   const entityYear = `${observation.entityId}:${observation.year}`;
@@ -237,6 +269,7 @@ export function caveatIdsForObservation(
   return caveats
     .filter(
       (caveat) =>
+        (observation.period !== undefined && caveat.affects.includes(`${observation.seriesId}:${observation.period}`)) ||
         caveat.affects.includes(seriesYear) ||
         caveat.affects.includes(entityYear) ||
         caveat.affects.includes(entitySeriesYear) ||

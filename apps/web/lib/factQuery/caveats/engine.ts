@@ -44,6 +44,8 @@ export type CaveatContext = {
     level: string;
     parentSeriesId: string | null;
     year: number;
+    /** Monthly observations only (inflation), YYYY-MM. */
+    period?: string;
     value: number | null;
     basis: Basis | null;
     /** Mirrors Observation.valueDefinitionId, so a rule can detect a real definition break between two years without reading display prose. */

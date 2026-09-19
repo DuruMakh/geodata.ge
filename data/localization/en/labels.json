@@ -1186,5 +1186,9 @@
   "regional-economies": {
     "text": "Regional economies",
     "reviewedAt": "2026-09-13"
+  },
+  "inflation": {
+    "text": "Consumer price inflation",
+    "reviewedAt": "2026-09-14"
   }
 }

@@ -1,7 +1,15 @@
 import Decimal from "decimal.js";
 import type { ParsedCpiSeries } from "./readGeostatCpi";
 import { periodFromKey, periodKey } from "./periods";
-import { CPI_SERIES_IDS, CPI_SERIES_MEASURES, type CpiFact, type InflationTargetRow } from "./types";
+import {
+  CPI_CATEGORY_MEASURES,
+  CPI_SERIES_IDS,
+  CPI_SERIES_MEASURES,
+  type BasketWeightRow,
+  type CpiCategoryFact,
+  type CpiFact,
+  type InflationTargetRow,
+} from "./types";
 
 const PERIOD = /^\d{4}-(0[1-9]|1[0-2])$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -158,4 +166,99 @@ export function validateTargetRows(rows: InflationTargetRow[]): void {
       if (periodFromKey(next.effectiveFrom) !== to + 1) throw new Error(`NBG target rows must be contiguous: ${row.effectiveTo} → ${next.effectiveFrom}`);
     }
   });
+}
+
+export const WEIGHT_SUM_TOLERANCE_PCT = 0.001;
+
+export function categoryFactKey(fact: Pick<CpiCategoryFact, "categoryId" | "measure" | "period">): string {
+  return `${fact.categoryId}:${fact.measure}:${fact.period}`;
+}
+
+/**
+ * Unlike the national series (validateCpiFacts), a category may start late, end
+ * early or skip months — 04.2 and 08.1 end in 2011, 09.6 starts in 2020, 12.5 and
+ * 12.6 skip interior months. Gaps are recorded, not rejected (spec §3.4).
+ */
+export function validateCategoryFacts(facts: CpiCategoryFact[]): { lastPeriod: string; categoryCount: number; gaps: string[] } {
+  const seen = new Set<string>();
+  const divisions = new Set<string>();
+  const periodsByGroup = new Map<string, number[]>();
+  for (const fact of facts) {
+    if (fact.level === 2) divisions.add(fact.categoryId);
+    if (!PERIOD.test(fact.period)) throw new Error(`Invalid category period ${fact.period}`);
+    if (!(CPI_CATEGORY_MEASURES as readonly string[]).includes(fact.measure)) throw new Error(`Unknown category measure ${fact.measure}`);
+    const key = categoryFactKey(fact);
+    if (seen.has(key)) throw new Error(`Duplicate category observation ${key}`);
+    seen.add(key);
+    const value = new Decimal(fact.value);
+    if (!value.isFinite()) throw new Error(`Non-finite category observation ${key}`);
+    if (value.decimalPlaces() > 6) throw new Error(`Category observation ${key} has more than 6 decimals: ${fact.value}`);
+    if (value.abs().gte(PLAUSIBLE_RATE_PCT * 8)) throw new Error(`Category rate ${key} is outside a plausible range: ${fact.value}`);
+    if (fact.status !== "published") throw new Error(`Invalid category status ${key}`);
+    if (!fact.sourceId || !fact.sourceLocator || !DATE.test(fact.lastReviewedAt)) throw new Error(`Category provenance missing ${key}`);
+    const group = `${fact.categoryId}:${fact.measure}`;
+    periodsByGroup.set(group, [...(periodsByGroup.get(group) ?? []), periodFromKey(fact.period)]);
+  }
+  for (const fact of facts) {
+    if (fact.level === 3 && (fact.parentId === null || !divisions.has(fact.parentId))) {
+      throw new Error(`Category ${fact.categoryId} has no parent division in the data`);
+    }
+  }
+  // COICOP has exactly 12 divisions (spec §4.4). Only the workbook reader enforced
+  // this, so a CSV or mirror missing one would have passed the serving-path check.
+  if (divisions.size !== 12) throw new Error(`Expected 12 COICOP divisions, found ${divisions.size}`);
+
+  const gaps: string[] = [];
+  let last = -Infinity;
+  for (const [group, periods] of periodsByGroup) {
+    periods.sort((a, b) => a - b);
+    for (let index = 1; index < periods.length; index += 1) {
+      if (periods[index] !== periods[index - 1]! + 1) gaps.push(`${group} after ${periodKey(periods[index - 1]!)}`);
+    }
+    last = Math.max(last, periods.at(-1)!);
+  }
+  if (!Number.isFinite(last)) throw new Error("Category coverage is empty");
+  return { lastPeriod: periodKey(last), categoryCount: new Set(facts.map((fact) => fact.categoryId)).size, gaps: gaps.sort() };
+}
+
+export function validateBasketWeights(weights: BasketWeightRow[], categoryIds: Set<string>): { years: number[]; maxSumErrorPct: number } {
+  if (weights.length === 0) throw new Error("Basket weights are empty");
+  const levels = new Map<string, Decimal>();
+  const years = new Set<number>();
+  for (const row of weights) {
+    if (!categoryIds.has(row.categoryId)) throw new Error(`Basket weight for ${row.categoryId} has no price data`);
+    const value = new Decimal(row.weightPct);
+    if (!value.isFinite() || value.lt(0) || value.gt(100)) throw new Error(`Invalid basket weight ${row.weightPct} for ${row.categoryId}`);
+    if (value.decimalPlaces() > 6) throw new Error(`Basket weight for ${row.categoryId} has more than 6 decimals`);
+    if (!row.sourceId || !DATE.test(row.lastReviewedAt)) throw new Error(`Basket weight provenance missing for ${row.categoryId}`);
+    years.add(row.year);
+    const level = row.categoryId.includes("_") ? 3 : 2;
+    const key = `${level}:${row.year}`;
+    levels.set(key, (levels.get(key) ?? new Decimal(0)).plus(value));
+  }
+  let maxSumErrorPct = 0;
+  for (const [key, total] of levels) {
+    const error = total.minus(100).abs().toNumber();
+    if (error > WEIGHT_SUM_TOLERANCE_PCT) throw new Error(`Basket weights for level ${key} sum to ${total.toFixed(6)}, not 100`);
+    maxSumErrorPct = Math.max(maxSumErrorPct, error);
+  }
+  return { years: [...years].sort((a, b) => a - b), maxSumErrorPct };
+}
+
+export function findCategoryRevisions(previous: CpiCategoryFact[], next: CpiCategoryFact[]): string[] {
+  const nextByKey = new Map(next.map((fact) => [categoryFactKey(fact), fact]));
+  const problems: string[] = [];
+  for (const fact of previous) {
+    const current = nextByKey.get(categoryFactKey(fact));
+    if (!current) problems.push(`${categoryFactKey(fact)} removed`);
+    else if (!new Decimal(current.value).eq(fact.value)) problems.push(`${categoryFactKey(fact)} ${fact.value} → ${current.value}`);
+  }
+  return problems;
+}
+
+export function assertNoCategoryRevisions(previous: CpiCategoryFact[], next: CpiCategoryFact[]): void {
+  const revisions = findCategoryRevisions(previous, next);
+  if (revisions.length > 0) {
+    throw new Error(`Geostat revised published category history; review before accepting (${revisions.length}):\n${revisions.slice(0, 20).join("\n")}`);
+  }
 }

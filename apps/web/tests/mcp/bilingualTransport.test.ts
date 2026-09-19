@@ -31,6 +31,7 @@ describe("bilingual text-only transport", () => {
     ["query_national", { side: "expenditure", seriesIds: ["spending.education"], years: [2025], measure: "amount_gel" }],
     ["query_national", { side: "expenditure", seriesIds: ["expenditure.total"], years: [2025], measure: "amount_gel" }],
     ["query_debt", { seriesIds: ["debt.rate.domestic"], years: [2025], measure: "rate_percent" }],
+    ["query_inflation", { seriesIds: ["cpi.cat.07"], measure: "contribution_pp", fromPeriod: "2026-08", toPeriod: "2026-08" }],
     ["query_municipal", { entityIds: ["05", "11"], seriesIds: ["municipal.total"], years: [2025], measure: "amount_gel" }],
     ["describe_coverage", { datasetId: "government-debt" }],
     ["compare", { target: { dataset: "municipal", entityIds: ["11"], seriesIds: ["municipal.total"] }, fromYear: 2024, toYear: 2025, measure: "amount_gel" }],
@@ -61,7 +62,7 @@ describe("bilingual text-only transport", () => {
     try {
       await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
       const { tools } = await client.listTools();
-      expect(tools).toHaveLength(12);
+      expect(tools).toHaveLength(13);
       for (const tool of tools) {
         const schema = JSON.stringify(tool.outputSchema);
         for (const field of ["nameEn", "titleEn", "publisherEn", "attributionEn", "documentLanguage", "methodologyRefEn"]) expect(schema, tool.name).toContain(`"${field}"`);

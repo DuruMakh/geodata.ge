@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { serverInstructions } from "../../lib/mcp/instructions";
+import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
 
 async function connected(): Promise<Client> {
@@ -22,6 +24,7 @@ const TOOL_NAMES = [
   "query_deficit",
   "query_economic_sectors",
   "query_gdp",
+  "query_inflation",
   "query_ministries",
   "query_municipal",
   "query_national",
@@ -211,6 +214,133 @@ describe("MCP tool surface", () => {
 
     expect(instructions).toContain("consolidated budget RECEIPTS");
     expect(instructions).toContain("STATE-BUDGET expenditure");
+  });
+
+  // The sector bullet carried its measure years as text ("cover2010–2025"), so
+  // they would have gone stale on the next data refresh - and lost their spaces
+  // on the way in.
+  it("states economic-sector measure years from the data", async () => {
+    const snapshot = loadPackagedSnapshot();
+    const range = (measure: string) => {
+      const years = snapshot.economicSectors.facts.filter((fact) => fact.measure === measure).map((fact) => fact.year);
+      return `${Math.min(...years)}-${Math.max(...years)}`;
+    };
+    const { tools } = await (await connected()).listTools();
+    const sectors = tools.find((tool) => tool.name === "query_economic_sectors")!;
+
+    expect(sectors.description).toContain(`shares cover ${range("nominal")}`);
+    expect(sectors.description).toContain(`real growth covers ${range("real_growth")}`);
+    const filled = serverInstructions({}, ENTITY_COUNTS, { amount_gel: "1999-2001", real_growth_pct: "2000-2001" });
+    expect(filled).toContain("shares cover 1999-2001");
+    expect(filled).toContain("real growth covers 2000-2001");
+    expect(serverInstructions({}, ENTITY_COUNTS)).toContain("shares cover see describe_coverage");
+  });
+
+  it("counts the datasets describe_coverage searches rather than naming a number", async () => {
+    const snapshot = loadPackagedSnapshot();
+    const catalogue = describeCoverage(snapshot, {});
+    if (catalogue.kind !== "catalogue") throw new Error("Expected catalogue");
+    const count = (catalogue.data as { datasets: unknown[] }).datasets.length;
+    const { tools } = await (await connected()).listTools();
+
+    expect(tools.find((tool) => tool.name === "describe_coverage")!.description).toContain(`all ${count} datasets`);
+  });
+
+  it("never glues a number to the word before it", async () => {
+    const { tools } = await (await connected()).listTools();
+    const texts = [...tools.map((tool) => tool.description ?? ""), serverInstructions({}, ENTITY_COUNTS)];
+    // A glued year ("cover2010") is the regression. Measure ids such as avg12_pct
+    // legitimately put a digit after a letter.
+    for (const text of texts) expect(text).not.toMatch(/[a-z]\d{4}/i);
+  });
+
+  // GDP is served in USD, constant-2015 USD and percent, and carries published
+  // and preliminary statuses. Telling a client that every amount is nominal GEL
+  // with an actual/planned/projection basis is false of two datasets.
+  it("does not describe every value as nominal GEL with a budget basis", () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+
+    expect(instructions).not.toContain("All amounts are nominal GEL");
+    expect(instructions).toContain('"published"');
+    expect(instructions).toContain('"preliminary"');
+    expect(instructions).toContain("real_growth_pct");
+  });
+
+  it("answers query_inflation with a monthly period in structured content", async () => {
+    const client = await connected();
+    const result = await client.callTool({
+      name: "query_inflation",
+      arguments: { seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" },
+    });
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent).toMatchObject({ data: { observations: [{ period: "2026-08", unit: "percent" }] } });
+    // The text twin must name the month, or a year of months reads as twelve identical "2026" rows.
+    expect((result.content as { text: string }[])[0]!.text).toContain("\t2026-08\tyoy_pct\t5.6479\t");
+  });
+
+  it("names both months of an inflation comparison in the text twin", async () => {
+    const client = await connected();
+    const result = await client.callTool({
+      name: "compare",
+      arguments: { target: { dataset: "inflation", seriesIds: ["cpi.headline"] }, fromPeriod: "2025-08", toPeriod: "2026-08", measure: "yoy_pct" },
+    });
+    expect(result.isError).toBeFalsy();
+    expect((result.content as { text: string }[])[0]!.text).toContain("\t2025-08→2026-08\t");
+  });
+
+  it("refuses an oversized inflation request before calculating it", async () => {
+    const client = await connected();
+    const snapshot = loadPackagedSnapshot();
+    const result = await client.callTool({
+      name: "query_inflation",
+      arguments: { seriesIds: snapshot.inflation.groups.map((group) => group.id), measure: "yoy_pct", fromPeriod: "2025-01", toPeriod: "2025-12" },
+    });
+    expect(result.isError).toBe(true);
+    expect((result.content as { text: string }[])[0]!.text).toContain("result_too_large");
+  });
+
+  // The binding MCP gate is LIMITS.resultBytes (512 KiB, both representations), not
+  // the 500-cell cap, and inflation rows carry long bilingual definitions. A year of
+  // division contributions is the everyday contributions question, so it must fit.
+  it("fits a year of division contributions within the response-size limit", async () => {
+    const client = await connected();
+    const snapshot = loadPackagedSnapshot();
+    const divisions = snapshot.inflation.groups.filter((group) => group.level === "division").map((group) => group.id);
+    const result = await client.callTool({
+      name: "query_inflation",
+      arguments: { seriesIds: divisions, measure: "contribution_pp", fromPeriod: "2025-01", toPeriod: "2025-12" },
+    });
+    expect(result.isError).toBeFalsy();
+  });
+
+  // The headline grows by a row every month. Before definitions moved to a legend the
+  // full history was 505 KiB of 512 and would have been refused within a few releases.
+  it("fits the full published headline history and prints its definition once", async () => {
+    const client = await connected();
+    const periods = loadPackagedSnapshot()
+      .inflation.facts.filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")
+      .map((fact) => fact.period)
+      .sort();
+    const result = await client.callTool({
+      name: "query_inflation",
+      arguments: { seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: periods[0], toPeriod: periods.at(-1) },
+    });
+    expect(result.isError).toBeFalsy();
+    const observations = (result.structuredContent as { data: { observations: { valueDefinitionEn: string }[] } }).data.observations;
+    expect(observations.length).toBe(periods.length);
+    const text = (result.content as { text: string }[])[0]!.text;
+    expect(text.split(observations[0]!.valueDefinitionEn)).toHaveLength(2);
+    expect(text).toContain("\tinflation:yoy_pct\t");
+    // Headroom, so the test fails years before production would refuse the call.
+    expect(Buffer.byteLength(JSON.stringify(result), "utf8")).toBeLessThan(0.85 * 512 * 1024);
+  });
+
+  it("tells clients inflation is the one monthly dataset", () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    expect(instructions).toContain("INFLATION");
+    expect(instructions).toContain("only monthly dataset");
+    expect(instructions).toContain("schema 1.3.0");
+    expect(instructions).not.toContain("Quarterly or monthly data, live budget execution");
   });
 
   it("keeps every tool name in the advertised set", () => {

@@ -98,17 +98,17 @@ test("language switch keeps the state", async ({ page }) => {
   await expect(page.getByTestId("inflation-tab-mom")).toHaveAttribute("aria-pressed", "true");
 });
 
-test("the sidebar lists three datasets and the hub links only the overview", async ({ page }) => {
+test("the sidebar lists three datasets and the hub links its two live sections", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/explorer/inflation");
   await expect(page.getByTestId("inflation-link")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("inflation-hub").getByTestId("hub-card")).toHaveCount(5);
-  await expect(page.getByTestId("inflation-hub").locator("a")).toHaveCount(1);
+  await expect(page.getByTestId("inflation-hub").locator("a")).toHaveCount(2);
   // Budget and Economy stay inactive; the footer names both publishers.
   await expect(page.getByTestId("section-link-expenditure")).toHaveCount(0);
   await expect(page.getByTestId("economy-link")).not.toHaveAttribute("aria-current", "page");
   await expect(page.getByText("მონაცემები: საქსტატი და საქართველოს ეროვნული ბანკი", { exact: false })).toBeVisible();
-  await page.getByTestId("inflation-hub").getByRole("link").click();
+  await page.getByTestId("inflation-hub").getByRole("link").first().click();
   await ready(page);
   await expect(page.getByTestId("inflation-overview-link")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("data-sidebar").getByText("მალე", { exact: true })).toHaveCount(2);

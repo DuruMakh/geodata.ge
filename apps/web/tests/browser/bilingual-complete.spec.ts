@@ -5,7 +5,7 @@ import { pageHref } from "../../lib/i18n/routes";
 test("every public page has two working document languages", async ({ request }) => {
   test.setTimeout(90_000);
   const paths = await listPublicPagePaths();
-  expect(paths).toHaveLength(112);
+  expect(paths).toHaveLength(113);
   for (const path of paths) for (const locale of ["ka", "en"] as const) {
     const response = await request.get(pageHref(path, locale));
     expect(response.status(), `${locale}:${path}`).toBe(200);
@@ -18,7 +18,7 @@ test("the English explorer, language switch and shared bilingual publication agr
   const response = await request.get("/downloads/data/national-expenditure.json");
   expect(response.status()).toBe(200);
   const data = await response.json();
-  expect(data.schemaVersion).toBe("1.2.0");
+  expect(data.schemaVersion).toBe("1.3.0");
   const education = data.observations.find((row: { year: number; seriesId: string }) => row.year === 2025 && row.seriesId === "spending.education");
   expect(education.value).toBe(3045941254);
   expect(education.seriesLabelEn).toBe("Education");

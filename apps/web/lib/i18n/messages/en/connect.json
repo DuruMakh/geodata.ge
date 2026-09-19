@@ -1,4 +1,8 @@
 {
+  "connect.inflationCoverage": "Consumer price inflation, monthly — {nationalRange}; {groupCount} COICOP groups; basket weights {weightRange}; contributions from {contributionStart}; National Bank of Georgia target from {targetStart}.",
+  "connect.inflationQuery": "Use query_inflation with fromPeriod and toPeriod (YYYY-MM) and one measure: yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct or contribution_pp. compare takes two months; rank orders divisions or subgroups in one month. Contributions are Fiscal.ge's approximation, not Geostat figures.",
+  "connect.inflationCategoriesMetadata": "Categories metadata",
+  "connect.inflationMethodology": "Inflation methodology",
   "connect.sectorCoverage": "Economic sectors, {count} national activities plus Total GDP — nominal GEL {nominalRange}; GDP shares {shareRange}; annual real growth {growthRange}.",
   "connect.sectorQuery": "Use query_economic_sectors for selected national activities, years and one measure: amount_gel, share_of_gdp_pct or real_growth_pct. Sector rankings and cumulative comparisons are not supported. 2025 is preliminary; 2010 growth is missing. Percent values use 7.5 for 7.5%; growth rates must not be summed.",
   "connect.regionalCoverage": "Regional economies, {count} regions — total GDP and 20 activities, current-price GEL and share of regional GDP, {range}.",
@@ -17,7 +21,7 @@
   "connect.codexStep3": "Set Type to Streamable HTTP.",
   "connect.codexStep4": "Paste the address above into the URL field. Leave Bearer token and Headers empty.",
   "connect.chatPrompt": "Answer my question using Fiscal.ge’s published data:",
-  "connect.notServed1": "Quarterly and monthly data — the monthly inflation figures on the site are not available through this connection",
+  "connect.notServed1": "Quarterly and monthly data for any dataset other than inflation",
   "connect.notServed2": "Individual capital projects and procurement",
   "connect.notServed3": "Current in-year execution",
   "connect.heading": "Connect your AI assistant",
@@ -59,6 +63,6 @@
   "connect.exampleRegional": "What was manufacturing's share of Imereti's regional GDP in 2024?",
   "connect.exampleDebt": "What was the government debt portfolio’s weighted-average interest rate in 2024?",
   "connect.exampleDeficit": "Which general government balance years are forecasts, and what does a negative value mean?",
-  "connect.languageContract": "Data format 1.2.0 adds regional economies while retaining *Ka and *En fields for reviewed Georgian and English descriptions. Generic fields retain the original wording; documentLanguage is null when unverified. A translation correction changes dataVersion. Existing requests and shared /mcp and /downloads/data/ URLs remain compatible. Clients must accept additive fields and version 1.2.0.",
+  "connect.languageContract": "Data format 1.3.0 adds regional economies after version 1.2.0 introduced the optional period (YYYY-MM) on monthly inflation values, while retaining *Ka and *En fields for reviewed Georgian and English descriptions. Generic fields retain the original wording; documentLanguage is null when unverified. A translation correction changes dataVersion. Existing requests and shared /mcp and /downloads/data/ URLs remain compatible. Clients must accept additive fields and version 1.3.0.",
   "connect.gdpCoverage": "GDP, annual real growth and nominal GDP per person — {range} (individual series have shorter coverage; current GEL/USD and constant 2015 USD are distinct)."
 }

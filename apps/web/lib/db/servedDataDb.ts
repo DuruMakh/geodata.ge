@@ -23,6 +23,8 @@ import {
   loadGdpOverviewFactsFromMirror,
   loadEconomicSectorFactsFromMirror,
   loadRegionalEconomyFactsFromMirror,
+  loadInflationBasketWeightsFromMirror,
+  loadInflationCategoryFactsFromMirror,
   loadInflationCpiFactsFromMirror,
   loadInflationTargetsFromMirror,
   loadSourceDocumentsFromMirror,
@@ -107,6 +109,11 @@ export async function loadRegionalEconomyFactsFromDb() {
 }
 
 export async function loadInflationDataFromDb() {
-  const [facts, targets] = await Promise.all([loadInflationCpiFactsFromMirror(prisma), loadInflationTargetsFromMirror(prisma)]);
-  return { facts, targets };
+  const [facts, targets, categories, weights] = await Promise.all([
+    loadInflationCpiFactsFromMirror(prisma),
+    loadInflationTargetsFromMirror(prisma),
+    loadInflationCategoryFactsFromMirror(prisma),
+    loadInflationBasketWeightsFromMirror(prisma),
+  ]);
+  return { facts, targets, categories, weights };
 }

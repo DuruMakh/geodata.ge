@@ -57,6 +57,8 @@ export const SERVED_DATA_FILES = {
   regionalEconomyFacts: "../../data/imports/regional-economies-annual.csv",
   inflationCpiFacts: "../../data/imports/cpi-national-monthly.csv",
   inflationTargets: "../../data/imports/nbg-inflation-target.csv",
+  inflationCategoryFacts: "../../data/imports/cpi-categories-monthly.csv",
+  inflationBasketWeights: "../../data/imports/cpi-basket-weights.csv",
   budgetFacts: "../../data/imports/budget-facts-2004-2025.csv",
   adminSpendingFacts: "../../data/imports/admin-spending-facts-2004-2025.csv",
   glossary: "../../data/glossary/category-glossary.csv",

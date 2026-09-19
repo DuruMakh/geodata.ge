@@ -25,6 +25,8 @@ import { SECTOR_DEFINITIONS } from "./economicSectorsSeries";
 import { loadRegionalEconomyFacts, REGIONAL_ECONOMY_REGIONS, REGIONAL_ECONOMY_SECTORS } from "../data/regionalEconomies/importRegionalEconomies";
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { REGIONAL_ECONOMY_DEFINITIONS } from "./regionalEconomySeries";
+import { loadServedInflationData } from "../data/inflation/importInflation";
+import { NATIONAL_SERIES, RESIDUAL_SERIES, RESIDUAL_SERIES_ID, TARGET_SERIES, TARGET_SERIES_ID, type InflationGroup } from "./inflationSeries";
 import { loadServedGeneralGovernmentBalanceData } from "../data/generalGovernmentBalance/importGeneralGovernmentBalance";
 import { loadServedGovernmentDebtData } from "../data/governmentDebt/importGovernmentDebtFacts";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
@@ -425,6 +427,30 @@ function compareBy<T>(...keys: Array<(row: T) => string | number>): (a: T, b: T)
   };
 }
 
+/**
+ * The COICOP tree with Geostat's own Georgian and English wording, read from
+ * the site's inflation message catalogue so the MCP names a group exactly as
+ * the page does. A group without both labels stops the build.
+ */
+async function loadInflationGroups(
+  repositoryRoot: string,
+  categories: readonly { categoryId: string; coicopCode: string; level: 2 | 3; parentId: string | null }[],
+): Promise<InflationGroup[]> {
+  const [ka, en] = await Promise.all(
+    (["ka", "en"] as const).map(async (locale) =>
+      JSON.parse(await readFile(path.join(repositoryRoot, "apps", "web", "lib", "i18n", "messages", locale, "inflation.json"), "utf8")) as Record<string, string>,
+    ),
+  );
+  const byId = new Map(categories.map((fact) => [fact.categoryId, fact]));
+  return [...byId.values()]
+    .sort((a, b) => (a.categoryId < b.categoryId ? -1 : a.categoryId > b.categoryId ? 1 : 0))
+    .map((fact) => {
+      const key = `inflation.category.${fact.categoryId}`;
+      if (!ka[key]?.trim() || !en[key]?.trim()) throw new Error(`Missing reviewed inflation group label: ${fact.categoryId}`);
+      return { id: fact.categoryId, coicopCode: fact.coicopCode, level: fact.level === 2 ? "division" : "subgroup", parentId: fact.parentId, labelKa: ka[key], labelEn: en[key] };
+    });
+}
+
 function sortedBy<T>(rows: T[], ...keys: Array<(row: T) => string | number>): T[] {
   return [...rows].sort(compareBy(...keys));
 }
@@ -487,6 +513,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID, ...Object.keys(GDP_QUERY_SERIES), "gdp-overview",
     ...ECONOMIC_SECTORS.map(r=>r.id), "economic-sectors",
     ...REGIONAL_ECONOMY_REGIONS.map(region => region.id), REGIONAL_GDP_TOTAL, "regional-economies",
+    "inflation",
     "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
   ])].sort();
   const localization: ServiceLocalization = {
@@ -500,6 +527,14 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
       en: Object.fromEntries(SERVICE_MESSAGE_KEYS.map(key => [key, serviceEn[key]])),
     },
   };
+  const inflation = await loadServedInflationData();
+  const inflationGroups = await loadInflationGroups(repositoryRoot, inflation.categories);
+  Object.assign(localization.labelsEn, Object.fromEntries([
+    ...Object.entries(NATIONAL_SERIES).map(([id, series]) => [id, series.labelEn]),
+    [TARGET_SERIES_ID, TARGET_SERIES.labelEn],
+    [RESIDUAL_SERIES_ID, RESIDUAL_SERIES.labelEn],
+    ...inflationGroups.map((group) => [group.id, group.labelEn]),
+  ]));
   for (const fact of explorer.adminFacts.filter(fact => fact.level === "major_program")) {
     const translated = catalogue.programmeHistory[fact.itemId]?.[fact.year];
     if (!translated || translated.originalKa !== fact.officialLabelKa) throw new Error(`Missing or stale reviewed programme history: ${fact.itemId}:${fact.year}`);
@@ -650,6 +685,13 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     gdpOverview: { facts: sortedBy(await loadGdpOverviewFacts(), f=>f.seriesId, f=>f.year), series: GDP_QUERY_SERIES },
     economicSectors: { facts: sortedBy(await loadEconomicSectorFacts(), f=>f.seriesId,f=>f.measure,f=>f.year), registry: ECONOMIC_SECTORS, definitions: SECTOR_DEFINITIONS },
     regionalEconomies: { facts: sortedBy(await loadRegionalEconomyFacts(), f=>f.regionId,f=>f.seriesId,f=>f.measure,f=>f.year), regions: REGIONAL_ECONOMY_REGIONS, registry: [{ id: REGIONAL_GDP_TOTAL, classificationCode: null, sortOrder: 0, officialName: "Total regional GDP", labelKa: "რეგიონის მთლიანი მშპ", labelEn: "Total regional GDP" }, ...REGIONAL_ECONOMY_SECTORS], definitions: REGIONAL_ECONOMY_DEFINITIONS },
+    inflation: {
+      facts: sortedBy(inflation.facts, (f) => f.seriesId, (f) => f.measure, (f) => f.period),
+      targets: sortedBy(inflation.targets, (row) => row.effectiveFrom),
+      categories: sortedBy(inflation.categories, (f) => f.categoryId, (f) => f.measure, (f) => f.period),
+      weights: sortedBy(inflation.weights, (row) => row.categoryId, (row) => row.year),
+      groups: inflationGroups,
+    },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
     sources,
   };

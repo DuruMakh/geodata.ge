@@ -66,6 +66,25 @@ it("keeps missing early nominal observations absent and validates requests", () 
   ).toBe("error");
 });
 
+it("names the SNA break only when the nominal cells returned span it", () => {
+  const codes = (seriesIds: string[], years: number[]) =>
+    queryGdp(snapshot, { seriesIds, years }).meta.caveats.map((c) => c.code);
+  // One standard on each side of the break: nothing to disclose.
+  expect(codes(["nominal_gel"], [2024])).not.toContain("gdp_historical_method");
+  expect(codes(["nominal_gel"], [2005])).not.toContain("gdp_historical_method");
+  const spanning = queryGdp(snapshot, {
+    seriesIds: ["nominal_gel"],
+    years: [2009, 2010],
+  });
+  const caveat = spanning.meta.caveats.find(
+    (c) => c.code === "gdp_historical_method",
+  );
+  expect(caveat?.affects).toEqual(["nominal_gel:2009", "nominal_gel:2010"]);
+  // World Bank history still rides on every real series cell it describes.
+  expect(codes(["real_usd_2015"], [2024])).toContain("gdp_world_bank_history");
+  expect(codes(["nominal_gel"], [2024])).not.toContain("gdp_world_bank_history");
+});
+
 it("discovers GDP in both languages and resolves its early-year originals", () => {
   for (const search of ["GDP", "მშპ"]) {
     const r = describeCoverage(snapshot, { datasetId: "gdp-overview", search });

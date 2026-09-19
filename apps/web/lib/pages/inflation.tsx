@@ -1,10 +1,13 @@
 import path from "node:path";
 import { BudgetHub } from "../../components/hub/budget-hub";
+import { InflationCategories } from "../../components/inflation/inflation-categories";
 import { InflationOverview } from "../../components/inflation/inflation-overview";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
+import { categoryFactInput } from "../data/inflation/types";
+import { packCategoryFacts } from "../explorer/inflationCategories";
 import { buildInflationHubCards } from "../explorer/inflationHubCards";
 import type { InflationWorkbookSource } from "../explorer/inflationWorkbook";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
@@ -21,6 +24,7 @@ import { resolveSiteUrl } from "../siteUrl";
 
 const HUB_PATH = "/explorer/inflation";
 const OVERVIEW_PATH = "/explorer/inflation/overview";
+const CATEGORIES_PATH = "/explorer/inflation/categories";
 const repositoryRoot = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
 
 export async function inflationHubMetadata(locale: Locale) {
@@ -29,7 +33,7 @@ export async function inflationHubMetadata(locale: Locale) {
 }
 
 export async function renderInflationHub(locale: Locale) {
-  const [{ facts }, presentation] = await Promise.all([loadServedInflationData(), getPresentation(locale, ["inflation", "common"], [])]);
+  const [{ facts, categories, weights }, presentation] = await Promise.all([loadServedInflationData(), getPresentation(locale, ["inflation", "common"], [])]);
   const t = (key: string) => message(presentation.messages, key);
   return (
     <I18nProvider {...presentation}>
@@ -41,7 +45,7 @@ export async function renderInflationHub(locale: Locale) {
             {t("inflation.hubHeading")}
           </h1>
           <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{t("inflation.hubDescription")}</p>
-          <BudgetHub cards={buildInflationHubCards(facts, presentation)} locale={locale} testId="inflation-hub" />
+          <BudgetHub cards={buildInflationHubCards(facts, presentation, categories, weights)} locale={locale} testId="inflation-hub" />
         </div>
       </main>
     </I18nProvider>
@@ -92,6 +96,64 @@ export async function renderInflationOverview(locale: Locale) {
         ]}
       />
       <InflationOverview facts={facts} targets={targets} sources={sources} siteOrigin={resolveSiteUrl()} />
+    </I18nProvider>
+  );
+}
+
+export async function inflationCategoriesMetadata(locale: Locale) {
+  const [{ categories }, messages] = await Promise.all([loadServedInflationData(), getMessages(locale, ["inflation"])]);
+  const years = categories.map((fact) => periodYear(periodFromKey(fact.period)));
+  return fiscalMetadata({
+    locale,
+    path: CATEGORIES_PATH,
+    title: message(messages, "inflation.categoriesMetaTitle", { first: Math.min(...years), last: Math.max(...years) }),
+    description: message(messages, "inflation.categoriesDescription"),
+  });
+}
+
+export async function renderInflationCategories(locale: Locale) {
+  const root = repositoryRoot();
+  const [{ facts, categories, weights }, presentation, manifest, catalogue] = await Promise.all([
+    loadServedInflationData(),
+    getPresentation(locale, ["inflation", "common", "controls", "format", "main"], []),
+    loadReviewedSourceManifest(root, "inflation"),
+    loadEnglishCatalogue(root),
+  ]);
+  const projected = projectPublicSources(manifest, locale, catalogue.documents);
+  const sources: InflationWorkbookSource[] = manifest.map((row) => {
+    const shown = projected.find((entry) => entry.source_id === row.source_id)!;
+    return {
+      sourceId: row.source_id.replace(/_ka$/, ""),
+      language: row.source_id.endsWith("_ka") ? "ka" : "en",
+      years: row.years,
+      title: shown.title,
+      organization: shown.publisher,
+      downloadHref: row.downloadHref,
+      retrievedAt: row.retrieved_at,
+    };
+  });
+  // The stack closes on the published national headline, so it travels with the page.
+  const headline = facts
+    .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")
+    .map((fact) => ({ period: periodFromKey(fact.period), value: fact.value }));
+  const t = (key: string) => message(presentation.messages, key);
+  return (
+    <I18nProvider {...presentation}>
+      <BreadcrumbJsonLd
+        items={[
+          { name: t("common.home"), path: pageHref("/", locale) },
+          { name: t("common.inflation"), path: pageHref(HUB_PATH, locale) },
+          { name: t("inflation.categoriesHeading"), path: pageHref(CATEGORIES_PATH, locale) },
+        ]}
+      />
+      <InflationCategories
+        facts={packCategoryFacts(categories.map(categoryFactInput))}
+        weights={weights}
+        headline={headline}
+        lastReviewedAt={categories.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
+        sources={sources}
+        siteOrigin={resolveSiteUrl()}
+      />
     </I18nProvider>
   );
 }

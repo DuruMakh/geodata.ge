@@ -2,9 +2,12 @@
 import type { CaveatRule } from "./engine";
 import { DEBT_CAVEAT_RULES } from "./rules.debt";
 import { DEFICIT_CAVEAT_RULES } from "./rules.deficit";
+import { GDP_CAVEAT_RULES } from "./rules.gdp";
+import { INFLATION_CAVEAT_RULES } from "./rules.inflation";
 import { MINISTRIES_CAVEAT_RULES } from "./rules.ministries";
 import { MUNICIPAL_CAVEAT_RULES } from "./rules.municipal";
 import { NATIONAL_CAVEAT_RULES } from "./rules.national";
+import { SECTORS_CAVEAT_RULES } from "./rules.sectors";
 
 /**
  * The single ordered rule list. Spec section 9.2 is the contract (22 codes),
@@ -14,7 +17,10 @@ import { NATIONAL_CAVEAT_RULES } from "./rules.national";
  * program_parent_category_modern_grouping carries the parent-attribution half
  * of program_historical_join's. nominal_gel was retired on 2026-09-04 (see
  * rules.national.ts), and the debt and general-government-balance datasets add
- * four and two codes of their own. 29 codes.
+ * four and two codes of their own. The GDP overview and economic sectors add
+ * two and one, registered on 2026-09-14 after shipping inline, and inflation
+ * adds four; the GDP overview's preliminary cells share gdp_preliminary. The count is asserted
+ * against ai-grounding-and-caveats.md rather than written here.
  */
 export const CAVEAT_RULES: readonly CaveatRule[] = [
   ...NATIONAL_CAVEAT_RULES,
@@ -22,6 +28,9 @@ export const CAVEAT_RULES: readonly CaveatRule[] = [
   ...MINISTRIES_CAVEAT_RULES,
   ...DEBT_CAVEAT_RULES,
   ...DEFICIT_CAVEAT_RULES,
+  ...GDP_CAVEAT_RULES,
+  ...SECTORS_CAVEAT_RULES,
+  ...INFLATION_CAVEAT_RULES,
 ];
 
 export { evaluateCaveats } from "./engine";

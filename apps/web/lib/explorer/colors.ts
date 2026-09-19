@@ -9,6 +9,22 @@ export const SERIES_COLORS: Record<string, string> = {
   "revenue.total": INK,
   "admin_spending.total": INK,
 
+  // COICOP divisions. A concept keeps its colour site-wide (DESIGN.md §4.2):
+  // health, education and transport take the same hues as the budget categories.
+  "cpi.cat.01": "#B3402A",
+  "cpi.cat.02": "#9C3D5E",
+  "cpi.cat.03": "#7A4E8C",
+  "cpi.cat.04": "#A5822B",
+  "cpi.cat.05": "#8A7B65",
+  "cpi.cat.06": "#1F6E56",
+  "cpi.cat.07": "#C26E4C",
+  "cpi.cat.08": "#4A707A",
+  "cpi.cat.09": "#4E5D74",
+  "cpi.cat.10": "#3D5A98",
+  "cpi.cat.11": "#8C5A32",
+  "cpi.cat.12": "#2F4B3A",
+  "cpi.cat.residual": "#94856D",
+
   "spending.social_protection": "#B3402A",
   "spending.health": "#1F6E56",
   "spending.education": "#3D5A98",

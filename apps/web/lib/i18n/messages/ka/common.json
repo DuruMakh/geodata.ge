@@ -1,7 +1,6 @@
 {
   "common.economicSectors": "სექტორები",
   "common.regionalEconomies": "რეგიონების ეკონომიკა",
-  "common.regionalEconomies": "რეგიონების ეკონომიკა",
   "common.sectorsSourceNote": "მონაცემები: საქსტატი. ბოლო განახლება: {updatedAt}.",
   "common.brandHome": "Fiscal.ge — მთავარი",
   "common.home": "მთავარი",
@@ -44,5 +43,6 @@
   "common.dataEconomy": "მონაცემები / ეკონომიკა",
   "common.inflationOverview": "ინფლაციის მიმოხილვა",
   "common.dataInflation": "მონაცემები / ინფლაცია",
-  "common.inflationSourceNote": "მონაცემები: საქსტატი და საქართველოს ეროვნული ბანკი. ბოლო განახლება: {updatedAt}."
+  "common.inflationSourceNote": "მონაცემები: საქსტატი და საქართველოს ეროვნული ბანკი. ბოლო განახლება: {updatedAt}.",
+  "common.inflationCategories": "კატეგორიები"
 }

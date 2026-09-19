@@ -19,11 +19,16 @@
 // `datasetVocabulary.enums.test.ts` asserts that against the query enums.
 
 import { GDP_QUERY_SERIES } from "../factQuery/gdpSeries";
+import type { InflationMeasure } from "../factQuery/inflationSeries";
 import type { DatasetId, Measure } from "../factQuery/types";
 import type { Locale } from "../i18n/types";
 
-/** Every published dataset except `ministries`, which has no page of its own. */
-export type FiscalDatasetId = Exclude<DatasetId, "ministries">;
+/**
+ * Every published dataset except `ministries`, which has no page of its own,
+ * and `inflation`, whose pages do not render Dataset JSON-LD from this vocabulary.
+ */
+export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation">;
+type FiscalMeasure = Exclude<Measure, InflationMeasure>;
 
 type Localized = Record<Locale, string>;
 
@@ -36,7 +41,7 @@ export type MeasureJsonLd = {
   unitText: string;
 };
 
-const MEASURES: Record<Measure, { name: Localized; description: Localized; unitText: string }> = {
+const MEASURES: Record<FiscalMeasure, { name: Localized; description: Localized; unitText: string }> = {
   real_growth_pct: {name:{ka:"წლიური რეალური ზრდა (%)",en:"Annual real growth (%)"},description:{ka:"წლიური მოცულობის ცვლილება, ფასების ეფექტის გარეშე.",en:"Annual change in volume, excluding price effects."},unitText:"%"},
   value: {name:{ka:"გამოქვეყნებული მაჩვენებელი",en:"Published value"},description:{ka:"ერთეული განსაზღვრულია სერიით.",en:"Unit and price basis are defined by each series."},unitText:"series-specific"},
   amount_gel: {
@@ -92,7 +97,7 @@ const MEASURES: Record<Measure, { name: Localized; description: Localized; unitT
 export const DATASETS: Record<
   FiscalDatasetId,
   {
-    measures: readonly Measure[];
+    measures: readonly FiscalMeasure[];
     keywords: Record<Locale, readonly string[]>;
     measurementTechnique: Localized;
   }

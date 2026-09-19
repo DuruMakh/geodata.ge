@@ -181,9 +181,9 @@ describe("public source resolution", () => {
         .map((source) => source.sourceId);
 
       expect(unresolved).toEqual([]);
-      // 117 shared sources plus two national-sector, seven inflation and three
+      // 117 shared sources plus two national-sector, eight inflation and three
       // regional-economy sources.
-      expect(snapshot.sources.length).toBe(129);
+      expect(snapshot.sources.length).toBe(130);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {

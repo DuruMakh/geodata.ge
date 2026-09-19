@@ -1,10 +1,15 @@
 import { queryGdpInput } from "./schemas";
 import { buildResponseMeta } from "./meta";
-import { buildObservationId, resolveDocumentIds } from "./observations";
+import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
+import {
+  buildObservationId,
+  caveatIdsForObservation,
+  countryLevelCaveatContext,
+  resolveDocumentIds,
+} from "./observations";
 import type { Observation } from "./observations";
 import { selectSources } from "./sources";
 import type {
-  Caveat,
   Coverage,
   FactQueryResponse,
   FactQuerySnapshot,
@@ -106,47 +111,19 @@ export function queryGdp(
       };
     }),
   );
-  const caveats: Caveat[] = [];
-  const add = (
-    code: string,
-    messageKa: string,
-    messageEn: string,
-    rows: Observation[],
-  ) => {
-    if (!rows.length) return;
-    caveats.push({
-      code,
-      severity: "note",
-      messageKa,
-      messageEn,
-      methodologyRef: "/methodology/gdp",
-      methodologyRefEn: "/en/methodology/gdp",
-      affects: rows.map((r) => `${r.seriesId}:${r.year}`),
-    });
-    rows.forEach((r) => r.caveatIds.push(code));
-  };
-  add(
-    "gdp_preliminary",
-    "მონაცემი წინასწარია და შეიძლება გადაიხედოს.",
-    "These observations are preliminary and subject to revision.",
-    observations.filter((o) => o.basis === "preliminary"),
-  );
-  add(
-    "gdp_historical_method",
-    "2009 წლის ჩათვლით გამოიყენება SNA 1993, 2010 წლიდან — SNA 2008; ისტორიული სერია ერთიანად გადახედილი არ არის.",
-    "Geostat nominal series use SNA 1993 through 2009 and SNA 2008 from 2010; the historical series is not uniformly revised.",
-    observations.filter(
-      (o) => o.availability === "available" && !o.seriesId.startsWith("real_"),
+  const caveats = evaluateCaveats(
+    snapshot,
+    countryLevelCaveatContext(
+      "gdp-overview",
+      "value",
+      input.years,
+      input.seriesIds,
+      observations,
     ),
+    CAVEAT_RULES,
   );
-  add(
-    "gdp_world_bank_history",
-    "ადრეული ისტორიული მონაცემების აღდგენის დეტალები წყაროს მეტამონაცემებში მითითებული არ არის.",
-    "The World Bank metadata does not specify how the earliest historical observations were reconstructed. Published values are preserved without custom rebasing or splicing.",
-    observations.filter(
-      (o) => o.availability === "available" && o.seriesId.startsWith("real_"),
-    ),
-  );
+  for (const observation of observations)
+    observation.caveatIds = caveatIdsForObservation(caveats, observation);
   const available = observations.filter((o) => o.availability === "available");
   const coverage: Coverage = {
     requestedYears: input.years,

@@ -182,6 +182,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     "gdp-overview": "gdp",
     "economic-sectors": "economic-sectors",
     "regional-economies": "regional-economies",
+    inflation: "inflation",
   }[input.datasetId];
   const entityCodes = (input.entityIds ?? []).flatMap((id) => {
     if (id.startsWith("region.")) return snapshot.municipal.municipalities.filter((m) => m.regionId === id).map((m) => m.code);
@@ -194,7 +195,10 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
         ? snapshot.deficit.facts.map((f) => f.sourceId)
         : input.datasetId === "gdp-overview" ? snapshot.gdpOverview.facts.map(f=>f.sourceId)
           : input.datasetId === "economic-sectors" ? snapshot.economicSectors.facts.map(f=>f.sourceId)
-            : input.datasetId === "regional-economies" ? snapshot.regionalEconomies.facts.map(f=>f.sourceId) : [],
+            : input.datasetId === "regional-economies" ? snapshot.regionalEconomies.facts.map(f=>f.sourceId)
+              : input.datasetId === "inflation"
+                ? [...snapshot.inflation.facts, ...snapshot.inflation.targets, ...snapshot.inflation.categories, ...snapshot.inflation.weights].map((row) => row.sourceId)
+                : [],
   );
 
   const sources: ResolvedSourceView[] = resolved.map((source) => {

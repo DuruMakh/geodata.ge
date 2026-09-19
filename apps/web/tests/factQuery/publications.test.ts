@@ -39,7 +39,7 @@ beforeAll(async () => {
   catalogueFile = allPublications.find((file) => file.fileName === "catalogue.json")!;
   sourcesFile = allPublications.find((file) => file.fileName === "sources.json")!;
   datasetFiles = allPublications.filter(
-    (file) => file.fileName.endsWith(".json") && !["catalogue.json", "sources.json", "manifest.json"].includes(file.fileName),
+    (file) => file.fileName.endsWith(".json") && !["catalogue.json", "sources.json", "manifest.json", "inflation-categories.json"].includes(file.fileName),
   );
 });
 
@@ -70,6 +70,7 @@ describe("catalogue.json", () => {
       "gdp-overview",
       "general-government-balance",
       "government-debt",
+      "inflation",
       "ministries",
       "municipal-expenditure",
       "national-expenditure",
@@ -187,6 +188,7 @@ describe("dataset publications", () => {
       "gdp-overview.json",
       "economic-sectors.json",
       "regional-economies.json",
+      "inflation-national.json",
     ]);
 
     for (const file of files) {
@@ -268,6 +270,9 @@ describe("dataset publications", () => {
       "economic-sectors.csv",
       "regional-economies.json",
       "regional-economies.csv",
+      "inflation-national.json",
+      "inflation-categories.csv",
+      "inflation-categories.json",
       "manifest.json",
     ]);
   });
@@ -326,8 +331,10 @@ describe("regressions from the Part 2 review", () => {
       // not a figure this service calculates - so there is no derived total
       // that could silently vanish, which is the regression above. Their
       // series level is the family (stock/service/rate). The balance file is
-      // not exempt: its single series IS a total.
-      if (!file.fileName.startsWith("government-debt")) {
+      // not exempt: its single series IS a total. Inflation is exempt for the
+      // same reason: its headline is Geostat's published series, not a total
+      // this service calculates.
+      if (!file.fileName.startsWith("government-debt") && file.fileName !== "inflation-national.json") {
         expect(advertised.length, `${file.fileName} advertises no total`).toBeGreaterThan(0);
       }
       for (const total of advertised) {
@@ -357,7 +364,7 @@ describe("regressions from the Part 2 review", () => {
     for (const file of datasetFiles) {
       const published = parse(file.bytes) as unknown as {
         caveats: { code: string; affects: string[] }[];
-        observations: { observationId: string; entityId: string; seriesId: string; year: number; caveatIds: string[] }[];
+        observations: { observationId: string; entityId: string; seriesId: string; year: number; period?: string; caveatIds: string[] }[];
       };
       const affectsByCode = new Map(published.caveats.map((caveat) => [caveat.code, new Set(caveat.affects)]));
 
@@ -373,6 +380,7 @@ describe("regressions from the Part 2 review", () => {
             `${observation.entityId}:${observation.year}`,
             `${observation.seriesId}:${observation.year}`,
             `${observation.entityId}:${observation.seriesId}:${observation.year}`,
+            ...(observation.period !== undefined ? [`${observation.seriesId}:${observation.period}`] : []),
           ];
           expect(
             shapes.some((shape) => affects!.has(shape)),

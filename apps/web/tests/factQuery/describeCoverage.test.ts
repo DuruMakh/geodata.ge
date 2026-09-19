@@ -63,6 +63,7 @@ describe("describeCoverage", () => {
       "gdp-overview",
       "general-government-balance",
       "government-debt",
+      "inflation",
       "ministries",
       "municipal-expenditure",
       "national-expenditure",
