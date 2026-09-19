@@ -1,3 +1,4 @@
+import { registryDebtSourceId } from "./sourceLineage";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import Decimal from "decimal.js";
@@ -124,7 +125,7 @@ function fact(
     value,
     valueKind,
     status,
-    sourceId: row.source_id || null,
+    sourceId: row.source_id ? registryDebtSourceId(row.source_id) : null,
     snapshotDate,
     lastReviewedAt: row.last_reviewed_at,
   };
