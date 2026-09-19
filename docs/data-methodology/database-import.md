@@ -242,9 +242,13 @@ npx prisma migrate diff --from-config-datasource --to-schema-datamodel prisma/sc
 ```
 
 Then place the SQL in a `prisma/migrations/<timestamp>_<name>/migration.sql`
-folder by hand, and add `ALTER TABLE "<Table>" ENABLE ROW LEVEL SECURITY;` for
-every new table — the generator does not emit RLS, and every mirror table here
-carries it.
+folder by hand, and for every new table add both
+`ALTER TABLE "<Table>" ENABLE ROW LEVEL SECURITY;` and
+`REVOKE ALL ON TABLE "<Table>" FROM anon, authenticated;` — the generator emits
+neither, and every mirror table here carries both. Give each migration folder a
+unique timestamp: `20260912000000_economic_sectors` and
+`20260912000000_inflation_cpi` share one and stay as applied, since renaming an
+applied migration breaks `_prisma_migrations`.
 
 **Verifying that workaround — `migrate status` is not enough.** `--from-config-datasource`
 diffs against the *live database*, not against migration history, so live drift

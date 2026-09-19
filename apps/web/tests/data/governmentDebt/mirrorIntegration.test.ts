@@ -35,4 +35,12 @@ describe.skipIf(!connectionString)("debt mirror source integrity", () => {
     await expect(client.query('DELETE FROM "SourceDocument" WHERE id = $1', ["source.mof_public_debt_bulletin_n25"]))
       .rejects.toMatchObject({ code: "23503", constraint: "GovernmentDebtFact_sourceId_fkey" });
   });
+  it.each(["GovernmentDebtFact", "GeneralGovernmentBalanceFact"])("keeps %s private from both API roles", async (table) => {
+    const relation = 'public."' + table + '"';
+    const grants = await client.query("SELECT role_name, has_table_privilege(role_name, $1, 'SELECT') AS allowed FROM (VALUES ('anon'), ('authenticated')) AS roles(role_name) ORDER BY role_name", [relation]);
+    expect(grants.rows).toEqual([{ role_name: "anon", allowed: false }, { role_name: "authenticated", allowed: false }]);
+    const rls = await client.query("SELECT relrowsecurity FROM pg_class WHERE oid = $1::regclass", [relation]);
+    expect(rls.rows).toEqual([{ relrowsecurity: true }]);
+  });
+
 });
