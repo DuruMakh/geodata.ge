@@ -32,6 +32,7 @@ const presentation = {
   englishLabels: {},
   messages: {
     "regionalEconomies.total": "Total regional GDP",
+    "regionalEconomies.region": "Region",
     "regionalEconomies.sector": "Economic activity",
     "regionalEconomies.nominal": "Nominal value in GEL",
     "regionalEconomies.shareOfRegionGdp": "Share of regional GDP",
@@ -58,16 +59,23 @@ test("nominal and share workbooks retain GEL numerators, percentage fractions, z
       "https://fiscal.ge",
     );
     expect(model.filename).toBe(`fiscal-regional-economy-imereti-${measure}-2023-2024-en.xlsx`);
+    expect(model.analysis.headers[0]).toBe("Region");
+    expect(model.analysis.rows[0]?.slice(0, 2)).toEqual(["Imereti", 2023]);
     expect(model.readable.rows[0].valuesByYear[2024]).toBe(measure === "nominal" ? 1 : 1);
-    expect(model.analysis.rows.find((row) => row[1] === "Mining and quarrying")?.[2]).toBe(0);
+    expect(model.analysis.rows.find((row) => row[2] === "Mining and quarrying")?.[3]).toBe(0);
     if (measure === "share_of_region_gdp") {
-      expect(model.analysis.rows.find((row) => row[1] === "Agriculture, forestry and fishing")?.slice(2, 4))
+      expect(model.analysis.rows.find((row) => row[2] === "Agriculture, forestry and fishing")?.slice(3, 5))
         .toEqual([250_000_000, 0.25]);
       expect(model.sources).toHaveLength(2);
     }
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(await createWorkbookBuffer(model));
     expect(workbook.worksheets).toHaveLength(3);
+    if (measure === "share_of_region_gdp") {
+      const readable = workbook.getWorksheet(model.sheetNames[0])!;
+      expect(readable.getCell("B5").value).toBe(0.25);
+      expect(readable.getCell("B5").numFmt).toContain("%");
+    }
   }
 });
 

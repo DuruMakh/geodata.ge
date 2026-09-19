@@ -38,6 +38,7 @@ for (const [name, route, testId] of [
   ["gdp-share", "/explorer/expenditure#g=fields&m=table&sh=1&r=2020-2025&sel=expenditure.total,spending.education"],
   ["ministries", "/explorer/expenditure#g=ministries&m=table&r=2014-2025&sel=admin_spending.total,admin_spending.defence"],
   ["receipts", "/explorer/revenue#m=table&r=2004-2025&sel=revenue.total,revenue.vat"],
+  ["regional-nominal", "/explorer/economy/regions/imereti#measure=nominal&view=table&sel=economy.regional_gdp_total,sector.a&range=all", "regional-excel-download"],
   ["regional-share", "/explorer/economy/regions/imereti#measure=share_of_region_gdp&view=table&sel=economy.regional_gdp_total,sector.a&range=all", "regional-excel-download"],
 ] as const) {
   test(`${name} downloads an English workbook with identical numbers and originals`, async ({ page, request }, testInfo) => {
@@ -49,6 +50,16 @@ for (const [name, route, testId] of [
     const records = sourceRecords(en.workbook);
     expect(records).toEqual(sourceRecords(ka.workbook));
     expect(records.length).toBeGreaterThan(0);
+    if (name.startsWith("regional-")) {
+      expect(en.workbook.worksheets[1].getCell("A1").value).toBe("Region");
+      expect(ka.workbook.worksheets[1].getCell("A1").value).toBe("რეგიონი");
+      expect(en.workbook.worksheets[1].getCell("A2").value).toBe("Imereti");
+      expect(ka.workbook.worksheets[1].getCell("A2").value).toBe("იმერეთი");
+    }
+    if (name === "regional-share") {
+      expect(en.workbook.worksheets[0].getCell("B5").numFmt).toContain("%");
+      expect(en.workbook.worksheets[1].getCell("E2").numFmt).toContain("%");
+    }
     en.workbook.eachSheet(sheet => sheet.eachRow(row => row.eachCell(cell => {
       expect(JSON.stringify(cell.value)).not.toMatch(/\p{Script=Georgian}/u);
       expect(cell.numFmt ?? "").not.toMatch(/\p{Script=Georgian}/u);

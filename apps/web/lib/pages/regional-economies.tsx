@@ -42,7 +42,6 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
   const model = buildRegionalEconomyMapModel({
     facts,
     regions: municipal.regions,
-    municipalities: municipal.municipalities,
   });
   const title = message(presentation.messages, "regionalEconomies.heading");
   const description = message(presentation.messages, "regionalEconomies.description");

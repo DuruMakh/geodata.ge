@@ -8,13 +8,18 @@ async function input() {
     loadRegionalEconomyFacts(),
     loadServedMunicipalData(),
   ]);
-  return { facts: regional.map((fact) => ({ ...fact, value: Number(fact.value) })), ...municipal };
+  return { facts: regional.map((fact) => ({ ...fact, value: Number(fact.value) })), regions: municipal.regions };
 }
 
 describe("regional economy map model", () => {
-  test("groups all verified municipality geometry into exactly eleven regions", async () => {
-    const { facts, regions, municipalities } = await input();
-    const model = buildRegionalEconomyMapModel({ facts, regions, municipalities });
+  test("builds exactly eleven region-level map paths without municipality pieces", async () => {
+    const { facts, regions } = await input();
+    const model = buildRegionalEconomyMapModel({ facts, regions });
+    const candidate = model as unknown as {
+      regions: Array<{ regionId: string; pathD?: string; bucket: number }>;
+      shapes?: unknown[];
+      markers?: unknown[];
+    };
 
     expect(model.year).toBe(2024);
     expect(model.firstYear).toBe(2010);
@@ -24,31 +29,42 @@ describe("regional economy map model", () => {
       totalGdpGel: 49_374_720_708.90671,
       rank: 1,
     });
-    expect(model.shapes).toHaveLength(60);
-    expect(model.markers).toHaveLength(5);
+    expect(candidate.regions.every((region) => typeof region.pathD === "string" && region.pathD.length > 0)).toBe(true);
+    expect(new Set(candidate.regions.map((region) => region.regionId))).toHaveLength(11);
+    expect("shapes" in candidate).toBe(false);
+    expect("markers" in candidate).toBe(false);
     expect(model.occupiedAreas).toHaveLength(2);
-    expect(new Set([...model.shapes.map((shape) => shape.code), ...model.markers.map((marker) => marker.code)]).size).toBe(64);
     expect(model.regions.every((region) => region.bucket >= 0 && region.bucket <= 5)).toBe(true);
   });
 
-  test("assigns every shape and marker the same GDP value and bucket as its region", async () => {
-    const { facts, regions, municipalities } = await input();
-    const model = buildRegionalEconomyMapModel({ facts, regions, municipalities });
-    const byRegion = new Map(model.regions.map((region) => [region.regionId, region]));
-    for (const piece of [...model.shapes, ...model.markers]) {
-      expect(piece.totalGdpGel).toBe(byRegion.get(piece.regionId)?.totalGdpGel);
-      expect(piece.bucket).toBe(byRegion.get(piece.regionId)?.bucket);
-    }
+  test("assigns one unique path, GDP value, and bucket to every published region", async () => {
+    const { facts, regions } = await input();
+    const model = buildRegionalEconomyMapModel({ facts, regions });
+    const mapRegions = model.regions as Array<(typeof model.regions)[number] & { pathD?: string }>;
+
+    expect(new Set(mapRegions.map((region) => region.pathD))).toHaveLength(11);
+    expect(mapRegions.every((region) => Number.isFinite(region.totalGdpGel) && region.totalGdpGel > 0)).toBe(true);
+    expect(mapRegions.every((region) => region.bucket >= 0 && region.bucket <= 5)).toBe(true);
   });
 
-  test("fails when a municipality or latest regional total cannot be resolved", async () => {
-    const { facts, regions, municipalities } = await input();
-    expect(() => buildRegionalEconomyMapModel({ facts, regions, municipalities: municipalities.slice(1) }))
-      .toThrow(/map geometry.*04|municipality.*04/i);
+  test("projects the regional boundaries across the visible map area", async () => {
+    const { facts, regions } = await input();
+    const model = buildRegionalEconomyMapModel({ facts, regions });
+    const coordinates = model.regions.flatMap((region) =>
+      [...region.pathD.matchAll(/[ML]([\d.]+) ([\d.]+)/g)].map((match) => [Number(match[1]), Number(match[2])]),
+    );
+    const xs = coordinates.map(([x]) => x!);
+    const ys = coordinates.map(([, y]) => y!);
+
+    expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThan(700);
+    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(300);
+  });
+
+  test("fails when a latest regional total cannot be resolved", async () => {
+    const { facts, regions } = await input();
     expect(() => buildRegionalEconomyMapModel({
       facts: facts.filter((fact) => fact.regionId !== "region.guria"),
       regions,
-      municipalities,
     })).toThrow(/regional GDP.*guria/i);
   });
 });

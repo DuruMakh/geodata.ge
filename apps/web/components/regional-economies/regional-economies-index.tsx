@@ -103,7 +103,7 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
       <div className="mt-9 border-t border-[var(--hairline)] pt-4">
         <SourceNote testId="regional-source-note">
           {sourceNote} {message(messages, "regionalEconomies.boundaries")} {" "}
-          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer" className="underline underline-offset-2">© OpenStreetMap contributors</a> (ODbL).
+          <a href="https://www.geoboundaries.org/" target="_blank" rel="noreferrer" className="underline underline-offset-2">geoBoundaries</a> (CC BY 3.0).
         </SourceNote>
       </div>
     </>

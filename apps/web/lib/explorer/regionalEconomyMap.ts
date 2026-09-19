@@ -1,8 +1,95 @@
-import type { Municipality, MunicipalRegion } from "../data/municipal/types";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { OCCUPIED_SOURCE_PATH } from "../data/municipalGeometry/source";
+import type { MunicipalRegion } from "../data/municipal/types";
 import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
-import { MUNICIPALITY_MAP_ARTIFACT } from "./municipalityMapData";
+import { GEORGIA_GEO } from "../landing/georgiaGeo";
 export { regionalEconomyHref } from "./regionalEconomyRoutes";
+
+const MAP_WIDTH = 1000;
+const MAP_HEIGHT = 540;
+const MAP_PADDING = 14;
+
+const GEO_ISO_TO_REGION_ID = {
+  "GE-AJ": "region.adjara",
+  "GE-GU": "region.guria",
+  "GE-IM": "region.imereti",
+  "GE-KA": "region.kakheti",
+  "GE-KK": "region.kvemo_kartli",
+  "GE-MM": "region.mtskheta_mtianeti",
+  "GE-RL": "region.racha_lechkhumi_kvemo_svaneti",
+  "GE-SZ": "region.samegrelo_zemo_svaneti",
+  "GE-SJ": "region.samtskhe_javakheti",
+  "GE-SK": "region.shida_kartli",
+  "GE-TB": "region.tbilisi",
+} as const;
+
+type Position = [number, number];
+type OccupiedFeature = {
+  properties: { key: "abkhazia" | "tskhinvali" };
+  geometry: {
+    type: "Polygon" | "MultiPolygon";
+    coordinates: Position[][] | Position[][][];
+  };
+};
+
+const occupiedFeatures = (JSON.parse(
+  readFileSync(path.resolve(/* turbopackIgnore: true */ process.cwd(), OCCUPIED_SOURCE_PATH), "utf8"),
+) as { features: OccupiedFeature[] }).features;
+
+function mercatorY(latitude: number): number {
+  const radians = latitude * Math.PI / 180;
+  return Math.log(Math.tan(Math.PI / 4 + radians / 2));
+}
+
+function mercatorX(longitude: number): number {
+  return longitude * Math.PI / 180;
+}
+
+function geometryPositions(feature: OccupiedFeature): Position[] {
+  const polygons = feature.geometry.type === "Polygon"
+    ? [feature.geometry.coordinates as Position[][]]
+    : feature.geometry.coordinates as Position[][][];
+  return polygons.flatMap((polygon) => polygon.flatMap((ring) => ring));
+}
+
+function createProjection() {
+  const positions = [
+    ...GEORGIA_GEO.outline,
+    ...occupiedFeatures.flatMap(geometryPositions),
+  ];
+  const xs = positions.map(([longitude]) => mercatorX(longitude));
+  const ys = positions.map(([, latitude]) => mercatorY(latitude));
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const scale = Math.min(
+    (MAP_WIDTH - MAP_PADDING * 2) / (maxX - minX),
+    (MAP_HEIGHT - MAP_PADDING * 2) / (maxY - minY),
+  );
+  const offsetX = (MAP_WIDTH - (maxX - minX) * scale) / 2;
+  const offsetY = (MAP_HEIGHT - (maxY - minY) * scale) / 2;
+  return ([longitude, latitude]: Position): Position => [
+    offsetX + (mercatorX(longitude) - minX) * scale,
+    offsetY + (maxY - mercatorY(latitude)) * scale,
+  ];
+}
+
+function ringPath(ring: Position[], project: (position: Position) => Position): string {
+  return ring.map((position, index) => {
+    const [x, y] = project(position);
+    return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+  }).join(" ") + " Z";
+}
+
+function occupiedPath(feature: OccupiedFeature, project: (position: Position) => Position): string {
+  const polygons = feature.geometry.type === "Polygon"
+    ? [feature.geometry.coordinates as Position[][]]
+    : feature.geometry.coordinates as Position[][][];
+  return polygons.flatMap((polygon) => polygon.map((ring) => ringPath(ring, project))).join(" ");
+}
 
 export type RegionalEconomyMapRegion = {
   regionId: string;
@@ -11,6 +98,7 @@ export type RegionalEconomyMapRegion = {
   totalGdpGel: number;
   rank: number;
   bucket: number;
+  pathD: string;
 };
 
 export type RegionalEconomyMapModel = {
@@ -18,9 +106,7 @@ export type RegionalEconomyMapModel = {
   firstYear: number;
   year: number;
   regions: RegionalEconomyMapRegion[];
-  shapes: Array<{ code: string; regionId: string; totalGdpGel: number; bucket: number }>;
-  markers: Array<{ code: string; regionId: string; x: number; y: number; totalGdpGel: number; bucket: number }>;
-  occupiedAreas: Array<{ key: "abkhazia" | "tskhinvali" }>;
+  occupiedAreas: Array<{ key: "abkhazia" | "tskhinvali"; pathD: string }>;
   legendMinGel: number;
   legendMaxGel: number;
 };
@@ -38,11 +124,9 @@ function quantileBucket(values: number[]) {
 export function buildRegionalEconomyMapModel({
   facts,
   regions,
-  municipalities,
 }: {
   facts: readonly ServedRegionalEconomyObservation[];
   regions: readonly MunicipalRegion[];
-  municipalities: readonly Municipality[];
 }): RegionalEconomyMapModel {
   const totalFacts = facts.filter((fact) => fact.seriesId === REGIONAL_GDP_TOTAL && fact.measure === "nominal");
   if (totalFacts.length === 0) throw new Error("Regional GDP totals are missing");
@@ -56,20 +140,11 @@ export function buildRegionalEconomyMapModel({
     latestByRegion.set(fact.regionId, fact.value);
   }
 
-  const municipalityByCode = new Map<string, Municipality>();
-  for (const municipality of municipalities) {
-    if (municipalityByCode.has(municipality.code)) throw new Error(`Duplicate municipality code ${municipality.code}`);
-    municipalityByCode.set(municipality.code, municipality);
-  }
-  const geometryCodes = new Set([
-    ...MUNICIPALITY_MAP_ARTIFACT.municipalityPaths.map((shape) => shape.code),
-    ...MUNICIPALITY_MAP_ARTIFACT.cityMarkers.map((marker) => marker.code),
-  ]);
-  for (const municipality of municipalities) {
-    if (!geometryCodes.has(municipality.code)) throw new Error(`Municipality ${municipality.code} has no map geometry`);
-  }
-  for (const code of geometryCodes) {
-    if (!municipalityByCode.has(code)) throw new Error(`Map geometry code ${code} has no municipality`);
+  const project = createProjection();
+  const pathByRegion = new Map<string, string>();
+  for (const geoRegion of GEORGIA_GEO.regions) {
+    const regionId = GEO_ISO_TO_REGION_ID[geoRegion.iso as keyof typeof GEO_ISO_TO_REGION_ID];
+    if (regionId) pathByRegion.set(regionId, ringPath(geoRegion.ring, project));
   }
 
   const regionRows = regions.map((region) => {
@@ -87,35 +162,30 @@ export function buildRegionalEconomyMapModel({
   const bucketOf = quantileBucket(regionRows.map((region) => region.totalGdpGel));
   const ranked = [...regionRows]
     .sort((left, right) => right.totalGdpGel - left.totalGdpGel || left.sortOrder - right.sortOrder)
-    .map((region, index): RegionalEconomyMapRegion => ({
-      regionId: region.regionId,
-      nameKa: region.nameKa,
-      slug: region.slug,
-      totalGdpGel: region.totalGdpGel,
-      rank: index + 1,
-      bucket: bucketOf(region.totalGdpGel),
-    }));
-  const regionById = new Map(ranked.map((region) => [region.regionId, region]));
-  const piece = (code: string) => {
-    const municipality = municipalityByCode.get(code);
-    if (!municipality) throw new Error(`Map geometry code ${code} has no municipality`);
-    const region = regionById.get(municipality.regionId);
-    if (!region) throw new Error(`Municipality ${code} references unknown region ${municipality.regionId}`);
-    return { code, regionId: region.regionId, totalGdpGel: region.totalGdpGel, bucket: region.bucket };
-  };
+    .map((region, index): RegionalEconomyMapRegion => {
+      const pathD = pathByRegion.get(region.regionId);
+      if (!pathD) throw new Error(`Missing regional map geometry for ${region.regionId}`);
+      return {
+        regionId: region.regionId,
+        nameKa: region.nameKa,
+        slug: region.slug,
+        totalGdpGel: region.totalGdpGel,
+        rank: index + 1,
+        bucket: bucketOf(region.totalGdpGel),
+        pathD,
+      };
+    });
+  if (pathByRegion.size !== regions.length) throw new Error("Regional map geometry contains an unknown region");
 
   return {
-    viewBox: MUNICIPALITY_MAP_ARTIFACT.viewBox,
+    viewBox: `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`,
     firstYear,
     year,
     regions: ranked,
-    shapes: MUNICIPALITY_MAP_ARTIFACT.municipalityPaths.map((shape) => piece(shape.code)),
-    markers: MUNICIPALITY_MAP_ARTIFACT.cityMarkers.map((marker) => ({
-      ...piece(marker.code),
-      x: marker.x,
-      y: marker.y,
+    occupiedAreas: occupiedFeatures.map((feature) => ({
+      key: feature.properties.key,
+      pathD: occupiedPath(feature, project),
     })),
-    occupiedAreas: MUNICIPALITY_MAP_ARTIFACT.occupiedAreas.map((area) => ({ key: area.key })),
     legendMinGel: Math.min(...regionRows.map((region) => region.totalGdpGel)),
     legendMaxGel: Math.max(...regionRows.map((region) => region.totalGdpGel)),
   };

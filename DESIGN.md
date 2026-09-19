@@ -947,7 +947,7 @@ The Economy hub also links to national economic sectors. Reuse the existing edit
 
 ## 26. Regional economy surfaces
 
-The Economy hub links to `/explorer/economy/regions`. Its index reuses the municipal geometry as an 11-region SVG map and a value-ranked list; both open ordinary region links. The map keeps the reviewed occupied-area overlays non-interactive and uses one keyboard stop per region with arrow-key movement. The index has no multi-region comparison chart.
+The Economy hub links to `/explorer/economy/regions`. Its index uses 11 region-level SVG boundaries and a value-ranked list; both open ordinary region links. Municipality boundaries and city markers are not drawn on this regional view. The map keeps the reviewed occupied-area overlays non-interactive and uses one keyboard stop per region with arrow-key movement. The index has no multi-region comparison chart.
 
 Each `/explorer/economy/regions/[id]` page reuses the editorial line chart, table, range strip, unlimited series panel, region picker, highlights and Excel action. Total regional GDP is first, selected by default and removable; all 20 NACE Rev. 2 activities are selectable. The joined measure control has exactly two choices: nominal GEL, shown with the literal `₾`, and share of that selected region's GDP, shown with Lucide `ChartPie`. There is no share of Georgia, real-growth, per-capita, USD, forecast or 2025 control.
 

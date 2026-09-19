@@ -39,7 +39,7 @@ export function buildRegionalEconomyWorkbookExportModel(
   const w = (key: Parameters<typeof workbookMessage>[1]) => workbookMessage(locale, key);
   const share = state.measure === "share_of_region_gdp";
   const measureLabel = t(share ? "shareOfRegionGdp" : "nominal");
-  const unitLabel = share ? measureLabel : message(messages, "format.bnGel");
+  const unitLabel = share ? w("workbook.percentShare") : message(messages, "format.bnGel");
   const definitions = rankRegionalEconomyDefinitions(regionalEconomyDefinitions(registry), model.endValues)
     .filter((definition) => state.selectedIds.includes(definition.id));
   const label = (definition: SectorDefinition) => locale === "en" ? definition.labelEn : definition.labelKa;
@@ -87,16 +87,18 @@ export function buildRegionalEconomyWorkbookExportModel(
     },
     analysis: {
       headers: [
+        t("region"),
         w("workbook.year"),
         t("sector"),
         w("workbook.amountGel"),
-        ...(share ? [measureLabel] : []),
+        ...(share ? [`${measureLabel} (%)`] : []),
         w("workbook.status"),
       ],
       rows: model.years.flatMap((year) => definitions.map((definition) => {
         const fact = byCell.get(`${definition.id}:${year}`);
         const amount = nominal.get(`${definition.id}:${year}`)?.value ?? null;
         return [
+          regionLabel,
           year,
           label(definition),
           amount,
@@ -104,7 +106,7 @@ export function buildRegionalEconomyWorkbookExportModel(
           w(fact ? "workbook.published" : "workbook.unavailable"),
         ];
       })),
-      numericFormats: share ? { 3: "#,##0.00", 4: "0.0%" } : { 3: "#,##0.00" },
+      numericFormats: share ? { 4: "#,##0.00", 5: "0.0%" } : { 4: "#,##0.00" },
     },
     sources: originals.map((source) => ({
       years: source.years,

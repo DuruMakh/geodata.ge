@@ -21,7 +21,6 @@ test("renders eleven linked map targets and ranked rows from one shared model", 
   const model = buildRegionalEconomyMapModel({
     facts: regional.map((fact) => ({ ...fact, value: Number(fact.value) })),
     regions: municipal.regions,
-    municipalities: municipal.municipalities,
   });
   const html = renderToStaticMarkup(
     <I18nProvider
@@ -53,7 +52,8 @@ test("renders eleven linked map targets and ranked rows from one shared model", 
   expect(html).toContain('href="/en/explorer/economy/regions/imereti"');
   expect(html).toContain("Imereti");
   expect(html).toContain("2024");
-  expect(html).toContain("© OpenStreetMap contributors");
+  expect((html.match(/data-testid="regional-map-path"/g) ?? [])).toHaveLength(11);
+  expect(html).toContain("geoBoundaries");
   expect((html.match(/data-occupied-overlay=""/g) ?? [])).toHaveLength(2);
   expect(html).not.toContain("share of Georgia");
 });

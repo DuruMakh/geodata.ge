@@ -30,6 +30,7 @@ const facts: ServedRegionalEconomyObservation[] = [2023, 2024].flatMap((year) =>
 
 const regionalMessages = {
   "regionalEconomies.heading": "Imereti regional economy",
+  "regionalEconomies.detailHeadingLead": "Regional economy —",
   "regionalEconomies.total": "Total regional GDP",
   "regionalEconomies.contextNominal": "GDP and sector GVA at current prices.",
   "regionalEconomies.contextShare": "Sector GVA divided by regional GDP.",
@@ -63,7 +64,11 @@ const regionalMessages = {
 test("selected-region workspace renders only the approved GEL and regional-share switch", async () => {
   const base = await getMessages("en", ["controls", "main", "format"]);
   const html = renderToStaticMarkup(
-    <I18nProvider locale="en" messages={{ ...base, ...regionalMessages }} englishLabels={{ "region.imereti": "Imereti" }}>
+    <I18nProvider locale="en" messages={{ ...base, ...regionalMessages }} englishLabels={{
+      "region.guria": "Guria",
+      "region.imereti": "Imereti",
+      "region.kakheti": "Kakheti",
+    }}>
       <RegionalEconomyExplorer
         facts={facts}
         registry={registry}
@@ -81,5 +86,9 @@ test("selected-region workspace renders only the approved GEL and regional-share
   expect(html).toContain("lucide-chart-pie");
   expect(html).toContain("1 / 21");
   expect(html).toContain("Total regional GDP");
+  expect(html).toContain("Regional economy —");
+  expect(html).toContain('data-testid="regional-entity-navigation"');
+  expect(html).toContain('href="/en/explorer/economy/regions/guria"');
+  expect(html).toContain('href="/en/explorer/economy/regions/kakheti"');
   expect(html).not.toMatch(/real growth|share of Georgia|USD|population|2025/i);
 });

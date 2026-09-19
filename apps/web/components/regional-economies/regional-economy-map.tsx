@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import municipalityMapDefinitions from "../../assets/municipality-map-definitions.svg";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
 import type { RegionalEconomyMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
@@ -74,40 +73,24 @@ export function RegionalEconomyMap({ model, activeRegionId, onActiveRegionChange
                   ?.querySelectorAll<SVGAElement>("[data-region-map-target]")[next]?.focus();
               }}
             >
-              <g>
-                {model.shapes.filter((shape) => shape.regionId === region.regionId).map((shape) => (
-                  <use
-                    key={shape.code}
-                    href={`${municipalityMapDefinitions.src}#municipality-shape-${shape.code}`}
-                    fill={MAP_RAMP[region.bucket]}
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    stroke={selected ? "var(--ink)" : "var(--hairline-soft)"}
-                    strokeWidth={selected ? 2.2 : 0.7}
-                    strokeLinejoin="round"
-                  />
-                ))}
-                {model.markers.filter((marker) => marker.regionId === region.regionId).map((marker) => (
-                  <circle
-                    key={marker.code}
-                    cx={marker.x}
-                    cy={marker.y}
-                    r={selected ? 9.5 : 7.5}
-                    fill={MAP_RAMP[region.bucket]}
-                    stroke="var(--tile)"
-                    strokeWidth={selected ? 2.2 : 1.2}
-                    vectorEffect="non-scaling-stroke"
-                  />
-                ))}
-              </g>
+              <path
+                data-testid="regional-map-path"
+                d={region.pathD}
+                fill={MAP_RAMP[region.bucket]}
+                fillRule="evenodd"
+                clipRule="evenodd"
+                stroke={selected ? "var(--ink)" : "var(--hairline-soft)"}
+                strokeWidth={selected ? 2.2 : 0.7}
+                strokeLinejoin="round"
+              />
             </a>
           );
         })}
         {model.occupiedAreas.map((area) => (
-          <use
+          <path
             key={area.key}
             data-occupied-overlay=""
-            href={`${municipalityMapDefinitions.src}#occupied-overlay-${area.key}`}
+            d={area.pathD}
             fill={`url(#${HATCH_ID})`}
             fillRule="evenodd"
             clipRule="evenodd"

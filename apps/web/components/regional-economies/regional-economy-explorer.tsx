@@ -1,6 +1,7 @@
 "use client";
 
 import { ChartPie, ChevronDown } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { SectorDefinition } from "../../lib/data/economicSectors/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
@@ -12,10 +13,13 @@ import {
   regionalEconomyDefinitions,
 } from "../../lib/explorer/regionalEconomies";
 import { buildRegionalEconomyWorkbookExportModel } from "../../lib/explorer/regionalEconomiesWorkbook";
+import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
 import { formatAmount, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
+import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
+import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -49,7 +53,7 @@ export function RegionalEconomyExplorer({
   siteOrigin: string;
 }) {
   const presentation = useI18n();
-  const { locale, messages } = presentation;
+  const { locale, messages, englishLabels } = presentation;
   const t = (key: string) => message(messages, `regionalEconomies.${key}`);
   const [pickerOpen, setPickerOpen] = useState(false);
   const { state, update } = useRegionalEconomyState(facts, registry);
@@ -61,16 +65,29 @@ export function RegionalEconomyExplorer({
   const series = model.series.map((entry) => ({ ...entry, label: labels.get(entry.id)! }));
   const totalRow = model.rows.find((row) => row.itemId === REGIONAL_GDP_TOTAL) ?? null;
   const regionLabel = locale === "en" ? region.labelEn : region.labelKa;
+  const orderedRegions = regions.slice().sort((left, right) => left.sortOrder - right.sortOrder);
+  const regionIndex = orderedRegions.findIndex((candidate) => candidate.id === region.id);
+  const previousRegion = orderedRegions[(regionIndex - 1 + orderedRegions.length) % orderedRegions.length]!;
+  const nextRegion = orderedRegions[(regionIndex + 1) % orderedRegions.length]!;
 
   return (
     <div data-testid="regional-economy-explorer" className="@container">
-      <div className="relative mt-[34px] mb-3">
+      <div className="relative mt-[34px] mb-3 flex flex-col gap-3 min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between">
         <h1 className="font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-          <button data-testid="region-picker-trigger" type="button" aria-expanded={pickerOpen} onClick={() => setPickerOpen((open) => !open)} className="inline-flex cursor-pointer items-center gap-2 text-left">
+          {t("detailHeadingLead")} {" "}
+          <button data-testid="region-picker-trigger" type="button" aria-expanded={pickerOpen} onClick={() => setPickerOpen((open) => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
             {regionLabel}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
           </button>
         </h1>
         <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={regions} activeRegionId={region.id} />
+        <span data-testid="regional-entity-navigation" className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink">
+          <Link href={pageHref(regionalEconomyHref(previousRegion.id), locale)} className="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
+            ← {publicLabel(locale, previousRegion.id, previousRegion.kaLabel, englishLabels)}
+          </Link>
+          <Link href={pageHref(regionalEconomyHref(nextRegion.id), locale)} className="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
+            {publicLabel(locale, nextRegion.id, nextRegion.kaLabel, englishLabels)} →
+          </Link>
+        </span>
       </div>
       <p data-testid="regional-headline" className="mb-2 text-[13px] text-[var(--body)]">
         {t("total")} · {model.headline?.year ?? "—"}: <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{share ? formatShare(model.headline ? model.headline.value / 100 : null) : formatAmount(model.headline?.value, locale)}</span>

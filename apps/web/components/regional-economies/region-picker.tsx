@@ -30,15 +30,19 @@ export function RegionPicker({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const baseId = useId();
+  const allRegionsLabel = message(messages, "regionalEconomies.allRegions");
+  const needle = query.trim();
+  const includeAll = !needle || matchesLabelQuery(needle, [allRegionsLabel]);
   const filtered = useMemo(() => {
-    const needle = query.trim();
     return needle
       ? regions.filter((region) => matchesLabelQuery(needle, [
           region.kaLabel,
           publicLabel("en", region.id, region.kaLabel, englishLabels),
         ]))
       : [...regions];
-  }, [englishLabels, query, regions]);
+  }, [englishLabels, needle, regions]);
+  const optionCount = filtered.length + (includeAll ? 1 : 0);
+  const regionOffset = includeAll ? 1 : 0;
 
   const [previousOpen, setPreviousOpen] = useState(open);
   if (open !== previousOpen) {
@@ -64,18 +68,27 @@ export function RegionPicker({
 
   if (!open) return null;
   const select = (index: number) => {
-    const region = filtered[index];
+    if (includeAll && index === 0) {
+      window.location.href = pageHref("/explorer/economy/regions", locale);
+      return;
+    }
+    const region = filtered[index - regionOffset];
     if (!region) return;
     window.location.href = pageHref(regionalEconomyHref(region.id), locale);
   };
   const move = (delta: 1 | -1) => {
-    if (!filtered.length) return;
+    if (!optionCount) return;
     const next = activeIndex === null
-      ? delta === 1 ? 0 : filtered.length - 1
-      : (activeIndex + delta + filtered.length) % filtered.length;
+      ? delta === 1 ? 0 : optionCount - 1
+      : (activeIndex + delta + optionCount) % optionCount;
     setActiveIndex(next);
   };
   const listboxId = `${baseId}-listbox`;
+  const activeOptionId = activeIndex === null
+    ? undefined
+    : activeIndex === 0 && includeAll
+      ? `${baseId}-all`
+      : `${baseId}-${filtered[activeIndex - regionOffset]?.id}`;
 
   return (
     <div className="relative">
@@ -88,7 +101,7 @@ export function RegionPicker({
             aria-expanded="true"
             aria-controls={listboxId}
             aria-autocomplete="list"
-            aria-activedescendant={activeIndex === null ? undefined : `${baseId}-${filtered[activeIndex]?.id}`}
+            aria-activedescendant={activeOptionId}
             value={query}
             onChange={(event) => { setQuery(event.target.value); setActiveIndex(null); }}
             onKeyDown={(event) => {
@@ -103,27 +116,29 @@ export function RegionPicker({
           />
         </div>
         <div id={listboxId} role="listbox" aria-label={message(messages, "regionalEconomies.pickerResults")} className="max-h-[340px] overflow-y-auto">
-          <Link href={pageHref("/explorer/economy/regions", locale)} role="option" aria-selected="false" tabIndex={-1} onClick={onClose} className="block border-b border-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-[12px] font-semibold text-[var(--accent)]">
-            {message(messages, "regionalEconomies.allRegions")}
-          </Link>
+          {includeAll ? (
+            <Link id={`${baseId}-all`} data-testid="region-picker-all-option" href={pageHref("/explorer/economy/regions", locale)} role="option" aria-selected={activeIndex === 0} tabIndex={-1} onClick={onClose} className={`block border-b border-l-2 border-b-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-[12px] font-semibold text-[var(--accent)] ${activeIndex === 0 ? "border-l-[var(--ink)]" : "border-l-transparent"}`}>
+              {allRegionsLabel}
+            </Link>
+          ) : null}
           {filtered.map((region, index) => (
             <Link
               key={region.id}
               id={`${baseId}-${region.id}`}
               href={pageHref(regionalEconomyHref(region.id), locale)}
               role="option"
-              aria-selected={index === activeIndex}
+              aria-selected={index + regionOffset === activeIndex}
               aria-current={region.id === activeRegionId ? "page" : undefined}
               tabIndex={-1}
               data-testid="region-picker-option"
               onClick={onClose}
-              className={`block border-b border-l-2 border-b-[var(--row-border)] px-3 py-2 text-[13px] ${index === activeIndex ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"} ${region.id === activeRegionId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
+              className={`block border-b border-l-2 border-b-[var(--row-border)] px-3 py-2 text-[13px] ${index + regionOffset === activeIndex ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"} ${region.id === activeRegionId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
             >
               {publicLabel(locale, region.id, region.kaLabel, englishLabels)}
             </Link>
           ))}
         </div>
-        {filtered.length === 0 ? (
+        {optionCount === 0 ? (
           <div className="px-3 py-6 text-center text-[13px]">
             <span role="status">{message(messages, "regionalEconomies.empty")}</span>
             <button type="button" onClick={() => { setQuery(""); inputRef.current?.focus(); }} className="mt-3 block w-full text-[12px] text-[var(--accent)]">{message(messages, "regionalEconomies.clearSearch")}</button>
