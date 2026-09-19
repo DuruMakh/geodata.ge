@@ -28,7 +28,7 @@ Hash keys are not renamed. Code unification is spec 8.
   - Continuous changes (range, selection) use `history.replaceState`.
   - Only the sectors measure and view switches use `history.pushState`.
   - Every history call sits in `try { … } catch { /* History can be unavailable in some embedded contexts; the UI still works. */ }`, as in `components/main-explorer/use-explorer-state.ts:188-192`.
-- **Reference implementation:** the budget explorer (`use-explorer-state.ts:181-193`). Effects depend on the serialized hash string, not the state object, so React StrictMode's double effects in `next dev` cannot stamp a URL.
+- **Reference implementation:** the budget explorer (`use-explorer-state.ts:181-193`). Effects depend on the serialized hash string, not the state object. Corrected after code review (2026-09-19): that dependency is not what keeps React StrictMode's doubled mount effects in `next dev` from stamping a URL. The `ready` gate is. While `ready` is false, both doubled runs return before touching the ref, and the skip is spent on the single run when `ready` turns true. The budget explorer's ungated version keeps its ref across StrictMode's simulated remount, so by the reviewer's reading its second mount run writes the default hash in `next dev`. Production is unaffected. This was not reproduced here: this machine's dev server cannot fetch Google Fonts, so its pages return 500. Spec 8 should standardise on the gated writer.
 - **Test loop:** targeted tests while editing; the full gates run once, in Task 8. Browser specs need `NEXT_PUBLIC_SITE_URL=https://fiscal.ge` and `CI=1`: with `CI=1`, `playwright.config.ts` builds and serves production on port 3100 (which must be free); without it the config starts `next dev`, where hydration-dependent interactions are unreliable. Each `CI=1` run pays a build, so red and green runs of neighbouring tasks can share one.
 
 ---
@@ -304,6 +304,8 @@ git commit -m "fix(economy): keep range and selection changes out of sectors bro
 ---
 
 ### Task 3: Debt "Clear" can be undone from the same control
+
+> Changed after code review (2026-09-19), by user decision: restoring the family default below put a full checkmark on every page load next to `1 / 9`. The shipped panel follows DESIGN.md §7.7 instead. An empty selection's `ყველას მონიშვნა` selects the active family's three rows, and the checkbox is full only when all three are selected. See the amended spec §1.2 and §3, and the commit "let the empty bulk control select the active family's rows". The steps below are the original execution record.
 
 **Files:**
 - Modify: `apps/web/components/debt/debt-series-panel.tsx`: imports at lines 9 and 11, props type at lines 14–22, destructuring at lines 34–42, the `SeriesSelector` props at lines 94–98
