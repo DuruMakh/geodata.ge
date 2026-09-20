@@ -9,6 +9,7 @@ import {
 import { stableIdSchema } from "../validation";
 import type { ServedGeneralGovernmentBalanceFact } from "../../servedRows";
 import type { GeneralGovernmentBalanceFact } from "./types";
+import { resolveServedDataSource } from "../servedDataSource";
 
 const EXPECTED_YEARS = Array.from({ length: 37 }, (_, index) => 1995 + index);
 
@@ -108,17 +109,11 @@ export function toServedGeneralGovernmentBalanceFact(
 export async function loadServedGeneralGovernmentBalanceData(): Promise<{
   facts: ServedGeneralGovernmentBalanceFact[];
 }> {
-  const raw = (process.env.GEODATA_DATA_SOURCE ?? "").trim().toLowerCase();
   const csvFacts = async () =>
     (await loadGeneralGovernmentBalanceFacts(SERVING_PATH)).map(
       toServedGeneralGovernmentBalanceFact,
     );
-  if (raw !== "db") {
-    if (raw !== "" && raw !== "csv") {
-      throw new Error(`GEODATA_DATA_SOURCE must be "db" or "csv", got "${raw}"`);
-    }
-    return { facts: await csvFacts() };
-  }
+  if (resolveServedDataSource() === "csv") return { facts: await csvFacts() };
 
   const { loadGeneralGovernmentBalanceFactsFromDb } = await import("../../db/servedDataDb");
   const [dbFacts, reviewedCsvFacts] = await Promise.all([

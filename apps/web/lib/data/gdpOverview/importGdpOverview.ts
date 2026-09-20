@@ -8,6 +8,7 @@ import {
   type GdpSeriesId,
   type ServedGdpObservation,
 } from "./types";
+import { resolveServedDataSource } from "../servedDataSource";
 
 export function assertGdpParity(csv: GdpObservation[], db: GdpObservation[]) {
   validateGdpObservations(csv);
@@ -50,9 +51,7 @@ export async function loadGdpOverviewFacts(
 export async function loadServedGdpOverviewData(): Promise<{
   facts: ServedGdpObservation[];
 }> {
-  const mode = (process.env.GEODATA_DATA_SOURCE ?? "csv").trim().toLowerCase();
-  if (mode !== "csv" && mode !== "" && mode !== "db")
-    throw new Error("Invalid GEODATA_DATA_SOURCE");
+  const mode = resolveServedDataSource();
   let facts = await loadGdpOverviewFacts();
   if (mode === "db") {
     const { loadGdpOverviewFactsFromDb } = await import(

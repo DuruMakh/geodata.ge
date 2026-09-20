@@ -30,7 +30,7 @@ test("serving projects exact decimals to numbers only after validation", async (
 test("serving rejects an unknown data source before reading facts", async () => {
   vi.stubEnv("GEODATA_DATA_SOURCE", "unknown");
   try {
-    await expect(loadServedRegionalEconomyData()).rejects.toThrow("Invalid GEODATA_DATA_SOURCE");
+    await expect(loadServedRegionalEconomyData()).rejects.toThrow('GEODATA_DATA_SOURCE must be "db" or "csv", got "unknown"');
   } finally {
     vi.unstubAllEnvs();
   }

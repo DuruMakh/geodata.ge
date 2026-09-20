@@ -4,6 +4,7 @@ import { readCsvRecords } from "../csv";
 import { assertSameServedRows } from "../servedDataParity";
 import { validateSectorObservations } from "./validation";
 import type { SectorDefinition, SectorObservation, ServedSectorObservation } from "./types";
+import { resolveServedDataSource } from "../servedDataSource";
 
 // Read at build time, like the canonical CSVs; the taxonomy is outside the app's bundle root.
 const registry: SectorDefinition[] = JSON.parse(readFileSync(path.resolve(/* turbopackIgnore: true */ process.cwd(), "../../data/taxonomy/economic-sectors.json"), "utf8"));
@@ -33,8 +34,7 @@ export async function loadEconomicSectorFacts(
 }
 
 export async function loadServedEconomicSectorsData(): Promise<{ facts: ServedSectorObservation[] }> {
-  const mode = (process.env.GEODATA_DATA_SOURCE ?? "csv").trim().toLowerCase();
-  if (!["", "csv", "db"].includes(mode)) throw new Error("Invalid GEODATA_DATA_SOURCE");
+  const mode = resolveServedDataSource();
   let facts = await loadEconomicSectorFacts();
   if (mode === "db") {
     const { loadEconomicSectorFactsFromDb } = await import("../../db/servedDataDb");

@@ -23,6 +23,7 @@ import {
   validateCpiFacts,
   validateTargetRows,
 } from "./validateInflation";
+import { resolveServedDataSource } from "../servedDataSource";
 
 // Relative to apps/web, like every served CSV path (lib/data/servedData.ts).
 export const CPI_FACTS_CSV = "../../data/imports/cpi-national-monthly.csv";
@@ -142,8 +143,7 @@ async function loadServedInflationDataUncached(): Promise<{
   categories: ServedCpiCategoryFact[];
   weights: ServedBasketWeightRow[];
 }> {
-  const mode = (process.env.GEODATA_DATA_SOURCE ?? "csv").trim().toLowerCase();
-  if (mode !== "csv" && mode !== "" && mode !== "db") throw new Error("Invalid GEODATA_DATA_SOURCE");
+  const mode = resolveServedDataSource();
   let facts = await loadCpiFacts();
   let targets = await loadInflationTargets();
   let categories = await loadCpiCategoryFacts();

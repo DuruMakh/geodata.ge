@@ -9,6 +9,7 @@ import type {
   ServedRegionalEconomyObservation,
 } from "./types";
 import { validateRegionalEconomyObservations } from "./validation";
+import { resolveServedDataSource } from "../servedDataSource";
 
 const repositoryFile = (relativePath: string) =>
   path.resolve(/* turbopackIgnore: true */ process.cwd(), relativePath);
@@ -71,8 +72,7 @@ export async function loadRegionalEconomyFacts(
 export async function loadServedRegionalEconomyData(): Promise<{
   facts: ServedRegionalEconomyObservation[];
 }> {
-  const mode = (process.env.GEODATA_DATA_SOURCE ?? "csv").trim().toLowerCase();
-  if (!["", "csv", "db"].includes(mode)) throw new Error("Invalid GEODATA_DATA_SOURCE");
+  const mode = resolveServedDataSource();
   let facts = await loadRegionalEconomyFacts();
   if (mode === "db") {
     const { loadRegionalEconomyFactsFromDb } = await import("../../db/servedDataDb");

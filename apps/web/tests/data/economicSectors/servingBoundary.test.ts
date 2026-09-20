@@ -12,6 +12,6 @@ test("serving sectors reads reviewed facts without workbook preparation", async 
 });
 test("serving rejects an unknown data source before reading facts", async () => {
   vi.stubEnv("GEODATA_DATA_SOURCE", "unknown");
-  try { await expect(loadServedEconomicSectorsData()).rejects.toThrow("Invalid GEODATA_DATA_SOURCE"); }
+  try { await expect(loadServedEconomicSectorsData()).rejects.toThrow('GEODATA_DATA_SOURCE must be "db" or "csv", got "unknown"'); }
   finally { vi.unstubAllEnvs(); }
 });
