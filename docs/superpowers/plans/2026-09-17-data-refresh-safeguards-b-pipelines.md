@@ -1040,7 +1040,7 @@ Expected: all tests pass, including `tests/browser/gdp.spec.ts` and `tests/brows
 5. `query_gdp` for `real_growth_percent` 2025 returns `gdp_world_bank_preliminary_basis`; for 2019 it does not.
 6. `npx vitest run tests/factQuery/reference.test.ts` passes with the fixture untouched.
 
-- [ ] **Step 5: Hand off**
+- [x] **Step 5: Hand off**
 
 Push `codex/data-refresh-safeguards-pipelines` and open a draft PR. State in the description that the rendered figures are unchanged, that the new caveat is the one service-output change, and whether db-mode was verified. Merge only after CI is green.
 
@@ -1053,6 +1053,7 @@ Push `codex/data-refresh-safeguards-pipelines` and open a draft PR. State in the
 ## Execution record
 
 - Branch: `codex/data-refresh-safeguards-pipelines`, based on `origin/main` at `248036d16` while Plan A remained unmerged.
+- Draft handoff: [PR #125](https://github.com/DuruMakh/geodata.ge/pull/125). Merge remains gated on required CI and is not part of this execution.
 - Final `npm run check`: 265 test files and 2,273 tests passed after the independent review fix pass; lint, type checking, data validation, and localization passed. The new nominal-GDP gate reported 1996–2025 and 47 comparisons.
 - CSV-mode `npm run build`: 235 static pages generated; all 19 publication hashes verified with data version `7545ee565484f2502e7a666871426412e48dfa32c804ad7790a581ae0abb213f`.
 - Database-mode build was not run because this isolated worktree has no Supabase `.env`.
