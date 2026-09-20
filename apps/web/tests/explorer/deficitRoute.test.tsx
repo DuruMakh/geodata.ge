@@ -50,4 +50,20 @@ describe("general-government deficit route composition", () => {
     expect(text).toContain("უარყოფითი მნიშვნელობა დეფიციტია");
     expect(markup).not.toContain('data-testid="site-footer"');
   });
+  it("marks the first projection year declared by the full facts", async () => {
+    const { DeficitExplorer } = await import("../../components/deficit/deficit-explorer");
+    const shifted = [
+      ...facts.map((fact) => ({ ...fact, status: "actual" as const })),
+      { ...facts[2]!, year: 2027 },
+    ];
+    const markup = renderGeorgianMarkup(createElement(DeficitExplorer, {
+      facts: shifted,
+      workbookSources: [],
+      lastUpdatedAt: "2026-09-04",
+    }));
+    const marker = /<[^>]*data-testid="range-marker"[\s\S]*?<\/[a-z]+>/.exec(markup)?.[0] ?? "";
+    // 2027 is the right endpoint of the 2024–2027 rail.
+    expect(marker).toContain('style="left:100.00%"');
+  });
+
 });
