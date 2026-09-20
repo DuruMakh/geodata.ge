@@ -87,9 +87,12 @@ function claimsFor(locale: Locale): Array<{ key: string; figures: string[] }> {
     { key: "gdp.per_capitaSummary.recent", figures: [String(last)] },
     { key: "gdp.growthSummary.recent", figures: [String(last), String(last - 1)] },
     ...["gdp.nominalSummary.periods", "gdp.per_capitaSummary.periods"].map((key) => ({
-      key, figures: [String(last - 10), String(last - 5), String(last)],
+      key, figures: [String(last - 5), String(last), String(last - 10), String(last)],
     })),
-    { key: "gdp.summary.recent", figures: [String(realYears[0]), String(last), String(last - 5), String(last - 10)] },
+    {
+      key: "gdp.summary.recent",
+      figures: [String(last), String(realYears[0]), String(last), String(last - 5), String(last), String(last - 10), String(last), String(last - 5)],
+    },
     { key: "gdp.summary.sovietGrowth", figures: [String(sovietYears[0]), "1990", String(peakYear)] },
     { key: "gdp.nominalSummary.note", figures: ["2010"] }, // reviewed accounting-method boundary
     { key: "gdp.per_capitaSummary.note", figures: ["2010"] },
@@ -106,27 +109,70 @@ const tokenPattern = {
   ka: /(?:\d{1,3}(?: \d{3})+(?:,\d+)?|\d+(?:,\d+)?)%?/g,
 } as const;
 
+function assertSummaryFigures(messages: Messages, locale: Locale): void {
+  const claims = claimsFor(locale);
+
+  for (const claim of claims) {
+    const value = messages[claim.key];
+    expect(value, claim.key).toBeTypeOf("string");
+    const tokens: string[] = [...(value!.match(tokenPattern[locale]) ?? [])];
+    let cursor = 0;
+    for (const figure of claim.figures) {
+      const index = tokens.indexOf(figure, cursor);
+      expect(index, `${claim.key} should quote ${figure} after its preceding figures`).toBeGreaterThanOrEqual(cursor);
+      cursor = index + 1;
+    }
+  }
+
+  // Completeness: no unlisted number may hide in the reviewed copy.
+  for (const key of Object.keys(messages).filter((key) => /^gdp\.(?:summary|nominalSummary|growthSummary|per_capitaSummary)\./.test(key))) {
+    const allowed = new Set(claims.filter((claim) => claim.key === key).flatMap((claim) => claim.figures));
+    const tokens = messages[key]!.match(tokenPattern[locale]) ?? [];
+    for (const token of tokens) {
+      expect(allowed.has(token), `${key} quotes an unchecked figure: ${token}`).toBe(true);
+    }
+  }
+
+  const growth = seriesOf("real_growth_percent");
+  const last = yearsOf(growth).at(-1)!;
+  const latestGrowth = at(growth, last);
+  const latestFigure = `${num(latestGrowth, 1, locale)}%`;
+  const directionClaim =
+    latestGrowth >= 0
+      ? locale === "en"
+        ? `grew by ${latestFigure}`
+        : `${latestFigure}-ით გაიზარდა`
+      : locale === "en"
+        ? `contracted by ${latestFigure}`
+        : `${latestFigure}-ით შემცირდა`;
+  expect(messages["gdp.growthSummary.recent"], `latest growth wording should say ${directionClaim}`).toContain(directionClaim);
+}
+
 describe.each(["ka", "en"] as const)("GDP summary figures: %s", (locale) => {
   it("quotes only figures the canonical CSV reproduces", () => {
+    assertSummaryFigures(messagesByLocale.get(locale)!, locale);
+  });
+
+  it("rejects swapped valid years and values", () => {
     const messages = messagesByLocale.get(locale)!;
-    const claims = claimsFor(locale);
+    const original = messages["gdp.growthSummary.recent"]!;
+    const [currentValue, previousValue] = locale === "en" ? ["7.5%", "9.7%"] : ["7,5%", "9,7%"];
+    const swappedValues = original
+      .replace(currentValue, "__CURRENT__")
+      .replace(previousValue, currentValue)
+      .replace("__CURRENT__", previousValue);
+    const swappedYears = original.replace("2025", "__CURRENT__").replace("2024", "2025").replace("__CURRENT__", "2024");
 
-    for (const claim of claims) {
-      const value = messages[claim.key];
-      expect(value, claim.key).toBeTypeOf("string");
-      for (const figure of claim.figures) {
-        expect(value!.match(tokenPattern[locale]) ?? [], `${claim.key} should quote ${figure}`).toContain(figure);
-      }
-    }
+    expect(() => assertSummaryFigures({ ...messages, "gdp.growthSummary.recent": swappedValues }, locale)).toThrow();
+    expect(() => assertSummaryFigures({ ...messages, "gdp.growthSummary.recent": swappedYears }, locale)).toThrow();
+  });
 
-    // Completeness: no unlisted number may hide in the reviewed copy.
-    for (const key of Object.keys(messages).filter((key) => /^gdp\.(?:summary|nominalSummary|growthSummary|per_capitaSummary)\./.test(key))) {
-      const allowed = new Set(claims.filter((claim) => claim.key === key).flatMap((claim) => claim.figures));
-      const tokens = messages[key]!.match(tokenPattern[locale]) ?? [];
-      for (const token of tokens) {
-        expect(allowed.has(token), `${key} quotes an unchecked figure: ${token}`).toBe(true);
-      }
-    }
+  it("rejects wording that reverses the latest growth direction", () => {
+    const messages = messagesByLocale.get(locale)!;
+    const original = messages["gdp.growthSummary.recent"]!;
+    const reversed = locale === "en" ? original.replace("grew", "contracted") : original.replace("გაიზარდა", "შემცირდა");
+
+    expect(() => assertSummaryFigures({ ...messages, "gdp.growthSummary.recent": reversed }, locale)).toThrow();
   });
 
   it("states data facts that still hold", () => {

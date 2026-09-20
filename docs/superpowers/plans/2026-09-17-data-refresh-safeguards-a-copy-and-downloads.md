@@ -817,6 +817,16 @@ Push `codex/data-refresh-safeguards-copy` and open a draft PR. Flag the reworded
 
 Delivery: [draft PR #124](https://github.com/DuruMakh/geodata.ge/pull/124). GitHub records subsequent CI and merge state.
 
+## Follow-up review fix pass (2026-09-21)
+
+A fresh review of the current branch found one Important test-design gap and one Minor whitespace defect. Both were fixed inline:
+
+- GDP summary checks now require each claim's expected figures to appear in order. Swapping the current and previous year or their two valid growth values fails in both locales instead of passing an unordered membership check.
+- The latest growth value is tied to direction-sensitive wording (`grew by` / `contracted by` and the Georgian equivalents), so reversing the prose while retaining the same number fails.
+- The trailing whitespace in `docs/data-methodology/gdp-overview.md` was removed; the full branch range now passes `git diff --check`.
+
+The two regression cases were observed failing before the checker changed, then passing. Focused verification passed 5 files / 40 tests. Final `npm run check` passed lint, type checking, 263 files / 2,269 tests, all data validation, and localization. The production build generated 235 pages and verified 19 publications with data version `881113cae4fe683331ef75ddd067d08bcb7f5df376aa8f9ea1244030d7e106ff`. The browser suite was not repeated because this pass changed only safeguards and documentation, with no rendered UI input or component change. Deferred minors: none.
+
 ### Execution rulings and limits
 
 - Consolidate plan Tasks 2/3 browser runs and Task 4 full data/build gates into Task 6 production acceptance — repository forbids repeating unchanged passing gates — cost if wrong: browser-only problems appear later.
