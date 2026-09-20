@@ -1053,10 +1053,10 @@ Push `codex/data-refresh-safeguards-pipelines` and open a draft PR. State in the
 ## Execution record
 
 - Branch: `codex/data-refresh-safeguards-pipelines`, based on `origin/main` at `248036d16` while Plan A remained unmerged.
-- `npm run check`: 265 test files and 2,270 tests passed; lint, type checking, data validation, and localization passed. The new nominal-GDP gate reported 1996–2025 and 47 comparisons.
+- Final `npm run check`: 265 test files and 2,273 tests passed after the independent review fix pass; lint, type checking, data validation, and localization passed. The new nominal-GDP gate reported 1996–2025 and 47 comparisons.
 - CSV-mode `npm run build`: 235 static pages generated; all 19 publication hashes verified with data version `7545ee565484f2502e7a666871426412e48dfa32c804ad7790a581ae0abb213f`.
 - Database-mode build was not run because this isolated worktree has no Supabase `.env`.
-- Production-build browser suite: 570 tests passed. English and Georgian real and nominal GDP notes were also checked interactively, with no framework error overlay and working home navigation.
+- Production-build browser suite: 570 tests passed. English and Georgian real and nominal GDP notes were also checked interactively, with no framework error overlay and working home navigation. The browser suite was not repeated after the review fix pass because those fixes changed only offline preparation and validation code, not browser inputs.
 - Acceptance mutations were restored byte-for-byte: a 2025 sector-total digit change failed the full data gate naming `economy.gdp_total 2025`; a manifest change to `[2024]` failed the workbook-header check; four 2020 Geostat rows marked preliminary failed the runtime “newest years” invariant.
 - `query_gdp` returns `gdp_world_bank_preliminary_basis` for 2025 real growth and omits it for settled 2019; the 34-intent fixture remained unchanged and its 45 assertions passed.
 
@@ -1071,3 +1071,13 @@ Push `codex/data-refresh-safeguards-pipelines` and open a draft PR. State in the
 7. The unrestricted query-suite run hit two existing 30-second setup timeouts under excessive worker concurrency; the complete suite passed 610 tests with the repository's standard four-worker limit.
 8. Methodology text states the verified five-decimal comparison rather than the plan's false “digit for digit” claim, and names the current 34-intent fixture rather than the stale count of 20.
 9. The runtime newest-year acceptance mutation changed all four Geostat 2020 series together, isolating that invariant instead of first triggering the cross-series disagreement check.
+
+### Independent review
+
+The single fresh-context whole-branch review found no Critical or Minor issues and three Important future-refresh gaps. One test-driven fix pass closed all three:
+
+1. The nominal-GDP consistency gate now requires complete national coverage and complete sector coverage from its established 2010 start, so an artifact that stops a year early fails.
+2. GDP preparation now reconciles every observed World Bank growth year against its level series and derives Geostat currency-check years from extracted observations, so a contradictory future endpoint fails.
+3. The WEO manifest now requires its source ID, publication month/year, archived filename, and retrieved filename to describe the same April or October edition.
+
+Each regression was observed failing before the fix, then passing. The final full suite passed 2,273 tests and the final CSV production build again generated 235 pages and verified all 19 publication hashes.
