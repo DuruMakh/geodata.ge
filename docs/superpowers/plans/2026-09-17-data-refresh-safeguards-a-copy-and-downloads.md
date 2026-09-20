@@ -787,7 +787,7 @@ Expected: all tests pass.
 4. The deficit workbook's Sources sheet shows the IMF URL, the retrieval date and the manifest's year range.
 5. `public/downloads/data` holds one copy of each CSV, and `npm run build` passes with the postbuild output check.
 
-- [ ] **Step 5: Hand off**
+- [x] **Step 5: Hand off**
 
 Push `codex/data-refresh-safeguards-copy` and open a draft PR. Flag the reworded deficit source sentence for owner approval. Merge only after CI is green.
 
@@ -814,3 +814,20 @@ Push `codex/data-refresh-safeguards-copy` and open a draft PR. Flag the reworded
 - Independent review found two Important test gaps, both fixed in one pass. Post-fix unit suite passed before current-main integration; no deferred minor findings.
 - No canonical data or financial values changed. No database migration, production deployment or merge was performed. Plan 5B and Plan 4 identifier changes remain separate.
 - Source sentence for owner review: English now ends with “World Economic Outlook, April 2026.”; Georgian ends with “World Economic Outlook, 2026 წლის აპრილი.”.
+
+Delivery: [draft PR #124](https://github.com/DuruMakh/geodata.ge/pull/124). GitHub records subsequent CI and merge state.
+
+### Execution rulings and limits
+
+- Consolidate plan Tasks 2/3 browser runs and Task 4 full data/build gates into Task 6 production acceptance — repository forbids repeating unchanged passing gates — cost if wrong: browser-only problems appear later.
+- Make numeric-token completeness local to each summary message, not the plan's global allowed set, and inspect all summary messages — prevents one message borrowing an unrelated valid number — cost if wrong: extra editorial review on new numeric copy.
+- marker contains only its label, not the year; assert its 100% rail position with a real 2027 projection fixture — proves visible placement — cost if wrong: test tied to existing rail rendering.
+- augment baseline-only planned tests with a future-edition page/workbook test in both locales; update the short component fixture expectation to its actual 2026-only forecast — proves refresh behavior rather than hardcoded current output — cost if wrong: fixture maintenance.
+- Record already-passed focused results without rerunning task-done solely for bookkeeping — repository forbids redundant passing gates — cost if wrong: ledger is manually recorded.
+- update GDP methodology reference to removed CSV checker to surviving publication check — avoids documenting a deleted check — cost if wrong: documentation correction only.
+- pipeline guards, GDP consistency and preliminary caveats remain Plan 5B scope — approved split — cost if wrong: refresh still needs pipeline work until 5B.
+- preserve current deficit identifiers pending separate Plan 4 merge — explicit sequencing — cost if wrong: later merge needs reconciliation.
+- rely on serving validators for sorted/nonempty actual-and-projection facts and reviewed manifest validation — accepted production input contract — cost if wrong: invalid inputs could render incorrect ranges.
+- unsupported publication month fails loudly; semantic editorial interpretation stays manual — approved spec — cost if wrong: new month requires localization and editorial judgments require human review.
+- reviewer did not judge delivery evidence; executor verifies build/browser/CI — separation of responsibilities — cost if wrong: overlooked delivery failure.
+- rebase only this plan commits onto remote main 248036d16 after regional-economy merge; exclude unrelated local-main f7d3b5371 commit and preserve all regional prepare/check steps — clean PR scope and current integration — cost if wrong: integration regression; rerun changed-input completion gates.
