@@ -10,6 +10,39 @@ import {
 } from "../../../lib/data/gdpOverview/prepareGdpOverview";
 
 describe("GDP overview source integration", () => {
+  it("reads the preliminary years from the manifest, not from a literal year", async () => {
+    const { geostatPreliminaryYears } = await import(
+      "../../../lib/data/gdpOverview/prepareGdpOverview"
+    );
+
+    expect([
+      ...geostatPreliminaryYears({
+        files: [
+          {
+            file: "sources/geostat_nominal_current.xlsx",
+            sha256: "x",
+            bytes: 1,
+            preliminary_years: [2026],
+          },
+          {
+            file: "sources/geostat_nominal_legacy.xlsx",
+            sha256: "y",
+            bytes: 1,
+            preliminary_years: [],
+          },
+          { file: "sources/NY.GDP.MKTP.KD.json", sha256: "z", bytes: 1 },
+        ],
+      }),
+    ]).toEqual([2026]);
+
+    const { facts } = await prepareGdpOverview();
+    const preliminary = [
+      ...new Set(facts.filter((fact) => fact.status === "preliminary").map((fact) => fact.year)),
+    ];
+    expect(preliminary).toEqual([2025]);
+    expect(facts.filter((fact) => fact.status === "preliminary")).toHaveLength(4);
+  });
+
   it("rejects tampered bytes and a rehashed wrong-country response", async () => {
     const temp = await fs.mkdtemp(path.join(os.tmpdir(), "gdp-source-test-"));
     try {

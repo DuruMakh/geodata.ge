@@ -16,10 +16,28 @@ const reviewed = "2026-09-11";
 import { validateGdpObservations } from "./validation";
 export { validateGdpObservations } from "./validation";
 
+type GdpSourceManifest = {
+  files: {
+    file: string;
+    sha256: string;
+    bytes: number;
+    preliminary_years?: number[];
+  }[];
+};
+
+/**
+ * Which Geostat years are still preliminary is a property of the archived
+ * edition, so it is declared in the manifest beside the hash rather than
+ * written into this script as a year.
+ */
+export function geostatPreliminaryYears(manifest: GdpSourceManifest): Set<number> {
+  return new Set(manifest.files.flatMap((entry) => entry.preliminary_years ?? []));
+}
+
 export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
   const manifest = JSON.parse(
     await fs.readFile(path.join(sourceRoot, "source-manifest.json"), "utf8"),
-  ) as { files: { file: string; sha256: string; bytes: number }[] };
+  ) as GdpSourceManifest;
   const buffers = new Map<string, Buffer>();
   const sourceHashes: Record<string, string> = {};
   for (const entry of manifest.files) {
@@ -30,6 +48,7 @@ export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
     buffers.set(path.basename(entry.file), bytes);
     sourceHashes[entry.file] = hash;
   }
+  const preliminary = geostatPreliminaryYears(manifest);
   const facts: GdpObservation[] = [];
   function add(
     seriesId: GdpSeriesId,
@@ -44,7 +63,7 @@ export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
       year,
       value,
       unit: GDP_SERIES[seriesId].unit,
-      status: accountingStandard && year === 2025 ? "preliminary" : "published",
+      status: accountingStandard && preliminary.has(year) ? "preliminary" : "published",
       accountingStandard,
       sourceId,
       sourceLocator,
@@ -103,7 +122,7 @@ export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
       if (!match) return;
       const year = Number(match[1]);
       if (year < first || year > last) return;
-      if ((year === 2025) !== Boolean(match[2]))
+      if (preliminary.has(year) !== Boolean(match[2]))
         throw new Error("Geostat preliminary header mismatch");
       fx[year] = Number(rows[fxRow][column]);
       for (const [id, row, scale] of mappings) {
