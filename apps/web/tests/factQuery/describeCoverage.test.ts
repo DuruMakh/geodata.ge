@@ -68,7 +68,27 @@ describe("describeCoverage", () => {
       "municipal-expenditure",
       "national-expenditure",
       "national-revenue",
+      "regional-economies",
     ]);
+  });
+
+  it("describes regional GDP coverage, regions, activities and only the two approved measures", () => {
+    const result = describeCoverage(snapshot, { datasetId: "regional-economies" });
+    const coverage = data(result);
+
+    expect(coverage.datasets).toEqual([
+      expect.objectContaining({
+        datasetId: "regional-economies",
+        years: [2010, 2024],
+        entityTypes: ["region"],
+        measures: ["amount_gel", "share_of_region_gdp_pct"],
+      }),
+    ]);
+    expect(coverage.entities).toHaveLength(11);
+    expect(coverage.series).toHaveLength(21);
+    expect(coverage.series?.[0]).toMatchObject({ seriesId: "economy.regional_gdp_total", level: "total" });
+    expect(JSON.stringify(coverage)).toContain("market-price GDP");
+    expect(JSON.stringify(coverage)).not.toContain("real_growth_pct");
   });
 
   it("narrows datasets to the requested one", () => {

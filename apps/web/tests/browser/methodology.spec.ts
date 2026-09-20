@@ -59,6 +59,7 @@ test("public header keeps landing active, exposes mission, and leaves methodolog
     ["/methodology/expenditure", "methodology-header"],
     ["/methodology/revenue", "methodology-header"],
     ["/methodology/municipalities", "methodology-header"],
+    ["/methodology/regional-economies", "methodology-header"],
     ["/about", "about-header"],
   ] as const) {
     await page.goto(`${TEST_BASE_URL}${path}`);
@@ -112,7 +113,7 @@ for (const path of [
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
-  await expect(page.getByTestId("methodology-live-row")).toHaveCount(7);
+  await expect(page.getByTestId("methodology-live-row")).toHaveCount(8);
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(2);
   await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
@@ -137,6 +138,7 @@ test("sitemap publishes exactly the live methodology routes", async ({ page }) =
     "/methodology/debt",
     "/methodology/gdp",
     "/methodology/economic-sectors",
+    "/methodology/regional-economies",
     "/methodology/inflation",
   ]);
 });
@@ -213,7 +215,7 @@ test("expenditure methodology exposes the complete layered article", async ({ pa
   await expect(page.locator("#source-archive")).toBeInViewport();
 });
 
-for (const dataset of ["expenditure", "revenue", "municipalities", "debt"] as const) {
+for (const dataset of ["expenditure", "revenue", "municipalities", "debt", "regional-economies"] as const) {
   test(`${dataset} methodology article is followed by the shared footer`, async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/methodology/${dataset}`);
 
@@ -255,18 +257,19 @@ test("regular content pages do not repeat the methodology promotion", async ({ p
 });
 
 test("source archives describe the full coverage and selected year without exposing provenance metadata", async ({ page }) => {
-  for (const [dataset, datasetTitle, coverage] of [
-    ["expenditure", "ხარჯების მეთოდოლოგია", "2004–2025"],
-    ["revenue", "შემოსავლების მეთოდოლოგია", "2004–2025"],
-    ["municipalities", "მუნიციპალიტეტების მეთოდოლოგია", "2015–2025"],
+  for (const [dataset, datasetTitle, coverage, selectedYear] of [
+    ["expenditure", "ხარჯების მეთოდოლოგია", "2004–2025", "2025"],
+    ["revenue", "შემოსავლების მეთოდოლოგია", "2004–2025", "2025"],
+    ["municipalities", "მუნიციპალიტეტების მეთოდოლოგია", "2015–2025", "2025"],
+    ["regional-economies", "რეგიონების ეკონომიკა", "2010–2024", "2024"],
   ] as const) {
     await page.goto(`${TEST_BASE_URL}/methodology/${dataset}#source-archive`);
     const archive = page.getByTestId("source-archive");
     const caption = archive.locator("table caption");
 
     await expect(caption).toHaveText(`${datasetTitle} — პირველწყაროების არქივი, ${coverage} წლები`);
-    await archive.getByRole("button", { name: "2025", exact: true }).click();
-    await expect(caption).toHaveText(`${datasetTitle} — პირველწყაროების არქივი, 2025 წელი`);
+    await archive.getByRole("button", { name: selectedYear, exact: true }).click();
+    await expect(caption).toHaveText(`${datasetTitle} — პირველწყაროების არქივი, ${selectedYear} წელი`);
     await expect(archive.locator("thead")).not.toContainText("თარიღი");
     await expect(archive.locator("thead")).not.toContainText("SHA-256");
     await expect(archive).not.toContainText("უახლესი ჩანაწერის თარიღი");

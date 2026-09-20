@@ -1179,6 +1179,14 @@
     "text": "Economic sectors",
     "reviewedAt": "2026-09-11"
   },
+  "economy.regional_gdp_total": {
+    "text": "Total regional GDP",
+    "reviewedAt": "2026-09-13"
+  },
+  "regional-economies": {
+    "text": "Regional economies",
+    "reviewedAt": "2026-09-13"
+  },
   "inflation": {
     "text": "Consumer price inflation",
     "reviewedAt": "2026-09-14"

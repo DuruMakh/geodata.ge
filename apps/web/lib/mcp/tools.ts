@@ -14,6 +14,8 @@ import { queryGdp } from "../factQuery/queryGdp";
 import { queryGdpInput } from "../factQuery/schemas";
 import { queryEconomicSectors } from "../factQuery/queryEconomicSectors";
 import { queryEconomicSectorsInput } from "../factQuery/schemas";
+import { queryRegionalEconomies } from "../factQuery/queryRegionalEconomies";
+import { queryRegionalEconomiesInput } from "./schemas.regional-economies";
 import { inflationDatasetPeriods } from "../factQuery/inflationData";
 import { inflationCellCount, queryInflation } from "../factQuery/queryInflation";
 import { queryInflationInput } from "../factQuery/schemas";
@@ -72,6 +74,7 @@ const ANNOTATIONS = {
 } as const;
 
 export const TOOLS: readonly ToolDefinition[] = [
+  { name:"query_regional_economies",title:"რეგიონული ეკონომიკები / Regional economies",describe:coverage=>`Annual GDP and 20 NACE Rev.2 economic activities for Georgia's 11 published regions, ${coverage["regional-economies"]}. Measures: amount_gel and share_of_region_gdp_pct. Values are current-price GEL; activities are GVA at basic prices, while each share divides by the same region's complete market-price GDP. Percent 7.5 means 7.5%. No 2025, real growth, per-capita values, national GDP share, rankings, forecasts or multi-region chart implication.`,schema:queryRegionalEconomiesInput,run:queryRegionalEconomies },
   { name:"query_economic_sectors",title:"ეკონომიკის სექტორები / Economic sectors",describe:(coverage,facts)=>`National economic activities A–T and Total GDP, ${coverage["economic-sectors"]}. Nominal GEL and GDP shares cover ${facts.sectorMeasureYears.amount_gel}; annual real growth covers ${facts.sectorMeasureYears.real_growth_pct}. Use describe_coverage for IDs and measure-specific years. Measures: amount_gel, share_of_gdp_pct, real_growth_pct. Sectors are GVA at basic prices; shares divide by market-price GDP, not selected sectors. Percent 7.5 means 7.5%. No regions, ranking, contributions or cumulative comparisons.`,schema:queryEconomicSectorsInput,run:queryEconomicSectors },
  { name: "query_gdp", title: "მშპ / GDP", describe: coverage=>`Annual GDP overview, ${coverage["gdp-overview"]}. Use describe_coverage for the six series IDs and their exact years. Series encode current GEL/USD, constant-2015 USD, annual real growth percent, or nominal GDP per capita GEL/USD. No currency conversion, index rebasing, population calculation, forecasts, ranking or cumulative comparison. Growth 7.5 means 7.5%. For long histories request one series at a time to stay within the response-size limit. Published/preliminary status and source caveats travel with every result.`, schema: queryGdpInput, run: (snapshot,input)=>queryGdp(snapshot,input) },
   {
@@ -276,9 +279,18 @@ export function createMcpServer(): McpServer {
       (args: unknown) => {
         // The SDK has validated and deduplicated these arrays. Reject the
         // requested product before calculating cells or resolving their sources.
-        const input = args as { years?: number[]; seriesIds?: string[]; entityIds?: string[]; target?: { seriesIds?: string[]; entityIds?: string[] } };
+        const input = args as { years?: number[]; fromYear?: number; toYear?: number; seriesIds?: string[]; entityIds?: string[]; regionIds?: string[]; target?: { seriesIds?: string[]; entityIds?: string[] } };
+        const regionalYears = input.years?.length ?? (
+          input.fromYear !== undefined && input.toYear !== undefined
+            ? input.toYear - input.fromYear + 1
+            : snapshot.regionalEconomies.facts.length > 0
+              ? new Set(snapshot.regionalEconomies.facts.map((fact) => fact.year)).size
+              : 0
+        );
         const count = tool.name === "compare"
           ? (input.target?.entityIds?.length ?? 1) * (input.target?.seriesIds?.length ?? 1)
+          : tool.name === "query_regional_economies"
+            ? (input.regionIds?.length ?? snapshot.regionalEconomies.regions.length) * (input.seriesIds?.length ?? snapshot.regionalEconomies.registry.length) * regionalYears
           : tool.name === "query_inflation"
             ? inflationCellCount(args as Parameters<typeof inflationCellCount>[0])
             : tool.name.startsWith("query_")

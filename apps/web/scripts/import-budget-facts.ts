@@ -2,6 +2,10 @@ import { loadGdpOverviewFacts, assertGdpParity } from "../lib/data/gdpOverview/i
 import { loadGdpOverviewFactsFromMirror } from "../lib/db/mirrorRows";
 import { loadEconomicSectorFacts, assertEconomicSectorParity } from "../lib/data/economicSectors/importEconomicSectors";
 import {
+  assertRegionalEconomyParity,
+  loadRegionalEconomyFacts,
+} from "../lib/data/regionalEconomies/importRegionalEconomies";
+import {
   assertInflationParity,
   loadBasketWeights,
   loadCpiCategoryFacts,
@@ -14,6 +18,7 @@ import {
   loadInflationCategoryFactsFromMirror,
   loadInflationCpiFactsFromMirror,
   loadInflationTargetsFromMirror,
+  loadRegionalEconomyFactsFromMirror,
 } from "../lib/db/mirrorRows";
 import { config as loadEnv } from "dotenv";
 import { mkdir, rm, writeFile } from "node:fs/promises";
@@ -240,6 +245,8 @@ async function main() {
   const gdpOverviewFacts = await loadGdpOverviewFacts(SERVED_DATA_FILES.gdpOverviewFacts);
   const economicSectorFacts = await loadEconomicSectorFacts(SERVED_DATA_FILES.economicSectorFacts);
   assertSubset("Economic sector source IDs", economicSectorFacts.map(f => f.sourceId), sourceIds);
+  const regionalEconomyFacts = await loadRegionalEconomyFacts(SERVED_DATA_FILES.regionalEconomyFacts);
+  assertSubset("Regional economy source IDs", regionalEconomyFacts.map((fact) => fact.sourceId), sourceIds);
   assertSubset("GDP overview source IDs",gdpOverviewFacts.map(f=>f.sourceId),sourceIds);
   const inflationCpiFacts = await loadCpiFacts(SERVED_DATA_FILES.inflationCpiFacts);
   const inflationTargets = await loadInflationTargets(SERVED_DATA_FILES.inflationTargets);
@@ -395,6 +402,7 @@ async function main() {
         await tx.governmentDebtFact.deleteMany();
         await tx.gdpOverviewFact.deleteMany();
         await tx.economicSectorFact.deleteMany();
+        await tx.regionalEconomyFact.deleteMany();
         await tx.inflationCpiFact.deleteMany();
         await tx.inflationTarget.deleteMany();
         await tx.inflationCategoryFact.deleteMany();
@@ -657,6 +665,16 @@ async function main() {
         })) });
         const mirrorEconomicSectorFacts = await loadEconomicSectorFactsFromMirror(tx);
         assertEconomicSectorParity(economicSectorFacts, mirrorEconomicSectorFacts);
+        await tx.regionalEconomyFact.createMany({
+          data: regionalEconomyFacts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
+            ...fact,
+            sourceDocumentId: sourceId,
+            lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`),
+            importRunId: run.id,
+          })),
+        });
+        const mirrorRegionalEconomyFacts = await loadRegionalEconomyFactsFromMirror(tx);
+        assertRegionalEconomyParity(regionalEconomyFacts, mirrorRegionalEconomyFacts);
         await tx.inflationCpiFact.createMany({
           data: inflationCpiFacts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
             ...fact,
@@ -896,6 +914,7 @@ async function main() {
               csvRows: gdpOverviewFacts.length, dbRows: mirrorGdpOverviewFacts.length,
             },
             { table: "EconomicSectorFact", csvRows: economicSectorFacts.length, dbRows: mirrorEconomicSectorFacts.length },
+            { table: "RegionalEconomyFact", csvRows: regionalEconomyFacts.length, dbRows: mirrorRegionalEconomyFacts.length },
             { table: "InflationCpiFact", csvRows: inflationCpiFacts.length, dbRows: mirrorInflation.facts.length },
             { table: "InflationTarget", csvRows: inflationTargets.length, dbRows: mirrorInflation.targets.length },
             { table: "InflationCategoryFact", csvRows: inflationCategoryFacts.length, dbRows: mirrorInflation.categories.length },

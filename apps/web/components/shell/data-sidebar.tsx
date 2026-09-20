@@ -33,6 +33,7 @@ export function DataSidebar() {
   const budgetActive = !economyActive && !inflationActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
   const sectorsActive = pathname.endsWith("/explorer/economy/sectors");
+  const regionsActive = pathname.includes("/explorer/economy/regions");
   const inflationOverviewActive = pathname.endsWith("/explorer/inflation/overview");
   const inflationCategoriesActive = pathname.endsWith("/explorer/inflation/categories");
 
@@ -210,6 +211,16 @@ export function DataSidebar() {
               >
                 <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${sectorsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
                 {message(messages, "common.economicSectors")}
+              </Link>
+            ) : null}
+            {economyActive ? (
+              <Link
+                href={pageHref("/explorer/economy/regions", locale)}
+                aria-current={regionsActive ? "page" : undefined}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${regionsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
+              >
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${regionsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+                {message(messages, "common.regionalEconomies")}
               </Link>
             ) : null}
             <Link

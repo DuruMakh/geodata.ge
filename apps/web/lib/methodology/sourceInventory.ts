@@ -40,6 +40,10 @@ const inventoryRules = {
     { root: "docs/Raw Data/Economy/economic-sectors/sources", include: extension(".xlsx") },
     { root: "docs/Raw Data/Economy/gdp-overview/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "geostat_nominal_current.xlsx" },
   ],
+  "regional-economies": [
+    { root: "docs/Raw Data/Economy/regional-economies/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "regional-GDP-by-activities-ENG.xlsx" },
+    { root: "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "regional-GDP-ENG.xlsx" },
+  ],
   inflation: [{ root: "docs/Raw Data/Inflation", include: (candidatePath: string) => [".xlsx", ".pdf"].includes(path.posix.extname(candidatePath).toLowerCase()) }],
   debt: [
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },

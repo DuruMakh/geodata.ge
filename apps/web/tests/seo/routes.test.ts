@@ -46,14 +46,18 @@ describe("indexable Fiscal.ge routes", () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    // Public connection discovery is enabled with the production MCP release.
-    expect(urls).toHaveLength(200);
+    // Regional economies add a bilingual index, eleven bilingual detail pages
+    // and one bilingual methodology page; the inflation categories page adds
+    // the other bilingual identity in the synchronized release.
+    expect(urls).toHaveLength(226);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
     expect(urls).toContain("https://fiscal.ge/connect");
     expect(urls).toContain("https://fiscal.ge/explorer/debt");
     expect(urls).toContain("https://fiscal.ge/explorer/deficit");
+    expect(urls).toContain("https://fiscal.ge/explorer/economy/regions");
+    expect(urls).toContain("https://fiscal.ge/en/explorer/economy/regions/imereti");
     expect(urls).toContain("https://fiscal.ge/methodology/debt");
     expect(urls.some((url) => url.includes("#") || url.includes("?"))).toBe(false);
   });

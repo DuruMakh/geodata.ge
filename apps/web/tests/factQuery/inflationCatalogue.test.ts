@@ -19,8 +19,8 @@ function catalogue(input: unknown): CoverageData {
 }
 
 describe("inflation snapshot and catalogue", () => {
-  it("is schema 1.2.0", () => {
-    expect(SCHEMA_VERSION).toBe("1.2.0");
+  it("is schema 1.3.0 after adding regional economies", () => {
+    expect(SCHEMA_VERSION).toBe("1.3.0");
   });
 
   it("carries every served inflation row", async () => {

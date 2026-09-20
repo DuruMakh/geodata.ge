@@ -19,6 +19,15 @@ test.each(["ka", "en"] as const)("Connect advertises national sector coverage an
   expect(html).toContain(`href="${locale === "en" ? "/en" : ""}/methodology/economic-sectors"`);
   expect(coverage).not.toContain("{count}");
   if (locale === "en") expect(coverage).not.toMatch(/\p{Script=Georgian}/u);
+
+  const regionalCoverage = html.match(/data-testid="connect-regional-coverage">(.*?)<\/li>/)?.[1];
+  expect(regionalCoverage).toContain("11");
+  expect(regionalCoverage).toContain("2010–2024");
+  expect(html).toContain("query_regional_economies");
+  expect(html).toContain('href="/downloads/data/regional-economies.json"');
+  expect(html).toContain('href="/downloads/data/regional-economies.csv"');
+  expect(html).toContain(`href="${locale === "en" ? "/en" : ""}/methodology/regional-economies"`);
+  if (locale === "en") expect(regionalCoverage).not.toMatch(/\p{Script=Georgian}/u);
 });
 
 test.each(["ka", "en"] as const)("Connect advertises monthly inflation coverage and files in %s", async locale => {
