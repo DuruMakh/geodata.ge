@@ -799,3 +799,6 @@ Push `codex/data-refresh-safeguards-copy` and open a draft PR. Flag the reworded
 - Future October-edition tests exercise both locales and workbook source metadata. The short route fixture reports its own coverage rather than the production dataset range.
 - Repeated browser/data/build steps are grouped into final acceptance, following the repository rule against rerunning unchanged passing gates. Already-passed focused results are recorded without rerunning solely for ledger bookkeeping.
 - Methodology now names the surviving publication check, replacing its reference to the removed separate CSV checker.
+
+- Final review found stale-year and year-shaped-percentage gaps in the planned GDP test. Both were reproduced and fixed with explicit per-message years and percent-bearing tokens; corrupted copy now fails in both languages.
+- Remote main advanced to `248036d16` with regional economies. Only this plan’s commits were rebased onto it, leaving the unrelated local-main navigation commit out. Regional preparation/check steps are preserved; final gates run again because their inputs changed.
