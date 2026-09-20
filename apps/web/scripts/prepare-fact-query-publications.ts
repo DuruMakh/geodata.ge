@@ -27,9 +27,9 @@ async function main() {
   const artifacts = buildAllPublications(snapshot);
 
   if (write) {
-    // Deliberately NOT clearing OUTPUT_DIR: preparePublicDatasets already wiped
-    // and rewrote it with the three public CSVs immediately before this script
-    // runs (see the prebuild chain), and clearing again would delete them.
+    // Deliberately NOT clearing OUTPUT_DIR: preparePublicDatasets wipes and
+    // rewrites it with its five public CSVs earlier in the prebuild chain, and
+    // the inflation CSV is written between the two. Clearing would delete them.
     await mkdir(OUTPUT_DIR, { recursive: true });
     for (const artifact of artifacts) {
       await writeFile(path.join(OUTPUT_DIR, artifact.fileName), artifact.bytes);

@@ -109,7 +109,7 @@ function totalRow(row: CsvRow, entityField: "municipality_code" | "scope_id"): C
 export async function preparePublicDatasets(options: {
   repositoryRoot: string;
   publicRoot: string;
-  mode: "write" | "check";
+  mode: "write" | "check" | "check-output";
 }): Promise<readonly PublicDatasetValidation[]> {
   const imports = path.join(options.repositoryRoot, "data", "imports");
   const budgetRows = await readCsv(path.join(imports, "budget-facts-2004-2025.csv"));
@@ -184,11 +184,20 @@ export async function preparePublicDatasets(options: {
   ];
 
   const validations = outputs.map((output) => validation(output.datasetId, output.rows, output.bytes));
+  const outputRoot = path.join(options.publicRoot, "downloads", "data");
   if (options.mode === "write") {
-    const outputRoot = path.join(options.publicRoot, "downloads", "data");
     await rm(outputRoot, { recursive: true, force: true });
     await mkdir(outputRoot, { recursive: true });
     await Promise.all(outputs.map((output) => writeFile(path.join(outputRoot, output.fileName), output.bytes)));
+  } else if (options.mode === "check-output") {
+    // "check" validates the inputs; only this mode reads what was written.
+    const stale: string[] = [];
+    for (const output of outputs) {
+      const onDisk = await readFile(path.join(outputRoot, output.fileName)).catch(() => null);
+      if (onDisk === null) stale.push(`${output.fileName}: missing`);
+      else if (!onDisk.equals(output.bytes)) stale.push(`${output.fileName}: content differs`);
+    }
+    if (stale.length > 0) throw new Error(`Public dataset downloads are stale:\n${stale.join("\n")}`);
   }
   return validations;
 }
