@@ -29,6 +29,54 @@ afterAll(async () => {
 });
 
 describe("loadGeneralGovernmentBalanceFacts", () => {
+  it("accepts a later WEO edition and rejects a mixed or mis-ordered file", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "weo-"));
+    temporaryDirectories.push(root);
+    const header =
+      "year,general_government_balance_pct_gdp,general_government_balance_gel,status,source_id,source_dataset,source_vintage,source_sheet,source_country_id,source_percent_series_code,source_nominal_series_code,source_unit,transformation,last_reviewed_at\n";
+    const row = (
+      year: number,
+      status: string,
+      vintage = "2026-10",
+      sourceId = "source.imf_weo_october_2026_general_government_balance",
+    ) =>
+      `${year},-2.5,-1000000000,${status},${sourceId},IMF.RES:WEO(9.0.0),${vintage},Countries,GEO,GEO.GGXCNL_NGDP.A,GEO.GGXCNL.A,billion GEL,"IMF billion GEL multiplied by 1,000,000,000; signed value preserved.",2026-11-02\n`;
+
+    const write = async (name: string, body: string) => {
+      await writeFile(path.join(root, name), header + body, "utf8");
+      return path.relative(process.cwd(), path.join(root, name));
+    };
+
+    const good = await write(
+      "good.csv",
+      [2024, 2025, 2026, 2027]
+        .map((year) => row(year, year <= 2026 ? "actual" : "projection"))
+        .join(""),
+    );
+    await expect(loadGeneralGovernmentBalanceFacts(good)).resolves.toHaveLength(4);
+
+    const mixed = await write(
+      "mixed.csv",
+      row(2024, "actual") +
+        row(
+          2025,
+          "actual",
+          "2026-04",
+          "source.imf_weo_april_2026_general_government_balance",
+        ) +
+        row(2026, "projection"),
+    );
+    await expect(loadGeneralGovernmentBalanceFacts(mixed)).rejects.toThrow(/one WEO edition/i);
+
+    const misordered = await write(
+      "misordered.csv",
+      row(2024, "projection") + row(2025, "actual") + row(2026, "projection"),
+    );
+    await expect(loadGeneralGovernmentBalanceFacts(misordered)).rejects.toThrow(
+      /actual years must come first/i,
+    );
+  });
+
   it("loads exactly one fact for every 1995-2031 year", async () => {
     const rows = await loadGeneralGovernmentBalanceFacts(
       "../../data/imports/general-government-balance-annual-1995-2031.csv",

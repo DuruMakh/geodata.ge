@@ -20,15 +20,15 @@ export type GeneralGovernmentBalanceFact = {
   generalGovernmentBalanceGel: number;
   status: GeneralGovernmentBalanceStatus;
   sourceId: string;
-  sourceDataset: "IMF.RES:WEO(9.0.0)";
-  sourceVintage: "2026-04";
+  sourceDataset: string;
+  sourceVintage: string;
   sourceSheet: "Countries";
   sourceCountryId: "GEO";
   sourcePercentSeriesCode: "GEO.GGXCNL_NGDP.A";
   sourceNominalSeriesCode: "GEO.GGXCNL.A";
   sourceUnit: "billion GEL";
   transformation: string;
-  lastReviewedAt: "2026-09-04";
+  lastReviewedAt: string;
 };
 
 export type GeneralGovernmentBalanceValidationSummary = {
@@ -39,15 +39,15 @@ export type GeneralGovernmentBalanceValidationSummary = {
 export type GeneralGovernmentBalanceValidationReport =
   GeneralGovernmentBalanceValidationSummary & {
     status: "PASS";
-    dataset: "IMF.RES:WEO(9.0.0)";
-    sourceBytes: 5585205;
+    dataset: string;
+    sourceBytes: number;
     sourceSha256: string;
-    sourceFactCount: 111;
-    canonicalFactCount: 37;
-    canonicalYearMin: 1995;
-    canonicalYearMax: 2031;
-    latestActualYear: 2025;
-    firstProjectionYear: 2026;
+    sourceFactCount: number;
+    canonicalFactCount: number;
+    canonicalYearMin: number;
+    canonicalYearMax: number;
+    latestActualYear: number;
+    firstProjectionYear: number;
     reconciliationTolerancePercentagePoints: 0.02;
   };
 
