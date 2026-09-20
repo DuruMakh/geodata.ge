@@ -23,9 +23,28 @@
 - **Sequencing:** if `2026-09-17-figure-accuracy-fixes.md` lands first, the basket-weight client row must keep `year` (spec §Series note), which the projection in Task 8 already does.
 - **Test loop:** targeted tests while editing; the full gates run once, in Task 10.
 
+## Amendment 2026-09-20: the sixth dataset
+
+This plan was written against `main` at `c7451ceaf`. It is executed from
+`248036d16`, which added the regional economies dataset (PR #121). That dataset
+repeats all four defects this plan fixes, so the user extended the scope to six
+datasets on 2026-09-20. Verified anchors on `248036d16`:
+
+| Task | What regional economies adds |
+|---|---|
+| 1 | `lib/data/regionalEconomies/importRegionalEconomies.ts:74-75` parses `GEODATA_DATA_SOURCE` itself and throws the old `Invalid GEODATA_DATA_SOURCE`. Six loaders call the resolver, not five. |
+| 2 | `loadServedRegionalEconomyData` has no memo, and an index page plus eleven per-region pages in two locales call it. It gains `resetRegionalEconomyCacheForTests`, registered with the others. |
+| 3 | `lib/factQuery/buildSnapshot.ts:687` reads `loadRegionalEconomyFacts()` straight from the CSV, so in database mode the snapshot's regional facts bypass the mirror exactly as GDP's and sectors' do. It takes the served loader too. |
+| 8 | `lib/pages/regional-economy.tsx:131` hands whole served rows to the client `RegionalEconomyExplorer`. It gains a client row type, a projection and a hoisted source-id map like the others. |
+| 9 | The guard covers eleven routes: the nine named below plus `/explorer/economy/regions` and one per-region page. |
+| 10 | Acceptance counts six datasets and eleven routes. |
+
+Naming follows the dataset's own singular form (`loadServedRegionalEconomyData`),
+not the plural directory name.
+
 ---
 
-### Task 1: One mode resolver for all five loaders
+### Task 1: One mode resolver for all six loaders
 
 **Files:**
 - Create: `apps/web/lib/data/servedDataSource.ts`
@@ -148,7 +167,7 @@ git commit -m "refactor(data): one resolver for GEODATA_DATA_SOURCE"
 
 ---
 
-### Task 2: Memoise the four new loaders
+### Task 2: Memoise the five new loaders
 
 **Files:**
 - Modify: `apps/web/lib/data/governmentDebt/importGovernmentDebtFacts.ts`, `…/generalGovernmentBalance/importGeneralGovernmentBalance.ts`, `…/gdpOverview/importGdpOverview.ts`, `…/economicSectors/importEconomicSectors.ts`
@@ -708,7 +727,7 @@ git commit -m "perf(explorer): send the browser only the GDP and sector fields i
 
 ---
 
-### Task 8: Client rows for inflation and debt
+### Task 8: Client rows for inflation, debt and regional economies
 
 **Files:**
 - Modify: `apps/web/lib/servedRows.ts`, `apps/web/lib/explorer/clientData.ts`
@@ -823,7 +842,7 @@ git commit -m "perf(explorer): send the browser only the inflation and debt fiel
 
 ---
 
-### Task 9: Guard nine routes, and record the contract
+### Task 9: Guard eleven routes, and record the contract
 
 **Files:**
 - Modify: `apps/web/tests/browser/main-explorer.spec.ts:1188-1211`
