@@ -67,6 +67,15 @@ describe("prepareGeneralGovernmentBalance", () => {
     };
 
     expect(validateGeneralGovernmentBalanceManifest(later)).toEqual(later);
+    for (const mismatch of [
+      { source_id: "source.imf_weo_april_2026_general_government_balance" },
+      { local_file: "official/WEOApr2026all.xlsx" },
+      { retrieved_file_url: "https://data.imf.org/files/WEOApr2026all.xlsx" },
+    ]) {
+      expect(() =>
+        validateGeneralGovernmentBalanceManifest({ ...later, ...mismatch }),
+      ).toThrow(/edition/i);
+    }
   });
 
   it.each([

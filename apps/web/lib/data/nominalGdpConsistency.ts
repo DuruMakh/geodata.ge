@@ -6,6 +6,16 @@ import Decimal from "decimal.js";
 type Row = Record<string, string>;
 
 const SECTOR_GDP_DECIMAL_PLACES = 5;
+const SECTOR_GDP_FIRST_YEAR = 2010;
+
+const sortedYears = (rows: Row[], include: (row: Row) => boolean): number[] =>
+  rows
+    .filter(include)
+    .map((row) => Number(row.year))
+    .sort((left, right) => left - right);
+
+const sameYears = (left: number[], right: number[]) =>
+  JSON.stringify(left) === JSON.stringify(right);
 
 const readCsv = async (file: string): Promise<Row[]> =>
   parse(await readFile(file, "utf8"), {
@@ -47,6 +57,23 @@ export async function checkNominalGdpConsistency(
     nominal.set(Number(row.year), new Decimal(row.value!));
   }
   if (nominal.size === 0) problems.push("The GDP overview CSV has no nominal_gel rows");
+  const overviewYears = [...nominal.keys()].sort((left, right) => left - right);
+  const sectorYears = sortedYears(
+    sectors,
+    (row) => row.series_id === "economy.gdp_total" && row.measure === "nominal",
+  );
+  const expectedSectorYears = overviewYears.filter((year) => year >= SECTOR_GDP_FIRST_YEAR);
+  if (!sameYears(sectorYears, expectedSectorYears)) {
+    problems.push(
+      `economy.gdp_total coverage is ${sectorYears.join(", ")}; expected ${expectedSectorYears.join(", ")}`,
+    );
+  }
+  const nationalYears = sortedYears(national, () => true);
+  if (!sameYears(nationalYears, overviewYears)) {
+    problems.push(
+      `national GDP coverage is ${nationalYears.join(", ")}; expected ${overviewYears.join(", ")}`,
+    );
+  }
 
   // 1. The sector table's GDP total is the same series, digit for digit.
   for (const row of sectors) {
@@ -108,5 +135,5 @@ export async function checkNominalGdpConsistency(
   if (problems.length > 0) {
     throw new Error(`Nominal GDP artifacts disagree:\n${problems.join("\n")}`);
   }
-  return { years: [...nominal.keys()].sort((left, right) => left - right), comparisons };
+  return { years: overviewYears, comparisons };
 }

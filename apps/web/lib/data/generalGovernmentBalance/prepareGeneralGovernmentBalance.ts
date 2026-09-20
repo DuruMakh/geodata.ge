@@ -79,6 +79,21 @@ const manifestSchema = z
   .refine(
     (row) => row.retrieved_at >= row.publication_date,
     "The file cannot be retrieved before it is published",
+  )
+  .refine(
+    (row) => {
+      const year = row.publication_date.slice(0, 4);
+      const april = row.publication_date.slice(5, 7) === "04";
+      const editionName = april ? "april" : "october";
+      const workbookName = `WEO${april ? "Apr" : "Oct"}${year}all.xlsx`;
+      return (
+        row.source_id ===
+          `source.imf_weo_${editionName}_${year}_general_government_balance` &&
+        row.local_file === `official/${workbookName}` &&
+        new URL(row.retrieved_file_url).pathname.endsWith(`/${workbookName}`)
+      );
+    },
+    "The WEO edition must agree across the source ID, publication date, and workbook filenames",
   );
 
 type ManifestRow = z.infer<typeof manifestSchema>;

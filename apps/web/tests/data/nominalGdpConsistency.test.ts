@@ -14,6 +14,8 @@ type Overrides = {
   sectorGdp?: string;
   nationalMillions?: string;
   nationalSha?: string;
+  omitSector2025?: boolean;
+  omitNational2025?: boolean;
 };
 
 async function fixtureRoot(overrides: Overrides = {}): Promise<string> {
@@ -32,13 +34,17 @@ async function fixtureRoot(overrides: Overrides = {}): Promise<string> {
     "data/imports/economic-sectors-annual.csv",
     "series_id,year,measure,value\n" +
       "economy.gdp_total,2024,nominal,93022275315.70538\n" +
-      `economy.gdp_total,2025,nominal,${overrides.sectorGdp ?? "104598139883.332"}\n` +
+      (overrides.omitSector2025
+        ? ""
+        : `economy.gdp_total,2025,nominal,${overrides.sectorGdp ?? "104598139883.332"}\n`) +
       "sector.a,2025,nominal,7000000000\n",
   );
   await write(
     "data/imports/national-gdp-annual-1996-2025.csv",
     "year,gdp_current_prices_million_gel\n2024,93022.3\n" +
-      `2025,${overrides.nationalMillions ?? "104598.1"}\n`,
+      (overrides.omitNational2025
+        ? ""
+        : `2025,${overrides.nationalMillions ?? "104598.1"}\n`),
   );
   await write(
     "docs/Raw Data/Economy/gdp-overview/source-manifest.json",
@@ -73,9 +79,21 @@ describe("nominal GDP consistency", () => {
     await expect(checkNominalGdpConsistency(root)).rejects.toThrow(/economy\.gdp_total 2025/);
   });
 
+  it("rejects a sector GDP total series that stops before the overview", async () => {
+    const root = await fixtureRoot({ omitSector2025: true });
+    await expect(checkNominalGdpConsistency(root)).rejects.toThrow(
+      /economy\.gdp_total coverage.*2025/i,
+    );
+  });
+
   it("rejects a budget denominator that differs by 0.1 mln GEL", async () => {
     const root = await fixtureRoot({ nationalMillions: "104598.2" });
     await expect(checkNominalGdpConsistency(root)).rejects.toThrow(/national GDP 2025/);
+  });
+
+  it("rejects a national GDP series that stops before the overview", async () => {
+    const root = await fixtureRoot({ omitNational2025: true });
+    await expect(checkNominalGdpConsistency(root)).rejects.toThrow(/national GDP coverage.*2025/i);
   });
 
   it("rejects two archived copies of the workbook with different hashes", async () => {

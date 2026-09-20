@@ -70,6 +70,42 @@ describe("GDP overview source integration", () => {
       await fs.rm(temp, { recursive: true, force: true });
     }
   });
+
+  it("checks every observed World Bank growth year against its level series", async () => {
+    const temp = await fs.mkdtemp(path.join(os.tmpdir(), "gdp-future-growth-test-"));
+    try {
+      await fs.cp(GDP_SOURCE_ROOT, temp, { recursive: true });
+      const manifestPath = path.join(temp, "source-manifest.json");
+      const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
+
+      for (const [filename, value] of [
+        ["NY.GDP.MKTP.KD.json", null],
+        ["NY.GDP.MKTP.KD.ZG.json", 100],
+      ] as const) {
+        const sourcePath = path.join(temp, `sources/${filename}`);
+        const response = JSON.parse(await fs.readFile(sourcePath, "utf8"));
+        const latest = response[1].find((row: { date: string }) => row.date === "2025");
+        response[1].push({
+          ...latest,
+          date: "2026",
+          value: value ?? latest.value,
+        });
+        const bytes = Buffer.from(JSON.stringify(response));
+        await fs.writeFile(sourcePath, bytes);
+        const entry = manifest.files.find(
+          (candidate: { file: string }) => candidate.file === `sources/${filename}`,
+        );
+        entry.bytes = bytes.length;
+        entry.sha256 = createHash("sha256").update(bytes).digest("hex");
+      }
+
+      await fs.writeFile(manifestPath, JSON.stringify(manifest));
+      await expect(prepareGdpOverview(temp)).rejects.toThrow(/growth\/level mismatch/);
+    } finally {
+      await fs.rm(temp, { recursive: true, force: true });
+    }
+  });
+
   it("reproduces all six source series without rebasing or population estimates", async () => {
     const { facts, validation } = await prepareGdpOverview();
     expect(facts).toHaveLength(251);
