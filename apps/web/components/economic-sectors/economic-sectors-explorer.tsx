@@ -1,10 +1,8 @@
 "use client";
 import { useMemo } from "react";
 import { ChartPie, ChartNoAxesCombined } from "lucide-react";
-import type {
-  SectorDefinition,
-  ServedSectorObservation,
-} from "../../lib/data/economicSectors/types";
+import type { SectorDefinition } from "../../lib/data/economicSectors/types";
+import type { ClientSectorObservation } from "../../lib/servedRows";
 import {
   buildEconomicSectorsModel,
   changeSectorMeasure,
@@ -30,7 +28,9 @@ import { SectorHighlights } from "./sector-highlights";
 import { useEconomicSectorsState } from "./use-economic-sectors-state";
 
 export type EconomicSectorsExplorerProps = {
-  facts: ServedSectorObservation[];
+  facts: ClientSectorObservation[];
+  // One entry per measure: every row of a measure comes from one publication.
+  sourceIdByMeasure: Record<string, string>;
   registry: SectorDefinition[];
   sources: (WorkbookPublicSource & { sourceId: string })[];
   siteOrigin: string;
@@ -38,6 +38,7 @@ export type EconomicSectorsExplorerProps = {
 
 export function EconomicSectorsExplorer({
   facts,
+  sourceIdByMeasure,
   registry,
   sources,
   siteOrigin,
@@ -47,8 +48,8 @@ export function EconomicSectorsExplorer({
   const t = (key: string) => message(messages, `sectors.${key}`);
   const { state, update } = useEconomicSectorsState(facts, registry);
   const model = useMemo(
-    () => buildEconomicSectorsModel(facts, registry, state),
-    [facts, registry, state],
+    () => buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure),
+    [facts, registry, state, sourceIdByMeasure],
   );
   const percent = state.measure !== "nominal";
   const measureLabel = t(
@@ -259,6 +260,7 @@ export function EconomicSectorsExplorer({
                     presentation,
                     sources,
                     siteOrigin,
+                    sourceIdByMeasure,
                   ),
                 );
               }}

@@ -8,6 +8,7 @@ import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
+import { projectGdpObservation, sourceIdBySeriesYear } from "../explorer/clientData";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
@@ -80,7 +81,9 @@ export async function renderGdpPage(locale: Locale) {
         ]}
       />
       <GdpOverview
-        facts={facts}
+        facts={facts.map(projectGdpObservation)}
+        sourceIdBySeriesYear={sourceIdBySeriesYear(facts)}
+        lastReviewedAt={facts.map((f) => f.lastReviewedAt).sort().at(-1)!}
         sources={sources}
         siteOrigin={resolveSiteUrl()}
       />

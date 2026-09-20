@@ -1,5 +1,6 @@
 import { EDITORIAL_PALETTE, INK, colorForProgram } from "./colors";
-import type { SectorDefinition, SectorMeasure, ServedSectorObservation } from "../data/economicSectors/types";
+import type { SectorDefinition, SectorMeasure } from "../data/economicSectors/types";
+import type { ClientSectorObservation } from "../servedRows";
 
 export const SECTOR_GDP = "economy.gdp_total";
 export type SectorState = {
@@ -49,7 +50,7 @@ export function serializeSectorHash(state: SectorState): string {
   return p.toString();
 }
 
-function resolveRange(state: SectorState, facts: readonly ServedSectorObservation[]) {
+function resolveRange(state: SectorState, facts: readonly ClientSectorObservation[]) {
   const availableYears = [...new Set(facts.filter(f => f.measure === state.measure).map(f => f.year))].sort((a,b)=>a-b);
   if (!availableYears.length) throw new Error(`No available sector years for ${state.measure}`);
   const min = availableYears[0], max = availableYears.at(-1)!;
@@ -57,13 +58,13 @@ function resolveRange(state: SectorState, facts: readonly ServedSectorObservatio
   return { availableYears, min, max, start: manual ? Math.max(min, manual.start) : min, end: manual ? Math.min(max, manual.end) : max };
 }
 
-export function changeSectorMeasure(state: SectorState, measure: SectorMeasure, facts: readonly ServedSectorObservation[]): SectorState {
+export function changeSectorMeasure(state: SectorState, measure: SectorMeasure, facts: readonly ClientSectorObservation[]): SectorState {
   const range = resolveRange({ ...state, measure }, facts);
   return { ...state, measure, range: state.range.kind === "all" || state.range.end < range.min || state.range.start > range.max
     ? { kind: "all" } : { kind: "manual", start: range.start, end: range.end } };
 }
 
-export function buildEconomicSectorsModel(facts: readonly ServedSectorObservation[], registry: readonly SectorDefinition[], state: SectorState) {
+export function buildEconomicSectorsModel(facts: readonly ClientSectorObservation[], registry: readonly SectorDefinition[], state: SectorState, sourceIdByMeasure: Record<string, string>) {
   const range = resolveRange(state, facts);
   const years = Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);
   const active = facts.filter(f => f.measure === state.measure && f.year >= range.start && f.year <= range.end);
@@ -89,7 +90,7 @@ export function buildEconomicSectorsModel(facts: readonly ServedSectorObservatio
     endValues,
     headline: active.filter(f => f.seriesId === SECTOR_GDP).sort((a,b)=>a.year-b.year).at(-1) ?? null,
     preliminaryYears: [...new Set(active.filter(f => f.status === "preliminary").map(f=>f.year))],
-    sourceIds: [...new Set(active.filter(f=>state.selectedIds.includes(f.seriesId)).map(f=>f.sourceId))],
+    sourceIds: active.some(f=>state.selectedIds.includes(f.seriesId)) && sourceIdByMeasure[state.measure] ? [sourceIdByMeasure[state.measure]!] : [],
     hasData: active.some(f => state.selectedIds.includes(f.seriesId)),
   };
 }

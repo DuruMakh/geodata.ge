@@ -1,5 +1,6 @@
 import { expect, it } from "vitest";
 import { prepareGdpOverview } from "../../lib/data/gdpOverview/prepareGdpOverview";
+import { sourceIdBySeriesYear } from "../../lib/explorer/clientData";
 import {
   DEFAULT_GDP_STATE,
   changeGdpIndicator,
@@ -40,7 +41,7 @@ it("preserves All, intersects manual periods and remembers currency", async () =
     indicator: "growth" as const,
     currency: "usd" as const,
   };
-  const m = buildGdpOverviewModel(facts, state);
+  const m = buildGdpOverviewModel(facts, state, sourceIdBySeriesYear(facts));
   expect(m.years[0]).toBe(1961);
   expect(m.points.find((p) => p.year === 1992)!.value).toBeLessThan(0);
   expect(m.points.at(-1)!.value).toBeCloseTo(0.0746161504152039);

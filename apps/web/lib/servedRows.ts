@@ -83,3 +83,23 @@ export type ServedGeneralGovernmentBalanceFact = {
   sourceId: string;
   lastReviewedAt: string;
 };
+
+// Explorer pages send these to the browser instead of the served rows. The
+// unread provenance columns (sourceLocator, unit, valuation, priceBasis,
+// accountingStandard, per-row lastReviewedAt) stay on the server; each page
+// hoists the source ids its workbook builder needs into one small map and
+// passes the newest review date once.
+export type ClientGdpObservation = {
+  seriesId: string;
+  year: number;
+  value: number;
+  status: "published" | "preliminary";
+};
+
+export type ClientSectorObservation = {
+  seriesId: string;
+  year: number;
+  measure: "nominal" | "share_of_gdp" | "real_growth";
+  value: number;
+  status: "published" | "preliminary";
+};

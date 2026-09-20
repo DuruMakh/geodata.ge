@@ -1,6 +1,5 @@
 import type {
   SectorDefinition,
-  ServedSectorObservation,
 } from "../data/economicSectors/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
@@ -18,16 +17,18 @@ import {
   type WorkbookExportModel,
   type WorkbookPublicSource,
 } from "./workbookModel";
+import type { ClientSectorObservation } from "../servedRows";
 
 export function buildEconomicSectorsWorkbookExportModel(
-  facts: ServedSectorObservation[],
+  facts: ClientSectorObservation[],
   registry: SectorDefinition[],
   state: SectorState,
   presentation: Presentation,
   sources: (WorkbookPublicSource & { sourceId: string })[],
   siteOrigin: string,
+  sourceIdByMeasure: Record<string, string>,
 ): WorkbookExportModel {
-  const model = buildEconomicSectorsModel(facts, registry, state);
+  const model = buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure);
   const { locale, messages } = presentation;
   const t = (key: string) => message(messages, `sectors.${key}`);
   const w = (key: Parameters<typeof workbookMessage>[1]) =>
@@ -52,12 +53,17 @@ export function buildEconomicSectorsWorkbookExportModel(
       .filter((f) => f.measure === "nominal")
       .map((f) => [`${f.seriesId}:${f.year}`, f]),
   );
+  // Every row of a measure comes from one publication, so the years the
+  // workbook must cite are simply the active years of that source. The old
+  // year_over_year branch went with the column: no fact carries that
+  // calculation — every real-growth row is index_to_growth.
   const neededYears = new Map<string, Set<number>>();
   for (const f of active) {
-    const years = neededYears.get(f.sourceId) ?? new Set<number>();
+    const sourceId = sourceIdByMeasure[f.measure];
+    if (!sourceId) continue;
+    const years = neededYears.get(sourceId) ?? new Set<number>();
     years.add(f.year);
-    if (f.calculation === "year_over_year") years.add(f.year - 1);
-    neededYears.set(f.sourceId, years);
+    neededYears.set(sourceId, years);
   }
   const originals = new Map<string, WorkbookPublicSource>();
   for (const source of sources) {

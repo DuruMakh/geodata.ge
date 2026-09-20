@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import type { ServedGdpObservation } from "../../lib/data/gdpOverview/types";
+import type { ClientGdpObservation } from "../../lib/servedRows";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
@@ -31,10 +31,17 @@ import { GdpSummary } from "./gdp-summary";
 export type GdpWorkbookSource = WorkbookPublicSource & { sourceId: string };
 export function GdpOverview({
   facts,
+  sourceIdBySeriesYear,
+  lastReviewedAt,
   sources,
   siteOrigin,
 }: {
-  facts: ServedGdpObservation[];
+  facts: ClientGdpObservation[];
+  // One entry per series and year: GDP cites a different Geostat vintage
+  // before and after the SNA 2008 switch, and the workbook lists the sources
+  // the selected range actually rests on.
+  sourceIdBySeriesYear: Record<string, string>;
+  lastReviewedAt: string;
   sources: GdpWorkbookSource[];
   siteOrigin: string;
 }) {
@@ -58,7 +65,10 @@ export function GdpOverview({
   useEffect(() => {
     if (ready) history.replaceState(null, "", `#${serializeGdpHash(state)}`);
   }, [state, ready]);
-  const m = useMemo(() => buildGdpOverviewModel(facts, state), [facts, state]);
+  const m = useMemo(
+    () => buildGdpOverviewModel(facts, state, sourceIdBySeriesYear),
+    [facts, state, sourceIdBySeriesYear],
+  );
   const d = gdpDisplay(state, presentation);
   const row = {
     itemId: "gdp.overview",
@@ -81,7 +91,7 @@ export function GdpOverview({
   );
   function select(indicator: GdpIndicator) {
     const next = changeGdpIndicator(state, indicator, facts),
-      nextModel = buildGdpOverviewModel(facts, next);
+      nextModel = buildGdpOverviewModel(facts, next, sourceIdBySeriesYear);
     setState(next);
     setAnnouncement(
       message(messages, "gdp.rangeChanged", {
@@ -109,10 +119,7 @@ export function GdpOverview({
             },
             { label: t("heading") },
           ]}
-          coverage={`${m.range.min}–${m.range.max} · ${facts
-            .map((f) => f.lastReviewedAt)
-            .sort()
-            .at(-1)}`}
+          coverage={`${m.range.min}–${m.range.max} · ${lastReviewedAt}`}
         />
         <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
           {t("heading")}
@@ -254,6 +261,7 @@ export function GdpOverview({
                 presentation,
                 currentSources,
                 siteOrigin,
+                sourceIdBySeriesYear,
               ),
             )
           }
