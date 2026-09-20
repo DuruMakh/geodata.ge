@@ -755,17 +755,17 @@ git commit -m "docs(methodology): record how the deficit page reads its IMF edit
 
 **Files:** none (verification only).
 
-- [ ] **Step 1: Full check**
+- [x] **Step 1: Full check**
 
 Run: `npm run check`
 Expected: exit 0.
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `npm run build`
 Expected: exit 0, with the new prebuild and postbuild chains.
 
-- [ ] **Step 3: Browser suite on the production build**
+- [x] **Step 3: Browser suite on the production build**
 
 Run, in two terminals:
 
@@ -779,7 +779,7 @@ CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge PLAYWRIGHT_BASE_URL=http://localhost
 
 Expected: all tests pass.
 
-- [ ] **Step 4: Acceptance walk**
+- [x] **Step 4: Acceptance walk**
 
 1. Change one value in `data/imports/gdp-overview-annual.csv`, run `npx vitest run tests/i18n/gdpSummaryFigures.test.ts`, and confirm it fails naming the message. Restore the file.
 2. Add an unlisted number to one summary message, run the same test, and confirm the completeness check fails. Restore the message.
@@ -802,3 +802,15 @@ Push `codex/data-refresh-safeguards-copy` and open a draft PR. Flag the reworded
 
 - Final review found stale-year and year-shaped-percentage gaps in the planned GDP test. Both were reproduced and fixed with explicit per-message years and percent-bearing tokens; corrupted copy now fails in both languages.
 - Remote main advanced to `248036d16` with regional economies. Only this plan’s commits were rebased onto it, leaving the unrelated local-main navigation commit out. Regional preparation/check steps are preserved; final gates run again because their inputs changed.
+
+## Final verification (2026-09-20)
+
+- Integrated base: remote main `248036d16` (regional economies preserved); production build commit `32032ee1a854859583050f9038c7baa81333789a`.
+- `npm run check`: 263 files / 2,265 tests passed, plus lint, typecheck, all data checks and localization (113 public page identities).
+- `npm run build`: 235 static pages; 19 publications and their hashes verified; all five on-disk CSV checks plus regional and inflation CSV checks passed.
+- Full browser suite against that production build: 570/570 passed in 3.1 minutes. Initial pre-integration suite also passed 540/540.
+- Desktop and 390px mobile rendering inspected; no browser errors. Actual bilingual Excel downloads preserve the IMF URL, retrieval date and full 1995–2031 source coverage.
+- Data/copy mutation checks reject changed GDP values, extra numbers, stale observation years, and unchecked percentages shaped like years; temporary files restored exactly.
+- Independent review found two Important test gaps, both fixed in one pass. Post-fix unit suite passed before current-main integration; no deferred minor findings.
+- No canonical data or financial values changed. No database migration, production deployment or merge was performed. Plan 5B and Plan 4 identifier changes remain separate.
+- Source sentence for owner review: English now ends with “World Economic Outlook, April 2026.”; Georgian ends with “World Economic Outlook, 2026 წლის აპრილი.”.
