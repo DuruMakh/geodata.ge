@@ -54,13 +54,37 @@ describe("prepareGeneralGovernmentBalance", () => {
     );
   });
 
+  it("accepts a later WEO manifest with the same extraction contract", () => {
+    const later = {
+      ...REVIEWED_MANIFEST,
+      source_id: "source.imf_weo_october_2026_general_government_balance",
+      publication_date: "2026-10-13",
+      retrieved_file_url: "https://data.imf.org/files/WEOOct2026all.xlsx",
+      retrieved_at: "2026-11-02",
+      local_file: "official/WEOOct2026all.xlsx",
+      year_max: "2032",
+      latest_actual_year: "2026",
+    };
+
+    expect(validateGeneralGovernmentBalanceManifest(later)).toEqual(later);
+    for (const mismatch of [
+      { source_id: "source.imf_weo_april_2026_general_government_balance" },
+      { local_file: "official/WEOApr2026all.xlsx" },
+      { retrieved_file_url: "https://data.imf.org/files/WEOApr2026all.xlsx" },
+    ]) {
+      expect(() =>
+        validateGeneralGovernmentBalanceManifest({ ...later, ...mismatch }),
+      ).toThrow(/edition/i);
+    }
+  });
+
   it.each([
     ["publisher", "Another publisher"],
     ["dataset", "Another dataset"],
-    ["publication_date", "2026-04-15"],
+    ["publication_date", "2026-05-15"],
     ["source_page_url", "https://example.com"],
     ["retrieved_file_url", "https://example.com/WEO.xlsx"],
-    ["retrieved_at", "2026-09-03"],
+    ["retrieved_at", "2026/09/03"],
     ["local_file", "official/other.xlsx"],
     ["methodology", "GFSM 2014"],
     ["valuation", "Accrual"],

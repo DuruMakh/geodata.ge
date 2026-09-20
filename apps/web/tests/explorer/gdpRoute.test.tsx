@@ -30,4 +30,5 @@ it("renders centered four indicator controls and the existing chart", async () =
   expect(html).not.toContain(">Display<");
   expect(html).not.toContain('data-testid="gdp-headline"');
   expect(html).toContain("bn · Constant 2015 USD");
+  expect(html).toContain("rest on Geostat national accounts that are still preliminary");
 });

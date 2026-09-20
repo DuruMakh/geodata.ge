@@ -25,7 +25,8 @@ type Manifest = {
   nominalReconciliationToleranceMillionGel: string; growthCheckTolerancePercentagePoints: string;
   files: Source[];
 };
-const years = (first: number) => Array.from({ length: 2026 - first }, (_, i) => first + i);
+const years = (first: number, last: number) =>
+  Array.from({ length: last - first + 1 }, (_, i) => first + i);
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
 export async function prepareEconomicSectors(repositoryRoot: string) {
@@ -38,6 +39,19 @@ export async function prepareEconomicSectors(repositoryRoot: string) {
     throw new Error("Unreviewed sector precision/classification contract");
   if (!same(manifest.files.map(s => s.role).sort(), ["growth", "growth_validation", "nominal"]))
     throw new Error("Unexpected sector source roles");
+  // Coverage and preliminary years belong to the archived edition. The check is
+  // that the three sources agree with each other and end together, not that they
+  // end in a year this file names.
+  const lastAnnualYear = Math.max(...manifest.files.flatMap((source) => source.annualYears));
+  const preliminaryYears = [
+    ...new Set(manifest.files.flatMap((source) => source.preliminaryYears)),
+  ].sort((a, b) => a - b);
+  const expectedPreliminaryYears = preliminaryYears.length
+    ? years(preliminaryYears[0]!, lastAnnualYear)
+    : [];
+  if (!same(preliminaryYears, expectedPreliminaryYears)) {
+    throw new Error("Sector preliminary years must be the newest annual years");
+  }
   const activities = registry.filter(s => s.classificationCode !== null).sort((a, b) => a.sortOrder - b.sortOrder);
   if (!same(activities.map(s => s.classificationCode), "ABCDEFGHIJKLMNOPQRST".split("")) ||
       activities.some(s => s.id !== `sector.${s.classificationCode!.toLowerCase()}`) ||
@@ -58,7 +72,9 @@ export async function prepareEconomicSectors(repositoryRoot: string) {
     const expectedUnit = { nominal: "million_gel", growth: "previous_year_100_index", growth_validation: "million_gel_constant_2019_chain_linked" }[source.role];
     const expectedSourceId = { nominal: "source.geostat_national_gdp_sna_2008", growth: "source.geostat_sector_growth", growth_validation: "source.geostat_sector_volume" }[source.role];
     if (source.unit !== expectedUnit || source.headerRow !== 2 || !same(source.activityRows, [3, 22]) || source.gdpRow !== 26 ||
-        !same(source.annualYears, years(source.role === "growth" ? 2011 : 2010)) || !same(source.preliminaryYears, [2025]) ||
+        !same(source.annualYears, years(source.role === "growth" ? 2011 : 2010, lastAnnualYear)) || !same(source.preliminaryYears, preliminaryYears) ||
+        // Edition guard: bump with the Geostat release named in the refresh
+        // step of docs/data-methodology/economic-sectors.md.
         source.releasedAt !== "2026-06-19" || source.sourceId !== expectedSourceId ||
         (source.role === "growth" && source.conversion !== "subtract 100 using decimal arithmetic"))
       throw new Error(`Unreviewed source mapping: ${source.role}`);
@@ -88,6 +104,8 @@ export async function prepareEconomicSectors(repositoryRoot: string) {
     });
     const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1 });
     const notes = rows.slice(26).flat().filter((v): v is string => typeof v === "string");
+    // Edition guard: these two notes identify the archived release. The refresh
+    // step in docs/data-methodology/economic-sectors.md updates both strings.
     if (!notes.includes("* Revised data will be published on November 16, 2026.") || !notes.includes("Last update: 19.06.2026"))
       throw new Error(`Source preliminary note/release mismatch: ${source.role}`);
     const annual = new Map<number, { column: number; header: string; status: SectorStatus }>();
@@ -176,8 +194,10 @@ export async function prepareEconomicSectors(repositoryRoot: string) {
     status: "PASS", reviewedAt: manifest.reviewedAt, capturedOn: manifest.capturedOn,
     counts: Object.fromEntries(measures.map(measure => [measure, facts.filter(f => f.measure === measure).length])),
     countsByStatus: Object.fromEntries(measures.map(measure => [measure, Object.fromEntries(["published", "preliminary"].map(status => [status, facts.filter(f => f.measure === measure && f.status === status).length]))])),
-    availableObservations: facts.length, fullGridObservations: 1008, missingCells,
-    missingGrowthReason: "2010: no published annual index and no compatible 2009 volume input; approved growth coverage is 2011-2025.",
+    availableObservations: facts.length,
+    fullGridObservations: registry.length * years(2010, lastAnnualYear).length * measures.length,
+    missingCells,
+    missingGrowthReason: `2010: no published annual index and no compatible 2009 volume input; approved growth coverage is 2011-${lastAnnualYear}.`,
     coverage: registry.map(s => ({ seriesId: s.id, yearsByMeasure: Object.fromEntries(measures.map(measure => [measure, facts.filter(f => f.seriesId === s.id && f.measure === measure).map(f => f.year)])) })),
     sourceHashes, sourceVintages: sources.map(s => ({ ...s.source, notes: s.notes })),
     nominalReconciliationToleranceMillionGel: manifest.nominalReconciliationToleranceMillionGel,

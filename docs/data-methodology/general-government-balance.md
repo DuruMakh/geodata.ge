@@ -56,7 +56,7 @@ calculated percentage = nominal balance / fiscal-year GDP × 100
 
 The published percentage must reconcile within 0.02 percentage points. The April 2026 source passes for every year; the largest difference is approximately 0.0148 percentage points. This check confirms internal consistency without changing either IMF value.
 
-The loader additionally requires complete 1995–2031 coverage, unique years, safe integer GEL values, matching signs, exact provenance fields, and the fixed 2025/2026 actual-to-projection boundary. `npm run data:validate` also requires the IMF source ID to exist in the source catalog.
+The loader additionally requires contiguous unique years, safe integer GEL values, matching signs, actual years before projections, and exactly one WEO edition across the source ID, dataset version, vintage and review date. The April/October edition encoded in the source ID must agree with the source vintage. `npm run data:validate` also requires the IMF source ID to exist in the source catalog.
 
 ## WEO revisions and limitations
 

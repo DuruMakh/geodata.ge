@@ -15,6 +15,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "caveats.gdp_preliminary",
   "caveats.gdp_sna_break_2010",
   "caveats.gdp_world_bank_history",
+  "caveats.gdp_world_bank_preliminary_basis",
   "caveats.inflation_contribution_derived",
   "caveats.inflation_contribution_residual",
   "caveats.inflation_contribution_weights_differ",

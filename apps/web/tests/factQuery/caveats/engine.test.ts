@@ -71,14 +71,16 @@ describe("CAVEAT_RULES registry", () => {
   // Plus four government-debt codes and two general-government-balance codes,
   // added on 2026-09-04 when those datasets began being served, and two GDP
   // overview codes and one economic-sectors code, registered on 2026-09-14 after
-  // those datasets shipped them inline.
+  // those datasets shipped them inline, plus the World Bank preliminary-basis
+  // disclosure registered by the data-refresh safeguards.
   it("registers spec section 9.2's codes, less nominal_gel, plus the approved splits, new datasets and 2004 component guard", () => {
-    expect(CAVEAT_RULES).toHaveLength(37);
+    expect(CAVEAT_RULES).toHaveLength(38);
     const codes = CAVEAT_RULES.map((rule) => rule.code);
     expect(codes).toContain("admin_category_not_yet_established");
     expect(codes).toContain("program_parent_category_modern_grouping");
     expect(codes).toContain("gdp_historical_method");
     expect(codes).toContain("gdp_world_bank_history");
+    expect(codes).toContain("gdp_world_bank_preliminary_basis");
     expect(codes).toContain("sectors_preliminary");
     expect(codes).toContain("inflation_contribution_derived");
     expect(codes).toContain("inflation_contribution_residual");

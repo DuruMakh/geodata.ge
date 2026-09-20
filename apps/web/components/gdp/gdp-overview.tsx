@@ -80,6 +80,16 @@ export function GdpOverview({
     color: "var(--ink)",
     valuesByYear: Object.fromEntries(m.points.map((p) => [p.year, p.value])),
   };
+  const selectedYears = new Set(m.years);
+  const preliminaryYears = [
+    ...new Set(
+      facts
+        .filter((fact) => fact.status === "preliminary" && selectedYears.has(fact.year))
+        .map((fact) => fact.year),
+    ),
+  ]
+    .sort((left, right) => left - right)
+    .join(", ");
   const chartSeries = [
     {
       id: row.itemId,
@@ -274,10 +284,24 @@ export function GdpOverview({
         />
         <div className="mt-5 space-y-2">
           <SourceNote>
-            {state.indicator === "real" || state.indicator === "growth"
-              ? t("wbNote")
-              : t("geostatNote")}{" "}
-            {state.indicator === "per_capita" ? t("perCapitaNote") : ""}
+            {state.indicator === "real" || state.indicator === "growth" ? (
+              <>
+                {t("wbNote")} {" "}
+                {preliminaryYears
+                  ? message(messages, "gdp.wbPreliminaryBasisNote", {
+                      years: preliminaryYears,
+                    })
+                  : ""}
+              </>
+            ) : (
+              <>
+                {t("geostatNote")} {" "}
+                {preliminaryYears
+                  ? message(messages, "gdp.preliminaryNote", { years: preliminaryYears })
+                  : ""}{" "}
+                {state.indicator === "per_capita" ? t("perCapitaNote") : ""}
+              </>
+            )}
           </SourceNote>
           <Link
             href={pageHref("/methodology/gdp", locale)}

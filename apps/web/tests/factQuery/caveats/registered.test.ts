@@ -45,7 +45,12 @@ describe("caveats come only from the registered catalogue", () => {
     const years = Array.from(new Set(snapshot.gdpOverview.facts.map((fact) => fact.year))).sort((a, b) => a - b);
     const caveats = expectRegistered(queryGdp(snapshot, { seriesIds: Object.keys(GDP_QUERY_SERIES), years }), "query_gdp");
     // Not vacuous: the full range carries preliminary, SNA-break and World Bank cells.
-    expect(caveats.map((caveat) => caveat.code).sort()).toEqual(["gdp_historical_method", "gdp_preliminary", "gdp_world_bank_history"]);
+    expect(caveats.map((caveat) => caveat.code).sort()).toEqual([
+      "gdp_historical_method",
+      "gdp_preliminary",
+      "gdp_world_bank_history",
+      "gdp_world_bank_preliminary_basis",
+    ]);
   });
 
   it("registers every caveat economic sectors emit for each measure", () => {

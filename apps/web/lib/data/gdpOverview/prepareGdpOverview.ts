@@ -16,10 +16,28 @@ const reviewed = "2026-09-11";
 import { validateGdpObservations } from "./validation";
 export { validateGdpObservations } from "./validation";
 
+type GdpSourceManifest = {
+  files: {
+    file: string;
+    sha256: string;
+    bytes: number;
+    preliminary_years?: number[];
+  }[];
+};
+
+/**
+ * Which Geostat years are still preliminary is a property of the archived
+ * edition, so it is declared in the manifest beside the hash rather than
+ * written into this script as a year.
+ */
+export function geostatPreliminaryYears(manifest: GdpSourceManifest): Set<number> {
+  return new Set(manifest.files.flatMap((entry) => entry.preliminary_years ?? []));
+}
+
 export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
   const manifest = JSON.parse(
     await fs.readFile(path.join(sourceRoot, "source-manifest.json"), "utf8"),
-  ) as { files: { file: string; sha256: string; bytes: number }[] };
+  ) as GdpSourceManifest;
   const buffers = new Map<string, Buffer>();
   const sourceHashes: Record<string, string> = {};
   for (const entry of manifest.files) {
@@ -30,6 +48,7 @@ export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
     buffers.set(path.basename(entry.file), bytes);
     sourceHashes[entry.file] = hash;
   }
+  const preliminary = geostatPreliminaryYears(manifest);
   const facts: GdpObservation[] = [];
   function add(
     seriesId: GdpSeriesId,
@@ -44,7 +63,7 @@ export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
       year,
       value,
       unit: GDP_SERIES[seriesId].unit,
-      status: accountingStandard && year === 2025 ? "preliminary" : "published",
+      status: accountingStandard && preliminary.has(year) ? "preliminary" : "published",
       accountingStandard,
       sourceId,
       sourceLocator,
@@ -78,7 +97,7 @@ export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
   const fx: Record<number, number> = {};
   for (const [filename, first, last, standard] of [
     ["geostat_nominal_legacy.xlsx", 1996, 2009, "sna_1993"],
-    ["geostat_nominal_current.xlsx", 2010, 2025, "sna_2008"],
+    ["geostat_nominal_current.xlsx", 2010, null, "sna_2008"],
   ] as const) {
     const book = XLSX.read(buffers.get(filename), { type: "buffer" });
     const name = book.SheetNames[0],
@@ -102,8 +121,8 @@ export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
       const match = /^(\d{4})(\*)?$/.exec(String(header));
       if (!match) return;
       const year = Number(match[1]);
-      if (year < first || year > last) return;
-      if ((year === 2025) !== Boolean(match[2]))
+      if (year < first || (last !== null && year > last)) return;
+      if (preliminary.has(year) !== Boolean(match[2]))
         throw new Error("Geostat preliminary header mismatch");
       fx[year] = Number(rows[fxRow][column]);
       for (const [id, row, scale] of mappings) {
@@ -123,26 +142,32 @@ export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
   }
   validateGdpObservations(facts);
   facts.sort((a, b) => a.seriesId.localeCompare(b.seriesId) || a.year - b.year);
-  const value = (id: GdpSeriesId, y: number) =>
-    Number(facts.find((f) => f.seriesId === id && f.year === y)!.value);
+  const value = (id: GdpSeriesId, year: number) => {
+    const observation = facts.find((fact) => fact.seriesId === id && fact.year === year);
+    if (!observation) throw new Error(`Missing GDP observation ${id}:${year}`);
+    return Number(observation.value);
+  };
   let maxGrowthError = 0;
-  for (let y = 1961; y <= 2025; y++)
+  for (const year of facts
+    .filter((fact) => fact.seriesId === "real_growth_percent")
+    .map((fact) => fact.year)) {
     maxGrowthError = Math.max(
       maxGrowthError,
       Math.abs(
-        (value("real_usd_2015", y) / value("real_usd_2015", y - 1) - 1) * 100 -
-          value("real_growth_percent", y),
+        (value("real_usd_2015", year) / value("real_usd_2015", year - 1) - 1) * 100 -
+          value("real_growth_percent", year),
       ),
     );
+  }
   if (maxGrowthError > 1e-7)
     throw new Error("World Bank growth/level mismatch");
-  for (let y = 1996; y <= 2025; y++)
+  for (const year of facts.filter((fact) => fact.seriesId === "nominal_gel").map((fact) => fact.year))
     for (const [gel, usd] of [
       ["nominal_gel", "nominal_usd"],
       ["per_capita_gel", "per_capita_usd"],
     ] as const) {
-      if (Math.abs(value(gel, y) / fx[y] - value(usd, y)) > 1)
-        throw new Error(`Geostat currency mismatch ${y}`);
+      if (!Number.isFinite(fx[year]) || Math.abs(value(gel, year) / fx[year] - value(usd, year)) > 1)
+        throw new Error(`Geostat currency mismatch ${year}`);
     }
   const denominator = parse(
     await fs.readFile(
