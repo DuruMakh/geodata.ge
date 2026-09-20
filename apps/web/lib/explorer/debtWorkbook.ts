@@ -2,8 +2,8 @@ import type {
   DebtFamily,
   DebtSeriesId,
   ClientGovernmentDebtFact,
-  ServedNationalGdpFact,
 } from "../servedRows";
+import type { ClientNationalGdpFact } from "./clientData";
 import { GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS } from "../data/governmentDebt/types";
 import type { Presentation } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
@@ -18,7 +18,7 @@ import {
 
 export type DebtWorkbookInput = {
   facts: readonly ClientGovernmentDebtFact[];
-  gdpFacts: readonly ServedNationalGdpFact[];
+  gdpFacts: readonly ClientNationalGdpFact[];
   family: DebtFamily;
   selectedIds: readonly DebtSeriesId[];
   range: { start: number; end: number };

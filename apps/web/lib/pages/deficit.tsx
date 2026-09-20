@@ -14,6 +14,7 @@ import { coverageFromYears, fiscalMetadata, generalGovernmentDeficitMetadata } f
 import { DEFICIT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { projectBalanceFact } from "../explorer/clientData";
 
 function workbookSourcesFor(messages: Parameters<typeof message>[0]): WorkbookPublicSource[] { return [{
   years: Array.from({ length: 37 }, (_, index) => 1995 + index),
@@ -63,7 +64,7 @@ export async function renderDeficitPage(locale: Locale) {
       ]} />
       <I18nProvider {...presentation}>
       <DeficitExplorer
-        facts={facts}
+        facts={facts.map(projectBalanceFact)}
         workbookSources={workbookSourcesFor(messages)}
         siteOrigin={resolveSiteUrl()}
         lastUpdatedAt={lastUpdatedAt}

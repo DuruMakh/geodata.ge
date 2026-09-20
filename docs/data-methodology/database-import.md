@@ -153,6 +153,35 @@ direct host is IPv6-only and unused in this project). Secret table:
 The deployed site is fully static in both modes; database downtime can only
 ever delay a rebuild, never take the site down.
 
+### How often a dataset loads
+
+`resolveServedDataSource()` in `apps/web/lib/data/servedDataSource.ts` is the
+only reader of `GEODATA_DATA_SOURCE`. It accepts `csv` (the default) and `db`
+and throws `GEODATA_DATA_SOURCE must be "db" or "csv", got "<raw>"` on anything
+else. It lives in its own module so the loaders `servedData.ts` re-exports can
+read the mode without closing an import cycle.
+
+Every served loader is memoised per process — `loadServedGovernmentDebtData`,
+`loadServedGeneralGovernmentBalanceData`, `loadServedGdpOverviewData`,
+`loadServedEconomicSectorsData`, `loadServedRegionalEconomyData` and
+`loadServedInflationData`. Each builds once and hands the same promise to later
+callers, so a build parses each dataset once and, in db mode, runs each parity
+check once, instead of once per route. A rejection is cached too: the first
+parity failure is the build failure.
+
+Two consequences for anyone editing this area:
+
+- A test that switches `GEODATA_DATA_SOURCE` between cases must call
+  `resetServedDataCacheForTests()` (or the loader's own
+  `reset…CacheForTests`) first, or the mode the first load resolved decides
+  every later one.
+- The snapshot `/mcp` answers from takes GDP, economic sector and regional
+  economy facts through `loadServed…Rows()`, the accessor that returns rows
+  before the numeric projection. Those rows keep `value` as the exact decimal
+  string: most of these values do not survive a float64 round-trip, so the
+  snapshot must never be built from the projected numbers.
+
+
 ## Re-running for a new data year
 
 1. Land the reviewed CSVs as usual (extraction → staging → review →

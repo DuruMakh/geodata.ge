@@ -1,4 +1,5 @@
-import type { DebtFamily, DebtSeriesId, ClientGovernmentDebtFact, ServedNationalGdpFact } from "../servedRows";
+import type { DebtFamily, DebtSeriesId, ClientGovernmentDebtFact } from "../servedRows";
+import type { ClientNationalGdpFact } from "./clientData";
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { INK } from "./colors";
@@ -115,7 +116,7 @@ export function debtRangeForFamily(
   return { start: Math.min(...years), end: Math.max(...years) };
 }
 
-function shareOfGdp(value: number | null, year: number, gdpByYear: Map<number, ServedNationalGdpFact>): number | null {
+function shareOfGdp(value: number | null, year: number, gdpByYear: Map<number, ClientNationalGdpFact>): number | null {
   if (value === null) return null;
   const gdp = gdpByYear.get(year)?.gdpCurrentPricesGel;
   return gdp === undefined || gdp <= 0 ? null : value / gdp;
@@ -125,7 +126,7 @@ function tableRowFor(
   item: DebtExplorerItem,
   factsBySeriesYear: Map<string, ClientGovernmentDebtFact>,
   years: number[],
-  gdpByYear: Map<number, ServedNationalGdpFact>,
+  gdpByYear: Map<number, ClientNationalGdpFact>,
 ): DebtExplorerTableRow | null {
   const valuesByYear: Record<number, number | null> = {};
   const statusByYear: Record<number, ClientGovernmentDebtFact["status"]> = {};
@@ -155,7 +156,7 @@ function tableRowFor(
 
 export function buildDebtExplorerModel(input: {
   facts: ClientGovernmentDebtFact[];
-  gdpFacts: ServedNationalGdpFact[];
+  gdpFacts: ClientNationalGdpFact[];
   family: DebtFamily;
   selectedIds: DebtSeriesId[];
   range: { start: number; end: number };

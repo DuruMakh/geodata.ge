@@ -1210,6 +1210,92 @@ test("ships no server-only provenance fields in explorer payloads", async ({ pag
   }
 });
 
+// Script text joined with a space: the guard counts occurrences, so the
+// separator only has to keep two payloads from forming one accidental match.
+const readPayloadOccurrences = (page: Page) =>
+  page.evaluate(() => {
+    const payload = [...document.querySelectorAll("script")].map((script) => script.textContent ?? "").join(" ");
+    const count = (needle: string) => payload.split(needle).length - 1;
+    return {
+      sourceIds: count("sourceId"),
+      sourceLocators: count("sourceLocator"),
+      snapshotDates: count("snapshotDate"),
+      valuations: count("valuation"),
+      priceBases: count("priceBasis"),
+      accountingStandards: count("accountingStandard"),
+      calculations: count("calculation"),
+      reviewDates: count("lastReviewedAt"),
+    };
+  });
+
+test("ships no unread provenance columns on the dataset routes", async ({ page }) => {
+  for (const route of [
+    "/explorer/debt",
+    "/explorer/deficit",
+    "/explorer/economy/gdp",
+    "/explorer/economy/sectors",
+    "/explorer/economy/regions",
+    "/explorer/economy/regions/imereti",
+    "/explorer/inflation/overview",
+    "/explorer/inflation/categories",
+  ]) {
+    await page.goto(`${TEST_BASE_URL}${route}`);
+    // The regions index is a map of links with no client explorer, so it never
+    // raises the app-ready flag; its payload is in the served HTML regardless.
+    if (route !== "/explorer/economy/regions") await expectAppReady(page);
+    const occurrences = await readPayloadOccurrences(page);
+
+    // These columns exist for validation, mapping review and the database
+    // parity check. No client component reads one.
+    expect(
+      {
+        sourceLocators: occurrences.sourceLocators,
+        snapshotDates: occurrences.snapshotDates,
+        valuations: occurrences.valuations,
+        priceBases: occurrences.priceBases,
+        calculations: occurrences.calculations,
+      },
+      route,
+    ).toEqual({
+      sourceLocators: 0,
+      snapshotDates: 0,
+      valuations: 0,
+      priceBases: 0,
+      calculations: 0,
+    });
+
+    // The debt page also carries the budget explorer's national GDP rows, and
+    // that shared client type keeps accountingStandard. Every provenance
+    // column of the debt dataset itself is gone.
+    if (route !== "/explorer/debt") {
+      expect(occurrences.accountingStandards, `${route} accountingStandard occurrences`).toBe(0);
+    }
+
+    // A page passes the newest review date once, as a prop, instead of
+    // carrying one on every row.
+    expect(occurrences.reviewDates, `${route} lastReviewedAt occurrences`).toBeLessThanOrEqual(4);
+  }
+});
+
+test("hoists the source ids the workbook builders read", async ({ page }) => {
+  // These pages send one map per page instead of an id per row. Debt is not in
+  // the list: a debt fact's source varies by series AND year, so its map would
+  // hold one entry per row and cost more than the column it replaced, and the
+  // rows keep sourceId.
+  for (const route of [
+    "/explorer/economy/gdp",
+    "/explorer/economy/sectors",
+    "/explorer/economy/regions/imereti",
+    "/explorer/inflation/overview",
+    "/explorer/inflation/categories",
+  ]) {
+    await page.goto(`${TEST_BASE_URL}${route}`);
+    await expectAppReady(page);
+    const occurrences = await readPayloadOccurrences(page);
+    expect(occurrences.sourceIds, `${route} sourceId occurrences`).toBeLessThanOrEqual(20);
+  }
+});
+
 test("every explorer route family renders the site footer", async ({ page }) => {
   // These are the site's main SEO landing targets, and the footer carries the
   // CC BY 4.0 licence, the contact address and the methodology link. Under the

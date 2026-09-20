@@ -9,7 +9,7 @@ import { DebtExplorer } from "../../components/debt/debt-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { loadServedExplorerData, loadServedGovernmentDebtData } from "../data/servedData";
-import { projectDebtFact } from "../explorer/clientData";
+import { projectDebtFact, projectGdpFact } from "../explorer/clientData";
 import { coverageFromYears, fiscalMetadata, governmentDebtMetadata } from "../seo/metadata";
 import { DEBT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
@@ -66,7 +66,7 @@ export async function renderDebtPage(locale: Locale) {
       <I18nProvider {...presentation}>
       <DebtExplorer
         facts={facts.map(projectDebtFact)}
-        gdpFacts={gdpFacts}
+        gdpFacts={gdpFacts.map(projectGdpFact)}
         workbookSources={workbookSources}
         gdpWorkbookSources={gdpWorkbookSources}
         siteOrigin={resolveSiteUrl()}

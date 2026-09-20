@@ -7,6 +7,7 @@ import type {
   ClientSectorObservation,
   ServedAdminFact,
   ServedBudgetFact,
+  ServedGeneralGovernmentBalanceFact,
   ServedGovernmentDebtFact,
   ServedNationalGdpFact,
 } from "../servedRows";
@@ -116,4 +117,20 @@ export function sourceIdBySeriesMeasure(
   return Object.fromEntries(
     facts.map((fact) => [`${fact.seriesId}:${fact.measure}`, fact.sourceId]),
   );
+}
+
+export type ClientGeneralGovernmentBalanceFact = Omit<
+  ServedGeneralGovernmentBalanceFact,
+  "sourceId" | "lastReviewedAt"
+>;
+
+/**
+ * The deficit page's workbook cites its sources from the reviewed manifest,
+ * not from the rows, so neither field has a browser reader.
+ */
+export function projectBalanceFact(
+  fact: ServedGeneralGovernmentBalanceFact,
+): ClientGeneralGovernmentBalanceFact {
+  const { sourceId: _sourceId, lastReviewedAt: _lastReviewedAt, ...rest } = fact;
+  return rest;
 }
