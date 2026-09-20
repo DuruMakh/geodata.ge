@@ -6,11 +6,6 @@ import { METHODOLOGY_CONTENT } from "../../lib/methodology/catalog";
 import common from "../../lib/i18n/messages/ka/common.json";
 import methodology from "../../lib/i18n/messages/ka/methodology.json";
 
-// The article page reaches lib/i18n/common.server.ts, whose server-only guard
-// resolves to its throwing client entry under Vitest (no react-server export
-// condition). The guard is a bundler check, so stub it here.
-vi.mock("server-only", () => ({}));
-
 // Counting the served loader is the only way to see which articles need debt
 // data: every article renders the same component, and the memo hides a second
 // call behind the first.
