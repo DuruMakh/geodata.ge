@@ -13,6 +13,20 @@ Nominal total cells in millions are multiplied by one million, using Decimal ari
 ## Validation and refresh
 `npm run data:prepare-gdp-overview` writes the canonical BOM CSV and validation report; `npm run data:check-gdp-overview` checks byte parity without writing. Both read archived originals offline. Source hashes, country/indicator, year uniqueness/coverage, units, status, finite values, FX and level/growth consistency are checked. Source updates require a reviewed replacement manifest; builds never fetch fresh upstream files.
 
+### Refresh order
+
+The GDP overview's Geostat nominal series feeds three artifacts, so they are refreshed together, in one change, in this order:
+
+1. `data/imports/national-gdp-annual-1996-2025.csv` — the budget and debt denominator, rounded to 0.1 mln GEL.
+2. `data/imports/gdp-overview-annual.csv` — the full-precision series behind the GDP page.
+3. `data/imports/economic-sectors-annual.csv` — `economy.gdp_total`, compared with the overview at five decimal places of one GEL.
+
+`npm run data:check-nominal-gdp-consistency` (part of `npm run data:validate`) is the gate: it compares the three artifacts at five decimal places of one GEL, preserves the national series' reviewed 0.1 mln GEL rounding, and verifies the two archived copies of `03_GDP-at-Current-Prices.xlsx`. A refresh that updates only one artifact fails there.
+
+Preliminary years are declared in the manifests — `preliminary_years` in the GDP overview manifest and `preliminaryYears` in the sector manifest — and the prepare scripts read them. The runtime validators assert only the invariant: preliminary years are the newest years, and every series from one publisher ends in the same year. The literals that remain in the prepare scripts are edition guards, each marked with a comment naming the refresh step that retires it.
+
+When Geostat finalises a year, `query_gdp` and the GDP page stop showing `gdp_world_bank_preliminary_basis` automatically: its scope follows the manifest's preliminary years, not a written-in year.
+
 Serving imports the pure observation validator without loading workbook preparation. The public GDP CSV is generated during prebuild and independently checked during postbuild, after it exists; canonical source validation remains available on a clean checkout before any build.
 
 ## Serving

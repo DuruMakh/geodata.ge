@@ -46,6 +46,18 @@ npm run data:prepare-economic-sectors
 npm run data:check-economic-sectors
 ```
 
+### Refresh order
+
+The economic-sectors GDP total is one of three artifacts fed by the same Geostat nominal GDP, so they are refreshed together, in one change, in this order:
+
+1. `data/imports/national-gdp-annual-1996-2025.csv` — the budget and debt denominator, rounded to 0.1 mln GEL.
+2. `data/imports/gdp-overview-annual.csv` — the full-precision series behind the GDP page.
+3. `data/imports/economic-sectors-annual.csv` — `economy.gdp_total`, compared with the overview at five decimal places of one GEL.
+
+`npm run data:check-nominal-gdp-consistency` (part of `npm run data:validate`) is the gate: it compares the three artifacts at five decimal places of one GEL, preserves the national series' reviewed 0.1 mln GEL rounding, and verifies the two archived copies of `03_GDP-at-Current-Prices.xlsx`. A refresh that updates only one artifact fails there.
+
+Preliminary years are declared in the manifests — `preliminary_years` in the GDP overview manifest and `preliminaryYears` in the sector manifest — and the prepare scripts read them. The runtime validators assert only the invariant: preliminary years are the newest years, and every series from one publisher ends in the same year. The literals that remain in the prepare scripts are edition guards, each marked with a comment naming the refresh step that retires it.
+
 `--write` regenerates the three outputs from local originals. `--check` regenerates them in memory and compares exact bytes, failing on any difference without writing. The check is appended to the existing data validation chain. Neither mode fetches upstream sources or uses the current clock; review dates come from the reviewed manifest. Geostat must be credited and archived originals must remain unchanged.
 
 ## Serving and public outputs
