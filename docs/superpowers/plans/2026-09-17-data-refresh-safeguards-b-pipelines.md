@@ -38,7 +38,7 @@
 - Produces: `checkNominalGdpConsistency(repositoryRoot: string): Promise<{ years: number[]; comparisons: number }>`. It throws an `Error` whose message lists every disagreement, one per line; it returns the covered years and the number of comparisons made.
 - Consumes: `data/imports/gdp-overview-annual.csv`, `data/imports/economic-sectors-annual.csv`, `data/imports/national-gdp-annual-1996-2025.csv`, `docs/Raw Data/Economy/gdp-overview/source-manifest.json`, `docs/Raw Data/GDP/national-nominal-gdp/source-manifest.csv`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/web/tests/data/nominalGdpConsistency.test.ts`:
 
@@ -112,7 +112,7 @@ describe("nominal GDP consistency", () => {
 Run: `npx vitest run tests/data/nominalGdpConsistency.test.ts`
 Expected: FAIL — the module does not exist.
 
-- [ ] **Step 2: Implement the check**
+- [x] **Step 2: Implement the check**
 
 Create `apps/web/lib/data/nominalGdpConsistency.ts`:
 
@@ -220,12 +220,12 @@ main().catch((error: unknown) => {
 });
 ```
 
-- [ ] **Step 3: Run the test**
+- [x] **Step 3: Run the test**
 
 Run: `npx vitest run tests/data/nominalGdpConsistency.test.ts`
 Expected: PASS, all four cases.
 
-- [ ] **Step 4: Put it in the data gate**
+- [x] **Step 4: Put it in the data gate**
 
 In `apps/web/package.json`, add beside the other `data:check-*` entries:
 
@@ -238,7 +238,7 @@ and add `npm run data:check-nominal-gdp-consistency && ` to the `data:validate` 
 Run: `npm run data:check-nominal-gdp-consistency`
 Expected: exit 0, printing `Nominal GDP artifacts agree for 1996–2025 (…)`.
 
-- [ ] **Step 5: Prove it bites on the real data**
+- [x] **Step 5: Prove it bites on the real data**
 
 Run:
 
@@ -248,7 +248,7 @@ node -e "const fs=require('fs');const p='../../data/imports/economic-sectors-ann
 
 Then `npm run data:check-nominal-gdp-consistency` and confirm it fails naming `economy.gdp_total 2025`. Restore the file with `git checkout -- ../../data/imports/economic-sectors-annual.csv` and re-run the check to confirm it passes again.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add lib/data/nominalGdpConsistency.ts scripts/check-nominal-gdp-consistency.ts tests/data/nominalGdpConsistency.test.ts package.json
@@ -270,7 +270,7 @@ git commit -m "feat(data): tie the three nominal GDP artifacts together with one
 - Produces: `geostatPreliminaryYears(manifest): Set<number>`, exported from `prepareGdpOverview.ts`. It returns every year listed in `preliminary_years` across the manifest's Geostat entries.
 - The manifest entry type becomes `{ file: string; sha256: string; bytes: number; preliminary_years?: number[] }`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `apps/web/tests/data/gdpOverview/prepareGdpOverview.test.ts`:
 
@@ -294,7 +294,7 @@ Append to `apps/web/tests/data/gdpOverview/prepareGdpOverview.test.ts`:
 Run: `npx vitest run tests/data/gdpOverview/prepareGdpOverview.test.ts`
 Expected: FAIL — `geostatPreliminaryYears` is not exported.
 
-- [ ] **Step 2: Add the field to the manifest**
+- [x] **Step 2: Add the field to the manifest**
 
 In `docs/Raw Data/Economy/gdp-overview/source-manifest.json`, add `"preliminary_years"` to the two Geostat entries and leave the World Bank entries untouched:
 
@@ -315,7 +315,7 @@ In `docs/Raw Data/Economy/gdp-overview/source-manifest.json`, add `"preliminary_
     },
 ```
 
-- [ ] **Step 3: Read it in the overview prepare script**
+- [x] **Step 3: Read it in the overview prepare script**
 
 In `apps/web/lib/data/gdpOverview/prepareGdpOverview.ts`:
 
@@ -347,7 +347,7 @@ In `apps/web/lib/data/gdpOverview/prepareGdpOverview.ts`:
            throw new Error("Geostat preliminary header mismatch");
    ```
 
-- [ ] **Step 4: Derive the sector coverage and preliminary years from its manifest**
+- [x] **Step 4: Derive the sector coverage and preliminary years from its manifest**
 
 In `apps/web/lib/data/economicSectors/prepareEconomicSectors.ts`:
 
@@ -380,7 +380,7 @@ In `apps/web/lib/data/economicSectors/prepareEconomicSectors.ts`:
        // step in docs/data-methodology/economic-sectors.md updates both strings.
    ```
 
-- [ ] **Step 5: Mark the national GDP literals as edition guards**
+- [x] **Step 5: Mark the national GDP literals as edition guards**
 
 In `apps/web/lib/data/nationalGdp/prepareNationalGdp.ts`, add above `EXPECTED_SOURCE_YEARS` (line 57):
 
@@ -398,7 +398,7 @@ and above the status rule (line 196):
     // moves this year and the manifest note that documents it.
 ```
 
-- [ ] **Step 6: Run the prepare tests**
+- [x] **Step 6: Run the prepare tests**
 
 Run: `npx vitest run tests/data/gdpOverview/prepareGdpOverview.test.ts tests/data/economicSectors`
 Expected: PASS. The 2025 status and the four preliminary facts are unchanged; they now come from the manifests.
@@ -406,7 +406,7 @@ Expected: PASS. The 2025 status and the four preliminary facts are unchanged; th
 Run: `npm run data:validate`
 Expected: exit 0.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add "../../docs/Raw Data/Economy/gdp-overview/source-manifest.json" lib/data/gdpOverview/prepareGdpOverview.ts lib/data/economicSectors/prepareEconomicSectors.ts lib/data/nationalGdp/prepareNationalGdp.ts tests/data/gdpOverview/prepareGdpOverview.test.ts
@@ -427,7 +427,7 @@ git commit -m "fix(data): read preliminary years and sector coverage from the ma
 - `GDP_SERIES` entries lose `last` and keep `{ unit, first }`. Nothing outside `validation.ts` read `last` (`importGdpOverview.ts:27` and `prepareGdpOverview.ts:46,164` use the key set and `unit` only).
 - `validateGdpObservations(facts: GdpObservation[]): void` keeps its signature and its `coverage`, `duplicate`, `unit` and `finite` message wording, which existing tests match.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/web/tests/data/gdpOverview/validation.test.ts`:
 
@@ -471,7 +471,7 @@ describe("GDP observation invariants", () => {
 Run: `npx vitest run tests/data/gdpOverview/validation.test.ts`
 Expected: FAIL — the current validator accepts a 2020 preliminary row and rejects nothing about series ending apart.
 
-- [ ] **Step 2: Drop the pinned last year**
+- [x] **Step 2: Drop the pinned last year**
 
 In `apps/web/lib/data/gdpOverview/types.ts`, replace lines 1–8:
 
@@ -488,7 +488,7 @@ export const GDP_SERIES = {
 } as const;
 ```
 
-- [ ] **Step 3: Rewrite the validator's status and coverage rules**
+- [x] **Step 3: Rewrite the validator's status and coverage rules**
 
 In `apps/web/lib/data/gdpOverview/validation.ts`, replace the status check inside the loop:
 
@@ -553,7 +553,7 @@ and replace the coverage loop at the end of the function:
     throw new Error("GDP coverage mismatch: Geostat and World Bank coverage are more than a year apart");
 ```
 
-- [ ] **Step 4: Remove the sector year ceiling**
+- [x] **Step 4: Remove the sector year ceiling**
 
 In `apps/web/lib/data/economicSectors/validation.ts`, replace line 39:
 
@@ -564,7 +564,7 @@ In `apps/web/lib/data/economicSectors/validation.ts`, replace line 39:
       throw new Error(`Invalid annual sector year ${f.year}`);
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run tests/data/gdpOverview tests/data/economicSectors`
 Expected: PASS, including `prepareGdpOverview.test.ts`'s `/coverage/i`, `/duplicate/i`, `/unit/i` and `/finite/i` expectations.
@@ -572,7 +572,7 @@ Expected: PASS, including `prepareGdpOverview.test.ts`'s `/coverage/i`, `/duplic
 Run: `npm run typecheck`
 Expected: exit 0. If any call site read `GDP_SERIES[...].last`, it appears here — fix it by deriving the year from the facts, never by re-adding the field.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add lib/data/gdpOverview/types.ts lib/data/gdpOverview/validation.ts lib/data/economicSectors/validation.ts tests/data/gdpOverview/validation.test.ts
@@ -592,7 +592,7 @@ git commit -m "fix(data): validate GDP and sector vintages as invariants, not as
 - `validateGeneralGovernmentBalanceManifest(record)` keeps its name and return type; its schema validates shapes and cross-field consistency instead of one edition's values.
 - `loadGeneralGovernmentBalanceFacts(relativePath)` keeps its signature. It now requires one edition per file and an actual-then-projection ordering, and it no longer names April 2026 or 2031.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to the existing loader test file (`apps/web/tests/data/generalGovernmentBalance/importGeneralGovernmentBalance.test.ts`, or create it beside the prepare test if it does not exist):
 
@@ -628,7 +628,7 @@ Add the `node:fs/promises` and `node:os` imports the block uses.
 Run: `npx vitest run tests/data/generalGovernmentBalance`
 Expected: FAIL — the loader rejects the October 2026 rows outright, because `source_id`, `source_vintage`, `last_reviewed_at` and the 2031 ceiling are `z.literal` pins.
 
-- [ ] **Step 2: Make the loader edition-agnostic**
+- [x] **Step 2: Make the loader edition-agnostic**
 
 In `apps/web/lib/data/generalGovernmentBalance/importGeneralGovernmentBalance.ts`:
 
@@ -661,7 +661,7 @@ In `apps/web/lib/data/generalGovernmentBalance/importGeneralGovernmentBalance.ts
    ```
    Use the fact field names the file already builds; if `sourceVintage` and `lastReviewedAt` are not on `GeneralGovernmentBalanceFact`, key the edition set on the parsed rows instead, inside the map's closure.
 
-- [ ] **Step 3: Make the prepare script read the manifest**
+- [x] **Step 3: Make the prepare script read the manifest**
 
 In `apps/web/lib/data/generalGovernmentBalance/prepareGeneralGovernmentBalance.ts`:
 
@@ -714,7 +714,7 @@ In `apps/web/lib/data/generalGovernmentBalance/prepareGeneralGovernmentBalance.t
    ```
    Pass `latestActualYear` at its call sites. The workbook's hash and byte length are still checked — now against the manifest's own values, which is what makes a swapped file fail.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run tests/data/generalGovernmentBalance tests/explorer/deficitRoute.test.tsx`
 Expected: PASS.
@@ -722,7 +722,7 @@ Expected: PASS.
 Run: `npm run data:validate`
 Expected: exit 0 — the canonical CSV still reproduces byte for byte from the April 2026 manifest.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/data/generalGovernmentBalance/prepareGeneralGovernmentBalance.ts lib/data/generalGovernmentBalance/importGeneralGovernmentBalance.ts tests/data/generalGovernmentBalance
@@ -748,7 +748,7 @@ git commit -m "fix(data): take the WEO edition from the manifest and the vintage
 - New caveat code `gdp_world_bank_preliminary_basis`, severity `note`, comparison effect `none`, message key `caveats.gdp_world_bank_preliminary_basis`, owner `gdp-overview.md`.
 - New message keys `gdp.preliminaryNote` (`{years}`) and `gdp.wbPreliminaryBasisNote` (`{years}`).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/web/tests/factQuery/caveats/gdpPreliminaryBasis.test.ts`:
 
@@ -789,7 +789,7 @@ describe("World Bank preliminary basis", () => {
 Run: `npx vitest run tests/factQuery/caveats/gdpPreliminaryBasis.test.ts`
 Expected: FAIL — the code is not registered.
 
-- [ ] **Step 2: Let a rule read dataset metadata**
+- [x] **Step 2: Let a rule read dataset metadata**
 
 In `apps/web/lib/factQuery/caveats/engine.ts`:
 
@@ -806,7 +806,7 @@ In `apps/web/lib/factQuery/caveats/engine.ts`:
    ```
 2. In `evaluateCaveats`, pass it: `if (!rule.applies(context, snapshot)) continue;` and `affects: rule.affects(context, snapshot),`.
 
-- [ ] **Step 3: Register the rule**
+- [x] **Step 3: Register the rule**
 
 In `apps/web/lib/factQuery/caveats/rules.gdp.ts`, add above the exported array:
 
@@ -839,7 +839,7 @@ with `import type { FactQuerySnapshot } from "../types";`, and add the rule to `
   },
 ```
 
-- [ ] **Step 4: Add the service message**
+- [x] **Step 4: Add the service message**
 
 In `apps/web/lib/factQuery/localization.ts`, add `"caveats.gdp_world_bank_preliminary_basis",` to `SERVICE_MESSAGE_KEYS`, in its alphabetical place after `"caveats.gdp_world_bank_history"`.
 
@@ -855,7 +855,7 @@ In `data/localization/ka/service-messages.json`, in the same position:
   "caveats.gdp_world_bank_preliminary_basis": "მსოფლიო ბანკი საქართველოს ეროვნულ ანგარიშებს წინასწარის ნიშნის გარეშე აქვეყნებს, ამიტომ რეალური მშპ-ის უახლესი მაჩვენებლები ეყრდნობა საქსტატის ჯერ კიდევ წინასწარ მონაცემებს და გადაიხედება.",
 ```
 
-- [ ] **Step 5: Document it**
+- [x] **Step 5: Document it**
 
 In `docs/data-methodology/ai-grounding-and-caveats.md`, change line 65 from `37 codes are registered.` to `38 codes are registered.`, and add a section after `### \`gdp_world_bank_history\``, matching the format of its neighbours:
 
@@ -875,7 +875,7 @@ In `docs/data-methodology/ai-grounding-and-caveats.md`, change line 65 from `37 
 The statuses stay publisher-faithful: the World Bank marks nothing preliminary, so the cell keeps basis `published` and the disclosure carries the qualification. The scope follows Geostat's preliminary years, so it clears itself when Geostat finalises them — this is the one rule that reads dataset metadata rather than the request scope, because a response holding only World Bank cells cannot show it.
 ```
 
-- [ ] **Step 6: Say the same thing on the page**
+- [x] **Step 6: Say the same thing on the page**
 
 In `apps/web/lib/i18n/messages/en/gdp.json`:
 
@@ -932,7 +932,7 @@ Append to `apps/web/tests/explorer/gdpRoute.test.tsx`:
 
 Match the file's existing render helper if it differs.
 
-- [ ] **Step 7: Run the query-service gates**
+- [x] **Step 7: Run the query-service gates**
 
 Run: `npx vitest run tests/factQuery/caveats tests/explorer/gdpRoute.test.tsx tests/i18n`
 Expected: PASS, including `documented.test.ts`'s count, section, verbatim-message and comparison-effect checks.
@@ -943,7 +943,7 @@ Expected: PASS **with no fixture edit**. Verified at the baseline: the only `que
 Run: `npm run data:prepare-fact-query-snapshot && npx vitest run tests/factQuery`
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add lib/factQuery/caveats/engine.ts lib/factQuery/caveats/rules.gdp.ts lib/factQuery/localization.ts ../../data/localization/ka/service-messages.json ../../data/localization/en/service-messages.json ../../docs/data-methodology/ai-grounding-and-caveats.md lib/i18n/messages/ka/gdp.json lib/i18n/messages/en/gdp.json components/gdp/gdp-overview.tsx tests/factQuery/caveats/gdpPreliminaryBasis.test.ts tests/explorer/gdpRoute.test.tsx
@@ -960,7 +960,7 @@ git commit -m "feat(mcp): disclose that the newest World Bank real GDP rests on 
 - Modify: `docs/data-methodology/economic-sectors.md`
 - Modify: `docs/data-methodology/ai-reference-intents.md`
 
-- [ ] **Step 1: Write the shared order**
+- [x] **Step 1: Write the shared order**
 
 Add this section to each of the three GDP-family documents, under their refresh or reproduction heading, adjusting only the first sentence to name the document's own dataset:
 
@@ -984,7 +984,7 @@ In `gdp-overview.md`, add one more line under that section:
 When Geostat finalises a year, `query_gdp` and the GDP page stop showing `gdp_world_bank_preliminary_basis` automatically: its scope follows the manifest's preliminary years, not a written-in year.
 ```
 
-- [ ] **Step 2: Record the caveat's reach for the reference intents**
+- [x] **Step 2: Record the caveat's reach for the reference intents**
 
 In `docs/data-methodology/ai-reference-intents.md`, add to the section that describes GDP intents:
 
@@ -992,7 +992,7 @@ In `docs/data-methodology/ai-reference-intents.md`, add to the section that desc
 No reference intent requests a real GDP series, so `gdp_world_bank_preliminary_basis` does not appear in the 20-intent fixture. A future intent that asks for `real_usd_2015` or `real_growth_percent` in a Geostat-preliminary year must expect it.
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add ../../docs/data-methodology/gdp-overview.md ../../docs/data-methodology/national-nominal-gdp.md ../../docs/data-methodology/economic-sectors.md ../../docs/data-methodology/ai-reference-intents.md
@@ -1005,19 +1005,19 @@ git commit -m "docs(methodology): state the nominal GDP refresh order and the ne
 
 **Files:** none (verification only).
 
-- [ ] **Step 1: Full check**
+- [x] **Step 1: Full check**
 
 Run: `npm run check`
 Expected: exit 0, with `data:check-nominal-gdp-consistency` in the `data:validate` output.
 
-- [ ] **Step 2: Build both modes**
+- [x] **Step 2: Build both modes**
 
 Run: `npm run build`
 Expected: exit 0.
 
 If a Supabase `.env` is available, also run `GEODATA_DATA_SOURCE=db npm run build` and expect exit 0: the parity path runs the rewritten validators against the mirror rows. If it is not available, say so in the PR rather than claiming the mode was verified.
 
-- [ ] **Step 3: Browser suite on the production build**
+- [x] **Step 3: Browser suite on the production build**
 
 Run, in two terminals:
 
@@ -1031,7 +1031,7 @@ CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge PLAYWRIGHT_BASE_URL=http://localhost
 
 Expected: all tests pass, including `tests/browser/gdp.spec.ts` and `tests/browser/seo.spec.ts`.
 
-- [ ] **Step 4: Acceptance walk**
+- [x] **Step 4: Acceptance walk**
 
 1. Change one digit of `economy.gdp_total` 2025, and `npm run data:validate` fails naming the year. Restore it.
 2. Change `preliminary_years` in the GDP overview manifest to `[2024]`, and `npm run data:prepare-gdp-overview` (or the prepare test) fails on the header-asterisk mismatch. Restore it.
@@ -1049,3 +1049,25 @@ Push `codex/data-refresh-safeguards-pipelines` and open a draft PR. State in the
 ## Observed, out of scope
 
 `gdp.geostatNote` was the third place that named 2025; Task 5 fixes it. Two more remain, in the budget explorer's own copy: `main-explorer.spec.ts:132` and `tests/methodology/catalog.test.ts:151` both pin `"2025 წლის მშპ წინასწარია"`, which comes from the share-of-GDP disclosure rather than from this spec's datasets. It is not touched here.
+
+## Execution record
+
+- Branch: `codex/data-refresh-safeguards-pipelines`, based on `origin/main` at `248036d16` while Plan A remained unmerged.
+- `npm run check`: 265 test files and 2,270 tests passed; lint, type checking, data validation, and localization passed. The new nominal-GDP gate reported 1996–2025 and 47 comparisons.
+- CSV-mode `npm run build`: 235 static pages generated; all 19 publication hashes verified with data version `7545ee565484f2502e7a666871426412e48dfa32c804ad7790a581ae0abb213f`.
+- Database-mode build was not run because this isolated worktree has no Supabase `.env`.
+- Production-build browser suite: 570 tests passed. English and Georgian real and nominal GDP notes were also checked interactively, with no framework error overlay and working home navigation.
+- Acceptance mutations were restored byte-for-byte: a 2025 sector-total digit change failed the full data gate naming `economy.gdp_total 2025`; a manifest change to `[2024]` failed the workbook-header check; four 2020 Geostat rows marked preliminary failed the runtime “newest years” invariant.
+- `query_gdp` returns `gdp_world_bank_preliminary_basis` for 2025 real growth and omits it for settled 2019; the 34-intent fixture remained unchanged and its 45 assertions passed.
+
+### Execution rulings
+
+1. Current canonical sector GDP totals differ from the overview by up to 0.000001 GEL in nine years, while this plan forbids value changes. The consistency gate compares them at five decimal places of one GEL and still rejects the planned 0.001 GEL mutation. The cost is that drift below 0.00001 GEL can pass.
+2. Runtime GDP validation runs coverage before per-series preliminary agreement and the newest-year rule, so invalid files receive the specific diagnostics the plan's tests require. The cost is only which error appears first when a file has multiple defects.
+3. Edition-derived deficit fields and validation counts in `generalGovernmentBalance/types.ts` were widened from April-2026 literals to strings and numbers. The cost is removing compile-time knowledge of the current edition, which was the stale pin this task removes.
+4. A deficit file beginning with a projection uses the same “actual years must come first” diagnostic as other ordering failures. The cost is wording only.
+5. GDP page preliminary notes are intersected with the active chart years, satisfying the specification's range rule. The cost would be a missing note if that intersection were wrong; browser acceptance covers the current preliminary range.
+6. Registry contract tests now enumerate 38 caveats and include `gdp_world_bank_preliminary_basis`. The cost is that a future addition must update both explicit lists and the documented catalogue.
+7. The unrestricted query-suite run hit two existing 30-second setup timeouts under excessive worker concurrency; the complete suite passed 610 tests with the repository's standard four-worker limit.
+8. Methodology text states the verified five-decimal comparison rather than the plan's false “digit for digit” claim, and names the current 34-intent fixture rather than the stale count of 20.
+9. The runtime newest-year acceptance mutation changed all four Geostat 2020 series together, isolating that invariant instead of first triggering the cross-series disagreement check.
