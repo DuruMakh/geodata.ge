@@ -36,18 +36,31 @@ export async function loadEconomicSectorFacts(
 // Build-time memo, for the reasons servedData.ts documents: one load per
 // process, concurrent callers collapsed onto it, and a cached rejection so the
 // first parity failure is the build failure.
-let servedEconomicSectorsPromise: Promise<{ facts: ServedSectorObservation[] }> | null = null;
+let servedEconomicSectorsPromise: Promise<{ facts: SectorObservation[] }> | null = null;
+let servedEconomicSectorsNumbersPromise: Promise<{ facts: ServedSectorObservation[] }> | null = null;
 
-export function loadServedEconomicSectorsData(): Promise<{ facts: ServedSectorObservation[] }> {
+// Rows as the reviewed CSV and the mirror hold them, with `value` still the
+// exact decimal string. The snapshot serialises these: most of these values do
+// not survive a float64 round-trip, so taking them from the numeric projection
+// below would change the digits /mcp publishes.
+export function loadServedEconomicSectorsRows(): Promise<{ facts: SectorObservation[] }> {
   servedEconomicSectorsPromise ??= loadServedEconomicSectorsDataUncached();
   return servedEconomicSectorsPromise;
 }
 
-export function resetEconomicSectorsCacheForTests(): void {
-  servedEconomicSectorsPromise = null;
+export function loadServedEconomicSectorsData(): Promise<{ facts: ServedSectorObservation[] }> {
+  servedEconomicSectorsNumbersPromise ??= loadServedEconomicSectorsRows().then(({ facts }) => ({
+    facts: facts.map((fact) => ({ ...fact, value: Number(fact.value) })),
+  }));
+  return servedEconomicSectorsNumbersPromise;
 }
 
-async function loadServedEconomicSectorsDataUncached(): Promise<{ facts: ServedSectorObservation[] }> {
+export function resetEconomicSectorsCacheForTests(): void {
+  servedEconomicSectorsPromise = null;
+  servedEconomicSectorsNumbersPromise = null;
+}
+
+async function loadServedEconomicSectorsDataUncached(): Promise<{ facts: SectorObservation[] }> {
   const mode = resolveServedDataSource();
   let facts = await loadEconomicSectorFacts();
   if (mode === "db") {
@@ -56,5 +69,5 @@ async function loadServedEconomicSectorsDataUncached(): Promise<{ facts: ServedS
     assertEconomicSectorParity(facts, mirror);
     facts = mirror;
   }
-  return { facts: facts.map(f => ({ ...f, value: Number(f.value) })) };
+  return { facts };
 }

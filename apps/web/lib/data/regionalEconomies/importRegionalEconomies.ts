@@ -72,19 +72,32 @@ export async function loadRegionalEconomyFacts(
 // Build-time memo, for the reasons servedData.ts documents: one load per
 // process, concurrent callers collapsed onto it, and a cached rejection so the
 // first parity failure is the build failure.
-let servedRegionalEconomyPromise: Promise<{ facts: ServedRegionalEconomyObservation[] }> | null = null;
+let servedRegionalEconomyPromise: Promise<{ facts: RegionalEconomyObservation[] }> | null = null;
+let servedRegionalEconomyNumbersPromise: Promise<{ facts: ServedRegionalEconomyObservation[] }> | null = null;
 
-export function loadServedRegionalEconomyData(): Promise<{ facts: ServedRegionalEconomyObservation[] }> {
+// Rows as the reviewed CSV and the mirror hold them, with `value` still the
+// exact decimal string. The snapshot serialises these: most of these values do
+// not survive a float64 round-trip, so taking them from the numeric projection
+// below would change the digits /mcp publishes.
+export function loadServedRegionalEconomyRows(): Promise<{ facts: RegionalEconomyObservation[] }> {
   servedRegionalEconomyPromise ??= loadServedRegionalEconomyDataUncached();
   return servedRegionalEconomyPromise;
 }
 
+export function loadServedRegionalEconomyData(): Promise<{ facts: ServedRegionalEconomyObservation[] }> {
+  servedRegionalEconomyNumbersPromise ??= loadServedRegionalEconomyRows().then(({ facts }) => ({
+    facts: facts.map((fact) => ({ ...fact, value: Number(fact.value) })),
+  }));
+  return servedRegionalEconomyNumbersPromise;
+}
+
 export function resetRegionalEconomyCacheForTests(): void {
   servedRegionalEconomyPromise = null;
+  servedRegionalEconomyNumbersPromise = null;
 }
 
 async function loadServedRegionalEconomyDataUncached(): Promise<{
-  facts: ServedRegionalEconomyObservation[];
+  facts: RegionalEconomyObservation[];
 }> {
   const mode = resolveServedDataSource();
   let facts = await loadRegionalEconomyFacts();
@@ -94,5 +107,5 @@ async function loadServedRegionalEconomyDataUncached(): Promise<{
     assertRegionalEconomyParity(facts, mirror);
     facts = mirror;
   }
-  return { facts: facts.map((fact) => ({ ...fact, value: Number(fact.value) })) };
+  return { facts };
 }
