@@ -31,6 +31,7 @@
   "caveats.gdp_preliminary": "A GDP figure used by this result is preliminary and may be revised.",
   "caveats.gdp_sna_break_2010": "The GDP denominator changes accounting standard at 2010 (SNA 1993 to SNA 2008).",
   "caveats.gdp_world_bank_history": "The World Bank metadata does not specify how the earliest historical observations were reconstructed. Published values are preserved without custom rebasing or splicing.",
+  "caveats.gdp_world_bank_preliminary_basis": "The World Bank republishes Georgia's national accounts without a preliminary marker, so its newest real GDP values rest on Geostat figures that are still preliminary and will be revised.",
   "caveats.municipal_country_scope": "The Georgia municipal aggregate covers 69 reviewed budgets plus the net Adjara adjustment; regional rows do not sum to it.",
   "caveats.municipal_financing_outside_functional": "The public total includes financing components not distributed across the ten functions.",
   "caveats.municipal_functional_total_gap": "Functional shares do not cover the applicable public total and are never normalised to 100%.",

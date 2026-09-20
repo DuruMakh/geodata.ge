@@ -120,8 +120,14 @@ export type CaveatRule = {
   messageKey: ServiceMessageKey;
   methodologyRef: string;
   methodologyRefEn: string;
-  applies: (context: CaveatContext) => boolean;
-  affects: (context: CaveatContext) => string[];
+  /**
+   * `context` is pre-scoped to the answered request; `snapshot` is the whole
+   * dataset and must only be used for metadata that is not request-scoped —
+   * for example which years a publisher still calls preliminary, which a
+   * response containing only World Bank cells cannot show.
+   */
+  applies: (context: CaveatContext, snapshot: FactQuerySnapshot) => boolean;
+  affects: (context: CaveatContext, snapshot: FactQuerySnapshot) => string[];
 };
 
 const SEVERITY_ORDER: Record<Severity, number> = { severe: 0, note: 1 };
@@ -131,7 +137,7 @@ export function evaluateCaveats(snapshot: FactQuerySnapshot, context: CaveatCont
 
   for (const rule of rules) {
     if (emitted.has(rule.code)) continue;
-    if (!rule.applies(context)) continue;
+    if (!rule.applies(context, snapshot)) continue;
     emitted.set(rule.code, {
       code: rule.code,
       severity: rule.severity,
@@ -139,7 +145,7 @@ export function evaluateCaveats(snapshot: FactQuerySnapshot, context: CaveatCont
       messageEn: serviceMessage(snapshot, "en", rule.messageKey),
       methodologyRef: rule.methodologyRef,
       methodologyRefEn: rule.methodologyRefEn,
-      affects: rule.affects(context),
+      affects: rule.affects(context, snapshot),
     });
   }
 
