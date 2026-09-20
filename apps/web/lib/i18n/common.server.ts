@@ -1,3 +1,5 @@
+import "server-only";
+
 import ka from "./messages/ka/common.json";
 import en from "./messages/en/common.json";
 import type { Locale, Messages } from "./types";
