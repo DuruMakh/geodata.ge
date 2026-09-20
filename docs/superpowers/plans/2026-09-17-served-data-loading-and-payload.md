@@ -1004,3 +1004,79 @@ Expected: exit 0, with GDP and sectors served from the mirror. If `apps/web/.env
 - [ ] **Step 6: Hand off**
 
 Push `codex/served-loading-and-payload` and open a draft PR with the payload measurements and whether db-mode was verified. Merge only after CI is green.
+
+## Execution notes 2026-09-20/21
+
+What the plan got wrong, and what the code does instead. Every item below was
+verified against the served data or a production build, not reasoned about.
+
+- **Task 3, the snapshot's value shape.** The served loaders convert `value` to
+  a number, and the snapshot stores the exact decimal string. 6,446 of the
+  8,168 GDP, sector and regional values do not survive a float64 round-trip
+  (`String(Number("22148652202.055619"))` is `"22148652202.05562"`), so feeding
+  the snapshot from the projected rows would have changed published digits.
+  Each of the three loaders now exposes `loadServed…Rows()`, the memoised load
+  before the numeric projection, and the snapshot takes that. Both accessors
+  share one load and one parity check.
+- **Task 3's byte-identical check is vacuous as written.**
+  `lib/factQuery/generated/snapshot.json` is gitignored, so
+  `git diff --stat` on it can never fail. The real check is a copy of the file
+  taken before the change: the data keys and the `dataVersion` hash
+  (`881113ca…`) are identical; only `releaseCommit` and `generatedAt` move.
+- **Task 7, the GDP source map.** `sourceIdBySeries` is wrong for this dataset:
+  four of the six series cite `source.geostat_national_gdp_sna_1993` before the
+  SNA 2008 switch and `…_sna_2008` after, so a series-only key drops a source
+  from every range that spans it. The map is keyed `seriesId:year`, and a test
+  pins the two vintages. Sectors' `sourceIdByMeasure` holds as planned
+  (three keys, one id each), and so does inflation's `seriesId:measure`.
+- **Task 8, regional economies needs no map.** Its model computed a `sourceIds`
+  list that nothing reads — the regional workbook derives its ids from the
+  selection — so that orphan went with the column.
+- **Task 8, debt keeps its per-row `sourceId`.** A debt fact's source varies by
+  series *and* year (126 rows, 8 ids, no coarser key), so a hoisted map would
+  be one entry per row and larger than the column it replaced.
+- **Task 4, the debt article's id is `debt`, not `government-debt`.** The
+  condition asks the article's own `coverageSource.kind`, which is what
+  `deriveMethodologyCoverage` reads, so it cannot drift from the id list.
+- **Task 6, the spec's change list was incomplete.** The client footer reached
+  `common.server.ts` through `site-footer.tsx` as well, so moving only
+  `explorer-footer.tsx` would have left both locales' catalogue in the bundle.
+  The markup moved to `site-footer-view.tsx`, which takes messages as a prop;
+  `site-footer.tsx` is now the server wrapper that reads the catalogue. The
+  `server-only` guard the spec asks for is a new dependency (it was not
+  installed), and Vitest resolves it to its throwing client entry, so a setup
+  file stubs it for the suite.
+- **Task 9 found two more leaks.** The debt page shipped unprojected national
+  GDP rows, and the deficit page — which the spec's §3.1 table does not list —
+  shipped a `sourceId` and `lastReviewedAt` on all 37 rows that no client file
+  reads. Both are projected now. The debt route keeps `accountingStandard`,
+  because that belongs to the budget explorer's shared national-GDP client
+  type, and the guard says so.
+- **Per-process loads (Task 10 Step 2).** With `console.count` inside the
+  uncached loaders, a build printed one debt load in six workers and one sector
+  load in five, with a single worker showing a second debt load — two module
+  instances in that worker, not a reload per route. Before the memo the same
+  build re-parsed debt about 25 times.
+- **Payload, measured against production** (`248036d16`, the commit this branch
+  is based on and the one deployed), Georgian locale, bytes of served HTML:
+
+  | route | before | after | saved |
+  |---|---|---|---|
+  | `/explorer/inflation/overview` | 577,985 | 308,070 | −46.7% |
+  | `/explorer/economy/sectors` | 516,158 | 250,826 | −51.4% |
+  | `/explorer/economy/regions/imereti` | 400,534 | 235,180 | −41.3% |
+  | `/explorer/economy/gdp` | 192,486 | 160,913 | −16.4% |
+  | `/explorer/inflation/categories` | 693,636 | 629,172 | −9.3% |
+  | `/explorer/debt` | 136,410 | 126,700 | −7.1% |
+  | `/explorer/deficit` | 89,761 | 85,112 | −5.2% |
+
+- **Gates.** `npm run check` 264 files / 2,265 tests, `npm run build` 235
+  pages, browser suite 568 passed with four load flakes
+  (`bilingual-workbooks.spec.ts` ×3, `landing.spec.ts` ×1) that pass 40/40 when
+  their files run alone — the pattern this repository already documents for
+  download and request specs under load.
+- **Database mode was not verified locally**: this worktree has no
+  `apps/web/.env`, so there are no mirror credentials here. The weekly
+  `db-health` workflow covers it after merge, and
+  `tests/i18n/servingParity.test.ts` proves each mirror reader is called once
+  per snapshot build.
