@@ -1,6 +1,6 @@
 # Data-Refresh Safeguards A: Copy, Deficit Vintage and Downloads — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** A data refresh can no longer leave stale figures or a stale IMF edition on the page, and each public CSV has one writer with a real on-disk check.
 
@@ -34,7 +34,7 @@
 - Consumes: `loadGdpOverviewFacts()` from `lib/data/gdpOverview/importGdpOverview.ts`, which returns `GdpObservation[]` whose `value` is a decimal string; `getMessages(locale, ["gdp"])`.
 - Produces: `REAL_GDP_SUMMARY_PERIODS: readonly (readonly [number, number])[]`, exported from `components/gdp/gdp-summary.tsx`. The growth summary uses its last two entries, as the component does today.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/web/tests/i18n/gdpSummaryFigures.test.ts`:
 
@@ -179,12 +179,12 @@ describe.each(["ka", "en"] as const)("GDP summary figures: %s", (locale) => {
 });
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `npx vitest run tests/i18n/gdpSummaryFigures.test.ts`
 Expected: FAIL, because `REAL_GDP_SUMMARY_PERIODS` is not exported by `components/gdp/gdp-summary.tsx`.
 
-- [ ] **Step 3: Export the period boundaries**
+- [x] **Step 3: Export the period boundaries**
 
 In `apps/web/components/gdp/gdp-summary.tsx`, add above the component:
 
@@ -214,7 +214,7 @@ with:
   );
 ```
 
-- [ ] **Step 4: Run it and fix what it catches**
+- [x] **Step 4: Run it and fix what it catches**
 
 Run: `npx vitest run tests/i18n/gdpSummaryFigures.test.ts`
 Expected: PASS for both locales. A failure here means either the claim list is wrong or a quoted figure no longer matches the data — read the message it names and fix the claim before touching the copy.
@@ -222,7 +222,7 @@ Expected: PASS for both locales. A failure here means either the claim list is w
 Run: `npx vitest run tests/explorer/gdpRoute.test.tsx tests/explorer/economyHub.test.tsx`
 Expected: PASS; the rendered period labels are unchanged.
 
-- [ ] **Step 5: Point the refresh procedure at the test**
+- [x] **Step 5: Point the refresh procedure at the test**
 
 In `../../docs/data-methodology/gdp-overview.md`, append to `## Validation and refresh`:
 
@@ -230,7 +230,7 @@ In `../../docs/data-methodology/gdp-overview.md`, append to `## Validation and r
 The four indicator summaries under the chart are reviewed editorial copy holding about 45 figures per language. `npx vitest run tests/i18n/gdpSummaryFigures.test.ts` recomputes every one of them from `data/imports/gdp-overview-annual.csv`. After any refresh, run it; when it fails, update `lib/i18n/messages/{ka,en}/gdp.json` in both languages and re-review the wording, as the design spec requires (`2026-09-10-gdp-overview-design.md` §213, §217).
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add components/gdp/gdp-summary.tsx tests/i18n/gdpSummaryFigures.test.ts ../../docs/data-methodology/gdp-overview.md
@@ -249,7 +249,7 @@ git commit -m "test(gdp): recompute every summary figure from the canonical CSV"
 - Consumes: `model.forecastStartYear` is range-filtered (`lib/explorer/deficitExplorer.ts:48`), so the marker uses the unfiltered `facts` prop instead, as debt does (`components/debt/debt-explorer.tsx:128-131`).
 - Produces: nothing new.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append inside the `describe` block of `apps/web/tests/explorer/deficitRoute.test.tsx`:
 
@@ -275,12 +275,12 @@ Append inside the `describe` block of `apps/web/tests/explorer/deficitRoute.test
 
 Match the file's existing way of building `facts` and rendering (`renderGeorgianMarkup`, `createElement`); if the file renders `renderDeficitPage` instead of the component, render the component the same way the existing test at line 30 does.
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `npx vitest run tests/explorer/deficitRoute.test.tsx`
 Expected: FAIL; the marker still reads 2026, and `edition` is not a prop yet (Task 3 adds it — until then, drop `edition` from this test and add it back in Task 3 Step 5).
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 In `apps/web/components/deficit/deficit-explorer.tsx`, add beside the other derived values (near line 58):
 
@@ -304,7 +304,7 @@ with:
                   : { year: forecastBoundaryYear, label: message(messages, "deficit.forecast") }}
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run tests/explorer/deficitRoute.test.tsx`
 Expected: PASS.
@@ -312,7 +312,7 @@ Expected: PASS.
 Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/deficit.spec.ts`
 Expected: PASS; the marker still reads `პროგნოზი` at 2026 on the real data.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add components/deficit/deficit-explorer.tsx tests/explorer/deficitRoute.test.tsx
@@ -340,7 +340,7 @@ git commit -m "fix(deficit): take the forecast marker from the facts"
 
 The IMF publishes WEO in April and October only, so an unexpected month raises a missing-message error, which is the wanted loud failure.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `apps/web/tests/explorer/deficitRoute.test.tsx`:
 
@@ -377,7 +377,7 @@ describe("IMF WEO manifest", () => {
 Run: `npx vitest run tests/methodology/workbookSources.test.ts tests/explorer/deficitRoute.test.tsx`
 Expected: FAIL; `loadImfWeoManifest` does not exist, and the page still prints the hard-coded sentence.
 
-- [ ] **Step 2: Read the manifest**
+- [x] **Step 2: Read the manifest**
 
 In `apps/web/lib/methodology/workbookSources.ts`, add:
 
@@ -425,7 +425,7 @@ export function loadImfWeoManifest(): Promise<ImfWeoManifest> {
 
 In `resetWorkbookSourceCacheForTests` (line 247), add `imfWeoManifest = null;`.
 
-- [ ] **Step 3: Parameterise the copy**
+- [x] **Step 3: Parameterise the copy**
 
 In `apps/web/lib/i18n/messages/en/deficit.json`, replace these four values and add three keys:
 
@@ -453,7 +453,7 @@ In `apps/web/lib/i18n/messages/ka/deficit.json`:
 
 The English and Georgian source sentences now place the edition after the publication name. That is the one wording change in this plan; call it out on the PR for the owner.
 
-- [ ] **Step 4: Build the page from the manifest**
+- [x] **Step 4: Build the page from the manifest**
 
 In `apps/web/lib/pages/deficit.tsx`, replace `workbookSourcesFor` (lines 18–24) with:
 
@@ -526,7 +526,7 @@ and the explorer element (lines 65–70):
       />
 ```
 
-- [ ] **Step 5: Use the parameters in the explorer**
+- [x] **Step 5: Use the parameters in the explorer**
 
 In `apps/web/components/deficit/deficit-explorer.tsx`:
 
@@ -554,7 +554,7 @@ In `apps/web/components/deficit/deficit-explorer.tsx`:
 
 Add `edition` to the props the Task 2 test passes.
 
-- [ ] **Step 6: State the rule in DESIGN.md**
+- [x] **Step 6: State the rule in DESIGN.md**
 
 In `DESIGN.md` §8.6 (line 600), replace `The deck line always reports the latest actual observation (2025), while 2026–2031 render as a dashed continuation with a visible \`პროგნოზი\` marker and table labels.` with:
 
@@ -562,7 +562,7 @@ In `DESIGN.md` §8.6 (line 600), replace `The deck line always reports the lates
 The deck line always reports the latest actual observation, while every projection year renders as a dashed continuation with a visible `პროგნოზი` marker and table labels. The boundary, the coverage sentences and the edition name come from the facts and the reviewed IMF manifest, never from written-in years.
 ```
 
-- [ ] **Step 7: Run the tests**
+- [x] **Step 7: Run the tests**
 
 Run: `npx vitest run tests/explorer/deficitRoute.test.tsx tests/methodology/workbookSources.test.ts tests/explorer/deficitWorkbook.test.ts`
 Expected: PASS.
@@ -573,7 +573,7 @@ Expected: exit 0.
 Run: `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npx playwright test tests/browser/deficit.spec.ts tests/browser/bilingual-debt-deficit.spec.ts tests/browser/seo.spec.ts`
 Expected: PASS. `bilingual-debt-deficit.spec.ts:51` and `seo.spec.ts:176` still find `2026–2031`, now rendered from the data.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add lib/i18n/messages/en/deficit.json lib/i18n/messages/ka/deficit.json lib/methodology/workbookSources.ts lib/pages/deficit.tsx components/deficit/deficit-explorer.tsx tests/explorer/deficitRoute.test.tsx tests/methodology/workbookSources.test.ts ../../DESIGN.md
@@ -596,7 +596,7 @@ git commit -m "fix(deficit): derive the IMF edition, coverage and workbook sourc
 - Produces: `preparePublicDatasets({ repositoryRoot, publicRoot, mode: "write" | "check" | "check-output" })`. `check-output` compares the five written CSVs on disk byte for byte and throws naming every stale or missing file.
 - `buildAllPublications` keeps writing `gdp-overview.csv` and `economic-sectors.csv`, and `data:check-fact-query-publications` keeps checking them (`scripts/prepare-fact-query-publications.ts:81-83`).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append inside `describe("public SEO dataset exports", …)` in `apps/web/tests/data/publicDatasetExports.test.ts`:
 
@@ -623,7 +623,7 @@ Add `writeFile` to the `node:fs/promises` imports at the top of the file.
 Run: `npx vitest run tests/data/publicDatasetExports.test.ts`
 Expected: FAIL; `"check-output"` is not an accepted mode.
 
-- [ ] **Step 2: Implement the output check**
+- [x] **Step 2: Implement the output check**
 
 In `apps/web/lib/data/publicDatasetExports.ts`, change the signature (line 112) to:
 
@@ -652,7 +652,7 @@ and replace the write branch (lines 187–192) with:
   return validations;
 ```
 
-- [ ] **Step 3: Accept the new flag in the script**
+- [x] **Step 3: Accept the new flag in the script**
 
 In `apps/web/scripts/prepare-public-datasets.ts`, replace lines 6–15 with:
 
@@ -672,7 +672,7 @@ In `apps/web/scripts/prepare-public-datasets.ts`, replace lines 6–15 with:
   });
 ```
 
-- [ ] **Step 4: Delete the duplicate writers and rewire the scripts**
+- [x] **Step 4: Delete the duplicate writers and rewire the scripts**
 
 Delete `apps/web/scripts/prepare-gdp-public.ts` and `apps/web/scripts/prepare-economic-sectors-public.ts`.
 
@@ -687,7 +687,7 @@ In `apps/web/package.json`:
    ```
 6. `data:validate` (line 26) uses `npm run data:validate-public-dataset-inputs` in place of `npm run data:check-public-datasets`.
 
-- [ ] **Step 5: Correct the stale comment**
+- [x] **Step 5: Correct the stale comment**
 
 In `apps/web/scripts/prepare-fact-query-publications.ts`, replace lines 30–32:
 
@@ -705,7 +705,7 @@ with:
     // the inflation CSV is written between the two. Clearing would delete them.
 ```
 
-- [ ] **Step 6: Verify**
+- [x] **Step 6: Verify**
 
 Run: `npx vitest run tests/data/publicDatasetExports.test.ts`
 Expected: PASS.
@@ -719,7 +719,7 @@ Expected: exit 0. The prebuild chain still writes `gdp-overview.csv` and `econom
 Run: `ls public/downloads/data`
 Expected: the five public dataset CSVs, the inflation CSV, `gdp-overview.csv`, `economic-sectors.csv`, the publication JSON files and `manifest.json`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add package.json scripts/prepare-public-datasets.ts scripts/prepare-fact-query-publications.ts lib/data/publicDatasetExports.ts tests/data/publicDatasetExports.test.ts
@@ -734,7 +734,7 @@ git commit -m "fix(data): one writer per public CSV and a real on-disk download 
 **Files:**
 - Modify: `../../docs/data-methodology/general-government-balance.md` (`## Reproduction`)
 
-- [ ] **Step 1: Describe what a new edition now needs**
+- [x] **Step 1: Describe what a new edition now needs**
 
 Append to `## Reproduction`:
 
@@ -742,7 +742,7 @@ Append to `## Reproduction`:
 The page reads the edition from the package manifest: the forecast marker comes from the first `projection` fact, and the source sentence, the workbook source sheet and the dataset description come from `publication_date`, `retrieved_file_url`, `retrieved_at`, `year_min` and `year_max`. A new WEO edition therefore needs no edit in the page or its copy, provided it is an April or October edition (`deficit.weoMonth.*` covers those two; another month raises a missing-message error).
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add ../../docs/data-methodology/general-government-balance.md
@@ -790,3 +790,12 @@ Expected: all tests pass.
 - [ ] **Step 5: Hand off**
 
 Push `codex/data-refresh-safeguards-copy` and open a draft PR. Flag the reworded deficit source sentence for owner approval. Merge only after CI is green.
+
+## Execution amendments (2026-09-20)
+
+- Based on current main `f7d3b5371`; Plan 4 is a separate unmerged branch. Existing deficit identifiers are preserved.
+- GDP numeric completeness is checked per message across all summary keys, using whole numeric tokens rather than substring matches.
+- The shifted forecast fixture includes a real 2027 projection; marker placement is tested at the rail endpoint because its visible label does not contain the year.
+- Future October-edition tests exercise both locales and workbook source metadata. The short route fixture reports its own coverage rather than the production dataset range.
+- Repeated browser/data/build steps are grouped into final acceptance, following the repository rule against rerunning unchanged passing gates. Already-passed focused results are recorded without rerunning solely for ledger bookkeeping.
+- Methodology now names the surviving publication check, replacing its reference to the removed separate CSV checker.
