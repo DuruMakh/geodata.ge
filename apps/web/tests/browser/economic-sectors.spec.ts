@@ -224,3 +224,47 @@ test("sector source notes and metadata name the correct dataset",async({page})=>
   await expect(page.locator("caption")).toContainText("bn GEL");
   await expect(page.getByTestId("explorer-table")).toContainText("Preliminary");
 });
+
+test("range drags and arrow keys replace history; only measure and view add entries", async ({ page }) => {
+  await page.goto("/en/explorer/economy/sectors");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const initial = await page.evaluate(() => history.length);
+
+  await page.getByRole("button", { name: "Real growth %", exact: true }).click();
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "real_growth");
+  expect(await page.evaluate(() => history.length)).toBe(initial + 1);
+
+  const startHandle = page.getByRole("slider", { name: "Start year" });
+  await startHandle.focus();
+  for (let press = 0; press < 5; press += 1) await page.keyboard.press("ArrowRight");
+  await expect(startHandle).toHaveAttribute("aria-valuenow", "2016");
+
+  const box = (await page.getByTestId("range-start-handle").boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + 160, box.y + box.height / 2, { steps: 16 });
+  await page.mouse.up();
+  // The drag must actually move the handle, or the history check below proves nothing.
+  await expect(startHandle).not.toHaveAttribute("aria-valuenow", "2016");
+  expect(await page.evaluate(() => history.length)).toBe(initial + 1);
+
+  await page.goBack();
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "nominal");
+});
+
+test("announces the period when the measure changes, not on every range change", async ({ page }) => {
+  await page.goto("/en/explorer/economy/sectors");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  // The explorer's own announcer; the Excel button keeps a separate status line.
+  const status = page.getByTestId("economic-sectors-explorer").locator('p.sr-only[role="status"]');
+  await expect(status).toHaveText("");
+
+  const startHandle = page.getByRole("slider", { name: "Start year" });
+  await startHandle.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(startHandle).toHaveAttribute("aria-valuenow", "2011");
+  await expect(status).toHaveText("");
+
+  await page.getByRole("button", { name: "Real growth %", exact: true }).click();
+  await expect(status).toHaveText(/^Period: \d{4}–\d{4}$/);
+});

@@ -4,7 +4,7 @@ import type {
   SectorDefinition,
   SectorMeasure,
 } from "../../lib/data/economicSectors/types";
-import { SECTOR_GDP, sectorColor, rankSectorDefinitions } from "../../lib/explorer/economicSectors";
+import { SECTOR_GDP, sectorColor, rankSectorDefinitions, sectorMatchesQuery } from "../../lib/explorer/economicSectors";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -32,13 +32,9 @@ export function SectorSeriesPanel({
 }) {
   const { locale, messages } = useI18n();
   const [query, setQuery] = useState("");
-  const normalized = query.trim().toLocaleLowerCase();
   const ordered = rankSectorDefinitions(registry, endValues);
-  const matches = (r: SectorDefinition) =>
-    `${r.labelKa} ${r.labelEn} ${r.classificationCode ?? ""}`
-      .toLocaleLowerCase()
-      .includes(normalized);
-  const visible = ordered.filter((r) => r.id === SECTOR_GDP || matches(r));
+  // Total GDP stays pinned whatever the query, like every panel's total row.
+  const visible = ordered.filter((r) => r.id === SECTOR_GDP || sectorMatchesQuery(r, query));
   return (
     <aside
       aria-label={message(messages, "controls.series")}
@@ -58,7 +54,7 @@ export function SectorSeriesPanel({
         onToggleAll={() =>
           onSelectionChange(selectedIds.length ? [] : ordered.map((r) => r.id))
         }
-        hasVisibleMatches={ordered.some(matches)}
+        hasVisibleMatches={ordered.some((r) => sectorMatchesQuery(r, query))}
       >
         {visible.map((r) => {
           const value = endValues[r.id];

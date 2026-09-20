@@ -39,13 +39,22 @@ export function useEconomicSectorsState(
     };
   }, [facts, registry]);
   const update = useCallback(
-    (change: (previous: SectorState) => SectorState) => {
+    (change: (previous: SectorState) => SectorState, historyMode: "push" | "replace" = "replace") => {
       const next = change(current.current);
       current.current = next;
       const hash = `#${serializeSectorHash(next)}`;
-      if (window.location.hash !== hash)
-        window.history.pushState(null, "", hash);
+      if (window.location.hash !== hash) {
+        try {
+          // Only a discrete switch earns a Back step. A range drag fires once per
+          // year crossed and must replace the entry, or Back would replay the drag.
+          if (historyMode === "push") window.history.pushState(null, "", hash);
+          else window.history.replaceState(null, "", hash);
+        } catch {
+          // History can be unavailable in some embedded contexts; the UI still works.
+        }
+      }
       setState(next);
+      return next;
     },
     [],
   );

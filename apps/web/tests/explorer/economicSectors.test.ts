@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import registry from "../../../../data/taxonomy/economic-sectors.json";
-import { DEFAULT_SECTOR_STATE, parseSectorHash, serializeSectorHash, changeSectorMeasure, buildEconomicSectorsModel, sectorColor } from "../../lib/explorer/economicSectors";
+import { DEFAULT_SECTOR_STATE, parseSectorHash, serializeSectorHash, changeSectorMeasure, buildEconomicSectorsModel, sectorColor, sectorMatchesQuery } from "../../lib/explorer/economicSectors";
 import type { ServedSectorObservation } from "../../lib/data/economicSectors/types";
 const ids = registry.map(r => r.id);
 const make = (seriesId: string, year: number, measure: ServedSectorObservation["measure"], value: number): ServedSectorObservation => ({
@@ -59,4 +59,13 @@ test("a manual range remains manual after switching through a shorter full cover
   const growth=changeSectorMeasure(state,"real_growth",history);
   expect(growth.range).toEqual(state.range);
   expect(changeSectorMeasure(growth,"nominal",history).range).toEqual(state.range);
+});
+
+test("sector search matches either label or the NACE code with the shared matcher", () => {
+  const ict = registry.find((row) => row.id === "sector.j")!;
+  expect(sectorMatchesQuery(ict, "information")).toBe(true);
+  expect(sectorMatchesQuery(ict, ict.labelKa.slice(0, 5))).toBe(true);
+  expect(sectorMatchesQuery(ict, " J ")).toBe(true);
+  expect(sectorMatchesQuery(ict, "")).toBe(true);
+  expect(sectorMatchesQuery(ict, "no-such-sector")).toBe(false);
 });

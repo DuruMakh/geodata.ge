@@ -331,7 +331,20 @@ The section lives in the route (§6.2). Everything else about a screen serialize
 /explorer/analysis#as=expenditure&ag=ministries&ay=2024              (analysis)
 ```
 
-Keys: `g` grouping (expenditure only), `m` mode, `sh` share measure, `r` range, `sel` selection; `as` analysis side, `ag` analysis grouping, `ay` analysis year. The hash never carries `nav`.
+Keys by section. The hash never carries `nav`, and no key is renamed once shipped — shared links depend on them.
+
+| Section | Keys | Notes |
+|---|---|---|
+| Expenditure, revenue, analysis | `g` grouping (expenditure only), `m` mode, `sh` share measure, `r` range, `sel` selection; `as` analysis side, `ag` analysis grouping, `ay` analysis year | — |
+| Municipalities | `m`, `sh`, `r`, `sel` on the country, region and municipality pages; `lvl=region` on the index | `lvl` switches the index list to regions. |
+| Government debt | `f` family, `m`, `sh`, `r`, `sel` | An empty `sel=` is a deliberate clear and survives a reload. |
+| General-government deficit | `m`, `sh`, `r`, `sel` | A missing `sh` means percent of GDP, the section's default measure. |
+| GDP overview | `indicator`, `view`, `currency`, `range=all` or `start`/`end` | — |
+| Economic sectors | `measure`, `view`, `sel`, `range=all` or `start`/`end` | — |
+| Inflation overview | `i` indicator, `m` mode, `r=YYYY-MM-YYYY-MM`, `sel`, `t` table series | — |
+| Inflation categories | `i`, `m`, `r`, `sel`, `t`, `x` expanded divisions | — |
+
+Write rules: loading a page never adds state to its URL, so a pristine URL stays clean. After that, every change replaces the current history entry, except the discrete switches a section's spec asks Back to step through, which push one — today only the economic sectors measure and view.
 
 Restore on load with validation (unknown values fall back to defaults; ranges clamp to loaded years; repeated selection IDs collapse to their first occurrence).
 
@@ -591,7 +604,7 @@ National columns: `<first col> | years… | ცვლილება | წილ
 
 ### 8.5 Government Debt — approved Variant D
 
-`/explorer/debt` reuses the explorer shell with exactly one chart or table and no dashboard cards or separate metric routes. Its right panel is one expanded hierarchy: `მთლიანი ვალი` with `საშინაო ვალი` and `საგარეო ვალი`; `ვალის გადახდა` with `ძირი თანხა` and `პროცენტი`; and `საპროცენტო განაკვეთი` with `საშინაო განაკვეთი` and `საგარეო განაკვეთი`. The three parents are real selectable series. The default is line mode, nominal GEL, full 2013–2025 stock coverage, and only `მთლიანი ვალი` selected. Same-family selections can be combined; choosing another family clears the old selection and resets to that family's full coverage.
+`/explorer/debt` reuses the explorer shell with exactly one chart or table and no dashboard cards or separate metric routes. Its right panel is one expanded hierarchy: `მთლიანი ვალი` with `საშინაო ვალი` and `საგარეო ვალი`; `ვალის გადახდა` with `ძირი თანხა` and `პროცენტი`; and `საპროცენტო განაკვეთი` with `საშინაო განაკვეთი` and `საგარეო განაკვეთი`. The three parents are real selectable series. The default is line mode, nominal GEL, full 2013–2025 stock coverage, and only `მთლიანი ვალი` selected. Same-family selections can be combined; choosing another family clears the old selection and resets to that family's full coverage. Because families never combine, the bulk control's "all" (§7.7) is the active family's three rows: `ყველას მონიშვნა` on an empty selection selects the parent and both children.
 
 Stock can optionally use `% მშპ-ში`; service stays in GEL and rates use percent. Exact rate gaps render as `—` and are never interpolated or replaced with zero. Service may extend past actual 2025 values with a dashed 2026–2030 segment, a visible `პროგნოზი` boundary, and the statement that it covers only the portfolio outstanding on 2025-12-31, not a full future-budget forecast. The Excel action exports the active family, selection, range, and measure through the standard three-sheet workbook. For rates the GEL amount cell is blank and the percentage column carries the value; forecast service rows use status `პროგნოზი`.
 
