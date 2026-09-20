@@ -48,7 +48,21 @@ export async function loadGdpOverviewFacts(
   validateGdpObservations(facts);
   return facts;
 }
-export async function loadServedGdpOverviewData(): Promise<{
+// Build-time memo, for the reasons servedData.ts documents: one load per
+// process, concurrent callers collapsed onto it, and a cached rejection so the
+// first parity failure is the build failure.
+let servedGdpOverviewPromise: Promise<{ facts: ServedGdpObservation[] }> | null = null;
+
+export function loadServedGdpOverviewData(): Promise<{ facts: ServedGdpObservation[] }> {
+  servedGdpOverviewPromise ??= loadServedGdpOverviewDataUncached();
+  return servedGdpOverviewPromise;
+}
+
+export function resetGdpOverviewCacheForTests(): void {
+  servedGdpOverviewPromise = null;
+}
+
+async function loadServedGdpOverviewDataUncached(): Promise<{
   facts: ServedGdpObservation[];
 }> {
   const mode = resolveServedDataSource();

@@ -33,7 +33,21 @@ export async function loadEconomicSectorFacts(
   return facts;
 }
 
-export async function loadServedEconomicSectorsData(): Promise<{ facts: ServedSectorObservation[] }> {
+// Build-time memo, for the reasons servedData.ts documents: one load per
+// process, concurrent callers collapsed onto it, and a cached rejection so the
+// first parity failure is the build failure.
+let servedEconomicSectorsPromise: Promise<{ facts: ServedSectorObservation[] }> | null = null;
+
+export function loadServedEconomicSectorsData(): Promise<{ facts: ServedSectorObservation[] }> {
+  servedEconomicSectorsPromise ??= loadServedEconomicSectorsDataUncached();
+  return servedEconomicSectorsPromise;
+}
+
+export function resetEconomicSectorsCacheForTests(): void {
+  servedEconomicSectorsPromise = null;
+}
+
+async function loadServedEconomicSectorsDataUncached(): Promise<{ facts: ServedSectorObservation[] }> {
   const mode = resolveServedDataSource();
   let facts = await loadEconomicSectorFacts();
   if (mode === "db") {

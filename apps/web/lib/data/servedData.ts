@@ -5,6 +5,12 @@ import { loadGlossary, type GlossaryEntry } from "./glossary";
 import { loadBudgetFactRows, type BudgetFactImportRow } from "./importBudgetFacts";
 import { loadNationalGdpFacts } from "./nationalGdp/importNationalGdp";
 import type { NationalGdpFact } from "./nationalGdp/types";
+import { resetEconomicSectorsCacheForTests } from "./economicSectors/importEconomicSectors";
+import { resetGdpOverviewCacheForTests } from "./gdpOverview/importGdpOverview";
+import { resetGeneralGovernmentBalanceCacheForTests } from "./generalGovernmentBalance/importGeneralGovernmentBalance";
+import { resetGovernmentDebtCacheForTests } from "./governmentDebt/importGovernmentDebtFacts";
+import { resetInflationCacheForTests } from "./inflation/importInflation";
+import { resetRegionalEconomyCacheForTests } from "./regionalEconomies/importRegionalEconomies";
 import { resolveServedDataSource, type ServedDataSource } from "./servedDataSource";
 import { loadSourceDocuments, type SourceDocumentRow } from "./sources";
 import type {
@@ -444,6 +450,12 @@ export function resetServedDataCacheForTests(): void {
   landingDataPromise = null;
   explorerDataPromise = null;
   municipalDataPromise = null;
+  resetGovernmentDebtCacheForTests();
+  resetGeneralGovernmentBalanceCacheForTests();
+  resetGdpOverviewCacheForTests();
+  resetEconomicSectorsCacheForTests();
+  resetRegionalEconomyCacheForTests();
+  resetInflationCacheForTests();
 }
 
 export function loadServedLandingData(): Promise<LandingData> {

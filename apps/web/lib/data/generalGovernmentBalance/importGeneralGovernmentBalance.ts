@@ -106,7 +106,21 @@ export function toServedGeneralGovernmentBalanceFact(
   };
 }
 
-export async function loadServedGeneralGovernmentBalanceData(): Promise<{
+// Build-time memo, for the reasons servedData.ts documents: one load per
+// process, concurrent callers collapsed onto it, and a cached rejection so the
+// first parity failure is the build failure.
+let servedDeficitPromise: Promise<{ facts: ServedGeneralGovernmentBalanceFact[] }> | null = null;
+
+export function loadServedGeneralGovernmentBalanceData(): Promise<{ facts: ServedGeneralGovernmentBalanceFact[] }> {
+  servedDeficitPromise ??= loadServedGeneralGovernmentBalanceDataUncached();
+  return servedDeficitPromise;
+}
+
+export function resetGeneralGovernmentBalanceCacheForTests(): void {
+  servedDeficitPromise = null;
+}
+
+async function loadServedGeneralGovernmentBalanceDataUncached(): Promise<{
   facts: ServedGeneralGovernmentBalanceFact[];
 }> {
   const csvFacts = async () =>

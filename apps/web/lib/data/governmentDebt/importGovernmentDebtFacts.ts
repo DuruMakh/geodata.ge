@@ -247,7 +247,21 @@ export async function prepareGovernmentDebtFacts(options: { write: boolean }): P
   return facts.length;
 }
 
-export async function loadServedGovernmentDebtData(): Promise<{
+// Build-time memo, for the reasons servedData.ts documents: one load per
+// process, concurrent callers collapsed onto it, and a cached rejection so the
+// first parity failure is the build failure.
+let servedDebtPromise: Promise<{ facts: ServedGovernmentDebtFact[] }> | null = null;
+
+export function loadServedGovernmentDebtData(): Promise<{ facts: ServedGovernmentDebtFact[] }> {
+  servedDebtPromise ??= loadServedGovernmentDebtDataUncached();
+  return servedDebtPromise;
+}
+
+export function resetGovernmentDebtCacheForTests(): void {
+  servedDebtPromise = null;
+}
+
+async function loadServedGovernmentDebtDataUncached(): Promise<{
   facts: ServedGovernmentDebtFact[];
 }> {
   if (resolveServedDataSource() === "csv") return { facts: await loadGovernmentDebtFacts() };

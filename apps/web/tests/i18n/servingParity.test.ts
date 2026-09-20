@@ -1,4 +1,5 @@
 import { loadGdpOverviewFacts } from "../../lib/data/gdpOverview/importGdpOverview";
+import { loadBasketWeights, loadCpiCategoryFacts, loadCpiFacts, loadInflationTargets } from "../../lib/data/inflation/importInflation";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadGlossary } from "../../lib/data/glossary";
@@ -12,7 +13,7 @@ import { getPresentation } from "../../lib/i18n/presentation.server";
 import { buildExplorerModel } from "../../lib/explorer/explorerData";
 import { projectAdminFact, projectBudgetFact, projectGdpFact } from "../../lib/explorer/clientData";
 
-const mirror = vi.hoisted(() => ({ loadLandingDataFromDb: vi.fn(), loadExplorerDataFromDb: vi.fn(), loadMunicipalDataFromDb: vi.fn(), loadGovernmentDebtFactsFromDb: vi.fn(), loadGeneralGovernmentBalanceFactsFromDb: vi.fn(), loadGdpOverviewFactsFromDb: vi.fn() }));
+const mirror = vi.hoisted(() => ({ loadLandingDataFromDb: vi.fn(), loadExplorerDataFromDb: vi.fn(), loadMunicipalDataFromDb: vi.fn(), loadGovernmentDebtFactsFromDb: vi.fn(), loadGeneralGovernmentBalanceFactsFromDb: vi.fn(), loadGdpOverviewFactsFromDb: vi.fn(), loadInflationDataFromDb: vi.fn() }));
 vi.mock("../../lib/db/servedDataDb", () => mirror);
 afterEach(() => { resetServedDataCacheForTests(); vi.unstubAllEnvs(); vi.clearAllMocks(); });
 
@@ -32,6 +33,12 @@ describe("bilingual presentation on both serving paths", () => {
     mirror.loadGovernmentDebtFactsFromDb.mockResolvedValue(debt.facts);
     mirror.loadGeneralGovernmentBalanceFactsFromDb.mockResolvedValue(balance.facts);
     mirror.loadGdpOverviewFactsFromDb.mockResolvedValue(await loadGdpOverviewFacts());
+    // The snapshot loads inflation through its memoised served loader, so in db
+    // mode this mirror reader runs and its rows face the parity check.
+    mirror.loadInflationDataFromDb.mockResolvedValue({
+      facts: await loadCpiFacts(), targets: await loadInflationTargets(),
+      categories: await loadCpiCategoryFacts(), weights: await loadBasketWeights(),
+    });
     const options = { releaseCommit: "loader-parity-fixture", generatedAt: "2026-09-06T00:00:00Z" };
     const csvSnapshot = await buildFactQuerySnapshot(options);
     const presentation = await getPresentation("en", ["main"], [...glossary.keys(), "expenditure.total", "admin_spending.total", ...adminCategories.map(row => row.id), ...adminFacts.map(row => row.itemId)]);

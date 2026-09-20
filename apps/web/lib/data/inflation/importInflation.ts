@@ -137,6 +137,10 @@ export function loadServedInflationData(): Promise<ServedInflationData> {
   return servedInflationPromise;
 }
 
+export function resetInflationCacheForTests(): void {
+  servedInflationPromise = null;
+}
+
 async function loadServedInflationDataUncached(): Promise<{
   facts: ServedCpiFact[];
   targets: ServedInflationTargetRow[];

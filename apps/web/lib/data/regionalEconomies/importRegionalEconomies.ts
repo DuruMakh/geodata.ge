@@ -69,7 +69,21 @@ export async function loadRegionalEconomyFacts(
   return facts;
 }
 
-export async function loadServedRegionalEconomyData(): Promise<{
+// Build-time memo, for the reasons servedData.ts documents: one load per
+// process, concurrent callers collapsed onto it, and a cached rejection so the
+// first parity failure is the build failure.
+let servedRegionalEconomyPromise: Promise<{ facts: ServedRegionalEconomyObservation[] }> | null = null;
+
+export function loadServedRegionalEconomyData(): Promise<{ facts: ServedRegionalEconomyObservation[] }> {
+  servedRegionalEconomyPromise ??= loadServedRegionalEconomyDataUncached();
+  return servedRegionalEconomyPromise;
+}
+
+export function resetRegionalEconomyCacheForTests(): void {
+  servedRegionalEconomyPromise = null;
+}
+
+async function loadServedRegionalEconomyDataUncached(): Promise<{
   facts: ServedRegionalEconomyObservation[];
 }> {
   const mode = resolveServedDataSource();
