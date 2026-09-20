@@ -36,7 +36,9 @@ export function validateSectorObservations(
   const rows = new Map<string, SectorObservation>();
   for (const f of facts) {
     if (!ids.has(f.seriesId)) throw new Error(`Unknown sector ${f.seriesId}`);
-    if (!Number.isInteger(f.year) || f.year < 2010 || f.year > 2025)
+    // The floor is the reviewed start of the SNA 2008 sector table; the ceiling
+    // is only a sanity bound, because annual data cannot describe a future year.
+    if (!Number.isInteger(f.year) || f.year < 2010 || f.year > new Date().getUTCFullYear())
       throw new Error(`Invalid annual sector year ${f.year}`);
     if (rows.has(key(f))) throw new Error(`Duplicate sector observation ${key(f)}`);
     rows.set(key(f), f);
