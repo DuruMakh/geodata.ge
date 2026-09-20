@@ -34,6 +34,8 @@ V1 excludes: data catalog, capital explorer, admin UI, public API, uploads, sub-
 
 Municipal budgets are an implemented v1 **section** in this branch at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). Production verification follows merge and deployment; this branch state is not evidence that the current municipal surfaces are live. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) remain markers only, with no data at all (inflation: see §25). Nothing about a marker may be styled as if it were live.
 
+Regional economies are an implemented Economy route family in this branch at `/explorer/economy/regions` (§2.1, §6.2, §26): one All Regions index and 11 detail pages. This branch state is not evidence that those routes are live in production.
+
 Every visual decision should support a focused budget product, not a generic dashboard.
 
 ### 2.1 Actual Data Coverage (data-driven, never hardcoded)
@@ -45,6 +47,7 @@ Year ranges in the UI always derive from loaded facts. Current reviewed coverage
 - Revenue: **2005–2025** (11 top-level categories).
 - Municipal expenditure by functional category: **2015–2025** (10 main functions plus the public total headline). The public entity set is 64 municipalities across 11 data-bearing regions. Adjara's total combines its six municipalities with Adjara republican actual payments net of transfers to territorial budgets. The separate Georgia scope aggregates all 69 reviewed municipal-budget series and adds the same net Adjara amount once; the 110 function rows remain municipal-only. Five occupied-territory-associated bodies appear only inside that country aggregate. Implemented in this branch at `/explorer/municipalities` (§20); production deployment remains unverified as described above.
 - General-government balance: **1995–2031** (1995–2025 actual; 2026–2031 IMF projection), published directly as percent of GDP and nominal GEL.
+- Regional economies: **2010–2024**, 11 regions, Total regional GDP plus 20 NACE Rev. 2 activities, with current-price GEL and share of the selected region's market-price GDP only.
 - All current budget facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned budget facts ever load; debt and deficit projections use the separate `პროგნოზი` treatment.
 
 ### 2.2 Bilingual presentation
@@ -310,6 +313,11 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
                                                           for expenditure, and year selector)
 /explorer/debt                         ვალი              Government Debt stock, service, and rate explorer (§8.5)
 /explorer/deficit                      დეფიციტი          General-government balance explorer (§8.6)
+/explorer/economy                     ეკონომიკა         Economy hub
+/explorer/economy/gdp                                   Annual GDP overview
+/explorer/economy/sectors                               National economic sectors
+/explorer/economy/regions                               All Regions map and ranked list (§26)
+/explorer/economy/regions/[id]                          11 regional-economy detail pages (§26)
 ```
 
 Outside `/explorer` and alongside `/about` sit the two editorial pages: `/about` (§2) and `/connect`, the MCP connection page (§23).
@@ -875,7 +883,7 @@ The Georgia page's total and function rows are dedicated `country.georgia` facts
 
 Approved visual and behavioral specification: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`. Approved preview: `design-shotgun/methodology-portal-2026-08-11/variant-d.html` (Editorial Fieldbook).
 
-The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, and Government Debt (GDP and inflation pages: see GDP overview extension and §25). Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
+The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, Government Debt, GDP, national economic sectors, regional economies, and inflation. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
 
 Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only.
 
@@ -951,3 +959,11 @@ Below the complete sector workspace, show four end-year highlights in the **same
 Display name: `სექტორები` / `Sectors` on the page, Economy card, sidebar and workbook title. Use concise explanations under the heading, with shared intrinsic height across the three measures so switching never shifts the chart; narrow screens may wrap without clipping text. Do not repeat `% მშპ-ში`, growth or GEL unit labels in a separate row under the line/table buttons. Preserve chart-axis units, table caption units and standalone row values. Rank the selector, table and workbook rows by the active measure's value in the selected final year, descending; keep GDP first, missing values last and stable classification order for ties. Detailed accounting caveats remain in methodology, source notes and machine-readable definitions.
 
 The Economy hub also links to national economic sectors. Reuse the existing editorial workspace, line chart, table, year strip, paper series panel and Excel action. Do not reproduce prototype styling or add top indicator tabs. A compact joined toolbar control switches nominal GEL, share of GDP and real growth. Only Total GDP is selected initially; it stays first and removable. All 20 sectors are selectable without a selection limit. Search does not restrict bulk actions or counts. Nominal values display their unit explicitly; percentage measures retain signed values, and preliminary observations are marked in charts, tables and workbooks. Coverage and range bounds come from the active measure's facts. Regional sectors are not part of this page. Bounded decisions: `docs/superpowers/specs/2026-09-11-economic-sectors-design.md`.
+
+## 26. Regional economy surfaces
+
+The Economy hub links to `/explorer/economy/regions`. Its index uses 11 region-level SVG boundaries and a value-ranked list; both open ordinary region links. Municipality boundaries and city markers are not drawn on this regional view. The map keeps the reviewed occupied-area overlays non-interactive and uses one keyboard stop per region with arrow-key movement. The index has no multi-region comparison chart.
+
+Each `/explorer/economy/regions/[id]` page reuses the editorial line chart, table, range strip, unlimited series panel, region picker, highlights and Excel action. Total regional GDP is first, selected by default and removable; all 20 NACE Rev. 2 activities are selectable. The joined measure control has exactly two choices: nominal GEL, shown with the literal `₾`, and share of that selected region's GDP, shown with Lucide `ChartPie`. There is no share of Georgia, real-growth, per-capita, USD, forecast or 2025 control.
+
+Activity amounts are gross value added at basic prices. The share denominator is the same region and year's complete GDP at market prices and never changes with series selection. Net product taxes explain why activity shares need not sum to 100%. The end-year highlights use all 20 activities independently of chart selection. Georgian and English pages, three-sheet Excel workbooks, methodology originals, Dataset JSON-LD, the read-only query tool and central JSON/CSV files all carry the same 2010–2024 boundary. Bounded decisions: `docs/superpowers/specs/2026-09-13-regional-economies-design.md`.

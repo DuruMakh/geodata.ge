@@ -2,6 +2,7 @@ import { BudgetHub } from "../../components/hub/budget-hub";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../data/economicSectors/importEconomicSectors";
+import { loadServedRegionalEconomyData } from "../data/regionalEconomies/importRegionalEconomies";
 import { getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { message } from "../i18n/messages";
@@ -19,10 +20,11 @@ export async function economyPageMetadata(locale: Locale) {
   });
 }
 export async function renderEconomyPage(locale: Locale) {
-  const [{ facts }, p, sectors] = await Promise.all([
+  const [{ facts }, p, sectors, regional] = await Promise.all([
     loadServedGdpOverviewData(),
     getPresentation(locale, ["gdp", "common"], []),
     loadServedEconomicSectorsData(),
+    loadServedRegionalEconomyData(),
   ]);
   const t = (k: string) => message(p.messages, `gdp.${k}`);
   return (
@@ -47,7 +49,7 @@ export async function renderEconomyPage(locale: Locale) {
             {t("hubDescription")}
           </p>
           <BudgetHub
-            cards={buildEconomyHubCards(facts, p, sectors.facts)}
+            cards={buildEconomyHubCards(facts, p, sectors.facts, regional.facts)}
             locale={locale}
             testId="economy-hub"
           />

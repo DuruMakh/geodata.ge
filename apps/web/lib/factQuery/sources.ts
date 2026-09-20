@@ -92,6 +92,10 @@ const DERIVED_SOURCE_UPSTREAMS: Readonly<Record<string, readonly string[]>> = {
     "source.adjara.republic.2015.actual_payments",
     "source.adjara.republic.2016_2025.actual_payments",
   ],
+  "source.fiscal_regional_economy_share": [
+    "source.geostat_regional_gdp",
+    "source.geostat_regional_gdp_by_activity",
+  ],
 };
 
 export type ResolvePublicSourcesInput = {

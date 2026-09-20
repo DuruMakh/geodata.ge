@@ -10,6 +10,8 @@
 // cannot disagree: there is only one implementation of an observation.
 import { queryGdp } from "./queryGdp";
 import { queryEconomicSectors } from "./queryEconomicSectors";
+import { queryRegionalEconomies } from "./queryRegionalEconomies";
+import { REGIONAL_ECONOMY_QUERY_MEASURES } from "./regionalEconomySeries";
 import { SECTOR_QUERY_MEASURES } from "./economicSectorsSeries";
 import { GDP_QUERY_SERIES } from "./gdpSeries";
 import { csvEscape } from "../data/csvEscape";
@@ -60,6 +62,7 @@ const DATASET_IDS: readonly DatasetId[] = [
   "general-government-balance",
   "gdp-overview",
   "economic-sectors",
+  "regional-economies",
   "inflation",
 ];
 
@@ -460,8 +463,75 @@ export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationAr
   const artifacts = [buildCatalogueFile(snapshot), buildSourcesFile(snapshot), ...buildDatasetFiles(snapshot),
  datasetFile(snapshot,"gdp-overview","gdp-overview.json",queryGdp(snapshot,{seriesIds:Object.keys(GDP_QUERY_SERIES),years:yearsOf(snapshot.gdpOverview.facts)}),{}),
  buildGdpCsv(snapshot), buildEconomicSectorsJson(snapshot), buildEconomicSectorsCsv(snapshot),
-    buildInflationNationalJson(snapshot), inflationCategoriesCsv, buildInflationCategoriesJson(snapshot, inflationCategories, inflationCategoriesCsv)];
+    buildRegionalEconomiesJson(snapshot), buildRegionalEconomiesCsv(snapshot), buildInflationNationalJson(snapshot),
+    inflationCategoriesCsv, buildInflationCategoriesJson(snapshot, inflationCategories, inflationCategoriesCsv)];
   return [...artifacts, buildManifestFile(snapshot, artifacts)];
+}
+
+export function buildRegionalEconomiesCsv(snapshot: {
+  regionalEconomies: Pick<FactQuerySnapshot["regionalEconomies"], "facts" | "regions" | "registry">;
+  localization: Pick<FactQuerySnapshot["localization"], "labelsEn">;
+}): PublicationArtifact {
+  const { facts, regions, registry } = snapshot.regionalEconomies;
+  const regionById = new Map(regions.map((region) => [region.id, region]));
+  const seriesById = new Map(registry.map((series) => [series.id, series]));
+  const header = "region_id,region_name_ka,region_name_en,series_id,series_name_ka,series_name_en,year,measure,value,unit,valuation,price_basis,status,source_id";
+  const rows = facts.map((fact) => {
+    const region = regionById.get(fact.regionId)!;
+    const series = seriesById.get(fact.seriesId)!;
+    return [
+      fact.regionId,
+      region.kaLabel,
+      snapshot.localization.labelsEn[fact.regionId],
+      fact.seriesId,
+      series.labelKa,
+      series.labelEn,
+      fact.year,
+      fact.measure,
+      fact.value,
+      fact.unit === "gel" ? "GEL" : "percent",
+      fact.valuation,
+      fact.priceBasis,
+      fact.status,
+      fact.sourceId,
+    ].map(csvEscape).join(",");
+  });
+  return { fileName: "regional-economies.csv", bytes: Buffer.from(`\uFEFF${header}\n${rows.join("\n")}\n`, "utf8"), rowCount: facts.length };
+}
+
+export function buildRegionalEconomiesJson(snapshot: FactQuerySnapshot): PublicationArtifact {
+  const years = yearsOf(snapshot.regionalEconomies.facts);
+  const regionIds = snapshot.regionalEconomies.regions.map((region) => region.id);
+  const seriesIds = snapshot.regionalEconomies.registry.map((series) => series.id);
+  const results = Object.keys(REGIONAL_ECONOMY_QUERY_MEASURES).map((measure) =>
+    queryRegionalEconomies(snapshot, { regionIds, seriesIds, years, measure }),
+  );
+  const parts = results.map((result) => observationsOf(result, "regional-economies.json"));
+  const first = results[0];
+  if (first?.kind !== "observations") throw new Error("Regional economy publication query failed");
+  const observations = parts.flatMap((part) => part.data.observations);
+  const returnedCount = observations.filter((observation) => observation.availability === "available").length;
+  const response: FactQueryResponse = {
+    ...first,
+    status: returnedCount === observations.length ? "ok" : returnedCount ? "partial" : "empty",
+    data: {
+      observations,
+      coverage: {
+        ...parts[0]!.data.coverage,
+        missingCells: parts.flatMap((part) => part.data.coverage.missingCells),
+        expectedCount: observations.length,
+        returnedCount,
+      },
+    },
+    meta: {
+      ...first.meta,
+      sources: parts.reduce<ResolvedSource[]>((all, part) => mergeSources(all, part.meta.sources), []),
+      caveats: parts.reduce<Caveat[]>((all, part) => mergeCaveats(all, part.meta.caveats), []),
+    },
+  };
+  return datasetFile(snapshot, "regional-economies", "regional-economies.json", response, {
+    definitions: snapshot.regionalEconomies.definitions,
+  });
 }
 
 export function buildEconomicSectorsCsv(snapshot: Pick<FactQuerySnapshot, "economicSectors">): PublicationArtifact {

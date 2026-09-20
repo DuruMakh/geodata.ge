@@ -29,7 +29,7 @@ describe("inflation publications", () => {
 
   it("publishes national CPI, the target and basket weights as observations", () => {
     const national = json("inflation-national.json");
-    expect(national).toMatchObject({ schemaVersion: "1.2.0", datasetId: "inflation" });
+    expect(national).toMatchObject({ schemaVersion: "1.3.0", datasetId: "inflation" });
     const headline = national.observations.find((o: { observationId: string }) => o.observationId === "inflation:country.georgia:cpi.headline:2026-08:yoy_pct");
     expect(headline.value).toBe(headlineYoy("2026-08"));
     expect(national.observations.some((o: { seriesId: string }) => o.seriesId === "cpi.target")).toBe(true);

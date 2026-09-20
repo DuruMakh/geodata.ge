@@ -1,5 +1,6 @@
 import type { ServedGdpObservation } from "../data/gdpOverview/types";
 import type { ServedSectorObservation } from "../data/economicSectors/types";
+import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import type { HubCardModel } from "./hubCards";
@@ -7,6 +8,7 @@ export function buildEconomyHubCards(
   facts: ServedGdpObservation[],
   p: Presentation,
   sectorFacts: ServedSectorObservation[] = [],
+  regionalFacts: ServedRegionalEconomyObservation[] = [],
 ): HubCardModel[] {
   const t = (k: string) => message(p.messages, `gdp.${k}`);
   const real = facts
@@ -30,11 +32,19 @@ export function buildEconomyHubCards(
       index: `0${i + 2}`,
       title: t(id),
       description: t(id + "Description"),
-      href: id === "sectors" && sectorFacts.length ? "/explorer/economy/sectors" : null,
-      comingSoon: id !== "sectors" || !sectorFacts.length,
+      href: id === "sectors" && sectorFacts.length
+        ? "/explorer/economy/sectors"
+        : id === "regions" && regionalFacts.length
+          ? "/explorer/economy/regions"
+          : null,
+      comingSoon: id === "sectors" ? !sectorFacts.length : !regionalFacts.length,
       series: null,
       seriesColor: null,
-      footer: id === "sectors" && sectorFacts.length ? `${Math.min(...sectorFacts.map(f=>f.year))}–${Math.max(...sectorFacts.map(f=>f.year))}` : null,
+      footer: id === "sectors" && sectorFacts.length
+        ? `${Math.min(...sectorFacts.map(f=>f.year))}–${Math.max(...sectorFacts.map(f=>f.year))}`
+        : id === "regions" && regionalFacts.length
+          ? `${Math.min(...regionalFacts.map(f=>f.year))}–${Math.max(...regionalFacts.map(f=>f.year))}`
+          : null,
     })),
   ];
 }

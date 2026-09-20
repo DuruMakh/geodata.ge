@@ -66,13 +66,14 @@ test("manual range clamps and All expands with a longer indicator", async ({
     page.getByRole("slider", { name: "Start year" }),
   ).toHaveAttribute("aria-valuenow", "1960");
 });
-test("Economy links the delivered overview and national sectors", async ({ page }) => {
+test("Economy links the delivered overview, national sectors and regional economies", async ({ page }) => {
   await page.goto("/en/explorer/economy");
   await expect(
     page.getByTestId("economy-hub").getByTestId("hub-card"),
   ).toHaveCount(3);
-  await expect(page.getByTestId("economy-hub").locator("a")).toHaveCount(2);
+  await expect(page.getByTestId("economy-hub").locator("a")).toHaveCount(3);
   await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/sectors"]')).toHaveCount(1);
+  await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/regions"]')).toHaveCount(1);
   await page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/gdp"]').click();
   await expect(page.getByTestId("gdp-overview")).toBeVisible();
 });

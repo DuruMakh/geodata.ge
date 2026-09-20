@@ -87,6 +87,10 @@ async function createFixtureRepository() {
   tempDirectories.push(repositoryRoot);
   const rows: Record<MethodologyDatasetId, ReviewedSourceManifestRow[]> = {
     "economic-sectors": [await writeReviewedSource(repositoryRoot,"economic-sectors","2011-2025","docs/Raw Data/Economy/economic-sectors/sources/growth.xlsx","downloads/methodology/economic-sectors/files/growth.xlsx","sector-growth")],
+    "regional-economies": [
+      await writeReviewedSource(repositoryRoot, "regional-economies", "2010-2024", "docs/Raw Data/Economy/regional-economies/sources/regional-GDP-by-activities-ENG.xlsx", "downloads/methodology/regional-economies/files/regional-gdp-by-activities-eng.xlsx", "regional-activities"),
+      await writeReviewedSource(repositoryRoot, "regional-economies", "2010-2024", "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/regional-GDP-ENG.xlsx", "downloads/methodology/regional-economies/files/regional-gdp-eng.xlsx", "regional-totals"),
+    ],
     expenditure: [
       await writeReviewedSource(repositoryRoot, "expenditure", "2005", "docs/Raw Data/Expenditure/2005/source-a.pdf", "downloads/methodology/expenditure/files/2005/source-a.pdf", "source-a"),
       await writeReviewedSource(repositoryRoot, "expenditure", "2006", "docs/Raw Data/Expenditure/2006/source-b.xlsx", "downloads/methodology/expenditure/files/2006/source-b.xlsx", "source-b"),

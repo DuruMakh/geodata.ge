@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "capturedOn": "2026-09-10",
+  "reviewedAt": "2026-09-13",
+  "coverage": {
+    "firstYear": 2010,
+    "lastYear": 2024,
+    "regions": 11,
+    "sectors": 20
+  },
+  "sourceCounts": {
+    "regionalTotals": 165,
+    "regionalSectorAmounts": 3300,
+    "reconciliationRows": 495
+  },
+  "validationCounts": {
+    "regions": 11,
+    "years": 15,
+    "selectableSeries": 21,
+    "nominal": 3465,
+    "shareOfRegionGdp": 3465,
+    "total": 6930
+  },
+  "missingValues": 0,
+  "duplicateKeys": 0,
+  "allRegionAccountsReconcile": true,
+  "allRegionTotalsReconcileToNational": true,
+  "regionalAccountingToleranceGel": "0.01",
+  "nationalSectorPublicationDifferences": [
+    {
+      "year": 2020,
+      "seriesId": "sector.a",
+      "regionalMinusNationalMillionGel": "-45.000000000000721"
+    },
+    {
+      "year": 2020,
+      "seriesId": "sector.c",
+      "regionalMinusNationalMillionGel": "-34.999999999999393"
+    },
+    {
+      "year": 2020,
+      "seriesId": "sector.r",
+      "regionalMinusNationalMillionGel": "79.999999999999974"
+    },
+    {
+      "year": 2021,
+      "seriesId": "sector.c",
+      "regionalMinusNationalMillionGel": "-60.000000000020284"
+    },
+    {
+      "year": 2021,
+      "seriesId": "sector.f",
+      "regionalMinusNationalMillionGel": "60.0000000000005447"
+    },
+    {
+      "year": 2022,
+      "seriesId": "sector.k",
+      "regionalMinusNationalMillionGel": "-4.9999999999998745"
+    },
+    {
+      "year": 2022,
+      "seriesId": "sector.o",
+      "regionalMinusNationalMillionGel": "4.999999999999802"
+    }
+  ],
+  "sourceHashes": {
+    "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/regional-GDP-ENG.xlsx": "dd2042dff5e2c44b98b4bb140163b5736cf5a71f4683b9e6a359373907d59c35",
+    "docs/Raw Data/Economy/regional-economies/sources/regional-GDP-by-activities-ENG.xlsx": "88e337bd82a5232ea5260f011b11cb2d82c2cec5115fddbe92d14d1ff3945337",
+    "docs/Raw Data/Economy/gdp-overview/sources/geostat_nominal_current.xlsx": "21a576c9c20434a87bcb32047cd143eef2b8d3f3ff360442b420c76b0da27d34"
+  }
+}

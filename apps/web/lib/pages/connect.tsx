@@ -37,6 +37,7 @@ function coverage(): {
   ranges: Record<DatasetId, string>;
   municipalities: number;
   regions: number;
+  regionalRegions: number;
   excludedCodes: string[];
   sectorCount: number;
   sectorRanges: Record<string, string>;
@@ -77,6 +78,7 @@ function coverage(): {
     })(),
     municipalities: snapshot.municipal.municipalities.length,
     regions: snapshot.municipal.regions.length,
+    regionalRegions: snapshot.regionalEconomies.regions.length,
     excludedCodes: exclusions.map((exclusion) => exclusion.entityId),
   };
 }
@@ -122,7 +124,7 @@ const NOT_SERVED = [
 export async function renderConnectPage(locale: Locale) {
   const messages = await getMessages(locale, ["common", "connect"]);
   const model = buildLandingContext(await loadServedLandingData());
-  const { ranges, municipalities, regions, excludedCodes, sectorCount, sectorRanges, inflation } = coverage();
+  const { ranges, municipalities, regions, regionalRegions, excludedCodes, sectorCount, sectorRanges, inflation } = coverage();
   const endpoint = `${resolveSiteUrl()}/mcp`;
 
   return (
@@ -223,7 +225,7 @@ export async function renderConnectPage(locale: Locale) {
             <p className="mt-4 max-w-[820px] text-[13.5px] leading-[1.8] text-[var(--body)]">{message(messages, "connect.bilingualText")}</p>
             <h3 className="mt-5 text-[14px] font-semibold">{message(messages, "connect.examplesHeading")}</h3>
             <ul className="mt-3 grid max-w-[820px] list-disc gap-2 pl-5 text-[13.5px] leading-[1.8] text-[var(--body)]">
-              {["connect.exampleNational", "connect.exampleMunicipal", "connect.exampleDebt", "connect.exampleDeficit"].map(key => <li key={key}>{message(messages, key)}</li>)}
+              {["connect.exampleNational", "connect.exampleMunicipal", "connect.exampleRegional", "connect.exampleDebt", "connect.exampleDeficit"].map(key => <li key={key}>{message(messages, key)}</li>)}
             </ul>
           </section>
 
@@ -262,6 +264,7 @@ export async function renderConnectPage(locale: Locale) {
                   </li>
                   <li>{message(messages,"connect.gdpCoverage",{range:ranges["gdp-overview"]})}</li>
                   <li data-testid="connect-sector-coverage">{message(messages, "connect.sectorCoverage", { count: sectorCount, nominalRange: sectorRanges.nominal, shareRange: sectorRanges.share_of_gdp, growthRange: sectorRanges.real_growth })}</li>
+                  <li data-testid="connect-regional-coverage">{message(messages, "connect.regionalCoverage", { count: regionalRegions, range: ranges["regional-economies"] })}</li>
                   <li data-testid="connect-inflation-coverage">{message(messages, "connect.inflationCoverage", { nationalRange: inflation.nationalRange, groupCount: inflation.groupCount, weightRange: inflation.weightRange, contributionStart: inflation.contributionStart, targetStart: inflation.targetStart })}</li>
                 </ul>
                 <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-sector-discovery">
@@ -269,6 +272,12 @@ export async function renderConnectPage(locale: Locale) {
                   <a className="underline" href="/downloads/data/economic-sectors.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/economic-sectors.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/economic-sectors", locale)}>{message(messages, "connect.sectorMethodology")}</a>
+                </p>
+                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-regional-discovery">
+                  {message(messages, "connect.regionalQuery")} {" "}
+                  <a className="underline" href="/downloads/data/regional-economies.json">JSON</a>{" · "}
+                  <a className="underline" href="/downloads/data/regional-economies.csv">CSV</a>{" · "}
+                  <a className="underline" href={pageHref("/methodology/regional-economies", locale)}>{message(messages, "connect.regionalMethodology")}</a>
                 </p>
                 <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-inflation-discovery">
                   {message(messages, "connect.inflationQuery")}{" "}

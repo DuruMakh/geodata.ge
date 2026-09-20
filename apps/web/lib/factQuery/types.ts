@@ -23,7 +23,7 @@ import type {
 export type { MunicipalTotalFact } from "../data/municipal/types";
 export type { ServedNationalGdpFact } from "../servedRows";
 
-export const SCHEMA_VERSION = "1.2.0" as const;
+export const SCHEMA_VERSION = "1.3.0" as const;
 
 /** Municipal codes whose budgets are not territorially attributable (spec section 5.4). */
 export const AGGREGATE_ONLY_MUNICIPAL_CODES = ["05", "42", "43", "46", "64"] as const;
@@ -37,6 +37,7 @@ export type DatasetId =
   | "general-government-balance"
   | "gdp-overview"
   | "economic-sectors"
+  | "regional-economies"
   | "inflation";
 
 // rate_percent is a rate per annum, NOT a share of anything. Reusing
@@ -46,6 +47,7 @@ export type Measure =
   | "amount_gel"
   | "share_of_total_pct"
   | "share_of_gdp_pct"
+  | "share_of_region_gdp_pct"
   | "gel_per_resident"
   | "rate_percent"
   | "value"
@@ -257,6 +259,7 @@ export type FactQuerySnapshot = {
   deficit: { facts: ServedGeneralGovernmentBalanceFact[] };
   gdpOverview: { facts: import("../data/gdpOverview/types").GdpObservation[]; series: typeof import("./gdpSeries").GDP_QUERY_SERIES };
   economicSectors: { facts: import("../data/economicSectors/types").SectorObservation[]; registry: import("../data/economicSectors/types").SectorDefinition[]; definitions: typeof import("./economicSectorsSeries").SECTOR_DEFINITIONS };
+  regionalEconomies: { facts: import("../data/regionalEconomies/types").RegionalEconomyObservation[]; regions: MunicipalRegion[]; registry: import("../data/economicSectors/types").SectorDefinition[]; definitions: typeof import("./regionalEconomySeries").REGIONAL_ECONOMY_DEFINITIONS };
   inflation: {
     facts: import("../data/inflation/types").ServedCpiFact[];
     targets: import("../data/inflation/types").ServedInflationTargetRow[];

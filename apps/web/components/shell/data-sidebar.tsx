@@ -190,6 +190,7 @@ export function DataSidebar() {
             </Link>
             {economyActive ? <Link href={pageHref("/explorer/economy/gdp",locale)} aria-current={pathname.endsWith('/gdp')?'page':undefined} className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline">{message(messages,"common.gdpOverview")}</Link> : null}
             {economyActive ? <Link href={pageHref("/explorer/economy/sectors",locale)} aria-current={pathname.endsWith('/sectors')?'page':undefined} className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline">{message(messages,"common.economicSectors")}</Link> : null}
+            {economyActive ? <Link href={pageHref("/explorer/economy/regions",locale)} aria-current={pathname.includes('/economy/regions')?'page':undefined} className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline">{message(messages,"common.regionalEconomies")}</Link> : null}
             <Link
               href={pageHref("/explorer/inflation", locale)}
               data-testid="inflation-link"
