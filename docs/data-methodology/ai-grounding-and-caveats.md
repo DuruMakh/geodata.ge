@@ -233,8 +233,10 @@ Every nominal cell already names its standard in `valueDefinitionId`; the caveat
 
 ### `gdp_world_bank_history`
 
-**Severity:** note  
-**Comparison effect:** `none`  
+**Severity:** note
+
+**Comparison effect:** `none`
+
 **Owner document:** `gdp-overview.md`
 
 **Trigger.** Any available cell of a World Bank real GDP series (constant-2015 USD or annual real growth).
@@ -247,8 +249,10 @@ The source does not say which years were reconstructed, so there is no narrower 
 
 ### `gdp_world_bank_preliminary_basis`
 
-**Severity:** note  
-**Comparison effect:** `none`  
+**Severity:** note
+
+**Comparison effect:** `none`
+
 **Owner document:** `gdp-overview.md`
 
 **Trigger.** A returned `real_usd_2015` or `real_growth_percent` cell whose year Geostat still marks preliminary in the same dataset.

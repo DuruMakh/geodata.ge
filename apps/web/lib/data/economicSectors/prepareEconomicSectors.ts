@@ -46,11 +46,10 @@ export async function prepareEconomicSectors(repositoryRoot: string) {
   const preliminaryYears = [
     ...new Set(manifest.files.flatMap((source) => source.preliminaryYears)),
   ].sort((a, b) => a - b);
-  if (
-    preliminaryYears.some(
-      (year) => year > lastAnnualYear || year <= lastAnnualYear - manifest.files.length,
-    )
-  ) {
+  const expectedPreliminaryYears = preliminaryYears.length
+    ? years(preliminaryYears[0]!, lastAnnualYear)
+    : [];
+  if (!same(preliminaryYears, expectedPreliminaryYears)) {
     throw new Error("Sector preliminary years must be the newest annual years");
   }
   const activities = registry.filter(s => s.classificationCode !== null).sort((a, b) => a.sortOrder - b.sortOrder);
@@ -195,8 +194,10 @@ export async function prepareEconomicSectors(repositoryRoot: string) {
     status: "PASS", reviewedAt: manifest.reviewedAt, capturedOn: manifest.capturedOn,
     counts: Object.fromEntries(measures.map(measure => [measure, facts.filter(f => f.measure === measure).length])),
     countsByStatus: Object.fromEntries(measures.map(measure => [measure, Object.fromEntries(["published", "preliminary"].map(status => [status, facts.filter(f => f.measure === measure && f.status === status).length]))])),
-    availableObservations: facts.length, fullGridObservations: 1008, missingCells,
-    missingGrowthReason: "2010: no published annual index and no compatible 2009 volume input; approved growth coverage is 2011-2025.",
+    availableObservations: facts.length,
+    fullGridObservations: registry.length * years(2010, lastAnnualYear).length * measures.length,
+    missingCells,
+    missingGrowthReason: `2010: no published annual index and no compatible 2009 volume input; approved growth coverage is 2011-${lastAnnualYear}.`,
     coverage: registry.map(s => ({ seriesId: s.id, yearsByMeasure: Object.fromEntries(measures.map(measure => [measure, facts.filter(f => f.seriesId === s.id && f.measure === measure).map(f => f.year)])) })),
     sourceHashes, sourceVintages: sources.map(s => ({ ...s.source, notes: s.notes })),
     nominalReconciliationToleranceMillionGel: manifest.nominalReconciliationToleranceMillionGel,

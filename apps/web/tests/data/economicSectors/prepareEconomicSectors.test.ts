@@ -24,10 +24,15 @@ afterEach(async () => { await Promise.all(temporary.splice(0).map(dir => fs.rm(d
 
 // Compact generated sheets retain reviewed row/column coordinates, but use simple
 // values: twenty sectors of 1m, basic total 20m, taxes 2m, subsidies 1m, GDP 21m.
-async function fixture(mutate?: (sheet: XLSX.WorkSheet, role: string) => void, rehash = true) {
+async function fixture(
+  mutate?: (sheet: XLSX.WorkSheet, role: string) => void,
+  rehash = true,
+  mutateManifest?: (manifest: { files: Array<{ role: string; annualYears: number[]; preliminaryYears: number[]; lastAnnualColumn: string }> }) => void,
+) {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "economic-sectors-"));
   temporary.push(dir);
   const manifest = JSON.parse(await fs.readFile(path.join(root, manifestPath), "utf8"));
+  mutateManifest?.(manifest);
   const registry = JSON.parse(await fs.readFile(path.join(root, "data/taxonomy/economic-sectors.json"), "utf8"));
   const save = async (file: string, content: string | Buffer) => {
     await fs.mkdir(path.dirname(path.join(dir, file)), { recursive: true });
@@ -37,7 +42,7 @@ async function fixture(mutate?: (sheet: XLSX.WorkSheet, role: string) => void, r
   for (const entry of manifest.files) {
     const sheet = XLSX.utils.aoa_to_sheet([]);
     const put = (address: string, value: string | number) => { sheet[address] = { t: typeof value === "number" ? "n" : "s", v: value }; };
-    sheet["!ref"] = "A1:CD36";
+    sheet["!ref"] = "A1:CZ36";
     put("A2", "NACE \nRev. 2 ");
     for (let i = 0; i < 20; i++) { put(`A${i + 3}`, registry[i].classificationCode); put(`B${i + 3}`, registry[i].officialName); }
     ["(=) GDP at basic prices", "(+) Taxes on products", "(-) Subsidies on products", "(=) GDP at market prices"].forEach((label, i) => put(`B${i + 23}`, label));
@@ -45,7 +50,7 @@ async function fixture(mutate?: (sheet: XLSX.WorkSheet, role: string) => void, r
     put("B36", "Last update: 19.06.2026");
     entry.annualYears.forEach((year: number, i: number) => {
       const c = 6 + i * 5;
-      put(XLSX.utils.encode_cell({ r: 1, c }), year === 2025 ? "2025*" : year);
+      put(XLSX.utils.encode_cell({ r: 1, c }), entry.preliminaryYears.includes(year) ? `${year}*` : year);
       for (let r = 2; r <= 25; r++) put(XLSX.utils.encode_cell({ r, c }), entry.role === "growth" ? 100 : r < 22 ? 1 : [20, 2, 1, 21][r - 22]);
     });
     const book = XLSX.utils.book_new();
@@ -58,7 +63,8 @@ async function fixture(mutate?: (sheet: XLSX.WorkSheet, role: string) => void, r
     await save(entry.file, bytes);
   }
   await save(manifestPath, JSON.stringify(manifest));
-  await save("data/imports/gdp-overview-annual.csv", "series_id,year,value\n" + Array.from({ length: 16 }, (_, i) => `nominal_gel,${2010 + i},21000000\n`).join(""));
+  const nominalYears = manifest.files.find((entry: { role: string }) => entry.role === "nominal").annualYears;
+  await save("data/imports/gdp-overview-annual.csv", "series_id,year,value\n" + nominalYears.map((year: number) => `nominal_gel,${year},21000000\n`).join(""));
   return dir;
 }
 
@@ -85,6 +91,28 @@ test("allows exactly the 21 unsupported 2010 growth cells without inventing rate
   expect(result.validation.missingCells).toHaveLength(21);
   expect(result.validation.missingCells.every(cell => cell.year === 2010 && cell.measure === "real_growth")).toBe(true);
   expect(result.facts.filter(f => f.measure === "real_growth").every(f => f.value === "0")).toBe(true);
+});
+
+test("derives future validation counts and wording from manifest coverage", async () => {
+  const dir = await fixture(undefined, true, (manifest) => {
+    for (const file of manifest.files) {
+      file.annualYears.push(2026);
+      file.preliminaryYears = [2026];
+      file.lastAnnualColumn = file.role === "growth" ? "CD" : "CI";
+    }
+  });
+
+  const result = await prepareEconomicSectors(dir);
+  expect(result.validation.fullGridObservations).toBe(21 * 17 * 3);
+  expect(result.validation.missingGrowthReason).toContain("2011-2026");
+});
+
+test("accepts any contiguous preliminary-year suffix ending at the latest year", async () => {
+  const dir = await fixture(undefined, true, (manifest) => {
+    for (const file of manifest.files) file.preliminaryYears = [2022, 2023, 2024, 2025];
+  });
+
+  await expect(prepareEconomicSectors(dir)).resolves.toMatchObject({ validation: { status: "PASS" } });
 });
 
 test.each([

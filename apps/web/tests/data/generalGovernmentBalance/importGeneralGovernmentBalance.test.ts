@@ -39,8 +39,9 @@ describe("loadGeneralGovernmentBalanceFacts", () => {
       status: string,
       vintage = "2026-10",
       sourceId = "source.imf_weo_october_2026_general_government_balance",
+      sourceDataset = "IMF.RES:WEO(9.0.0)",
     ) =>
-      `${year},-2.5,-1000000000,${status},${sourceId},IMF.RES:WEO(9.0.0),${vintage},Countries,GEO,GEO.GGXCNL_NGDP.A,GEO.GGXCNL.A,billion GEL,"IMF billion GEL multiplied by 1,000,000,000; signed value preserved.",2026-11-02\n`;
+      `${year},-2.5,-1000000000,${status},${sourceId},${sourceDataset},${vintage},Countries,GEO,GEO.GGXCNL_NGDP.A,GEO.GGXCNL.A,billion GEL,"IMF billion GEL multiplied by 1,000,000,000; signed value preserved.",2026-11-02\n`;
 
     const write = async (name: string, body: string) => {
       await writeFile(path.join(root, name), header + body, "utf8");
@@ -67,6 +68,22 @@ describe("loadGeneralGovernmentBalanceFacts", () => {
         row(2026, "projection"),
     );
     await expect(loadGeneralGovernmentBalanceFacts(mixed)).rejects.toThrow(/one WEO edition/i);
+
+    const mixedDataset = await write(
+      "mixed-dataset.csv",
+      row(2024, "actual") +
+        row(2025, "actual", "2026-10", "source.imf_weo_october_2026_general_government_balance", "IMF.RES:WEO(8.0.0)") +
+        row(2026, "projection"),
+    );
+    await expect(loadGeneralGovernmentBalanceFacts(mixedDataset)).rejects.toThrow(/one WEO edition/i);
+
+    const mismatchedIdAndVintage = await write(
+      "mismatched-id-vintage.csv",
+      [2024, 2025, 2026]
+        .map((year) => row(year, year <= 2025 ? "actual" : "projection", "2026-10", "source.imf_weo_april_2026_general_government_balance"))
+        .join(""),
+    );
+    await expect(loadGeneralGovernmentBalanceFacts(mismatchedIdAndVintage)).rejects.toThrow(/source ID.*vintage/i);
 
     const misordered = await write(
       "misordered.csv",

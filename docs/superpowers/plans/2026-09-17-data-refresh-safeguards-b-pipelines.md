@@ -862,8 +862,10 @@ In `docs/data-methodology/ai-grounding-and-caveats.md`, change line 65 from `37 
 ```markdown
 ### `gdp_world_bank_preliminary_basis`
 
-**Severity:** note  
-**Comparison effect:** `none`  
+**Severity:** note
+
+**Comparison effect:** `none`
+
 **Owner document:** `gdp-overview.md`
 
 **Trigger.** A returned `real_usd_2015` or `real_growth_percent` cell whose year Geostat still marks preliminary in the same dataset.
@@ -1082,3 +1084,14 @@ The single fresh-context whole-branch review found no Critical or Minor issues a
 3. The WEO manifest now requires its source ID, publication month/year, archived filename, and retrieved filename to describe the same April or October edition.
 
 Each regression was observed failing before the fix, then passing. The final full suite passed 2,273 tests and the final CSV production build again generated 235 pages and verified all 19 publication hashes.
+
+## Follow-up review fix pass (2026-09-21)
+
+A fresh review of the current branch found three Important future-refresh gaps and one Minor manifest-rule flaw. All four were fixed inline:
+
+- The economic-sector serving loader now rejects incomplete 2010-to-latest grids and requires nominal/share coverage from 2010, real-growth coverage from 2011, and one common contiguous preliminary-year suffix across every registered series and measure.
+- Sector validation evidence now derives its full-grid count and growth-coverage endpoint from the manifest's latest annual year.
+- Sector preparation accepts any contiguous preliminary-year suffix ending at the latest year; its length is no longer tied to the number of archived files.
+- The WEO runtime one-edition check now includes the dataset version and requires the April/October edition encoded in the source ID to agree with `sourceVintage`.
+
+Each regression was observed failing before its implementation changed, then passing. Focused verification passed 4 files / 85 tests. Final `npm run check` passed lint, type checking, 265 files / 2,277 tests, all data validation, the 47-comparison nominal-GDP gate, and localization. The production build generated 235 pages and verified 19 publications with data version `7545ee565484f2502e7a666871426412e48dfa32c804ad7790a581ae0abb213f`; GDP, sector, regional, and inflation public CSV checks passed. Canonical data values and reference fixtures remain unchanged. The browser suite was not repeated because this pass changed offline preparation and serving validation without changing rendered UI inputs. Database mode remains unverified because this isolated worktree has no Supabase `.env`. Deferred minors: none.

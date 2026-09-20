@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { readCsvRecords } from "../csv";
 import { assertSameServedRows } from "../servedDataParity";
-import { validateSectorObservations } from "./validation";
+import { assertCompleteSectorCoverage, validateSectorObservations } from "./validation";
 import type { SectorDefinition, SectorObservation, ServedSectorObservation } from "./types";
 
 // Read at build time, like the canonical CSVs; the taxonomy is outside the app's bundle root.
@@ -28,7 +28,7 @@ export async function loadEconomicSectorFacts(
     sourceId: r.source_id, sourceLocator: r.source_locator, lastReviewedAt: r.last_reviewed_at,
   }));
   validateSectorObservations(facts, registry);
-  if (!facts.length) throw new Error("Economic sector facts are empty");
+  assertCompleteSectorCoverage(facts, registry);
   return facts;
 }
 

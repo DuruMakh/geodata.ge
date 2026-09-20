@@ -79,10 +79,17 @@ export async function loadGeneralGovernmentBalanceFacts(
   // One edition per file, and the projection horizon follows the actual years.
   // Which year that boundary falls in is the edition's business, not this file's.
   const editions = new Set(
-    facts.map((fact) => `${fact.sourceId}|${fact.sourceVintage}|${fact.lastReviewedAt}`),
+    facts.map((fact) => `${fact.sourceId}|${fact.sourceDataset}|${fact.sourceVintage}|${fact.lastReviewedAt}`),
   );
   if (editions.size !== 1) {
     throw new Error("A balance file must carry exactly one WEO edition");
+  }
+  for (const fact of facts) {
+    const edition = /^source\.imf_weo_(april|october)_(\d{4})_general_government_balance$/.exec(fact.sourceId);
+    const expectedVintage = edition ? `${edition[2]}-${edition[1] === "april" ? "04" : "10"}` : null;
+    if (expectedVintage !== fact.sourceVintage) {
+      throw new Error("The WEO source ID edition must agree with its source vintage");
+    }
   }
   const firstProjection = facts.findIndex((fact) => fact.status === "projection");
   if (firstProjection <= 0) {
