@@ -124,7 +124,13 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
   const [landingData, municipalData, debtData, archiveSummaries, rows, catalogue] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
-    loadServedGovernmentDebtData(),
+    // Only an article whose coverage line is drawn from the debt facts needs
+    // them, and a build renders eight articles in two locales. The id is not
+    // hard-coded here: the same coverage source deriveMethodologyCoverage
+    // reads decides it.
+    content.coverageSource.kind === "governmentDebt"
+      ? loadServedGovernmentDebtData()
+      : Promise.resolve({ facts: [] }),
     loadGeneratedArchiveSummaries(repositoryRoot),
     loadReviewedSourceManifest(repositoryRoot, content.archiveManifestId),
     loadEnglishCatalogue(repositoryRoot),
