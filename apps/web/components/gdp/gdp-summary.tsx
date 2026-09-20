@@ -2,6 +2,13 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import type { GdpIndicator } from "../../lib/explorer/gdpOverview";
 
+/** Reviewed periods shared with the canonical-data summary checks. */
+export const REAL_GDP_SUMMARY_PERIODS = [
+  [1994, 2003],
+  [2003, 2012],
+  [2012, 2025],
+] as const satisfies readonly (readonly [number, number])[];
+
 export function GdpSummary({ indicator }: { indicator: GdpIndicator }) {
   return (
     <>
@@ -23,10 +30,9 @@ function IndicatorSummary({
   const prefix = indicator === "real" ? "summary" : `${indicator}Summary`;
   const t = (key: string) => message(messages, `gdp.${prefix}.${key}`);
   const common = (key: string) => message(messages, `gdp.summary.${key}`);
-  const periods =
-    indicator === "real"
-      ? ["1994–2003", "2003–2012", "2012–2025"]
-      : ["2003–2012", "2012–2025"];
+  const periods = (indicator === "real" ? REAL_GDP_SUMMARY_PERIODS : REAL_GDP_SUMMARY_PERIODS.slice(1)).map(
+    ([from, to]) => `${from}–${to}`,
+  );
   const columns =
     indicator === "growth" ? ["annual", "total"] : ["total", "annual"];
   return (

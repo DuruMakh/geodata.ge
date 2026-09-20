@@ -11,6 +11,8 @@ Geostat SNA1993 is selected for 1996–2009, SNA2008 for 2010–2025. This is no
 Nominal total cells in millions are multiplied by one million, using Decimal arithmetic. Original underlying source precision is retained. The separate budget denominator CSV remains at its established one-decimal million GEL precision and is not modified. Real GDP is not spliced or custom-rebased. Growth source percent is converted to a fraction only at the display/export boundary.
 
 ## Validation and refresh
+The four indicator summaries contain reviewed editorial figures. After any refresh, run `npx vitest run tests/i18n/gdpSummaryFigures.test.ts` from `apps/web`; it recomputes the figures from the canonical CSV and checks each summary for unchecked numeric claims. If it fails, update both languages in `lib/i18n/messages/{ka,en}/gdp.json` and re-review the wording against the approved GDP overview design.
+
 `npm run data:prepare-gdp-overview` writes the canonical BOM CSV and validation report; `npm run data:check-gdp-overview` checks byte parity without writing. Both read archived originals offline. Source hashes, country/indicator, year uniqueness/coverage, units, status, finite values, FX and level/growth consistency are checked. Source updates require a reviewed replacement manifest; builds never fetch fresh upstream files.
 
 Serving imports the pure observation validator without loading workbook preparation. The public GDP CSV is generated during prebuild and independently checked during postbuild, after it exists; canonical source validation remains available on a clean checkout before any build.
