@@ -81,3 +81,5 @@ The preparation command regenerates:
 - `data/reports/general-government-balance-annual-1995-2031-validation.json` — source identity, coverage, status boundary, and reconciliation evidence.
 
 The check command recreates the artifacts in memory and requires a byte-for-byte match with the committed files.
+
+The page reads the edition from the reviewed package manifest. The forecast marker and actual/projection ranges come from the facts; the source sentence and workbook title use `publication_date`, while the workbook source uses `retrieved_file_url`, `retrieved_at`, `year_min` and `year_max`. A new April or October WEO edition needs no page-copy edit; another publication month raises a missing-translation error for `deficit.weoMonth.*`. Pipeline edition guards still require the separate data-refresh procedure.
