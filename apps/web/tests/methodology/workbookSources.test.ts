@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import path from "node:path";
 import {
   loadGdpWorkbookSources,
+  loadImfWeoManifest,
   loadWorkbookSources,
   projectGdpWorkbookSources,
   projectWorkbookSources,
@@ -289,5 +290,18 @@ describe("loadGdpWorkbookSources", () => {
     expect(loadGdpWorkbookSources()).toBe(first);
     resetWorkbookSourceCacheForTests();
     expect(loadGdpWorkbookSources()).not.toBe(first);
+  });
+});
+
+
+describe("IMF WEO manifest", () => {
+  it("reads the reviewed edition URL, dates and coverage", async () => {
+    expect(await loadImfWeoManifest()).toEqual({
+      retrievedFileUrl: "https://data.imf.org/-/media/iData/External-Storage/Documents/2F78EE59F79143A7921E5E203D3AAA80/en/WEOApr2026all.xlsx",
+      retrievedAt: "2026-09-04",
+      publicationDate: "2026-04-14",
+      yearMin: 1995,
+      yearMax: 2031,
+    });
   });
 });

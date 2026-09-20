@@ -244,7 +244,48 @@ export function loadGdpWorkbookSources(locale: Locale = "ka"): Promise<WorkbookP
   return pending;
 }
 
+const imfWeoManifestSchema = z.object({
+  retrieved_file_url: z.string().url().startsWith("https://"),
+  retrieved_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  publication_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  year_min: z.coerce.number().int(),
+  year_max: z.coerce.number().int(),
+});
+
+let imfWeoManifest: Promise<ImfWeoManifest> | null = null;
+
+export type ImfWeoManifest = {
+  retrievedFileUrl: string;
+  retrievedAt: string;
+  publicationDate: string;
+  yearMin: number;
+  yearMax: number;
+};
+
+/** The reviewed IMF WEO edition behind the deficit dataset, read from its package manifest. */
+export function loadImfWeoManifest(): Promise<ImfWeoManifest> {
+  imfWeoManifest ??= (async () => {
+    const manifestPath = path.resolve(
+      process.cwd(),
+      "../..",
+      "docs/Raw Data/Deficit/imf-weo-general-government-balance/source-manifest.csv",
+    );
+    const rows = parse(await readFile(manifestPath, "utf8"), { bom: true, columns: true, skip_empty_lines: true, trim: true }) as unknown[];
+    if (rows.length !== 1) throw new Error("Expected exactly one IMF WEO manifest row");
+    const row = imfWeoManifestSchema.parse(rows[0]);
+    return {
+      retrievedFileUrl: row.retrieved_file_url,
+      retrievedAt: row.retrieved_at,
+      publicationDate: row.publication_date,
+      yearMin: row.year_min,
+      yearMax: row.year_max,
+    };
+  })();
+  return imfWeoManifest;
+}
+
 export function resetWorkbookSourceCacheForTests(): void {
   cache.clear();
   gdpCache.clear();
+  imfWeoManifest = null;
 }

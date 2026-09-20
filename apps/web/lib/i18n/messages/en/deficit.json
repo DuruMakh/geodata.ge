@@ -3,14 +3,17 @@
   "deficit.negative": "A negative value indicates a deficit",
   "deficit.caption": "General government balance, {start}–{end}",
   "deficit.forecast": "Forecast",
-  "deficit.forecastNote": "The IMF projects the figures for 2026–2031. This WEO edition identifies 1995–2025 as the actual-data period.",
-  "deficit.source": "Data: the International Monetary Fund’s (IMF) April 2026 World Economic Outlook.",
+  "deficit.forecastNote": "The IMF projects the figures for {projectionFirst}–{projectionLast}. This WEO edition identifies {actualFirst}–{actualLast} as the actual-data period.",
+  "deficit.source": "Data: the International Monetary Fund’s (IMF) World Economic Outlook, {edition}.",
   "deficit.definition": "A negative value indicates a deficit and a positive value a surplus. The measure is the general government balance, rather than the difference between state-budget receipts and expenditure.",
   "deficit.metaTitle": "Georgia general government deficit {first}–{last} | Fiscal.ge",
   "deficit.description": "Georgia’s general government deficit or surplus, as a percentage of GDP and in nominal GEL, {first}–{last}.",
-  "deficit.datasetDescription": "Georgia’s general government deficit or surplus, as a percentage of GDP and in nominal GEL, {first}–{last}; 2026–2031 are IMF projections.",
+  "deficit.datasetDescription": "Georgia’s general government deficit or surplus, as a percentage of GDP and in nominal GEL, {first}–{last}; {projectionFirst}–{projectionLast} are IMF projections.",
   "deficit.datasetName": "Georgia general government deficit",
   "deficit.georgia": "Georgia",
-  "deficit.workbookTitle": "IMF World Economic Outlook — April 2026",
-  "deficit.workbookOrganization": "International Monetary Fund (IMF)"
+  "deficit.workbookTitle": "IMF World Economic Outlook — {edition}",
+  "deficit.workbookOrganization": "International Monetary Fund (IMF)",
+  "deficit.weoEdition": "{month} {year}",
+  "deficit.weoMonth.4": "April",
+  "deficit.weoMonth.10": "October"
 }
