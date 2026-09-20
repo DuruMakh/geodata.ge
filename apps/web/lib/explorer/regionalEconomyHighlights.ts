@@ -1,9 +1,9 @@
 import type { SectorDefinition } from "../data/economicSectors/types";
-import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
+import type { ClientRegionalEconomyObservation } from "../servedRows";
 
 export function buildRegionalEconomyHighlights(
-  facts: readonly ServedRegionalEconomyObservation[],
+  facts: readonly ClientRegionalEconomyObservation[],
   registry: readonly SectorDefinition[],
   year: number,
 ) {

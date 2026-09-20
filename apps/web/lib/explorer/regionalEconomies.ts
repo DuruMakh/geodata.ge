@@ -1,11 +1,9 @@
 import type { SectorDefinition } from "../data/economicSectors/types";
-import type {
-  RegionalEconomyMeasure,
-  ServedRegionalEconomyObservation,
-} from "../data/regionalEconomies/types";
+import type { RegionalEconomyMeasure } from "../data/regionalEconomies/types";
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { INK } from "./colors";
 import { sectorColor } from "./economicSectors";
+import type { ClientRegionalEconomyObservation } from "../servedRows";
 
 export type RegionalEconomyState = {
   measure: RegionalEconomyMeasure;
@@ -103,7 +101,7 @@ export function serializeRegionalEconomyHash(state: RegionalEconomyState) {
 
 function resolveRange(
   state: RegionalEconomyState,
-  facts: readonly ServedRegionalEconomyObservation[],
+  facts: readonly ClientRegionalEconomyObservation[],
 ) {
   const availableYears = [
     ...new Set(facts.filter((fact) => fact.measure === state.measure).map((fact) => fact.year)),
@@ -126,7 +124,7 @@ function resolveRange(
 export function changeRegionalEconomyMeasure(
   state: RegionalEconomyState,
   measure: RegionalEconomyMeasure,
-  facts: readonly ServedRegionalEconomyObservation[],
+  facts: readonly ClientRegionalEconomyObservation[],
 ): RegionalEconomyState {
   const range = resolveRange({ ...state, measure }, facts);
   return {
@@ -139,7 +137,7 @@ export function changeRegionalEconomyMeasure(
 }
 
 export function buildRegionalEconomyModel(
-  facts: readonly ServedRegionalEconomyObservation[],
+  facts: readonly ClientRegionalEconomyObservation[],
   registry: readonly SectorDefinition[],
   state: RegionalEconomyState,
 ) {
@@ -187,7 +185,6 @@ export function buildRegionalEconomyModel(
       .filter((fact) => fact.seriesId === REGIONAL_GDP_TOTAL)
       .sort((left, right) => left.year - right.year)
       .at(-1) ?? null,
-    sourceIds: [...new Set(active.filter((fact) => state.selectedIds.includes(fact.seriesId)).map((fact) => fact.sourceId))],
     hasData: active.some((fact) => state.selectedIds.includes(fact.seriesId)),
   };
 }

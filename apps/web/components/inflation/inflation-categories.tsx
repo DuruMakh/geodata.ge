@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
-import type { ServedBasketWeightRow } from "../../lib/data/inflation/types";
+import type { ClientBasketWeightRow } from "../../lib/servedRows";
 import { formatDisplayDate } from "../../lib/explorer/format";
 
 import { periodLabel } from "../../lib/explorer/inflationLabels";
@@ -55,7 +55,7 @@ const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 export type InflationCategoriesProps = {
   /** Packed on the server: 27,668 rows cross the wire, so they travel as dense runs. */
   facts: PackedCategorySeries[];
-  weights: ServedBasketWeightRow[];
+  weights: ClientBasketWeightRow[];
   headline: Array<{ period: number; value: number }>;
   lastReviewedAt: string;
   sources: InflationWorkbookSource[];

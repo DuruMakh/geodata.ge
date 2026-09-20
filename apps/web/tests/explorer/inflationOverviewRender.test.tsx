@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeAll, describe, expect, it } from "vitest";
 import { InflationOverview } from "../../components/inflation/inflation-overview";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
+import { sourceIdBySeriesMeasure } from "../../lib/explorer/clientData";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { I18nProvider } from "../../lib/i18n/provider";
 
@@ -12,7 +13,14 @@ beforeAll(async () => {
   const messages = await getMessages("en", ["inflation", "common", "controls", "format", "main"]);
   html = renderToStaticMarkup(
     <I18nProvider locale="en" messages={messages}>
-      <InflationOverview facts={facts} targets={targets} sources={[]} siteOrigin="https://fiscal.ge" />
+      <InflationOverview
+        facts={facts}
+        sourceIdBySeriesMeasure={sourceIdBySeriesMeasure(facts)}
+        lastReviewedAt={facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
+        targets={targets}
+        sources={[]}
+        siteOrigin="https://fiscal.ge"
+      />
     </I18nProvider>,
   );
 });

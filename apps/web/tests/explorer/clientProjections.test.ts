@@ -49,3 +49,44 @@ describe("client projections", () => {
     ]);
   });
 });
+
+describe("client projections for inflation, debt and regional economies", () => {
+  it("keeps only the fields the browser reads", async () => {
+    const { loadServedInflationData } = await import("../../lib/data/inflation/importInflation");
+    const { loadServedGovernmentDebtData } = await import(
+      "../../lib/data/governmentDebt/importGovernmentDebtFacts"
+    );
+    const { loadServedRegionalEconomyData } = await import(
+      "../../lib/data/regionalEconomies/importRegionalEconomies"
+    );
+    const { projectCpiFact, projectBasketWeight, projectDebtFact, projectRegionalObservation } =
+      await import("../../lib/explorer/clientData");
+
+    const [inflation, debt, regional] = await Promise.all([
+      loadServedInflationData(),
+      loadServedGovernmentDebtData(),
+      loadServedRegionalEconomyData(),
+    ]);
+
+    expect(Object.keys(projectCpiFact(inflation.facts[0]!)).sort()).toEqual([
+      "measure", "period", "seriesId", "value",
+    ]);
+    expect(Object.keys(projectBasketWeight(inflation.weights[0]!)).sort()).toEqual([
+      "categoryId", "weightPct", "year",
+    ]);
+    expect(projectDebtFact(debt.facts[0]!)).not.toHaveProperty("snapshotDate");
+    expect(projectDebtFact(debt.facts[0]!)).not.toHaveProperty("lastReviewedAt");
+    expect(Object.keys(projectRegionalObservation(regional.facts[0]!)).sort()).toEqual([
+      "measure", "regionId", "seriesId", "status", "value", "year",
+    ]);
+  });
+
+  it("hoists one source id per series and measure", async () => {
+    const { loadServedInflationData } = await import("../../lib/data/inflation/importInflation");
+    const { sourceIdBySeriesMeasure } = await import("../../lib/explorer/clientData");
+    const { facts } = await loadServedInflationData();
+
+    const map = sourceIdBySeriesMeasure(facts);
+    for (const fact of facts) expect(map[`${fact.seriesId}:${fact.measure}`]).toBe(fact.sourceId);
+  });
+});

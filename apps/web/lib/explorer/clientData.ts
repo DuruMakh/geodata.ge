@@ -1,12 +1,19 @@
 import type {
+  ClientBasketWeightRow,
+  ClientCpiFact,
   ClientGdpObservation,
+  ClientGovernmentDebtFact,
+  ClientRegionalEconomyObservation,
   ClientSectorObservation,
   ServedAdminFact,
   ServedBudgetFact,
+  ServedGovernmentDebtFact,
   ServedNationalGdpFact,
 } from "../servedRows";
 import type { ServedGdpObservation } from "../data/gdpOverview/types";
 import type { ServedSectorObservation } from "../data/economicSectors/types";
+import type { ServedBasketWeightRow, ServedCpiFact } from "../data/inflation/types";
+import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
 
 export type ClientBudgetFact = Omit<ServedBudgetFact, "sourceId">;
 export type ClientAdminFact = Omit<
@@ -74,4 +81,39 @@ export function sourceIdByMeasure(
   facts: readonly { measure: string; sourceId: string }[],
 ): Record<string, string> {
   return Object.fromEntries(facts.map((fact) => [fact.measure, fact.sourceId]));
+}
+
+export function projectCpiFact(fact: ServedCpiFact): ClientCpiFact {
+  return { seriesId: fact.seriesId, measure: fact.measure, period: fact.period, value: fact.value };
+}
+
+export function projectBasketWeight(row: ServedBasketWeightRow): ClientBasketWeightRow {
+  return { categoryId: row.categoryId, year: row.year, weightPct: row.weightPct };
+}
+
+export function projectDebtFact(fact: ServedGovernmentDebtFact): ClientGovernmentDebtFact {
+  const { snapshotDate: _snapshotDate, lastReviewedAt: _lastReviewedAt, ...rest } = fact;
+  return rest;
+}
+
+export function projectRegionalObservation(
+  fact: ServedRegionalEconomyObservation,
+): ClientRegionalEconomyObservation {
+  return {
+    regionId: fact.regionId,
+    seriesId: fact.seriesId,
+    year: fact.year,
+    measure: fact.measure,
+    value: fact.value,
+    status: fact.status,
+  };
+}
+
+/** Inflation: one publication per series and measure. */
+export function sourceIdBySeriesMeasure(
+  facts: readonly { seriesId: string; measure: string; sourceId: string }[],
+): Record<string, string> {
+  return Object.fromEntries(
+    facts.map((fact) => [`${fact.seriesId}:${fact.measure}`, fact.sourceId]),
+  );
 }

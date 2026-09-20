@@ -103,3 +103,30 @@ export type ClientSectorObservation = {
   value: number;
   status: "published" | "preliminary";
 };
+
+export type ClientCpiFact = {
+  seriesId: string;
+  measure: string;
+  period: string;
+  value: number;
+};
+
+export type ClientBasketWeightRow = {
+  categoryId: string;
+  year: number;
+  weightPct: number;
+};
+
+export type ClientGovernmentDebtFact = Omit<
+  ServedGovernmentDebtFact,
+  "snapshotDate" | "lastReviewedAt"
+>;
+
+export type ClientRegionalEconomyObservation = {
+  regionId: string;
+  seriesId: string;
+  year: number;
+  measure: "nominal" | "share_of_region_gdp";
+  value: number;
+  status: "published";
+};

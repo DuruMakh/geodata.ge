@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { OCCUPIED_SOURCE_PATH } from "../data/municipalGeometry/source";
 import type { MunicipalRegion } from "../data/municipal/types";
-import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { GEORGIA_GEO } from "../landing/georgiaGeo";
+import type { ClientRegionalEconomyObservation } from "../servedRows";
 export { regionalEconomyHref } from "./regionalEconomyRoutes";
 
 const MAP_WIDTH = 1000;
@@ -125,7 +125,7 @@ export function buildRegionalEconomyMapModel({
   facts,
   regions,
 }: {
-  facts: readonly ServedRegionalEconomyObservation[];
+  facts: readonly ClientRegionalEconomyObservation[];
   regions: readonly MunicipalRegion[];
 }): RegionalEconomyMapModel {
   const totalFacts = facts.filter((fact) => fact.seriesId === REGIONAL_GDP_TOTAL && fact.measure === "nominal");

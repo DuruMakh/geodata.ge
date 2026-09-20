@@ -1,5 +1,6 @@
 import { periodFromKey, periodKey } from "../data/inflation/periods";
-import type { CpiMeasure, CpiSeriesId, ServedCpiFact, ServedInflationTargetRow } from "../data/inflation/types";
+import type { CpiMeasure, CpiSeriesId, ServedInflationTargetRow } from "../data/inflation/types";
+import type { ClientCpiFact } from "../servedRows";
 import { ACCENT, INK } from "./colors";
 
 // Pure state and data selection for the inflation overview. Components compose
@@ -43,14 +44,17 @@ export function seriesGroup(key: InflationSeriesKey, tab: InflationTab): string 
   return `${SERIES_DATA_ID[key]}:${TAB_MEASURE[tab]}`;
 }
 
-export function indexInflationFacts(facts: ServedCpiFact[]): InflationIndex {
+export function indexInflationFacts(
+  facts: ClientCpiFact[],
+  sourceIdBySeriesMeasure: Record<string, string>,
+): InflationIndex {
   const values = new Map<string, Map<number, number>>();
   const sourceIds = new Map<string, string>();
   for (const fact of facts) {
     const group = `${fact.seriesId}:${fact.measure}`;
     if (!values.has(group)) values.set(group, new Map());
     values.get(group)!.set(periodFromKey(fact.period), fact.value);
-    sourceIds.set(group, fact.sourceId);
+    sourceIds.set(group, sourceIdBySeriesMeasure[group]!);
   }
   return { values, sourceIds };
 }

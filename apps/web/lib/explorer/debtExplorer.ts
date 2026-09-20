@@ -1,4 +1,4 @@
-import type { DebtFamily, DebtSeriesId, ServedGovernmentDebtFact, ServedNationalGdpFact } from "../servedRows";
+import type { DebtFamily, DebtSeriesId, ClientGovernmentDebtFact, ServedNationalGdpFact } from "../servedRows";
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { INK } from "./colors";
@@ -25,7 +25,7 @@ type DebtExplorerPoint = {
   year: number;
   itemId: DebtSeriesId;
   value: number | null;
-  status: ServedGovernmentDebtFact["status"];
+  status: ClientGovernmentDebtFact["status"];
 };
 
 export type DebtExplorerTableRow = {
@@ -36,7 +36,7 @@ export type DebtExplorerTableRow = {
   color: string;
   valuesByYear: Record<number, number | null>;
   shareByYear?: Record<number, number | null>;
-  statusByYear: Record<number, ServedGovernmentDebtFact["status"]>;
+  statusByYear: Record<number, ClientGovernmentDebtFact["status"]>;
 };
 
 export type GovernmentDebtExplorerModel = {
@@ -108,7 +108,7 @@ export function selectDebtSeries(current: DebtSeriesId[], next: DebtSeriesId): D
 }
 
 export function debtRangeForFamily(
-  facts: readonly Pick<ServedGovernmentDebtFact, "family" | "year">[],
+  facts: readonly Pick<ClientGovernmentDebtFact, "family" | "year">[],
   family: DebtFamily,
 ): { start: number; end: number } {
   const years = facts.filter((fact) => fact.family === family).map((fact) => fact.year);
@@ -123,12 +123,12 @@ function shareOfGdp(value: number | null, year: number, gdpByYear: Map<number, S
 
 function tableRowFor(
   item: DebtExplorerItem,
-  factsBySeriesYear: Map<string, ServedGovernmentDebtFact>,
+  factsBySeriesYear: Map<string, ClientGovernmentDebtFact>,
   years: number[],
   gdpByYear: Map<number, ServedNationalGdpFact>,
 ): DebtExplorerTableRow | null {
   const valuesByYear: Record<number, number | null> = {};
-  const statusByYear: Record<number, ServedGovernmentDebtFact["status"]> = {};
+  const statusByYear: Record<number, ClientGovernmentDebtFact["status"]> = {};
   const shareByYear: Record<number, number | null> = {};
 
   for (const year of years) {
@@ -154,7 +154,7 @@ function tableRowFor(
 }
 
 export function buildDebtExplorerModel(input: {
-  facts: ServedGovernmentDebtFact[];
+  facts: ClientGovernmentDebtFact[];
   gdpFacts: ServedNationalGdpFact[];
   family: DebtFamily;
   selectedIds: DebtSeriesId[];

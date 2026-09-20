@@ -25,6 +25,7 @@ import path from "node:path";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectPublicSources } from "../methodology/publicSources";
+import { projectRegionalObservation } from "../explorer/clientData";
 export {
   regionalEconomiesPageMetadata,
   renderRegionalEconomiesPage,
@@ -128,7 +129,7 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
         <div className="@container mx-auto max-w-[1180px]">
           <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${reviewedAt}`} />
           <RegionalEconomyExplorer
-            facts={regionalFacts}
+            facts={regionalFacts.map(projectRegionalObservation)}
             registry={REGIONAL_ECONOMY_SECTORS}
             region={identity}
             regions={REGIONAL_ECONOMY_REGIONS}
