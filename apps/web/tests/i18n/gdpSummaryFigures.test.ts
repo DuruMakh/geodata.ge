@@ -46,7 +46,7 @@ function claimsFor(locale: Locale): Array<{ key: string; figures: string[] }> {
   const realYears = yearsOf(real);
   const last = realYears.at(-1)!;
   const bn = (series: Series, year: number) => num(at(series, year) / 1e9, 1, locale);
-  const pct = (value: number) => num(value, 1, locale);
+  const pct = (value: number) => `${num(value, 1, locale)}%`;
   const whole = (series: Series, year: number) => num(at(series, year), 0, locale);
 
   const sovietYears = realYears.filter((year) => year <= 1991);
@@ -67,7 +67,7 @@ function claimsFor(locale: Locale): Array<{ key: string; figures: string[] }> {
     { key: "gdp.nominalSummary.recent", figures: [bn(nominalGel, last), bn(nominalUsd, last), pct(changePct(nominalGel, last - 1, last))] },
     { key: "gdp.nominalSummary.periods", figures: [pct(changePct(nominalGel, last - 5, last)), bn(nominalGel, last - 5), bn(nominalGel, last), pct(changePct(nominalGel, last - 10, last))] },
     { key: "gdp.nominalSummary.note", figures: [] },
-    { key: "gdp.growthSummary.recent", figures: [pct(at(growth, last)), pct(at(growth, last - 1)), pct(at(growth, last - 1) - at(growth, last))] },
+    { key: "gdp.growthSummary.recent", figures: [pct(at(growth, last)), pct(at(growth, last - 1)), num(at(growth, last - 1) - at(growth, last), 1, locale)] },
     { key: "gdp.growthSummary.comparison", figures: [String(lastPeriod![1] - lastPeriod![0]), String(secondPeriod![1] - secondPeriod![0])] },
     { key: "gdp.growthSummary.context", figures: [pct(at(growth, maxGrowthYear)), ...contractionYears.map((year) => pct(at(growth, year)))] },
     { key: "gdp.growthSummary.note", figures: [] },
@@ -82,20 +82,29 @@ function claimsFor(locale: Locale): Array<{ key: string; figures: string[] }> {
     // Coverage sentences quote the first and last year of their own series. A
     // key may appear twice: the assertion loop checks each entry's figures, and
     // the completeness loop unions them per key.
-    { key: "gdp.summary.recent", figures: [String(realYears[0]), String(last)] },
+    { key: "gdp.summary.intro", figures: ["2015"] }, // fixed-price basis, not an observation year
+    { key: "gdp.nominalSummary.recent", figures: [String(last)] },
+    { key: "gdp.per_capitaSummary.recent", figures: [String(last)] },
+    { key: "gdp.growthSummary.recent", figures: [String(last), String(last - 1)] },
+    ...["gdp.nominalSummary.periods", "gdp.per_capitaSummary.periods"].map((key) => ({
+      key, figures: [String(last - 10), String(last - 5), String(last)],
+    })),
+    { key: "gdp.summary.recent", figures: [String(realYears[0]), String(last), String(last - 5), String(last - 10)] },
+    { key: "gdp.summary.sovietGrowth", figures: [String(sovietYears[0]), "1990", String(peakYear)] },
+    { key: "gdp.nominalSummary.note", figures: ["2010"] }, // reviewed accounting-method boundary
+    { key: "gdp.per_capitaSummary.note", figures: ["2010"] },
     { key: "gdp.nominalSummary.note", figures: [String(yearsOf(nominalGel)[0]), String(last)] },
     { key: "gdp.growthSummary.note", figures: [String(yearsOf(growth)[0]), String(last)] },
     { key: "gdp.per_capitaSummary.note", figures: [String(yearsOf(perCapitaGel)[0]), String(last)] },
     { key: "gdp.summary.peak", figures: [String(peakYear), String(exceedYear - 1), String(exceedYear)] },
-    { key: "gdp.growthSummary.context", figures: [String(maxGrowthYear), ...contractionYears.map(String)] },
+    { key: "gdp.growthSummary.context", figures: [String(recentGrowthYears[0]), String(last), String(maxGrowthYear), ...contractionYears.map(String)] },
   ];
 }
 
 const tokenPattern = {
-  en: /\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?/g,
-  ka: /\d{1,3}(?: \d{3})+(?:,\d+)?|\d+(?:,\d+)?/g,
+  en: /(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)%?/g,
+  ka: /(?:\d{1,3}(?: \d{3})+(?:,\d+)?|\d+(?:,\d+)?)%?/g,
 } as const;
-const isYear = (token: string) => /^(?:19|20)\d{2}$/.test(token);
 
 describe.each(["ka", "en"] as const)("GDP summary figures: %s", (locale) => {
   it("quotes only figures the canonical CSV reproduces", () => {
@@ -113,7 +122,7 @@ describe.each(["ka", "en"] as const)("GDP summary figures: %s", (locale) => {
     // Completeness: no unlisted number may hide in the reviewed copy.
     for (const key of Object.keys(messages).filter((key) => /^gdp\.(?:summary|nominalSummary|growthSummary|per_capitaSummary)\./.test(key))) {
       const allowed = new Set(claims.filter((claim) => claim.key === key).flatMap((claim) => claim.figures));
-      const tokens = (messages[key]!.match(tokenPattern[locale]) ?? []).filter((token) => !isYear(token));
+      const tokens = messages[key]!.match(tokenPattern[locale]) ?? [];
       for (const token of tokens) {
         expect(allowed.has(token), `${key} quotes an unchecked figure: ${token}`).toBe(true);
       }
