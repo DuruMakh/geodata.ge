@@ -72,6 +72,7 @@ export function buildEconomicSectorsModel(facts: readonly ClientSectorObservatio
   const endValues = Object.fromEntries(registry.map(r => [r.id, byCell.get(`${r.id}:${range.end}`)?.value ?? null]));
   const definitions = rankSectorDefinitions(registry, endValues);
   const selected = definitions.filter(r => state.selectedIds.includes(r.id));
+  const hasData = active.some(f => state.selectedIds.includes(f.seriesId));
   const percent = state.measure !== "nominal";
   const rows = selected.map(r => ({
     itemId: r.id, kaLabel: r.labelKa, color: sectorColor(r.id),
@@ -90,7 +91,7 @@ export function buildEconomicSectorsModel(facts: readonly ClientSectorObservatio
     endValues,
     headline: active.filter(f => f.seriesId === SECTOR_GDP).sort((a,b)=>a.year-b.year).at(-1) ?? null,
     preliminaryYears: [...new Set(active.filter(f => f.status === "preliminary").map(f=>f.year))],
-    sourceIds: active.some(f=>state.selectedIds.includes(f.seriesId)) && sourceIdByMeasure[state.measure] ? [sourceIdByMeasure[state.measure]!] : [],
-    hasData: active.some(f => state.selectedIds.includes(f.seriesId)),
+    sourceIds: hasData && sourceIdByMeasure[state.measure] ? [sourceIdByMeasure[state.measure]!] : [],
+    hasData,
   };
 }

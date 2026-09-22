@@ -178,9 +178,18 @@ Two consequences for anyone editing this area:
 - The snapshot `/mcp` answers from takes GDP, economic sector and regional
   economy facts through `loadServed…Rows()`, the accessor that returns rows
   before the numeric projection. Those rows keep `value` as the exact decimal
-  string: most of these values do not survive a float64 round-trip, so the
-  snapshot must never be built from the projected numbers.
+  string, because most of these values do not survive a float64 round-trip:
+  6,446 of the 8,168 values across those three datasets come back different.
+  The snapshot stores inflation as projected numbers instead, and that is
+  safe rather than inconsistent — every CPI value round-trips exactly, and the
+  only basket weights that change are 80 trailing zeros. Measure before
+  assuming a new dataset is in one camp or the other.
 
+Adding a seventh dataset means four things: call `resolveServedDataSource()`
+rather than reading the environment variable; memoise the served loader;
+register its reset in `resetServedDataCacheForTests()` in `servedData.ts`; and,
+if the snapshot serialises its values, expose a `loadServed…Rows()` accessor
+and read the snapshot from that.
 
 ## Re-running for a new data year
 

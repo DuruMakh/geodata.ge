@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { loadServedGovernmentDebtData } from "../../lib/data/governmentDebt/importGovernmentDebtFacts";
 import { loadServedGeneralGovernmentBalanceData } from "../../lib/data/generalGovernmentBalance/importGeneralGovernmentBalance";
-import { loadServedGdpOverviewData } from "../../lib/data/gdpOverview/importGdpOverview";
-import { loadServedEconomicSectorsData } from "../../lib/data/economicSectors/importEconomicSectors";
-import { loadServedRegionalEconomyData } from "../../lib/data/regionalEconomies/importRegionalEconomies";
+import { loadServedGdpOverviewData, loadServedGdpOverviewRows } from "../../lib/data/gdpOverview/importGdpOverview";
+import { loadServedEconomicSectorsData, loadServedEconomicSectorsRows } from "../../lib/data/economicSectors/importEconomicSectors";
+import { loadServedRegionalEconomyData, loadServedRegionalEconomyRows } from "../../lib/data/regionalEconomies/importRegionalEconomies";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
 import { resetServedDataCacheForTests } from "../../lib/data/servedData";
 
@@ -17,7 +17,22 @@ const loaders = {
   sectors: loadServedEconomicSectorsData,
   regional: loadServedRegionalEconomyData,
   inflation: loadServedInflationData,
+  // The three the snapshot reads before the numeric projection. Their row memo
+  // sits behind the numbers memo, so a reset that clears only the numbers still
+  // hands back a fresh wrapper around stale rows — checking the numbers alone
+  // cannot see that.
+  gdpRows: loadServedGdpOverviewRows,
+  sectorRows: loadServedEconomicSectorsRows,
+  regionalRows: loadServedRegionalEconomyRows,
 } as const;
+
+// Every other file in tests/data pins the mode. Without this the file reads
+// whatever the environment happens to set, and a mirror failure reads like a
+// memo bug.
+beforeEach(() => {
+  delete process.env.GEODATA_DATA_SOURCE;
+  resetServedDataCacheForTests();
+});
 
 describe("served loaders", () => {
   it("returns the same promise to concurrent and later callers", () => {

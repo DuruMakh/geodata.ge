@@ -35,10 +35,10 @@ describe("bilingual presentation on both serving paths", () => {
     mirror.loadGovernmentDebtFactsFromDb.mockResolvedValue(debt.facts);
     mirror.loadGeneralGovernmentBalanceFactsFromDb.mockResolvedValue(balance.facts);
     mirror.loadGdpOverviewFactsFromDb.mockResolvedValue(await loadGdpOverviewFacts());
-    // The snapshot loads inflation through its memoised served loader, so in db
-    // mode this mirror reader runs and its rows face the parity check.
     mirror.loadEconomicSectorFactsFromDb.mockResolvedValue(await loadEconomicSectorFacts());
     mirror.loadRegionalEconomyFactsFromDb.mockResolvedValue(await loadRegionalEconomyFacts());
+    // The snapshot loads inflation through its memoised served loader, so in db
+    // mode this mirror reader runs and its rows face the parity check.
     mirror.loadInflationDataFromDb.mockResolvedValue({
       facts: await loadCpiFacts(), targets: await loadInflationTargets(),
       categories: await loadCpiCategoryFacts(), weights: await loadBasketWeights(),

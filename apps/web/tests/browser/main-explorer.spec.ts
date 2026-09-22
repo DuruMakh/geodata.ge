@@ -1193,16 +1193,10 @@ test("ships no server-only provenance fields in explorer payloads", async ({ pag
     // lastUpdatedAt and workbook source links are computed from the complete
     // server rows before projection. Per-row source ids and original institution
     // labels have no browser consumer and must not be repeated through RSC.
-    const occurrences = await page.evaluate(() => {
-      const payload = [...document.querySelectorAll("script")].map((script) => script.textContent ?? "").join("\n");
-      return {
-        sourceRegistry: payload.split("sourceUrlOrFile").length - 1,
-        sourceIds: payload.split("sourceId").length - 1,
-        officialInstitutionLabels: payload.split("officialInstitutionLabelKa").length - 1,
-      };
-    });
+    const { sourceRegistry, sourceIds, officialInstitutionLabels } =
+      await readPayloadOccurrences(page);
 
-    expect(occurrences, route).toEqual({
+    expect({ sourceRegistry, sourceIds, officialInstitutionLabels }, route).toEqual({
       sourceRegistry: 0,
       sourceIds: 0,
       officialInstitutionLabels: 0,
@@ -1210,13 +1204,16 @@ test("ships no server-only provenance fields in explorer payloads", async ({ pag
   }
 });
 
-// Script text joined with a space: the guard counts occurrences, so the
-// separator only has to keep two payloads from forming one accidental match.
+// Script text joined with nothing. A separator can only hide an occurrence
+// that straddles two flight chunks; it can never invent one, and this is a
+// guard, so it should err towards counting.
 const readPayloadOccurrences = (page: Page) =>
   page.evaluate(() => {
-    const payload = [...document.querySelectorAll("script")].map((script) => script.textContent ?? "").join(" ");
+    const payload = [...document.querySelectorAll("script")].map((script) => script.textContent ?? "").join("");
     const count = (needle: string) => payload.split(needle).length - 1;
     return {
+      sourceRegistry: count("sourceUrlOrFile"),
+      officialInstitutionLabels: count("officialInstitutionLabelKa"),
       sourceIds: count("sourceId"),
       sourceLocators: count("sourceLocator"),
       snapshotDates: count("snapshotDate"),
@@ -1234,15 +1231,18 @@ test("ships no unread provenance columns on the dataset routes", async ({ page }
     "/explorer/deficit",
     "/explorer/economy/gdp",
     "/explorer/economy/sectors",
+    "/explorer/economy",
     "/explorer/economy/regions",
     "/explorer/economy/regions/imereti",
     "/explorer/inflation/overview",
     "/explorer/inflation/categories",
   ]) {
     await page.goto(`${TEST_BASE_URL}${route}`);
-    // The regions index is a map of links with no client explorer, so it never
-    // raises the app-ready flag; its payload is in the served HTML regardless.
-    if (route !== "/explorer/economy/regions") await expectAppReady(page);
+    // The economy hub and the regions index are link maps with no client
+    // explorer, so they never raise the app-ready flag; their payload is in the
+    // served HTML regardless.
+    if (!["/explorer/economy", "/explorer/economy/regions"].includes(route))
+      await expectAppReady(page);
     const occurrences = await readPayloadOccurrences(page);
 
     // These columns exist for validation, mapping review and the database
@@ -1264,35 +1264,47 @@ test("ships no unread provenance columns on the dataset routes", async ({ page }
       calculations: 0,
     });
 
-    // The debt page also carries the budget explorer's national GDP rows, and
-    // that shared client type keeps accountingStandard. Every provenance
-    // column of the debt dataset itself is gone.
+    // The debt page also carries the budget explorer's national GDP rows, whose
+    // shared client type still keeps accountingStandard — 30 values no client
+    // file reads. That type is out of this change's scope; it is tracked
+    // separately. Every provenance column of the debt dataset itself is gone.
     if (route !== "/explorer/debt") {
       expect(occurrences.accountingStandards, `${route} accountingStandard occurrences`).toBe(0);
     }
 
-    // A page passes the newest review date once, as a prop, instead of
-    // carrying one on every row.
-    expect(occurrences.reviewDates, `${route} lastReviewedAt occurrences`).toBeLessThanOrEqual(4);
+    // A page passes the newest review date once, as a prop, instead of carrying
+    // one on every row. Measured 2026-09-22: 1 on gdp and the two inflation
+    // routes, 0 on the rest.
+    expect(occurrences.reviewDates, `${route} lastReviewedAt occurrences`).toBeLessThanOrEqual(1);
+
+    // Routes whose client rows carry no source id at all — the deficit rows
+    // used to ship one each.
+    if (["/explorer/deficit", "/explorer/economy", "/explorer/economy/regions"].includes(route)) {
+      expect(occurrences.sourceIds, `${route} sourceId occurrences`).toBe(0);
+    }
   }
 });
 
 test("hoists the source ids the workbook builders read", async ({ page }) => {
-  // These pages send one map per page instead of an id per row. Debt is not in
-  // the list: a debt fact's source varies by series AND year, so its map would
-  // hold one entry per row and cost more than the column it replaced, and the
-  // rows keep sourceId.
-  for (const route of [
-    "/explorer/economy/gdp",
-    "/explorer/economy/sectors",
-    "/explorer/economy/regions/imereti",
-    "/explorer/inflation/overview",
-    "/explorer/inflation/categories",
-  ]) {
+  // One map or run list per page instead of an id per row. The bound is the
+  // count measured on 2026-09-22 plus room for a few more published sources;
+  // what matters is that none of them grows with the number of rows, which run
+  // to hundreds. Debt is absent: its rows still carry sourceId (126 of them),
+  // because the plan judged a hoisted map no cheaper there. Run-length encoding
+  // would in fact fit it in 22 runs — a follow-up, not a regression.
+  for (const [route, limit] of [
+    // 10 SNA vintage runs + the prop name + one per published source.
+    ["/explorer/economy/gdp", 24],
+    ["/explorer/economy/sectors", 8],
+    ["/explorer/economy/regions/imereti", 6],
+    // Also the three NBG target rows, which cite their own source.
+    ["/explorer/inflation/overview", 26],
+    ["/explorer/inflation/categories", 22],
+  ] as const) {
     await page.goto(`${TEST_BASE_URL}${route}`);
     await expectAppReady(page);
     const occurrences = await readPayloadOccurrences(page);
-    expect(occurrences.sourceIds, `${route} sourceId occurrences`).toBeLessThanOrEqual(20);
+    expect(occurrences.sourceIds, `${route} sourceId occurrences`).toBeLessThanOrEqual(limit);
   }
 });
 
