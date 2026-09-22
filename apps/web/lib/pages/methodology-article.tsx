@@ -15,6 +15,7 @@ import {
   deriveMethodologyCoverage,
   LIVE_METHODOLOGY_IDS,
   getMethodologyContent,
+  METHODOLOGY_CONTENT,
 } from "../methodology/catalog";
 import { loadGeneratedArchiveSummaries } from "../methodology/prepareArchives";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
@@ -126,9 +127,9 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
     loadServedMunicipalData(),
     // Only an article whose coverage line is drawn from the debt facts needs
     // them, and a build renders eight articles in two locales. The id is not
-    // hard-coded here: the same coverage source deriveMethodologyCoverage
-    // reads decides it.
-    content.coverageSource.kind === "governmentDebt"
+    // hard-coded here: this reads the same record deriveMethodologyCoverage
+    // reads — the Georgian one, whatever the locale — so the two cannot drift.
+    METHODOLOGY_CONTENT[dataset].coverageSource.kind === "governmentDebt"
       ? loadServedGovernmentDebtData()
       : Promise.resolve({ facts: [] }),
     loadGeneratedArchiveSummaries(repositoryRoot),

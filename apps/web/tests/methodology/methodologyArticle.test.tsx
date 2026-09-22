@@ -76,5 +76,14 @@ describe("methodology article data loading", () => {
 
     await renderMethodologyArticle("ka", { params: Promise.resolve({ dataset: "debt" }) });
     expect(loadServedGovernmentDebtData).toHaveBeenCalledTimes(1);
+
+    // English articles come from a separate content record, but
+    // deriveMethodologyCoverage always reads the Georgian one. The guard has to
+    // agree in both locales, or the English debt build throws for want of years.
+    await renderMethodologyArticle("en", { params: Promise.resolve({ dataset: "debt" }) });
+    expect(loadServedGovernmentDebtData).toHaveBeenCalledTimes(2);
+
+    await renderMethodologyArticle("en", { params: Promise.resolve({ dataset: "revenue" }) });
+    expect(loadServedGovernmentDebtData).toHaveBeenCalledTimes(2);
   });
 });
