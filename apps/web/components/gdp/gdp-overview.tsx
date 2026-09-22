@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import type { ClientGdpObservation } from "../../lib/servedRows";
+import type { ClientGdpObservation, SourceIdRanges } from "../../lib/servedRows";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
@@ -31,16 +31,16 @@ import { GdpSummary } from "./gdp-summary";
 export type GdpWorkbookSource = WorkbookPublicSource & { sourceId: string };
 export function GdpOverview({
   facts,
-  sourceIdBySeriesYear,
+  sourceIdRanges,
   lastReviewedAt,
   sources,
   siteOrigin,
 }: {
   facts: ClientGdpObservation[];
-  // One entry per series and year: GDP cites a different Geostat vintage
-  // before and after the SNA 2008 switch, and the workbook lists the sources
-  // the selected range actually rests on.
-  sourceIdBySeriesYear: Record<string, string>;
+  // GDP cites a different Geostat vintage before and after the SNA 2008
+  // switch, and the workbook lists the sources the selected range actually
+  // rests on — so the id is carried per run of years, not per series.
+  sourceIdRanges: SourceIdRanges;
   lastReviewedAt: string;
   sources: GdpWorkbookSource[];
   siteOrigin: string;
@@ -66,8 +66,8 @@ export function GdpOverview({
     if (ready) history.replaceState(null, "", `#${serializeGdpHash(state)}`);
   }, [state, ready]);
   const m = useMemo(
-    () => buildGdpOverviewModel(facts, state, sourceIdBySeriesYear),
-    [facts, state, sourceIdBySeriesYear],
+    () => buildGdpOverviewModel(facts, state, sourceIdRanges),
+    [facts, state, sourceIdRanges],
   );
   const d = gdpDisplay(state, presentation);
   const row = {
@@ -91,7 +91,7 @@ export function GdpOverview({
   );
   function select(indicator: GdpIndicator) {
     const next = changeGdpIndicator(state, indicator, facts),
-      nextModel = buildGdpOverviewModel(facts, next, sourceIdBySeriesYear);
+      nextModel = buildGdpOverviewModel(facts, next, sourceIdRanges);
     setState(next);
     setAnnouncement(
       message(messages, "gdp.rangeChanged", {
@@ -261,7 +261,7 @@ export function GdpOverview({
                 presentation,
                 currentSources,
                 siteOrigin,
-                sourceIdBySeriesYear,
+                sourceIdRanges,
               ),
             )
           }

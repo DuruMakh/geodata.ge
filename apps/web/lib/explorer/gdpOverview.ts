@@ -1,4 +1,4 @@
-import type { ClientGdpObservation } from "../servedRows";
+import type { ClientGdpObservation, SourceIdRanges } from "../servedRows";
 export type GdpIndicator = "real" | "nominal" | "growth" | "per_capita";
 export type GdpState = {
   indicator: GdpIndicator;
@@ -57,10 +57,19 @@ export function changeGdpIndicator(
         : { kind: "manual", start: r.start, end: r.end },
   };
 }
+/** The newest run that starts at or before `year`. */
+export function sourceIdForYear(
+  ranges: SourceIdRanges,
+  seriesId: string,
+  year: number,
+): string | undefined {
+  return ranges[seriesId]?.find((run) => year >= run.fromYear)?.sourceId;
+}
+
 export function buildGdpOverviewModel(
   facts: ClientGdpObservation[],
   state: GdpState,
-  sourceIdBySeriesYear: Record<string, string>,
+  sourceIdRanges: SourceIdRanges,
 ) {
   const available = facts
     .filter((f) => f.seriesId === seriesFor(state))
@@ -81,7 +90,13 @@ export function buildGdpOverviewModel(
     preliminaryYears: selected
       .filter((f) => f.status === "preliminary")
       .map((f) => f.year),
-    sourceIds: [...new Set(selected.map((f) => sourceIdBySeriesYear[`${f.seriesId}:${f.year}`]!))],
+    sourceIds: [
+      ...new Set(
+        selected
+          .map((f) => sourceIdForYear(sourceIdRanges, f.seriesId, f.year))
+          .filter((id): id is string => id !== undefined),
+      ),
+    ],
     headline: points.at(-1) ?? null,
   };
 }

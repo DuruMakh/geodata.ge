@@ -8,7 +8,12 @@ import { loadServedInflationData } from "../data/inflation/importInflation";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
 import { categoryFactInput } from "../data/inflation/types";
 import { packCategoryFacts } from "../explorer/inflationCategories";
-import { projectBasketWeight, projectCpiFact, sourceIdBySeriesMeasure } from "../explorer/clientData";
+import {
+  projectBasketWeight,
+  projectCpiFact,
+  projectInflationTarget,
+  sourceIdBySeriesMeasure,
+} from "../explorer/clientData";
 import { buildInflationHubCards } from "../explorer/inflationHubCards";
 import type { InflationWorkbookSource } from "../explorer/inflationWorkbook";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
@@ -100,7 +105,7 @@ export async function renderInflationOverview(locale: Locale) {
         facts={facts.map(projectCpiFact)}
         sourceIdBySeriesMeasure={sourceIdBySeriesMeasure(facts)}
         lastReviewedAt={facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
-        targets={targets}
+        targets={targets.map(projectInflationTarget)}
         sources={sources}
         siteOrigin={resolveSiteUrl()}
       />

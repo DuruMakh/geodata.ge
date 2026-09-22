@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { sourceIdForYear } from "../../lib/explorer/gdpOverview";
 import { loadGdpOverviewFacts } from "../../lib/data/gdpOverview/importGdpOverview";
 import { loadEconomicSectorFacts } from "../../lib/data/economicSectors/importEconomicSectors";
 import {
   projectGdpObservation,
   projectSectorObservation,
   sourceIdByMeasure,
-  sourceIdBySeriesYear,
+  sourceIdRangesBySeries,
 } from "../../lib/explorer/clientData";
 
 const gdpRows = async () =>
@@ -25,14 +26,26 @@ describe("client projections", () => {
     ]);
   });
 
-  it("hoists one source id per GDP series and year, and one per sector measure", async () => {
+  it("hoists every GDP row's source id into runs, and one per sector measure", async () => {
     const [gdp, sectors] = await Promise.all([gdpRows(), sectorRows()]);
 
-    const bySeriesYear = sourceIdBySeriesYear(gdp);
-    for (const fact of gdp) expect(bySeriesYear[`${fact.seriesId}:${fact.year}`]).toBe(fact.sourceId);
+    // Lossless: the runs must answer for every row exactly what the row says.
+    const ranges = sourceIdRangesBySeries(gdp);
+    for (const fact of gdp)
+      expect(sourceIdForYear(ranges, fact.seriesId, fact.year)).toBe(fact.sourceId);
 
     const byMeasure = sourceIdByMeasure(sectors);
     for (const fact of sectors) expect(byMeasure[fact.measure]).toBe(fact.sourceId);
+  });
+
+  it("keeps the hoisted GDP map smaller than the column it replaced", async () => {
+    const gdp = await gdpRows();
+    const asColumn = gdp.reduce((n, fact) => n + `"sourceId":"${fact.sourceId}",`.length, 0);
+
+    // The whole point of hoisting. One entry per row (the shape the plan
+    // specified) serialises to ~14.6 kB against ~11.5 kB for the column, so a
+    // regression to per-row keys makes the payload worse, not better.
+    expect(JSON.stringify(sourceIdRangesBySeries(gdp)).length).toBeLessThan(asColumn / 4);
   });
 
   it("keeps the year in the GDP key: one series cites two Geostat vintages", async () => {

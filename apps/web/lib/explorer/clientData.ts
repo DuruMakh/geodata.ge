@@ -3,6 +3,7 @@ import type {
   ClientCpiFact,
   ClientGdpObservation,
   ClientGovernmentDebtFact,
+  ClientInflationTargetRow,
   ClientRegionalEconomyObservation,
   ClientSectorObservation,
   ServedAdminFact,
@@ -10,10 +11,15 @@ import type {
   ServedGeneralGovernmentBalanceFact,
   ServedGovernmentDebtFact,
   ServedNationalGdpFact,
+  SourceIdRanges,
 } from "../servedRows";
 import type { ServedGdpObservation } from "../data/gdpOverview/types";
 import type { ServedSectorObservation } from "../data/economicSectors/types";
-import type { ServedBasketWeightRow, ServedCpiFact } from "../data/inflation/types";
+import type {
+  ServedBasketWeightRow,
+  ServedCpiFact,
+  ServedInflationTargetRow,
+} from "../data/inflation/types";
 import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
 
 export type ClientBudgetFact = Omit<ServedBudgetFact, "sourceId">;
@@ -68,13 +74,33 @@ export function projectSectorObservation(fact: ServedSectorObservation): ClientS
   };
 }
 
-// GDP switched national accounts standard mid-history, so four of its six
-// series cite one Geostat vintage before 2010 and another after: the key has
-// to carry the year, or a range spanning the switch would lose a source.
-export function sourceIdBySeriesYear(
+/**
+ * Run-length encodes each series' source ids by year. Emitting a run whenever
+ * the id changes keeps the lookup correct whatever the data does — blocky
+ * vintages collapse to one entry per boundary, interleaved ids simply produce
+ * more runs. See SourceIdRanges for why GDP cannot use a coarser key.
+ */
+export function sourceIdRangesBySeries(
   facts: readonly { seriesId: string; year: number; sourceId: string }[],
-): Record<string, string> {
-  return Object.fromEntries(facts.map((fact) => [`${fact.seriesId}:${fact.year}`, fact.sourceId]));
+): SourceIdRanges {
+  const bySeries = new Map<string, { year: number; sourceId: string }[]>();
+  for (const fact of facts) {
+    const row = { year: fact.year, sourceId: fact.sourceId };
+    const rows = bySeries.get(fact.seriesId);
+    if (rows) rows.push(row);
+    else bySeries.set(fact.seriesId, [row]);
+  }
+  const ranges: Record<string, { fromYear: number; sourceId: string }[]> = {};
+  for (const [seriesId, rows] of bySeries) {
+    const runs: { fromYear: number; sourceId: string }[] = [];
+    for (const row of [...rows].sort((a, b) => a.year - b.year))
+      if (runs.at(-1)?.sourceId !== row.sourceId)
+        runs.push({ fromYear: row.year, sourceId: row.sourceId });
+    // Newest run first, so a lookup takes the first run starting at or before
+    // the year it asks about.
+    ranges[seriesId] = runs.reverse();
+  }
+  return ranges;
 }
 
 /** Sectors: every row of a measure comes from the same publication. */
@@ -86,6 +112,13 @@ export function sourceIdByMeasure(
 
 export function projectCpiFact(fact: ServedCpiFact): ClientCpiFact {
   return { seriesId: fact.seriesId, measure: fact.measure, period: fact.period, value: fact.value };
+}
+
+export function projectInflationTarget(
+  row: ServedInflationTargetRow,
+): ClientInflationTargetRow {
+  const { lastReviewedAt: _lastReviewedAt, ...rest } = row;
+  return rest;
 }
 
 export function projectBasketWeight(row: ServedBasketWeightRow): ClientBasketWeightRow {

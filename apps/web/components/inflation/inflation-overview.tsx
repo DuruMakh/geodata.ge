@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
-import type { ServedInflationTargetRow } from "../../lib/data/inflation/types";
+import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import type { ClientCpiFact } from "../../lib/servedRows";
 import { formatDisplayDate } from "../../lib/explorer/format";
 import { periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
@@ -37,7 +37,7 @@ export type InflationOverviewProps = {
   // same Geostat publication, and the workbook cites it.
   sourceIdBySeriesMeasure: Record<string, string>;
   lastReviewedAt: string;
-  targets: ServedInflationTargetRow[];
+  targets: ClientInflationTargetRow[];
   sources: InflationWorkbookSource[];
   siteOrigin: string;
 };

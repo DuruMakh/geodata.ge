@@ -1,4 +1,4 @@
-import type { ClientGdpObservation } from "../servedRows";
+import type { ClientGdpObservation, SourceIdRanges } from "../servedRows";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { buildGdpOverviewModel, type GdpState } from "./gdpOverview";
@@ -41,9 +41,9 @@ export function buildGdpWorkbookExportModel(
   presentation: Presentation,
   sources: WorkbookPublicSource[],
   siteOrigin: string,
-  sourceIdBySeriesYear: Record<string, string>,
+  sourceIdRanges: SourceIdRanges,
 ): WorkbookExportModel {
-  const m = buildGdpOverviewModel(facts, state, sourceIdBySeriesYear),
+  const m = buildGdpOverviewModel(facts, state, sourceIdRanges),
     d = gdpDisplay(state, presentation);
   const t = (key: string) => message(presentation.messages, `gdp.${key}`);
   const activeSources = sources

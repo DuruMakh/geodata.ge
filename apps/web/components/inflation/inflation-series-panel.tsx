@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import type { ServedInflationTargetRow } from "../../lib/data/inflation/types";
+import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import { MISSING } from "../../lib/explorer/format";
 import { formatInflationValue, seriesLabel } from "../../lib/explorer/inflationLabels";
 import { INFLATION_COLORS, SELECTION_ORDER, panelValue, type InflationIndex, type InflationSelectionKey, type InflationState, type ResolvedPeriodRange } from "../../lib/explorer/inflationOverview";
@@ -15,7 +15,7 @@ import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selec
 
 type InflationSeriesPanelProps = {
   index: InflationIndex;
-  targets: ServedInflationTargetRow[];
+  targets: ClientInflationTargetRow[];
   state: InflationState;
   range: ResolvedPeriodRange;
   onToggle: (key: InflationSelectionKey) => void;

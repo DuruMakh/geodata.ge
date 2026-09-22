@@ -96,12 +96,35 @@ export type ClientGdpObservation = {
   status: "published" | "preliminary";
 };
 
+/**
+ * A source id per run of years, newest run first, rather than per row.
+ *
+ * GDP changed national accounts standard mid-history, so four of its six
+ * series cite one Geostat vintage before 2010 and another from 2010 on: a
+ * series-only key would drop a source from any range spanning the switch.
+ * Keying all 251 rows by `${seriesId}:${year}` is correct but ships 14.6 kB,
+ * more than the 11.5 kB `sourceId` column it replaced. The id only changes at
+ * a boundary, so one entry per boundary carries the same answer in 0.8 kB.
+ */
+export type SourceIdRanges = Readonly<
+  Record<string, readonly { fromYear: number; sourceId: string }[]>
+>;
+
 export type ClientSectorObservation = {
   seriesId: string;
   year: number;
   measure: "nominal" | "share_of_gdp" | "real_growth";
   value: number;
   status: "published" | "preliminary";
+};
+
+// The workbook cites the targets' source, and the chart reads the band and
+// its effective dates. lastReviewedAt is not read anywhere on the client.
+export type ClientInflationTargetRow = {
+  effectiveFrom: string;
+  effectiveTo: string | null;
+  targetPct: number;
+  sourceId: string;
 };
 
 export type ClientCpiFact = {
