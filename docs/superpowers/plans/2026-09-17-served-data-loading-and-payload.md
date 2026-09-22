@@ -1080,3 +1080,50 @@ verified against the served data or a production build, not reasoned about.
   `db-health` workflow covers it after merge, and
   `tests/i18n/servingParity.test.ts` proves each mirror reader is called once
   per snapshot build.
+
+## Code review 2026-09-22
+
+Two reviewers, one per half of the change (loading/snapshot and client
+payload). No Critical. Six Important, all fixed on the branch; the numbers
+below are measured, not estimated.
+
+- **The GDP map made that column worse.** Keying every row `seriesId:year` is
+  correct but ships 14,602 bytes against 11,510 for the `sourceId` column it
+  replaced. The ids change only at the SNA 2008 boundary, so the map now
+  run-length encodes per series: 10 runs, 781 bytes. `sourceIdRangesBySeries`
+  emits a run whenever the id changes, so interleaved data stays correct.
+  Its own test asserts the encoding answers for every row what that row says.
+- **The same reasoning applies to debt, and the plan's note was wrong about
+  it.** The note kept debt's per-row `sourceId` because "a hoisted map would be
+  one entry per row" — measured against the flat shape. Run-length encoded,
+  debt's 126 rows fit in 22 runs: 1,415 bytes against 4,961. Left as a
+  follow-up rather than widened into this branch, because the plan recorded the
+  opposite decision and the debt files already conflict with PR #122.
+- **The NBG target rows were never projected.** Three rows, each carrying an
+  unread `lastReviewedAt`. Adding `projectInflationTarget` takes the inflation
+  overview from four occurrences to one, the page-level prop.
+- **`lastReviewedAt <= 4` was exactly the current count** and data-shaped: the
+  next NBG target change would have failed a payload guard. Bounds are now the
+  counts measured 2026-09-22, per route, recorded beside each.
+- **The methodology guard read the wrong record.** `content.coverageSource` is
+  locale-specific; `deriveMethodologyCoverage` always reads the Georgian
+  record. Fail-closed, and they agree today, but the comment claiming they
+  cannot drift was false. Now reads `METHODOLOGY_CONTENT[dataset]`, tested in
+  both locales.
+- **The loader reset test could not see a missed row-memo reset**, because the
+  numbers memo allocates a fresh wrapper each rebuild. The three `Rows`
+  accessors are now in the table.
+- **Nothing pinned the `year_over_year` premise.** The workbook branch was
+  deleted because no fact carries the value, but `validation.ts` still admits
+  it and the client rows no longer carry `calculation`. Dropping it from the
+  union would break a deliberate validation test, so a data assertion in
+  `servingBoundary.test.ts` fails first instead.
+- **The GDP workbook's source list had no test** although the vintage key
+  exists for it: every `buildGdpWorkbookExportModel` call passed `[]` for
+  sources. `buildGdpOverviewModel` is now asserted across the boundary.
+
+Re-verified on the fixed tree: `npm run check` 264 files / **2,268 tests**,
+`npm run build` 235 pages, browser suite **572 passed, none flaky**. The GDP
+route's payload carries 10 `fromYear` runs where it carried 251 map entries,
+and the inflation overview still serves all three target rows with one review
+date between them.
