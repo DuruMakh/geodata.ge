@@ -1,5 +1,4 @@
 import type { SectorDefinition } from "../data/economicSectors/types";
-import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
@@ -16,6 +15,7 @@ import {
   type WorkbookExportModel,
   type WorkbookPublicSource,
 } from "./workbookModel";
+import type { ClientRegionalEconomyObservation } from "../servedRows";
 
 type RegionExportIdentity = {
   id: string;
@@ -25,7 +25,7 @@ type RegionExportIdentity = {
 };
 
 export function buildRegionalEconomyWorkbookExportModel(
-  facts: ServedRegionalEconomyObservation[],
+  facts: ClientRegionalEconomyObservation[],
   registry: SectorDefinition[],
   state: RegionalEconomyState,
   region: RegionExportIdentity,

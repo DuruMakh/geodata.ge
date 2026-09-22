@@ -4,6 +4,7 @@ import { readCsvRecords } from "../csv";
 import { assertSameServedRows } from "../servedDataParity";
 import { assertCompleteSectorCoverage, validateSectorObservations } from "./validation";
 import type { SectorDefinition, SectorObservation, ServedSectorObservation } from "./types";
+import { resolveServedDataSource } from "../servedDataSource";
 
 // Read at build time, like the canonical CSVs; the taxonomy is outside the app's bundle root.
 const registry: SectorDefinition[] = JSON.parse(readFileSync(path.resolve(/* turbopackIgnore: true */ process.cwd(), "../../data/taxonomy/economic-sectors.json"), "utf8"));
@@ -32,9 +33,35 @@ export async function loadEconomicSectorFacts(
   return facts;
 }
 
-export async function loadServedEconomicSectorsData(): Promise<{ facts: ServedSectorObservation[] }> {
-  const mode = (process.env.GEODATA_DATA_SOURCE ?? "csv").trim().toLowerCase();
-  if (!["", "csv", "db"].includes(mode)) throw new Error("Invalid GEODATA_DATA_SOURCE");
+// Build-time memo, for the reasons servedData.ts documents: one load per
+// process, concurrent callers collapsed onto it, and a cached rejection so the
+// first parity failure is the build failure.
+let servedEconomicSectorsPromise: Promise<{ facts: SectorObservation[] }> | null = null;
+let servedEconomicSectorsNumbersPromise: Promise<{ facts: ServedSectorObservation[] }> | null = null;
+
+// Rows as the reviewed CSV and the mirror hold them, with `value` still the
+// exact decimal string. The snapshot serialises these: most of these values do
+// not survive a float64 round-trip, so taking them from the numeric projection
+// below would change the digits /mcp publishes.
+export function loadServedEconomicSectorsRows(): Promise<{ facts: SectorObservation[] }> {
+  servedEconomicSectorsPromise ??= loadServedEconomicSectorsDataUncached();
+  return servedEconomicSectorsPromise;
+}
+
+export function loadServedEconomicSectorsData(): Promise<{ facts: ServedSectorObservation[] }> {
+  servedEconomicSectorsNumbersPromise ??= loadServedEconomicSectorsRows().then(({ facts }) => ({
+    facts: facts.map((fact) => ({ ...fact, value: Number(fact.value) })),
+  }));
+  return servedEconomicSectorsNumbersPromise;
+}
+
+export function resetEconomicSectorsCacheForTests(): void {
+  servedEconomicSectorsPromise = null;
+  servedEconomicSectorsNumbersPromise = null;
+}
+
+async function loadServedEconomicSectorsDataUncached(): Promise<{ facts: SectorObservation[] }> {
+  const mode = resolveServedDataSource();
   let facts = await loadEconomicSectorFacts();
   if (mode === "db") {
     const { loadEconomicSectorFactsFromDb } = await import("../../db/servedDataDb");
@@ -42,5 +69,5 @@ export async function loadServedEconomicSectorsData(): Promise<{ facts: ServedSe
     assertEconomicSectorParity(facts, mirror);
     facts = mirror;
   }
-  return { facts: facts.map(f => ({ ...f, value: Number(f.value) })) };
+  return { facts };
 }

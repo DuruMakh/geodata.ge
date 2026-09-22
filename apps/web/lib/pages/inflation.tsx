@@ -8,6 +8,12 @@ import { loadServedInflationData } from "../data/inflation/importInflation";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
 import { categoryFactInput } from "../data/inflation/types";
 import { packCategoryFacts } from "../explorer/inflationCategories";
+import {
+  projectBasketWeight,
+  projectCpiFact,
+  projectInflationTarget,
+  sourceIdBySeriesMeasure,
+} from "../explorer/clientData";
 import { buildInflationHubCards } from "../explorer/inflationHubCards";
 import type { InflationWorkbookSource } from "../explorer/inflationWorkbook";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
@@ -95,7 +101,14 @@ export async function renderInflationOverview(locale: Locale) {
           { name: t("inflation.heading"), path: pageHref(OVERVIEW_PATH, locale) },
         ]}
       />
-      <InflationOverview facts={facts} targets={targets} sources={sources} siteOrigin={resolveSiteUrl()} />
+      <InflationOverview
+        facts={facts.map(projectCpiFact)}
+        sourceIdBySeriesMeasure={sourceIdBySeriesMeasure(facts)}
+        lastReviewedAt={facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
+        targets={targets.map(projectInflationTarget)}
+        sources={sources}
+        siteOrigin={resolveSiteUrl()}
+      />
     </I18nProvider>
   );
 }
@@ -148,7 +161,7 @@ export async function renderInflationCategories(locale: Locale) {
       />
       <InflationCategories
         facts={packCategoryFacts(categories.map(categoryFactInput))}
-        weights={weights}
+        weights={weights.map(projectBasketWeight)}
         headline={headline}
         lastReviewedAt={categories.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
         sources={sources}

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import type { ServedGdpObservation } from "../../lib/data/gdpOverview/types";
+import type { ClientGdpObservation, SourceIdRanges } from "../../lib/servedRows";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
@@ -32,10 +32,17 @@ import { GdpSummary } from "./gdp-summary";
 export type GdpWorkbookSource = WorkbookPublicSource & { sourceId: string };
 export function GdpOverview({
   facts,
+  sourceIdRanges,
+  lastReviewedAt,
   sources,
   siteOrigin,
 }: {
-  facts: ServedGdpObservation[];
+  facts: ClientGdpObservation[];
+  // GDP cites a different Geostat vintage before and after the SNA 2008
+  // switch, and the workbook lists the sources the selected range actually
+  // rests on — so the id is carried per run of years, not per series.
+  sourceIdRanges: SourceIdRanges;
+  lastReviewedAt: string;
   sources: GdpWorkbookSource[];
   siteOrigin: string;
 }) {
@@ -72,7 +79,10 @@ export function GdpOverview({
       // History can be unavailable in some embedded contexts; the UI still works.
     }
   }, [serializedHash, ready]);
-  const m = useMemo(() => buildGdpOverviewModel(facts, state), [facts, state]);
+  const m = useMemo(
+    () => buildGdpOverviewModel(facts, state, sourceIdRanges),
+    [facts, state, sourceIdRanges],
+  );
   const d = gdpDisplay(state, presentation);
   const row = {
     itemId: "gdp.overview",
@@ -105,7 +115,7 @@ export function GdpOverview({
   );
   function select(indicator: GdpIndicator) {
     const next = changeGdpIndicator(state, indicator, facts),
-      nextModel = buildGdpOverviewModel(facts, next);
+      nextModel = buildGdpOverviewModel(facts, next, sourceIdRanges);
     setState(next);
     setAnnouncement(
       message(messages, "gdp.rangeChanged", {
@@ -114,7 +124,6 @@ export function GdpOverview({
       }),
     );
   }
-  const lastReviewedAt = facts.map((f) => f.lastReviewedAt).sort().at(-1) ?? "";
   return (
     <main
       data-testid="gdp-overview"
@@ -278,6 +287,7 @@ export function GdpOverview({
                 presentation,
                 currentSources,
                 siteOrigin,
+                sourceIdRanges,
               ),
             )
           }

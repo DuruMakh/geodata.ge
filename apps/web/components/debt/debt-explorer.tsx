@@ -16,9 +16,9 @@ import type { ChartMode } from "../../lib/explorer/types";
 import type {
   DebtFamily,
   DebtSeriesId,
-  ServedGovernmentDebtFact,
-  ServedNationalGdpFact,
+  ClientGovernmentDebtFact,
 } from "../../lib/servedRows";
+import type { ClientNationalGdpFact } from "../../lib/explorer/clientData";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -31,8 +31,8 @@ import { useDebtExplorerState } from "./use-debt-explorer-state";
 type DebtRange = { start: number; end: number; min: number; max: number };
 
 type DebtExplorerProps = {
-  facts: ServedGovernmentDebtFact[];
-  gdpFacts: ServedNationalGdpFact[];
+  facts: ClientGovernmentDebtFact[];
+  gdpFacts: ClientNationalGdpFact[];
   workbookSources: WorkbookPublicSource[];
   gdpWorkbookSources?: WorkbookPublicSource[];
   siteOrigin?: string;

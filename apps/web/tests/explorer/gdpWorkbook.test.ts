@@ -1,5 +1,6 @@
 import { expect, it } from "vitest";
 import { prepareGdpOverview } from "../../lib/data/gdpOverview/prepareGdpOverview";
+import { sourceIdRangesBySeries } from "../../lib/explorer/clientData";
 import { DEFAULT_GDP_STATE } from "../../lib/explorer/gdpOverview";
 import { buildGdpWorkbookExportModel } from "../../lib/explorer/gdpWorkbook";
 import { getMessages } from "../../lib/i18n/messages.server";
@@ -21,6 +22,7 @@ it("keeps USD and percentage units distinct and excludes cumulative change", asy
     presentation,
     [],
     "https://fiscal.ge",
+    sourceIdRangesBySeries(facts),
   );
   expect(nominal.analysis.headers.join(" ")).toContain("USD");
   expect(nominal.analysis.headers.join(" ")).not.toContain("GEL");
@@ -32,6 +34,7 @@ it("keeps USD and percentage units distinct and excludes cumulative change", asy
     presentation,
     [],
     "https://fiscal.ge",
+    sourceIdRangesBySeries(facts),
   );
   expect(growth.analysis.rows.at(-1)?.[1]).toBeCloseTo(0.0746161504152039);
 });
@@ -63,6 +66,7 @@ it("writes readable values, preliminary status and percentage cells in both lang
         p,
         [],
         "https://fiscal.ge",
+        sourceIdRangesBySeries(facts),
       );
       const workbook = new ExcelJS.Workbook();
       await workbook.xlsx.load(await createWorkbookBuffer(model));

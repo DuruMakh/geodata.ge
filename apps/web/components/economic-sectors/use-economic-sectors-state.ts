@@ -1,9 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type {
-  SectorDefinition,
-  ServedSectorObservation,
-} from "../../lib/data/economicSectors/types";
+import type { SectorDefinition } from "../../lib/data/economicSectors/types";
+import type { ClientSectorObservation } from "../../lib/servedRows";
 import {
   DEFAULT_SECTOR_STATE,
   changeSectorMeasure,
@@ -13,7 +11,7 @@ import {
 } from "../../lib/explorer/economicSectors";
 
 export function useEconomicSectorsState(
-  facts: ServedSectorObservation[],
+  facts: ClientSectorObservation[],
   registry: SectorDefinition[],
 ) {
   const [state, setState] = useState<SectorState>(DEFAULT_SECTOR_STATE);

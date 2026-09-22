@@ -9,6 +9,7 @@ import {
 import { stableIdSchema } from "../validation";
 import type { ServedGeneralGovernmentBalanceFact } from "../../servedRows";
 import type { GeneralGovernmentBalanceFact } from "./types";
+import { resolveServedDataSource } from "../servedDataSource";
 
 const rowSchema = z
   .object({
@@ -123,20 +124,28 @@ export function toServedGeneralGovernmentBalanceFact(
   };
 }
 
-export async function loadServedGeneralGovernmentBalanceData(): Promise<{
+// Build-time memo, for the reasons servedData.ts documents: one load per
+// process, concurrent callers collapsed onto it, and a cached rejection so the
+// first parity failure is the build failure.
+let servedDeficitPromise: Promise<{ facts: ServedGeneralGovernmentBalanceFact[] }> | null = null;
+
+export function loadServedGeneralGovernmentBalanceData(): Promise<{ facts: ServedGeneralGovernmentBalanceFact[] }> {
+  servedDeficitPromise ??= loadServedGeneralGovernmentBalanceDataUncached();
+  return servedDeficitPromise;
+}
+
+export function resetGeneralGovernmentBalanceCacheForTests(): void {
+  servedDeficitPromise = null;
+}
+
+async function loadServedGeneralGovernmentBalanceDataUncached(): Promise<{
   facts: ServedGeneralGovernmentBalanceFact[];
 }> {
-  const raw = (process.env.GEODATA_DATA_SOURCE ?? "").trim().toLowerCase();
   const csvFacts = async () =>
     (await loadGeneralGovernmentBalanceFacts(SERVING_PATH)).map(
       toServedGeneralGovernmentBalanceFact,
     );
-  if (raw !== "db") {
-    if (raw !== "" && raw !== "csv") {
-      throw new Error(`GEODATA_DATA_SOURCE must be "db" or "csv", got "${raw}"`);
-    }
-    return { facts: await csvFacts() };
-  }
+  if (resolveServedDataSource() === "csv") return { facts: await csvFacts() };
 
   const { loadGeneralGovernmentBalanceFactsFromDb } = await import("../../db/servedDataDb");
   const [dbFacts, reviewedCsvFacts] = await Promise.all([

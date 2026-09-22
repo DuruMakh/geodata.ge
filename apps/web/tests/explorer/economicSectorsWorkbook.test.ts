@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import ExcelJS from "exceljs";
 import registry from "../../../../data/taxonomy/economic-sectors.json";
 import type { ServedSectorObservation } from "../../lib/data/economicSectors/types";
+import { sourceIdByMeasure } from "../../lib/explorer/clientData";
 import { DEFAULT_SECTOR_STATE } from "../../lib/explorer/economicSectors";
 import { buildEconomicSectorsWorkbookExportModel } from "../../lib/explorer/economicSectorsWorkbook";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
@@ -32,7 +33,7 @@ const facts: ServedSectorObservation[] = [
         : ("current_prices" as const),
     calculation:
       measure === "real_growth"
-        ? ("year_over_year" as const)
+        ? ("index_to_growth" as const)
         : ("published" as const),
     status: year === 2025 ? ("preliminary" as const) : ("published" as const),
     sourceId: measure === "real_growth" ? "volume" : "nominal",
@@ -68,6 +69,7 @@ test("exports full GEL, single-conversion percentages, mixed status, missing row
         presentation,
         sources,
         "https://fiscal.ge",
+        sourceIdByMeasure(facts),
       );
       expect(model.readable.rows).toHaveLength(2);
       expect(model.readable.rows[1].valuesByYear[2025]).toBeNull();
@@ -90,9 +92,7 @@ test("exports full GEL, single-conversion percentages, mixed status, missing row
       if (measure === "real_growth")
         expect(model.analysis.headers.join(" ")).not.toMatch(/GEL|₾/);
       expect(model.sources).toHaveLength(1);
-      expect(model.sources[0].years).toEqual(
-        measure === "real_growth" ? [2023, 2024, 2025] : [2024, 2025],
-      );
+      expect(model.sources[0].years).toEqual([2024, 2025]);
       expect(model.sources[0].absoluteUrl).toBe(
         `https://fiscal.ge/downloads/methodology/${measure === "real_growth" ? "volume" : "nominal"}.xlsx`,
       );
@@ -118,6 +118,7 @@ test("exports full GEL, single-conversion percentages, mixed status, missing row
         presentation,
         sources,
         "https://fiscal.ge",
+        sourceIdByMeasure(facts),
       );
       expect(empty.readable.rows).toEqual([]);
       expect(empty.analysis.rows).toEqual([]);
@@ -126,7 +127,7 @@ test("exports full GEL, single-conversion percentages, mixed status, missing row
   }
 });
 
-test("a one-year calculated rate retains the preceding source year and shared originals are not duplicated", async () => {
+test("a one-year rate cites that year's source once, and shared originals are not duplicated", async () => {
   const presentation = {
     locale: "en" as const,
     messages: await getMessages("en", ["sectors", "workbook", "format"]),
@@ -144,10 +145,14 @@ test("a one-year calculated rate retains the preceding source year and shared or
     presentation,
     [...sources, sources[1]],
     "https://fiscal.ge/",
+    sourceIdByMeasure(facts),
   );
   expect(model.readable.years).toEqual([2025]);
+  // One entry although the same original is passed twice, and only the year
+  // the range covers: no sector row is a year_over_year calculation, so
+  // nothing pulls in the preceding source year.
   expect(model.sources).toHaveLength(1);
-  expect(model.sources[0].years).toEqual([2024, 2025]);
+  expect(model.sources[0].years).toEqual([2025]);
   expect(model.analysis.rows).toEqual([
     [
       2025,
@@ -171,6 +176,7 @@ test("zero remains numeric and only the explicitly selected sector is exported",
     presentation,
     sources,
     "https://fiscal.ge",
+    sourceIdByMeasure(facts),
   );
   expect(model.readable.rows).toHaveLength(1);
   expect(model.readable.rows[0].valuesByYear).toEqual({ 2024: 0, 2025: 0 });

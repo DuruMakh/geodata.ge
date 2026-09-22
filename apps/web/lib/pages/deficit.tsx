@@ -15,6 +15,7 @@ import { DEFICIT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { loadImfWeoManifest, type ImfWeoManifest } from "../methodology/workbookSources";
 import { resolveSiteUrl } from "../siteUrl";
+import { projectBalanceFact } from "../explorer/clientData";
 
 function editionLabel(messages: Parameters<typeof message>[0], publicationDate: string): string {
   const [year, month] = publicationDate.split("-");
@@ -88,7 +89,7 @@ export async function renderDeficitPage(locale: Locale) {
       ]} />
       <I18nProvider {...presentation}>
       <DeficitExplorer
-        facts={facts}
+        facts={facts.map(projectBalanceFact)}
         workbookSources={workbookSourcesFor(messages, manifest, edition)}
         edition={edition}
         siteOrigin={resolveSiteUrl()}

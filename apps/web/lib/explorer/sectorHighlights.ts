@@ -1,11 +1,12 @@
-import type { SectorDefinition, ServedSectorObservation } from "../data/economicSectors/types";
+import type { SectorDefinition } from "../data/economicSectors/types";
+import type { ClientSectorObservation } from "../servedRows";
 import { SECTOR_GDP } from "./economicSectors";
 
 /** National point-in-time highlights deliberately have no chart-selection input. */
-export function buildSectorHighlights(facts: readonly ServedSectorObservation[], registry: readonly SectorDefinition[], year: number) {
+export function buildSectorHighlights(facts: readonly ClientSectorObservation[], registry: readonly SectorDefinition[], year: number) {
   const order = new Map(registry.filter(r => r.id !== SECTOR_GDP).map(r => [r.id, r.sortOrder]));
   const annual = facts.filter(f => f.year === year && order.has(f.seriesId));
-  const tie = (a: ServedSectorObservation, b: ServedSectorObservation) => order.get(a.seriesId)! - order.get(b.seriesId)!;
+  const tie = (a: ClientSectorObservation, b: ClientSectorObservation) => order.get(a.seriesId)! - order.get(b.seriesId)!;
   const nominal = annual.filter(f => f.measure === "nominal").sort((a, b) => b.value - a.value || tie(a, b));
   const growth = annual.filter(f => f.measure === "real_growth");
   const shares = new Map(annual.filter(f => f.measure === "share_of_gdp").map(f => [f.seriesId, f.value]));
@@ -18,7 +19,7 @@ export function buildSectorHighlights(facts: readonly ServedSectorObservation[],
   const firstYear = history.length ? Math.min(...history.map(f => f.year)) : year;
   const years = Array.from({ length: year - firstYear + 1 }, (_, i) => firstYear + i);
   const byCell = new Map(history.map(f => [`${f.seriesId}:${f.measure}:${f.year}`, f.value]));
-  const growthTrend = (winner: ServedSectorObservation | null) => winner
+  const growthTrend = (winner: ClientSectorObservation | null) => winner
     ? years.map(y => byCell.get(`${winner.seriesId}:real_growth:${y}`) ?? null) : [];
   return {
     year, largest, largestShare: largest ? shares.get(largest.seriesId) ?? null : null,

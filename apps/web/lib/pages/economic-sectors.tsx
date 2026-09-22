@@ -1,5 +1,6 @@
 import path from "node:path";
 import { EconomicSectorsExplorer } from "../../components/economic-sectors/economic-sectors-explorer";
+import { projectSectorObservation, sourceIdByMeasure } from "../explorer/clientData";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
@@ -41,7 +42,7 @@ export async function renderEconomicSectorsPage(locale: Locale) {
     <main className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
       <div className="mx-auto max-w-[1180px]">
         <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${message(presentation.messages, "main.updated", { date: locale === "en" ? formatDisplayDate(dateModified, locale) : dateModified })}`}/>
-        <EconomicSectorsExplorer facts={facts} registry={ECONOMIC_SECTORS} sources={sources} siteOrigin={resolveSiteUrl()}/>
+        <EconomicSectorsExplorer facts={facts.map(projectSectorObservation)} sourceIdByMeasure={sourceIdByMeasure(facts)} registry={ECONOMIC_SECTORS} sources={sources} siteOrigin={resolveSiteUrl()}/>
       </div>
     </main>
   </I18nProvider>;

@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import type { SectorDefinition } from "../../lib/data/economicSectors/types";
-import type { ServedRegionalEconomyObservation } from "../../lib/data/regionalEconomies/types";
 import { buildRegionalEconomyHighlights } from "../../lib/explorer/regionalEconomyHighlights";
 import { regionalEconomyColor } from "../../lib/explorer/regionalEconomies";
 import { formatAmount, formatAmountParts, formatShare } from "../../lib/explorer/format";
@@ -10,9 +9,10 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { Overline, SectionTitle, SourceNote } from "../ui/editorial";
 import { Sparkline } from "../ui/sparkline";
+import type { ClientRegionalEconomyObservation } from "../../lib/servedRows";
 
 export function RegionHighlights({ facts, registry, year }: {
-  facts: ServedRegionalEconomyObservation[];
+  facts: ClientRegionalEconomyObservation[];
   registry: SectorDefinition[];
   year: number;
 }) {

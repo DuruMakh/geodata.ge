@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  loadGdpOverviewFactsFromMirror,
   loadMunicipalAdjaraBudgetAdjustmentsFromMirror,
   loadMunicipalPopulationFactsFromMirror,
   type MirrorClient,
@@ -115,5 +116,39 @@ describe("municipal population mirror date conversion", () => {
         }),
       ),
     ).resolves.toMatchObject([{ referenceDate: "2025-01-01", lastReviewedAt: "2026-08-03" }]);
+  });
+});
+
+function mirrorWithGdpFact(lastReviewedAt: Date): MirrorClient {
+  return {
+    gdpOverviewFact: {
+      findMany: async () => [
+        {
+          seriesId: "nominal_gel",
+          year: 2025,
+          value: 1,
+          unit: "gel",
+          status: "preliminary",
+          accountingStandard: "sna_2008",
+          sourceDocumentId: "source.geostat_national_gdp_sna_2008",
+          sourceLocator: "GDP at curr pr!G54",
+          lastReviewedAt,
+        },
+      ],
+    },
+  } as unknown as MirrorClient;
+}
+
+describe("GDP overview mirror date conversion", () => {
+  afterEach(() => {
+    process.env.TZ = ORIGINAL_TZ;
+  });
+
+  it("keeps the calendar date when the driver returns local midnight in a UTC+ zone", async () => {
+    process.env.TZ = "Asia/Tbilisi";
+
+    await expect(loadGdpOverviewFactsFromMirror(mirrorWithGdpFact(new Date(2026, 8, 11)))).resolves.toMatchObject([
+      { lastReviewedAt: "2026-09-11" },
+    ]);
   });
 });

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SectorDefinition } from "../../lib/data/economicSectors/types";
-import type { ServedRegionalEconomyObservation } from "../../lib/data/regionalEconomies/types";
 import {
   DEFAULT_REGIONAL_ECONOMY_STATE,
   changeRegionalEconomyMeasure,
@@ -11,9 +10,10 @@ import {
   serializeRegionalEconomyHash,
   type RegionalEconomyState,
 } from "../../lib/explorer/regionalEconomies";
+import type { ClientRegionalEconomyObservation } from "../../lib/servedRows";
 
 export function useRegionalEconomyState(
-  facts: ServedRegionalEconomyObservation[],
+  facts: ClientRegionalEconomyObservation[],
   registry: SectorDefinition[],
 ) {
   const [state, setState] = useState<RegionalEconomyState>(DEFAULT_REGIONAL_ECONOMY_STATE);

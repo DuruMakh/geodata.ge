@@ -1,4 +1,4 @@
-import type { ServedGeneralGovernmentBalanceFact } from "../servedRows";
+import type { ClientGeneralGovernmentBalanceFact } from "./clientData";
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { INK } from "./colors";
@@ -14,7 +14,7 @@ export const DEFICIT_ITEM = {
 } as const;
 
 export function buildDeficitExplorerModel(input: {
-  facts: ServedGeneralGovernmentBalanceFact[];
+  facts: ClientGeneralGovernmentBalanceFact[];
   range: { start: number; end: number };
   percentage: boolean;
   selected: boolean;

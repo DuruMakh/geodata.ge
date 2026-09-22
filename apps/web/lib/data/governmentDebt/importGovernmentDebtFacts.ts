@@ -9,6 +9,7 @@ import type {
 } from "../../servedRows";
 import { assertSameServedRows, governmentDebtFactParityKey } from "../servedDataParity";
 import { readCsvRecords } from "../csv";
+import { resolveServedDataSource } from "../servedDataSource";
 
 const SERVING_PATH = "../../data/imports/government-debt-facts-2013-2030.csv";
 const packagePath = "../../docs/Raw Data/Debt/government-debt-annual";
@@ -246,16 +247,24 @@ export async function prepareGovernmentDebtFacts(options: { write: boolean }): P
   return facts.length;
 }
 
-export async function loadServedGovernmentDebtData(): Promise<{
+// Build-time memo, for the reasons servedData.ts documents: one load per
+// process, concurrent callers collapsed onto it, and a cached rejection so the
+// first parity failure is the build failure.
+let servedDebtPromise: Promise<{ facts: ServedGovernmentDebtFact[] }> | null = null;
+
+export function loadServedGovernmentDebtData(): Promise<{ facts: ServedGovernmentDebtFact[] }> {
+  servedDebtPromise ??= loadServedGovernmentDebtDataUncached();
+  return servedDebtPromise;
+}
+
+export function resetGovernmentDebtCacheForTests(): void {
+  servedDebtPromise = null;
+}
+
+async function loadServedGovernmentDebtDataUncached(): Promise<{
   facts: ServedGovernmentDebtFact[];
 }> {
-  const raw = (process.env.GEODATA_DATA_SOURCE ?? "").trim().toLowerCase();
-  if (raw !== "db") {
-    if (raw !== "" && raw !== "csv") {
-      throw new Error(`GEODATA_DATA_SOURCE must be "db" or "csv", got "${raw}"`);
-    }
-    return { facts: await loadGovernmentDebtFacts() };
-  }
+  if (resolveServedDataSource() === "csv") return { facts: await loadGovernmentDebtFacts() };
 
   const { loadGovernmentDebtFactsFromDb } = await import("../../db/servedDataDb");
   const [dbFacts, csvFacts] = await Promise.all([

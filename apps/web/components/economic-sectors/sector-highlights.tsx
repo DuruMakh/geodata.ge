@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import type { SectorDefinition, ServedSectorObservation } from "../../lib/data/economicSectors/types";
+import type { SectorDefinition } from "../../lib/data/economicSectors/types";
+import type { ClientSectorObservation } from "../../lib/servedRows";
 import { buildSectorHighlights } from "../../lib/explorer/sectorHighlights";
 import { formatAmountParts, formatShare } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
@@ -13,7 +14,7 @@ import { Sparkline } from "../ui/sparkline";
 import { sectorColor } from "../../lib/explorer/economicSectors";
 
 export function SectorHighlights({ facts, registry, year }: {
-  facts: ServedSectorObservation[]; registry: SectorDefinition[]; year: number;
+  facts: ClientSectorObservation[]; registry: SectorDefinition[]; year: number;
 }) {
   const { locale, messages } = useI18n();
   const model = useMemo(() => buildSectorHighlights(facts, registry, year), [facts, registry, year]);

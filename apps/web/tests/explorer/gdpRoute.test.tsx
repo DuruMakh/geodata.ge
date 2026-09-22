@@ -4,6 +4,7 @@ import { GdpOverview } from "../../components/gdp/gdp-overview";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { prepareGdpOverview } from "../../lib/data/gdpOverview/prepareGdpOverview";
+import { sourceIdRangesBySeries } from "../../lib/explorer/clientData";
 it("renders centered four indicator controls and the existing chart", async () => {
   const facts = (await prepareGdpOverview()).facts.map((f) => ({
     ...f,
@@ -18,7 +19,13 @@ it("renders centered four indicator controls and the existing chart", async () =
   ]);
   const html = renderToStaticMarkup(
     <I18nProvider locale="en" messages={messages}>
-      <GdpOverview facts={facts} sources={[]} siteOrigin="https://fiscal.ge" />
+      <GdpOverview
+        facts={facts}
+        sourceIdRanges={sourceIdRangesBySeries(facts)}
+        lastReviewedAt={facts.map((f) => f.lastReviewedAt).sort().at(-1)!}
+        sources={[]}
+        siteOrigin="https://fiscal.ge"
+      />
     </I18nProvider>,
   );
   expect(html).toContain('data-testid="gdp-indicators"');

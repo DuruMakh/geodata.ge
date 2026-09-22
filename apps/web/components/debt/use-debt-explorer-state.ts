@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { DebtFamily, DebtSeriesId, ServedGovernmentDebtFact } from "../../lib/servedRows";
+import type { DebtFamily, DebtSeriesId, ClientGovernmentDebtFact } from "../../lib/servedRows";
 import {
   debtRangeForFamily,
   familyForDebtSeries,
@@ -21,7 +21,7 @@ function normalizeRange(rawStart: number, rawEnd: number, range: Range): { start
   return start <= end ? { start, end } : { start: end, end: start };
 }
 
-export function useDebtExplorerState(facts: ServedGovernmentDebtFact[]) {
+export function useDebtExplorerState(facts: ClientGovernmentDebtFact[]) {
   const fullRanges = useMemo<Record<DebtFamily, Range>>(() => {
     const range = (family: DebtFamily): Range => {
       const resolved = debtRangeForFamily(facts, family);

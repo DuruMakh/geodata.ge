@@ -9,6 +9,7 @@ import type {
   ServedRegionalEconomyObservation,
 } from "./types";
 import { validateRegionalEconomyObservations } from "./validation";
+import { resolveServedDataSource } from "../servedDataSource";
 
 const repositoryFile = (relativePath: string) =>
   path.resolve(/* turbopackIgnore: true */ process.cwd(), relativePath);
@@ -68,11 +69,37 @@ export async function loadRegionalEconomyFacts(
   return facts;
 }
 
-export async function loadServedRegionalEconomyData(): Promise<{
-  facts: ServedRegionalEconomyObservation[];
+// Build-time memo, for the reasons servedData.ts documents: one load per
+// process, concurrent callers collapsed onto it, and a cached rejection so the
+// first parity failure is the build failure.
+let servedRegionalEconomyPromise: Promise<{ facts: RegionalEconomyObservation[] }> | null = null;
+let servedRegionalEconomyNumbersPromise: Promise<{ facts: ServedRegionalEconomyObservation[] }> | null = null;
+
+// Rows as the reviewed CSV and the mirror hold them, with `value` still the
+// exact decimal string. The snapshot serialises these: most of these values do
+// not survive a float64 round-trip, so taking them from the numeric projection
+// below would change the digits /mcp publishes.
+export function loadServedRegionalEconomyRows(): Promise<{ facts: RegionalEconomyObservation[] }> {
+  servedRegionalEconomyPromise ??= loadServedRegionalEconomyDataUncached();
+  return servedRegionalEconomyPromise;
+}
+
+export function loadServedRegionalEconomyData(): Promise<{ facts: ServedRegionalEconomyObservation[] }> {
+  servedRegionalEconomyNumbersPromise ??= loadServedRegionalEconomyRows().then(({ facts }) => ({
+    facts: facts.map((fact) => ({ ...fact, value: Number(fact.value) })),
+  }));
+  return servedRegionalEconomyNumbersPromise;
+}
+
+export function resetRegionalEconomyCacheForTests(): void {
+  servedRegionalEconomyPromise = null;
+  servedRegionalEconomyNumbersPromise = null;
+}
+
+async function loadServedRegionalEconomyDataUncached(): Promise<{
+  facts: RegionalEconomyObservation[];
 }> {
-  const mode = (process.env.GEODATA_DATA_SOURCE ?? "csv").trim().toLowerCase();
-  if (!["", "csv", "db"].includes(mode)) throw new Error("Invalid GEODATA_DATA_SOURCE");
+  const mode = resolveServedDataSource();
   let facts = await loadRegionalEconomyFacts();
   if (mode === "db") {
     const { loadRegionalEconomyFactsFromDb } = await import("../../db/servedDataDb");
@@ -80,5 +107,5 @@ export async function loadServedRegionalEconomyData(): Promise<{
     assertRegionalEconomyParity(facts, mirror);
     facts = mirror;
   }
-  return { facts: facts.map((fact) => ({ ...fact, value: Number(fact.value) })) };
+  return { facts };
 }

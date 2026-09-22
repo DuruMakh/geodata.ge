@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ServedGeneralGovernmentBalanceFact } from "../../lib/servedRows";
+import type { ClientGeneralGovernmentBalanceFact } from "../../lib/explorer/clientData";
 import { buildDeficitExplorerModel, DEFICIT_ITEM } from "../../lib/explorer/deficitExplorer";
 import { parseDeficitHash, serializeDeficitHash } from "../../lib/explorer/deficitUrlState";
 import { buildDeficitWorkbookExportModel } from "../../lib/explorer/deficitWorkbook";
@@ -24,7 +24,7 @@ import { PageHeader } from "../shell/page-header";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
 type DeficitExplorerProps = {
-  facts: ServedGeneralGovernmentBalanceFact[];
+  facts: ClientGeneralGovernmentBalanceFact[];
   workbookSources: WorkbookPublicSource[];
   edition: string;
   siteOrigin?: string;

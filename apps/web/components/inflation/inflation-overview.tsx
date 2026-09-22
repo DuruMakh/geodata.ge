@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
-import type { ServedCpiFact, ServedInflationTargetRow } from "../../lib/data/inflation/types";
+import type { ClientInflationTargetRow } from "../../lib/servedRows";
+import type { ClientCpiFact } from "../../lib/servedRows";
 import { formatDisplayDate } from "../../lib/explorer/format";
 import { periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
 import {
@@ -31,17 +32,24 @@ import { InflationTable } from "./inflation-table";
 const INDEX_UNIT = { divisor: 1, label: "", decimals: 1 };
 
 export type InflationOverviewProps = {
-  facts: ServedCpiFact[];
-  targets: ServedInflationTargetRow[];
+  facts: ClientCpiFact[];
+  // One entry per series and measure: every CPI row of a group comes from the
+  // same Geostat publication, and the workbook cites it.
+  sourceIdBySeriesMeasure: Record<string, string>;
+  lastReviewedAt: string;
+  targets: ClientInflationTargetRow[];
   sources: InflationWorkbookSource[];
   siteOrigin: string;
 };
 
-export function InflationOverview({ facts, targets, sources, siteOrigin }: InflationOverviewProps) {
+export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewedAt, targets, sources, siteOrigin }: InflationOverviewProps) {
   const presentation = useI18n();
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
-  const index = useMemo(() => indexInflationFacts(facts), [facts]);
+  const index = useMemo(
+    () => indexInflationFacts(facts, sourceIdBySeriesMeasure),
+    [facts, sourceIdBySeriesMeasure],
+  );
   const [state, setState] = useState<InflationState>(DEFAULT_INFLATION_STATE);
   const [ready, setReady] = useState(false);
   const [announcement, setAnnouncement] = useState("");
@@ -79,7 +87,6 @@ export function InflationOverview({ facts, targets, sources, siteOrigin }: Infla
   const { periods, lines } = buildInflationLines(index, targets, state, range);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   const coverage = overallCoverage(index);
-  const lastReviewedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
   const hasSeries = lines.some((line) => line.key !== "target");
   const chartSeries: ChartSeries[] = lines.map((line) => ({

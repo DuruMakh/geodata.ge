@@ -1,9 +1,9 @@
 import type {
   DebtFamily,
   DebtSeriesId,
-  ServedGovernmentDebtFact,
-  ServedNationalGdpFact,
+  ClientGovernmentDebtFact,
 } from "../servedRows";
+import type { ClientNationalGdpFact } from "./clientData";
 import { GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS } from "../data/governmentDebt/types";
 import type { Presentation } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
@@ -17,8 +17,8 @@ import {
 } from "./workbookModel";
 
 export type DebtWorkbookInput = {
-  facts: readonly ServedGovernmentDebtFact[];
-  gdpFacts: readonly ServedNationalGdpFact[];
+  facts: readonly ClientGovernmentDebtFact[];
+  gdpFacts: readonly ClientNationalGdpFact[];
   family: DebtFamily;
   selectedIds: readonly DebtSeriesId[];
   range: { start: number; end: number };
@@ -85,7 +85,7 @@ function debtSourcesFor(input: DebtWorkbookInput): WorkbookPublicSource[] {
   });
 }
 
-function workbookStatus(status: ServedGovernmentDebtFact["status"]) {
+function workbookStatus(status: ClientGovernmentDebtFact["status"]) {
   if (status === "projection_existing_portfolio") return "forecast" as const;
   if (status === "not_available") return "not_available" as const;
   return "actual" as const;

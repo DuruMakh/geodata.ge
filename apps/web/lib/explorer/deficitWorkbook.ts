@@ -1,4 +1,4 @@
-import type { ServedGeneralGovernmentBalanceFact } from "../servedRows";
+import type { ClientGeneralGovernmentBalanceFact } from "./clientData";
 import { DEFICIT_ITEM } from "./deficitExplorer";
 import type { Presentation } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
@@ -10,7 +10,7 @@ import {
 } from "./workbookModel";
 
 export function buildDeficitWorkbookExportModel(input: {
-  facts: readonly ServedGeneralGovernmentBalanceFact[];
+  facts: readonly ClientGeneralGovernmentBalanceFact[];
   range: { start: number; end: number };
   percentage: boolean;
   sources: readonly WorkbookPublicSource[];
