@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { makePeriod } from "../../lib/data/inflation/periods";
-import { GRID_TINTS, MOM_BINS, YOY_BINS, binFor, buildMonthGrid, contrastRatio, decemberAverages, displayedValue, legendLabels } from "../../lib/explorer/inflationGrid";
+import { GRID_TINTS, MOM_BINS, YOY_BINS, binFor, buildMonthGrid, decemberAverages, displayedValue, legendLabels } from "../../lib/explorer/inflationGrid";
+import { contrastRatio } from "../helpers/contrast";
 import { formatInflationValue } from "../../lib/explorer/inflationLabels";
 
 const series = new Map<number, number>();

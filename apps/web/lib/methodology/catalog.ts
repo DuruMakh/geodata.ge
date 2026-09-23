@@ -39,11 +39,6 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   inflation: INFLATION_METHODOLOGY_CONTENT,
 };
 
-export const FUTURE_METHODOLOGY_DATASETS = [
-  { title: "მოსახლეობა", href: null, state: "future" },
-  { title: "უმუშევრობა", href: null, state: "future" },
-] as const;
-
 const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, MethodologyContent>> = {
   "economic-sectors": EN_SECTORS,
   "regional-economies": EN_REGIONAL_ECONOMIES,

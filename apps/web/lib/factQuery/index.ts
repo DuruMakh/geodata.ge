@@ -1,11 +1,13 @@
 // apps/web/lib/factQuery/index.ts
 //
-// The public entry point. Consumers import from here, never from a module
-// inside the folder, so the surface stays one reviewable list.
+// The public entry point: one reviewable list of the query service's surface.
+// It is the catalogue, not a wall: lib/mcp, the publication and snapshot
+// scripts and several explorer and SEO modules import types and helpers from
+// modules inside the folder directly.
 //
-// The seven functions are pure: each takes a FactQuerySnapshot and returns a
-// FactQueryResponse, with no filesystem, database, network, model call, or
-// logging anywhere behind them (tests/factQuery/purity.test.ts enforces it).
+// Every query function here is pure: each takes a FactQuerySnapshot and returns
+// a FactQueryResponse, with no filesystem, database, network, model call, or
+// logging anywhere behind it (tests/factQuery/purity.test.ts enforces it).
 // buildFactQuerySnapshot is the single exception and the only thing here that
 // touches the loaders - build the snapshot once, then hand it to everything
 // else.
