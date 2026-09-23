@@ -278,7 +278,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
                   id={DEFICIT_ITEM.id}
                   label={label}
                   color={DEFICIT_ITEM.color}
-                  value={latestActual ? formatShare(latestActual.generalGovernmentBalancePctGdp / 100) : "—"}
+                  value={headlineValue}
                   selected={selected}
                   level="total"
                   onToggle={() => setSelected((current) => !current)}

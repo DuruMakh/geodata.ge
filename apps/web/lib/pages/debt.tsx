@@ -14,7 +14,7 @@ import { coverageFromYears, fiscalMetadata, governmentDebtMetadata } from "../se
 import { DEBT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { loadGdpWorkbookSources, loadWorkbookSources } from "../methodology/workbookSources";
+import { loadDebtWorkbookSources, loadGdpWorkbookSources } from "../methodology/workbookSources";
 
 export async function debtPageMetadata(locale: Locale): Promise<Metadata> {
   const { facts } = await loadServedGovernmentDebtData();
@@ -28,7 +28,7 @@ export async function renderDebtPage(locale: Locale) {
   const [{ facts }, { gdpFacts }, workbookSources, gdpWorkbookSources] = await Promise.all([
     loadServedGovernmentDebtData(),
     loadServedExplorerData(),
-    loadWorkbookSources("debt", undefined, locale),
+    loadDebtWorkbookSources(locale),
     loadGdpWorkbookSources(locale),
   ]);
   const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "debt"], [...new Set(facts.map(fact => fact.seriesId))]);

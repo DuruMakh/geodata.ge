@@ -12,7 +12,7 @@ const facts: ServedGeneralGovernmentBalanceFact[] = [
 
 describe("general-government deficit workbook", () => {
   it("retains signed GEL values, percentage values and projections in English", async () => {
-    const presentation = await getPresentation("en", ["workbook"], ["deficit.general_government_balance"]);
+    const presentation = await getPresentation("en", ["workbook"], ["deficit.general_government.balance"]);
     const input = { facts, range: { start: 2025, end: 2026 }, percentage: true, sources: [], siteOrigin: "https://fiscal.ge" };
     const ka = buildDeficitWorkbookExportModel(input);
     const en = buildDeficitWorkbookExportModel(input, presentation);
@@ -51,5 +51,11 @@ describe("general-government deficit workbook", () => {
       [2026, "ზოგადი მთავრობის ბალანსი", "ზოგადი მთავრობის ბალანსი", -2_672_000_000, "პროგნოზი", -0.02327],
     ]);
     expect(model.sources).toHaveLength(1);
+  });
+
+  it("drops the relative change column from the percentage export only", () => {
+    const input = { facts, range: { start: 2025, end: 2026 }, sources: [], siteOrigin: "https://fiscal.ge" };
+    expect(buildDeficitWorkbookExportModel({ ...input, percentage: true }).readable.showChangeColumn).toBe(false);
+    expect(buildDeficitWorkbookExportModel({ ...input, percentage: false }).readable.showChangeColumn).toBeUndefined();
   });
 });

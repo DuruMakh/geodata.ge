@@ -24,10 +24,15 @@ function columnLetter(column: number): string {
   return result;
 }
 
-function readableNumberFormat(isPercentage: boolean, isPlanned: boolean, locale: Locale, amountDecimals: number): string {
+function readableNumberFormat(
+  isPercentage: boolean,
+  markerKey: "workbook.planned" | "workbook.forecast" | null,
+  locale: Locale,
+  amountDecimals: number,
+): string {
   const amount = `#,##0${amountDecimals ? `.${"0".repeat(amountDecimals)}` : ""}`;
-  if (isPlanned) {
-    const marker = workbookMessage(locale, "workbook.planned");
+  if (markerKey) {
+    const marker = workbookMessage(locale, markerKey);
     return isPercentage ? `0.0% "${marker}";[Red](0.0%) "${marker}";0.0% "${marker}"` : `${amount} "${marker}";[Red](${amount}) "${marker}";${amount.replace("#,##", "")} "${marker}"`;
   }
   return isPercentage ? PERCENTAGE_NUMBER_FORMAT : `${amount};[Red](${amount});–`;
@@ -81,8 +86,10 @@ function writeReadableRow(
     cell.value = value;
     cell.alignment = { horizontal: "right", vertical: "middle" };
     if (value !== null) {
-      const isPlanned = row.basisByYear[year] === "planned";
-      cell.numFmt = numberFormat ?? readableNumberFormat(isPercentage, isPlanned, locale, amountDecimals);
+      const basis = row.basisByYear[year];
+      const isPlanned = basis === "planned";
+      const markerKey = isPlanned ? "workbook.planned" : basis === "forecast" ? "workbook.forecast" : null;
+      cell.numFmt = numberFormat ?? readableNumberFormat(isPercentage, markerKey, locale, amountDecimals);
       if (row.basisByYear[year] === "preliminary") {
         const marker = workbookMessage(locale, "workbook.preliminary");
         cell.numFmt = isPercentage ? `0.0% "${marker}"` : `#,##0${amountDecimals ? `.${"0".repeat(amountDecimals)}` : ""} "${marker}"`;

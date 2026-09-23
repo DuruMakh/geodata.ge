@@ -1,11 +1,12 @@
 import ExcelJS from "exceljs";
 import { describe, expect, it } from "vitest";
 import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
+import type { SourcedWorkbookPublicSource } from "../../lib/methodology/workbookSources";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import { loadGovernmentDebtFacts } from "../../lib/data/governmentDebt/importGovernmentDebtFacts";
-import { loadWorkbookSources, resetWorkbookSourceCacheForTests } from "../../lib/methodology/workbookSources";
+import { loadDebtWorkbookSources, resetWorkbookSourceCacheForTests } from "../../lib/methodology/workbookSources";
 import type { ServedGovernmentDebtFact, ServedNationalGdpFact } from "../../lib/servedRows";
 
 const facts: ServedGovernmentDebtFact[] = [
@@ -25,8 +26,9 @@ const gdpFacts: ServedNationalGdpFact[] = [
   { year: 2014, gdpCurrentPricesGel: 20_000_000_000, accountingStandard: "sna_2008", status: "final_as_published", sourceId: "gdp" },
 ];
 
-const debtSources: WorkbookPublicSource[] = [
+const debtSources: SourcedWorkbookPublicSource[] = [
   {
+    sourceId: "source.mof_public_debt_bulletin_n13",
     years: [2013, 2014],
     title: "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
     organization: "საქართველოს ფინანსთა სამინისტრო",
@@ -34,6 +36,7 @@ const debtSources: WorkbookPublicSource[] = [
     retrievedAt: "2026-09-01",
   },
   {
+    sourceId: "source.mof_public_debt_bulletin_n25",
     years: [2015, 2025, 2026],
     title: "სახელმწიფო ვალის სტატისტიკური ბიულეტენი",
     organization: "საქართველოს ფინანსთა სამინისტრო",
@@ -44,6 +47,7 @@ const debtSources: WorkbookPublicSource[] = [
     years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
     title: "მთავრობის ვალის ყოველთვიური ანგარიში",
     organization: "საქართველოს ფინანსთა სამინისტრო",
+    sourceId: "source.mof_monthly_debt_report_2026_07",
     downloadHref: "/downloads/methodology/debt/files/2015-2025/monthly-debt-report-2026-07.pdf",
     retrievedAt: "2026-09-01",
   },
@@ -91,7 +95,7 @@ describe("Debt workbook adapter", () => {
     resetWorkbookSourceCacheForTests();
     const [realFacts, realSources] = await Promise.all([
       loadGovernmentDebtFacts(),
-      loadWorkbookSources("debt"),
+      loadDebtWorkbookSources(),
     ]);
     const build = (family: "stock" | "service", start: number, end: number) => buildDebtWorkbookExportModel({
       facts: realFacts,
@@ -186,7 +190,7 @@ describe("Debt workbook adapter", () => {
     resetWorkbookSourceCacheForTests();
     const [realFacts, realSources] = await Promise.all([
       loadGovernmentDebtFacts(),
-      loadWorkbookSources("debt"),
+      loadDebtWorkbookSources(),
     ]);
     const model = buildDebtWorkbookExportModel({
       facts: realFacts,
@@ -326,5 +330,16 @@ describe("Debt workbook adapter", () => {
         absoluteUrl: "https://fiscal.ge/downloads/methodology/debt/files/2013-2030/public-debt-bulletin-n25.pdf",
       }),
     ]);
+  });
+
+  it("drops the relative change column from percentage exports only", () => {
+    const base = { facts, gdpFacts, sources: debtSources, gdpSources, siteOrigin: "https://fiscal.ge" };
+    const rate = buildDebtWorkbookExportModel({ ...base, family: "rate", selectedIds: ["debt.rate.total"], range: { start: 2019, end: 2021 }, shareOfGdp: false });
+    const stockShare = buildDebtWorkbookExportModel({ ...base, family: "stock", selectedIds: ["debt.stock.total"], range: { start: 2013, end: 2014 }, shareOfGdp: true });
+    const stockGel = buildDebtWorkbookExportModel({ ...base, family: "stock", selectedIds: ["debt.stock.total"], range: { start: 2013, end: 2014 }, shareOfGdp: false });
+
+    expect(rate.readable.showChangeColumn).toBe(false);
+    expect(stockShare.readable.showChangeColumn).toBe(false);
+    expect(stockGel.readable.showChangeColumn).toBeUndefined();
   });
 });

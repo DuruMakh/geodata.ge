@@ -83,3 +83,11 @@ describe("served Government Debt facts", () => {
     });
   });
 });
+
+it("cites source-registry ids on every sourced debt fact", async () => {
+  const { loadGovernmentDebtFacts } = await import("../../../lib/data/governmentDebt/importGovernmentDebtFacts");
+  const facts = await loadGovernmentDebtFacts();
+  const sourced = facts.filter((fact) => fact.sourceId !== null);
+  expect(sourced.length).toBeGreaterThan(0);
+  expect(sourced.every((fact) => fact.sourceId!.startsWith("source.mof_"))).toBe(true);
+});

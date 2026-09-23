@@ -190,7 +190,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   });
   const packageSourceIds = new Set(
     input.datasetId === "government-debt"
-      ? snapshot.debt.facts.flatMap((f) => f.sourceId ? [f.sourceId.startsWith("source.") ? f.sourceId : `source.${f.sourceId}`] : [])
+      ? snapshot.debt.facts.flatMap((f) => (f.sourceId ? [f.sourceId] : []))
       : input.datasetId === "general-government-balance"
         ? snapshot.deficit.facts.map((f) => f.sourceId)
         : input.datasetId === "gdp-overview" ? snapshot.gdpOverview.facts.map(f=>f.sourceId)

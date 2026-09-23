@@ -258,10 +258,10 @@ test("growth renders negative domains, isolated points and gaps through the shar
   );
   expect(html).toContain("−");
   expect(html).toContain("0%");
-  expect(html).toMatch(/r="2.5" fill="#B3402A"/);
+  expect(html).toMatch(/r="2.5" fill="#2F4B3A"/);
   const chartHtml = html.slice(html.indexOf('data-testid="chart-frame"')).split("</svg>")[0];
   const paths = [
-    ...chartHtml.matchAll(/<path[^>]*d="([^"]+)"[^>]*stroke="#B3402A"/g),
+    ...chartHtml.matchAll(/<path[^>]*d="([^"]+)"[^>]*stroke="#2F4B3A"/g),
   ];
   expect(paths).toHaveLength(1);
   expect(paths[0][1].match(/L/g)).toHaveLength(1);

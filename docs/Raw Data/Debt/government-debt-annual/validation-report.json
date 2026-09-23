@@ -385,6 +385,112 @@
         "difference_million_gel": 0,
         "comparison_status": "exact_match"
       }
+    ],
+    "totalControls": [
+      {
+        "year": 2013,
+        "source_id": "mof_public_debt_bulletin_n13",
+        "canonical_total_million_gel": 8433,
+        "published_total_million_gel": 8433,
+        "difference_million_gel": 0,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2014,
+        "source_id": "mof_public_debt_bulletin_n13",
+        "canonical_total_million_gel": 9622.9,
+        "published_total_million_gel": 9623,
+        "difference_million_gel": 0.1,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2015,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 12442.6,
+        "published_total_million_gel": 12443,
+        "difference_million_gel": 0.4,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2016,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 14436,
+        "published_total_million_gel": 14436,
+        "difference_million_gel": 0,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2017,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 16062.5,
+        "published_total_million_gel": 16063,
+        "difference_million_gel": 0.5,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2018,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 17348.7,
+        "published_total_million_gel": 17349,
+        "difference_million_gel": 0.3,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2019,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 19915.7,
+        "published_total_million_gel": 19916,
+        "difference_million_gel": 0.3,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2020,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 29672,
+        "published_total_million_gel": 29672,
+        "difference_million_gel": 0,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2021,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 29811.9,
+        "published_total_million_gel": 29812,
+        "difference_million_gel": 0.1,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2022,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 28587.3,
+        "published_total_million_gel": 28587,
+        "difference_million_gel": -0.3,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2023,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 31482.2,
+        "published_total_million_gel": 31482,
+        "difference_million_gel": -0.2,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2024,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 33169.3,
+        "published_total_million_gel": 33169,
+        "difference_million_gel": -0.3,
+        "tolerance_million_gel": 0.5
+      },
+      {
+        "year": 2025,
+        "source_id": "mof_public_debt_bulletin_n25",
+        "canonical_total_million_gel": 35934.4,
+        "published_total_million_gel": 35934,
+        "difference_million_gel": -0.4,
+        "tolerance_million_gel": 0.5
+      }
     ]
   },
   "actualService": {
@@ -587,7 +693,8 @@
         "source_row_label": "Domestic Government Debt **",
         "comparison_status": "within_source_precision"
       }
-    ]
+    ],
+    "externalTotalControl": "not_published"
   },
   "interestRates": {
     "rowCount": 33,

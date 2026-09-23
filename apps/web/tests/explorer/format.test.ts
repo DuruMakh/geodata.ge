@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatPerResidentGel, formatShare, formatSignedAmount, UNIT_BN, UNIT_MLN } from "../../lib/explorer/format";
+import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatPerResidentGel, formatPoints, formatShare, formatSignedAmount, UNIT_BN, UNIT_MLN } from "../../lib/explorer/format";
 
 describe("editorial formatters", () => {
   it("reuses number-format rules across subsequent chart and map values", () => {
@@ -78,6 +78,14 @@ describe("editorial formatters", () => {
     expect(formatShare(0.124, true)).toBe("+12.4%");
     expect(formatShare(-0.031, true)).toBe("−3.1%");
     expect(formatShare(null)).toBe("—");
+  });
+
+  it("formats percentage-point differences like shares, without a percent sign", () => {
+    expect(formatPoints(4.7 - 4.9, true)).toBe("−0.2");
+    expect(formatPoints(5 - 3.9, true)).toBe("+1.1");
+    expect(formatPoints(0.3)).toBe("0.3");
+    expect(formatPoints(null)).toBe("—");
+    expect(formatPoints(Number.NaN)).toBe("—");
   });
 
   it("accepts a decimals override for 0-decimal signed percents", () => {

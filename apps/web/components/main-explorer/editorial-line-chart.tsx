@@ -6,8 +6,10 @@ import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
-import { SwatchBar } from "../ui/editorial";
-import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
+import { decimalsFor, niceMax } from "../../lib/explorer/chartScale";
+import { CHART_AXIS_LABEL, CHART_LATTICE } from "../../lib/explorer/colors";
+import { nearestPeriodIndex } from "../../lib/explorer/chartNavigation";
+import { ChartScrollFrame, ChartTooltip } from "./chart-frame";
 
 // Bespoke SVG line chart per DESIGN.md §8.3: chart sits directly on paper, dot
 // lattice for the grid, ink baseline at zero, mono axis labels, hover crosshair + tooltip.
@@ -72,24 +74,6 @@ export function buildTooltipRows(
   present.sort((a, b) => b.value - a.value);
 
   return { rows: present.slice(0, cap), hidden: Math.max(0, present.length - cap) };
-}
-
-function niceMax(rawMax: number): number {
-  const raw = rawMax * 1.12;
-  const magnitude = 10 ** Math.floor(Math.log10(raw));
-  const normalized = raw / magnitude;
-  const step = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 2.5 ? 2.5 : normalized <= 5 ? 5 : 10;
-  return step * magnitude;
-}
-
-// Smallest decimal count (up to max) that renders the gridline step exactly,
-// so axis labels are never rounded into duplicates ("0.3" for a 0.25 step).
-function decimalsFor(step: number, max: number): number {
-  for (let digits = 0; digits <= max; digits += 1) {
-    const scaled = step * 10 ** digits;
-    if (Math.abs(Math.round(scaled) - scaled) < 1e-6) return digits;
-  }
-  return max;
 }
 
 export function EditorialLineChart({
@@ -166,9 +150,7 @@ export function EditorialLineChart({
 
   function handlePointerMove(event: React.PointerEvent<SVGSVGElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
-    const px = ((event.clientX - rect.left) / rect.width) * W;
-    const pointerStep = n <= 1 ? 1 : (W - axisLeftPadding - PAD_R) / (n - 1);
-    const index = Math.min(n - 1, Math.max(0, Math.round((px - axisLeftPadding) / pointerStep)));
+    const index = nearestPeriodIndex((event.clientX - rect.left) / rect.width, n, W, axisLeftPadding, PAD_R);
     if (index !== hoverRaw) setHover(index);
   }
 
@@ -176,24 +158,7 @@ export function EditorialLineChart({
   const tooltip = hover === null ? null : buildTooltipRows(series, hover);
 
   return (
-    // Scroll instead of shrink on narrow screens: an unbounded w-full SVG scales
-    // its text below the DESIGN.md §13 legibility floor on phones.
-    //
-    // Exception, 900–1019px: the shell's sidebar leaves the column under 720px, so
-    // the floor would put a scrollbar under a desktop-width chart. There the chart
-    // shrinks to fit instead — an approved trade of label size for a whole chart
-    // (DESIGN.md §12). Below 900px the sidebar is a top bar and the column is wide
-    // again, so phones keep the scroll.
-    <>
-      <HorizontalScrollHint testId="chart-scroll-hint" />
-      <div
-        data-testid="chart-frame"
-        role="region"
-        tabIndex={0}
-        aria-label={message(messages, "controls.chartScrollable")}
-        className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-      >
-      <div className="relative min-w-[720px] min-[900px]:max-[1020px]:min-w-0">
+    <ChartScrollFrame>
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
@@ -213,7 +178,7 @@ export function EditorialLineChart({
                 width={lattice.colPitch}
                 height={lattice.rowPitch}
               >
-                <circle cx={lattice.colPitch / 2} cy={lattice.rowPitch / 2} r={DOT_R} fill="#C9BEA9" />
+                <circle cx={lattice.colPitch / 2} cy={lattice.rowPitch / 2} r={DOT_R} fill={CHART_LATTICE} />
               </pattern>
             </defs>
             {/* Grown by one dot radius on every side: the pitch divides the plot
@@ -247,7 +212,7 @@ export function EditorialLineChart({
                 strokeWidth={1}
               />
             ) : null}
-            <text x={axisLeftPadding - 10} y={y(value) + 3} fontSize={11} fill="#6A6050" textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
+            <text x={axisLeftPadding - 10} y={y(value) + 3} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
               {formatAxis(value)}
             </text>
           </g>
@@ -260,13 +225,13 @@ export function EditorialLineChart({
           const tx = index === 0 ? x(index) - 4 : isLast ? x(index) + 4 : x(index);
 
           return (
-            <text key={`year-${year}`} x={tx} y={H - 8} fontSize={11} fill="#6A6050" textAnchor={anchor} style={{ fontFamily: "var(--font-numeric)" }}>
+            <text key={`year-${year}`} x={tx} y={H - 8} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor={anchor} style={{ fontFamily: "var(--font-numeric)" }}>
               {formatPeriod ? formatPeriod(year, "axis") : year}
             </text>
           );
         })}
         {hover !== null ? (
-          <line x1={x(hover)} x2={x(hover)} y1={PAD_T - 6} y2={H - PAD_B} stroke="#C9BEA9" strokeWidth={1} />
+          <line x1={x(hover)} x2={x(hover)} y1={PAD_T - 6} y2={H - PAD_B} stroke={CHART_LATTICE} strokeWidth={1} />
         ) : null}
         {series.map((line) => {
           // Interior data gaps (e.g. programs with no 2015 facts) split the path
@@ -363,37 +328,16 @@ export function EditorialLineChart({
         })}
       </svg>
       {hover !== null && hoverX !== null && tooltip !== null ? (
-        <div
-          data-testid="chart-tooltip"
-          className="pointer-events-none absolute top-0 z-[2] flex max-h-full min-w-[200px] flex-col gap-1 overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
-          style={{
-            left: `${hoverX}%`,
-            transform: hoverX > 60 ? "translateX(calc(-100% - 12px))" : "translateX(12px)",
-          }}
-        >
-          <div className="mb-0.5 flex justify-between gap-3 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">
-            <span>{formatPeriod ? formatPeriod(years[hover]!, "tooltip") : years[hover]}</span>
-            {share ? <span>{shareLabel}</span> : null}
-          </div>
-          {tooltip.rows.map((row) => (
-            <div key={row.id} className="flex items-center justify-between gap-2">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[var(--body)]">
-                <SwatchBar color={row.color} className="!w-3" />
-                <span className="max-w-[190px] overflow-hidden text-ellipsis whitespace-nowrap">{row.label}</span>
-              </span>
-              <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
-                {formatValue(row.value)}
-                {row.preliminary && preliminaryLabel ? <sup className="ml-1 text-[9px]">{preliminaryLabel}</sup> : null}
-              </span>
-            </div>
-          ))}
-          {tooltip.hidden > 0 ? (
-            <div className="pt-0.5 text-[10.5px] text-[var(--muted)]">+{tooltip.hidden} {message(messages, "controls.other")}</div>
-          ) : null}
-        </div>
+        <ChartTooltip
+          leftPercent={hoverX}
+          header={formatPeriod ? formatPeriod(years[hover]!, "tooltip") : String(years[hover])}
+          headerRight={share ? shareLabel : null}
+          rows={tooltip.rows}
+          hidden={tooltip.hidden}
+          formatValue={formatValue}
+          preliminaryLabel={preliminaryLabel}
+        />
       ) : null}
-      </div>
-      </div>
-    </>
+    </ChartScrollFrame>
   );
 }

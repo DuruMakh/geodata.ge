@@ -237,7 +237,7 @@ export function SeriesSelectorRow({
           </span>
         </span>
         {meta === undefined ? null : (
-          <span className="mt-0.5 flex-none font-[family-name:var(--font-mono)] text-[10px] whitespace-nowrap text-[var(--muted)] opacity-70">
+          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--muted)] opacity-70">
             {metaLabel === undefined ? null : <span className="sr-only">{metaLabel} </span>}
             {meta}
           </span>

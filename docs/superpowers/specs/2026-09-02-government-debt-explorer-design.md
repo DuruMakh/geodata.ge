@@ -98,3 +98,7 @@ No new chart library, selector system, workbook renderer, shell or visual design
 - Unit tests cover serving parity, totals, GDP shares, gaps, forecast split, family exclusivity, URL restoration and workbook contents.
 - Browser tests cover the default expanded hierarchy, one-chart invariant, same-family multi-selection, cross-family clearing, line/table, GDP pill visibility, rate gaps, forecast styling, Excel and desktop/mobile behavior.
 - Required gates: `npm run check`, `npm run test:browser`, and `npm run build`.
+
+## Amendment — 2026-09-17
+
+The deck line reports the latest actual year for every family, and the rate change is shown in percentage points. This supersedes the earlier 2030 service headline. See `2026-09-17-figure-accuracy-fixes-design.md` §2.

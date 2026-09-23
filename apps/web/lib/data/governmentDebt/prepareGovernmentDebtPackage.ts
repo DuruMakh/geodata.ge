@@ -9,6 +9,7 @@ import {
   parseDomesticServiceOverlapControls,
   parseDebtServiceForecast,
   parseGovernmentDebtStock,
+  parseGovernmentDebtStockTotalControls,
   parseGovernmentDebtStockOverlapSources,
   parseInterestRateGrid,
   parsePublishedGovernmentDebtGdpRatios,
@@ -30,6 +31,8 @@ import type {
   GovernmentDebtRateGap,
   GovernmentDebtSourceId,
   GovernmentDebtStockRow,
+  GovernmentDebtStockTotalControl,
+  GovernmentDebtStockTotalComparison,
   GovernmentDebtStockOverlapComparison,
   GovernmentDebtValidationReport,
   SourceManifestRow,
@@ -845,6 +848,38 @@ function stockOverlapComparisons(
   });
 }
 
+const STOCK_TOTAL_TOLERANCE_MILLION_GEL = 0.5;
+
+// Each canonical total is the exact sum of its published components; the table's
+// own rounded total (whole million GEL) must agree within half a published unit.
+function stockTotalComparisons(
+  stockRows: GovernmentDebtStockRow[],
+  controls: GovernmentDebtStockTotalControl[],
+): GovernmentDebtStockTotalComparison[] {
+  const totals = new Map(
+    stockRows.filter((row) => row.debt_scope === "total").map((row) => [row.year, row]),
+  );
+  return controls
+    .filter((control) => totals.get(control.year)?.source_id === control.source_id)
+    .map((control) => {
+      const row = totals.get(control.year)!;
+      const difference = Number((control.published_total_million_gel - row.amount_million_gel).toFixed(10));
+      if (Math.abs(difference) > STOCK_TOTAL_TOLERANCE_MILLION_GEL) {
+        throw new Error(
+          `Stock total control failed for ${control.year}: published ${control.published_total_million_gel} vs component sum ${row.amount_million_gel} million GEL`,
+        );
+      }
+      return {
+        year: control.year,
+        source_id: control.source_id,
+        canonical_total_million_gel: row.amount_million_gel,
+        published_total_million_gel: control.published_total_million_gel,
+        difference_million_gel: difference,
+        tolerance_million_gel: STOCK_TOTAL_TOLERANCE_MILLION_GEL,
+      };
+    });
+}
+
 function actualServiceOverlapComparisons(
   canonicalRows: GovernmentDebtActualServiceRow[],
   controls: ReturnType<typeof parseDomesticServiceOverlapControls>,
@@ -1024,6 +1059,11 @@ export async function buildGovernmentDebtPackage(options: {
     stockOverlapSources,
   );
 
+  const stockTotals = stockTotalComparisons(
+    stockRows,
+    parseGovernmentDebtStockTotalControls({ n13Page31: pages.n13Page31, n25Page26: pages.n25Page26 }),
+  );
+
   const validation: GovernmentDebtValidationReport = {
     status: "complete_with_documented_rate_gaps",
     review_date: REVIEW_DATE,
@@ -1037,11 +1077,13 @@ export async function buildGovernmentDebtPackage(options: {
       rowCount: stockRows.length,
       observedYears: Array.from({ length: 13 }, (_, index) => 2013 + index),
       overlapComparisons: stockOverlaps,
+      totalControls: stockTotals,
     },
     actualService: {
       rowCount: actualServiceRows.length,
       observedYears: Array.from({ length: 13 }, (_, index) => 2013 + index),
       overlapComparisons: serviceOverlaps,
+      externalTotalControl: "not_published",
     },
     interestRates: {
       rowCount: interestRateRows.length,

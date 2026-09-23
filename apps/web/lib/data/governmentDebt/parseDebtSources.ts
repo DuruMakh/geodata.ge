@@ -9,6 +9,7 @@ import type {
   GovernmentDebtInterestRateRow,
   GovernmentDebtSourceId,
   GovernmentDebtStockRow,
+  GovernmentDebtStockTotalControl,
 } from "./types";
 
 function requireNonnegativeNumber(value: number, source: string): number {
@@ -175,6 +176,33 @@ export function parseGovernmentDebtStock(
       "mof_public_debt_bulletin_n25",
       "17. Public Debt Stock",
     ),
+  ];
+}
+
+/**
+ * The rounded "Total Government Debt" row each stock table publishes beside its
+ * components. Canonical totals are exact component sums; this row is their control.
+ */
+export function parseGovernmentDebtStockTotalControls(sources: {
+  n13Page31: string;
+  n25Page26: string;
+}): GovernmentDebtStockTotalControl[] {
+  const n13Years = [2013, 2014, 2015, 2016, 2017, 2018, 2019];
+  const n13Totals = gelValues(sources.n13Page31, "Total Government Debt", n13Years.length, legacyNumberTokens);
+  const n25Years = Array.from({ length: 11 }, (_, index) => 2015 + index);
+  const n25Totals = gelValues(sources.n25Page26, "Total Government Debt", n25Years.length, englishNumberTokens);
+
+  return [
+    ...n13Years.slice(0, 2).map((year, index) => ({
+      year,
+      source_id: "mof_public_debt_bulletin_n13" as const,
+      published_total_million_gel: n13Totals[index]!,
+    })),
+    ...n25Years.map((year, index) => ({
+      year,
+      source_id: "mof_public_debt_bulletin_n25" as const,
+      published_total_million_gel: n25Totals[index]!,
+    })),
   ];
 }
 

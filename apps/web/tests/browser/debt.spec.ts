@@ -172,7 +172,7 @@ test.describe("Government Debt explorer", () => {
     await expect(page.getByTestId("explorer-table")).toHaveCount(0);
   });
 
-  test("keeps the deck on latest coverage and identifies projected service totals", async ({ page }) => {
+  test("keeps the deck on the latest actual year for every family", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/debt#f=stock&m=line&r=2013-2024&sel=debt.stock.total`);
     await expectAppReady(page);
 
@@ -182,9 +182,14 @@ test.describe("Government Debt explorer", () => {
 
     await page.goto(`${TEST_BASE_URL}/explorer/debt?case=service-deck#f=service&m=line&r=2013-2025&sel=debt.service.total`);
     await expectAppReady(page);
-    await expect(page.getByTestId("debt-deck")).toContainText("2030: ვალის გადახდა");
-    await expect(page.getByTestId("debt-deck")).toContainText("პროგნოზი");
-    await expect(page.getByTestId("debt-deck")).toContainText("წინა წელთან");
+    await expect(page.getByTestId("debt-deck")).toContainText("2025: ვალის გადახდა · 4.4 მლრდ ₾");
+    await expect(page.getByTestId("debt-deck")).toContainText("−9.2%");
+    await expect(page.getByTestId("debt-deck")).not.toContainText("პროგნოზი");
+
+    await page.goto(`${TEST_BASE_URL}/explorer/debt?case=rate-deck#f=rate&m=line&r=2015-2025&sel=debt.rate.total`);
+    await expectAppReady(page);
+    await expect(page.getByTestId("debt-deck")).toContainText("2025: საპროცენტო განაკვეთი · 4.7%");
+    await expect(page.getByTestId("debt-deck")).toContainText("−0.2 პპ");
   });
 
   test("marks the service forecast and downloads its active actual and forecast rows", async ({ page }) => {
@@ -223,6 +228,10 @@ test.describe("Government Debt explorer", () => {
       [2025, "ფაქტი"],
       [2026, "პროგნოზი"],
     ]);
+    // Range 2024–2026: column B = 2024, C = 2025, D = 2026.
+    const summary = workbook.getWorksheet("მარტივი ცხრილი")!;
+    expect(summary.getCell("C4").numFmt).not.toContain("პროგნოზი");
+    expect(summary.getCell("D4").numFmt).toContain("პროგნოზი");
   });
 
   test("the bulk control clears, then selects every row of the active family", async ({ page }) => {

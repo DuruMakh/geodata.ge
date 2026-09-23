@@ -295,6 +295,11 @@ async function main() {
   assertSubset("National GDP fact source IDs", nationalGdpFacts.map((fact) => fact.sourceId), sourceIds);
   assertUnique("national GDP fact natural key", nationalGdpFacts.map(nationalGdpFactParityKey));
   assertUnique("Government Debt fact natural key", governmentDebtFacts.map(governmentDebtFactParityKey));
+  assertSubset(
+    "Government Debt fact source IDs",
+    governmentDebtFacts.flatMap((fact) => (fact.sourceId === null ? [] : [fact.sourceId])),
+    sourceIds,
+  );
   assertUnique(
     "general-government balance fact natural key",
     generalGovernmentBalanceFacts.map(generalGovernmentBalanceFactParityKey),

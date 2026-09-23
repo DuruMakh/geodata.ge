@@ -1,3 +1,4 @@
+import { DEFICIT_SERIES_ID } from "../factQuery/types";
 import type { Locale } from "../i18n/types";
 import { I18nProvider } from "../i18n/provider";
 import { getPresentation } from "../i18n/presentation.server";
@@ -52,7 +53,7 @@ export async function renderDeficitPage(locale: Locale) {
     loadServedGeneralGovernmentBalanceData(),
     loadImfWeoManifest(),
   ]);
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "deficit"], ["deficit.general_government_balance"]);
+  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "deficit"], [DEFICIT_SERIES_ID]);
   const { messages } = presentation;
   const { firstYear, lastYear } = coverageFromYears(facts);
   const lastUpdatedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";

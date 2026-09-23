@@ -309,4 +309,24 @@ describe("createWorkbookBuffer", () => {
     expect(percentageWorkbook.getWorksheet("მარტივი ცხრილი")!.getCell("B4").value).toBe(0);
     expect(percentageWorkbook.getWorksheet("მარტივი ცხრილი")!.getCell("B4").numFmt).toContain("გეგმა");
   });
+
+  it("marks forecast cells in every section of the readable number format", async () => {
+    const workbook = await loadWorkbook({
+      ...approvedModelFixture,
+      readable: {
+        ...approvedModelFixture.readable,
+        unitLabel: "% მშპ-ში",
+        rows: [{
+          ...readableRows[0]!,
+          valuesByYear: { 2020: -0.012, 2021: -0.02, 2022: 0.01 },
+          basisByYear: { 2020: "actual", 2021: "forecast", 2022: "forecast" },
+        }],
+      },
+    });
+    const summary = workbook.getWorksheet("მარტივი ცხრილი")!;
+
+    expect(summary.getCell("B4").numFmt).not.toContain("პროგნოზი");
+    expect(summary.getCell("C4").numFmt).toBe('0.0% "პროგნოზი";[Red](0.0%) "პროგნოზი";0.0% "პროგნოზი"');
+    expect(summary.getCell("D4").value).toBe(0.01);
+  });
 });

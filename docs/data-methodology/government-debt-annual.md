@@ -40,6 +40,8 @@ The Ministry of Finance of Georgia is the publisher of all ten preserved files. 
 
 The `official/` files are immutable captures. A future source update must be preserved separately with its observed URL, date, size and hash before it replaces any canonical input.
 
+The package and its manifest keep bare document ids (`mof_public_debt_bulletin_n25`). Served facts, the mirror and the public `government-debt.csv` cite the source registry's form (`source.mof_public_debt_bulletin_n25`), the same ids `data/sources/source-documents.csv` registers; the mirror enforces them with a foreign key and the import rejects an unregistered id. Which documents a fact rests on — its own table, the external-service bulletin for actual service years, and every reviewed strategy for an unpublished rate — is defined once in `apps/web/lib/data/governmentDebt/sourceLineage.ts`.
+
 ## Stock normalization
 
 Bulletin N13 page 31, table `16. PUBLIC DEBT STOCK`, supplies the published GEL domestic and external components for 2013-2014. Bulletin N25 page 26, table `17. Public Debt Stock`, supplies the components for 2015-2025. Source precision is retained in million GEL, and `amount_gel` is the rounded mechanical conversion `amount_million_gel * 1,000,000`.
@@ -56,6 +58,8 @@ Representative exact controls are:
 Published total rows can be rounded to whole millions. The normalized total is instead the exact sum of the published domestic and external components.
 
 The validation report also records 39 stock overlap comparisons: all three scopes for N13 versus N25 in 2015-2019, and all three scopes for N19 versus N25 in 2015-2022. Every observed comparison is an exact source-precision match with a `0` million GEL difference. N25 remains canonical; if a future capture revises an overlap, the exact control value, canonical value and difference are reported as `revision` rather than silently replacing either source.
+
+Each total is the exact sum of the published domestic and external components. The table's own "Total Government Debt" row, published in whole million GEL, is its control: generation fails if a component sum differs from it by more than 0.5 million GEL, and the comparisons are recorded in `validation-report.json` under `stock.totalControls`.
 
 ## Actual principal and interest paid
 
@@ -150,6 +154,8 @@ Generation fails if an approved source file is missing or any pinned manifest fi
 The four normalized CSVs use fixed headers, UTF-8 with BOM, source-precision numbers and final newlines. `validation-report.json` records 39 stock rows, 39 stock overlap comparisons, 39 actual-service rows, 13 domestic-service overlap comparisons, 33 interest-rate rows/checks, 15 forecast rows, 30 forecast source checks, 10 verified source IDs, 13 GDP-share checks, both control years, `estimates_created: 0`, `source_hashes_match: true`, and the check-derived `normalized_values_reconcile: true`. Every exact rate/forecast check stores expected, observed, difference, tolerance, source reference and status. The package status is `complete_with_documented_rate_gaps`.
 
 The seven-sheet `government-debt-review.xlsx` mirrors every normalized CSV field and type. Its two Stock review columns reuse existing GDP and calculate the ratio with `=IFERROR(Cn/Nn,"")`. The workbook is an internal review aid, not the future public Excel download.
+
+External government service has no published total of its own — the bulletins' TOTAL rows combine public-debt service including NBG and on-lending — so `actualService.externalTotalControl` records `not_published` rather than implying a check.
 
 ## Reproducible rerun
 

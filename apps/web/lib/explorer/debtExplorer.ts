@@ -116,6 +116,35 @@ export function debtRangeForFamily(
   return { start: Math.min(...years), end: Math.max(...years) };
 }
 
+export type DebtDeckChange =
+  | { kind: "relative"; value: number }
+  | { kind: "points"; value: number };
+
+export type DebtDeck = { year: number; value: number; change: DebtDeckChange | null };
+
+/**
+ * The deck line under the page title: the family total's latest actual year and
+ * its change against the previous actual year. A projection never leads the page,
+ * and an interest rate moves in percentage points rather than as a relative change
+ * of a rate — the rule lib/factQuery/compare.ts applies to rate_percent.
+ */
+export function buildDebtDeck(facts: readonly ClientGovernmentDebtFact[], family: DebtFamily): DebtDeck | null {
+  const totalId = SERIES_BY_FAMILY[family][0]!;
+  const actual = facts
+    .filter((fact): fact is ClientGovernmentDebtFact & { value: number } =>
+      fact.seriesId === totalId && fact.status === "actual" && fact.value !== null)
+    .sort((left, right) => left.year - right.year);
+  const latest = actual.at(-1);
+  if (!latest) return null;
+  const previous = actual.find((fact) => fact.year === latest.year - 1);
+  let change: DebtDeckChange | null = null;
+  if (previous) {
+    if (family === "rate") change = { kind: "points", value: latest.value - previous.value };
+    else if (previous.value !== 0) change = { kind: "relative", value: (latest.value - previous.value) / previous.value };
+  }
+  return { year: latest.year, value: latest.value, change };
+}
+
 function shareOfGdp(value: number | null, year: number, gdpByYear: Map<number, ClientNationalGdpFact>): number | null {
   if (value === null) return null;
   const gdp = gdpByYear.get(year)?.gdpCurrentPricesGel;

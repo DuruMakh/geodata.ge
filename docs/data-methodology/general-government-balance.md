@@ -11,6 +11,8 @@ The measure is general-government net lending or borrowing. A negative value is 
 
 These two forms describe the same fiscal balance. The percentage is the standard cross-country scale measure; the nominal amount shows its monetary size.
 
+The series id is `deficit.general_government.balance` everywhere: the explorer, `/mcp`, the JSON publications and the English label catalogue. Explorer links created before 2026-09-17 with `deficit.general_government_balance` still select the series.
+
 ## Canonical IMF source
 
 The sole canonical source is the IMF April 2026 World Economic Outlook workbook, dataset `IMF.RES:WEO(9.0.0)`, worksheet `Countries`, country ID `GEO`.

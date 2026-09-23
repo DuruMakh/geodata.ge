@@ -17,8 +17,8 @@ test.describe("General-government deficit explorer", () => {
       await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "percent");
       await expect(page.getByTestId("deficit-deck")).toContainText("2025: ზოგადი მთავრობის ბალანსი · −1.5%");
       await expect(page.getByTestId("series-row")).toHaveCount(1);
-      await expect(page.getByTestId("chart-series-deficit.general_government_balance-actual")).toBeVisible();
-      await expect(page.getByTestId("chart-series-deficit.general_government_balance-forecast")).toHaveAttribute("stroke-dasharray", "6 5");
+      await expect(page.getByTestId("chart-series-deficit.general_government.balance-actual")).toBeVisible();
+      await expect(page.getByTestId("chart-series-deficit.general_government.balance-forecast")).toHaveAttribute("stroke-dasharray", "6 5");
       await expect(page.getByTestId("range-marker")).toContainText("პროგნოზი");
       const overflow = await page.evaluate(() => ({
         body: document.body.scrollWidth,
@@ -31,10 +31,13 @@ test.describe("General-government deficit explorer", () => {
   test("switches between GDP percentage, nominal GEL and the forecast-labelled table", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/deficit`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("series-row")).toContainText("−1.5%");
 
     await page.getByTestId("measure-share-toggle").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "amount");
     await expect(page.getByTestId("deficit-measure-label")).toHaveText("მლრდ ₾");
+    await expect(page.getByTestId("series-row")).toContainText("−1.5 მლრდ ₾");
+    await expect(page.getByTestId("series-row")).not.toContainText("−1.5%");
     await page.getByTestId("chart-mode-table").click();
     await expect(page.getByTestId("explorer-table")).toBeVisible();
     await expect(page.getByTestId("explorer-table").getByText("პროგნოზი", { exact: true })).toHaveCount(6);
@@ -52,6 +55,8 @@ test.describe("General-government deficit explorer", () => {
     await page.getByTestId("series-row-toggle").click();
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
     await expect(page).toHaveURL(/#m=table&sh=0&r=2001-2026&sel=$/);
+    await page.getByTestId("series-row-toggle").click();
+    await expect(page).toHaveURL(/sel=deficit\.general_government\.balance$/);
   });
 
   test("downloads the active range with IMF source and projection status", async ({ page }) => {

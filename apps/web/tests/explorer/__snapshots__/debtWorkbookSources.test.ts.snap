@@ -1,0 +1,190 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`debt workbook sources (golden) > lists the same documents and years: 'rate, full coverage' 1`] = `
+[
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2015-2025/monthly-debt-report-2026-07.pdf",
+    "title": "მთავრობის ვალის ყოველთვიური ანგარიში — 2026 წლის ივლისი",
+    "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+    ],
+  },
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2018/debt-management-strategy-2019-2021.pdf",
+    "title": "მთავრობის ვალის მართვის სტრატეგია 2019–2021",
+    "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2025,
+    ],
+  },
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2019-2020/debt-management-strategy-2022-2025.pdf",
+    "title": "მთავრობის ვალის მართვის სტრატეგია 2022–2025",
+    "years": [
+      2015,
+      2016,
+      2017,
+      2019,
+      2020,
+      2025,
+    ],
+  },
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2021-2022/debt-management-strategy-2023-2026.pdf",
+    "title": "მთავრობის ვალის მართვის სტრატეგია 2023–2026",
+    "years": [
+      2015,
+      2016,
+      2017,
+      2021,
+      2022,
+      2025,
+    ],
+  },
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2023-2024/debt-management-strategy-2025-2029.pdf",
+    "title": "მთავრობის ვალის მართვის სტრატეგია 2025–2029",
+    "years": [
+      2015,
+      2016,
+      2017,
+      2023,
+      2024,
+      2025,
+    ],
+  },
+]
+`;
+
+exports[`debt workbook sources (golden) > lists the same documents and years: 'service total, 2017–2021' 1`] = `
+[
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2013-2030/public-debt-bulletin-n25.pdf",
+    "title": "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №25",
+    "years": [
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+    ],
+  },
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2013-2019/public-debt-bulletin-n13.pdf",
+    "title": "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
+    "years": [
+      2017,
+      2018,
+      2019,
+    ],
+  },
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2015-2022/public-debt-bulletin-n19.pdf",
+    "title": "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №19",
+    "years": [
+      2020,
+      2021,
+    ],
+  },
+]
+`;
+
+exports[`debt workbook sources (golden) > lists the same documents and years: 'service, full coverage' 1`] = `
+[
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2013-2030/public-debt-bulletin-n25.pdf",
+    "title": "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №25",
+    "years": [
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026,
+      2027,
+      2028,
+      2029,
+      2030,
+    ],
+  },
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2013-2016/public-debt-bulletin-n7.pdf",
+    "title": "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №7",
+    "years": [
+      2013,
+      2014,
+      2015,
+      2016,
+    ],
+  },
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2013-2019/public-debt-bulletin-n13.pdf",
+    "title": "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
+    "years": [
+      2017,
+      2018,
+      2019,
+    ],
+  },
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2015-2022/public-debt-bulletin-n19.pdf",
+    "title": "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №19",
+    "years": [
+      2020,
+      2021,
+      2022,
+    ],
+  },
+]
+`;
+
+exports[`debt workbook sources (golden) > lists the same documents and years: 'stock, full coverage' 1`] = `
+[
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2013-2019/public-debt-bulletin-n13.pdf",
+    "title": "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №13",
+    "years": [
+      2013,
+      2014,
+    ],
+  },
+  {
+    "downloadHref": "/downloads/methodology/debt/files/2013-2030/public-debt-bulletin-n25.pdf",
+    "title": "სახელმწიფო ვალის სტატისტიკური ბიულეტენი №25",
+    "years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+    ],
+  },
+]
+`;

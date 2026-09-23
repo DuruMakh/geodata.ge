@@ -134,3 +134,37 @@ test("the hub card and the sidebar both reach the page", async ({ page }) => {
   await ready(page);
   await expect(page).toHaveURL(/\/explorer\/inflation\/overview/);
 });
+
+test("the contribution chart scrolls on phones, hovers without moving the page and answers the keyboard", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 1000 });
+  await page.goto(`/en${CATEGORIES}`);
+  await ready(page);
+  const frame = page.getByTestId("stack-chart-frame");
+  expect(await frame.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const svg = frame.locator("svg");
+  const box = (await svg.boundingBox())!;
+  const strip = page.getByTestId("year-range-strip");
+  const before = (await strip.boundingBox())!.y;
+  await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+  await expect(page.getByTestId("stack-chart-tooltip")).toBeVisible();
+  await page.mouse.move(box.x + box.width * 0.5 + 3, box.y + box.height * 0.5);
+  await expect(page.getByTestId("stack-chart-tooltip")).toBeVisible();
+  expect((await strip.boundingBox())!.y).toBe(before);
+
+  const lattice = await page.evaluate(() => {
+    const circle = document.querySelector("#stack-dot-lattice circle");
+    const rect = document.querySelector('[data-testid="stack-dot-lattice"]');
+    return { fill: circle ? getComputedStyle(circle).fill : null, opacity: rect ? getComputedStyle(rect).opacity : null };
+  });
+  expect(lattice).toEqual({ fill: "rgb(201, 190, 169)", opacity: "0.6" });
+
+  await page.mouse.move(0, 0);
+  await svg.focus();
+  await page.keyboard.press("End");
+  await expect(page.getByTestId("stack-chart-tooltip")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("stack-chart-tooltip")).toHaveCount(0);
+});
