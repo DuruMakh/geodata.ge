@@ -4,6 +4,7 @@ import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { INK } from "./colors";
 import { sectorColor } from "./economicSectors";
 import type { ClientRegionalEconomyObservation } from "../servedRows";
+import { refitRange, resolveRange as resolvePeriodRange } from "./periodRange";
 
 export type RegionalEconomyState = {
   measure: RegionalEconomyMeasure;
@@ -109,16 +110,7 @@ function resolveRange(
   if (availableYears.length === 0) throw new Error(`No available regional economy years for ${state.measure}`);
   const min = availableYears[0];
   const max = availableYears.at(-1)!;
-  const manual = state.range.kind === "manual" && state.range.end >= min && state.range.start <= max
-    ? state.range
-    : null;
-  return {
-    availableYears,
-    min,
-    max,
-    start: manual ? Math.max(min, manual.start) : min,
-    end: manual ? Math.min(max, manual.end) : max,
-  };
+  return { availableYears, ...resolvePeriodRange(state.range, { min, max }) };
 }
 
 export function changeRegionalEconomyMeasure(
@@ -130,9 +122,7 @@ export function changeRegionalEconomyMeasure(
   return {
     ...state,
     measure,
-    range: state.range.kind === "all" || state.range.end < range.min || state.range.start > range.max
-      ? { kind: "all" }
-      : { kind: "manual", start: range.start, end: range.end },
+    range: refitRange(state.range, range, { collapseToAll: false }),
   };
 }
 

@@ -31,6 +31,7 @@ import { GdpSummary } from "./gdp-summary";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type GdpWorkbookSource = WorkbookPublicSource & { sourceId: string };
 export function GdpOverview({
@@ -256,17 +257,7 @@ export function GdpOverview({
           years={m.availableYears}
           range={m.range}
           onChange={(patch) =>
-            setState((s) => {
-              const start = patch.start ?? m.range.start,
-                end = patch.end ?? m.range.end;
-              return {
-                ...s,
-                range:
-                  start === m.range.min && end === m.range.max
-                    ? { kind: "all" }
-                    : { kind: "manual", start, end },
-              };
-            })
+            setState((s) => ({ ...s, range: rangeFromPatch(m.range, patch) }))
           }
         />
       </section>

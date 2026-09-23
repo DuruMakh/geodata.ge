@@ -2,6 +2,7 @@ import { periodFromKey, periodKey } from "../data/inflation/periods";
 import type { CpiMeasure, CpiSeriesId } from "../data/inflation/types";
 import type { ClientCpiFact, ClientInflationTargetRow } from "../servedRows";
 import { ACCENT, INK } from "./colors";
+import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 
 // Pure state and data selection for the inflation overview. Components compose
 // these; nothing here renders or reads the DOM.
@@ -25,7 +26,7 @@ export const INFLATION_COLORS: Record<InflationSelectionKey, string> = {
   target: ACCENT,
 };
 
-export type InflationRange = { kind: "all" } | { kind: "manual"; start: number; end: number };
+export type InflationRange = PeriodRange;
 export type InflationState = {
   tab: InflationTab;
   mode: "line" | "table";
@@ -38,7 +39,7 @@ export type InflationState = {
 export const DEFAULT_INFLATION_STATE: InflationState = { tab: "yoy", mode: "line", range: { kind: "all" }, selected: ["cpi", "target"], tableSeries: null };
 
 export type InflationIndex = { values: Map<string, Map<number, number>>; sourceIds: Map<string, string> };
-export type ResolvedPeriodRange = { min: number; max: number; start: number; end: number };
+export type { ResolvedPeriodRange };
 
 export function seriesGroup(key: InflationSeriesKey, tab: InflationTab): string {
   return `${SERIES_DATA_ID[key]}:${TAB_MEASURE[tab]}`;
@@ -63,51 +64,24 @@ export function seriesValues(index: InflationIndex, key: InflationSeriesKey, tab
   return index.values.get(seriesGroup(key, tab));
 }
 
-function bounds(maps: Array<Map<number, number> | undefined>): { min: number; max: number } {
-  let min = Infinity;
-  let max = -Infinity;
-  for (const map of maps) {
-    for (const period of map?.keys() ?? []) {
-      if (period < min) min = period;
-      if (period > max) max = period;
-    }
-  }
-  if (min === Infinity) throw new Error("Inflation data has no periods");
-  return { min, max };
-}
-
 export function tabCoverage(index: InflationIndex, tab: InflationTab): { min: number; max: number } {
-  return bounds(INFLATION_SERIES.map((key) => seriesValues(index, key, tab)));
+  return periodBounds(INFLATION_SERIES.map((key) => seriesValues(index, key, tab)), "Inflation data has no periods");
 }
 
 export function overallCoverage(index: InflationIndex): { min: number; max: number } {
-  return bounds([...index.values.values()]);
+  return periodBounds([...index.values.values()], "Inflation data has no periods");
 }
 
 export function resolveInflationRange(state: InflationState, index: InflationIndex): ResolvedPeriodRange {
-  const { min, max } = tabCoverage(index, state.tab);
-  if (state.range.kind === "all") return { min, max, start: min, end: max };
-  const start = Math.max(min, state.range.start);
-  const end = Math.min(max, state.range.end);
-  return start > end ? { min, max, start: min, end: max } : { min, max, start, end };
+  return resolveRange(state.range, tabCoverage(index, state.tab));
 }
 
 /** Spec §8: keep "all" as all, intersect a manual range, fall back when nothing overlaps. */
 export function changeInflationTab(state: InflationState, tab: InflationTab, index: InflationIndex): InflationState {
-  const next = { ...state, tab };
-  if (state.range.kind === "all") return next;
-  const { min, max } = tabCoverage(index, tab);
-  const start = Math.max(min, state.range.start);
-  const end = Math.min(max, state.range.end);
-  if (start > end || (start === min && end === max)) return { ...next, range: { kind: "all" } };
-  return { ...next, range: { kind: "manual", start, end } };
+  return { ...state, tab, range: refitRange(state.range, tabCoverage(index, tab), { collapseToAll: true }) };
 }
 
-export function rangeFromPatch(range: ResolvedPeriodRange, patch: { start?: number; end?: number }): InflationRange {
-  const start = patch.start ?? range.start;
-  const end = patch.end ?? range.end;
-  return start === range.min && end === range.max ? { kind: "all" } : { kind: "manual", start, end };
-}
+export { rangeFromPatch };
 
 export function targetForPeriod(targets: ClientInflationTargetRow[], period: number): number | null {
   const row = targets.find((entry) => periodFromKey(entry.effectiveFrom) <= period && (entry.effectiveTo === null || period <= periodFromKey(entry.effectiveTo)));
@@ -156,7 +130,7 @@ export function effectiveTableSeries(index: InflationIndex, state: InflationStat
 export function latestIndicators(index: InflationIndex, targets: ClientInflationTargetRow[]) {
   const yoy = seriesValues(index, "cpi", "yoy");
   if (!yoy || yoy.size === 0) return null;
-  const period = bounds([yoy]).max;
+  const period = periodBounds([yoy], "Inflation data has no periods").max;
   const coreYoy = seriesValues(index, "core", "yoy");
   const mom = seriesValues(index, "cpi", "mom");
   const avg12 = index.values.get("cpi.headline:avg12_pct");

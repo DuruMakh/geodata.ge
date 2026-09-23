@@ -2,6 +2,7 @@ import { SERIES_COLORS } from "./colors";
 import type { SectorDefinition, SectorMeasure } from "../data/economicSectors/types";
 import { matchesLabelQuery } from "../i18n/search";
 import type { ClientSectorObservation } from "../servedRows";
+import { refitRange, resolveRange as resolvePeriodRange } from "./periodRange";
 
 export const SECTOR_GDP = "economy.gdp_total";
 export type SectorState = {
@@ -60,14 +61,12 @@ function resolveRange(state: SectorState, facts: readonly ClientSectorObservatio
   const availableYears = [...new Set(facts.filter(f => f.measure === state.measure).map(f => f.year))].sort((a,b)=>a-b);
   if (!availableYears.length) throw new Error(`No available sector years for ${state.measure}`);
   const min = availableYears[0], max = availableYears.at(-1)!;
-  const manual = state.range.kind === "manual" && state.range.end >= min && state.range.start <= max ? state.range : null;
-  return { availableYears, min, max, start: manual ? Math.max(min, manual.start) : min, end: manual ? Math.min(max, manual.end) : max };
+  return { availableYears, ...resolvePeriodRange(state.range, { min, max }) };
 }
 
 export function changeSectorMeasure(state: SectorState, measure: SectorMeasure, facts: readonly ClientSectorObservation[]): SectorState {
   const range = resolveRange({ ...state, measure }, facts);
-  return { ...state, measure, range: state.range.kind === "all" || state.range.end < range.min || state.range.start > range.max
-    ? { kind: "all" } : { kind: "manual", start: range.start, end: range.end } };
+  return { ...state, measure, range: refitRange(state.range, range, { collapseToAll: false }) };
 }
 
 export function buildEconomicSectorsModel(facts: readonly ClientSectorObservation[], registry: readonly SectorDefinition[], state: SectorState, sourceIdByMeasure: Record<string, string>) {

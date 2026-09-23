@@ -28,6 +28,7 @@ import { SectorHighlights } from "./sector-highlights";
 import { useEconomicSectorsState } from "./use-economic-sectors-state";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type EconomicSectorsExplorerProps = {
   facts: ClientSectorObservation[];
@@ -213,17 +214,7 @@ export function EconomicSectorsExplorer({
               years={model.availableYears}
               range={model.range}
               onChange={(patch) =>
-                update((s) => {
-                  const start = patch.start ?? model.range.start,
-                    end = patch.end ?? model.range.end;
-                  return {
-                    ...s,
-                    range:
-                      start === model.range.min && end === model.range.max
-                        ? { kind: "all" }
-                        : { kind: "manual", start, end },
-                  };
-                })
+                update((s) => ({ ...s, range: rangeFromPatch(model.range, patch) }))
               }
             />
           </section>

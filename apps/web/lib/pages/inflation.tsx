@@ -34,6 +34,27 @@ const OVERVIEW_PATH = "/explorer/inflation/overview";
 const CATEGORIES_PATH = "/explorer/inflation/categories";
 const repositoryRoot = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
 
+// Archive rows ending in "_ka" are the Georgian twins of the English source files.
+function inflationWorkbookSources(
+  manifest: Awaited<ReturnType<typeof loadReviewedSourceManifest>>,
+  locale: Locale,
+  documents: Awaited<ReturnType<typeof loadEnglishCatalogue>>["documents"],
+): InflationWorkbookSource[] {
+  const projected = projectPublicSources(manifest, locale, documents);
+  return manifest.map((row) => {
+    const shown = projected.find((entry) => entry.source_id === row.source_id)!;
+    return {
+      sourceId: row.source_id.replace(/_ka$/, ""),
+      language: row.source_id.endsWith("_ka") ? "ka" : "en",
+      years: row.years,
+      title: shown.title,
+      organization: shown.publisher,
+      downloadHref: row.downloadHref,
+      retrievedAt: row.retrieved_at,
+    };
+  });
+}
+
 export async function inflationHubMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["inflation"]);
   return fiscalMetadata({ locale, path: HUB_PATH, title: message(messages, "inflation.hubMetaTitle"), description: message(messages, "inflation.hubDescription") });
@@ -76,20 +97,7 @@ export async function renderInflationOverview(locale: Locale) {
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
   ]);
-  const projected = projectPublicSources(manifest, locale, catalogue.documents);
-  // Archive rows ending in "_ka" are the Georgian twins of the English source files.
-  const sources: InflationWorkbookSource[] = manifest.map((row) => {
-    const shown = projected.find((entry) => entry.source_id === row.source_id)!;
-    return {
-      sourceId: row.source_id.replace(/_ka$/, ""),
-      language: row.source_id.endsWith("_ka") ? "ka" : "en",
-      years: row.years,
-      title: shown.title,
-      organization: shown.publisher,
-      downloadHref: row.downloadHref,
-      retrievedAt: row.retrieved_at,
-    };
-  });
+  const sources = inflationWorkbookSources(manifest, locale, catalogue.documents);
   const t = (key: string) => message(presentation.messages, key);
   return (
     <I18nProvider {...presentation}>
@@ -131,19 +139,7 @@ export async function renderInflationCategories(locale: Locale) {
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
   ]);
-  const projected = projectPublicSources(manifest, locale, catalogue.documents);
-  const sources: InflationWorkbookSource[] = manifest.map((row) => {
-    const shown = projected.find((entry) => entry.source_id === row.source_id)!;
-    return {
-      sourceId: row.source_id.replace(/_ka$/, ""),
-      language: row.source_id.endsWith("_ka") ? "ka" : "en",
-      years: row.years,
-      title: shown.title,
-      organization: shown.publisher,
-      downloadHref: row.downloadHref,
-      retrievedAt: row.retrieved_at,
-    };
-  });
+  const sources = inflationWorkbookSources(manifest, locale, catalogue.documents);
   // The stack closes on the published national headline, so it travels with the page.
   const headline = facts
     .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")

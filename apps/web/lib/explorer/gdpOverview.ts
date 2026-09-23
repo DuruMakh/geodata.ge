@@ -1,4 +1,5 @@
 import type { ClientGdpObservation, SourceIdRanges } from "../servedRows";
+import { refitRange, resolveRange } from "./periodRange";
 export type GdpIndicator = "real" | "nominal" | "growth" | "per_capita";
 export type GdpState = {
   indicator: GdpIndicator;
@@ -27,20 +28,7 @@ export function resolveGdpRange(
     .filter((f) => f.seriesId === seriesFor(state))
     .map((f) => f.year)
     .sort((a, b) => a - b);
-  const min = years[0],
-    max = years.at(-1)!;
-  if (
-    state.range.kind === "all" ||
-    state.range.end < min ||
-    state.range.start > max
-  )
-    return { min, max, start: min, end: max };
-  return {
-    min,
-    max,
-    start: Math.max(min, state.range.start),
-    end: Math.min(max, state.range.end),
-  };
+  return resolveRange(state.range, { min: years[0], max: years.at(-1)! });
 }
 export function changeGdpIndicator(
   state: GdpState,
@@ -48,14 +36,8 @@ export function changeGdpIndicator(
   facts: ClientGdpObservation[],
 ): GdpState {
   const next = { ...state, indicator },
-    r = resolveGdpRange(next, facts);
-  return {
-    ...next,
-    range:
-      state.range.kind === "all" || (r.start === r.min && r.end === r.max)
-        ? { kind: "all" }
-        : { kind: "manual", start: r.start, end: r.end },
-  };
+    { min, max } = resolveGdpRange(next, facts);
+  return { ...next, range: refitRange(state.range, { min, max }, { collapseToAll: true }) };
 }
 /** The newest run that starts at or before `year`. */
 export function sourceIdForYear(
