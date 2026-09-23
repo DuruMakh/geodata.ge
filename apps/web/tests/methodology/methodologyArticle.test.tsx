@@ -16,6 +16,25 @@ vi.mock("../../lib/data/governmentDebt/importGovernmentDebtFacts", async (import
   return { ...actual, loadServedGovernmentDebtData: vi.fn(actual.loadServedGovernmentDebtData) };
 });
 
+// The archive report is written by `prebuild`, and CI runs the tests before the
+// build, so a fresh checkout has no report to read. Nothing here is about the
+// archives: every live article gets the same validated summary.
+vi.mock("../../lib/methodology/prepareArchives", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../lib/methodology/prepareArchives")>();
+  const { LIVE_METHODOLOGY_IDS } = await import("../../lib/methodology/catalog");
+  return {
+    ...actual,
+    loadGeneratedArchiveSummaries: vi.fn(async () =>
+      Object.fromEntries(
+        LIVE_METHODOLOGY_IDS.map((id) => [
+          id,
+          { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-09-01", validated: true, status: "PASS", minYear: 2004, maxYear: 2025 },
+        ]),
+      ),
+    ),
+  };
+});
+
 const archiveSummary = {
   fileCount: 1,
   totalBytes: 1,
