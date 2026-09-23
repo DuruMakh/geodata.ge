@@ -1,0 +1,189 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`'debt' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [
+    "<aside aria-label="სერიები" class="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">",
+  ],
+  "h1": [
+    "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main data-testid="debt-explorer" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"><div class="@container mx-auto max-w-[1180px]">",
+  ],
+  "pill": [
+    "<button type="button" data-testid="measure-share-toggle" aria-pressed="false" class="h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]">",
+  ],
+  "workspace": [
+    "<div data-testid="explorer-workspace" class="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">",
+  ],
+}
+`;
+
+exports[`'deficit' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [
+    "<aside aria-label="სერიები" class="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">",
+  ],
+  "h1": [
+    "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main data-testid="deficit-explorer" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"><div class="@container mx-auto max-w-[1180px]">",
+  ],
+  "pill": [
+    "<button type="button" data-testid="measure-share-toggle" aria-pressed="true" class="h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]">",
+  ],
+  "workspace": [
+    "<div data-testid="explorer-workspace" class="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">",
+  ],
+}
+`;
+
+exports[`'economy' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [],
+  "h1": [
+    "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main class="px-5 pb-16 min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
+  ],
+  "pill": [],
+  "workspace": [],
+}
+`;
+
+exports[`'expenditure' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [
+    "<aside aria-label="სერიები" class="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">",
+  ],
+  "h1": [
+    "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main data-testid="explorer-shell" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"><div class="@container mx-auto max-w-[1180px]">",
+  ],
+  "pill": [
+    "<button type="button" data-testid="measure-share-toggle" aria-pressed="false" class="h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]">",
+  ],
+  "workspace": [
+    "<div data-testid="explorer-workspace" class="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">",
+  ],
+}
+`;
+
+exports[`'gdp' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [],
+  "h1": [
+    "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main data-testid="gdp-overview" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
+  ],
+  "pill": [],
+  "workspace": [],
+}
+`;
+
+exports[`'inflation' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [],
+  "h1": [
+    "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main class="px-5 pb-16 min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
+  ],
+  "pill": [],
+  "workspace": [],
+}
+`;
+
+exports[`'inflation-categories' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [
+    "<aside aria-label="სერიები" class="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">",
+  ],
+  "h1": [
+    "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main data-testid="inflation-categories" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
+  ],
+  "pill": [],
+  "workspace": [
+    "<div data-testid="explorer-workspace" class="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">",
+  ],
+}
+`;
+
+exports[`'inflation-overview' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [
+    "<aside aria-label="სერიები" class="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">",
+  ],
+  "h1": [
+    "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main data-testid="inflation-overview" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
+  ],
+  "pill": [],
+  "workspace": [
+    "<div data-testid="explorer-workspace" class="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">",
+  ],
+}
+`;
+
+exports[`'region' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [
+    "<aside aria-label="სერიები" class="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">",
+  ],
+  "h1": [
+    "<h1 class="font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main data-testid="explorer-shell" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
+  ],
+  "pill": [],
+  "workspace": [
+    "<div class="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">",
+  ],
+}
+`;
+
+exports[`'regions' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [],
+  "h1": [
+    "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main data-testid="explorer-shell" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
+  ],
+  "pill": [],
+  "workspace": [],
+}
+`;
+
+exports[`'sectors' shell > keeps its wrapper, heading, workspace, aside and measure pill 1`] = `
+{
+  "aside": [
+    "<aside aria-label="სერიები" class="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">",
+  ],
+  "h1": [
+    "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
+  ],
+  "main": [
+    "<main class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
+  ],
+  "pill": [],
+  "workspace": [
+    "<div data-testid="explorer-workspace" class="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">",
+  ],
+}
+`;
