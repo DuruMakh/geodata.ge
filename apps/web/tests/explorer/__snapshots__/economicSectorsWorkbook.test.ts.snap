@@ -1,0 +1,631 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`builds a stable model for a fixed input > en nominal 1`] = `
+{
+  "analysis": {
+    "headers": [
+      "Year",
+      "Sector",
+      "Amount (GEL)",
+      "Status",
+    ],
+    "numericFormats": {
+      "3": "#,##0.00",
+    },
+    "rows": [
+      [
+        2024,
+        "Agriculture, forestry and fishing",
+        2500000000,
+        "Published",
+      ],
+      [
+        2024,
+        "Mining and quarrying",
+        null,
+        "Not available",
+      ],
+      [
+        2025,
+        "Agriculture, forestry and fishing",
+        2500000000,
+        "Preliminary",
+      ],
+      [
+        2025,
+        "Mining and quarrying",
+        null,
+        "Not available",
+      ],
+    ],
+  },
+  "filename": "fiscal-economic-sectors-nominal-2024-2025-en.xlsx",
+  "locale": "en",
+  "readable": {
+    "amountDecimals": 0,
+    "rows": [
+      {
+        "basisByYear": {
+          "2024": "published",
+          "2025": "preliminary",
+        },
+        "change": null,
+        "kind": "item",
+        "label": "Agriculture, forestry and fishing",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": 2.5,
+          "2025": 2.5,
+        },
+      },
+      {
+        "basisByYear": {
+          "2024": null,
+          "2025": null,
+        },
+        "change": null,
+        "kind": "item",
+        "label": "Mining and quarrying",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": null,
+          "2025": null,
+        },
+      },
+    ],
+    "showChangeColumn": false,
+    "subtitle": "2024–2025 · bn GEL · Preliminary: 2025",
+    "title": "Sectors · Nominal value in GEL",
+    "unitLabel": "bn GEL",
+    "years": [
+      2024,
+      2025,
+    ],
+  },
+  "sheetNames": [
+    "Summary",
+    "Data",
+    "Sources",
+  ],
+  "sources": [
+    {
+      "absoluteUrl": "https://fiscal.ge/downloads/methodology/nominal.xlsx",
+      "downloadHref": "/downloads/methodology/nominal.xlsx",
+      "organization": "Geostat",
+      "retrievedAt": "2026-09-11",
+      "title": "nominal",
+      "years": [
+        2024,
+        2025,
+      ],
+    },
+  ],
+}
+`;
+
+exports[`builds a stable model for a fixed input > en real_growth 1`] = `
+{
+  "analysis": {
+    "headers": [
+      "Year",
+      "Sector",
+      "Real growth %",
+      "Status",
+    ],
+    "numericFormats": {
+      "3": "0.0%",
+    },
+    "rows": [
+      [
+        2024,
+        "Agriculture, forestry and fishing",
+        0,
+        "Published",
+      ],
+      [
+        2024,
+        "Mining and quarrying",
+        null,
+        "Not available",
+      ],
+      [
+        2025,
+        "Agriculture, forestry and fishing",
+        -0.075,
+        "Preliminary",
+      ],
+      [
+        2025,
+        "Mining and quarrying",
+        null,
+        "Not available",
+      ],
+    ],
+  },
+  "filename": "fiscal-economic-sectors-real_growth-2024-2025-en.xlsx",
+  "locale": "en",
+  "readable": {
+    "amountDecimals": 0,
+    "rows": [
+      {
+        "basisByYear": {
+          "2024": "published",
+          "2025": "preliminary",
+        },
+        "change": null,
+        "kind": "item",
+        "label": "Agriculture, forestry and fishing",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": 0,
+          "2025": -0.075,
+        },
+      },
+      {
+        "basisByYear": {
+          "2024": null,
+          "2025": null,
+        },
+        "change": null,
+        "kind": "item",
+        "label": "Mining and quarrying",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": null,
+          "2025": null,
+        },
+      },
+    ],
+    "showChangeColumn": false,
+    "subtitle": "2024–2025 · Real growth % · Preliminary: 2025",
+    "title": "Sectors · Real growth %",
+    "unitLabel": "Real growth %",
+    "years": [
+      2024,
+      2025,
+    ],
+  },
+  "sheetNames": [
+    "Summary",
+    "Data",
+    "Sources",
+  ],
+  "sources": [
+    {
+      "absoluteUrl": "https://fiscal.ge/downloads/methodology/volume.xlsx",
+      "downloadHref": "/downloads/methodology/volume.xlsx",
+      "organization": "Geostat",
+      "retrievedAt": "2026-09-11",
+      "title": "volume",
+      "years": [
+        2024,
+        2025,
+      ],
+    },
+  ],
+}
+`;
+
+exports[`builds a stable model for a fixed input > en share_of_gdp 1`] = `
+{
+  "analysis": {
+    "headers": [
+      "Year",
+      "Sector",
+      "Amount (GEL)",
+      "% of GDP",
+      "Status",
+    ],
+    "numericFormats": {
+      "3": "#,##0.00",
+      "4": "0.0%",
+    },
+    "rows": [
+      [
+        2024,
+        "Agriculture, forestry and fishing",
+        2500000000,
+        0.125,
+        "Published",
+      ],
+      [
+        2024,
+        "Mining and quarrying",
+        null,
+        null,
+        "Not available",
+      ],
+      [
+        2025,
+        "Agriculture, forestry and fishing",
+        2500000000,
+        0.125,
+        "Preliminary",
+      ],
+      [
+        2025,
+        "Mining and quarrying",
+        null,
+        null,
+        "Not available",
+      ],
+    ],
+  },
+  "filename": "fiscal-economic-sectors-share_of_gdp-2024-2025-en.xlsx",
+  "locale": "en",
+  "readable": {
+    "amountDecimals": 0,
+    "rows": [
+      {
+        "basisByYear": {
+          "2024": "published",
+          "2025": "preliminary",
+        },
+        "change": null,
+        "kind": "item",
+        "label": "Agriculture, forestry and fishing",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": 0.125,
+          "2025": 0.125,
+        },
+      },
+      {
+        "basisByYear": {
+          "2024": null,
+          "2025": null,
+        },
+        "change": null,
+        "kind": "item",
+        "label": "Mining and quarrying",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": null,
+          "2025": null,
+        },
+      },
+    ],
+    "showChangeColumn": false,
+    "subtitle": "2024–2025 · % of GDP · Preliminary: 2025",
+    "title": "Sectors · % of GDP",
+    "unitLabel": "% of GDP",
+    "years": [
+      2024,
+      2025,
+    ],
+  },
+  "sheetNames": [
+    "Summary",
+    "Data",
+    "Sources",
+  ],
+  "sources": [
+    {
+      "absoluteUrl": "https://fiscal.ge/downloads/methodology/nominal.xlsx",
+      "downloadHref": "/downloads/methodology/nominal.xlsx",
+      "organization": "Geostat",
+      "retrievedAt": "2026-09-11",
+      "title": "nominal",
+      "years": [
+        2024,
+        2025,
+      ],
+    },
+  ],
+}
+`;
+
+exports[`builds a stable model for a fixed input > ka nominal 1`] = `
+{
+  "analysis": {
+    "headers": [
+      "წელი",
+      "სექტორი",
+      "თანხა (₾)",
+      "სტატუსი",
+    ],
+    "numericFormats": {
+      "3": "#,##0.00",
+    },
+    "rows": [
+      [
+        2024,
+        "სოფლის, სატყეო და თევზის მეურნეობა",
+        2500000000,
+        "გამოქვეყნებული",
+      ],
+      [
+        2024,
+        "სამთომოპოვებითი მრეწველობა",
+        null,
+        "არ არის ხელმისაწვდომი",
+      ],
+      [
+        2025,
+        "სოფლის, სატყეო და თევზის მეურნეობა",
+        2500000000,
+        "წინასწარი",
+      ],
+      [
+        2025,
+        "სამთომოპოვებითი მრეწველობა",
+        null,
+        "არ არის ხელმისაწვდომი",
+      ],
+    ],
+  },
+  "filename": "fiscal-economic-sectors-nominal-2024-2025.xlsx",
+  "locale": "ka",
+  "readable": {
+    "amountDecimals": 0,
+    "rows": [
+      {
+        "basisByYear": {
+          "2024": "published",
+          "2025": "preliminary",
+        },
+        "change": null,
+        "kind": "item",
+        "label": "სოფლის, სატყეო და თევზის მეურნეობა",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": 2.5,
+          "2025": 2.5,
+        },
+      },
+      {
+        "basisByYear": {
+          "2024": null,
+          "2025": null,
+        },
+        "change": null,
+        "kind": "item",
+        "label": "სამთომოპოვებითი მრეწველობა",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": null,
+          "2025": null,
+        },
+      },
+    ],
+    "showChangeColumn": false,
+    "subtitle": "2024–2025 · მლრდ ₾ · წინასწარი: 2025",
+    "title": "სექტორები · ნომინალური ღირებულება ლარში",
+    "unitLabel": "მლრდ ₾",
+    "years": [
+      2024,
+      2025,
+    ],
+  },
+  "sheetNames": [
+    "მარტივი ცხრილი",
+    "მონაცემები",
+    "წყაროები",
+  ],
+  "sources": [
+    {
+      "absoluteUrl": "https://fiscal.ge/downloads/methodology/nominal.xlsx",
+      "downloadHref": "/downloads/methodology/nominal.xlsx",
+      "organization": "Geostat",
+      "retrievedAt": "2026-09-11",
+      "title": "nominal",
+      "years": [
+        2024,
+        2025,
+      ],
+    },
+  ],
+}
+`;
+
+exports[`builds a stable model for a fixed input > ka real_growth 1`] = `
+{
+  "analysis": {
+    "headers": [
+      "წელი",
+      "სექტორი",
+      "რეალური ზრდა %",
+      "სტატუსი",
+    ],
+    "numericFormats": {
+      "3": "0.0%",
+    },
+    "rows": [
+      [
+        2024,
+        "სოფლის, სატყეო და თევზის მეურნეობა",
+        0,
+        "გამოქვეყნებული",
+      ],
+      [
+        2024,
+        "სამთომოპოვებითი მრეწველობა",
+        null,
+        "არ არის ხელმისაწვდომი",
+      ],
+      [
+        2025,
+        "სოფლის, სატყეო და თევზის მეურნეობა",
+        -0.075,
+        "წინასწარი",
+      ],
+      [
+        2025,
+        "სამთომოპოვებითი მრეწველობა",
+        null,
+        "არ არის ხელმისაწვდომი",
+      ],
+    ],
+  },
+  "filename": "fiscal-economic-sectors-real_growth-2024-2025.xlsx",
+  "locale": "ka",
+  "readable": {
+    "amountDecimals": 0,
+    "rows": [
+      {
+        "basisByYear": {
+          "2024": "published",
+          "2025": "preliminary",
+        },
+        "change": null,
+        "kind": "item",
+        "label": "სოფლის, სატყეო და თევზის მეურნეობა",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": 0,
+          "2025": -0.075,
+        },
+      },
+      {
+        "basisByYear": {
+          "2024": null,
+          "2025": null,
+        },
+        "change": null,
+        "kind": "item",
+        "label": "სამთომოპოვებითი მრეწველობა",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": null,
+          "2025": null,
+        },
+      },
+    ],
+    "showChangeColumn": false,
+    "subtitle": "2024–2025 · რეალური ზრდა % · წინასწარი: 2025",
+    "title": "სექტორები · რეალური ზრდა %",
+    "unitLabel": "რეალური ზრდა %",
+    "years": [
+      2024,
+      2025,
+    ],
+  },
+  "sheetNames": [
+    "მარტივი ცხრილი",
+    "მონაცემები",
+    "წყაროები",
+  ],
+  "sources": [
+    {
+      "absoluteUrl": "https://fiscal.ge/downloads/methodology/volume.xlsx",
+      "downloadHref": "/downloads/methodology/volume.xlsx",
+      "organization": "Geostat",
+      "retrievedAt": "2026-09-11",
+      "title": "volume",
+      "years": [
+        2024,
+        2025,
+      ],
+    },
+  ],
+}
+`;
+
+exports[`builds a stable model for a fixed input > ka share_of_gdp 1`] = `
+{
+  "analysis": {
+    "headers": [
+      "წელი",
+      "სექტორი",
+      "თანხა (₾)",
+      "% მშპ-ში",
+      "სტატუსი",
+    ],
+    "numericFormats": {
+      "3": "#,##0.00",
+      "4": "0.0%",
+    },
+    "rows": [
+      [
+        2024,
+        "სოფლის, სატყეო და თევზის მეურნეობა",
+        2500000000,
+        0.125,
+        "გამოქვეყნებული",
+      ],
+      [
+        2024,
+        "სამთომოპოვებითი მრეწველობა",
+        null,
+        null,
+        "არ არის ხელმისაწვდომი",
+      ],
+      [
+        2025,
+        "სოფლის, სატყეო და თევზის მეურნეობა",
+        2500000000,
+        0.125,
+        "წინასწარი",
+      ],
+      [
+        2025,
+        "სამთომოპოვებითი მრეწველობა",
+        null,
+        null,
+        "არ არის ხელმისაწვდომი",
+      ],
+    ],
+  },
+  "filename": "fiscal-economic-sectors-share_of_gdp-2024-2025.xlsx",
+  "locale": "ka",
+  "readable": {
+    "amountDecimals": 0,
+    "rows": [
+      {
+        "basisByYear": {
+          "2024": "published",
+          "2025": "preliminary",
+        },
+        "change": null,
+        "kind": "item",
+        "label": "სოფლის, სატყეო და თევზის მეურნეობა",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": 0.125,
+          "2025": 0.125,
+        },
+      },
+      {
+        "basisByYear": {
+          "2024": null,
+          "2025": null,
+        },
+        "change": null,
+        "kind": "item",
+        "label": "სამთომოპოვებითი მრეწველობა",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2024": null,
+          "2025": null,
+        },
+      },
+    ],
+    "showChangeColumn": false,
+    "subtitle": "2024–2025 · % მშპ-ში · წინასწარი: 2025",
+    "title": "სექტორები · % მშპ-ში",
+    "unitLabel": "% მშპ-ში",
+    "years": [
+      2024,
+      2025,
+    ],
+  },
+  "sheetNames": [
+    "მარტივი ცხრილი",
+    "მონაცემები",
+    "წყაროები",
+  ],
+  "sources": [
+    {
+      "absoluteUrl": "https://fiscal.ge/downloads/methodology/nominal.xlsx",
+      "downloadHref": "/downloads/methodology/nominal.xlsx",
+      "organization": "Geostat",
+      "retrievedAt": "2026-09-11",
+      "title": "nominal",
+      "years": [
+        2024,
+        2025,
+      ],
+    },
+  ],
+}
+`;

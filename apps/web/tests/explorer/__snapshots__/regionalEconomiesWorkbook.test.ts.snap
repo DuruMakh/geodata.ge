@@ -1,0 +1,303 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`builds a stable model for a fixed input > nominal 1`] = `
+{
+  "analysis": {
+    "headers": [
+      "Region",
+      "Year",
+      "Economic activity",
+      "Amount (GEL)",
+      "Status",
+    ],
+    "numericFormats": {
+      "4": "#,##0.00",
+    },
+    "rows": [
+      [
+        "Imereti",
+        2023,
+        "Total regional GDP",
+        1000000000,
+        "Published",
+      ],
+      [
+        "Imereti",
+        2023,
+        "Agriculture, forestry and fishing",
+        250000000,
+        "Published",
+      ],
+      [
+        "Imereti",
+        2023,
+        "Mining and quarrying",
+        0,
+        "Published",
+      ],
+      [
+        "Imereti",
+        2024,
+        "Total regional GDP",
+        1000000000,
+        "Published",
+      ],
+      [
+        "Imereti",
+        2024,
+        "Agriculture, forestry and fishing",
+        250000000,
+        "Published",
+      ],
+      [
+        "Imereti",
+        2024,
+        "Mining and quarrying",
+        0,
+        "Published",
+      ],
+    ],
+  },
+  "filename": "fiscal-regional-economy-imereti-nominal-2023-2024-en.xlsx",
+  "locale": "en",
+  "readable": {
+    "amountDecimals": 2,
+    "rows": [
+      {
+        "basisByYear": {
+          "2023": "published",
+          "2024": "published",
+        },
+        "change": null,
+        "kind": "total",
+        "label": "Total regional GDP",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2023": 1,
+          "2024": 1,
+        },
+      },
+      {
+        "basisByYear": {
+          "2023": "published",
+          "2024": "published",
+        },
+        "change": null,
+        "kind": "item",
+        "label": "Agriculture, forestry and fishing",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2023": 0.25,
+          "2024": 0.25,
+        },
+      },
+      {
+        "basisByYear": {
+          "2023": "published",
+          "2024": "published",
+        },
+        "change": null,
+        "kind": "item",
+        "label": "Mining and quarrying",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2023": 0,
+          "2024": 0,
+        },
+      },
+    ],
+    "showChangeColumn": false,
+    "subtitle": "2023–2024 · GEL bn",
+    "title": "Imereti regional economy — Nominal value in GEL",
+    "unitLabel": "GEL bn",
+    "years": [
+      2023,
+      2024,
+    ],
+  },
+  "sheetNames": [
+    "Summary",
+    "Data",
+    "Sources",
+  ],
+  "sources": [
+    {
+      "absoluteUrl": "https://fiscal.ge/downloads/methodology/totals.xlsx",
+      "downloadHref": "/downloads/methodology/totals.xlsx",
+      "organization": "Geostat",
+      "retrievedAt": "2026-09-10",
+      "title": "Totals",
+      "years": [
+        2023,
+        2024,
+      ],
+    },
+    {
+      "absoluteUrl": "https://fiscal.ge/downloads/methodology/activities.xlsx",
+      "downloadHref": "/downloads/methodology/activities.xlsx",
+      "organization": "Geostat",
+      "retrievedAt": "2026-09-10",
+      "title": "Activities",
+      "years": [
+        2023,
+        2024,
+      ],
+    },
+  ],
+}
+`;
+
+exports[`builds a stable model for a fixed input > share_of_region_gdp 1`] = `
+{
+  "analysis": {
+    "headers": [
+      "Region",
+      "Year",
+      "Economic activity",
+      "Amount (GEL)",
+      "Share of regional GDP (%)",
+      "Status",
+    ],
+    "numericFormats": {
+      "4": "#,##0.00",
+      "5": "0.0%",
+    },
+    "rows": [
+      [
+        "Imereti",
+        2023,
+        "Total regional GDP",
+        1000000000,
+        1,
+        "Published",
+      ],
+      [
+        "Imereti",
+        2023,
+        "Agriculture, forestry and fishing",
+        250000000,
+        0.25,
+        "Published",
+      ],
+      [
+        "Imereti",
+        2023,
+        "Mining and quarrying",
+        0,
+        0,
+        "Published",
+      ],
+      [
+        "Imereti",
+        2024,
+        "Total regional GDP",
+        1000000000,
+        1,
+        "Published",
+      ],
+      [
+        "Imereti",
+        2024,
+        "Agriculture, forestry and fishing",
+        250000000,
+        0.25,
+        "Published",
+      ],
+      [
+        "Imereti",
+        2024,
+        "Mining and quarrying",
+        0,
+        0,
+        "Published",
+      ],
+    ],
+  },
+  "filename": "fiscal-regional-economy-imereti-share_of_region_gdp-2023-2024-en.xlsx",
+  "locale": "en",
+  "readable": {
+    "amountDecimals": 2,
+    "rows": [
+      {
+        "basisByYear": {
+          "2023": "published",
+          "2024": "published",
+        },
+        "change": null,
+        "kind": "total",
+        "label": "Total regional GDP",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2023": 1,
+          "2024": 1,
+        },
+      },
+      {
+        "basisByYear": {
+          "2023": "published",
+          "2024": "published",
+        },
+        "change": null,
+        "kind": "item",
+        "label": "Agriculture, forestry and fishing",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2023": 0.25,
+          "2024": 0.25,
+        },
+      },
+      {
+        "basisByYear": {
+          "2023": "published",
+          "2024": "published",
+        },
+        "change": null,
+        "kind": "item",
+        "label": "Mining and quarrying",
+        "parentLabel": null,
+        "valuesByYear": {
+          "2023": 0,
+          "2024": 0,
+        },
+      },
+    ],
+    "showChangeColumn": false,
+    "subtitle": "2023–2024 · Share (%)",
+    "title": "Imereti regional economy — Share of regional GDP",
+    "unitLabel": "Share (%)",
+    "years": [
+      2023,
+      2024,
+    ],
+  },
+  "sheetNames": [
+    "Summary",
+    "Data",
+    "Sources",
+  ],
+  "sources": [
+    {
+      "absoluteUrl": "https://fiscal.ge/downloads/methodology/totals.xlsx",
+      "downloadHref": "/downloads/methodology/totals.xlsx",
+      "organization": "Geostat",
+      "retrievedAt": "2026-09-10",
+      "title": "Totals",
+      "years": [
+        2023,
+        2024,
+      ],
+    },
+    {
+      "absoluteUrl": "https://fiscal.ge/downloads/methodology/activities.xlsx",
+      "downloadHref": "/downloads/methodology/activities.xlsx",
+      "organization": "Geostat",
+      "retrievedAt": "2026-09-10",
+      "title": "Activities",
+      "years": [
+        2023,
+        2024,
+      ],
+    },
+  ],
+}
+`;
