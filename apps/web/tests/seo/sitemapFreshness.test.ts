@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it } from "vitest";
 import sitemap from "../../lib/seo/sitemap";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { loadServedGdpOverviewData } from "../../lib/data/gdpOverview/importGdpOverview";
+import { loadServedEconomicSectorsData } from "../../lib/data/economicSectors/importEconomicSectors";
 import {
   aggregateFactsForEntity,
   applyAdjaraBudgetAdjustment,
@@ -120,5 +122,22 @@ describe("sitemap lastmod reports each entity's own reviewed date", () => {
     for (const path of ["/explorer/expenditure", "/explorer/revenue", "/explorer/analysis"]) {
       expect(dates.get(`${SITE}${path}`)).toBe(siteWide);
     }
+  });
+
+  it("dates the economy pages from their own facts, not the budget documents", async () => {
+    const [dates, { facts: gdpFacts }, { facts: sectorFacts }] = await Promise.all([
+      sitemapDates(),
+      loadServedGdpOverviewData(),
+      loadServedEconomicSectorsData(),
+    ]);
+    const latest = (facts: readonly { lastReviewedAt: string }[]) =>
+      facts.map((fact) => fact.lastReviewedAt).sort().at(-1);
+    const gdp = latest(gdpFacts);
+    const sectors = latest(sectorFacts);
+
+    expect(dates.get(`${SITE}/explorer/economy/gdp`)).toBe(gdp);
+    expect(dates.get(`${SITE}/explorer/economy/sectors`)).toBe(sectors);
+    // The hub shows both, so it moves when either refreshes.
+    expect(dates.get(`${SITE}/explorer/economy`)).toBe([gdp!, sectors!].sort().at(-1));
   });
 });
