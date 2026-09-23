@@ -4,9 +4,10 @@ import { message } from "../i18n/messages";
 import { buildGdpOverviewModel, type GdpState } from "./gdpOverview";
 import {
   SHEET_NAMES,
-  absoluteWorkbookSourceUrl,
   type WorkbookExportModel,
   type WorkbookPublicSource,
+  withAbsoluteUrls,
+  workbookFilename,
 } from "./workbookModel";
 
 export function gdpDisplay(state: GdpState, presentation: Presentation) {
@@ -51,7 +52,10 @@ export function buildGdpWorkbookExportModel(
     .filter((s) => s.years.length);
   return {
     locale: presentation.locale,
-    filename: `fiscal-gdp-${state.indicator}-${state.indicator === "real" ? "usd" : state.indicator === "growth" ? "percent" : state.currency}-${m.range.start}-${m.range.end}-${presentation.locale}.xlsx`,
+    filename: workbookFilename(
+      `gdp-${state.indicator}-${state.indicator === "real" ? "usd" : state.indicator === "growth" ? "percent" : state.currency}-${m.range.start}-${m.range.end}`,
+      presentation.locale,
+    ),
     sheetNames: SHEET_NAMES[presentation.locale],
     readable: {
       title: d.label,
@@ -82,9 +86,6 @@ export function buildGdpWorkbookExportModel(
       rows: m.points.map((p) => [p.year, p.value, t(p.status)]),
       numericFormats: { 2: d.growth ? "0.0%" : "#,##0.00" },
     },
-    sources: activeSources.map((s) => ({
-      ...s,
-      absoluteUrl: absoluteWorkbookSourceUrl(siteOrigin, s.downloadHref),
-    })),
+    sources: withAbsoluteUrls(activeSources, siteOrigin),
   };
 }

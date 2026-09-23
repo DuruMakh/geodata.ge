@@ -1,4 +1,4 @@
-import { makePeriod, periodKey, periodMonth, periodYear } from "../data/inflation/periods";
+import { periodKey, periodMonth, periodYear } from "../data/inflation/periods";
 import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import {
@@ -11,13 +11,18 @@ import {
 } from "./inflationCategories";
 import { categoryLabel } from "./inflationCategoryLabels";
 import { MONTH_NUMBERS, periodLabel } from "./inflationLabels";
-import type { InflationWorkbookSource } from "./inflationWorkbook";
+import {
+  calendarYearsOf,
+  monthlyReadableRows,
+  monthlyWorkbookSources,
+  pickLocaleEditions,
+  type InflationWorkbookSource,
+} from "./inflationWorkbook";
 import {
   SHEET_NAMES,
-  absoluteWorkbookSourceUrl,
-  type WorkbookBasis,
   type WorkbookExportModel,
   type WorkbookReadableRow,
+  workbookFilename,
 } from "./workbookModel";
 
 const WEIGHTS_SOURCE_ID = "source.geostat_basket_weights";
@@ -63,25 +68,11 @@ export function buildInflationCategoryWorkbookExportModel(input: {
       })();
 
   const label = (id: string) => (id === RESIDUAL_ID ? t("categoryResidual") : categoryLabel(messages, id));
-  const firstYear = periodYear(range.start);
-  const lastYear = periodYear(range.end);
-  const calendarYears = Array.from({ length: lastYear - firstYear + 1 }, (_, offset) => firstYear + offset);
+  const calendarYears = calendarYearsOf(range);
 
   const rows: WorkbookReadableRow[] = series.entries.flatMap((entry) => {
     const byPeriod = new Map(series.periods.map((period, position) => [period, entry.values[position] ?? null]));
-    return [...calendarYears].reverse().flatMap((year) => {
-      const valuesByYear: Record<number, number | null> = {};
-      const basisByYear: Record<number, WorkbookBasis | null> = {};
-      for (const month of MONTH_NUMBERS) {
-        const value = byPeriod.get(makePeriod(year, month)) ?? null;
-        valuesByYear[month] = value === null ? null : scale(value);
-        basisByYear[month] = value === null ? null : "published";
-      }
-      if (MONTH_NUMBERS.every((month) => valuesByYear[month] === null)) return [];
-      return [
-        { kind: "item" as const, parentLabel: label(entry.id), label: String(year), valuesByYear, basisByYear, change: null },
-      ];
-    });
+    return monthlyReadableRows(label(entry.id), byPeriod, calendarYears, scale);
   });
 
   const unit = contribution ? t("pp") : "%";
@@ -120,17 +111,13 @@ export function buildInflationCategoryWorkbookExportModel(input: {
   }
   if (contribution) usedSourceIds.add(WEIGHTS_SOURCE_ID);
 
-  const chosen = [...usedSourceIds].flatMap((id) => {
-    const candidates = sources.filter((row) => row.sourceId === id);
-    const row = candidates.find((entry) => entry.language === locale) ?? candidates.find((entry) => entry.language === "en");
-    return row ? [row] : [];
-  });
+  const chosen = pickLocaleEditions(sources, usedSourceIds, locale);
 
   const subtitle = `${periodLabel(messages, range.start, "long")} – ${periodLabel(messages, range.end, "long")} · ${t(`categoryWorkbookUnit.${state.tab}`)}`;
 
   return {
     locale,
-    filename: `fiscal-inflation-categories-${state.tab}-${periodKey(range.start)}-${periodKey(range.end)}${locale === "en" ? "-en" : ""}.xlsx`,
+    filename: workbookFilename(`inflation-categories-${state.tab}-${periodKey(range.start)}-${periodKey(range.end)}`, locale),
     sheetNames: SHEET_NAMES[locale],
     readable: {
       title: t(`categoryTab.${state.tab}`),
@@ -163,13 +150,7 @@ export function buildInflationCategoryWorkbookExportModel(input: {
       // format — a literal "%" suffix would render a 33.6% share as 0.3%.
       numericFormats: { 6: "0.0%", 7: contribution ? "0.00" : "0.00%" },
     },
-    sources: chosen
-      .map((row) => ({
-        ...row,
-        years: row.years.filter((year) => calendarYears.includes(year)),
-        absoluteUrl: absoluteWorkbookSourceUrl(siteOrigin, row.downloadHref),
-      }))
-      .filter((row) => row.years.length > 0),
+    sources: monthlyWorkbookSources(chosen, calendarYears, siteOrigin),
     sourceYears: calendarYears,
   };
 }
