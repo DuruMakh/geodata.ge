@@ -9,6 +9,7 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { SeriesAside } from "../explorer-shell/series-aside";
 
 // A thin composition of the shared selector, as DebtSeriesPanel is. The target
 // is a reference row with a dashed swatch; values follow the active tab and range.
@@ -30,10 +31,7 @@ export function InflationSeriesPanel({ index, targets, state, range, onToggle, o
   const visible = rows.filter((row) => matchesLabelQuery(query, [row.label, row.key]));
 
   return (
-    <aside
-      aria-label={message(messages, "controls.series")}
-      className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
-    >
+    <SeriesAside label={message(messages, "controls.series")}>
       <SeriesSelector
         query={query}
         onQueryChange={setQuery}
@@ -60,6 +58,6 @@ export function InflationSeriesPanel({ index, targets, state, range, onToggle, o
         ))}
       </SeriesSelector>
       {downloadAction}
-    </aside>
+    </SeriesAside>
   );
 }

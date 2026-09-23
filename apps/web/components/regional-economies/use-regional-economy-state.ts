@@ -11,6 +11,7 @@ import {
   type RegionalEconomyState,
 } from "../../lib/explorer/regionalEconomies";
 import type { ClientRegionalEconomyObservation } from "../../lib/servedRows";
+import { useAppReady } from "../explorer-shell/use-app-ready";
 
 export function useRegionalEconomyState(
   facts: ClientRegionalEconomyObservation[],
@@ -29,15 +30,14 @@ export function useRegionalEconomyState(
       setState(next);
     }
     restore();
-    document.body.dataset.appReady = "true";
     window.addEventListener("popstate", restore);
     window.addEventListener("hashchange", restore);
     return () => {
-      delete document.body.dataset.appReady;
       window.removeEventListener("popstate", restore);
       window.removeEventListener("hashchange", restore);
     };
   }, [facts, registry]);
+  useAppReady();
   const update = useCallback((change: (previous: RegionalEconomyState) => RegionalEconomyState) => {
     const next = change(current.current);
     current.current = next;

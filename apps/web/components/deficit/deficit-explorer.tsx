@@ -22,6 +22,12 @@ import { RangeStrip } from "../main-explorer/range-strip";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { PageHeader } from "../shell/page-header";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { SeriesAside } from "../explorer-shell/series-aside";
+import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { ExplorerPage } from "../explorer-shell/explorer-page";
+import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { useAppReady } from "../explorer-shell/use-app-ready";
+import { MeasurePill } from "../explorer-shell/measure-pill";
 
 type DeficitExplorerProps = {
   facts: ClientGeneralGovernmentBalanceFact[];
@@ -123,182 +129,157 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
     }
   }, [hash]);
 
-  useEffect(() => {
-    document.body.dataset.appReady = "true";
-    return () => {
-      delete document.body.dataset.appReady;
-    };
-  }, []);
+  useAppReady();
 
   return (
-    <main
-      data-testid="deficit-explorer"
-      className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"
-    >
-      <div className="@container mx-auto max-w-[1180px]">
-        <PageHeader
-          crumbs={[
-            { label: message(messages, "common.home"), href: pageHref("/", locale) },
-            { label: message(messages, "common.data") },
-            { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
-            { label: message(messages, "common.deficit") },
-          ]}
-          coverage={coverage}
-        />
-        <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-          {message(messages, "deficit.heading")}
-        </h1>
-        <p data-testid="deficit-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
-          <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
-            {latestActual?.year}: {label} · {headlineValue}
-          </span>
-          <span>{message(messages, "deficit.negative")}</span>
-        </p>
+    <ExplorerPage testId="deficit-explorer" repeatDesktopBottomPadding>
+      <PageHeader
+        crumbs={[
+          { label: message(messages, "common.home"), href: pageHref("/", locale) },
+          { label: message(messages, "common.data") },
+          { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+          { label: message(messages, "common.deficit") },
+        ]}
+        coverage={coverage}
+      />
+      <ExplorerHeading>{message(messages, "deficit.heading")}</ExplorerHeading>
+      <p data-testid="deficit-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
+        <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
+          {latestActual?.year}: {label} · {headlineValue}
+        </span>
+        <span>{message(messages, "deficit.negative")}</span>
+      </p>
 
-        <div data-testid="explorer-workspace" className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">
-          <div className="flex min-w-0 flex-col">
-            <section
-              data-testid="chart-panel"
-              data-mode={chartMode}
-              data-measure={percentage ? "percent" : "amount"}
-              className="border-t border-[var(--ink)] pt-4"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <SegmentedTabs<ChartMode>
-                  ariaLabel={message(messages, "controls.viewMode")}
-                  value={chartMode}
-                  onChange={setChartMode}
-                  options={[
-                    { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
-                    { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                  ]}
-                />
-                <div className="flex items-center gap-3.5">
-                  <span data-testid="deficit-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                    {percentage ? message(messages, "main.percentGdp") : message(messages, "format.bnGel")}
-                  </span>
-                  <button
-                    type="button"
-                    data-testid="measure-share-toggle"
-                    aria-pressed={percentage}
-                    onClick={() => setPercentage((current) => !current)}
-                    className={`h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 ${percentage
-                      ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]"
-                      : "border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]"}`}
-                  >
-                    {message(messages, "main.percentGdp")}
-                  </button>
-                </div>
-              </div>
-
-              {!selected ? (
-                <div className="mt-5">
-                  <Callout testId="no-selection-callout">
-                    {message(messages, "main.noSelection")}
-                  </Callout>
-                </div>
-              ) : chartMode === "table" ? (
-                <ExplorerTable
-                  caption={message(messages, "deficit.caption", { start: range.start, end: range.end })}
-                  rows={[model.tableRow]}
-                  totalRow={null}
-                  showTotal={false}
-                  years={model.years}
-                  firstColumnLabel={message(messages, "controls.seriesColumn")}
-                  unit={unit}
-                  share={percentage}
-                  showChangeColumn={false}
-                  forecastYears={forecastYears}
-                  forecastLabel={message(messages, "deficit.forecast")}
-                  shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
-                />
-              ) : (
-                <div className="mt-5">
-                  <EditorialLineChart
-                    years={model.years}
-                    series={chartSeries}
-                    share={percentage}
-                    unit={unit}
-                    shareLabel={message(messages, "main.shareGdp")}
-                  />
-                </div>
-              )}
-
-              <RangeStrip
-                years={years}
-                range={range}
-                onChange={(patch) => setRange((current) => ({
-                  ...current,
-                  start: patch.start ?? current.start,
-                  end: patch.end ?? current.end,
-                }))}
-                marker={forecastBoundaryYear === null
-                  ? undefined
-                  : { year: forecastBoundaryYear, label: message(messages, "deficit.forecast") }}
-              />
-              <p data-testid="deficit-forecast-note" className="mt-3 max-w-[680px] text-xs leading-relaxed text-[var(--muted)]">
-                {message(messages, "deficit.forecastNote", {
-                  projectionFirst: projectionYears[0] ?? "",
-                  projectionLast: projectionYears.at(-1) ?? "",
-                  actualFirst: actualYears[0] ?? "",
-                  actualLast: actualYears.at(-1) ?? "",
-                })}
-              </p>
-            </section>
-
-            <div className="mt-[18px]">
-              <SourceNote testId="source-label">
-                {message(messages, "deficit.source", { edition })}
-                {" "}{message(messages, "deficit.definition")}
-                {lastUpdatedAt ? (
-                  <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} /></>
-                ) : null}
-              </SourceNote>
-            </div>
-          </div>
-
-          <aside
-            aria-label={message(messages, "controls.series")}
-            className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
+      <ExplorerWorkspace>
+        <div className="flex min-w-0 flex-col">
+          <section
+            data-testid="chart-panel"
+            data-mode={chartMode}
+            data-measure={percentage ? "percent" : "amount"}
+            className="border-t border-[var(--ink)] pt-4"
           >
-            <SeriesSelector
-              query={query}
-              onQueryChange={setQuery}
-              searchPlaceholder={message(messages, "controls.searchSeries")}
-              selectedCount={selected ? 1 : 0}
-              totalCount={1}
-              hasSelection={selected}
-              allSelected={selected}
-              onToggleAll={() => setSelected(false)}
-              allowSelectAll={false}
-              hasVisibleMatches={queryMatches}
-            >
-              {queryMatches ? (
-                <SeriesSelectorRow
-                  id={DEFICIT_ITEM.id}
-                  label={label}
-                  color={DEFICIT_ITEM.color}
-                  value={headlineValue}
-                  selected={selected}
-                  level="total"
-                  onToggle={() => setSelected((current) => !current)}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <SegmentedTabs<ChartMode>
+                ariaLabel={message(messages, "controls.viewMode")}
+                value={chartMode}
+                onChange={setChartMode}
+                options={[
+                  { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
+                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
+                ]}
+              />
+              <div className="flex items-center gap-3.5">
+                <span data-testid="deficit-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+                  {percentage ? message(messages, "main.percentGdp") : message(messages, "format.bnGel")}
+                </span>
+                <MeasurePill label={message(messages, "main.percentGdp")} pressed={percentage} onChange={setPercentage} />
+              </div>
+            </div>
+
+            {!selected ? (
+              <div className="mt-5">
+                <Callout testId="no-selection-callout">
+                  {message(messages, "main.noSelection")}
+                </Callout>
+              </div>
+            ) : chartMode === "table" ? (
+              <ExplorerTable
+                caption={message(messages, "deficit.caption", { start: range.start, end: range.end })}
+                rows={[model.tableRow]}
+                totalRow={null}
+                showTotal={false}
+                years={model.years}
+                firstColumnLabel={message(messages, "controls.seriesColumn")}
+                unit={unit}
+                share={percentage}
+                showChangeColumn={false}
+                forecastYears={forecastYears}
+                forecastLabel={message(messages, "deficit.forecast")}
+                shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
+              />
+            ) : (
+              <div className="mt-5">
+                <EditorialLineChart
+                  years={model.years}
+                  series={chartSeries}
+                  share={percentage}
+                  unit={unit}
+                  shareLabel={message(messages, "main.shareGdp")}
                 />
-              ) : null}
-            </SeriesSelector>
-            <ExcelDownloadButton
-              testId="deficit-excel"
-              disabled={!selected}
-              onDownload={() => downloadWorkbook(buildDeficitWorkbookExportModel({
-                facts,
-                range,
-                percentage,
-                sources: workbookSources,
-                siteOrigin: siteOrigin ?? window.location.origin,
-              }, presentation))}
+              </div>
+            )}
+
+            <RangeStrip
+              years={years}
+              range={range}
+              onChange={(patch) => setRange((current) => ({
+                ...current,
+                start: patch.start ?? current.start,
+                end: patch.end ?? current.end,
+              }))}
+              marker={forecastBoundaryYear === null
+                ? undefined
+                : { year: forecastBoundaryYear, label: message(messages, "deficit.forecast") }}
             />
-          </aside>
+            <p data-testid="deficit-forecast-note" className="mt-3 max-w-[680px] text-xs leading-relaxed text-[var(--muted)]">
+              {message(messages, "deficit.forecastNote", {
+                projectionFirst: projectionYears[0] ?? "",
+                projectionLast: projectionYears.at(-1) ?? "",
+                actualFirst: actualYears[0] ?? "",
+                actualLast: actualYears.at(-1) ?? "",
+              })}
+            </p>
+          </section>
+
+          <div className="mt-[18px]">
+            <SourceNote testId="source-label">
+              {message(messages, "deficit.source", { edition })}
+              {" "}{message(messages, "deficit.definition")}
+              {lastUpdatedAt ? (
+                <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} /></>
+              ) : null}
+            </SourceNote>
+          </div>
         </div>
-      </div>
-    </main>
+
+        <SeriesAside label={message(messages, "controls.series")}>
+          <SeriesSelector
+            query={query}
+            onQueryChange={setQuery}
+            searchPlaceholder={message(messages, "controls.searchSeries")}
+            selectedCount={selected ? 1 : 0}
+            totalCount={1}
+            hasSelection={selected}
+            allSelected={selected}
+            onToggleAll={() => setSelected(false)}
+            allowSelectAll={false}
+            hasVisibleMatches={queryMatches}
+          >
+            {queryMatches ? (
+              <SeriesSelectorRow
+                id={DEFICIT_ITEM.id}
+                label={label}
+                color={DEFICIT_ITEM.color}
+                value={headlineValue}
+                selected={selected}
+                level="total"
+                onToggle={() => setSelected((current) => !current)}
+              />
+            ) : null}
+          </SeriesSelector>
+          <ExcelDownloadButton
+            testId="deficit-excel"
+            disabled={!selected}
+            onDownload={() => downloadWorkbook(buildDeficitWorkbookExportModel({
+              facts,
+              range,
+              percentage,
+              sources: workbookSources,
+              siteOrigin: siteOrigin ?? window.location.origin,
+            }, presentation))}
+          />
+        </SeriesAside>
+      </ExplorerWorkspace>
+    </ExplorerPage>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import type { Presentation } from "../../lib/i18n/types";
@@ -18,6 +18,9 @@ import { buildExplorerModel, isDerivedTotalItemId, type ExplorerModel } from "..
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 import { formatAmount, formatDisplayDate, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
+import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { ExplorerPage } from "../explorer-shell/explorer-page";
+import { useAppReady } from "../explorer-shell/use-app-ready";
 import type { ExplorerNav, ExplorerScope } from "../../lib/explorer/types";
 import {
   buildWorkbookExportModel,
@@ -57,13 +60,7 @@ export function MainExplorer(props: MainExplorerProps) {
 
 function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
   const { locale, messages } = presentation;
-  useEffect(() => {
-    document.body.dataset.appReady = "true";
-
-    return () => {
-      delete document.body.dataset.appReady;
-    };
-  }, []);
+  useAppReady();
 
   const glossary = useMemo(() => new Map(glossaryEntries.map((entry) => [entry.id, entry])), [glossaryEntries]);
   const adminCategoryMap = useMemo(() => new Map(adminCategories.map((category) => [category.id, category])), [adminCategories]);
@@ -280,87 +277,80 @@ function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminC
   }
 
   return (
-    <main
-      data-testid="explorer-shell"
-      className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"
-    >
-      {/* The workspace measures THIS column, not the viewport (DESIGN.md §12):
-          the shell sidebar takes 232px off the viewport, so a viewport query
-          would keep the two-column layout past the width the chart can fit. */}
-      <div className="@container mx-auto max-w-[1180px]">
-        <PageHeader
-          crumbs={[
-            { label: message(messages, "common.home"), href: "/" },
-            { label: message(messages, "common.data") },
-            { label: message(messages, "common.budget"), href: "/explorer" },
-            { label: sectionLabel },
-          ]}
-          coverage={coverage}
-        />
+    <ExplorerPage testId="explorer-shell" repeatDesktopBottomPadding>
+    {/* The workspace measures THIS column, not the viewport (DESIGN.md §12):
+        the shell sidebar takes 232px off the viewport, so a viewport query
+        would keep the two-column layout past the width the chart can fit. */}
+      <PageHeader
+        crumbs={[
+          { label: message(messages, "common.home"), href: "/" },
+          { label: message(messages, "common.data") },
+          { label: message(messages, "common.budget"), href: "/explorer" },
+          { label: sectionLabel },
+        ]}
+        coverage={coverage}
+      />
 
-        <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-          {screenTitle}
-        </h1>
+      <ExplorerHeading>{screenTitle}</ExplorerHeading>
 
-        <p className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
-          <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">{deck.lead}</span>
-          {deck.yoy !== null ? (
-            <>
-              <span
-                className="font-[family-name:var(--font-numeric)] text-[13px]"
-                style={{ color: deck.yoy < 0 ? NEGATIVE : POSITIVE }}
-              >
-                {formatShare(deck.yoy, true)}
-              </span>
-              <span>{message(messages, "main.previousYear")}</span>
-            </>
-          ) : null}
-        </p>
-
-        {analysisModel ? (
-          <AnalysisView
-            model={analysisModel}
-            years={analysisYears}
-            plannedYears={analysisPlannedYears}
-            side={analysisSide}
-            grouping={analysisGrouping}
-            year={analysisYear}
-            lastUpdatedAt={lastUpdatedAt}
-            onSideChange={setAnalysisSide}
-            onGroupingChange={setAnalysisGrouping}
-            onYearChange={setAnalysisYear}
-          />
-        ) : model ? (
-          <ExplorerView
-            model={model}
-            scope={scope}
-            unit={unit}
-            showGrouping={nav === "expenditure"}
-            grouping={grouping}
-            chartMode={chartMode}
-            share={share}
-            range={range}
-            scopeYears={scopeYears}
-            selectedIds={selectedIds}
-            expandedMinistries={expandedMinistries}
-            lastUpdatedAt={lastUpdatedAt}
-            onGroupingChange={handleGroupingChange}
-            onChartModeChange={handleChartModeChange}
-            onShareChange={setShare}
-            onRangeChange={(patch) => setRange(scope, patch)}
-            onSelectionChange={setSelectedSeries}
-            onToggleSeries={toggleSeries}
-            onToggleExpanded={toggleMinistryExpanded}
-            downloadAction={
-              <ExcelDownloadButton
-                testId="series-excel"
-                disabled={model.tableRows.length === 0}
-                onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildWorkbookInput(model)))}
-              />
-            }
-          />
+      <p className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
+        <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">{deck.lead}</span>
+        {deck.yoy !== null ? (
+          <>
+            <span
+              className="font-[family-name:var(--font-numeric)] text-[13px]"
+              style={{ color: deck.yoy < 0 ? NEGATIVE : POSITIVE }}
+            >
+              {formatShare(deck.yoy, true)}
+            </span>
+            <span>{message(messages, "main.previousYear")}</span>
+          </>
         ) : null}
-      </div>
-    </main>
+      </p>
+
+      {analysisModel ? (
+        <AnalysisView
+          model={analysisModel}
+          years={analysisYears}
+          plannedYears={analysisPlannedYears}
+          side={analysisSide}
+          grouping={analysisGrouping}
+          year={analysisYear}
+          lastUpdatedAt={lastUpdatedAt}
+          onSideChange={setAnalysisSide}
+          onGroupingChange={setAnalysisGrouping}
+          onYearChange={setAnalysisYear}
+        />
+      ) : model ? (
+        <ExplorerView
+          model={model}
+          scope={scope}
+          unit={unit}
+          showGrouping={nav === "expenditure"}
+          grouping={grouping}
+          chartMode={chartMode}
+          share={share}
+          range={range}
+          scopeYears={scopeYears}
+          selectedIds={selectedIds}
+          expandedMinistries={expandedMinistries}
+          lastUpdatedAt={lastUpdatedAt}
+          onGroupingChange={handleGroupingChange}
+          onChartModeChange={handleChartModeChange}
+          onShareChange={setShare}
+          onRangeChange={(patch) => setRange(scope, patch)}
+          onSelectionChange={setSelectedSeries}
+          onToggleSeries={toggleSeries}
+          onToggleExpanded={toggleMinistryExpanded}
+          downloadAction={
+            <ExcelDownloadButton
+              testId="series-excel"
+              disabled={model.tableRows.length === 0}
+              onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildWorkbookInput(model)))}
+            />
+          }
+        />
+      ) : null}
+    </ExplorerPage>
   );
 }

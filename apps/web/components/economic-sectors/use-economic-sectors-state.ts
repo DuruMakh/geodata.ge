@@ -9,6 +9,7 @@ import {
   serializeSectorHash,
   type SectorState,
 } from "../../lib/explorer/economicSectors";
+import { useAppReady } from "../explorer-shell/use-app-ready";
 
 export function useEconomicSectorsState(
   facts: ClientSectorObservation[],
@@ -27,15 +28,14 @@ export function useEconomicSectorsState(
       setState(next);
     }
     restore();
-    document.body.dataset.appReady = "true";
     window.addEventListener("popstate", restore);
     window.addEventListener("hashchange", restore);
     return () => {
-      delete document.body.dataset.appReady;
       window.removeEventListener("popstate", restore);
       window.removeEventListener("hashchange", restore);
     };
   }, [facts, registry]);
+  useAppReady();
   const update = useCallback(
     (change: (previous: SectorState) => SectorState, historyMode: "push" | "replace" = "replace") => {
       const next = change(current.current);

@@ -44,6 +44,10 @@ import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
 import { InflationCategoryIndicators } from "./inflation-category-indicators";
 import { InflationCategoryPanel } from "./inflation-category-panel";
 import { InflationCategoryTable } from "./inflation-category-table";
+import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { ExplorerPage } from "../explorer-shell/explorer-page";
+import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { useAppReady } from "../explorer-shell/use-app-ready";
 
 // Inflation categories (spec §6): the overview's layout, with a stacked column
 // chart on the contribution tab where the parts visibly re-add to the published
@@ -78,11 +82,8 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setState(changeCategoryTab(parsed, parsed.tab, index));
     setReady(true);
-    document.body.dataset.appReady = "true";
-    return () => {
-      delete document.body.dataset.appReady;
-    };
   }, [index]);
+  useAppReady();
 
   const serializedHash = serializeCategoryHash(state);
   const hashApplied = useRef(false);
@@ -140,192 +141,182 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
   }));
 
   return (
-    <main
-      data-testid="inflation-categories"
-      className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"
-    >
-      <div className="@container mx-auto max-w-[1180px]">
-        <PageHeader
-          crumbs={[
-            { label: message(messages, "common.home"), href: pageHref("/", locale) },
-            { label: message(messages, "common.data") },
-            { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
-            { label: t("categoriesHeading") },
-          ]}
-          coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
-        />
-        <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-          {t("categoriesHeading")}
-        </h1>
-        <p data-testid="inflation-category-unit" className="mb-4 text-[13px] text-[var(--muted)]">
-          {unitLine}
-        </p>
+    <ExplorerPage testId="inflation-categories">
+      <PageHeader
+        crumbs={[
+          { label: message(messages, "common.home"), href: pageHref("/", locale) },
+          { label: message(messages, "common.data") },
+          { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
+          { label: t("categoriesHeading") },
+        ]}
+        coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+      />
+      <ExplorerHeading>{t("categoriesHeading")}</ExplorerHeading>
+      <p data-testid="inflation-category-unit" className="mb-4 text-[13px] text-[var(--muted)]">
+        {unitLine}
+      </p>
 
-        <div
-          data-testid="inflation-category-tabs"
-          role="group"
-          aria-label={t("tabs")}
-          className="mb-3 overflow-x-auto py-2"
-          onFocusCapture={(event) => event.target.scrollIntoView({ block: "nearest", inline: "nearest" })}
-        >
-          <div className="mx-auto flex w-max gap-7 px-1">
-            {CATEGORY_TABS.map((tab) => (
-              <TextTab
-                key={tab}
-                testId={`inflation-category-tab-${tab}`}
-                label={t(`categoryTab.${tab}`)}
-                active={state.tab === tab}
-                onClick={() => selectTab(tab)}
-              />
-            ))}
-          </div>
+      <div
+        data-testid="inflation-category-tabs"
+        role="group"
+        aria-label={t("tabs")}
+        className="mb-3 overflow-x-auto py-2"
+        onFocusCapture={(event) => event.target.scrollIntoView({ block: "nearest", inline: "nearest" })}
+      >
+        <div className="mx-auto flex w-max gap-7 px-1">
+          {CATEGORY_TABS.map((tab) => (
+            <TextTab
+              key={tab}
+              testId={`inflation-category-tab-${tab}`}
+              label={t(`categoryTab.${tab}`)}
+              active={state.tab === tab}
+              onClick={() => selectTab(tab)}
+            />
+          ))}
         </div>
-        <p role="status" className="sr-only">
-          {announcement}
-        </p>
-
-        <div
-          data-testid="explorer-workspace"
-          className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10"
-        >
-          <div className="flex min-w-0 flex-col">
-            <section
-              data-testid="chart-panel"
-              data-mode={state.mode}
-              data-tab={state.tab}
-              className="border-t border-[var(--ink)] pt-3"
-            >
-              <SegmentedTabs<CategoryState["mode"]>
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={state.mode}
-                onChange={(mode) => setState((current) => ({ ...current, mode }))}
-                options={[
-                  {
-                    value: "chart",
-                    label: state.tab === "contrib" ? t("chartMode.columns") : message(messages, "controls.chart"),
-                    testId: "chart-mode-chart",
-                  },
-                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                ]}
-              />
-              {!hasSeries ? (
-                <div className="mt-5">
-                  <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
-                </div>
-              ) : state.mode === "table" ? (
-                <InflationCategoryTable
-                  index={index}
-                  state={state}
-                  range={range}
-                  onTableSeriesChange={(categoryId) => setState((current) => ({ ...current, tableSeries: categoryId }))}
-                />
-              ) : state.tab === "contrib" ? (
-                <div className="mt-5">
-                  <StackedColumnChart
-                    periods={stack.periods}
-                    segments={[
-                      ...stack.segments.map((segment) => ({
-                        id: segment.categoryId,
-                        label: categoryLabel(messages, segment.categoryId),
-                        color: categoryColor(segment.categoryId),
-                        values: segment.values,
-                      })),
-                      {
-                        id: RESIDUAL_ID,
-                        label: t("categoryResidual"),
-                        color: categoryColor(RESIDUAL_ID),
-                        values: stack.residual,
-                      },
-                    ]}
-                    overlay={{ label: t("categoryHeadline"), values: stack.headline }}
-                    formatPeriod={(period) =>
-                      periodMonth(period) === 1 ? String(periodYear(period)) : periodLabel(messages, period, "short")
-                    }
-                    formatValue={(value) => `${formatContribution(value)} ${t("pp")}`}
-                    ariaLabel={t("categoryTab.contrib")}
-                  />
-                </div>
-              ) : (
-                <div className="mt-5">
-                  <EditorialLineChart
-                    years={lines.periods}
-                    series={chartSeries}
-                    share
-                    unit={PCT_UNIT}
-                    shareLabel={t(`categoryTab.${state.tab}`)}
-                    periodsPerYear={12}
-                    formatPeriod={(period, kind) =>
-                      kind === "axis" && periodMonth(period) === 1
-                        ? String(periodYear(period))
-                        : periodLabel(messages, period, kind === "axis" ? "short" : "long")
-                    }
-                  />
-                </div>
-              )}
-              <RangeStrip
-                years={tabPeriods}
-                range={range}
-                periodsPerYear={12}
-                formatPeriod={(period) => periodLabel(messages, period, "short")}
-                onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
-              />
-            </section>
-            <div className="mt-[18px] space-y-2">
-              <SourceNote testId="source-label">
-                {t("categorySource")} {message(messages, "main.lastUpdated", { date: displayDate })}
-              </SourceNote>
-              {state.tab === "contrib" ? (
-                <p data-testid="inflation-derived-note" className="text-xs text-[var(--muted)]">
-                  {t("categoryContributionNote")}
-                </p>
-              ) : null}
-              <Link
-                href={pageHref("/methodology/inflation", locale)}
-                className="text-xs text-[var(--muted)] underline underline-offset-4"
-              >
-                {t("methodology")}
-              </Link>
-            </div>
-          </div>
-
-          <InflationCategoryPanel
-            index={index}
-            state={state}
-            range={range}
-            onToggle={(categoryId) => setState((current) => toggleCategory(current, categoryId, index))}
-            onToggleExpanded={(categoryId) => setState((current) => toggleExpanded(current, categoryId))}
-            onToggleAll={() =>
-              // Clearing 55 rows was a one-way door: the selector hides the bulk
-              // button when nothing is selected, and the hash keeps it empty.
-              setState((current) => ({
-                ...current,
-                selected: current.selected.length > 0 ? [] : DIVISION_IDS.filter((id) => index.order.includes(id)),
-              }))
-            }
-            downloadAction={
-              <ExcelDownloadButton
-                testId="inflation-category-download"
-                disabled={!hasSeries}
-                onDownload={() =>
-                  downloadWorkbook(
-                    buildInflationCategoryWorkbookExportModel({
-                      index,
-                      state,
-                      range,
-                      headline: headlineByPeriod,
-                      presentation,
-                      sources,
-                      siteOrigin,
-                    }),
-                  )
-                }
-              />
-            }
-          />
-        </div>
-
-        <InflationCategoryIndicators index={index} />
       </div>
-    </main>
+      <p role="status" className="sr-only">
+        {announcement}
+      </p>
+
+      <ExplorerWorkspace>
+        <div className="flex min-w-0 flex-col">
+          <section
+            data-testid="chart-panel"
+            data-mode={state.mode}
+            data-tab={state.tab}
+            className="border-t border-[var(--ink)] pt-3"
+          >
+            <SegmentedTabs<CategoryState["mode"]>
+              ariaLabel={message(messages, "controls.viewMode")}
+              value={state.mode}
+              onChange={(mode) => setState((current) => ({ ...current, mode }))}
+              options={[
+                {
+                  value: "chart",
+                  label: state.tab === "contrib" ? t("chartMode.columns") : message(messages, "controls.chart"),
+                  testId: "chart-mode-chart",
+                },
+                { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
+              ]}
+            />
+            {!hasSeries ? (
+              <div className="mt-5">
+                <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
+              </div>
+            ) : state.mode === "table" ? (
+              <InflationCategoryTable
+                index={index}
+                state={state}
+                range={range}
+                onTableSeriesChange={(categoryId) => setState((current) => ({ ...current, tableSeries: categoryId }))}
+              />
+            ) : state.tab === "contrib" ? (
+              <div className="mt-5">
+                <StackedColumnChart
+                  periods={stack.periods}
+                  segments={[
+                    ...stack.segments.map((segment) => ({
+                      id: segment.categoryId,
+                      label: categoryLabel(messages, segment.categoryId),
+                      color: categoryColor(segment.categoryId),
+                      values: segment.values,
+                    })),
+                    {
+                      id: RESIDUAL_ID,
+                      label: t("categoryResidual"),
+                      color: categoryColor(RESIDUAL_ID),
+                      values: stack.residual,
+                    },
+                  ]}
+                  overlay={{ label: t("categoryHeadline"), values: stack.headline }}
+                  formatPeriod={(period) =>
+                    periodMonth(period) === 1 ? String(periodYear(period)) : periodLabel(messages, period, "short")
+                  }
+                  formatValue={(value) => `${formatContribution(value)} ${t("pp")}`}
+                  ariaLabel={t("categoryTab.contrib")}
+                />
+              </div>
+            ) : (
+              <div className="mt-5">
+                <EditorialLineChart
+                  years={lines.periods}
+                  series={chartSeries}
+                  share
+                  unit={PCT_UNIT}
+                  shareLabel={t(`categoryTab.${state.tab}`)}
+                  periodsPerYear={12}
+                  formatPeriod={(period, kind) =>
+                    kind === "axis" && periodMonth(period) === 1
+                      ? String(periodYear(period))
+                      : periodLabel(messages, period, kind === "axis" ? "short" : "long")
+                  }
+                />
+              </div>
+            )}
+            <RangeStrip
+              years={tabPeriods}
+              range={range}
+              periodsPerYear={12}
+              formatPeriod={(period) => periodLabel(messages, period, "short")}
+              onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
+            />
+          </section>
+          <div className="mt-[18px] space-y-2">
+            <SourceNote testId="source-label">
+              {t("categorySource")} {message(messages, "main.lastUpdated", { date: displayDate })}
+            </SourceNote>
+            {state.tab === "contrib" ? (
+              <p data-testid="inflation-derived-note" className="text-xs text-[var(--muted)]">
+                {t("categoryContributionNote")}
+              </p>
+            ) : null}
+            <Link
+              href={pageHref("/methodology/inflation", locale)}
+              className="text-xs text-[var(--muted)] underline underline-offset-4"
+            >
+              {t("methodology")}
+            </Link>
+          </div>
+        </div>
+
+        <InflationCategoryPanel
+          index={index}
+          state={state}
+          range={range}
+          onToggle={(categoryId) => setState((current) => toggleCategory(current, categoryId, index))}
+          onToggleExpanded={(categoryId) => setState((current) => toggleExpanded(current, categoryId))}
+          onToggleAll={() =>
+            // Clearing 55 rows was a one-way door: the selector hides the bulk
+            // button when nothing is selected, and the hash keeps it empty.
+            setState((current) => ({
+              ...current,
+              selected: current.selected.length > 0 ? [] : DIVISION_IDS.filter((id) => index.order.includes(id)),
+            }))
+          }
+          downloadAction={
+            <ExcelDownloadButton
+              testId="inflation-category-download"
+              disabled={!hasSeries}
+              onDownload={() =>
+                downloadWorkbook(
+                  buildInflationCategoryWorkbookExportModel({
+                    index,
+                    state,
+                    range,
+                    headline: headlineByPeriod,
+                    presentation,
+                    sources,
+                    siteOrigin,
+                  }),
+                )
+              }
+            />
+          }
+        />
+      </ExplorerWorkspace>
+
+      <InflationCategoryIndicators index={index} />
+    </ExplorerPage>
   );
 }

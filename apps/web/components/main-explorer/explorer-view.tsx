@@ -15,6 +15,8 @@ import { ExplorerTable } from "./explorer-table";
 import { Indicators } from "./indicators";
 import { RangeStrip } from "./range-strip";
 import { SeriesPanel } from "./series-panel";
+import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { MeasurePill } from "../explorer-shell/measure-pill";
 import type { ResolvedRange } from "./use-explorer-state";
 
 // Multi-year explorer per DESIGN.md §8: mode/grouping tabs and the measure pill over
@@ -117,7 +119,7 @@ export function ExplorerView({
 
   return (
     <>
-      <div data-testid="explorer-workspace" className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">
+      <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
           <section data-testid="chart-panel" data-mode={chartMode} data-measure={share ? "share_of_gdp" : "nominal"} className="border-t border-[var(--ink)] pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -134,19 +136,7 @@ export function ExplorerView({
                 <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
                   {message(messages, share ? "main.percentGdp" : "format.bnGel")}
                 </span>
-                <button
-                  type="button"
-                  data-testid="measure-share-toggle"
-                  aria-pressed={share}
-                  onClick={() => onShareChange(!share)}
-                  className={`h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 ${
-                    share
-                      ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]"
-                      : "border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]"
-                  }`}
-                >
-                  {message(messages, "main.percentGdp")}
-                </button>
+                <MeasurePill label={message(messages, "main.percentGdp")} pressed={share} onChange={onShareChange} />
               </div>
             </div>
 
@@ -212,7 +202,7 @@ export function ExplorerView({
           onToggleExpanded={onToggleExpanded}
           downloadAction={downloadAction}
         />
-      </div>
+      </ExplorerWorkspace>
 
       <Indicators model={model} scope={scope} />
     </>

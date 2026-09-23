@@ -10,6 +10,7 @@ import type { GovernmentDebtExplorerModel } from "../../lib/explorer/debtExplore
 import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
 import type { DebtFamily, DebtSeriesId, ClientGovernmentDebtFact } from "../../lib/servedRows";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { SeriesAside } from "../explorer-shell/series-aside";
 
 type DebtSeriesPanelProps = {
   items: GovernmentDebtExplorerModel["items"];
@@ -88,10 +89,7 @@ export function DebtSeriesPanel({
   const familyIds = items.filter((item) => item.family === family).map((item) => item.id);
   const allFamilySelected = familyIds.every((id) => selectedIds.includes(id));
   return (
-    <aside
-      aria-label={message(messages, "controls.series")}
-      className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
-    >
+    <SeriesAside label={message(messages, "controls.series")}>
       <SeriesSelector
         query={query}
         onQueryChange={setQuery}
@@ -132,6 +130,6 @@ export function DebtSeriesPanel({
         ))}
       </SeriesSelector>
       {downloadAction}
-    </aside>
+    </SeriesAside>
   );
 }

@@ -27,6 +27,7 @@ import { projectPublicSources } from "../methodology/publicSources";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
+import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 
 const HUB_PATH = "/explorer/inflation";
 const OVERVIEW_PATH = "/explorer/inflation/overview";
@@ -47,9 +48,7 @@ export async function renderInflationHub(locale: Locale) {
       <main className="px-5 pb-16 min-[768px]:px-[34px]">
         <div className="mx-auto max-w-[1180px]">
           <PageHeader crumbs={[{ label: t("common.home"), href: pageHref("/", locale) }, { label: t("common.data") }, { label: t("common.inflation") }]} coverage="" />
-          <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-            {t("inflation.hubHeading")}
-          </h1>
+          <ExplorerHeading>{t("inflation.hubHeading")}</ExplorerHeading>
           <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{t("inflation.hubDescription")}</p>
           <BudgetHub cards={buildInflationHubCards(facts, presentation, categories, weights)} locale={locale} testId="inflation-hub" />
         </div>
