@@ -1,10 +1,39 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MethodologyArticle } from "../../components/methodology/methodology-article";
 import { METHODOLOGY_CONTENT } from "../../lib/methodology/catalog";
 import common from "../../lib/i18n/messages/ka/common.json";
 import methodology from "../../lib/i18n/messages/ka/methodology.json";
+
+// Counting the served loader is the only way to see which articles need debt
+// data: every article renders the same component, and the memo hides a second
+// call behind the first.
+vi.mock("../../lib/data/governmentDebt/importGovernmentDebtFacts", async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import("../../lib/data/governmentDebt/importGovernmentDebtFacts")
+  >();
+  return { ...actual, loadServedGovernmentDebtData: vi.fn(actual.loadServedGovernmentDebtData) };
+});
+
+// The archive report is written by `prebuild`, and CI runs the tests before the
+// build, so a fresh checkout has no report to read. Nothing here is about the
+// archives: every live article gets the same validated summary.
+vi.mock("../../lib/methodology/prepareArchives", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../lib/methodology/prepareArchives")>();
+  const { LIVE_METHODOLOGY_IDS } = await import("../../lib/methodology/catalog");
+  return {
+    ...actual,
+    loadGeneratedArchiveSummaries: vi.fn(async () =>
+      Object.fromEntries(
+        LIVE_METHODOLOGY_IDS.map((id) => [
+          id,
+          { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-09-01", validated: true, status: "PASS", minYear: 2004, maxYear: 2025 },
+        ]),
+      ),
+    ),
+  };
+});
 
 const archiveSummary = {
   fileCount: 1,
@@ -51,5 +80,29 @@ describe("methodology processed-download caption", () => {
     expect(markup).toContain('href="/downloads/data/national-expenditure.csv"');
     expect(markup).toContain("UTF-8 / Excel თავსებადი · CC BY 4.0");
     expect(markup).toContain("სტატუსის მეტამონაცემებით");
+  });
+});
+
+describe("methodology article data loading", () => {
+  it("loads debt facts only for the debt article", async () => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const { loadServedGovernmentDebtData } = await import(
+      "../../lib/data/governmentDebt/importGovernmentDebtFacts"
+    );
+
+    await renderMethodologyArticle("ka", { params: Promise.resolve({ dataset: "revenue" }) });
+    expect(loadServedGovernmentDebtData).not.toHaveBeenCalled();
+
+    await renderMethodologyArticle("ka", { params: Promise.resolve({ dataset: "debt" }) });
+    expect(loadServedGovernmentDebtData).toHaveBeenCalledTimes(1);
+
+    // English articles come from a separate content record, but
+    // deriveMethodologyCoverage always reads the Georgian one. The guard has to
+    // agree in both locales, or the English debt build throws for want of years.
+    await renderMethodologyArticle("en", { params: Promise.resolve({ dataset: "debt" }) });
+    expect(loadServedGovernmentDebtData).toHaveBeenCalledTimes(2);
+
+    await renderMethodologyArticle("en", { params: Promise.resolve({ dataset: "revenue" }) });
+    expect(loadServedGovernmentDebtData).toHaveBeenCalledTimes(2);
   });
 });

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { SectorDefinition } from "../../lib/data/economicSectors/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
-import type { ServedRegionalEconomyObservation } from "../../lib/data/regionalEconomies/types";
 import { REGIONAL_GDP_TOTAL } from "../../lib/data/regionalEconomies/types";
 import {
   buildRegionalEconomyModel,
@@ -29,6 +28,7 @@ import { RegionHighlights } from "./region-highlights";
 import { RegionPicker } from "./region-picker";
 import { RegionalEconomySeriesPanel } from "./regional-economy-series-panel";
 import { useRegionalEconomyState } from "./use-regional-economy-state";
+import type { ClientRegionalEconomyObservation } from "../../lib/servedRows";
 
 export type RegionalEconomyIdentity = {
   id: string;
@@ -45,7 +45,7 @@ export function RegionalEconomyExplorer({
   sources,
   siteOrigin,
 }: {
-  facts: ServedRegionalEconomyObservation[];
+  facts: ClientRegionalEconomyObservation[];
   registry: SectorDefinition[];
   region: RegionalEconomyIdentity;
   regions: MunicipalRegion[];

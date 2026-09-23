@@ -1,5 +1,5 @@
 import { periodFromKey, periodKey, periodYear } from "./periods";
-import type { CategoryFactInput, ServedBasketWeightRow } from "./types";
+import type { CategoryFactInput } from "./types";
 
 // A category's share of the headline: its published price change, weighted by its
 // share of the basket. Never stored — derived at build time from two published
@@ -22,7 +22,9 @@ export function contributionFor(changePct: number, weightPct: number): number {
 
 export function buildContributionIndex(
   facts: CategoryFactInput[],
-  weights: ServedBasketWeightRow[],
+  // The three fields the weighting needs, so served rows and the client
+  // projection of them both fit.
+  weights: readonly { categoryId: string; year: number; weightPct: number }[],
 ): Map<string, Map<number, number>> {
   const weightByKey = new Map(weights.map((row) => [`${row.categoryId}:${row.year}`, row.weightPct]));
   const index = new Map<string, Map<number, number>>();

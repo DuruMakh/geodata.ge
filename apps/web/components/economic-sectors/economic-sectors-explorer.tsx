@@ -1,10 +1,8 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ChartPie, ChartNoAxesCombined } from "lucide-react";
-import type {
-  SectorDefinition,
-  ServedSectorObservation,
-} from "../../lib/data/economicSectors/types";
+import type { SectorDefinition } from "../../lib/data/economicSectors/types";
+import type { ClientSectorObservation } from "../../lib/servedRows";
 import {
   buildEconomicSectorsModel,
   changeSectorMeasure,
@@ -30,7 +28,9 @@ import { SectorHighlights } from "./sector-highlights";
 import { useEconomicSectorsState } from "./use-economic-sectors-state";
 
 export type EconomicSectorsExplorerProps = {
-  facts: ServedSectorObservation[];
+  facts: ClientSectorObservation[];
+  // One entry per measure: every row of a measure comes from one publication.
+  sourceIdByMeasure: Record<string, string>;
   registry: SectorDefinition[];
   sources: (WorkbookPublicSource & { sourceId: string })[];
   siteOrigin: string;
@@ -38,6 +38,7 @@ export type EconomicSectorsExplorerProps = {
 
 export function EconomicSectorsExplorer({
   facts,
+  sourceIdByMeasure,
   registry,
   sources,
   siteOrigin,
@@ -46,9 +47,10 @@ export function EconomicSectorsExplorer({
   const { locale, messages } = presentation;
   const t = (key: string) => message(messages, `sectors.${key}`);
   const { state, update } = useEconomicSectorsState(facts, registry);
+  const [announcement, setAnnouncement] = useState("");
   const model = useMemo(
-    () => buildEconomicSectorsModel(facts, registry, state),
-    [facts, registry, state],
+    () => buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure),
+    [facts, registry, state, sourceIdByMeasure],
   );
   const percent = state.measure !== "nominal";
   const measureLabel = t(
@@ -115,10 +117,7 @@ export function EconomicSectorsExplorer({
         ))}
       </div>
       <p role="status" className="sr-only">
-        {message(messages, "sectors.rangeChanged", {
-          start: model.range.start,
-          end: model.range.end,
-        })}
+        {announcement}
       </p>
       <div
         data-testid="explorer-workspace"
@@ -135,7 +134,7 @@ export function EconomicSectorsExplorer({
               <SegmentedTabs
                 ariaLabel={message(messages, "controls.viewMode")}
                 value={state.mode}
-                onChange={(mode) => update((s) => ({ ...s, mode }))}
+                onChange={(mode) => update((s) => ({ ...s, mode }), "push")}
                 options={[
                   {
                     value: "line",
@@ -152,9 +151,17 @@ export function EconomicSectorsExplorer({
               <SegmentedTabs
                 ariaLabel={t("measure")}
                 value={state.measure}
-                onChange={(measure) =>
-                  update((s) => changeSectorMeasure(s, measure, facts))
-                }
+                onChange={(measure) => {
+                  // Build on the hook's current state, not this render's: a click can
+                  // land after a deep link is applied but before it re-renders.
+                  const next = update((s) => changeSectorMeasure(s, measure, facts), "push");
+                  // Announce the period the new measure lands on, as GDP does on a tab change.
+                  const nextModel = buildEconomicSectorsModel(facts, registry, next, sourceIdByMeasure);
+                  setAnnouncement(message(messages, "sectors.rangeChanged", {
+                    start: nextModel.range.start,
+                    end: nextModel.range.end,
+                  }));
+                }}
                 options={[
                   { value: "nominal", label: t("nominal"), icon: <span aria-hidden="true" className="text-base">₾</span> },
                   { value: "share_of_gdp", label: t("shareOfGdp"), icon: <ChartPie aria-hidden="true" size={18} strokeWidth={1.5} /> },
@@ -259,6 +266,7 @@ export function EconomicSectorsExplorer({
                     presentation,
                     sources,
                     siteOrigin,
+                    sourceIdByMeasure,
                   ),
                 );
               }}

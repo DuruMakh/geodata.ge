@@ -5,6 +5,13 @@ import { loadGlossary, type GlossaryEntry } from "./glossary";
 import { loadBudgetFactRows, type BudgetFactImportRow } from "./importBudgetFacts";
 import { loadNationalGdpFacts } from "./nationalGdp/importNationalGdp";
 import type { NationalGdpFact } from "./nationalGdp/types";
+import { resetEconomicSectorsCacheForTests } from "./economicSectors/importEconomicSectors";
+import { resetGdpOverviewCacheForTests } from "./gdpOverview/importGdpOverview";
+import { resetGeneralGovernmentBalanceCacheForTests } from "./generalGovernmentBalance/importGeneralGovernmentBalance";
+import { resetGovernmentDebtCacheForTests } from "./governmentDebt/importGovernmentDebtFacts";
+import { resetInflationCacheForTests } from "./inflation/importInflation";
+import { resetRegionalEconomyCacheForTests } from "./regionalEconomies/importRegionalEconomies";
+import { resolveServedDataSource, type ServedDataSource } from "./servedDataSource";
 import { loadSourceDocuments, type SourceDocumentRow } from "./sources";
 import type {
   ServedAdminFact,
@@ -85,11 +92,9 @@ export { loadServedGovernmentDebtData } from "./governmentDebt/importGovernmentD
 export { loadServedGeneralGovernmentBalanceData } from "./generalGovernmentBalance/importGeneralGovernmentBalance";
 export { loadServedRegionalEconomyData } from "./regionalEconomies/importRegionalEconomies";
 
-// Single switch for where the site reads its data while pages are built.
-// "db" reads the Supabase mirror populated by `npm run data:import` (the
-// canonical serving store) and verifies it row-by-row against the reviewed
-// CSVs in the checkout; "csv" (default) reads the reviewed files directly.
-export type ServedDataSource = "csv" | "db";
+// Both live in servedDataSource.ts so the loaders re-exported above can read
+// the mode without importing this module back.
+export { resolveServedDataSource, type ServedDataSource };
 
 // Full ingestion rows: what the loaders read and what the parity check compares.
 // Exported only so the db loader can declare the same shape — no page or
@@ -135,20 +140,6 @@ export type MunicipalData = {
   adjaraBudgetAdjustments: AdjaraBudgetAdjustment[];
   populationFacts: MunicipalPopulationFact[];
 };
-
-export function resolveServedDataSource(): ServedDataSource {
-  const raw = (process.env.GEODATA_DATA_SOURCE ?? "").trim().toLowerCase();
-
-  if (raw === "" || raw === "csv") {
-    return "csv";
-  }
-
-  if (raw === "db") {
-    return "db";
-  }
-
-  throw new Error(`GEODATA_DATA_SOURCE must be "db" or "csv", got "${raw}"`);
-}
 
 // The explorer model walks the facts and lets the last one win, so each series
 // carries its most recent official name (lib/explorer/explorerData.ts). That
@@ -459,6 +450,12 @@ export function resetServedDataCacheForTests(): void {
   landingDataPromise = null;
   explorerDataPromise = null;
   municipalDataPromise = null;
+  resetGovernmentDebtCacheForTests();
+  resetGeneralGovernmentBalanceCacheForTests();
+  resetGdpOverviewCacheForTests();
+  resetEconomicSectorsCacheForTests();
+  resetRegionalEconomyCacheForTests();
+  resetInflationCacheForTests();
 }
 
 export function loadServedLandingData(): Promise<LandingData> {

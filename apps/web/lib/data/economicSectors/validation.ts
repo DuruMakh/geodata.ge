@@ -36,7 +36,9 @@ export function validateSectorObservations(
   const rows = new Map<string, SectorObservation>();
   for (const f of facts) {
     if (!ids.has(f.seriesId)) throw new Error(`Unknown sector ${f.seriesId}`);
-    if (!Number.isInteger(f.year) || f.year < 2010 || f.year > 2025)
+    // The floor is the reviewed start of the SNA 2008 sector table; the ceiling
+    // is only a sanity bound, because annual data cannot describe a future year.
+    if (!Number.isInteger(f.year) || f.year < 2010 || f.year > new Date().getUTCFullYear())
       throw new Error(`Invalid annual sector year ${f.year}`);
     if (rows.has(key(f))) throw new Error(`Duplicate sector observation ${key(f)}`);
     rows.set(key(f), f);
@@ -97,4 +99,42 @@ export function validateSectorObservations(
     }
   }
   return { missingCells };
+}
+
+export function assertCompleteSectorCoverage(
+  facts: SectorObservation[],
+  registry: readonly SectorDefinition[],
+): void {
+  if (!facts.length) throw new Error("Economic sector facts are empty");
+
+  const rows = new Set(facts.map(key));
+  const lastAnnualYear = Math.max(...facts.map((fact) => fact.year));
+  const missing: string[] = [];
+  for (const { id } of registry) {
+    for (const year of Array.from({ length: lastAnnualYear - 2010 + 1 }, (_, index) => 2010 + index)) {
+      for (const measure of year === 2010 ? measures.slice(0, 2) : measures) {
+        const expected = key({ seriesId: id, measure, year });
+        if (!rows.has(expected)) missing.push(expected);
+      }
+    }
+  }
+  if (missing.length || facts.some((fact) => fact.measure === "real_growth" && fact.year === 2010)) {
+    throw new Error(`Incomplete sector coverage: ${missing[0] ?? "unexpected 2010 real growth"}`);
+  }
+
+  const preliminaryYears = [...new Set(facts.filter((fact) => fact.status === "preliminary").map((fact) => fact.year))]
+    .sort((left, right) => left - right);
+  if (preliminaryYears.length) {
+    const expectedYears = Array.from(
+      { length: lastAnnualYear - preliminaryYears[0]! + 1 },
+      (_, index) => preliminaryYears[0]! + index,
+    );
+    if (JSON.stringify(preliminaryYears) !== JSON.stringify(expectedYears)) {
+      throw new Error("Preliminary sector years must be a contiguous newest-year suffix");
+    }
+    const preliminary = new Set(preliminaryYears);
+    if (facts.some((fact) => (fact.status === "preliminary") !== preliminary.has(fact.year))) {
+      throw new Error("Preliminary sector years must agree across every series and measure");
+    }
+  }
 }

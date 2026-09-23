@@ -66,6 +66,14 @@ test("manual range clamps and All expands with a longer indicator", async ({
     page.getByRole("slider", { name: "Start year" }),
   ).toHaveAttribute("aria-valuenow", "1960");
 });
+test("the Economy heading steps from 30px on phones to 40px on wider screens", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/en/explorer/economy");
+  const heading = page.getByRole("heading", { level: 1 });
+  await expect(heading).toHaveCSS("font-size", "30px");
+  await page.setViewportSize({ width: 1024, height: 800 });
+  await expect(heading).toHaveCSS("font-size", "40px");
+});
 test("Economy links the delivered overview, national sectors and regional economies", async ({ page }) => {
   await page.goto("/en/explorer/economy");
   await expect(

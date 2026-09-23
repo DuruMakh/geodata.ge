@@ -224,4 +224,25 @@ test.describe("Government Debt explorer", () => {
       [2026, "პროგნოზი"],
     ]);
   });
+
+  test("the bulk control clears, then selects every row of the active family", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt`);
+    await expectAppReady(page);
+    const bulk = page.getByTestId("series-toggle-all");
+    const toggle = (id: string) => seriesRow(page, id).getByTestId("series-row-toggle");
+    // The default total alone is a partial selection.
+    await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+
+    await bulk.click();
+    await expect(toggle("debt.stock.total")).toHaveAttribute("aria-pressed", "false");
+    await expect(bulk).toBeVisible();
+    await expect(bulk).toHaveAttribute("aria-checked", "false");
+
+    await bulk.click();
+    for (const id of ["debt.stock.total", "debt.stock.domestic", "debt.stock.external"]) {
+      await expect(toggle(id)).toHaveAttribute("aria-pressed", "true");
+    }
+    await expect(bulk).toHaveAttribute("aria-checked", "true");
+    await expect(page.getByTestId("series-status")).toContainText("3 / 9");
+  });
 });

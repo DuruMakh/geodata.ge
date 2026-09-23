@@ -1,6 +1,7 @@
 import { buildContributionIndex } from "../data/inflation/contributions";
 import { periodFromKey, periodKey } from "../data/inflation/periods";
-import type { CategoryFactInput, ServedBasketWeightRow } from "../data/inflation/types";
+import type { CategoryFactInput } from "../data/inflation/types";
+import type { ClientBasketWeightRow } from "../servedRows";
 
 // Pure state and data selection for the inflation categories section, mirroring
 // lib/explorer/inflationOverview.ts. Components compose these; nothing here
@@ -95,7 +96,7 @@ export function unpackCategoryFacts(series: PackedCategorySeries[]): CategoryFac
   });
 }
 
-export function buildCategoryIndex(facts: CategoryFactInput[], weights: ServedBasketWeightRow[]): CategoryIndex {
+export function buildCategoryIndex(facts: CategoryFactInput[], weights: ClientBasketWeightRow[]): CategoryIndex {
   const values = new Map<string, Map<number, number>>();
   const levels = new Map<string, 2 | 3>();
   const children = new Map<string, string[]>();

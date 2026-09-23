@@ -54,6 +54,10 @@ const REPORT_PATH = path.join(
   "national-gdp-annual-1996-2025-validation.json",
 );
 
+// Edition guards, not coverage: these three literals pin the two archived Geostat
+// workbooks and the reviewed canonical span. The refresh step in
+// docs/data-methodology/national-nominal-gdp.md updates them together with the
+// manifest hashes; nothing else in the pipeline may widen them silently.
 const EXPECTED_SOURCE_YEARS: Record<GdpAccountingStandard, [number, number]> = {
   sna_1993: [1996, 2018],
   sna_2008: [2010, 2025],
@@ -193,6 +197,8 @@ export function validateNationalGdpSeries(
     if (row.accountingStandard !== expectedStandard) {
       throw new Error(`Canonical GDP accounting-standard handoff is invalid for ${row.year}`);
     }
+    // Geostat publishes the newest year with an asterisk. The same refresh step
+    // moves this year and the manifest note that documents it.
     const expectedStatus = row.year === 2025 ? "preliminary" : "final_as_published";
     if (row.status !== expectedStatus) {
       throw new Error(`Canonical GDP status is invalid for ${row.year}`);

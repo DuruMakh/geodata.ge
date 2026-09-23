@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
-import type { ServedCpiFact, ServedInflationTargetRow } from "../../lib/data/inflation/types";
+import type { ClientInflationTargetRow } from "../../lib/servedRows";
+import type { ClientCpiFact } from "../../lib/servedRows";
 import { formatDisplayDate } from "../../lib/explorer/format";
 import { periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
 import {
@@ -31,17 +32,24 @@ import { InflationTable } from "./inflation-table";
 const INDEX_UNIT = { divisor: 1, label: "", decimals: 1 };
 
 export type InflationOverviewProps = {
-  facts: ServedCpiFact[];
-  targets: ServedInflationTargetRow[];
+  facts: ClientCpiFact[];
+  // One entry per series and measure: every CPI row of a group comes from the
+  // same Geostat publication, and the workbook cites it.
+  sourceIdBySeriesMeasure: Record<string, string>;
+  lastReviewedAt: string;
+  targets: ClientInflationTargetRow[];
   sources: InflationWorkbookSource[];
   siteOrigin: string;
 };
 
-export function InflationOverview({ facts, targets, sources, siteOrigin }: InflationOverviewProps) {
+export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewedAt, targets, sources, siteOrigin }: InflationOverviewProps) {
   const presentation = useI18n();
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
-  const index = useMemo(() => indexInflationFacts(facts), [facts]);
+  const index = useMemo(
+    () => indexInflationFacts(facts, sourceIdBySeriesMeasure),
+    [facts, sourceIdBySeriesMeasure],
+  );
   const [state, setState] = useState<InflationState>(DEFAULT_INFLATION_STATE);
   const [ready, setReady] = useState(false);
   const [announcement, setAnnouncement] = useState("");
@@ -58,15 +66,27 @@ export function InflationOverview({ facts, targets, sources, siteOrigin }: Infla
     };
   }, [index]);
 
+  const serializedHash = serializeInflationHash(state);
+  const hashApplied = useRef(false);
   useEffect(() => {
-    if (ready) history.replaceState(null, "", `#${serializeInflationHash(state)}`);
-  }, [ready, state]);
+    if (!ready) return;
+    // Skip the run that applies the incoming hash: writing it back would stamp a
+    // pristine URL with the default state (use-explorer-state.ts has the same rule).
+    if (!hashApplied.current) {
+      hashApplied.current = true;
+      return;
+    }
+    try {
+      history.replaceState(null, "", `#${serializedHash}`);
+    } catch {
+      // History can be unavailable in some embedded contexts; the UI still works.
+    }
+  }, [serializedHash, ready]);
 
   const range = resolveInflationRange(state, index);
   const { periods, lines } = buildInflationLines(index, targets, state, range);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   const coverage = overallCoverage(index);
-  const lastReviewedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
   const hasSeries = lines.some((line) => line.key !== "target");
   const chartSeries: ChartSeries[] = lines.map((line) => ({

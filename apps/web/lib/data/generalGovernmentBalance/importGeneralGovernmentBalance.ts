@@ -9,20 +9,19 @@ import {
 import { stableIdSchema } from "../validation";
 import type { ServedGeneralGovernmentBalanceFact } from "../../servedRows";
 import type { GeneralGovernmentBalanceFact } from "./types";
-
-const EXPECTED_YEARS = Array.from({ length: 37 }, (_, index) => 1995 + index);
+import { resolveServedDataSource } from "../servedDataSource";
 
 const rowSchema = z
   .object({
-    year: z.coerce.number().int().min(1995).max(2031),
+    year: z.coerce.number().int().min(1995).max(2100),
     general_government_balance_pct_gdp: z.string().min(1),
     general_government_balance_gel: z.string().min(1),
     status: z.enum(["actual", "projection"]),
     source_id: stableIdSchema.and(
-      z.literal("source.imf_weo_april_2026_general_government_balance"),
+      z.string().regex(/^source\.imf_weo_[a-z]+_\d{4}_general_government_balance$/),
     ),
-    source_dataset: z.literal("IMF.RES:WEO(9.0.0)"),
-    source_vintage: z.literal("2026-04"),
+    source_dataset: z.string().regex(/^IMF\.RES:WEO\(\d+\.\d+\.\d+\)$/),
+    source_vintage: z.string().regex(/^\d{4}-(?:04|10)$/),
     source_sheet: z.literal("Countries"),
     source_country_id: z.literal("GEO"),
     source_percent_series_code: z.literal("GEO.GGXCNL_NGDP.A"),
@@ -31,7 +30,7 @@ const rowSchema = z
     transformation: z.literal(
       "IMF billion GEL multiplied by 1,000,000,000; signed value preserved.",
     ),
-    last_reviewed_at: z.literal("2026-09-04"),
+    last_reviewed_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   })
   .strict();
 
@@ -59,11 +58,6 @@ export async function loadGeneralGovernmentBalanceFacts(
     if (!percent.isZero() && !gel.isZero() && percent.isNegative() !== gel.isNegative()) {
       throw new Error(`General-government balance sign mismatch for ${row.year}`);
     }
-    const expectedStatus = row.year <= 2025 ? "actual" : "projection";
-    if (row.status !== expectedStatus) {
-      throw new Error(`General-government balance status is invalid for ${row.year}`);
-    }
-
     return {
       year: row.year,
       generalGovernmentBalancePctGdp: percent.toNumber(),
@@ -83,8 +77,33 @@ export async function loadGeneralGovernmentBalanceFacts(
   });
 
   facts.sort((left, right) => left.year - right.year);
-  if (JSON.stringify(facts.map((row) => row.year)) !== JSON.stringify(EXPECTED_YEARS)) {
-    throw new Error("Canonical general-government balance coverage must be 1995-2031");
+  // One edition per file, and the projection horizon follows the actual years.
+  // Which year that boundary falls in is the edition's business, not this file's.
+  const editions = new Set(
+    facts.map((fact) => `${fact.sourceId}|${fact.sourceDataset}|${fact.sourceVintage}|${fact.lastReviewedAt}`),
+  );
+  if (editions.size !== 1) {
+    throw new Error("A balance file must carry exactly one WEO edition");
+  }
+  for (const fact of facts) {
+    const edition = /^source\.imf_weo_(april|october)_(\d{4})_general_government_balance$/.exec(fact.sourceId);
+    const expectedVintage = edition ? `${edition[2]}-${edition[1] === "april" ? "04" : "10"}` : null;
+    if (expectedVintage !== fact.sourceVintage) {
+      throw new Error("The WEO source ID edition must agree with its source vintage");
+    }
+  }
+  const firstProjection = facts.findIndex((fact) => fact.status === "projection");
+  if (firstProjection <= 0) {
+    throw new Error("General-government balance actual years must come first, then projections");
+  }
+  if (
+    facts.slice(0, firstProjection).some((fact) => fact.status !== "actual") ||
+    facts.slice(firstProjection).some((fact) => fact.status !== "projection")
+  ) {
+    throw new Error("General-government balance actual years must come first, then projections");
+  }
+  if (facts.some((fact, index) => index > 0 && fact.year !== facts[index - 1]!.year + 1)) {
+    throw new Error("General-government balance years must be contiguous");
   }
 
   return facts;
@@ -105,20 +124,28 @@ export function toServedGeneralGovernmentBalanceFact(
   };
 }
 
-export async function loadServedGeneralGovernmentBalanceData(): Promise<{
+// Build-time memo, for the reasons servedData.ts documents: one load per
+// process, concurrent callers collapsed onto it, and a cached rejection so the
+// first parity failure is the build failure.
+let servedDeficitPromise: Promise<{ facts: ServedGeneralGovernmentBalanceFact[] }> | null = null;
+
+export function loadServedGeneralGovernmentBalanceData(): Promise<{ facts: ServedGeneralGovernmentBalanceFact[] }> {
+  servedDeficitPromise ??= loadServedGeneralGovernmentBalanceDataUncached();
+  return servedDeficitPromise;
+}
+
+export function resetGeneralGovernmentBalanceCacheForTests(): void {
+  servedDeficitPromise = null;
+}
+
+async function loadServedGeneralGovernmentBalanceDataUncached(): Promise<{
   facts: ServedGeneralGovernmentBalanceFact[];
 }> {
-  const raw = (process.env.GEODATA_DATA_SOURCE ?? "").trim().toLowerCase();
   const csvFacts = async () =>
     (await loadGeneralGovernmentBalanceFacts(SERVING_PATH)).map(
       toServedGeneralGovernmentBalanceFact,
     );
-  if (raw !== "db") {
-    if (raw !== "" && raw !== "csv") {
-      throw new Error(`GEODATA_DATA_SOURCE must be "db" or "csv", got "${raw}"`);
-    }
-    return { facts: await csvFacts() };
-  }
+  if (resolveServedDataSource() === "csv") return { facts: await csvFacts() };
 
   const { loadGeneralGovernmentBalanceFactsFromDb } = await import("../../db/servedDataDb");
   const [dbFacts, reviewedCsvFacts] = await Promise.all([

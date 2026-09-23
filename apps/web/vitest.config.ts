@@ -17,6 +17,8 @@ const HEAVY_TESTS = [
 const shared = {
   environment: "node",
   pool: "forks",
+  // Mutable on purpose: `shared` is `as const`, and setupFiles is typed as string[].
+  setupFiles: ["./tests/setup/server-only.ts"] as string[],
   // Vitest's 5s default is a latency budget, and latency legitimately rises once files run
   // concurrently: the workbook and PDF parsers here take ~0.4-2s alone but several seconds when
   // a dozen forks compete for CPU. 30s matches the budget the heavy tests already declare

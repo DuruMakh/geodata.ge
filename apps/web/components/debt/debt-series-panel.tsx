@@ -8,12 +8,13 @@ import type { Locale } from "../../lib/i18n/types";
 import { useState, type ReactNode } from "react";
 import type { GovernmentDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
-import type { DebtSeriesId, ServedGovernmentDebtFact } from "../../lib/servedRows";
+import type { DebtFamily, DebtSeriesId, ClientGovernmentDebtFact } from "../../lib/servedRows";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 
 type DebtSeriesPanelProps = {
   items: GovernmentDebtExplorerModel["items"];
-  facts: ServedGovernmentDebtFact[];
+  family: DebtFamily;
+  facts: ClientGovernmentDebtFact[];
   selectedIds: DebtSeriesId[];
   expandedParentIds: DebtSeriesId[];
   onSelectionChange: (ids: DebtSeriesId[]) => void;
@@ -25,7 +26,7 @@ function matches(item: GovernmentDebtExplorerModel["items"][number], query: stri
   return matchesLabelQuery(query, [item.kaLabel, item.enLabel, item.id]);
 }
 
-function formatSummary(fact: ServedGovernmentDebtFact | undefined, latestYear: number | undefined, locale: Locale): string {
+function formatSummary(fact: ClientGovernmentDebtFact | undefined, latestYear: number | undefined, locale: Locale): string {
   if (!fact || fact.value === null) return MISSING;
   const value = fact.family === "rate" ? formatShare(fact.value / 100) : formatAmount(fact.value, locale);
   return fact.family === "rate" && fact.year !== latestYear ? `${value} · ${fact.year}` : value;
@@ -33,6 +34,7 @@ function formatSummary(fact: ServedGovernmentDebtFact | undefined, latestYear: n
 
 export function DebtSeriesPanel({
   items,
+  family,
   facts,
   selectedIds,
   expandedParentIds,
@@ -45,7 +47,7 @@ export function DebtSeriesPanel({
   const [expandedIds, setExpandedIds] = useState<DebtSeriesId[]>(expandedParentIds);
   const normalizedQuery = query.trim().toLowerCase();
   const latestYearBySeries = new Map<DebtSeriesId, number>();
-  const summaryBySeries = new Map<DebtSeriesId, ServedGovernmentDebtFact>();
+  const summaryBySeries = new Map<DebtSeriesId, ClientGovernmentDebtFact>();
 
   for (const fact of facts) {
     latestYearBySeries.set(fact.seriesId, Math.max(latestYearBySeries.get(fact.seriesId) ?? fact.year, fact.year));
@@ -81,6 +83,10 @@ export function DebtSeriesPanel({
   }
 
   const hasSelection = selectedIds.length > 0;
+  // Families never combine, so the bulk control's "all" (DESIGN.md §7.7) is the
+  // active family's three rows: empty selects them, anything else clears.
+  const familyIds = items.filter((item) => item.family === family).map((item) => item.id);
+  const allFamilySelected = familyIds.every((id) => selectedIds.includes(id));
   return (
     <aside
       aria-label={message(messages, "controls.series")}
@@ -93,9 +99,8 @@ export function DebtSeriesPanel({
         selectedCount={selectedIds.length}
         totalCount={items.length}
         hasSelection={hasSelection}
-        allSelected={false}
-        onToggleAll={() => onSelectionChange([])}
-        allowSelectAll={false}
+        allSelected={allFamilySelected}
+        onToggleAll={() => onSelectionChange(hasSelection ? [] : familyIds)}
         hasVisibleMatches={normalizedQuery === "" || visibleRows.length > 0}
       >
         {visibleRows.map(({ item, isChild, hasChildren, expanded, expansionLocked }) => (

@@ -153,6 +153,44 @@ direct host is IPv6-only and unused in this project). Secret table:
 The deployed site is fully static in both modes; database downtime can only
 ever delay a rebuild, never take the site down.
 
+### How often a dataset loads
+
+`resolveServedDataSource()` in `apps/web/lib/data/servedDataSource.ts` is the
+only reader of `GEODATA_DATA_SOURCE`. It accepts `csv` (the default) and `db`
+and throws `GEODATA_DATA_SOURCE must be "db" or "csv", got "<raw>"` on anything
+else. It lives in its own module so the loaders `servedData.ts` re-exports can
+read the mode without closing an import cycle.
+
+Every served loader is memoised per process — `loadServedGovernmentDebtData`,
+`loadServedGeneralGovernmentBalanceData`, `loadServedGdpOverviewData`,
+`loadServedEconomicSectorsData`, `loadServedRegionalEconomyData` and
+`loadServedInflationData`. Each builds once and hands the same promise to later
+callers, so a build parses each dataset once and, in db mode, runs each parity
+check once, instead of once per route. A rejection is cached too: the first
+parity failure is the build failure.
+
+Two consequences for anyone editing this area:
+
+- A test that switches `GEODATA_DATA_SOURCE` between cases must call
+  `resetServedDataCacheForTests()` (or the loader's own
+  `reset…CacheForTests`) first, or the mode the first load resolved decides
+  every later one.
+- The snapshot `/mcp` answers from takes GDP, economic sector and regional
+  economy facts through `loadServed…Rows()`, the accessor that returns rows
+  before the numeric projection. Those rows keep `value` as the exact decimal
+  string, because most of these values do not survive a float64 round-trip:
+  6,446 of the 8,168 values across those three datasets come back different.
+  The snapshot stores inflation as projected numbers instead, and that is
+  safe rather than inconsistent — every CPI value round-trips exactly, and the
+  only basket weights that change are 80 trailing zeros. Measure before
+  assuming a new dataset is in one camp or the other.
+
+Adding a seventh dataset means four things: call `resolveServedDataSource()`
+rather than reading the environment variable; memoise the served loader;
+register its reset in `resetServedDataCacheForTests()` in `servedData.ts`; and,
+if the snapshot serialises its values, expose a `loadServed…Rows()` accessor
+and read the snapshot from that.
+
 ## Re-running for a new data year
 
 1. Land the reviewed CSVs as usual (extraction → staging → review →

@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -13,6 +13,22 @@ afterEach(async () => {
 });
 
 describe("public SEO dataset exports", () => {
+  it("checks the written downloads and names a stale or missing file", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "fiscal-public-data-"));
+    tempRoots.push(root);
+    const publicRoot = path.join(root, "public");
+    await preparePublicDatasets({ repositoryRoot, publicRoot, mode: "write" });
+
+    await expect(preparePublicDatasets({ repositoryRoot, publicRoot, mode: "check-output" })).resolves.toHaveLength(5);
+
+    const target = path.join(publicRoot, "downloads", "data", "government-debt.csv");
+    await writeFile(target, "year,family\n", "utf8");
+    await expect(preparePublicDatasets({ repositoryRoot, publicRoot, mode: "check-output" })).rejects.toThrow("government-debt.csv");
+
+    await rm(target);
+    await expect(preparePublicDatasets({ repositoryRoot, publicRoot, mode: "check-output" })).rejects.toThrow("missing");
+  });
+
   it("publishes deterministic BOM-prefixed national and municipal CSVs", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "fiscal-public-data-"));
     tempRoots.push(root);

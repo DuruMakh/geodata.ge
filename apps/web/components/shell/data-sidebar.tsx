@@ -31,6 +31,11 @@ export function DataSidebar() {
   const economyActive = pathname.includes("/explorer/economy");
   const inflationActive = pathname.includes("/explorer/inflation");
   const budgetActive = !economyActive && !inflationActive;
+  const gdpActive = pathname.endsWith("/explorer/economy/gdp");
+  const sectorsActive = pathname.endsWith("/explorer/economy/sectors");
+  const regionsActive = pathname.includes("/explorer/economy/regions");
+  const inflationOverviewActive = pathname.endsWith("/explorer/inflation/overview");
+  const inflationCategoriesActive = pathname.endsWith("/explorer/inflation/categories");
 
   // Read after mount: the server render cannot see localStorage, and guessing
   // would flash the wrong width on every load.
@@ -188,9 +193,36 @@ export function DataSidebar() {
             <Link href={pageHref("/explorer/economy",locale)} data-testid="economy-link" aria-current={pathname.endsWith('/economy')?'page':undefined} className={`flex items-baseline gap-2 border-l-2 px-2.5 py-2 text-[12.5px] font-semibold no-underline ${economyActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages,"common.economy")}
             </Link>
-            {economyActive ? <Link href={pageHref("/explorer/economy/gdp",locale)} aria-current={pathname.endsWith('/gdp')?'page':undefined} className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline">{message(messages,"common.gdpOverview")}</Link> : null}
-            {economyActive ? <Link href={pageHref("/explorer/economy/sectors",locale)} aria-current={pathname.endsWith('/sectors')?'page':undefined} className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline">{message(messages,"common.economicSectors")}</Link> : null}
-            {economyActive ? <Link href={pageHref("/explorer/economy/regions",locale)} aria-current={pathname.includes('/economy/regions')?'page':undefined} className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline">{message(messages,"common.regionalEconomies")}</Link> : null}
+            {economyActive ? (
+              <Link
+                href={pageHref("/explorer/economy/gdp", locale)}
+                aria-current={gdpActive ? "page" : undefined}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${gdpActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
+              >
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${gdpActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+                {message(messages, "common.gdpOverview")}
+              </Link>
+            ) : null}
+            {economyActive ? (
+              <Link
+                href={pageHref("/explorer/economy/sectors", locale)}
+                aria-current={sectorsActive ? "page" : undefined}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${sectorsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
+              >
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${sectorsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+                {message(messages, "common.economicSectors")}
+              </Link>
+            ) : null}
+            {economyActive ? (
+              <Link
+                href={pageHref("/explorer/economy/regions", locale)}
+                aria-current={regionsActive ? "page" : undefined}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${regionsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
+              >
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${regionsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+                {message(messages, "common.regionalEconomies")}
+              </Link>
+            ) : null}
             <Link
               href={pageHref("/explorer/inflation", locale)}
               data-testid="inflation-link"
@@ -203,9 +235,10 @@ export function DataSidebar() {
               <Link
                 href={pageHref("/explorer/inflation/overview", locale)}
                 data-testid="inflation-overview-link"
-                aria-current={pathname.endsWith("/explorer/inflation/overview") ? "page" : undefined}
-                className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline"
+                aria-current={inflationOverviewActive ? "page" : undefined}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${inflationOverviewActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
               >
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${inflationOverviewActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
                 {message(messages, "common.inflationOverview")}
               </Link>
             ) : null}
@@ -213,9 +246,10 @@ export function DataSidebar() {
               <Link
                 href={pageHref("/explorer/inflation/categories", locale)}
                 data-testid="inflation-categories-link"
-                aria-current={pathname.endsWith("/explorer/inflation/categories") ? "page" : undefined}
-                className="ml-[18px] py-[5px] pl-2 text-[12px] text-[var(--paper)] no-underline"
+                aria-current={inflationCategoriesActive ? "page" : undefined}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${inflationCategoriesActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
               >
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${inflationCategoriesActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
                 {message(messages, "common.inflationCategories")}
               </Link>
             ) : null}

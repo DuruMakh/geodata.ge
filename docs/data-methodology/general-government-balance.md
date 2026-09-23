@@ -56,7 +56,7 @@ calculated percentage = nominal balance / fiscal-year GDP × 100
 
 The published percentage must reconcile within 0.02 percentage points. The April 2026 source passes for every year; the largest difference is approximately 0.0148 percentage points. This check confirms internal consistency without changing either IMF value.
 
-The loader additionally requires complete 1995–2031 coverage, unique years, safe integer GEL values, matching signs, exact provenance fields, and the fixed 2025/2026 actual-to-projection boundary. `npm run data:validate` also requires the IMF source ID to exist in the source catalog.
+The loader additionally requires contiguous unique years, safe integer GEL values, matching signs, actual years before projections, and exactly one WEO edition across the source ID, dataset version, vintage and review date. The April/October edition encoded in the source ID must agree with the source vintage. `npm run data:validate` also requires the IMF source ID to exist in the source catalog.
 
 ## WEO revisions and limitations
 
@@ -81,3 +81,5 @@ The preparation command regenerates:
 - `data/reports/general-government-balance-annual-1995-2031-validation.json` — source identity, coverage, status boundary, and reconciliation evidence.
 
 The check command recreates the artifacts in memory and requires a byte-for-byte match with the committed files.
+
+The page reads the edition from the reviewed package manifest. The forecast marker and actual/projection ranges come from the facts; the source sentence and workbook title use `publication_date`, while the workbook source uses `retrieved_file_url`, `retrieved_at`, `year_min` and `year_max`. A new April or October WEO edition needs no page-copy edit; another publication month raises a missing-translation error for `deficit.weoMonth.*`. Pipeline edition guards still require the separate data-refresh procedure.

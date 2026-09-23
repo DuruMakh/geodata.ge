@@ -1,6 +1,6 @@
 "use client";
 
-import type { ServedInflationTargetRow } from "../../lib/data/inflation/types";
+import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import { periodMonth } from "../../lib/data/inflation/periods";
 import { formatShare } from "../../lib/explorer/format";
 import { displayedValue } from "../../lib/explorer/inflationGrid";
@@ -47,7 +47,7 @@ function TargetGauge({ value, target }: { value: number; target: number | null }
   );
 }
 
-export function InflationIndicators({ index, targets }: { index: InflationIndex; targets: ServedInflationTargetRow[] }) {
+export function InflationIndicators({ index, targets }: { index: InflationIndex; targets: ClientInflationTargetRow[] }) {
   const { messages } = useI18n();
   const latest = latestIndicators(index, targets);
   if (!latest) return null;

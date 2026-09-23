@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import type { ServedGdpObservation } from "../../lib/data/gdpOverview/types";
+import type { ClientGdpObservation, SourceIdRanges } from "../../lib/servedRows";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
@@ -18,6 +18,7 @@ import {
   buildGdpWorkbookExportModel,
   gdpDisplay,
 } from "../../lib/explorer/gdpWorkbook";
+import { formatDisplayDate } from "../../lib/explorer/format";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { PageHeader } from "../shell/page-header";
@@ -31,10 +32,17 @@ import { GdpSummary } from "./gdp-summary";
 export type GdpWorkbookSource = WorkbookPublicSource & { sourceId: string };
 export function GdpOverview({
   facts,
+  sourceIdRanges,
+  lastReviewedAt,
   sources,
   siteOrigin,
 }: {
-  facts: ServedGdpObservation[];
+  facts: ClientGdpObservation[];
+  // GDP cites a different Geostat vintage before and after the SNA 2008
+  // switch, and the workbook lists the sources the selected range actually
+  // rests on — so the id is carried per run of years, not per series.
+  sourceIdRanges: SourceIdRanges;
+  lastReviewedAt: string;
   sources: GdpWorkbookSource[];
   siteOrigin: string;
 }) {
@@ -55,10 +63,26 @@ export function GdpOverview({
       delete document.body.dataset.appReady;
     };
   }, [facts]);
+  const serializedHash = serializeGdpHash(state);
+  const hashApplied = useRef(false);
   useEffect(() => {
-    if (ready) history.replaceState(null, "", `#${serializeGdpHash(state)}`);
-  }, [state, ready]);
-  const m = useMemo(() => buildGdpOverviewModel(facts, state), [facts, state]);
+    if (!ready) return;
+    // Skip the run that applies the incoming hash: writing it back would stamp a
+    // pristine URL with the default state (use-explorer-state.ts has the same rule).
+    if (!hashApplied.current) {
+      hashApplied.current = true;
+      return;
+    }
+    try {
+      history.replaceState(null, "", `#${serializedHash}`);
+    } catch {
+      // History can be unavailable in some embedded contexts; the UI still works.
+    }
+  }, [serializedHash, ready]);
+  const m = useMemo(
+    () => buildGdpOverviewModel(facts, state, sourceIdRanges),
+    [facts, state, sourceIdRanges],
+  );
   const d = gdpDisplay(state, presentation);
   const row = {
     itemId: "gdp.overview",
@@ -66,6 +90,16 @@ export function GdpOverview({
     color: "var(--ink)",
     valuesByYear: Object.fromEntries(m.points.map((p) => [p.year, p.value])),
   };
+  const selectedYears = new Set(m.years);
+  const preliminaryYears = [
+    ...new Set(
+      facts
+        .filter((fact) => fact.status === "preliminary" && selectedYears.has(fact.year))
+        .map((fact) => fact.year),
+    ),
+  ]
+    .sort((left, right) => left - right)
+    .join(", ");
   const chartSeries = [
     {
       id: row.itemId,
@@ -81,7 +115,7 @@ export function GdpOverview({
   );
   function select(indicator: GdpIndicator) {
     const next = changeGdpIndicator(state, indicator, facts),
-      nextModel = buildGdpOverviewModel(facts, next);
+      nextModel = buildGdpOverviewModel(facts, next, sourceIdRanges);
     setState(next);
     setAnnouncement(
       message(messages, "gdp.rangeChanged", {
@@ -109,10 +143,9 @@ export function GdpOverview({
             },
             { label: t("heading") },
           ]}
-          coverage={`${m.range.min}–${m.range.max} · ${facts
-            .map((f) => f.lastReviewedAt)
-            .sort()
-            .at(-1)}`}
+          coverage={`${m.range.min}–${m.range.max} · ${message(messages, "main.updated", {
+            date: locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt,
+          })}`}
         />
         <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
           {t("heading")}
@@ -254,16 +287,31 @@ export function GdpOverview({
                 presentation,
                 currentSources,
                 siteOrigin,
+                sourceIdRanges,
               ),
             )
           }
         />
         <div className="mt-5 space-y-2">
           <SourceNote>
-            {state.indicator === "real" || state.indicator === "growth"
-              ? t("wbNote")
-              : t("geostatNote")}{" "}
-            {state.indicator === "per_capita" ? t("perCapitaNote") : ""}
+            {state.indicator === "real" || state.indicator === "growth" ? (
+              <>
+                {t("wbNote")} {" "}
+                {preliminaryYears
+                  ? message(messages, "gdp.wbPreliminaryBasisNote", {
+                      years: preliminaryYears,
+                    })
+                  : ""}
+              </>
+            ) : (
+              <>
+                {t("geostatNote")} {" "}
+                {preliminaryYears
+                  ? message(messages, "gdp.preliminaryNote", { years: preliminaryYears })
+                  : ""}{" "}
+                {state.indicator === "per_capita" ? t("perCapitaNote") : ""}
+              </>
+            )}
           </SourceNote>
           <Link
             href={pageHref("/methodology/gdp", locale)}

@@ -1,6 +1,7 @@
 import ExcelJS from "exceljs";
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
+import { sourceIdBySeriesMeasure } from "../../lib/explorer/clientData";
 import { makePeriod } from "../../lib/data/inflation/periods";
 import type { ServedInflationTargetRow } from "../../lib/data/inflation/types";
 import { DEFAULT_INFLATION_STATE, indexInflationFacts, resolveInflationRange, type InflationIndex, type InflationState } from "../../lib/explorer/inflationOverview";
@@ -18,7 +19,7 @@ const sources = ["source.geostat_cpi_yoy", "source.geostat_cpi_avg12", "source.g
 
 beforeAll(async () => {
   const data = await loadServedInflationData();
-  index = indexInflationFacts(data.facts);
+  index = indexInflationFacts(data.facts, sourceIdBySeriesMeasure(data.facts));
   targets = data.targets;
 });
 

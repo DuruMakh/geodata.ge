@@ -1,5 +1,5 @@
 import { makePeriod, periodKey, periodMonth, periodYear } from "../data/inflation/periods";
-import type { ServedInflationTargetRow } from "../data/inflation/types";
+import type { ClientInflationTargetRow } from "../servedRows";
 import { message } from "../i18n/messages";
 import type { Locale, Presentation } from "../i18n/types";
 import { decemberAverages } from "./inflationGrid";
@@ -16,7 +16,7 @@ export const SUMMARY_COLUMN = 13;
 // year, months across — and percentages leave as fractions under Excel's % format.
 export function buildInflationWorkbookExportModel(input: {
   index: InflationIndex;
-  targets: ServedInflationTargetRow[];
+  targets: ClientInflationTargetRow[];
   state: InflationState;
   range: ResolvedPeriodRange;
   presentation: Presentation;

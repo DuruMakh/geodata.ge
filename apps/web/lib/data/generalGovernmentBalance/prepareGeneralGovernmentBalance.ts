@@ -18,17 +18,9 @@ import type {
   GeneralGovernmentBalanceValidationSummary,
 } from "./types";
 
-const EXPECTED_DATASET = "IMF.RES:WEO(9.0.0)" as const;
 const EXPECTED_COUNTRY_ID = "GEO" as const;
 const EXPECTED_SHEET = "Countries" as const;
-const EXPECTED_SOURCE_BYTES = 5_585_205 as const;
-const EXPECTED_SOURCE_SHA256 =
-  "B29239CB48F8B895D1E526070C4FDE01147BC8F6BD3B86F636363BB6BD87FE7A";
-const EXPECTED_LATEST_ACTUAL_YEAR = 2025;
-const EXPECTED_YEARS = Array.from({ length: 37 }, (_, index) => 1995 + index);
 const RECONCILIATION_TOLERANCE_PP = 0.02 as const;
-const SOURCE_ID = "source.imf_weo_april_2026_general_government_balance";
-const REVIEWED_AT = "2026-09-04" as const;
 const TRANSFORMATION =
   "IMF billion GEL multiplied by 1,000,000,000; signed value preserved.";
 
@@ -52,32 +44,57 @@ const TARGETS = {
 
 const manifestSchema = z
   .object({
-    source_id: z.literal(SOURCE_ID),
+    source_id: z
+      .string()
+      .regex(/^source\.imf_weo_[a-z]+_\d{4}_general_government_balance$/),
     publisher: z.literal("International Monetary Fund"),
     dataset: z.literal("World Economic Outlook"),
-    dataset_version: z.literal(EXPECTED_DATASET),
-    publication_date: z.literal("2026-04-14"),
+    dataset_version: z.string().regex(/^IMF\.RES:WEO\(\d+\.\d+\.\d+\)$/),
+    publication_date: z.string().regex(/^\d{4}-(?:04|10)-\d{2}$/),
     source_page_url: z.literal("https://data.imf.org/Datasets/WEO"),
-    retrieved_file_url: z.literal(
-      "https://data.imf.org/-/media/iData/External-Storage/Documents/2F78EE59F79143A7921E5E203D3AAA80/en/WEOApr2026all.xlsx",
-    ),
-    retrieved_at: z.literal(REVIEWED_AT),
-    local_file: z.literal("official/WEOApr2026all.xlsx"),
-    sha256: z.literal(EXPECTED_SOURCE_SHA256),
-    bytes: z.literal(String(EXPECTED_SOURCE_BYTES)),
+    retrieved_file_url: z.string().url().startsWith("https://data.imf.org/"),
+    retrieved_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    local_file: z.string().regex(/^official\/WEO[A-Za-z]{3}\d{4}all\.xlsx$/),
+    sha256: z.string().regex(/^[0-9A-F]{64}$/),
+    bytes: z.string().regex(/^\d+$/),
     country_id: z.literal(EXPECTED_COUNTRY_ID),
     source_sheet: z.literal(EXPECTED_SHEET),
     percent_series_code: z.literal(TARGETS.GGXCNL_NGDP.seriesCode),
     nominal_series_code: z.literal(TARGETS.GGXCNL.seriesCode),
     validation_gdp_series_code: z.literal(TARGETS.NGDP_FY.seriesCode),
-    year_min: z.literal("1995"),
-    year_max: z.literal("2031"),
-    latest_actual_year: z.literal("2025"),
+    year_min: z.string().regex(/^\d{4}$/),
+    year_max: z.string().regex(/^\d{4}$/),
+    latest_actual_year: z.string().regex(/^\d{4}$/),
     methodology: z.literal("GFSM 2001"),
     valuation: z.literal("Cash"),
     general_government_composition: z.literal("Central Government; Local Government"),
   })
-  .strict();
+  .strict()
+  .refine(
+    (row) =>
+      Number(row.year_min) < Number(row.latest_actual_year) &&
+      Number(row.latest_actual_year) < Number(row.year_max),
+    "The manifest's actual year must fall inside its coverage",
+  )
+  .refine(
+    (row) => row.retrieved_at >= row.publication_date,
+    "The file cannot be retrieved before it is published",
+  )
+  .refine(
+    (row) => {
+      const year = row.publication_date.slice(0, 4);
+      const april = row.publication_date.slice(5, 7) === "04";
+      const editionName = april ? "april" : "october";
+      const workbookName = `WEO${april ? "Apr" : "Oct"}${year}all.xlsx`;
+      return (
+        row.source_id ===
+          `source.imf_weo_${editionName}_${year}_general_government_balance` &&
+        row.local_file === `official/${workbookName}` &&
+        new URL(row.retrieved_file_url).pathname.endsWith(`/${workbookName}`)
+      );
+    },
+    "The WEO edition must agree across the source ID, publication date, and workbook filenames",
+  );
 
 type ManifestRow = z.infer<typeof manifestSchema>;
 
@@ -140,11 +157,19 @@ function expectMetadata(
   }
 }
 
-function expectedStatus(year: number): GeneralGovernmentBalanceStatus {
-  return year <= EXPECTED_LATEST_ACTUAL_YEAR ? "actual" : "projection";
+function expectedStatus(
+  year: number,
+  latestActualYear: number,
+): GeneralGovernmentBalanceStatus {
+  return year <= latestActualYear ? "actual" : "projection";
 }
 
-function extractSourceFacts(workbookBytes: Buffer): GeneralGovernmentBalanceSourceFact[] {
+function extractSourceFacts(
+  workbookBytes: Buffer,
+  manifest: ManifestRow,
+  expectedYears: number[],
+  latestActualYear: number,
+): GeneralGovernmentBalanceSourceFact[] {
   const workbook = XLSX.read(workbookBytes, { type: "buffer", cellNF: true });
   const sheet = workbook.Sheets[EXPECTED_SHEET];
   if (!sheet) throw new Error(`IMF workbook is missing the ${EXPECTED_SHEET} sheet`);
@@ -157,7 +182,7 @@ function extractSourceFacts(workbookBytes: Buffer): GeneralGovernmentBalanceSour
     const header = String(value ?? "").trim();
     if (header) columns.set(header, column);
     const year = Number(value);
-    if (Number.isInteger(year) && EXPECTED_YEARS.includes(year)) yearColumns.set(year, column);
+    if (Number.isInteger(year) && expectedYears.includes(year)) yearColumns.set(year, column);
   }
 
   const seriesColumn = columns.get("SERIES_CODE");
@@ -176,7 +201,7 @@ function extractSourceFacts(workbookBytes: Buffer): GeneralGovernmentBalanceSour
     }
     const sourceRow = matchingRows[0];
 
-    expectMetadata(sheet, sourceRow, columns, "DATASET", EXPECTED_DATASET);
+    expectMetadata(sheet, sourceRow, columns, "DATASET", manifest.dataset_version);
     expectMetadata(sheet, sourceRow, columns, "COUNTRY.ID", EXPECTED_COUNTRY_ID);
     expectMetadata(sheet, sourceRow, columns, "INDICATOR.ID", indicatorId);
     expectMetadata(sheet, sourceRow, columns, "FREQUENCY", "Annual");
@@ -189,7 +214,13 @@ function extractSourceFacts(workbookBytes: Buffer): GeneralGovernmentBalanceSour
     );
     expectMetadata(sheet, sourceRow, columns, "SCALE", target.scale);
     expectMetadata(sheet, sourceRow, columns, "UNIT", target.unit);
-    expectMetadata(sheet, sourceRow, columns, "LATEST_ACTUAL_ANNUAL_DATA", "2025");
+    expectMetadata(
+      sheet,
+      sourceRow,
+      columns,
+      "LATEST_ACTUAL_ANNUAL_DATA",
+      String(latestActualYear),
+    );
     expectMetadata(sheet, sourceRow, columns, "PRIMARY_DOMESTIC_CURRENCY", "Georgian lari");
 
     if (indicatorId !== "NGDP_FY") {
@@ -210,7 +241,7 @@ function extractSourceFacts(workbookBytes: Buffer): GeneralGovernmentBalanceSour
       );
     }
 
-    for (const year of EXPECTED_YEARS) {
+    for (const year of expectedYears) {
       const column = yearColumns.get(year);
       if (column === undefined) throw new Error(`IMF workbook is missing the ${year} column`);
       const sourceCell = XLSX.utils.encode_cell({ r: sourceRow, c: column });
@@ -225,8 +256,8 @@ function extractSourceFacts(workbookBytes: Buffer): GeneralGovernmentBalanceSour
         value,
         unit: target.unit,
         scale: target.scale,
-        status: expectedStatus(year),
-        sourceId: SOURCE_ID,
+        status: expectedStatus(year, latestActualYear),
+        sourceId: manifest.source_id,
         sourceSheet: EXPECTED_SHEET,
         sourceCell,
       });
@@ -254,8 +285,11 @@ function sourceValue(
 
 function buildCanonicalFacts(
   sourceFacts: GeneralGovernmentBalanceSourceFact[],
+  manifest: ManifestRow,
+  expectedYears: number[],
+  latestActualYear: number,
 ): GeneralGovernmentBalanceFact[] {
-  return EXPECTED_YEARS.map((year) => {
+  return expectedYears.map((year) => {
     const percent = sourceValue(sourceFacts, year, "GGXCNL_NGDP");
     const nominalBillions = sourceValue(sourceFacts, year, "GGXCNL");
     const balanceGel = new Decimal(nominalBillions).times(1_000_000_000);
@@ -267,17 +301,17 @@ function buildCanonicalFacts(
       year,
       generalGovernmentBalancePctGdp: percent,
       generalGovernmentBalanceGel: balanceGel.toNumber(),
-      status: expectedStatus(year),
-      sourceId: SOURCE_ID,
-      sourceDataset: EXPECTED_DATASET,
-      sourceVintage: "2026-04",
+      status: expectedStatus(year, latestActualYear),
+      sourceId: manifest.source_id,
+      sourceDataset: manifest.dataset_version,
+      sourceVintage: manifest.publication_date.slice(0, 7),
       sourceSheet: EXPECTED_SHEET,
       sourceCountryId: EXPECTED_COUNTRY_ID,
-      sourcePercentSeriesCode: "GEO.GGXCNL_NGDP.A",
-      sourceNominalSeriesCode: "GEO.GGXCNL.A",
+      sourcePercentSeriesCode: manifest.percent_series_code,
+      sourceNominalSeriesCode: manifest.nominal_series_code,
       sourceUnit: "billion GEL",
       transformation: TRANSFORMATION,
-      lastReviewedAt: REVIEWED_AT,
+      lastReviewedAt: manifest.retrieved_at,
     };
   });
 }
@@ -286,13 +320,25 @@ export function validateGeneralGovernmentBalanceSeries(
   sourceFacts: GeneralGovernmentBalanceSourceFact[],
   canonicalFacts: GeneralGovernmentBalanceFact[],
 ): GeneralGovernmentBalanceValidationSummary {
+  const expectedYears = sourceFacts
+    .filter((row) => row.indicatorId === "GGXCNL_NGDP")
+    .map((row) => row.year)
+    .sort((left, right) => left - right);
+  const latestActualYear = Math.max(
+    ...sourceFacts.filter((row) => row.status === "actual").map((row) => row.year),
+  );
+  if (!Number.isFinite(latestActualYear) || expectedYears.length === 0) {
+    throw new Error("IMF balance source needs actual observations and annual coverage");
+  }
   const canonicalYears = canonicalFacts.map((row) => row.year);
-  if (JSON.stringify(canonicalYears) !== JSON.stringify(EXPECTED_YEARS)) {
-    throw new Error("Canonical general-government balance coverage must be 1995-2031");
+  if (JSON.stringify(canonicalYears) !== JSON.stringify(expectedYears)) {
+    throw new Error(
+      `Canonical general-government balance coverage must be ${expectedYears[0]}-${expectedYears.at(-1)}`,
+    );
   }
 
   for (const row of canonicalFacts) {
-    if (row.status !== expectedStatus(row.year)) {
+    if (row.status !== expectedStatus(row.year, latestActualYear)) {
       throw new Error(`General-government balance status is invalid for ${row.year}`);
     }
     const sourcePercent = sourceValue(sourceFacts, row.year, "GGXCNL_NGDP");
@@ -324,7 +370,7 @@ export function validateGeneralGovernmentBalanceSeries(
     const key = `${row.indicatorId}:${row.year}`;
     if (sourceKeys.has(key)) throw new Error(`Duplicate IMF balance source fact: ${key}`);
     sourceKeys.add(key);
-    if (row.status !== expectedStatus(row.year)) {
+    if (row.status !== expectedStatus(row.year, latestActualYear)) {
       throw new Error(`IMF balance source status is invalid for ${row.year}`);
     }
   }
@@ -332,8 +378,10 @@ export function validateGeneralGovernmentBalanceSeries(
     const years = sourceFacts
       .filter((row) => row.indicatorId === indicatorId)
       .map((row) => row.year);
-    if (JSON.stringify(years) !== JSON.stringify(EXPECTED_YEARS)) {
-      throw new Error(`${indicatorId} source coverage must be 1995-2031`);
+    if (JSON.stringify(years) !== JSON.stringify(expectedYears)) {
+      throw new Error(
+        `${indicatorId} source coverage must be ${expectedYears[0]}-${expectedYears.at(-1)}`,
+      );
     }
   }
 
@@ -383,32 +431,46 @@ export async function prepareGeneralGovernmentBalance({
   }) as Record<string, string>[];
   if (manifestRows.length !== 1) throw new Error("Expected exactly one IMF balance source");
   const manifest = validateGeneralGovernmentBalanceManifest(manifestRows[0]);
+  const expectedYears = Array.from(
+    { length: Number(manifest.year_max) - Number(manifest.year_min) + 1 },
+    (_, index) => Number(manifest.year_min) + index,
+  );
+  const latestActualYear = Number(manifest.latest_actual_year);
+  const expectedSourceBytes = Number(manifest.bytes);
 
   const workbookBytes = await fs.readFile(path.join(PACKAGE_DIR, manifest.local_file));
   const sourceSha256 = createHash("sha256").update(workbookBytes).digest("hex").toUpperCase();
   if (
-    workbookBytes.byteLength !== EXPECTED_SOURCE_BYTES ||
-    sourceSha256 !== EXPECTED_SOURCE_SHA256 ||
-    manifest.bytes !== String(EXPECTED_SOURCE_BYTES) ||
-    manifest.sha256 !== EXPECTED_SOURCE_SHA256
+    workbookBytes.byteLength !== expectedSourceBytes ||
+    sourceSha256 !== manifest.sha256
   ) {
-    throw new Error(`Reviewed source mismatch for ${SOURCE_ID}`);
+    throw new Error(`Reviewed source mismatch for ${manifest.source_id}`);
   }
 
-  const sourceFacts = extractSourceFacts(workbookBytes);
-  const canonicalFacts = buildCanonicalFacts(sourceFacts);
+  const sourceFacts = extractSourceFacts(
+    workbookBytes,
+    manifest,
+    expectedYears,
+    latestActualYear,
+  );
+  const canonicalFacts = buildCanonicalFacts(
+    sourceFacts,
+    manifest,
+    expectedYears,
+    latestActualYear,
+  );
   const validationSummary = validateGeneralGovernmentBalanceSeries(sourceFacts, canonicalFacts);
   const validation: GeneralGovernmentBalanceValidationReport = {
     status: "PASS",
-    dataset: EXPECTED_DATASET,
-    sourceBytes: EXPECTED_SOURCE_BYTES,
+    dataset: manifest.dataset_version,
+    sourceBytes: expectedSourceBytes,
     sourceSha256,
-    sourceFactCount: 111,
-    canonicalFactCount: 37,
-    canonicalYearMin: 1995,
-    canonicalYearMax: 2031,
-    latestActualYear: 2025,
-    firstProjectionYear: 2026,
+    sourceFactCount: sourceFacts.length,
+    canonicalFactCount: canonicalFacts.length,
+    canonicalYearMin: expectedYears[0]!,
+    canonicalYearMax: expectedYears.at(-1)!,
+    latestActualYear,
+    firstProjectionYear: latestActualYear + 1,
     reconciliationTolerancePercentagePoints: RECONCILIATION_TOLERANCE_PP,
     ...validationSummary,
   };

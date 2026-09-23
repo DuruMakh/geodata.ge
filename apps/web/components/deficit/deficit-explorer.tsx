@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ServedGeneralGovernmentBalanceFact } from "../../lib/servedRows";
+import type { ClientGeneralGovernmentBalanceFact } from "../../lib/explorer/clientData";
 import { buildDeficitExplorerModel, DEFICIT_ITEM } from "../../lib/explorer/deficitExplorer";
 import { parseDeficitHash, serializeDeficitHash } from "../../lib/explorer/deficitUrlState";
 import { buildDeficitWorkbookExportModel } from "../../lib/explorer/deficitWorkbook";
@@ -24,13 +24,14 @@ import { PageHeader } from "../shell/page-header";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
 type DeficitExplorerProps = {
-  facts: ServedGeneralGovernmentBalanceFact[];
+  facts: ClientGeneralGovernmentBalanceFact[];
   workbookSources: WorkbookPublicSource[];
+  edition: string;
   siteOrigin?: string;
   lastUpdatedAt: string;
 };
 
-export function DeficitExplorer({ facts, workbookSources, siteOrigin, lastUpdatedAt }: DeficitExplorerProps) {
+export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, lastUpdatedAt }: DeficitExplorerProps) {
   const presentation = useI18n();
   const { locale, messages, englishLabels } = presentation;
   const years = useMemo(
@@ -50,6 +51,9 @@ export function DeficitExplorer({ facts, workbookSources, siteOrigin, lastUpdate
     () => buildDeficitExplorerModel({ facts, range, percentage, selected }, presentation),
     [facts, range, percentage, selected, presentation],
   );
+  const forecastBoundaryYear = facts.find((fact) => fact.status === "projection")?.year ?? null;
+  const actualYears = facts.filter((fact) => fact.status === "actual").map((fact) => fact.year);
+  const projectionYears = facts.filter((fact) => fact.status === "projection").map((fact) => fact.year);
   const latestActual = facts.filter((fact) => fact.status === "actual").at(-1) ?? null;
   const unit = useMemo(
     () => unitFor(facts.map((fact) => fact.generalGovernmentBalanceGel), unitsFor(locale).bn, 2),
@@ -228,16 +232,23 @@ export function DeficitExplorer({ facts, workbookSources, siteOrigin, lastUpdate
                   start: patch.start ?? current.start,
                   end: patch.end ?? current.end,
                 }))}
-                marker={{ year: 2026, label: message(messages, "deficit.forecast") }}
+                marker={forecastBoundaryYear === null
+                  ? undefined
+                  : { year: forecastBoundaryYear, label: message(messages, "deficit.forecast") }}
               />
               <p data-testid="deficit-forecast-note" className="mt-3 max-w-[680px] text-xs leading-relaxed text-[var(--muted)]">
-                {message(messages, "deficit.forecastNote")}
+                {message(messages, "deficit.forecastNote", {
+                  projectionFirst: projectionYears[0] ?? "",
+                  projectionLast: projectionYears.at(-1) ?? "",
+                  actualFirst: actualYears[0] ?? "",
+                  actualLast: actualYears.at(-1) ?? "",
+                })}
               </p>
             </section>
 
             <div className="mt-[18px]">
               <SourceNote testId="source-label">
-                {message(messages, "deficit.source")}
+                {message(messages, "deficit.source", { edition })}
                 {" "}{message(messages, "deficit.definition")}
                 {lastUpdatedAt ? (
                   <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} /></>

@@ -18,11 +18,11 @@ import { absoluteWorkbookSourceUrl } from "../explorer/workbookModel";
 import { PROGRAM_SUCCESSIONS, findProgramSuccession } from "../data/adminSpending/programSuccessions";
 import { LEGACY_PROGRAM_JOINS } from "../data/adminSpending/legacyProgramJoins";
 import { makeProgramItemId } from "../data/adminSpending/generateAdminSpendingFacts";
-import { loadGdpOverviewFacts, loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
+import { loadServedGdpOverviewRows } from "../data/gdpOverview/importGdpOverview";
 import { GDP_QUERY_SERIES } from "./gdpSeries";
-import { loadEconomicSectorFacts, ECONOMIC_SECTORS } from "../data/economicSectors/importEconomicSectors";
+import { loadServedEconomicSectorsRows, ECONOMIC_SECTORS } from "../data/economicSectors/importEconomicSectors";
 import { SECTOR_DEFINITIONS } from "./economicSectorsSeries";
-import { loadRegionalEconomyFacts, REGIONAL_ECONOMY_REGIONS, REGIONAL_ECONOMY_SECTORS } from "../data/regionalEconomies/importRegionalEconomies";
+import { loadServedRegionalEconomyRows, REGIONAL_ECONOMY_REGIONS, REGIONAL_ECONOMY_SECTORS } from "../data/regionalEconomies/importRegionalEconomies";
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { REGIONAL_ECONOMY_DEFINITIONS } from "./regionalEconomySeries";
 import { loadServedInflationData } from "../data/inflation/importInflation";
@@ -490,7 +490,7 @@ export function enrichSourceTranslations(sources: readonly RawResolvedSource[], 
 
 export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Promise<FactQuerySnapshot> {
   const repositoryRoot = path.resolve(process.cwd(), "../..");
-  const [explorer, municipal, taxonomy, manifestDocuments, debt, deficit, catalogue, serviceKa, serviceEn] = await Promise.all([
+  const [explorer, municipal, taxonomy, manifestDocuments, debt, deficit, catalogue, serviceKa, serviceEn, gdpOverview, economicSectors, regionalEconomies] = await Promise.all([
     loadServedExplorerData(),
     loadServedMunicipalData(),
     loadTaxonomyFiles("../../data/taxonomy"),
@@ -500,7 +500,9 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     loadEnglishCatalogue(repositoryRoot),
     readFile(path.join(repositoryRoot, "data/localization/ka/service-messages.json"), "utf8").then(text => serviceMessagesSchema.parse(JSON.parse(text))),
     readFile(path.join(repositoryRoot, "data/localization/en/service-messages.json"), "utf8").then(text => serviceMessagesSchema.parse(JSON.parse(text))),
-    loadServedGdpOverviewData(),
+    loadServedGdpOverviewRows(),
+    loadServedEconomicSectorsRows(),
+    loadServedRegionalEconomyRows(),
   ]);
   const messageErrors = validateServiceMessages(serviceKa, serviceEn);
   if (messageErrors.length) throw new Error(messageErrors.join("\n"));
@@ -682,9 +684,9 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
       ),
     },
     deficit: { facts: sortedBy(deficit.facts, (f) => f.year) },
-    gdpOverview: { facts: sortedBy(await loadGdpOverviewFacts(), f=>f.seriesId, f=>f.year), series: GDP_QUERY_SERIES },
-    economicSectors: { facts: sortedBy(await loadEconomicSectorFacts(), f=>f.seriesId,f=>f.measure,f=>f.year), registry: ECONOMIC_SECTORS, definitions: SECTOR_DEFINITIONS },
-    regionalEconomies: { facts: sortedBy(await loadRegionalEconomyFacts(), f=>f.regionId,f=>f.seriesId,f=>f.measure,f=>f.year), regions: REGIONAL_ECONOMY_REGIONS, registry: [{ id: REGIONAL_GDP_TOTAL, classificationCode: null, sortOrder: 0, officialName: "Total regional GDP", labelKa: "რეგიონის მთლიანი მშპ", labelEn: "Total regional GDP" }, ...REGIONAL_ECONOMY_SECTORS], definitions: REGIONAL_ECONOMY_DEFINITIONS },
+    gdpOverview: { facts: sortedBy(gdpOverview.facts, f=>f.seriesId, f=>f.year), series: GDP_QUERY_SERIES },
+    economicSectors: { facts: sortedBy(economicSectors.facts, f=>f.seriesId,f=>f.measure,f=>f.year), registry: ECONOMIC_SECTORS, definitions: SECTOR_DEFINITIONS },
+    regionalEconomies: { facts: sortedBy(regionalEconomies.facts, f=>f.regionId,f=>f.seriesId,f=>f.measure,f=>f.year), regions: REGIONAL_ECONOMY_REGIONS, registry: [{ id: REGIONAL_GDP_TOTAL, classificationCode: null, sortOrder: 0, officialName: "Total regional GDP", labelKa: "რეგიონის მთლიანი მშპ", labelEn: "Total regional GDP" }, ...REGIONAL_ECONOMY_SECTORS], definitions: REGIONAL_ECONOMY_DEFINITIONS },
     inflation: {
       facts: sortedBy(inflation.facts, (f) => f.seriesId, (f) => f.measure, (f) => f.period),
       targets: sortedBy(inflation.targets, (row) => row.effectiveFrom),

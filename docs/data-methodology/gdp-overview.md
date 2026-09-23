@@ -11,7 +11,23 @@ Geostat SNA1993 is selected for 1996–2009, SNA2008 for 2010–2025. This is no
 Nominal total cells in millions are multiplied by one million, using Decimal arithmetic. Original underlying source precision is retained. The separate budget denominator CSV remains at its established one-decimal million GEL precision and is not modified. Real GDP is not spliced or custom-rebased. Growth source percent is converted to a fraction only at the display/export boundary.
 
 ## Validation and refresh
+The four indicator summaries contain reviewed editorial figures. After any refresh, run `npx vitest run tests/i18n/gdpSummaryFigures.test.ts` from `apps/web`; it recomputes the figures from the canonical CSV and checks each summary for unchecked numeric claims. If it fails, update both languages in `lib/i18n/messages/{ka,en}/gdp.json` and re-review the wording against the approved GDP overview design.
+
 `npm run data:prepare-gdp-overview` writes the canonical BOM CSV and validation report; `npm run data:check-gdp-overview` checks byte parity without writing. Both read archived originals offline. Source hashes, country/indicator, year uniqueness/coverage, units, status, finite values, FX and level/growth consistency are checked. Source updates require a reviewed replacement manifest; builds never fetch fresh upstream files.
+
+### Refresh order
+
+The GDP overview's Geostat nominal series feeds three artifacts, so they are refreshed together, in one change, in this order:
+
+1. `data/imports/national-gdp-annual-1996-2025.csv` — the budget and debt denominator, rounded to 0.1 mln GEL.
+2. `data/imports/gdp-overview-annual.csv` — the full-precision series behind the GDP page.
+3. `data/imports/economic-sectors-annual.csv` — `economy.gdp_total`, compared with the overview at five decimal places of one GEL.
+
+`npm run data:check-nominal-gdp-consistency` (part of `npm run data:validate`) is the gate: it compares the three artifacts at five decimal places of one GEL, preserves the national series' reviewed 0.1 mln GEL rounding, and verifies the two archived copies of `03_GDP-at-Current-Prices.xlsx`. A refresh that updates only one artifact fails there.
+
+Preliminary years are declared in the manifests — `preliminary_years` in the GDP overview manifest and `preliminaryYears` in the sector manifest — and the prepare scripts read them. The runtime validators assert only the invariant: preliminary years are the newest years, and every series from one publisher ends in the same year. The literals that remain in the prepare scripts are edition guards, each marked with a comment naming the refresh step that retires it.
+
+When Geostat finalises a year, `query_gdp` and the GDP page stop showing `gdp_world_bank_preliminary_basis` automatically: its scope follows the manifest's preliminary years, not a written-in year.
 
 Serving imports the pure observation validator without loading workbook preparation. The public GDP CSV is generated during prebuild and independently checked during postbuild, after it exists; canonical source validation remains available on a clean checkout before any build.
 
@@ -28,4 +44,4 @@ One active indicator at a time, in both Georgian and English. GDP/nominal per-pe
 
 The seventh dataset is `gdp-overview`. Discovery returns each series' exact observed years and bilingual names. Responses carry bilingual definitions, historical methodology/reconstruction caveats, preliminary status and original-source references. Requested gaps remain missing, never zero; years outside the overall dataset range are rejected. There is no GDP ranking or cumulative comparison operation. Long histories should be queried one series at a time to respect the existing MCP response-size cap.
 
-The versioned snapshot retains canonical decimal strings plus the bilingual series definitions so either data or definition changes update dataVersion. `gdp-overview.json` publishes all six series over the full union of years (251 available observations and explicit missing cells). `gdp-overview.csv` preserves the exact reviewed decimals, units, status and source IDs with a UTF-8 BOM. Both are in the central manifest with byte hashes; the existing CSV preparation check verifies the CSV independently against canonical inputs.
+The versioned snapshot retains canonical decimal strings plus the bilingual series definitions so either data or definition changes update dataVersion. `gdp-overview.json` publishes all six series over the full union of years (251 available observations and explicit missing cells). `gdp-overview.csv` preserves the exact reviewed decimals, units, status and source IDs with a UTF-8 BOM. Both are in the central manifest with byte hashes; `data:check-fact-query-publications` verifies the written CSV and JSON against the canonical-data snapshot.

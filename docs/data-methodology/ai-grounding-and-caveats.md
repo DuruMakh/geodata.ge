@@ -62,7 +62,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-37 codes are registered.
+38 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -77,6 +77,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `gdp_preliminary` | note | `none` | `national-nominal-gdp.md` |
 | `gdp_historical_method` | note | `limits` | `gdp-overview.md` |
 | `gdp_world_bank_history` | note | `none` | `gdp-overview.md` |
+| `gdp_world_bank_preliminary_basis` | note | `none` | `gdp-overview.md` |
 | `sectors_preliminary` | note | `none` | `economic-sectors.md` |
 | `inflation_contribution_derived` | severe | `none` | `inflation-cpi-national.md` |
 | `inflation_contribution_residual` | note | `none` | `inflation-cpi-national.md` |
@@ -232,8 +233,10 @@ Every nominal cell already names its standard in `valueDefinitionId`; the caveat
 
 ### `gdp_world_bank_history`
 
-**Severity:** note  
-**Comparison effect:** `none`  
+**Severity:** note
+
+**Comparison effect:** `none`
+
 **Owner document:** `gdp-overview.md`
 
 **Trigger.** Any available cell of a World Bank real GDP series (constant-2015 USD or annual real growth).
@@ -243,6 +246,22 @@ Every nominal cell already names its standard in `valueDefinitionId`; the caveat
 **English.** The World Bank metadata does not specify how the earliest historical observations were reconstructed. Published values are preserved without custom rebasing or splicing.
 
 The source does not say which years were reconstructed, so there is no narrower scope to give it than the World Bank cells themselves.
+
+### `gdp_world_bank_preliminary_basis`
+
+**Severity:** note
+
+**Comparison effect:** `none`
+
+**Owner document:** `gdp-overview.md`
+
+**Trigger.** A returned `real_usd_2015` or `real_growth_percent` cell whose year Geostat still marks preliminary in the same dataset.
+
+**Georgian.** მსოფლიო ბანკი საქართველოს ეროვნულ ანგარიშებს წინასწარის ნიშნის გარეშე აქვეყნებს, ამიტომ რეალური მშპ-ის უახლესი მაჩვენებლები ეყრდნობა საქსტატის ჯერ კიდევ წინასწარ მონაცემებს და გადაიხედება.
+
+**English.** The World Bank republishes Georgia's national accounts without a preliminary marker, so its newest real GDP values rest on Geostat figures that are still preliminary and will be revised.
+
+The statuses stay publisher-faithful: the World Bank marks nothing preliminary, so the cell keeps basis `published` and the disclosure carries the qualification. The scope follows Geostat's preliminary years, so it clears itself when Geostat finalises them — this is the one rule that reads dataset metadata rather than the request scope, because a response holding only World Bank cells cannot show it.
 
 ### `sectors_preliminary`
 

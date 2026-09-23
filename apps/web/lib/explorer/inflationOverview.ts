@@ -1,5 +1,6 @@
 import { periodFromKey, periodKey } from "../data/inflation/periods";
-import type { CpiMeasure, CpiSeriesId, ServedCpiFact, ServedInflationTargetRow } from "../data/inflation/types";
+import type { CpiMeasure, CpiSeriesId } from "../data/inflation/types";
+import type { ClientCpiFact, ClientInflationTargetRow } from "../servedRows";
 import { ACCENT, INK } from "./colors";
 
 // Pure state and data selection for the inflation overview. Components compose
@@ -43,14 +44,17 @@ export function seriesGroup(key: InflationSeriesKey, tab: InflationTab): string 
   return `${SERIES_DATA_ID[key]}:${TAB_MEASURE[tab]}`;
 }
 
-export function indexInflationFacts(facts: ServedCpiFact[]): InflationIndex {
+export function indexInflationFacts(
+  facts: ClientCpiFact[],
+  sourceIdBySeriesMeasure: Record<string, string>,
+): InflationIndex {
   const values = new Map<string, Map<number, number>>();
   const sourceIds = new Map<string, string>();
   for (const fact of facts) {
     const group = `${fact.seriesId}:${fact.measure}`;
     if (!values.has(group)) values.set(group, new Map());
     values.get(group)!.set(periodFromKey(fact.period), fact.value);
-    sourceIds.set(group, fact.sourceId);
+    sourceIds.set(group, sourceIdBySeriesMeasure[group]!);
   }
   return { values, sourceIds };
 }
@@ -105,12 +109,12 @@ export function rangeFromPatch(range: ResolvedPeriodRange, patch: { start?: numb
   return start === range.min && end === range.max ? { kind: "all" } : { kind: "manual", start, end };
 }
 
-export function targetForPeriod(targets: ServedInflationTargetRow[], period: number): number | null {
+export function targetForPeriod(targets: ClientInflationTargetRow[], period: number): number | null {
   const row = targets.find((entry) => periodFromKey(entry.effectiveFrom) <= period && (entry.effectiveTo === null || period <= periodFromKey(entry.effectiveTo)));
   return row ? row.targetPct : null;
 }
 
-export function buildInflationLines(index: InflationIndex, targets: ServedInflationTargetRow[], state: InflationState, range: ResolvedPeriodRange) {
+export function buildInflationLines(index: InflationIndex, targets: ClientInflationTargetRow[], state: InflationState, range: ResolvedPeriodRange) {
   const periods = Array.from({ length: range.end - range.start + 1 }, (_, offset) => range.start + offset);
   const lines = state.selected.flatMap((key) => {
     if (key === "target") return state.tab === "yoy" ? [{ key, values: periods.map((period) => targetForPeriod(targets, period)) }] : [];
@@ -129,7 +133,7 @@ function lastInRange(values: Map<number, number> | undefined, range: ResolvedPer
   return null;
 }
 
-export function panelValue(index: InflationIndex, targets: ServedInflationTargetRow[], key: InflationSelectionKey, state: InflationState, range: ResolvedPeriodRange): number | null {
+export function panelValue(index: InflationIndex, targets: ClientInflationTargetRow[], key: InflationSelectionKey, state: InflationState, range: ResolvedPeriodRange): number | null {
   if (key === "target") return state.tab === "yoy" ? targetForPeriod(targets, range.end) : null;
   return lastInRange(seriesValues(index, key, state.tab), range)?.value ?? null;
 }
@@ -149,7 +153,7 @@ export function effectiveTableSeries(index: InflationIndex, state: InflationStat
 }
 
 /** Spec §6: the indicators always describe the latest published month. */
-export function latestIndicators(index: InflationIndex, targets: ServedInflationTargetRow[]) {
+export function latestIndicators(index: InflationIndex, targets: ClientInflationTargetRow[]) {
   const yoy = seriesValues(index, "cpi", "yoy");
   if (!yoy || yoy.size === 0) return null;
   const period = bounds([yoy]).max;

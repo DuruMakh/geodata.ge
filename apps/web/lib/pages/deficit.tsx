@@ -13,15 +13,31 @@ import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { coverageFromYears, fiscalMetadata, generalGovernmentDeficitMetadata } from "../seo/metadata";
 import { DEFICIT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
+import { loadImfWeoManifest, type ImfWeoManifest } from "../methodology/workbookSources";
 import { resolveSiteUrl } from "../siteUrl";
+import { projectBalanceFact } from "../explorer/clientData";
 
-function workbookSourcesFor(messages: Parameters<typeof message>[0]): WorkbookPublicSource[] { return [{
-  years: Array.from({ length: 37 }, (_, index) => 1995 + index),
-  title: message(messages, "deficit.workbookTitle"),
-  organization: message(messages, "deficit.workbookOrganization"),
-  downloadHref: "https://data.imf.org/-/media/iData/External-Storage/Documents/2F78EE59F79143A7921E5E203D3AAA80/en/WEOApr2026all.xlsx",
-  retrievedAt: "2026-09-04",
-}]; }
+function editionLabel(messages: Parameters<typeof message>[0], publicationDate: string): string {
+  const [year, month] = publicationDate.split("-");
+  return message(messages, "deficit.weoEdition", {
+    year: year!,
+    month: message(messages, `deficit.weoMonth.${Number(month)}`),
+  });
+}
+
+function workbookSourcesFor(
+  messages: Parameters<typeof message>[0],
+  manifest: ImfWeoManifest,
+  edition: string,
+): WorkbookPublicSource[] {
+  return [{
+    years: Array.from({ length: manifest.yearMax - manifest.yearMin + 1 }, (_, index) => manifest.yearMin + index),
+    title: message(messages, "deficit.workbookTitle", { edition }),
+    organization: message(messages, "deficit.workbookOrganization"),
+    downloadHref: manifest.retrievedFileUrl as `https://${string}`,
+    retrievedAt: manifest.retrievedAt,
+  }];
+}
 
 export async function deficitPageMetadata(locale: Locale): Promise<Metadata> {
   const { facts } = await loadServedGeneralGovernmentBalanceData();
@@ -32,12 +48,22 @@ export async function deficitPageMetadata(locale: Locale): Promise<Metadata> {
 }
 
 export async function renderDeficitPage(locale: Locale) {
-  const { facts } = await loadServedGeneralGovernmentBalanceData();
+  const [{ facts }, manifest] = await Promise.all([
+    loadServedGeneralGovernmentBalanceData(),
+    loadImfWeoManifest(),
+  ]);
   const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "deficit"], ["deficit.general_government_balance"]);
   const { messages } = presentation;
   const { firstYear, lastYear } = coverageFromYears(facts);
   const lastUpdatedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";
-  const description = message(messages, "deficit.datasetDescription", { first: firstYear, last: lastYear });
+  const edition = editionLabel(messages, manifest.publicationDate);
+  const projections = facts.filter((fact) => fact.status === "projection").map((fact) => fact.year);
+  const description = message(messages, "deficit.datasetDescription", {
+    first: firstYear,
+    last: lastYear,
+    projectionFirst: projections[0] ?? lastYear,
+    projectionLast: projections.at(-1) ?? lastYear,
+  });
 
   return (
     <>
@@ -63,8 +89,9 @@ export async function renderDeficitPage(locale: Locale) {
       ]} />
       <I18nProvider {...presentation}>
       <DeficitExplorer
-        facts={facts}
-        workbookSources={workbookSourcesFor(messages)}
+        facts={facts.map(projectBalanceFact)}
+        workbookSources={workbookSourcesFor(messages, manifest, edition)}
+        edition={edition}
         siteOrigin={resolveSiteUrl()}
         lastUpdatedAt={lastUpdatedAt}
       />

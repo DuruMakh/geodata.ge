@@ -42,7 +42,7 @@ export async function renderEconomyPage(locale: Locale) {
             ]}
             coverage=""
           />
-          <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[40px] font-semibold">
+          <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
             {t("economy")}
           </h1>
           <p className="mb-[30px] text-[13px] text-[var(--body)]">

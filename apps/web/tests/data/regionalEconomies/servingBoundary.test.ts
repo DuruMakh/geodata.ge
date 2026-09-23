@@ -1,4 +1,4 @@
-import { expect, test, vi } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
 
 vi.mock("../../../lib/data/regionalEconomies/prepareRegionalEconomies", () => {
   throw new Error("Serving regional economies must not load workbook preparation");
@@ -7,7 +7,13 @@ vi.mock("../../../lib/data/regionalEconomies/prepareRegionalEconomies", () => {
 import {
   loadRegionalEconomyFacts,
   loadServedRegionalEconomyData,
+  resetRegionalEconomyCacheForTests,
 } from "../../../lib/data/regionalEconomies/importRegionalEconomies";
+
+// The loader memoises its promise, so a case that stubs the data source has to
+// start from an empty memo or it asserts against the mode the previous one
+// resolved.
+beforeEach(resetRegionalEconomyCacheForTests);
 
 test("serving reads reviewed Regional GDP facts without source workbooks", async () => {
   const facts = await loadRegionalEconomyFacts();
@@ -30,7 +36,7 @@ test("serving projects exact decimals to numbers only after validation", async (
 test("serving rejects an unknown data source before reading facts", async () => {
   vi.stubEnv("GEODATA_DATA_SOURCE", "unknown");
   try {
-    await expect(loadServedRegionalEconomyData()).rejects.toThrow("Invalid GEODATA_DATA_SOURCE");
+    await expect(loadServedRegionalEconomyData()).rejects.toThrow('GEODATA_DATA_SOURCE must be "db" or "csv", got "unknown"');
   } finally {
     vi.unstubAllEnvs();
   }

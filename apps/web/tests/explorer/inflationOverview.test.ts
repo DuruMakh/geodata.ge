@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
+import { sourceIdBySeriesMeasure } from "../../lib/explorer/clientData";
 import { makePeriod, periodFromKey } from "../../lib/data/inflation/periods";
 import type { ServedCpiFact, ServedInflationTargetRow } from "../../lib/data/inflation/types";
 import {
@@ -17,7 +18,7 @@ let last: number;
 
 beforeAll(async () => {
   ({ facts, targets } = await loadServedInflationData());
-  index = indexInflationFacts(facts);
+  index = indexInflationFacts(facts, sourceIdBySeriesMeasure(facts));
   last = Math.max(...facts.map((fact) => periodFromKey(fact.period)));
 });
 

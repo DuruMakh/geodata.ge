@@ -6,6 +6,7 @@ import { SectorSeriesPanel } from "../../components/economic-sectors/sector-seri
 import { I18nProvider } from "../../lib/i18n/provider";
 import { getMessages } from "../../lib/i18n/messages.server";
 import type { ServedSectorObservation } from "../../lib/data/economicSectors/types";
+import { sourceIdByMeasure } from "../../lib/explorer/clientData";
 import { ExplorerTable } from "../../components/main-explorer/explorer-table";
 import { buildTooltipRows } from "../../components/main-explorer/editorial-line-chart";
 import * as sectorState from "../../components/economic-sectors/use-economic-sectors-state";
@@ -56,7 +57,7 @@ test("renders one workspace, a removable GDP default and all activities in both 
     const html = renderToStaticMarkup(
       <I18nProvider locale={locale} messages={messages}>
         <EconomicSectorsExplorer
-          facts={facts}
+          facts={facts} sourceIdByMeasure={sourceIdByMeasure(facts)}
           registry={registry}
           sources={[]}
           siteOrigin="https://fiscal.ge"
@@ -179,12 +180,12 @@ test("restored selections show empty and no-data states, keeping the national re
   for (const selectedIds of [[], ["sector.a"]]) {
     vi.spyOn(sectorState, "useEconomicSectorsState").mockReturnValue({
       state: { ...DEFAULT_SECTOR_STATE, selectedIds },
-      update: () => {},
+      update: () => DEFAULT_SECTOR_STATE,
     });
     const html = renderToStaticMarkup(
       <I18nProvider locale="en" messages={messages}>
         <EconomicSectorsExplorer
-          facts={facts}
+          facts={facts} sourceIdByMeasure={sourceIdByMeasure(facts)}
           registry={registry}
           sources={[]}
           siteOrigin="https://fiscal.ge"
@@ -209,7 +210,7 @@ test("growth renders negative domains, isolated points and gaps through the shar
       measure: "real_growth",
       selectedIds: ["sector.a"],
     },
-    update: () => {},
+    update: () => DEFAULT_SECTOR_STATE,
   });
   const facts: ServedSectorObservation[] = [
     2021, 2022, 2023, 2024, 2025,
@@ -248,7 +249,7 @@ test("growth renders negative domains, isolated points and gaps through the shar
       ])}
     >
       <EconomicSectorsExplorer
-        facts={facts}
+        facts={facts} sourceIdByMeasure={sourceIdByMeasure(facts)}
         registry={registry}
         sources={[]}
         siteOrigin="https://fiscal.ge"

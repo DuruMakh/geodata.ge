@@ -5,13 +5,15 @@
       "file": "sources/geostat_nominal_current.xlsx",
       "url": "https://geostat.ge/media/81052/03_GDP-at-Current-Prices.xlsx",
       "sha256": "21a576c9c20434a87bcb32047cd143eef2b8d3f3ff360442b420c76b0da27d34",
-      "bytes": 50098
+      "bytes": 50098,
+      "preliminary_years": [2025]
     },
     {
       "file": "sources/geostat_nominal_legacy.xlsx",
       "url": "https://geostat.ge/media/27798/GDP-at-current-prices.xlsx",
       "sha256": "1f9befdca89f3a635f66abb14892386a9947bf7294045e4442832aa53e63dc8e",
-      "bytes": 94214
+      "bytes": 94214,
+      "preliminary_years": []
     },
     {
       "file": "sources/NY.GDP.MKTP.KD.json",

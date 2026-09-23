@@ -365,7 +365,7 @@ describe("Government Debt route composition", () => {
     }
   });
 
-  it("shows an empty nine-row count without offering an impossible select-all action", async () => {
+  it("offers the bulk control on an empty selection so clearing can be undone", async () => {
     const components = await loadDebtComponents();
     expect(components).not.toBeNull();
     if (!components) return;
@@ -390,7 +390,39 @@ describe("Government Debt route composition", () => {
     const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
     expect(visibleText).toContain("სერიები 0 / 9");
-    expect(visibleText).not.toContain("ყველას მონიშვნა");
-    expect(markup).not.toContain('data-testid="series-toggle-all"');
+    expect(visibleText).toContain("ყველას მონიშვნა");
+    expect(markup).toMatch(/<button[^>]*data-testid="series-toggle-all"[^>]*aria-checked="false"/);
+  });
+
+  it("shows the bulk checkbox full only when every row of the active family is selected", async () => {
+    const components = await loadDebtComponents();
+    expect(components).not.toBeNull();
+    if (!components) return;
+
+    const noop = () => {};
+    const bulkState = (family: "stock" | "service", selectedIds: DebtSeriesId[]) => {
+      const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
+        facts,
+        gdpFacts,
+        workbookSources: [],
+        lastUpdatedAt: reviewedAt,
+        family,
+        chartMode: "line",
+        shareOfGdp: false,
+        range: { start: 2013, end: 2025, min: 2013, max: 2025 },
+        selectedIds,
+        onChartModeChange: noop,
+        onShareChange: noop,
+        onRangeChange: noop,
+        onSelectionChange: noop,
+        onToggleSeries: noop,
+      }));
+      return markup.match(/<button[^>]*data-testid="series-toggle-all"[^>]*aria-checked="([a-z]+)"/)?.[1];
+    };
+
+    // The default total alone is a partial selection, as in every other explorer.
+    expect(bulkState("stock", ["debt.stock.total"])).toBe("mixed");
+    expect(bulkState("service", ["debt.service.total"])).toBe("mixed");
+    expect(bulkState("service", ["debt.service.total", "debt.service.principal", "debt.service.interest"])).toBe("true");
   });
 });

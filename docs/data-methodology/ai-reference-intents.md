@@ -13,6 +13,8 @@ client then *says* the right thing in either language needs a separate real-clie
 check; the service itself makes no AI calls. SDK transport tests do not establish
 an external assistant's language understanding.
 
+No reference intent requests a real GDP series, so `gdp_world_bank_preliminary_basis` does not appear in the 34-intent fixture. A future intent that asks for `real_usd_2015` or `real_growth_percent` in a Geostat-preliminary year must expect it.
+
 **Questions and responses are bilingual in schema 1.1.0.** Reviewed Georgian and
 English labels, definitions, missingness, comparisons, ranking explanations and
 source descriptions travel with the same figures. Clients use the appropriate
