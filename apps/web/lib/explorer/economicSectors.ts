@@ -1,4 +1,4 @@
-import { EDITORIAL_PALETTE, INK, colorForProgram } from "./colors";
+import { SERIES_COLORS } from "./colors";
 import type { SectorDefinition, SectorMeasure } from "../data/economicSectors/types";
 import { matchesLabelQuery } from "../i18n/search";
 import type { ClientSectorObservation } from "../servedRows";
@@ -31,9 +31,9 @@ export function sectorMatchesQuery(definition: SectorDefinition, query: string):
 }
 
 export function sectorColor(id: string): string {
-  if (id === SECTOR_GDP) return INK;
-  const index = id.charCodeAt(id.length - 1) - 97;
-  return index < EDITORIAL_PALETTE.length ? EDITORIAL_PALETTE[index] : colorForProgram(EDITORIAL_PALETTE[index - EDITORIAL_PALETTE.length], 1);
+  const color = SERIES_COLORS[id];
+  if (!color) throw new Error(`No colour for economic sector ${id}`);
+  return color;
 }
 
 export function parseSectorHash(hash: string, validIds: readonly string[]): SectorState {
