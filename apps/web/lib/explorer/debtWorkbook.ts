@@ -4,7 +4,8 @@ import type {
   ClientGovernmentDebtFact,
 } from "../servedRows";
 import type { ClientNationalGdpFact } from "./clientData";
-import { GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS } from "../data/governmentDebt/types";
+import { sourcesForDebtFact } from "../data/governmentDebt/sourceLineage";
+import type { SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import type { Presentation } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
 import { publicLabel } from "../i18n/labels";
@@ -23,42 +24,16 @@ export type DebtWorkbookInput = {
   selectedIds: readonly DebtSeriesId[];
   range: { start: number; end: number };
   shareOfGdp: boolean;
-  sources: readonly WorkbookPublicSource[];
+  sources: readonly SourcedWorkbookPublicSource[];
   gdpSources: readonly WorkbookPublicSource[];
   siteOrigin: string;
 };
 
 const FAMILY_LABEL = { stock: "workbook.debtStock", service: "workbook.debtService", rate: "workbook.debtRate" } as const;
 
-const SOURCE_FILENAME_BY_ID: Readonly<Record<string, string>> = {
-  mof_public_debt_bulletin_n7: "public-debt-bulletin-n7",
-  mof_public_debt_bulletin_n13: "public-debt-bulletin-n13",
-  mof_public_debt_bulletin_n19: "public-debt-bulletin-n19",
-  mof_public_debt_bulletin_n25: "public-debt-bulletin-n25",
-  mof_monthly_debt_report_2026_07: "monthly-debt-report-2026-07",
-  mof_debt_strategy_2019_2021: "debt-management-strategy-2019-2021",
-  mof_debt_strategy_2022_2025: "debt-management-strategy-2022-2025",
-  mof_debt_strategy_2023_2026: "debt-management-strategy-2023-2026",
-  mof_debt_strategy_2025_2029: "debt-management-strategy-2025-2029",
-};
-
-function externalServiceSourceId(year: number): string | null {
-  if (year >= 2013 && year <= 2016) return "mof_public_debt_bulletin_n7";
-  if (year <= 2019) return "mof_public_debt_bulletin_n13";
-  if (year <= 2022) return "mof_public_debt_bulletin_n19";
-  if (year <= 2025) return "mof_public_debt_bulletin_n25";
-  return null;
-}
-
 function debtSourcesFor(input: DebtWorkbookInput): WorkbookPublicSource[] {
   const selected = new Set(input.selectedIds);
   const yearsBySourceId = new Map<string, Set<number>>();
-  const add = (sourceId: string | null, year: number) => {
-    if (!sourceId) return;
-    const years = yearsBySourceId.get(sourceId) ?? new Set<number>();
-    years.add(year);
-    yearsBySourceId.set(sourceId, years);
-  };
 
   for (const fact of input.facts) {
     if (
@@ -67,21 +42,24 @@ function debtSourcesFor(input: DebtWorkbookInput): WorkbookPublicSource[] {
       fact.year < input.range.start ||
       fact.year > input.range.end
     ) continue;
-    add(fact.sourceId, fact.year);
-    if (fact.family === "rate" && fact.status === "not_available" && !fact.sourceId) {
-      for (const sourceId of GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS) add(sourceId, fact.year);
-    }
-    if (fact.family === "service" && fact.status === "actual") {
-      add(externalServiceSourceId(fact.year), fact.year);
+    for (const sourceId of sourcesForDebtFact(fact)) {
+      const years = yearsBySourceId.get(sourceId) ?? new Set<number>();
+      years.add(fact.year);
+      yearsBySourceId.set(sourceId, years);
     }
   }
 
   return [...yearsBySourceId].flatMap(([sourceId, years]) => {
-    const filename = SOURCE_FILENAME_BY_ID[sourceId];
-    const source = filename
-      ? input.sources.find((candidate) => candidate.downloadHref.includes(filename))
-      : undefined;
-    return source ? [{ ...source, years: [...years].sort((left, right) => left - right) }] : [];
+    const source = input.sources.find((candidate) => candidate.sourceId === sourceId);
+    return source
+      ? [{
+          years: [...years].sort((left, right) => left - right),
+          title: source.title,
+          organization: source.organization,
+          downloadHref: source.downloadHref,
+          retrievedAt: source.retrievedAt,
+        }]
+      : [];
   });
 }
 

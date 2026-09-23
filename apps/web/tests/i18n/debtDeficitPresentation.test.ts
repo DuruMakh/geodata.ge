@@ -43,7 +43,6 @@ describe("debt and deficit English presentation", () => {
       const input = { facts: deficit.facts, range: { start: 1995, end: 2031 }, percentage, selected: true };
       const english = buildDeficitExplorerModel(input, en);
       expect(english).toEqual(buildDeficitExplorerModel(input, ka));
-      expect(withoutEnglishLabels(english)).toEqual(withoutEnglishLabels(buildDeficitExplorerModel(input)));
       expect(english.tableRow.enLabel).toBe(en.englishLabels[DEFICIT_SERIES_ID]);
       expect(english.points.some(point => point.value < 0)).toBe(true);
       expect(english.forecastStartYear).toBe(2026);

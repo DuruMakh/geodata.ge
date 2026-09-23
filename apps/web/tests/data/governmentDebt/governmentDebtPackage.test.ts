@@ -270,6 +270,15 @@ describe("government debt research package", () => {
         (comparison) => comparison.difference_million_gel === 0,
       ),
     ).toBe(true);
+    const totalControls = result.validation.stock.totalControls;
+    expect(totalControls).toHaveLength(13);
+    expect(totalControls.every((control) => Math.abs(control.difference_million_gel) <= 0.5)).toBe(true);
+    expect(totalControls.find((control) => control.year === 2015)).toMatchObject({
+      canonical_total_million_gel: 12442.6,
+      published_total_million_gel: 12443,
+      difference_million_gel: 0.4,
+    });
+    expect(result.validation.actualService.externalTotalControl).toBe("not_published");
     const serviceOverlapComparisons =
       result.validation.actualService.overlapComparisons;
     expect(serviceOverlapComparisons).toHaveLength(13);
@@ -837,4 +846,44 @@ describe("government debt research package", () => {
       spy.mockRestore();
     }
   });
+});
+
+  it("parses the published total row from synthetic bulletin text", async () => {
+    const parser = await import("../../../lib/data/governmentDebt/parseDebtSources");
+    const text = (label: string, pairs: string) => `${label} ${pairs}`;
+    const n13 = [
+      text("Total Government Debt", "4 857 8 433 5 164 9 623 5 195 12 443 5 454 14 436 6 196 16 063 6 482 17 349 6 945 19 916"),
+    ].join("\n");
+    const n25 = [
+      text("Total Government Debt", Array.from({ length: 11 }, () => "1,000 2,000").join(" ")),
+    ].join("\n");
+    const controls = parser.parseGovernmentDebtStockTotalControls({ n13Page31: n13, n25Page26: n25 });
+    expect(controls.find((control) => control.year === 2015)?.published_total_million_gel).toBe(2000);
+  });
+
+it.each([
+  { name: "raised published total", from: "Total Government Debt 5,195 12,443", to: "Total Government Debt 5,195 12,445" },
+  { name: "lowered published total", from: "Total Government Debt 5,195 12,443", to: "Total Government Debt 5,195 12,442" },
+  { name: "altered external component", from: "External Government Debt 4,295.5 10,287.3", to: "External Government Debt 4,295.5 10,289.3" },
+])("rejects a $name beyond published precision during preparation", async ({ from, to }) => {
+  const { PDFParse } = await import("pdf-parse");
+  const originalGetText = PDFParse.prototype.getText;
+  let changed = false;
+  const spy = vi.spyOn(PDFParse.prototype, "getText").mockImplementation(async function (this: InstanceType<typeof PDFParse>, options) {
+    const result = await originalGetText.call(this, options);
+    for (const page of result.pages) {
+      if (page.num === 26 && page.text.includes(from)) {
+        page.text = page.text.replace(from, to);
+        changed = true;
+      }
+    }
+    return result;
+  });
+  try {
+    const { buildGovernmentDebtPackage } = await import(pathToFileURL(packageModulePath).href);
+    await expect(buildGovernmentDebtPackage({ write: false })).rejects.toThrow("Stock total control failed for 2015");
+    expect(changed).toBe(true);
+  } finally {
+    spy.mockRestore();
+  }
 });

@@ -9,7 +9,7 @@ describe("General-government deficit URL state", () => {
       rangeStart: 2001,
       rangeEnd: 2026,
       selected: true,
-    })).toBe("m=table&sh=0&r=2001-2026&sel=deficit.general_government_balance");
+    })).toBe("m=table&sh=0&r=2001-2026&sel=deficit.general_government.balance");
   });
 
   it("parses valid state and preserves a deliberate clear", () => {
@@ -24,5 +24,10 @@ describe("General-government deficit URL state", () => {
   it("ignores unknown and malformed values", () => {
     expect(parseDeficitHash("#m=bars&sh=other&r=bad&sel=unknown")).toEqual({});
     expect(parseDeficitHash("#%%%" )).toEqual({});
+  });
+
+  it("selects the balance from both old explorer links and the published id", () => {
+    expect(parseDeficitHash("#sel=deficit.general_government_balance").selected).toBe(true);
+    expect(parseDeficitHash("#sel=deficit.general_government.balance").selected).toBe(true);
   });
 });

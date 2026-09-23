@@ -1,6 +1,9 @@
 import { DEFICIT_SERIES_ID } from "./deficitExplorer";
 import type { ChartMode } from "./types";
 
+// Accept previously shared explorer links; only the published ID is written.
+const LEGACY_DEFICIT_SERIES_ID = "deficit.general_government_balance";
+
 export type DeficitUrlState = {
   chartMode?: ChartMode;
   percentage?: boolean;
@@ -26,7 +29,7 @@ export function parseDeficitHash(hash: string): DeficitUrlState {
     if (params.has("sel")) {
       const selection = params.get("sel") ?? "";
       if (selection === "") state.selected = false;
-      if (selection.split(",").includes(DEFICIT_SERIES_ID)) state.selected = true;
+      if (selection.split(",").some((id) => id === DEFICIT_SERIES_ID || id === LEGACY_DEFICIT_SERIES_ID)) state.selected = true;
     }
 
     return state;
