@@ -2,7 +2,7 @@ import { BudgetHub } from "../../components/hub/budget-hub";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../data/economicSectors/importEconomicSectors";
-import { loadServedRegionalEconomyData } from "../data/regionalEconomies/importRegionalEconomies";
+import { loadServedRegionalEconomyData, REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { message } from "../i18n/messages";
@@ -22,7 +22,7 @@ export async function economyPageMetadata(locale: Locale) {
 export async function renderEconomyPage(locale: Locale) {
   const [{ facts }, p, sectors, regional] = await Promise.all([
     loadServedGdpOverviewData(),
-    getPresentation(locale, ["gdp", "common"], []),
+    getPresentation(locale, ["gdp", "common", "sectors", "regionalEconomies"], REGIONAL_ECONOMY_REGIONS.map((region) => region.id)),
     loadServedEconomicSectorsData(),
     loadServedRegionalEconomyData(),
   ]);

@@ -1,9 +1,16 @@
 import type { ServedGdpObservation } from "../data/gdpOverview/types";
 import type { ServedSectorObservation } from "../data/economicSectors/types";
 import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
+import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
+import { ECONOMIC_SECTORS } from "../data/economicSectors/importEconomicSectors";
+import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
+import { publicLabel } from "../i18n/labels";
 import type { HubCardModel } from "./hubCards";
+import { INK } from "./colors";
+import { formatAmount, formatShare } from "./format";
+import { buildSectorHighlights } from "./sectorHighlights";
 export function buildEconomyHubCards(
   facts: ServedGdpObservation[],
   p: Presentation,
@@ -17,6 +24,23 @@ export function buildEconomyHubCards(
   const nominal = facts
     .filter((f) => f.seriesId === "nominal_gel")
     .sort((a, b) => a.year - b.year);
+  const sectorYears = sectorFacts.filter((f) => f.measure === "nominal").map((f) => f.year);
+  const latestSectorYear = sectorYears.length ? Math.max(...sectorYears) : null;
+  const sectorHighlights = latestSectorYear === null
+    ? null
+    : buildSectorHighlights(sectorFacts, ECONOMIC_SECTORS, latestSectorYear);
+  const regionalTotals = regionalFacts.filter((f) => f.measure === "nominal" && f.seriesId === REGIONAL_GDP_TOTAL);
+  const regionalYears = regionalTotals.map((f) => f.year);
+  const firstRegionalYear = regionalYears.length ? Math.min(...regionalYears) : null;
+  const latestRegionalYear = regionalYears.length ? Math.max(...regionalYears) : null;
+  const largestRegion = latestRegionalYear === null
+    ? null
+    : regionalTotals.filter((f) => f.year === latestRegionalYear).sort((a, b) => b.value - a.value)[0];
+  const regionTrend = largestRegion && firstRegionalYear !== null && latestRegionalYear !== null
+    ? Array.from({ length: latestRegionalYear - firstRegionalYear + 1 }, (_, index) =>
+      regionalTotals.find((f) => f.regionId === largestRegion.regionId && f.year === firstRegionalYear + index)?.value ?? null)
+    : null;
+  const region = largestRegion && REGIONAL_ECONOMY_REGIONS.find((r) => r.id === largestRegion.regionId);
   return [
     {
       index: "01",
@@ -25,26 +49,32 @@ export function buildEconomyHubCards(
       href: "/explorer/economy/gdp",
       comingSoon: false,
       series: real.map((f) => f.value),
-      seriesColor: "#1E1B16",
+      seriesColor: INK,
       footer: `${real.at(-1)!.year}: ${(real.at(-1)!.value / 1e9).toFixed(1)} ${t("bn")} (${t("constant")}) · ${t("real")}: ${real[0].year}–${real.at(-1)!.year} · ${t("nominal")}: ${nominal[0].year}–${nominal.at(-1)!.year}`,
     },
-    ...(["sectors", "regions"] as const).map((id, i) => ({
-      index: `0${i + 2}`,
-      title: t(id),
-      description: t(id + "Description"),
-      href: id === "sectors" && sectorFacts.length
-        ? "/explorer/economy/sectors"
-        : id === "regions" && regionalFacts.length
-          ? "/explorer/economy/regions"
-          : null,
-      comingSoon: id === "sectors" ? !sectorFacts.length : !regionalFacts.length,
-      series: null,
-      seriesColor: null,
-      footer: id === "sectors" && sectorFacts.length
-        ? `${Math.min(...sectorFacts.map(f=>f.year))}–${Math.max(...sectorFacts.map(f=>f.year))}`
-        : id === "regions" && regionalFacts.length
-          ? `${Math.min(...regionalFacts.map(f=>f.year))}–${Math.max(...regionalFacts.map(f=>f.year))}`
-          : null,
-    })),
+    {
+      index: "02",
+      title: t("sectors"),
+      description: t("sectorsDescription"),
+      href: sectorHighlights ? "/explorer/economy/sectors" : null,
+      comingSoon: sectorHighlights === null,
+      series: sectorHighlights?.trends.topThree ?? null,
+      seriesColor: sectorHighlights ? INK : null,
+      footer: sectorHighlights && sectorHighlights.topThreeShare !== null
+        ? `${latestSectorYear} · ${message(p.messages, "sectors.topThree")} ${formatShare(sectorHighlights.topThreeShare / 100)} · ${Math.min(...sectorYears)}–${latestSectorYear}${sectorHighlights.preliminary ? ` · ${t("preliminary")}` : ""}`
+        : null,
+    },
+    {
+      index: "03",
+      title: t("regions"),
+      description: t("regionsDescription"),
+      href: largestRegion ? "/explorer/economy/regions" : null,
+      comingSoon: largestRegion === null,
+      series: regionTrend,
+      seriesColor: largestRegion ? INK : null,
+      footer: largestRegion && region
+        ? `${latestRegionalYear} · ${message(p.messages, "regionalEconomies.largestRegion")}: ${publicLabel(p.locale, region.id, region.kaLabel, p.englishLabels)} · ${message(p.messages, "regionalEconomies.total")} (${message(p.messages, "regionalEconomies.currentPrices")}): ${formatAmount(largestRegion.value, p.locale)} · ${firstRegionalYear}–${latestRegionalYear}`
+        : null,
+    },
   ];
 }

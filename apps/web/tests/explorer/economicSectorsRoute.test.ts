@@ -14,8 +14,8 @@ test("national sectors have bilingual methodology and all three original sources
   expect(manifest).toHaveLength(3);
   expect(manifest.some(s=>s.source_id==="source.geostat_national_gdp_sna_2008")).toBe(true);
 });
-test("Economy activates sectors with loaded coverage and keeps regions deferred",async()=>{
-  const [{facts:gdp},{facts:sectors},presentation]=await Promise.all([loadServedGdpOverviewData(),loadServedEconomicSectorsData(),getPresentation("en",["gdp"],[])]);
+test("Economy activates sectors with loaded coverage and no regional facts",async()=>{
+  const [{facts:gdp},{facts:sectors},presentation]=await Promise.all([loadServedGdpOverviewData(),loadServedEconomicSectorsData(),getPresentation("en",["gdp","sectors"],[])]);
   const cards=buildEconomyHubCards(gdp,presentation,sectors);
   expect(cards[1].href).toBe("/explorer/economy/sectors");
   expect(cards[1].footer).toContain("2010–2025");
