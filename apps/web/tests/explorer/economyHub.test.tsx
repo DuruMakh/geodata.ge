@@ -21,6 +21,7 @@ it("links all three delivered Economy datasets and derives their coverage", asyn
     "/explorer/economy/regions",
   ]);
   expect(cards[0].footer).toContain("27.1");
+  expect(cards[0].footer).toContain("2025: 27.1 bn (Constant 2015 USD)");
   expect(cards[1].footer).toBe("2010–2025");
   expect(cards[2].footer).toBe("2010–2024");
   expect(cards.slice(1).every((c) => !c.comingSoon && c.series === null)).toBe(true);

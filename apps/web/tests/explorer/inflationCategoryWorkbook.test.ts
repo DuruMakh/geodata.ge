@@ -1,10 +1,12 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { makePeriod } from "../../lib/data/inflation/periods";
+import type { ServedBasketWeightRow, ServedCpiCategoryFact } from "../../lib/data/inflation/types";
+import { buildCategoryIndex } from "../../lib/explorer/inflationCategories";
 import { buildInflationCategoryWorkbookExportModel } from "../../lib/explorer/inflationCategoryWorkbook";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
-import { fixtureHeadline, fixtureIndex, fixtureState } from "./fixtures/inflationCategories";
+import { fixtureFacts, fixtureHeadline, fixtureIndex, fixtureState, fixtureWeights } from "./fixtures/inflationCategories";
 
 const period = makePeriod(2026, 8);
 const source = (sourceId: string, language: "ka" | "en"): InflationWorkbookSource => ({
@@ -81,6 +83,7 @@ describe("buildInflationCategoryWorkbookExportModel", () => {
   it("says on the sheet that contributions are a Fiscal.ge calculation", () => {
     const model = buildInflationCategoryWorkbookExportModel(contribInput);
     expect(model.readable.subtitle).toContain("Fiscal.ge");
+    expect(model.readable.subtitle).toContain("÷ 100 ×");
   });
 
   it("exports contributions as percentage points and rates as percent", () => {
@@ -100,5 +103,38 @@ describe("buildInflationCategoryWorkbookExportModel", () => {
     expect(rates.readable.numberFormat).toBe("0.0%");
     const rateRow = rates.readable.rows.find((row) => row.parentLabel === "ტრანსპორტი")!;
     expect(rateRow.valuesByYear[8]).toBeCloseTo(0.152, 6);
+  });
+
+  it("writes each row's own year weight, the weight its contribution used", () => {
+    const earlier = makePeriod(2025, 8);
+    const transportYoy = fixtureFacts.find((fact) => fact.categoryId === "cpi.cat.07" && fact.measure === "yoy_pct")!;
+    const facts: ServedCpiCategoryFact[] = [...fixtureFacts, { ...transportYoy, period: "2025-08", value: 3 }];
+    const weights: ServedBasketWeightRow[] = [
+      ...fixtureWeights,
+      { categoryId: "cpi.cat.07", year: 2025, weightPct: 10.2, sourceId: "source.geostat_basket_weights", lastReviewedAt: "2026-09-12" },
+    ];
+    const model = buildInflationCategoryWorkbookExportModel({
+      ...contribInput,
+      index: buildCategoryIndex(facts, weights),
+      range: { min: earlier, max: period, start: earlier, end: period },
+      headline: new Map([...fixtureHeadline, [earlier, 3.1]]),
+    });
+
+    const transport = model.analysis.rows.filter((row) => row[3] === "07");
+    expect(transport.map((row) => [row[0], row[1], row[5]])).toEqual([
+      [2025, 8, expect.closeTo(0.102, 6)],
+      [2026, 8, expect.closeTo(0.114, 6)],
+    ]);
+  });
+
+  it("labels contributions as calculated and published rates as published", () => {
+    const contrib = buildInflationCategoryWorkbookExportModel(contribInput);
+    const rates = buildInflationCategoryWorkbookExportModel({
+      ...contribInput,
+      state: { ...contribInput.state, tab: "yoy" },
+    });
+
+    expect([...new Set(contrib.analysis.rows.map((row) => row[8]))]).toEqual(["გამოთვლილი"]);
+    expect([...new Set(rates.analysis.rows.map((row) => row[8]))]).toEqual(["გამოქვეყნებული"]);
   });
 });

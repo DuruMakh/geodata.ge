@@ -4,6 +4,7 @@
   "debt.service": "Debt service",
   "debt.rate": "Interest rate",
   "debt.forecast": "Forecast",
+  "debt.pp": "pp",
   "debt.caption": "{family}, {start}–{end}",
   "debt.expand": "{name} — expand subseries",
   "debt.collapse": "{name} — collapse subseries",

@@ -26,7 +26,7 @@ export function buildEconomyHubCards(
       comingSoon: false,
       series: real.map((f) => f.value),
       seriesColor: "#1E1B16",
-      footer: `${real.at(-1)!.year}: ${(real.at(-1)!.value / 1e9).toFixed(1)} ${t("bn")} ${t("usd")} · ${t("real")}: ${real[0].year}–${real.at(-1)!.year} · ${t("nominal")}: ${nominal[0].year}–${nominal.at(-1)!.year}`,
+      footer: `${real.at(-1)!.year}: ${(real.at(-1)!.value / 1e9).toFixed(1)} ${t("bn")} (${t("constant")}) · ${t("real")}: ${real[0].year}–${real.at(-1)!.year} · ${t("nominal")}: ${nominal[0].year}–${nominal.at(-1)!.year}`,
     },
     ...(["sectors", "regions"] as const).map((id, i) => ({
       index: `0${i + 2}`,

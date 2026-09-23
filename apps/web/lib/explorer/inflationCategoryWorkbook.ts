@@ -5,7 +5,6 @@ import {
   RESIDUAL_ID,
   buildCategoryLines,
   buildStackModel,
-  latestWeight,
   type CategoryIndex,
   type CategoryState,
   type ResolvedPeriodRange,
@@ -91,7 +90,8 @@ export function buildInflationCategoryWorkbookExportModel(input: {
       const value = entry.values[position];
       if (value === null || value === undefined) return [];
       const isResidual = entry.id === RESIDUAL_ID;
-      const weight = isResidual ? null : latestWeight(index, entry.id);
+      // The weight of the month's own calendar year: the one its contribution used (spec §4.6).
+      const weight = isResidual ? null : index.weights.get(entry.id)?.get(periodYear(period)) ?? null;
       return [
         [
           periodYear(period),
@@ -102,7 +102,7 @@ export function buildInflationCategoryWorkbookExportModel(input: {
           weight === null ? null : weight / 100,
           scale(value),
           unit,
-          t("published"),
+          contribution ? t("calculated") : t("published"),
         ],
       ];
     }),

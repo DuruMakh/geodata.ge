@@ -4,6 +4,7 @@
   "debt.service": "ვალის გადახდა",
   "debt.rate": "საპროცენტო განაკვეთი",
   "debt.forecast": "პროგნოზი",
+  "debt.pp": "პპ",
   "debt.caption": "{family}, {start}–{end}",
   "debt.expand": "{name} — ქვესერიების გაშლა",
   "debt.collapse": "{name} — ქვესერიების ჩაკეცვა",

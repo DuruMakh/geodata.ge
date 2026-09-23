@@ -31,10 +31,13 @@ test.describe("General-government deficit explorer", () => {
   test("switches between GDP percentage, nominal GEL and the forecast-labelled table", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/deficit`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("series-row")).toContainText("−1.5%");
 
     await page.getByTestId("measure-share-toggle").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "amount");
     await expect(page.getByTestId("deficit-measure-label")).toHaveText("მლრდ ₾");
+    await expect(page.getByTestId("series-row")).toContainText("−1.5 მლრდ ₾");
+    await expect(page.getByTestId("series-row")).not.toContainText("−1.5%");
     await page.getByTestId("chart-mode-table").click();
     await expect(page.getByTestId("explorer-table")).toBeVisible();
     await expect(page.getByTestId("explorer-table").getByText("პროგნოზი", { exact: true })).toHaveCount(6);
