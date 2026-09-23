@@ -457,9 +457,23 @@ export async function loadMunicipalAdjaraBudgetAdjustmentsFromMirror(
   });
 }
 
-export async function loadGdpOverviewFactsFromMirror(db:MirrorClient):Promise<import('../data/gdpOverview/types').GdpObservation[]> {
-  const rows=await db.gdpOverviewFact.findMany({orderBy:[{seriesId:'asc'},{year:'asc'}]});
-  return rows.map(row=>({seriesId:row.seriesId as import('../data/gdpOverview/types').GdpSeriesId,year:row.year,value:row.value.toFixed(),unit:row.unit as import('../data/gdpOverview/types').GdpObservation['unit'],status:row.status as import('../data/gdpOverview/types').GdpObservation['status'],accountingStandard:row.accountingStandard as import('../data/gdpOverview/types').GdpObservation['accountingStandard'],sourceId:row.sourceDocumentId,sourceLocator:row.sourceLocator,lastReviewedAt:isoDate(row.lastReviewedAt)}));
+export async function loadGdpOverviewFactsFromMirror(
+  db: MirrorClient,
+): Promise<import('../data/gdpOverview/types').GdpObservation[]> {
+  const rows = await db.gdpOverviewFact.findMany({
+    orderBy: [{ seriesId: 'asc' }, { year: 'asc' }],
+  });
+  return rows.map(row => ({
+    seriesId: row.seriesId as import('../data/gdpOverview/types').GdpSeriesId,
+    year: row.year,
+    value: row.value.toFixed(),
+    unit: row.unit as import('../data/gdpOverview/types').GdpObservation['unit'],
+    status: row.status as import('../data/gdpOverview/types').GdpObservation['status'],
+    accountingStandard: row.accountingStandard as import('../data/gdpOverview/types').GdpObservation['accountingStandard'],
+    sourceId: row.sourceDocumentId,
+    sourceLocator: row.sourceLocator,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
 }
 
 export async function loadEconomicSectorFactsFromMirror(db: MirrorClient): Promise<SectorObservation[]> {

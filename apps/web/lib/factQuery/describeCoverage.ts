@@ -156,10 +156,30 @@ const DATASET_META: Record<
     entityTypes: ["country"],
     measures: DEBT_MEASURES,
   },
-  "gdp-overview": { budgetScope: "national_accounts", labelKa: "მშპ-ის მიმოხილვა", entityTypes: ["country"], measures: ["value"] },
-  "economic-sectors": { budgetScope: "national_accounts", labelKa: "ეკონომიკის სექტორები", entityTypes: ["country"], measures: ["amount_gel", "share_of_gdp_pct", "real_growth_pct"] },
-  "regional-economies": { budgetScope: "regional_accounts", labelKa: "რეგიონული ეკონომიკები", entityTypes: ["region"], measures: ["amount_gel", "share_of_region_gdp_pct"] },
-  inflation: { budgetScope: "consumer_prices", labelKa: "ინფლაცია", entityTypes: ["country"], measures: [...INFLATION_MEASURES] },
+  "gdp-overview": {
+    budgetScope: "national_accounts",
+    labelKa: "მშპ-ის მიმოხილვა",
+    entityTypes: ["country"],
+    measures: ["value"],
+  },
+  "economic-sectors": {
+    budgetScope: "national_accounts",
+    labelKa: "ეკონომიკის სექტორები",
+    entityTypes: ["country"],
+    measures: ["amount_gel", "share_of_gdp_pct", "real_growth_pct"],
+  },
+  "regional-economies": {
+    budgetScope: "regional_accounts",
+    labelKa: "რეგიონული ეკონომიკები",
+    entityTypes: ["region"],
+    measures: ["amount_gel", "share_of_region_gdp_pct"],
+  },
+  inflation: {
+    budgetScope: "consumer_prices",
+    labelKa: "ინფლაცია",
+    entityTypes: ["country"],
+    measures: [...INFLATION_MEASURES],
+  },
   "general-government-balance": {
     // General government per the IMF: wider than either national series here,
     // and NOT their difference.
@@ -255,18 +275,77 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
   // website"), so handing back the module-level array itself would let one
   // caller's in-place mutation of a response corrupt every later call.
   return {
-    datasetId, ...meta, labelEn: serviceLabelEn(snapshot, datasetId), entityTypes: [...meta.entityTypes], measures: [...meta.measures], years,
-    ...(datasetId === "economic-sectors" ? {
-      measureNotesKa: Object.fromEntries(Object.entries(SECTOR_QUERY_MEASURES).map(([query,measure])=>[query,`${snapshot.economicSectors.definitions[measure].ka} ${snapshot.economicSectors.definitions.reference[measure].ka}`])),
-      measureNotesEn: Object.fromEntries(Object.entries(SECTOR_QUERY_MEASURES).map(([query,measure])=>[query,`${snapshot.economicSectors.definitions[measure].en} ${snapshot.economicSectors.definitions.reference[measure].en}`])),
-    } : {}),
-    ...(datasetId === "regional-economies" ? {
-      measureNotesKa: Object.fromEntries(Object.entries(REGIONAL_ECONOMY_QUERY_MEASURES).map(([query, measure]) => [query, snapshot.regionalEconomies.definitions[measure].ka])),
-      measureNotesEn: Object.fromEntries(Object.entries(REGIONAL_ECONOMY_QUERY_MEASURES).map(([query, measure]) => [query, snapshot.regionalEconomies.definitions[measure].en])),
-    } : {}),
+    datasetId,
+    ...meta,
+    labelEn: serviceLabelEn(snapshot, datasetId),
+    entityTypes: [...meta.entityTypes],
+    measures: [...meta.measures],
+    years,
+    ...(datasetId === "economic-sectors"
+      ? {
+          measureNotesKa: Object.fromEntries(
+            Object.entries(SECTOR_QUERY_MEASURES).map(([query, measure]) => [
+              query,
+              `${snapshot.economicSectors.definitions[measure].ka} ${snapshot.economicSectors.definitions.reference[measure].ka}`,
+            ]),
+          ),
+          measureNotesEn: Object.fromEntries(
+            Object.entries(SECTOR_QUERY_MEASURES).map(([query, measure]) => [
+              query,
+              `${snapshot.economicSectors.definitions[measure].en} ${snapshot.economicSectors.definitions.reference[measure].en}`,
+            ]),
+          ),
+        }
+      : {}),
+    ...(datasetId === "regional-economies"
+      ? {
+          measureNotesKa: Object.fromEntries(
+            Object.entries(REGIONAL_ECONOMY_QUERY_MEASURES).map(([query, measure]) => [
+              query,
+              snapshot.regionalEconomies.definitions[measure].ka,
+            ]),
+          ),
+          measureNotesEn: Object.fromEntries(
+            Object.entries(REGIONAL_ECONOMY_QUERY_MEASURES).map(([query, measure]) => [
+              query,
+              snapshot.regionalEconomies.definitions[measure].en,
+            ]),
+          ),
+        }
+      : {}),
     ...(datasetId === "inflation" ? { periods: inflationDatasetPeriods(snapshot) } : {}),
-    ...(datasetId === "municipal-expenditure" ? { measureNotesKa: { gel_per_resident: serviceMessage(snapshot, "ka", "coverage.perResident") }, measureNotesEn: { gel_per_resident: serviceMessage(snapshot, "en", "coverage.perResident") }, measureNotes: { gel_per_resident: "Available only for 2025 municipality and region totals (municipal.total); not for the country aggregate or individual functions." } } : {}),
-    ...(datasetId === "government-debt" ? { measureNotesKa: { amount_gel: serviceMessage(snapshot, "ka", "coverage.debtAmount"), share_of_gdp_pct: serviceMessage(snapshot, "ka", "coverage.debtGdp"), rate_percent: serviceMessage(snapshot, "ka", "coverage.debtRate") }, measureNotesEn: { amount_gel: serviceMessage(snapshot, "en", "coverage.debtAmount"), share_of_gdp_pct: serviceMessage(snapshot, "en", "coverage.debtGdp"), rate_percent: serviceMessage(snapshot, "en", "coverage.debtRate") }, measureNotes: { amount_gel: "Stock and service only.", share_of_gdp_pct: "Stock and service, where reviewed GDP is available.", rate_percent: "Interest-rate series only; unpublished rates are missing, not zero." } } : {}),
+    ...(datasetId === "municipal-expenditure"
+      ? {
+          measureNotesKa: {
+            gel_per_resident: serviceMessage(snapshot, "ka", "coverage.perResident"),
+          },
+          measureNotesEn: {
+            gel_per_resident: serviceMessage(snapshot, "en", "coverage.perResident"),
+          },
+          measureNotes: {
+            gel_per_resident: "Available only for 2025 municipality and region totals (municipal.total); not for the country aggregate or individual functions.",
+          },
+        }
+      : {}),
+    ...(datasetId === "government-debt"
+      ? {
+          measureNotesKa: {
+            amount_gel: serviceMessage(snapshot, "ka", "coverage.debtAmount"),
+            share_of_gdp_pct: serviceMessage(snapshot, "ka", "coverage.debtGdp"),
+            rate_percent: serviceMessage(snapshot, "ka", "coverage.debtRate"),
+          },
+          measureNotesEn: {
+            amount_gel: serviceMessage(snapshot, "en", "coverage.debtAmount"),
+            share_of_gdp_pct: serviceMessage(snapshot, "en", "coverage.debtGdp"),
+            rate_percent: serviceMessage(snapshot, "en", "coverage.debtRate"),
+          },
+          measureNotes: {
+            amount_gel: "Stock and service only.",
+            share_of_gdp_pct: "Stock and service, where reviewed GDP is available.",
+            rate_percent: "Interest-rate series only; unpublished rates are missing, not zero.",
+          },
+        }
+      : {}),
   };
 }
 
@@ -505,11 +584,58 @@ function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId)
     case "general-government-balance":
       return deficitSeriesFor(snapshot);
     case "gdp-overview":
-      return Object.entries(GDP_QUERY_SERIES).map(([seriesId,s])=>({seriesId,labelKa:s.labelKa,level:LEVEL_TOTAL,parentSeriesId:null,availability:"served",years:sortedUniqueYears(snapshot.gdpOverview.facts.filter(f=>f.seriesId===seriesId).map(f=>f.year))}));
+      return Object.entries(GDP_QUERY_SERIES).map(([seriesId, s]) => ({
+        seriesId,
+        labelKa: s.labelKa,
+        level: LEVEL_TOTAL,
+        parentSeriesId: null,
+        availability: "served",
+        years: sortedUniqueYears(
+          snapshot.gdpOverview.facts.filter(f => f.seriesId === seriesId).map(f => f.year),
+        ),
+      }));
     case "economic-sectors":
-      return snapshot.economicSectors.registry.map(r=>({seriesId:r.id,labelKa:r.labelKa,level:r.id==="economy.gdp_total"?LEVEL_TOTAL:"economic_activity",parentSeriesId:null,availability:"served",years:sortedUniqueYears(snapshot.economicSectors.facts.filter(f=>f.seriesId===r.id).map(f=>f.year)),yearsByMeasure:Object.fromEntries(Object.entries(SECTOR_QUERY_MEASURES).map(([query,measure])=>[query,sortedUniqueYears(snapshot.economicSectors.facts.filter(f=>f.seriesId===r.id&&f.measure===measure).map(f=>f.year))]))}));
+      return snapshot.economicSectors.registry.map(r => ({
+        seriesId: r.id,
+        labelKa: r.labelKa,
+        level: r.id === "economy.gdp_total" ? LEVEL_TOTAL : "economic_activity",
+        parentSeriesId: null,
+        availability: "served",
+        years: sortedUniqueYears(
+          snapshot.economicSectors.facts.filter(f => f.seriesId === r.id).map(f => f.year),
+        ),
+        yearsByMeasure: Object.fromEntries(
+          Object.entries(SECTOR_QUERY_MEASURES).map(([query, measure]) => [
+            query,
+            sortedUniqueYears(
+              snapshot.economicSectors.facts
+                .filter(f => f.seriesId === r.id && f.measure === measure)
+                .map(f => f.year),
+            ),
+          ]),
+        ),
+      }));
     case "regional-economies":
-      return snapshot.regionalEconomies.registry.map(r=>({seriesId:r.id,labelKa:r.labelKa,level:r.id==="economy.regional_gdp_total"?LEVEL_TOTAL:"economic_activity",parentSeriesId:null,availability:"served",years:sortedUniqueYears(snapshot.regionalEconomies.facts.filter(f=>f.seriesId===r.id).map(f=>f.year)),yearsByMeasure:Object.fromEntries(Object.entries(REGIONAL_ECONOMY_QUERY_MEASURES).map(([query,measure])=>[query,sortedUniqueYears(snapshot.regionalEconomies.facts.filter(f=>f.seriesId===r.id&&f.measure===measure).map(f=>f.year))]))}));
+      return snapshot.regionalEconomies.registry.map(r => ({
+        seriesId: r.id,
+        labelKa: r.labelKa,
+        level: r.id === "economy.regional_gdp_total" ? LEVEL_TOTAL : "economic_activity",
+        parentSeriesId: null,
+        availability: "served",
+        years: sortedUniqueYears(
+          snapshot.regionalEconomies.facts.filter(f => f.seriesId === r.id).map(f => f.year),
+        ),
+        yearsByMeasure: Object.fromEntries(
+          Object.entries(REGIONAL_ECONOMY_QUERY_MEASURES).map(([query, measure]) => [
+            query,
+            sortedUniqueYears(
+              snapshot.regionalEconomies.facts
+                .filter(f => f.seriesId === r.id && f.measure === measure)
+                .map(f => f.year),
+            ),
+          ]),
+        ),
+      }));
     case "inflation":
       return inflationCatalogueSeries(snapshot);
   }
@@ -559,7 +685,14 @@ function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): Se
 
 function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): EntityEntry[] | undefined {
   if (datasetId === "municipal-expenditure") return municipalEntitiesFor(snapshot).map(entity => ({ ...entity, labelEn: serviceLabelEn(snapshot, entity.entityId) }));
-  if (datasetId === "regional-economies") return snapshot.regionalEconomies.regions.map(region => ({ entityId: region.id, entityType: "region", labelKa: region.kaLabel, labelEn: serviceLabelEn(snapshot, region.id), entitySlug: null }));
+  if (datasetId === "regional-economies")
+    return snapshot.regionalEconomies.regions.map(region => ({
+      entityId: region.id,
+      entityType: "region",
+      labelKa: region.kaLabel,
+      labelEn: serviceLabelEn(snapshot, region.id),
+      entitySlug: null,
+    }));
   return undefined;
 }
 

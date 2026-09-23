@@ -74,9 +74,30 @@ const ANNOTATIONS = {
 } as const;
 
 export const TOOLS: readonly ToolDefinition[] = [
-  { name:"query_regional_economies",title:"რეგიონული ეკონომიკები / Regional economies",describe:coverage=>`Annual GDP and 20 NACE Rev.2 economic activities for Georgia's 11 published regions, ${coverage["regional-economies"]}. Measures: amount_gel and share_of_region_gdp_pct. Values are current-price GEL; activities are GVA at basic prices, while each share divides by the same region's complete market-price GDP. Percent 7.5 means 7.5%. No 2025, real growth, per-capita values, national GDP share, rankings, forecasts or multi-region chart implication.`,schema:queryRegionalEconomiesInput,run:queryRegionalEconomies },
-  { name:"query_economic_sectors",title:"ეკონომიკის სექტორები / Economic sectors",describe:(coverage,facts)=>`National economic activities A–T and Total GDP, ${coverage["economic-sectors"]}. Nominal GEL and GDP shares cover ${facts.sectorMeasureYears.amount_gel}; annual real growth covers ${facts.sectorMeasureYears.real_growth_pct}. Use describe_coverage for IDs and measure-specific years. Measures: amount_gel, share_of_gdp_pct, real_growth_pct. Sectors are GVA at basic prices; shares divide by market-price GDP, not selected sectors. Percent 7.5 means 7.5%. No regions, ranking, contributions or cumulative comparisons.`,schema:queryEconomicSectorsInput,run:queryEconomicSectors },
- { name: "query_gdp", title: "მშპ / GDP", describe: coverage=>`Annual GDP overview, ${coverage["gdp-overview"]}. Use describe_coverage for the six series IDs and their exact years. Series encode current GEL/USD, constant-2015 USD, annual real growth percent, or nominal GDP per capita GEL/USD. No currency conversion, index rebasing, population calculation, forecasts, ranking or cumulative comparison. Growth 7.5 means 7.5%. For long histories request one series at a time to stay within the response-size limit. Published/preliminary status and source caveats travel with every result.`, schema: queryGdpInput, run: (snapshot,input)=>queryGdp(snapshot,input) },
+  {
+    name: "query_regional_economies",
+    title: "რეგიონული ეკონომიკები / Regional economies",
+    describe: coverage =>
+      `Annual GDP and 20 NACE Rev.2 economic activities for Georgia's 11 published regions, ${coverage["regional-economies"]}. Measures: amount_gel and share_of_region_gdp_pct. Values are current-price GEL; activities are GVA at basic prices, while each share divides by the same region's complete market-price GDP. Percent 7.5 means 7.5%. No 2025, real growth, per-capita values, national GDP share, rankings, forecasts or multi-region chart implication.`,
+    schema: queryRegionalEconomiesInput,
+    run: queryRegionalEconomies,
+  },
+  {
+    name: "query_economic_sectors",
+    title: "ეკონომიკის სექტორები / Economic sectors",
+    describe: (coverage, facts) =>
+      `National economic activities A–T and Total GDP, ${coverage["economic-sectors"]}. Nominal GEL and GDP shares cover ${facts.sectorMeasureYears.amount_gel}; annual real growth covers ${facts.sectorMeasureYears.real_growth_pct}. Use describe_coverage for IDs and measure-specific years. Measures: amount_gel, share_of_gdp_pct, real_growth_pct. Sectors are GVA at basic prices; shares divide by market-price GDP, not selected sectors. Percent 7.5 means 7.5%. No regions, ranking, contributions or cumulative comparisons.`,
+    schema: queryEconomicSectorsInput,
+    run: queryEconomicSectors,
+  },
+  {
+    name: "query_gdp",
+    title: "მშპ / GDP",
+    describe: coverage =>
+      `Annual GDP overview, ${coverage["gdp-overview"]}. Use describe_coverage for the six series IDs and their exact years. Series encode current GEL/USD, constant-2015 USD, annual real growth percent, or nominal GDP per capita GEL/USD. No currency conversion, index rebasing, population calculation, forecasts, ranking or cumulative comparison. Growth 7.5 means 7.5%. For long histories request one series at a time to stay within the response-size limit. Published/preliminary status and source caveats travel with every result.`,
+    schema: queryGdpInput,
+    run: (snapshot, input) => queryGdp(snapshot, input),
+  },
   {
     name: "query_inflation",
     title: "ინფლაცია / Inflation",

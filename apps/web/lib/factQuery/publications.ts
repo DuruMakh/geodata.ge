@@ -452,19 +452,42 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
 }
 
 export function buildGdpCsv(snapshot: FactQuerySnapshot): PublicationArtifact {
- const rows=snapshot.gdpOverview.facts;
- const text="\uFEFFseries_id,year,value,unit,status,source_id\n"+rows.map(f=>[f.seriesId,f.year,f.value,f.unit,f.status,f.sourceId].map(csvEscape).join(",")).join("\n")+"\n";
- return {fileName:"gdp-overview.csv",bytes:Buffer.from(text,"utf8"),rowCount:rows.length};
+  const rows = snapshot.gdpOverview.facts;
+  const text =
+    "\uFEFFseries_id,year,value,unit,status,source_id\n" +
+    rows
+      .map(f => [f.seriesId, f.year, f.value, f.unit, f.status, f.sourceId].map(csvEscape).join(","))
+      .join("\n") +
+    "\n";
+  return { fileName: "gdp-overview.csv", bytes: Buffer.from(text, "utf8"), rowCount: rows.length };
 }
 
 export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationArtifact[] {
   const inflationCategories = inflationCategoryParts(snapshot);
   const inflationCategoriesCsv = buildInflationCategoriesCsv(inflationCategories);
-  const artifacts = [buildCatalogueFile(snapshot), buildSourcesFile(snapshot), ...buildDatasetFiles(snapshot),
- datasetFile(snapshot,"gdp-overview","gdp-overview.json",queryGdp(snapshot,{seriesIds:Object.keys(GDP_QUERY_SERIES),years:yearsOf(snapshot.gdpOverview.facts)}),{}),
- buildGdpCsv(snapshot), buildEconomicSectorsJson(snapshot), buildEconomicSectorsCsv(snapshot),
-    buildRegionalEconomiesJson(snapshot), buildRegionalEconomiesCsv(snapshot), buildInflationNationalJson(snapshot),
-    inflationCategoriesCsv, buildInflationCategoriesJson(snapshot, inflationCategories, inflationCategoriesCsv)];
+  const artifacts = [
+    buildCatalogueFile(snapshot),
+    buildSourcesFile(snapshot),
+    ...buildDatasetFiles(snapshot),
+    datasetFile(
+      snapshot,
+      "gdp-overview",
+      "gdp-overview.json",
+      queryGdp(snapshot, {
+        seriesIds: Object.keys(GDP_QUERY_SERIES),
+        years: yearsOf(snapshot.gdpOverview.facts),
+      }),
+      {},
+    ),
+    buildGdpCsv(snapshot),
+    buildEconomicSectorsJson(snapshot),
+    buildEconomicSectorsCsv(snapshot),
+    buildRegionalEconomiesJson(snapshot),
+    buildRegionalEconomiesCsv(snapshot),
+    buildInflationNationalJson(snapshot),
+    inflationCategoriesCsv,
+    buildInflationCategoriesJson(snapshot, inflationCategories, inflationCategoriesCsv),
+  ];
   return [...artifacts, buildManifestFile(snapshot, artifacts)];
 }
 
@@ -542,29 +565,63 @@ export function buildEconomicSectorsCsv(snapshot: Pick<FactQuerySnapshot, "econo
     if (a.measure !== b.measure) return a.measure < b.measure ? -1 : 1;
     return a.year - b.year;
   });
-  const text = "\uFEFFseries_id,label_ka,label_en,year,measure,value,unit,valuation,price_basis,calculation,status,source_id\n" + ordered.map(f=>{
-    const r=registry.find(r=>r.id===f.seriesId)!;
-    return [f.seriesId,r.labelKa,r.labelEn,f.year,f.measure,f.value,f.unit,f.valuation,f.priceBasis,f.calculation,f.status,f.sourceId].map(csvEscape).join(",");
-  }).join("\n")+"\n";
-  return {fileName:"economic-sectors.csv",bytes:Buffer.from(text,"utf8"),rowCount:facts.length};
+  const text =
+    "\uFEFFseries_id,label_ka,label_en,year,measure,value,unit,valuation,price_basis,calculation,status,source_id\n" +
+    ordered
+      .map(f => {
+        const r = registry.find(r => r.id === f.seriesId)!;
+        return [
+          f.seriesId,
+          r.labelKa,
+          r.labelEn,
+          f.year,
+          f.measure,
+          f.value,
+          f.unit,
+          f.valuation,
+          f.priceBasis,
+          f.calculation,
+          f.status,
+          f.sourceId,
+        ].map(csvEscape).join(",");
+      })
+      .join("\n") +
+    "\n";
+  return { fileName: "economic-sectors.csv", bytes: Buffer.from(text, "utf8"), rowCount: facts.length };
 }
 
 function buildEconomicSectorsJson(snapshot: FactQuerySnapshot): PublicationArtifact {
-  const results=Object.keys(SECTOR_QUERY_MEASURES).map(measure=>queryEconomicSectors(snapshot,{
-    measure,seriesIds:snapshot.economicSectors.registry.map(r=>r.id),years:yearsOf(snapshot.economicSectors.facts),
-  }));
-  const parts=results.map(r=>observationsOf(r,"economic-sectors.json"));
-  const first=results[0];
-  if(first.kind!=="observations") throw new Error("Sector publication query failed");
-  const observations=parts.flatMap(p=>p.data.observations);
+  const results = Object.keys(SECTOR_QUERY_MEASURES).map(measure =>
+    queryEconomicSectors(snapshot, {
+      measure,
+      seriesIds: snapshot.economicSectors.registry.map(r => r.id),
+      years: yearsOf(snapshot.economicSectors.facts),
+    }),
+  );
+  const parts = results.map(r => observationsOf(r, "economic-sectors.json"));
+  const first = results[0];
+  if (first.kind !== "observations") throw new Error("Sector publication query failed");
+  const observations = parts.flatMap(p => p.data.observations);
   const returnedCount = observations.filter(o => o.availability === "available").length;
-  const response: FactQueryResponse={...first,status:returnedCount === observations.length ? "ok" : returnedCount ? "partial" : "empty",data:{observations,coverage:{...parts[0].data.coverage,
-    missingCells:parts.flatMap(p=>p.data.coverage.missingCells),expectedCount:observations.length,returnedCount,
-  }},meta:{...first.meta,
-    sources:parts.reduce<ResolvedSource[]>((all, part) => mergeSources(all, part.meta.sources), []),
-    caveats:parts.reduce<Caveat[]>((all, part) => mergeCaveats(all, part.meta.caveats), []),
-  }};
-  return datasetFile(snapshot,"economic-sectors","economic-sectors.json",response,{});
+  const response: FactQueryResponse = {
+    ...first,
+    status: returnedCount === observations.length ? "ok" : returnedCount ? "partial" : "empty",
+    data: {
+      observations,
+      coverage: {
+        ...parts[0].data.coverage,
+        missingCells: parts.flatMap(p => p.data.coverage.missingCells),
+        expectedCount: observations.length,
+        returnedCount,
+      },
+    },
+    meta: {
+      ...first.meta,
+      sources: parts.reduce<ResolvedSource[]>((all, part) => mergeSources(all, part.meta.sources), []),
+      caveats: parts.reduce<Caveat[]>((all, part) => mergeCaveats(all, part.meta.caveats), []),
+    },
+  };
+  return datasetFile(snapshot, "economic-sectors", "economic-sectors.json", response, {});
 }
 
 /**
