@@ -10,6 +10,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { Overline, SectionTitle, SourceNote } from "../ui/editorial";
 import { Sparkline } from "../ui/sparkline";
 import type { ClientRegionalEconomyObservation } from "../../lib/servedRows";
+import { KPI_GRID_CLASS, SIDE_KPI_LIST_CLASS } from "../main-explorer/kpi-blocks";
 
 export function RegionHighlights({ facts, registry, year }: {
   facts: ClientRegionalEconomyObservation[];
@@ -36,7 +37,7 @@ export function RegionHighlights({ facts, registry, year }: {
         <SectionTitle>{t("highlights")}</SectionTitle>
         <p className="text-[12.5px] text-[var(--muted)]">{message(messages, "regionalEconomies.rowYear", { year })}</p>
       </div>
-      <div className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div className={KPI_GRID_CLASS}>
         <div className="min-w-0 @min-[1100px]:pr-11">
           <Overline>{t("largest")}</Overline>
           <p className="mt-3.5 font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]">
@@ -48,7 +49,7 @@ export function RegionHighlights({ facts, registry, year }: {
             <Sparkline values={model.trends.largest} color={model.largest ? regionalEconomyColor(model.largest.seriesId) : "var(--ink)"} />
           </div>
         </div>
-        <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
+        <div className={SIDE_KPI_LIST_CLASS}>
           {cards.map((card, index) => (
             <div key={card.id} className={index === 0 ? "pt-0.5 pb-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}>
               <Overline>{card.label}</Overline>

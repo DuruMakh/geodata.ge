@@ -6,6 +6,7 @@ import { formatAmount, formatAmountParts, formatShare, formatSignedAmount } from
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { Sparkline } from "../ui/sparkline";
 import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
+import { HERO_KPI_VALUE_CLASS, KPI_GRID_CLASS, KPI_UNIT_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
 
 // KPI row (DESIGN.md §7.11), movers board (§7.13) and the period comparison.
 
@@ -73,7 +74,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
           </p>
         </div>
 
-        <div data-testid="entity-kpi-grid" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <div data-testid="entity-kpi-grid" className={KPI_GRID_CLASS}>
           {singleYear ? (
             <div className="min-w-0 @min-[1100px]:pr-11">
               <p data-testid="period-single-year-note" className="max-w-[420px] text-[13px] leading-relaxed text-[var(--muted)]">
@@ -84,7 +85,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
           <div data-testid="entity-kpi" className="min-w-0 @min-[1100px]:pr-11">
             <Overline>{message(messages, "municipal.periodChange")}</Overline>
             <p
-              className="mt-3.5 whitespace-nowrap font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]"
+              className={HERO_KPI_VALUE_CLASS}
               style={{ color: headline.change !== null && headline.change < 0 ? NEGATIVE : "var(--ink)" }}
             >
               {formatShare(headline.change, true)}
@@ -114,16 +115,16 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
             </div>
           </div>
           )}
-          <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
+          <div className={SIDE_KPI_LIST_CLASS}>
             {sideKpis.map((kpi, index) => (
-              <div key={kpi.label} data-testid="entity-kpi" className={index === 0 ? "pt-0.5 pb-3.5" : index === 2 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}>
+              <div key={kpi.label} data-testid="entity-kpi" className={sideKpiRowClass(index, sideKpis.length)}>
                 <div data-testid="side-kpi">
                   <Overline>{kpi.label}</Overline>
                   <div className="mt-[7px] flex items-baseline justify-between gap-4">
-                    <span className="whitespace-nowrap font-[family-name:var(--font-display)] text-2xl font-semibold leading-[1.1] tracking-[-0.02em]">
+                    <span className={SIDE_KPI_VALUE_CLASS}>
                       {kpi.value}
                       {kpi.unit ? (
-                        <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-xs font-medium tracking-normal text-[var(--body)]">
+                        <span className={KPI_UNIT_CLASS}>
                           {kpi.unit}
                         </span>
                       ) : null}

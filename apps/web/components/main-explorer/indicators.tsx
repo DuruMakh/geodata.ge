@@ -11,7 +11,7 @@ import { compoundAnnualGrowth, rankPeriodDeltas } from "../../lib/explorer/indic
 import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
 import { formatAmount, formatAmountParts, formatBn, formatShare, MISSING } from "../../lib/explorer/format";
 import { SectionTitle, SwatchBar } from "../ui/editorial";
-import { HeroKpi, SideKpiList } from "./kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "./kpi-blocks";
 
 // "ძირითადი ინდიკატორები" per DESIGN.md §8.5: hero KPI with a two-segment gauge and
 // an editorial sentence, three side KPIs, the movers board, and the period comparison.
@@ -158,7 +158,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
         </p>
       </div>
 
-      <div data-testid="period-kpi-cards" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div data-testid="period-kpi-cards" className={KPI_GRID_CLASS}>
         {singleYear ? (
           // No overline: it would title a block that has no value under it.
           <div className="min-w-0 @min-[1100px]:pr-11">
