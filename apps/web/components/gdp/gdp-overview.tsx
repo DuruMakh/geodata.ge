@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { ClientGdpObservation, SourceIdRanges } from "../../lib/servedRows";
-import { I18nProvider, useI18n } from "../../lib/i18n/provider";
+import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import {
@@ -33,6 +33,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { INK } from "../../lib/explorer/colors";
 
 export type GdpWorkbookSource = WorkbookPublicSource & { sourceId: string };
 export function GdpOverview({
@@ -92,7 +93,7 @@ export function GdpOverview({
     {
       id: row.itemId,
       label: d.label,
-      color: "#1E1B16",
+      color: INK,
       // Shared chart percentages use points; table and workbook use fractions.
       vals: m.points.map((p) => d.growth ? p.value * 100 : p.value),
       planned: m.years.map(() => false),
@@ -216,28 +217,21 @@ export function GdpOverview({
               shareLabel={d.fullUnitLabel}
             />
           ) : (
-            <I18nProvider
-              {...presentation}
-              englishLabels={{
-                ...presentation.englishLabels,
-                "gdp.overview": d.label,
-              }}
-            >
-              <ExplorerTable
-                caption={`${d.label} · ${d.fullUnitLabel}`}
-                rows={[row]}
-                totalRow={null}
-                showTotal={false}
-                years={m.years}
-                firstColumnLabel={t("indicator")}
-                unit={d.unit}
-                share={d.growth}
-                showChangeColumn={false}
-                preliminaryYears={m.preliminaryYears}
-                preliminaryLabel={t("preliminary")}
-                shareValueForYear={(r, y) => r.valuesByYear[y] ?? null}
-              />
-            </I18nProvider>
+            <ExplorerTable
+              caption={`${d.label} · ${d.fullUnitLabel}`}
+              rows={[row]}
+              totalRow={null}
+              showTotal={false}
+              years={m.years}
+              firstColumnLabel={t("indicator")}
+              unit={d.unit}
+              share={d.growth}
+              showChangeColumn={false}
+              preliminaryYears={m.preliminaryYears}
+              preliminaryLabel={t("preliminary")}
+              rowLabelsLocalized
+              shareValueForYear={(r, y) => r.valuesByYear[y] ?? null}
+            />
           )}
         </div>
         <RangeStrip
