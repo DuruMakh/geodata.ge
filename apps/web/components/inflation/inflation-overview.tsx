@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import type { ClientCpiFact } from "../../lib/servedRows";
@@ -29,6 +29,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 // Inflation overview (spec §6): the GDP overview's centred tabs over the Budget
 // explorers' workspace — chart or monthly table, range strip and series panel.
@@ -68,21 +69,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   useAppReady();
 
   const serializedHash = serializeInflationHash(state);
-  const hashApplied = useRef(false);
-  useEffect(() => {
-    if (!ready) return;
-    // Skip the run that applies the incoming hash: writing it back would stamp a
-    // pristine URL with the default state (use-explorer-state.ts has the same rule).
-    if (!hashApplied.current) {
-      hashApplied.current = true;
-      return;
-    }
-    try {
-      history.replaceState(null, "", `#${serializedHash}`);
-    } catch {
-      // History can be unavailable in some embedded contexts; the UI still works.
-    }
-  }, [serializedHash, ready]);
+  useReplaceHash(serializedHash, ready);
 
   const range = resolveInflationRange(state, index);
   const { periods, lines } = buildInflationLines(index, targets, state, range);

@@ -5,6 +5,7 @@ import type { ClientAdminFact, ClientBudgetFact } from "../../lib/explorer/clien
 import { getDefaultSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerNav, type ExplorerScope } from "../../lib/explorer/types";
 import { parseExplorerHash, scopeFor, serializeExplorerHash } from "../../lib/explorer/urlState";
+import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 type UseExplorerStateInput = {
   facts: ClientBudgetFact[];
@@ -65,7 +66,6 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
   const [analysisGrouping, setAnalysisGrouping] = useState<ExpenditureGrouping>("fields");
   const [analysisYear, setAnalysisYear] = useState<number | null>(null);
   const hashAppliedRef = useRef(false);
-  const hashWrittenRef = useRef(false);
 
   const explorerSide: "expenditure" | "revenue" = nav === "revenue" ? "revenue" : "expenditure";
   const scope = scopeFor(explorerSide, grouping);
@@ -178,19 +178,7 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     analysisYear: resolvedAnalysisYear,
   });
 
-  useEffect(() => {
-    // Skip the mount run: its serializedHash was computed from default state, so
-    // writing it would clobber an incoming deep link (and stamp pristine URLs).
-    if (!hashWrittenRef.current) {
-      hashWrittenRef.current = true;
-      return;
-    }
-    try {
-      history.replaceState(null, "", `#${serializedHash}`);
-    } catch {
-      // History can be unavailable in some embedded contexts; the UI still works.
-    }
-  }, [serializedHash]);
+  useReplaceHash(serializedHash);
 
   return {
     explorerSide,

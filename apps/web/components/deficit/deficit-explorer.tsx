@@ -28,6 +28,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { MeasurePill } from "../explorer-shell/measure-pill";
+import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 type DeficitExplorerProps = {
   facts: ClientGeneralGovernmentBalanceFact[];
@@ -52,7 +53,6 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
   const [query, setQuery] = useState("");
   const [range, setRange] = useState({ start: min, end: max, min, max });
   const parsedRef = useRef(false);
-  const writtenRef = useRef(false);
   const model = useMemo(
     () => buildDeficitExplorerModel({ facts, range, percentage, selected }, presentation),
     [facts, range, percentage, selected, presentation],
@@ -117,17 +117,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
     selected,
   });
 
-  useEffect(() => {
-    if (!writtenRef.current) {
-      writtenRef.current = true;
-      return;
-    }
-    try {
-      history.replaceState(null, "", `#${hash}`);
-    } catch {
-      // Browser history may be unavailable in embedded contexts; the explorer remains usable.
-    }
-  }, [hash]);
+  useReplaceHash(hash);
 
   useAppReady();
 

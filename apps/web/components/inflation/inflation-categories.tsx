@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientBasketWeightRow } from "../../lib/servedRows";
 import { formatDisplayDate } from "../../lib/explorer/format";
@@ -48,6 +48,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 // Inflation categories (spec §6): the overview's layout, with a stacked column
 // chart on the contribution tab where the parts visibly re-add to the published
@@ -86,21 +87,7 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
   useAppReady();
 
   const serializedHash = serializeCategoryHash(state);
-  const hashApplied = useRef(false);
-  useEffect(() => {
-    if (!ready) return;
-    // Skip the run that applies the incoming hash: writing it back would stamp a
-    // pristine URL with the default state (use-explorer-state.ts has the same rule).
-    if (!hashApplied.current) {
-      hashApplied.current = true;
-      return;
-    }
-    try {
-      history.replaceState(null, "", `#${serializedHash}`);
-    } catch {
-      // History can be unavailable in some embedded contexts; the UI still works.
-    }
-  }, [serializedHash, ready]);
+  useReplaceHash(serializedHash, ready);
 
   const range = resolveCategoryRange(state, index);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);

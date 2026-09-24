@@ -3,6 +3,7 @@ import type { SectorDefinition, SectorMeasure } from "../data/economicSectors/ty
 import { matchesLabelQuery } from "../i18n/search";
 import type { ClientSectorObservation } from "../servedRows";
 import { refitRange, resolveRange as resolvePeriodRange } from "./periodRange";
+import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
 
 export const SECTOR_GDP = "economy.gdp_total";
 export type SectorState = {
@@ -40,20 +41,17 @@ export function sectorColor(id: string): string {
 export function parseSectorHash(hash: string, validIds: readonly string[]): SectorState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
   const measure = p.get("measure");
-  const start = Number(p.get("start")), end = Number(p.get("end"));
   return {
     measure: measure === "share_of_gdp" || measure === "real_growth" ? measure : "nominal",
     mode: p.get("view") === "table" ? "table" : "line",
     selectedIds: p.has("sel") ? [...new Set(p.get("sel")!.split(","))].filter(id => validIds.includes(id)) : [SECTOR_GDP],
-    range: p.get("range") !== "all" && p.has("start") && p.has("end") && Number.isInteger(start) && Number.isInteger(end) && start > 0 && end > 0
-      ? { kind: "manual", start: Math.min(start, end), end: Math.max(start, end) } : { kind: "all" },
+    range: parseYearRangeKeys(p),
   };
 }
 
 export function serializeSectorHash(state: SectorState): string {
   const p = new URLSearchParams({ measure: state.measure, view: state.mode, sel: state.selectedIds.join(",") });
-  if (state.range.kind === "all") p.set("range", "all");
-  else { p.set("start", String(state.range.start)); p.set("end", String(state.range.end)); }
+  writeYearRangeKeys(p, state.range);
   return p.toString();
 }
 

@@ -1,8 +1,9 @@
-import { periodFromKey, periodKey } from "../data/inflation/periods";
+import { periodFromKey } from "../data/inflation/periods";
 import type { CpiMeasure, CpiSeriesId } from "../data/inflation/types";
 import type { ClientCpiFact, ClientInflationTargetRow } from "../servedRows";
 import { ACCENT, INK } from "./colors";
 import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
+import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
 // Pure state and data selection for the inflation overview. Components compose
 // these; nothing here renders or reads the DOM.
@@ -147,22 +148,10 @@ export function latestIndicators(index: InflationIndex, targets: ClientInflation
   };
 }
 
-const RANGE_PARAM = /^(\d{4}-\d{2})-(\d{4}-\d{2})$/;
-
 export function parseInflationHash(hash: string): InflationState {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
   const tab = INFLATION_TABS.find((entry) => entry === params.get("i")) ?? DEFAULT_INFLATION_STATE.tab;
-  let range: InflationRange = { kind: "all" };
-  const match = RANGE_PARAM.exec(params.get("r") ?? "");
-  if (match) {
-    try {
-      const a = periodFromKey(match[1]!);
-      const b = periodFromKey(match[2]!);
-      range = { kind: "manual", start: Math.min(a, b), end: Math.max(a, b) };
-    } catch {
-      range = { kind: "all" };
-    }
-  }
+  const range = parseMonthRangeKey(params);
   const requested = params.has("sel") ? (params.get("sel") ?? "").split(",") : DEFAULT_INFLATION_STATE.selected;
   const selected = SELECTION_ORDER.filter((key) => requested.includes(key));
   const tableSeries = INFLATION_SERIES.find((key) => key === params.get("t")) ?? null;
@@ -171,7 +160,7 @@ export function parseInflationHash(hash: string): InflationState {
 
 export function serializeInflationHash(state: InflationState): string {
   const params = new URLSearchParams({ i: state.tab, m: state.mode });
-  if (state.range.kind === "manual") params.set("r", `${periodKey(state.range.start)}-${periodKey(state.range.end)}`);
+  writeMonthRangeKey(params, state.range);
   params.set("sel", state.selected.join(","));
   if (state.tableSeries !== null) params.set("t", state.tableSeries);
   return params.toString();

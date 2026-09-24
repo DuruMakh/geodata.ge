@@ -1,5 +1,6 @@
 import { DEFICIT_SERIES_ID } from "./deficitExplorer";
 import type { ChartMode } from "./types";
+import { parseSharedHashKeys } from "./urlState";
 
 // Accept previously shared explorer links; only the published ID is written.
 const LEGACY_DEFICIT_SERIES_ID = "deficit.general_government_balance";
@@ -15,16 +16,12 @@ export function parseDeficitHash(hash: string): DeficitUrlState {
   try {
     const params = new URLSearchParams(hash.replace(/^#/, ""));
     const state: DeficitUrlState = {};
-    const mode = params.get("m");
-    if (mode === "line" || mode === "table") state.chartMode = mode;
+    const { chartMode, range } = parseSharedHashKeys(params);
+    if (chartMode) state.chartMode = chartMode;
+    // Unlike the shared `sh`, the deficit writes 0 as well as 1.
     if (params.get("sh") === "1") state.percentage = true;
     if (params.get("sh") === "0") state.percentage = false;
-
-    const range = params.get("r");
-    if (range && /^\d{4}-\d{4}$/.test(range)) {
-      const [start = 0, end = 0] = range.split("-").map(Number);
-      state.range = { start, end };
-    }
+    if (range) state.range = range;
 
     if (params.has("sel")) {
       const selection = params.get("sel") ?? "";

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChartMode } from "../../lib/explorer/types";
 import { parseMunicipalHash, serializeMunicipalHash } from "../../lib/explorer/urlState";
+import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 function clampYear(year: number, min: number, max: number): number {
   return Math.min(Math.max(year, min), max);
@@ -29,7 +30,6 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
   const [end, setEnd] = useState(max);
   const [selectedIds, setSelectedIds] = useState(defaultSelection);
   const appliedRef = useRef(false);
-  const writtenRef = useRef(false);
 
   useEffect(() => {
     if (appliedRef.current) return;
@@ -56,17 +56,7 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
 
   const hash = serializeMunicipalHash({ chartMode, share, rangeStart: start, rangeEnd: end, selectedIds });
 
-  useEffect(() => {
-    if (!writtenRef.current) {
-      writtenRef.current = true;
-      return;
-    }
-    try {
-      history.replaceState(null, "", `#${hash}`);
-    } catch {
-      // History can be unavailable in embedded contexts; the UI still works.
-    }
-  }, [hash]);
+  useReplaceHash(hash);
 
   function toggleSeries(itemId: string) {
     setSelectedIds((current) =>

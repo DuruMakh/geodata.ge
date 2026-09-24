@@ -1,3 +1,5 @@
+import { periodFromKey, periodKey } from "../data/inflation/periods";
+import type { PeriodRange } from "./periodRange";
 import type { ChartMode, ExpenditureGrouping, ExplorerNav, ExplorerScope } from "./types";
 
 // Shareable screen state, serialized into the URL hash (DESIGN.md §6.3). The
@@ -25,18 +27,18 @@ function selectionIds(value: string): string[] {
   return [...new Set(value.split(",").filter(Boolean))];
 }
 
-// The budget explorer and the municipalities section share four hash keys —
-// m mode, sh share, r range, sel selection — so there is one vocabulary in the
-// URL spec (DESIGN.md §6.3). Both sections read and write them through these
-// two helpers; each section adds only its own keys on top.
-type SharedHashState = {
+// The budget explorer, the municipalities section and the debt explorer share
+// four hash keys — m mode, sh share, r range, sel selection — so there is one
+// vocabulary in the URL spec (DESIGN.md §6.3). All three read and write them
+// through these two helpers; each adds only its own keys on top.
+export type SharedHashState = {
   chartMode?: ChartMode;
   share?: boolean;
   range?: { start: number; end: number };
   selection?: string[];
 };
 
-function parseSharedHashKeys(params: URLSearchParams): SharedHashState {
+export function parseSharedHashKeys(params: URLSearchParams): SharedHashState {
   const state: SharedHashState = {};
 
   const mode = params.get("m");
@@ -56,7 +58,7 @@ function parseSharedHashKeys(params: URLSearchParams): SharedHashState {
   return state;
 }
 
-function writeSharedHashKeys(
+export function writeSharedHashKeys(
   params: URLSearchParams,
   input: { chartMode: ChartMode; share: boolean; rangeStart: number; rangeEnd: number; selectedIds: string[] },
 ): void {
@@ -64,6 +66,50 @@ function writeSharedHashKeys(
   if (input.share) params.set("sh", "1");
   params.set("r", `${input.rangeStart}-${input.rangeEnd}`);
   params.set("sel", input.selectedIds.join(","));
+}
+
+// The GDP, sector and regional pages keep their range in `range=all` or a
+// `start`/`end` year pair, read in either order.
+export function parseYearRangeKeys(params: URLSearchParams): PeriodRange {
+  const start = Number(params.get("start"));
+  const end = Number(params.get("end"));
+  return params.get("range") !== "all" &&
+    params.has("start") &&
+    params.has("end") &&
+    Number.isInteger(start) &&
+    Number.isInteger(end) &&
+    start > 0 &&
+    end > 0
+    ? { kind: "manual", start: Math.min(start, end), end: Math.max(start, end) }
+    : { kind: "all" };
+}
+
+export function writeYearRangeKeys(params: URLSearchParams, range: PeriodRange): void {
+  if (range.kind === "all") params.set("range", "all");
+  else {
+    params.set("start", String(range.start));
+    params.set("end", String(range.end));
+  }
+}
+
+const MONTH_RANGE = /^(\d{4}-\d{2})-(\d{4}-\d{2})$/;
+
+// The inflation pages keep a manual range in `r` as two `YYYY-MM` months, read
+// in either order; "all" is the key's absence.
+export function parseMonthRangeKey(params: URLSearchParams): PeriodRange {
+  const match = MONTH_RANGE.exec(params.get("r") ?? "");
+  if (!match) return { kind: "all" };
+  try {
+    const a = periodFromKey(match[1]!);
+    const b = periodFromKey(match[2]!);
+    return { kind: "manual", start: Math.min(a, b), end: Math.max(a, b) };
+  } catch {
+    return { kind: "all" };
+  }
+}
+
+export function writeMonthRangeKey(params: URLSearchParams, range: PeriodRange): void {
+  if (range.kind === "manual") params.set("r", `${periodKey(range.start)}-${periodKey(range.end)}`);
 }
 
 export function parseExplorerHash(hash: string, nav: ExplorerNav): ExplorerUrlState {

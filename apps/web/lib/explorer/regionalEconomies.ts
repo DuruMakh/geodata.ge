@@ -5,6 +5,7 @@ import { INK } from "./colors";
 import { sectorColor } from "./economicSectors";
 import type { ClientRegionalEconomyObservation } from "../servedRows";
 import { refitRange, resolveRange as resolvePeriodRange } from "./periodRange";
+import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
 
 export type RegionalEconomyState = {
   measure: RegionalEconomyMeasure;
@@ -65,21 +66,10 @@ export function parseRegionalEconomyHash(
   validIds: readonly string[],
 ): RegionalEconomyState {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
-  const start = Number(params.get("start"));
-  const end = Number(params.get("end"));
   return {
     measure: params.get("measure") === "share_of_region_gdp" ? "share_of_region_gdp" : "nominal",
     mode: params.get("view") === "table" ? "table" : "line",
-    range:
-      params.get("range") !== "all" &&
-      params.has("start") &&
-      params.has("end") &&
-      Number.isInteger(start) &&
-      Number.isInteger(end) &&
-      start > 0 &&
-      end > 0
-        ? { kind: "manual", start: Math.min(start, end), end: Math.max(start, end) }
-        : { kind: "all" },
+    range: parseYearRangeKeys(params),
     selectedIds: params.has("sel")
       ? [...new Set(params.get("sel")!.split(","))].filter((id) => validIds.includes(id))
       : [REGIONAL_GDP_TOTAL],
@@ -92,11 +82,7 @@ export function serializeRegionalEconomyHash(state: RegionalEconomyState) {
     view: state.mode,
     sel: state.selectedIds.join(","),
   });
-  if (state.range.kind === "all") params.set("range", "all");
-  else {
-    params.set("start", String(state.range.start));
-    params.set("end", String(state.range.end));
-  }
+  writeYearRangeKeys(params, state.range);
   return params.toString();
 }
 

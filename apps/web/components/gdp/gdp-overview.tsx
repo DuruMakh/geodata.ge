@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { ClientGdpObservation, SourceIdRanges } from "../../lib/servedRows";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
@@ -32,6 +32,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
+import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 export type GdpWorkbookSource = WorkbookPublicSource & { sourceId: string };
 export function GdpOverview({
@@ -65,21 +66,7 @@ export function GdpOverview({
   }, [facts]);
   useAppReady();
   const serializedHash = serializeGdpHash(state);
-  const hashApplied = useRef(false);
-  useEffect(() => {
-    if (!ready) return;
-    // Skip the run that applies the incoming hash: writing it back would stamp a
-    // pristine URL with the default state (use-explorer-state.ts has the same rule).
-    if (!hashApplied.current) {
-      hashApplied.current = true;
-      return;
-    }
-    try {
-      history.replaceState(null, "", `#${serializedHash}`);
-    } catch {
-      // History can be unavailable in some embedded contexts; the UI still works.
-    }
-  }, [serializedHash, ready]);
+  useReplaceHash(serializedHash, ready);
   const m = useMemo(
     () => buildGdpOverviewModel(facts, state, sourceIdRanges),
     [facts, state, sourceIdRanges],

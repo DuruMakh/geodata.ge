@@ -3,6 +3,7 @@ import { periodFromKey, periodKey } from "../data/inflation/periods";
 import type { CategoryFactInput } from "../data/inflation/types";
 import type { ClientBasketWeightRow } from "../servedRows";
 import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
+import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
 // Pure state and data selection for the inflation categories section. The period
 // range rules are shared with the overview (lib/explorer/periodRange.ts).
@@ -402,23 +403,12 @@ export function latestCategoryIndicators(index: CategoryIndex): CategoryIndicato
   };
 }
 
-const RANGE_PARAM = /^(\d{4}-\d{2})-(\d{4}-\d{2})$/;
 const CATEGORY_ID = /^cpi\.cat\.(0[1-9]|1[0-2])(_[1-9])?$/;
 
 export function parseCategoryHash(hash: string): CategoryState {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
   const tab = CATEGORY_TABS.find((entry) => entry === params.get("i")) ?? DEFAULT_CATEGORY_STATE.tab;
-  let range: CategoryRange = { kind: "all" };
-  const match = RANGE_PARAM.exec(params.get("r") ?? "");
-  if (match) {
-    try {
-      const a = periodFromKey(match[1]!);
-      const b = periodFromKey(match[2]!);
-      range = { kind: "manual", start: Math.min(a, b), end: Math.max(a, b) };
-    } catch {
-      range = { kind: "all" };
-    }
-  }
+  const range = parseMonthRangeKey(params);
   // Unknown categories are dropped rather than failing the page (spec §8).
   const selected = params.has("sel")
     ? pruneOverlaps(
@@ -435,7 +425,7 @@ export function parseCategoryHash(hash: string): CategoryState {
 
 export function serializeCategoryHash(state: CategoryState): string {
   const params = new URLSearchParams({ i: state.tab, m: state.mode });
-  if (state.range.kind === "manual") params.set("r", `${periodKey(state.range.start)}-${periodKey(state.range.end)}`);
+  writeMonthRangeKey(params, state.range);
   params.set("sel", state.selected.join(","));
   if (state.expanded.length > 0) params.set("x", state.expanded.join(","));
   if (state.tableSeries !== null) params.set("t", state.tableSeries);
