@@ -76,14 +76,20 @@ test("the Economy heading steps from 30px on phones to 40px on wider screens", a
 });
 test("Economy links the delivered overview, national sectors and regional economies", async ({ page }) => {
   await page.goto("/en/explorer/economy");
-  await expect(
-    page.getByTestId("economy-hub").getByTestId("hub-card"),
-  ).toHaveCount(3);
+  const cards = page.getByTestId("economy-hub").getByTestId("hub-card");
+  await expect(cards).toHaveCount(3);
   await expect(page.getByTestId("economy-hub").locator("a")).toHaveCount(3);
   await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/sectors"]')).toHaveCount(1);
   await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/regions"]')).toHaveCount(1);
+  for (let index = 0; index < 3; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+  await expect(cards.nth(1)).toContainText("Top 3 sectors’ GDP share");
+  await expect(cards.nth(2)).toContainText("Total regional GDP (Current prices)");
   await page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/gdp"]').click();
   await expect(page.getByTestId("gdp-overview")).toBeVisible();
+  await page.goto("/explorer/economy");
+  for (let index = 0; index < 3; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+  await expect(cards.nth(1)).toContainText("ტოპ 3-ის წილი მშპ-ში");
+  await expect(cards.nth(2)).toContainText("რეგიონის მთლიანი მშპ (მიმდინარე ფასები)");
 });
 
 for (const locale of ['ka', 'en']) {
