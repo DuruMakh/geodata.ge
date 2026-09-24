@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
-import { csvEscape } from "../csvEscape";
+import { serializeBomCsv } from "../csvEscape";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 
 const GEOSTAT_ARTIFACT_LABEL = "Geostat municipal indicators";
@@ -546,16 +546,6 @@ async function verifySources(
   return true;
 }
 
-function serializeCsv<T extends object>(headers: Array<keyof T>, rows: T[]): string {
-  const lines = [
-    headers.join(","),
-    ...rows.map((row) =>
-      headers.map((header) => csvEscape(row[header] as string | number | boolean | null)).join(","),
-    ),
-  ];
-  return `\uFEFF${lines.join("\n")}\n`;
-}
-
 function csvNumber(value: string): number | null {
   if (value === "") return null;
   const number = Number(value);
@@ -931,8 +921,8 @@ export async function buildGeostatPackage(
     "transformation",
     "last_reviewed_at",
   ];
-  const populationCsv = serializeCsv(populationHeaders, populationRows);
-  const gdpCsv = serializeCsv(gdpHeaders, regionalGdpRows);
+  const populationCsv = serializeBomCsv(populationHeaders, populationRows);
+  const gdpCsv = serializeBomCsv(gdpHeaders, regionalGdpRows);
   const normalizedValuesReconcile =
     reconciliationEntriesMatch(
       parseCsv(populationCsv).map(serializedPopulationEntry),

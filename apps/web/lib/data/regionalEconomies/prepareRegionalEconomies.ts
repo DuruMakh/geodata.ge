@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import Decimal from "decimal.js";
 import type { MunicipalRegion } from "../municipal/types";
-import { csvEscape } from "../csvEscape";
+import { serializeBomCsvRows } from "../csvEscape";
 import { shareOfRegionGdpPercent } from "./calculations";
 import { loadRegionalSourceEvidence } from "./sourceEvidence";
 import {
@@ -246,8 +246,7 @@ export async function prepareRegionalEconomies(repositoryRoot: string) {
   };
 }
 
-const csv = (headers: string[], rows: (string | number | boolean)[][]) =>
-  "\uFEFF" + [headers, ...rows].map((row) => row.map(csvEscape).join(",")).join("\n") + "\n";
+const csv = (headers: string[], rows: (string | number | boolean)[][]) => serializeBomCsvRows([headers, ...rows]);
 
 export function buildRegionalEconomyArtifacts(
   result: Awaited<ReturnType<typeof prepareRegionalEconomies>>,

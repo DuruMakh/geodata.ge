@@ -1,11 +1,11 @@
 import { createHash } from "node:crypto";
-import fs from "node:fs/promises";
 import path from "node:path";
 import {
   GOVERNMENT_DEBT_SOURCE_IDS,
   type GovernmentDebtSourceId,
   type SourceManifestRow,
 } from "./types";
+import { readPackageFile } from "../sourcePackage";
 
 type CsvRow = Record<string, string>;
 
@@ -306,8 +306,7 @@ export async function validateGovernmentDebtSourceManifest(
       throw new Error(`Invalid source-manifest period bounds for ${sourceId}`);
     }
 
-    const sourcePath = path.join(packageDir, row.local_file);
-    const bytes = await fs.readFile(sourcePath);
+    const bytes = await readPackageFile(packageDir, row.local_file);
     const hash = createHash("sha256").update(bytes).digest("hex").toUpperCase();
     if (hash !== row.sha256) {
       throw new Error(`Unexpected source-manifest sha256 for ${sourceId}`);

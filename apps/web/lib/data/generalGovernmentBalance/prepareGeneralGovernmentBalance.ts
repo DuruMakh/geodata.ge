@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
@@ -6,7 +5,7 @@ import Decimal from "decimal.js";
 import * as XLSX from "xlsx";
 import { z } from "zod";
 
-import { csvEscape } from "../csvEscape";
+import { serializeBomCsv } from "../csvEscape";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import type {
   GeneralGovernmentBalanceFact,
@@ -17,6 +16,7 @@ import type {
   GeneralGovernmentBalanceValidationReport,
   GeneralGovernmentBalanceValidationSummary,
 } from "./types";
+import { readVerifiedPackageFile } from "../sourcePackage";
 
 const EXPECTED_COUNTRY_ID = "GEO" as const;
 const EXPECTED_SHEET = "Countries" as const;
@@ -130,13 +130,6 @@ const REPORT_PATH = path.join(
   "reports",
   "general-government-balance-annual-1995-2031-validation.json",
 );
-
-function serializeCsv(headers: string[], rows: Array<Record<string, string | number>>): string {
-  return `\uFEFF${[
-    headers.join(","),
-    ...rows.map((row) => headers.map((header) => csvEscape(row[header] ?? "")).join(",")),
-  ].join("\n")}\n`;
-}
 
 function textValue(sheet: XLSX.WorkSheet, row: number, column: number): string {
   return String(sheet[XLSX.utils.encode_cell({ r: row, c: column })]?.v ?? "").trim();
@@ -438,14 +431,13 @@ export async function prepareGeneralGovernmentBalance({
   const latestActualYear = Number(manifest.latest_actual_year);
   const expectedSourceBytes = Number(manifest.bytes);
 
-  const workbookBytes = await fs.readFile(path.join(PACKAGE_DIR, manifest.local_file));
-  const sourceSha256 = createHash("sha256").update(workbookBytes).digest("hex").toUpperCase();
-  if (
-    workbookBytes.byteLength !== expectedSourceBytes ||
-    sourceSha256 !== manifest.sha256
-  ) {
-    throw new Error(`Reviewed source mismatch for ${manifest.source_id}`);
-  }
+  const { bytes: workbookBytes, sha256 } = await readVerifiedPackageFile(
+    PACKAGE_DIR,
+    manifest.local_file,
+    { sha256: manifest.sha256, bytes: expectedSourceBytes },
+    `Reviewed source mismatch for ${manifest.source_id}`,
+  );
+  const sourceSha256 = sha256.toUpperCase();
 
   const sourceFacts = extractSourceFacts(
     workbookBytes,
@@ -506,11 +498,11 @@ export async function prepareGeneralGovernmentBalance({
   const artifacts = [
     {
       filePath: STAGING_PATH,
-      content: serializeCsv(Object.keys(stagingRows[0] ?? {}), stagingRows),
+      content: serializeBomCsv(Object.keys(stagingRows[0] ?? {}), stagingRows),
     },
     {
       filePath: CANONICAL_PATH,
-      content: serializeCsv(Object.keys(canonicalRows[0] ?? {}), canonicalRows),
+      content: serializeBomCsv(Object.keys(canonicalRows[0] ?? {}), canonicalRows),
     },
     { filePath: REPORT_PATH, content: `${JSON.stringify(validation, null, 2)}\n` },
   ];

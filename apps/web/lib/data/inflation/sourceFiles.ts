@@ -1,9 +1,9 @@
-import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
 import { CPI_FILE_ROLES } from "./readGeostatCpi";
+import { readVerifiedPackageFile } from "../sourcePackage";
 
 export const INFLATION_RAW_ROOT = path.resolve(process.cwd(), "../../docs/Raw Data/Inflation");
 
@@ -48,9 +48,7 @@ export async function readVerifiedCpiFiles(vintageDir: string): Promise<Verified
   if (rows.length !== CPI_FILE_ROLES.length * 2) throw new Error(`CPI manifest lists ${rows.length} files, expected ${CPI_FILE_ROLES.length * 2}`);
   return Promise.all(
     rows.map(async (row) => {
-      const content = await fs.readFile(path.join(vintageDir, row.local_file));
-      const sha256 = createHash("sha256").update(content).digest("hex");
-      if (content.length !== row.bytes || sha256 !== row.sha256) throw new Error(`CPI source hash mismatch: ${row.local_file}`);
+      const { bytes: content } = await readVerifiedPackageFile(vintageDir, row.local_file, row, `CPI source hash mismatch: ${row.local_file}`);
       return { ...row, content };
     }),
   );

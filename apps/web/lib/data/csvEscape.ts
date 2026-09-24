@@ -8,3 +8,23 @@ export function csvEscape(value: string | number | boolean | null): string {
   const text = String(value);
   return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
+
+type CsvCell = string | number | boolean | null;
+
+/**
+ * A generated CSV: UTF-8 with a BOM (Excel then opens Georgian text correctly),
+ * every cell escaped, and a line ending after the last row. Canonical imports use
+ * "\n"; the public downloads keep "\r\n".
+ */
+export function serializeBomCsvRows(rows: ReadonlyArray<ReadonlyArray<CsvCell>>, lineEnding: "\n" | "\r\n" = "\n"): string {
+  return `﻿${rows.map((row) => row.map(csvEscape).join(",")).join(lineEnding)}${lineEnding}`;
+}
+
+/** The same from records keyed by header; a missing cell is written empty. */
+export function serializeBomCsv(
+  headers: readonly string[],
+  records: ReadonlyArray<Partial<Record<string, CsvCell>>>,
+  lineEnding: "\n" | "\r\n" = "\n",
+): string {
+  return serializeBomCsvRows([headers, ...records.map((record) => headers.map((header) => record[header] ?? ""))], lineEnding);
+}
