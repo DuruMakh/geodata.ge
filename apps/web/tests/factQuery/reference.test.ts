@@ -19,6 +19,7 @@ import { queryDeficit } from "../../lib/factQuery/queryDeficit";
 import { queryEconomicSectors } from "../../lib/factQuery/queryEconomicSectors";
 import { queryGdp } from "../../lib/factQuery/queryGdp";
 import { queryInflation } from "../../lib/factQuery/queryInflation";
+import { queryRegionalEconomies } from "../../lib/factQuery/queryRegionalEconomies";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { rank } from "../../lib/factQuery/rank";
@@ -45,6 +46,7 @@ function run(tool: string, args: unknown): FactQueryResponse {
     query_gdp: (input) => queryGdp(snapshot, input),
     query_economic_sectors: (input) => queryEconomicSectors(snapshot, input),
     query_inflation: (input) => queryInflation(snapshot, input),
+    query_regional_economies: (input) => queryRegionalEconomies(snapshot, input),
     compare: (input) => compare(snapshot, input),
     rank: (input) => rank(snapshot, input),
     get_sources: (input) => getSources(snapshot, input),
@@ -72,9 +74,9 @@ describe("section 14.3 bilingual reference fixture", () => {
   // Six more on 2026-09-14 for inflation: a published month, a refused core index,
   // an unverified early target, contributions with their residual, a two-month
   // point change, and a division ranking.
-  it("covers 34 intents, each asked in both languages", () => {
-    expect(REFERENCE_INTENTS).toHaveLength(34);
-    expect(REFERENCE_INTENTS.map((intent) => intent.id)).toEqual(Array.from({ length: 34 }, (_, i) => i + 1));
+  it("covers 37 intents, each asked in both languages", () => {
+    expect(REFERENCE_INTENTS).toHaveLength(37);
+    expect(REFERENCE_INTENTS.map((intent) => intent.id)).toEqual(Array.from({ length: 37 }, (_, i) => i + 1));
 
     for (const intent of REFERENCE_INTENTS) {
       expect(intent.promptKa.length, `intent ${intent.id} promptKa`).toBeGreaterThan(10);
@@ -111,6 +113,9 @@ describe("section 14.3 bilingual reference fixture", () => {
 
         if (intent.expectedStatus === "error") {
           expect(response.kind).toBe("error");
+          if (response.kind === "error" && intent.expectedErrorCode !== undefined) {
+            expect(response.error.code).toBe(intent.expectedErrorCode);
+          }
           return;
         }
         if (response.kind === "error") throw new Error(`unexpected error: ${response.error.messageEn}`);
@@ -228,8 +233,7 @@ describe("section 14.3 bilingual reference fixture", () => {
         // An intent flagged as needing a qualification must actually have
         // something to qualify with.
         if (intent.mustDeclineOrQualify) {
-          // Three of the twenty responses carry no caveat at all, and none of
-          // those three is flagged, so the flag discriminates. Requiring a
+          // Responses with no caveat are not flagged, so the flag discriminates. Requiring a
           // SEVERE caveat would be the opposite mistake: intents 8, 9, 15 and
           // 16 qualify correctly with a note. What this flag means is that the
           // service holds something back specific to THIS question.

@@ -54,7 +54,7 @@ reasons that have nothing to do with your change.
 1. `npm run check` and `npm run build` pass locally.
 2. UI changes: `npm run test:browser` passes.
 3. Data changes: the matching methodology doc under `docs/data-methodology/` is updated in the same change.
-4. Query-service changes (`lib/factQuery/`, `lib/mcp/`, `app/mcp/`): the 20-intent reference fixture (`npx vitest run tests/factQuery/reference.test.ts`) passes. A disagreement there is a stop condition — report it rather than editing the expectation.
+4. Query-service changes (`lib/factQuery/`, `lib/mcp/`, `app/mcp/`): the reference fixture (`npx vitest run tests/factQuery/reference.test.ts`) passes. A disagreement there is a stop condition — report it rather than editing the expectation.
 5. Durable project changes update their canonical owner: scope in `Project_Definition.md`, visuals in `DESIGN.md`, data/deployment behavior in the relevant methodology or runbook, and `AGENTS.md` only for always-relevant operational rules.
 6. CI (`.github/workflows/ci.yml`) must be green before a PR merges.
 
