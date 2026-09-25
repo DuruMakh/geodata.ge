@@ -18,6 +18,8 @@ import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
+import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 
 export async function regionalEconomiesPageMetadata(locale: Locale) {
   const presentation = await getPresentation(locale, ["regionalEconomies"], []);
@@ -82,14 +84,12 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
           };
         }),
       })} />
-      <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
-        <div className="@container mx-auto max-w-[1180px]">
-          <PageHeader crumbs={crumbs} coverage={`${model.firstYear}–${model.year} · ${message(presentation.messages, "regionalEconomies.currentPrices")}`} />
-          <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">{title}</h1>
-          <p className="mb-[30px] max-w-[720px] text-[13px] leading-relaxed text-[var(--body)]">{description}</p>
-          <RegionalEconomiesIndex model={model} sourceNote={message(presentation.messages, "regionalEconomies.sourceNote")} />
-        </div>
-      </main>
+      <ExplorerPage testId="explorer-shell">
+        <PageHeader crumbs={crumbs} coverage={`${model.firstYear}–${model.year} · ${message(presentation.messages, "regionalEconomies.currentPrices")}`} />
+        <ExplorerHeading>{title}</ExplorerHeading>
+        <p className="mb-[30px] max-w-[720px] text-[13px] leading-relaxed text-[var(--body)]">{description}</p>
+        <RegionalEconomiesIndex model={model} sourceNote={message(presentation.messages, "regionalEconomies.sourceNote")} />
+      </ExplorerPage>
     </I18nProvider>
   );
 }

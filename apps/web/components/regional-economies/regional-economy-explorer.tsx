@@ -29,6 +29,7 @@ import { RegionPicker } from "./region-picker";
 import { RegionalEconomySeriesPanel } from "./regional-economy-series-panel";
 import { useRegionalEconomyState } from "./use-regional-economy-state";
 import type { ClientRegionalEconomyObservation } from "../../lib/servedRows";
+import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type RegionalEconomyIdentity = {
   id: string;
@@ -114,11 +115,7 @@ export function RegionalEconomyExplorer({
               : !model.hasData ? <div className="mt-5"><Callout testId="no-range-data-callout">{message(messages, "main.noRangeData")}</Callout></div>
               : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel={measureLabel} formatTooltipValue={share ? undefined : (value) => formatAmount(value, locale)} /></div>
               : <ExplorerTable caption={`${regionLabel} · ${share ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`} rows={model.rows.filter((row) => row.itemId !== REGIONAL_GDP_TOTAL)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels years={model.years} firstColumnLabel={t("sector")} unit={unit} share={share} showChangeColumn={false} shareValueForYear={(row, year) => row.valuesByYear[year] ?? null} />}
-            <RangeStrip years={model.availableYears} range={model.range} onChange={(patch) => update((previous) => {
-              const start = patch.start ?? model.range.start;
-              const end = patch.end ?? model.range.end;
-              return { ...previous, range: start === model.range.min && end === model.range.max ? { kind: "all" } : { kind: "manual", start, end } };
-            })} />
+            <RangeStrip years={model.availableYears} range={model.range} onChange={(patch) => update((previous) => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
           </section>
           <div className="mt-[18px]"><SourceNote testId="regional-source-label">{t("source")} {model.range.start}–{model.range.end}</SourceNote></div>
           <div className="mt-3 border-l-2 border-[var(--accent)] bg-[var(--tint)] px-3.5 py-3"><SourceNote>{t("accountingNote")}</SourceNote></div>

@@ -38,6 +38,7 @@ import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selec
 import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup } from "./entity-picker";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
+import { useAppReady } from "../explorer-shell/use-app-ready";
 
 export type MunicipalMetricContext =
   | {
@@ -259,13 +260,12 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
     }
 
     window.addEventListener("keydown", onKey);
-    document.body.dataset.appReady = "true";
 
     return () => {
       window.removeEventListener("keydown", onKey);
-      delete document.body.dataset.appReady;
     };
   }, []);
+  useAppReady();
 
   return (
     <>

@@ -12,6 +12,7 @@ import {
   SeriesSelector,
   SeriesSelectorRow,
 } from "../main-explorer/series-selector";
+import { SeriesAside } from "../explorer-shell/series-aside";
 
 export function SectorSeriesPanel({
   registry,
@@ -36,10 +37,7 @@ export function SectorSeriesPanel({
   // Total GDP stays pinned whatever the query, like every panel's total row.
   const visible = ordered.filter((r) => r.id === SECTOR_GDP || sectorMatchesQuery(r, query));
   return (
-    <aside
-      aria-label={message(messages, "controls.series")}
-      className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
-    >
+    <SeriesAside label={message(messages, "controls.series")}>
       <p className="mb-3 text-[11px] text-[var(--muted)]">
         {message(messages, "sectors.rowYear", { year: endYear })}
       </p>
@@ -83,6 +81,6 @@ export function SectorSeriesPanel({
         })}
       </SeriesSelector>
       {downloadAction}
-    </aside>
+    </SeriesAside>
   );
 }

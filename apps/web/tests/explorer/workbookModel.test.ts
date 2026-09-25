@@ -160,4 +160,17 @@ describe("buildWorkbookExportModel", () => {
     });
     expect(nonAdditive.readable.rows[0]?.valuesByYear[2025]).toBe(1_212.5);
   });
+
+  it("does not label published or preliminary data as actual", () => {
+    const withBasis = (basis: "published" | "preliminary") => buildWorkbookExportModel({
+      ...input,
+      series: input.series.map((series) => ({
+        ...series,
+        pointsByYear: Object.fromEntries(Object.entries(series.pointsByYear).map(([year, point]) => [year, point && { ...point, basis }])),
+      })),
+    });
+
+    expect(withBasis("published").readable.subtitle).toBe("2020–2021 · გამოქვეყნებული · მილიონი ₾");
+    expect(withBasis("preliminary").readable.subtitle).toBe("2020–2021 · წინასწარი · მილიონი ₾");
+  });
 });

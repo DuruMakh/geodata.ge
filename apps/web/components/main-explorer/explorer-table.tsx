@@ -35,6 +35,8 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   forecastLabel?: string;
   preliminaryYears?: number[];
   preliminaryLabel?: string;
+  /** Each row's `kaLabel` already holds its label in the page language, with no catalogue entry to look up. */
+  rowLabelsLocalized?: boolean;
   shareValueForYear: (row: Row, year: number) => number | null;
 };
 
@@ -64,10 +66,11 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   forecastLabel,
   preliminaryYears,
   preliminaryLabel,
+  rowLabelsLocalized = false,
   shareValueForYear,
 }: ExplorerTableProps<Row>) {
   const { locale, messages, englishLabels } = useI18n();
-  const rowLabel = (row: Row) => publicLabel(locale, row.itemId, row.kaLabel, englishLabels);
+  const rowLabel = (row: Row) => (rowLabelsLocalized ? row.kaLabel : publicLabel(locale, row.itemId, row.kaLabel, englishLabels));
   const endYear = years.at(-1);
   const lastIndex = years.length - 1;
   const cellValue = (row: Row, year: number): string => {

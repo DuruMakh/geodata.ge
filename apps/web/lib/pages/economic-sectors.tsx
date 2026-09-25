@@ -18,6 +18,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { formatDisplayDate } from "../explorer/format";
 import { resolveSiteUrl } from "../siteUrl";
+import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 
 export async function economicSectorsPageMetadata(locale: Locale) {
   const messages = await getMessages(locale,["sectors"]);
@@ -39,11 +40,9 @@ export async function renderEconomicSectorsPage(locale: Locale) {
   return <I18nProvider {...presentation}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({locale,datasetId:"economic-sectors",origin:resolveSiteUrl(),path:"/explorer/economy/sectors",name:title,description:message(presentation.messages,"sectors.nominalContext"),firstYear,lastYear,dateModified,spatialCoverageName:locale==="ka"?"საქართველო":"Georgia",downloadPath:"/downloads/data/economic-sectors.csv"})}/>
     <BreadcrumbJsonLd items={[{name:crumbs[0].label,path:pageHref("/",locale)},{name:crumbs[2].label,path:pageHref("/explorer/economy",locale)},{name:title,path:pageHref("/explorer/economy/sectors",locale)}]}/>
-    <main className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
-      <div className="mx-auto max-w-[1180px]">
-        <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${message(presentation.messages, "main.updated", { date: locale === "en" ? formatDisplayDate(dateModified, locale) : dateModified })}`}/>
-        <EconomicSectorsExplorer facts={facts.map(projectSectorObservation)} sourceIdByMeasure={sourceIdByMeasure(facts)} registry={ECONOMIC_SECTORS} sources={sources} siteOrigin={resolveSiteUrl()}/>
-      </div>
-    </main>
+    <ExplorerPage containerQueries={false}>
+      <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${message(presentation.messages, "main.updated", { date: locale === "en" ? formatDisplayDate(dateModified, locale) : dateModified })}`}/>
+      <EconomicSectorsExplorer facts={facts.map(projectSectorObservation)} sourceIdByMeasure={sourceIdByMeasure(facts)} registry={ECONOMIC_SECTORS} sources={sources} siteOrigin={resolveSiteUrl()}/>
+    </ExplorerPage>
   </I18nProvider>;
 }

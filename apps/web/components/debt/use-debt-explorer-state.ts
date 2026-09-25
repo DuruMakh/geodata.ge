@@ -11,6 +11,7 @@ import {
 } from "../../lib/explorer/debtExplorer";
 import { parseDebtHash, serializeDebtHash } from "../../lib/explorer/debtUrlState";
 import type { ChartMode } from "../../lib/explorer/types";
+import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 type Range = { start: number; end: number; min: number; max: number };
 type RangePatch = { start?: number; end?: number };
@@ -39,7 +40,6 @@ export function useDebtExplorerState(facts: ClientGovernmentDebtFact[]) {
   }));
   const [selectedIds, setSelectedIds] = useState<DebtSeriesId[]>(getDefaultDebtSelection("stock"));
   const parsedRef = useRef(false);
-  const writtenRef = useRef(false);
 
   useEffect(() => {
     if (parsedRef.current) return;
@@ -71,17 +71,7 @@ export function useDebtExplorerState(facts: ClientGovernmentDebtFact[]) {
     selectedIds,
   });
 
-  useEffect(() => {
-    if (!writtenRef.current) {
-      writtenRef.current = true;
-      return;
-    }
-    try {
-      history.replaceState(null, "", `#${hash}`);
-    } catch {
-      // Browser history may be unavailable in embedded contexts; the explorer remains usable.
-    }
-  }, [hash]);
+  useReplaceHash(hash);
 
   function setRange(patch: RangePatch) {
     const current = ranges[activeFamily];

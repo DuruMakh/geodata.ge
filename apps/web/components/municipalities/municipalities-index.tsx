@@ -17,6 +17,7 @@ import { municipalityHrefForCode } from "../../lib/explorer/municipalityRoutes";
 import { municipalEntityHref } from "../../lib/seo/internalLinks";
 import { SourceNote, TabDivider, TextTab } from "../ui/editorial";
 import { MunicipalityMap } from "./municipality-map";
+import { useAppReady } from "../explorer-shell/use-app-ready";
 
 type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResidentGel" | "legendMaxPerResidentGel"> & {
   legendMin: string;
@@ -71,13 +72,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
     }
   }, [level]);
 
-  useEffect(() => {
-    document.body.dataset.appReady = "true";
-
-    return () => {
-      delete document.body.dataset.appReady;
-    };
-  }, []);
+  useAppReady();
 
   const sources = useMemo(
     () => ({ muni: props.municipalities, region: [props.country, ...props.regions] }),

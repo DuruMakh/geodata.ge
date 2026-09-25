@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
@@ -28,6 +28,11 @@ import { PageHeader } from "../shell/page-header";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { DebtSeriesPanel } from "./debt-series-panel";
 import { useDebtExplorerState } from "./use-debt-explorer-state";
+import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { ExplorerPage } from "../explorer-shell/explorer-page";
+import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { useAppReady } from "../explorer-shell/use-app-ready";
+import { MeasurePill } from "../explorer-shell/measure-pill";
 
 type DebtRange = { start: number; end: number; min: number; max: number };
 
@@ -121,192 +126,170 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
     .sort((left, right) => left - right)[0] ?? null;
 
   return (
-    <main
-      data-testid="debt-explorer"
-      className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"
-    >
-      <div className="@container mx-auto max-w-[1180px]">
-        <PageHeader
-          crumbs={[
-            { label: message(messages, "common.home"), href: pageHref("/", locale) },
-            { label: message(messages, "common.data") },
-            { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
-            { label: message(messages, "common.debt") },
-          ]}
-          coverage={coverage}
-        />
-        <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-          {message(messages, "debt.heading")}
-        </h1>
-        <p data-testid="debt-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
-          <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
-            {deck?.year}: {message(messages, FAMILY_LABEL[props.family])} · {deckValue}
-          </span>
-          {deckChange !== null ? (
-            <>
-              <span
-                className="font-[family-name:var(--font-numeric)] text-[13px]"
-                style={{ color: deckChange.value < 0 ? NEGATIVE : POSITIVE }}
-              >
-                {deckChange.kind === "points"
-                  ? `${formatPoints(deckChange.value, true)} ${message(messages, "debt.pp")}`
-                  : formatShare(deckChange.value, true)}
-              </span>
-              <span>{message(messages, "main.previousYear")}</span>
-            </>
-          ) : null}
-        </p>
-
-        <div data-testid="explorer-workspace" className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">
-          <div className="flex min-w-0 flex-col">
-            <section
-              data-testid="chart-panel"
-              data-mode={props.chartMode}
-              data-family={props.family}
-              data-measure={isPercent ? "percent" : "amount"}
-              className="border-t border-[var(--ink)] pt-4"
+    <ExplorerPage testId="debt-explorer" repeatDesktopBottomPadding>
+      <PageHeader
+        crumbs={[
+          { label: message(messages, "common.home"), href: pageHref("/", locale) },
+          { label: message(messages, "common.data") },
+          { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+          { label: message(messages, "common.debt") },
+        ]}
+        coverage={coverage}
+      />
+      <ExplorerHeading>{message(messages, "debt.heading")}</ExplorerHeading>
+      <p data-testid="debt-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
+        <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
+          {deck?.year}: {message(messages, FAMILY_LABEL[props.family])} · {deckValue}
+        </span>
+        {deckChange !== null ? (
+          <>
+            <span
+              className="font-[family-name:var(--font-numeric)] text-[13px]"
+              style={{ color: deckChange.value < 0 ? NEGATIVE : POSITIVE }}
             >
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <SegmentedTabs<ChartMode>
-                  ariaLabel={message(messages, "controls.viewMode")}
-                  value={props.chartMode}
-                  onChange={props.onChartModeChange}
-                  options={[
-                    { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
-                    { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                  ]}
-                />
-                <div className="flex items-center gap-3.5">
-                  <span data-testid="debt-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                    {props.family === "rate" ? "%" : props.shareOfGdp ? message(messages, "main.percentGdp") : message(messages, "format.bnGel")}
-                  </span>
-                  {props.family === "stock" ? (
-                    <button
-                      type="button"
-                      data-testid="measure-share-toggle"
-                      aria-pressed={props.shareOfGdp}
-                      onClick={() => props.onShareChange(!props.shareOfGdp)}
-                      className={`h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 ${props.shareOfGdp
-                        ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]"
-                        : "border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]"}`}
-                    >
-                      {message(messages, "main.percentGdp")}
-                    </button>
-                  ) : null}
-                </div>
-              </div>
+              {deckChange.kind === "points"
+                ? `${formatPoints(deckChange.value, true)} ${message(messages, "debt.pp")}`
+                : formatShare(deckChange.value, true)}
+            </span>
+            <span>{message(messages, "main.previousYear")}</span>
+          </>
+        ) : null}
+      </p>
 
-              {noSelection ? (
-                <div className="mt-5">
-                  <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
-                </div>
-              ) : noRangeData ? (
-                <div className="mt-5">
-                  <Callout testId="no-range-data-callout">
-                    {message(messages, "main.noRangeData")}
-                  </Callout>
-                </div>
-              ) : props.chartMode === "table" ? (
-                <ExplorerTable
-                  caption={message(messages, "debt.caption", { family: message(messages, FAMILY_LABEL[props.family]), start: props.range.start, end: props.range.end })}
-                  rows={model.tableRows.filter((row) => row.itemId !== totalItemId)}
-                  totalRow={model.totalRow}
-                  showTotal={Boolean(totalItemId && props.selectedIds.includes(totalItemId))}
-                  years={model.years}
-                  firstColumnLabel={message(messages, "controls.seriesColumn")}
-                  unit={unit}
-                  share={isPercent}
-                  showChangeColumn={false}
-                  forecastYears={forecastYears}
-                  forecastLabel={message(messages, "debt.forecast")}
-                  shareValueForYear={(row, year) => props.family === "rate"
-                    ? row.valuesByYear[year] === null || row.valuesByYear[year] === undefined
-                      ? null
-                      : row.valuesByYear[year]! / 100
-                    : row.shareByYear?.[year] ?? null}
-                />
-              ) : (
-                <div className="mt-5">
-                  <EditorialLineChart
-                    years={model.years}
-                    series={chartSeries}
-                    share={isPercent}
-                    unit={unit}
-                    shareLabel={message(messages, props.family === "rate" ? "debt.rate" : "main.shareGdp")}
-                  />
-                </div>
-              )}
-
-              <RangeStrip
-                years={familyYears}
-                range={props.range}
-                onChange={props.onRangeChange}
-                marker={props.family === "service" && forecastBoundaryYear !== null
-                  ? { year: forecastBoundaryYear, label: message(messages, "debt.forecast") }
-                  : undefined}
+      <ExplorerWorkspace>
+        <div className="flex min-w-0 flex-col">
+          <section
+            data-testid="chart-panel"
+            data-mode={props.chartMode}
+            data-family={props.family}
+            data-measure={isPercent ? "percent" : "amount"}
+            className="border-t border-[var(--ink)] pt-4"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <SegmentedTabs<ChartMode>
+                ariaLabel={message(messages, "controls.viewMode")}
+                value={props.chartMode}
+                onChange={props.onChartModeChange}
+                options={[
+                  { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
+                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
+                ]}
               />
-              {props.family === "service" ? (
-                <p data-testid="debt-forecast-note" className="mt-3 max-w-[680px] text-xs leading-relaxed text-[var(--muted)]">
-                  {message(messages, "debt.portfolioForecast")}
-                </p>
-              ) : null}
-            </section>
-
-            <div className="mt-[18px]">
-              <SourceNote testId="source-label">
-                {message(messages, "debt.source")}
-                {" "}{message(messages, "debt.comparability")}
-                {props.family === "stock" ? " " + message(messages, "main.gdpSource") : null}
-                {preliminaryGdpYears.length > 0 ? " " + message(messages, "main.preliminaryGdp", { years: preliminaryGdpYears.join(", ") }) : null}
-                {props.family === "rate" ? message(messages, "debt.missingRates") : null}
-                {props.lastUpdatedAt ? (
-                  <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt}</span> }} /></>
+              <div className="flex items-center gap-3.5">
+                <span data-testid="debt-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+                  {props.family === "rate" ? "%" : props.shareOfGdp ? message(messages, "main.percentGdp") : message(messages, "format.bnGel")}
+                </span>
+                {props.family === "stock" ? (
+                  <MeasurePill label={message(messages, "main.percentGdp")} pressed={props.shareOfGdp} onChange={props.onShareChange} />
                 ) : null}
-              </SourceNote>
+              </div>
             </div>
-          </div>
 
-          <DebtSeriesPanel
-            items={model.items}
-            family={props.family}
-            facts={props.facts}
-            selectedIds={props.selectedIds}
-            expandedParentIds={model.expandedParentIds}
-            onSelectionChange={props.onSelectionChange}
-            onToggle={props.onToggleSeries}
-            downloadAction={(
-              <ExcelDownloadButton
-                testId="debt-excel"
-                disabled={noSelection}
-                onDownload={() => downloadWorkbook(buildDebtWorkbookExportModel({
-                  facts: props.facts,
-                  gdpFacts: props.gdpFacts,
-                  family: props.family,
-                  selectedIds: props.selectedIds,
-                  range: props.range,
-                  shareOfGdp: props.shareOfGdp,
-                  sources: props.workbookSources,
-                  gdpSources: props.gdpWorkbookSources ?? [],
-                  siteOrigin: props.siteOrigin ?? window.location.origin,
-                }, presentation))}
+            {noSelection ? (
+              <div className="mt-5">
+                <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
+              </div>
+            ) : noRangeData ? (
+              <div className="mt-5">
+                <Callout testId="no-range-data-callout">
+                  {message(messages, "main.noRangeData")}
+                </Callout>
+              </div>
+            ) : props.chartMode === "table" ? (
+              <ExplorerTable
+                caption={message(messages, "debt.caption", { family: message(messages, FAMILY_LABEL[props.family]), start: props.range.start, end: props.range.end })}
+                rows={model.tableRows.filter((row) => row.itemId !== totalItemId)}
+                totalRow={model.totalRow}
+                showTotal={Boolean(totalItemId && props.selectedIds.includes(totalItemId))}
+                years={model.years}
+                firstColumnLabel={message(messages, "controls.seriesColumn")}
+                unit={unit}
+                share={isPercent}
+                showChangeColumn={false}
+                forecastYears={forecastYears}
+                forecastLabel={message(messages, "debt.forecast")}
+                shareValueForYear={(row, year) => props.family === "rate"
+                  ? row.valuesByYear[year] === null || row.valuesByYear[year] === undefined
+                    ? null
+                    : row.valuesByYear[year]! / 100
+                  : row.shareByYear?.[year] ?? null}
               />
+            ) : (
+              <div className="mt-5">
+                <EditorialLineChart
+                  years={model.years}
+                  series={chartSeries}
+                  share={isPercent}
+                  unit={unit}
+                  shareLabel={message(messages, props.family === "rate" ? "debt.rate" : "main.shareGdp")}
+                />
+              </div>
             )}
-          />
+
+            <RangeStrip
+              years={familyYears}
+              range={props.range}
+              onChange={props.onRangeChange}
+              marker={props.family === "service" && forecastBoundaryYear !== null
+                ? { year: forecastBoundaryYear, label: message(messages, "debt.forecast") }
+                : undefined}
+            />
+            {props.family === "service" ? (
+              <p data-testid="debt-forecast-note" className="mt-3 max-w-[680px] text-xs leading-relaxed text-[var(--muted)]">
+                {message(messages, "debt.portfolioForecast")}
+              </p>
+            ) : null}
+          </section>
+
+          <div className="mt-[18px]">
+            <SourceNote testId="source-label">
+              {message(messages, "debt.source")}
+              {" "}{message(messages, "debt.comparability")}
+              {props.family === "stock" ? " " + message(messages, "main.gdpSource") : null}
+              {preliminaryGdpYears.length > 0 ? " " + message(messages, "main.preliminaryGdp", { years: preliminaryGdpYears.join(", ") }) : null}
+              {props.family === "rate" ? message(messages, "debt.missingRates") : null}
+              {props.lastUpdatedAt ? (
+                <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt}</span> }} /></>
+              ) : null}
+            </SourceNote>
+          </div>
         </div>
-      </div>
-    </main>
+
+        <DebtSeriesPanel
+          items={model.items}
+          family={props.family}
+          facts={props.facts}
+          selectedIds={props.selectedIds}
+          expandedParentIds={model.expandedParentIds}
+          onSelectionChange={props.onSelectionChange}
+          onToggle={props.onToggleSeries}
+          downloadAction={(
+            <ExcelDownloadButton
+              testId="debt-excel"
+              disabled={noSelection}
+              onDownload={() => downloadWorkbook(buildDebtWorkbookExportModel({
+                facts: props.facts,
+                gdpFacts: props.gdpFacts,
+                family: props.family,
+                selectedIds: props.selectedIds,
+                range: props.range,
+                shareOfGdp: props.shareOfGdp,
+                sources: props.workbookSources,
+                gdpSources: props.gdpWorkbookSources ?? [],
+                siteOrigin: props.siteOrigin ?? window.location.origin,
+              }, presentation))}
+            />
+          )}
+        />
+      </ExplorerWorkspace>
+    </ExplorerPage>
   );
 }
 
 export function DebtExplorer(props: DebtExplorerProps) {
   const state = useDebtExplorerState(props.facts);
 
-  useEffect(() => {
-    document.body.dataset.appReady = "true";
-    return () => {
-      delete document.body.dataset.appReady;
-    };
-  }, []);
+  useAppReady();
 
   return (
     <DebtExplorerSurface

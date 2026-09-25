@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
-import { csvEscape } from "./csvEscape";
+import { serializeBomCsv } from "./csvEscape";
 import { budgetFactHeaders } from "./factCsv";
 
 export type PublicDatasetId =
@@ -48,11 +48,7 @@ async function readCsv(filePath: string): Promise<CsvRow[]> {
 }
 
 function serialize(headers: readonly string[], rows: readonly CsvRow[]): Buffer {
-  const lines = [
-    headers.join(","),
-    ...rows.map((row) => headers.map((header) => csvEscape(row[header] ?? "")).join(",")),
-  ];
-  return Buffer.from(`\uFEFF${lines.join("\r\n")}\r\n`, "utf8");
+  return Buffer.from(serializeBomCsv(headers, rows, "\r\n"), "utf8");
 }
 
 function byYearAndId(left: CsvRow, right: CsvRow): number {

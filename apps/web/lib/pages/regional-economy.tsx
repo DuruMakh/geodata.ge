@@ -30,6 +30,7 @@ export {
   regionalEconomiesPageMetadata,
   renderRegionalEconomiesPage,
 } from "./regional-economies";
+import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 
 export function regionalEconomyStaticParams() {
   return REGIONAL_ECONOMY_REGIONS.map((region) => ({ id: region.id.replace(/^region\./, "") }));
@@ -125,19 +126,17 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
         partOfPath: "/explorer/economy/regions",
         sameAsPath: "/methodology/regional-economies",
       })} />
-      <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
-        <div className="@container mx-auto max-w-[1180px]">
-          <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${reviewedAt}`} />
-          <RegionalEconomyExplorer
-            facts={regionalFacts.map(projectRegionalObservation)}
-            registry={REGIONAL_ECONOMY_SECTORS}
-            region={identity}
-            regions={REGIONAL_ECONOMY_REGIONS}
-            sources={sources}
-            siteOrigin={resolveSiteUrl()}
-          />
-        </div>
-      </main>
+      <ExplorerPage testId="explorer-shell">
+        <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${reviewedAt}`} />
+        <RegionalEconomyExplorer
+          facts={regionalFacts.map(projectRegionalObservation)}
+          registry={REGIONAL_ECONOMY_SECTORS}
+          region={identity}
+          regions={REGIONAL_ECONOMY_REGIONS}
+          sources={sources}
+          siteOrigin={resolveSiteUrl()}
+        />
+      </ExplorerPage>
     </I18nProvider>
   );
 }

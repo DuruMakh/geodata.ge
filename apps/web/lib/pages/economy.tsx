@@ -10,6 +10,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { buildEconomyHubCards } from "../explorer/economyHubCards";
+import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 export async function economyPageMetadata(locale: Locale) {
   const p = await getPresentation(locale, ["gdp"], []);
   return fiscalMetadata({
@@ -42,9 +43,7 @@ export async function renderEconomyPage(locale: Locale) {
             ]}
             coverage=""
           />
-          <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-            {t("economy")}
-          </h1>
+          <ExplorerHeading>{t("economy")}</ExplorerHeading>
           <p className="mb-[30px] text-[13px] text-[var(--body)]">
             {t("hubDescription")}
           </p>

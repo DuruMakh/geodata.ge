@@ -12,6 +12,7 @@ import { Message } from "../../lib/i18n/message";
 import { Overline, SectionTitle, SourceNote } from "../ui/editorial";
 import { Sparkline } from "../ui/sparkline";
 import { sectorColor } from "../../lib/explorer/economicSectors";
+import { KPI_GRID_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
 
 export function SectorHighlights({ facts, registry, year }: {
   facts: ClientSectorObservation[]; registry: SectorDefinition[]; year: number;
@@ -48,7 +49,7 @@ export function SectorHighlights({ facts, registry, year }: {
         <SectionTitle>{t("highlights")}</SectionTitle>
         <p className="text-[12.5px] text-[var(--muted)]"><Message messages={messages} id="sectors.rowYear" values={{ year: <span className="font-[family-name:var(--font-numeric)]">{year}</span> }} /></p>
       </div>
-      <div data-testid="sector-kpi-layout" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div data-testid="sector-kpi-layout" className={KPI_GRID_CLASS}>
         <div data-testid="sector-highlight-largest" className="min-w-0 @min-[1100px]:pr-11">
           <Overline>{t("largest")}</Overline>
           <p data-testid="sector-hero-value" className="mt-3.5 font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]">
@@ -67,12 +68,12 @@ export function SectorHighlights({ facts, registry, year }: {
             <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">{model.largest ? name(model.largest.seriesId) : t("unavailable")}</p>
           </div>
         </div>
-        <div data-testid="sector-side-kpis" className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
+        <div data-testid="sector-side-kpis" className={SIDE_KPI_LIST_CLASS}>
         {cards.map((card, index) => (
-          <div key={card.id} data-testid={`sector-highlight-${card.id}`} className={index === 0 ? "pt-0.5 pb-3.5" : index === cards.length - 1 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}>
+          <div key={card.id} data-testid={`sector-highlight-${card.id}`} className={sideKpiRowClass(index, cards.length)}>
             <Overline>{card.label}</Overline>
             <div className="mt-[7px] flex items-baseline justify-between gap-4">
-              <p className="whitespace-nowrap font-[family-name:var(--font-display)] text-2xl font-semibold leading-[1.1] tracking-[-0.02em]" style={{ color: card.color }}>{card.value}</p>
+              <p className={SIDE_KPI_VALUE_CLASS} style={{ color: card.color }}>{card.value}</p>
               <p title={card.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${card.available ? "overflow-hidden text-ellipsis whitespace-nowrap" : "leading-relaxed"}`}>{card.detail}</p>
             </div>
             <Sparkline values={card.trend} color={card.trendColor} />

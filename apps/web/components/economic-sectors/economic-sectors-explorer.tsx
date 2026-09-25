@@ -26,6 +26,9 @@ import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { SectorSeriesPanel } from "./sector-series-panel";
 import { SectorHighlights } from "./sector-highlights";
 import { useEconomicSectorsState } from "./use-economic-sectors-state";
+import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type EconomicSectorsExplorerProps = {
   facts: ClientSectorObservation[];
@@ -91,9 +94,7 @@ export function EconomicSectorsExplorer({
   ].sort((a, b) => a - b);
   return (
     <div data-testid="economic-sectors-explorer" className="@container">
-      <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-        {t("heading")}
-      </h1>
+      <ExplorerHeading>{t("heading")}</ExplorerHeading>
       <p
         data-testid="sectors-headline"
         className="mb-2 text-[13px] text-[var(--body)]"
@@ -119,10 +120,7 @@ export function EconomicSectorsExplorer({
       <p role="status" className="sr-only">
         {announcement}
       </p>
-      <div
-        data-testid="explorer-workspace"
-        className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10"
-      >
+      <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
           <section
             data-testid="chart-panel"
@@ -216,17 +214,7 @@ export function EconomicSectorsExplorer({
               years={model.availableYears}
               range={model.range}
               onChange={(patch) =>
-                update((s) => {
-                  const start = patch.start ?? model.range.start,
-                    end = patch.end ?? model.range.end;
-                  return {
-                    ...s,
-                    range:
-                      start === model.range.min && end === model.range.max
-                        ? { kind: "all" }
-                        : { kind: "manual", start, end },
-                  };
-                })
+                update((s) => ({ ...s, range: rangeFromPatch(model.range, patch) }))
               }
             />
           </section>
@@ -273,7 +261,7 @@ export function EconomicSectorsExplorer({
             />
           }
         />
-      </div>
+      </ExplorerWorkspace>
       <SectorHighlights facts={facts} registry={registry} year={model.range.end} />
     </div>
   );

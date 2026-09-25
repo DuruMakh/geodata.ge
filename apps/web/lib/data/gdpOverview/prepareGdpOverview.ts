@@ -1,10 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createHash } from "node:crypto";
 import Decimal from "decimal.js";
 import * as XLSX from "xlsx";
 import { parse } from "csv-parse/sync";
-import { csvEscape } from "../csvEscape";
+import { serializeBomCsvRows } from "../csvEscape";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import { GDP_SERIES, type GdpObservation, type GdpSeriesId } from "./types";
 
@@ -14,6 +13,7 @@ export const GDP_SOURCE_ROOT = path.resolve(
 );
 const reviewed = "2026-09-11";
 import { validateGdpObservations } from "./validation";
+import { readVerifiedPackageFile } from "../sourcePackage";
 export { validateGdpObservations } from "./validation";
 
 type GdpSourceManifest = {
@@ -41,10 +41,7 @@ export async function prepareGdpOverview(sourceRoot = GDP_SOURCE_ROOT) {
   const buffers = new Map<string, Buffer>();
   const sourceHashes: Record<string, string> = {};
   for (const entry of manifest.files) {
-    const bytes = await fs.readFile(path.join(sourceRoot, entry.file));
-    const hash = createHash("sha256").update(bytes).digest("hex");
-    if (hash !== entry.sha256 || bytes.length !== entry.bytes)
-      throw new Error(`GDP source hash mismatch: ${entry.file}`);
+    const { bytes, sha256: hash } = await readVerifiedPackageFile(sourceRoot, entry.file, entry, `GDP source hash mismatch: ${entry.file}`);
     buffers.set(path.basename(entry.file), bytes);
     sourceHashes[entry.file] = hash;
   }
@@ -216,27 +213,20 @@ export async function writeGdpOverviewArtifacts(write: boolean) {
     "source_locator",
     "last_reviewed_at",
   ];
-  const csv =
-    "\uFEFF" +
-    [
-      headers.join(","),
-      ...result.facts.map((f) =>
-        [
-          f.seriesId,
-          f.year,
-          f.value,
-          f.unit,
-          f.status,
-          f.accountingStandard ?? "",
-          f.sourceId,
-          f.sourceLocator,
-          f.lastReviewedAt,
-        ]
-          .map(csvEscape)
-          .join(","),
-      ),
-    ].join("\n") +
-    "\n";
+  const csv = serializeBomCsvRows([
+    headers,
+    ...result.facts.map((f) => [
+      f.seriesId,
+      f.year,
+      f.value,
+      f.unit,
+      f.status,
+      f.accountingStandard ?? "",
+      f.sourceId,
+      f.sourceLocator,
+      f.lastReviewedAt,
+    ]),
+  ]);
   for (const [file, content] of [
     ["data/imports/gdp-overview-annual.csv", csv],
     [

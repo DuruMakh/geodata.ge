@@ -38,6 +38,8 @@ for (const [name, route, testId] of [
   ["gdp-share", "/explorer/expenditure#g=fields&m=table&sh=1&r=2020-2025&sel=expenditure.total,spending.education"],
   ["ministries", "/explorer/expenditure#g=ministries&m=table&r=2014-2025&sel=admin_spending.total,admin_spending.defence"],
   ["receipts", "/explorer/revenue#m=table&r=2004-2025&sel=revenue.total,revenue.vat"],
+  // GDP used to append -ka to the Georgian filename; it now follows the same rule.
+  ["gdp", "/explorer/economy/gdp", "gdp-download"],
   ["regional-nominal", "/explorer/economy/regions/imereti#measure=nominal&view=table&sel=economy.regional_gdp_total,sector.a&range=all", "regional-excel-download"],
   ["regional-share", "/explorer/economy/regions/imereti#measure=share_of_region_gdp&view=table&sel=economy.regional_gdp_total,sector.a&range=all", "regional-excel-download"],
 ] as const) {

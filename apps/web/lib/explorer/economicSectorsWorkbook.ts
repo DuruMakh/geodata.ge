@@ -13,9 +13,11 @@ import {
 } from "./economicSectors";
 import {
   SHEET_NAMES,
-  absoluteWorkbookSourceUrl,
+  mergeSourcesByHref,
   type WorkbookExportModel,
   type WorkbookPublicSource,
+  withAbsoluteUrls,
+  workbookFilename,
 } from "./workbookModel";
 import type { ClientSectorObservation } from "../servedRows";
 
@@ -65,23 +67,9 @@ export function buildEconomicSectorsWorkbookExportModel(
     years.add(f.year);
     neededYears.set(sourceId, years);
   }
-  const originals = new Map<string, WorkbookPublicSource>();
-  for (const source of sources) {
-    const years = source.years.filter((y) =>
-      neededYears.get(source.sourceId)?.has(y),
-    );
-    if (!years.length) continue;
-    const previous = originals.get(source.downloadHref);
-    originals.set(source.downloadHref, {
-      years: [...new Set([...(previous?.years ?? []), ...years])].sort(
-        (a, b) => a - b,
-      ),
-      title: source.title,
-      organization: source.organization,
-      downloadHref: source.downloadHref,
-      retrievedAt: source.retrievedAt,
-    });
-  }
+  const originals = mergeSourcesByHref(sources, (source) =>
+    source.years.filter((y) => neededYears.get(source.sourceId)?.has(y)),
+  ).map(({ sourceId: _sourceId, ...source }) => source);
   const preliminaryYears = [
     ...new Set(
       active.filter((f) => f.status === "preliminary").map((f) => f.year),
@@ -89,7 +77,7 @@ export function buildEconomicSectorsWorkbookExportModel(
   ].sort((a, b) => a - b);
   return {
     locale,
-    filename: `fiscal-economic-sectors-${state.measure}-${model.range.start}-${model.range.end}${locale === "en" ? "-en" : ""}.xlsx`,
+    filename: workbookFilename(`economic-sectors-${state.measure}-${model.range.start}-${model.range.end}`, locale),
     sheetNames: SHEET_NAMES[locale],
     readable: {
       title: message(messages, "sectors.workbookTitle", { measure: label }),
@@ -148,9 +136,6 @@ export function buildEconomicSectorsWorkbookExportModel(
         ? { 3: "#,##0.00", 4: "0.0%" }
         : { 3: percent ? "0.0%" : "#,##0.00" },
     },
-    sources: [...originals.values()].map((s) => ({
-      ...s,
-      absoluteUrl: absoluteWorkbookSourceUrl(siteOrigin, s.downloadHref),
-    })),
+    sources: withAbsoluteUrls(originals, siteOrigin),
   };
 }

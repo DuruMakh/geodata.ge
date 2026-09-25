@@ -1,8 +1,8 @@
-import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
+import { readVerifiedPackageFile } from "../sourcePackage";
 
 // Basket weights refresh once a year in January rather than monthly with the CPI,
 // so they keep their own archive tree with the same manifest discipline.
@@ -45,11 +45,7 @@ export async function readVerifiedBasketWeightFiles(vintageDir: string): Promise
   }
   return Promise.all(
     rows.map(async (row) => {
-      const content = await fs.readFile(path.join(vintageDir, row.local_file));
-      const sha256 = createHash("sha256").update(content).digest("hex");
-      if (content.length !== row.bytes || sha256 !== row.sha256) {
-        throw new Error(`Basket-weight source hash mismatch: ${row.local_file}`);
-      }
+      const { bytes: content } = await readVerifiedPackageFile(vintageDir, row.local_file, row, `Basket-weight source hash mismatch: ${row.local_file}`);
       return { ...row, content };
     }),
   );

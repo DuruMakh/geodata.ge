@@ -13,6 +13,7 @@ import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { SeriesAside } from "../explorer-shell/series-aside";
 
 export function RegionalEconomySeriesPanel({
   registry,
@@ -39,7 +40,7 @@ export function RegionalEconomySeriesPanel({
     `${definition.labelKa} ${definition.labelEn} ${definition.classificationCode ?? ""}`.toLocaleLowerCase().includes(normalized);
   const visible = ordered.filter((definition) => definition.id === REGIONAL_GDP_TOTAL || matches(definition));
   return (
-    <aside aria-label={message(messages, "controls.series")} className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
+    <SeriesAside label={message(messages, "controls.series")}>
       <p className="mb-3 text-[11px] text-[var(--muted)]">{message(messages, "regionalEconomies.rowYear", { year: endYear })}</p>
       <SeriesSelector
         query={query}
@@ -74,6 +75,6 @@ export function RegionalEconomySeriesPanel({
         })}
       </SeriesSelector>
       {downloadAction}
-    </aside>
+    </SeriesAside>
   );
 }

@@ -93,3 +93,17 @@ test("empty selection exports no rows or sources", () => {
   expect(model.analysis.rows).toEqual([]);
   expect(model.sources).toEqual([]);
 });
+
+test("builds a stable model for a fixed input", () => {
+  for (const measure of ["nominal", "share_of_region_gdp"] as const) {
+    expect(buildRegionalEconomyWorkbookExportModel(
+      facts,
+      registry,
+      { ...DEFAULT_REGIONAL_ECONOMY_STATE, measure, selectedIds: [REGIONAL_GDP_TOTAL, "sector.a", "sector.b"] },
+      region,
+      presentation,
+      sources,
+      "https://fiscal.ge",
+    )).toMatchSnapshot(measure);
+  }
+});

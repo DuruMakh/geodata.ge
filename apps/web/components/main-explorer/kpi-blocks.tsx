@@ -5,13 +5,29 @@ import { Sparkline } from "../ui/sparkline";
 // The two presentational halves of ძირითადი ინდიკატორები (DESIGN.md §8.5),
 // shared by the budget Indicators and the inflation overview. Callers own the
 // figures, the gauge and the sentence; these own the anatomy.
+//
+// The sector, regional and municipal pages lay out their own cards (their own
+// test ids, spans and sparklines), so the anatomy they repeat is exported as
+// class strings too: one place to change the grid, the side column and its rules.
+
+/** Hero column beside the side KPIs, stacked below 1100px of column width. */
+export const KPI_GRID_CLASS = "mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]";
+export const HERO_KPI_VALUE_CLASS = "mt-3.5 whitespace-nowrap font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]";
+export const SIDE_KPI_LIST_CLASS = "mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9";
+export const SIDE_KPI_VALUE_CLASS = "whitespace-nowrap font-[family-name:var(--font-display)] text-2xl font-semibold leading-[1.1] tracking-[-0.02em]";
+export const KPI_UNIT_CLASS = "ml-1.5 font-[family-name:var(--font-numeric)] text-xs font-medium tracking-normal text-[var(--body)]";
+
+/** A hairline between side KPIs; the first row has none and the last no bottom padding. */
+export function sideKpiRowClass(index: number, count: number): string {
+  return index === 0 ? "pt-0.5 pb-3.5" : index === count - 1 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5";
+}
 
 export function HeroKpi({ label, value, valueColor = "var(--ink)", children }: { label: string; value: string; valueColor?: string; children: ReactNode }) {
   return (
     <div className="min-w-0 @min-[1100px]:pr-11">
       <Overline>{label}</Overline>
       <p
-        className="mt-3.5 whitespace-nowrap font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]"
+        className={HERO_KPI_VALUE_CLASS}
         style={{ color: valueColor }}
       >
         {value}
@@ -32,22 +48,22 @@ export type SideKpi = {
 
 export function SideKpiList({ kpis }: { kpis: SideKpi[] }) {
   return (
-    <div className="mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9">
+    <div className={SIDE_KPI_LIST_CLASS}>
       {kpis.map((kpi, index) => (
         <div
           key={kpi.label}
           data-testid="side-kpi"
-          className={index === 0 ? "pt-0.5 pb-3.5" : index === kpis.length - 1 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5"}
+          className={sideKpiRowClass(index, kpis.length)}
         >
           <Overline>{kpi.label}</Overline>
           <div className="mt-[7px] flex items-baseline justify-between gap-4">
             <p
-              className="whitespace-nowrap font-[family-name:var(--font-display)] text-2xl font-semibold leading-[1.1] tracking-[-0.02em]"
+              className={SIDE_KPI_VALUE_CLASS}
               style={{ color: kpi.color }}
             >
               {kpi.value}
               {kpi.unit ? (
-                <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-xs font-medium tracking-normal text-[var(--body)]">
+                <span className={KPI_UNIT_CLASS}>
                   {kpi.unit}
                 </span>
               ) : null}

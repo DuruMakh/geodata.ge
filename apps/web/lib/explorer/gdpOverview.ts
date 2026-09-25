@@ -1,4 +1,6 @@
 import type { ClientGdpObservation, SourceIdRanges } from "../servedRows";
+import { refitRange, resolveRange } from "./periodRange";
+import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
 export type GdpIndicator = "real" | "nominal" | "growth" | "per_capita";
 export type GdpState = {
   indicator: GdpIndicator;
@@ -27,20 +29,7 @@ export function resolveGdpRange(
     .filter((f) => f.seriesId === seriesFor(state))
     .map((f) => f.year)
     .sort((a, b) => a - b);
-  const min = years[0],
-    max = years.at(-1)!;
-  if (
-    state.range.kind === "all" ||
-    state.range.end < min ||
-    state.range.start > max
-  )
-    return { min, max, start: min, end: max };
-  return {
-    min,
-    max,
-    start: Math.max(min, state.range.start),
-    end: Math.min(max, state.range.end),
-  };
+  return resolveRange(state.range, { min: years[0], max: years.at(-1)! });
 }
 export function changeGdpIndicator(
   state: GdpState,
@@ -48,14 +37,8 @@ export function changeGdpIndicator(
   facts: ClientGdpObservation[],
 ): GdpState {
   const next = { ...state, indicator },
-    r = resolveGdpRange(next, facts);
-  return {
-    ...next,
-    range:
-      state.range.kind === "all" || (r.start === r.min && r.end === r.max)
-        ? { kind: "all" }
-        : { kind: "manual", start: r.start, end: r.end },
-  };
+    { min, max } = resolveGdpRange(next, facts);
+  return { ...next, range: refitRange(state.range, { min, max }, { collapseToAll: true }) };
 }
 /** The newest run that starts at or before `year`. */
 export function sourceIdForYear(
@@ -105,8 +88,6 @@ export function parseGdpHash(hash: string): GdpState {
   const indicator = p.get("indicator"),
     view = p.get("view"),
     currency = p.get("currency");
-  const start = Number(p.get("start")),
-    end = Number(p.get("end"));
   return {
     indicator: (["real", "nominal", "growth", "per_capita"].includes(
       indicator ?? "",
@@ -115,20 +96,7 @@ export function parseGdpHash(hash: string): GdpState {
       : "real") as GdpIndicator,
     mode: view === "table" ? "table" : "line",
     currency: currency === "usd" ? "usd" : "gel",
-    range:
-      p.get("range") !== "all" &&
-      p.has("start") &&
-      p.has("end") &&
-      Number.isInteger(start) &&
-      Number.isInteger(end) &&
-      start > 0 &&
-      end > 0
-        ? {
-            kind: "manual",
-            start: Math.min(start, end),
-            end: Math.max(start, end),
-          }
-        : { kind: "all" },
+    range: parseYearRangeKeys(p),
   };
 }
 export function serializeGdpHash(state: GdpState) {
@@ -137,10 +105,6 @@ export function serializeGdpHash(state: GdpState) {
     view: state.mode,
     currency: state.currency,
   });
-  if (state.range.kind === "all") p.set("range", "all");
-  else {
-    p.set("start", String(state.range.start));
-    p.set("end", String(state.range.end));
-  }
+  writeYearRangeKeys(p, state.range);
   return p.toString();
 }

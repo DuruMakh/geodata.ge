@@ -9,7 +9,7 @@ import { INFLATION_COLORS, latestIndicators, type InflationIndex } from "../../l
 import { Message } from "../../lib/i18n/message";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { HeroKpi, SideKpiList, type SideKpi } from "../main-explorer/kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, SideKpiList, type SideKpi } from "../main-explorer/kpi-blocks";
 import { SectionTitle } from "../ui/editorial";
 
 // ძირითადი ინდიკატორები for inflation: always the latest published month,
@@ -74,7 +74,7 @@ export function InflationIndicators({ index, targets }: { index: InflationIndex;
   return (
     <section data-testid="inflation-indicators" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
       <SectionTitle>{message(messages, "main.indicators")}</SectionTitle>
-      <div data-testid="period-kpi-cards" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div data-testid="period-kpi-cards" className={KPI_GRID_CLASS}>
         <HeroKpi label={`${t("tab.yoy")} · ${periodLabel(messages, latest.period, "long")}`} value={pct(latest.yoy)}>
           <TargetGauge value={latest.yoy} target={latest.target} />
           <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">

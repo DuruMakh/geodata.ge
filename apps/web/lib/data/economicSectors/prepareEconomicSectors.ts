@@ -1,14 +1,15 @@
-import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import Decimal from "decimal.js";
 import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
 import { strFromU8, unzipSync } from "fflate";
-import { csvEscape } from "../csvEscape";
+import { serializeBomCsvRows } from "../csvEscape";
+import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import { annualGrowthPercent, indexToGrowthPercent, sharePercent } from "./calculations";
 import type { SectorDefinition, SectorObservation, SectorStatus } from "./types";
 import { validateSectorObservations } from "./validation";
+import { readVerifiedPackageFile } from "../sourcePackage";
 
 const D = Decimal.clone({ precision: 50, rounding: Decimal.ROUND_HALF_UP });
 const GDP = "economy.gdp_total";
@@ -62,9 +63,7 @@ export async function prepareEconomicSectors(repositoryRoot: string) {
   const buffers = new Map<string, Buffer>();
   const sourceHashes: Record<string, string> = {};
   for (const source of manifest.files) {
-    const bytes = await read(source.file);
-    const hash = createHash("sha256").update(bytes).digest("hex");
-    if (hash !== source.sha256 || bytes.length !== source.bytes) throw new Error(`Sector source hash mismatch: ${source.file}`);
+    const { bytes, sha256: hash } = await readVerifiedPackageFile(repositoryRoot, source.file, source, `Sector source hash mismatch: ${source.file}`);
     buffers.set(source.role, bytes);
     sourceHashes[source.file] = hash;
   }
@@ -206,7 +205,7 @@ export async function prepareEconomicSectors(repositoryRoot: string) {
   } };
 }
 
-const csv = (headers: string[], rows: (string | number | boolean)[][]) => "\uFEFF" + [headers, ...rows].map(row => row.map(csvEscape).join(",")).join("\n") + "\n";
+const csv = (headers: string[], rows: (string | number | boolean)[][]) => serializeBomCsvRows([headers, ...rows]);
 
 export async function writeEconomicSectorsArtifacts(write: boolean, repositoryRoot = path.resolve(process.cwd(), "../..")) {
   const result = await prepareEconomicSectors(repositoryRoot);
@@ -224,7 +223,7 @@ export async function writeEconomicSectorsArtifacts(write: boolean, repositoryRo
     if (write) {
       await fs.mkdir(path.dirname(target), { recursive: true });
       await fs.writeFile(target, expected);
-    } else if (!(await fs.readFile(target)).equals(expected)) throw new Error(`Generated economic sectors artifact is stale: ${file}`);
+    } else await assertGeneratedArtifactMatches("economic sectors", target, content);
   }
   return result.validation;
 }

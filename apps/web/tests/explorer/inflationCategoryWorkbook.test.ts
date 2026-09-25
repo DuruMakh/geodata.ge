@@ -137,4 +137,10 @@ describe("buildInflationCategoryWorkbookExportModel", () => {
     expect([...new Set(contrib.analysis.rows.map((row) => row[8]))]).toEqual(["გამოთვლილი"]);
     expect([...new Set(rates.analysis.rows.map((row) => row[8]))]).toEqual(["გამოქვეყნებული"]);
   });
+
+  it("builds a stable model for a fixed input", () => {
+    for (const tab of ["contrib", "yoy", "mom"] as const) {
+      expect(buildInflationCategoryWorkbookExportModel({ ...contribInput, state: { ...contribInput.state, tab } })).toMatchSnapshot(tab);
+    }
+  });
 });

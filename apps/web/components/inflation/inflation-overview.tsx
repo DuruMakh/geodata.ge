@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import type { ClientCpiFact } from "../../lib/servedRows";
@@ -25,6 +25,11 @@ import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
 import { InflationIndicators } from "./inflation-indicators";
 import { InflationSeriesPanel } from "./inflation-series-panel";
 import { InflationTable } from "./inflation-table";
+import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { ExplorerPage } from "../explorer-shell/explorer-page";
+import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 // Inflation overview (spec §6): the GDP overview's centred tabs over the Budget
 // explorers' workspace — chart or monthly table, range strip and series panel.
@@ -60,28 +65,11 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setState(changeInflationTab(parsed, parsed.tab, index));
     setReady(true);
-    document.body.dataset.appReady = "true";
-    return () => {
-      delete document.body.dataset.appReady;
-    };
   }, [index]);
+  useAppReady();
 
   const serializedHash = serializeInflationHash(state);
-  const hashApplied = useRef(false);
-  useEffect(() => {
-    if (!ready) return;
-    // Skip the run that applies the incoming hash: writing it back would stamp a
-    // pristine URL with the default state (use-explorer-state.ts has the same rule).
-    if (!hashApplied.current) {
-      hashApplied.current = true;
-      return;
-    }
-    try {
-      history.replaceState(null, "", `#${serializedHash}`);
-    } catch {
-      // History can be unavailable in some embedded contexts; the UI still works.
-    }
-  }, [serializedHash, ready]);
+  useReplaceHash(serializedHash, ready);
 
   const range = resolveInflationRange(state, index);
   const { periods, lines } = buildInflationLines(index, targets, state, range);
@@ -106,107 +94,103 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   }
 
   return (
-    <main data-testid="inflation-overview" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
-      <div className="@container mx-auto max-w-[1180px]">
-        <PageHeader
-          crumbs={[
-            { label: message(messages, "common.home"), href: pageHref("/", locale) },
-            { label: message(messages, "common.data") },
-            { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
-            { label: t("heading") },
-          ]}
-          coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
-        />
-        <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-          {t("heading")}
-        </h1>
-        <p data-testid="inflation-unit" className="mb-4 text-[13px] text-[var(--muted)]">{t(`unit.${state.tab}`)}</p>
+    <ExplorerPage testId="inflation-overview">
+      <PageHeader
+        crumbs={[
+          { label: message(messages, "common.home"), href: pageHref("/", locale) },
+          { label: message(messages, "common.data") },
+          { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
+          { label: t("heading") },
+        ]}
+        coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+      />
+      <ExplorerHeading>{t("heading")}</ExplorerHeading>
+      <p data-testid="inflation-unit" className="mb-4 text-[13px] text-[var(--muted)]">{t(`unit.${state.tab}`)}</p>
 
-        <div
-          data-testid="inflation-tabs"
-          role="group"
-          aria-label={t("tabs")}
-          className="mb-3 overflow-x-auto py-2"
-          onFocusCapture={(event) => event.target.scrollIntoView({ block: "nearest", inline: "nearest" })}
-        >
-          <div className="mx-auto flex w-max gap-7 px-1">
-            {INFLATION_TABS.map((tab) => (
-              <TextTab key={tab} testId={`inflation-tab-${tab}`} label={t(`tab.${tab}`)} active={state.tab === tab} onClick={() => selectTab(tab)} />
-            ))}
-          </div>
+      <div
+        data-testid="inflation-tabs"
+        role="group"
+        aria-label={t("tabs")}
+        className="mb-3 overflow-x-auto py-2"
+        onFocusCapture={(event) => event.target.scrollIntoView({ block: "nearest", inline: "nearest" })}
+      >
+        <div className="mx-auto flex w-max gap-7 px-1">
+          {INFLATION_TABS.map((tab) => (
+            <TextTab key={tab} testId={`inflation-tab-${tab}`} label={t(`tab.${tab}`)} active={state.tab === tab} onClick={() => selectTab(tab)} />
+          ))}
         </div>
-        <p role="status" className="sr-only">{announcement}</p>
-
-        <div data-testid="explorer-workspace" className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">
-          <div className="flex min-w-0 flex-col">
-            <section data-testid="chart-panel" data-mode={state.mode} data-tab={state.tab} className="border-t border-[var(--ink)] pt-3">
-              <SegmentedTabs<InflationState["mode"]>
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={state.mode}
-                onChange={(mode) => setState((current) => ({ ...current, mode }))}
-                options={[
-                  { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
-                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                ]}
-              />
-              {!hasSeries ? (
-                <div className="mt-5">
-                  <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
-                </div>
-              ) : state.mode === "table" ? (
-                <InflationTable index={index} state={state} range={range} onTableSeriesChange={(key) => setState((current) => ({ ...current, tableSeries: key }))} />
-              ) : (
-                <div className="mt-5">
-                  <EditorialLineChart
-                    years={periods}
-                    series={chartSeries}
-                    share={state.tab !== "index"}
-                    unit={INDEX_UNIT}
-                    shareLabel={t(`tab.${state.tab}`)}
-                    periodsPerYear={12}
-                    formatPeriod={(period, kind) =>
-                      kind === "axis" && periodMonth(period) === 1 ? String(periodYear(period)) : periodLabel(messages, period, kind === "axis" ? "short" : "long")
-                    }
-                  />
-                </div>
-              )}
-              <RangeStrip
-                years={tabPeriods}
-                range={range}
-                periodsPerYear={12}
-                formatPeriod={(period) => periodLabel(messages, period, "short")}
-                onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
-              />
-            </section>
-            <div className="mt-[18px] space-y-2">
-              <SourceNote testId="source-label">
-                {t("source")} {message(messages, "main.lastUpdated", { date: displayDate })}
-              </SourceNote>
-              <Link href={pageHref("/methodology/inflation", locale)} className="text-xs text-[var(--muted)] underline underline-offset-4">
-                {t("methodology")}
-              </Link>
-            </div>
-          </div>
-
-          <InflationSeriesPanel
-            index={index}
-            targets={targets}
-            state={state}
-            range={range}
-            onToggle={(key) => setState((current) => toggleSelection(current, key))}
-            onClear={() => setState((current) => ({ ...current, selected: [] }))}
-            downloadAction={
-              <ExcelDownloadButton
-                testId="inflation-download"
-                disabled={!hasSeries}
-                onDownload={() => downloadWorkbook(buildInflationWorkbookExportModel({ index, targets, state, range, presentation, sources, siteOrigin }))}
-              />
-            }
-          />
-        </div>
-
-        <InflationIndicators index={index} targets={targets} />
       </div>
-    </main>
+      <p role="status" className="sr-only">{announcement}</p>
+
+      <ExplorerWorkspace>
+        <div className="flex min-w-0 flex-col">
+          <section data-testid="chart-panel" data-mode={state.mode} data-tab={state.tab} className="border-t border-[var(--ink)] pt-3">
+            <SegmentedTabs<InflationState["mode"]>
+              ariaLabel={message(messages, "controls.viewMode")}
+              value={state.mode}
+              onChange={(mode) => setState((current) => ({ ...current, mode }))}
+              options={[
+                { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
+                { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
+              ]}
+            />
+            {!hasSeries ? (
+              <div className="mt-5">
+                <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
+              </div>
+            ) : state.mode === "table" ? (
+              <InflationTable index={index} state={state} range={range} onTableSeriesChange={(key) => setState((current) => ({ ...current, tableSeries: key }))} />
+            ) : (
+              <div className="mt-5">
+                <EditorialLineChart
+                  years={periods}
+                  series={chartSeries}
+                  share={state.tab !== "index"}
+                  unit={INDEX_UNIT}
+                  shareLabel={t(`tab.${state.tab}`)}
+                  periodsPerYear={12}
+                  formatPeriod={(period, kind) =>
+                    kind === "axis" && periodMonth(period) === 1 ? String(periodYear(period)) : periodLabel(messages, period, kind === "axis" ? "short" : "long")
+                  }
+                />
+              </div>
+            )}
+            <RangeStrip
+              years={tabPeriods}
+              range={range}
+              periodsPerYear={12}
+              formatPeriod={(period) => periodLabel(messages, period, "short")}
+              onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
+            />
+          </section>
+          <div className="mt-[18px] space-y-2">
+            <SourceNote testId="source-label">
+              {t("source")} {message(messages, "main.lastUpdated", { date: displayDate })}
+            </SourceNote>
+            <Link href={pageHref("/methodology/inflation", locale)} className="text-xs text-[var(--muted)] underline underline-offset-4">
+              {t("methodology")}
+            </Link>
+          </div>
+        </div>
+
+        <InflationSeriesPanel
+          index={index}
+          targets={targets}
+          state={state}
+          range={range}
+          onToggle={(key) => setState((current) => toggleSelection(current, key))}
+          onClear={() => setState((current) => ({ ...current, selected: [] }))}
+          downloadAction={
+            <ExcelDownloadButton
+              testId="inflation-download"
+              disabled={!hasSeries}
+              onDownload={() => downloadWorkbook(buildInflationWorkbookExportModel({ index, targets, state, range, presentation, sources, siteOrigin }))}
+            />
+          }
+        />
+      </ExplorerWorkspace>
+
+      <InflationIndicators index={index} targets={targets} />
+    </ExplorerPage>
   );
 }

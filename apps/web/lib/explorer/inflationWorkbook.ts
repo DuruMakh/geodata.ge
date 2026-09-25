@@ -5,12 +5,76 @@ import type { Locale, Presentation } from "../i18n/types";
 import { decemberAverages } from "./inflationGrid";
 import { MONTH_NUMBERS, periodLabel, seriesLabel } from "./inflationLabels";
 import { buildInflationLines, seriesGroup, type InflationIndex, type InflationState, type ResolvedPeriodRange } from "./inflationOverview";
-import { SHEET_NAMES, absoluteWorkbookSourceUrl, type WorkbookBasis, type WorkbookExportModel, type WorkbookPublicSource, type WorkbookReadableRow } from "./workbookModel";
+import { SHEET_NAMES, type WorkbookBasis, type WorkbookExportModel, type WorkbookPublicSource, type WorkbookReadableRow, withAbsoluteUrls, workbookFilename } from "./workbookModel";
 
 export type InflationWorkbookSource = WorkbookPublicSource & { sourceId: string; language: Locale };
 
 /** Readable-sheet column key for the annual average, after months 1–12. */
 export const SUMMARY_COLUMN = 13;
+
+/** Every calendar year the period range touches, oldest first. */
+export function calendarYearsOf(range: ResolvedPeriodRange): number[] {
+  const firstYear = periodYear(range.start);
+  const lastYear = periodYear(range.end);
+  return Array.from({ length: lastYear - firstYear + 1 }, (_, offset) => firstYear + offset);
+}
+
+/**
+ * One series on the readable sheet: a row per calendar year, newest first,
+ * months across, plus the summary column when `summary` is given. A year
+ * without a single month is left out.
+ */
+export function monthlyReadableRows(
+  parentLabel: string,
+  byPeriod: Map<number, number | null>,
+  calendarYears: readonly number[],
+  scale: (value: number) => number,
+  summary?: (year: number) => number | null,
+): WorkbookReadableRow[] {
+  return [...calendarYears].reverse().flatMap((year) => {
+    const valuesByYear: Record<number, number | null> = {};
+    const basisByYear: Record<number, WorkbookBasis | null> = {};
+    for (const month of MONTH_NUMBERS) {
+      const value = byPeriod.get(makePeriod(year, month)) ?? null;
+      valuesByYear[month] = value === null ? null : scale(value);
+      basisByYear[month] = value === null ? null : "published";
+    }
+    if (summary) {
+      const value = summary(year);
+      valuesByYear[SUMMARY_COLUMN] = value === null ? null : scale(value);
+      basisByYear[SUMMARY_COLUMN] = value === null ? null : "published";
+    }
+    if (MONTH_NUMBERS.every((month) => valuesByYear[month] === null)) return [];
+    return [{ kind: "item" as const, parentLabel, label: String(year), valuesByYear, basisByYear, change: null }];
+  });
+}
+
+/** Link the archive copy in the reader's language when one exists, else the English one. */
+export function pickLocaleEditions(
+  sources: readonly InflationWorkbookSource[],
+  sourceIds: Iterable<string>,
+  locale: Locale,
+): InflationWorkbookSource[] {
+  return [...sourceIds].flatMap((id) => {
+    const candidates = sources.filter((row) => row.sourceId === id);
+    const row = candidates.find((entry) => entry.language === locale) ?? candidates.find((entry) => entry.language === "en");
+    return row ? [row] : [];
+  });
+}
+
+/** The Sources sheet: each chosen edition, narrowed to the calendar years the sheet covers. */
+export function monthlyWorkbookSources(
+  chosen: readonly InflationWorkbookSource[],
+  calendarYears: readonly number[],
+  siteOrigin: string,
+) {
+  return withAbsoluteUrls(
+    chosen
+      .map((row) => ({ ...row, years: row.years.filter((year) => calendarYears.includes(year)) }))
+      .filter((row) => row.years.length > 0),
+    siteOrigin,
+  );
+}
 
 // Spec §9: the readable sheet mirrors ცხრილი — one row per selected series and
 // year, months across — and percentages leave as fractions under Excel's % format.
@@ -31,29 +95,13 @@ export function buildInflationWorkbookExportModel(input: {
   const { periods, lines } = buildInflationLines(index, targets, state, range);
   const summary = state.tab === "yoy" && lines.some((line) => line.key === "cpi") ? decemberAverages(index.values.get("cpi.headline:avg12_pct")) : null;
   const columns: number[] = [...MONTH_NUMBERS, ...(summary ? [SUMMARY_COLUMN] : [])];
-  const firstYear = periodYear(range.start);
-  const lastYear = periodYear(range.end);
-  const calendarYears = Array.from({ length: lastYear - firstYear + 1 }, (_, offset) => firstYear + offset);
+  const calendarYears = calendarYearsOf(range);
 
   const rows: WorkbookReadableRow[] = lines.flatMap((line) => {
     const label = seriesLabel(messages, line.key, state.tab);
     const byPeriod = new Map(periods.map((period, position) => [period, line.values[position] ?? null]));
-    return [...calendarYears].reverse().flatMap((year) => {
-      const valuesByYear: Record<number, number | null> = {};
-      const basisByYear: Record<number, WorkbookBasis | null> = {};
-      for (const month of MONTH_NUMBERS) {
-        const value = byPeriod.get(makePeriod(year, month)) ?? null;
-        valuesByYear[month] = value === null ? null : scale(value);
-        basisByYear[month] = value === null ? null : "published";
-      }
-      if (summary) {
-        const value = line.key === "cpi" ? summary.get(year) ?? null : null;
-        valuesByYear[SUMMARY_COLUMN] = value === null ? null : scale(value);
-        basisByYear[SUMMARY_COLUMN] = value === null ? null : "published";
-      }
-      if (MONTH_NUMBERS.every((month) => valuesByYear[month] === null)) return [];
-      return [{ kind: "item" as const, parentLabel: label, label: String(year), valuesByYear, basisByYear, change: null }];
-    });
+    const lineSummary = summary ? (year: number) => (line.key === "cpi" ? summary.get(year) ?? null : null) : undefined;
+    return monthlyReadableRows(label, byPeriod, calendarYears, scale, lineSummary);
   });
 
   const unit = percent ? "%" : "2010=100";
@@ -79,16 +127,11 @@ export function buildInflationWorkbookExportModel(input: {
     const id = index.sourceIds.get("cpi.headline:avg12_pct");
     if (id) usedSourceIds.add(id);
   }
-  // Link the archive copy in the reader's language when one exists.
-  const chosen = [...usedSourceIds].flatMap((id) => {
-    const candidates = sources.filter((row) => row.sourceId === id);
-    const row = candidates.find((entry) => entry.language === locale) ?? candidates.find((entry) => entry.language === "en");
-    return row ? [row] : [];
-  });
+  const chosen = pickLocaleEditions(sources, usedSourceIds, locale);
 
   return {
     locale,
-    filename: `fiscal-inflation-${state.tab}-${periodKey(range.start)}-${periodKey(range.end)}${locale === "en" ? "-en" : ""}.xlsx`,
+    filename: workbookFilename(`inflation-${state.tab}-${periodKey(range.start)}-${periodKey(range.end)}`, locale),
     sheetNames: SHEET_NAMES[locale],
     readable: {
       title: t(`tab.${state.tab}`),
@@ -109,9 +152,7 @@ export function buildInflationWorkbookExportModel(input: {
       rows: analysisRows,
       numericFormats: { 4: percent ? "0.00%" : "#,##0.00" },
     },
-    sources: chosen
-      .map((row) => ({ ...row, years: row.years.filter((year) => calendarYears.includes(year)), absoluteUrl: absoluteWorkbookSourceUrl(siteOrigin, row.downloadHref) }))
-      .filter((row) => row.years.length > 0),
+    sources: monthlyWorkbookSources(chosen, calendarYears, siteOrigin),
     sourceYears: calendarYears,
   };
 }

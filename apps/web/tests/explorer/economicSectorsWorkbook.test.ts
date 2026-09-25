@@ -182,3 +182,24 @@ test("zero remains numeric and only the explicitly selected sector is exported",
   expect(model.readable.rows[0].valuesByYear).toEqual({ 2024: 0, 2025: 0 });
   expect(model.analysis.rows.map((r) => r[2])).toEqual([0, 0]);
 });
+
+test("builds a stable model for a fixed input", async () => {
+  for (const locale of ["ka", "en"] as const) {
+    const presentation = {
+      locale,
+      messages: await getMessages(locale, ["sectors", "workbook", "format"]),
+      englishLabels: {},
+    };
+    for (const measure of ["nominal", "share_of_gdp", "real_growth"] as const) {
+      expect(buildEconomicSectorsWorkbookExportModel(
+        facts,
+        registry,
+        { ...DEFAULT_SECTOR_STATE, measure, selectedIds: ["sector.a", "sector.b"] },
+        presentation,
+        sources,
+        "https://fiscal.ge",
+        sourceIdByMeasure(facts),
+      )).toMatchSnapshot(`${locale} ${measure}`);
+    }
+  }
+});

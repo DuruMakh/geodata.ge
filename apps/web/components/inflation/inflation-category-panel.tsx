@@ -17,6 +17,7 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { SeriesAside } from "../explorer-shell/series-aside";
 
 // A thin composition of the shared selector, like InflationSeriesPanel. The
 // two-level COICOP tree needs no new component: SeriesSelectorRow already does
@@ -62,10 +63,7 @@ export function InflationCategoryPanel({
   const selectedSubgroups = state.selected.filter((categoryId) => categoryId.includes("_")).length;
 
   return (
-    <aside
-      aria-label={message(messages, "controls.series")}
-      className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
-    >
+    <SeriesAside label={message(messages, "controls.series")}>
       <SeriesSelector
         query={query}
         onQueryChange={setQuery}
@@ -108,6 +106,6 @@ export function InflationCategoryPanel({
         ))}
       </SeriesSelector>
       {downloadAction}
-    </aside>
+    </SeriesAside>
   );
 }

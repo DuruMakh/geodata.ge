@@ -11,9 +11,10 @@ import {
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import {
   SHEET_NAMES,
-  absoluteWorkbookSourceUrl,
   type WorkbookExportModel,
   type WorkbookPublicSource,
+  withAbsoluteUrls,
+  workbookFilename,
 } from "./workbookModel";
 import type { ClientRegionalEconomyObservation } from "../servedRows";
 
@@ -61,7 +62,7 @@ export function buildRegionalEconomyWorkbookExportModel(
   const regionLabel = locale === "en" ? region.labelEn : region.labelKa;
   return {
     locale,
-    filename: `fiscal-regional-economy-${region.slug}-${state.measure}-${model.range.start}-${model.range.end}${locale === "en" ? "-en" : ""}.xlsx`,
+    filename: workbookFilename(`regional-economy-${region.slug}-${state.measure}-${model.range.start}-${model.range.end}`, locale),
     sheetNames: SHEET_NAMES[locale],
     readable: {
       title: message(messages, "regionalEconomies.workbookTitle", { measure: measureLabel, region: regionLabel }),
@@ -108,13 +109,6 @@ export function buildRegionalEconomyWorkbookExportModel(
       })),
       numericFormats: share ? { 4: "#,##0.00", 5: "0.0%" } : { 4: "#,##0.00" },
     },
-    sources: originals.map((source) => ({
-      years: source.years,
-      title: source.title,
-      organization: source.organization,
-      downloadHref: source.downloadHref,
-      retrievedAt: source.retrievedAt,
-      absoluteUrl: absoluteWorkbookSourceUrl(siteOrigin, source.downloadHref),
-    })),
+    sources: withAbsoluteUrls(originals.map(({ sourceId: _sourceId, ...source }) => source), siteOrigin),
   };
 }

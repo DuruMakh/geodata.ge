@@ -10,6 +10,7 @@ import { formatAmount } from "../../lib/explorer/format";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
 import { TextTab } from "../ui/editorial";
 import { SeriesSelector, SeriesSelectorRow } from "./series-selector";
+import { SeriesAside } from "../explorer-shell/series-aside";
 
 // Series aside per DESIGN.md §7.6–7.8: flat editorial rows with a checkbox square,
 // persistent swatch bar, and (for ministries) caret-expandable major programs.
@@ -134,10 +135,7 @@ export function SeriesPanel({
   const allSelected = bulkIds.every((itemId) => selectedIds.includes(itemId));
 
   return (
-    <aside
-      aria-label={message(messages, "controls.series")}
-      className="min-w-0 max-w-full border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:sticky @min-[1100px]:top-5 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]"
-    >
+    <SeriesAside label={message(messages, "controls.series")}>
       <SeriesSelector
         controls={
           showGrouping ? (
@@ -187,6 +185,6 @@ export function SeriesPanel({
       </SeriesSelector>
 
       {downloadAction}
-    </aside>
+    </SeriesAside>
   );
 }

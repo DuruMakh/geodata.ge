@@ -4,7 +4,7 @@ import path from "node:path";
 import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
 
-import { csvEscape } from "../csvEscape";
+import { serializeBomCsv } from "../csvEscape";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import type {
   GdpAccountingStandard,
@@ -64,13 +64,6 @@ const EXPECTED_SOURCE_YEARS: Record<GdpAccountingStandard, [number, number]> = {
 };
 const EXPECTED_CANONICAL_YEARS = Array.from({ length: 30 }, (_, index) => 1996 + index);
 const EXPECTED_OVERLAP_YEARS = Array.from({ length: 9 }, (_, index) => 2010 + index);
-
-function serializeCsv(headers: string[], rows: Array<Record<string, string | number>>): string {
-  return `\uFEFF${[
-    headers.join(","),
-    ...rows.map((row) => headers.map((header) => csvEscape(row[header] ?? "")).join(",")),
-  ].join("\n")}\n`;
-}
 
 function sourceByteKey(standard: GdpAccountingStandard): "sna1993" | "sna2008" {
   return standard === "sna_1993" ? "sna1993" : "sna2008";
@@ -309,11 +302,11 @@ export async function prepareNationalGdp({
   const artifacts = [
     {
       filePath: STAGING_PATH,
-      content: serializeCsv(Object.keys(stagingRows[0] ?? {}), stagingRows),
+      content: serializeBomCsv(Object.keys(stagingRows[0] ?? {}), stagingRows),
     },
     {
       filePath: CANONICAL_PATH,
-      content: serializeCsv(Object.keys(canonicalRows[0] ?? {}), canonicalRows),
+      content: serializeBomCsv(Object.keys(canonicalRows[0] ?? {}), canonicalRows),
     },
     { filePath: REPORT_PATH, content: `${JSON.stringify(validation, null, 2)}\n` },
   ];

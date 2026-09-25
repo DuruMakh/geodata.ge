@@ -98,6 +98,41 @@ export function absoluteWorkbookSourceUrl(
   return `${siteOrigin.replace(/\/+$/, "")}/${downloadHref.replace(/^\/+/, "")}`;
 }
 
+/** `fiscal-<stem>.xlsx`; only the English edition carries a language suffix. */
+export function workbookFilename(stem: string, locale: Locale): string {
+  return `fiscal-${stem}${locale === "en" ? "-en" : ""}.xlsx`;
+}
+
+/** Adds the absolute link the Sources sheet prints for each source. */
+export function withAbsoluteUrls<T extends WorkbookPublicSource>(
+  sources: readonly T[],
+  siteOrigin: string,
+): Array<T & { absoluteUrl: string }> {
+  return sources.map((source) => ({ ...source, absoluteUrl: absoluteWorkbookSourceUrl(siteOrigin, source.downloadHref) }));
+}
+
+/**
+ * One entry per document: sources that share a link merge their active years,
+ * and a source with no active year is dropped. The first source with a link
+ * keeps its place and its title, organization and retrieval date.
+ */
+export function mergeSourcesByHref<T extends WorkbookPublicSource>(
+  sources: readonly T[],
+  activeYears: (source: T) => number[],
+): T[] {
+  const byHref = new Map<string, T>();
+  for (const source of sources) {
+    const years = activeYears(source);
+    if (years.length === 0) continue;
+    const existing = byHref.get(source.downloadHref);
+    byHref.set(source.downloadHref, {
+      ...(existing ?? source),
+      years: [...new Set([...(existing?.years ?? []), ...years])].sort((left, right) => left - right),
+    });
+  }
+  return [...byHref.values()];
+}
+
 function safeChange(start: number | null, end: number | null): number | null {
   if (start === null || end === null || start <= 0 || end < 0) return null;
   return end / start - 1;
@@ -123,9 +158,14 @@ function subtitle(rows: WorkbookReadableRow[], years: number[], unitLabel: strin
         ? workbookMessage(locale, "workbook.forecast")
         : bases.has("planned")
           ? workbookMessage(locale, "workbook.planned")
-          : statuses.includes("not_available")
-            ? workbookMessage(locale, "workbook.unavailable")
-          : workbookMessage(locale, "workbook.actual");
+          // Without these two a published or preliminary workbook fell through to "Actual".
+          : bases.has("preliminary")
+            ? workbookMessage(locale, "workbook.preliminary")
+            : bases.has("published")
+              ? workbookMessage(locale, "workbook.published")
+              : statuses.includes("not_available")
+                ? workbookMessage(locale, "workbook.unavailable")
+                : workbookMessage(locale, "workbook.actual");
   const period = years.length > 0 ? `${years[0]}–${years.at(-1)}` : workbookMessage(locale, "workbook.noPeriod");
   return `${period} · ${basis} · ${unitLabel}`;
 }
@@ -168,24 +208,16 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
     }
   }
 
-  const sourcesByHref = new Map<string, WorkbookPublicSource>();
-  for (const source of input.sources) {
-    const activeYears = source.years.filter((year) => years.includes(year));
-    if (activeYears.length === 0) continue;
-    const existing = sourcesByHref.get(source.downloadHref);
-    sourcesByHref.set(source.downloadHref, existing
-      ? { ...existing, years: [...new Set([...existing.years, ...activeYears])].sort((left, right) => left - right) }
-      : { ...source, years: [...new Set(activeYears)].sort((left, right) => left - right) });
-  }
-  const sources = [...sourcesByHref.values()].sort((left, right) => (left.years[0] ?? 0) - (right.years[0] ?? 0)).map((source) => ({
-    ...source,
-    absoluteUrl: absoluteWorkbookSourceUrl(input.siteOrigin, source.downloadHref),
-  }));
+  const sources = withAbsoluteUrls(
+    mergeSourcesByHref(input.sources, (source) => source.years.filter((year) => years.includes(year)))
+      .sort((left, right) => (left.years[0] ?? 0) - (right.years[0] ?? 0)),
+    input.siteOrigin,
+  );
 
   const range = years.length > 0 ? `-${years[0]}-${years.at(-1)}` : "";
   return {
     locale: input.locale,
-    filename: `fiscal-${input.filenameBase}${range}${input.locale === "en" ? "-en" : ""}.xlsx`,
+    filename: workbookFilename(`${input.filenameBase}${range}`, input.locale),
     sheetNames: SHEET_NAMES[input.locale],
     readable: {
       title: input.title,

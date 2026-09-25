@@ -27,11 +27,33 @@ import { projectPublicSources } from "../methodology/publicSources";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
+import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 
 const HUB_PATH = "/explorer/inflation";
 const OVERVIEW_PATH = "/explorer/inflation/overview";
 const CATEGORIES_PATH = "/explorer/inflation/categories";
 const repositoryRoot = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+
+// Archive rows ending in "_ka" are the Georgian twins of the English source files.
+function inflationWorkbookSources(
+  manifest: Awaited<ReturnType<typeof loadReviewedSourceManifest>>,
+  locale: Locale,
+  documents: Awaited<ReturnType<typeof loadEnglishCatalogue>>["documents"],
+): InflationWorkbookSource[] {
+  const projected = projectPublicSources(manifest, locale, documents);
+  return manifest.map((row) => {
+    const shown = projected.find((entry) => entry.source_id === row.source_id)!;
+    return {
+      sourceId: row.source_id.replace(/_ka$/, ""),
+      language: row.source_id.endsWith("_ka") ? "ka" : "en",
+      years: row.years,
+      title: shown.title,
+      organization: shown.publisher,
+      downloadHref: row.downloadHref,
+      retrievedAt: row.retrieved_at,
+    };
+  });
+}
 
 export async function inflationHubMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["inflation"]);
@@ -47,9 +69,7 @@ export async function renderInflationHub(locale: Locale) {
       <main className="px-5 pb-16 min-[768px]:px-[34px]">
         <div className="mx-auto max-w-[1180px]">
           <PageHeader crumbs={[{ label: t("common.home"), href: pageHref("/", locale) }, { label: t("common.data") }, { label: t("common.inflation") }]} coverage="" />
-          <h1 className="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-            {t("inflation.hubHeading")}
-          </h1>
+          <ExplorerHeading>{t("inflation.hubHeading")}</ExplorerHeading>
           <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{t("inflation.hubDescription")}</p>
           <BudgetHub cards={buildInflationHubCards(facts, presentation, categories, weights)} locale={locale} testId="inflation-hub" />
         </div>
@@ -77,20 +97,7 @@ export async function renderInflationOverview(locale: Locale) {
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
   ]);
-  const projected = projectPublicSources(manifest, locale, catalogue.documents);
-  // Archive rows ending in "_ka" are the Georgian twins of the English source files.
-  const sources: InflationWorkbookSource[] = manifest.map((row) => {
-    const shown = projected.find((entry) => entry.source_id === row.source_id)!;
-    return {
-      sourceId: row.source_id.replace(/_ka$/, ""),
-      language: row.source_id.endsWith("_ka") ? "ka" : "en",
-      years: row.years,
-      title: shown.title,
-      organization: shown.publisher,
-      downloadHref: row.downloadHref,
-      retrievedAt: row.retrieved_at,
-    };
-  });
+  const sources = inflationWorkbookSources(manifest, locale, catalogue.documents);
   const t = (key: string) => message(presentation.messages, key);
   return (
     <I18nProvider {...presentation}>
@@ -132,19 +139,7 @@ export async function renderInflationCategories(locale: Locale) {
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
   ]);
-  const projected = projectPublicSources(manifest, locale, catalogue.documents);
-  const sources: InflationWorkbookSource[] = manifest.map((row) => {
-    const shown = projected.find((entry) => entry.source_id === row.source_id)!;
-    return {
-      sourceId: row.source_id.replace(/_ka$/, ""),
-      language: row.source_id.endsWith("_ka") ? "ka" : "en",
-      years: row.years,
-      title: shown.title,
-      organization: shown.publisher,
-      downloadHref: row.downloadHref,
-      retrievedAt: row.retrieved_at,
-    };
-  });
+  const sources = inflationWorkbookSources(manifest, locale, catalogue.documents);
   // The stack closes on the published national headline, so it travels with the page.
   const headline = facts
     .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")
