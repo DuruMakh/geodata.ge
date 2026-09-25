@@ -23,7 +23,7 @@ const manifestRowSchema = z.object({
 });
 
 export type ProductManifestRow = z.infer<typeof manifestRowSchema>;
-export type VerifiedProductFile = ProductManifestRow & { content: Buffer };
+export type VerifiedProductFile = ProductManifestRow & { vintage: string; content: Buffer };
 
 export async function latestProductVintage(rawRoot = INFLATION_PRODUCTS_RAW_ROOT): Promise<string> {
   const entries = await fs.readdir(rawRoot, { withFileTypes: true });
@@ -50,6 +50,6 @@ export async function readVerifiedProductFiles(vintageDir: string): Promise<Veri
   if (new Set(rows.map((row) => row.source_id)).size !== rows.length) throw new Error("Product manifest has duplicate source IDs");
   return Promise.all(rows.map(async (row) => {
     const { bytes: content } = await readVerifiedPackageFile(vintageDir, row.local_file, row, `Product source hash mismatch: ${row.local_file}`);
-    return { ...row, content };
+    return { ...row, vintage: path.basename(vintageDir), content };
   }));
 }
