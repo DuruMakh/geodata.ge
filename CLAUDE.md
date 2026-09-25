@@ -1,10 +1,10 @@
-# GeoData.ge — agent entry point
+# Fiscal.ge (repo: GeoData.ge) — agent entry point
 
 @AGENTS.md
 
 ## Commands (run in `apps/web`)
 
-- `npm run check` — lint + typecheck + unit tests + data validation. Run before claiming any work done.
+- `npm run check` — lint + typecheck + unit tests + data validation + `i18n:check`. Run before claiming any work done.
 - `npm run test:browser` — Playwright e2e (local Edge; CI uses Chromium). Run for UI-affecting changes.
 - `npm run build` — production build (static; reads CSVs from `data/imports` by default, no `.env` needed; `GEODATA_DATA_SOURCE=db` builds from the Supabase mirror instead).
 - `npm run data:import` — parity-checked CSV→Supabase import (needs `apps/web/.env`; see `docs/data-methodology/database-import.md`).

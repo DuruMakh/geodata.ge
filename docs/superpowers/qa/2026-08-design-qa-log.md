@@ -1,5 +1,7 @@
 # Municipality Map Design QA
 
+> Historical record (2026-08), moved from the repository root. The screenshot paths below are local to one machine and are not in the repository; this file is not current design guidance — `DESIGN.md` is.
+
 ## Evidence
 
 - Source visual truth: `C:\Users\Mylaptop\.codex\visualizations\2026\08\06\019fd8a6-6e57-7820-8879-5e6681b4761a\municipality-geometry-preview.html`
