@@ -42,12 +42,15 @@ When you do need the whole browser suite, build and serve once and point the run
 same 281 tests. It also tests the artifact that deploys rather than `next dev`:
 
 ```
-npm run build && npm run start -- --port 3100
+NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build && npm run start -- --port 3100
 CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge PLAYWRIGHT_BASE_URL=http://localhost:3100 npx playwright test
 ```
 
-`NEXT_PUBLIC_SITE_URL` is required or ~10 `seo.spec.ts` URL assertions fail locally for
-reasons that have nothing to do with your change.
+`NEXT_PUBLIC_SITE_URL` is required on the build as well as the test run: the origin is baked
+into the static HTML at build time. Without it on the test run ~10 `seo.spec.ts` assertions
+fail; without it on the build ~140 URL assertions across seo, bilingual-seo, connect and
+municipal specs fail with `http://localhost:3000` — none of it related to your change. Stop
+the server before rebuilding: a running `next start` corrupts the `.next` it is serving.
 
 ## Definition of done
 
