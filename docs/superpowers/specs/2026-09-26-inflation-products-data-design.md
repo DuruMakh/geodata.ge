@@ -2,13 +2,13 @@
 
 Date: 2026-09-26
 
-Status: Draft for user review. This document covers the data stage of the product inflation explorer.
+Status: Approved for the data stage on 2026-09-26. This document covers the data stage of the product inflation explorer.
 
 ## 1. Outcome and scope
 
 Prepare a reviewed, reproducible monthly dataset of price changes for individual goods and services in Georgia's current consumer basket. The public explorer will start at **2015-01** and include **every product in the latest published basket**, including products added after 2015. A product's history begins at its first verified observation within that range. Products that have left the latest basket stay in Geostat's archived workbooks and the validation inventory but do not appear in the delivered product catalogue or facts.
 
-The existing third hub-card position becomes `პროდუქტები` / Products; the separate fifth Products placeholder is removed. Basket weights remain context in Categories, and there is no standalone `სამომხმარებლო კალათა` card. This data-stage spec does not define the page layout, implement the route, or change the existing inflation pages. The page and its exports need a subsequent design section before implementation.
+The existing third hub-card position becomes `პროდუქტები` / Products; the separate fifth Products placeholder is removed. Basket weights remain context in Categories, and there is no standalone `სამომხმარებლო კალათა` card. This data-stage spec does not define the page layout or implement the explorer route. The page and its exports need a subsequent design section before implementation. The methodology archive may gain the reviewed product source files during this data stage.
 
 Geostat publishes each product's index with **previous month = 100** and **same month of the previous year = 100**. Preserve those published indices in canonical data. The explorer can display `index − 100` as a percentage price change. These sources do not supply a price in GEL, a city-specific product figure, a product's individual basket weight, or an exact contribution to headline inflation. Do not derive or imply any of those measures. Geostat's workbook note says an unavailable product price may be imputed when calculating its index; a published index must not be described as a literal shop price observation.
 
