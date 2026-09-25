@@ -14,6 +14,8 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [National revenue](https://fiscal.ge/explorer/revenue) — annual consolidated-budget receipts.
 - [Annual analysis](https://fiscal.ge/explorer/analysis) — one-year budget analysis.
 - [Municipal budgets](https://fiscal.ge/explorer/municipalities) — annual municipal expenditure.
+- [Government debt explorer](https://fiscal.ge/explorer/debt) — annual government debt stock, debt service and weighted-average interest rates.
+- [Deficit explorer](https://fiscal.ge/explorer/deficit) — the IMF general-government balance as a share of GDP and in GEL, with IMF projection years marked.
 
 - [Economy overview](https://fiscal.ge/explorer/economy/gdp) — real GDP, annual real growth, nominal GDP and nominal GDP per person.
 - [Economic sectors](https://fiscal.ge/explorer/economy/sectors) — 20 national economic activities plus a Total GDP reference.
