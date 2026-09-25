@@ -6,9 +6,9 @@ import path from "node:path";
  * Reads one archived source file named by a package manifest and checks it
  * against the manifest's byte size and SHA-256 before anything parses it.
  *
- * The file must sit inside `packageDir` and be a regular file, not a symlink:
- * a manifest row cannot point the pipeline at bytes outside the reviewed
- * package. `mismatch` is the caller's own message, so each dataset keeps its
+ * The file must sit inside `packageDir` and be a regular file, and neither it
+ * nor any folder between it and `packageDir` may be a symlink or junction: a
+ * manifest row cannot point the pipeline at bytes outside the reviewed package. `mismatch` is the caller's own message, so each dataset keeps its
  * diagnostic. Hashes compare case-insensitively (the debt and IMF manifests
  * record them upper-case); the returned `sha256` is lower-case hex.
  */
@@ -29,11 +29,22 @@ export async function readPackageFile(packageDir: string, file: string): Promise
   const root = path.resolve(packageDir);
   const target = path.resolve(root, file);
   const relative = path.relative(root, target);
-  if (path.isAbsolute(file) || relative === "" || relative.startsWith("..") || path.isAbsolute(relative)) {
+  if (
+    path.isAbsolute(file) ||
+    relative === "" ||
+    relative === ".." ||
+    relative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relative)
+  ) {
     throw new Error(`Source file is outside its package: ${file}`);
   }
   const stat = await fs.lstat(target);
-  if (stat.isSymbolicLink()) throw new Error(`Source file is a symlink: ${file}`);
+  // A symlinked folder above the file leads outside as surely as the file itself.
+  let current = root;
+  for (const segment of relative.split(path.sep)) {
+    current = path.join(current, segment);
+    if ((await fs.lstat(current)).isSymbolicLink()) throw new Error(`Source file is a symlink: ${file}`);
+  }
   if (!stat.isFile()) throw new Error(`Source file is not a regular file: ${file}`);
   return fs.readFile(target);
 }

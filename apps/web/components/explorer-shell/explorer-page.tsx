@@ -9,7 +9,9 @@ const PAGE_CLASS = "min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] 
  * changes nothing on screen; the budget, debt and deficit pages carry it and
  * the rest do not, so the flag keeps both class lists as they were.
  * `containerQueries` makes the column the container the workspace's
- * `@min-[1100px]` queries measure.
+ * `@min-[1100px]` queries measure, not the viewport: the shell sidebar takes
+ * 232px off the viewport, so a viewport query would keep the two-column layout
+ * past the width the chart can fit.
  */
 export function ExplorerPage({
   testId,

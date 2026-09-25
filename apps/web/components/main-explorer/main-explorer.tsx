@@ -278,9 +278,6 @@ function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminC
 
   return (
     <ExplorerPage testId="explorer-shell" repeatDesktopBottomPadding>
-    {/* The workspace measures THIS column, not the viewport (DESIGN.md §12):
-        the shell sidebar takes 232px off the viewport, so a viewport query
-        would keep the two-column layout past the width the chart can fit. */}
       <PageHeader
         crumbs={[
           { label: message(messages, "common.home"), href: "/" },

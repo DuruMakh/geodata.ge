@@ -35,7 +35,7 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   forecastLabel?: string;
   preliminaryYears?: number[];
   preliminaryLabel?: string;
-  /** The rows carry labels already in the page language, with no catalogue entry to look up. */
+  /** Each row's `kaLabel` already holds its label in the page language, with no catalogue entry to look up. */
   rowLabelsLocalized?: boolean;
   shareValueForYear: (row: Row, year: number) => number | null;
 };

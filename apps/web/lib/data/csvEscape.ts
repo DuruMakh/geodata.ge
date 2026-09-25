@@ -17,7 +17,7 @@ type CsvCell = string | number | boolean | null;
  * "\n"; the public downloads keep "\r\n".
  */
 export function serializeBomCsvRows(rows: ReadonlyArray<ReadonlyArray<CsvCell>>, lineEnding: "\n" | "\r\n" = "\n"): string {
-  return `﻿${rows.map((row) => row.map(csvEscape).join(",")).join(lineEnding)}${lineEnding}`;
+  return `\uFEFF${rows.map((row) => row.map(csvEscape).join(",")).join(lineEnding)}${lineEnding}`;
 }
 
 /** The same from records keyed by header; a missing cell is written empty. */

@@ -10,6 +10,10 @@ import { useEffect, useRef } from "react";
  *
  * A page that restores the hash in an effect passes `ready` once it has, so the
  * skipped run is the one that applied the hash.
+ *
+ * Under `next dev`, StrictMode re-runs the effect with the ref already set, so
+ * a page that does not pass `ready` can still stamp the defaults there; the
+ * guarantee is the production build's.
  */
 export function useReplaceHash(hash: string, ready = true): void {
   const written = useRef(false);

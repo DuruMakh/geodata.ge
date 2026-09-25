@@ -83,3 +83,49 @@ it("writes readable values, preliminary status and percentage cells in both lang
         );
     }
 });
+it("names the workbook per reader language and links only the sources in range", async () => {
+  const facts = (await prepareGdpOverview()).facts.map((f) => ({
+    ...f,
+    value: Number(f.value),
+  }));
+  const sources = [
+    {
+      years: [2023, 2024, 2025],
+      title: "GDP release",
+      organization: "Geostat",
+      downloadHref: "/downloads/methodology/gdp/release.xlsx" as const,
+      retrievedAt: "2026-01-01",
+    },
+    {
+      years: [2010],
+      title: "Old release",
+      organization: "Geostat",
+      downloadHref: "/downloads/methodology/gdp/old.xlsx" as const,
+      retrievedAt: "2026-01-01",
+    },
+  ];
+  const models = await Promise.all(
+    (["ka", "en"] as const).map(async (locale) =>
+      buildGdpWorkbookExportModel(
+        facts,
+        { ...DEFAULT_GDP_STATE, indicator: "nominal", currency: "gel", range: { kind: "manual", start: 2024, end: 2025 } },
+        { locale, messages: await getMessages(locale, ["gdp"]), englishLabels: {} },
+        sources,
+        "https://fiscal.ge",
+        sourceIdRangesBySeries(facts),
+      ),
+    ),
+  );
+  expect(models.map((model) => model.filename)).toEqual([
+    "fiscal-gdp-nominal-gel-2024-2025.xlsx",
+    "fiscal-gdp-nominal-gel-2024-2025-en.xlsx",
+  ]);
+  for (const model of models)
+    expect(model.sources).toEqual([
+      {
+        ...sources[0],
+        years: [2024, 2025],
+        absoluteUrl: "https://fiscal.ge/downloads/methodology/gdp/release.xlsx",
+      },
+    ]);
+});

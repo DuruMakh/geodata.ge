@@ -113,7 +113,8 @@ export function withAbsoluteUrls<T extends WorkbookPublicSource>(
 
 /**
  * One entry per document: sources that share a link merge their active years,
- * and a source with no active year is dropped.
+ * and a source with no active year is dropped. The first source with a link
+ * keeps its place and its title, organization and retrieval date.
  */
 export function mergeSourcesByHref<T extends WorkbookPublicSource>(
   sources: readonly T[],
