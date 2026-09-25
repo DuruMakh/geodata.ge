@@ -177,6 +177,22 @@ test("general-government deficit metadata includes the IMF projection horizon", 
   expect(node.description).toContain("პროგნოზია");
 });
 
+test("the GDP methodology page emits the shared Dataset vocabulary", async ({ page }) => {
+  for (const path of ["/methodology/gdp", "/en/methodology/gdp"]) {
+    await page.goto(`${BASE_URL}${path}`);
+    const node = JSON.parse(await page.getByTestId("dataset-json-ld").textContent() ?? "{}");
+
+    expect(node["@type"], path).toBe("Dataset");
+    expect(Array.isArray(node.keywords), `${path} keywords`).toBe(true);
+    expect(node.keywords.length, `${path} keywords`).toBeGreaterThan(0);
+    expect(Array.isArray(node.variableMeasured), `${path} variableMeasured`).toBe(true);
+    expect(Array.isArray(node.distribution), `${path} distribution`).toBe(true);
+    expect(node.distribution.map((entry: { contentUrl: string }) => entry.contentUrl), path).toContain(
+      "https://fiscal.ge/downloads/data/gdp-overview.csv",
+    );
+  }
+});
+
 test("only third-party methodology source originals send a noindex header", async ({ request }) => {
   const original = await request.get(
     `${BASE_URL}/downloads/methodology/expenditure/files/2004/mof-annual-execution-annex.pdf`,

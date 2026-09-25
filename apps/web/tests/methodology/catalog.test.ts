@@ -3,7 +3,6 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import type { MunicipalTotalFact } from "../../lib/data/municipal/types";
 import {
-  FUTURE_METHODOLOGY_DATASETS,
   LIVE_METHODOLOGY_IDS,
   METHODOLOGY_CONTENT,
   buildMethodologyHubEntries,
@@ -70,10 +69,6 @@ describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
     expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "inflation"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
-    expect(FUTURE_METHODOLOGY_DATASETS).toEqual([
-      { title: "მოსახლეობა", href: null, state: "future" },
-      { title: "უმუშევრობა", href: null, state: "future" },
-    ]);
   });
 
   it("keeps the Debt methodology concise and discloses its approved boundaries", () => {

@@ -102,8 +102,12 @@ export async function loadMunicipalDataFromDb(): Promise<MunicipalData> {
   };
 }
 
-export async function loadGdpOverviewFactsFromDb(){return loadGdpOverviewFactsFromMirror(prisma);}
-export async function loadEconomicSectorFactsFromDb() { return loadEconomicSectorFactsFromMirror(prisma); }
+export async function loadGdpOverviewFactsFromDb() {
+  return loadGdpOverviewFactsFromMirror(prisma);
+}
+export async function loadEconomicSectorFactsFromDb() {
+  return loadEconomicSectorFactsFromMirror(prisma);
+}
 export async function loadRegionalEconomyFactsFromDb() {
   return loadRegionalEconomyFactsFromMirror(prisma);
 }

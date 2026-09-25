@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { CONTRIBUTION_BINS, GRID_TINTS, binFor, contrastRatio, legendLabelsPp } from "../../lib/explorer/inflationGrid";
+import { CONTRIBUTION_BINS, GRID_TINTS, binFor, legendLabelsPp } from "../../lib/explorer/inflationGrid";
+import { contrastRatio } from "../helpers/contrast";
 
 describe("contribution bins", () => {
   it("puts a negative contribution in the deflation bin", () => {
