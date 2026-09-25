@@ -306,13 +306,13 @@ before rerunning.
 ## The `/mcp` runtime
 
 `/mcp` is the only request-time route. Explorer pages, `/connect`, methodology,
-and publications remain static. The endpoint exposes nine read-only tools
+and publications remain static. The endpoint exposes 13 read-only tools
 through the pinned MCP SDK, stateless Streamable HTTP revision `2025-11-25`.
 There is no session store, model invocation, authentication, or write tool.
 
 ### Snapshot and network boundary
 
-All budget answers use `apps/web/lib/factQuery/generated/snapshot.json`, prepared
+All MCP data answers use `apps/web/lib/factQuery/generated/snapshot.json`, prepared
 at build time and cached once per function instance. The sole runtime network
 exception is `lib/mcp/upstashCounter.ts`, which sends fixed Redis rate-limit
 commands to the configured Upstash endpoint. It never sends query arguments,
@@ -419,8 +419,10 @@ production limiter and switch before the final deployment; do not bypass CI.
 After Vercel reports READY for the merge commit:
 
 - Check the published catalogue's releaseCommit and dataVersion.
-- Connect an SDK client, list all nine tools, discover an entity, and query
-  reviewed expenditure, municipal totals, debt, and a signed deficit.
+- Connect an SDK client, list all 13 tools, discover an entity, and query
+  revenue, expenditure, ministries, municipal totals, debt, deficit, GDP,
+  national sectors, regional economies, and inflation. Exercise `compare`,
+  `rank`, and `get_sources` as well.
 - Check missing values, invalid inputs, source narrowing, and a stale version.
 - Verify rate enforcement with bounded test counters or a preview deployment;
   do not consume the global production quota for a load test.

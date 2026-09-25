@@ -1,6 +1,6 @@
 // apps/web/tests/factQuery/fixtures/referenceIntents.ts
 //
-// The spec section 14.3 reference fixture: 20 intents, each asked in Georgian
+// The spec section 14.3 reference fixture: source-checked intents in Georgian
 // and English, with expected values checked against the reviewed data rather
 // than recorded from whatever the code returned.
 //
@@ -10,7 +10,7 @@
 // scope or caveats.
 //
 // Running these calls tests arithmetic and evidence, not language
-// understanding. The 40 prompts go through real AI clients separately
+// understanding. The prompts can be tested through real AI clients separately
 // (section 14.4); the production service makes no inference calls.
 //
 // Independently checked while authoring, by summing the reviewed rows in
@@ -65,6 +65,7 @@ export type ReferenceIntent = {
   promptEn: string;
   call: { tool: string; arguments: Record<string, unknown> };
   expectedStatus: "ok" | "partial" | "empty" | "error";
+  expectedErrorCode?: string;
   expectedCells?: ExpectedCell[];
   expectedComparison?: ExpectedComparison;
   expectedRanking?: ExpectedRanking;
@@ -957,5 +958,50 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     requiredCaveatCodes: [],
     mustDeclineOrQualify: false,
     note: "Read from data/imports/cpi-categories-monthly.csv: the 12 division yoy_pct rows for 2026-08, sorted by hand.",
+  },
+  {
+    id: 35,
+    promptKa: "რამდენი იყო იმერეთის მთლიანი რეგიონული მშპ 2024 წელს?",
+    promptEn: "What was Imereti's total regional GDP in 2024?",
+    call: { tool: "query_regional_economies", arguments: { regionIds: ["region.imereti"], seriesIds: ["economy.regional_gdp_total"], years: [2024], measure: "amount_gel" } },
+    expectedStatus: "ok",
+    expectedCells: [{ id: "regional-economies:region.imereti:economy.regional_gdp_total:2024:amount_gel", value: 7203151022.643833, unit: "GEL" }],
+    allowedRounding: EXACT,
+    expectedBudgetScope: "regional_accounts",
+    requiredSourceIds: ["source.geostat_regional_gdp"],
+    requiredDocumentIds: ["source.geostat_regional_gdp"],
+    requiredCaveatCodes: [],
+    mustDeclineOrQualify: false,
+    note: "Read from data/imports/regional-economies-annual.csv: Imereti, total regional GDP, 2024, nominal = 7203151022.6438331 GEL at market prices. The source row cites the Geostat regional GDP workbook.",
+  },
+  {
+    id: 36,
+    promptKa: "იმერეთის მშპ-ის რა წილი შეადგინა სოფლის მეურნეობის, მეტყევეობისა და თევზჭერის სექტორმა 2024 წელს?",
+    promptEn: "What share of Imereti's GDP came from agriculture, forestry and fishing in 2024?",
+    call: { tool: "query_regional_economies", arguments: { regionIds: ["region.imereti"], seriesIds: ["sector.a"], years: [2024], measure: "share_of_region_gdp_pct" } },
+    expectedStatus: "ok",
+    expectedCells: [{ id: "regional-economies:region.imereti:sector.a:2024:share_of_region_gdp_pct", value: 9.935606228689402, unit: "percent" }],
+    allowedRounding: RATIO_TOLERANCE,
+    expectedBudgetScope: "regional_accounts",
+    requiredSourceIds: ["source.fiscal_regional_economy_share"],
+    requiredDocumentIds: ["source.geostat_regional_gdp", "source.geostat_regional_gdp_by_activity"],
+    requiredCaveatCodes: [],
+    mustDeclineOrQualify: false,
+    note: "Calculated independently from reviewed regional CSV amounts: 715676721.66770501 / 7203151022.6438331 × 100 = 9.9356062286894016%. Both Geostat workbooks are cited as inputs to Fiscal.ge's derived share.",
+  },
+  {
+    id: 37,
+    promptKa: "რამდენი იყო იმერეთის რეგიონული მშპ 2025 წელს?",
+    promptEn: "What was Imereti's regional GDP in 2025?",
+    call: { tool: "query_regional_economies", arguments: { regionIds: ["region.imereti"], seriesIds: ["economy.regional_gdp_total"], years: [2025], measure: "amount_gel" } },
+    expectedStatus: "error",
+    expectedErrorCode: "year_out_of_range",
+    allowedRounding: EXACT,
+    expectedBudgetScope: null,
+    requiredSourceIds: [],
+    requiredDocumentIds: [],
+    requiredCaveatCodes: [],
+    mustDeclineOrQualify: true,
+    note: "The reviewed regional CSV ends at 2024 and has zero 2025 rows. The service must reject a 2025 request, not invent an estimate or return zero.",
   },
 ] as const;
