@@ -1,0 +1,174 @@
+﻿product_id,boundary_year,current_source_cell,current_group,current_label_en,current_label_ka,previous_year,candidate_source_cell,candidate_group,candidate_label_en,candidate_label_ka,clues,clue_type,review_status
+cpi.product.p0051,2017,2017!D54,01,Plum,ქლიავი,2016,2016!D54,01,Cherry,ალუბალი,same COICOP group; same sheet row number,same_row_only,unresolved
+cpi.product.p0105,2017,2017!D110,03,Man's boxers,მამაკაცის ტრუსი,2016,2016!D110,03,Man's boxers,მამაკაცის ტრუსები,same COICOP group; same English name; same sheet row number,one_language_same,unresolved
+cpi.product.p0105,2017,2017!D110,03,Man's boxers,მამაკაცის ტრუსი,2016,2016!D117,03,Woman's panties,ქალის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0105,2017,2017!D110,03,Man's boxers,მამაკაცის ტრუსი,2016,2016!D128,03,Child's panties,ბავშვის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0112,2017,2017!D117,03,Woman's panties,ქალის ტრუსი,2016,2016!D117,03,Woman's panties,ქალის ტრუსები,same COICOP group; same English name; same sheet row number,one_language_same,unresolved
+cpi.product.p0112,2017,2017!D117,03,Woman's panties,ქალის ტრუსი,2016,2016!D110,03,Man's boxers,მამაკაცის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0112,2017,2017!D117,03,Woman's panties,ქალის ტრუსი,2016,2016!D128,03,Child's panties,ბავშვის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0123,2017,2017!D128,03,Child's panties,ბავშვის ტრუსი,2016,2016!D128,03,Child's panties,ბავშვის ტრუსები,same COICOP group; same English name; same sheet row number,one_language_same,unresolved
+cpi.product.p0123,2017,2017!D128,03,Child's panties,ბავშვის ტრუსი,2016,2016!D110,03,Man's boxers,მამაკაცის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0123,2017,2017!D128,03,Child's panties,ბავშვის ტრუსი,2016,2016!D117,03,Woman's panties,ქალის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0124,2017,2017!D129,03,Woman’s headwear,ქუდი ქალის,2016,2016!D110,03,Man's boxers,მამაკაცის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0124,2017,2017!D129,03,Woman’s headwear,ქუდი ქალის,2016,2016!D117,03,Woman's panties,ქალის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0124,2017,2017!D129,03,Woman’s headwear,ქუდი ქალის,2016,2016!D128,03,Child's panties,ბავშვის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0125,2017,2017!D130,03,Man’s headwear,ქუდი კაცის,2016,2016!D110,03,Man's boxers,მამაკაცის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0125,2017,2017!D130,03,Man’s headwear,ქუდი კაცის,2016,2016!D117,03,Woman's panties,ქალის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0125,2017,2017!D130,03,Man’s headwear,ქუდი კაცის,2016,2016!D128,03,Child's panties,ბავშვის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0134,2017,2017!D135,03,Woman’s slippers,საშინაო ფეხსაცმელი ქალის,2016,2016!D110,03,Man's boxers,მამაკაცის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0134,2017,2017!D135,03,Woman’s slippers,საშინაო ფეხსაცმელი ქალის,2016,2016!D117,03,Woman's panties,ქალის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0134,2017,2017!D135,03,Woman’s slippers,საშინაო ფეხსაცმელი ქალის,2016,2016!D128,03,Child's panties,ბავშვის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0130,2017,2017!D139,03,Man’s slippers,საშინაო ფეხსაცმელი კაცის,2016,2016!D110,03,Man's boxers,მამაკაცის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0130,2017,2017!D139,03,Man’s slippers,საშინაო ფეხსაცმელი კაცის,2016,2016!D117,03,Woman's panties,ქალის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0130,2017,2017!D139,03,Man’s slippers,საშინაო ფეხსაცმელი კაცის,2016,2016!D128,03,Child's panties,ბავშვის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0139,2017,2017!D144,03,Child’s slippers,საშინაო ფეხსაცმელი ბავშვის,2016,2016!D110,03,Man's boxers,მამაკაცის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0139,2017,2017!D144,03,Child’s slippers,საშინაო ფეხსაცმელი ბავშვის,2016,2016!D117,03,Woman's panties,ქალის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0139,2017,2017!D144,03,Child’s slippers,საშინაო ფეხსაცმელი ბავშვის,2016,2016!D128,03,Child's panties,ბავშვის ტრუსები,same COICOP group,same_group_only,unresolved
+cpi.product.p0148,2017,2017!D154,04,Chipboard,თაბაშირ-მუყაოს ფილა,2016,2016!D149,04,Chipboard,თაბაშირ–მუყაოს ფილა,same COICOP group; same English name,one_language_same,unresolved
+cpi.product.p0162,2017,2017!D168,05,Sofa,დივანი,2016,,,,,"no candidate with a shared group, label or row number",no_candidate,unresolved
+cpi.product.p0193,2017,2017!D198,05,Dry battery,მშრალი ბატარეა,2016,,,,,"no candidate with a shared group, label or row number",no_candidate,unresolved
+cpi.product.p0202,2017,2017!D207,06,Blood pressure meter,წნევის საზომი აპარატი,2016,,,,,"no candidate with a shared group, label or row number",no_candidate,unresolved
+cpi.product.p0210,2017,2017!D215,06,Echo scanning,ექოსკანირება,2016,,,,,"no candidate with a shared group, label or row number",no_candidate,unresolved
+cpi.product.p0224,2017,2017!D229,07,Car-wash fee,ავტომობილის რეცხვის გადასახდელი,2016,2016!D220,07,Car-wash fee,ავტომობილის რეცხვის გადასახადი,same COICOP group; same English name,one_language_same,unresolved
+cpi.product.p0259,2017,2017!D263,09,Museum ticket,მუზეუმის ბილეთი,2016,,,,,"no candidate with a shared group, label or row number",no_candidate,unresolved
+cpi.product.p0304,2017,2017!D307,12,Notarial fee,სანოტარო გადასახდელი,2016,2016!D297,12,Notarial fee,სანოტარო გადასახადი,same COICOP group; same English name,one_language_same,unresolved
+cpi.product.p0029,2018,2018!D32,01,Manufactured milk,ქარხნული რძე,2017,2017!D32,01,Pasteurized milk,პასტერიზებული რძე,same COICOP group; same sheet row number,same_row_only,unresolved
+cpi.product.p0029,2018,2018!D32,01,Manufactured milk,ქარხნული რძე,2017,2017!D33,01,Condensed milk,შესქელებული რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0029,2018,2018!D32,01,Manufactured milk,ქარხნული რძე,2017,2017!D41,01,Butter,კარაქი,same COICOP group,same_group_only,unresolved
+cpi.product.p0030,2018,2018!D33,01,Condensed milk and milk containing product,შესქელებული რძე და რძის შემცველი პროდუქტი,2017,2017!D33,01,Condensed milk,შესქელებული რძე,same COICOP group; same sheet row number,same_row_only,unresolved
+cpi.product.p0030,2018,2018!D33,01,Condensed milk and milk containing product,შესქელებული რძე და რძის შემცველი პროდუქტი,2017,2017!D32,01,Pasteurized milk,პასტერიზებული რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0030,2018,2018!D33,01,Condensed milk and milk containing product,შესქელებული რძე და რძის შემცველი პროდუქტი,2017,2017!D41,01,Butter,კარაქი,same COICOP group,same_group_only,unresolved
+cpi.product.p0038,2018,2018!D41,01,Butter and spread,კარაქი და სპრედი,2017,2017!D41,01,Butter,კარაქი,same COICOP group; same sheet row number,same_row_only,unresolved
+cpi.product.p0038,2018,2018!D41,01,Butter and spread,კარაქი და სპრედი,2017,2017!D32,01,Pasteurized milk,პასტერიზებული რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0038,2018,2018!D41,01,Butter and spread,კარაქი და სპრედი,2017,2017!D33,01,Condensed milk,შესქელებული რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0220,2018,2018!D225,07,Diesel fuel,დიზელის საწვავი,2017,2017!D225,07,Diesel,დიზელის საწვავი,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0007,2019,2019!D10,01,Cookies,ნამცხვარი,2018,2018!D10,01,Cake,ნამცხვარი,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0007,2019,2019!D10,01,Cookies,ნამცხვარი,2018,2018!D12,01,Toast,ორცხობილა,same COICOP group,same_group_only,unresolved
+cpi.product.p0007,2019,2019!D10,01,Cookies,ნამცხვარი,2018,2018!D22,01,Meat dumplings (semi-prepared food),პილმენი (ნახევარფაბრიკატი),same COICOP group,same_group_only,unresolved
+cpi.product.p0007,2019,2019!D10,01,Cookies,ნამცხვარი,2018,2018!D31,01,Milk,რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0007,2019,2019!D10,01,Cookies,ნამცხვარი,2018,2018!D36,01,Fresh cheese,მოუხდელი ყველი,same COICOP group,same_group_only,unresolved
+cpi.product.p0007,2019,2019!D10,01,Cookies,ნამცხვარი,2018,2018!D37,01,Sulguni (cheese),სულგუნი,same COICOP group,same_group_only,unresolved
+cpi.product.p0007,2019,2019!D10,01,Cookies,ნამცხვარი,2018,2018!D68,01,Water-melon,საზამთრო,same COICOP group,same_group_only,unresolved
+cpi.product.p0007,2019,2019!D10,01,Cookies,ნამცხვარი,2018,2018!D82,01,Plum sauce,ტყემლის საწებელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0007,2019,2019!D10,01,Cookies,ნამცხვარი,2018,2018!D92,01,Mineral water,მინერალური წყალი,same COICOP group,same_group_only,unresolved
+cpi.product.p0007,2019,2019!D10,01,Cookies,ნამცხვარი,2018,2018!D94,01,Drinks of Coca-cola type,კოლა-ს ტიპის სასმელები,same COICOP group,same_group_only,unresolved
+cpi.product.p0009,2019,2019!D12,01,Rusk,ორცხობილა,2018,2018!D12,01,Toast,ორცხობილა,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0009,2019,2019!D12,01,Rusk,ორცხობილა,2018,2018!D10,01,Cake,ნამცხვარი,same COICOP group,same_group_only,unresolved
+cpi.product.p0009,2019,2019!D12,01,Rusk,ორცხობილა,2018,2018!D22,01,Meat dumplings (semi-prepared food),პილმენი (ნახევარფაბრიკატი),same COICOP group,same_group_only,unresolved
+cpi.product.p0009,2019,2019!D12,01,Rusk,ორცხობილა,2018,2018!D31,01,Milk,რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0009,2019,2019!D12,01,Rusk,ორცხობილა,2018,2018!D36,01,Fresh cheese,მოუხდელი ყველი,same COICOP group,same_group_only,unresolved
+cpi.product.p0009,2019,2019!D12,01,Rusk,ორცხობილა,2018,2018!D37,01,Sulguni (cheese),სულგუნი,same COICOP group,same_group_only,unresolved
+cpi.product.p0009,2019,2019!D12,01,Rusk,ორცხობილა,2018,2018!D68,01,Water-melon,საზამთრო,same COICOP group,same_group_only,unresolved
+cpi.product.p0009,2019,2019!D12,01,Rusk,ორცხობილა,2018,2018!D82,01,Plum sauce,ტყემლის საწებელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0009,2019,2019!D12,01,Rusk,ორცხობილა,2018,2018!D92,01,Mineral water,მინერალური წყალი,same COICOP group,same_group_only,unresolved
+cpi.product.p0009,2019,2019!D12,01,Rusk,ორცხობილა,2018,2018!D94,01,Drinks of Coca-cola type,კოლა-ს ტიპის სასმელები,same COICOP group,same_group_only,unresolved
+cpi.product.p0010,2019,2019!D13,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2018,2018!D10,01,Cake,ნამცხვარი,same COICOP group,same_group_only,unresolved
+cpi.product.p0010,2019,2019!D13,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2018,2018!D12,01,Toast,ორცხობილა,same COICOP group,same_group_only,unresolved
+cpi.product.p0010,2019,2019!D13,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2018,2018!D22,01,Meat dumplings (semi-prepared food),პილმენი (ნახევარფაბრიკატი),same COICOP group,same_group_only,unresolved
+cpi.product.p0010,2019,2019!D13,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2018,2018!D31,01,Milk,რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0010,2019,2019!D13,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2018,2018!D36,01,Fresh cheese,მოუხდელი ყველი,same COICOP group,same_group_only,unresolved
+cpi.product.p0010,2019,2019!D13,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2018,2018!D37,01,Sulguni (cheese),სულგუნი,same COICOP group,same_group_only,unresolved
+cpi.product.p0010,2019,2019!D13,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2018,2018!D68,01,Water-melon,საზამთრო,same COICOP group,same_group_only,unresolved
+cpi.product.p0010,2019,2019!D13,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2018,2018!D82,01,Plum sauce,ტყემლის საწებელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0010,2019,2019!D13,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2018,2018!D92,01,Mineral water,მინერალური წყალი,same COICOP group,same_group_only,unresolved
+cpi.product.p0010,2019,2019!D13,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2018,2018!D94,01,Drinks of Coca-cola type,კოლა-ს ტიპის სასმელები,same COICOP group,same_group_only,unresolved
+cpi.product.p0020,2019,2019!D23,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2018,2018!D22,01,Meat dumplings (semi-prepared food),პილმენი (ნახევარფაბრიკატი),same COICOP group; same English name,one_language_same,unresolved
+cpi.product.p0020,2019,2019!D23,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2018,2018!D10,01,Cake,ნამცხვარი,same COICOP group,same_group_only,unresolved
+cpi.product.p0020,2019,2019!D23,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2018,2018!D12,01,Toast,ორცხობილა,same COICOP group,same_group_only,unresolved
+cpi.product.p0020,2019,2019!D23,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2018,2018!D31,01,Milk,რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0020,2019,2019!D23,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2018,2018!D36,01,Fresh cheese,მოუხდელი ყველი,same COICOP group,same_group_only,unresolved
+cpi.product.p0020,2019,2019!D23,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2018,2018!D37,01,Sulguni (cheese),სულგუნი,same COICOP group,same_group_only,unresolved
+cpi.product.p0020,2019,2019!D23,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2018,2018!D68,01,Water-melon,საზამთრო,same COICOP group,same_group_only,unresolved
+cpi.product.p0020,2019,2019!D23,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2018,2018!D82,01,Plum sauce,ტყემლის საწებელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0020,2019,2019!D23,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2018,2018!D92,01,Mineral water,მინერალური წყალი,same COICOP group,same_group_only,unresolved
+cpi.product.p0020,2019,2019!D23,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2018,2018!D94,01,Drinks of Coca-cola type,კოლა-ს ტიპის სასმელები,same COICOP group,same_group_only,unresolved
+cpi.product.p0033,2019,2019!D36,01,Cheese Imeruli,იმერული ყველი,2018,2018!D36,01,Fresh cheese,მოუხდელი ყველი,same COICOP group; same sheet row number,same_row_only,unresolved
+cpi.product.p0033,2019,2019!D36,01,Cheese Imeruli,იმერული ყველი,2018,2018!D10,01,Cake,ნამცხვარი,same COICOP group,same_group_only,unresolved
+cpi.product.p0033,2019,2019!D36,01,Cheese Imeruli,იმერული ყველი,2018,2018!D12,01,Toast,ორცხობილა,same COICOP group,same_group_only,unresolved
+cpi.product.p0033,2019,2019!D36,01,Cheese Imeruli,იმერული ყველი,2018,2018!D22,01,Meat dumplings (semi-prepared food),პილმენი (ნახევარფაბრიკატი),same COICOP group,same_group_only,unresolved
+cpi.product.p0033,2019,2019!D36,01,Cheese Imeruli,იმერული ყველი,2018,2018!D31,01,Milk,რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0033,2019,2019!D36,01,Cheese Imeruli,იმერული ყველი,2018,2018!D37,01,Sulguni (cheese),სულგუნი,same COICOP group,same_group_only,unresolved
+cpi.product.p0033,2019,2019!D36,01,Cheese Imeruli,იმერული ყველი,2018,2018!D68,01,Water-melon,საზამთრო,same COICOP group,same_group_only,unresolved
+cpi.product.p0033,2019,2019!D36,01,Cheese Imeruli,იმერული ყველი,2018,2018!D82,01,Plum sauce,ტყემლის საწებელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0033,2019,2019!D36,01,Cheese Imeruli,იმერული ყველი,2018,2018!D92,01,Mineral water,მინერალური წყალი,same COICOP group,same_group_only,unresolved
+cpi.product.p0033,2019,2019!D36,01,Cheese Imeruli,იმერული ყველი,2018,2018!D94,01,Drinks of Coca-cola type,კოლა-ს ტიპის სასმელები,same COICOP group,same_group_only,unresolved
+cpi.product.p0034,2019,2019!D37,01,Cheese Sulguni,სულგუნი,2018,2018!D37,01,Sulguni (cheese),სულგუნი,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0034,2019,2019!D37,01,Cheese Sulguni,სულგუნი,2018,2018!D10,01,Cake,ნამცხვარი,same COICOP group,same_group_only,unresolved
+cpi.product.p0034,2019,2019!D37,01,Cheese Sulguni,სულგუნი,2018,2018!D12,01,Toast,ორცხობილა,same COICOP group,same_group_only,unresolved
+cpi.product.p0034,2019,2019!D37,01,Cheese Sulguni,სულგუნი,2018,2018!D22,01,Meat dumplings (semi-prepared food),პილმენი (ნახევარფაბრიკატი),same COICOP group,same_group_only,unresolved
+cpi.product.p0034,2019,2019!D37,01,Cheese Sulguni,სულგუნი,2018,2018!D31,01,Milk,რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0034,2019,2019!D37,01,Cheese Sulguni,სულგუნი,2018,2018!D36,01,Fresh cheese,მოუხდელი ყველი,same COICOP group,same_group_only,unresolved
+cpi.product.p0034,2019,2019!D37,01,Cheese Sulguni,სულგუნი,2018,2018!D68,01,Water-melon,საზამთრო,same COICOP group,same_group_only,unresolved
+cpi.product.p0034,2019,2019!D37,01,Cheese Sulguni,სულგუნი,2018,2018!D82,01,Plum sauce,ტყემლის საწებელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0034,2019,2019!D37,01,Cheese Sulguni,სულგუნი,2018,2018!D92,01,Mineral water,მინერალური წყალი,same COICOP group,same_group_only,unresolved
+cpi.product.p0034,2019,2019!D37,01,Cheese Sulguni,სულგუნი,2018,2018!D94,01,Drinks of Coca-cola type,კოლა-ს ტიპის სასმელები,same COICOP group,same_group_only,unresolved
+cpi.product.p0065,2019,2019!D68,01,Watermelon,საზამთრო,2018,2018!D68,01,Water-melon,საზამთრო,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0065,2019,2019!D68,01,Watermelon,საზამთრო,2018,2018!D10,01,Cake,ნამცხვარი,same COICOP group,same_group_only,unresolved
+cpi.product.p0065,2019,2019!D68,01,Watermelon,საზამთრო,2018,2018!D12,01,Toast,ორცხობილა,same COICOP group,same_group_only,unresolved
+cpi.product.p0065,2019,2019!D68,01,Watermelon,საზამთრო,2018,2018!D22,01,Meat dumplings (semi-prepared food),პილმენი (ნახევარფაბრიკატი),same COICOP group,same_group_only,unresolved
+cpi.product.p0065,2019,2019!D68,01,Watermelon,საზამთრო,2018,2018!D31,01,Milk,რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0065,2019,2019!D68,01,Watermelon,საზამთრო,2018,2018!D36,01,Fresh cheese,მოუხდელი ყველი,same COICOP group,same_group_only,unresolved
+cpi.product.p0065,2019,2019!D68,01,Watermelon,საზამთრო,2018,2018!D37,01,Sulguni (cheese),სულგუნი,same COICOP group,same_group_only,unresolved
+cpi.product.p0065,2019,2019!D68,01,Watermelon,საზამთრო,2018,2018!D82,01,Plum sauce,ტყემლის საწებელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0065,2019,2019!D68,01,Watermelon,საზამთრო,2018,2018!D92,01,Mineral water,მინერალური წყალი,same COICOP group,same_group_only,unresolved
+cpi.product.p0065,2019,2019!D68,01,Watermelon,საზამთრო,2018,2018!D94,01,Drinks of Coca-cola type,კოლა-ს ტიპის სასმელები,same COICOP group,same_group_only,unresolved
+cpi.product.p0088,2019,2019!D91,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2018,2018!D10,01,Cake,ნამცხვარი,same COICOP group,same_group_only,unresolved
+cpi.product.p0088,2019,2019!D91,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2018,2018!D12,01,Toast,ორცხობილა,same COICOP group,same_group_only,unresolved
+cpi.product.p0088,2019,2019!D91,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2018,2018!D22,01,Meat dumplings (semi-prepared food),პილმენი (ნახევარფაბრიკატი),same COICOP group,same_group_only,unresolved
+cpi.product.p0088,2019,2019!D91,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2018,2018!D31,01,Milk,რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0088,2019,2019!D91,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2018,2018!D36,01,Fresh cheese,მოუხდელი ყველი,same COICOP group,same_group_only,unresolved
+cpi.product.p0088,2019,2019!D91,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2018,2018!D37,01,Sulguni (cheese),სულგუნი,same COICOP group,same_group_only,unresolved
+cpi.product.p0088,2019,2019!D91,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2018,2018!D68,01,Water-melon,საზამთრო,same COICOP group,same_group_only,unresolved
+cpi.product.p0088,2019,2019!D91,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2018,2018!D82,01,Plum sauce,ტყემლის საწებელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0088,2019,2019!D91,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2018,2018!D92,01,Mineral water,მინერალური წყალი,same COICOP group,same_group_only,unresolved
+cpi.product.p0088,2019,2019!D91,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2018,2018!D94,01,Drinks of Coca-cola type,კოლა-ს ტიპის სასმელები,same COICOP group,same_group_only,unresolved
+cpi.product.p0089,2019,2019!D92,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2018,2018!D92,01,Mineral water,მინერალური წყალი,same COICOP group; same sheet row number,same_row_only,unresolved
+cpi.product.p0089,2019,2019!D92,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2018,2018!D10,01,Cake,ნამცხვარი,same COICOP group,same_group_only,unresolved
+cpi.product.p0089,2019,2019!D92,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2018,2018!D12,01,Toast,ორცხობილა,same COICOP group,same_group_only,unresolved
+cpi.product.p0089,2019,2019!D92,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2018,2018!D22,01,Meat dumplings (semi-prepared food),პილმენი (ნახევარფაბრიკატი),same COICOP group,same_group_only,unresolved
+cpi.product.p0089,2019,2019!D92,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2018,2018!D31,01,Milk,რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0089,2019,2019!D92,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2018,2018!D36,01,Fresh cheese,მოუხდელი ყველი,same COICOP group,same_group_only,unresolved
+cpi.product.p0089,2019,2019!D92,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2018,2018!D37,01,Sulguni (cheese),სულგუნი,same COICOP group,same_group_only,unresolved
+cpi.product.p0089,2019,2019!D92,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2018,2018!D68,01,Water-melon,საზამთრო,same COICOP group,same_group_only,unresolved
+cpi.product.p0089,2019,2019!D92,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2018,2018!D82,01,Plum sauce,ტყემლის საწებელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0089,2019,2019!D92,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2018,2018!D94,01,Drinks of Coca-cola type,კოლა-ს ტიპის სასმელები,same COICOP group,same_group_only,unresolved
+cpi.product.p0091,2019,2019!D94,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2018,2018!D94,01,Drinks of Coca-cola type,კოლა-ს ტიპის სასმელები,same COICOP group; same English name; same sheet row number,one_language_same,unresolved
+cpi.product.p0091,2019,2019!D94,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2018,2018!D10,01,Cake,ნამცხვარი,same COICOP group,same_group_only,unresolved
+cpi.product.p0091,2019,2019!D94,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2018,2018!D12,01,Toast,ორცხობილა,same COICOP group,same_group_only,unresolved
+cpi.product.p0091,2019,2019!D94,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2018,2018!D22,01,Meat dumplings (semi-prepared food),პილმენი (ნახევარფაბრიკატი),same COICOP group,same_group_only,unresolved
+cpi.product.p0091,2019,2019!D94,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2018,2018!D31,01,Milk,რძე,same COICOP group,same_group_only,unresolved
+cpi.product.p0091,2019,2019!D94,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2018,2018!D36,01,Fresh cheese,მოუხდელი ყველი,same COICOP group,same_group_only,unresolved
+cpi.product.p0091,2019,2019!D94,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2018,2018!D37,01,Sulguni (cheese),სულგუნი,same COICOP group,same_group_only,unresolved
+cpi.product.p0091,2019,2019!D94,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2018,2018!D68,01,Water-melon,საზამთრო,same COICOP group,same_group_only,unresolved
+cpi.product.p0091,2019,2019!D94,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2018,2018!D82,01,Plum sauce,ტყემლის საწებელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0091,2019,2019!D94,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2018,2018!D92,01,Mineral water,მინერალური წყალი,same COICOP group,same_group_only,unresolved
+cpi.product.p0096,2019,2019!D99,02,Bottled wine,ღვინო ბოთლებში ჩამოსხმული,2018,2018!D99,02,"Wine, bottled",ღვინო ბოთლებში ჩამოსხმული,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0096,2019,2019!D99,02,Bottled wine,ღვინო ბოთლებში ჩამოსხმული,2018,2018!D103,02,Domestically produced non filtered cigarette,ადგილობრივი წარმოების უფილტრო სიგარეტი,same COICOP group,same_group_only,unresolved
+cpi.product.p0108,2019,2019!D113,03,Woman's demi-season jacket,ქალის დემისეზონური ქურთუკი,2018,2018!D113,03,Woman's light jacket (for winter and spring use),ქალის დემისეზონური ქურთუკი,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0108,2019,2019!D113,03,Woman's demi-season jacket,ქალის დემისეზონური ქურთუკი,2018,2018!D138,03,Woman shoes for spring and autumn season,ქალის დემისეზონური ფეხსაცმელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0133,2019,2019!D138,03,Woman's demi-season shoes,ქალის დემისეზონური ფეხსაცმელი,2018,2018!D138,03,Woman shoes for spring and autumn season,ქალის დემისეზონური ფეხსაცმელი,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0133,2019,2019!D138,03,Woman's demi-season shoes,ქალის დემისეზონური ფეხსაცმელი,2018,2018!D113,03,Woman's light jacket (for winter and spring use),ქალის დემისეზონური ქურთუკი,same COICOP group,same_group_only,unresolved
+cpi.product.p0170,2019,2019!D175,05,Gas heater,გაზის გამათბობელი,2018,2018!D184,05,Coffee set,ყავის სერვიზი,same COICOP group,same_group_only,unresolved
+cpi.product.p0170,2019,2019!D175,05,Gas heater,გაზის გამათბობელი,2018,2018!D192,05,Detergent jelly for dishes,ჭურჭლის სინთეტიკური სარეცხი საშუალებები,same COICOP group,same_group_only,unresolved
+cpi.product.p0179,2019,2019!D184,05,Coffee cup with saucer,ყავის ფინჯანი ლამბაქით,2018,2018!D184,05,Coffee set,ყავის სერვიზი,same COICOP group; same sheet row number,same_row_only,unresolved
+cpi.product.p0179,2019,2019!D184,05,Coffee cup with saucer,ყავის ფინჯანი ლამბაქით,2018,2018!D192,05,Detergent jelly for dishes,ჭურჭლის სინთეტიკური სარეცხი საშუალებები,same COICOP group,same_group_only,unresolved
+cpi.product.p0187,2019,2019!D192,05,Detergents for dishes,ჭურჭლის სინთეტიკური სარეცხი საშუალებები,2018,2018!D192,05,Detergent jelly for dishes,ჭურჭლის სინთეტიკური სარეცხი საშუალებები,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0187,2019,2019!D192,05,Detergents for dishes,ჭურჭლის სინთეტიკური სარეცხი საშუალებები,2018,2018!D184,05,Coffee set,ყავის სერვიზი,same COICOP group,same_group_only,unresolved
+cpi.product.p0203,2019,2019!D208,06,Eyeglass lens,სათვალის ლინზები,2018,2018!D208,06,Glass lens,სათვალის ლინზები,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0214,2019,2019!D219,07,New motor car,ახალი მსუბუქი ავტომობილი,2018,2018!D219,07,New motor cars,ახალი მსუბუქი ავტომობილი,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0214,2019,2019!D219,07,New motor car,ახალი მსუბუქი ავტომობილი,2018,2018!D220,07,Used motor cars,მეორადი მოხმარების მსუბუქი ავტომობილი,same COICOP group,same_group_only,unresolved
+cpi.product.p0215,2019,2019!D220,07,Used motor car,მეორადი მოხმარების მსუბუქი ავტომობილი,2018,2018!D220,07,Used motor cars,მეორადი მოხმარების მსუბუქი ავტომობილი,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0215,2019,2019!D220,07,Used motor car,მეორადი მოხმარების მსუბუქი ავტომობილი,2018,2018!D219,07,New motor cars,ახალი მსუბუქი ავტომობილი,same COICOP group,same_group_only,unresolved
+cpi.product.p0244,2019,2019!D249,09,Toy,ბავშვის სათამაშო,2018,2018!D249,09,Doll,თოჯინა,same COICOP group; same sheet row number,same_row_only,unresolved
+cpi.product.p0244,2019,2019!D249,09,Toy,ბავშვის სათამაშო,2018,2018!D253,09,Sporting shoes,სპორტული ფეხსაცმელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0244,2019,2019!D249,09,Toy,ბავშვის სათამაშო,2018,2018!D254,09,Child's sporting shoes,ბავშვის სპორტული ფეხსაცმელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0248,2019,2019!D253,09,Sports shoes,სპორტული ფეხსაცმელი,2018,2018!D253,09,Sporting shoes,სპორტული ფეხსაცმელი,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0248,2019,2019!D253,09,Sports shoes,სპორტული ფეხსაცმელი,2018,2018!D249,09,Doll,თოჯინა,same COICOP group,same_group_only,unresolved
+cpi.product.p0248,2019,2019!D253,09,Sports shoes,სპორტული ფეხსაცმელი,2018,2018!D254,09,Child's sporting shoes,ბავშვის სპორტული ფეხსაცმელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0249,2019,2019!D254,09,Child's sports shoes,ბავშვის სპორტული ფეხსაცმელი,2018,2018!D254,09,Child's sporting shoes,ბავშვის სპორტული ფეხსაცმელი,same COICOP group; same Georgian name; same sheet row number,one_language_same,unresolved
+cpi.product.p0249,2019,2019!D254,09,Child's sports shoes,ბავშვის სპორტული ფეხსაცმელი,2018,2018!D249,09,Doll,თოჯინა,same COICOP group,same_group_only,unresolved
+cpi.product.p0249,2019,2019!D254,09,Child's sports shoes,ბავშვის სპორტული ფეხსაცმელი,2018,2018!D253,09,Sporting shoes,სპორტული ფეხსაცმელი,same COICOP group,same_group_only,unresolved
+cpi.product.p0279,2019,2019!D283,11,Khinkali in Restaurant,ხინკალი რესტორანში,2018,2018!D282,11,Khinkali in sakhinkle,ხინკალი სახინკლეში,same COICOP group,same_group_only,unresolved
+cpi.product.p0251,2020,2020!D254,09,Pet food,შინაური ცხოველების საკვები,2019,2019!D273,09,Tourist trip,ტურისტული მოგზაურობა,same COICOP group,same_group_only,unresolved
+cpi.product.p0269,2020,2020!D272,09,Tourist trip abroad,ტურისტული მოგზაურობა ქვეყნის გარეთ,2019,2019!D273,09,Tourist trip,ტურისტული მოგზაურობა,same COICOP group,same_group_only,unresolved
+cpi.product.p0233,2023,2023!D236,07,Travel pass,სამგზავრო აბონემენტი,2022,,,,,"no candidate with a shared group, label or row number",no_candidate,unresolved
