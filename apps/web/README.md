@@ -1,11 +1,11 @@
 # Fiscal.ge Web App
 
-Next.js app for Fiscal.ge: the landing page at `/` (living-relief hero, three paths to the data) and the Budget Explorer behind the platform shell at `/explorer` — a hub plus one route per section: `/explorer/expenditure`, `/explorer/revenue`, `/explorer/analysis` (multi-year explorer, single-year analysis, Excel workbook export).
+Next.js app for Fiscal.ge: the landing page at `/`, the data explorers behind the platform shell at `/explorer` (Budget, Economy and Inflation hubs and their sections), the methodology centre at `/methodology`, the `/about` and `/connect` pages, and the read-only MCP endpoint at `/mcp`. Georgian pages live in `app/(ka)`; the English mirror under `/en` lives in `app/(en)`. `../../DESIGN.md` §6.2 holds the full route map.
 
 Product scope, agent rules, data rules, and the design system live at the repo root — read those before changing this app:
 
 - `../../README.md` (setup and data foundation overview)
-- `../../AGENTS.md` (operating rules)
+- `../../AGENTS.md` (operating rules) and `../../CLAUDE.md` (commands and definition of done)
 - `../../Project_Definition.md` (canonical v1 scope)
 - `../../DESIGN.md` (production design system)
 
@@ -27,7 +27,7 @@ npm run dev            # dev server
 npm run build          # production build
 npm run lint           # eslint (zero warnings allowed)
 npm run typecheck      # tsc --noEmit
-npm run check          # lint + typecheck + unit tests + data validation
+npm run check          # lint + typecheck + unit tests + data validation + i18n check
 npm run test           # vitest unit tests
 npm run test:browser   # Playwright browser tests
 npm run prisma:generate

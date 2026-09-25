@@ -1,4 +1,4 @@
-# GeoData.ge Agent Instructions
+# Fiscal.ge Agent Instructions
 
 These are durable, always-loaded rules for this repository. Load task-specific detail only when the task needs it.
 
@@ -23,83 +23,16 @@ Repository precedence: `Project_Definition.md` section 2 owns scope; `DESIGN.md`
 
 ## Engineering Behavior
 
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
-
-Tradeoff: These guidelines bias toward caution over speed. For trivial tasks, use judgment.
-
-### 1. Think Before Coding
-
-Don't assume. Don't hide confusion. Surface tradeoffs.
-
-Before implementing:
-
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them; don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
-
-### 2. Simplicity First
-
-Minimum code that solves the problem. Nothing speculative.
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No flexibility or configurability that was not requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
-
-Ask yourself: would a senior engineer say this is overcomplicated? If yes, simplify.
-
-For GeoData.ge, this does not mean skipping real data validation. Budget import validation, source checks, unmapped-row handling, and planned/actual rules are required because they address real product risks.
-
-### 3. Surgical Changes
-
-Touch only what you must. Clean up only your own mess.
-
-When editing existing code:
-
-- Do not improve adjacent code, comments, or formatting.
-- Do not refactor things that are not broken.
-- Match existing style, even if you would do it differently.
-- If you notice unrelated dead code, mention it; do not delete it.
-
-When your changes create orphans:
-
-- Remove imports, variables, and functions that your changes made unused.
-- Do not remove pre-existing dead code unless asked.
-
-Every changed line should trace directly to the user's request.
-
-### 4. Goal-Driven Execution
-
-Define success criteria. Loop until verified.
-
-Transform tasks into verifiable goals:
-
-- Add validation -> write tests for invalid inputs, then make them pass.
-- Fix the bug -> write a test that reproduces it, then make it pass.
-- Refactor X -> ensure tests pass before and after.
-
-For multi-step tasks, state a brief plan:
-
-```text
-1. [Step] -> verify: [check]
-2. [Step] -> verify: [check]
-3. [Step] -> verify: [check]
-```
-
-Strong success criteria let you loop independently. Weak criteria like "make it work" require clarification.
-
-Match the verification to the change. The narrowest command that can observe the thing you
-just edited is the feedback loop; the full gate is the done-check you run once, when you are
-about to claim the work is finished. Re-running a whole gate after every edit is not extra
-rigor — it buys no additional signal over the targeted run, and in this repository it has
-been measured as the single largest consumer of session wall clock. Never re-run a gate
-whose inputs have not changed since it last passed. `CLAUDE.md` owns which command is which.
+- Inspect relevant files, patterns, tests, and call sites before editing. State important assumptions and tradeoffs; prefer the simplest correct solution. Ask only when unresolved uncertainty materially changes the outcome or risks doing the wrong work.
+- Explain plans, choices, and results in plain language for a non-developer. Resolve implementation details independently when the codebase provides the answer.
+- Implement only the requested scope. Avoid speculative abstractions, configuration, and handling for impossible cases. Preserve required data validation, source checks, unmapped-row handling, and planned/actual rules.
+- Match existing style. Do not refactor, reformat, rename, or remove unrelated code. Remove only imports, variables, functions, and files made unnecessary by your changes; report unrelated issues separately. Every changed line must serve the request.
+- Define observable success criteria. For multi-step work, give a short plan pairing each step with its verification; skip formal planning for trivial changes. Reproduce bugs, verify invalid cases for validation changes, and compare behavior before and after refactoring.
+- Verify outcomes before claiming completion. During editing, run the narrowest relevant check; run the full completion gate once. Never repeat a passing gate unless its inputs changed. `CLAUDE.md` owns commands and completion requirements.
 
 ## Project Snapshot
 
-GeoData.ge v1 is an implemented Georgian-first Georgia Budget Explorer, not a broad public-data catalog. Current route families are expenditure, revenue, municipalities, and single-year analysis under `/explorer`.
+Fiscal.ge (repository and Vercel project name: GeoData.ge) is an implemented Georgian-first explorer of reviewed Georgian public-finance and economy data, not a broad public-data catalog. Georgian keeps the established URLs; English mirrors them under `/en`. Route families under `/explorer` are budget (expenditure, revenue, municipalities, single-year analysis, debt, deficit), economy (GDP, sectors, regions) and inflation (overview, categories); alongside them sit `/methodology`, `/connect`, `/about` and the read-only `/mcp`. `Project_Definition.md` section 2 owns the authoritative list.
 
 The stack is Next.js 16, strict TypeScript, Tailwind v4, and the custom editorial component layer; do not introduce shadcn. Reviewed CSVs under `data/imports/` are the canonical human-reviewed source of truth. Supabase Postgres via Prisma 7 is the serving mirror, populated only by the transactional, parity-checked `npm run data:import`; never edit the database directly. Builds remain fully static, with CSV mode as the documented fallback. See `docs/data-methodology/database-import.md`.
 
@@ -111,7 +44,7 @@ A branch implementation, merged commit, green deploy-trigger workflow, or accept
 
 ## V1 and Data Non-Negotiables
 
-- Do not expand v1 beyond `Project_Definition.md` section 2 without explicit user approval. Excluded features include a broad catalog, clickable drilldown/detail pages, admin UI, public API, uploads, sub-annual data, and automated production document extraction.
+- Do not expand v1 beyond `Project_Definition.md` section 2 without explicit user approval. Excluded features include a broad catalog, clickable drilldown/detail pages, admin UI, a public API beyond the approved read-only MCP and static publications, uploads, sub-annual data other than the approved monthly inflation dataset, and automated production document extraction.
 - Multi-year institutions and major programs are selectable series, not clickable drilldown.
 - Use stable lowercase ASCII category IDs; Georgian and English labels are display data, not identifiers.
 - Public expenditure fields come from reviewed mappings over official rows. Preserve every official row. Assign uncertain rows explicitly to `spending.other_unclassified` and retain mapping confidence and notes.
@@ -142,4 +75,4 @@ codex/* branch -> commits -> push -> draft PR -> required CI -> review/resolved 
 
 Check Git and worktree state before promising branch, commit, push, PR, or merge actions. Do not push implementation commits directly to `main`. Publishing or merging requires task scope or explicit authorization. Required CI must be green before merge; do not bypass a required check.
 
-Use Context7 for current library, framework, SDK, API, CLI, or cloud-service documentation before relying on memory. Do not claim completion without the relevant verification in `CLAUDE.md`.
+Check current library, framework, SDK, API, CLI, or cloud-service documentation before relying on memory: Context7 where the agent has it configured, otherwise official docs; for Next.js, the bundled guides in `apps/web/node_modules/next/dist/docs/`. Do not claim completion without the relevant verification in `CLAUDE.md`.

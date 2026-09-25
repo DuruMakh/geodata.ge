@@ -15,6 +15,8 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/revenue",
   "https://fiscal.ge/explorer/analysis",
   "https://fiscal.ge/explorer/municipalities",
+  "https://fiscal.ge/explorer/debt",
+  "https://fiscal.ge/explorer/deficit",
   "https://fiscal.ge/explorer/economy/gdp",
   "https://fiscal.ge/explorer/economy/sectors",
   "https://fiscal.ge/explorer/economy/regions",
