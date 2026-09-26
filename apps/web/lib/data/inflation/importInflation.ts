@@ -3,11 +3,15 @@ import { readCsvRecords } from "../csv";
 import { assertSameServedRows } from "../servedDataParity";
 import {
   CPI_CATEGORY_MEASURES,
+  CPI_CITY_IDS,
+  CPI_CITY_MEASURES,
   CPI_MEASURES,
   CPI_SERIES_IDS,
   type BasketWeightRow,
   type CpiCategoryFact,
   type CpiCategoryMeasure,
+  type CpiCityFact,
+  type CpiCityMeasure,
   type CpiFact,
   type InflationTargetRow,
   type ServedBasketWeightRow,
@@ -20,6 +24,7 @@ import {
   factKey,
   validateBasketWeights,
   validateCategoryFacts,
+  validateCityFacts,
   validateCpiFacts,
   validateTargetRows,
 } from "./validateInflation";
@@ -86,6 +91,29 @@ export async function loadCpiCategoryFacts(relativePath = CPI_CATEGORY_FACTS_CSV
     };
   });
   validateCategoryFacts(facts);
+  return facts;
+}
+
+export const CPI_CITY_FACTS_CSV = "../../data/imports/cpi-cities-monthly.csv";
+
+export async function loadCpiCityFacts(relativePath = CPI_CITY_FACTS_CSV): Promise<CpiCityFact[]> {
+  const rows = await readCsvRecords(relativePath);
+  const facts = rows.map((row): CpiCityFact => {
+    if (!(CPI_CITY_IDS as readonly string[]).includes(row.city_id)) throw new Error(`Unknown city ${row.city_id}`);
+    if (!(CPI_CITY_MEASURES as readonly string[]).includes(row.measure)) throw new Error(`Unknown city measure ${row.measure}`);
+    return {
+      cityId: row.city_id as CpiCityFact["cityId"],
+      seriesId: row.series_id,
+      measure: row.measure as CpiCityMeasure,
+      period: row.period,
+      value: new Decimal(row.value).toFixed(),
+      status: row.status as CpiCityFact["status"],
+      sourceId: row.source_id,
+      sourceLocator: row.source_locator,
+      lastReviewedAt: row.last_reviewed_at,
+    };
+  });
+  validateCityFacts(facts);
   return facts;
 }
 
