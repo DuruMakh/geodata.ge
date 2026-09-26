@@ -49,6 +49,13 @@ describe("Geostat detailed product indices", () => {
     expect(() => readGeostatProducts(text.content, "yoy", "en")).toThrow(/unexpected|missing marker/);
   });
 
+  it("stops a new missing-value pattern in either measure", () => {
+    const monthlyGap = rewrite(file("mom", "en"), (sheet) => { sheet["D4"] = { t: "s", v: "..." }; });
+    expect(() => readGeostatProducts(monthlyGap.content, "mom", "en")).toThrow(/missing.*pattern/i);
+    const isolatedAnnualGap = rewrite(file("yoy", "en"), (sheet) => { sheet["D4"] = { t: "s", v: "…" }; });
+    expect(() => readGeostatProducts(isolatedAnnualGap.content, "yoy", "en")).toThrow(/missing.*pattern/i);
+  });
+
   it("rejects a formula even when it has a cached numeric value", () => {
     const broken = rewrite(file("mom", "en"), (sheet) => { sheet["D4"]!.f = "1+1"; });
     expect(() => readGeostatProducts(broken.content, "mom", "en")).toThrow(/formula/);

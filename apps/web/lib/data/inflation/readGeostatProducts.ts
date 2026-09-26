@@ -103,6 +103,11 @@ export function readGeostatProducts(content: Buffer, role: ProductFileRole, lang
       seenNames.add(nameKey);
       if (values.slice(3 + monthCount).some((value) => text(value) !== "")) throw new Error(`Product source extra value beyond month header at ${sheetName}!${row + 1}`);
       const cells = Array.from({ length: monthCount }, (_, month) => sourceCell(sheet, sheetName, year, row, 3 + month, month + 1));
+      const missing = cells.filter((cell) => cell.index100 === null);
+      if (missing.length > 0 && !(role === "yoy" && monthCount === 12 && missing.length === 11 &&
+          cells.slice(0, 11).every((cell) => cell.index100 === null) && cells[11]!.index100 !== null)) {
+        throw new Error(`Product source missing-value pattern changed at ${sheetName}!${row + 1}`);
+      }
       output.push({ year, ordinal, coicopCode, label, cells });
     }
     if (ordinal === 0) throw new Error(`Product source has no item rows in ${sheetName}`);

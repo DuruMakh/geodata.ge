@@ -18,7 +18,7 @@ For this vintage, 47 first boundaries were reviewed: **29 linked** and **18 spli
 
 ## Missing values and validation
 
-The source's `...` and `…` cells become explicit facts with a blank `index_100` and `availability=not_published`, never zero or an estimate. An item absent from a whole year has no fact rows for that year. The August 2026 reviewed cohort has **84,056 fact rows**, of which **176** are explicit unavailable cells. The source gives no more specific reason for those cells.
+The source's `...` and `…` cells become explicit facts with a blank `index_100` and `availability=not_published`, never zero or an estimate. The reviewed source pattern has no unavailable monthly indices; unavailable annual indices occupy January through November for an item-year and December is published. Any new missing-value pattern stops preparation for review. An item absent from a whole year has no fact rows for that year. The August 2026 reviewed cohort has **84,056 fact rows**, of which **176** are explicit unavailable cells. The source gives no more specific reason for those cells.
 
 `prepare-inflation-products` verifies all four source hashes, the full year-by-year English/Georgian inventories and values, the latest cohort, all identity decisions, provenance and the source registry. It compounds twelve published monthly indices where the verified identity and all twelve cells exist, then compares with Geostat's annual index. The guard is **0.002 index points**. This vintage has **38,673** comparable annual cells, maximum error **0.000583342**, and **3,179** published annual cells that cannot be compared from the public 2015-floor fact file or lack a verified twelve-month path. Uncomparable cells are reported rather than counted as passes.
 

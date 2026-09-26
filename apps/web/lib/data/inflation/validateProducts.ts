@@ -118,3 +118,33 @@ export function findProductRevisions(previousFacts: ProductFactRow[], previousCa
   }
   return issues;
 }
+
+export function findProductOutputRevisions(previousCatalogue: ProductCatalogueRow[], currentCatalogue: ProductCatalogueRow[], previousFacts: ProductFactRow[], currentFacts: ProductFactRow[]): string[] {
+  const issues: string[] = [];
+  const currentById = new Map(currentCatalogue.map((row) => [row.productId, row]));
+  const previousIds = new Set(previousCatalogue.map((row) => row.productId));
+  for (const previous of previousCatalogue) {
+    const current = currentById.get(previous.productId);
+    if (!current) {
+      issues.push(`Product identity removed: ${previous.productId}`);
+    } else if (current.coicopCode !== previous.coicopCode || current.labelEn !== previous.labelEn ||
+        current.labelKa !== previous.labelKa || current.firstPeriod !== previous.firstPeriod || current.decisionRef !== previous.decisionRef) {
+      issues.push(`Product identity changed for ${previous.productId}: ${previous.labelEn} -> ${current.labelEn}`);
+    }
+  }
+  for (const current of currentCatalogue) if (!previousIds.has(current.productId)) issues.push(`Product identity added: ${current.productId}`);
+
+  const currentByKey = new Map(currentFacts.map((fact) => [`${fact.productId}:${fact.measure}:${fact.period}`, fact]));
+  for (const previous of previousFacts) {
+    const key = `${previous.productId}:${previous.measure}:${previous.period}`;
+    const current = currentByKey.get(key);
+    if (!current) {
+      issues.push(`Product historical fact removed: ${key}`);
+    } else if (current.sourceId !== previous.sourceId || current.sourceLocator !== previous.sourceLocator) {
+      issues.push(`Product source assignment changed for ${key}: ${previous.sourceLocator} -> ${current.sourceLocator}`);
+    } else if (current.index100 !== previous.index100 || current.availability !== previous.availability) {
+      issues.push(`Product historical fact changed for ${key}: ${previous.index100 ?? "missing"} -> ${current.index100 ?? "missing"}`);
+    }
+  }
+  return issues;
+}

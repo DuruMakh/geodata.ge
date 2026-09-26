@@ -6,7 +6,7 @@ import { buildProductIdentityAudit, loadProductDecisions, type ProductCatalogueR
 import { prepareProducts, serializeProductCatalogue, serializeProductFacts, writeProductArtifacts } from "../../../lib/data/inflation/prepareProducts";
 import { INFLATION_PRODUCTS_RAW_ROOT, readVerifiedProductFiles } from "../../../lib/data/inflation/productSourceFiles";
 import { pairProductEditions } from "../../../lib/data/inflation/readGeostatProducts";
-import { findProductRevisions, validateProductIndices } from "../../../lib/data/inflation/validateProducts";
+import { findProductOutputRevisions, findProductRevisions, validateProductIndices } from "../../../lib/data/inflation/validateProducts";
 import type { PairedProductRow } from "../../../lib/data/inflation/productTypes";
 
 let rows: PairedProductRow[];
@@ -88,6 +88,20 @@ describe("reviewed product identity mapping", () => {
     expect(findProductRevisions(prepared.facts, catalogue, smallerBasket, decisions).join(" ")).toMatch(/latest basket.*Photocopying/i);
     const changedDecision = decisions.map((row) => row.productId === "cpi.product.p0088" ? { ...row, decision: "split" as const } : row);
     expect(findProductRevisions(prepared.facts, catalogue, rows, changedDecision).join(" ")).toMatch(/identity.*p0088/i);
+  });
+
+  it("stops reassigned stable IDs and old fact locators before replacing canonical files", () => {
+    expect(findProductOutputRevisions(catalogue, catalogue, prepared.facts, prepared.facts)).toEqual([]);
+    const swappedCatalogue = catalogue.map((item) => item.productId === "cpi.product.p0001" ?
+      { ...item, productId: "cpi.product.p0002" } : item.productId === "cpi.product.p0002" ?
+        { ...item, productId: "cpi.product.p0001" } : item);
+    expect(findProductOutputRevisions(catalogue, swappedCatalogue, prepared.facts, prepared.facts).join(" ")).toMatch(/identity.*p0001|p0001.*identity/i);
+    const replacedId = catalogue.map((item) => item.productId === "cpi.product.p0001" ? { ...item, productId: "cpi.product.p0999" } : item);
+    expect(findProductOutputRevisions(catalogue, replacedId, prepared.facts, prepared.facts).join(" ")).toMatch(/identity removed.*p0001/i);
+    const swappedFacts = prepared.facts.map((fact) => fact.productId === "cpi.product.p0001" ?
+      { ...fact, productId: "cpi.product.p0002" } : fact.productId === "cpi.product.p0002" ?
+        { ...fact, productId: "cpi.product.p0001" } : fact);
+    expect(findProductOutputRevisions(catalogue, catalogue, prepared.facts, swappedFacts).join(" ")).toMatch(/source.*assignment|locator.*changed/i);
   });
 
   it("matches committed canonical files, retains Excel BOM and reports validation", async () => {

@@ -7,7 +7,7 @@ import { buildProductIdentityAudit, loadProductDecisions, type ProductCatalogueR
 import { INFLATION_PRODUCTS_RAW_ROOT, latestProductVintage, readVerifiedProductFiles } from "./productSourceFiles";
 import { pairProductEditions } from "./readGeostatProducts";
 import type { ProductFactRow, ProductMeasure, ProductSourceCell } from "./productTypes";
-import { findProductRevisions, validateProductIndices } from "./validateProducts";
+import { findProductOutputRevisions, findProductRevisions, validateProductIndices } from "./validateProducts";
 
 const CATALOGUE_FILE = path.resolve(process.cwd(), "../../data/mappings/inflation-products/catalogue.csv");
 
@@ -73,6 +73,10 @@ export async function prepareProducts(options: { rawRoot?: string; previousFacts
   }
   facts.sort((a, b) => a.productId.localeCompare(b.productId) || a.measure.localeCompare(b.measure) || a.period.localeCompare(b.period));
   const indexValidation = validateProductIndices(facts);
+  if (options.previousFacts !== null && options.previousFacts !== undefined) {
+    const revisions = findProductOutputRevisions(options.previousCatalogue ?? catalogue, audit.catalogue, options.previousFacts, facts);
+    if (revisions.length > 0) throw new Error(`Product canonical output requires review:\n${revisions.slice(0, 20).join("\n")}${revisions.length > 20 ? `\n... and ${revisions.length - 20} more` : ""}`);
+  }
   const rosterByYear: Record<string, number> = {};
   for (const row of rows) rosterByYear[row.year] = (rosterByYear[row.year] ?? 0) + 1;
   return { catalogue: audit.catalogue, facts, validation: {
