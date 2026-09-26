@@ -4,16 +4,19 @@ import { buildProductIdentityAudit, loadProductDecisions, type ProductCatalogueR
 import { prepareProducts, serializeProductCatalogue, serializeProductFacts } from "../../../lib/data/inflation/prepareProducts";
 import { INFLATION_PRODUCTS_RAW_ROOT, readVerifiedProductFiles } from "../../../lib/data/inflation/productSourceFiles";
 import { pairProductEditions } from "../../../lib/data/inflation/readGeostatProducts";
+import { findProductRevisions, validateProductIndices } from "../../../lib/data/inflation/validateProducts";
 import type { PairedProductRow } from "../../../lib/data/inflation/productTypes";
 
 let rows: PairedProductRow[];
 let decisions: ProductDecisionRow[];
 let catalogue: ProductCatalogueRow[];
+let prepared: Awaited<ReturnType<typeof prepareProducts>>;
 
 beforeAll(async () => {
   rows = pairProductEditions(await readVerifiedProductFiles(path.join(INFLATION_PRODUCTS_RAW_ROOT, "2026-08")));
   decisions = await loadProductDecisions();
-  catalogue = (await prepareProducts({ previousFacts: null })).catalogue;
+  prepared = await prepareProducts({ previousFacts: null });
+  catalogue = prepared.catalogue;
 });
 
 describe("reviewed product identity mapping", () => {
@@ -43,7 +46,7 @@ describe("reviewed product identity mapping", () => {
   });
 
   it("keeps every latest product, excludes retired rows and preserves source cell meaning", async () => {
-    const output = await prepareProducts({ previousFacts: null });
+    const output = prepared;
     expect(output.catalogue).toHaveLength(305);
     expect(output.catalogue.some((item) => item.labelEn === "Advertising in a newspaper")).toBe(false);
     expect(output.facts.find((fact) => fact.productId === "cpi.product.p0088" && fact.measure === "mom_index_100" && fact.period === "2018-01")?.sourceLocator).toBe("2018!D92");
@@ -53,5 +56,43 @@ describe("reviewed product identity mapping", () => {
     expect(output.facts.find((fact) => fact.productId === "cpi.product.p0219" && fact.measure === "mom_index_100" && fact.period === "2026-08")).toMatchObject({ index100: "103.258", sourceLocator: "2026!K222" });
     expect(serializeProductCatalogue(output.catalogue).charCodeAt(0)).toBe(0xfeff);
     expect(serializeProductFacts(output.facts).charCodeAt(0)).toBe(0xfeff);
+  });
+
+  it("checks published annual indices against twelve monthly indices and counts uncomparable cells", () => {
+    const report = validateProductIndices(prepared.facts);
+    expect(report.arithmeticChecked).toBeGreaterThan(38_000);
+    expect(report.arithmeticUncomparable).toBeGreaterThan(0);
+    expect(report.maxArithmeticError).toBeLessThan(0.002);
+    expect(report.unavailableCells).toBeGreaterThan(0);
+    const bent = prepared.facts.map((fact) => fact.productId === "cpi.product.p0088" && fact.measure === "yoy_index_100" && fact.period === "2020-03" ?
+      { ...fact, index100: "150" } : fact);
+    expect(() => validateProductIndices(bent)).toThrow(/annual|twelve|arithmetic/i);
+  });
+
+  it("reports historical value, missing-marker and removed-row revisions before cohort filtering", () => {
+    expect(findProductRevisions(prepared.facts, catalogue, rows, decisions)).toEqual([]);
+    const valueChanged = rows.map((row) => row.year === 2019 && row.ordinal === 89 ?
+      { ...row, momCells: row.momCells.map((cell) => cell.period === "2019-01" ? { ...cell, index100: "150" } : cell) } : row);
+    expect(findProductRevisions(prepared.facts, catalogue, valueChanged, decisions).join(" ")).toMatch(/2019-01.*value|value.*2019-01/i);
+    const markerChanged = rows.map((row) => row.year === 2019 && row.ordinal === 89 ?
+      { ...row, yoyCells: row.yoyCells.map((cell) => cell.period === "2019-01" ? { ...cell, index100: "100", marker: null } : cell) } : row);
+    expect(findProductRevisions(prepared.facts, catalogue, markerChanged, decisions).join(" ")).toMatch(/2019-01.*availability|availability.*2019-01/i);
+    const missing = rows.filter((row) => !(row.year === 2019 && row.ordinal === 89));
+    expect(findProductRevisions(prepared.facts, catalogue, missing, decisions).join(" ")).toMatch(/missing source cell/i);
+  });
+
+  it("stops a changed current basket or an old identity decision with a readable difference", () => {
+    const smallerBasket = rows.filter((row) => !(row.year === 2026 && row.ordinal === 305));
+    expect(findProductRevisions(prepared.facts, catalogue, smallerBasket, decisions).join(" ")).toMatch(/latest basket.*Photocopying/i);
+    const changedDecision = decisions.map((row) => row.productId === "cpi.product.p0088" ? { ...row, decision: "split" as const } : row);
+    expect(findProductRevisions(prepared.facts, catalogue, rows, changedDecision).join(" ")).toMatch(/identity.*p0088/i);
+  });
+
+  it("checks previously reviewed facts during preparation before accepting a refresh", async () => {
+    const repeat = await prepareProducts({ previousFacts: prepared.facts });
+    expect(repeat.facts.length).toBe(prepared.facts.length);
+    const changed = prepared.facts.map((fact) => fact.productId === "cpi.product.p0088" && fact.measure === "mom_index_100" && fact.period === "2018-01" ?
+      { ...fact, index100: "150" } : fact);
+    await expect(prepareProducts({ previousFacts: changed })).rejects.toThrow(/historical.*revision|value changed/i);
   });
 });

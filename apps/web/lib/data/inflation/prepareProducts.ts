@@ -6,6 +6,7 @@ import { buildProductIdentityAudit, loadProductDecisions, type ProductCatalogueR
 import { INFLATION_PRODUCTS_RAW_ROOT, latestProductVintage, readVerifiedProductFiles } from "./productSourceFiles";
 import { pairProductEditions } from "./readGeostatProducts";
 import type { ProductFactRow, ProductMeasure, ProductSourceCell } from "./productTypes";
+import { findProductRevisions, validateProductIndices } from "./validateProducts";
 
 const CATALOGUE_FILE = path.resolve(process.cwd(), "../../data/mappings/inflation-products/catalogue.csv");
 
@@ -39,13 +40,16 @@ export function serializeProductFacts(facts: ProductFactRow[]): string {
 }
 
 export async function prepareProducts(options: { rawRoot?: string; previousFacts?: ProductFactRow[] | null } = {}) {
-  if (options.previousFacts?.length) throw new Error("Product historical revision checks must run before reusing previous facts");
   const rawRoot = options.rawRoot ?? INFLATION_PRODUCTS_RAW_ROOT;
   const vintage = await latestProductVintage(rawRoot);
   const files = await readVerifiedProductFiles(path.join(rawRoot, vintage));
   const rows = pairProductEditions(files);
   const catalogue = await loadProductCatalogue();
   const decisions = await loadProductDecisions();
+  if (options.previousFacts !== null && options.previousFacts !== undefined) {
+    const revisions = findProductRevisions(options.previousFacts, catalogue, rows, decisions);
+    if (revisions.length > 0) throw new Error(`Product historical revision requires review:\n${revisions.slice(0, 20).join("\n")}${revisions.length > 20 ? `\n... and ${revisions.length - 20} more` : ""}`);
+  }
   const audit = buildProductIdentityAudit(rows, catalogue, decisions);
   if (audit.unresolvedTransitions.length > 0) {
     throw new Error(`Unreviewed product identity transitions: ${audit.unresolvedTransitions.map((item) => `${item.productId} ${item.later.year}`).join(", ")}`);
@@ -67,10 +71,12 @@ export async function prepareProducts(options: { rawRoot?: string; previousFacts
     }
   }
   facts.sort((a, b) => a.productId.localeCompare(b.productId) || a.measure.localeCompare(b.measure) || a.period.localeCompare(b.period));
+  const indexValidation = validateProductIndices(facts);
   return { catalogue: audit.catalogue, facts, validation: {
     latestPeriod: audit.latestPeriod, includedProducts: audit.catalogue.length,
     reviewedLinks: decisions.filter((row) => row.decision === "link").length,
     reviewedSplits: decisions.filter((row) => row.decision === "split").length,
     sourceRowsOutsideCurrentTrace: audit.unassignedSourceRows.length,
+    ...indexValidation,
   } };
 }
