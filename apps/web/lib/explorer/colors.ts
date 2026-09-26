@@ -25,6 +25,15 @@ export const SERIES_COLORS: Record<string, string> = {
   "cpi.cat.12": "#2F4B3A",
   "cpi.cat.residual": "#94856D",
 
+  // Inflation cities (spec 2026-09-26 §6). Six hue families; Georgia is the ink
+  // benchmark and needs no entry.
+  "city.tbilisi": "#B3402A",
+  "city.kutaisi": "#3D5A98",
+  "city.batumi": "#1F6E56",
+  "city.gori": "#A5822B",
+  "city.telavi": "#7A4E8C",
+  "city.zugdidi": "#4A707A",
+
   "spending.social_protection": "#B3402A",
   "spending.health": "#1F6E56",
   "spending.education": "#3D5A98",

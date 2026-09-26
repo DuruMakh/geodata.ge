@@ -44,5 +44,6 @@
   "common.inflationOverview": "ინფლაციის მიმოხილვა",
   "common.dataInflation": "მონაცემები · ინფლაცია",
   "common.inflationSourceNote": "მონაცემები: საქსტატი და საქართველოს ეროვნული ბანკი. ბოლო განახლება: {updatedAt}.",
-  "common.inflationCategories": "კატეგორიები"
+  "common.inflationCategories": "კატეგორიები",
+  "common.inflationCities": "ქალაქები"
 }
