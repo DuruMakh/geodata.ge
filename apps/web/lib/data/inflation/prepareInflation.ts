@@ -318,6 +318,23 @@ const CITY_ROLES = ["yoy", "mom", "avg12"] as const;
 const CITY_ROLE_MEASURE: Record<(typeof CITY_ROLES)[number], CpiCityMeasure> = { yoy: "yoy_pct", mom: "mom_pct", avg12: "avg12_pct" };
 const GEORGIA = "country.georgia";
 
+// Sheets Geostat stores as a formula result rather than a typed figure, so the
+// stored double carries precision noise past the one decimal it displays (a
+// cell shown as 104.4 stores 104.44085283679487; confirmed against the sheet's
+// own formatted text). Today this is only Zugdidi's yoy sheet — Total and its
+// divisions alike, not just the divisions. Named and scoped like
+// EXPECTED_CITY_LATE_STARTS in validateInflation.ts: only these city:role
+// sheets are rounded before validateCityFacts sees them, so a future change
+// producing unexpected precision anywhere else still throws instead of being
+// silently truncated.
+const CITY_FORMULA_SHEETS = new Set<string>(["city.zugdidi:yoy"]);
+
+// The mirror's own storage precision (DECIMAL(20,6)), and validateCityFacts'
+// limit — never a display or rounding preference invented here.
+function cityValue(line: string, role: (typeof CITY_ROLES)[number], raw: string): string {
+  return line !== GEORGIA && CITY_FORMULA_SHEETS.has(`${line}:${role}`) ? new Decimal(raw).toDecimalPlaces(6).toFixed() : raw;
+}
+
 /**
  * City rows come from the same yoy, mom and avg12 workbooks the national series
  * reads: one sheet per city. Georgia's sheet is read too, but only as evidence —
@@ -351,7 +368,9 @@ export async function prepareInflationCities(
         const left = series.cells.map((cell) => `${cell.period}=${cell.value}`).join("|");
         const right = other?.cells.map((cell) => `${cell.period}=${cell.value}`).join("|");
         if (other?.seriesId !== series.seriesId || left !== right) throw new Error(`English and Georgian ${role} files differ for ${line} ${series.seriesId}`);
-        if (series.seriesId === "cpi.headline") for (const cell of series.cells) full.get(line)![measure].set(cell.period, Number(cell.value));
+        if (series.seriesId === "cpi.headline") {
+          for (const cell of series.cells) full.get(line)![measure].set(cell.period, Number(cityValue(line, role, cell.value)));
+        }
         if (line === GEORGIA) return;
         for (const cell of series.cells) {
           const period = periodKey(cell.period);
@@ -361,14 +380,9 @@ export async function prepareInflationCities(
             seriesId: series.seriesId,
             measure,
             period,
-            // The Total row is a typed figure, but the divisions on a city sheet are
-            // formula results carrying double-precision noise past what Geostat
-            // displays (e.g. a cell shown as 104.4 stores 104.44085283679487) —
-            // confirmed against the sheet's own formatted text. Six decimals matches
-            // the mirror's DECIMAL(20,6) column and validateCityFacts' limit; the
-            // national reader never needs this because its own workbook values are
-            // already clean to four decimals.
-            value: new Decimal(cell.value).toDecimalPlaces(6).toFixed(),
+            // Rounded only for the known formula sheets (CITY_FORMULA_SHEETS); every
+            // other city/role keeps the value exactly as published.
+            value: cityValue(line, role, cell.value),
             status: "published",
             sourceId: english.source_id,
             sourceLocator: cell.locator,
