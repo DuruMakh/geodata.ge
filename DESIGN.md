@@ -28,7 +28,7 @@ Superseded and must not appear in production:
 
 Fiscal.ge is a Georgian-first explorer of reviewed annual budget and economy data plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
 
-Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories), methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
+Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories, cities), methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
 
 Excluded: data catalog, capital explorer, admin UI, a public API beyond the read-only MCP and static publications, uploads, sub-annual data other than inflation (§25), automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
@@ -322,6 +322,7 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/inflation                   ინფლაცია          Inflation hub (§25)
 /explorer/inflation/overview                            Monthly national CPI overview (§25)
 /explorer/inflation/categories                          COICOP categories and contributions (§25.1)
+/explorer/inflation/cities                              Inflation by city (§25.2)
 ```
 
 Outside `/explorer` sit the two editorial pages, `/about` (§23) and `/connect`, the MCP connection page (§24), and the methodology centre at `/methodology` and `/methodology/[dataset]` (§21).
@@ -355,6 +356,7 @@ Keys by section. The hash never carries `nav`, and no key is renamed once shippe
 | Economic sectors | `measure`, `view`, `sel`, `range=all` or `start`/`end` | — |
 | Inflation overview | `i` indicator, `m` mode, `r=YYYY-MM-YYYY-MM`, `sel`, `t` table series | — |
 | Inflation categories | `i`, `m`, `r`, `sel`, `t`, `x` expanded divisions | — |
+| Inflation cities | `i` yoy/mom, `m`, `r`, `c` total or 01–12, `sel` line slugs, `t` table line | — |
 
 Write rules: loading a page never adds state to its URL, so a pristine URL stays clean. After that, every change replaces the current history entry, except the discrete switches a section's spec asks Back to step through, which push one — today only the economic sectors measure and view.
 
@@ -403,7 +405,7 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
 - Three dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
-- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, or Inflation's overview / categories, all in the section-row style below.
+- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, or Inflation's overview / categories / cities, all in the section-row style below.
 - `უმუშევრობა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, Lucide `ChevronsLeft` (expanded) / `ChevronsRight` (collapsed) (§7.2a).
@@ -946,7 +948,7 @@ The three live Economy hub cards use the same card anatomy: a 200×34 sparkline 
 
 ## 25. Inflation Surfaces
 
-Inflation is the third dataset in the explorer sidebar (Budget, Economy, Inflation), with the same active-row, nested-section, collapse, keyboard and mobile behaviour. Its hub reuses the budget hub cards: `ინფლაციის მიმოხილვა` and `კატეგორიები` are live; basket, cities and products are non-clickable coming-soon cards. The collapsed rail reads `მონაცემები / ინფლაცია`.
+Inflation is the third dataset in the explorer sidebar (Budget, Economy, Inflation), with the same active-row, nested-section, collapse, keyboard and mobile behaviour. Its hub reuses the budget hub cards: `ინფლაციის მიმოხილვა`, `კატეგორიები` and `ქალაქები` are live; basket and products are non-clickable coming-soon cards. The collapsed rail reads `მონაცემები / ინფლაცია`.
 
 The overview follows the GDP overview's header — a single unit line under the H1, `TextTab` indicator tabs centred directly above the workspace (`წლიური ინფლაცია`, `თვიური ინფლაცია`, `ფასების ინდექსი`) — over the Budget explorers' workspace: `ხაზი / ცხრილი`, chart or table, range strip, series panel with the download at its foot, source note. The series panel adds a reference row (the NBG target) with a dashed swatch; its chart line is dashed accent with no end dot, and it appears only on annual inflation. Inflation values are never coloured good/bad; rate changes are in percentage points.
 
@@ -969,6 +971,16 @@ Monthly axes: the line chart and range strip take a periods-per-year hint. Axis 
 **Category colour.** Twelve stable division colours from the editorial palette, keeping each concept's colour site-wide (§4.2) — health `#1F6E56`, education `#3D5A98`, transport `#C26E4C`, housing `#A5822B`, food `#B3402A`, alcohol and tobacco `#9C3D5E`, clothing `#7A4E8C`, furnishings `#8A7B65`, communication `#4A707A`, recreation `#4E5D74`, restaurants `#8C5A32`, miscellaneous `#2F4B3A` — with the residual on the existing neutral `#94856D`. Subgroups inherit their division's colour; because the residual absorbs everything unselected, a readable stack never needs 43 distinct colours.
 
 The month grid gains contribution bins (`0 / 0.25 / 0.75 / 1.5` pp) on the same five-step tint scale, with a legend in `პპ`, and has no annual-average column: Geostat publishes no annual average per category. The indicators block carries **four different measures, not one ranked four ways**: the hero is the largest contributor of the latest published month with its price change and basket share, then `ყველაზე გაძვირებული` (highest annual change, as a rate, contribution as detail), `ყველაზე გაიაფებული` (lowest annual change — relabelled `ყველაზე ნაკლებად გაძვირებული` when nothing fell), and `ინფლაციის სიგანე` (`10 / 12` divisions rising, sparkline of that count). Divisions only. A negative value is described as `გაიაფდა`, never coloured as good or bad. See `docs/superpowers/specs/2026-09-12-inflation-categories-design.md`.
+
+### 25.2 Cities
+
+`ქალაქები`, at `/explorer/inflation/cities`, repeats the overview's anatomy — unit line alone under the H1, centred `TextTab`s, workspace, range strip, series panel, indicators — with **two tabs** (`წლიური ინფლაცია`, `თვიური ინფლაცია`, landing on the first) and **seven lines**: `საქართველო` first, drawn in ink as the benchmark, then the six cities in Geostat's order, all selected by default — a deliberate, owner-approved departure from the "only the total" rule, since a Cities page that opened on the national line alone would show nothing city-specific. Georgia stays first, selectable and removable; the count reads `სერიები {selected} / 7`.
+
+**Category picker.** A labelled native `<select>` in the toolbar (`კატეგორია: სულ`, then the 12 divisions), styled with a bottom hairline on the paper ground and 12.5px text, left of `ხაზი / ცხრილი`. It applies to both tabs and to the indicators. It is the editorial layer's only select; do not introduce another without a design decision.
+
+**City colours** (§4.2): Tbilisi `#B3402A`, Kutaisi `#3D5A98`, Batumi `#1F6E56`, Gori `#A5822B`, Telavi `#7A4E8C`, Zugdidi `#4A707A`, each ≥ 3:1 against paper and tint.
+
+The month grid shows `წლის საშუალო` only for `სულ` on the annual tab. Zugdidi's late start leaves empty cells, never filled values. Indicators: hero = the city with the highest annual rate for the picked category in the latest month, with its distance from Georgia in `პპ`; then `ყველაზე დაბალი` (never claims a fall that did not happen), `ქალაქებს შორის სხვაობა` (highest minus lowest, 36-month sparkline) and `ეროვნულზე მაღალი` (`{n} / 6`, sparkline). Georgia is never ranked. One standing note under the source says some prices are recorded once and applied to every city. See `docs/superpowers/specs/2026-09-26-inflation-cities-design.md`.
 
 
 ## National economic sectors extension
