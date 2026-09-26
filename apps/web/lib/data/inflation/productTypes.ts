@@ -24,3 +24,14 @@ export type PairedProductRow = {
   momCells: ProductSourceCell[];
   yoyCells: ProductSourceCell[];
 };
+
+export type ProductFactRow = {
+  productId: string;
+  measure: ProductMeasure;
+  period: string;
+  index100: string | null;
+  availability: "published" | "not_published";
+  sourceId: string;
+  sourceLocator: string;
+  lastReviewedAt: string;
+};

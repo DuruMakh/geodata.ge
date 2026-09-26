@@ -2,7 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import { assertGeneratedArtifactMatches } from "../lib/data/generatedArtifacts";
-import { buildProductIdentityAudit, seedProductCatalogue, serializeCandidateCatalogue, serializeIdentityReview, type ProductCatalogueRow } from "../lib/data/inflation/productIdentity";
+import { buildProductIdentityAudit, loadProductDecisions, seedProductCatalogue, serializeIdentityReview, type ProductCatalogueRow } from "../lib/data/inflation/productIdentity";
+import { serializeProductCatalogue } from "../lib/data/inflation/prepareProducts";
 import { INFLATION_PRODUCTS_RAW_ROOT, latestProductVintage, readVerifiedProductFiles } from "../lib/data/inflation/productSourceFiles";
 import { pairProductEditions } from "../lib/data/inflation/readGeostatProducts";
 
@@ -19,24 +20,28 @@ async function main() {
     if (error.code === "ENOENT") return null;
     throw error;
   });
+  const decisions = await loadProductDecisions().catch((error: NodeJS.ErrnoException) => {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  });
   if (mode === "--check" && existing === null) throw new Error("Product candidate catalogue is missing");
+  if (decisions.length > 0 && existing === null) throw new Error("Reviewed product IDs require the committed candidate catalogue");
   const catalogue: ProductCatalogueRow[] = existing === null ? seedProductCatalogue(rows) :
     (parse(existing, { bom: true, columns: true, skip_empty_lines: true }) as Record<string, string>[]).map((record) => ({
       productId: record.product_id!, coicopCode: record.coicop_code!, labelEn: record.label_en!,
       labelKa: record.label_ka!, firstPeriod: record.first_period!, decisionRef: record.decision_ref!,
     }));
-  const audit = buildProductIdentityAudit(rows, catalogue, []);
-  const candidateCsv = serializeCandidateCatalogue(audit.catalogue);
-  const reportCsv = serializeIdentityReview(audit);
-  if (existing !== null && candidateCsv !== existing) throw new Error("Product candidate catalogue changed; review identity decisions before replacing it");
+  const audit = buildProductIdentityAudit(rows, catalogue, decisions);
+  const candidateReview = buildProductIdentityAudit(rows, catalogue, []);
+  const candidateCsv = serializeProductCatalogue(audit.catalogue);
+  const reportCsv = serializeIdentityReview(candidateReview);
   if (mode === "--write") {
-    if (existing === null) {
-      await fs.mkdir(path.dirname(CATALOGUE_FILE), { recursive: true });
-      await fs.writeFile(CATALOGUE_FILE, candidateCsv);
-    }
+    await fs.mkdir(path.dirname(CATALOGUE_FILE), { recursive: true });
+    await fs.writeFile(CATALOGUE_FILE, candidateCsv);
     await fs.mkdir(path.dirname(REPORT_FILE), { recursive: true });
     await fs.writeFile(REPORT_FILE, reportCsv);
   } else {
+    await assertGeneratedArtifactMatches("product catalogue", CATALOGUE_FILE, candidateCsv);
     await assertGeneratedArtifactMatches("product identity", REPORT_FILE, reportCsv);
   }
   console.log(JSON.stringify({ vintage, latestPeriod: audit.latestPeriod, currentProducts: audit.catalogue.length,

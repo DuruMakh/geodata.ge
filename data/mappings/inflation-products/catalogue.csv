@@ -5,10 +5,10 @@ cpi.product.p0003,01,Manna-croup,მანანის ბურღული,201
 cpi.product.p0004,01,Wheat bread,ხორბლის პური,2015-01,exact-bilingual-through-2015
 cpi.product.p0005,01,Macaroni products,მაკარონი და მაკარონის ნაწარმი,2015-01,exact-bilingual-through-2015
 cpi.product.p0006,01,Vermicelli,ვერმიშელი,2015-01,exact-bilingual-through-2015
-cpi.product.p0007,01,Cookies,ნამცხვარი,2019-01,pending-review-2019
+cpi.product.p0007,01,Cookies,ნამცხვარი,2015-01,identity.p0007.2019
 cpi.product.p0008,01,Waffle,ვაფლი კრემით,2015-01,exact-bilingual-through-2015
-cpi.product.p0009,01,Rusk,ორცხობილა,2019-01,pending-review-2019
-cpi.product.p0010,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2019-01,pending-review-2019
+cpi.product.p0009,01,Rusk,ორცხობილა,2015-01,identity.p0009.2019
+cpi.product.p0010,01,Khachapuri at a bakery,ხაჭაპური საცხობში,2019-01,identity.p0010.2019
 cpi.product.p0011,01,Wheat flour,ხორბლის ფქვილი,2015-01,exact-bilingual-through-2015
 cpi.product.p0012,01,Corn flour,სიმინდის ფქვილი,2015-01,exact-bilingual-through-2015
 cpi.product.p0013,01,Beef,ძროხის ხორცი,2015-01,exact-bilingual-through-2015
@@ -18,7 +18,7 @@ cpi.product.p0016,01,Chicken meat,ქათმის ხორცი,2015-01,exa
 cpi.product.p0017,01,Frozen chicken meat,გაყინული ქათმის ხორცი,2015-01,exact-bilingual-through-2015
 cpi.product.p0018,01,Chicken legs,ქათმის ბარკლები,2015-01,exact-bilingual-through-2015
 cpi.product.p0019,01,Smoked meat,შებოლილი ხორცი,2015-01,exact-bilingual-through-2015
-cpi.product.p0020,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2019-01,pending-review-2019
+cpi.product.p0020,01,Meat dumplings (semi-prepared food),პელმენი (ნახევარფაბრიკატი),2015-01,identity.p0020.2019
 cpi.product.p0021,01,Canned stew meat,მოშუშული ხორცის კონსერვი,2015-01,exact-bilingual-through-2015
 cpi.product.p0022,01,Smoked sausage,შებოლილი ძეხვი,2015-01,exact-bilingual-through-2015
 cpi.product.p0023,01,Boiled sausage,მოხარშული ძეხვი,2015-01,exact-bilingual-through-2015
@@ -27,16 +27,16 @@ cpi.product.p0025,01,Fresh fish,ახალი თევზი,2015-01,exact-bi
 cpi.product.p0026,01,Frozen fish,გაყინული თევზი,2015-01,exact-bilingual-through-2015
 cpi.product.p0027,01,Smoked fish,შებოლილი თევზი,2015-01,exact-bilingual-through-2015
 cpi.product.p0028,01,Canned fish,თევზის კონსერვი,2015-01,exact-bilingual-through-2015
-cpi.product.p0029,01,Manufactured milk,ქარხნული რძე,2018-01,pending-review-2018
-cpi.product.p0030,01,Condensed milk and milk containing product,შესქელებული რძე და რძის შემცველი პროდუქტი,2018-01,pending-review-2018
+cpi.product.p0029,01,Manufactured milk,ქარხნული რძე,2015-01,identity.p0029.2018
+cpi.product.p0030,01,Condensed milk and milk containing product,შესქელებული რძე და რძის შემცველი პროდუქტი,2015-01,identity.p0030.2018
 cpi.product.p0031,01,Matsoni (fermented milk),მაწონი,2015-01,exact-bilingual-through-2015
 cpi.product.p0032,01,Yogurt,იოგურტი,2015-01,exact-bilingual-through-2015
-cpi.product.p0033,01,Cheese Imeruli,იმერული ყველი,2019-01,pending-review-2019
-cpi.product.p0034,01,Cheese Sulguni,სულგუნი,2019-01,pending-review-2019
+cpi.product.p0033,01,Cheese Imeruli,იმერული ყველი,2015-01,identity.p0033.2019
+cpi.product.p0034,01,Cheese Sulguni,სულგუნი,2015-01,identity.p0034.2019
 cpi.product.p0035,01,Cottage cheese,ხაჭო,2015-01,exact-bilingual-through-2015
 cpi.product.p0036,01,Sour cream,არაჟანი,2015-01,exact-bilingual-through-2015
 cpi.product.p0037,01,Egg,კვერცხი,2015-01,exact-bilingual-through-2015
-cpi.product.p0038,01,Butter and spread,კარაქი და სპრედი,2018-01,pending-review-2018
+cpi.product.p0038,01,Butter and spread,კარაქი და სპრედი,2015-01,identity.p0038.2018
 cpi.product.p0039,01,Margarine,მარგარინი,2015-01,exact-bilingual-through-2015
 cpi.product.p0040,01,Mayonnaise,მაიონეზი,2015-01,exact-bilingual-through-2015
 cpi.product.p0041,01,Sunflower oil,მზესუმზირის ზეთი,2015-01,exact-bilingual-through-2015
@@ -49,7 +49,7 @@ cpi.product.p0047,01,Banana,ბანანი,2015-01,exact-bilingual-through-2
 cpi.product.p0048,01,Apple,ვაშლი,2015-01,exact-bilingual-through-2015
 cpi.product.p0049,01,Pear,მსხალი,2015-01,exact-bilingual-through-2015
 cpi.product.p0050,01,Grapes,ყურძენი,2015-01,exact-bilingual-through-2015
-cpi.product.p0051,01,Plum,ქლიავი,2017-01,pending-review-2017
+cpi.product.p0051,01,Plum,ქლიავი,2017-01,identity.p0051.2017
 cpi.product.p0052,01,Peach,ატამი,2015-01,exact-bilingual-through-2015
 cpi.product.p0053,01,Raisin,ქიშმიში,2015-01,exact-bilingual-through-2015
 cpi.product.p0054,01,Greens (herb),მწვანილი,2015-01,exact-bilingual-through-2015
@@ -63,7 +63,7 @@ cpi.product.p0061,01,Carrot,სტაფილო,2015-01,exact-bilingual-throug
 cpi.product.p0062,01,Beet,ჭარხალი,2015-01,exact-bilingual-through-2015
 cpi.product.p0063,01,Onion,ხახვი,2015-01,exact-bilingual-through-2015
 cpi.product.p0064,01,Garlic,ნიორი,2015-01,exact-bilingual-through-2015
-cpi.product.p0065,01,Watermelon,საზამთრო,2019-01,pending-review-2019
+cpi.product.p0065,01,Watermelon,საზამთრო,2015-01,identity.p0065.2019
 cpi.product.p0066,01,Canned vegetables,ბოსტნეულის კონსერვი,2015-01,exact-bilingual-through-2015
 cpi.product.p0067,01,Tomato paste,ტომატ-პასტა,2015-01,exact-bilingual-through-2015
 cpi.product.p0068,01,Pickled cucumber,კიტრის მწნილი,2015-01,exact-bilingual-through-2015
@@ -86,15 +86,15 @@ cpi.product.p0084,01,Instant coffee,ხსნადი ყავა,2015-01,exac
 cpi.product.p0085,01,Tea leaves,ფოთლოვანი ჩაი,2015-01,exact-bilingual-through-2015
 cpi.product.p0086,01,Tea bags,ჩაი ერთჯერად პაკეტებში,2015-01,exact-bilingual-through-2015
 cpi.product.p0087,01,Cocoa,კაკაო,2015-01,exact-bilingual-through-2015
-cpi.product.p0088,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2019-01,pending-review-2019
-cpi.product.p0089,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2019-01,pending-review-2019
+cpi.product.p0088,01,Mineral water (sparkling),მინერალური წყალი (გაზირებული),2015-01,identity.p0088.2019
+cpi.product.p0089,01,Mineral water (still),მინერალური წყალი (არაგაზირებული),2019-01,identity.p0089.2019
 cpi.product.p0090,01,Lemonade,ლიმონათი,2015-01,exact-bilingual-through-2015
-cpi.product.p0091,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2019-01,pending-review-2019
+cpi.product.p0091,01,Drinks of Coca-cola type,კოლას ტიპის სასმელები,2015-01,identity.p0091.2019
 cpi.product.p0092,01,Fruit juice,ხილის წვენები,2015-01,exact-bilingual-through-2015
 cpi.product.p0093,02,Vodka,არაყი,2015-01,exact-bilingual-through-2015
 cpi.product.p0094,02,Brandy,კონიაკი,2015-01,exact-bilingual-through-2015
 cpi.product.p0095,02,Non-bottled wine,ღვინო ჩამოსასხმელი,2015-01,exact-bilingual-through-2015
-cpi.product.p0096,02,Bottled wine,ღვინო ბოთლებში ჩამოსხმული,2019-01,pending-review-2019
+cpi.product.p0096,02,Bottled wine,ღვინო ბოთლებში ჩამოსხმული,2015-01,identity.p0096.2019
 cpi.product.p0097,02,Beer,ლუდი,2015-01,exact-bilingual-through-2015
 cpi.product.p0098,02,Imported filtered cigarette,იმპორტული წარმოების ფილტრიანი სიგარეტი,2015-01,exact-bilingual-through-2015
 cpi.product.p0099,03,Man's warm jacket,მამაკაცის დათბუნებული ქურთუკი,2015-01,exact-bilingual-through-2015
@@ -103,14 +103,14 @@ cpi.product.p0101,03,Man's trousers,მამაკაცის შარვა�
 cpi.product.p0102,03,Man's shirt,მამაკაცის პერანგი,2015-01,exact-bilingual-through-2015
 cpi.product.p0103,03,Man's sweater,მამაკაცის სვიტერი,2015-01,exact-bilingual-through-2015
 cpi.product.p0104,03,Man's t-shirt,მამაკაცის მაისური,2015-01,exact-bilingual-through-2015
-cpi.product.p0105,03,Man's boxers,მამაკაცის ტრუსი,2017-01,pending-review-2017
+cpi.product.p0105,03,Man's boxers,მამაკაცის ტრუსი,2015-01,identity.p0105.2017
 cpi.product.p0106,03,Man's socks,მამაკაცის წინდები,2015-01,exact-bilingual-through-2015
 cpi.product.p0107,03,Woman's winter coat,ქალის ზამთრის პალტო,2015-01,exact-bilingual-through-2015
-cpi.product.p0108,03,Woman's demi-season jacket,ქალის დემისეზონური ქურთუკი,2019-01,pending-review-2019
+cpi.product.p0108,03,Woman's demi-season jacket,ქალის დემისეზონური ქურთუკი,2015-01,identity.p0108.2019
 cpi.product.p0109,03,Woman's trousers,ქალის შარვალი,2015-01,exact-bilingual-through-2015
 cpi.product.p0110,03,Woman's summer dress,ქალის საზაფხულო კაბა,2015-01,exact-bilingual-through-2015
 cpi.product.p0111,03,Woman's sweater,ქალის სვიტერი,2015-01,exact-bilingual-through-2015
-cpi.product.p0112,03,Woman's panties,ქალის ტრუსი,2017-01,pending-review-2017
+cpi.product.p0112,03,Woman's panties,ქალის ტრუსი,2015-01,identity.p0112.2017
 cpi.product.p0113,03,Brassiere,ბიუსტჰალტერი,2015-01,exact-bilingual-through-2015
 cpi.product.p0114,03,Woman's stockings,კოლგოტი,2015-01,exact-bilingual-through-2015
 cpi.product.p0115,03,Woman's skirt,ქალის ქვედაკაბა,2015-01,exact-bilingual-through-2015
@@ -121,23 +121,23 @@ cpi.product.p0119,03,Child's shirt,ბავშვის პერანგი,2
 cpi.product.p0120,03,Child's trousers,ბავშვის შარვალი,2015-01,exact-bilingual-through-2015
 cpi.product.p0121,03,Child's jacket,ბავშვის ქურთუკი,2015-01,exact-bilingual-through-2015
 cpi.product.p0122,03,Child's socks,ბავშვის წინდები,2015-01,exact-bilingual-through-2015
-cpi.product.p0123,03,Child's panties,ბავშვის ტრუსი,2017-01,pending-review-2017
-cpi.product.p0124,03,Woman’s headwear,ქუდი ქალის,2017-01,pending-review-2017
-cpi.product.p0125,03,Man’s headwear,ქუდი კაცის,2017-01,pending-review-2017
+cpi.product.p0123,03,Child's panties,ბავშვის ტრუსი,2015-01,identity.p0123.2017
+cpi.product.p0124,03,Woman’s headwear,ქუდი ქალის,2017-01,identity.p0124.2017
+cpi.product.p0125,03,Man’s headwear,ქუდი კაცის,2017-01,identity.p0125.2017
 cpi.product.p0126,03,Belt,ქამარი,2015-01,exact-bilingual-through-2015
 cpi.product.p0127,03,Man's custom tailoring,მამაკაცის ტანსაცმლის გადაკეთება,2015-01,exact-bilingual-through-2015
 cpi.product.p0128,03,Man's summer shoes,მამაკაცის ფეხსაცმელი,2015-01,exact-bilingual-through-2015
 cpi.product.p0129,03,Man's winter shoes,მამაკაცის ზამთრის ფეხსაცმელი,2015-01,exact-bilingual-through-2015
-cpi.product.p0130,03,Man’s slippers,საშინაო ფეხსაცმელი კაცის,2017-01,pending-review-2017
+cpi.product.p0130,03,Man’s slippers,საშინაო ფეხსაცმელი კაცის,2017-01,identity.p0130.2017
 cpi.product.p0131,03,Woman's summer shoes,ქალის საზაფხულო ფეხსაცმელი,2015-01,exact-bilingual-through-2015
 cpi.product.p0132,03,Woman's winter shoes,ქალის ზამთრის ფეხსაცმელი,2015-01,exact-bilingual-through-2015
-cpi.product.p0133,03,Woman's demi-season shoes,ქალის დემისეზონური ფეხსაცმელი,2019-01,pending-review-2019
-cpi.product.p0134,03,Woman’s slippers,საშინაო ფეხსაცმელი ქალის,2017-01,pending-review-2017
+cpi.product.p0133,03,Woman's demi-season shoes,ქალის დემისეზონური ფეხსაცმელი,2015-01,identity.p0133.2019
+cpi.product.p0134,03,Woman’s slippers,საშინაო ფეხსაცმელი ქალის,2017-01,identity.p0134.2017
 cpi.product.p0135,03,Boy's ankle boots,ბიჭის ნახევარჩექმა,2015-01,exact-bilingual-through-2015
 cpi.product.p0136,03,Girl's boots,გოგოს ჩექმა,2015-01,exact-bilingual-through-2015
 cpi.product.p0137,03,Boy's shoes,ბიჭის ფეხსაცმელი,2015-01,exact-bilingual-through-2015
 cpi.product.p0138,03,Girl's summer shoes,გოგოს საზაფხულო ფეხსაცმელი,2015-01,exact-bilingual-through-2015
-cpi.product.p0139,03,Child’s slippers,საშინაო ფეხსაცმელი ბავშვის,2017-01,pending-review-2017
+cpi.product.p0139,03,Child’s slippers,საშინაო ფეხსაცმელი ბავშვის,2017-01,identity.p0139.2017
 cpi.product.p0140,03,Shoe repair (for men),მამაკაცის ფეხსაცმლის შეკეთება,2015-01,exact-bilingual-through-2015
 cpi.product.p0141,03,Shoe repair (for women),ქალის ფეხსაცმლის შეკეთება,2015-01,exact-bilingual-through-2015
 cpi.product.p0142,04,Apartment rent,ბინის დაქირავების ღირებულება,2015-01,exact-bilingual-through-2015
@@ -146,7 +146,7 @@ cpi.product.p0144,04,Decorative materials,მოსაპირკეთებ�
 cpi.product.p0145,04,Wallpaper,შპალერი,2015-01,exact-bilingual-through-2015
 cpi.product.p0146,04,Emulsion paint,ემულსიის საღებავი,2015-01,exact-bilingual-through-2015
 cpi.product.p0147,04,Putty,ფითხი,2015-01,exact-bilingual-through-2015
-cpi.product.p0148,04,Chipboard,თაბაშირ-მუყაოს ფილა,2017-01,pending-review-2017
+cpi.product.p0148,04,Chipboard,თაბაშირ-მუყაოს ფილა,2015-01,identity.p0148.2017
 cpi.product.p0149,04,Plumber's service,სანტექნიკოსის მომსახურება,2015-01,exact-bilingual-through-2015
 cpi.product.p0150,04,Electrician's service,ელექტროგაყვანილობის ხელოსნის მომსახურება,2015-01,exact-bilingual-through-2015
 cpi.product.p0151,04,House painter's service,მღებავის მომსახურება,2015-01,exact-bilingual-through-2015
@@ -160,7 +160,7 @@ cpi.product.p0158,05,Bedroom suite,საძინებელი ოთახ�
 cpi.product.p0159,05,Kitchen suite,სამზარეულოს გარნიტური,2015-01,exact-bilingual-through-2015
 cpi.product.p0160,05,Table,მაგიდა,2015-01,exact-bilingual-through-2015
 cpi.product.p0161,05,Chair,სკამი,2015-01,exact-bilingual-through-2015
-cpi.product.p0162,05,Sofa,დივანი,2017-01,pending-review-2017
+cpi.product.p0162,05,Sofa,დივანი,2017-01,identity.p0162.2017
 cpi.product.p0163,05,Blanket,საბანი,2015-01,exact-bilingual-through-2015
 cpi.product.p0164,05,Bed linen,ლოგინის თეთრეული,2015-01,exact-bilingual-through-2015
 cpi.product.p0165,05,Towel,პირსახოცი,2015-01,exact-bilingual-through-2015
@@ -168,7 +168,7 @@ cpi.product.p0166,05,Curtain,ფარდა,2015-01,exact-bilingual-through-201
 cpi.product.p0167,05,Refrigerator,მაცივარი,2015-01,exact-bilingual-through-2015
 cpi.product.p0168,05,Washing machine,სარეცხი მანქანა,2015-01,exact-bilingual-through-2015
 cpi.product.p0169,05,Gas stove,გაზქურა,2015-01,exact-bilingual-through-2015
-cpi.product.p0170,05,Gas heater,გაზის გამათბობელი,2019-01,pending-review-2019
+cpi.product.p0170,05,Gas heater,გაზის გამათბობელი,2019-01,identity.p0170.2019
 cpi.product.p0171,05,Air conditioner,კონდიციონერი,2015-01,exact-bilingual-through-2015
 cpi.product.p0172,05,Vacuum cleaner,მტვერსასრუტი,2015-01,exact-bilingual-through-2015
 cpi.product.p0173,05,Electric coffeepot,ელექტროყავადანი,2015-01,exact-bilingual-through-2015
@@ -177,7 +177,7 @@ cpi.product.p0175,05,Iron,უთო,2015-01,exact-bilingual-through-2015
 cpi.product.p0176,05,Mixer,მიქსერი,2015-01,exact-bilingual-through-2015
 cpi.product.p0177,05,Glass,ჭიქა,2015-01,exact-bilingual-through-2015
 cpi.product.p0178,05,Plate,თეფში,2015-01,exact-bilingual-through-2015
-cpi.product.p0179,05,Coffee cup with saucer,ყავის ფინჯანი ლამბაქით,2019-01,pending-review-2019
+cpi.product.p0179,05,Coffee cup with saucer,ყავის ფინჯანი ლამბაქით,2019-01,identity.p0179.2019
 cpi.product.p0180,05,"Fork, knife",დანა - ჩანგალი,2015-01,exact-bilingual-through-2015
 cpi.product.p0181,05,Frying pan,ტაფა,2015-01,exact-bilingual-through-2015
 cpi.product.p0182,05,Pot,ქვაბი,2015-01,exact-bilingual-through-2015
@@ -185,13 +185,13 @@ cpi.product.p0183,05,Hammer,ჩაქუჩი,2015-01,exact-bilingual-through-2
 cpi.product.p0184,05,Pliers,ბრტყელტუჩა,2015-01,exact-bilingual-through-2015
 cpi.product.p0185,05,Laundry soap,სარეცხი საპონი,2015-01,exact-bilingual-through-2015
 cpi.product.p0186,05,Powdered detergents,სინთეტიკური სარეცხი ფხვნილები,2015-01,exact-bilingual-through-2015
-cpi.product.p0187,05,Detergents for dishes,ჭურჭლის სინთეტიკური სარეცხი საშუალებები,2019-01,pending-review-2019
+cpi.product.p0187,05,Detergents for dishes,ჭურჭლის სინთეტიკური სარეცხი საშუალებები,2015-01,identity.p0187.2019
 cpi.product.p0188,05,Paper napkins,ქაღალდის ხელსახოცები,2015-01,exact-bilingual-through-2015
 cpi.product.p0189,05,Dusters,მტვრის საწმენდი ტილოები,2015-01,exact-bilingual-through-2015
 cpi.product.p0190,05,Nails,ლურსმანი,2015-01,exact-bilingual-through-2015
 cpi.product.p0191,05,Matches,ასანთი,2015-01,exact-bilingual-through-2015
 cpi.product.p0192,05,Light bulb,ნათურა,2015-01,exact-bilingual-through-2015
-cpi.product.p0193,05,Dry battery,მშრალი ბატარეა,2017-01,pending-review-2017
+cpi.product.p0193,05,Dry battery,მშრალი ბატარეა,2017-01,identity.p0193.2017
 cpi.product.p0194,05,Dry nurse service,ძიძის მომსახურების ღირებულება,2015-01,exact-bilingual-through-2015
 cpi.product.p0195,06,Cardiovascular dilative medicaments,სისხლძარღვთა გამაფართოებელი მედიკამენტები,2015-01,exact-bilingual-through-2015
 cpi.product.p0196,06,Analgetics,ტკივილგამაყუჩებელი მედიკამენტები,2015-01,exact-bilingual-through-2015
@@ -200,29 +200,29 @@ cpi.product.p0198,06,Vitamins,ვიტამინები,2015-01,exact-bilin
 cpi.product.p0199,06,Digestive system medicaments,საჭმლის მომნელებელი სისტემის პრეპარატები,2015-01,exact-bilingual-through-2015
 cpi.product.p0200,06,Anti-inflammatory medicaments,ანთების საწინააღმდეგო პრეპარატები,2015-01,exact-bilingual-through-2015
 cpi.product.p0201,06,Thermometer,თერმომეტრი,2015-01,exact-bilingual-through-2015
-cpi.product.p0202,06,Blood pressure meter,წნევის საზომი აპარატი,2017-01,pending-review-2017
-cpi.product.p0203,06,Eyeglass lens,სათვალის ლინზები,2019-01,pending-review-2019
+cpi.product.p0202,06,Blood pressure meter,წნევის საზომი აპარატი,2017-01,identity.p0202.2017
+cpi.product.p0203,06,Eyeglass lens,სათვალის ლინზები,2015-01,identity.p0203.2019
 cpi.product.p0204,06,Cotton,ბამბა,2015-01,exact-bilingual-through-2015
 cpi.product.p0205,06,Syringe,შპრიცი,2015-01,exact-bilingual-through-2015
 cpi.product.p0206,06,Therapist's consultation,თერაპევტის კონსულტაცია,2015-01,exact-bilingual-through-2015
 cpi.product.p0207,06,Dentist's services (tooth filling),სტომატოლოგის მომსახურება (კბილის დაბჟენა),2015-01,exact-bilingual-through-2015
 cpi.product.p0208,06,Dentist's services (tooth extraction),სტომატოლოგის მომსახურება (კბილის ამოღება),2015-01,exact-bilingual-through-2015
 cpi.product.p0209,06,Blood test,სისხლის ანალიზი,2015-01,exact-bilingual-through-2015
-cpi.product.p0210,06,Echo scanning,ექოსკანირება,2017-01,pending-review-2017
+cpi.product.p0210,06,Echo scanning,ექოსკანირება,2017-01,identity.p0210.2017
 cpi.product.p0211,06,Hospital Services,საავადმყოფოს მომსახურება,2015-01,exact-bilingual-through-2015
 cpi.product.p0212,06,Surgeon's services,ქირურგიული მომსახურება,2015-01,exact-bilingual-through-2015
 cpi.product.p0213,06,Child delivery services,სამშობიარო მომსახურება,2015-01,exact-bilingual-through-2015
-cpi.product.p0214,07,New motor car,ახალი მსუბუქი ავტომობილი,2019-01,pending-review-2019
-cpi.product.p0215,07,Used motor car,მეორადი მოხმარების მსუბუქი ავტომობილი,2019-01,pending-review-2019
+cpi.product.p0214,07,New motor car,ახალი მსუბუქი ავტომობილი,2015-01,identity.p0214.2019
+cpi.product.p0215,07,Used motor car,მეორადი მოხმარების მსუბუქი ავტომობილი,2015-01,identity.p0215.2019
 cpi.product.p0216,07,Motor car tire,ავტომობილის საბურავი,2015-01,exact-bilingual-through-2015
 cpi.product.p0217,07,Motor car accumulator,ავტომობილის აკუმულატორი,2015-01,exact-bilingual-through-2015
 cpi.product.p0218,07,Car spare parts,ავტომობილის სათადარიგო ნაწილები,2015-01,exact-bilingual-through-2015
 cpi.product.p0219,07,Gasoline,ბენზინი,2015-01,exact-bilingual-through-2015
-cpi.product.p0220,07,Diesel fuel,დიზელის საწვავი,2018-01,pending-review-2018
+cpi.product.p0220,07,Diesel fuel,დიზელის საწვავი,2015-01,identity.p0220.2018
 cpi.product.p0221,07,Gas fuel,გაზის საწვავი,2015-01,exact-bilingual-through-2015
 cpi.product.p0222,07,Car repair,ავტომობილის შეკეთება,2015-01,exact-bilingual-through-2015
 cpi.product.p0223,07,Motor car oil and filter replacement,ავტომობილის ზეთისა და ფილტრის შეცვლა,2015-01,exact-bilingual-through-2015
-cpi.product.p0224,07,Car-wash fee,ავტომობილის რეცხვის გადასახდელი,2017-01,pending-review-2017
+cpi.product.p0224,07,Car-wash fee,ავტომობილის რეცხვის გადასახდელი,2015-01,identity.p0224.2017
 cpi.product.p0225,07,Suburban train tariff,საგარეუბნო მატარებლით მგზავრობა,2015-01,exact-bilingual-through-2015
 cpi.product.p0226,07,Long distance train tariff,შორი მიმოსვლის მატარებლით მგზავრობა,2015-01,exact-bilingual-through-2015
 cpi.product.p0227,07,Subway tariff,მეტროპოლიტენით მგზავრობა,2015-01,exact-bilingual-through-2015
@@ -231,7 +231,7 @@ cpi.product.p0229,07,Intracity taxi tariff,ქალაქის შიგნი
 cpi.product.p0230,07,Suburban bus tariff,საგარეუბნო ავტობუსით მგზავრობა,2015-01,exact-bilingual-through-2015
 cpi.product.p0231,07,Intercity motor transport tariff,საქალაქთაშორისო ავტოტრანსპორტით მგზავრობა,2015-01,exact-bilingual-through-2015
 cpi.product.p0232,07,Air flight fee,თვითმფრინავით მგზავრობა,2015-01,exact-bilingual-through-2015
-cpi.product.p0233,07,Travel pass,სამგზავრო აბონემენტი,2023-01,pending-review-2023
+cpi.product.p0233,07,Travel pass,სამგზავრო აბონემენტი,2023-01,identity.p0233.2023
 cpi.product.p0234,08,Mobile phone,მობილური ტელეფონი,2015-01,exact-bilingual-through-2015
 cpi.product.p0235,08,Mobile phone repair,მობილური ტელეფონის შეკეთება,2015-01,exact-bilingual-through-2015
 cpi.product.p0236,08,Monthly telephone fee,ტელეფონის სააბონენტო გადასახდელი,2015-01,exact-bilingual-through-2015
@@ -242,14 +242,14 @@ cpi.product.p0240,09,Camera,ფოტოაპარატი,2015-01,exact-bili
 cpi.product.p0241,09,Computer,კომპიუტერი,2015-01,exact-bilingual-through-2015
 cpi.product.p0242,09,USB flash stick,USB ფლეშბარათი,2015-01,exact-bilingual-through-2015
 cpi.product.p0243,09,Guitar,გიტარა,2015-01,exact-bilingual-through-2015
-cpi.product.p0244,09,Toy,ბავშვის სათამაშო,2019-01,pending-review-2019
+cpi.product.p0244,09,Toy,ბავშვის სათამაშო,2015-01,identity.p0244.2019
 cpi.product.p0245,09,Ball,ბურთი,2015-01,exact-bilingual-through-2015
 cpi.product.p0246,09,Sports suit,სპორტული კოსტუმი,2015-01,exact-bilingual-through-2015
 cpi.product.p0247,09,Child's sports suit,ბავშვის სპორტული კოსტუმი,2015-01,exact-bilingual-through-2015
-cpi.product.p0248,09,Sports shoes,სპორტული ფეხსაცმელი,2019-01,pending-review-2019
-cpi.product.p0249,09,Child's sports shoes,ბავშვის სპორტული ფეხსაცმელი,2019-01,pending-review-2019
+cpi.product.p0248,09,Sports shoes,სპორტული ფეხსაცმელი,2015-01,identity.p0248.2019
+cpi.product.p0249,09,Child's sports shoes,ბავშვის სპორტული ფეხსაცმელი,2015-01,identity.p0249.2019
 cpi.product.p0250,09,Flower,ყვავილი,2015-01,exact-bilingual-through-2015
-cpi.product.p0251,09,Pet food,შინაური ცხოველების საკვები,2020-01,pending-review-2020
+cpi.product.p0251,09,Pet food,შინაური ცხოველების საკვები,2020-01,identity.p0251.2020
 cpi.product.p0252,09,Swimming pool fee,საცურაო აუზის მომსახურების ღირებულება,2015-01,exact-bilingual-through-2015
 cpi.product.p0253,09,Merry-go-round,ატრაქციონი,2015-01,exact-bilingual-through-2015
 cpi.product.p0254,09,Study circle fee,შემოქმედებითი წრის გადასახდელი,2015-01,exact-bilingual-through-2015
@@ -257,7 +257,7 @@ cpi.product.p0255,09,Sport circle fee,სპორტული წრის გ�
 cpi.product.p0256,09,Entertainment center services,გასართობი ცენტრის მომსახურების ღირებულება,2015-01,exact-bilingual-through-2015
 cpi.product.p0257,09,Movie visit fee,დასწრება კინოსეანსზე,2015-01,exact-bilingual-through-2015
 cpi.product.p0258,09,Theater visit fee,დასწრება სპექტაკლზე,2015-01,exact-bilingual-through-2015
-cpi.product.p0259,09,Museum ticket,მუზეუმის ბილეთი,2017-01,pending-review-2017
+cpi.product.p0259,09,Museum ticket,მუზეუმის ბილეთი,2017-01,identity.p0259.2017
 cpi.product.p0260,09,Cable TV fee,საკაბელო ტელევიზიის გადასახდელი,2015-01,exact-bilingual-through-2015
 cpi.product.p0261,09,Photo printing,სურათების ბეჭდვა,2015-01,exact-bilingual-through-2015
 cpi.product.p0262,09,Book,წიგნი,2015-01,exact-bilingual-through-2015
@@ -267,7 +267,7 @@ cpi.product.p0265,09,Magazine,ჟურნალი,2015-01,exact-bilingual-thro
 cpi.product.p0266,09,Notebook,რვეული,2015-01,exact-bilingual-through-2015
 cpi.product.p0267,09,Pen,კალამი,2015-01,exact-bilingual-through-2015
 cpi.product.p0268,09,Pencil,ფანქარი,2015-01,exact-bilingual-through-2015
-cpi.product.p0269,09,Tourist trip abroad,ტურისტული მოგზაურობა ქვეყნის გარეთ,2020-01,pending-review-2020
+cpi.product.p0269,09,Tourist trip abroad,ტურისტული მოგზაურობა ქვეყნის გარეთ,2020-01,identity.p0269.2020
 cpi.product.p0270,10,Kindergarten fee,საბავშვო ბაღის გადასახდელი,2015-01,exact-bilingual-through-2015
 cpi.product.p0271,10,College tuition fee,სკოლა-ლიცეუმის გადასახდელი,2015-01,exact-bilingual-through-2015
 cpi.product.p0272,10,Tutor's fee,რეპეტიტორის მომსახურება,2015-01,exact-bilingual-through-2015
@@ -277,7 +277,7 @@ cpi.product.p0275,11,Restaurant lunch fee,სადილი რესტორ�
 cpi.product.p0276,11,Coffee in café,ყავა კაფეში,2015-01,exact-bilingual-through-2015
 cpi.product.p0277,11,Khachapuri in café,ხაჭაპური კაფეში,2015-01,exact-bilingual-through-2015
 cpi.product.p0278,11,Bar beer,ლუდი ბარში,2015-01,exact-bilingual-through-2015
-cpi.product.p0279,11,Khinkali in Restaurant,ხინკალი რესტორანში,2019-01,pending-review-2019
+cpi.product.p0279,11,Khinkali in Restaurant,ხინკალი რესტორანში,2015-01,identity.p0279.2019
 cpi.product.p0280,11,Hotel service,სასტუმროს მომსახურების ღირებულება,2015-01,exact-bilingual-through-2015
 cpi.product.p0281,12,Man's haircut,მამაკაცის თმის შეჭრა,2015-01,exact-bilingual-through-2015
 cpi.product.p0282,12,Woman's hair-styling,ქალის თმის დავარცხნა,2015-01,exact-bilingual-through-2015
@@ -302,5 +302,5 @@ cpi.product.p0300,12,Bag,ხელჩანთა,2015-01,exact-bilingual-throug
 cpi.product.p0301,12,Coffin,სასახლის დამზადება,2015-01,exact-bilingual-through-2015
 cpi.product.p0302,12,Health insurance premium,ჯანმრთელობის დაზღვევა,2015-01,exact-bilingual-through-2015
 cpi.product.p0303,12,Banking services,საბანკო მომსახურების ღირებულება,2015-01,exact-bilingual-through-2015
-cpi.product.p0304,12,Notarial fee,სანოტარო გადასახდელი,2017-01,pending-review-2017
+cpi.product.p0304,12,Notarial fee,სანოტარო გადასახდელი,2015-01,identity.p0304.2017
 cpi.product.p0305,12,Photocopying,ასლის გადაღება,2015-01,exact-bilingual-through-2015

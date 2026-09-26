@@ -4,7 +4,8 @@ import { parse } from "csv-parse/sync";
 import { beforeAll, describe, expect, it } from "vitest";
 import { INFLATION_PRODUCTS_RAW_ROOT, readVerifiedProductFiles } from "../../../lib/data/inflation/productSourceFiles";
 import { pairProductEditions } from "../../../lib/data/inflation/readGeostatProducts";
-import { buildProductIdentityAudit, seedProductCatalogue, serializeCandidateCatalogue, serializeIdentityReview, type ProductCatalogueRow } from "../../../lib/data/inflation/productIdentity";
+import { buildProductIdentityAudit, loadProductDecisions, seedProductCatalogue, serializeIdentityReview, type ProductCatalogueRow } from "../../../lib/data/inflation/productIdentity";
+import { serializeProductCatalogue } from "../../../lib/data/inflation/prepareProducts";
 import type { PairedProductRow, ProductSourceCell } from "../../../lib/data/inflation/productTypes";
 
 let rows: PairedProductRow[];
@@ -84,8 +85,10 @@ describe("current-basket product identity audit", () => {
       productId: record.product_id!, coicopCode: record.coicop_code!, labelEn: record.label_en!,
       labelKa: record.label_ka!, firstPeriod: record.first_period!, decisionRef: record.decision_ref!,
     }));
-    const audit = buildProductIdentityAudit(rows, catalogue, []);
-    expect(serializeCandidateCatalogue(audit.catalogue)).toBe(catalogueText);
-    expect(serializeIdentityReview(audit)).toBe(await fs.readFile(reportFile, "utf8"));
+    const reviewed = buildProductIdentityAudit(rows, catalogue, await loadProductDecisions());
+    expect(reviewed.unresolvedTransitions).toHaveLength(0);
+    expect(serializeProductCatalogue(reviewed.catalogue)).toBe(catalogueText);
+    const candidates = buildProductIdentityAudit(rows, catalogue, []);
+    expect(serializeIdentityReview(candidates)).toBe(await fs.readFile(reportFile, "utf8"));
   });
 });
