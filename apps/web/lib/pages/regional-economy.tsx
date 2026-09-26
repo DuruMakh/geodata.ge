@@ -123,8 +123,11 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
         dateModified: reviewedAt,
         spatialCoverageName: regionName,
         withinGeorgia: true,
-        partOfPath: "/explorer/economy/regions",
-        sameAsPath: "/methodology/regional-economies",
+        partOf: {
+          path: "/explorer/economy/regions",
+          name: title,
+          description: message(presentation.messages, "regionalEconomies.description"),
+        },
       })} />
       <ExplorerPage testId="explorer-shell">
         <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${reviewedAt}`} />

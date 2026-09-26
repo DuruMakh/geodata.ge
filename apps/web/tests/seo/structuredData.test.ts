@@ -89,7 +89,11 @@ describe("Fiscal.ge structured data", () => {
       origin: "https://fiscal.ge",
       path: "/explorer/municipalities/tbilisi",
       datasetId: "municipal-expenditure",
-      partOfPath: "/explorer/municipalities",
+      partOf: {
+        path: "/explorer/municipalities",
+        name: "საქართველოს მუნიციპალიტეტების ბიუჯეტები",
+        description: "საქართველოს მუნიციპალიტეტების ფაქტობრივი ბიუჯეტები ფუნქციების მიხედვით, 2015–2025.",
+      },
       name: "ქალაქ თბილისის მუნიციპალიტეტის ბიუჯეტი",
       description:
         "ქალაქ თბილისის მუნიციპალიტეტის ფაქტობრივი ბიუჯეტის გადამოწმებული მრავალწლიანი მონაცემები ფუნქციების მიხედვით.",
@@ -261,7 +265,11 @@ describe("Dataset records carry the full Google Dataset property set", () => {
     lastYear: 2025,
     dateModified: "2026-08-16",
     spatialCoverageName: "ქალაქ თბილისის მუნიციპალიტეტი",
-    partOfPath: "/explorer/municipalities" as const,
+    partOf: {
+      path: "/explorer/municipalities" as const,
+      name: municipalParent.name,
+      description: municipalParent.description,
+    },
     withinGeorgia: true,
   };
 
@@ -478,15 +486,16 @@ describe("Dataset records carry the full Google Dataset property set", () => {
     expect(/[Ⴀ-ჿ]/.test(data.variableMeasured[0].name)).toBe(true);
   });
 
-  it("types the nodes it points at, so one page is readable on its own", () => {
+  it("completes the parent Dataset so one page is valid on its own", () => {
     expect(explorerDatasetJsonLd(tbilisiSubset)).toMatchObject({
       isPartOf: {
-        // @type and url make the reference self-describing; the parent's name is
-        // locale-dependent and carries no message key, so it is left out rather
-        // than hardcoded in one language.
         "@type": "Dataset",
         "@id": "https://fiscal.ge/explorer/municipalities#dataset",
         url: "https://fiscal.ge/explorer/municipalities",
+        name: "საქართველოს მუნიციპალიტეტების ბიუჯეტები",
+        description: "საქართველოს მუნიციპალიტეტების ფაქტობრივი ბიუჯეტები ფუნქციების მიხედვით, გადამოწმებული წლიური მონაცემები.",
+        license: "https://creativecommons.org/licenses/by/4.0/",
+        creator: { "@type": "Organization", "@id": "https://fiscal.ge/#organization", name: "Fiscal.ge" },
       },
     });
     expect(explorerDatasetJsonLd(municipalParent)).toMatchObject({
