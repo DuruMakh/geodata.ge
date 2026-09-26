@@ -98,12 +98,12 @@ test("language switch keeps the state", async ({ page }) => {
   await expect(page.getByTestId("inflation-tab-mom")).toHaveAttribute("aria-pressed", "true");
 });
 
-test("the sidebar lists three datasets and the hub links its two live sections", async ({ page }) => {
+test("the sidebar lists three datasets and the hub links its three live sections", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/explorer/inflation");
   await expect(page.getByTestId("inflation-link")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("inflation-hub").getByTestId("hub-card")).toHaveCount(5);
-  await expect(page.getByTestId("inflation-hub").locator("a")).toHaveCount(2);
+  await expect(page.getByTestId("inflation-hub").locator("a")).toHaveCount(3);
   // Budget and Economy stay inactive; the footer names both publishers.
   await expect(page.getByTestId("section-link-expenditure")).toHaveCount(0);
   await expect(page.getByTestId("economy-link")).not.toHaveAttribute("aria-current", "page");
