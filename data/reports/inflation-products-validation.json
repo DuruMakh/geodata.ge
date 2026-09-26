@@ -1,0 +1,42 @@
+{
+  "latestPeriod": "2026-08",
+  "includedProducts": 305,
+  "sourceRowsRead": 4778,
+  "rosterByYear": {
+    "2011": 266,
+    "2012": 288,
+    "2013": 288,
+    "2014": 295,
+    "2015": 295,
+    "2016": 295,
+    "2017": 305,
+    "2018": 305,
+    "2019": 306,
+    "2020": 305,
+    "2021": 305,
+    "2022": 305,
+    "2023": 305,
+    "2024": 305,
+    "2025": 305,
+    "2026": 305
+  },
+  "languageParity": "PASS",
+  "sourceHashes": {
+    "en/products-mom.xlsx": "26d9b429229cbad2ad6ee2bbefd5e86f52d4482d49abdcc14e270d4a956dcf20",
+    "en/products-yoy.xlsx": "ec9cd520693db0479f7fd576f0d2f4cfa65c9c9ba607c46ec7679e13b900faf9",
+    "ka/products-mom.xlsx": "7154963abfe05c0f8e5edd953ef0fb91274fde4911ce0a45eac7f3efc02bbd9c",
+    "ka/products-yoy.xlsx": "c4f87ab0b44d94538d7a0783371c28d639359977d8d00d12dcf588fa4b9390df"
+  },
+  "reviewedLinks": 29,
+  "reviewedSplits": 18,
+  "sourceRowsOutsideCurrentTrace": 1174,
+  "excludedSourceRowsSince2015": 37,
+  "reviewedRevisions": [],
+  "factCount": 84056,
+  "publishedCells": 83880,
+  "unavailableCells": 176,
+  "arithmeticChecked": 38673,
+  "arithmeticUncomparable": 3179,
+  "maxArithmeticError": 0.00058334133588745,
+  "gapCount": 0
+}

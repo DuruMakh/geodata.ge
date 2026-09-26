@@ -64,6 +64,16 @@ describe("original-source inventory", () => {
     }
   });
 
+  it("registers all four original bilingual product-index workbooks for public download", async () => {
+    const manifest = await loadReviewedSourceManifest(REPOSITORY_ROOT, "inflation");
+    const productRows = manifest.filter((row) => row.source_id.startsWith("source.geostat_product_"));
+    expect(productRows.map((row) => row.source_id).sort()).toEqual([
+      "source.geostat_product_mom", "source.geostat_product_mom_ka", "source.geostat_product_yoy", "source.geostat_product_yoy_ka",
+    ]);
+    expect(productRows.every((row) => row.repository_source_path.includes("geostat-products/2026-08/") &&
+      row.downloadHref.startsWith("/downloads/methodology/inflation/files/"))).toBe(true);
+  });
+
   it("publishes the complete 2004 execution-report downloads", async () => {
     const manifest = await loadReviewedSourceManifest(REPOSITORY_ROOT, "expenditure");
 

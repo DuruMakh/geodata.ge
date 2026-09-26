@@ -124,8 +124,9 @@ Approved 2026-09-11 (`docs/superpowers/specs/2026-09-11-inflation-overview-desig
 - Inflation categories at `/explorer/inflation/categories`: the national CPI decomposed into its 12 COICOP divisions and 43 subgroups — annual and monthly price change per group, the annual consumer-basket weights, and a contribution-to-inflation measure derived by Fiscal.ge from those two published series with a visible residual that closes the stack on the published headline; stacked column chart, year × month table, Excel download; Georgian and English.
 - Methodology page `/methodology/inflation` with the archived Geostat and NBG source files.
 - Read-only MCP access and bulk publications for the inflation data above: `query_inflation`; inflation in `describe_coverage`, `get_sources`, `compare` and `rank`; and `inflation-national.json`, `inflation-categories.csv` and `inflation-categories.json`. Approved 2026-09-14 (`docs/superpowers/specs/2026-09-14-inflation-mcp-design.md`).
+- Reviewed individual-product inflation **data foundation** from 2015 for every item in the latest Geostat basket: archived bilingual original workbooks, explicit identity decisions, a current-product catalogue, published monthly and annual product indices, and validation evidence. Approved 2026-09-26 (`docs/superpowers/specs/2026-09-26-inflation-products-data-design.md`). A public product page and serving integration still require the separately approved page design.
 
-Still excluded: city indices, product-level indices, the price calculator, a standalone basket-composition section, every other price index (producer, import, construction, property, agricultural), HICP, and monthly or quarterly data for any other dataset. Each needs its own approved spec.
+Still excluded: city indices, a public product explorer until its page design is approved, the price calculator, a standalone basket-composition section, every other price index (producer, import, construction, property, agricultural), HICP, and monthly or quarterly data for any other dataset. Each needs its own approved spec.
 
 ## 3. Target Users
 

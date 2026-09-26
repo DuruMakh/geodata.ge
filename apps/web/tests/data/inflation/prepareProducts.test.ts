@@ -1,7 +1,9 @@
+import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildProductIdentityAudit, loadProductDecisions, type ProductCatalogueRow, type ProductDecisionRow } from "../../../lib/data/inflation/productIdentity";
-import { prepareProducts, serializeProductCatalogue, serializeProductFacts } from "../../../lib/data/inflation/prepareProducts";
+import { prepareProducts, serializeProductCatalogue, serializeProductFacts, writeProductArtifacts } from "../../../lib/data/inflation/prepareProducts";
 import { INFLATION_PRODUCTS_RAW_ROOT, readVerifiedProductFiles } from "../../../lib/data/inflation/productSourceFiles";
 import { pairProductEditions } from "../../../lib/data/inflation/readGeostatProducts";
 import { findProductRevisions, validateProductIndices } from "../../../lib/data/inflation/validateProducts";
@@ -88,11 +90,34 @@ describe("reviewed product identity mapping", () => {
     expect(findProductRevisions(prepared.facts, catalogue, rows, changedDecision).join(" ")).toMatch(/identity.*p0088/i);
   });
 
-  it("checks previously reviewed facts during preparation before accepting a refresh", async () => {
-    const repeat = await prepareProducts({ previousFacts: prepared.facts });
-    expect(repeat.facts.length).toBe(prepared.facts.length);
-    const changed = prepared.facts.map((fact) => fact.productId === "cpi.product.p0088" && fact.measure === "mom_index_100" && fact.period === "2018-01" ?
-      { ...fact, index100: "150" } : fact);
-    await expect(prepareProducts({ previousFacts: changed })).rejects.toThrow(/historical.*revision|value changed/i);
+  it("matches committed canonical files, retains Excel BOM and reports validation", async () => {
+    const root = path.resolve("../..");
+    const catalogueCsv = await fs.readFile(path.join(root, "data/imports/cpi-products.csv"), "utf8");
+    const factsCsv = await fs.readFile(path.join(root, "data/imports/cpi-products-monthly.csv"), "utf8");
+    expect(catalogueCsv.charCodeAt(0)).toBe(0xfeff);
+    expect(factsCsv.charCodeAt(0)).toBe(0xfeff);
+    expect(catalogueCsv).toBe(serializeProductCatalogue(prepared.catalogue));
+    expect(factsCsv).toBe(serializeProductFacts(prepared.facts));
+    const report = JSON.parse(await fs.readFile(path.join(root, "data/reports/inflation-products-validation.json"), "utf8")) as Record<string, unknown>;
+    expect(report).toMatchObject({ latestPeriod: "2026-08", includedProducts: 305, reviewedLinks: 29, reviewedSplits: 18 });
+    expect(report.arithmeticChecked).toBeGreaterThan(38_000);
+    await expect(writeProductArtifacts("check")).resolves.toMatchObject({ includedProducts: 305 });
   });
+
+  it("rejects a stale generated artifact without touching committed data", async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "product-artifacts-"));
+    try {
+      const root = path.resolve("../..");
+      for (const relative of ["data/imports/cpi-products.csv", "data/imports/cpi-products-monthly.csv", "data/reports/inflation-products-validation.json"]) {
+        const destination = path.join(dir, relative);
+        await fs.mkdir(path.dirname(destination), { recursive: true });
+        await fs.copyFile(path.join(root, relative), destination);
+      }
+      const report = path.join(dir, "data/reports/inflation-products-validation.json");
+      await fs.appendFile(report, " ");
+      await expect(writeProductArtifacts("check", { outputRoot: dir })).rejects.toThrow(/stale|mismatch/i);
+    } finally {
+      await fs.rm(dir, { recursive: true, force: true });
+    }
+  }, 60_000);
 });
