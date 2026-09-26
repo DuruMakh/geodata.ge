@@ -14,9 +14,9 @@ Geostat says the [2018 basket was identical to 2017’s](https://www.geostat.ge/
 
 | ID | Current (English / Georgian) | Earlier candidate (English / Georgian) | Proposal | Reason |
 | --- | --- | --- | --- | --- |
-| p0051 | Plum<br>ქლიავი | Cherry<br>ალუბალი | Split | Different fruit despite same sheet position. |
-| p0105 | Man's boxers<br>მამაკაცის ტრუსი | Man's boxers<br>მამაკაცის ტრუსები | Link | English unchanged; Georgian singular/plural wording. |
-| p0112 | Woman's panties<br>ქალის ტრუსი | Woman's panties<br>ქალის ტრუსები | Link | English unchanged; Georgian singular/plural wording. |
+| p0051 | Plum<br>ქლიავი | Cherry<br>ალუბალი | Split | Different fruit despite same sheet position.|    agree|
+| p0105 | Man's boxers<br>მამაკაცის ტრუსი | Man's boxers<br>მამაკაცის ტრუსები | Link | English unchanged; Georgian singular/plural wording.\ Agree   |
+| p0112 | Woman's panties<br>ქალის ტრუსი | Woman's panties<br>ქალის ტრუსები | Link | English unchanged; Georgian singular/plural wording.\ agree    |
 | p0123 | Child's panties<br>ბავშვის ტრუსი | Child's panties<br>ბავშვის ტრუსები | Link | English unchanged; Georgian singular/plural wording. |
 | p0124 | Woman’s headwear<br>ქუდი ქალის | — | Split | No matching product name in either language. |
 | p0125 | Man’s headwear<br>ქუდი კაცის | — | Split | No matching product name in either language. |
@@ -36,38 +36,38 @@ Geostat says the [2018 basket was identical to 2017’s](https://www.geostat.ge/
 
 | ID | Current (English / Georgian) | Earlier candidate (English / Georgian) | Proposal | Reason |
 | --- | --- | --- | --- | --- |
-| p0029 | Manufactured milk<br>ქარხნული რძე | Pasteurized milk<br>პასტერიზებული რძე | Split | The description changes the type of milk; same row and unchanged basket count do not prove an unchanged specification. |
-| p0030 | Condensed milk and milk containing product<br>შესქელებული რძე და რძის შემცველი პროდუქტი | Condensed milk<br>შესქელებული რძე | Split | Current description is broader. |
-| p0038 | Butter and spread<br>კარაქი და სპრედი | Butter<br>კარაქი | Split | Current description adds spread. |
+| p0029 | Manufactured milk<br>ქარხნული რძე | Pasteurized milk<br>პასტერიზებული რძე | Split -llink || The description changes the type of milk; same row and unchanged basket count do not prove an unchanged specification.  |
+| p0030 | Condensed milk and milk containing product<br>შესქელებული რძე და რძის შემცველი პროდუქტი | Condensed milk<br>შესქელებული რძე | Split-link   | Current description is broader. |
+| p0038 | Butter and spread<br>კარაქი და სპრედი | Butter<br>კარაქი | Split-link   | Current description adds spread. |
 | p0220 | Diesel fuel<br>დიზელის საწვავი | Diesel<br>დიზელის საწვავი | Link | Georgian name and row unchanged; English wording clarifies the same fuel. |
 
 ## 2019 boundary: 23 products
 
 | ID | Current (English / Georgian) | Earlier candidate (English / Georgian) | Proposal | Reason |
 | --- | --- | --- | --- | --- |
-| p0007 | Cookies<br>ნამცხვარი | Cake<br>ნამცხვარი | Split | Different English product descriptions despite unchanged Georgian name. |
-| p0009 | Rusk<br>ორცხობილა | Toast<br>ორცხობილა | Split | Similar but not verified as the same product. |
-| p0010 | Khachapuri at a bakery<br>ხაჭაპური საცხობში | — | Split | Point of sale is part of the current description. |
+| p0007 | Cookies<br>ნამცხვარი | Cake<br>ნამცხვარი | Split-link   | Different English product descriptions despite unchanged Georgian name. |
+| p0009 | Rusk<br>ორცხობილა | Toast<br>ორცხობილა | Split-link   | Similar but not verified as the same product. |
+| p0010 | Khachapuri at a bakery<br>ხაჭაპური საცხობში | — | Split | Point of sale is part of the current description.-therewasnokachapuribefore?           |
 | p0020 | Meat dumplings (semi-prepared food)<br>პელმენი (ნახევარფაბრიკატი) | Meat dumplings (semi-prepared food)<br>პილმენი (ნახევარფაბრიკატი) | Link | Georgian spelling changed; English unchanged. |
-| p0033 | Cheese Imeruli<br>იმერული ყველი | Fresh cheese<br>მოუხდელი ყველი | Split | Current description names a specific cheese. |
+| p0033 | Cheese Imeruli<br>იმერული ყველი | Fresh cheese<br>მოუხდელი ყველი | Split-link   | Current description names a specific cheese. |
 | p0034 | Cheese Sulguni<br>სულგუნი | Sulguni (cheese)<br>სულგუნი | Link | Georgian unchanged; English word order changed. |
 | p0065 | Watermelon<br>საზამთრო | Water-melon<br>საზამთრო | Link | Georgian unchanged; English hyphen changed. |
 | p0088 | Mineral water (sparkling)<br>მინერალური წყალი (გაზირებული) | — | Split | Current description adds a sparkling subtype. |
-| p0089 | Mineral water (still)<br>მინერალური წყალი (არაგაზირებული) | Mineral water<br>მინერალური წყალი | Split | Current description adds a still subtype. |
+| p0089 | Mineral water (still)<br>მინერალური წყალი (არაგაზირებული) | Mineral water<br>მინერალური წყალი | Split-ლინკthistop0088        | Current description adds a still subtype. |
 | p0091 | Drinks of Coca-cola type<br>კოლას ტიპის სასმელები | Drinks of Coca-cola type<br>კოლა-ს ტიპის სასმელები | Link | English unchanged; Georgian punctuation changed. |
 | p0096 | Bottled wine<br>ღვინო ბოთლებში ჩამოსხმული | Wine, bottled<br>ღვინო ბოთლებში ჩამოსხმული | Link | Georgian unchanged; English word order changed. |
 | p0108 | Woman's demi-season jacket<br>ქალის დემისეზონური ქურთუკი | Woman's light jacket (for winter and spring use)<br>ქალის დემისეზონური ქურთუკი | Link | Georgian unchanged; English seasonal wording shortened. |
 | p0133 | Woman's demi-season shoes<br>ქალის დემისეზონური ფეხსაცმელი | Woman shoes for spring and autumn season<br>ქალის დემისეზონური ფეხსაცმელი | Link | Georgian unchanged; English seasonal wording changed. |
 | p0170 | Gas heater<br>გაზის გამათბობელი | — | Split | No matching unmatched product in either language. |
 | p0179 | Coffee cup with saucer<br>ყავის ფინჯანი ლამბაქით | Coffee set<br>ყავის სერვიზი | Split | Single cup and set are different descriptions. |
-| p0187 | Detergents for dishes<br>ჭურჭლის სინთეტიკური სარეცხი საშუალებები | Detergent jelly for dishes<br>ჭურჭლის სინთეტიკური სარეცხი საშუალებები | Split | Current English description is broader, despite unchanged Georgian name. |
+| p0187 | Detergents for dishes<br>ჭურჭლის სინთეტიკური სარეცხი საშუალებები | Detergent jelly for dishes<br>ჭურჭლის სინთეტიკური სარეცხი საშუალებები | Split-link   | Current English description is broader, despite unchanged Georgian name. |
 | p0203 | Eyeglass lens<br>სათვალის ლინზები | Glass lens<br>სათვალის ლინზები | Link | Georgian unchanged; English label clarifies the lens use. |
 | p0214 | New motor car<br>ახალი მსუბუქი ავტომობილი | New motor cars<br>ახალი მსუბუქი ავტომობილი | Link | Georgian unchanged; English singular/plural wording. |
 | p0215 | Used motor car<br>მეორადი მოხმარების მსუბუქი ავტომობილი | Used motor cars<br>მეორადი მოხმარების მსუბუქი ავტომობილი | Link | Georgian unchanged; English singular/plural wording. |
-| p0244 | Toy<br>ბავშვის სათამაშო | Doll<br>თოჯინა | Split | Current description is broader. |
+| p0244 | Toy<br>ბავშვის სათამაშო | Doll<br>თოჯინა | Split-link | Current description is broader. |
 | p0248 | Sports shoes<br>სპორტული ფეხსაცმელი | Sporting shoes<br>სპორტული ფეხსაცმელი | Link | Georgian unchanged; equivalent English wording. |
 | p0249 | Child's sports shoes<br>ბავშვის სპორტული ფეხსაცმელი | Child's sporting shoes<br>ბავშვის სპორტული ფეხსაცმელი | Link | Georgian unchanged; equivalent English wording. |
-| p0279 | Khinkali in Restaurant<br>ხინკალი რესტორანში | Khinkali in sakhinkle<br>ხინკალი სახინკლეში | Split | Different venue named in source labels. |
+| p0279 | Khinkali in Restaurant<br>ხინკალი რესტორანში | Khinkali in sakhinkle<br>ხინკალი სახინკლეში | Split-link | Different venue named in source labels. |
 
 ## 2020 and 2023 boundaries: 3 products
 
