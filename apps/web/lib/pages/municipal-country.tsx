@@ -68,6 +68,7 @@ export async function renderMunicipalCountry(locale: Locale) {
     servedMunicipalData;
   const { sourceDocuments } = landingData;
   const { firstYear, latestYear, latestTotal } = buildGeorgiaPageFacts(servedMunicipalData);
+  const parentCoverage = coverageFromYears(totalFacts);
   const entityWorkbookSources = scopeMunicipalWorkbookSources(
     workbookSources,
     {
@@ -93,7 +94,11 @@ export async function renderMunicipalCountry(locale: Locale) {
       <JsonLd
         data={explorerDatasetJsonLd({ locale,
           datasetId: "municipal-expenditure",
-          partOfPath: "/explorer/municipalities",
+          partOf: {
+            path: "/explorer/municipalities",
+            name: message(messages, "municipal.indexDatasetName"),
+            description: message(messages, "municipal.metaIndexDescription", { first: parentCoverage.firstYear, last: parentCoverage.lastYear }),
+          },
           // catalogue.json qualifies gel_per_resident: it exists for municipality
           // and region totals, "not for the country aggregate". This page is that
           // aggregate, so claiming the measure here would be a false claim.

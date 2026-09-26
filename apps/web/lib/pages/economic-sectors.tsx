@@ -22,7 +22,7 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 
 export async function economicSectorsPageMetadata(locale: Locale) {
   const messages = await getMessages(locale,["sectors"]);
-  return fiscalMetadata({locale,path:"/explorer/economy/sectors",title:message(messages,"sectors.heading"),description:message(messages,"sectors.nominalContext")});
+  return fiscalMetadata({locale,path:"/explorer/economy/sectors",title:message(messages,"sectors.metaTitle"),description:message(messages,"sectors.metaDescription")});
 }
 export async function renderEconomicSectorsPage(locale: Locale) {
   const root=path.resolve(/* turbopackIgnore: true */ process.cwd(),"../..");

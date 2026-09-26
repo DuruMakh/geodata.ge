@@ -106,3 +106,21 @@ describe("methodology article data loading", () => {
     expect(loadServedGovernmentDebtData).toHaveBeenCalledTimes(2);
   });
 });
+
+describe("methodology footer attribution", () => {
+  it.each([
+    ["inflation", "Geostat and the National Bank of Georgia"],
+    ["gdp", "World Bank and Geostat"],
+    ["economic-sectors", "Geostat"],
+    ["regional-economies", "Geostat"],
+  ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle("en", { params: Promise.resolve({ dataset }) }));
+    const footer = markup.match(/<footer[\s\S]*?<\/footer>/)?.[0] ?? "";
+    expect(footer).toContain(source);
+    expect(footer).not.toContain("Ministry of Finance");
+    expect(footer).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+    const header = markup.match(/<header[\s\S]*?<\/header>/)?.[0] ?? "";
+    expect(header).toContain(`Last methodology review · ${METHODOLOGY_CONTENT[dataset as keyof typeof METHODOLOGY_CONTENT].reviewedAt}`);
+  });
+});

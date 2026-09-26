@@ -6,13 +6,20 @@ import { message } from "../../lib/i18n/messages";
 import { splitLanguagePath } from "../../lib/i18n/routes";
 import type { Locale } from "../../lib/i18n/types";
 
-export function ExplorerFooter({updatedAt,locale}:{updatedAt:string;locale:Locale}) {
+export function ExplorerFooter({locale}:{locale:Locale}) {
   // The messages come from the layout's provider. Importing common.server.ts
   // here bundled BOTH locales' common catalogue into every explorer route.
   const {messages}=useI18n();
   const {pathname}=splitLanguagePath(usePathname());
   const economy=pathname==='/explorer/economy'||pathname.startsWith('/explorer/economy/');
   const inflation=pathname==='/explorer/inflation'||pathname.startsWith('/explorer/inflation/');
-  const noteKey=inflation?'common.inflationSourceNote':economy?(pathname==='/explorer/economy/sectors'?'common.sectorsSourceNote':'common.economySourceNote'):null;
-  return <SiteFooterView updatedAt={updatedAt} locale={locale} messages={messages} sourceNote={noteKey?message(messages,noteKey,{updatedAt:'{updatedAt}'}):undefined}/>;
+  let noteKey='common.budgetSourceNote';
+  if (pathname==='/explorer') noteKey='common.budgetHubSourceNote';
+  else if (pathname==='/explorer/deficit') noteKey='common.deficitSourceNote';
+  else if (pathname==='/explorer/inflation/categories') noteKey='common.geostatSourceNote';
+  else if (inflation) noteKey='common.inflationSourceNote';
+  else if (pathname==='/explorer/economy/sectors'||pathname==='/explorer/economy/regions'||pathname.startsWith('/explorer/economy/regions/')) noteKey='common.geostatSourceNote';
+  else if (economy) noteKey='common.economySourceNote';
+  else if (['/explorer/expenditure','/explorer/revenue','/explorer/debt','/explorer/municipalities'].includes(pathname)) noteKey='common.budgetStatisticsSourceNote';
+  return <SiteFooterView locale={locale} messages={messages} sourceNote={message(messages,noteKey)}/>;
 }
