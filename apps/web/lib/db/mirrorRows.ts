@@ -6,7 +6,7 @@ import type {
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { NationalGdpFact } from "../data/nationalGdp/types";
-import type { BasketWeightRow, CpiCategoryFact, CpiFact, InflationTargetRow } from "../data/inflation/types";
+import type { BasketWeightRow, CpiCategoryFact, CpiCityFact, CpiFact, InflationTargetRow } from "../data/inflation/types";
 import type {
   ServedGeneralGovernmentBalanceFact,
   ServedGovernmentDebtFact,
@@ -559,6 +559,21 @@ export async function loadInflationBasketWeightsFromMirror(db: MirrorClient): Pr
     year: row.year,
     weightPct: row.weightPct.toFixed(),
     sourceId: row.sourceDocumentId,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export async function loadInflationCityFactsFromMirror(db: MirrorClient): Promise<CpiCityFact[]> {
+  const rows = await db.inflationCityFact.findMany({ orderBy: [{ cityId: "asc" }, { seriesId: "asc" }, { measure: "asc" }, { period: "asc" }] });
+  return rows.map((row) => ({
+    cityId: row.cityId as CpiCityFact["cityId"],
+    seriesId: row.seriesId,
+    measure: row.measure as CpiCityFact["measure"],
+    period: row.period,
+    value: row.value.toFixed(),
+    status: row.status as CpiCityFact["status"],
+    sourceId: row.sourceDocumentId,
+    sourceLocator: row.sourceLocator,
     lastReviewedAt: isoDate(row.lastReviewedAt),
   }));
 }

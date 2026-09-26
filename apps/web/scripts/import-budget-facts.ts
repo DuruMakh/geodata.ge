@@ -9,6 +9,7 @@ import {
   assertInflationParity,
   loadBasketWeights,
   loadCpiCategoryFacts,
+  loadCpiCityFacts,
   loadCpiFacts,
   loadInflationTargets,
 } from "../lib/data/inflation/importInflation";
@@ -16,6 +17,7 @@ import {
   loadEconomicSectorFactsFromMirror,
   loadInflationBasketWeightsFromMirror,
   loadInflationCategoryFactsFromMirror,
+  loadInflationCityFactsFromMirror,
   loadInflationCpiFactsFromMirror,
   loadInflationTargetsFromMirror,
   loadRegionalEconomyFactsFromMirror,
@@ -252,9 +254,10 @@ async function main() {
   const inflationTargets = await loadInflationTargets(SERVED_DATA_FILES.inflationTargets);
   const inflationCategoryFacts = await loadCpiCategoryFacts(SERVED_DATA_FILES.inflationCategoryFacts);
   const inflationBasketWeights = await loadBasketWeights(SERVED_DATA_FILES.inflationBasketWeights);
+  const inflationCityFacts = await loadCpiCityFacts(SERVED_DATA_FILES.inflationCityFacts);
   assertSubset(
     "Inflation source IDs",
-    [...inflationCpiFacts, ...inflationTargets, ...inflationCategoryFacts, ...inflationBasketWeights].map((row) => row.sourceId),
+    [...inflationCpiFacts, ...inflationTargets, ...inflationCategoryFacts, ...inflationBasketWeights, ...inflationCityFacts].map((row) => row.sourceId),
     sourceIds,
   );
 
@@ -412,6 +415,7 @@ async function main() {
         await tx.inflationTarget.deleteMany();
         await tx.inflationCategoryFact.deleteMany();
         await tx.inflationBasketWeight.deleteMany();
+        await tx.inflationCityFact.deleteMany();
         await tx.generalGovernmentBalanceFact.deleteMany();
         await tx.budgetItem.deleteMany();
         await tx.adminSpendingCategory.deleteMany();
@@ -712,11 +716,20 @@ async function main() {
             importRunId: run.id,
           })),
         });
+        await tx.inflationCityFact.createMany({
+          data: inflationCityFacts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
+            ...fact,
+            sourceDocumentId: sourceId,
+            lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`),
+            importRunId: run.id,
+          })),
+        });
         const mirrorInflation = {
           facts: await loadInflationCpiFactsFromMirror(tx),
           targets: await loadInflationTargetsFromMirror(tx),
           categories: await loadInflationCategoryFactsFromMirror(tx),
           weights: await loadInflationBasketWeightsFromMirror(tx),
+          cities: await loadInflationCityFactsFromMirror(tx),
         };
         assertInflationParity(
           {
@@ -724,6 +737,7 @@ async function main() {
             targets: inflationTargets,
             categories: inflationCategoryFacts,
             weights: inflationBasketWeights,
+            cities: inflationCityFacts,
           },
           mirrorInflation,
         );
@@ -924,6 +938,7 @@ async function main() {
             { table: "InflationTarget", csvRows: inflationTargets.length, dbRows: mirrorInflation.targets.length },
             { table: "InflationCategoryFact", csvRows: inflationCategoryFacts.length, dbRows: mirrorInflation.categories.length },
             { table: "InflationBasketWeight", csvRows: inflationBasketWeights.length, dbRows: mirrorInflation.weights.length },
+            { table: "InflationCityFact", csvRows: inflationCityFacts.length, dbRows: mirrorInflation.cities.length },
             {
               table: "GeneralGovernmentBalanceFact",
               csvRows: generalGovernmentBalanceFacts.length,
