@@ -73,10 +73,12 @@ describe("section 14.3 bilingual reference fixture", () => {
   // GDP year, a preliminary one, a sector share of GDP, and a missing growth year.
   // Six more on 2026-09-14 for inflation: a published month, a refused core index,
   // an unverified early target, contributions with their residual, a two-month
-  // point change, and a division ranking.
-  it("covers 37 intents, each asked in both languages", () => {
-    expect(REFERENCE_INTENTS).toHaveLength(37);
-    expect(REFERENCE_INTENTS.map((intent) => intent.id)).toEqual(Array.from({ length: 37 }, (_, i) => i + 1));
+  // point change, and a division ranking. Three more on 2026-09-27 for city
+  // inflation: a single city's total, a cross-city food ranking, and a city's
+  // late-starting series reported missing rather than filled.
+  it("covers 40 intents, each asked in both languages", () => {
+    expect(REFERENCE_INTENTS).toHaveLength(40);
+    expect(REFERENCE_INTENTS.map((intent) => intent.id)).toEqual(Array.from({ length: 40 }, (_, i) => i + 1));
 
     for (const intent of REFERENCE_INTENTS) {
       expect(intent.promptKa.length, `intent ${intent.id} promptKa`).toBeGreaterThan(10);
