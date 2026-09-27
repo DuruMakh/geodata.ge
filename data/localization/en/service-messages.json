@@ -1,4 +1,6 @@
 {
+  "errors.rankInflationCityInput": "An inflation city ranking needs entityType city and exactly one seriesId (cpi.headline or cpi.cat.01–12).",
+  "ranking.inflationCities": "The six cities where Geostat records prices; Georgia's national rate is not a candidate.",
   "caveats.inflation_city_central_prices": "Some prices — fuel, medicines, cars, mobile tariffs, flights and train fares — are recorded once and applied to every city, so city differences in those items are not measured differences.",
   "caveats.inflation_contribution_derived": "Contributions are Fiscal.ge's approximation from Geostat's published price changes and basket weights, not a figure Geostat publishes.",
   "caveats.inflation_contribution_residual": "The residual is the published headline minus the contributions returned: everything not requested, any requested group without a contribution that month, and approximation error; it is not a category of goods.",
@@ -123,7 +125,7 @@
   "errors.measureSeriesMismatch": "Measure \"{measure}\" does not apply to series: {mismatched}.",
   "errors.rankAmountChanges": "absolute_change and percentage_change apply to GEL amounts; use percentage_point_change for a percentage measure.",
   "errors.rankChangeYears": "A change ranking takes fromYear and toYear, not a single year.",
-  "errors.rankDimension": "Municipal data ranks by \"entities\"; every other dataset ranks by \"series\".",
+  "errors.rankDimension": "Municipal data ranks by \"entities\"; inflation ranks COICOP groups by \"series\" or cities by \"entities\"; every other dataset ranks by \"series\".",
   "errors.rankMixedBasis": "The eligible rows mix actual and planned bases; a single unqualified ordering is not returned.",
   "errors.rankMunicipalInput": "A municipal ranking requires entityType and exactly one seriesId.",
   "errors.rankNoCandidates": "No rankable series or entity matches these parameters.",

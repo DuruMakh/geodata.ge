@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { compare } from "../../lib/factQuery/compare";
+import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { queryInflation, inflationCellCount } from "../../lib/factQuery/queryInflation";
+import { rank } from "../../lib/factQuery/rank";
+import { SCHEMA_VERSION } from "../../lib/factQuery/types";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 
 const snapshot = loadPackagedSnapshot();
@@ -47,5 +51,35 @@ describe("query_inflation for cities", () => {
 
   it("counts cells across entities", () => {
     expect(inflationCellCount({ entityIds: ["city.gori", "city.telavi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-01", toPeriod: "2026-08" })).toBe(16);
+  });
+});
+
+describe("city rankings, comparisons and coverage", () => {
+  it("ranks the six cities for one series and month, without Georgia", () => {
+    const response = rank(snapshot, { datasetId: "inflation", dimension: "entities", entityType: "city", seriesId: "cpi.cat.01", period: "2026-08", measure: "yoy_pct", metric: "value", limit: 3 });
+    const data = (response as { data: { entries: { entityId: string; value: number }[]; universe: { candidateCount: number } } }).data;
+    expect(data.entries.map((entry) => entry.entityId)).toEqual(["city.kutaisi", "city.batumi", "city.tbilisi"]);
+    expect(data.entries.map((entry) => entry.value)).toEqual([6.507, 5.9542, 4.8642]);
+    expect(data.universe.candidateCount).toBe(6);
+  });
+
+  it("refuses a city ranking without one seriesId", () => {
+    expect(rank(snapshot, { datasetId: "inflation", dimension: "entities", entityType: "city", period: "2026-08", measure: "yoy_pct", metric: "value" }).kind).toBe("error");
+  });
+
+  it("compares one city between two months", () => {
+    const response = compare(snapshot, { target: { dataset: "inflation", seriesIds: ["cpi.headline"], entityIds: ["city.batumi"] }, fromPeriod: "2025-08", toPeriod: "2026-08", measure: "yoy_pct" });
+    expect(response.kind).toBe("comparisons");
+  });
+
+  it("lists the cities as inflation entities with their coverage", () => {
+    const response = describeCoverage(snapshot, { datasetId: "inflation" });
+    const entities = (response as { data: { entities?: { entityId: string; entityType: string; periods?: [string, string] }[] } }).data.entities!;
+    expect(entities.map((entity) => entity.entityId)).toEqual(["country.georgia", "city.tbilisi", "city.kutaisi", "city.batumi", "city.gori", "city.telavi", "city.zugdidi"]);
+    expect(entities.find((entity) => entity.entityId === "city.zugdidi")!.periods![0]).toBe("2016-01");
+  });
+
+  it("is schema 1.4.0", () => {
+    expect(SCHEMA_VERSION).toBe("1.4.0");
   });
 });

@@ -124,7 +124,7 @@ const dataShapes = {
   catalogue: z.object({
     datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), labelEn: z.string().min(1), years: z.tuple([z.number(), z.number()]), entityTypes: z.array(z.string()), measures: z.array(z.string()), periods: z.tuple([z.string(), z.string()]).optional(), measureNotes: z.record(z.string(), z.string()).optional(), measureNotesEn: z.record(z.string(), z.string()).optional(), measureNotesKa: z.record(z.string(), z.string()).optional() })),
 series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), yearsByMeasure: z.record(z.string(), z.array(z.number())).optional(), periods: z.tuple([z.string(), z.string()]).optional(), periodsByMeasure: z.record(z.string(), z.tuple([z.string(), z.string()])).optional(), datasetId: z.string().optional() })).optional(),
-    entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), labelEn: z.string().min(1), entitySlug: z.string().nullable(), datasetId: z.string().optional() })).optional(),
+    entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), labelEn: z.string().min(1), entitySlug: z.string().nullable(), periods: z.tuple([z.string(), z.string()]).optional(), datasetId: z.string().optional() })).optional(),
     exclusions: z.array(bilingualExcludedEntity),
   }),
   sources: z.object({

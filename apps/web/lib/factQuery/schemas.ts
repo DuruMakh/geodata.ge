@@ -58,7 +58,7 @@ export const queryInflationInput = z.strictObject({
 export const describeCoverageInput = z.strictObject({
   datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation"]).optional(),
   search: z.string().max(120).optional(),
-  entityType: z.enum(["country", "municipality", "region"]).optional(),
+  entityType: z.enum(["country", "municipality", "region", "city"]).optional(),
   level: z.enum(["admin_category", "major_program", "division", "subgroup"]).optional(),
   expectedDataVersion,
 });
@@ -117,7 +117,7 @@ export const compareInput = z
       z.strictObject({ dataset: z.literal("debt"), seriesIds: seriesIdList }),
       // No seriesIds: the balance dataset has exactly one series.
       z.strictObject({ dataset: z.literal("deficit") }),
-      z.strictObject({ dataset: z.literal("inflation"), seriesIds: seriesIdList }),
+      z.strictObject({ dataset: z.literal("inflation"), seriesIds: seriesIdList, entityIds: entityIdList.optional() }),
     ]),
     fromYear: z.number().int().optional(),
     toYear: z.number().int().optional(),
@@ -151,7 +151,7 @@ export const rankInput = z
     dimension: z.enum(["series", "entities"]),
     level: z.enum(["admin_category", "major_program", "division", "subgroup"]).optional(),
     parentSeriesId: z.string().optional().describe("For ministries with level major_program, or inflation with level subgroup: filters to that parent."),
-    entityType: z.enum(["municipality", "region"]).optional(),
+    entityType: z.enum(["municipality", "region", "city"]).optional(),
     seriesId: z.string().optional(),
     withinRegionId: z.string().optional().describe("Only for municipal rankings with entityType municipality; obtain the region id from describe_coverage."),
     year: z.number().int().optional(),
@@ -178,12 +178,13 @@ export const rankInput = z
     const inflation = input.datasetId === "inflation";
     const ministriesLevel = input.level === "admin_category" || input.level === "major_program";
     const inflationLevel = input.level === "division" || input.level === "subgroup";
-    if (inflation && input.level === undefined) {
+    const inflationCities = inflation && input.dimension === "entities";
+    if (inflation && !inflationCities && input.level === undefined) {
       context.addIssue({ code: "custom", path: ["level"], message: "inflation rankings need level division or subgroup." });
     }
     const invalid = [
-      !municipal && input.entityType !== undefined ? "entityType" : null,
-      !municipal && input.seriesId !== undefined ? "seriesId" : null,
+      !(municipal || inflationCities) && input.entityType !== undefined ? "entityType" : null,
+      !(municipal || inflationCities) && input.seriesId !== undefined ? "seriesId" : null,
       (!municipal || input.entityType !== "municipality") && input.withinRegionId !== undefined ? "withinRegionId" : null,
       input.level !== undefined && !(ministries && ministriesLevel) && !(inflation && inflationLevel) ? "level" : null,
       input.parentSeriesId !== undefined && !(ministries && input.level === "major_program") && !(inflation && input.level === "subgroup") ? "parentSeriesId" : null,
@@ -193,6 +194,9 @@ export const rankInput = z
       // stray field must be refused, never silently ignored.
       inflation && input.metric === "value" && (input.fromPeriod !== undefined || input.toPeriod !== undefined) ? "fromPeriod" : null,
       inflation && input.metric !== "value" && input.period !== undefined ? "period" : null,
+      inflationCities && input.entityType !== "city" ? "entityType" : null,
+      municipal && input.entityType === "city" ? "entityType" : null,
+      inflationCities && input.level !== undefined ? "level" : null,
     ];
     for (const field of invalid) {
       if (field !== null) context.addIssue({ code: "custom", path: [field], message: `${field} does not apply to this ranking mode; omit it or choose its supported mode.` });

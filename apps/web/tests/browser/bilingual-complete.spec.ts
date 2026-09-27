@@ -18,7 +18,7 @@ test("the English explorer, language switch and shared bilingual publication agr
   const response = await request.get("/downloads/data/national-expenditure.json");
   expect(response.status()).toBe(200);
   const data = await response.json();
-  expect(data.schemaVersion).toBe("1.3.0");
+  expect(data.schemaVersion).toBe("1.4.0");
   const education = data.observations.find((row: { year: number; seriesId: string }) => row.year === 2025 && row.seriesId === "spending.education");
   expect(education.value).toBe(3045941254);
   expect(education.seriesLabelEn).toBe("Education");
