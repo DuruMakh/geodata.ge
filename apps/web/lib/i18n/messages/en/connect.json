@@ -1,6 +1,6 @@
 {
   "connect.inflationCoverage": "Consumer price inflation, monthly — {nationalRange}; {groupCount} COICOP groups; basket weights {weightRange}; contributions from {contributionStart}; National Bank of Georgia target from {targetStart}.",
-  "connect.inflationQuery": "Use query_inflation with fromPeriod and toPeriod (YYYY-MM) and one measure: yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct or contribution_pp. compare takes two months; rank orders divisions or subgroups in one month. Contributions are Fiscal.ge's approximation, not Geostat figures.",
+  "connect.inflationQuery": "Use query_inflation with fromPeriod and toPeriod (YYYY-MM) and one measure: yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct or contribution_pp. compare takes two months; rank orders divisions or subgroups in one month. Contributions are Fiscal.ge's approximation, not Geostat figures. Optional entityIds answers for a city instead of Georgia; rank with entityType city ranks the six cities.",
   "connect.inflationCategoriesMetadata": "Categories metadata",
   "connect.inflationCitiesCsv": "Cities (CSV)",
   "connect.inflationCitiesMetadata": "Cities metadata",

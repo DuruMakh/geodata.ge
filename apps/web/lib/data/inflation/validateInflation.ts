@@ -361,7 +361,7 @@ export function chainIndex(mom: Map<number, number>): Map<number, number> {
 }
 
 // A tripwire for a shifted column, not an accuracy claim: the 2026-08 vintage
-// agrees with its own m/m chain within 0.0002 pp in every city.
+// agrees with its own m/m chain within ≤ 0.0004 pp in every city.
 export const CITY_CONSISTENCY_TOLERANCE_PP = 0.01;
 
 export function cityConsistencyError(series: { yoy: Map<number, number>; mom: Map<number, number>; avg12: Map<number, number> }): { maxPp: number; comparisons: number } {

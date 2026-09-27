@@ -1,6 +1,6 @@
 {
   "connect.inflationCoverage": "სამომხმარებლო ფასების ინფლაცია, თვიური — {nationalRange}; {groupCount} COICOP ჯგუფი; კალათის წილები {weightRange}; წვლილები {contributionStart}-დან; ეროვნული ბანკის მიზნობრივი მაჩვენებელი {targetStart}-დან.",
-  "connect.inflationQuery": "query_inflation აბრუნებს fromPeriod-დან toPeriod-მდე (YYYY-MM) ერთ მაჩვენებელს: yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct ან contribution_pp. compare ადარებს ორ თვეს; rank ალაგებს განყოფილებებს ან ქვეჯგუფებს ერთ თვეში. წვლილები Fiscal.ge-ის მიერ მიახლოებით გამოთვლილია და საქსტატის მაჩვენებელი არ არის.",
+  "connect.inflationQuery": "query_inflation აბრუნებს fromPeriod-დან toPeriod-მდე (YYYY-MM) ერთ მაჩვენებელს: yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct ან contribution_pp. compare ადარებს ორ თვეს; rank ალაგებს განყოფილებებს ან ქვეჯგუფებს ერთ თვეში. წვლილები Fiscal.ge-ის მიერ მიახლოებით გამოთვლილია და საქსტატის მაჩვენებელი არ არის. არასავალდებულო entityIds პასუხობს ერთი ქალაქისთვის, საქართველოს ნაცვლად; entityType city-ით rank ალაგებს ექვს ქალაქს.",
   "connect.inflationCategoriesMetadata": "კატეგორიების მეტამონაცემები",
   "connect.inflationCitiesCsv": "ქალაქები (CSV)",
   "connect.inflationCitiesMetadata": "ქალაქების მეტამონაცემები",
