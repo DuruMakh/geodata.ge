@@ -329,10 +329,12 @@ const GEORGIA = "country.georgia";
 // silently truncated.
 const CITY_FORMULA_SHEETS = new Set<string>(["city.zugdidi:yoy"]);
 
-// The mirror's own storage precision (DECIMAL(20,6)), and validateCityFacts'
-// limit — never a display or rounding preference invented here.
+// Four decimals: the precision every other city and national value already
+// carries (the typed sheets), not the mirror's wider DECIMAL(20,6) column or
+// validateCityFacts' six-decimal ceiling — rounding to those would keep this
+// one sheet's formula noise instead of matching the rest.
 function cityValue(line: string, role: (typeof CITY_ROLES)[number], raw: string): string {
-  return line !== GEORGIA && CITY_FORMULA_SHEETS.has(`${line}:${role}`) ? new Decimal(raw).toDecimalPlaces(6).toFixed() : raw;
+  return line !== GEORGIA && CITY_FORMULA_SHEETS.has(`${line}:${role}`) ? new Decimal(raw).toDecimalPlaces(4).toFixed() : raw;
 }
 
 /**
