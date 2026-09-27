@@ -48,7 +48,18 @@ test("Zugdidi's annual series starts late and is never filled", async ({ page })
   await page.goto(`/en${CITIES}#i=yoy&m=table&c=total&t=zugdidi`);
   await ready(page);
   await expect(page.getByTestId("inflation-city-table-series-city.zugdidi")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("month-grid")).toContainText("—");
+  // Zugdidi's y/y series starts 2016-12: Jan-Nov 2016 are missing (never a filled
+  // 0), December is the first real value.
+  const row2016 = page.locator('[data-testid="month-grid-row"][data-year="2016"]');
+  await expect(row2016).toBeVisible();
+  const monthCells = row2016.locator("td");
+  for (let month = 0; month < 11; month += 1) {
+    await expect(monthCells.nth(month)).toHaveText("—");
+    await expect(monthCells.nth(month)).not.toHaveAttribute("data-testid", "month-grid-cell");
+  }
+  const december = monthCells.nth(11);
+  await expect(december).toHaveAttribute("data-testid", "month-grid-cell");
+  await expect(december).not.toHaveText("—");
 });
 
 test("clearing the selection can be undone from the same control", async ({ page }) => {
