@@ -123,6 +123,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "missing.totalDenominator",
   "publication.catalogueNotice",
   "publication.inflationCategoriesNotice",
+  "publication.inflationCitiesNotice",
   "publication.sourcesNotice",
   "publication.sumWarning",
   "ranking.ascending",

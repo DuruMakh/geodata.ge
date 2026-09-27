@@ -72,4 +72,27 @@ describe("inflation publications", () => {
   it("adds inflation to the published catalogue", () => {
     expect(json("catalogue.json").datasets.map((d: { datasetId: string }) => d.datasetId)).toContain("inflation");
   });
+
+  it("publishes the city CSV and its metadata", () => {
+    const files = buildAllPublications(snapshot);
+    const csv = files.find((file) => file.fileName === "inflation-cities.csv")!;
+    const json = JSON.parse(files.find((file) => file.fileName === "inflation-cities.json")!.bytes.toString("utf8"));
+    const text = csv.bytes.toString("utf8");
+    expect(text.startsWith("﻿entity_id,series_id,measure,period,value,unit,status,source_ids\n")).toBe(true);
+    expect(csv.rowCount).toBe(20570);
+    expect(text).toContain("city.batumi,cpi.headline,yoy_pct,2026-08,7.0857,percent,published,source.geostat_cpi_yoy");
+    expect(text).not.toContain("country.georgia");
+    expect(json).toMatchObject({ datasetId: "inflation", data: { url: "/downloads/data/inflation-cities.csv", rowCount: 20570 } });
+    // Two fields legitimately say "weight" in prose without publishing any
+    // city weight: `catalogue` is the shared inflation-dataset catalogue
+    // (also embedded in inflation-categories.json and inflation-national.json)
+    // and lists every measure the whole dataset supports, including the
+    // national-only basket_weight_pct; `notice`/`noticeEn` are the brief's
+    // mandated caveat text, which states in prose that Geostat does not
+    // publish city weights - the exact fact this test exists to enforce. What
+    // must stay clean of any weight reference is everything this file defines
+    // and publishes on its own: definitions, data, sources and caveats.
+    const { catalogue: _catalogue, notice: _notice, noticeEn: _noticeEn, ...ownContent } = json;
+    expect(JSON.stringify(ownContent)).not.toMatch(/weight/i);
+  });
 });

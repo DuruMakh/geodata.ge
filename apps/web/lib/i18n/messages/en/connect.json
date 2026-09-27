@@ -2,6 +2,8 @@
   "connect.inflationCoverage": "Consumer price inflation, monthly — {nationalRange}; {groupCount} COICOP groups; basket weights {weightRange}; contributions from {contributionStart}; National Bank of Georgia target from {targetStart}.",
   "connect.inflationQuery": "Use query_inflation with fromPeriod and toPeriod (YYYY-MM) and one measure: yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct or contribution_pp. compare takes two months; rank orders divisions or subgroups in one month. Contributions are Fiscal.ge's approximation, not Geostat figures.",
   "connect.inflationCategoriesMetadata": "Categories metadata",
+  "connect.inflationCitiesCsv": "Cities (CSV)",
+  "connect.inflationCitiesMetadata": "Cities metadata",
   "connect.inflationMethodology": "Inflation methodology",
   "connect.sectorCoverage": "Economic sectors, {count} national activities plus Total GDP — nominal GEL {nominalRange}; GDP shares {shareRange}; annual real growth {growthRange}.",
   "connect.sectorQuery": "Use query_economic_sectors for selected national activities, years and one measure: amount_gel, share_of_gdp_pct or real_growth_pct. Sector rankings and cumulative comparisons are not supported. 2025 is preliminary; 2010 growth is missing. Percent values use 7.5 for 7.5%; growth rates must not be summed.",

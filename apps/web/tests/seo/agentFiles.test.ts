@@ -42,6 +42,8 @@ const requiredTargets = [
   "https://fiscal.ge/downloads/data/inflation-national.json",
   "https://fiscal.ge/downloads/data/inflation-categories.csv",
   "https://fiscal.ge/downloads/data/inflation-categories.json",
+  "https://fiscal.ge/downloads/data/inflation-cities.csv",
+  "https://fiscal.ge/downloads/data/inflation-cities.json",
   "https://fiscal.ge/downloads/data/manifest.json",
   "https://fiscal.ge/downloads/data/government-debt.json",
   "https://fiscal.ge/downloads/data/general-government-balance.json",

@@ -16,8 +16,9 @@ import { SECTOR_QUERY_MEASURES } from "./economicSectorsSeries";
 import { GDP_QUERY_SERIES } from "./gdpSeries";
 import { csvEscape } from "../data/csvEscape";
 import { CONTRIBUTION_FIRST_YEAR } from "../data/inflation/contributions";
+import { CITY_FIRST_PERIOD } from "../data/inflation/types";
 import { inflationSeriesCoverage, measurePeriodRange, periodsBetween, weightYearRange } from "./inflationData";
-import { INFLATION_DEFINITIONS, NATIONAL_SERIES, TARGET_SERIES_ID, type InflationMeasure } from "./inflationSeries";
+import { CITY_SERIES_MEASURES, INFLATION_DEFINITIONS, NATIONAL_SERIES, TARGET_SERIES_ID, type InflationMeasure } from "./inflationSeries";
 import { inflationObservations } from "./queryInflation";
 import { createHash } from "node:crypto";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
@@ -465,6 +466,8 @@ export function buildGdpCsv(snapshot: FactQuerySnapshot): PublicationArtifact {
 export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationArtifact[] {
   const inflationCategories = inflationCategoryParts(snapshot);
   const inflationCategoriesCsv = buildInflationCategoriesCsv(inflationCategories);
+  const inflationCities = inflationCityParts(snapshot);
+  const inflationCitiesCsv = buildInflationCitiesCsv(inflationCities);
   const artifacts = [
     buildCatalogueFile(snapshot),
     buildSourcesFile(snapshot),
@@ -487,6 +490,8 @@ export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationAr
     buildInflationNationalJson(snapshot),
     inflationCategoriesCsv,
     buildInflationCategoriesJson(snapshot, inflationCategories, inflationCategoriesCsv),
+    inflationCitiesCsv,
+    buildInflationCitiesJson(snapshot, inflationCities, inflationCitiesCsv),
   ];
   return [...artifacts, buildManifestFile(snapshot, artifacts)];
 }
@@ -737,4 +742,54 @@ function buildInflationCategoriesJson(snapshot: FactQuerySnapshot, parts: Inflat
     caveats: results.reduce<Caveat[]>((all, result) => mergeCaveats(all, result.meta.caveats), []),
   });
   return { fileName: "inflation-categories.json", bytes, rowCount: csv.rowCount };
+}
+
+export const INFLATION_CITIES_CSV_COLUMNS = ["entity_id", "series_id", "measure", "period", "value", "unit", "status", "source_ids"] as const;
+
+/** City cells per measure from 2016-01, through the one observation implementation; available cells only. */
+function inflationCityParts(snapshot: FactQuerySnapshot): FactQueryResponse[] {
+  const entityIds = snapshot.inflation.cityEntities.map((city) => city.id);
+  const last = measurePeriodRange(snapshot, "yoy_pct")![1];
+  const periods = periodsBetween(CITY_FIRST_PERIOD, last);
+  const divisions = Object.keys(CITY_SERIES_MEASURES);
+  return [
+    inflationObservations(snapshot, { entityIds, seriesIds: divisions, measure: "yoy_pct", periods }, { includeResidual: false }),
+    inflationObservations(snapshot, { entityIds, seriesIds: divisions, measure: "mom_pct", periods }, { includeResidual: false }),
+    inflationObservations(snapshot, { entityIds, seriesIds: ["cpi.headline"], measure: "avg12_pct", periods }, { includeResidual: false }),
+  ];
+}
+
+function buildInflationCitiesCsv(parts: FactQueryResponse[]): PublicationArtifact {
+  const lines: string[] = [];
+  for (const part of parts) {
+    for (const o of observationsOf(part, "inflation-cities.csv").data.observations) {
+      if (o.value === null) continue;
+      lines.push([o.entityId, o.seriesId, o.measure, o.period ?? "", String(o.value), o.unit, o.basis ?? "", o.sourceIds.join(";")].map(csvEscape).join(","));
+    }
+  }
+  const text = `﻿${INFLATION_CITIES_CSV_COLUMNS.join(",")}\n${lines.join("\n")}\n`;
+  return { fileName: "inflation-cities.csv", bytes: Buffer.from(text, "utf8"), rowCount: lines.length };
+}
+
+function buildInflationCitiesJson(snapshot: FactQuerySnapshot, parts: FactQueryResponse[], csv: PublicationArtifact): PublicationArtifact {
+  const results = parts.map((part) => observationsOf(part, "inflation-cities.json"));
+  const bytes = serialize({
+    ...publicationHeader(snapshot),
+    datasetId: "inflation",
+    notice: serviceMessage(snapshot, "ka", "publication.inflationCitiesNotice"),
+    noticeEn: serviceMessage(snapshot, "en", "publication.inflationCitiesNotice"),
+    catalogue: catalogueData(snapshot, "inflation"),
+    data: {
+      url: "/downloads/data/inflation-cities.csv",
+      mediaType: "text/csv",
+      columns: [...INFLATION_CITIES_CSV_COLUMNS],
+      rowCount: csv.rowCount,
+      byteSize: csv.bytes.byteLength,
+      sha256: sha256(csv.bytes),
+    },
+    definitions: { yoy_pct: INFLATION_DEFINITIONS.yoy_pct, mom_pct: INFLATION_DEFINITIONS.mom_pct, avg12_pct: INFLATION_DEFINITIONS.avg12_pct },
+    sources: results.reduce<ResolvedSource[]>((all, result) => mergeSources(all, result.meta.sources), []),
+    caveats: results.reduce<Caveat[]>((all, result) => mergeCaveats(all, result.meta.caveats), []),
+  });
+  return { fileName: "inflation-cities.json", bytes, rowCount: csv.rowCount };
 }

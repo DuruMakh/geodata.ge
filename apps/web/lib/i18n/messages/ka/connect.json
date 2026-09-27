@@ -2,6 +2,8 @@
   "connect.inflationCoverage": "სამომხმარებლო ფასების ინფლაცია, თვიური — {nationalRange}; {groupCount} COICOP ჯგუფი; კალათის წილები {weightRange}; წვლილები {contributionStart}-დან; ეროვნული ბანკის მიზნობრივი მაჩვენებელი {targetStart}-დან.",
   "connect.inflationQuery": "query_inflation აბრუნებს fromPeriod-დან toPeriod-მდე (YYYY-MM) ერთ მაჩვენებელს: yoy_pct, mom_pct, avg12_pct, index_2010, target_pct, basket_weight_pct ან contribution_pp. compare ადარებს ორ თვეს; rank ალაგებს განყოფილებებს ან ქვეჯგუფებს ერთ თვეში. წვლილები Fiscal.ge-ის მიერ მიახლოებით გამოთვლილია და საქსტატის მაჩვენებელი არ არის.",
   "connect.inflationCategoriesMetadata": "კატეგორიების მეტამონაცემები",
+  "connect.inflationCitiesCsv": "ქალაქები (CSV)",
+  "connect.inflationCitiesMetadata": "ქალაქების მეტამონაცემები",
   "connect.inflationMethodology": "ინფლაციის მეთოდოლოგია",
   "connect.sectorCoverage": "ეკონომიკური სექტორები, {count} ეროვნული საქმიანობა და მთლიანი მშპ — ნომინალური ლარი {nominalRange}; მშპ-ის წილები {shareRange}; წლიური რეალური ზრდა {growthRange}.",
   "connect.sectorQuery": "query_economic_sectors აბრუნებს შერჩეულ ეროვნულ საქმიანობებს, წლებსა და ერთ მაჩვენებელს: amount_gel, share_of_gdp_pct ან real_growth_pct. სექტორების რეიტინგები და კუმულაციური შედარებები მხარდაჭერილი არ არის. 2025 წლის მონაცემები წინასწარია; 2010 წლის ზრდა მიუწვდომელია. 7.5 ნიშნავს 7.5%-ს; ზრდის ტემპები არ ჯამდება.",

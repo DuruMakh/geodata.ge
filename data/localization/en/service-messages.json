@@ -154,6 +154,7 @@
   "missing.totalDenominator": "The applicable total for this year is unavailable or not positive, so the share cannot be calculated.",
   "publication.catalogueNotice": "This reviewed catalogue identifies the available datasets, entities and series. Numerical values are in the individual files.",
   "publication.inflationCategoriesNotice": "Rates never sum. The CSV holds year-on-year and month-on-month rates for every group, then contributions (contribution_pp) for the divisions and for the subgroups, each selection with its own residual. Contributions add up to the published headline only within one selection plus its cpi.contribution_residual row; summing across selections double-counts.",
+  "publication.inflationCitiesNotice": "Rates never sum. The CSV holds year-on-year and month-on-month rates for the total and the 12 divisions and the total's 12-month average, for the six cities from 2016-01. Georgia's national rate is in inflation-national.json and inflation-categories.csv. City weights are not published by Geostat and are not in this file.",
   "publication.sourcesNotice": "A document with role=\"derivation_upstream\" is an input to a calculation, not a publication of the final figure.",
   "publication.sumWarning": "This file contains totals and their component rows. Summing all rows double-counts amounts; use level and parentSeriesId.",
   "ranking.ascending": "ascending",
