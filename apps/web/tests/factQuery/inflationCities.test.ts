@@ -26,7 +26,7 @@ describe("query_inflation for cities", () => {
     const response = queryInflation(snapshot, { entityIds: ["city.zugdidi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2016-06", toPeriod: "2016-06" });
     expect(response.status).toBe("empty");
     expect(observations(response)[0]).toMatchObject({ value: null, availability: "missing" });
-    expect(observations(response)[0]!.missingReasonEn).toMatch(/2016-01/);
+    expect(observations(response)[0]!.missingReasonEn).toMatch(/2016-12/);
   });
 
   it("refuses what Geostat does not publish for cities", () => {
@@ -41,6 +41,26 @@ describe("query_inflation for cities", () => {
       expect(response.kind, JSON.stringify(request)).toBe("error");
     }
     expect((queryInflation(snapshot, { entityIds: ["city.rustavi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" }) as { error: { code: string } }).error.code).toBe("unknown_entity");
+  });
+
+  it("refuses a city subgroup request as unknown_series with the 13 city series ids", () => {
+    const response = queryInflation(snapshot, { entityIds: ["city.gori"], seriesIds: ["cpi.cat.01_1"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" }) as {
+      kind: string;
+      error: { code: string; validChoices: string[] };
+    };
+    expect(response.kind).toBe("error");
+    expect(response.error.code).toBe("unknown_series");
+    expect(response.error.validChoices).toEqual(["cpi.headline", ...Array.from({ length: 12 }, (_, index) => `cpi.cat.${String(index + 1).padStart(2, "0")}`)]);
+  });
+
+  it("refuses a city measure Geostat does not publish for that series as unsupported_measure with that series' choices", () => {
+    const response = queryInflation(snapshot, { entityIds: ["city.gori"], seriesIds: ["cpi.cat.01"], measure: "avg12_pct", fromPeriod: "2026-08", toPeriod: "2026-08" }) as {
+      kind: string;
+      error: { code: string; validChoices: string[] };
+    };
+    expect(response.kind).toBe("error");
+    expect(response.error.code).toBe("unsupported_measure");
+    expect(response.error.validChoices).toEqual(["yoy_pct", "mom_pct"]);
   });
 
   it("flags centrally priced items on city division cells", () => {

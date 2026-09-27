@@ -119,6 +119,30 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
     });
   }
 
+  if (hasCity) {
+    // A city publishes only cpi.headline and cpi.cat.01-12: a series outside that
+    // vocabulary is unknown for a city (not merely the wrong measure), and a
+    // measure outside that series' own city measures is unsupported (spec §11).
+    const cityUnknownSeriesIds = request.seriesIds.filter((id) => !Object.hasOwn(CITY_SERIES_MEASURES, id));
+    if (cityUnknownSeriesIds.length > 0) {
+      return errorResponse(snapshot, {
+        code: "unknown_series",
+        ...bilingual(snapshot, "errors.inflationCityInput"),
+        retryable: false,
+        validChoices: Object.keys(CITY_SERIES_MEASURES),
+      });
+    }
+    const cityMismatched = request.seriesIds.filter((id) => !CITY_SERIES_MEASURES[id]!.includes(measure));
+    if (cityMismatched.length > 0) {
+      return errorResponse(snapshot, {
+        code: "unsupported_measure",
+        ...bilingual(snapshot, "errors.inflationCityInput"),
+        retryable: false,
+        validChoices: [...CITY_SERIES_MEASURES[cityMismatched[0]!]!],
+      });
+    }
+  }
+
   const mismatched = request.seriesIds.filter((id) => !info.get(id)!.measures.includes(measure));
   if (mismatched.length > 0) {
     return errorResponse(snapshot, {
@@ -131,15 +155,6 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
 
   if (measure === "contribution_pp" && new Set(request.seriesIds.map((id) => info.get(id)!.level)).size > 1) {
     return errorResponse(snapshot, { code: "invalid_parameters", ...bilingual(snapshot, "errors.contributionMixedLevels"), retryable: false });
-  }
-
-  if (hasCity && request.seriesIds.some((id) => !(CITY_SERIES_MEASURES[id] ?? []).includes(measure))) {
-    return errorResponse(snapshot, {
-      code: "unsupported_measure",
-      ...bilingual(snapshot, "errors.inflationCityInput"),
-      retryable: false,
-      validChoices: ["yoy_pct", "mom_pct", "avg12_pct"],
-    });
   }
 
   const monthly = measure !== "basket_weight_pct";
@@ -178,13 +193,25 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
   const nationalFacts = new Map(snapshot.inflation.facts.filter((f) => f.measure === factMeasure).map((f) => [`${f.seriesId}|${f.period}`, f]));
   const categoryFacts = new Map(snapshot.inflation.categories.filter((f) => f.measure === factMeasure).map((f) => [`${f.categoryId}|${f.period}`, f]));
   const weights = new Map(snapshot.inflation.weights.map((row) => [`${row.categoryId}|${row.year}`, row]));
-  const cityFacts = new Map(snapshot.inflation.cities.filter((f) => f.measure === factMeasure).map((f) => [`${f.cityId}|${f.seriesId}|${f.period}`, f]));
+  const cityFactsForMeasure = snapshot.inflation.cities.filter((f) => f.measure === factMeasure);
+  const cityFacts = new Map(cityFactsForMeasure.map((f) => [`${f.cityId}|${f.seriesId}|${f.period}`, f]));
+  // A city's own first month can start later than CITY_FIRST_PERIOD (Zugdidi's
+  // yoy_pct starts 2016-12, its avg12_pct 2017-12): the missing reason must name
+  // that city, series and measure's real start, not the generic city window.
+  const cityFirstPeriods = new Map<string, string>();
+  for (const fact of cityFactsForMeasure) {
+    const key = `${fact.cityId}|${fact.seriesId}`;
+    const existing = cityFirstPeriods.get(key);
+    if (existing === undefined || fact.period < existing) cityFirstPeriods.set(key, fact.period);
+  }
   const missing = (missingKey: ServiceMessageKey, missingValues?: Record<string, string | number>): Cell => ({ value: null, sourceIds: [], missingKey, missingValues });
 
   const cellFor = (entityId: string, seriesId: string, series: SeriesInfo, key: string): Cell => {
     if (entityId !== INFLATION_ENTITY_ID) {
       const fact = cityFacts.get(`${entityId}|${seriesId}|${key}`);
-      return fact ? { value: fact.value, sourceIds: [fact.sourceId] } : missing("missing.inflationCityNotObserved", { first: CITY_FIRST_PERIOD });
+      if (fact) return { value: fact.value, sourceIds: [fact.sourceId] };
+      const first = cityFirstPeriods.get(`${entityId}|${seriesId}`) ?? CITY_FIRST_PERIOD;
+      return missing("missing.inflationCityNotObserved", { first });
     }
     if (measure === "basket_weight_pct") {
       const row = weights.get(`${seriesId}|${key}`);

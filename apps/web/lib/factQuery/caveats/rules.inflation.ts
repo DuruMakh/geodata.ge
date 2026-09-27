@@ -63,7 +63,7 @@ export const INFLATION_CAVEAT_RULES: readonly CaveatRule[] = [
     methodologyRefEn: OWNER_EN,
     // Geostat extends centrally recorded prices to every city (metadata §18.3).
     applies: (c) => c.datasetId === DATASET_ID && cityDivisionCells(c).length > 0,
-    affects: (c) => cityDivisionCells(c).map((cell) => `${cell.entityId}:${cell.seriesId}:${cell.year}`),
+    affects: (c) => [...new Set(cityDivisionCells(c).map((cell) => `${cell.entityId}:${cell.seriesId}:${cell.year}`))],
   },
   {
     code: "inflation_target_unverified_before_2015",
