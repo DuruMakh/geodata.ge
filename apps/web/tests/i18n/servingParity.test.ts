@@ -1,5 +1,5 @@
 import { loadGdpOverviewFacts } from "../../lib/data/gdpOverview/importGdpOverview";
-import { loadBasketWeights, loadCpiCategoryFacts, loadCpiFacts, loadInflationTargets } from "../../lib/data/inflation/importInflation";
+import { loadBasketWeights, loadCpiCategoryFacts, loadCpiCityFacts, loadCpiFacts, loadInflationTargets } from "../../lib/data/inflation/importInflation";
 import { loadEconomicSectorFacts } from "../../lib/data/economicSectors/importEconomicSectors";
 import { loadRegionalEconomyFacts } from "../../lib/data/regionalEconomies/importRegionalEconomies";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -42,6 +42,7 @@ describe("bilingual presentation on both serving paths", () => {
     mirror.loadInflationDataFromDb.mockResolvedValue({
       facts: await loadCpiFacts(), targets: await loadInflationTargets(),
       categories: await loadCpiCategoryFacts(), weights: await loadBasketWeights(),
+      cities: await loadCpiCityFacts(),
     });
     const options = { releaseCommit: "loader-parity-fixture", generatedAt: "2026-09-06T00:00:00Z" };
     const csvSnapshot = await buildFactQuerySnapshot(options);
