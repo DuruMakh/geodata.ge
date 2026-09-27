@@ -62,7 +62,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-38 codes are registered.
+39 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -83,6 +83,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `inflation_contribution_residual` | note | `none` | `inflation-cpi-national.md` |
 | `inflation_contribution_weights_differ` | note | `limits` | `inflation-cpi-national.md` |
 | `inflation_target_unverified_before_2015` | note | `none` | `inflation-cpi-national.md` |
+| `inflation_city_central_prices` | note | `none` | `inflation-cpi-national.md` |
 | `municipality_not_territorial` | severe | `none` | `municipal-functional-annual-2015-2025.md` |
 | `municipal_country_scope` | note | `none` | `municipal-functional-annual-2015-2025.md` |
 | `adjara_consolidation_applied` | note | `none` | `municipal-functional-annual-2015-2025.md` |
@@ -332,6 +333,20 @@ Within one calendar year the weights are identical and the comparison is compara
 **English.** No earlier numeric inflation target is verified in the reviewed sources; this does not mean none existed.
 
 A secondary lead shows 6% for 2010–2014, but no primary National Bank document was archived for those years, so the months stay missing. Reporting "Georgia had no target" would state something the sources do not.
+
+### `inflation_city_central_prices`
+
+**Severity:** note  
+**Comparison effect:** `none`  
+**Owner document:** `inflation-cpi-national.md`
+
+**Trigger.** Any returned city-entity observation on a COICOP division series (`cpi.cat.01`–`12`) with a value.
+
+**Georgian.** ზოგიერთი ფასი — საწვავი, მედიკამენტები, ავტომობილები, მობილური კავშირის ტარიფები, ავია- და მატარებლის ბილეთები — ერთხელ აღირიცხება და ყველა ქალაქზე ვრცელდება, ამიტომ ამ პროდუქტებში ქალაქებს შორის სხვაობა გაზომილი არ არის.
+
+**English.** Some prices — fuel, medicines, cars, mobile tariffs, flights and train fares — are recorded once and applied to every city, so city differences in those items are not measured differences.
+
+Geostat records some prices once nationally rather than once per city (metadata §18.3) and applies that single price to every city's index. A division that carries any centrally recorded item therefore cannot show a genuine city-to-city difference in that item, even though the returned figure is a real published value, not an approximation.
 
 ### `municipality_not_territorial`
 
