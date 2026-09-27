@@ -8,10 +8,12 @@
 // queryInflation, compare, rank and the publications all call it, so a figure
 // cannot differ between an answer, a comparison and a download.
 import { CONTRIBUTION_FIRST_YEAR } from "../data/inflation/contributions";
+import { CITY_FIRST_PERIOD } from "../data/inflation/types";
 import { periodFromKey } from "../data/inflation/periods";
 import { CAVEAT_RULES, evaluateCaveats, type CaveatContext } from "./caveats";
 import { contributionIndex, measurePeriodRange, periodsBetween, weightYearRange, yearOfPeriod, type PeriodRange } from "./inflationData";
 import {
+  CITY_SERIES_MEASURES,
   GROUP_MEASURES,
   INFLATION_DATASET_ID,
   INFLATION_DEFINITIONS,
@@ -32,12 +34,12 @@ import { queryInflationInput } from "./schemas";
 import { selectSources } from "./sources";
 import type { FactQueryError, FactQueryResponse, FactQuerySnapshot } from "./types";
 
-export type InflationRequest = { seriesIds: string[]; measure: string; periods?: string[]; years?: number[] };
+export type InflationRequest = { seriesIds: string[]; measure: string; periods?: string[]; years?: number[]; entityIds?: string[] };
 export type InflationOptions = { includeResidual: boolean; comparison?: CaveatContext["comparison"] };
 
 type SeriesInfo = { labelKa: string; labelEn: string; level: string; parentSeriesId: string | null; measures: readonly string[] };
 type Cell = { value: number | null; sourceIds: string[]; missingKey?: ServiceMessageKey; missingValues?: Record<string, string | number> };
-type RawCell = { seriesId: string; info: SeriesInfo; key: string; cell: Cell };
+type RawCell = { entityId: string; seriesId: string; info: SeriesInfo; key: string; cell: Cell };
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
@@ -66,7 +68,7 @@ function requestableSeriesIds(snapshot: FactQuerySnapshot): string[] {
 const yearsBetween = (first: number, last: number) => Array.from({ length: last - first + 1 }, (_, index) => first + index);
 
 /** Cells a query_inflation call would return, counted before any work (the MCP 500-cell gate). */
-export function inflationCellCount(input: { seriesIds?: string[]; measure?: string; fromPeriod?: string; toPeriod?: string }): number {
+export function inflationCellCount(input: { seriesIds?: string[]; measure?: string; fromPeriod?: string; toPeriod?: string; entityIds?: string[] }): number {
   if (input.fromPeriod === undefined || input.toPeriod === undefined) return 0;
   let from: number;
   let to: number;
@@ -78,7 +80,7 @@ export function inflationCellCount(input: { seriesIds?: string[]; measure?: stri
   }
   if (to < from) return 0;
   const span = input.measure === "basket_weight_pct" ? yearOfPeriod(input.toPeriod) - yearOfPeriod(input.fromPeriod) + 1 : to - from + 1;
-  return span * ((input.seriesIds?.length ?? 0) + (input.measure === "contribution_pp" ? 1 : 0));
+  return span * ((input.seriesIds?.length ?? 0) + (input.measure === "contribution_pp" ? 1 : 0)) * Math.max(1, input.entityIds?.length ?? 1);
 }
 
 export function inflationObservations(snapshot: FactQuerySnapshot, request: InflationRequest, options: InflationOptions): FactQueryResponse {
@@ -91,6 +93,20 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
     });
   }
   const measure = request.measure as InflationMeasure;
+
+  const entityIds = request.entityIds ?? [INFLATION_ENTITY_ID];
+  const cityEntities = new Map(snapshot.inflation.cityEntities.map((city) => [city.id, city]));
+  const unknownEntityIds = entityIds.filter((id) => id !== INFLATION_ENTITY_ID && !cityEntities.has(id));
+  if (unknownEntityIds.length > 0) {
+    return errorResponse(snapshot, {
+      code: "unknown_entity",
+      ...bilingual(snapshot, "errors.unknownEntity", { unknownEntityIds: unknownEntityIds.join(", ") }),
+      retryable: false,
+      validChoices: [INFLATION_ENTITY_ID, ...cityEntities.keys()],
+    });
+  }
+  const hasCity = entityIds.some((id) => cityEntities.has(id));
+
   const info = new Map(request.seriesIds.map((id) => [id, seriesInfo(snapshot, id)] as const));
 
   const unknownSeriesIds = request.seriesIds.filter((id) => info.get(id) === undefined);
@@ -115,6 +131,15 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
 
   if (measure === "contribution_pp" && new Set(request.seriesIds.map((id) => info.get(id)!.level)).size > 1) {
     return errorResponse(snapshot, { code: "invalid_parameters", ...bilingual(snapshot, "errors.contributionMixedLevels"), retryable: false });
+  }
+
+  if (hasCity && request.seriesIds.some((id) => !(CITY_SERIES_MEASURES[id] ?? []).includes(measure))) {
+    return errorResponse(snapshot, {
+      code: "unsupported_measure",
+      ...bilingual(snapshot, "errors.inflationCityInput"),
+      retryable: false,
+      validChoices: ["yoy_pct", "mom_pct", "avg12_pct"],
+    });
   }
 
   const monthly = measure !== "basket_weight_pct";
@@ -153,9 +178,14 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
   const nationalFacts = new Map(snapshot.inflation.facts.filter((f) => f.measure === factMeasure).map((f) => [`${f.seriesId}|${f.period}`, f]));
   const categoryFacts = new Map(snapshot.inflation.categories.filter((f) => f.measure === factMeasure).map((f) => [`${f.categoryId}|${f.period}`, f]));
   const weights = new Map(snapshot.inflation.weights.map((row) => [`${row.categoryId}|${row.year}`, row]));
+  const cityFacts = new Map(snapshot.inflation.cities.filter((f) => f.measure === factMeasure).map((f) => [`${f.cityId}|${f.seriesId}|${f.period}`, f]));
   const missing = (missingKey: ServiceMessageKey, missingValues?: Record<string, string | number>): Cell => ({ value: null, sourceIds: [], missingKey, missingValues });
 
-  const cellFor = (seriesId: string, series: SeriesInfo, key: string): Cell => {
+  const cellFor = (entityId: string, seriesId: string, series: SeriesInfo, key: string): Cell => {
+    if (entityId !== INFLATION_ENTITY_ID) {
+      const fact = cityFacts.get(`${entityId}|${seriesId}|${key}`);
+      return fact ? { value: fact.value, sourceIds: [fact.sourceId] } : missing("missing.inflationCityNotObserved", { first: CITY_FIRST_PERIOD });
+    }
     if (measure === "basket_weight_pct") {
       const row = weights.get(`${seriesId}|${key}`);
       return row ? { value: row.weightPct, sourceIds: [row.sourceId] } : missing("missing.inflationWeight");
@@ -176,8 +206,10 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
     return value !== undefined && fact && weight ? { value, sourceIds: [fact.sourceId, weight.sourceId] } : missing("missing.inflationContribution");
   };
 
-  const raw: RawCell[] = request.seriesIds.flatMap((seriesId) =>
-    keys.map((key) => ({ seriesId, info: info.get(seriesId)!, key, cell: cellFor(seriesId, info.get(seriesId)!, key) })),
+  const raw: RawCell[] = entityIds.flatMap((entityId) =>
+    request.seriesIds.flatMap((seriesId) =>
+      keys.map((key) => ({ entityId, seriesId, info: info.get(seriesId)!, key, cell: cellFor(entityId, seriesId, info.get(seriesId)!, key) })),
+    ),
   );
 
   if (measure === "contribution_pp" && options.includeResidual) {
@@ -195,22 +227,23 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
                 value: published.value - parts.reduce((total, entry) => total + (entry.cell.value as number), 0),
                 sourceIds: [...new Set([published.sourceId, ...parts.flatMap((entry) => entry.cell.sourceIds)])],
               };
-      raw.push({ seriesId: RESIDUAL_SERIES_ID, info: residualInfo, key, cell });
+      raw.push({ entityId: INFLATION_ENTITY_ID, seriesId: RESIDUAL_SERIES_ID, info: residualInfo, key, cell });
     }
   }
 
   const sources = selectSources(snapshot, [...new Set(raw.flatMap((entry) => entry.cell.sourceIds))]);
-  const observations: Observation[] = raw.map(({ seriesId, info: series, key, cell }) => {
+  const observations: Observation[] = raw.map(({ entityId, seriesId, info: series, key, cell }) => {
     const definitionKey = seriesId === RESIDUAL_SERIES_ID ? "residual" : measure;
     const year = monthly ? yearOfPeriod(key) : Number(key);
+    const city = cityEntities.get(entityId);
     return {
-      observationId: buildObservationId(INFLATION_DATASET_ID, INFLATION_ENTITY_ID, seriesId, monthly ? key : year, measure),
+      observationId: buildObservationId(INFLATION_DATASET_ID, entityId, seriesId, monthly ? key : year, measure),
       datasetId: INFLATION_DATASET_ID,
       budgetScope: "consumer_prices",
-      entityId: INFLATION_ENTITY_ID,
-      entityType: "country",
-      entityLabelKa: "საქართველო",
-      entityLabelEn: "Georgia",
+      entityId,
+      entityType: city ? "city" : "country",
+      entityLabelKa: city ? city.labelKa : "საქართველო",
+      entityLabelEn: city ? city.labelEn : "Georgia",
       entitySlug: null,
       seriesId,
       seriesLabelKa: series.labelKa,
@@ -239,7 +272,7 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
   const years = [...new Set(observations.map((o) => o.year))].sort((a, b) => a - b);
   const caveats = evaluateCaveats(
     snapshot,
-    countryLevelCaveatContext(INFLATION_DATASET_ID, measure, years, [...new Set(observations.map((o) => o.seriesId))], observations, options.comparison ?? null),
+    { ...countryLevelCaveatContext(INFLATION_DATASET_ID, measure, years, [...new Set(observations.map((o) => o.seriesId))], observations, options.comparison ?? null), entityIds },
     CAVEAT_RULES,
   );
   for (const observation of observations) observation.caveatIds = caveatIdsForObservation(caveats, observation);
@@ -287,7 +320,7 @@ export function queryInflation(snapshot: FactQuerySnapshot, rawInput: unknown): 
   const periods = periodsBetween(input.fromPeriod, input.toPeriod);
   const request: InflationRequest =
     input.measure === "basket_weight_pct"
-      ? { seriesIds: input.seriesIds, measure: input.measure, years: [...new Set(periods.map(yearOfPeriod))] }
-      : { seriesIds: input.seriesIds, measure: input.measure, periods };
+      ? { seriesIds: input.seriesIds, measure: input.measure, years: [...new Set(periods.map(yearOfPeriod))], entityIds: input.entityIds }
+      : { seriesIds: input.seriesIds, measure: input.measure, periods, entityIds: input.entityIds };
   return inflationObservations(snapshot, request, { includeResidual: true });
 }

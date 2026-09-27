@@ -110,7 +110,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "Contributions are percentage points, never mix divisions and subgroups, and arrive with a residual series that closes them on the published headline. " +
       "Take the latest month from describe_coverage. Monthly changes do not add up to annual inflation, and the 12-month average is not annual inflation. " +
       "One answer fits about 250 cells (series × months): a single series' full history, or a year of every division's contributions. " +
-      "Beyond that ask for fewer months or groups; a result over the response-size limit is refused and points to the bulk files.",
+      "Beyond that ask for fewer months or groups; a result over the response-size limit is refused and points to the bulk files. " +
+      "Optional entityIds: country.georgia (default) or the six city.* ids from describe_coverage — Tbilisi, Kutaisi, Batumi, Gori, Telavi, Zugdidi — from 2016-01, for cpi.headline and cpi.cat.01–12 (yoy_pct, mom_pct; avg12_pct for cpi.headline). Cells count entities × series × months.",
     schema: queryInflationInput,
     run: (snapshot, input) => queryInflation(snapshot, input),
   },

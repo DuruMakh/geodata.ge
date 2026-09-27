@@ -266,6 +266,8 @@ export type FactQuerySnapshot = {
     categories: import("../data/inflation/types").ServedCpiCategoryFact[];
     weights: import("../data/inflation/types").ServedBasketWeightRow[];
     groups: import("./inflationSeries").InflationGroup[];
+    cities: import("../data/inflation/types").ServedCpiCityFact[];
+    cityEntities: import("./inflationSeries").InflationCityEntity[];
   };
   gdpFacts: ServedNationalGdpFact[];
   sources: ResolvedSource[];

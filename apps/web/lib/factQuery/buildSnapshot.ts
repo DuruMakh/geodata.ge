@@ -26,7 +26,8 @@ import { loadServedRegionalEconomyRows, REGIONAL_ECONOMY_REGIONS, REGIONAL_ECONO
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { REGIONAL_ECONOMY_DEFINITIONS } from "./regionalEconomySeries";
 import { loadServedInflationData } from "../data/inflation/importInflation";
-import { NATIONAL_SERIES, RESIDUAL_SERIES, RESIDUAL_SERIES_ID, TARGET_SERIES, TARGET_SERIES_ID, type InflationGroup } from "./inflationSeries";
+import { CPI_CITY_IDS } from "../data/inflation/types";
+import { NATIONAL_SERIES, RESIDUAL_SERIES, RESIDUAL_SERIES_ID, TARGET_SERIES, TARGET_SERIES_ID, type InflationCityEntity, type InflationGroup } from "./inflationSeries";
 import { loadServedGeneralGovernmentBalanceData } from "../data/generalGovernmentBalance/importGeneralGovernmentBalance";
 import { loadServedGovernmentDebtData } from "../data/governmentDebt/importGovernmentDebtFacts";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
@@ -451,6 +452,23 @@ async function loadInflationGroups(
     });
 }
 
+/**
+ * The six cities' reviewed labels, read from the same message catalogue as
+ * the COICOP groups above, so the page and an MCP answer name a city alike.
+ */
+async function loadInflationCityEntities(repositoryRoot: string): Promise<InflationCityEntity[]> {
+  const [ka, en] = await Promise.all(
+    (["ka", "en"] as const).map(async (locale) =>
+      JSON.parse(await readFile(path.join(repositoryRoot, "apps", "web", "lib", "i18n", "messages", locale, "inflation.json"), "utf8")) as Record<string, string>,
+    ),
+  );
+  return CPI_CITY_IDS.map((id) => {
+    const key = `inflation.city.${id}`;
+    if (!ka[key]?.trim() || !en[key]?.trim()) throw new Error(`Missing reviewed inflation city label: ${id}`);
+    return { id, labelKa: ka[key], labelEn: en[key] };
+  });
+}
+
 function sortedBy<T>(rows: T[], ...keys: Array<(row: T) => string | number>): T[] {
   return [...rows].sort(compareBy(...keys));
 }
@@ -531,11 +549,13 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
   };
   const inflation = await loadServedInflationData();
   const inflationGroups = await loadInflationGroups(repositoryRoot, inflation.categories);
+  const inflationCities = await loadInflationCityEntities(repositoryRoot);
   Object.assign(localization.labelsEn, Object.fromEntries([
     ...Object.entries(NATIONAL_SERIES).map(([id, series]) => [id, series.labelEn]),
     [TARGET_SERIES_ID, TARGET_SERIES.labelEn],
     [RESIDUAL_SERIES_ID, RESIDUAL_SERIES.labelEn],
     ...inflationGroups.map((group) => [group.id, group.labelEn]),
+    ...inflationCities.map((city) => [city.id, city.labelEn]),
   ]));
   for (const fact of explorer.adminFacts.filter(fact => fact.level === "major_program")) {
     const translated = catalogue.programmeHistory[fact.itemId]?.[fact.year];
@@ -693,6 +713,8 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
       categories: sortedBy(inflation.categories, (f) => f.categoryId, (f) => f.measure, (f) => f.period),
       weights: sortedBy(inflation.weights, (row) => row.categoryId, (row) => row.year),
       groups: inflationGroups,
+      cities: sortedBy(inflation.cities, (f) => f.cityId, (f) => f.seriesId, (f) => f.measure, (f) => f.period),
+      cityEntities: inflationCities,
     },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
     sources,

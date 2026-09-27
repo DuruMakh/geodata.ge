@@ -47,6 +47,14 @@ export type InflationGroup = {
   labelEn: string;
 };
 
+export type InflationCityEntity = { id: string; labelKa: string; labelEn: string };
+
+/** What Geostat publishes per city (spec 2026-09-26 §1.1): no index, core, weights or contributions. */
+export const CITY_SERIES_MEASURES: Readonly<Record<string, readonly InflationMeasure[]>> = Object.fromEntries([
+  ["cpi.headline", ["yoy_pct", "mom_pct", "avg12_pct"]],
+  ...Array.from({ length: 12 }, (_, index) => [`cpi.cat.${String(index + 1).padStart(2, "0")}`, ["yoy_pct", "mom_pct"]]),
+]);
+
 export const INFLATION_DEFINITIONS: Record<InflationMeasure | "residual", { ka: string; en: string }> = {
   yoy_pct: {
     ka: "სამომხმარებლო ფასების ცვლილება წინა წლის იმავე თვესთან, პროცენტებში, როგორც საქსტატი აქვეყნებს: 2.4 ნიშნავს 2.4%-ს.",
