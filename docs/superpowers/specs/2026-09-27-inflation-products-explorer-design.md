@@ -1,7 +1,7 @@
 # Inflation: individual-product explorer specification
 
 Date: 2026-09-27
-Status: Draft for user review. The page layout and illustration direction were approved in conversation on 2026-09-27. This document specifies the production implementation; it does not claim the page is built or published.
+Status: Approved for implementation planning by the user's 2026-09-27 request to write the plan. The page layout and illustration direction were approved in conversation. This document specifies the production implementation; it does not claim the page is built or published.
 
 ## 1. Outcome and approved decisions
 
