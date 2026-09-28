@@ -228,5 +228,16 @@
   "inflation.productsDerivedNote": "Cumulative change is calculated by Fiscal.ge from Geostat's published monthly indices; a missing month makes the full selected range unavailable.",
   "inflation.productsSelectorLabel": "Select products",
   "inflation.productsCount": "Products",
-  "inflation.productsSearch": "Search products"
+  "inflation.productsSearch": "Search products",
+  "inflation.productsKpiFocus": "Focused product · latest annual change",
+  "inflation.productsKpiCumulative": "Selected-years cumulative change",
+  "inflation.productsKpiHighest": "Highest annual change",
+  "inflation.productsKpiLowest": "Lowest annual change",
+  "inflation.productsHeroComparison": "Comparison: {current} against {previous}.",
+  "inflation.productsChooseProduct": "Select a product",
+  "inflation.productsAllHeading": "All current products",
+  "inflation.productsTableCaption": "Current products ranked by annual change in {latest}; cumulative change over {start}–{end}.",
+  "inflation.productsSelect": "Add to chart:",
+  "inflation.productsDeselect": "Remove from chart:",
+  "inflation.productsMore": "More products"
 }

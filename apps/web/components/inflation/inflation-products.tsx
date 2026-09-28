@@ -26,6 +26,8 @@ import { PageHeader } from "../shell/page-header";
 import { ControlTooltip } from "../ui/control-tooltip";
 import { Callout, SourceNote } from "../ui/editorial";
 import { InflationProductPanel } from "./inflation-product-panel";
+import { InflationProductIndicators } from "./inflation-product-indicators";
+import { InflationProductTable } from "./inflation-product-table";
 
 const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
@@ -157,5 +159,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
         />}
       />
     </ExplorerWorkspace>
+    <InflationProductIndicators index={index} state={state} />
+    <InflationProductTable index={index} state={state} onToggle={(id) => setState((current) => toggleProduct(current, id))} />
   </ExplorerPage>;
 }

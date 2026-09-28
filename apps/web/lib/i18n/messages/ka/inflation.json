@@ -228,5 +228,16 @@
   "inflation.productsDerivedNote": "დაგროვილ ცვლილებას Fiscal.ge ითვლის საქსტატის გამოქვეყნებული თვიური ინდექსებით; გამოტოვებული თვე მთელ არჩეულ პერიოდს მიუწვდომელს ხდის.",
   "inflation.productsSelectorLabel": "პროდუქტების არჩევა",
   "inflation.productsCount": "პროდუქტები",
-  "inflation.productsSearch": "პროდუქტის ძებნა"
+  "inflation.productsSearch": "პროდუქტის ძებნა",
+  "inflation.productsKpiFocus": "არჩეული პროდუქტი · ბოლო წლიური ცვლილება",
+  "inflation.productsKpiCumulative": "არჩეულ წლებში დაგროვილი ცვლილება",
+  "inflation.productsKpiHighest": "ყველაზე მაღალი წლიური ცვლილება",
+  "inflation.productsKpiLowest": "ყველაზე დაბალი წლიური ცვლილება",
+  "inflation.productsHeroComparison": "შედარება: {current} {previous}-თან.",
+  "inflation.productsChooseProduct": "აირჩიეთ პროდუქტი",
+  "inflation.productsAllHeading": "ყველა მოქმედი პროდუქტი",
+  "inflation.productsTableCaption": "მოქმედი პროდუქტები დალაგებულია {latest} წლიური ცვლილებით; დაგროვილი ცვლილება {start}–{end} პერიოდში.",
+  "inflation.productsSelect": "გრაფიკზე დამატება:",
+  "inflation.productsDeselect": "გრაფიკიდან ამოღება:",
+  "inflation.productsMore": "მეტი პროდუქტი"
 }
