@@ -86,6 +86,7 @@ model SourceDocument {
   inflationTargets  InflationTarget[]
   inflationCategoryFacts InflationCategoryFact[]
   inflationBasketWeights InflationBasketWeight[]
+  inflationProductFacts InflationProductFact[]
 }
 
 model ImportRun {
@@ -115,6 +116,7 @@ model ImportRun {
   inflationTargets  InflationTarget[]
   inflationCategoryFacts InflationCategoryFact[]
   inflationBasketWeights InflationBasketWeight[]
+  inflationProductFacts InflationProductFact[]
   populationFacts       MunicipalPopulationFact[]
 }
 
@@ -517,4 +519,31 @@ model InflationTarget {
   lastReviewedAt   DateTime       @db.Date
   importRunId      String?
   importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+}
+
+model InflationProduct {
+  productId   String @id
+  coicopCode  String
+  labelEn     String
+  labelKa     String
+  firstPeriod String
+  decisionRef String
+  facts       InflationProductFact[]
+}
+
+model InflationProductFact {
+  productId        String
+  product          InflationProduct @relation(fields: [productId], references: [productId])
+  measure          String
+  period           String
+  index100         Decimal?       @db.Decimal(12, 4)
+  availability     String
+  sourceLocator    String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([productId, measure, period])
 }

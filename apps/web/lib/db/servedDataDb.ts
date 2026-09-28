@@ -27,6 +27,8 @@ import {
   loadInflationCategoryFactsFromMirror,
   loadInflationCpiFactsFromMirror,
   loadInflationTargetsFromMirror,
+  loadProductCatalogueFromMirror,
+  loadProductFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "./mirrorRows";
 import { prisma } from "./prisma";
@@ -120,4 +122,11 @@ export async function loadInflationDataFromDb() {
     loadInflationBasketWeightsFromMirror(prisma),
   ]);
   return { facts, targets, categories, weights };
+}
+
+export async function loadProductDataFromDb() {
+  const [catalogue, facts] = await Promise.all([
+    loadProductCatalogueFromMirror(prisma), loadProductFactsFromMirror(prisma),
+  ]);
+  return { catalogue, facts };
 }
