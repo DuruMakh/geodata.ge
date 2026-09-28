@@ -55,6 +55,24 @@ export async function prepareProducts(options: { rawRoot?: string; previousFacts
   if (audit.unresolvedTransitions.length > 0) {
     throw new Error(`Unreviewed product identity transitions: ${audit.unresolvedTransitions.map((item) => `${item.productId} ${item.later.year}`).join(", ")}`);
   }
+  // The public series starts in 2015. Only exact group and bilingual-name
+  // matches may supply the archived 2014 months needed to audit 2015 annual indices.
+  const sourceKey = (row: { coicopCode: string; labelEn: string; labelKa: string }) =>
+    `${row.coicopCode}:${row.labelEn.trim().replace(/\s+/g, " ").toLocaleLowerCase()}:${row.labelKa.trim().replace(/\s+/g, " ").toLocaleLowerCase()}`;
+  const rows2014 = new Map<string, typeof rows[number]>();
+  for (const row of rows.filter((item) => item.year === 2014)) {
+    const key = sourceKey(row);
+    if (rows2014.has(key)) throw new Error(`Duplicate 2014 product identity: ${key}`);
+    rows2014.set(key, row);
+  }
+  const priorYearMonthly = new Map<string, string>();
+  for (const { productId, row } of audit.assignments.filter((item) => item.row.year === 2015)) {
+    const previous = rows2014.get(sourceKey(row));
+    if (!previous) continue;
+    for (const cell of previous.momCells) {
+      if (cell.index100 !== null) priorYearMonthly.set(`${productId}:${cell.period}`, cell.index100);
+    }
+  }
   const reviewedAt = decisions.map((row) => row.reviewedAt).sort().at(-1)!;
   const sourceIds = {
     mom_index_100: files.find((file) => file.language === "en" && file.file_role === "mom")!.source_id,
@@ -72,7 +90,7 @@ export async function prepareProducts(options: { rawRoot?: string; previousFacts
     }
   }
   facts.sort((a, b) => a.productId.localeCompare(b.productId) || a.measure.localeCompare(b.measure) || a.period.localeCompare(b.period));
-  const indexValidation = validateProductIndices(facts);
+  const indexValidation = validateProductIndices(facts, priorYearMonthly);
   if (options.previousFacts !== null && options.previousFacts !== undefined) {
     const revisions = findProductOutputRevisions(options.previousCatalogue ?? catalogue, audit.catalogue, options.previousFacts, facts);
     if (revisions.length > 0) throw new Error(`Product canonical output requires review:\n${revisions.slice(0, 20).join("\n")}${revisions.length > 20 ? `\n... and ${revisions.length - 20} more` : ""}`);

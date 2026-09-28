@@ -35,8 +35,9 @@
   "factCount": 84056,
   "publishedCells": 83880,
   "unavailableCells": 176,
-  "arithmeticChecked": 38673,
-  "arithmeticUncomparable": 3179,
-  "maxArithmeticError": 0.00058334133588745,
+  "arithmeticChecked": 41830,
+  "arithmeticPriorYearChecked": 3157,
+  "arithmeticUncomparable": 22,
+  "maxArithmeticError": 0.00061239483704408,
   "gapCount": 0
 }

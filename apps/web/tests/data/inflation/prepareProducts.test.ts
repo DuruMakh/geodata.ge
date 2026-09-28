@@ -71,6 +71,35 @@ describe("reviewed product identity mapping", () => {
     expect(() => validateProductIndices(bent)).toThrow(/annual|twelve|arithmetic/i);
   });
 
+  it("checks 2015 annual cells against verified 2014 monthly indices", () => {
+    const audit = buildProductIdentityAudit(rows, catalogue, decisions);
+    const previousRows = new Map(rows.filter((row) => row.year === 2014).map((row) =>
+      [`${row.coicopCode}:${row.labelEn.trim().toLocaleLowerCase()}:${row.labelKa.trim().toLocaleLowerCase()}`, row]));
+    const priorYearMonthly = new Map<string, string>();
+    for (const { productId, row } of audit.assignments.filter(({ row }) => row.year === 2015)) {
+      const key = `${row.coicopCode}:${row.labelEn.trim().toLocaleLowerCase()}:${row.labelKa.trim().toLocaleLowerCase()}`;
+      const prior = previousRows.get(key);
+      if (!prior) continue;
+      for (const cell of prior.momCells) if (cell.index100 !== null) priorYearMonthly.set(`${productId}:${cell.period}`, cell.index100);
+    }
+    const report = validateProductIndices(prepared.facts, priorYearMonthly);
+    expect(report.arithmeticChecked).toBe(41_830);
+    expect(report.arithmeticPriorYearChecked).toBe(3_157);
+    expect(report.arithmeticUncomparable).toBe(22);
+    expect(prepared.validation.arithmeticChecked).toBe(41_830);
+    const tampered2014 = new Map(priorYearMonthly);
+    tampered2014.set("cpi.product.p0001:2014-12", "150");
+    expect(() => validateProductIndices(prepared.facts, tampered2014)).toThrow(/annual index/);
+  });
+
+  it("keeps conservative identities and Geostat's inconsistent bilingual label", () => {
+    expect(catalogue.find((item) => item.productId === "cpi.product.p0179")?.firstPeriod).toBe("2019-01");
+    expect(catalogue.find((item) => item.productId === "cpi.product.p0269")?.firstPeriod).toBe("2020-01");
+    expect(catalogue.find((item) => item.productId === "cpi.product.p0148")).toMatchObject({
+      labelEn: "Chipboard", labelKa: "თაბაშირ-მუყაოს ფილა",
+    });
+  });
+
   it("reports historical value, missing-marker and removed-row revisions before cohort filtering", () => {
     expect(findProductRevisions(prepared.facts, catalogue, rows, decisions)).toEqual([]);
     const valueChanged = rows.map((row) => row.year === 2019 && row.ordinal === 89 ?

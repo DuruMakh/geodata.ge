@@ -8,12 +8,13 @@ export type ProductValidationReport = {
   publishedCells: number;
   unavailableCells: number;
   arithmeticChecked: number;
+  arithmeticPriorYearChecked: number;
   arithmeticUncomparable: number;
   maxArithmeticError: number;
   gapCount: number;
 };
 
-export function validateProductIndices(facts: ProductFactRow[]): ProductValidationReport {
+export function validateProductIndices(facts: ProductFactRow[], priorYearMonthly?: ReadonlyMap<string, string>): ProductValidationReport {
   const seen = new Set<string>();
   const monthly = new Map<string, ProductFactRow>();
   const yearOnYear: ProductFactRow[] = [];
@@ -44,6 +45,7 @@ export function validateProductIndices(facts: ProductFactRow[]): ProductValidati
     else throw new Error(`Unknown product measure: ${key}`);
   }
   let arithmeticChecked = 0;
+  let arithmeticPriorYearChecked = 0;
   let arithmeticUncomparable = 0;
   let maxArithmeticError = 0;
   for (const annual of yearOnYear) {
@@ -51,13 +53,17 @@ export function validateProductIndices(facts: ProductFactRow[]): ProductValidati
     const end = periodFromKey(annual.period);
     let compounded = new Decimal(100);
     let comparable = true;
+    let usedPriorYear = false;
     for (let period = end - 11; period <= end; period += 1) {
-      const month = monthly.get(`${annual.productId}:${periodKey(period)}`);
-      if (!month?.index100) {
+      const key = `${annual.productId}:${periodKey(period)}`;
+      const canonical = monthly.get(key);
+      const value = canonical?.index100 ?? priorYearMonthly?.get(key);
+      if (!value) {
         comparable = false;
         break;
       }
-      compounded = compounded.mul(new Decimal(month.index100).div(100));
+      if (!canonical) usedPriorYear = true;
+      compounded = compounded.mul(new Decimal(value).div(100));
     }
     if (!comparable) {
       arithmeticUncomparable += 1;
@@ -66,6 +72,7 @@ export function validateProductIndices(facts: ProductFactRow[]): ProductValidati
     const error = compounded.minus(annual.index100).abs().toNumber();
     if (error > 0.002) throw new Error(`Product annual index disagrees with twelve monthly indices: ${annual.productId} ${annual.period}, error ${error}`);
     arithmeticChecked += 1;
+    if (usedPriorYear) arithmeticPriorYearChecked += 1;
     maxArithmeticError = Math.max(maxArithmeticError, error);
   }
   let gapCount = 0;
@@ -73,7 +80,8 @@ export function validateProductIndices(facts: ProductFactRow[]): ProductValidati
     periods.sort((a, b) => a - b);
     for (let index = 1; index < periods.length; index += 1) gapCount += periods[index]! - periods[index - 1]! - 1;
   }
-  return { factCount: facts.length, publishedCells, unavailableCells, arithmeticChecked, arithmeticUncomparable, maxArithmeticError, gapCount };
+  return { factCount: facts.length, publishedCells, unavailableCells, arithmeticChecked, arithmeticPriorYearChecked,
+    arithmeticUncomparable, maxArithmeticError, gapCount };
 }
 
 export function findProductRevisions(previousFacts: ProductFactRow[], previousCatalogue: ProductCatalogueRow[], currentSource: PairedProductRow[], decisions: ProductDecisionRow[]): string[] {
