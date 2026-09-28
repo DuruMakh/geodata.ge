@@ -1,0 +1,9 @@
+# Individual-product illustration review
+
+The [full contact sheet](2026-09-28-inflation-products-contact-sheet.html) shows all 305 current Geostat catalogue IDs at their intended 32 px display size, each beside both official labels. The [nine-item pilot](2026-09-28-inflation-products-icon-pilot.png) tested food, household goods and services on the site's paper colour before the full run. The [edge-case samples](2026-09-28-inflation-products-final-samples.png) include the ambiguous board label and the corrected plain coffin.
+
+The built-in ImageGen tool produced warm, grainy gouache cutouts in a numbered atlas for consecutive groups of 16 products, with one final single-product image. Prompts named the exact English catalogue subjects in row order, required clear transparent gutters and no labels, logos, prices, faces or background. The nine-item pilot and final photocopier/coffin corrections used focused prompts. The atlases were cropped by fixed cells, resized to 128 px and optimized to transparent WebP; the final ID-to-file mapping is in `apps/web/public/inflation-products/`.
+
+Every atlas was visually checked against its ordered subject list before cropping. Similar goods were differentiated by form, colour or state where possible; service items use a representative object cue. p0148 uses a neutral panel because Geostat's English and Georgian labels name different materials. p0301 was regenerated as a plain coffin after the group image added a religious symbol. Images are decorative representations, never evidence of price, brand, product specification or historical identity.
+
+The automated art test checks the current catalogue against every asset name, transparency, dimensions, file size and distinct file content. The review sheet permits a future source refresh to expose a new product with no icon before the page is updated.
