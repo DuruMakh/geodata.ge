@@ -211,5 +211,22 @@
   "inflation.productsNotPublished": "Not published",
   "inflation.productsUnavailable": "Unavailable for full range",
   "inflation.productsLateStart": "history starts {period}",
-  "inflation.productsMissingMonth": "monthly index missing in {period}"
+  "inflation.productsMissingMonth": "monthly index missing in {period}",
+  "inflation.productsHeading": "Product inflation",
+  "inflation.productsDescription": "Annual price change for every item in Geostat's current consumer basket, with a selectable cumulative change over time.",
+  "inflation.productsMetaTitle": "Product inflation {first}–{last} | Fiscal.ge",
+  "inflation.productsUnit": "Percent · published annual change for individual current-basket products",
+  "inflation.productsAnnualTitle": "Annual inflation",
+  "inflation.productsAnnualUnit": "Change from the same month a year earlier (%)",
+  "inflation.productsCumulativeTitle": "Cumulative price change",
+  "inflation.productsCumulativeUnit": "Compounded since December before the selected first year (%)",
+  "inflation.productsShowCumulative": "Show cumulative price change",
+  "inflation.productsShowAnnual": "Show annual inflation",
+  "inflation.productsChartSummary": "{mode} for {count} selected products, from {start} through {end}. Exact values are in the product list and Excel download.",
+  "inflation.productsNoCompleteSeries": "The selected products have no complete series for this view and range. Check their first available month or a missing monthly index below.",
+  "inflation.productsSource": "Data: National Statistics Office of Georgia (Geostat), detailed product price indices.",
+  "inflation.productsDerivedNote": "Cumulative change is calculated by Fiscal.ge from Geostat's published monthly indices; a missing month makes the full selected range unavailable.",
+  "inflation.productsSelectorLabel": "Select products",
+  "inflation.productsCount": "Products",
+  "inflation.productsSearch": "Search products"
 }

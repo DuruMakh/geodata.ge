@@ -211,5 +211,22 @@
   "inflation.productsNotPublished": "არ გამოქვეყნებულა",
   "inflation.productsUnavailable": "მთელი პერიოდისთვის მიუწვდომელია",
   "inflation.productsLateStart": "ისტორია იწყება {period}-დან",
-  "inflation.productsMissingMonth": "თვიური ინდექსი აკლია {period}-ში"
+  "inflation.productsMissingMonth": "თვიური ინდექსი აკლია {period}-ში",
+  "inflation.productsHeading": "პროდუქტების ინფლაცია",
+  "inflation.productsDescription": "საქსტატის მოქმედი სამომხმარებლო კალათის თითოეული პროდუქტის წლიური ფასის ცვლილება და არჩეულ პერიოდში დაგროვილი ცვლილება.",
+  "inflation.productsMetaTitle": "პროდუქტების ინფლაცია {first}–{last} | Fiscal.ge",
+  "inflation.productsUnit": "პროცენტი · მოქმედი კალათის ცალკეული პროდუქტების გამოქვეყნებული წლიური ცვლილება",
+  "inflation.productsAnnualTitle": "წლიური ინფლაცია",
+  "inflation.productsAnnualUnit": "ცვლილება წინა წლის იმავე თვესთან შედარებით (%)",
+  "inflation.productsCumulativeTitle": "ფასის დაგროვილი ცვლილება",
+  "inflation.productsCumulativeUnit": "დაგროვილი ცვლილება არჩეული საწყისი წლის წინა დეკემბრიდან (%)",
+  "inflation.productsShowCumulative": "დაგროვილი ცვლილების ჩვენება",
+  "inflation.productsShowAnnual": "წლიური ინფლაციის ჩვენება",
+  "inflation.productsChartSummary": "{mode}: {count} არჩეული პროდუქტი {start} წლიდან {end}-მდე. ზუსტი მნიშვნელობები მოცემულია პროდუქტების სიაში და Excel ფაილში.",
+  "inflation.productsNoCompleteSeries": "არჩეულ პროდუქტებს ამ ხედისა და პერიოდისთვის სრული მონაცემები არ აქვთ. ქვემოთ იხილეთ ისტორიის საწყისი თვე ან გამოტოვებული თვიური ინდექსი.",
+  "inflation.productsSource": "მონაცემები: საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი), პროდუქტების დეტალური ფასების ინდექსები.",
+  "inflation.productsDerivedNote": "დაგროვილ ცვლილებას Fiscal.ge ითვლის საქსტატის გამოქვეყნებული თვიური ინდექსებით; გამოტოვებული თვე მთელ არჩეულ პერიოდს მიუწვდომელს ხდის.",
+  "inflation.productsSelectorLabel": "პროდუქტების არჩევა",
+  "inflation.productsCount": "პროდუქტები",
+  "inflation.productsSearch": "პროდუქტის ძებნა"
 }

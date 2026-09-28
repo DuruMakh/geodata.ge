@@ -2,12 +2,15 @@ import path from "node:path";
 import { BudgetHub } from "../../components/hub/budget-hub";
 import { InflationCategories } from "../../components/inflation/inflation-categories";
 import { InflationOverview } from "../../components/inflation/inflation-overview";
+import { InflationProducts } from "../../components/inflation/inflation-products";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedInflationData } from "../data/inflation/importInflation";
+import { loadServedProductData } from "../data/inflation/importProducts";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
 import { categoryFactInput } from "../data/inflation/types";
 import { packCategoryFacts } from "../explorer/inflationCategories";
+import { packProductFacts } from "../explorer/inflationProducts";
 import {
   projectBasketWeight,
   projectCpiFact,
@@ -32,6 +35,7 @@ import { ExplorerHeading } from "../../components/explorer-shell/explorer-headin
 const HUB_PATH = "/explorer/inflation";
 const OVERVIEW_PATH = "/explorer/inflation/overview";
 const CATEGORIES_PATH = "/explorer/inflation/categories";
+const PRODUCTS_PATH = "/explorer/inflation/products";
 const repositoryRoot = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
 
 // Archive rows ending in "_ka" are the Georgian twins of the English source files.
@@ -164,4 +168,43 @@ export async function renderInflationCategories(locale: Locale) {
       />
     </I18nProvider>
   );
+}
+
+export async function inflationProductsMetadata(locale: Locale) {
+  const [{ catalogue, facts }, messages] = await Promise.all([loadServedProductData(), getMessages(locale, ["inflation"])]);
+  const first = Math.min(...catalogue.map((row) => Number(row.firstPeriod.slice(0, 4))));
+  const last = Math.max(...facts.map((fact) => Number(fact.period.slice(0, 4))));
+  return fiscalMetadata({
+    locale,
+    path: PRODUCTS_PATH,
+    title: message(messages, "inflation.productsMetaTitle", { first, last }),
+    description: message(messages, "inflation.productsDescription"),
+  });
+}
+
+export async function renderInflationProducts(locale: Locale) {
+  const root = repositoryRoot();
+  const [{ catalogue: products, facts }, presentation, manifest, languageCatalogue] = await Promise.all([
+    loadServedProductData(),
+    getPresentation(locale, ["inflation", "common", "controls", "format", "main"], []),
+    loadReviewedSourceManifest(root, "inflation"),
+    loadEnglishCatalogue(root),
+  ]);
+  const sources = inflationWorkbookSources(manifest, locale, languageCatalogue.documents).filter((row) =>
+    row.sourceId === "source.geostat_product_yoy" || row.sourceId === "source.geostat_product_mom");
+  const t = (key: string) => message(presentation.messages, key);
+  return <I18nProvider {...presentation}>
+    <BreadcrumbJsonLd items={[
+      { name: t("common.home"), path: pageHref("/", locale) },
+      { name: t("common.inflation"), path: pageHref(HUB_PATH, locale) },
+      { name: t("inflation.productsHeading"), path: pageHref(PRODUCTS_PATH, locale) },
+    ]} />
+    <InflationProducts
+      products={products.map(({ productId, labelEn, labelKa, firstPeriod }) => ({ productId, labelEn, labelKa, firstPeriod }))}
+      facts={packProductFacts(facts)}
+      lastReviewedAt={facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
+      sources={sources}
+      siteOrigin={resolveSiteUrl()}
+    />
+  </I18nProvider>;
 }

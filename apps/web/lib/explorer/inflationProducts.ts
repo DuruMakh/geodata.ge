@@ -2,6 +2,7 @@ import Decimal from "decimal.js";
 import { makePeriod, periodFromKey, periodYear } from "../data/inflation/periods";
 import type { ProductCatalogueRow } from "../data/inflation/productIdentity";
 import type { ProductFactRow } from "../data/inflation/productTypes";
+import { EDITORIAL_PALETTE } from "./colors";
 
 export type ClientProduct = Pick<ProductCatalogueRow, "productId" | "labelEn" | "labelKa" | "firstPeriod">;
 
@@ -142,4 +143,10 @@ export function rankProducts(index: ProductIndex): string[] {
     if (right === null) return -1;
     return right - left || a.localeCompare(b);
   });
+}
+
+export function productColor(id: string): string {
+  const ordinal = Number(id.split(".").at(-1)?.slice(1));
+  if (!Number.isInteger(ordinal) || ordinal < 1) throw new Error(`Invalid product colour ID ${id}`);
+  return EDITORIAL_PALETTE[(ordinal - 1) % EDITORIAL_PALETTE.length]!;
 }
