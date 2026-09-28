@@ -195,5 +195,21 @@
   "inflation.inflationBreadth": "ინფლაციის სიგანე",
   "inflation.breadthDetail": "ჯგუფი გაძვირდა",
   "inflation.breadthValue": "{rose} / {total}",
-  "inflation.contributionDetail": "{category} · წვლილი {value}"
+  "inflation.contributionDetail": "{category} · წვლილი {value}",
+  "inflation.productsWorkbookTitle": "ცალკეული პროდუქტების ინფლაცია",
+  "inflation.productsWorkbookSubtitle": "ბოლო წლიური: {latest} · არჩეული პერიოდი: {start}–{end} · დაგროვილი ცვლილება გამოითვალა Fiscal.ge-ზე გამოქვეყნებული თვიური ინდექსებით",
+  "inflation.productsWorkbookUnit": "% · გამოქვეყნებული წლიური და Fiscal.ge-ზე გამოთვლილი დაგროვილი ცვლილება",
+  "inflation.productsProductColumn": "პროდუქტი",
+  "inflation.productsAnnualColumn": "ბოლო 12 თვის ცვლილება · {period}",
+  "inflation.productsCumulativeColumn": "დაგროვილი ცვლილება · {start}–{end}",
+  "inflation.productsAnnualIndexColumn": "გამოქვეყნებული წლიური ინდექსი (წინა წელი = 100)",
+  "inflation.productsAnnualDataColumn": "გამოქვეყნებული წლიური ცვლილება (%)",
+  "inflation.productsCumulativeDataColumn": "Fiscal.ge-ზე გამოთვლილი დაგროვილი ცვლილება (%)",
+  "inflation.productsAnnualStatus": "წლიური სტატუსი",
+  "inflation.productsCumulativeStatus": "დაგროვილი სტატუსი",
+  "inflation.productsDerived": "გამოთვლილია Fiscal.ge-ზე",
+  "inflation.productsNotPublished": "არ გამოქვეყნებულა",
+  "inflation.productsUnavailable": "მთელი პერიოდისთვის მიუწვდომელია",
+  "inflation.productsLateStart": "ისტორია იწყება {period}-დან",
+  "inflation.productsMissingMonth": "თვიური ინდექსი აკლია {period}-ში"
 }

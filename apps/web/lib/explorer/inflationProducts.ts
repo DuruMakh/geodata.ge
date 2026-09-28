@@ -105,6 +105,10 @@ export function productAnnual(index: ProductIndex, id: string, period: number): 
   return value === null ? null : value.minus(100).toNumber();
 }
 
+export function productAnnualIndex(index: ProductIndex, id: string, period: number): number | null {
+  return packedValue(index.annual.get(id), period)?.toNumber() ?? null;
+}
+
 export type ProductCumulative = {
   value: number | null;
   reason: "late_start" | "missing_month" | null;
