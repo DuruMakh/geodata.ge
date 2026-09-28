@@ -1,31 +1,34 @@
 import { describe, expect, it } from "vitest";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
+import { loadServedProductData } from "../../lib/data/inflation/importProducts";
 import { periodFromKey } from "../../lib/data/inflation/periods";
-import { buildInflationHubCards } from "../../lib/explorer/inflationHubCards";
+import { buildInflationHubCards, buildLatestProductHubSummary } from "../../lib/explorer/inflationHubCards";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { formatShare } from "../../lib/explorer/format";
 import { getMessages } from "../../lib/i18n/messages.server";
 
 describe("inflation hub", () => {
-  it("links the delivered sections and marks the rest as coming soon", async () => {
+  it("shows Products as the third live inflation card", async () => {
     const { facts, categories, weights } = await loadServedInflationData();
+    const products = await loadServedProductData();
     const messages = await getMessages("en", ["inflation"]);
-    const cards = buildInflationHubCards(facts, { locale: "en", messages, englishLabels: {} }, categories, weights);
+    const cards = buildInflationHubCards(facts, { locale: "en", messages, englishLabels: {} }, categories, weights, buildLatestProductHubSummary(products));
     expect(cards.map((card) => card.href)).toEqual([
       "/explorer/inflation/overview",
       "/explorer/inflation/categories",
-      null,
-      null,
+      "/explorer/inflation/products",
       null,
     ]);
     expect(cards.map((card) => card.title)).toEqual([
       "Inflation overview",
       "Categories",
-      "Consumer basket",
-      "Cities",
       "Products",
+      "Cities",
     ]);
-    expect(cards.slice(2).every((card) => card.comingSoon && card.series === null && card.footer === null)).toBe(true);
+    expect(cards[2]!.comingSoon).toBe(false);
+    expect(cards[2]!.footer).toMatch(/Tomato.*57\.5%/);
+    expect(cards[2]!.series?.length ?? 0).toBeGreaterThan(100);
+    expect(cards[3]).toMatchObject({ comingSoon: true, series: null, footer: null });
     const yoy = facts.filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct");
     const last = yoy.reduce((latest, fact) => (fact.period > latest.period ? fact : latest));
     expect(cards[0]!.footer).toBe(
