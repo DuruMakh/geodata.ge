@@ -25,7 +25,7 @@ describe("complete ranked product list", () => {
     expect(shown).toBe(index.products.length);
     expect(visibleProductIds(index, shown)).toEqual(rankProducts(index));
     const html = renderGeorgianMarkup(<InflationProductTable index={index} state={state} onToggle={() => {}} />, { ...common, ...controls, ...inflation, ...main });
-    expect((html.match(/data-product-id="cpi\.product\./g) ?? [])).toHaveLength(40);
+    expect((html.match(/<tr data-product-id="cpi\.product\./g) ?? [])).toHaveLength(40);
     expect(html.includes("40 / 305")).toBe(true);
     expect(html.includes('data-testid="product-more"')).toBe(true);
   });

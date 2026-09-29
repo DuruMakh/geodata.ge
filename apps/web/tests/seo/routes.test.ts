@@ -47,9 +47,9 @@ describe("indexable Fiscal.ge routes", () => {
     const urls = entries.map((entry) => entry.url);
 
     // Regional economies add a bilingual index, eleven bilingual detail pages
-    // and one bilingual methodology page; the inflation categories page adds
-    // the other bilingual identity in the synchronized release.
-    expect(urls).toHaveLength(226);
+    // and one bilingual methodology page; inflation categories and products
+    // add the remaining bilingual identities.
+    expect(urls).toHaveLength(228);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");

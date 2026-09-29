@@ -1,0 +1,136 @@
+import { expect, test, type Page } from "@playwright/test";
+import ExcelJS from "exceljs";
+
+const ROUTE = "/explorer/inflation/products";
+const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+
+for (const locale of ["ka", "en"] as const) {
+  for (const width of [390, 1440]) {
+    test(`product inflation layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto(`${locale === "en" ? "/en" : ""}${ROUTE}`);
+      await ready(page);
+      await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-indicator", "annual");
+      await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "false");
+      await expect(page.getByTestId("series-status")).toContainText("1 / 305");
+      await expect(page.getByTestId("product-indicators")).toBeVisible();
+      await expect(page.getByTestId("product-list-count")).toHaveText("40 / 305");
+      await expect(page.locator('[data-series-id="cpi.product.p0058"]')).toHaveAttribute("data-series-id", "cpi.product.p0058");
+      await expect(page.getByTestId("inflation-products-link")).toHaveAttribute("aria-current", "page");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      const icon = page.locator('[data-series-id="cpi.product.p0058"] img');
+      expect(await icon.evaluate((image) => Math.round(image.getBoundingClientRect().width))).toBe(32);
+      if (width === 390) {
+        const region = (await page.getByTestId("product-table").boundingBox())!;
+        const annualCell = (await page.getByTestId("product-table").locator("tbody tr").first().locator("td").nth(1).boundingBox())!;
+        // A phone should show the product and its latest annual value before a horizontal swipe.
+        expect(annualCell.x + annualCell.width).toBeLessThanOrEqual(region.x + region.width + 1);
+      }
+      await page.screenshot({ path: testInfo.outputPath(`products-${locale}-${width}.png`), fullPage: true });
+    });
+  }
+}
+
+test("annual default, bilingual search, multi-selection and icon-only cumulative toggle", async ({ page }) => {
+  await page.goto(`/en${ROUTE}`);
+  await ready(page);
+  const toggle = page.getByTestId("product-cumulative-toggle");
+  await expect(toggle).toHaveAttribute("aria-label", "Show cumulative price change");
+  expect((await toggle.textContent())?.trim()).toBe("");
+  await toggle.hover();
+  await expect(page.getByRole("tooltip")).toHaveText("Show cumulative price change");
+  const search = page.getByTestId("series-search");
+  await search.fill("  ToMaTo  ");
+  await expect(page.getByTestId("series-row")).toHaveCount(2);
+  await expect(page.getByTestId("series-status")).toContainText("1 / 305");
+  await search.fill("  პომიდორი  ");
+  await expect(page.getByTestId("series-row")).toHaveCount(1);
+  await search.fill("rice");
+  await page.locator('[data-series-id="cpi.product.p0001"]').getByTestId("series-row-toggle").click();
+  await expect(page.getByTestId("series-status")).toContainText("2 / 305");
+  await expect(page.getByTestId("product-indicators")).toContainText("Rice");
+  await expect(page.getByTestId("product-list-count")).toHaveText("40 / 305");
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  await expect(toggle).toHaveAttribute("aria-label", "Show annual inflation");
+  await expect(page.getByTestId("chart-panel")).toContainText("Cumulative price change");
+  await expect(page).toHaveURL(/i=cumulative/);
+});
+
+test("year controls, late history, empty selection and language restoration", async ({ page }) => {
+  await page.goto(`/en${ROUTE}#i=cumulative&r=2015-2026&sel=cpi.product.p0179`);
+  await ready(page);
+  await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await expect(page.getByTestId("product-indicators")).toContainText("history starts 2019-01");
+  await page.getByTestId("language-switch").first().getByRole("link", { name: "ქართული" }).click();
+  await ready(page);
+  await expect(page).toHaveURL(/\/explorer\/inflation\/products#.*i=cumulative/);
+  await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "true");
+  await page.getByTestId("product-cumulative-toggle").click();
+  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+  await page.getByRole("button", { name: "ყველა", exact: true }).click();
+  await expect(page.getByRole("slider", { name: "საწყისი წელი" })).toHaveAttribute("aria-valuenow", "2015");
+  const start = page.getByRole("slider", { name: "საწყისი წელი" });
+  await start.focus();
+  await page.keyboard.press("End");
+  await expect(start).toHaveAttribute("aria-valuenow", "2026");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2026–2026");
+  await page.goto(`/en${ROUTE}#i=annual&r=2023-2026&sel=`);
+  await ready(page);
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await expect(page.getByTestId("inflation-product-download")).toBeEnabled();
+  expect(new URL(page.url()).hash).toContain("sel=");
+});
+
+test("the complete list is reachable while the latest annual order stays fixed", async ({ page }) => {
+  await page.goto(`/en${ROUTE}#i=cumulative&r=2015-2016&sel=`);
+  await ready(page);
+  const list = page.getByTestId("product-table");
+  await expect(list.locator("tbody tr")).toHaveCount(40);
+  await expect(list.locator("tbody tr").first()).toHaveAttribute("data-product-id", "cpi.product.p0058");
+  for (let shown = 80; shown <= 320; shown += 40) {
+    await page.getByTestId("product-more").click();
+    await expect(list.locator("tbody tr")).toHaveCount(Math.min(shown, 305));
+  }
+  await expect(page.getByTestId("product-list-count")).toHaveText("305 / 305");
+  await expect(list.locator('tr[data-product-id="cpi.product.p0305"]')).toHaveCount(1);
+  await expect(page.getByTestId("product-more")).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test("an empty selection downloads a valid full Summary workbook", async ({ page }, testInfo) => {
+  await page.goto(`/en${ROUTE}#i=annual&r=2023-2026&sel=`);
+  await ready(page);
+  const pending = page.waitForEvent("download");
+  await page.getByTestId("inflation-product-download").click();
+  const result = await pending;
+  expect(result.suggestedFilename()).toMatch(/^fiscal-inflation-products-2023-2026-08-en\.xlsx$/);
+  const output = testInfo.outputPath("products-empty.xlsx");
+  await result.saveAs(output);
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile(output);
+  expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
+  expect(workbook.worksheets[0]!.getCell("B4").value).toBeCloseTo(0.575291);
+  expect(workbook.worksheets[0]!.getCell("B4").numFmt).toBe("0.0%");
+  expect(workbook.worksheets[0]!.rowCount).toBeGreaterThan(305);
+  expect(workbook.worksheets[1]!.rowCount).toBe(1);
+  expect(workbook.worksheets[2]!.getCell("D4").hyperlink).toMatch(/^https:\/\/fiscal\.ge\/downloads\//);
+});
+
+test("all 305 selected products produce a complete full-history workbook", async ({ page }, testInfo) => {
+  test.setTimeout(90_000);
+  const ids = Array.from({ length: 305 }, (_, offset) => `cpi.product.p${String(offset + 1).padStart(4, "0")}`);
+  await page.goto(`/en${ROUTE}#i=annual&r=2015-2026&sel=${ids.join(",")}`);
+  await ready(page);
+  await expect(page.getByTestId("series-status")).toContainText("305 / 305");
+  const pending = page.waitForEvent("download");
+  await page.getByTestId("inflation-product-download").click();
+  const result = await pending;
+  const output = testInfo.outputPath("products-all.xlsx");
+  await result.saveAs(output);
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile(output);
+  expect(workbook.worksheets[0]!.rowCount).toBeGreaterThan(305);
+  expect(workbook.worksheets[1]!.rowCount).toBeGreaterThan(40_000);
+});
