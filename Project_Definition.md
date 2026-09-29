@@ -26,7 +26,7 @@ This v1 scope is deliberate. A narrow, high-quality budget explorer is more valu
 - Revenue overview and major tax revenue categories.
 - Expenditure overview using public-friendly spending fields such as health, education, social protection, defence, infrastructure, and similar categories.
 - Multi-year explorer with line and table views.
-- National revenue and expenditure multi-year explorers can show each series as a share of same-year nominal GDP at current prices. The reviewed annual denominator covers 1996-2025; the canonical handoff uses SNA 1993 through 2009 and SNA 2008 from 2010. This supports `% მშპ-ში` inside the budget explorers only: it does not create a separate GDP explorer or make the future GDP methodology marker live. Municipal shares and single-year composition shares remain shares of their applicable budget total.
+- National revenue and expenditure multi-year explorers can show each series as a share of same-year nominal GDP at current prices. The reviewed annual denominator covers 1996-2025; the canonical handoff uses SNA 1993 through 2009 and SNA 2008 from 2010. This supports `% მშპ-ში` inside the budget explorers only; the GDP overview below is a separately approved item. Municipal shares and single-year composition shares remain shares of their applicable budget total.
 - Annual general-government deficit explorer at `/explorer/deficit`, using reviewed IMF WEO data for 1995-2031: signed net lending/borrowing as percent of GDP and nominal GEL, with 1995-2025 marked actual and 2026-2031 marked projection. The page adds no fiscal statistic beyond those two measures and never derives a deficit by subtracting the differently scoped revenue and expenditure datasets.
 - Multi-year expenditure grouping by public spending fields or by ministries/major programs (ministries data exists for 2004-2025; 2004 has no major-program rows, while later drill-down rows are partial from 2012 and contiguous 2017-2025); this is series selection, not drilldown.
 - Single-year snapshot with headline cards, treemap, Every 100 GEL, Budget Radar, Budget Field, and full ranking.
@@ -50,7 +50,7 @@ The approved national-sector page also includes four point-in-time highlights: l
 - Broad public data catalog.
 - Historical municipal per-capita series, detail-page per-capita measures, and per-capita exports. V1 includes only the bounded 2025 index map, supporting list values, and median KPI described above.
 - The six selected-detail municipal categories. Only the ten main functions are served.
-- Any data behind the four sidebar indicator markers (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) (inflation: see 2C).
+- Any data behind the remaining sidebar indicator markers (`უმუშევრობა`, `დემოგრაფია`).
 - Capital projects explorer.
 - Admin UI.
 - Public API.
@@ -71,7 +71,8 @@ section states what V2 adds, and what stays excluded.
   their sources and limitations attached. Unauthenticated and free, bounded by
   documented operating limits.
 - **Static data publications** under `/downloads/data/`: a manifest, the
-  capability catalogue, the source resolution, and four dataset files. These are
+  capability catalogue, the source resolution, and one or more files per served
+  dataset (four at launch; the manifest lists the current set). These are
   published files, not a query service.
 - A Georgian **connection page** at `/connect` describing the service, its exact
   coverage, and how to connect — the one human-facing surface for the above.
@@ -250,4 +251,4 @@ Build the data foundation first. Visual ambition is important, but the platform 
 
 Avoid short-term UI-only hacks. The product should be architected so future versions can add more datasets, drilldown, bilingual UI, and additional budget modules without rebuilding the foundation.
 
-Implementation should follow this order: data foundation, real sample data, main explorer core with line/table modes and Excel workbook export, single-year core, and production UI polish against `DESIGN.md`. The bounded national `% მშპ-ში` measure described in section 2 is approved; bar mode, stacked mode, a separate GDP explorer, and broader advanced chart controls remain outside the current production v1 scope unless explicitly re-approved. Do not start with visual richness before the data model and import validation are working.
+Implementation should follow this order: data foundation, real sample data, main explorer core with line/table modes and Excel workbook export, single-year core, and production UI polish against `DESIGN.md`. The bounded national `% მშპ-ში` measure described in section 2 is approved, as are the GDP overview (section 2) and the inflation-categories stacked chart (2C); bar mode, stacked mode elsewhere, and broader advanced chart controls remain outside the current production scope unless explicitly re-approved. Do not start with visual richness before the data model and import validation are working.

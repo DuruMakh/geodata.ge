@@ -1,17 +1,13 @@
 # Fiscal.ge
 
-Fiscal.ge v1 is a Georgian-first Georgia Budget Explorer.
+Fiscal.ge is a Georgian-first explorer of reviewed Georgian public-finance and economy data, with an English mirror under `/en`: national expenditure and revenue, municipal budgets, government debt, the general-government balance, GDP, national economic sectors, regional economies, and monthly national inflation. Each explorer downloads as an Excel workbook; the same figures are published as static data files under `/downloads/data/` and through a read-only MCP connection for AI clients at `/mcp`.
 
 Read first:
 
-- `AGENTS.md`
-- `Project_Definition.md`
-- `docs/superpowers/specs/2026-05-10-geodata-budget-v1-design.md`
+- `AGENTS.md` (operating rules) and `CLAUDE.md` (commands and definition of done)
+- `Project_Definition.md` (scope and coverage; section 2 is authoritative)
 - `DESIGN.md` (for any UI work)
-
-V1 focuses on annual national budget data for 2004-2025, reviewed data ingestion, public spending-field taxonomy, revenue categories, ministry-level expenditure series, Excel workbook export, and clear budget visualizations.
-
-Current loaded coverage: expenditure has detailed public-field and ministry-category data for 2004-2025. Revenue covers 2004-2025; the 2004 annual report supplies ten revenue-and-grants categories totaling GEL 2,283,035,800, while the unavailable comparable increase-in-liabilities amount is omitted rather than estimated or treated as zero. The served 2004 expenditure total is the full state-budget execution-annex total of GEL 1,930,210,300; the separate Treasury E11 PDF is central-budget scoped and not served.
+- the relevant file under `docs/data-methodology/` (for any data work)
 
 ## Development
 
@@ -42,6 +38,9 @@ Root data files live under `data/`.
 - `data/mappings`: reviewed mappings from official rows to public spending fields.
 - `data/imports`: reviewed import files and sample imports.
 - `data/sources`: source document metadata.
+- `data/methodology`: the public methodology decision register and archived original source files.
+- `data/geometry`: municipality map paths.
+- `data/localization`: reviewed Georgian and English display text for the bilingual site.
 - `data/staging`: intermediate extraction outputs staged for review before promotion into imports.
 - `data/reports`: generated internal import validation reports; these are local generated artifacts and are ignored by git unless explicitly promoted.
 

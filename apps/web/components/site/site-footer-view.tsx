@@ -9,7 +9,7 @@ const ANALYSIS_HREF = "/explorer/analysis";
 // lookup below because the explorer footer is a client component: importing
 // common.server.ts from here put BOTH locales' catalogue in every explorer
 // route's client bundle.
-export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages }: { updatedAt: string; locale?: Locale; sourceNote?: string; messages: Messages }) {
+export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages }: { updatedAt?: string; locale?: Locale; sourceNote?: string; messages: Messages }) {
   const [sourcePrefix, sourceSuffix] = (sourceNote ?? messages["common.sourceNote"]).split("{updatedAt}");
   return (
     <footer data-testid="site-footer" className="mt-[72px] border-t-2 border-[var(--ink)] pb-10 pt-[26px]">
@@ -59,7 +59,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
           <div className="flex max-w-[340px] flex-col gap-[9px]">
             <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "common.data")}</span>
             <p className="text-pretty text-[12px] leading-relaxed text-[var(--muted)]">
-              {sourcePrefix}<span className="font-[family-name:var(--font-numeric)]">{updatedAt}</span>{sourceSuffix}
+              {sourcePrefix}{sourceSuffix !== undefined && <span className="font-[family-name:var(--font-numeric)]">{updatedAt}</span>}{sourceSuffix}
             </p>
             <p className="text-pretty text-[12px] leading-relaxed text-[var(--muted)]">
               {message(messages, "common.footerLicence")}

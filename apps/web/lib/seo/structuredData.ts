@@ -48,7 +48,7 @@ export type ExplorerDatasetJsonLdInput = {
    * A subset belongs to its parent, not directly to the catalog, so this and
    * `includedInDataCatalog` are mutually exclusive.
    */
-  partOfPath?: `/${string}`;
+  partOf?: { path: `/${string}`; name: string; description: string };
   /** Set on the parent dataset to name the subsets it is made of. */
   hasParts?: readonly { path: `/${string}`; name: string; description: string }[];
   /** True when spatialCoverageName is a place inside Georgia, not the country. */
@@ -276,12 +276,16 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
       : {}),
     // A subset is reachable from the catalog through its parent, so it claims
     // one relationship or the other and never both.
-    ...(input.partOfPath
+    ...(input.partOf
       ? {
           isPartOf: {
             "@type": "Dataset",
-            "@id": explorerDatasetId(input.origin, input.partOfPath),
-            url: absoluteUrl(input.origin, pageHref(input.partOfPath, input.locale)),
+            "@id": explorerDatasetId(input.origin, input.partOf.path),
+            url: absoluteUrl(input.origin, pageHref(input.partOf.path, input.locale)),
+            name: input.partOf.name,
+            description: input.partOf.description,
+            license: "https://creativecommons.org/licenses/by/4.0/",
+            creator: { "@type": "Organization", "@id": `${input.origin}/#organization`, name: "Fiscal.ge" },
           },
         }
       : { includedInDataCatalog: catalogReference(input.origin, input.locale) }),

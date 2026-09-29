@@ -1,4 +1,6 @@
 {
+  "sectors.metaTitle": "Georgia GDP by economic sector | Fiscal.ge",
+  "sectors.metaDescription": "Compare the size, share of GDP and annual real growth of Georgia’s economic sectors over time, with Geostat sources and downloadable Excel data.",
   "sectors.heading": "Sectors",
   "sectors.highlights": "Key indicators",
   "sectors.largest": "Largest sector",

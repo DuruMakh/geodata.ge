@@ -1,9 +1,9 @@
 # Fiscal.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-09-01
-Status: Production visual system for Fiscal.ge Budget Explorer v1
-Scope: Budget Explorer product UI, charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
+Last updated: 2026-09-26
+Status: Production visual system for Fiscal.ge
+Scope: Explorer product UI (budget, economy and inflation), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
 ---
 
@@ -26,15 +26,15 @@ Superseded and must not appear in production:
 
 ## 2. Product Scope Boundary
 
-Fiscal.ge v1 is a Georgian-first national budget explorer for annual data. It is not a broad public-data catalog.
+Fiscal.ge is a Georgian-first explorer of reviewed annual budget and economy data plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
 
-V1 includes: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, Excel workbook export, Georgian-first UI, minimal public source label, internal provenance metadata.
+Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories), methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
 
-V1 excludes: data catalog, capital explorer, admin UI, public API, uploads, sub-annual data, automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
+Excluded: data catalog, capital explorer, admin UI, a public API beyond the read-only MCP and static publications, uploads, sub-annual data other than inflation (§25), automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
-Municipal budgets are an implemented v1 **section** in this branch at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). Production verification follows merge and deployment; this branch state is not evidence that the current municipal surfaces are live. The four teaser datasets in the sidebar (`უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია`) remain markers only, with no data at all (inflation: see §25). Nothing about a marker may be styled as if it were live.
+Municipal budgets are a budget **section** at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). The two teaser datasets in the sidebar (`უმუშევრობა`, `დემოგრაფია`) remain markers only, with no data at all. Nothing about a marker may be styled as if it were live.
 
-Regional economies are an implemented Economy route family in this branch at `/explorer/economy/regions` (§2.1, §6.2, §26): one All Regions index and 11 detail pages. This branch state is not evidence that those routes are live in production.
+Regional economies are an Economy route family at `/explorer/economy/regions` (§2.1, §6.2, §26): one All Regions index and 11 detail pages.
 
 Every visual decision should support a focused budget product, not a generic dashboard.
 
@@ -44,10 +44,11 @@ Year ranges in the UI always derive from loaded facts. Current reviewed coverage
 
 - Expenditure by public spending fields: **2004–2025** (13 fields per year, 12-month actual execution).
 - Expenditure by ministries (administrative view): **2004–2025** categories; major-program drill-down rows exist from 2012 (partial) and are contiguous 2017–2025.
-- Revenue: **2005–2025** (11 top-level categories).
-- Municipal expenditure by functional category: **2015–2025** (10 main functions plus the public total headline). The public entity set is 64 municipalities across 11 data-bearing regions. Adjara's total combines its six municipalities with Adjara republican actual payments net of transfers to territorial budgets. The separate Georgia scope aggregates all 69 reviewed municipal-budget series and adds the same net Adjara amount once; the 110 function rows remain municipal-only. Five occupied-territory-associated bodies appear only inside that country aggregate. Implemented in this branch at `/explorer/municipalities` (§20); production deployment remains unverified as described above.
+- Revenue: **2004–2025** (11 top-level categories; 2004 has 10 because increase in liabilities starts in 2005).
+- Municipal expenditure by functional category: **2015–2025** (10 main functions plus the public total headline). The public entity set is 64 municipalities across 11 data-bearing regions. Adjara's total combines its six municipalities with Adjara republican actual payments net of transfers to territorial budgets. The separate Georgia scope aggregates all 69 reviewed municipal-budget series and adds the same net Adjara amount once; the 110 function rows remain municipal-only. Five occupied-territory-associated bodies appear only inside that country aggregate. Served at `/explorer/municipalities` (§20).
 - General-government balance: **1995–2031** (1995–2025 actual; 2026–2031 IMF projection), published directly as percent of GDP and nominal GEL.
 - Regional economies: **2010–2024**, 11 regions, Total regional GDP plus 20 NACE Rev. 2 activities, with current-price GEL and share of the selected region's market-price GDP only.
+- Government Debt, GDP overview, national economic sectors and inflation: coverage is stated in `Project_Definition.md` §2 and §2C and in each dataset's methodology page.
 - All current budget facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned budget facts ever load; debt and deficit projections use the separate `პროგნოზი` treatment.
 
 ### 2.2 Bilingual presentation
@@ -299,7 +300,7 @@ No screen card, no outer container. Content sits directly on paper.
 
 ### 6.2 Information Architecture
 
-The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: a budget hub and its sections, all mounted under `/explorer` inside the shell of §6.7.
+The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: the Budget, Economy and Inflation hubs and their sections, all mounted under `/explorer` inside the shell of §6.7. Every route below also exists under `/en` (§2.2).
 
 ```text
 /explorer                              budget hub — the six sections as cards
@@ -318,9 +319,12 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/economy/sectors                               National economic sectors
 /explorer/economy/regions                               All Regions map and ranked list (§26)
 /explorer/economy/regions/[id]                          11 regional-economy detail pages (§26)
+/explorer/inflation                   ინფლაცია          Inflation hub (§25)
+/explorer/inflation/overview                            Monthly national CPI overview (§25)
+/explorer/inflation/categories                          COICOP categories and contributions (§25.1)
 ```
 
-Outside `/explorer` and alongside `/about` sit the two editorial pages: `/about` (§2) and `/connect`, the MCP connection page (§23).
+Outside `/explorer` sit the two editorial pages, `/about` (§23) and `/connect`, the MCP connection page (§24), and the methodology centre at `/methodology` and `/methodology/[dataset]` (§21).
 
 Public municipality routes use the explicit lowercase-ASCII `[slug]` registry. Numeric municipality codes remain internal data, geometry, and join identifiers; they are not the public route identity.
 
@@ -398,24 +402,24 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
-- `ბიუჯეტი` — the active dataset: `2px accent` left border, active-row background, sans 12.5/600 in `paper`. Not a link; it is where you already are.
-- Its six sections nest beneath it (below).
-- `უმუშევრობა`, `ინფლაცია`, `ეკონომიკური ზრდა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data (inflation: see §25).
+- Three dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
+- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, or Inflation's overview / categories, all in the section-row style below.
+- `უმუშევრობა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
-- Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, mono glyph `«` (expanded) / `»` (collapsed).
+- Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, Lucide `ChevronsLeft` (expanded) / `ChevronsRight` (collapsed) (§7.2a).
 
 **Section list** (`section-nav.tsx`, nested under `ბიუჯეტი`). Each entry is a route link. Active: accent `▸` marker, `paper` text at weight 600, active-row background, `aria-current="page"`. Inactive: `ink-fg-muted`, marker held in transparent so labels do not shift. All six sections — `ხარჯები`, `შემოსავლები`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი`, `დეფიციტი` — render this way; none is a `მალე` marker. Deleting this one component and its single usage reverts navigation to hub-and-breadcrumb only; nothing else imports it.
 
 **Collapsed rail (≥900px).** 52px, same `ink` surface, radius 0:
 
-- The toggle stays in place at the top, glyph flipped to `»`.
-- Below it, the context line runs vertically down the rail: `მონაცემები · ბიუჯეტი`, mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
-- At the foot, an 8×8 `accent` square is the collapsed `← მთავარი` link, with a 26×26 hit area, `aria-label="მთავარი"`, and a `title` tooltip. The collapsed rail remains logo-free.
+- The toggle stays in place at the top, icon flipped to `ChevronsRight`.
+- Below it, the context line runs vertically down the rail, naming the active dataset (`მონაცემები · ბიუჯეტი`, or the Economy / Inflation equivalent), mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
+- Beneath it, the compact language switch; at the foot, a Lucide `House` icon is the collapsed `← მთავარი` link, with a 26×26 hit area, `aria-label="მთავარი"`, and a `title` tooltip. The collapsed rail remains logo-free.
 - **Sections are not reachable while collapsed** — the list is unmounted, not hidden. A 52px rail cannot carry Georgian section names, and reducing them to invented initials would trade one extra click for three ambiguous glyphs. Collapse is a reading posture: it hands the width back to the data and keeps only orientation and escape.
 
 Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: reduce`. The choice persists in `localStorage` under `geodata:sidebar-collapsed`, read after mount; a storage denial falls back to expanded rather than breaking the render.
 
-**Below 900px.** The sidebar becomes a full-width top bar (brand + toggle). The toggle opens the same nav as an **in-flow panel directly below the bar**: it is content-height, it pushes the page content down, and it has no backdrop. It is deliberately not the full-height sheet the design spec asked for — nothing is overlaid, so nothing needs covering. `Escape` closes it and hands focus back to the toggle. Expanded/collapsed is a **desktop-only** state: a persisted collapse preference is ignored below 900px rather than applied as an unexplained narrow rail, so the `«` glyph does double duty — collapse on desktop, close the panel on mobile.
+**Below 900px.** The sidebar becomes a full-width top bar (brand + toggle). The toggle opens the same nav as an **in-flow panel directly below the bar**: it is content-height, it pushes the page content down, and it has no backdrop. It is deliberately not the full-height sheet the design spec asked for — nothing is overlaid, so nothing needs covering. `Escape` closes it and hands focus back to the toggle. Expanded/collapsed is a **desktop-only** state: a persisted collapse preference is ignored below 900px rather than applied as an unexplained narrow rail, so the `ChevronsLeft` toggle does double duty — collapse on desktop, close the panel on mobile.
 
 **Accessibility, and the deviations on record.**
 
@@ -426,7 +430,7 @@ Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: redu
 
 The crumbs carry `BreadcrumbTrail`'s semantics, not its markup: a `<nav aria-label="Breadcrumb">` landmark, `aria-hidden` separators, and `aria-current="page"` on the final crumb. They deliberately do **not** reuse the component itself — `BreadcrumbTrail` renders its own `BreadcrumbJsonLd`, and these routes already emit one, so reusing it would ship two structured-data blocks per page. Marking the current page by colour alone, in a paragraph of spans, is what this replaced: on the site's largest set of routes the trail was not a landmark and read as a run-on string with the slashes announced.
 
-**Footer.** Every `/explorer` route renders `SiteFooter` (§19) at the foot of the content column — inside it, not beside the sidebar — with the pages' own horizontal padding so its rule lines up with the content above. The footer uses the compact lockup at approximately 150px; its trust, navigation, source/update, contact, and CC BY 4.0 licence content remains unchanged. These routes are the site's main SEO landing targets, and the footer is where the licence, contact address and methodology link live (§21); without it ~85 pages ended with no licence, no way to report an error and no route to the methodology. `updatedAt` comes from the landing model, the same site-wide review date the methodology and about pages show.
+**Footer.** Every `/explorer` route renders `SiteFooter` (§19) at the foot of the content column — inside it, not beside the sidebar — with the pages' own horizontal padding so its rule lines up with the content above. The footer uses the compact lockup at approximately 150px and retains its trust, navigation, contact, and CC BY 4.0 licence content. Explorer and methodology-article footers name the relevant dataset's source institutions; review dates remain in the page's existing source note or article header. They do not repeat the site-wide latest review date as if it applied to that dataset. Generic footers explicitly label the landing model's `updatedAt` as the latest source review across Fiscal.ge. These routes are the site's main SEO landing targets, and the footer is where the licence, contact address and methodology link live (§21).
 
 **Budget hub (`/explorer`).** Breadcrumb, serif H1 `საქართველოს ბიუჯეტი`, a concise lead covering budgets, debt and deficit, then six cards in a two-column grid (one column below 768px, max-width 860px), then the standard source note (§7.10). Card anatomy, in order: mono index in accent with `→` right-aligned, serif 18px title, 11.5px `muted` description, graphic, mono 10px `faint` footer.
 
@@ -857,7 +861,7 @@ Section order is fixed: shared header → living-relief hero → country figures
 The exact dataset contracts are:
 
 1. `სახელმწიფო ხარჯები`; H2 `როგორ იხარჯება საქართველოს ბიუჯეტი`; total `მთლიანი ხარჯი`; first column `სფერო`; `ხარჯების მონაცემები →` → `/explorer/expenditure`.
-2. `სახელმწიფო შემოსავლები`; H2 `როგორ ფინანსდება საქართველოს ბიუჯეტი`; total `მთლიანი შემოსავლები`; first column `მუხლი`; `შემოსავლების მონაცემები →` → `/explorer/revenue`.
+2. `ნაერთი ბიუჯეტის შემოსულობები`; H2 `როგორ ფინანსდება საქართველოს ბიუჯეტი`; total `მთლიანი შემოსულობები`; first column `მუხლი`; `შემოსავლების მონაცემები →` → `/explorer/revenue`.
 3. `მუნიციპალური ბიუჯეტები`; H2 `როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები`; total `საქართველოს მუნიციპალური ჯამი`; first column `უდიდესი მუნიციპალური ბიუჯეტები`; `მუნიციპალური მონაცემები →` → `/explorer/municipalities`.
 4. `სახელმწიფო ვალი`; H2 `რამდენია საქართველოს მთავრობის ვალი`; latest actual total Government Debt stock plus its domestic and external amounts and shares; `ვალის მონაცემები →` → `/explorer/debt`.
 5. `ზოგადი მთავრობის დეფიციტი`; H2 `რამდენია საქართველოს ბიუჯეტის დეფიციტი`; main label `დეფიციტი მშპ-სთან მიმართებით`; latest actual deficit as percent of GDP followed by the last three actual annual percentages; `დეფიციტის მონაცემები →` → `/explorer/deficit`.

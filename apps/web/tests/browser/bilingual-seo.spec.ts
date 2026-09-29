@@ -68,7 +68,9 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
       expect(result.canonicals).toEqual([expected.canonical]);
       expect(result.alternates).toEqual({ ka: expected.ka, en: expected.en, "x-default": expected.ka });
       if (route === "/explorer/economy/sectors") {
-        expect(result.title).toBe(locale === "en" ? "Sectors" : "სექტორები");
+        expect(result.title).toBe(locale === "en" ? "Georgia GDP by economic sector | Fiscal.ge" : "საქართველოს მშპ სექტორების მიხედვით | Fiscal.ge");
+      } else if (route === "/explorer/economy/gdp") {
+        expect(result.title).toBe(locale === "en" ? "Georgia GDP: growth and GDP per capita | Fiscal.ge" : "საქართველოს მშპ, ეკონომიკური ზრდა და მშპ ერთ სულ მოსახლეზე | Fiscal.ge");
       } else {
         expect(result.title.length).toBeGreaterThan(8);
       }

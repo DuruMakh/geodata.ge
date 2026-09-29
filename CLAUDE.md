@@ -1,10 +1,10 @@
-# GeoData.ge — agent entry point
+# Fiscal.ge (repo: GeoData.ge) — agent entry point
 
 @AGENTS.md
 
 ## Commands (run in `apps/web`)
 
-- `npm run check` — lint + typecheck + unit tests + data validation. Run before claiming any work done.
+- `npm run check` — lint + typecheck + unit tests + data validation + `i18n:check`. Run before claiming any work done.
 - `npm run test:browser` — Playwright e2e (local Edge; CI uses Chromium). Run for UI-affecting changes.
 - `npm run build` — production build (static; reads CSVs from `data/imports` by default, no `.env` needed; `GEODATA_DATA_SOURCE=db` builds from the Supabase mirror instead).
 - `npm run data:import` — parity-checked CSV→Supabase import (needs `apps/web/.env`; see `docs/data-methodology/database-import.md`).
@@ -42,12 +42,15 @@ When you do need the whole browser suite, build and serve once and point the run
 same 281 tests. It also tests the artifact that deploys rather than `next dev`:
 
 ```
-npm run build && npm run start -- --port 3100
+NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build && npm run start -- --port 3100
 CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge PLAYWRIGHT_BASE_URL=http://localhost:3100 npx playwright test
 ```
 
-`NEXT_PUBLIC_SITE_URL` is required or ~10 `seo.spec.ts` URL assertions fail locally for
-reasons that have nothing to do with your change.
+`NEXT_PUBLIC_SITE_URL` is required on the build as well as the test run: the origin is baked
+into the static HTML at build time. Without it on the test run ~10 `seo.spec.ts` assertions
+fail; without it on the build ~140 URL assertions across seo, bilingual-seo, connect and
+municipal specs fail with `http://localhost:3000` — none of it related to your change. Stop
+the server before rebuilding: a running `next start` corrupts the `.next` it is serving.
 
 ## Definition of done
 
