@@ -91,7 +91,7 @@ The first two follow the focused product, even with several chart lines; the las
 
 ### 4.2 Complete product list
 
-Place a semantic, responsive table after the indicators, in the existing `ExplorerTable` rule and type system. Include **every product in the current catalogue** through incremental “More products” batches; never drop a row merely because its history begins later. Initial and subsequent batch sizes are a simple implementation choice, but the visible `shown / total` count and final access to every row are required. The table columns are:
+Place a semantic, responsive table after the indicators, in the existing `ExplorerTable` type system. The section has a “Browse products” heading and its own bilingual search field, without a dividing rule above it or a visible row counter. Search matches either official name, independently of the chart selector search; changing the query resets the visible list to its first batch. Include **every product in the current catalogue** through incremental “More products” batches, scoped to the search results; never drop a row merely because its history begins later. The table columns are:
 
 | Column | Meaning |
 | --- | --- |
@@ -99,7 +99,7 @@ Place a semantic, responsive table after the indicators, in the existing `Explor
 | Latest 12-month change | The cohort's latest published same-month-of-prior-year rate; latest month printed in the heading. |
 | Selected-years cumulative change | The full selected January-to-endpoint compounded change, or `—` with the first available year when incomplete. Heading updates with the selected years and last month. |
 
-The list stays sorted by the **latest annual** column even when the cumulative chart is active or the year range changes. The selected rows use the existing tint; a product clicked here toggles it on the chart. On narrow screens, preserve the name and both numerical columns with the project's existing table scroll hint rather than shrinking Georgian labels or hiding the cumulative column. No large product image, card grid or separate basket-weight list appears.
+The list stays sorted by the **latest annual** column even when searched, when the cumulative chart is active or when the year range changes. Its search does not change chart selection. The selected rows use the existing tint; a product clicked here toggles it on the chart. On narrow screens, preserve the name and both numerical columns with the project's existing table scroll hint rather than shrinking Georgian labels or hiding the cumulative column. No large product image, card grid or separate basket-weight list appears.
 
 ## 5. Production illustrations
 
@@ -131,7 +131,7 @@ All headings, actions, data notes, labels, tooltips, hash-restored state, workbo
 
 Extend the internal `docs/data-methodology/inflation-products.md` and public `/methodology/inflation` page with the published annual index definition, Fiscal.ge's cumulative formula and December baseline, range-end rules, late-entry `—` rule, the source identity safeguards and audit disclosures, and the distinction from GEL prices, weights and contributions. Link the existing archived source workbooks; do not expose the internal decisions CSV as if it were a Geostat product crosswalk.
 
-The icon-only mode control has a localized accessible name, tooltip and pressed state. Search, selection, slider handles, “More products” and workbook action work by keyboard and touch. The chart has a concise screen-reader summary; exact series values remain available in the table/export and tooltips. Series colour is paired with labels/swatches rather than relied on alone. Product art is decorative. The complete list is a real table with headers and a visible `shown / total` count. On phones the workspace stacks in the existing order (chart then selector), followed by indicators and product list, without page-level horizontal overflow.
+The icon-only mode control has a localized accessible name, tooltip and pressed state. Both independent searches, selection, slider handles, “More products” and workbook action work by keyboard and touch. The chart has a concise screen-reader summary; exact series values remain available in the table/export and tooltips. Series colour is paired with labels/swatches rather than relied on alone. Product art is decorative. The complete list is a real table with headers. On phones the workspace stacks in the existing order (chart then selector), followed by indicators and product list, without page-level horizontal overflow.
 
 ## 8. Verification and acceptance
 

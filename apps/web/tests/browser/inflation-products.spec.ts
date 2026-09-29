@@ -14,7 +14,10 @@ for (const locale of ["ka", "en"] as const) {
       await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "false");
       await expect(page.getByTestId("series-status")).toContainText("1 / 305");
       await expect(page.getByTestId("product-indicators")).toBeVisible();
-      await expect(page.getByTestId("product-list-count")).toHaveText("40 / 305");
+      await expect(page.getByTestId("product-list").getByRole("heading", { name: locale === "en" ? "Browse products" : "პროდუქტების სია" })).toBeVisible();
+      await expect(page.getByTestId("product-list-search")).toBeVisible();
+      await expect(page.getByTestId("product-list-count")).toHaveCount(0);
+      expect(await page.getByTestId("product-list").evaluate((section) => getComputedStyle(section).borderTopWidth)).toBe("0px");
       await expect(page.locator('[data-series-id="cpi.product.p0058"]')).toHaveAttribute("data-series-id", "cpi.product.p0058");
       await expect(page.getByTestId("inflation-products-link")).toHaveAttribute("aria-current", "page");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -49,12 +52,37 @@ test("annual default, bilingual search, multi-selection and icon-only cumulative
   await page.locator('[data-series-id="cpi.product.p0001"]').getByTestId("series-row-toggle").click();
   await expect(page.getByTestId("series-status")).toContainText("2 / 305");
   await expect(page.getByTestId("product-indicators")).toContainText("Rice");
-  await expect(page.getByTestId("product-list-count")).toHaveText("40 / 305");
+  await expect(page.getByTestId("product-table").locator("tbody tr")).toHaveCount(40);
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-pressed", "true");
   await expect(toggle).toHaveAttribute("aria-label", "Show annual inflation");
   await expect(page.getByTestId("chart-panel")).toContainText("Cumulative price change");
   await expect(page).toHaveURL(/i=cumulative/);
+});
+
+test("the lower list searches all products independently of the chart selector", async ({ page }) => {
+  await page.goto(`/en${ROUTE}`);
+  await ready(page);
+  const listRows = page.getByTestId("product-table").locator("tbody tr");
+  const listSearch = page.getByTestId("product-list-search");
+  const selectorSearch = page.getByTestId("series-search");
+  await page.getByTestId("product-more").click();
+  await expect(listRows).toHaveCount(80);
+  await selectorSearch.fill("rice");
+  await listSearch.fill("  Coffee   cup with saucer  ");
+  await expect(listRows).toHaveCount(1);
+  await expect(listRows.first()).toHaveAttribute("data-product-id", "cpi.product.p0179");
+  await expect(page.getByTestId("product-more")).toHaveCount(0);
+  await expect(selectorSearch).toHaveValue("rice");
+  await expect(page.getByTestId("series-status")).toContainText("1 / 305");
+  await listSearch.fill("  ყავის ფინჯანი ლამბაქით  ");
+  await expect(listRows.first()).toHaveAttribute("data-product-id", "cpi.product.p0179");
+  await listSearch.fill("no-such-product");
+  await expect(listRows).toHaveCount(0);
+  await expect(page.getByTestId("product-list-empty")).toBeVisible();
+  await listSearch.fill("");
+  await expect(listRows).toHaveCount(40);
+  await expect(listRows.first()).toHaveAttribute("data-product-id", "cpi.product.p0058");
 });
 
 test("year controls, late history, empty selection and language restoration", async ({ page }) => {
@@ -111,7 +139,7 @@ test("the complete list is reachable while the latest annual order stays fixed",
     await page.getByTestId("product-more").click();
     await expect(list.locator("tbody tr")).toHaveCount(Math.min(shown, 305));
   }
-  await expect(page.getByTestId("product-list-count")).toHaveText("305 / 305");
+  await expect(list.locator("tbody tr")).toHaveCount(305);
   await expect(list.locator('tr[data-product-id="cpi.product.p0305"]')).toHaveCount(1);
   await expect(page.getByTestId("product-more")).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

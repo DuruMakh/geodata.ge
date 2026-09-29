@@ -4,22 +4,19 @@ import { useState } from "react";
 import { makePeriod, periodKey } from "../../lib/data/inflation/periods";
 import { formatShare, MISSING } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
-import { productAnnual, productCumulative, rankProducts, type ProductIndex } from "../../lib/explorer/inflationProducts";
+import { productAnnual, productCumulative, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import type { ProductState } from "../../lib/explorer/inflationProductState";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 import { SectionTitle } from "../ui/editorial";
 import { InflationProductArt } from "./inflation-product-art";
+import { filteredProductIds } from "./inflation-product-panel";
 
 const BATCH_SIZE = 40;
 
 export function nextProductCount(shown: number, total: number): number {
   return Math.min(shown + BATCH_SIZE, total);
-}
-
-export function visibleProductIds(index: ProductIndex, shown: number): string[] {
-  return rankProducts(index).slice(0, shown);
 }
 
 export function InflationProductTable({ index, state, onToggle }: {
@@ -29,18 +26,27 @@ export function InflationProductTable({ index, state, onToggle }: {
 }) {
   const { locale, messages } = useI18n();
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `inflation.${key}`, values);
+  const [query, setQuery] = useState("");
   const [shown, setShown] = useState(Math.min(BATCH_SIZE, index.products.length));
-  const ids = visibleProductIds(index, shown);
+  const matches = filteredProductIds(index, query);
+  const ids = matches.slice(0, shown);
   const endPeriod = Math.min(makePeriod(state.range.endYear, 12), index.latestPeriod);
   const latestLabel = periodLabel(messages, index.latestPeriod, "long");
   const endLabel = periodLabel(messages, endPeriod, "long");
 
-  return <section data-testid="product-list" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
-    <SectionTitle>{t("productsAllHeading")}</SectionTitle>
-    <p data-testid="product-list-count" className="mt-2 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-      {shown} / {index.products.length}
-    </p>
-    <div className="mt-[18px]">
+  return <section data-testid="product-list" className="mt-12">
+    <div className="flex flex-col gap-3 min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between">
+      <SectionTitle>{t("productsBrowseHeading")}</SectionTitle>
+      <input
+        data-testid="product-list-search"
+        value={query}
+        onChange={(event) => { setQuery(event.target.value); setShown(Math.min(BATCH_SIZE, index.products.length)); }}
+        placeholder={t("productsSearch")}
+        aria-label={t("productsSearch")}
+        className="h-[34px] w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] min-[768px]:w-[280px]"
+      />
+    </div>
+    {ids.length === 0 ? <p data-testid="product-list-empty" className="mt-6 text-[13px] text-[var(--muted)]">{t("productsNoMatches")}</p> : <div className="mt-[18px]">
       <HorizontalScrollHint testId="product-table-scroll-hint" />
       <div
         data-testid="product-table"
@@ -112,11 +118,11 @@ export function InflationProductTable({ index, state, onToggle }: {
           </tbody>
         </table>
       </div>
-    </div>
-    {shown < index.products.length ? <button
+    </div>}
+    {shown < matches.length ? <button
       type="button"
       data-testid="product-more"
-      onClick={() => setShown((current) => nextProductCount(current, index.products.length))}
+      onClick={() => setShown((current) => nextProductCount(current, matches.length))}
       className="mt-5 cursor-pointer border-b border-[var(--accent)] pb-0.5 text-[12.5px] font-semibold text-[var(--ink)] hover:text-[var(--accent)]"
     >{t("productsMore")}</button> : null}
   </section>;

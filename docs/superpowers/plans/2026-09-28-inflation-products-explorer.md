@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-27-inflation-products-explorer-design.md`. Read it with this plan; the approved layout and data rules live there.
 
+**Later user refinement (2026-09-29):** The lower table has its own bilingual search, a “Browse products” heading, no dividing rule above it, and no visible `shown / total` counter. This supersedes the original Task 7 counter instruction; the updated spec and `DESIGN.md` own the final layout.
+
 ## Global Constraints
 
 - Use the current-basket catalogue and fact CSVs already in `data/imports/`. The August 2026 regression fixture has **305 products**, **84,056 facts** and **176 explicit unavailable cells**; runtime counts and latest month come from loaded data.
