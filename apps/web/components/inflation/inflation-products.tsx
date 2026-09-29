@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { makePeriod, periodMonth, periodYear } from "../../lib/data/inflation/periods";
+import { makePeriod, periodKey, periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import { formatDisplayDate } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { buildProductIndex, productAnnual, productColor, productCumulative, type ClientProduct, type PackedProductSeries } from "../../lib/explorer/inflationProducts";
@@ -63,10 +63,21 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
   const periods = Array.from({ length: endPeriod - makePeriod(state.range.startYear, 1) + 1 },
     (_, offset) => makePeriod(state.range.startYear, 1) + offset);
   const years = Array.from({ length: maxYear - minYear + 1 }, (_, offset) => minYear + offset);
+  const omitted = state.indicator === "cumulative" ? state.selected.flatMap((id) => {
+    const product = index.productById.get(id);
+    if (!product) return [];
+    const cumulative = productCumulative(index, id, state.range.startYear, endPeriod);
+    if (cumulative.value !== null) return [];
+    const reason = cumulative.reason === "late_start" ? t("productsLateStart", { period: product.firstPeriod }) :
+      cumulative.missingPeriod !== null ? t("productsMissingMonth", { period: periodKey(cumulative.missingPeriod) }) :
+        t("productsUnavailable");
+    return [{ id, label: locale === "ka" ? product.labelKa : product.labelEn, reason }];
+  }) : [];
+  const omittedIds = new Set(omitted.map((item) => item.id));
   const chartSeries: ChartSeries[] = state.selected.flatMap((id) => {
     const item = index.productById.get(id);
     if (!item) return [];
-    if (state.indicator === "cumulative" && productCumulative(index, id, state.range.startYear, endPeriod).value === null) return [];
+    if (omittedIds.has(id)) return [];
     const vals = periods.map((period) => state.indicator === "annual" ?
       productAnnual(index, id, period) : productCumulative(index, id, state.range.startYear, period).value);
     return [{ id, label: locale === "ka" ? item.labelKa : item.labelEn, color: productColor(id), vals,
@@ -130,6 +141,12 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
           </div> : <div className="mt-5"><Callout testId="no-selection-callout">
             {state.selected.length === 0 ? message(messages, "main.noSelection") : t("productsNoCompleteSeries")}
           </Callout></div>}
+          {omitted.length > 0 ? <div data-testid="product-chart-omissions" className="mt-3 border-l-2 border-[var(--accent)] pl-3 text-[11px] leading-relaxed text-[var(--muted)]">
+            <p className="font-semibold text-[var(--ink)]">{t("productsChartOmitted")}</p>
+            <ul className="mt-1 list-disc pl-4">
+              {omitted.map((item) => <li key={item.id}>{item.label} — {item.reason}</li>)}
+            </ul>
+          </div> : null}
           <RangeStrip
             years={years}
             range={range}

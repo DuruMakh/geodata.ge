@@ -50,14 +50,17 @@ export function InflationProductPanel({ index, state, onToggle, onClear, downloa
       {visible.map((id) => {
         const item = index.productById.get(id)!;
         const annual = productAnnual(index, id, index.latestPeriod);
+        const focused = state.selected.at(-1) === id;
         return <SeriesSelectorRow
           key={id}
           id={id}
           label={locale === "ka" ? item.labelKa : item.labelEn}
           color={productColor(id)}
           art={<InflationProductArt productId={id} />}
+          meta={focused ? message(messages, "inflation.productsFocusedTag") : undefined}
           value={annual === null ? MISSING : formatShare(annual / 100, true)}
           selected={state.selected.includes(id)}
+          showRail={focused}
           onToggle={() => onToggle(id)}
         />;
       })}

@@ -83,6 +83,24 @@ test("year controls, late history, empty selection and language restoration", as
   expect(new URL(page.url()).hash).toContain("sel=");
 });
 
+test("a mixed cumulative selection names the omitted product and marks the focused product", async ({ page }) => {
+  await page.goto(`/en${ROUTE}#i=cumulative&r=2015-2026&sel=cpi.product.p0179,cpi.product.p0058`);
+  await ready(page);
+  await expect(page.getByTestId("product-chart-summary")).toContainText("Product lines shown: 1");
+  await expect(page.getByTestId("product-chart-omissions")).toContainText("Coffee cup with saucer — history starts 2019-01");
+  const tomato = page.locator('[data-series-id="cpi.product.p0058"]');
+  const coffee = page.locator('[data-series-id="cpi.product.p0179"]');
+  await expect(tomato).toContainText("Focus");
+  await expect(coffee).not.toContainText("Focus");
+  await page.setViewportSize({ width: 390, height: 900 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await coffee.getByTestId("series-row-toggle").click();
+  await expect(page.getByTestId("product-chart-omissions")).toHaveCount(0);
+  await coffee.getByTestId("series-row-toggle").click();
+  await expect(coffee).toContainText("Focus");
+  await expect(tomato).not.toContainText("Focus");
+});
+
 test("the complete list is reachable while the latest annual order stays fixed", async ({ page }) => {
   await page.goto(`/en${ROUTE}#i=cumulative&r=2015-2016&sel=`);
   await ready(page);

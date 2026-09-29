@@ -1,4 +1,4 @@
-import { makePeriod, periodKey, periodMonth, periodYear } from "../data/inflation/periods";
+import { makePeriod, periodFromKey, periodKey, periodMonth, periodYear } from "../data/inflation/periods";
 import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import { periodLabel } from "./inflationLabels";
@@ -49,7 +49,12 @@ export function buildInflationProductWorkbookExportModel(input: {
     const product = index.productById.get(id);
     if (!product) continue;
     const name = locale === "ka" ? product.labelKa : product.labelEn;
-    const cumulativeComplete = productCumulative(index, id, state.range.startYear, end).value !== null;
+    const firstPeriod = periodFromKey(product.firstPeriod);
+    const cumulativeResult = productCumulative(index, id, state.range.startYear, end);
+    const cumulativeComplete = cumulativeResult.value !== null;
+    const cumulativeIssue = cumulativeResult.reason === "late_start" ? t("productsLateStart", { period: product.firstPeriod }) :
+      cumulativeResult.reason === "missing_month" && cumulativeResult.missingPeriod !== null ?
+        t("productsMissingMonth", { period: periodKey(cumulativeResult.missingPeriod) }) : t("productsUnavailable");
     for (let period = makePeriod(state.range.startYear, 1); period <= end; period += 1) {
       const annualIndex = productAnnualIndex(index, id, period);
       const annual = productAnnual(index, id, period);
@@ -58,8 +63,8 @@ export function buildInflationProductWorkbookExportModel(input: {
         periodYear(period), periodMonth(period), name, annualIndex,
         annual === null ? null : annual / 100,
         cumulative === null ? null : cumulative / 100,
-        annual === null ? t("productsNotPublished") : t("published"),
-        cumulative === null ? t("productsUnavailable") : t("productsDerived"),
+        annual === null ? period < firstPeriod ? t("productsLateStart", { period: product.firstPeriod }) : t("productsNotPublished") : t("published"),
+        cumulative === null ? cumulativeIssue : t("productsDerived"),
       ]);
     }
   }

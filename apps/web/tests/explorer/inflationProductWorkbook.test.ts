@@ -58,6 +58,16 @@ describe("individual-product inflation workbook", () => {
     expect(past.readable.rows[0]!.valuesByYear[1]).toBe(annual);
   });
 
+  it("does not call unverified earlier identity history unpublished", () => {
+    const model = buildInflationProductWorkbookExportModel({
+      ...input(), state: { indicator: "cumulative", range: { startYear: 2015, endYear: 2020 }, selected: ["cpi.product.p0179"] },
+    });
+    const beforeIdentity = model.analysis.rows.find((row) => row[0] === 2015 && row[1] === 1)!;
+    expect(beforeIdentity[3]).toBeNull();
+    expect(beforeIdentity[6]).toBe("history starts 2019-01");
+    expect(beforeIdentity[7]).toBe("history starts 2019-01");
+  });
+
   it("leaves a full-range cumulative value blank after one missing monthly index", () => {
     const shortId = "cpi.product.p0999";
     const shortIndex = buildProductIndex(
