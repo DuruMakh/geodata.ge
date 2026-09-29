@@ -27,6 +27,7 @@ describe("individual-product inflation page", () => {
     expect(html).toMatch(/data-series-id="cpi.product.p0058"[^>]*bg-\[var\(--tint\)\]/);
     expect(html).toContain('data-testid="series-status"');
     expect(html).toContain("305");
+    expect(html).toContain("დაგროვილ ცვლილებას Fiscal.ge ითვლის");
     const clearAction = html.slice(html.indexOf('data-testid="series-toggle-all"'), html.indexOf('data-testid="series-toggle-all"') + 650);
     expect(clearAction).toContain("გასუფთავება");
     expect(clearAction).not.toContain("ყველას მონიშვნა");

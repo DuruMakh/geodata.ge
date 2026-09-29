@@ -158,7 +158,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
         </section>
         <div className="mt-[18px] space-y-2">
           <SourceNote testId="source-label">{t("productsSource")} {message(messages, "main.lastUpdated", { date: displayDate })}</SourceNote>
-          {state.indicator === "cumulative" ? <p className="text-xs text-[var(--muted)]">{t("productsDerivedNote")}</p> : null}
+          <p className="text-xs text-[var(--muted)]">{t("productsDerivedNote")}</p>
           <Link href={pageHref("/methodology/inflation", locale)} className="text-xs text-[var(--muted)] underline underline-offset-4">
             {t("methodology")}
           </Link>
