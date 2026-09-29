@@ -76,11 +76,24 @@ describe("latestCityIndicators", () => {
     const latest = latestCityIndicators(index, "cpi.headline")!;
     expect(latest.period).toBe(makePeriod(2026, 8));
     expect(latest.highest.cityIds).toEqual(["city.batumi"]);
-    expect(latest.highest.deltaPp).toBeCloseTo(7.0857 - 5.6479, 6);
     expect(latest.lowest.cityIds).toEqual(["city.telavi"]);
     expect(latest.lowest.fell).toBe(false);
-    expect(latest.gap.value).toBeCloseTo(7.0857 - 4.3561, 6);
     expect(latest.aboveNational).toMatchObject({ count: 2, total: 6 });
+  });
+
+  it("argues differences from the printed one-decimal figures", () => {
+    // 7.0857 - 5.6479 = 1.4378 would print 1.4 beside 7.1% and 5.6%; the reader checks 7.1 - 5.6.
+    const latest = latestCityIndicators(index, "cpi.headline")!;
+    expect(latest.highest.deltaPp).toBe(1.5);
+    expect(latest.lowest.deltaPp).toBe(-1.2);
+    expect(latest.gap.value).toBe(2.7);
+  });
+
+  it("says prices fell only when the printed rate is negative", () => {
+    const withTelavi = (value: number) =>
+      buildCityIndex(fixtureCityFacts.map((fact) => (fact.lineId === "city.telavi" && fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct" && fact.period === "2026-08" ? { ...fact, value } : fact)));
+    expect(latestCityIndicators(withTelavi(-0.3), "cpi.headline")!.lowest.fell).toBe(true);
+    expect(latestCityIndicators(withTelavi(-0.03), "cpi.headline")!.lowest.fell).toBe(false);
   });
 
   it("follows the picked category", () => {

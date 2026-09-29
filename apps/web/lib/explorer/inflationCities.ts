@@ -1,6 +1,6 @@
 import { periodFromKey, periodKey } from "../data/inflation/periods";
 import { CPI_CITY_IDS, type CityFactInput, type CpiCityMeasure } from "../data/inflation/types";
-import { decemberAverages } from "./inflationGrid";
+import { decemberAverages, displayedValue } from "./inflationGrid";
 import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
@@ -156,7 +156,8 @@ const SPARK_MONTHS = 36;
 /**
  * Spec §6: the latest published month, year on year, for the picked category,
  * whatever the tab or range. Cities only — Georgia is the benchmark, never a
- * ranked entry. Ties name every tied city.
+ * ranked entry. Ties name every tied city. Differences and the fall wording argue
+ * from the printed one-decimal figures, so they never disagree with them.
  */
 export function latestCityIndicators(index: CityIndex, category: string): CityIndicators | null {
   const series = CPI_CITY_IDS.flatMap((cityId) => {
@@ -179,16 +180,16 @@ export function latestCityIndicators(index: CityIndex, category: string): CityIn
   const rate = (value: number): CityRate => ({
     cityIds: present.filter((row) => row.value === value).map((row) => row.cityId),
     value,
-    deltaPp: nationalNow === null ? null : value - nationalNow,
+    deltaPp: nationalNow === null ? null : displayedValue(displayedValue(value) - displayedValue(nationalNow)),
   });
   const window = Array.from({ length: SPARK_MONTHS }, (_, offset) => period - SPARK_MONTHS + 1 + offset);
   return {
     period,
     national: nationalNow,
     highest: rate(max),
-    lowest: { ...rate(min), fell: min < 0 },
+    lowest: { ...rate(min), fell: displayedValue(min) < 0 },
     gap: {
-      value: max - min,
+      value: displayedValue(displayedValue(max) - displayedValue(min)),
       spark: window.map((month) => {
         const rows = at(month);
         return rows.length < 2 ? null : Math.max(...rows.map((row) => row.value)) - Math.min(...rows.map((row) => row.value));

@@ -193,7 +193,7 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
   const nationalFacts = new Map(snapshot.inflation.facts.filter((f) => f.measure === factMeasure).map((f) => [`${f.seriesId}|${f.period}`, f]));
   const categoryFacts = new Map(snapshot.inflation.categories.filter((f) => f.measure === factMeasure).map((f) => [`${f.categoryId}|${f.period}`, f]));
   const weights = new Map(snapshot.inflation.weights.map((row) => [`${row.categoryId}|${row.year}`, row]));
-  const cityFactsForMeasure = snapshot.inflation.cities.filter((f) => f.measure === factMeasure);
+  const cityFactsForMeasure = hasCity ? snapshot.inflation.cities.filter((f) => f.measure === factMeasure) : [];
   const cityFacts = new Map(cityFactsForMeasure.map((f) => [`${f.cityId}|${f.seriesId}|${f.period}`, f]));
   // A city's own first month can start later than CITY_FIRST_PERIOD (Zugdidi's
   // yoy_pct starts 2016-12, its avg12_pct 2017-12): the missing reason must name
