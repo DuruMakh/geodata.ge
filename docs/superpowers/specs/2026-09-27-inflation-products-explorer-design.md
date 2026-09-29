@@ -96,10 +96,10 @@ Place a semantic, responsive table after the indicators, in the existing `Explor
 | Column | Meaning |
 | --- | --- |
 | Product | Small illustration and official name in the active language, with the other official language as the secondary label. |
-| Latest 12-month change | The cohort's latest published same-month-of-prior-year rate; latest month printed in the heading. |
 | Selected-years cumulative change | The full selected January-to-endpoint compounded change, or `—` with the first available year when incomplete. Heading updates with the selected years and last month. |
+| Latest 12-month change | The cohort's latest published same-month-of-prior-year rate; latest month printed in the heading. |
 
-The list stays sorted by the **latest annual** column even when searched, when the cumulative chart is active or when the year range changes. Its search does not change chart selection. The selected rows use the existing tint; a product clicked here toggles it on the chart. On narrow screens, preserve the name and both numerical columns with the project's existing table scroll hint rather than shrinking Georgian labels or hiding the cumulative column. No large product image, card grid or separate basket-weight list appears.
+The list sorts by the **selected-years cumulative change**, highest first, and re-ranks when the selected year range changes, regardless of chart mode. A missing full-range cumulative value sorts after every available value. Search preserves this order and does not change chart selection; the right-side selector keeps its latest-annual ranking. The selected rows use the existing tint; a product clicked here toggles it on the chart. On narrow screens, preserve the name and both numerical columns with the project's existing table scroll hint rather than shrinking Georgian labels or hiding the cumulative column. No large product image, card grid or separate basket-weight list appears.
 
 ## 5. Production illustrations
 
@@ -119,7 +119,7 @@ Use stable ASCII hash state, following the other explorers: `i=annual|cumulative
 
 Add one Excel action in the right panel using the site's localized **Summary / Data / Sources** workbook pattern:
 
-- **Summary:** every current product, in the on-page latest-annual ranking, with official names, latest annual rate and selected-range cumulative rate or a clearly explained missing value.
+- **Summary:** every current product in the export's latest-annual ranking, with official names, latest annual rate and selected-range cumulative rate or a clearly explained missing value. The on-page table uses the selected-range cumulative ranking.
 - **Data:** monthly published annual indices/changes and Fiscal.ge cumulative changes for the selected products and selected years. Include measure, month, percent unit and published-versus-derived status; no invented values or internal source locator columns.
 - **Sources:** the relevant original Geostat annual and previous-month workbooks, preferring the reader's language edition where available, with validated public archive links and selected coverage.
 
@@ -139,7 +139,7 @@ The implementation plan should break this into focused tests and changes, then r
 
 - **Data and arithmetic:** all 305 current products resolve to unique IDs; 84,056 reviewed fact rows and 176 explicit unavailable cells retain source parity; annual values equal published index minus 100; cumulative examples match independent products of full-precision monthly indices; annual and cumulative chart endpoints match the list and workbook at display precision; 2015, a one-year range, a past December endpoint, current partial year, later first periods and a synthetic missing monthly cell are exercised.
 - **Mirror and refresh:** migration/import is transactional and exact-parity checked in CSV and DB build modes; the existing revision and identity guards still stop changed historical values; the audit's 2014-backed check becomes repeatable; the p0179/p0269/p0148 decisions and disclosures are recorded before public sign-off.
-- **Behavior:** default annual chart and top-ranked selection; icon-only cumulative toggle and keyboard/tooltip semantics; multi-selection, focused-product indicators, clear/empty state; bilingual search; descending ranking and stable ties; quick range choices and handle movement; all current products reachable through the table; late products show `—` for incomplete cumulative ranges; URL and language switching restore the view; Excel's three sheets match the page.
+- **Behavior:** default annual chart and top-ranked selection; icon-only cumulative toggle and keyboard/tooltip semantics; multi-selection, focused-product indicators, clear/empty state; bilingual search; latest-annual ranking in the right selector and selected-range cumulative ranking in the lower table, with incomplete histories last; quick range choices and handle movement; all current products reachable through the table; late products show `—` for incomplete cumulative ranges; URL and language switching restore the view; Excel's three sheets use the same rate calculations as the page.
 - **Visual and accessibility:** compare the page to the existing inflation overview/categories at desktop and mobile widths in both languages. Verify type, spacing, chart axes, table scroll, contrast, focus, no oversize product imagery, no duplicate functional icon family, complete reviewed icon mapping, and no horizontal page overflow. Run the targeted browser spec, then `npm run check`, `npm run build` in CSV and DB modes where configured, and `npm run test:browser` per `CLAUDE.md`.
 
 ## 9. Authority and next step

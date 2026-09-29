@@ -28,9 +28,17 @@ export function InflationProductTable({ index, state, onToggle }: {
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `inflation.${key}`, values);
   const [query, setQuery] = useState("");
   const [shown, setShown] = useState(Math.min(BATCH_SIZE, index.products.length));
-  const matches = filteredProductIds(index, query);
-  const ids = matches.slice(0, shown);
   const endPeriod = Math.min(makePeriod(state.range.endYear, 12), index.latestPeriod);
+  const matches = filteredProductIds(index, query);
+  const cumulativeById = new Map(matches.map((id) => [id, productCumulative(index, id, state.range.startYear, endPeriod)] as const));
+  matches.sort((a, b) => {
+    const left = cumulativeById.get(a)!.value;
+    const right = cumulativeById.get(b)!.value;
+    if (left === null) return right === null ? 0 : 1;
+    if (right === null) return -1;
+    return right - left;
+  });
+  const ids = matches.slice(0, shown);
   const latestLabel = periodLabel(messages, index.latestPeriod, "long");
   const endLabel = periodLabel(messages, endPeriod, "long");
 
@@ -67,10 +75,10 @@ export function InflationProductTable({ index, state, onToggle }: {
               {t("productsProductColumn")}
             </th>
             <th scope="col" className="border-b-2 border-[var(--ink)] px-2 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
-              {t("productsAnnualColumn", { period: latestLabel })}
+              {t("productsCumulativeColumn", { start: state.range.startYear, end: endLabel })}
             </th>
             <th scope="col" className="border-b-2 border-[var(--ink)] py-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
-              {t("productsCumulativeColumn", { start: state.range.startYear, end: endLabel })}
+              {t("productsAnnualColumn", { period: latestLabel })}
             </th>
           </tr></thead>
           <tbody>
@@ -80,7 +88,7 @@ export function InflationProductTable({ index, state, onToggle }: {
               const secondary = locale === "ka" ? product.labelEn : product.labelKa;
               const selected = state.selected.includes(id);
               const annual = productAnnual(index, id, index.latestPeriod);
-              const cumulative = productCumulative(index, id, state.range.startYear, endPeriod);
+              const cumulative = cumulativeById.get(id)!;
               const missing = cumulative.reason === "late_start" ? t("productsLateStart", { period: product.firstPeriod }) :
                 cumulative.reason === "missing_month" && cumulative.missingPeriod !== null ?
                   t("productsMissingMonth", { period: periodKey(cumulative.missingPeriod) }) : null;
@@ -107,11 +115,11 @@ export function InflationProductTable({ index, state, onToggle }: {
                   </button>
                 </td>
                 <td className="px-3 py-2 text-right font-[family-name:var(--font-numeric)] text-[12.5px] font-semibold whitespace-nowrap text-[var(--ink)]">
-                  {annual === null ? MISSING : formatShare(annual / 100, true)}
-                </td>
-                <td className="py-2 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)]">
                   {cumulative.value === null ? MISSING : formatShare(cumulative.value / 100, true)}
                   {missing ? <span className="block max-w-[230px] whitespace-normal text-[10px] leading-snug text-[var(--muted)]">{missing}</span> : null}
+                </td>
+                <td className="py-2 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)]">
+                  {annual === null ? MISSING : formatShare(annual / 100, true)}
                 </td>
               </tr>;
             })}

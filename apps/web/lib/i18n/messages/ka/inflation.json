@@ -237,7 +237,7 @@
   "inflation.productsChooseProduct": "აირჩიეთ პროდუქტი",
   "inflation.productsBrowseHeading": "პროდუქტების სია",
   "inflation.productsNoMatches": "შესაბამისი პროდუქტი ვერ მოიძებნა.",
-  "inflation.productsTableCaption": "მოქმედი პროდუქტები დალაგებულია {latest} წლიური ცვლილებით; დაგროვილი ცვლილება {start}–{end} პერიოდში.",
+  "inflation.productsTableCaption": "მოქმედი პროდუქტები დალაგებულია {start}–{end} პერიოდში დაგროვილი ცვლილებით; ბოლო წლიური ცვლილება — {latest}.",
   "inflation.productsSelect": "გრაფიკზე დამატება:",
   "inflation.productsDeselect": "გრაფიკიდან ამოღება:",
   "inflation.productsMore": "მეტი პროდუქტი"

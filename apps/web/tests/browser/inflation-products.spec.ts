@@ -17,6 +17,7 @@ for (const locale of ["ka", "en"] as const) {
       await expect(page.getByTestId("product-list").getByRole("heading", { name: locale === "en" ? "Browse products" : "პროდუქტების სია" })).toBeVisible();
       await expect(page.getByTestId("product-list-search")).toBeVisible();
       await expect(page.getByTestId("product-list-count")).toHaveCount(0);
+      await expect(page.getByTestId("series-row").first()).toHaveAttribute("data-series-id", "cpi.product.p0058");
       expect(await page.getByTestId("product-list").evaluate((section) => getComputedStyle(section).borderTopWidth)).toBe("0px");
       await expect(page.locator('[data-series-id="cpi.product.p0058"]')).toHaveAttribute("data-series-id", "cpi.product.p0058");
       await expect(page.getByTestId("inflation-products-link")).toHaveAttribute("aria-current", "page");
@@ -25,9 +26,9 @@ for (const locale of ["ka", "en"] as const) {
       expect(await icon.evaluate((image) => Math.round(image.getBoundingClientRect().width))).toBe(32);
       if (width === 390) {
         const region = (await page.getByTestId("product-table").boundingBox())!;
-        const annualCell = (await page.getByTestId("product-table").locator("tbody tr").first().locator("td").nth(1).boundingBox())!;
-        // A phone should show the product and its latest annual value before a horizontal swipe.
-        expect(annualCell.x + annualCell.width).toBeLessThanOrEqual(region.x + region.width + 1);
+        const cumulativeCell = (await page.getByTestId("product-table").locator("tbody tr").first().locator("td").nth(1).boundingBox())!;
+        // A phone should show the product and its selected-years cumulative value before a horizontal swipe.
+        expect(cumulativeCell.x + cumulativeCell.width).toBeLessThanOrEqual(region.x + region.width + 1);
       }
       await page.screenshot({ path: testInfo.outputPath(`products-${locale}-${width}.png`), fullPage: true });
     });
@@ -66,6 +67,7 @@ test("the lower list searches all products independently of the chart selector",
   const listRows = page.getByTestId("product-table").locator("tbody tr");
   const listSearch = page.getByTestId("product-list-search");
   const selectorSearch = page.getByTestId("series-search");
+  const firstBeforeSearch = await listRows.first().getAttribute("data-product-id");
   await page.getByTestId("product-more").click();
   await expect(listRows).toHaveCount(80);
   await selectorSearch.fill("rice");
@@ -77,12 +79,16 @@ test("the lower list searches all products independently of the chart selector",
   await expect(page.getByTestId("series-status")).toContainText("1 / 305");
   await listSearch.fill("  ყავის ფინჯანი ლამბაქით  ");
   await expect(listRows.first()).toHaveAttribute("data-product-id", "cpi.product.p0179");
+  await listSearch.fill("პომიდორი");
+  await expect(listRows.first()).toHaveAttribute("data-product-id", "cpi.product.p0058");
+  await expect(listRows.first().locator("td").nth(1)).toContainText("−26.6%");
+  await expect(listRows.first().locator("td").nth(2)).toContainText("+57.5%");
   await listSearch.fill("no-such-product");
   await expect(listRows).toHaveCount(0);
   await expect(page.getByTestId("product-list-empty")).toBeVisible();
   await listSearch.fill("");
   await expect(listRows).toHaveCount(40);
-  await expect(listRows.first()).toHaveAttribute("data-product-id", "cpi.product.p0058");
+  await expect(listRows.first()).toHaveAttribute("data-product-id", firstBeforeSearch!);
 });
 
 test("year controls, late history, empty selection and language restoration", async ({ page }) => {
@@ -129,17 +135,31 @@ test("a mixed cumulative selection names the omitted product and marks the focus
   await expect(tomato).not.toContainText("Focus");
 });
 
-test("the complete list is reachable while the latest annual order stays fixed", async ({ page }) => {
+test("the complete list is reachable in descending cumulative order", async ({ page }) => {
   await page.goto(`/en${ROUTE}#i=cumulative&r=2015-2016&sel=`);
   await ready(page);
   const list = page.getByTestId("product-table");
   await expect(list.locator("tbody tr")).toHaveCount(40);
-  await expect(list.locator("tbody tr").first()).toHaveAttribute("data-product-id", "cpi.product.p0058");
+  const headers = await list.locator("thead th").allTextContents();
+  expect(headers[1]).toContain("Cumulative change");
+  expect(headers[2]).toContain("Latest 12-month change");
   for (let shown = 80; shown <= 320; shown += 40) {
     await page.getByTestId("product-more").click();
     await expect(list.locator("tbody tr")).toHaveCount(Math.min(shown, 305));
   }
   await expect(list.locator("tbody tr")).toHaveCount(305);
+  const values = await list.locator("tbody tr td:nth-child(2)").allTextContents();
+  let previous = Infinity;
+  let unavailable = false;
+  for (const text of values) {
+    const match = /^\s*([+−-]?\d[\d,]*(?:\.\d+)?)%/.exec(text);
+    if (!match) { unavailable = true; continue; }
+    expect(unavailable).toBe(false);
+    const value = Number(match[1]!.replace("−", "-").replaceAll(",", ""));
+    expect(value).toBeLessThanOrEqual(previous);
+    previous = value;
+  }
+  expect(unavailable).toBe(true);
   await expect(list.locator('tr[data-product-id="cpi.product.p0305"]')).toHaveCount(1);
   await expect(page.getByTestId("product-more")).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

@@ -12,6 +12,8 @@
 
 **Later user refinement (2026-09-29):** The lower table has its own bilingual search, a “Browse products” heading, no dividing rule above it, and no visible `shown / total` counter. This supersedes the original Task 7 counter instruction; the updated spec and `DESIGN.md` own the final layout.
 
+**Later user refinement (2026-09-30):** The lower table puts selected-years cumulative change before latest annual change and ranks by cumulative change, highest first, with incomplete histories last. The right-side selector retains its latest-annual order. This supersedes Task 7's lower-list sort and column order; the updated spec owns the final behavior.
+
 ## Global Constraints
 
 - Use the current-basket catalogue and fact CSVs already in `data/imports/`. The August 2026 regression fixture has **305 products**, **84,056 facts** and **176 explicit unavailable cells**; runtime counts and latest month come from loaded data.
