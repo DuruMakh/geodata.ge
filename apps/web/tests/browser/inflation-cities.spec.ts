@@ -129,6 +129,19 @@ test("an old link with the retired tab and category keys still opens", async ({ 
   await page.goto(`/en${CITIES}#i=mom&c=07`);
   await ready(page);
   await expect(page.getByTestId("series-status")).toContainText("7 / 7");
+  await page.locator('[data-testid="series-row"][data-series-id="city.gori"] button').first().click();
+  await expect(page).toHaveURL(/sel=/);
+  await expect(page).not.toHaveURL(/[#&](i|c)=/);
+});
+
+test("switching language keeps a city page's selection and table series", async ({ page }) => {
+  await page.goto(`${CITIES}/batumi#m=table&sel=total%2C01&t=01`);
+  await ready(page);
+  await page.getByTestId("language-switch").first().getByRole("link", { name: "English", exact: true }).click();
+  await ready(page);
+  await expect(page).toHaveURL(/\/en\/explorer\/inflation\/cities\/batumi#.*sel=total%2C01/);
+  await expect(page.getByTestId("series-status")).toContainText("2 / 13");
+  await expect(page.getByTestId("inflation-city-table-series-cpi.cat.01")).toHaveAttribute("aria-pressed", "true");
 });
 
 test("clearing the selection can be undone from the same control", async ({ page }) => {

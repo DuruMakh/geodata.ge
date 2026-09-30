@@ -59,7 +59,7 @@ Home / Data / Inflation / Cities                 Jan 2016 – Aug 2026 · update
 ინფლაცია ქალაქებში — საქართველო ▾
 პროცენტი · წინა წლის შესაბამის თვესთან შედარებით
 
-                               ხაზი | ცხრილი     │  სერიები 7 / 7
+ხაზი | ცხრილი                                     │  სერიები 7 / 7
 line chart: Georgia (ink) + 6 cities, total      │  ☑ საქართველო
 legend · monthly range strip · source note        │  ☑ თბილისი … ☑ ზუგდიდი
                                                   │  ჩამოტვირთვა
@@ -79,7 +79,7 @@ Home / Data / Inflation / Cities / Batumi        Jan 2016 – Aug 2026 · update
 ინფლაცია ქალაქებში — ბათუმი ▾                    ← ქუთაისი · გორი →
 პროცენტი · წინა წლის შესაბამის თვესთან შედარებით
 
-                               ხაზი | ცხრილი     │  სერიები 1 / 13
+ხაზი | ცხრილი                                     │  სერიები 1 / 13
 line chart: Batumi total (ink) + picked divisions│  ☑ სულ
 legend · monthly range strip · source note        │  ☐ სურსათი და უალკოჰოლო სასმელები … (12)
                                                   │  ჩამოტვირთვა
@@ -96,7 +96,7 @@ hero: city total vs Georgia │ ყველაზე გაძვირებ�
   - **`ყველაზე გაძვირებული`**: the division with the highest rate; detail: its distance from Georgia's same division in `პპ`.
   - **`ყველაზე ნაკლებად გაძვირებული`**, or **`ყველაზე გაიაფებული`** when its printed rate is negative (the Categories page's labels and rule): the division with the lowest rate, same detail, never coloured good or bad.
   - **`ინფლაციის სიგანე`**: divisions with a positive printed rate, as `{n} / 12` with `ჯგუფი გაძვირდა`, and a 36-month sparkline of that count — the Categories page's breadth indicator.
-  - Differences use the printed one-decimal figures; ties resolve by COICOP order, as on the Categories page.
+  - Differences use the printed one-decimal figures; ties resolve exactly as on the Categories page: ranking uses the unrounded rates, and an exact tie keeps COICOP order (so the fastest is the earlier division and the slowest the later one).
 - **Caveat.** The same standing same-price-everywhere sentence in the source note. It matters more here, because a city page shows the categories where the centrally priced items sit.
 - **Excel.** The standard three-sheet workbook for the selected series of that city over the range: `მარტივი ცხრილი` (one row per series and year, `წლის საშუალო` for `სულ` only), `მონაცემები` (`წელი`, `თვე`, `ქალაქი`, `კატეგორია`, `COICOP კოდი`, `მნიშვნელობა`, `ერთეული`, `სტატუსი`), `წყაროები`. The same note; no weights.
 

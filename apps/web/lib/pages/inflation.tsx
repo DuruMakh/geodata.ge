@@ -258,7 +258,8 @@ export async function renderInflationCityPage(slug: string, locale: Locale) {
   const cityId = cityForSlug(slug);
   const data = await loadServedInflationData();
   const own = data.cities.filter((fact) => fact.cityId === cityId && isPageFact(fact));
-  const latest = own.filter((fact) => fact.measure === "yoy_pct").map((fact) => fact.period).sort().at(-1)!;
+  // The indicators rank divisions in their latest month, so Georgia is shipped for that month.
+  const latest = own.filter((fact) => fact.measure === "yoy_pct" && fact.seriesId !== "cpi.headline").map((fact) => fact.period).sort().at(-1)!;
   const facts = [...own.map(cityFactInput), ...georgiaRatesAt(data, latest)];
   return renderCitiesView(locale, { kind: "city", cityId }, facts, own.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "");
 }
