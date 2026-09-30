@@ -27,7 +27,7 @@ describe("InflationCities — Georgia page", () => {
   });
 
   it("names Georgia in the heading and carries the unit line", () => {
-    expect(markup).toContain("ინფლაცია ქალაქებში — საქართველო");
+    expect(markup).toContain("ინფლაცია ქალაქებში —");
     expect(block(markup, "inflation-city-unit")).toContain("პროცენტი");
   });
 
@@ -47,5 +47,29 @@ describe("InflationCities — Georgia page", () => {
 
   it("states that some prices are the same in every city", () => {
     expect(markup).toContain("ყველა ქალაქზე ვრცელდება");
+  });
+
+  it("puts the place name in a picker trigger with no previous/next links", () => {
+    expect(block(markup, "city-picker-trigger")).toContain("საქართველო");
+    expect(block(markup, "city-picker-trigger")).toContain('aria-expanded="false"');
+    expect(markup).not.toContain('data-testid="city-entity-navigation"');
+  });
+});
+
+describe("InflationCities — city page", () => {
+  const cityMarkup = renderGeorgianMarkup(
+    <InflationCities view={{ kind: "city", cityId: "city.batumi" }} facts={packCityFacts(fixtureCityFacts)} lastReviewedAt="2026-09-11" sources={[]} siteOrigin="https://fiscal.ge" />,
+    { ...common, ...controls, ...inflation, ...main },
+  );
+
+  it("names the city in the trigger and links its neighbours in Geostat's order", () => {
+    expect(block(cityMarkup, "city-picker-trigger")).toContain("ბათუმი");
+    const navigation = block(cityMarkup, "city-entity-navigation");
+    expect(navigation).toContain('href="/explorer/inflation/cities/kutaisi"');
+    expect(navigation).toContain('href="/explorer/inflation/cities/gori"');
+  });
+
+  it("lists the total and 12 divisions with only the total selected", () => {
+    expect(block(cityMarkup, "series-status")).toContain("1 / 13");
   });
 });

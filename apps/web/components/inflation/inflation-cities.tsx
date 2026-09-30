@@ -20,7 +20,7 @@ import {
   type CityView,
   type PackedCitySeries,
 } from "../../lib/explorer/inflationCities";
-import { cityLineLabel, cityPlaceLabel, cityViewLineColor, cityViewLineLabel } from "../../lib/explorer/inflationCityLabels";
+import { cityLineLabel, cityViewLineColor, cityViewLineLabel } from "../../lib/explorer/inflationCityLabels";
 import { CITIES_PATH } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
@@ -30,7 +30,6 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
@@ -39,6 +38,7 @@ import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial
 import { RangeStrip } from "../main-explorer/range-strip";
 import { PageHeader } from "../shell/page-header";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { InflationCityHeading } from "./inflation-city-heading";
 import { InflationCityIndicators } from "./inflation-city-indicators";
 import { InflationCityPanel } from "./inflation-city-panel";
 import { InflationCityTable } from "./inflation-city-table";
@@ -102,9 +102,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
         ]}
         coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
       />
-      <ExplorerHeading>
-        {t("cityHeadingLead")} {cityPlaceLabel(messages, view)}
-      </ExplorerHeading>
+      <InflationCityHeading view={view} />
       <p data-testid="inflation-city-unit" className="mb-4 text-[13px] text-[var(--muted)]">
         {t("categoryUnit.yoy")}
       </p>
