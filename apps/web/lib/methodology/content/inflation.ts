@@ -5,7 +5,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
   slug: "inflation",
   title: "ინფლაცია",
   summary: "საქართველოს სამომხმარებლო ფასების ინდექსი: წლიური და თვიური ინფლაცია, ფასების ინდექსი და საბაზო ინფლაცია, ეროვნული ბანკის მიზნობრივ მაჩვენებელთან ერთად.",
-  reviewedAt: "2026-09-26",
+  reviewedAt: "2026-09-30",
   archiveManifestId: "inflation",
   coverageSource: { kind: "archive" },
   canonicalDocuments: ["docs/data-methodology/inflation-cpi-national.md"],

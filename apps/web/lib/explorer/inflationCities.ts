@@ -14,7 +14,6 @@ export type { CityView };
 export const GEORGIA_LINE_ID = "country.georgia";
 export const HEADLINE_ID = "cpi.headline";
 export const CITY_LINE_IDS = [GEORGIA_LINE_ID, ...CPI_CITY_IDS] as const;
-export type CityLineId = (typeof CITY_LINE_IDS)[number];
 export const CITY_CATEGORIES: readonly string[] = [HEADLINE_ID, ...Array.from({ length: 12 }, (_, index) => `cpi.cat.${String(index + 1).padStart(2, "0")}`)];
 
 export type CityState = {

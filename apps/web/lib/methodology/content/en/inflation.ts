@@ -5,7 +5,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
   slug: "inflation",
   title: "Inflation",
   summary: "Georgia's consumer price index: annual and monthly inflation, the price index and core inflation, alongside the National Bank of Georgia's inflation target.",
-  reviewedAt: "2026-09-26",
+  reviewedAt: "2026-09-30",
   archiveManifestId: "inflation",
   coverageSource: { kind: "archive" },
   canonicalDocuments: ["docs/data-methodology/inflation-cpi-national.md"],

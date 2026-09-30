@@ -1,7 +1,7 @@
 # Inflation: city pages (amendment to the cities section)
 
 Date: 2026-09-30
-Status: Draft for owner review. The structure below was approved in conversation on 2026-09-30.
+Status: Approved by the owner on 2026-09-30.
 Amends: `docs/superpowers/specs/2026-09-26-inflation-cities-design.md` ("the cities spec"). Everything in the cities spec not changed here still holds — data, pipeline, validation, mirror, MCP, publications and methodology scope.
 
 ## 1. Why

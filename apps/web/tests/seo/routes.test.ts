@@ -49,7 +49,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Regional economies add a bilingual index, eleven bilingual detail pages
     // and one bilingual methodology page; the inflation categories page adds
     // the other bilingual identity in the synchronized release. The inflation
-    // cities page adds one more bilingual pair.
+    // cities page and its six city pages add seven more bilingual pairs
+    // (the Georgia page plus one page per city, both languages).
     expect(urls).toHaveLength(240);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);

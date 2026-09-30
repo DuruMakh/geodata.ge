@@ -38,12 +38,13 @@ const OVERVIEW_PATH = "/explorer/inflation/overview";
 const CATEGORIES_PATH = "/explorer/inflation/categories";
 const repositoryRoot = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
 
-const PAGE_MEASURES: ReadonlySet<string> = new Set(["yoy_pct", "avg12_pct"]);
+/** Pages carry the annual rate in full; the 12-month average only feeds the table and workbook summary column, which reads December alone. */
+const isPageFact = (fact: { measure: string; period: string }) => fact.measure === "yoy_pct" || (fact.measure === "avg12_pct" && fact.period.endsWith("-12"));
 
 /** Georgia's total for the Georgia page: the national annual rate and 12-month average from 2016, never copied into the city CSV. */
 function georgiaTotals(data: Awaited<ReturnType<typeof loadServedInflationData>>): CityFactInput[] {
   return data.facts
-    .filter((fact) => fact.seriesId === "cpi.headline" && PAGE_MEASURES.has(fact.measure) && fact.period >= CITY_FIRST_PERIOD)
+    .filter((fact) => fact.seriesId === "cpi.headline" && isPageFact(fact) && fact.period >= CITY_FIRST_PERIOD)
     .map((fact) => ({ lineId: GEORGIA_LINE_ID, seriesId: "cpi.headline", measure: fact.measure as CpiCityMeasure, period: fact.period, value: fact.value }));
 }
 
@@ -236,7 +237,7 @@ async function renderCitiesView(locale: Locale, view: CityView, facts: CityFactI
 
 export async function renderInflationCities(locale: Locale) {
   const data = await loadServedInflationData();
-  const facts = [...georgiaTotals(data), ...data.cities.filter((fact) => fact.seriesId === "cpi.headline" && PAGE_MEASURES.has(fact.measure)).map(cityFactInput)];
+  const facts = [...georgiaTotals(data), ...data.cities.filter((fact) => fact.seriesId === "cpi.headline" && isPageFact(fact)).map(cityFactInput)];
   return renderCitiesView(locale, GEORGIA_VIEW, facts, data.cities.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "");
 }
 
@@ -256,7 +257,7 @@ export async function inflationCityPageMetadata(slug: string, locale: Locale) {
 export async function renderInflationCityPage(slug: string, locale: Locale) {
   const cityId = cityForSlug(slug);
   const data = await loadServedInflationData();
-  const own = data.cities.filter((fact) => fact.cityId === cityId && PAGE_MEASURES.has(fact.measure));
+  const own = data.cities.filter((fact) => fact.cityId === cityId && isPageFact(fact));
   const latest = own.filter((fact) => fact.measure === "yoy_pct").map((fact) => fact.period).sort().at(-1)!;
   const facts = [...own.map(cityFactInput), ...georgiaRatesAt(data, latest)];
   return renderCitiesView(locale, { kind: "city", cityId }, facts, own.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "");
