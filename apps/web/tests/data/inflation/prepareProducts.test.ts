@@ -110,7 +110,7 @@ describe("reviewed product identity mapping", () => {
     expect(findProductRevisions(prepared.facts, catalogue, markerChanged, decisions).join(" ")).toMatch(/2019-01.*availability|availability.*2019-01/i);
     const missing = rows.filter((row) => !(row.year === 2019 && row.ordinal === 89));
     expect(findProductRevisions(prepared.facts, catalogue, missing, decisions).join(" ")).toMatch(/missing source cell/i);
-  });
+  }, 90_000);
 
   it("stops a changed current basket or an old identity decision with a readable difference", () => {
     const smallerBasket = rows.filter((row) => !(row.year === 2026 && row.ordinal === 305));
@@ -145,7 +145,7 @@ describe("reviewed product identity mapping", () => {
     expect(report).toMatchObject({ latestPeriod: "2026-08", includedProducts: 305, reviewedLinks: 29, reviewedSplits: 18 });
     expect(report.arithmeticChecked).toBeGreaterThan(38_000);
     await expect(writeProductArtifacts("check")).resolves.toMatchObject({ includedProducts: 305 });
-  });
+  }, 90_000);
 
   it("rejects a stale generated artifact without touching committed data", async () => {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "product-artifacts-"));

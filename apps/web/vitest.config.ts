@@ -5,10 +5,11 @@ import { defaultExclude, defineConfig } from "vitest/config";
 // that same file byte-for-byte, so the tamper must never overlap another test file. Keeping it
 // in its own group — run alone, after everything else — lets the rest of the suite parallelize.
 const EXCLUSIVE_TEST = "tests/data/municipalGeometry/dataValidateGeometry.test.ts";
-// These suites repeatedly parse the largest preserved PDFs. Running them beside one another can
-// push their 30-second checks past the timeout even with four workers, so they share one worker
-// before the ordinary parallel group starts competing for CPU and memory.
+// These suites repeatedly parse large preserved PDFs or product workbooks. Running them beside
+// one another can push their checks past the timeout even with four workers, so they share one
+// worker before the ordinary parallel group starts competing for CPU and memory.
 const HEAVY_TESTS = [
+  "tests/data/inflation/prepareProducts.test.ts",
   "tests/data/adminSpending/olderMinistryYears.test.ts",
   "tests/data/governmentDebt/governmentDebtPackage.test.ts",
   "tests/data/realExpenditurePdf/year2004StateBudget.test.ts",
