@@ -322,7 +322,8 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/inflation                   ინფლაცია          Inflation hub (§25)
 /explorer/inflation/overview                            Monthly national CPI overview (§25)
 /explorer/inflation/categories                          COICOP categories and contributions (§25.1)
-/explorer/inflation/cities                              Inflation by city (§25.2)
+/explorer/inflation/cities                              Inflation by city: Georgia page (§25.2)
+/explorer/inflation/cities/[city]                       Inflation in one city (§25.2)
 ```
 
 Outside `/explorer` sit the two editorial pages, `/about` (§23) and `/connect`, the MCP connection page (§24), and the methodology centre at `/methodology` and `/methodology/[dataset]` (§21).
@@ -356,7 +357,7 @@ Keys by section. The hash never carries `nav`, and no key is renamed once shippe
 | Economic sectors | `measure`, `view`, `sel`, `range=all` or `start`/`end` | — |
 | Inflation overview | `i` indicator, `m` mode, `r=YYYY-MM-YYYY-MM`, `sel`, `t` table series | — |
 | Inflation categories | `i`, `m`, `r`, `sel`, `t`, `x` expanded divisions | — |
-| Inflation cities | `i` yoy/mom, `m`, `r`, `c` total or 01–12, `sel` line slugs, `t` table line | — |
+| Inflation cities | `m`, `r`, `sel` (place slugs on the Georgia page; `total`, `01`–`12` on a city page), `t` table line | — |
 
 Write rules: loading a page never adds state to its URL, so a pristine URL stays clean. After that, every change replaces the current history entry, except the discrete switches a section's spec asks Back to step through, which push one — today only the economic sectors measure and view.
 
@@ -974,13 +975,19 @@ The month grid gains contribution bins (`0 / 0.25 / 0.75 / 1.5` pp) on the same 
 
 ### 25.2 Cities
 
-`ქალაქები`, at `/explorer/inflation/cities`, repeats the overview's anatomy — unit line alone under the H1, centred `TextTab`s, workspace, range strip, series panel, indicators — with **two tabs** (`წლიური ინფლაცია`, `თვიური ინფლაცია`, landing on the first) and **seven lines**: `საქართველო` first, drawn in ink as the benchmark, then the six cities in Geostat's order, all selected by default — a deliberate, owner-approved departure from the "only the total" rule, since a Cities page that opened on the national line alone would show nothing city-specific. Georgia stays first, selectable and removable; the count reads `სერიები {selected} / 7`.
+The section is a **Georgia page** at `/explorer/inflation/cities` and **one page per city** at `/explorer/inflation/cities/{tbilisi|kutaisi|batumi|gori|telavi|zugdidi}`. Both show annual inflation only (the unit line alone under the H1, no tabs) and repeat the overview's workspace, range strip, series panel, month grid, Excel action and indicators.
 
-**Category picker.** A labelled native `<select>` in the toolbar (`კატეგორია: სულ`, then the 12 divisions), styled with a bottom hairline on the paper ground and 12.5px text, left of `ხაზი / ცხრილი`. It applies to both tabs and to the indicators. It is the editorial layer's only select; do not introduce another without a design decision.
+**Heading picker.** Both open with `ინფლაცია ქალაქებში — {place} ▾`, the place being the regions page's trigger (accent text, dashed accent underline, Lucide `ChevronDown`). It opens `CityPicker`, `RegionPicker`'s anatomy: search combobox, listbox, arrow keys and Enter, Escape or an outside click to close and refocus the trigger, the empty-search state and hint. `საქართველო` is first, styled as the "all" row; the six cities follow in Geostat's order; the current page is `aria-current`. City pages add `← {previous} · {next} →` on the right, wrapping; the Georgia page has none. There is no category select anywhere in the section.
+
+**Georgia page.** Seven lines on the total: `საქართველო` first in ink as the benchmark, then the six cities, all selected by default — an owner-approved departure from the "only the total" rule; the count reads `სერიები {selected} / 7`. Indicators: hero = the city with the highest annual rate with its distance from Georgia in `პპ`; `ყველაზე დაბალი`; `ქალაქებს შორის სხვაობა` (36-month sparkline); `ეროვნულზე მაღალი` (`{n} / 6`, sparkline). Georgia is never ranked.
+
+**City page.** The city's `სულ` in ink plus the 12 divisions in the Categories page's colours; only `სულ` is selected by default (`სერიები 1 / 13`). Georgia's line is not drawn. Coverage follows the city (Zugdidi from December 2016). Indicators: hero = the city's total with Georgia's beside it; `ყველაზე გაძვირებული`, `ყველაზე ნაკლებად გაძვირებული` / `ყველაზე გაიაფებული`, `ინფლაციის სიგანე` (`{n} / 12`, sparkline), each division against Georgia's same division in `პპ`.
+
+**Shared rules.** Every difference subtracts the printed one-decimal figures. The month grid shows `წლის საშუალო` for a total line only; Zugdidi's late start leaves empty cells, never filled values. One standing note under the source says some prices are recorded once and applied to every city.
 
 **City colours** (§4.2): Tbilisi `#B3402A`, Kutaisi `#3D5A98`, Batumi `#1F6E56`, Gori `#A5822B`, Telavi `#7A4E8C`, Zugdidi `#4A707A`, each ≥ 3:1 against paper and tint.
 
-The month grid shows `წლის საშუალო` only for `სულ` on the annual tab. Zugdidi's late start leaves empty cells, never filled values. Indicators: hero = the city with the highest annual rate for the picked category in the latest month, with its distance from Georgia in `პპ`; then `ყველაზე დაბალი` (never claims a fall that did not happen), `ქალაქებს შორის სხვაობა` (highest minus lowest, 36-month sparkline) and `ეროვნულზე მაღალი` (`{n} / 6`, sparkline). Georgia is never ranked. One standing note under the source says some prices are recorded once and applied to every city. See `docs/superpowers/specs/2026-09-26-inflation-cities-design.md`.
+See `docs/superpowers/specs/2026-09-26-inflation-cities-design.md` as amended by `docs/superpowers/specs/2026-09-30-inflation-city-pages-design.md`.
 
 
 ## National economic sectors extension

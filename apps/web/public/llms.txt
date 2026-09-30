@@ -23,7 +23,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Inflation](https://fiscal.ge/explorer/inflation) — the inflation section.
 - [Inflation overview](https://fiscal.ge/explorer/inflation/overview) — monthly national CPI inflation, core inflation, the price index and the National Bank of Georgia's target, as Geostat and the NBG publish them. The [inflation CSV](https://fiscal.ge/downloads/data/inflation-cpi-national.csv) carries every value; percentages are percentages (2.4 means 2.4%).
 - [Inflation categories](https://fiscal.ge/explorer/inflation/categories) — the national CPI by its 12 COICOP divisions and 43 subgroups, the annual consumer-basket weights, and each group's contribution to annual inflation as derived by Fiscal.ge.
-- [Inflation by city](https://fiscal.ge/explorer/inflation/cities) — annual and monthly inflation in Tbilisi, Kutaisi, Batumi, Gori, Telavi and Zugdidi from 2016, overall and by the 12 COICOP divisions, beside Georgia's national rate. Some prices (fuel, medicines, cars, mobile tariffs, flights) are recorded once and applied to every city.
+- [Inflation by city](https://fiscal.ge/explorer/inflation/cities) — annual inflation in Tbilisi, Kutaisi, Batumi, Gori, Telavi and Zugdidi from 2016 compared with Georgia's national rate, plus one page per city with its 12 COICOP divisions. Some prices (fuel, medicines, cars, mobile tariffs, flights) are recorded once and applied to every city.
 
 ## Methodology and sources
 

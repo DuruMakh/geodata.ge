@@ -53,7 +53,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
       kind: "scope",
       title: "Cities",
       paragraphs: [
-        "Geostat records prices in six cities — Tbilisi, Kutaisi, Batumi, Gori, Telavi and Zugdidi — with the same consumer basket in each. The cities page shows each city's annual and monthly inflation from January 2016, overall and for the 12 COICOP groups, beside Georgia's national rate. Zugdidi's annual inflation starts in December 2016 and its 12-month average in December 2017, because Geostat began recording prices there in December 2015; those months are left empty, not filled.",
+        "Geostat records prices in six cities — Tbilisi, Kutaisi, Batumi, Gori, Telavi and Zugdidi — with the same consumer basket in each. The cities pages show annual inflation from January 2016: one page compares the six cities' overall rates with Georgia's, and each city has its own page with its 12 COICOP groups. Zugdidi's annual inflation starts in December 2016 and its 12-month average in December 2017, because Geostat began recording prices there in December 2015; those months are left empty, not filled.",
         "Some prices — fuel, medicines, cars, mobile tariffs, flights and train fares — are recorded once and applied to every city, so differences between cities in those items are not measured differences.",
         "The national index is a weighted average of the city indices. Geostat does not publish the city weights, and Fiscal.ge does not show them; it uses the published figures only to check that the six cities add up to the national index every year. The price index (2010 = 100) is not shown for cities: each city's index is relative to its own 2010 prices, so it cannot say which city is more expensive.",
       ],
