@@ -142,6 +142,8 @@
   "inflation.cityPickerHint": "გადაადგილდით ისრებით და ქალაქის გასახსნელად დააჭირეთ Enter-ს.",
   "inflation.cityPickerEmpty": "ქალაქი ვერ მოიძებნა",
   "inflation.cityPickerClear": "ძიების გასუფთავება",
+  "inflation.cityPageMetaTitle": "{city}: ინფლაცია {first}–{last} | Fiscal.ge",
+  "inflation.cityPageDescription": "{city}: წლიური ინფლაცია სულ და COICOP-ის 12 ჯგუფის მიხედვით, საქსტატის მონაცემებით, საქართველოს მაჩვენებელთან შედარებით.",
   "inflation.categoryTab.yoy": "წლიური ინფლაცია",
   "inflation.categoryTab.mom": "თვიური ინფლაცია",
   "inflation.categoryTab.contrib": "წვლილი ინფლაციაში",

@@ -142,6 +142,8 @@
   "inflation.cityPickerHint": "Use the arrow keys to move and Enter to open a city.",
   "inflation.cityPickerEmpty": "No cities found",
   "inflation.cityPickerClear": "Clear search",
+  "inflation.cityPageMetaTitle": "{city} inflation {first}–{last} | Fiscal.ge",
+  "inflation.cityPageDescription": "{city}: annual inflation overall and in the 12 COICOP groups, from Geostat data, compared with Georgia's rate.",
   "inflation.categoryTab.yoy": "Annual inflation",
   "inflation.categoryTab.mom": "Monthly inflation",
   "inflation.categoryTab.contrib": "Contribution to inflation",

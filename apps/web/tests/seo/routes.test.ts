@@ -50,7 +50,7 @@ describe("indexable Fiscal.ge routes", () => {
     // and one bilingual methodology page; the inflation categories page adds
     // the other bilingual identity in the synchronized release. The inflation
     // cities page adds one more bilingual pair.
-    expect(urls).toHaveLength(228);
+    expect(urls).toHaveLength(240);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");

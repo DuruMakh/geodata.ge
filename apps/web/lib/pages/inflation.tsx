@@ -1,4 +1,5 @@
 import path from "node:path";
+import { notFound } from "next/navigation";
 import { BudgetHub } from "../../components/hub/budget-hub";
 import { InflationCategories } from "../../components/inflation/inflation-categories";
 import { InflationCities } from "../../components/inflation/inflation-cities";
@@ -7,10 +8,10 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
-import { CITY_FIRST_PERIOD, categoryFactInput, cityFactInput, type CityFactInput, type CpiCityMeasure } from "../data/inflation/types";
+import { CITY_FIRST_PERIOD, CPI_CITY_IDS, categoryFactInput, cityFactInput, type CityFactInput, type CpiCityId, type CpiCityMeasure } from "../data/inflation/types";
 import { packCategoryFacts } from "../explorer/inflationCategories";
 import { GEORGIA_LINE_ID, packCityFacts } from "../explorer/inflationCities";
-import { GEORGIA_VIEW } from "../explorer/inflationCityRoutes";
+import { CITIES_PATH, GEORGIA_VIEW, cityIdForSlug, cityPageHref, citySlug, type CityView } from "../explorer/inflationCityRoutes";
 import {
   projectBasketWeight,
   projectCpiFact,
@@ -35,7 +36,6 @@ import { ExplorerHeading } from "../../components/explorer-shell/explorer-headin
 const HUB_PATH = "/explorer/inflation";
 const OVERVIEW_PATH = "/explorer/inflation/overview";
 const CATEGORIES_PATH = "/explorer/inflation/categories";
-const CITIES_PATH = "/explorer/inflation/cities";
 const repositoryRoot = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
 
 const PAGE_MEASURES: ReadonlySet<string> = new Set(["yoy_pct", "avg12_pct"]);
@@ -45,6 +45,27 @@ function georgiaTotals(data: Awaited<ReturnType<typeof loadServedInflationData>>
   return data.facts
     .filter((fact) => fact.seriesId === "cpi.headline" && PAGE_MEASURES.has(fact.measure) && fact.period >= CITY_FIRST_PERIOD)
     .map((fact) => ({ lineId: GEORGIA_LINE_ID, seriesId: "cpi.headline", measure: fact.measure as CpiCityMeasure, period: fact.period, value: fact.value }));
+}
+
+/** Georgia's total and division rates in one month: a city page compares against them in its indicators only. */
+function georgiaRatesAt(data: Awaited<ReturnType<typeof loadServedInflationData>>, period: string): CityFactInput[] {
+  const total = data.facts
+    .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct" && fact.period === period)
+    .map((fact) => ({ lineId: GEORGIA_LINE_ID, seriesId: "cpi.headline", measure: "yoy_pct" as const, period, value: fact.value }));
+  const divisions = data.categories
+    .filter((fact) => fact.level === 2 && fact.measure === "yoy_pct" && fact.period === period)
+    .map((fact) => ({ lineId: GEORGIA_LINE_ID, seriesId: fact.categoryId, measure: "yoy_pct" as const, period, value: fact.value }));
+  return [...total, ...divisions];
+}
+
+function cityForSlug(slug: string): CpiCityId {
+  const cityId = cityIdForSlug(slug);
+  if (!cityId) notFound();
+  return cityId;
+}
+
+export function inflationCityStaticParams() {
+  return CPI_CITY_IDS.map((cityId) => ({ city: citySlug(cityId) }));
 }
 
 // Archive rows ending in "_ka" are the Georgian twins of the English source files.
@@ -190,32 +211,53 @@ export async function inflationCitiesMetadata(locale: Locale) {
   });
 }
 
-export async function renderInflationCities(locale: Locale) {
+async function renderCitiesView(locale: Locale, view: CityView, facts: CityFactInput[], lastReviewedAt: string) {
   const root = repositoryRoot();
-  const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedInflationData(),
+  const [presentation, manifest, catalogue] = await Promise.all([
     getPresentation(locale, ["inflation", "common", "controls", "format", "main"], []),
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
   ]);
   const sources = inflationWorkbookSources(manifest, locale, catalogue.documents);
   const t = (key: string) => message(presentation.messages, key);
+  const crumbs = [
+    { name: t("common.home"), path: pageHref("/", locale) },
+    { name: t("common.inflation"), path: pageHref(HUB_PATH, locale) },
+    { name: t("inflation.citiesHeading"), path: pageHref(CITIES_PATH, locale) },
+    ...(view.kind === "city" ? [{ name: t(`inflation.city.${view.cityId}`), path: pageHref(cityPageHref(view.cityId), locale) }] : []),
+  ];
   return (
     <I18nProvider {...presentation}>
-      <BreadcrumbJsonLd
-        items={[
-          { name: t("common.home"), path: pageHref("/", locale) },
-          { name: t("common.inflation"), path: pageHref(HUB_PATH, locale) },
-          { name: t("inflation.citiesHeading"), path: pageHref(CITIES_PATH, locale) },
-        ]}
-      />
-      <InflationCities
-        view={GEORGIA_VIEW}
-        facts={packCityFacts([...georgiaTotals(data), ...data.cities.filter((fact) => fact.seriesId === "cpi.headline" && PAGE_MEASURES.has(fact.measure)).map(cityFactInput)])}
-        lastReviewedAt={data.cities.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
-        sources={sources}
-        siteOrigin={resolveSiteUrl()}
-      />
+      <BreadcrumbJsonLd items={crumbs} />
+      <InflationCities view={view} facts={packCityFacts(facts)} lastReviewedAt={lastReviewedAt} sources={sources} siteOrigin={resolveSiteUrl()} />
     </I18nProvider>
   );
+}
+
+export async function renderInflationCities(locale: Locale) {
+  const data = await loadServedInflationData();
+  const facts = [...georgiaTotals(data), ...data.cities.filter((fact) => fact.seriesId === "cpi.headline" && PAGE_MEASURES.has(fact.measure)).map(cityFactInput)];
+  return renderCitiesView(locale, GEORGIA_VIEW, facts, data.cities.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "");
+}
+
+export async function inflationCityPageMetadata(slug: string, locale: Locale) {
+  const cityId = cityForSlug(slug);
+  const [{ cities }, messages] = await Promise.all([loadServedInflationData(), getMessages(locale, ["inflation"])]);
+  const years = cities.filter((fact) => fact.cityId === cityId && fact.measure === "yoy_pct").map((fact) => periodYear(periodFromKey(fact.period)));
+  const city = message(messages, `inflation.city.${cityId}`);
+  return fiscalMetadata({
+    locale,
+    path: cityPageHref(cityId),
+    title: message(messages, "inflation.cityPageMetaTitle", { city, first: Math.min(...years), last: Math.max(...years) }),
+    description: message(messages, "inflation.cityPageDescription", { city }),
+  });
+}
+
+export async function renderInflationCityPage(slug: string, locale: Locale) {
+  const cityId = cityForSlug(slug);
+  const data = await loadServedInflationData();
+  const own = data.cities.filter((fact) => fact.cityId === cityId && PAGE_MEASURES.has(fact.measure));
+  const latest = own.filter((fact) => fact.measure === "yoy_pct").map((fact) => fact.period).sort().at(-1)!;
+  const facts = [...own.map(cityFactInput), ...georgiaRatesAt(data, latest)];
+  return renderCitiesView(locale, { kind: "city", cityId }, facts, own.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "");
 }

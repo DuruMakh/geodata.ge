@@ -36,7 +36,7 @@ export function DataSidebar() {
   const regionsActive = pathname.includes("/explorer/economy/regions");
   const inflationOverviewActive = pathname.endsWith("/explorer/inflation/overview");
   const inflationCategoriesActive = pathname.endsWith("/explorer/inflation/categories");
-  const inflationCitiesActive = pathname.endsWith("/explorer/inflation/cities");
+  const inflationCitiesActive = pathname.includes("/explorer/inflation/cities");
 
   // Read after mount: the server render cannot see localStorage, and guessing
   // would flash the wrong width on every load.

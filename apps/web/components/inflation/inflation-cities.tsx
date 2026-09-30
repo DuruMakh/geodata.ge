@@ -38,6 +38,7 @@ import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial
 import { RangeStrip } from "../main-explorer/range-strip";
 import { PageHeader } from "../shell/page-header";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { InflationCityCategoryIndicators } from "./inflation-city-category-indicators";
 import { InflationCityHeading } from "./inflation-city-heading";
 import { InflationCityIndicators } from "./inflation-city-indicators";
 import { InflationCityPanel } from "./inflation-city-panel";
@@ -180,7 +181,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
         />
       </ExplorerWorkspace>
 
-      {view.kind === "georgia" ? <InflationCityIndicators index={index} /> : null}
+      {view.kind === "georgia" ? <InflationCityIndicators index={index} /> : <InflationCityCategoryIndicators index={index} cityId={view.cityId} />}
     </ExplorerPage>
   );
 }

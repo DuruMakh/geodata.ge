@@ -72,4 +72,13 @@ describe("InflationCities — city page", () => {
   it("lists the total and 12 divisions with only the total selected", () => {
     expect(block(cityMarkup, "series-status")).toContain("1 / 13");
   });
+
+  it("shows the city's own indicators, not the city ranking", () => {
+    const indicators = cityMarkup.slice(cityMarkup.indexOf('data-testid="inflation-city-category-indicators"'));
+    expect(cityMarkup).toContain('data-testid="inflation-city-category-indicators"');
+    expect(cityMarkup).not.toContain('data-testid="inflation-city-indicators"');
+    expect(block(indicators, "inflation-city-category-hero")).toContain("ბათუმი");
+    expect(indicators).toContain("ყველაზე გაძვირებული");
+    expect(indicators).toContain("ინფლაციის სიგანე");
+  });
 });

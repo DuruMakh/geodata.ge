@@ -12,6 +12,7 @@ import {
   latestReviewedAtForMunicipalFacts,
   regionFactsFor,
 } from "../explorer/municipalData";
+import { CITY_PAGE_PATHS } from "../explorer/inflationCityRoutes";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../siteUrl";
 import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "./internalLinks";
@@ -91,6 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/inflation/overview`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/inflation/categories`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/inflation/cities`, lastModified: inflationModified },
+    ...CITY_PAGE_PATHS.map((path) => ({ url: `${siteUrl}${path}`, lastModified: inflationModified })),
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
     { url: `${siteUrl}/explorer/revenue`, lastModified },
     { url: `${siteUrl}/explorer/analysis`, lastModified },

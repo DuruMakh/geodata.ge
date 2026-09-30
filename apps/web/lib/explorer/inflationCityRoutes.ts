@@ -7,13 +7,13 @@ import { CPI_CITY_IDS, type CpiCityId } from "../data/inflation/types";
 export type CityView = { kind: "georgia" } | { kind: "city"; cityId: CpiCityId };
 export const GEORGIA_VIEW: CityView = { kind: "georgia" };
 
-export const CITIES_PATH = "/explorer/inflation/cities";
+export const CITIES_PATH = "/explorer/inflation/cities" as const;
 
 export function citySlug(cityId: CpiCityId): string {
   return cityId.slice("city.".length);
 }
 
-export function cityPageHref(cityId: CpiCityId): string {
+export function cityPageHref(cityId: CpiCityId): `/${string}` {
   return `${CITIES_PATH}/${citySlug(cityId)}`;
 }
 
@@ -28,4 +28,4 @@ export function neighbourCities(cityId: CpiCityId): { previous: CpiCityId; next:
   return { previous: CPI_CITY_IDS[(position - 1 + count) % count]!, next: CPI_CITY_IDS[(position + 1) % count]! };
 }
 
-export const CITY_PAGE_PATHS: string[] = CPI_CITY_IDS.map(cityPageHref);
+export const CITY_PAGE_PATHS: `/${string}`[] = CPI_CITY_IDS.map(cityPageHref);
