@@ -2,32 +2,109 @@ import { expect, test, type Page } from "@playwright/test";
 
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const CITIES = "/explorer/inflation/cities";
+const noOverflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
 
 for (const locale of ["ka", "en"] as const) {
+  const prefix = locale === "en" ? "/en" : "";
   for (const width of [390, 1440]) {
-    test(`inflation cities layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
+    test(`Georgia page layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
       await page.setViewportSize({ width, height: 1000 });
-      await page.goto(`${locale === "en" ? "/en" : ""}${CITIES}`);
+      await page.goto(`${prefix}${CITIES}`);
       await ready(page);
       await expect(page.getByTestId("inflation-city-tabs")).toHaveCount(0);
+      await expect(page.locator("select")).toHaveCount(0);
       await expect(page.getByTestId("series-row")).toHaveCount(7);
       await expect(page.getByTestId("series-status")).toContainText("7 / 7");
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(await noOverflow(page)).toBe(true);
       await page.screenshot({ path: testInfo.outputPath(`cities-${locale}-${width}.png`), fullPage: true });
 
       await page.getByTestId("chart-mode-table").click();
       await expect(page.getByTestId("month-grid")).toBeVisible();
-      const grid = (await page.getByTestId("month-grid").innerText()).normalize();
-      expect(/[Ⴀ-ჿ]/.test(grid)).toBe(locale === "ka");
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await page.screenshot({ path: testInfo.outputPath(`cities-table-${locale}-${width}.png`), fullPage: true });
+      expect(/[Ⴀ-ჿ]/.test((await page.getByTestId("month-grid").innerText()).normalize())).toBe(locale === "ka");
+      expect(await noOverflow(page)).toBe(true);
+    });
+
+    test(`city page layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto(`${prefix}${CITIES}/batumi`);
+      await ready(page);
+      await expect(page.getByTestId("series-row")).toHaveCount(13);
+      await expect(page.getByTestId("series-status")).toContainText("1 / 13");
+      await expect(page.getByTestId("city-entity-navigation")).toBeVisible();
+      expect(await noOverflow(page)).toBe(true);
+      await page.screenshot({ path: testInfo.outputPath(`city-batumi-${locale}-${width}.png`), fullPage: true });
     });
   }
 }
 
-test("the annual average column appears in the table on the Georgia page", async ({ page }) => {
+test("the heading picker searches and opens a city page", async ({ page }) => {
+  await page.goto(CITIES);
+  await ready(page);
+  await page.getByTestId("city-picker-trigger").click();
+  const dialog = page.getByRole("dialog", { name: "ქალაქის არჩევა" });
+  await expect(dialog).toBeVisible();
+  await dialog.locator("input").fill("ბათ");
+  await expect(page.getByTestId("city-picker-option")).toHaveCount(1);
+  await page.getByTestId("city-picker-option").click();
+  await expect(page).toHaveURL(/\/explorer\/inflation\/cities\/batumi$/);
+});
+
+test("the picker marks the current page", async ({ page }) => {
+  await page.goto(`/en${CITIES}/gori`);
+  await ready(page);
+  await page.getByTestId("city-picker-trigger").click();
+  await expect(page.getByRole("dialog", { name: "Choose a city" })).toBeVisible();
+  await expect(page.getByTestId("city-picker-option").filter({ hasText: "Gori" })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("city-picker-georgia-option")).not.toHaveAttribute("aria-current", "page");
+});
+
+test("Escape closes the picker and returns focus to the trigger", async ({ page }) => {
+  await page.goto(`/en${CITIES}/gori`);
+  await ready(page);
+  await page.getByTestId("city-picker-trigger").click();
+  await expect(page.getByRole("dialog", { name: "Choose a city" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Choose a city" })).toHaveCount(0);
+  await expect(page.getByTestId("city-picker-trigger")).toBeFocused();
+});
+
+test("the keyboard reaches Georgia first and opens the comparison page", async ({ page }) => {
+  await page.goto(`/en${CITIES}/telavi`);
+  await ready(page);
+  await page.getByTestId("city-picker-trigger").click();
+  const search = page.getByRole("combobox", { name: "Search cities" });
+  await search.press("ArrowDown");
+  await expect(page.getByTestId("city-picker-georgia-option")).toHaveAttribute("aria-selected", "true");
+  await search.press("Enter");
+  await expect(page).toHaveURL(/\/en\/explorer\/inflation\/cities$/);
+});
+
+test("previous and next follow Geostat's order and wrap", async ({ page }) => {
+  await page.goto(`/en${CITIES}/batumi`);
+  await ready(page);
+  const navigation = page.getByTestId("city-entity-navigation");
+  await expect(navigation.getByRole("link").first()).toHaveText("← Kutaisi");
+  await expect(navigation.getByRole("link").last()).toHaveText("Gori →");
+  await page.goto(`/en${CITIES}/tbilisi`);
+  await expect(page.getByTestId("city-entity-navigation").getByRole("link").first()).toHaveText("← Zugdidi");
+});
+
+test("a city page opens on its total and adds a division", async ({ page }) => {
+  await page.goto(`/en${CITIES}/kutaisi`);
+  await ready(page);
+  await page.locator('[data-testid="series-row"][data-series-id="cpi.cat.01"] button').first().click();
+  await expect(page.getByTestId("series-status")).toContainText("2 / 13");
+  await expect(page).toHaveURL(/sel=total%2C01/);
+});
+
+test("the annual average column follows the total", async ({ page }) => {
   await page.goto(`/en${CITIES}#m=table`);
   await ready(page);
+  await expect(page.getByTestId("month-grid")).toContainText("Annual average");
+  await page.goto(`/en${CITIES}/batumi#m=table&sel=total%2C01&t=01`);
+  await ready(page);
+  await expect(page.getByTestId("month-grid")).not.toContainText("Annual average");
+  await page.getByTestId("inflation-city-table-series-cpi.headline").click();
   await expect(page.getByTestId("month-grid")).toContainText("Annual average");
 });
 
@@ -35,18 +112,23 @@ test("Zugdidi's annual series starts late and is never filled", async ({ page })
   await page.goto(`/en${CITIES}#m=table&t=zugdidi`);
   await ready(page);
   await expect(page.getByTestId("inflation-city-table-series-city.zugdidi")).toHaveAttribute("aria-pressed", "true");
-  // Zugdidi's y/y series starts 2016-12: Jan-Nov 2016 are missing (never a filled
-  // 0), December is the first real value.
-  const row2016 = page.locator('[data-testid="month-grid-row"][data-year="2016"]');
-  await expect(row2016).toBeVisible();
-  const monthCells = row2016.locator("td");
+  const monthCells = page.locator('[data-testid="month-grid-row"][data-year="2016"] td');
   for (let month = 0; month < 11; month += 1) {
     await expect(monthCells.nth(month)).toHaveText("—");
     await expect(monthCells.nth(month)).not.toHaveAttribute("data-testid", "month-grid-cell");
   }
-  const december = monthCells.nth(11);
-  await expect(december).toHaveAttribute("data-testid", "month-grid-cell");
-  await expect(december).not.toHaveText("—");
+  await expect(monthCells.nth(11)).toHaveAttribute("data-testid", "month-grid-cell");
+  await expect(monthCells.nth(11)).not.toHaveText("—");
+
+  await page.goto(`/en${CITIES}/zugdidi`);
+  await ready(page);
+  await expect(page.getByTestId("explorer-header")).toContainText("Dec 2016 –");
+});
+
+test("an old link with the retired tab and category keys still opens", async ({ page }) => {
+  await page.goto(`/en${CITIES}#i=mom&c=07`);
+  await ready(page);
+  await expect(page.getByTestId("series-status")).toContainText("7 / 7");
 });
 
 test("clearing the selection can be undone from the same control", async ({ page }) => {
@@ -58,9 +140,22 @@ test("clearing the selection can be undone from the same control", async ({ page
   await expect(page.getByTestId("series-status")).toContainText("7 / 7");
 });
 
-test("the hub links the live cities card and the sidebar names the section", async ({ page }) => {
+test("the hub links the Georgia page and the sidebar stays on the section across city pages", async ({ page }) => {
   await page.goto("/en/explorer/inflation");
   await page.getByTestId("inflation-hub").locator('a[href="/en/explorer/inflation/cities"]').click();
   await ready(page);
   await expect(page.getByTestId("inflation-cities-link")).toHaveAttribute("aria-current", "page");
+  await page.goto(`/en${CITIES}/gori`);
+  await expect(page.getByTestId("inflation-cities-link")).toHaveAttribute("aria-current", "page");
+});
+
+test("every city page is statically available in both languages", async ({ request }) => {
+  for (const prefix of ["", "/en"]) {
+    for (const slug of ["tbilisi", "kutaisi", "batumi", "gori", "telavi", "zugdidi"]) {
+      const response = await request.get(`${prefix}${CITIES}/${slug}`);
+      expect(response.status(), `${prefix || "/ka"}:${slug}`).toBe(200);
+      await response.dispose();
+    }
+  }
+  expect((await request.get(`${CITIES}/rustavi`)).status()).toBe(404);
 });
