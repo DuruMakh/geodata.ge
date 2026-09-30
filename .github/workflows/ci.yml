@@ -25,16 +25,8 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci --no-audit
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run data:validate
-      # The e2e job also builds, inside Playwright's webServer. This runs the
-      # build directly so a build failure reports as a build failure instead of
-      # as a webServer timeout, and so the job name above stays true.
-      - run: npm run build
       # Deliberately NOT --omit=dev. The data pipeline's file parsers (xlsx,
-      # pdf-parse) are devDependencies, and the data:validate step above runs
+      # pdf-parse) are devDependencies, and the data:validate step below runs
       # them over official workbooks and PDFs inside this job — so scoping the
       # audit to production dependencies exempted exactly the code that reads
       # outside files. `xlsx` is installed from the SheetJS CDN (see
@@ -52,6 +44,14 @@ jobs:
             fi
           done
           exit 1
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run data:validate
+      # The e2e job also builds, inside Playwright's webServer. This runs the
+      # build directly so a build failure reports as a build failure instead of
+      # as a webServer timeout, and so the job name above stays true.
+      - run: npm run build
       # Nothing in this job may write into the repository. `git status --porcelain`
       # respects .gitignore, so the generated output under public/downloads/ and
       # data/reports/ stays invisible here — but unlike `git diff` it also reports
