@@ -134,6 +134,7 @@
   "inflation.cityVsNational": "{city} · {delta} pp against Georgia",
   "inflation.cityFellDetail": "{city} · prices fell, {delta} pp against Georgia",
   "inflation.cityColumn": "City",
+  "inflation.cityCategoryVsNational": "{category} · {delta} pp against Georgia's same group",
   "inflation.categoryTab.yoy": "Annual inflation",
   "inflation.categoryTab.mom": "Monthly inflation",
   "inflation.categoryTab.contrib": "Contribution to inflation",

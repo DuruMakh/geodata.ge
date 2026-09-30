@@ -1,6 +1,6 @@
 import { periodFromKey, periodKey } from "../data/inflation/periods";
 import { CPI_CITY_IDS, type CityFactInput, type CpiCityMeasure } from "../data/inflation/types";
-import { decemberAverages, displayedValue } from "./inflationGrid";
+import { decemberAverages } from "./inflationGrid";
 import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
@@ -138,76 +138,6 @@ export function effectiveCityTableSeries(index: CityIndex, state: CityState): Ci
 export function cityAnnualAverages(index: CityIndex, state: CityState, lineId: string): Map<number, number> | undefined {
   if (state.tab !== "yoy" || state.category !== HEADLINE_ID) return undefined;
   return decemberAverages(cityValues(index, lineId, HEADLINE_ID, "avg12_pct"));
-}
-
-export type CityRate = { cityIds: string[]; value: number; deltaPp: number | null };
-export type CityIndicators = {
-  period: number;
-  national: number | null;
-  highest: CityRate;
-  /** `fell` says whether the lowest city actually got cheaper, so the page never claims a fall that did not happen. */
-  lowest: CityRate & { fell: boolean };
-  gap: { value: number; spark: Array<number | null> };
-  aboveNational: { count: number; total: number; spark: Array<number | null> } | null;
-};
-
-const SPARK_MONTHS = 36;
-
-/**
- * Spec §6: the latest published month, year on year, for the picked category,
- * whatever the tab or range. Cities only — Georgia is the benchmark, never a
- * ranked entry. Ties name every tied city. Differences and the fall wording argue
- * from the printed one-decimal figures, so they never disagree with them.
- */
-export function latestCityIndicators(index: CityIndex, category: string): CityIndicators | null {
-  const series = CPI_CITY_IDS.flatMap((cityId) => {
-    const values = cityValues(index, cityId, category, "yoy_pct");
-    return values ? [{ cityId, values }] : [];
-  });
-  if (series.length === 0) return null;
-  const period = periodBounds(series.map((entry) => entry.values), "City data has no periods").max;
-  const national = cityValues(index, GEORGIA_LINE_ID, category, "yoy_pct");
-  const at = (month: number) =>
-    series.flatMap((entry) => {
-      const value = entry.values.get(month);
-      return value === undefined ? [] : [{ cityId: entry.cityId, value }];
-    });
-  const present = at(period);
-  if (present.length === 0) return null;
-  const nationalNow = national?.get(period) ?? null;
-  const max = Math.max(...present.map((row) => row.value));
-  const min = Math.min(...present.map((row) => row.value));
-  const rate = (value: number): CityRate => ({
-    cityIds: present.filter((row) => row.value === value).map((row) => row.cityId),
-    value,
-    deltaPp: nationalNow === null ? null : displayedValue(displayedValue(value) - displayedValue(nationalNow)),
-  });
-  const window = Array.from({ length: SPARK_MONTHS }, (_, offset) => period - SPARK_MONTHS + 1 + offset);
-  return {
-    period,
-    national: nationalNow,
-    highest: rate(max),
-    lowest: { ...rate(min), fell: displayedValue(min) < 0 },
-    gap: {
-      value: displayedValue(displayedValue(max) - displayedValue(min)),
-      spark: window.map((month) => {
-        const rows = at(month);
-        return rows.length < 2 ? null : Math.max(...rows.map((row) => row.value)) - Math.min(...rows.map((row) => row.value));
-      }),
-    },
-    aboveNational:
-      nationalNow === null
-        ? null
-        : {
-            count: present.filter((row) => row.value > nationalNow).length,
-            total: present.length,
-            spark: window.map((month) => {
-              const base = national?.get(month);
-              const rows = at(month);
-              return base === undefined || rows.length === 0 ? null : rows.filter((row) => row.value > base).length;
-            }),
-          },
-  };
 }
 
 const CATEGORY_CODE = /^(0[1-9]|1[0-2])$/;

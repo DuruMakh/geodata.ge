@@ -3,7 +3,8 @@
 import { INK } from "../../lib/explorer/colors";
 import { formatShare } from "../../lib/explorer/format";
 import { formatContribution } from "../../lib/explorer/inflationCategoryLabels";
-import { latestCityIndicators, type CityIndex } from "../../lib/explorer/inflationCities";
+import { type CityIndex } from "../../lib/explorer/inflationCities";
+import { latestCityIndicators } from "../../lib/explorer/inflationCityIndicators";
 import { cityLineLabel } from "../../lib/explorer/inflationCityLabels";
 import { displayedValue } from "../../lib/explorer/inflationGrid";
 import { periodLabel } from "../../lib/explorer/inflationLabels";

@@ -7,7 +7,8 @@ import { formatShare } from "./format";
 import type { HubCardModel } from "./hubCards";
 import { buildCategoryIndex, latestContributors } from "./inflationCategories";
 import { categoryColor, categoryLabel, formatContribution } from "./inflationCategoryLabels";
-import { buildCityIndex, latestCityIndicators } from "./inflationCities";
+import { buildCityIndex } from "./inflationCities";
+import { latestCityIndicators } from "./inflationCityIndicators";
 import { cityLineLabel } from "./inflationCityLabels";
 import { periodLabel } from "./inflationLabels";
 

@@ -7,7 +7,6 @@ import {
   buildCityLines,
   changeCityTab,
   cityAnnualAverages,
-  latestCityIndicators,
   packCityFacts,
   parseCityHash,
   resolveCityRange,
@@ -68,48 +67,5 @@ describe("inflation cities state", () => {
 
   it("drops unknown hash values rather than failing", () => {
     expect(parseCityHash("#i=index&c=99&sel=rustavi,batumi&t=rustavi")).toMatchObject({ tab: "yoy", category: "cpi.headline", selected: ["city.batumi"], tableSeries: null });
-  });
-});
-
-describe("latestCityIndicators", () => {
-  it("names the highest and lowest city against Georgia for the total", () => {
-    const latest = latestCityIndicators(index, "cpi.headline")!;
-    expect(latest.period).toBe(makePeriod(2026, 8));
-    expect(latest.highest.cityIds).toEqual(["city.batumi"]);
-    expect(latest.lowest.cityIds).toEqual(["city.telavi"]);
-    expect(latest.lowest.fell).toBe(false);
-    expect(latest.aboveNational).toMatchObject({ count: 2, total: 6 });
-  });
-
-  it("argues differences from the printed one-decimal figures", () => {
-    // 7.0857 - 5.6479 = 1.4378 would print 1.4 beside 7.1% and 5.6%; the reader checks 7.1 - 5.6.
-    const latest = latestCityIndicators(index, "cpi.headline")!;
-    expect(latest.highest.deltaPp).toBe(1.5);
-    expect(latest.lowest.deltaPp).toBe(-1.2);
-    expect(latest.gap.value).toBe(2.7);
-  });
-
-  it("says prices fell only when the printed rate is negative", () => {
-    const withTelavi = (value: number) =>
-      buildCityIndex(fixtureCityFacts.map((fact) => (fact.lineId === "city.telavi" && fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct" && fact.period === "2026-08" ? { ...fact, value } : fact)));
-    expect(latestCityIndicators(withTelavi(-0.3), "cpi.headline")!.lowest.fell).toBe(true);
-    expect(latestCityIndicators(withTelavi(-0.03), "cpi.headline")!.lowest.fell).toBe(false);
-  });
-
-  it("follows the picked category", () => {
-    const latest = latestCityIndicators(index, "cpi.cat.01")!;
-    expect(latest.highest.cityIds).toEqual(["city.kutaisi"]);
-    expect(latest.aboveNational?.count).toBe(2);
-  });
-
-  it("never ranks Georgia", () => {
-    const latest = latestCityIndicators(index, "cpi.headline")!;
-    expect([...latest.highest.cityIds, ...latest.lowest.cityIds]).not.toContain("country.georgia");
-  });
-
-  it("names every tied city", () => {
-    // Set exactly, not by arithmetic: 5.3103 + 1.7754 need not equal 7.0857 in floating point.
-    const tied = buildCityIndex(fixtureCityFacts.map((fact) => (fact.lineId === "city.gori" && fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct" && fact.period === "2026-08" ? { ...fact, value: 7.0857 } : fact)));
-    expect(latestCityIndicators(tied, "cpi.headline")!.highest.cityIds).toEqual(["city.batumi", "city.gori"]);
   });
 });
