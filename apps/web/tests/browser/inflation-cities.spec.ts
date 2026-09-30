@@ -9,7 +9,7 @@ for (const locale of ["ka", "en"] as const) {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${locale === "en" ? "/en" : ""}${CITIES}`);
       await ready(page);
-      await expect(page.getByTestId("inflation-city-tabs").getByRole("button")).toHaveCount(2);
+      await expect(page.getByTestId("inflation-city-tabs")).toHaveCount(0);
       await expect(page.getByTestId("series-row")).toHaveCount(7);
       await expect(page.getByTestId("series-status")).toContainText("7 / 7");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -25,27 +25,14 @@ for (const locale of ["ka", "en"] as const) {
   }
 }
 
-test("the category picker drives the chart, the hash and the indicators", async ({ page }) => {
-  await page.goto(`/en${CITIES}`);
-  await ready(page);
-  const hero = page.getByTestId("inflation-city-hero");
-  const before = await hero.innerText();
-  await page.getByTestId("inflation-city-category").selectOption("cpi.cat.07");
-  await expect(page).toHaveURL(/c=07/);
-  await expect(hero).not.toHaveText(before);
-  await expect(page.getByTestId("inflation-city-unit")).toContainText("Percent");
-});
-
-test("the annual average column appears only for the total on the annual tab", async ({ page }) => {
-  await page.goto(`/en${CITIES}#i=yoy&m=table&c=total`);
+test("the annual average column appears in the table on the Georgia page", async ({ page }) => {
+  await page.goto(`/en${CITIES}#m=table`);
   await ready(page);
   await expect(page.getByTestId("month-grid")).toContainText("Annual average");
-  await page.getByTestId("inflation-city-category").selectOption("cpi.cat.01");
-  await expect(page.getByTestId("month-grid")).not.toContainText("Annual average");
 });
 
 test("Zugdidi's annual series starts late and is never filled", async ({ page }) => {
-  await page.goto(`/en${CITIES}#i=yoy&m=table&c=total&t=zugdidi`);
+  await page.goto(`/en${CITIES}#m=table&t=zugdidi`);
   await ready(page);
   await expect(page.getByTestId("inflation-city-table-series-city.zugdidi")).toHaveAttribute("aria-pressed", "true");
   // Zugdidi's y/y series starts 2016-12: Jan-Nov 2016 are missing (never a filled

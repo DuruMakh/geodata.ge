@@ -5,24 +5,23 @@ import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import { formatDisplayDate } from "../../lib/explorer/format";
 import {
-  CITY_TABS,
-  DEFAULT_CITY_STATE,
   buildCityIndex,
   buildCityLines,
-  changeCityTab,
   cityCoverage,
-  parseCityHash,
+  defaultCityState,
   rangeFromPatch,
   resolveCityRange,
+  restoreCityState,
   serializeCityHash,
   toggleAllCityLines,
   toggleCityLine,
   unpackCityFacts,
   type CityState,
-  type CityTab,
+  type CityView,
   type PackedCitySeries,
 } from "../../lib/explorer/inflationCities";
-import { cityLineColor, cityLineLabel } from "../../lib/explorer/inflationCityLabels";
+import { cityLineLabel, cityPlaceLabel, cityViewLineColor, cityViewLineLabel } from "../../lib/explorer/inflationCityLabels";
+import { CITIES_PATH } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
@@ -39,65 +38,57 @@ import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { PageHeader } from "../shell/page-header";
-import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
-import { InflationCityCategorySelect } from "./inflation-city-category-select";
+import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { InflationCityIndicators } from "./inflation-city-indicators";
 import { InflationCityPanel } from "./inflation-city-panel";
 import { InflationCityTable } from "./inflation-city-table";
 
-// Inflation cities (spec 2026-09-26 §6): the overview's anatomy, seven lines —
-// Georgia in ink, then the six cities — and a category picker. No headline value
-// line under the H1 (DESIGN.md §25).
+// Inflation cities (spec 2026-09-30): the Georgia page compares seven places on the
+// total; a city page shows that city's total and divisions. Annual inflation only.
+// No headline value line under the H1 (DESIGN.md §25).
 
 const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
 export type InflationCitiesProps = {
+  view: CityView;
   facts: PackedCitySeries[];
   lastReviewedAt: string;
   sources: InflationWorkbookSource[];
   siteOrigin: string;
 };
 
-export function InflationCities({ facts, lastReviewedAt, sources, siteOrigin }: InflationCitiesProps) {
+export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrigin }: InflationCitiesProps) {
   const presentation = useI18n();
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
   const index = useMemo(() => buildCityIndex(unpackCityFacts(facts)), [facts]);
-  const [state, setState] = useState<CityState>(DEFAULT_CITY_STATE);
+  const [state, setState] = useState<CityState>(() => defaultCityState(view));
   const [ready, setReady] = useState(false);
-  const [announcement, setAnnouncement] = useState("");
 
   useEffect(() => {
-    const parsed = parseCityHash(window.location.hash);
     // The hash is read after hydration so the server render stays the stable default view.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState(changeCityTab(parsed, parsed.tab, index));
+    setState(restoreCityState(window.location.hash, index, view));
     setReady(true);
-  }, [index]);
+  }, [index, view]);
   useAppReady();
-  useReplaceHash(serializeCityHash(state), ready);
+  useReplaceHash(serializeCityHash(state, view), ready);
 
-  const range = resolveCityRange(state, index);
-  const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
-  const coverage = cityCoverage(index, "mom");
+  const range = resolveCityRange(state, index, view);
+  const coverage = cityCoverage(index, view);
+  const periods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
-  const lines = buildCityLines(index, state, range);
+  const lines = buildCityLines(index, view, state, range);
   const hasSeries = lines.lines.length > 0;
-
-  function selectTab(tab: CityTab) {
-    const next = changeCityTab(state, tab, index);
-    const nextRange = resolveCityRange(next, index);
-    setState(next);
-    setAnnouncement(t("rangeChanged", { start: periodLabel(messages, nextRange.start, "short"), end: periodLabel(messages, nextRange.end, "short") }));
-  }
 
   const chartSeries: ChartSeries[] = lines.lines.map((line) => ({
     id: line.key,
-    label: cityLineLabel(messages, line.key),
-    color: cityLineColor(line.key),
+    label: cityViewLineLabel(messages, view, line.key),
+    color: cityViewLineColor(view, line.key),
     vals: line.values,
     planned: line.values.map(() => false),
   }));
+  const citiesCrumb = { label: t("citiesHeading"), ...(view.kind === "city" ? { href: pageHref(CITIES_PATH, locale) } : {}) };
 
   return (
     <ExplorerPage testId="inflation-cities">
@@ -106,37 +97,22 @@ export function InflationCities({ facts, lastReviewedAt, sources, siteOrigin }: 
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
           { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
-          { label: t("citiesHeading") },
+          citiesCrumb,
+          ...(view.kind === "city" ? [{ label: cityLineLabel(messages, view.cityId) }] : []),
         ]}
         coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
       />
-      <ExplorerHeading>{t("citiesHeading")}</ExplorerHeading>
+      <ExplorerHeading>
+        {t("cityHeadingLead")} {cityPlaceLabel(messages, view)}
+      </ExplorerHeading>
       <p data-testid="inflation-city-unit" className="mb-4 text-[13px] text-[var(--muted)]">
-        {t(`categoryUnit.${state.tab}`)}
-      </p>
-
-      <div
-        data-testid="inflation-city-tabs"
-        role="group"
-        aria-label={t("tabs")}
-        className="mb-3 overflow-x-auto py-2"
-        onFocusCapture={(event) => event.target.scrollIntoView({ block: "nearest", inline: "nearest" })}
-      >
-        <div className="mx-auto flex w-max gap-7 px-1">
-          {CITY_TABS.map((tab) => (
-            <TextTab key={tab} testId={`inflation-city-tab-${tab}`} label={t(`categoryTab.${tab}`)} active={state.tab === tab} onClick={() => selectTab(tab)} />
-          ))}
-        </div>
-      </div>
-      <p role="status" className="sr-only">
-        {announcement}
+        {t("categoryUnit.yoy")}
       </p>
 
       <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
-          <section data-testid="chart-panel" data-mode={state.mode} data-tab={state.tab} className="border-t border-[var(--ink)] pt-3">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <InflationCityCategorySelect value={state.category} onChange={(category) => setState((current) => ({ ...current, category }))} />
+          <section data-testid="chart-panel" data-mode={state.mode} className="border-t border-[var(--ink)] pt-3">
+            <div className="flex flex-wrap items-center justify-end gap-4">
               <SegmentedTabs<CityState["mode"]>
                 ariaLabel={message(messages, "controls.viewMode")}
                 value={state.mode}
@@ -152,7 +128,7 @@ export function InflationCities({ facts, lastReviewedAt, sources, siteOrigin }: 
                 <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
               </div>
             ) : state.mode === "table" ? (
-              <InflationCityTable index={index} state={state} range={range} onTableSeriesChange={(lineId) => setState((current) => ({ ...current, tableSeries: lineId }))} />
+              <InflationCityTable index={index} view={view} state={state} range={range} onTableSeriesChange={(lineId) => setState((current) => ({ ...current, tableSeries: lineId }))} />
             ) : (
               <div className="mt-5">
                 <EditorialLineChart
@@ -160,7 +136,7 @@ export function InflationCities({ facts, lastReviewedAt, sources, siteOrigin }: 
                   series={chartSeries}
                   share
                   unit={PCT_UNIT}
-                  shareLabel={t(`categoryTab.${state.tab}`)}
+                  shareLabel={t("categoryTab.yoy")}
                   periodsPerYear={12}
                   formatPeriod={(period, kind) =>
                     kind === "axis" && periodMonth(period) === 1 ? String(periodYear(period)) : periodLabel(messages, period, kind === "axis" ? "short" : "long")
@@ -169,7 +145,7 @@ export function InflationCities({ facts, lastReviewedAt, sources, siteOrigin }: 
               </div>
             )}
             <RangeStrip
-              years={tabPeriods}
+              years={periods}
               range={range}
               periodsPerYear={12}
               formatPeriod={(period) => periodLabel(messages, period, "short")}
@@ -191,21 +167,22 @@ export function InflationCities({ facts, lastReviewedAt, sources, siteOrigin }: 
 
         <InflationCityPanel
           index={index}
+          view={view}
           state={state}
           range={range}
-          onToggle={(lineId) => setState((current) => toggleCityLine(current, lineId))}
-          onToggleAll={() => setState((current) => toggleAllCityLines(current))}
+          onToggle={(lineId) => setState((current) => toggleCityLine(current, view, lineId))}
+          onToggleAll={() => setState((current) => toggleAllCityLines(current, view))}
           downloadAction={
             <ExcelDownloadButton
               testId="inflation-city-download"
               disabled={!hasSeries}
-              onDownload={() => downloadWorkbook(buildInflationCityWorkbookExportModel({ index, state, range, presentation, sources, siteOrigin }))}
+              onDownload={() => downloadWorkbook(buildInflationCityWorkbookExportModel({ index, view, state, range, presentation, sources, siteOrigin }))}
             />
           }
         />
       </ExplorerWorkspace>
 
-      <InflationCityIndicators index={index} category={state.category} />
+      {view.kind === "georgia" ? <InflationCityIndicators index={index} /> : null}
     </ExplorerPage>
   );
 }

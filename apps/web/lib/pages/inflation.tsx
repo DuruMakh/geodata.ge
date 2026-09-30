@@ -10,6 +10,7 @@ import { periodFromKey, periodYear } from "../data/inflation/periods";
 import { CITY_FIRST_PERIOD, categoryFactInput, cityFactInput, type CityFactInput, type CpiCityMeasure } from "../data/inflation/types";
 import { packCategoryFacts } from "../explorer/inflationCategories";
 import { GEORGIA_LINE_ID, packCityFacts } from "../explorer/inflationCities";
+import { GEORGIA_VIEW } from "../explorer/inflationCityRoutes";
 import {
   projectBasketWeight,
   projectCpiFact,
@@ -37,15 +38,13 @@ const CATEGORIES_PATH = "/explorer/inflation/categories";
 const CITIES_PATH = "/explorer/inflation/cities";
 const repositoryRoot = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
 
-/** Georgia's line for the cities page: the national total and divisions from 2016, never copied into the city CSV. */
-function georgiaCityLine(data: Awaited<ReturnType<typeof loadServedInflationData>>): CityFactInput[] {
-  const total = data.facts
-    .filter((fact) => fact.seriesId === "cpi.headline" && (fact.measure === "yoy_pct" || fact.measure === "mom_pct" || fact.measure === "avg12_pct") && fact.period >= CITY_FIRST_PERIOD)
+const PAGE_MEASURES: ReadonlySet<string> = new Set(["yoy_pct", "avg12_pct"]);
+
+/** Georgia's total for the Georgia page: the national annual rate and 12-month average from 2016, never copied into the city CSV. */
+function georgiaTotals(data: Awaited<ReturnType<typeof loadServedInflationData>>): CityFactInput[] {
+  return data.facts
+    .filter((fact) => fact.seriesId === "cpi.headline" && PAGE_MEASURES.has(fact.measure) && fact.period >= CITY_FIRST_PERIOD)
     .map((fact) => ({ lineId: GEORGIA_LINE_ID, seriesId: "cpi.headline", measure: fact.measure as CpiCityMeasure, period: fact.period, value: fact.value }));
-  const divisions = data.categories
-    .filter((fact) => fact.level === 2 && fact.period >= CITY_FIRST_PERIOD)
-    .map((fact) => ({ lineId: GEORGIA_LINE_ID, seriesId: fact.categoryId, measure: fact.measure, period: fact.period, value: fact.value }));
-  return [...total, ...divisions];
 }
 
 // Archive rows ending in "_ka" are the Georgian twins of the English source files.
@@ -211,7 +210,8 @@ export async function renderInflationCities(locale: Locale) {
         ]}
       />
       <InflationCities
-        facts={packCityFacts([...georgiaCityLine(data), ...data.cities.map(cityFactInput)])}
+        view={GEORGIA_VIEW}
+        facts={packCityFacts([...georgiaTotals(data), ...data.cities.filter((fact) => fact.seriesId === "cpi.headline" && PAGE_MEASURES.has(fact.measure)).map(cityFactInput)])}
         lastReviewedAt={data.cities.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
         sources={sources}
         siteOrigin={resolveSiteUrl()}

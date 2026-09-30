@@ -1,48 +1,50 @@
 import { periodFromKey, periodKey } from "../data/inflation/periods";
 import { CPI_CITY_IDS, type CityFactInput, type CpiCityMeasure } from "../data/inflation/types";
 import { decemberAverages } from "./inflationGrid";
+import type { CityView } from "./inflationCityRoutes";
 import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
-// Pure state and data selection for the inflation cities section
-// (docs/superpowers/specs/2026-09-26-inflation-cities-design.md). Components
-// compose these; nothing here renders or reads the DOM.
+// Pure state and data selection for the inflation cities pages
+// (docs/superpowers/specs/2026-09-30-inflation-city-pages-design.md). On the
+// Georgia page a line is a place on the total; on a city page it is one of that
+// city's 13 series. Annual inflation only. Nothing here renders or reads the DOM.
 
+export type { CityView };
 export const GEORGIA_LINE_ID = "country.georgia";
 export const HEADLINE_ID = "cpi.headline";
 export const CITY_LINE_IDS = [GEORGIA_LINE_ID, ...CPI_CITY_IDS] as const;
 export type CityLineId = (typeof CITY_LINE_IDS)[number];
-export const CITY_TABS = ["yoy", "mom"] as const;
-export type CityTab = (typeof CITY_TABS)[number];
 export const CITY_CATEGORIES: readonly string[] = [HEADLINE_ID, ...Array.from({ length: 12 }, (_, index) => `cpi.cat.${String(index + 1).padStart(2, "0")}`)];
 
 export type CityState = {
-  tab: CityTab;
   mode: "chart" | "table";
   range: PeriodRange;
-  category: string;
-  selected: CityLineId[];
-  tableSeries: CityLineId | null;
+  selected: string[];
+  tableSeries: string | null;
 };
 
-// All seven lines start selected: a Cities page that opened on Georgia alone
-// would show nothing city-specific (spec §1.1, owner decision 2026-09-26).
-export const DEFAULT_CITY_STATE: CityState = {
-  tab: "yoy",
-  mode: "chart",
-  range: { kind: "all" },
-  category: HEADLINE_ID,
-  selected: [...CITY_LINE_IDS],
-  tableSeries: null,
-};
+export function cityViewLineIds(view: CityView): readonly string[] {
+  return view.kind === "georgia" ? CITY_LINE_IDS : CITY_CATEGORIES;
+}
 
-const TAB_MEASURE: Record<CityTab, CpiCityMeasure> = { yoy: "yoy_pct", mom: "mom_pct" };
+/** Which place and series a line draws. */
+export function cityLineSource(view: CityView, lineId: string): { entityId: string; seriesId: string } {
+  return view.kind === "georgia" ? { entityId: lineId, seriesId: HEADLINE_ID } : { entityId: view.cityId, seriesId: lineId };
+}
+
+// The Georgia page opens on all seven lines (owner decision 2026-09-26); a city
+// page on its total alone, the project's default rule.
+export function defaultCityState(view: CityView): CityState {
+  return { mode: "chart", range: { kind: "all" }, selected: view.kind === "georgia" ? [...CITY_LINE_IDS] : [HEADLINE_ID], tableSeries: null };
+}
+
 const factKey = (lineId: string, seriesId: string, measure: string) => `${lineId}|${seriesId}|${measure}`;
 
 export type CityIndex = { values: Map<string, Map<number, number>> };
 export type { ResolvedPeriodRange };
 
-/** Dense runs per series, as the categories page packs its facts: ~22,000 rows cross the wire. */
+/** Dense runs per series, as the categories page packs its facts. */
 export type PackedCitySeries = { k: string; s: string; v: Array<number | null> };
 
 export function packCityFacts(facts: CityFactInput[]): PackedCitySeries[] {
@@ -82,41 +84,42 @@ export function cityValues(index: CityIndex, lineId: string, seriesId: string, m
   return index.values.get(factKey(lineId, seriesId, measure));
 }
 
-/** A tab's coverage: every line's total on that measure. Zugdidi's late start does not narrow it. */
-export function cityCoverage(index: CityIndex, tab: CityTab): { min: number; max: number } {
-  return periodBounds(CITY_LINE_IDS.map((lineId) => cityValues(index, lineId, HEADLINE_ID, TAB_MEASURE[tab])), "City data has no periods");
+function lineValues(index: CityIndex, view: CityView, lineId: string): Map<number, number> | undefined {
+  const { entityId, seriesId } = cityLineSource(view, lineId);
+  return cityValues(index, entityId, seriesId, "yoy_pct");
 }
 
-export function resolveCityRange(state: CityState, index: CityIndex): ResolvedPeriodRange {
-  return resolveRange(state.range, cityCoverage(index, state.tab));
+/** A page's coverage: every one of its lines. Zugdidi's page therefore starts 2016-12. */
+export function cityCoverage(index: CityIndex, view: CityView): { min: number; max: number } {
+  return periodBounds(cityViewLineIds(view).map((lineId) => lineValues(index, view, lineId)), "City data has no periods");
 }
 
-export function changeCityTab(state: CityState, tab: CityTab, index: CityIndex): CityState {
-  return { ...state, tab, range: refitRange(state.range, cityCoverage(index, tab), { collapseToAll: true }) };
+export function resolveCityRange(state: CityState, index: CityIndex, view: CityView): ResolvedPeriodRange {
+  return resolveRange(state.range, cityCoverage(index, view));
 }
 
 export { rangeFromPatch };
 
-export function toggleCityLine(state: CityState, lineId: CityLineId): CityState {
+export function toggleCityLine(state: CityState, view: CityView, lineId: string): CityState {
   const next = state.selected.includes(lineId) ? state.selected.filter((entry) => entry !== lineId) : [...state.selected, lineId];
-  return { ...state, selected: CITY_LINE_IDS.filter((entry) => next.includes(entry)) };
+  return { ...state, selected: cityViewLineIds(view).filter((entry) => next.includes(entry)) };
 }
 
-export function toggleAllCityLines(state: CityState): CityState {
-  return { ...state, selected: state.selected.length > 0 ? [] : [...CITY_LINE_IDS] };
+export function toggleAllCityLines(state: CityState, view: CityView): CityState {
+  return { ...state, selected: state.selected.length > 0 ? [] : [...cityViewLineIds(view)] };
 }
 
-export function buildCityLines(index: CityIndex, state: CityState, range: ResolvedPeriodRange) {
+export function buildCityLines(index: CityIndex, view: CityView, state: CityState, range: ResolvedPeriodRange) {
   const periods = Array.from({ length: range.end - range.start + 1 }, (_, offset) => range.start + offset);
   const lines = state.selected.flatMap((lineId) => {
-    const values = cityValues(index, lineId, state.category, TAB_MEASURE[state.tab]);
+    const values = lineValues(index, view, lineId);
     return values ? [{ key: lineId, values: periods.map((period) => values.get(period) ?? null) }] : [];
   });
   return { periods, lines };
 }
 
-export function cityPanelValue(index: CityIndex, lineId: CityLineId, state: CityState, range: ResolvedPeriodRange): number | null {
-  const values = cityValues(index, lineId, state.category, TAB_MEASURE[state.tab]);
+export function cityPanelValue(index: CityIndex, view: CityView, lineId: string, range: ResolvedPeriodRange): number | null {
+  const values = lineValues(index, view, lineId);
   if (!values) return null;
   for (let period = range.end; period >= range.start; period -= 1) {
     const value = values.get(period);
@@ -125,46 +128,52 @@ export function cityPanelValue(index: CityIndex, lineId: CityLineId, state: City
   return null;
 }
 
-export function cityTableOptions(index: CityIndex, state: CityState): CityLineId[] {
-  return state.selected.filter((lineId) => cityValues(index, lineId, state.category, TAB_MEASURE[state.tab]) !== undefined);
+export function cityTableOptions(index: CityIndex, view: CityView, state: CityState): string[] {
+  return state.selected.filter((lineId) => lineValues(index, view, lineId) !== undefined);
 }
 
-export function effectiveCityTableSeries(index: CityIndex, state: CityState): CityLineId | null {
-  const options = cityTableOptions(index, state);
+export function effectiveCityTableSeries(index: CityIndex, view: CityView, state: CityState): string | null {
+  const options = cityTableOptions(index, view, state);
   return state.tableSeries !== null && options.includes(state.tableSeries) ? state.tableSeries : (options[0] ?? null);
 }
 
-/** Geostat's December 12-month average: the table's წლის საშუალო, for the total on the annual tab only. */
-export function cityAnnualAverages(index: CityIndex, state: CityState, lineId: string): Map<number, number> | undefined {
-  if (state.tab !== "yoy" || state.category !== HEADLINE_ID) return undefined;
-  return decemberAverages(cityValues(index, lineId, HEADLINE_ID, "avg12_pct"));
+/** Geostat's December 12-month average: the table's წლის საშუალო, for a total line only. */
+export function cityAnnualAverages(index: CityIndex, view: CityView, lineId: string): Map<number, number> | undefined {
+  const { entityId, seriesId } = cityLineSource(view, lineId);
+  if (seriesId !== HEADLINE_ID) return undefined;
+  return decemberAverages(cityValues(index, entityId, HEADLINE_ID, "avg12_pct"));
 }
 
-const CATEGORY_CODE = /^(0[1-9]|1[0-2])$/;
-const slug = (lineId: string) => lineId.split(".")[1]!;
-const LINE_BY_SLUG = new Map(CITY_LINE_IDS.map((lineId) => [slug(lineId), lineId]));
+/** Short, stable hash values: place slugs on the Georgia page, `total` and COICOP codes on a city page. */
+export function cityLineSlug(view: CityView, lineId: string): string {
+  if (view.kind === "georgia") return lineId.split(".")[1]!;
+  return lineId === HEADLINE_ID ? "total" : lineId.replace("cpi.cat.", "");
+}
 
-export function parseCityHash(hash: string): CityState {
+export function parseCityHash(hash: string, view: CityView): CityState {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
-  const tab = CITY_TABS.find((entry) => entry === params.get("i")) ?? DEFAULT_CITY_STATE.tab;
-  const code = params.get("c") ?? "";
-  // Unknown values are dropped rather than failing the page (spec §8).
+  const ids = cityViewLineIds(view);
+  const bySlug = new Map(ids.map((lineId) => [cityLineSlug(view, lineId), lineId]));
+  // Unknown values — and the retired `i` and `c` keys — are dropped rather than failing the page.
   const requested = (params.get("sel") ?? "").split(",");
   return {
-    tab,
     mode: params.get("m") === "table" ? "table" : "chart",
     range: parseMonthRangeKey(params),
-    category: CATEGORY_CODE.test(code) ? `cpi.cat.${code}` : HEADLINE_ID,
-    selected: params.has("sel") ? CITY_LINE_IDS.filter((lineId) => requested.includes(slug(lineId))) : [...CITY_LINE_IDS],
-    tableSeries: LINE_BY_SLUG.get(params.get("t") ?? "") ?? null,
+    selected: params.has("sel") ? ids.filter((lineId) => requested.includes(cityLineSlug(view, lineId))) : defaultCityState(view).selected,
+    tableSeries: bySlug.get(params.get("t") ?? "") ?? null,
   };
 }
 
-export function serializeCityHash(state: CityState): string {
-  const params = new URLSearchParams({ i: state.tab, m: state.mode });
+/** The hash, read after hydration, with its range refitted to the page's coverage. */
+export function restoreCityState(hash: string, index: CityIndex, view: CityView): CityState {
+  const parsed = parseCityHash(hash, view);
+  return { ...parsed, range: refitRange(parsed.range, cityCoverage(index, view), { collapseToAll: true }) };
+}
+
+export function serializeCityHash(state: CityState, view: CityView): string {
+  const params = new URLSearchParams({ m: state.mode });
   writeMonthRangeKey(params, state.range);
-  params.set("c", state.category === HEADLINE_ID ? "total" : state.category.replace("cpi.cat.", ""));
-  params.set("sel", state.selected.map(slug).join(","));
-  if (state.tableSeries !== null) params.set("t", slug(state.tableSeries));
+  params.set("sel", state.selected.map((lineId) => cityLineSlug(view, lineId)).join(","));
+  if (state.tableSeries !== null) params.set("t", cityLineSlug(view, state.tableSeries));
   return params.toString();
 }

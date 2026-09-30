@@ -14,11 +14,11 @@ import { HeroKpi, SideKpiList, type SideKpi } from "../main-explorer/kpi-blocks"
 import { SectionTitle } from "../ui/editorial";
 
 // ძირითადი ინდიკატორები for the cities page (spec §6): the latest published month,
-// year on year, for the picked category. Cities only; Georgia is the benchmark.
+// year on year, on the total. Cities only; Georgia is the benchmark.
 // A negative rate reads as გაიაფდა, never coloured good or bad.
-export function InflationCityIndicators({ index, category }: { index: CityIndex; category: string }) {
+export function InflationCityIndicators({ index }: { index: CityIndex }) {
   const { messages } = useI18n();
-  const latest = latestCityIndicators(index, category);
+  const latest = latestCityIndicators(index);
   if (!latest) return null;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
   const pct = (value: number) => formatShare(displayedValue(value) / 100);

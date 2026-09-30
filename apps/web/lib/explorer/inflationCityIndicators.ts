@@ -21,19 +21,19 @@ export type CityIndicators = {
 const SPARK_MONTHS = 36;
 
 /**
- * Spec §6: the latest published month, year on year, for the picked category,
- * whatever the tab or range. Cities only — Georgia is the benchmark, never a
- * ranked entry. Ties name every tied city. Differences and the fall wording argue
- * from the printed one-decimal figures, so they never disagree with them.
+ * Spec 2026-09-30 §4: the latest published month, year on year, on the total.
+ * Cities only — Georgia is the benchmark, never a ranked entry. Ties name every
+ * tied city. Differences and the fall wording argue from the printed one-decimal
+ * figures, so they never disagree with them.
  */
-export function latestCityIndicators(index: CityIndex, category: string): CityIndicators | null {
+export function latestCityIndicators(index: CityIndex): CityIndicators | null {
   const series = CPI_CITY_IDS.flatMap((cityId) => {
-    const values = cityValues(index, cityId, category, "yoy_pct");
+    const values = cityValues(index, cityId, HEADLINE_ID, "yoy_pct");
     return values ? [{ cityId, values }] : [];
   });
   if (series.length === 0) return null;
   const period = periodBounds(series.map((entry) => entry.values), "City data has no periods").max;
-  const national = cityValues(index, GEORGIA_LINE_ID, category, "yoy_pct");
+  const national = cityValues(index, GEORGIA_LINE_ID, HEADLINE_ID, "yoy_pct");
   const at = (month: number) =>
     series.flatMap((entry) => {
       const value = entry.values.get(month);

@@ -72,7 +72,7 @@ export function buildInflationHubCards(
   // Cities lead with the highest city's annual rate; the sparkline is the gap
   // between cities, the question the section adds (spec §5).
   const cityIndex = cities.length > 0 ? buildCityIndex(cities) : null;
-  const cityLatest = cityIndex === null ? null : latestCityIndicators(cityIndex, "cpi.headline");
+  const cityLatest = cityIndex === null ? null : latestCityIndicators(cityIndex);
   const comingSoon = (name: "Basket" | "Products", position: string): HubCardModel => ({
     index: position,
     title: t(`card${name}`),

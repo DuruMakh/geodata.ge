@@ -23,9 +23,9 @@ export function cityCategoryLabel(messages: Messages, category: string): string 
   return category === "cpi.headline" ? message(messages, "inflation.cityCategoryTotal") : categoryLabel(messages, category);
 }
 
-/** Percentage points shown as percent; monthly change is signed. */
-export function formatCityValue(value: number, tab: "yoy" | "mom"): string {
-  return formatShare(displayedValue(value) / 100, tab === "mom");
+/** Annual rates, in percent at one decimal. */
+export function formatCityValue(value: number): string {
+  return formatShare(displayedValue(value) / 100);
 }
 
 /** The picker's place name: საქართველო on the Georgia page, else the city. */
