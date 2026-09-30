@@ -1,7 +1,7 @@
 # Inflation: cities section specification
 
 Date: 2026-09-26
-Status: Approved by the owner on 2026-09-26. Data scope, page shape, defaults, indicators, MCP inclusion and every decision in §1.1 were approved in conversation on 2026-09-26.
+Status: Approved by the owner on 2026-09-26; page shape amended by `2026-09-30-inflation-city-pages-design.md` (Georgia page plus six city pages, annual inflation only, no category picker). Data scope, page shape, defaults, indicators, MCP inclusion and every decision in §1.1 were approved in conversation on 2026-09-26.
 
 ## 1. Outcome and scope
 
