@@ -914,5 +914,19 @@
       "reviewedAt": "2026-09-13"
     },
     "derivation": null
+  },
+  "source.geostat_product_mom": {
+    "name": {
+      "text": "Geostat detailed product indices, previous month = 100 (English)",
+      "reviewedAt": "2026-09-26"
+    },
+    "derivation": null
+  },
+  "source.geostat_product_yoy": {
+    "name": {
+      "text": "Geostat detailed product indices, same month of previous year = 100 (English)",
+      "reviewedAt": "2026-09-26"
+    },
+    "derivation": null
   }
 }
