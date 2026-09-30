@@ -111,17 +111,15 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
       <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
           <section data-testid="chart-panel" data-mode={state.mode} className="border-t border-[var(--ink)] pt-3">
-            <div className="flex flex-wrap items-center justify-end gap-4">
-              <SegmentedTabs<CityState["mode"]>
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={state.mode}
-                onChange={(mode) => setState((current) => ({ ...current, mode }))}
-                options={[
-                  { value: "chart", label: message(messages, "controls.chart"), testId: "chart-mode-chart" },
-                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                ]}
-              />
-            </div>
+            <SegmentedTabs<CityState["mode"]>
+              ariaLabel={message(messages, "controls.viewMode")}
+              value={state.mode}
+              onChange={(mode) => setState((current) => ({ ...current, mode }))}
+              options={[
+                { value: "chart", label: message(messages, "controls.chart"), testId: "chart-mode-chart" },
+                { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
+              ]}
+            />
             {!hasSeries ? (
               <div className="mt-5">
                 <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
