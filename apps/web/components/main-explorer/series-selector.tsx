@@ -138,6 +138,8 @@ type SeriesSelectorRowProps = {
   meta?: string;
   /** Names `meta` for a screen reader, so the row is not two unlabelled percentages. */
   metaLabel?: string;
+  /** Optional decorative icon beside the label; the official text remains the accessible name. */
+  art?: ReactNode;
   selected: boolean;
   level?: string;
   parentId?: string | null;
@@ -162,6 +164,7 @@ export function SeriesSelectorRow({
   value,
   meta,
   metaLabel,
+  art,
   selected,
   level,
   parentId,
@@ -229,6 +232,7 @@ export function SeriesSelectorRow({
           <span data-testid="series-swatch" className="mt-[7px] flex-none">
             {swatch === "dashed" ? <DashedSwatch color={color} /> : <SwatchBar color={color} />}
           </span>
+          {art ? <span className="-mt-1 flex-none" aria-hidden="true">{art}</span> : null}
           <span
             data-testid="series-label"
             className={`${wrapLabel ? "" : "line-clamp-2"} leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[12px]" : "text-[11.5px]"} font-normal text-[var(--body)]` : "text-[12.5px] font-medium text-[var(--ink)]"}`}

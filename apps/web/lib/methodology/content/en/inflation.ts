@@ -4,13 +4,13 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
   id: "inflation",
   slug: "inflation",
   title: "Inflation",
-  summary: "Georgia's consumer price index: annual and monthly inflation, the price index and core inflation, alongside the National Bank of Georgia's inflation target.",
-  reviewedAt: "2026-09-30",
+  summary: "Georgia's consumer price index, inflation categories, city inflation and individual-product price changes, alongside the National Bank of Georgia's inflation target.",
+  reviewedAt: "2026-10-01",
   archiveManifestId: "inflation",
   coverageSource: { kind: "archive" },
-  canonicalDocuments: ["docs/data-methodology/inflation-cpi-national.md"],
+  canonicalDocuments: ["docs/data-methodology/inflation-cpi-national.md", "docs/data-methodology/inflation-products.md"],
   disclosure:
-    "Figures are the values Geostat and the National Bank of Georgia publish; Fiscal.ge converts Geostat's published indices to percentage change and, on the categories page only, multiplies a published price change by a published basket weight to show each group's contribution to inflation. Nothing else is computed or adjusted.",
+    "Figures come from Geostat and the National Bank of Georgia. Fiscal.ge converts published indices to percentage changes, derives category contributions from published changes and weights, and compounds published product monthly indices for selected-years cumulative change. Derived measures are labelled; underlying source values are not adjusted.",
   keyFacts: [
     { label: "Coverage", valueKind: "coverage" },
     { label: "Frequency", valueKind: "frequency", value: "Monthly" },
@@ -49,6 +49,17 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
       ],
     },
     {
+      id: "products",
+      kind: "scope",
+      title: "Individual products in the current basket",
+      paragraphs: [
+        "The product explorer includes every item in Geostat's current basket and excludes products that have left it. Reviewed public history starts in January 2015, or at a later verified first month. Names and groups can change; a historical series is linked only after reviewing the official English and Georgian labels and the source row. The illustrations are decorative cues, not identity evidence.",
+        "Geostat publishes each product's same-month-of-prior-year index and previous-month index with comparison period = 100. Annual product inflation is the published annual index minus 100. Fiscal.ge calculates the selected-years cumulative percentage by multiplying every published previous-month index divided by 100, from January of the selected first year through December of the last complete year or the latest published month. The baseline is the December immediately before the selected start year. This cumulative figure is derived by Fiscal.ge, not published as a Geostat series.",
+        "If a product entered after the selected start or any monthly index in that span is missing, the full-range cumulative value is unavailable (—); a shorter history is never silently substituted. The latest annual ranking always uses the newest published month, even when the selected years end earlier. These product indices are not GEL shop prices, product-level basket weights, city prices or contributions to headline inflation.",
+        "Two conservative identity splits keep p0179 Coffee cup with saucer from 2019 and p0269 Tourist trip abroad from 2020. Earlier descriptions and annual arithmetic suggest statistical continuity, but do not prove the earlier and current goods/services are the same specification. Geostat's p0148 English label says Chipboard while its Georgian label describes plasterboard; both official labels are preserved and the discrepancy is disclosed. The four archived English/Georgian product-index workbooks are listed among the original sources below.",
+      ],
+    },
+    {
       id: "cities",
       kind: "scope",
       title: "Cities",
@@ -65,6 +76,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
       paragraphs: [
         "Each file's size and SHA-256 are checked; the series are contiguous and monthly; every file ends in the same month; annual, monthly and 12-month average change are recomputed from the price index and agree within 0.2 percentage points.",
         "Geostat does not plan revisions to published figures. On a refresh, any change to an already published month stops the update for review. Updates are monthly and checked by hand.",
+        "For the August 2026 product vintage, 41,830 published annual product indices reconcile with 12 monthly indices within 0.002 index points, including 3,157 checks using verified 2014 source months solely as validation input. The remaining 22 first-year annual cells belong to the two conservative identity splits and are reported as uncomparable, not counted as passes.",
       ],
     },
     {
@@ -80,7 +92,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
       id: "archive",
       kind: "archive",
       title: "Original sources",
-      paragraphs: ["Geostat's Excel files (English and Georgian) and the National Bank of Georgia's Monetary Policy Strategy are available below."],
+      paragraphs: ["Geostat's national and detailed product Excel files (English and Georgian), and the National Bank of Georgia's Monetary Policy Strategy, are available below."],
     },
   ],
   decisions: [],

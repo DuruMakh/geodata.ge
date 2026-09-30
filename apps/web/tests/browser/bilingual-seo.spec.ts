@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
+import { loadProductCatalogueCsv } from "../../lib/data/inflation/importProducts";
 import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
 import { LIVE_METHODOLOGY_IDS } from "../../lib/methodology/types";
 
@@ -8,12 +9,14 @@ const paths = Object.keys(JSON.parse(readFileSync(path.resolve(process.cwd(), ".
 const origin = "https://fiscal.ge";
 const englishPath = (path: string) => path === "/" ? "/en" : `/en${path}`;
 let originalFilenames: Record<string, string>;
+let originalProductLabels: Record<string, string>;
 test.beforeAll(async () => {
   // Every live dataset, not a hand-listed subset: Geostat names the Georgian
   // basket-weights file in Georgian script, and an omitted manifest would read
   // as untranslated Georgian on the English page.
   const rows = await Promise.all(LIVE_METHODOLOGY_IDS.map(id => loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), id)));
   originalFilenames = Object.fromEntries(rows.flat().map(row => [row.source_id, row.official_filename]));
+  originalProductLabels = Object.fromEntries((await loadProductCatalogueCsv()).map(row => [row.productId, row.labelKa]));
 });
 
 // The only Georgian fragments allowed on English pages are the language switch
@@ -26,7 +29,7 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
     const initialHtml = await response!.text();
     const expected = { canonical: origin + target, ka: origin + route, en: origin + englishPath(route), locale };
     for (const initial of [true, false]) {
-      const result = await page.evaluate(({ html, initial, originals, locale }) => {
+      const result = await page.evaluate(({ html, initial, originals, products, locale }) => {
         const root = initial ? new DOMParser().parseFromString(html, "text/html") : document;
         const failures: string[] = [];
         const checkText = (body: HTMLElement) => {
@@ -37,6 +40,8 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
             if (text === "ქართული" && parent.closest('[data-testid="language-switch"]')) continue;
             const original = parent.closest('[data-original-language="filename"][lang="ka"][data-source-id]');
             if (original && originals[original.getAttribute("data-source-id")!] === text) continue;
+            const product = parent.closest('[data-original-language="product"][lang="ka"][data-product-id]');
+            if (product && products[product.getAttribute("data-product-id")!] === text) continue;
             failures.push(text);
           }
           for (const element of root.querySelectorAll("[aria-label],[title],[placeholder],img[alt]")) for (const attribute of ["aria-label", "title", "placeholder", "alt"]) {
@@ -58,12 +63,14 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
           breadcrumbs: jsonLd.filter(item => item["@type"] === "BreadcrumbList").flatMap(item => item.itemListElement.map((entry: { item: string }) => entry.item)),
           jsonLd, failures,
         };
-      }, { html: initialHtml, initial, originals: originalFilenames, locale });
+      }, { html: initialHtml, initial, originals: originalFilenames, products: originalProductLabels, locale });
       expect(result.lang).toBe(locale);
       expect(result.canonicals).toEqual([expected.canonical]);
       expect(result.alternates).toEqual({ ka: expected.ka, en: expected.en, "x-default": expected.ka });
       if (route === "/explorer/economy/sectors") {
-        expect(result.title).toBe(locale === "en" ? "Sectors" : "სექტორები");
+        expect(result.title).toBe(locale === "en" ? "Georgia GDP by economic sector | Fiscal.ge" : "საქართველოს მშპ სექტორების მიხედვით | Fiscal.ge");
+      } else if (route === "/explorer/economy/gdp") {
+        expect(result.title).toBe(locale === "en" ? "Georgia GDP: growth and GDP per capita | Fiscal.ge" : "საქართველოს მშპ, ეკონომიკური ზრდა და მშპ ერთ სულ მოსახლეზე | Fiscal.ge");
       } else {
         expect(result.title.length).toBeGreaterThan(8);
       }

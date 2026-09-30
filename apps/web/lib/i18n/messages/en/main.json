@@ -17,7 +17,7 @@
   "main.expenditureGel": "Expenditure in GEL",
   "main.noSelection": "No series selected. Choose a series from the series panel.",
   "main.noRangeData": "No data is available for the selected series in this range. Widen the range or change the series.",
-  "main.sourceData": "Data: reviewed official budget documents (Ministry of Finance of Georgia).",
+  "main.sourceData": "Data: reviewed official budget documents (Ministry of Finance of Georgia). Receipts cover the consolidated budget; expenditure covers the state budget. Their difference is not the deficit.",
   "main.annualExecution": "· Actual execution for the full 12 months.",
   "main.missing2004Liabilities": "The increase in liabilities for 2004 is unavailable and is excluded from the 2004 total.",
   "main.gdpSource": "GDP: Geostat, at current prices.",
@@ -47,7 +47,7 @@
   "main.metadataExpenditureTitle": "Georgia’s budget expenditure {firstYear}–{lastYear} | Fiscal.ge",
   "main.metadataExpenditureDescription": "Georgia’s actual state-budget expenditure by function and institution, {firstYear}–{lastYear}.",
   "main.datasetExpenditureName": "Georgia’s state-budget expenditure",
-  "main.metadataRevenueTitle": "Georgia’s budget receipts {firstYear}–{lastYear} | Fiscal.ge",
+  "main.metadataRevenueTitle": "Georgia’s consolidated-budget receipts {firstYear}–{lastYear} | Fiscal.ge",
   "main.metadataRevenueDescription": "Georgia’s actual consolidated-budget receipts: taxes, grants and other receipts, {firstYear}–{lastYear}.",
   "main.datasetRevenueName": "Georgia’s consolidated-budget receipts",
   "main.georgia": "Georgia"

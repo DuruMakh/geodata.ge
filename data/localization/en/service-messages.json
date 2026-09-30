@@ -372,5 +372,19 @@
   "documents.source.geostat_basket_weights.attribution": "Geostat",
   "documents.source.geostat_basket_weights_ka.title": "Consumer basket weights, % (Georgian)",
   "documents.source.geostat_basket_weights_ka.publisher": "National Statistics Office of Georgia",
-  "documents.source.geostat_basket_weights_ka.attribution": "Geostat"
+  "documents.source.geostat_basket_weights_ka.attribution": "Geostat",
+  "sources.source.geostat_product_mom.name": "Geostat detailed product indices, previous month = 100 (English)",
+  "sources.source.geostat_product_yoy.name": "Geostat detailed product indices, same month of previous year = 100 (English)",
+  "documents.source.geostat_product_mom.title": "Consumer price detail indices, previous month = 100 (English)",
+  "documents.source.geostat_product_mom.publisher": "National Statistics Office of Georgia",
+  "documents.source.geostat_product_mom.attribution": "Geostat",
+  "documents.source.geostat_product_yoy.title": "Consumer price detail indices, same month of previous year = 100 (English)",
+  "documents.source.geostat_product_yoy.publisher": "National Statistics Office of Georgia",
+  "documents.source.geostat_product_yoy.attribution": "Geostat",
+  "documents.source.geostat_product_mom_ka.title": "Consumer price detail indices, previous month = 100 (Georgian)",
+  "documents.source.geostat_product_mom_ka.publisher": "National Statistics Office of Georgia",
+  "documents.source.geostat_product_mom_ka.attribution": "Geostat",
+  "documents.source.geostat_product_yoy_ka.title": "Consumer price detail indices, same month of previous year = 100 (Georgian)",
+  "documents.source.geostat_product_yoy_ka.publisher": "National Statistics Office of Georgia",
+  "documents.source.geostat_product_yoy_ka.attribution": "Geostat"
 }

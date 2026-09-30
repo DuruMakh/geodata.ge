@@ -21,8 +21,8 @@ export async function gdpPageMetadata(locale: Locale) {
   return fiscalMetadata({
     locale,
     path: "/explorer/economy/gdp",
-    title: message(m, "gdp.heading"),
-    description: message(m, "gdp.description"),
+    title: message(m, "gdp.metaTitle"),
+    description: message(m, "gdp.metaDescription"),
   });
 }
 export async function renderGdpPage(locale: Locale) {

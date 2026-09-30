@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
 import { ADJARA_REGION_ID } from "../data/municipal/types";
 import { loadServedInflationData } from "../data/inflation/importInflation";
+import { loadServedProductData } from "../data/inflation/importProducts";
 import { loadServedRegionalEconomyData } from "../data/regionalEconomies/importRegionalEconomies";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../data/economicSectors/importEconomicSectors";
@@ -29,17 +30,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
     loadServedGeneralGovernmentBalanceData(),
     loadServedInflationData(),
+    loadServedProductData(),
     loadServedRegionalEconomyData(),
     loadServedGdpOverviewData(),
     loadServedEconomicSectorsData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
+  const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const regionalModified = new Date(regionalEconomyFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   // A GDP or sector refresh must move these URLs' lastmod, exactly as an
   // inflation or debt refresh moves theirs. They used to carry the budget date.
@@ -91,6 +94,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/inflation`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/inflation/overview`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/inflation/categories`, lastModified: inflationModified },
+    { url: `${siteUrl}/explorer/inflation/products`, lastModified: productModified },
     { url: `${siteUrl}/explorer/inflation/cities`, lastModified: inflationModified },
     ...CITY_PAGE_PATHS.map((path) => ({ url: `${siteUrl}${path}`, lastModified: inflationModified })),
     { url: `${siteUrl}/explorer/expenditure`, lastModified },

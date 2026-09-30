@@ -181,7 +181,11 @@ export async function renderMunicipality(slug: string, locale: Locale) {
           origin: resolveSiteUrl(),
           path: municipalityHrefForCode(code),
           datasetId: "municipal-expenditure",
-          partOfPath: "/explorer/municipalities",
+          partOf: {
+            path: "/explorer/municipalities",
+            name: message(messages, "municipal.indexDatasetName"),
+            description: message(messages, "municipal.metaIndexDescription", { first: firstYear, last: latestYear }),
+          },
           withinGeorgia: true,
           name: message(messages, "municipal.municipalityDatasetName", { name: officialName }),
           description,

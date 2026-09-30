@@ -54,6 +54,17 @@ const DATASET_SCHEMA_IDS = {
   "regional-economies": "regional-economies",
 } as const;
 
+const DATASET_SOURCE_NOTES = {
+  expenditure: "common.budgetSourceNote",
+  revenue: "common.budgetSourceNote",
+  municipalities: "common.budgetSourceNote",
+  debt: "common.budgetSourceNote",
+  gdp: "common.economySourceNote",
+  "economic-sectors": "common.geostatSourceNote",
+  "regional-economies": "common.geostatSourceNote",
+  inflation: "common.inflationSourceNote",
+} as const;
+
 const DATASET_DOWNLOADS = {
   expenditure: "/downloads/data/national-expenditure.csv",
   revenue: "/downloads/data/national-revenue.csv",
@@ -137,7 +148,6 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
     loadEnglishCatalogue(repositoryRoot),
   ]);
   const coverage = deriveMethodologyCoverage(dataset, landingData.facts, municipalData.totalFacts, debtData.facts, archiveSummaries[dataset]);
-  const updatedAt = landingData.sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
   const publicRows = projectPublicSources(rows, locale, catalogue.documents);
 
   return (
@@ -180,7 +190,7 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
         ]}
       />
       <div className="mx-auto w-full max-w-[1240px] px-5 min-[768px]:px-7">
-        <SiteFooter locale={locale} updatedAt={updatedAt} />
+        <SiteFooter locale={locale} sourceNote={message(messages, DATASET_SOURCE_NOTES[dataset])} />
       </div>
     </>
   );

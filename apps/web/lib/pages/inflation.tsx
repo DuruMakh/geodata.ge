@@ -4,21 +4,25 @@ import { BudgetHub } from "../../components/hub/budget-hub";
 import { InflationCategories } from "../../components/inflation/inflation-categories";
 import { InflationCities } from "../../components/inflation/inflation-cities";
 import { InflationOverview } from "../../components/inflation/inflation-overview";
+import { InflationProducts } from "../../components/inflation/inflation-products";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedInflationData } from "../data/inflation/importInflation";
+import { loadServedProductData } from "../data/inflation/importProducts";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
 import { CITY_FIRST_PERIOD, CPI_CITY_IDS, categoryFactInput, cityFactInput, type CityFactInput, type CpiCityId, type CpiCityMeasure } from "../data/inflation/types";
 import { packCategoryFacts } from "../explorer/inflationCategories";
 import { GEORGIA_LINE_ID, packCityFacts } from "../explorer/inflationCities";
 import { CITIES_PATH, GEORGIA_VIEW, cityIdForSlug, cityPageHref, citySlug, type CityView } from "../explorer/inflationCityRoutes";
+import { packProductFacts } from "../explorer/inflationProducts";
 import {
   projectBasketWeight,
   projectCpiFact,
   projectInflationTarget,
   sourceIdBySeriesMeasure,
 } from "../explorer/clientData";
-import { buildInflationHubCards } from "../explorer/inflationHubCards";
+import { buildInflationHubCards, buildLatestProductHubSummary } from "../explorer/inflationHubCards";
 import type { InflationWorkbookSource } from "../explorer/inflationWorkbook";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { getMessages } from "../i18n/messages.server";
@@ -30,12 +34,14 @@ import type { Locale } from "../i18n/types";
 import { projectPublicSources } from "../methodology/publicSources";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
+import { inflationProductDatasetJsonLd } from "../seo/inflationProductDataset";
 import { resolveSiteUrl } from "../siteUrl";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 
 const HUB_PATH = "/explorer/inflation";
 const OVERVIEW_PATH = "/explorer/inflation/overview";
 const CATEGORIES_PATH = "/explorer/inflation/categories";
+const PRODUCTS_PATH = "/explorer/inflation/products";
 const repositoryRoot = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
 
 /** Pages carry the annual rate in full; the 12-month average only feeds the table and workbook summary column, which reads December alone. */
@@ -96,7 +102,9 @@ export async function inflationHubMetadata(locale: Locale) {
 }
 
 export async function renderInflationHub(locale: Locale) {
-  const [{ facts, categories, weights, cities }, presentation] = await Promise.all([loadServedInflationData(), getPresentation(locale, ["inflation", "common"], [])]);
+  const [{ facts, categories, weights, cities }, productData, presentation] = await Promise.all([
+    loadServedInflationData(), loadServedProductData(), getPresentation(locale, ["inflation", "common"], []),
+  ]);
   const t = (key: string) => message(presentation.messages, key);
   return (
     <I18nProvider {...presentation}>
@@ -106,7 +114,7 @@ export async function renderInflationHub(locale: Locale) {
           <PageHeader crumbs={[{ label: t("common.home"), href: pageHref("/", locale) }, { label: t("common.data") }, { label: t("common.inflation") }]} coverage="" />
           <ExplorerHeading>{t("inflation.hubHeading")}</ExplorerHeading>
           <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{t("inflation.hubDescription")}</p>
-          <BudgetHub cards={buildInflationHubCards(facts, presentation, categories, weights, cities.map(cityFactInput))} locale={locale} testId="inflation-hub" />
+          <BudgetHub cards={buildInflationHubCards(facts, presentation, categories, weights, buildLatestProductHubSummary(productData), cities.map(cityFactInput))} locale={locale} testId="inflation-hub" />
         </div>
       </main>
     </I18nProvider>
@@ -262,4 +270,51 @@ export async function renderInflationCityPage(slug: string, locale: Locale) {
   const latest = own.filter((fact) => fact.measure === "yoy_pct" && fact.seriesId !== "cpi.headline").map((fact) => fact.period).sort().at(-1)!;
   const facts = [...own.map(cityFactInput), ...georgiaRatesAt(data, latest)];
   return renderCitiesView(locale, { kind: "city", cityId }, facts, own.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "");
+}
+
+export async function inflationProductsMetadata(locale: Locale) {
+  const [{ catalogue, facts }, messages] = await Promise.all([loadServedProductData(), getMessages(locale, ["inflation"])]);
+  const first = Math.min(...catalogue.map((row) => Number(row.firstPeriod.slice(0, 4))));
+  const last = Math.max(...facts.map((fact) => Number(fact.period.slice(0, 4))));
+  return fiscalMetadata({
+    locale,
+    path: PRODUCTS_PATH,
+    title: message(messages, "inflation.productsMetaTitle", { first, last }),
+    description: message(messages, "inflation.productsDescription"),
+  });
+}
+
+export async function renderInflationProducts(locale: Locale) {
+  const root = repositoryRoot();
+  const [{ catalogue: products, facts }, presentation, manifest, languageCatalogue] = await Promise.all([
+    loadServedProductData(),
+    getPresentation(locale, ["inflation", "common", "controls", "format", "main"], []),
+    loadReviewedSourceManifest(root, "inflation"),
+    loadEnglishCatalogue(root),
+  ]);
+  const sources = inflationWorkbookSources(manifest, locale, languageCatalogue.documents).filter((row) =>
+    row.sourceId === "source.geostat_product_yoy" || row.sourceId === "source.geostat_product_mom");
+  const t = (key: string) => message(presentation.messages, key);
+  const origin = resolveSiteUrl();
+  const firstPeriod = products.map((row) => row.firstPeriod).sort()[0]!;
+  const lastPeriod = facts.map((fact) => fact.period).sort().at(-1)!;
+  const reviewedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1)!;
+  return <I18nProvider {...presentation}>
+    <JsonLd testId="product-dataset-json-ld" data={inflationProductDatasetJsonLd({
+      locale, origin, firstPeriod, lastPeriod, reviewedAt,
+      sourceUrls: sources.map((row) => new URL(row.downloadHref, origin).href),
+    })} />
+    <BreadcrumbJsonLd items={[
+      { name: t("common.home"), path: pageHref("/", locale) },
+      { name: t("common.inflation"), path: pageHref(HUB_PATH, locale) },
+      { name: t("inflation.productsHeading"), path: pageHref(PRODUCTS_PATH, locale) },
+    ]} />
+    <InflationProducts
+      products={products.map(({ productId, labelEn, labelKa, firstPeriod }) => ({ productId, labelEn, labelKa, firstPeriod }))}
+      facts={packProductFacts(facts)}
+      lastReviewedAt={reviewedAt}
+      sources={sources}
+      siteOrigin={origin}
+    />
+  </I18nProvider>;
 }

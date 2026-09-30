@@ -322,8 +322,8 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/inflation                   ინფლაცია          Inflation hub (§25)
 /explorer/inflation/overview                            Monthly national CPI overview (§25)
 /explorer/inflation/categories                          COICOP categories and contributions (§25.1)
-/explorer/inflation/cities                              Inflation by city: Georgia page (§25.2)
-/explorer/inflation/cities/[city]                       Inflation in one city (§25.2)
+/explorer/inflation/cities                              Inflation by city: Georgia page (§25.3)
+/explorer/inflation/cities/[city]                       Inflation in one city (§25.3)
 ```
 
 Outside `/explorer` sit the two editorial pages, `/about` (§23) and `/connect`, the MCP connection page (§24), and the methodology centre at `/methodology` and `/methodology/[dataset]` (§21).
@@ -433,7 +433,7 @@ Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: redu
 
 The crumbs carry `BreadcrumbTrail`'s semantics, not its markup: a `<nav aria-label="Breadcrumb">` landmark, `aria-hidden` separators, and `aria-current="page"` on the final crumb. They deliberately do **not** reuse the component itself — `BreadcrumbTrail` renders its own `BreadcrumbJsonLd`, and these routes already emit one, so reusing it would ship two structured-data blocks per page. Marking the current page by colour alone, in a paragraph of spans, is what this replaced: on the site's largest set of routes the trail was not a landmark and read as a run-on string with the slashes announced.
 
-**Footer.** Every `/explorer` route renders `SiteFooter` (§19) at the foot of the content column — inside it, not beside the sidebar — with the pages' own horizontal padding so its rule lines up with the content above. The footer uses the compact lockup at approximately 150px; its trust, navigation, source/update, contact, and CC BY 4.0 licence content remains unchanged. These routes are the site's main SEO landing targets, and the footer is where the licence, contact address and methodology link live (§21); without it ~85 pages ended with no licence, no way to report an error and no route to the methodology. `updatedAt` comes from the landing model, the same site-wide review date the methodology and about pages show.
+**Footer.** Every `/explorer` route renders `SiteFooter` (§19) at the foot of the content column — inside it, not beside the sidebar — with the pages' own horizontal padding so its rule lines up with the content above. The footer uses the compact lockup at approximately 150px and retains its trust, navigation, contact, and CC BY 4.0 licence content. Explorer and methodology-article footers name the relevant dataset's source institutions; review dates remain in the page's existing source note or article header. They do not repeat the site-wide latest review date as if it applied to that dataset. Generic footers explicitly label the landing model's `updatedAt` as the latest source review across Fiscal.ge. These routes are the site's main SEO landing targets, and the footer is where the licence, contact address and methodology link live (§21).
 
 **Budget hub (`/explorer`).** Breadcrumb, serif H1 `საქართველოს ბიუჯეტი`, a concise lead covering budgets, debt and deficit, then six cards in a two-column grid (one column below 768px, max-width 860px), then the standard source note (§7.10). Card anatomy, in order: mono index in accent with `→` right-aligned, serif 18px title, 11.5px `muted` description, graphic, mono 10px `faint` footer.
 
@@ -864,7 +864,7 @@ Section order is fixed: shared header → living-relief hero → country figures
 The exact dataset contracts are:
 
 1. `სახელმწიფო ხარჯები`; H2 `როგორ იხარჯება საქართველოს ბიუჯეტი`; total `მთლიანი ხარჯი`; first column `სფერო`; `ხარჯების მონაცემები →` → `/explorer/expenditure`.
-2. `სახელმწიფო შემოსავლები`; H2 `როგორ ფინანსდება საქართველოს ბიუჯეტი`; total `მთლიანი შემოსავლები`; first column `მუხლი`; `შემოსავლების მონაცემები →` → `/explorer/revenue`.
+2. `ნაერთი ბიუჯეტის შემოსულობები`; H2 `როგორ ფინანსდება საქართველოს ბიუჯეტი`; total `მთლიანი შემოსულობები`; first column `მუხლი`; `შემოსავლების მონაცემები →` → `/explorer/revenue`.
 3. `მუნიციპალური ბიუჯეტები`; H2 `როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები`; total `საქართველოს მუნიციპალური ჯამი`; first column `უდიდესი მუნიციპალური ბიუჯეტები`; `მუნიციპალური მონაცემები →` → `/explorer/municipalities`.
 4. `სახელმწიფო ვალი`; H2 `რამდენია საქართველოს მთავრობის ვალი`; latest actual total Government Debt stock plus its domestic and external amounts and shares; `ვალის მონაცემები →` → `/explorer/debt`.
 5. `ზოგადი მთავრობის დეფიციტი`; H2 `რამდენია საქართველოს ბიუჯეტის დეფიციტი`; main label `დეფიციტი მშპ-სთან მიმართებით`; latest actual deficit as percent of GDP followed by the last three actual annual percentages; `დეფიციტის მონაცემები →` → `/explorer/deficit`.
@@ -949,7 +949,7 @@ The three live Economy hub cards use the same card anatomy: a 200×34 sparkline 
 
 ## 25. Inflation Surfaces
 
-Inflation is the third dataset in the explorer sidebar (Budget, Economy, Inflation), with the same active-row, nested-section, collapse, keyboard and mobile behaviour. Its hub reuses the budget hub cards: `ინფლაციის მიმოხილვა`, `კატეგორიები` and `ქალაქები` are live; basket and products are non-clickable coming-soon cards. The collapsed rail reads `მონაცემები / ინფლაცია`.
+Inflation is the third dataset in the explorer sidebar (Budget, Economy, Inflation), with the same active-row, nested-section, collapse, keyboard and mobile behaviour. Its hub reuses the budget hub cards: `ინფლაციის მიმოხილვა`, `კატეგორიები`, `პროდუქტები` and `ქალაქები` are all live. There is no separate basket card. The collapsed rail reads `მონაცემები / ინფლაცია`.
 
 The overview follows the GDP overview's header — a single unit line under the H1, `TextTab` indicator tabs centred directly above the workspace (`წლიური ინფლაცია`, `თვიური ინფლაცია`, `ფასების ინდექსი`) — over the Budget explorers' workspace: `ხაზი / ცხრილი`, chart or table, range strip, series panel with the download at its foot, source note. The series panel adds a reference row (the NBG target) with a dashed swatch; its chart line is dashed accent with no end dot, and it appears only on annual inflation. Inflation values are never coloured good/bad; rate changes are in percentage points.
 
@@ -973,7 +973,13 @@ Monthly axes: the line chart and range strip take a periods-per-year hint. Axis 
 
 The month grid gains contribution bins (`0 / 0.25 / 0.75 / 1.5` pp) on the same five-step tint scale, with a legend in `პპ`, and has no annual-average column: Geostat publishes no annual average per category. The indicators block carries **four different measures, not one ranked four ways**: the hero is the largest contributor of the latest published month with its price change and basket share, then `ყველაზე გაძვირებული` (highest annual change, as a rate, contribution as detail), `ყველაზე გაიაფებული` (lowest annual change — relabelled `ყველაზე ნაკლებად გაძვირებული` when nothing fell), and `ინფლაციის სიგანე` (`10 / 12` divisions rising, sparkline of that count). Divisions only. A negative value is described as `გაიაფდა`, never coloured as good or bad. See `docs/superpowers/specs/2026-09-12-inflation-categories-design.md`.
 
-### 25.2 Cities
+### 25.2 Individual products
+
+`პროდუქტები` is the third inflation section, at `/explorer/inflation/products`. It uses the existing editorial page header and two-column explorer workspace. The left column begins with the monthly-observation line chart in **annual inflation** mode, with the standard year range strip directly beneath it. A single 36px `TrendingUp` Lucide button in the chart heading switches to or from a Fiscal.ge-derived cumulative change; its accessible name and tooltip are localized, but the button carries no visible word. There is no separate annual button, monthly tab or chart/table switch. The right column contains the existing selector anatomy with icon-sized product cutouts, official names, latest annual values, bilingual search, Clear and an Excel action at the foot. Products are sorted by the latest published annual rate, with missing rates last; right-panel search never changes selection totals or the lower list.
+
+Below the workspace, the established one-hero-plus-three-side indicators show the last selected product's latest annual rate on the cohort min–max scale, that product's selected-years cumulative change, and the highest and lowest latest annual product rates across the whole current cohort. Names, exact periods and unavailable explanations remain visible. A “Browse products” heading and independent bilingual search precede the complete illustrated product table, without a dividing rule or row counter. The table places selected-years cumulative change before latest annual change and ranks matching products by the selected-range cumulative value, highest first, with incomplete histories last; it re-ranks when the selected years change. `More products` works within matching results. It is a semantic table, not a product-card grid. On phones, the workspace stacks chart then selector; the table scrolls within its own region without hiding either rate column. Object illustrations are small transparent cutouts beside names and never function as UI icons or data evidence. See `docs/superpowers/specs/2026-09-27-inflation-products-explorer-design.md`.
+
+### 25.3 Cities
 
 The section is a **Georgia page** at `/explorer/inflation/cities` and **one page per city** at `/explorer/inflation/cities/{tbilisi|kutaisi|batumi|gori|telavi|zugdidi}`. Both show annual inflation only (the unit line alone under the H1, no tabs) and repeat the overview's workspace, range strip, series panel, month grid, Excel action and indicators.
 

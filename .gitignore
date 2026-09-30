@@ -32,6 +32,7 @@ Thumbs.db
 # generated reports
 data/reports/*.json
 !data/reports/economic-sectors-validation.json
+!data/reports/inflation-products-validation.json
 data/reports/*.txt
 
 # local-only planning/source/prototype material

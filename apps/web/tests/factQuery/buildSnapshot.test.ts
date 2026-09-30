@@ -13,8 +13,9 @@ describe("buildFactQuerySnapshot", () => {
       buildFactQuerySnapshot(OPTIONS),
       loadSourceDocuments("../../data/sources/source-documents.csv"),
     ]);
-    // 127 sources from main plus three regional-economy sources.
-    expect(sources).toHaveLength(130);
+    // The two English product-index files supply new fact sources; their
+    // Georgian parity twins remain methodology originals.
+    expect(sources).toHaveLength(132);
     expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.map(source => source.sourceId).sort());
     expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([
       "source.geostat_sector_growth", "source.geostat_sector_volume",

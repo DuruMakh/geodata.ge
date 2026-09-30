@@ -372,5 +372,19 @@
   "documents.source.geostat_basket_weights.attribution": "საქსტატი",
   "documents.source.geostat_basket_weights_ka.title": "სამომხმარებლო კალათის წონები, % (ქართული)",
   "documents.source.geostat_basket_weights_ka.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური",
-  "documents.source.geostat_basket_weights_ka.attribution": "საქსტატი"
+  "documents.source.geostat_basket_weights_ka.attribution": "საქსტატი",
+  "sources.source.geostat_product_mom.name": "საქსტატი · პროდუქტების დეტალური ფასების ინდექსები, წინა თვე = 100 (ინგლისური)",
+  "sources.source.geostat_product_yoy.name": "საქსტატი · პროდუქტების დეტალური ფასების ინდექსები, წინა წლის შესაბამისი თვე = 100 (ინგლისური)",
+  "documents.source.geostat_product_mom.title": "სამომხმარებლო ფასების დეტალური ინდექსები, წინა თვე = 100 (ინგლისური)",
+  "documents.source.geostat_product_mom.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური",
+  "documents.source.geostat_product_mom.attribution": "საქსტატი",
+  "documents.source.geostat_product_yoy.title": "სამომხმარებლო ფასების დეტალური ინდექსები, წინა წლის შესაბამისი თვე = 100 (ინგლისური)",
+  "documents.source.geostat_product_yoy.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური",
+  "documents.source.geostat_product_yoy.attribution": "საქსტატი",
+  "documents.source.geostat_product_mom_ka.title": "სამომხმარებლო ფასების დეტალური ინდექსები, წინა თვე = 100 (ქართული)",
+  "documents.source.geostat_product_mom_ka.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური",
+  "documents.source.geostat_product_mom_ka.attribution": "საქსტატი",
+  "documents.source.geostat_product_yoy_ka.title": "სამომხმარებლო ფასების დეტალური ინდექსები, წინა წლის შესაბამისი თვე = 100 (ქართული)",
+  "documents.source.geostat_product_yoy_ka.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური",
+  "documents.source.geostat_product_yoy_ka.attribution": "საქსტატი"
 }
