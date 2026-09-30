@@ -120,7 +120,7 @@ The native category select (`inflation-city-category-select.tsx`), its `DESIGN.m
 - `Project_Definition.md` §2C: the cities item describes the Georgia page and six city pages, annual inflation only on the pages, monthly city data through MCP and publications.
 - `DESIGN.md` §25: the Cities surface is rewritten — heading picker, Georgia page, city page, indicators; the native-select paragraph is removed.
 - `docs/data-methodology/inflation-cpi-national.md`: the page description paragraph only; data and validation text is unchanged.
-- `public/llms.txt`: lists the Georgia page; city pages are listed if region pages are.
+- `public/llms.txt`: the cities line describes the Georgia page and says each city has its own page; individual city URLs are not listed, as individual region URLs are not.
 - The cities spec gets a status line pointing to this amendment.
 
 ## 10. Verification
