@@ -31,7 +31,7 @@ These replace the listed items of the cities spec §1.1:
 | `/explorer/inflation/cities/{slug}` | City page, `slug` ∈ `tbilisi`, `kutaisi`, `batumi`, `gori`, `telavi`, `zugdidi` |
 
 - `slug` is the city ID without its `city.` prefix. City pages are prerendered with `dynamicParams = false`, as region pages are; an unknown slug is a 404.
-- 12 new pages (6 × ka/en). The sitemap and `bilingual-complete` counts grow by 12 and 6 respectively (the plan states exact numbers after reading the current totals).
+- 12 new pages (6 × ka/en). The sitemap (both languages) grows by 12 URLs and the public page inventory by 6 paths.
 - The sidebar keeps one `ქალაქები` row, pointing to the Georgia page and active on the Georgia page and every city page.
 - Hub card 04 is unchanged and links to the Georgia page.
 - The `/methodology/inflation` city section text is updated to describe the new page shape (no tabs, per-city pages).
@@ -92,11 +92,11 @@ hero: city total vs Georgia │ ყველაზე გაძვირებ�
 - **Colours.** The total in ink; divisions in the colours the national Categories page already gives each `cpi.cat.*`, so a division is the same colour on both pages.
 - **Table.** The same month grid, one series at a time through the existing series switcher. `წლის საშუალო` appears for `სულ` only (Geostat publishes a 12-month average for the city total, not for divisions).
 - **Indicators** (latest published month, year on year, divisions only; Georgia is the reference, never ranked):
-  - **Hero:** the city's total rate at 62px; the existing hero sentence (`ბათუმი: წლიური ინფლაცია 7.1%; საქართველოში 5.6%, სხვაობა +1.5 პპ.`), with a 36-month sparkline of the city's total.
+  - **Hero:** the city's total rate at 62px; the existing hero sentence (`ბათუმი: წლიური ინფლაცია 7.1%; საქართველოში 5.6%, სხვაობა +1.5 პპ.`); like the Georgia page's hero, it has no sparkline.
   - **`ყველაზე გაძვირებული`**: the division with the highest rate; detail: its distance from Georgia's same division in `პპ`.
   - **`ყველაზე ნაკლებად გაძვირებული`**, or **`ყველაზე გაიაფებული`** when its printed rate is negative (the Categories page's labels and rule): the division with the lowest rate, same detail, never coloured good or bad.
   - **`ინფლაციის სიგანე`**: divisions with a positive printed rate, as `{n} / 12` with `ჯგუფი გაძვირდა`, and a 36-month sparkline of that count — the Categories page's breadth indicator.
-  - Differences use the printed one-decimal figures; ties name every tied division.
+  - Differences use the printed one-decimal figures; ties resolve by COICOP order, as on the Categories page.
 - **Caveat.** The same standing same-price-everywhere sentence in the source note. It matters more here, because a city page shows the categories where the centrally priced items sit.
 - **Excel.** The standard three-sheet workbook for the selected series of that city over the range: `მარტივი ცხრილი` (one row per series and year, `წლის საშუალო` for `სულ` only), `მონაცემები` (`წელი`, `თვე`, `ქალაქი`, `კატეგორია`, `COICOP კოდი`, `მნიშვნელობა`, `ერთეული`, `სტატუსი`), `წყაროები`. The same note; no weights.
 
