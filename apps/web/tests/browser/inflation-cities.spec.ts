@@ -159,3 +159,56 @@ test("every city page is statically available in both languages", async ({ reque
   }
   expect((await request.get(`${CITIES}/rustavi`)).status()).toBe(404);
 });
+
+// The dialog is a sibling of the heading inside the heading's own column, so it opens
+// under the heading and never at the far edge of the row (where overflow-x: hidden
+// would clip it).
+const pickerCases = [
+  { name: "Georgia page at 1440px", path: CITIES, width: 1440, anchored: true },
+  { name: "Georgia page at 390px", path: CITIES, width: 390, anchored: false },
+  { name: "city page at 1440px", path: `${CITIES}/batumi`, width: 1440, anchored: true },
+] as const;
+
+for (const { name, path, width, anchored } of pickerCases) {
+  test(`the city picker opens inside the viewport: ${name}`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(path);
+    await ready(page);
+    const trigger = page.getByTestId("city-picker-trigger");
+    await trigger.click();
+    const dialog = page.getByRole("dialog", { name: "ქალაქის არჩევა" });
+    await expect(dialog).toBeVisible();
+    const box = await dialog.boundingBox();
+    const headingBox = await page.locator("h1").boundingBox();
+    expect(box).not.toBeNull();
+    expect(headingBox).not.toBeNull();
+    expect(box!.x, "dialog left edge").toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width, "dialog right edge").toBeLessThanOrEqual(width);
+    // As on municipal pages the dialog is left-aligned with the heading and opens just below it.
+    if (anchored) {
+      expect(Math.abs(box!.x - headingBox!.x), "dialog left edge vs heading").toBeLessThanOrEqual(24);
+      expect(box!.y, "dialog opens below the heading").toBeGreaterThanOrEqual(headingBox!.y + headingBox!.height - 1);
+    }
+  });
+}
+
+test("the Georgia page picker shows an empty state for no match and recovers", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto(CITIES);
+  await ready(page);
+  await page.getByTestId("city-picker-trigger").click();
+  const dialog = page.getByRole("dialog", { name: "ქალაქის არჩევა" });
+  await dialog.locator("input").fill("zzzz");
+  await expect(dialog.getByText("ქალაქი ვერ მოიძებნა")).toBeVisible();
+  await expect(page.getByTestId("city-picker-option")).toHaveCount(0);
+  await dialog.getByRole("button", { name: "ძიების გასუფთავება" }).click();
+  await expect(page.getByTestId("city-picker-option")).toHaveCount(6);
+});
+
+test("page payloads carry yoy_pct and never mom_pct", async ({ request }) => {
+  for (const path of [CITIES, `${CITIES}/batumi`]) {
+    const html = await (await request.get(path)).text();
+    expect(html, path).toContain("|yoy_pct");
+    expect(html, path).not.toContain("|mom_pct");
+  }
+});
