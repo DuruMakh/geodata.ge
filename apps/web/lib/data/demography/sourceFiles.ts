@@ -36,9 +36,17 @@ const manifestRowSchema = z.object({
   bytes: z.coerce.number().int().positive(),
   source_year_min: optionalYear,
   source_year_max: optionalYear,
+  normalized_year_min: optionalYear,
+  normalized_year_max: optionalYear,
   unit: z.string(),
   notes: z.string().min(1),
-});
+})
+  .refine((row) => (row.normalized_year_min === null) === (row.normalized_year_max === null), {
+    message: "served years need both a minimum and a maximum",
+  })
+  .refine((row) => row.role !== "canonical_input" || row.normalized_year_min !== null, {
+    message: "a canonical input needs its served years",
+  });
 
 /** The newest vintage folder (named after the month it was captured). */
 export async function latestDemographyVintage(packageRoot: string): Promise<string> {
@@ -81,6 +89,8 @@ function parseManifest(text: string): DemographyManifestRow[] {
       bytes: row.bytes,
       sourceYearMin: row.source_year_min,
       sourceYearMax: row.source_year_max,
+      servedYearMin: row.normalized_year_min,
+      servedYearMax: row.normalized_year_max,
       unit: row.unit,
       notes: row.notes,
     } satisfies DemographyManifestRow;

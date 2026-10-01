@@ -13,6 +13,7 @@ const MUNICIPAL_TABLE_01 =
 /** The reviewed identity files the preparation reads besides the archive. */
 const PREPARATION_INPUTS = [
   "data/imports/municipalities.csv",
+  "data/sources/source-documents.csv",
   "data/taxonomy/municipal-regions.json",
   "docs/Raw Data/Municipalities/geostat-population-regional-gdp/geography-map.csv",
   "docs/Raw Data/Municipalities/geostat-population-regional-gdp/population-component-map.csv",

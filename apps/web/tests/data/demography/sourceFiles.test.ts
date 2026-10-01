@@ -28,6 +28,29 @@ describe("demography source package", () => {
     ]);
   });
 
+  test("records the years each canonical input serves, and none for evidence files", async () => {
+    const sources = await loadDemographySources(repositoryRoot);
+    const served = (sourceId: string) => [sources.get(sourceId).row.servedYearMin, sources.get(sourceId).row.servedYearMax];
+
+    expect(served("source.geostat_demography_births")).toEqual([2014, 2025]);
+    expect(served("source.geostat_demography_net_migration")).toEqual([2012, 2025]);
+    expect(served("source.geostat_demography_population_age_sex")).toEqual([2004, 2026]);
+    expect(served("source.geostat_municipal_population")).toEqual([2004, 2026]);
+    for (const row of sources.rows) {
+      if (row.role !== "canonical_input") expect([row.servedYearMin, row.servedYearMax], row.sourceId).toEqual([null, null]);
+    }
+  });
+
+  test("rejects half of a served-years pair and a canonical input with none", async () => {
+    const halfPair = await copyDemographyPackage();
+    await editManifest(halfPair, (lines) => lines.map((line) => (line.includes("09-number-of-live-births") ? line.replace(",2014,2025,persons,", ",2014,,persons,") : line)));
+    const none = await copyDemographyPackage();
+    await editManifest(none, (lines) => lines.map((line) => (line.includes("09-number-of-live-births") ? line.replace(",2014,2025,persons,", ",,,persons,") : line)));
+
+    await expect(loadDemographySources(halfPair)).rejects.toThrow(/served years/);
+    await expect(loadDemographySources(none)).rejects.toThrow(/served years/);
+  });
+
   test("verifies every file against its manifest bytes and SHA-256", async () => {
     const sources = await loadDemographySources(repositoryRoot);
 

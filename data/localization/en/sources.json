@@ -928,5 +928,82 @@
       "reviewedAt": "2026-09-26"
     },
     "derivation": null
+  },
+  "source.geostat_demography_population_age_sex": {
+    "name": {
+      "text": "Geostat population as of 1 January by age group and sex",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_births": {
+    "name": {
+      "text": "Geostat live births by regions and self-governed units",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_crude_birth_rate": {
+    "name": {
+      "text": "Geostat crude birth rate",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_fertility": {
+    "name": {
+      "text": "Geostat age-specific fertility rates and total fertility rate",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_deaths": {
+    "name": {
+      "text": "Geostat deaths by regions and self-governed units",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_crude_death_rate": {
+    "name": {
+      "text": "Geostat crude death rate",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_infant_mortality": {
+    "name": {
+      "text": "Geostat infant mortality rate by sex",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_life_expectancy": {
+    "name": {
+      "text": "Geostat life expectancy at birth by sex",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_natural_increase": {
+    "name": {
+      "text": "Geostat natural increase by regions and self-governed units",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_net_migration": {
+    "name": {
+      "text": "Geostat net migration (number and rate)",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_migration_citizenship": {
+    "name": {
+      "text": "Geostat immigrants and emigrants by sex and citizenship",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
   }
 }

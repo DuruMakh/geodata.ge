@@ -88,6 +88,19 @@ describe("preparing the demography files", () => {
     await expect(writeDemographyArtifacts(false, root)).rejects.toThrow(/missing: data\/reports\/demography-validation\.json/);
   });
 
+  test("stops, writing nothing, when a served source is not registered", async () => {
+    const root = await copyPreparationInputs();
+    const registry = path.join(root, "data/sources/source-documents.csv");
+    const rows = (await fs.readFile(registry, "utf8")).split("\n");
+    await fs.writeFile(registry, rows.filter((row) => !row.startsWith("source.geostat_demography_births,")).join("\n"));
+
+    await expect(writeDemographyArtifacts(true, root)).rejects.toMatchObject({
+      condition: "unregistered_source",
+      message: expect.stringContaining("source.geostat_demography_births"),
+    });
+    await expect(fs.access(path.join(root, FILES.population))).rejects.toThrow();
+  });
+
   test("a write never overwrites a changed historical value", async () => {
     const root = await copyPreparationInputs();
     await writeDemographyArtifacts(true, root);

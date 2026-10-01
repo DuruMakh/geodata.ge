@@ -181,9 +181,9 @@ describe("public source resolution", () => {
         .map((source) => source.sourceId);
 
       expect(unresolved).toEqual([]);
-      // The two product-index fact sources extend the existing inventory;
-      // their Georgian parity twins are methodology originals only.
-      expect(snapshot.sources.length).toBe(132);
+      // The eleven demography canonical inputs extend the existing inventory;
+      // the package's validation inputs and definitions are evidence, not sources.
+      expect(snapshot.sources.length).toBe(143);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {
@@ -211,6 +211,27 @@ describe("public source resolution", () => {
       expect(source?.documents[0]?.sha256).toBe(
         "8bd7a1b56e756e8d6bc92192095795b204b23fd18274aaff39b78c0b0a487a57",
       );
+    });
+
+    it("resolves the Geostat demography package to the files it serves and publishes nothing else", async () => {
+      const snapshot = await buildFactQuerySnapshot(OPTIONS);
+      const demography = snapshot.sources.filter((source) => source.sourceId.startsWith("source.geostat_demography_"));
+      const births = demography.find((source) => source.sourceId === "source.geostat_demography_births");
+      const documentIds = snapshot.sources.flatMap((source) => source.documents.map((document) => document.documentId));
+
+      expect(demography).toHaveLength(11);
+      expect(births?.documents).toHaveLength(1);
+      expect(births?.documents[0]).toMatchObject({
+        officialUrl: "https://geostat.ge/media/77847/09-number-of-live-births-by-self-governed-units.xlsx",
+        sha256: "b8b2b0c352aa1e787925e896773b40aa7181d7b2c83bb05c9a1646c7f798a58d",
+        byteSize: 26206,
+        years: Array.from({ length: 12 }, (_, index) => 2014 + index),
+      });
+      // The validation inputs and definition PDFs stay evidence, and table 01 stays the municipal package's one document.
+      expect(documentIds).not.toContain("source.geostat_demography_median_age");
+      expect(documentIds).not.toContain("source.geostat_demography_metadata_population");
+      expect(documentIds.filter((id) => id.startsWith("source.geostat_demography_"))).toHaveLength(11);
+      expect(snapshot.sources.find((source) => source.sourceId === "source.geostat_municipal_population")?.documents).toHaveLength(1);
     });
 
     it("states the derivation of the consolidated Adjara calculation and cites its upstream originals", async () => {

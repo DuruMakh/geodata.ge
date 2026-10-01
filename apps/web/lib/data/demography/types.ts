@@ -18,6 +18,9 @@ export type DemographyManifestRow = {
   bytes: number;
   sourceYearMin: number | null;
   sourceYearMax: number | null;
+  /** The years the dataset serves from this file, which a citation claims. Only a canonical input has them. */
+  servedYearMin: number | null;
+  servedYearMax: number | null;
   unit: string;
   notes: string;
 };

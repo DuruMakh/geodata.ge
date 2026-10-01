@@ -12,6 +12,7 @@ import { readAgeStructure, readPopulation } from "./readPopulation";
 import { readVitalEvents } from "./readVital";
 import { FAMILIES } from "./series";
 import { loadDemographySources } from "./sourceFiles";
+import { DemographyStopError } from "./stops";
 import { ESTIMATE_BASES } from "./types";
 import type { DemographyObservation } from "./types";
 import { validateDemography } from "./validation";
@@ -86,6 +87,16 @@ async function loadPreviousObservations(repositoryRoot: string): Promise<Demogra
   return found ? rows : undefined;
 }
 
+/** Every source the canonical files cite must be a registered source, or no reader could trace a number to its document. */
+async function checkSourcesRegistered(repositoryRoot: string, observations: readonly DemographyObservation[]): Promise<void> {
+  const text = await fs.readFile(path.join(repositoryRoot, "data/sources/source-documents.csv"), "utf8");
+  const registered = new Set((parse(text, { bom: true, columns: true, skip_empty_lines: true }) as Array<{ source_id: string }>).map((row) => row.source_id));
+  const missing = [...new Set(observations.map((row) => row.sourceId))].filter((sourceId) => !registered.has(sourceId));
+  if (missing.length > 0) {
+    throw new DemographyStopError("unregistered_source", `Served sources are not registered in data/sources/source-documents.csv: ${missing.join(", ")}`);
+  }
+}
+
 /** Reads every family from the archive and validates the whole. Throws a named stop before anything is written. */
 export async function prepareDemography(repositoryRoot: string) {
   const [sources, geography, anomalies, citizenships, previous] = await Promise.all([
@@ -101,6 +112,7 @@ export async function prepareDemography(repositoryRoot: string) {
     ...readVitalEvents(sources, geography, anomalies),
     ...readMigration(sources, citizenships),
   ];
+  await checkSourcesRegistered(repositoryRoot, observations);
   const report = validateDemography({ observations, sources, geography, previous });
   return { observations, report, breaks: buildBreakRegister() };
 }

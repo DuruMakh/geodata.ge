@@ -27,6 +27,8 @@ export const STOP_CONDITIONS = [
   "rate_deviation",
   /** A previously captured value that changed. */
   "revision",
+  /** A served source id that data/sources/source-documents.csv does not register. */
+  "unregistered_source",
 ] as const;
 
 export type StopCondition = (typeof STOP_CONDITIONS)[number];

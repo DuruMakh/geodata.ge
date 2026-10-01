@@ -216,6 +216,17 @@ describe("one corrupted case per stop condition", () => {
     expect(stop(() => prepare(tables))).toBe("identity_failed");
   });
 
+  test("a manifest that states different served years than its rows cover", () => {
+    const stale = (sourceId: string, servedYearMax: number) => ({
+      ...sources,
+      rows: sources.rows.map((row) => (row.sourceId === sourceId ? { ...row, servedYearMax } : row)),
+    });
+
+    expect(() => validateDemography({ observations, sources, geography })).not.toThrow();
+    expect(stop(() => validateDemography({ observations, sources: stale("source.geostat_demography_births", 2024), geography }))).toBe("layout_changed");
+    expect(stop(() => validateDemography({ observations, sources: stale("source.geostat_municipal_population", 2025), geography }))).toBe("layout_changed");
+  });
+
   test("a row outside the coverage rules, a repeated key and a geography nobody reviewed", () => {
     const births = observations.find((row) => row.seriesId === "demography.live_births")!;
     const early = [...observations, { ...births, year: 2013 }];

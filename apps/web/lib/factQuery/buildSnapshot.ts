@@ -30,6 +30,7 @@ import { CPI_CITY_IDS } from "../data/inflation/types";
 import { NATIONAL_SERIES, RESIDUAL_SERIES, RESIDUAL_SERIES_ID, TARGET_SERIES, TARGET_SERIES_ID, type InflationCityEntity, type InflationGroup } from "./inflationSeries";
 import { loadServedGeneralGovernmentBalanceData } from "../data/generalGovernmentBalance/importGeneralGovernmentBalance";
 import { loadServedGovernmentDebtData } from "../data/governmentDebt/importGovernmentDebtFacts";
+import { DEMOGRAPHY_RAW_ROOT, latestDemographyVintage } from "../data/demography/sourceFiles";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { hashDataVersion } from "./canonical";
 import { resolvePublicSources, type ManifestDocument } from "./sources";
@@ -196,6 +197,16 @@ const PACKAGE_MANIFEST_DIRECTORIES: readonly (readonly string[])[] = [
   ["docs", "Raw Data", "Debt", "government-debt-annual"],
 ];
 
+/**
+ * The demography manifest also records files kept as evidence: validation inputs, definition PDFs and
+ * table 01, which the municipal package already publishes under its own document. Only the canonical
+ * inputs the demography package stores itself are public documents.
+ */
+function isDemographyPublicDocument(rawRow: unknown): boolean {
+  const row = rawRow as { role?: string; local_file?: string };
+  return row.role === "canonical_input" && row.local_file?.startsWith("official/") === true;
+}
+
 function yearsBetween(first: number, last: number): number[] {
   if (last < first) return [];
   return Array.from({ length: last - first + 1 }, (_value, index) => first + index);
@@ -265,7 +276,12 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
   // loadReviewedSourceManifest cannot read them. loadGdpWorkbookSources
   // (workbookSources.ts) reads the GDP one but, like loadWorkbookSources,
   // projects source_id away — read them directly here to keep it.
-  for (const directory of PACKAGE_MANIFEST_DIRECTORIES) {
+  // The demography package keeps a folder per capture, so its newest folder is the one read.
+  const demographyDirectory = [
+    ...DEMOGRAPHY_RAW_ROOT.split("/"),
+    await latestDemographyVintage(path.join(repositoryRoot, DEMOGRAPHY_RAW_ROOT)),
+  ];
+  for (const directory of [...PACKAGE_MANIFEST_DIRECTORIES, demographyDirectory]) {
     const manifestPath = path.join(repositoryRoot, ...directory, "source-manifest.csv");
     const csv = await readFile(manifestPath, "utf8");
     const rawRows = parse(csv, {
@@ -276,6 +292,7 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
     }) as unknown[];
 
     for (const [index, rawRow] of rawRows.entries()) {
+      if (directory === demographyDirectory && !isDemographyPublicDocument(rawRow)) continue;
       const parsed = packageManifestRowSchema.safeParse(rawRow);
       if (!parsed.success) {
         const issues = parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ");

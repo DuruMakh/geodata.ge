@@ -90,6 +90,21 @@ function checkCoverage(rows: readonly DemographyObservation[], geography: Demogr
   }
 }
 
+/** The years the manifest states for each canonical input are the years its rows cover, so a citation claims neither more nor less than the data. */
+function checkServedYears(sources: DemographySources, rows: readonly DemographyObservation[]): void {
+  for (const source of sources.rows.filter((entry) => entry.role === "canonical_input")) {
+    const years = rows.filter((row) => row.sourceId === source.sourceId).map((row) => row.year);
+    const first = years.length > 0 ? Math.min(...years) : null;
+    const last = years.length > 0 ? Math.max(...years) : null;
+    if (first !== source.servedYearMin || last !== source.servedYearMax) {
+      throw new DemographyStopError(
+        "layout_changed",
+        `${source.sourceId} serves ${first}–${last}, but the manifest states ${source.servedYearMin}–${source.servedYearMax}`,
+      );
+    }
+  }
+}
+
 /** Parts add to wholes exactly, in whole persons, for every identity the audit established. */
 function checkWholes(rows: readonly DemographyObservation[], lookup: Lookup, geography: DemographyGeography): void {
   const equal = (what: string, parts: number, whole: number) => {
@@ -217,6 +232,7 @@ export function validateDemography(input: ValidationInput): DemographyValidation
   };
 
   checkCoverage(rows, geography);
+  checkServedYears(sources, rows);
   const balancing = checkBalancing(sources);
   checkWholes(rows, lookup, geography);
   checkMigrationTotals(sources);

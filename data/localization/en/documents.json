@@ -3277,5 +3277,71 @@
     "publisher": { "text": "National Statistics Office of Georgia", "reviewedAt": "2026-09-26" },
     "attribution": { "text": "Geostat", "reviewedAt": "2026-09-26" },
     "documentLanguage": "ka"
+  },
+  "source.geostat_demography_population_age_sex": {
+    "title": { "text": "Population as of 1 January by 5-year age groups and sex", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_births": {
+    "title": { "text": "Number of live births by regions and self-governed units", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_crude_birth_rate": {
+    "title": { "text": "Crude birth rate (Live births per 1 000 population)", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_fertility": {
+    "title": { "text": "Age specific fertility rates and total fertility rate (TFR)", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_deaths": {
+    "title": { "text": "Number of deaths by regions and self-governed units", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_crude_death_rate": {
+    "title": { "text": "Crude death rate (death per 1 000 population)", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_infant_mortality": {
+    "title": { "text": "Infant mortality rate by sex (infant deaths per 1,000 live births)", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_life_expectancy": {
+    "title": { "text": "Life expectancy at births by sex", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_natural_increase": {
+    "title": { "text": "Natural increase by regions and self-governed units", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_net_migration": {
+    "title": { "text": "Net migration (number and rate)", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_migration_citizenship": {
+    "title": { "text": "Number of immigrants and emigrants by sex and citizenship", "reviewedAt": "2026-10-01" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-01" },
+    "attribution": null,
+    "documentLanguage": "en"
   }
 }
