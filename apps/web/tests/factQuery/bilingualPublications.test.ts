@@ -18,7 +18,7 @@ describe("bilingual bulk publications", () => {
     expect(artifacts.map(file => file.fileName).sort()).toEqual(["manifest.json", "catalogue.json", "sources.json", "national-revenue.json", "national-expenditure.json", "ministries.json", "municipal-expenditure.json", "government-debt.json", "government-debt-rates.json", "general-government-balance.json", "gdp-overview.json", "gdp-overview.csv", "economic-sectors.json", "economic-sectors.csv", "regional-economies.json", "regional-economies.csv", "inflation-national.json", "inflation-categories.csv", "inflation-categories.json", "inflation-cities.csv", "inflation-cities.json"].sort());
     for (const artifact of artifacts.filter(file=>file.fileName.endsWith(".json"))) {
       const published = read(artifact.fileName);
-      expect(published.schemaVersion).toBe("1.4.0");
+      expect(published.schemaVersion).toBe("1.5.0");
       expect(published.dataVersion).toBe(snapshot.dataVersion);
     }
     for (const entry of read("manifest.json").files) {

@@ -21,11 +21,11 @@ export type ProductIndex = {
   defaultRange: { startYear: number; endYear: number };
 };
 
-function runKey(fact: ProductFactRow): string {
+function runKey(fact: Pick<ProductFactRow, "productId" | "measure">): string {
   return `${fact.productId}:${fact.measure === "yoy_index_100" ? "a" : "m"}`;
 }
 
-export function packProductFacts(facts: ProductFactRow[]): PackedProductSeries[] {
+export function packProductFacts(facts: readonly Pick<ProductFactRow, "productId" | "measure" | "period" | "index100">[]): PackedProductSeries[] {
   const groups = new Map<string, Map<number, string | null>>();
   for (const fact of facts) {
     const key = runKey(fact);

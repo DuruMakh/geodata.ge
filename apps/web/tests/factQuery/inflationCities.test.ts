@@ -160,7 +160,7 @@ describe("city rankings, comparisons and coverage", () => {
     expect(entities.find((entity) => entity.entityId === "city.zugdidi")!.periods![0]).toBe("2016-01");
   });
 
-  it("is schema 1.4.0", () => {
-    expect(SCHEMA_VERSION).toBe("1.4.0");
+  it("is schema 1.5.0", () => {
+    expect(SCHEMA_VERSION).toBe("1.5.0");
   });
 });

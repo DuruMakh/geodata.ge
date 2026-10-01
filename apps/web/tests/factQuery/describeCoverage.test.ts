@@ -64,6 +64,7 @@ describe("describeCoverage", () => {
       "general-government-balance",
       "government-debt",
       "inflation",
+      "inflation-products",
       "ministries",
       "municipal-expenditure",
       "national-expenditure",

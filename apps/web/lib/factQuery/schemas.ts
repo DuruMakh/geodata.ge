@@ -56,7 +56,7 @@ export const queryInflationInput = z.strictObject({
 });
 
 export const describeCoverageInput = z.strictObject({
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation", "inflation-products"]).optional(),
   search: z.string().max(120).optional(),
   entityType: z.enum(["country", "municipality", "region", "city"]).optional(),
   level: z.enum(["admin_category", "major_program", "division", "subgroup"]).optional(),
@@ -205,7 +205,7 @@ export const rankInput = z
 
 export const getSourcesInput = z.strictObject({
   sourceIds: sourceIdList,
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation", "inflation-products"]).optional(),
   years: uniqueSortedYears.optional(),
   entityIds: entityIdList.optional(),
   expectedDataVersion,

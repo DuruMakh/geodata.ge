@@ -23,7 +23,7 @@ import type {
 export type { MunicipalTotalFact } from "../data/municipal/types";
 export type { ServedNationalGdpFact } from "../servedRows";
 
-export const SCHEMA_VERSION = "1.4.0" as const;
+export const SCHEMA_VERSION = "1.5.0" as const;
 
 /** Municipal codes whose budgets are not territorially attributable (spec section 5.4). */
 export const AGGREGATE_ONLY_MUNICIPAL_CODES = ["05", "42", "43", "46", "64"] as const;
@@ -38,7 +38,8 @@ export type DatasetId =
   | "gdp-overview"
   | "economic-sectors"
   | "regional-economies"
-  | "inflation";
+  | "inflation"
+  | "inflation-products";
 
 // rate_percent is a rate per annum, NOT a share of anything. Reusing
 // share_of_gdp_pct or share_of_total_pct for a weighted-average interest rate
@@ -53,6 +54,7 @@ export type Measure =
   | "value"
   | "real_growth_pct"
   | "yoy_pct"
+  | "cumulative_pct"
   | "mom_pct"
   | "avg12_pct"
   | "index_2010"
@@ -268,6 +270,11 @@ export type FactQuerySnapshot = {
     groups: import("./inflationSeries").InflationGroup[];
     cities: import("../data/inflation/types").ServedCpiCityFact[];
     cityEntities: import("./inflationSeries").InflationCityEntity[];
+  };
+  inflationProducts: {
+    catalogue: import("./inflationProductSeries").ProductSnapshotCatalogueRow[];
+    facts: import("./inflationProductSeries").ProductSnapshotFact[];
+    historyNotes: import("./inflationProductSeries").ProductHistoryNote[];
   };
   gdpFacts: ServedNationalGdpFact[];
   sources: ResolvedSource[];

@@ -11,7 +11,7 @@ for (const prefix of ["", "/en"]) {
     await expect(bilingual.locator("li")).toHaveCount(5);
     await expect(bilingual).toContainText("2025");
     await expect(bilingual).toContainText("2024");
-    await expect(page.getByTestId("connect-technical")).toContainText("1.4.0");
+    await expect(page.getByTestId("connect-technical")).toContainText("1.5.0");
     await expect(page.getByTestId("connect-technical")).toContainText("dataVersion");
     if (prefix) expect(await bilingual.innerText()).not.toMatch(/\p{Script=Georgian}/u);
     else await expect(bilingual).toContainText("ხულოს");

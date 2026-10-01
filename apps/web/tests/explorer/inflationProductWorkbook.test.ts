@@ -73,9 +73,9 @@ describe("individual-product inflation workbook", () => {
     const shortIndex = buildProductIndex(
       [{ productId: shortId, labelEn: "Sample", labelKa: "ნიმუში", firstPeriod: "2026-01" }],
       packProductFacts([
-        { productId: shortId, measure: "mom_index_100", period: "2026-01", index100: "101", availability: "published", sourceId: "source.geostat_product_mom", sourceLocator: "x", lastReviewedAt: "2026-09-27" },
-        { productId: shortId, measure: "mom_index_100", period: "2026-02", index100: null, availability: "not_published", sourceId: "source.geostat_product_mom", sourceLocator: "y", lastReviewedAt: "2026-09-27" },
-        { productId: shortId, measure: "yoy_index_100", period: "2026-02", index100: "110", availability: "published", sourceId: "source.geostat_product_yoy", sourceLocator: "z", lastReviewedAt: "2026-09-27" },
+        { productId: shortId, measure: "mom_index_100", period: "2026-01", index100: "101" },
+        { productId: shortId, measure: "mom_index_100", period: "2026-02", index100: null },
+        { productId: shortId, measure: "yoy_index_100", period: "2026-02", index100: "110" },
       ]),
     );
     const model = buildInflationProductWorkbookExportModel({

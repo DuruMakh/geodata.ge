@@ -183,6 +183,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     "economic-sectors": "economic-sectors",
     "regional-economies": "regional-economies",
     inflation: "inflation",
+    "inflation-products": "inflation",
   }[input.datasetId];
   const entityCodes = (input.entityIds ?? []).flatMap((id) => {
     if (id.startsWith("region.")) return snapshot.municipal.municipalities.filter((m) => m.regionId === id).map((m) => m.code);
