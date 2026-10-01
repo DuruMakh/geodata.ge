@@ -27,6 +27,8 @@ export type ExpectedCell = {
   /** null means the cell must come back MISSING - never 0, never estimated. */
   value: number | null;
   unit: "GEL" | "percent" | "GEL_per_resident" | "percentage_points";
+  calculationBasePeriod?: string;
+  missingReasonIncludes?: string;
 };
 
 export type ExpectedComparison = {
@@ -67,6 +69,9 @@ export type ReferenceIntent = {
   expectedStatus: "ok" | "partial" | "empty" | "error";
   expectedErrorCode?: string;
   expectedCells?: ExpectedCell[];
+  expectedAvailablePeriods?: [string, string] | null;
+  /** Structural missing-input test only; never presented as a published source gap. */
+  syntheticMissingMonthlyInput?: { seriesId: string; period: string };
   expectedComparison?: ExpectedComparison;
   expectedRanking?: ExpectedRanking;
   /** Money is exact. Ratios carry a tolerance tight enough to catch a scaling or denominator mistake. */
@@ -1010,6 +1015,7 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     promptEn: "What was annual inflation in Batumi in August 2026?",
     call: { tool: "query_inflation", arguments: { entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" } },
     expectedStatus: "ok",
+    expectedAvailablePeriods: ["2016-01", "2026-08"],
     expectedCells: [{ id: "inflation:city.batumi:cpi.headline:2026-08:yoy_pct", value: 7.0857, unit: "percent" }],
     allowedRounding: EXACT,
     expectedBudgetScope: "consumer_prices",
@@ -1040,6 +1046,7 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     promptEn: "What was annual inflation in Zugdidi in June 2016?",
     call: { tool: "query_inflation", arguments: { entityIds: ["city.zugdidi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2016-06", toPeriod: "2016-06" } },
     expectedStatus: "empty",
+    expectedAvailablePeriods: ["2016-12", "2026-08"],
     expectedCells: [{ id: "inflation:city.zugdidi:cpi.headline:2016-06:yoy_pct", value: null, unit: "percent" }],
     allowedRounding: EXACT,
     expectedBudgetScope: "consumer_prices",
@@ -1048,5 +1055,98 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
     requiredCaveatCodes: [],
     mustDeclineOrQualify: true,
     note: "Geostat began pricing in Zugdidi in 2015-12, so its annual change starts 2016-12. Missing with a reason, never 0 and never filled.",
+  },
+  // Product expectations independently established from reviewed CSV rows and
+  // Decimal precision 100, without any query/explorer helper. Audit calculation,
+  // source locators and verified archive hashes are in task-7-independent-reference.json.
+  // Originals: docs/Raw Data/Inflation/geostat-products/2026-08/en/products-{yoy,mom}.xlsx;
+  // source-manifest.csv pins official URLs, bytes and SHA-256. Reference locators
+  // below are authoring evidence only and must never enter public responses.
+  {
+    id: 41,
+    promptKa: "რამდენით შეიცვალა ბრინჯის ფასი წლიურად 2026 წლის აგვისტოში?",
+    promptEn: "How much did rice prices change annually in August 2026?",
+    call: { tool: "query_inflation_products", arguments: { seriesIds: ["cpi.product.p0001"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" } },
+    expectedStatus: "ok",
+    expectedCells: [{ id: "inflation-products:country.georgia:cpi.product.p0001:2026-08:yoy_pct", value: 1.8973, unit: "percent" }],
+    allowedRounding: EXACT, expectedBudgetScope: "consumer_prices",
+    requiredSourceIds: ["source.geostat_product_yoy"], requiredDocumentIds: ["source.geostat_product_yoy"], requiredCaveatCodes: [], mustDeclineOrQualify: false,
+    note: "Canonical cpi-products-monthly.csv p0001 yoy_index_100 2026-08 = 101.8973, published, annual workbook 2026!K4. Independent index minus 100 = +1.8973%.",
+  },
+  {
+    id: 42,
+    promptKa: "რამდენით შეიცვალა ბრინჯის ფასი ჯამურად 2025 წელს?",
+    promptEn: "What was the cumulative rice price change during calendar year 2025?",
+    call: { tool: "query_inflation_products", arguments: { seriesIds: ["cpi.product.p0001"], measure: "cumulative_pct", startYear: 2025, fromPeriod: "2025-12", toPeriod: "2025-12" } },
+    expectedStatus: "ok",
+    expectedCells: [{ id: "inflation-products:country.georgia:cpi.product.p0001:2025-12:cumulative_pct:base=2024-12", value: -13.7927891681444, unit: "percent", calculationBasePeriod: "2024-12" }],
+    allowedRounding: 1e-10, expectedBudgetScope: "consumer_prices",
+    requiredSourceIds: ["source.geostat_product_mom"], requiredDocumentIds: ["source.geostat_product_mom"], requiredCaveatCodes: ["inflation_product_cumulative_derived"], mustDeclineOrQualify: true,
+    note: "Independent Decimal precision 100 product of all twelve 2025 monthly indices / 100, minus 1, times 100 = -13.7927891681443997763374881344365338561433%. Inputs: 99.5466,98.6808,101.9158,101.1221,93.6445,100.6254,97.8588,92.9414,102.2059,99.5407,98.5394,99.1086; monthly original 2025!D4 through O4. Tolerance 1e-10 allows finite-precision prefix division and JS conversion, far below source precision; annual index is not the expectation.",
+  },
+  {
+    id: 43,
+    promptKa: "როგორ შეიცვალა ქლიავის ფასი 2015 წლიდან 2026 წლის აგვისტომდე?",
+    promptEn: "How did plum prices change from January 2015 to August 2026?",
+    call: { tool: "query_inflation_products", arguments: { seriesIds: ["cpi.product.p0051"], measure: "cumulative_pct", startYear: 2015, fromPeriod: "2026-08", toPeriod: "2026-08" } },
+    expectedStatus: "empty",
+    expectedCells: [{ id: "inflation-products:country.georgia:cpi.product.p0051:2026-08:cumulative_pct:base=2014-12", value: null, unit: "percent", calculationBasePeriod: "2014-12", missingReasonIncludes: "2017-01" }],
+    allowedRounding: EXACT, expectedBudgetScope: "consumer_prices",
+    requiredSourceIds: ["source.geostat_product_mom"], requiredDocumentIds: ["source.geostat_product_mom"], requiredCaveatCodes: ["inflation_product_cumulative_derived", "inflation_product_history_limits"], mustDeclineOrQualify: true,
+    note: "Reviewed cpi-products.csv p0051 Plum first_period=2017-01; decisions.csv says different fruit despite same sheet position. January 2015 cannot be bridged across that split; no partial accumulated value is permitted.",
+  },
+  {
+    id: 44,
+    promptKa: "რამდენი იყო უგაზო მინერალური წყლის წლიური გაძვირება 2019 წლის იანვარში?",
+    promptEn: "What was annual price growth of still mineral water in January 2019?",
+    call: { tool: "query_inflation_products", arguments: { seriesIds: ["cpi.product.p0089"], measure: "yoy_pct", fromPeriod: "2019-01", toPeriod: "2019-01" } },
+    expectedStatus: "empty",
+    expectedCells: [{ id: "inflation-products:country.georgia:cpi.product.p0089:2019-01:yoy_pct", value: null, unit: "percent", missingReasonIncludes: "2019-01" }],
+    allowedRounding: EXACT, expectedBudgetScope: "consumer_prices",
+    requiredSourceIds: ["source.geostat_product_yoy"], requiredDocumentIds: ["source.geostat_product_yoy"], requiredCaveatCodes: ["inflation_product_history_limits"], mustDeclineOrQualify: true,
+    note: "Canonical p0089 yoy_index_100 2019-01 is blank/not_published, annual original 2019!D92. This is a genuine published annual-comparison gap; its monthly input is available and must not be called a monthly gap.",
+  },
+  {
+    id: 45,
+    promptKa: "რომელი ხუთი პროდუქტი გაძვირდა ყველაზე მეტად წლიურად 2026 წლის აგვისტოში?",
+    promptEn: "Which five products had the highest annual price increases in August 2026?",
+    call: { tool: "rank", arguments: { datasetId: "inflation-products", dimension: "series", measure: "yoy_pct", metric: "value", period: "2026-08", limit: 5 } },
+    expectedStatus: "ok",
+    expectedRanking: { orderedIds: ["cpi.product.p0058", "cpi.product.p0264", "cpi.product.p0063", "cpi.product.p0220", "cpi.product.p0299"], topValues: [57.5291, 45.4489, 42.6783, 39.5780, 36.5071], unit: "percent", candidateCount: 305, eligibleCount: 305 },
+    allowedRounding: EXACT, expectedBudgetScope: null,
+    requiredSourceIds: ["source.geostat_product_yoy"], requiredDocumentIds: ["source.geostat_product_yoy"], requiredCaveatCodes: [], mustDeclineOrQualify: false,
+    note: "Independent Decimal sort of all 305 published 2026-08 annual CSV rows after subtracting 100. Top raw indices 157.5291,145.4489,142.6783,139.5780,136.5071; annual original 2026!K61,K267,K66,K223,K302; no missing candidates.",
+  },
+  {
+    id: 46,
+    promptKa: "რომელ ხუთ პროდუქტზე შემცირდა ფასი ყველაზე მეტად წლიურად 2026 წლის აგვისტოში?",
+    promptEn: "Which five products had the lowest annual price changes in August 2026?",
+    call: { tool: "rank", arguments: { datasetId: "inflation-products", dimension: "series", measure: "yoy_pct", metric: "value", period: "2026-08", order: "ascending", limit: 5 } },
+    expectedStatus: "ok",
+    expectedRanking: { orderedIds: ["cpi.product.p0043", "cpi.product.p0064", "cpi.product.p0238", "cpi.product.p0044", "cpi.product.p0051"], topValues: [-29.9494, -29.0482, -25.4733, -22.7648, -20.2006], unit: "percent", candidateCount: 305, eligibleCount: 305 },
+    allowedRounding: EXACT, expectedBudgetScope: null,
+    requiredSourceIds: ["source.geostat_product_yoy"], requiredDocumentIds: ["source.geostat_product_yoy"], requiredCaveatCodes: [], mustDeclineOrQualify: false,
+    note: "Independent ascending Decimal sort of the reviewed 305 annual CSV rows. Bottom raw indices 70.0506,70.9518,74.5267,77.2352,79.7994; annual original 2026!K46,K67,K241,K47,K54. Negative changes are valid values, not missing.",
+  },
+  {
+    id: 47,
+    promptKa: "შევადაროთ ბრინჯის დაგროვილი ცვლილება ორ თვეს შორის?",
+    promptEn: "Can we compare two cumulative rice rates as price change between those months?",
+    call: { tool: "compare", arguments: { target: { dataset: "inflation-products", seriesIds: ["cpi.product.p0001"] }, measure: "cumulative_pct", fromPeriod: "2025-12", toPeriod: "2026-08" } },
+    expectedStatus: "error", expectedErrorCode: "unsupported_comparison",
+    allowedRounding: EXACT, expectedBudgetScope: null, requiredSourceIds: [], requiredDocumentIds: [], requiredCaveatCodes: [], mustDeclineOrQualify: true,
+    note: "Approved product contract supports annual percentage-point comparison only. A difference of cumulative rates is not inter-month price growth; refuse and guide to a startYear query.",
+  },
+  {
+    id: 48,
+    promptKa: "როგორ ვუპასუხოთ, თუ ბრინჯის ჯამური ცვლილების გამოთვლას ერთი თვე აკლია?",
+    promptEn: "How should a cumulative rice query respond if a required monthly input is missing?",
+    call: { tool: "query_inflation_products", arguments: { seriesIds: ["cpi.product.p0001"], measure: "cumulative_pct", startYear: 2025, fromPeriod: "2025-12", toPeriod: "2025-12" } },
+    syntheticMissingMonthlyInput: { seriesId: "cpi.product.p0001", period: "2025-02" },
+    expectedStatus: "empty",
+    expectedCells: [{ id: "inflation-products:country.georgia:cpi.product.p0001:2025-12:cumulative_pct:base=2024-12", value: null, unit: "percent", calculationBasePeriod: "2024-12", missingReasonIncludes: "2025-02" }],
+    allowedRounding: EXACT, expectedBudgetScope: "consumer_prices",
+    requiredSourceIds: ["source.geostat_product_mom"], requiredDocumentIds: ["source.geostat_product_mom"], requiredCaveatCodes: ["inflation_product_cumulative_derived"], mustDeclineOrQualify: true,
+    note: "SYNTHETIC structural test: current reviewed CSV has zero missing monthly inputs. Replace only p0001 2025-02 monthly input with null in a test-local snapshot. The real row is published 98.6808 at 2025!E4. This is not evidence of a source gap; incomplete compounding must return missing, not a partial number.",
   },
 ] as const;

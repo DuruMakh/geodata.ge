@@ -1,0 +1,268 @@
+{
+  "method": "Direct csv-parse rows; Decimal precision 100; no application helpers",
+  "factCount": 84056,
+  "rosterCount": 305,
+  "publishedAnnualCandidates": 305,
+  "missingMonthlyInputs": 0,
+  "annual": {
+    "productId": "cpi.product.p0001",
+    "measure": "yoy_index_100",
+    "period": "2026-08",
+    "index100": "101.8973",
+    "availability": "published",
+    "sourceId": "source.geostat_product_yoy",
+    "locator": "2026!K4",
+    "percent": "1.8973"
+  },
+  "cumulative": {
+    "basePeriod": "2024-12",
+    "inputs": [
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-01",
+        "index100": "99.5466",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!D4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-02",
+        "index100": "98.6808",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!E4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-03",
+        "index100": "101.9158",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!F4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-04",
+        "index100": "101.1221",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!G4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-05",
+        "index100": "93.6445",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!H4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-06",
+        "index100": "100.6254",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!I4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-07",
+        "index100": "97.8588",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!J4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-08",
+        "index100": "92.9414",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!K4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-09",
+        "index100": "102.2059",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!L4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-10",
+        "index100": "99.5407",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!M4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-11",
+        "index100": "98.5394",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!N4"
+      },
+      {
+        "productId": "cpi.product.p0001",
+        "measure": "mom_index_100",
+        "period": "2025-12",
+        "index100": "99.1086",
+        "availability": "published",
+        "sourceId": "source.geostat_product_mom",
+        "locator": "2025!O4"
+      }
+    ],
+    "percent": "-13.792789168144399776337488134436533856143340529895131881553604732111872"
+  },
+  "annualTopFive": [
+    {
+      "productId": "cpi.product.p0058",
+      "measure": "yoy_index_100",
+      "period": "2026-08",
+      "index100": "157.5291",
+      "availability": "published",
+      "sourceId": "source.geostat_product_yoy",
+      "locator": "2026!K61",
+      "percent": "57.5291"
+    },
+    {
+      "productId": "cpi.product.p0264",
+      "measure": "yoy_index_100",
+      "period": "2026-08",
+      "index100": "145.4489",
+      "availability": "published",
+      "sourceId": "source.geostat_product_yoy",
+      "locator": "2026!K267",
+      "percent": "45.4489"
+    },
+    {
+      "productId": "cpi.product.p0063",
+      "measure": "yoy_index_100",
+      "period": "2026-08",
+      "index100": "142.6783",
+      "availability": "published",
+      "sourceId": "source.geostat_product_yoy",
+      "locator": "2026!K66",
+      "percent": "42.6783"
+    },
+    {
+      "productId": "cpi.product.p0220",
+      "measure": "yoy_index_100",
+      "period": "2026-08",
+      "index100": "139.578",
+      "availability": "published",
+      "sourceId": "source.geostat_product_yoy",
+      "locator": "2026!K223",
+      "percent": "39.578"
+    },
+    {
+      "productId": "cpi.product.p0299",
+      "measure": "yoy_index_100",
+      "period": "2026-08",
+      "index100": "136.5071",
+      "availability": "published",
+      "sourceId": "source.geostat_product_yoy",
+      "locator": "2026!K302",
+      "percent": "36.5071"
+    }
+  ],
+  "annualBottomFive": [
+    {
+      "productId": "cpi.product.p0043",
+      "measure": "yoy_index_100",
+      "period": "2026-08",
+      "index100": "70.0506",
+      "availability": "published",
+      "sourceId": "source.geostat_product_yoy",
+      "locator": "2026!K46",
+      "percent": "-29.9494"
+    },
+    {
+      "productId": "cpi.product.p0064",
+      "measure": "yoy_index_100",
+      "period": "2026-08",
+      "index100": "70.9518",
+      "availability": "published",
+      "sourceId": "source.geostat_product_yoy",
+      "locator": "2026!K67",
+      "percent": "-29.0482"
+    },
+    {
+      "productId": "cpi.product.p0238",
+      "measure": "yoy_index_100",
+      "period": "2026-08",
+      "index100": "74.5267",
+      "availability": "published",
+      "sourceId": "source.geostat_product_yoy",
+      "locator": "2026!K241",
+      "percent": "-25.4733"
+    },
+    {
+      "productId": "cpi.product.p0044",
+      "measure": "yoy_index_100",
+      "period": "2026-08",
+      "index100": "77.2352",
+      "availability": "published",
+      "sourceId": "source.geostat_product_yoy",
+      "locator": "2026!K47",
+      "percent": "-22.7648"
+    },
+    {
+      "productId": "cpi.product.p0051",
+      "measure": "yoy_index_100",
+      "period": "2026-08",
+      "index100": "79.7994",
+      "availability": "published",
+      "sourceId": "source.geostat_product_yoy",
+      "locator": "2026!K54",
+      "percent": "-20.2006"
+    }
+  ],
+  "annualSourceMissing": {
+    "productId": "cpi.product.p0089",
+    "measure": "yoy_index_100",
+    "period": "2019-01",
+    "index100": "",
+    "availability": "not_published",
+    "sourceId": "source.geostat_product_yoy",
+    "locator": "2019!D92"
+  },
+  "lateStart": {
+    "product_id": "cpi.product.p0051",
+    "coicop_code": "01",
+    "label_en": "Plum",
+    "label_ka": "ქლიავი",
+    "first_period": "2017-01",
+    "decision_ref": "identity.p0051.2017"
+  },
+  "archives": [
+    {
+      "sourceId": "source.geostat_product_mom",
+      "officialUrl": "https://geostat.ge/media/82470/Consumer-Price-Detail-Indices-%28Previous-month%3D100%29.xlsx",
+      "archive": "en/products-mom.xlsx",
+      "sha256": "26d9b429229cbad2ad6ee2bbefd5e86f52d4482d49abdcc14e270d4a956dcf20",
+      "bytes": 583143
+    },
+    {
+      "sourceId": "source.geostat_product_yoy",
+      "officialUrl": "https://geostat.ge/media/82472/Consumer-Price-Detail-Indices-%28The-same-month-of-the-previous-year%3D100%29.xlsx",
+      "archive": "en/products-yoy.xlsx",
+      "sha256": "ec9cd520693db0479f7fd576f0d2f4cfa65c9c9ba607c46ec7679e13b900faf9",
+      "bytes": 599891
+    }
+  ]
+}

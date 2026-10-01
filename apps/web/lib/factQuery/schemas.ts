@@ -281,7 +281,7 @@ export const observationSchema = z.object({
   parentSeriesId: z.string().nullable(),
   year: z.number().int(),
   period: periodKeySchema.optional(),
-  calculationBasePeriod: periodKeySchema.optional(),
+  calculationBasePeriod: periodKeySchema.optional().describe("Cumulative products only: December preceding startYear; all returned endpoints share this base."),
   measure: z.string(),
   unit: z.enum(["GEL", "percent", "GEL_per_resident", "USD", "USD_2015", "GEL_per_person", "USD_per_person", "index_2010_100", "percentage_points"]),
   value: z.number().finite().nullable(),

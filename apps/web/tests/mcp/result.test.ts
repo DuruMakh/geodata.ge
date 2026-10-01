@@ -5,6 +5,11 @@ import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { LIMITS, boundedToolResult, toolResult, tooLargeResponse } from "../../lib/mcp/result";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
+import { queryInflationProducts } from "../../lib/factQuery/queryInflationProducts";
+import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import { rank } from "../../lib/factQuery/rank";
+import type { Observation } from "../../lib/factQuery/observations";
+import type { RankData } from "../../lib/factQuery/rank";
 
 let snapshot: FactQuerySnapshot;
 beforeAll(async () => {
@@ -14,6 +19,46 @@ beforeAll(async () => {
 const size = (value: unknown) => Buffer.byteLength(JSON.stringify(value), "utf8");
 
 describe("MCP tool results", () => {
+  it("prints cumulative bases, derivation, sources, missingness and caveats with their structured values", () => {
+    const response = queryInflationProducts(snapshot, { seriesIds: ["cpi.product.p0001", "cpi.product.p0051"], measure: "cumulative_pct", startYear: 2015, fromPeriod: "2026-08", toPeriod: "2026-08" });
+    if (response.kind !== "observations") throw new Error("Expected product observations");
+    const result = boundedToolResult(snapshot, response);
+    expect(result.isError).toBe(false);
+    const text = result.content[0]!.text;
+    expect(text).toContain("calculationBasePeriod");
+    expect(text).toContain("2014-12");
+    expect(text).toContain("Fiscal.ge");
+    for (const observation of (response.data as { observations: Observation[] }).observations) {
+      expect(text).toContain(observation.seriesId);
+      expect(text).toContain(observation.value === null ? "missing" : String(observation.value));
+      if (observation.missingReasonEn) expect(text).toContain(observation.missingReasonEn);
+      for (const id of [...observation.sourceIds, ...observation.documentIds, ...observation.caveatIds]) expect(text).toContain(id);
+    }
+    const ranked = rank(snapshot, { datasetId: "inflation-products", dimension: "series", metric: "value", measure: "cumulative_pct", startYear: 2015, period: "2026-08" });
+    if (ranked.kind !== "ranking") throw new Error("Expected product ranking");
+    const rankedText = boundedToolResult(snapshot, ranked).content[0]!.text;
+    expect(rankedText).toContain("calculationBasePeriod");
+    for (const entry of (ranked.data as RankData).entries) expect(rankedText).toContain(`${entry.period}\t${entry.calculationBasePeriod}`);
+  });
+
+  it("fits the complete reviewed product catalogue and realistic rankings with exclusions", () => {
+    const responses = [describeCoverage(snapshot, { datasetId: "inflation-products" }), ...["yoy_pct", "cumulative_pct"].map(measure => rank(snapshot, {
+      datasetId: "inflation-products", dimension: "series", metric: "value", measure, period: "2026-08", limit: 100,
+      ...(measure === "cumulative_pct" ? { startYear: 2015 } : {}),
+    }))];
+    if (responses.some(response => response.kind === "error")) throw new Error("Expected successful catalogue/rank responses");
+    const catalogue = responses[0]!;
+    const cumulative = responses[2]!;
+    if (catalogue.kind !== "catalogue" || cumulative.kind !== "ranking") throw new Error("Expected catalogue and ranking");
+    expect((catalogue.data as { series: unknown[] }).series).toHaveLength(305);
+    expect((cumulative.data as RankData).universe).toMatchObject({ candidateCount: 305, eligibleCount: 287, returnedCount: 100 });
+    for (const response of responses) {
+      const result = boundedToolResult(snapshot, response);
+      expect(result.isError).toBe(false);
+      expect(result.structuredContent).toEqual(response);
+      expect(LIMITS.resultBytes - size(result)).toBeGreaterThan(0);
+    }
+  });
   it("carries the envelope as structured content and an equivalent text twin", () => {
     const response = queryNational(snapshot, {
       side: "expenditure",

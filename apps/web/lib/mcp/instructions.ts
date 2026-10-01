@@ -70,11 +70,16 @@ WHAT IS SERVED
   IMF, ${range("general-government-balance")}.
 - Consumer-price inflation, ${range("inflation")}, through query_inflation. It is
   monthly; read INFLATION below before answering.
+- Reviewed current-basket product inflation, ${range("inflation-products")}, through
+  query_inflation_products. Discover product IDs, firstPeriod, measure spans and
+  history notes under inflation-products; read PRODUCT INFLATION below.
 Coverage is derived from the loaded data and is reported by describe_coverage.
 Do not assume a year or a series exists; ask.
 
 LANGUAGES AND COMPATIBILITY
-Schema 1.4.0 adds inflation cities (the city entity type and query_inflation entityIds) after schema 1.3.0 added regional economies and schema 1.2.0 introduced the optional period (YYYY-MM) on inflation observations, comparison endpoints and ranking entries, while retaining reviewed Georgian (*Ka) and English (*En) names, definitions,
+Schema 1.5.0 adds reviewed product inflation, cumulative_pct and optional
+calculationBasePeriod on cumulative observations and rankings. Schema 1.4.0 added
+inflation cities (the city entity type and query_inflation entityIds) after schema 1.3.0 added regional economies and schema 1.2.0 introduced the optional period (YYYY-MM) on inflation observations, comparison endpoints and ranking entries, while retaining reviewed Georgian (*Ka) and English (*En) names, definitions,
 missing-value explanations, comparison reasons, rankings and source descriptions.
 Answer in the user's language using those fields. Catalogue search matches both
 languages. The discovered tools and input schemas work without a language argument.
@@ -83,7 +88,7 @@ translated companions describe it without replacing it. documentLanguage is null
 when unverified; a translated title does not mean the source document was translated.
 Translation corrections change dataVersion because the text is part of the pinned
 data identity. Reuse a dataVersion only with responses from that same snapshot.
-Clients must accept additive fields and schema 1.4.0; exact-version or unknown-field
+Clients must accept additive fields and schema 1.5.0; exact-version or unknown-field
 validators need updating. Byte-for-byte response compatibility is not promised.
 Both /connect and /en/connect describe the shared /mcp endpoint and /downloads/data/
 publications. Static publications carry the same bilingual evidence and remain
@@ -91,8 +96,9 @@ available without an MCP connection. Text rows include both languages; values an
 stable identifiers are not translated.
 
 WHAT IS NOT SERVED
-Quarterly or monthly data for any dataset other than inflation; product
-price indices, city subgroups, city price-index levels, city weights and core
+Quarterly or monthly data for any dataset other than inflation; retail product
+prices in GEL, product weights/contributions, city products, retired products,
+city subgroups, city price-index levels, city weights and core
 inflation by city, HICP and other price indices; live budget execution, individual
 capital projects, procurement, and anything after the last reviewed year that is not
 explicitly served as a projection. There
@@ -174,6 +180,28 @@ INFLATION
 - One inflation answer fits about 250 cells (entities × series × months), below
   the general 500-cell limit. For more, split the request by period or use the
   bulk files.
+
+PRODUCT INFLATION
+- Query measures are exactly yoy_pct and cumulative_pct. Annual is the published
+  annual index minus 100. Percent 2.4 means 2.4%; it is not a retail GEL price.
+- Cumulative requires startYear <= the year of fromPeriod. Compound every monthly
+  index from January startYear to each endpoint; the base is the preceding December,
+  stated in calculationBasePeriod. Say this is Fiscal.ge's derived calculation over
+  Geostat monthly inputs, not a Geostat publication of the cumulative figure.
+- Missing inputs and products starting after January startYear return missing with
+  the first missing month or actual start. Never sum rates, bridge identity splits,
+  interpolate or report a partial accumulated value. Catalogue cumulative spans are
+  conditional on startYear and complete inputs, not promises of uninterrupted data.
+- Linked descriptions do not prove an unchanged brand or retail specification.
+  Preserve history limitations and the reviewed bilingual-label discrepancy caveat.
+- Product compare supports annual percentage-point changes only. Cumulative compare
+  is refused; query_inflation_products with startYear answers accumulated price change.
+- Product rank uses all current products, dimension series, metric value and one period.
+  Cumulative rank also requires startYear. Missing histories are excluded with reasons;
+  never treat them as zero. No entity/region/parent/level filters or change rankings.
+- Output cells count products times output months, not preceding compounding inputs.
+  Narrow products/months if the 500-cell or 512 KiB evidence-inclusive limit refuses
+  a call, or use the bulk inputs and metadata under /downloads/data/.
 
 HOW TO PRESENT AN ANSWER
 The reader is a member of the public asking about their country's budget, not a

@@ -7,7 +7,8 @@ import { WebStandardStreamableHTTPServerTransport as LegacyServerTransport } fro
 import { POST, GET, DELETE, OPTIONS } from "../../app/mcp/route";
 import { TOOLS } from "../../lib/mcp/tools";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
-import { boundedToolResult } from "../../lib/mcp/result";
+import { boundedToolResult, LIMITS } from "../../lib/mcp/result";
+import { outputSchemaFor } from "../../lib/mcp/outputSchema";
 import { httpBridge } from "./httpBridge";
 
 const original = { ...process.env };
@@ -59,7 +60,7 @@ it("pinned and automatic v2 clients and a real v1 client complete the same sourc
     expect(pinned.getProtocolEra()).toBe("modern");
     expect(automatic.getProtocolEra()).toBe("modern");
     const order = (await legacy.listTools()).tools.map(tool => tool.name);
-    expect(order).toEqual(["query_regional_economies", "query_economic_sectors", "query_gdp", "query_inflation", "describe_coverage", "query_national", "query_ministries", "query_municipal", "query_debt", "query_deficit", "compare", "rank", "get_sources"]);
+    expect(order).toEqual(["query_regional_economies", "query_economic_sectors", "query_gdp", "query_inflation", "query_inflation_products", "describe_coverage", "query_national", "query_ministries", "query_municipal", "query_debt", "query_deficit", "compare", "rank", "get_sources"]);
     for (const client of [pinned, automatic]) expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(order);
     await legacy.ping();
     const coverage = await legacy.callTool({ name: "describe_coverage", arguments: { datasetId: "inflation" } });
@@ -82,6 +83,62 @@ it("pinned and automatic v2 clients and a real v1 client complete the same sourc
     const missing = await pinned.callTool({ name: "query_inflation", arguments: { entityIds: ["city.zugdidi"], seriesIds: ["cpi.headline"], measure: "avg12_pct", fromPeriod: "2016-06", toPeriod: "2016-06" } });
     expect(missing.structuredContent).toMatchObject({ data: { observations: [{ value: null }] } });
   } finally { await pinned.close(); await automatic.close(); await legacy.close(); await bridge.close(); }
+});
+
+it("real v1/v2 clients cache product schemas then accept equal values, complete catalogues and bounded rankings", async () => {
+  const wires: { era: string; bytes: number; body: { result?: { resultType?: string; _meta?: unknown; isError?: boolean } } }[] = [];
+  const bridge = await httpBridge(async request => {
+    const parsed = await request.clone().json();
+    const response = await POST(request);
+    if (parsed.method === "tools/call") {
+      const payload = await response.clone().text();
+      wires.push({ era: request.headers.get("mcp-protocol-version") ?? "legacy", bytes: Buffer.byteLength(payload), body: JSON.parse(payload) });
+    }
+    return response;
+  });
+  const modern = new Client({ name: "product-modern", version: "1" }, { versionNegotiation: { mode: { pin: VERSION } } });
+  const legacy = new LegacyClient({ name: "product-legacy", version: "1" });
+  const calls = [
+    { name: "query_inflation_products", arguments: { seriesIds: ["cpi.product.p0001"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" } },
+    { name: "query_inflation_products", arguments: { seriesIds: ["cpi.product.p0001"], measure: "cumulative_pct", startYear: 2025, fromPeriod: "2025-12", toPeriod: "2025-12" } },
+    { name: "describe_coverage", arguments: { datasetId: "inflation-products" } },
+    { name: "rank", arguments: { datasetId: "inflation-products", dimension: "series", metric: "value", measure: "yoy_pct", period: "2026-08", limit: 100 } },
+    { name: "rank", arguments: { datasetId: "inflation-products", dimension: "series", metric: "value", measure: "cumulative_pct", startYear: 2015, period: "2026-08", limit: 100 } },
+    { name: "query_inflation_products", arguments: { seriesIds: ["cpi.product.p0089"], measure: "yoy_pct", fromPeriod: "2019-01", toPeriod: "2019-01" } },
+  ];
+  try {
+    await modern.connect(new StreamableHTTPClientTransport(bridge.url));
+    await legacy.connect(new LegacyClientTransport(bridge.url));
+    const legacyTools = (await legacy.listTools()).tools;
+    const modernTools = (await modern.listTools()).tools;
+    const product = legacyTools.find(tool => tool.name === "query_inflation_products");
+    expect(product).toBeDefined();
+    expect(product!.inputSchema).toEqual(modernTools.find(tool => tool.name === product!.name)!.inputSchema);
+    expect(product!.outputSchema).toEqual(modernTools.find(tool => tool.name === product!.name)!.outputSchema);
+    // listTools installs each client's output validator; these calls exercise it.
+    for (const [index, call] of calls.entries()) {
+      const old = await legacy.callTool(call);
+      const current = await modern.callTool(call);
+      expect(old.isError).toBeFalsy();
+      expect(current.isError).toBeFalsy();
+      expect(current.structuredContent).toEqual(old.structuredContent);
+      expect(outputSchemaFor(call.name).parse(current.structuredContent)).toEqual(current.structuredContent);
+      if (index === 0) expect(current.structuredContent).toMatchObject({ data: { observations: [{ value: 1.8973 }] } });
+      if (index === 1) expect(current.structuredContent).toMatchObject({ data: { observations: [{ calculationBasePeriod: "2024-12" }] } });
+      if (index === 2) expect((current.structuredContent as { data: { series: unknown[] } }).data.series).toHaveLength(305);
+      if (index === 4) expect(current.structuredContent).toMatchObject({ data: { universe: { candidateCount: 305, eligibleCount: 287, returnedCount: 100 } } });
+      if (index === 5) expect(current.structuredContent).toMatchObject({ status: "empty", data: { observations: [{ value: null }] } });
+    }
+    expect(wires).toHaveLength(calls.length * 2);
+    for (const wire of wires) {
+      expect(wire.body.result?.isError).toBeFalsy();
+      expect(LIMITS.resultBytes - wire.bytes).toBeGreaterThan(0);
+      if (wire.era === VERSION) {
+        expect(wire.body.result?.resultType).toBe("complete");
+        expect(wire.body.result?._meta).toBeDefined();
+      }
+    }
+  } finally { await modern.close(); await legacy.close(); await bridge.close(); }
 });
 
 it("a v2 automatic client genuinely falls back to a legacy-only v1 server", async () => {
