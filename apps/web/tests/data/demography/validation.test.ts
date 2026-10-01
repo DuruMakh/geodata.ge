@@ -52,14 +52,13 @@ const stop = (run: () => unknown) => {
 const bump = (sheet: XLSX.WorkSheet, ref: string, by: number) => setCell(sheet, ref, (sheet[ref]!.v as number) + by);
 
 describe("validation of the reviewed archive", () => {
-  test("passes and records the archive, the coverage and the revision comparison", () => {
+  test("passes and records the archive and the coverage", () => {
     const report = validateDemography({ observations, sources, geography });
 
     expect(report.vintage).toBe("2026-10");
     expect(report.sources).toHaveLength(26);
     expect(report.sources[0]).toMatchObject({ sourceId: "source.geostat_municipal_population", role: "canonical_input", bytes: 34_994 });
     expect(report.sources.every((source) => /^[0-9a-f]{64}$/.test(source.sha256))).toBe(true);
-    expect(report.revisions).toEqual({ comparedRows: 0 });
     const coverage = (seriesId: string) => report.coverage.find((entry) => entry.seriesId === seriesId);
     expect(coverage("demography.population_total")).toEqual({ family: "population", seriesId: "demography.population_total", geographies: 76, firstYear: 2004, lastYear: 2026, rows: 923 });
     expect(coverage("demography.population_by_age_sex")).toMatchObject({ family: "structure", geographies: 1, firstYear: 2004, rows: 3 * 20 * 23 });
@@ -132,7 +131,7 @@ describe("validation of the reviewed archive", () => {
     const changed = observations.map((row) => (row.seriesId === "demography.live_births" && row.geographyId === "country.georgia" && row.year === 2020 ? { ...row, value: "1" } : row));
     const removed = [...observations, { ...observations[0]!, year: 1999 }];
 
-    expect(validateDemography({ observations, sources, geography, previous: earlier }).revisions).toEqual({ comparedRows: earlier.length });
+    expect(() => validateDemography({ observations, sources, geography, previous: earlier })).not.toThrow();
     expect(() => validateDemography({ observations, sources, geography, previous: changed })).toThrow(/live_births\|country\.georgia\|2020\S* value 1 → \d+/);
     expect(stop(() => validateDemography({ observations, sources, geography, previous: changed }))).toBe("revision");
     expect(stop(() => validateDemography({ observations, sources, geography, previous: removed }))).toBe("revision");

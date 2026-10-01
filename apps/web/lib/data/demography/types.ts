@@ -32,7 +32,8 @@ export type DemographySources = {
 };
 
 /** Where a value comes from, which decides how far it can be compared with its neighbours. */
-export type EstimateBasis = "retro_projection" | "pre_census" | "census_based" | "registered" | "border_police";
+export const ESTIMATE_BASES = ["retro_projection", "pre_census", "census_based", "registered", "border_police"] as const;
+export type EstimateBasis = (typeof ESTIMATE_BASES)[number];
 export type Sex = "total" | "male" | "female";
 
 /** One published Geostat value in the canonical demography files. */

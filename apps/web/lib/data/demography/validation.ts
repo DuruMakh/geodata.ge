@@ -50,7 +50,6 @@ export type DemographyValidationReport = {
   midYear: { firstYear: number; lastYear: number; maxDifferencePersons: number };
   censusAnchor: CensusAnchor;
   rates: RateCheck[];
-  revisions: { comparedRows: number };
 };
 
 type Keyed = Pick<DemographyObservation, "seriesId" | "geographyId" | "year" | "sex" | "ageGroup" | "citizenshipId">;
@@ -264,6 +263,5 @@ export function validateDemography(input: ValidationInput): DemographyValidation
     midYear,
     censusAnchor,
     rates,
-    revisions: { comparedRows: previous?.length ?? 0 },
   };
 }

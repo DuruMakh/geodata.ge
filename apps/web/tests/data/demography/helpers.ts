@@ -10,6 +10,14 @@ export const VINTAGE_DIR = "docs/Raw Data/Demography/geostat-demography/2026-10"
 const MUNICIPAL_TABLE_01 =
   "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx";
 
+/** The reviewed identity files the preparation reads besides the archive. */
+const PREPARATION_INPUTS = [
+  "data/imports/municipalities.csv",
+  "data/taxonomy/municipal-regions.json",
+  "docs/Raw Data/Municipalities/geostat-population-regional-gdp/geography-map.csv",
+  "docs/Raw Data/Municipalities/geostat-population-regional-gdp/population-component-map.csv",
+];
+
 const created: string[] = [];
 
 /** Removes every throwaway repository root a test created. Call once at the top of a describe. */
@@ -28,6 +36,17 @@ export async function copyDemographyPackage(): Promise<string> {
   });
   await mkdir(path.dirname(path.join(root, MUNICIPAL_TABLE_01)), { recursive: true });
   await cp(path.join(repositoryRoot, MUNICIPAL_TABLE_01), path.join(root, MUNICIPAL_TABLE_01));
+  return root;
+}
+
+/** A throwaway repository root holding everything the preparation reads, so it can write its files without touching the real ones. */
+export async function copyPreparationInputs(): Promise<string> {
+  const root = await copyDemographyPackage();
+  for (const file of PREPARATION_INPUTS) {
+    await mkdir(path.dirname(path.join(root, file)), { recursive: true });
+    await cp(path.join(repositoryRoot, file), path.join(root, file));
+  }
+  await cp(path.join(repositoryRoot, "data/mappings/demography"), path.join(root, "data/mappings/demography"), { recursive: true });
   return root;
 }
 
