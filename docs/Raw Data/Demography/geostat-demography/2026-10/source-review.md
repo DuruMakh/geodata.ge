@@ -1,6 +1,6 @@
 # Demography source review (Geostat, 2026-10)
 
-Reviewed 2026-10-01. Source inspection is complete for the four families approved the same day: population, age and sex structure, vital events and international migration. No canonical data file, route or page exists yet. `source-manifest.csv` records the URL, retrieval date, bytes and SHA-256 of every archived file, and all 29 rows were re-verified against the files on disk. The decisions this review leaves open are in §9.
+Reviewed 2026-10-01. Source inspection is complete for the four families approved the same day: population, age and sex structure, vital events and international migration. No canonical data file, route or page exists yet. `source-manifest.csv` records the URL, retrieval date, bytes and SHA-256 of every archived file, and all 29 rows were re-verified against the files on disk. The decisions taken after this review, and those still open, are in §9.
 
 ## 1. What Geostat publishes, and what was archived
 
@@ -10,7 +10,7 @@ Geostat's [Population and Demography](https://www.geostat.ge/en/modules/categori
 | --- | --- | --- |
 | A. Population | 01 population on 1 January by region and municipality (reused capture) | 04 mid-year population; census table 2024; Eurostat; World Bank |
 | B. Structure | 02 population by age group and sex | 06 median age; 07 share aged 65+; 08 dependency ratios. 02-1 (single years of age, 2015–2026, exact persons) is archived but not proposed for this stage |
-| C. Vital events | 09 births, 19 deaths, 29 natural increase, 16 fertility, 25 infant mortality rate, 28 life expectancy | 15, 24, 30 crude rates; 21 infant deaths; 27 abridged life tables |
+| C. Vital events | 09 births, 19 deaths, 29 natural increase, 15 crude birth rate, 24 crude death rate, 16 fertility, 25 infant mortality rate, 28 life expectancy | 30 natural increase rate; 21 infant deaths; 27 abridged life tables |
 | D. Migration | 31 net migration, 32 immigrants and emigrants by age and sex, 33 by citizenship | |
 
 Every table was read at its **stored** cell value, not the displayed one (see §7). The Geostat sources reachable from the audit environment were `www.geostat.ge` and `pc-axis.geostat.ge`. `database.geostat.ge` (the interactive demographic portal) failed TLS verification from the audit environment and is not needed, because the same tables are published as XLSX.
@@ -108,10 +108,16 @@ Mid-year population equals the average of consecutive 1 January values in every 
 
 Refresh rhythm: vital events in late March, population and migration in April, each followed by the diff against the previous capture.
 
-## 9. Decisions needed
+## 9. Decisions
 
-1. **Retro-projected years.** Carry 2004–2013 vital events and 2004–2011 migration, flagged as retro-projected with the break shown (consistent with "Georgia from 2004"), or start those series at 2014 and 2012.
-2. **Rates.** Carry total fertility rate, infant mortality rate and life expectancy, leaving the crude rates, mid-year population and published ratios as validation only; or carry more.
-3. **Single years of age** (table 02-1): archive only, or include 2015–2026 in the structure file. Needed later for school-age and pension-age cohorts.
-4. **Precision of the shipped municipal population file** (§7): leave until the denominator policy is chosen, or re-extract at stored precision now.
-5. **Licences** for Eurostat, the World Bank and the UN extract were not reviewed. Geostat's Terms of Use (reviewed 2026-09-11) permit redistribution with credit. The cross-check files are evidence only and nothing from them is served.
+Decided on 2026-10-01 after this review:
+
+1. **Modelled years.** Start at the registered years: vital events from 2014 and migration from 2012. The 2014 and 2012 method changes become series start dates and do not appear inside the served data.
+2. **Rates.** Carry total fertility rate, infant mortality rate, life expectancy and the crude birth and death rates. The natural increase rate, net migration rate, mid-year population and Geostat's published ratios stay validation inputs.
+3. **Precision of the shipped municipal population file** (§7): left unchanged until the denominator policy is chosen.
+
+Still open:
+
+4. **Single years of age** (table 02-1): archive only, or include 2015–2026 in the structure file. Needed later for school-age and pension-age cohorts.
+5. **Population and age structure before 2015.** Geostat's metadata says the 2018 re-estimate covered "the main demographic indicators for the period 1994-2014", which includes the 1 January population, although table 01 carries no retro-projection footnote. These figures are the official series and the denominator that per-resident figures for 2004–2013 would need. Carry them from 2004 with an explicit flag, or start at 2015.
+6. **Licences** for Eurostat, the World Bank and the UN extract were not reviewed. Geostat's Terms of Use (reviewed 2026-09-11) permit redistribution with credit. The cross-check files are evidence only and nothing from them is served.
