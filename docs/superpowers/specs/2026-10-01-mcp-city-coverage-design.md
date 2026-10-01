@@ -1,7 +1,7 @@
 # MCP: accurate city coverage dates
 
 Date: 2026-10-01
-Status: draft for user review. The user requested specifications for all four MCP tasks; this document is not an implementation or release claim.
+Status: accepted for implementation planning by the user's 2026-10-01 request to write the unified implementation plan. This document is not an implementation or release claim.
 Baseline: `1c2a0acd07f0fa522bf4f6aab33924b319cc2112`, the fetched main commit and live release identity observed during the audit.
 
 ## 1. Outcome

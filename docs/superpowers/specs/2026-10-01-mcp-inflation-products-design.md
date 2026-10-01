@@ -1,7 +1,7 @@
 # MCP: reviewed individual-product inflation
 
 Date: 2026-10-01
-Status: draft for user review. The user requested this expansion and its specification; the proposed public contract still needs written-spec review before implementation planning.
+Status: accepted for implementation planning by the user's 2026-10-01 request to write the unified implementation plan. The implementation plan still needs review before execution.
 Baseline: fetched main `1c2a0acd07f0fa522bf4f6aab33924b319cc2112`.
 
 ## 1. Outcome and scope
@@ -151,4 +151,4 @@ For authorized production delivery, verify the deployed commit/data identity, pr
 
 [City coverage](2026-10-01-mcp-city-coverage-design.md) is a small independent reliability fix. [Protocol compatibility](2026-10-01-mcp-client-compatibility-design.md) is independently proven before combining transport and product changes. [Documentation](2026-10-01-mcp-documentation-design.md) lands capability claims with the completed implementation.
 
-These four specifications form one approved workstream only after the written designs are reviewed. Produce an implementation plan next; keep publishing subject to delivery authorization and all normal repository gates.
+The user's request to write the unified implementation plan accepts these four specifications for planning. Review that plan before execution; keep publishing subject to delivery authorization and all normal repository gates.

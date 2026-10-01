@@ -1,7 +1,7 @@
 # MCP: accurate instructions and discoverable inflation examples
 
 Date: 2026-10-01
-Status: draft for user review.
+Status: accepted for implementation planning by the user's 2026-10-01 request to write the unified implementation plan.
 Baseline: fetched main `1c2a0acd07f0fa522bf4f6aab33924b319cc2112` and the live service audited on this date.
 
 ## 1. Outcome
