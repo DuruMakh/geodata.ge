@@ -62,7 +62,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-39 codes are registered.
+42 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -83,6 +83,9 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `inflation_contribution_residual` | note | `none` | `inflation-cpi-national.md` |
 | `inflation_contribution_weights_differ` | note | `limits` | `inflation-cpi-national.md` |
 | `inflation_target_unverified_before_2015` | note | `none` | `inflation-cpi-national.md` |
+| `inflation_product_cumulative_derived` | severe | `none` | `inflation-products.md` |
+| `inflation_product_history_limits` | note | `limits` | `inflation-products.md` |
+| `inflation_product_label_discrepancy` | note | `none` | `inflation-products.md` |
 | `inflation_city_central_prices` | note | `none` | `inflation-cpi-national.md` |
 | `municipality_not_territorial` | severe | `none` | `municipal-functional-annual-2015-2025.md` |
 | `municipal_country_scope` | note | `none` | `municipal-functional-annual-2015-2025.md` |
@@ -798,3 +801,39 @@ rankings. It does not change reviewed amounts or the validated VAT comparison.
 **Georgian:** 2004 წლის კაპიტალური შემოსავლები და სხვა გადასახადები შემდგომი წლებისგან განსხვავებული განსაზღვრებითაა მოცემული; ამ საზღვარზე ზრდა არ გამოითვლება.
 
 **English:** The 2004 capital receipts and other taxes use different definitions from later years. Growth is not calculated across this boundary.
+
+### `inflation_product_cumulative_derived`
+
+**Severity:** severe
+**Comparison effect:** `none`
+**Owner:** `inflation-products.md`; English public topic: `/en/methodology/inflation`.
+
+დაგროვილი ცვლილება Fiscal.ge-ის გამოთვლაა გამოქვეყნებული თვიური ინდექსების გადამრავლებით; იგი საქსტატის მიერ გამოქვეყნებული დაგროვილი მაჩვენებელი არ არის.
+
+The cumulative change is calculated by Fiscal.ge by compounding published monthly indices; it is not a cumulative figure published by Geostat.
+
+Applies to every cumulative product cell, including unavailable calculations. Each definition and observation includes the preceding December baseline; a missing cell has no numerical result and names the first missing input or actual product start. Monthly originals are marked derivation_upstream in a copied response-specific source view; the snapshot source records retain their primary roles.
+
+### `inflation_product_history_limits`
+
+**Severity:** note
+**Comparison effect:** `limits`
+**Owner:** `inflation-products.md`; English public topic: `/en/methodology/inflation`.
+
+განხილული ისტორია შეიცავს დასახელების დაკავშირებულ ცვლილებას ან კონსერვატიულად გამიჯნულ პროდუქტს. კავშირი არ ადასტურებს უცვლელ საცალო მახასიათებლებს ან ბრენდს; კონკრეტული შეზღუდვა მოცემულია მნიშვნელობის განმარტებაში.
+
+The reviewed history contains a linked description change or a conservatively separated product. A link does not establish an unchanged retail specification or brand; the value definition states the relevant limitation.
+
+Applies only to selected product cells whose annual year or cumulative first year is at or before a reviewed description boundary, including older observations labelled retrospectively and unavailable spans before a conservative split. Spans entirely after a boundary do not inherit its warning. Public bilingual reviewed notes are appended to the affected value definitions. Aggregate coverage spans do not guarantee complete history for every product.
+
+### `inflation_product_label_discrepancy`
+
+**Severity:** note
+**Comparison effect:** `none`
+**Owner:** `inflation-products.md`; English public topic: `/en/methodology/inflation`.
+
+p0148-ის ოფიციალური ინგლისური დასახელებაა Chipboard, ხოლო ქართული დასახელება თაბაშირ-მუყაოს ფილას აღწერს. ორივე წყაროს დასახელება შენარჩუნებულია მათი ეკვივალენტურობის მტკიცების გარეშე.
+
+For p0148, the official English label is Chipboard while the Georgian label describes plasterboard. Both source labels are retained without asserting equivalence.
+
+Applies only to selected p0148 cells across its entire reviewed history. The 2017 punctuation boundary does not establish the start of the bilingual discrepancy.

@@ -386,5 +386,14 @@
   "documents.source.geostat_product_mom_ka.attribution": "Geostat",
   "documents.source.geostat_product_yoy_ka.title": "Consumer price detail indices, same month of previous year = 100 (Georgian)",
   "documents.source.geostat_product_yoy_ka.publisher": "National Statistics Office of Georgia",
-  "documents.source.geostat_product_yoy_ka.attribution": "Geostat"
+  "documents.source.geostat_product_yoy_ka.attribution": "Geostat",
+  "caveats.inflation_product_cumulative_derived": "The cumulative change is calculated by Fiscal.ge by compounding published monthly indices; it is not a cumulative figure published by Geostat.",
+  "caveats.inflation_product_history_limits": "The reviewed history contains a linked description change or a conservatively separated product. A link does not establish an unchanged retail specification or brand; the value definition states the relevant limitation.",
+  "caveats.inflation_product_label_discrepancy": "For p0148, the official English label is Chipboard while the Georgian label describes plasterboard. Both source labels are retained without asserting equivalence.",
+  "definitions.inflationProductAnnual": "Geostat published annual index minus 100: percent price change against the same month of the preceding year.",
+  "definitions.inflationProductCumulative": "Fiscal.ge cumulative price change calculated by compounding published monthly indices relative to {basePeriod}. Every monthly input must be available.",
+  "definitions.inflationProductCumulativeSource": "Fiscal.ge derives cumulative changes by compounding published monthly indices. The Geostat workbooks are upstream inputs and do not publish the derived cumulative result.",
+  "missing.inflationProductStart": "The product’s verified history starts at {first}; the requested earlier history is unavailable.",
+  "missing.inflationProductAnnual": "The published annual index for {period} is unavailable; a missing value does not mean zero.",
+  "missing.inflationProductMonthlyInput": "Cumulative change is unavailable: the first missing monthly input is {period}. No partial result is calculated."
 }

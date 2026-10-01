@@ -4,6 +4,7 @@ import { DEBT_CAVEAT_RULES } from "./rules.debt";
 import { DEFICIT_CAVEAT_RULES } from "./rules.deficit";
 import { GDP_CAVEAT_RULES } from "./rules.gdp";
 import { INFLATION_CAVEAT_RULES } from "./rules.inflation";
+import { INFLATION_PRODUCT_CAVEAT_RULES } from "./rules.inflation-products";
 import { MINISTRIES_CAVEAT_RULES } from "./rules.ministries";
 import { MUNICIPAL_CAVEAT_RULES } from "./rules.municipal";
 import { NATIONAL_CAVEAT_RULES } from "./rules.national";
@@ -31,6 +32,7 @@ export const CAVEAT_RULES: readonly CaveatRule[] = [
   ...GDP_CAVEAT_RULES,
   ...SECTORS_CAVEAT_RULES,
   ...INFLATION_CAVEAT_RULES,
+  ...INFLATION_PRODUCT_CAVEAT_RULES,
 ];
 
 export { evaluateCaveats } from "./engine";

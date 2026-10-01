@@ -1,6 +1,7 @@
 // apps/web/lib/factQuery/schemas.ts
 import { z } from "zod";
 import { INFLATION_MEASURES } from "./inflationSeries";
+import { PRODUCT_QUERY_MEASURES } from "./inflationProductSeries";
 
 /**
  * Spec section 11.3's input array bounds.
@@ -46,6 +47,20 @@ export const deficitMeasure = z.enum(["share_of_gdp_pct", "amount_gel"]);
 export const economicSectorMeasure = z.enum(["amount_gel", "share_of_gdp_pct", "real_growth_pct"]);
 export const queryEconomicSectorsInput = z.strictObject({ seriesIds: seriesIdList, years: uniqueSortedYears, measure: economicSectorMeasure, expectedDataVersion });
 export const inflationMeasure = z.enum(INFLATION_MEASURES);
+export const queryInflationProductsInput = z.strictObject({
+  seriesIds: z.array(z.string().min(1)).min(1).max(INPUT_LIMITS.series).refine(ids => new Set(ids).size === ids.length, "seriesIds must be unique"),
+  measure: z.enum(PRODUCT_QUERY_MEASURES),
+  fromPeriod: periodKeySchema,
+  toPeriod: periodKeySchema,
+  startYear: z.number().int().optional().describe("First calendar year of compounding, relative to the preceding December; required only for cumulative_pct."),
+  expectedDataVersion,
+}).superRefine((input, context) => {
+  if (input.fromPeriod > input.toPeriod) context.addIssue({ code: "custom", path: ["toPeriod"], message: "toPeriod must not precede fromPeriod" });
+  if (input.measure === "cumulative_pct" ? input.startYear === undefined || input.startYear > Number(input.fromPeriod.slice(0, 4)) : input.startYear !== undefined) {
+    context.addIssue({ code: "custom", path: ["startYear"], message: "startYear is required only for cumulative_pct and must not follow fromPeriod's year" });
+  }
+});
+export type QueryInflationProductsInput = z.infer<typeof queryInflationProductsInput>;
 export const queryInflationInput = z.strictObject({
   seriesIds: seriesIdList,
   measure: inflationMeasure,
@@ -251,6 +266,7 @@ export const observationSchema = z.object({
   parentSeriesId: z.string().nullable(),
   year: z.number().int(),
   period: periodKeySchema.optional(),
+  calculationBasePeriod: periodKeySchema.optional(),
   measure: z.string(),
   unit: z.enum(["GEL", "percent", "GEL_per_resident", "USD", "USD_2015", "GEL_per_person", "USD_per_person", "index_2010_100", "percentage_points"]),
   value: z.number().finite().nullable(),

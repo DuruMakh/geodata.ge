@@ -46,6 +46,7 @@ export type CaveatContext = {
     year: number;
     /** Monthly observations only (inflation), YYYY-MM. */
     period?: string;
+    calculationBasePeriod?: string;
     value: number | null;
     basis: Basis | null;
     /** Mirrors Observation.valueDefinitionId, so a rule can detect a real definition break between two years without reading display prose. */
