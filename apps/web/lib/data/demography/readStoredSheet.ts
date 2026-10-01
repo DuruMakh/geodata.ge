@@ -1,3 +1,4 @@
+import Decimal from "decimal.js";
 import * as XLSX from "xlsx";
 import { DemographyStopError } from "./stops";
 
@@ -102,13 +103,23 @@ export class StoredSheet {
     return this.whole(ref, 1);
   }
 
-  /** A published rate as its shortest decimal text (70.099999999999994 reads as "70.1"). */
-  published(ref: string): string | null {
+  /**
+   * A published rate as text at the decimals Geostat displays (`0.0` shows one). Some cells store the
+   * unrounded result under that format (9.621254111811286 displays as 9.6); the digits past the display
+   * are not published. Rounds half up on the decimal digits, as the workbook's own display does.
+   */
+  published(ref: string, decimals: number): string | null {
     const value = this.number(ref);
     if (value === null) return null;
-    const text = String(value);
-    if (/e/i.test(text)) throw new UnexpectedCellError(this.name, ref, value);
-    return text;
+    return new Decimal(String(value)).toDecimalPlaces(decimals, Decimal.ROUND_HALF_UP).toFixed(decimals);
+  }
+
+  /** Stops preparation unless `ref` holds exactly `expected`: the guard that a header is where the reviewed layout put it. */
+  expectLabel(ref: string, expected: string): void {
+    const found = this.label(ref);
+    if (found !== expected) {
+      throw new DemographyStopError("layout_changed", `Sheet ${this.name} cell ${ref} is ${found === null ? "blank" : `"${found}"`}, expected "${expected}"`);
+    }
   }
 
   /** A four-digit year in a number or text cell, else null. */
@@ -167,6 +178,26 @@ export function findYearColumns(sheet: StoredSheet, headerRow: number): Map<numb
   }
   if (columns.size === 0) throw new DemographyStopError("layout_changed", `No year header found in row ${headerRow} of sheet ${sheet.name}`);
   return columns;
+}
+
+/**
+ * Year → row for a table with one row per year: consecutive years down column A from `firstRow`,
+ * ending at the first cell that is not a year (a blank row or the notes).
+ */
+export function findYearRows(sheet: StoredSheet, firstRow: number): Map<number, number> {
+  const rows = new Map<number, number>();
+  let expected: number | null = null;
+  for (let row = firstRow; row <= sheet.lastRow; row += 1) {
+    const year = sheet.yearAt(sheet.ref("A", row));
+    if (year === null) break;
+    if (expected !== null && year !== expected) {
+      throw new DemographyStopError("layout_changed", `Years are not consecutive down column A of sheet ${sheet.name} at row ${row}`);
+    }
+    rows.set(year, row);
+    expected = year + 1;
+  }
+  if (rows.size === 0) throw new DemographyStopError("layout_changed", `No year rows found from row ${firstRow} of sheet ${sheet.name}`);
+  return rows;
 }
 
 /**

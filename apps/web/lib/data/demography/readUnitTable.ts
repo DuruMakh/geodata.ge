@@ -19,6 +19,8 @@ export type UnitTableOptions = {
   /** First year served for Georgia, and for regions and municipalities. The last year is whatever the header holds. */
   countryFrom: number;
   unitsFrom: number;
+  /** A reviewed stray cell: a value Geostat prints where none is published, which no total may use. */
+  acceptStray?: (ref: string, value: number) => boolean;
 };
 
 /**
@@ -41,6 +43,10 @@ export function readUnitTable(sheet: StoredSheet, geography: DemographyGeography
     return sheet.ref(block[0]!, row);
   };
   const read = (ref: string) => (scale === "thousands" ? sheet.persons(ref) : sheet.count(ref));
+  const stray = (ref: string) => {
+    const value = read(ref);
+    return value !== null && !options.acceptStray?.(ref, value);
+  };
   const required = (ref: string, label: string) => {
     const value = read(ref);
     if (value === null) throw new DemographyStopError("missing_served_cell", `Sheet ${sheet.name} has no value at ${ref} (${label})`);
@@ -60,14 +66,14 @@ export function readUnitTable(sheet: StoredSheet, geography: DemographyGeography
     if (unit.kind === "excluded") {
       for (const year of years(unitsFrom)) {
         const ref = refAt(row, year);
-        if (read(ref) !== null) throw new DemographyStopError("unexpected_value", `Excluded unit ${label} holds a value at ${sheet.name}!${ref}`);
+        if (stray(ref)) throw new DemographyStopError("unexpected_value", `Excluded unit ${label} holds a value at ${sheet.name}!${ref}`);
       }
     } else if (unit.kind === "city_component") {
       for (const year of years(unitsFrom)) {
         const ref = refAt(row, year);
         if (year >= unit.startYear && year <= unit.endYear) {
           cityRows.push({ hostId: unit.geographyId, year, value: required(ref, label), ref });
-        } else if (read(ref) !== null) {
+        } else if (stray(ref)) {
           throw new DemographyStopError("unexpected_value", `City row ${label} holds a value outside its published years at ${sheet.name}!${ref}`);
         }
       }

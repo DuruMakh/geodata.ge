@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 import {
   findYearBlocks,
   findYearColumns,
+  findYearRows,
   NotWholePersonError,
   readStoredSheet,
   UnexpectedCellError,
@@ -40,12 +41,29 @@ describe("stored-value sheet reader", () => {
     expect(population.label("A5")).toBe("Georgia");
   });
 
-  test("returns published rates as their shortest decimal text", () => {
+  test("returns a published rate at the decimals Geostat displays", () => {
     const lifeExpectancy = table("source.geostat_demography_life_expectancy");
+    const fertility = table("source.geostat_demography_fertility");
 
-    expect(lifeExpectancy.published("B5")).toBe("70.1");
-    expect(lifeExpectancy.published("C5")).toBe("66");
-    expect(lifeExpectancy.published("D5")).toBe("74.1");
+    expect(lifeExpectancy.published("B5", 1)).toBe("70.1");
+    expect(lifeExpectancy.published("C5", 1)).toBe("66.0");
+    expect(lifeExpectancy.published("D5", 1)).toBe("74.1");
+    expect(fertility.published("I35", 2)).toBe("1.70");
+    expect(fertility.published("I37", 2)).toBe("1.53");
+  });
+
+  test("drops digits Geostat stores below the decimals it displays, rounding half up on the decimal digits", () => {
+    const birthRate = table("source.geostat_demography_crude_birth_rate");
+    const infantMortality = table("source.geostat_demography_infant_mortality");
+
+    expect(birthRate.number("B36")).toBe(9.621254111811286);
+    expect(birthRate.published("B36", 1)).toBe("9.6");
+    expect(infantMortality.number("B26")).toBe(8.557106449053991);
+    expect(infantMortality.published("B26", 1)).toBe("8.6");
+    const ties = syntheticSheet({ B2: 0.25, B3: 2.675 });
+    expect(ties.published("B2", 1)).toBe("0.3");
+    expect(ties.published("B3", 2)).toBe("2.68");
+    expect(ties.published("B4", 1)).toBeNull();
   });
 
   test("finds one column per year in the population table", () => {
@@ -103,6 +121,28 @@ describe("stored-value sheet reader", () => {
     const workbook = XLSX.read(bytes, { type: "buffer" });
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([[1]]), "2");
     expect(() => readStoredSheet(Buffer.from(XLSX.write(workbook, { type: "buffer", bookType: "xlsx" })), "1")).toThrow(/exactly one sheet/);
+  });
+
+  test("finds one row per year in a table with years down column A, ending before the notes", () => {
+    const rates = findYearRows(table("source.geostat_demography_crude_birth_rate"), 5);
+
+    expect([...rates.keys()]).toEqual(Array.from({ length: 32 }, (_, index) => 1994 + index));
+    expect(rates.get(1994)).toBe(5);
+    expect(rates.get(2025)).toBe(36);
+    expect(findYearRows(table("source.geostat_demography_fertility"), 6).get(2025)).toBe(37);
+  });
+
+  test("refuses years that skip a year and a table with no year rows", () => {
+    expect(() => findYearRows(syntheticSheet({ A2: 2020, A3: 2022 }), 2)).toThrow(/consecutive/);
+    expect(() => findYearRows(table("source.geostat_demography_crude_birth_rate"), 4)).toThrow(/No year rows/);
+  });
+
+  test("expects a header where the reviewed layout puts it", () => {
+    const rates = table("source.geostat_demography_crude_birth_rate");
+
+    expect(() => rates.expectLabel("B4", "Rate")).not.toThrow();
+    expect(() => rates.expectLabel("B4", "Ratio")).toThrow(/B4 is "Rate", expected "Ratio"/);
+    expect(() => rates.expectLabel("C4", "Rate")).toThrow(/C4 is blank/);
   });
 
   test("finds the year blocks of the stacked migration table", () => {
