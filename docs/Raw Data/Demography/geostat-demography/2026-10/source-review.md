@@ -11,7 +11,7 @@ Geostat's [Population and Demography](https://www.geostat.ge/en/modules/categori
 | A. Population | 01 population on 1 January by region and municipality (reused capture) | 04 mid-year population; census table 2024 |
 | B. Structure | 02 population by age group and sex | 06 median age; 07 share aged 65+; 08 dependency ratios. 02-1 (single years of age, 2015–2026, exact persons) is archived but not proposed for this stage |
 | C. Vital events | 09 births, 19 deaths, 29 natural increase, 15 crude birth rate, 24 crude death rate, 16 fertility, 25 infant mortality rate, 28 life expectancy | 30 natural increase rate; 21 infant deaths; 27 abridged life tables |
-| D. Migration | 31 net migration, 32 immigrants and emigrants by age and sex, 33 by citizenship | |
+| D. Migration | 31 net migration, 33 immigrants and emigrants by sex and citizenship | 32 immigrants and emigrants by age and sex (its totals must agree with 33) |
 
 Every table was read at its **stored** cell value, not the displayed one (see §7). The Geostat sources reachable from the audit environment were `www.geostat.ge` and `pc-axis.geostat.ge`. `database.geostat.ge` (the interactive demographic portal) failed TLS verification from the audit environment and is not needed, because the same tables are published as XLSX.
 

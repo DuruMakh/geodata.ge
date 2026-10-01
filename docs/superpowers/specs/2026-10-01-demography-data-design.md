@@ -17,7 +17,7 @@ Prepare a reviewed, reproducible annual dataset of Georgia's population and its 
 
 The municipality and region sets are the existing 64 municipalities and 11 regions. The five aggregate-only codes (`05`, `42`, `43`, `46`, `64`) stay out, as in the municipal population package.
 
-Not in this stage: pages, routes, charts, Excel, MCP, publications or any sidebar change; the 2024 census detail (households, education, nationality, language, religion, internal migration, displaced persons); age structure by region or municipality (only the census tables carry it); projections; marriages and divorces; citizenship changes; causes of death; mid-year population, the natural increase rate and the net migration rate as served series; budget-linked indicators (spending per resident, per pensioner or per child); half-year and other sub-annual releases; extraction from PDF.
+Not in this stage: pages, routes, charts, Excel, MCP, publications or any sidebar change; the 2024 census detail (households, education, nationality, language, religion, internal migration, displaced persons); age structure by region or municipality (only the census tables carry it); migration by age (table 32 is a validation input only); projections; marriages and divorces; citizenship changes; causes of death; mid-year population, the natural increase rate and the net migration rate as served series; budget-linked indicators (spending per resident, per pensioner or per child); half-year and other sub-annual releases; extraction from PDF.
 
 ## 2. Decisions
 
