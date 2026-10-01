@@ -35,6 +35,14 @@ export const SOURCE_ID = {
   lifeExpectancy: "source.geostat_demography_life_expectancy",
   netMigration: "source.geostat_demography_net_migration",
   migrationCitizenship: "source.geostat_demography_migration_citizenship",
+  /** Validation inputs: archived and compared with the served rows, never served. */
+  infantDeaths: "source.geostat_demography_infant_deaths",
+  lifeTables: "source.geostat_demography_life_tables",
+  naturalIncreaseRate: "source.geostat_demography_natural_increase_rate",
+  share65Plus: "source.geostat_demography_share_65_plus",
+  ageDependency: "source.geostat_demography_age_dependency",
+  migrationAgeSex: "source.geostat_demography_migration_age_sex",
+  census: "source.geostat_census2024_population_by_unit",
 } as const;
 
 /** The day the 2026-10 Geostat capture was reviewed; every observation carries it as `last_reviewed_at`. */
@@ -60,6 +68,28 @@ export function populationEstimateBasis(year: number): EstimateBasis {
   if (year <= RETRO_PROJECTION_THROUGH) return "retro_projection";
   return year >= CENSUS_BASED_FROM ? "census_based" : "pre_census";
 }
+
+/** The served series by family: the split of the canonical files and the grouping of the coverage report. */
+export const FAMILIES = {
+  population: [SERIES.populationTotal],
+  structure: [SERIES.populationByAgeSex, SERIES.populationAgeBand],
+  vital: [
+    SERIES.liveBirths,
+    SERIES.deaths,
+    SERIES.naturalIncrease,
+    SERIES.crudeBirthRate,
+    SERIES.crudeDeathRate,
+    SERIES.totalFertilityRate,
+    SERIES.infantMortalityRate,
+    SERIES.lifeExpectancyTotal,
+    SERIES.lifeExpectancyMale,
+    SERIES.lifeExpectancyFemale,
+  ],
+  migration: [SERIES.immigrants, SERIES.emigrants, SERIES.netMigration],
+} as const;
+
+/** The 2025 census recalculation of the 1 January population: the one balancing residual the archive may hold. */
+export const CENSUS_STEP = { fromYear: 2024, toYear: 2025, referenceDate: "2025-01-01", residual: 225_922 } as const;
 
 /** The 19 age rows of the age table, in the order Geostat prints them. */
 export const AGE_GROUPS = [
