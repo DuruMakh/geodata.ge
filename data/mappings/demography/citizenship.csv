@@ -1,0 +1,23 @@
+﻿table_label,citizenship_id,mapping_note,reviewed_at
+Total,citizenship.total,All citizenships.,2026-10-01
+Georgia,citizenship.georgia,Listed in every year.,2026-10-01
+Armenia,citizenship.armenia,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+Russian Federation,citizenship.russian_federation,Listed in every year.,2026-10-01
+Turkey,citizenship.turkey,Listed in every year.,2026-10-01
+Azerbaijan,citizenship.azerbaijan,Listed in every year.,2026-10-01
+Ukraine,citizenship.ukraine,Listed in every year.,2026-10-01
+India,citizenship.india,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+United States of America,citizenship.united_states,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+"Iran, Islamic Republic of",citizenship.iran,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+China,citizenship.china,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+Greece,citizenship.greece,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+Iraq,citizenship.iraq,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+Kuwait,citizenship.kuwait,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+Israel,citizenship.israel,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+"Moldova, Republic of",citizenship.moldova,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+Kazakhstan,citizenship.kazakhstan,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+Belarus,citizenship.belarus,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+Turkmenistan,citizenship.turkmenistan,"Listed separately only in the years it is among Geostat's largest groups; in other years it is inside Other, not zero.",2026-10-01
+Other,citizenship.other,Residual group whose composition changes from year to year; not a comparable series.,2026-10-01
+Stateless,citizenship.stateless,Listed in every year.,2026-10-01
+Not stated,citizenship.not_stated,Listed in every year.,2026-10-01

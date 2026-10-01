@@ -41,7 +41,7 @@
 | --- | --- |
 | Source package (archived) | `docs/Raw Data/Demography/geostat-demography/2026-10/{source-manifest.csv,source-review.md,official/}` |
 | Package and sheet readers | `apps/web/lib/data/demography/sourceFiles.ts`, `readStoredSheet.ts`, `types.ts` |
-| Reviewed identity maps | `data/mappings/demography/{geography-aliases,event-city-components,citizenship}.csv`; `apps/web/lib/data/demography/geography.ts`, `citizenship.ts` |
+| Reviewed identity maps | `data/mappings/demography/{geography-aliases,excluded-units,event-city-components,source-anomalies,citizenship}.csv`; `apps/web/lib/data/demography/{geography,citizenship,anomalies}.ts` |
 | Family readers | `apps/web/lib/data/demography/{readPopulation,readVital,readMigration}.ts` |
 | Calculations and validation | `apps/web/lib/data/demography/{calculations,validation,breaks}.ts` |
 | Preparation and canonical output | `apps/web/lib/data/demography/prepareDemography.ts`, `apps/web/scripts/prepare-demography.ts`, `data/imports/demography-{population,structure,vital,migration}-annual.csv`, `data/imports/demography-series-breaks.csv`, `data/reports/demography-validation.json` |
@@ -75,16 +75,16 @@
 
 ### Task 3: Reviewed identity maps
 
-**Files:** Create the three mapping CSVs under `data/mappings/demography/`, `geography.ts`, `citizenship.ts`; tests in `tests/data/demography/geography.test.ts` and `citizenship.test.ts`.
+**Files:** Create five mapping CSVs under `data/mappings/demography/`, `geography.ts`, `citizenship.ts`, `anomalies.ts`; tests in `tests/data/demography/geography.test.ts` and `citizenship.test.ts`.
 
-**Content:** `geography-aliases.csv` holds the reviewed spelling bridges: `Dedoplistskaro`/`Dedoplistsqaro`, `Tetritskaro`/`Tetritsqaro`, `Tkibuli`/`Tqibuli`, `Tskaltubo`/`Tsqaltubo` for the event tables, plus the census table's `C. Name` city labels and the census spelling of Sighnagi (find it in the archived census table and record it). `event-city-components.csv` lists the seven starred cities for 2014–2016; the population component years (2015–2017) come from the existing `population-component-map.csv`, which is reused, not copied. `citizenship.csv` maps every label seen in table 33 (22 countries plus `Total`, `Other`, `Stateless`, `Not stated`) to a stable lowercase ASCII ID. The existing `geography-map.csv` and `data/imports/municipalities.csv` stay the municipality and region authority.
+**Content:** `geography-aliases.csv` holds the reviewed spelling bridges, each scoped to the table family it was seen in: `Dedoplistskaro`/`Dedoplistsqaro`, `Tetritskaro`/`Tetritsqaro`, `Tkibuli`/`Tqibuli`, `Tskaltubo`/`Tsqaltubo` for the event tables and the census table, plus the census table's `Sighnaghi` and its five `C. Name` city labels. `excluded-units.csv` lists the six units outside the 64 (`Abkhazia A.R.`, `Ajara Municipality`, `Akhalgori`, `Eredvi`, `Tighva`, `Kurta`). `event-city-components.csv` lists the seven starred cities for 2014–2016; the population component years (2015–2017) come from the existing `population-component-map.csv`, which is reused, not copied. `source-anomalies.csv` records the one reviewed stray cell (table 29, `AB85`, value 0). `citizenship.csv` maps every label seen in table 33 (22 labels: 18 countries plus `Total`, `Other`, `Stateless`, `Not stated`) to a stable lowercase ASCII ID. The existing `geography-map.csv` and `data/imports/municipalities.csv` stay the municipality and region authority, and identifiers follow the query layer: `country.georgia`, `region.*` and two-digit municipality codes.
 
-**Interfaces:** `resolveEventUnit(label: string): { geographyId: string; kind: "georgia" | "region" | "municipality" | "city_component" | "excluded" }`; `resolveCitizenship(label: string): string`. Both throw on an unreviewed label.
+**Interfaces:** `loadDemographyGeography(root): Promise<DemographyGeography>` with `resolve(label, scope: "population" | "events" | "census"): ResolvedUnit` (kinds `country`, `region`, `municipality`, `city_component` with its years, `excluded`) and `readUnitRows(sheet)`; `loadCitizenships(root).resolve(label): string`; `loadReviewedAnomalies(root).accepts(sourceId, cell, value): boolean`. All throw on an unreviewed label, and each loader refuses a conflicting or malformed reviewed file.
 
-- [ ] **Step 1: Write failing tests.** Every label in tables 01, 09, 19 and 29 resolves; an invented spelling throws; the five aggregate-only codes and `Abkhazia A.R.`, `Akhalgori`, `Eredvi`, `Tighva`, `Kurta` resolve to `excluded`; component years are enforced; the `AB85` zero is the only accepted stray cell; all 26 citizenship labels resolve and an unseen label throws.
-- [ ] **Step 2: Run the tests.** Expected: fail.
-- [ ] **Step 3: Implement the resolvers and add the reviewed rows with a `mapping_note` for each.**
-- [ ] **Step 4: Run the tests; commit the maps and resolvers.**
+- [x] **Step 1: Write failing tests.** Every label in tables 01, 09, 19 and 29 resolves (1 country, 10 regions, 64 municipalities, 7 city components, 6 excluded); an invented spelling throws, as does a variant used outside its reviewed scope; component years are enforced; the `AB85` zero is the only accepted stray cell and only with value 0; all 22 citizenship labels resolve with unique ids and an unseen label throws.
+- [x] **Step 2: Run the tests.** Expected: fail.
+- [x] **Step 3: Implement the resolvers and add the reviewed rows with a `mapping_note` for each.**
+- [x] **Step 4: Run the tests; commit the maps and resolvers.**
 
 ### Task 4: Population and structure observations
 
