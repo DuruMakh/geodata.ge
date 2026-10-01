@@ -16,7 +16,7 @@ const cases: Array<{ name: string; family: DebtFamily; selectedIds: DebtSeriesId
 describe("debt workbook sources (golden)", () => {
   beforeEach(() => resetWorkbookSourceCacheForTests());
 
-  it.each(cases)("lists the same documents and years: $name", async ({ family, selectedIds, range }) => {
+  it.each(cases)("lists the same documents and years: '$name'", async ({ family, selectedIds, range }) => {
     const [facts, sources] = await Promise.all([loadGovernmentDebtFacts(), loadDebtWorkbookSources()]);
     const model = buildDebtWorkbookExportModel({
       facts,

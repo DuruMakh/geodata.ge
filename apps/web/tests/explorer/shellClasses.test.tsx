@@ -22,7 +22,7 @@ const PAGES: ReadonlyArray<{ name: string; render: (locale: Locale) => Promise<u
 const attributesOf = (markup: string, pattern: RegExp): string[] =>
   [...markup.matchAll(pattern)].map((match) => match[0]);
 
-describe.each(PAGES)("$name shell", ({ render }) => {
+describe.each(PAGES)("'$name' shell", ({ render }) => {
   it("keeps its wrapper, heading, workspace, aside and measure pill", async () => {
     const markup = renderToStaticMarkup((await render("ka")) as never);
 
