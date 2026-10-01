@@ -2,7 +2,7 @@
 
 Date: 2026-10-01
 
-Status: Draft. Scope decisions were approved in conversation on 2026-10-01 (§2). The source audit in §4 is pending: Geostat and the cross-check hosts were not reachable from the session that wrote this draft, so no new source has been inspected. This document covers the data stage only.
+Status: Draft. Scope decisions were approved in conversation on 2026-10-01 (§2). The source audit (§3, §4) was run the same day. Its evidence is in `docs/Raw Data/Demography/geostat-demography/2026-10/source-review.md`, with every archived file in `source-manifest.csv`. Five decisions the audit leaves open are listed in §2. This document covers the data stage only.
 
 ## 1. Outcome and scope
 
@@ -10,14 +10,14 @@ Prepare a reviewed, reproducible annual dataset of Georgia's population and its 
 
 | Family | Content | Coverage |
 | --- | --- | --- |
-| A. Population | Population on 1 January: Georgia, 11 regions, 64 municipalities | Georgia from 2004; regions and municipalities from 2015 |
-| B. Structure | Population by sex and age group: 0–14, 15–64 and 65+ at minimum, finer groups where published | Georgia from 2004; regions where Geostat publishes them, from 2015 |
-| C. Vital events | Live births, deaths, natural increase, total fertility rate, life expectancy at birth by sex, infant mortality | Annual; Georgia from 2004; regions where published, from 2015 |
-| D. Migration | Immigrants, emigrants and net migration, by citizenship where published | Annual; Georgia; from the first year of Geostat's current method, floor 2004 |
+| A. Population | Population on 1 January: Georgia, 11 regions, 64 municipalities | Georgia from 2004; regions and municipalities from 2015; through 2026 |
+| B. Structure | Population by sex and 5-year age group, with 0–14, 15–64 and 65+ derived from it | Georgia from 2004; through 2026 |
+| C. Vital events | Live births, deaths and natural increase (Georgia, regions, municipalities); total fertility rate, infant mortality rate and life expectancy at birth by sex (Georgia) | Georgia from 2004; regions and municipalities from 2015; through 2025 |
+| D. Migration | Immigrants, emigrants and net migration (Georgia); by citizenship from 2012 | Georgia; through 2025; years before 2012 depend on decision 1 |
 
 The municipality and region sets are the existing 64 municipalities and 11 regions. The five aggregate-only codes (`05`, `42`, `43`, `46`, `64`) stay out, as in the municipal population package.
 
-Not in this stage: pages, routes, charts, Excel, MCP, publications or any sidebar change; 2024 census detail (households, education, ethnicity, religion, language); projections; marriages and divorces; internal migration; displaced-person counts; budget-linked indicators (spending per resident, per pensioner or per child, dependency-based budget ratios); half-year or other sub-annual releases; extraction from PDF.
+Not in this stage: pages, routes, charts, Excel, MCP, publications or any sidebar change; the 2024 census detail (households, education, nationality, language, religion, internal migration, displaced persons); age structure by region or municipality (only the census tables carry it); projections; marriages and divorces; citizenship changes; causes of death; mid-year population as a served series; budget-linked indicators (spending per resident, per pensioner or per child); half-year and other sub-annual releases; extraction from PDF.
 
 ## 2. Decisions
 
@@ -32,77 +32,77 @@ Taken in this draft, for review:
 
 - Geostat is the only source of served values. Eurostat, UN World Population Prospects and the World Bank are cross-checks and never mixed into a served series.
 - Annual data only. Sub-annual data is excluded by `AGENTS.md`, so half-year preliminary releases are not collected.
-- Machine-readable tables only (XLSX, CSV or equivalent). Geostat PDF reports are archived as cross-reads and are not extracted for served values.
-- Definitions are fixed at audit and recorded in the methodology: permanent resident population as of 1 January, events by the calendar year Geostat assigns, occupied territories excluded. The audit must confirm each wording from the source.
-- `status` follows Geostat (`published`, `preliminary`). The census recalculation is carried by a separate break register, not by `status`.
+- Machine-readable tables only. Geostat PDF reports are archived as cross-reads and are not extracted for served values.
+- Definitions follow Geostat's metadata (§4) and are recorded in the methodology.
+- A column `estimate_basis` carries each value's lineage, and a break register carries the breaks (§6). `status` stays publisher-faithful.
 
-## 3. Evidence already in the repository
+Open after the audit, each with a recommendation (source review §9):
 
-All figures below are computed from files in the repository, not from outside sources.
+1. **Retro-projected years.** Carry 2004–2013 vital events and 2004–2011 migration, flagged `retro_projection` with the break shown, or start those series at 2014 and 2012. *Recommended: carry and flag, consistent with decision 3.*
+2. **Rates.** Carry total fertility rate, infant mortality rate and life expectancy only; crude rates, mid-year population and Geostat's published ratios stay validation inputs. *Recommended.*
+3. **Single years of age** (table 02-1, 2015–2026, exact persons): archive only, or include in the structure file. *Recommended: archive only; add it when school-age and pension-age cohorts are needed.*
+4. **Precision of the shipped `data/imports/municipal-population-2025.csv`**, which holds one-decimal values while Geostat stores persons (§3). *Recommended: leave until the denominator policy is chosen, then change it in one recorded step.*
+5. **Licences.** Geostat's Terms of Use were reviewed on 2026-09-11. Eurostat, World Bank and UN terms are not reviewed; their files are evidence only.
 
-- `docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx` (captured 2026-08-03) has one sheet `1`, in thousands, 1994–2026. Its footnote reads: "Based on the results of the 2024 population census, the population size and related data as of January 1, 2025 were recalculated."
-- Georgia (row 5): 3,694.6k on 2024-01-01 and 3,930.4k on 2025-01-01, a change of +235.8k (+6.4%) that is a recalculation, not growth. By region the change runs from +15.0% (Imereti) to +0.4% (Guria). Across the 64 municipalities it runs from −42.4% (Khulo) to +61.0% (Ninotsminda), and 22 of 64 fall. No uniform rescaling can bridge it.
-- Georgia changes for 2022, 2023 and 2024 are −39.9k, +47.7k and −41.7k. They are the largest moves before the census step and are the first cases for the balancing check in §7.
-- The workbook is silent on whether 2015–2024 will be re-estimated. The published history is smooth through the 2014 census, which suggests an earlier re-estimation. The audit must re-capture and compare.
-- Two population bases already coexist on the site. Dividing `nominal_gel` by `per_capita_gel` in `data/imports/gdp-overview-annual.csv` implies 3,699.6k (2024) and 3,704.5k (2025, preliminary), a pre-census basis. The municipal budget-per-resident map uses 3,930.6k for 2025. Choosing a denominator policy belongs to the later budget-linked stage; this stage records the basis of every population value so that choice can be made safely.
+## 3. What the audit found
 
-## 4. Source audit (pending)
+- **Source set.** Geostat lists 82 numbered tables in seven categories. The package holds 21 of them (table 01 is the existing 2026-08-03 capture, re-downloaded with identical bytes), the census population table, four metadata PDFs and three cross-check captures: 29 manifest rows, all verified by SHA-256. Table 01 being unchanged means 2015–2024 are not re-estimated.
+- **The population series is exact bookkeeping.** At stored precision, the change in the 1 January population equals births minus deaths plus net migration with residual 0 persons in 31 of 32 transitions (1994→1995 to 2025→2026). The exception is 2024→2025: **+225,922**, the census recalculation (3,704,506 pre-census against 3,930,428). The census count is 3,929,581 at 14 November 2024.
+- **Four breaks.** The census recalculation at 2025-01-01; vital events switching from retro-projection to registered data in 2014 (births 49,657 → 60,635, total fertility rate 1.86 → 2.31); migration switching to border-police data in 2012; life tables switching to actuarial in 2002 (before the approved depth). Counts of registered births and deaths and border-police migration do not break at the census. The population stock, age structure, mid-year population and every rate with a population denominator do.
+- **Revision precedent.** After the 2014 census, retro-projected results for 1994–2014 appeared in 2018, three to four years later. Expect 2015–2024 to be re-estimated at an unknown date, so today's numbers are one version of the series.
+- **Stored precision.** Cells such as Tbilisi 2025 store `1335.671` thousand while the workbook displays `1,335.7`. At stored precision the 64 municipalities sum to Georgia exactly. The −0.3 to +0.5 thousand "published rounding" in `docs/data-methodology/municipal-population-regional-gdp.md` comes from one-decimal values, not from Geostat's publication. The reader must use stored values.
+- **Two population bases on the site.** The 2025 GDP per capita implies 3,704.5k people, the pre-census 1 January 2025 estimate. The municipal budget-per-resident map uses the census-based 2025 values. Eurostat also still shows the pre-census 3,704,506 for 2025, and the World Bank's 2024 total spans the break. Choosing a denominator policy belongs to the later budget-linked stage.
+- **Identity work needed.** Four spelling variants between tables, starred city rows that are separate for 2014–2016 in event tables, and one stray zero (table 29, `C. Gori*`, 2020).
 
-For each source record: page URL, download URL, retrieval date, bytes, SHA-256, sheet or table, units, year coverage, footnotes, last-update and release status, and terms of use. Geostat's Terms of Use permitting redistribution with credit were reviewed on 2026-09-11 (`docs/Raw Data/Economy/economic-sectors/source-review.md`); each other host needs its own terms check.
+## 4. Audit answers
 
-Candidate tables, to be confirmed. The Geostat category numbers come from search results and are unverified.
-
-| Need | Geostat (to inspect) | Cross-check |
-| --- | --- | --- |
-| A | Population (category 41): re-capture the 1 January workbook | Eurostat `demo_pjan` (Georgia included) |
-| B | Demographic pyramid database; age and sex tables | Eurostat `demo_pjan`; UN World Population Prospects |
-| C | Births (319), Deaths (320) and the vital-statistics tables for fertility and life expectancy | World Bank indicators; UN World Population Prospects |
-| D | Migration (322) | UN; Eurostat migration tables if Georgia is present |
-
-The audit must answer:
-
-1. Has Geostat re-estimated 2015–2024 since the 2026-08-03 capture? Which years, by how much?
-2. For each table: units, year coverage, regional and municipal availability, sex and age detail, preliminary flags, and footnotes on definitions or breaks.
-3. Are births and deaths counted by registration or occurrence year? Do births, deaths and net migration exist for every year needed by the balancing check?
-4. Migration: the method (border-crossing records, residence rule), the year the current method starts, and any method break.
-5. Are 2025–2026 age and sex values census-based while 2004–2024 are not? Is the census-day count (14 November 2024) published, to anchor the census check?
-6. What population does Geostat use for per-capita GDP (1 January or annual average), and will it be rebased on the census?
-7. The release calendar for each family, for a refresh runbook.
+| Question | Answer |
+| --- | --- |
+| Re-estimated since 2026-08-03? | No. Table 01 is byte-identical. |
+| Units, coverage, geography | Source review §1 and the manifest. Regional and municipal detail exists for population, births, deaths and natural increase; age structure is national only. |
+| Births and deaths by registration or occurrence? | Registered in the reference year, including events of Georgian citizens registered abroad. |
+| Migration method and start | 183 days within twelve months, Ministry of Internal Affairs records; current method from 2012; by citizenship from 2012. |
+| 2025–2026 census-based, earlier years not? | Yes. The census count is published and anchors the check. |
+| Population behind per-capita GDP | Mid-year population on the pre-census basis for 2024 and 2025. Whether Geostat rebases it is not stated. |
+| Release calendar | Vital events late March, population and migration April; see source review §8. |
 
 ## 5. Archive and source reader
 
-Archive untouched originals under `docs/Raw Data/Demography/<source>/<YYYY-MM>/` with a source manifest and README, following the inflation and municipal population packages. The 2026-08-03 population capture stays where it is. Follow the existing latest-vintage retention rule; earlier files remain recoverable from git history. Register source IDs in `data/sources/source-documents.csv`. No automated production fetching.
+The package is `docs/Raw Data/Demography/geostat-demography/2026-10/`: `source-manifest.csv`, `source-review.md`, `official/` (tables, `metadata/`, `census-2024/`) and `cross-checks/`. Table 01 is referenced from the municipal package, not duplicated. Follow the latest-vintage retention rule; earlier files remain recoverable from git history. Register source IDs in `data/sources/source-documents.csv` when the canonical files exist. No automated production fetching.
 
-A deterministic `scripts/prepare-demography.ts` with `--write` and `--check`, wired into `data:validate`, follows the other prepare scripts. The reader finds sheets, headers and year columns by validated content and rejects a changed layout rather than guessing.
+A deterministic `scripts/prepare-demography.ts` with `--write` and `--check`, wired into `data:validate`, follows the other prepare scripts. The reader reads **stored** cell values, never displayed ones, finds sheets, headers and year blocks by validated content, and rejects a changed layout rather than guessing.
 
 ## 6. Canonical files and missing values
 
-Reviewed files under `data/imports/`, one per family (`demography-population-annual.csv`, `demography-structure-annual.csv`, `demography-vital-annual.csv`, `demography-migration-annual.csv`), plus `demography-series-breaks.csv`. Conventions follow `regional-economies-annual.csv`: stable lowercase ASCII `series_id` such as `demography.population_total`, geography IDs from the existing taxonomy, published precision, explicit `unit`, `status`, `source_id`, a sheet-and-cell `source_locator` and `last_reviewed_at`. Exact columns are fixed after the audit.
+Reviewed files under `data/imports/`, one per family (`demography-population-annual.csv`, `demography-structure-annual.csv`, `demography-vital-annual.csv`, `demography-migration-annual.csv`), plus `demography-series-breaks.csv`. Conventions follow `regional-economies-annual.csv`: stable lowercase ASCII `series_id` such as `demography.population_total`, geography IDs from the existing taxonomy, published precision, explicit `unit`, `status`, `source_id`, a sheet-and-cell `source_locator` and `last_reviewed_at`. Exact columns are fixed after the open decisions.
+
+`estimate_basis` takes `pre_census` or `census_based` for population stock and structure; `retro_projection` or `registered` for vital events; `retro_projection` or `border_police` for migration.
 
 An unpublished, suppressed or non-numeric cell stays blank and is counted in the validation report. It is never zero and never interpolated.
 
-The break register holds `break_id`, the series it applies to, `reference_date`, `reason` and `source_note`. Its first entry is 2025-01-01, the census recalculation, quoting Geostat's footnote. A source method change found in the audit is added the same way.
+The break register holds `break_id`, the series or families it applies to, `reference_date`, `reason` and `source_note`. Entries: 2025-01-01 census recalculation, applying to population stock, structure and every rate with a population denominator but not to event counts; 2014-01-01 vital-event method; 2012-01-01 migration method. Each quotes Geostat's footnote.
 
 ## 7. Validation and review stops
 
-Preparation fails unless all of these hold:
+Tolerances come from the audit's observed precision and are not widened to pass. Preparation fails unless all of these hold:
 
 1. Every archived file matches its manifest bytes and SHA-256; source IDs are registered; headers parse; coverage is derived from the file.
-2. Municipality codes equal the existing 64, region IDs equal the existing 11, excluded codes are absent, and keys are unique.
-3. Parts add to wholes: municipalities to regions to Georgia; sexes to total; age groups to total; births minus deaths to natural increase. Tolerance for tables published in thousands is the published rounding, observed as −0.3 to +0.5 thousand in the existing reconciliation; integer-person tables are exact. Tolerances are fixed before implementation from observed precision and are not widened to pass.
-4. Balancing check: the change between consecutive 1 January values for Georgia against births minus deaths plus net migration for the calendar year. The residual is reported for every year and never corrected. A residual outside tolerance must be explained by a break-register entry (the census step) or stops preparation.
-5. Census anchor: Geostat's census count against the 1 January 2025 value; the difference is reported.
-6. Cross-source parity at national level against Eurostat, UN and World Bank. Differences are documented, never corrected, and expected to widen from 2025.
-7. Every previously captured historical value is compared on refresh. A changed value, identity decision or definition is a stop-and-review event with a readable diff; the pipeline never silently overwrites history.
+2. Municipality codes equal the existing 64, region IDs equal the existing 11, excluded codes are absent, keys are unique. Name differences are bridged only by reviewed aliases; row position is never a join key.
+3. Parts add to wholes, **exactly at stored precision**: municipalities to regions to Georgia, with the starred city components added for the years they are published; sexes to total; ages to total; births minus deaths to natural increase.
+4. Balancing check: the change between consecutive 1 January values equals births minus deaths plus net migration within 0.5 person, in every transition except those the break register explains. The census step must equal the recalculation currently published (+225,922); any other residual stops preparation.
+5. Census anchor: Geostat's census count is compared with the 1 January 2025 value and the difference reported (+847 persons in the audit). Municipal 1 January 2025 values must be within ±1% of their census counts (observed largest 0.82%).
+6. Published rates are recomputed from counts: within 0.05 for rates published to one decimal, within 0.005 for total fertility rate. Life expectancy in the abridged table 27 is compared with table 28 within 0.25 years (observed 0.157, a method difference), reported and not corrected.
+7. Cross-source expectations: Eurostat equals Geostat on 1 January 2018–2024; the World Bank total equals Geostat's mid-year population except 2024; UN differences are reported only. A departure from an expected relationship stops for review.
+8. Every previously captured historical value is compared on refresh. A changed value, identity decision or definition is a stop-and-review event with a readable diff; the pipeline never silently overwrites history.
 
-Stops for user review: re-estimation of earlier years, a changed layout, a changed definition, a table available only as PDF, an unexplained residual, a new break candidate. Tests corrupt one representative case per stop condition and show that preparation fails.
+Stops for user review: re-estimation of earlier years, a changed layout, a changed definition, a table available only as PDF, an unexplained residual, a new break candidate, a new missing-value pattern, a display-rounded value read in place of a stored one. Tests corrupt one representative case per stop condition and show that preparation fails.
 
-The validation report records source hashes, coverage by family, the blank-cell inventory, the balancing residual by year, the census anchor difference, cross-source differences and any reviewed revision.
+The validation report records source hashes, coverage by family, the blank-cell inventory, the balancing residual by year, the census anchor, recomputed-rate deviations, cross-source differences and any reviewed revision.
 
-Review checkpoints: first the audit findings and break register; then the canonical-data diff and validation report. Only after the data stage passes do we design pages and integrate the files into the serving mirror, downloads and MCP.
+Review checkpoints: first the audit and break register (this stage); then the canonical-data diff and validation report. Only after the data stage passes do we design pages and integrate the files into the serving mirror, downloads and MCP.
 
 ## 8. Acceptance for this data stage
 
-Archived originals, canonical files, break register and validation report are reproducible from the reviewed sources. Published cells match the source exactly, blank cells stay blank, the 2025 break is registered, the balancing residual is reported for every year, and every stop condition is exercised by a test. Existing datasets and their public figures stay unchanged. No page, route or deployment is part of this stage.
+Archived originals, canonical files, break register and validation report are reproducible from the reviewed sources. Published cells match the source exactly at stored precision, blank cells stay blank, the three breaks are registered, the balancing residual is reported for every year, and every stop condition is exercised by a test. Existing datasets and their public figures stay unchanged. No page, route or deployment is part of this stage.
 
-When accepted: amend `Project_Definition.md` with a bounded demography extension (the `დემოგრაფია` sidebar marker stays non-clickable until a page spec is approved) and write `docs/data-methodology/demography.md` alongside the data.
+When accepted: amend `Project_Definition.md` with a bounded demography extension (the `დემოგრაფია` sidebar marker stays non-clickable until a page spec is approved), write `docs/data-methodology/demography.md` alongside the data, and add a `demography` entry to `lib/methodology/sourceInventory.ts` when the methodology page ships.
