@@ -1,6 +1,6 @@
 # Demography source review (Geostat, 2026-10)
 
-Reviewed 2026-10-01. Source inspection is complete for the four families approved the same day: population, age and sex structure, vital events and international migration. No canonical data file, route or page exists yet. `source-manifest.csv` records the URL, retrieval date, bytes and SHA-256 of every archived file, and all 29 rows were re-verified against the files on disk. The decisions taken after this review, and those still open, are in §9.
+Reviewed 2026-10-01. Source inspection is complete for the four families approved the same day: population, age and sex structure, vital events and international migration. No canonical data file, route or page exists yet. `source-manifest.csv` records the URL, retrieval date, bytes and SHA-256 of every archived file, and all 26 rows were re-verified against the files on disk. The decisions taken after this review, and those still open, are in §9.
 
 ## 1. What Geostat publishes, and what was archived
 
@@ -8,7 +8,7 @@ Geostat's [Population and Demography](https://www.geostat.ge/en/modules/categori
 
 | Family | Canonical inputs (proposed) | Validation only |
 | --- | --- | --- |
-| A. Population | 01 population on 1 January by region and municipality (reused capture) | 04 mid-year population; census table 2024; Eurostat; World Bank |
+| A. Population | 01 population on 1 January by region and municipality (reused capture) | 04 mid-year population; census table 2024 |
 | B. Structure | 02 population by age group and sex | 06 median age; 07 share aged 65+; 08 dependency ratios. 02-1 (single years of age, 2015–2026, exact persons) is archived but not proposed for this stage |
 | C. Vital events | 09 births, 19 deaths, 29 natural increase, 15 crude birth rate, 24 crude death rate, 16 fertility, 25 infant mortality rate, 28 life expectancy | 30 natural increase rate; 21 infant deaths; 27 abridged life tables |
 | D. Migration | 31 net migration, 32 immigrants and emigrants by age and sex, 33 by citizenship | |
@@ -78,12 +78,9 @@ All checks below were run on the archived files on 2026-10-01.
 
 Mid-year population equals the average of consecutive 1 January values in every year except 2024. Geostat publishes 3,699,557 for 2024, which is the average of 3,694,608 and the pre-census 3,704,506. Geostat's published 2024 rates therefore sit on the pre-census basis, and the 2025 rates on the census basis.
 
-**Cross-source parity.**
+**Outside sources, compared once and not used.** On 2026-10-01 Geostat's figures were compared with Eurostat (`demo_pjan`, updated 2026-09-25), the World Bank (SP.POP.TOTL, release 2026-07-13) and UN World Population Prospects 2024. Eurostat and the World Bank mostly re-publish Geostat: Eurostat equals Geostat's 1 January population for 2018–2024, and the World Bank equals Geostat's mid-year population to within one person except in 2024. Neither has absorbed the census yet. Eurostat shows the pre-census 3,704,506 for 1 January 2025, and the World Bank's 2024 total (3,812,518) averages across the break. The UN model stays near 3.81 million for 2023–2026, so it cannot confirm Geostat's numbers. No file from these sources is archived, no value from them is used, and no check depends on them.
 
-- **Eurostat** `demo_pjan` (updated 2026-09-25) equals Geostat's 1 January population exactly for 2018–2024. It differs for 2015–2017 (+7,584, −8,236, −8,174), carries the pre-retro-projection vintage for 2000–2014 (2004: 4,315,200 against 3,937,716; 2014: 4,490,498 against 3,716,911), has no 2013 value, and shows 3,704,506 for 2025, flagged estimated: the pre-census figure. Eurostat is a copy-integrity check for 2018–2024 only.
-- **World Bank** SP.POP.TOTL (release 2026-07-13) equals Geostat's mid-year population to within one person for 2004–2023 and 2025. For 2024 it shows 3,812,518, the average of the pre-census 1 January 2024 and the census-based 1 January 2025 (+112,961 against Geostat's 3,699,557). Its other demographic indicators are UN-modelled and differ from Geostat's (life expectancy by up to 1.25 years, crude birth rate by up to 1.67 per 1,000).
-- **UN World Population Prospects 2024**, Medium variant, is an independent model: about 3.81 million for 2023–2026 against Geostat's 3.74 million, 3.69 million, 3.93 million and 3.94 million. Births 2024 are 43.0 thousand against Geostat's 39.5 thousand, and total fertility rate 1.80 against 1.67. No 2026 edition was listed on 2026-10-01. UN figures are a plausibility reference with large documented differences, never a parity check.
-- The existing GDP per capita (`data/imports/gdp-overview-annual.csv`) implies 3,699.6k people for 2024 and 3,704.5k for 2025 (preliminary): Geostat's mid-year 2024 and the pre-census 1 January 2025. The shipped municipal budget-per-resident map uses the census-based 2025 values. Whether Geostat rebases per-capita GDP on the census is not stated; the repository already tracks a GDP revision scheduled for 2026-11-16.
+**Existing figures on the site.** The existing GDP per capita (`data/imports/gdp-overview-annual.csv`) implies 3,699.6k people for 2024 and 3,704.5k for 2025 (preliminary): Geostat's mid-year 2024 and the pre-census 1 January 2025. The shipped municipal budget-per-resident map uses the census-based 2025 values. Whether Geostat rebases per-capita GDP on the census is not stated; the repository already tracks a GDP revision scheduled for 2026-11-16.
 
 ## 7. Source anomalies and identity decisions for implementation
 
@@ -119,7 +116,4 @@ Decided on 2026-10-01 after this review:
 3. **Precision of the shipped municipal population file** (§7): left unchanged until the denominator policy is chosen.
 4. **Single years of age** (table 02-1): stay as the original archived file; not in the dataset until a page needs school-age or pension-age groups.
 5. **Population and age structure before 2015.** Geostat's metadata says the 2018 re-estimate covered "the main demographic indicators for the period 1994-2014", which includes the 1 January population, although table 01 carries no retro-projection footnote. Carried from 2004 with an explicit `retro_projection` flag for 1 January 2004–2014.
-
-Open:
-
-6. **Licences** for Eurostat, the World Bank and the UN extract were not reviewed. Geostat's Terms of Use (reviewed 2026-09-11) permit redistribution with credit. The cross-check files are evidence only and nothing from them is served, so this does not block the data stage.
+6. **Outside cross-checks dropped.** The Eurostat, World Bank and UN files were removed from the package and from the validation; §6 keeps a dated note. Geostat is the only source, and its Terms of Use (reviewed 2026-09-11) permit redistribution with credit.
