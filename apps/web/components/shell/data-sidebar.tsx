@@ -37,6 +37,7 @@ export function DataSidebar() {
   const inflationOverviewActive = pathname.endsWith("/explorer/inflation/overview");
   const inflationCategoriesActive = pathname.endsWith("/explorer/inflation/categories");
   const inflationProductsActive = pathname.endsWith("/explorer/inflation/products");
+  const inflationCitiesActive = pathname.includes("/explorer/inflation/cities");
 
   // Read after mount: the server render cannot see localStorage, and guessing
   // would flash the wrong width on every load.
@@ -263,6 +264,17 @@ export function DataSidebar() {
               >
                 <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${inflationProductsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
                 {message(messages, "common.inflationProducts")}
+              </Link>
+            ) : null}
+            {inflationActive ? (
+              <Link
+                href={pageHref("/explorer/inflation/cities", locale)}
+                data-testid="inflation-cities-link"
+                aria-current={inflationCitiesActive ? "page" : undefined}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${inflationCitiesActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
+              >
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${inflationCitiesActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+                {message(messages, "common.inflationCities")}
               </Link>
             ) : null}
 

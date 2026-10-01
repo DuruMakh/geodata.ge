@@ -39,7 +39,7 @@ beforeAll(async () => {
   catalogueFile = allPublications.find((file) => file.fileName === "catalogue.json")!;
   sourcesFile = allPublications.find((file) => file.fileName === "sources.json")!;
   datasetFiles = allPublications.filter(
-    (file) => file.fileName.endsWith(".json") && !["catalogue.json", "sources.json", "manifest.json", "inflation-categories.json"].includes(file.fileName),
+    (file) => file.fileName.endsWith(".json") && !["catalogue.json", "sources.json", "manifest.json", "inflation-categories.json", "inflation-cities.json"].includes(file.fileName),
   );
 });
 
@@ -273,6 +273,8 @@ describe("dataset publications", () => {
       "inflation-national.json",
       "inflation-categories.csv",
       "inflation-categories.json",
+      "inflation-cities.csv",
+      "inflation-cities.json",
       "manifest.json",
     ]);
   });

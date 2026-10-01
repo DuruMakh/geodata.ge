@@ -9,6 +9,7 @@ import {
   assertInflationParity,
   loadBasketWeights,
   loadCpiCategoryFacts,
+  loadCpiCityFacts,
   loadCpiFacts,
   loadInflationTargets,
 } from "../lib/data/inflation/importInflation";
@@ -17,6 +18,7 @@ import {
   loadEconomicSectorFactsFromMirror,
   loadInflationBasketWeightsFromMirror,
   loadInflationCategoryFactsFromMirror,
+  loadInflationCityFactsFromMirror,
   loadInflationCpiFactsFromMirror,
   loadInflationTargetsFromMirror,
   loadProductCatalogueFromMirror,
@@ -255,13 +257,14 @@ async function main() {
   const inflationTargets = await loadInflationTargets(SERVED_DATA_FILES.inflationTargets);
   const inflationCategoryFacts = await loadCpiCategoryFacts(SERVED_DATA_FILES.inflationCategoryFacts);
   const inflationBasketWeights = await loadBasketWeights(SERVED_DATA_FILES.inflationBasketWeights);
+  const inflationCityFacts = await loadCpiCityFacts(SERVED_DATA_FILES.inflationCityFacts);
   const productData = {
     catalogue: await loadProductCatalogueCsv(),
     facts: await loadProductFactsCsv(),
   };
   assertSubset(
     "Inflation source IDs",
-    [...inflationCpiFacts, ...inflationTargets, ...inflationCategoryFacts, ...inflationBasketWeights].map((row) => row.sourceId),
+    [...inflationCpiFacts, ...inflationTargets, ...inflationCategoryFacts, ...inflationBasketWeights, ...inflationCityFacts].map((row) => row.sourceId),
     sourceIds,
   );
   assertSubset("Product source IDs", productData.facts.map((row) => row.sourceId), sourceIds);
@@ -421,6 +424,7 @@ async function main() {
         await tx.inflationTarget.deleteMany();
         await tx.inflationCategoryFact.deleteMany();
         await tx.inflationBasketWeight.deleteMany();
+        await tx.inflationCityFact.deleteMany();
         await tx.inflationProductFact.deleteMany();
         await tx.inflationProduct.deleteMany();
         await tx.generalGovernmentBalanceFact.deleteMany();
@@ -723,6 +727,14 @@ async function main() {
             importRunId: run.id,
           })),
         });
+        await tx.inflationCityFact.createMany({
+          data: inflationCityFacts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
+            ...fact,
+            sourceDocumentId: sourceId,
+            lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`),
+            importRunId: run.id,
+          })),
+        });
         await tx.inflationProduct.createMany({ data: productData.catalogue });
         // Bounded statements keep parameter counts well below PostgreSQL's limit.
         for (let offset = 0; offset < productData.facts.length; offset += 2_000) {
@@ -745,6 +757,7 @@ async function main() {
           targets: await loadInflationTargetsFromMirror(tx),
           categories: await loadInflationCategoryFactsFromMirror(tx),
           weights: await loadInflationBasketWeightsFromMirror(tx),
+          cities: await loadInflationCityFactsFromMirror(tx),
         };
         assertInflationParity(
           {
@@ -752,6 +765,7 @@ async function main() {
             targets: inflationTargets,
             categories: inflationCategoryFacts,
             weights: inflationBasketWeights,
+            cities: inflationCityFacts,
           },
           mirrorInflation,
         );
@@ -952,6 +966,7 @@ async function main() {
             { table: "InflationTarget", csvRows: inflationTargets.length, dbRows: mirrorInflation.targets.length },
             { table: "InflationCategoryFact", csvRows: inflationCategoryFacts.length, dbRows: mirrorInflation.categories.length },
             { table: "InflationBasketWeight", csvRows: inflationBasketWeights.length, dbRows: mirrorInflation.weights.length },
+            { table: "InflationCityFact", csvRows: inflationCityFacts.length, dbRows: mirrorInflation.cities.length },
             { table: "InflationProduct", csvRows: productData.catalogue.length, dbRows: mirrorProducts.catalogue.length },
             { table: "InflationProductFact", csvRows: productData.facts.length, dbRows: mirrorProducts.facts.length },
             {

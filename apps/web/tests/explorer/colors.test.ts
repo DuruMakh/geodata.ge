@@ -160,3 +160,16 @@ describe("ministries scope on the reviewed corpus", () => {
     expect(model.items.length).toBeGreaterThan(60);
   });
 });
+
+describe("inflation city colours", () => {
+  const CITIES = ["city.tbilisi", "city.kutaisi", "city.batumi", "city.gori", "city.telavi", "city.zugdidi"];
+  it("gives each city a distinct colour that holds 3:1 against paper and tint", () => {
+    const colours = CITIES.map((id) => SERIES_COLORS[id]);
+    expect(new Set(colours).size).toBe(6);
+    for (const colour of colours) {
+      expect(colour).toMatch(/^#[0-9A-F]{6}$/);
+      expect(contrastRatio(colour!, PAPER)).toBeGreaterThanOrEqual(3);
+      expect(contrastRatio(colour!, TINT)).toBeGreaterThanOrEqual(3);
+    }
+  });
+});

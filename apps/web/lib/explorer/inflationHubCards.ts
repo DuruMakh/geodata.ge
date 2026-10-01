@@ -1,5 +1,5 @@
 import { periodFromKey } from "../data/inflation/periods";
-import type { CategoryFactInput, ServedBasketWeightRow, ServedCpiFact } from "../data/inflation/types";
+import type { CategoryFactInput, CityFactInput, ServedBasketWeightRow, ServedCpiFact } from "../data/inflation/types";
 import type { ServedProductData } from "../data/inflation/importProducts";
 import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
@@ -8,13 +8,15 @@ import { formatShare } from "./format";
 import type { HubCardModel } from "./hubCards";
 import { buildCategoryIndex, latestContributors } from "./inflationCategories";
 import { categoryColor, categoryLabel, formatContribution } from "./inflationCategoryLabels";
+import { buildCityIndex } from "./inflationCities";
+import { latestCityIndicators } from "./inflationCityIndicators";
+import { cityLineLabel } from "./inflationCityLabels";
 import { periodLabel } from "./inflationLabels";
 import { productColor } from "./inflationProducts";
 
 // Inflation hub cards reuse the budget card anatomy (DESIGN.md §6.6). The
-// overview, categories and products are delivered; cities is a coming-soon
-// marker. Figures come from
-// served facts at build time.
+// overview, categories, products and cities are all delivered. Figures come
+// from served facts at build time.
 
 export type ProductHubSummary = {
   productId: string;
@@ -48,6 +50,7 @@ export function buildInflationHubCards(
   categories: CategoryFactInput[],
   weights: ServedBasketWeightRow[],
   productSummary: ProductHubSummary | null = null,
+  cities: CityFactInput[] = [],
 ): HubCardModel[] {
   const t = (key: string) => message(presentation.messages, `inflation.${key}`);
   const yoy = facts
@@ -67,51 +70,60 @@ export function buildInflationHubCards(
           .sort((a, b) => a[0] - b[0])
           .map(([, value]) => value);
 
-  return [
-    {
-      index: "01",
-      title: t("heading"),
-      description: t("description"),
-      href: "/explorer/inflation/overview",
-      comingSoon: false,
-      series: yoy.map((fact) => fact.value),
-      seriesColor: INK,
-      footer: last
-        ? `${periodLabel(presentation.messages, periodFromKey(last.period), "long")} · ${formatShare(last.value / 100)}`
+  const overviewCard: HubCardModel = {
+    index: "01",
+    title: t("heading"),
+    description: t("description"),
+    href: "/explorer/inflation/overview",
+    comingSoon: false,
+    series: yoy.map((fact) => fact.value),
+    seriesColor: INK,
+    footer: last
+      ? `${periodLabel(presentation.messages, periodFromKey(last.period), "long")} · ${formatShare(last.value / 100)}`
+      : null,
+  };
+
+  const categoriesCard: HubCardModel = {
+    index: "02",
+    title: t("categoriesHeading"),
+    description: t("categoriesDescription"),
+    href: "/explorer/inflation/categories",
+    comingSoon: false,
+    series: leaderSeries,
+    seriesColor: leader === null ? INK : categoryColor(leader.categoryId),
+    footer:
+      top && leader
+        ? `${periodLabel(presentation.messages, top.period, "long")} · ${categoryLabel(presentation.messages, leader.categoryId)} ${formatContribution(leader.value)} ${t("pp")}`
         : null,
-    },
-    {
-      index: "02",
-      title: t("categoriesHeading"),
-      description: t("categoriesDescription"),
-      href: "/explorer/inflation/categories",
-      comingSoon: false,
-      series: leaderSeries,
-      seriesColor: leader === null ? INK : categoryColor(leader.categoryId),
-      footer:
-        top && leader
-          ? `${periodLabel(presentation.messages, top.period, "long")} · ${categoryLabel(presentation.messages, leader.categoryId)} ${formatContribution(leader.value)} ${t("pp")}`
-          : null,
-    },
-    {
-      index: "03",
-      title: t("cardProducts"),
-      description: t("cardProductsDescription"),
-      href: "/explorer/inflation/products",
-      comingSoon: false,
-      series: productSummary?.annualSeries ?? null,
-      seriesColor: productSummary ? productColor(productSummary.productId) : null,
-      footer: productSummary ? `${periodLabel(presentation.messages, periodFromKey(productSummary.latestPeriod), "long")} · ${presentation.locale === "ka" ? productSummary.labelKa : productSummary.labelEn} ${formatShare(productSummary.annualChangePct / 100)}` : null,
-    },
-    {
-      index: "04",
-      title: t("cardCities"),
-      description: t("cardCitiesDescription"),
-      href: null,
-      comingSoon: true,
-      series: null,
-      seriesColor: null,
-      footer: null,
-    },
-  ];
+  };
+
+  const productsCard: HubCardModel = {
+    index: "03",
+    title: t("cardProducts"),
+    description: t("cardProductsDescription"),
+    href: "/explorer/inflation/products",
+    comingSoon: false,
+    series: productSummary?.annualSeries ?? null,
+    seriesColor: productSummary ? productColor(productSummary.productId) : null,
+    footer: productSummary ? `${periodLabel(presentation.messages, periodFromKey(productSummary.latestPeriod), "long")} · ${presentation.locale === "ka" ? productSummary.labelKa : productSummary.labelEn} ${formatShare(productSummary.annualChangePct / 100)}` : null,
+  };
+
+  // Cities lead with the highest city's annual rate; the sparkline is the gap
+  // between cities, the question the section adds (spec §5).
+  const cityIndex = cities.length > 0 ? buildCityIndex(cities) : null;
+  const cityLatest = cityIndex === null ? null : latestCityIndicators(cityIndex);
+  const citiesCard: HubCardModel = {
+    index: "04",
+    title: t("citiesHeading"),
+    description: t("citiesDescription"),
+    href: "/explorer/inflation/cities",
+    comingSoon: false,
+    series: cityLatest === null ? null : cityLatest.gap.spark.filter((value): value is number => value !== null),
+    seriesColor: INK,
+    footer: cityLatest === null
+      ? null
+      : `${periodLabel(presentation.messages, cityLatest.period, "long")} · ${cityLatest.highest.cityIds.map((id) => cityLineLabel(presentation.messages, id)).join(", ")} ${formatShare(cityLatest.highest.value / 100)}`,
+  };
+
+  return [overviewCard, categoriesCard, productsCard, citiesCard];
 }

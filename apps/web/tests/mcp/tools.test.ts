@@ -339,7 +339,7 @@ describe("MCP tool surface", () => {
     const instructions = serverInstructions({}, ENTITY_COUNTS);
     expect(instructions).toContain("INFLATION");
     expect(instructions).toContain("only monthly dataset");
-    expect(instructions).toContain("schema 1.3.0");
+    expect(instructions).toContain("schema 1.4.0");
     expect(instructions).not.toContain("Quarterly or monthly data, live budget execution");
   });
 

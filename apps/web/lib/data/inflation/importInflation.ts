@@ -3,23 +3,30 @@ import { readCsvRecords } from "../csv";
 import { assertSameServedRows } from "../servedDataParity";
 import {
   CPI_CATEGORY_MEASURES,
+  CPI_CITY_IDS,
+  CPI_CITY_MEASURES,
   CPI_MEASURES,
   CPI_SERIES_IDS,
   type BasketWeightRow,
   type CpiCategoryFact,
   type CpiCategoryMeasure,
+  type CpiCityFact,
+  type CpiCityMeasure,
   type CpiFact,
   type InflationTargetRow,
   type ServedBasketWeightRow,
   type ServedCpiCategoryFact,
+  type ServedCpiCityFact,
   type ServedCpiFact,
   type ServedInflationTargetRow,
 } from "./types";
 import {
   categoryFactKey,
+  cityFactKey,
   factKey,
   validateBasketWeights,
   validateCategoryFacts,
+  validateCityFacts,
   validateCpiFacts,
   validateTargetRows,
 } from "./validateInflation";
@@ -89,6 +96,29 @@ export async function loadCpiCategoryFacts(relativePath = CPI_CATEGORY_FACTS_CSV
   return facts;
 }
 
+export const CPI_CITY_FACTS_CSV = "../../data/imports/cpi-cities-monthly.csv";
+
+export async function loadCpiCityFacts(relativePath = CPI_CITY_FACTS_CSV): Promise<CpiCityFact[]> {
+  const rows = await readCsvRecords(relativePath);
+  const facts = rows.map((row): CpiCityFact => {
+    if (!(CPI_CITY_IDS as readonly string[]).includes(row.city_id)) throw new Error(`Unknown city ${row.city_id}`);
+    if (!(CPI_CITY_MEASURES as readonly string[]).includes(row.measure)) throw new Error(`Unknown city measure ${row.measure}`);
+    return {
+      cityId: row.city_id as CpiCityFact["cityId"],
+      seriesId: row.series_id,
+      measure: row.measure as CpiCityMeasure,
+      period: row.period,
+      value: new Decimal(row.value).toFixed(),
+      status: row.status as CpiCityFact["status"],
+      sourceId: row.source_id,
+      sourceLocator: row.source_locator,
+      lastReviewedAt: row.last_reviewed_at,
+    };
+  });
+  validateCityFacts(facts);
+  return facts;
+}
+
 export async function loadBasketWeights(relativePath = BASKET_WEIGHTS_CSV): Promise<BasketWeightRow[]> {
   const rows = await readCsvRecords(relativePath);
   return rows.map((row) => ({
@@ -103,17 +133,19 @@ export async function loadBasketWeights(relativePath = BASKET_WEIGHTS_CSV): Prom
 const SOURCE_DOCUMENTS_CSV = "../../data/sources/source-documents.csv";
 
 export function assertInflationParity(
-  csv: { facts: CpiFact[]; targets: InflationTargetRow[]; categories: CpiCategoryFact[]; weights: BasketWeightRow[] },
-  db: { facts: CpiFact[]; targets: InflationTargetRow[]; categories: CpiCategoryFact[]; weights: BasketWeightRow[] },
+  csv: { facts: CpiFact[]; targets: InflationTargetRow[]; categories: CpiCategoryFact[]; weights: BasketWeightRow[]; cities: CpiCityFact[] },
+  db: { facts: CpiFact[]; targets: InflationTargetRow[]; categories: CpiCategoryFact[]; weights: BasketWeightRow[]; cities: CpiCityFact[] },
 ): void {
   validateCpiFacts(db.facts);
   validateTargetRows(db.targets);
   validateCategoryFacts(db.categories);
   validateBasketWeights(db.weights, new Set(db.categories.map((fact) => fact.categoryId)));
+  validateCityFacts(db.cities);
   assertSameServedRows("Inflation CPI", csv.facts, db.facts, factKey);
   assertSameServedRows("NBG inflation target", csv.targets, db.targets, (row) => row.effectiveFrom);
   assertSameServedRows("Inflation CPI categories", csv.categories, db.categories, categoryFactKey);
   assertSameServedRows("CPI basket weights", csv.weights, db.weights, (row) => `${row.categoryId}:${row.year}`);
+  assertSameServedRows("Inflation CPI cities", csv.cities, db.cities, cityFactKey);
 }
 
 /**
@@ -130,6 +162,7 @@ export type ServedInflationData = {
   targets: ServedInflationTargetRow[];
   categories: ServedCpiCategoryFact[];
   weights: ServedBasketWeightRow[];
+  cities: ServedCpiCityFact[];
 };
 
 export function loadServedInflationData(): Promise<ServedInflationData> {
@@ -146,30 +179,34 @@ async function loadServedInflationDataUncached(): Promise<{
   targets: ServedInflationTargetRow[];
   categories: ServedCpiCategoryFact[];
   weights: ServedBasketWeightRow[];
+  cities: ServedCpiCityFact[];
 }> {
   const mode = resolveServedDataSource();
   let facts = await loadCpiFacts();
   let targets = await loadInflationTargets();
   let categories = await loadCpiCategoryFacts();
   let weights = await loadBasketWeights();
+  let cities = await loadCpiCityFacts();
   validateBasketWeights(weights, new Set(categories.map((fact) => fact.categoryId)));
   const registered = new Set((await readCsvRecords(SOURCE_DOCUMENTS_CSV)).map((row) => row.source_id));
-  for (const id of new Set([...facts, ...targets, ...categories, ...weights].map((row) => row.sourceId))) {
+  for (const id of new Set([...facts, ...targets, ...categories, ...weights, ...cities].map((row) => row.sourceId))) {
     if (!registered.has(id)) throw new Error(`Inflation source ${id} is not registered in data/sources/source-documents.csv`);
   }
   if (mode === "db") {
     const { loadInflationDataFromDb } = await import("../../db/servedDataDb");
     const db = await loadInflationDataFromDb();
-    assertInflationParity({ facts, targets, categories, weights }, db);
+    assertInflationParity({ facts, targets, categories, weights, cities }, db);
     facts = db.facts;
     targets = db.targets;
     categories = db.categories;
     weights = db.weights;
+    cities = db.cities;
   }
   return {
     facts: facts.map((fact) => ({ ...fact, value: Number(fact.value) })),
     targets: targets.map((row) => ({ ...row, targetPct: Number(row.targetPct) })),
     categories: categories.map((fact) => ({ ...fact, value: Number(fact.value) })),
     weights: weights.map((row) => ({ ...row, weightPct: Number(row.weightPct) })),
+    cities: cities.map((fact) => ({ ...fact, value: Number(fact.value) })),
   };
 }
