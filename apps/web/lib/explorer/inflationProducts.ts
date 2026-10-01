@@ -133,7 +133,7 @@ export function productCumulative(index: ProductIndex, id: string, startYear: nu
     return { value: null, reason: "missing_month", missingPeriod: run.start + missing };
   }
   if (endPeriod >= run.start + run.values.length) {
-    return { value: null, reason: "missing_month", missingPeriod: run.start + run.values.length };
+    return { value: null, reason: "missing_month", missingPeriod: Math.max(start, run.start + run.values.length) };
   }
   return { value: run.prefix[right]!.div(run.prefix[left]!).minus(1).mul(100).toNumber(), reason: null, missingPeriod: null };
 }

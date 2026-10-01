@@ -23,6 +23,15 @@ const input = (measure = "yoy_pct", fromPeriod = "2026-02", toPeriod = fromPerio
 const errorCode = (response: FactQueryResponse) => response.kind === "error" ? response.error.code : response.status;
 
 describe("queryInflationProducts", () => {
+  it("names the first required January when compounding starts after the monthly run", () => {
+    const snapshot = synthetic([
+      fact("2025-01", "101"), fact("2025-02", "102"), fact("2026-01", "110", "yoy_index_100"),
+    ], "2025-01");
+    const row = rows(queryInflationProducts(snapshot, input("cumulative_pct", "2026-01", undefined, 2026)))[0]!;
+    expect(row).toMatchObject({ value: null, availability: "missing", calculationBasePeriod: "2025-12" });
+    expect(row.missingReasonEn).toContain("2026-01");
+    expect(row.missingReasonEn).not.toContain("2025-03");
+  });
   it("uses the published annual index rather than monthly compounding", () => {
     const [row] = rows(queryInflationProducts(synthetic(), input()));
     expect(row).toMatchObject({ value: 60, unit: "percent", basis: "published", sourceIds: ["source.geostat_product_yoy"] });
