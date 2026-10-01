@@ -135,7 +135,7 @@
 - [x] **Step 2: Run the tests.** Expected: fail.
 - [x] **Step 3: Implement preparation and the script.** Add `data:prepare-demography` and `data:check-demography` to `package.json` and append `npm run data:check-demography` to `data:validate`.
 - [x] **Step 4: Run `npm run data:prepare-demography`, then `npm run data:check-demography`.** Read the report and the row counts: 923 population, 1,587 structure, 2,595 vital and 1,274 migration rows, one break, 11 rate checks within their bounds.
-- [ ] **Review checkpoint:** the user inspects the break register and the canonical-data diff before Task 8.
+- [x] **Review checkpoint:** the user inspects the break register and the canonical-data diff before Task 8. (Reviewed; the user approved proceeding to Task 8 on 2026-10-01.)
 - [x] **Step 5: Commit the code, canonical files and report.**
 
 ### Task 8: Registration, methodology, scope amendment and final verification
@@ -148,5 +148,5 @@
 - [x] **Step 2: Update the two source-count tests from 132 to 143.** Run `npx vitest run tests/factQuery/reference.test.ts`; a disagreement is a stop condition, reported and not edited away. (51 tests agree; the fact-query, MCP and methodology folders pass, 864 tests.)
 - [x] **Step 3: Write `docs/data-methodology/demography.md`.** Scope, sources and hashes, definitions from Geostat's metadata, the census break and the 2014 and 2012 start dates, the integer-persons rule, the identities and tolerances, the revision precedent, the refresh rhythm and the stored-versus-displayed note about `municipal-population-2025.csv`.
 - [x] **Step 4: Amend `Project_Definition.md`** with a bounded demography data-stage approval. The `დემოგრაფია` sidebar marker stays non-clickable and no page, route or export is approved.
-- [ ] **Step 5: Run the done-check once.** From `apps/web`: `npm run check`, then `npm run build`. No UI changes, so no browser tests. Report any failure with its output.
-- [ ] **Step 6: Commit.** Do not open a pull request unless asked.
+- [x] **Step 5: Run the done-check once.** From `apps/web`: `npm run check`, then `npm run build`. No UI changes, so no browser tests. Report any failure with its output. `npm run check` passed (316 test files, 2,674 tests). `npm run build` cannot finish in the cloud sandbox: Turbopack's `next/font/google` loader fails with `Module not found: Can't resolve '@vercel/turbopack-next/internal/font/google/font'`, and the commit before this work (`e30ba0c`) fails identically there. With the Google fonts stubbed out temporarily (not committed), the whole build passes: the prebuild steps, the compile, all 251 static pages and the post-build checks, including 21 fact-query publications current at the new data version. The real build, with fonts, runs in CI.
+- [x] **Step 6: Commit.** Do not open a pull request unless asked.
