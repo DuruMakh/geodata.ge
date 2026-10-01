@@ -2,6 +2,10 @@ import type { FactQuerySnapshot } from "./types";
 
 // Authored service sentence keys; their text is supplied by the snapshot.
 export const SERVICE_MESSAGE_KEYS = [
+  "publication.inflationProductsNotice",
+  "definitions.inflationProductMonthlyIndex",
+  "definitions.inflationProductAnnualIndex",
+  "definitions.inflationProductCumulativeBase",
   "coverage.inflationProductCumulative",
   "errors.compareProductCumulative",
   "ranking.inflationProducts",

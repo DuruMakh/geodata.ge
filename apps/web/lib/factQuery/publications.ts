@@ -5,9 +5,8 @@
 // scripts/prepare-fact-query-publications.ts owns all I/O, exactly as
 // buildSnapshot and prepare-fact-query-snapshot already split those concerns.
 //
-// Every figure here comes from the Part 1 query functions. Nothing in this
-// file recalculates a budget number, so a published file and an MCP answer
-// cannot disagree: there is only one implementation of an observation.
+// Observation figures come from the query functions. Product publications
+// preserve exact published input indices directly from the sanitized snapshot.
 import { queryGdp } from "./queryGdp";
 import { queryEconomicSectors } from "./queryEconomicSectors";
 import { queryRegionalEconomies } from "./queryRegionalEconomies";
@@ -20,6 +19,9 @@ import { CITY_FIRST_PERIOD } from "../data/inflation/types";
 import { inflationSeriesCoverage, measurePeriodRange, periodsBetween, weightYearRange } from "./inflationData";
 import { CITY_SERIES_MEASURES, INFLATION_DEFINITIONS, NATIONAL_SERIES, TARGET_SERIES_ID, type InflationMeasure } from "./inflationSeries";
 import { inflationObservations } from "./queryInflation";
+import { inflationProductSources } from "./inflationProductData";
+import { PRODUCT_QUERY_MEASURES } from "./inflationProductSeries";
+import { selectSources } from "./sources";
 import { createHash } from "node:crypto";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { describeCoverage, type CoverageData } from "./describeCoverage";
@@ -65,6 +67,7 @@ const DATASET_IDS: readonly DatasetId[] = [
   "economic-sectors",
   "regional-economies",
   "inflation",
+  "inflation-products",
 ];
 
 /**
@@ -468,6 +471,7 @@ export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationAr
   const inflationCategoriesCsv = buildInflationCategoriesCsv(inflationCategories);
   const inflationCities = inflationCityParts(snapshot);
   const inflationCitiesCsv = buildInflationCitiesCsv(inflationCities);
+  const inflationProductsCsv = buildInflationProductsCsv(snapshot);
   const artifacts = [
     buildCatalogueFile(snapshot),
     buildSourcesFile(snapshot),
@@ -492,6 +496,8 @@ export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationAr
     buildInflationCategoriesJson(snapshot, inflationCategories, inflationCategoriesCsv),
     inflationCitiesCsv,
     buildInflationCitiesJson(snapshot, inflationCities, inflationCitiesCsv),
+    inflationProductsCsv,
+    buildInflationProductsJson(snapshot, inflationProductsCsv),
   ];
   return [...artifacts, buildManifestFile(snapshot, artifacts)];
 }
@@ -792,4 +798,60 @@ function buildInflationCitiesJson(snapshot: FactQuerySnapshot, parts: FactQueryR
     caveats: results.reduce<Caveat[]>((all, result) => mergeCaveats(all, result.meta.caveats), []),
   });
   return { fileName: "inflation-cities.json", bytes, rowCount: csv.rowCount };
+}
+
+export const INFLATION_PRODUCTS_CSV_COLUMNS = ["series_id", "measure", "period", "index_100", "availability", "source_ids"] as const;
+
+/** Exact source-precision inputs, including explicit missing cells; no query-output envelope. */
+export function buildInflationProductsCsv(snapshot: FactQuerySnapshot): PublicationArtifact {
+  const ordered = [...snapshot.inflationProducts.facts].sort((a, b) => {
+    if (a.productId !== b.productId) return a.productId < b.productId ? -1 : 1;
+    if (a.measure !== b.measure) return a.measure < b.measure ? -1 : 1;
+    return a.period < b.period ? -1 : a.period > b.period ? 1 : 0;
+  });
+  const rows = ordered.map(fact => [fact.productId, fact.measure, fact.period, fact.index100 ?? "", fact.availability, fact.sourceId].map(csvEscape).join(","));
+  const bytes = Buffer.from(`\uFEFF${INFLATION_PRODUCTS_CSV_COLUMNS.join(",")}\n${rows.join("\n")}\n`, "utf8");
+  return { fileName: "inflation-products.csv", bytes, rowCount: rows.length };
+}
+
+export function buildInflationProductsJson(snapshot: FactQuerySnapshot, csv: PublicationArtifact): PublicationArtifact {
+  const bilingual = (key: Parameters<typeof serviceMessage>[2]) => ({
+    ka: serviceMessage(snapshot, "ka", key), en: serviceMessage(snapshot, "en", key),
+  });
+  const coverage = Object.fromEntries((["mom_index_100", "yoy_index_100"] as const).map(measure => {
+    const facts = snapshot.inflationProducts.facts.filter(fact => fact.measure === measure);
+    const periods = facts.map(fact => fact.period).sort();
+    const availableCount = facts.filter(fact => fact.index100 !== null).length;
+    return [measure, { periods: [periods[0], periods.at(-1)], rowCount: facts.length, availableCount, missingCount: facts.length - availableCount }];
+  }));
+  const bytes = serialize({
+    ...publicationHeader(snapshot),
+    datasetId: "inflation-products",
+    notice: serviceMessage(snapshot, "ka", "publication.inflationProductsNotice"),
+    noticeEn: serviceMessage(snapshot, "en", "publication.inflationProductsNotice"),
+    catalogue: catalogueData(snapshot, "inflation-products"),
+    coverage,
+    queryMeasures: [...PRODUCT_QUERY_MEASURES],
+    data: {
+      url: "/downloads/data/inflation-products.csv", mediaType: "text/csv",
+      columns: [...INFLATION_PRODUCTS_CSV_COLUMNS], rowCount: csv.rowCount,
+      byteSize: csv.bytes.byteLength, sha256: sha256(csv.bytes),
+    },
+    definitions: {
+      mom_index_100: { ...bilingual("definitions.inflationProductMonthlyIndex"), reference: "previous_month", unit: "index_previous_month_100", calculation: "published" },
+      yoy_index_100: { ...bilingual("definitions.inflationProductAnnualIndex"), reference: "same_month_previous_year", unit: "index_previous_year_100", calculation: "published" },
+      yoy_pct: { ...bilingual("definitions.inflationProductAnnual"), formula: "yoy_index_100 - 100", unit: "percent", calculation: "published_index_minus_100" },
+      cumulative_pct: {
+        ka: serviceMessage(snapshot, "ka", "definitions.inflationProductCumulative", { basePeriod: "(startYear - 1)-12" }),
+        en: serviceMessage(snapshot, "en", "definitions.inflationProductCumulative", { basePeriod: "(startYear - 1)-12" }),
+        formula: "(product(mom_index_100 / 100, January(startYear)..endpoint) - 1) * 100",
+        unit: "percent", calculation: "fiscal_ge_derived", calculationBasePeriod: "(startYear - 1)-12", requiresCompleteInputs: true,
+        baseDefinitionKa: serviceMessage(snapshot, "ka", "definitions.inflationProductCumulativeBase"),
+        baseDefinitionEn: serviceMessage(snapshot, "en", "definitions.inflationProductCumulativeBase"),
+      },
+    },
+    sources: selectSources(snapshot, [...new Set(snapshot.inflationProducts.facts.map(fact => fact.sourceId))]),
+    derivationSources: inflationProductSources(snapshot, "cumulative_pct"),
+  });
+  return { fileName: "inflation-products.json", bytes, rowCount: csv.rowCount };
 }
